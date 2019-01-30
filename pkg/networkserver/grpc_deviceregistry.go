@@ -58,18 +58,6 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			// TODO: Apply version IDs (https://github.com/TheThingsIndustries/lorawan-stack/issues/1544)
 		}
 
-		if req.Device.MACSettings == nil {
-			return nil, nil, errNoMACSettings
-		}
-
-		if !ttnpb.HasAnyField(paths, "mac_settings.adr_margin") {
-			// TODO: Apply NS-wide default (https://github.com/TheThingsIndustries/lorawan-stack/issues/1544)
-			req.Device.MACSettings.ADRMargin = 15
-			paths = append(paths, "mac_settings.adr_margin")
-		} else if req.Device.MACSettings.ADRMargin == 0 {
-			return nil, nil, errInvalidADRMargin
-		}
-
 		if err := ttnpb.RequireFields(paths,
 			"frequency_plan_id",
 			"lorawan_phy_version",
@@ -85,24 +73,32 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			return nil, nil, errInvalidFieldMask.WithCause(err)
 		}
 
-		if ttnpb.HasAnyField(paths, "supports_class_b") {
-			if !ttnpb.HasAnyField(paths, "mac_settings.class_b_timeout") {
-				// TODO: Apply NS-wide default if not set (https://github.com/TheThingsIndustries/lorawan-stack/issues/1544)
-				req.Device.MACSettings.ClassBTimeout = time.Minute
-				paths = append(paths, "mac_settings.class_b_timeout")
-			} else if req.Device.MACSettings.ClassBTimeout == 0 {
-				return nil, nil, errInvalidClassBTimeout
-			}
+		if req.Device.MACSettings == nil {
+			return nil, nil, errNoMACSettings
 		}
 
-		if ttnpb.HasAnyField(paths, "supports_class_c") {
-			if !ttnpb.HasAnyField(paths, "mac_settings.class_c_timeout") {
-				// TODO: Apply NS-wide default if not set (https://github.com/TheThingsIndustries/lorawan-stack/issues/1544)
-				req.Device.MACSettings.ClassCTimeout = 10 * time.Second
-				paths = append(paths, "mac_settings.class_c_timeout")
-			} else if req.Device.MACSettings.ClassCTimeout == 0 {
-				return nil, nil, errInvalidClassCTimeout
-			}
+		if !ttnpb.HasAnyField(paths, "mac_settings.adr_margin") {
+			// TODO: Apply NS-wide default (https://github.com/TheThingsIndustries/lorawan-stack/issues/1544)
+			req.Device.MACSettings.ADRMargin = 15
+			paths = append(paths, "mac_settings.adr_margin")
+		} else if req.Device.MACSettings.ADRMargin == 0 {
+			return nil, nil, errInvalidADRMargin
+		}
+
+		if !ttnpb.HasAnyField(paths, "mac_settings.class_b_timeout") {
+			// TODO: Apply NS-wide default if not set (https://github.com/TheThingsIndustries/lorawan-stack/issues/1544)
+			req.Device.MACSettings.ClassBTimeout = time.Minute
+			paths = append(paths, "mac_settings.class_b_timeout")
+		} else if req.Device.MACSettings.ClassBTimeout == 0 {
+			return nil, nil, errInvalidClassBTimeout
+		}
+
+		if !ttnpb.HasAnyField(paths, "mac_settings.class_c_timeout") {
+			// TODO: Apply NS-wide default if not set (https://github.com/TheThingsIndustries/lorawan-stack/issues/1544)
+			req.Device.MACSettings.ClassCTimeout = 10 * time.Second
+			paths = append(paths, "mac_settings.class_c_timeout")
+		} else if req.Device.MACSettings.ClassCTimeout == 0 {
+			return nil, nil, errInvalidClassCTimeout
 		}
 
 		if req.Device.SupportsJoin {
