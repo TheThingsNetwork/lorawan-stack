@@ -113,7 +113,7 @@ func SaveCache(cache Cache) (err error) {
 	}
 	_, err = os.Stat(filepath.Dir(cacheFile))
 	if os.IsNotExist(err) {
-		err = os.Mkdir(filepath.Dir(cacheFile), 0700)
+		err = os.MkdirAll(filepath.Dir(cacheFile), 0700)
 	}
 	if err != nil {
 		return err
