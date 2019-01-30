@@ -24,6 +24,9 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	"go.thethings.network/lorawan-stack/pkg/email"
+	"go.thethings.network/lorawan-stack/pkg/email/sendgrid"
+	"go.thethings.network/lorawan-stack/pkg/email/smtp"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/oauth"
 	"go.thethings.network/lorawan-stack/pkg/redis"
@@ -62,6 +65,11 @@ type Config struct {
 		Bucket      string `name:"bucket" description:"Bucket used for storing profile pictures"`
 		BucketURL   string `name:"bucket-url" description:"Base URL for public bucket access"`
 	} `name:"profile-picture"`
+	Email struct {
+		email.Config `name:",squash"`
+		SendGrid     sendgrid.Config `name:"sendgrid"`
+		SMTP         smtp.Config     `name:"smtp"`
+	} `name:"email"`
 }
 
 // IdentityServer implements the Identity Server component.
