@@ -181,9 +181,9 @@ func (s *server) RegisterRoutes(server *web.Server) {
 	page.POST("/authorize", s.Authorize(webui.Template.Handler), s.redirectToLogin)
 
 	if s.config.Mount != "" && s.config.Mount != "/" {
-		group.GET("", webui.Template.Handler)
+		group.GET("", webui.Template.Handler, middleware.CSRF())
 	}
-	group.GET("/*", webui.Template.Handler)
+	group.GET("/*", webui.Template.Handler, middleware.CSRF())
 
 	group.POST("/token", s.Token) // No CSRF here.
 }

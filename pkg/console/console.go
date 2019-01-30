@@ -162,7 +162,7 @@ func (console *Console) RegisterRoutes(server *web.Server) {
 	page.GET("/oauth/callback", console.Callback)
 
 	if console.config.Mount != "" && console.config.Mount != "/" {
-		group.GET("", webui.Template.Handler)
+		group.GET("", webui.Template.Handler, middleware.CSRF())
 	}
-	group.GET("/*", webui.Template.Handler)
+	group.GET("/*", webui.Template.Handler, middleware.CSRF())
 }
