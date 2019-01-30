@@ -15,6 +15,7 @@
 package commands
 
 import (
+	"go.thethings.network/lorawan-stack/cmd/internal/commands"
 	"go.thethings.network/lorawan-stack/cmd/internal/shared"
 	shared_applicationserver "go.thethings.network/lorawan-stack/cmd/internal/shared/applicationserver"
 	shared_console "go.thethings.network/lorawan-stack/cmd/internal/shared/console"
@@ -51,4 +52,8 @@ var DefaultConfig = Config{
 	AS:          shared_applicationserver.DefaultApplicationServerConfig,
 	JS:          shared_joinserver.DefaultJoinServerConfig,
 	Console:     shared_console.DefaultConsoleConfig,
+}
+
+func init() {
+	Root.AddCommand(commands.Config(mgr))
 }

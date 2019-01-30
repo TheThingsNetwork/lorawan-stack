@@ -35,6 +35,7 @@ const TimeFormat = time.RFC3339Nano
 // Manager is a manager for the configuration.
 type Manager struct {
 	name         string
+	envPrefix    string
 	viper        *viper.Viper
 	flags        *pflag.FlagSet
 	replacer     *strings.Replacer
@@ -62,11 +63,9 @@ func EnvKeyReplacer(r *strings.Replacer) Option {
 func (m *Manager) AllEnvironment() []string {
 	keys := m.AllKeys()
 	env := make([]string, 0, len(keys))
-
 	for _, key := range keys {
-		env = append(env, strings.ToUpper(m.replacer.Replace(m.name+"."+key)))
+		env = append(env, m.EnvironmentForKey(key))
 	}
-
 	return env
 }
 
@@ -75,8 +74,17 @@ func (m *Manager) AllEnvironment() []string {
 func (m *Manager) AllKeys() []string {
 	keys := m.viper.AllKeys()
 	sort.Strings(keys)
-
 	return keys
+}
+
+// EnvironmentForKey returns the name of the environment variable for the given config key.
+func (m *Manager) EnvironmentForKey(key string) string {
+	return strings.ToUpper(m.replacer.Replace(m.envPrefix + "." + key))
+}
+
+// Get returns the current value of the given config key.
+func (m *Manager) Get(key string) interface{} {
+	return m.viper.Get(key)
 }
 
 // Option is the type of an option for the manager.
@@ -121,11 +129,12 @@ var DefaultOptions = []Option{
 //                                         in which case the names are merged into the parent struct.
 func Initialize(name, envPrefix string, defaults interface{}, opts ...Option) *Manager {
 	m := &Manager{
-		name:     name,
-		viper:    viper.New(),
-		flags:    pflag.NewFlagSet(name, pflag.ExitOnError),
-		replacer: strings.NewReplacer(),
-		defaults: defaults,
+		name:      name,
+		envPrefix: envPrefix,
+		viper:     viper.New(),
+		flags:     pflag.NewFlagSet(name, pflag.ExitOnError),
+		replacer:  strings.NewReplacer(),
+		defaults:  defaults,
 	}
 
 	m.viper.SetTypeByDefaultValue(true)

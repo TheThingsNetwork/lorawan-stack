@@ -15,6 +15,7 @@
 package commands
 
 import (
+	"go.thethings.network/lorawan-stack/cmd/internal/commands"
 	conf "go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/log"
 )
@@ -55,4 +56,8 @@ var DefaultConfig = Config{
 	NetworkServerAddress:     clusterGRPCAddress,
 	ApplicationServerAddress: clusterGRPCAddress,
 	JoinServerAddress:        clusterGRPCAddress,
+}
+
+func init() {
+	Root.AddCommand(commands.Config(mgr))
 }
