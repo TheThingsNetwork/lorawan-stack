@@ -17,7 +17,11 @@ package commands
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"os"
 	"time"
 
@@ -87,10 +91,25 @@ var (
 			ctx = log.NewContext(ctx, logger)
 
 			// prepare the API
+			http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{}
 			api.SetLogger(logger)
-			api.SetInsecure(config.Insecure)
+			if config.Insecure {
+				api.SetInsecure(true)
+			}
 			if config.CA != "" {
-				if err = api.SetCA(config.CA); err != nil {
+				pemBytes, err := ioutil.ReadFile(config.CA)
+				if err != nil {
+					return err
+				}
+				rootCAs := http.DefaultTransport.(*http.Transport).TLSClientConfig.RootCAs
+				if rootCAs == nil {
+					if rootCAs, err = x509.SystemCertPool(); err != nil {
+						rootCAs = x509.NewCertPool()
+					}
+				}
+				rootCAs.AppendCertsFromPEM(pemBytes)
+				http.DefaultTransport.(*http.Transport).TLSClientConfig.RootCAs = rootCAs
+				if err = api.AddCA(pemBytes); err != nil {
 					return err
 				}
 			}

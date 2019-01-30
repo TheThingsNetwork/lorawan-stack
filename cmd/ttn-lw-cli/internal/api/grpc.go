@@ -18,7 +18,6 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
-	"io/ioutil"
 	"sync"
 
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -46,16 +45,19 @@ func SetInsecure(insecure bool) {
 	withInsecure = insecure
 }
 
-// SetCA sets the CA certificate file.
-func SetCA(ca string) error {
-	caBytes, err := ioutil.ReadFile(ca)
-	if err != nil {
-		return err
+// AddCA adds the CA certificate file.
+func AddCA(pemBytes []byte) (err error) {
+	if tlsConfig == nil {
+		tlsConfig = &tls.Config{}
 	}
-	pool := x509.NewCertPool()
-	if pool.AppendCertsFromPEM(caBytes) {
-		tlsConfig = &tls.Config{RootCAs: pool}
+	rootCAs := tlsConfig.RootCAs
+	if rootCAs == nil {
+		if rootCAs, err = x509.SystemCertPool(); err != nil {
+			rootCAs = x509.NewCertPool()
+		}
 	}
+	rootCAs.AppendCertsFromPEM(pemBytes)
+	tlsConfig.RootCAs = rootCAs
 	return nil
 }
 
