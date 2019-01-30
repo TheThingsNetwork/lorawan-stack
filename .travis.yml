@@ -29,9 +29,9 @@ before_install:
 - curl -L https://github.com/docker/compose/releases/download/1.23.2/docker-compose-`uname -s`-`uname -m` > docker-compose
 - chmod +x docker-compose
 - sudo mv docker-compose /usr/local/bin
-- openssl aes-256-cbc -K $encrypted_fc3d5d829302_key -iv $encrypted_fc3d5d829302_iv -in pkg/blob/testdata/gcloud.json.enc -out pkg/blob/testdata/gcloud.json -d
+- if [[ ! -z "$encrypted_fc3d5d829302_key" ]]; then openssl aes-256-cbc -K $encrypted_fc3d5d829302_key -iv $encrypted_fc3d5d829302_iv -in pkg/blob/testdata/gcloud.json.enc -out pkg/blob/testdata/gcloud.json -d; fi
 install: true
 script:
 - if [[ $TRAVIS_EVENT_TYPE != "push" ]]; then make ci.$RUNTYPE.full; else make ci.$RUNTYPE.simple; fi
 after_success:
-- if [[ $RUNTYPE == go.test.amd64 ]]; then make go.coveralls; fi
+- if [[ $RUNTYPE == go.test.amd64 && ! -z "$COVERALLS_TOKEN" ]]; then make go.coveralls; fi
