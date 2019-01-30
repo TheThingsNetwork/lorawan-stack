@@ -126,6 +126,9 @@ var (
 					Redis:     config.Redis,
 					Namespace: []string{"ns", "tasks"},
 				}), 100000, "ns", redis.Key(host, strconv.Itoa(os.Getpid())))
+				if err := nsDownlinkTasks.Init(); err != nil {
+					return shared.ErrInitializeNetworkServer.WithCause(err)
+				}
 				config.NS.DownlinkTasks = nsDownlinkTasks
 				ns, err := networkserver.New(c, &config.NS)
 				if err != nil {
