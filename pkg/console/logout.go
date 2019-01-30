@@ -24,5 +24,5 @@ import (
 func (console *Console) Logout(c echo.Context) error {
 	console.removeAuthCookie(c)
 
-	return c.NoContent(http.StatusOK)
+	return c.NoContent(http.StatusNoContent)
 }

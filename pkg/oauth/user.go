@@ -199,7 +199,7 @@ func (s *server) Login(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.NoContent(http.StatusOK)
+	return c.NoContent(http.StatusNoContent)
 }
 
 func (s *server) Logout(c echo.Context) error {
@@ -213,5 +213,5 @@ func (s *server) Logout(c echo.Context) error {
 		return err
 	}
 	s.removeAuthCookie(c)
-	return c.NoContent(http.StatusOK)
+	return c.NoContent(http.StatusNoContent)
 }
