@@ -11,9 +11,9 @@ matrix:
     - env: RUNTYPE=js
     - env: RUNTYPE=go.lint
     - env: RUNTYPE=go.test.amd64
-    - if: type != "push"
+    - if: type = pull_request
       env: RUNTYPE=go.test.386
-    - if: type != "push"
+    - if: type = pull_request OR branch =~ master$
       env: RUNTYPE=build-all
 go_import_path: go.thethings.network/lorawan-stack
 sudo: required
@@ -36,6 +36,6 @@ before_install:
 - if [[ ! -z "$encrypted_fc3d5d829302_key" ]]; then openssl aes-256-cbc -K $encrypted_fc3d5d829302_key -iv $encrypted_fc3d5d829302_iv -in pkg/blob/testdata/gcloud.json.enc -out pkg/blob/testdata/gcloud.json -d; fi
 install: true
 script:
-- if [[ $TRAVIS_EVENT_TYPE != "push" ]]; then make ci.$RUNTYPE.full; else make ci.$RUNTYPE.simple; fi
+- if [[ $TRAVIS_EVENT_TYPE = pull_request ]]; then make ci.$RUNTYPE.full; else make ci.$RUNTYPE.simple; fi
 after_success:
 - if [[ $RUNTYPE == go.test.amd64 && ! -z "$COVERALLS_TOKEN" ]]; then make go.coveralls; fi
