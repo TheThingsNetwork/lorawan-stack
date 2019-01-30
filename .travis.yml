@@ -39,3 +39,14 @@ script:
 - if [[ $TRAVIS_EVENT_TYPE = pull_request ]]; then make ci.$RUNTYPE.full; else make ci.$RUNTYPE.simple; fi
 after_success:
 - if [[ $RUNTYPE == go.test.amd64 && ! -z "$COVERALLS_TOKEN" ]]; then make go.coveralls; fi
+- |
+  if [[ $RUNTYPE == build-all && ! -z "$DOCKER_IMAGE" && ! -z "$DOCKER_USERNAME" && ! -z "$DOCKER_PASSWORD" ]]
+  then
+    make dev-deps deps docker
+    if [[ $TRAVIS_EVENT_TYPE == "push" && "$TRAVIS_BRANCH" =~ master$ ]]
+    then
+      docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+      docker tag "$DOCKER_IMAGE" "$DOCKER_IMAGE:latest"
+      docker push "$DOCKER_IMAGE:latest"
+    fi
+  fi
