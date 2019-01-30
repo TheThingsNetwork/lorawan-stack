@@ -76,15 +76,15 @@
   "views.console.application-general-settings.index.deleteApp": "Xxxxxx xxxxxxxxxxx",
   "views.console.application-general-settings.index.modalWarning": "Xxx xxx xxxx xxx xxxx xx xxxxxx \"{appName}\"? Xxxxxxxx xx xxxxxxxxxxx xxxxxx xx xxxxxx!",
   "views.console.application-general-settings.index.generalSettings": "Xxxxxxx Xxxxxxxx",
-  "views.console.login.index.welcome": "Xxxxxxx xx {ttnConsole}",
+  "views.console.login.index.welcome": "Xxxxxxx xx {stackConsole}",
   "views.console.login.index.login": "Xxx xxxx xx xx xxxxxx xx xx xxx xxxx xxxx",
-  "views.console.login.index.loginViaTTN": "Xxxxx xxx XXX Xxxxxxx",
+  "views.console.login.index.loginWithStackAccount": "Xxxxx xxxx xxxx XXX Xxxxx Xxxxxxx",
   "views.oauth.authorize.index.modalTitle": "Xxxxxxx xxx Xxxxxxxxxx",
   "views.oauth.authorize.index.modalSubtitle": "{clientName} xx xxxxxxxxxx xxxxxxxxxxx xx xx xxx xxxxxxxxx:",
   "views.oauth.authorize.index.loginInfo": "Xxx xxx xxxxxx xx xx {userId}.",
   "views.oauth.authorize.index.redirectInfo": "Xxx xxxx xx xxxxxxxxxx xx {redirectUri}",
   "views.oauth.authorize.index.authorize": "Xxxxxxxxx",
-  "views.oauth.create-account.index.createTtnAccount": "Xxxxxx Xxx Xxxxxx Xxxxxxx Xxxxxxx",
+  "views.oauth.create-account.index.createAccount": "Xxxxxx XXX Xxxxx Xxxxxxx",
   "views.oauth.create-account.index.register": "Xxxxxxxx",
   "views.oauth.create-account.index.goToLogin": "Xx xx xxxxx",
   "views.oauth.create-account.index.confirmPassword": "Xxxxxxx Xxxxxxxx",
@@ -96,5 +96,5 @@
   "views.oauth.create-account.index.registrationPending": "Xxx xxxx xxxxxxxxxxxx xxxx xxx xxxxxxxxxxxx xxxxxxx. Xxxxxx xxxx xxxxx xx xxxxx xxxxxxxx xx.",
   "views.oauth.login.index.createAccount": "Xxxxxx xx xxxxxxx",
   "views.oauth.login.index.loginToContinue": "Xxxxxx xxxxx xx xxxxxxxx",
-  "views.oauth.login.index.ttnAccount": "Xxx Xxxxxx Xxxxxxx Xxxxxxx"
+  "views.oauth.login.index.stackAccount": "XXX Xxxxx Xxxxxxx"
 }

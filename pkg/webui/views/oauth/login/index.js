@@ -35,7 +35,7 @@ import style from './login.styl'
 const m = defineMessages({
   createAccount: 'Create an account',
   loginToContinue: 'Please login to continue',
-  ttnAccount: 'The Things Network Account',
+  stackAccount: 'TTN Stack Account',
 })
 @withRouter
 @connect()
@@ -89,7 +89,7 @@ export default class OAuth extends React.PureComponent {
             </div>
           </div>
           <div className={style.right}>
-            <h1><Message content={m.ttnAccount} /></h1>
+            <h1><Message content={m.stackAccount} /></h1>
             <Form
               onSubmit={this.handleSubmit}
               initialValues={initialValues}

@@ -76,15 +76,15 @@
   "views.console.application-general-settings.index.deleteApp": "Delete application",
   "views.console.application-general-settings.index.modalWarning": "Are you sure you want to delete \"{appName}\"? Deleting an application cannot be undone!",
   "views.console.application-general-settings.index.generalSettings": "General Settings",
-  "views.console.login.index.welcome": "Welcome to {ttnConsole}",
+  "views.console.login.index.welcome": "Welcome to {stackConsole}",
   "views.console.login.index.login": "You need to be logged in to use this site",
-  "views.console.login.index.loginViaTTN": "Login via TTN Account",
+  "views.console.login.index.loginWithStackAccount": "Login with your TTN Stack Account",
   "views.oauth.authorize.index.modalTitle": "Request for Permission",
   "views.oauth.authorize.index.modalSubtitle": "{clientName} is requesting permissions to do the following:",
   "views.oauth.authorize.index.loginInfo": "You are logged in as {userId}.",
   "views.oauth.authorize.index.redirectInfo": "You will be redirected to {redirectUri}",
   "views.oauth.authorize.index.authorize": "Authorize",
-  "views.oauth.create-account.index.createTtnAccount": "Create The Things Network Account",
+  "views.oauth.create-account.index.createAccount": "Create TTN Stack Account",
   "views.oauth.create-account.index.register": "Register",
   "views.oauth.create-account.index.goToLogin": "Go to login",
   "views.oauth.create-account.index.confirmPassword": "Confirm Password",
@@ -96,5 +96,5 @@
   "views.oauth.create-account.index.registrationPending": "You have successfully sent the registration request. Please wait until an admin approves it.",
   "views.oauth.login.index.createAccount": "Create an account",
   "views.oauth.login.index.loginToContinue": "Please login to continue",
-  "views.oauth.login.index.ttnAccount": "The Things Network Account"
+  "views.oauth.login.index.stackAccount": "TTN Stack Account"
 }

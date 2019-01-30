@@ -45,8 +45,8 @@ export default class OAuthApp extends React.PureComponent {
         <Provider store={store}>
           <Init>
             <Helmet
-              titleTemplate="%s - Account - The Things Network"
-              defaultTitle="The Things Network Account"
+              titleTemplate="%s - Account - TTN Stack"
+              defaultTitle="TTN Stack Account"
             />
             <WithLocale>
               <ConnectedRouter history={history}>

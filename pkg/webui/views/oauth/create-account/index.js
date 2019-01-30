@@ -32,7 +32,7 @@ import IntlHelmet from '../../../lib/components/intl-helmet'
 import style from './create-account.styl'
 
 const m = defineMessages({
-  createTtnAccount: 'Create The Things Network Account',
+  createAccount: 'Create TTN Stack Account',
   register: 'Register',
   goToLogin: 'Go to login',
   confirmPassword: 'Confirm Password',
@@ -137,7 +137,7 @@ export default class CreateAccount extends React.PureComponent {
           <title><Message content={m.register} /></title>
         </IntlHelmet>
         <div className={style.wrapper}>
-          <h1><Message content={m.createTtnAccount} /></h1>
+          <h1><Message content={m.createAccount} /></h1>
           <Form
             onSubmit={this.handleSubmit}
             error={error}

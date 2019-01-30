@@ -52,8 +52,8 @@ export default class ConsoleApp extends React.Component {
     return (
       <div className={style.app}>
         <Helmet
-          titleTemplate="%s - Console - The Things Network"
-          defaultTitle="The Things Network Console"
+          titleTemplate="%s - Console - TTN Stack"
+          defaultTitle="TTN Stack Console"
         />
         <div id="modal-container" />
         <Header className={style.header} user={user} handleLogout={this.handleLogout} />

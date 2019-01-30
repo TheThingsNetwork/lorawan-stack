@@ -28,9 +28,9 @@ import sharedMessages from '../../../lib/shared-messages'
 import style from './login.styl'
 
 const m = defineMessages({
-  welcome: 'Welcome to {ttnConsole}',
+  welcome: 'Welcome to {stackConsole}',
   login: 'You need to be logged in to use this site',
-  loginViaTTN: 'Login via TTN Account',
+  loginWithStackAccount: 'Login with your TTN Stack Account',
 })
 
 @withEnv
@@ -65,12 +65,12 @@ export default class Login extends React.PureComponent {
             <Col>
               <Message
                 className={style.loginHeader}
-                values={{ ttnConsole: 'The Things Network Console' }}
+                values={{ stackConsole: 'TTN Stack Console' }}
                 component="h2"
                 content={m.welcome}
               />
               <Message className={style.loginSub} content={m.login} />
-              <Button message={m.loginViaTTN} onClick={this.redirectToLogin} />
+              <Button message={m.loginWithStackAccount} onClick={this.redirectToLogin} />
             </Col>
           </Row>
         </Container>
