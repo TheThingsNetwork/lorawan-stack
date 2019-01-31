@@ -49,6 +49,8 @@ LoRaWAN is a protocol for low-power wide area networks. It allows for large scal
 
 ## Getting Started
 
+You want to get started? Fantastic! Here's an [extensive Getting Started guide](./doc/gettingstarted.md).
+
 The easiest way to set up a private network is with the provided [`docker-compose.yml`](docker-compose.yml).
 
 0. Prerequisites
@@ -93,6 +95,8 @@ The easiest way to set up a private network is with the provided [`docker-compos
     ```sh
     docker-compose up
     ```
+
+[Read the full Getting Started guide here](./doc/gettingstarted.md)
 
 ## Documentation
 
