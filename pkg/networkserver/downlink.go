@@ -453,7 +453,8 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 		ctx = log.NewContext(ctx, logger)
 		logger.Debug("Processing downlink task...")
 
-		dev, err := ns.devices.SetByID(ctx, devID.ApplicationIdentifiers, devID.DeviceID,
+		var nextDownlinkAt time.Time
+		_, err := ns.devices.SetByID(ctx, devID.ApplicationIdentifiers, devID.DeviceID,
 			[]string{
 				"frequency_plan_id",
 				"last_dev_status_received_at",
@@ -650,8 +651,19 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 							ns.FrequencyPlans,
 						)
 						if err != nil {
+							if errors.Resemble(err, errScheduleTooSoon) {
+								nextDownlinkAt = dev.MACState.LastConfirmedDownlinkAt.Add(dev.MACSettings.ClassCTimeout)
+							}
 							return nil, nil, err
 						}
+						if dev.MACState.DeviceClass == ttnpb.CLASS_C {
+							if dev.MACState.LastConfirmedDownlinkAt != nil {
+								nextDownlinkAt = dev.MACState.LastConfirmedDownlinkAt.Add(dev.MACSettings.ClassCTimeout)
+							} else {
+								nextDownlinkAt = time.Now()
+							}
+						}
+
 						if appDown != nil {
 							ctx = events.ContextWithCorrelationID(ctx, appDown.CorrelationIDs...)
 						}
@@ -800,19 +812,21 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 		case err != nil && errors.Resemble(err, errNoDownlink):
 			return nil
 
+		case err != nil && errors.Resemble(err, errScheduleTooSoon):
+			break
+
 		case err != nil:
 			setErr = true
 			logger.WithError(err).Error("Failed to update device in registry")
 			return err
 		}
 
-		if dev.GetMACState().GetDeviceClass() != ttnpb.CLASS_C {
+		if nextDownlinkAt.IsZero() {
 			return nil
 		}
-
-		if err := ns.downlinkTasks.Add(ctx, devID, time.Now()); err != nil {
+		if err := ns.downlinkTasks.Add(ctx, devID, nextDownlinkAt); err != nil {
 			addErr = true
-			logger.WithError(err).Error("Failed to add class C device to downlink schedule")
+			logger.WithError(err).Error("Failed to add device to downlink schedule")
 			return err
 		}
 		return nil
