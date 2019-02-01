@@ -21,7 +21,6 @@ import (
 
 	"github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/rpclog"
@@ -53,7 +52,7 @@ func (c *Component) setupGRPC() (err error) {
 	for _, sub := range c.grpcSubsystems {
 		sub.RegisterHandlers(c.grpc.ServeMux, c.loopback)
 	}
-	c.web.RootGroup(ttnpb.HTTPAPIPrefix).Any("/*", echo.WrapHandler(http.StripPrefix(ttnpb.HTTPAPIPrefix, c.grpc)), middleware.CORS())
+	c.web.RootGroup(ttnpb.HTTPAPIPrefix).Any("/*", echo.WrapHandler(http.StripPrefix(ttnpb.HTTPAPIPrefix, c.grpc)))
 	return nil
 }
 
