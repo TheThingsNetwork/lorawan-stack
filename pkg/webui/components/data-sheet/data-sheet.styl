@@ -15,32 +15,26 @@
 .table
   width: 100%
   table-layout: fixed
-  margin-top: $cs.xs
 
   tr
-    height: $cs.xl
+    height: 3rem
 
   th
     text-align: left
     font-weight: normal
     color: $tc-subtle-gray
-    min-width: 10rem
-    line-height: 1
+    min-width: 6rem
     padding-right: $cs.xs
 
   td
     width: 66%
 
-tr.taller
-  height: $ls.m
+tr.group-heading
+  height: auto
+  vertical-align: bottom
 
-  & + tr:not(.taller)
-    height: $ls.m
-
-.group-heading
   &:not(:first-child)
-    height: 2.5rem
-    vertical-align: bottom
+    height: 3.5rem
   th
     color: $tc-deep-gray
     font-weight: bold
