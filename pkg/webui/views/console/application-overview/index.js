@@ -17,8 +17,8 @@ import { connect } from 'react-redux'
 import { Col, Row, Container } from 'react-grid-system'
 
 import sharedMessages from '../../../lib/shared-messages'
-import Message from '../../../lib/components/message'
 import DevicesTable from '../../../containers/devices-table'
+import DataSheet from '../../../components/data-sheet'
 
 import style from './application-overview.styl'
 
@@ -36,29 +36,26 @@ class ApplicationOverview extends React.Component {
       ids,
       description,
       created_at,
-      updated_at,
     } = this.props.application
+
+    const sheetData = [
+      {
+        header: sharedMessages.generalInformation,
+        items: [
+          { key: sharedMessages.appId, value: ids.application_id, type: 'code', sensitive: false },
+          { key: sharedMessages.joinEUI, value: '00000000000000', type: 'byte', sensitive: false },
+          { key: sharedMessages.createdAt, value: created_at.toLocaleDateString() },
+        ],
+      },
+    ]
 
     return (
       <div>
-        <h2 className={style.id}>
+        <h2 className={style.title}>
           {ids.application_id}
         </h2>
-        <p>{description}</p>
-        <ul className={style.attributes}>
-          <li className={style.attributesEntry}>
-            <strong className={style.key}>
-              <Message content={sharedMessages.createdAt} />
-            </strong>
-            <span className={style.value}>{created_at.toLocaleDateString()}</span>
-          </li>
-          <li className={style.attributesEntry}>
-            <strong className={style.key}>
-              <Message content={sharedMessages.updatedAt} />
-            </strong>
-            <span className={style.value}>{updated_at.toLocaleDateString()}</span>
-          </li>
-        </ul>
+        <span className={style.description}>{description}</span>
+        <DataSheet data={sheetData} />
       </div>
     )
   }
@@ -66,12 +63,15 @@ class ApplicationOverview extends React.Component {
   render () {
     return (
       <Container>
-        <Row className={style.head}>
+        <Row>
           <Col sm={12} lg={6}>
             {this.applicationInfo}
           </Col>
           <Col sm={12} lg={6}>
-            <div className={style.latestEvents}>Latest Events Placeholder</div>
+            <div className={style.latestEvents}>
+              <h4>Latest Data</h4>
+              <div>Activity Events Placeholder</div>
+            </div>
           </Col>
         </Row>
         <Row>
