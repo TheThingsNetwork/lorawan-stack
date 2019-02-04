@@ -55,6 +55,7 @@ export default defineMessages({
   logout: 'Logout',
   name: 'Name',
   networkKey: 'Network Key',
+  noDesc: 'This device has no description',
   noMatch: 'No items matched your criteria',
   ok: 'Ok',
   organizations: 'Organizations',
