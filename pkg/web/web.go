@@ -22,6 +22,7 @@ import (
 	"strings"
 
 	"github.com/labstack/echo"
+	echomiddleware "github.com/labstack/echo/middleware"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -77,6 +78,9 @@ func New(ctx context.Context, config config.HTTP) (*Server, error) {
 
 	server.Use(
 		middleware.ID(""),
+		echomiddleware.BodyLimit("16M"),
+		echomiddleware.Secure(),
+		echomiddleware.Recover(),
 		cookie.Cookies(blockKey, hashKey),
 	)
 
