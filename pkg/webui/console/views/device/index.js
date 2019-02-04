@@ -99,11 +99,7 @@ export default class Device extends React.Component {
         <Container>
           <Row>
             <Col lg={12}>
-              <div className={style.title}>
-                <h2 className={style.id}>
-                  {devId}
-                </h2>
-              </div>
+              <h2 className={style.title}>{devId}</h2>
               <Tabs
                 narrow
                 active="overview"

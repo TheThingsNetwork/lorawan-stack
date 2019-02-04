@@ -23,7 +23,6 @@ import sharedMessages from '../../../lib/shared-messages'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import Message from '../../../lib/components/message'
 import DataSheet from '../../../components/data-sheet'
-import Message from '../../../lib/components/message'
 
 import style from './device-overview.styl'
 
@@ -69,6 +68,13 @@ class DeviceOverview extends React.Component {
 
     const sheetData = [
       {
+        header: sharedMessages.generalInformation,
+        items: [
+          { key: sharedMessages.devID, value: ids.device_id, type: 'code', sensitive: false },
+          { key: sharedMessages.description, value: description || sharedMessages.noDesc },
+        ],
+      },
+      {
         header: m.hardware,
         items: [
           { key: m.brand, value: version_ids.brand_id },
@@ -108,16 +114,6 @@ class DeviceOverview extends React.Component {
 
     return (
       <div className={style.overviewInfo}>
-        <div className={style.overviewInfoGeneral}>
-          <span className={style.devId}>{ids.device_id}</span>
-          <span className={style.devDesc}>{description || <Message content={m.noDesc} />}</span>
-          <div className={style.connectivity}>
-            <span className={style.activityDot} />
-            <span className={style.lastSeen}>Last seen 2 secs. ago</span>
-            <span className={style.frameCountUp}><Icon icon="arrow_upward" className={style.frameCountIcon} />89.139</span>
-            <span><Icon icon="arrow_downward" className={style.frameCountIcon} />0</span>
-          </div>
-        </div>
         <div>
           <DataSheet data={sheetData} />
         </div>
