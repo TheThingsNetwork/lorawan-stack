@@ -112,8 +112,7 @@ func TestStore(t *testing.T) {
 	}, 800, 400)
 
 	a.So(err, should.BeNil)
-
-	if a.So(pic.Sizes, should.ContainKey, uint32(400)) {
+	if a.So(pic, should.NotBeNil) && a.So(pic.Sizes, should.ContainKey, uint32(400)) {
 		a.So(pic.Sizes[400], should.Equal, "picture/400.png")
 	}
 }
