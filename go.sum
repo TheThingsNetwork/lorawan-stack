@@ -38,8 +38,8 @@ github.com/TheThingsIndustries/mystique v0.0.0-20181023142449-f12a32cee6d6 h1:bU
 github.com/TheThingsIndustries/mystique v0.0.0-20181023142449-f12a32cee6d6/go.mod h1:l1YfNoSNxng8UF9XBfDixHAQjMEMAyoEQnbKSqX/qII=
 github.com/TheThingsNetwork/go-cayenne-lib v1.0.0 h1:be7h6E/69+qaYs1iwQ2xjGjSFPXzvU3q6AWBCWayG2Y=
 github.com/TheThingsNetwork/go-cayenne-lib v1.0.0/go.mod h1:Lkg0oDuFTF6WlZvyPV35WFHov5U9zPv2lLoAQ15NjrI=
-github.com/ThethingsIndustries/grpc-gateway v0.0.0-20190109121333-7004821b0205 h1:7dJBzm5GT/uFvaptwAztHAgLuLCq9w/lSPQtAPiBuJ4=
-github.com/ThethingsIndustries/grpc-gateway v0.0.0-20190109121333-7004821b0205/go.mod h1:rayRUXDeYZhVN/HXIUMNuz/8hpKG0l3JUruSYn3RLSI=
+github.com/ThethingsIndustries/grpc-gateway v1.7.0-gogo h1:4KV6I1ds1U4F91k28Ct5CzO76dhqcqQjFKortbf4UMo=
+github.com/ThethingsIndustries/grpc-gateway v1.7.0-gogo/go.mod h1:rayRUXDeYZhVN/HXIUMNuz/8hpKG0l3JUruSYn3RLSI=
 github.com/ThethingsIndustries/otto v0.0.0-20181129100957-6ddbbb60554a h1:OgIt3d0PKh4q6kU+/d0ZWJF7PogxxE/EWOqISahT/Ic=
 github.com/ThethingsIndustries/otto v0.0.0-20181129100957-6ddbbb60554a/go.mod h1:LdsY7jn/wxbaFJec8sYiJzeqCmVWCrM0dVEehiWVcWs=
 github.com/alecthomas/gocyclo v0.0.0-20150208221726-aa8f8b160214 h1:YI/8G3uLbYyowJeOPVL6BMKe2wbL54h0FdEKmncU6lU=
@@ -76,8 +76,8 @@ github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f/go.mod h1:E3G3o1h8I7cfc
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/denisenkom/go-mssqldb v0.0.0-20190121005146-b04fd42d9952 h1:b5OnbZD49x9g+/FcYbs/vukEt8C/jUbGhCJ3uduQmu8=
-github.com/denisenkom/go-mssqldb v0.0.0-20190121005146-b04fd42d9952/go.mod h1:xN/JuLBIz4bjkxNmByTiV1IbhfnYb6oo99phBn4Eqhc=
+github.com/denisenkom/go-mssqldb v0.0.0-20190204142019-df6d76eb9289 h1:U+DzmGUpc/dOjREgbyyChPhdDIFwPYnVk+/5YcAa194=
+github.com/denisenkom/go-mssqldb v0.0.0-20190204142019-df6d76eb9289/go.mod h1:xN/JuLBIz4bjkxNmByTiV1IbhfnYb6oo99phBn4Eqhc=
 github.com/dgrijalva/jwt-go v3.2.0+incompatible h1:7qlOGliEKZXTDg6OTjfoBKDXWrumCAMpl/TFQ4/5kLM=
 github.com/dgrijalva/jwt-go v3.2.0+incompatible/go.mod h1:E3ru+11k8xSBh+hMPgOLZmtrrCbhqsmaPHjLKYnJCaQ=
 github.com/disintegration/imaging v1.6.0 h1:nVPXRUUQ36Z7MNf0O77UzgnOb1mkMMor7lmJMJXc/mA=
