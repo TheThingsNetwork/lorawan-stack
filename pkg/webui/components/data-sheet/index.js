@@ -77,7 +77,6 @@ DataSheet.propTypes = {
 const DataSheetRow = function ({ item, sub }) {
   const isSafeInspector = item.type === 'byte' || item.type === 'code'
   const rowStyle = classnames({
-    [style.taller]: isSafeInspector,
     [style.sub]: sub,
   })
 
