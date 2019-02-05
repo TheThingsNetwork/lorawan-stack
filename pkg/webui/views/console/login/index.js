@@ -21,9 +21,9 @@ import { Container, Row, Col } from 'react-grid-system'
 
 import { withEnv } from '../../../lib/components/env'
 import Button from '../../../components/button'
-import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import sharedMessages from '../../../lib/shared-messages'
+import Message from '../../../lib/components/message'
 
 import style from './login.styl'
 
@@ -57,9 +57,7 @@ export default class Login extends React.PureComponent {
 
     return (
       <div className={style.login}>
-        <IntlHelmet>
-          <title><Message content={sharedMessages.login} /></title>
-        </IntlHelmet>
+        <IntlHelmet title={sharedMessages.login} />
         <Container>
           <Row>
             <Col>

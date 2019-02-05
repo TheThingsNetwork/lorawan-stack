@@ -15,7 +15,6 @@
 import React from 'react'
 import { Row, Col, Container } from 'react-grid-system'
 
-import Message from '../../../lib/components/message'
 import sharedMessages from '../../../lib/shared-messages'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 
@@ -28,9 +27,7 @@ export default class List extends React.Component {
     return (
       <Container>
         <Row>
-          <IntlHelmet>
-            <title><Message content={sharedMessages.applications} /></title>
-          </IntlHelmet>
+          <IntlHelmet title={sharedMessages.applications} />
           <Col sm={12}>
             <ApplicationsTable pageSize={APPLICATIONS_TABLE_SIZE} />
           </Col>

@@ -16,7 +16,6 @@ import React from 'react'
 import { Container, Row, Col } from 'react-grid-system'
 import bind from 'autobind-decorator'
 
-import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import ApiKeysTable from '../../../containers/api-keys-table'
 import { getApplicationApiKeysList } from '../../../actions/application'
@@ -43,9 +42,7 @@ export default class ApplicationAccess extends React.Component {
     return (
       <Container>
         <Row>
-          <IntlHelmet>
-            <title><Message content={sharedMessages.access} /></title>
-          </IntlHelmet>
+          <IntlHelmet title={sharedMessages.access} />
           <Col sm={12}>
             <ApiKeysTable
               pageSize={API_KEYS_TABLE_SIZE}
