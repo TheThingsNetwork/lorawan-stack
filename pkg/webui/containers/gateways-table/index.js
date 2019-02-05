@@ -22,7 +22,7 @@ import FetchTable from '../fetch-table'
 import {
   getGatewaysList,
   searchGatewaysList,
-} from '../../actions/gateways'
+} from '../../console/store/actions/gateways'
 
 const m = defineMessages({
   add: 'Add Gateway',

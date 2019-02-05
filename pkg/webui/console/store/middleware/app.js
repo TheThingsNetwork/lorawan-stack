@@ -12,48 +12,42 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/* eslint-disable no-console */
-
 import { createLogic } from 'redux-logic'
 
 import * as user from '../actions/user'
-import * as _console from '../actions/console'
-import api from '../api'
-import * as accessToken from '../lib/access-token'
+import * as app from '../actions/app'
+import api from '../../api'
+import * as accessToken from '../../lib/access-token'
 
-const consoleLogic = createLogic({
-  type: _console.INITIALIZE,
+const consoleAppLogic = createLogic({
+  type: app.INITIALIZE,
   async process ({ getState, action }, dispatch, done) {
     dispatch(user.getUserMe())
 
     try {
       try {
-        const isConsole = window.APP_ROOT === '/console'
-
-        let result
-        if (isConsole) {
-          // there is no way to retrieve the current user directly
-          // within the console app, so first get the authentication info
-          // and only afterwards fetch the user
-          const info = await api.v3.is.users.authInfo()
-          const userId = info.data.oauth_access_token.user_ids.user_id
-          result = await api.v3.is.users.get(userId)
-        } else {
-          result = await api.oauth.me()
-        }
-
+        // there is no way to retrieve the current user directly
+        // within the console app, so first get the authentication info
+        // and only afterwards fetch the user
+        const info = await api.users.authInfo()
+        const userId = info.data.oauth_access_token.user_ids.user_id
+        const result = await api.users.get(userId)
         dispatch(user.getUserMeSuccess(result.data))
       } catch (error) {
         dispatch(user.getUserMeFailure())
         accessToken.clear()
       }
-      dispatch(_console.initializeSuccess())
-      console.log('Initialization successful!')
+
+      dispatch(app.initializeSuccess())
+
+      // eslint-disable-next-line no-console
+      console.log('Console initialization successful!')
     } catch (error) {
-      dispatch(_console.initializeFailure())
+      dispatch(app.initializeFailure())
     }
+
     done()
   },
 })
 
-export default consoleLogic
+export default consoleAppLogic

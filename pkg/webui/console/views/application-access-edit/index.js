@@ -30,7 +30,7 @@ import Spinner from '../../../components/spinner'
 import ModalButton from '../../../components/button/modal-button'
 import Message from '../../../lib/components/message'
 
-import { getApplicationsRightsList } from '../../../actions/applications'
+import { getApplicationsRightsList } from '../../store/actions/applications'
 
 import style from './application-access-edit.styl'
 

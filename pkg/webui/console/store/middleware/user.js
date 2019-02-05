@@ -12,18 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const INITIALIZE = 'INITIALIZE'
-export const INITIALIZE_FAILURE = 'INITIALIZE_FAILURE'
-export const INITIALIZE_SUCCESS = 'INITIALIZE_SUCCESS'
+import { createLogic } from 'redux-logic'
 
-export const initialize = () => (
-  { type: INITIALIZE }
-)
+import * as user from '../actions/user'
+import api from '../../api'
+import * as accessToken from '../../lib/access-token'
 
-export const initializeFailure = () => (
-  { type: INITIALIZE_FAILURE }
-)
+export default [
+  createLogic({
+    type: user.LOGOUT,
+    async process ({ getState, action }, dispatch, done) {
+      try {
+        await api.console.logout()
 
-export const initializeSuccess = () => (
-  { type: INITIALIZE_SUCCESS }
-)
+        accessToken.clear()
+        dispatch(user.logoutSuccess())
+      } catch (error) {
+        dispatch(user.logoutFailure())
+      }
+
+      done()
+    },
+  }),
+]

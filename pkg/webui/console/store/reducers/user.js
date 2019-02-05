@@ -28,27 +28,34 @@ const defaultState = {
 const user = function (state = defaultState, action) {
   switch (action.type) {
   case GET_USER_ME:
-    return Object.assign({}, state, {
+    return {
+      ...state,
       fetching: true,
-    })
+      user: undefined,
+    }
   case GET_USER_ME_SUCCESS:
-    return Object.assign({}, state, {
+    return {
+      ...state,
       fetching: false,
-      user: action.userData.user,
-    })
+      user: action.userData,
+    }
   case GET_USER_ME_FAILURE:
-    return Object.assign({}, state, {
+    return {
+      ...state,
       fetching: false,
       user: undefined,
-    })
+    }
   case LOGOUT:
-    return Object.assign({}, state, {
+    return {
+      ...state,
       fetching: false,
-    })
+    }
   case LOGOUT_SUCCESS:
-    return Object.assign({}, state, {
+    return {
+      ...state,
+      fetching: false,
       user: undefined,
-    })
+    }
   default:
     return state
   }

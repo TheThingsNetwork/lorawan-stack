@@ -26,7 +26,7 @@ import Footer from '../../../components/footer'
 import Landing from '../landing'
 import Login from '../login'
 
-import { logout } from '../../../actions/user'
+import { logout } from '../../store/actions/user'
 
 import style from './app.styl'
 

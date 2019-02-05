@@ -21,7 +21,7 @@ import FetchTable from '../fetch-table'
 import {
   getApplicationsList,
   searchApplicationsList,
-} from '../../actions/applications'
+} from '../../console/store/actions/applications'
 
 const m = defineMessages({
   all: 'All',

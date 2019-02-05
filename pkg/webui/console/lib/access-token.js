@@ -20,11 +20,11 @@ export default async function () {
 
   if (!storedToken) {
     // If we don't have a token stored, we want to retrieve it
-    const response = await api.console.auth.token()
+    const response = await api.console.token()
     token = response.data
   } else if (Date.parse(storedToken.expiry) < Date.now()) {
     // If we have a token, but it's expired, we want to refresh it
-    token = (await api.console.auth.refresh()).data
+    token = (await api.console.refresh()).data
   } else {
     // If we have a stored token and its valid, we want to use it
     return storedToken

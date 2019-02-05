@@ -24,7 +24,7 @@ import { SideNavigationProvider } from './components/navigation/side/context'
 import Init from './lib/components/init'
 import WithLocale from './lib/components/with-locale'
 
-import createStore from './store'
+import createStore from './console/store'
 import App from './console/views/app'
 
 const history = createBrowserHistory()

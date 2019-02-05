@@ -12,20 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import client from './client'
+import { combineReducers } from 'redux'
+import { SHARED_NAME as APPLICATION_SHARED_NAME } from '../actions/application'
+import { SHARED_NAME as APPLICATIONS_SHARED_NAME } from '../actions/applications'
 import user from './user'
-import init from './init'
+import client from './client'
+import app from './app'
 import applications from './applications'
 import application from './application'
 import devices from './devices'
 import gateways from './gateways'
+import createNamedApiKeysReducer from './api-keys'
+import createNamedRightsReducer from './rights'
 
-export default [
+export default combineReducers({
+  user,
   client,
-  ...user,
-  init,
-  ...applications,
-  ...application,
-  ...devices,
-  ...gateways,
-]
+  app,
+  applications,
+  application,
+  devices,
+  gateways,
+  apiKeys: combineReducers({
+    applications: createNamedApiKeysReducer(APPLICATION_SHARED_NAME),
+  }),
+  rights: combineReducers({
+    applications: createNamedRightsReducer(APPLICATIONS_SHARED_NAME),
+  }),
+})

@@ -14,7 +14,7 @@
 
 import { createLogic } from 'redux-logic'
 
-import api from '../api'
+import api from '../../api'
 import * as devices from '../actions/devices'
 
 const getDevicesListLogic = createLogic({
@@ -27,8 +27,8 @@ const getDevicesListLogic = createLogic({
 
     try {
       const data = filters.query
-        ? await api.v3.is.devices.search(appId, filters)
-        : await api.v3.is.devices.list(appId, filters)
+        ? await api.devices.search(appId, filters)
+        : await api.devices.list(appId, filters)
 
       dispatch(devices.getDevicesListSuccess(data.devices, data.totalCount))
     } catch (error) {

@@ -14,20 +14,34 @@
 
 import { createLogic } from 'redux-logic'
 
-import api from '../api'
-import * as client from '../actions/client'
+import api from '../../api'
+import * as gateways from '../actions/gateways'
 
-const clientLogic = createLogic({
-  type: client.GET_CLIENT,
+const getGatewaysLogic = createLogic({
+  type: [
+    gateways.GET_GTWS_LIST,
+    gateways.CHANGE_GTWS_ORDER,
+    gateways.CHANGE_GTWS_PAGE,
+    gateways.SEARCH_GTWS_LIST,
+  ],
+  latest: true,
   async process ({ getState, action }, dispatch, done) {
+    const { filters } = action
+
     try {
-      const result = await api.v3.is.clients.get(action.clientId)
-      dispatch(client.getClientSuccess(result.data))
+      const data = filters.query
+        ? await api.gateways.search(filters)
+        : await api.gateways.list(filters)
+      const gtws = data.gateways.map(g => ({ ...g, antennasCount: g.antennas.length }))
+      dispatch(gateways.getGatewaysSuccess(gtws, data.totalCount))
     } catch (error) {
-      dispatch(client.getClientFailure(action.clientId))
+      dispatch(gateways.getGatewaysFailure(error))
     }
+
     done()
   },
 })
 
-export default clientLogic
+export default [
+  getGatewaysLogic,
+]

@@ -14,7 +14,7 @@
 
 import { createLogic } from 'redux-logic'
 
-import api from '../api'
+import api from '../../api'
 import * as applications from '../actions/applications'
 
 const getApplicationsLogic = createLogic({
@@ -31,8 +31,8 @@ const getApplicationsLogic = createLogic({
 
     try {
       const data = filters.query
-        ? await api.v3.is.applications.search(filters)
-        : await api.v3.is.applications.list(filters)
+        ? await api.applications.search(filters)
+        : await api.applications.list(filters)
       dispatch(applications.getApplicationsSuccess(data.applications, data.totalCount))
     } catch (error) {
       dispatch(applications.getApplicationsFailure(error))
@@ -46,7 +46,7 @@ const getApplicationsRightsLogic = createLogic({
   type: applications.GET_APPS_RIGHTS_LIST,
   async process ({ getState, action }, dispatch, done) {
     try {
-      const rights = await api.v3.is.rights.applications()
+      const rights = await api.rights.applications()
 
       dispatch(applications.getApplicationsRightsListSuccess(rights))
     } catch (error) {

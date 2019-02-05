@@ -27,7 +27,7 @@ import ApplicationOverview from '../application-overview'
 import ApplicationGeneralSettings from '../application-general-settings'
 import ApplicationAccess from '../application-access'
 
-import { getApplication } from '../../../actions/application'
+import { getApplication } from '../../store/actions/application'
 
 @connect(function ({ application }, props) {
   return {
