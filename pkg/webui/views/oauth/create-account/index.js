@@ -26,8 +26,8 @@ import sharedMessages from '../../../lib/shared-messages'
 import Button from '../../../components/button'
 import Field from '../../../components/field'
 import Form from '../../../components/form'
-import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
+import Message from '../../../lib/components/message'
 
 import style from './create-account.styl'
 
@@ -133,9 +133,7 @@ export default class CreateAccount extends React.PureComponent {
 
     return (
       <div className={style.fullHeightCenter}>
-        <IntlHelmet>
-          <title><Message content={m.register} /></title>
-        </IntlHelmet>
+        <IntlHelmet title={m.register} />
         <div className={style.wrapper}>
           <h1><Message content={m.createAccount} /></h1>
           <Form

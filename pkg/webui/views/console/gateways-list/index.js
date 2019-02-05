@@ -15,7 +15,6 @@
 import React from 'react'
 import { Container, Row, Col } from 'react-grid-system'
 
-import Message from '../../../lib/components/message'
 import GatewaysTable from '../../../containers/gateways-table'
 import sharedMessages from '../../../lib/shared-messages'
 import IntlHelmet from '../../../lib/components/intl-helmet'
@@ -27,9 +26,7 @@ export default class GatewaysList extends React.Component {
     return (
       <Container>
         <Row>
-          <IntlHelmet>
-            <title><Message content={sharedMessages.gateways} /></title>
-          </IntlHelmet>
+          <IntlHelmet title={sharedMessages.gateways} />
           <Col sm={12}>
             <GatewaysTable pageSize={GATEWAYS_TABLE_SIZE} />
           </Col>
