@@ -57,6 +57,7 @@ class DeviceOverview extends React.Component {
       version_ids,
       root_keys,
       session,
+      created_at,
     } = this.props.device
 
     const {
@@ -72,6 +73,7 @@ class DeviceOverview extends React.Component {
         items: [
           { key: sharedMessages.devID, value: ids.device_id, type: 'code', sensitive: false },
           { key: sharedMessages.description, value: description || sharedMessages.noDesc },
+          { key: sharedMessages.createdAt, value: created_at.toLocaleDateString() },
         ],
       },
       {
