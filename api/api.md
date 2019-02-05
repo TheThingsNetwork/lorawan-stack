@@ -121,6 +121,8 @@
     - [MACParameters](#ttn.lorawan.v3.MACParameters)
     - [MACParameters.Channel](#ttn.lorawan.v3.MACParameters.Channel)
     - [MACSettings](#ttn.lorawan.v3.MACSettings)
+    - [MACSettings.DataRateIndexValue](#ttn.lorawan.v3.MACSettings.DataRateIndexValue)
+    - [MACSettings.RxDelayValue](#ttn.lorawan.v3.MACSettings.RxDelayValue)
     - [MACState](#ttn.lorawan.v3.MACState)
     - [MACState.JoinAccept](#ttn.lorawan.v3.MACState.JoinAccept)
     - [Session](#ttn.lorawan.v3.Session)
@@ -1788,6 +1790,39 @@ This is used internally by the Network Server and is read only.
 | class_c_timeout | [google.protobuf.Duration](#google.protobuf.Duration) |  | Deadline for the device to respond to requests from the Network Server. |
 | status_time_periodicity | [google.protobuf.Duration](#google.protobuf.Duration) |  | The interval after which a DevStatusReq MACCommand shall be sent. |
 | status_count_periodicity | [uint32](#uint32) |  | Number of uplink messages after which a DevStatusReq MACCommand shall be sent. |
+| rx1_delay | [MACSettings.RxDelayValue](#ttn.lorawan.v3.MACSettings.RxDelayValue) |  |  |
+| rx2_data_rate_index | [MACSettings.DataRateIndexValue](#ttn.lorawan.v3.MACSettings.DataRateIndexValue) |  |  |
+| rx2_frequency | [google.protobuf.UInt64Value](#google.protobuf.UInt64Value) |  |  |
+
+
+
+
+
+
+<a name="ttn.lorawan.v3.MACSettings.DataRateIndexValue"/>
+
+### MACSettings.DataRateIndexValue
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| value | [DataRateIndex](#ttn.lorawan.v3.DataRateIndex) |  |  |
+
+
+
+
+
+
+<a name="ttn.lorawan.v3.MACSettings.RxDelayValue"/>
+
+### MACSettings.RxDelayValue
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| value | [RxDelay](#ttn.lorawan.v3.RxDelay) |  |  |
 
 
 

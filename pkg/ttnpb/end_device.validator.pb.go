@@ -12,6 +12,7 @@ import _ "github.com/gogo/protobuf/gogoproto"
 import _ "github.com/golang/protobuf/ptypes/duration"
 import _ "github.com/golang/protobuf/ptypes/struct"
 import _ "github.com/golang/protobuf/ptypes/timestamp"
+import _ "github.com/golang/protobuf/ptypes/wrappers"
 import _ "github.com/mwitkow/go-proto-validators"
 import _ "google.golang.org/genproto/googleapis/api/annotations"
 import _ "google.golang.org/genproto/protobuf/field_mask"
@@ -95,6 +96,27 @@ func (this *MACSettings) Validate() error {
 	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.StatusTimePeriodicity)); err != nil {
 		return github_com_mwitkow_go_proto_validators.FieldError("StatusTimePeriodicity", err)
 	}
+	if this.Rx1Delay != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.Rx1Delay); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("Rx1Delay", err)
+		}
+	}
+	if this.Rx2DataRateIndex != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.Rx2DataRateIndex); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("Rx2DataRateIndex", err)
+		}
+	}
+	if this.Rx2Frequency != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.Rx2Frequency); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("Rx2Frequency", err)
+		}
+	}
+	return nil
+}
+func (this *MACSettings_RxDelayValue) Validate() error {
+	return nil
+}
+func (this *MACSettings_DataRateIndexValue) Validate() error {
 	return nil
 }
 func (this *MACState) Validate() error {

@@ -4870,6 +4870,22 @@
         }
       }
     },
+    "MACSettingsDataRateIndexValue": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/v3DataRateIndex"
+        }
+      }
+    },
+    "MACSettingsRxDelayValue": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/v3RxDelay"
+        }
+      }
+    },
     "MACStateJoinAccept": {
       "type": "object",
       "properties": {
@@ -7438,6 +7454,16 @@
           "type": "integer",
           "format": "int64",
           "description": "Number of uplink messages after which a DevStatusReq MACCommand shall be sent."
+        },
+        "rx1_delay": {
+          "$ref": "#/definitions/MACSettingsRxDelayValue"
+        },
+        "rx2_data_rate_index": {
+          "$ref": "#/definitions/MACSettingsDataRateIndexValue"
+        },
+        "rx2_frequency": {
+          "type": "string",
+          "format": "uint64"
         }
       }
     },

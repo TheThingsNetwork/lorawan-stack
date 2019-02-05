@@ -889,6 +889,11 @@ var MACSettingsFieldPathsNested = []string{
 	"adr_margin",
 	"class_b_timeout",
 	"class_c_timeout",
+	"rx1_delay",
+	"rx1_delay.value",
+	"rx2_data_rate_index",
+	"rx2_data_rate_index.value",
+	"rx2_frequency",
 	"status_count_periodicity",
 	"status_time_periodicity",
 	"use_adr",
@@ -898,6 +903,9 @@ var MACSettingsFieldPathsTopLevel = []string{
 	"adr_margin",
 	"class_b_timeout",
 	"class_c_timeout",
+	"rx1_delay",
+	"rx2_data_rate_index",
+	"rx2_frequency",
 	"status_count_periodicity",
 	"status_time_periodicity",
 	"use_adr",
@@ -965,6 +973,115 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 			} else {
 				var zero uint32
 				dst.StatusCountPeriodicity = zero
+			}
+		case "rx1_delay":
+			if len(subs) > 0 {
+				newDst := dst.Rx1Delay
+				if newDst == nil {
+					newDst = &MACSettings_RxDelayValue{}
+					dst.Rx1Delay = newDst
+				}
+				var newSrc *MACSettings_RxDelayValue
+				if src != nil {
+					newSrc = src.Rx1Delay
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Rx1Delay = src.Rx1Delay
+				} else {
+					dst.Rx1Delay = nil
+				}
+			}
+		case "rx2_data_rate_index":
+			if len(subs) > 0 {
+				newDst := dst.Rx2DataRateIndex
+				if newDst == nil {
+					newDst = &MACSettings_DataRateIndexValue{}
+					dst.Rx2DataRateIndex = newDst
+				}
+				var newSrc *MACSettings_DataRateIndexValue
+				if src != nil {
+					newSrc = src.Rx2DataRateIndex
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Rx2DataRateIndex = src.Rx2DataRateIndex
+				} else {
+					dst.Rx2DataRateIndex = nil
+				}
+			}
+		case "rx2_frequency":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rx2_frequency' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Rx2Frequency = src.Rx2Frequency
+			} else {
+				dst.Rx2Frequency = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+var MACSettings_RxDelayValueFieldPathsNested = []string{
+	"value",
+}
+
+var MACSettings_RxDelayValueFieldPathsTopLevel = []string{
+	"value",
+}
+
+func (dst *MACSettings_RxDelayValue) SetFields(src *MACSettings_RxDelayValue, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "value":
+			if len(subs) > 0 {
+				return fmt.Errorf("'value' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Value = src.Value
+			} else {
+				var zero RxDelay
+				dst.Value = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+var MACSettings_DataRateIndexValueFieldPathsNested = []string{
+	"value",
+}
+
+var MACSettings_DataRateIndexValueFieldPathsTopLevel = []string{
+	"value",
+}
+
+func (dst *MACSettings_DataRateIndexValue) SetFields(src *MACSettings_DataRateIndexValue, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "value":
+			if len(subs) > 0 {
+				return fmt.Errorf("'value' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Value = src.Value
+			} else {
+				var zero DataRateIndex
+				dst.Value = zero
 			}
 
 		default:
@@ -1567,6 +1684,11 @@ var EndDeviceFieldPathsNested = []string{
 	"mac_settings.adr_margin",
 	"mac_settings.class_b_timeout",
 	"mac_settings.class_c_timeout",
+	"mac_settings.rx1_delay",
+	"mac_settings.rx1_delay.value",
+	"mac_settings.rx2_data_rate_index",
+	"mac_settings.rx2_data_rate_index.value",
+	"mac_settings.rx2_frequency",
 	"mac_settings.status_count_periodicity",
 	"mac_settings.status_time_periodicity",
 	"mac_settings.use_adr",
@@ -2531,6 +2653,11 @@ var CreateEndDeviceRequestFieldPathsNested = []string{
 	"end_device.mac_settings.adr_margin",
 	"end_device.mac_settings.class_b_timeout",
 	"end_device.mac_settings.class_c_timeout",
+	"end_device.mac_settings.rx1_delay",
+	"end_device.mac_settings.rx1_delay.value",
+	"end_device.mac_settings.rx2_data_rate_index",
+	"end_device.mac_settings.rx2_data_rate_index.value",
+	"end_device.mac_settings.rx2_frequency",
 	"end_device.mac_settings.status_count_periodicity",
 	"end_device.mac_settings.status_time_periodicity",
 	"end_device.mac_settings.use_adr",
@@ -2894,6 +3021,11 @@ var UpdateEndDeviceRequestFieldPathsNested = []string{
 	"end_device.mac_settings.adr_margin",
 	"end_device.mac_settings.class_b_timeout",
 	"end_device.mac_settings.class_c_timeout",
+	"end_device.mac_settings.rx1_delay",
+	"end_device.mac_settings.rx1_delay.value",
+	"end_device.mac_settings.rx2_data_rate_index",
+	"end_device.mac_settings.rx2_data_rate_index.value",
+	"end_device.mac_settings.rx2_frequency",
 	"end_device.mac_settings.status_count_periodicity",
 	"end_device.mac_settings.status_time_periodicity",
 	"end_device.mac_settings.use_adr",
@@ -3410,6 +3542,11 @@ var SetEndDeviceRequestFieldPathsNested = []string{
 	"device.mac_settings.adr_margin",
 	"device.mac_settings.class_b_timeout",
 	"device.mac_settings.class_c_timeout",
+	"device.mac_settings.rx1_delay",
+	"device.mac_settings.rx1_delay.value",
+	"device.mac_settings.rx2_data_rate_index",
+	"device.mac_settings.rx2_data_rate_index.value",
+	"device.mac_settings.rx2_frequency",
 	"device.mac_settings.status_count_periodicity",
 	"device.mac_settings.status_time_periodicity",
 	"device.mac_settings.use_adr",

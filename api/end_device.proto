@@ -21,6 +21,7 @@ import "google/protobuf/duration.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
 import "lorawan-stack/api/identifiers.proto";
 import "lorawan-stack/api/join.proto";
 import "lorawan-stack/api/keys.proto";
@@ -101,9 +102,9 @@ message MACParameters {
     // Channel can be used by device for uplink.
     bool enable_uplink = 5;
   }
-
   // Configured uplink channels and optionally Rx1 frequency.
   repeated Channel channels = 16;
+
   // Frequency of the class B ping slot (Hz).
   uint64 ping_slot_frequency = 17;
   // Data rate index of the class B ping slot.
@@ -187,6 +188,18 @@ message MACSettings {
   google.protobuf.Duration status_time_periodicity = 5 [(gogoproto.stdduration) = true, (gogoproto.nullable) = false];
   // Number of uplink messages after which a DevStatusReq MACCommand shall be sent.
   uint32 status_count_periodicity = 6;
+
+  message RxDelayValue {
+    RxDelay value = 1;
+  }
+  RxDelayValue rx1_delay = 7;
+
+  message DataRateIndexValue {
+    DataRateIndex value = 1;
+  }
+  DataRateIndexValue rx2_data_rate_index = 8;
+
+  google.protobuf.UInt64Value rx2_frequency = 9;
 }
 
 // MACState represents the state of MAC layer of the device.
