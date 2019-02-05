@@ -13,15 +13,26 @@
 // limitations under the License.
 
 import React from 'react'
+
 import { Helmet } from 'react-helmet'
 import { injectIntl } from 'react-intl'
 
+import { warn } from '../log'
+
 /**
- * IntlHelmet is a HOC that enables usage of i18n messages inside the props in
- * react-helmet, which will be translated automatically
+ * IntlHelmet is a HOC that enables usage of i18n message objects inside the
+ * props in react-helmet, which will be translated automatically.
  */
 @injectIntl
 export default class IntlHelmet extends React.Component {
+  componentDidMount () {
+    if (this.props.children) {
+      warn(`Children of <IntlHelmet /> will not be translated. If you tried to
+translate head elements with <Message />, use props with message objects
+instead.`)
+    }
+  }
+
   render () {
     const { intl, children, ...rest } = this.props
     let translatedRest = {}
