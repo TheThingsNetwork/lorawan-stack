@@ -14,20 +14,23 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
+import bind from 'autobind-decorator'
 
 import Button from '../../../components/button'
 import WithAuth from '../../../lib/components/with-auth'
-import api from '../../api'
 
-@connect((state, props) => ({
+import { logout } from '../../store/actions/user'
+
+@connect(state => ({
   user: state.user.user,
-})
-)
+}))
+@bind
 export default class OAuth extends React.PureComponent {
 
   async handleLogout () {
-    await api.oauth.logout()
-    window.location = '/oauth/login'
+    const { dispatch } = this.props
+
+    dispatch(logout())
   }
 
   render () {

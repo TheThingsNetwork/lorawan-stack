@@ -12,10 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import app from './app'
-import user from './user'
 
-export default [
-  app,
-  user,
-]
+import { createLogic } from 'redux-logic'
+
+import api from '../../api'
+import * as user from '../actions/user'
+
+const userLogic = createLogic({
+  type: user.LOGOUT,
+  async process ({ getState, action }, dispatch, done) {
+    try {
+      await api.oauth.logout()
+      dispatch(user.logoutSuccess())
+    } catch (error) {
+      dispatch(user.logoutFailure(error))
+    }
+
+    done()
+  },
+})
+
+export default userLogic
+

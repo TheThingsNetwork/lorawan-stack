@@ -15,6 +15,9 @@
 export const GET_USER_ME = 'GET_OAUTH_USER_ME'
 export const GET_USER_ME_SUCCESS = 'GET_OAUTH_USER_SUCCESS_ME'
 export const GET_USER_ME_FAILURE = 'GET_OAUTH_USER_FAILURE_ME'
+export const LOGOUT = 'LOGOUT'
+export const LOGOUT_SUCCESS = 'LOGOUT_SUCCESS'
+export const LOGOUT_FAILURE = 'LOGOUT_FAILURE'
 
 export const getUserMe = () => (
   { type: GET_USER_ME }
@@ -26,4 +29,16 @@ export const getUserMeSuccess = user => (
 
 export const getUserMeFailure = error => (
   { type: GET_USER_ME_FAILURE, error }
+)
+
+export const logout = () => (
+  { type: LOGOUT }
+)
+
+export const logoutSuccess = () => (
+  { type: LOGOUT_SUCCESS }
+)
+
+export const logoutFailure = error => (
+  { type: LOGOUT_FAILURE, error }
 )

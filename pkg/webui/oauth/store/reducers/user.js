@@ -16,6 +16,9 @@ import {
   GET_USER_ME,
   GET_USER_ME_SUCCESS,
   GET_USER_ME_FAILURE,
+  LOGOUT,
+  LOGOUT_SUCCESS,
+  LOGOUT_FAILURE,
 } from '../actions/user'
 
 const defaultState = {
@@ -45,6 +48,25 @@ const user = function (state = defaultState, action) {
       ...state,
       fetching: false,
       user: undefined,
+      error: action.error,
+    }
+  case LOGOUT:
+    return {
+      ...state,
+      fetching: true,
+      error: false,
+    }
+  case LOGOUT_SUCCESS:
+    return {
+      ...state,
+      user: undefined,
+      fetching: false,
+      error: false,
+    }
+  case LOGOUT_FAILURE:
+    return {
+      ...state,
+      fetching: false,
       error: action.error,
     }
   default:
