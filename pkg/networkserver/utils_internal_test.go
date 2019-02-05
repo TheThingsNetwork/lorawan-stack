@@ -40,6 +40,11 @@ func TestResetMACState(t *testing.T) {
 				FrequencyPlanID:   test.EUFrequencyPlanID,
 				LoRaWANVersion:    ttnpb.MAC_V1_1,
 				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+				MACSettings: &ttnpb.MACSettings{
+					Rx1Delay: &ttnpb.MACSettings_RxDelayValue{
+						Value: ttnpb.RX_DELAY_13,
+					},
+				},
 			},
 			DeviceDiff: func(dev *ttnpb.EndDevice) {
 				fp := test.Must(frequencyplans.NewStore(test.FrequencyPlansFetcher).GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
@@ -106,7 +111,7 @@ func TestResetMACState(t *testing.T) {
 						RejoinCountPeriodicity: ttnpb.REJOIN_COUNT_16,
 						RejoinTimePeriodicity:  ttnpb.REJOIN_TIME_0,
 						Rx1DataRateOffset:      0,
-						Rx1Delay:               ttnpb.RxDelay(band.ReceiveDelay1.Seconds()),
+						Rx1Delay:               ttnpb.RX_DELAY_13,
 						Rx2DataRateIndex:       band.DefaultRx2Parameters.DataRateIndex,
 						Rx2Frequency:           band.DefaultRx2Parameters.Frequency,
 						UplinkDwellTime:        false,
@@ -186,6 +191,11 @@ func TestResetMACState(t *testing.T) {
 				FrequencyPlanID:   test.USFrequencyPlanID,
 				LoRaWANVersion:    ttnpb.MAC_V1_1,
 				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+				MACSettings: &ttnpb.MACSettings{
+					Rx1Delay: &ttnpb.MACSettings_RxDelayValue{
+						Value: ttnpb.RX_DELAY_13,
+					},
+				},
 			},
 			DeviceDiff: func() func(dev *ttnpb.EndDevice) {
 				var bandChannels []*ttnpb.MACParameters_Channel
@@ -252,7 +262,7 @@ func TestResetMACState(t *testing.T) {
 							RejoinCountPeriodicity: ttnpb.REJOIN_COUNT_16,
 							RejoinTimePeriodicity:  ttnpb.REJOIN_TIME_0,
 							Rx1DataRateOffset:      0,
-							Rx1Delay:               ttnpb.RxDelay(band.ReceiveDelay1.Seconds()),
+							Rx1Delay:               ttnpb.RX_DELAY_13,
 							Rx2DataRateIndex:       band.DefaultRx2Parameters.DataRateIndex,
 							Rx2Frequency:           band.DefaultRx2Parameters.Frequency,
 							UplinkDwellTime:        false,

@@ -178,6 +178,18 @@ outerDown:
 		dev.MACState.DesiredParameters.MaxEIRP = float32(math.Min(float64(dev.MACState.CurrentParameters.MaxEIRP), float64(*fp.MaxEIRP)))
 	}
 
+	if dev.MACSettings.Rx1Delay != nil {
+		dev.MACState.DesiredParameters.Rx1Delay = dev.MACSettings.Rx1Delay.Value
+	}
+
+	if dev.MACSettings.Rx2Frequency != nil {
+		dev.MACState.DesiredParameters.Rx2Frequency = dev.MACSettings.Rx2Frequency.Value
+	}
+
+	if dev.MACSettings.Rx2DataRateIndex != nil {
+		dev.MACState.DesiredParameters.Rx2DataRateIndex = dev.MACSettings.Rx2DataRateIndex.Value
+	}
+
 	if dev.DefaultMACParameters != nil {
 		dev.MACState.CurrentParameters = deepcopy.Copy(*dev.DefaultMACParameters).(ttnpb.MACParameters)
 	}

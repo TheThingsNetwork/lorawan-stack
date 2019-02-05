@@ -187,6 +187,7 @@ func handleUplinkTest() func(t *testing.T) {
 				},
 				LoRaWANVersion:    ttnpb.MAC_V1_1,
 				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+				MACSettings:       &ttnpb.MACSettings{},
 				Session: &ttnpb.Session{
 					DevAddr: DevAddr,
 					SessionKeys: ttnpb.SessionKeys{
@@ -251,6 +252,7 @@ func handleUplinkTest() func(t *testing.T) {
 				},
 				LoRaWANVersion:    ttnpb.MAC_V1_1,
 				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+				MACSettings:       &ttnpb.MACSettings{},
 				Session: &ttnpb.Session{
 					DevAddr: DevAddr,
 					SessionKeys: ttnpb.SessionKeys{
@@ -1441,6 +1443,7 @@ func handleJoinTest() func(t *testing.T) {
 						DeviceID:               DeviceID,
 					},
 					FrequencyPlanID: test.EUFrequencyPlanID,
+					MACSettings:     &ttnpb.MACSettings{},
 				},
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
@@ -1468,6 +1471,7 @@ func handleJoinTest() func(t *testing.T) {
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session:         ttnpb.NewPopulatedSession(test.Randy, false),
 					MACState:        ttnpb.NewPopulatedMACState(test.Randy, false),
+					MACSettings:     &ttnpb.MACSettings{},
 				},
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
@@ -1495,6 +1499,7 @@ func handleJoinTest() func(t *testing.T) {
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session:         ttnpb.NewPopulatedSession(test.Randy, false),
 					MACState:        ttnpb.NewPopulatedMACState(test.Randy, false),
+					MACSettings:     &ttnpb.MACSettings{},
 				},
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
@@ -1522,6 +1527,7 @@ func handleJoinTest() func(t *testing.T) {
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session:         ttnpb.NewPopulatedSession(test.Randy, false),
 					MACState:        ttnpb.NewPopulatedMACState(test.Randy, false),
+					MACSettings:     &ttnpb.MACSettings{},
 				},
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
@@ -1549,6 +1555,7 @@ func handleJoinTest() func(t *testing.T) {
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session:         ttnpb.NewPopulatedSession(test.Randy, false),
 					MACState:        ttnpb.NewPopulatedMACState(test.Randy, false),
+					MACSettings:     &ttnpb.MACSettings{},
 				},
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
