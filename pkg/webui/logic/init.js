@@ -35,7 +35,7 @@ const consoleLogic = createLogic({
           // there is no way to retrieve the current user directly
           // within the console app, so first get the authentication info
           // and only afterwards fetch the user
-          const info = await api.v3.is.authInfo()
+          const info = await api.v3.is.users.authInfo()
           const userId = info.data.oauth_access_token.user_ids.user_id
           result = await api.v3.is.users.get(userId)
         } else {
