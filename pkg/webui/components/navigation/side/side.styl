@@ -13,9 +13,9 @@
 // limitations under the License.
 
 .navigation
-  border-dark(right)
-  min-width: 14rem
-  max-width: 16rem
+  border-normal(right)
+  max-width: 18rem
+  min-width: 16rem
   height: 100%
   display: flex
   flex-direction: column
@@ -24,6 +24,7 @@
   &-minimized
     min-width: auto
     display: inline-flex
+    min-width: auto
 
   &-button
     align-self: center
@@ -31,11 +32,11 @@
 .header
   display: flex
   align-content: center
-  padding: $cs.l $cs.m
+  padding: $cs.xl $cs.l
   font-weight: 600
-  background-color: $c-backdrop
 
   &-minimized
+    padding: $cs.l $cs.m
     display: inline-block
 
     .message
