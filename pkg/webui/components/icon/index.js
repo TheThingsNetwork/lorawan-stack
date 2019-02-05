@@ -26,7 +26,7 @@ const hardcoded = {
   integration: 'settings_ethernet',
   data: 'poll',
   sort: 'arrow_drop_down',
-  overview: 'apps',
+  overview: 'dashboard',
   application: 'web_asset',
   gateway: 'router',
   organization: 'people',
