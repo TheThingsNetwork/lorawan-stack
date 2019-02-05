@@ -19,6 +19,7 @@ import { Col, Row, Container } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 import bind from 'autobind-decorator'
 import IntlHelmet from '../../../lib/components/intl-helmet'
+import Message from '../../../lib/components/message'
 import sharedMessages from '../../../lib/shared-messages'
 
 import DataSheet from '../../../components/data-sheet'
@@ -32,12 +33,13 @@ const m = defineMessages({
   hardwareVersion: 'Hardware version',
   firmwareVersion: 'Firmware Version',
   activationInfo: 'Activation Info',
-  rootKeyId: 'Root Key Id',
+  rootKeyId: 'Root Key ID',
   sessionInfo: 'Session Info',
   fwdNtwkKey: 'FNwkSIntKey',
   sNtwkSIKey: 'SNwkSIntKey',
   ntwkSEncKey: 'NwkSEncKey',
   appSKey: 'AppSKey',
+  latestData: 'Latest Data',
 })
 
 @connect(function ({ device }, props) {
@@ -135,11 +137,11 @@ class DeviceOverview extends React.Component {
           </Col>
           <Col md={12} lg={6}>
             <div className={style.activityPlaceholder}>
-              <h4>Latest Data</h4>
+              <h4><Message content={m.latestData} /></h4>
               <div>Activity Panel Placeholder</div>
             </div>
             <div className={style.locationPlaceholder}>
-              <h4>Location</h4>
+              <h4><Message content={sharedMessages.location} /></h4>
               <div>Location Map Placeholder</div>
             </div>
           </Col>

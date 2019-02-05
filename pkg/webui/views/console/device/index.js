@@ -35,7 +35,7 @@ const tabs = [
   { title: sharedMessages.overview, name: 'overview' },
   { title: sharedMessages.data, name: 'data' },
   { title: sharedMessages.location, name: 'location' },
-  { title: sharedMessages.payloadFormatter, name: 'develop' },
+  { title: sharedMessages.payloadFormats, name: 'develop' },
   { title: sharedMessages.generalSettings, name: 'general-settings' },
 ]
 
