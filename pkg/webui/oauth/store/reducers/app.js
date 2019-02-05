@@ -12,31 +12,40 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import { connect } from 'react-redux'
+import {
+  INITIALIZE,
+  INITIALIZE_SUCCESS,
+  INITIALIZE_FAILURE,
+} from '../actions/app'
 
-import Button from '../../../components/button'
-import WithAuth from '../../../lib/components/with-auth'
-import api from '../../api'
+const defaultState = {
+  initialized: false,
+  error: false,
+}
 
-@connect((state, props) => ({
-  user: state.user.user,
-})
-)
-export default class OAuth extends React.PureComponent {
-
-  async handleLogout () {
-    await api.oauth.logout()
-    window.location = '/oauth/login'
-  }
-
-  render () {
-    const { user = { ids: {}}} = this.props
-
-    return (
-      <WithAuth>
-        <div>You are logged in as {user.ids.user_id}. <Button message="Logout" onClick={this.handleLogout} /></div>
-      </WithAuth>
-    )
+const app = function (state = defaultState, action) {
+  switch (action.type) {
+  case INITIALIZE:
+    return {
+      ...state,
+      error: false,
+      initialized: false,
+    }
+  case INITIALIZE_SUCCESS:
+    return {
+      ...state,
+      error: false,
+      initialized: true,
+    }
+  case INITIALIZE_FAILURE:
+    return {
+      ...state,
+      error: action.error,
+      initialized: false,
+    }
+  default:
+    return state
   }
 }
+
+export default app

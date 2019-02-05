@@ -20,7 +20,7 @@ import { defineMessages } from 'react-intl'
 import { replace } from 'connected-react-router'
 import { connect } from 'react-redux'
 
-import api from '../../../api'
+import api from '../../api'
 import sharedMessages from '../../../lib/shared-messages'
 
 import Button from '../../../components/button'

@@ -26,7 +26,7 @@ import Landing from '../landing'
 import Login from '../login'
 import Authorize from '../authorize'
 import CreateAccount from '../create-account'
-import createStore from '../../../store'
+import createStore from '../../store'
 import Init from '../../../lib/components/init'
 
 const history = createBrowserHistory()

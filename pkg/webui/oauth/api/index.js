@@ -12,31 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import { connect } from 'react-redux'
+import axios from 'axios'
 
-import Button from '../../../components/button'
-import WithAuth from '../../../lib/components/with-auth'
-import api from '../../api'
+import getCookieValue from '../../lib/cookie'
 
-@connect((state, props) => ({
-  user: state.user.user,
+const csrf = getCookieValue('_csrf')
+const instance = axios.create({
+  headers: { 'X-CSRF-Token': csrf },
 })
-)
-export default class OAuth extends React.PureComponent {
 
-  async handleLogout () {
-    await api.oauth.logout()
-    window.location = '/oauth/login'
-  }
-
-  render () {
-    const { user = { ids: {}}} = this.props
-
-    return (
-      <WithAuth>
-        <div>You are logged in as {user.ids.user_id}. <Button message="Logout" onClick={this.handleLogout} /></div>
-      </WithAuth>
-    )
-  }
+export default {
+  users: {
+    async register (userData) {
+      return axios.post(`/api/v3/users`, userData)
+    },
+  },
+  oauth: {
+    login (credentials) {
+      return instance.post('/oauth/api/auth/login', credentials)
+    },
+    logout () {
+      return instance.post('/oauth/api/auth/logout')
+    },
+    me () {
+      return instance.get('/oauth/api/me')
+    },
+  },
 }

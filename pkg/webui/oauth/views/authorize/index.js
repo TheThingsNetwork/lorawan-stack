@@ -16,7 +16,7 @@ import React, { PureComponent, Fragment } from 'react'
 import Query from 'query-string'
 import { defineMessages } from 'react-intl'
 
-import api from '../../../api'
+import api from '../../api'
 import sharedMessages from '../../../lib/shared-messages'
 
 import ErrorMessage from '../../../lib/components/error-message'

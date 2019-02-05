@@ -20,7 +20,7 @@ import { connect } from 'react-redux'
 import { replace } from 'connected-react-router'
 import * as Yup from 'yup'
 
-import api from '../../../api'
+import api from '../../api'
 import sharedMessages from '../../../lib/shared-messages'
 
 import Button from '../../../components/button'
@@ -100,7 +100,7 @@ export default class CreateAccount extends React.PureComponent {
   async handleSubmit (values, { setSubmitting, setErrors }) {
     try {
       const { user_id, ...rest } = values
-      const result = await api.v3.is.users.create({
+      const result = await api.users.register({
         user: { ids: { user_id }, ...rest },
       })
 
