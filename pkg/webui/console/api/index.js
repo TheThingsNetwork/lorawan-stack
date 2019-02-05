@@ -13,9 +13,25 @@
 // limitations under the License.
 
 import axios from 'axios'
+import TTN from 'ttn-lw'
 
 import token from '../lib/access-token'
 import stubs from './stubs'
+
+const config = window.APP_CONFIG
+const stack = {
+  is: config.is.enabled ? config.is.base_url : undefined,
+  gs: config.gs.enabled ? config.gs.base_url : undefined,
+  ns: config.ns.enabled ? config.ns.base_url : undefined,
+  as: config.as.enabled ? config.as.base_url : undefined,
+  js: config.js.enabled ? config.js.base_url : undefined,
+}
+
+const ttnClient = new TTN(token, {
+  stackConfig: stack,
+  connectionType: 'http',
+  proxy: false,
+})
 
 export default {
   console: {
@@ -51,11 +67,14 @@ export default {
     },
   },
   applications: {
-    list: stubs.applications.list,
-    search: stubs.applications.search,
+    list: ttnClient.Applications.getAll,
+    search: ttnClient.Applications.search,
   },
   application: {
-    get: stubs.application.get,
+    get: ttnClient.Applications.getById,
+    'delete': ttnClient.Applications.deleteById,
+    create: ttnClient.Applications.create,
+    update: ttnClient.Applications.updateById,
     apiKeys: {
       list: stubs.application.apiKeys.list,
     },
