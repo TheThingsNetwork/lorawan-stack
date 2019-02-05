@@ -54,7 +54,8 @@ const tabs = [
   }
 })
 @withBreadcrumb('device.single', function (props) {
-  const { appId, devId } = props
+  const { devId } = props
+  const { appId } = props.match.params
   return (
     <Breadcrumb
       path={`/console/applications/${appId}/devices/${devId}`}
