@@ -25,7 +25,7 @@ import Init from './lib/components/init'
 import WithLocale from './lib/components/with-locale'
 
 import createStore from './store'
-import App from './views/console/app'
+import App from './console/views/app'
 
 const history = createBrowserHistory()
 const store = createStore(history)
