@@ -15,6 +15,7 @@
 package ttnpb
 
 import (
+	"fmt"
 	"sort"
 	"strings"
 )
@@ -171,3 +172,12 @@ func (r *Rights) IncludesAll(search ...Right) bool {
 
 // RightsFrom returns a Rights message from a list of rights.
 func RightsFrom(rights ...Right) *Rights { return &Rights{Rights: rights} }
+
+// PrettyName returns the key ID (Name if present)
+func (m *APIKey) PrettyName() string {
+	identifier := m.GetID()
+	if name := m.GetName(); name != "" {
+		identifier = fmt.Sprintf("%v (%v)", identifier, name)
+	}
+	return identifier
+}
