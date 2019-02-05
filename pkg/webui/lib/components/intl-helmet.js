@@ -16,29 +16,27 @@ import React from 'react'
 import { Helmet } from 'react-helmet'
 import { injectIntl } from 'react-intl'
 
-import Message from './message'
-
 /**
- * IntlHelmet is a HOC that enables usage of <Message /> components inside
- * header tags used in react-helmet.
+ * IntlHelmet is a HOC that enables usage of i18n messages inside the props in
+ * react-helmet, which will be translated automatically
  */
 @injectIntl
 export default class IntlHelmet extends React.Component {
   render () {
     const { intl, children, ...rest } = this.props
+    let translatedRest = {}
+    for (const key in rest) {
+      let prop = rest[key]
+      if (typeof prop === 'object' && prop.id && prop.defaultMessage) {
+        prop = intl.formatMessage(prop)
+      }
 
-    const translatedChildren = React.Children.map(children, function (child) {
-      const childrenChildren = React.Children.map(child.props.children, function (childChild) {
-        let message = childChild
-        if (childChild.type === Message) {
-          // Evaluate the message
-          message = intl.formatMessage(childChild.props.content)
-        }
-        return message
-      })
-      return <child.type>{childrenChildren.join(' ')}</child.type>
-    })
+      translatedRest = {
+        ...translatedRest,
+        [key]: prop,
+      }
+    }
 
-    return <Helmet {...rest}>{translatedChildren}</Helmet>
+    return <Helmet {...translatedRest}>{children}</Helmet>
   }
 }
