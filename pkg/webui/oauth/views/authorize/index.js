@@ -77,9 +77,7 @@ export default class Authorize extends PureComponent {
 
     return (
       <Fragment>
-        <IntlHelmet>
-          <title><Message content={m.authorize} /></title>
-        </IntlHelmet>
+        <IntlHelmet title={m.authorize} />
         <Modal
           title={m.modalTitle}
           subtitle={{ ...m.modalSubtitle, values: { clientName }}}

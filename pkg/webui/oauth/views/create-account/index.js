@@ -134,9 +134,7 @@ export default class CreateAccount extends React.PureComponent {
 
     return (
       <div className={style.fullHeightCenter}>
-        <IntlHelmet>
-          <title><Message content={m.register} /></title>
-        </IntlHelmet>
+        <IntlHelmet title={m.register} />
         <div className={style.wrapper}>
           <h1><Message content={m.createAccount} /></h1>
           <Form

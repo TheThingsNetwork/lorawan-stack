@@ -27,8 +27,8 @@ import Button from '../../../components/button'
 import Field from '../../../components/field'
 import Form from '../../../components/form'
 import Logo from '../../../components/logo'
-import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
+import Message from '../../../lib/components/message'
 
 import style from './login.styl'
 
@@ -78,9 +78,7 @@ export default class OAuth extends React.PureComponent {
 
     return (
       <div className={style.fullHeightCenter}>
-        <IntlHelmet>
-          <title><Message content={sharedMessages.login} /></title>
-        </IntlHelmet>
+        <IntlHelmet title={sharedMessages.login} />
         <div>
           <div className={style.left}>
             <div>
