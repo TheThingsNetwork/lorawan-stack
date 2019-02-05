@@ -48,7 +48,8 @@ const tabs = [
   }
 })
 @withBreadcrumb('device.single', function (props) {
-  const { appId, devId } = props
+  const { devId } = props
+  const { appId } = props.match.params
   return (
     <Breadcrumb
       path={`/console/applications/${appId}/devices/${devId}`}
@@ -71,6 +72,7 @@ export default class Device extends React.Component {
 
   render () {
     const { fetching, error, match, appName, devId } = this.props
+    const { appId } = this.props.match.params
 
     if (fetching) {
       return (
@@ -88,7 +90,7 @@ export default class Device extends React.Component {
     return (
       <React.Fragment>
         <Helmet
-          titleTemplate={`%s - ${appName} - The Things Network Console`}
+          titleTemplate={`%s - ${appName || appId} - The Things Network Console`}
           defaultTitle="Devices - The Things Network Console"
         />
         <Container>
