@@ -19,7 +19,7 @@ import Marshaler from '../util/marshaler'
  * Http Class is a connector for the API that uses the HTTP bridge to connect.
  */
 class Http {
-  constructor (token, { baseURL, axiosConfig = {}}) {
+  constructor (token, stackConfig, axiosConfig = {}) {
     const headers = axiosConfig.headers || {}
     let Authorization = null
 
@@ -27,33 +27,43 @@ class Http {
       Authorization = `Bearer ${token}`
     }
 
-    this.axios = axios.create({
-      baseURL,
-      headers: {
-        Authorization,
-        ...headers,
-      },
-      ...axiosConfig,
-    })
+    const stackComponents = Object.keys(stackConfig)
+    const instances = stackComponents.reduce(function (acc, curr) {
+      acc[curr] = axios.create({
+        baseURL: stackConfig[curr],
+        headers: {
+          Authorization,
+          ...headers,
+        },
+        ...axiosConfig,
+      })
 
-    // Re-evaluate headers on each request if token is a thunk. This can be
-    // useful if the token needs to be refreshed frequently, as the case for
-    // access tokens.
-    if (typeof token === 'function') {
-      this.axios.interceptors.request.use(async function (config) {
-        const tkn = (await token()).access_token
-        config.headers.Authorization = `Bearer ${tkn}`
+      return acc
+    }, {})
 
-        return config
-      },
-      err => Promise.reject(err))
+    for (const instance in instances) {
+      this[instance] = instances[instance]
+
+      // Re-evaluate headers on each request if token is a thunk. This can be
+      // useful if the token needs to be refreshed frequently, as the case for
+      // access tokens.
+      if (typeof token === 'function') {
+        this[instance].interceptors.request.use(async function (config) {
+          const tkn = (await token()).access_token
+          config.headers.Authorization = `Bearer ${tkn}`
+
+          return config
+        },
+        err => Promise.reject(err))
+      }
     }
   }
 
   async handleRequest (method, endpoint, rawPayload) {
     const payload = rawPayload ? Marshaler.payload(rawPayload) : {}
+    const component = this._parseStackComponent(endpoint)
     try {
-      return await this.axios[method](endpoint, payload)
+      return await this[component][method](endpoint, payload)
     } catch (err) {
       if ('response' in err && err.response && 'data' in err.response) {
         throw err.response.data
@@ -81,6 +91,28 @@ class Http {
 
   async delete (endpoint) {
     return this.handleRequest('delete', endpoint)
+  }
+
+  /**
+   *  Extracts the stack component abbreviation from the endpoint.
+   * @param {string} endpoint - The endpoint got for a request method.
+   * @returns {string} One of {is|as|gs|js|ns}.
+   */
+  _parseStackComponent (endpoint) {
+    try {
+      const component = endpoint.split('/')[1]
+      switch (component) {
+      case 'as':
+      case 'gs':
+      case 'js':
+      case 'ns':
+        return component
+      default:
+        return 'is'
+      }
+    } catch (err) {
+      throw new Error('Unable to extract the stack component:', endpoint)
+    }
   }
 }
 

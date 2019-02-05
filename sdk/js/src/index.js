@@ -18,14 +18,14 @@ import Api from './api'
 
 class TtnLw {
   constructor (token, {
-    baseURL,
+    stackConfig,
     connectionType,
     defaultUserId,
     proxy,
-    axiosConfig = {},
+    axiosConfig,
   }) {
     this.config = arguments.config
-    this.api = new Api(connectionType, { baseURL, ...axiosConfig }, token)
+    this.api = new Api(connectionType, stackConfig, axiosConfig, token)
 
     this.Applications = new Applications(this.api, { defaultUserId, proxy })
     this.Application = Application.bind(null, this.Applications)

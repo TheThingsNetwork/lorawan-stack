@@ -22,16 +22,15 @@ import Http from './http'
  * expose the same class API for both
  */
 class Api {
-  constructor (connectionType = 'http', connectionConfig, token) {
+  constructor (connectionType = 'http', stackConfig, axiosConfig, token) {
     this.connectionType = connectionType
-    this.connectionConfig = connectionConfig
     this.token = token
 
     if (this.connectionType !== 'http') {
       throw new Error('Only http connection type is supported')
     }
 
-    this._connector = new Http(token, connectionConfig)
+    this._connector = new Http(token, stackConfig, axiosConfig)
     const connector = this._connector
 
     for (const serviceName of Object.keys(apiDefinition)) {
