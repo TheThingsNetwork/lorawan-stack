@@ -160,6 +160,9 @@ outerDown:
 	dev.MACState.DesiredParameters.UplinkDwellTime = fp.DwellTime.GetUplinks()
 	dev.MACState.DesiredParameters.DownlinkDwellTime = fp.DwellTime.GetDownlinks()
 
+	// TODO: Apply NS-wide default (https://github.com/TheThingsIndustries/lorawan-stack/issues/1544)
+	dev.MACState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_5
+
 	if fp.Rx2Channel != nil {
 		dev.MACState.DesiredParameters.Rx2Frequency = fp.Rx2Channel.Frequency
 	}
