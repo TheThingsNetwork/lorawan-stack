@@ -22,8 +22,8 @@ import sharedMessages from '../../../lib/shared-messages'
 import ErrorMessage from '../../../lib/components/error-message'
 import Modal from '../../../components/modal'
 import Icon from '../../../components/icon'
-import IntlHelmet from '../../../lib/components/intl-helmet'
 import Message from '../../../lib/components/message'
+import IntlHelmet from '../../../lib/components/intl-helmet'
 import { withEnv } from '../../../lib/components/env'
 import getCookieValue from '../../../lib/cookie'
 
@@ -77,7 +77,9 @@ export default class Authorize extends PureComponent {
 
     return (
       <Fragment>
-        <IntlHelmet title={m.authorize} />
+        <IntlHelmet>
+          <title><Message content={m.authorize} /></title>
+        </IntlHelmet>
         <Modal
           title={m.modalTitle}
           subtitle={{ ...m.modalSubtitle, values: { clientName }}}

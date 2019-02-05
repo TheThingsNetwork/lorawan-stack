@@ -25,7 +25,6 @@ import api from '../../../api'
 )
 export default class OAuth extends React.PureComponent {
 
-
   async handleLogout () {
     await api.oauth.logout()
     window.location = '/oauth/login'

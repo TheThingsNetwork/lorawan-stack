@@ -14,7 +14,7 @@
 
 import React from 'react'
 import DOM from 'react-dom'
-import OAuthApp from './views/oauth/app'
+import OAuthApp from './oauth/views/app'
 
 const root = document.getElementById('app')
 DOM.render((<OAuthApp />), root)
