@@ -43,7 +43,6 @@ class ApplicationOverview extends React.Component {
         header: sharedMessages.generalInformation,
         items: [
           { key: sharedMessages.appId, value: ids.application_id, type: 'code', sensitive: false },
-          { key: sharedMessages.joinEUI, value: '00000000000000', type: 'byte', sensitive: false },
           { key: sharedMessages.createdAt, value: created_at.toLocaleDateString() },
         ],
       },
