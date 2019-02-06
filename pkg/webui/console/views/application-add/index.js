@@ -68,9 +68,8 @@ const validationSchema = Yup.object().shape({
     />
   )
 })
-@connect(({ user }) => ({
-  userId: user.user.ids.user_id,
-}))
+
+@connect(({ application }) => ({ error: application.error || '' }))
 @bind
 export default class Add extends React.Component {
 
