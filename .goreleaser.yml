@@ -1,0 +1,83 @@
+project_name: lorawan-stack
+
+before:
+  hooks:
+  - make js.build
+
+builds:
+  - main: ./cmd/ttn-lw-stack
+    binary: ttn-lw-stack
+    ldflags:
+    - -s
+    - -w
+    - -X go.thethings.network/lorawan-stack/pkg/version.BuildDate={{.Date}}
+    - -X go.thethings.network/lorawan-stack/pkg/version.GitCommit={{.ShortCommit}}
+    - -X go.thethings.network/lorawan-stack/pkg/version.TTN={{.Version}}
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - darwin
+      - freebsd
+      - linux
+      - netbsd
+      - openbsd
+      - windows
+    goarch:
+      - 386
+      - amd64
+      - arm
+      - arm64
+    goarm:
+      - 6
+      - 7
+
+  - main: ./cmd/ttn-lw-cli
+    binary: ttn-lw-cli
+    ldflags:
+    - -s
+    - -w
+    - -X go.thethings.network/lorawan-stack/pkg/version.BuildDate={{.Date}}
+    - -X go.thethings.network/lorawan-stack/pkg/version.GitCommit={{.ShortCommit}}
+    - -X go.thethings.network/lorawan-stack/pkg/version.TTN={{.Version}}
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - darwin
+      - freebsd
+      - linux
+      - netbsd
+      - openbsd
+      - windows
+    goarch:
+      - 386
+      - amd64
+      - arm
+      - arm64
+    goarm:
+      - 6
+      - 7
+
+archive:
+  files:
+    - CODEOWNERS
+    - LICENSE
+    - README.md
+    - doc/**/*
+    - docker-compose.yml
+    - public/**/*
+  wrap_in_directory: true
+  format_overrides:
+    - goos: windows
+      format: zip
+
+changelog:
+  filters:
+      exclude:
+        - '^doc:'
+        - '^dev:'
+        - '^make:'
+        - '^ci:'
+        - '^Merge pull request'
+
+release:
+  prerelease: auto
