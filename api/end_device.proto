@@ -176,18 +176,18 @@ message EndDeviceVersion {
 }
 
 message MACSettings {
-  bool use_adr = 1 [(gogoproto.customname) = "UseADR"];
+  google.protobuf.BoolValue use_adr = 1 [(gogoproto.customname) = "UseADR"];
   // The ADR margin tells the network server how much margin it should add in ADR requests.
   // A bigger margin is less efficient, but gives a better chance of successful reception.
-  uint32 adr_margin = 2 [(gogoproto.customname) = "ADRMargin"];
+  google.protobuf.UInt32Value adr_margin = 2 [(gogoproto.customname) = "ADRMargin"];
   // Deadline for the device to respond to requests from the Network Server.
-  google.protobuf.Duration class_b_timeout = 3 [(gogoproto.stdduration) = true, (gogoproto.nullable) = false];
+  google.protobuf.Duration class_b_timeout = 3 [(gogoproto.stdduration) = true];
   // Deadline for the device to respond to requests from the Network Server.
-  google.protobuf.Duration class_c_timeout = 4 [(gogoproto.stdduration) = true, (gogoproto.nullable) = false];
+  google.protobuf.Duration class_c_timeout = 4 [(gogoproto.stdduration) = true];
   // The interval after which a DevStatusReq MACCommand shall be sent.
-  google.protobuf.Duration status_time_periodicity = 5 [(gogoproto.stdduration) = true, (gogoproto.nullable) = false];
+  google.protobuf.Duration status_time_periodicity = 5 [(gogoproto.stdduration) = true];
   // Number of uplink messages after which a DevStatusReq MACCommand shall be sent.
-  uint32 status_count_periodicity = 6;
+  google.protobuf.UInt32Value status_count_periodicity = 6;
 
   message RxDelayValue {
     RxDelay value = 1;

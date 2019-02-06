@@ -87,14 +87,35 @@ func (this *EndDeviceVersion) Validate() error {
 	return nil
 }
 func (this *MACSettings) Validate() error {
-	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.ClassBTimeout)); err != nil {
-		return github_com_mwitkow_go_proto_validators.FieldError("ClassBTimeout", err)
+	if this.UseADR != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.UseADR); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("UseADR", err)
+		}
 	}
-	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.ClassCTimeout)); err != nil {
-		return github_com_mwitkow_go_proto_validators.FieldError("ClassCTimeout", err)
+	if this.ADRMargin != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.ADRMargin); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("ADRMargin", err)
+		}
 	}
-	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.StatusTimePeriodicity)); err != nil {
-		return github_com_mwitkow_go_proto_validators.FieldError("StatusTimePeriodicity", err)
+	if this.ClassBTimeout != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.ClassBTimeout); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("ClassBTimeout", err)
+		}
+	}
+	if this.ClassCTimeout != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.ClassCTimeout); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("ClassCTimeout", err)
+		}
+	}
+	if this.StatusTimePeriodicity != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.StatusTimePeriodicity); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("StatusTimePeriodicity", err)
+		}
+	}
+	if this.StatusCountPeriodicity != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.StatusCountPeriodicity); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("StatusCountPeriodicity", err)
+		}
 	}
 	if this.Rx1Delay != nil {
 		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.Rx1Delay); err != nil {

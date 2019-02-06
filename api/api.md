@@ -1784,12 +1784,12 @@ This is used internally by the Network Server and is read only.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| use_adr | [bool](#bool) |  |  |
-| adr_margin | [uint32](#uint32) |  | The ADR margin tells the network server how much margin it should add in ADR requests. A bigger margin is less efficient, but gives a better chance of successful reception. |
+| use_adr | [google.protobuf.BoolValue](#google.protobuf.BoolValue) |  |  |
+| adr_margin | [google.protobuf.UInt32Value](#google.protobuf.UInt32Value) |  | The ADR margin tells the network server how much margin it should add in ADR requests. A bigger margin is less efficient, but gives a better chance of successful reception. |
 | class_b_timeout | [google.protobuf.Duration](#google.protobuf.Duration) |  | Deadline for the device to respond to requests from the Network Server. |
 | class_c_timeout | [google.protobuf.Duration](#google.protobuf.Duration) |  | Deadline for the device to respond to requests from the Network Server. |
 | status_time_periodicity | [google.protobuf.Duration](#google.protobuf.Duration) |  | The interval after which a DevStatusReq MACCommand shall be sent. |
-| status_count_periodicity | [uint32](#uint32) |  | Number of uplink messages after which a DevStatusReq MACCommand shall be sent. |
+| status_count_periodicity | [google.protobuf.UInt32Value](#google.protobuf.UInt32Value) |  | Number of uplink messages after which a DevStatusReq MACCommand shall be sent. |
 | rx1_delay | [MACSettings.RxDelayValue](#ttn.lorawan.v3.MACSettings.RxDelayValue) |  |  |
 | rx2_data_rate_index | [MACSettings.DataRateIndexValue](#ttn.lorawan.v3.MACSettings.DataRateIndexValue) |  |  |
 | rx2_frequency | [google.protobuf.UInt64Value](#google.protobuf.UInt64Value) |  |  |

@@ -921,8 +921,7 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 			if src != nil {
 				dst.UseADR = src.UseADR
 			} else {
-				var zero bool
-				dst.UseADR = zero
+				dst.UseADR = nil
 			}
 		case "adr_margin":
 			if len(subs) > 0 {
@@ -931,8 +930,7 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 			if src != nil {
 				dst.ADRMargin = src.ADRMargin
 			} else {
-				var zero uint32
-				dst.ADRMargin = zero
+				dst.ADRMargin = nil
 			}
 		case "class_b_timeout":
 			if len(subs) > 0 {
@@ -941,8 +939,7 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 			if src != nil {
 				dst.ClassBTimeout = src.ClassBTimeout
 			} else {
-				var zero time.Duration
-				dst.ClassBTimeout = zero
+				dst.ClassBTimeout = nil
 			}
 		case "class_c_timeout":
 			if len(subs) > 0 {
@@ -951,8 +948,7 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 			if src != nil {
 				dst.ClassCTimeout = src.ClassCTimeout
 			} else {
-				var zero time.Duration
-				dst.ClassCTimeout = zero
+				dst.ClassCTimeout = nil
 			}
 		case "status_time_periodicity":
 			if len(subs) > 0 {
@@ -961,8 +957,7 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 			if src != nil {
 				dst.StatusTimePeriodicity = src.StatusTimePeriodicity
 			} else {
-				var zero time.Duration
-				dst.StatusTimePeriodicity = zero
+				dst.StatusTimePeriodicity = nil
 			}
 		case "status_count_periodicity":
 			if len(subs) > 0 {
@@ -971,8 +966,7 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 			if src != nil {
 				dst.StatusCountPeriodicity = src.StatusCountPeriodicity
 			} else {
-				var zero uint32
-				dst.StatusCountPeriodicity = zero
+				dst.StatusCountPeriodicity = nil
 			}
 		case "rx1_delay":
 			if len(subs) > 0 {
