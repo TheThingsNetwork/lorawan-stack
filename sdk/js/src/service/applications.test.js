@@ -42,7 +42,7 @@ jest.mock('../api', function () {
   return jest.fn().mockImplementation(function () {
     return {
       ApplicationRegistry: {
-        Get: jest.fn().mockResolvedValue(mockApplicationData),
+        Get: jest.fn().mockResolvedValue({ data: mockApplicationData }),
         List: jest.fn().mockResolvedValue({
           data: { applications: [ mockApplicationData ]},
           headers: { 'x-total-count': 1 },
@@ -61,32 +61,35 @@ describe('Applications', function () {
     applications = new Applications(new Api(), { defaultUserId: 'testuser' })
   })
 
-  test('instance initializes correctly', function () {
-    jest.resetModules()
+  describe('Proxied results', function () {
+    test('instance initializes correctly', function () {
+      jest.resetModules()
 
-    expect(applications).toBeInstanceOf(Applications)
-    expect(applications._api).toBeDefined()
+      expect(applications).toBeInstanceOf(Applications)
+      expect(applications._api).toBeDefined()
+    })
+
+    test('instance returns an application instance on getById()', async function () {
+      jest.resetModules()
+
+      const app = await applications.getById('test')
+      expect(app).toBeDefined()
+      expect(app.constructor.name).toBe('Application')
+      expect(app.ids.application_id).toBe('test')
+    })
+
+    test('instance returns an application list on getAll()', async function () {
+      jest.resetModules()
+
+      const result = await applications.getAll()
+      expect(result).toBeDefined()
+
+      const { applications: apps, totalCount } = result
+      expect(apps.constructor.name).toBe('Array')
+      expect(apps).toHaveLength(1)
+      expect(apps[0].constructor.name).toBe('Application')
+      expect(totalCount).toBe(1)
+    })
   })
 
-  test('instance returns an application instance on getById()', async function () {
-    jest.resetModules()
-
-    const app = await applications.getById('test')
-    expect(app).toBeDefined()
-    expect(app.constructor.name).toBe('Application')
-    expect(app.ids.application_id).toBe('test')
-  })
-
-  test('instance returns an application list on getAll()', async function () {
-    jest.resetModules()
-
-    const result = await applications.getAll()
-    expect(result).toBeDefined()
-
-    const { applications: apps, totalCount } = result
-    expect(apps.constructor.name).toBe('Array')
-    expect(apps).toHaveLength(1)
-    expect(apps[0].constructor.name).toBe('Application')
-    expect(totalCount).toBe(1)
-  })
 })

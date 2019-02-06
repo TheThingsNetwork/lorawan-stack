@@ -58,8 +58,11 @@ jest.mock('./api', function () {
   return jest.fn().mockImplementation(function () {
     return {
       ApplicationRegistry: {
-        Get: jest.fn().mockResolvedValue(mockApplicationData),
-        List: jest.fn().mockResolvedValue([ mockApplicationData ]),
+        Get: jest.fn().mockResolvedValue({ data: mockApplicationData }),
+        List: jest.fn().mockResolvedValue({
+          data: { applications: [ mockApplicationData ]},
+          headers: { 'x-total-count': 1 },
+        }),
       },
       EndDeviceRegistry: {
         Get: jest.fn().mockResolvedValue(mockDeviceData),
@@ -72,7 +75,7 @@ describe('SDK class', function () {
   const token = 'faketoken'
   const ttn = new TTN( token, {
     connectionType: 'http',
-    baseURL: 'http://localhost:1885/api/v3',
+    stackConfig: { is: 'http://localhost:1885/api/v3' },
   })
 
   test('instance instanciates successfully', async function () {
