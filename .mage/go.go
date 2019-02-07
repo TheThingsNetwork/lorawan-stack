@@ -106,7 +106,7 @@ var goBuildConfigs = []goBuildConfig{
 	{GOOS: "darwin", GOARCH: "amd64"},
 }
 
-var releaseDir = "release"
+var releaseDir = "dist"
 
 func init() {
 	if releaseDirEnv := os.Getenv("RELEASE_DIR"); releaseDirEnv != "" {
