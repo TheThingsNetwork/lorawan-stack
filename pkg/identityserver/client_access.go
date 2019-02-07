@@ -20,8 +20,11 @@ import (
 	"github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/pkg/email"
 	"go.thethings.network/lorawan-stack/pkg/events"
+	"go.thethings.network/lorawan-stack/pkg/identityserver/emails"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 )
@@ -65,7 +68,13 @@ func (is *IdentityServer) setClientCollaborator(ctx context.Context, req *ttnpb.
 	}
 	if len(req.Collaborator.Rights) > 0 {
 		events.Publish(evtUpdateClientCollaborator(ctx, req.ClientIdentifiers, nil))
-		// TODO: Send notification email (https://github.com/TheThingsNetwork/lorawan-stack/issues/72).
+		err = is.SendContactsEmail(ctx, req.EntityIdentifiers(), func(data emails.Data) email.MessageData {
+			data.SetEntity(req.EntityIdentifiers())
+			return &emails.CollaboratorChanged{Data: data, Collaborator: req.Collaborator}
+		})
+		if err != nil {
+			log.FromContext(ctx).WithError(err).Error("Could not send collaborator updated notification email")
+		}
 	} else {
 		events.Publish(evtDeleteClientCollaborator(ctx, req.ClientIdentifiers, nil))
 	}
