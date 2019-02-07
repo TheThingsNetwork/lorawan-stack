@@ -14,9 +14,9 @@
 
 import {
   INITIALIZE,
-  INITIALIZE_SUCCESS,
   INITIALIZE_FAILURE,
-} from '../actions/app'
+  INITIALIZE_SUCCESS,
+} from '../actions/init'
 
 const defaultState = {
   initialized: false,
@@ -28,20 +28,20 @@ const app = function (state = defaultState, action) {
   case INITIALIZE:
     return {
       ...state,
-      error: false,
       initialized: false,
+      error: false,
     }
   case INITIALIZE_SUCCESS:
     return {
       ...state,
-      error: false,
       initialized: true,
+      error: false,
     }
   case INITIALIZE_FAILURE:
     return {
       ...state,
-      error: action.error,
       initialized: false,
+      error: action.error,
     }
   default:
     return state

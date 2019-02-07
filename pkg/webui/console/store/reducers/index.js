@@ -17,7 +17,7 @@ import { SHARED_NAME as APPLICATION_SHARED_NAME } from '../actions/application'
 import { SHARED_NAME as APPLICATIONS_SHARED_NAME } from '../actions/applications'
 import user from './user'
 import client from './client'
-import app from './app'
+import init from './init'
 import applications from './applications'
 import application from './application'
 import devices from './devices'
@@ -28,7 +28,7 @@ import createNamedRightsReducer from './rights'
 export default combineReducers({
   user,
   client,
-  app,
+  init,
   applications,
   application,
   devices,

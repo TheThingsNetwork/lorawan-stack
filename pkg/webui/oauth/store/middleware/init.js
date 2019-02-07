@@ -16,11 +16,11 @@
 import { createLogic } from 'redux-logic'
 
 import api from '../../api'
-import * as app from '../actions/app'
+import * as init from '../actions/init'
 import * as user from '../actions/user'
 
-const oauthAppLogic = createLogic({
-  type: app.INITIALIZE,
+const oauthInitLogic = createLogic({
+  type: init.INITIALIZE,
   async process ({ getState, action }, dispatch, done) {
     dispatch(user.getUserMe())
 
@@ -34,18 +34,18 @@ const oauthAppLogic = createLogic({
         dispatch(user.getUserMeFailure(userError))
       }
 
-      dispatch(app.initializeSuccess())
+      dispatch(init.initializeSuccess())
 
       // eslint-disable-next-line no-console
       console.log('Oauth initialization successful!')
     } catch (error) {
       const initError = error.data ? error.data : error
-      dispatch(app.initializeFailure(initError))
+      dispatch(init.initializeFailure(initError))
     }
 
     done()
   },
 })
 
-export default oauthAppLogic
+export default oauthInitLogic
 

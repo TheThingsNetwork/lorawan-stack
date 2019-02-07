@@ -32,8 +32,8 @@ setConfiguration({
 
 @connect(state => (
   {
-    initialized: state.app.initialized,
-    error: state.app.error,
+    initialized: state.init.initialized,
+    error: state.init.error,
   }
 ))
 export default class Init extends React.PureComponent {

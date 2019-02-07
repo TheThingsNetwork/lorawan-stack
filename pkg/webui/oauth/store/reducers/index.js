@@ -14,10 +14,10 @@
 
 import { combineReducers } from 'redux'
 
-import app from './app'
+import init from './init'
 import user from './user'
 
 export default combineReducers({
-  app,
+  init,
   user,
 })

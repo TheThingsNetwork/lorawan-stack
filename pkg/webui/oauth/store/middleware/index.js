@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import app from './app'
+import init from './init'
 import user from './user'
 
 export default [
-  app,
+  init,
   user,
 ]

@@ -14,38 +14,38 @@
 
 import {
   INITIALIZE,
-  INITIALIZE_FAILURE,
   INITIALIZE_SUCCESS,
-} from '../actions/app'
+  INITIALIZE_FAILURE,
+} from '../actions/init'
 
 const defaultState = {
   initialized: false,
   error: false,
 }
 
-const app = function (state = defaultState, action) {
+const init = function (state = defaultState, action) {
   switch (action.type) {
   case INITIALIZE:
     return {
       ...state,
-      initialized: false,
       error: false,
+      initialized: false,
     }
   case INITIALIZE_SUCCESS:
     return {
       ...state,
-      initialized: true,
       error: false,
+      initialized: true,
     }
   case INITIALIZE_FAILURE:
     return {
       ...state,
-      initialized: false,
       error: action.error,
+      initialized: false,
     }
   default:
     return state
   }
 }
 
-export default app
+export default init

@@ -15,12 +15,12 @@
 import { createLogic } from 'redux-logic'
 
 import * as user from '../actions/user'
-import * as app from '../actions/app'
+import * as init from '../actions/init'
 import api from '../../api'
 import * as accessToken from '../../lib/access-token'
 
 const consoleAppLogic = createLogic({
-  type: app.INITIALIZE,
+  type: init.INITIALIZE,
   async process ({ getState, action }, dispatch, done) {
     dispatch(user.getUserMe())
 
@@ -38,12 +38,12 @@ const consoleAppLogic = createLogic({
         accessToken.clear()
       }
 
-      dispatch(app.initializeSuccess())
+      dispatch(init.initializeSuccess())
 
       // eslint-disable-next-line no-console
       console.log('Console initialization successful!')
     } catch (error) {
-      dispatch(app.initializeFailure())
+      dispatch(init.initializeFailure())
     }
 
     done()
