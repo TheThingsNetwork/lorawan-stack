@@ -143,6 +143,9 @@ func TestLink(t *testing.T) {
 			a.So(err, should.BeNil)
 			a.So(*actual, should.Resemble, link)
 
+			// Wait for link to subscribe internally.
+			time.Sleep(timeout)
+
 			// Delete link.
 			_, err = as.DeleteLink(ctx, &app2)
 			a.So(err, should.BeNil)
