@@ -14,8 +14,8 @@
 
 # run tests
 go.test: go.min-version key.pem cert.pem
-	@$(log) "Testing `$(TEST_PACKAGES) | $(count)` go packages"
-	$(GO) test $(GO_FLAGS) $(GO_TEST_FLAGS) `$(TEST_PACKAGES)`
+	@$(log) "Running tests..."
+	$(GO) test $(GO_FLAGS) $(GO_TEST_FLAGS) ./...
 
 $(GO_COVER_FILE): GO_TEST_FLAGS = $(GO_COVERALLS_FLAGS)
 $(GO_COVER_FILE):

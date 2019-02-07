@@ -78,9 +78,6 @@ GO_PACKAGES = $(GO) list -v ./...
 # local go packages as absolute paths
 GO_PACKAGES_ABSOLUTE = $(GO) list -v -f '{{.Dir}}' ./...
 
-# packages for testing
-TEST_PACKAGES = $(GO_FILES) | $(no_vendor) | $(only_test) | $(to_packages)
-
 # get tools required for development
 go.dev-deps:
 	@$(log) "Installing go dev dependencies"
