@@ -14,71 +14,87 @@
 
 import React from 'react'
 import { Formik } from 'formik'
+import bind from 'autobind-decorator'
 
 import Field from '../field'
 import Button from '../button'
 import Notification from '../notification'
 import PropTypes from '../../lib/prop-types'
 
-const InnerForm = function ({
-  setFieldValue,
-  setFieldTouched,
-  handleSubmit,
-  handleReset,
-  isSubmitting,
-  isValid,
-  errors,
-  error,
-  info,
-  values,
-  touched,
-  children,
-  horizontal,
-  submitEnabledWhenInvalid,
-  validateOnBlur,
-  validateOnChange,
-  dirty,
-}) {
-  const decoratedChildren = recursiveMap(children,
-    function (Child) {
-      if (Child.type === Field) {
-        return React.cloneElement(Child, {
-          setFieldValue,
-          setFieldTouched,
-          errors,
-          values,
-          touched,
-          horizontal,
-          submitEnabledWhenInvalid,
-          validateOnBlur,
-          validateOnChange,
-          ...Child.props,
-        })
-      } else if (Child.type === Button) {
-        if (Child.props.type === 'submit') {
+@bind
+class InnerForm extends React.Component {
+
+  componentDidUpdate (prevProps) {
+    const { loading, setSubmitting } = this.props
+
+    if (prevProps.loading && !loading) {
+      setSubmitting(loading)
+    }
+  }
+
+  render () {
+    const {
+      setFieldValue,
+      setFieldTouched,
+      handleSubmit,
+      handleReset,
+      isSubmitting,
+      isValid,
+      errors,
+      error,
+      info,
+      values,
+      touched,
+      children,
+      horizontal,
+      submitEnabledWhenInvalid,
+      validateOnBlur,
+      validateOnChange,
+      dirty,
+    } = this.props
+
+    const decoratedChildren = recursiveMap(children,
+      function (Child) {
+        if (Child.type === Field) {
           return React.cloneElement(Child, {
+            setFieldValue,
+            setFieldTouched,
+            errors,
+            values,
+            touched,
+            horizontal,
+            submitEnabledWhenInvalid,
+            validateOnBlur,
+            validateOnChange,
             ...Child.props,
-            disabled: isSubmitting || (!submitEnabledWhenInvalid && !isValid),
           })
-        } else if (Child.props.type === 'reset') {
-          return React.cloneElement(Child, {
-            ...Child.props,
-            disabled: !isSubmitting && !dirty,
-            onClick: handleReset,
-          })
+        } else if (Child.type === Button) {
+          if (Child.props.type === 'submit') {
+            return React.cloneElement(Child, {
+              ...Child.props,
+              disabled: isSubmitting || !submitEnabledWhenInvalid && !isValid,
+              busy: isSubmitting,
+            })
+          } else if (Child.props.type === 'reset') {
+            return React.cloneElement(Child, {
+              ...Child.props,
+              disabled: isSubmitting || !dirty,
+              onClick: handleReset,
+            })
+          }
         }
-      }
 
-      return Child
-    })
+        return Child
+      })
 
-  return (
-    <form onSubmit={handleSubmit}>
-      {error && (<Notification small error={error} />)}
-      {info && (<Notification small info={info} />)}
-      {decoratedChildren}
-    </form>
-  )
+    return (
+      <form onSubmit={handleSubmit}>
+        {error && (<Notification small error={error} />)}
+        {info && (<Notification small info={info} />)}
+        {decoratedChildren}
+      </form>
+    )
+  }
 }
 
 const formRender = ({ children, ...rest }) => function (props) {
@@ -96,6 +112,7 @@ const Form = ({
   children,
   error,
   info,
+  loading,
   horizontal,
   submitEnabledWhenInvalid,
   validateOnBlur = true,
@@ -106,7 +123,7 @@ const Form = ({
     {...rest}
     validateOnBlur={validateOnBlur}
     validateOnChange={validateOnChange}
-    render={formRender({ children, error, info, horizontal, submitEnabledWhenInvalid })}
+    render={formRender({ children, error, info, horizontal, submitEnabledWhenInvalid, loading })}
   />
 )
 
@@ -134,6 +151,8 @@ Form.propTypes = {
   /** Whether the submit button stays enabled also when the form data is not
    * not yet valid */
   submitEnabledWhenInvalid: PropTypes.bool,
+  /** The flag specifying whether the form is in the loading state */
+  loading: PropTypes.bool,
 }
 
 export default Form
