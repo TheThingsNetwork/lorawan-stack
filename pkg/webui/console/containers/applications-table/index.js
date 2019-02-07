@@ -12,72 +12,65 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { Component } from 'react'
 import { defineMessages } from 'react-intl'
 import bind from 'autobind-decorator'
 
-import sharedMessages from '../../lib/shared-messages'
 import FetchTable from '../fetch-table'
 
 import {
-  getGatewaysList,
-  searchGatewaysList,
-} from '../../console/store/actions/gateways'
+  getApplicationsList,
+  searchApplicationsList,
+} from '../../../console/store/actions/applications'
 
 const m = defineMessages({
-  add: 'Add Gateway',
-  gtwId: 'Gateway ID',
-  gtwEUI: 'Gateway EUI',
-  freqPlan: 'Frequency Plan',
+  all: 'All',
+  appId: 'Application ID',
+  desc: 'Description',
+  empty: 'No items matched your criteria',
+  add: 'Add Application',
 })
+
+const tabs = [
+  {
+    title: m.all,
+    name: 'all',
+    disabled: true,
+  },
+]
 
 const headers = [
   {
-    name: 'ids.gateway_id',
-    displayName: m.gtwId,
-    width: 45,
+    name: 'ids.application_id',
+    displayName: m.appId,
   },
   {
-    name: 'ids.eui',
-    displayName: m.gtwEUI,
-    width: 25,
-  },
-  {
-    name: 'name',
-    displayName: sharedMessages.name,
-    width: 10,
-  },
-  {
-    name: 'antennasCount',
-    displayName: sharedMessages.antennas,
-    centered: true,
-    width: 5,
-  },
-  {
-    name: 'frequency_plan_id',
-    displayName: m.freqPlan,
-    width: 15,
+    name: 'description',
+    displayName: m.desc,
   },
 ]
 
 @bind
-export default class GatewaysTable extends React.Component {
+export default class ApplicationsTable extends Component {
 
-  baseDataSelector ({ gateways }) {
-    return gateways
+  baseDataSelector ({ applications }) {
+    return applications
   }
 
   render () {
     return (
       <FetchTable
-        entity="gateways"
-        addMessage={m.add}
+        entity="applications"
         headers={headers}
-        getItemsAction={getGatewaysList}
-        searchItemsAction={searchGatewaysList}
+        addMessage={m.add}
+        tableTitle={this.tableTitle}
+        getItemsAction={getApplicationsList}
+        searchItemsAction={searchApplicationsList}
+        tabs={tabs}
         baseDataSelector={this.baseDataSelector}
         {...this.props}
       />
     )
   }
 }
+

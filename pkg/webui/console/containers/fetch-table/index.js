@@ -18,13 +18,13 @@ import { push } from 'connected-react-router'
 import bind from 'autobind-decorator'
 import classnames from 'classnames'
 
-import debounce from '../../lib/debounce'
+import debounce from '../../../lib/debounce'
 
-import sharedMessages from '../../lib/shared-messages'
-import Tabular from '../../components/table'
-import Input from '../../components/input'
-import Button from '../../components/button'
-import Tabs from '../../components/tabs'
+import sharedMessages from '../../../lib/shared-messages'
+import Tabular from '../../../components/table'
+import Input from '../../../components/input'
+import Button from '../../../components/button'
+import Tabs from '../../../components/tabs'
 
 import style from './fetch-table.styl'
 

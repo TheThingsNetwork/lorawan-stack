@@ -15,7 +15,7 @@
 import React from 'react'
 import { Container, Row, Col } from 'react-grid-system'
 
-import GatewaysTable from '../../../containers/gateways-table'
+import GatewaysTable from '../../containers/gateways-table'
 import sharedMessages from '../../../lib/shared-messages'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 

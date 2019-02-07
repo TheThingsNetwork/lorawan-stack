@@ -17,11 +17,11 @@ import { connect } from 'react-redux'
 import { defineMessages } from 'react-intl'
 import bind from 'autobind-decorator'
 
-import sharedMessages from '../../lib/shared-messages'
-import Message from '../../lib/components/message'
+import sharedMessages from '../../../lib/shared-messages'
+import Message from '../../../lib/components/message'
 import FetchTable from '../fetch-table'
 
-import { getDevicesList, searchDevicesList } from '../../console/store/actions/devices'
+import { getDevicesList, searchDevicesList } from '../../../console/store/actions/devices'
 
 const m = defineMessages({
   deviceId: 'Device ID',

@@ -17,7 +17,7 @@ import { Container, Row, Col } from 'react-grid-system'
 import bind from 'autobind-decorator'
 
 import IntlHelmet from '../../../lib/components/intl-helmet'
-import ApiKeysTable from '../../../containers/api-keys-table'
+import ApiKeysTable from '../../containers/api-keys-table'
 import { getApplicationApiKeysList } from '../../store/actions/application'
 import sharedMessages from '../../../lib/shared-messages'
 

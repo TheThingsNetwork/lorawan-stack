@@ -18,7 +18,7 @@ import { Col, Row, Container } from 'react-grid-system'
 
 import sharedMessages from '../../../lib/shared-messages'
 import Message from '../../../lib/components/message'
-import DevicesTable from '../../../containers/devices-table'
+import DevicesTable from '../../containers/devices-table'
 
 import style from './application-overview.styl'
 

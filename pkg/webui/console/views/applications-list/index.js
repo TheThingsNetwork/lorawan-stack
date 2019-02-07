@@ -18,7 +18,7 @@ import { Row, Col, Container } from 'react-grid-system'
 import sharedMessages from '../../../lib/shared-messages'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 
-import ApplicationsTable from '../../../containers/applications-table'
+import ApplicationsTable from '../../containers/applications-table'
 
 const APPLICATIONS_TABLE_SIZE = 5
 
