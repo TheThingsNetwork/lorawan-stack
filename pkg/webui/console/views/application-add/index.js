@@ -47,6 +47,9 @@ const initialValues = {
   description: '',
 }
 
+// alphanumeric, dashes, lowercase
+const applicationIdRegexp = /^[a-z0-9]+(-[a-z0-9]+)*$/
+
 const validationSchema = Yup.object().shape({
   application_id: Yup.string()
     .matches(applicationIdRegexp, sharedMessages.validateAlphanum)
@@ -69,7 +72,9 @@ const validationSchema = Yup.object().shape({
   )
 })
 
-@connect(({ application }) => ({ error: application.error || '' }))
+@connect(({ user }) => ({
+  userId: user.user.ids.user_id,
+}))
 @bind
 export default class Add extends React.Component {
 
@@ -77,7 +82,7 @@ export default class Add extends React.Component {
     error: '',
   }
 
-  async handleSubmit (values, { setSubmitting, resetForm }) {
+  async handleSubmit (values, { setSubmitting, setStatus, resetForm }) {
     const { userId, dispatch } = this.props
 
     await this.setState({ error: '' })
@@ -95,8 +100,9 @@ export default class Add extends React.Component {
     } catch (error) {
       const { application_id, name, description } = values
       resetForm({ application_id, name, description })
-
       await this.setState({ error })
+    } finally {
+      setSubmitting(false)
     }
   }
 
