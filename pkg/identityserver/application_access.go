@@ -155,7 +155,13 @@ func (is *IdentityServer) setApplicationCollaborator(ctx context.Context, req *t
 	}
 	if len(req.Collaborator.Rights) > 0 {
 		events.Publish(evtUpdateApplicationCollaborator(ctx, req.ApplicationIdentifiers, nil))
-		// TODO: Send notification email (https://github.com/TheThingsNetwork/lorawan-stack/issues/72).
+		err = is.SendContactsEmail(ctx, req.EntityIdentifiers(), func(data emails.Data) email.MessageData {
+			data.SetEntity(req.EntityIdentifiers())
+			return &emails.CollaboratorChanged{Data: data, Collaborator: req.Collaborator}
+		})
+		if err != nil {
+			log.FromContext(ctx).WithError(err).Error("Could not send collaborator updated notification email")
+		}
 	} else {
 		events.Publish(evtDeleteApplicationCollaborator(ctx, req.ApplicationIdentifiers, nil))
 	}
