@@ -15,7 +15,6 @@
 import React from 'react'
 import { Container, Col, Row } from 'react-grid-system'
 import * as Yup from 'yup'
-import { replace } from 'connected-react-router'
 import { connect } from 'react-redux'
 import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
@@ -28,8 +27,7 @@ import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import sharedMessages from '../../../lib/shared-messages'
 
-import { createApplication } from '../../store/actions/application'
-
+import api from '../../api'
 
 import style from './application-add.styl'
 
@@ -47,16 +45,18 @@ const initialValues = {
   description: '',
 }
 
+// alphanumeric, dashes, lowercase
+const applicationIdRegexp = /^[a-z0-9]+(-[a-z0-9]+)*$/
+
 const validationSchema = Yup.object().shape({
   application_id: Yup.string()
-    .matches(/^[0-9a-z]+$/i, sharedMessages.validateAlphanum)
+    .matches(applicationIdRegexp, sharedMessages.validateAlphanum)
     .min(2, sharedMessages.validateTooShort)
     .max(25, sharedMessages.validateTooLong)
     .required(sharedMessages.validateRequired),
   name: Yup.string()
     .min(2, sharedMessages.validateTooShort)
-    .max(50, sharedMessages.validateTooLong)
-    .required(sharedMessages.validateRequired),
+    .max(50, sharedMessages.validateTooLong),
   description: Yup.string(),
 })
 
@@ -69,26 +69,40 @@ const validationSchema = Yup.object().shape({
     />
   )
 })
-@connect(({ application }) => ({ error: application.error }))
+@connect(({ user }) => ({
+  userId: user.user.ids.user_id,
+}))
 @bind
 export default class Add extends React.Component {
 
-  handleSubmit (values, { setSubmitting }) {
-    const { dispatch } = this.props
-
-    dispatch(createApplication(values))
-    setSubmitting(false)
+  state = {
+    error: '',
   }
 
-  handleCancel () {
-    const { dispatch } = this.props
+  async handleSubmit (values, { setSubmitting, resetForm }) {
+    const { userId } = this.props
 
-    dispatch(replace('/console/applications'))
+    await this.setState({ error: '' })
+
+    try {
+      await api.application.create(userId,
+        {
+          ids: { application_id: values.application_id },
+          name: values.name,
+          description: values.description,
+        })
+    } catch (error) {
+      const { application_id, name, description } = values
+      resetForm({ application_id, name, description })
+      await this.setState({ error })
+    } finally {
+      setSubmitting(false)
+    }
+
   }
 
   render () {
-    const { error } = this.props
-
+    const { error } = this.state
     return (
       <Container>
         <Row className={style.wrapper}>
@@ -99,6 +113,10 @@ export default class Add extends React.Component {
               onSubmit={this.handleSubmit}
               initialValues={initialValues}
               validationSchema={validationSchema}
+              mapErrorsToFields={{
+                id_taken: 'application_id',
+                identifiers: 'application_id',
+              }}
               horizontal
             >
               <Field
@@ -124,7 +142,7 @@ export default class Add extends React.Component {
               />
               <div className={style.submitBar}>
                 <Button type="submit" message={m.createApplication} />
-                <Button type="button" naked message={sharedMessages.cancel} onClick={this.handleCancel} />
+                <Button type="reset" naked message={sharedMessages.cancel} />
               </div>
             </Form>
           </Col>
