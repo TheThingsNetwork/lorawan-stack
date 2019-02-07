@@ -67,7 +67,13 @@ func (is *IdentityServer) createUserAPIKey(ctx context.Context, req *ttnpb.Creat
 	}
 	key.Key = token
 	events.Publish(evtCreateUserAPIKey(ctx, req.UserIdentifiers, nil))
-	// TODO: Send notification email (https://github.com/TheThingsNetwork/lorawan-stack/issues/72).
+	err = is.SendUserEmail(ctx, &req.UserIdentifiers, func(data emails.Data) email.MessageData {
+		data.SetEntity(req.EntityIdentifiers())
+		return &emails.APIKeyCreated{Data: data, Identifier: key.PrettyName(), Rights: key.Rights}
+	})
+	if err != nil {
+		log.FromContext(ctx).WithError(err).Error("Could not send API key created notification email")
+	}
 	return key, nil
 }
 
