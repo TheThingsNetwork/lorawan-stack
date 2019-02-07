@@ -17,10 +17,7 @@ builds:
       - CGO_ENABLED=0
     goos:
       - darwin
-      - freebsd
       - linux
-      - netbsd
-      - openbsd
       - windows
     goarch:
       - 386
@@ -43,10 +40,7 @@ builds:
       - CGO_ENABLED=0
     goos:
       - darwin
-      - freebsd
       - linux
-      - netbsd
-      - openbsd
       - windows
     goarch:
       - 386
