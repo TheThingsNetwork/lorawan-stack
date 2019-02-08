@@ -15,6 +15,7 @@
 package applicationserver_test
 
 import (
+	"strconv"
 	"testing"
 	"time"
 
@@ -89,7 +90,7 @@ func TestLink(t *testing.T) {
 	}
 
 	// app2: expect no link, set link, expect link, delete link and expect link to be gone.
-	for _, link := range []ttnpb.ApplicationLink{
+	for i, link := range []ttnpb.ApplicationLink{
 		{
 			// Cluster-local Network Server.
 			APIKey: "secret",
@@ -100,62 +101,67 @@ func TestLink(t *testing.T) {
 			APIKey:               "secret",
 		},
 	} {
-		ctx := rights.NewContext(ctx, rights.Rights{
-			ApplicationRights: map[string]*ttnpb.Rights{
-				unique.ID(ctx, app2): {
-					Rights: []ttnpb.Right{ttnpb.RIGHT_APPLICATION_LINK},
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			ctx := rights.NewContext(ctx, rights.Rights{
+				ApplicationRights: map[string]*ttnpb.Rights{
+					unique.ID(ctx, app2): {
+						Rights: []ttnpb.Right{ttnpb.RIGHT_APPLICATION_LINK},
+					},
 				},
-			},
-		})
+			})
 
-		// Expect no link.
-		_, err := as.GetLink(ctx, &ttnpb.GetApplicationLinkRequest{
-			ApplicationIdentifiers: app2,
-			FieldMask: pbtypes.FieldMask{
-				Paths: mask,
-			},
-		})
-		a.So(errors.IsNotFound(err), should.BeTrue)
+			// Expect no link.
+			_, err := as.GetLink(ctx, &ttnpb.GetApplicationLinkRequest{
+				ApplicationIdentifiers: app2,
+				FieldMask: pbtypes.FieldMask{
+					Paths: mask,
+				},
+			})
+			a.So(errors.IsNotFound(err), should.BeTrue)
 
-		// Set link, expect link to establish.
-		_, err = as.SetLink(ctx, &ttnpb.SetApplicationLinkRequest{
-			ApplicationIdentifiers: app2,
-			ApplicationLink:        link,
-			FieldMask: pbtypes.FieldMask{
-				Paths: mask,
-			},
-		})
-		a.So(err, should.BeNil)
-		select {
-		case ids := <-ns.linkCh:
-			a.So(ids, should.Resemble, app2)
-		case <-time.After(timeout):
-			t.Fatal("Expect link timeout")
-		}
-		actual, err := as.GetLink(ctx, &ttnpb.GetApplicationLinkRequest{
-			ApplicationIdentifiers: app2,
-			FieldMask: pbtypes.FieldMask{
-				Paths: mask,
-			},
-		})
-		a.So(err, should.BeNil)
-		a.So(*actual, should.Resemble, link)
+			// Set link, expect link to establish.
+			_, err = as.SetLink(ctx, &ttnpb.SetApplicationLinkRequest{
+				ApplicationIdentifiers: app2,
+				ApplicationLink:        link,
+				FieldMask: pbtypes.FieldMask{
+					Paths: mask,
+				},
+			})
+			a.So(err, should.BeNil)
+			select {
+			case ids := <-ns.linkCh:
+				a.So(ids, should.Resemble, app2)
+			case <-time.After(timeout):
+				t.Fatal("Expect link timeout")
+			}
+			actual, err := as.GetLink(ctx, &ttnpb.GetApplicationLinkRequest{
+				ApplicationIdentifiers: app2,
+				FieldMask: pbtypes.FieldMask{
+					Paths: mask,
+				},
+			})
+			a.So(err, should.BeNil)
+			a.So(*actual, should.Resemble, link)
 
-		// Delete link.
-		_, err = as.DeleteLink(ctx, &app2)
-		a.So(err, should.BeNil)
-		select {
-		case ids := <-ns.unlinkCh:
-			a.So(ids, should.Resemble, app2)
-		case <-time.After(timeout):
-			t.Fatal("Expect unlink timeout")
-		}
-		_, err = as.GetLink(ctx, &ttnpb.GetApplicationLinkRequest{
-			ApplicationIdentifiers: app2,
-			FieldMask: pbtypes.FieldMask{
-				Paths: mask,
-			},
+			// Wait for link to subscribe internally.
+			time.Sleep(timeout)
+
+			// Delete link.
+			_, err = as.DeleteLink(ctx, &app2)
+			a.So(err, should.BeNil)
+			select {
+			case ids := <-ns.unlinkCh:
+				a.So(ids, should.Resemble, app2)
+			case <-time.After(timeout):
+				t.Fatal("Expect unlink timeout")
+			}
+			_, err = as.GetLink(ctx, &ttnpb.GetApplicationLinkRequest{
+				ApplicationIdentifiers: app2,
+				FieldMask: pbtypes.FieldMask{
+					Paths: mask,
+				},
+			})
+			a.So(errors.IsNotFound(err), should.BeTrue)
 		})
-		a.So(errors.IsNotFound(err), should.BeTrue)
 	}
 }
