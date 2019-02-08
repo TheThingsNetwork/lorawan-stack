@@ -87,14 +87,14 @@ script:
   fi
 - |
   if [[ "$RUNTYPE" == "go.test" ]]; then
-    make go.dev-deps go.deps
+    make go.deps
     make dev.databases.start
     make dev.certs
     make go.test
   fi
 - |
   if [[ "$RUNTYPE" == "go.lint" ]]; then
-    make go.dev-deps go.deps
+    make go.deps
     make protos.clean protos
     make go.unconvert
     make go.fmt
@@ -118,7 +118,7 @@ after_success:
 deploy:
 - provider: script
   skip_cleanup: true
-  script: curl -sL https://git.io/goreleaser | bash
+  script: GO111MODULE=on go run github.com/goreleaser/goreleaser
   on:
     tags: true
     condition: $RUNTYPE = "release"

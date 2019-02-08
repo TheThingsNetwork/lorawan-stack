@@ -25,6 +25,6 @@ $(GO_FILTERED_COVER_FILE): $(GO_COVER_FILE)
 	@cat $(GO_COVER_FILE) | grep -vE '\.pb(\.gw|\.fm|\.util\.fm)?\.go' > $(GO_FILTERED_COVER_FILE)
 
 go.coveralls: $(GO_FILTERED_COVER_FILE)
-	@goveralls -coverprofile=$(GO_FILTERED_COVER_FILE) -service=$${COVERALLS_SERVICE:-travis-ci} -repotoken $${COVERALLS_TOKEN:-""}
+	@GO111MODULE=on $(GO) run github.com/mattn/goveralls -coverprofile=$(GO_FILTERED_COVER_FILE) -service=$${COVERALLS_SERVICE:-travis-ci} -repotoken $${COVERALLS_TOKEN:-""}
 
 # vim: ft=make

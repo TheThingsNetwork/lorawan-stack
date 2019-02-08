@@ -20,17 +20,17 @@ go.fmt:
 # lint all packages, exiting when errors occur
 go.lint:
 	@$(log) "Linting `$(GO_PACKAGES) | $(count)` go packages"
-	@CODE=0; $(GO_METALINTER) `$(GO_PACKAGES_ABSOLUTE)` 2> /dev/null || { CODE=1; }; exit $$CODE
+	@CODE=0; GO111MODULE=on; $(GO) run github.com/alecthomas/gometalinter `$(GO_PACKAGES_ABSOLUTE)` 2> /dev/null || { CODE=1; }; exit $$CODE
 
 # fix misspellings in all packages
 go.misspell:
 	@$(log) "Fixing misspellings in `$(GO_PACKAGES) | $(count)` go packages"
-	@[[ -z "`$(GO_PACKAGES_ABSOLUTE) | xargs $(GO_MISSPELL) -w | tee -a /dev/stderr`" ]]
+	@[[ -z "`$(GO_PACKAGES_ABSOLUTE) | GO111MODULE=on xargs $(GO) run github.com/client9/misspell/cmd/misspell -w | tee -a /dev/stderr`" ]]
 
 # unconvert all packages
 go.unconvert:
 	@$(log) "Unconverting `$(GO_PACKAGES) | $(count)` go packages"
-	@[[ -z "`$(GO_PACKAGES) | xargs $(GO_UNCONVERT) -safe -apply | tee -a /dev/stderr`" ]]
+	@[[ -z "`$(GO_PACKAGES) | GO111MODULE=on xargs $(GO) run github.com/mdempsky/unconvert -safe -apply | tee -a /dev/stderr`" ]]
 
 # lint changed packages in travis
 go.lint-travis: GO_PACKAGES = git diff --name-only HEAD $(TRAVIS_BRANCH) | $(to_packages)

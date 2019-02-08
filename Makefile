@@ -36,7 +36,7 @@ include .make/sdk/main.make
 messages:
 	@$(GO) run ./cmd/internal/generate_i18n.go
 
-dev-deps: go.dev-deps js.dev-deps
+dev-deps: go.deps js.dev-deps
 
 deps: go.deps js.deps sdk.deps
 
