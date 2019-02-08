@@ -7434,8 +7434,8 @@
           "format": "boolean"
         },
         "adr_margin": {
-          "type": "integer",
-          "format": "int64",
+          "type": "number",
+          "format": "float",
           "description": "The ADR margin tells the network server how much margin it should add in ADR requests.\nA bigger margin is less efficient, but gives a better chance of successful reception."
         },
         "class_b_timeout": {

@@ -179,7 +179,7 @@ message MACSettings {
   google.protobuf.BoolValue use_adr = 1 [(gogoproto.customname) = "UseADR"];
   // The ADR margin tells the network server how much margin it should add in ADR requests.
   // A bigger margin is less efficient, but gives a better chance of successful reception.
-  google.protobuf.UInt32Value adr_margin = 2 [(gogoproto.customname) = "ADRMargin"];
+  google.protobuf.FloatValue adr_margin = 2 [(gogoproto.customname) = "ADRMargin"];
   // Deadline for the device to respond to requests from the Network Server.
   google.protobuf.Duration class_b_timeout = 3 [(gogoproto.stdduration) = true];
   // Deadline for the device to respond to requests from the Network Server.

@@ -1785,7 +1785,7 @@ This is used internally by the Network Server and is read only.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | use_adr | [google.protobuf.BoolValue](#google.protobuf.BoolValue) |  |  |
-| adr_margin | [google.protobuf.UInt32Value](#google.protobuf.UInt32Value) |  | The ADR margin tells the network server how much margin it should add in ADR requests. A bigger margin is less efficient, but gives a better chance of successful reception. |
+| adr_margin | [google.protobuf.FloatValue](#google.protobuf.FloatValue) |  | The ADR margin tells the network server how much margin it should add in ADR requests. A bigger margin is less efficient, but gives a better chance of successful reception. |
 | class_b_timeout | [google.protobuf.Duration](#google.protobuf.Duration) |  | Deadline for the device to respond to requests from the Network Server. |
 | class_c_timeout | [google.protobuf.Duration](#google.protobuf.Duration) |  | Deadline for the device to respond to requests from the Network Server. |
 | status_time_periodicity | [google.protobuf.Duration](#google.protobuf.Duration) |  | The interval after which a DevStatusReq MACCommand shall be sent. |
