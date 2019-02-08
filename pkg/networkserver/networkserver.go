@@ -111,7 +111,7 @@ type NetworkServer struct {
 
 	devices DeviceRegistry
 
-	NetID types.NetID
+	netID types.NetID
 
 	applicationServersMu *sync.RWMutex
 	applicationServers   map[string]*applicationUpStream
@@ -131,6 +131,8 @@ type NetworkServer struct {
 	jsClient NsJsClientFunc
 
 	handleASUplink func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, up *ttnpb.ApplicationUp) (bool, error)
+
+	defaultMACSettings ttnpb.MACSettings
 }
 
 // Option configures the NetworkServer.
@@ -197,14 +199,16 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 	ns := &NetworkServer{
 		Component:               c,
 		devices:                 conf.Devices,
-		downlinkTasks:           conf.DownlinkTasks,
-		downlinkPriorities:      downlinkPriorities,
+		netID:                   conf.NetID,
 		applicationServersMu:    &sync.RWMutex{},
 		applicationServers:      make(map[string]*applicationUpStream),
 		metadataAccumulators:    &sync.Map{},
 		metadataAccumulatorPool: &sync.Pool{},
 		hashPool:                &sync.Pool{},
 		macHandlers:             &sync.Map{},
+		downlinkTasks:           conf.DownlinkTasks,
+		downlinkPriorities:      downlinkPriorities,
+		defaultMACSettings:      conf.DefaultMACSettings,
 	}
 	ns.hashPool.New = func() interface{} {
 		return fnv.New64a()

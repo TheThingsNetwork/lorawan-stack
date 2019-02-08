@@ -27,10 +27,30 @@ var (
 	evtReceiveDevStatusAnswer  = defineReceiveMACAnswerEvent("dev_status", "device status")()
 )
 
-func enqueueDevStatusReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) (uint16, uint16, bool) {
-	if dev.LastDevStatusReceivedAt != nil &&
-		(dev.MACSettings.StatusCountPeriodicity == 0 || dev.MACState.LastDevStatusFCntUp+dev.MACSettings.StatusCountPeriodicity > dev.Session.LastFCntUp) &&
-		(dev.MACSettings.StatusTimePeriodicity == 0 || dev.LastDevStatusReceivedAt.Add(dev.MACSettings.StatusTimePeriodicity).After(time.Now())) {
+const (
+	DefaultStatusCountPeriodicity uint32 = 20
+	DefaultStatusTimePeriodicity         = time.Hour
+)
+
+func enqueueDevStatusReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16, defaults ttnpb.MACSettings) (uint16, uint16, bool) {
+	cp := DefaultStatusCountPeriodicity
+	if dev.GetMACSettings().GetStatusCountPeriodicity() != nil {
+		cp = dev.MACSettings.StatusCountPeriodicity.Value
+	} else if defaults.StatusCountPeriodicity != nil {
+		cp = defaults.StatusCountPeriodicity.Value
+	}
+
+	tp := DefaultStatusTimePeriodicity
+	if dev.GetMACSettings().GetStatusTimePeriodicity() != nil {
+		tp = *dev.MACSettings.StatusTimePeriodicity
+	} else if defaults.StatusCountPeriodicity != nil {
+		tp = *defaults.StatusTimePeriodicity
+	}
+
+	if cp == 0 && tp == 0 ||
+		dev.LastDevStatusReceivedAt != nil &&
+			(cp == 0 || dev.MACState.LastDevStatusFCntUp+cp > dev.Session.LastFCntUp) &&
+			(tp == 0 || dev.LastDevStatusReceivedAt.Add(tp).After(time.Now())) {
 		return maxDownLen, maxUpLen, true
 	}
 

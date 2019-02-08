@@ -61,10 +61,6 @@ var (
 	}
 )
 
-func init() {
-	SetAppQueueUpdateTimeout(0)
-}
-
 type UplinkHandler interface {
 	HandleUplink(context.Context, *ttnpb.UplinkMessage) (*pbtypes.Empty, error)
 }
@@ -1195,7 +1191,7 @@ func handleUplinkTest() func(t *testing.T) {
 					pb.CreatedAt = ret.CreatedAt
 					pb.UpdatedAt = ret.UpdatedAt
 					if pb.MACState == nil {
-						err := ResetMACState(pb, ns.FrequencyPlans)
+						err := ResetMACState(pb, ns.FrequencyPlans, ttnpb.MACSettings{})
 						if !a.So(err, should.BeNil) {
 							t.FailNow()
 						}
@@ -1621,6 +1617,7 @@ func handleJoinTest() func(t *testing.T) {
 				ns := test.Must(New(
 					component.MustNew(test.GetLogger(t), &component.Config{}),
 					&Config{
+						NetID:   NetID,
 						Devices: devReg,
 						DownlinkTasks: &MockDownlinkTaskQueue{
 							AddFunc: func(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time) error {
@@ -1677,7 +1674,7 @@ func handleJoinTest() func(t *testing.T) {
 				pb.UpdatedAt = ret.UpdatedAt
 				a.So(ret, should.Resemble, pb)
 
-				err = ResetMACState(ret, ns.FrequencyPlans)
+				err = ResetMACState(ret, ns.FrequencyPlans, ttnpb.MACSettings{})
 				if !a.So(err, should.BeNil) {
 					t.Fatalf("Failed to reset MAC state: %s", err)
 				}
@@ -1686,7 +1683,7 @@ func handleJoinTest() func(t *testing.T) {
 				expectedRequest := &ttnpb.JoinRequest{
 					RawPayload:         append(tc.UplinkMessage.RawPayload[:0:0], tc.UplinkMessage.RawPayload...),
 					Payload:            CopyUplinkMessage(tc.UplinkMessage).Payload,
-					NetID:              ns.NetID,
+					NetID:              NetID,
 					SelectedMACVersion: pb.LoRaWANVersion,
 					RxDelay:            pb.MACState.DesiredParameters.Rx1Delay,
 					CFList:             frequencyplans.CFList(*test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan), pb.LoRaWANPHYVersion),

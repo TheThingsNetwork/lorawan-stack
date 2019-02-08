@@ -62,43 +62,24 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			"frequency_plan_id",
 			"lorawan_phy_version",
 			"lorawan_version",
-			"mac_settings.use_adr",
-			"resets_f_cnt",
-			"resets_join_nonces",
-			"supports_class_b",
-			"supports_class_c",
 			"supports_join",
-			"uses_32_bit_f_cnt",
 		); err != nil {
 			return nil, nil, errInvalidFieldMask.WithCause(err)
 		}
 
-		if req.Device.MACSettings == nil {
-			return nil, nil, errNoMACSettings
-		}
-
-		if !ttnpb.HasAnyField(paths, "mac_settings.adr_margin") {
-			// TODO: Apply NS-wide default (https://github.com/TheThingsIndustries/lorawan-stack/issues/1544)
-			req.Device.MACSettings.ADRMargin = 15
-			paths = append(paths, "mac_settings.adr_margin")
-		} else if req.Device.MACSettings.ADRMargin == 0 {
+		if ttnpb.HasAnyField(paths, "mac_settings.adr_margin") && req.Device.GetMACSettings().GetADRMargin() == nil {
 			return nil, nil, errInvalidADRMargin
 		}
-
-		if !ttnpb.HasAnyField(paths, "mac_settings.class_b_timeout") {
-			// TODO: Apply NS-wide default if not set (https://github.com/TheThingsIndustries/lorawan-stack/issues/1544)
-			req.Device.MACSettings.ClassBTimeout = time.Minute
-			paths = append(paths, "mac_settings.class_b_timeout")
-		} else if req.Device.MACSettings.ClassBTimeout == 0 {
+		if ttnpb.HasAnyField(paths, "mac_settings.class_b_timeout") && req.Device.GetMACSettings().GetClassBTimeout() == nil {
 			return nil, nil, errInvalidClassBTimeout
 		}
-
-		if !ttnpb.HasAnyField(paths, "mac_settings.class_c_timeout") {
-			// TODO: Apply NS-wide default if not set (https://github.com/TheThingsIndustries/lorawan-stack/issues/1544)
-			req.Device.MACSettings.ClassCTimeout = 10 * time.Second
-			paths = append(paths, "mac_settings.class_c_timeout")
-		} else if req.Device.MACSettings.ClassCTimeout == 0 {
+		if ttnpb.HasAnyField(paths, "mac_settings.class_c_timeout") && req.Device.GetMACSettings().GetClassCTimeout() == nil {
 			return nil, nil, errInvalidClassCTimeout
+		}
+
+		if !ttnpb.HasAnyField(paths, "uses_32_bit_f_cnt") {
+			dev.Uses32BitFCnt = true
+			paths = append(paths, "uses_32_bit_f_cnt")
 		}
 
 		if req.Device.SupportsJoin {
@@ -149,7 +130,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		req.Device.Session.StartedAt = time.Now().UTC()
 		paths = append(paths, "session.started_at")
 
-		if err := resetMACState(&req.Device, ns.FrequencyPlans); err != nil {
+		if err := resetMACState(&req.Device, ns.FrequencyPlans, ns.defaultMACSettings); err != nil {
 			return nil, nil, err
 		}
 		if req.Device.MACState.DeviceClass != ttnpb.CLASS_A {

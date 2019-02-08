@@ -19,6 +19,7 @@ import (
 	"math/rand"
 	"testing"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -104,7 +105,9 @@ func TestAdaptDataRate(t *testing.T) {
 					},
 				},
 				MACSettings: &ttnpb.MACSettings{
-					ADRMargin: 2,
+					ADRMargin: &pbtypes.FloatValue{
+						Value: 2,
+					},
 				},
 				FrequencyPlanID: test.EUFrequencyPlanID,
 				RecentADRUplinks: adrMatrixToUplinks([]adrMatrixRow{
@@ -154,7 +157,7 @@ func TestAdaptDataRate(t *testing.T) {
 
 			dev := CopyEndDevice(tc.Device)
 
-			err := adaptDataRate(dev, frequencyplans.NewStore(test.FrequencyPlansFetcher))
+			err := adaptDataRate(dev, frequencyplans.NewStore(test.FrequencyPlansFetcher), ttnpb.MACSettings{})
 			if err != nil && !a.So(err, should.Equal, tc.Error) ||
 				err == nil && !a.So(err, should.BeNil) {
 				t.FailNow()

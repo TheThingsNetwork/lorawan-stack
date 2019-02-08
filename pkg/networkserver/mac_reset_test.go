@@ -41,13 +41,11 @@ func TestHandleResetInd(t *testing.T) {
 				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 				SupportsJoin:      false,
 				MACState:          &ttnpb.MACState{},
-				MACSettings:       &ttnpb.MACSettings{},
 			},
 			Expected: &ttnpb.EndDevice{
 				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 				SupportsJoin:      false,
 				MACState:          &ttnpb.MACState{},
-				MACSettings:       &ttnpb.MACSettings{},
 			},
 			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
 				return assertions.New(t).So(evs, should.BeEmpty)
@@ -68,7 +66,6 @@ func TestHandleResetInd(t *testing.T) {
 					DesiredParameters: *ttnpb.NewPopulatedMACParameters(test.Randy, false),
 					QueuedResponses:   []*ttnpb.MACCommand{},
 				},
-				MACSettings: &ttnpb.MACSettings{},
 			},
 			Expected: func() *ttnpb.EndDevice {
 				dev := &ttnpb.EndDevice{
@@ -78,9 +75,8 @@ func TestHandleResetInd(t *testing.T) {
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					SupportsJoin:      false,
 					FrequencyPlanID:   test.EUFrequencyPlanID,
-					MACSettings:       &ttnpb.MACSettings{},
 				}
-				if err := ResetMACState(dev, frequencyplans.NewStore(test.FrequencyPlansFetcher)); err != nil {
+				if err := ResetMACState(dev, frequencyplans.NewStore(test.FrequencyPlansFetcher), ttnpb.MACSettings{}); err != nil {
 					t.Fatalf("Failed to reset MACState: %v", errors.Stack(err))
 				}
 
@@ -126,7 +122,6 @@ func TestHandleResetInd(t *testing.T) {
 						{},
 					},
 				},
-				MACSettings: &ttnpb.MACSettings{},
 			},
 			Expected: func() *ttnpb.EndDevice {
 				dev := &ttnpb.EndDevice{
@@ -136,9 +131,8 @@ func TestHandleResetInd(t *testing.T) {
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					SupportsJoin:      false,
 					FrequencyPlanID:   test.EUFrequencyPlanID,
-					MACSettings:       &ttnpb.MACSettings{},
 				}
-				if err := ResetMACState(dev, frequencyplans.NewStore(test.FrequencyPlansFetcher)); err != nil {
+				if err := ResetMACState(dev, frequencyplans.NewStore(test.FrequencyPlansFetcher), ttnpb.MACSettings{}); err != nil {
 					t.Fatalf("Failed to reset MACState: %v", errors.Stack(err))
 				}
 
@@ -174,7 +168,7 @@ func TestHandleResetInd(t *testing.T) {
 
 			var err error
 			evs := collectEvents(func() {
-				err = handleResetInd(test.Context(), dev, tc.Payload, frequencyplans.NewStore(test.FrequencyPlansFetcher))
+				err = handleResetInd(test.Context(), dev, tc.Payload, frequencyplans.NewStore(test.FrequencyPlansFetcher), ttnpb.MACSettings{})
 			})
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 				tc.Error == nil && !a.So(err, should.BeNil) {

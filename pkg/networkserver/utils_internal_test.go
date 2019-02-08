@@ -296,7 +296,7 @@ func TestResetMACState(t *testing.T) {
 
 			pb := CopyEndDevice(tc.Device)
 
-			err := resetMACState(pb, tc.FrequencyPlanStore)
+			err := resetMACState(pb, tc.FrequencyPlanStore, ttnpb.MACSettings{})
 			if tc.ErrorAssertion != nil {
 				a.So(tc.ErrorAssertion(t, err), should.BeTrue)
 			} else {

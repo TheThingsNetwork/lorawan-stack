@@ -552,7 +552,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 
 			if stored.MACState != nil {
 				stored.MACState.PendingApplicationDownlink = nil
-			} else if err := resetMACState(stored, ns.FrequencyPlans); err != nil {
+			} else if err := resetMACState(stored, ns.FrequencyPlans, ns.defaultMACSettings); err != nil {
 				handleErr = true
 				return nil, nil, err
 			}
@@ -566,7 +566,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 				cmd, cmds = cmds[0], cmds[1:]
 				switch cmd.CID {
 				case ttnpb.CID_RESET:
-					err = handleResetInd(ctx, stored, cmd.GetResetInd(), ns.FrequencyPlans)
+					err = handleResetInd(ctx, stored, cmd.GetResetInd(), ns.FrequencyPlans, ns.defaultMACSettings)
 				case ttnpb.CID_LINK_CHECK:
 					err = handleLinkCheckReq(ctx, stored, up)
 				case ttnpb.CID_LINK_ADR:
@@ -659,7 +659,9 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 			stored.MACState.PendingJoinRequest = nil
 
 			paths = append(paths, "recent_adr_uplinks")
-			if !pld.FHDR.ADR {
+			if !pld.FHDR.ADR ||
+				stored.MACSettings.GetUseADR() != nil && !stored.MACSettings.UseADR.Value ||
+				ns.defaultMACSettings.GetUseADR() != nil && !ns.defaultMACSettings.UseADR.Value {
 				stored.RecentADRUplinks = nil
 				return stored, paths, nil
 			}
@@ -669,7 +671,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 				stored.RecentADRUplinks = append(stored.RecentADRUplinks[:0], stored.RecentADRUplinks[len(stored.RecentADRUplinks)-recentUplinkCount:]...)
 			}
 
-			if err := adaptDataRate(stored, ns.FrequencyPlans); err != nil {
+			if err := adaptDataRate(stored, ns.FrequencyPlans, ns.defaultMACSettings); err != nil {
 				handleErr = true
 				return nil, nil, err
 			}
@@ -713,10 +715,11 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 
 // newDevAddr generates a DevAddr for specified EndDevice.
 func (ns *NetworkServer) newDevAddr(context.Context, *ttnpb.EndDevice) types.DevAddr {
-	nwkAddr := make([]byte, types.NwkAddrLength(ns.NetID))
+	// TODO: Allow generating DevAddr from a prefix. (https://github.com/TheThingsNetwork/lorawan-stack/issues/130)
+	nwkAddr := make([]byte, types.NwkAddrLength(ns.netID))
 	random.Read(nwkAddr)
-	nwkAddr[0] &= 0xff >> (8 - types.NwkAddrBits(ns.NetID)%8)
-	devAddr, err := types.NewDevAddr(ns.NetID, nwkAddr)
+	nwkAddr[0] &= 0xff >> (8 - types.NwkAddrBits(ns.netID)%8)
+	devAddr, err := types.NewDevAddr(ns.netID, nwkAddr)
 	if err != nil {
 		panic(errors.New("failed to create new DevAddr").WithCause(err))
 	}
@@ -764,7 +767,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 	logger = logger.WithField("dev_addr", devAddr)
 	ctx = log.NewContext(ctx, logger)
 
-	if err := resetMACState(dev, ns.FrequencyPlans); err != nil {
+	if err := resetMACState(dev, ns.FrequencyPlans, ns.defaultMACSettings); err != nil {
 		logger.WithError(err).Error("Failed to reset device's MAC state")
 		return err
 	}
@@ -778,7 +781,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 		CFList:             frequencyplans.CFList(*fp, dev.LoRaWANPHYVersion),
 		CorrelationIDs:     events.CorrelationIDsFromContext(ctx),
 		DevAddr:            devAddr,
-		NetID:              ns.NetID,
+		NetID:              ns.netID,
 		Payload:            up.Payload,
 		RawPayload:         up.RawPayload,
 		RxDelay:            dev.MACState.DesiredParameters.Rx1Delay,
@@ -834,7 +837,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			var paths []string
 
-			if err := resetMACState(dev, ns.Component.FrequencyPlans); err != nil {
+			if err := resetMACState(dev, ns.Component.FrequencyPlans, ns.defaultMACSettings); err != nil {
 				resetErr = true
 				return nil, nil, err
 			}

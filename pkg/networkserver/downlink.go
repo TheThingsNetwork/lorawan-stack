@@ -49,6 +49,18 @@ type DownlinkTaskQueue interface {
 
 var errNoDownlink = errors.Define("no_downlink", "no downlink to send")
 
+const DefaultClassCTimeout = 15 * time.Second
+
+func deviceClassCTimeout(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) time.Duration {
+	ret := DefaultClassCTimeout
+	if dev.MACSettings != nil && dev.MACSettings.ClassCTimeout != nil {
+		ret = *dev.MACSettings.ClassCTimeout
+	} else if defaults.ClassCTimeout != nil {
+		ret = *defaults.ClassCTimeout
+	}
+	return ret
+}
+
 // generateDownlink attempts to generate a downlink.
 // generateDownlink returns the marshaled payload of the downlink, application downlink, if included in the payload and error, if any.
 // generateDownlink may mutate the device in order to record the downlink generated.
@@ -60,7 +72,7 @@ var errNoDownlink = errors.Define("no_downlink", "no downlink to send")
 // For example, a sequence of 'NewChannel' MAC commands could be generated for a
 // device operating in a region where a fixed channel plan is defined in case
 // dev.MACState.CurrentParameters.Channels is not equal to dev.MACState.DesiredParameters.Channels.
-func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16, fps *frequencyplans.Store) ([]byte, *ttnpb.ApplicationDownlink, error) {
+func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16, fps *frequencyplans.Store, defaults ttnpb.MACSettings) ([]byte, *ttnpb.ApplicationDownlink, error) {
 	if dev.MACState == nil {
 		return nil, nil, errUnknownMACState
 	}
@@ -105,7 +117,9 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, max
 		enqueueNewChannelReq,
 		enqueueDutyCycleReq,
 		enqueueRxParamSetupReq,
-		enqueueDevStatusReq,
+		func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) (uint16, uint16, bool) {
+			return enqueueDevStatusReq(ctx, dev, maxDownLen, maxUpLen, defaults)
+		},
 		enqueueRxTimingSetupReq,
 		enqueuePingSlotChannelReq,
 		enqueueBeaconFreqReq,
@@ -237,11 +251,11 @@ outer:
 	logger = logger.WithField("f_pending", pld.FHDR.FCtrl.FPending)
 
 	switch {
-	case dev.MACState.DeviceClass != ttnpb.CLASS_C,
-		mType != ttnpb.MType_CONFIRMED_DOWN && len(dev.MACState.PendingRequests) == 0:
+	case mType != ttnpb.MType_CONFIRMED_DOWN && len(dev.MACState.PendingRequests) == 0:
 		break
 
-	case dev.MACState.LastConfirmedDownlinkAt != nil && dev.MACState.LastConfirmedDownlinkAt.Add(dev.MACSettings.ClassCTimeout).After(time.Now()):
+	case dev.MACState.DeviceClass == ttnpb.CLASS_C &&
+		dev.MACState.LastConfirmedDownlinkAt.Add(deviceClassCTimeout(dev, defaults)).After(time.Now()):
 		return nil, nil, errScheduleTooSoon
 
 	default:
@@ -594,6 +608,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 							band.DataRates[minDR].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 							maxUpLength,
 							ns.FrequencyPlans,
+							ns.defaultMACSettings,
 						)
 						if err != nil {
 							return nil, nil, err
@@ -648,16 +663,17 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 							band.DataRates[req.Rx1DataRateIndex].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 							maxUpLength,
 							ns.FrequencyPlans,
+							ns.defaultMACSettings,
 						)
 						if err != nil {
 							if errors.Resemble(err, errScheduleTooSoon) {
-								nextDownlinkAt = dev.MACState.LastConfirmedDownlinkAt.Add(dev.MACSettings.ClassCTimeout)
+								nextDownlinkAt = dev.MACState.LastConfirmedDownlinkAt.Add(deviceClassCTimeout(dev, ns.defaultMACSettings))
 							}
 							return nil, nil, err
 						}
 						if dev.MACState.DeviceClass == ttnpb.CLASS_C {
 							if dev.MACState.LastConfirmedDownlinkAt != nil {
-								nextDownlinkAt = dev.MACState.LastConfirmedDownlinkAt.Add(dev.MACSettings.ClassCTimeout)
+								nextDownlinkAt = dev.MACState.LastConfirmedDownlinkAt.Add(deviceClassCTimeout(dev, ns.defaultMACSettings))
 							} else {
 								nextDownlinkAt = time.Now()
 							}
@@ -742,6 +758,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						band.DataRates[req.Rx2DataRateIndex].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 						maxUpLength,
 						ns.FrequencyPlans,
+						ns.defaultMACSettings,
 					)
 					if err != nil {
 						return nil, nil, err

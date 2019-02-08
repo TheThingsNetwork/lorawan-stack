@@ -19,6 +19,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
 // Config represents the NetworkServer configuration.
@@ -28,6 +29,8 @@ type Config struct {
 	DeduplicationWindow time.Duration          `name:"deduplication-window" description:"Time window during which, duplicate messages are collected for metadata"`
 	CooldownWindow      time.Duration          `name:"cooldown-window" description:"Time window starting right after deduplication window, during which, duplicate messages are discarded"`
 	DownlinkPriorities  DownlinkPriorityConfig `name:"downlink-priorities" description:"Downlink message priorities"`
+	NetID               types.NetID            `name:"net_id" description:"NetID of this Network Server"`
+	DefaultMACSettings  ttnpb.MACSettings      `name:"mac_defaults" description:"Default MAC settings to use if not specified for device"`
 }
 
 // DownlinkPriorityConfig defines priorities for downlink messages.

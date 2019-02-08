@@ -215,7 +215,6 @@ func TestDeviceRegistrySet(t *testing.T) {
 				Device: ttnpb.EndDevice{
 					EndDeviceIdentifiers: ids,
 					SupportsJoin:         true,
-					MACSettings:          &ttnpb.MACSettings{},
 				},
 				FieldMask: pbtypes.FieldMask{
 					Paths: []string{
@@ -267,6 +266,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					"frequency_plan_id",
 					"lorawan_phy_version",
 					"lorawan_version",
+					"mac_settings.adr_margin",
 					"mac_settings.use_adr",
 					"resets_f_cnt",
 					"resets_join_nonces",
@@ -283,8 +283,6 @@ func TestDeviceRegistrySet(t *testing.T) {
 					"lorawan_phy_version",
 					"lorawan_version",
 					"mac_settings.adr_margin",
-					"mac_settings.class_b_timeout",
-					"mac_settings.class_c_timeout",
 					"mac_settings.use_adr",
 					"resets_f_cnt",
 					"resets_join_nonces",
@@ -297,18 +295,14 @@ func TestDeviceRegistrySet(t *testing.T) {
 					EndDeviceIdentifiers: ids,
 					SupportsJoin:         true,
 					MACSettings: &ttnpb.MACSettings{
-						ADRMargin:     15,
-						ClassBTimeout: time.Minute,
-						ClassCTimeout: 10 * time.Second,
+						ADRMargin: &pbtypes.FloatValue{Value: 4},
 					},
 				})
 				return &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ids,
 					SupportsJoin:         true,
 					MACSettings: &ttnpb.MACSettings{
-						ADRMargin:     15,
-						ClassBTimeout: time.Minute,
-						ClassCTimeout: 10 * time.Second,
+						ADRMargin: &pbtypes.FloatValue{Value: 4},
 					},
 				}, nil
 			},
@@ -316,13 +310,16 @@ func TestDeviceRegistrySet(t *testing.T) {
 				Device: ttnpb.EndDevice{
 					EndDeviceIdentifiers: ids,
 					SupportsJoin:         true,
-					MACSettings:          &ttnpb.MACSettings{},
+					MACSettings: &ttnpb.MACSettings{
+						ADRMargin: &pbtypes.FloatValue{Value: 4},
+					},
 				},
 				FieldMask: pbtypes.FieldMask{
 					Paths: []string{
 						"frequency_plan_id",
 						"lorawan_phy_version",
 						"lorawan_version",
+						"mac_settings.adr_margin",
 						"mac_settings.use_adr",
 						"resets_f_cnt",
 						"resets_join_nonces",
@@ -337,9 +334,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				EndDeviceIdentifiers: ids,
 				SupportsJoin:         true,
 				MACSettings: &ttnpb.MACSettings{
-					ADRMargin:     15,
-					ClassBTimeout: time.Minute,
-					ClassCTimeout: 10 * time.Second,
+					ADRMargin: &pbtypes.FloatValue{Value: 4},
 				},
 			},
 			ContextAssertion: func(ctx context.Context) bool {
