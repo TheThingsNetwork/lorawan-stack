@@ -22,7 +22,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"path/filepath"
 	"testing"
 	"time"
 
@@ -40,13 +39,19 @@ import (
 )
 
 var (
-	pemDir = filepath.Join(os.Getenv("GOPATH"), "src", "go.thethings.network", "lorawan-stack")
-
-	certPem = filepath.Join(pemDir, "cert.pem")
-	keyPem  = filepath.Join(pemDir, "key.pem")
+	certPem string
+	keyPem  string
 )
 
 func init() {
+	certPem = "cert.pem"
+	if _, err := os.Stat(certPem); err != nil {
+		certPem = "../../cert.pem"
+	}
+	keyPem = "key.pem"
+	if _, err := os.Stat(keyPem); err != nil {
+		keyPem = "../../key.pem"
+	}
 	for _, filepath := range []string{certPem, keyPem} {
 		if _, err := os.Stat(filepath); err != nil {
 			panic(fmt.Sprintf("could not retrieve information about the %s file - if you haven't generated it, generate it with `make dev.certs`.", filepath))
