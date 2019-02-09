@@ -1859,6 +1859,38 @@
         ]
       }
     },
+    "/gs/gateways/{gateway_id}/connection/stats": {
+      "get": {
+        "operationId": "GetGatewayConnectionStats",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3GatewayConnectionStats"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "gateway_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "eui",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          }
+        ],
+        "tags": [
+          "Gs"
+        ]
+      }
+    },
     "/invitations": {
       "get": {
         "operationId": "List",
