@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"net"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
@@ -275,6 +276,8 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 		}
 		return err
 	}
+	atomic.AddUint64(&link.downlinks, uint64(len(encryptedItems)))
+	atomic.StoreInt64(&link.lastDownlinkTime, time.Now().UnixNano())
 	for _, item := range encryptedItems {
 		registerForwardDownlink(ctx, ids, item, link.connName)
 	}

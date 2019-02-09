@@ -17,6 +17,7 @@ package applicationserver
 import (
 	"context"
 	"fmt"
+	"sync/atomic"
 	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io"
@@ -68,6 +69,14 @@ func (as *ApplicationServer) startLinkTask(ctx context.Context, ids ttnpb.Applic
 }
 
 type link struct {
+	// Align for sync/atomic.
+	ups,
+	downlinks uint64
+	linkTime,
+	lastUpTime,
+	lastDownlinkTime int64
+
+	ttnpb.ApplicationIdentifiers
 	ttnpb.ApplicationLink
 	ctx    context.Context
 	cancel context.CancelFunc
@@ -89,7 +98,7 @@ var (
 	errNSNotFound    = errors.DefineNotFound("network_server_not_found", "Network Server not found for `{application_uid}`")
 )
 
-func (as *ApplicationServer) connectLink(ctx context.Context, ids ttnpb.ApplicationIdentifiers, link *link) error {
+func (as *ApplicationServer) connectLink(ctx context.Context, link *link) error {
 	var allowInsecure bool
 	if link.NetworkServerAddress != "" {
 		options := rpcclient.DefaultDialOptions(ctx)
@@ -108,21 +117,22 @@ func (as *ApplicationServer) connectLink(ctx context.Context, ids ttnpb.Applicat
 		}()
 	} else {
 		allowInsecure = !as.ClusterTLS()
-		ns := as.GetPeer(ctx, ttnpb.PeerInfo_NETWORK_SERVER, ids)
+		ns := as.GetPeer(ctx, ttnpb.PeerInfo_NETWORK_SERVER, link.ApplicationIdentifiers)
 		if ns == nil {
-			return errNSNotFound.WithAttributes("application_uid", unique.ID(ctx, ids))
+			return errNSNotFound.WithAttributes("application_uid", unique.ID(ctx, link.ApplicationIdentifiers))
 		}
 		link.conn = ns.Conn()
 		link.connName = ns.Name()
 	}
 	link.callOpts = []grpc.CallOption{
 		grpc.PerRPCCredentials(rpcmetadata.MD{
-			ID:            ids.ApplicationID,
+			ID:            link.ApplicationID,
 			AuthType:      "Bearer",
 			AuthValue:     link.APIKey,
 			AllowInsecure: allowInsecure,
 		}),
 	}
+	link.linkTime = time.Now().UnixNano()
 	close(link.connReady)
 	return nil
 }
@@ -132,13 +142,14 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 	ctx = log.NewContextWithField(ctx, "application_uid", uid)
 	ctx, cancel := context.WithCancel(ctx)
 	l := &link{
-		ApplicationLink: *target,
-		ctx:             ctx,
-		cancel:          cancel,
-		connReady:       make(chan struct{}),
-		subscribeCh:     make(chan *io.Subscription, 1),
-		unsubscribeCh:   make(chan *io.Subscription, 1),
-		upCh:            make(chan *ttnpb.ApplicationUp, linkBufferSize),
+		ApplicationIdentifiers: ids,
+		ApplicationLink:        *target,
+		ctx:                    ctx,
+		cancel:                 cancel,
+		connReady:              make(chan struct{}),
+		subscribeCh:            make(chan *io.Subscription, 1),
+		unsubscribeCh:          make(chan *io.Subscription, 1),
+		upCh:                   make(chan *ttnpb.ApplicationUp, linkBufferSize),
 	}
 	if _, loaded := as.links.LoadOrStore(uid, l); loaded {
 		cancel()
@@ -148,7 +159,7 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 		cancel()
 		as.links.Delete(uid)
 	}()
-	if err := as.connectLink(ctx, ids, l); err != nil {
+	if err := as.connectLink(ctx, l); err != nil {
 		return err
 	}
 	client := ttnpb.NewAsNsClient(l.conn)
@@ -180,6 +191,9 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 			}
 			return err
 		}
+		atomic.AddUint64(&l.ups, 1)
+		atomic.StoreInt64(&l.lastUpTime, time.Now().UnixNano())
+
 		ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("as:up:%s", events.NewCorrelationID()))
 		up.CorrelationIDs = append(up.CorrelationIDs, events.CorrelationIDsFromContext(ctx)...)
 		registerReceiveUp(ctx, up, l.connName)
@@ -260,4 +274,25 @@ func (l *link) run() {
 			}
 		}
 	}
+}
+
+// GetLinkTime returns the timestamp when the link got established.
+func (l *link) GetLinkTime() time.Time { return time.Unix(0, l.linkTime) }
+
+// GetUpStats returns the upstream statistics.
+func (l *link) GetUpStats() (total uint64, t time.Time, ok bool) {
+	total = atomic.LoadUint64(&l.ups)
+	if ok = total > 0; ok {
+		t = time.Unix(0, atomic.LoadInt64(&l.lastUpTime))
+	}
+	return
+}
+
+// GetDownlinkStats returns the downlink statistics.
+func (l *link) GetDownlinkStats() (total uint64, t time.Time, ok bool) {
+	total = atomic.LoadUint64(&l.downlinks)
+	if ok = total > 0; ok {
+		t = time.Unix(0, atomic.LoadInt64(&l.lastDownlinkTime))
+	}
+	return
 }

@@ -118,6 +118,8 @@ func TestLink(t *testing.T) {
 				},
 			})
 			a.So(errors.IsNotFound(err), should.BeTrue)
+			_, err = as.GetLinkStats(ctx, &app2)
+			a.So(errors.IsNotFound(err), should.BeTrue)
 
 			// Set link, expect link to establish.
 			_, err = as.SetLink(ctx, &ttnpb.SetApplicationLinkRequest{
@@ -142,6 +144,9 @@ func TestLink(t *testing.T) {
 			})
 			a.So(err, should.BeNil)
 			a.So(*actual, should.Resemble, link)
+			stats, err := as.GetLinkStats(ctx, &app2)
+			a.So(err, should.BeNil)
+			a.So(stats.NetworkServerAddress, should.Equal, link.NetworkServerAddress)
 
 			// Wait for link to subscribe internally.
 			time.Sleep(timeout)
@@ -161,6 +166,8 @@ func TestLink(t *testing.T) {
 					Paths: mask,
 				},
 			})
+			a.So(errors.IsNotFound(err), should.BeTrue)
+			_, err = as.GetLinkStats(ctx, &app2)
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		})
 	}
