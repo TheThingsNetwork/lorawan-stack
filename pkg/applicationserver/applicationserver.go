@@ -264,18 +264,15 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 			}
 			_, err = op(client, ctx, req, link.callOpts...)
 			if err != nil {
-				for _, item := range encryptedItems {
-					registerDropDownlink(ctx, ids, item, err)
-				}
 				return nil, nil, err
-			}
-			for _, item := range encryptedItems {
-				registerForwardDownlink(ctx, ids, item, link.connName)
 			}
 			return dev, []string{"session.last_a_f_cnt_down"}, nil
 		},
 	)
 	if err != nil {
+		for _, item := range encryptedItems {
+			registerDropDownlink(ctx, ids, item, err)
+		}
 		return err
 	}
 	for _, item := range encryptedItems {
