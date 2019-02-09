@@ -2,7 +2,10 @@
 
 package ttnpb
 
-import fmt "fmt"
+import (
+	fmt "fmt"
+	time "time"
+)
 
 var GatewayUpFieldPathsNested = []string{
 	"gateway_status",
@@ -201,6 +204,35 @@ func (dst *GatewayDown) SetFields(src *GatewayDown, paths ...string) error {
 				} else {
 					dst.DownlinkMessage = nil
 				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+var ScheduleDownlinkResponseFieldPathsNested = []string{
+	"delay",
+}
+
+var ScheduleDownlinkResponseFieldPathsTopLevel = []string{
+	"delay",
+}
+
+func (dst *ScheduleDownlinkResponse) SetFields(src *ScheduleDownlinkResponse, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "delay":
+			if len(subs) > 0 {
+				return fmt.Errorf("'delay' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Delay = src.Delay
+			} else {
+				var zero time.Duration
+				dst.Delay = zero
 			}
 
 		default:

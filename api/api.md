@@ -205,6 +205,7 @@
 - [lorawan-stack/api/gatewayserver.proto](#lorawan-stack/api/gatewayserver.proto)
     - [GatewayDown](#ttn.lorawan.v3.GatewayDown)
     - [GatewayUp](#ttn.lorawan.v3.GatewayUp)
+    - [ScheduleDownlinkResponse](#ttn.lorawan.v3.ScheduleDownlinkResponse)
   
   
   
@@ -2620,6 +2621,21 @@ GatewayUp may contain zero or more uplink messages and/or a status message for t
 
 
 
+
+<a name="ttn.lorawan.v3.ScheduleDownlinkResponse"/>
+
+### ScheduleDownlinkResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| delay | [google.protobuf.Duration](#google.protobuf.Duration) |  |  |
+
+
+
+
+
  
 
  
@@ -2655,7 +2671,7 @@ The NsGs service connects a Network Server to a Gateway Server.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| ScheduleDownlink | [DownlinkMessage](#ttn.lorawan.v3.DownlinkMessage) | [.google.protobuf.Empty](#ttn.lorawan.v3.DownlinkMessage) | ScheduleDownlink instructs the Gateway Server to schedule a downlink message. The Gateway Server may refuse if there are any conflicts in the schedule or if a duty cycle prevents the gateway from transmitting. |
+| ScheduleDownlink | [DownlinkMessage](#ttn.lorawan.v3.DownlinkMessage) | [ScheduleDownlinkResponse](#ttn.lorawan.v3.DownlinkMessage) | ScheduleDownlink instructs the Gateway Server to schedule a downlink message. The Gateway Server may refuse if there are any conflicts in the schedule or if a duty cycle prevents the gateway from transmitting. |
 
  
 
