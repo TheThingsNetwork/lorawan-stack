@@ -18,6 +18,7 @@ import { Col, Row, Container } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 import { connect } from 'react-redux'
 import * as Yup from 'yup'
+import { replace } from 'connected-react-router'
 
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
@@ -27,8 +28,9 @@ import Form from '../../../components/form'
 import Field from '../../../components/field'
 import Button from '../../../components/button'
 import ModalButton from '../../../components/button/modal-button'
+import diff from '../../../lib/diff'
 
-import { deleteApplication, updateApplication } from '../../store/actions/application'
+import api from '../../api'
 
 import style from './application-general-settings.styl'
 
@@ -42,16 +44,15 @@ const m = defineMessages({
 const validationSchema = Yup.object().shape({
   name: Yup.string()
     .min(3, sharedMessages.validateTooShort)
-    .max(50, sharedMessages.validateTooLong)
-    .required(sharedMessages.validateRequired),
+    .max(50, sharedMessages.validateTooLong),
   description: Yup.string()
     .max(150, sharedMessages.validateTooLong),
 })
 
+
 @connect(function ({ application }) {
   return {
     application: application.application,
-    error: application.error,
   }
 })
 @withBreadcrumb('apps.single.general-settings', function (props) {
@@ -69,21 +70,42 @@ const validationSchema = Yup.object().shape({
 @bind
 export default class ApplicationGeneralSettings extends React.Component {
 
-  handleSubmit (values, { setSubmitting }) {
-    const { dispatch } = this.props
-
-    dispatch(updateApplication(values))
-    setSubmitting(false)
+  state = {
+    error: '',
   }
 
-  handleDelete () {
-    const { match, dispatch } = this.props
+  async handleSubmit (values, { setSubmitting, resetForm }) {
+    const { application } = this.props
 
-    dispatch(deleteApplication(match.params.appId))
+    await this.setState({ error: '' })
+
+    const changed = diff(application, values)
+    try {
+      await api.application.update(application.ids.application_id, changed)
+      resetForm({ ...values })
+    } catch (error) {
+      resetForm({ ...values })
+      await this.setState(error)
+    }
+  }
+
+  async handleDelete () {
+    const { dispatch } = this.props
+    const { appId } = this.props.match.params
+
+    await this.setState({ error: '' })
+
+    try {
+      await api.application.delete(appId)
+      dispatch(replace('/console/applications'))
+    } catch (error) {
+      this.setState(error)
+    }
   }
 
   render () {
-    const { application, error } = this.props
+    const { application } = this.props
+    const { error } = this.state
 
     return (
       <Container>

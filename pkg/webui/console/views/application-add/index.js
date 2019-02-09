@@ -96,13 +96,11 @@ export default class Add extends React.Component {
       const { ids: { application_id }} = result
       dispatch(push(`/console/applications/${application_id}`))
     } catch (error) {
-      await this.setState({ error })
-
       const { application_id, name, description } = values
       resetForm({ application_id, name, description })
-      setSubmitting(false)
-    }
 
+      await this.setState({ error })
+    }
   }
 
   render () {
@@ -136,7 +134,6 @@ export default class Add extends React.Component {
                 name="name"
                 type="text"
                 placeholder={m.appNamePlaceholder}
-                required
               />
               <Field
                 title={sharedMessages.description}
