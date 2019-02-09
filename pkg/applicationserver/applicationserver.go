@@ -229,6 +229,7 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 		return err
 	}
 	<-link.connReady
+	var encryptedItems []*ttnpb.ApplicationDownlink
 	_, err = as.deviceRegistry.Set(ctx, ids,
 		[]string{
 			"session",
@@ -254,20 +255,21 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 				item.DecodedPayload = nil
 				item.CorrelationIDs = events.CorrelationIDsFromContext(ctx)
 				dev.Session.LastAFCntDown = item.FCnt
+				encryptedItems = append(encryptedItems, item)
 			}
 			client := ttnpb.NewAsNsClient(link.conn)
 			req := &ttnpb.DownlinkQueueRequest{
 				EndDeviceIdentifiers: ids,
-				Downlinks:            items,
+				Downlinks:            encryptedItems,
 			}
 			_, err = op(client, ctx, req, link.callOpts...)
 			if err != nil {
-				for _, item := range items {
+				for _, item := range encryptedItems {
 					registerDropDownlink(ctx, ids, item, err)
 				}
 				return nil, nil, err
 			}
-			for _, item := range items {
+			for _, item := range encryptedItems {
 				registerForwardDownlink(ctx, ids, item, link.connName)
 			}
 			return dev, []string{"session.last_a_f_cnt_down"}, nil
@@ -276,7 +278,7 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 	if err != nil {
 		return err
 	}
-	for _, item := range items {
+	for _, item := range encryptedItems {
 		registerForwardDownlink(ctx, ids, item, link.connName)
 	}
 	return nil
