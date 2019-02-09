@@ -242,7 +242,7 @@ func (l *link) run() {
 		case <-l.ctx.Done():
 			return
 		case sub := <-l.subscribeCh:
-			correlationID := fmt.Sprintf("subscriber:%s", events.NewCorrelationID())
+			correlationID := fmt.Sprintf("as:subscriber:%s", events.NewCorrelationID())
 			subscribers[sub] = correlationID
 			registerSubscribe(events.ContextWithCorrelationID(l.ctx, correlationID), sub)
 			log.FromContext(sub.Context()).Debug("Subscribed")
