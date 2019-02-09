@@ -171,6 +171,7 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 		return err
 	}
 	logger.Info("Linked")
+	registerLink(ctx, l)
 
 	go l.run()
 	for _, sub := range as.defaultSubscribers {
@@ -189,6 +190,7 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 			} else {
 				logger.WithError(err).Warn("Link failed")
 			}
+			registerUnlink(ctx, l, err)
 			return err
 		}
 		atomic.AddUint64(&l.ups, 1)

@@ -4760,6 +4760,24 @@
       "file": "observability.go"
     }
   },
+  "event:as.link.start": {
+    "translations": {
+      "en": "link start"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "observability.go"
+    }
+  },
+  "event:as.link.stop": {
+    "translations": {
+      "en": "link stop"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "observability.go"
+    }
+  },
   "event:as.up.data.decode.fail": {
     "translations": {
       "en": "decode uplink data message fail"

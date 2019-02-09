@@ -26,6 +26,9 @@ import (
 )
 
 var (
+	evtLinkStart = events.Define("as.link.start", "link start")
+	evtLinkStop  = events.Define("as.link.stop", "link stop")
+
 	evtApplicationSubscribe   = events.Define("as.application.subscribe", "application subscribe")
 	evtApplicationUnsubscribe = events.Define("as.application.unsubscribe", "application unsubscribe")
 
@@ -54,6 +57,22 @@ const (
 )
 
 var asMetrics = &messageMetrics{
+	linksStarted: metrics.NewContextualCounterVec(
+		prometheus.CounterOpts{
+			Subsystem: subsystem,
+			Name:      "links_started",
+			Help:      "Number of links started",
+		},
+		[]string{networkServer},
+	),
+	linksStopped: metrics.NewContextualCounterVec(
+		prometheus.CounterOpts{
+			Subsystem: subsystem,
+			Name:      "links_stopped",
+			Help:      "Number of links stopped",
+		},
+		[]string{networkServer},
+	),
 	subscriptionsStarted: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
@@ -62,11 +81,11 @@ var asMetrics = &messageMetrics{
 		},
 		[]string{protocol},
 	),
-	subscriptionsEnded: metrics.NewContextualCounterVec(
+	subscriptionsStopped: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
-			Name:      "subscriptions_ended",
-			Help:      "Number of subscriptions ended",
+			Name:      "subscriptions_stopped",
+			Help:      "Number of subscriptions stopped",
 		},
 		[]string{protocol},
 	),
@@ -125,8 +144,10 @@ func init() {
 }
 
 type messageMetrics struct {
+	linksStarted         *metrics.ContextualCounterVec
+	linksStopped         *metrics.ContextualCounterVec
 	subscriptionsStarted *metrics.ContextualCounterVec
-	subscriptionsEnded   *metrics.ContextualCounterVec
+	subscriptionsStopped *metrics.ContextualCounterVec
 	uplinkReceived       *metrics.ContextualCounterVec
 	uplinkForwarded      *metrics.ContextualCounterVec
 	uplinkDropped        *metrics.ContextualCounterVec
@@ -136,8 +157,10 @@ type messageMetrics struct {
 }
 
 func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
+	m.linksStarted.Describe(ch)
+	m.linksStopped.Describe(ch)
 	m.subscriptionsStarted.Describe(ch)
-	m.subscriptionsEnded.Describe(ch)
+	m.subscriptionsStopped.Describe(ch)
 	m.uplinkReceived.Describe(ch)
 	m.uplinkForwarded.Describe(ch)
 	m.uplinkDropped.Describe(ch)
@@ -147,14 +170,26 @@ func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
 }
 
 func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
+	m.linksStarted.Collect(ch)
+	m.linksStopped.Collect(ch)
 	m.subscriptionsStarted.Collect(ch)
-	m.subscriptionsEnded.Collect(ch)
+	m.subscriptionsStopped.Collect(ch)
 	m.uplinkReceived.Collect(ch)
 	m.uplinkForwarded.Collect(ch)
 	m.uplinkDropped.Collect(ch)
 	m.downlinkReceived.Collect(ch)
 	m.downlinkForwarded.Collect(ch)
 	m.downlinkDropped.Collect(ch)
+}
+
+func registerLink(ctx context.Context, link *link) {
+	events.Publish(evtLinkStart(ctx, link.ApplicationIdentifiers, nil))
+	asMetrics.linksStarted.WithLabelValues(ctx, link.NetworkServerAddress).Inc()
+}
+
+func registerUnlink(ctx context.Context, link *link, err error) {
+	events.Publish(evtLinkStop(ctx, link.ApplicationIdentifiers, err))
+	asMetrics.linksStopped.WithLabelValues(ctx, link.NetworkServerAddress).Inc()
 }
 
 func registerSubscribe(ctx context.Context, sub *io.Subscription) {
@@ -172,7 +207,7 @@ func registerUnsubscribe(ctx context.Context, sub *io.Subscription) {
 		ids = appIDs
 	}
 	events.Publish(evtApplicationUnsubscribe(ctx, ids, nil))
-	asMetrics.subscriptionsEnded.WithLabelValues(ctx, sub.Protocol()).Inc()
+	asMetrics.subscriptionsStopped.WithLabelValues(ctx, sub.Protocol()).Inc()
 }
 
 func registerReceiveUp(ctx context.Context, msg *ttnpb.ApplicationUp, ns string) {
