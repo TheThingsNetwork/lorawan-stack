@@ -202,3 +202,89 @@ func (dst *SetApplicationLinkRequest) SetFields(src *SetApplicationLinkRequest, 
 	}
 	return nil
 }
+
+var ApplicationLinkStatsFieldPathsNested = []string{
+	"downlink_count",
+	"last_downlink_forwarded_at",
+	"last_up_received_at",
+	"linked_at",
+	"network_server_address",
+	"up_count",
+}
+
+var ApplicationLinkStatsFieldPathsTopLevel = []string{
+	"downlink_count",
+	"last_downlink_forwarded_at",
+	"last_up_received_at",
+	"linked_at",
+	"network_server_address",
+	"up_count",
+}
+
+func (dst *ApplicationLinkStats) SetFields(src *ApplicationLinkStats, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "linked_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'linked_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.LinkedAt = src.LinkedAt
+			} else {
+				dst.LinkedAt = nil
+			}
+		case "network_server_address":
+			if len(subs) > 0 {
+				return fmt.Errorf("'network_server_address' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.NetworkServerAddress = src.NetworkServerAddress
+			} else {
+				var zero string
+				dst.NetworkServerAddress = zero
+			}
+		case "last_up_received_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'last_up_received_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.LastUpReceivedAt = src.LastUpReceivedAt
+			} else {
+				dst.LastUpReceivedAt = nil
+			}
+		case "up_count":
+			if len(subs) > 0 {
+				return fmt.Errorf("'up_count' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.UpCount = src.UpCount
+			} else {
+				var zero uint64
+				dst.UpCount = zero
+			}
+		case "last_downlink_forwarded_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'last_downlink_forwarded_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.LastDownlinkForwardedAt = src.LastDownlinkForwardedAt
+			} else {
+				dst.LastDownlinkForwardedAt = nil
+			}
+		case "downlink_count":
+			if len(subs) > 0 {
+				return fmt.Errorf("'downlink_count' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DownlinkCount = src.DownlinkCount
+			} else {
+				var zero uint64
+				dst.DownlinkCount = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
