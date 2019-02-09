@@ -68,15 +68,25 @@ class Applications {
   }
 
   async getByOrganization (organizationId) {
-    return this._api.ApplicationRegistry.List({
+    const result = this._api.ApplicationRegistry.List({
       route: { 'collaborator.organization_ids.organization_id': organizationId },
     })
+
+    return Marshaler.unwrapApplications(
+      result,
+      this._applicationTransform
+    )
   }
 
   async getByCollaborator (userId) {
-    return this._api.ApplicationRegistry.List({
+    const result = this._api.ApplicationRegistry.List({
       route: { 'collaborator.user_ids.user_id': userId },
     })
+
+    return Marshaler.unwrapApplications(
+      result,
+      this._applicationTransform
+    )
   }
 
   async search (params) {
@@ -92,7 +102,7 @@ class Applications {
   // Update
 
   async updateById (id, patch, mask = Marshaler.fieldMaskFromPatch(patch)) {
-    return this._api.ApplicationRegistry.Update({
+    const result = await this._api.ApplicationRegistry.Update({
       route: {
         'application.ids.application_id': id,
       },
@@ -101,15 +111,23 @@ class Applications {
       application: patch,
       field_mask: Marshaler.fieldMask(mask),
     })
+    return Marshaler.unwrapApplication(
+      result,
+      this._applicationTransform
+    )
   }
 
   // Create
 
   async create (userId = this._defaultUserId, application) {
-    return this._api.ApplicationRegistry.Create({
+    const result = await this._api.ApplicationRegistry.Create({
       route: { 'collaborator.user_ids.user_id': userId },
     },
     { application })
+    return Marshaler.unwrapApplication(
+      result,
+      this._applicationTransform
+    )
   }
 
   // Delete
