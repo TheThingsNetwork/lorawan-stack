@@ -233,3 +233,14 @@ func (s *Scheduler) SyncWithGateway(v uint32, server, gateway time.Time) {
 	s.clock.SyncWithGateway(v, server, gateway)
 	s.mu.Unlock()
 }
+
+// Now returns an indication of the current concentrator time.
+// This method returns false if the clock is not synced with the server.
+func (s *Scheduler) Now() (ConcentratorTime, bool) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if !s.clock.IsSynced() {
+		return 0, false
+	}
+	return s.clock.ServerTime(time.Now()), true
+}
