@@ -107,17 +107,17 @@ func (c *Component) ListenUDP(address string) (*net.UDPConn, error) {
 }
 
 type endpoint struct {
-	toNativeListener func(Listener) (net.Listener, error)
-
-	address, protocol string
+	listen   func(Listener) (net.Listener, error)
+	address  string
+	protocol string
 }
 
-func (c *Component) serveOnListeners(endpoints []endpoint, serve func(*Component, net.Listener) error, namespace string) error {
+func (c *Component) serveOnEndpoints(endpoints []endpoint, serve func(*Component, net.Listener) error, namespace string) error {
 	for _, endpoint := range endpoints {
 		if endpoint.address == "" {
 			continue
 		}
-		err := c.serveOnListener(endpoint, serve, namespace)
+		err := c.serveOnEndpoint(endpoint, serve, namespace)
 		if err != nil {
 			return err
 		}
@@ -125,12 +125,12 @@ func (c *Component) serveOnListeners(endpoints []endpoint, serve func(*Component
 	return nil
 }
 
-func (c *Component) serveOnListener(endpoint endpoint, serve func(*Component, net.Listener) error, namespace string) error {
+func (c *Component) serveOnEndpoint(endpoint endpoint, serve func(*Component, net.Listener) error, namespace string) error {
 	l, err := c.ListenTCP(endpoint.address)
 	if err != nil {
 		return errListenEndpoint.WithAttributes("endpoint", endpoint.address).WithCause(err)
 	}
-	lis, err := endpoint.toNativeListener(l)
+	lis, err := endpoint.listen(l)
 	if err != nil {
 		return errListener.WithAttributes("protocol", endpoint.protocol).WithCause(err)
 	}
