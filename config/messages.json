@@ -3158,9 +3158,27 @@
       "file": "microchip.go"
     }
   },
+  "error:pkg/joinserver/redis:already_provisioned": {
+    "translations": {
+      "en": "device already provisioned"
+    },
+    "description": {
+      "package": "pkg/joinserver/redis",
+      "file": "registry.go"
+    }
+  },
   "error:pkg/joinserver/redis:invalid_identifiers": {
     "translations": {
       "en": "invalid identifiers"
+    },
+    "description": {
+      "package": "pkg/joinserver/redis",
+      "file": "registry.go"
+    }
+  },
+  "error:pkg/joinserver/redis:provisioner_not_found": {
+    "translations": {
+      "en": "provisioner `{id}` not found"
     },
     "description": {
       "package": "pkg/joinserver/redis",

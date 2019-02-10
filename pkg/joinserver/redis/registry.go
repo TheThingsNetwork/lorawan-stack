@@ -21,13 +21,20 @@ import (
 
 	"github.com/go-redis/redis"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/joinserver/provisioning"
 	ttnredis "go.thethings.network/lorawan-stack/pkg/redis"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
+const (
+	provisionerKey = "provisioner"
+)
+
 var (
-	errInvalidIdentifiers = errors.DefineInvalidArgument("invalid_identifiers", "invalid identifiers")
+	errInvalidIdentifiers  = errors.DefineInvalidArgument("invalid_identifiers", "invalid identifiers")
+	errProvisionerNotFound = errors.DefineNotFound("provisioner_not_found", "provisioner `{id}` not found")
+	errAlreadyProvisioned  = errors.DefineAlreadyExists("already_provisioned", "device already provisioned")
 )
 
 func applyDeviceFieldMask(dst, src *ttnpb.EndDevice, paths ...string) (*ttnpb.EndDevice, error) {
@@ -44,6 +51,17 @@ func applyDeviceFieldMask(dst, src *ttnpb.EndDevice, paths ...string) (*ttnpb.En
 // DeviceRegistry is an implementation of joinserver.DeviceRegistry.
 type DeviceRegistry struct {
 	Redis *ttnredis.Client
+}
+
+func provisionerUniqueID(dev *ttnpb.EndDevice) (string, error) {
+	if dev.ProvisionerID == "" {
+		return "", nil
+	}
+	provisioner := provisioning.Get(dev.ProvisionerID)
+	if provisioner == nil {
+		return "", errProvisionerNotFound.WithAttributes("id", dev.ProvisionerID)
+	}
+	return provisioner.UniqueID(dev.ProvisioningData)
 }
 
 // GetByEUI gets device by joinEUI, devEUI.
@@ -92,11 +110,21 @@ func (r *DeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devE
 		if err != nil {
 			return err
 		}
+		if stored == nil && pb == nil {
+			return nil
+		}
 
 		var f func(redis.Pipeliner) error
 		if pb == nil {
 			f = func(p redis.Pipeliner) error {
 				p.Del(k)
+				uniqueID, err := provisionerUniqueID(stored)
+				if err != nil {
+					return err
+				}
+				if uniqueID != "" {
+					p.Del(r.Redis.Key(provisionerKey, stored.ProvisionerID, uniqueID))
+				}
 				return nil
 			}
 		} else {
@@ -121,8 +149,31 @@ func (r *DeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devE
 				return err
 			}
 			f = func(p redis.Pipeliner) error {
-				_, err := ttnredis.SetProto(p, k, stored, 0)
-				return err
+				if _, err := ttnredis.SetProto(p, k, stored, 0); err != nil {
+					return err
+				}
+				uniqueID, err := provisionerUniqueID(stored)
+				if err != nil {
+					return err
+				}
+				if uniqueID != "" {
+					uk := r.Redis.Key(provisionerKey, stored.ProvisionerID, uniqueID)
+					if err := tx.Watch(uk).Err(); err != nil {
+						return err
+					}
+					s, err := tx.Get(uk).Result()
+					if err != nil && err != redis.Nil {
+						return ttnredis.ConvertError(err)
+					}
+					val := ttnredis.Key(joinEUI.String(), devEUI.String())
+					if err == nil && s != val {
+						return errAlreadyProvisioned
+					}
+					if s != val {
+						p.Set(uk, val, 0)
+					}
+				}
+				return nil
 			}
 		}
 

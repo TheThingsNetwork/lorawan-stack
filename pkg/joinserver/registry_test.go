@@ -19,6 +19,7 @@ import (
 	"testing"
 	"time"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -44,6 +45,16 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 			JoinEUI: &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+		},
+		ProvisionerID: "mock",
+		ProvisioningData: &pbtypes.Struct{
+			Fields: map[string]*pbtypes.Value{
+				"serial_number": {
+					Kind: &pbtypes.Value_NumberValue{
+						NumberValue: 42,
+					},
+				},
+			},
 		},
 	}
 
@@ -80,19 +91,9 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 	a.So(ret, should.BeNil)
 
 	ret, err = CreateDevice(ctx, reg, pbOther)
-	if !a.So(err, should.BeNil) || !a.So(ret, should.NotBeNil) {
+	if !a.So(errors.IsAlreadyExists(err), should.BeTrue) { // Conflicting provisioner unique ID.
 		t.FailNow()
 	}
-	a.So(ret.CreatedAt, should.HappenAfter, pb.CreatedAt)
-	a.So(ret.UpdatedAt, should.HappenAfter, pb.UpdatedAt)
-	a.So(ret.UpdatedAt, should.Equal, ret.CreatedAt)
-	pbOther.CreatedAt = ret.CreatedAt
-	pbOther.UpdatedAt = ret.UpdatedAt
-	a.So(ret, should.HaveEmptyDiff, pbOther)
-
-	ret, err = reg.GetByEUI(ctx, *pbOther.EndDeviceIdentifiers.JoinEUI, *pbOther.EndDeviceIdentifiers.DevEUI, ttnpb.EndDeviceFieldPathsTopLevel)
-	a.So(err, should.BeNil)
-	a.So(ret, should.HaveEmptyDiff, pbOther)
 
 	err = DeleteDevice(ctx, reg, *pb.EndDeviceIdentifiers.JoinEUI, *pb.EndDeviceIdentifiers.DevEUI)
 	if !a.So(err, should.BeNil) {
@@ -104,6 +105,22 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 		t.Fatalf("Error received: %v", err)
 	}
 	a.So(ret, should.BeNil)
+
+	ret, err = CreateDevice(ctx, reg, pbOther)
+	if !a.So(err, should.BeNil) || !a.So(ret, should.NotBeNil) { // No more conflicts.
+		t.FailNow()
+	}
+
+	a.So(ret.CreatedAt, should.HappenAfter, pb.CreatedAt)
+	a.So(ret.UpdatedAt, should.HappenAfter, pb.UpdatedAt)
+	a.So(ret.UpdatedAt, should.Equal, ret.CreatedAt)
+	pbOther.CreatedAt = ret.CreatedAt
+	pbOther.UpdatedAt = ret.UpdatedAt
+	a.So(ret, should.HaveEmptyDiff, pbOther)
+
+	ret, err = reg.GetByEUI(ctx, *pbOther.EndDeviceIdentifiers.JoinEUI, *pbOther.EndDeviceIdentifiers.DevEUI, ttnpb.EndDeviceFieldPathsTopLevel)
+	a.So(err, should.BeNil)
+	a.So(ret, should.HaveEmptyDiff, pbOther)
 
 	err = DeleteDevice(ctx, reg, *pbOther.EndDeviceIdentifiers.JoinEUI, *pbOther.EndDeviceIdentifiers.DevEUI)
 	if !a.So(err, should.BeNil) {
