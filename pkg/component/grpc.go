@@ -69,18 +69,18 @@ func (c *Component) serveGRPC(lis net.Listener) error {
 	return c.grpc.Serve(lis)
 }
 
-func (c *Component) grpcListenerConfigs() []endpoint {
+func (c *Component) grpcEndpoints() []endpoint {
 	return []endpoint{
-		{toNativeListener: Listener.TCP, address: c.config.GRPC.Listen, protocol: "gRPC"},
-		{toNativeListener: Listener.TLS, address: c.config.GRPC.ListenTLS, protocol: "gRPC/tls"},
+		{listen: Listener.TCP, address: c.config.GRPC.Listen, protocol: "gRPC"},
+		{listen: Listener.TLS, address: c.config.GRPC.ListenTLS, protocol: "gRPC/tls"},
 	}
 }
 
 func (c *Component) listenGRPC() (err error) {
-	return c.serveOnListeners(c.grpcListenerConfigs(), (*Component).serveGRPC, "grpc")
+	return c.serveOnEndpoints(c.grpcEndpoints(), (*Component).serveGRPC, "grpc")
 }
 
-// RegisterGRPC registers a gRPC subsystem to the component
+// RegisterGRPC registers a gRPC subsystem to the component.
 func (c *Component) RegisterGRPC(s rpcserver.Registerer) {
 	if c.grpc == nil {
 		c.initGRPC()
