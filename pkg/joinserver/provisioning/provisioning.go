@@ -29,8 +29,8 @@ type Provisioner interface {
 	DefaultJoinEUI(entry *pbtypes.Struct) (types.EUI64, error)
 	// DefaultDevEUI returns the default DevEUI for the given entry.
 	DefaultDevEUI(entry *pbtypes.Struct) (types.EUI64, error)
-	// DeviceID generates a device ID.
-	DeviceID(joinEUI, devEUI types.EUI64, entry *pbtypes.Struct) (string, error)
+	// DefaultDeviceID returns the default device ID.
+	DefaultDeviceID(joinEUI, devEUI types.EUI64, entry *pbtypes.Struct) (string, error)
 	// UniqueID returns the vendor-specific unique ID for the given entry.
 	UniqueID(entry *pbtypes.Struct) (string, error)
 }

@@ -122,8 +122,8 @@ func (p *microchip) DefaultDevEUI(entry *pbtypes.Struct) (types.EUI64, error) {
 	return eui, nil
 }
 
-// DeviceID returns the device ID formatted as sn-{uniqueId}.
-func (p *microchip) DeviceID(joinEUI, devEUI types.EUI64, entry *pbtypes.Struct) (string, error) {
+// DeviceID returns the default device ID formatted as sn-{uniqueId}.
+func (p *microchip) DefaultDeviceID(joinEUI, devEUI types.EUI64, entry *pbtypes.Struct) (string, error) {
 	sn, err := p.UniqueID(entry)
 	if err != nil {
 		return "", err

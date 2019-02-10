@@ -48,7 +48,7 @@ func TestMicrochip(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(devEUI, should.Resemble, types.EUI64{0x01, 0x23, 0x7a, 0x00, 0x5b, 0x08, 0xbc, 0xc5})
 
-	deviceID, err := provisioner.DeviceID(joinEUI, devEUI, entry)
+	deviceID, err := provisioner.DefaultDeviceID(joinEUI, devEUI, entry)
 	a.So(err, should.BeNil)
 	a.So(deviceID, should.Equal, "sn-01237a005b08bcc527")
 

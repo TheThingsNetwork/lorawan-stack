@@ -1668,7 +1668,7 @@ func (p *byteToSerialNumber) DefaultDevEUI(entry *pbtypes.Struct) (types.EUI64, 
 	return devEUI, nil
 }
 
-func (p *byteToSerialNumber) DeviceID(joinEUI, devEUI types.EUI64, entry *pbtypes.Struct) (string, error) {
+func (p *byteToSerialNumber) DefaultDeviceID(joinEUI, devEUI types.EUI64, entry *pbtypes.Struct) (string, error) {
 	return fmt.Sprintf("sn-%d", int(entry.Fields["serial_number"].GetNumberValue())), nil
 }
 
