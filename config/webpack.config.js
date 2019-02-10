@@ -54,6 +54,10 @@ export default {
   mode: production ? 'production' : 'development',
   externals: [ filterLocales ],
   stats: 'minimal',
+  node: {
+    fs: 'empty',
+    module: 'empty',
+  },
   devServer: {
     port: 8080,
     inline: true,
