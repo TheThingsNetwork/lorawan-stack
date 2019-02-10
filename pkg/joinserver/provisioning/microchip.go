@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
+	"strings"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -123,11 +124,20 @@ func (p *microchip) DefaultDevEUI(entry *pbtypes.Struct) (types.EUI64, error) {
 
 // DeviceID returns the device ID formatted as sn-{uniqueId}.
 func (p *microchip) DeviceID(joinEUI, devEUI types.EUI64, entry *pbtypes.Struct) (string, error) {
+	sn, err := p.UniqueID(entry)
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("sn-%s", strings.ToLower(sn)), nil
+}
+
+// UniqueID returns the serial number.
+func (p *microchip) UniqueID(entry *pbtypes.Struct) (string, error) {
 	sn := entry.Fields["uniqueId"].GetStringValue()
 	if sn == "" {
 		return "", errEntry
 	}
-	return fmt.Sprintf("sn-%s", sn), nil
+	return strings.ToUpper(sn), nil
 }
 
 func init() {

@@ -18,6 +18,7 @@ import (
 	"context"
 	"encoding/binary"
 	"fmt"
+	"strconv"
 	"testing"
 
 	pbtypes "github.com/gogo/protobuf/types"
@@ -1669,6 +1670,10 @@ func (p *byteToSerialNumber) DefaultDevEUI(entry *pbtypes.Struct) (types.EUI64, 
 
 func (p *byteToSerialNumber) DeviceID(joinEUI, devEUI types.EUI64, entry *pbtypes.Struct) (string, error) {
 	return fmt.Sprintf("sn-%d", int(entry.Fields["serial_number"].GetNumberValue())), nil
+}
+
+func (p *byteToSerialNumber) UniqueID(entry *pbtypes.Struct) (string, error) {
+	return strconv.Itoa(int(entry.Fields["serial_number"].GetNumberValue())), nil
 }
 
 func (p *byteToSerialNumber) Decode(data []byte) ([]*pbtypes.Struct, error) {
