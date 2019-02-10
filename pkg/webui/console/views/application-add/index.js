@@ -23,7 +23,7 @@ import { push } from 'connected-react-router'
 import Form from '../../../components/form'
 import Field from '../../../components/field'
 import Button from '../../../components/button'
-
+import Message from '../../../lib/components/message'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import sharedMessages from '../../../lib/shared-messages'
@@ -108,7 +108,9 @@ export default class Add extends React.Component {
     return (
       <Container>
         <Row className={style.wrapper}>
-          <Col sm={12}><h2>Add Application</h2></Col>
+          <Col sm={12}>
+            <Message component="h2" content={sharedMessages.addApplication} />
+          </Col>
           <Col className={style.form} sm={12} md={8} lg={8} xl={8}>
             <Form
               error={error}
