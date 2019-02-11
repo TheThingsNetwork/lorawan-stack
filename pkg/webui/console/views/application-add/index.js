@@ -18,6 +18,7 @@ import * as Yup from 'yup'
 import { connect } from 'react-redux'
 import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
+import { push } from 'connected-react-router'
 
 import Form from '../../../components/form'
 import Field from '../../../components/field'
@@ -80,22 +81,25 @@ export default class Add extends React.Component {
   }
 
   async handleSubmit (values, { setSubmitting, resetForm }) {
-    const { userId } = this.props
+    const { userId, dispatch } = this.props
 
     await this.setState({ error: '' })
 
     try {
-      await api.application.create(userId,
+      const result = await api.application.create(userId,
         {
           ids: { application_id: values.application_id },
           name: values.name,
           description: values.description,
         })
+
+      const { ids: { application_id }} = result
+      dispatch(push(`/console/applications/${application_id}`))
     } catch (error) {
+      await this.setState({ error })
+
       const { application_id, name, description } = values
       resetForm({ application_id, name, description })
-      await this.setState({ error })
-    } finally {
       setSubmitting(false)
     }
 
@@ -142,7 +146,6 @@ export default class Add extends React.Component {
               />
               <div className={style.submitBar}>
                 <Button type="submit" message={m.createApplication} />
-                <Button type="reset" naked message={sharedMessages.cancel} />
               </div>
             </Form>
           </Col>
