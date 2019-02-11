@@ -91,6 +91,7 @@ export default {
   devices: {
     list: stubs.devices.list,
     search: stubs.devices.search,
+    get: stubs.device.get,
   },
   gateways: {
     list: stubs.gateways.list,
