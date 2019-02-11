@@ -30,6 +30,8 @@ import ApplicationLink from '../application-link'
 
 import { getApplication } from '../../store/actions/application'
 
+import Device from '../device'
+
 @connect(function ({ application }, props) {
   return {
     appId: props.match.params.appId,
@@ -129,6 +131,7 @@ export default class Application extends React.Component {
         <Route path={`${match.path}/general-settings`} component={ApplicationGeneralSettings} />
         <Route path={`${match.path}/api-keys`} component={ApplicationApiKeys} />
         <Route path={`${match.path}/link`} component={ApplicationLink} />
+        <Route path={`${match.path}/devices/:devId`} component={Device} />
       </Switch>
     )
   }
