@@ -77,15 +77,24 @@ make test
 
 ### Building
 
-You can build the stack with the following command:
+There is a single binary for the server, `ttn-lw-stack`, as well as a binary for the command-line interface `ttn-lw-cli`. The single binary contains all components start one or multiple components. This allows you to run the stack with one command in simple deployment scenarios, as well as distributing micro-services for more advanced scenarios.
+
+We provide binary releases for all supported platforms, including packages for various package managers at https://github.com/TheThingsNetwork/lorawan-stack/releases. We suggest you use the compiled packages we provide in production scenarios.
+
+For development/testing purposes we suggest either running required binaries via `go run` (e.g. `go run ./cmd/ttn-lw-cli` from repository root for CLI), or using `go build` directly. Note, that frontend (if used) needs to be built manually via `make js.build` before `go build` or `go run` commands are run.
+
+If you must, you can build all arifacts with the following command:
 
 ```
 make clean build-all
 ```
 
-This will compile the front-end in `public`, and the binaries in `release`. There is a single binary for the server, `ttn-lw-stack`, as well as a binary for the command-line interface `ttn-lw-cli`. The single binary contains all components start one or multiple components. This allows you to run the stack with one command in simple deployment scenarios, as well as distributing micro-services for more advanced scenarios.
+>Note: You will at least need to have [`rpm`](http://rpm5.org/) and [`snapcraft`](https://snapcraft.io/) in your `PATH`.
 
->Note: The operating system and architecture is appended to the binary name, i.e. on macOS, you will find `release/ttn-lw-stack-darwin-amd64`.
+This will compile the front-end in `public`, the binaries for all supported platforms, `deb`, `rpm` and Snapcraft packages, release archives in `dist`,  as well as Docker images.
+
+>Note: The operating system and architecture represent the name of the directory in `dist` in which the binaries are placed.
+>For example, the binaries for Darwin x64 (macOS) will be located at `dist/darwin_amd64`.
 
 #### API
 
