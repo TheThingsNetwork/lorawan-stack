@@ -12,9 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import DOM from 'react-dom'
-import OAuthApp from './oauth/views/app'
+import { createStore, applyMiddleware, compose } from 'redux'
+import { createLogicMiddleware } from 'redux-logic'
+import { connectRouter, routerMiddleware } from 'connected-react-router'
 
-const root = document.getElementById('app')
-DOM.render((<OAuthApp />), root)
+import reducer from './reducers'
+import logic from './middleware'
+
+const composeEnhancers = (process.env.NODE_ENV === 'development'
+  && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) || compose
+
+export default function (history) {
+  const middleware = applyMiddleware(
+    routerMiddleware(history),
+    createLogicMiddleware(logic),
+  )
+
+  return createStore(
+    connectRouter(history)(reducer),
+    composeEnhancers(middleware)
+  )
+}

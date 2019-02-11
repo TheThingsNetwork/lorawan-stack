@@ -18,6 +18,7 @@ import 'focus-visible/dist/focus-visible'
 import { setConfiguration } from 'react-grid-system'
 
 import Spinner from '../../components/spinner'
+import ErrorMessage from './error-message'
 
 import '../../styles/main.styl'
 
@@ -31,7 +32,8 @@ setConfiguration({
 
 @connect(state => (
   {
-    initialized: state.console.initialized,
+    initialized: state.init.initialized,
+    error: state.init.error,
   }
 ))
 export default class Init extends React.PureComponent {
@@ -41,7 +43,11 @@ export default class Init extends React.PureComponent {
   }
 
   render () {
-    const { initialized } = this.props
+    const { initialized, error } = this.props
+
+    if (error) {
+      return <ErrorMessage content={error} />
+    }
 
     if (!initialized) {
       return (<Spinner center>Please wait…</Spinner>)

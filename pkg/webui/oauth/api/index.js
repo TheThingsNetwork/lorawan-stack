@@ -12,9 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import DOM from 'react-dom'
-import OAuthApp from './oauth/views/app'
+import axios from 'axios'
 
-const root = document.getElementById('app')
-DOM.render((<OAuthApp />), root)
+import getCookieValue from '../../lib/cookie'
+
+const csrf = getCookieValue('_csrf')
+const instance = axios.create({
+  headers: { 'X-CSRF-Token': csrf },
+})
+
+export default {
+  users: {
+    async register (userData) {
+      return axios.post(`/api/v3/users`, userData)
+    },
+  },
+  oauth: {
+    login (credentials) {
+      return instance.post('/oauth/api/auth/login', credentials)
+    },
+    logout () {
+      return instance.post('/oauth/api/auth/logout')
+    },
+    me () {
+      return instance.get('/oauth/api/me')
+    },
+  },
+}

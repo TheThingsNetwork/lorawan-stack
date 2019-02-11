@@ -12,9 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import DOM from 'react-dom'
-import OAuthApp from './oauth/views/app'
+import { createLogic } from 'redux-logic'
 
-const root = document.getElementById('app')
-DOM.render((<OAuthApp />), root)
+import api from '../../api'
+import * as client from '../actions/client'
+
+const clientLogic = createLogic({
+  type: client.GET_CLIENT,
+  async process ({ getState, action }, dispatch, done) {
+    try {
+      const result = await api.clients.get(action.clientId)
+      dispatch(client.getClientSuccess(result.data))
+    } catch (error) {
+      dispatch(client.getClientFailure(action.clientId))
+    }
+    done()
+  },
+})
+
+export default clientLogic

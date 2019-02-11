@@ -13,8 +13,26 @@
 // limitations under the License.
 
 import React from 'react'
-import DOM from 'react-dom'
-import OAuthApp from './oauth/views/app'
+import { Row, Col, Container } from 'react-grid-system'
 
-const root = document.getElementById('app')
-DOM.render((<OAuthApp />), root)
+import sharedMessages from '../../../lib/shared-messages'
+import IntlHelmet from '../../../lib/components/intl-helmet'
+
+import ApplicationsTable from '../../containers/applications-table'
+
+const APPLICATIONS_TABLE_SIZE = 5
+
+export default class List extends React.Component {
+  render () {
+    return (
+      <Container>
+        <Row>
+          <IntlHelmet title={sharedMessages.applications} />
+          <Col sm={12}>
+            <ApplicationsTable pageSize={APPLICATIONS_TABLE_SIZE} />
+          </Col>
+        </Row>
+      </Container>
+    )
+  }
+}

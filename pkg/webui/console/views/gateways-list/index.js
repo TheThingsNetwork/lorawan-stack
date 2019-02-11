@@ -13,8 +13,25 @@
 // limitations under the License.
 
 import React from 'react'
-import DOM from 'react-dom'
-import OAuthApp from './oauth/views/app'
+import { Container, Row, Col } from 'react-grid-system'
 
-const root = document.getElementById('app')
-DOM.render((<OAuthApp />), root)
+import GatewaysTable from '../../containers/gateways-table'
+import sharedMessages from '../../../lib/shared-messages'
+import IntlHelmet from '../../../lib/components/intl-helmet'
+
+const GATEWAYS_TABLE_SIZE = 5
+
+export default class GatewaysList extends React.Component {
+  render () {
+    return (
+      <Container>
+        <Row>
+          <IntlHelmet title={sharedMessages.gateways} />
+          <Col sm={12}>
+            <GatewaysTable pageSize={GATEWAYS_TABLE_SIZE} />
+          </Col>
+        </Row>
+      </Container>
+    )
+  }
+}

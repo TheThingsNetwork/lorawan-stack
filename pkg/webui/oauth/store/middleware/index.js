@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import DOM from 'react-dom'
-import OAuthApp from './oauth/views/app'
+import init from './init'
+import user from './user'
 
-const root = document.getElementById('app')
-DOM.render((<OAuthApp />), root)
+export default [
+  init,
+  user,
+]

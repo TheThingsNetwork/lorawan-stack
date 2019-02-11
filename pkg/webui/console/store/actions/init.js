@@ -12,9 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import DOM from 'react-dom'
-import OAuthApp from './oauth/views/app'
+export const INITIALIZE = 'INITIALIZE'
+export const INITIALIZE_FAILURE = 'INITIALIZE_FAILURE'
+export const INITIALIZE_SUCCESS = 'INITIALIZE_SUCCESS'
 
-const root = document.getElementById('app')
-DOM.render((<OAuthApp />), root)
+export const initialize = () => (
+  { type: INITIALIZE }
+)
+
+export const initializeFailure = () => (
+  { type: INITIALIZE_FAILURE }
+)
+
+export const initializeSuccess = error => (
+  { type: INITIALIZE_SUCCESS, error }
+)
