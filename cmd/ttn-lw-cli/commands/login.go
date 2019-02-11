@@ -15,9 +15,13 @@
 package commands
 
 import (
+	"bufio"
+	"context"
+	"fmt"
 	"net"
 	"net/http"
-	"sync"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -31,40 +35,76 @@ var (
 		Use:   "login",
 		Short: "Login",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			lis, err := net.Listen("tcp", ":11885")
+			ctx, done := context.WithCancel(ctx)
+			defer done()
+
+			callback, err := cmd.Flags().GetBool("callback")
 			if err != nil {
 				return err
 			}
-			var (
-				once    sync.Once
-				tokenCh = make(chan *oauth2.Token)
-			)
-			go http.Serve(lis, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				if r.Method != http.MethodGet || r.URL.Path != "/oauth/callback" {
-					http.NotFound(w, r)
-					return
-				}
-				token, err := oauth2Config.Exchange(ctx, r.URL.Query().Get("code"))
-				if err != nil {
-					msg := "Could not exchange OAuth access token"
-					logger.WithError(err).Error(msg)
-					w.WriteHeader(http.StatusUnauthorized)
+
+			var token *oauth2.Token
+
+			if callback {
+				oauth2Config.RedirectURL = "http://localhost:11885/oauth/callback"
+
+				http.HandleFunc("/oauth/callback", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					if r.Method != http.MethodGet {
+						http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+						return
+					}
+					token, err = oauth2Config.Exchange(ctx, r.URL.Query().Get("code"))
+					if err != nil {
+						msg := "Could not exchange OAuth access token"
+						logger.WithError(err).Error(msg)
+						w.WriteHeader(http.StatusUnauthorized)
+						w.Write([]byte(msg))
+						return
+					}
+					msg := "Got OAuth access token"
+					logger.Info(msg)
 					w.Write([]byte(msg))
-					return
+					done()
+				}))
+
+				lis, err := net.Listen("tcp", ":11885")
+				defer lis.Close()
+				if err != nil {
+					return err
 				}
-				msg := "Got OAuth access token"
-				logger.Info(msg)
-				w.Write([]byte(msg))
-				once.Do(func() {
-					tokenCh <- token
-				})
-			}))
+				go http.Serve(lis, nil)
+			} else {
+				oauth2Config.RedirectURL = "/oauth/code"
+			}
 
 			logger.Infof("Please go to %s", oauth2Config.AuthCodeURL(""))
-			logger.Info("Waiting for your authorization...")
 
-			token := <-tokenCh
-			lis.Close()
+			if callback {
+				logger.Info("Waiting for your authorization...")
+				<-ctx.Done()
+			} else {
+				logger.Info("Then paste the authorization code and press enter")
+				var code string
+				for {
+					fmt.Fprint(os.Stderr, "> ")
+					r := bufio.NewReader(os.Stdin)
+					code, err = r.ReadString('\n')
+					if err != nil {
+						return err
+					}
+					code = strings.TrimSpace(code)
+					if code != "" {
+						break
+					}
+					logger.Info("Please paste the authorization code and press enter")
+				}
+				token, err = oauth2Config.Exchange(ctx, code)
+				if err != nil {
+					logger.WithError(err).Error("Could not exchange OAuth access token")
+					return err
+				}
+				logger.Info("Got OAuth access token")
+			}
 
 			cache.Set("oauth_token", token)
 
@@ -116,6 +156,7 @@ var (
 )
 
 func init() {
+	loginCommand.Flags().Bool("callback", true, "use local OAuth callback endpoint")
 	Root.AddCommand(loginCommand)
 	Root.AddCommand(logoutCommand)
 }
