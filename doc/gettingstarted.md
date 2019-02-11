@@ -64,7 +64,7 @@ You can run it using Docker, or container orchestration solutions. An example [D
 $ docker-compose pull
 $ docker-compose run --rm stack is-db init
 $ docker-compose run --rm stack is-db create-admin-user --id admin --email admin@localhost
-$ docker-compose run --rm stack is-db create-oauth-client --id cli --name "Command Line Interface" --owner admin --no-secret --redirect-uri 'http://localhost:11885/oauth/callback'
+$ docker-compose run --rm stack is-db create-oauth-client --id cli --name "Command Line Interface" --owner admin --no-secret --redirect-uri 'http://localhost:11885/oauth/callback' --redirect-uri '/oauth/code'
 $ docker-compose up
 ```
 
