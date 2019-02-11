@@ -303,7 +303,7 @@ func TestTraffic(t *testing.T) {
 			t.Run(strconv.Itoa(i), func(t *testing.T) {
 				a := assertions.New(t)
 
-				err := conn.SendDown(tc.Path, tc.Message)
+				_, err := conn.SendDown(tc.Path, tc.Message)
 				if err != nil && (tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue)) {
 					t.Fatalf("Unexpected error: %v", err)
 				}

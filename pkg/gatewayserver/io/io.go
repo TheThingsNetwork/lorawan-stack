@@ -201,14 +201,15 @@ func getDownlinkPath(path *ttnpb.DownlinkPath, class ttnpb.Class) (ids ttnpb.Gat
 
 // SendDown schedules and sends a downlink message by using the given path and updates the downlink stats.
 // This method returns an error if the downlink message is not a Tx request.
-func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessage) error {
+func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessage) (time.Duration, error) {
 	if c.gateway.DownlinkPathConstraint == ttnpb.DOWNLINK_PATH_CONSTRAINT_NEVER {
-		return errNotAllowed
+		return 0, errNotAllowed
 	}
 	request := msg.GetRequest()
 	if request == nil {
-		return errNotTxRequest
+		return 0, errNotTxRequest
 	}
+	var delay time.Duration
 	// If the connection has no scheduler, scheduling is done by the gateway scheduler.
 	// Otherwise, scheduling is done by the Gateway Server scheduler. This converts TxRequest to TxSettings.
 	if c.scheduler != nil {
@@ -216,11 +217,11 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 		logger.Debug("Scheduling downlink")
 		ids, uplinkTimestamp, err := getDownlinkPath(path, request.Class)
 		if err != nil {
-			return err
+			return 0, err
 		}
 		band, err := band.GetByID(c.fp.BandID)
 		if err != nil {
-			return err
+			return 0, err
 		}
 		var errRxDetails []interface{}
 		for i, rx := range []struct {
@@ -250,12 +251,12 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 			}
 			dataRate := band.DataRates[rx.dataRateIndex].Rate
 			if dataRate == (ttnpb.DataRate{}) {
-				return errDataRate.WithAttributes("index", rx.dataRateIndex)
+				return 0, errDataRate.WithAttributes("index", rx.dataRateIndex)
 			}
 			// The maximum payload size is MACPayload only; for PHYPayload take MHDR (1 byte) and MIC (4 bytes) into account.
 			maxPHYLength := band.DataRates[rx.dataRateIndex].DefaultMaxSize.PayloadSize(c.fp.DwellTime.GetDownlinks()) + 5
 			if len(msg.RawPayload) > int(maxPHYLength) {
-				return errTooLong.WithAttributes(
+				return 0, errTooLong.WithAttributes(
 					"payload_length", len(msg.RawPayload),
 					"maximum_length", maxPHYLength,
 					"data_rate_index", rx.dataRateIndex,
@@ -314,22 +315,25 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 				"duration", em.Duration(),
 			)).Debug("Scheduled downlink")
 			errRxDetails = nil
+			if now, ok := c.scheduler.Now(); ok {
+				delay = time.Duration(em.Starts() - now)
+			}
 			break
 		}
 		if errRxDetails != nil {
-			return errTxSchedule.WithDetails(errRxDetails...)
+			return 0, errTxSchedule.WithDetails(errRxDetails...)
 		}
 	}
 	select {
 	case <-c.ctx.Done():
-		return c.ctx.Err()
+		return 0, c.ctx.Err()
 	case c.downCh <- msg:
 		atomic.AddUint64(&c.downlinks, 1)
 		atomic.StoreInt64(&c.lastDownlinkTime, time.Now().UnixNano())
 	default:
-		return errBufferFull
+		return 0, errBufferFull
 	}
-	return nil
+	return delay, nil
 }
 
 // Status returns the status channel.

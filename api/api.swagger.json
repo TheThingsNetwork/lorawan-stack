@@ -8045,6 +8045,14 @@
       },
       "description": "Contains metadata for a received message. Each antenna that receives\na message corresponds to one RxMetadata."
     },
+    "v3ScheduleDownlinkResponse": {
+      "type": "object",
+      "properties": {
+        "delay": {
+          "type": "string"
+        }
+      }
+    },
     "v3SendInvitationRequest": {
       "type": "object",
       "properties": {

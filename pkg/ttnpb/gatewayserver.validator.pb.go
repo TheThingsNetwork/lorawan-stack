@@ -8,6 +8,7 @@ import proto "github.com/gogo/protobuf/proto"
 import fmt "fmt"
 import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
+import _ "github.com/golang/protobuf/ptypes/duration"
 import _ "github.com/golang/protobuf/ptypes/empty"
 
 import time "time"
@@ -43,6 +44,12 @@ func (this *GatewayDown) Validate() error {
 		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.DownlinkMessage); err != nil {
 			return github_com_mwitkow_go_proto_validators.FieldError("DownlinkMessage", err)
 		}
+	}
+	return nil
+}
+func (this *ScheduleDownlinkResponse) Validate() error {
+	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.Delay)); err != nil {
+		return github_com_mwitkow_go_proto_validators.FieldError("Delay", err)
 	}
 	return nil
 }

@@ -15,6 +15,7 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
 import "lorawan-stack/api/gateway.proto";
 import "lorawan-stack/api/identifiers.proto";
@@ -47,12 +48,16 @@ service GtwGs {
   rpc GetConcentratorConfig(google.protobuf.Empty) returns (ConcentratorConfig);
 }
 
+message ScheduleDownlinkResponse {
+  google.protobuf.Duration delay = 1 [(gogoproto.stdduration) = true, (gogoproto.nullable) = false];
+}
+
 // The NsGs service connects a Network Server to a Gateway Server.
 service NsGs {
   // ScheduleDownlink instructs the Gateway Server to schedule a downlink message.
   // The Gateway Server may refuse if there are any conflicts in the schedule or
   // if a duty cycle prevents the gateway from transmitting.
-  rpc ScheduleDownlink(DownlinkMessage) returns (google.protobuf.Empty);
+  rpc ScheduleDownlink(DownlinkMessage) returns (ScheduleDownlinkResponse);
 }
 
 service Gs {

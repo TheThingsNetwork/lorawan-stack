@@ -18,7 +18,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/gogo/protobuf/types"
 	"github.com/mohae/deepcopy"
 	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -40,7 +39,7 @@ var (
 // This method returns an error if the downlink path cannot be found, if the requested parameters are invalid for the
 // gateway's frequency plan or if there is no transmission window available because of scheduling conflicts or regional
 // limitations such as duty-cycle and dwell time.
-func (gs *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.DownlinkMessage) (*types.Empty, error) {
+func (gs *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error) {
 	if err := clusterauth.Authorized(ctx); err != nil {
 		return nil, err
 	}
@@ -75,7 +74,8 @@ func (gs *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.Downl
 		}
 		down := deepcopy.Copy(down).(*ttnpb.DownlinkMessage) // Let the connection own the DownlinkMessage.
 		down.GetRequest().DownlinkPaths = nil                // And do not leak the downlink paths to the gateway.
-		if err := conn.SendDown(path, down); err != nil {
+		delay, err := conn.SendDown(path, down)
+		if err != nil {
 			logger.WithField("gateway_uid", uid).WithError(err).Debug("Failed to schedule on path")
 			details = append(details, errSchedulePath.WithCause(err).WithAttributes("gateway_uid", uid))
 			continue
@@ -83,7 +83,9 @@ func (gs *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.Downl
 		ctx = events.ContextWithCorrelationID(ctx, events.CorrelationIDsFromContext(conn.Context())...)
 		down.CorrelationIDs = append(down.CorrelationIDs, events.CorrelationIDsFromContext(ctx)...)
 		registerSendDownlink(ctx, conn.Gateway(), down)
-		return &types.Empty{}, nil
+		return &ttnpb.ScheduleDownlinkResponse{
+			Delay: delay,
+		}, nil
 	}
 
 	return nil, errSchedule.WithDetails(details...)

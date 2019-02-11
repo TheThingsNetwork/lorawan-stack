@@ -24,7 +24,6 @@ import (
 	"testing"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/band"
@@ -45,19 +44,19 @@ import (
 var _ ttnpb.NsGsServer = &MockNsGsServer{}
 
 type MockNsGsServer struct {
-	ScheduleDownlinkFunc func(context.Context, *ttnpb.DownlinkMessage) (*pbtypes.Empty, error)
+	ScheduleDownlinkFunc func(context.Context, *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error)
 }
 
-func (m *MockNsGsServer) ScheduleDownlink(ctx context.Context, msg *ttnpb.DownlinkMessage) (*pbtypes.Empty, error) {
+func (m *MockNsGsServer) ScheduleDownlink(ctx context.Context, msg *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error) {
 	if m.ScheduleDownlinkFunc == nil {
 		return nil, nil
 	}
 	return m.ScheduleDownlinkFunc(ctx, msg)
 }
 
-func makeScheduleDownlinkSequence(fs ...func(ctx context.Context, msg *ttnpb.DownlinkMessage) (*pbtypes.Empty, error)) func(ctx context.Context, msg *ttnpb.DownlinkMessage) (*pbtypes.Empty, error) {
+func makeScheduleDownlinkSequence(fs ...func(ctx context.Context, msg *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error)) func(ctx context.Context, msg *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error) {
 	var i uint64
-	return func(ctx context.Context, msg *ttnpb.DownlinkMessage) (*pbtypes.Empty, error) {
+	return func(ctx context.Context, msg *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error) {
 		defer atomic.AddUint64(&i, 1)
 		return fs[i](ctx, msg)
 	}
@@ -398,7 +397,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 					case unique.ID(ctx, gateways[1]):
 						a.So(test.MustCounterFromContext(ctx, getPeerCallKey{}), should.Equal, 1)
-						gs124.ScheduleDownlinkFunc = func(_ context.Context, msg *ttnpb.DownlinkMessage) (*pbtypes.Empty, error) {
+						gs124.ScheduleDownlinkFunc = func(_ context.Context, msg *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error) {
 							t.Fatal("ScheduleDownlink must not be called")
 							panic("Unreachable")
 						}
@@ -406,9 +405,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 					case unique.ID(ctx, gateways[2]):
 						a.So(test.MustCounterFromContext(ctx, getPeerCallKey{}), should.Equal, 2)
-						gs124.ScheduleDownlinkFunc = func(_ context.Context, msg *ttnpb.DownlinkMessage) (*pbtypes.Empty, error) {
+						gs124.ScheduleDownlinkFunc = func(_ context.Context, msg *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error) {
 							defer func() {
-								gs124.ScheduleDownlinkFunc = func(_ context.Context, msg *ttnpb.DownlinkMessage) (*pbtypes.Empty, error) {
+								gs124.ScheduleDownlinkFunc = func(_ context.Context, msg *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error) {
 									defer test.MustIncrementContextCounter(ctx, scheduleDownlinkCallKey{}, 1)
 
 									a.So(test.MustCounterFromContext(ctx, scheduleDownlinkCallKey{}), should.Equal, 2)
@@ -443,7 +442,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 											},
 										},
 									})
-									return ttnpb.Empty, nil
+									return &ttnpb.ScheduleDownlinkResponse{}, nil
 								}
 							}()
 
@@ -493,7 +492,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					case unique.ID(ctx, gateways[3]):
 						a.So(test.MustCounterFromContext(ctx, getPeerCallKey{}), should.Equal, 3)
 						return test.Must(test.NewGRPCServerPeer(ctx, &MockNsGsServer{
-							ScheduleDownlinkFunc: func(_ context.Context, msg *ttnpb.DownlinkMessage) (*pbtypes.Empty, error) {
+							ScheduleDownlinkFunc: func(_ context.Context, msg *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error) {
 								defer test.MustIncrementContextCounter(ctx, scheduleDownlinkCallKey{}, 1)
 
 								a.So(test.MustCounterFromContext(ctx, scheduleDownlinkCallKey{}), should.Equal, 1)
@@ -817,7 +816,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 					once.Do(func() {
 						gs124.ScheduleDownlinkFunc = makeScheduleDownlinkSequence(
-							func(_ context.Context, msg *ttnpb.DownlinkMessage) (*pbtypes.Empty, error) {
+							func(_ context.Context, msg *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error) {
 								defer test.MustIncrementContextCounter(ctx, scheduleDownlinkCallKey{}, 1)
 
 								a.So(test.MustCounterFromContext(ctx, scheduleDownlinkCallKey{}), should.Equal, 0)
@@ -858,7 +857,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								return nil, errors.New("ScheduleDownlink error")
 							},
 
-							func(_ context.Context, msg *ttnpb.DownlinkMessage) (*pbtypes.Empty, error) {
+							func(_ context.Context, msg *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error) {
 								defer test.MustIncrementContextCounter(ctx, scheduleDownlinkCallKey{}, 1)
 
 								a.So(test.MustCounterFromContext(ctx, scheduleDownlinkCallKey{}), should.Equal, 2)
@@ -891,7 +890,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 										},
 									},
 								})
-								return ttnpb.Empty, nil
+								return &ttnpb.ScheduleDownlinkResponse{}, nil
 							},
 						)
 					})
@@ -912,7 +911,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					case unique.ID(ctx, gateways[3]):
 						a.So(test.MustCounterFromContext(ctx, getPeerCallKey{}), should.Equal, 3)
 						return test.Must(test.NewGRPCServerPeer(ctx, &MockNsGsServer{
-							ScheduleDownlinkFunc: func(_ context.Context, msg *ttnpb.DownlinkMessage) (*pbtypes.Empty, error) {
+							ScheduleDownlinkFunc: func(_ context.Context, msg *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error) {
 								defer test.MustIncrementContextCounter(ctx, scheduleDownlinkCallKey{}, 1)
 
 								a.So(test.MustCounterFromContext(ctx, scheduleDownlinkCallKey{}), should.Equal, 1)
@@ -1242,7 +1241,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 					once.Do(func() {
 						gs3.ScheduleDownlinkFunc = makeScheduleDownlinkSequence(
-							func(_ context.Context, msg *ttnpb.DownlinkMessage) (*pbtypes.Empty, error) {
+							func(_ context.Context, msg *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error) {
 								defer test.MustIncrementContextCounter(ctx, scheduleDownlinkCallKey{}, 1)
 
 								a.So(test.MustCounterFromContext(ctx, scheduleDownlinkCallKey{}), should.Equal, 1)
@@ -1278,7 +1277,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								return nil, errors.New("ScheduleDownlink error")
 							},
 
-							func(_ context.Context, msg *ttnpb.DownlinkMessage) (*pbtypes.Empty, error) {
+							func(_ context.Context, msg *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error) {
 								defer test.MustIncrementContextCounter(ctx, scheduleDownlinkCallKey{}, 1)
 
 								a.So(test.MustCounterFromContext(ctx, scheduleDownlinkCallKey{}), should.Equal, 4)
@@ -1315,7 +1314,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						)
 
 						gs124.ScheduleDownlinkFunc = makeScheduleDownlinkSequence(
-							func(_ context.Context, msg *ttnpb.DownlinkMessage) (*pbtypes.Empty, error) {
+							func(_ context.Context, msg *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error) {
 								defer test.MustIncrementContextCounter(ctx, scheduleDownlinkCallKey{}, 1)
 
 								a.So(test.MustCounterFromContext(ctx, scheduleDownlinkCallKey{}), should.Equal, 0)
@@ -1356,7 +1355,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								return nil, errors.New("ScheduleDownlink error")
 							},
 
-							func(_ context.Context, msg *ttnpb.DownlinkMessage) (*pbtypes.Empty, error) {
+							func(_ context.Context, msg *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error) {
 								defer test.MustIncrementContextCounter(ctx, scheduleDownlinkCallKey{}, 1)
 
 								a.So(test.MustCounterFromContext(ctx, scheduleDownlinkCallKey{}), should.Equal, 2)
@@ -1393,7 +1392,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								return nil, errors.New("ScheduleDownlink error")
 							},
 
-							func(_ context.Context, msg *ttnpb.DownlinkMessage) (*pbtypes.Empty, error) {
+							func(_ context.Context, msg *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error) {
 								defer test.MustIncrementContextCounter(ctx, scheduleDownlinkCallKey{}, 1)
 
 								a.So(test.MustCounterFromContext(ctx, scheduleDownlinkCallKey{}), should.Equal, 3)
@@ -1433,7 +1432,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								return nil, errors.New("ScheduleDownlink error")
 							},
 
-							func(_ context.Context, msg *ttnpb.DownlinkMessage) (*pbtypes.Empty, error) {
+							func(_ context.Context, msg *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error) {
 								defer test.MustIncrementContextCounter(ctx, scheduleDownlinkCallKey{}, 1)
 
 								a.So(test.MustCounterFromContext(ctx, scheduleDownlinkCallKey{}), should.Equal, 5)
@@ -1465,7 +1464,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 										},
 									},
 								})
-								return ttnpb.Empty, nil
+								return &ttnpb.ScheduleDownlinkResponse{}, nil
 							},
 						)
 					})
@@ -1827,7 +1826,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 					once.Do(func() {
 						gs3.ScheduleDownlinkFunc = makeScheduleDownlinkSequence(
-							func(_ context.Context, msg *ttnpb.DownlinkMessage) (*pbtypes.Empty, error) {
+							func(_ context.Context, msg *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error) {
 								defer test.MustIncrementContextCounter(ctx, scheduleDownlinkCallKey{}, 1)
 
 								a.So(test.MustCounterFromContext(ctx, scheduleDownlinkCallKey{}), should.Equal, 1)
@@ -1866,7 +1865,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								return nil, errors.New("ScheduleDownlink error")
 							},
 
-							func(_ context.Context, msg *ttnpb.DownlinkMessage) (*pbtypes.Empty, error) {
+							func(_ context.Context, msg *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error) {
 								defer test.MustIncrementContextCounter(ctx, scheduleDownlinkCallKey{}, 1)
 
 								a.So(test.MustCounterFromContext(ctx, scheduleDownlinkCallKey{}), should.Equal, 4)
@@ -1906,7 +1905,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						)
 
 						gs124.ScheduleDownlinkFunc = makeScheduleDownlinkSequence(
-							func(_ context.Context, msg *ttnpb.DownlinkMessage) (*pbtypes.Empty, error) {
+							func(_ context.Context, msg *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error) {
 								defer test.MustIncrementContextCounter(ctx, scheduleDownlinkCallKey{}, 1)
 
 								a.So(test.MustCounterFromContext(ctx, scheduleDownlinkCallKey{}), should.Equal, 0)
@@ -1953,7 +1952,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								return nil, errors.New("ScheduleDownlink error")
 							},
 
-							func(_ context.Context, msg *ttnpb.DownlinkMessage) (*pbtypes.Empty, error) {
+							func(_ context.Context, msg *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error) {
 								defer test.MustIncrementContextCounter(ctx, scheduleDownlinkCallKey{}, 1)
 
 								a.So(test.MustCounterFromContext(ctx, scheduleDownlinkCallKey{}), should.Equal, 2)
@@ -1993,7 +1992,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								return nil, errors.New("ScheduleDownlink error")
 							},
 
-							func(_ context.Context, msg *ttnpb.DownlinkMessage) (*pbtypes.Empty, error) {
+							func(_ context.Context, msg *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error) {
 								defer test.MustIncrementContextCounter(ctx, scheduleDownlinkCallKey{}, 1)
 
 								a.So(test.MustCounterFromContext(ctx, scheduleDownlinkCallKey{}), should.Equal, 3)
@@ -2039,7 +2038,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								return nil, errors.New("ScheduleDownlink error")
 							},
 
-							func(_ context.Context, msg *ttnpb.DownlinkMessage) (*pbtypes.Empty, error) {
+							func(_ context.Context, msg *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error) {
 								defer test.MustIncrementContextCounter(ctx, scheduleDownlinkCallKey{}, 1)
 
 								a.So(test.MustCounterFromContext(ctx, scheduleDownlinkCallKey{}), should.Equal, 5)
@@ -2074,7 +2073,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 										},
 									},
 								})
-								return ttnpb.Empty, nil
+								return &ttnpb.ScheduleDownlinkResponse{}, nil
 							},
 						)
 					})
@@ -2379,7 +2378,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 					case unique.ID(ctx, gateways[1]):
 						a.So(test.MustCounterFromContext(ctx, getPeerCallKey{}), should.Equal, 1)
-						gs124.ScheduleDownlinkFunc = func(_ context.Context, msg *ttnpb.DownlinkMessage) (*pbtypes.Empty, error) {
+						gs124.ScheduleDownlinkFunc = func(_ context.Context, msg *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error) {
 							t.Fatal("ScheduleDownlink must not be called")
 							panic("Unreachable")
 						}
@@ -2387,9 +2386,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 					case unique.ID(ctx, gateways[2]):
 						a.So(test.MustCounterFromContext(ctx, getPeerCallKey{}), should.Equal, 2)
-						gs124.ScheduleDownlinkFunc = func(_ context.Context, msg *ttnpb.DownlinkMessage) (*pbtypes.Empty, error) {
+						gs124.ScheduleDownlinkFunc = func(_ context.Context, msg *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error) {
 							defer func() {
-								gs124.ScheduleDownlinkFunc = func(_ context.Context, msg *ttnpb.DownlinkMessage) (*pbtypes.Empty, error) {
+								gs124.ScheduleDownlinkFunc = func(_ context.Context, msg *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error) {
 									defer test.MustIncrementContextCounter(ctx, scheduleDownlinkCallKey{}, 1)
 
 									a.So(test.MustCounterFromContext(ctx, scheduleDownlinkCallKey{}), should.Equal, 2)
@@ -2422,7 +2421,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 											},
 										},
 									})
-									return ttnpb.Empty, nil
+									return &ttnpb.ScheduleDownlinkResponse{}, nil
 								}
 							}()
 
@@ -2470,7 +2469,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					case unique.ID(ctx, gateways[3]):
 						a.So(test.MustCounterFromContext(ctx, getPeerCallKey{}), should.Equal, 3)
 						return test.Must(test.NewGRPCServerPeer(ctx, &MockNsGsServer{
-							ScheduleDownlinkFunc: func(_ context.Context, msg *ttnpb.DownlinkMessage) (*pbtypes.Empty, error) {
+							ScheduleDownlinkFunc: func(_ context.Context, msg *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error) {
 								defer test.MustIncrementContextCounter(ctx, scheduleDownlinkCallKey{}, 1)
 
 								a.So(test.MustCounterFromContext(ctx, scheduleDownlinkCallKey{}), should.Equal, 1)
