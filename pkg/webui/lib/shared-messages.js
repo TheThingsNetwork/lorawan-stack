@@ -35,6 +35,7 @@ export default defineMessages({
   description: 'Description',
   devices: 'Devices',
   downlinksScheduled: 'Downlinks (re)scheduled',
+  devID: 'Device ID',
   edit: 'Edit',
   email: 'Email',
   gateways: 'Gateways',
