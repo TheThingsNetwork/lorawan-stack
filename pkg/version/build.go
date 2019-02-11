@@ -17,8 +17,5 @@ package version
 // BuildDate of the binary
 var BuildDate = ""
 
-// GitBranch from which the binary was built
-var GitBranch = ""
-
 // GitCommit from which the binary was built
 var GitCommit = ""

@@ -51,8 +51,8 @@ func DefaultDialOptions(ctx context.Context) []grpc.DialOption {
 	}
 
 	ttnVersion := strings.TrimPrefix(version.TTN, "v")
-	if version.GitBranch != "" && version.GitCommit != "" && version.BuildDate != "" {
-		ttnVersion += fmt.Sprintf("(%s@%s, %s)", version.GitBranch, version.GitCommit, version.BuildDate)
+	if version.GitCommit != "" && version.BuildDate != "" {
+		ttnVersion += fmt.Sprintf("(%s, %s)", version.GitCommit, version.BuildDate)
 	}
 
 	return []grpc.DialOption{
