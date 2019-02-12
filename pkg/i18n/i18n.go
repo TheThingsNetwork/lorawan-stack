@@ -35,6 +35,7 @@ type MessageDescriptor struct {
 		Package string `json:"package,omitempty"`
 		File    string `json:"file,omitempty"`
 	} `json:"description,omitempty"`
+	id      string
 	touched bool
 	updated bool
 }
@@ -44,6 +45,16 @@ func (m *MessageDescriptor) Touched() bool { return m.touched }
 
 // Updated returns whether the descriptor was updated.
 func (m *MessageDescriptor) Updated() bool { return m.updated }
+
+func (m *MessageDescriptor) String() string {
+	if m == nil {
+		return "<nil message descriptor>"
+	}
+	if translation, ok := m.Translations[defaultLanguage]; ok {
+		return translation
+	}
+	return m.id
+}
 
 // SetSource sets the source package and file name of the message descriptor.
 // The argument skip is the number of stack frames to ascend, with 0 identifying the caller of SetSource.
@@ -76,6 +87,9 @@ func ReadFile(filename string) (MessageDescriptorMap, error) {
 	err = json.Unmarshal(bytes, &descriptors)
 	if err != nil {
 		return nil, err
+	}
+	for id, descriptor := range descriptors {
+		descriptor.id = id
 	}
 	return descriptors, nil
 }
@@ -139,6 +153,7 @@ func (m MessageDescriptorMap) Define(id, message string) *MessageDescriptor {
 		Translations: map[string]string{
 			defaultLanguage: message,
 		},
+		id:      id,
 		touched: true,
 	}
 	m[id].SetSource(1)
@@ -150,6 +165,19 @@ func Define(id, message string) *MessageDescriptor {
 	d := Global.Define(id, message)
 	d.SetSource(1)
 	return d
+}
+
+// Get returns the MessageDescriptor of a specific message.
+func (m MessageDescriptorMap) Get(id string) *MessageDescriptor {
+	if md, ok := m[id]; ok {
+		return md
+	}
+	return nil
+}
+
+// Get returns the MessageDescriptor of a specific message from the global registry.
+func Get(id string) *MessageDescriptor {
+	return Global.Get(id)
 }
 
 // Merge messages from the given descriptor map into the current registry.
