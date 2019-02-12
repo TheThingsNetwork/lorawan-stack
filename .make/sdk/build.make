@@ -12,10 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+BABEL_SDK_FLAGS ?= --quiet
+
 sdk.js.build:
 	@$(log) "Building JS SDK files"
-	@$(YARN_SDK) run build $(YARN_FLAGS)
+	@$(YARN_SDK) run build $(YARN_FLAGS) $(BABEL_SDK_FLAGS)
 
 sdk.js.build-watch:
 	@$(log) "Watching JS SDK files"
-	@$(YARN_SDK) run build:watch $(YARN_FLAGS)
+	@$(YARN_SDK) run build:watch $(YARN_FLAGS) $(BABEL_SDK_FLAGS)

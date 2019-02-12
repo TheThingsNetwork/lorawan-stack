@@ -16,6 +16,7 @@ import React, { Component } from 'react'
 import { defineMessages } from 'react-intl'
 import bind from 'autobind-decorator'
 
+import sharedMessages from '../../../lib/shared-messages'
 import FetchTable from '../fetch-table'
 
 import {
@@ -28,7 +29,6 @@ const m = defineMessages({
   appId: 'Application ID',
   desc: 'Description',
   empty: 'No items matched your criteria',
-  add: 'Add Application',
 })
 
 const tabs = [
@@ -62,7 +62,7 @@ export default class ApplicationsTable extends Component {
       <FetchTable
         entity="applications"
         headers={headers}
-        addMessage={m.add}
+        addMessage={sharedMessages.addApplication}
         tableTitle={this.tableTitle}
         getItemsAction={getApplicationsList}
         searchItemsAction={searchApplicationsList}

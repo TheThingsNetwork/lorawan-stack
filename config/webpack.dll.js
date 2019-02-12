@@ -33,6 +33,10 @@ export default {
   context,
   mode: 'development',
   target: 'web',
+  node: {
+    fs: 'empty',
+    module: 'empty',
+  },
   stats: 'minimal',
   devtool: 'module-source-map',
   recordsPath: path.resolve(context, CACHE_DIR, '_libs_records'),

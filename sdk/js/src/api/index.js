@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import apiDefinition from '../../generated/api-definition.json'
+import Marshaler from '../util/marshaler'
 import Http from './http'
 
 /**
@@ -21,16 +22,15 @@ import Http from './http'
  * expose the same class API for both
  */
 class Api {
-  constructor (connectionType = 'http', connectionConfig, token) {
+  constructor (connectionType = 'http', stackConfig, axiosConfig, token) {
     this.connectionType = connectionType
-    this.connectionConfig = connectionConfig
     this.token = token
 
     if (this.connectionType !== 'http') {
       throw new Error('Only http connection type is supported')
     }
 
-    this._connector = new Http(token, connectionConfig)
+    this._connector = new Http(token, stackConfig, axiosConfig)
     const connector = this._connector
 
     for (const serviceName of Object.keys(apiDefinition)) {
@@ -42,7 +42,11 @@ class Api {
         const rpc = service[rpcName]
 
         this[serviceName][rpcName] = function (params = {}, body) {
-          const paramSignature = Object.keys(params).sort().join()
+
+          const routeParams = params.route || {}
+          const queryParams = params.query || {}
+
+          const paramSignature = Object.keys(routeParams).sort().join()
 
           const endpoint = rpc.http.find(function (prospect) {
             return prospect.parameters.sort().join() === paramSignature
@@ -55,8 +59,11 @@ class Api {
           let route = endpoint.pattern
 
           for (const parameter of endpoint.parameters) {
-            route = route.replace(`{${parameter}}`, params[parameter])
+            route = route.replace(`{${parameter}}`, routeParams[parameter])
           }
+
+          const searchQuery = Marshaler.query(queryParams)
+          route = searchQuery ? `${route}?${searchQuery}` : route
 
           return connector[endpoint.method](route, body)
         }

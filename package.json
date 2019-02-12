@@ -120,6 +120,7 @@
     "react-text-mask": "^5.0.2",
     "redux": "^3.7.2",
     "redux-logic": "^0.15.0",
+    "ttn-lw": "file:sdk/js",
     "ulid": "^2.3.0",
     "yup": "^0.26.6"
   },

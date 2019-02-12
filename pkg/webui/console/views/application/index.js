@@ -33,6 +33,7 @@ import { getApplication } from '../../store/actions/application'
   return {
     appId: props.match.params.appId,
     fetching: application.fetching,
+    application: application.application,
     error: application.error,
   }
 })
@@ -105,19 +106,19 @@ export default class Application extends React.Component {
   }
 
   render () {
-    const { fetching, error, match } = this.props
+    const { fetching, error, match, application } = this.props
 
-    if (fetching) {
+    // show any application fetching error, e.g. not found, not rights, etc
+    if (error) {
+      return 'ERROR'
+    }
+
+    if (fetching || !application) {
       return (
         <Spinner center>
           <Message content={sharedMessages.loading} />
         </Spinner>
       )
-    }
-
-    // show any application fetching error, e.g. not found, not rights, etc
-    if (error) {
-      return 'ERROR'
     }
 
     return (

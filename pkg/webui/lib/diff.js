@@ -12,24 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Applications from './service/applications'
-import Application from './entity/application'
-import Api from './api'
+const shallowDiff = function (initial, changed) {
+  return Object.keys(changed).reduce(function (patch, field) {
+    const oldValue = initial[field]
+    const newValue = changed[field]
 
-class TtnLw {
-  constructor (token, {
-    stackConfig,
-    connectionType,
-    defaultUserId,
-    proxy,
-    axiosConfig,
-  }) {
-    this.config = arguments.config
-    this.api = new Api(connectionType, stackConfig, axiosConfig, token)
+    if (oldValue !== newValue) {
+      patch[field] = newValue
+    }
 
-    this.Applications = new Applications(this.api, { defaultUserId, proxy })
-    this.Application = Application.bind(null, this.Applications)
-  }
+    return patch
+  }, {})
 }
 
-export default TtnLw
+export default shallowDiff

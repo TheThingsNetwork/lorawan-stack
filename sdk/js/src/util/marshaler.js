@@ -15,6 +15,7 @@
 /* eslint-disable no-invalid-this */
 
 import traverse from 'traverse'
+import queryString from 'query-string'
 
 /** Class used to marshal data shapes. Currently a stub. */
 class Marshaler {
@@ -33,6 +34,10 @@ class Marshaler {
     return query
   }
 
+  static query (params) {
+    return queryString.stringify(params)
+  }
+
   static payload (payload, wrap) {
     let res = payload
 
@@ -43,8 +48,34 @@ class Marshaler {
     return res
   }
 
-  static unwrapApplications (raw) {
-    return raw.applications
+  static payloadListResponse (entity, { data = {}, headers = {}}, transform) {
+    const list = data[entity]
+
+    if (!list) {
+      return { [entity]: [], totalCount: 0 }
+    }
+
+    const totalCount = parseInt(headers['x-total-count'])
+
+    if (isNaN(totalCount)) {
+      return { [entity]: list, totalCount: list.length }
+    }
+
+    const transformedList = transform ? list.map(transform) : list
+
+    return { [entity]: transformedList, totalCount }
+  }
+
+  static payloadSingleResponse ({ data }, transform) {
+    return transform ? transform(data) : data
+  }
+
+  static unwrapApplications (result, transform) {
+    return this.payloadListResponse('applications', result, transform)
+  }
+
+  static unwrapApplication (result, transform) {
+    return this.payloadSingleResponse(result, transform)
   }
 
   static fieldMaskFromPatch (patch) {

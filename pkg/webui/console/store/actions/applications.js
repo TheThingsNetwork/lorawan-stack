@@ -27,10 +27,6 @@ export const GET_APPS_LIST = 'GET_APPLICATIONS_LIST'
 export const SEARCH_APPS_LIST = 'SEARCH_APPLICATIONS_LIST'
 export const GET_APPS_LIST_SUCCESS = 'GET_APPLICATIONS_LIST_SUCCESS'
 export const GET_APPS_LIST_FAILURE = 'GET_APPLICATIONS_LIST_FAILURE'
-export const CHANGE_APPS_PAGE = 'CHANGE_APPLICATIONS_PAGE'
-export const CHANGE_APPS_ORDER = 'CHANGE_APPLICATIONS_ORDER'
-export const CHANGE_APPS_TAB = 'CHANGE_APPLICATIONS_TAB'
-export const CHANGE_APPS_SEARCH = 'CHANGE_APPLICATIONS_SEARCH'
 export const GET_APPS_RIGHTS_LIST = createGetRightsListActionType(SHARED_NAME)
 export const GET_APPS_RIGHTS_LIST_SUCCESS = createGetRightsListSuccessActionType(SHARED_NAME)
 export const GET_APPS_RIGHTS_LIST_FAILURE = createGetRightsListFailureActionType(SHARED_NAME)
@@ -49,22 +45,6 @@ export const getApplicationsSuccess = (applications, totalCount) => (
 
 export const getApplicationsFailure = error => (
   { type: GET_APPS_LIST_FAILURE, error }
-)
-
-export const changeApplicationsPage = page => (
-  { type: CHANGE_APPS_PAGE, page }
-)
-
-export const changeApplicationsOrder = (order, orderBy) => (
-  { type: CHANGE_APPS_ORDER, order, orderBy }
-)
-
-export const changeApplicationsTab = tab => (
-  { type: CHANGE_APPS_TAB, tab }
-)
-
-export const changeApplicationsSearch = query => (
-  { type: CHANGE_APPS_SEARCH, query }
 )
 
 export const getApplicationsRightsList = getRightsList(SHARED_NAME)

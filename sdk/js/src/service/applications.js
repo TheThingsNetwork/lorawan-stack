@@ -20,56 +20,122 @@ import Application from '../entity/application'
  * Applications Class provides an abstraction on all applications and manages
  * data handling from different sources. It exposes an API to easily work with
  * application data.
+ * @param {Object} api - The connector to be used by the service.
+ * @param {Object} config - The configuration for the service
+ * @param {string} config.defaultUserId - The users identifier to be used in
+ * user related requests.
+ * @param {boolean} config.proxy - The flag to identify if the results
+ *  should be proxied with the wrapper objects.
  */
 class Applications {
-  constructor (api, { defaultUserId }) {
+  constructor (api, { defaultUserId, proxy = true }) {
     this._defaultUserId = defaultUserId
     this._api = api
+    this._applicationTransform = proxy
+      ? app => new Application(this, app, false)
+      : undefined
+
+    this.getAll = this.getAll.bind(this)
+    this.getById = this.getById.bind(this)
+    this.getByOrganization = this.getByOrganization.bind(this)
+    this.getByCollaborator = this.getByCollaborator.bind(this)
+    this.search = this.search.bind(this)
+    this.updateById = this.updateById.bind(this)
+    this.create = this.create.bind(this)
+    this.deleteById = this.deleteById.bind(this)
+    this.withId = this.withId.bind(this)
   }
 
   // Retrieval
 
-  async getAll () {
-    let applications = await this._api.ApplicationRegistry.List()
-    applications = Marshaler.unwrapApplications(applications)
-    return applications.map(data => new Application(this, data, false))
+  async getAll (params) {
+    const result = await this._api.ApplicationRegistry.List({ query: params })
+    return Marshaler.unwrapApplications(
+      result,
+      this._applicationTransform
+    )
   }
 
   async getById (id) {
-    const application = await this._api.ApplicationRegistry.Get({ 'application_ids.application_id': id })
-    return new Application(this, application, false)
+    const result = await this._api.ApplicationRegistry.Get({
+      route: { 'application_ids.application_id': id },
+    })
+
+    return Marshaler.unwrapApplication(
+      result,
+      this._applicationTransform
+    )
   }
 
   async getByOrganization (organizationId) {
-    return this._api.ApplicationRegistry.List({ 'collaborator.organization_ids.organization_id': organizationId })
+    const result = this._api.ApplicationRegistry.List({
+      route: { 'collaborator.organization_ids.organization_id': organizationId },
+    })
+
+    return Marshaler.unwrapApplications(
+      result,
+      this._applicationTransform
+    )
   }
 
   async getByCollaborator (userId) {
-    return this._api.ApplicationRegistry.List({ 'collaborator.user_ids.user_id': userId })
+    const result = this._api.ApplicationRegistry.List({
+      route: { 'collaborator.user_ids.user_id': userId },
+    })
+
+    return Marshaler.unwrapApplications(
+      result,
+      this._applicationTransform
+    )
+  }
+
+  async search (params) {
+    const result = await this._api.EntityRegistrySearch.SearchApplications({
+      query: params,
+    })
+    return Marshaler.unwrapApplications(
+      result,
+      this._applicationTransform
+    )
   }
 
   // Update
 
   async updateById (id, patch, mask = Marshaler.fieldMaskFromPatch(patch)) {
-    return this._api.ApplicationRegistry.Update({
-      'application.ids.application_id': id,
+    const result = await this._api.ApplicationRegistry.Update({
+      route: {
+        'application.ids.application_id': id,
+      },
     },
     {
       application: patch,
       field_mask: Marshaler.fieldMask(mask),
     })
+    return Marshaler.unwrapApplication(
+      result,
+      this._applicationTransform
+    )
   }
 
   // Create
 
   async create (userId = this._defaultUserId, application) {
-    return this._api.ApplicationRegistry.Create({ 'collaborator.user_ids.user_id': userId }, { application })
+    const result = await this._api.ApplicationRegistry.Create({
+      route: { 'collaborator.user_ids.user_id': userId },
+    },
+    { application })
+    return Marshaler.unwrapApplication(
+      result,
+      this._applicationTransform
+    )
   }
 
   // Delete
 
   async deleteById (applicationId) {
-    return this._api.ApplicationRegistry.Delete({ application_id: applicationId })
+    return this._api.ApplicationRegistry.Delete({
+      route: { application_id: applicationId },
+    })
   }
 
   // Shorthand to methods of single application

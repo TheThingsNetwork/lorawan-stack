@@ -20,19 +20,20 @@ import * as applications from '../actions/applications'
 const getApplicationsLogic = createLogic({
   type: [
     applications.GET_APPS_LIST,
-    applications.CHANGE_APPS_ORDER,
-    applications.CHANGE_APPS_PAGE,
-    applications.CHANGE_APPS_TAB,
     applications.SEARCH_APPS_LIST,
   ],
   latest: true,
   async process ({ getState, action }, dispatch, done) {
-    const { filters } = action
-
+    const { page, pageSize: limit, query } = action.filters
     try {
-      const data = filters.query
-        ? await api.applications.search(filters)
-        : await api.applications.list(filters)
+      const data = query
+        ? await api.applications.search({
+          page,
+          limit,
+          id_contains: query,
+          name_contains: query,
+        })
+        : await api.applications.list({ page, limit })
       dispatch(applications.getApplicationsSuccess(data.applications, data.totalCount))
     } catch (error) {
       dispatch(applications.getApplicationsFailure(error))

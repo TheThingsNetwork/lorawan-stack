@@ -50,13 +50,13 @@ class ApplicationOverview extends React.Component {
             <strong className={style.key}>
               <Message content={sharedMessages.createdAt} />
             </strong>
-            <span className={style.value}>{created_at.toLocaleDateString()}</span>
+            <span className={style.value}>{created_at}</span>
           </li>
           <li className={style.attributesEntry}>
             <strong className={style.key}>
               <Message content={sharedMessages.updatedAt} />
             </strong>
-            <span className={style.value}>{updated_at.toLocaleDateString()}</span>
+            <span className={style.value}>{updated_at}</span>
           </li>
         </ul>
       </div>

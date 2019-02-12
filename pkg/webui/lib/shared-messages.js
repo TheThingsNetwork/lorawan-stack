@@ -18,6 +18,7 @@ export default defineMessages({
   // Keep these sorted alphabetically
   access: 'Access',
   add: 'Add',
+  addApplication: 'Add Application',
   all: 'All',
   antennas: 'Antennas',
   appId: 'Application ID',

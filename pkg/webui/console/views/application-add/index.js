@@ -15,18 +15,21 @@
 import React from 'react'
 import { Container, Col, Row } from 'react-grid-system'
 import * as Yup from 'yup'
-import { push } from 'connected-react-router'
 import { connect } from 'react-redux'
 import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
+import { push } from 'connected-react-router'
 
 import Form from '../../../components/form'
 import Field from '../../../components/field'
 import Button from '../../../components/button'
-
+import Message from '../../../lib/components/message'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import sharedMessages from '../../../lib/shared-messages'
+import { id as applicationIdRegexp } from '../../lib/regexp'
+
+import api from '../../api'
 
 import style from './application-add.styl'
 
@@ -39,21 +42,20 @@ const m = defineMessages({
 })
 
 const initialValues = {
-  app_id: '',
+  application_id: '',
   name: '',
   description: '',
 }
 
 const validationSchema = Yup.object().shape({
-  app_id: Yup.string()
-    .matches(/^[0-9a-z]+$/i, sharedMessages.validateAlphanum)
+  application_id: Yup.string()
+    .matches(applicationIdRegexp, sharedMessages.validateAlphanum)
     .min(2, sharedMessages.validateTooShort)
     .max(25, sharedMessages.validateTooLong)
     .required(sharedMessages.validateRequired),
   name: Yup.string()
     .min(2, sharedMessages.validateTooShort)
-    .max(50, sharedMessages.validateTooLong)
-    .required(sharedMessages.validateRequired),
+    .max(50, sharedMessages.validateTooLong),
   description: Yup.string(),
 })
 
@@ -66,33 +68,62 @@ const validationSchema = Yup.object().shape({
     />
   )
 })
-@connect()
+@connect(({ user }) => ({
+  userId: user.user.ids.user_id,
+}))
 @bind
 export default class Add extends React.Component {
 
-  handleSubmit (e) {
-    // Add API call and redirect to applications page go here
+  state = {
+    error: '',
   }
 
-  handleCancel () {
-    this.props.dispatch(push('/console/applications'))
+  async handleSubmit (values, { setSubmitting, resetForm }) {
+    const { userId, dispatch } = this.props
+
+    await this.setState({ error: '' })
+
+    try {
+      const result = await api.application.create(userId,
+        {
+          ids: { application_id: values.application_id },
+          name: values.name,
+          description: values.description,
+        })
+
+      const { ids: { application_id }} = result
+      dispatch(push(`/console/applications/${application_id}`))
+    } catch (error) {
+      const { application_id, name, description } = values
+      resetForm({ application_id, name, description })
+
+      await this.setState({ error })
+    }
   }
 
   render () {
+    const { error } = this.state
     return (
       <Container>
         <Row className={style.wrapper}>
-          <Col sm={12}><h2>Add Application</h2></Col>
+          <Col sm={12}>
+            <Message component="h2" content={sharedMessages.addApplication} />
+          </Col>
           <Col className={style.form} sm={12} md={8} lg={8} xl={8}>
             <Form
+              error={error}
               onSubmit={this.handleSubmit}
               initialValues={initialValues}
               validationSchema={validationSchema}
+              mapErrorsToFields={{
+                id_taken: 'application_id',
+                identifiers: 'application_id',
+              }}
               horizontal
             >
               <Field
                 title={sharedMessages.appId}
-                name="app_id"
+                name="application_id"
                 type="text"
                 placeholder={m.appIdPlaceholder}
                 autoFocus
@@ -103,7 +134,6 @@ export default class Add extends React.Component {
                 name="name"
                 type="text"
                 placeholder={m.appNamePlaceholder}
-                required
               />
               <Field
                 title={sharedMessages.description}
@@ -113,7 +143,6 @@ export default class Add extends React.Component {
               />
               <div className={style.submitBar}>
                 <Button type="submit" message={m.createApplication} />
-                <Button type="button" naked message={sharedMessages.cancel} onClick={this.handleCancel} />
               </div>
             </Form>
           </Col>

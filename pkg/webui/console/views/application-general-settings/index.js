@@ -18,6 +18,7 @@ import { Col, Row, Container } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 import { connect } from 'react-redux'
 import * as Yup from 'yup'
+import { replace } from 'connected-react-router'
 
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
@@ -27,6 +28,9 @@ import Form from '../../../components/form'
 import Field from '../../../components/field'
 import Button from '../../../components/button'
 import ModalButton from '../../../components/button/modal-button'
+import diff from '../../../lib/diff'
+
+import api from '../../api'
 
 import style from './application-general-settings.styl'
 
@@ -40,11 +44,11 @@ const m = defineMessages({
 const validationSchema = Yup.object().shape({
   name: Yup.string()
     .min(3, sharedMessages.validateTooShort)
-    .max(50, sharedMessages.validateTooLong)
-    .required(sharedMessages.validateRequired),
+    .max(50, sharedMessages.validateTooLong),
   description: Yup.string()
     .max(150, sharedMessages.validateTooLong),
 })
+
 
 @connect(function ({ application }) {
   return {
@@ -66,14 +70,42 @@ const validationSchema = Yup.object().shape({
 @bind
 export default class ApplicationGeneralSettings extends React.Component {
 
-  handleSubmit (e) {
+  state = {
+    error: '',
   }
 
-  handleDelete () {
+  async handleSubmit (values, { setSubmitting, resetForm }) {
+    const { application } = this.props
+
+    await this.setState({ error: '' })
+
+    const changed = diff(application, values)
+    try {
+      await api.application.update(application.ids.application_id, changed)
+      resetForm({ ...values })
+    } catch (error) {
+      resetForm({ ...values })
+      await this.setState(error)
+    }
+  }
+
+  async handleDelete () {
+    const { dispatch } = this.props
+    const { appId } = this.props.match.params
+
+    await this.setState({ error: '' })
+
+    try {
+      await api.application.delete(appId)
+      dispatch(replace('/console/applications'))
+    } catch (error) {
+      this.setState(error)
+    }
   }
 
   render () {
     const { application } = this.props
+    const { error } = this.state
 
     return (
       <Container>
@@ -88,6 +120,7 @@ export default class ApplicationGeneralSettings extends React.Component {
         <Row>
           <Col lg={8} md={12}>
             <Form
+              error={error}
               horizontal
               onSubmit={this.handleSubmit}
               initialValues={{ name: application.name, description: application.description }}

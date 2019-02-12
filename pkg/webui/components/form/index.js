@@ -14,78 +14,142 @@
 
 import React from 'react'
 import { Formik } from 'formik'
+import bind from 'autobind-decorator'
 
 import Field from '../field'
 import Button from '../button'
 import Notification from '../notification'
 import PropTypes from '../../lib/prop-types'
 
-const InnerForm = function ({
-  setFieldValue,
-  setFieldTouched,
-  handleSubmit,
-  handleReset,
-  isSubmitting,
-  isValid,
-  errors,
-  error,
-  info,
-  values,
-  touched,
-  children,
-  horizontal,
-  submitEnabledWhenInvalid,
-  validateOnBlur,
-  validateOnChange,
-  dirty,
-}) {
-  const decoratedChildren = recursiveMap(children,
-    function (Child) {
-      if (Child.type === Field) {
-        return React.cloneElement(Child, {
-          setFieldValue,
-          setFieldTouched,
-          errors,
-          values,
-          touched,
-          horizontal,
-          submitEnabledWhenInvalid,
-          validateOnBlur,
-          validateOnChange,
-          ...Child.props,
-        })
-      } else if (Child.type === Button) {
-        if (Child.props.type === 'submit') {
-          return React.cloneElement(Child, {
-            ...Child.props,
-            disabled: isSubmitting || (!submitEnabledWhenInvalid && !isValid),
-          })
-        } else if (Child.props.type === 'reset') {
-          return React.cloneElement(Child, {
-            ...Child.props,
-            disabled: !isSubmitting && !dirty,
-            onClick: handleReset,
-          })
+@bind
+class InnerForm extends React.Component {
+
+  componentDidUpdate (prev) {
+    const {
+      loading,
+      setSubmitting,
+      setStatus,
+      setTouched,
+      status = {},
+      values,
+      initialValues,
+      error,
+      mapErrorsToFields,
+    } = this.props
+
+    if (prev.loading && !loading) {
+      setSubmitting(loading)
+    }
+
+    // add field errors from the outside
+    if (prev.error !== error) {
+      const apiFieldErrors = fieldErrors(mapErrorsToFields, error)
+      const { errors, ...restStatus } = status
+      if (apiFieldErrors) {
+        const forceTouched = Object.keys(apiFieldErrors)
+          .reduce((acc, curr) => ({ ...acc, [curr]: true }), {})
+
+        setTouched(forceTouched)
+        setStatus({ errors: apiFieldErrors, ...restStatus })
+      } else {
+        setStatus({ formError: error })
+      }
+    }
+
+    // remove errors from the outside on value change
+    if (status.errors && prev.values !== values) {
+      const { errors, ...restStatus } = status
+      const errs = { ...errors }
+      const forceTouched = {}
+
+      for (const fieldName in errs) {
+        const err = status.errors[fieldName]
+        if (err && values[fieldName] !== initialValues[fieldName]) {
+          delete errs[fieldName]
+          forceTouched[fieldName] = true
         }
       }
 
-      return Child
-    })
+      setTouched(forceTouched)
+      setStatus({ errors: errs, ...restStatus })
+    }
+  }
 
-  return (
-    <form onSubmit={handleSubmit}>
-      {error && (<Notification small error={error} />)}
-      {info && (<Notification small info={info} />)}
-      {decoratedChildren}
-    </form>
-  )
+  render () {
+    const {
+      setFieldValue,
+      setFieldTouched,
+      handleSubmit,
+      handleReset,
+      isSubmitting,
+      isValid,
+      errors,
+      error,
+      info,
+      values,
+      touched,
+      children,
+      horizontal,
+      submitEnabledWhenInvalid,
+      validateOnBlur,
+      validateOnChange,
+      dirty,
+      status = {},
+    } = this.props
+
+    const formError = status.formError || false
+    const serverErrors = status.errors || {}
+    const clientErrors = errors
+
+    const decoratedChildren = recursiveMap(children,
+      function (Child) {
+        if (Child.type === Field) {
+          return React.cloneElement(Child, {
+            setFieldValue,
+            setFieldTouched,
+            errors: { ...serverErrors, ...clientErrors },
+            values,
+            touched,
+            horizontal,
+            submitEnabledWhenInvalid,
+            validateOnBlur,
+            validateOnChange,
+            ...Child.props,
+          })
+        } else if (Child.type === Button) {
+          if (Child.props.type === 'submit') {
+            return React.cloneElement(Child, {
+              ...Child.props,
+              disabled: isSubmitting || !submitEnabledWhenInvalid && !isValid,
+              busy: isSubmitting,
+            })
+          } else if (Child.props.type === 'reset') {
+            return React.cloneElement(Child, {
+              ...Child.props,
+              disabled: isSubmitting || !dirty,
+              onClick: handleReset,
+            })
+          }
+        }
+
+        return Child
+      })
+
+    return (
+      <form onSubmit={handleSubmit}>
+        {formError && (<Notification small error={error} />)}
+        {info && (<Notification small info={info} />)}
+        {decoratedChildren}
+      </form>
+    )
+  }
 }
 
 const formRender = ({ children, ...rest }) => function (props) {
   return (
     <InnerForm
-      {...rest}
       {...props}
+      {...rest}
     >
       {children}
     </InnerForm>
@@ -96,17 +160,27 @@ const Form = ({
   children,
   error,
   info,
+  loading,
   horizontal,
   submitEnabledWhenInvalid,
   validateOnBlur = true,
   validateOnChange = false,
+  mapErrorsToFields = {},
   ...rest
 }) => (
   <Formik
     {...rest}
     validateOnBlur={validateOnBlur}
     validateOnChange={validateOnChange}
-    render={formRender({ children, error, info, horizontal, submitEnabledWhenInvalid })}
+    render={formRender({
+      children,
+      error,
+      info,
+      horizontal,
+      submitEnabledWhenInvalid,
+      loading,
+      mapErrorsToFields,
+    })}
   />
 )
 
@@ -126,6 +200,27 @@ function recursiveMap (children, fn) {
   })
 }
 
+const fieldErrors = function (definition, error) {
+  // stack custom errors
+  if (typeof error === 'object' && error.details) {
+    const formatted = {}
+
+    error.details.forEach(function (detail) {
+      const fieldName = definition[detail.name]
+      if (fieldName) {
+        const err = {}
+        err.id = error.message.split(' ')[0]
+        err.defaultMessage = error.details[0].message_format || error.message.replace(/^.*\s/, '')
+        err.values = error.details[0].attribute
+
+        formatted[fieldName] = err
+      }
+    })
+
+    return formatted
+  }
+}
+
 Form.propTypes = {
   /** An error message belonging to the form */
   error: PropTypes.error,
@@ -134,6 +229,10 @@ Form.propTypes = {
   /** Whether the submit button stays enabled also when the form data is not
    * not yet valid */
   submitEnabledWhenInvalid: PropTypes.bool,
+  /** The flag specifying whether the form is in the loading state */
+  loading: PropTypes.bool,
+  /** Field name to stack error name mappings, e.g. { id: 'invalid_id' } */
+  mapErrorsToFields: PropTypes.object,
 }
 
 export default Form

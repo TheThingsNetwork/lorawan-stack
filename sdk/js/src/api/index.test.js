@@ -38,6 +38,16 @@ jest.mock('../../generated/api-definition.json', () => (
           },
         ],
       },
+      List: {
+        file: 'lorawan-stack/api/application_services.proto',
+        http: [
+          {
+            method: 'get',
+            pattern: '/applications',
+            parameters: [],
+          },
+        ],
+      },
     },
   }
 ))
@@ -47,6 +57,7 @@ describe('API', function () {
   beforeEach(function () {
     api = new Api('http', { baseURL: 'http://localhost:1885' })
     api._connector.post = jest.fn()
+    api._connector.get = jest.fn()
   })
 
   test('it applies api definitions correctly', function () {
@@ -55,9 +66,7 @@ describe('API', function () {
   })
 
   test('it applies parameters correctly', function () {
-    api._connector.get = jest.fn()
-
-    api.ApplicationRegistry.Create({ 'collaborator.user_ids.user_id': 'test' })
+    api.ApplicationRegistry.Create({ route: { 'collaborator.user_ids.user_id': 'test' }})
 
     expect(api._connector.post).toHaveBeenCalledTimes(1)
     expect(api._connector.post).toHaveBeenCalledWith('/users/test/applications', undefined)
@@ -67,5 +76,12 @@ describe('API', function () {
     expect(function () {
       api.ApplicationRegistry.Create({ 'some.other.param': 'test' })
     }).toThrow()
+  })
+
+  test('it respects the search query', function () {
+    api.ApplicationRegistry.List({ query: { limit: 2, page: 1 }})
+
+    expect(api._connector.get).toHaveBeenCalledTimes(1)
+    expect(api._connector.get).toHaveBeenCalledWith('/applications?limit=2&page=1', undefined)
   })
 })

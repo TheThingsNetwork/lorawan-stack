@@ -12,24 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Applications from './service/applications'
-import Application from './entity/application'
-import Api from './api'
+/* eslint-disable import/prefer-default-export */
 
-class TtnLw {
-  constructor (token, {
-    stackConfig,
-    connectionType,
-    defaultUserId,
-    proxy,
-    axiosConfig,
-  }) {
-    this.config = arguments.config
-    this.api = new Api(connectionType, stackConfig, axiosConfig, token)
-
-    this.Applications = new Applications(this.api, { defaultUserId, proxy })
-    this.Application = Application.bind(null, this.Applications)
-  }
-}
-
-export default TtnLw
+// alphanumeric, dashes, lowercase
+export const id = /^[a-z0-9]+(-[a-z0-9]+)*$/

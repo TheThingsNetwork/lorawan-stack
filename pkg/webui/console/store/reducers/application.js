@@ -19,7 +19,7 @@ import {
 } from '../actions/application'
 
 const defaultState = {
-  fetching: true,
+  fetching: false,
   error: undefined,
   application: undefined,
 }
