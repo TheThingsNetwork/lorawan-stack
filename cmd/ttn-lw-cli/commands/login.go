@@ -26,6 +26,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/api"
+	"go.thethings.network/lorawan-stack/pkg/auth"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"golang.org/x/oauth2"
 )
@@ -83,9 +84,9 @@ var (
 				logger.Info("Waiting for your authorization...")
 				<-ctx.Done()
 			} else {
-				logger.Info("Then paste the authorization code and press enter")
 				var code string
 				for {
+					logger.Info("Please paste the authorization code and press enter")
 					fmt.Fprint(os.Stderr, "> ")
 					r := bufio.NewReader(os.Stdin)
 					code, err = r.ReadString('\n')
@@ -93,10 +94,16 @@ var (
 						return err
 					}
 					code = strings.TrimSpace(code)
-					if code != "" {
-						break
+					tokenType, _, _, err := auth.SplitToken(code)
+					if err == nil {
+						logger.WithError(err).Warn("Could not parse authorization code")
+						continue
 					}
-					logger.Info("Please paste the authorization code and press enter")
+					if tokenType != auth.AuthorizationCode {
+						logger.Warnf("Authorization codes should start with %s", auth.AuthorizationCode)
+						continue
+					}
+					break
 				}
 				token, err = oauth2Config.Exchange(ctx, code)
 				if err != nil {
