@@ -212,3 +212,24 @@ func stringToByteSliceHook(f reflect.Type, t reflect.Type, data interface{}) (in
 
 	return slice, nil
 }
+
+func stringToByteArrayHook(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
+	if f.Kind() != reflect.String || t.Kind() != reflect.Array || t.Elem().Kind() != reflect.Uint8 {
+		return data, nil
+	}
+
+	str := strings.TrimPrefix(data.(string), "0x")
+	slice, err := hex.DecodeString(str)
+	if err != nil {
+		return nil, fmt.Errorf("Could not decode hex: %s", err)
+	}
+	if len(slice) != t.Len() {
+		return nil, fmt.Errorf("Invalid length: expected %d, got %d", t.Len(), len(slice))
+	}
+
+	rv := reflect.New(t).Elem()
+	for i, v := range slice {
+		rv.Index(i).SetUint(uint64(v))
+	}
+	return rv.Interface(), nil
+}

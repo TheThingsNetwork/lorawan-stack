@@ -213,6 +213,7 @@ func (m *Manager) Unmarshal(result interface{}) error {
 			configurableInterfaceHook,
 			configurableInterfaceSliceHook,
 			stringToByteSliceHook,
+			stringToByteArrayHook,
 		),
 	})
 	if err != nil {
@@ -470,8 +471,9 @@ func (m *Manager) setDefaults(prefix string, flags *pflag.FlagSet, config interf
 				m.viper.SetDefault(name, val)
 
 			case []byte:
-				str := fmt.Sprintf("0x%X", val)
+				var str string
 				if len(val) > 0 {
+					str = fmt.Sprintf("0x%X", val)
 					m.viper.SetDefault(name, str)
 				}
 				flags.StringP(name, shorthand, str, description)
