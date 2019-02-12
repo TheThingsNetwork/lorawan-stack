@@ -27,6 +27,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
@@ -479,6 +480,10 @@ func (m *Manager) setDefaults(prefix string, flags *pflag.FlagSet, config interf
 				str := fmt.Sprintf("%X", val)
 				m.viper.SetDefault(name, str)
 				flags.StringP(name, shorthand, str, description)
+
+			case ttnpb.RxDelay:
+				m.viper.SetDefault(name, int32(val))
+				flags.Int32P(name, shorthand, int32(val), description)
 
 			default:
 				switch fieldType {
