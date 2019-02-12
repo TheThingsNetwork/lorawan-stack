@@ -24,6 +24,8 @@ left-border($color)
   padding: $cs.xl $cs.l
   margin-bottom: $ls.xxs
   box-shadow: 0 1px 1px 0 $c-divider-dark
+  display: flex
+  flex-wrap: nowrap
 
   &.small
     padding: $cs.s
@@ -41,5 +43,13 @@ left-border($color)
     left-border($c-active-blue)
     color: $c-active-blue
 
-  span:last-child
+  .title
+    margin: 0
+    font-weight: 600
+
+  .content
     margin-left: $cs.xs
+    display: inline-block
+
+  .icon
+    display: flex
