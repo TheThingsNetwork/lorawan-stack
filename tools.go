@@ -12,10 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package version
+// +build tools
 
-// BuildDate of the binary
-var BuildDate = ""
+package tools
 
-// GitCommit from which the binary was built
-var GitCommit = ""
+import (
+	_ "github.com/alecthomas/gometalinter"
+	_ "github.com/client9/misspell/cmd/misspell"
+	_ "github.com/goreleaser/goreleaser"
+	_ "github.com/magefile/mage"
+	_ "github.com/mattn/goveralls"
+	_ "github.com/mdempsky/unconvert"
+	_ "golang.org/x/tools/cmd/goimports"
+)

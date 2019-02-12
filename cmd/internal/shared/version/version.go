@@ -37,9 +37,6 @@ func Print(command string) *cobra.Command {
 			if version.BuildDate != "" {
 				print("Build date", version.BuildDate)
 			}
-			if version.GitBranch != "" {
-				print("Git branch", version.GitBranch)
-			}
 			if version.GitCommit != "" {
 				print("Git commit", version.GitCommit)
 			}

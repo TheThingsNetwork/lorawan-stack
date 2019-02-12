@@ -10,7 +10,7 @@ sed \
   . "github.com/grpc-ecosystem/grpc-gateway/runtime" // nolint: golint' \
   $GOPATH/src/github.com/grpc-ecosystem/grpc-gateway/runtime/marshal_jsonpb.go > marshaling.go
 
-goimports -w marshaling.go
+GO111MODULE=on go run golang.org/x/tools/cmd/goimports -w marshaling.go
 
 echo "// Code generated from github.com/grpc-ecosystem/grpc-gateway/runtime by copy.sh
 

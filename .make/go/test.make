@@ -14,8 +14,8 @@
 
 # run tests
 go.test: go.min-version key.pem cert.pem
-	@$(log) "Testing `$(TEST_PACKAGES) | $(count)` go packages"
-	$(GO) test $(GO_FLAGS) $(GO_TEST_FLAGS) `$(TEST_PACKAGES)`
+	@$(log) "Running tests..."
+	$(GO) test $(GO_FLAGS) $(GO_TEST_FLAGS) ./...
 
 $(GO_COVER_FILE): GO_TEST_FLAGS = $(GO_COVERALLS_FLAGS)
 $(GO_COVER_FILE):
@@ -25,6 +25,6 @@ $(GO_FILTERED_COVER_FILE): $(GO_COVER_FILE)
 	@cat $(GO_COVER_FILE) | grep -vE '\.pb(\.gw|\.fm|\.util\.fm)?\.go' > $(GO_FILTERED_COVER_FILE)
 
 go.coveralls: $(GO_FILTERED_COVER_FILE)
-	@goveralls -coverprofile=$(GO_FILTERED_COVER_FILE) -service=$${COVERALLS_SERVICE:-travis-ci} -repotoken $${COVERALLS_TOKEN:-""}
+	@GO111MODULE=on $(GO) run github.com/mattn/goveralls -coverprofile=$(GO_FILTERED_COVER_FILE) -service=$${COVERALLS_SERVICE:-travis-ci} -repotoken $${COVERALLS_TOKEN:-""}
 
 # vim: ft=make

@@ -21,11 +21,8 @@ RELEASE_DIR ?= release#
 GO_PATH ?= $(shell echo $(GOPATH) | awk -F':' '{ print $$1 }')
 
 # programs
-GO = go
-GO_FMT= gofmt
-GO_MISSPELL= misspell
-GO_UNCONVERT= unconvert
-GO_METALINTER = gometalinter
+GO ?= go
+GO_FMT ?= gofmt
 GO_LINT_FILES = $(ALL_FILES) | $(only_go_lintable)
 
 # go flags
@@ -78,20 +75,8 @@ GO_PACKAGES = $(GO) list -v ./...
 # local go packages as absolute paths
 GO_PACKAGES_ABSOLUTE = $(GO) list -v -f '{{.Dir}}' ./...
 
-# packages for testing
-TEST_PACKAGES = $(GO_FILES) | $(no_vendor) | $(only_test) | $(to_packages)
-
-# get tools required for development
-go.dev-deps:
-	@$(log) "Installing go dev dependencies"
-	@if [[ ! -z "$(CI)" ]]; then $(log) "Getting goveralls" && GO111MODULE=off go get -u github.com/mattn/goveralls; fi
-	@$(log) "Getting gometalinter" && GO111MODULE=off go get -u github.com/alecthomas/gometalinter
-	@$(log) "Getting gometalinter linters" && $(GO_METALINTER) -i
-
 go.min-version: $(MAGE)
 	@$(MAGE) go:checkVersion
-
-DEP_FLAGS ?= -v
 
 # install dependencies
 go.deps:
@@ -106,8 +91,7 @@ go.clean:
 # init initializes go
 go.init: go.min-version
 	@$(log) "Initializing go"
-	@make go.dev-deps
-	@make go.deps
+	@$(MAKE) go.deps
 
 INIT_RULES += go.init
 

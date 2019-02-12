@@ -14,12 +14,9 @@
 
 MAGE := .mage/run
 
-GOBIN ?= $(shell go env GOPATH)/bin
-
 $(MAGE): magefile.go $(wildcard .mage/*.go)
 	@command -v go > /dev/null || ($(error) Did you forget to install Go?)
-	@command -v $(GOBIN)/mage > /dev/null || (GO111MODULE=off GOOS="" GOARCH="" go get github.com/magefile/mage)
-	GO111MODULE=on $(GOBIN)/mage -compile $(MAGE)
+	GO111MODULE=on go run github.com/magefile/mage -compile $(MAGE)
 
 .PHONY: mage
 

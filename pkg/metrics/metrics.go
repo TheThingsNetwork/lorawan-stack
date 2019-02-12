@@ -38,7 +38,6 @@ var ttnInfo = prometheus.NewGauge(prometheus.GaugeOpts{
 	ConstLabels: prometheus.Labels{
 		"version":    version.TTN,
 		"build_date": version.BuildDate,
-		"git_branch": version.GitBranch,
 		"git_commit": version.GitCommit,
 	},
 })

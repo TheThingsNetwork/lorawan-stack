@@ -2,15 +2,17 @@ FROM alpine:3.8
 
 RUN addgroup -g 886 thethings && adduser -u 886 -S -G thethings thethings
 
-ARG release_dir=release
 RUN apk --update --no-cache add ca-certificates
-ADD $release_dir/ttn-*-linux-amd64 /bin/
-ADD public /srv/ttn-lorawan/public
-RUN cd /bin && \
-  for binary in `ls ttn-*-linux-amd64`; \
-  do ln -sf $binary /bin/${binary%-linux-amd64}; \
-  done
-RUN chmod 755 /bin/ttn-*
+
+COPY ttn-lw-stack /bin/ttn-lw-stack
+RUN ln -s /bin/ttn-lw-stack /bin/stack
+RUN chmod 755 /bin/ttn-lw-stack
+
+COPY ttn-lw-cli /bin/ttn-lw-cli
+RUN ln -s /bin/ttn-lw-cli /bin/cli
+RUN chmod 755 /bin/ttn-lw-cli
+
+COPY public /srv/ttn-lorawan/public
 
 EXPOSE 1700/udp 1882 8882 1883 8883 1884 8884 1885 8885
 

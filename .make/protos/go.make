@@ -25,9 +25,9 @@ go.protos: $(wildcard api/*.proto)
 	$(PROTOC) $(GO_PROTOC_FLAGS) $(API_PROTO_FILES) 2>&1 | grep -vE ' protoc-gen-gogo: WARNING: failed finding publicly imported dependency for \.ttn\.lorawan\.v3\..* used in' || true
 	$(MAKE_DIR)/protos/fix-grpc-gateway-names.sh api
 	perl -i -pe 's:golang.org/x/net/context:context:' `find ./pkg -name '*pb.go' -or -name '*pb.gw.go' | grep -v 'vendor'`
-	goimports -w $(PWD)/pkg/ttnpb
-	unconvert -apply ./pkg/ttnpb
-	gofmt -w -s $(PWD)/pkg/ttnpb
+	GO111MODULE=on $(GO) run golang.org/x/tools/cmd/goimports -w $(PWD)/pkg/ttnpb
+	GO111MODULE=on $(GO) run github.com/mdempsky/unconvert -apply ./pkg/ttnpb
+	$(GO_FMT) -w -s $(PWD)/pkg/ttnpb
 
 go.protos.clean:
 	find ./pkg/ttnpb -name '*.pb.go' -delete -or -name '*.pb.gw.go' -delete -or -name '*.pb.fm.go' -delete -or -name '*.pb.util.fm.go' -delete

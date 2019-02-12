@@ -29,7 +29,6 @@ include .make/go/main.make
 include .make/protos/main.make
 include .make/js/main.make
 include .make/dev.make
-include .make/ci.make
 include .make/styl/main.make
 include .make/snap/main.make
 include .make/sdk/main.make
@@ -37,7 +36,7 @@ include .make/sdk/main.make
 messages:
 	@$(GO) run ./cmd/internal/generate_i18n.go
 
-dev-deps: go.dev-deps js.dev-deps
+dev-deps: go.deps js.dev-deps
 
 deps: go.deps js.deps sdk.deps
 
@@ -45,28 +44,10 @@ test: go.test js.test sdk.test
 
 quality: go.quality js.quality styl.quality snap.quality
 
+build-all: $(MAGE)
+	@GO111MODULE=on $(GO) run github.com/goreleaser/goreleaser --snapshot --skip-publish
+
 clean: go.clean js.clean
-
-# stack binary
-ttn-lw-stack: $(MAGE) js.build
-	@GO_BINARIES=stack $(MAGE) go:build
-
-# cli binary
-ttn-lw-cli: $(MAGE)
-	@GO_BINARIES=cli $(MAGE) go:build
-
-# All binaries
-build-all: $(MAGE) js.build
-	@GO_BINARIES="" $(MAGE) go:build
-
-# All supported platforms
-build-all-platforms:
-	@GO_BINARIES="" $(MAGE) go:buildCrossPlatform
-
-DOCKER_IMAGE ?= thethingsnetwork/lorawan-stack
-
-docker:
-	GOOS=linux GOARCH=amd64 make build-all
-	docker build -t $(DOCKER_IMAGE) .
+	rm -rf dist
 
 translations: messages js.translations
