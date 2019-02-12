@@ -27,6 +27,7 @@ import Message from '../../../lib/components/message'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import sharedMessages from '../../../lib/shared-messages'
+import { id as applicationIdRegexp } from '../../lib/regexp'
 
 import api from '../../api'
 
@@ -45,9 +46,6 @@ const initialValues = {
   name: '',
   description: '',
 }
-
-// alphanumeric, dashes, lowercase
-const applicationIdRegexp = /^[a-z0-9]+(-[a-z0-9]+)*$/
 
 const validationSchema = Yup.object().shape({
   application_id: Yup.string()
