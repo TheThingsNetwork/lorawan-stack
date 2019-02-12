@@ -28,6 +28,7 @@ import Authorize from '../authorize'
 import CreateAccount from '../create-account'
 import createStore from '../../store'
 import Init from '../../../lib/components/init'
+import Code from '../code'
 
 const history = createBrowserHistory()
 const store = createStore(history)
@@ -55,6 +56,7 @@ export default class OAuthApp extends React.PureComponent {
                   <Route path="/oauth/login" component={Login} />
                   <Route path="/oauth/authorize" component={Authorize} />
                   <Route path="/oauth/register" component={CreateAccount} />
+                  <Route path="/oauth/code" component={Code} />
                 </Switch>
               </ConnectedRouter>
             </WithLocale>

@@ -84,6 +84,7 @@
   "oauth.views.authorize.index.loginInfo": "Xxx xxx xxxxxx xx xx {userId}.",
   "oauth.views.authorize.index.redirectInfo": "Xxx xxxx xx xxxxxxxxxx xx {redirectUri}",
   "oauth.views.authorize.index.authorize": "Xxxxxxxxx",
+  "oauth.views.code.index.code": "Xxxx Xxxxxxxxxxxxx Xxxx",
   "oauth.views.create-account.index.createAccount": "Xxxxxx XXX Xxxxx Xxxxxxx",
   "oauth.views.create-account.index.register": "Xxxxxxxx",
   "oauth.views.create-account.index.goToLogin": "Xx xx xxxxx",

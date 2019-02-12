@@ -84,6 +84,7 @@
   "oauth.views.authorize.index.loginInfo": "You are logged in as {userId}.",
   "oauth.views.authorize.index.redirectInfo": "You will be redirected to {redirectUri}",
   "oauth.views.authorize.index.authorize": "Authorize",
+  "oauth.views.code.index.code": "Your Authorization Code",
   "oauth.views.create-account.index.createAccount": "Create TTN Stack Account",
   "oauth.views.create-account.index.register": "Register",
   "oauth.views.create-account.index.goToLogin": "Go to login",
