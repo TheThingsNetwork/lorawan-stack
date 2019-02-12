@@ -27,6 +27,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
+	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
 // TimeFormat is the format to parse times in.
@@ -308,7 +309,7 @@ func (m *Manager) setDefaults(prefix string, flags *pflag.FlagSet, config interf
 	}
 
 	if configKind != reflect.Struct {
-		return
+		panic("default config is not a struct type")
 	}
 
 	for i := 0; i < configValue.NumField(); i++ {
@@ -468,10 +469,15 @@ func (m *Manager) setDefaults(prefix string, flags *pflag.FlagSet, config interf
 				m.viper.SetDefault(name, val)
 
 			case []byte:
-				var str string
+				str := fmt.Sprintf("0x%X", val)
 				if len(val) > 0 {
-					m.viper.SetDefault(name, fmt.Sprintf("0x%X", val))
+					m.viper.SetDefault(name, str)
 				}
+				flags.StringP(name, shorthand, str, description)
+
+			case types.NetID:
+				str := fmt.Sprintf("%X", val)
+				m.viper.SetDefault(name, str)
 				flags.StringP(name, shorthand, str, description)
 
 			default:
