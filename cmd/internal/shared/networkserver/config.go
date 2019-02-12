@@ -17,14 +17,9 @@ package networkserver
 import (
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/networkserver"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
-
-func durationPtr(v time.Duration) *time.Duration {
-	return &v
-}
 
 // DefaultNetworkServerConfig is the default configuration for the NetworkServer
 var DefaultNetworkServerConfig = networkserver.Config{
@@ -35,13 +30,10 @@ var DefaultNetworkServerConfig = networkserver.Config{
 		MACCommands:            "highest",
 		MaxApplicationDownlink: "high",
 	},
-	DefaultMACSettings: ttnpb.MACSettings{
-		UseADR:                 &pbtypes.BoolValue{Value: true},
-		ADRMargin:              &pbtypes.FloatValue{Value: networkserver.DefaultADRMargin},
-		ClassBTimeout:          durationPtr(time.Minute),
-		ClassCTimeout:          durationPtr(networkserver.DefaultClassCTimeout),
-		StatusTimePeriodicity:  durationPtr(networkserver.DefaultStatusTimePeriodicity),
-		StatusCountPeriodicity: &pbtypes.UInt32Value{Value: networkserver.DefaultStatusCountPeriodicity},
-		Rx1Delay:               &ttnpb.MACSettings_RxDelayValue{Value: ttnpb.RX_DELAY_5},
-	},
+	DefaultADRMargin:              func(v float32) *float32 { return &v }(networkserver.DefaultADRMargin),
+	DefaultRx1Delay:               func(v ttnpb.RxDelay) *ttnpb.RxDelay { return &v }(ttnpb.RX_DELAY_5),
+	DefaultClassBTimeout:          func(v time.Duration) *time.Duration { return &v }(time.Minute),
+	DefaultClassCTimeout:          func(v time.Duration) *time.Duration { return &v }(networkserver.DefaultClassCTimeout),
+	DefaultStatusTimePeriodicity:  func(v time.Duration) *time.Duration { return &v }(networkserver.DefaultStatusTimePeriodicity),
+	DefaultStatusCountPeriodicity: func(v uint32) *uint32 { return &v }(networkserver.DefaultStatusCountPeriodicity),
 }

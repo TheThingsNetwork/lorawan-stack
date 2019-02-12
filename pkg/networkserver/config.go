@@ -24,13 +24,18 @@ import (
 
 // Config represents the NetworkServer configuration.
 type Config struct {
-	Devices             DeviceRegistry         `name:"-"`
-	DownlinkTasks       DownlinkTaskQueue      `name:"-"`
-	DeduplicationWindow time.Duration          `name:"deduplication-window" description:"Time window during which, duplicate messages are collected for metadata"`
-	CooldownWindow      time.Duration          `name:"cooldown-window" description:"Time window starting right after deduplication window, during which, duplicate messages are discarded"`
-	DownlinkPriorities  DownlinkPriorityConfig `name:"downlink-priorities" description:"Downlink message priorities"`
-	NetID               types.NetID            `name:"net_id" description:"NetID of this Network Server"`
-	DefaultMACSettings  ttnpb.MACSettings      `name:"mac_defaults" description:"Default MAC settings to use if not specified for device"`
+	Devices                       DeviceRegistry         `name:"-"`
+	DownlinkTasks                 DownlinkTaskQueue      `name:"-"`
+	DeduplicationWindow           time.Duration          `name:"deduplication-window" description:"Time window during which, duplicate messages are collected for metadata"`
+	CooldownWindow                time.Duration          `name:"cooldown-window" description:"Time window starting right after deduplication window, during which, duplicate messages are discarded"`
+	DownlinkPriorities            DownlinkPriorityConfig `name:"downlink-priorities" description:"Downlink message priorities"`
+	NetID                         types.NetID            `name:"net_id" description:"NetID of this Network Server"`
+	DefaultADRMargin              *float32               `name:"default-adr-margin" description:"The default margin Network Server should add in ADR requests if not configured in device's MAC settings"`
+	DefaultRx1Delay               *ttnpb.RxDelay         `name:"default-rx1-delay" description:"Rx1Delay value Network Server should use if not configured in device's MAC settings"`
+	DefaultClassBTimeout          *time.Duration         `name:"default-class-b-timeout" description:"Deadline for a device in class B mode to respond to requests from the Network Server if not configured in device's MAC settings"`
+	DefaultClassCTimeout          *time.Duration         `name:"default-class-c-timeout" description:"Deadline for a device in class C mode to respond to requests from the Network Server if not configured in device's MAC settings"`
+	DefaultStatusTimePeriodicity  *time.Duration         `name:"default-status-time-periodicity" description:"The interval after which a DevStatusReq MACCommand shall be sent by Network Server if not configured in device's MAC settings"`
+	DefaultStatusCountPeriodicity *uint32                `name:"default-status-count-periodicity" description:"Number of uplink messages after which a DevStatusReq MACCommand shall be sent by Network Server if not configured in device's MAC settings"`
 }
 
 // DownlinkPriorityConfig defines priorities for downlink messages.

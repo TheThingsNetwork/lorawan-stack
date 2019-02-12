@@ -2548,10 +2548,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					Devices: &MockDeviceRegistry{
 						SetByIDFunc: tc.SetByIDFunc,
 					},
-					DefaultMACSettings: ttnpb.MACSettings{
-						StatusTimePeriodicity:  DurationPtr(0),
-						StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
-					},
+					DefaultStatusTimePeriodicity:  DurationPtr(0),
+					DefaultStatusCountPeriodicity: func(v uint32) *uint32 { return &v }(0),
 				},
 			)).(*NetworkServer)
 			ns.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)

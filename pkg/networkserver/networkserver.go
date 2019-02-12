@@ -22,6 +22,7 @@ import (
 	"sync"
 	"time"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
@@ -208,13 +209,27 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		macHandlers:             &sync.Map{},
 		downlinkTasks:           conf.DownlinkTasks,
 		downlinkPriorities:      downlinkPriorities,
-		defaultMACSettings:      conf.DefaultMACSettings,
+		defaultMACSettings: ttnpb.MACSettings{
+			ClassBTimeout:         conf.DefaultClassBTimeout,
+			ClassCTimeout:         conf.DefaultClassCTimeout,
+			StatusTimePeriodicity: conf.DefaultStatusTimePeriodicity,
+		},
 	}
 	ns.hashPool.New = func() interface{} {
 		return fnv.New64a()
 	}
 	ns.metadataAccumulatorPool.New = func() interface{} {
 		return &metadataAccumulator{}
+	}
+
+	if conf.DefaultADRMargin != nil {
+		ns.defaultMACSettings.ADRMargin = &pbtypes.FloatValue{Value: *conf.DefaultADRMargin}
+	}
+	if conf.DefaultRx1Delay != nil {
+		ns.defaultMACSettings.Rx1Delay = &ttnpb.MACSettings_RxDelayValue{Value: *conf.DefaultRx1Delay}
+	}
+	if conf.DefaultStatusCountPeriodicity != nil {
+		ns.defaultMACSettings.StatusCountPeriodicity = &pbtypes.UInt32Value{Value: *conf.DefaultStatusCountPeriodicity}
 	}
 
 	for _, opt := range opts {
