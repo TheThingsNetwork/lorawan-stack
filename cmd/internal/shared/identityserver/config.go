@@ -48,6 +48,9 @@ func init() {
 	DefaultIdentityServerConfig.UserRegistration.PasswordRequirements.MinLength = 8
 	DefaultIdentityServerConfig.UserRegistration.PasswordRequirements.MinUppercase = 1
 	DefaultIdentityServerConfig.UserRegistration.PasswordRequirements.MinDigits = 1
+	DefaultIdentityServerConfig.Email.Network.Name = DefaultIdentityServerConfig.OAuth.UI.SiteName
+	DefaultIdentityServerConfig.Email.Network.IdentityServerURL = shared.DefaultOAuthPublicURL
+	DefaultIdentityServerConfig.Email.Network.ConsoleURL = shared.DefaultConsolePublicURL
 	DefaultIdentityServerConfig.ProfilePicture.Bucket = "profile_pictures"
 	DefaultIdentityServerConfig.ProfilePicture.BucketURL = path.Join(shared.DefaultAssetsBaseURL, "blob", "profile_pictures")
 	DefaultIdentityServerConfig.ProfilePicture.UseGravatar = true

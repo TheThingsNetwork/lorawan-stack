@@ -16,8 +16,6 @@ package identityserver
 
 import (
 	"context"
-	"net/url"
-
 	"github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/pkg/email"
@@ -51,11 +49,9 @@ func (is *IdentityServer) SendEmail(ctx context.Context, f func(emails.Data) ema
 		return err
 	}
 	var data emails.Data
-	data.Network.Name = isConfig.OAuth.UI.SiteName // TODO: Should this be separate config?
-	url, _ := url.Parse(isConfig.OAuth.UI.CanonicalURL)
-	url.Path = "/"
-	data.Network.IdentityServerURL = url.String() // TODO: Should this be separate config?
-	data.Network.ConsoleURL = url.String()        // TODO: Should this be separate config?
+	data.Network.Name = isConfig.Email.Network.Name
+	data.Network.IdentityServerURL = isConfig.Email.Network.IdentityServerURL
+	data.Network.ConsoleURL = isConfig.Email.Network.ConsoleURL
 	messageData := f(data)
 	if messageData == nil {
 		return nil
