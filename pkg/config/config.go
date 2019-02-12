@@ -409,17 +409,17 @@ func (m *Manager) setDefaults(prefix string, flags *pflag.FlagSet, config interf
 				flags.BoolP(name, shorthand, val, description)
 
 			case int, int8, int16, int32, int64:
-				fieldValue := configValue.Field(i).Int()
+				fieldValue := reflect.Indirect(configValue.Field(i)).Int()
 				m.viper.SetDefault(name, int(fieldValue))
 				flags.IntP(name, shorthand, int(fieldValue), description)
 
 			case uint, uint8, uint16, uint32, uint64:
-				fieldValue := configValue.Field(i).Uint()
+				fieldValue := reflect.Indirect(configValue.Field(i)).Uint()
 				m.viper.SetDefault(name, uint(fieldValue))
 				flags.UintP(name, shorthand, uint(fieldValue), description)
 
 			case float32, float64:
-				fieldValue := configValue.Field(i).Float()
+				fieldValue := reflect.Indirect(configValue.Field(i)).Float()
 				m.viper.SetDefault(name, fieldValue)
 				flags.Float64P(name, shorthand, fieldValue, description)
 
