@@ -19,20 +19,85 @@ import Notification from '.'
 
 storiesOf('Notification', module)
   .add('Default', () => (
-    <Notification message="This is an example message" />
+    <div>
+      <Notification
+        title="example message title"
+        message="This is an example message"
+      />
+      <Notification message="This is an example message" />
+      <Notification
+        title="example message title"
+        message="This is an example message"
+        small
+      />
+      <Notification message="This is an example message" small />
+    </div>
   ))
   .add('Info', () => (
-    <Notification
-      info="This message is good to know"
-    />
+    <div>
+      <Notification
+        title="example message title"
+        info="This message is good to know"
+      />
+      <Notification
+        info="This message is good to know"
+      />
+      <Notification
+        title="example message title"
+        info="This message is good to know"
+        small
+      />
+      <Notification info="This message is good to know" small />
+    </div>
   ))
   .add('Warning', () => (
-    <Notification
-      warning="This issue should be addressed!"
-    />
+    <div>
+      <Notification
+        title="example message title"
+        warning="This issue should be addressed!"
+      />
+      <Notification
+        warning="This issue should be addressed!"
+      />
+      <Notification
+        title="example message title"
+        warning="This issue should be addressed!"
+        small
+      />
+      <Notification warning="This issue should be addressed!" small />
+    </div>
   ))
   .add('Error', () => (
-    <Notification
-      error="We got a problem here!"
-    />
+    <div>
+      <Notification
+        title="example message title"
+        error="We got a problem here!"
+      />
+      <Notification
+        error="We got a problem here!"
+      />
+      <Notification
+        title="example message title"
+        error="We got a problem here!"
+        small
+      />
+      <Notification error="We got a problem here!" small />
+    </div>
+  ))
+  .add('Success', () => (
+    <div>
+      <Notification
+        title="example message title"
+        success="Successful action!"
+      />
+      <Notification
+        success="Successful action!"
+      />
+      <Notification
+        title="example message title"
+        success="Successful action!"
+        small
+      />
+      <Notification success="Successful action!" small />
+    </div>
   ))
