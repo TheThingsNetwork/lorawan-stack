@@ -30,6 +30,7 @@ const Notification = function ({
   info,
   small,
   message,
+  success,
 }) {
 
   const classname = classnames(style.notification, className, {
@@ -37,6 +38,7 @@ const Notification = function ({
     [style.warning]: warning,
     [style.info]: info,
     [style.small]: small,
+    [style.success]: success,
   })
 
   let icon = 'info'
@@ -46,7 +48,7 @@ const Notification = function ({
     icon = 'warning'
   }
 
-  const content = message || error || warning || info
+  const content = message || error || warning || info || success
   const Component = error ? ErrorMessage : Message
 
   return (
@@ -73,6 +75,7 @@ Notification.propTypes = {
   info: PropTypes.message,
   small: PropTypes.bool,
   title: PropTypes.message,
+  success: PropTypes.message,
 }
 
 export default Notification
