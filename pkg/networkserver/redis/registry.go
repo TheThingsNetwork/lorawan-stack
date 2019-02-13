@@ -95,7 +95,7 @@ func (r *DeviceRegistry) RangeByAddr(addr types.DevAddr, paths []string, f func(
 	})
 }
 
-func getDevAddrsAndIDs(pb *ttnpb.EndDevice) (addrs struct{ current, fallback *types.DevAddr }, ids ttnpb.EndDeviceIdentifiers) {
+func getDevAddrsAndIDs(pb *ttnpb.EndDevice) (addrs struct{ current, pending *types.DevAddr }, ids ttnpb.EndDeviceIdentifiers) {
 	if pb == nil {
 		return
 	}
@@ -108,7 +108,7 @@ func getDevAddrsAndIDs(pb *ttnpb.EndDevice) (addrs struct{ current, fallback *ty
 	if pb.PendingSession != nil {
 		var addr types.DevAddr
 		copy(addr[:], pb.PendingSession.DevAddr[:])
-		addrs.fallback = &addr
+		addrs.pending = &addr
 	}
 	return addrs, *pb.EndDeviceIdentifiers.Copy(&ttnpb.EndDeviceIdentifiers{})
 }
@@ -177,8 +177,8 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 				if oldIDs.JoinEUI != nil && oldIDs.DevEUI != nil {
 					p.Del(r.Redis.Key(euiKey, oldIDs.JoinEUI.String(), oldIDs.DevEUI.String()))
 				}
-				if oldAddrs.fallback != nil {
-					p.SRem(r.Redis.Key(addrKey, oldAddrs.fallback.String()), uid)
+				if oldAddrs.pending != nil {
+					p.SRem(r.Redis.Key(addrKey, oldAddrs.pending.String()), uid)
 				}
 				if oldAddrs.current != nil {
 					p.SRem(r.Redis.Key(addrKey, oldAddrs.current.String()), uid)
@@ -215,7 +215,11 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 			}
 
 			f = func(p redis.Pipeliner) error {
-				if create && newIDs.JoinEUI != nil && newIDs.DevEUI != nil {
+				if create {
+					if newIDs.JoinEUI == nil || newIDs.DevEUI == nil {
+						return errInvalidIdentifiers
+					}
+
 					ek := r.Redis.Key(euiKey, newIDs.JoinEUI.String(), newIDs.DevEUI.String())
 					if err := tx.Watch(ek).Err(); err != nil {
 						return err
@@ -236,16 +240,16 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 					return err
 				}
 
-				if oldAddrs.fallback != nil && !equalAddr(oldAddrs.fallback, newAddrs.fallback) && !equalAddr(oldAddrs.fallback, newAddrs.current) {
-					p.SRem(r.Redis.Key(addrKey, oldAddrs.fallback.String()), uid)
+				if oldAddrs.pending != nil && !equalAddr(oldAddrs.pending, newAddrs.pending) && !equalAddr(oldAddrs.pending, newAddrs.current) {
+					p.SRem(r.Redis.Key(addrKey, oldAddrs.pending.String()), uid)
 				}
-				if oldAddrs.current != nil && !equalAddr(oldAddrs.current, newAddrs.fallback) && !equalAddr(oldAddrs.current, newAddrs.current) {
+				if oldAddrs.current != nil && !equalAddr(oldAddrs.current, newAddrs.pending) && !equalAddr(oldAddrs.current, newAddrs.current) {
 					p.SRem(r.Redis.Key(addrKey, oldAddrs.current.String()), uid)
 				}
-				if newAddrs.fallback != nil && !equalAddr(newAddrs.fallback, oldAddrs.fallback) && !equalAddr(newAddrs.fallback, oldAddrs.current) {
-					p.SAdd(r.Redis.Key(addrKey, newAddrs.fallback.String()), uid)
+				if newAddrs.pending != nil && !equalAddr(newAddrs.pending, oldAddrs.pending) && !equalAddr(newAddrs.pending, oldAddrs.current) {
+					p.SAdd(r.Redis.Key(addrKey, newAddrs.pending.String()), uid)
 				}
-				if newAddrs.current != nil && !equalAddr(newAddrs.current, oldAddrs.fallback) && !equalAddr(newAddrs.current, oldAddrs.current) {
+				if newAddrs.current != nil && !equalAddr(newAddrs.current, oldAddrs.pending) && !equalAddr(newAddrs.current, oldAddrs.current) {
 					p.SAdd(r.Redis.Key(addrKey, newAddrs.current.String()), uid)
 				}
 				return nil

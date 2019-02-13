@@ -178,7 +178,7 @@ outer:
 
 	pld := &ttnpb.MACPayload{
 		FHDR: ttnpb.FHDR{
-			DevAddr: *dev.EndDeviceIdentifiers.DevAddr,
+			DevAddr: dev.Session.DevAddr,
 			FCtrl: ttnpb.FCtrl{
 				Ack: up != nil && up.Payload.MHDR.MType == ttnpb.MType_CONFIRMED_UP,
 			},

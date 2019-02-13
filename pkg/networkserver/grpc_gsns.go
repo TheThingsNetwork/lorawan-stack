@@ -161,6 +161,7 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 						}
 					}
 				}
+
 				devs = append(devs, device{
 					EndDevice:      dev,
 					matchedSession: dev.PendingSession,
@@ -365,8 +366,14 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 
 	if matched.MACState != nil && matched.MACState.PendingApplicationDownlink != nil {
 		asUp := &ttnpb.ApplicationUp{
-			EndDeviceIdentifiers: matched.EndDeviceIdentifiers,
-			CorrelationIDs:       matched.MACState.PendingApplicationDownlink.CorrelationIDs,
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				DevAddr:                &pld.DevAddr,
+				JoinEUI:                matched.JoinEUI,
+				DevEUI:                 matched.DevEUI,
+				ApplicationIdentifiers: matched.ApplicationIdentifiers,
+				DeviceID:               matched.DeviceID,
+			},
+			CorrelationIDs: matched.MACState.PendingApplicationDownlink.CorrelationIDs,
 		}
 
 		if pld.Ack {
@@ -410,7 +417,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 		}
 		copy(key[:], ses.NwkSEncKey.Key[:])
 
-		mac, err = crypto.DecryptUplink(key, *matched.EndDeviceIdentifiers.DevAddr, pld.FCnt, mac)
+		mac, err = crypto.DecryptUplink(key, pld.DevAddr, pld.FCnt, mac)
 		if err != nil {
 			return errDecrypt.WithCause(err)
 		}
