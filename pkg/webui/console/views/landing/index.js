@@ -22,6 +22,7 @@ import Overview from '../overview'
 import Applications from '../applications'
 import Gateways from '../gateways'
 import Organizations from '../organizations'
+import { ToastContainer } from '../../../components/toast'
 
 import style from './landing.styl'
 
@@ -31,6 +32,7 @@ export default class Landing extends React.PureComponent {
     const { path } = this.props.match
     return (
       <div className={style.container}>
+        <ToastContainer />
         <div className={style.breadcrumbsContainer}>
           <Container>
             <Breadcrumbs />
