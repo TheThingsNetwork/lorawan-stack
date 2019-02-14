@@ -55,15 +55,19 @@ func (Version) Current() error {
 	return nil
 }
 
-// Files writes the current version to files that contain version info.
+const goVersionFilePath = "pkg/version/ttn.go"
+
+var packageJSONFilePaths = []string{"package.json", "sdk/js/package.json"}
+
+// Files writes the current version to files that contain version info and adds them to the Git index.
 func (Version) Files() error {
 	mg.Deps(Version.getCurrent)
-	err := ioutil.WriteFile("pkg/version/ttn.go", []byte(fmt.Sprintf(goVersionFile, currentVersion)), 0644)
+	err := ioutil.WriteFile(goVersionFilePath, []byte(fmt.Sprintf(goVersionFile, currentVersion)), 0644)
 	if err != nil {
 		return err
 	}
 	version := strings.TrimPrefix(currentVersion, "v")
-	for _, packageJSONFile := range []string{"package.json", "sdk/js/package.json"} {
+	for _, packageJSONFile := range packageJSONFilePaths {
 		err = sh.Run(
 			nodeBin("json"),
 			"-f", packageJSONFile,
@@ -74,7 +78,7 @@ func (Version) Files() error {
 			return err
 		}
 	}
-	return nil
+	return git.Add(append(packageJSONFilePaths, goVersionFilePath)...)
 }
 
 func bumpVersion(bump string) error {
