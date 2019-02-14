@@ -34,6 +34,103 @@ func formatFrequency(frequency uint64) string {
 	return fmt.Sprintf("%g", freq)
 }
 
+// BuildSX1301Config builds the SX1301 configuration for the given frequency plan.
+func BuildSX1301Config(frequencyPlan *frequencyplans.FrequencyPlan) (*SX1301Config, error) {
+	band, err := band.GetByID(frequencyPlan.BandID)
+	if err != nil {
+		return nil, err
+	}
+
+	conf := new(SX1301Config)
+
+	conf.LoRaWANPublic = true
+	conf.ClockSource = frequencyPlan.ClockSource
+
+	if frequencyPlan.LBT != nil {
+		lbtConfig := &LBTConfig{
+			Enable:     true,
+			RSSITarget: frequencyPlan.LBT.RSSITarget,
+			RSSIOffset: frequencyPlan.LBT.RSSIOffset,
+		}
+		for i, channel := range frequencyPlan.DownlinkChannels {
+			if i > 7 {
+				break
+			}
+			lbtConfig.ChannelConfigs = append(lbtConfig.ChannelConfigs, LBTChannelConfig{
+				Frequency:            channel.Frequency,
+				ScanTimeMicroseconds: uint32(frequencyPlan.LBT.ScanTime / time.Microsecond),
+			})
+		}
+		conf.LBTConfig = lbtConfig
+	}
+
+	conf.Radios = make([]RFConfig, len(frequencyPlan.Radios))
+	for i, radio := range frequencyPlan.Radios {
+		rfConfig := RFConfig{
+			Enable:     radio.Enable,
+			Type:       radio.ChipType,
+			Frequency:  radio.Frequency,
+			RSSIOffset: radio.RSSIOffset,
+		}
+		if radio.TxConfiguration != nil {
+			rfConfig.TxEnable = true
+			rfConfig.TxFreqMin = radio.TxConfiguration.MinFrequency
+			rfConfig.TxFreqMax = radio.TxConfiguration.MaxFrequency
+			if radio.TxConfiguration.NotchFrequency != nil {
+				rfConfig.TxNotchFreq = *radio.TxConfiguration.NotchFrequency
+			}
+		}
+		conf.Radios[i] = rfConfig
+	}
+
+	numChannels := len(frequencyPlan.UplinkChannels)
+	if numChannels < 8 {
+		numChannels = 8
+	}
+	conf.Channels = make([]IFConfig, numChannels)
+	for i, channel := range frequencyPlan.UplinkChannels {
+		ifConfig := IFConfig{
+			Description: fmt.Sprintf("Lora MAC, 125kHz, all SF, %s MHz", formatFrequency(channel.Frequency)),
+			Enable:      true,
+			Radio:       channel.Radio,
+			IFValue:     int32(int64(channel.Frequency) - int64(conf.Radios[channel.Radio].Frequency)),
+		}
+		conf.Channels[i] = ifConfig
+	}
+
+	conf.LoRaStandardChannel = &IFConfig{Enable: false}
+	if channel := frequencyPlan.LoRaStandardChannel; channel != nil {
+		if lora := band.DataRates[channel.DataRate].Rate.GetLoRa(); lora != nil {
+			conf.LoRaStandardChannel = &IFConfig{
+				Description:  fmt.Sprintf("Lora MAC, %dkHz, SF%d, %s MHz", lora.Bandwidth/1000, lora.SpreadingFactor, formatFrequency(channel.Frequency)),
+				Enable:       true,
+				Radio:        channel.Radio,
+				IFValue:      int32(int64(channel.Frequency) - int64(conf.Radios[channel.Radio].Frequency)),
+				Bandwidth:    lora.Bandwidth,
+				SpreadFactor: uint8(lora.SpreadingFactor),
+			}
+		}
+	}
+
+	conf.FSKChannel = &IFConfig{Enable: false}
+	if channel := frequencyPlan.FSKChannel; channel != nil {
+		if fsk := band.DataRates[channel.DataRate].Rate.GetFSK(); fsk != nil {
+			conf.FSKChannel = &IFConfig{
+				Description: fmt.Sprintf("FSK %dkbps, %s MHz", fsk.BitRate/1000, formatFrequency(channel.Frequency)),
+				Enable:      true,
+				Radio:       channel.Radio,
+				IFValue:     int32(int64(channel.Frequency) - int64(conf.Radios[channel.Radio].Frequency)),
+				Bandwidth:   125000,
+				Datarate:    fsk.BitRate,
+			}
+		}
+	}
+
+	conf.TxLUTConfigs = defaultTxLUTConfigs
+
+	return conf, nil
+}
+
 // Build builds a packet forwarder configuration for the given gateway, using the given frequency plan store.
 func Build(gateway *ttnpb.Gateway, store *frequencyplans.Store) (*Config, error) {
 	var c Config
@@ -56,95 +153,12 @@ func Build(gateway *ttnpb.Gateway, store *frequencyplans.Store) (*Config, error)
 	if err != nil {
 		return nil, err
 	}
-	band, err := band.GetByID(frequencyPlan.BandID)
+	sx1301Config, err := BuildSX1301Config(frequencyPlan)
 	if err != nil {
 		return nil, err
 	}
 
-	c.SX1301Conf.LoRaWANPublic = true
-	c.SX1301Conf.ClockSource = frequencyPlan.ClockSource
-
-	if frequencyPlan.LBT != nil {
-		lbtConfig := &LBTConfig{
-			Enable:     true,
-			RSSITarget: frequencyPlan.LBT.RSSITarget,
-			RSSIOffset: frequencyPlan.LBT.RSSIOffset,
-		}
-		for i, channel := range frequencyPlan.DownlinkChannels {
-			if i > 7 {
-				break
-			}
-			lbtConfig.ChannelConfigs = append(lbtConfig.ChannelConfigs, LBTChannelConfig{
-				Frequency:            channel.Frequency,
-				ScanTimeMicroseconds: uint32(frequencyPlan.LBT.ScanTime / time.Microsecond),
-			})
-		}
-		c.SX1301Conf.LBTConfig = lbtConfig
-	}
-
-	c.SX1301Conf.Radios = make([]RFConfig, len(frequencyPlan.Radios))
-	for i, radio := range frequencyPlan.Radios {
-		rfConfig := RFConfig{
-			Enable:     radio.Enable,
-			Type:       radio.ChipType,
-			Frequency:  radio.Frequency,
-			RSSIOffset: radio.RSSIOffset,
-		}
-		if radio.TxConfiguration != nil {
-			rfConfig.TxEnable = true
-			rfConfig.TxFreqMin = radio.TxConfiguration.MinFrequency
-			rfConfig.TxFreqMax = radio.TxConfiguration.MaxFrequency
-			if radio.TxConfiguration.NotchFrequency != nil {
-				rfConfig.TxNotchFreq = *radio.TxConfiguration.NotchFrequency
-			}
-		}
-		c.SX1301Conf.Radios[i] = rfConfig
-	}
-
-	numChannels := len(frequencyPlan.UplinkChannels)
-	if numChannels < 8 {
-		numChannels = 8
-	}
-	c.SX1301Conf.Channels = make([]IFConfig, numChannels)
-	for i, channel := range frequencyPlan.UplinkChannels {
-		ifConfig := IFConfig{
-			Description: fmt.Sprintf("Lora MAC, 125kHz, all SF, %s MHz", formatFrequency(channel.Frequency)),
-			Enable:      true,
-			Radio:       channel.Radio,
-			IFValue:     int32(int64(channel.Frequency) - int64(c.SX1301Conf.Radios[channel.Radio].Frequency)),
-		}
-		c.SX1301Conf.Channels[i] = ifConfig
-	}
-
-	c.SX1301Conf.LoRaStandardChannel = &IFConfig{Enable: false}
-	if channel := frequencyPlan.LoRaStandardChannel; channel != nil {
-		if lora := band.DataRates[channel.DataRate].Rate.GetLoRa(); lora != nil {
-			c.SX1301Conf.LoRaStandardChannel = &IFConfig{
-				Description:  fmt.Sprintf("Lora MAC, %dkHz, SF%d, %s MHz", lora.Bandwidth/1000, lora.SpreadingFactor, formatFrequency(channel.Frequency)),
-				Enable:       true,
-				Radio:        channel.Radio,
-				IFValue:      int32(int64(channel.Frequency) - int64(c.SX1301Conf.Radios[channel.Radio].Frequency)),
-				Bandwidth:    lora.Bandwidth,
-				SpreadFactor: uint8(lora.SpreadingFactor),
-			}
-		}
-	}
-
-	c.SX1301Conf.FSKChannel = &IFConfig{Enable: false}
-	if channel := frequencyPlan.FSKChannel; channel != nil {
-		if fsk := band.DataRates[channel.DataRate].Rate.GetFSK(); fsk != nil {
-			c.SX1301Conf.FSKChannel = &IFConfig{
-				Description: fmt.Sprintf("FSK %dkbps, %s MHz", fsk.BitRate/1000, formatFrequency(channel.Frequency)),
-				Enable:      true,
-				Radio:       channel.Radio,
-				IFValue:     int32(int64(channel.Frequency) - int64(c.SX1301Conf.Radios[channel.Radio].Frequency)),
-				Bandwidth:   125000,
-				Datarate:    fsk.BitRate,
-			}
-		}
-	}
-
-	c.SX1301Conf.TxLUTConfigs = defaultTxLUTConfigs
+	c.SX1301Conf = *sx1301Config
 
 	return &c, nil
 }
