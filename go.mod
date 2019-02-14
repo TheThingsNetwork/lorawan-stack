@@ -10,7 +10,7 @@ require (
 	github.com/PuerkitoBio/purell v1.1.0
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/RangelReale/osin v1.0.1
-	github.com/TheThingsIndustries/magepkg v0.0.0-20190121105130-84da34311dab
+	github.com/TheThingsIndustries/magepkg v0.0.0-20190214092847-6c0299b7c3ed
 	github.com/TheThingsIndustries/mystique v0.0.0-20181023142449-f12a32cee6d6
 	github.com/TheThingsNetwork/go-cayenne-lib v1.0.0
 	github.com/alecthomas/gometalinter v3.0.0+incompatible

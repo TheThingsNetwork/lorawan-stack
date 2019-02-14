@@ -30,8 +30,8 @@ github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 h1:d+Bc7a5rLufV
 github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578/go.mod h1:uGdkoq3SwY9Y+13GIhn11/XLaGBb4BfwItxLd5jeuXE=
 github.com/RangelReale/osin v1.0.1 h1:JcqBe8ljQq9WQJPtioXGxBWyIcfuVMw0BX6yJ9E4HKw=
 github.com/RangelReale/osin v1.0.1/go.mod h1:k/PH1SjZDitJDtK3zHm/XZRi+bRz6i3rhx9qE9p54CY=
-github.com/TheThingsIndustries/magepkg v0.0.0-20190121105130-84da34311dab h1:TACV1bRELhjK8U5EhWLKlIjoHE/TfWQXJcNE0kbetOY=
-github.com/TheThingsIndustries/magepkg v0.0.0-20190121105130-84da34311dab/go.mod h1:InVSk9cxzZR1y4QaHF4CbDQ/uFeoTnbJfnwiKM04UNo=
+github.com/TheThingsIndustries/magepkg v0.0.0-20190214092847-6c0299b7c3ed h1:rsGbnyV9cP0ocol1W17uTbZ1iWcEeg+gp3ivzW6NQ6Q=
+github.com/TheThingsIndustries/magepkg v0.0.0-20190214092847-6c0299b7c3ed/go.mod h1:InVSk9cxzZR1y4QaHF4CbDQ/uFeoTnbJfnwiKM04UNo=
 github.com/TheThingsIndustries/mystique v0.0.0-20181023142449-f12a32cee6d6 h1:bU/mzNwvlF6Rn/5Qk9g8+/bSWmK2Iz+9XaemmJo4nBk=
 github.com/TheThingsIndustries/mystique v0.0.0-20181023142449-f12a32cee6d6/go.mod h1:l1YfNoSNxng8UF9XBfDixHAQjMEMAyoEQnbKSqX/qII=
 github.com/TheThingsNetwork/go-cayenne-lib v1.0.0 h1:be7h6E/69+qaYs1iwQ2xjGjSFPXzvU3q6AWBCWayG2Y=
