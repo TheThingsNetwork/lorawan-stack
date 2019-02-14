@@ -138,3 +138,21 @@ func (Version) BumpPatch() error { return bumpVersion("patch") }
 
 // BumpRC bumps a release candidate version.
 func (Version) BumpRC() error { return bumpVersion("rc") }
+
+// Tag creates a git tag for the current version.
+func (Version) Tag() error {
+	version, err := semver.Parse(strings.TrimPrefix(currentVersion, "v"))
+	if err != nil {
+		return err
+	}
+	versionType := "Release version"
+	if len(version.Pre) > 0 {
+		pre := version.Pre[0].VersionStr
+		versionType = "Pre-release for version"
+		if strings.HasPrefix(pre, "rc") {
+			versionType = fmt.Sprintf("Release candidate %s for version", strings.TrimPrefix(pre, "rc"))
+		}
+		version.Pre = nil
+	}
+	return git.Tag(currentVersion, fmt.Sprintf("%s %s", versionType, version))
+}
