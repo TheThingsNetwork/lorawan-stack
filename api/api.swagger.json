@@ -4870,11 +4870,27 @@
         }
       }
     },
+    "MACSettingsAggregatedDutyCycleValue": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/v3AggregatedDutyCycle"
+        }
+      }
+    },
     "MACSettingsDataRateIndexValue": {
       "type": "object",
       "properties": {
         "value": {
           "$ref": "#/definitions/v3DataRateIndex"
+        }
+      }
+    },
+    "MACSettingsPingSlotPeriodValue": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/v3PingSlotPeriod"
         }
       }
     },
@@ -6332,10 +6348,6 @@
           "type": "string",
           "description": "ID of the frequency plan used by this device.\nCopied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any."
         },
-        "default_mac_parameters": {
-          "$ref": "#/definitions/v3MACParameters",
-          "description": "Default MAC layer parameters, to which device is reset by default (e.g. on join or ResetInd). Stored in Network Server.\nCopied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any."
-        },
         "min_frequency": {
           "type": "string",
           "format": "uint64",
@@ -6346,16 +6358,6 @@
           "format": "uint64",
           "description": "Maximum frequency the device is capable of using (Hz). Stored in Network Server.\nCopied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any."
         },
-        "resets_f_cnt": {
-          "type": "boolean",
-          "format": "boolean",
-          "description": "Whether the device resets the frame counters (not LoRaWAN compliant). Stored in Network Server.\nCopied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any."
-        },
-        "uses_32_bit_f_cnt": {
-          "type": "boolean",
-          "format": "boolean",
-          "description": "Whether the device uses 32-bit frame counters. Stored in Network Server.\nCopied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any."
-        },
         "supports_join": {
           "type": "boolean",
           "format": "boolean",
@@ -6364,7 +6366,7 @@
         "resets_join_nonces": {
           "type": "boolean",
           "format": "boolean",
-          "description": "Whether the device resets the join and dev nonces (not LoRaWAN 1.1 compliant). Stored in Network Server.\nCopied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any."
+          "description": "Whether the device resets the join and dev nonces (not LoRaWAN 1.1 compliant). Stored in Join Server.\nCopied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any."
         },
         "root_keys": {
           "$ref": "#/definitions/v3RootKeys",
@@ -6377,7 +6379,7 @@
         },
         "mac_settings": {
           "$ref": "#/definitions/v3MACSettings",
-          "description": "Settings for how the Network Server handles MAC for this device. Stored in Network Server."
+          "description": "Settings for how the Network Server handles MAC layer for this device. Stored in Network Server."
         },
         "mac_state": {
           "$ref": "#/definitions/v3MACState",
@@ -7343,6 +7345,10 @@
           "format": "uint64",
           "description": "Frequency for Rx2 (Hz)."
         },
+        "max_duty_cycle": {
+          "$ref": "#/definitions/v3AggregatedDutyCycle",
+          "description": "Maximum uplink duty cycle (of all channels)."
+        },
         "rejoin_time_periodicity": {
           "$ref": "#/definitions/v3RejoinTimeExponent",
           "description": "Time within which a rejoin-request must be sent."
@@ -7350,17 +7356,6 @@
         "rejoin_count_periodicity": {
           "$ref": "#/definitions/v3RejoinCountExponent",
           "description": "Message count within which a rejoin-request must be sent."
-        },
-        "max_duty_cycle": {
-          "$ref": "#/definitions/v3AggregatedDutyCycle",
-          "description": "Maximum uplink duty cycle (of all channels)."
-        },
-        "channels": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v3MACParametersChannel"
-          },
-          "description": "Configured uplink channels and optionally Rx1 frequency."
         },
         "ping_slot_frequency": {
           "type": "string",
@@ -7375,6 +7370,13 @@
           "type": "string",
           "format": "uint64",
           "description": "Frequency of the class B beacon (Hz)."
+        },
+        "channels": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3MACParametersChannel"
+          },
+          "description": "Configured uplink channels and optionally Rx1 frequency."
         }
       },
       "description": "MACParameters represent the parameters of the device's MAC layer (active or desired).\nThis is used internally by the Network Server and is read only."
@@ -7429,22 +7431,76 @@
     "v3MACSettings": {
       "type": "object",
       "properties": {
+        "class_b_timeout": {
+          "type": "string",
+          "description": "Maximum delay for the device to answer a MAC request or a confirmed downlink frame.\nMust be set if the device supports class B."
+        },
+        "ping_slot_periodicity": {
+          "$ref": "#/definitions/MACSettingsPingSlotPeriodValue",
+          "description": "Periodicity of the class B ping slot.\nMust be set if the device supports class B."
+        },
+        "ping_slot_data_rate_index": {
+          "$ref": "#/definitions/MACSettingsDataRateIndexValue",
+          "description": "Data rate index of the class B ping slot.\nMust be set if the device supports class B."
+        },
+        "ping_slot_frequency": {
+          "type": "string",
+          "format": "uint64",
+          "description": "Frequency of the class B ping slot (Hz).\nMust be set if the device supports class B."
+        },
+        "class_c_timeout": {
+          "type": "string",
+          "description": "Maximum delay for the device to answer a MAC request or a confirmed downlink frame.\nMust be set if the device supports class C."
+        },
+        "rx1_delay": {
+          "$ref": "#/definitions/MACSettingsRxDelayValue",
+          "description": "Class A Rx1 delay.\nMust be set if the device is ABP."
+        },
+        "rx1_data_rate_offset": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Rx1 data rate offset.\nMust be set if the device is ABP."
+        },
+        "rx2_data_rate_index": {
+          "$ref": "#/definitions/MACSettingsDataRateIndexValue",
+          "description": "Data rate index for Rx2.\nMust be set if the device is ABP."
+        },
+        "rx2_frequency": {
+          "type": "string",
+          "format": "uint64",
+          "description": "Frequency for Rx2 (Hz).\nMust be set if the device is ABP."
+        },
+        "factory_preset_frequencies": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uint64"
+          },
+          "description": "List of factory-preset frequencies.\nMust be set if the device is ABP."
+        },
+        "max_duty_cycle": {
+          "$ref": "#/definitions/MACSettingsAggregatedDutyCycleValue",
+          "description": "Maximum uplink duty cycle (of all channels)."
+        },
+        "supports_32_bit_f_cnt": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Whether the device supports 32-bit frame counters.\nMust be set if the device MAC version is 1.0."
+        },
         "use_adr": {
           "type": "boolean",
-          "format": "boolean"
+          "format": "boolean",
+          "description": "Whether the Network Server should use ADR for the device."
         },
         "adr_margin": {
           "type": "number",
           "format": "float",
           "description": "The ADR margin tells the network server how much margin it should add in ADR requests.\nA bigger margin is less efficient, but gives a better chance of successful reception."
         },
-        "class_b_timeout": {
-          "type": "string",
-          "description": "Deadline for the device to respond to requests from the Network Server."
-        },
-        "class_c_timeout": {
-          "type": "string",
-          "description": "Deadline for the device to respond to requests from the Network Server."
+        "resets_f_cnt": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Whether the device resets the frame counters (not LoRaWAN compliant)."
         },
         "status_time_periodicity": {
           "type": "string",
@@ -7455,15 +7511,23 @@
           "format": "int64",
           "description": "Number of uplink messages after which a DevStatusReq MACCommand shall be sent."
         },
-        "rx1_delay": {
-          "$ref": "#/definitions/MACSettingsRxDelayValue"
+        "desired_rx1_delay": {
+          "$ref": "#/definitions/MACSettingsRxDelayValue",
+          "description": "The Rx1 delay Network Server should configure device to use via MAC commands or Join-Accept."
         },
-        "rx2_data_rate_index": {
-          "$ref": "#/definitions/MACSettingsDataRateIndexValue"
+        "desired_rx1_data_rate_offset": {
+          "type": "integer",
+          "format": "int64",
+          "description": "The Rx1 data rate offset Network Server should configure device to use via MAC commands or Join-Accept."
         },
-        "rx2_frequency": {
+        "desired_rx2_data_rate_index": {
+          "$ref": "#/definitions/MACSettingsDataRateIndexValue",
+          "description": "The Rx2 data rate index Network Server should configure device to use via MAC commands or Join-Accept."
+        },
+        "desired_rx2_frequency": {
           "type": "string",
-          "format": "uint64"
+          "format": "uint64",
+          "description": "The Rx2 frequency index Network Server should configure device to use via MAC commands."
         }
       }
     },

@@ -29,12 +29,11 @@ func NewPopulatedEndDeviceVersion(r randyEndDevice, easy bool) *EndDeviceVersion
 	if r.Intn(10) != 0 {
 		out.DefaultFormatters = *NewPopulatedMessagePayloadFormatters(r, easy)
 	}
-	out.DefaultMACParameters = NewPopulatedMACParameters(r, easy)
 	out.MaxFrequency = uint64(r.Uint32())
 	out.MinFrequency = uint64(r.Uint32()) % out.MaxFrequency
 	out.ResetsFCnt = bool(r.Intn(2) == 0)
-	out.Uses32BitFCnt = bool(r.Intn(2) == 0)
 	out.ResetsJoinNonces = bool(r.Intn(2) == 0)
+	out.DefaultMACSettings = NewPopulatedMACSettings(r, easy)
 	return out
 }
 
