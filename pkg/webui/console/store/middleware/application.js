@@ -41,7 +41,7 @@ const getApplicationApiKeysLogic = createLogic({
       dispatch(
         application.getApplicationApiKeysListSuccess(
           id,
-          res.applicationsApiKeys,
+          res.api_keys,
           res.totalCount
         )
       )

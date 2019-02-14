@@ -76,7 +76,7 @@ export default {
     create: ttnClient.Applications.create,
     update: ttnClient.Applications.updateById,
     apiKeys: {
-      list: stubs.application.apiKeys.list,
+      list: ttnClient.Applications.ApiKeys.getAll,
     },
   },
   devices: {
