@@ -75,3 +75,59 @@ changelog:
 
 release:
   prerelease: auto
+
+nfpm:
+  vendor: The Things Network
+  homepage: https://www.thethingsnetwork.org
+  maintainer: The Things Network Foundation <stack@thethingsnetwork.org>
+  description: The Things Network Stack for LoRaWAN
+  license: Apache 2.0
+  formats:
+    - deb
+    - rpm
+  recommends:
+    - redis
+    - cockroach
+  files:
+    "public/**/*": "/var/lib/ttn/public"
+
+snapcraft:
+  name: ttn-lw-stack
+  summary: The Things Network Stack for LoRaWAN
+  description: The Things Network Stack for LoRaWAN
+  grade: devel
+  confinement: strict
+
+# TODO: Generate separate formulas for stack+CLI and CLI only.(https://github.com/TheThingsNetwork/lorawan-stack/issues/108)
+brew:
+  name: ttn-lw-stack
+  github:
+    owner: TheThingsNetwork
+    name: homebrew-lorawan-stack
+  commit_author:
+    name: ttn-ci
+    email: stack@thethingsnetwork.org
+  homepage: https://www.thethingsnetwork.org
+  description: The Things Network Stack for LoRaWAN
+  skip_upload: auto
+  install: |
+    bin.install "ttn-lw-cli"
+    libexec.install %w[ttn-lw-stack public doc]
+    env = {
+        :TTN_LW_HTTP_STATIC_SEARCH_PATH => libexec/"public"
+    }
+    (bin/"ttn-lw-stack").write_env_script libexec/"ttn-lw-stack", env
+
+dockers:
+  - goos: linux
+    goarch: amd64
+    binaries:
+      - ttn-lw-cli
+      - ttn-lw-stack
+    image_templates:
+      - "thethingsnetwork/lorawan-stack:latest"
+      - "thethingsnetwork/lorawan-stack:{{ .Major }}"
+      - "thethingsnetwork/lorawan-stack:{{ .Major }}.{{ .Minor }}"
+      - "thethingsnetwork/lorawan-stack:{{ .Major }}.{{ .Minor }}.{{ .Patch }}"
+    extra_files:
+      - public
