@@ -15,9 +15,6 @@
 package networkserver
 
 import (
-	"math"
-
-	"github.com/mohae/deepcopy"
 	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -68,28 +65,135 @@ func resetMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttn
 	}
 
 	dev.MACState = &ttnpb.MACState{
-		DeviceClass:    ttnpb.CLASS_A,
 		LoRaWANVersion: dev.LoRaWANVersion,
-		CurrentParameters: ttnpb.MACParameters{
-			ADRAckDelay:      uint32(band.ADRAckDelay),
-			ADRAckLimit:      uint32(band.ADRAckLimit),
-			ADRNbTrans:       1,
-			MaxDutyCycle:     ttnpb.DUTY_CYCLE_1,
-			MaxEIRP:          band.DefaultMaxEIRP,
-			Rx1Delay:         ttnpb.RxDelay(band.ReceiveDelay1.Seconds()),
-			Rx2DataRateIndex: band.DefaultRx2Parameters.DataRateIndex,
-			Rx2Frequency:     band.DefaultRx2Parameters.Frequency,
-		},
-	}
-	if dev.SupportsClassB {
-		dev.MACState.DeviceClass = ttnpb.CLASS_B
 	}
 	if dev.SupportsClassC {
 		dev.MACState.DeviceClass = ttnpb.CLASS_C
+	} else if dev.SupportsClassB {
+		dev.MACState.DeviceClass = ttnpb.CLASS_B
+	} else {
+		dev.MACState.DeviceClass = ttnpb.CLASS_A
 	}
 
-	// NOTE: dev.MACState.CurrentParameters must not contain pointer values at this point.
-	dev.MACState.DesiredParameters = dev.MACState.CurrentParameters
+	dev.MACState.CurrentParameters.MaxEIRP = band.DefaultMaxEIRP
+	dev.MACState.DesiredParameters.MaxEIRP = dev.MACState.CurrentParameters.MaxEIRP
+	if fp.MaxEIRP != nil && *fp.MaxEIRP > 0 && *fp.MaxEIRP < dev.MACState.CurrentParameters.MaxEIRP {
+		dev.MACState.DesiredParameters.MaxEIRP = *fp.MaxEIRP
+	}
+
+	dev.MACState.CurrentParameters.UplinkDwellTime = false
+	dev.MACState.DesiredParameters.UplinkDwellTime = fp.DwellTime.GetUplinks()
+
+	dev.MACState.CurrentParameters.DownlinkDwellTime = false
+	dev.MACState.DesiredParameters.DownlinkDwellTime = fp.DwellTime.GetDownlinks()
+
+	dev.MACState.CurrentParameters.ADRDataRateIndex = ttnpb.DATA_RATE_0
+	dev.MACState.DesiredParameters.ADRDataRateIndex = dev.MACState.CurrentParameters.ADRDataRateIndex
+
+	dev.MACState.CurrentParameters.ADRTxPowerIndex = 0
+	dev.MACState.DesiredParameters.ADRTxPowerIndex = dev.MACState.CurrentParameters.ADRTxPowerIndex
+
+	dev.MACState.CurrentParameters.ADRNbTrans = 1
+	dev.MACState.DesiredParameters.ADRNbTrans = dev.MACState.CurrentParameters.ADRNbTrans
+
+	dev.MACState.CurrentParameters.ADRAckLimit = uint32(band.ADRAckLimit)
+	dev.MACState.DesiredParameters.ADRAckLimit = dev.MACState.CurrentParameters.ADRAckLimit
+
+	dev.MACState.CurrentParameters.ADRAckDelay = uint32(band.ADRAckDelay)
+	dev.MACState.DesiredParameters.ADRAckDelay = dev.MACState.CurrentParameters.ADRAckDelay
+
+	dev.MACState.CurrentParameters.Rx1Delay = ttnpb.RxDelay(band.ReceiveDelay1.Seconds())
+	if dev.GetMACSettings().GetRx1Delay() != nil {
+		dev.MACState.CurrentParameters.Rx1Delay = dev.MACSettings.Rx1Delay.Value
+	} else if defaults.Rx1Delay != nil {
+		dev.MACState.CurrentParameters.Rx1Delay = defaults.Rx1Delay.Value
+	}
+	dev.MACState.DesiredParameters.Rx1Delay = dev.MACState.CurrentParameters.Rx1Delay
+	if dev.GetMACSettings().GetDesiredRx1Delay() != nil {
+		dev.MACState.DesiredParameters.Rx1Delay = dev.MACSettings.Rx1Delay.Value
+	} else if defaults.DesiredRx1Delay != nil {
+		dev.MACState.DesiredParameters.Rx1Delay = defaults.Rx1Delay.Value
+	}
+
+	dev.MACState.CurrentParameters.Rx1DataRateOffset = 0
+	if dev.GetMACSettings().GetRx1DataRateOffset() != nil {
+		dev.MACState.CurrentParameters.Rx1DataRateOffset = dev.MACSettings.Rx1DataRateOffset.Value
+	} else if defaults.Rx1DataRateOffset != nil {
+		dev.MACState.CurrentParameters.Rx1DataRateOffset = defaults.Rx1DataRateOffset.Value
+	}
+	dev.MACState.DesiredParameters.Rx1DataRateOffset = dev.MACState.CurrentParameters.Rx1DataRateOffset
+	if dev.GetMACSettings().GetDesiredRx1DataRateOffset() != nil {
+		dev.MACState.DesiredParameters.Rx1DataRateOffset = dev.MACSettings.DesiredRx1DataRateOffset.Value
+	} else if defaults.DesiredRx1DataRateOffset != nil {
+		dev.MACState.DesiredParameters.Rx1DataRateOffset = defaults.DesiredRx1DataRateOffset.Value
+	}
+
+	dev.MACState.CurrentParameters.Rx2DataRateIndex = band.DefaultRx2Parameters.DataRateIndex
+	if dev.GetMACSettings().GetRx2DataRateIndex() != nil {
+		dev.MACState.CurrentParameters.Rx2DataRateIndex = dev.MACSettings.Rx2DataRateIndex.Value
+	} else if defaults.Rx2DataRateIndex != nil {
+		dev.MACState.CurrentParameters.Rx2DataRateIndex = defaults.Rx2DataRateIndex.Value
+	}
+	dev.MACState.DesiredParameters.Rx2DataRateIndex = dev.MACState.CurrentParameters.Rx2DataRateIndex
+	if dev.GetMACSettings().GetDesiredRx2DataRateIndex() != nil {
+		dev.MACState.DesiredParameters.Rx2DataRateIndex = dev.MACSettings.DesiredRx2DataRateIndex.Value
+	} else if defaults.DesiredRx2DataRateIndex != nil {
+		dev.MACState.DesiredParameters.Rx2DataRateIndex = defaults.DesiredRx2DataRateIndex.Value
+	} else if fp.DefaultRx2DataRate != nil {
+		dev.MACState.DesiredParameters.Rx2DataRateIndex = ttnpb.DataRateIndex(*fp.DefaultRx2DataRate)
+	}
+
+	dev.MACState.CurrentParameters.Rx2Frequency = band.DefaultRx2Parameters.Frequency
+	if dev.GetMACSettings().GetRx2Frequency() != 0 {
+		dev.MACState.CurrentParameters.Rx2Frequency = dev.MACSettings.Rx2Frequency
+	} else if defaults.Rx2Frequency != 0 {
+		dev.MACState.CurrentParameters.Rx2Frequency = defaults.Rx2Frequency
+	}
+	dev.MACState.DesiredParameters.Rx2Frequency = dev.MACState.CurrentParameters.Rx2Frequency
+	if dev.MACSettings != nil && dev.GetMACSettings().GetDesiredRx2Frequency() != 0 {
+		dev.MACState.DesiredParameters.Rx2Frequency = dev.MACSettings.DesiredRx2Frequency
+	} else if defaults.DesiredRx2Frequency != 0 {
+		dev.MACState.DesiredParameters.Rx2Frequency = defaults.DesiredRx2Frequency
+	} else if fp.Rx2Channel != nil {
+		dev.MACState.DesiredParameters.Rx2Frequency = fp.Rx2Channel.Frequency
+	}
+
+	dev.MACState.CurrentParameters.MaxDutyCycle = ttnpb.DUTY_CYCLE_1
+	if dev.GetMACSettings().GetMaxDutyCycle() != nil {
+		dev.MACState.CurrentParameters.MaxDutyCycle = dev.MACSettings.MaxDutyCycle.Value
+	}
+	dev.MACState.DesiredParameters.MaxDutyCycle = dev.MACState.CurrentParameters.MaxDutyCycle
+
+	dev.MACState.CurrentParameters.RejoinTimePeriodicity = ttnpb.REJOIN_TIME_0
+	dev.MACState.DesiredParameters.RejoinTimePeriodicity = dev.MACState.CurrentParameters.RejoinTimePeriodicity
+
+	dev.MACState.CurrentParameters.RejoinCountPeriodicity = ttnpb.REJOIN_COUNT_16
+	dev.MACState.DesiredParameters.RejoinCountPeriodicity = dev.MACState.CurrentParameters.RejoinCountPeriodicity
+
+	dev.MACState.CurrentParameters.PingSlotFrequency = 0
+	if dev.GetMACSettings().GetPingSlotFrequency() != 0 {
+		dev.MACState.CurrentParameters.PingSlotFrequency = dev.MACSettings.PingSlotFrequency
+	} else if defaults.PingSlotFrequency != 0 {
+		dev.MACState.CurrentParameters.PingSlotFrequency = defaults.PingSlotFrequency
+	}
+	dev.MACState.DesiredParameters.PingSlotFrequency = dev.MACState.CurrentParameters.PingSlotFrequency
+	if fp.PingSlot != nil && fp.PingSlot.Frequency != 0 {
+		dev.MACState.DesiredParameters.PingSlotFrequency = fp.PingSlot.Frequency
+	}
+
+	dev.MACState.CurrentParameters.PingSlotDataRateIndex = ttnpb.DATA_RATE_0
+	if dev.GetMACSettings().GetPingSlotDataRateIndex() != nil {
+		dev.MACState.CurrentParameters.PingSlotDataRateIndex = dev.MACSettings.PingSlotDataRateIndex.Value
+	} else if defaults.PingSlotDataRateIndex != nil {
+		dev.MACState.CurrentParameters.PingSlotDataRateIndex = defaults.PingSlotDataRateIndex.Value
+	}
+	dev.MACState.DesiredParameters.PingSlotDataRateIndex = dev.MACState.CurrentParameters.PingSlotDataRateIndex
+	if fp.DefaultPingSlotDataRate != nil {
+		dev.MACState.DesiredParameters.PingSlotDataRateIndex = ttnpb.DataRateIndex(*fp.DefaultPingSlotDataRate)
+	}
+
+	dev.MACState.CurrentParameters.BeaconFrequency = 0
+	dev.MACState.DesiredParameters.BeaconFrequency = dev.MACState.CurrentParameters.BeaconFrequency
 
 	if len(band.DownlinkChannels) > len(band.UplinkChannels) || len(fp.DownlinkChannels) > len(fp.UplinkChannels) ||
 		len(band.UplinkChannels) > int(band.MaxUplinkChannels) || len(band.DownlinkChannels) > int(band.MaxDownlinkChannels) ||
@@ -99,28 +203,42 @@ func resetMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttn
 		panic("uplink/downlink channel length is inconsistent")
 	}
 
-	dev.MACState.CurrentParameters.Channels = make([]*ttnpb.MACParameters_Channel, len(band.UplinkChannels))
-	dev.MACState.DesiredParameters.Channels = make([]*ttnpb.MACParameters_Channel, 0, len(band.UplinkChannels)+len(fp.UplinkChannels))
+	if len(dev.GetMACSettings().GetFactoryPresetFrequencies()) > 0 {
+		dev.MACState.CurrentParameters.Channels = make([]*ttnpb.MACParameters_Channel, 0, len(dev.MACSettings.FactoryPresetFrequencies))
+		for _, freq := range dev.MACSettings.FactoryPresetFrequencies {
+			dev.MACState.CurrentParameters.Channels = append(dev.MACState.CurrentParameters.Channels, &ttnpb.MACParameters_Channel{
+				MinDataRateIndex:  0,
+				MaxDataRateIndex:  ttnpb.DATA_RATE_15,
+				UplinkFrequency:   freq,
+				DownlinkFrequency: freq,
+				EnableUplink:      true,
+			})
+		}
+	} else {
+		dev.MACState.CurrentParameters.Channels = make([]*ttnpb.MACParameters_Channel, len(band.UplinkChannels))
+		for i, upCh := range band.UplinkChannels {
+			dev.MACState.CurrentParameters.Channels = append(dev.MACState.CurrentParameters.Channels, &ttnpb.MACParameters_Channel{
+				MinDataRateIndex: upCh.MinDataRate,
+				MaxDataRateIndex: upCh.MaxDataRate,
+				UplinkFrequency:  upCh.Frequency,
+				EnableUplink:     true,
+			})
+		}
+		for i, downCh := range band.DownlinkChannels {
+			dev.MACState.CurrentParameters.Channels[i].DownlinkFrequency = downCh.Frequency
+		}
+	}
 
+	dev.MACState.DesiredParameters.Channels = make([]*ttnpb.MACParameters_Channel, 0, len(band.UplinkChannels)+len(fp.UplinkChannels))
 	for i, upCh := range band.UplinkChannels {
-		ch := &ttnpb.MACParameters_Channel{
+		dev.MACState.DesiredParameters.Channels = append(dev.MACState.DesiredParameters.Channels, &ttnpb.MACParameters_Channel{
 			MinDataRateIndex: upCh.MinDataRate,
 			MaxDataRateIndex: upCh.MaxDataRate,
 			UplinkFrequency:  upCh.Frequency,
-			EnableUplink:     true,
-		}
-		dev.MACState.CurrentParameters.Channels[i] = ch
+		})
 	}
-
 	for i, downCh := range band.DownlinkChannels {
-		// NOTE: len(band.DownlinkChannels) <= len(band.UplinkChannels) => i < len(dev.MACState.CurrentParameters.Channels)
-		dev.MACState.CurrentParameters.Channels[i].DownlinkFrequency = downCh.Frequency
-	}
-
-	for _, ch := range dev.MACState.CurrentParameters.Channels {
-		chCopy := *ch
-		chCopy.EnableUplink = false
-		dev.MACState.DesiredParameters.Channels = append(dev.MACState.DesiredParameters.Channels, &chCopy)
+		dev.MACState.DesiredParameters.Channels[i].DownlinkFrequency = downCh.Frequency
 	}
 
 outerUp:
@@ -155,45 +273,6 @@ outerDown:
 			}
 		}
 		panic("uplink/downlink channel length is inconsistent")
-	}
-
-	dev.MACState.DesiredParameters.UplinkDwellTime = fp.DwellTime.GetUplinks()
-	dev.MACState.DesiredParameters.DownlinkDwellTime = fp.DwellTime.GetDownlinks()
-
-	if dev.GetMACSettings().GetRx1Delay() != nil {
-		dev.MACState.DesiredParameters.Rx1Delay = dev.MACSettings.Rx1Delay.Value
-	} else if defaults.Rx1Delay != nil {
-		dev.MACState.DesiredParameters.Rx1Delay = defaults.Rx1Delay.Value
-	}
-
-	if dev.GetMACSettings().GetRx2Frequency() != nil {
-		dev.MACState.DesiredParameters.Rx2Frequency = dev.MACSettings.Rx2Frequency.Value
-	} else if fp.Rx2Channel != nil {
-		dev.MACState.DesiredParameters.Rx2Frequency = fp.Rx2Channel.Frequency
-	} else if defaults.Rx2Frequency != nil {
-		dev.MACState.DesiredParameters.Rx2Frequency = defaults.Rx2Frequency.Value
-	}
-
-	if dev.GetMACSettings().GetRx2DataRateIndex() != nil {
-		dev.MACState.DesiredParameters.Rx2DataRateIndex = dev.MACSettings.Rx2DataRateIndex.Value
-	} else if fp.DefaultRx2DataRate != nil {
-		dev.MACState.DesiredParameters.Rx2DataRateIndex = ttnpb.DataRateIndex(*fp.DefaultRx2DataRate)
-	} else if defaults.Rx2DataRateIndex != nil {
-		dev.MACState.DesiredParameters.Rx2DataRateIndex = defaults.Rx2DataRateIndex.Value
-	}
-
-	if fp.PingSlot != nil {
-		dev.MACState.DesiredParameters.PingSlotFrequency = fp.PingSlot.Frequency
-	}
-	if fp.DefaultPingSlotDataRate != nil {
-		dev.MACState.DesiredParameters.PingSlotDataRateIndex = ttnpb.DataRateIndex(*fp.DefaultPingSlotDataRate)
-	}
-	if fp.MaxEIRP != nil && *fp.MaxEIRP > 0 {
-		dev.MACState.DesiredParameters.MaxEIRP = float32(math.Min(float64(dev.MACState.CurrentParameters.MaxEIRP), float64(*fp.MaxEIRP)))
-	}
-
-	if dev.DefaultMACParameters != nil {
-		dev.MACState.CurrentParameters = deepcopy.Copy(*dev.DefaultMACParameters).(ttnpb.MACParameters)
 	}
 
 	return nil
