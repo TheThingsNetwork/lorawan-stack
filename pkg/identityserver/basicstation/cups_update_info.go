@@ -39,13 +39,14 @@ const (
 	cupsAttribute               = "_cups"
 	cupsURIAttribute            = "_cups_uri"
 	cupsLastSeenAttribute       = "_cups_last_seen"
-	cupsCredentialsAttribute    = "_cups_credentials"
 	cupsCredentialsIDAttribute  = "_cups_credentials_id"
+	cupsCredentialsAttribute    = "_cups_credentials"
 	cupsCredentialsCRCAttribute = "_cups_credentials_crc"
 	cupsStationAttribute        = "_cups_station"
 	cupsModelAttribute          = "_cups_model"
 	cupsPackageAttribute        = "_cups_package"
 	lnsCredentialsIDAttribute   = "_lns_credentials_id"
+	lnsCredentialsAttribute     = "_lns_credentials"
 	lnsCredentialsCRCAttribute  = "_lns_credentials_crc"
 )
 
@@ -163,25 +164,31 @@ func (s *CUPSServer) UpdateInfo(c echo.Context) error {
 		res.LNSURI = gtw.GatewayServerAddress // TODO: Clean / Format.
 	}
 	if gtw.Attributes[cupsCredentialsCRCAttribute] != strconv.FormatUint(uint64(req.CUPSCredentialsCRC), 10) {
-		apiKey, err := s.gatewayAccess.CreateAPIKey(ctx, &ttnpb.CreateGatewayAPIKeyRequest{
-			GatewayIdentifiers: gtw.GatewayIdentifiers,
-			Name:               fmt.Sprintf("CUPS Key, generated %s", time.Now().UTC().Format(time.RFC3339)),
-			Rights: []ttnpb.Right{
-				ttnpb.RIGHT_GATEWAY_INFO,              // We need to read private attributes.
-				ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC,    // We need to write attributes.
-				ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS, // We need to create API keys.
-				ttnpb.RIGHT_GATEWAY_LINK,              // We need to create the LNS API key with this right.
-			},
-		}, authorization)
-		if err != nil {
-			return err
+		if gtw.Attributes[cupsCredentialsAttribute] == "" {
+			if gtw.Attributes[cupsCredentialsIDAttribute] != "" {
+				// TODO: Try deleting old CUPS credentials.
+			}
+			apiKey, err := s.gatewayAccess.CreateAPIKey(ctx, &ttnpb.CreateGatewayAPIKeyRequest{
+				GatewayIdentifiers: gtw.GatewayIdentifiers,
+				Name:               fmt.Sprintf("CUPS Key, generated %s", time.Now().UTC().Format(time.RFC3339)),
+				Rights: []ttnpb.Right{
+					ttnpb.RIGHT_GATEWAY_INFO,              // We need to read private attributes.
+					ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC,    // We need to write attributes.
+					ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS, // We need to create API keys.
+					ttnpb.RIGHT_GATEWAY_LINK,              // We need to create the LNS API key with this right.
+				},
+			}, authorization)
+			if err != nil {
+				return err
+			}
+			gtw.Attributes[cupsCredentialsIDAttribute] = apiKey.ID
+			gtw.Attributes[cupsCredentialsAttribute] = apiKey.Key
 		}
-		gtw.Attributes[cupsCredentialsIDAttribute] = apiKey.ID
 		trust, err := s.getTrust(gtw.Attributes[cupsURIAttribute])
 		if err != nil {
 			return err
 		}
-		creds, err := TokenCredentials(trust, apiKey.Key)
+		creds, err := TokenCredentials(trust, gtw.Attributes[cupsCredentialsAttribute])
 		if err != nil {
 			return err
 		}
@@ -189,23 +196,29 @@ func (s *CUPSServer) UpdateInfo(c echo.Context) error {
 		gtw.Attributes[cupsCredentialsCRCAttribute] = strconv.FormatUint(uint64(crc32.ChecksumIEEE(res.CUPSCredentials)), 10)
 	}
 	if gtw.Attributes[lnsCredentialsCRCAttribute] != strconv.FormatUint(uint64(req.LNSCredentialsCRC), 10) {
-		apiKey, err := s.gatewayAccess.CreateAPIKey(ctx, &ttnpb.CreateGatewayAPIKeyRequest{
-			GatewayIdentifiers: gtw.GatewayIdentifiers,
-			Name:               fmt.Sprintf("LNS Key, generated %s", time.Now().UTC().Format(time.RFC3339)),
-			Rights: []ttnpb.Right{
-				ttnpb.RIGHT_GATEWAY_INFO,
-				ttnpb.RIGHT_GATEWAY_LINK,
-			},
-		}, authorization)
-		if err != nil {
-			return err
+		if gtw.Attributes[lnsCredentialsAttribute] == "" {
+			if gtw.Attributes[lnsCredentialsIDAttribute] != "" {
+				// TODO: Try deleting old LNS credentials.
+			}
+			apiKey, err := s.gatewayAccess.CreateAPIKey(ctx, &ttnpb.CreateGatewayAPIKeyRequest{
+				GatewayIdentifiers: gtw.GatewayIdentifiers,
+				Name:               fmt.Sprintf("LNS Key, generated %s", time.Now().UTC().Format(time.RFC3339)),
+				Rights: []ttnpb.Right{
+					ttnpb.RIGHT_GATEWAY_INFO,
+					ttnpb.RIGHT_GATEWAY_LINK,
+				},
+			}, authorization)
+			if err != nil {
+				return err
+			}
+			gtw.Attributes[lnsCredentialsIDAttribute] = apiKey.ID
+			gtw.Attributes[lnsCredentialsAttribute] = apiKey.Key
 		}
-		gtw.Attributes[lnsCredentialsIDAttribute] = apiKey.ID
 		trust, err := s.getTrust(gtw.GatewayServerAddress)
 		if err != nil {
 			return err
 		}
-		creds, err := TokenCredentials(trust, apiKey.Key)
+		creds, err := TokenCredentials(trust, gtw.Attributes[lnsCredentialsAttribute])
 		if err != nil {
 			return err
 		}
