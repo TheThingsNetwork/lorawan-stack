@@ -67,7 +67,6 @@ func (s *CUPSServer) UpdateInfo(c echo.Context) error {
 	}
 
 	ctx := getContext(c)
-	// TODO: Extend Context.
 
 	md := rpcmetadata.FromIncomingContext(ctx)
 
@@ -78,7 +77,7 @@ func (s *CUPSServer) UpdateInfo(c echo.Context) error {
 
 	switch strings.ToLower(md.AuthType) {
 	case "":
-		// TODO: check c.Request().TLS.PeerCertificates
+		// TODO: Support TLS Client Auth (https://github.com/TheThingsNetwork/lorawan-stack/issues/137).
 		return errUnauthenticated
 	case "bearer":
 		if _, _, _, err := auth.SplitToken(md.AuthValue); err == nil {
