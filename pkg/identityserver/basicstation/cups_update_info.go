@@ -154,8 +154,10 @@ func (s *CUPSServer) UpdateInfo(c echo.Context) error {
 
 	res := UpdateInfoResponse{}
 
-	if cupsURI := gtw.Attributes[cupsURIAttribute]; cupsURI != "" && cupsURI != req.CUPSURI {
-		res.CUPSURI = cupsURI
+	if s.allowCUPSURIUpdate {
+		if cupsURI := gtw.Attributes[cupsURIAttribute]; cupsURI != "" && cupsURI != req.CUPSURI {
+			res.CUPSURI = cupsURI
+		}
 	}
 	if gtw.GatewayServerAddress != "" && gtw.GatewayServerAddress != req.LNSURI {
 		res.LNSURI = gtw.GatewayServerAddress // TODO: Clean / Format.

@@ -42,6 +42,8 @@ type CUPSServer struct {
 	registerUnknown       bool
 	defaultOwner          ttnpb.OrganizationOrUserIdentifiers
 
+	allowCUPSURIUpdate bool
+
 	rootCAs *x509.CertPool
 	trust   *x509.Certificate
 
@@ -78,6 +80,14 @@ func WithRegisterUnknown(owner *ttnpb.OrganizationOrUserIdentifiers) Option {
 		} else {
 			s.registerUnknown, s.defaultOwner = false, ttnpb.OrganizationOrUserIdentifiers{}
 		}
+	}
+}
+
+// WithAllowCUPSURIUpdate configures the CUPS server to allow updates of the CUPS
+// Server URI.
+func WithAllowCUPSURIUpdate(allow bool) Option {
+	return func(s *CUPSServer) {
+		s.allowCUPSURIUpdate = allow
 	}
 }
 

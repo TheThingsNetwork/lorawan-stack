@@ -275,6 +275,7 @@ func TestCUPSServer(t *testing.T) {
 				WithTrust(&x509.Certificate{
 					Raw: []byte("FAKE CERTIFICATE CONTENTS"),
 				}),
+				WithAllowCUPSURIUpdate(true),
 			},
 			RequestSetup: func(req *http.Request) {
 				req.Header.Set(echo.HeaderAuthorization, "Bearer "+auth.JoinToken(auth.APIKey, "ID", "KEY"))
