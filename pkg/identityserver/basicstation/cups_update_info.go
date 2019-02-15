@@ -188,12 +188,16 @@ func (s *CUPSServer) UpdateInfo(c echo.Context) error {
 		if err != nil {
 			return err
 		}
-		creds, err := TokenCredentials(trust, gtw.Attributes[cupsCredentialsAttribute])
-		if err != nil {
-			return err
+		if trust != nil {
+			creds, err := TokenCredentials(trust, gtw.Attributes[cupsCredentialsAttribute])
+			if err != nil {
+				return err
+			}
+			res.CUPSCredentials = creds
+			gtw.Attributes[cupsCredentialsCRCAttribute] = strconv.FormatUint(uint64(crc32.ChecksumIEEE(res.CUPSCredentials)), 10)
+		} else {
+			delete(gtw.Attributes, cupsCredentialsCRCAttribute)
 		}
-		res.CUPSCredentials = creds
-		gtw.Attributes[cupsCredentialsCRCAttribute] = strconv.FormatUint(uint64(crc32.ChecksumIEEE(res.CUPSCredentials)), 10)
 	}
 	if gtw.Attributes[lnsCredentialsCRCAttribute] != strconv.FormatUint(uint64(req.LNSCredentialsCRC), 10) {
 		if gtw.Attributes[lnsCredentialsAttribute] == "" {
@@ -218,12 +222,16 @@ func (s *CUPSServer) UpdateInfo(c echo.Context) error {
 		if err != nil {
 			return err
 		}
-		creds, err := TokenCredentials(trust, gtw.Attributes[lnsCredentialsAttribute])
-		if err != nil {
-			return err
+		if trust != nil {
+			creds, err := TokenCredentials(trust, gtw.Attributes[lnsCredentialsAttribute])
+			if err != nil {
+				return err
+			}
+			res.LNSCredentials = creds
+			gtw.Attributes[lnsCredentialsCRCAttribute] = strconv.FormatUint(uint64(crc32.ChecksumIEEE(res.LNSCredentials)), 10)
+		} else {
+			delete(gtw.Attributes, lnsCredentialsCRCAttribute)
 		}
-		res.LNSCredentials = creds
-		gtw.Attributes[lnsCredentialsCRCAttribute] = strconv.FormatUint(uint64(crc32.ChecksumIEEE(res.LNSCredentials)), 10)
 	}
 	if gtw.AutoUpdate {
 		// TODO:
