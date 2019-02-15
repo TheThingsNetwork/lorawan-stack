@@ -305,11 +305,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 				fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
 				rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
 				rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint8))].DownlinkFrequency
-				payload, _, err := GenerateDownlink(ctx, CopyEndDevice(pb),
+				payload, _, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
 					band.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 					band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
-					ns.FrequencyPlans,
-					ns.defaultMACSettings,
 				)
 				if !a.So(err, should.BeNil) {
 					t.Fatalf("Failed to generate Rx2 payload: %s", err)
@@ -381,11 +379,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 					if rx1DRIdx < drIdx {
 						drIdx = rx1DRIdx
 					}
-					payload, _, err := GenerateDownlink(ctx, CopyEndDevice(pb),
+					payload, _, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
 						band.DataRates[drIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
-						ns.FrequencyPlans,
-						ns.defaultMACSettings,
 					)
 					if !a.So(err, should.BeNil) {
 						t.Fatalf("Failed to generate Rx2 payload: %s", err)
@@ -733,11 +729,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 				fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
 				rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
 				rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint8))].DownlinkFrequency
-				payload, _, err := GenerateDownlink(ctx, CopyEndDevice(pb),
+				payload, _, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
 					band.DataRates[rx1DRIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 					band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
-					ns.FrequencyPlans,
-					ns.defaultMACSettings,
 				)
 				if !a.So(err, should.BeNil) {
 					t.Fatalf("Failed to generate Rx1 payload: %s", err)
@@ -805,11 +799,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 					fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
 					rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
 					rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint8))].DownlinkFrequency
-					payload, _, err := GenerateDownlink(ctx, CopyEndDevice(pb),
+					payload, _, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
 						band.DataRates[rx1DRIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
-						ns.FrequencyPlans,
-						ns.defaultMACSettings,
 					)
 					if !a.So(err, should.BeNil) {
 						t.Fatalf("Failed to generate Rx1 payload: %s", err)
@@ -1148,11 +1140,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 					t.Fatal("Invalid context")
 				}
 				fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
-				rx2Payload, _, err := GenerateDownlink(ctx, CopyEndDevice(pb),
+				rx2Payload, _, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
 					band.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 					band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
-					ns.FrequencyPlans,
-					ns.defaultMACSettings,
 				)
 				if !a.So(err, should.BeNil) {
 					t.Fatalf("Failed to generate Rx2 payload: %s", err)
@@ -1222,20 +1212,16 @@ func TestProcessDownlinkTask(t *testing.T) {
 					fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
 					rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
 					rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint8))].DownlinkFrequency
-					rx1Payload, _, err := GenerateDownlink(ctx, CopyEndDevice(pb),
+					rx1Payload, _, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
 						band.DataRates[rx1DRIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
-						ns.FrequencyPlans,
-						ns.defaultMACSettings,
 					)
 					if !a.So(err, should.BeNil) {
 						t.Fatalf("Failed to generate Rx1 payload: %s", err)
 					}
-					rx2Payload, _, err := GenerateDownlink(ctx, CopyEndDevice(pb),
+					rx2Payload, _, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
 						band.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
-						ns.FrequencyPlans,
-						ns.defaultMACSettings,
 					)
 					if !a.So(err, should.BeNil) {
 						t.Fatalf("Failed to generate Rx2 payload: %s", err)
@@ -1731,11 +1717,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 					t.Fatal("Invalid context")
 				}
 				fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
-				rx2Payload, _, err := GenerateDownlink(ctx, CopyEndDevice(pb),
+				rx2Payload, _, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
 					band.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 					band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
-					ns.FrequencyPlans,
-					ns.defaultMACSettings,
 				)
 				if !a.So(err, should.BeNil) {
 					t.Fatalf("Failed to generate Rx2 payload: %s", err)
@@ -1808,20 +1792,16 @@ func TestProcessDownlinkTask(t *testing.T) {
 					fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
 					rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
 					rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint8))].DownlinkFrequency
-					rx1Payload, _, err := GenerateDownlink(ctx, CopyEndDevice(pb),
+					rx1Payload, _, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
 						band.DataRates[rx1DRIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
-						ns.FrequencyPlans,
-						ns.defaultMACSettings,
 					)
 					if !a.So(err, should.BeNil) {
 						t.Fatalf("Failed to generate Rx1 payload: %s", err)
 					}
-					rx2Payload, _, err := GenerateDownlink(ctx, CopyEndDevice(pb),
+					rx2Payload, _, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
 						band.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
-						ns.FrequencyPlans,
-						ns.defaultMACSettings,
 					)
 					if !a.So(err, should.BeNil) {
 						t.Fatalf("Failed to generate Rx2 payload: %s", err)
@@ -3508,12 +3488,26 @@ func TestGenerateDownlink(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
+			ns := test.Must(New(
+				component.MustNew(test.GetLogger(t),
+					&component.Config{},
+				),
+				&Config{
+					DeduplicationWindow:           42,
+					CooldownWindow:                42,
+					DownlinkTasks:                 &MockDownlinkTaskQueue{},
+					Devices:                       &MockDeviceRegistry{},
+					DefaultStatusTimePeriodicity:  DurationPtr(0),
+					DefaultStatusCountPeriodicity: func(v uint32) *uint32 { return &v }(0),
+				},
+			)).(*NetworkServer)
+			ns.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
+			test.Must(nil, ns.Start())
+			defer ns.Close()
+
 			dev := CopyEndDevice(tc.Device)
 
-			b, appDown, err := generateDownlink(tc.Context, dev, math.MaxUint16, math.MaxUint16, frequencyplans.NewStore(test.FrequencyPlansFetcher), ttnpb.MACSettings{
-				StatusTimePeriodicity:  DurationPtr(0),
-				StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
-			})
+			b, appDown, err := ns.generateDownlink(tc.Context, dev, math.MaxUint16, math.MaxUint16)
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 				tc.Error == nil && !a.So(err, should.BeNil) {
 				t.FailNow()

@@ -82,14 +82,14 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 	if len(up.RawPayload) < 4 {
 		return nil, nil, errRawPayloadTooShort
 	}
-	b := up.RawPayload[:len(up.RawPayload)-4]
+	macPayloadBytes := up.RawPayload[:len(up.RawPayload)-4]
 
 	pld := up.Payload.GetMACPayload()
 
 	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"dev_addr", pld.DevAddr,
 		"uplink_f_cnt", pld.FCnt,
-		"payload_length", len(b),
+		"payload_length", len(macPayloadBytes),
 	))
 
 	type device struct {
@@ -274,16 +274,21 @@ outer:
 		}
 
 		if dev.matchedSession.FNwkSIntKey == nil || len(dev.matchedSession.FNwkSIntKey.Key) == 0 {
-			logger.Warn("Device missing FNwkSIntKey in registry")
+			logger.Warn("Device missing FNwkSIntKey in registry, skipping...")
 			continue
 		}
 
 		var fNwkSIntKey types.AES128Key
 		if dev.matchedSession.FNwkSIntKey.KEKLabel != "" {
-			// TODO: https://github.com/TheThingsNetwork/lorawan-stack/issues/5
-			panic("unsupported")
+			b, err := ns.Component.KeyVault.Unwrap(dev.matchedSession.FNwkSIntKey.Key, dev.matchedSession.FNwkSIntKey.KEKLabel)
+			if err != nil {
+				logger.WithField("kek_label", dev.matchedSession.FNwkSIntKey.KEKLabel).WithError(err).Error("Failed to unwrap FNwkSIntKey, skipping...")
+				continue
+			}
+			copy(fNwkSIntKey[:], b)
+		} else {
+			copy(fNwkSIntKey[:], dev.matchedSession.FNwkSIntKey.Key[:])
 		}
-		copy(fNwkSIntKey[:], dev.matchedSession.FNwkSIntKey.Key[:])
 
 		var computedMIC [4]byte
 		var err error
@@ -292,20 +297,25 @@ outer:
 				fNwkSIntKey,
 				pld.DevAddr,
 				dev.fCnt,
-				b,
+				macPayloadBytes,
 			)
 		} else {
 			if dev.matchedSession.SNwkSIntKey == nil || len(dev.matchedSession.SNwkSIntKey.Key) == 0 {
-				logger.Warn("Device missing SNwkSIntKey in registry")
+				logger.Warn("Device missing SNwkSIntKey in registry, skipping...")
 				continue
 			}
 
 			var sNwkSIntKey types.AES128Key
 			if dev.matchedSession.SNwkSIntKey.KEKLabel != "" {
-				// TODO: https://github.com/TheThingsNetwork/lorawan-stack/issues/5
-				panic("unsupported")
+				b, err := ns.Component.KeyVault.Unwrap(dev.matchedSession.SNwkSIntKey.Key, dev.matchedSession.SNwkSIntKey.KEKLabel)
+				if err != nil {
+					logger.WithField("kek_label", dev.matchedSession.SNwkSIntKey.KEKLabel).WithError(err).Error("Failed to unwrap SNwkSIntKey, skipping...")
+					continue
+				}
+				copy(sNwkSIntKey[:], b)
+			} else {
+				copy(sNwkSIntKey[:], dev.matchedSession.SNwkSIntKey.Key[:])
 			}
-			copy(sNwkSIntKey[:], dev.matchedSession.SNwkSIntKey.Key[:])
 
 			var confFCnt uint32
 			if pld.Ack {
@@ -332,7 +342,7 @@ outer:
 				chIdx,
 				pld.DevAddr,
 				dev.fCnt,
-				b,
+				macPayloadBytes,
 			)
 		}
 		if err != nil {
@@ -426,10 +436,15 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 
 		var key types.AES128Key
 		if ses.NwkSEncKey.KEKLabel != "" {
-			// TODO: https://github.com/TheThingsNetwork/lorawan-stack/issues/5
-			panic("unsupported")
+			b, err := ns.Component.KeyVault.Unwrap(ses.NwkSEncKey.Key, ses.NwkSEncKey.KEKLabel)
+			if err != nil {
+				logger.WithField("kek_label", ses.NwkSEncKey.KEKLabel).WithError(err).Error("Failed to unwrap NwkSEncKey")
+				return err
+			}
+			copy(key[:], b)
+		} else {
+			copy(key[:], ses.NwkSEncKey.Key[:])
 		}
-		copy(key[:], ses.NwkSEncKey.Key[:])
 
 		mac, err = crypto.DecryptUplink(key, pld.DevAddr, pld.FCnt, mac)
 		if err != nil {
