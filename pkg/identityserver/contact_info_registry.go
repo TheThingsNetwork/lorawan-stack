@@ -21,6 +21,8 @@ import (
 	"github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/pkg/auth"
+	"go.thethings.network/lorawan-stack/pkg/email"
+	"go.thethings.network/lorawan-stack/pkg/identityserver/emails"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -81,8 +83,19 @@ func (is *IdentityServer) requestContactInfoValidation(ctx context.Context, ids 
 		if err != nil {
 			return nil, err
 		}
-		// TODO: Send validation email (https://github.com/TheThingsNetwork/lorawan-stack/issues/72).
-		for _, validation := range emailValidations {
+		for address, validation := range emailValidations {
+			err := is.SendEmail(ctx, func(data emails.Data) email.MessageData {
+				data.User.Email = address
+				data.SetEntity(validation.Entity)
+				return emails.Validate{
+					Data:  data,
+					ID:    validation.ID,
+					Token: validation.Token,
+				}
+			})
+			if err != nil {
+				log.FromContext(ctx).WithError(err).Error("Could not send validation email")
+			}
 			pendingContactInfo = append(pendingContactInfo, validation.ContactInfo...)
 			validation.Token = "" // Unset tokens after sending emails
 		}

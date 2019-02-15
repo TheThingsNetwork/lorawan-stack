@@ -104,6 +104,26 @@ func (ids EntityIdentifiers) IDString() string {
 	}
 }
 
+// EntityType returns the entity type for the Identifiers inside the oneof.
+func (ids EntityIdentifiers) EntityType() string {
+	switch ids.Ids.(type) {
+	case *EntityIdentifiers_ApplicationIDs:
+		return "application"
+	case *EntityIdentifiers_ClientIDs:
+		return "client"
+	case *EntityIdentifiers_DeviceIDs:
+		return "end device"
+	case *EntityIdentifiers_GatewayIDs:
+		return "gateway"
+	case *EntityIdentifiers_OrganizationIDs:
+		return "organization"
+	case *EntityIdentifiers_UserIDs:
+		return "user"
+	default:
+		panic("missed oneof type in EntityIdentifiers.EntityType()")
+	}
+}
+
 // EntityIdentifiers returns the ApplicationIdentifiers as EntityIdentifiers.
 func (ids ApplicationIdentifiers) EntityIdentifiers() *EntityIdentifiers {
 	return &EntityIdentifiers{Ids: &EntityIdentifiers_ApplicationIDs{

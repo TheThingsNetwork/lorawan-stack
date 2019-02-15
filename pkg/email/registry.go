@@ -57,8 +57,8 @@ type registeredTemplate struct {
 
 func (r *TemplateRegistry) getTemplate(data MessageData) (m *MessageTemplate, err error) {
 	name := data.TemplateName()
-	registeredI, ok := r.registry.LoadOrStore(name, registeredTemplate{ready: make(chan struct{})})
-	registered := registeredI.(registeredTemplate)
+	registeredI, ok := r.registry.LoadOrStore(name, &registeredTemplate{ready: make(chan struct{})})
+	registered := registeredI.(*registeredTemplate)
 	if ok {
 		<-registered.ready
 		return registered.m, registered.err

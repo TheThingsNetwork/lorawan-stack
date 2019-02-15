@@ -2078,6 +2078,15 @@
       "file": "devicerepository.go"
     }
   },
+  "error:pkg/email/sendgrid:email_not_sent": {
+    "translations": {
+      "en": "email was not sent"
+    },
+    "description": {
+      "package": "pkg/email/sendgrid",
+      "file": "sendgrid.go"
+    }
+  },
   "error:pkg/encoding/lorawan:decode": {
     "translations": {
       "en": "could not decode `{lorawan_field}`"

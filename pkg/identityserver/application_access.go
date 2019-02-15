@@ -20,8 +20,11 @@ import (
 	"github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/pkg/email"
 	"go.thethings.network/lorawan-stack/pkg/events"
+	"go.thethings.network/lorawan-stack/pkg/identityserver/emails"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 )
@@ -67,7 +70,13 @@ func (is *IdentityServer) createApplicationAPIKey(ctx context.Context, req *ttnp
 	}
 	key.Key = token
 	events.Publish(evtCreateApplicationAPIKey(ctx, req.ApplicationIdentifiers, nil))
-	// TODO: Send notification email (https://github.com/TheThingsNetwork/lorawan-stack/issues/72).
+	err = is.SendContactsEmail(ctx, req.EntityIdentifiers(), func(data emails.Data) email.MessageData {
+		data.SetEntity(req.EntityIdentifiers())
+		return &emails.APIKeyCreated{Data: data, Identifier: key.PrettyName(), Rights: key.Rights}
+	})
+	if err != nil {
+		log.FromContext(ctx).WithError(err).Error("Could not send API key creation notification email")
+	}
 	return key, nil
 }
 
@@ -111,7 +120,13 @@ func (is *IdentityServer) updateApplicationAPIKey(ctx context.Context, req *ttnp
 	key.Key = ""
 	if len(req.Rights) > 0 {
 		events.Publish(evtUpdateApplicationAPIKey(ctx, req.ApplicationIdentifiers, nil))
-		// TODO: Send notification email (https://github.com/TheThingsNetwork/lorawan-stack/issues/72).
+		err = is.SendContactsEmail(ctx, req.EntityIdentifiers(), func(data emails.Data) email.MessageData {
+			data.SetEntity(req.EntityIdentifiers())
+			return &emails.APIKeyChanged{Data: data, Identifier: key.PrettyName(), Rights: key.Rights}
+		})
+		if err != nil {
+			log.FromContext(ctx).WithError(err).Error("Could not send API key update notification email")
+		}
 	} else {
 		events.Publish(evtDeleteApplicationAPIKey(ctx, req.ApplicationIdentifiers, nil))
 	}
@@ -140,7 +155,13 @@ func (is *IdentityServer) setApplicationCollaborator(ctx context.Context, req *t
 	}
 	if len(req.Collaborator.Rights) > 0 {
 		events.Publish(evtUpdateApplicationCollaborator(ctx, req.ApplicationIdentifiers, nil))
-		// TODO: Send notification email (https://github.com/TheThingsNetwork/lorawan-stack/issues/72).
+		err = is.SendContactsEmail(ctx, req.EntityIdentifiers(), func(data emails.Data) email.MessageData {
+			data.SetEntity(req.EntityIdentifiers())
+			return &emails.CollaboratorChanged{Data: data, Collaborator: req.Collaborator}
+		})
+		if err != nil {
+			log.FromContext(ctx).WithError(err).Error("Could not send collaborator updated notification email")
+		}
 	} else {
 		events.Publish(evtDeleteApplicationCollaborator(ctx, req.ApplicationIdentifiers, nil))
 	}
