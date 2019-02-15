@@ -12,24 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package basicstation_test
+package cups_test
 
 import (
 	"bytes"
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/identityserver/basicstation"
+	"go.thethings.network/lorawan-stack/pkg/basicstation/cups"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func TestUpdateInfoResponse(t *testing.T) {
 	for _, tt := range []struct {
 		Name string
-		basicstation.UpdateInfoResponse
+		cups.UpdateInfoResponse
 	}{
 		{Name: "Empty"},
-		{Name: "Full", UpdateInfoResponse: basicstation.UpdateInfoResponse{
+		{Name: "Full", UpdateInfoResponse: cups.UpdateInfoResponse{
 			CUPSURI:         "https://cups.example.com",
 			LNSURI:          "https://lns.example.com",
 			CUPSCredentials: bytes.Repeat([]byte("CUPS CREDENTIALS"), 1000),
@@ -45,7 +45,7 @@ func TestUpdateInfoResponse(t *testing.T) {
 			data, err := tt.UpdateInfoResponse.MarshalBinary()
 			a.So(err, should.BeNil)
 
-			var dec basicstation.UpdateInfoResponse
+			var dec cups.UpdateInfoResponse
 			err = dec.UnmarshalBinary(data)
 			a.So(err, should.BeNil)
 			a.So(dec, should.Resemble, tt.UpdateInfoResponse)
