@@ -259,6 +259,7 @@ outer:
 		break
 
 	case dev.MACState.DeviceClass == ttnpb.CLASS_C &&
+		dev.MACState.LastConfirmedDownlinkAt != nil &&
 		dev.MACState.LastConfirmedDownlinkAt.Add(deviceClassCTimeout(dev, ns.defaultMACSettings)).After(time.Now()):
 		return nil, nil, errScheduleTooSoon
 
