@@ -479,7 +479,7 @@ func (m *Manager) setDefaults(prefix string, flags *pflag.FlagSet, config interf
 				flags.StringP(name, shorthand, str, description)
 
 			case types.NetID:
-				str := fmt.Sprintf("%X", val)
+				str := val.String()
 				m.viper.SetDefault(name, str)
 				flags.StringP(name, shorthand, str, description)
 
