@@ -2750,6 +2750,7 @@ func TestGenerateDownlink(t *testing.T) {
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
 				Session: &ttnpb.Session{
+					DevAddr:       DevAddr,
 					LastNFCntDown: 41,
 					SessionKeys: ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
@@ -2804,6 +2805,7 @@ func TestGenerateDownlink(t *testing.T) {
 						LoRaWANVersion: ttnpb.MAC_V1_1,
 					},
 					Session: &ttnpb.Session{
+						DevAddr:       DevAddr,
 						LastNFCntDown: 42,
 						SessionKeys: ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
@@ -2845,6 +2847,7 @@ func TestGenerateDownlink(t *testing.T) {
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
 				Session: &ttnpb.Session{
+					DevAddr: DevAddr,
 					SessionKeys: ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
 							Key: NwkSEncKey[:],
@@ -2910,6 +2913,7 @@ func TestGenerateDownlink(t *testing.T) {
 						LoRaWANVersion: ttnpb.MAC_V1_1,
 					},
 					Session: &ttnpb.Session{
+						DevAddr: DevAddr,
 						SessionKeys: ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
 								Key: NwkSEncKey[:],
@@ -2945,6 +2949,7 @@ func TestGenerateDownlink(t *testing.T) {
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
 				Session: &ttnpb.Session{
+					DevAddr: DevAddr,
 					SessionKeys: ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
 							Key: NwkSEncKey[:],
@@ -3016,6 +3021,7 @@ func TestGenerateDownlink(t *testing.T) {
 						LoRaWANVersion: ttnpb.MAC_V1_1,
 					},
 					Session: &ttnpb.Session{
+						DevAddr: DevAddr,
 						SessionKeys: ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
 								Key: NwkSEncKey[:],
@@ -3057,6 +3063,7 @@ func TestGenerateDownlink(t *testing.T) {
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
 				Session: &ttnpb.Session{
+					DevAddr: DevAddr,
 					SessionKeys: ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
 							Key: NwkSEncKey[:],
@@ -3135,6 +3142,7 @@ func TestGenerateDownlink(t *testing.T) {
 						},
 					},
 					Session: &ttnpb.Session{
+						DevAddr:          DevAddr,
 						LastConfFCntDown: 42,
 						SessionKeys: ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
@@ -3171,6 +3179,7 @@ func TestGenerateDownlink(t *testing.T) {
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
 				Session: &ttnpb.Session{
+					DevAddr: DevAddr,
 					SessionKeys: ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
 							Key: NwkSEncKey[:],
@@ -3255,6 +3264,7 @@ func TestGenerateDownlink(t *testing.T) {
 						},
 					},
 					Session: &ttnpb.Session{
+						DevAddr:          DevAddr,
 						LastConfFCntDown: 42,
 						SessionKeys: ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
@@ -3301,6 +3311,7 @@ func TestGenerateDownlink(t *testing.T) {
 					LastDevStatusFCntUp: 4,
 				},
 				Session: &ttnpb.Session{
+					DevAddr:       DevAddr,
 					LastFCntUp:    99,
 					LastNFCntDown: 41,
 					SessionKeys: ttnpb.SessionKeys{
@@ -3367,6 +3378,7 @@ func TestGenerateDownlink(t *testing.T) {
 						},
 					},
 					Session: &ttnpb.Session{
+						DevAddr:       DevAddr,
 						LastFCntUp:    99,
 						LastNFCntDown: 42,
 						SessionKeys: ttnpb.SessionKeys{
@@ -3405,6 +3417,7 @@ func TestGenerateDownlink(t *testing.T) {
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
 				Session: &ttnpb.Session{
+					DevAddr:       DevAddr,
 					LastNFCntDown: 41,
 					SessionKeys: ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
@@ -3469,6 +3482,7 @@ func TestGenerateDownlink(t *testing.T) {
 						},
 					},
 					Session: &ttnpb.Session{
+						DevAddr:       DevAddr,
 						LastNFCntDown: 42,
 						SessionKeys: ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{

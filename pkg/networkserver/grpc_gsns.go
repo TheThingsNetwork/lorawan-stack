@@ -105,13 +105,13 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 		[]string{
 			"frequency_plan_id",
 			"lorawan_phy_version",
+			"mac_settings.resets_f_cnt",
+			"mac_settings.supports_32_bit_f_cnt",
 			"mac_state",
 			"pending_session",
 			"recent_downlinks",
 			"recent_uplinks",
-			"resets_f_cnt",
 			"session",
-			"uses_32_bit_f_cnt",
 		},
 		func(dev *ttnpb.EndDevice) bool {
 			if dev.MACState == nil {
@@ -182,9 +182,16 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 
 outer:
 	for _, dev := range devs {
+		supports32BitFCnt := true
+		if dev.GetMACSettings().GetSupports32BitFCnt() != nil {
+			supports32BitFCnt = dev.MACSettings.Supports32BitFCnt.Value
+		} else if ns.defaultMACSettings.GetSupports32BitFCnt() != nil {
+			supports32BitFCnt = ns.defaultMACSettings.Supports32BitFCnt.Value
+		}
+
 		fCnt := pld.FCnt
 		switch {
-		case !dev.Uses32BitFCnt, fCnt > dev.matchedSession.LastFCntUp, fCnt == 0:
+		case !supports32BitFCnt, fCnt > dev.matchedSession.LastFCntUp, fCnt == 0:
 		case fCnt > dev.matchedSession.LastFCntUp&0xffff:
 			fCnt |= dev.matchedSession.LastFCntUp &^ 0xffff
 		case dev.matchedSession.LastFCntUp < 0xffff0000:
@@ -198,11 +205,18 @@ outer:
 			"uplink_f_cnt_up", pld.FCnt,
 		))
 
+		resetsFCnt := false
+		if dev.GetMACSettings().GetResetsFCnt() != nil {
+			resetsFCnt = dev.MACSettings.ResetsFCnt.Value
+		} else if ns.defaultMACSettings.GetResetsFCnt() != nil {
+			resetsFCnt = ns.defaultMACSettings.ResetsFCnt.Value
+		}
+
 		gap := uint32(math.MaxUint32)
 		if fCnt == 0 && dev.matchedSession.LastFCntUp == 0 &&
 			(len(dev.RecentUplinks) == 0 || dev.PendingSession != nil) {
 			gap = 0
-		} else if !dev.ResetsFCnt {
+		} else if !resetsFCnt {
 			if fCnt <= dev.matchedSession.LastFCntUp {
 				logger.Debug("FCnt too low, skipping...")
 				continue outer
@@ -229,7 +243,7 @@ outer:
 			gap:            gap,
 			fCnt:           fCnt,
 		})
-		if dev.ResetsFCnt && fCnt != pld.FCnt {
+		if resetsFCnt && fCnt != pld.FCnt {
 			matching = append(matching, device{
 				EndDevice:      dev.EndDevice,
 				matchedSession: dev.matchedSession,
@@ -448,7 +462,6 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	var handleErr bool
 	stored, err := ns.devices.SetByID(ctx, matched.EndDeviceIdentifiers.ApplicationIdentifiers, matched.EndDeviceIdentifiers.DeviceID,
 		[]string{
-			"default_mac_parameters",
 			"downlink_margin",
 			"frequency_plan_id",
 			"last_dev_status_received_at",
@@ -458,7 +471,6 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 			"mac_state",
 			"pending_session",
 			"recent_uplinks",
-			"resets_f_cnt",
 			"session",
 			"supports_join",
 		},
@@ -480,7 +492,14 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 				handleErr = true
 				return nil, nil, errOutdatedData
 			}
-			if storedSes.GetLastFCntUp() > ses.LastFCntUp && !stored.ResetsFCnt {
+
+			resetsFCnt := false
+			if stored.GetMACSettings().GetResetsFCnt() != nil {
+				resetsFCnt = stored.MACSettings.ResetsFCnt.Value
+			} else if ns.defaultMACSettings.GetResetsFCnt() != nil {
+				resetsFCnt = ns.defaultMACSettings.ResetsFCnt.Value
+			}
+			if storedSes.GetLastFCntUp() > ses.LastFCntUp && !resetsFCnt {
 				logger.WithFields(log.Fields(
 					"stored_f_cnt", storedSes.GetLastFCntUp(),
 					"got_f_cnt", ses.LastFCntUp,
@@ -829,7 +848,6 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 	var resetErr bool
 	dev, err = ns.devices.SetByID(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, dev.EndDeviceIdentifiers.DeviceID,
 		[]string{
-			"default_mac_parameters",
 			"frequency_plan_id",
 			"lorawan_phy_version",
 			"lorawan_version",

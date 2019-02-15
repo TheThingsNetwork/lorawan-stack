@@ -98,34 +98,34 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			return &req.Device, req.FieldMask.Paths, nil
 		}
 
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.dev_addr") && req.Device.Session == nil || req.Device.Session.DevAddr.IsZero() {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.dev_addr") && (req.Device.Session == nil || req.Device.Session.DevAddr.IsZero()) {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "session.dev_addr")
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.session_key_id") && req.Device.Session == nil || len(req.Device.Session.SessionKeys.GetSessionKeyID()) == 0 {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.session_key_id") && (req.Device.Session == nil || len(req.Device.Session.SessionKeys.GetSessionKeyID()) == 0) {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "session.keys.session_key_id")
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.f_nwk_s_int_key.key") && req.Device.Session == nil || len(req.Device.Session.SessionKeys.GetFNwkSIntKey().GetKey()) == 0 {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.f_nwk_s_int_key.key") && (req.Device.Session == nil || len(req.Device.Session.SessionKeys.GetFNwkSIntKey().GetKey()) == 0) {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "session.keys.f_nwk_s_int_key.key")
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.f_nwk_s_int_key.kek_label") && req.Device.Session == nil || len(req.Device.Session.SessionKeys.GetFNwkSIntKey().GetKEKLabel()) == 0 {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.f_nwk_s_int_key.kek_label") && (req.Device.Session == nil || len(req.Device.Session.SessionKeys.GetFNwkSIntKey().GetKEKLabel()) == 0) {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "session.keys.f_nwk_s_int_key.kek_label")
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.s_nwk_s_int_key.key") && req.Device.Session == nil || len(req.Device.Session.SessionKeys.GetSNwkSIntKey().GetKey()) == 0 {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.s_nwk_s_int_key.key") && (req.Device.Session == nil || len(req.Device.Session.SessionKeys.GetSNwkSIntKey().GetKey()) == 0) {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "session.keys.s_nwk_s_int_key.key")
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.s_nwk_s_int_key.kek_label") && req.Device.Session == nil || len(req.Device.Session.SessionKeys.GetSNwkSIntKey().GetKEKLabel()) == 0 {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.s_nwk_s_int_key.kek_label") && (req.Device.Session == nil || len(req.Device.Session.SessionKeys.GetSNwkSIntKey().GetKEKLabel()) == 0) {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "session.keys.s_nwk_s_int_key.kek_label")
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.nwk_s_enc_key.key") && req.Device.Session == nil || len(req.Device.Session.SessionKeys.GetNwkSEncKey().GetKey()) == 0 {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.nwk_s_enc_key.key") && (req.Device.Session == nil || len(req.Device.Session.SessionKeys.GetNwkSEncKey().GetKey()) == 0) {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "session.keys.nwk_s_enc_key.key")
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.nwk_s_enc_key.kek_label") && req.Device.Session == nil || len(req.Device.Session.SessionKeys.GetNwkSEncKey().GetKEKLabel()) == 0 {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.nwk_s_enc_key.kek_label") && (req.Device.Session == nil || len(req.Device.Session.SessionKeys.GetNwkSEncKey().GetKEKLabel()) == 0) {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "session.keys.nwk_s_enc_key.kek_label")
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.app_s_key.key") && req.Device.Session == nil || len(req.Device.Session.SessionKeys.GetAppSKey().GetKey()) == 0 {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.app_s_key.key") && (req.Device.Session == nil || len(req.Device.Session.SessionKeys.GetAppSKey().GetKey()) == 0) {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "session.keys.app_s_key.key")
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.app_s_key.kek_label") && req.Device.Session == nil || len(req.Device.Session.SessionKeys.GetAppSKey().GetKEKLabel()) == 0 {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.app_s_key.kek_label") && (req.Device.Session == nil || len(req.Device.Session.SessionKeys.GetAppSKey().GetKEKLabel()) == 0) {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "session.keys.app_s_key.kek_label")
 		}
 

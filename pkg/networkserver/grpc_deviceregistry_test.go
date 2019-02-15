@@ -221,13 +221,13 @@ func TestDeviceRegistrySet(t *testing.T) {
 						"frequency_plan_id",
 						"lorawan_phy_version",
 						"lorawan_version",
+						"mac_settings.supports_32_bit_f_cnt",
 						"mac_settings.use_adr",
 						"resets_f_cnt",
 						"resets_join_nonces",
 						"supports_class_b",
 						"supports_class_c",
 						"supports_join",
-						"uses_32_bit_f_cnt",
 					},
 				},
 			},
@@ -267,13 +267,11 @@ func TestDeviceRegistrySet(t *testing.T) {
 					"lorawan_phy_version",
 					"lorawan_version",
 					"mac_settings.adr_margin",
-					"mac_settings.use_adr",
 					"resets_f_cnt",
 					"resets_join_nonces",
 					"supports_class_b",
 					"supports_class_c",
 					"supports_join",
-					"uses_32_bit_f_cnt",
 				})
 
 				dev, sets, err := f(nil)
@@ -283,16 +281,17 @@ func TestDeviceRegistrySet(t *testing.T) {
 					"lorawan_phy_version",
 					"lorawan_version",
 					"mac_settings.adr_margin",
-					"mac_settings.use_adr",
 					"resets_f_cnt",
 					"resets_join_nonces",
 					"supports_class_b",
 					"supports_class_c",
 					"supports_join",
-					"uses_32_bit_f_cnt",
 				})
 				a.So(dev, should.Resemble, &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ids,
+					FrequencyPlanID:      test.EUFrequencyPlanID,
+					LoRaWANPHYVersion:    ttnpb.PHY_V1_0,
+					LoRaWANVersion:       ttnpb.MAC_V1_0,
 					SupportsJoin:         true,
 					MACSettings: &ttnpb.MACSettings{
 						ADRMargin: &pbtypes.FloatValue{Value: 4},
@@ -300,6 +299,9 @@ func TestDeviceRegistrySet(t *testing.T) {
 				})
 				return &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ids,
+					FrequencyPlanID:      test.EUFrequencyPlanID,
+					LoRaWANPHYVersion:    ttnpb.PHY_V1_0,
+					LoRaWANVersion:       ttnpb.MAC_V1_0,
 					SupportsJoin:         true,
 					MACSettings: &ttnpb.MACSettings{
 						ADRMargin: &pbtypes.FloatValue{Value: 4},
@@ -309,6 +311,9 @@ func TestDeviceRegistrySet(t *testing.T) {
 			Request: &ttnpb.SetEndDeviceRequest{
 				Device: ttnpb.EndDevice{
 					EndDeviceIdentifiers: ids,
+					FrequencyPlanID:      test.EUFrequencyPlanID,
+					LoRaWANPHYVersion:    ttnpb.PHY_V1_0,
+					LoRaWANVersion:       ttnpb.MAC_V1_0,
 					SupportsJoin:         true,
 					MACSettings: &ttnpb.MACSettings{
 						ADRMargin: &pbtypes.FloatValue{Value: 4},
@@ -320,18 +325,19 @@ func TestDeviceRegistrySet(t *testing.T) {
 						"lorawan_phy_version",
 						"lorawan_version",
 						"mac_settings.adr_margin",
-						"mac_settings.use_adr",
 						"resets_f_cnt",
 						"resets_join_nonces",
 						"supports_class_b",
 						"supports_class_c",
 						"supports_join",
-						"uses_32_bit_f_cnt",
 					},
 				},
 			},
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ids,
+				FrequencyPlanID:      test.EUFrequencyPlanID,
+				LoRaWANPHYVersion:    ttnpb.PHY_V1_0,
+				LoRaWANVersion:       ttnpb.MAC_V1_0,
 				SupportsJoin:         true,
 				MACSettings: &ttnpb.MACSettings{
 					ADRMargin: &pbtypes.FloatValue{Value: 4},

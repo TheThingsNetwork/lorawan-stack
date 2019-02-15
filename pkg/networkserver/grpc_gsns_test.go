@@ -183,7 +183,6 @@ func handleUplinkTest() func(t *testing.T) {
 				},
 				LoRaWANVersion:    ttnpb.MAC_V1_1,
 				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
-				MACSettings:       &ttnpb.MACSettings{},
 				Session: &ttnpb.Session{
 					DevAddr: DevAddr,
 					SessionKeys: ttnpb.SessionKeys{
@@ -248,7 +247,6 @@ func handleUplinkTest() func(t *testing.T) {
 				},
 				LoRaWANVersion:    ttnpb.MAC_V1_1,
 				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
-				MACSettings:       &ttnpb.MACSettings{},
 				Session: &ttnpb.Session{
 					DevAddr: DevAddr,
 					SessionKeys: ttnpb.SessionKeys{
@@ -300,7 +298,6 @@ func handleUplinkTest() func(t *testing.T) {
 			{
 				"1.0/unconfirmed/no ack/FCnt does not reset",
 				&ttnpb.EndDevice{
-					MACSettings: &ttnpb.MACSettings{},
 					MACState: &ttnpb.MACState{
 						LoRaWANVersion: ttnpb.MAC_V1_0,
 						CurrentParameters: ttnpb.MACParameters{
@@ -329,7 +326,6 @@ func handleUplinkTest() func(t *testing.T) {
 					},
 					LoRaWANVersion:    ttnpb.MAC_V1_0,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_0,
-					ResetsFCnt:        true,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationID: ApplicationID,
@@ -376,7 +372,9 @@ func handleUplinkTest() func(t *testing.T) {
 			{
 				"1.0/unconfirmed/no ack/FCnt resets",
 				&ttnpb.EndDevice{
-					MACSettings: &ttnpb.MACSettings{},
+					MACSettings: &ttnpb.MACSettings{
+						ResetsFCnt: &pbtypes.BoolValue{Value: true},
+					},
 					MACState: &ttnpb.MACState{
 						LoRaWANVersion: ttnpb.MAC_V1_0,
 						CurrentParameters: ttnpb.MACParameters{
@@ -405,7 +403,6 @@ func handleUplinkTest() func(t *testing.T) {
 					},
 					LoRaWANVersion:    ttnpb.MAC_V1_0,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_0,
-					ResetsFCnt:        true,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationID: ApplicationID,
@@ -452,7 +449,6 @@ func handleUplinkTest() func(t *testing.T) {
 			{
 				"1.0/confirmed/ack/FCnt does not reset",
 				&ttnpb.EndDevice{
-					MACSettings: &ttnpb.MACSettings{},
 					MACState: &ttnpb.MACState{
 						LoRaWANVersion:             ttnpb.MAC_V1_0,
 						PendingApplicationDownlink: ttnpb.NewPopulatedApplicationDownlink(test.Randy, false),
@@ -533,7 +529,9 @@ func handleUplinkTest() func(t *testing.T) {
 			{
 				"1.0/confirmed/ack/FCnt resets",
 				&ttnpb.EndDevice{
-					MACSettings: &ttnpb.MACSettings{},
+					MACSettings: &ttnpb.MACSettings{
+						ResetsFCnt: &pbtypes.BoolValue{Value: true},
+					},
 					MACState: &ttnpb.MACState{
 						LoRaWANVersion:             ttnpb.MAC_V1_0,
 						PendingApplicationDownlink: ttnpb.NewPopulatedApplicationDownlink(test.Randy, false),
@@ -563,7 +561,6 @@ func handleUplinkTest() func(t *testing.T) {
 					},
 					LoRaWANVersion:    ttnpb.MAC_V1_0,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_0,
-					ResetsFCnt:        true,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationID: ApplicationID,
@@ -615,7 +612,6 @@ func handleUplinkTest() func(t *testing.T) {
 			{
 				"1.1/unconfirmed/no ack/FCnt does not reset",
 				&ttnpb.EndDevice{
-					MACSettings: &ttnpb.MACSettings{},
 					MACState: &ttnpb.MACState{
 						LoRaWANVersion: ttnpb.MAC_V1_1,
 						CurrentParameters: ttnpb.MACParameters{
@@ -702,7 +698,6 @@ func handleUplinkTest() func(t *testing.T) {
 			{
 				"1.1/confirmed/ack/FCnt does not reset",
 				&ttnpb.EndDevice{
-					MACSettings: &ttnpb.MACSettings{},
 					MACState: &ttnpb.MACState{
 						LoRaWANVersion:             ttnpb.MAC_V1_1,
 						PendingApplicationDownlink: ttnpb.NewPopulatedApplicationDownlink(test.Randy, false),
@@ -801,7 +796,9 @@ func handleUplinkTest() func(t *testing.T) {
 			{
 				"1.1/unconfirmed/no ack/FCnt resets",
 				&ttnpb.EndDevice{
-					MACSettings: &ttnpb.MACSettings{},
+					MACSettings: &ttnpb.MACSettings{
+						ResetsFCnt: &pbtypes.BoolValue{Value: true},
+					},
 					MACState: &ttnpb.MACState{
 						LoRaWANVersion: ttnpb.MAC_V1_1,
 						CurrentParameters: ttnpb.MACParameters{
@@ -830,7 +827,6 @@ func handleUplinkTest() func(t *testing.T) {
 					},
 					LoRaWANVersion:    ttnpb.MAC_V1_1,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
-					ResetsFCnt:        true,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationID: ApplicationID,
@@ -889,7 +885,9 @@ func handleUplinkTest() func(t *testing.T) {
 			{
 				"1.1/confirmed/ack/FCnt resets",
 				&ttnpb.EndDevice{
-					MACSettings: &ttnpb.MACSettings{},
+					MACSettings: &ttnpb.MACSettings{
+						ResetsFCnt: &pbtypes.BoolValue{Value: true},
+					},
 					MACState: &ttnpb.MACState{
 						LoRaWANVersion:             ttnpb.MAC_V1_1,
 						PendingApplicationDownlink: ttnpb.NewPopulatedApplicationDownlink(test.Randy, false),
@@ -919,7 +917,6 @@ func handleUplinkTest() func(t *testing.T) {
 					},
 					LoRaWANVersion:    ttnpb.MAC_V1_1,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
-					ResetsFCnt:        true,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationID: ApplicationID,
@@ -1262,7 +1259,7 @@ func handleUplinkTest() func(t *testing.T) {
 						errch <- err
 					}()
 
-					if !pb.ResetsFCnt {
+					if pb.GetMACSettings().GetResetsFCnt() == nil || !pb.MACSettings.ResetsFCnt.Value {
 						close(deduplicationDoneCh)
 						_ = sendUplinkDuplicates(t, ns, collectionDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
 						close(collectionDoneCh)
@@ -1439,7 +1436,6 @@ func handleJoinTest() func(t *testing.T) {
 						DeviceID:               DeviceID,
 					},
 					FrequencyPlanID: test.EUFrequencyPlanID,
-					MACSettings:     &ttnpb.MACSettings{},
 				},
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
@@ -1467,7 +1463,6 @@ func handleJoinTest() func(t *testing.T) {
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session:         ttnpb.NewPopulatedSession(test.Randy, false),
 					MACState:        ttnpb.NewPopulatedMACState(test.Randy, false),
-					MACSettings:     &ttnpb.MACSettings{},
 				},
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
@@ -1495,7 +1490,6 @@ func handleJoinTest() func(t *testing.T) {
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session:         ttnpb.NewPopulatedSession(test.Randy, false),
 					MACState:        ttnpb.NewPopulatedMACState(test.Randy, false),
-					MACSettings:     &ttnpb.MACSettings{},
 				},
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
@@ -1523,7 +1517,6 @@ func handleJoinTest() func(t *testing.T) {
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session:         ttnpb.NewPopulatedSession(test.Randy, false),
 					MACState:        ttnpb.NewPopulatedMACState(test.Randy, false),
-					MACSettings:     &ttnpb.MACSettings{},
 				},
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
@@ -1551,7 +1544,6 @@ func handleJoinTest() func(t *testing.T) {
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					Session:         ttnpb.NewPopulatedSession(test.Randy, false),
 					MACState:        ttnpb.NewPopulatedMACState(test.Randy, false),
-					MACSettings:     &ttnpb.MACSettings{},
 				},
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)

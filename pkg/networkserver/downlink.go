@@ -52,13 +52,13 @@ var errNoDownlink = errors.Define("no_downlink", "no downlink to send")
 const DefaultClassCTimeout = 15 * time.Second
 
 func deviceClassCTimeout(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) time.Duration {
-	ret := DefaultClassCTimeout
 	if dev.MACSettings != nil && dev.MACSettings.ClassCTimeout != nil {
-		ret = *dev.MACSettings.ClassCTimeout
-	} else if defaults.ClassCTimeout != nil {
-		ret = *defaults.ClassCTimeout
+		return *dev.MACSettings.ClassCTimeout
 	}
-	return ret
+	if defaults.ClassCTimeout != nil {
+		return *defaults.ClassCTimeout
+	}
+	return DefaultClassCTimeout
 }
 
 // generateDownlink attempts to generate a downlink.

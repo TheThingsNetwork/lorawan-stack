@@ -55,9 +55,6 @@ func TestHandleResetInd(t *testing.T) {
 		{
 			Name: "empty queue",
 			Device: &ttnpb.EndDevice{
-				DefaultMACParameters: &ttnpb.MACParameters{
-					MaxEIRP: 42,
-				},
 				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 				SupportsJoin:      false,
 				FrequencyPlanID:   test.EUFrequencyPlanID,
@@ -69,9 +66,6 @@ func TestHandleResetInd(t *testing.T) {
 			},
 			Expected: func() *ttnpb.EndDevice {
 				dev := &ttnpb.EndDevice{
-					DefaultMACParameters: &ttnpb.MACParameters{
-						MaxEIRP: 42,
-					},
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					SupportsJoin:      false,
 					FrequencyPlanID:   test.EUFrequencyPlanID,
@@ -107,9 +101,6 @@ func TestHandleResetInd(t *testing.T) {
 		{
 			Name: "non-empty queue",
 			Device: &ttnpb.EndDevice{
-				DefaultMACParameters: &ttnpb.MACParameters{
-					MaxEIRP: 42,
-				},
 				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 				SupportsJoin:      false,
 				FrequencyPlanID:   test.EUFrequencyPlanID,
@@ -125,9 +116,6 @@ func TestHandleResetInd(t *testing.T) {
 			},
 			Expected: func() *ttnpb.EndDevice {
 				dev := &ttnpb.EndDevice{
-					DefaultMACParameters: &ttnpb.MACParameters{
-						MaxEIRP: 42,
-					},
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					SupportsJoin:      false,
 					FrequencyPlanID:   test.EUFrequencyPlanID,

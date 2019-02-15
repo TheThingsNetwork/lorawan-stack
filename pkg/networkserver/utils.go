@@ -110,9 +110,9 @@ func resetMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttn
 	}
 	dev.MACState.DesiredParameters.Rx1Delay = dev.MACState.CurrentParameters.Rx1Delay
 	if dev.GetMACSettings().GetDesiredRx1Delay() != nil {
-		dev.MACState.DesiredParameters.Rx1Delay = dev.MACSettings.Rx1Delay.Value
+		dev.MACState.DesiredParameters.Rx1Delay = dev.MACSettings.DesiredRx1Delay.Value
 	} else if defaults.DesiredRx1Delay != nil {
-		dev.MACState.DesiredParameters.Rx1Delay = defaults.Rx1Delay.Value
+		dev.MACState.DesiredParameters.Rx1Delay = defaults.DesiredRx1Delay.Value
 	}
 
 	dev.MACState.CurrentParameters.Rx1DataRateOffset = 0
@@ -215,8 +215,8 @@ func resetMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttn
 			})
 		}
 	} else {
-		dev.MACState.CurrentParameters.Channels = make([]*ttnpb.MACParameters_Channel, len(band.UplinkChannels))
-		for i, upCh := range band.UplinkChannels {
+		dev.MACState.CurrentParameters.Channels = make([]*ttnpb.MACParameters_Channel, 0, len(band.UplinkChannels))
+		for _, upCh := range band.UplinkChannels {
 			dev.MACState.CurrentParameters.Channels = append(dev.MACState.CurrentParameters.Channels, &ttnpb.MACParameters_Channel{
 				MinDataRateIndex: upCh.MinDataRate,
 				MaxDataRateIndex: upCh.MaxDataRate,
@@ -230,7 +230,7 @@ func resetMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttn
 	}
 
 	dev.MACState.DesiredParameters.Channels = make([]*ttnpb.MACParameters_Channel, 0, len(band.UplinkChannels)+len(fp.UplinkChannels))
-	for i, upCh := range band.UplinkChannels {
+	for _, upCh := range band.UplinkChannels {
 		dev.MACState.DesiredParameters.Channels = append(dev.MACState.DesiredParameters.Channels, &ttnpb.MACParameters_Channel{
 			MinDataRateIndex: upCh.MinDataRate,
 			MaxDataRateIndex: upCh.MaxDataRate,
