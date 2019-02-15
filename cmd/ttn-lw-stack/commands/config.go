@@ -24,6 +24,7 @@ import (
 	shared_joinserver "go.thethings.network/lorawan-stack/cmd/internal/shared/joinserver"
 	shared_networkserver "go.thethings.network/lorawan-stack/cmd/internal/shared/networkserver"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver"
+	"go.thethings.network/lorawan-stack/pkg/basicstation/cups"
 	conf "go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/console"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver"
@@ -41,6 +42,9 @@ type Config struct {
 	AS               applicationserver.Config `name:"as"`
 	JS               joinserver.Config        `name:"js"`
 	Console          console.Config           `name:"console"`
+	GCS              struct {
+		BasicStation cups.ServerConfig `name:"basic-station"`
+	} `name:"gcs"`
 }
 
 // DefaultConfig contains the default config for the ttn-lw-stack binary.

@@ -105,7 +105,7 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 		gtw, err = registry.Create(ctx, &ttnpb.CreateGatewayRequest{
 			Gateway: ttnpb.Gateway{
 				GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-					GatewayID: fmt.Sprintf("eui-%s", req.Router.EUI64.String()),
+					GatewayID: fmt.Sprintf("eui-%s", strings.ToLower(req.Router.EUI64.String())),
 					EUI:       &req.Router.EUI64,
 				},
 				Attributes: map[string]string{
