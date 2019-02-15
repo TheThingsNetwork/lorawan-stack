@@ -167,8 +167,8 @@ func mockGateway() *ttnpb.Gateway {
 }
 
 var (
-	mockFallbackAuth     = grpc.PerRPCCredentials(nil)
-	mockFallbackAuthFunc = func(ctx context.Context, gatewayEUI types.EUI64, auth string) grpc.CallOption {
+	mockFallbackAuth = grpc.PerRPCCredentials(nil)
+	mockAuthFunc     = func(ctx context.Context, gatewayEUI types.EUI64, auth string) grpc.CallOption {
 		return mockFallbackAuth
 	}
 	mockGatewayEUI  = types.EUI64{0x58, 0xA0, 0xCB, 0xFF, 0xFE, 0x80, 0x00, 0x19}
@@ -295,7 +295,6 @@ func TestServer(t *testing.T) {
 				a.So(bytes.Equal(res.CUPSCredentials, res.LNSCredentials), should.BeTrue)
 			},
 			AssertStore: func(a *assertions.Assertion, s *mockGatewayClient) {
-				a.So(s.opts.Update, should.NotContain, mockFallbackAuth)
 				a.So(s.req.Update.Gateway.Attributes[cupsCredentialsCRCAttribute], should.NotBeEmpty)
 				a.So(s.req.Update.Gateway.Attributes[lnsCredentialsCRCAttribute], should.NotBeEmpty)
 			},
@@ -309,7 +308,7 @@ func TestServer(t *testing.T) {
 			}
 
 			s := NewServer(component.MustNew(test.GetLogger(t), &component.Config{}), append([]Option{
-				WithFallbackAuth(mockFallbackAuthFunc),
+				WithAuth(mockAuthFunc),
 				WithRegistries(store, store),
 			}, tt.Options...)...)
 			req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(updateInfoRequest))
