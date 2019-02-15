@@ -26,6 +26,7 @@ import (
 	"github.com/labstack/echo"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/web"
@@ -37,8 +38,9 @@ import (
 type ServerConfig struct {
 	ExplicitEnable  bool `name:"require-explicit-enable" description:"Require gateways to explicitly enable CUPS"`
 	RegisterUnknown struct {
-		Type string `name:"account-type" description:"Type of account to register unknown gateways to (user|organization)"`
-		ID   string `name:"id" description:"ID of the account to register unknown gateways to"`
+		Type   string `name:"account-type" description:"Type of account to register unknown gateways to (user|organization)"`
+		ID     string `name:"id" description:"ID of the account to register unknown gateways to"`
+		APIKey string `name:"api-key" description:"API Key to use for unknown gateway registration"`
 	} `name:"owner-for-unknown"`
 	AllowCUPSURIUpdate bool `name:"allow-cups-uri-update" description:"Allow CUPS URI updates"`
 }
@@ -59,6 +61,15 @@ func (conf ServerConfig) NewServer(c *component.Component, customOpts ...Option)
 		WithExplicitEnable(conf.ExplicitEnable),
 		WithRegisterUnknown(registerUnknownTo),
 		WithAllowCUPSURIUpdate(conf.AllowCUPSURIUpdate),
+	}
+	if conf.RegisterUnknown.APIKey != "" {
+		opts = append(opts, WithFallbackAuth(func(ctx context.Context, gatewayEUI types.EUI64, auth string) grpc.CallOption {
+			return grpc.PerRPCCredentials(rpcmetadata.MD{
+				AuthType:      "bearer",
+				AuthValue:     conf.RegisterUnknown.APIKey,
+				AllowInsecure: true,
+			})
+		}))
 	}
 	if tlsConfig, err := c.GetBaseConfig(c.Context()).TLS.Config(c.Context()); err == nil {
 		opts = append(opts, WithRootCAs(tlsConfig.RootCAs))
