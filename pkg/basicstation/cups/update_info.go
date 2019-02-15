@@ -15,6 +15,7 @@
 package cups
 
 import (
+	"context"
 	"crypto"
 	"crypto/rand"
 	"crypto/sha512"
@@ -28,8 +29,8 @@ import (
 
 	"github.com/gogo/protobuf/types"
 	"github.com/labstack/echo"
-	"go.thethings.network/lorawan-stack/pkg/auth"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
@@ -57,6 +58,78 @@ var (
 	errInvalidToken    = errors.DefinePermissionDenied("invalid_token", "invalid provisioning token")
 )
 
+var getGatewayMask = types.FieldMask{Paths: []string{
+	"attributes",
+	"version_ids",
+	"gateway_server_address",
+	"auto_update",
+	"update_channel",
+	"frequency_plan_id",
+}}
+
+func (s *Server) getOrRegisterGateway(ctx context.Context, req UpdateInfoRequest, authHeader string) (gtw *ttnpb.Gateway, err error) {
+	logger := log.FromContext(ctx)
+	serverAuth := s.getAuth(ctx, req.Router.EUI64, authHeader)
+
+	logger.Info("Finding gateway...")
+	ids, err := s.getRegistry(ctx, nil).GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
+		EUI: req.Router.EUI64,
+	}, serverAuth)
+
+	if errors.IsNotFound(err) && s.registerUnknown {
+		gatewayID := fmt.Sprintf("eui-%s", strings.ToLower(req.Router.EUI64.String()))
+		logger.WithField("gateway_id", gatewayID).Info("Registering new gateway")
+		ids := ttnpb.GatewayIdentifiers{
+			GatewayID: gatewayID,
+			EUI:       &req.Router.EUI64,
+		}
+		return s.getRegistry(ctx, &ids).Create(ctx, &ttnpb.CreateGatewayRequest{
+			Gateway: ttnpb.Gateway{
+				GatewayIdentifiers: ids,
+				Attributes: map[string]string{
+					cupsAttribute:               "true",
+					cupsCredentialsAttribute:    authHeader,
+					cupsCredentialsCRCAttribute: strconv.FormatUint(uint64(req.CUPSCredentialsCRC), 10),
+					lnsCredentialsCRCAttribute:  strconv.FormatUint(uint64(req.LNSCredentialsCRC), 10),
+				},
+				GatewayServerAddress: req.LNSURI,
+			},
+			Collaborator: s.defaultOwner,
+		}, serverAuth)
+	} else if err != nil {
+		return nil, err
+	}
+
+	logger = logger.WithField("gateway_id", ids.GetGatewayID())
+
+	if md := rpcmetadata.FromIncomingContext(ctx); strings.ToLower(md.AuthType) == "bearer" && md.AuthValue != "" {
+		logger.Debug("Getting gateway with request credentials")
+		md.AllowInsecure = s.component.AllowInsecureForCredentials()
+		if gtw, err = s.getRegistry(ctx, ids).Get(ctx, &ttnpb.GetGatewayRequest{
+			GatewayIdentifiers: *ids,
+			FieldMask:          getGatewayMask,
+		}, grpc.PerRPCCredentials(md)); err == nil {
+			return gtw, nil
+		} else if !errors.IsUnauthenticated(err) && !errors.IsPermissionDenied(err) {
+			return nil, err
+		}
+	}
+
+	logger.Debug("Getting gateway with server credentials")
+	gtw, err = s.getRegistry(ctx, ids).Get(ctx, &ttnpb.GetGatewayRequest{
+		GatewayIdentifiers: *ids,
+		FieldMask:          getGatewayMask,
+	}, serverAuth)
+	if err != nil {
+		return nil, err
+	}
+	if gtw.Attributes[cupsCredentialsAttribute] != "" && authHeader != gtw.Attributes[cupsCredentialsAttribute] {
+		return nil, errInvalidToken
+	}
+
+	return gtw, nil
+}
+
 // UpdateInfo implements the CUPS update-info handler.
 func (s *Server) UpdateInfo(c echo.Context) error {
 	if c.Request().Header.Get(echo.HeaderContentType) == "" {
@@ -69,70 +142,16 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 	}
 
 	ctx := getContext(c)
+	logger := log.FromContext(ctx).WithFields(log.Fields(
+		"gateway_eui", req.Router.EUI64.String(),
+	))
+	ctx = log.NewContext(ctx, logger)
 
-	md := rpcmetadata.FromIncomingContext(ctx)
-
-	var (
-		authorization   grpc.CallOption
-		cupsCredentials = c.Request().Header.Get(echo.HeaderAuthorization)
-	)
-
-	switch strings.ToLower(md.AuthType) {
-	case "":
-		// TODO: Support TLS Client Auth (https://github.com/TheThingsNetwork/lorawan-stack/issues/137).
-		return errUnauthenticated
-	case "bearer":
-		if _, _, _, err := auth.SplitToken(md.AuthValue); err == nil {
-			authorization = grpc.PerRPCCredentials(md)
-			cupsCredentials = ""
-		}
-	}
-
-	if authorization == nil && s.fallbackAuth != nil {
-		authorization = s.fallbackAuth(ctx, req.Router.EUI64, cupsCredentials)
-	}
-	if authorization == nil {
+	authHeader := c.Request().Header.Get(echo.HeaderAuthorization)
+	if authHeader == "" {
 		return errUnauthenticated
 	}
-
-	var gtw *ttnpb.Gateway
-
-	registry := s.getRegistry(ctx, nil)
-	ids, err := registry.GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
-		EUI: req.Router.EUI64,
-	}, authorization)
-	if errors.IsNotFound(err) && s.registerUnknown {
-		gtw, err = registry.Create(ctx, &ttnpb.CreateGatewayRequest{
-			Gateway: ttnpb.Gateway{
-				GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-					GatewayID: fmt.Sprintf("eui-%s", strings.ToLower(req.Router.EUI64.String())),
-					EUI:       &req.Router.EUI64,
-				},
-				Attributes: map[string]string{
-					cupsAttribute:               "true",
-					cupsCredentialsAttribute:    cupsCredentials,
-					cupsCredentialsCRCAttribute: strconv.FormatUint(uint64(req.CUPSCredentialsCRC), 10),
-					lnsCredentialsCRCAttribute:  strconv.FormatUint(uint64(req.LNSCredentialsCRC), 10),
-				},
-				GatewayServerAddress: req.LNSURI,
-			},
-			Collaborator: s.defaultOwner,
-		}, authorization)
-	} else if err != nil {
-		return err
-	} else {
-		gtw, err = s.getRegistry(ctx, ids).Get(ctx, &ttnpb.GetGatewayRequest{
-			GatewayIdentifiers: *ids,
-			FieldMask: types.FieldMask{Paths: []string{
-				"attributes",
-				"version_ids",
-				"gateway_server_address",
-				"auto_update",
-				"update_channel",
-				"frequency_plan_id",
-			}},
-		}, authorization)
-	}
+	gtw, err := s.getOrRegisterGateway(ctx, req, authHeader)
 	if err != nil {
 		return err
 	}
@@ -147,14 +166,8 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 		}
 	}
 
-	if cupsCredentials != "" {
-		registeredCredentials := gtw.Attributes[cupsCredentialsAttribute]
-		if registeredCredentials != "" && registeredCredentials != cupsCredentials {
-			return errInvalidToken
-		}
-	}
-
 	res := UpdateInfoResponse{}
+	authorization := s.getAuth(ctx, req.Router.EUI64, authHeader)
 
 	if gtw.Attributes[cupsURIAttribute] == "" {
 		gtw.Attributes[cupsURIAttribute] = req.CUPSURI
@@ -286,7 +299,7 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 	gtw.Attributes[cupsModelAttribute] = req.Model
 	gtw.Attributes[cupsPackageAttribute] = req.Package
 
-	gtw, err = registry.Update(ctx, &ttnpb.UpdateGatewayRequest{
+	gtw, err = s.getRegistry(ctx, &gtw.GatewayIdentifiers).Update(ctx, &ttnpb.UpdateGatewayRequest{
 		Gateway: *gtw,
 		FieldMask: types.FieldMask{Paths: []string{
 			"attributes",

@@ -26,6 +26,7 @@ import (
 	"github.com/labstack/echo"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/web"
@@ -37,8 +38,9 @@ import (
 type ServerConfig struct {
 	ExplicitEnable  bool `name:"require-explicit-enable" description:"Require gateways to explicitly enable CUPS"`
 	RegisterUnknown struct {
-		Type string `name:"account-type" description:"Type of account to register unknown gateways to (user|organization)"`
-		ID   string `name:"id" description:"ID of the account to register unknown gateways to"`
+		Type   string `name:"account-type" description:"Type of account to register unknown gateways to (user|organization)"`
+		ID     string `name:"id" description:"ID of the account to register unknown gateways to"`
+		APIKey string `name:"api-key" description:"API Key to use for unknown gateway registration"`
 	} `name:"owner-for-unknown"`
 	AllowCUPSURIUpdate bool `name:"allow-cups-uri-update" description:"Allow CUPS URI updates"`
 }
@@ -53,12 +55,18 @@ func (conf ServerConfig) NewServer(c *component.Component, customOpts ...Option)
 		registerUnknownTo = ttnpb.OrganizationIdentifiers{OrganizationID: conf.RegisterUnknown.ID}.OrganizationOrUserIdentifiers()
 	}
 	opts := []Option{
-		WithFallbackAuth(func(ctx context.Context, gatewayEUI types.EUI64, auth string) grpc.CallOption {
-			return c.WithClusterAuth()
-		}),
 		WithExplicitEnable(conf.ExplicitEnable),
 		WithRegisterUnknown(registerUnknownTo),
 		WithAllowCUPSURIUpdate(conf.AllowCUPSURIUpdate),
+	}
+	if conf.RegisterUnknown.APIKey != "" {
+		opts = append(opts, WithAuth(func(ctx context.Context, gatewayEUI types.EUI64, auth string) grpc.CallOption {
+			return grpc.PerRPCCredentials(rpcmetadata.MD{
+				AuthType:      "bearer",
+				AuthValue:     conf.RegisterUnknown.APIKey,
+				AllowInsecure: c.AllowInsecureForCredentials(),
+			})
+		}))
 	}
 	if tlsConfig, err := c.GetBaseConfig(c.Context()).TLS.Config(c.Context()); err == nil {
 		opts = append(opts, WithRootCAs(tlsConfig.RootCAs))
@@ -77,7 +85,7 @@ type Server struct {
 	registry ttnpb.GatewayRegistryClient
 	access   ttnpb.GatewayAccessClient
 
-	fallbackAuth func(context.Context, types.EUI64, string) grpc.CallOption
+	auth func(context.Context, types.EUI64, string) grpc.CallOption
 
 	requireExplicitEnable bool
 	registerUnknown       bool
@@ -89,6 +97,13 @@ type Server struct {
 	trust   *x509.Certificate
 
 	signers map[uint32]crypto.Signer
+}
+
+func (s *Server) getAuth(ctx context.Context, eui types.EUI64, auth string) grpc.CallOption {
+	if s.auth != nil {
+		return s.auth(ctx, eui, auth)
+	}
+	return s.component.WithClusterAuth()
 }
 
 func (s *Server) getRegistry(ctx context.Context, ids *ttnpb.GatewayIdentifiers) ttnpb.GatewayRegistryClient {
@@ -108,12 +123,12 @@ func (s *Server) getAccess(ctx context.Context, ids *ttnpb.GatewayIdentifiers) t
 // Option configures the CUPSServer.
 type Option func(s *Server)
 
-// WithFallbackAuth sets fallback auth for gateways that don't provide TTN auth.
+// WithAuth sets the auth function for gateways that don't provide TTN auth.
 // When this auth method is used, the CUPS server will look up the _cups_credentials
 // attribute in the gateway registry.
-func WithFallbackAuth(fallback func(ctx context.Context, gatewayEUI types.EUI64, auth string) grpc.CallOption) Option {
+func WithAuth(auth func(ctx context.Context, gatewayEUI types.EUI64, auth string) grpc.CallOption) Option {
 	return func(s *Server) {
-		s.fallbackAuth = fallback
+		s.auth = auth
 	}
 }
 

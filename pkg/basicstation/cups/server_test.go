@@ -27,8 +27,10 @@ import (
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/auth"
+	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 )
@@ -165,8 +167,8 @@ func mockGateway() *ttnpb.Gateway {
 }
 
 var (
-	mockFallbackAuth     = grpc.PerRPCCredentials(nil)
-	mockFallbackAuthFunc = func(ctx context.Context, gatewayEUI types.EUI64, auth string) grpc.CallOption {
+	mockFallbackAuth = grpc.PerRPCCredentials(nil)
+	mockAuthFunc     = func(ctx context.Context, gatewayEUI types.EUI64, auth string) grpc.CallOption {
 		return mockFallbackAuth
 	}
 	mockGatewayEUI  = types.EUI64{0x58, 0xA0, 0xCB, 0xFF, 0xFE, 0x80, 0x00, 0x19}
@@ -293,7 +295,6 @@ func TestServer(t *testing.T) {
 				a.So(bytes.Equal(res.CUPSCredentials, res.LNSCredentials), should.BeTrue)
 			},
 			AssertStore: func(a *assertions.Assertion, s *mockGatewayClient) {
-				a.So(s.opts.Update, should.NotContain, mockFallbackAuth)
 				a.So(s.req.Update.Gateway.Attributes[cupsCredentialsCRCAttribute], should.NotBeEmpty)
 				a.So(s.req.Update.Gateway.Attributes[lnsCredentialsCRCAttribute], should.NotBeEmpty)
 			},
@@ -305,8 +306,9 @@ func TestServer(t *testing.T) {
 			if tt.StoreSetup != nil {
 				tt.StoreSetup(store)
 			}
-			s := NewServer(nil, append([]Option{
-				WithFallbackAuth(mockFallbackAuthFunc),
+
+			s := NewServer(component.MustNew(test.GetLogger(t), &component.Config{}), append([]Option{
+				WithAuth(mockAuthFunc),
 				WithRegistries(store, store),
 			}, tt.Options...)...)
 			req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(updateInfoRequest))
