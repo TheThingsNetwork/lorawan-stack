@@ -67,7 +67,7 @@ func (conf ServerConfig) NewServer(c *component.Component, customOpts ...Option)
 			return grpc.PerRPCCredentials(rpcmetadata.MD{
 				AuthType:      "bearer",
 				AuthValue:     conf.RegisterUnknown.APIKey,
-				AllowInsecure: true,
+				AllowInsecure: c.AllowInsecureForCredentials(),
 			})
 		}))
 	}

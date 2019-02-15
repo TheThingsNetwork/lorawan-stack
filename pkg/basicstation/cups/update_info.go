@@ -83,6 +83,7 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 		return errUnauthenticated
 	case "bearer":
 		if _, _, _, err := auth.SplitToken(md.AuthValue); err == nil {
+			md.AllowInsecure = s.component.AllowInsecureForCredentials()
 			authorization = grpc.PerRPCCredentials(md)
 			cupsCredentials = ""
 		}

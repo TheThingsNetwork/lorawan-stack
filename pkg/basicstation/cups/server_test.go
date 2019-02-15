@@ -27,8 +27,10 @@ import (
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/auth"
+	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 )
@@ -305,7 +307,8 @@ func TestServer(t *testing.T) {
 			if tt.StoreSetup != nil {
 				tt.StoreSetup(store)
 			}
-			s := NewServer(nil, append([]Option{
+
+			s := NewServer(component.MustNew(test.GetLogger(t), &component.Config{}), append([]Option{
 				WithFallbackAuth(mockFallbackAuthFunc),
 				WithRegistries(store, store),
 			}, tt.Options...)...)
