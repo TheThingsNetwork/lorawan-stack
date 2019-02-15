@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package basicstation
+package cups
 
 import (
 	"context"
@@ -24,6 +24,7 @@ import (
 	"strings"
 
 	"github.com/labstack/echo"
+	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
@@ -32,11 +33,51 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-// CUPSServer implements the Basic Station Configuration and Update Server.
-type CUPSServer struct {
-	gatewayRegistry ttnpb.GatewayRegistryClient
-	gatewayAccess   ttnpb.GatewayAccessClient
-	fallbackAuth    func(context.Context, types.EUI64, string) grpc.CallOption
+// ServerConfig is the configuration of the CUPS server.
+type ServerConfig struct {
+	ExplicitEnable  bool `name:"require-explicit-enable" description:"Require gateways to explicitly enable CUPS"`
+	RegisterUnknown struct {
+		Type string `name:"account-type" description:"Type of account to register unknown gateways to (user|organization)"`
+		ID   string `name:"id" description:"ID of the account to register unknown gateways to"`
+	} `name:"owner-for-unknown"`
+	AllowCUPSURIUpdate bool `name:"allow-cups-uri-update" description:"Allow CUPS URI updates"`
+}
+
+// NewServer returns a new CUPS server from this config on top of the component.
+func (conf ServerConfig) NewServer(c *component.Component, customOpts ...Option) *Server {
+	var registerUnknownTo *ttnpb.OrganizationOrUserIdentifiers
+	switch conf.RegisterUnknown.Type {
+	case "user":
+		registerUnknownTo = ttnpb.UserIdentifiers{UserID: conf.RegisterUnknown.ID}.OrganizationOrUserIdentifiers()
+	case "organization":
+		registerUnknownTo = ttnpb.OrganizationIdentifiers{OrganizationID: conf.RegisterUnknown.ID}.OrganizationOrUserIdentifiers()
+	}
+	opts := []Option{
+		WithFallbackAuth(func(ctx context.Context, gatewayEUI types.EUI64, auth string) grpc.CallOption {
+			return c.WithClusterAuth()
+		}),
+		WithExplicitEnable(conf.ExplicitEnable),
+		WithRegisterUnknown(registerUnknownTo),
+		WithAllowCUPSURIUpdate(conf.AllowCUPSURIUpdate),
+	}
+	if tlsConfig, err := c.GetBaseConfig(c.Context()).TLS.Config(c.Context()); err == nil {
+		opts = append(opts, WithRootCAs(tlsConfig.RootCAs))
+	}
+	s := NewServer(c, append(opts, customOpts...)...)
+	c.RegisterWeb(s)
+	return s
+}
+
+// Server implements the Basic Station Configuration and Update Server.
+type Server struct {
+	component *component.Component
+
+	// registry and access can be used to override the default behavior of getting
+	// clients from the appropriate cluster peer.
+	registry ttnpb.GatewayRegistryClient
+	access   ttnpb.GatewayAccessClient
+
+	fallbackAuth func(context.Context, types.EUI64, string) grpc.CallOption
 
 	requireExplicitEnable bool
 	registerUnknown       bool
@@ -50,14 +91,28 @@ type CUPSServer struct {
 	signers map[uint32]crypto.Signer
 }
 
+func (s *Server) getRegistry(ctx context.Context, ids *ttnpb.GatewayIdentifiers) ttnpb.GatewayRegistryClient {
+	if s.registry != nil {
+		return s.registry
+	}
+	return ttnpb.NewGatewayRegistryClient(s.component.GetPeer(ctx, ttnpb.PeerInfo_ENTITY_REGISTRY, ids).Conn())
+}
+
+func (s *Server) getAccess(ctx context.Context, ids *ttnpb.GatewayIdentifiers) ttnpb.GatewayAccessClient {
+	if s.access != nil {
+		return s.access
+	}
+	return ttnpb.NewGatewayAccessClient(s.component.GetPeer(ctx, ttnpb.PeerInfo_ACCESS, ids).Conn())
+}
+
 // Option configures the CUPSServer.
-type Option func(s *CUPSServer)
+type Option func(s *Server)
 
 // WithFallbackAuth sets fallback auth for gateways that don't provide TTN auth.
 // When this auth method is used, the CUPS server will look up the _cups_credentials
 // attribute in the gateway registry.
 func WithFallbackAuth(fallback func(ctx context.Context, gatewayEUI types.EUI64, auth string) grpc.CallOption) Option {
-	return func(s *CUPSServer) {
+	return func(s *Server) {
 		s.fallbackAuth = fallback
 	}
 }
@@ -65,7 +120,7 @@ func WithFallbackAuth(fallback func(ctx context.Context, gatewayEUI types.EUI64,
 // WithExplicitEnable requires CUPS to be explicitly enabled with a _cups attribute
 // in the gateway registry.
 func WithExplicitEnable(enable bool) Option {
-	return func(s *CUPSServer) {
+	return func(s *Server) {
 		s.requireExplicitEnable = enable
 	}
 }
@@ -74,7 +129,7 @@ func WithExplicitEnable(enable bool) Option {
 // do not already exist in the registry. The gateways will be registered under the
 // given owner.
 func WithRegisterUnknown(owner *ttnpb.OrganizationOrUserIdentifiers) Option {
-	return func(s *CUPSServer) {
+	return func(s *Server) {
 		if owner != nil {
 			s.registerUnknown, s.defaultOwner = true, *owner
 		} else {
@@ -86,7 +141,7 @@ func WithRegisterUnknown(owner *ttnpb.OrganizationOrUserIdentifiers) Option {
 // WithAllowCUPSURIUpdate configures the CUPS server to allow updates of the CUPS
 // Server URI.
 func WithAllowCUPSURIUpdate(allow bool) Option {
-	return func(s *CUPSServer) {
+	return func(s *Server) {
 		s.allowCUPSURIUpdate = allow
 	}
 }
@@ -95,7 +150,7 @@ func WithAllowCUPSURIUpdate(allow bool) Option {
 // as trusted certificate for the CUPS server. This should typically be the certificate
 // of the Root CA in the chain of the CUPS server's TLS certificate.
 func WithTrust(cert *x509.Certificate) Option {
-	return func(s *CUPSServer) {
+	return func(s *Server) {
 		s.trust = cert
 	}
 }
@@ -103,25 +158,31 @@ func WithTrust(cert *x509.Certificate) Option {
 // WithRootCAs configures the CUPS server with the given Root CAs that will be used
 // to lookup CUPS/LNS Root CAs.
 func WithRootCAs(pool *x509.CertPool) Option {
-	return func(s *CUPSServer) {
+	return func(s *Server) {
 		s.rootCAs = pool
 	}
 }
 
 // WithSigner configures the CUPS server with a firmware signer.
 func WithSigner(keyCRC uint32, signer crypto.Signer) Option {
-	return func(s *CUPSServer) {
+	return func(s *Server) {
 		s.signers[keyCRC] = signer
 	}
 }
 
-// NewCUPSServer returns a new CUPS server on top of the given gateway registry
+// WithRegistries overrides the CUPS server's gateway registries.
+func WithRegistries(registry ttnpb.GatewayRegistryClient, access ttnpb.GatewayAccessClient) Option {
+	return func(s *Server) {
+		s.registry, s.access = registry, access
+	}
+}
+
+// NewServer returns a new CUPS server on top of the given gateway registry
 // and gateway access clients.
-func NewCUPSServer(gr ttnpb.GatewayRegistryClient, ga ttnpb.GatewayAccessClient, options ...Option) *CUPSServer {
-	s := &CUPSServer{
-		gatewayRegistry: gr,
-		gatewayAccess:   ga,
-		signers:         make(map[uint32]crypto.Signer),
+func NewServer(c *component.Component, options ...Option) *Server {
+	s := &Server{
+		component: c,
+		signers:   make(map[uint32]crypto.Signer),
 	}
 	for _, opt := range options {
 		opt(s)
@@ -130,7 +191,7 @@ func NewCUPSServer(gr ttnpb.GatewayRegistryClient, ga ttnpb.GatewayAccessClient,
 }
 
 // RegisterRoutes implements web.Registerer
-func (s *CUPSServer) RegisterRoutes(web *web.Server) {
+func (s *Server) RegisterRoutes(web *web.Server) {
 	web.POST("/update-info", s.UpdateInfo)
 }
 
@@ -183,7 +244,7 @@ func parseAddress(address string) (scheme, host, port string, err error) {
 	return
 }
 
-func (s *CUPSServer) getTrust(address string) (*x509.Certificate, error) {
+func (s *Server) getTrust(address string) (*x509.Certificate, error) {
 	if address == "" {
 		if s.trust == nil {
 			return nil, errNoTrust

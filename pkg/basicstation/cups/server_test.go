@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package basicstation
+package cups
 
 import (
 	"bytes"
@@ -36,7 +36,7 @@ import (
 func TestGetTrust(t *testing.T) {
 	a := assertions.New(t)
 
-	s := new(CUPSServer)
+	s := new(Server)
 
 	for _, addr := range []string{
 		"thethingsnetwork.org:443",
@@ -173,7 +173,7 @@ var (
 	mockErrNotFound = grpc.Errorf(codes.NotFound, "not found")
 )
 
-func TestCUPSServer(t *testing.T) {
+func TestServer(t *testing.T) {
 	e := echo.New()
 
 	for _, tt := range []struct {
@@ -305,8 +305,9 @@ func TestCUPSServer(t *testing.T) {
 			if tt.StoreSetup != nil {
 				tt.StoreSetup(store)
 			}
-			s := NewCUPSServer(store, store, append([]Option{
+			s := NewServer(nil, append([]Option{
 				WithFallbackAuth(mockFallbackAuthFunc),
+				WithRegistries(store, store),
 			}, tt.Options...)...)
 			req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(updateInfoRequest))
 			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package basicstation
+package cups
 
 import (
 	"crypto"
@@ -20,6 +20,7 @@ import (
 	"crypto/sha512"
 	"fmt"
 	"hash/crc32"
+	"net"
 	"net/http"
 	"strconv"
 	"strings"
@@ -57,7 +58,7 @@ var (
 )
 
 // UpdateInfo implements the CUPS update-info handler.
-func (s *CUPSServer) UpdateInfo(c echo.Context) error {
+func (s *Server) UpdateInfo(c echo.Context) error {
 	if c.Request().Header.Get(echo.HeaderContentType) == "" {
 		c.Request().Header.Set(echo.HeaderContentType, "application/json")
 	}
@@ -96,11 +97,12 @@ func (s *CUPSServer) UpdateInfo(c echo.Context) error {
 
 	var gtw *ttnpb.Gateway
 
-	ids, err := s.gatewayRegistry.GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
+	registry := s.getRegistry(ctx, nil)
+	ids, err := registry.GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
 		EUI: req.Router.EUI64,
 	}, authorization)
 	if errors.IsNotFound(err) && s.registerUnknown {
-		gtw, err = s.gatewayRegistry.Create(ctx, &ttnpb.CreateGatewayRequest{
+		gtw, err = registry.Create(ctx, &ttnpb.CreateGatewayRequest{
 			Gateway: ttnpb.Gateway{
 				GatewayIdentifiers: ttnpb.GatewayIdentifiers{
 					GatewayID: fmt.Sprintf("eui-%s", req.Router.EUI64.String()),
@@ -108,7 +110,6 @@ func (s *CUPSServer) UpdateInfo(c echo.Context) error {
 				},
 				Attributes: map[string]string{
 					cupsAttribute:               "true",
-					cupsURIAttribute:            req.CUPSURI,
 					cupsCredentialsAttribute:    cupsCredentials,
 					cupsCredentialsCRCAttribute: strconv.FormatUint(uint64(req.CUPSCredentialsCRC), 10),
 					lnsCredentialsCRCAttribute:  strconv.FormatUint(uint64(req.LNSCredentialsCRC), 10),
@@ -120,7 +121,7 @@ func (s *CUPSServer) UpdateInfo(c echo.Context) error {
 	} else if err != nil {
 		return err
 	} else {
-		gtw, err = s.gatewayRegistry.Get(ctx, &ttnpb.GetGatewayRequest{
+		gtw, err = s.getRegistry(ctx, ids).Get(ctx, &ttnpb.GetGatewayRequest{
 			GatewayIdentifiers: *ids,
 			FieldMask: types.FieldMask{Paths: []string{
 				"attributes",
@@ -155,20 +156,36 @@ func (s *CUPSServer) UpdateInfo(c echo.Context) error {
 
 	res := UpdateInfoResponse{}
 
-	if s.allowCUPSURIUpdate {
-		if cupsURI := gtw.Attributes[cupsURIAttribute]; cupsURI != "" && cupsURI != req.CUPSURI {
-			res.CUPSURI = cupsURI
+	if gtw.Attributes[cupsURIAttribute] == "" {
+		gtw.Attributes[cupsURIAttribute] = req.CUPSURI
+	} else if s.allowCUPSURIUpdate && gtw.Attributes[cupsURIAttribute] != req.CUPSURI {
+		res.CUPSURI = gtw.Attributes[cupsURIAttribute]
+	}
+
+	if gtw.GatewayServerAddress == "" {
+		gtw.GatewayServerAddress = req.LNSURI
+	} else if gtw.GatewayServerAddress != req.LNSURI {
+		scheme, host, port, err := parseAddress(gtw.GatewayServerAddress)
+		if err != nil {
+			return err
 		}
+		if scheme == "" {
+			scheme = "wss"
+		}
+		address := host
+		if port != "" {
+			address = net.JoinHostPort(host, port)
+		}
+		res.LNSURI = fmt.Sprintf("%s://%s", scheme, address)
 	}
-	if gtw.GatewayServerAddress != "" && gtw.GatewayServerAddress != req.LNSURI {
-		res.LNSURI = gtw.GatewayServerAddress // TODO: Clean / Format.
-	}
+
 	if gtw.Attributes[cupsCredentialsCRCAttribute] != strconv.FormatUint(uint64(req.CUPSCredentialsCRC), 10) {
 		if gtw.Attributes[cupsCredentialsAttribute] == "" {
+			registry := s.getAccess(ctx, &gtw.GatewayIdentifiers)
 			if gtw.Attributes[cupsCredentialsIDAttribute] != "" {
 				// TODO: Try deleting old CUPS credentials.
 			}
-			apiKey, err := s.gatewayAccess.CreateAPIKey(ctx, &ttnpb.CreateGatewayAPIKeyRequest{
+			apiKey, err := registry.CreateAPIKey(ctx, &ttnpb.CreateGatewayAPIKeyRequest{
 				GatewayIdentifiers: gtw.GatewayIdentifiers,
 				Name:               fmt.Sprintf("CUPS Key, generated %s", time.Now().UTC().Format(time.RFC3339)),
 				Rights: []ttnpb.Right{
@@ -201,10 +218,11 @@ func (s *CUPSServer) UpdateInfo(c echo.Context) error {
 	}
 	if gtw.Attributes[lnsCredentialsCRCAttribute] != strconv.FormatUint(uint64(req.LNSCredentialsCRC), 10) {
 		if gtw.Attributes[lnsCredentialsAttribute] == "" {
+			registry := s.getAccess(ctx, &gtw.GatewayIdentifiers)
 			if gtw.Attributes[lnsCredentialsIDAttribute] != "" {
 				// TODO: Try deleting old LNS credentials.
 			}
-			apiKey, err := s.gatewayAccess.CreateAPIKey(ctx, &ttnpb.CreateGatewayAPIKeyRequest{
+			apiKey, err := registry.CreateAPIKey(ctx, &ttnpb.CreateGatewayAPIKeyRequest{
 				GatewayIdentifiers: gtw.GatewayIdentifiers,
 				Name:               fmt.Sprintf("LNS Key, generated %s", time.Now().UTC().Format(time.RFC3339)),
 				Rights: []ttnpb.Right{
@@ -268,7 +286,7 @@ func (s *CUPSServer) UpdateInfo(c echo.Context) error {
 	gtw.Attributes[cupsModelAttribute] = req.Model
 	gtw.Attributes[cupsPackageAttribute] = req.Package
 
-	gtw, err = s.gatewayRegistry.Update(ctx, &ttnpb.UpdateGatewayRequest{
+	gtw, err = registry.Update(ctx, &ttnpb.UpdateGatewayRequest{
 		Gateway: *gtw,
 		FieldMask: types.FieldMask{Paths: []string{
 			"attributes",
