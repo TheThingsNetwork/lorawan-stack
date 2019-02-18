@@ -27,6 +27,7 @@ export default defineMessages({
   approve: 'Approve',
   cancel: 'Cancel',
   collaborators: 'Collaborators',
+  createAccessKey: 'Create Access Key',
   createdAt: 'Created at',
   data: 'Data',
   description: 'Description',

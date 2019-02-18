@@ -21,6 +21,7 @@ import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 
 import ApplicationAccessList from '../application-access-list'
 import ApplicationAccessEdit from '../application-access-edit'
+import ApplicationAccessAdd from '../application-access-add'
 
 @withBreadcrumb('apps.single.access', function (props) {
   const { match } = props
@@ -41,6 +42,7 @@ export default class ApplicationAccess extends React.Component {
     return (
       <Switch>
         <Route exact path={`${match.path}`} component={ApplicationAccessList} />
+        <Route path={`${match.path}/add`} component={ApplicationAccessAdd} />
         <Route path={`${match.path}/:apiKeyId`} component={ApplicationAccessEdit} />
       </Switch>
     )
