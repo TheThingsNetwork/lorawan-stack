@@ -102,6 +102,9 @@ func (r WebhookRegistry) Set(ctx context.Context, ids ttnpb.ApplicationWebhookId
 		if err != nil {
 			return err
 		}
+		if stored == nil && pb == nil {
+			return nil
+		}
 
 		var f func(redis.Pipeliner) error
 		if pb == nil {
