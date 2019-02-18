@@ -210,7 +210,11 @@ func DefineAborted(name, messageFormat string, publicAttributes ...string) Defin
 
 // OutOfRange - not used for now
 
-// Unimplemented - not used for now
+// Unimplemented defines a registered error of type Unimplemented.
+func DefineUnimplemented(name, messageFormat string, publicAttributes ...string) Definition {
+	def := define(uint32(codes.Unimplemented), name, messageFormat, publicAttributes...)
+	return def
+}
 
 // DefineInternal defines a registered error of type Internal.
 func DefineInternal(name, messageFormat string, publicAttributes ...string) Definition {
