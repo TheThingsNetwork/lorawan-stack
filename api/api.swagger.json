@@ -864,6 +864,30 @@
         ]
       }
     },
+    "/as/applications/{application_id}/link/stats": {
+      "get": {
+        "operationId": "GetLinkStats",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ApplicationLinkStats"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "As"
+        ]
+      }
+    },
     "/as/applications/{device.ids.application_ids.application_id}/devices": {
       "post": {
         "operationId": "Set2",
@@ -1856,6 +1880,38 @@
         ],
         "tags": [
           "GatewayAccess"
+        ]
+      }
+    },
+    "/gs/gateways/{gateway_id}/connection/stats": {
+      "get": {
+        "operationId": "GetGatewayConnectionStats",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3GatewayConnectionStats"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "gateway_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "eui",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          }
+        ],
+        "tags": [
+          "Gs"
         ]
       }
     },
@@ -5345,6 +5401,39 @@
           "$ref": "#/definitions/v3MessagePayloadFormatters"
         }
       }
+    },
+    "v3ApplicationLinkStats": {
+      "type": "object",
+      "properties": {
+        "linked_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "network_server_address": {
+          "type": "string"
+        },
+        "last_up_received_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the last upstream message has been received from a Network Server.\nThis can be a join-accept, uplink message or downlink message event."
+        },
+        "up_count": {
+          "type": "string",
+          "format": "uint64",
+          "description": "Number of upstream messages received."
+        },
+        "last_downlink_forwarded_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the last downlink message has been forwarded to a Network Server."
+        },
+        "downlink_count": {
+          "type": "string",
+          "format": "uint64",
+          "description": "Number of downlink messages forwarded."
+        }
+      },
+      "description": "Link stats as monitored by the Application Server."
     },
     "v3ApplicationLocation": {
       "type": "object",

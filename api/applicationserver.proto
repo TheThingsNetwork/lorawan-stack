@@ -19,6 +19,7 @@ import "github.com/mwitkow/go-proto-validators/validator.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
 import "lorawan-stack/api/end_device.proto";
 import "lorawan-stack/api/identifiers.proto";
 import "lorawan-stack/api/messages.proto";
@@ -48,6 +49,21 @@ message SetApplicationLinkRequest {
   google.protobuf.FieldMask field_mask = 3 [(gogoproto.nullable) = false];
 }
 
+// Link stats as monitored by the Application Server.
+message ApplicationLinkStats {
+  google.protobuf.Timestamp linked_at = 1 [(gogoproto.stdtime) = true];
+  string network_server_address = 2;
+  // Timestamp when the last upstream message has been received from a Network Server.
+  // This can be a join-accept, uplink message or downlink message event.
+  google.protobuf.Timestamp last_up_received_at = 3 [(gogoproto.stdtime) = true];
+  // Number of upstream messages received.
+  uint64 up_count = 4;
+  // Timestamp when the last downlink message has been forwarded to a Network Server.
+  google.protobuf.Timestamp last_downlink_forwarded_at = 5 [(gogoproto.stdtime) = true];
+  // Number of downlink messages forwarded.
+  uint64 downlink_count = 6;
+}
+
 // The As service manages the Application Server.
 service As {
   rpc GetLink(GetApplicationLinkRequest) returns (ApplicationLink) {
@@ -66,6 +82,12 @@ service As {
   rpc DeleteLink(ApplicationIdentifiers) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/as/applications/{application_id}/link",
+    };
+  };
+
+  rpc GetLinkStats(ApplicationIdentifiers) returns (ApplicationLinkStats) {
+    option (google.api.http) = {
+      get: "/as/applications/{application_id}/link/stats"
     };
   };
 }

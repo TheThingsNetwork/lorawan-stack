@@ -9,6 +9,7 @@ import proto "github.com/gogo/protobuf/proto"
 import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
 import _ "github.com/golang/protobuf/ptypes/empty"
+import _ "github.com/golang/protobuf/ptypes/timestamp"
 import _ "github.com/mwitkow/go-proto-validators"
 import _ "google.golang.org/genproto/googleapis/api/annotations"
 import _ "google.golang.org/genproto/protobuf/field_mask"
@@ -50,6 +51,24 @@ func (this *SetApplicationLinkRequest) Validate() error {
 	}
 	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.FieldMask)); err != nil {
 		return github_com_mwitkow_go_proto_validators.FieldError("FieldMask", err)
+	}
+	return nil
+}
+func (this *ApplicationLinkStats) Validate() error {
+	if this.LinkedAt != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.LinkedAt); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("LinkedAt", err)
+		}
+	}
+	if this.LastUpReceivedAt != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.LastUpReceivedAt); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("LastUpReceivedAt", err)
+		}
+	}
+	if this.LastDownlinkForwardedAt != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.LastDownlinkForwardedAt); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("LastDownlinkForwardedAt", err)
+		}
 	}
 	return nil
 }

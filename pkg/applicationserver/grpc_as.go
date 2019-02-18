@@ -75,3 +75,30 @@ func (as *ApplicationServer) DeleteLink(ctx context.Context, ids *ttnpb.Applicat
 	}
 	return ttnpb.Empty, nil
 }
+
+// GetLinkStats implements ttnpb.AsServer.
+func (as *ApplicationServer) GetLinkStats(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*ttnpb.ApplicationLinkStats, error) {
+	if err := rights.RequireApplication(ctx, *ids, ttnpb.RIGHT_APPLICATION_LINK); err != nil {
+		return nil, err
+	}
+
+	link, err := as.getLink(ctx, *ids)
+	if err != nil {
+		return nil, err
+	}
+	<-link.connReady
+
+	stats := &ttnpb.ApplicationLinkStats{}
+	lt := link.GetLinkTime()
+	stats.LinkedAt = &lt
+	stats.NetworkServerAddress = link.NetworkServerAddress
+	if n, t, ok := link.GetUpStats(); ok {
+		stats.UpCount = n
+		stats.LastUpReceivedAt = &t
+	}
+	if n, t, ok := link.GetDownlinkStats(); ok {
+		stats.DownlinkCount = n
+		stats.LastDownlinkForwardedAt = &t
+	}
+	return stats, nil
+}

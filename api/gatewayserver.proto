@@ -15,6 +15,7 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "google/api/annotations.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
 import "lorawan-stack/api/gateway.proto";
@@ -63,5 +64,9 @@ service NsGs {
 service Gs {
   // Get statistics about the current gateway connection to the Gateway Server.
   // This is not persisted between reconnects.
-  rpc GetGatewayConnectionStats(GatewayIdentifiers) returns (GatewayConnectionStats);
+  rpc GetGatewayConnectionStats(GatewayIdentifiers) returns (GatewayConnectionStats) {
+    option (google.api.http) = {
+      get: "/gs/gateways/{gateway_id}/connection/stats"
+    };
+  };
 }
