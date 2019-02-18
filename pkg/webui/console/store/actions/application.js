@@ -19,6 +19,8 @@ import {
   createGetApiKeysListFailureActionType,
   getApiKeysListSuccess,
   createGetApiKeysListSuccessActionType,
+  getApiKey,
+  createGetApiKeyActionType,
 } from '../actions/api-keys'
 
 export const SHARED_NAME = 'APPLICATION'
@@ -29,6 +31,7 @@ export const GET_APP_FAILURE = 'GET_APPLICATION_FAILURE'
 export const GET_APP_API_KEYS_LIST = createGetApiKeysListActionType(SHARED_NAME)
 export const GET_APP_API_KEYS_LIST_SUCCESS = createGetApiKeysListSuccessActionType(SHARED_NAME)
 export const GET_APP_API_KEYS_LIST_FAILURE = createGetApiKeysListFailureActionType(SHARED_NAME)
+export const GET_APP_API_KEY = createGetApiKeyActionType(SHARED_NAME)
 
 export const getApplication = id => (
   { type: GET_APP, id }
@@ -47,3 +50,5 @@ export const getApplicationApiKeysList = getApiKeysList(SHARED_NAME)
 export const getApplicationApiKeysListSuccess = getApiKeysListSuccess(SHARED_NAME)
 
 export const getApplicationApiKeysListFailure = getApiKeysListFailure(SHARED_NAME)
+
+export const getApplicationApiKey = getApiKey(SHARED_NAME)

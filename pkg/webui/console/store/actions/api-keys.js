@@ -28,6 +28,10 @@ export const createGetApiKeysListFailureActionType = name => (
   `GET_${name}_API_KEYS_LIST_FAILURE`
 )
 
+export const createGetApiKeyActionType = name => (
+  `GET_${name}_API_KEY`
+)
+
 export const getApiKeysList = name => (id, params) => (
   { type: createGetApiKeysListActionType(name), id, params }
 )
@@ -38,4 +42,8 @@ export const getApiKeysListSuccess = name => (id, keys, totalCount) => (
 
 export const getApiKeysListFailure = name => (id, error) => (
   { type: createGetApiKeysListFailureActionType(name), id, error }
+)
+
+export const getApiKey = name => id => (
+  { type: createGetApiKeyActionType(name), id }
 )
