@@ -18,6 +18,7 @@ import bind from 'autobind-decorator'
 import { Container, Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 import * as Yup from 'yup'
+import { replace } from 'connected-react-router'
 
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
@@ -131,7 +132,18 @@ export default class ApplicationAccessEdit extends React.Component {
     }
   }
 
-  handleDelete () { }
+  async handleDelete () {
+    const { dispatch, appId, keyId } = this.props
+
+    await this.setState({ error: '' })
+
+    try {
+      await api.application.apiKeys.delete(appId, keyId)
+      dispatch(replace(`/console/applications/${appId}/access`))
+    } catch (error) {
+      await this.setState(error)
+    }
+  }
 
     await this.setState({ error: '' })
 
