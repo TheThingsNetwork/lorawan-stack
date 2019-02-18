@@ -5,7 +5,7 @@
   "components.safe-inspector.index.toggleVisibility": "Xxxxxx xxxxxxxxxx",
   "components.safe-inspector.index.copyClipboard": "Xxxx xx xxxxxxxxx",
   "components.safe-inspector.index.cStyle": "Xxxxxx X-Xxxxx xxxxxxxxxx",
-  "components.safe-inspector.index.byteSignificance": "Xxxx xxxx xxxxxxxxxxxx",
+  "components.safe-inspector.index.byteOrder": "Xxxxxx xxxx xxxxx",
   "console.containers.api-keys-table.index.keyId": "Xxx XX",
   "console.containers.api-keys-table.index.grantedRights": "Xxxxxxx Xxxxxx",
   "console.containers.api-keys-table.index.add": "Xxx Xxxxxx Xxx",

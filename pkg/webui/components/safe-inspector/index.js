@@ -50,7 +50,7 @@ const m = defineMessages({
   toggleVisibility: 'Toggle visibility',
   copyClipboard: 'Copy to clipboard',
   cStyle: 'Toggle C-Style formatting',
-  byteSignificance: 'Swap byte significance',
+  byteOrder: 'Switch byte order',
 })
 
 @bind
@@ -174,7 +174,7 @@ export class SafeInspector extends Component {
             <React.Fragment>
               <span>{ msb ? 'msb' : 'lsb' }</span>
               <button
-                title={m.byteSignificance}
+                title={m.byteOrder}
                 className={style.buttonSwap}
                 onClick={this.handleSwapToggle}
               >
