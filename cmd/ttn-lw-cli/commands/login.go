@@ -95,7 +95,7 @@ var (
 					}
 					code = strings.TrimSpace(code)
 					tokenType, _, _, err := auth.SplitToken(code)
-					if err == nil {
+					if err != nil {
 						logger.WithError(err).Warn("Could not parse authorization code")
 						continue
 					}
