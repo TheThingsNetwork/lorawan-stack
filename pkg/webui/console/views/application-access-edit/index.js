@@ -139,16 +139,6 @@ export default class ApplicationAccessEdit extends React.Component {
 
     try {
       await api.application.apiKeys.delete(appId, keyId)
-      dispatch(replace(`/console/applications/${appId}/access`))
-    } catch (error) {
-      await this.setState(error)
-    }
-  }
-
-    await this.setState({ error: '' })
-
-    try {
-      await api.application.apiKeys.delete(appId, keyId)
       toast({
         message: m.deleteSuccess,
         type: toast.types.SUCCESS,
@@ -240,10 +230,7 @@ export default class ApplicationAccessEdit extends React.Component {
                 {rightsItems}
               </FieldGroup>
               <div className={style.submitBar}>
-                <div>
-                  <Button type="submit" message={sharedMessages.saveChanges} />
-                  <Button type="reset" naked secondary message={sharedMessages.cancel} />
-                </div>
+                <Button type="submit" message={sharedMessages.saveChanges} />
                 <ModalButton
                   type="button"
                   icon="delete"
