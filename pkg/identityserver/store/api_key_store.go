@@ -107,7 +107,7 @@ func (s *apiKeyStore) UpdateAPIKey(ctx context.Context, entityID *ttnpb.EntityId
 		return nil, err
 	}
 	if len(key.Rights) == 0 {
-		return nil, s.db.Delete(&APIKey{}).Error
+		return nil, s.db.Delete(&keyModel).Error
 	}
 	keyModel.Name = key.Name
 	keyModel.Rights = Rights{Rights: key.Rights}
