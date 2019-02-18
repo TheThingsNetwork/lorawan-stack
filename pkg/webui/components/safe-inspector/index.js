@@ -49,7 +49,7 @@ const m = defineMessages({
   copied: 'Copied to clipboard!',
   toggleVisibility: 'Toggle visibility',
   copyClipboard: 'Copy to clipboard',
-  cStyle: 'Toggle C-Style formatting',
+  arrayFormatting: 'Toggle array formatting',
   byteOrder: 'Switch byte order',
 })
 
@@ -148,7 +148,7 @@ export class SafeInspector extends Component {
       const chunks = chunkArray(data.toUpperCase().split(''), 2)
       if (!byteStyle) {
         const orderedChunks = msb ? chunks : chunks.reverse()
-        formattedData = display = `{ ${orderedChunks.map(chunk => ` 0x${chunk.join('')}`)} }`
+        formattedData = display = `${orderedChunks.map(chunk => ` 0x${chunk.join('')}`)}`
       } else {
         display = chunks.map((chunk, index) => (<span key={`${data}_chunk_${index}`}>{hidden ? '••' : chunk}</span>))
       }
@@ -184,7 +184,7 @@ export class SafeInspector extends Component {
           )}
           {!hidden && isBytes && (
             <button
-              title={m.cStyle}
+              title={m.arrayFormatting}
               className={style.buttonTransform}
               onClick={this.handleTransformToggle}
             >
