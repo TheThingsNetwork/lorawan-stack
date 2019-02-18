@@ -45,7 +45,6 @@ const validationSchema = Yup.object().shape({
     .min(2, sharedMessages.validateTooShort)
     .max(50, sharedMessages.validateTooLong)
     .required(sharedMessages.validateRequired),
-  description: Yup.string(),
 })
 
 @connect(function ({ apiKeys, rights }, props) {
@@ -120,7 +119,6 @@ export default class ApplicationAccessEdit extends React.Component {
 
     const initialFormValues = {
       name: apiKey.name,
-      description: apiKey.description,
       ...rightsValues,
     }
 
@@ -148,11 +146,6 @@ export default class ApplicationAccessEdit extends React.Component {
                 title={sharedMessages.name}
                 required
                 name="name"
-                type="text"
-              />
-              <Field
-                title={sharedMessages.description}
-                name="description"
                 type="text"
               />
               <Message component="h4" content={sharedMessages.rights} />
