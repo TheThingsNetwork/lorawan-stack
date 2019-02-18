@@ -268,4 +268,4 @@ const Err = function (props) {
 }
 
 export default injectIntl(Field)
-export { Field }
+export { Field, Err as FieldError }
