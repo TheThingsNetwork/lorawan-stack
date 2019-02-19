@@ -234,7 +234,7 @@ outer:
 		}
 
 		var err error
-		cmdBuf, err = crypto.EncryptDownlink(key, *dev.EndDeviceIdentifiers.DevAddr, pld.FHDR.FCnt, cmdBuf)
+		cmdBuf, err = crypto.EncryptDownlink(key, dev.Session.DevAddr, pld.FHDR.FCnt, cmdBuf)
 		if err != nil {
 			return nil, nil, errEncryptMAC.WithCause(err)
 		}
@@ -300,7 +300,7 @@ outer:
 	if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 		mic, err = crypto.ComputeLegacyDownlinkMIC(
 			key,
-			*dev.EndDeviceIdentifiers.DevAddr,
+			dev.Session.DevAddr,
 			pld.FHDR.FCnt,
 			b,
 		)
@@ -311,7 +311,7 @@ outer:
 		}
 		mic, err = crypto.ComputeDownlinkMIC(
 			key,
-			*dev.EndDeviceIdentifiers.DevAddr,
+			dev.Session.DevAddr,
 			confFCnt,
 			pld.FHDR.FCnt,
 			b,
