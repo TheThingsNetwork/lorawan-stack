@@ -37,7 +37,7 @@ func (fw *forwarder) forward(ctx context.Context, method string, err error) {
 		return
 	}
 
-	code := grpc.Code(err)
+	code := codes.Code(errors.Code(err))
 	switch code {
 	case codes.Canceled,
 		codes.InvalidArgument,
