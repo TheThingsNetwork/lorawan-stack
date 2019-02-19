@@ -34,12 +34,13 @@ instead.`)
   }
 
   render () {
-    const { intl, children, ...rest } = this.props
+    const { intl, children, values, ...rest } = this.props
     let translatedRest = {}
     for (const key in rest) {
       let prop = rest[key]
       if (typeof prop === 'object' && prop.id && prop.defaultMessage) {
-        prop = intl.formatMessage(prop)
+        const messageValues = values || {}
+        prop = intl.formatMessage(prop, messageValues)
       }
 
       translatedRest = {
