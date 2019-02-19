@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+$border-width = $cs.xxs
+
 left-border($color)
   background: linear-gradient(left, $color, 5px $color, 5px white)
 
@@ -21,15 +23,18 @@ left-border($color)
   border-right: 1px solid $c-divider
   border-color: $c-divider-subtle
   border-radius: $br.m
-  padding: $cs.xl $cs.l
+  padding: $cs.xl $cs.l $cs.xl $cs.xl
   margin-bottom: $ls.xxs
   box-shadow: 0 1px 1px 0 $c-divider-dark
   display: flex
   flex-wrap: nowrap
 
   &.small
-    padding: $cs.s
-    border-left-width: 4px
+    padding: $cs.s $cs.s $cs.s $cs.l
+    border-left-width: $border-width
+
+    .icon
+      margin-right: $cs.l - $border-width
 
   &.error
     left-border($c-error)
@@ -52,8 +57,9 @@ left-border($color)
     font-weight: 600
 
   .content
-    margin-left: $cs.xs
     display: inline-block
+    color: $tc-deep-gray
 
   .icon
     display: flex
+    margin-right: $cs.xl - $border-width

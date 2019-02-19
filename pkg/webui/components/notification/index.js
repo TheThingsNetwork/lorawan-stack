@@ -53,7 +53,7 @@ const Notification = function ({
 
   return (
     <div className={classname}>
-      <Icon className={style.icon} icon={icon} />
+      <Icon className={style.icon} icon={icon} large={!small} />
       <div className={style.content}>
         { title && (
           <Message
