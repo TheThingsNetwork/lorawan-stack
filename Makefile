@@ -38,7 +38,7 @@ messages:
 
 dev-deps: go.deps js.dev-deps
 
-deps: go.deps js.deps sdk.deps
+deps: go.deps sdk.deps sdk.js.build js.deps
 
 test: go.test js.test sdk.test
 

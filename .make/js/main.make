@@ -88,6 +88,8 @@ js.deps: $(YARN)
 js.init: $(MAGE)
 	@$(log) "Initializing js"
 	@make js.dev-deps
+	@make sdk.js.deps
+	@make sdk.js.build
 	@make js.deps
 
 INIT_RULES += js.init
