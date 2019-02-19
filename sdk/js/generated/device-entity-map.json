@@ -1,0 +1,77 @@
+{
+  "ids": ["is", "is"],
+  "name": ["is", "is"],
+  "description": ["is", "is"],
+  "attributes": ["is", "is"],
+  "locations": ["is", "is"],
+  "version_ids": ["is", "is"],
+  "service_profile_id": ["is", "is"],
+  "application_server_address": ["is", ["is", "js"]],
+  "join_server_address": ["is", "is"],
+  "network_server_address": ["is", ["is", "js"]],
+  "battery_percentage": ["ns", "read_only"],
+  "default_class": ["ns", "ns"],
+  "default_mac_parameters": ["ns", "ns"],
+  "downlink_margin": ["ns", "read_only"],
+  "frequency_plan_id": ["ns", "ns"],
+  "last_dev_status_received_at": ["ns", "read_only"],
+  "lorawan_phy_version": ["ns", "ns"],
+  "lorawan_version": ["ns", "ns"],
+  "mac_settings": ["ns", "ns"],
+  "mac_state": ["ns", "read_only"],
+  "max_frequency": ["ns", "ns"],
+  "min_frequency": ["ns", "ns"],
+  "power_state": ["ns", "read_only"],
+  "recent_downlinks": ["ns", "read_only"],
+  "recent_uplinks": ["ns", "read_only"],
+  "resets_f_cnt": ["ns", "ns"],
+  "resets_join_nonces": ["js", "js"],
+  "supports_class_b": ["ns", "ns"],
+  "supports_class_c": ["ns", "ns"],
+  "supports_join": ["ns", "ns"],
+  "uses_32_bit_f_cnt": ["ns", "ns"],
+  "session": {
+    "_root": [["ns", "as"], "read_only"],
+    "dev_addr": ["ns", "ns"],
+    "last_f_cnt_down": ["ns", "ns"],
+    "last_f_cnt_up": ["ns", "ns"],
+    "last_conf_f_cnt_down": ["ns", "ns"],
+    "last_a_f_cnt_down": ["as", "as"],
+    "started_at": ["ns", "ns"],
+    "keys": {
+      "_root": [["ns", "as"], "read_only"],
+      "f_nwk_s_int_key": {
+        "_root": ["ns", "read_only"],
+        "key": ["ns", "ns"],
+        "label": ["ns", "read_only"]
+      },
+      "nwk_s_enc_key": {
+        "_root": ["ns", "read_only"],
+        "key": ["ns", "ns"],
+        "label": ["ns", "read_only"]
+      },
+      "s_nwk_s_int_key": {
+        "_root": ["ns", "read_only"],
+        "key": ["ns", "ns"],
+        "label": ["ns", "read_only"]
+      },
+      "app_s_key": {
+        "_root": ["as", "read_only"],
+        "key": ["as", "as"],
+        "label": ["as", "read_only"]
+      }
+    }
+  },
+  "formatters": ["as", "as"],
+  "queued_application_downlinks": ["ns", "read_only"],
+  "last_dev_nonce": ["js", "js"],
+  "last_join_nonce": ["js", "js"],
+  "last_rj_count_0": ["js", "js"],
+  "last_rj_count_1": ["js", "js"],
+  "net_id": ["js", "js"],
+  "provisioner_id": ["js", "js"],
+  "provisioning_data": ["js", "js"],
+  "resets_join_nonces": ["js", "js"],
+  "root_keys": ["js", "js"],
+  "used_dev_nonces": ["js", "js"]
+}
