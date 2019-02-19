@@ -21,6 +21,7 @@ import (
 	"net/http/pprof"
 	"strings"
 
+	"github.com/heptiolabs/healthcheck"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -31,11 +32,22 @@ import (
 const (
 	metricsUsername = "metrics"
 	pprofUsername   = "pprof"
+	healthUsername  = "health"
 )
 
-// RegisterWeb registers a web subsystem to the component
+// RegisterWeb registers a web subsystem to the component.
 func (c *Component) RegisterWeb(s web.Registerer) {
 	c.webSubsystems = append(c.webSubsystems, s)
+}
+
+// RegisterLivenessCheck registers a liveness check for the component.
+func (c *Component) RegisterLivenessCheck(name string, check healthcheck.Check) {
+	c.healthHandler.AddLivenessCheck(name, check)
+}
+
+// RegisterReadinessCheck registers a readiness check for the component.
+func (c *Component) RegisterReadinessCheck(name string, check healthcheck.Check) {
+	c.healthHandler.AddReadinessCheck(name, check)
 }
 
 func (c *Component) serveHTTP(lis net.Listener) error {
@@ -75,6 +87,16 @@ func (c *Component) listenWeb() (err error) {
 		g := c.web.RootGroup("/metrics", middleware...)
 		g.GET("/", func(c echo.Context) error { return c.Redirect(http.StatusFound, strings.TrimSuffix(c.Path(), "/")) })
 		g.GET("", echo.WrapHandler(metrics.Exporter))
+	}
+
+	if c.config.HTTP.Health.Enable {
+		var middleware []echo.MiddlewareFunc
+		if c.config.HTTP.Health.Password != "" {
+			middleware = append(middleware, c.basicAuth(healthUsername, c.config.HTTP.Health.Password))
+		}
+		g := c.web.RootGroup("/healthz", middleware...)
+		g.GET("/live", echo.WrapHandler(http.HandlerFunc(c.healthHandler.LiveEndpoint)))
+		g.GET("/ready", echo.WrapHandler(http.HandlerFunc(c.healthHandler.ReadyEndpoint)))
 	}
 
 	return nil

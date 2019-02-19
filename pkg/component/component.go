@@ -23,7 +23,8 @@ import (
 	"sort"
 	"syscall"
 
-	raven "github.com/getsentry/raven-go"
+	"github.com/getsentry/raven-go"
+	"github.com/heptiolabs/healthcheck"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/config"
@@ -62,6 +63,8 @@ type Component struct {
 
 	web           *web.Server
 	webSubsystems []web.Registerer
+
+	healthHandler healthcheck.Handler
 
 	loopback *grpc.ClientConn
 
@@ -113,6 +116,8 @@ func New(logger log.Stack, config *Config, opts ...Option) (*Component, error) {
 
 		config: config,
 		logger: logger,
+
+		healthHandler: healthcheck.NewHandler(),
 
 		tcpListeners: make(map[string]*listener),
 

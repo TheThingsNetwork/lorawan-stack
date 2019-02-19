@@ -84,6 +84,11 @@ type Metrics struct {
 	Password string `name:"password" description:"Password to protect metrics endpoint (username is metrics)"`
 }
 
+type Health struct {
+	Enable   bool   `name:"enable" description:"Enable health check endpoint on HTTP server"`
+	Password string `name:"password" description:"Password to protect health endpoint (username is health)"`
+}
+
 // HTTPStaticConfig represents the HTTP static file server configuration.
 type HTTPStaticConfig struct {
 	Mount      string   `name:"mount" description:"Path on the server where static assets will be served"`
@@ -98,6 +103,7 @@ type HTTP struct {
 	Cookie    Cookie           `name:"cookie"`
 	PProf     PProf            `name:"pprof"`
 	Metrics   Metrics          `name:"metrics"`
+	Health    Health           `name:"health"`
 }
 
 // Redis represents Redis configuration.

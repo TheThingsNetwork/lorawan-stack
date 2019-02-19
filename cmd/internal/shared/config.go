@@ -54,6 +54,9 @@ var DefaultHTTPConfig = config.HTTP{
 	Metrics: config.Metrics{
 		Enable: true,
 	},
+	Health: config.Health{
+		Enable: true,
+	},
 }
 
 // DefaultGRPCConfig is the default config for GRPC.
