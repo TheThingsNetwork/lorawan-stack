@@ -46,7 +46,7 @@ func (Js) installYarn() error {
 	} else {
 		yarn = "yarn"
 	}
-	return sh.RunV("npm", "install", "--no-package-lock", "--no-save", yarn)
+	return sh.RunV("npm", "install", "--no-package-lock", "--no-save", "--production=false", yarn)
 }
 
 func (js Js) yarn() (func(args ...string) error, error) {
@@ -72,5 +72,5 @@ func (js Js) Deps() error {
 	if err != nil {
 		return err
 	}
-	return yarn("install", "--no-progress")
+	return yarn("install", "--no-progress", "--production=false")
 }
