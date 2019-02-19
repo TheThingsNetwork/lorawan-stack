@@ -35,6 +35,28 @@ func RegisterAllowedFieldMaskPaths(rpcFullMethod string, allowedPaths ...string)
 	allowedFieldMaskPaths[rpcFullMethod] = append(allowedFieldMaskPaths[rpcFullMethod], allowedPaths...)
 }
 
+var allowedFieldMaskPathGetters []func(string) []string
+
+// RegisterAllowedFieldMaskPathsGetter registers a function that is called with
+// the full RPC method when validating the field mask paths for an RPC.
+// If the function does not know the allowed field mask paths for the given RPC,
+// it should return nil.
+func RegisterAllowedFieldMaskPathsGetter(f func(rpcFullMethod string) []string) {
+	allowedFieldMaskPathGetters = append(allowedFieldMaskPathGetters, f)
+}
+
+func getAllowedFieldMaskPaths(rpcFullMethod string) []string {
+	if paths, ok := allowedFieldMaskPaths[rpcFullMethod]; ok {
+		return paths
+	}
+	for i := len(allowedFieldMaskPathGetters) - 1; i >= 0; i-- {
+		if paths := allowedFieldMaskPathGetters[i](rpcFullMethod); paths != nil {
+			return paths
+		}
+	}
+	return nil
+}
+
 type fieldMaskGetter interface {
 	GetFieldMask() types.FieldMask
 }
@@ -84,7 +106,7 @@ func convertError(err error) error {
 // then the field mask paths are validated according to the registered list.
 func UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		if allowed, ok := allowedFieldMaskPaths[info.FullMethod]; ok {
+		if allowed := getAllowedFieldMaskPaths(info.FullMethod); allowed != nil {
 			if v, ok := req.(fieldMaskGetter); ok {
 				requested := v.GetFieldMask().Paths
 				if len(requested) == 0 {
@@ -127,7 +149,7 @@ func UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 // then the field mask paths are validated according to the registered list.
 func StreamServerInterceptor() grpc.StreamServerInterceptor {
 	return func(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
-		wrapper := &recvWrapper{ServerStream: stream, allowedFieldMaskPaths: allowedFieldMaskPaths[info.FullMethod]}
+		wrapper := &recvWrapper{ServerStream: stream, allowedFieldMaskPaths: getAllowedFieldMaskPaths(info.FullMethod)}
 		return handler(srv, wrapper)
 	}
 }
