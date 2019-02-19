@@ -186,3 +186,29 @@ func (v *DataRateIndex) UnmarshalText(b []byte) error {
 	*v = DataRateIndex(i)
 	return nil
 }
+
+// String implements fmt.Stringer.
+func (v RxDelay) String() string {
+	return strconv.Itoa(int(v))
+}
+
+// MarshalText implements encoding.TextMarshaler interface.
+func (v RxDelay) MarshalText() ([]byte, error) {
+	return []byte(v.String()), nil
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler interface.
+func (v *RxDelay) UnmarshalText(b []byte) error {
+	i, err := strconv.Atoi(string(b))
+	if err != nil {
+		return errCouldNotParse("RxDelay")(string(b)).WithCause(err)
+	}
+	if i > int(RX_DELAY_15) {
+		return errFieldHasMax.WithAttributes(
+			"lorawan_field", "RxDelay",
+			"max", RX_DELAY_15,
+		)
+	}
+	*v = RxDelay(i)
+	return nil
+}
