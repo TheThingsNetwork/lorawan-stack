@@ -51,6 +51,7 @@ class Applications {
     this.create = this.create.bind(this)
     this.deleteById = this.deleteById.bind(this)
     this.withId = this.withId.bind(this)
+    this.getRightsById = this.getRightsById.bind(this)
   }
 
   // Retrieval
@@ -144,6 +145,14 @@ class Applications {
     return this._api.ApplicationRegistry.Delete({
       route: { application_id: applicationId },
     })
+  }
+
+  async getRightsById (applicationId) {
+    const result = await this._api.ApplicationAccess.ListRights({
+      route: { application_id: applicationId },
+    })
+
+    return Marshaler.unwrapRights(result)
   }
 
   // Shorthand to methods of single application

@@ -70,6 +70,10 @@ class Marshaler {
     return transform ? transform(data) : data
   }
 
+  static unwrapRights (result, transform) {
+    return this.payloadListResponse('rights', result, transform)
+  }
+
   static unwrapApplications (result, transform) {
     return this.payloadListResponse('applications', result, transform)
   }
