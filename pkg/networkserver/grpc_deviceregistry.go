@@ -17,6 +17,7 @@ package networkserver
 import (
 	"bytes"
 	"context"
+	"strings"
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
@@ -59,23 +60,12 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			"queued_application_downlinks",
 		)
 	}
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.desired_parameters") {
-		gets = append(gets,
-			"mac_state.current_parameters",
-			"mac_state.device_class",
-		)
-	}
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.current_parameters") {
-		gets = append(gets,
-			"mac_state.desired_parameters",
-			"mac_state.device_class",
-		)
-	}
 
 	var addDownlinkTask bool
 	dev, err := ns.devices.SetByID(ctx, req.Device.EndDeviceIdentifiers.ApplicationIdentifiers, req.Device.EndDeviceIdentifiers.DeviceID, gets, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		if err := ttnpb.ProhibitFields(req.FieldMask.Paths,
-			"mac_state",
+			"mac_state.current_parameters",
+			"mac_state.desired_parameters",
 			"pending_session",
 		); err != nil {
 			return nil, nil, errInvalidFieldMask.WithCause(err)
@@ -89,8 +79,6 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			}
 
 			addDownlinkTask = ttnpb.HasAnyField(req.FieldMask.Paths,
-				"mac_state.current_parameters",
-				"mac_state.desired_parameters",
 				"mac_state.device_class",
 				"queued_application_downlinks",
 			) && req.Device.MACState.DeviceClass != ttnpb.CLASS_A &&
@@ -231,8 +219,17 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			}
 		}
 
-		if req.Device.SupportsJoin && !ttnpb.HasAnyField(sets, "session") {
-			return &req.Device, sets, nil
+		if req.Device.SupportsJoin {
+			var hasSession bool
+			for _, p := range sets {
+				if p == "session" || strings.HasPrefix(p, "session.") {
+					hasSession = true
+					break
+				}
+			}
+			if !hasSession {
+				return &req.Device, sets, nil
+			}
 		}
 
 		if err := ttnpb.RequireFields(sets,
@@ -272,7 +269,12 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			// TODO: Encrypt (https://github.com/TheThingsIndustries/lorawan-stack/issues/1562)
 			req.Device.Session.SNwkSIntKey = req.Device.Session.FNwkSIntKey
 			req.Device.Session.NwkSEncKey = req.Device.Session.FNwkSIntKey
-			sets = append(sets, "session.keys.s_nwk_s_int_key", "session.keys.nwk_s_enc_key")
+			sets = append(sets,
+				"session.keys.nwk_s_enc_key.kek_label",
+				"session.keys.nwk_s_enc_key.key",
+				"session.keys.s_nwk_s_int_key.kek_label",
+				"session.keys.s_nwk_s_int_key.key",
+			)
 		}
 
 		if ttnpb.HasAnyField(sets, "session.started_at") && req.Device.GetSession().GetStartedAt().IsZero() {
@@ -285,6 +287,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		if err := resetMACState(&req.Device, ns.FrequencyPlans, ns.defaultMACSettings); err != nil {
 			return nil, nil, err
 		}
+		sets = append(sets, "mac_state")
 
 		addDownlinkTask = req.Device.MACState.DeviceClass != ttnpb.CLASS_A &&
 			(len(req.Device.QueuedApplicationDownlinks) > 0 || !req.Device.MACState.CurrentParameters.Equal(req.Device.MACState.DesiredParameters))
