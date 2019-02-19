@@ -37,12 +37,12 @@ func (r *deviceRegistryRPC) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequ
 
 // Set implements ttnpb.AsEndDeviceRegistryServer.
 func (r *deviceRegistryRPC) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest) (*ttnpb.EndDevice, error) {
-	if err := rights.RequireApplication(ctx, req.Device.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
+	if err := rights.RequireApplication(ctx, req.EndDevice.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
 	// TODO: Validate field mask (https://github.com/TheThingsNetwork/lorawan-stack/issues/39)
-	return r.registry.Set(ctx, req.Device.EndDeviceIdentifiers, req.FieldMask.Paths, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
-		return &req.Device, req.FieldMask.Paths, nil
+	return r.registry.Set(ctx, req.EndDevice.EndDeviceIdentifiers, req.FieldMask.Paths, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+		return &req.EndDevice, req.FieldMask.Paths, nil
 	})
 }
 

@@ -127,10 +127,10 @@ service AsEndDeviceRegistry {
   // Set creates or updates the device.
   rpc Set(SetEndDeviceRequest) returns (EndDevice) {
     option (google.api.http) = {
-      put: "/as/applications/{device.ids.application_ids.application_id}/devices/{device.ids.device_id}"
+      put: "/as/applications/{end_device.ids.application_ids.application_id}/devices/{end_device.ids.device_id}"
       body: "*"
       additional_bindings {
-        post: "/as/applications/{device.ids.application_ids.application_id}/devices"
+        post: "/as/applications/{end_device.ids.application_ids.application_id}/devices"
         body: "*"
       };
     };

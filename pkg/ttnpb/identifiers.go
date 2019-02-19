@@ -312,7 +312,7 @@ func (m *DownlinkMessage) CombinedIdentifiers() *CombinedIdentifiers {
 
 // CombinedIdentifiers implements Identifiers.
 func (m *SetEndDeviceRequest) CombinedIdentifiers() *CombinedIdentifiers {
-	return m.Device.CombinedIdentifiers()
+	return m.EndDevice.CombinedIdentifiers()
 }
 
 // CombinedIdentifiers implements Identifiers.

@@ -115,26 +115,26 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 
 // Set implements ttnpb.JsEndDeviceRegistryServer.
 func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest) (*ttnpb.EndDevice, error) {
-	if req.Device.JoinEUI == nil || req.Device.JoinEUI.IsZero() {
+	if req.EndDevice.JoinEUI == nil || req.EndDevice.JoinEUI.IsZero() {
 		return nil, errNoJoinEUI
 	}
-	if req.Device.DevEUI == nil || req.Device.DevEUI.IsZero() {
+	if req.EndDevice.DevEUI == nil || req.EndDevice.DevEUI.IsZero() {
 		return nil, errNoDevEUI
 	}
-	if err := rights.RequireApplication(ctx, req.Device.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
+	if err := rights.RequireApplication(ctx, req.EndDevice.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "root_keys") {
-		if err := rights.RequireApplication(ctx, req.Device.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
+		if err := rights.RequireApplication(ctx, req.EndDevice.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
 			return nil, err
 		}
 	}
 	// TODO: Validate field mask (https://github.com/TheThingsNetwork/lorawan-stack/issues/39)
-	return srv.JS.devices.SetByEUI(ctx, *req.Device.JoinEUI, *req.Device.DevEUI, req.FieldMask.Paths, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
-		if dev != nil && !dev.ApplicationIdentifiers.Equal(req.Device.ApplicationIdentifiers) {
+	return srv.JS.devices.SetByEUI(ctx, *req.EndDevice.JoinEUI, *req.EndDevice.DevEUI, req.FieldMask.Paths, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+		if dev != nil && !dev.ApplicationIdentifiers.Equal(req.EndDevice.ApplicationIdentifiers) {
 			return nil, nil, errInvalidIdentifiers
 		}
-		return &req.Device, req.FieldMask.Paths, nil
+		return &req.EndDevice, req.FieldMask.Paths, nil
 	})
 }
 

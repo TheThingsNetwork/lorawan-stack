@@ -1944,7 +1944,7 @@ This is used internally by the Network Server and is read only.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| device | [EndDevice](#ttn.lorawan.v3.EndDevice) |  |  |
+| end_device | [EndDevice](#ttn.lorawan.v3.EndDevice) |  |  |
 | field_mask | [google.protobuf.FieldMask](#google.protobuf.FieldMask) |  |  |
 
 
