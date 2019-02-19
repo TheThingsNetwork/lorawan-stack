@@ -21,6 +21,10 @@ In this guide we will get everything up and running on your local machine (on `l
 
 ## <a name="dependencies">Dependencies</a>
 
+### CLI and Stack
+
+Get the latest packages or binaries for your operating system from the [releases](https://github.com/TheThingsNetwork/lorawan-stack/releases) page on GitHub.
+
 ### Certificates
 
 By default, the Stack requires a `cert.pem` and `key.pem`, in order to to serve content over TLS.
