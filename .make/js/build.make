@@ -55,9 +55,9 @@ js.build-watch: NODE_ENV = development
 js.build-watch: WEBPACK_FLAGS += -w
 js.build-watch: js.webpack-main
 
-js.build: sdk.js.build js.build-dll js.build-main
+js.build: js.build-dll js.build-main
 
-js.watch: sdk.js.build js.build-dll js.build-watch
+js.watch: js.build-dll js.build-watch
 
 js.serve: DEV_SERVER_BUILD = true
 js.serve: $(WEBPACK_CONFIG_BUILT) $(DEFAULT_LOCALE_FILE) $(BACKEND_LOCALES_DIR) $(DLL_OUTPUT)
