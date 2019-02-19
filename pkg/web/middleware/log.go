@@ -36,6 +36,9 @@ func Log(logger log.Interface) echo.MiddlewareFunc {
 				logger = logger.WithField("forwarded_for", fwd)
 			}
 
+			ctx := log.NewContext(req.Context(), logger)
+			c.SetRequest(req.WithContext(ctx))
+
 			start := time.Now()
 			err := next(c)
 			stop := time.Now()
