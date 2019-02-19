@@ -26,6 +26,7 @@ import (
 	"github.com/gogo/protobuf/types"
 	"github.com/spf13/pflag"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 var (
@@ -87,7 +88,7 @@ func isAtomicType(t reflect.Type, maskOnly bool) bool {
 		}
 	case "go.thethings.network/lorawan-stack/pkg/ttnpb":
 		switch t.Name() {
-		case "Picture":
+		case "Picture", "MACSettings_DataRateIndexValue", "MACSettings_PingSlotPeriodValue", "MACSettings_AggregatedDutyCycleValue", "MACSettings_RxDelayValue":
 			return true
 		}
 	}
@@ -219,6 +220,33 @@ func addField(fs *pflag.FlagSet, name string, t reflect.Type, maskOnly bool) {
 				fs.String(name, "", "")
 			case "BytesValue":
 				fs.String(name, "", "(hex)")
+			}
+		case "go.thethings.network/lorawan-stack/pkg/ttnpb":
+			switch t.Name() {
+			case "MACSettings_DataRateIndexValue":
+				values := make([]string, 0, len(proto.EnumValueMap("ttn.lorawan.v3.DataRateIndex")))
+				for value := range proto.EnumValueMap("ttn.lorawan.v3.DataRateIndex") {
+					values = append(values, value)
+				}
+				fs.String(name, "", strings.Join(values, "|"))
+			case "MACSettings_PingSlotPeriodValue":
+				values := make([]string, 0, len(proto.EnumValueMap("ttn.lorawan.v3.PingSlotPeriod")))
+				for value := range proto.EnumValueMap("ttn.lorawan.v3.PingSlotPeriod") {
+					values = append(values, value)
+				}
+				fs.String(name, "", strings.Join(values, "|"))
+			case "MACSettings_AggregatedDutyCycleValue":
+				values := make([]string, 0, len(proto.EnumValueMap("ttn.lorawan.v3.AggregatedDutyCycle")))
+				for value := range proto.EnumValueMap("ttn.lorawan.v3.AggregatedDutyCycle") {
+					values = append(values, value)
+				}
+				fs.String(name, "", strings.Join(values, "|"))
+			case "MACSettings_RxDelayValue":
+				values := make([]string, 0, len(proto.EnumValueMap("ttn.lorawan.v3.RxDelay")))
+				for value := range proto.EnumValueMap("ttn.lorawan.v3.RxDelay") {
+					values = append(values, value)
+				}
+				fs.String(name, "", strings.Join(values, "|"))
 			}
 		default:
 			fmt.Printf("flags: %s.%s not yet supported (%s)\n", t.PkgPath(), t.Name(), name)
@@ -402,6 +430,45 @@ func setField(rv reflect.Value, path []string, v reflect.Value) error {
 							return err
 						}
 						field.Set(reflect.ValueOf(types.BytesValue{Value: buf}))
+					}
+				case ft.PkgPath() == "go.thethings.network/lorawan-stack/pkg/ttnpb":
+					switch ft.Name() {
+					case "MACSettings_DataRateIndexValue":
+						if enumValue, ok := proto.EnumValueMap("ttn.lorawan.v3.DataRateIndex")[v.String()]; ok {
+							field.Set(reflect.ValueOf(ttnpb.MACSettings_DataRateIndexValue{Value: ttnpb.DataRateIndex(enumValue)}))
+							break
+						}
+
+						var enum ttnpb.DataRateIndex
+						if err := enum.UnmarshalText([]byte(v.String())); err != nil {
+							field.Set(reflect.ValueOf(ttnpb.MACSettings_DataRateIndexValue{Value: enum}))
+							break
+						}
+						return fmt.Errorf(`invalid value "%s" for %s`, v.String(), ft.Name())
+					case "MACSettings_PingSlotPeriodValue":
+						if enumValue, ok := proto.EnumValueMap("ttn.lorawan.v3.PingSlotPeriod")[v.String()]; ok {
+							field.Set(reflect.ValueOf(ttnpb.MACSettings_PingSlotPeriodValue{Value: ttnpb.PingSlotPeriod(enumValue)}))
+							break
+						}
+						return fmt.Errorf(`invalid value "%s" for %s`, v.String(), ft.Name())
+					case "MACSettings_AggregatedDutyCycleValue":
+						if enumValue, ok := proto.EnumValueMap("ttn.lorawan.v3.AggregatedDutyCycle")[v.String()]; ok {
+							field.Set(reflect.ValueOf(ttnpb.MACSettings_AggregatedDutyCycleValue{Value: ttnpb.AggregatedDutyCycle(enumValue)}))
+							break
+						}
+						return fmt.Errorf(`invalid value "%s" for %s`, v.String(), ft.Name())
+					case "MACSettings_RxDelayValue":
+						if enumValue, ok := proto.EnumValueMap("ttn.lorawan.v3.RxDelay")[v.String()]; ok {
+							field.Set(reflect.ValueOf(ttnpb.MACSettings_RxDelayValue{Value: ttnpb.RxDelay(enumValue)}))
+							break
+						}
+
+						var enum ttnpb.RxDelay
+						if err := enum.UnmarshalText([]byte(v.String())); err != nil {
+							field.Set(reflect.ValueOf(ttnpb.MACSettings_RxDelayValue{Value: enum}))
+							break
+						}
+						return fmt.Errorf(`invalid value "%s" for %s`, v.String(), ft.Name())
 					}
 				case ft.Kind() == reflect.Slice && ft.Elem().Kind() == reflect.Uint8 && vt.Kind() == reflect.String:
 					s := strings.TrimPrefix(v.String(), "0x")
