@@ -82,7 +82,7 @@ func (fw *forwarder) forward(ctx context.Context, method string, err error) {
 	}
 
 	// Error Attributes
-	for k, v := range errors.Attributes(err) {
+	for k, v := range errors.Attributes(errors.Stack(err)...) {
 		if val := fmt.Sprint(v); len(val) < 64 {
 			tags["error.attributes."+k] = val
 		}
