@@ -137,10 +137,10 @@ func resetMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttn
 	dev.MACState.DesiredParameters.Rx2DataRateIndex = dev.MACState.CurrentParameters.Rx2DataRateIndex
 	if dev.GetMACSettings().GetDesiredRx2DataRateIndex() != nil {
 		dev.MACState.DesiredParameters.Rx2DataRateIndex = dev.MACSettings.DesiredRx2DataRateIndex.Value
-	} else if defaults.DesiredRx2DataRateIndex != nil {
-		dev.MACState.DesiredParameters.Rx2DataRateIndex = defaults.DesiredRx2DataRateIndex.Value
 	} else if fp.DefaultRx2DataRate != nil {
 		dev.MACState.DesiredParameters.Rx2DataRateIndex = ttnpb.DataRateIndex(*fp.DefaultRx2DataRate)
+	} else if defaults.DesiredRx2DataRateIndex != nil {
+		dev.MACState.DesiredParameters.Rx2DataRateIndex = defaults.DesiredRx2DataRateIndex.Value
 	}
 
 	dev.MACState.CurrentParameters.Rx2Frequency = band.DefaultRx2Parameters.Frequency
@@ -152,10 +152,10 @@ func resetMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttn
 	dev.MACState.DesiredParameters.Rx2Frequency = dev.MACState.CurrentParameters.Rx2Frequency
 	if dev.MACSettings != nil && dev.GetMACSettings().GetDesiredRx2Frequency() != 0 {
 		dev.MACState.DesiredParameters.Rx2Frequency = dev.MACSettings.DesiredRx2Frequency
-	} else if defaults.DesiredRx2Frequency != 0 {
-		dev.MACState.DesiredParameters.Rx2Frequency = defaults.DesiredRx2Frequency
 	} else if fp.Rx2Channel != nil {
 		dev.MACState.DesiredParameters.Rx2Frequency = fp.Rx2Channel.Frequency
+	} else if defaults.DesiredRx2Frequency != 0 {
+		dev.MACState.DesiredParameters.Rx2Frequency = defaults.DesiredRx2Frequency
 	}
 
 	dev.MACState.CurrentParameters.MaxDutyCycle = ttnpb.DUTY_CYCLE_1
@@ -204,6 +204,17 @@ func resetMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttn
 	}
 
 	if len(dev.GetMACSettings().GetFactoryPresetFrequencies()) > 0 {
+		dev.MACState.CurrentParameters.Channels = make([]*ttnpb.MACParameters_Channel, 0, len(dev.MACSettings.FactoryPresetFrequencies))
+		for _, freq := range dev.MACSettings.FactoryPresetFrequencies {
+			dev.MACState.CurrentParameters.Channels = append(dev.MACState.CurrentParameters.Channels, &ttnpb.MACParameters_Channel{
+				MinDataRateIndex:  0,
+				MaxDataRateIndex:  ttnpb.DATA_RATE_15,
+				UplinkFrequency:   freq,
+				DownlinkFrequency: freq,
+				EnableUplink:      true,
+			})
+		}
+	} else if len(defaults.GetFactoryPresetFrequencies()) > 0 {
 		dev.MACState.CurrentParameters.Channels = make([]*ttnpb.MACParameters_Channel, 0, len(dev.MACSettings.FactoryPresetFrequencies))
 		for _, freq := range dev.MACSettings.FactoryPresetFrequencies {
 			dev.MACState.CurrentParameters.Channels = append(dev.MACState.CurrentParameters.Channels, &ttnpb.MACParameters_Channel{
