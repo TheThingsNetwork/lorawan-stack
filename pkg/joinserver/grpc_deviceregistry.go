@@ -186,7 +186,7 @@ func (srv jsEndDeviceRegistryServer) Provision(req *ttnpb.ProvisionEndDevicesReq
 					return nil, err
 				}
 			}
-			deviceID, err := provisioner.DeviceID(joinEUI, devEUI, entry)
+			deviceID, err := provisioner.DefaultDeviceID(joinEUI, devEUI, entry)
 			if err != nil {
 				return nil, err
 			}
@@ -214,7 +214,7 @@ func (srv jsEndDeviceRegistryServer) Provision(req *ttnpb.ProvisionEndDevicesReq
 			if err != nil {
 				return nil, err
 			}
-			deviceID, err := provisioner.DeviceID(joinEUI, devEUI, entry)
+			deviceID, err := provisioner.DefaultDeviceID(joinEUI, devEUI, entry)
 			if err != nil {
 				return nil, err
 			}

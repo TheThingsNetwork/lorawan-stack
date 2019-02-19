@@ -16,8 +16,6 @@ package joinserver_test
 
 import (
 	"context"
-	"encoding/binary"
-	"fmt"
 	"testing"
 
 	pbtypes "github.com/gogo/protobuf/types"
@@ -28,7 +26,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	. "go.thethings.network/lorawan-stack/pkg/joinserver"
-	"go.thethings.network/lorawan-stack/pkg/joinserver/provisioning"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/unique"
@@ -1654,39 +1651,6 @@ func TestDeviceRegistryProvision(t *testing.T) {
 	}
 }
 
-type byteToSerialNumber struct {
-}
-
-func (p *byteToSerialNumber) DefaultJoinEUI(entry *pbtypes.Struct) (types.EUI64, error) {
-	return types.EUI64{0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}, nil
-}
-
-func (p *byteToSerialNumber) DefaultDevEUI(entry *pbtypes.Struct) (types.EUI64, error) {
-	var devEUI types.EUI64
-	binary.BigEndian.PutUint64(devEUI[:], uint64(entry.Fields["serial_number"].GetNumberValue()))
-	return devEUI, nil
-}
-
-func (p *byteToSerialNumber) DeviceID(joinEUI, devEUI types.EUI64, entry *pbtypes.Struct) (string, error) {
-	return fmt.Sprintf("sn-%d", int(entry.Fields["serial_number"].GetNumberValue())), nil
-}
-
-func (p *byteToSerialNumber) Decode(data []byte) ([]*pbtypes.Struct, error) {
-	var res []*pbtypes.Struct
-	for _, b := range data {
-		res = append(res, &pbtypes.Struct{
-			Fields: map[string]*pbtypes.Value{
-				"serial_number": {
-					Kind: &pbtypes.Value_NumberValue{
-						NumberValue: float64(b),
-					},
-				},
-			},
-		})
-	}
-	return res, nil
-}
-
 type mockJsEndDeviceRegistryProvisionServer struct {
 	*test.MockServerStream
 	SendFunc func(*ttnpb.EndDevice) error
@@ -1697,8 +1661,4 @@ func (s *mockJsEndDeviceRegistryProvisionServer) Send(up *ttnpb.EndDevice) error
 		return nil
 	}
 	return s.SendFunc(up)
-}
-
-func init() {
-	provisioning.Register("mock", &byteToSerialNumber{})
 }

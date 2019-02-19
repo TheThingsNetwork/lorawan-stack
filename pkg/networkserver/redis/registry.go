@@ -166,6 +166,9 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 		if err != nil {
 			return err
 		}
+		if stored == nil && pb == nil {
+			return nil
+		}
 
 		var f func(redis.Pipeliner) error
 		if pb == nil {
@@ -224,7 +227,9 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 					if err == nil && s != "" {
 						return errDuplicateIdentifiers
 					}
-					p.Set(ek, uid, 0)
+					if s != uid {
+						p.Set(ek, uid, 0)
+					}
 				}
 
 				if _, err := ttnredis.SetProto(p, k, stored, 0); err != nil {
