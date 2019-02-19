@@ -187,64 +187,73 @@ message MACSettings {
   }
 
   // Maximum delay for the device to answer a MAC request or a confirmed downlink frame.
-  // Must be set if the device supports class B.
+  // If unset, the default value from Network Server configuration will be used.
   google.protobuf.Duration class_b_timeout = 1 [(gogoproto.stdduration) = true];
   // Periodicity of the class B ping slot.
-  // Must be set if the device supports class B.
+  // If unset, the default value from Network Server configuration will be used.
   PingSlotPeriodValue ping_slot_periodicity = 2;
   // Data rate index of the class B ping slot.
-  // Must be set if the device supports class B.
+  // If unset, the default value from Network Server configuration will be used.
   DataRateIndexValue ping_slot_data_rate_index = 3;
   // Frequency of the class B ping slot (Hz).
-  // Must be set if the device supports class B.
+  // If unset, the default value from Network Server configuration will be used.
   uint64 ping_slot_frequency = 4;
 
   // Maximum delay for the device to answer a MAC request or a confirmed downlink frame.
-  // Must be set if the device supports class C.
+  // If unset, the default value from Network Server configuration will be used.
   google.protobuf.Duration class_c_timeout = 5 [(gogoproto.stdduration) = true];
 
   // Class A Rx1 delay.
-  // Must be set if the device is ABP.
+  // If unset, the default value from Network Server configuration or regional parameters specification will be used.
   RxDelayValue rx1_delay = 6;
   // Rx1 data rate offset.
-  // Must be set if the device is ABP.
+  // If unset, the default value from Network Server configuration will be used.
   google.protobuf.UInt32Value rx1_data_rate_offset = 7;
   // Data rate index for Rx2.
-  // Must be set if the device is ABP.
+  // If unset, the default value from Network Server configuration or regional parameters specification will be used.
   DataRateIndexValue rx2_data_rate_index = 8;
   // Frequency for Rx2 (Hz).
-  // Must be set if the device is ABP.
+  // If unset, the default value from Network Server configuration or regional parameters specification will be used.
   uint64 rx2_frequency = 9;
   // List of factory-preset frequencies.
-  // Must be set if the device is ABP.
+  // If unset, the default value from Network Server configuration or regional parameters specification will be used.
   repeated uint64 factory_preset_frequencies = 10;
 
   // Maximum uplink duty cycle (of all channels).
   AggregatedDutyCycleValue max_duty_cycle = 11;
 
   // Whether the device supports 32-bit frame counters.
-  // Must be set if the device MAC version is 1.0.
+  // If unset, the default value from Network Server configuration will be used.
   google.protobuf.BoolValue supports_32_bit_f_cnt = 12 [(gogoproto.customname) = "Supports32BitFCnt"];
 
   // Whether the Network Server should use ADR for the device.
+  // If unset, the default value from Network Server configuration will be used.
   google.protobuf.BoolValue use_adr = 13 [(gogoproto.customname) = "UseADR"];
   // The ADR margin tells the network server how much margin it should add in ADR requests.
   // A bigger margin is less efficient, but gives a better chance of successful reception.
+  // If unset, the default value from Network Server configuration will be used.
   google.protobuf.FloatValue adr_margin = 14 [(gogoproto.customname) = "ADRMargin"];
   // Whether the device resets the frame counters (not LoRaWAN compliant).
+  // If unset, the default value from Network Server configuration will be used.
   google.protobuf.BoolValue resets_f_cnt = 15;
   // The interval after which a DevStatusReq MACCommand shall be sent.
+  // If unset, the default value from Network Server configuration will be used.
   google.protobuf.Duration status_time_periodicity = 16 [(gogoproto.stdduration) = true];
   // Number of uplink messages after which a DevStatusReq MACCommand shall be sent.
+  // If unset, the default value from Network Server configuration will be used.
   google.protobuf.UInt32Value status_count_periodicity = 17;
 
   // The Rx1 delay Network Server should configure device to use via MAC commands or Join-Accept.
+  // If unset, the default value from Network Server configuration or regional parameters specification will be used.
   RxDelayValue desired_rx1_delay = 18;
   // The Rx1 data rate offset Network Server should configure device to use via MAC commands or Join-Accept.
+  // If unset, the default value from Network Server configuration will be used.
   google.protobuf.UInt32Value desired_rx1_data_rate_offset = 19;
   // The Rx2 data rate index Network Server should configure device to use via MAC commands or Join-Accept.
+  // If unset, the default value from frequency plan, Network Server configuration or regional parameters specification will be used.
   DataRateIndexValue desired_rx2_data_rate_index = 20;
   // The Rx2 frequency index Network Server should configure device to use via MAC commands.
+  // If unset, the default value from frequency plan, Network Server configuration or regional parameters specification will be used.
   uint64 desired_rx2_frequency = 21;
 }
 

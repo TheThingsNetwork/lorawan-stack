@@ -62,7 +62,7 @@ var PowerState_value = map[string]int32{
 }
 
 func (PowerState) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_7df2e0db88789f5d, []int{0}
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{0}
 }
 
 type Session struct {
@@ -87,7 +87,7 @@ type Session struct {
 func (m *Session) Reset()      { *m = Session{} }
 func (*Session) ProtoMessage() {}
 func (*Session) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_7df2e0db88789f5d, []int{0}
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{0}
 }
 func (m *Session) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -199,7 +199,7 @@ type MACParameters struct {
 func (m *MACParameters) Reset()      { *m = MACParameters{} }
 func (*MACParameters) ProtoMessage() {}
 func (*MACParameters) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_7df2e0db88789f5d, []int{1}
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{1}
 }
 func (m *MACParameters) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -379,7 +379,7 @@ type MACParameters_Channel struct {
 func (m *MACParameters_Channel) Reset()      { *m = MACParameters_Channel{} }
 func (*MACParameters_Channel) ProtoMessage() {}
 func (*MACParameters_Channel) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_7df2e0db88789f5d, []int{1, 0}
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{1, 0}
 }
 func (m *MACParameters_Channel) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -456,7 +456,7 @@ type EndDeviceBrand struct {
 func (m *EndDeviceBrand) Reset()      { *m = EndDeviceBrand{} }
 func (*EndDeviceBrand) ProtoMessage() {}
 func (*EndDeviceBrand) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_7df2e0db88789f5d, []int{2}
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{2}
 }
 func (m *EndDeviceBrand) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -524,7 +524,7 @@ type EndDeviceModel struct {
 func (m *EndDeviceModel) Reset()      { *m = EndDeviceModel{} }
 func (*EndDeviceModel) ProtoMessage() {}
 func (*EndDeviceModel) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_7df2e0db88789f5d, []int{3}
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{3}
 }
 func (m *EndDeviceModel) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -587,7 +587,7 @@ type EndDeviceVersionIdentifiers struct {
 func (m *EndDeviceVersionIdentifiers) Reset()      { *m = EndDeviceVersionIdentifiers{} }
 func (*EndDeviceVersionIdentifiers) ProtoMessage() {}
 func (*EndDeviceVersionIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_7df2e0db88789f5d, []int{4}
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{4}
 }
 func (m *EndDeviceVersionIdentifiers) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -681,7 +681,7 @@ type EndDeviceVersion struct {
 func (m *EndDeviceVersion) Reset()      { *m = EndDeviceVersion{} }
 func (*EndDeviceVersion) ProtoMessage() {}
 func (*EndDeviceVersion) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_7df2e0db88789f5d, []int{5}
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{5}
 }
 func (m *EndDeviceVersion) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -803,58 +803,67 @@ func (m *EndDeviceVersion) GetDefaultFormatters() MessagePayloadFormatters {
 
 type MACSettings struct {
 	// Maximum delay for the device to answer a MAC request or a confirmed downlink frame.
-	// Must be set if the device supports class B.
+	// If unset, the default value from Network Server configuration will be used.
 	ClassBTimeout *time.Duration `protobuf:"bytes,1,opt,name=class_b_timeout,json=classBTimeout,proto3,stdduration" json:"class_b_timeout,omitempty"`
 	// Periodicity of the class B ping slot.
-	// Must be set if the device supports class B.
+	// If unset, the default value from Network Server configuration will be used.
 	PingSlotPeriodicity *MACSettings_PingSlotPeriodValue `protobuf:"bytes,2,opt,name=ping_slot_periodicity,json=pingSlotPeriodicity,proto3" json:"ping_slot_periodicity,omitempty"`
 	// Data rate index of the class B ping slot.
-	// Must be set if the device supports class B.
+	// If unset, the default value from Network Server configuration will be used.
 	PingSlotDataRateIndex *MACSettings_DataRateIndexValue `protobuf:"bytes,3,opt,name=ping_slot_data_rate_index,json=pingSlotDataRateIndex,proto3" json:"ping_slot_data_rate_index,omitempty"`
 	// Frequency of the class B ping slot (Hz).
-	// Must be set if the device supports class B.
+	// If unset, the default value from Network Server configuration will be used.
 	PingSlotFrequency uint64 `protobuf:"varint,4,opt,name=ping_slot_frequency,json=pingSlotFrequency,proto3" json:"ping_slot_frequency,omitempty"`
 	// Maximum delay for the device to answer a MAC request or a confirmed downlink frame.
-	// Must be set if the device supports class C.
+	// If unset, the default value from Network Server configuration will be used.
 	ClassCTimeout *time.Duration `protobuf:"bytes,5,opt,name=class_c_timeout,json=classCTimeout,proto3,stdduration" json:"class_c_timeout,omitempty"`
 	// Class A Rx1 delay.
-	// Must be set if the device is ABP.
+	// If unset, the default value from Network Server configuration or regional parameters specification will be used.
 	Rx1Delay *MACSettings_RxDelayValue `protobuf:"bytes,6,opt,name=rx1_delay,json=rx1Delay,proto3" json:"rx1_delay,omitempty"`
 	// Rx1 data rate offset.
-	// Must be set if the device is ABP.
+	// If unset, the default value from Network Server configuration will be used.
 	Rx1DataRateOffset *types.UInt32Value `protobuf:"bytes,7,opt,name=rx1_data_rate_offset,json=rx1DataRateOffset,proto3" json:"rx1_data_rate_offset,omitempty"`
 	// Data rate index for Rx2.
-	// Must be set if the device is ABP.
+	// If unset, the default value from Network Server configuration or regional parameters specification will be used.
 	Rx2DataRateIndex *MACSettings_DataRateIndexValue `protobuf:"bytes,8,opt,name=rx2_data_rate_index,json=rx2DataRateIndex,proto3" json:"rx2_data_rate_index,omitempty"`
 	// Frequency for Rx2 (Hz).
-	// Must be set if the device is ABP.
+	// If unset, the default value from Network Server configuration or regional parameters specification will be used.
 	Rx2Frequency uint64 `protobuf:"varint,9,opt,name=rx2_frequency,json=rx2Frequency,proto3" json:"rx2_frequency,omitempty"`
 	// List of factory-preset frequencies.
-	// Must be set if the device is ABP.
+	// If unset, the default value from Network Server configuration or regional parameters specification will be used.
 	FactoryPresetFrequencies []uint64 `protobuf:"varint,10,rep,packed,name=factory_preset_frequencies,json=factoryPresetFrequencies,proto3" json:"factory_preset_frequencies,omitempty"`
 	// Maximum uplink duty cycle (of all channels).
 	MaxDutyCycle *MACSettings_AggregatedDutyCycleValue `protobuf:"bytes,11,opt,name=max_duty_cycle,json=maxDutyCycle,proto3" json:"max_duty_cycle,omitempty"`
 	// Whether the device supports 32-bit frame counters.
-	// Must be set if the device MAC version is 1.0.
+	// If unset, the default value from Network Server configuration will be used.
 	Supports32BitFCnt *types.BoolValue `protobuf:"bytes,12,opt,name=supports_32_bit_f_cnt,json=supports32BitFCnt,proto3" json:"supports_32_bit_f_cnt,omitempty"`
 	// Whether the Network Server should use ADR for the device.
+	// If unset, the default value from Network Server configuration will be used.
 	UseADR *types.BoolValue `protobuf:"bytes,13,opt,name=use_adr,json=useAdr,proto3" json:"use_adr,omitempty"`
 	// The ADR margin tells the network server how much margin it should add in ADR requests.
 	// A bigger margin is less efficient, but gives a better chance of successful reception.
+	// If unset, the default value from Network Server configuration will be used.
 	ADRMargin *types.FloatValue `protobuf:"bytes,14,opt,name=adr_margin,json=adrMargin,proto3" json:"adr_margin,omitempty"`
 	// Whether the device resets the frame counters (not LoRaWAN compliant).
+	// If unset, the default value from Network Server configuration will be used.
 	ResetsFCnt *types.BoolValue `protobuf:"bytes,15,opt,name=resets_f_cnt,json=resetsFCnt,proto3" json:"resets_f_cnt,omitempty"`
 	// The interval after which a DevStatusReq MACCommand shall be sent.
+	// If unset, the default value from Network Server configuration will be used.
 	StatusTimePeriodicity *time.Duration `protobuf:"bytes,16,opt,name=status_time_periodicity,json=statusTimePeriodicity,proto3,stdduration" json:"status_time_periodicity,omitempty"`
 	// Number of uplink messages after which a DevStatusReq MACCommand shall be sent.
+	// If unset, the default value from Network Server configuration will be used.
 	StatusCountPeriodicity *types.UInt32Value `protobuf:"bytes,17,opt,name=status_count_periodicity,json=statusCountPeriodicity,proto3" json:"status_count_periodicity,omitempty"`
 	// The Rx1 delay Network Server should configure device to use via MAC commands or Join-Accept.
+	// If unset, the default value from Network Server configuration or regional parameters specification will be used.
 	DesiredRx1Delay *MACSettings_RxDelayValue `protobuf:"bytes,18,opt,name=desired_rx1_delay,json=desiredRx1Delay,proto3" json:"desired_rx1_delay,omitempty"`
 	// The Rx1 data rate offset Network Server should configure device to use via MAC commands or Join-Accept.
+	// If unset, the default value from Network Server configuration will be used.
 	DesiredRx1DataRateOffset *types.UInt32Value `protobuf:"bytes,19,opt,name=desired_rx1_data_rate_offset,json=desiredRx1DataRateOffset,proto3" json:"desired_rx1_data_rate_offset,omitempty"`
 	// The Rx2 data rate index Network Server should configure device to use via MAC commands or Join-Accept.
+	// If unset, the default value from frequency plan, Network Server configuration or regional parameters specification will be used.
 	DesiredRx2DataRateIndex *MACSettings_DataRateIndexValue `protobuf:"bytes,20,opt,name=desired_rx2_data_rate_index,json=desiredRx2DataRateIndex,proto3" json:"desired_rx2_data_rate_index,omitempty"`
 	// The Rx2 frequency index Network Server should configure device to use via MAC commands.
+	// If unset, the default value from frequency plan, Network Server configuration or regional parameters specification will be used.
 	DesiredRx2Frequency  uint64   `protobuf:"varint,21,opt,name=desired_rx2_frequency,json=desiredRx2Frequency,proto3" json:"desired_rx2_frequency,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -863,7 +872,7 @@ type MACSettings struct {
 func (m *MACSettings) Reset()      { *m = MACSettings{} }
 func (*MACSettings) ProtoMessage() {}
 func (*MACSettings) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_7df2e0db88789f5d, []int{6}
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{6}
 }
 func (m *MACSettings) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1048,7 +1057,7 @@ type MACSettings_DataRateIndexValue struct {
 func (m *MACSettings_DataRateIndexValue) Reset()      { *m = MACSettings_DataRateIndexValue{} }
 func (*MACSettings_DataRateIndexValue) ProtoMessage() {}
 func (*MACSettings_DataRateIndexValue) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_7df2e0db88789f5d, []int{6, 0}
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{6, 0}
 }
 func (m *MACSettings_DataRateIndexValue) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1093,7 +1102,7 @@ type MACSettings_PingSlotPeriodValue struct {
 func (m *MACSettings_PingSlotPeriodValue) Reset()      { *m = MACSettings_PingSlotPeriodValue{} }
 func (*MACSettings_PingSlotPeriodValue) ProtoMessage() {}
 func (*MACSettings_PingSlotPeriodValue) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_7df2e0db88789f5d, []int{6, 1}
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{6, 1}
 }
 func (m *MACSettings_PingSlotPeriodValue) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1138,7 +1147,7 @@ type MACSettings_AggregatedDutyCycleValue struct {
 func (m *MACSettings_AggregatedDutyCycleValue) Reset()      { *m = MACSettings_AggregatedDutyCycleValue{} }
 func (*MACSettings_AggregatedDutyCycleValue) ProtoMessage() {}
 func (*MACSettings_AggregatedDutyCycleValue) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_7df2e0db88789f5d, []int{6, 2}
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{6, 2}
 }
 func (m *MACSettings_AggregatedDutyCycleValue) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1183,7 +1192,7 @@ type MACSettings_RxDelayValue struct {
 func (m *MACSettings_RxDelayValue) Reset()      { *m = MACSettings_RxDelayValue{} }
 func (*MACSettings_RxDelayValue) ProtoMessage() {}
 func (*MACSettings_RxDelayValue) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_7df2e0db88789f5d, []int{6, 3}
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{6, 3}
 }
 func (m *MACSettings_RxDelayValue) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1265,7 +1274,7 @@ type MACState struct {
 func (m *MACState) Reset()      { *m = MACState{} }
 func (*MACState) ProtoMessage() {}
 func (*MACState) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_7df2e0db88789f5d, []int{7}
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{7}
 }
 func (m *MACState) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1399,7 +1408,7 @@ type MACState_JoinAccept struct {
 func (m *MACState_JoinAccept) Reset()      { *m = MACState_JoinAccept{} }
 func (*MACState_JoinAccept) ProtoMessage() {}
 func (*MACState_JoinAccept) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_7df2e0db88789f5d, []int{7, 0}
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{7, 0}
 }
 func (m *MACState_JoinAccept) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1587,7 +1596,7 @@ type EndDevice struct {
 func (m *EndDevice) Reset()      { *m = EndDevice{} }
 func (*EndDevice) ProtoMessage() {}
 func (*EndDevice) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_7df2e0db88789f5d, []int{8}
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{8}
 }
 func (m *EndDevice) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1912,7 +1921,7 @@ type EndDevices struct {
 func (m *EndDevices) Reset()      { *m = EndDevices{} }
 func (*EndDevices) ProtoMessage() {}
 func (*EndDevices) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_7df2e0db88789f5d, []int{9}
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{9}
 }
 func (m *EndDevices) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1957,7 +1966,7 @@ type CreateEndDeviceRequest struct {
 func (m *CreateEndDeviceRequest) Reset()      { *m = CreateEndDeviceRequest{} }
 func (*CreateEndDeviceRequest) ProtoMessage() {}
 func (*CreateEndDeviceRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_7df2e0db88789f5d, []int{10}
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{10}
 }
 func (m *CreateEndDeviceRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1996,7 +2005,7 @@ type UpdateEndDeviceRequest struct {
 func (m *UpdateEndDeviceRequest) Reset()      { *m = UpdateEndDeviceRequest{} }
 func (*UpdateEndDeviceRequest) ProtoMessage() {}
 func (*UpdateEndDeviceRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_7df2e0db88789f5d, []int{11}
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{11}
 }
 func (m *UpdateEndDeviceRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -2042,7 +2051,7 @@ type GetEndDeviceRequest struct {
 func (m *GetEndDeviceRequest) Reset()      { *m = GetEndDeviceRequest{} }
 func (*GetEndDeviceRequest) ProtoMessage() {}
 func (*GetEndDeviceRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_7df2e0db88789f5d, []int{12}
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{12}
 }
 func (m *GetEndDeviceRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -2095,7 +2104,7 @@ type ListEndDevicesRequest struct {
 func (m *ListEndDevicesRequest) Reset()      { *m = ListEndDevicesRequest{} }
 func (*ListEndDevicesRequest) ProtoMessage() {}
 func (*ListEndDevicesRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_7df2e0db88789f5d, []int{13}
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{13}
 }
 func (m *ListEndDevicesRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -2162,7 +2171,7 @@ type SetEndDeviceRequest struct {
 func (m *SetEndDeviceRequest) Reset()      { *m = SetEndDeviceRequest{} }
 func (*SetEndDeviceRequest) ProtoMessage() {}
 func (*SetEndDeviceRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_7df2e0db88789f5d, []int{14}
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{14}
 }
 func (m *SetEndDeviceRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -11738,13 +11747,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/end_device.proto", fileDescriptor_end_device_7df2e0db88789f5d)
+	proto.RegisterFile("lorawan-stack/api/end_device.proto", fileDescriptor_end_device_7c7976812d2926f8)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/end_device.proto", fileDescriptor_end_device_7df2e0db88789f5d)
+	golang_proto.RegisterFile("lorawan-stack/api/end_device.proto", fileDescriptor_end_device_7c7976812d2926f8)
 }
 
-var fileDescriptor_end_device_7df2e0db88789f5d = []byte{
+var fileDescriptor_end_device_7c7976812d2926f8 = []byte{
 	// 3729 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x5a, 0x4b, 0x70, 0x1b, 0xc7,
 	0x99, 0x06, 0x40, 0x8a, 0x04, 0x1a, 0x24, 0x1e, 0xcd, 0x87, 0xc6, 0x94, 0x0c, 0xd0, 0x94, 0xec,

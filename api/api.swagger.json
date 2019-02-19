@@ -7433,42 +7433,42 @@
       "properties": {
         "class_b_timeout": {
           "type": "string",
-          "description": "Maximum delay for the device to answer a MAC request or a confirmed downlink frame.\nMust be set if the device supports class B."
+          "description": "Maximum delay for the device to answer a MAC request or a confirmed downlink frame.\nIf unset, the default value from Network Server configuration will be used."
         },
         "ping_slot_periodicity": {
           "$ref": "#/definitions/MACSettingsPingSlotPeriodValue",
-          "description": "Periodicity of the class B ping slot.\nMust be set if the device supports class B."
+          "description": "Periodicity of the class B ping slot.\nIf unset, the default value from Network Server configuration will be used."
         },
         "ping_slot_data_rate_index": {
           "$ref": "#/definitions/MACSettingsDataRateIndexValue",
-          "description": "Data rate index of the class B ping slot.\nMust be set if the device supports class B."
+          "description": "Data rate index of the class B ping slot.\nIf unset, the default value from Network Server configuration will be used."
         },
         "ping_slot_frequency": {
           "type": "string",
           "format": "uint64",
-          "description": "Frequency of the class B ping slot (Hz).\nMust be set if the device supports class B."
+          "description": "Frequency of the class B ping slot (Hz).\nIf unset, the default value from Network Server configuration will be used."
         },
         "class_c_timeout": {
           "type": "string",
-          "description": "Maximum delay for the device to answer a MAC request or a confirmed downlink frame.\nMust be set if the device supports class C."
+          "description": "Maximum delay for the device to answer a MAC request or a confirmed downlink frame.\nIf unset, the default value from Network Server configuration will be used."
         },
         "rx1_delay": {
           "$ref": "#/definitions/MACSettingsRxDelayValue",
-          "description": "Class A Rx1 delay.\nMust be set if the device is ABP."
+          "description": "Class A Rx1 delay.\nIf unset, the default value from Network Server configuration or regional parameters specification will be used."
         },
         "rx1_data_rate_offset": {
           "type": "integer",
           "format": "int64",
-          "description": "Rx1 data rate offset.\nMust be set if the device is ABP."
+          "description": "Rx1 data rate offset.\nIf unset, the default value from Network Server configuration will be used."
         },
         "rx2_data_rate_index": {
           "$ref": "#/definitions/MACSettingsDataRateIndexValue",
-          "description": "Data rate index for Rx2.\nMust be set if the device is ABP."
+          "description": "Data rate index for Rx2.\nIf unset, the default value from Network Server configuration or regional parameters specification will be used."
         },
         "rx2_frequency": {
           "type": "string",
           "format": "uint64",
-          "description": "Frequency for Rx2 (Hz).\nMust be set if the device is ABP."
+          "description": "Frequency for Rx2 (Hz).\nIf unset, the default value from Network Server configuration or regional parameters specification will be used."
         },
         "factory_preset_frequencies": {
           "type": "array",
@@ -7476,7 +7476,7 @@
             "type": "string",
             "format": "uint64"
           },
-          "description": "List of factory-preset frequencies.\nMust be set if the device is ABP."
+          "description": "List of factory-preset frequencies.\nIf unset, the default value from Network Server configuration or regional parameters specification will be used."
         },
         "max_duty_cycle": {
           "$ref": "#/definitions/MACSettingsAggregatedDutyCycleValue",
@@ -7485,49 +7485,49 @@
         "supports_32_bit_f_cnt": {
           "type": "boolean",
           "format": "boolean",
-          "description": "Whether the device supports 32-bit frame counters.\nMust be set if the device MAC version is 1.0."
+          "description": "Whether the device supports 32-bit frame counters.\nIf unset, the default value from Network Server configuration will be used."
         },
         "use_adr": {
           "type": "boolean",
           "format": "boolean",
-          "description": "Whether the Network Server should use ADR for the device."
+          "description": "Whether the Network Server should use ADR for the device.\nIf unset, the default value from Network Server configuration will be used."
         },
         "adr_margin": {
           "type": "number",
           "format": "float",
-          "description": "The ADR margin tells the network server how much margin it should add in ADR requests.\nA bigger margin is less efficient, but gives a better chance of successful reception."
+          "description": "The ADR margin tells the network server how much margin it should add in ADR requests.\nA bigger margin is less efficient, but gives a better chance of successful reception.\nIf unset, the default value from Network Server configuration will be used."
         },
         "resets_f_cnt": {
           "type": "boolean",
           "format": "boolean",
-          "description": "Whether the device resets the frame counters (not LoRaWAN compliant)."
+          "description": "Whether the device resets the frame counters (not LoRaWAN compliant).\nIf unset, the default value from Network Server configuration will be used."
         },
         "status_time_periodicity": {
           "type": "string",
-          "description": "The interval after which a DevStatusReq MACCommand shall be sent."
+          "description": "The interval after which a DevStatusReq MACCommand shall be sent.\nIf unset, the default value from Network Server configuration will be used."
         },
         "status_count_periodicity": {
           "type": "integer",
           "format": "int64",
-          "description": "Number of uplink messages after which a DevStatusReq MACCommand shall be sent."
+          "description": "Number of uplink messages after which a DevStatusReq MACCommand shall be sent.\nIf unset, the default value from Network Server configuration will be used."
         },
         "desired_rx1_delay": {
           "$ref": "#/definitions/MACSettingsRxDelayValue",
-          "description": "The Rx1 delay Network Server should configure device to use via MAC commands or Join-Accept."
+          "description": "The Rx1 delay Network Server should configure device to use via MAC commands or Join-Accept.\nIf unset, the default value from Network Server configuration or regional parameters specification will be used."
         },
         "desired_rx1_data_rate_offset": {
           "type": "integer",
           "format": "int64",
-          "description": "The Rx1 data rate offset Network Server should configure device to use via MAC commands or Join-Accept."
+          "description": "The Rx1 data rate offset Network Server should configure device to use via MAC commands or Join-Accept.\nIf unset, the default value from Network Server configuration will be used."
         },
         "desired_rx2_data_rate_index": {
           "$ref": "#/definitions/MACSettingsDataRateIndexValue",
-          "description": "The Rx2 data rate index Network Server should configure device to use via MAC commands or Join-Accept."
+          "description": "The Rx2 data rate index Network Server should configure device to use via MAC commands or Join-Accept.\nIf unset, the default value from frequency plan, Network Server configuration or regional parameters specification will be used."
         },
         "desired_rx2_frequency": {
           "type": "string",
           "format": "uint64",
-          "description": "The Rx2 frequency index Network Server should configure device to use via MAC commands."
+          "description": "The Rx2 frequency index Network Server should configure device to use via MAC commands.\nIf unset, the default value from frequency plan, Network Server configuration or regional parameters specification will be used."
         }
       }
     },
