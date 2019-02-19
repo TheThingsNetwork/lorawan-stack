@@ -15,6 +15,7 @@
 package commands
 
 import (
+	"context"
 	stdio "io"
 	"os"
 	"strings"
@@ -364,7 +365,7 @@ var (
 			res, err := setEndDevice(&device, nil, nsPaths, asPaths, jsPaths, true)
 			if err != nil {
 				logger.WithError(err).Error("Could not create end device, rolling back...")
-				return deleteEndDevice(&device.EndDeviceIdentifiers)
+				return deleteEndDevice(context.Background(), &device.EndDeviceIdentifiers)
 			}
 
 			device.SetFields(res, append(append(nsPaths, asPaths...), jsPaths...)...)
@@ -591,7 +592,7 @@ var (
 
 			compareServerAddresses(existingDevice, config)
 
-			return deleteEndDevice(devID)
+			return deleteEndDevice(ctx, devID)
 		},
 	}
 )

@@ -15,6 +15,7 @@
 package commands
 
 import (
+	"context"
 	"strings"
 
 	"github.com/gogo/protobuf/types"
@@ -501,10 +502,10 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths []
 		res.SetFields(asRes, asPaths...)
 	}
 
-	return &res, nil
+	return &res, ctx.Err()
 }
 
-func deleteEndDevice(devID *ttnpb.EndDeviceIdentifiers) error {
+func deleteEndDevice(ctx context.Context, devID *ttnpb.EndDeviceIdentifiers) error {
 	as, err := api.Dial(ctx, config.ApplicationServerAddress)
 	if err != nil {
 		return err
