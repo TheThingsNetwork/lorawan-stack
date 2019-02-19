@@ -41,7 +41,7 @@ var (
 	mgr          = conf.InitializeWithDefaults(name, "ttn_lw", DefaultConfig)
 	config       = &Config{}
 	oauth2Config *oauth2.Config
-	ctx          = context.Background()
+	ctx          = newContext(context.Background())
 	cache        util.Cache
 
 	inputDecoder io.Decoder
@@ -146,7 +146,7 @@ var (
 				logger.Warn("No access token present")
 			}
 
-			return nil
+			return ctx.Err()
 		},
 		PersistentPostRunE: func(cmd *cobra.Command, args []string) error {
 			// clean up the API
@@ -157,7 +157,7 @@ var (
 				return err
 			}
 
-			return nil
+			return ctx.Err()
 		},
 	}
 )

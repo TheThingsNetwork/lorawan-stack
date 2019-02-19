@@ -12,23 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// ttn-lw-cli is the binary for the Command-line interface of The Things Network Stack for LoRaWAN.
-package main
+package commands
 
 import (
+	"context"
 	"os"
-
-	cli_errors "go.thethings.network/lorawan-stack/cmd/internal/errors"
-	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/commands"
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	"os/signal"
+	"syscall"
 )
 
-func main() {
-	if err := commands.Root.Execute(); err != nil {
-		if errors.IsCanceled(err) {
-			os.Exit(130)
+var cancelSignals = []os.Signal{syscall.SIGHUP, os.Interrupt, syscall.SIGTERM}
+
+func newContext(parent context.Context) context.Context {
+	ctx, cancel := context.WithCancel(parent)
+	sig := make(chan os.Signal)
+	signal.Notify(sig, cancelSignals...)
+	go func() {
+		select {
+		case <-ctx.Done():
+		case sig := <-sig:
+			logger.WithField("signal", sig).Debug("Command interrupted")
+			cancel()
 		}
-		cli_errors.PrintStack(os.Stderr, err)
-		os.Exit(-1)
-	}
+		signal.Stop(sig)
+	}()
+	return ctx
 }

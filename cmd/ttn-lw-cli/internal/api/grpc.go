@@ -71,6 +71,7 @@ func SetAuth(authType, authValue string) {
 
 // GetDialOptions gets the dial options for a gRPC connection.
 func GetDialOptions() (opts []grpc.DialOption) {
+	opts = append(opts, grpc.FailOnNonTempDialError(true), grpc.WithBlock())
 	if withInsecure {
 		opts = append(opts, grpc.WithInsecure())
 		if auth != nil {

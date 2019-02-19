@@ -15,12 +15,8 @@
 package commands
 
 import (
-	"context"
-	"fmt"
 	"os"
-	"os/signal"
 	"sync"
-	"syscall"
 
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/api"
@@ -34,9 +30,6 @@ var eventsCommand = &cobra.Command{
 	Aliases: []string{"event", "evt", "e"},
 	Short:   "Subscribe to events",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		ctx, cancel := context.WithCancel(ctx)
-		defer cancel()
-
 		var wg sync.WaitGroup
 
 		addresses := make(map[string]bool)
@@ -82,16 +75,6 @@ var eventsCommand = &cobra.Command{
 			}()
 		}
 
-		sigCh := make(chan os.Signal)
-		signal.Notify(sigCh, os.Interrupt, os.Kill, syscall.SIGTERM)
-
-		go func() {
-			sig := <-sigCh
-			fmt.Println()
-			logger.WithField("signal", sig).Info("Received signal, exiting...")
-			cancel()
-		}()
-
 		go func() {
 			wg.Wait()
 			close(events)
@@ -101,7 +84,7 @@ var eventsCommand = &cobra.Command{
 			io.Write(os.Stdout, config.OutputFormat, evt)
 		}
 
-		return nil
+		return ctx.Err()
 	},
 }
 
