@@ -15,6 +15,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import bind from 'autobind-decorator'
+import classnames from 'classnames'
 
 import style from './checkbox.styl'
 
@@ -26,7 +27,11 @@ class Checkbox extends React.PureComponent {
   }
 
   render () {
-    const { value, onChange, ...rest } = this.props
+    const { value, onChange, indeterminate, ...rest } = this.props
+    const checkedClassNames = classnames(style.checkbox, {
+      [style.checkmark]: !indeterminate,
+      [style.indeterminate]: indeterminate,
+    })
 
     return (
       <label className={style.container}>
@@ -37,7 +42,7 @@ class Checkbox extends React.PureComponent {
           checked={value}
           {...rest}
         />
-        <span className={style.checkmark} />
+        <span className={checkedClassNames} />
       </label>
     )
   }
@@ -50,6 +55,7 @@ Checkbox.propTypes = {
   onBlur: PropTypes.func,
   onChange: PropTypes.func,
   disabled: PropTypes.bool,
+  indeterminate: PropTypes.bool,
 }
 
 Checkbox.defaultProps = {

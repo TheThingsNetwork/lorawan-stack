@@ -57,6 +57,7 @@ const checkboxAllowedProps = [
   'onBlur',
   'onChange',
   'disabled',
+  'indeterminate',
 ]
 
 const getAllowedPropsByType = function (type) {
