@@ -51,6 +51,9 @@ var errHTTP = errors.Define("http", "HTTP error: {message}")
 // determining the HTTP status code to return.
 func ProcessError(in error) (statusCode int, err error) {
 	statusCode, err = http.StatusInternalServerError, in
+	if errors.Resemble(in, errHTTP) {
+		err = errors.Cause(err)
+	}
 	if echoErr, ok := err.(*echo.HTTPError); ok {
 		if echoErr.Code != 0 {
 			statusCode = echoErr.Code
