@@ -185,7 +185,7 @@ func TestGatewayAccessClusterAuth(t *testing.T) {
 		rights, err := reg.ListRights(ctx, &gatewayID, is.WithClusterAuth())
 
 		a.So(rights, should.NotBeNil)
-		a.So(ttnpb.AllClusterRights.Sub(rights).Rights, should.BeEmpty)
+		a.So(ttnpb.AllClusterRights.Intersect(ttnpb.AllGatewayRights).Sub(rights).Rights, should.BeEmpty)
 		a.So(err, should.BeNil)
 	})
 }
