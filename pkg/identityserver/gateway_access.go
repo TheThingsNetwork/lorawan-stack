@@ -46,7 +46,7 @@ func (is *IdentityServer) listGatewayRights(ctx context.Context, ids *ttnpb.Gate
 	if !ok || gtwRights == nil {
 		return &ttnpb.Rights{}, nil
 	}
-	return gtwRights, nil
+	return gtwRights.Intersect(ttnpb.AllGatewayRights), nil
 }
 
 func (is *IdentityServer) createGatewayAPIKey(ctx context.Context, req *ttnpb.CreateGatewayAPIKeyRequest) (key *ttnpb.APIKey, err error) {

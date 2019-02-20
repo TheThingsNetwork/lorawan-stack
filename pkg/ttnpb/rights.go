@@ -23,6 +23,8 @@ import (
 var (
 	AllUserRights         = &Rights{}
 	AllApplicationRights  = &Rights{}
+	AllClientRights       = &Rights{}
+	AllEntityRights       = &Rights{}
 	AllGatewayRights      = &Rights{}
 	AllOrganizationRights = &Rights{}
 	AllClusterRights      = &Rights{}
@@ -39,8 +41,13 @@ func init() {
 			AllUserRights.Rights = append(AllUserRights.Rights, Right(v))
 		case strings.HasPrefix(k, "RIGHT_APPLICATION_"):
 			AllApplicationRights.Rights = append(AllApplicationRights.Rights, Right(v))
+			AllEntityRights.Rights = append(AllEntityRights.Rights, Right(v))
+		case strings.HasPrefix(k, "RIGHT_CLIENT_"):
+			AllClientRights.Rights = append(AllClientRights.Rights, Right(v))
+			AllEntityRights.Rights = append(AllEntityRights.Rights, Right(v))
 		case strings.HasPrefix(k, "RIGHT_GATEWAY_"):
 			AllGatewayRights.Rights = append(AllGatewayRights.Rights, Right(v))
+			AllEntityRights.Rights = append(AllEntityRights.Rights, Right(v))
 		case strings.HasPrefix(k, "RIGHT_ORGANIZATION_"):
 			AllOrganizationRights.Rights = append(AllOrganizationRights.Rights, Right(v))
 		}

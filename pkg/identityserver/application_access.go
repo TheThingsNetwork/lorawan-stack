@@ -46,7 +46,7 @@ func (is *IdentityServer) listApplicationRights(ctx context.Context, ids *ttnpb.
 	if !ok || appRights == nil {
 		return &ttnpb.Rights{}, nil
 	}
-	return appRights, nil
+	return appRights.Intersect(ttnpb.AllApplicationRights), nil
 }
 
 func (is *IdentityServer) createApplicationAPIKey(ctx context.Context, req *ttnpb.CreateApplicationAPIKeyRequest) (key *ttnpb.APIKey, err error) {

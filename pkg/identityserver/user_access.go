@@ -43,7 +43,7 @@ func (is *IdentityServer) listUserRights(ctx context.Context, ids *ttnpb.UserIde
 	if !ok || usrRights == nil {
 		return &ttnpb.Rights{}, nil
 	}
-	return usrRights, nil
+	return usrRights.Intersect(ttnpb.AllEntityRights.Union(ttnpb.AllOrganizationRights, ttnpb.AllUserRights)), nil
 }
 
 func (is *IdentityServer) createUserAPIKey(ctx context.Context, req *ttnpb.CreateUserAPIKeyRequest) (key *ttnpb.APIKey, err error) {
