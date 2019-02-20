@@ -60,7 +60,7 @@ const getApplicationApiKeyDataLogic = createLogic({
     const { id } = action
 
     dispatch(application.getApplicationApiKeysList(id))
-    dispatch(applications.getApplicationsRightsList())
+    dispatch(applications.getApplicationsRightsList(id))
 
     done()
   },

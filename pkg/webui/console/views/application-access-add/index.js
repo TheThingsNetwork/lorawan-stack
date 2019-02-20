@@ -79,9 +79,9 @@ export default class ApplicationAccessAdd extends React.Component {
   }
 
   componentDidMount () {
-    const { dispatch } = this.props
+    const { dispatch, appId } = this.props
 
-    dispatch(getApplicationsRightsList())
+    dispatch(getApplicationsRightsList(appId))
   }
 
   async handleSubmit (values, { resetForm }) {

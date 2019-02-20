@@ -46,10 +46,11 @@ const getApplicationsLogic = createLogic({
 const getApplicationsRightsLogic = createLogic({
   type: applications.GET_APPS_RIGHTS_LIST,
   async process ({ getState, action }, dispatch, done) {
+    const { id } = action
     try {
-      const rights = await api.rights.applications()
+      const result = await api.rights.applications(id)
 
-      dispatch(applications.getApplicationsRightsListSuccess(rights))
+      dispatch(applications.getApplicationsRightsListSuccess(result.rights))
     } catch (error) {
       dispatch(applications.getApplicationsRightsListFailure(error))
     }

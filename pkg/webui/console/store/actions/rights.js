@@ -24,8 +24,8 @@ export const createGetRightsListFailureActionType = name => (
   `GET_${name}_RIGHTS_LIST_FAILURE`
 )
 
-export const getRightsList = name => () => (
-  { type: createGetRightsListActionType(name) }
+export const getRightsList = name => id => (
+  { type: createGetRightsListActionType(name), id }
 )
 
 export const getRightsListSuccess = name => rights => (

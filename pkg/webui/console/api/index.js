@@ -91,6 +91,6 @@ export default {
     search: stubs.gateways.search,
   },
   rights: {
-    applications: stubs.rights.applications,
+    applications: ttnClient.Applications.getRightsById,
   },
 }
