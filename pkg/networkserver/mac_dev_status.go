@@ -32,25 +32,36 @@ const (
 	DefaultStatusTimePeriodicity         = time.Hour
 )
 
+func deviceStatusCountPeriodicity(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) uint32 {
+	if dev.MACSettings != nil && dev.MACSettings.StatusCountPeriodicity != nil {
+		return dev.MACSettings.StatusCountPeriodicity.Value
+	}
+	if defaults.StatusCountPeriodicity != nil {
+		return defaults.StatusCountPeriodicity.Value
+	}
+	return DefaultStatusCountPeriodicity
+}
+
+func deviceStatusTimePeriodicity(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) time.Duration {
+	if dev.MACSettings != nil && dev.MACSettings.StatusTimePeriodicity != nil {
+		return *dev.MACSettings.StatusTimePeriodicity
+	}
+	if defaults.StatusTimePeriodicity != nil {
+		return *defaults.StatusTimePeriodicity
+	}
+	return DefaultStatusTimePeriodicity
+}
+
 func enqueueDevStatusReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16, defaults ttnpb.MACSettings) (uint16, uint16, bool) {
-	cp := DefaultStatusCountPeriodicity
-	if dev.GetMACSettings().GetStatusCountPeriodicity() != nil {
-		cp = dev.MACSettings.StatusCountPeriodicity.Value
-	} else if defaults.StatusCountPeriodicity != nil {
-		cp = defaults.StatusCountPeriodicity.Value
-	}
+	cp := deviceStatusCountPeriodicity(dev, defaults)
+	tp := deviceStatusTimePeriodicity(dev, defaults)
 
-	tp := DefaultStatusTimePeriodicity
-	if dev.GetMACSettings().GetStatusTimePeriodicity() != nil {
-		tp = *dev.MACSettings.StatusTimePeriodicity
-	} else if defaults.StatusCountPeriodicity != nil {
-		tp = *defaults.StatusTimePeriodicity
+	if cp == 0 && tp == 0 {
+		return maxDownLen, maxUpLen, true
 	}
-
-	if cp == 0 && tp == 0 ||
-		dev.LastDevStatusReceivedAt != nil &&
-			(cp == 0 || dev.MACState.LastDevStatusFCntUp+cp > dev.Session.LastFCntUp) &&
-			(tp == 0 || dev.LastDevStatusReceivedAt.Add(tp).After(time.Now())) {
+	if dev.LastDevStatusReceivedAt != nil &&
+		(cp == 0 || dev.MACState.LastDevStatusFCntUp+cp > dev.Session.LastFCntUp) &&
+		(tp == 0 || dev.LastDevStatusReceivedAt.Add(tp).After(time.Now())) {
 		return maxDownLen, maxUpLen, true
 	}
 

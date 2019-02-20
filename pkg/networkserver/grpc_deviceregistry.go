@@ -43,6 +43,15 @@ func validABPSessionKey(key *ttnpb.KeyEnvelope) bool {
 
 // Set implements NsEndDeviceRegistryServer.
 func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest) (*ttnpb.EndDevice, error) {
+	if err := ttnpb.ProhibitFields(req.FieldMask.Paths,
+		"mac_state.current_parameters",
+		"mac_state.desired_parameters",
+		"pending_session",
+		"session.keys.app_s_key",
+	); err != nil {
+		return nil, errInvalidFieldMask.WithCause(err)
+	}
+
 	if err := rights.RequireApplication(ctx, req.Device.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
@@ -63,14 +72,6 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 
 	var addDownlinkTask bool
 	dev, err := ns.devices.SetByID(ctx, req.Device.EndDeviceIdentifiers.ApplicationIdentifiers, req.Device.EndDeviceIdentifiers.DeviceID, gets, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
-		if err := ttnpb.ProhibitFields(req.FieldMask.Paths,
-			"mac_state.current_parameters",
-			"mac_state.desired_parameters",
-			"pending_session",
-		); err != nil {
-			return nil, nil, errInvalidFieldMask.WithCause(err)
-		}
-
 		if dev != nil {
 			if err := ttnpb.ProhibitFields(req.FieldMask.Paths,
 				"session",
@@ -109,12 +110,6 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		}
 		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.nwk_s_enc_key.kek_label") && (req.Device.Session == nil || len(req.Device.Session.SessionKeys.GetNwkSEncKey().GetKEKLabel()) == 0) {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "session.keys.nwk_s_enc_key.kek_label")
-		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.app_s_key.key") && (req.Device.Session == nil || len(req.Device.Session.SessionKeys.GetAppSKey().GetKey()) == 0) {
-			return nil, nil, errInvalidFieldValue.WithAttributes("field", "session.keys.app_s_key.key")
-		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.app_s_key.kek_label") && (req.Device.Session == nil || len(req.Device.Session.SessionKeys.GetAppSKey().GetKEKLabel()) == 0) {
-			return nil, nil, errInvalidFieldValue.WithAttributes("field", "session.keys.app_s_key.kek_label")
 		}
 
 		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.class_b_timeout") && req.Device.GetMACSettings().GetClassBTimeout() == nil {
