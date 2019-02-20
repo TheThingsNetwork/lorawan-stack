@@ -16,6 +16,7 @@ package networkserver_test
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
@@ -67,8 +68,9 @@ func TestDeviceRegistryGet(t *testing.T) {
 				})
 			},
 			GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, error) {
-				test.MustTFromContext(ctx).Fatal("GetByIDFunc must not be called")
-				panic("Unreachable")
+				err := errors.New("GetByIDFunc must not be called")
+				test.MustTFromContext(ctx).Error(err)
+				return nil, err
 			},
 			Request: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: ids,
@@ -210,8 +212,9 @@ func TestDeviceRegistrySet(t *testing.T) {
 				})
 			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
-				test.MustTFromContext(ctx).Fatal("SetByIDFunc must not be called")
-				panic("Unreachable")
+				err := errors.New("SetByIDFunc must not be called")
+				test.MustTFromContext(ctx).Error(err)
+				return nil, err
 			},
 			Request: &ttnpb.SetEndDeviceRequest{
 				Device: ttnpb.EndDevice{
@@ -277,7 +280,9 @@ func TestDeviceRegistrySet(t *testing.T) {
 				})
 
 				dev, sets, err := f(nil)
-				a.So(err, should.BeNil)
+				if !a.So(err, should.BeNil) {
+					return nil, err
+				}
 				a.So(sets, should.HaveSameElementsDeep, []string{
 					"frequency_plan_id",
 					"lorawan_phy_version",
@@ -380,7 +385,9 @@ func TestDeviceRegistrySet(t *testing.T) {
 				})
 
 				dev, sets, err := f(nil)
-				a.So(err, should.BeNil)
+				if !a.So(err, should.BeNil) {
+					return nil, err
+				}
 				a.So(sets, should.HaveSameElementsDeep, []string{
 					"frequency_plan_id",
 					"lorawan_phy_version",
@@ -446,7 +453,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				}
 				err = ResetMACState(expected, frequencyplans.NewStore(test.FrequencyPlansFetcher), ttnpb.MACSettings{})
 				if !a.So(err, should.BeNil) {
-					t.Fatalf("Failed to reset MAC state: %s", err)
+					panic(fmt.Sprintf("Failed to reset MAC state: %s", err))
 				}
 				a.So(dev, should.Resemble, expected)
 				return dev, nil
@@ -544,7 +551,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					},
 				}
 				if err := ResetMACState(expected, frequencyplans.NewStore(test.FrequencyPlansFetcher), ttnpb.MACSettings{}); err != nil {
-					t.Fatalf("Failed to reset MAC state: %s", err)
+					panic(fmt.Sprintf("Failed to reset MAC state: %s", err))
 				}
 				return expected
 			}(),
@@ -631,8 +638,9 @@ func TestDeviceRegistryDelete(t *testing.T) {
 				})
 			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
-				test.MustTFromContext(ctx).Fatal("SetByIDFunc must not be called")
-				panic("Unreachable")
+				err := errors.New("SetByIDFunc must not be called")
+				test.MustTFromContext(ctx).Error(err)
+				return nil, err
 			},
 			Request: deepcopy.Copy(&ids).(*ttnpb.EndDeviceIdentifiers),
 			ErrorAssertion: func(t *testing.T, err error) bool {
@@ -670,7 +678,9 @@ func TestDeviceRegistryDelete(t *testing.T) {
 				a.So(gets, should.BeNil)
 
 				dev, sets, err := f(nil)
-				a.So(err, should.BeNil)
+				if !a.So(err, should.BeNil) {
+					return nil, err
+				}
 				a.So(sets, should.BeNil)
 				a.So(dev, should.BeNil)
 				return nil, nil
@@ -705,7 +715,9 @@ func TestDeviceRegistryDelete(t *testing.T) {
 				dev, sets, err := f(&ttnpb.EndDevice{
 					EndDeviceIdentifiers: ids,
 				})
-				a.So(err, should.BeNil)
+				if !a.So(err, should.BeNil) {
+					return nil, err
+				}
 				a.So(sets, should.BeNil)
 				a.So(dev, should.BeNil)
 				return nil, nil
