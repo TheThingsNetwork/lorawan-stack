@@ -230,7 +230,6 @@ func TestDeviceRegistrySet(t *testing.T) {
 						"mac_settings.supports_32_bit_f_cnt",
 						"mac_settings.use_adr",
 						"resets_f_cnt",
-						"resets_join_nonces",
 						"supports_class_b",
 						"supports_class_c",
 						"supports_join",
@@ -274,7 +273,6 @@ func TestDeviceRegistrySet(t *testing.T) {
 					"lorawan_version",
 					"mac_settings.adr_margin",
 					"resets_f_cnt",
-					"resets_join_nonces",
 					"supports_class_b",
 					"supports_class_c",
 					"supports_join",
@@ -290,7 +288,6 @@ func TestDeviceRegistrySet(t *testing.T) {
 					"lorawan_version",
 					"mac_settings.adr_margin",
 					"resets_f_cnt",
-					"resets_join_nonces",
 					"supports_class_b",
 					"supports_class_c",
 					"supports_join",
@@ -335,7 +332,6 @@ func TestDeviceRegistrySet(t *testing.T) {
 						"lorawan_version",
 						"mac_settings.adr_margin",
 						"resets_f_cnt",
-						"resets_join_nonces",
 						"supports_class_b",
 						"supports_class_c",
 						"supports_join",
@@ -389,10 +385,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					"mac_settings.use_adr",
 					"mac_settings.supports_32_bit_f_cnt",
 					"resets_f_cnt",
-					"resets_join_nonces",
-					"root_keys.app_key.key",
 					"session.dev_addr",
-					"session.keys.app_s_key.key",
 					"session.keys.f_nwk_s_int_key.key",
 					"session.last_f_cnt_up",
 					"session.last_n_f_cnt_down",
@@ -412,10 +405,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					"mac_settings.use_adr",
 					"mac_state",
 					"resets_f_cnt",
-					"resets_join_nonces",
-					"root_keys.app_key.key",
 					"session.dev_addr",
-					"session.keys.app_s_key.key",
 					"session.keys.f_nwk_s_int_key.key",
 					"session.keys.nwk_s_enc_key.kek_label",
 					"session.keys.nwk_s_enc_key.key",
@@ -443,20 +433,12 @@ func TestDeviceRegistrySet(t *testing.T) {
 						Supports32BitFCnt: &pbtypes.BoolValue{Value: true},
 						UseADR:            &pbtypes.BoolValue{Value: true},
 					},
-					RootKeys: &ttnpb.RootKeys{
-						AppKey: &ttnpb.KeyEnvelope{
-							Key: []byte{0x4f, 0x93, 0x95, 0x95, 0xce, 0x83, 0x28, 0x8a, 0xfe, 0xf8, 0x1b, 0xd8, 0x81, 0xc3, 0xc3, 0x6e},
-						},
-					},
 					Session: &ttnpb.Session{
 						StartedAt:     time.Unix(0, 42).UTC(),
 						DevAddr:       types.DevAddr{0x01, 0x0b, 0x60, 0x0c},
 						LastFCntUp:    45872,
 						LastNFCntDown: 1880,
 						SessionKeys: ttnpb.SessionKeys{
-							AppSKey: &ttnpb.KeyEnvelope{
-								Key: []byte{0xa1, 0x5b, 0xef, 0x4a, 0x32, 0x33, 0x27, 0x4a, 0xe9, 0x17, 0xe4, 0xaf, 0xb1, 0x90, 0x55, 0xf2},
-							},
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
 								Key: []byte{0x9e, 0x2f, 0xb6, 0x1d, 0x73, 0x10, 0xc9, 0x27, 0x98, 0x86, 0xdb, 0x79, 0xfa, 0x52, 0xf9, 0xf4},
 							},
@@ -493,20 +475,12 @@ func TestDeviceRegistrySet(t *testing.T) {
 						Supports32BitFCnt: &pbtypes.BoolValue{Value: true},
 						UseADR:            &pbtypes.BoolValue{Value: true},
 					},
-					RootKeys: &ttnpb.RootKeys{
-						AppKey: &ttnpb.KeyEnvelope{
-							Key: []byte{0x4f, 0x93, 0x95, 0x95, 0xce, 0x83, 0x28, 0x8a, 0xfe, 0xf8, 0x1b, 0xd8, 0x81, 0xc3, 0xc3, 0x6e},
-						},
-					},
 					Session: &ttnpb.Session{
 						StartedAt:     time.Unix(0, 42).UTC(),
 						DevAddr:       types.DevAddr{0x01, 0x0b, 0x60, 0x0c},
 						LastFCntUp:    45872,
 						LastNFCntDown: 1880,
 						SessionKeys: ttnpb.SessionKeys{
-							AppSKey: &ttnpb.KeyEnvelope{
-								Key: []byte{0xa1, 0x5b, 0xef, 0x4a, 0x32, 0x33, 0x27, 0x4a, 0xe9, 0x17, 0xe4, 0xaf, 0xb1, 0x90, 0x55, 0xf2},
-							},
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
 								Key: []byte{0x9e, 0x2f, 0xb6, 0x1d, 0x73, 0x10, 0xc9, 0x27, 0x98, 0x86, 0xdb, 0x79, 0xfa, 0x52, 0xf9, 0xf4},
 							},
@@ -521,10 +495,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 						"mac_settings.use_adr",
 						"mac_settings.supports_32_bit_f_cnt",
 						"resets_f_cnt",
-						"resets_join_nonces",
-						"root_keys.app_key.key",
 						"session.dev_addr",
-						"session.keys.app_s_key.key",
 						"session.keys.f_nwk_s_int_key.key",
 						"session.last_f_cnt_up",
 						"session.last_n_f_cnt_down",
@@ -550,9 +521,6 @@ func TestDeviceRegistrySet(t *testing.T) {
 						Supports32BitFCnt: &pbtypes.BoolValue{Value: true},
 						UseADR:            &pbtypes.BoolValue{Value: true},
 					},
-					RootKeys: &ttnpb.RootKeys{
-						AppKey: &ttnpb.KeyEnvelope{
-							Key: []byte{0x4f, 0x93, 0x95, 0x95, 0xce, 0x83, 0x28, 0x8a, 0xfe, 0xf8, 0x1b, 0xd8, 0x81, 0xc3, 0xc3, 0x6e},
 						},
 					},
 					Session: &ttnpb.Session{
@@ -561,8 +529,6 @@ func TestDeviceRegistrySet(t *testing.T) {
 						LastFCntUp:    45872,
 						LastNFCntDown: 1880,
 						SessionKeys: ttnpb.SessionKeys{
-							AppSKey: &ttnpb.KeyEnvelope{
-								Key: []byte{0xa1, 0x5b, 0xef, 0x4a, 0x32, 0x33, 0x27, 0x4a, 0xe9, 0x17, 0xe4, 0xaf, 0xb1, 0x90, 0x55, 0xf2},
 							},
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
 								Key: []byte{0x9e, 0x2f, 0xb6, 0x1d, 0x73, 0x10, 0xc9, 0x27, 0x98, 0x86, 0xdb, 0x79, 0xfa, 0x52, 0xf9, 0xf4},
