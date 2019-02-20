@@ -35,7 +35,7 @@ type Config struct {
 
 type MACSettingConfig struct {
 	ADRMargin              *float32       `name:"adr-margin" description:"The default margin Network Server should add in ADR requests if not configured in device's MAC settings"`
-	Rx1Delay               *ttnpb.RxDelay `name:"rx1-delay" description:"Rx1Delay value Network Server should use if not configured in device's MAC settings"`
+	DesiredRx1Delay        *ttnpb.RxDelay `name:"desired-rx1-delay" description:"Desired Rx1Delay value Network Server should use if not configured in device's MAC settings"`
 	ClassBTimeout          *time.Duration `name:"class-b-timeout" description:"Deadline for a device in class B mode to respond to requests from the Network Server if not configured in device's MAC settings"`
 	ClassCTimeout          *time.Duration `name:"class-c-timeout" description:"Deadline for a device in class C mode to respond to requests from the Network Server if not configured in device's MAC settings"`
 	StatusTimePeriodicity  *time.Duration `name:"status-time-periodicity" description:"The interval after which a DevStatusReq MACCommand shall be sent by Network Server if not configured in device's MAC settings"`

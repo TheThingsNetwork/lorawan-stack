@@ -225,8 +225,8 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 	if conf.DefaultMACSettings.ADRMargin != nil {
 		ns.defaultMACSettings.ADRMargin = &pbtypes.FloatValue{Value: *conf.DefaultMACSettings.ADRMargin}
 	}
-	if conf.DefaultMACSettings.Rx1Delay != nil {
-		ns.defaultMACSettings.Rx1Delay = &ttnpb.MACSettings_RxDelayValue{Value: *conf.DefaultMACSettings.Rx1Delay}
+	if conf.DefaultMACSettings.DesiredRx1Delay != nil {
+		ns.defaultMACSettings.DesiredRx1Delay = &ttnpb.MACSettings_RxDelayValue{Value: *conf.DefaultMACSettings.DesiredRx1Delay}
 	}
 	if conf.DefaultMACSettings.StatusCountPeriodicity != nil {
 		ns.defaultMACSettings.StatusCountPeriodicity = &pbtypes.UInt32Value{Value: *conf.DefaultMACSettings.StatusCountPeriodicity}
