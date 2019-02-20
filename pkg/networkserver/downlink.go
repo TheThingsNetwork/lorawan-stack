@@ -24,12 +24,12 @@ import (
 	"github.com/mohae/deepcopy"
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
+	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 )
 
@@ -220,20 +220,12 @@ outer:
 		if dev.Session.NwkSEncKey == nil || len(dev.Session.NwkSEncKey.Key) == 0 {
 			return nil, nil, errUnknownNwkSEncKey
 		}
-
-		var key types.AES128Key
-		if dev.Session.NwkSEncKey.KEKLabel != "" {
-			b, err := ns.KeyVault.Unwrap(dev.Session.NwkSEncKey.Key, dev.Session.NwkSEncKey.KEKLabel)
-			if err != nil {
-				logger.WithField("kek_label", dev.Session.NwkSEncKey.KEKLabel).WithError(err).Error("Failed to unwrap NwkSEncKey")
-				return nil, nil, err
-			}
-			copy(key[:], b)
-		} else {
-			copy(key[:], dev.Session.NwkSEncKey.Key[:])
+		key, err := cryptoutil.UnwrapAES128Key(*dev.Session.NwkSEncKey, ns.KeyVault)
+		if err != nil {
+			logger.WithField("kek_label", dev.Session.NwkSEncKey.KEKLabel).WithError(err).Error("Failed to unwrap NwkSEncKey")
+			return nil, nil, err
 		}
 
-		var err error
 		cmdBuf, err = crypto.EncryptDownlink(key, dev.Session.DevAddr, pld.FHDR.FCnt, cmdBuf)
 		if err != nil {
 			return nil, nil, errEncryptMAC.WithCause(err)
@@ -281,19 +273,13 @@ outer:
 	}
 	// NOTE: It is assumed, that b does not contain MIC.
 
-	var key types.AES128Key
 	if dev.Session.SNwkSIntKey == nil || len(dev.Session.SNwkSIntKey.Key) == 0 {
 		return nil, nil, errUnknownSNwkSIntKey
 	}
-	if dev.Session.SNwkSIntKey.KEKLabel != "" {
-		b, err := ns.KeyVault.Unwrap(dev.Session.SNwkSIntKey.Key, dev.Session.SNwkSIntKey.KEKLabel)
-		if err != nil {
-			logger.WithField("kek_label", dev.Session.SNwkSIntKey.KEKLabel).WithError(err).Error("Failed to unwrap SNwkSIntKey")
-			return nil, nil, err
-		}
-		copy(key[:], b)
-	} else {
-		copy(key[:], dev.Session.SNwkSIntKey.Key[:])
+	key, err := cryptoutil.UnwrapAES128Key(*dev.Session.SNwkSIntKey, ns.KeyVault)
+	if err != nil {
+		logger.WithField("kek_label", dev.Session.SNwkSIntKey.KEKLabel).WithError(err).Error("Failed to unwrap SNwkSIntKey")
+		return nil, nil, err
 	}
 
 	var mic [4]byte

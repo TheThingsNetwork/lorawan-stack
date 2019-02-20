@@ -27,6 +27,7 @@ import (
 	"github.com/mohae/deepcopy"
 	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
+	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
@@ -278,20 +279,13 @@ outer:
 			continue
 		}
 
-		var fNwkSIntKey types.AES128Key
-		if dev.matchedSession.FNwkSIntKey.KEKLabel != "" {
-			b, err := ns.Component.KeyVault.Unwrap(dev.matchedSession.FNwkSIntKey.Key, dev.matchedSession.FNwkSIntKey.KEKLabel)
-			if err != nil {
-				logger.WithField("kek_label", dev.matchedSession.FNwkSIntKey.KEKLabel).WithError(err).Error("Failed to unwrap FNwkSIntKey, skipping...")
-				continue
-			}
-			copy(fNwkSIntKey[:], b)
-		} else {
-			copy(fNwkSIntKey[:], dev.matchedSession.FNwkSIntKey.Key[:])
+		fNwkSIntKey, err := cryptoutil.UnwrapAES128Key(*dev.matchedSession.FNwkSIntKey, ns.KeyVault)
+		if err != nil {
+			logger.WithField("kek_label", dev.matchedSession.FNwkSIntKey.KEKLabel).WithError(err).Error("Failed to unwrap FNwkSIntKey, skipping...")
+			continue
 		}
 
 		var computedMIC [4]byte
-		var err error
 		if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 			computedMIC, err = crypto.ComputeLegacyUplinkMIC(
 				fNwkSIntKey,
@@ -305,16 +299,10 @@ outer:
 				continue
 			}
 
-			var sNwkSIntKey types.AES128Key
-			if dev.matchedSession.SNwkSIntKey.KEKLabel != "" {
-				b, err := ns.Component.KeyVault.Unwrap(dev.matchedSession.SNwkSIntKey.Key, dev.matchedSession.SNwkSIntKey.KEKLabel)
-				if err != nil {
-					logger.WithField("kek_label", dev.matchedSession.SNwkSIntKey.KEKLabel).WithError(err).Error("Failed to unwrap SNwkSIntKey, skipping...")
-					continue
-				}
-				copy(sNwkSIntKey[:], b)
-			} else {
-				copy(sNwkSIntKey[:], dev.matchedSession.SNwkSIntKey.Key[:])
+			sNwkSIntKey, err := cryptoutil.UnwrapAES128Key(*dev.matchedSession.SNwkSIntKey, ns.KeyVault)
+			if err != nil {
+				logger.WithField("kek_label", dev.matchedSession.SNwkSIntKey.KEKLabel).WithError(err).Error("Failed to unwrap SNwkSIntKey, skipping...")
+				continue
 			}
 
 			var confFCnt uint32
@@ -433,17 +421,10 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 		if ses.NwkSEncKey == nil || len(ses.NwkSEncKey.Key) == 0 {
 			return errUnknownNwkSEncKey
 		}
-
-		var key types.AES128Key
-		if ses.NwkSEncKey.KEKLabel != "" {
-			b, err := ns.Component.KeyVault.Unwrap(ses.NwkSEncKey.Key, ses.NwkSEncKey.KEKLabel)
-			if err != nil {
-				logger.WithField("kek_label", ses.NwkSEncKey.KEKLabel).WithError(err).Error("Failed to unwrap NwkSEncKey")
-				return err
-			}
-			copy(key[:], b)
-		} else {
-			copy(key[:], ses.NwkSEncKey.Key[:])
+		key, err := cryptoutil.UnwrapAES128Key(*ses.NwkSEncKey, ns.KeyVault)
+		if err != nil {
+			logger.WithField("kek_label", ses.NwkSEncKey.KEKLabel).WithError(err).Error("Failed to unwrap NwkSEncKey")
+			return err
 		}
 
 		mac, err = crypto.DecryptUplink(key, pld.DevAddr, pld.FCnt, mac)
