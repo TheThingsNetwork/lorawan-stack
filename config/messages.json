@@ -3869,6 +3869,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/networkserver:no_dev_eui": {
+    "translations": {
+      "en": "no DevEUI specified"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/networkserver:no_downlink": {
     "translations": {
       "en": "no downlink to send"
@@ -3890,6 +3899,15 @@
   "error:pkg/networkserver:no_frequency_plan": {
     "translations": {
       "en": "no frequency plan specified"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:no_join_eui": {
+    "translations": {
+      "en": "no JoinEUI specified"
     },
     "description": {
       "package": "pkg/networkserver",

@@ -215,11 +215,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 			}
 
 			f = func(p redis.Pipeliner) error {
-				if create {
-					if newIDs.JoinEUI == nil || newIDs.DevEUI == nil {
-						return errInvalidIdentifiers
-					}
-
+				if create && newIDs.JoinEUI != nil && newIDs.DevEUI != nil {
 					ek := r.Redis.Key(euiKey, newIDs.JoinEUI.String(), newIDs.DevEUI.String())
 					if err := tx.Watch(ek).Err(); err != nil {
 						return err

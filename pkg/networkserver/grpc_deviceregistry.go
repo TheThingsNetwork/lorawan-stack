@@ -17,7 +17,6 @@ package networkserver
 import (
 	"bytes"
 	"context"
-	"strings"
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
@@ -215,14 +214,13 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		}
 
 		if req.Device.SupportsJoin {
-			var hasSession bool
-			for _, p := range sets {
-				if p == "session" || strings.HasPrefix(p, "session.") {
-					hasSession = true
-					break
-				}
+			if req.Device.EndDeviceIdentifiers.JoinEUI == nil {
+				return nil, nil, errNoJoinEUI
 			}
-			if !hasSession {
+			if req.Device.EndDeviceIdentifiers.DevEUI == nil {
+				return nil, nil, errNoDevEUI
+			}
+			if !ttnpb.HasAnyField([]string{"session"}, sets...) {
 				return &req.Device, sets, nil
 			}
 		}

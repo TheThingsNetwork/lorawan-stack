@@ -48,6 +48,8 @@ var (
 	errJoinServerNotFound        = errors.DefineNotFound("join_server_not_found", "Join Server not found")
 	errMACRequestNotFound        = errors.DefineInvalidArgument("mac_request_not_found", "MAC response received, but corresponding request not found")
 	errNoFrequencyPlan           = errors.DefineInvalidArgument("no_frequency_plan", "no frequency plan specified")
+	errNoDevEUI                  = errors.DefineInvalidArgument("no_dev_eui", "no DevEUI specified")
+	errNoJoinEUI                 = errors.DefineInvalidArgument("no_join_eui", "no JoinEUI specified")
 	errNoPath                    = errors.DefineNotFound("no_downlink_path", "no downlink path available")
 	errNoPayload                 = errors.DefineInvalidArgument("no_payload", "no message payload specified")
 	errNoRekey                   = errors.DefineInvalidArgument("no_rekey", "rekey not received after join-accept")
