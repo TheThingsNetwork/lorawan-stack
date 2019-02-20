@@ -28,6 +28,7 @@ import (
 )
 
 const (
+	euiKey         = "eui"
 	provisionerKey = "provisioner"
 )
 
@@ -71,7 +72,7 @@ func (r *DeviceRegistry) GetByEUI(ctx context.Context, joinEUI types.EUI64, devE
 	}
 
 	pb := &ttnpb.EndDevice{}
-	if err := ttnredis.GetProto(r.Redis, r.Redis.Key(joinEUI.String(), devEUI.String())).ScanProto(pb); err != nil {
+	if err := ttnredis.GetProto(r.Redis, r.Redis.Key(euiKey, joinEUI.String(), devEUI.String())).ScanProto(pb); err != nil {
 		return nil, err
 	}
 	return applyDeviceFieldMask(&ttnpb.EndDevice{}, pb, paths...)
@@ -83,7 +84,7 @@ func (r *DeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devE
 		return nil, errInvalidIdentifiers
 	}
 
-	k := r.Redis.Key(joinEUI.String(), devEUI.String())
+	k := r.Redis.Key(euiKey, joinEUI.String(), devEUI.String())
 
 	var pb *ttnpb.EndDevice
 	err := r.Redis.Watch(func(tx *redis.Tx) error {
