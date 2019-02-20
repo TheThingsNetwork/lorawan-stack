@@ -71,6 +71,16 @@ storiesOf('Field', module)
       form={false}
     />
   ))
+  .add('Boolean Indeterminate', () => (
+    <Field
+      type="checkbox"
+      name="foo"
+      title="Foo"
+      description="Foo field in the indeterminate state."
+      form={false}
+      indeterminate
+    />
+  ))
   .add('Error', () => (
     <Field
       name="email"
