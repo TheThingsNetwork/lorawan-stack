@@ -210,9 +210,9 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		downlinkTasks:           conf.DownlinkTasks,
 		downlinkPriorities:      downlinkPriorities,
 		defaultMACSettings: ttnpb.MACSettings{
-			ClassBTimeout:         conf.DefaultClassBTimeout,
-			ClassCTimeout:         conf.DefaultClassCTimeout,
-			StatusTimePeriodicity: conf.DefaultStatusTimePeriodicity,
+			ClassBTimeout:         conf.DefaultMACSettings.ClassBTimeout,
+			ClassCTimeout:         conf.DefaultMACSettings.ClassCTimeout,
+			StatusTimePeriodicity: conf.DefaultMACSettings.StatusTimePeriodicity,
 		},
 	}
 	ns.hashPool.New = func() interface{} {
@@ -222,14 +222,14 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		return &metadataAccumulator{}
 	}
 
-	if conf.DefaultADRMargin != nil {
-		ns.defaultMACSettings.ADRMargin = &pbtypes.FloatValue{Value: *conf.DefaultADRMargin}
+	if conf.DefaultMACSettings.ADRMargin != nil {
+		ns.defaultMACSettings.ADRMargin = &pbtypes.FloatValue{Value: *conf.DefaultMACSettings.ADRMargin}
 	}
-	if conf.DefaultRx1Delay != nil {
-		ns.defaultMACSettings.Rx1Delay = &ttnpb.MACSettings_RxDelayValue{Value: *conf.DefaultRx1Delay}
+	if conf.DefaultMACSettings.Rx1Delay != nil {
+		ns.defaultMACSettings.Rx1Delay = &ttnpb.MACSettings_RxDelayValue{Value: *conf.DefaultMACSettings.Rx1Delay}
 	}
-	if conf.DefaultStatusCountPeriodicity != nil {
-		ns.defaultMACSettings.StatusCountPeriodicity = &pbtypes.UInt32Value{Value: *conf.DefaultStatusCountPeriodicity}
+	if conf.DefaultMACSettings.StatusCountPeriodicity != nil {
+		ns.defaultMACSettings.StatusCountPeriodicity = &pbtypes.UInt32Value{Value: *conf.DefaultMACSettings.StatusCountPeriodicity}
 	}
 
 	for _, opt := range opts {

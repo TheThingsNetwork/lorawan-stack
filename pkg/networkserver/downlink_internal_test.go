@@ -2528,8 +2528,10 @@ func TestProcessDownlinkTask(t *testing.T) {
 					Devices: &MockDeviceRegistry{
 						SetByIDFunc: tc.SetByIDFunc,
 					},
-					DefaultStatusTimePeriodicity:  DurationPtr(0),
-					DefaultStatusCountPeriodicity: func(v uint32) *uint32 { return &v }(0),
+					DefaultMACSettings: MACSettingConfig{
+						StatusTimePeriodicity:  DurationPtr(0),
+						StatusCountPeriodicity: func(v uint32) *uint32 { return &v }(0),
+					},
 				},
 			)).(*NetworkServer)
 			ns.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
@@ -3493,12 +3495,14 @@ func TestGenerateDownlink(t *testing.T) {
 					&component.Config{},
 				),
 				&Config{
-					DeduplicationWindow:           42,
-					CooldownWindow:                42,
-					DownlinkTasks:                 &MockDownlinkTaskQueue{},
-					Devices:                       &MockDeviceRegistry{},
-					DefaultStatusTimePeriodicity:  DurationPtr(0),
-					DefaultStatusCountPeriodicity: func(v uint32) *uint32 { return &v }(0),
+					DeduplicationWindow: 42,
+					CooldownWindow:      42,
+					DownlinkTasks:       &MockDownlinkTaskQueue{},
+					Devices:             &MockDeviceRegistry{},
+					DefaultMACSettings: MACSettingConfig{
+						StatusTimePeriodicity:  DurationPtr(0),
+						StatusCountPeriodicity: func(v uint32) *uint32 { return &v }(0),
+					},
 				},
 			)).(*NetworkServer)
 			ns.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)

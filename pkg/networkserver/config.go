@@ -24,18 +24,22 @@ import (
 
 // Config represents the NetworkServer configuration.
 type Config struct {
-	Devices                       DeviceRegistry         `name:"-"`
-	DownlinkTasks                 DownlinkTaskQueue      `name:"-"`
-	DeduplicationWindow           time.Duration          `name:"deduplication-window" description:"Time window during which, duplicate messages are collected for metadata"`
-	CooldownWindow                time.Duration          `name:"cooldown-window" description:"Time window starting right after deduplication window, during which, duplicate messages are discarded"`
-	DownlinkPriorities            DownlinkPriorityConfig `name:"downlink-priorities" description:"Downlink message priorities"`
-	NetID                         types.NetID            `name:"net_id" description:"NetID of this Network Server"`
-	DefaultADRMargin              *float32               `name:"default-adr-margin" description:"The default margin Network Server should add in ADR requests if not configured in device's MAC settings"`
-	DefaultRx1Delay               *ttnpb.RxDelay         `name:"default-rx1-delay" description:"Rx1Delay value Network Server should use if not configured in device's MAC settings"`
-	DefaultClassBTimeout          *time.Duration         `name:"default-class-b-timeout" description:"Deadline for a device in class B mode to respond to requests from the Network Server if not configured in device's MAC settings"`
-	DefaultClassCTimeout          *time.Duration         `name:"default-class-c-timeout" description:"Deadline for a device in class C mode to respond to requests from the Network Server if not configured in device's MAC settings"`
-	DefaultStatusTimePeriodicity  *time.Duration         `name:"default-status-time-periodicity" description:"The interval after which a DevStatusReq MACCommand shall be sent by Network Server if not configured in device's MAC settings"`
-	DefaultStatusCountPeriodicity *uint32                `name:"default-status-count-periodicity" description:"Number of uplink messages after which a DevStatusReq MACCommand shall be sent by Network Server if not configured in device's MAC settings"`
+	Devices             DeviceRegistry         `name:"-"`
+	DownlinkTasks       DownlinkTaskQueue      `name:"-"`
+	NetID               types.NetID            `name:"net_id" description:"NetID of this Network Server"`
+	DeduplicationWindow time.Duration          `name:"deduplication-window" description:"Time window during which, duplicate messages are collected for metadata"`
+	CooldownWindow      time.Duration          `name:"cooldown-window" description:"Time window starting right after deduplication window, during which, duplicate messages are discarded"`
+	DownlinkPriorities  DownlinkPriorityConfig `name:"downlink-priorities" description:"Downlink message priorities"`
+	DefaultMACSettings  MACSettingConfig       `name:"default-mac-settings" description:"Default MAC settings to fallback to if not specified by device, band or frequency plan"`
+}
+
+type MACSettingConfig struct {
+	ADRMargin              *float32       `name:"adr-margin" description:"The default margin Network Server should add in ADR requests if not configured in device's MAC settings"`
+	Rx1Delay               *ttnpb.RxDelay `name:"rx1-delay" description:"Rx1Delay value Network Server should use if not configured in device's MAC settings"`
+	ClassBTimeout          *time.Duration `name:"class-b-timeout" description:"Deadline for a device in class B mode to respond to requests from the Network Server if not configured in device's MAC settings"`
+	ClassCTimeout          *time.Duration `name:"class-c-timeout" description:"Deadline for a device in class C mode to respond to requests from the Network Server if not configured in device's MAC settings"`
+	StatusTimePeriodicity  *time.Duration `name:"status-time-periodicity" description:"The interval after which a DevStatusReq MACCommand shall be sent by Network Server if not configured in device's MAC settings"`
+	StatusCountPeriodicity *uint32        `name:"status-count-periodicity" description:"Number of uplink messages after which a DevStatusReq MACCommand shall be sent by Network Server if not configured in device's MAC settings"`
 }
 
 // DownlinkPriorityConfig defines priorities for downlink messages.

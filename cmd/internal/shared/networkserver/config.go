@@ -30,10 +30,12 @@ var DefaultNetworkServerConfig = networkserver.Config{
 		MACCommands:            "highest",
 		MaxApplicationDownlink: "high",
 	},
-	DefaultADRMargin:              func(v float32) *float32 { return &v }(networkserver.DefaultADRMargin),
-	DefaultRx1Delay:               func(v ttnpb.RxDelay) *ttnpb.RxDelay { return &v }(ttnpb.RX_DELAY_5),
-	DefaultClassBTimeout:          func(v time.Duration) *time.Duration { return &v }(time.Minute),
-	DefaultClassCTimeout:          func(v time.Duration) *time.Duration { return &v }(networkserver.DefaultClassCTimeout),
-	DefaultStatusTimePeriodicity:  func(v time.Duration) *time.Duration { return &v }(networkserver.DefaultStatusTimePeriodicity),
-	DefaultStatusCountPeriodicity: func(v uint32) *uint32 { return &v }(networkserver.DefaultStatusCountPeriodicity),
+	DefaultMACSettings: networkserver.MACSettingConfig{
+		ADRMargin:              func(v float32) *float32 { return &v }(networkserver.DefaultADRMargin),
+		Rx1Delay:               func(v ttnpb.RxDelay) *ttnpb.RxDelay { return &v }(ttnpb.RX_DELAY_5),
+		ClassBTimeout:          func(v time.Duration) *time.Duration { return &v }(time.Minute),
+		ClassCTimeout:          func(v time.Duration) *time.Duration { return &v }(networkserver.DefaultClassCTimeout),
+		StatusTimePeriodicity:  func(v time.Duration) *time.Duration { return &v }(networkserver.DefaultStatusTimePeriodicity),
+		StatusCountPeriodicity: func(v uint32) *uint32 { return &v }(networkserver.DefaultStatusCountPeriodicity),
+	},
 }
