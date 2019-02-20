@@ -31,6 +31,7 @@
   "console.views.application-general-settings.index.deleteApp": "Delete application",
   "console.views.application-general-settings.index.modalWarning": "Are you sure you want to delete \"{appName}\"? Deleting an application cannot be undone!",
   "console.views.application-general-settings.index.generalSettings": "General Settings",
+  "console.views.application-general-settings.index.updateSuccess": "Successfully updated application",
   "console.views.login.index.welcome": "Welcome to {stackConsole}",
   "console.views.login.index.login": "You need to be logged in to use this site",
   "console.views.login.index.loginWithStackAccount": "Login with your TTN Stack Account",

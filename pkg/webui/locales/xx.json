@@ -31,6 +31,7 @@
   "console.views.application-general-settings.index.deleteApp": "Xxxxxx xxxxxxxxxxx",
   "console.views.application-general-settings.index.modalWarning": "Xxx xxx xxxx xxx xxxx xx xxxxxx \"{appName}\"? Xxxxxxxx xx xxxxxxxxxxx xxxxxx xx xxxxxx!",
   "console.views.application-general-settings.index.generalSettings": "Xxxxxxx Xxxxxxxx",
+  "console.views.application-general-settings.index.updateSuccess": "Xxxxxxxxxxxx xxxxxxx xxxxxxxxxxx",
   "console.views.login.index.welcome": "Xxxxxxx xx {stackConsole}",
   "console.views.login.index.login": "Xxx xxxx xx xx xxxxxx xx xx xxx xxxx xxxx",
   "console.views.login.index.loginWithStackAccount": "Xxxxx xxxx xxxx XXX Xxxxx Xxxxxxx",

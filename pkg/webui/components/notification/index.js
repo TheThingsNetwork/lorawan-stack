@@ -24,11 +24,13 @@ import style from './notification.styl'
 
 const Notification = function ({
   className,
+  title,
   error,
   warning,
   info,
   small,
   message,
+  success,
 }) {
 
   const classname = classnames(style.notification, className, {
@@ -36,6 +38,7 @@ const Notification = function ({
     [style.warning]: warning,
     [style.info]: info,
     [style.small]: small,
+    [style.success]: success,
   })
 
   let icon = 'info'
@@ -45,12 +48,22 @@ const Notification = function ({
     icon = 'warning'
   }
 
-  const content = message || error || warning || info
+  const content = message || error || warning || info || success
   const Component = error ? ErrorMessage : Message
 
   return (
     <div className={classname}>
-      <Icon nudgeUp icon={icon} /><Component content={content} />
+      <Icon className={style.icon} icon={icon} large={!small} />
+      <div className={style.content}>
+        { title && (
+          <Message
+            className={style.title}
+            content={title}
+            component="h4"
+          />
+        )}
+        <Component content={content} />
+      </div>
     </div>
   )
 }
@@ -61,6 +74,8 @@ Notification.propTypes = {
   warning: PropTypes.message,
   info: PropTypes.message,
   small: PropTypes.bool,
+  title: PropTypes.message,
+  success: PropTypes.message,
 }
 
 export default Notification

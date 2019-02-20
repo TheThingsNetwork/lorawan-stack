@@ -29,6 +29,7 @@ import Field from '../../../components/field'
 import Button from '../../../components/button'
 import ModalButton from '../../../components/button/modal-button'
 import diff from '../../../lib/diff'
+import toast from '../../../components/toast'
 
 import api from '../../api'
 
@@ -39,6 +40,7 @@ const m = defineMessages({
   deleteApp: 'Delete application',
   modalWarning: 'Are you sure you want to delete "{appName}"? Deleting an application cannot be undone!',
   generalSettings: 'General Settings',
+  updateSuccess: 'Successfully updated application',
 })
 
 const validationSchema = Yup.object().shape({
@@ -74,15 +76,21 @@ export default class ApplicationGeneralSettings extends React.Component {
     error: '',
   }
 
-  async handleSubmit (values, { setSubmitting, resetForm }) {
+  async handleSubmit (values, { resetForm }) {
     const { application } = this.props
 
     await this.setState({ error: '' })
 
     const changed = diff(application, values)
     try {
-      await api.application.update(application.ids.application_id, changed)
+      const { ids: { application_id }} = application
+      await api.application.update(application_id, changed)
       resetForm({ ...values })
+      toast({
+        title: application_id,
+        message: m.updateSuccess,
+        type: toast.types.SUCCESS,
+      })
     } catch (error) {
       resetForm({ ...values })
       await this.setState(error)
