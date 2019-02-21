@@ -21,6 +21,7 @@ import FieldGroup from '../field/group'
 import Button from '../button'
 import Notification from '../notification'
 import PropTypes from '../../lib/prop-types'
+import recursiveMap from '../../lib/react-recursive-map'
 
 @bind
 class InnerForm extends React.Component {
@@ -189,23 +190,6 @@ const Form = ({
     })}
   />
 )
-
-function recursiveMap (children, fn) {
-  return React.Children.map(children, function (Child) {
-    if (!React.isValidElement(Child)) {
-      return Child
-    }
-
-    let child = Child
-    if (child.props.children) {
-      child = React.cloneElement(child, {
-        children: recursiveMap(child.props.children, fn),
-      })
-    }
-
-    return fn(child)
-  })
-}
 
 const fieldErrors = function (definition, error) {
   // stack custom errors
