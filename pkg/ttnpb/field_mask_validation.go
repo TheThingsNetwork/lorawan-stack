@@ -14,6 +14,49 @@
 
 package ttnpb
 
+var isEndDeviceReadFieldPaths = []string{
+	"application_server_address",
+	"attributes",
+	"created_at",
+	"description",
+	"ids",
+	"ids.application_ids",
+	"ids.application_ids.application_id",
+	"ids.dev_eui",
+	"ids.device_id",
+	"ids.join_eui",
+	"join_server_address",
+	"locations",
+	"name",
+	"network_server_address",
+	"service_profile_id",
+	"updated_at",
+	"version_ids",
+	"version_ids.brand_id",
+	"version_ids.firmware_version",
+	"version_ids.hardware_version",
+	"version_ids.model_id",
+}
+
+var isEndDeviceWriteFieldPaths = []string{
+	"application_server_address",
+	"attributes",
+	"description",
+	"ids",
+	"ids.dev_eui",
+	"ids.join_eui",
+	"join_server_address",
+	"locations",
+	"name",
+	"network_server_address",
+	"service_profile_id",
+	"version_ids",
+	"version_ids.brand_id",
+	"version_ids.firmware_version",
+	"version_ids.hardware_version",
+	"version_ids.model_id",
+}
+
 var allowedFieldMaskPathsForRPC = map[string][]string{
 	// Applications:
 	"/ttn.lorawan.v3.ApplicationRegistry/Get":                 ApplicationFieldPathsNested,
@@ -40,10 +83,10 @@ var allowedFieldMaskPathsForRPC = map[string][]string{
 	// TODO: Restrict field paths for IS/NS/AS/JS.
 	"/ttn.lorawan.v3.AsEndDeviceRegistry/Get":                  EndDeviceFieldPathsNested,
 	"/ttn.lorawan.v3.AsEndDeviceRegistry/Set":                  EndDeviceFieldPathsNested,
-	"/ttn.lorawan.v3.EndDeviceRegistry/Get":                    EndDeviceFieldPathsNested,
-	"/ttn.lorawan.v3.EndDeviceRegistry/List":                   EndDeviceFieldPathsNested,
-	"/ttn.lorawan.v3.EndDeviceRegistry/Update":                 EndDeviceFieldPathsNested,
-	"/ttn.lorawan.v3.EndDeviceRegistrySearch/SearchEndDevices": EndDeviceFieldPathsNested,
+	"/ttn.lorawan.v3.EndDeviceRegistry/Get":                    isEndDeviceReadFieldPaths,
+	"/ttn.lorawan.v3.EndDeviceRegistry/List":                   isEndDeviceReadFieldPaths,
+	"/ttn.lorawan.v3.EndDeviceRegistry/Update":                 isEndDeviceWriteFieldPaths,
+	"/ttn.lorawan.v3.EndDeviceRegistrySearch/SearchEndDevices": isEndDeviceReadFieldPaths,
 	"/ttn.lorawan.v3.JsEndDeviceRegistry/Get":                  EndDeviceFieldPathsNested,
 	"/ttn.lorawan.v3.JsEndDeviceRegistry/Set":                  EndDeviceFieldPathsNested,
 	"/ttn.lorawan.v3.NsEndDeviceRegistry/Get":                  EndDeviceFieldPathsNested,
