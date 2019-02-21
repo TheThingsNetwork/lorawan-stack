@@ -63,73 +63,20 @@ func TestGetDataRatesFromFrequencyPlan(t *testing.T) {
 		})
 	}
 }
-
-func TestGetUint16IntegerAsByteSlice(t *testing.T) {
-	a := assertions.New(t)
-
-	a.So(getUint16IntegerAsByteSlice(0x12), should.Resemble, [2]byte{0x12, 0})
-	a.So(getUint16IntegerAsByteSlice(0x1234), should.Equal, [2]byte{0x34, 0x12})
-}
-
 func TestGetUint32IntegerAsByteSlice(t *testing.T) {
 	a := assertions.New(t)
 
-	b, err := getInt32IntegerAsByteSlice(0x12)
+	b, err := getInt32AsByteSlice(0x12)
 	a.So(err, should.BeNil)
 	a.So(b, should.Resemble, []byte{0x12, 0, 0, 0})
 
-	b, err = getInt32IntegerAsByteSlice(0x12345678)
+	b, err = getInt32AsByteSlice(0x12345678)
 	a.So(err, should.BeNil)
 	a.So(b, should.Resemble, []byte{0x78, 0x56, 0x34, 0x12})
 
-	b, err = getInt32IntegerAsByteSlice(0x7FFFFFFF)
+	b, err = getInt32AsByteSlice(0x7FFFFFFF)
 	a.So(err, should.BeNil)
 	a.So(b, should.Resemble, []byte{0xFF, 0xFF, 0xFF, 0x7F})
-}
-
-func TestGetMHDR(t *testing.T) {
-	a := assertions.New(t)
-	for _, tc := range []struct {
-		Name          string
-		MHDR          uint
-		ParsedMHDR    ttnpb.MHDR
-		ExpectedError error
-	}{
-		{
-			"Valid/1",
-			0x00,
-			ttnpb.MHDR{MType: ttnpb.MType_JOIN_REQUEST, Major: ttnpb.Major_LORAWAN_R1},
-			nil,
-		},
-		{
-			"Valid/2",
-			224,
-			ttnpb.MHDR{MType: ttnpb.MType_PROPRIETARY, Major: ttnpb.Major_LORAWAN_R1},
-			nil,
-		},
-		{
-			"Valid/3",
-			255,
-			ttnpb.MHDR{MType: ttnpb.MType_PROPRIETARY, Major: 3},
-			nil,
-		},
-		{
-			"Invalid/1",
-			256,
-			ttnpb.MHDR{},
-			errJoinRequestMessage,
-		},
-	} {
-		t.Run(tc.Name, func(t *testing.T) {
-			mhdr, err := getMHDRFromInt(tc.MHDR)
-			if !(a.So(err, should.Resemble, tc.ExpectedError)) {
-				t.Fatalf("Unexpected error: %v", err)
-			}
-			if !(a.So(mhdr, should.Resemble, tc.ParsedMHDR)) {
-				t.Fatalf("Invalid mhdr: %v", mhdr)
-			}
-		})
-	}
 }
 
 func TestGetDataRateFromDataRateIndex(t *testing.T) {
@@ -163,13 +110,13 @@ func TestGetDataRateFromDataRateIndex(t *testing.T) {
 		{
 			"Invalid_EU",
 			"EU_863_870",
-			8,
+			16,
 			ttnpb.DataRate{},
 			errDataRateIndex,
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
-			dr, err := getDataRateFromDataRateIndex(tc.BandID, tc.DataRateIndex)
+			dr, err := getDataRateFromIndex(tc.BandID, tc.DataRateIndex)
 			if !(a.So(err, should.Resemble, tc.ExpectedError)) {
 				t.Fatalf("Unexpected error: %v", err)
 			}
