@@ -15,19 +15,12 @@
 package web
 
 import (
-	"fmt"
-
 	"github.com/labstack/echo"
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/errors/web"
 )
 
 // ErrorHandler is an echo.HTTPErrorHandler.
 func ErrorHandler(err error, c echo.Context) {
-	status := errors.ToHTTPStatusCode(err)
-	msg := err.Error()
-	if h, ok := err.(*echo.HTTPError); ok {
-		status = h.Code
-		msg = fmt.Sprintf("%s", h.Message)
-	}
-	c.String(status, msg)
+	status, err := web.ProcessError(err)
+	c.JSON(status, err.Error())
 }

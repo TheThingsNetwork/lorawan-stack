@@ -18,6 +18,7 @@ import (
 	"time"
 
 	"github.com/labstack/echo"
+	"go.thethings.network/lorawan-stack/pkg/errors/web"
 	"go.thethings.network/lorawan-stack/pkg/log"
 )
 
@@ -48,26 +49,26 @@ func Log(logger log.Interface) echo.MiddlewareFunc {
 				"request_id", c.Response().Header().Get("X-Request-ID"),
 			))
 
+			var statusCode int
 			if err != nil {
-				logger.WithError(err).Error("Request errored")
-				return err
+				statusCode, err = web.ProcessError(err)
+				logger = logger.WithError(err)
+			} else {
+				res := c.Response()
+				statusCode = res.Status
+				logger = logger.WithField("response_size", res.Size)
+				if loc := res.Header().Get("Location"); res.Status >= 300 && res.Status < 400 && loc != "" {
+					logger = logger.WithField("location", loc)
+				}
 			}
+			logger = logger.WithField("status", statusCode)
 
-			res := c.Response()
-			logger = logger.WithFields(log.Fields(
-				"response_size", res.Size,
-				"status", res.Status,
-			))
-			if loc := res.Header().Get("Location"); res.Status >= 300 && res.Status < 400 && loc != "" {
-				logger = logger.WithField("location", loc)
-			}
-
-			if res.Status >= 500 {
+			if statusCode >= 500 {
 				logger.Error("Request error")
-				return err
+			} else {
+				logger.Info("Request handled")
 			}
 
-			logger.Info("Request handled")
 			return err
 		}
 	}

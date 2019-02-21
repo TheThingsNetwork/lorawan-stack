@@ -51,17 +51,17 @@ var errHTTP = errors.Define("http", "HTTP error: {message}")
 // determining the HTTP status code to return.
 func ProcessError(in error) (statusCode int, err error) {
 	statusCode, err = http.StatusInternalServerError, in
+	if errors.Resemble(in, errHTTP) {
+		err = errors.Cause(err)
+	}
 	if echoErr, ok := err.(*echo.HTTPError); ok {
 		if echoErr.Code != 0 {
 			statusCode = echoErr.Code
 		}
-		if ttnErr, ok := errors.From(echoErr.Internal); ok {
-			if statusCode == http.StatusInternalServerError {
-				statusCode = errors.ToHTTPStatusCode(ttnErr)
-			}
-			return statusCode, ttnErr
+		if echoErr.Internal == nil {
+			return statusCode, errHTTP.WithCause(echoErr).WithAttributes("message", err.Error())
 		}
-		return statusCode, errHTTP.WithCause(echoErr).WithAttributes("message", err.Error())
+		err = echoErr.Internal
 	}
 	if ttnErr, ok := errors.From(err); ok {
 		statusCode = errors.ToHTTPStatusCode(ttnErr)

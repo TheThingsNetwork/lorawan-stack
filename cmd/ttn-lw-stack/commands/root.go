@@ -57,9 +57,6 @@ var (
 				log.WithLevel(config.Base.Log.Level),
 				log.WithHandler(log.NewCLI(os.Stdout)),
 			)
-			if sentry, err := shared.SentryMiddleware(config.ServiceBase); err == nil && sentry != nil {
-				logger.Use(sentry)
-			}
 
 			// initialize shared packages
 			if err := shared.Initialize(config.ServiceBase); err != nil {

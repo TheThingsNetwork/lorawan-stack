@@ -62,8 +62,14 @@ var httpErrorCodes = map[int]uint32{
 
 // ToHTTPStatusCode maps an error to HTTP response codes.
 func ToHTTPStatusCode(err error) int {
-	if status, ok := httpStatusCodes[Code(err)]; ok {
-		return status
+	for _, err := range Stack(err) {
+		code := Code(err)
+		if code == uint32(codes.Unknown) {
+			continue
+		}
+		if status, ok := httpStatusCodes[code]; ok {
+			return status
+		}
 	}
 	return http.StatusInternalServerError
 }

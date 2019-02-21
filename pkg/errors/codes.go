@@ -38,6 +38,12 @@ func (e Error) Code() uint32 {
 }
 
 func code(err error) uint32 {
+	switch err {
+	case context.Canceled:
+		return uint32(codes.Canceled)
+	case context.DeadlineExceeded:
+		return uint32(codes.DeadlineExceeded)
+	}
 	if c, ok := err.(coder); ok {
 		return c.Code()
 	}
@@ -50,6 +56,9 @@ func code(err error) uint32 {
 // Code gets the code of an error.
 // If the error doesn't implement codes, Unknown is returned.
 func Code(err error) uint32 {
+	if err == nil {
+		return uint32(codes.OK)
+	}
 	if code := code(err); code != 0 {
 		return code
 	}
@@ -64,7 +73,7 @@ func HasCode(err error, c uint32) bool {
 
 // IsCanceled returns whether the givenerror is context.Canceled or of type Canceled.
 func IsCanceled(err error) bool {
-	return err == context.Canceled || HasCode(err, uint32(codes.Canceled))
+	return HasCode(err, uint32(codes.Canceled))
 }
 
 // IsUnknown returns whether the given error is of type Unknown.
@@ -75,7 +84,7 @@ func IsInvalidArgument(err error) bool { return HasCode(err, uint32(codes.Invali
 
 // IsDeadlineExceeded returns whether the givenerror is context.DeadlineExceeded or of type DeadlineExceeded.
 func IsDeadlineExceeded(err error) bool {
-	return err == context.DeadlineExceeded || HasCode(err, uint32(codes.DeadlineExceeded))
+	return HasCode(err, uint32(codes.DeadlineExceeded))
 }
 
 // IsNotFound returns whether the given error is of type NotFound.
