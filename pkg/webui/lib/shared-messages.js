@@ -51,6 +51,7 @@ export default defineMessages({
   profileSettings: 'Profile Settings',
   rights: 'Rights',
   saveChanges: 'Save Changes',
+  search: 'Search',
   settings: 'Settings',
   termsAndCondition: 'Terms and Conditions',
   traffic: 'Traffic',
