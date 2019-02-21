@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/basicstation"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -235,12 +236,11 @@ func TestGetUplinkMessage(t *testing.T) {
 						DevEUI:   types.EUI64{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 						DevNonce: [2]byte{0x00, 0x00},
 					}}},
-				RxMetadata: []*ttnpb.RxMetadata{&ttnpb.RxMetadata{
+				RxMetadata: []*ttnpb.RxMetadata{{
 					GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"},
 					Time:               &[]time.Time{time.Unix(0, 0)}[0],
 				}},
 				Settings: ttnpb.TxSettings{
-					CodingRate: "4/5",
 					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 12,
 						Bandwidth:       125000,
@@ -252,8 +252,8 @@ func TestGetUplinkMessage(t *testing.T) {
 			"ValidJoinRequest",
 			JoinRequest{
 				MHdr:     0,
-				DevEUI:   EUI{Prefix: "DevEui", EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
-				JoinEUI:  EUI{Prefix: "JoinEui", EUI64: types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22}},
+				DevEUI:   basicstation.EUI{Prefix: "DevEui", EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
+				JoinEUI:  basicstation.EUI{Prefix: "JoinEui", EUI64: types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22}},
 				DevNonce: 18000,
 				MIC:      12345678,
 				RadioMetaData: RadioMetaData{
@@ -278,7 +278,7 @@ func TestGetUplinkMessage(t *testing.T) {
 						DevEUI:   types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11},
 						DevNonce: [2]byte{0x50, 0x46},
 					}}},
-				RxMetadata: []*ttnpb.RxMetadata{&ttnpb.RxMetadata{
+				RxMetadata: []*ttnpb.RxMetadata{{
 					GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"},
 					Time:               &[]time.Time{time.Unix(1548059982, 0)}[0],
 					Timestamp:          (uint32)(12666373963464220 & 0xFFFFFFFF),
@@ -287,7 +287,6 @@ func TestGetUplinkMessage(t *testing.T) {
 				},
 				},
 				Settings: ttnpb.TxSettings{
-					CodingRate:    "4/5",
 					Frequency:     868300000,
 					DataRateIndex: 1,
 					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
