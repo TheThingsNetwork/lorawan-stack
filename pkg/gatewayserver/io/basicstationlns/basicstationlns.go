@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package basicstation
+package basicstationlns
 
 import (
 	"context"
@@ -22,9 +22,10 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/pkg/basicstation"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
-	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/basicstation/messages"
+	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/basicstationlns/messages"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
@@ -32,7 +33,7 @@ import (
 )
 
 var (
-	errEmptyGatewayEUI = errors.Define("empty_gateway_eui", "empty gateway eui")
+	errEmptyGatewayEUI = errors.Define("empty_gateway_eui", "empty gateway EUI")
 )
 
 type srv struct {
@@ -77,20 +78,11 @@ func (s *srv) handleDiscover(c echo.Context) error {
 	var req messages.DiscoverQuery
 	if err := json.Unmarshal(data, &req); err != nil {
 		logger.WithError(err).Debug("Failed to parse discover query message")
-		errMsg, _ := json.Marshal(messages.DiscoverResponse{Error: "Invalid request"})
-		if err := ws.WriteMessage(websocket.TextMessage, errMsg); err != nil {
-			logger.WithError(err).Warn("Failed to write error response message")
-			return err
-		}
 		return err
 	}
 
 	if req.EUI.IsZero() {
-		errMsg, _ := json.Marshal(messages.DiscoverResponse{Error: "Invalid request"})
-		if err := ws.WriteMessage(websocket.TextMessage, errMsg); err != nil {
-			logger.WithError(err).Warn("Failed to write error response message")
-			return err
-		}
+		writeDiscoverError(s.ctx, ws, "Invalid request")
 		return errEmptyGatewayEUI
 	}
 
@@ -100,11 +92,7 @@ func (s *srv) handleDiscover(c echo.Context) error {
 	ctx, ids, err := s.server.FillGatewayContext(s.ctx, ids)
 	if err != nil {
 		logger.WithError(err).Debug("Failed to fill gateway context")
-		errMsg, _ := json.Marshal(messages.DiscoverResponse{Error: "Router not provisioned"})
-		if err := ws.WriteMessage(websocket.TextMessage, errMsg); err != nil {
-			logger.WithError(err).Warn("Failed to write error response message")
-			return err
-		}
+		writeDiscoverError(ctx, ws, "Router not provisioned")
 		return err
 	}
 	uid := unique.ID(ctx, ids)
@@ -116,7 +104,7 @@ func (s *srv) handleDiscover(c echo.Context) error {
 	}
 	res := messages.DiscoverResponse{
 		EUI: req.EUI,
-		Muxs: messages.EUI{
+		Muxs: basicstation.EUI{
 			Prefix: "muxs",
 		},
 		URI: fmt.Sprintf("%s://%s%s", scheme, c.Request().Host, c.Echo().URI(s.handleTraffic, uid)),
@@ -124,11 +112,7 @@ func (s *srv) handleDiscover(c echo.Context) error {
 	data, err = json.Marshal(res)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to marshal response message")
-		errMsg, _ := json.Marshal(messages.DiscoverResponse{Error: "Internal error"})
-		if err := ws.WriteMessage(websocket.TextMessage, errMsg); err != nil {
-			logger.WithError(err).Warn("Failed to write error response message")
-			return err
-		}
+		writeDiscoverError(ctx, ws, "Router not provisioned")
 		return err
 	}
 	if err := ws.WriteMessage(websocket.TextMessage, data); err != nil {
@@ -154,7 +138,11 @@ func (s *srv) handleTraffic(c echo.Context) error {
 		"endpoint", "traffic",
 		"remote_addr", c.Request().RemoteAddr,
 	))
-
+	fp, err := s.server.GetFrequencyPlan(ctx, ids)
+	if err != nil {
+		logger.WithError(err).Warn("Failed to get frequency plan")
+		return err
+	}
 	ws, err := s.upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
 		logger.WithError(err).Debug("Failed to upgrade request to websocket connection")
@@ -185,7 +173,6 @@ func (s *srv) handleTraffic(c echo.Context) error {
 	}()
 
 	// TODO: Start downlink processing in goroutine, see gRPC frontend.
-
 	for {
 		_, data, err := ws.ReadMessage()
 		if err != nil {
@@ -197,11 +184,10 @@ func (s *srv) handleTraffic(c echo.Context) error {
 			logger.WithError(err).Debug("Failed to parse message type")
 			return err
 		}
-		fp, err := s.server.GetFrequencyPlan(ctx, ids)
-		if err != nil {
-			logger.WithError(err).Warn("Failed to get frequency plan")
-			return err
-		}
+		logger = logger.WithFields(log.Fields(
+			"upstream_type", typ,
+		))
+
 		switch typ {
 		case messages.TypeUpstreamVersion:
 			var version messages.Version
@@ -232,15 +218,12 @@ func (s *srv) handleTraffic(c echo.Context) error {
 		case messages.TypeUpstreamJoinRequest:
 			var jreq messages.JoinRequest
 			if err := json.Unmarshal(data, &jreq); err != nil {
-				logger.WithError(err).Debug("Failed to unmarshal join request message")
+				logger.WithError(err).Debug("Failed to unmarshal join-request message")
 				return err
 			}
-			logger = logger.WithFields(log.Fields(
-				"upstream_type", messages.TypeUpstreamJoinRequest,
-			))
 			up, err := jreq.ToUplinkMessage(ids, fp.BandID)
 			if err != nil {
-				logger.WithError(err).Debug("Failed to parse join request message")
+				logger.WithError(err).Debug("Failed to parse join-request message")
 				return err
 			}
 			if err := conn.HandleUp(&up); err != nil {
@@ -257,5 +240,18 @@ func (s *srv) handleTraffic(c echo.Context) error {
 			// Unknown message types are ignored by the server
 			logger.WithField("message_type", typ).Debug("Unknown message type")
 		}
+	}
+}
+
+// writeDiscoverError sends the error messages during the discovery on the WS connection to the station.
+func writeDiscoverError(ctx context.Context, ws *websocket.Conn, msg string) {
+	logger := log.FromContext(ctx)
+	errMsg, err := json.Marshal(messages.DiscoverResponse{Error: msg})
+	if err != nil {
+		logger.WithError(err).Debug("Failed to marshal error message")
+		return
+	}
+	if err := ws.WriteMessage(websocket.TextMessage, errMsg); err != nil {
+		logger.WithError(err).Debug("Failed to write error response message")
 	}
 }
