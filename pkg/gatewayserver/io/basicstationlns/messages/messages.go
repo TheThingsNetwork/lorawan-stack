@@ -20,14 +20,18 @@ import (
 	"strings"
 	"time"
 
+	"go.thethings.network/lorawan-stack/pkg/band"
+	"go.thethings.network/lorawan-stack/pkg/basicstation"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-var errFrequencyPlan = errors.Define("frequency_plan", "invalid frequency plan")
-var errJoinRequestMessage = errors.Define("join_request_message", "invalid join request message received")
+var (
+	errFrequencyPlan      = errors.Define("frequency_plan", "invalid frequency plan")
+	errJoinRequestMessage = errors.Define("join_request_message", "invalid join-request message received")
+)
 
 // Definition of message types
 const (
@@ -61,16 +65,16 @@ type DataRates [16][3]int
 // DiscoverQuery contains the unique identifier of the gateway.
 // This message is sent by the gateway.
 type DiscoverQuery struct {
-	EUI EUI `json:"router"`
+	EUI basicstation.EUI `json:"router"`
 }
 
 // DiscoverResponse contains the response to the discover query.
 // This message is sent by the Gateway Server.
 type DiscoverResponse struct {
-	EUI   EUI    `json:"router"`
-	Muxs  EUI    `json:"muxs,omitempty"`
-	URI   string `json:"uri,omitempty"`
-	Error string `json:"error,omitempty"`
+	EUI   basicstation.EUI `json:"router"`
+	Muxs  basicstation.EUI `json:"muxs,omitempty"`
+	URI   string           `json:"uri,omitempty"`
+	Error string           `json:"error,omitempty"`
 }
 
 // Type returns the message type of the given data.
@@ -122,7 +126,7 @@ func (v Version) IsProduction() bool {
 }
 
 // SX1301Config contains the concentrator configuration.
-// TODO: Hamonize this with sx1301_conf from https://github.com/TheThingsIndustries/lorawan-stack/issues/408
+// TODO: Harmonize this with sx1301_conf from https://github.com/TheThingsNetwork/lorawan-stack/pull/276
 type SX1301Config struct{}
 
 // RouterConfig contains the router configuration.
@@ -146,7 +150,6 @@ type RouterConfig struct {
 }
 
 // GetRouterConfig returns the routerconfig message to be sent to the gateway
-// TODO: Adapt to https://github.com/TheThingsIndustries/lorawan-stack/pull/1402
 func GetRouterConfig(fp frequencyplans.FrequencyPlan, isProd bool) (RouterConfig, error) {
 	if err := fp.Validate(); err != nil {
 		return RouterConfig{}, errFrequencyPlan
@@ -154,11 +157,16 @@ func GetRouterConfig(fp frequencyplans.FrequencyPlan, isProd bool) (RouterConfig
 
 	cfg := RouterConfig{}
 
-	// TODO: Set maximumally permissive values
+	// This disables filtering in the gateway.
 	cfg.JoinEUI = nil
 	cfg.NetID = nil
 
-	s := strings.Split(fp.BandID, "_")
+	band, err := band.GetByID(fp.BandID)
+	if err != nil {
+		return RouterConfig{}, errFrequencyPlan
+	}
+
+	s := strings.Split(band.ID, "_")
 	if len(s) < 2 {
 		return RouterConfig{}, errFrequencyPlan
 	}
@@ -167,9 +175,12 @@ func GetRouterConfig(fp frequencyplans.FrequencyPlan, isProd bool) (RouterConfig
 		return RouterConfig{}, errFrequencyPlan
 	}
 	// TODO: Handle FP with multiple radios if necessary
-	cfg.FrequencyRange = []int{int(fp.Radios[0].TxConfiguration.MinFrequency), int(fp.Radios[0].TxConfiguration.MaxFrequency)}
+	cfg.FrequencyRange = []int{
+		int(fp.Radios[0].TxConfiguration.MinFrequency),
+		int(fp.Radios[0].TxConfiguration.MaxFrequency),
+	}
 
-	// TODO: Figure out how to evaluate configHardwareSpecNoOfConcentrators
+	// TODO: https://github.com/TheThingsNetwork/lorawan-stack/issues/284
 	cfg.HardwareSpec = fmt.Sprintf("%s/%s", configHardwareSpecPrefix, configHardwareSpecNoOfConcentrators)
 
 	drs, err := getDataRatesFromBandID(fp.BandID)
@@ -178,17 +189,11 @@ func GetRouterConfig(fp frequencyplans.FrequencyPlan, isProd bool) (RouterConfig
 	}
 	cfg.DataRates = drs
 
-	if isProd {
-		cfg.NoCCA = false
-		cfg.NoDutyCycle = false
-		cfg.NoDwellTime = false
-	} else {
-		cfg.NoCCA = true
-		cfg.NoDutyCycle = true
-		cfg.NoDwellTime = true
-	}
+	cfg.NoCCA = !isProd
+	cfg.NoDutyCycle = !isProd
+	cfg.NoDwellTime = !isProd
 
-	// TODO: Get sx1301 config https://github.com/TheThingsIndustries/lorawan-stack/issues/408
+	// TODO: Harmonize this with sx1301_conf from https://github.com/TheThingsNetwork/lorawan-stack/pull/276
 	cfg.SX1301Config = SX1301Config{}
 	return cfg, nil
 }
@@ -212,12 +217,12 @@ type RadioMetaData struct {
 
 // JoinRequest is the LoRaWAN Join Request message
 type JoinRequest struct {
-	MHdr          uint    `json:"MHdr"`
-	JoinEUI       EUI     `json:"JoinEui"`
-	DevEUI        EUI     `json:"DevEui"`
-	DevNonce      uint    `json:"DevNonce"`
-	MIC           int32   `json:"MIC"`
-	RefTime       float64 `json:"RefTime"`
+	MHdr          uint             `json:"MHdr"`
+	JoinEUI       basicstation.EUI `json:"JoinEui"`
+	DevEUI        basicstation.EUI `json:"DevEui"`
+	DevNonce      uint             `json:"DevNonce"`
+	MIC           int32            `json:"MIC"`
+	RefTime       float64          `json:"RefTime"`
 	RadioMetaData RadioMetaData
 }
 
@@ -239,12 +244,13 @@ func (req *JoinRequest) ToUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID str
 	up := ttnpb.UplinkMessage{}
 	up.ReceivedAt = time.Now()
 
-	parsedMHDR, err := getMHDRFromInt(req.MHdr)
+	parsedMHDR := ttnpb.MHDR{}
+	err := lorawan.UnmarshalMHDR([]byte{byte(req.MHdr)}, &parsedMHDR)
 	if err != nil {
 		return ttnpb.UplinkMessage{}, errJoinRequestMessage.WithCause(err)
 	}
 
-	micBytes, err := getInt32IntegerAsByteSlice(req.MIC)
+	micBytes, err := getInt32AsByteSlice(req.MIC)
 	if err != nil {
 		return ttnpb.UplinkMessage{}, errJoinRequestMessage.WithCause(err)
 	}
@@ -254,7 +260,7 @@ func (req *JoinRequest) ToUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID str
 		Payload: &ttnpb.Message_JoinRequestPayload{JoinRequestPayload: &ttnpb.JoinRequestPayload{
 			JoinEUI:  req.JoinEUI.EUI64,
 			DevEUI:   req.DevEUI.EUI64,
-			DevNonce: getUint16IntegerAsByteSlice(uint16(req.DevNonce)),
+			DevNonce: [2]byte{byte(req.DevNonce), byte(req.DevNonce >> 8)},
 		}},
 	}
 
@@ -267,19 +273,17 @@ func (req *JoinRequest) ToUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID str
 	rxMetadata := &ttnpb.RxMetadata{
 		GatewayIdentifiers: ids,
 		Time:               &rxTime,
-		Timestamp:          (uint32)(req.RadioMetaData.UpInfo.XTime & 0xFFFFFFFF),
+		Timestamp:          uint32(req.RadioMetaData.UpInfo.XTime & 0xFFFFFFFF),
 		RSSI:               req.RadioMetaData.UpInfo.RSSI,
 		SNR:                req.RadioMetaData.UpInfo.SNR,
 	}
 	up.RxMetadata = append(up.RxMetadata, rxMetadata)
 
-	loraDR, err := getDataRateFromDataRateIndex(bandID, req.RadioMetaData.DataRate)
+	loraDR, err := getDataRateFromIndex(bandID, req.RadioMetaData.DataRate)
 	if err != nil {
 		return ttnpb.UplinkMessage{}, errJoinRequestMessage.WithCause(err)
 	}
 	up.Settings = ttnpb.TxSettings{
-		// TODO: Is this to be hardcoded or left out?
-		CodingRate:    "4/5",
 		Frequency:     req.RadioMetaData.Frequency,
 		DataRateIndex: (ttnpb.DataRateIndex)(req.RadioMetaData.DataRate),
 		DataRate:      loraDR,
