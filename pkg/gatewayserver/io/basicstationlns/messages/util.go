@@ -17,22 +17,15 @@ package messages
 import (
 	"bytes"
 	"encoding/binary"
-	"math"
 
 	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-var errDataRateIndex = errors.Define("data_rate_index", "datarate index is out of range")
+var errDataRateIndex = errors.Define("data_rate_index", "data rate index is out of range")
 
-func getUint16IntegerAsByteSlice(value uint16) [2]byte {
-	b := [2]byte{}
-	binary.LittleEndian.PutUint16(b[:], value)
-	return b
-}
-
-func getInt32IntegerAsByteSlice(value int32) ([]byte, error) {
+func getInt32AsByteSlice(value int32) ([]byte, error) {
 	b := new(bytes.Buffer)
 	err := binary.Write(b, binary.LittleEndian, value)
 	if err != nil {
@@ -41,32 +34,18 @@ func getInt32IntegerAsByteSlice(value int32) ([]byte, error) {
 	return b.Bytes(), nil
 }
 
-func getMHDRFromInt(mhdr uint) (ttnpb.MHDR, error) {
-	if mhdr > math.MaxUint8 {
-		return ttnpb.MHDR{}, errJoinRequestMessage
-	}
-	mhdrBytes := getUint16IntegerAsByteSlice((uint16)(mhdr))
-	return ttnpb.MHDR{
-		MType: ttnpb.MType(mhdrBytes[0] >> 5),
-		Major: ttnpb.Major(mhdrBytes[0] & 3),
-	}, nil
-}
-
-func getDataRateFromDataRateIndex(bandID string, index int) (ttnpb.DataRate, error) {
+func getDataRateFromIndex(bandID string, index int) (ttnpb.DataRate, error) {
 	band, err := band.GetByID(bandID)
 	if err != nil {
 		return ttnpb.DataRate{}, errDataRateIndex.WithCause(err)
 	}
-	if index > len(band.DataRates) {
-		return ttnpb.DataRate{}, errDataRateIndex
-	}
-	if band.DataRates[index].Rate.GetLoRa() == nil && band.DataRates[index].Rate.GetFSK() == nil {
+	if index >= len(band.DataRates) {
 		return ttnpb.DataRate{}, errDataRateIndex
 	}
 	return band.DataRates[index].Rate, nil
 }
 
-// getDataRatesFromBandID parses the available datarates from the Frequency Plam into the LNS Format.
+// getDataRatesFromBandID parses the available data rates from the band into DataRates.
 func getDataRatesFromBandID(id string) (DataRates, error) {
 	band, err := band.GetByID(id)
 	if err != nil {
@@ -85,8 +64,8 @@ func getDataRatesFromBandID(id string) (DataRates, error) {
 	for _, dr := range band.DataRates {
 		if loraDR := dr.Rate.GetLoRa(); loraDR != nil {
 			loraDR.GetSpreadingFactor()
-			drs[i][0] = (int)(loraDR.GetSpreadingFactor())
-			drs[i][1] = (int)(loraDR.GetBandwidth() / 1000)
+			drs[i][0] = int(loraDR.GetSpreadingFactor())
+			drs[i][1] = int(loraDR.GetBandwidth() / 1000)
 			i++
 		} else if fskDR := dr.Rate.GetFSK(); fskDR != nil {
 			drs[i][0] = 0 // must be set to 0 for FSK, the BW field is ignored.

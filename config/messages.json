@@ -2582,6 +2582,42 @@
       "file": "frequencyplans.go"
     }
   },
+  "error:pkg/gatewayserver/io/basicstationlns/messages:data_rate_index": {
+    "translations": {
+      "en": "data rate index is out of range"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/basicstationlns/messages",
+      "file": "util.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/basicstationlns/messages:frequency_plan": {
+    "translations": {
+      "en": "invalid frequency plan"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/basicstationlns/messages",
+      "file": "messages.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/basicstationlns/messages:join_request_message": {
+    "translations": {
+      "en": "invalid join-request message received"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/basicstationlns/messages",
+      "file": "messages.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/basicstationlns:empty_gateway_eui": {
+    "translations": {
+      "en": "empty gateway EUI"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/basicstationlns",
+      "file": "basicstationlns.go"
+    }
+  },
   "error:pkg/gatewayserver/io/grpc:connect": {
     "translations": {
       "en": "failed to connect gateway `{gateway_uid}`"
