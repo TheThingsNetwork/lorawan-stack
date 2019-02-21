@@ -97,7 +97,7 @@ export default class Input extends React.Component {
 
     return (
       <div className={classname}>
-        {icon && <Icon className={style.icon}icon={icon} />}
+        {icon && <Icon className={style.icon} icon={icon} />}
         <Component
           key="i"
           className={style.input}
