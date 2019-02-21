@@ -38,6 +38,7 @@ require (
 	github.com/googleapis/gax-go/v2 v2.0.4 // indirect
 	github.com/goreleaser/goreleaser v0.103.1
 	github.com/gorilla/securecookie v1.1.1
+	github.com/gorilla/websocket v1.4.0
 	github.com/gotnospirit/makeplural v0.0.0-20180622080156-a5f48d94d976 // indirect
 	github.com/gotnospirit/messageformat v0.0.0-20180622080451-0eab1176a3fb
 	github.com/gregjones/httpcache v0.0.0-20190212212710-3befbb6ad0cc

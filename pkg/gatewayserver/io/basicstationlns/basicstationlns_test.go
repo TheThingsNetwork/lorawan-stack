@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package basicstation_test
+package basicstationlns_test
 
 import (
 	"encoding/json"
@@ -23,12 +23,13 @@ import (
 
 	"github.com/gorilla/websocket"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/basicstation"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
-	. "go.thethings.network/lorawan-stack/pkg/gatewayserver/io/basicstation"
-	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/basicstation/messages"
+	. "go.thethings.network/lorawan-stack/pkg/gatewayserver/io/basicstationlns"
+	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/basicstationlns/messages"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/mock"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -39,7 +40,7 @@ import (
 
 var (
 	registeredGatewayUID = "0101010101010101"
-	registeredGatewayID  = ttnpb.GatewayIdentifiers{GatewayID: "eui-0101010101010101"}
+	registeredGatewayID  = ttnpb.GatewayIdentifiers{GatewayID: "eui-" + registeredGatewayUID}
 	registeredGateway    = ttnpb.Gateway{GatewayIdentifiers: registeredGatewayID, FrequencyPlanID: "EU_863_870"}
 	registeredGatewayKey = "test-key"
 
@@ -53,7 +54,7 @@ var (
 
 func TestAuthentication(t *testing.T) {
 	// TODO: Test authentication. We're gonna provision authentication tokens, which may be API keys.
-	// https://github.com/TheThingsIndustries/lorawan-stack/issues/1413
+	// https://github.com/TheThingsNetwork/lorawan-stack/issues/75
 }
 
 func TestDiscover(t *testing.T) {
@@ -76,34 +77,26 @@ func TestDiscover(t *testing.T) {
 	}
 	defer c.Close()
 
-	// Test Endpoints
+	// Invalid Endpoints
 	for i, tc := range []struct {
-		URL                string
-		ExpectedError      error
-		ExpectedStatusCode int
+		URL string
 	}{
 		{
-			"ws://localhost:8100/router-info", // This would ideally be proxied to "ws://server-address:port/api/v3/gs/io/basicstation/discover" but is invalid for unit tests.
-			websocket.ErrBadHandshake,
-			http.StatusNotFound,
+			"ws://localhost:8100/router-info",
 		},
 		{
 			discoveryEndPoint + "/router-58a0:cbff:fe80:f8",
-			websocket.ErrBadHandshake,
-			http.StatusNotFound,
 		},
 		{
 			discoveryEndPoint + "/eui-0101010101010101",
-			websocket.ErrBadHandshake,
-			http.StatusNotFound,
 		},
 	} {
 		t.Run(fmt.Sprintf("InvalidDiscoveryEndPoint/%d", i), func(t *testing.T) {
 			_, res, err := websocket.DefaultDialer.Dial(tc.URL, nil)
-			if res.StatusCode != tc.ExpectedStatusCode {
+			if res.StatusCode != http.StatusNotFound {
 				t.Fatalf("Unexpected response received: %v", res.Status)
 			}
-			if !a.So(err, should.Equal, tc.ExpectedError) {
+			if !a.So(err, should.Equal, websocket.ErrBadHandshake) {
 				t.Fatalf("Connection failed: %v", err)
 			}
 		})
@@ -111,19 +104,62 @@ func TestDiscover(t *testing.T) {
 
 	// Test Queries
 	for i, tc := range []struct {
-		Query interface{}
+		Query    interface{}
+		Response messages.DiscoverResponse
 	}{
 		{
 			messages.DiscoverQuery{},
+			messages.DiscoverResponse{Error: "Invalid request"},
 		},
 		{
 			struct{}{},
+			messages.DiscoverResponse{Error: "Invalid request"},
 		},
 		{
 			struct {
 				EUI string `json:"route"`
 			}{EUI: `"01-02-03-04-05-06-07-08"`},
+			messages.DiscoverResponse{Error: "Invalid request"},
 		},
+	} {
+		t.Run(fmt.Sprintf("InvalidQuery/%d", i), func(t *testing.T) {
+			conn, _, err := websocket.DefaultDialer.Dial(discoveryEndPoint, nil)
+			if !a.So(err, should.BeNil) {
+				t.Fatalf("Connection failed: %v", err)
+			}
+			defer conn.Close()
+			req, err := json.Marshal(tc.Query)
+			if err != nil {
+				panic(err)
+			}
+			if err := conn.WriteMessage(websocket.TextMessage, req); err != nil {
+				t.Fatalf("Failed to write message: %v", err)
+			}
+
+			resCh := make(chan []byte)
+			go func() {
+				_, data, err := conn.ReadMessage()
+				if err != nil {
+					t.Fatalf("Failed to read message: %v", err)
+				}
+				resCh <- data
+			}()
+			select {
+			case res := <-resCh:
+				var response messages.DiscoverResponse
+				if err := json.Unmarshal(res, &response); err != nil {
+					t.Fatalf("Failed to unmarshal response `%s`: %v", string(res), err)
+				}
+				a.So(response, should.Resemble, tc.Response)
+			case <-time.After(timeout):
+				t.Fatal("Read message timeout")
+			}
+		})
+	}
+
+	for i, tc := range []struct {
+		Query interface{}
+	}{
 		{
 			struct {
 				EUI string `json:"router"`
@@ -146,7 +182,6 @@ func TestDiscover(t *testing.T) {
 				t.Fatalf("Connection failed: %v", err)
 			}
 			defer conn.Close()
-
 			req, err := json.Marshal(tc.Query)
 			if err != nil {
 				panic(err)
@@ -158,26 +193,24 @@ func TestDiscover(t *testing.T) {
 			resCh := make(chan []byte)
 			go func() {
 				_, data, err := conn.ReadMessage()
-				if err != nil {
+				if err == nil {
 					t.Fatalf("Failed to read message: %v", err)
 				}
 				resCh <- data
 			}()
 			select {
 			case res := <-resCh:
-				var response messages.DiscoverResponse
-				if err := json.Unmarshal(res, &response); err != nil {
-					t.Fatalf("Failed to unmarshal response `%s`: %v", string(res), err)
+				if len(res) != 0 {
+					t.Fatal("Expected empty response")
 				}
-				a.So(response, should.Resemble, messages.DiscoverResponse{
-					Error: "Invalid request",
-				})
 			case <-time.After(timeout):
-				t.Fatalf("Read message timeout")
+				t.Log("Read message timeout")
 			}
+			conn.Close()
 		})
 	}
 
+	// Valid
 	for i, tc := range []struct {
 		EndPointEUI string
 		EUI         types.EUI64
@@ -186,7 +219,12 @@ func TestDiscover(t *testing.T) {
 		{
 			"1111111111111111",
 			types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11},
-			messages.DiscoverQuery{EUI: messages.EUI{Prefix: "router", EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}}},
+			messages.DiscoverQuery{
+				EUI: basicstation.EUI{
+					Prefix: "router",
+					EUI64:  types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11},
+				},
+			},
 		},
 	} {
 		t.Run(fmt.Sprintf("ValidQuery/%d", i), func(t *testing.T) {
@@ -195,7 +233,6 @@ func TestDiscover(t *testing.T) {
 				t.Fatalf("Connection failed: %v", err)
 			}
 			defer conn.Close()
-
 			req, err := json.Marshal(tc.Query)
 			if err != nil {
 				panic(err)
@@ -219,8 +256,8 @@ func TestDiscover(t *testing.T) {
 					t.Fatalf("Failed to unmarshal response `%s`: %v", string(res), err)
 				}
 				a.So(response, should.Resemble, messages.DiscoverResponse{
-					EUI: messages.EUI{Prefix: "router", EUI64: tc.EUI},
-					Muxs: messages.EUI{
+					EUI: basicstation.EUI{Prefix: "router", EUI64: tc.EUI},
+					Muxs: basicstation.EUI{
 						Prefix: "muxs",
 					},
 					URI: connectionRootEndPoint + "eui-" + tc.EndPointEUI,
@@ -228,6 +265,7 @@ func TestDiscover(t *testing.T) {
 			case <-time.After(timeout):
 				t.Fatalf("Read message timeout")
 			}
+			conn.Close()
 		})
 	}
 }
@@ -259,7 +297,7 @@ func TestVersion(t *testing.T) {
 	}
 	defer conn.Close()
 
-	for i, tc := range []struct {
+	for _, tc := range []struct {
 		Name                 string
 		VersionQuery         interface{}
 		ExpectedRouterConfig interface{}
@@ -279,14 +317,14 @@ func TestVersion(t *testing.T) {
 				HardwareSpec:   "sx1301/1",
 				FrequencyRange: []int{863000000, 870000000},
 				DataRates: [16][3]int{
-					[3]int{12, 125, 0},
-					[3]int{11, 125, 0},
-					[3]int{10, 125, 0},
-					[3]int{9, 125, 0},
-					[3]int{8, 125, 0},
-					[3]int{7, 125, 0},
-					[3]int{7, 250, 0},
-					[3]int{0, 0, 0},
+					{12, 125, 0},
+					{11, 125, 0},
+					{10, 125, 0},
+					{9, 125, 0},
+					{8, 125, 0},
+					{7, 125, 0},
+					{7, 250, 0},
+					{0, 0, 0},
 				},
 			},
 		},
@@ -305,14 +343,14 @@ func TestVersion(t *testing.T) {
 				HardwareSpec:   "sx1301/1",
 				FrequencyRange: []int{863000000, 870000000},
 				DataRates: [16][3]int{
-					[3]int{12, 125, 0},
-					[3]int{11, 125, 0},
-					[3]int{10, 125, 0},
-					[3]int{9, 125, 0},
-					[3]int{8, 125, 0},
-					[3]int{7, 125, 0},
-					[3]int{7, 250, 0},
-					[3]int{0, 0, 0},
+					{12, 125, 0},
+					{11, 125, 0},
+					{10, 125, 0},
+					{9, 125, 0},
+					{8, 125, 0},
+					{7, 125, 0},
+					{7, 250, 0},
+					{0, 0, 0},
 				},
 				NoCCA:       true,
 				NoDwellTime: true,
@@ -320,7 +358,7 @@ func TestVersion(t *testing.T) {
 			},
 		},
 	} {
-		t.Run(fmt.Sprintf("VersionMessage/%d", i), func(t *testing.T) {
+		t.Run(tc.Name, func(t *testing.T) {
 			reqVersion, err := json.Marshal(tc.VersionQuery)
 			if err != nil {
 				panic(err)
@@ -349,8 +387,6 @@ func TestVersion(t *testing.T) {
 			}
 		})
 	}
-
-	//TODO: test hardcoded URL, connect without discover.
 }
 
 func TestUpstream(t *testing.T) {
@@ -399,8 +435,8 @@ func TestUpstream(t *testing.T) {
 			12666373963464220,
 			messages.JoinRequest{
 				MHdr:     0,
-				DevEUI:   messages.EUI{Prefix: "DevEui", EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
-				JoinEUI:  messages.EUI{Prefix: "JoinEui", EUI64: types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22}},
+				DevEUI:   basicstation.EUI{Prefix: "DevEui", EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
+				JoinEUI:  basicstation.EUI{Prefix: "JoinEui", EUI64: types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22}},
 				DevNonce: 18000,
 				MIC:      12345678,
 				RadioMetaData: messages.RadioMetaData{
@@ -423,7 +459,7 @@ func TestUpstream(t *testing.T) {
 						DevEUI:   types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11},
 						DevNonce: [2]byte{0x50, 0x46},
 					}}},
-				RxMetadata: []*ttnpb.RxMetadata{&ttnpb.RxMetadata{
+				RxMetadata: []*ttnpb.RxMetadata{{
 					GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "eui-0101010101010101"},
 					Time:               &[]time.Time{time.Unix(1548059982, 0)}[0],
 					Timestamp:          (uint32)(12666373963464220 & 0xFFFFFFFF),
@@ -431,7 +467,6 @@ func TestUpstream(t *testing.T) {
 					SNR:                9.25,
 				}},
 				Settings: ttnpb.TxSettings{
-					CodingRate:    "4/5",
 					Frequency:     868300000,
 					DataRateIndex: 1,
 					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
