@@ -27,6 +27,7 @@ import (
 	"github.com/mohae/deepcopy"
 	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
+	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
@@ -82,14 +83,14 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 	if len(up.RawPayload) < 4 {
 		return nil, nil, errRawPayloadTooShort
 	}
-	b := up.RawPayload[:len(up.RawPayload)-4]
+	macPayloadBytes := up.RawPayload[:len(up.RawPayload)-4]
 
 	pld := up.Payload.GetMACPayload()
 
 	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"dev_addr", pld.DevAddr,
 		"uplink_f_cnt", pld.FCnt,
-		"payload_length", len(b),
+		"payload_length", len(macPayloadBytes),
 	))
 
 	type device struct {
@@ -105,13 +106,13 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 		[]string{
 			"frequency_plan_id",
 			"lorawan_phy_version",
+			"mac_settings.resets_f_cnt",
+			"mac_settings.supports_32_bit_f_cnt",
 			"mac_state",
 			"pending_session",
 			"recent_downlinks",
 			"recent_uplinks",
-			"resets_f_cnt",
 			"session",
-			"uses_32_bit_f_cnt",
 		},
 		func(dev *ttnpb.EndDevice) bool {
 			if dev.MACState == nil {
@@ -161,6 +162,7 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 						}
 					}
 				}
+
 				devs = append(devs, device{
 					EndDevice:      dev,
 					matchedSession: dev.PendingSession,
@@ -181,9 +183,16 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 
 outer:
 	for _, dev := range devs {
+		supports32BitFCnt := true
+		if dev.GetMACSettings().GetSupports32BitFCnt() != nil {
+			supports32BitFCnt = dev.MACSettings.Supports32BitFCnt.Value
+		} else if ns.defaultMACSettings.GetSupports32BitFCnt() != nil {
+			supports32BitFCnt = ns.defaultMACSettings.Supports32BitFCnt.Value
+		}
+
 		fCnt := pld.FCnt
 		switch {
-		case !dev.Uses32BitFCnt, fCnt > dev.matchedSession.LastFCntUp, fCnt == 0:
+		case !supports32BitFCnt, fCnt > dev.matchedSession.LastFCntUp, fCnt == 0:
 		case fCnt > dev.matchedSession.LastFCntUp&0xffff:
 			fCnt |= dev.matchedSession.LastFCntUp &^ 0xffff
 		case dev.matchedSession.LastFCntUp < 0xffff0000:
@@ -197,11 +206,18 @@ outer:
 			"uplink_f_cnt_up", pld.FCnt,
 		))
 
+		resetsFCnt := false
+		if dev.GetMACSettings().GetResetsFCnt() != nil {
+			resetsFCnt = dev.MACSettings.ResetsFCnt.Value
+		} else if ns.defaultMACSettings.GetResetsFCnt() != nil {
+			resetsFCnt = ns.defaultMACSettings.ResetsFCnt.Value
+		}
+
 		gap := uint32(math.MaxUint32)
 		if fCnt == 0 && dev.matchedSession.LastFCntUp == 0 &&
 			(len(dev.RecentUplinks) == 0 || dev.PendingSession != nil) {
 			gap = 0
-		} else if !dev.ResetsFCnt {
+		} else if !resetsFCnt {
 			if fCnt <= dev.matchedSession.LastFCntUp {
 				logger.Debug("FCnt too low, skipping...")
 				continue outer
@@ -228,7 +244,7 @@ outer:
 			gap:            gap,
 			fCnt:           fCnt,
 		})
-		if dev.ResetsFCnt && fCnt != pld.FCnt {
+		if resetsFCnt && fCnt != pld.FCnt {
 			matching = append(matching, device{
 				EndDevice:      dev.EndDevice,
 				matchedSession: dev.matchedSession,
@@ -259,38 +275,35 @@ outer:
 		}
 
 		if dev.matchedSession.FNwkSIntKey == nil || len(dev.matchedSession.FNwkSIntKey.Key) == 0 {
-			logger.Warn("Device missing FNwkSIntKey in registry")
+			logger.Warn("Device missing FNwkSIntKey in registry, skipping...")
 			continue
 		}
 
-		var fNwkSIntKey types.AES128Key
-		if dev.matchedSession.FNwkSIntKey.KEKLabel != "" {
-			// TODO: https://github.com/TheThingsNetwork/lorawan-stack/issues/5
-			panic("unsupported")
+		fNwkSIntKey, err := cryptoutil.UnwrapAES128Key(*dev.matchedSession.FNwkSIntKey, ns.KeyVault)
+		if err != nil {
+			logger.WithField("kek_label", dev.matchedSession.FNwkSIntKey.KEKLabel).WithError(err).Error("Failed to unwrap FNwkSIntKey, skipping...")
+			continue
 		}
-		copy(fNwkSIntKey[:], dev.matchedSession.FNwkSIntKey.Key[:])
 
 		var computedMIC [4]byte
-		var err error
 		if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 			computedMIC, err = crypto.ComputeLegacyUplinkMIC(
 				fNwkSIntKey,
 				pld.DevAddr,
 				dev.fCnt,
-				b,
+				macPayloadBytes,
 			)
 		} else {
 			if dev.matchedSession.SNwkSIntKey == nil || len(dev.matchedSession.SNwkSIntKey.Key) == 0 {
-				logger.Warn("Device missing SNwkSIntKey in registry")
+				logger.Warn("Device missing SNwkSIntKey in registry, skipping...")
 				continue
 			}
 
-			var sNwkSIntKey types.AES128Key
-			if dev.matchedSession.SNwkSIntKey.KEKLabel != "" {
-				// TODO: https://github.com/TheThingsNetwork/lorawan-stack/issues/5
-				panic("unsupported")
+			sNwkSIntKey, err := cryptoutil.UnwrapAES128Key(*dev.matchedSession.SNwkSIntKey, ns.KeyVault)
+			if err != nil {
+				logger.WithField("kek_label", dev.matchedSession.SNwkSIntKey.KEKLabel).WithError(err).Error("Failed to unwrap SNwkSIntKey, skipping...")
+				continue
 			}
-			copy(sNwkSIntKey[:], dev.matchedSession.SNwkSIntKey.Key[:])
 
 			var confFCnt uint32
 			if pld.Ack {
@@ -317,7 +330,7 @@ outer:
 				chIdx,
 				pld.DevAddr,
 				dev.fCnt,
-				b,
+				macPayloadBytes,
 			)
 		}
 		if err != nil {
@@ -365,8 +378,14 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 
 	if matched.MACState != nil && matched.MACState.PendingApplicationDownlink != nil {
 		asUp := &ttnpb.ApplicationUp{
-			EndDeviceIdentifiers: matched.EndDeviceIdentifiers,
-			CorrelationIDs:       matched.MACState.PendingApplicationDownlink.CorrelationIDs,
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				DevAddr:                &pld.DevAddr,
+				JoinEUI:                matched.JoinEUI,
+				DevEUI:                 matched.DevEUI,
+				ApplicationIdentifiers: matched.ApplicationIdentifiers,
+				DeviceID:               matched.DeviceID,
+			},
+			CorrelationIDs: matched.MACState.PendingApplicationDownlink.CorrelationIDs,
 		}
 
 		if pld.Ack {
@@ -402,15 +421,13 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 		if ses.NwkSEncKey == nil || len(ses.NwkSEncKey.Key) == 0 {
 			return errUnknownNwkSEncKey
 		}
-
-		var key types.AES128Key
-		if ses.NwkSEncKey.KEKLabel != "" {
-			// TODO: https://github.com/TheThingsNetwork/lorawan-stack/issues/5
-			panic("unsupported")
+		key, err := cryptoutil.UnwrapAES128Key(*ses.NwkSEncKey, ns.KeyVault)
+		if err != nil {
+			logger.WithField("kek_label", ses.NwkSEncKey.KEKLabel).WithError(err).Error("Failed to unwrap NwkSEncKey")
+			return err
 		}
-		copy(key[:], ses.NwkSEncKey.Key[:])
 
-		mac, err = crypto.DecryptUplink(key, *matched.EndDeviceIdentifiers.DevAddr, pld.FCnt, mac)
+		mac, err = crypto.DecryptUplink(key, pld.DevAddr, pld.FCnt, mac)
 		if err != nil {
 			return errDecrypt.WithCause(err)
 		}
@@ -441,7 +458,6 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	var handleErr bool
 	stored, err := ns.devices.SetByID(ctx, matched.EndDeviceIdentifiers.ApplicationIdentifiers, matched.EndDeviceIdentifiers.DeviceID,
 		[]string{
-			"default_mac_parameters",
 			"downlink_margin",
 			"frequency_plan_id",
 			"last_dev_status_received_at",
@@ -451,7 +467,6 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 			"mac_state",
 			"pending_session",
 			"recent_uplinks",
-			"resets_f_cnt",
 			"session",
 			"supports_join",
 		},
@@ -473,7 +488,14 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 				handleErr = true
 				return nil, nil, errOutdatedData
 			}
-			if storedSes.GetLastFCntUp() > ses.LastFCntUp && !stored.ResetsFCnt {
+
+			resetsFCnt := false
+			if stored.GetMACSettings().GetResetsFCnt() != nil {
+				resetsFCnt = stored.MACSettings.ResetsFCnt.Value
+			} else if ns.defaultMACSettings.GetResetsFCnt() != nil {
+				resetsFCnt = ns.defaultMACSettings.ResetsFCnt.Value
+			}
+			if storedSes.GetLastFCntUp() > ses.LastFCntUp && !resetsFCnt {
 				logger.WithFields(log.Fields(
 					"stored_f_cnt", storedSes.GetLastFCntUp(),
 					"got_f_cnt", ses.LastFCntUp,
@@ -552,7 +574,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 
 			if stored.MACState != nil {
 				stored.MACState.PendingApplicationDownlink = nil
-			} else if err := resetMACState(stored, ns.FrequencyPlans); err != nil {
+			} else if err := resetMACState(stored, ns.FrequencyPlans, ns.defaultMACSettings); err != nil {
 				handleErr = true
 				return nil, nil, err
 			}
@@ -566,7 +588,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 				cmd, cmds = cmds[0], cmds[1:]
 				switch cmd.CID {
 				case ttnpb.CID_RESET:
-					err = handleResetInd(ctx, stored, cmd.GetResetInd(), ns.FrequencyPlans)
+					err = handleResetInd(ctx, stored, cmd.GetResetInd(), ns.FrequencyPlans, ns.defaultMACSettings)
 				case ttnpb.CID_LINK_CHECK:
 					err = handleLinkCheckReq(ctx, stored, up)
 				case ttnpb.CID_LINK_ADR:
@@ -659,7 +681,9 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 			stored.MACState.PendingJoinRequest = nil
 
 			paths = append(paths, "recent_adr_uplinks")
-			if !pld.FHDR.ADR {
+			if !pld.FHDR.ADR ||
+				stored.MACSettings.GetUseADR() != nil && !stored.MACSettings.UseADR.Value ||
+				ns.defaultMACSettings.GetUseADR() != nil && !ns.defaultMACSettings.UseADR.Value {
 				stored.RecentADRUplinks = nil
 				return stored, paths, nil
 			}
@@ -669,7 +693,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 				stored.RecentADRUplinks = append(stored.RecentADRUplinks[:0], stored.RecentADRUplinks[len(stored.RecentADRUplinks)-recentUplinkCount:]...)
 			}
 
-			if err := adaptDataRate(stored, ns.FrequencyPlans); err != nil {
+			if err := adaptDataRate(stored, ns.FrequencyPlans, ns.defaultMACSettings); err != nil {
 				handleErr = true
 				return nil, nil, err
 			}
@@ -713,10 +737,11 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 
 // newDevAddr generates a DevAddr for specified EndDevice.
 func (ns *NetworkServer) newDevAddr(context.Context, *ttnpb.EndDevice) types.DevAddr {
-	nwkAddr := make([]byte, types.NwkAddrLength(ns.NetID))
+	// TODO: Allow generating DevAddr from a prefix. (https://github.com/TheThingsNetwork/lorawan-stack/issues/130)
+	nwkAddr := make([]byte, types.NwkAddrLength(ns.netID))
 	random.Read(nwkAddr)
-	nwkAddr[0] &= 0xff >> (8 - types.NwkAddrBits(ns.NetID)%8)
-	devAddr, err := types.NewDevAddr(ns.NetID, nwkAddr)
+	nwkAddr[0] &= 0xff >> (8 - types.NwkAddrBits(ns.netID)%8)
+	devAddr, err := types.NewDevAddr(ns.netID, nwkAddr)
 	if err != nil {
 		panic(errors.New("failed to create new DevAddr").WithCause(err))
 	}
@@ -737,6 +762,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 			"frequency_plan_id",
 			"lorawan_phy_version",
 			"lorawan_version",
+			"mac_settings",
 			"mac_state",
 			"session",
 		},
@@ -763,7 +789,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 	logger = logger.WithField("dev_addr", devAddr)
 	ctx = log.NewContext(ctx, logger)
 
-	if err := resetMACState(dev, ns.FrequencyPlans); err != nil {
+	if err := resetMACState(dev, ns.FrequencyPlans, ns.defaultMACSettings); err != nil {
 		logger.WithError(err).Error("Failed to reset device's MAC state")
 		return err
 	}
@@ -777,7 +803,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 		CFList:             frequencyplans.CFList(*fp, dev.LoRaWANPHYVersion),
 		CorrelationIDs:     events.CorrelationIDsFromContext(ctx),
 		DevAddr:            devAddr,
-		NetID:              ns.NetID,
+		NetID:              ns.netID,
 		Payload:            up.Payload,
 		RawPayload:         up.RawPayload,
 		RxDelay:            dev.MACState.DesiredParameters.Rx1Delay,
@@ -818,10 +844,10 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 	var resetErr bool
 	dev, err = ns.devices.SetByID(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, dev.EndDeviceIdentifiers.DeviceID,
 		[]string{
-			"default_mac_parameters",
 			"frequency_plan_id",
 			"lorawan_phy_version",
 			"lorawan_version",
+			"mac_settings",
 			"mac_state",
 			"pending_session",
 			"queued_application_downlinks",
@@ -832,7 +858,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			var paths []string
 
-			if err := resetMACState(dev, ns.Component.FrequencyPlans); err != nil {
+			if err := resetMACState(dev, ns.Component.FrequencyPlans, ns.defaultMACSettings); err != nil {
 				resetErr = true
 				return nil, nil, err
 			}

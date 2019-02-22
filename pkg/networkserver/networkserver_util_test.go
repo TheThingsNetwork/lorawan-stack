@@ -30,9 +30,8 @@ const (
 )
 
 var (
-	ResetMACState    = resetMACState
-	GenerateDownlink = generateDownlink
-	TimePtr          = timePtr
+	ResetMACState = resetMACState
+	TimePtr       = timePtr
 
 	ErrNoDownlink     = errNoDownlink
 	ErrDeviceNotFound = errDeviceNotFound
@@ -42,6 +41,7 @@ var (
 	NwkSEncKey  = types.AES128Key{0x42, 0x42, 0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
 	AppSKey     = types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
 
+	NetID         = types.NetID{0x42, 0x41, 0x43}
 	DevAddr       = types.DevAddr{0x42, 0x42, 0xff, 0xff}
 	DevEUI        = types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
 	JoinEUI       = types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
@@ -61,8 +61,8 @@ func CopyUplinkMessage(pb *ttnpb.UplinkMessage) *ttnpb.UplinkMessage {
 	return deepcopy.Copy(pb).(*ttnpb.UplinkMessage)
 }
 
-func SetAppQueueUpdateTimeout(d time.Duration) {
-	appQueueUpdateTimeout = d
+func DurationPtr(v time.Duration) *time.Duration {
+	return &v
 }
 
 var _ DownlinkTaskQueue = MockDownlinkTaskQueue{}

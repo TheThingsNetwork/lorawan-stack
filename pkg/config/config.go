@@ -27,6 +27,8 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
 // TimeFormat is the format to parse times in.
@@ -211,6 +213,7 @@ func (m *Manager) Unmarshal(result interface{}) error {
 			configurableInterfaceHook,
 			configurableInterfaceSliceHook,
 			stringToByteSliceHook,
+			stringToByteArrayHook,
 		),
 	})
 	if err != nil {
@@ -308,7 +311,7 @@ func (m *Manager) setDefaults(prefix string, flags *pflag.FlagSet, config interf
 	}
 
 	if configKind != reflect.Struct {
-		return
+		panic("default config is not a struct type")
 	}
 
 	for i := 0; i < configValue.NumField(); i++ {
@@ -406,17 +409,17 @@ func (m *Manager) setDefaults(prefix string, flags *pflag.FlagSet, config interf
 				flags.BoolP(name, shorthand, val, description)
 
 			case int, int8, int16, int32, int64:
-				fieldValue := configValue.Field(i).Int()
+				fieldValue := reflect.Indirect(configValue.Field(i)).Int()
 				m.viper.SetDefault(name, int(fieldValue))
 				flags.IntP(name, shorthand, int(fieldValue), description)
 
 			case uint, uint8, uint16, uint32, uint64:
-				fieldValue := configValue.Field(i).Uint()
+				fieldValue := reflect.Indirect(configValue.Field(i)).Uint()
 				m.viper.SetDefault(name, uint(fieldValue))
 				flags.UintP(name, shorthand, uint(fieldValue), description)
 
 			case float32, float64:
-				fieldValue := configValue.Field(i).Float()
+				fieldValue := reflect.Indirect(configValue.Field(i)).Float()
 				m.viper.SetDefault(name, fieldValue)
 				flags.Float64P(name, shorthand, fieldValue, description)
 
@@ -470,9 +473,19 @@ func (m *Manager) setDefaults(prefix string, flags *pflag.FlagSet, config interf
 			case []byte:
 				var str string
 				if len(val) > 0 {
-					m.viper.SetDefault(name, fmt.Sprintf("0x%X", val))
+					str = fmt.Sprintf("0x%X", val)
+					m.viper.SetDefault(name, str)
 				}
 				flags.StringP(name, shorthand, str, description)
+
+			case types.NetID:
+				str := val.String()
+				m.viper.SetDefault(name, str)
+				flags.StringP(name, shorthand, str, description)
+
+			case ttnpb.RxDelay:
+				m.viper.SetDefault(name, int32(val))
+				flags.Int32P(name, shorthand, int32(val), description)
 
 			default:
 				switch fieldType {

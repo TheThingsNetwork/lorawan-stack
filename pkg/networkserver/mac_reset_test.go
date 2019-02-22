@@ -55,9 +55,6 @@ func TestHandleResetInd(t *testing.T) {
 		{
 			Name: "empty queue",
 			Device: &ttnpb.EndDevice{
-				DefaultMACParameters: &ttnpb.MACParameters{
-					MaxEIRP: 42,
-				},
 				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 				SupportsJoin:      false,
 				FrequencyPlanID:   test.EUFrequencyPlanID,
@@ -69,14 +66,11 @@ func TestHandleResetInd(t *testing.T) {
 			},
 			Expected: func() *ttnpb.EndDevice {
 				dev := &ttnpb.EndDevice{
-					DefaultMACParameters: &ttnpb.MACParameters{
-						MaxEIRP: 42,
-					},
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					SupportsJoin:      false,
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 				}
-				if err := ResetMACState(dev, frequencyplans.NewStore(test.FrequencyPlansFetcher)); err != nil {
+				if err := ResetMACState(dev, frequencyplans.NewStore(test.FrequencyPlansFetcher), ttnpb.MACSettings{}); err != nil {
 					t.Fatalf("Failed to reset MACState: %v", errors.Stack(err))
 				}
 
@@ -107,9 +101,6 @@ func TestHandleResetInd(t *testing.T) {
 		{
 			Name: "non-empty queue",
 			Device: &ttnpb.EndDevice{
-				DefaultMACParameters: &ttnpb.MACParameters{
-					MaxEIRP: 42,
-				},
 				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 				SupportsJoin:      false,
 				FrequencyPlanID:   test.EUFrequencyPlanID,
@@ -125,14 +116,11 @@ func TestHandleResetInd(t *testing.T) {
 			},
 			Expected: func() *ttnpb.EndDevice {
 				dev := &ttnpb.EndDevice{
-					DefaultMACParameters: &ttnpb.MACParameters{
-						MaxEIRP: 42,
-					},
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					SupportsJoin:      false,
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 				}
-				if err := ResetMACState(dev, frequencyplans.NewStore(test.FrequencyPlansFetcher)); err != nil {
+				if err := ResetMACState(dev, frequencyplans.NewStore(test.FrequencyPlansFetcher), ttnpb.MACSettings{}); err != nil {
 					t.Fatalf("Failed to reset MACState: %v", errors.Stack(err))
 				}
 
@@ -168,7 +156,7 @@ func TestHandleResetInd(t *testing.T) {
 
 			var err error
 			evs := collectEvents(func() {
-				err = handleResetInd(test.Context(), dev, tc.Payload, frequencyplans.NewStore(test.FrequencyPlansFetcher))
+				err = handleResetInd(test.Context(), dev, tc.Payload, frequencyplans.NewStore(test.FrequencyPlansFetcher), ttnpb.MACSettings{})
 			})
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 				tc.Error == nil && !a.So(err, should.BeNil) {

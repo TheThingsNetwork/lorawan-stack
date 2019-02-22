@@ -72,7 +72,20 @@ const maxNbTrans = 3
 // optimalADRUplinkCount is the amount of uplinks required to ensure optimal results from the ADR algorithm.
 const optimalADRUplinkCount = 20
 
-func adaptDataRate(dev *ttnpb.EndDevice, fps *frequencyplans.Store) error {
+// DefaultADRMargin is the default ADR margin used if not specified in MACSettings of the device or NS-wide defaults.
+const DefaultADRMargin = 15
+
+func deviceADRMargin(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) float32 {
+	if dev.MACSettings != nil && dev.MACSettings.ADRMargin != nil {
+		return dev.MACSettings.ADRMargin.Value
+	}
+	if defaults.ADRMargin != nil {
+		return defaults.ADRMargin.Value
+	}
+	return DefaultADRMargin
+}
+
+func adaptDataRate(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb.MACSettings) error {
 	ups := dev.RecentADRUplinks
 	if len(ups) == 0 {
 		return nil
@@ -111,7 +124,7 @@ func adaptDataRate(dev *ttnpb.EndDevice, fps *frequencyplans.Store) error {
 	// minimum (floor) that we need to demodulate the signal. We subtract a
 	// configurable margin, and an extra safety margin if we're afraid that we
 	// don't have enough data for our decision.
-	margin := maxSNR - df - float32(dev.MACSettings.ADRMargin)
+	margin := maxSNR - df - deviceADRMargin(dev, defaults)
 	if len(ups) < optimalADRUplinkCount {
 		margin -= safetyMargin
 	}

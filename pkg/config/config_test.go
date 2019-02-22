@@ -129,7 +129,7 @@ func TestNilConfig(t *testing.T) {
 
 func TestInvalidConfig(t *testing.T) {
 	a := assertions.New(t)
-	config := InitializeWithDefaults("invalid", "invalid", "invalid")
+	config := InitializeWithDefaults("invalid", "invalid", struct{}{})
 	a.So(config, should.NotBeNil)
 }
 

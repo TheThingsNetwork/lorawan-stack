@@ -12,6 +12,7 @@ import _ "github.com/gogo/protobuf/gogoproto"
 import _ "github.com/golang/protobuf/ptypes/duration"
 import _ "github.com/golang/protobuf/ptypes/struct"
 import _ "github.com/golang/protobuf/ptypes/timestamp"
+import _ "github.com/golang/protobuf/ptypes/wrappers"
 import _ "github.com/mwitkow/go-proto-validators"
 import _ "google.golang.org/genproto/googleapis/api/annotations"
 import _ "google.golang.org/genproto/protobuf/field_mask"
@@ -75,9 +76,9 @@ func (this *EndDeviceVersion) Validate() error {
 	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.EndDeviceVersionIdentifiers)); err != nil {
 		return github_com_mwitkow_go_proto_validators.FieldError("EndDeviceVersionIdentifiers", err)
 	}
-	if this.DefaultMACParameters != nil {
-		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.DefaultMACParameters); err != nil {
-			return github_com_mwitkow_go_proto_validators.FieldError("DefaultMACParameters", err)
+	if this.DefaultMACSettings != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.DefaultMACSettings); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("DefaultMACSettings", err)
 		}
 	}
 	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.DefaultFormatters)); err != nil {
@@ -86,15 +87,103 @@ func (this *EndDeviceVersion) Validate() error {
 	return nil
 }
 func (this *MACSettings) Validate() error {
-	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.ClassBTimeout)); err != nil {
-		return github_com_mwitkow_go_proto_validators.FieldError("ClassBTimeout", err)
+	if this.ClassBTimeout != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.ClassBTimeout); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("ClassBTimeout", err)
+		}
 	}
-	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.ClassCTimeout)); err != nil {
-		return github_com_mwitkow_go_proto_validators.FieldError("ClassCTimeout", err)
+	if this.PingSlotPeriodicity != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.PingSlotPeriodicity); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("PingSlotPeriodicity", err)
+		}
 	}
-	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.StatusTimePeriodicity)); err != nil {
-		return github_com_mwitkow_go_proto_validators.FieldError("StatusTimePeriodicity", err)
+	if this.PingSlotDataRateIndex != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.PingSlotDataRateIndex); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("PingSlotDataRateIndex", err)
+		}
 	}
+	if this.ClassCTimeout != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.ClassCTimeout); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("ClassCTimeout", err)
+		}
+	}
+	if this.Rx1Delay != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.Rx1Delay); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("Rx1Delay", err)
+		}
+	}
+	if this.Rx1DataRateOffset != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.Rx1DataRateOffset); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("Rx1DataRateOffset", err)
+		}
+	}
+	if this.Rx2DataRateIndex != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.Rx2DataRateIndex); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("Rx2DataRateIndex", err)
+		}
+	}
+	if this.MaxDutyCycle != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.MaxDutyCycle); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("MaxDutyCycle", err)
+		}
+	}
+	if this.Supports32BitFCnt != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.Supports32BitFCnt); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("Supports32BitFCnt", err)
+		}
+	}
+	if this.UseADR != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.UseADR); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("UseADR", err)
+		}
+	}
+	if this.ADRMargin != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.ADRMargin); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("ADRMargin", err)
+		}
+	}
+	if this.ResetsFCnt != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.ResetsFCnt); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("ResetsFCnt", err)
+		}
+	}
+	if this.StatusTimePeriodicity != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.StatusTimePeriodicity); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("StatusTimePeriodicity", err)
+		}
+	}
+	if this.StatusCountPeriodicity != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.StatusCountPeriodicity); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("StatusCountPeriodicity", err)
+		}
+	}
+	if this.DesiredRx1Delay != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.DesiredRx1Delay); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("DesiredRx1Delay", err)
+		}
+	}
+	if this.DesiredRx1DataRateOffset != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.DesiredRx1DataRateOffset); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("DesiredRx1DataRateOffset", err)
+		}
+	}
+	if this.DesiredRx2DataRateIndex != nil {
+		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.DesiredRx2DataRateIndex); err != nil {
+			return github_com_mwitkow_go_proto_validators.FieldError("DesiredRx2DataRateIndex", err)
+		}
+	}
+	return nil
+}
+func (this *MACSettings_DataRateIndexValue) Validate() error {
+	return nil
+}
+func (this *MACSettings_PingSlotPeriodValue) Validate() error {
+	return nil
+}
+func (this *MACSettings_AggregatedDutyCycleValue) Validate() error {
+	return nil
+}
+func (this *MACSettings_RxDelayValue) Validate() error {
 	return nil
 }
 func (this *MACState) Validate() error {
@@ -175,11 +264,6 @@ func (this *EndDevice) Validate() error {
 		}
 	}
 	// Validation of proto3 map<> fields is unsupported.
-	if this.DefaultMACParameters != nil {
-		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.DefaultMACParameters); err != nil {
-			return github_com_mwitkow_go_proto_validators.FieldError("DefaultMACParameters", err)
-		}
-	}
 	if this.RootKeys != nil {
 		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.RootKeys); err != nil {
 			return github_com_mwitkow_go_proto_validators.FieldError("RootKeys", err)

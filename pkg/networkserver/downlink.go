@@ -24,13 +24,12 @@ import (
 	"github.com/mohae/deepcopy"
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
+	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
-	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 )
 
@@ -49,6 +48,18 @@ type DownlinkTaskQueue interface {
 
 var errNoDownlink = errors.Define("no_downlink", "no downlink to send")
 
+const DefaultClassCTimeout = 15 * time.Second
+
+func deviceClassCTimeout(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) time.Duration {
+	if dev.MACSettings != nil && dev.MACSettings.ClassCTimeout != nil {
+		return *dev.MACSettings.ClassCTimeout
+	}
+	if defaults.ClassCTimeout != nil {
+		return *defaults.ClassCTimeout
+	}
+	return DefaultClassCTimeout
+}
+
 // generateDownlink attempts to generate a downlink.
 // generateDownlink returns the marshaled payload of the downlink, application downlink, if included in the payload and error, if any.
 // generateDownlink may mutate the device in order to record the downlink generated.
@@ -60,7 +71,7 @@ var errNoDownlink = errors.Define("no_downlink", "no downlink to send")
 // For example, a sequence of 'NewChannel' MAC commands could be generated for a
 // device operating in a region where a fixed channel plan is defined in case
 // dev.MACState.CurrentParameters.Channels is not equal to dev.MACState.DesiredParameters.Channels.
-func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16, fps *frequencyplans.Store) ([]byte, *ttnpb.ApplicationDownlink, error) {
+func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) ([]byte, *ttnpb.ApplicationDownlink, error) {
 	if dev.MACState == nil {
 		return nil, nil, errUnknownMACState
 	}
@@ -95,7 +106,7 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, max
 
 	dev.MACState.PendingRequests = dev.MACState.PendingRequests[:0]
 
-	maxDownLen, maxUpLen, ok, err := enqueueLinkADRReq(ctx, dev, maxDownLen, maxUpLen, fps)
+	maxDownLen, maxUpLen, ok, err := enqueueLinkADRReq(ctx, dev, maxDownLen, maxUpLen, ns.FrequencyPlans)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -105,7 +116,9 @@ func generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, max
 		enqueueNewChannelReq,
 		enqueueDutyCycleReq,
 		enqueueRxParamSetupReq,
-		enqueueDevStatusReq,
+		func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) (uint16, uint16, bool) {
+			return enqueueDevStatusReq(ctx, dev, maxDownLen, maxUpLen, ns.defaultMACSettings)
+		},
 		enqueueRxTimingSetupReq,
 		enqueuePingSlotChannelReq,
 		enqueueBeaconFreqReq,
@@ -164,7 +177,7 @@ outer:
 
 	pld := &ttnpb.MACPayload{
 		FHDR: ttnpb.FHDR{
-			DevAddr: *dev.EndDeviceIdentifiers.DevAddr,
+			DevAddr: dev.Session.DevAddr,
 			FCtrl: ttnpb.FCtrl{
 				Ack: up != nil && up.Payload.MHDR.MType == ttnpb.MType_CONFIRMED_UP,
 			},
@@ -207,16 +220,13 @@ outer:
 		if dev.Session.NwkSEncKey == nil || len(dev.Session.NwkSEncKey.Key) == 0 {
 			return nil, nil, errUnknownNwkSEncKey
 		}
-
-		var key types.AES128Key
-		if dev.Session.NwkSEncKey.KEKLabel != "" {
-			// TODO: (https://github.com/TheThingsNetwork/lorawan-stack/issues/5)
-			panic("unsupported")
+		key, err := cryptoutil.UnwrapAES128Key(*dev.Session.NwkSEncKey, ns.KeyVault)
+		if err != nil {
+			logger.WithField("kek_label", dev.Session.NwkSEncKey.KEKLabel).WithError(err).Error("Failed to unwrap NwkSEncKey")
+			return nil, nil, err
 		}
-		copy(key[:], dev.Session.NwkSEncKey.Key[:])
 
-		var err error
-		cmdBuf, err = crypto.EncryptDownlink(key, *dev.EndDeviceIdentifiers.DevAddr, pld.FHDR.FCnt, cmdBuf)
+		cmdBuf, err = crypto.EncryptDownlink(key, dev.Session.DevAddr, pld.FHDR.FCnt, cmdBuf)
 		if err != nil {
 			return nil, nil, errEncryptMAC.WithCause(err)
 		}
@@ -237,11 +247,12 @@ outer:
 	logger = logger.WithField("f_pending", pld.FHDR.FCtrl.FPending)
 
 	switch {
-	case dev.MACState.DeviceClass != ttnpb.CLASS_C,
-		mType != ttnpb.MType_CONFIRMED_DOWN && len(dev.MACState.PendingRequests) == 0:
+	case mType != ttnpb.MType_CONFIRMED_DOWN && len(dev.MACState.PendingRequests) == 0:
 		break
 
-	case dev.MACState.LastConfirmedDownlinkAt != nil && dev.MACState.LastConfirmedDownlinkAt.Add(dev.MACSettings.ClassCTimeout).After(time.Now()):
+	case dev.MACState.DeviceClass == ttnpb.CLASS_C &&
+		dev.MACState.LastConfirmedDownlinkAt != nil &&
+		dev.MACState.LastConfirmedDownlinkAt.Add(deviceClassCTimeout(dev, ns.defaultMACSettings)).After(time.Now()):
 		return nil, nil, errScheduleTooSoon
 
 	default:
@@ -262,21 +273,20 @@ outer:
 	}
 	// NOTE: It is assumed, that b does not contain MIC.
 
-	var key types.AES128Key
 	if dev.Session.SNwkSIntKey == nil || len(dev.Session.SNwkSIntKey.Key) == 0 {
 		return nil, nil, errUnknownSNwkSIntKey
 	}
-	if dev.Session.SNwkSIntKey.KEKLabel != "" {
-		// TODO: https://github.com/TheThingsNetwork/lorawan-stack/issues/5
-		panic("unsupported")
+	key, err := cryptoutil.UnwrapAES128Key(*dev.Session.SNwkSIntKey, ns.KeyVault)
+	if err != nil {
+		logger.WithField("kek_label", dev.Session.SNwkSIntKey.KEKLabel).WithError(err).Error("Failed to unwrap SNwkSIntKey")
+		return nil, nil, err
 	}
-	copy(key[:], dev.Session.SNwkSIntKey.Key[:])
 
 	var mic [4]byte
 	if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 		mic, err = crypto.ComputeLegacyDownlinkMIC(
 			key,
-			*dev.EndDeviceIdentifiers.DevAddr,
+			dev.Session.DevAddr,
 			pld.FHDR.FCnt,
 			b,
 		)
@@ -287,7 +297,7 @@ outer:
 		}
 		mic, err = crypto.ComputeDownlinkMIC(
 			key,
-			*dev.EndDeviceIdentifiers.DevAddr,
+			dev.Session.DevAddr,
 			confFCnt,
 			pld.FHDR.FCnt,
 			b,
@@ -590,10 +600,9 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						if req.Rx2DataRateIndex < minDR {
 							minDR = req.Rx2DataRateIndex
 						}
-						b, appDown, err := generateDownlink(ctx, dev,
+						b, appDown, err := ns.generateDownlink(ctx, dev,
 							band.DataRates[minDR].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 							maxUpLength,
-							ns.FrequencyPlans,
 						)
 						if err != nil {
 							return nil, nil, err
@@ -644,20 +653,19 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						// we need to create a deep copy for the first call.
 						devCopy := deepcopy.Copy(dev).(*ttnpb.EndDevice)
 
-						b, appDown, err := generateDownlink(ctx, dev,
+						b, appDown, err := ns.generateDownlink(ctx, dev,
 							band.DataRates[req.Rx1DataRateIndex].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 							maxUpLength,
-							ns.FrequencyPlans,
 						)
 						if err != nil {
 							if errors.Resemble(err, errScheduleTooSoon) {
-								nextDownlinkAt = dev.MACState.LastConfirmedDownlinkAt.Add(dev.MACSettings.ClassCTimeout)
+								nextDownlinkAt = dev.MACState.LastConfirmedDownlinkAt.Add(deviceClassCTimeout(dev, ns.defaultMACSettings))
 							}
 							return nil, nil, err
 						}
 						if dev.MACState.DeviceClass == ttnpb.CLASS_C {
 							if dev.MACState.LastConfirmedDownlinkAt != nil {
-								nextDownlinkAt = dev.MACState.LastConfirmedDownlinkAt.Add(dev.MACSettings.ClassCTimeout)
+								nextDownlinkAt = dev.MACState.LastConfirmedDownlinkAt.Add(deviceClassCTimeout(dev, ns.defaultMACSettings))
 							} else {
 								nextDownlinkAt = time.Now()
 							}
@@ -738,10 +746,9 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						Rx2Frequency:     dev.MACState.CurrentParameters.Rx2Frequency,
 					}
 
-					b, appDown, err := generateDownlink(ctx, dev,
+					b, appDown, err := ns.generateDownlink(ctx, dev,
 						band.DataRates[req.Rx2DataRateIndex].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 						maxUpLength,
-						ns.FrequencyPlans,
 					)
 					if err != nil {
 						return nil, nil, err

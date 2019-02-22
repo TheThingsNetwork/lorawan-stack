@@ -18,6 +18,7 @@ import (
 	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/networkserver"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 // DefaultNetworkServerConfig is the default configuration for the NetworkServer
@@ -28,5 +29,13 @@ var DefaultNetworkServerConfig = networkserver.Config{
 		JoinAccept:             "highest",
 		MACCommands:            "highest",
 		MaxApplicationDownlink: "high",
+	},
+	DefaultMACSettings: networkserver.MACSettingConfig{
+		ADRMargin:              func(v float32) *float32 { return &v }(networkserver.DefaultADRMargin),
+		DesiredRx1Delay:        func(v ttnpb.RxDelay) *ttnpb.RxDelay { return &v }(ttnpb.RX_DELAY_5),
+		ClassBTimeout:          func(v time.Duration) *time.Duration { return &v }(time.Minute),
+		ClassCTimeout:          func(v time.Duration) *time.Duration { return &v }(networkserver.DefaultClassCTimeout),
+		StatusTimePeriodicity:  func(v time.Duration) *time.Duration { return &v }(networkserver.DefaultStatusTimePeriodicity),
+		StatusCountPeriodicity: func(v uint32) *uint32 { return &v }(networkserver.DefaultStatusCountPeriodicity),
 	},
 }

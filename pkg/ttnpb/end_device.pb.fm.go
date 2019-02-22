@@ -299,6 +299,16 @@ func (dst *MACParameters) SetFields(src *MACParameters, paths ...string) error {
 				var zero uint64
 				dst.Rx2Frequency = zero
 			}
+		case "max_duty_cycle":
+			if len(subs) > 0 {
+				return fmt.Errorf("'max_duty_cycle' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MaxDutyCycle = src.MaxDutyCycle
+			} else {
+				var zero AggregatedDutyCycle
+				dst.MaxDutyCycle = zero
+			}
 		case "rejoin_time_periodicity":
 			if len(subs) > 0 {
 				return fmt.Errorf("'rejoin_time_periodicity' has no subfields, but %s were specified", subs)
@@ -318,25 +328,6 @@ func (dst *MACParameters) SetFields(src *MACParameters, paths ...string) error {
 			} else {
 				var zero RejoinCountExponent
 				dst.RejoinCountPeriodicity = zero
-			}
-		case "max_duty_cycle":
-			if len(subs) > 0 {
-				return fmt.Errorf("'max_duty_cycle' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.MaxDutyCycle = src.MaxDutyCycle
-			} else {
-				var zero AggregatedDutyCycle
-				dst.MaxDutyCycle = zero
-			}
-		case "channels":
-			if len(subs) > 0 {
-				return fmt.Errorf("'channels' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.Channels = src.Channels
-			} else {
-				dst.Channels = nil
 			}
 		case "ping_slot_frequency":
 			if len(subs) > 0 {
@@ -367,6 +358,15 @@ func (dst *MACParameters) SetFields(src *MACParameters, paths ...string) error {
 			} else {
 				var zero uint64
 				dst.BeaconFrequency = zero
+			}
+		case "channels":
+			if len(subs) > 0 {
+				return fmt.Errorf("'channels' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Channels = src.Channels
+			} else {
+				dst.Channels = nil
 			}
 
 		default:
@@ -641,26 +641,35 @@ var EndDeviceVersionFieldPathsNested = []string{
 	"default_formatters.down_formatter_parameter",
 	"default_formatters.up_formatter",
 	"default_formatters.up_formatter_parameter",
-	"default_mac_parameters",
-	"default_mac_parameters.adr_ack_delay",
-	"default_mac_parameters.adr_ack_limit",
-	"default_mac_parameters.adr_data_rate_index",
-	"default_mac_parameters.adr_nb_trans",
-	"default_mac_parameters.adr_tx_power_index",
-	"default_mac_parameters.beacon_frequency",
-	"default_mac_parameters.channels",
-	"default_mac_parameters.downlink_dwell_time",
-	"default_mac_parameters.max_duty_cycle",
-	"default_mac_parameters.max_eirp",
-	"default_mac_parameters.ping_slot_data_rate_index",
-	"default_mac_parameters.ping_slot_frequency",
-	"default_mac_parameters.rejoin_count_periodicity",
-	"default_mac_parameters.rejoin_time_periodicity",
-	"default_mac_parameters.rx1_data_rate_offset",
-	"default_mac_parameters.rx1_delay",
-	"default_mac_parameters.rx2_data_rate_index",
-	"default_mac_parameters.rx2_frequency",
-	"default_mac_parameters.uplink_dwell_time",
+	"default_mac_settings",
+	"default_mac_settings.adr_margin",
+	"default_mac_settings.class_b_timeout",
+	"default_mac_settings.class_c_timeout",
+	"default_mac_settings.desired_rx1_data_rate_offset",
+	"default_mac_settings.desired_rx1_delay",
+	"default_mac_settings.desired_rx1_delay.value",
+	"default_mac_settings.desired_rx2_data_rate_index",
+	"default_mac_settings.desired_rx2_data_rate_index.value",
+	"default_mac_settings.desired_rx2_frequency",
+	"default_mac_settings.factory_preset_frequencies",
+	"default_mac_settings.max_duty_cycle",
+	"default_mac_settings.max_duty_cycle.value",
+	"default_mac_settings.ping_slot_data_rate_index",
+	"default_mac_settings.ping_slot_data_rate_index.value",
+	"default_mac_settings.ping_slot_frequency",
+	"default_mac_settings.ping_slot_periodicity",
+	"default_mac_settings.ping_slot_periodicity.value",
+	"default_mac_settings.resets_f_cnt",
+	"default_mac_settings.rx1_data_rate_offset",
+	"default_mac_settings.rx1_delay",
+	"default_mac_settings.rx1_delay.value",
+	"default_mac_settings.rx2_data_rate_index",
+	"default_mac_settings.rx2_data_rate_index.value",
+	"default_mac_settings.rx2_frequency",
+	"default_mac_settings.status_count_periodicity",
+	"default_mac_settings.status_time_periodicity",
+	"default_mac_settings.supports_32_bit_f_cnt",
+	"default_mac_settings.use_adr",
 	"frequency_plan_id",
 	"ids",
 	"ids.brand_id",
@@ -677,12 +686,11 @@ var EndDeviceVersionFieldPathsNested = []string{
 	"supports_class_b",
 	"supports_class_c",
 	"supports_join",
-	"uses_32_bit_f_cnt",
 }
 
 var EndDeviceVersionFieldPathsTopLevel = []string{
 	"default_formatters",
-	"default_mac_parameters",
+	"default_mac_settings",
 	"frequency_plan_id",
 	"ids",
 	"lorawan_phy_version",
@@ -695,7 +703,6 @@ var EndDeviceVersionFieldPathsTopLevel = []string{
 	"supports_class_b",
 	"supports_class_c",
 	"supports_join",
-	"uses_32_bit_f_cnt",
 }
 
 func (dst *EndDeviceVersion) SetFields(src *EndDeviceVersion, paths ...string) error {
@@ -778,25 +785,25 @@ func (dst *EndDeviceVersion) SetFields(src *EndDeviceVersion, paths ...string) e
 				var zero bool
 				dst.SupportsClassC = zero
 			}
-		case "default_mac_parameters":
+		case "default_mac_settings":
 			if len(subs) > 0 {
-				newDst := dst.DefaultMACParameters
+				newDst := dst.DefaultMACSettings
 				if newDst == nil {
-					newDst = &MACParameters{}
-					dst.DefaultMACParameters = newDst
+					newDst = &MACSettings{}
+					dst.DefaultMACSettings = newDst
 				}
-				var newSrc *MACParameters
+				var newSrc *MACSettings
 				if src != nil {
-					newSrc = src.DefaultMACParameters
+					newSrc = src.DefaultMACSettings
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.DefaultMACParameters = src.DefaultMACParameters
+					dst.DefaultMACSettings = src.DefaultMACSettings
 				} else {
-					dst.DefaultMACParameters = nil
+					dst.DefaultMACSettings = nil
 				}
 			}
 		case "min_frequency":
@@ -828,16 +835,6 @@ func (dst *EndDeviceVersion) SetFields(src *EndDeviceVersion, paths ...string) e
 			} else {
 				var zero bool
 				dst.ResetsFCnt = zero
-			}
-		case "uses_32_bit_f_cnt":
-			if len(subs) > 0 {
-				return fmt.Errorf("'uses_32_bit_f_cnt' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.Uses32BitFCnt = src.Uses32BitFCnt
-			} else {
-				var zero bool
-				dst.Uses32BitFCnt = zero
 			}
 		case "supports_join":
 			if len(subs) > 0 {
@@ -889,8 +886,30 @@ var MACSettingsFieldPathsNested = []string{
 	"adr_margin",
 	"class_b_timeout",
 	"class_c_timeout",
+	"desired_rx1_data_rate_offset",
+	"desired_rx1_delay",
+	"desired_rx1_delay.value",
+	"desired_rx2_data_rate_index",
+	"desired_rx2_data_rate_index.value",
+	"desired_rx2_frequency",
+	"factory_preset_frequencies",
+	"max_duty_cycle",
+	"max_duty_cycle.value",
+	"ping_slot_data_rate_index",
+	"ping_slot_data_rate_index.value",
+	"ping_slot_frequency",
+	"ping_slot_periodicity",
+	"ping_slot_periodicity.value",
+	"resets_f_cnt",
+	"rx1_data_rate_offset",
+	"rx1_delay",
+	"rx1_delay.value",
+	"rx2_data_rate_index",
+	"rx2_data_rate_index.value",
+	"rx2_frequency",
 	"status_count_periodicity",
 	"status_time_periodicity",
+	"supports_32_bit_f_cnt",
 	"use_adr",
 }
 
@@ -898,34 +917,29 @@ var MACSettingsFieldPathsTopLevel = []string{
 	"adr_margin",
 	"class_b_timeout",
 	"class_c_timeout",
+	"desired_rx1_data_rate_offset",
+	"desired_rx1_delay",
+	"desired_rx2_data_rate_index",
+	"desired_rx2_frequency",
+	"factory_preset_frequencies",
+	"max_duty_cycle",
+	"ping_slot_data_rate_index",
+	"ping_slot_frequency",
+	"ping_slot_periodicity",
+	"resets_f_cnt",
+	"rx1_data_rate_offset",
+	"rx1_delay",
+	"rx2_data_rate_index",
+	"rx2_frequency",
 	"status_count_periodicity",
 	"status_time_periodicity",
+	"supports_32_bit_f_cnt",
 	"use_adr",
 }
 
 func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
-		case "use_adr":
-			if len(subs) > 0 {
-				return fmt.Errorf("'use_adr' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.UseADR = src.UseADR
-			} else {
-				var zero bool
-				dst.UseADR = zero
-			}
-		case "adr_margin":
-			if len(subs) > 0 {
-				return fmt.Errorf("'adr_margin' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.ADRMargin = src.ADRMargin
-			} else {
-				var zero uint32
-				dst.ADRMargin = zero
-			}
 		case "class_b_timeout":
 			if len(subs) > 0 {
 				return fmt.Errorf("'class_b_timeout' has no subfields, but %s were specified", subs)
@@ -933,8 +947,59 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 			if src != nil {
 				dst.ClassBTimeout = src.ClassBTimeout
 			} else {
-				var zero time.Duration
-				dst.ClassBTimeout = zero
+				dst.ClassBTimeout = nil
+			}
+		case "ping_slot_periodicity":
+			if len(subs) > 0 {
+				newDst := dst.PingSlotPeriodicity
+				if newDst == nil {
+					newDst = &MACSettings_PingSlotPeriodValue{}
+					dst.PingSlotPeriodicity = newDst
+				}
+				var newSrc *MACSettings_PingSlotPeriodValue
+				if src != nil {
+					newSrc = src.PingSlotPeriodicity
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.PingSlotPeriodicity = src.PingSlotPeriodicity
+				} else {
+					dst.PingSlotPeriodicity = nil
+				}
+			}
+		case "ping_slot_data_rate_index":
+			if len(subs) > 0 {
+				newDst := dst.PingSlotDataRateIndex
+				if newDst == nil {
+					newDst = &MACSettings_DataRateIndexValue{}
+					dst.PingSlotDataRateIndex = newDst
+				}
+				var newSrc *MACSettings_DataRateIndexValue
+				if src != nil {
+					newSrc = src.PingSlotDataRateIndex
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.PingSlotDataRateIndex = src.PingSlotDataRateIndex
+				} else {
+					dst.PingSlotDataRateIndex = nil
+				}
+			}
+		case "ping_slot_frequency":
+			if len(subs) > 0 {
+				return fmt.Errorf("'ping_slot_frequency' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.PingSlotFrequency = src.PingSlotFrequency
+			} else {
+				var zero uint64
+				dst.PingSlotFrequency = zero
 			}
 		case "class_c_timeout":
 			if len(subs) > 0 {
@@ -943,8 +1008,134 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 			if src != nil {
 				dst.ClassCTimeout = src.ClassCTimeout
 			} else {
-				var zero time.Duration
-				dst.ClassCTimeout = zero
+				dst.ClassCTimeout = nil
+			}
+		case "rx1_delay":
+			if len(subs) > 0 {
+				newDst := dst.Rx1Delay
+				if newDst == nil {
+					newDst = &MACSettings_RxDelayValue{}
+					dst.Rx1Delay = newDst
+				}
+				var newSrc *MACSettings_RxDelayValue
+				if src != nil {
+					newSrc = src.Rx1Delay
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Rx1Delay = src.Rx1Delay
+				} else {
+					dst.Rx1Delay = nil
+				}
+			}
+		case "rx1_data_rate_offset":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rx1_data_rate_offset' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Rx1DataRateOffset = src.Rx1DataRateOffset
+			} else {
+				dst.Rx1DataRateOffset = nil
+			}
+		case "rx2_data_rate_index":
+			if len(subs) > 0 {
+				newDst := dst.Rx2DataRateIndex
+				if newDst == nil {
+					newDst = &MACSettings_DataRateIndexValue{}
+					dst.Rx2DataRateIndex = newDst
+				}
+				var newSrc *MACSettings_DataRateIndexValue
+				if src != nil {
+					newSrc = src.Rx2DataRateIndex
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Rx2DataRateIndex = src.Rx2DataRateIndex
+				} else {
+					dst.Rx2DataRateIndex = nil
+				}
+			}
+		case "rx2_frequency":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rx2_frequency' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Rx2Frequency = src.Rx2Frequency
+			} else {
+				var zero uint64
+				dst.Rx2Frequency = zero
+			}
+		case "factory_preset_frequencies":
+			if len(subs) > 0 {
+				return fmt.Errorf("'factory_preset_frequencies' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FactoryPresetFrequencies = src.FactoryPresetFrequencies
+			} else {
+				dst.FactoryPresetFrequencies = nil
+			}
+		case "max_duty_cycle":
+			if len(subs) > 0 {
+				newDst := dst.MaxDutyCycle
+				if newDst == nil {
+					newDst = &MACSettings_AggregatedDutyCycleValue{}
+					dst.MaxDutyCycle = newDst
+				}
+				var newSrc *MACSettings_AggregatedDutyCycleValue
+				if src != nil {
+					newSrc = src.MaxDutyCycle
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.MaxDutyCycle = src.MaxDutyCycle
+				} else {
+					dst.MaxDutyCycle = nil
+				}
+			}
+		case "supports_32_bit_f_cnt":
+			if len(subs) > 0 {
+				return fmt.Errorf("'supports_32_bit_f_cnt' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Supports32BitFCnt = src.Supports32BitFCnt
+			} else {
+				dst.Supports32BitFCnt = nil
+			}
+		case "use_adr":
+			if len(subs) > 0 {
+				return fmt.Errorf("'use_adr' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.UseADR = src.UseADR
+			} else {
+				dst.UseADR = nil
+			}
+		case "adr_margin":
+			if len(subs) > 0 {
+				return fmt.Errorf("'adr_margin' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ADRMargin = src.ADRMargin
+			} else {
+				dst.ADRMargin = nil
+			}
+		case "resets_f_cnt":
+			if len(subs) > 0 {
+				return fmt.Errorf("'resets_f_cnt' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ResetsFCnt = src.ResetsFCnt
+			} else {
+				dst.ResetsFCnt = nil
 			}
 		case "status_time_periodicity":
 			if len(subs) > 0 {
@@ -953,8 +1144,7 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 			if src != nil {
 				dst.StatusTimePeriodicity = src.StatusTimePeriodicity
 			} else {
-				var zero time.Duration
-				dst.StatusTimePeriodicity = zero
+				dst.StatusTimePeriodicity = nil
 			}
 		case "status_count_periodicity":
 			if len(subs) > 0 {
@@ -963,8 +1153,184 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 			if src != nil {
 				dst.StatusCountPeriodicity = src.StatusCountPeriodicity
 			} else {
-				var zero uint32
-				dst.StatusCountPeriodicity = zero
+				dst.StatusCountPeriodicity = nil
+			}
+		case "desired_rx1_delay":
+			if len(subs) > 0 {
+				newDst := dst.DesiredRx1Delay
+				if newDst == nil {
+					newDst = &MACSettings_RxDelayValue{}
+					dst.DesiredRx1Delay = newDst
+				}
+				var newSrc *MACSettings_RxDelayValue
+				if src != nil {
+					newSrc = src.DesiredRx1Delay
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DesiredRx1Delay = src.DesiredRx1Delay
+				} else {
+					dst.DesiredRx1Delay = nil
+				}
+			}
+		case "desired_rx1_data_rate_offset":
+			if len(subs) > 0 {
+				return fmt.Errorf("'desired_rx1_data_rate_offset' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DesiredRx1DataRateOffset = src.DesiredRx1DataRateOffset
+			} else {
+				dst.DesiredRx1DataRateOffset = nil
+			}
+		case "desired_rx2_data_rate_index":
+			if len(subs) > 0 {
+				newDst := dst.DesiredRx2DataRateIndex
+				if newDst == nil {
+					newDst = &MACSettings_DataRateIndexValue{}
+					dst.DesiredRx2DataRateIndex = newDst
+				}
+				var newSrc *MACSettings_DataRateIndexValue
+				if src != nil {
+					newSrc = src.DesiredRx2DataRateIndex
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DesiredRx2DataRateIndex = src.DesiredRx2DataRateIndex
+				} else {
+					dst.DesiredRx2DataRateIndex = nil
+				}
+			}
+		case "desired_rx2_frequency":
+			if len(subs) > 0 {
+				return fmt.Errorf("'desired_rx2_frequency' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DesiredRx2Frequency = src.DesiredRx2Frequency
+			} else {
+				var zero uint64
+				dst.DesiredRx2Frequency = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+var MACSettings_DataRateIndexValueFieldPathsNested = []string{
+	"value",
+}
+
+var MACSettings_DataRateIndexValueFieldPathsTopLevel = []string{
+	"value",
+}
+
+func (dst *MACSettings_DataRateIndexValue) SetFields(src *MACSettings_DataRateIndexValue, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "value":
+			if len(subs) > 0 {
+				return fmt.Errorf("'value' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Value = src.Value
+			} else {
+				var zero DataRateIndex
+				dst.Value = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+var MACSettings_PingSlotPeriodValueFieldPathsNested = []string{
+	"value",
+}
+
+var MACSettings_PingSlotPeriodValueFieldPathsTopLevel = []string{
+	"value",
+}
+
+func (dst *MACSettings_PingSlotPeriodValue) SetFields(src *MACSettings_PingSlotPeriodValue, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "value":
+			if len(subs) > 0 {
+				return fmt.Errorf("'value' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Value = src.Value
+			} else {
+				var zero PingSlotPeriod
+				dst.Value = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+var MACSettings_AggregatedDutyCycleValueFieldPathsNested = []string{
+	"value",
+}
+
+var MACSettings_AggregatedDutyCycleValueFieldPathsTopLevel = []string{
+	"value",
+}
+
+func (dst *MACSettings_AggregatedDutyCycleValue) SetFields(src *MACSettings_AggregatedDutyCycleValue, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "value":
+			if len(subs) > 0 {
+				return fmt.Errorf("'value' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Value = src.Value
+			} else {
+				var zero AggregatedDutyCycle
+				dst.Value = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+var MACSettings_RxDelayValueFieldPathsNested = []string{
+	"value",
+}
+
+var MACSettings_RxDelayValueFieldPathsTopLevel = []string{
+	"value",
+}
+
+func (dst *MACSettings_RxDelayValue) SetFields(src *MACSettings_RxDelayValue, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "value":
+			if len(subs) > 0 {
+				return fmt.Errorf("'value' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Value = src.Value
+			} else {
+				var zero RxDelay
+				dst.Value = zero
 			}
 
 		default:
@@ -1519,26 +1885,6 @@ var EndDeviceFieldPathsNested = []string{
 	"attributes",
 	"battery_percentage",
 	"created_at",
-	"default_mac_parameters",
-	"default_mac_parameters.adr_ack_delay",
-	"default_mac_parameters.adr_ack_limit",
-	"default_mac_parameters.adr_data_rate_index",
-	"default_mac_parameters.adr_nb_trans",
-	"default_mac_parameters.adr_tx_power_index",
-	"default_mac_parameters.beacon_frequency",
-	"default_mac_parameters.channels",
-	"default_mac_parameters.downlink_dwell_time",
-	"default_mac_parameters.max_duty_cycle",
-	"default_mac_parameters.max_eirp",
-	"default_mac_parameters.ping_slot_data_rate_index",
-	"default_mac_parameters.ping_slot_frequency",
-	"default_mac_parameters.rejoin_count_periodicity",
-	"default_mac_parameters.rejoin_time_periodicity",
-	"default_mac_parameters.rx1_data_rate_offset",
-	"default_mac_parameters.rx1_delay",
-	"default_mac_parameters.rx2_data_rate_index",
-	"default_mac_parameters.rx2_frequency",
-	"default_mac_parameters.uplink_dwell_time",
 	"description",
 	"downlink_margin",
 	"formatters",
@@ -1567,8 +1913,30 @@ var EndDeviceFieldPathsNested = []string{
 	"mac_settings.adr_margin",
 	"mac_settings.class_b_timeout",
 	"mac_settings.class_c_timeout",
+	"mac_settings.desired_rx1_data_rate_offset",
+	"mac_settings.desired_rx1_delay",
+	"mac_settings.desired_rx1_delay.value",
+	"mac_settings.desired_rx2_data_rate_index",
+	"mac_settings.desired_rx2_data_rate_index.value",
+	"mac_settings.desired_rx2_frequency",
+	"mac_settings.factory_preset_frequencies",
+	"mac_settings.max_duty_cycle",
+	"mac_settings.max_duty_cycle.value",
+	"mac_settings.ping_slot_data_rate_index",
+	"mac_settings.ping_slot_data_rate_index.value",
+	"mac_settings.ping_slot_frequency",
+	"mac_settings.ping_slot_periodicity",
+	"mac_settings.ping_slot_periodicity.value",
+	"mac_settings.resets_f_cnt",
+	"mac_settings.rx1_data_rate_offset",
+	"mac_settings.rx1_delay",
+	"mac_settings.rx1_delay.value",
+	"mac_settings.rx2_data_rate_index",
+	"mac_settings.rx2_data_rate_index.value",
+	"mac_settings.rx2_frequency",
 	"mac_settings.status_count_periodicity",
 	"mac_settings.status_time_periodicity",
+	"mac_settings.supports_32_bit_f_cnt",
 	"mac_settings.use_adr",
 	"mac_state",
 	"mac_state.current_parameters",
@@ -1798,7 +2166,6 @@ var EndDeviceFieldPathsNested = []string{
 	"recent_adr_uplinks",
 	"recent_downlinks",
 	"recent_uplinks",
-	"resets_f_cnt",
 	"resets_join_nonces",
 	"root_keys",
 	"root_keys.app_key",
@@ -1835,7 +2202,6 @@ var EndDeviceFieldPathsNested = []string{
 	"supports_join",
 	"updated_at",
 	"used_dev_nonces",
-	"uses_32_bit_f_cnt",
 	"version_ids",
 	"version_ids.brand_id",
 	"version_ids.firmware_version",
@@ -1848,7 +2214,6 @@ var EndDeviceFieldPathsTopLevel = []string{
 	"attributes",
 	"battery_percentage",
 	"created_at",
-	"default_mac_parameters",
 	"description",
 	"downlink_margin",
 	"formatters",
@@ -1878,7 +2243,6 @@ var EndDeviceFieldPathsTopLevel = []string{
 	"recent_adr_uplinks",
 	"recent_downlinks",
 	"recent_uplinks",
-	"resets_f_cnt",
 	"resets_join_nonces",
 	"root_keys",
 	"service_profile_id",
@@ -1888,7 +2252,6 @@ var EndDeviceFieldPathsTopLevel = []string{
 	"supports_join",
 	"updated_at",
 	"used_dev_nonces",
-	"uses_32_bit_f_cnt",
 	"version_ids",
 }
 
@@ -2082,27 +2445,6 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 				var zero string
 				dst.FrequencyPlanID = zero
 			}
-		case "default_mac_parameters":
-			if len(subs) > 0 {
-				newDst := dst.DefaultMACParameters
-				if newDst == nil {
-					newDst = &MACParameters{}
-					dst.DefaultMACParameters = newDst
-				}
-				var newSrc *MACParameters
-				if src != nil {
-					newSrc = src.DefaultMACParameters
-				}
-				if err := newDst.SetFields(newSrc, subs...); err != nil {
-					return err
-				}
-			} else {
-				if src != nil {
-					dst.DefaultMACParameters = src.DefaultMACParameters
-				} else {
-					dst.DefaultMACParameters = nil
-				}
-			}
 		case "min_frequency":
 			if len(subs) > 0 {
 				return fmt.Errorf("'min_frequency' has no subfields, but %s were specified", subs)
@@ -2122,26 +2464,6 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 			} else {
 				var zero uint64
 				dst.MaxFrequency = zero
-			}
-		case "resets_f_cnt":
-			if len(subs) > 0 {
-				return fmt.Errorf("'resets_f_cnt' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.ResetsFCnt = src.ResetsFCnt
-			} else {
-				var zero bool
-				dst.ResetsFCnt = zero
-			}
-		case "uses_32_bit_f_cnt":
-			if len(subs) > 0 {
-				return fmt.Errorf("'uses_32_bit_f_cnt' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.Uses32BitFCnt = src.Uses32BitFCnt
-			} else {
-				var zero bool
-				dst.Uses32BitFCnt = zero
 			}
 		case "supports_join":
 			if len(subs) > 0 {
@@ -2483,26 +2805,6 @@ var CreateEndDeviceRequestFieldPathsNested = []string{
 	"end_device.attributes",
 	"end_device.battery_percentage",
 	"end_device.created_at",
-	"end_device.default_mac_parameters",
-	"end_device.default_mac_parameters.adr_ack_delay",
-	"end_device.default_mac_parameters.adr_ack_limit",
-	"end_device.default_mac_parameters.adr_data_rate_index",
-	"end_device.default_mac_parameters.adr_nb_trans",
-	"end_device.default_mac_parameters.adr_tx_power_index",
-	"end_device.default_mac_parameters.beacon_frequency",
-	"end_device.default_mac_parameters.channels",
-	"end_device.default_mac_parameters.downlink_dwell_time",
-	"end_device.default_mac_parameters.max_duty_cycle",
-	"end_device.default_mac_parameters.max_eirp",
-	"end_device.default_mac_parameters.ping_slot_data_rate_index",
-	"end_device.default_mac_parameters.ping_slot_frequency",
-	"end_device.default_mac_parameters.rejoin_count_periodicity",
-	"end_device.default_mac_parameters.rejoin_time_periodicity",
-	"end_device.default_mac_parameters.rx1_data_rate_offset",
-	"end_device.default_mac_parameters.rx1_delay",
-	"end_device.default_mac_parameters.rx2_data_rate_index",
-	"end_device.default_mac_parameters.rx2_frequency",
-	"end_device.default_mac_parameters.uplink_dwell_time",
 	"end_device.description",
 	"end_device.downlink_margin",
 	"end_device.formatters",
@@ -2531,8 +2833,30 @@ var CreateEndDeviceRequestFieldPathsNested = []string{
 	"end_device.mac_settings.adr_margin",
 	"end_device.mac_settings.class_b_timeout",
 	"end_device.mac_settings.class_c_timeout",
+	"end_device.mac_settings.desired_rx1_data_rate_offset",
+	"end_device.mac_settings.desired_rx1_delay",
+	"end_device.mac_settings.desired_rx1_delay.value",
+	"end_device.mac_settings.desired_rx2_data_rate_index",
+	"end_device.mac_settings.desired_rx2_data_rate_index.value",
+	"end_device.mac_settings.desired_rx2_frequency",
+	"end_device.mac_settings.factory_preset_frequencies",
+	"end_device.mac_settings.max_duty_cycle",
+	"end_device.mac_settings.max_duty_cycle.value",
+	"end_device.mac_settings.ping_slot_data_rate_index",
+	"end_device.mac_settings.ping_slot_data_rate_index.value",
+	"end_device.mac_settings.ping_slot_frequency",
+	"end_device.mac_settings.ping_slot_periodicity",
+	"end_device.mac_settings.ping_slot_periodicity.value",
+	"end_device.mac_settings.resets_f_cnt",
+	"end_device.mac_settings.rx1_data_rate_offset",
+	"end_device.mac_settings.rx1_delay",
+	"end_device.mac_settings.rx1_delay.value",
+	"end_device.mac_settings.rx2_data_rate_index",
+	"end_device.mac_settings.rx2_data_rate_index.value",
+	"end_device.mac_settings.rx2_frequency",
 	"end_device.mac_settings.status_count_periodicity",
 	"end_device.mac_settings.status_time_periodicity",
+	"end_device.mac_settings.supports_32_bit_f_cnt",
 	"end_device.mac_settings.use_adr",
 	"end_device.mac_state",
 	"end_device.mac_state.current_parameters",
@@ -2762,7 +3086,6 @@ var CreateEndDeviceRequestFieldPathsNested = []string{
 	"end_device.recent_adr_uplinks",
 	"end_device.recent_downlinks",
 	"end_device.recent_uplinks",
-	"end_device.resets_f_cnt",
 	"end_device.resets_join_nonces",
 	"end_device.root_keys",
 	"end_device.root_keys.app_key",
@@ -2799,7 +3122,6 @@ var CreateEndDeviceRequestFieldPathsNested = []string{
 	"end_device.supports_join",
 	"end_device.updated_at",
 	"end_device.used_dev_nonces",
-	"end_device.uses_32_bit_f_cnt",
 	"end_device.version_ids",
 	"end_device.version_ids.brand_id",
 	"end_device.version_ids.firmware_version",
@@ -2846,26 +3168,6 @@ var UpdateEndDeviceRequestFieldPathsNested = []string{
 	"end_device.attributes",
 	"end_device.battery_percentage",
 	"end_device.created_at",
-	"end_device.default_mac_parameters",
-	"end_device.default_mac_parameters.adr_ack_delay",
-	"end_device.default_mac_parameters.adr_ack_limit",
-	"end_device.default_mac_parameters.adr_data_rate_index",
-	"end_device.default_mac_parameters.adr_nb_trans",
-	"end_device.default_mac_parameters.adr_tx_power_index",
-	"end_device.default_mac_parameters.beacon_frequency",
-	"end_device.default_mac_parameters.channels",
-	"end_device.default_mac_parameters.downlink_dwell_time",
-	"end_device.default_mac_parameters.max_duty_cycle",
-	"end_device.default_mac_parameters.max_eirp",
-	"end_device.default_mac_parameters.ping_slot_data_rate_index",
-	"end_device.default_mac_parameters.ping_slot_frequency",
-	"end_device.default_mac_parameters.rejoin_count_periodicity",
-	"end_device.default_mac_parameters.rejoin_time_periodicity",
-	"end_device.default_mac_parameters.rx1_data_rate_offset",
-	"end_device.default_mac_parameters.rx1_delay",
-	"end_device.default_mac_parameters.rx2_data_rate_index",
-	"end_device.default_mac_parameters.rx2_frequency",
-	"end_device.default_mac_parameters.uplink_dwell_time",
 	"end_device.description",
 	"end_device.downlink_margin",
 	"end_device.formatters",
@@ -2894,8 +3196,30 @@ var UpdateEndDeviceRequestFieldPathsNested = []string{
 	"end_device.mac_settings.adr_margin",
 	"end_device.mac_settings.class_b_timeout",
 	"end_device.mac_settings.class_c_timeout",
+	"end_device.mac_settings.desired_rx1_data_rate_offset",
+	"end_device.mac_settings.desired_rx1_delay",
+	"end_device.mac_settings.desired_rx1_delay.value",
+	"end_device.mac_settings.desired_rx2_data_rate_index",
+	"end_device.mac_settings.desired_rx2_data_rate_index.value",
+	"end_device.mac_settings.desired_rx2_frequency",
+	"end_device.mac_settings.factory_preset_frequencies",
+	"end_device.mac_settings.max_duty_cycle",
+	"end_device.mac_settings.max_duty_cycle.value",
+	"end_device.mac_settings.ping_slot_data_rate_index",
+	"end_device.mac_settings.ping_slot_data_rate_index.value",
+	"end_device.mac_settings.ping_slot_frequency",
+	"end_device.mac_settings.ping_slot_periodicity",
+	"end_device.mac_settings.ping_slot_periodicity.value",
+	"end_device.mac_settings.resets_f_cnt",
+	"end_device.mac_settings.rx1_data_rate_offset",
+	"end_device.mac_settings.rx1_delay",
+	"end_device.mac_settings.rx1_delay.value",
+	"end_device.mac_settings.rx2_data_rate_index",
+	"end_device.mac_settings.rx2_data_rate_index.value",
+	"end_device.mac_settings.rx2_frequency",
 	"end_device.mac_settings.status_count_periodicity",
 	"end_device.mac_settings.status_time_periodicity",
+	"end_device.mac_settings.supports_32_bit_f_cnt",
 	"end_device.mac_settings.use_adr",
 	"end_device.mac_state",
 	"end_device.mac_state.current_parameters",
@@ -3125,7 +3449,6 @@ var UpdateEndDeviceRequestFieldPathsNested = []string{
 	"end_device.recent_adr_uplinks",
 	"end_device.recent_downlinks",
 	"end_device.recent_uplinks",
-	"end_device.resets_f_cnt",
 	"end_device.resets_join_nonces",
 	"end_device.root_keys",
 	"end_device.root_keys.app_key",
@@ -3162,7 +3485,6 @@ var UpdateEndDeviceRequestFieldPathsNested = []string{
 	"end_device.supports_join",
 	"end_device.updated_at",
 	"end_device.used_dev_nonces",
-	"end_device.uses_32_bit_f_cnt",
 	"end_device.version_ids",
 	"end_device.version_ids.brand_id",
 	"end_device.version_ids.firmware_version",
@@ -3362,26 +3684,6 @@ var SetEndDeviceRequestFieldPathsNested = []string{
 	"device.attributes",
 	"device.battery_percentage",
 	"device.created_at",
-	"device.default_mac_parameters",
-	"device.default_mac_parameters.adr_ack_delay",
-	"device.default_mac_parameters.adr_ack_limit",
-	"device.default_mac_parameters.adr_data_rate_index",
-	"device.default_mac_parameters.adr_nb_trans",
-	"device.default_mac_parameters.adr_tx_power_index",
-	"device.default_mac_parameters.beacon_frequency",
-	"device.default_mac_parameters.channels",
-	"device.default_mac_parameters.downlink_dwell_time",
-	"device.default_mac_parameters.max_duty_cycle",
-	"device.default_mac_parameters.max_eirp",
-	"device.default_mac_parameters.ping_slot_data_rate_index",
-	"device.default_mac_parameters.ping_slot_frequency",
-	"device.default_mac_parameters.rejoin_count_periodicity",
-	"device.default_mac_parameters.rejoin_time_periodicity",
-	"device.default_mac_parameters.rx1_data_rate_offset",
-	"device.default_mac_parameters.rx1_delay",
-	"device.default_mac_parameters.rx2_data_rate_index",
-	"device.default_mac_parameters.rx2_frequency",
-	"device.default_mac_parameters.uplink_dwell_time",
 	"device.description",
 	"device.downlink_margin",
 	"device.formatters",
@@ -3410,8 +3712,30 @@ var SetEndDeviceRequestFieldPathsNested = []string{
 	"device.mac_settings.adr_margin",
 	"device.mac_settings.class_b_timeout",
 	"device.mac_settings.class_c_timeout",
+	"device.mac_settings.desired_rx1_data_rate_offset",
+	"device.mac_settings.desired_rx1_delay",
+	"device.mac_settings.desired_rx1_delay.value",
+	"device.mac_settings.desired_rx2_data_rate_index",
+	"device.mac_settings.desired_rx2_data_rate_index.value",
+	"device.mac_settings.desired_rx2_frequency",
+	"device.mac_settings.factory_preset_frequencies",
+	"device.mac_settings.max_duty_cycle",
+	"device.mac_settings.max_duty_cycle.value",
+	"device.mac_settings.ping_slot_data_rate_index",
+	"device.mac_settings.ping_slot_data_rate_index.value",
+	"device.mac_settings.ping_slot_frequency",
+	"device.mac_settings.ping_slot_periodicity",
+	"device.mac_settings.ping_slot_periodicity.value",
+	"device.mac_settings.resets_f_cnt",
+	"device.mac_settings.rx1_data_rate_offset",
+	"device.mac_settings.rx1_delay",
+	"device.mac_settings.rx1_delay.value",
+	"device.mac_settings.rx2_data_rate_index",
+	"device.mac_settings.rx2_data_rate_index.value",
+	"device.mac_settings.rx2_frequency",
 	"device.mac_settings.status_count_periodicity",
 	"device.mac_settings.status_time_periodicity",
+	"device.mac_settings.supports_32_bit_f_cnt",
 	"device.mac_settings.use_adr",
 	"device.mac_state",
 	"device.mac_state.current_parameters",
@@ -3641,7 +3965,6 @@ var SetEndDeviceRequestFieldPathsNested = []string{
 	"device.recent_adr_uplinks",
 	"device.recent_downlinks",
 	"device.recent_uplinks",
-	"device.resets_f_cnt",
 	"device.resets_join_nonces",
 	"device.root_keys",
 	"device.root_keys.app_key",
@@ -3678,7 +4001,6 @@ var SetEndDeviceRequestFieldPathsNested = []string{
 	"device.supports_join",
 	"device.updated_at",
 	"device.used_dev_nonces",
-	"device.uses_32_bit_f_cnt",
 	"device.version_ids",
 	"device.version_ids.brand_id",
 	"device.version_ids.firmware_version",

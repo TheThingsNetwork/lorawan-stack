@@ -68,8 +68,6 @@ func getEndDevicePathFromNS(pathParts ...string) bool {
 	switch pathParts[0] {
 	case
 		"battery_percentage",
-		"default_class",
-		"default_mac_parameters",
 		"downlink_margin",
 		"frequency_plan_id",
 		"last_dev_status_received_at",
@@ -82,12 +80,10 @@ func getEndDevicePathFromNS(pathParts ...string) bool {
 		"power_state",
 		"recent_downlinks",
 		"recent_uplinks",
-		"resets_f_cnt",
 		"resets_join_nonces",
 		"supports_class_b",
 		"supports_class_c",
-		"supports_join",
-		"uses_32_bit_f_cnt":
+		"supports_join":
 		return true
 	case "session":
 		if len(pathParts) == 1 {
@@ -122,20 +118,16 @@ func getEndDevicePathFromNS(pathParts ...string) bool {
 func setEndDevicePathToNS(pathParts ...string) bool {
 	switch pathParts[0] {
 	case
-		"default_class",
-		"default_mac_parameters",
 		"frequency_plan_id",
 		"lorawan_phy_version",
 		"lorawan_version",
 		"mac_settings",
 		"max_frequency",
 		"min_frequency",
-		"resets_f_cnt",
 		"resets_join_nonces",
 		"supports_class_b",
 		"supports_class_c",
-		"supports_join",
-		"uses_32_bit_f_cnt":
+		"supports_join":
 		return true
 	case "session":
 		if len(pathParts) == 1 {

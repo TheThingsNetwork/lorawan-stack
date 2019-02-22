@@ -3626,15 +3626,6 @@
       "file": "registry.go"
     }
   },
-  "error:pkg/networkserver:adr_margin": {
-    "translations": {
-      "en": "invalid ADR margin"
-    },
-    "description": {
-      "package": "pkg/networkserver",
-      "file": "errors.go"
-    }
-  },
   "error:pkg/networkserver:channel_index": {
     "translations": {
       "en": "invalid channel index"
@@ -3647,24 +3638,6 @@
   "error:pkg/networkserver:cid_out_of_range": {
     "translations": {
       "en": "CID must be in range from {min} to {max}"
-    },
-    "description": {
-      "package": "pkg/networkserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/networkserver:class_b_timeout": {
-    "translations": {
-      "en": "invalid class B timeout"
-    },
-    "description": {
-      "package": "pkg/networkserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/networkserver:class_c_timeout": {
-    "translations": {
-      "en": "invalid class C timeout"
     },
     "description": {
       "package": "pkg/networkserver",
@@ -3833,6 +3806,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/networkserver:field_value": {
+    "translations": {
+      "en": "invalid value of field `{field}`"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/networkserver:gateway_server_not_found": {
     "translations": {
       "en": "Gateway Server not found"
@@ -3887,6 +3869,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/networkserver:no_dev_eui": {
+    "translations": {
+      "en": "no DevEUI specified"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/networkserver:no_downlink": {
     "translations": {
       "en": "no downlink to send"
@@ -3914,9 +3905,9 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/networkserver:no_mac_settings": {
+  "error:pkg/networkserver:no_join_eui": {
     "translations": {
-      "en": "no mac settings specified"
+      "en": "no JoinEUI specified"
     },
     "description": {
       "package": "pkg/networkserver",

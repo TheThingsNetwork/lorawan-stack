@@ -27,7 +27,7 @@ var (
 	evtEnqueueResetConfirmation = defineEnqueueMACConfirmationEvent("reset", "device reset")()
 )
 
-func handleResetInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_ResetInd, fps *frequencyplans.Store) error {
+func handleResetInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_ResetInd, fps *frequencyplans.Store, defaults ttnpb.MACSettings) error {
 	if pld == nil {
 		return errNoPayload
 	}
@@ -38,7 +38,7 @@ func handleResetInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCom
 		return nil
 	}
 
-	if err := resetMACState(dev, fps); err != nil {
+	if err := resetMACState(dev, fps, defaults); err != nil {
 		return err
 	}
 	dev.MACState.LoRaWANVersion = ttnpb.MAC_V1_1

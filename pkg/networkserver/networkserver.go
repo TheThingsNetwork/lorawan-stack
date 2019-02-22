@@ -22,6 +22,7 @@ import (
 	"sync"
 	"time"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
@@ -111,7 +112,7 @@ type NetworkServer struct {
 
 	devices DeviceRegistry
 
-	NetID types.NetID
+	netID types.NetID
 
 	applicationServersMu *sync.RWMutex
 	applicationServers   map[string]*applicationUpStream
@@ -131,6 +132,8 @@ type NetworkServer struct {
 	jsClient NsJsClientFunc
 
 	handleASUplink func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, up *ttnpb.ApplicationUp) (bool, error)
+
+	defaultMACSettings ttnpb.MACSettings
 }
 
 // Option configures the NetworkServer.
@@ -197,20 +200,36 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 	ns := &NetworkServer{
 		Component:               c,
 		devices:                 conf.Devices,
-		downlinkTasks:           conf.DownlinkTasks,
-		downlinkPriorities:      downlinkPriorities,
+		netID:                   conf.NetID,
 		applicationServersMu:    &sync.RWMutex{},
 		applicationServers:      make(map[string]*applicationUpStream),
 		metadataAccumulators:    &sync.Map{},
 		metadataAccumulatorPool: &sync.Pool{},
 		hashPool:                &sync.Pool{},
 		macHandlers:             &sync.Map{},
+		downlinkTasks:           conf.DownlinkTasks,
+		downlinkPriorities:      downlinkPriorities,
+		defaultMACSettings: ttnpb.MACSettings{
+			ClassBTimeout:         conf.DefaultMACSettings.ClassBTimeout,
+			ClassCTimeout:         conf.DefaultMACSettings.ClassCTimeout,
+			StatusTimePeriodicity: conf.DefaultMACSettings.StatusTimePeriodicity,
+		},
 	}
 	ns.hashPool.New = func() interface{} {
 		return fnv.New64a()
 	}
 	ns.metadataAccumulatorPool.New = func() interface{} {
 		return &metadataAccumulator{}
+	}
+
+	if conf.DefaultMACSettings.ADRMargin != nil {
+		ns.defaultMACSettings.ADRMargin = &pbtypes.FloatValue{Value: *conf.DefaultMACSettings.ADRMargin}
+	}
+	if conf.DefaultMACSettings.DesiredRx1Delay != nil {
+		ns.defaultMACSettings.DesiredRx1Delay = &ttnpb.MACSettings_RxDelayValue{Value: *conf.DefaultMACSettings.DesiredRx1Delay}
+	}
+	if conf.DefaultMACSettings.StatusCountPeriodicity != nil {
+		ns.defaultMACSettings.StatusCountPeriodicity = &pbtypes.UInt32Value{Value: *conf.DefaultMACSettings.StatusCountPeriodicity}
 	}
 
 	for _, opt := range opts {

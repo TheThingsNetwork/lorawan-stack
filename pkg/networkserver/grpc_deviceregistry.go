@@ -42,85 +42,203 @@ func validABPSessionKey(key *ttnpb.KeyEnvelope) bool {
 
 // Set implements NsEndDeviceRegistryServer.
 func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest) (*ttnpb.EndDevice, error) {
+	if err := ttnpb.ProhibitFields(req.FieldMask.Paths,
+		"mac_state.current_parameters",
+		"mac_state.desired_parameters",
+		"pending_session",
+		"session.keys.app_s_key",
+	); err != nil {
+		return nil, errInvalidFieldMask.WithCause(err)
+	}
+
 	if err := rights.RequireApplication(ctx, req.Device.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
+
+	gets := append(req.FieldMask.Paths[:0:0], req.FieldMask.Paths...)
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "queued_application_downlinks") {
+		gets = append(gets,
+			"mac_state.device_class",
+		)
+	}
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.device_class") {
+		gets = append(gets,
+			"mac_state.current_parameters",
+			"mac_state.desired_parameters",
+			"queued_application_downlinks",
+		)
+	}
+
 	var addDownlinkTask bool
-	dev, err := ns.devices.SetByID(ctx, req.Device.EndDeviceIdentifiers.ApplicationIdentifiers, req.Device.EndDeviceIdentifiers.DeviceID, req.FieldMask.Paths, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
-		paths := req.FieldMask.Paths
+	dev, err := ns.devices.SetByID(ctx, req.Device.EndDeviceIdentifiers.ApplicationIdentifiers, req.Device.EndDeviceIdentifiers.DeviceID, gets, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		if dev != nil {
-			addDownlinkTask = ttnpb.HasAnyField(paths, "mac_state.device_class") && req.Device.MACState.DeviceClass != ttnpb.CLASS_A ||
-				ttnpb.HasAnyField(paths, "queued_application_downlinks") && len(req.Device.QueuedApplicationDownlinks) > 0
-			return &req.Device, paths, nil
+			if err := ttnpb.ProhibitFields(req.FieldMask.Paths,
+				"session",
+			); err != nil {
+				return nil, nil, errInvalidFieldMask.WithCause(err)
+			}
+
+			addDownlinkTask = ttnpb.HasAnyField(req.FieldMask.Paths,
+				"mac_state.device_class",
+				"queued_application_downlinks",
+			) && req.Device.MACState.DeviceClass != ttnpb.CLASS_A &&
+				(len(req.Device.QueuedApplicationDownlinks) > 0 || !req.Device.MACState.CurrentParameters.Equal(req.Device.MACState.DesiredParameters))
+			return &req.Device, req.FieldMask.Paths, nil
 		}
 
-		if ttnpb.HasAnyField(paths, "version_ids") {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.dev_addr") && (req.Device.Session == nil || req.Device.Session.DevAddr.IsZero()) {
+			return nil, nil, errInvalidFieldValue.WithAttributes("field", "session.dev_addr")
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.session_key_id") && (req.Device.Session == nil || len(req.Device.Session.SessionKeys.GetSessionKeyID()) == 0) {
+			return nil, nil, errInvalidFieldValue.WithAttributes("field", "session.keys.session_key_id")
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.f_nwk_s_int_key.key") && (req.Device.Session == nil || len(req.Device.Session.SessionKeys.GetFNwkSIntKey().GetKey()) == 0) {
+			return nil, nil, errInvalidFieldValue.WithAttributes("field", "session.keys.f_nwk_s_int_key.key")
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.f_nwk_s_int_key.kek_label") && (req.Device.Session == nil || len(req.Device.Session.SessionKeys.GetFNwkSIntKey().GetKEKLabel()) == 0) {
+			return nil, nil, errInvalidFieldValue.WithAttributes("field", "session.keys.f_nwk_s_int_key.kek_label")
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.s_nwk_s_int_key.key") && (req.Device.Session == nil || len(req.Device.Session.SessionKeys.GetSNwkSIntKey().GetKey()) == 0) {
+			return nil, nil, errInvalidFieldValue.WithAttributes("field", "session.keys.s_nwk_s_int_key.key")
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.s_nwk_s_int_key.kek_label") && (req.Device.Session == nil || len(req.Device.Session.SessionKeys.GetSNwkSIntKey().GetKEKLabel()) == 0) {
+			return nil, nil, errInvalidFieldValue.WithAttributes("field", "session.keys.s_nwk_s_int_key.kek_label")
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.nwk_s_enc_key.key") && (req.Device.Session == nil || len(req.Device.Session.SessionKeys.GetNwkSEncKey().GetKey()) == 0) {
+			return nil, nil, errInvalidFieldValue.WithAttributes("field", "session.keys.nwk_s_enc_key.key")
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.nwk_s_enc_key.kek_label") && (req.Device.Session == nil || len(req.Device.Session.SessionKeys.GetNwkSEncKey().GetKEKLabel()) == 0) {
+			return nil, nil, errInvalidFieldValue.WithAttributes("field", "session.keys.nwk_s_enc_key.kek_label")
+		}
+
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.class_b_timeout") && req.Device.GetMACSettings().GetClassBTimeout() == nil {
+			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.class_b_timeout")
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.ping_slot_periodicity") && req.Device.GetMACSettings().GetPingSlotPeriodicity() == nil {
+			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.ping_slot_periodicity")
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.ping_slot_date_rate_index") && req.Device.GetMACSettings().GetPingSlotDataRateIndex() == nil {
+			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.ping_slot_date_rate_index")
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.ping_slot_frequency") && req.Device.GetMACSettings().GetPingSlotFrequency() == 0 {
+			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.ping_slot_frequency")
+		}
+
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.class_c_timeout") && req.Device.GetMACSettings().GetClassCTimeout() == nil {
+			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.class_c_timeout")
+		}
+
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.rx1_delay") && req.Device.GetMACSettings().GetRx1Delay() == nil {
+			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.rx1_delay")
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.rx1_data_rate_offset") && req.Device.GetMACSettings().GetRx1DataRateOffset() == nil {
+			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.rx1_data_rate_offset")
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.rx2_data_rate_index") && req.Device.GetMACSettings().GetRx2DataRateIndex() == nil {
+			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.rx2_data_rate_index")
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.rx2_frequency") && req.Device.GetMACSettings().GetRx2Frequency() == 0 {
+			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.rx2_frequency")
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.factory_preset_frequencies") && len(req.Device.GetMACSettings().GetFactoryPresetFrequencies()) == 0 {
+			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.factory_preset_frequencies")
+		}
+
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.max_duty_cycle") && req.Device.GetMACSettings().GetMaxDutyCycle() == nil {
+			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.max_duty_cycle")
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.supports_32_bit_f_cnt") && req.Device.GetMACSettings().GetSupports32BitFCnt() == nil {
+			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.supports_32_bit_f_cnt")
+		}
+
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.use_adr") && req.Device.GetMACSettings().GetUseADR() == nil {
+			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.use_adr")
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.adr_margin") && req.Device.GetMACSettings().GetADRMargin() == nil {
+			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.adr_margin")
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.resets_f_cnt") && req.Device.GetMACSettings().GetResetsFCnt() == nil {
+			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.resets_f_cnt")
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.status_time_periodicity") && req.Device.GetMACSettings().GetStatusTimePeriodicity() == nil {
+			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.status_time_periodicity")
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.status_count_periodicity") && req.Device.GetMACSettings().GetStatusCountPeriodicity() == nil {
+			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.status_count_periodicity")
+		}
+
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.desired_rx1_delay") && req.Device.GetMACSettings().GetDesiredRx1Delay() == nil {
+			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.desired_rx1_delay")
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.desired_rx1_data_rate_offset") && req.Device.GetMACSettings().GetDesiredRx1DataRateOffset() == nil {
+			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.desired_rx1_data_rate_offset")
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.desired_rx2_data_rate_index") && req.Device.GetMACSettings().GetDesiredRx2DataRateIndex() == nil {
+			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.desired_rx2_data_rate_index")
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.desired_rx2_frequency") && req.Device.GetMACSettings().GetDesiredRx2Frequency() == 0 {
+			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.desired_rx2_frequency")
+		}
+
+		sets := append(req.FieldMask.Paths[:0:0], req.FieldMask.Paths...)
+		if ttnpb.HasAnyField(sets, "version_ids") {
 			// TODO: Apply version IDs (https://github.com/TheThingsIndustries/lorawan-stack/issues/1544)
 		}
 
-		if err := ttnpb.RequireFields(paths,
+		if err := ttnpb.RequireFields(sets,
 			"frequency_plan_id",
 			"lorawan_phy_version",
 			"lorawan_version",
-			"mac_settings.use_adr",
-			"resets_f_cnt",
-			"resets_join_nonces",
-			"supports_class_b",
-			"supports_class_c",
 			"supports_join",
-			"uses_32_bit_f_cnt",
 		); err != nil {
 			return nil, nil, errInvalidFieldMask.WithCause(err)
 		}
-
-		if req.Device.MACSettings == nil {
-			return nil, nil, errNoMACSettings
+		if len(req.Device.FrequencyPlanID) == 0 {
+			return nil, nil, errInvalidFieldValue.WithAttributes("field", "frequency_plan_id")
+		}
+		if err := req.Device.LoRaWANVersion.Validate(); err != nil {
+			return nil, nil, errInvalidFieldValue.WithAttributes("field", "lorawan_version").WithCause(err)
+		}
+		if req.Device.LoRaWANPHYVersion == ttnpb.PHY_UNKNOWN {
+			return nil, nil, errInvalidFieldValue.WithAttributes("field", "lorawan_phy_version")
 		}
 
-		if !ttnpb.HasAnyField(paths, "mac_settings.adr_margin") {
-			// TODO: Apply NS-wide default (https://github.com/TheThingsIndustries/lorawan-stack/issues/1544)
-			req.Device.MACSettings.ADRMargin = 15
-			paths = append(paths, "mac_settings.adr_margin")
-		} else if req.Device.MACSettings.ADRMargin == 0 {
-			return nil, nil, errInvalidADRMargin
-		}
-
-		if !ttnpb.HasAnyField(paths, "mac_settings.class_b_timeout") {
-			// TODO: Apply NS-wide default if not set (https://github.com/TheThingsIndustries/lorawan-stack/issues/1544)
-			req.Device.MACSettings.ClassBTimeout = time.Minute
-			paths = append(paths, "mac_settings.class_b_timeout")
-		} else if req.Device.MACSettings.ClassBTimeout == 0 {
-			return nil, nil, errInvalidClassBTimeout
-		}
-
-		if !ttnpb.HasAnyField(paths, "mac_settings.class_c_timeout") {
-			// TODO: Apply NS-wide default if not set (https://github.com/TheThingsIndustries/lorawan-stack/issues/1544)
-			req.Device.MACSettings.ClassCTimeout = 10 * time.Second
-			paths = append(paths, "mac_settings.class_c_timeout")
-		} else if req.Device.MACSettings.ClassCTimeout == 0 {
-			return nil, nil, errInvalidClassCTimeout
+		if ttnpb.HasAnyField(sets, "supports_class_b") && req.Device.SupportsClassB {
+			if err := ttnpb.RequireFields(sets,
+				"mac_settings.ping_slot_date_rate_index",
+				"mac_settings.ping_slot_frequency",
+				"mac_settings.ping_slot_periodicity",
+			); err != nil {
+				return nil, nil, errInvalidFieldMask.WithCause(err)
+			}
 		}
 
 		if req.Device.SupportsJoin {
-			return &req.Device, paths, nil
+			if req.Device.EndDeviceIdentifiers.JoinEUI == nil {
+				return nil, nil, errNoJoinEUI
+			}
+			if req.Device.EndDeviceIdentifiers.DevEUI == nil {
+				return nil, nil, errNoDevEUI
+			}
+			if !ttnpb.HasAnyField([]string{"session"}, sets...) {
+				return &req.Device, sets, nil
+			}
 		}
 
-		if err := ttnpb.RequireFields(paths,
+		if err := ttnpb.RequireFields(sets,
 			"session.dev_addr",
 			"session.keys.f_nwk_s_int_key.key",
 		); err != nil {
 			return nil, nil, errInvalidFieldMask.WithCause(err)
 		}
-		if req.Device.Session == nil {
-			return nil, nil, errEmptySession
-		}
+		req.Device.EndDeviceIdentifiers.DevAddr = &req.Device.Session.DevAddr
 
 		if !validABPSessionKey(req.Device.Session.FNwkSIntKey) {
 			return nil, nil, errInvalidFNwkSIntKey
 		}
 
 		if req.Device.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
-			if err := ttnpb.RequireFields(paths,
+			if err := ttnpb.RequireFields(sets,
 				"session.keys.nwk_s_enc_key.key",
 				"session.keys.s_nwk_s_int_key.key",
 			); err != nil {
@@ -135,7 +253,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				return nil, nil, errInvalidNwkSEncKey
 			}
 		} else {
-			if err := ttnpb.ProhibitFields(paths,
+			if err := ttnpb.ProhibitFields(sets,
 				"session.keys.nwk_s_enc_key.key",
 				"session.keys.s_nwk_s_int_key.key",
 			); err != nil {
@@ -144,21 +262,30 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			// TODO: Encrypt (https://github.com/TheThingsIndustries/lorawan-stack/issues/1562)
 			req.Device.Session.SNwkSIntKey = req.Device.Session.FNwkSIntKey
 			req.Device.Session.NwkSEncKey = req.Device.Session.FNwkSIntKey
-			paths = append(paths, "session.keys.s_nwk_s_int_key", "session.keys.nwk_s_enc_key")
+			sets = append(sets,
+				"session.keys.nwk_s_enc_key.kek_label",
+				"session.keys.nwk_s_enc_key.key",
+				"session.keys.s_nwk_s_int_key.kek_label",
+				"session.keys.s_nwk_s_int_key.key",
+			)
 		}
-		req.Device.Session.StartedAt = time.Now().UTC()
-		paths = append(paths, "session.started_at")
 
-		if err := resetMACState(&req.Device, ns.FrequencyPlans); err != nil {
+		if ttnpb.HasAnyField(sets, "session.started_at") && req.Device.GetSession().GetStartedAt().IsZero() {
+			return nil, nil, errInvalidFieldValue.WithAttributes("field", "session.started_at")
+		} else if !ttnpb.HasAnyField(sets, "session.started_at") {
+			req.Device.Session.StartedAt = time.Now().UTC()
+			sets = append(sets, "session.started_at")
+		}
+
+		if err := resetMACState(&req.Device, ns.FrequencyPlans, ns.defaultMACSettings); err != nil {
 			return nil, nil, err
 		}
-		if req.Device.MACState.DeviceClass != ttnpb.CLASS_A {
-			addDownlinkTask = len(req.Device.QueuedApplicationDownlinks) > 0 ||
-				!req.Device.MACState.CurrentParameters.Equal(req.Device.MACState.DesiredParameters)
-		}
-		paths = append(paths, "mac_state")
+		sets = append(sets, "mac_state")
 
-		return &req.Device, paths, nil
+		addDownlinkTask = req.Device.MACState.DeviceClass != ttnpb.CLASS_A &&
+			(len(req.Device.QueuedApplicationDownlinks) > 0 || !req.Device.MACState.CurrentParameters.Equal(req.Device.MACState.DesiredParameters))
+
+		return &req.Device, sets, nil
 	})
 	if err != nil {
 		return nil, err

@@ -121,6 +121,10 @@
     - [MACParameters](#ttn.lorawan.v3.MACParameters)
     - [MACParameters.Channel](#ttn.lorawan.v3.MACParameters.Channel)
     - [MACSettings](#ttn.lorawan.v3.MACSettings)
+    - [MACSettings.AggregatedDutyCycleValue](#ttn.lorawan.v3.MACSettings.AggregatedDutyCycleValue)
+    - [MACSettings.DataRateIndexValue](#ttn.lorawan.v3.MACSettings.DataRateIndexValue)
+    - [MACSettings.PingSlotPeriodValue](#ttn.lorawan.v3.MACSettings.PingSlotPeriodValue)
+    - [MACSettings.RxDelayValue](#ttn.lorawan.v3.MACSettings.RxDelayValue)
     - [MACState](#ttn.lorawan.v3.MACState)
     - [MACState.JoinAccept](#ttn.lorawan.v3.MACState.JoinAccept)
     - [Session](#ttn.lorawan.v3.Session)
@@ -1522,16 +1526,13 @@ SDKs are responsible for combining (if desired) the three.
 | lorawan_version | [MACVersion](#ttn.lorawan.v3.MACVersion) |  | LoRaWAN MAC version. Stored in Network Server. Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any. |
 | lorawan_phy_version | [PHYVersion](#ttn.lorawan.v3.PHYVersion) |  | LoRaWAN PHY version. Stored in Network Server. Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any. |
 | frequency_plan_id | [string](#string) |  | ID of the frequency plan used by this device. Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any. |
-| default_mac_parameters | [MACParameters](#ttn.lorawan.v3.MACParameters) |  | Default MAC layer parameters, to which device is reset by default (e.g. on join or ResetInd). Stored in Network Server. Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any. |
 | min_frequency | [uint64](#uint64) |  | Minimum frequency the device is capable of using (Hz). Stored in Network Server. Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any. |
 | max_frequency | [uint64](#uint64) |  | Maximum frequency the device is capable of using (Hz). Stored in Network Server. Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any. |
-| resets_f_cnt | [bool](#bool) |  | Whether the device resets the frame counters (not LoRaWAN compliant). Stored in Network Server. Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any. |
-| uses_32_bit_f_cnt | [bool](#bool) |  | Whether the device uses 32-bit frame counters. Stored in Network Server. Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any. |
 | supports_join | [bool](#bool) |  | The device supports join (it&#39;s OTAA). Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any. |
-| resets_join_nonces | [bool](#bool) |  | Whether the device resets the join and dev nonces (not LoRaWAN 1.1 compliant). Stored in Network Server. Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any. |
+| resets_join_nonces | [bool](#bool) |  | Whether the device resets the join and dev nonces (not LoRaWAN 1.1 compliant). Stored in Join Server. Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any. |
 | root_keys | [RootKeys](#ttn.lorawan.v3.RootKeys) |  | Device root keys. Stored in Join Server. |
 | net_id | [bytes](#bytes) |  | Home NetID. Stored in Join Server. |
-| mac_settings | [MACSettings](#ttn.lorawan.v3.MACSettings) |  | Settings for how the Network Server handles MAC for this device. Stored in Network Server. |
+| mac_settings | [MACSettings](#ttn.lorawan.v3.MACSettings) |  | Settings for how the Network Server handles MAC layer for this device. Stored in Network Server. |
 | mac_state | [MACState](#ttn.lorawan.v3.MACState) |  | MAC state of the device. Stored in Network Server. |
 | session | [Session](#ttn.lorawan.v3.Session) |  | Current session of the device. Stored in Network Server and Application Server. |
 | pending_session | [Session](#ttn.lorawan.v3.Session) |  | Pending session. Stored in Network Server and Application Server until RekeyInd is received. |
@@ -1639,11 +1640,10 @@ Template for creating end devices.
 | photos | [string](#string) | repeated | Photos contains file names of device photos. |
 | supports_class_b | [bool](#bool) |  | Whether the device supports class B. |
 | supports_class_c | [bool](#bool) |  | Whether the device supports class C. |
-| default_mac_parameters | [MACParameters](#ttn.lorawan.v3.MACParameters) |  | Default MAC layer parameters, to which device is reset by default (e.g. on join or ResetInd). |
+| default_mac_settings | [MACSettings](#ttn.lorawan.v3.MACSettings) |  | Default MAC layer settings of the device. |
 | min_frequency | [uint64](#uint64) |  | Minimum frequency the device is capable of using (Hz). |
 | max_frequency | [uint64](#uint64) |  | Maximum frequency the device is capable of using (Hz). |
 | resets_f_cnt | [bool](#bool) |  | Whether the device resets the frame counters (not LoRaWAN compliant). |
-| uses_32_bit_f_cnt | [bool](#bool) |  | Whether the device uses 32-bit frame counters. |
 | supports_join | [bool](#bool) |  | The device supports join (it&#39;s OTAA). |
 | resets_join_nonces | [bool](#bool) |  | Whether the device resets the join and dev nonces (not LoRaWAN 1.1 compliant). |
 | default_formatters | [MessagePayloadFormatters](#ttn.lorawan.v3.MessagePayloadFormatters) |  | Default formatters defining the payload formats for this end device. |
@@ -1742,13 +1742,13 @@ This is used internally by the Network Server and is read only.
 | rx1_data_rate_offset | [uint32](#uint32) |  | Data rate offset for Rx1. |
 | rx2_data_rate_index | [DataRateIndex](#ttn.lorawan.v3.DataRateIndex) |  | Data rate index for Rx2. |
 | rx2_frequency | [uint64](#uint64) |  | Frequency for Rx2 (Hz). |
+| max_duty_cycle | [AggregatedDutyCycle](#ttn.lorawan.v3.AggregatedDutyCycle) |  | Maximum uplink duty cycle (of all channels). |
 | rejoin_time_periodicity | [RejoinTimeExponent](#ttn.lorawan.v3.RejoinTimeExponent) |  | Time within which a rejoin-request must be sent. |
 | rejoin_count_periodicity | [RejoinCountExponent](#ttn.lorawan.v3.RejoinCountExponent) |  | Message count within which a rejoin-request must be sent. |
-| max_duty_cycle | [AggregatedDutyCycle](#ttn.lorawan.v3.AggregatedDutyCycle) |  | Maximum uplink duty cycle (of all channels). |
-| channels | [MACParameters.Channel](#ttn.lorawan.v3.MACParameters.Channel) | repeated | Configured uplink channels and optionally Rx1 frequency. |
 | ping_slot_frequency | [uint64](#uint64) |  | Frequency of the class B ping slot (Hz). |
 | ping_slot_data_rate_index | [DataRateIndex](#ttn.lorawan.v3.DataRateIndex) |  | Data rate index of the class B ping slot. |
 | beacon_frequency | [uint64](#uint64) |  | Frequency of the class B beacon (Hz). |
+| channels | [MACParameters.Channel](#ttn.lorawan.v3.MACParameters.Channel) | repeated | Configured uplink channels and optionally Rx1 frequency. |
 
 
 
@@ -1782,12 +1782,87 @@ This is used internally by the Network Server and is read only.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| use_adr | [bool](#bool) |  |  |
-| adr_margin | [uint32](#uint32) |  | The ADR margin tells the network server how much margin it should add in ADR requests. A bigger margin is less efficient, but gives a better chance of successful reception. |
-| class_b_timeout | [google.protobuf.Duration](#google.protobuf.Duration) |  | Deadline for the device to respond to requests from the Network Server. |
-| class_c_timeout | [google.protobuf.Duration](#google.protobuf.Duration) |  | Deadline for the device to respond to requests from the Network Server. |
-| status_time_periodicity | [google.protobuf.Duration](#google.protobuf.Duration) |  | The interval after which a DevStatusReq MACCommand shall be sent. |
-| status_count_periodicity | [uint32](#uint32) |  | Number of uplink messages after which a DevStatusReq MACCommand shall be sent. |
+| class_b_timeout | [google.protobuf.Duration](#google.protobuf.Duration) |  | Maximum delay for the device to answer a MAC request or a confirmed downlink frame. If unset, the default value from Network Server configuration will be used. |
+| ping_slot_periodicity | [MACSettings.PingSlotPeriodValue](#ttn.lorawan.v3.MACSettings.PingSlotPeriodValue) |  | Periodicity of the class B ping slot. If unset, the default value from Network Server configuration will be used. |
+| ping_slot_data_rate_index | [MACSettings.DataRateIndexValue](#ttn.lorawan.v3.MACSettings.DataRateIndexValue) |  | Data rate index of the class B ping slot. If unset, the default value from Network Server configuration will be used. |
+| ping_slot_frequency | [uint64](#uint64) |  | Frequency of the class B ping slot (Hz). If unset, the default value from Network Server configuration will be used. |
+| class_c_timeout | [google.protobuf.Duration](#google.protobuf.Duration) |  | Maximum delay for the device to answer a MAC request or a confirmed downlink frame. If unset, the default value from Network Server configuration will be used. |
+| rx1_delay | [MACSettings.RxDelayValue](#ttn.lorawan.v3.MACSettings.RxDelayValue) |  | Class A Rx1 delay. If unset, the default value from Network Server configuration or regional parameters specification will be used. |
+| rx1_data_rate_offset | [google.protobuf.UInt32Value](#google.protobuf.UInt32Value) |  | Rx1 data rate offset. If unset, the default value from Network Server configuration will be used. |
+| rx2_data_rate_index | [MACSettings.DataRateIndexValue](#ttn.lorawan.v3.MACSettings.DataRateIndexValue) |  | Data rate index for Rx2. If unset, the default value from Network Server configuration or regional parameters specification will be used. |
+| rx2_frequency | [uint64](#uint64) |  | Frequency for Rx2 (Hz). If unset, the default value from Network Server configuration or regional parameters specification will be used. |
+| factory_preset_frequencies | [uint64](#uint64) | repeated | List of factory-preset frequencies. If unset, the default value from Network Server configuration or regional parameters specification will be used. |
+| max_duty_cycle | [MACSettings.AggregatedDutyCycleValue](#ttn.lorawan.v3.MACSettings.AggregatedDutyCycleValue) |  | Maximum uplink duty cycle (of all channels). |
+| supports_32_bit_f_cnt | [google.protobuf.BoolValue](#google.protobuf.BoolValue) |  | Whether the device supports 32-bit frame counters. If unset, the default value from Network Server configuration will be used. |
+| use_adr | [google.protobuf.BoolValue](#google.protobuf.BoolValue) |  | Whether the Network Server should use ADR for the device. If unset, the default value from Network Server configuration will be used. |
+| adr_margin | [google.protobuf.FloatValue](#google.protobuf.FloatValue) |  | The ADR margin tells the network server how much margin it should add in ADR requests. A bigger margin is less efficient, but gives a better chance of successful reception. If unset, the default value from Network Server configuration will be used. |
+| resets_f_cnt | [google.protobuf.BoolValue](#google.protobuf.BoolValue) |  | Whether the device resets the frame counters (not LoRaWAN compliant). If unset, the default value from Network Server configuration will be used. |
+| status_time_periodicity | [google.protobuf.Duration](#google.protobuf.Duration) |  | The interval after which a DevStatusReq MACCommand shall be sent. If unset, the default value from Network Server configuration will be used. |
+| status_count_periodicity | [google.protobuf.UInt32Value](#google.protobuf.UInt32Value) |  | Number of uplink messages after which a DevStatusReq MACCommand shall be sent. If unset, the default value from Network Server configuration will be used. |
+| desired_rx1_delay | [MACSettings.RxDelayValue](#ttn.lorawan.v3.MACSettings.RxDelayValue) |  | The Rx1 delay Network Server should configure device to use via MAC commands or Join-Accept. If unset, the default value from Network Server configuration or regional parameters specification will be used. |
+| desired_rx1_data_rate_offset | [google.protobuf.UInt32Value](#google.protobuf.UInt32Value) |  | The Rx1 data rate offset Network Server should configure device to use via MAC commands or Join-Accept. If unset, the default value from Network Server configuration will be used. |
+| desired_rx2_data_rate_index | [MACSettings.DataRateIndexValue](#ttn.lorawan.v3.MACSettings.DataRateIndexValue) |  | The Rx2 data rate index Network Server should configure device to use via MAC commands or Join-Accept. If unset, the default value from frequency plan, Network Server configuration or regional parameters specification will be used. |
+| desired_rx2_frequency | [uint64](#uint64) |  | The Rx2 frequency index Network Server should configure device to use via MAC commands. If unset, the default value from frequency plan, Network Server configuration or regional parameters specification will be used. |
+
+
+
+
+
+
+<a name="ttn.lorawan.v3.MACSettings.AggregatedDutyCycleValue"/>
+
+### MACSettings.AggregatedDutyCycleValue
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| value | [AggregatedDutyCycle](#ttn.lorawan.v3.AggregatedDutyCycle) |  |  |
+
+
+
+
+
+
+<a name="ttn.lorawan.v3.MACSettings.DataRateIndexValue"/>
+
+### MACSettings.DataRateIndexValue
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| value | [DataRateIndex](#ttn.lorawan.v3.DataRateIndex) |  |  |
+
+
+
+
+
+
+<a name="ttn.lorawan.v3.MACSettings.PingSlotPeriodValue"/>
+
+### MACSettings.PingSlotPeriodValue
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| value | [PingSlotPeriod](#ttn.lorawan.v3.PingSlotPeriod) |  |  |
+
+
+
+
+
+
+<a name="ttn.lorawan.v3.MACSettings.RxDelayValue"/>
+
+### MACSettings.RxDelayValue
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| value | [RxDelay](#ttn.lorawan.v3.RxDelay) |  |  |
 
 
 

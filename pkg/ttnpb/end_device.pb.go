@@ -62,7 +62,7 @@ var PowerState_value = map[string]int32{
 }
 
 func (PowerState) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_f8ea6acb7b9cd33a, []int{0}
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{0}
 }
 
 type Session struct {
@@ -87,7 +87,7 @@ type Session struct {
 func (m *Session) Reset()      { *m = Session{} }
 func (*Session) ProtoMessage() {}
 func (*Session) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_f8ea6acb7b9cd33a, []int{0}
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{0}
 }
 func (m *Session) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -178,28 +178,28 @@ type MACParameters struct {
 	Rx2DataRateIndex DataRateIndex `protobuf:"varint,11,opt,name=rx2_data_rate_index,json=rx2DataRateIndex,proto3,enum=ttn.lorawan.v3.DataRateIndex" json:"rx2_data_rate_index,omitempty"`
 	// Frequency for Rx2 (Hz).
 	Rx2Frequency uint64 `protobuf:"varint,12,opt,name=rx2_frequency,json=rx2Frequency,proto3" json:"rx2_frequency,omitempty"`
-	// Time within which a rejoin-request must be sent.
-	RejoinTimePeriodicity RejoinTimeExponent `protobuf:"varint,13,opt,name=rejoin_time_periodicity,json=rejoinTimePeriodicity,proto3,enum=ttn.lorawan.v3.RejoinTimeExponent" json:"rejoin_time_periodicity,omitempty"`
-	// Message count within which a rejoin-request must be sent.
-	RejoinCountPeriodicity RejoinCountExponent `protobuf:"varint,14,opt,name=rejoin_count_periodicity,json=rejoinCountPeriodicity,proto3,enum=ttn.lorawan.v3.RejoinCountExponent" json:"rejoin_count_periodicity,omitempty"`
 	// Maximum uplink duty cycle (of all channels).
-	MaxDutyCycle AggregatedDutyCycle `protobuf:"varint,15,opt,name=max_duty_cycle,json=maxDutyCycle,proto3,enum=ttn.lorawan.v3.AggregatedDutyCycle" json:"max_duty_cycle,omitempty"`
-	// Configured uplink channels and optionally Rx1 frequency.
-	Channels []*MACParameters_Channel `protobuf:"bytes,16,rep,name=channels,proto3" json:"channels,omitempty"`
+	MaxDutyCycle AggregatedDutyCycle `protobuf:"varint,13,opt,name=max_duty_cycle,json=maxDutyCycle,proto3,enum=ttn.lorawan.v3.AggregatedDutyCycle" json:"max_duty_cycle,omitempty"`
+	// Time within which a rejoin-request must be sent.
+	RejoinTimePeriodicity RejoinTimeExponent `protobuf:"varint,14,opt,name=rejoin_time_periodicity,json=rejoinTimePeriodicity,proto3,enum=ttn.lorawan.v3.RejoinTimeExponent" json:"rejoin_time_periodicity,omitempty"`
+	// Message count within which a rejoin-request must be sent.
+	RejoinCountPeriodicity RejoinCountExponent `protobuf:"varint,15,opt,name=rejoin_count_periodicity,json=rejoinCountPeriodicity,proto3,enum=ttn.lorawan.v3.RejoinCountExponent" json:"rejoin_count_periodicity,omitempty"`
 	// Frequency of the class B ping slot (Hz).
-	PingSlotFrequency uint64 `protobuf:"varint,17,opt,name=ping_slot_frequency,json=pingSlotFrequency,proto3" json:"ping_slot_frequency,omitempty"`
+	PingSlotFrequency uint64 `protobuf:"varint,16,opt,name=ping_slot_frequency,json=pingSlotFrequency,proto3" json:"ping_slot_frequency,omitempty"`
 	// Data rate index of the class B ping slot.
-	PingSlotDataRateIndex DataRateIndex `protobuf:"varint,18,opt,name=ping_slot_data_rate_index,json=pingSlotDataRateIndex,proto3,enum=ttn.lorawan.v3.DataRateIndex" json:"ping_slot_data_rate_index,omitempty"`
+	PingSlotDataRateIndex DataRateIndex `protobuf:"varint,17,opt,name=ping_slot_data_rate_index,json=pingSlotDataRateIndex,proto3,enum=ttn.lorawan.v3.DataRateIndex" json:"ping_slot_data_rate_index,omitempty"`
 	// Frequency of the class B beacon (Hz).
-	BeaconFrequency      uint64   `protobuf:"varint,19,opt,name=beacon_frequency,json=beaconFrequency,proto3" json:"beacon_frequency,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	BeaconFrequency uint64 `protobuf:"varint,18,opt,name=beacon_frequency,json=beaconFrequency,proto3" json:"beacon_frequency,omitempty"`
+	// Configured uplink channels and optionally Rx1 frequency.
+	Channels             []*MACParameters_Channel `protobuf:"bytes,19,rep,name=channels,proto3" json:"channels,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                 `json:"-"`
+	XXX_sizecache        int32                    `json:"-"`
 }
 
 func (m *MACParameters) Reset()      { *m = MACParameters{} }
 func (*MACParameters) ProtoMessage() {}
 func (*MACParameters) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_f8ea6acb7b9cd33a, []int{1}
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{1}
 }
 func (m *MACParameters) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -312,6 +312,13 @@ func (m *MACParameters) GetRx2Frequency() uint64 {
 	return 0
 }
 
+func (m *MACParameters) GetMaxDutyCycle() AggregatedDutyCycle {
+	if m != nil {
+		return m.MaxDutyCycle
+	}
+	return DUTY_CYCLE_1
+}
+
 func (m *MACParameters) GetRejoinTimePeriodicity() RejoinTimeExponent {
 	if m != nil {
 		return m.RejoinTimePeriodicity
@@ -324,20 +331,6 @@ func (m *MACParameters) GetRejoinCountPeriodicity() RejoinCountExponent {
 		return m.RejoinCountPeriodicity
 	}
 	return REJOIN_COUNT_16
-}
-
-func (m *MACParameters) GetMaxDutyCycle() AggregatedDutyCycle {
-	if m != nil {
-		return m.MaxDutyCycle
-	}
-	return DUTY_CYCLE_1
-}
-
-func (m *MACParameters) GetChannels() []*MACParameters_Channel {
-	if m != nil {
-		return m.Channels
-	}
-	return nil
 }
 
 func (m *MACParameters) GetPingSlotFrequency() uint64 {
@@ -361,6 +354,13 @@ func (m *MACParameters) GetBeaconFrequency() uint64 {
 	return 0
 }
 
+func (m *MACParameters) GetChannels() []*MACParameters_Channel {
+	if m != nil {
+		return m.Channels
+	}
+	return nil
+}
+
 type MACParameters_Channel struct {
 	// Uplink frequency of the channel (Hz).
 	UplinkFrequency uint64 `protobuf:"varint,1,opt,name=uplink_frequency,json=uplinkFrequency,proto3" json:"uplink_frequency,omitempty"`
@@ -379,7 +379,7 @@ type MACParameters_Channel struct {
 func (m *MACParameters_Channel) Reset()      { *m = MACParameters_Channel{} }
 func (*MACParameters_Channel) ProtoMessage() {}
 func (*MACParameters_Channel) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_f8ea6acb7b9cd33a, []int{1, 0}
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{1, 0}
 }
 func (m *MACParameters_Channel) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -456,7 +456,7 @@ type EndDeviceBrand struct {
 func (m *EndDeviceBrand) Reset()      { *m = EndDeviceBrand{} }
 func (*EndDeviceBrand) ProtoMessage() {}
 func (*EndDeviceBrand) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_f8ea6acb7b9cd33a, []int{2}
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{2}
 }
 func (m *EndDeviceBrand) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -524,7 +524,7 @@ type EndDeviceModel struct {
 func (m *EndDeviceModel) Reset()      { *m = EndDeviceModel{} }
 func (*EndDeviceModel) ProtoMessage() {}
 func (*EndDeviceModel) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_f8ea6acb7b9cd33a, []int{3}
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{3}
 }
 func (m *EndDeviceModel) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -587,7 +587,7 @@ type EndDeviceVersionIdentifiers struct {
 func (m *EndDeviceVersionIdentifiers) Reset()      { *m = EndDeviceVersionIdentifiers{} }
 func (*EndDeviceVersionIdentifiers) ProtoMessage() {}
 func (*EndDeviceVersionIdentifiers) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_f8ea6acb7b9cd33a, []int{4}
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{4}
 }
 func (m *EndDeviceVersionIdentifiers) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -660,16 +660,14 @@ type EndDeviceVersion struct {
 	SupportsClassB bool `protobuf:"varint,6,opt,name=supports_class_b,json=supportsClassB,proto3" json:"supports_class_b,omitempty"`
 	// Whether the device supports class C.
 	SupportsClassC bool `protobuf:"varint,7,opt,name=supports_class_c,json=supportsClassC,proto3" json:"supports_class_c,omitempty"`
-	// Default MAC layer parameters, to which device is reset by default (e.g. on join or ResetInd).
-	DefaultMACParameters *MACParameters `protobuf:"bytes,8,opt,name=default_mac_parameters,json=defaultMacParameters,proto3" json:"default_mac_parameters,omitempty"`
+	// Default MAC layer settings of the device.
+	DefaultMACSettings *MACSettings `protobuf:"bytes,8,opt,name=default_mac_settings,json=defaultMacSettings,proto3" json:"default_mac_settings,omitempty"`
 	// Minimum frequency the device is capable of using (Hz).
 	MinFrequency uint64 `protobuf:"varint,9,opt,name=min_frequency,json=minFrequency,proto3" json:"min_frequency,omitempty"`
 	// Maximum frequency the device is capable of using (Hz).
 	MaxFrequency uint64 `protobuf:"varint,10,opt,name=max_frequency,json=maxFrequency,proto3" json:"max_frequency,omitempty"`
 	// Whether the device resets the frame counters (not LoRaWAN compliant).
 	ResetsFCnt bool `protobuf:"varint,11,opt,name=resets_f_cnt,json=resetsFCnt,proto3" json:"resets_f_cnt,omitempty"`
-	// Whether the device uses 32-bit frame counters.
-	Uses32BitFCnt bool `protobuf:"varint,12,opt,name=uses_32_bit_f_cnt,json=uses32BitFCnt,proto3" json:"uses_32_bit_f_cnt,omitempty"`
 	// The device supports join (it's OTAA).
 	SupportsJoin bool `protobuf:"varint,13,opt,name=supports_join,json=supportsJoin,proto3" json:"supports_join,omitempty"`
 	// Whether the device resets the join and dev nonces (not LoRaWAN 1.1 compliant).
@@ -683,7 +681,7 @@ type EndDeviceVersion struct {
 func (m *EndDeviceVersion) Reset()      { *m = EndDeviceVersion{} }
 func (*EndDeviceVersion) ProtoMessage() {}
 func (*EndDeviceVersion) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_f8ea6acb7b9cd33a, []int{5}
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{5}
 }
 func (m *EndDeviceVersion) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -754,9 +752,9 @@ func (m *EndDeviceVersion) GetSupportsClassC() bool {
 	return false
 }
 
-func (m *EndDeviceVersion) GetDefaultMACParameters() *MACParameters {
+func (m *EndDeviceVersion) GetDefaultMACSettings() *MACSettings {
 	if m != nil {
-		return m.DefaultMACParameters
+		return m.DefaultMACSettings
 	}
 	return nil
 }
@@ -778,13 +776,6 @@ func (m *EndDeviceVersion) GetMaxFrequency() uint64 {
 func (m *EndDeviceVersion) GetResetsFCnt() bool {
 	if m != nil {
 		return m.ResetsFCnt
-	}
-	return false
-}
-
-func (m *EndDeviceVersion) GetUses32BitFCnt() bool {
-	if m != nil {
-		return m.Uses32BitFCnt
 	}
 	return false
 }
@@ -811,26 +802,77 @@ func (m *EndDeviceVersion) GetDefaultFormatters() MessagePayloadFormatters {
 }
 
 type MACSettings struct {
-	UseADR bool `protobuf:"varint,1,opt,name=use_adr,json=useAdr,proto3" json:"use_adr,omitempty"`
+	// Maximum delay for the device to answer a MAC request or a confirmed downlink frame.
+	// If unset, the default value from Network Server configuration will be used.
+	ClassBTimeout *time.Duration `protobuf:"bytes,1,opt,name=class_b_timeout,json=classBTimeout,proto3,stdduration" json:"class_b_timeout,omitempty"`
+	// Periodicity of the class B ping slot.
+	// If unset, the default value from Network Server configuration will be used.
+	PingSlotPeriodicity *MACSettings_PingSlotPeriodValue `protobuf:"bytes,2,opt,name=ping_slot_periodicity,json=pingSlotPeriodicity,proto3" json:"ping_slot_periodicity,omitempty"`
+	// Data rate index of the class B ping slot.
+	// If unset, the default value from Network Server configuration will be used.
+	PingSlotDataRateIndex *MACSettings_DataRateIndexValue `protobuf:"bytes,3,opt,name=ping_slot_data_rate_index,json=pingSlotDataRateIndex,proto3" json:"ping_slot_data_rate_index,omitempty"`
+	// Frequency of the class B ping slot (Hz).
+	// If unset, the default value from Network Server configuration will be used.
+	PingSlotFrequency uint64 `protobuf:"varint,4,opt,name=ping_slot_frequency,json=pingSlotFrequency,proto3" json:"ping_slot_frequency,omitempty"`
+	// Maximum delay for the device to answer a MAC request or a confirmed downlink frame.
+	// If unset, the default value from Network Server configuration will be used.
+	ClassCTimeout *time.Duration `protobuf:"bytes,5,opt,name=class_c_timeout,json=classCTimeout,proto3,stdduration" json:"class_c_timeout,omitempty"`
+	// Class A Rx1 delay.
+	// If unset, the default value from Network Server configuration or regional parameters specification will be used.
+	Rx1Delay *MACSettings_RxDelayValue `protobuf:"bytes,6,opt,name=rx1_delay,json=rx1Delay,proto3" json:"rx1_delay,omitempty"`
+	// Rx1 data rate offset.
+	// If unset, the default value from Network Server configuration will be used.
+	Rx1DataRateOffset *types.UInt32Value `protobuf:"bytes,7,opt,name=rx1_data_rate_offset,json=rx1DataRateOffset,proto3" json:"rx1_data_rate_offset,omitempty"`
+	// Data rate index for Rx2.
+	// If unset, the default value from Network Server configuration or regional parameters specification will be used.
+	Rx2DataRateIndex *MACSettings_DataRateIndexValue `protobuf:"bytes,8,opt,name=rx2_data_rate_index,json=rx2DataRateIndex,proto3" json:"rx2_data_rate_index,omitempty"`
+	// Frequency for Rx2 (Hz).
+	// If unset, the default value from Network Server configuration or regional parameters specification will be used.
+	Rx2Frequency uint64 `protobuf:"varint,9,opt,name=rx2_frequency,json=rx2Frequency,proto3" json:"rx2_frequency,omitempty"`
+	// List of factory-preset frequencies.
+	// If unset, the default value from Network Server configuration or regional parameters specification will be used.
+	FactoryPresetFrequencies []uint64 `protobuf:"varint,10,rep,packed,name=factory_preset_frequencies,json=factoryPresetFrequencies,proto3" json:"factory_preset_frequencies,omitempty"`
+	// Maximum uplink duty cycle (of all channels).
+	MaxDutyCycle *MACSettings_AggregatedDutyCycleValue `protobuf:"bytes,11,opt,name=max_duty_cycle,json=maxDutyCycle,proto3" json:"max_duty_cycle,omitempty"`
+	// Whether the device supports 32-bit frame counters.
+	// If unset, the default value from Network Server configuration will be used.
+	Supports32BitFCnt *types.BoolValue `protobuf:"bytes,12,opt,name=supports_32_bit_f_cnt,json=supports32BitFCnt,proto3" json:"supports_32_bit_f_cnt,omitempty"`
+	// Whether the Network Server should use ADR for the device.
+	// If unset, the default value from Network Server configuration will be used.
+	UseADR *types.BoolValue `protobuf:"bytes,13,opt,name=use_adr,json=useAdr,proto3" json:"use_adr,omitempty"`
 	// The ADR margin tells the network server how much margin it should add in ADR requests.
 	// A bigger margin is less efficient, but gives a better chance of successful reception.
-	ADRMargin uint32 `protobuf:"varint,2,opt,name=adr_margin,json=adrMargin,proto3" json:"adr_margin,omitempty"`
-	// Deadline for the device to respond to requests from the Network Server.
-	ClassBTimeout time.Duration `protobuf:"bytes,3,opt,name=class_b_timeout,json=classBTimeout,proto3,stdduration" json:"class_b_timeout"`
-	// Deadline for the device to respond to requests from the Network Server.
-	ClassCTimeout time.Duration `protobuf:"bytes,4,opt,name=class_c_timeout,json=classCTimeout,proto3,stdduration" json:"class_c_timeout"`
+	// If unset, the default value from Network Server configuration will be used.
+	ADRMargin *types.FloatValue `protobuf:"bytes,14,opt,name=adr_margin,json=adrMargin,proto3" json:"adr_margin,omitempty"`
+	// Whether the device resets the frame counters (not LoRaWAN compliant).
+	// If unset, the default value from Network Server configuration will be used.
+	ResetsFCnt *types.BoolValue `protobuf:"bytes,15,opt,name=resets_f_cnt,json=resetsFCnt,proto3" json:"resets_f_cnt,omitempty"`
 	// The interval after which a DevStatusReq MACCommand shall be sent.
-	StatusTimePeriodicity time.Duration `protobuf:"bytes,5,opt,name=status_time_periodicity,json=statusTimePeriodicity,proto3,stdduration" json:"status_time_periodicity"`
+	// If unset, the default value from Network Server configuration will be used.
+	StatusTimePeriodicity *time.Duration `protobuf:"bytes,16,opt,name=status_time_periodicity,json=statusTimePeriodicity,proto3,stdduration" json:"status_time_periodicity,omitempty"`
 	// Number of uplink messages after which a DevStatusReq MACCommand shall be sent.
-	StatusCountPeriodicity uint32   `protobuf:"varint,6,opt,name=status_count_periodicity,json=statusCountPeriodicity,proto3" json:"status_count_periodicity,omitempty"`
-	XXX_NoUnkeyedLiteral   struct{} `json:"-"`
-	XXX_sizecache          int32    `json:"-"`
+	// If unset, the default value from Network Server configuration will be used.
+	StatusCountPeriodicity *types.UInt32Value `protobuf:"bytes,17,opt,name=status_count_periodicity,json=statusCountPeriodicity,proto3" json:"status_count_periodicity,omitempty"`
+	// The Rx1 delay Network Server should configure device to use via MAC commands or Join-Accept.
+	// If unset, the default value from Network Server configuration or regional parameters specification will be used.
+	DesiredRx1Delay *MACSettings_RxDelayValue `protobuf:"bytes,18,opt,name=desired_rx1_delay,json=desiredRx1Delay,proto3" json:"desired_rx1_delay,omitempty"`
+	// The Rx1 data rate offset Network Server should configure device to use via MAC commands or Join-Accept.
+	// If unset, the default value from Network Server configuration will be used.
+	DesiredRx1DataRateOffset *types.UInt32Value `protobuf:"bytes,19,opt,name=desired_rx1_data_rate_offset,json=desiredRx1DataRateOffset,proto3" json:"desired_rx1_data_rate_offset,omitempty"`
+	// The Rx2 data rate index Network Server should configure device to use via MAC commands or Join-Accept.
+	// If unset, the default value from frequency plan, Network Server configuration or regional parameters specification will be used.
+	DesiredRx2DataRateIndex *MACSettings_DataRateIndexValue `protobuf:"bytes,20,opt,name=desired_rx2_data_rate_index,json=desiredRx2DataRateIndex,proto3" json:"desired_rx2_data_rate_index,omitempty"`
+	// The Rx2 frequency index Network Server should configure device to use via MAC commands.
+	// If unset, the default value from frequency plan, Network Server configuration or regional parameters specification will be used.
+	DesiredRx2Frequency  uint64   `protobuf:"varint,21,opt,name=desired_rx2_frequency,json=desiredRx2Frequency,proto3" json:"desired_rx2_frequency,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *MACSettings) Reset()      { *m = MACSettings{} }
 func (*MACSettings) ProtoMessage() {}
 func (*MACSettings) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_f8ea6acb7b9cd33a, []int{6}
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{6}
 }
 func (m *MACSettings) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -859,46 +901,331 @@ func (m *MACSettings) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MACSettings proto.InternalMessageInfo
 
-func (m *MACSettings) GetUseADR() bool {
-	if m != nil {
-		return m.UseADR
-	}
-	return false
-}
-
-func (m *MACSettings) GetADRMargin() uint32 {
-	if m != nil {
-		return m.ADRMargin
-	}
-	return 0
-}
-
-func (m *MACSettings) GetClassBTimeout() time.Duration {
+func (m *MACSettings) GetClassBTimeout() *time.Duration {
 	if m != nil {
 		return m.ClassBTimeout
 	}
+	return nil
+}
+
+func (m *MACSettings) GetPingSlotPeriodicity() *MACSettings_PingSlotPeriodValue {
+	if m != nil {
+		return m.PingSlotPeriodicity
+	}
+	return nil
+}
+
+func (m *MACSettings) GetPingSlotDataRateIndex() *MACSettings_DataRateIndexValue {
+	if m != nil {
+		return m.PingSlotDataRateIndex
+	}
+	return nil
+}
+
+func (m *MACSettings) GetPingSlotFrequency() uint64 {
+	if m != nil {
+		return m.PingSlotFrequency
+	}
 	return 0
 }
 
-func (m *MACSettings) GetClassCTimeout() time.Duration {
+func (m *MACSettings) GetClassCTimeout() *time.Duration {
 	if m != nil {
 		return m.ClassCTimeout
 	}
+	return nil
+}
+
+func (m *MACSettings) GetRx1Delay() *MACSettings_RxDelayValue {
+	if m != nil {
+		return m.Rx1Delay
+	}
+	return nil
+}
+
+func (m *MACSettings) GetRx1DataRateOffset() *types.UInt32Value {
+	if m != nil {
+		return m.Rx1DataRateOffset
+	}
+	return nil
+}
+
+func (m *MACSettings) GetRx2DataRateIndex() *MACSettings_DataRateIndexValue {
+	if m != nil {
+		return m.Rx2DataRateIndex
+	}
+	return nil
+}
+
+func (m *MACSettings) GetRx2Frequency() uint64 {
+	if m != nil {
+		return m.Rx2Frequency
+	}
 	return 0
 }
 
-func (m *MACSettings) GetStatusTimePeriodicity() time.Duration {
+func (m *MACSettings) GetFactoryPresetFrequencies() []uint64 {
+	if m != nil {
+		return m.FactoryPresetFrequencies
+	}
+	return nil
+}
+
+func (m *MACSettings) GetMaxDutyCycle() *MACSettings_AggregatedDutyCycleValue {
+	if m != nil {
+		return m.MaxDutyCycle
+	}
+	return nil
+}
+
+func (m *MACSettings) GetSupports32BitFCnt() *types.BoolValue {
+	if m != nil {
+		return m.Supports32BitFCnt
+	}
+	return nil
+}
+
+func (m *MACSettings) GetUseADR() *types.BoolValue {
+	if m != nil {
+		return m.UseADR
+	}
+	return nil
+}
+
+func (m *MACSettings) GetADRMargin() *types.FloatValue {
+	if m != nil {
+		return m.ADRMargin
+	}
+	return nil
+}
+
+func (m *MACSettings) GetResetsFCnt() *types.BoolValue {
+	if m != nil {
+		return m.ResetsFCnt
+	}
+	return nil
+}
+
+func (m *MACSettings) GetStatusTimePeriodicity() *time.Duration {
 	if m != nil {
 		return m.StatusTimePeriodicity
 	}
-	return 0
+	return nil
 }
 
-func (m *MACSettings) GetStatusCountPeriodicity() uint32 {
+func (m *MACSettings) GetStatusCountPeriodicity() *types.UInt32Value {
 	if m != nil {
 		return m.StatusCountPeriodicity
 	}
+	return nil
+}
+
+func (m *MACSettings) GetDesiredRx1Delay() *MACSettings_RxDelayValue {
+	if m != nil {
+		return m.DesiredRx1Delay
+	}
+	return nil
+}
+
+func (m *MACSettings) GetDesiredRx1DataRateOffset() *types.UInt32Value {
+	if m != nil {
+		return m.DesiredRx1DataRateOffset
+	}
+	return nil
+}
+
+func (m *MACSettings) GetDesiredRx2DataRateIndex() *MACSettings_DataRateIndexValue {
+	if m != nil {
+		return m.DesiredRx2DataRateIndex
+	}
+	return nil
+}
+
+func (m *MACSettings) GetDesiredRx2Frequency() uint64 {
+	if m != nil {
+		return m.DesiredRx2Frequency
+	}
 	return 0
+}
+
+type MACSettings_DataRateIndexValue struct {
+	Value                DataRateIndex `protobuf:"varint,1,opt,name=value,proto3,enum=ttn.lorawan.v3.DataRateIndex" json:"value,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
+	XXX_sizecache        int32         `json:"-"`
+}
+
+func (m *MACSettings_DataRateIndexValue) Reset()      { *m = MACSettings_DataRateIndexValue{} }
+func (*MACSettings_DataRateIndexValue) ProtoMessage() {}
+func (*MACSettings_DataRateIndexValue) Descriptor() ([]byte, []int) {
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{6, 0}
+}
+func (m *MACSettings_DataRateIndexValue) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MACSettings_DataRateIndexValue) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MACSettings_DataRateIndexValue.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (dst *MACSettings_DataRateIndexValue) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MACSettings_DataRateIndexValue.Merge(dst, src)
+}
+func (m *MACSettings_DataRateIndexValue) XXX_Size() int {
+	return m.Size()
+}
+func (m *MACSettings_DataRateIndexValue) XXX_DiscardUnknown() {
+	xxx_messageInfo_MACSettings_DataRateIndexValue.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MACSettings_DataRateIndexValue proto.InternalMessageInfo
+
+func (m *MACSettings_DataRateIndexValue) GetValue() DataRateIndex {
+	if m != nil {
+		return m.Value
+	}
+	return DATA_RATE_0
+}
+
+type MACSettings_PingSlotPeriodValue struct {
+	Value                PingSlotPeriod `protobuf:"varint,1,opt,name=value,proto3,enum=ttn.lorawan.v3.PingSlotPeriod" json:"value,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
+	XXX_sizecache        int32          `json:"-"`
+}
+
+func (m *MACSettings_PingSlotPeriodValue) Reset()      { *m = MACSettings_PingSlotPeriodValue{} }
+func (*MACSettings_PingSlotPeriodValue) ProtoMessage() {}
+func (*MACSettings_PingSlotPeriodValue) Descriptor() ([]byte, []int) {
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{6, 1}
+}
+func (m *MACSettings_PingSlotPeriodValue) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MACSettings_PingSlotPeriodValue) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MACSettings_PingSlotPeriodValue.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (dst *MACSettings_PingSlotPeriodValue) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MACSettings_PingSlotPeriodValue.Merge(dst, src)
+}
+func (m *MACSettings_PingSlotPeriodValue) XXX_Size() int {
+	return m.Size()
+}
+func (m *MACSettings_PingSlotPeriodValue) XXX_DiscardUnknown() {
+	xxx_messageInfo_MACSettings_PingSlotPeriodValue.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MACSettings_PingSlotPeriodValue proto.InternalMessageInfo
+
+func (m *MACSettings_PingSlotPeriodValue) GetValue() PingSlotPeriod {
+	if m != nil {
+		return m.Value
+	}
+	return PING_EVERY_1S
+}
+
+type MACSettings_AggregatedDutyCycleValue struct {
+	Value                AggregatedDutyCycle `protobuf:"varint,1,opt,name=value,proto3,enum=ttn.lorawan.v3.AggregatedDutyCycle" json:"value,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}            `json:"-"`
+	XXX_sizecache        int32               `json:"-"`
+}
+
+func (m *MACSettings_AggregatedDutyCycleValue) Reset()      { *m = MACSettings_AggregatedDutyCycleValue{} }
+func (*MACSettings_AggregatedDutyCycleValue) ProtoMessage() {}
+func (*MACSettings_AggregatedDutyCycleValue) Descriptor() ([]byte, []int) {
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{6, 2}
+}
+func (m *MACSettings_AggregatedDutyCycleValue) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MACSettings_AggregatedDutyCycleValue) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MACSettings_AggregatedDutyCycleValue.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (dst *MACSettings_AggregatedDutyCycleValue) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MACSettings_AggregatedDutyCycleValue.Merge(dst, src)
+}
+func (m *MACSettings_AggregatedDutyCycleValue) XXX_Size() int {
+	return m.Size()
+}
+func (m *MACSettings_AggregatedDutyCycleValue) XXX_DiscardUnknown() {
+	xxx_messageInfo_MACSettings_AggregatedDutyCycleValue.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MACSettings_AggregatedDutyCycleValue proto.InternalMessageInfo
+
+func (m *MACSettings_AggregatedDutyCycleValue) GetValue() AggregatedDutyCycle {
+	if m != nil {
+		return m.Value
+	}
+	return DUTY_CYCLE_1
+}
+
+type MACSettings_RxDelayValue struct {
+	Value                RxDelay  `protobuf:"varint,1,opt,name=value,proto3,enum=ttn.lorawan.v3.RxDelay" json:"value,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *MACSettings_RxDelayValue) Reset()      { *m = MACSettings_RxDelayValue{} }
+func (*MACSettings_RxDelayValue) ProtoMessage() {}
+func (*MACSettings_RxDelayValue) Descriptor() ([]byte, []int) {
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{6, 3}
+}
+func (m *MACSettings_RxDelayValue) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MACSettings_RxDelayValue) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MACSettings_RxDelayValue.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (dst *MACSettings_RxDelayValue) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MACSettings_RxDelayValue.Merge(dst, src)
+}
+func (m *MACSettings_RxDelayValue) XXX_Size() int {
+	return m.Size()
+}
+func (m *MACSettings_RxDelayValue) XXX_DiscardUnknown() {
+	xxx_messageInfo_MACSettings_RxDelayValue.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MACSettings_RxDelayValue proto.InternalMessageInfo
+
+func (m *MACSettings_RxDelayValue) GetValue() RxDelay {
+	if m != nil {
+		return m.Value
+	}
+	return RX_DELAY_0
 }
 
 // MACState represents the state of MAC layer of the device.
@@ -947,7 +1274,7 @@ type MACState struct {
 func (m *MACState) Reset()      { *m = MACState{} }
 func (*MACState) ProtoMessage() {}
 func (*MACState) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_f8ea6acb7b9cd33a, []int{7}
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{7}
 }
 func (m *MACState) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1081,7 +1408,7 @@ type MACState_JoinAccept struct {
 func (m *MACState_JoinAccept) Reset()      { *m = MACState_JoinAccept{} }
 func (*MACState_JoinAccept) ProtoMessage() {}
 func (*MACState_JoinAccept) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_f8ea6acb7b9cd33a, []int{7, 0}
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{7, 0}
 }
 func (m *MACState_JoinAccept) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1186,91 +1513,82 @@ type EndDevice struct {
 	// ID of the frequency plan used by this device.
 	// Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
 	FrequencyPlanID string `protobuf:"bytes,17,opt,name=frequency_plan_id,json=frequencyPlanId,proto3" json:"frequency_plan_id,omitempty"`
-	// Default MAC layer parameters, to which device is reset by default (e.g. on join or ResetInd). Stored in Network Server.
-	// Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
-	DefaultMACParameters *MACParameters `protobuf:"bytes,18,opt,name=default_mac_parameters,json=defaultMacParameters,proto3" json:"default_mac_parameters,omitempty"`
 	// Minimum frequency the device is capable of using (Hz). Stored in Network Server.
 	// Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
-	MinFrequency uint64 `protobuf:"varint,19,opt,name=min_frequency,json=minFrequency,proto3" json:"min_frequency,omitempty"`
+	MinFrequency uint64 `protobuf:"varint,18,opt,name=min_frequency,json=minFrequency,proto3" json:"min_frequency,omitempty"`
 	// Maximum frequency the device is capable of using (Hz). Stored in Network Server.
 	// Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
-	MaxFrequency uint64 `protobuf:"varint,20,opt,name=max_frequency,json=maxFrequency,proto3" json:"max_frequency,omitempty"`
-	// Whether the device resets the frame counters (not LoRaWAN compliant). Stored in Network Server.
-	// Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
-	ResetsFCnt bool `protobuf:"varint,21,opt,name=resets_f_cnt,json=resetsFCnt,proto3" json:"resets_f_cnt,omitempty"`
-	// Whether the device uses 32-bit frame counters. Stored in Network Server.
-	// Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
-	Uses32BitFCnt bool `protobuf:"varint,22,opt,name=uses_32_bit_f_cnt,json=uses32BitFCnt,proto3" json:"uses_32_bit_f_cnt,omitempty"`
+	MaxFrequency uint64 `protobuf:"varint,19,opt,name=max_frequency,json=maxFrequency,proto3" json:"max_frequency,omitempty"`
 	// The device supports join (it's OTAA).
 	// Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
-	SupportsJoin bool `protobuf:"varint,23,opt,name=supports_join,json=supportsJoin,proto3" json:"supports_join,omitempty"`
-	// Whether the device resets the join and dev nonces (not LoRaWAN 1.1 compliant). Stored in Network Server.
+	SupportsJoin bool `protobuf:"varint,20,opt,name=supports_join,json=supportsJoin,proto3" json:"supports_join,omitempty"`
+	// Whether the device resets the join and dev nonces (not LoRaWAN 1.1 compliant). Stored in Join Server.
 	// Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
-	ResetsJoinNonces bool `protobuf:"varint,24,opt,name=resets_join_nonces,json=resetsJoinNonces,proto3" json:"resets_join_nonces,omitempty"`
+	ResetsJoinNonces bool `protobuf:"varint,21,opt,name=resets_join_nonces,json=resetsJoinNonces,proto3" json:"resets_join_nonces,omitempty"`
 	// Device root keys. Stored in Join Server.
-	RootKeys *RootKeys `protobuf:"bytes,25,opt,name=root_keys,json=rootKeys,proto3" json:"root_keys,omitempty"`
+	RootKeys *RootKeys `protobuf:"bytes,22,opt,name=root_keys,json=rootKeys,proto3" json:"root_keys,omitempty"`
 	// Home NetID. Stored in Join Server.
-	NetID *go_thethings_network_lorawan_stack_pkg_types.NetID `protobuf:"bytes,26,opt,name=net_id,json=netId,proto3,customtype=go.thethings.network/lorawan-stack/pkg/types.NetID" json:"net_id,omitempty"`
-	// Settings for how the Network Server handles MAC for this device. Stored in Network Server.
-	MACSettings *MACSettings `protobuf:"bytes,27,opt,name=mac_settings,json=macSettings,proto3" json:"mac_settings,omitempty"`
+	NetID *go_thethings_network_lorawan_stack_pkg_types.NetID `protobuf:"bytes,23,opt,name=net_id,json=netId,proto3,customtype=go.thethings.network/lorawan-stack/pkg/types.NetID" json:"net_id,omitempty"`
+	// Settings for how the Network Server handles MAC layer for this device. Stored in Network Server.
+	MACSettings *MACSettings `protobuf:"bytes,24,opt,name=mac_settings,json=macSettings,proto3" json:"mac_settings,omitempty"`
 	// MAC state of the device. Stored in Network Server.
-	MACState *MACState `protobuf:"bytes,28,opt,name=mac_state,json=macState,proto3" json:"mac_state,omitempty"`
+	MACState *MACState `protobuf:"bytes,25,opt,name=mac_state,json=macState,proto3" json:"mac_state,omitempty"`
 	// Current session of the device. Stored in Network Server and Application Server.
-	Session *Session `protobuf:"bytes,29,opt,name=session,proto3" json:"session,omitempty"`
+	Session *Session `protobuf:"bytes,26,opt,name=session,proto3" json:"session,omitempty"`
 	// Pending session. Stored in Network Server and Application Server until RekeyInd is received.
-	PendingSession *Session `protobuf:"bytes,30,opt,name=pending_session,json=pendingSession,proto3" json:"pending_session,omitempty"`
+	PendingSession *Session `protobuf:"bytes,27,opt,name=pending_session,json=pendingSession,proto3" json:"pending_session,omitempty"`
 	// Last DevNonce used.
 	// This field is only used for devices using LoRaWAN version 1.1 and later.
 	// Stored in Join Server.
-	LastDevNonce uint32 `protobuf:"varint,31,opt,name=last_dev_nonce,json=lastDevNonce,proto3" json:"last_dev_nonce,omitempty"`
+	LastDevNonce uint32 `protobuf:"varint,28,opt,name=last_dev_nonce,json=lastDevNonce,proto3" json:"last_dev_nonce,omitempty"`
 	// Used DevNonces sorted in ascending order.
 	// This field is only used for devices using LoRaWAN versions preceding 1.1.
 	// Stored in Join Server.
-	UsedDevNonces []uint32 `protobuf:"varint,32,rep,packed,name=used_dev_nonces,json=usedDevNonces,proto3" json:"used_dev_nonces,omitempty"`
+	UsedDevNonces []uint32 `protobuf:"varint,29,rep,packed,name=used_dev_nonces,json=usedDevNonces,proto3" json:"used_dev_nonces,omitempty"`
 	// Last JoinNonce/AppNonce(for devices using LoRaWAN versions preceding 1.1) used.
 	// Stored in Join Server.
-	LastJoinNonce uint32 `protobuf:"varint,33,opt,name=last_join_nonce,json=lastJoinNonce,proto3" json:"last_join_nonce,omitempty"`
+	LastJoinNonce uint32 `protobuf:"varint,30,opt,name=last_join_nonce,json=lastJoinNonce,proto3" json:"last_join_nonce,omitempty"`
 	// Last Rejoin counter value used (type 0/2).
 	// Stored in Join Server.
-	LastRJCount0 uint32 `protobuf:"varint,34,opt,name=last_rj_count_0,json=lastRjCount0,proto3" json:"last_rj_count_0,omitempty"`
+	LastRJCount0 uint32 `protobuf:"varint,31,opt,name=last_rj_count_0,json=lastRjCount0,proto3" json:"last_rj_count_0,omitempty"`
 	// Last Rejoin counter value used (type 1).
 	// Stored in Join Server.
-	LastRJCount1 uint32 `protobuf:"varint,35,opt,name=last_rj_count_1,json=lastRjCount1,proto3" json:"last_rj_count_1,omitempty"`
+	LastRJCount1 uint32 `protobuf:"varint,32,opt,name=last_rj_count_1,json=lastRjCount1,proto3" json:"last_rj_count_1,omitempty"`
 	// Time when last DevStatus MAC command was received.
 	// Stored in Network Server.
-	LastDevStatusReceivedAt *time.Time `protobuf:"bytes,36,opt,name=last_dev_status_received_at,json=lastDevStatusReceivedAt,proto3,stdtime" json:"last_dev_status_received_at,omitempty"`
+	LastDevStatusReceivedAt *time.Time `protobuf:"bytes,33,opt,name=last_dev_status_received_at,json=lastDevStatusReceivedAt,proto3,stdtime" json:"last_dev_status_received_at,omitempty"`
 	// The power state of the device; whether it is battery-powered or connected to an external power source.
 	// Received via the DevStatus MAC command at status_received_at.
 	// Stored in Network Server.
-	PowerState PowerState `protobuf:"varint,37,opt,name=power_state,json=powerState,proto3,enum=ttn.lorawan.v3.PowerState" json:"power_state,omitempty"`
+	PowerState PowerState `protobuf:"varint,34,opt,name=power_state,json=powerState,proto3,enum=ttn.lorawan.v3.PowerState" json:"power_state,omitempty"`
 	// Latest-known battery percentage of the device.
 	// Received via the DevStatus MAC command at last_dev_status_received_at or earlier.
 	// Stored in Network Server.
-	BatteryPercentage float32 `protobuf:"fixed32,38,opt,name=battery_percentage,json=batteryPercentage,proto3" json:"battery_percentage,omitempty"`
+	BatteryPercentage float32 `protobuf:"fixed32,35,opt,name=battery_percentage,json=batteryPercentage,proto3" json:"battery_percentage,omitempty"`
 	// Demodulation signal-to-noise ratio (dB).
 	// Received via the DevStatus MAC command at last_dev_status_received_at.
 	// Stored in Network Server.
-	DownlinkMargin int32 `protobuf:"varint,39,opt,name=downlink_margin,json=downlinkMargin,proto3" json:"downlink_margin,omitempty"`
+	DownlinkMargin int32 `protobuf:"varint,36,opt,name=downlink_margin,json=downlinkMargin,proto3" json:"downlink_margin,omitempty"`
 	// Recent uplink messages with ADR bit set to 1 sorted by time. Stored in Network Server.
 	// The field is reset each time an uplink message carrying MACPayload is received with ADR bit set to 0.
 	// The number of messages stored is in the range [0,20];
-	RecentADRUplinks []*UplinkMessage `protobuf:"bytes,40,rep,name=recent_adr_uplinks,json=recentAdrUplinks,proto3" json:"recent_adr_uplinks,omitempty"`
+	RecentADRUplinks []*UplinkMessage `protobuf:"bytes,37,rep,name=recent_adr_uplinks,json=recentAdrUplinks,proto3" json:"recent_adr_uplinks,omitempty"`
 	// Recent uplink messages sorted by time. Stored in Network Server.
 	// The number of messages stored may depend on configuration.
-	RecentUplinks []*UplinkMessage `protobuf:"bytes,41,rep,name=recent_uplinks,json=recentUplinks,proto3" json:"recent_uplinks,omitempty"`
+	RecentUplinks []*UplinkMessage `protobuf:"bytes,38,rep,name=recent_uplinks,json=recentUplinks,proto3" json:"recent_uplinks,omitempty"`
 	// Recent downlink messages sorted by time. Stored in Network Server.
 	// The number of messages stored may depend on configuration.
-	RecentDownlinks []*DownlinkMessage `protobuf:"bytes,42,rep,name=recent_downlinks,json=recentDownlinks,proto3" json:"recent_downlinks,omitempty"`
+	RecentDownlinks []*DownlinkMessage `protobuf:"bytes,39,rep,name=recent_downlinks,json=recentDownlinks,proto3" json:"recent_downlinks,omitempty"`
 	// Queued Application downlink messages. Stored in Application Server,
 	// which sets them on the Network Server.
-	QueuedApplicationDownlinks []*ApplicationDownlink `protobuf:"bytes,43,rep,name=queued_application_downlinks,json=queuedApplicationDownlinks,proto3" json:"queued_application_downlinks,omitempty"`
+	QueuedApplicationDownlinks []*ApplicationDownlink `protobuf:"bytes,40,rep,name=queued_application_downlinks,json=queuedApplicationDownlinks,proto3" json:"queued_application_downlinks,omitempty"`
 	// The payload formatters for this end device. Stored in Application Server.
 	// Copied on creation from template identified by version_ids.
-	Formatters *MessagePayloadFormatters `protobuf:"bytes,44,opt,name=formatters,proto3" json:"formatters,omitempty"`
+	Formatters *MessagePayloadFormatters `protobuf:"bytes,41,opt,name=formatters,proto3" json:"formatters,omitempty"`
 	// ID of the provisioner. Stored in Join Server.
-	ProvisionerID string `protobuf:"bytes,45,opt,name=provisioner_id,json=provisionerId,proto3" json:"provisioner_id,omitempty"`
+	ProvisionerID string `protobuf:"bytes,42,opt,name=provisioner_id,json=provisionerId,proto3" json:"provisioner_id,omitempty"`
 	// Vendor-specific provisioning data. Stored in Join Server.
-	ProvisioningData     *types.Struct `protobuf:"bytes,46,opt,name=provisioning_data,json=provisioningData,proto3" json:"provisioning_data,omitempty"`
+	ProvisioningData     *types.Struct `protobuf:"bytes,43,opt,name=provisioning_data,json=provisioningData,proto3" json:"provisioning_data,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
 	XXX_sizecache        int32         `json:"-"`
 }
@@ -1278,7 +1596,7 @@ type EndDevice struct {
 func (m *EndDevice) Reset()      { *m = EndDevice{} }
 func (*EndDevice) ProtoMessage() {}
 func (*EndDevice) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_f8ea6acb7b9cd33a, []int{8}
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{8}
 }
 func (m *EndDevice) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1419,13 +1737,6 @@ func (m *EndDevice) GetFrequencyPlanID() string {
 	return ""
 }
 
-func (m *EndDevice) GetDefaultMACParameters() *MACParameters {
-	if m != nil {
-		return m.DefaultMACParameters
-	}
-	return nil
-}
-
 func (m *EndDevice) GetMinFrequency() uint64 {
 	if m != nil {
 		return m.MinFrequency
@@ -1438,20 +1749,6 @@ func (m *EndDevice) GetMaxFrequency() uint64 {
 		return m.MaxFrequency
 	}
 	return 0
-}
-
-func (m *EndDevice) GetResetsFCnt() bool {
-	if m != nil {
-		return m.ResetsFCnt
-	}
-	return false
-}
-
-func (m *EndDevice) GetUses32BitFCnt() bool {
-	if m != nil {
-		return m.Uses32BitFCnt
-	}
-	return false
 }
 
 func (m *EndDevice) GetSupportsJoin() bool {
@@ -1624,7 +1921,7 @@ type EndDevices struct {
 func (m *EndDevices) Reset()      { *m = EndDevices{} }
 func (*EndDevices) ProtoMessage() {}
 func (*EndDevices) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_f8ea6acb7b9cd33a, []int{9}
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{9}
 }
 func (m *EndDevices) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1669,7 +1966,7 @@ type CreateEndDeviceRequest struct {
 func (m *CreateEndDeviceRequest) Reset()      { *m = CreateEndDeviceRequest{} }
 func (*CreateEndDeviceRequest) ProtoMessage() {}
 func (*CreateEndDeviceRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_f8ea6acb7b9cd33a, []int{10}
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{10}
 }
 func (m *CreateEndDeviceRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1708,7 +2005,7 @@ type UpdateEndDeviceRequest struct {
 func (m *UpdateEndDeviceRequest) Reset()      { *m = UpdateEndDeviceRequest{} }
 func (*UpdateEndDeviceRequest) ProtoMessage() {}
 func (*UpdateEndDeviceRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_f8ea6acb7b9cd33a, []int{11}
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{11}
 }
 func (m *UpdateEndDeviceRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1754,7 +2051,7 @@ type GetEndDeviceRequest struct {
 func (m *GetEndDeviceRequest) Reset()      { *m = GetEndDeviceRequest{} }
 func (*GetEndDeviceRequest) ProtoMessage() {}
 func (*GetEndDeviceRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_f8ea6acb7b9cd33a, []int{12}
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{12}
 }
 func (m *GetEndDeviceRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1807,7 +2104,7 @@ type ListEndDevicesRequest struct {
 func (m *ListEndDevicesRequest) Reset()      { *m = ListEndDevicesRequest{} }
 func (*ListEndDevicesRequest) ProtoMessage() {}
 func (*ListEndDevicesRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_f8ea6acb7b9cd33a, []int{13}
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{13}
 }
 func (m *ListEndDevicesRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1874,7 +2171,7 @@ type SetEndDeviceRequest struct {
 func (m *SetEndDeviceRequest) Reset()      { *m = SetEndDeviceRequest{} }
 func (*SetEndDeviceRequest) ProtoMessage() {}
 func (*SetEndDeviceRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_end_device_f8ea6acb7b9cd33a, []int{14}
+	return fileDescriptor_end_device_7c7976812d2926f8, []int{14}
 }
 func (m *SetEndDeviceRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1934,6 +2231,14 @@ func init() {
 	golang_proto.RegisterType((*EndDeviceVersion)(nil), "ttn.lorawan.v3.EndDeviceVersion")
 	proto.RegisterType((*MACSettings)(nil), "ttn.lorawan.v3.MACSettings")
 	golang_proto.RegisterType((*MACSettings)(nil), "ttn.lorawan.v3.MACSettings")
+	proto.RegisterType((*MACSettings_DataRateIndexValue)(nil), "ttn.lorawan.v3.MACSettings.DataRateIndexValue")
+	golang_proto.RegisterType((*MACSettings_DataRateIndexValue)(nil), "ttn.lorawan.v3.MACSettings.DataRateIndexValue")
+	proto.RegisterType((*MACSettings_PingSlotPeriodValue)(nil), "ttn.lorawan.v3.MACSettings.PingSlotPeriodValue")
+	golang_proto.RegisterType((*MACSettings_PingSlotPeriodValue)(nil), "ttn.lorawan.v3.MACSettings.PingSlotPeriodValue")
+	proto.RegisterType((*MACSettings_AggregatedDutyCycleValue)(nil), "ttn.lorawan.v3.MACSettings.AggregatedDutyCycleValue")
+	golang_proto.RegisterType((*MACSettings_AggregatedDutyCycleValue)(nil), "ttn.lorawan.v3.MACSettings.AggregatedDutyCycleValue")
+	proto.RegisterType((*MACSettings_RxDelayValue)(nil), "ttn.lorawan.v3.MACSettings.RxDelayValue")
+	golang_proto.RegisterType((*MACSettings_RxDelayValue)(nil), "ttn.lorawan.v3.MACSettings.RxDelayValue")
 	proto.RegisterType((*MACState)(nil), "ttn.lorawan.v3.MACState")
 	golang_proto.RegisterType((*MACState)(nil), "ttn.lorawan.v3.MACState")
 	proto.RegisterType((*MACState_JoinAccept)(nil), "ttn.lorawan.v3.MACState.JoinAccept")
@@ -2063,22 +2368,14 @@ func (this *MACParameters) Equal(that interface{}) bool {
 	if this.Rx2Frequency != that1.Rx2Frequency {
 		return false
 	}
+	if this.MaxDutyCycle != that1.MaxDutyCycle {
+		return false
+	}
 	if this.RejoinTimePeriodicity != that1.RejoinTimePeriodicity {
 		return false
 	}
 	if this.RejoinCountPeriodicity != that1.RejoinCountPeriodicity {
 		return false
-	}
-	if this.MaxDutyCycle != that1.MaxDutyCycle {
-		return false
-	}
-	if len(this.Channels) != len(that1.Channels) {
-		return false
-	}
-	for i := range this.Channels {
-		if !this.Channels[i].Equal(that1.Channels[i]) {
-			return false
-		}
 	}
 	if this.PingSlotFrequency != that1.PingSlotFrequency {
 		return false
@@ -2088,6 +2385,14 @@ func (this *MACParameters) Equal(that interface{}) bool {
 	}
 	if this.BeaconFrequency != that1.BeaconFrequency {
 		return false
+	}
+	if len(this.Channels) != len(that1.Channels) {
+		return false
+	}
+	for i := range this.Channels {
+		if !this.Channels[i].Equal(that1.Channels[i]) {
+			return false
+		}
 	}
 	return true
 }
@@ -2273,7 +2578,7 @@ func (this *EndDeviceVersion) Equal(that interface{}) bool {
 	if this.SupportsClassC != that1.SupportsClassC {
 		return false
 	}
-	if !this.DefaultMACParameters.Equal(that1.DefaultMACParameters) {
+	if !this.DefaultMACSettings.Equal(that1.DefaultMACSettings) {
 		return false
 	}
 	if this.MinFrequency != that1.MinFrequency {
@@ -2283,9 +2588,6 @@ func (this *EndDeviceVersion) Equal(that interface{}) bool {
 		return false
 	}
 	if this.ResetsFCnt != that1.ResetsFCnt {
-		return false
-	}
-	if this.Uses32BitFCnt != that1.Uses32BitFCnt {
 		return false
 	}
 	if this.SupportsJoin != that1.SupportsJoin {
@@ -2318,22 +2620,186 @@ func (this *MACSettings) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if this.UseADR != that1.UseADR {
+	if this.ClassBTimeout != nil && that1.ClassBTimeout != nil {
+		if *this.ClassBTimeout != *that1.ClassBTimeout {
+			return false
+		}
+	} else if this.ClassBTimeout != nil {
+		return false
+	} else if that1.ClassBTimeout != nil {
 		return false
 	}
-	if this.ADRMargin != that1.ADRMargin {
+	if !this.PingSlotPeriodicity.Equal(that1.PingSlotPeriodicity) {
 		return false
 	}
-	if this.ClassBTimeout != that1.ClassBTimeout {
+	if !this.PingSlotDataRateIndex.Equal(that1.PingSlotDataRateIndex) {
 		return false
 	}
-	if this.ClassCTimeout != that1.ClassCTimeout {
+	if this.PingSlotFrequency != that1.PingSlotFrequency {
 		return false
 	}
-	if this.StatusTimePeriodicity != that1.StatusTimePeriodicity {
+	if this.ClassCTimeout != nil && that1.ClassCTimeout != nil {
+		if *this.ClassCTimeout != *that1.ClassCTimeout {
+			return false
+		}
+	} else if this.ClassCTimeout != nil {
+		return false
+	} else if that1.ClassCTimeout != nil {
 		return false
 	}
-	if this.StatusCountPeriodicity != that1.StatusCountPeriodicity {
+	if !this.Rx1Delay.Equal(that1.Rx1Delay) {
+		return false
+	}
+	if !this.Rx1DataRateOffset.Equal(that1.Rx1DataRateOffset) {
+		return false
+	}
+	if !this.Rx2DataRateIndex.Equal(that1.Rx2DataRateIndex) {
+		return false
+	}
+	if this.Rx2Frequency != that1.Rx2Frequency {
+		return false
+	}
+	if len(this.FactoryPresetFrequencies) != len(that1.FactoryPresetFrequencies) {
+		return false
+	}
+	for i := range this.FactoryPresetFrequencies {
+		if this.FactoryPresetFrequencies[i] != that1.FactoryPresetFrequencies[i] {
+			return false
+		}
+	}
+	if !this.MaxDutyCycle.Equal(that1.MaxDutyCycle) {
+		return false
+	}
+	if !this.Supports32BitFCnt.Equal(that1.Supports32BitFCnt) {
+		return false
+	}
+	if !this.UseADR.Equal(that1.UseADR) {
+		return false
+	}
+	if !this.ADRMargin.Equal(that1.ADRMargin) {
+		return false
+	}
+	if !this.ResetsFCnt.Equal(that1.ResetsFCnt) {
+		return false
+	}
+	if this.StatusTimePeriodicity != nil && that1.StatusTimePeriodicity != nil {
+		if *this.StatusTimePeriodicity != *that1.StatusTimePeriodicity {
+			return false
+		}
+	} else if this.StatusTimePeriodicity != nil {
+		return false
+	} else if that1.StatusTimePeriodicity != nil {
+		return false
+	}
+	if !this.StatusCountPeriodicity.Equal(that1.StatusCountPeriodicity) {
+		return false
+	}
+	if !this.DesiredRx1Delay.Equal(that1.DesiredRx1Delay) {
+		return false
+	}
+	if !this.DesiredRx1DataRateOffset.Equal(that1.DesiredRx1DataRateOffset) {
+		return false
+	}
+	if !this.DesiredRx2DataRateIndex.Equal(that1.DesiredRx2DataRateIndex) {
+		return false
+	}
+	if this.DesiredRx2Frequency != that1.DesiredRx2Frequency {
+		return false
+	}
+	return true
+}
+func (this *MACSettings_DataRateIndexValue) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*MACSettings_DataRateIndexValue)
+	if !ok {
+		that2, ok := that.(MACSettings_DataRateIndexValue)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.Value != that1.Value {
+		return false
+	}
+	return true
+}
+func (this *MACSettings_PingSlotPeriodValue) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*MACSettings_PingSlotPeriodValue)
+	if !ok {
+		that2, ok := that.(MACSettings_PingSlotPeriodValue)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.Value != that1.Value {
+		return false
+	}
+	return true
+}
+func (this *MACSettings_AggregatedDutyCycleValue) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*MACSettings_AggregatedDutyCycleValue)
+	if !ok {
+		that2, ok := that.(MACSettings_AggregatedDutyCycleValue)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.Value != that1.Value {
+		return false
+	}
+	return true
+}
+func (this *MACSettings_RxDelayValue) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*MACSettings_RxDelayValue)
+	if !ok {
+		that2, ok := that.(MACSettings_RxDelayValue)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.Value != that1.Value {
 		return false
 	}
 	return true
@@ -2522,19 +2988,10 @@ func (this *EndDevice) Equal(that interface{}) bool {
 	if this.FrequencyPlanID != that1.FrequencyPlanID {
 		return false
 	}
-	if !this.DefaultMACParameters.Equal(that1.DefaultMACParameters) {
-		return false
-	}
 	if this.MinFrequency != that1.MinFrequency {
 		return false
 	}
 	if this.MaxFrequency != that1.MaxFrequency {
-		return false
-	}
-	if this.ResetsFCnt != that1.ResetsFCnt {
-		return false
-	}
-	if this.Uses32BitFCnt != that1.Uses32BitFCnt {
 		return false
 	}
 	if this.SupportsJoin != that1.SupportsJoin {
@@ -2962,24 +3419,45 @@ func (m *MACParameters) MarshalTo(dAtA []byte) (int, error) {
 		i++
 		i = encodeVarintEndDevice(dAtA, i, m.Rx2Frequency)
 	}
-	if m.RejoinTimePeriodicity != 0 {
+	if m.MaxDutyCycle != 0 {
 		dAtA[i] = 0x68
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.MaxDutyCycle))
+	}
+	if m.RejoinTimePeriodicity != 0 {
+		dAtA[i] = 0x70
 		i++
 		i = encodeVarintEndDevice(dAtA, i, uint64(m.RejoinTimePeriodicity))
 	}
 	if m.RejoinCountPeriodicity != 0 {
-		dAtA[i] = 0x70
+		dAtA[i] = 0x78
 		i++
 		i = encodeVarintEndDevice(dAtA, i, uint64(m.RejoinCountPeriodicity))
 	}
-	if m.MaxDutyCycle != 0 {
-		dAtA[i] = 0x78
+	if m.PingSlotFrequency != 0 {
+		dAtA[i] = 0x80
 		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.MaxDutyCycle))
+		dAtA[i] = 0x1
+		i++
+		i = encodeVarintEndDevice(dAtA, i, m.PingSlotFrequency)
+	}
+	if m.PingSlotDataRateIndex != 0 {
+		dAtA[i] = 0x88
+		i++
+		dAtA[i] = 0x1
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.PingSlotDataRateIndex))
+	}
+	if m.BeaconFrequency != 0 {
+		dAtA[i] = 0x90
+		i++
+		dAtA[i] = 0x1
+		i++
+		i = encodeVarintEndDevice(dAtA, i, m.BeaconFrequency)
 	}
 	if len(m.Channels) > 0 {
 		for _, msg := range m.Channels {
-			dAtA[i] = 0x82
+			dAtA[i] = 0x9a
 			i++
 			dAtA[i] = 0x1
 			i++
@@ -2990,27 +3468,6 @@ func (m *MACParameters) MarshalTo(dAtA []byte) (int, error) {
 			}
 			i += n
 		}
-	}
-	if m.PingSlotFrequency != 0 {
-		dAtA[i] = 0x88
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintEndDevice(dAtA, i, m.PingSlotFrequency)
-	}
-	if m.PingSlotDataRateIndex != 0 {
-		dAtA[i] = 0x90
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.PingSlotDataRateIndex))
-	}
-	if m.BeaconFrequency != 0 {
-		dAtA[i] = 0x98
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintEndDevice(dAtA, i, m.BeaconFrequency)
 	}
 	return i, nil
 }
@@ -3266,11 +3723,11 @@ func (m *EndDeviceVersion) MarshalTo(dAtA []byte) (int, error) {
 		}
 		i++
 	}
-	if m.DefaultMACParameters != nil {
+	if m.DefaultMACSettings != nil {
 		dAtA[i] = 0x42
 		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.DefaultMACParameters.Size()))
-		n5, err := m.DefaultMACParameters.MarshalTo(dAtA[i:])
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.DefaultMACSettings.Size()))
+		n5, err := m.DefaultMACSettings.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
@@ -3290,16 +3747,6 @@ func (m *EndDeviceVersion) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0x58
 		i++
 		if m.ResetsFCnt {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
-	}
-	if m.Uses32BitFCnt {
-		dAtA[i] = 0x60
-		i++
-		if m.Uses32BitFCnt {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
@@ -3352,49 +3799,311 @@ func (m *MACSettings) MarshalTo(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.UseADR {
+	if m.ClassBTimeout != nil {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(*m.ClassBTimeout)))
+		n7, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(*m.ClassBTimeout, dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n7
+	}
+	if m.PingSlotPeriodicity != nil {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.PingSlotPeriodicity.Size()))
+		n8, err := m.PingSlotPeriodicity.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n8
+	}
+	if m.PingSlotDataRateIndex != nil {
+		dAtA[i] = 0x1a
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.PingSlotDataRateIndex.Size()))
+		n9, err := m.PingSlotDataRateIndex.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n9
+	}
+	if m.PingSlotFrequency != 0 {
+		dAtA[i] = 0x20
+		i++
+		i = encodeVarintEndDevice(dAtA, i, m.PingSlotFrequency)
+	}
+	if m.ClassCTimeout != nil {
+		dAtA[i] = 0x2a
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(*m.ClassCTimeout)))
+		n10, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(*m.ClassCTimeout, dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n10
+	}
+	if m.Rx1Delay != nil {
+		dAtA[i] = 0x32
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.Rx1Delay.Size()))
+		n11, err := m.Rx1Delay.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n11
+	}
+	if m.Rx1DataRateOffset != nil {
+		dAtA[i] = 0x3a
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.Rx1DataRateOffset.Size()))
+		n12, err := m.Rx1DataRateOffset.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n12
+	}
+	if m.Rx2DataRateIndex != nil {
+		dAtA[i] = 0x42
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.Rx2DataRateIndex.Size()))
+		n13, err := m.Rx2DataRateIndex.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n13
+	}
+	if m.Rx2Frequency != 0 {
+		dAtA[i] = 0x48
+		i++
+		i = encodeVarintEndDevice(dAtA, i, m.Rx2Frequency)
+	}
+	if len(m.FactoryPresetFrequencies) > 0 {
+		dAtA15 := make([]byte, len(m.FactoryPresetFrequencies)*10)
+		var j14 int
+		for _, num := range m.FactoryPresetFrequencies {
+			for num >= 1<<7 {
+				dAtA15[j14] = uint8(num&0x7f | 0x80)
+				num >>= 7
+				j14++
+			}
+			dAtA15[j14] = uint8(num)
+			j14++
+		}
+		dAtA[i] = 0x52
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(j14))
+		i += copy(dAtA[i:], dAtA15[:j14])
+	}
+	if m.MaxDutyCycle != nil {
+		dAtA[i] = 0x5a
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.MaxDutyCycle.Size()))
+		n16, err := m.MaxDutyCycle.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n16
+	}
+	if m.Supports32BitFCnt != nil {
+		dAtA[i] = 0x62
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.Supports32BitFCnt.Size()))
+		n17, err := m.Supports32BitFCnt.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n17
+	}
+	if m.UseADR != nil {
+		dAtA[i] = 0x6a
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.UseADR.Size()))
+		n18, err := m.UseADR.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n18
+	}
+	if m.ADRMargin != nil {
+		dAtA[i] = 0x72
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.ADRMargin.Size()))
+		n19, err := m.ADRMargin.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n19
+	}
+	if m.ResetsFCnt != nil {
+		dAtA[i] = 0x7a
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.ResetsFCnt.Size()))
+		n20, err := m.ResetsFCnt.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n20
+	}
+	if m.StatusTimePeriodicity != nil {
+		dAtA[i] = 0x82
+		i++
+		dAtA[i] = 0x1
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(*m.StatusTimePeriodicity)))
+		n21, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(*m.StatusTimePeriodicity, dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n21
+	}
+	if m.StatusCountPeriodicity != nil {
+		dAtA[i] = 0x8a
+		i++
+		dAtA[i] = 0x1
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.StatusCountPeriodicity.Size()))
+		n22, err := m.StatusCountPeriodicity.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n22
+	}
+	if m.DesiredRx1Delay != nil {
+		dAtA[i] = 0x92
+		i++
+		dAtA[i] = 0x1
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.DesiredRx1Delay.Size()))
+		n23, err := m.DesiredRx1Delay.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n23
+	}
+	if m.DesiredRx1DataRateOffset != nil {
+		dAtA[i] = 0x9a
+		i++
+		dAtA[i] = 0x1
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.DesiredRx1DataRateOffset.Size()))
+		n24, err := m.DesiredRx1DataRateOffset.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n24
+	}
+	if m.DesiredRx2DataRateIndex != nil {
+		dAtA[i] = 0xa2
+		i++
+		dAtA[i] = 0x1
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.DesiredRx2DataRateIndex.Size()))
+		n25, err := m.DesiredRx2DataRateIndex.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n25
+	}
+	if m.DesiredRx2Frequency != 0 {
+		dAtA[i] = 0xa8
+		i++
+		dAtA[i] = 0x1
+		i++
+		i = encodeVarintEndDevice(dAtA, i, m.DesiredRx2Frequency)
+	}
+	return i, nil
+}
+
+func (m *MACSettings_DataRateIndexValue) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MACSettings_DataRateIndexValue) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.Value != 0 {
 		dAtA[i] = 0x8
 		i++
-		if m.UseADR {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.Value))
 	}
-	if m.ADRMargin != 0 {
-		dAtA[i] = 0x10
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.ADRMargin))
-	}
-	dAtA[i] = 0x1a
-	i++
-	i = encodeVarintEndDevice(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(m.ClassBTimeout)))
-	n7, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(m.ClassBTimeout, dAtA[i:])
+	return i, nil
+}
+
+func (m *MACSettings_PingSlotPeriodValue) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
-	i += n7
-	dAtA[i] = 0x22
-	i++
-	i = encodeVarintEndDevice(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(m.ClassCTimeout)))
-	n8, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(m.ClassCTimeout, dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n8
-	dAtA[i] = 0x2a
-	i++
-	i = encodeVarintEndDevice(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(m.StatusTimePeriodicity)))
-	n9, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(m.StatusTimePeriodicity, dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n9
-	if m.StatusCountPeriodicity != 0 {
-		dAtA[i] = 0x30
+	return dAtA[:n], nil
+}
+
+func (m *MACSettings_PingSlotPeriodValue) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.Value != 0 {
+		dAtA[i] = 0x8
 		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.StatusCountPeriodicity))
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.Value))
+	}
+	return i, nil
+}
+
+func (m *MACSettings_AggregatedDutyCycleValue) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MACSettings_AggregatedDutyCycleValue) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.Value != 0 {
+		dAtA[i] = 0x8
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.Value))
+	}
+	return i, nil
+}
+
+func (m *MACSettings_RxDelayValue) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MACSettings_RxDelayValue) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.Value != 0 {
+		dAtA[i] = 0x8
+		i++
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.Value))
 	}
 	return i, nil
 }
@@ -3417,19 +4126,19 @@ func (m *MACState) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintEndDevice(dAtA, i, uint64(m.CurrentParameters.Size()))
-	n10, err := m.CurrentParameters.MarshalTo(dAtA[i:])
+	n26, err := m.CurrentParameters.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n10
+	i += n26
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintEndDevice(dAtA, i, uint64(m.DesiredParameters.Size()))
-	n11, err := m.DesiredParameters.MarshalTo(dAtA[i:])
+	n27, err := m.DesiredParameters.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n11
+	i += n27
 	if m.DeviceClass != 0 {
 		dAtA[i] = 0x18
 		i++
@@ -3444,11 +4153,11 @@ func (m *MACState) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0x2a
 		i++
 		i = encodeVarintEndDevice(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.LastConfirmedDownlinkAt)))
-		n12, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.LastConfirmedDownlinkAt, dAtA[i:])
+		n28, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.LastConfirmedDownlinkAt, dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n12
+		i += n28
 	}
 	if m.LastDevStatusFCntUp != 0 {
 		dAtA[i] = 0x30
@@ -3464,11 +4173,11 @@ func (m *MACState) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0x42
 		i++
 		i = encodeVarintEndDevice(dAtA, i, uint64(m.PendingApplicationDownlink.Size()))
-		n13, err := m.PendingApplicationDownlink.MarshalTo(dAtA[i:])
+		n29, err := m.PendingApplicationDownlink.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n13
+		i += n29
 	}
 	if len(m.QueuedResponses) > 0 {
 		for _, msg := range m.QueuedResponses {
@@ -3498,21 +4207,21 @@ func (m *MACState) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0x5a
 		i++
 		i = encodeVarintEndDevice(dAtA, i, uint64(m.QueuedJoinAccept.Size()))
-		n14, err := m.QueuedJoinAccept.MarshalTo(dAtA[i:])
+		n30, err := m.QueuedJoinAccept.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n14
+		i += n30
 	}
 	if m.PendingJoinRequest != nil {
 		dAtA[i] = 0x62
 		i++
 		i = encodeVarintEndDevice(dAtA, i, uint64(m.PendingJoinRequest.Size()))
-		n15, err := m.PendingJoinRequest.MarshalTo(dAtA[i:])
+		n31, err := m.PendingJoinRequest.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n15
+		i += n31
 	}
 	if m.RxWindowsAvailable {
 		dAtA[i] = 0x68
@@ -3551,19 +4260,19 @@ func (m *MACState_JoinAccept) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintEndDevice(dAtA, i, uint64(m.Request.Size()))
-	n16, err := m.Request.MarshalTo(dAtA[i:])
+	n32, err := m.Request.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n16
+	i += n32
 	dAtA[i] = 0x1a
 	i++
 	i = encodeVarintEndDevice(dAtA, i, uint64(m.Keys.Size()))
-	n17, err := m.Keys.MarshalTo(dAtA[i:])
+	n33, err := m.Keys.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n17
+	i += n33
 	return i, nil
 }
 
@@ -3585,27 +4294,27 @@ func (m *EndDevice) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintEndDevice(dAtA, i, uint64(m.EndDeviceIdentifiers.Size()))
-	n18, err := m.EndDeviceIdentifiers.MarshalTo(dAtA[i:])
+	n34, err := m.EndDeviceIdentifiers.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n18
+	i += n34
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintEndDevice(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)))
-	n19, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
+	n35, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n19
+	i += n35
 	dAtA[i] = 0x1a
 	i++
 	i = encodeVarintEndDevice(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt)))
-	n20, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i:])
+	n36, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n20
+	i += n36
 	if len(m.Name) > 0 {
 		dAtA[i] = 0x22
 		i++
@@ -3639,11 +4348,11 @@ func (m *EndDevice) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0x3a
 		i++
 		i = encodeVarintEndDevice(dAtA, i, uint64(m.VersionIDs.Size()))
-		n21, err := m.VersionIDs.MarshalTo(dAtA[i:])
+		n37, err := m.VersionIDs.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n21
+		i += n37
 	}
 	if len(m.ServiceProfileID) > 0 {
 		dAtA[i] = 0x42
@@ -3689,11 +4398,11 @@ func (m *EndDevice) MarshalTo(dAtA []byte) (int, error) {
 				dAtA[i] = 0x12
 				i++
 				i = encodeVarintEndDevice(dAtA, i, uint64(v.Size()))
-				n22, err := v.MarshalTo(dAtA[i:])
+				n38, err := v.MarshalTo(dAtA[i:])
 				if err != nil {
 					return 0, err
 				}
-				i += n22
+				i += n38
 			}
 		}
 	}
@@ -3737,58 +4446,22 @@ func (m *EndDevice) MarshalTo(dAtA []byte) (int, error) {
 		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.FrequencyPlanID)))
 		i += copy(dAtA[i:], m.FrequencyPlanID)
 	}
-	if m.DefaultMACParameters != nil {
-		dAtA[i] = 0x92
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.DefaultMACParameters.Size()))
-		n23, err := m.DefaultMACParameters.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n23
-	}
 	if m.MinFrequency != 0 {
-		dAtA[i] = 0x98
+		dAtA[i] = 0x90
 		i++
 		dAtA[i] = 0x1
 		i++
 		i = encodeVarintEndDevice(dAtA, i, m.MinFrequency)
 	}
 	if m.MaxFrequency != 0 {
-		dAtA[i] = 0xa0
+		dAtA[i] = 0x98
 		i++
 		dAtA[i] = 0x1
 		i++
 		i = encodeVarintEndDevice(dAtA, i, m.MaxFrequency)
 	}
-	if m.ResetsFCnt {
-		dAtA[i] = 0xa8
-		i++
-		dAtA[i] = 0x1
-		i++
-		if m.ResetsFCnt {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
-	}
-	if m.Uses32BitFCnt {
-		dAtA[i] = 0xb0
-		i++
-		dAtA[i] = 0x1
-		i++
-		if m.Uses32BitFCnt {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
-	}
 	if m.SupportsJoin {
-		dAtA[i] = 0xb8
+		dAtA[i] = 0xa0
 		i++
 		dAtA[i] = 0x1
 		i++
@@ -3800,7 +4473,7 @@ func (m *EndDevice) MarshalTo(dAtA []byte) (int, error) {
 		i++
 	}
 	if m.ResetsJoinNonces {
-		dAtA[i] = 0xc0
+		dAtA[i] = 0xa8
 		i++
 		dAtA[i] = 0x1
 		i++
@@ -3812,145 +4485,145 @@ func (m *EndDevice) MarshalTo(dAtA []byte) (int, error) {
 		i++
 	}
 	if m.RootKeys != nil {
-		dAtA[i] = 0xca
+		dAtA[i] = 0xb2
 		i++
 		dAtA[i] = 0x1
 		i++
 		i = encodeVarintEndDevice(dAtA, i, uint64(m.RootKeys.Size()))
-		n24, err := m.RootKeys.MarshalTo(dAtA[i:])
+		n39, err := m.RootKeys.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n24
+		i += n39
 	}
 	if m.NetID != nil {
-		dAtA[i] = 0xd2
+		dAtA[i] = 0xba
 		i++
 		dAtA[i] = 0x1
 		i++
 		i = encodeVarintEndDevice(dAtA, i, uint64(m.NetID.Size()))
-		n25, err := m.NetID.MarshalTo(dAtA[i:])
+		n40, err := m.NetID.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n25
+		i += n40
 	}
 	if m.MACSettings != nil {
-		dAtA[i] = 0xda
+		dAtA[i] = 0xc2
 		i++
 		dAtA[i] = 0x1
 		i++
 		i = encodeVarintEndDevice(dAtA, i, uint64(m.MACSettings.Size()))
-		n26, err := m.MACSettings.MarshalTo(dAtA[i:])
+		n41, err := m.MACSettings.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n26
+		i += n41
 	}
 	if m.MACState != nil {
-		dAtA[i] = 0xe2
+		dAtA[i] = 0xca
 		i++
 		dAtA[i] = 0x1
 		i++
 		i = encodeVarintEndDevice(dAtA, i, uint64(m.MACState.Size()))
-		n27, err := m.MACState.MarshalTo(dAtA[i:])
+		n42, err := m.MACState.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n27
+		i += n42
 	}
 	if m.Session != nil {
-		dAtA[i] = 0xea
+		dAtA[i] = 0xd2
 		i++
 		dAtA[i] = 0x1
 		i++
 		i = encodeVarintEndDevice(dAtA, i, uint64(m.Session.Size()))
-		n28, err := m.Session.MarshalTo(dAtA[i:])
+		n43, err := m.Session.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n28
+		i += n43
 	}
 	if m.PendingSession != nil {
-		dAtA[i] = 0xf2
+		dAtA[i] = 0xda
 		i++
 		dAtA[i] = 0x1
 		i++
 		i = encodeVarintEndDevice(dAtA, i, uint64(m.PendingSession.Size()))
-		n29, err := m.PendingSession.MarshalTo(dAtA[i:])
+		n44, err := m.PendingSession.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n29
+		i += n44
 	}
 	if m.LastDevNonce != 0 {
-		dAtA[i] = 0xf8
+		dAtA[i] = 0xe0
 		i++
 		dAtA[i] = 0x1
 		i++
 		i = encodeVarintEndDevice(dAtA, i, uint64(m.LastDevNonce))
 	}
 	if len(m.UsedDevNonces) > 0 {
-		dAtA31 := make([]byte, len(m.UsedDevNonces)*10)
-		var j30 int
+		dAtA46 := make([]byte, len(m.UsedDevNonces)*10)
+		var j45 int
 		for _, num := range m.UsedDevNonces {
 			for num >= 1<<7 {
-				dAtA31[j30] = uint8(uint64(num)&0x7f | 0x80)
+				dAtA46[j45] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
-				j30++
+				j45++
 			}
-			dAtA31[j30] = uint8(num)
-			j30++
+			dAtA46[j45] = uint8(num)
+			j45++
 		}
-		dAtA[i] = 0x82
+		dAtA[i] = 0xea
 		i++
-		dAtA[i] = 0x2
+		dAtA[i] = 0x1
 		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(j30))
-		i += copy(dAtA[i:], dAtA31[:j30])
+		i = encodeVarintEndDevice(dAtA, i, uint64(j45))
+		i += copy(dAtA[i:], dAtA46[:j45])
 	}
 	if m.LastJoinNonce != 0 {
-		dAtA[i] = 0x88
+		dAtA[i] = 0xf0
 		i++
-		dAtA[i] = 0x2
+		dAtA[i] = 0x1
 		i++
 		i = encodeVarintEndDevice(dAtA, i, uint64(m.LastJoinNonce))
 	}
 	if m.LastRJCount0 != 0 {
-		dAtA[i] = 0x90
+		dAtA[i] = 0xf8
 		i++
-		dAtA[i] = 0x2
+		dAtA[i] = 0x1
 		i++
 		i = encodeVarintEndDevice(dAtA, i, uint64(m.LastRJCount0))
 	}
 	if m.LastRJCount1 != 0 {
-		dAtA[i] = 0x98
+		dAtA[i] = 0x80
 		i++
 		dAtA[i] = 0x2
 		i++
 		i = encodeVarintEndDevice(dAtA, i, uint64(m.LastRJCount1))
 	}
 	if m.LastDevStatusReceivedAt != nil {
-		dAtA[i] = 0xa2
+		dAtA[i] = 0x8a
 		i++
 		dAtA[i] = 0x2
 		i++
 		i = encodeVarintEndDevice(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.LastDevStatusReceivedAt)))
-		n32, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.LastDevStatusReceivedAt, dAtA[i:])
+		n47, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.LastDevStatusReceivedAt, dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n32
+		i += n47
 	}
 	if m.PowerState != 0 {
-		dAtA[i] = 0xa8
+		dAtA[i] = 0x90
 		i++
 		dAtA[i] = 0x2
 		i++
 		i = encodeVarintEndDevice(dAtA, i, uint64(m.PowerState))
 	}
 	if m.BatteryPercentage != 0 {
-		dAtA[i] = 0xb5
+		dAtA[i] = 0x9d
 		i++
 		dAtA[i] = 0x2
 		i++
@@ -3958,7 +4631,7 @@ func (m *EndDevice) MarshalTo(dAtA []byte) (int, error) {
 		i += 4
 	}
 	if m.DownlinkMargin != 0 {
-		dAtA[i] = 0xb8
+		dAtA[i] = 0xa0
 		i++
 		dAtA[i] = 0x2
 		i++
@@ -3966,7 +4639,7 @@ func (m *EndDevice) MarshalTo(dAtA []byte) (int, error) {
 	}
 	if len(m.RecentADRUplinks) > 0 {
 		for _, msg := range m.RecentADRUplinks {
-			dAtA[i] = 0xc2
+			dAtA[i] = 0xaa
 			i++
 			dAtA[i] = 0x2
 			i++
@@ -3980,7 +4653,7 @@ func (m *EndDevice) MarshalTo(dAtA []byte) (int, error) {
 	}
 	if len(m.RecentUplinks) > 0 {
 		for _, msg := range m.RecentUplinks {
-			dAtA[i] = 0xca
+			dAtA[i] = 0xb2
 			i++
 			dAtA[i] = 0x2
 			i++
@@ -3994,7 +4667,7 @@ func (m *EndDevice) MarshalTo(dAtA []byte) (int, error) {
 	}
 	if len(m.RecentDownlinks) > 0 {
 		for _, msg := range m.RecentDownlinks {
-			dAtA[i] = 0xd2
+			dAtA[i] = 0xba
 			i++
 			dAtA[i] = 0x2
 			i++
@@ -4008,7 +4681,7 @@ func (m *EndDevice) MarshalTo(dAtA []byte) (int, error) {
 	}
 	if len(m.QueuedApplicationDownlinks) > 0 {
 		for _, msg := range m.QueuedApplicationDownlinks {
-			dAtA[i] = 0xda
+			dAtA[i] = 0xc2
 			i++
 			dAtA[i] = 0x2
 			i++
@@ -4021,19 +4694,19 @@ func (m *EndDevice) MarshalTo(dAtA []byte) (int, error) {
 		}
 	}
 	if m.Formatters != nil {
-		dAtA[i] = 0xe2
+		dAtA[i] = 0xca
 		i++
 		dAtA[i] = 0x2
 		i++
 		i = encodeVarintEndDevice(dAtA, i, uint64(m.Formatters.Size()))
-		n33, err := m.Formatters.MarshalTo(dAtA[i:])
+		n48, err := m.Formatters.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n33
+		i += n48
 	}
 	if len(m.ProvisionerID) > 0 {
-		dAtA[i] = 0xea
+		dAtA[i] = 0xd2
 		i++
 		dAtA[i] = 0x2
 		i++
@@ -4041,16 +4714,16 @@ func (m *EndDevice) MarshalTo(dAtA []byte) (int, error) {
 		i += copy(dAtA[i:], m.ProvisionerID)
 	}
 	if m.ProvisioningData != nil {
-		dAtA[i] = 0xf2
+		dAtA[i] = 0xda
 		i++
 		dAtA[i] = 0x2
 		i++
 		i = encodeVarintEndDevice(dAtA, i, uint64(m.ProvisioningData.Size()))
-		n34, err := m.ProvisioningData.MarshalTo(dAtA[i:])
+		n49, err := m.ProvisioningData.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n34
+		i += n49
 	}
 	return i, nil
 }
@@ -4103,11 +4776,11 @@ func (m *CreateEndDeviceRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintEndDevice(dAtA, i, uint64(m.EndDevice.Size()))
-	n35, err := m.EndDevice.MarshalTo(dAtA[i:])
+	n50, err := m.EndDevice.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n35
+	i += n50
 	return i, nil
 }
 
@@ -4129,19 +4802,19 @@ func (m *UpdateEndDeviceRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintEndDevice(dAtA, i, uint64(m.EndDevice.Size()))
-	n36, err := m.EndDevice.MarshalTo(dAtA[i:])
+	n51, err := m.EndDevice.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n36
+	i += n51
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintEndDevice(dAtA, i, uint64(m.FieldMask.Size()))
-	n37, err := m.FieldMask.MarshalTo(dAtA[i:])
+	n52, err := m.FieldMask.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n37
+	i += n52
 	return i, nil
 }
 
@@ -4163,19 +4836,19 @@ func (m *GetEndDeviceRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintEndDevice(dAtA, i, uint64(m.EndDeviceIdentifiers.Size()))
-	n38, err := m.EndDeviceIdentifiers.MarshalTo(dAtA[i:])
+	n53, err := m.EndDeviceIdentifiers.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n38
+	i += n53
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintEndDevice(dAtA, i, uint64(m.FieldMask.Size()))
-	n39, err := m.FieldMask.MarshalTo(dAtA[i:])
+	n54, err := m.FieldMask.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n39
+	i += n54
 	return i, nil
 }
 
@@ -4197,19 +4870,19 @@ func (m *ListEndDevicesRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintEndDevice(dAtA, i, uint64(m.ApplicationIdentifiers.Size()))
-	n40, err := m.ApplicationIdentifiers.MarshalTo(dAtA[i:])
+	n55, err := m.ApplicationIdentifiers.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n40
+	i += n55
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintEndDevice(dAtA, i, uint64(m.FieldMask.Size()))
-	n41, err := m.FieldMask.MarshalTo(dAtA[i:])
+	n56, err := m.FieldMask.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n41
+	i += n56
 	if len(m.Order) > 0 {
 		dAtA[i] = 0x1a
 		i++
@@ -4247,19 +4920,19 @@ func (m *SetEndDeviceRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintEndDevice(dAtA, i, uint64(m.Device.Size()))
-	n42, err := m.Device.MarshalTo(dAtA[i:])
+	n57, err := m.Device.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n42
+	i += n57
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintEndDevice(dAtA, i, uint64(m.FieldMask.Size()))
-	n43, err := m.FieldMask.MarshalTo(dAtA[i:])
+	n58, err := m.FieldMask.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n43
+	i += n58
 	return i, nil
 }
 
@@ -4327,15 +5000,97 @@ func NewPopulatedEndDeviceVersionIdentifiers(r randyEndDevice, easy bool) *EndDe
 
 func NewPopulatedMACSettings(r randyEndDevice, easy bool) *MACSettings {
 	this := &MACSettings{}
-	this.UseADR = bool(r.Intn(2) == 0)
-	this.ADRMargin = r.Uint32()
-	v5 := github_com_gogo_protobuf_types.NewPopulatedStdDuration(r, easy)
-	this.ClassBTimeout = *v5
-	v6 := github_com_gogo_protobuf_types.NewPopulatedStdDuration(r, easy)
-	this.ClassCTimeout = *v6
-	v7 := github_com_gogo_protobuf_types.NewPopulatedStdDuration(r, easy)
-	this.StatusTimePeriodicity = *v7
-	this.StatusCountPeriodicity = r.Uint32()
+	if r.Intn(10) != 0 {
+		this.ClassBTimeout = github_com_gogo_protobuf_types.NewPopulatedStdDuration(r, easy)
+	}
+	if r.Intn(10) != 0 {
+		this.PingSlotPeriodicity = NewPopulatedMACSettings_PingSlotPeriodValue(r, easy)
+	}
+	if r.Intn(10) != 0 {
+		this.PingSlotDataRateIndex = NewPopulatedMACSettings_DataRateIndexValue(r, easy)
+	}
+	this.PingSlotFrequency = uint64(r.Uint32())
+	if r.Intn(10) != 0 {
+		this.ClassCTimeout = github_com_gogo_protobuf_types.NewPopulatedStdDuration(r, easy)
+	}
+	if r.Intn(10) != 0 {
+		this.Rx1Delay = NewPopulatedMACSettings_RxDelayValue(r, easy)
+	}
+	if r.Intn(10) != 0 {
+		this.Rx1DataRateOffset = types.NewPopulatedUInt32Value(r, easy)
+	}
+	if r.Intn(10) != 0 {
+		this.Rx2DataRateIndex = NewPopulatedMACSettings_DataRateIndexValue(r, easy)
+	}
+	this.Rx2Frequency = uint64(r.Uint32())
+	v5 := r.Intn(10)
+	this.FactoryPresetFrequencies = make([]uint64, v5)
+	for i := 0; i < v5; i++ {
+		this.FactoryPresetFrequencies[i] = uint64(r.Uint32())
+	}
+	if r.Intn(10) != 0 {
+		this.MaxDutyCycle = NewPopulatedMACSettings_AggregatedDutyCycleValue(r, easy)
+	}
+	if r.Intn(10) != 0 {
+		this.Supports32BitFCnt = types.NewPopulatedBoolValue(r, easy)
+	}
+	if r.Intn(10) != 0 {
+		this.UseADR = types.NewPopulatedBoolValue(r, easy)
+	}
+	if r.Intn(10) != 0 {
+		this.ADRMargin = types.NewPopulatedFloatValue(r, easy)
+	}
+	if r.Intn(10) != 0 {
+		this.ResetsFCnt = types.NewPopulatedBoolValue(r, easy)
+	}
+	if r.Intn(10) != 0 {
+		this.StatusTimePeriodicity = github_com_gogo_protobuf_types.NewPopulatedStdDuration(r, easy)
+	}
+	if r.Intn(10) != 0 {
+		this.StatusCountPeriodicity = types.NewPopulatedUInt32Value(r, easy)
+	}
+	if r.Intn(10) != 0 {
+		this.DesiredRx1Delay = NewPopulatedMACSettings_RxDelayValue(r, easy)
+	}
+	if r.Intn(10) != 0 {
+		this.DesiredRx1DataRateOffset = types.NewPopulatedUInt32Value(r, easy)
+	}
+	if r.Intn(10) != 0 {
+		this.DesiredRx2DataRateIndex = NewPopulatedMACSettings_DataRateIndexValue(r, easy)
+	}
+	this.DesiredRx2Frequency = uint64(r.Uint32())
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedMACSettings_DataRateIndexValue(r randyEndDevice, easy bool) *MACSettings_DataRateIndexValue {
+	this := &MACSettings_DataRateIndexValue{}
+	this.Value = DataRateIndex([]int32{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}[r.Intn(16)])
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedMACSettings_PingSlotPeriodValue(r randyEndDevice, easy bool) *MACSettings_PingSlotPeriodValue {
+	this := &MACSettings_PingSlotPeriodValue{}
+	this.Value = PingSlotPeriod([]int32{0, 1, 2, 3, 4, 5, 6, 7}[r.Intn(8)])
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedMACSettings_AggregatedDutyCycleValue(r randyEndDevice, easy bool) *MACSettings_AggregatedDutyCycleValue {
+	this := &MACSettings_AggregatedDutyCycleValue{}
+	this.Value = AggregatedDutyCycle([]int32{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}[r.Intn(16)])
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedMACSettings_RxDelayValue(r randyEndDevice, easy bool) *MACSettings_RxDelayValue {
+	this := &MACSettings_RxDelayValue{}
+	this.Value = RxDelay([]int32{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}[r.Intn(16)])
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -4343,15 +5098,15 @@ func NewPopulatedMACSettings(r randyEndDevice, easy bool) *MACSettings {
 
 func NewPopulatedMACState_JoinAccept(r randyEndDevice, easy bool) *MACState_JoinAccept {
 	this := &MACState_JoinAccept{}
-	v8 := r.Intn(100)
-	this.Payload = make([]byte, v8)
-	for i := 0; i < v8; i++ {
+	v6 := r.Intn(100)
+	this.Payload = make([]byte, v6)
+	for i := 0; i < v6; i++ {
 		this.Payload[i] = byte(r.Intn(256))
 	}
-	v9 := NewPopulatedJoinRequest(r, easy)
-	this.Request = *v9
-	v10 := NewPopulatedSessionKeys(r, easy)
-	this.Keys = *v10
+	v7 := NewPopulatedJoinRequest(r, easy)
+	this.Request = *v7
+	v8 := NewPopulatedSessionKeys(r, easy)
+	this.Keys = *v8
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -4360,9 +5115,9 @@ func NewPopulatedMACState_JoinAccept(r randyEndDevice, easy bool) *MACState_Join
 func NewPopulatedEndDevices(r randyEndDevice, easy bool) *EndDevices {
 	this := &EndDevices{}
 	if r.Intn(10) != 0 {
-		v11 := r.Intn(5)
-		this.EndDevices = make([]*EndDevice, v11)
-		for i := 0; i < v11; i++ {
+		v9 := r.Intn(5)
+		this.EndDevices = make([]*EndDevice, v9)
+		for i := 0; i < v9; i++ {
 			this.EndDevices[i] = NewPopulatedEndDevice(r, easy)
 		}
 	}
@@ -4373,8 +5128,8 @@ func NewPopulatedEndDevices(r randyEndDevice, easy bool) *EndDevices {
 
 func NewPopulatedCreateEndDeviceRequest(r randyEndDevice, easy bool) *CreateEndDeviceRequest {
 	this := &CreateEndDeviceRequest{}
-	v12 := NewPopulatedEndDevice(r, easy)
-	this.EndDevice = *v12
+	v10 := NewPopulatedEndDevice(r, easy)
+	this.EndDevice = *v10
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -4382,10 +5137,10 @@ func NewPopulatedCreateEndDeviceRequest(r randyEndDevice, easy bool) *CreateEndD
 
 func NewPopulatedUpdateEndDeviceRequest(r randyEndDevice, easy bool) *UpdateEndDeviceRequest {
 	this := &UpdateEndDeviceRequest{}
-	v13 := NewPopulatedEndDevice(r, easy)
-	this.EndDevice = *v13
-	v14 := types.NewPopulatedFieldMask(r, easy)
-	this.FieldMask = *v14
+	v11 := NewPopulatedEndDevice(r, easy)
+	this.EndDevice = *v11
+	v12 := types.NewPopulatedFieldMask(r, easy)
+	this.FieldMask = *v12
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -4393,10 +5148,10 @@ func NewPopulatedUpdateEndDeviceRequest(r randyEndDevice, easy bool) *UpdateEndD
 
 func NewPopulatedGetEndDeviceRequest(r randyEndDevice, easy bool) *GetEndDeviceRequest {
 	this := &GetEndDeviceRequest{}
-	v15 := NewPopulatedEndDeviceIdentifiers(r, easy)
-	this.EndDeviceIdentifiers = *v15
-	v16 := types.NewPopulatedFieldMask(r, easy)
-	this.FieldMask = *v16
+	v13 := NewPopulatedEndDeviceIdentifiers(r, easy)
+	this.EndDeviceIdentifiers = *v13
+	v14 := types.NewPopulatedFieldMask(r, easy)
+	this.FieldMask = *v14
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -4404,10 +5159,10 @@ func NewPopulatedGetEndDeviceRequest(r randyEndDevice, easy bool) *GetEndDeviceR
 
 func NewPopulatedListEndDevicesRequest(r randyEndDevice, easy bool) *ListEndDevicesRequest {
 	this := &ListEndDevicesRequest{}
-	v17 := NewPopulatedApplicationIdentifiers(r, easy)
-	this.ApplicationIdentifiers = *v17
-	v18 := types.NewPopulatedFieldMask(r, easy)
-	this.FieldMask = *v18
+	v15 := NewPopulatedApplicationIdentifiers(r, easy)
+	this.ApplicationIdentifiers = *v15
+	v16 := types.NewPopulatedFieldMask(r, easy)
+	this.FieldMask = *v16
 	this.Order = randStringEndDevice(r)
 	this.Limit = r.Uint32()
 	this.Page = r.Uint32()
@@ -4418,10 +5173,10 @@ func NewPopulatedListEndDevicesRequest(r randyEndDevice, easy bool) *ListEndDevi
 
 func NewPopulatedSetEndDeviceRequest(r randyEndDevice, easy bool) *SetEndDeviceRequest {
 	this := &SetEndDeviceRequest{}
-	v19 := NewPopulatedEndDevice(r, easy)
-	this.Device = *v19
-	v20 := types.NewPopulatedFieldMask(r, easy)
-	this.FieldMask = *v20
+	v17 := NewPopulatedEndDevice(r, easy)
+	this.Device = *v17
+	v18 := types.NewPopulatedFieldMask(r, easy)
+	this.FieldMask = *v18
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -4446,9 +5201,9 @@ func randUTF8RuneEndDevice(r randyEndDevice) rune {
 	return rune(ru + 61)
 }
 func randStringEndDevice(r randyEndDevice) string {
-	v21 := r.Intn(100)
-	tmps := make([]rune, v21)
-	for i := 0; i < v21; i++ {
+	v19 := r.Intn(100)
+	tmps := make([]rune, v19)
+	for i := 0; i < v19; i++ {
 		tmps[i] = randUTF8RuneEndDevice(r)
 	}
 	return string(tmps)
@@ -4470,11 +5225,11 @@ func randFieldEndDevice(dAtA []byte, r randyEndDevice, fieldNumber int, wire int
 	switch wire {
 	case 0:
 		dAtA = encodeVarintPopulateEndDevice(dAtA, uint64(key))
-		v22 := r.Int63()
+		v20 := r.Int63()
 		if r.Intn(2) == 0 {
-			v22 *= -1
+			v20 *= -1
 		}
-		dAtA = encodeVarintPopulateEndDevice(dAtA, uint64(v22))
+		dAtA = encodeVarintPopulateEndDevice(dAtA, uint64(v20))
 	case 1:
 		dAtA = encodeVarintPopulateEndDevice(dAtA, uint64(key))
 		dAtA = append(dAtA, byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)))
@@ -4568,20 +5323,14 @@ func (m *MACParameters) Size() (n int) {
 	if m.Rx2Frequency != 0 {
 		n += 1 + sovEndDevice(m.Rx2Frequency)
 	}
+	if m.MaxDutyCycle != 0 {
+		n += 1 + sovEndDevice(uint64(m.MaxDutyCycle))
+	}
 	if m.RejoinTimePeriodicity != 0 {
 		n += 1 + sovEndDevice(uint64(m.RejoinTimePeriodicity))
 	}
 	if m.RejoinCountPeriodicity != 0 {
 		n += 1 + sovEndDevice(uint64(m.RejoinCountPeriodicity))
-	}
-	if m.MaxDutyCycle != 0 {
-		n += 1 + sovEndDevice(uint64(m.MaxDutyCycle))
-	}
-	if len(m.Channels) > 0 {
-		for _, e := range m.Channels {
-			l = e.Size()
-			n += 2 + l + sovEndDevice(uint64(l))
-		}
 	}
 	if m.PingSlotFrequency != 0 {
 		n += 2 + sovEndDevice(m.PingSlotFrequency)
@@ -4591,6 +5340,12 @@ func (m *MACParameters) Size() (n int) {
 	}
 	if m.BeaconFrequency != 0 {
 		n += 2 + sovEndDevice(m.BeaconFrequency)
+	}
+	if len(m.Channels) > 0 {
+		for _, e := range m.Channels {
+			l = e.Size()
+			n += 2 + l + sovEndDevice(uint64(l))
+		}
 	}
 	return n
 }
@@ -4722,8 +5477,8 @@ func (m *EndDeviceVersion) Size() (n int) {
 	if m.SupportsClassC {
 		n += 2
 	}
-	if m.DefaultMACParameters != nil {
-		l = m.DefaultMACParameters.Size()
+	if m.DefaultMACSettings != nil {
+		l = m.DefaultMACSettings.Size()
 		n += 1 + l + sovEndDevice(uint64(l))
 	}
 	if m.MinFrequency != 0 {
@@ -4733,9 +5488,6 @@ func (m *EndDeviceVersion) Size() (n int) {
 		n += 1 + sovEndDevice(m.MaxFrequency)
 	}
 	if m.ResetsFCnt {
-		n += 2
-	}
-	if m.Uses32BitFCnt {
 		n += 2
 	}
 	if m.SupportsJoin {
@@ -4755,20 +5507,137 @@ func (m *MACSettings) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if m.UseADR {
-		n += 2
+	if m.ClassBTimeout != nil {
+		l = github_com_gogo_protobuf_types.SizeOfStdDuration(*m.ClassBTimeout)
+		n += 1 + l + sovEndDevice(uint64(l))
 	}
-	if m.ADRMargin != 0 {
-		n += 1 + sovEndDevice(uint64(m.ADRMargin))
+	if m.PingSlotPeriodicity != nil {
+		l = m.PingSlotPeriodicity.Size()
+		n += 1 + l + sovEndDevice(uint64(l))
 	}
-	l = github_com_gogo_protobuf_types.SizeOfStdDuration(m.ClassBTimeout)
-	n += 1 + l + sovEndDevice(uint64(l))
-	l = github_com_gogo_protobuf_types.SizeOfStdDuration(m.ClassCTimeout)
-	n += 1 + l + sovEndDevice(uint64(l))
-	l = github_com_gogo_protobuf_types.SizeOfStdDuration(m.StatusTimePeriodicity)
-	n += 1 + l + sovEndDevice(uint64(l))
-	if m.StatusCountPeriodicity != 0 {
-		n += 1 + sovEndDevice(uint64(m.StatusCountPeriodicity))
+	if m.PingSlotDataRateIndex != nil {
+		l = m.PingSlotDataRateIndex.Size()
+		n += 1 + l + sovEndDevice(uint64(l))
+	}
+	if m.PingSlotFrequency != 0 {
+		n += 1 + sovEndDevice(m.PingSlotFrequency)
+	}
+	if m.ClassCTimeout != nil {
+		l = github_com_gogo_protobuf_types.SizeOfStdDuration(*m.ClassCTimeout)
+		n += 1 + l + sovEndDevice(uint64(l))
+	}
+	if m.Rx1Delay != nil {
+		l = m.Rx1Delay.Size()
+		n += 1 + l + sovEndDevice(uint64(l))
+	}
+	if m.Rx1DataRateOffset != nil {
+		l = m.Rx1DataRateOffset.Size()
+		n += 1 + l + sovEndDevice(uint64(l))
+	}
+	if m.Rx2DataRateIndex != nil {
+		l = m.Rx2DataRateIndex.Size()
+		n += 1 + l + sovEndDevice(uint64(l))
+	}
+	if m.Rx2Frequency != 0 {
+		n += 1 + sovEndDevice(m.Rx2Frequency)
+	}
+	if len(m.FactoryPresetFrequencies) > 0 {
+		l = 0
+		for _, e := range m.FactoryPresetFrequencies {
+			l += sovEndDevice(e)
+		}
+		n += 1 + sovEndDevice(uint64(l)) + l
+	}
+	if m.MaxDutyCycle != nil {
+		l = m.MaxDutyCycle.Size()
+		n += 1 + l + sovEndDevice(uint64(l))
+	}
+	if m.Supports32BitFCnt != nil {
+		l = m.Supports32BitFCnt.Size()
+		n += 1 + l + sovEndDevice(uint64(l))
+	}
+	if m.UseADR != nil {
+		l = m.UseADR.Size()
+		n += 1 + l + sovEndDevice(uint64(l))
+	}
+	if m.ADRMargin != nil {
+		l = m.ADRMargin.Size()
+		n += 1 + l + sovEndDevice(uint64(l))
+	}
+	if m.ResetsFCnt != nil {
+		l = m.ResetsFCnt.Size()
+		n += 1 + l + sovEndDevice(uint64(l))
+	}
+	if m.StatusTimePeriodicity != nil {
+		l = github_com_gogo_protobuf_types.SizeOfStdDuration(*m.StatusTimePeriodicity)
+		n += 2 + l + sovEndDevice(uint64(l))
+	}
+	if m.StatusCountPeriodicity != nil {
+		l = m.StatusCountPeriodicity.Size()
+		n += 2 + l + sovEndDevice(uint64(l))
+	}
+	if m.DesiredRx1Delay != nil {
+		l = m.DesiredRx1Delay.Size()
+		n += 2 + l + sovEndDevice(uint64(l))
+	}
+	if m.DesiredRx1DataRateOffset != nil {
+		l = m.DesiredRx1DataRateOffset.Size()
+		n += 2 + l + sovEndDevice(uint64(l))
+	}
+	if m.DesiredRx2DataRateIndex != nil {
+		l = m.DesiredRx2DataRateIndex.Size()
+		n += 2 + l + sovEndDevice(uint64(l))
+	}
+	if m.DesiredRx2Frequency != 0 {
+		n += 2 + sovEndDevice(m.DesiredRx2Frequency)
+	}
+	return n
+}
+
+func (m *MACSettings_DataRateIndexValue) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Value != 0 {
+		n += 1 + sovEndDevice(uint64(m.Value))
+	}
+	return n
+}
+
+func (m *MACSettings_PingSlotPeriodValue) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Value != 0 {
+		n += 1 + sovEndDevice(uint64(m.Value))
+	}
+	return n
+}
+
+func (m *MACSettings_AggregatedDutyCycleValue) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Value != 0 {
+		n += 1 + sovEndDevice(uint64(m.Value))
+	}
+	return n
+}
+
+func (m *MACSettings_RxDelayValue) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Value != 0 {
+		n += 1 + sovEndDevice(uint64(m.Value))
 	}
 	return n
 }
@@ -4923,21 +5792,11 @@ func (m *EndDevice) Size() (n int) {
 	if l > 0 {
 		n += 2 + l + sovEndDevice(uint64(l))
 	}
-	if m.DefaultMACParameters != nil {
-		l = m.DefaultMACParameters.Size()
-		n += 2 + l + sovEndDevice(uint64(l))
-	}
 	if m.MinFrequency != 0 {
 		n += 2 + sovEndDevice(m.MinFrequency)
 	}
 	if m.MaxFrequency != 0 {
 		n += 2 + sovEndDevice(m.MaxFrequency)
-	}
-	if m.ResetsFCnt {
-		n += 3
-	}
-	if m.Uses32BitFCnt {
-		n += 3
 	}
 	if m.SupportsJoin {
 		n += 3
@@ -5174,13 +6033,13 @@ func (this *MACParameters) String() string {
 		`Rx1DataRateOffset:` + fmt.Sprintf("%v", this.Rx1DataRateOffset) + `,`,
 		`Rx2DataRateIndex:` + fmt.Sprintf("%v", this.Rx2DataRateIndex) + `,`,
 		`Rx2Frequency:` + fmt.Sprintf("%v", this.Rx2Frequency) + `,`,
+		`MaxDutyCycle:` + fmt.Sprintf("%v", this.MaxDutyCycle) + `,`,
 		`RejoinTimePeriodicity:` + fmt.Sprintf("%v", this.RejoinTimePeriodicity) + `,`,
 		`RejoinCountPeriodicity:` + fmt.Sprintf("%v", this.RejoinCountPeriodicity) + `,`,
-		`MaxDutyCycle:` + fmt.Sprintf("%v", this.MaxDutyCycle) + `,`,
-		`Channels:` + strings.Replace(fmt.Sprintf("%v", this.Channels), "MACParameters_Channel", "MACParameters_Channel", 1) + `,`,
 		`PingSlotFrequency:` + fmt.Sprintf("%v", this.PingSlotFrequency) + `,`,
 		`PingSlotDataRateIndex:` + fmt.Sprintf("%v", this.PingSlotDataRateIndex) + `,`,
 		`BeaconFrequency:` + fmt.Sprintf("%v", this.BeaconFrequency) + `,`,
+		`Channels:` + strings.Replace(fmt.Sprintf("%v", this.Channels), "MACParameters_Channel", "MACParameters_Channel", 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -5249,11 +6108,10 @@ func (this *EndDeviceVersion) String() string {
 		`Photos:` + fmt.Sprintf("%v", this.Photos) + `,`,
 		`SupportsClassB:` + fmt.Sprintf("%v", this.SupportsClassB) + `,`,
 		`SupportsClassC:` + fmt.Sprintf("%v", this.SupportsClassC) + `,`,
-		`DefaultMACParameters:` + strings.Replace(fmt.Sprintf("%v", this.DefaultMACParameters), "MACParameters", "MACParameters", 1) + `,`,
+		`DefaultMACSettings:` + strings.Replace(fmt.Sprintf("%v", this.DefaultMACSettings), "MACSettings", "MACSettings", 1) + `,`,
 		`MinFrequency:` + fmt.Sprintf("%v", this.MinFrequency) + `,`,
 		`MaxFrequency:` + fmt.Sprintf("%v", this.MaxFrequency) + `,`,
 		`ResetsFCnt:` + fmt.Sprintf("%v", this.ResetsFCnt) + `,`,
-		`Uses32BitFCnt:` + fmt.Sprintf("%v", this.Uses32BitFCnt) + `,`,
 		`SupportsJoin:` + fmt.Sprintf("%v", this.SupportsJoin) + `,`,
 		`ResetsJoinNonces:` + fmt.Sprintf("%v", this.ResetsJoinNonces) + `,`,
 		`DefaultFormatters:` + strings.Replace(strings.Replace(this.DefaultFormatters.String(), "MessagePayloadFormatters", "MessagePayloadFormatters", 1), `&`, ``, 1) + `,`,
@@ -5266,12 +6124,67 @@ func (this *MACSettings) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&MACSettings{`,
-		`UseADR:` + fmt.Sprintf("%v", this.UseADR) + `,`,
-		`ADRMargin:` + fmt.Sprintf("%v", this.ADRMargin) + `,`,
-		`ClassBTimeout:` + strings.Replace(strings.Replace(this.ClassBTimeout.String(), "Duration", "types.Duration", 1), `&`, ``, 1) + `,`,
-		`ClassCTimeout:` + strings.Replace(strings.Replace(this.ClassCTimeout.String(), "Duration", "types.Duration", 1), `&`, ``, 1) + `,`,
-		`StatusTimePeriodicity:` + strings.Replace(strings.Replace(this.StatusTimePeriodicity.String(), "Duration", "types.Duration", 1), `&`, ``, 1) + `,`,
-		`StatusCountPeriodicity:` + fmt.Sprintf("%v", this.StatusCountPeriodicity) + `,`,
+		`ClassBTimeout:` + strings.Replace(fmt.Sprintf("%v", this.ClassBTimeout), "Duration", "types.Duration", 1) + `,`,
+		`PingSlotPeriodicity:` + strings.Replace(fmt.Sprintf("%v", this.PingSlotPeriodicity), "MACSettings_PingSlotPeriodValue", "MACSettings_PingSlotPeriodValue", 1) + `,`,
+		`PingSlotDataRateIndex:` + strings.Replace(fmt.Sprintf("%v", this.PingSlotDataRateIndex), "MACSettings_DataRateIndexValue", "MACSettings_DataRateIndexValue", 1) + `,`,
+		`PingSlotFrequency:` + fmt.Sprintf("%v", this.PingSlotFrequency) + `,`,
+		`ClassCTimeout:` + strings.Replace(fmt.Sprintf("%v", this.ClassCTimeout), "Duration", "types.Duration", 1) + `,`,
+		`Rx1Delay:` + strings.Replace(fmt.Sprintf("%v", this.Rx1Delay), "MACSettings_RxDelayValue", "MACSettings_RxDelayValue", 1) + `,`,
+		`Rx1DataRateOffset:` + strings.Replace(fmt.Sprintf("%v", this.Rx1DataRateOffset), "UInt32Value", "types.UInt32Value", 1) + `,`,
+		`Rx2DataRateIndex:` + strings.Replace(fmt.Sprintf("%v", this.Rx2DataRateIndex), "MACSettings_DataRateIndexValue", "MACSettings_DataRateIndexValue", 1) + `,`,
+		`Rx2Frequency:` + fmt.Sprintf("%v", this.Rx2Frequency) + `,`,
+		`FactoryPresetFrequencies:` + fmt.Sprintf("%v", this.FactoryPresetFrequencies) + `,`,
+		`MaxDutyCycle:` + strings.Replace(fmt.Sprintf("%v", this.MaxDutyCycle), "MACSettings_AggregatedDutyCycleValue", "MACSettings_AggregatedDutyCycleValue", 1) + `,`,
+		`Supports32BitFCnt:` + strings.Replace(fmt.Sprintf("%v", this.Supports32BitFCnt), "BoolValue", "types.BoolValue", 1) + `,`,
+		`UseADR:` + strings.Replace(fmt.Sprintf("%v", this.UseADR), "BoolValue", "types.BoolValue", 1) + `,`,
+		`ADRMargin:` + strings.Replace(fmt.Sprintf("%v", this.ADRMargin), "FloatValue", "types.FloatValue", 1) + `,`,
+		`ResetsFCnt:` + strings.Replace(fmt.Sprintf("%v", this.ResetsFCnt), "BoolValue", "types.BoolValue", 1) + `,`,
+		`StatusTimePeriodicity:` + strings.Replace(fmt.Sprintf("%v", this.StatusTimePeriodicity), "Duration", "types.Duration", 1) + `,`,
+		`StatusCountPeriodicity:` + strings.Replace(fmt.Sprintf("%v", this.StatusCountPeriodicity), "UInt32Value", "types.UInt32Value", 1) + `,`,
+		`DesiredRx1Delay:` + strings.Replace(fmt.Sprintf("%v", this.DesiredRx1Delay), "MACSettings_RxDelayValue", "MACSettings_RxDelayValue", 1) + `,`,
+		`DesiredRx1DataRateOffset:` + strings.Replace(fmt.Sprintf("%v", this.DesiredRx1DataRateOffset), "UInt32Value", "types.UInt32Value", 1) + `,`,
+		`DesiredRx2DataRateIndex:` + strings.Replace(fmt.Sprintf("%v", this.DesiredRx2DataRateIndex), "MACSettings_DataRateIndexValue", "MACSettings_DataRateIndexValue", 1) + `,`,
+		`DesiredRx2Frequency:` + fmt.Sprintf("%v", this.DesiredRx2Frequency) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *MACSettings_DataRateIndexValue) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&MACSettings_DataRateIndexValue{`,
+		`Value:` + fmt.Sprintf("%v", this.Value) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *MACSettings_PingSlotPeriodValue) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&MACSettings_PingSlotPeriodValue{`,
+		`Value:` + fmt.Sprintf("%v", this.Value) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *MACSettings_AggregatedDutyCycleValue) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&MACSettings_AggregatedDutyCycleValue{`,
+		`Value:` + fmt.Sprintf("%v", this.Value) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *MACSettings_RxDelayValue) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&MACSettings_RxDelayValue{`,
+		`Value:` + fmt.Sprintf("%v", this.Value) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -5352,11 +6265,8 @@ func (this *EndDevice) String() string {
 		`LoRaWANVersion:` + fmt.Sprintf("%v", this.LoRaWANVersion) + `,`,
 		`LoRaWANPHYVersion:` + fmt.Sprintf("%v", this.LoRaWANPHYVersion) + `,`,
 		`FrequencyPlanID:` + fmt.Sprintf("%v", this.FrequencyPlanID) + `,`,
-		`DefaultMACParameters:` + strings.Replace(fmt.Sprintf("%v", this.DefaultMACParameters), "MACParameters", "MACParameters", 1) + `,`,
 		`MinFrequency:` + fmt.Sprintf("%v", this.MinFrequency) + `,`,
 		`MaxFrequency:` + fmt.Sprintf("%v", this.MaxFrequency) + `,`,
-		`ResetsFCnt:` + fmt.Sprintf("%v", this.ResetsFCnt) + `,`,
-		`Uses32BitFCnt:` + fmt.Sprintf("%v", this.Uses32BitFCnt) + `,`,
 		`SupportsJoin:` + fmt.Sprintf("%v", this.SupportsJoin) + `,`,
 		`ResetsJoinNonces:` + fmt.Sprintf("%v", this.ResetsJoinNonces) + `,`,
 		`RootKeys:` + strings.Replace(fmt.Sprintf("%v", this.RootKeys), "RootKeys", "RootKeys", 1) + `,`,
@@ -5929,6 +6839,25 @@ func (m *MACParameters) Unmarshal(dAtA []byte) error {
 			}
 		case 13:
 			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MaxDutyCycle", wireType)
+			}
+			m.MaxDutyCycle = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.MaxDutyCycle |= (AggregatedDutyCycle(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 14:
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RejoinTimePeriodicity", wireType)
 			}
 			m.RejoinTimePeriodicity = 0
@@ -5946,7 +6875,7 @@ func (m *MACParameters) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 14:
+		case 15:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RejoinCountPeriodicity", wireType)
 			}
@@ -5965,11 +6894,11 @@ func (m *MACParameters) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 15:
+		case 16:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MaxDutyCycle", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field PingSlotFrequency", wireType)
 			}
-			m.MaxDutyCycle = 0
+			m.PingSlotFrequency = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowEndDevice
@@ -5979,12 +6908,50 @@ func (m *MACParameters) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.MaxDutyCycle |= (AggregatedDutyCycle(b) & 0x7F) << shift
+				m.PingSlotFrequency |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-		case 16:
+		case 17:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PingSlotDataRateIndex", wireType)
+			}
+			m.PingSlotDataRateIndex = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.PingSlotDataRateIndex |= (DataRateIndex(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 18:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field BeaconFrequency", wireType)
+			}
+			m.BeaconFrequency = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.BeaconFrequency |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 19:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Channels", wireType)
 			}
@@ -6015,63 +6982,6 @@ func (m *MACParameters) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 17:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PingSlotFrequency", wireType)
-			}
-			m.PingSlotFrequency = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEndDevice
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.PingSlotFrequency |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 18:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PingSlotDataRateIndex", wireType)
-			}
-			m.PingSlotDataRateIndex = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEndDevice
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.PingSlotDataRateIndex |= (DataRateIndex(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 19:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BeaconFrequency", wireType)
-			}
-			m.BeaconFrequency = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEndDevice
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.BeaconFrequency |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipEndDevice(dAtA[iNdEx:])
@@ -6905,7 +7815,7 @@ func (m *EndDeviceVersion) Unmarshal(dAtA []byte) error {
 			m.SupportsClassC = bool(v != 0)
 		case 8:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DefaultMACParameters", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field DefaultMACSettings", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -6929,10 +7839,10 @@ func (m *EndDeviceVersion) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.DefaultMACParameters == nil {
-				m.DefaultMACParameters = &MACParameters{}
+			if m.DefaultMACSettings == nil {
+				m.DefaultMACSettings = &MACSettings{}
 			}
-			if err := m.DefaultMACParameters.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.DefaultMACSettings.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -6994,26 +7904,6 @@ func (m *EndDeviceVersion) Unmarshal(dAtA []byte) error {
 				}
 			}
 			m.ResetsFCnt = bool(v != 0)
-		case 12:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Uses32BitFCnt", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEndDevice
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.Uses32BitFCnt = bool(v != 0)
 		case 13:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field SupportsJoin", wireType)
@@ -7135,45 +8025,6 @@ func (m *MACSettings) Unmarshal(dAtA []byte) error {
 		}
 		switch fieldNum {
 		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field UseADR", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEndDevice
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.UseADR = bool(v != 0)
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ADRMargin", wireType)
-			}
-			m.ADRMargin = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEndDevice
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.ADRMargin |= (uint32(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ClassBTimeout", wireType)
 			}
@@ -7199,11 +8050,99 @@ func (m *MACSettings) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := github_com_gogo_protobuf_types.StdDurationUnmarshal(&m.ClassBTimeout, dAtA[iNdEx:postIndex]); err != nil {
+			if m.ClassBTimeout == nil {
+				m.ClassBTimeout = new(time.Duration)
+			}
+			if err := github_com_gogo_protobuf_types.StdDurationUnmarshal(m.ClassBTimeout, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PingSlotPeriodicity", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.PingSlotPeriodicity == nil {
+				m.PingSlotPeriodicity = &MACSettings_PingSlotPeriodValue{}
+			}
+			if err := m.PingSlotPeriodicity.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PingSlotDataRateIndex", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.PingSlotDataRateIndex == nil {
+				m.PingSlotDataRateIndex = &MACSettings_DataRateIndexValue{}
+			}
+			if err := m.PingSlotDataRateIndex.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PingSlotFrequency", wireType)
+			}
+			m.PingSlotFrequency = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.PingSlotFrequency |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 5:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ClassCTimeout", wireType)
 			}
@@ -7229,11 +8168,370 @@ func (m *MACSettings) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := github_com_gogo_protobuf_types.StdDurationUnmarshal(&m.ClassCTimeout, dAtA[iNdEx:postIndex]); err != nil {
+			if m.ClassCTimeout == nil {
+				m.ClassCTimeout = new(time.Duration)
+			}
+			if err := github_com_gogo_protobuf_types.StdDurationUnmarshal(m.ClassCTimeout, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
-		case 5:
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Rx1Delay", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Rx1Delay == nil {
+				m.Rx1Delay = &MACSettings_RxDelayValue{}
+			}
+			if err := m.Rx1Delay.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Rx1DataRateOffset", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Rx1DataRateOffset == nil {
+				m.Rx1DataRateOffset = &types.UInt32Value{}
+			}
+			if err := m.Rx1DataRateOffset.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 8:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Rx2DataRateIndex", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Rx2DataRateIndex == nil {
+				m.Rx2DataRateIndex = &MACSettings_DataRateIndexValue{}
+			}
+			if err := m.Rx2DataRateIndex.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 9:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Rx2Frequency", wireType)
+			}
+			m.Rx2Frequency = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Rx2Frequency |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 10:
+			if wireType == 0 {
+				var v uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowEndDevice
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					v |= (uint64(b) & 0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				m.FactoryPresetFrequencies = append(m.FactoryPresetFrequencies, v)
+			} else if wireType == 2 {
+				var packedLen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowEndDevice
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					packedLen |= (int(b) & 0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if packedLen < 0 {
+					return ErrInvalidLengthEndDevice
+				}
+				postIndex := iNdEx + packedLen
+				if postIndex > l {
+					return io.ErrUnexpectedEOF
+				}
+				var elementCount int
+				var count int
+				for _, integer := range dAtA {
+					if integer < 128 {
+						count++
+					}
+				}
+				elementCount = count
+				if elementCount != 0 && len(m.FactoryPresetFrequencies) == 0 {
+					m.FactoryPresetFrequencies = make([]uint64, 0, elementCount)
+				}
+				for iNdEx < postIndex {
+					var v uint64
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowEndDevice
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						v |= (uint64(b) & 0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					m.FactoryPresetFrequencies = append(m.FactoryPresetFrequencies, v)
+				}
+			} else {
+				return fmt.Errorf("proto: wrong wireType = %d for field FactoryPresetFrequencies", wireType)
+			}
+		case 11:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MaxDutyCycle", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.MaxDutyCycle == nil {
+				m.MaxDutyCycle = &MACSettings_AggregatedDutyCycleValue{}
+			}
+			if err := m.MaxDutyCycle.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 12:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Supports32BitFCnt", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Supports32BitFCnt == nil {
+				m.Supports32BitFCnt = &types.BoolValue{}
+			}
+			if err := m.Supports32BitFCnt.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 13:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UseADR", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.UseADR == nil {
+				m.UseADR = &types.BoolValue{}
+			}
+			if err := m.UseADR.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 14:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ADRMargin", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.ADRMargin == nil {
+				m.ADRMargin = &types.FloatValue{}
+			}
+			if err := m.ADRMargin.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 15:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ResetsFCnt", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.ResetsFCnt == nil {
+				m.ResetsFCnt = &types.BoolValue{}
+			}
+			if err := m.ResetsFCnt.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 16:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field StatusTimePeriodicity", wireType)
 			}
@@ -7259,15 +8557,18 @@ func (m *MACSettings) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := github_com_gogo_protobuf_types.StdDurationUnmarshal(&m.StatusTimePeriodicity, dAtA[iNdEx:postIndex]); err != nil {
+			if m.StatusTimePeriodicity == nil {
+				m.StatusTimePeriodicity = new(time.Duration)
+			}
+			if err := github_com_gogo_protobuf_types.StdDurationUnmarshal(m.StatusTimePeriodicity, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
-		case 6:
-			if wireType != 0 {
+		case 17:
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field StatusCountPeriodicity", wireType)
 			}
-			m.StatusCountPeriodicity = 0
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowEndDevice
@@ -7277,7 +8578,415 @@ func (m *MACSettings) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.StatusCountPeriodicity |= (uint32(b) & 0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.StatusCountPeriodicity == nil {
+				m.StatusCountPeriodicity = &types.UInt32Value{}
+			}
+			if err := m.StatusCountPeriodicity.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 18:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DesiredRx1Delay", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.DesiredRx1Delay == nil {
+				m.DesiredRx1Delay = &MACSettings_RxDelayValue{}
+			}
+			if err := m.DesiredRx1Delay.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 19:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DesiredRx1DataRateOffset", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.DesiredRx1DataRateOffset == nil {
+				m.DesiredRx1DataRateOffset = &types.UInt32Value{}
+			}
+			if err := m.DesiredRx1DataRateOffset.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 20:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DesiredRx2DataRateIndex", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.DesiredRx2DataRateIndex == nil {
+				m.DesiredRx2DataRateIndex = &MACSettings_DataRateIndexValue{}
+			}
+			if err := m.DesiredRx2DataRateIndex.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 21:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DesiredRx2Frequency", wireType)
+			}
+			m.DesiredRx2Frequency = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.DesiredRx2Frequency |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipEndDevice(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MACSettings_DataRateIndexValue) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowEndDevice
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: DataRateIndexValue: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: DataRateIndexValue: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Value", wireType)
+			}
+			m.Value = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Value |= (DataRateIndex(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipEndDevice(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MACSettings_PingSlotPeriodValue) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowEndDevice
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: PingSlotPeriodValue: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: PingSlotPeriodValue: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Value", wireType)
+			}
+			m.Value = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Value |= (PingSlotPeriod(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipEndDevice(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MACSettings_AggregatedDutyCycleValue) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowEndDevice
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: AggregatedDutyCycleValue: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: AggregatedDutyCycleValue: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Value", wireType)
+			}
+			m.Value = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Value |= (AggregatedDutyCycle(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipEndDevice(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthEndDevice
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MACSettings_RxDelayValue) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowEndDevice
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: RxDelayValue: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RxDelayValue: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Value", wireType)
+			}
+			m.Value = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEndDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Value |= (RxDelay(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -8519,39 +10228,6 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 			m.FrequencyPlanID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 18:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DefaultMACParameters", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEndDevice
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthEndDevice
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.DefaultMACParameters == nil {
-				m.DefaultMACParameters = &MACParameters{}
-			}
-			if err := m.DefaultMACParameters.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 19:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field MinFrequency", wireType)
 			}
@@ -8570,7 +10246,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 20:
+		case 19:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field MaxFrequency", wireType)
 			}
@@ -8589,47 +10265,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 21:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ResetsFCnt", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEndDevice
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.ResetsFCnt = bool(v != 0)
-		case 22:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Uses32BitFCnt", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEndDevice
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.Uses32BitFCnt = bool(v != 0)
-		case 23:
+		case 20:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field SupportsJoin", wireType)
 			}
@@ -8649,7 +10285,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 				}
 			}
 			m.SupportsJoin = bool(v != 0)
-		case 24:
+		case 21:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ResetsJoinNonces", wireType)
 			}
@@ -8669,7 +10305,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 				}
 			}
 			m.ResetsJoinNonces = bool(v != 0)
-		case 25:
+		case 22:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RootKeys", wireType)
 			}
@@ -8702,7 +10338,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 26:
+		case 23:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field NetID", wireType)
 			}
@@ -8734,7 +10370,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 27:
+		case 24:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field MACSettings", wireType)
 			}
@@ -8767,7 +10403,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 28:
+		case 25:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field MACState", wireType)
 			}
@@ -8800,7 +10436,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 29:
+		case 26:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Session", wireType)
 			}
@@ -8833,7 +10469,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 30:
+		case 27:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field PendingSession", wireType)
 			}
@@ -8866,7 +10502,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 31:
+		case 28:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field LastDevNonce", wireType)
 			}
@@ -8885,7 +10521,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 32:
+		case 29:
 			if wireType == 0 {
 				var v uint32
 				for shift := uint(0); ; shift += 7 {
@@ -8958,7 +10594,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 			} else {
 				return fmt.Errorf("proto: wrong wireType = %d for field UsedDevNonces", wireType)
 			}
-		case 33:
+		case 30:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field LastJoinNonce", wireType)
 			}
@@ -8977,7 +10613,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 34:
+		case 31:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field LastRJCount0", wireType)
 			}
@@ -8996,7 +10632,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 35:
+		case 32:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field LastRJCount1", wireType)
 			}
@@ -9015,7 +10651,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 36:
+		case 33:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field LastDevStatusReceivedAt", wireType)
 			}
@@ -9048,7 +10684,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 37:
+		case 34:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field PowerState", wireType)
 			}
@@ -9067,7 +10703,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 38:
+		case 35:
 			if wireType != 5 {
 				return fmt.Errorf("proto: wrong wireType = %d for field BatteryPercentage", wireType)
 			}
@@ -9078,7 +10714,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 			v = encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:])
 			iNdEx += 4
 			m.BatteryPercentage = float32(math.Float32frombits(v))
-		case 39:
+		case 36:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field DownlinkMargin", wireType)
 			}
@@ -9097,7 +10733,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 40:
+		case 37:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RecentADRUplinks", wireType)
 			}
@@ -9128,7 +10764,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 41:
+		case 38:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RecentUplinks", wireType)
 			}
@@ -9159,7 +10795,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 42:
+		case 39:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RecentDownlinks", wireType)
 			}
@@ -9190,7 +10826,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 43:
+		case 40:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field QueuedApplicationDownlinks", wireType)
 			}
@@ -9221,7 +10857,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 44:
+		case 41:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Formatters", wireType)
 			}
@@ -9254,7 +10890,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 45:
+		case 42:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ProvisionerID", wireType)
 			}
@@ -9283,7 +10919,7 @@ func (m *EndDevice) Unmarshal(dAtA []byte) error {
 			}
 			m.ProvisionerID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 46:
+		case 43:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ProvisioningData", wireType)
 			}
@@ -10111,227 +11747,246 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/end_device.proto", fileDescriptor_end_device_f8ea6acb7b9cd33a)
+	proto.RegisterFile("lorawan-stack/api/end_device.proto", fileDescriptor_end_device_7c7976812d2926f8)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/end_device.proto", fileDescriptor_end_device_f8ea6acb7b9cd33a)
+	golang_proto.RegisterFile("lorawan-stack/api/end_device.proto", fileDescriptor_end_device_7c7976812d2926f8)
 }
 
-var fileDescriptor_end_device_f8ea6acb7b9cd33a = []byte{
-	// 3434 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x5a, 0x4d, 0x6c, 0x1c, 0xc7,
-	0x95, 0x9e, 0x1e, 0x52, 0xe4, 0x4c, 0x0d, 0xe7, 0xaf, 0x48, 0x49, 0x6d, 0xda, 0xee, 0xa1, 0x29,
-	0xd9, 0xa1, 0x1d, 0x71, 0x28, 0x51, 0xf6, 0xc6, 0x51, 0xb2, 0x90, 0x67, 0x38, 0x54, 0x4c, 0x9b,
-	0xa2, 0xb8, 0x25, 0xc9, 0x5a, 0xc7, 0x91, 0x1b, 0xc5, 0xe9, 0xe2, 0xb0, 0xcd, 0x99, 0xee, 0x4e,
-	0x55, 0x0d, 0x39, 0xdc, 0x1f, 0x20, 0x97, 0x05, 0x72, 0x4b, 0x16, 0xd8, 0x05, 0x72, 0x59, 0x20,
-	0x58, 0xec, 0x02, 0xc1, 0x62, 0x0f, 0x39, 0xfa, 0x98, 0xa3, 0x8f, 0x3e, 0x06, 0x39, 0x8c, 0xa2,
-	0xe1, 0x25, 0xc7, 0x00, 0x7b, 0xc9, 0x71, 0x51, 0x3f, 0xfd, 0x33, 0x3f, 0x94, 0x49, 0x7b, 0xbd,
-	0x17, 0xa2, 0xfb, 0xbd, 0xef, 0x7d, 0xfd, 0xaa, 0x5e, 0xd5, 0xab, 0xf7, 0x6a, 0x08, 0x96, 0xdb,
-	0x3e, 0xc5, 0xc7, 0xd8, 0x5b, 0x65, 0x1c, 0x37, 0x0f, 0xd7, 0x70, 0xe0, 0xae, 0x11, 0xcf, 0xb1,
-	0x1d, 0x72, 0xe4, 0x36, 0x49, 0x35, 0xa0, 0x3e, 0xf7, 0x61, 0x81, 0x73, 0xaf, 0xaa, 0x71, 0xd5,
-	0xa3, 0xdb, 0x8b, 0xab, 0x2d, 0x97, 0x1f, 0x74, 0xf7, 0xaa, 0x4d, 0xbf, 0xb3, 0xd6, 0xf2, 0x5b,
-	0xfe, 0x9a, 0x84, 0xed, 0x75, 0xf7, 0xe5, 0x9b, 0x7c, 0x91, 0x4f, 0xca, 0x7c, 0xf1, 0xaf, 0x12,
-	0xf0, 0xce, 0xb1, 0xcb, 0x0f, 0xfd, 0xe3, 0xb5, 0x96, 0xbf, 0x2a, 0x95, 0xab, 0x47, 0xb8, 0xed,
-	0x3a, 0x98, 0xfb, 0x94, 0xad, 0x45, 0x8f, 0xda, 0xee, 0x95, 0x96, 0xef, 0xb7, 0xda, 0x44, 0xfa,
-	0x84, 0x3d, 0xcf, 0xe7, 0x98, 0xbb, 0xbe, 0xc7, 0xb4, 0xd6, 0xd2, 0xda, 0xe8, 0xdb, 0x4e, 0x97,
-	0x4a, 0x80, 0xd6, 0x2f, 0x8d, 0xea, 0xf7, 0x5d, 0xd2, 0x76, 0xec, 0x0e, 0x66, 0x87, 0x23, 0xfc,
-	0x11, 0x82, 0x71, 0xda, 0x6d, 0x72, 0xad, 0xad, 0x8c, 0x6a, 0xb9, 0xdb, 0x21, 0x8c, 0xe3, 0x4e,
-	0xa0, 0x01, 0xd7, 0xc6, 0x67, 0xce, 0x75, 0x88, 0xc7, 0xdd, 0x7d, 0x97, 0xd0, 0xd0, 0xcb, 0x57,
-	0xc6, 0x41, 0x9f, 0xf9, 0xae, 0x77, 0xb6, 0xf6, 0x90, 0x9c, 0x84, 0xb6, 0x95, 0x71, 0x6d, 0x18,
-	0x04, 0x3d, 0xc4, 0x71, 0x40, 0x87, 0x30, 0x86, 0x5b, 0x84, 0xbd, 0x08, 0xc1, 0xb1, 0x83, 0x39,
-	0x56, 0x88, 0xe5, 0x5f, 0x4c, 0x81, 0xd9, 0x87, 0x84, 0x31, 0xd7, 0xf7, 0xe0, 0x13, 0x90, 0x71,
-	0xc8, 0x91, 0x8d, 0x1d, 0x87, 0x9a, 0xe9, 0x25, 0x63, 0x65, 0xae, 0xfe, 0xc3, 0x2f, 0xfa, 0x95,
-	0xd4, 0x1f, 0xfa, 0x95, 0xb7, 0x5b, 0x7e, 0x95, 0x1f, 0x10, 0x7e, 0xe0, 0x7a, 0x2d, 0x56, 0xf5,
-	0x08, 0x3f, 0xf6, 0xe9, 0xe1, 0xda, 0x30, 0x79, 0x70, 0xd8, 0x5a, 0xe3, 0x27, 0x01, 0x61, 0xd5,
-	0x06, 0x39, 0xaa, 0x39, 0x0e, 0x45, 0xb3, 0x8e, 0x7a, 0x80, 0xdf, 0x07, 0xd3, 0x62, 0x5c, 0xe6,
-	0xd4, 0x92, 0xb1, 0x92, 0x5b, 0x7f, 0xb9, 0x3a, 0xbc, 0x9e, 0xaa, 0xfa, 0xfb, 0x1f, 0x92, 0x13,
-	0x56, 0xcf, 0x88, 0x2f, 0x7e, 0xd9, 0xaf, 0x18, 0x48, 0x9a, 0xc0, 0xd7, 0x40, 0xbe, 0x8d, 0x19,
-	0xb7, 0xf7, 0xed, 0xa6, 0xc7, 0xed, 0x6e, 0x60, 0x4e, 0x2f, 0x19, 0x2b, 0x79, 0x04, 0x84, 0xf0,
-	0xde, 0x86, 0xc7, 0x1f, 0x07, 0x70, 0x05, 0x94, 0x25, 0xc4, 0xd3, 0x20, 0xc7, 0x3f, 0xf6, 0xcc,
-	0x4b, 0x12, 0x26, 0x6d, 0x77, 0x04, 0xae, 0xe1, 0x1f, 0x7b, 0x11, 0x12, 0x27, 0x91, 0x33, 0x31,
-	0xb2, 0x16, 0x21, 0xab, 0x60, 0x41, 0x22, 0x9b, 0xbe, 0xb7, 0x9f, 0x04, 0xcf, 0x4a, 0x70, 0x49,
-	0xe8, 0x36, 0x7c, 0x6f, 0x3f, 0xc2, 0x6f, 0x00, 0xc0, 0x38, 0xa6, 0x9c, 0x38, 0x36, 0xe6, 0x66,
-	0x46, 0x8e, 0x73, 0xb1, 0xaa, 0x96, 0x50, 0x35, 0x5c, 0x42, 0xd5, 0x47, 0xe1, 0x12, 0x52, 0xc3,
-	0xfc, 0xe5, 0xb3, 0x8a, 0x81, 0xb2, 0xda, 0xae, 0xc6, 0x3f, 0x98, 0xce, 0x18, 0xa5, 0xf4, 0xf2,
-	0xb3, 0x1c, 0xc8, 0xdf, 0xaf, 0x6d, 0xec, 0x62, 0x8a, 0x3b, 0x84, 0x13, 0xca, 0xe0, 0x1b, 0x20,
-	0xd3, 0xc1, 0x3d, 0x9b, 0xb8, 0x34, 0x30, 0x8d, 0x25, 0x63, 0x25, 0x5d, 0xcf, 0x0d, 0xfa, 0x95,
-	0xd9, 0xfb, 0xb8, 0xb7, 0xb9, 0x85, 0x76, 0xd1, 0x6c, 0x07, 0xf7, 0x36, 0x5d, 0x1a, 0xc0, 0xb7,
-	0x40, 0xb9, 0x1b, 0xb4, 0x5d, 0xef, 0xd0, 0x76, 0x8e, 0x49, 0xbb, 0x6d, 0x8b, 0x15, 0x2b, 0x03,
-	0x99, 0x41, 0x45, 0xa5, 0x68, 0x08, 0xb9, 0xf0, 0x02, 0x56, 0xc1, 0xbc, 0x18, 0xd0, 0x28, 0x7a,
-	0x4a, 0xa2, 0xcb, 0xa1, 0x2a, 0xc6, 0xef, 0x81, 0x79, 0xec, 0x50, 0x5b, 0xac, 0x1c, 0x9b, 0x62,
-	0x4e, 0x6c, 0xd7, 0x73, 0x48, 0x4f, 0x46, 0xa3, 0xb0, 0xfe, 0xea, 0x68, 0x44, 0x1b, 0x98, 0x63,
-	0x84, 0x39, 0xd9, 0x12, 0xa0, 0xfa, 0xc2, 0xa0, 0x5f, 0x29, 0xd5, 0x1a, 0x68, 0x48, 0x8a, 0x4a,
-	0xd8, 0xa1, 0x43, 0x12, 0xf8, 0x1e, 0x80, 0xe2, 0x1b, 0xbc, 0x67, 0x07, 0xfe, 0x31, 0xa1, 0xfa,
-	0x13, 0x32, 0x92, 0xf5, 0xf9, 0x41, 0xbf, 0x52, 0xac, 0x35, 0xd0, 0xa3, 0xde, 0xae, 0xd0, 0x29,
-	0x8a, 0x22, 0x76, 0x68, 0x52, 0x00, 0x6f, 0x82, 0x39, 0xc1, 0xe0, 0xed, 0xd9, 0x9c, 0x62, 0x8f,
-	0xa9, 0xd8, 0xd6, 0x0b, 0x83, 0x7e, 0x05, 0xd4, 0x1a, 0x68, 0x67, 0xef, 0x91, 0x90, 0x22, 0x80,
-	0x1d, 0xaa, 0x9f, 0xe1, 0x6d, 0x90, 0x17, 0x16, 0xb8, 0x79, 0x68, 0xb7, 0xdd, 0x8e, 0xcb, 0x55,
-	0x84, 0xeb, 0xc5, 0x41, 0xbf, 0x92, 0xab, 0x35, 0x50, 0xad, 0x79, 0xb8, 0x2d, 0xc4, 0x28, 0x87,
-	0x1d, 0x1a, 0xbe, 0x24, 0x8d, 0x1c, 0xd2, 0xc6, 0x27, 0x32, 0xe0, 0x43, 0x46, 0x0d, 0x21, 0x0e,
-	0x8d, 0xe4, 0x0b, 0x7c, 0x1b, 0x64, 0x69, 0xef, 0x96, 0x36, 0xc8, 0xca, 0x79, 0xbb, 0x3a, 0x3a,
-	0x6f, 0xa8, 0xa7, 0x0c, 0x33, 0xb4, 0x77, 0x4b, 0x59, 0xad, 0x81, 0x05, 0x69, 0x15, 0xcd, 0xbb,
-	0xbf, 0xbf, 0xcf, 0x08, 0x37, 0x81, 0x5c, 0x88, 0x65, 0x81, 0xd3, 0x73, 0xf8, 0x40, 0x2a, 0xe0,
-	0x36, 0x98, 0xa7, 0xbd, 0xf5, 0xb1, 0x40, 0xe5, 0xce, 0x11, 0x28, 0x54, 0xa2, 0xbd, 0xf5, 0xe1,
-	0x90, 0x5c, 0x03, 0x79, 0xc1, 0xb6, 0x4f, 0xc9, 0x4f, 0xbb, 0xc4, 0x6b, 0x9e, 0x98, 0x73, 0x4b,
-	0xc6, 0xca, 0x34, 0x9a, 0xa3, 0xbd, 0xf5, 0x7b, 0xa1, 0x0c, 0xfe, 0x18, 0x5c, 0xa5, 0x44, 0xa4,
-	0x35, 0xb9, 0x86, 0xec, 0x80, 0x50, 0xd7, 0x77, 0xdc, 0xa6, 0xcb, 0x4f, 0xcc, 0xbc, 0xfc, 0xec,
-	0xf2, 0xd8, 0x38, 0x25, 0x5c, 0x2c, 0xac, 0xcd, 0x5e, 0xe0, 0x7b, 0xc4, 0xe3, 0xe8, 0x32, 0x8d,
-	0x64, 0xbb, 0x31, 0x01, 0x7c, 0x0a, 0x4c, 0xcd, 0xdd, 0xf4, 0xbb, 0x1e, 0x1f, 0x22, 0x2f, 0x48,
-	0xf2, 0x6b, 0x93, 0xc9, 0x37, 0x04, 0x3c, 0x62, 0xbf, 0x42, 0x63, 0x61, 0x92, 0x7e, 0x0b, 0x14,
-	0xc4, 0xd6, 0x72, 0xba, 0xfc, 0xc4, 0x6e, 0x9e, 0x34, 0xdb, 0xc4, 0x2c, 0x4e, 0x26, 0xad, 0xb5,
-	0x5a, 0x94, 0xb4, 0x30, 0x27, 0x4e, 0xa3, 0xcb, 0x4f, 0x36, 0x04, 0x14, 0xcd, 0x75, 0x70, 0x2f,
-	0x7a, 0x83, 0x35, 0x90, 0x69, 0x1e, 0x60, 0xcf, 0x23, 0x6d, 0x66, 0x96, 0x96, 0xa6, 0x56, 0x72,
-	0xeb, 0xaf, 0x8f, 0x92, 0x0c, 0x6d, 0xeb, 0xea, 0x86, 0x42, 0xa3, 0xc8, 0x4c, 0x6c, 0xca, 0xc0,
-	0xf5, 0x5a, 0x36, 0x6b, 0xfb, 0x3c, 0x31, 0xe7, 0x65, 0x39, 0xe7, 0x65, 0xa1, 0x7a, 0xd8, 0xf6,
-	0x79, 0x3c, 0xf1, 0x4f, 0xc0, 0x4b, 0x31, 0x7e, 0x34, 0xe2, 0xf0, 0x3c, 0x11, 0xbf, 0x1c, 0x92,
-	0x0e, 0x87, 0xfd, 0x4d, 0x50, 0xda, 0x23, 0xb8, 0xe9, 0x7b, 0x09, 0x2f, 0xe6, 0xa5, 0x17, 0x45,
-	0x25, 0x8f, 0x7c, 0x58, 0xfc, 0xaf, 0x34, 0x98, 0xd5, 0x23, 0x11, 0x66, 0x3a, 0x01, 0xc5, 0x66,
-	0x86, 0x32, 0x53, 0xf2, 0xd8, 0xf5, 0x55, 0x00, 0xa3, 0xfc, 0x13, 0x83, 0xd3, 0x6a, 0xa4, 0xa1,
-	0x26, 0x86, 0x6f, 0x83, 0xf9, 0x8e, 0xeb, 0x8d, 0x8d, 0x71, 0xea, 0x5c, 0xab, 0xba, 0xe3, 0x7a,
-	0xc3, 0xc3, 0x13, 0x6c, 0x22, 0xea, 0x5f, 0x23, 0x99, 0xa1, 0x92, 0x08, 0xfa, 0xe8, 0x1e, 0x21,
-	0x1e, 0xde, 0x6b, 0x13, 0x5b, 0x0d, 0x52, 0x66, 0xac, 0x0c, 0x9a, 0x53, 0xc2, 0xc7, 0x52, 0x76,
-	0x67, 0xfa, 0xf3, 0x5f, 0x57, 0x52, 0xea, 0xef, 0x72, 0x07, 0x14, 0x36, 0x3d, 0xa7, 0x21, 0x4b,
-	0xac, 0x3a, 0xc5, 0x9e, 0x03, 0xaf, 0x80, 0xb4, 0xeb, 0xc8, 0xa9, 0xca, 0xd6, 0x67, 0x06, 0xfd,
-	0x4a, 0x7a, 0xab, 0x81, 0xd2, 0xae, 0x03, 0x21, 0x98, 0xf6, 0xb0, 0x4e, 0xe2, 0x59, 0x24, 0x9f,
-	0xe1, 0x4b, 0x60, 0xaa, 0x4b, 0xdb, 0x72, 0xe8, 0xd9, 0xfa, 0xec, 0xa0, 0x5f, 0x99, 0x7a, 0x8c,
-	0xb6, 0x91, 0x90, 0xc1, 0x05, 0x70, 0xa9, 0xed, 0xb7, 0x7c, 0x66, 0x4e, 0x2f, 0x4d, 0xad, 0x64,
-	0x91, 0x7a, 0x59, 0x76, 0x12, 0x9f, 0xbb, 0xef, 0x3b, 0xa4, 0x2d, 0x0e, 0x94, 0x3d, 0xf1, 0x5d,
-	0x3b, 0xfa, 0xa8, 0x3c, 0x50, 0xa4, 0x2f, 0x5b, 0x0d, 0x34, 0x2b, 0x95, 0x5b, 0xa1, 0x5b, 0xe9,
-	0x33, 0xdd, 0x9a, 0x8a, 0xdd, 0x5a, 0xfe, 0xd7, 0x34, 0x78, 0x39, 0xfa, 0xcc, 0x47, 0x84, 0x8a,
-	0x13, 0x7d, 0x2b, 0xae, 0x87, 0xe0, 0x83, 0xb1, 0x6f, 0xbe, 0x9d, 0xf8, 0xe6, 0xe0, 0x59, 0xe5,
-	0x75, 0xf0, 0xda, 0xa7, 0x9f, 0xe0, 0xd5, 0xbf, 0xbb, 0xb9, 0xfa, 0xfd, 0xa7, 0x2b, 0x77, 0xef,
-	0x7c, 0xb2, 0xfa, 0xf4, 0x6e, 0xf8, 0xfa, 0xe6, 0xdf, 0xaf, 0xdf, 0xf8, 0xc7, 0xeb, 0xff, 0xf0,
-	0xe9, 0xf5, 0xde, 0xeb, 0xb1, 0x73, 0x0f, 0x40, 0xa6, 0x23, 0x46, 0x63, 0x47, 0x2e, 0x4a, 0x42,
-	0x39, 0xc2, 0x0b, 0x11, 0x4a, 0x96, 0x2d, 0x47, 0xac, 0xde, 0x03, 0x4c, 0x9d, 0x63, 0x4c, 0x89,
-	0x7d, 0xa4, 0x06, 0xa0, 0x47, 0x58, 0x0c, 0xe5, 0x7a, 0x5c, 0x02, 0xba, 0xef, 0xd2, 0xce, 0x10,
-	0x74, 0x5a, 0x41, 0x43, 0xb9, 0x86, 0x2e, 0xff, 0xcb, 0x2c, 0x28, 0x8d, 0xce, 0x0b, 0xfc, 0x11,
-	0x98, 0x72, 0x1d, 0x26, 0xe7, 0x21, 0xb7, 0xfe, 0xdd, 0xd1, 0x05, 0xf7, 0x82, 0x69, 0x4c, 0xd4,
-	0x47, 0x82, 0x01, 0x3e, 0x01, 0x45, 0x6d, 0x18, 0xf9, 0x91, 0x96, 0xab, 0x78, 0x71, 0x42, 0xee,
-	0xd1, 0x74, 0x75, 0x38, 0xe8, 0x57, 0x0a, 0xdb, 0x3e, 0xc2, 0x4f, 0x6a, 0x3b, 0x5a, 0x86, 0x0a,
-	0x1a, 0x1a, 0x7a, 0x88, 0xc1, 0x7c, 0x48, 0x1c, 0x1c, 0x9c, 0x0c, 0xcd, 0xc7, 0x04, 0xf2, 0xdd,
-	0xf7, 0x3f, 0x0e, 0xc9, 0x2f, 0x0f, 0xfa, 0x95, 0xb2, 0x26, 0x8f, 0xc5, 0xa8, 0xac, 0xd1, 0xbb,
-	0x07, 0x27, 0xe1, 0x27, 0xee, 0x82, 0x72, 0xb4, 0xf3, 0xed, 0xa0, 0x8d, 0x3d, 0x11, 0x49, 0x39,
-	0x8b, 0xea, 0xb4, 0x8f, 0x76, 0xff, 0x6e, 0x1b, 0x7b, 0x5b, 0x0d, 0x54, 0xdc, 0x1f, 0x12, 0x88,
-	0xe5, 0x39, 0x13, 0x1c, 0xf8, 0xdc, 0x67, 0xe6, 0x25, 0xb9, 0xde, 0xf5, 0x1b, 0x5c, 0x01, 0x25,
-	0xd6, 0x0d, 0x02, 0x9f, 0x72, 0x66, 0x37, 0xdb, 0x98, 0x31, 0x7b, 0x4f, 0x56, 0x02, 0x19, 0x54,
-	0x08, 0xe5, 0x1b, 0x42, 0x5c, 0x9f, 0x80, 0x6c, 0xca, 0x02, 0x60, 0x14, 0xb9, 0x01, 0x3b, 0xe0,
-	0x8a, 0x43, 0xf6, 0x71, 0xb7, 0xcd, 0xed, 0x0e, 0x6e, 0xda, 0x41, 0x94, 0xc6, 0x75, 0xb1, 0xf7,
-	0xea, 0x0b, 0x73, 0x7d, 0xdd, 0x1c, 0xf4, 0x2b, 0x0b, 0x0d, 0x45, 0x30, 0xa4, 0x41, 0x0b, 0x9a,
-	0xf6, 0x3e, 0x6e, 0x26, 0x4a, 0xbe, 0x6b, 0x20, 0x2f, 0xf2, 0x5d, 0x9c, 0x19, 0xb3, 0xea, 0xdc,
-	0xed, 0xb8, 0x71, 0xea, 0x95, 0x20, 0xdc, 0x4b, 0x80, 0x80, 0x06, 0xe1, 0x5e, 0x0c, 0x5a, 0x02,
-	0x73, 0x94, 0x30, 0xc2, 0x99, 0x2a, 0x63, 0x65, 0x21, 0x90, 0x41, 0x40, 0xc9, 0x44, 0xfd, 0x0a,
-	0x7f, 0x00, 0xca, 0x5d, 0x46, 0x98, 0x7d, 0x7b, 0xdd, 0xde, 0x73, 0x75, 0xa5, 0x2d, 0xcf, 0xf9,
-	0x4c, 0xbd, 0x3c, 0xe8, 0x57, 0xf2, 0x8f, 0x19, 0x61, 0xb7, 0xd7, 0xeb, 0xae, 0xac, 0xb7, 0x51,
-	0xbe, 0x9b, 0x7c, 0x15, 0x3e, 0x44, 0x33, 0x28, 0x4e, 0x58, 0x79, 0xe2, 0x67, 0xd0, 0x5c, 0x28,
-	0xfc, 0xc0, 0x77, 0x3d, 0x78, 0x03, 0x40, 0xed, 0x83, 0x3c, 0xc9, 0x3d, 0xdf, 0x6b, 0x12, 0x26,
-	0x8f, 0xef, 0x0c, 0x2a, 0x29, 0x8d, 0xc0, 0xed, 0x48, 0x39, 0x7c, 0x0a, 0x60, 0x38, 0xd5, 0xfb,
-	0x3e, 0xed, 0x60, 0x2e, 0xa7, 0xb9, 0x28, 0xa7, 0x79, 0x65, 0x6c, 0x9a, 0x55, 0xc3, 0xb3, 0x8b,
-	0x4f, 0xda, 0x3e, 0x76, 0xee, 0x45, 0xf8, 0xfa, 0xb4, 0xd8, 0x28, 0xa8, 0xac, 0x99, 0x62, 0x85,
-	0xce, 0xc1, 0xff, 0x3c, 0x05, 0x72, 0xf7, 0x6b, 0x1b, 0x0f, 0x09, 0xe7, 0xa2, 0xa7, 0x81, 0xd7,
-	0xc0, 0x6c, 0x97, 0x11, 0x1b, 0x3b, 0x54, 0xee, 0xca, 0x4c, 0x1d, 0x0c, 0xfa, 0x95, 0x99, 0xc7,
-	0x8c, 0xd4, 0x1a, 0x08, 0xcd, 0x74, 0x19, 0xa9, 0x39, 0x14, 0xde, 0x00, 0xa2, 0x74, 0xb4, 0x3b,
-	0x98, 0xb6, 0x5c, 0xb5, 0xd1, 0xf2, 0xf5, 0xfc, 0xa0, 0x5f, 0xc9, 0xd6, 0x1a, 0xe8, 0xbe, 0x14,
-	0xa2, 0x2c, 0x76, 0xa8, 0x7a, 0x84, 0x1f, 0x82, 0xa2, 0x5e, 0x7d, 0xb2, 0x2e, 0xf2, 0xbb, 0x5c,
-	0x37, 0x40, 0x2f, 0x8d, 0x35, 0x06, 0x0d, 0xdd, 0xbb, 0xaa, 0xed, 0xfd, 0x2b, 0xd1, 0x17, 0xe4,
-	0xa5, 0x6d, 0xfd, 0x91, 0xb2, 0x8c, 0xc9, 0x9a, 0x11, 0xd9, 0xf4, 0x45, 0xc9, 0x36, 0x42, 0xb2,
-	0x4f, 0xc0, 0x55, 0xc6, 0x31, 0xef, 0xb2, 0xf1, 0x82, 0xed, 0xd2, 0xf9, 0x49, 0x2f, 0x2b, 0x8e,
-	0xd1, 0x8a, 0xed, 0x5d, 0x60, 0x6a, 0xf2, 0xf1, 0x8a, 0x4d, 0xf5, 0x5a, 0x57, 0x94, 0x7e, 0xb4,
-	0x18, 0x5b, 0xfe, 0xcf, 0x2c, 0xc8, 0x88, 0x98, 0x70, 0xcc, 0x09, 0x44, 0x00, 0x36, 0xbb, 0x94,
-	0x12, 0xc1, 0x10, 0x6f, 0x36, 0xe3, 0x3c, 0x9b, 0x4d, 0x87, 0x5e, 0x9b, 0x27, 0x76, 0x15, 0x12,
-	0x2b, 0x8b, 0xb9, 0x94, 0x38, 0x49, 0xce, 0xf4, 0x05, 0x38, 0xb5, 0x79, 0x82, 0xf3, 0x5d, 0x30,
-	0xa7, 0x2e, 0x4b, 0x54, 0x02, 0xd1, 0x19, 0xf2, 0xf2, 0x28, 0x9b, 0x4c, 0x23, 0x28, 0xa7, 0xa0,
-	0xf2, 0x65, 0x52, 0xee, 0x9e, 0xfe, 0x3f, 0xc9, 0xdd, 0x4f, 0xc1, 0x62, 0xd4, 0xbc, 0xba, 0xb4,
-	0x43, 0x1c, 0x3b, 0x2a, 0xb5, 0x30, 0xd7, 0x11, 0x7e, 0x51, 0x73, 0x3a, 0x2d, 0x1b, 0xd3, 0xab,
-	0x61, 0x93, 0x2b, 0x29, 0x1a, 0x9a, 0xa1, 0xc6, 0xe1, 0x3b, 0xc0, 0x94, 0xf4, 0x0e, 0x39, 0xb2,
-	0x75, 0xa4, 0xa3, 0xee, 0x5c, 0x05, 0x78, 0x5e, 0xe8, 0x1b, 0xe4, 0xe8, 0xa1, 0xd4, 0xea, 0x36,
-	0x1d, 0x81, 0xcb, 0x71, 0xb1, 0x9a, 0x5c, 0x14, 0xb3, 0x72, 0xd0, 0xd6, 0xd8, 0x99, 0xa2, 0x2b,
-	0x53, 0xb5, 0x42, 0xd0, 0x7c, 0x30, 0xf4, 0xae, 0xd6, 0x1a, 0x01, 0xaf, 0x04, 0xc4, 0x73, 0x04,
-	0x2d, 0x0e, 0x82, 0xb6, 0xdb, 0x94, 0x6b, 0x34, 0x1a, 0xae, 0xce, 0xcd, 0xe3, 0xc5, 0x7c, 0x8c,
-	0x0d, 0xc7, 0x85, 0x16, 0x35, 0xd1, 0x04, 0x1d, 0xdc, 0x04, 0xa5, 0x9f, 0x76, 0x49, 0x97, 0x38,
-	0x36, 0x25, 0x2c, 0xf0, 0x3d, 0x46, 0x98, 0x99, 0x95, 0x25, 0xfe, 0xa4, 0x50, 0x6d, 0xf8, 0x9d,
-	0x0e, 0xf6, 0x1c, 0x54, 0x54, 0x36, 0x28, 0x34, 0x11, 0x34, 0xa1, 0xb7, 0x32, 0x3d, 0x33, 0xce,
-	0x4c, 0xf0, 0xd5, 0x34, 0xda, 0x06, 0x69, 0x13, 0xf8, 0x37, 0x00, 0x6a, 0x6f, 0x64, 0x36, 0xc5,
-	0xcd, 0x26, 0x09, 0x54, 0x5e, 0x9f, 0x30, 0xd4, 0x70, 0x3f, 0x55, 0x45, 0x82, 0xad, 0x49, 0x28,
-	0xd2, 0x83, 0x89, 0x25, 0xf0, 0x3e, 0x58, 0x08, 0x3d, 0x93, 0x9c, 0xda, 0x3d, 0x79, 0x0a, 0x4c,
-	0xb8, 0xb0, 0x11, 0x96, 0xda, 0x1d, 0x04, 0xb5, 0x61, 0x42, 0x06, 0x6f, 0x8a, 0xa6, 0xd5, 0x3e,
-	0x76, 0x3d, 0xc7, 0x3f, 0x66, 0x36, 0x3e, 0xc2, 0x6e, 0x5b, 0x94, 0xc2, 0xfa, 0x6c, 0x80, 0xb4,
-	0xf7, 0x44, 0xa9, 0x6a, 0xa1, 0x66, 0xf1, 0x3f, 0x0c, 0x00, 0x12, 0xfe, 0x2c, 0x83, 0xd9, 0x40,
-	0x65, 0x74, 0xb9, 0xe3, 0xe7, 0xea, 0x99, 0xc1, 0xb3, 0xca, 0x74, 0x90, 0xeb, 0xbd, 0x8a, 0x42,
-	0x05, 0xfc, 0x01, 0x98, 0x0d, 0xdd, 0x4c, 0x7f, 0xa5, 0x9b, 0x7a, 0xff, 0x86, 0x16, 0xf0, 0x9d,
-	0xf3, 0xdf, 0x48, 0x29, 0x4b, 0x09, 0xd7, 0x67, 0xc7, 0x3f, 0x99, 0x20, 0x1b, 0xd5, 0x68, 0xf0,
-	0xbd, 0x64, 0x2d, 0x77, 0xfd, 0xcc, 0x5a, 0xee, 0x05, 0x45, 0xdc, 0x06, 0x00, 0x4d, 0x4a, 0xb0,
-	0xbe, 0x3c, 0x4a, 0x5f, 0xe4, 0xf2, 0x48, 0xdb, 0xd5, 0xb8, 0x20, 0xe9, 0x06, 0x4e, 0x48, 0x32,
-	0x75, 0x11, 0x12, 0x6d, 0x57, 0xe3, 0x51, 0x61, 0x3f, 0x9d, 0xe8, 0x37, 0x96, 0x40, 0xce, 0x21,
-	0xac, 0x49, 0xdd, 0x40, 0xec, 0x09, 0x99, 0x3e, 0xb2, 0x28, 0x29, 0x82, 0x5b, 0x00, 0x60, 0xce,
-	0xa9, 0xbb, 0xd7, 0xe5, 0x84, 0x99, 0x33, 0x72, 0x45, 0xbf, 0x79, 0xe6, 0x44, 0x54, 0x6b, 0x11,
-	0x76, 0xd3, 0xe3, 0xf4, 0x04, 0x25, 0x8c, 0xe1, 0x4f, 0x40, 0x4e, 0xe7, 0x42, 0x5b, 0x4c, 0xea,
-	0xec, 0xc5, 0x0b, 0x64, 0x79, 0xd9, 0x13, 0xca, 0x1b, 0x0c, 0x81, 0xa3, 0x10, 0xc3, 0x60, 0x1d,
-	0x40, 0x46, 0xa8, 0x4c, 0xd6, 0x01, 0xf5, 0xf7, 0xdd, 0x36, 0x11, 0x25, 0x67, 0x46, 0x96, 0x9c,
-	0xf2, 0x92, 0xea, 0xa1, 0xd2, 0xee, 0x2a, 0xe5, 0x56, 0x03, 0x95, 0xd8, 0xb0, 0xc4, 0x81, 0x6f,
-	0x83, 0x2b, 0xfa, 0xfe, 0xd3, 0x16, 0x3a, 0x42, 0xe5, 0x7d, 0x29, 0x61, 0x4c, 0x96, 0x68, 0x59,
-	0xb4, 0xa0, 0xb5, 0x0f, 0xa5, 0xb2, 0xa6, 0x74, 0xf0, 0x87, 0x60, 0x31, 0x99, 0xa0, 0x46, 0x2c,
-	0x81, 0xb4, 0x34, 0x13, 0x88, 0x61, 0xeb, 0x2a, 0x98, 0x97, 0xdb, 0x72, 0xc4, 0x2c, 0x27, 0xcd,
-	0xca, 0x42, 0x35, 0x8c, 0xbf, 0x07, 0xb2, 0x6d, 0x5f, 0x11, 0x31, 0x73, 0x4e, 0xc6, 0x63, 0xe5,
-	0xec, 0x78, 0x6c, 0x87, 0x50, 0x15, 0x8e, 0xd8, 0x74, 0x62, 0x21, 0x9d, 0x3f, 0x77, 0x21, 0x5d,
-	0x98, 0x58, 0x48, 0x4f, 0x38, 0xf5, 0x8a, 0xdf, 0x66, 0xc7, 0x52, 0xfa, 0xb6, 0x3b, 0x96, 0xf2,
-	0x05, 0x3a, 0x96, 0xb3, 0xbb, 0x08, 0xf8, 0xff, 0xd2, 0x45, 0xcc, 0x9f, 0xa7, 0x8b, 0x58, 0x38,
-	0x47, 0x17, 0x71, 0xf9, 0x7c, 0x5d, 0xc4, 0x95, 0xaf, 0xdb, 0x45, 0x5c, 0x3d, 0x77, 0x17, 0x61,
-	0x9e, 0xd1, 0x45, 0xbc, 0x03, 0xb2, 0xd4, 0xf7, 0xb9, 0x2d, 0xd3, 0xfc, 0x4b, 0x72, 0x76, 0xcd,
-	0xb1, 0x9b, 0x42, 0xdf, 0xe7, 0x22, 0xc7, 0xa3, 0x0c, 0xd5, 0x4f, 0xf0, 0x23, 0x30, 0xe3, 0x11,
-	0x2e, 0xe2, 0xba, 0x28, 0x0f, 0x9e, 0xbb, 0x7f, 0xe8, 0x57, 0xd6, 0x2f, 0xf4, 0xeb, 0xc7, 0x0e,
-	0xe1, 0x5b, 0x8d, 0x41, 0xbf, 0x72, 0x49, 0x3e, 0xa0, 0x4b, 0x1e, 0xe1, 0xf2, 0xb6, 0x62, 0x4e,
-	0x44, 0x9c, 0xe9, 0x7e, 0xc3, 0x7c, 0x79, 0xf2, 0xc1, 0x93, 0x68, 0x49, 0xd4, 0x75, 0x72, 0x42,
-	0x80, 0x72, 0x1d, 0xdc, 0x8c, 0x1a, 0x96, 0x0d, 0x90, 0x95, 0x84, 0xe2, 0x70, 0x37, 0x5f, 0x99,
-	0x3c, 0xbe, 0xf0, 0xf0, 0xaf, 0xcf, 0x0d, 0xfa, 0x95, 0xa8, 0xb4, 0x46, 0x19, 0xc1, 0x23, 0x8b,
-	0xec, 0x5b, 0x60, 0x96, 0xa9, 0xa3, 0xce, 0x7c, 0x55, 0x52, 0x5c, 0x3d, 0xe3, 0x24, 0x44, 0x21,
-	0x0e, 0xbe, 0x07, 0xc2, 0x82, 0xc4, 0x0e, 0x4d, 0xad, 0x17, 0x9b, 0x16, 0x34, 0x3e, 0xfc, 0x99,
-	0xe9, 0x3a, 0x28, 0x44, 0xf5, 0xa3, 0x0c, 0xa2, 0x59, 0x91, 0x55, 0xe3, 0x9c, 0xae, 0x1a, 0x65,
-	0x00, 0xe1, 0x1b, 0xa0, 0xd8, 0x65, 0xc4, 0x89, 0x51, 0xcc, 0x5c, 0x5a, 0x9a, 0x5a, 0xc9, 0xcb,
-	0xa5, 0xe3, 0x84, 0x30, 0x26, 0x70, 0x92, 0x2d, 0x5e, 0x13, 0xe6, 0x6b, 0xf1, 0x2f, 0x3a, 0xd1,
-	0x82, 0x80, 0xdf, 0xd3, 0x38, 0xfa, 0x99, 0xee, 0x4b, 0x6e, 0x9a, 0xcb, 0xb2, 0x81, 0x2b, 0x0d,
-	0xfa, 0x95, 0xb9, 0x6d, 0xcc, 0x38, 0xfa, 0x40, 0x76, 0x24, 0x37, 0x95, 0x23, 0xe8, 0x33, 0xf5,
-	0x36, 0x6e, 0x78, 0xcb, 0xbc, 0x36, 0xd1, 0xf0, 0xd6, 0x90, 0xe1, 0x2d, 0xf8, 0x29, 0x78, 0x79,
-	0xb4, 0x4e, 0xa6, 0xa4, 0x49, 0xdc, 0x23, 0x75, 0x44, 0x5f, 0xbf, 0x48, 0x1d, 0x1e, 0x15, 0xd3,
-	0x48, 0x33, 0xd4, 0xc4, 0x8e, 0xcb, 0xa9, 0xdf, 0x49, 0xd4, 0x1a, 0x78, 0xfd, 0x8c, 0x44, 0x27,
-	0x20, 0x2a, 0xee, 0x20, 0x88, 0x9e, 0xe1, 0x2a, 0x80, 0x7b, 0xb2, 0x21, 0x3e, 0x11, 0xb5, 0x78,
-	0x93, 0x78, 0x1c, 0xb7, 0x88, 0xf9, 0xc6, 0x92, 0xb1, 0x92, 0x46, 0x65, 0xad, 0xd9, 0x8d, 0x14,
-	0xf0, 0x3b, 0xa0, 0x18, 0xf5, 0x10, 0xba, 0xfd, 0xfd, 0xce, 0x92, 0xb1, 0x72, 0x09, 0x15, 0x42,
-	0xb1, 0x6e, 0x7a, 0xb1, 0xd8, 0xa4, 0xc2, 0x4a, 0xb4, 0xd2, 0xfa, 0x42, 0x94, 0x99, 0x2b, 0xf2,
-	0x0c, 0x1a, 0xcb, 0x6e, 0xea, 0x6e, 0x54, 0xb7, 0xf0, 0xea, 0x04, 0x46, 0xd2, 0xb8, 0xd6, 0x40,
-	0x4a, 0xc7, 0xc4, 0xce, 0x96, 0x12, 0x87, 0x6a, 0x09, 0x6c, 0x80, 0x82, 0xfe, 0x44, 0x48, 0xff,
-	0xe6, 0x39, 0xe8, 0x51, 0x5e, 0x19, 0x85, 0x2c, 0x1f, 0x00, 0xcd, 0x1c, 0x75, 0x0b, 0xcc, 0x7c,
-	0x4b, 0xf2, 0x54, 0xc6, 0x2e, 0x80, 0xc3, 0x21, 0x6a, 0xa6, 0xa2, 0x32, 0x0c, 0xc5, 0x4c, 0xb4,
-	0x21, 0xba, 0x22, 0x9f, 0xd4, 0x85, 0x30, 0xf3, 0xbb, 0x92, 0xf7, 0x7c, 0x6d, 0x88, 0x22, 0x9a,
-	0xa0, 0x62, 0xf0, 0x7d, 0x00, 0x12, 0x17, 0x22, 0x37, 0x2e, 0x76, 0x21, 0x82, 0x12, 0xb6, 0x10,
-	0x83, 0x42, 0x40, 0xfd, 0x23, 0x57, 0xec, 0x47, 0x42, 0x45, 0xb6, 0x5b, 0x95, 0xa7, 0xd8, 0x1d,
-	0x91, 0xa9, 0x77, 0x63, 0xcd, 0x45, 0xee, 0x51, 0xf3, 0x09, 0xc6, 0x2d, 0x07, 0x36, 0x40, 0x39,
-	0x12, 0x88, 0x64, 0xe1, 0x60, 0x8e, 0xcd, 0xaa, 0xce, 0x14, 0xa3, 0x6b, 0xfe, 0xa1, 0xfc, 0xe5,
-	0x1d, 0x95, 0x92, 0x16, 0x0d, 0xcc, 0xf1, 0xe2, 0x5f, 0x83, 0xe2, 0x48, 0xb9, 0x08, 0x4b, 0x60,
-	0xea, 0x90, 0xa8, 0xdf, 0x15, 0xb2, 0x48, 0x3c, 0xc2, 0x05, 0x70, 0xe9, 0x08, 0xb7, 0xbb, 0xe1,
-	0x35, 0xb9, 0x7a, 0xb9, 0x93, 0x7e, 0xd7, 0x58, 0xfc, 0x08, 0x14, 0x86, 0xab, 0x9b, 0x09, 0xd6,
-	0xd5, 0xa4, 0xf5, 0x84, 0x24, 0x1a, 0x12, 0x24, 0x78, 0x75, 0x1f, 0xf0, 0x3e, 0x00, 0x51, 0x15,
-	0xc5, 0xe0, 0x1d, 0x90, 0x8b, 0xff, 0x73, 0x42, 0xf4, 0x03, 0x53, 0xf2, 0x22, 0xe5, 0xac, 0xb2,
-	0x0b, 0x01, 0x12, 0xd9, 0x2e, 0xff, 0x04, 0x5c, 0xd9, 0x90, 0x95, 0x7c, 0xac, 0xd6, 0x8d, 0x4a,
-	0x1d, 0x80, 0x98, 0x55, 0x37, 0x19, 0x67, 0x93, 0x26, 0x3a, 0x8b, 0x6c, 0x44, 0xbf, 0xfc, 0x6f,
-	0x06, 0xb8, 0xf2, 0x58, 0xd6, 0xf8, 0xdf, 0x06, 0x3d, 0xbc, 0x0b, 0x40, 0xfc, 0xbf, 0x15, 0x67,
-	0xb6, 0x2f, 0xf7, 0x04, 0xe4, 0x3e, 0x66, 0x87, 0xba, 0xa1, 0xca, 0xee, 0x87, 0x82, 0xe5, 0xff,
-	0x36, 0xc0, 0xfc, 0x8f, 0x08, 0x1f, 0x73, 0xee, 0x11, 0x28, 0xc4, 0xce, 0xd9, 0x5f, 0xbf, 0xc9,
-	0x9a, 0x23, 0xb1, 0x9e, 0x7d, 0x73, 0x77, 0xff, 0xc7, 0x00, 0x97, 0xb7, 0x5d, 0x16, 0xfb, 0xcb,
-	0x42, 0x87, 0x3f, 0x06, 0xc5, 0x64, 0x02, 0x88, 0x3d, 0x7e, 0xe3, 0x05, 0x5b, 0x7f, 0xb2, 0xcf,
-	0x05, 0x9c, 0x44, 0x7c, 0x73, 0xaf, 0xc5, 0x26, 0xf1, 0xa9, 0x43, 0xa8, 0xfe, 0x49, 0x43, 0xbd,
-	0xc8, 0x5f, 0x8c, 0xe4, 0xcf, 0xde, 0xea, 0xdf, 0x2a, 0xd4, 0x8b, 0x68, 0x03, 0x03, 0x71, 0x1c,
-	0xa8, 0x7f, 0xa2, 0x90, 0xcf, 0xcb, 0xbf, 0x30, 0xc0, 0xfc, 0xc3, 0x09, 0x41, 0xfa, 0x1e, 0x98,
-	0x39, 0xef, 0xea, 0x51, 0x3e, 0x69, 0xf8, 0x37, 0x1e, 0xd1, 0x5b, 0xf7, 0x00, 0x88, 0x0f, 0x37,
-	0x58, 0x06, 0xf9, 0xdd, 0x07, 0x4f, 0x36, 0x91, 0xfd, 0x78, 0xe7, 0xc3, 0x9d, 0x07, 0x4f, 0x76,
-	0x4a, 0xa9, 0x58, 0x54, 0xaf, 0x3d, 0x7a, 0xb4, 0x89, 0x3e, 0x2e, 0x19, 0x10, 0x82, 0x82, 0x12,
-	0x6d, 0xfe, 0xed, 0xa3, 0x4d, 0xb4, 0x53, 0xdb, 0x2e, 0xa5, 0xeb, 0xff, 0x6e, 0x7c, 0xf1, 0xdc,
-	0x32, 0xbe, 0x7c, 0x6e, 0x19, 0xbf, 0x7f, 0x6e, 0xa5, 0xfe, 0xf8, 0xdc, 0x4a, 0xfd, 0xe9, 0xb9,
-	0x95, 0xfa, 0xf3, 0x73, 0x2b, 0xf5, 0x97, 0xe7, 0x96, 0xf1, 0xb3, 0x81, 0x65, 0xfc, 0x7c, 0x60,
-	0xa5, 0x7e, 0x33, 0xb0, 0x8c, 0xdf, 0x0e, 0xac, 0xd4, 0xe7, 0x03, 0x2b, 0xf5, 0xbb, 0x81, 0x95,
-	0xfa, 0x62, 0x60, 0x19, 0x5f, 0x0e, 0x2c, 0xe3, 0xf7, 0x03, 0x2b, 0xf5, 0xc7, 0x81, 0x65, 0xfc,
-	0x69, 0x60, 0xa5, 0xfe, 0x3c, 0xb0, 0x8c, 0xbf, 0x0c, 0xac, 0xd4, 0xcf, 0x4e, 0xad, 0xd4, 0xcf,
-	0x4f, 0x2d, 0xe3, 0x97, 0xa7, 0x56, 0xea, 0x57, 0xa7, 0x96, 0xf1, 0xeb, 0x53, 0x2b, 0xf5, 0x9b,
-	0x53, 0x2b, 0xf5, 0xdb, 0x53, 0xcb, 0xf8, 0xfc, 0xd4, 0x32, 0x7e, 0x77, 0x6a, 0x19, 0x3f, 0xbe,
-	0x71, 0xde, 0xaa, 0x92, 0x7b, 0xc1, 0xde, 0xde, 0x8c, 0x9c, 0x91, 0xdb, 0xff, 0x1b, 0x00, 0x00,
-	0xff, 0xff, 0x1f, 0x91, 0x75, 0x03, 0xb0, 0x25, 0x00, 0x00,
+var fileDescriptor_end_device_7c7976812d2926f8 = []byte{
+	// 3729 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x5a, 0x4b, 0x70, 0x1b, 0xc7,
+	0x99, 0x06, 0x40, 0x8a, 0x04, 0x1a, 0x24, 0x1e, 0xcd, 0x87, 0xc6, 0x94, 0x0c, 0xd0, 0x94, 0xec,
+	0xd0, 0x8e, 0x09, 0x4a, 0x94, 0xbc, 0x89, 0x15, 0xa7, 0x64, 0x80, 0xa0, 0x6c, 0xda, 0x14, 0xc5,
+	0x6d, 0x52, 0xd2, 0xda, 0xb1, 0x3c, 0xd5, 0xc4, 0x34, 0xc9, 0x31, 0x81, 0x99, 0x49, 0x77, 0x83,
+	0x04, 0xf7, 0x51, 0x95, 0x63, 0x6e, 0xc9, 0x65, 0xab, 0x72, 0xd9, 0xaa, 0xd4, 0xd6, 0x6e, 0x55,
+	0x6a, 0x6b, 0x0f, 0x39, 0xed, 0xfa, 0x98, 0xa3, 0x6f, 0xeb, 0x63, 0x2a, 0x07, 0x38, 0x02, 0x2f,
+	0x39, 0xa6, 0x6a, 0x2f, 0x3e, 0x6e, 0xf5, 0x63, 0x1e, 0x78, 0x51, 0xa0, 0xbc, 0xbe, 0xb0, 0x30,
+	0xff, 0xe3, 0xeb, 0xbf, 0x5f, 0x7f, 0x7f, 0xfd, 0x37, 0xc1, 0x52, 0xdd, 0xa5, 0xf8, 0x14, 0x3b,
+	0x2b, 0x8c, 0xe3, 0xda, 0xf1, 0x2a, 0xf6, 0xec, 0x55, 0xe2, 0x58, 0xa6, 0x45, 0x4e, 0xec, 0x1a,
+	0x29, 0x79, 0xd4, 0xe5, 0x2e, 0xcc, 0x70, 0xee, 0x94, 0xb4, 0x5d, 0xe9, 0xe4, 0xce, 0xc2, 0xca,
+	0xa1, 0xcd, 0x8f, 0x9a, 0xfb, 0xa5, 0x9a, 0xdb, 0x58, 0x3d, 0x74, 0x0f, 0xdd, 0x55, 0x69, 0xb6,
+	0xdf, 0x3c, 0x90, 0x5f, 0xf2, 0x43, 0xfe, 0x52, 0xee, 0x0b, 0x7f, 0x13, 0x31, 0x6f, 0x9c, 0xda,
+	0xfc, 0xd8, 0x3d, 0x5d, 0x3d, 0x74, 0x57, 0xa4, 0x72, 0xe5, 0x04, 0xd7, 0x6d, 0x0b, 0x73, 0x97,
+	0xb2, 0xd5, 0xe0, 0xa7, 0xf6, 0xbb, 0x7e, 0xe8, 0xba, 0x87, 0x75, 0x22, 0x63, 0xc2, 0x8e, 0xe3,
+	0x72, 0xcc, 0x6d, 0xd7, 0x61, 0x5a, 0x5b, 0xd0, 0xda, 0xa0, 0x6d, 0xab, 0x49, 0xa5, 0x81, 0xd6,
+	0x2f, 0xf6, 0xea, 0x0f, 0x6c, 0x52, 0xb7, 0xcc, 0x06, 0x66, 0xc7, 0x3d, 0xf8, 0x81, 0x05, 0xe3,
+	0xb4, 0x59, 0xe3, 0x5a, 0x5b, 0xec, 0xd5, 0x72, 0xbb, 0x41, 0x18, 0xc7, 0x0d, 0x6f, 0x58, 0x00,
+	0xa7, 0x14, 0x7b, 0x1e, 0xa1, 0x7e, 0x80, 0x37, 0xfa, 0x47, 0xd6, 0xb6, 0x88, 0xc3, 0xed, 0x03,
+	0x3b, 0x34, 0xba, 0xde, 0x6f, 0xf4, 0x85, 0x6b, 0x3b, 0xc3, 0xb5, 0xc7, 0xe4, 0xcc, 0xf7, 0x2d,
+	0xf6, 0x6b, 0xfd, 0x49, 0xd2, 0x43, 0xd0, 0x6f, 0xd0, 0x20, 0x8c, 0xe1, 0x43, 0xc2, 0x2e, 0xb2,
+	0xe0, 0xd8, 0xc2, 0x1c, 0x2b, 0x8b, 0xa5, 0x5f, 0x8d, 0x81, 0xc9, 0x5d, 0xc2, 0x98, 0xed, 0x3a,
+	0xf0, 0x29, 0x48, 0x5a, 0xe4, 0xc4, 0xc4, 0x96, 0x45, 0x8d, 0xc4, 0x62, 0x7c, 0x79, 0xaa, 0xf2,
+	0xde, 0x57, 0xed, 0x62, 0xec, 0x4f, 0xed, 0xe2, 0xdd, 0x43, 0xb7, 0xc4, 0x8f, 0x08, 0x3f, 0xb2,
+	0x9d, 0x43, 0x56, 0x72, 0x08, 0x3f, 0x75, 0xe9, 0xf1, 0x6a, 0x37, 0xb8, 0x77, 0x7c, 0xb8, 0xca,
+	0xcf, 0x3c, 0xc2, 0x4a, 0x55, 0x72, 0x52, 0xb6, 0x2c, 0x8a, 0x26, 0x2d, 0xf5, 0x03, 0xbe, 0x0b,
+	0xc6, 0x45, 0xbf, 0x8c, 0xb1, 0xc5, 0xf8, 0x72, 0x7a, 0xed, 0x5a, 0xa9, 0x7b, 0xbd, 0x95, 0x74,
+	0xfb, 0x1f, 0x93, 0x33, 0x56, 0x49, 0x8a, 0x16, 0xbf, 0x6e, 0x17, 0xe3, 0x48, 0xba, 0xc0, 0xd7,
+	0xc0, 0x74, 0x1d, 0x33, 0x6e, 0x1e, 0x98, 0x35, 0x87, 0x9b, 0x4d, 0xcf, 0x18, 0x5f, 0x8c, 0x2f,
+	0x4f, 0x23, 0x20, 0x84, 0x0f, 0xd6, 0x1d, 0xfe, 0xd8, 0x83, 0xcb, 0x20, 0x2f, 0x4d, 0x1c, 0x6d,
+	0x64, 0xb9, 0xa7, 0x8e, 0x71, 0x45, 0x9a, 0x49, 0xdf, 0x6d, 0x61, 0x57, 0x75, 0x4f, 0x9d, 0xc0,
+	0x12, 0x47, 0x2d, 0x27, 0x42, 0xcb, 0x72, 0x60, 0x59, 0x02, 0xb3, 0xd2, 0xb2, 0xe6, 0x3a, 0x07,
+	0x51, 0xe3, 0x49, 0x69, 0x9c, 0x13, 0xba, 0x75, 0xd7, 0x39, 0x08, 0xec, 0xd7, 0x01, 0x60, 0x1c,
+	0x53, 0x4e, 0x2c, 0x13, 0x73, 0x23, 0x29, 0xfb, 0xb9, 0x50, 0x52, 0x2b, 0xa8, 0xe4, 0xaf, 0xa0,
+	0xd2, 0x9e, 0xbf, 0xc4, 0x54, 0x37, 0x7f, 0xfd, 0x4d, 0x31, 0x8e, 0x52, 0xda, 0xaf, 0xcc, 0x3f,
+	0x1a, 0x4f, 0xc6, 0x73, 0x89, 0xa5, 0x6f, 0xd2, 0x60, 0xfa, 0x61, 0x79, 0x7d, 0x07, 0x53, 0xdc,
+	0x20, 0x9c, 0x50, 0x06, 0xdf, 0x00, 0xc9, 0x06, 0x6e, 0x99, 0xc4, 0xa6, 0x9e, 0x11, 0x5f, 0x8c,
+	0x2f, 0x27, 0x2a, 0xe9, 0x4e, 0xbb, 0x38, 0xf9, 0x10, 0xb7, 0x36, 0x36, 0xd1, 0x0e, 0x9a, 0x6c,
+	0xe0, 0xd6, 0x86, 0x4d, 0x3d, 0xf8, 0x16, 0xc8, 0x37, 0xbd, 0xba, 0xed, 0x1c, 0x9b, 0xd6, 0x29,
+	0xa9, 0xd7, 0x4d, 0xb1, 0xa2, 0xe5, 0x44, 0x26, 0x51, 0x56, 0x29, 0xaa, 0x42, 0x2e, 0xa2, 0x80,
+	0x25, 0x30, 0x23, 0x3a, 0xd4, 0x6b, 0x3d, 0x26, 0xad, 0xf3, 0xbe, 0x2a, 0xb4, 0xdf, 0x07, 0x33,
+	0xd8, 0xa2, 0xa6, 0x58, 0x39, 0x26, 0xc5, 0x9c, 0x98, 0xb6, 0x63, 0x91, 0x96, 0x9c, 0x8d, 0xcc,
+	0xda, 0xab, 0xbd, 0x33, 0x5a, 0xc5, 0x1c, 0x23, 0xcc, 0xc9, 0xa6, 0x30, 0xaa, 0xcc, 0x76, 0xda,
+	0xc5, 0x5c, 0xb9, 0x8a, 0xba, 0xa4, 0x28, 0x87, 0x2d, 0xda, 0x25, 0x81, 0xef, 0x03, 0x28, 0xda,
+	0xe0, 0x2d, 0xd3, 0x73, 0x4f, 0x09, 0xd5, 0x4d, 0xc8, 0x99, 0xac, 0xcc, 0x74, 0xda, 0xc5, 0x6c,
+	0xb9, 0x8a, 0xf6, 0x5a, 0x3b, 0x42, 0xa7, 0x20, 0xb2, 0xd8, 0xa2, 0x51, 0x01, 0xbc, 0x05, 0xa6,
+	0x04, 0x82, 0xb3, 0x6f, 0x72, 0x8a, 0x1d, 0xa6, 0xe6, 0xb6, 0x92, 0xe9, 0xb4, 0x8b, 0xa0, 0x5c,
+	0x45, 0xdb, 0xfb, 0x7b, 0x42, 0x8a, 0x00, 0xb6, 0xa8, 0xfe, 0x0d, 0xef, 0x80, 0x69, 0xe1, 0x81,
+	0x6b, 0xc7, 0x66, 0xdd, 0x6e, 0xd8, 0x5c, 0xcd, 0x70, 0x25, 0xdb, 0x69, 0x17, 0xd3, 0xe5, 0x2a,
+	0x2a, 0xd7, 0x8e, 0xb7, 0x84, 0x18, 0xa5, 0xb1, 0x45, 0xfd, 0x8f, 0xa8, 0x93, 0x45, 0xea, 0xf8,
+	0x4c, 0x4e, 0x78, 0x97, 0x53, 0x55, 0x88, 0x7d, 0x27, 0xf9, 0x01, 0xef, 0x82, 0x14, 0x6d, 0xdd,
+	0xd6, 0x0e, 0x29, 0x39, 0x6e, 0x57, 0x7b, 0xc7, 0x0d, 0xb5, 0x94, 0x63, 0x92, 0xb6, 0x6e, 0x2b,
+	0xaf, 0x55, 0x30, 0x2b, 0xbd, 0x82, 0x71, 0x77, 0x0f, 0x0e, 0x18, 0xe1, 0x06, 0x90, 0x0b, 0x31,
+	0x2f, 0xec, 0xf4, 0x18, 0x3e, 0x92, 0x0a, 0xb8, 0x05, 0x66, 0x68, 0x6b, 0xad, 0x6f, 0xa2, 0xd2,
+	0x23, 0x4c, 0x14, 0xca, 0xd1, 0xd6, 0x5a, 0xf7, 0x94, 0xdc, 0x00, 0xd3, 0x02, 0xed, 0x80, 0x92,
+	0x9f, 0x37, 0x89, 0x53, 0x3b, 0x33, 0xa6, 0x16, 0xe3, 0xcb, 0xe3, 0x68, 0x8a, 0xb6, 0xd6, 0x1e,
+	0xf8, 0x32, 0xb8, 0x09, 0x32, 0x62, 0x7d, 0x5a, 0x4d, 0x7e, 0x66, 0xd6, 0xce, 0x6a, 0x75, 0x62,
+	0x4c, 0xcb, 0xd6, 0x6e, 0xf4, 0xb6, 0x56, 0x3e, 0x3c, 0xa4, 0xe4, 0x10, 0x73, 0x62, 0x55, 0x9b,
+	0xfc, 0x6c, 0x5d, 0x98, 0xa2, 0xa9, 0x06, 0x6e, 0x05, 0x5f, 0xf0, 0x53, 0x70, 0x95, 0x12, 0x91,
+	0x21, 0xe5, 0x72, 0x34, 0x3d, 0x42, 0x6d, 0xd7, 0xb2, 0x6b, 0x36, 0x3f, 0x33, 0x32, 0x12, 0x73,
+	0xa9, 0x6f, 0xc8, 0xa4, 0xb9, 0x58, 0xa3, 0x1b, 0x2d, 0xcf, 0x75, 0x88, 0xc3, 0xd1, 0x1c, 0x0d,
+	0x64, 0x3b, 0x21, 0x00, 0x7c, 0x06, 0x0c, 0x8d, 0x5d, 0x73, 0x9b, 0x0e, 0xef, 0x02, 0xcf, 0x0e,
+	0x0e, 0x58, 0x81, 0xaf, 0x0b, 0xf3, 0x00, 0x7d, 0x9e, 0x86, 0xc2, 0x28, 0x7c, 0x09, 0xcc, 0x78,
+	0xb6, 0x73, 0x68, 0xb2, 0xba, 0xcb, 0x23, 0x03, 0x96, 0x93, 0x03, 0x96, 0x17, 0xaa, 0xdd, 0xba,
+	0xcb, 0xc3, 0x51, 0x7b, 0x0a, 0x5e, 0x09, 0xed, 0x7b, 0xa7, 0x2b, 0x3f, 0xca, 0x74, 0xcd, 0xf9,
+	0xa0, 0xdd, 0x73, 0xf6, 0x26, 0xc8, 0xed, 0x13, 0x5c, 0x73, 0x9d, 0x48, 0x14, 0x50, 0x46, 0x91,
+	0x55, 0xf2, 0x30, 0x86, 0x32, 0x48, 0xd6, 0x8e, 0xb0, 0xe3, 0x90, 0x3a, 0x33, 0x66, 0x16, 0xc7,
+	0x96, 0xd3, 0x6b, 0xaf, 0xf7, 0x36, 0xd9, 0x95, 0x8a, 0x4a, 0xeb, 0xca, 0x1a, 0x05, 0x6e, 0x0b,
+	0xff, 0x91, 0x00, 0x93, 0x5a, 0x2a, 0x5a, 0xd6, 0x09, 0x28, 0x6c, 0x39, 0xae, 0x5a, 0x56, 0xf2,
+	0xb0, 0xe5, 0x15, 0x00, 0x83, 0xfc, 0x13, 0x1a, 0x27, 0xd4, 0x60, 0xf9, 0x9a, 0xd0, 0x7c, 0x0b,
+	0xcc, 0x34, 0x6c, 0xa7, 0x6f, 0x98, 0xc6, 0x46, 0x5a, 0xd5, 0x0d, 0xdb, 0xe9, 0x1e, 0x21, 0x81,
+	0x26, 0x16, 0xec, 0x4b, 0x24, 0x33, 0x94, 0x13, 0xeb, 0xb5, 0x77, 0x8f, 0x10, 0x07, 0xef, 0xd7,
+	0x89, 0xa9, 0x3a, 0x29, 0x33, 0x56, 0x12, 0x4d, 0x29, 0xe1, 0x63, 0x29, 0xbb, 0x37, 0xfe, 0xe5,
+	0x6f, 0x8b, 0x31, 0xf5, 0x77, 0xa9, 0x01, 0x32, 0x1b, 0x8e, 0x55, 0x95, 0x14, 0xac, 0x42, 0xb1,
+	0x63, 0xc1, 0x79, 0x90, 0xb0, 0x2d, 0x39, 0x54, 0xa9, 0xca, 0x44, 0xa7, 0x5d, 0x4c, 0x6c, 0x56,
+	0x51, 0xc2, 0xb6, 0x20, 0x04, 0xe3, 0x0e, 0xd6, 0x49, 0x3c, 0x85, 0xe4, 0x6f, 0xf8, 0x0a, 0x18,
+	0x6b, 0xd2, 0xba, 0xec, 0x7a, 0xaa, 0x32, 0xd9, 0x69, 0x17, 0xc7, 0x1e, 0xa3, 0x2d, 0x24, 0x64,
+	0x70, 0x16, 0x5c, 0xa9, 0xbb, 0x87, 0x2e, 0x33, 0xc6, 0x17, 0xc7, 0x96, 0x53, 0x48, 0x7d, 0x2c,
+	0x59, 0x91, 0xe6, 0x1e, 0xba, 0x16, 0xa9, 0x8b, 0x03, 0x65, 0x5f, 0xb4, 0x6b, 0x06, 0x8d, 0xca,
+	0x03, 0x45, 0xc6, 0xb2, 0x59, 0x45, 0x93, 0x52, 0xb9, 0xe9, 0x87, 0x95, 0x18, 0x1a, 0xd6, 0x58,
+	0x18, 0xd6, 0xd2, 0x3f, 0x27, 0xc0, 0xb5, 0xa0, 0x99, 0x27, 0x84, 0x8a, 0x13, 0x7d, 0x33, 0xe4,
+	0x43, 0xf0, 0x51, 0x5f, 0x9b, 0x77, 0x23, 0x6d, 0x76, 0xbe, 0x29, 0xbe, 0x0e, 0x5e, 0xfb, 0xfc,
+	0x67, 0x78, 0xe5, 0xef, 0x6f, 0xad, 0xbc, 0xfb, 0x6c, 0xf9, 0xfe, 0xbd, 0x9f, 0xad, 0x3c, 0xbb,
+	0xef, 0x7f, 0xbe, 0xf9, 0x0f, 0x6b, 0x6f, 0xff, 0xd3, 0xcd, 0x7f, 0xfc, 0xfc, 0x66, 0xeb, 0xf5,
+	0x30, 0xb8, 0x47, 0x20, 0xd9, 0x10, 0xbd, 0x31, 0x83, 0x10, 0x25, 0xa0, 0xec, 0xe1, 0xa5, 0x00,
+	0x25, 0xca, 0xa6, 0x25, 0x56, 0xef, 0x11, 0xa6, 0xd6, 0x29, 0xa6, 0xc4, 0x3c, 0x51, 0x1d, 0xd0,
+	0x3d, 0xcc, 0xfa, 0x72, 0xdd, 0x2f, 0x61, 0x7a, 0x60, 0xd3, 0x46, 0x97, 0xe9, 0xb8, 0x32, 0xf5,
+	0xe5, 0xda, 0x74, 0xe9, 0x7f, 0x26, 0x40, 0xae, 0x77, 0x5c, 0xe0, 0x07, 0x60, 0xcc, 0xb6, 0x98,
+	0x1c, 0x87, 0xf4, 0xda, 0x0f, 0x7b, 0x17, 0xdc, 0x05, 0xc3, 0x18, 0xe1, 0x47, 0x02, 0x01, 0x3e,
+	0x05, 0x59, 0xed, 0x18, 0xc4, 0x91, 0x90, 0xab, 0x78, 0x61, 0xc0, 0x3e, 0xd6, 0x70, 0x15, 0xd8,
+	0x69, 0x17, 0x33, 0x5b, 0x2e, 0xc2, 0x4f, 0xcb, 0xdb, 0x5a, 0x86, 0x32, 0xda, 0xd4, 0x8f, 0x10,
+	0x83, 0x19, 0x1f, 0xd8, 0x3b, 0x3a, 0xeb, 0x1a, 0x8f, 0x01, 0xe0, 0x3b, 0x1f, 0x7e, 0xe2, 0x83,
+	0xcf, 0x75, 0xda, 0xc5, 0xbc, 0x06, 0x0f, 0xc5, 0x28, 0xaf, 0xad, 0x77, 0x8e, 0xce, 0xfc, 0x26,
+	0xee, 0x83, 0x7c, 0xb0, 0xf3, 0x4d, 0xaf, 0x8e, 0x1d, 0x31, 0x93, 0x72, 0x14, 0xd5, 0x69, 0x1f,
+	0xec, 0xfe, 0x9d, 0x3a, 0x76, 0x36, 0xab, 0x28, 0x7b, 0xd0, 0x25, 0x10, 0xcb, 0x73, 0xc2, 0x3b,
+	0x72, 0xb9, 0xcb, 0x8c, 0x2b, 0x72, 0xbd, 0xeb, 0x2f, 0xb8, 0x0c, 0x72, 0xac, 0xe9, 0x79, 0x2e,
+	0xe5, 0xcc, 0xac, 0xd5, 0x31, 0x63, 0xe6, 0xbe, 0x64, 0x02, 0x49, 0x94, 0xf1, 0xe5, 0xeb, 0x42,
+	0x5c, 0x19, 0x60, 0x59, 0x93, 0x04, 0xa0, 0xd7, 0x72, 0x1d, 0x12, 0x30, 0x6b, 0x91, 0x03, 0xdc,
+	0xac, 0x73, 0xb3, 0x81, 0x6b, 0x26, 0x23, 0x9c, 0x0b, 0x2e, 0xac, 0xa9, 0xde, 0xb5, 0x01, 0xa3,
+	0xbd, 0xab, 0x4d, 0x2a, 0xf3, 0x9d, 0x76, 0x11, 0x56, 0x95, 0x73, 0x44, 0x8e, 0xa0, 0x06, 0x7c,
+	0x88, 0x6b, 0xbe, 0x4c, 0xe4, 0x12, 0x91, 0xe7, 0xc2, 0x8c, 0x98, 0x52, 0xe7, 0x6d, 0xc3, 0x8e,
+	0x64, 0x6d, 0x61, 0x84, 0x5b, 0x11, 0x23, 0xa0, 0x8d, 0x70, 0x2b, 0x34, 0x5a, 0x04, 0x53, 0x94,
+	0x30, 0xc2, 0x99, 0xa2, 0xaf, 0x92, 0x00, 0x24, 0x11, 0x50, 0x32, 0xc1, 0x5b, 0x05, 0x4c, 0xd0,
+	0x79, 0x71, 0xa2, 0xc9, 0x53, 0x3b, 0x89, 0xa6, 0x7c, 0xe1, 0x47, 0xae, 0xed, 0xc0, 0xb7, 0x01,
+	0xd4, 0x30, 0xf2, 0xe4, 0x74, 0x5c, 0xa7, 0x46, 0x98, 0x3c, 0x8b, 0x93, 0x28, 0xa7, 0x34, 0xc2,
+	0x6e, 0x5b, 0xca, 0xe1, 0x33, 0xe0, 0x77, 0xca, 0x3c, 0x70, 0x69, 0x03, 0x73, 0x71, 0x68, 0xc8,
+	0xc3, 0x35, 0xbd, 0xb6, 0xdc, 0x37, 0x46, 0xea, 0xae, 0xb2, 0x83, 0xcf, 0xea, 0x2e, 0xb6, 0x1e,
+	0x04, 0xf6, 0x95, 0x71, 0xb1, 0xc6, 0x51, 0x5e, 0x23, 0x85, 0x0a, 0x9d, 0x3e, 0xff, 0x2b, 0x0b,
+	0xd2, 0x91, 0x71, 0x84, 0x1f, 0x80, 0xac, 0x9e, 0x65, 0x49, 0x1a, 0xdc, 0x26, 0xd7, 0x1b, 0xeb,
+	0x95, 0x3e, 0x02, 0x5e, 0xd5, 0x77, 0xc8, 0xca, 0xf8, 0x6f, 0x04, 0xf7, 0x9e, 0x96, 0x7e, 0x95,
+	0x3d, 0xe5, 0x05, 0x6b, 0x60, 0x2e, 0x3c, 0x91, 0xa3, 0xec, 0x20, 0x21, 0xe1, 0x56, 0x2f, 0x98,
+	0xe4, 0xd2, 0x8e, 0x3e, 0x8a, 0x15, 0x23, 0x78, 0x82, 0xeb, 0x4d, 0x82, 0x66, 0xbc, 0x2e, 0xa1,
+	0xa2, 0x09, 0x47, 0x17, 0x1d, 0xfb, 0xea, 0x82, 0x54, 0xba, 0xa8, 0xa1, 0xae, 0xb3, 0x47, 0xb5,
+	0x33, 0x84, 0x07, 0x0c, 0x21, 0x24, 0xe3, 0xc3, 0x08, 0x49, 0x30, 0x8e, 0xb5, 0x60, 0x1c, 0xaf,
+	0x5c, 0x66, 0x1c, 0xd7, 0xfd, 0x71, 0xdc, 0x88, 0x32, 0xdd, 0x89, 0x21, 0x93, 0x1f, 0xe9, 0x92,
+	0x66, 0xbd, 0xaa, 0x33, 0x21, 0xf5, 0x7d, 0x38, 0x84, 0xfa, 0x4e, 0x4a, 0xc4, 0xeb, 0x7d, 0x41,
+	0x3d, 0xde, 0x74, 0xf8, 0x9d, 0x35, 0x85, 0x32, 0x80, 0x18, 0x3f, 0x1b, 0x4c, 0x8c, 0x93, 0x2f,
+	0x35, 0xe4, 0x23, 0x30, 0xe5, 0xd4, 0x00, 0xa6, 0xfc, 0x1e, 0x58, 0x38, 0xc0, 0x35, 0xee, 0xd2,
+	0x33, 0xd3, 0x93, 0x9b, 0x27, 0xb0, 0xb7, 0x09, 0x33, 0xc0, 0xe2, 0xd8, 0xf2, 0x38, 0x32, 0xb4,
+	0xc5, 0x8e, 0x34, 0x78, 0x10, 0xea, 0xe1, 0xa7, 0x7d, 0x3c, 0x3b, 0x2d, 0x83, 0xbf, 0x7b, 0x51,
+	0xf0, 0x03, 0x38, 0xb7, 0xea, 0x42, 0x37, 0xf1, 0xae, 0x81, 0xb9, 0x20, 0x19, 0xdc, 0x59, 0x33,
+	0xf7, 0x6d, 0x7d, 0xe5, 0x96, 0x84, 0x7f, 0xd0, 0x5d, 0xb6, 0xe2, 0xba, 0x75, 0x09, 0xa4, 0x32,
+	0xfe, 0xae, 0x76, 0xbe, 0xb3, 0x56, 0xb1, 0xe5, 0xc5, 0x1c, 0xe5, 0x59, 0xaf, 0x08, 0xde, 0x07,
+	0x93, 0x4d, 0x46, 0x4c, 0x6c, 0x51, 0x99, 0x6b, 0x2e, 0x86, 0x05, 0x9d, 0x76, 0x71, 0xe2, 0x31,
+	0x23, 0xe5, 0x2a, 0x42, 0x13, 0x4d, 0x46, 0xca, 0x16, 0x85, 0x9b, 0x40, 0xdc, 0xdd, 0xcc, 0x06,
+	0xa6, 0x87, 0xb6, 0x23, 0xb3, 0x90, 0xc8, 0xbd, 0xbd, 0x18, 0x0f, 0xea, 0x2e, 0xe6, 0x0a, 0x64,
+	0xba, 0xd3, 0x2e, 0xa6, 0xca, 0x55, 0xf4, 0x50, 0x7a, 0xa0, 0x14, 0xb6, 0xa8, 0xfa, 0x09, 0xdf,
+	0xeb, 0xc9, 0x8f, 0xd9, 0x17, 0x05, 0xd4, 0x95, 0x3b, 0x9f, 0x82, 0xab, 0x8c, 0x63, 0xde, 0x64,
+	0xfd, 0xf7, 0x94, 0xdc, 0x68, 0x7b, 0x66, 0x4e, 0xf9, 0xf7, 0x5e, 0x52, 0x9e, 0x00, 0x43, 0x03,
+	0xf7, 0x5f, 0x52, 0xf2, 0x23, 0x2c, 0xfc, 0x79, 0xe5, 0xdd, 0x77, 0x3b, 0xd9, 0x03, 0x79, 0x8b,
+	0x30, 0x9b, 0x12, 0xcb, 0x0c, 0xf7, 0x26, 0xbc, 0xe4, 0xde, 0xcc, 0x6a, 0x08, 0xe4, 0x6f, 0xd1,
+	0xcf, 0xc0, 0xf5, 0x2e, 0xd4, 0xde, 0xad, 0x3a, 0x33, 0x42, 0xc4, 0x46, 0x04, 0xb4, 0x7b, 0xc7,
+	0xd6, 0xc1, 0xb5, 0x10, 0xbd, 0x7f, 0xe7, 0xce, 0xbe, 0xd4, 0xce, 0xbd, 0x1a, 0x34, 0xd7, 0xb3,
+	0x81, 0xd7, 0xc0, 0x5c, 0xb4, 0xb5, 0x70, 0x23, 0xcf, 0xc9, 0x8d, 0x3c, 0x13, 0xfa, 0x05, 0xfb,
+	0x79, 0x61, 0x13, 0xc0, 0xfe, 0x26, 0xe0, 0x1d, 0x70, 0xe5, 0x44, 0xfc, 0x90, 0xc7, 0xd0, 0x0b,
+	0x2f, 0x14, 0xca, 0x76, 0xe1, 0x63, 0x30, 0x33, 0xe0, 0x0c, 0x81, 0x77, 0xbb, 0xb1, 0x0a, 0x7d,
+	0xcc, 0xab, 0xcb, 0xc7, 0x07, 0x7b, 0x0c, 0x8c, 0x61, 0xfb, 0x1e, 0xbe, 0xdb, 0x8d, 0x38, 0xd2,
+	0x25, 0x5d, 0xc3, 0xfe, 0x14, 0x4c, 0x45, 0xd7, 0x03, 0x5c, 0xe9, 0x86, 0x1a, 0x5a, 0xce, 0x50,
+	0x56, 0x4b, 0xff, 0x9e, 0x02, 0x49, 0x31, 0x3b, 0x1c, 0x73, 0x02, 0x11, 0x80, 0xb5, 0x26, 0xa5,
+	0x44, 0xac, 0xf1, 0xe0, 0x7e, 0xa9, 0x0f, 0xee, 0x57, 0x2f, 0xbc, 0x84, 0xfa, 0xfc, 0x40, 0xbb,
+	0x47, 0x0a, 0x65, 0x48, 0xd0, 0x0f, 0x35, 0x85, 0x11, 0xcc, 0xc4, 0x25, 0x30, 0xb5, 0x7b, 0x04,
+	0xf3, 0xc7, 0x60, 0x4a, 0x15, 0xcb, 0x15, 0x41, 0xd4, 0x0c, 0x78, 0xae, 0x17, 0x4d, 0xd2, 0x44,
+	0x94, 0x56, 0xa6, 0xf2, 0x63, 0x10, 0x37, 0x1f, 0xff, 0x7f, 0xe1, 0xe6, 0xcf, 0xc0, 0x42, 0x50,
+	0x9c, 0xb4, 0x69, 0x83, 0x58, 0x66, 0x70, 0x95, 0xc6, 0xfe, 0x99, 0x7d, 0x51, 0xf1, 0x71, 0x5c,
+	0x16, 0x1e, 0xaf, 0xfa, 0x45, 0x4c, 0x09, 0x51, 0xd5, 0x08, 0x65, 0x0e, 0xdf, 0x01, 0x86, 0x84,
+	0xb7, 0xc8, 0x89, 0xa9, 0x73, 0x51, 0x50, 0x7d, 0x55, 0xc5, 0xd2, 0x19, 0xa1, 0xaf, 0x92, 0x93,
+	0x5d, 0xa9, 0xd5, 0x65, 0x58, 0x34, 0x8c, 0x3d, 0x4d, 0x8e, 0xb4, 0x72, 0x07, 0x92, 0x25, 0x02,
+	0xae, 0x7b, 0xc4, 0xb1, 0x04, 0x2c, 0xf6, 0xbc, 0xba, 0x5d, 0x93, 0x19, 0x34, 0xe8, 0xae, 0x3e,
+	0xbc, 0xfb, 0x97, 0x70, 0x68, 0xeb, 0xf7, 0x0b, 0x2d, 0x68, 0xa0, 0x01, 0x3a, 0xb8, 0x01, 0x72,
+	0x3f, 0x6f, 0x92, 0xa6, 0xd8, 0xf9, 0x84, 0x79, 0xae, 0xc3, 0x08, 0x33, 0x52, 0xb2, 0x1c, 0x32,
+	0x68, 0xaa, 0xd6, 0xdd, 0x46, 0x03, 0x3b, 0x16, 0xca, 0x2a, 0x1f, 0xe4, 0xbb, 0x08, 0x18, 0x3f,
+	0x5a, 0x99, 0x21, 0x18, 0x57, 0x67, 0xfa, 0x0b, 0x60, 0xb4, 0x0f, 0xd2, 0x2e, 0xf0, 0x6f, 0x01,
+	0xd4, 0xd1, 0x48, 0xca, 0x8d, 0x6b, 0x35, 0xe2, 0x71, 0x7d, 0xd4, 0xdf, 0x18, 0x94, 0xed, 0xc4,
+	0x7e, 0x2a, 0x09, 0x16, 0x5e, 0x96, 0xa6, 0x48, 0x77, 0x26, 0x94, 0x08, 0x2a, 0xe5, 0x47, 0x26,
+	0x31, 0x75, 0x78, 0xfa, 0x70, 0xef, 0xbb, 0xbd, 0x08, 0x4f, 0x1d, 0x0e, 0x82, 0xda, 0x31, 0x22,
+	0x83, 0xb7, 0x04, 0x33, 0x33, 0x4f, 0x6d, 0xc7, 0x72, 0x4f, 0x99, 0x89, 0x4f, 0xb0, 0x5d, 0xc7,
+	0xfb, 0xba, 0xec, 0x97, 0x44, 0x90, 0xb6, 0x9e, 0x2a, 0x55, 0xd9, 0xd7, 0x2c, 0xfc, 0x5b, 0x1c,
+	0x80, 0x48, 0x3c, 0x4b, 0x60, 0xd2, 0x53, 0xb4, 0x5f, 0xee, 0xf8, 0xa9, 0x4a, 0xb2, 0xf3, 0x4d,
+	0x71, 0xdc, 0x4b, 0xb7, 0x5e, 0x45, 0xbe, 0x02, 0xfe, 0x04, 0x4c, 0xfa, 0x61, 0x26, 0x5e, 0x18,
+	0xa6, 0xde, 0xbf, 0xbe, 0x07, 0x7c, 0x67, 0xf4, 0x17, 0x07, 0xe5, 0x29, 0xcd, 0xf5, 0x05, 0xe3,
+	0xbf, 0xe7, 0x41, 0x2a, 0xb8, 0x83, 0xc3, 0xf7, 0xa3, 0x77, 0xf5, 0x9b, 0x43, 0xef, 0xea, 0x17,
+	0x5c, 0xd2, 0xd7, 0x01, 0xa8, 0x51, 0x82, 0xf5, 0xe3, 0x40, 0xe2, 0x32, 0x8f, 0x03, 0xda, 0xaf,
+	0xcc, 0x05, 0x48, 0xd3, 0xb3, 0x7c, 0x90, 0xb1, 0xcb, 0x80, 0x68, 0xbf, 0x32, 0x0f, 0x0a, 0x37,
+	0xe3, 0x91, 0x7a, 0xd2, 0x22, 0x48, 0x5b, 0x84, 0xd5, 0xa8, 0xed, 0x89, 0x3d, 0x21, 0xd3, 0x47,
+	0x0a, 0x45, 0x45, 0x92, 0x75, 0x71, 0x4e, 0xed, 0xfd, 0x26, 0x27, 0xcc, 0x98, 0x90, 0x2b, 0xfa,
+	0xcd, 0xa1, 0x03, 0x51, 0x2a, 0x07, 0xb6, 0x1b, 0x0e, 0xa7, 0x67, 0x28, 0xe2, 0x0c, 0x3f, 0x03,
+	0x69, 0x9d, 0x0b, 0x4d, 0x31, 0xa8, 0x93, 0x97, 0x2f, 0x80, 0xc8, 0x62, 0xbe, 0x2f, 0xaf, 0x32,
+	0x04, 0x4e, 0x7c, 0x1b, 0x06, 0x2b, 0x00, 0x32, 0x42, 0x65, 0xb2, 0xf6, 0xa8, 0x7b, 0x60, 0xd7,
+	0x89, 0x69, 0x5b, 0x32, 0x49, 0xa4, 0xd4, 0x23, 0xc4, 0xae, 0xd2, 0xee, 0x28, 0xe5, 0x66, 0x15,
+	0xe5, 0x58, 0xb7, 0xc4, 0x82, 0x77, 0xc1, 0xbc, 0x7e, 0xdf, 0x32, 0x85, 0x8e, 0x50, 0xf9, 0x1e,
+	0x46, 0x18, 0x93, 0x84, 0x3e, 0x85, 0x66, 0xb5, 0x76, 0x57, 0x2a, 0xcb, 0x4a, 0x27, 0x88, 0x7d,
+	0x34, 0x41, 0xf5, 0x78, 0x02, 0xe9, 0x69, 0x44, 0x2c, 0xba, 0xbd, 0x4b, 0x60, 0x46, 0x6e, 0xcb,
+	0x1e, 0xb7, 0xb4, 0x74, 0xcb, 0x0b, 0x55, 0xb7, 0xfd, 0x03, 0x90, 0xaa, 0xbb, 0x0a, 0x88, 0x19,
+	0x53, 0x72, 0x3e, 0x96, 0x87, 0xcf, 0xc7, 0x96, 0x6f, 0xaa, 0xa6, 0x23, 0x74, 0x1d, 0x58, 0x28,
+	0x99, 0x1e, 0xb9, 0x50, 0x92, 0x19, 0x58, 0x28, 0x19, 0x70, 0xea, 0x65, 0xbf, 0xcf, 0x8a, 0x54,
+	0xee, 0xfb, 0xae, 0x48, 0xe5, 0x2f, 0x51, 0x91, 0xea, 0x2b, 0xdf, 0xc0, 0x51, 0xca, 0x37, 0x33,
+	0x03, 0xca, 0x37, 0x7d, 0xc5, 0x99, 0xd9, 0x91, 0x8b, 0x33, 0x73, 0x43, 0x8a, 0x33, 0xef, 0x80,
+	0x14, 0x75, 0x5d, 0x6e, 0xca, 0xc4, 0x38, 0x2f, 0x77, 0x9e, 0xd1, 0xc7, 0xd8, 0x5c, 0x97, 0x8b,
+	0xac, 0x88, 0x92, 0x54, 0xff, 0x82, 0x4f, 0xc0, 0x84, 0x43, 0xb8, 0x18, 0x89, 0xab, 0x32, 0x55,
+	0xdf, 0xff, 0x53, 0xbb, 0xb8, 0x76, 0xa9, 0xf7, 0xe0, 0x6d, 0xc2, 0x37, 0xab, 0x9d, 0x76, 0xf1,
+	0x8a, 0xfc, 0x81, 0xae, 0x38, 0x84, 0xcb, 0xfa, 0xed, 0x54, 0x57, 0x25, 0xcd, 0x78, 0x71, 0x25,
+	0x4d, 0x3e, 0xb0, 0x45, 0x4b, 0x68, 0xe9, 0x46, 0xa4, 0x76, 0xb6, 0x0e, 0x52, 0x12, 0x50, 0x1c,
+	0x87, 0xc6, 0x2b, 0x83, 0xfb, 0xe7, 0x1f, 0x97, 0x95, 0xa9, 0x4e, 0xbb, 0x18, 0x90, 0x51, 0x94,
+	0x14, 0x38, 0x92, 0x96, 0xde, 0x06, 0x93, 0x4c, 0x1d, 0x0e, 0xc6, 0x82, 0x84, 0xb8, 0x3a, 0xe4,
+	0xec, 0x40, 0xbe, 0x1d, 0x7c, 0x1f, 0xf8, 0x47, 0xb8, 0xe9, 0xbb, 0x5e, 0xbb, 0xd8, 0x35, 0xa3,
+	0xed, 0xfd, 0x87, 0xf7, 0x9b, 0x20, 0x13, 0x30, 0x2e, 0x39, 0x89, 0xc6, 0x75, 0xc9, 0xb3, 0xa6,
+	0x34, 0xcf, 0x92, 0x13, 0x08, 0xdf, 0x00, 0xd9, 0x26, 0x23, 0x56, 0x68, 0xc5, 0x8c, 0x57, 0x17,
+	0xc7, 0x96, 0xa7, 0xd1, 0xb4, 0x10, 0xfb, 0x66, 0x4c, 0xd8, 0x49, 0xb4, 0x70, 0x4d, 0x18, 0x85,
+	0xf0, 0x8d, 0x3b, 0x58, 0x10, 0xf0, 0x47, 0xda, 0x8e, 0x7e, 0xa1, 0xef, 0x9a, 0xb7, 0x8c, 0xa2,
+	0x7c, 0xc7, 0xcc, 0x75, 0xda, 0xc5, 0xa9, 0x2d, 0xcc, 0x38, 0xfa, 0x48, 0xde, 0x23, 0x6f, 0xa9,
+	0x40, 0xd0, 0x17, 0xea, 0xab, 0xdf, 0xf1, 0xb6, 0xb1, 0x38, 0xd0, 0xf1, 0x76, 0x97, 0xe3, 0x6d,
+	0xf8, 0x39, 0xb8, 0xd6, 0xcb, 0x2c, 0x29, 0xa9, 0x11, 0xfb, 0x44, 0x1d, 0x6a, 0xaf, 0x5d, 0x86,
+	0xb9, 0x06, 0xf4, 0x13, 0x69, 0x84, 0x32, 0x87, 0x3f, 0x01, 0x69, 0xf5, 0x72, 0xac, 0xd6, 0xc0,
+	0xd2, 0x90, 0xd4, 0x20, 0x4c, 0xd4, 0xbc, 0x03, 0x2f, 0xf8, 0x0d, 0x57, 0x00, 0xdc, 0x97, 0x75,
+	0xc6, 0x33, 0xc1, 0x5e, 0x6b, 0xc4, 0xe1, 0xf8, 0x90, 0x18, 0x37, 0x16, 0xe3, 0xcb, 0x09, 0x94,
+	0xd7, 0x9a, 0x9d, 0x40, 0x01, 0x7f, 0x00, 0xb2, 0x01, 0xeb, 0xd6, 0xf5, 0x88, 0x9b, 0x8b, 0xf1,
+	0xe5, 0x2b, 0x28, 0xe3, 0x8b, 0x75, 0xa1, 0x01, 0x8b, 0x4d, 0x2a, 0xbc, 0x4c, 0x6c, 0x51, 0xfd,
+	0x44, 0xc4, 0x8c, 0xd7, 0x65, 0xd6, 0xee, 0xbb, 0x94, 0xa8, 0xd7, 0x22, 0x5d, 0x19, 0x55, 0x67,
+	0x16, 0x92, 0xce, 0xe5, 0x2a, 0x52, 0x3a, 0x26, 0x76, 0xb6, 0x94, 0x58, 0x54, 0x4b, 0x60, 0x15,
+	0x64, 0x74, 0x13, 0x3e, 0xfc, 0x1b, 0x23, 0xc0, 0xa3, 0x69, 0xe5, 0xe4, 0xa3, 0x7c, 0x04, 0x34,
+	0x72, 0xc0, 0xaf, 0x99, 0xf1, 0x03, 0x89, 0x53, 0xec, 0xbb, 0xc1, 0xfa, 0x5d, 0xd4, 0x48, 0x59,
+	0xe5, 0xe8, 0x8b, 0x99, 0x20, 0xee, 0x9a, 0xc3, 0x0e, 0xe2, 0xed, 0xcc, 0x58, 0x96, 0xb8, 0xa3,
+	0x11, 0x77, 0x05, 0x34, 0x40, 0xc5, 0xe0, 0x87, 0x00, 0x44, 0xea, 0xcc, 0x6f, 0x5e, 0xae, 0xce,
+	0x8c, 0x22, 0xbe, 0x10, 0x83, 0x8c, 0x47, 0xdd, 0x13, 0x5b, 0xec, 0x47, 0x42, 0x45, 0xb6, 0x7b,
+	0x4b, 0xe6, 0xfd, 0x7b, 0x9d, 0x76, 0x71, 0x7a, 0x27, 0xd4, 0x5c, 0xe6, 0x65, 0x69, 0x3a, 0x82,
+	0xb8, 0x69, 0xc1, 0x2a, 0xc8, 0x07, 0x02, 0x91, 0x2c, 0x2c, 0xcc, 0xb1, 0xf1, 0x43, 0x9d, 0x29,
+	0x7a, 0xd7, 0xfc, 0xae, 0xfc, 0x5f, 0x25, 0x94, 0x8b, 0x7a, 0x54, 0x31, 0xc7, 0x0b, 0x3f, 0x05,
+	0xd9, 0x1e, 0x82, 0x05, 0x73, 0x60, 0xec, 0x98, 0xa8, 0x97, 0xd6, 0x14, 0x12, 0x3f, 0xe1, 0xac,
+	0x7f, 0x31, 0x57, 0x0f, 0x87, 0xea, 0xe3, 0x5e, 0xe2, 0xc7, 0xf1, 0x85, 0x27, 0x20, 0xd3, 0xcd,
+	0x07, 0x06, 0x78, 0x97, 0xa2, 0xde, 0x03, 0x92, 0xa8, 0x0f, 0x10, 0xc1, 0xd5, 0xcc, 0xf9, 0x43,
+	0x00, 0x02, 0xde, 0xc1, 0xe0, 0x3d, 0x90, 0x0e, 0xff, 0xd7, 0x4c, 0x30, 0xe8, 0x31, 0x59, 0x18,
+	0x1b, 0x46, 0x54, 0x10, 0x20, 0x81, 0xef, 0xd2, 0x67, 0x60, 0x7e, 0x5d, 0x72, 0xdf, 0x50, 0xad,
+	0xa9, 0x7d, 0x05, 0x80, 0x10, 0x35, 0xa8, 0xf4, 0x0f, 0x03, 0x8d, 0x70, 0xf1, 0x54, 0x00, 0xbf,
+	0xf4, 0x2f, 0x71, 0x30, 0xff, 0x58, 0xb2, 0xe2, 0xef, 0x03, 0x1e, 0xde, 0x07, 0x20, 0xfc, 0x6f,
+	0xb4, 0xa1, 0x84, 0xff, 0x81, 0x30, 0x79, 0x88, 0xd9, 0xb1, 0xbe, 0x82, 0xa4, 0x0e, 0x7c, 0xc1,
+	0xd2, 0x7f, 0xc6, 0xc1, 0xcc, 0x07, 0x84, 0xf7, 0x05, 0xb7, 0x07, 0x32, 0x61, 0x70, 0xe6, 0xcb,
+	0x5f, 0x4b, 0xa6, 0x48, 0xa8, 0x67, 0xdf, 0x3d, 0xdc, 0xff, 0x8d, 0x83, 0xb9, 0x2d, 0x9b, 0x85,
+	0xf1, 0x32, 0x3f, 0xe0, 0x4f, 0x40, 0x36, 0x9a, 0x00, 0xc2, 0x88, 0xdf, 0xb8, 0x60, 0xeb, 0x0f,
+	0x8e, 0x39, 0x83, 0xa3, 0x16, 0xdf, 0x3d, 0x6a, 0xb1, 0x49, 0x5c, 0x6a, 0x11, 0xaa, 0x1f, 0x79,
+	0xd5, 0x87, 0x7c, 0x43, 0x97, 0xff, 0x08, 0xa4, 0xfe, 0xd1, 0x4c, 0x7d, 0x88, 0x8b, 0x93, 0x27,
+	0x8e, 0x03, 0xf5, 0x6f, 0x65, 0xf2, 0xf7, 0xd2, 0xaf, 0xe2, 0x60, 0x66, 0x77, 0xc0, 0x24, 0xfd,
+	0x08, 0x4c, 0x8c, 0xba, 0x7a, 0x54, 0x4c, 0xda, 0xfc, 0x3b, 0xf7, 0xe8, 0xad, 0x07, 0x00, 0x84,
+	0x87, 0x1b, 0xcc, 0x83, 0xe9, 0x9d, 0x47, 0x4f, 0x37, 0x90, 0xf9, 0x78, 0xfb, 0xe3, 0xed, 0x47,
+	0x4f, 0xb7, 0x73, 0xb1, 0x50, 0x54, 0x29, 0xef, 0xed, 0x6d, 0xa0, 0x4f, 0x72, 0x71, 0x08, 0x41,
+	0x46, 0x89, 0x36, 0xfe, 0x6e, 0x6f, 0x03, 0x6d, 0x97, 0xb7, 0x72, 0x89, 0xca, 0xbf, 0xc6, 0xbf,
+	0x7a, 0x5e, 0x88, 0x7f, 0xfd, 0xbc, 0x10, 0xff, 0xe3, 0xf3, 0x42, 0xec, 0xcf, 0xcf, 0x0b, 0xb1,
+	0xbf, 0x3c, 0x2f, 0xc4, 0xfe, 0xfa, 0xbc, 0x10, 0xfb, 0xf6, 0x79, 0x21, 0xfe, 0x8b, 0x4e, 0x21,
+	0xfe, 0xcb, 0x4e, 0x21, 0xf6, 0xbb, 0x4e, 0x21, 0xfe, 0xfb, 0x4e, 0x21, 0xf6, 0x65, 0xa7, 0x10,
+	0xfb, 0x43, 0xa7, 0x10, 0xfb, 0xaa, 0x53, 0x88, 0x7f, 0xdd, 0x29, 0xc4, 0xff, 0xd8, 0x29, 0xc4,
+	0xfe, 0xdc, 0x29, 0xc4, 0xff, 0xd2, 0x29, 0xc4, 0xfe, 0xda, 0x29, 0xc4, 0xbf, 0xed, 0x14, 0x62,
+	0xbf, 0x38, 0x2f, 0xc4, 0x7e, 0x79, 0x5e, 0x88, 0xff, 0xfa, 0xbc, 0x10, 0xfb, 0xcd, 0x79, 0x21,
+	0xfe, 0xdb, 0xf3, 0x42, 0xec, 0x77, 0xe7, 0x85, 0xd8, 0xef, 0xcf, 0x0b, 0xf1, 0x2f, 0xcf, 0x0b,
+	0xf1, 0x3f, 0x9c, 0x17, 0xe2, 0x9f, 0xbe, 0x3d, 0x2a, 0xab, 0xe4, 0x8e, 0xb7, 0xbf, 0x3f, 0x21,
+	0x47, 0xe4, 0xce, 0xff, 0x05, 0x00, 0x00, 0xff, 0xff, 0x19, 0xc6, 0x35, 0x44, 0xe2, 0x2a, 0x00,
+	0x00,
 }

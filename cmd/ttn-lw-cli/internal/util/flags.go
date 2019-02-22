@@ -23,8 +23,10 @@ import (
 	"time"
 
 	"github.com/gogo/protobuf/proto"
+	"github.com/gogo/protobuf/types"
 	"github.com/spf13/pflag"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 var (
@@ -73,13 +75,20 @@ func FieldMaskFlags(v interface{}, prefix ...string) *pflag.FlagSet {
 }
 
 func isAtomicType(t reflect.Type, maskOnly bool) bool {
-	switch t.Name() {
-	case "Time", "Duration":
-		return true
-	}
-	if t.PkgPath() == "go.thethings.network/lorawan-stack/pkg/ttnpb" {
+	switch t.PkgPath() {
+	case "time":
 		switch t.Name() {
-		case "Picture":
+		case "Time", "Duration":
+			return true
+		}
+	case "github.com/gogo/protobuf/types":
+		switch t.Name() {
+		case "DoubleValue", "FloatValue", "Int64Value", "UInt64Value", "Int32Value", "UInt32Value", "BoolValue", "StringValue", "BytesValue":
+			return true
+		}
+	case "go.thethings.network/lorawan-stack/pkg/ttnpb":
+		switch t.Name() {
+		case "Picture", "MACSettings_DataRateIndexValue", "MACSettings_PingSlotPeriodValue", "MACSettings_AggregatedDutyCycleValue", "MACSettings_RxDelayValue":
 			return true
 		}
 	}
@@ -183,11 +192,62 @@ func addField(fs *pflag.FlagSet, name string, t reflect.Type, maskOnly bool) {
 	} else if (t.Kind() == reflect.Slice || t.Kind() == reflect.Array) && t.Elem().Kind() == reflect.Uint8 {
 		fs.String(name, "", "(hex)")
 	} else {
-		switch t.Name() {
-		case "Time":
-			fs.String(name, "", "(YYYY-MM-DDTHH:MM:SSZ)")
-		case "Duration":
-			fs.Duration(name, 0, "(1h2m3s)")
+		switch t.PkgPath() {
+		case "time":
+			switch t.Name() {
+			case "Time":
+				fs.String(name, "", "(YYYY-MM-DDTHH:MM:SSZ)")
+			case "Duration":
+				fs.Duration(name, 0, "(1h2m3s)")
+			}
+		case "github.com/gogo/protobuf/types":
+			switch t.Name() {
+			case "DoubleValue":
+				fs.Float64(name, 0, "")
+			case "FloatValue":
+				fs.Float32(name, 0, "")
+			case "Int64Value":
+				fs.Int64(name, 0, "")
+			case "UInt64Value":
+				fs.Uint64(name, 0, "")
+			case "Int32Value":
+				fs.Int32(name, 0, "")
+			case "UInt32Value":
+				fs.Uint32(name, 0, "")
+			case "BoolValue":
+				fs.Bool(name, false, "")
+			case "StringValue":
+				fs.String(name, "", "")
+			case "BytesValue":
+				fs.String(name, "", "(hex)")
+			}
+		case "go.thethings.network/lorawan-stack/pkg/ttnpb":
+			switch t.Name() {
+			case "MACSettings_DataRateIndexValue":
+				values := make([]string, 0, len(proto.EnumValueMap("ttn.lorawan.v3.DataRateIndex")))
+				for value := range proto.EnumValueMap("ttn.lorawan.v3.DataRateIndex") {
+					values = append(values, value)
+				}
+				fs.String(name, "", strings.Join(values, "|"))
+			case "MACSettings_PingSlotPeriodValue":
+				values := make([]string, 0, len(proto.EnumValueMap("ttn.lorawan.v3.PingSlotPeriod")))
+				for value := range proto.EnumValueMap("ttn.lorawan.v3.PingSlotPeriod") {
+					values = append(values, value)
+				}
+				fs.String(name, "", strings.Join(values, "|"))
+			case "MACSettings_AggregatedDutyCycleValue":
+				values := make([]string, 0, len(proto.EnumValueMap("ttn.lorawan.v3.AggregatedDutyCycle")))
+				for value := range proto.EnumValueMap("ttn.lorawan.v3.AggregatedDutyCycle") {
+					values = append(values, value)
+				}
+				fs.String(name, "", strings.Join(values, "|"))
+			case "MACSettings_RxDelayValue":
+				values := make([]string, 0, len(proto.EnumValueMap("ttn.lorawan.v3.RxDelay")))
+				for value := range proto.EnumValueMap("ttn.lorawan.v3.RxDelay") {
+					values = append(values, value)
+				}
+				fs.String(name, "", strings.Join(values, "|"))
+			}
 		default:
 			fmt.Printf("flags: %s.%s not yet supported (%s)\n", t.PkgPath(), t.Name(), name)
 		}
@@ -326,22 +386,90 @@ func setField(rv reflect.Value, path []string, v reflect.Value) error {
 						}
 					}
 					return fmt.Errorf(`invalid value "%s" for %s`, v.String(), ft.Name())
-				case ft.PkgPath() == "time" && ft.Name() == "Time" && vt.Kind() == reflect.String:
-					var t time.Time
-					var err error
-					if v.String() != "" {
-						t, err = time.Parse(time.RFC3339Nano, v.String())
+				case ft.PkgPath() == "time":
+					switch {
+					case ft.Name() == "Time" && vt.Kind() == reflect.String:
+						var t time.Time
+						var err error
+						if v.String() != "" {
+							t, err = time.Parse(time.RFC3339Nano, v.String())
+							if err != nil {
+								return err
+							}
+						}
+						field.Set(reflect.ValueOf(t))
+					case ft.Name() == "Duration" && vt.Kind() == reflect.String:
+						d, err := time.ParseDuration(v.String())
 						if err != nil {
 							return err
 						}
+						field.Set(reflect.ValueOf(d))
 					}
-					field.Set(reflect.ValueOf(t))
-				case ft.PkgPath() == "time" && ft.Name() == "Duration" && vt.Kind() == reflect.String:
-					d, err := time.ParseDuration(v.String())
-					if err != nil {
-						return err
+				case ft.PkgPath() == "github.com/gogo/protobuf/types":
+					switch ft.Name() {
+					case "DoubleValue":
+						field.Set(reflect.ValueOf(types.DoubleValue{Value: v.Float()}))
+					case "FloatValue":
+						field.Set(reflect.ValueOf(types.FloatValue{Value: float32(v.Float())}))
+					case "Int64Value":
+						field.Set(reflect.ValueOf(types.Int64Value{Value: v.Int()}))
+					case "UInt64Value":
+						field.Set(reflect.ValueOf(types.UInt64Value{Value: v.Uint()}))
+					case "Int32Value":
+						field.Set(reflect.ValueOf(types.Int32Value{Value: int32(v.Int())}))
+					case "UInt32Value":
+						field.Set(reflect.ValueOf(types.UInt32Value{Value: uint32(v.Uint())}))
+					case "BoolValue":
+						field.Set(reflect.ValueOf(types.BoolValue{Value: v.Bool()}))
+					case "StringValue":
+						field.Set(reflect.ValueOf(types.StringValue{Value: v.String()}))
+					case "BytesValue":
+						s := strings.TrimPrefix(v.String(), "0x")
+						buf, err := hex.DecodeString(s)
+						if err != nil {
+							return err
+						}
+						field.Set(reflect.ValueOf(types.BytesValue{Value: buf}))
 					}
-					field.Set(reflect.ValueOf(d))
+				case ft.PkgPath() == "go.thethings.network/lorawan-stack/pkg/ttnpb":
+					switch ft.Name() {
+					case "MACSettings_DataRateIndexValue":
+						if enumValue, ok := proto.EnumValueMap("ttn.lorawan.v3.DataRateIndex")[v.String()]; ok {
+							field.Set(reflect.ValueOf(ttnpb.MACSettings_DataRateIndexValue{Value: ttnpb.DataRateIndex(enumValue)}))
+							break
+						}
+
+						var enum ttnpb.DataRateIndex
+						if err := enum.UnmarshalText([]byte(v.String())); err != nil {
+							field.Set(reflect.ValueOf(ttnpb.MACSettings_DataRateIndexValue{Value: enum}))
+							break
+						}
+						return fmt.Errorf(`invalid value "%s" for %s`, v.String(), ft.Name())
+					case "MACSettings_PingSlotPeriodValue":
+						if enumValue, ok := proto.EnumValueMap("ttn.lorawan.v3.PingSlotPeriod")[v.String()]; ok {
+							field.Set(reflect.ValueOf(ttnpb.MACSettings_PingSlotPeriodValue{Value: ttnpb.PingSlotPeriod(enumValue)}))
+							break
+						}
+						return fmt.Errorf(`invalid value "%s" for %s`, v.String(), ft.Name())
+					case "MACSettings_AggregatedDutyCycleValue":
+						if enumValue, ok := proto.EnumValueMap("ttn.lorawan.v3.AggregatedDutyCycle")[v.String()]; ok {
+							field.Set(reflect.ValueOf(ttnpb.MACSettings_AggregatedDutyCycleValue{Value: ttnpb.AggregatedDutyCycle(enumValue)}))
+							break
+						}
+						return fmt.Errorf(`invalid value "%s" for %s`, v.String(), ft.Name())
+					case "MACSettings_RxDelayValue":
+						if enumValue, ok := proto.EnumValueMap("ttn.lorawan.v3.RxDelay")[v.String()]; ok {
+							field.Set(reflect.ValueOf(ttnpb.MACSettings_RxDelayValue{Value: ttnpb.RxDelay(enumValue)}))
+							break
+						}
+
+						var enum ttnpb.RxDelay
+						if err := enum.UnmarshalText([]byte(v.String())); err != nil {
+							field.Set(reflect.ValueOf(ttnpb.MACSettings_RxDelayValue{Value: enum}))
+							break
+						}
+						return fmt.Errorf(`invalid value "%s" for %s`, v.String(), ft.Name())
+					}
 				case ft.Kind() == reflect.Slice && ft.Elem().Kind() == reflect.Uint8 && vt.Kind() == reflect.String:
 					s := strings.TrimPrefix(v.String(), "0x")
 					buf, err := hex.DecodeString(s)
