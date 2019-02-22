@@ -106,12 +106,8 @@ func TestDeviceRegistryGet(t *testing.T) {
 				})
 			},
 			GetByEUIFunc: func(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error) {
-				defer test.MustIncrementContextCounter(ctx, getByEUIFuncKey{}, 1)
-				a := assertions.New(test.MustTFromContext(ctx))
-				a.So(joinEUI, should.Equal, *registeredJoinEUI)
-				a.So(devEUI, should.Equal, *registeredDevEUI)
-				a.So(paths, should.HaveSameElementsDeep, []string{"ids"})
-				return deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice), nil
+				test.MustTFromContext(ctx).Errorf("GetByEUIFunc must not be called")
+				return nil, errors.New("GetByEUIFunc must not be called")
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: deepcopy.Copy(registeredDevice.EndDeviceIdentifiers).(ttnpb.EndDeviceIdentifiers),
@@ -139,12 +135,8 @@ func TestDeviceRegistryGet(t *testing.T) {
 				})
 			},
 			GetByEUIFunc: func(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error) {
-				defer test.MustIncrementContextCounter(ctx, getByEUIFuncKey{}, 1)
-				a := assertions.New(test.MustTFromContext(ctx))
-				a.So(joinEUI, should.Equal, registeredJoinEUI)
-				a.So(devEUI, should.Equal, registeredDevEUI)
-				a.So(paths, should.HaveSameElementsDeep, []string{"ids"})
-				return deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice), nil
+				test.MustTFromContext(ctx).Errorf("GetByEUIFunc must not be called")
+				return nil, errors.New("GetByEUIFunc must not be called")
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -179,12 +171,8 @@ func TestDeviceRegistryGet(t *testing.T) {
 				})
 			},
 			GetByEUIFunc: func(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error) {
-				defer test.MustIncrementContextCounter(ctx, getByEUIFuncKey{}, 1)
-				a := assertions.New(test.MustTFromContext(ctx))
-				a.So(joinEUI, should.Equal, registeredJoinEUI)
-				a.So(devEUI, should.Equal, registeredDevEUI)
-				a.So(paths, should.HaveSameElementsDeep, []string{"ids"})
-				return deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice), nil
+				test.MustTFromContext(ctx).Errorf("GetByEUIFunc must not be called")
+				return nil, errors.New("GetByEUIFunc must not be called")
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -331,12 +319,8 @@ func TestDeviceRegistryGet(t *testing.T) {
 				})
 			},
 			GetByEUIFunc: func(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error) {
-				defer test.MustIncrementContextCounter(ctx, getByEUIFuncKey{}, 1)
-				a := assertions.New(test.MustTFromContext(ctx))
-				a.So(joinEUI, should.Equal, *registeredJoinEUI)
-				a.So(devEUI, should.Equal, *registeredDevEUI)
-				a.So(paths, should.HaveSameElementsDeep, []string{"ids", "root_keys"})
-				return deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice), nil
+				test.MustTFromContext(ctx).Errorf("GetByEUIFunc must not be called")
+				return nil, errors.New("GetByEUIFunc must not be called")
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: deepcopy.Copy(registeredDevice.EndDeviceIdentifiers).(ttnpb.EndDeviceIdentifiers),
@@ -481,13 +465,8 @@ func TestDeviceRegistrySet(t *testing.T) {
 				},
 			},
 			SetByEUIFunc: func(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
-				a := assertions.New(test.MustTFromContext(ctx))
-				defer test.MustIncrementContextCounter(ctx, setByEUIFuncKey{}, 1)
-				a.So(joinEUI, should.Equal, *registeredJoinEUI)
-				a.So(devEUI, should.Equal, *registeredDevEUI)
-				a.So(paths, should.Contain, "ids")
-				dev, _, err := cb(deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice))
-				return dev, err
+				test.MustTFromContext(ctx).Errorf("SetByEUIFunc must not be called")
+				return nil, errors.New("SetByEUIFunc must not be called")
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				a := assertions.New(t)
@@ -524,13 +503,8 @@ func TestDeviceRegistrySet(t *testing.T) {
 				},
 			},
 			SetByEUIFunc: func(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
-				a := assertions.New(test.MustTFromContext(ctx))
-				defer test.MustIncrementContextCounter(ctx, setByEUIFuncKey{}, 1)
-				a.So(joinEUI, should.Equal, *registeredJoinEUI)
-				a.So(devEUI, should.Equal, *registeredDevEUI)
-				a.So(paths, should.Contain, "ids")
-				dev, _, err := cb(deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice))
-				return dev, err
+				test.MustTFromContext(ctx).Errorf("SetByEUIFunc must not be called")
+				return nil, errors.New("SetByEUIFunc must not be called")
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				a := assertions.New(t)
@@ -567,13 +541,8 @@ func TestDeviceRegistrySet(t *testing.T) {
 				},
 			},
 			SetByEUIFunc: func(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
-				a := assertions.New(test.MustTFromContext(ctx))
-				defer test.MustIncrementContextCounter(ctx, setByEUIFuncKey{}, 1)
-				a.So(joinEUI, should.Equal, registeredJoinEUI)
-				a.So(devEUI, should.Equal, registeredDevEUI)
-				a.So(paths, should.Contain, "ids")
-				dev, _, err := cb(deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice))
-				return dev, err
+				test.MustTFromContext(ctx).Errorf("SetByEUIFunc must not be called")
+				return nil, errors.New("SetByEUIFunc must not be called")
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				a := assertions.New(t)
@@ -730,13 +699,8 @@ func TestDeviceRegistrySet(t *testing.T) {
 				},
 			},
 			SetByEUIFunc: func(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
-				a := assertions.New(test.MustTFromContext(ctx))
-				defer test.MustIncrementContextCounter(ctx, setByEUIFuncKey{}, 1)
-				a.So(joinEUI, should.Equal, *registeredJoinEUI)
-				a.So(devEUI, should.Equal, *registeredDevEUI)
-				a.So(paths, should.Contain, "ids")
-				dev, _, err := cb(deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice))
-				return dev, err
+				test.MustTFromContext(ctx).Errorf("SetByEUIFunc must not be called")
+				return nil, errors.New("SetByEUIFunc must not be called")
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				a := assertions.New(t)
@@ -858,13 +822,8 @@ func TestDeviceRegistryDelete(t *testing.T) {
 			},
 			Device: deepcopy.Copy(&registeredDevice.EndDeviceIdentifiers).(*ttnpb.EndDeviceIdentifiers),
 			SetByEUIFunc: func(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
-				a := assertions.New(test.MustTFromContext(ctx))
-				defer test.MustIncrementContextCounter(ctx, setByEUIFuncKey{}, 1)
-				a.So(joinEUI, should.Equal, *registeredJoinEUI)
-				a.So(devEUI, should.Equal, *registeredDevEUI)
-				a.So(paths, should.BeNil)
-				dev, _, err := cb(deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice))
-				return dev, err
+				test.MustTFromContext(ctx).Errorf("SetByEUIFunc must not be called")
+				return nil, errors.New("SetByEUIFunc must not be called")
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				a := assertions.New(t)
@@ -894,13 +853,8 @@ func TestDeviceRegistryDelete(t *testing.T) {
 				JoinEUI:  registeredJoinEUI,
 			},
 			SetByEUIFunc: func(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
-				a := assertions.New(test.MustTFromContext(ctx))
-				defer test.MustIncrementContextCounter(ctx, setByEUIFuncKey{}, 1)
-				a.So(joinEUI, should.Equal, *registeredJoinEUI)
-				a.So(devEUI, should.Equal, *registeredDevEUI)
-				a.So(paths, should.BeNil)
-				dev, _, err := cb(deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice))
-				return dev, err
+				test.MustTFromContext(ctx).Errorf("SetByEUIFunc must not be called")
+				return nil, errors.New("SetByEUIFunc must not be called")
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				a := assertions.New(t)
@@ -928,6 +882,10 @@ func TestDeviceRegistryDelete(t *testing.T) {
 				},
 				DeviceID: registeredDeviceID,
 				DevEUI:   registeredDevEUI,
+			},
+			SetByEUIFunc: func(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+				test.MustTFromContext(ctx).Errorf("SetByEUIFunc must not be called")
+				return nil, errors.New("SetByEUIFunc must not be called")
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				a := assertions.New(t)
