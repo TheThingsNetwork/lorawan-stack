@@ -53,6 +53,7 @@ const inputAllowedProps = [
 
 const checkboxAllowedProps = [
   'value',
+  'name',
   'onFocus',
   'onBlur',
   'onChange',

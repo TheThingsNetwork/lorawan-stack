@@ -23,7 +23,9 @@ import style from './checkbox.styl'
 class Checkbox extends React.PureComponent {
 
   onChange (evt) {
-    this.props.onChange(evt.target.checked)
+    const { onChange, name } = this.props
+
+    onChange(name, evt.target.checked)
   }
 
   render () {
