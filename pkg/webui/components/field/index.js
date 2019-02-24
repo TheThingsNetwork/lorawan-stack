@@ -59,6 +59,7 @@ const checkboxAllowedProps = [
   'onChange',
   'disabled',
   'indeterminate',
+  'tabIndex',
 ]
 
 const getAllowedPropsByType = function (type) {
