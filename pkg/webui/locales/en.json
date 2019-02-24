@@ -1,4 +1,6 @@
 {
+  "components.checkbox.group.index.checkAll": "Check All",
+  "components.checkbox.group.index.selections": "Your Selections",
   "components.footer.index.footer": "You are the network. Let's build this thing together.",
   "components.navigation.side.side.hideSidebar": "Hide Sidebar",
   "components.safe-inspector.index.copied": "Copied to clipboard!",
@@ -70,6 +72,7 @@
   "lib.shared-messages.profileSettings": "Profile Settings",
   "lib.shared-messages.rights": "Rights",
   "lib.shared-messages.saveChanges": "Save Changes",
+  "lib.shared-messages.search": "Search",
   "lib.shared-messages.settings": "Settings",
   "lib.shared-messages.termsAndCondition": "Terms and Conditions",
   "lib.shared-messages.traffic": "Traffic",
