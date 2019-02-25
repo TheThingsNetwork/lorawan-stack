@@ -29,6 +29,7 @@ const (
 	httpAddress     = "0.0.0.0:8097"
 	metricsPassword = "secret-metrics-test-password"
 	pprofPassword   = "secret-pprof-test-password"
+	healthPassword  = "secret-health-test-password"
 )
 
 func TestPProf(t *testing.T) {
@@ -46,6 +47,10 @@ func TestPProf(t *testing.T) {
 					Enable:   true,
 					Password: pprofPassword,
 				},
+				Health: config.Health{
+					Enable:   true,
+					Password: healthPassword,
+				},
 			},
 		},
 	}
@@ -62,7 +67,7 @@ func TestPProf(t *testing.T) {
 		username, password string
 	}{
 		{
-			path:     "/debug/pprof",
+			path:     "debug/pprof",
 			username: pprofUsername,
 			password: pprofPassword,
 		},
@@ -70,6 +75,16 @@ func TestPProf(t *testing.T) {
 			path:     "metrics",
 			username: metricsUsername,
 			password: metricsPassword,
+		},
+		{
+			path:     "healthz/live",
+			username: healthUsername,
+			password: healthPassword,
+		},
+		{
+			path:     "healthz/ready",
+			username: healthUsername,
+			password: healthPassword,
 		},
 	} {
 		t.Run(fmt.Sprintf("%s endpoint", tc.path), func(t *testing.T) {
