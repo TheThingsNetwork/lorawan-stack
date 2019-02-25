@@ -111,7 +111,7 @@ func (s *apiKeyStore) UpdateAPIKey(ctx context.Context, entityID *ttnpb.EntityId
 	}
 	keyModel.Name = key.Name
 	keyModel.Rights = Rights{Rights: key.Rights}
-	if err = s.db.Model(&keyModel).Select("name", "rights").Updates(&keyModel).Error; err != nil {
+	if err = s.db.Select("name", "rights", "updated_at").Save(&keyModel).Error; err != nil {
 		return nil, err
 	}
 	return keyModel.toPB(), nil

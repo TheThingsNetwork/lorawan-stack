@@ -134,7 +134,7 @@ func (s *clientStore) UpdateClient(ctx context.Context, cli *ttnpb.Client, field
 	oldAttributes := cliModel.Attributes
 	columns := cliModel.fromPB(cli, fieldMask)
 	if len(columns) > 0 {
-		query = s.db.Model(&cliModel).Select(columns).Updates(&cliModel)
+		query = s.db.Select(append(columns, "updated_at")).Save(&cliModel)
 		if query.Error != nil {
 			return nil, query.Error
 		}

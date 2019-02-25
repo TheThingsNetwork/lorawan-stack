@@ -139,7 +139,7 @@ func (s *gatewayStore) UpdateGateway(ctx context.Context, gtw *ttnpb.Gateway, fi
 	oldAttributes, oldAntennas := gtwModel.Attributes, gtwModel.Antennas
 	columns := gtwModel.fromPB(gtw, fieldMask)
 	if len(columns) > 0 {
-		query = s.db.Model(&gtwModel).Select(columns).Updates(&gtwModel)
+		query = s.db.Select(append(columns, "updated_at")).Save(&gtwModel)
 		if query.Error != nil {
 			return nil, query.Error
 		}

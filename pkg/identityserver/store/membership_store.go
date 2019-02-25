@@ -99,7 +99,7 @@ func (s *membershipStore) SetMember(ctx context.Context, id *ttnpb.OrganizationO
 			return s.db.Delete(&membership).Error
 		}
 		membership.Rights = Rights(*rights)
-		return s.db.Model(&membership).Select("rights").Updates(&membership).Error
+		return s.db.Select("rights", "updated_at").Save(&membership).Error
 	}
 	return s.db.Model(entity).
 		Set("gorm:association_autoupdate", false). // otherwise it does UPDATE instead of INSERT

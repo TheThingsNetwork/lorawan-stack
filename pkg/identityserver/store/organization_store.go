@@ -138,7 +138,7 @@ func (s *organizationStore) UpdateOrganization(ctx context.Context, org *ttnpb.O
 	oldAttributes := orgModel.Attributes
 	columns := orgModel.fromPB(org, fieldMask)
 	if len(columns) > 0 {
-		query = s.db.Model(&orgModel).Select(columns).Updates(&orgModel)
+		query = s.db.Select(append(columns, "updated_at")).Save(&orgModel)
 		if query.Error != nil {
 			return nil, query.Error
 		}
