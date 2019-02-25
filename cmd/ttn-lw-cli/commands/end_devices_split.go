@@ -451,7 +451,7 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths []
 		var jsDevice ttnpb.EndDevice
 		jsDevice.SetFields(device, append(jsPaths, "ids")...)
 		jsRes, err := ttnpb.NewJsEndDeviceRegistryClient(js).Set(ctx, &ttnpb.SetEndDeviceRequest{
-			Device:    jsDevice,
+			EndDevice: jsDevice,
 			FieldMask: types.FieldMask{Paths: jsPaths},
 		})
 		if err != nil {
@@ -468,7 +468,7 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths []
 		var nsDevice ttnpb.EndDevice
 		nsDevice.SetFields(device, append(nsPaths, "ids")...)
 		nsRes, err := ttnpb.NewNsEndDeviceRegistryClient(ns).Set(ctx, &ttnpb.SetEndDeviceRequest{
-			Device:    nsDevice,
+			EndDevice: nsDevice,
 			FieldMask: types.FieldMask{Paths: nsPaths},
 		})
 		if err != nil {
@@ -485,7 +485,7 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths []
 		var asDevice ttnpb.EndDevice
 		asDevice.SetFields(device, append(asPaths, "ids")...)
 		asRes, err := ttnpb.NewAsEndDeviceRegistryClient(as).Set(ctx, &ttnpb.SetEndDeviceRequest{
-			Device:    asDevice,
+			EndDevice: asDevice,
 			FieldMask: types.FieldMask{Paths: asPaths},
 		})
 		if err != nil {

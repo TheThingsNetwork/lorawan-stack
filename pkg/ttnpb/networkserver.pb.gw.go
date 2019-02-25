@@ -94,26 +94,26 @@ func request_NsEndDeviceRegistry_Set_0(ctx context.Context, marshaler runtime.Ma
 		_   = err
 	)
 
-	val, ok = pathParams["device.ids.application_ids.application_id"]
+	val, ok = pathParams["end_device.ids.application_ids.application_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "device.ids.application_ids.application_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "end_device.ids.application_ids.application_id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "device.ids.application_ids.application_id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "end_device.ids.application_ids.application_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "device.ids.application_ids.application_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "end_device.ids.application_ids.application_id", err)
 	}
 
-	val, ok = pathParams["device.ids.device_id"]
+	val, ok = pathParams["end_device.ids.device_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "device.ids.device_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "end_device.ids.device_id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "device.ids.device_id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "end_device.ids.device_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "device.ids.device_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "end_device.ids.device_id", err)
 	}
 
 	msg, err := client.Set(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -140,15 +140,15 @@ func request_NsEndDeviceRegistry_Set_1(ctx context.Context, marshaler runtime.Ma
 		_   = err
 	)
 
-	val, ok = pathParams["device.ids.application_ids.application_id"]
+	val, ok = pathParams["end_device.ids.application_ids.application_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "device.ids.application_ids.application_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "end_device.ids.application_ids.application_id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "device.ids.application_ids.application_id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "end_device.ids.application_ids.application_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "device.ids.application_ids.application_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "end_device.ids.application_ids.application_id", err)
 	}
 
 	msg, err := client.Set(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -326,9 +326,9 @@ func RegisterNsEndDeviceRegistryHandlerClient(ctx context.Context, mux *runtime.
 var (
 	pattern_NsEndDeviceRegistry_Get_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"ns", "applications", "end_device_ids.application_ids.application_id", "devices", "end_device_ids.device_id"}, ""))
 
-	pattern_NsEndDeviceRegistry_Set_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"ns", "applications", "device.ids.application_ids.application_id", "devices", "device.ids.device_id"}, ""))
+	pattern_NsEndDeviceRegistry_Set_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"ns", "applications", "end_device.ids.application_ids.application_id", "devices", "end_device.ids.device_id"}, ""))
 
-	pattern_NsEndDeviceRegistry_Set_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"ns", "applications", "device.ids.application_ids.application_id", "devices"}, ""))
+	pattern_NsEndDeviceRegistry_Set_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"ns", "applications", "end_device.ids.application_ids.application_id", "devices"}, ""))
 
 	pattern_NsEndDeviceRegistry_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"ns", "applications", "application_ids.application_id", "devices", "device_id"}, ""))
 )

@@ -384,8 +384,8 @@ func (this *ListEndDevicesRequest) Validate() error {
 	return nil
 }
 func (this *SetEndDeviceRequest) Validate() error {
-	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.Device)); err != nil {
-		return github_com_mwitkow_go_proto_validators.FieldError("Device", err)
+	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.EndDevice)); err != nil {
+		return github_com_mwitkow_go_proto_validators.FieldError("EndDevice", err)
 	}
 	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.FieldMask)); err != nil {
 		return github_com_mwitkow_go_proto_validators.FieldError("FieldMask", err)

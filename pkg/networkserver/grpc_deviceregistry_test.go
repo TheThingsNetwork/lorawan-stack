@@ -215,7 +215,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				return nil, err
 			},
 			Request: &ttnpb.SetEndDeviceRequest{
-				Device: ttnpb.EndDevice{
+				EndDevice: ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceID:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
@@ -310,7 +310,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				return dev, nil
 			},
 			Request: &ttnpb.SetEndDeviceRequest{
-				Device: ttnpb.EndDevice{
+				EndDevice: ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceID:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
@@ -459,7 +459,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				return dev, nil
 			},
 			Request: &ttnpb.SetEndDeviceRequest{
-				Device: ttnpb.EndDevice{
+				EndDevice: ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceID:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
@@ -646,7 +646,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				return dev, nil
 			},
 			Request: &ttnpb.SetEndDeviceRequest{
-				Device: ttnpb.EndDevice{
+				EndDevice: ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceID:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
@@ -830,7 +830,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				return dev, nil
 			},
 			Request: &ttnpb.SetEndDeviceRequest{
-				Device: ttnpb.EndDevice{
+				EndDevice: ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceID:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},

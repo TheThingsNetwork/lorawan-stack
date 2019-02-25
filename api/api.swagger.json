@@ -888,7 +888,7 @@
         ]
       }
     },
-    "/as/applications/{device.ids.application_ids.application_id}/devices": {
+    "/as/applications/{end_device.ids.application_ids.application_id}/devices": {
       "post": {
         "operationId": "Set2",
         "responses": {
@@ -901,7 +901,7 @@
         },
         "parameters": [
           {
-            "name": "device.ids.application_ids.application_id",
+            "name": "end_device.ids.application_ids.application_id",
             "in": "path",
             "required": true,
             "type": "string"
@@ -920,7 +920,7 @@
         ]
       }
     },
-    "/as/applications/{device.ids.application_ids.application_id}/devices/{device.ids.device_id}": {
+    "/as/applications/{end_device.ids.application_ids.application_id}/devices/{end_device.ids.device_id}": {
       "put": {
         "operationId": "Set",
         "responses": {
@@ -933,13 +933,13 @@
         },
         "parameters": [
           {
-            "name": "device.ids.application_ids.application_id",
+            "name": "end_device.ids.application_ids.application_id",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "device.ids.device_id",
+            "name": "end_device.ids.device_id",
             "in": "path",
             "required": true,
             "type": "string"
@@ -2063,7 +2063,7 @@
         ]
       }
     },
-    "/js/applications/{device.ids.application_ids.application_id}/devices": {
+    "/js/applications/{end_device.ids.application_ids.application_id}/devices": {
       "post": {
         "operationId": "Set2",
         "responses": {
@@ -2076,7 +2076,7 @@
         },
         "parameters": [
           {
-            "name": "device.ids.application_ids.application_id",
+            "name": "end_device.ids.application_ids.application_id",
             "in": "path",
             "required": true,
             "type": "string"
@@ -2095,7 +2095,7 @@
         ]
       }
     },
-    "/js/applications/{device.ids.application_ids.application_id}/devices/{device.ids.device_id}": {
+    "/js/applications/{end_device.ids.application_ids.application_id}/devices/{end_device.ids.device_id}": {
       "put": {
         "operationId": "Set",
         "responses": {
@@ -2108,13 +2108,13 @@
         },
         "parameters": [
           {
-            "name": "device.ids.application_ids.application_id",
+            "name": "end_device.ids.application_ids.application_id",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "device.ids.device_id",
+            "name": "end_device.ids.device_id",
             "in": "path",
             "required": true,
             "type": "string"
@@ -2251,7 +2251,7 @@
         ]
       }
     },
-    "/ns/applications/{device.ids.application_ids.application_id}/devices": {
+    "/ns/applications/{end_device.ids.application_ids.application_id}/devices": {
       "post": {
         "operationId": "Set2",
         "responses": {
@@ -2264,7 +2264,7 @@
         },
         "parameters": [
           {
-            "name": "device.ids.application_ids.application_id",
+            "name": "end_device.ids.application_ids.application_id",
             "in": "path",
             "required": true,
             "type": "string"
@@ -2283,7 +2283,7 @@
         ]
       }
     },
-    "/ns/applications/{device.ids.application_ids.application_id}/devices/{device.ids.device_id}": {
+    "/ns/applications/{end_device.ids.application_ids.application_id}/devices/{end_device.ids.device_id}": {
       "put": {
         "operationId": "Set",
         "responses": {
@@ -2296,13 +2296,13 @@
         },
         "parameters": [
           {
-            "name": "device.ids.application_ids.application_id",
+            "name": "end_device.ids.application_ids.application_id",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "device.ids.device_id",
+            "name": "end_device.ids.device_id",
             "in": "path",
             "required": true,
             "type": "string"
@@ -8355,7 +8355,7 @@
     "v3SetEndDeviceRequest": {
       "type": "object",
       "properties": {
-        "device": {
+        "end_device": {
           "$ref": "#/definitions/v3EndDevice"
         },
         "field_mask": {

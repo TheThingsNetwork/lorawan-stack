@@ -237,7 +237,7 @@
       "http": [
         {
           "method": "put",
-          "pattern": "/as/applications/{device.ids.application_ids.application_id}/devices/{device.ids.device_id}",
+          "pattern": "/as/applications/{end_device.ids.application_ids.application_id}/devices/{end_device.ids.device_id}",
           "body": "*",
           "parameters": [
             "device.ids.application_ids.application_id",
@@ -246,7 +246,7 @@
         },
         {
           "method": "post",
-          "pattern": "/as/applications/{device.ids.application_ids.application_id}/devices",
+          "pattern": "/as/applications/{end_device.ids.application_ids.application_id}/devices",
           "body": "*",
           "parameters": [
             "device.ids.application_ids.application_id"
@@ -685,7 +685,7 @@
       "http": [
         {
           "method": "put",
-          "pattern": "/js/applications/{device.ids.application_ids.application_id}/devices/{device.ids.device_id}",
+          "pattern": "/js/applications/{end_device.ids.application_ids.application_id}/devices/{end_device.ids.device_id}",
           "body": "*",
           "parameters": [
             "device.ids.application_ids.application_id",
@@ -694,7 +694,7 @@
         },
         {
           "method": "post",
-          "pattern": "/js/applications/{device.ids.application_ids.application_id}/devices",
+          "pattern": "/js/applications/{end_device.ids.application_ids.application_id}/devices",
           "body": "*",
           "parameters": [
             "device.ids.application_ids.application_id"
@@ -781,7 +781,7 @@
       "http": [
         {
           "method": "put",
-          "pattern": "/ns/applications/{device.ids.application_ids.application_id}/devices/{device.ids.device_id}",
+          "pattern": "/ns/applications/{end_device.ids.application_ids.application_id}/devices/{end_device.ids.device_id}",
           "body": "*",
           "parameters": [
             "device.ids.application_ids.application_id",
@@ -790,7 +790,7 @@
         },
         {
           "method": "post",
-          "pattern": "/ns/applications/{device.ids.application_ids.application_id}/devices",
+          "pattern": "/ns/applications/{end_device.ids.application_ids.application_id}/devices",
           "body": "*",
           "parameters": [
             "device.ids.application_ids.application_id"

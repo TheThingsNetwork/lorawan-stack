@@ -475,7 +475,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				})
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
-				Device: deepcopy.Copy(*registeredDevice).(ttnpb.EndDevice),
+				EndDevice: deepcopy.Copy(*registeredDevice).(ttnpb.EndDevice),
 				FieldMask: pbtypes.FieldMask{
 					Paths: []string{"ids"},
 				},
@@ -510,7 +510,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				})
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
-				Device: ttnpb.EndDevice{
+				EndDevice: ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationID: registeredApplicationID,
@@ -553,7 +553,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				})
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
-				Device: ttnpb.EndDevice{
+				EndDevice: ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationID: registeredApplicationID,
@@ -596,7 +596,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				})
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
-				Device: ttnpb.EndDevice{
+				EndDevice: ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationID: registeredApplicationID,
@@ -649,7 +649,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				})
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
-				Device: ttnpb.EndDevice{
+				EndDevice: ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationID: "other-app",
@@ -693,7 +693,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				})
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
-				Device: deepcopy.Copy(*registeredDevice).(ttnpb.EndDevice),
+				EndDevice: deepcopy.Copy(*registeredDevice).(ttnpb.EndDevice),
 				FieldMask: pbtypes.FieldMask{
 					Paths: []string{"ids"},
 				},
@@ -724,7 +724,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				})
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
-				Device: deepcopy.Copy(*registeredDevice).(ttnpb.EndDevice),
+				EndDevice: deepcopy.Copy(*registeredDevice).(ttnpb.EndDevice),
 				FieldMask: pbtypes.FieldMask{
 					Paths: []string{"ids", "root_keys"},
 				},
@@ -760,7 +760,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				})
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
-				Device: deepcopy.Copy(*registeredDevice).(ttnpb.EndDevice),
+				EndDevice: deepcopy.Copy(*registeredDevice).(ttnpb.EndDevice),
 				FieldMask: pbtypes.FieldMask{
 					Paths: []string{"ids", "root_keys"},
 				},
