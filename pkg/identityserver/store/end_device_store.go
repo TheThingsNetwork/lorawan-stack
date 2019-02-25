@@ -154,7 +154,7 @@ func (s *deviceStore) UpdateEndDevice(ctx context.Context, dev *ttnpb.EndDevice,
 	oldAttributes, oldLocations := devModel.Attributes, devModel.Locations
 	columns := devModel.fromPB(dev, fieldMask)
 	if len(columns) > 0 {
-		query = s.db.Model(&devModel).Select(columns).Updates(&devModel)
+		query = s.db.Select(append(columns, "updated_at")).Save(&devModel)
 		if query.Error != nil {
 			return nil, query.Error
 		}

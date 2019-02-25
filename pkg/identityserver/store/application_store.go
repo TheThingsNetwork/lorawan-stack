@@ -134,7 +134,7 @@ func (s *applicationStore) UpdateApplication(ctx context.Context, app *ttnpb.App
 	oldAttributes := appModel.Attributes
 	columns := appModel.fromPB(app, fieldMask)
 	if len(columns) > 0 {
-		query = s.db.Model(&appModel).Select(columns).Updates(&appModel)
+		query = s.db.Select(append(columns, "updated_at")).Save(&appModel)
 		if query.Error != nil {
 			return nil, query.Error
 		}

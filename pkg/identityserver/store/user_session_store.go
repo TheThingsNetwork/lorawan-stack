@@ -108,7 +108,7 @@ func (s *userSessionStore) UpdateSession(ctx context.Context, sess *ttnpb.UserSe
 		return nil, err
 	}
 	sessionModel.fromPB(sess)
-	if err = s.db.Model(&sessionModel).Updates(&sessionModel).Error; err != nil {
+	if err = s.db.Save(&sessionModel).Error; err != nil {
 		return nil, err
 	}
 	updated := &ttnpb.UserSession{}

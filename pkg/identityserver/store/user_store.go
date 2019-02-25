@@ -157,7 +157,7 @@ func (s *userStore) UpdateUser(ctx context.Context, usr *ttnpb.User, fieldMask *
 		}
 	}
 	if len(columns) > 0 {
-		query = s.db.Model(&userModel).Select(columns).Updates(&userModel)
+		query = s.db.Select(append(columns, "updated_at")).Save(&userModel)
 		if query.Error != nil {
 			return nil, query.Error
 		}
