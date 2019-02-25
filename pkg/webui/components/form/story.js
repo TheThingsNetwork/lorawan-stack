@@ -18,8 +18,11 @@ import { action } from '@storybook/addon-actions'
 import { withInfo } from '@storybook/addon-info'
 
 import Field from '../field'
+import CheckboxGroup from '../checkbox/group'
 import Button from '../button'
+import style from './story.styl'
 import Form from '.'
+
 
 const handleSubmit = function (data, { setSubmitting }) {
   action('Submit')(data)
@@ -68,31 +71,27 @@ storiesOf('Form', module)
     <div style={containerStyles}>
       <Form
         onSubmit={handleSubmit}
-        initialValues={{
-          APPLICATION_RIGHT_READ: true,
-          APPLICATION_RIGHT_WRITE: false,
-          APPLICATION_RIGHT_DEVICE_READ: false,
-        }}
         submitEnabledWhenInvalid
       >
-        <Field
-          type="checkbox"
-          title="Application Read"
-          name="APPLICATION_RIGHT_READ"
+        <CheckboxGroup
+          className={style.checkboxGroup}
+          selectAllTitle="All Application Rights"
+          selectAllName="RIGHT_APPLICATION_ALL"
+          transfer
+          name="rights"
+          title="Rights"
           form
-        />
-        <Field
-          type="checkbox"
-          title="Application Write"
-          name="APPLICATION_RIGHT_WRITE"
-          form
-        />
-        <Field
-          type="checkbox"
-          title="Application Device Read"
-          name="APPLICATION_RIGHT_DEVICE_READ"
-          form
-        />
+        >
+          <Field title="Application Rights Read" name="APPLICATION_RIGHT_READ" form />
+          <Field title="Application Rights Edit" name="APPLICATION_RIGHT_WRITE" />
+          <Field title="Application Device Read" name="APPLICATION_RIGHT_DEVICE_READ" />
+          <Field title="Application Info Read" name="RIGHT_APPLICATION_INFO" />
+          <Field title="Application Basic Settings" name="RIGHT_APPLICATION_SETTINGS_BASIC" />
+          <Field title="Application Api Keys" name="RIGHT_APPLICATION_SETTINGS_API_KEYS" />
+          <Field title="Application Collaborators" name="RIGHT_APPLICATION_SETTINGS_COLLABORATORS" />
+          <Field title="Application Delete" name="RIGHT_APPLICATION_DELETE" />
+          <Field title="Application Delete Dayum Son Herrlo World" name="RIGHT_APPLICATION_DELETE2" />
+        </CheckboxGroup>
         <Button type="submit" message="Save" />
       </Form>
     </div>
