@@ -42,15 +42,6 @@ func validABPSessionKey(key *ttnpb.KeyEnvelope) bool {
 
 // Set implements NsEndDeviceRegistryServer.
 func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest) (*ttnpb.EndDevice, error) {
-	if err := ttnpb.ProhibitFields(req.FieldMask.Paths,
-		"mac_state.current_parameters",
-		"mac_state.desired_parameters",
-		"pending_session",
-		"session.keys.app_s_key",
-	); err != nil {
-		return nil, errInvalidFieldMask.WithCause(err)
-	}
-
 	if err := rights.RequireApplication(ctx, req.EndDevice.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
