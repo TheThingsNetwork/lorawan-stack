@@ -19,6 +19,7 @@ import { injectIntl } from 'react-intl'
 import PropTypes from '../../lib/prop-types'
 import from from '../../lib/from'
 import { warn } from '../../lib/log'
+import getByPath from '../../lib/get-by-path'
 
 import Icon from '../icon'
 import Input from '../input'
@@ -103,11 +104,13 @@ const component = function (type) {
 
 const Field = function (props) {
 
-  const handleChange = function (value) {
+  const handleChange = function (_, value) {
     props.setFieldValue(props.name, value)
     if (props.validateOnChange) {
       props.setFieldTouched(props.name, true)
     }
+
+    props.onChange(props.name, value)
   }
 
   const handleBlur = function (e) {
@@ -127,7 +130,7 @@ const Field = function (props) {
     error,
     value,
     warning,
-    touched,
+    touched = {},
     horizontal = false,
     disabled = false,
     readOnly = false,
@@ -136,12 +139,13 @@ const Field = function (props) {
     ...rest
   } = props
 
-  // Underscored assignment due to naming conflict
 
+  const formatMessage = content => typeof content === 'object' ? props.intl.formatMessage(content) : content
+
+  // Underscored assignment due to naming conflict
   let _value = props.value
   let _error = props.error
   let _touched = props.touched
-  const formatMessage = content => typeof content === 'object' ? props.intl.formatMessage(content) : content
 
   if (form) {
     const {
@@ -151,22 +155,25 @@ const Field = function (props) {
 
     // preserve default values for different inputs
     // make sure the checkbox component gets `false` as a falsy value
-    _value = values[name] || (type === 'checkbox' ? false : '')
-    _error = errors[name]
-    _touched = touched[name]
+    _value = getByPath(values, name) || (type === 'checkbox' ? false : '')
+    _error = getByPath(errors, name)
+    _touched = getByPath(touched, name)
     rest.value = _value
     rest.onChange = handleChange
     rest.onBlur = handleBlur
-
-    // restore the rest object for future per component filtering
-    rest.name = name
-    rest.readOnly = readOnly
-    rest.disabled = disabled
-    rest.error = _touched && Boolean(_error)
-    rest.warning = Boolean(warning)
-    rest.type = type
-    rest.placeholder = placeholder ? formatMessage(placeholder) : ''
+  } else {
+    rest.value = _value
+    rest.error = _error
+    rest.touched = _touched
   }
+
+  rest.name = name
+  rest.readOnly = readOnly
+  rest.disabled = disabled
+  rest.error = _touched && Boolean(_error)
+  rest.warning = Boolean(warning)
+  rest.type = type
+  rest.placeholder = placeholder ? formatMessage(placeholder) : ''
 
   const hasMessages = _touched && (_error || warning)
 
