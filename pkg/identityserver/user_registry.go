@@ -446,7 +446,7 @@ func (is *IdentityServer) createTemporaryPassword(ctx context.Context, req *ttnp
 		if err != nil {
 			return err
 		}
-		if usr.TemporaryPasswordExpiresAt.After(time.Now()) {
+		if usr.TemporaryPasswordExpiresAt != nil && usr.TemporaryPasswordExpiresAt.After(time.Now()) {
 			return errTemporaryPasswordStillValid
 		}
 		usr.TemporaryPassword = string(hashedTemporaryPassword)
