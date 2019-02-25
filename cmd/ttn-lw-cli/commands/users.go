@@ -227,6 +227,28 @@ var (
 			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
+	usersForgotPasswordCommand = &cobra.Command{
+		Use:   "forgot-password",
+		Short: "Request a temporary user password",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			usrID := getUserID(cmd.Flags(), args)
+			if usrID == nil {
+				return errNoUserID
+			}
+
+			usrID.Email, _ = cmd.Flags().GetString("email")
+
+			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			if err != nil {
+				return err
+			}
+			_, err = ttnpb.NewUserRegistryClient(is).CreateTemporaryPassword(ctx, &ttnpb.CreateTemporaryPasswordRequest{
+				UserIdentifiers: *usrID,
+			})
+
+			return err
+		},
+	}
 	usersUpdatePasswordCommand = &cobra.Command{
 		Use:     "update-password",
 		Aliases: []string{"change-password"},
@@ -320,6 +342,9 @@ func init() {
 	usersUpdateCommand.Flags().AddFlagSet(attributesFlags())
 	usersUpdateCommand.Flags().AddFlagSet(profilePictureFlags)
 	usersCommand.AddCommand(usersUpdateCommand)
+	usersForgotPasswordCommand.Flags().AddFlagSet(userIDFlags())
+	usersForgotPasswordCommand.Flags().String("email", "", "")
+	usersCommand.AddCommand(usersForgotPasswordCommand)
 	usersUpdatePasswordCommand.Flags().AddFlagSet(userIDFlags())
 	usersUpdatePasswordCommand.Flags().String("old", "", "")
 	usersUpdatePasswordCommand.Flags().String("new", "", "")
