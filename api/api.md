@@ -1515,7 +1515,7 @@ SDKs are responsible for combining (if desired) the three.
 | name | [string](#string) |  | Friendly name of the device. Stored in Entity Registry. |
 | description | [string](#string) |  | Description of the device. Stored in Entity Registry. |
 | attributes | [EndDevice.AttributesEntry](#ttn.lorawan.v3.EndDevice.AttributesEntry) | repeated | Attributes of the device. Stored in Entity Registry. |
-| version_ids | [EndDeviceVersionIdentifiers](#ttn.lorawan.v3.EndDeviceVersionIdentifiers) |  | Version Identifiers. Stored in Entity Registry and Application Server. |
+| version_ids | [EndDeviceVersionIdentifiers](#ttn.lorawan.v3.EndDeviceVersionIdentifiers) |  | Version Identifiers. Stored in Entity Registry, Network Server and Application Server. |
 | service_profile_id | [string](#string) |  | Default service profile. Stored in Entity Registry. |
 | network_server_address | [string](#string) |  | The address of the Network Server where this device is supposed to be registered. Stored in Entity Registry. The typical format of the address is &#34;host:port&#34;. If the port is omitted, the normal port inference (with DNS lookup, otherwise defaults) is used. The connection shall be established with transport layer security (TLS). Custom certificate authorities may be configured out-of-band. |
 | application_server_address | [string](#string) |  | The address of the Application Server where this device is supposed to be registered. Stored in Entity Registry. The typical format of the address is &#34;host:port&#34;. If the port is omitted, the normal port inference (with DNS lookup, otherwise defaults) is used. The connection shall be established with transport layer security (TLS). Custom certificate authorities may be configured out-of-band. |
