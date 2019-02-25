@@ -56,15 +56,16 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	}
 
 	gets := append(req.FieldMask.Paths[:0:0], req.FieldMask.Paths...)
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "queued_application_downlinks") {
-		gets = append(gets,
-			"mac_state.device_class",
-		)
-	}
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.device_class") {
 		gets = append(gets,
 			"mac_state.current_parameters",
 			"mac_state.desired_parameters",
+			"queued_application_downlinks",
+		)
+	}
+
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state") {
+		gets = append(gets,
 			"queued_application_downlinks",
 		)
 	}
