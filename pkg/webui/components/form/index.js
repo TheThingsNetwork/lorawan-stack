@@ -22,6 +22,7 @@ import Button from '../button'
 import Notification from '../notification'
 import PropTypes from '../../lib/prop-types'
 import recursiveMap from '../../lib/react-recursive-map'
+import CheckboxGroup from '../checkbox/group'
 
 @bind
 class InnerForm extends React.Component {
@@ -79,6 +80,7 @@ class InnerForm extends React.Component {
 
   render () {
     const {
+      setValues,
       setFieldValue,
       setFieldTouched,
       handleSubmit,
@@ -107,6 +109,8 @@ class InnerForm extends React.Component {
       function (Child) {
         if (Child.type === Field) {
           return React.cloneElement(Child, {
+            ...Child.props,
+            form: true,
             setFieldValue,
             setFieldTouched,
             errors: { ...serverErrors, ...clientErrors },
@@ -116,7 +120,6 @@ class InnerForm extends React.Component {
             submitEnabledWhenInvalid,
             validateOnBlur,
             validateOnChange,
-            ...Child.props,
           })
         } else if (Child.type === Button) {
           if (Child.props.type === 'submit') {
@@ -136,6 +139,11 @@ class InnerForm extends React.Component {
           return React.cloneElement(Child, {
             ...Child.props,
             errors,
+          })
+        } else if (Child.type === CheckboxGroup) {
+          return React.cloneElement(Child, {
+            ...Child.props,
+            setValues,
           })
         }
 
