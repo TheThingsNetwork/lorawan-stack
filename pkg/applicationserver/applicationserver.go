@@ -230,7 +230,9 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 		return err
 	}
 	<-link.connReady
-	var encryptedItems []*ttnpb.ApplicationDownlink
+	for _, item := range items {
+		registerReceiveDownlink(ctx, ids, item)
+	}
 	_, err = as.deviceRegistry.Set(ctx, ids,
 		[]string{
 			"session",
@@ -245,23 +247,20 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 				return nil, nil, errNoDeviceSession
 			}
 			for _, item := range items {
-				registerReceiveDownlink(ctx, ids, item)
 				item.SessionKeyID = dev.Session.SessionKeyID
 				item.FCnt = dev.Session.LastAFCntDown + 1
 				if err := as.encodeAndEncrypt(ctx, dev, item, link.DefaultFormatters); err != nil {
 					logger.WithError(err).Warn("Dropping downlink message; encoding and encryption failed")
-					registerDropDownlink(ctx, ids, item, err)
-					continue
+					return nil, nil, err
 				}
 				item.DecodedPayload = nil
 				item.CorrelationIDs = events.CorrelationIDsFromContext(ctx)
 				dev.Session.LastAFCntDown = item.FCnt
-				encryptedItems = append(encryptedItems, item)
 			}
 			client := ttnpb.NewAsNsClient(link.conn)
 			req := &ttnpb.DownlinkQueueRequest{
 				EndDeviceIdentifiers: ids,
-				Downlinks:            encryptedItems,
+				Downlinks:            items,
 			}
 			_, err = op(client, ctx, req, link.callOpts...)
 			if err != nil {
@@ -271,14 +270,14 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 		},
 	)
 	if err != nil {
-		for _, item := range encryptedItems {
+		for _, item := range items {
 			registerDropDownlink(ctx, ids, item, err)
 		}
 		return err
 	}
-	atomic.AddUint64(&link.downlinks, uint64(len(encryptedItems)))
+	atomic.AddUint64(&link.downlinks, uint64(len(items)))
 	atomic.StoreInt64(&link.lastDownlinkTime, time.Now().UnixNano())
-	for _, item := range encryptedItems {
+	for _, item := range items {
 		registerForwardDownlink(ctx, ids, item, link.connName)
 	}
 	return nil
