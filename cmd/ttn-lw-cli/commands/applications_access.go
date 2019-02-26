@@ -190,7 +190,7 @@ var (
 
 			rights := getRights(cmd.Flags())
 			if len(rights) == 0 {
-				logger.Info("No rights selected, will remove API key")
+				return errNoAPIKeyRights
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerAddress)
@@ -203,6 +203,38 @@ var (
 					ID:     id,
 					Name:   name,
 					Rights: rights,
+				},
+			})
+			if err != nil {
+				return err
+			}
+
+			return nil
+		},
+	}
+	applicationAPIKeysDelete = &cobra.Command{
+		Use:     "delete",
+		Aliases: []string{"remove"},
+		Short:   "Delete an application API key",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			id := getAPIKeyID(cmd.Flags(), args)
+			if id == "" {
+				return errNoAPIKeyID
+			}
+			appID := getApplicationID(cmd.Flags(), nil)
+			if appID == nil {
+				return errNoApplicationID
+			}
+
+			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			if err != nil {
+				return err
+			}
+			_, err = ttnpb.NewApplicationAccessClient(is).UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
+				ApplicationIdentifiers: *appID,
+				APIKey: ttnpb.APIKey{
+					ID:     id,
+					Rights: nil,
 				},
 			})
 			if err != nil {
@@ -237,6 +269,8 @@ func init() {
 	applicationAPIKeysUpdate.Flags().String("name", "", "")
 	applicationAPIKeysUpdate.Flags().AddFlagSet(applicationRightsFlags)
 	applicationAPIKeys.AddCommand(applicationAPIKeysUpdate)
+	applicationAPIKeysDelete.Flags().String("api-key-id", "", "")
+	applicationAPIKeys.AddCommand(applicationAPIKeysDelete)
 	applicationAPIKeys.PersistentFlags().AddFlagSet(applicationIDFlags())
 	applicationsCommand.AddCommand(applicationAPIKeys)
 }
