@@ -27,7 +27,7 @@ import (
 // Go namespace.
 type Go mg.Namespace
 
-var minGoVersion = "1.11.4"
+var minGoVersion = "1.12.0"
 
 // CheckVersion checks the installed Go version against the minimum version we support.
 func (Go) CheckVersion() error {
