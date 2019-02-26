@@ -114,12 +114,6 @@ func TestUnaryServerInterceptor(t *testing.T) {
 		fieldMask: types.FieldMask{Paths: []string{"bar"}},
 	}, info, handler)
 	a.So(err, should.NotBeNil)
-
-	res, err = intercept(ctx, &msgWithFieldMask{
-		fieldMask: types.FieldMask{},
-	}, info, handler)
-	a.So(err, should.NotBeNil)
-
 }
 
 type ss struct {
@@ -188,15 +182,8 @@ func TestStreamServerInterceptor(t *testing.T) {
 		err = stream.RecvMsg(subject)
 		a.So(err, should.NotBeNil)
 
-		subject = &msgWithFieldMask{
-			fieldMask: types.FieldMask{},
-		}
-		err = stream.RecvMsg(subject)
-		a.So(err, should.NotBeNil)
-
 		return nil
 	})
 
 	a.So(err, should.BeNil)
-
 }

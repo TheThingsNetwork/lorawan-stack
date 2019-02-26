@@ -29,7 +29,7 @@ import (
 
 var allowedFieldMaskPaths = make(map[string][]string)
 
-// RegisterAllowedFieldMaskPaths registeres the allowed field mask paths for an
+// RegisterAllowedFieldMaskPaths registers the allowed field mask paths for an
 // RPC. Note that all allowed paths and sub-paths must be registered.
 func RegisterAllowedFieldMaskPaths(rpcFullMethod string, allowedPaths ...string) {
 	allowedFieldMaskPaths[rpcFullMethod] = append(allowedFieldMaskPaths[rpcFullMethod], allowedPaths...)
@@ -61,7 +61,6 @@ type fieldMaskGetter interface {
 	GetFieldMask() types.FieldMask
 }
 
-var errMissingFieldMask = errors.DefineInvalidArgument("missing_field_mask", "missing field mask")
 var errForbiddenFieldMaskPaths = errors.DefineInvalidArgument("field_mask_paths", "forbidden path(s) in field mask", "forbidden_paths")
 
 func forbiddenPaths(requested []string, allowed ...string) (invalid []string) {
@@ -109,9 +108,6 @@ func UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 		if allowed := getAllowedFieldMaskPaths(info.FullMethod); allowed != nil {
 			if v, ok := req.(fieldMaskGetter); ok {
 				requested := v.GetFieldMask().Paths
-				if len(requested) == 0 {
-					return nil, errMissingFieldMask
-				}
 				if forbiddenPaths := forbiddenPaths(requested, allowed...); len(forbiddenPaths) > 0 {
 					return nil, errForbiddenFieldMaskPaths.WithAttributes("forbidden_paths", forbiddenPaths)
 				}
@@ -166,9 +162,6 @@ func (s *recvWrapper) RecvMsg(m interface{}) error {
 	if s.allowedFieldMaskPaths != nil {
 		if v, ok := m.(fieldMaskGetter); ok {
 			requested := v.GetFieldMask().Paths
-			if len(requested) == 0 {
-				return errMissingFieldMask
-			}
 			if forbiddenPaths := forbiddenPaths(requested, s.allowedFieldMaskPaths...); len(forbiddenPaths) > 0 {
 				return errForbiddenFieldMaskPaths.WithAttributes("forbidden_paths", forbiddenPaths)
 			}
