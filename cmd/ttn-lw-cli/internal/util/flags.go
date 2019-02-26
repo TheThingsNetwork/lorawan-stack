@@ -19,6 +19,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"reflect"
+	"sort"
 	"strings"
 	"time"
 
@@ -114,7 +115,18 @@ func isSettableField(name string) bool {
 
 func enumValues(t reflect.Type) map[string]int32 {
 	if t.PkgPath() == "go.thethings.network/lorawan-stack/pkg/ttnpb" {
-		return proto.EnumValueMap(fmt.Sprintf("ttn.lorawan.v3.%s", t.Name()))
+		enumValues := make(map[string]int32)
+		implementsStringer := t.Implements(reflect.TypeOf((*fmt.Stringer)(nil)).Elem())
+		for s, v := range proto.EnumValueMap(fmt.Sprintf("ttn.lorawan.v3.%s", t.Name())) {
+			enumValues[s] = v
+			if implementsStringer {
+				rv := reflect.New(t).Elem()
+				rv.SetInt(int64(v))
+				s := rv.MethodByName("String").Call(nil)[0].String()
+				enumValues[s] = v
+			}
+		}
+		return enumValues
 	}
 	return nil
 }
@@ -187,6 +199,7 @@ func addField(fs *pflag.FlagSet, name string, t reflect.Type, maskOnly bool) {
 			for value := range valueMap {
 				values = append(values, value)
 			}
+			sort.Strings(values)
 			fs.String(name, "", strings.Join(values, "|"))
 		}
 	} else if (t.Kind() == reflect.Slice || t.Kind() == reflect.Array) && t.Elem().Kind() == reflect.Uint8 {
