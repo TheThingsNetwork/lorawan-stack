@@ -23,6 +23,8 @@
 
 .PHONY: git.hooks
 
+INIT_RULES += git.hooks
+
 GIT_TAG ?= `git describe --abbrev=0 --tags 2>/dev/null`
 
 GIT_RELATIVE_DIR=git rev-parse --show-prefix
