@@ -50,7 +50,7 @@ const getApplicationsRightsLogic = createLogic({
     try {
       const result = await api.rights.applications(id)
 
-      dispatch(applications.getApplicationsRightsListSuccess(result.rights))
+      dispatch(applications.getApplicationsRightsListSuccess(result.rights.sort()))
     } catch (error) {
       dispatch(applications.getApplicationsRightsListFailure(error))
     }
