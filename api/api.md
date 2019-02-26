@@ -1643,7 +1643,6 @@ Template for creating end devices.
 | default_mac_settings | [MACSettings](#ttn.lorawan.v3.MACSettings) |  | Default MAC layer settings of the device. |
 | min_frequency | [uint64](#uint64) |  | Minimum frequency the device is capable of using (Hz). |
 | max_frequency | [uint64](#uint64) |  | Maximum frequency the device is capable of using (Hz). |
-| resets_f_cnt | [bool](#bool) |  | Whether the device resets the frame counters (not LoRaWAN compliant). |
 | supports_join | [bool](#bool) |  | The device supports join (it&#39;s OTAA). |
 | resets_join_nonces | [bool](#bool) |  | Whether the device resets the join and dev nonces (not LoRaWAN 1.1 compliant). |
 | default_formatters | [MessagePayloadFormatters](#ttn.lorawan.v3.MessagePayloadFormatters) |  | Default formatters defining the payload formats for this end device. |

@@ -681,7 +681,6 @@ var EndDeviceVersionFieldPathsNested = []string{
 	"max_frequency",
 	"min_frequency",
 	"photos",
-	"resets_f_cnt",
 	"resets_join_nonces",
 	"supports_class_b",
 	"supports_class_c",
@@ -698,7 +697,6 @@ var EndDeviceVersionFieldPathsTopLevel = []string{
 	"max_frequency",
 	"min_frequency",
 	"photos",
-	"resets_f_cnt",
 	"resets_join_nonces",
 	"supports_class_b",
 	"supports_class_c",
@@ -825,16 +823,6 @@ func (dst *EndDeviceVersion) SetFields(src *EndDeviceVersion, paths ...string) e
 			} else {
 				var zero uint64
 				dst.MaxFrequency = zero
-			}
-		case "resets_f_cnt":
-			if len(subs) > 0 {
-				return fmt.Errorf("'resets_f_cnt' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.ResetsFCnt = src.ResetsFCnt
-			} else {
-				var zero bool
-				dst.ResetsFCnt = zero
 			}
 		case "supports_join":
 			if len(subs) > 0 {

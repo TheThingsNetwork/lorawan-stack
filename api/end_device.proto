@@ -161,15 +161,13 @@ message EndDeviceVersion {
   uint64 min_frequency = 9;
   // Maximum frequency the device is capable of using (Hz).
   uint64 max_frequency = 10;
-  // Whether the device resets the frame counters (not LoRaWAN compliant).
-  bool resets_f_cnt = 11;
   // The device supports join (it's OTAA).
-  bool supports_join = 13;
+  bool supports_join = 11;
   // Whether the device resets the join and dev nonces (not LoRaWAN 1.1 compliant).
-  bool resets_join_nonces = 14;
+  bool resets_join_nonces = 12;
 
   // Default formatters defining the payload formats for this end device.
-  MessagePayloadFormatters default_formatters = 15 [(gogoproto.nullable) = false];
+  MessagePayloadFormatters default_formatters = 13 [(gogoproto.nullable) = false];
 }
 
 message MACSettings {
