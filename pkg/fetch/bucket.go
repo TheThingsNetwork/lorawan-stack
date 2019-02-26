@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"gocloud.dev/blob"
+	"gocloud.dev/gcerrors"
 )
 
 type bucketFetcher struct {
@@ -46,7 +47,7 @@ func (f *bucketFetcher) File(pathElements ...string) ([]byte, error) {
 		return content, nil
 	}
 
-	if blob.IsNotExist(err) {
+	if gcerrors.Code(err) == gcerrors.NotFound {
 		return nil, errFileNotFound.WithAttributes("filename", filepath.Join(pathElements...))
 	}
 	return nil, errCouldNotReadFile.WithCause(err).WithAttributes("filename", filepath.Join(pathElements...))
