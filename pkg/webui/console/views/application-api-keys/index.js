@@ -19,19 +19,19 @@ import sharedMessages from '../../../lib/shared-messages'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 
-import ApplicationAccessList from '../application-access-list'
-import ApplicationAccessEdit from '../application-access-edit'
-import ApplicationAccessAdd from '../application-access-add'
+import ApplicationApiKeysList from '../application-api-keys-list'
+import ApplicationApiKeyEdit from '../application-api-key-edit'
+import ApplicationApiKeyAdd from '../application-api-key-add'
 
-@withBreadcrumb('apps.single.access', function (props) {
+@withBreadcrumb('apps.single.api-keys', function (props) {
   const { match } = props
   const appId = match.params.appId
 
   return (
     <Breadcrumb
-      path={`/console/applications/${appId}/access`}
-      icon="access"
-      content={sharedMessages.access}
+      path={`/console/applications/${appId}/api-keys`}
+      icon="api_keys"
+      content={sharedMessages.apiKeys}
     />
   )
 })
@@ -41,9 +41,9 @@ export default class ApplicationAccess extends React.Component {
     const { match } = this.props
     return (
       <Switch>
-        <Route exact path={`${match.path}`} component={ApplicationAccessList} />
-        <Route path={`${match.path}/add`} component={ApplicationAccessAdd} />
-        <Route path={`${match.path}/:apiKeyId`} component={ApplicationAccessEdit} />
+        <Route exact path={`${match.path}`} component={ApplicationApiKeysList} />
+        <Route path={`${match.path}/add`} component={ApplicationApiKeyAdd} />
+        <Route path={`${match.path}/:apiKeyId`} component={ApplicationApiKeyEdit} />
       </Switch>
     )
   }

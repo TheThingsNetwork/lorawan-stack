@@ -37,13 +37,13 @@ import toast from '../../../components/toast'
 import { getApplicationApiKey } from '../../store/actions/application'
 import api from '../../api'
 
-import style from './application-access-edit.styl'
+import style from './application-api-key-edit.styl'
 
 const m = defineMessages({
   deleteKey: 'Delete Key',
   modalWarning:
     'Are you sure you want to delete the {keyName} API Key? Deleting an application API Key cannot be undone!',
-  accessEdit: 'Edit {keyName}',
+  keyEdit: 'Edit {keyName}',
   updateSuccess: 'Successfully updated API Key',
   deleteSuccess: 'Successfully deleted API Key',
 })
@@ -82,19 +82,19 @@ const validationSchema = Yup.object().shape({
     error: keysError || rightsError,
   }
 })
-@withBreadcrumb('apps.single.access.edit', function (props) {
+@withBreadcrumb('apps.single.api-keys.edit', function (props) {
   const { appId, keyId } = props
 
   return (
     <Breadcrumb
-      path={`/console/applications/${appId}/access/${keyId}/edit`}
+      path={`/console/applications/${appId}/api-keys/${keyId}/edit`}
       icon="general_settings"
       content={sharedMessages.edit}
     />
   )
 })
 @bind
-export default class ApplicationAccessEdit extends React.Component {
+export default class ApplicationApiKeyEdit extends React.Component {
 
   state = {
     error: '',
@@ -143,7 +143,7 @@ export default class ApplicationAccessEdit extends React.Component {
         message: m.deleteSuccess,
         type: toast.types.SUCCESS,
       })
-      dispatch(replace(`/console/applications/${appId}/access`))
+      dispatch(replace(`/console/applications/${appId}/api-keys`))
     } catch (error) {
       await this.setState(error)
     }
@@ -192,7 +192,7 @@ export default class ApplicationAccessEdit extends React.Component {
       <Container>
         <Row>
           <Col lg={8} md={12}>
-            <IntlHelmet title={m.accessEdit} values={{ keyName: apiKey.name || sharedMessages.apiKey }} />
+            <IntlHelmet title={m.keyEdit} values={{ keyName: apiKey.name || sharedMessages.apiKey }} />
             <Message component="h2" content={sharedMessages.edit} />
           </Col>
         </Row>

@@ -16,19 +16,20 @@ import { defineMessages } from 'react-intl'
 
 export default defineMessages({
   // Keep these sorted alphabetically
-  access: 'Access',
   add: 'Add',
   addApplication: 'Add Application',
+  addApiKey: 'Add API Key',
   all: 'All',
   antennas: 'Antennas',
   apiKey: 'API Key',
+  apiKeys: 'API Keys',
   appId: 'Application ID',
   application: 'Application',
   applications: 'Applications',
   approve: 'Approve',
   cancel: 'Cancel',
   collaborators: 'Collaborators',
-  createAccessKey: 'Create Access Key',
+  createApiKey: 'Create API Key',
   createdAt: 'Created at',
   data: 'Data',
   description: 'Description',

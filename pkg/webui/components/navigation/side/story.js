@@ -58,9 +58,9 @@ storiesOf('Navigation', module)
         path: '/integrations',
       },
       {
-        title: 'Access',
+        title: 'API Keys',
         icon: 'lock',
-        path: '/access',
+        path: '/api-keys',
       },
       {
         title: 'General Settings',
@@ -115,9 +115,9 @@ storiesOf('Navigation', module)
         ],
       },
       {
-        title: 'Access',
+        title: 'API Keys',
         icon: 'lock',
-        path: '/access',
+        path: '/api-keys',
       },
       {
         title: 'General Settings',
