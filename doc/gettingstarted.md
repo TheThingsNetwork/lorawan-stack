@@ -344,3 +344,7 @@ Now when the device sends an uplink, the application server will do a `POST` req
 ``` 
 
 Use the `--help` flag to see all available options.
+
+## Congratulations
+
+You have now set up The Things Network Stack V3! 🎉
