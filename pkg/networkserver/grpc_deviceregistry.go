@@ -55,21 +55,9 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		)
 	}
 
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state") {
-		gets = append(gets,
-			"queued_application_downlinks",
-		)
-	}
-
 	var addDownlinkTask bool
 	dev, err := ns.devices.SetByID(ctx, req.EndDevice.EndDeviceIdentifiers.ApplicationIdentifiers, req.EndDevice.EndDeviceIdentifiers.DeviceID, gets, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		if dev != nil {
-			if err := ttnpb.ProhibitFields(req.FieldMask.Paths,
-				"session",
-			); err != nil {
-				return nil, nil, errInvalidFieldMask.WithCause(err)
-			}
-
 			addDownlinkTask = ttnpb.HasAnyField(req.FieldMask.Paths,
 				"mac_state.device_class",
 				"queued_application_downlinks",
