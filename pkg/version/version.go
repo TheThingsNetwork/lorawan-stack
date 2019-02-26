@@ -14,3 +14,17 @@
 
 // Package version contains version and build variables set by the CI process.
 package version
+
+import (
+	"fmt"
+	"strings"
+)
+
+// String returns the version string.
+func String() string {
+	version := strings.TrimPrefix(TTN, "v")
+	if GitCommit != "" && BuildDate != "" {
+		version += fmt.Sprintf(" (%s, %s)", GitCommit, BuildDate)
+	}
+	return version
+}

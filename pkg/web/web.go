@@ -80,7 +80,7 @@ func New(ctx context.Context, config config.HTTP) (*Server, error) {
 		middleware.ID(""),
 		echomiddleware.BodyLimit("16M"),
 		echomiddleware.Secure(),
-		echomiddleware.Recover(),
+		middleware.Recover(),
 		cookie.Cookies(blockKey, hashKey),
 	)
 

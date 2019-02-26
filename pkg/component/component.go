@@ -34,6 +34,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/log/middleware/sentry"
 	"go.thethings.network/lorawan-stack/pkg/rpcserver"
+	"go.thethings.network/lorawan-stack/pkg/version"
 	"go.thethings.network/lorawan-stack/pkg/web"
 	"google.golang.org/grpc"
 )
@@ -128,6 +129,7 @@ func New(logger log.Stack, config *Config, opts ...Option) (*Component, error) {
 	if config.Sentry.DSN != "" {
 		c.sentry, _ = raven.New(config.Sentry.DSN)
 		c.sentry.SetIncludePaths([]string{"go.thethings.network/lorawan-stack"})
+		c.sentry.SetRelease(version.String())
 		c.logger.Use(sentry.New(c.sentry))
 	}
 

@@ -23,7 +23,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/grpc-ecosystem/go-grpc-middleware"
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"go.opencensus.io/plugin/ocgrpc"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/metrics"
@@ -50,18 +50,13 @@ func DefaultDialOptions(ctx context.Context) []grpc.DialOption {
 		warning.UnaryClientInterceptor,
 	}
 
-	ttnVersion := strings.TrimPrefix(version.TTN, "v")
-	if version.GitCommit != "" && version.BuildDate != "" {
-		ttnVersion += fmt.Sprintf("(%s, %s)", version.GitCommit, version.BuildDate)
-	}
-
 	return []grpc.DialOption{
 		grpc.WithStatsHandler(rpcmiddleware.StatsHandlers{new(ocgrpc.ClientHandler), metrics.StatsHandler}),
 		grpc.WithUserAgent(fmt.Sprintf(
 			"%s go/%s ttn/%s",
 			filepath.Base(os.Args[0]),
 			strings.TrimPrefix(runtime.Version(), "go"),
-			ttnVersion,
+			version.String(),
 		)),
 		grpc.WithStreamInterceptor(grpc_middleware.ChainStreamClient(streamInterceptors...)),
 		grpc.WithUnaryInterceptor(grpc_middleware.ChainUnaryClient(unaryInterceptors...)),
