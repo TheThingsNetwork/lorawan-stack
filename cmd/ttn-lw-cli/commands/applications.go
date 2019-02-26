@@ -38,10 +38,7 @@ func applicationIDFlags() *pflag.FlagSet {
 	return flagSet
 }
 
-var (
-	errNoApplicationID = errors.DefineInvalidArgument("no_application_id", "no application ID set")
-	errNoAPIKeyRights  = errors.DefineInvalidArgument("no_api_key_rights", "no API key rights set")
-)
+var errNoApplicationID = errors.DefineInvalidArgument("no_application_id", "no application ID set")
 
 func getApplicationID(flagSet *pflag.FlagSet, args []string) *ttnpb.ApplicationIdentifiers {
 	var applicationID string

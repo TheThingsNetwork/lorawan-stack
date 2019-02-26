@@ -87,7 +87,7 @@ var (
 			}
 			rights := getRights(cmd.Flags())
 			if len(rights) == 0 {
-				logger.Info("No rights selected, will remove collaborator")
+				return errNoCollaboratorRights
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerAddress)
@@ -99,6 +99,38 @@ var (
 				Collaborator: ttnpb.Collaborator{
 					OrganizationOrUserIdentifiers: *collaborator,
 					Rights:                        rights,
+				},
+			})
+			if err != nil {
+				return err
+			}
+
+			return nil
+		},
+	}
+	applicationCollaboratorsDelete = &cobra.Command{
+		Use:     "delete",
+		Aliases: []string{"remove"},
+		Short:   "Delete an application collaborator",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			appID := getApplicationID(cmd.Flags(), nil)
+			if appID == nil {
+				return errNoApplicationID
+			}
+			collaborator := getCollaborator(cmd.Flags())
+			if collaborator == nil {
+				return errNoCollaborator
+			}
+
+			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			if err != nil {
+				return err
+			}
+			_, err = ttnpb.NewApplicationAccessClient(is).SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
+				ApplicationIdentifiers: *appID,
+				Collaborator: ttnpb.Collaborator{
+					OrganizationOrUserIdentifiers: *collaborator,
+					Rights:                        nil,
 				},
 			})
 			if err != nil {
@@ -258,6 +290,8 @@ func init() {
 	applicationCollaboratorsSet.Flags().AddFlagSet(collaboratorFlags())
 	applicationCollaboratorsSet.Flags().AddFlagSet(applicationRightsFlags)
 	applicationCollaborators.AddCommand(applicationCollaboratorsSet)
+	applicationCollaboratorsDelete.Flags().AddFlagSet(collaboratorFlags())
+	applicationCollaborators.AddCommand(applicationCollaboratorsDelete)
 	applicationCollaborators.PersistentFlags().AddFlagSet(applicationIDFlags())
 	applicationsCommand.AddCommand(applicationCollaborators)
 
