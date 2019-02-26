@@ -1,11 +1,13 @@
 # The Things Network Stack for LoRaWAN
 
 ## Introduction
+
 This document is a guide for setting up The Things Network's Network Stack V3 in a private environment. If you already have some knowledge about how the backend works and if you are comfortable with a command line, this is the perfect place to start.
 
 In this guide we will get everything up and running on your local machine (on `localhost`) using Docker.
  
 ## Table of Contents
+
 1. [Dependencies](#dependencies)
 2. [Configuration](#configuration)
 3. [Running the stack](#running)
@@ -16,37 +18,32 @@ In this guide we will get everything up and running on your local machine (on `l
 8. [Linking the application](#linkappserver)
 9. [Using the MQTT broker](#mqtt)
 10. [Using WebHooks](#webhooks)
- 
-<a name="dependencies"/>
 
-## Dependencies 
+## <a name="dependencies">Dependencies</a>
 
-#### Certificates
+### CLI and Stack
+
+Get the latest packages or binaries for your operating system from the [releases](https://github.com/TheThingsNetwork/lorawan-stack/releases) page on GitHub.
+
+### Certificates
+
 By default, the Stack requires a `cert.pem` and `key.pem`, in order to to serve content over TLS.
 
-+ To generate testing certificates, you can use the following command. This requires a [Go environment setup](../DEVELOPMENT.md#development-environment).
++ To generate self-signed certificates, you can use the following command. This requires a [Go environment setup](../DEVELOPMENT.md#development-environment).
 
-    ```bash
-    go run $(go env GOROOT)/src/crypto/tls/generate_cert.go -ca -host localhost && chmod 0444 ./key.pem
-    ```
-    
-+ For production certificates we recommend [LetsEncrypt](https://letsencrypt.org/getting-started/).
-    
-<a name="configuration"/>
+```bash
+go run $(go env GOROOT)/src/crypto/tls/generate_cert.go -ca -host localhost && chmod 0444 ./key.pem
+```
 
-## Configuration 
+Keep in mind that self-signed certificates are not trusted by browsers and operating systems, and as such they will return a warning regarding this matter. In order to avoid such issues, we recommend [Let's Encrypt](https://letsencrypt.org/getting-started/).
 
-The Stack can be started without passing any [configuration](config.md). We however recommend paying attention to the following parameters:
+## <a name="configuration">Configuration</a>
 
-+ `TTN_LW_COOKIE_HASHKEY` is a 32 or 64 bytes long parameter, and `TTN_LW_COOKIE_BLOCKKEY` is a 32 bytes long 
-parameter. Both are used for cookie secrets. They should be passed in a hexadecimal string form. If no value is passed, a random value will be generated at startup.
-
-+ `TTN_LW_CLUSTER_KEYS` is a set of 16, 24 or 32 bytes long hexadecimal keys, used to identify components within a cluster. If no value is passed, a random value will be generated at startup. The first one passed is used for outgoing RPC calls, and all of them can be used to accept incoming RPC 
-calls.
+The Stack can be started without passing any [configuration](config.md).
 
 You can refer to our [networking documentation](networking.md) for the default endpoints of the Stack.
 
-#### Frequency plans
+### Frequency plans
 
 By default, frequency plans are fetched by the stack from the [`TheThingsNetwork/lorawan-frequency-plans` repository](https://github.com/TheThingsNetwork/lorawan-frequency-plans). To set a new source:
 
@@ -54,9 +51,7 @@ By default, frequency plans are fetched by the stack from the [`TheThingsNetwork
 
 + `TTN_LW_FREQUENCY_PLANS_DIRECTORY` allows you to serve frequency plans from a local directory.
 
-<a name="running"/>
-
-## Running the stack
+## <a name="running">Running the stack</a>
 
 You can run it using Docker, or container orchestration solutions. An example [Docker Compose configuration](../docker-compose.yml) is available in the repository:
 
@@ -70,93 +65,82 @@ $ docker-compose up
 
 This will create an admin user `admin`, and also create the OAuth client used by the CLI.
 
-<a name="login"/>
-
-## Login using the CLI
+## <a name="login">Login using the CLI</a>
 
 The CLI needs to be logged on in order to create gateways, devices or API keys. You can use the following commands in a separate console session to login:
+
 ```bash
-$ docker-compose exec stack ttn-lw-cli login
+$ ttn-lw-cli login
 ```
+
 A link will be provided to the OAuth login page where you can login using the credentials from the step ahead.
 
-<a name="registergtw"/>
-
-## Registering a gateway
+## <a name="registergtw">Registering a gateway</a>
 
 By default, the stack allows unregistered gateways to connect, but without providing a default band. As such, it is highly recommended that each gateway is registered:
 
 ```bash
-$ docker-compose exec stack ttn-lw-cli gateway create gtw1 --user-id admin --frequency_plan_id EU_863_870 --gateway-eui 00800000A00009EF
+$ ttn-lw-cli gateway create gtw1 --user-id admin --frequency_plan_id EU_863_870 --gateway-eui 00800000A00009EF --enforce-duty-cycle
 ```
 
-This creates a gateway `gtw1` with the frequency plan `EU_863_870` and EUI `00800000A00009EF`. You can now connect 
-your gateway to the stack.
+This creates a gateway `gtw1` with the frequency plan `EU_863_870` and EUI `00800000A00009EF` that respects duty-cycle limitations. For more options, you can use the `--help` flag. You can now connect your gateway to the stack.
 
-<a name="registerapp"/>
-
-## Registering an application
+## <a name="registerapp">Registering an application</a>
 
 In order to register a device, the controlling application of the said device must be registered first:
 
 ```bash
-$ docker-compose exec stack ttn-lw-cli app create app1 --user-id admin
+$ ttn-lw-cli app create app1 --user-id admin
 ```
 
-This create an application `app1` for the user `admin`.
+This creates an application `app1` for the user `admin`.
 
-<a name="registerdev"/>
-
-## Registering a device
+## <a name="registerdev">Registering a device</a>
 
 You can now register an OTAA activated device to be used with the stack as follows:
 
 ```bash
-$ docker-compose exec stack ttn-lw-cli end-devices create --device-id dev1 --dev-eui 0004A30B001C0530 --join-eui 800000000000000C --application-id app1 --frequency_plan_id EU_863_870 --root_keys.app_key.key 752BAEC23EAE7964AF27C325F4C23C9A --lorawan_phy_version 1.0.2-b --lorawan_version 1.0.2
+$ ttn-lw-cli end-devices create app1 dev1 --dev-eui 0004A30B001C0530 --join-eui 800000000000000C --frequency_plan_id EU_863_870 --root_keys.app_key.key 752BAEC23EAE7964AF27C325F4C23C9A --lorawan_phy_version 1.0.2-b --lorawan_version 1.0.2
 ```
 
 This will create an LoRa 1.0.2 end-device `dev1` with DevEUI `0004A30B001C0530`, AppEUI `800000000000000C` and AppKey
  `752BAEC23EAE7964AF27C325F4C23C9A`. After flashing the AppEUI and AppKey (which you can choose on your own), you should be able to join the private network.
 If you wish to enable class C support for this device, you can add the `--supports-class-c` flag in the above command.
 
-<a name="linkappserver"/>
-
-## Linking the application
+## <a name="linkappserver">Linking the application</a>
 
 In order to send uplinks and receive downlinks from your device, you must first link the application server to the network server of the private network. In order to achieve this, first create an API key:
 
 ```bash
-$ docker-compose exec stack ttn-lw-cli app api-keys create --application-id app1 --right-application-link
+$ ttn-lw-cli app api-keys create --application-id app1 --right-application-link
 ```
 
 The CLI will return an API key such as `NNSXS.VEEBURF3KR77ZRUF5JGCFIJQ4FLH5ELQXGR2SQQ.EKMEIDASX5EZTGOPDCZXGAXEHMD4FD2NAYTJERPD55VV3WAXADZQ`.
-This API key has only linking rights, and should be used only during the linking process. In the future this step might get automated.
+This API key has only linking rights, and should be used only during the linking process. 
 
 You can now link the application server to the network server:
 
 ```bash
-$ docker-compose exec stack ttn-lw-cli app link set app1 --api-key [...]
+$ ttn-lw-cli app link set app1 --api-key [...]
 ```
 
 Your application is now linked, and can use the built-in MQTT broker and Webhooks support.
 
-<a name="mqtt"/>
-
-## Using the MQTT broker
+## <a name="mqtt">Using the MQTT broker</a>
 
 In order to use the MQTT broker it is necessary to register a new API key that will be used during the authentication process:
 
 ```bash
-$ docker-compose exec stack ttn-lw-cli app api-keys create --application-id app1 --right-application-all
+$ ttn-lw-cli app api-keys create --application-id app1 --right-application-traffic-down-write --right-application-traffic-read
 ```
 
 Note that this new API key has full rights and can both receive uplinks and schedule downlinks. You can now login using an MQTT client using the username `app1` (the application name) and the newly generated API key as password.
 
-#### Subscribing to events
+### Subscribing to messages
 
-MQTT topics provided by the built-in broker follow the format `v3/{application id}/devices/{device id}/{event type}`. While you could indeed subscribe for separate topics, for the purpose of this tutorial we will use the wilcard topic `#`, which provides all of the available events of the application.
+MQTT topics provided by the built-in broker follow the format `v3/{application id}/devices/{device id}/{traffic type}`. While you could indeed subscribe for separate topics, for the purpose of this tutorial we will use the wilcard topic `#`, which provides all of the available messages of the application.
 
-After subscribing to `#` from your client, when a device of the application that is currently logged in joins the network, a `join` event will be broadcasted. For example, for a device called `dev-simulator`, the event will  be broadcasted on the topic `v3/app1/devices/dev-simulator/join` with the following contents:
+After subscribing to `#` from your client, when a device of the application that is currently logged in joins the network, a `join` message will be published. For example, for a device called `dev-simulator`, the message will be published on the topic `v3/app1/devices/dev-simulator/join` with the following contents:
 
 ```json
 {
@@ -176,9 +160,9 @@ After subscribing to `#` from your client, when a device of the application that
 }
 ```
 
-As you can see, using correlation IDs it is possible to follow each event as it passes through the stack components, which can be handy while debugging the stack.
+As you can see, with correlation IDs it will be possible to follow each message as it passes through the stack components, which can be handy while debugging.
 
-When the device sends an uplink, the event will be broadcasted to the topic `v3/app1/devices/dev-simulator/up` and will contain a payload formatted as follows:
+When the device sends an uplink, the message will be broadcasted to the topic `v3/app1/devices/dev-simulator/up` and will contain a payload formatted as follows:
 
 ```json
 {
@@ -224,9 +208,9 @@ When the device sends an uplink, the event will be broadcasted to the topic `v3/
 }
 ```
 
-#### Scheduling a downlink
+### Scheduling a downlink
 
-Downlinks can be scheduled by publishing the event to the topic `v3/{application id}/devices/{device id}/down/push`. For example, if we want to send an unconfirmed downlink to the device `dev-simulator` with a payload of `BE EF` on port 15, we can use the topic `v3/app1/devices/dev-simulator/down/push` with the following contents:
+Downlinks can be scheduled by publishing the message to the topic `v3/{application id}/devices/{device id}/down/push`. For example, if we want to send an unconfirmed downlink to the device `dev-simulator` with a payload of `BE EF` on port 15, we can use the topic `v3/app1/devices/dev-simulator/down/push` with the following contents:
 
 ```json
 {
@@ -251,7 +235,7 @@ If we want to send a confirmed downlink to our device, we will use the same topi
 }
 ```
 
-Once the downlink has been acknowledged, an event is published to the topic `v3/app1/devices/dev-simulator/down/ack`:
+Once the downlink has been acknowledged, a message is published to the topic `v3/app1/devices/dev-simulator/down/ack`:
 
 ```json
 {
@@ -276,14 +260,12 @@ Once the downlink has been acknowledged, an event is published to the topic `v3/
 }
 ```
 
-<a name="webhooks"/>
+## <a name="webhooks">Using WebHooks</a>
 
-## Using WebHooks
-
-The WebHooks feature allows the application server to send application related events to specific HTTP(S) endpoints. Creating a WebHook requires you to have an endpoint available as an event sink.
+The WebHooks feature allows the application server to send application related messages to specific HTTP(S) endpoints. Creating a WebHook requires you to have an endpoint available as a message sink.
 
 ```bash
-$ docker-compose exec stack ttn-lw-cli app webhook set --application-id app1 --webhook-id wh1 --base-url https://example.com/lorahooks --join-accept.path "join" --format "json"
+$ ttn-lw-cli app webhook set --application-id app1 --webhook-id wh1 --base-url https://example.com/lorahooks --join-accept.path "join" --format "json"
 ```
 
 This will create an WebHook `wh1` for the application `app1` with a base URL `https://example.com/lorahooks` and a join path `join`. When a device of the application `app1` joins the network, the application server will do a `POST` request on the endpoint `https://example.com/lorahooks/join` with the following body:
@@ -306,10 +288,10 @@ This will create an WebHook `wh1` for the application `app1` with a base URL `ht
 }
 ```
 
-You can later on subscribe for other events, such as uplinks, using the following command:
+You can later on subscribe for other messages, such as uplinks, using the following command:
 
 ```bash
-$ docker-compose exec stack ttn-lw-cli app webhook set --application-id app1 --webhook-id wh1 --uplink-message.path "up"
+$ ttn-lw-cli app webhook set --application-id app1 --webhook-id wh1 --uplink-message.path "up"
 ```
 
 Now when the device sends an uplink, the application server will do a `POST` request to `https://example.com/lorahooks/up` with the following body:
