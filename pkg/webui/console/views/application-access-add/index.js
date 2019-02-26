@@ -30,6 +30,7 @@ import Button from '../../../components/button'
 import Message from '../../../lib/components/message'
 import FieldGroup from '../../../components/field/group'
 import IntlHelmet from '../../../lib/components/intl-helmet'
+import ApiKeyModal from '../../containers/api-key-modal'
 
 import { getApplicationsRightsList } from '../../store/actions/applications'
 import api from '../../api'
@@ -76,6 +77,7 @@ export default class ApplicationAccessAdd extends React.Component {
 
   state = {
     error: '',
+    modal: null,
   }
 
   componentDidMount () {
@@ -84,9 +86,17 @@ export default class ApplicationAccessAdd extends React.Component {
     dispatch(getApplicationsRightsList(appId))
   }
 
+  async handleApprove () {
+    const { dispatch, appId } = this.props
+    const { createdId } = this.state
+
+    await this.setState({ modal: null })
+    dispatch(replace(`/console/applications/${appId}/access/${createdId}`))
+  }
+
   async handleSubmit (values, { resetForm }) {
     const { name, rights } = values
-    const { appId, dispatch } = this.props
+    const { appId } = this.props
 
     const key = {
       name,
@@ -96,9 +106,17 @@ export default class ApplicationAccessAdd extends React.Component {
     await this.setState({ error: '' })
 
     try {
-      await api.application.apiKeys.create(appId, key)
+      const created = await api.application.apiKeys.create(appId, key)
+      await this.setState({
+        createdId: created.id,
+        modal: {
+          secret: created.key,
+          rights: created.rights,
+          onComplete: this.handleApprove,
+          approval: false,
+        },
+      })
       resetForm(values)
-      dispatch(replace(`/console/applications/${appId}/access`))
     } catch (error) {
       resetForm(values)
       await this.setState(error)
@@ -107,6 +125,7 @@ export default class ApplicationAccessAdd extends React.Component {
 
   render () {
     const { rights, fetching, error } = this.props
+    const { modal } = this.state
 
     if (error) {
       return 'ERROR'
@@ -138,6 +157,7 @@ export default class ApplicationAccessAdd extends React.Component {
       }
     )
 
+    const modalProps = modal ? modal : {}
     const initialFormValues = {
       name: '',
       rights: rightsValues,
@@ -145,6 +165,11 @@ export default class ApplicationAccessAdd extends React.Component {
 
     return (
       <Container>
+        <ApiKeyModal
+          {...modalProps}
+          visible={!!modal}
+          approval={false}
+        />
         <Row>
           <Col lg={8} md={12}>
             <IntlHelmet title={m.accessAdd} />
