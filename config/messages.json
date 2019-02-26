@@ -4634,6 +4634,15 @@
       "file": "lorawan.go"
     }
   },
+  "error:pkg/web/middleware:http_recovered": {
+    "translations": {
+      "en": "Internal Server Error"
+    },
+    "description": {
+      "package": "pkg/web/middleware",
+      "file": "recover.go"
+    }
+  },
   "event:application.api-key.create": {
     "translations": {
       "en": "Create application API key"

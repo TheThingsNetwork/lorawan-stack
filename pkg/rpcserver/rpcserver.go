@@ -17,8 +17,11 @@ package rpcserver
 
 import (
 	"context"
+	"fmt"
 	"math"
 	"net/http"
+	"os"
+	"runtime/debug"
 	"strconv"
 	"time"
 
@@ -123,6 +126,8 @@ func New(ctx context.Context, opts ...Option) *Server {
 	}
 	recoveryOpts := []grpc_recovery.Option{
 		grpc_recovery.WithRecoveryHandler(func(p interface{}) (err error) {
+			fmt.Fprintln(os.Stderr, p)
+			os.Stderr.Write(debug.Stack())
 			return ErrRPCRecovered.WithAttributes("panic", p)
 		}),
 	}
