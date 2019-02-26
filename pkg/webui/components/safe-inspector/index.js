@@ -145,7 +145,13 @@ export class SafeInspector extends Component {
       copied,
     } = this.state
 
-    const { data, isBytes, hideable, small } = this.props
+    const {
+      className,
+      data,
+      isBytes,
+      hideable,
+      small,
+    } = this.props
 
     let formattedData = isBytes ? data.toUpperCase() : data
     let display = formattedData
@@ -162,7 +168,7 @@ export class SafeInspector extends Component {
       display = '•'.repeat(formattedData.length)
     }
 
-    const containerStyle = classnames(style.container, {
+    const containerStyle = classnames(className, style.container, {
       [style.containerSmall]: small,
       [style.containerHidden]: hidden,
     })
