@@ -40,7 +40,18 @@ instead.`)
       let prop = rest[key]
       if (typeof prop === 'object' && prop.id && prop.defaultMessage) {
         const messageValues = values || {}
-        prop = intl.formatMessage(prop, messageValues)
+        const translatedMessageValues = {}
+
+        for (const entry in messageValues) {
+          const content = messageValues[entry]
+          if (typeof content === 'object' && prop.id && prop.defaultMessage) {
+            translatedMessageValues[entry] = intl.formatMessage(content)
+          } else {
+            translatedMessageValues[entry] = messageValues[entry]
+          }
+        }
+
+        prop = intl.formatMessage(prop, translatedMessageValues)
       }
 
       translatedRest = {
