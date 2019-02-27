@@ -23,6 +23,8 @@ In this guide we will get everything up and running on a server using Docker.
 
 ### CLI and Stack
 
+For now, the web interface Console is not available; in this tutorial, we use the command-line interface (CLI) to manage the network.
+
 Get the latest packages or binaries for your operating system from the [releases](https://github.com/TheThingsNetwork/lorawan-stack/releases) page on GitHub.
 
 ### Certificates
