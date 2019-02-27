@@ -79,11 +79,7 @@ func (r *DeviceRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIde
 // GetByEUI gets device by joinEUI, devEUI.
 func (r *DeviceRegistry) GetByEUI(_ context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error) {
 	pb := &ttnpb.EndDevice{}
-	if err := ttnredis.FindProto(
-		r.Redis,
-		r.Redis.Key(euiKey, joinEUI.String(), devEUI.String()),
-		func(uid string) string { return r.Redis.Key(uidKey, uid) },
-	).ScanProto(pb); err != nil {
+	if err := ttnredis.FindProto(r.Redis, r.Redis.Key(euiKey, joinEUI.String(), devEUI.String()), func(uid string) string { return r.Redis.Key(uidKey, uid) }).ScanProto(pb); err != nil {
 		return nil, err
 	}
 	return applyDeviceFieldMask(nil, pb, paths...)
@@ -91,11 +87,7 @@ func (r *DeviceRegistry) GetByEUI(_ context.Context, joinEUI, devEUI types.EUI64
 
 // RangeByAddr ranges over devices by addr.
 func (r *DeviceRegistry) RangeByAddr(addr types.DevAddr, paths []string, f func(*ttnpb.EndDevice) bool) error {
-	return ttnredis.FindProtos(
-		r.Redis,
-		r.Redis.Key(addrKey, addr.String()),
-		func(uid string) string { return r.Redis.Key(uidKey, uid) },
-	).Range(func() (proto.Message, func() (bool, error)) {
+	return ttnredis.FindProtos(r.Redis, r.Redis.Key(addrKey, addr.String()), func(uid string) string { return r.Redis.Key(uidKey, uid) }).Range(func() (proto.Message, func() (bool, error)) {
 		pb := &ttnpb.EndDevice{}
 		return pb, func() (bool, error) {
 			pb, err := applyDeviceFieldMask(nil, pb, paths...)
@@ -107,7 +99,7 @@ func (r *DeviceRegistry) RangeByAddr(addr types.DevAddr, paths []string, f func(
 	})
 }
 
-func getDevAddrsAndIDs(pb *ttnpb.EndDevice) (addrs struct{ current, pending *types.DevAddr }, ids ttnpb.EndDeviceIdentifiers) {
+func getDevAddrs(pb *ttnpb.EndDevice) (addrs struct{ current, pending *types.DevAddr }) {
 	if pb == nil {
 		return
 	}
@@ -122,7 +114,7 @@ func getDevAddrsAndIDs(pb *ttnpb.EndDevice) (addrs struct{ current, pending *typ
 		copy(addr[:], pb.PendingSession.DevAddr[:])
 		addrs.pending = &addr
 	}
-	return addrs, *pb.EndDeviceIdentifiers.Copy(&ttnpb.EndDeviceIdentifiers{})
+	return addrs
 }
 
 func equalAddr(x, y *types.DevAddr) bool {
@@ -145,29 +137,31 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 		ApplicationIdentifiers: appID,
 		DeviceID:               devID,
 	}
-	if err := ids.Validate(); err != nil {
+	if err := ids.ValidateContext(ctx); err != nil {
 		return nil, err
 	}
 	uid := unique.ID(ctx, ids)
-	k := r.Redis.Key(uidKey, uid)
+	uk := r.Redis.Key(uidKey, uid)
 
 	var pb *ttnpb.EndDevice
 	err := r.Redis.Watch(func(tx *redis.Tx) error {
-		var create bool
-		cmd := ttnredis.GetProto(tx, k)
+		cmd := ttnredis.GetProto(tx, uk)
 		stored := &ttnpb.EndDevice{}
 		if err := cmd.ScanProto(stored); errors.IsNotFound(err) {
-			create = true
 			stored = nil
 		} else if err != nil {
 			return err
 		}
 
-		oldAddrs, oldIDs := getDevAddrsAndIDs(stored)
+		storedAddrs := getDevAddrs(stored)
 
 		var err error
 		if stored != nil {
-			pb, err = applyDeviceFieldMask(nil, stored, gets...)
+			pb = &ttnpb.EndDevice{}
+			if err := cmd.ScanProto(pb); err != nil {
+				return err
+			}
+			pb, err = applyDeviceFieldMask(nil, pb, gets...)
 			if err != nil {
 				return err
 			}
@@ -185,88 +179,97 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 		var f func(redis.Pipeliner) error
 		if pb == nil {
 			f = func(p redis.Pipeliner) error {
-				p.Del(k)
-				if oldIDs.JoinEUI != nil && oldIDs.DevEUI != nil {
-					p.Del(r.Redis.Key(euiKey, oldIDs.JoinEUI.String(), oldIDs.DevEUI.String()))
+				p.Del(uk)
+				if stored.JoinEUI != nil && stored.DevEUI != nil {
+					p.Del(r.Redis.Key(euiKey, stored.JoinEUI.String(), stored.DevEUI.String()))
 				}
-				if oldAddrs.pending != nil {
-					p.SRem(r.Redis.Key(addrKey, oldAddrs.pending.String()), uid)
+				if storedAddrs.pending != nil {
+					p.SRem(r.Redis.Key(addrKey, storedAddrs.pending.String()), uid)
 				}
-				if oldAddrs.current != nil {
-					p.SRem(r.Redis.Key(addrKey, oldAddrs.current.String()), uid)
+				if storedAddrs.current != nil {
+					p.SRem(r.Redis.Key(addrKey, storedAddrs.current.String()), uid)
 				}
 				return nil
 			}
 		} else {
-			pb.ApplicationIdentifiers = appID
-			pb.DeviceID = devID
-			pb.UpdatedAt = time.Now().UTC()
-			sets = append(sets, "updated_at")
-			if create {
-				pb.CreatedAt = pb.UpdatedAt
-				sets = append(sets, "created_at")
-			}
-			stored = &ttnpb.EndDevice{}
-			if err := cmd.ScanProto(stored); err != nil && !errors.IsNotFound(err) {
-				return err
-			}
-			stored, err = applyDeviceFieldMask(stored, pb, sets...)
-			if err != nil {
-				return err
-			}
-			pb, err = applyDeviceFieldMask(nil, stored, gets...)
-			if err != nil {
-				return err
-			}
-
-			newAddrs, newIDs := getDevAddrsAndIDs(stored)
-
-			if !create && (!equalEUI(oldIDs.JoinEUI, newIDs.JoinEUI) || !equalEUI(oldIDs.DevEUI, newIDs.DevEUI) ||
-				oldIDs.ApplicationIdentifiers != newIDs.ApplicationIdentifiers || oldIDs.DeviceID != newIDs.DeviceID) {
+			if pb.ApplicationIdentifiers != appID || pb.DeviceID != devID {
 				return errInvalidIdentifiers
 			}
 
+			pb.UpdatedAt = time.Now().UTC()
+			sets = append(sets, "updated_at")
+
+			updated := &ttnpb.EndDevice{}
+			if stored == nil {
+				pb.CreatedAt = pb.UpdatedAt
+				sets = append(sets, "created_at")
+
+				updated, err = applyDeviceFieldMask(updated, pb, sets...)
+				if err != nil {
+					return err
+				}
+			} else {
+				if err := cmd.ScanProto(updated); err != nil {
+					return err
+				}
+				updated, err = applyDeviceFieldMask(updated, pb, sets...)
+				if err != nil {
+					return err
+				}
+				if !equalEUI(stored.JoinEUI, updated.JoinEUI) || !equalEUI(stored.DevEUI, updated.DevEUI) ||
+					stored.ApplicationIdentifiers != updated.ApplicationIdentifiers || stored.DeviceID != updated.DeviceID {
+					return errInvalidIdentifiers
+				}
+			}
+			pb, err = applyDeviceFieldMask(nil, updated, gets...)
+			if err != nil {
+				return err
+			}
+
+			updatedAddrs := getDevAddrs(updated)
+
 			f = func(p redis.Pipeliner) error {
-				if create && newIDs.JoinEUI != nil && newIDs.DevEUI != nil {
-					ek := r.Redis.Key(euiKey, newIDs.JoinEUI.String(), newIDs.DevEUI.String())
+				if stored == nil && updated.JoinEUI != nil && updated.DevEUI != nil {
+					ek := r.Redis.Key(euiKey, pb.JoinEUI.String(), pb.DevEUI.String())
 					if err := tx.Watch(ek).Err(); err != nil {
 						return err
 					}
-					s, err := tx.Get(ek).Result()
-					if err != nil && err != redis.Nil {
+					i, err := tx.Exists(ek).Result()
+					if err != nil {
 						return ttnredis.ConvertError(err)
 					}
-					if err == nil && s != "" {
+					if i != 0 {
 						return errDuplicateIdentifiers
 					}
-					if s != uid {
-						p.Set(ek, uid, 0)
-					}
+					p.SetNX(ek, uid, 0)
 				}
 
-				if _, err := ttnredis.SetProto(p, k, stored, 0); err != nil {
+				_, err := ttnredis.SetProto(p, uk, updated, 0)
+				if err != nil {
 					return err
 				}
 
-				if oldAddrs.pending != nil && !equalAddr(oldAddrs.pending, newAddrs.pending) && !equalAddr(oldAddrs.pending, newAddrs.current) {
-					p.SRem(r.Redis.Key(addrKey, oldAddrs.pending.String()), uid)
+				if storedAddrs.pending != nil && !equalAddr(storedAddrs.pending, updatedAddrs.pending) && !equalAddr(storedAddrs.pending, updatedAddrs.current) {
+					p.SRem(r.Redis.Key(addrKey, storedAddrs.pending.String()), uid)
 				}
-				if oldAddrs.current != nil && !equalAddr(oldAddrs.current, newAddrs.pending) && !equalAddr(oldAddrs.current, newAddrs.current) {
-					p.SRem(r.Redis.Key(addrKey, oldAddrs.current.String()), uid)
+				if storedAddrs.current != nil && !equalAddr(storedAddrs.current, updatedAddrs.pending) && !equalAddr(storedAddrs.current, updatedAddrs.current) {
+					p.SRem(r.Redis.Key(addrKey, storedAddrs.current.String()), uid)
 				}
-				if newAddrs.pending != nil && !equalAddr(newAddrs.pending, oldAddrs.pending) && !equalAddr(newAddrs.pending, oldAddrs.current) {
-					p.SAdd(r.Redis.Key(addrKey, newAddrs.pending.String()), uid)
+				if updatedAddrs.pending != nil && !equalAddr(updatedAddrs.pending, storedAddrs.pending) && !equalAddr(updatedAddrs.pending, storedAddrs.current) {
+					p.SAdd(r.Redis.Key(addrKey, updatedAddrs.pending.String()), uid)
 				}
-				if newAddrs.current != nil && !equalAddr(newAddrs.current, oldAddrs.pending) && !equalAddr(newAddrs.current, oldAddrs.current) {
-					p.SAdd(r.Redis.Key(addrKey, newAddrs.current.String()), uid)
+				if updatedAddrs.current != nil && !equalAddr(updatedAddrs.current, storedAddrs.pending) && !equalAddr(updatedAddrs.current, storedAddrs.current) {
+					p.SAdd(r.Redis.Key(addrKey, updatedAddrs.current.String()), uid)
 				}
 				return nil
 			}
 		}
-
 		_, err = tx.Pipelined(f)
-		return err
-	}, k)
+		if err != nil {
+			return err
+		}
+		return nil
+	}, uk)
 	if err != nil {
 		return nil, err
 	}
