@@ -87,7 +87,7 @@ var (
 			}
 			rights := getRights(cmd.Flags())
 			if len(rights) == 0 {
-				logger.Info("No rights selected, will remove collaborator")
+				return errNoCollaboratorRights
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerAddress)
@@ -99,6 +99,38 @@ var (
 				Collaborator: ttnpb.Collaborator{
 					OrganizationOrUserIdentifiers: *collaborator,
 					Rights:                        rights,
+				},
+			})
+			if err != nil {
+				return err
+			}
+
+			return nil
+		},
+	}
+	gatewayCollaboratorsDelete = &cobra.Command{
+		Use:     "delete",
+		Aliases: []string{"remove"},
+		Short:   "Delete a gateway collaborator",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			gtwID, err := getGatewayID(cmd.Flags(), args, true)
+			if err != nil {
+				return err
+			}
+			collaborator := getCollaborator(cmd.Flags())
+			if collaborator == nil {
+				return errNoCollaborator
+			}
+
+			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			if err != nil {
+				return err
+			}
+			_, err = ttnpb.NewGatewayAccessClient(is).SetCollaborator(ctx, &ttnpb.SetGatewayCollaboratorRequest{
+				GatewayIdentifiers: *gtwID,
+				Collaborator: ttnpb.Collaborator{
+					OrganizationOrUserIdentifiers: *collaborator,
+					Rights:                        nil,
 				},
 			})
 			if err != nil {
@@ -226,6 +258,8 @@ func init() {
 	gatewayCollaboratorsSet.Flags().AddFlagSet(collaboratorFlags())
 	gatewayCollaboratorsSet.Flags().AddFlagSet(gatewayRightsFlags)
 	gatewayCollaborators.AddCommand(gatewayCollaboratorsSet)
+	gatewayCollaboratorsDelete.Flags().AddFlagSet(collaboratorFlags())
+	gatewayCollaborators.AddCommand(gatewayCollaboratorsDelete)
 	gatewayCollaborators.PersistentFlags().AddFlagSet(gatewayIDFlags())
 	gatewaysCommand.AddCommand(gatewayCollaborators)
 
