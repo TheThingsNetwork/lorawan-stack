@@ -22,7 +22,18 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	ttnredis "go.thethings.network/lorawan-stack/pkg/redis"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/unique"
+)
+
+const (
+	euiKey = "eui"
+	uidKey = "uid"
+)
+
+var (
+	errInvalidIdentifiers   = errors.DefineInvalidArgument("invalid_identifiers", "invalid identifiers")
+	errDuplicateIdentifiers = errors.DefineAlreadyExists("duplicate_identifiers", "duplicate identifiers")
 )
 
 func applyDeviceFieldMask(dst, src *ttnpb.EndDevice, paths ...string) (*ttnpb.EndDevice, error) {
@@ -45,25 +56,37 @@ type DeviceRegistry struct {
 
 // Get returns the end device by its identifiers.
 func (r *DeviceRegistry) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
-	k := r.Redis.Key(unique.ID(ctx, ids))
+	if err := ids.ValidateContext(ctx); err != nil {
+		return nil, err
+	}
+
 	pb := &ttnpb.EndDevice{}
-	if err := ttnredis.GetProto(r.Redis, k).ScanProto(pb); err != nil {
+	if err := ttnredis.GetProto(r.Redis, r.Redis.Key(uidKey, unique.ID(ctx, ids))).ScanProto(pb); err != nil {
 		return nil, err
 	}
 	return applyDeviceFieldMask(nil, pb, paths...)
 }
 
+func equalEUI(x, y *types.EUI64) bool {
+	if x == nil || y == nil {
+		return x == y
+	}
+	return x.Equal(*y)
+}
+
 // Set creates, updates or deletes the end device by its identifiers.
 func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
-	k := r.Redis.Key(unique.ID(ctx, ids))
+	if err := ids.ValidateContext(ctx); err != nil {
+		return nil, err
+	}
+	uid := unique.ID(ctx, ids)
+	uk := r.Redis.Key(uidKey, uid)
 
 	var pb *ttnpb.EndDevice
 	err := r.Redis.Watch(func(tx *redis.Tx) error {
-		var create bool
-		cmd := ttnredis.GetProto(tx, k)
+		cmd := ttnredis.GetProto(tx, uk)
 		stored := &ttnpb.EndDevice{}
 		if err := cmd.ScanProto(stored); errors.IsNotFound(err) {
-			create = true
 			stored = nil
 		} else if err != nil {
 			return err
@@ -71,7 +94,11 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 
 		var err error
 		if stored != nil {
-			pb, err = applyDeviceFieldMask(nil, stored, gets...)
+			pb = &ttnpb.EndDevice{}
+			if err := cmd.ScanProto(pb); err != nil {
+				return err
+			}
+			pb, err = applyDeviceFieldMask(nil, pb, gets...)
 			if err != nil {
 				return err
 			}
@@ -89,46 +116,75 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 		var f func(redis.Pipeliner) error
 		if pb == nil {
 			f = func(p redis.Pipeliner) error {
-				p.Del(k)
+				p.Del(uk)
+				if stored.JoinEUI != nil && stored.DevEUI != nil {
+					p.Del(r.Redis.Key(euiKey, stored.JoinEUI.String(), stored.DevEUI.String()))
+				}
 				return nil
 			}
 		} else {
-			pb.EndDeviceIdentifiers = ids
+			if pb.ApplicationIdentifiers != ids.ApplicationIdentifiers || pb.DeviceID != ids.DeviceID {
+				return errInvalidIdentifiers
+			}
+
 			pb.UpdatedAt = time.Now().UTC()
 			sets = append(sets, "updated_at")
-			if create {
+
+			updated := &ttnpb.EndDevice{}
+			if stored == nil {
 				pb.CreatedAt = pb.UpdatedAt
 				sets = append(sets, "created_at")
+
+				updated, err = applyDeviceFieldMask(updated, pb, sets...)
+				if err != nil {
+					return err
+				}
+			} else {
+				if err := cmd.ScanProto(updated); err != nil {
+					return err
+				}
+				updated, err = applyDeviceFieldMask(updated, pb, sets...)
+				if err != nil {
+					return err
+				}
+				if !equalEUI(stored.JoinEUI, updated.JoinEUI) || !equalEUI(stored.DevEUI, updated.DevEUI) ||
+					stored.ApplicationIdentifiers != updated.ApplicationIdentifiers || stored.DeviceID != updated.DeviceID {
+					return errInvalidIdentifiers
+				}
 			}
-			stored = &ttnpb.EndDevice{}
-			if err := cmd.ScanProto(stored); err != nil && !errors.IsNotFound(err) {
-				return err
-			}
-			stored, err = applyDeviceFieldMask(stored, pb, sets...)
+			pb, err = applyDeviceFieldMask(nil, updated, gets...)
 			if err != nil {
 				return err
 			}
-			pb, err = applyDeviceFieldMask(nil, stored, gets...)
-			if err != nil {
-				return err
-			}
+
 			f = func(p redis.Pipeliner) error {
-				_, err := ttnredis.SetProto(p, k, stored, 0)
-				return err
+				if stored == nil && updated.JoinEUI != nil && updated.DevEUI != nil {
+					ek := r.Redis.Key(euiKey, pb.JoinEUI.String(), pb.DevEUI.String())
+					if err := tx.Watch(ek).Err(); err != nil {
+						return err
+					}
+					i, err := tx.Exists(ek).Result()
+					if err != nil {
+						return ttnredis.ConvertError(err)
+					}
+					if i != 0 {
+						return errDuplicateIdentifiers
+					}
+					p.SetNX(ek, uid, 0)
+				}
+
+				if _, err := ttnredis.SetProto(p, uk, updated, 0); err != nil {
+					return err
+				}
+				return nil
 			}
 		}
-
-		cmds, err := tx.Pipelined(f)
+		_, err = tx.Pipelined(f)
 		if err != nil {
 			return err
 		}
-		for _, cmd := range cmds {
-			if err := cmd.Err(); err != nil {
-				return err
-			}
-		}
 		return nil
-	}, k)
+	}, uk)
 	if err != nil {
 		return nil, err
 	}
@@ -154,9 +210,8 @@ const (
 
 // Get returns the link by the application identifiers.
 func (r *LinkRegistry) Get(ctx context.Context, ids ttnpb.ApplicationIdentifiers, paths []string) (*ttnpb.ApplicationLink, error) {
-	k := r.Redis.Key(linkKey, unique.ID(ctx, ids))
 	pb := &ttnpb.ApplicationLink{}
-	if err := ttnredis.GetProto(r.Redis, k).ScanProto(pb); err != nil {
+	if err := ttnredis.GetProto(r.Redis, r.Redis.Key(linkKey, unique.ID(ctx, ids))).ScanProto(pb); err != nil {
 		return nil, err
 	}
 	return applyLinkFieldMask(nil, pb, paths...)
@@ -197,10 +252,10 @@ func (r *LinkRegistry) Range(ctx context.Context, paths []string, f func(context
 // Set creates, updates or deletes the link by the application identifiers.
 func (r *LinkRegistry) Set(ctx context.Context, ids ttnpb.ApplicationIdentifiers, gets []string, f func(*ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error)) (*ttnpb.ApplicationLink, error) {
 	uid := unique.ID(ctx, ids)
-	k := r.Redis.Key(linkKey, uid)
+	uk := r.Redis.Key(linkKey, uid)
 	var pb *ttnpb.ApplicationLink
 	err := r.Redis.Watch(func(tx *redis.Tx) error {
-		cmd := ttnredis.GetProto(tx, k)
+		cmd := ttnredis.GetProto(tx, uk)
 		stored := &ttnpb.ApplicationLink{}
 		if err := cmd.ScanProto(stored); errors.IsNotFound(err) {
 			stored = nil
@@ -210,7 +265,11 @@ func (r *LinkRegistry) Set(ctx context.Context, ids ttnpb.ApplicationIdentifiers
 
 		var err error
 		if pb != nil {
-			pb, err = applyLinkFieldMask(nil, stored, gets...)
+			pb = &ttnpb.ApplicationLink{}
+			if err := cmd.ScanProto(pb); err != nil {
+				return err
+			}
+			pb, err = applyLinkFieldMask(nil, pb, gets...)
 			if err != nil {
 				return err
 			}
@@ -221,29 +280,36 @@ func (r *LinkRegistry) Set(ctx context.Context, ids ttnpb.ApplicationIdentifiers
 		if err != nil {
 			return err
 		}
+		if stored == nil && pb == nil {
+			return nil
+		}
 
 		var f func(redis.Pipeliner) error
 		if pb == nil {
 			f = func(p redis.Pipeliner) error {
-				p.Del(k)
+				p.Del(uk)
 				p.SRem(r.Redis.Key(allKey), uid)
 				return nil
 			}
 		} else {
-			stored = &ttnpb.ApplicationLink{}
-			if err := cmd.ScanProto(stored); err != nil && !errors.IsNotFound(err) {
-				return err
+			updated := &ttnpb.ApplicationLink{}
+			if stored != nil {
+				if err := cmd.ScanProto(updated); err != nil {
+					return err
+				}
 			}
-			stored, err = applyLinkFieldMask(stored, pb, sets...)
+			updated, err = applyLinkFieldMask(updated, pb, sets...)
 			if err != nil {
 				return err
 			}
-			pb, err = applyLinkFieldMask(nil, stored, gets...)
+
+			pb, err = applyLinkFieldMask(nil, updated, gets...)
 			if err != nil {
 				return err
 			}
+
 			f = func(p redis.Pipeliner) error {
-				_, err := ttnredis.SetProto(p, k, stored, 0)
+				_, err := ttnredis.SetProto(p, uk, updated, 0)
 				if err != nil {
 					return err
 				}
@@ -252,8 +318,11 @@ func (r *LinkRegistry) Set(ctx context.Context, ids ttnpb.ApplicationIdentifiers
 			}
 		}
 		_, err = tx.Pipelined(f)
-		return err
-	}, k)
+		if err != nil {
+			return err
+		}
+		return nil
+	}, uk)
 	if err != nil {
 		return nil, err
 	}
