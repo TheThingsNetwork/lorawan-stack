@@ -30,6 +30,7 @@ import (
 const (
 	addrKey = "addr"
 	euiKey  = "eui"
+	uidKey  = "uid"
 )
 
 var (
@@ -66,7 +67,10 @@ func (r *DeviceRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIde
 	}
 
 	pb := &ttnpb.EndDevice{}
-	if err := ttnredis.GetProto(r.Redis, r.Redis.Key(unique.ID(ctx, ids))).ScanProto(pb); err != nil {
+	if err := ttnredis.GetProto(
+		r.Redis,
+		r.Redis.Key(uidKey, unique.ID(ctx, ids)),
+	).ScanProto(pb); err != nil {
 		return nil, err
 	}
 	return applyDeviceFieldMask(nil, pb, paths...)
@@ -75,7 +79,11 @@ func (r *DeviceRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIde
 // GetByEUI gets device by joinEUI, devEUI.
 func (r *DeviceRegistry) GetByEUI(_ context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error) {
 	pb := &ttnpb.EndDevice{}
-	if err := ttnredis.FindProto(r.Redis, r.Redis.Key(euiKey, joinEUI.String(), devEUI.String()), r.Redis.Key).ScanProto(pb); err != nil {
+	if err := ttnredis.FindProto(
+		r.Redis,
+		r.Redis.Key(euiKey, joinEUI.String(), devEUI.String()),
+		func(uid string) string { return r.Redis.Key(uidKey, uid) },
+	).ScanProto(pb); err != nil {
 		return nil, err
 	}
 	return applyDeviceFieldMask(nil, pb, paths...)
@@ -83,7 +91,11 @@ func (r *DeviceRegistry) GetByEUI(_ context.Context, joinEUI, devEUI types.EUI64
 
 // RangeByAddr ranges over devices by addr.
 func (r *DeviceRegistry) RangeByAddr(addr types.DevAddr, paths []string, f func(*ttnpb.EndDevice) bool) error {
-	return ttnredis.FindProtos(r.Redis, r.Redis.Key(addrKey, addr.String()), r.Redis.Key).Range(func() (proto.Message, func() (bool, error)) {
+	return ttnredis.FindProtos(
+		r.Redis,
+		r.Redis.Key(addrKey, addr.String()),
+		func(uid string) string { return r.Redis.Key(uidKey, uid) },
+	).Range(func() (proto.Message, func() (bool, error)) {
 		pb := &ttnpb.EndDevice{}
 		return pb, func() (bool, error) {
 			pb, err := applyDeviceFieldMask(nil, pb, paths...)
@@ -137,7 +149,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 		return nil, err
 	}
 	uid := unique.ID(ctx, ids)
-	k := r.Redis.Key(uid)
+	k := r.Redis.Key(uidKey, uid)
 
 	var pb *ttnpb.EndDevice
 	err := r.Redis.Watch(func(tx *redis.Tx) error {
