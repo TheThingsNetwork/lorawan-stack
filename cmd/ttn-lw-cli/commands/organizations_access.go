@@ -87,7 +87,7 @@ var (
 			}
 			rights := getRights(cmd.Flags())
 			if len(rights) == 0 {
-				logger.Info("No rights selected, will remove collaborator")
+				return errNoCollaboratorRights
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerAddress)
@@ -99,6 +99,38 @@ var (
 				Collaborator: ttnpb.Collaborator{
 					OrganizationOrUserIdentifiers: *collaborator,
 					Rights:                        rights,
+				},
+			})
+			if err != nil {
+				return err
+			}
+
+			return nil
+		},
+	}
+	organizationCollaboratorsDelete = &cobra.Command{
+		Use:     "delete",
+		Aliases: []string{"remove"},
+		Short:   "Delete an organization collaborator",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			orgID := getOrganizationID(cmd.Flags(), nil)
+			if orgID == nil {
+				return errNoOrganizationID
+			}
+			collaborator := getCollaborator(cmd.Flags())
+			if collaborator == nil {
+				return errNoCollaborator
+			}
+
+			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			if err != nil {
+				return err
+			}
+			_, err = ttnpb.NewOrganizationAccessClient(is).SetCollaborator(ctx, &ttnpb.SetOrganizationCollaboratorRequest{
+				OrganizationIdentifiers: *orgID,
+				Collaborator: ttnpb.Collaborator{
+					OrganizationOrUserIdentifiers: *collaborator,
+					Rights:                        nil,
 				},
 			})
 			if err != nil {
@@ -226,6 +258,8 @@ func init() {
 	organizationCollaboratorsSet.Flags().AddFlagSet(collaboratorFlags())
 	organizationCollaboratorsSet.Flags().AddFlagSet(organizationRightsFlags)
 	organizationCollaborators.AddCommand(organizationCollaboratorsSet)
+	organizationCollaboratorsDelete.Flags().AddFlagSet(collaboratorFlags())
+	organizationCollaborators.AddCommand(organizationCollaboratorsDelete)
 	organizationCollaborators.PersistentFlags().AddFlagSet(organizationIDFlags())
 	organizationsCommand.AddCommand(organizationCollaborators)
 
