@@ -222,7 +222,7 @@ var (
 
 			rights := getRights(cmd.Flags())
 			if len(rights) == 0 {
-				logger.Info("No rights selected, will remove API key")
+				return errNoAPIKeyRights
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerAddress)
@@ -235,6 +235,38 @@ var (
 					ID:     id,
 					Name:   name,
 					Rights: rights,
+				},
+			})
+			if err != nil {
+				return err
+			}
+
+			return nil
+		},
+	}
+	gatewayAPIKeysDelete = &cobra.Command{
+		Use:     "delete",
+		Aliases: []string{"remove"},
+		Short:   "Delete a gateway API key",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			id := getAPIKeyID(cmd.Flags(), args)
+			if id == "" {
+				return errNoAPIKeyID
+			}
+			gtwID, err := getGatewayID(cmd.Flags(), args, true)
+			if err != nil {
+				return err
+			}
+
+			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			if err != nil {
+				return err
+			}
+			_, err = ttnpb.NewGatewayAccessClient(is).UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
+				GatewayIdentifiers: *gtwID,
+				APIKey: ttnpb.APIKey{
+					ID:     id,
+					Rights: nil,
 				},
 			})
 			if err != nil {
@@ -271,6 +303,8 @@ func init() {
 	gatewayAPIKeysUpdate.Flags().String("name", "", "")
 	gatewayAPIKeysUpdate.Flags().AddFlagSet(gatewayRightsFlags)
 	gatewayAPIKeys.AddCommand(gatewayAPIKeysUpdate)
+	gatewayAPIKeysDelete.Flags().String("api-key-id", "", "")
+	gatewayAPIKeys.AddCommand(gatewayAPIKeysDelete)
 	gatewayAPIKeys.PersistentFlags().AddFlagSet(gatewayIDFlags())
 	gatewaysCommand.AddCommand(gatewayAPIKeys)
 }
