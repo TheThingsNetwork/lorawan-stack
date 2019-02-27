@@ -1329,30 +1329,31 @@ func TestApplicationServer(t *testing.T) {
 						}
 					}
 					res, err := as.DownlinkQueueList(ctx, registeredDevice.EndDeviceIdentifiers)
-					a.So(err, should.BeNil)
-					a.So(res, should.Resemble, []*ttnpb.ApplicationDownlink{
-						{
-							SessionKeyID:   []byte{0x11},
-							FPort:          11,
-							FCnt:           1,
-							FRMPayload:     []byte{0x1, 0x1, 0x1},
-							CorrelationIDs: res[0].CorrelationIDs,
-						},
-						{
-							SessionKeyID:   []byte{0x11},
-							FPort:          22,
-							FCnt:           2,
-							FRMPayload:     []byte{0x2, 0x2, 0x2},
-							CorrelationIDs: res[1].CorrelationIDs,
-						},
-						{
-							SessionKeyID:   []byte{0x11},
-							FPort:          33,
-							FCnt:           3,
-							FRMPayload:     []byte{0x1, 0x1, 0x1, 0x1, 0x1, 0x1},
-							CorrelationIDs: res[2].CorrelationIDs,
-						},
-					})
+					if a.So(err, should.BeNil) && a.So(res, should.HaveLength, 3) {
+						a.So(res, should.Resemble, []*ttnpb.ApplicationDownlink{
+							{
+								SessionKeyID:   []byte{0x11},
+								FPort:          11,
+								FCnt:           1,
+								FRMPayload:     []byte{0x1, 0x1, 0x1},
+								CorrelationIDs: res[0].CorrelationIDs,
+							},
+							{
+								SessionKeyID:   []byte{0x11},
+								FPort:          22,
+								FCnt:           2,
+								FRMPayload:     []byte{0x2, 0x2, 0x2},
+								CorrelationIDs: res[1].CorrelationIDs,
+							},
+							{
+								SessionKeyID:   []byte{0x11},
+								FPort:          33,
+								FCnt:           3,
+								FRMPayload:     []byte{0x1, 0x1, 0x1, 0x1, 0x1, 0x1},
+								CorrelationIDs: res[2].CorrelationIDs,
+							},
+						})
+					}
 				})
 				t.Run("RegisteredDevice/Replace", func(t *testing.T) {
 					a := assertions.New(t)
@@ -1378,23 +1379,24 @@ func TestApplicationServer(t *testing.T) {
 						t.Fatal("Expected downlink error timeout")
 					}
 					res, err := as.DownlinkQueueList(ctx, registeredDevice.EndDeviceIdentifiers)
-					a.So(err, should.BeNil)
-					a.So(res, should.Resemble, []*ttnpb.ApplicationDownlink{
-						{
-							SessionKeyID:   []byte{0x11},
-							FPort:          11,
-							FCnt:           4,
-							FRMPayload:     []byte{0x1, 0x1, 0x1},
-							CorrelationIDs: res[0].CorrelationIDs,
-						},
-						{
-							SessionKeyID:   []byte{0x11},
-							FPort:          22,
-							FCnt:           5,
-							FRMPayload:     []byte{0x2, 0x2, 0x2},
-							CorrelationIDs: res[1].CorrelationIDs,
-						},
-					})
+					if a.So(err, should.BeNil) && a.So(res, should.HaveLength, 2) {
+						a.So(res, should.Resemble, []*ttnpb.ApplicationDownlink{
+							{
+								SessionKeyID:   []byte{0x11},
+								FPort:          11,
+								FCnt:           4,
+								FRMPayload:     []byte{0x1, 0x1, 0x1},
+								CorrelationIDs: res[0].CorrelationIDs,
+							},
+							{
+								SessionKeyID:   []byte{0x11},
+								FPort:          22,
+								FCnt:           5,
+								FRMPayload:     []byte{0x2, 0x2, 0x2},
+								CorrelationIDs: res[1].CorrelationIDs,
+							},
+						})
+					}
 				})
 			})
 
