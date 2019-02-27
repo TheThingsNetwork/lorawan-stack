@@ -100,7 +100,7 @@ func TestApplicationServer(t *testing.T) {
 	defer linksFlush()
 	defer linksRedisClient.Close()
 	linkRegistry := &redis.LinkRegistry{Redis: linksRedisClient}
-	linkRegistry.Set(ctx, registeredApplicationID, nil, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
+	_, err := linkRegistry.Set(ctx, registeredApplicationID, nil, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
 		return &ttnpb.ApplicationLink{
 			APIKey: registeredApplicationKey,
 			DefaultFormatters: &ttnpb.MessagePayloadFormatters{
@@ -109,6 +109,9 @@ func TestApplicationServer(t *testing.T) {
 			},
 		}, []string{"api_key", "default_formatters"}, nil
 	})
+	if err != nil {
+		t.Fatalf("Failed to set link in registry: %s", err)
+	}
 
 	webhooksRedisClient, webhooksFlush := test.NewRedis(t, "applicationserver_test", "webhooks")
 	defer webhooksFlush()

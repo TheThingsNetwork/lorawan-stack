@@ -48,53 +48,56 @@ func TestWebhooks(t *testing.T) {
 		ApplicationIdentifiers: registeredApplicationID,
 		WebhookID:              registeredWebhookID,
 	}
-	registry.Set(ctx, ids, nil, func(_ *ttnpb.ApplicationWebhook) (*ttnpb.ApplicationWebhook, []string, error) {
-		hook := &ttnpb.ApplicationWebhook{
-			BaseURL: "https://myapp.com/api/ttn/v3",
-			Headers: map[string]string{
-				"Authorization": "key secret",
+	_, err := registry.Set(ctx, ids, nil, func(_ *ttnpb.ApplicationWebhook) (*ttnpb.ApplicationWebhook, []string, error) {
+		return &ttnpb.ApplicationWebhook{
+				ApplicationWebhookIdentifiers: ids,
+				BaseURL:                       "https://myapp.com/api/ttn/v3",
+				Headers: map[string]string{
+					"Authorization": "key secret",
+				},
+				Format: "json",
+				UplinkMessage: &ttnpb.ApplicationWebhook_Message{
+					Path: "up",
+				},
+				JoinAccept: &ttnpb.ApplicationWebhook_Message{
+					Path: "join",
+				},
+				DownlinkAck: &ttnpb.ApplicationWebhook_Message{
+					Path: "down/ack",
+				},
+				DownlinkNack: &ttnpb.ApplicationWebhook_Message{
+					Path: "down/nack",
+				},
+				DownlinkSent: &ttnpb.ApplicationWebhook_Message{
+					Path: "down/sent",
+				},
+				DownlinkQueued: &ttnpb.ApplicationWebhook_Message{
+					Path: "down/queued",
+				},
+				DownlinkFailed: &ttnpb.ApplicationWebhook_Message{
+					Path: "down/failed",
+				},
+				LocationSolved: &ttnpb.ApplicationWebhook_Message{
+					Path: "location",
+				},
 			},
-			Format: "json",
-			UplinkMessage: &ttnpb.ApplicationWebhook_Message{
-				Path: "up",
-			},
-			JoinAccept: &ttnpb.ApplicationWebhook_Message{
-				Path: "join",
-			},
-			DownlinkAck: &ttnpb.ApplicationWebhook_Message{
-				Path: "down/ack",
-			},
-			DownlinkNack: &ttnpb.ApplicationWebhook_Message{
-				Path: "down/nack",
-			},
-			DownlinkSent: &ttnpb.ApplicationWebhook_Message{
-				Path: "down/sent",
-			},
-			DownlinkQueued: &ttnpb.ApplicationWebhook_Message{
-				Path: "down/queued",
-			},
-			DownlinkFailed: &ttnpb.ApplicationWebhook_Message{
-				Path: "down/failed",
-			},
-			LocationSolved: &ttnpb.ApplicationWebhook_Message{
-				Path: "location",
-			},
-		}
-		paths := []string{
-			"base_url",
-			"headers",
-			"format",
-			"uplink_message",
-			"join_accept",
-			"downlink_ack",
-			"downlink_nack",
-			"downlink_sent",
-			"downlink_failed",
-			"downlink_queued",
-			"location_solved",
-		}
-		return hook, paths, nil
+			[]string{
+				"base_url",
+				"headers",
+				"format",
+				"uplink_message",
+				"join_accept",
+				"downlink_ack",
+				"downlink_nack",
+				"downlink_sent",
+				"downlink_failed",
+				"downlink_queued",
+				"location_solved",
+			}, nil
 	})
+	if err != nil {
+		t.Fatalf("Failed to set webhook in registry: %s", err)
+	}
 
 	t.Run("Upstream", func(t *testing.T) {
 		testSink := &mockSink{
