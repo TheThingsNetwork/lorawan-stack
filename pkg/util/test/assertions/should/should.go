@@ -165,4 +165,8 @@ var (
 	HaveEmptyDiff = testassertions.ShouldHaveEmptyDiff
 	// NotHaveEmptyDiff receives exactly two parameters and does an inequality check using pretty.Diff.
 	NotHaveEmptyDiff = testassertions.ShouldNotHaveEmptyDiff
+	// HaveRoute asserts that the given *echo.Echo server has a route with the given method and path.
+	HaveRoute = testassertions.ShouldHaveRoute
+	// NotHaveRoute asserts that the given *echo.Echo server does not have a route with the given method and path.
+	NotHaveRoute = testassertions.ShouldNotHaveRoute
 )
