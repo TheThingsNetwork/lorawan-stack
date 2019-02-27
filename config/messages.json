@@ -1187,6 +1187,15 @@
       "file": "flags.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:no_api_key_rights": {
+    "translations": {
+      "en": "no API key rights set"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "flags.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/commands:no_application_id": {
     "translations": {
       "en": "no application ID set"
@@ -1217,6 +1226,15 @@
   "error:cmd/ttn-lw-cli/commands:no_collaborator": {
     "translations": {
       "en": "no collaborator set"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "flags.go"
+    }
+  },
+  "error:cmd/ttn-lw-cli/commands:no_collaborator_rights": {
+    "translations": {
+      "en": "no collaborator rights set"
     },
     "description": {
       "package": "cmd/ttn-lw-cli/commands",

@@ -180,8 +180,7 @@ var (
 
 			rights := getRights(cmd.Flags())
 			if len(rights) == 0 {
-				logger.Info("No rights selected, won't create API key")
-				return nil
+				return errNoAPIKeyRights
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerAddress)
