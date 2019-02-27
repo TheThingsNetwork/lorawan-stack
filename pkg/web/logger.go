@@ -18,8 +18,14 @@ import (
 	"io"
 	"io/ioutil"
 
+	"github.com/labstack/echo"
 	"github.com/labstack/gommon/log"
 )
+
+// NewNoopLogger returns an echo.Logger that discards all log messages.
+func NewNoopLogger() echo.Logger {
+	return &noopLogger{}
+}
 
 type noopLogger struct{}
 
