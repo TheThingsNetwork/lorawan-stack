@@ -85,9 +85,11 @@ By default, the stack allows unregistered gateways to connect, but without provi
 $ ttn-lw-cli gateway create gtw1 --user-id admin --frequency-plan-id EU_863_870 --gateway-eui 00800000A00009EF --enforce-duty-cycle
 ```
 
-This creates a gateway `gtw1` with the frequency plan `EU_863_870` and EUI `00800000A00009EF` that respects duty-cycle limitations. For more options, you can use the `--help` flag. You can now connect your gateway to the stack.
+This creates a gateway `gtw1` with the frequency plan `EU_863_870` and EUI `00800000A00009EF` that respects duty-cycle limitations. You can now connect your gateway to the stack.
 
 The frequency plan is fetched automatically from the [configured source](#frequencyplans).
+
+>Note: if you need help with any command in `ttn-lw-cli`, use the `--help` flag to get a list of subcommands, flags and their description and aliases.
 
 ## <a name="registerapp">Registering an application</a>
 
@@ -344,8 +346,6 @@ Now when the device sends an uplink, the application server will do a `POST` req
 	}
 }
 ``` 
-
-Use the `--help` flag to see all available options.
 
 ## Congratulations
 
