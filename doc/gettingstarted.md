@@ -109,10 +109,15 @@ You can now register an OTAA activated device to be used with the stack as follo
 $ ttn-lw-cli end-devices create app1 dev1 --dev-eui 0004A30B001C0530 --join-eui 800000000000000C --frequency-plan-id EU_863_870 --root-keys.app-key.key 752BAEC23EAE7964AF27C325F4C23C9A --lorawan-phy-version 1.0.2-b --lorawan-version 1.0.2
 ```
 
-This will create an LoRaWAN 1.0.2 end device `dev1` with DevEUI `0004A30B001C0530`, AppEUI `800000000000000C` and AppKey
- `752BAEC23EAE7964AF27C325F4C23C9A`. After configuring the credentials in the end device, you should be able to join the private network.
+This will create an LoRaWAN 1.0.2 end device `dev1` with DevEUI `0004A30B001C0530`, AppEUI `800000000000000C` and AppKey `752BAEC23EAE7964AF27C325F4C23C9A`. After configuring the credentials in the end device, you should be able to join the private network.
 
-If you wish to enable class C support for this device, you can add the `--supports-class-c` flag in the above command.
+It is also possible to register an ABP activated device using the `--abp` flag as follows:
+
+```bash
+$ ttn-lw-cli end-devices create app1 dev1 --frequency-plan-id EU_863_870 --lorawan-phy-version 1.0.2-b --lorawan-version 1.0.2 --abp --session.dev-addr 00E4304D --session.keys.app-s-key.key A0CAD5A30036DBE03096EB67CA975BAA --session.keys.f_nwk_s_int_key.key B7F3E161BC9D4388E6C788A0C547F255
+```
+
+This will create an LoRaWAN 1.0.2 end device `dev1` with DevAddr `00E4304D`, AppSKey `A0CAD5A30036DBE03096EB67CA975BAA` and NwkSKey `B7F3E161BC9D4388E6C788A0C547F255`.
 
 ## <a name="linkappserver">Linking the application</a>
 
@@ -218,6 +223,8 @@ When the device sends an uplink, the message will be broadcasted to the topic `v
 
 ### Scheduling a downlink message
 
+#### Class A downlinks
+
 Downlinks can be scheduled by publishing the message to the topic `v3/{application id}/devices/{device id}/down/push`. For example, if we want to send an unconfirmed downlink to the device `dev-simulator` with a payload of `BE EF` on port 15, we can use the topic `v3/app1/devices/dev-simulator/down/push` with the following contents:
 
 ```json
@@ -265,6 +272,42 @@ Once the downlink has been acknowledged, a message is published to the topic `v3
 		"confirmed": true,
 		"correlation_ids": ["as:conn:01D2CT5BZNX862RP9SV2JSRWZ7", "as:downlink:01D2CVN6WW9S152ZVB0C7VHM4Z"]
 	}
+}
+```
+
+#### Class C downlinks
+
+In order to schedule class C downlinks, the support for class C scheduling has to be enabled in the network server using the following command:
+
+```bash
+$ ttn-lw-cli end-devices set app1 dev1 --supports-class-c
+```
+
+This will enable the class C downlink scheduling of the device. It is assumed that devices with LoRaWAN versions earlier than 1.1 enable class C after the join procedure, while later devices use the `DeviceMode` MAC command to change their own class.
+
+No other changes are required in the format of the downlink message, since class C support is related to downlink scheduling.
+
+#### Class C multicast downlinks
+
+Multicast downlinks are downlinks which are sent to a specific ABP session which is shared by multiple devices. Since the session is shared by multiple devices, the downlink will be received by all of them when it's transmitted by the gateway. 
+
+Class C scheduling support is required in order to achieve this, and can be enabled using the command in the section above.
+
+Downlinks can be scheduled by adding the `class_bc` flag to the downlink message, which specifies on which gateway(s) the downlink should be scheduled.
+
+```json
+{
+    "downlinks": [{
+        "f_port": 15,
+        "frm_payload": "vu8=",
+        "class_b_c": {
+            "gateways": [{
+                "gateway_ids": {
+                    "gateway_id": "gtw1"
+                }
+            }]
+        }
+    }]
 }
 ```
 
