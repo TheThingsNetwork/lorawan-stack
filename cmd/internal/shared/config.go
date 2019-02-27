@@ -62,6 +62,11 @@ var DefaultHTTPConfig = config.HTTP{
 	},
 }
 
+// DefaultInteropConfig is the default interop config.
+var DefaultInteropConfig = config.Interop{
+	ListenTLS: ":8886",
+}
+
 // DefaultGRPCConfig is the default config for GRPC.
 var DefaultGRPCConfig = config.GRPC{
 	Listen:    ":1884",
@@ -112,6 +117,7 @@ var DefaultServiceBase = config.ServiceBase{
 	Events:           DefaultEventsConfig,
 	GRPC:             DefaultGRPCConfig,
 	HTTP:             DefaultHTTPConfig,
+	Interop:          DefaultInteropConfig,
 	TLS:              DefaultTLSConfig,
 	Blob:             DefaultBlobConfig,
 	FrequencyPlans:   DefaultFrequencyPlansConfig,
