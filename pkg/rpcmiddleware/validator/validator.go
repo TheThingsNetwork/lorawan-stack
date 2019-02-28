@@ -63,15 +63,15 @@ type fieldMaskGetter interface {
 
 var errForbiddenFieldMaskPaths = errors.DefineInvalidArgument("field_mask_paths", "forbidden path(s) in field mask", "forbidden_paths")
 
-func forbiddenPaths(requested []string, allowed ...string) (invalid []string) {
-nextRequested:
-	for _, requested := range requested {
-		for _, allowed := range allowed {
-			if requested == allowed {
-				continue nextRequested
+func forbiddenPaths(requestedPaths []string, allowedPaths ...string) (invalidPaths []string) {
+nextRequestedPath:
+	for _, requestedPath := range requestedPaths {
+		for _, allowedPath := range allowedPaths {
+			if requestedPath == allowedPath {
+				continue nextRequestedPath
 			}
 		}
-		invalid = append(invalid, requested)
+		invalidPaths = append(invalidPaths, requestedPath)
 	}
 	return
 }
