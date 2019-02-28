@@ -760,8 +760,19 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						maxUpLength,
 					)
 					if err != nil {
+						if errors.Resemble(err, errScheduleTooSoon) {
+							nextDownlinkAt = dev.MACState.LastConfirmedDownlinkAt.Add(deviceClassCTimeout(dev, ns.defaultMACSettings))
+						}
 						return nil, nil, err
 					}
+					if dev.MACState.DeviceClass == ttnpb.CLASS_C {
+						if dev.MACState.LastConfirmedDownlinkAt != nil {
+							nextDownlinkAt = dev.MACState.LastConfirmedDownlinkAt.Add(deviceClassCTimeout(dev, ns.defaultMACSettings))
+						} else {
+							nextDownlinkAt = time.Now()
+						}
+					}
+
 					if appDown != nil {
 						ctx = events.ContextWithCorrelationID(ctx, appDown.CorrelationIDs...)
 					}
@@ -788,7 +799,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						paths = downlinkPathsFromRecentUplinks(dev.RecentUplinks...)
 					}
 
-					down, _, err := ns.scheduleDownlinkByPaths(
+					down, delay, err := ns.scheduleDownlinkByPaths(
 						log.NewContext(ctx, logger.WithFields(log.Fields(
 							"downlink_type", "data",
 							"attempt_rx1", false,
@@ -802,6 +813,13 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					if err != nil {
 						scheduleErr = true
 					} else {
+						if dev.MACState.DeviceClass == ttnpb.CLASS_C {
+							downAt := time.Now().Add(delay)
+							if nextDownlinkAt.Before(downAt) {
+								nextDownlinkAt = downAt
+							}
+						}
+
 						if appDown == nil && len(dev.QueuedApplicationDownlinks) > 0 && dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 							go ns.sendQueueInvalidationToAS(ctx, dev)
 						}
