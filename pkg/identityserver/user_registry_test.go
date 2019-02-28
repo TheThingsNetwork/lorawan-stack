@@ -315,6 +315,18 @@ func TestUsersCRUD(t *testing.T) {
 
 		a.So(empty, should.BeNil)
 		a.So(err, should.NotBeNil)
+
+		// NOTE: For other entities, this would be a NotFound, but in this case
+		// the user's credentials become invalid when the user is deleted.
+		a.So(errors.IsUnauthenticated(err), should.BeTrue)
+
+		empty, err = reg.Get(ctx, &ttnpb.GetUserRequest{
+			UserIdentifiers: user.UserIdentifiers,
+			FieldMask:       types.FieldMask{Paths: []string{"name"}},
+		}, userCreds(adminUserIdx))
+
+		a.So(empty, should.BeNil)
+		a.So(err, should.NotBeNil)
 		a.So(errors.IsNotFound(err), should.BeTrue)
 	})
 }
