@@ -105,12 +105,9 @@ func convertError(err error) error {
 // then the field mask paths are validated according to the registered list.
 func UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		if allowed := getAllowedFieldMaskPaths(info.FullMethod); allowed != nil {
-			if v, ok := req.(fieldMaskGetter); ok {
-				requested := v.GetFieldMask().Paths
-				if forbiddenPaths := forbiddenPaths(requested, allowed...); len(forbiddenPaths) > 0 {
-					return nil, errForbiddenFieldMaskPaths.WithAttributes("forbidden_paths", forbiddenPaths)
-				}
+		if v, ok := req.(fieldMaskGetter); ok {
+			if forbiddenPaths := forbiddenPaths(v.GetFieldMask().Paths, getAllowedFieldMaskPaths(info.FullMethod)...); len(forbiddenPaths) > 0 {
+				return nil, errForbiddenFieldMaskPaths.WithAttributes("forbidden_paths", forbiddenPaths)
 			}
 		}
 		if v, ok := req.(validatorWithContext); ok {
@@ -159,12 +156,10 @@ func (s *recvWrapper) RecvMsg(m interface{}) error {
 	if err := s.ServerStream.RecvMsg(m); err != nil {
 		return err
 	}
-	if s.allowedFieldMaskPaths != nil {
-		if v, ok := m.(fieldMaskGetter); ok {
-			requested := v.GetFieldMask().Paths
-			if forbiddenPaths := forbiddenPaths(requested, s.allowedFieldMaskPaths...); len(forbiddenPaths) > 0 {
-				return errForbiddenFieldMaskPaths.WithAttributes("forbidden_paths", forbiddenPaths)
-			}
+	if v, ok := m.(fieldMaskGetter); ok {
+		requested := v.GetFieldMask().Paths
+		if forbiddenPaths := forbiddenPaths(requested, s.allowedFieldMaskPaths...); len(forbiddenPaths) > 0 {
+			return errForbiddenFieldMaskPaths.WithAttributes("forbidden_paths", forbiddenPaths)
 		}
 	}
 	if v, ok := m.(validatorWithContext); ok {
