@@ -29,12 +29,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/unique"
 )
 
-const (
-	euiKey         = "eui"
-	provisionerKey = "provisioner"
-	uidKey         = "uid"
-)
-
 var (
 	errAlreadyProvisioned   = errors.DefineAlreadyExists("already_provisioned", "device already provisioned")
 	errDuplicateIdentifiers = errors.DefineAlreadyExists("duplicate_identifiers", "duplicate identifiers")
@@ -69,6 +63,18 @@ func provisionerUniqueID(dev *ttnpb.EndDevice) (string, error) {
 	return provisioner.UniqueID(dev.ProvisioningData)
 }
 
+func (r *DeviceRegistry) uidKey(uid string) string {
+	return r.Redis.Key("uid", uid)
+}
+
+func (r *DeviceRegistry) euiKey(devEUI, joinEUI types.EUI64) string {
+	return r.Redis.Key("eui", joinEUI.String(), devEUI.String())
+}
+
+func (r *DeviceRegistry) provisionerKey(provisionerID, pid string) string {
+	return r.Redis.Key("provisioner", provisionerID, pid)
+}
+
 // GetByEUI gets device by joinEUI, devEUI.
 func (r *DeviceRegistry) GetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error) {
 	if joinEUI.IsZero() || devEUI.IsZero() {
@@ -76,7 +82,7 @@ func (r *DeviceRegistry) GetByEUI(ctx context.Context, joinEUI types.EUI64, devE
 	}
 
 	pb := &ttnpb.EndDevice{}
-	if err := ttnredis.GetProto(r.Redis, r.Redis.Key(euiKey, joinEUI.String(), devEUI.String())).ScanProto(pb); err != nil {
+	if err := ttnredis.GetProto(r.Redis, r.euiKey(joinEUI, devEUI)).ScanProto(pb); err != nil {
 		return nil, err
 	}
 	return applyDeviceFieldMask(&ttnpb.EndDevice{}, pb, paths...)
@@ -94,7 +100,7 @@ func (r *DeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devE
 	if joinEUI.IsZero() || devEUI.IsZero() {
 		return nil, errInvalidIdentifiers
 	}
-	ek := r.Redis.Key(euiKey, joinEUI.String(), devEUI.String())
+	ek := r.euiKey(joinEUI, devEUI)
 
 	var pb *ttnpb.EndDevice
 	err := r.Redis.Watch(func(tx *redis.Tx) error {
@@ -132,14 +138,14 @@ func (r *DeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devE
 			f = func(p redis.Pipeliner) error {
 				p.Del(ek)
 				if !stored.ApplicationIdentifiers.IsZero() && stored.DeviceID != "" {
-					p.Del(r.Redis.Key(uidKey, unique.ID(ctx, stored.EndDeviceIdentifiers)))
+					p.Del(r.uidKey(unique.ID(ctx, stored.EndDeviceIdentifiers)))
 				}
 				pid, err := provisionerUniqueID(stored)
 				if err != nil {
 					return err
 				}
 				if pid != "" {
-					p.Del(r.Redis.Key(provisionerKey, stored.ProvisionerID, pid))
+					p.Del(r.provisionerKey(stored.ProvisionerID, pid))
 				}
 				return nil
 			}
@@ -199,22 +205,22 @@ func (r *DeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devE
 
 				if stored == nil {
 					if !updated.ApplicationIdentifiers.IsZero() && updated.DeviceID != "" {
-						uk := r.Redis.Key(uidKey, unique.ID(ctx, updated.EndDeviceIdentifiers))
-						if err := tx.Watch(uk).Err(); err != nil {
+						ik := r.uidKey(unique.ID(ctx, updated.EndDeviceIdentifiers))
+						if err := tx.Watch(ik).Err(); err != nil {
 							return err
 						}
-						i, err := tx.Exists(uk).Result()
+						i, err := tx.Exists(ik).Result()
 						if err != nil {
 							return ttnredis.ConvertError(err)
 						}
 						if i != 0 {
 							return errDuplicateIdentifiers
 						}
-						p.SetNX(uk, eid, 0)
+						p.SetNX(ik, r.euiKey(joinEUI, devEUI), 0)
 					}
 
 					if updatedPID != "" {
-						pk := r.Redis.Key(provisionerKey, updated.ProvisionerID, updatedPID)
+						pk := r.provisionerKey(updated.ProvisionerID, updatedPID)
 						if err := tx.Watch(pk).Err(); err != nil {
 							return err
 						}
@@ -260,6 +266,10 @@ type KeyRegistry struct {
 	Redis *ttnredis.Client
 }
 
+func (r *KeyRegistry) idKey(devEUI types.EUI64, id []byte) string {
+	return r.Redis.Key("id", devEUI.String(), base64.RawStdEncoding.EncodeToString(id))
+}
+
 // GetByID gets session keys by devEUI, id.
 func (r *KeyRegistry) GetByID(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 	if devEUI.IsZero() || len(id) == 0 {
@@ -267,7 +277,7 @@ func (r *KeyRegistry) GetByID(ctx context.Context, devEUI types.EUI64, id []byte
 	}
 
 	pb := &ttnpb.SessionKeys{}
-	if err := ttnredis.GetProto(r.Redis, r.Redis.Key(uidKey, devEUI.String(), base64.RawStdEncoding.EncodeToString(id))).ScanProto(pb); err != nil {
+	if err := ttnredis.GetProto(r.Redis, r.idKey(devEUI, id)).ScanProto(pb); err != nil {
 		return nil, err
 	}
 	return applyKeyFieldMask(&ttnpb.SessionKeys{}, pb, paths...)
@@ -278,12 +288,11 @@ func (r *KeyRegistry) SetByID(ctx context.Context, devEUI types.EUI64, id []byte
 	if devEUI.IsZero() || len(id) == 0 {
 		return nil, errInvalidIdentifiers
 	}
-
-	uk := r.Redis.Key(uidKey, devEUI.String(), base64.RawStdEncoding.EncodeToString(id))
+	ik := r.idKey(devEUI, id)
 
 	var pb *ttnpb.SessionKeys
 	err := r.Redis.Watch(func(tx *redis.Tx) error {
-		cmd := ttnredis.GetProto(tx, uk)
+		cmd := ttnredis.GetProto(tx, ik)
 		stored := &ttnpb.SessionKeys{}
 		if err := cmd.ScanProto(stored); errors.IsNotFound(err) {
 			stored = nil
@@ -315,7 +324,7 @@ func (r *KeyRegistry) SetByID(ctx context.Context, devEUI types.EUI64, id []byte
 		var f func(redis.Pipeliner) error
 		if pb == nil {
 			f = func(p redis.Pipeliner) error {
-				p.Del(uk)
+				p.Del(ik)
 				return nil
 			}
 		} else {
@@ -339,7 +348,7 @@ func (r *KeyRegistry) SetByID(ctx context.Context, devEUI types.EUI64, id []byte
 				return err
 			}
 			f = func(p redis.Pipeliner) error {
-				_, err := ttnredis.SetProto(p, uk, updated, 0)
+				_, err := ttnredis.SetProto(p, ik, updated, 0)
 				if err != nil {
 					return err
 				}
@@ -351,7 +360,7 @@ func (r *KeyRegistry) SetByID(ctx context.Context, devEUI types.EUI64, id []byte
 			return err
 		}
 		return nil
-	}, uk)
+	}, ik)
 	if err != nil {
 		return nil, err
 	}

@@ -26,11 +26,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/unique"
 )
 
-const (
-	euiKey = "eui"
-	uidKey = "uid"
-)
-
 var (
 	errInvalidIdentifiers   = errors.DefineInvalidArgument("invalid_identifiers", "invalid identifiers")
 	errDuplicateIdentifiers = errors.DefineAlreadyExists("duplicate_identifiers", "duplicate identifiers")
@@ -54,6 +49,14 @@ type DeviceRegistry struct {
 	Redis *ttnredis.Client
 }
 
+func (r *DeviceRegistry) uidKey(uid string) string {
+	return r.Redis.Key("uid", uid)
+}
+
+func (r *DeviceRegistry) euiKey(devEUI, joinEUI types.EUI64) string {
+	return r.Redis.Key("eui", joinEUI.String(), devEUI.String())
+}
+
 // Get returns the end device by its identifiers.
 func (r *DeviceRegistry) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
 	if err := ids.ValidateContext(ctx); err != nil {
@@ -61,7 +64,7 @@ func (r *DeviceRegistry) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 	}
 
 	pb := &ttnpb.EndDevice{}
-	if err := ttnredis.GetProto(r.Redis, r.Redis.Key(uidKey, unique.ID(ctx, ids))).ScanProto(pb); err != nil {
+	if err := ttnredis.GetProto(r.Redis, r.uidKey(unique.ID(ctx, ids))).ScanProto(pb); err != nil {
 		return nil, err
 	}
 	return applyDeviceFieldMask(nil, pb, paths...)
@@ -80,7 +83,7 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 		return nil, err
 	}
 	uid := unique.ID(ctx, ids)
-	uk := r.Redis.Key(uidKey, uid)
+	uk := r.uidKey(uid)
 
 	var pb *ttnpb.EndDevice
 	err := r.Redis.Watch(func(tx *redis.Tx) error {
@@ -118,7 +121,7 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 			f = func(p redis.Pipeliner) error {
 				p.Del(uk)
 				if stored.JoinEUI != nil && stored.DevEUI != nil {
-					p.Del(r.Redis.Key(euiKey, stored.JoinEUI.String(), stored.DevEUI.String()))
+					p.Del(r.euiKey(*stored.JoinEUI, *stored.DevEUI))
 				}
 				return nil
 			}
@@ -159,7 +162,7 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 
 			f = func(p redis.Pipeliner) error {
 				if stored == nil && updated.JoinEUI != nil && updated.DevEUI != nil {
-					ek := r.Redis.Key(euiKey, pb.JoinEUI.String(), pb.DevEUI.String())
+					ek := r.euiKey(*pb.JoinEUI, *pb.DevEUI)
 					if err := tx.Watch(ek).Err(); err != nil {
 						return err
 					}
@@ -203,15 +206,18 @@ type LinkRegistry struct {
 	Redis *ttnredis.Client
 }
 
-const (
-	allKey  = "all"
-	linkKey = "link"
-)
+func (r *LinkRegistry) allKey() string {
+	return r.Redis.Key("all")
+}
+
+func (r *LinkRegistry) appKey(uid string) string {
+	return r.Redis.Key("uid", uid)
+}
 
 // Get returns the link by the application identifiers.
 func (r *LinkRegistry) Get(ctx context.Context, ids ttnpb.ApplicationIdentifiers, paths []string) (*ttnpb.ApplicationLink, error) {
 	pb := &ttnpb.ApplicationLink{}
-	if err := ttnredis.GetProto(r.Redis, r.Redis.Key(linkKey, unique.ID(ctx, ids))).ScanProto(pb); err != nil {
+	if err := ttnredis.GetProto(r.Redis, r.appKey(unique.ID(ctx, ids))).ScanProto(pb); err != nil {
 		return nil, err
 	}
 	return applyLinkFieldMask(nil, pb, paths...)
@@ -221,7 +227,7 @@ var errApplicationUID = errors.DefineCorruption("application_uid", "invalid appl
 
 // Range ranges the links and calls the callback function, until false is returned.
 func (r *LinkRegistry) Range(ctx context.Context, paths []string, f func(context.Context, ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationLink) bool) error {
-	uids, err := r.Redis.SMembers(r.Redis.Key(allKey)).Result()
+	uids, err := r.Redis.SMembers(r.allKey()).Result()
 	if err != nil {
 		return err
 	}
@@ -235,7 +241,7 @@ func (r *LinkRegistry) Range(ctx context.Context, paths []string, f func(context
 			return errApplicationUID.WithCause(err).WithAttributes("application_uid", uid)
 		}
 		pb := &ttnpb.ApplicationLink{}
-		if err := ttnredis.GetProto(r.Redis, r.Redis.Key(linkKey, uid)).ScanProto(pb); err != nil {
+		if err := ttnredis.GetProto(r.Redis, r.appKey(uid)).ScanProto(pb); err != nil {
 			return err
 		}
 		pb, err = applyLinkFieldMask(nil, pb, paths...)
@@ -252,7 +258,7 @@ func (r *LinkRegistry) Range(ctx context.Context, paths []string, f func(context
 // Set creates, updates or deletes the link by the application identifiers.
 func (r *LinkRegistry) Set(ctx context.Context, ids ttnpb.ApplicationIdentifiers, gets []string, f func(*ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error)) (*ttnpb.ApplicationLink, error) {
 	uid := unique.ID(ctx, ids)
-	uk := r.Redis.Key(linkKey, uid)
+	uk := r.appKey(uid)
 	var pb *ttnpb.ApplicationLink
 	err := r.Redis.Watch(func(tx *redis.Tx) error {
 		cmd := ttnredis.GetProto(tx, uk)
@@ -288,7 +294,7 @@ func (r *LinkRegistry) Set(ctx context.Context, ids ttnpb.ApplicationIdentifiers
 		if pb == nil {
 			f = func(p redis.Pipeliner) error {
 				p.Del(uk)
-				p.SRem(r.Redis.Key(allKey), uid)
+				p.SRem(r.allKey(), uid)
 				return nil
 			}
 		} else {
@@ -313,7 +319,7 @@ func (r *LinkRegistry) Set(ctx context.Context, ids ttnpb.ApplicationIdentifiers
 				if err != nil {
 					return err
 				}
-				p.SAdd(r.Redis.Key(allKey), uid)
+				p.SAdd(r.allKey(), uid)
 				return nil
 			}
 		}

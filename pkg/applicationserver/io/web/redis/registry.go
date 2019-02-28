@@ -26,8 +26,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/unique"
 )
 
-const webhookKey = "webhook"
-
 var (
 	errInvalidIdentifiers = errors.DefineInvalidArgument("invalid_identifiers", "invalid identifiers")
 )
@@ -44,10 +42,24 @@ type WebhookRegistry struct {
 	Redis *ttnredis.Client
 }
 
+func (r *WebhookRegistry) appKey(uid string) string {
+	return r.Redis.Key("uid", uid)
+}
+
+func (r *WebhookRegistry) idKey(appUID, id string) string {
+	return r.Redis.Key("uid", appUID, id)
+}
+
+func (r *WebhookRegistry) makeIDKeyFunc(appUID string) func(id string) string {
+	return func(id string) string {
+		return r.idKey(appUID, id)
+	}
+}
+
 // Get implements WebhookRegistry.
 func (r WebhookRegistry) Get(ctx context.Context, ids ttnpb.ApplicationWebhookIdentifiers, paths []string) (*ttnpb.ApplicationWebhook, error) {
 	pb := &ttnpb.ApplicationWebhook{}
-	if err := ttnredis.GetProto(r.Redis, r.Redis.Key(webhookKey, unique.ID(ctx, ids.ApplicationIdentifiers), ids.WebhookID)).ScanProto(pb); err != nil {
+	if err := ttnredis.GetProto(r.Redis, r.idKey(unique.ID(ctx, ids.ApplicationIdentifiers), ids.WebhookID)).ScanProto(pb); err != nil {
 		return nil, err
 	}
 	return applyWebhookFieldMask(nil, pb, paths...)
@@ -57,7 +69,7 @@ func (r WebhookRegistry) Get(ctx context.Context, ids ttnpb.ApplicationWebhookId
 func (r WebhookRegistry) List(ctx context.Context, ids ttnpb.ApplicationIdentifiers, paths []string) ([]*ttnpb.ApplicationWebhook, error) {
 	var pbs []*ttnpb.ApplicationWebhook
 	appUID := unique.ID(ctx, ids)
-	err := ttnredis.FindProtos(r.Redis, r.Redis.Key(webhookKey, appUID), func(id string) string { return r.Redis.Key(webhookKey, appUID, id) }).Range(func() (proto.Message, func() (bool, error)) {
+	err := ttnredis.FindProtos(r.Redis, r.appKey(appUID), r.makeIDKeyFunc(appUID)).Range(func() (proto.Message, func() (bool, error)) {
 		pb := &ttnpb.ApplicationWebhook{}
 		return pb, func() (bool, error) {
 			pb, err := applyWebhookFieldMask(nil, pb, paths...)
@@ -77,10 +89,10 @@ func (r WebhookRegistry) List(ctx context.Context, ids ttnpb.ApplicationIdentifi
 // Set implements WebhookRegistry.
 func (r WebhookRegistry) Set(ctx context.Context, ids ttnpb.ApplicationWebhookIdentifiers, gets []string, f func(*ttnpb.ApplicationWebhook) (*ttnpb.ApplicationWebhook, []string, error)) (*ttnpb.ApplicationWebhook, error) {
 	appUID := unique.ID(ctx, ids.ApplicationIdentifiers)
-	uk := r.Redis.Key(webhookKey, appUID, ids.WebhookID)
+	ik := r.idKey(appUID, ids.WebhookID)
 	var pb *ttnpb.ApplicationWebhook
 	err := r.Redis.Watch(func(tx *redis.Tx) error {
-		cmd := ttnredis.GetProto(tx, uk)
+		cmd := ttnredis.GetProto(tx, ik)
 		stored := &ttnpb.ApplicationWebhook{}
 		if err := cmd.ScanProto(stored); errors.IsNotFound(err) {
 			stored = nil
@@ -112,8 +124,8 @@ func (r WebhookRegistry) Set(ctx context.Context, ids ttnpb.ApplicationWebhookId
 		var f func(redis.Pipeliner) error
 		if pb == nil {
 			f = func(p redis.Pipeliner) error {
-				p.Del(uk)
-				p.SRem(r.Redis.Key(webhookKey, appUID), stored.WebhookID)
+				p.Del(ik)
+				p.SRem(r.appKey(appUID), stored.WebhookID)
 				return nil
 			}
 		} else {
@@ -151,10 +163,10 @@ func (r WebhookRegistry) Set(ctx context.Context, ids ttnpb.ApplicationWebhookId
 			}
 
 			f = func(p redis.Pipeliner) error {
-				if _, err := ttnredis.SetProto(p, uk, updated, 0); err != nil {
+				if _, err := ttnredis.SetProto(p, ik, updated, 0); err != nil {
 					return err
 				}
-				p.SAdd(r.Redis.Key(webhookKey, appUID), updated.WebhookID)
+				p.SAdd(r.appKey(appUID), updated.WebhookID)
 				return nil
 			}
 		}
@@ -163,7 +175,7 @@ func (r WebhookRegistry) Set(ctx context.Context, ids ttnpb.ApplicationWebhookId
 			return err
 		}
 		return nil
-	}, uk)
+	}, ik)
 	if err != nil {
 		return nil, err
 	}
