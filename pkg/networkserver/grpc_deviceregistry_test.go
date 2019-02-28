@@ -72,7 +72,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 				},
 				FieldMask: pbtypes.FieldMask{
 					Paths: []string{
-						"test",
+						"frequency_plan_id",
 					},
 				},
 			},
@@ -108,7 +108,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
 				a.So(paths, should.HaveSameElementsDeep, []string{
-					"test",
+					"frequency_plan_id",
 				})
 				return &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -124,7 +124,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 				},
 				FieldMask: pbtypes.FieldMask{
 					Paths: []string{
-						"test",
+						"frequency_plan_id",
 					},
 				},
 			},
@@ -172,11 +172,9 @@ func TestDeviceRegistryGet(t *testing.T) {
 			req := deepcopy.Copy(tc.Request).(*ttnpb.GetEndDeviceRequest)
 
 			dev, err := ttnpb.NewNsEndDeviceRegistryClient(ns.LoopbackConn()).Get(test.Context(), req)
-			if tc.ErrorAssertion != nil {
-				a.So(tc.ErrorAssertion(t, err), should.BeTrue)
+			if tc.ErrorAssertion != nil && a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
 				a.So(dev, should.BeNil)
-			} else {
-				a.So(err, should.BeNil)
+			} else if a.So(err, should.BeNil) {
 				a.So(dev, should.Resemble, tc.Device)
 			}
 			a.So(req, should.Resemble, tc.Request)
@@ -219,19 +217,19 @@ func TestDeviceRegistrySet(t *testing.T) {
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceID:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+						JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+						DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 					},
-					SupportsJoin: true,
+					FrequencyPlanID:   test.EUFrequencyPlanID,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_0,
+					LoRaWANVersion:    ttnpb.MAC_V1_0,
+					SupportsJoin:      true,
 				},
 				FieldMask: pbtypes.FieldMask{
 					Paths: []string{
 						"frequency_plan_id",
 						"lorawan_phy_version",
 						"lorawan_version",
-						"mac_settings.supports_32_bit_f_cnt",
-						"mac_settings.use_adr",
-						"resets_f_cnt",
-						"supports_class_b",
-						"supports_class_c",
 						"supports_join",
 					},
 				},
@@ -272,7 +270,6 @@ func TestDeviceRegistrySet(t *testing.T) {
 					"lorawan_phy_version",
 					"lorawan_version",
 					"mac_settings.adr_margin",
-					"resets_f_cnt",
 					"supports_class_b",
 					"supports_class_c",
 					"supports_join",
@@ -287,7 +284,6 @@ func TestDeviceRegistrySet(t *testing.T) {
 					"lorawan_phy_version",
 					"lorawan_version",
 					"mac_settings.adr_margin",
-					"resets_f_cnt",
 					"supports_class_b",
 					"supports_class_c",
 					"supports_join",
@@ -331,7 +327,6 @@ func TestDeviceRegistrySet(t *testing.T) {
 						"lorawan_phy_version",
 						"lorawan_version",
 						"mac_settings.adr_margin",
-						"resets_f_cnt",
 						"supports_class_b",
 						"supports_class_c",
 						"supports_join",
@@ -382,9 +377,8 @@ func TestDeviceRegistrySet(t *testing.T) {
 					"frequency_plan_id",
 					"lorawan_phy_version",
 					"lorawan_version",
-					"mac_settings.use_adr",
 					"mac_settings.supports_32_bit_f_cnt",
-					"resets_f_cnt",
+					"mac_settings.use_adr",
 					"session.dev_addr",
 					"session.keys.f_nwk_s_int_key.key",
 					"session.last_f_cnt_up",
@@ -404,7 +398,6 @@ func TestDeviceRegistrySet(t *testing.T) {
 					"mac_settings.supports_32_bit_f_cnt",
 					"mac_settings.use_adr",
 					"mac_state",
-					"resets_f_cnt",
 					"session.dev_addr",
 					"session.keys.f_nwk_s_int_key.key",
 					"session.keys.nwk_s_enc_key.kek_label",
@@ -492,9 +485,8 @@ func TestDeviceRegistrySet(t *testing.T) {
 						"frequency_plan_id",
 						"lorawan_phy_version",
 						"lorawan_version",
-						"mac_settings.use_adr",
 						"mac_settings.supports_32_bit_f_cnt",
-						"resets_f_cnt",
+						"mac_settings.use_adr",
 						"session.dev_addr",
 						"session.keys.f_nwk_s_int_key.key",
 						"session.last_f_cnt_up",
@@ -572,9 +564,8 @@ func TestDeviceRegistrySet(t *testing.T) {
 					"frequency_plan_id",
 					"lorawan_phy_version",
 					"lorawan_version",
-					"mac_settings.use_adr",
 					"mac_settings.supports_32_bit_f_cnt",
-					"resets_f_cnt",
+					"mac_settings.use_adr",
 					"session.dev_addr",
 					"session.keys.f_nwk_s_int_key.key",
 					"session.last_f_cnt_up",
@@ -594,7 +585,6 @@ func TestDeviceRegistrySet(t *testing.T) {
 					"mac_settings.supports_32_bit_f_cnt",
 					"mac_settings.use_adr",
 					"mac_state",
-					"resets_f_cnt",
 					"session.dev_addr",
 					"session.keys.f_nwk_s_int_key.key",
 					"session.keys.nwk_s_enc_key.kek_label",
@@ -676,9 +666,8 @@ func TestDeviceRegistrySet(t *testing.T) {
 						"frequency_plan_id",
 						"lorawan_phy_version",
 						"lorawan_version",
-						"mac_settings.use_adr",
 						"mac_settings.supports_32_bit_f_cnt",
-						"resets_f_cnt",
+						"mac_settings.use_adr",
 						"session.dev_addr",
 						"session.keys.f_nwk_s_int_key.key",
 						"session.last_f_cnt_up",
@@ -754,9 +743,8 @@ func TestDeviceRegistrySet(t *testing.T) {
 					"frequency_plan_id",
 					"lorawan_phy_version",
 					"lorawan_version",
-					"mac_settings.use_adr",
 					"mac_settings.supports_32_bit_f_cnt",
-					"resets_f_cnt",
+					"mac_settings.use_adr",
 					"session.dev_addr",
 					"session.keys.f_nwk_s_int_key.key",
 					"session.last_f_cnt_up",
@@ -776,7 +764,6 @@ func TestDeviceRegistrySet(t *testing.T) {
 					"mac_settings.supports_32_bit_f_cnt",
 					"mac_settings.use_adr",
 					"mac_state",
-					"resets_f_cnt",
 					"session.dev_addr",
 					"session.keys.f_nwk_s_int_key.key",
 					"session.keys.nwk_s_enc_key.kek_label",
@@ -862,9 +849,8 @@ func TestDeviceRegistrySet(t *testing.T) {
 						"frequency_plan_id",
 						"lorawan_phy_version",
 						"lorawan_version",
-						"mac_settings.use_adr",
 						"mac_settings.supports_32_bit_f_cnt",
-						"resets_f_cnt",
+						"mac_settings.use_adr",
 						"session.dev_addr",
 						"session.keys.f_nwk_s_int_key.key",
 						"session.last_f_cnt_up",
@@ -952,11 +938,9 @@ func TestDeviceRegistrySet(t *testing.T) {
 			req := deepcopy.Copy(tc.Request).(*ttnpb.SetEndDeviceRequest)
 
 			dev, err := ttnpb.NewNsEndDeviceRegistryClient(ns.LoopbackConn()).Set(test.Context(), req)
-			if tc.ErrorAssertion != nil {
-				a.So(tc.ErrorAssertion(t, err), should.BeTrue)
+			if tc.ErrorAssertion != nil && a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
 				a.So(dev, should.BeNil)
-			} else {
-				a.So(err, should.BeNil)
+			} else if a.So(err, should.BeNil) {
 				a.So(dev, should.Resemble, tc.Device)
 			}
 			a.So(req, should.Resemble, tc.Request)
@@ -1124,11 +1108,9 @@ func TestDeviceRegistryDelete(t *testing.T) {
 			req := deepcopy.Copy(tc.Request).(*ttnpb.EndDeviceIdentifiers)
 
 			res, err := ttnpb.NewNsEndDeviceRegistryClient(ns.LoopbackConn()).Delete(test.Context(), req)
-			if tc.ErrorAssertion != nil {
-				a.So(tc.ErrorAssertion(t, err), should.BeTrue)
+			if tc.ErrorAssertion != nil && a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
 				a.So(res, should.BeNil)
-			} else {
-				a.So(err, should.BeNil)
+			} else if a.So(err, should.BeNil) {
 				a.So(res, should.Resemble, ttnpb.Empty)
 			}
 			a.So(req, should.Resemble, tc.Request)

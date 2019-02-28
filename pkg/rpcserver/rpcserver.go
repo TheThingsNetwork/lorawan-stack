@@ -51,6 +51,9 @@ import (
 
 func init() {
 	grpc.EnableTracing = false
+	for rpc, paths := range ttnpb.AllowedFieldMaskPathsForRPC {
+		validator.RegisterAllowedFieldMaskPaths(rpc, paths...)
+	}
 }
 
 type options struct {

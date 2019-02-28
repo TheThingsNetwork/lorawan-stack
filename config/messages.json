@@ -4211,6 +4211,15 @@
       "file": "request.go"
     }
   },
+  "error:pkg/rpcmiddleware/validator:field_mask_paths": {
+    "translations": {
+      "en": "forbidden path(s) in field mask"
+    },
+    "description": {
+      "package": "pkg/rpcmiddleware/validator",
+      "file": "validator.go"
+    }
+  },
   "error:pkg/rpcserver:rpc_recovered": {
     "translations": {
       "en": "Internal Server Error"

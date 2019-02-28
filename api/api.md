@@ -1515,10 +1515,10 @@ SDKs are responsible for combining (if desired) the three.
 | name | [string](#string) |  | Friendly name of the device. Stored in Entity Registry. |
 | description | [string](#string) |  | Description of the device. Stored in Entity Registry. |
 | attributes | [EndDevice.AttributesEntry](#ttn.lorawan.v3.EndDevice.AttributesEntry) | repeated | Attributes of the device. Stored in Entity Registry. |
-| version_ids | [EndDeviceVersionIdentifiers](#ttn.lorawan.v3.EndDeviceVersionIdentifiers) |  | Version Identifiers. Stored in Entity Registry and Application Server. |
+| version_ids | [EndDeviceVersionIdentifiers](#ttn.lorawan.v3.EndDeviceVersionIdentifiers) |  | Version Identifiers. Stored in Entity Registry, Network Server and Application Server. |
 | service_profile_id | [string](#string) |  | Default service profile. Stored in Entity Registry. |
-| network_server_address | [string](#string) |  | The address of the Network Server where this device is supposed to be registered. Stored in Entity Registry. The typical format of the address is &#34;host:port&#34;. If the port is omitted, the normal port inference (with DNS lookup, otherwise defaults) is used. The connection shall be established with transport layer security (TLS). Custom certificate authorities may be configured out-of-band. |
-| application_server_address | [string](#string) |  | The address of the Application Server where this device is supposed to be registered. Stored in Entity Registry. The typical format of the address is &#34;host:port&#34;. If the port is omitted, the normal port inference (with DNS lookup, otherwise defaults) is used. The connection shall be established with transport layer security (TLS). Custom certificate authorities may be configured out-of-band. |
+| network_server_address | [string](#string) |  | The address of the Network Server where this device is supposed to be registered. Stored in Entity Registry and Join Server. The typical format of the address is &#34;host:port&#34;. If the port is omitted, the normal port inference (with DNS lookup, otherwise defaults) is used. The connection shall be established with transport layer security (TLS). Custom certificate authorities may be configured out-of-band. |
+| application_server_address | [string](#string) |  | The address of the Application Server where this device is supposed to be registered. Stored in Entity Registry and Join Server. The typical format of the address is &#34;host:port&#34;. If the port is omitted, the normal port inference (with DNS lookup, otherwise defaults) is used. The connection shall be established with transport layer security (TLS). Custom certificate authorities may be configured out-of-band. |
 | join_server_address | [string](#string) |  | The address of the Join Server where this device is supposed to be registered. Stored in Entity Registry. The typical format of the address is &#34;host:port&#34;. If the port is omitted, the normal port inference (with DNS lookup, otherwise defaults) is used. The connection shall be established with transport layer security (TLS). Custom certificate authorities may be configured out-of-band. |
 | locations | [EndDevice.LocationsEntry](#ttn.lorawan.v3.EndDevice.LocationsEntry) | repeated | Location of the device. Stored in Entity Registry. |
 | supports_class_b | [bool](#bool) |  | Whether the device supports class B. Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any. |
@@ -1643,7 +1643,6 @@ Template for creating end devices.
 | default_mac_settings | [MACSettings](#ttn.lorawan.v3.MACSettings) |  | Default MAC layer settings of the device. |
 | min_frequency | [uint64](#uint64) |  | Minimum frequency the device is capable of using (Hz). |
 | max_frequency | [uint64](#uint64) |  | Maximum frequency the device is capable of using (Hz). |
-| resets_f_cnt | [bool](#bool) |  | Whether the device resets the frame counters (not LoRaWAN compliant). |
 | supports_join | [bool](#bool) |  | The device supports join (it&#39;s OTAA). |
 | resets_join_nonces | [bool](#bool) |  | Whether the device resets the join and dev nonces (not LoRaWAN 1.1 compliant). |
 | default_formatters | [MessagePayloadFormatters](#ttn.lorawan.v3.MessagePayloadFormatters) |  | Default formatters defining the payload formats for this end device. |

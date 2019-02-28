@@ -161,15 +161,13 @@ message EndDeviceVersion {
   uint64 min_frequency = 9;
   // Maximum frequency the device is capable of using (Hz).
   uint64 max_frequency = 10;
-  // Whether the device resets the frame counters (not LoRaWAN compliant).
-  bool resets_f_cnt = 11;
   // The device supports join (it's OTAA).
-  bool supports_join = 13;
+  bool supports_join = 11;
   // Whether the device resets the join and dev nonces (not LoRaWAN 1.1 compliant).
-  bool resets_join_nonces = 14;
+  bool resets_join_nonces = 12;
 
   // Default formatters defining the payload formats for this end device.
-  MessagePayloadFormatters default_formatters = 15 [(gogoproto.nullable) = false];
+  MessagePayloadFormatters default_formatters = 13 [(gogoproto.nullable) = false];
 }
 
 message MACSettings {
@@ -334,21 +332,21 @@ message EndDevice {
   // Attributes of the device. Stored in Entity Registry.
   map<string,string> attributes = 6;
 
-  // Version Identifiers. Stored in Entity Registry and Application Server.
+  // Version Identifiers. Stored in Entity Registry, Network Server and Application Server.
   EndDeviceVersionIdentifiers version_ids = 7 [(gogoproto.customname) = "VersionIDs"];
 
   // Default service profile. Stored in Entity Registry.
   string service_profile_id = 8 [(gogoproto.customname) = "ServiceProfileID"];
 
   // The address of the Network Server where this device is supposed to be registered.
-  // Stored in Entity Registry.
+  // Stored in Entity Registry and Join Server.
   // The typical format of the address is "host:port". If the port is omitted,
   // the normal port inference (with DNS lookup, otherwise defaults) is used.
   // The connection shall be established with transport layer security (TLS).
   // Custom certificate authorities may be configured out-of-band.
   string network_server_address = 9;
   // The address of the Application Server where this device is supposed to be registered.
-  // Stored in Entity Registry.
+  // Stored in Entity Registry and Join Server.
   // The typical format of the address is "host:port". If the port is omitted,
   // the normal port inference (with DNS lookup, otherwise defaults) is used.
   // The connection shall be established with transport layer security (TLS).

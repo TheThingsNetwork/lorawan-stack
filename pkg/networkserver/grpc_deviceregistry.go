@@ -42,25 +42,11 @@ func validABPSessionKey(key *ttnpb.KeyEnvelope) bool {
 
 // Set implements NsEndDeviceRegistryServer.
 func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest) (*ttnpb.EndDevice, error) {
-	if err := ttnpb.ProhibitFields(req.FieldMask.Paths,
-		"mac_state.current_parameters",
-		"mac_state.desired_parameters",
-		"pending_session",
-		"session.keys.app_s_key",
-	); err != nil {
-		return nil, errInvalidFieldMask.WithCause(err)
-	}
-
 	if err := rights.RequireApplication(ctx, req.EndDevice.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
 
 	gets := append(req.FieldMask.Paths[:0:0], req.FieldMask.Paths...)
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "queued_application_downlinks") {
-		gets = append(gets,
-			"mac_state.device_class",
-		)
-	}
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.device_class") {
 		gets = append(gets,
 			"mac_state.current_parameters",
@@ -72,12 +58,6 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	var addDownlinkTask bool
 	dev, err := ns.devices.SetByID(ctx, req.EndDevice.EndDeviceIdentifiers.ApplicationIdentifiers, req.EndDevice.EndDeviceIdentifiers.DeviceID, gets, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		if dev != nil {
-			if err := ttnpb.ProhibitFields(req.FieldMask.Paths,
-				"session",
-			); err != nil {
-				return nil, nil, errInvalidFieldMask.WithCause(err)
-			}
-
 			addDownlinkTask = ttnpb.HasAnyField(req.FieldMask.Paths,
 				"mac_state.device_class",
 				"queued_application_downlinks",

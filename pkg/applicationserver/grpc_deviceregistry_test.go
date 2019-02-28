@@ -91,10 +91,10 @@ func TestDeviceRegistry(t *testing.T) {
 		_, err = client.Set(ctx, &ttnpb.SetEndDeviceRequest{
 			EndDevice: ttnpb.EndDevice{
 				EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
-				FrequencyPlanID:      "EU_863_870",
+				Formatters:           &ttnpb.MessagePayloadFormatters{},
 			},
 			FieldMask: pbtypes.FieldMask{
-				Paths: []string{"frequency_plan_id"},
+				Paths: []string{"formatters"},
 			},
 		})
 		a.So(errors.IsUnauthenticated(err), should.BeTrue)
@@ -120,10 +120,10 @@ func TestDeviceRegistry(t *testing.T) {
 		_, err = client.Set(ctx, &ttnpb.SetEndDeviceRequest{
 			EndDevice: ttnpb.EndDevice{
 				EndDeviceIdentifiers: otherID,
-				FrequencyPlanID:      "EU_863_870",
+				Formatters:           &ttnpb.MessagePayloadFormatters{},
 			},
 			FieldMask: pbtypes.FieldMask{
-				Paths: []string{"frequency_plan_id"},
+				Paths: []string{"formatters"},
 			},
 		}, creds)
 		a.So(errors.IsPermissionDenied(err), should.BeTrue)

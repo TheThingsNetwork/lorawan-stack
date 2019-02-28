@@ -18,7 +18,6 @@ import (
 	"context"
 	stdio "io"
 	"os"
-	"strings"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
@@ -353,7 +352,10 @@ var (
 			res, err := setEndDevice(&device, nil, nsPaths, asPaths, jsPaths, true)
 			if err != nil {
 				logger.WithError(err).Error("Could not create end device, rolling back...")
-				return deleteEndDevice(context.Background(), &device.EndDeviceIdentifiers)
+				if err := deleteEndDevice(context.Background(), &device.EndDeviceIdentifiers); err != nil {
+					logger.WithError(err).Error("Could not roll back end device creation")
+				}
+				return err
 			}
 
 			device.SetFields(res, append(append(nsPaths, asPaths...), jsPaths...)...)
@@ -587,24 +589,21 @@ var (
 
 func init() {
 	util.FieldMaskFlags(&ttnpb.EndDevice{}).VisitAll(func(flag *pflag.Flag) {
-		path := strings.Split(flag.Name, ".")
-		if getEndDevicePathFromIS(path...) {
+		if selectPath(flag.Name, getEndDeviceFromIS) {
 			selectEndDeviceListFlags.AddFlag(flag)
 			selectEndDeviceFlags.AddFlag(flag)
-		}
-		if getEndDevicePathFromNS(path...) ||
-			getEndDevicePathFromAS(path...) ||
-			getEndDevicePathFromJS(path...) {
+		} else if selectPath(flag.Name, getEndDeviceFromNS) ||
+			selectPath(flag.Name, getEndDeviceFromAS) ||
+			selectPath(flag.Name, getEndDeviceFromJS) {
 			selectEndDeviceFlags.AddFlag(flag)
 		}
 	})
 
 	util.FieldFlags(&ttnpb.EndDevice{}).VisitAll(func(flag *pflag.Flag) {
-		path := strings.Split(flag.Name, ".")
-		if setEndDevicePathToIS(path...) ||
-			setEndDevicePathToNS(path...) ||
-			setEndDevicePathToAS(path...) ||
-			setEndDevicePathToJS(path...) {
+		if selectPath(flag.Name, setEndDeviceToIS) ||
+			selectPath(flag.Name, setEndDeviceToNS) ||
+			selectPath(flag.Name, setEndDeviceToAS) ||
+			selectPath(flag.Name, setEndDeviceToJS) {
 			setEndDeviceFlags.AddFlag(flag)
 		}
 	})
