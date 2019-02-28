@@ -118,8 +118,9 @@ var (
 			oauth2Config = &oauth2.Config{
 				ClientID: "cli",
 				Endpoint: oauth2.Endpoint{
-					AuthURL:  fmt.Sprintf("%s/oauth/authorize", config.OAuthServerAddress),
-					TokenURL: fmt.Sprintf("%s/oauth/token", config.OAuthServerAddress),
+					AuthURL:   fmt.Sprintf("%s/oauth/authorize", config.OAuthServerAddress),
+					TokenURL:  fmt.Sprintf("%s/oauth/token", config.OAuthServerAddress),
+					AuthStyle: oauth2.AuthStyleInParams,
 				},
 			}
 
