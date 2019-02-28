@@ -26,6 +26,7 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
+	"go.thethings.network/lorawan-stack/cmd/internal/commands"
 	"go.thethings.network/lorawan-stack/cmd/internal/shared/version"
 	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/api"
 	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/io"
@@ -192,11 +193,22 @@ func requireAuth() error {
 	return errUnauthenticated
 }
 
-var versionCommand = version.Print(name)
+var (
+	versionCommand     = version.Print(name)
+	genManPagesCommand = commands.GenManPages(Root)
+	genMDDocCommand    = commands.GenMDDoc(Root)
+	ganYAMLDocCommand  = commands.GenYAMLDoc(Root)
+)
 
 func init() {
 	Root.SetGlobalNormalizationFunc(util.NormalizeFlags)
 	Root.PersistentFlags().AddFlagSet(mgr.Flags())
 	versionCommand.PersistentPreRunE = preRun()
 	Root.AddCommand(versionCommand)
+	genManPagesCommand.PersistentPreRunE = preRun()
+	Root.AddCommand(genManPagesCommand)
+	genMDDocCommand.PersistentPreRunE = preRun()
+	Root.AddCommand(genMDDocCommand)
+	ganYAMLDocCommand.PersistentPreRunE = preRun()
+	Root.AddCommand(ganYAMLDocCommand)
 }

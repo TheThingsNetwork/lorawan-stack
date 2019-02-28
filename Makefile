@@ -36,6 +36,15 @@ include .make/sdk/main.make
 messages:
 	@$(GO) run ./cmd/internal/generate_i18n.go
 
+docs:
+	@rm -f doc/ttn-lw-{stack,cli}/*.{md,1,yaml}
+	@$(GO) run ./cmd/ttn-lw-stack gen-man-pages --log.level=error -o doc/ttn-lw-stack
+	@$(GO) run ./cmd/ttn-lw-stack gen-md-doc --log.level=error -o doc/ttn-lw-stack
+	@$(GO) run ./cmd/ttn-lw-stack gen-yaml-doc --log.level=error -o doc/ttn-lw-stack
+	@$(GO) run ./cmd/ttn-lw-cli gen-man-pages --log.level=error -o doc/ttn-lw-cli
+	@$(GO) run ./cmd/ttn-lw-cli gen-md-doc --log.level=error -o doc/ttn-lw-cli
+	@$(GO) run ./cmd/ttn-lw-cli gen-yaml-doc --log.level=error -o doc/ttn-lw-cli
+
 dev-deps: go.deps js.dev-deps
 
 deps: go.deps sdk.deps sdk.js.build js.deps
