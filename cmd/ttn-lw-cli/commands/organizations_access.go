@@ -87,7 +87,7 @@ var (
 			}
 			rights := getRights(cmd.Flags())
 			if len(rights) == 0 {
-				logger.Info("No rights selected, will remove collaborator")
+				return errNoCollaboratorRights
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerAddress)
@@ -99,6 +99,38 @@ var (
 				Collaborator: ttnpb.Collaborator{
 					OrganizationOrUserIdentifiers: *collaborator,
 					Rights:                        rights,
+				},
+			})
+			if err != nil {
+				return err
+			}
+
+			return nil
+		},
+	}
+	organizationCollaboratorsDelete = &cobra.Command{
+		Use:     "delete",
+		Aliases: []string{"remove"},
+		Short:   "Delete an organization collaborator",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			orgID := getOrganizationID(cmd.Flags(), nil)
+			if orgID == nil {
+				return errNoOrganizationID
+			}
+			collaborator := getCollaborator(cmd.Flags())
+			if collaborator == nil {
+				return errNoCollaborator
+			}
+
+			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			if err != nil {
+				return err
+			}
+			_, err = ttnpb.NewOrganizationAccessClient(is).SetCollaborator(ctx, &ttnpb.SetOrganizationCollaboratorRequest{
+				OrganizationIdentifiers: *orgID,
+				Collaborator: ttnpb.Collaborator{
+					OrganizationOrUserIdentifiers: *collaborator,
+					Rights:                        nil,
 				},
 			})
 			if err != nil {
@@ -148,8 +180,7 @@ var (
 
 			rights := getRights(cmd.Flags())
 			if len(rights) == 0 {
-				logger.Info("No rights selected, won't create API key")
-				return nil
+				return errNoAPIKeyRights
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerAddress)
@@ -190,7 +221,7 @@ var (
 
 			rights := getRights(cmd.Flags())
 			if len(rights) == 0 {
-				logger.Info("No rights selected, will remove API key")
+				return errNoAPIKeyRights
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerAddress)
@@ -203,6 +234,38 @@ var (
 					ID:     id,
 					Name:   name,
 					Rights: rights,
+				},
+			})
+			if err != nil {
+				return err
+			}
+
+			return nil
+		},
+	}
+	organizationAPIKeysDelete = &cobra.Command{
+		Use:     "delete",
+		Aliases: []string{"remove"},
+		Short:   "Delete an organization API key",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			id := getAPIKeyID(cmd.Flags(), args)
+			if id == "" {
+				return errNoAPIKeyID
+			}
+			orgID := getOrganizationID(cmd.Flags(), nil)
+			if orgID == nil {
+				return errNoOrganizationID
+			}
+
+			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			if err != nil {
+				return err
+			}
+			_, err = ttnpb.NewOrganizationAccessClient(is).UpdateAPIKey(ctx, &ttnpb.UpdateOrganizationAPIKeyRequest{
+				OrganizationIdentifiers: *orgID,
+				APIKey: ttnpb.APIKey{
+					ID:     id,
+					Rights: nil,
 				},
 			})
 			if err != nil {
@@ -226,6 +289,8 @@ func init() {
 	organizationCollaboratorsSet.Flags().AddFlagSet(collaboratorFlags())
 	organizationCollaboratorsSet.Flags().AddFlagSet(organizationRightsFlags)
 	organizationCollaborators.AddCommand(organizationCollaboratorsSet)
+	organizationCollaboratorsDelete.Flags().AddFlagSet(collaboratorFlags())
+	organizationCollaborators.AddCommand(organizationCollaboratorsDelete)
 	organizationCollaborators.PersistentFlags().AddFlagSet(organizationIDFlags())
 	organizationsCommand.AddCommand(organizationCollaborators)
 
@@ -237,6 +302,8 @@ func init() {
 	organizationAPIKeysUpdate.Flags().String("name", "", "")
 	organizationAPIKeysUpdate.Flags().AddFlagSet(organizationRightsFlags)
 	organizationAPIKeys.AddCommand(organizationAPIKeysUpdate)
+	organizationAPIKeysDelete.Flags().String("api-key-id", "", "")
+	organizationAPIKeys.AddCommand(organizationAPIKeysDelete)
 	organizationAPIKeys.PersistentFlags().AddFlagSet(organizationIDFlags())
 	organizationsCommand.AddCommand(organizationAPIKeys)
 }

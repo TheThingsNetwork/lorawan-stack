@@ -32,7 +32,10 @@ func collaboratorFlags() *pflag.FlagSet {
 	return flagSet
 }
 
-var errNoCollaborator = errors.DefineInvalidArgument("no_collaborator", "no collaborator set")
+var (
+	errNoCollaborator       = errors.DefineInvalidArgument("no_collaborator", "no collaborator set")
+	errNoCollaboratorRights = errors.DefineInvalidArgument("no_collaborator_rights", "no collaborator rights set")
+)
 
 func getCollaborator(flagSet *pflag.FlagSet) *ttnpb.OrganizationOrUserIdentifiers {
 	organizationID, _ := flagSet.GetString("organization-id")
@@ -93,7 +96,10 @@ func getRights(flagSet *pflag.FlagSet) (rights []ttnpb.Right) {
 	return
 }
 
-var errNoAPIKeyID = errors.DefineInvalidArgument("no_api_key_id", "no API key ID set")
+var (
+	errNoAPIKeyID     = errors.DefineInvalidArgument("no_api_key_id", "no API key ID set")
+	errNoAPIKeyRights = errors.DefineInvalidArgument("no_api_key_rights", "no API key rights set")
+)
 
 func getAPIKeyID(flagSet *pflag.FlagSet, args []string) string {
 	var apiKeyID string

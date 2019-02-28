@@ -86,8 +86,7 @@ var (
 
 			rights := getRights(cmd.Flags())
 			if len(rights) == 0 {
-				logger.Info("No rights selected, won't create API key")
-				return nil
+				return errNoAPIKeyRights
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerAddress)
@@ -128,7 +127,7 @@ var (
 
 			rights := getRights(cmd.Flags())
 			if len(rights) == 0 {
-				logger.Info("No rights selected, will remove API key")
+				return errNoAPIKeyRights
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerAddress)
@@ -141,6 +140,38 @@ var (
 					ID:     id,
 					Name:   name,
 					Rights: rights,
+				},
+			})
+			if err != nil {
+				return err
+			}
+
+			return nil
+		},
+	}
+	userAPIKeysDelete = &cobra.Command{
+		Use:     "delete",
+		Aliases: []string{"remove"},
+		Short:   "Delete a user API key",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			id := getAPIKeyID(cmd.Flags(), args)
+			if id == "" {
+				return errNoAPIKeyID
+			}
+			usrID := getUserID(cmd.Flags(), nil)
+			if usrID == nil {
+				return errNoUserID
+			}
+
+			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			if err != nil {
+				return err
+			}
+			_, err = ttnpb.NewUserAccessClient(is).UpdateAPIKey(ctx, &ttnpb.UpdateUserAPIKeyRequest{
+				UserIdentifiers: *usrID,
+				APIKey: ttnpb.APIKey{
+					ID:     id,
+					Rights: nil,
 				},
 			})
 			if err != nil {
@@ -168,6 +199,8 @@ func init() {
 	userAPIKeysUpdate.Flags().String("name", "", "")
 	userAPIKeysUpdate.Flags().AddFlagSet(userRightsFlags)
 	userAPIKeys.AddCommand(userAPIKeysUpdate)
+	userAPIKeysDelete.Flags().String("api-key-id", "", "")
+	userAPIKeys.AddCommand(userAPIKeysDelete)
 	userAPIKeys.PersistentFlags().AddFlagSet(userIDFlags())
 	usersCommand.AddCommand(userAPIKeys)
 }
