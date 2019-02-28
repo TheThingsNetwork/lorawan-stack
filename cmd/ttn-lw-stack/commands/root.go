@@ -19,6 +19,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"go.thethings.network/lorawan-stack/cmd/internal/commands"
 	"go.thethings.network/lorawan-stack/cmd/internal/shared"
 	"go.thethings.network/lorawan-stack/cmd/internal/shared/version"
 	conf "go.thethings.network/lorawan-stack/pkg/config"
@@ -71,4 +72,7 @@ var (
 func init() {
 	Root.PersistentFlags().AddFlagSet(mgr.Flags())
 	Root.AddCommand(version.Print(name))
+	Root.AddCommand(commands.GenManPages(Root))
+	Root.AddCommand(commands.GenMDDoc(Root))
+	Root.AddCommand(commands.GenYAMLDoc(Root))
 }

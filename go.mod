@@ -21,6 +21,7 @@ require (
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/certifi/gocertifi v0.0.0-20190105021004-abcd57078448 // indirect
 	github.com/client9/misspell v0.3.4
+	github.com/cpuguy83/go-md2man v1.0.8 // indirect
 	github.com/denisenkom/go-mssqldb v0.0.0-20190204142019-df6d76eb9289 // indirect
 	github.com/disintegration/imaging v1.6.0
 	github.com/eclipse/paho.mqtt.golang v1.1.1
