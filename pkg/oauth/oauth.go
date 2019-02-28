@@ -21,8 +21,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/RangelReale/osin"
 	"github.com/labstack/echo"
+	"github.com/openshift/osin"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/jsonpb"
@@ -161,12 +161,8 @@ func (r tokenRequest) Values() (values url.Values) {
 	if r.RedirectURI != "" {
 		values.Set("redirect_uri", r.RedirectURI)
 	}
-	if r.ClientID != "" {
-		values.Set("client_id", r.ClientID)
-	}
-	if r.ClientSecret != "" {
-		values.Set("client_secret", r.ClientSecret)
-	}
+	values.Set("client_id", r.ClientID)
+	values.Set("client_secret", r.ClientSecret)
 	return
 }
 

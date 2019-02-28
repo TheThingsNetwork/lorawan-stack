@@ -15,7 +15,7 @@
 package oauth
 
 import (
-	"github.com/RangelReale/osin"
+	"github.com/openshift/osin"
 	"go.thethings.network/lorawan-stack/pkg/auth"
 )
 

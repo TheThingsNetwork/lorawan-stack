@@ -121,12 +121,10 @@ var (
 		},
 	}
 	usersCreateCommand = &cobra.Command{
-		Use:     "create",
-		Aliases: []string{"add", "register"},
-		Short:   "Create a user",
-		PreRun: func(cmd *cobra.Command, args []string) {
-			api.SetAuth("", "") // Unset auth on this call
-		},
+		Use:               "create",
+		Aliases:           []string{"add", "register"},
+		Short:             "Create a user",
+		PersistentPreRunE: preRun(optionalAuth),
 		RunE: asBulk(func(cmd *cobra.Command, args []string) (err error) {
 			usrID := getUserID(cmd.Flags(), args)
 			var user ttnpb.User
