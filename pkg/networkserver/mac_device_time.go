@@ -38,6 +38,10 @@ func handleDeviceTimeReq(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.U
 		}
 		ts = append(ts, *md.Time)
 	}
+	if len(ts) == 0 {
+		return nil
+	}
+
 	sort.Slice(ts, func(i, j int) bool {
 		return ts[i].Before(ts[j])
 	})
