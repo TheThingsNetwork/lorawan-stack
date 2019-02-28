@@ -16,7 +16,6 @@ package commands
 
 import (
 	"context"
-	"strings"
 
 	"github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/api"
@@ -24,326 +23,51 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-// getEndDevicePathFromIS returns whether the field with given path should be
-// retrieved from the Identity Server.
-func getEndDevicePathFromIS(pathParts ...string) bool {
-	switch pathParts[0] {
-	case
-		"application_server_address",
-		"attributes",
-		"description",
-		"join_server_address",
-		"locations",
-		"name",
-		"network_server_address",
-		"service_profile_id",
-		"version_ids":
-		return true
-	}
-	return false
-}
-
-// setEndDevicePathToIS returns whether the field with given path should be
-// set in the Identity Server.
-func setEndDevicePathToIS(pathParts ...string) bool {
-	switch pathParts[0] {
-	case
-		"application_server_address",
-		"attributes",
-		"description",
-		"join_server_address",
-		"locations",
-		"name",
-		"network_server_address",
-		"service_profile_id",
-		"version_ids":
-		return true
-	}
-	return false
-}
-
-// getEndDevicePathFromNS returns whether the field with given path should be
-// retrieved from the Network Server.
-func getEndDevicePathFromNS(pathParts ...string) bool {
-	switch pathParts[0] {
-	case
-		"battery_percentage",
-		"downlink_margin",
-		"frequency_plan_id",
-		"last_dev_status_received_at",
-		"lorawan_phy_version",
-		"lorawan_version",
-		"mac_settings",
-		"mac_state",
-		"max_frequency",
-		"min_frequency",
-		"power_state",
-		"recent_downlinks",
-		"recent_uplinks",
-		"resets_join_nonces",
-		"supports_class_b",
-		"supports_class_c",
-		"supports_join":
-		return true
-	case "session":
-		if len(pathParts) == 1 {
+func selectPath(path string, allowedPaths []string) bool {
+	for _, allowedPath := range allowedPaths {
+		if path == allowedPath {
 			return true
 		}
-		switch pathParts[1] {
-		case
-			"dev_addr",
-			"last_f_cnt_up",
-			"last_n_f_cnt_down",
-			"last_conf_f_cnt_down",
-			"started_at":
-			return true
-		case "keys":
-			if len(pathParts) == 2 {
-				return true
-			}
-			switch pathParts[2] {
-			case
-				"f_nwk_s_int_key",
-				"s_nwk_s_int_key",
-				"nwk_s_enc_key":
-				return true
-			}
-		}
 	}
 	return false
 }
 
-// setEndDevicePathToNS returns whether the field with given path should be
-// set in the Network Server.
-func setEndDevicePathToNS(pathParts ...string) bool {
-	switch pathParts[0] {
-	case
-		"frequency_plan_id",
-		"lorawan_phy_version",
-		"lorawan_version",
-		"mac_settings",
-		"max_frequency",
-		"min_frequency",
-		"resets_join_nonces",
-		"supports_class_b",
-		"supports_class_c",
-		"supports_join":
-		return true
-	case "session":
-		if len(pathParts) == 1 {
-			return false // Only set specific fields.
-		}
-		switch pathParts[1] {
-		case
-			"dev_addr",
-			"last_conf_f_cnt_down",
-			"last_f_cnt_up",
-			"last_n_f_cnt_down",
-			"started_at":
-			return true
-		case "keys":
-			if len(pathParts) < 4 {
-				return false // Only set specific fields.
-			}
-			switch pathParts[2] {
-			case
-				"f_nwk_s_int_key",
-				"nwk_s_enc_key",
-				"s_nwk_s_int_key":
-				return pathParts[3] == "key"
-			}
-		}
-	}
-	return false
-}
+var (
+	getEndDeviceFromIS = ttnpb.AllowedFieldMaskPathsForRPC["/ttn.lorawan.v3.EndDeviceRegistry/Get"]
+	getEndDeviceFromNS = ttnpb.AllowedFieldMaskPathsForRPC["/ttn.lorawan.v3.NsEndDeviceRegistry/Get"]
+	getEndDeviceFromAS = ttnpb.AllowedFieldMaskPathsForRPC["/ttn.lorawan.v3.AsEndDeviceRegistry/Get"]
+	getEndDeviceFromJS = ttnpb.AllowedFieldMaskPathsForRPC["/ttn.lorawan.v3.JsEndDeviceRegistry/Get"]
+	setEndDeviceToIS   = ttnpb.AllowedFieldMaskPathsForRPC["/ttn.lorawan.v3.EndDeviceRegistry/Update"]
+	setEndDeviceToNS   = ttnpb.AllowedFieldMaskPathsForRPC["/ttn.lorawan.v3.NsEndDeviceRegistry/Set"]
+	setEndDeviceToAS   = ttnpb.AllowedFieldMaskPathsForRPC["/ttn.lorawan.v3.AsEndDeviceRegistry/Set"]
+	setEndDeviceToJS   = ttnpb.AllowedFieldMaskPathsForRPC["/ttn.lorawan.v3.JsEndDeviceRegistry/Set"]
+)
 
-// getEndDevicePathFromAS returns whether the field with given path should be
-// retrieved from the Application Server.
-func getEndDevicePathFromAS(pathParts ...string) bool {
-	switch pathParts[0] {
-	case
-		"formatters",
-		"queued_application_downlinks":
-		return true
-	case "session":
-		if len(pathParts) == 1 {
-			return true
-		}
-		switch pathParts[1] {
-		case
-			"last_a_f_cnt_down":
-			return true
-		case "keys":
-			if len(pathParts) == 2 {
-				return true
-			}
-			switch pathParts[2] {
-			case
-				"app_s_key":
-				return true
-			}
+func selectPaths(paths []string, allowedPaths []string) []string {
+	selectedPaths := make([]string, 0, len(paths))
+	for _, path := range paths {
+		if selectPath(path, allowedPaths) {
+			selectedPaths = append(selectedPaths, path)
+			continue
 		}
 	}
-	return false
-}
-
-// setEndDevicePathToAS returns whether the field with given path should be
-// set in the Application Server.
-func setEndDevicePathToAS(pathParts ...string) bool {
-	switch pathParts[0] {
-	case "formatters":
-		return true
-	case "session":
-		if len(pathParts) == 1 {
-			return false // Only set specific fields.
-		}
-		switch pathParts[1] {
-		case
-			"dev_addr",
-			"last_a_f_cnt_down":
-			return true
-		case "keys":
-			if len(pathParts) < 4 {
-				return false // Only set specific fields.
-			}
-			switch pathParts[2] {
-			case
-				"app_s_key":
-				return pathParts[3] == "key"
-			}
-		}
-	}
-	return false
-}
-
-// getEndDevicePathFromJS returns whether the field with given path should be
-// retrieved from the Join Server.
-func getEndDevicePathFromJS(pathParts ...string) bool {
-	switch pathParts[0] {
-	case
-		"last_dev_nonce",
-		"last_join_nonce",
-		"last_rj_count_0",
-		"last_rj_count_1",
-		"net_id",
-		"provisioner_id",
-		"provisioning_data",
-		"resets_join_nonces",
-		"root_keys",
-		"used_dev_nonces":
-		return true
-	}
-	return false
-}
-
-// setEndDevicePathToJS returns whether the field with given path should be
-// set in the Join Server.
-func setEndDevicePathToJS(pathParts ...string) bool {
-	switch pathParts[0] {
-	case
-		"application_server_address",
-		"last_dev_nonce",
-		"last_join_nonce",
-		"last_rj_count_0",
-		"last_rj_count_1",
-		"net_id",
-		"network_server_address",
-		"provisioner_id",
-		"provisioning_data",
-		"resets_join_nonces",
-		"root_keys",
-		"used_dev_nonces":
-		return true
-	}
-	return false
+	return selectedPaths
 }
 
 func splitEndDeviceGetPaths(paths ...string) (is, ns, as, js []string) {
-	var unassigned []string
-	for _, path := range paths {
-		switch path {
-		case "session.keys.session_key_id": // Ignore.
-			continue
-		}
-		parts := strings.Split(path, ".")
-		switch parts[0] {
-		case "ids", "created_at", "updated_at":
-			continue
-		case "pending_session": // Ignore.
-			continue
-		}
-		var assigned bool
-		if getEndDevicePathFromIS(parts...) {
-			is = append(is, path)
-			assigned = true
-		}
-		if getEndDevicePathFromNS(parts...) {
-			ns = append(ns, path)
-			assigned = true
-		}
-		if getEndDevicePathFromAS(parts...) {
-			as = append(as, path)
-			assigned = true
-		}
-		if getEndDevicePathFromJS(parts...) {
-			js = append(js, path)
-			assigned = true
-		}
-		if !assigned {
-			switch path {
-			// Here we can ignore intentionally unassigned paths/
-			default:
-				unassigned = append(unassigned, path)
-			}
-		}
-	}
-	if len(unassigned) > 0 {
-		logger.WithField("fields", unassigned).Warn("Some fields could not be assigned to a server")
-	}
+	is = selectPaths(paths, getEndDeviceFromIS)
+	ns = selectPaths(paths, getEndDeviceFromNS)
+	as = selectPaths(paths, getEndDeviceFromAS)
+	js = selectPaths(paths, getEndDeviceFromJS)
 	return
 }
 
 func splitEndDeviceSetPaths(supportsJoin bool, paths ...string) (is, ns, as, js []string) {
-	var unassigned []string
-	for _, path := range paths {
-		switch path {
-		case "session.keys.session_key_id": // Ignore.
-			continue
-		}
-		parts := strings.Split(path, ".")
-		switch parts[0] {
-		case "ids", "created_at", "updated_at":
-			continue
-		case "pending_session": // Ignore.
-			continue
-		}
-		var assigned bool
-		if setEndDevicePathToIS(parts...) {
-			is = append(is, path)
-			assigned = true
-		}
-		if setEndDevicePathToNS(parts...) {
-			ns = append(ns, path)
-			assigned = true
-		}
-		if setEndDevicePathToAS(parts...) {
-			as = append(as, path)
-			assigned = true
-		}
-		if supportsJoin && setEndDevicePathToJS(parts...) {
-			js = append(js, path)
-			assigned = true
-		}
-		if !assigned {
-			switch path {
-			// Here we can ignore intentionally unassigned paths.
-			default:
-				unassigned = append(unassigned, path)
-			}
-		}
-	}
-	if len(unassigned) > 0 {
-		logger.WithField("fields", unassigned).Warn("Some fields could not be assigned to a server")
+	is = selectPaths(paths, setEndDeviceToIS)
+	ns = selectPaths(paths, setEndDeviceToNS)
+	as = selectPaths(paths, setEndDeviceToAS)
+	if supportsJoin {
+		js = selectPaths(paths, setEndDeviceToJS)
 	}
 	return
 }
