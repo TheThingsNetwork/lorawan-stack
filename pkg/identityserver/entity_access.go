@@ -34,7 +34,9 @@ import (
 var (
 	errUnauthenticated          = errors.DefineUnauthenticated("unauthenticated", "unauthenticated")
 	errUnsupportedAuthorization = errors.DefineUnauthenticated("unsupported_authorization", "Unsupported authorization method")
+	errAPIKeyNotFound           = errors.DefineUnauthenticated("api_key_not_found", "API key not found")
 	errInvalidAuthorization     = errors.DefinePermissionDenied("invalid_authorization", "invalid authorization")
+	errTokenNotFound            = errors.DefineUnauthenticated("token_not_found", "access token not found")
 	errTokenExpired             = errors.DefineUnauthenticated("token_expired", "access token expired")
 	errOAuthClientRejected      = errors.DefinePermissionDenied("oauth_client_rejected", "OAuth client was rejected")
 	errOAuthClientSuspended     = errors.DefinePermissionDenied("oauth_client_suspended", "OAuth client was suspended")
@@ -99,6 +101,9 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 		fetch = func(db *gorm.DB) error {
 			ids, apiKey, err := store.GetAPIKeyStore(db).GetAPIKey(ctx, tokenID)
 			if err != nil {
+				if errors.IsNotFound(err) {
+					return errAPIKeyNotFound.WithCause(err)
+				}
 				return err
 			}
 			valid, err := auth.Password(apiKey.GetKey()).Validate(tokenKey)
@@ -119,6 +124,9 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 			if userIDs := ids.GetUserIDs(); userIDs != nil {
 				user, err = store.GetUserStore(db).GetUser(ctx, userIDs, userFieldMask)
 				if err != nil {
+					if errors.IsNotFound(err) {
+						return errAPIKeyNotFound.WithCause(err)
+					}
 					return err
 				}
 				userRights = ttnpb.RightsFrom(apiKey.Rights...)
@@ -129,6 +137,9 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 		fetch = func(db *gorm.DB) error {
 			accessToken, err := store.GetOAuthStore(db).GetAccessToken(ctx, tokenID)
 			if err != nil {
+				if errors.IsNotFound(err) {
+					return errTokenNotFound.WithCause(err)
+				}
 				return err
 			}
 			valid, err := auth.Password(accessToken.GetAccessToken()).Validate(tokenKey)
@@ -148,10 +159,16 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 			}
 			user, err = store.GetUserStore(db).GetUser(ctx, &accessToken.UserIDs, userFieldMask)
 			if err != nil {
+				if errors.IsNotFound(err) {
+					return errTokenNotFound.WithCause(err)
+				}
 				return err
 			}
 			client, err := store.GetClientStore(db).GetClient(ctx, &accessToken.ClientIDs, clientFieldMask)
 			if err != nil {
+				if errors.IsNotFound(err) {
+					return errTokenNotFound.WithCause(err)
+				}
 				return err
 			}
 			switch client.State {

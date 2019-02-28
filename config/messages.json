@@ -2969,6 +2969,15 @@
       "file": "contact_info_store.go"
     }
   },
+  "error:pkg/identityserver:api_key_not_found": {
+    "translations": {
+      "en": "API key not found"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "entity_access.go"
+    }
+  },
   "error:pkg/identityserver:client_update_admin_field": {
     "translations": {
       "en": "only admins can update the `{field}` field"
@@ -3125,6 +3134,15 @@
   "error:pkg/identityserver:token_expired": {
     "translations": {
       "en": "access token expired"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "entity_access.go"
+    }
+  },
+  "error:pkg/identityserver:token_not_found": {
+    "translations": {
+      "en": "access token not found"
     },
     "description": {
       "package": "pkg/identityserver",
