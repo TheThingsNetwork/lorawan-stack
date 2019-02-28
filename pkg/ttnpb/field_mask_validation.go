@@ -57,7 +57,8 @@ var isEndDeviceWriteFieldPaths = []string{
 	"version_ids.model_id",
 }
 
-var allowedFieldMaskPathsForRPC = map[string][]string{
+// AllowedFieldMaskPathsForRPC lists the allowed field mask paths for each RPC in this API.
+var AllowedFieldMaskPathsForRPC = map[string][]string{
 	// Applications:
 	"/ttn.lorawan.v3.ApplicationRegistry/Get":                 ApplicationFieldPathsNested,
 	"/ttn.lorawan.v3.ApplicationRegistry/List":                ApplicationFieldPathsNested,
@@ -575,10 +576,4 @@ var allowedFieldMaskPathsForRPC = map[string][]string{
 	"/ttn.lorawan.v3.UserRegistry/Get":                 UserFieldPathsNested,
 	"/ttn.lorawan.v3.UserRegistry/Update":              UserFieldPathsNested,
 	"/ttn.lorawan.v3.EntityRegistrySearch/SearchUsers": UserFieldPathsNested,
-}
-
-// AllowedFieldMaskPathsForRPC returns the list of allowed field mask paths for
-// the given RPC method.
-func AllowedFieldMaskPathsForRPC(rpcFullMethod string) []string {
-	return allowedFieldMaskPathsForRPC[rpcFullMethod]
 }
