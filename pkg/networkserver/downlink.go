@@ -738,6 +738,8 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 								}, nil
 							}
 						}
+						// Rx1 did not get scheduled, so we restore the original state of the device.
+						dev = devCopy
 					}
 				}
 				if dev.MACState.QueuedJoinAccept != nil {
