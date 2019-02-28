@@ -19,7 +19,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/RangelReale/osin"
+	"github.com/openshift/osin"
 	"go.thethings.network/lorawan-stack/pkg/auth"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"

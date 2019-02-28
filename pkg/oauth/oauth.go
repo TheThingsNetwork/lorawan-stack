@@ -21,8 +21,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/RangelReale/osin"
 	"github.com/labstack/echo"
+	"github.com/openshift/osin"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/jsonpb"

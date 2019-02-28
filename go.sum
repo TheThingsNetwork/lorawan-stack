@@ -28,8 +28,6 @@ github.com/PuerkitoBio/purell v1.1.0 h1:rmGxhojJlM0tuKtfdvliR84CFHljx9ag64t2xmVk
 github.com/PuerkitoBio/purell v1.1.0/go.mod h1:c11w/QuzBsJSee3cPx9rAFu61PvFxuPbtSwDGJws/X0=
 github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 h1:d+Bc7a5rLufV/sSk/8dngufqelfh6jnri85riMAaF/M=
 github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578/go.mod h1:uGdkoq3SwY9Y+13GIhn11/XLaGBb4BfwItxLd5jeuXE=
-github.com/RangelReale/osin v1.0.1 h1:JcqBe8ljQq9WQJPtioXGxBWyIcfuVMw0BX6yJ9E4HKw=
-github.com/RangelReale/osin v1.0.1/go.mod h1:k/PH1SjZDitJDtK3zHm/XZRi+bRz6i3rhx9qE9p54CY=
 github.com/TheThingsIndustries/magepkg v0.0.0-20190214092847-6c0299b7c3ed h1:rsGbnyV9cP0ocol1W17uTbZ1iWcEeg+gp3ivzW6NQ6Q=
 github.com/TheThingsIndustries/magepkg v0.0.0-20190214092847-6c0299b7c3ed/go.mod h1:InVSk9cxzZR1y4QaHF4CbDQ/uFeoTnbJfnwiKM04UNo=
 github.com/TheThingsIndustries/mystique v0.0.0-20181023142449-f12a32cee6d6 h1:bU/mzNwvlF6Rn/5Qk9g8+/bSWmK2Iz+9XaemmJo4nBk=
@@ -286,6 +284,8 @@ github.com/onsi/ginkgo v1.7.0 h1:WSHQ+IS43OoUrWtD1/bbclrwK8TTH5hzp+umCiuxHgs=
 github.com/onsi/ginkgo v1.7.0/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=
 github.com/onsi/gomega v1.4.3 h1:RE1xgDvH7imwFD45h+u2SgIfERHlS2yNG4DObb5BSKU=
 github.com/onsi/gomega v1.4.3/go.mod h1:ex+gbHU/CVuBBDIJjb2X0qEXbFg53c61hWP/1CpauHY=
+github.com/openshift/osin v1.0.1 h1:2hYushQtTLGVfnKAmz1+/ln5GZD0ykJCavs2JIwVEfQ=
+github.com/openshift/osin v1.0.1/go.mod h1:/gGuqQHvGNST0GB+Pomi3398FTdcM+9UaXafpqHvfDM=
 github.com/openzipkin/zipkin-go v0.1.1/go.mod h1:NtoC/o8u3JlF1lSlyPNswIbeQH9bJTmOf0Erfk+hxe8=
 github.com/openzipkin/zipkin-go v0.1.3/go.mod h1:NtoC/o8u3JlF1lSlyPNswIbeQH9bJTmOf0Erfk+hxe8=
 github.com/pborman/uuid v1.2.0 h1:J7Q5mO4ysT1dv8hyrUGHb9+ooztCXu1D8MY8DZYsu3g=

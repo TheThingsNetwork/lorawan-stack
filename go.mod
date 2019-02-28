@@ -13,7 +13,6 @@ require (
 	github.com/Azure/azure-storage-blob-go v0.0.0-20190123011202-457680cc0804 // indirect
 	github.com/PuerkitoBio/purell v1.1.0
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
-	github.com/RangelReale/osin v1.0.1
 	github.com/TheThingsIndustries/magepkg v0.0.0-20190214092847-6c0299b7c3ed
 	github.com/TheThingsIndustries/mystique v0.0.0-20181023142449-f12a32cee6d6
 	github.com/TheThingsNetwork/go-cayenne-lib v1.0.0
@@ -81,6 +80,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.1 // indirect
 	github.com/onsi/ginkgo v1.7.0 // indirect
 	github.com/onsi/gomega v1.4.3 // indirect
+	github.com/openshift/osin v1.0.1
 	github.com/pborman/uuid v1.2.0 // indirect
 	github.com/pkg/errors v0.8.1
 	github.com/prometheus/client_golang v0.9.2
