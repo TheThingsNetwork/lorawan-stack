@@ -3833,6 +3833,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/networkserver:frequency_plan": {
+    "translations": {
+      "en": "invalid frequency plan"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/networkserver:gateway_server_not_found": {
     "translations": {
       "en": "Gateway Server not found"
