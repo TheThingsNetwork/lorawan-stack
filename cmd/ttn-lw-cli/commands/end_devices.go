@@ -353,7 +353,10 @@ var (
 			res, err := setEndDevice(&device, nil, nsPaths, asPaths, jsPaths, true)
 			if err != nil {
 				logger.WithError(err).Error("Could not create end device, rolling back...")
-				return deleteEndDevice(context.Background(), &device.EndDeviceIdentifiers)
+				if err := deleteEndDevice(context.Background(), &device.EndDeviceIdentifiers); err != nil {
+					logger.WithError(err).Error("Could not roll back end device creation")
+				}
+				return err
 			}
 
 			device.SetFields(res, append(append(nsPaths, asPaths...), jsPaths...)...)
