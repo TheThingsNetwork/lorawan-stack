@@ -35,7 +35,7 @@ var (
 	errUnauthenticated          = errors.DefineUnauthenticated("unauthenticated", "unauthenticated")
 	errUnsupportedAuthorization = errors.DefineUnauthenticated("unsupported_authorization", "Unsupported authorization method")
 	errAPIKeyNotFound           = errors.DefineUnauthenticated("api_key_not_found", "API key not found")
-	errInvalidAuthorization     = errors.DefinePermissionDenied("invalid_authorization", "invalid authorization")
+	errInvalidAuthorization     = errors.DefineUnauthenticated("invalid_authorization", "invalid authorization")
 	errTokenNotFound            = errors.DefineUnauthenticated("token_not_found", "access token not found")
 	errTokenExpired             = errors.DefineUnauthenticated("token_expired", "access token expired")
 	errOAuthClientRejected      = errors.DefinePermissionDenied("oauth_client_rejected", "OAuth client was rejected")
