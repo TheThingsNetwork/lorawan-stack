@@ -35,7 +35,7 @@ func TestResetMACState(t *testing.T) {
 		ErrorAssertion     func(*testing.T, error) bool
 	}{
 		{
-			Name: "1.1/EU868",
+			Name: "1.1/EU868/OTAA",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
 				LoRaWANVersion:    ttnpb.MAC_V1_1,
@@ -45,6 +45,7 @@ func TestResetMACState(t *testing.T) {
 						Value: ttnpb.RX_DELAY_13,
 					},
 				},
+				SupportsJoin: true,
 			},
 			DeviceDiff: func(dev *ttnpb.EndDevice) {
 				fp := test.Must(frequencyplans.NewStore(test.FrequencyPlansFetcher).GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
@@ -186,7 +187,200 @@ func TestResetMACState(t *testing.T) {
 			FrequencyPlanStore: frequencyplans.NewStore(test.FrequencyPlansFetcher),
 		},
 		{
-			Name: "1.1/US915",
+			Name: "1.1/EU868/ABP",
+			Device: &ttnpb.EndDevice{
+				FrequencyPlanID:   test.EUFrequencyPlanID,
+				LoRaWANVersion:    ttnpb.MAC_V1_1,
+				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+				MACSettings: &ttnpb.MACSettings{
+					DesiredRx1Delay: &ttnpb.MACSettings_RxDelayValue{
+						Value: ttnpb.RX_DELAY_13,
+					},
+				},
+			},
+			DeviceDiff: func(dev *ttnpb.EndDevice) {
+				fp := test.Must(frequencyplans.NewStore(test.FrequencyPlansFetcher).GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
+				band := test.Must(band.GetByID(fp.BandID)).(band.Band)
+				dev.MACState = &ttnpb.MACState{
+					DeviceClass:         ttnpb.CLASS_A,
+					LoRaWANVersion:      ttnpb.MAC_V1_1,
+					PingSlotPeriodicity: ttnpb.PING_EVERY_1S,
+					CurrentParameters: ttnpb.MACParameters{
+						ADRAckDelay:            uint32(band.ADRAckDelay),
+						ADRAckLimit:            uint32(band.ADRAckLimit),
+						ADRDataRateIndex:       0,
+						ADRNbTrans:             1,
+						ADRTxPowerIndex:        0,
+						BeaconFrequency:        0,
+						DownlinkDwellTime:      false,
+						MaxDutyCycle:           ttnpb.DUTY_CYCLE_1,
+						MaxEIRP:                band.DefaultMaxEIRP,
+						PingSlotDataRateIndex:  ttnpb.DATA_RATE_0,
+						PingSlotFrequency:      0,
+						RejoinCountPeriodicity: ttnpb.REJOIN_COUNT_16,
+						RejoinTimePeriodicity:  ttnpb.REJOIN_TIME_0,
+						Rx1DataRateOffset:      0,
+						Rx1Delay:               ttnpb.RxDelay(band.ReceiveDelay1.Seconds()),
+						Rx2DataRateIndex:       band.DefaultRx2Parameters.DataRateIndex,
+						Rx2Frequency:           band.DefaultRx2Parameters.Frequency,
+						UplinkDwellTime:        false,
+						Channels: []*ttnpb.MACParameters_Channel{
+							{
+								UplinkFrequency:   868100000,
+								DownlinkFrequency: 868100000,
+								MinDataRateIndex:  ttnpb.DATA_RATE_0,
+								MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+								EnableUplink:      true,
+							},
+							{
+								UplinkFrequency:   868300000,
+								DownlinkFrequency: 868300000,
+								MinDataRateIndex:  ttnpb.DATA_RATE_0,
+								MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+								EnableUplink:      true,
+							},
+							{
+								UplinkFrequency:   868500000,
+								DownlinkFrequency: 868500000,
+								MinDataRateIndex:  ttnpb.DATA_RATE_0,
+								MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+								EnableUplink:      true,
+							},
+							{
+								UplinkFrequency:   867100000,
+								DownlinkFrequency: 867100000,
+								MinDataRateIndex:  ttnpb.DATA_RATE_0,
+								MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+								EnableUplink:      true,
+							},
+							{
+								UplinkFrequency:   867300000,
+								DownlinkFrequency: 867300000,
+								MinDataRateIndex:  ttnpb.DATA_RATE_0,
+								MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+								EnableUplink:      true,
+							},
+							{
+								UplinkFrequency:   867500000,
+								DownlinkFrequency: 867500000,
+								MinDataRateIndex:  ttnpb.DATA_RATE_0,
+								MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+								EnableUplink:      true,
+							},
+							{
+								UplinkFrequency:   867700000,
+								DownlinkFrequency: 867700000,
+								MinDataRateIndex:  ttnpb.DATA_RATE_0,
+								MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+								EnableUplink:      true,
+							},
+							{
+								UplinkFrequency:   867900000,
+								DownlinkFrequency: 867900000,
+								MinDataRateIndex:  ttnpb.DATA_RATE_0,
+								MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+								EnableUplink:      true,
+							},
+							{
+								UplinkFrequency:   869525000,
+								DownlinkFrequency: 869525000,
+								MinDataRateIndex:  ttnpb.DATA_RATE_0,
+								MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+								EnableUplink:      true,
+							},
+						},
+					},
+					DesiredParameters: ttnpb.MACParameters{
+						ADRAckDelay:            uint32(band.ADRAckDelay),
+						ADRAckLimit:            uint32(band.ADRAckLimit),
+						ADRDataRateIndex:       0,
+						ADRNbTrans:             1,
+						ADRTxPowerIndex:        0,
+						BeaconFrequency:        0,
+						DownlinkDwellTime:      false,
+						MaxDutyCycle:           ttnpb.DUTY_CYCLE_1,
+						MaxEIRP:                band.DefaultMaxEIRP,
+						PingSlotDataRateIndex:  ttnpb.DATA_RATE_0,
+						PingSlotFrequency:      0,
+						RejoinCountPeriodicity: ttnpb.REJOIN_COUNT_16,
+						RejoinTimePeriodicity:  ttnpb.REJOIN_TIME_0,
+						Rx1DataRateOffset:      0,
+						Rx1Delay:               ttnpb.RX_DELAY_13,
+						Rx2DataRateIndex:       band.DefaultRx2Parameters.DataRateIndex,
+						Rx2Frequency:           band.DefaultRx2Parameters.Frequency,
+						UplinkDwellTime:        false,
+						Channels: []*ttnpb.MACParameters_Channel{
+							{
+								UplinkFrequency:   868100000,
+								DownlinkFrequency: 868100000,
+								MinDataRateIndex:  ttnpb.DATA_RATE_0,
+								MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+								EnableUplink:      true,
+							},
+							{
+								UplinkFrequency:   868300000,
+								DownlinkFrequency: 868300000,
+								MinDataRateIndex:  ttnpb.DATA_RATE_0,
+								MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+								EnableUplink:      true,
+							},
+							{
+								UplinkFrequency:   868500000,
+								DownlinkFrequency: 868500000,
+								MinDataRateIndex:  ttnpb.DATA_RATE_0,
+								MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+								EnableUplink:      true,
+							},
+							{
+								UplinkFrequency:   867100000,
+								DownlinkFrequency: 867100000,
+								MinDataRateIndex:  ttnpb.DATA_RATE_0,
+								MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+								EnableUplink:      true,
+							},
+							{
+								UplinkFrequency:   867300000,
+								DownlinkFrequency: 867300000,
+								MinDataRateIndex:  ttnpb.DATA_RATE_0,
+								MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+								EnableUplink:      true,
+							},
+							{
+								UplinkFrequency:   867500000,
+								DownlinkFrequency: 867500000,
+								MinDataRateIndex:  ttnpb.DATA_RATE_0,
+								MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+								EnableUplink:      true,
+							},
+							{
+								UplinkFrequency:   867700000,
+								DownlinkFrequency: 867700000,
+								MinDataRateIndex:  ttnpb.DATA_RATE_0,
+								MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+								EnableUplink:      true,
+							},
+							{
+								UplinkFrequency:   867900000,
+								DownlinkFrequency: 867900000,
+								MinDataRateIndex:  ttnpb.DATA_RATE_0,
+								MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+								EnableUplink:      true,
+							},
+							{
+								UplinkFrequency:   869525000,
+								DownlinkFrequency: 869525000,
+								MinDataRateIndex:  ttnpb.DATA_RATE_0,
+								MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+								EnableUplink:      true,
+							},
+						},
+					},
+				}
+			},
+			FrequencyPlanStore: frequencyplans.NewStore(test.FrequencyPlansFetcher),
+		},
+		{
+			Name: "1.1/US915/OTAA",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.USFrequencyPlanID,
 				LoRaWANVersion:    ttnpb.MAC_V1_1,
@@ -196,6 +390,7 @@ func TestResetMACState(t *testing.T) {
 						Value: ttnpb.RX_DELAY_13,
 					},
 				},
+				SupportsJoin: true,
 			},
 			DeviceDiff: func() func(dev *ttnpb.EndDevice) {
 				var bandChannels []*ttnpb.MACParameters_Channel
