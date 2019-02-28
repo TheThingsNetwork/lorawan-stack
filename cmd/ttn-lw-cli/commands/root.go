@@ -166,6 +166,14 @@ func refreshToken() error {
 
 var errUnauthenticated = errors.DefineUnauthenticated("unauthenticated", "not authenticated with either API key or OAuth access token")
 
+func optionalAuth() error {
+	err := requireAuth()
+	if err != nil && !errors.IsUnauthenticated(err) {
+		return err
+	}
+	return nil
+}
+
 func requireAuth() error {
 	if apiKey, ok := cache.Get("api_key").(string); ok {
 		logger.Debug("Using API key")
@@ -184,8 +192,11 @@ func requireAuth() error {
 	return errUnauthenticated
 }
 
+var versionCommand = version.Print(name)
+
 func init() {
 	Root.SetGlobalNormalizationFunc(util.NormalizeFlags)
 	Root.PersistentFlags().AddFlagSet(mgr.Flags())
-	Root.AddCommand(version.Print(name))
+	versionCommand.PersistentPreRunE = preRun()
+	Root.AddCommand(versionCommand)
 }

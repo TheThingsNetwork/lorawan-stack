@@ -33,8 +33,9 @@ import (
 
 var (
 	loginCommand = &cobra.Command{
-		Use:   "login",
-		Short: "Login",
+		Use:               "login",
+		Short:             "Login",
+		PersistentPreRunE: preRun(),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx, done := context.WithCancel(ctx)
 			defer done()

@@ -1331,6 +1331,15 @@
       "file": "users.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:unauthenticated": {
+    "translations": {
+      "en": "not authenticated with either API key or OAuth access token"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "root.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/internal/util:flag_value": {
     "translations": {
       "en": "invalid flag value"

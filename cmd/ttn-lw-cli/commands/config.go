@@ -58,6 +58,9 @@ var DefaultConfig = Config{
 	JoinServerAddress:        clusterGRPCAddress,
 }
 
+var configCommand = commands.Config(mgr)
+
 func init() {
-	Root.AddCommand(commands.Config(mgr))
+	versionCommand.PersistentPreRunE = preRun()
+	Root.AddCommand(configCommand)
 }
