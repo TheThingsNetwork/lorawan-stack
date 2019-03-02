@@ -1394,6 +1394,15 @@
       "file": "mqtt.go"
     }
   },
+  "error:pkg/applicationserver/io/web/redis:invalid_identifiers": {
+    "translations": {
+      "en": "invalid identifiers"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/web/redis",
+      "file": "registry.go"
+    }
+  },
   "error:pkg/applicationserver/io/web:format_not_found": {
     "translations": {
       "en": "format `{format}` not found"
@@ -1451,6 +1460,24 @@
   "error:pkg/applicationserver/redis:application_uid": {
     "translations": {
       "en": "invalid application UID `{application_uid}`"
+    },
+    "description": {
+      "package": "pkg/applicationserver/redis",
+      "file": "registry.go"
+    }
+  },
+  "error:pkg/applicationserver/redis:duplicate_identifiers": {
+    "translations": {
+      "en": "duplicate identifiers"
+    },
+    "description": {
+      "package": "pkg/applicationserver/redis",
+      "file": "registry.go"
+    }
+  },
+  "error:pkg/applicationserver/redis:invalid_identifiers": {
+    "translations": {
+      "en": "invalid identifiers"
     },
     "description": {
       "package": "pkg/applicationserver/redis",
@@ -3206,6 +3233,15 @@
   "error:pkg/joinserver/redis:already_provisioned": {
     "translations": {
       "en": "device already provisioned"
+    },
+    "description": {
+      "package": "pkg/joinserver/redis",
+      "file": "registry.go"
+    }
+  },
+  "error:pkg/joinserver/redis:duplicate_identifiers": {
+    "translations": {
+      "en": "duplicate identifiers"
     },
     "description": {
       "package": "pkg/joinserver/redis",

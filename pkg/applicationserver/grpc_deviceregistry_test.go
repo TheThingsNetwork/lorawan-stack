@@ -150,17 +150,23 @@ func TestDeviceRegistry(t *testing.T) {
 				Paths: []string{"ids", "version_ids", "formatters"},
 			},
 		}, creds)
-		a.So(err, should.BeNil)
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
 		dev, err := client.Get(ctx, &ttnpb.GetEndDeviceRequest{
 			EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
 			FieldMask: pbtypes.FieldMask{
 				Paths: []string{"ids", "version_ids", "formatters"},
 			},
 		}, creds)
-		a.So(err, should.BeNil)
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
 		registeredDevice.CreatedAt = dev.CreatedAt
 		registeredDevice.UpdatedAt = dev.UpdatedAt
-		a.So(dev, should.HaveEmptyDiff, registeredDevice)
+		if !a.So(dev, should.HaveEmptyDiff, registeredDevice) {
+			t.FailNow()
+		}
 
 		// Update and assert new value.
 		registeredDevice.Formatters.UpFormatter = ttnpb.PayloadFormatter_FORMATTER_NONE
@@ -170,21 +176,29 @@ func TestDeviceRegistry(t *testing.T) {
 				Paths: []string{"formatters"},
 			},
 		}, creds)
-		a.So(err, should.BeNil)
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
 		dev, err = client.Get(ctx, &ttnpb.GetEndDeviceRequest{
 			EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
 			FieldMask: pbtypes.FieldMask{
 				Paths: []string{"ids", "version_ids", "formatters"},
 			},
 		}, creds)
-		a.So(err, should.BeNil)
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
 		registeredDevice.CreatedAt = dev.CreatedAt
 		registeredDevice.UpdatedAt = dev.UpdatedAt
-		a.So(dev, should.HaveEmptyDiff, registeredDevice)
+		if !a.So(dev, should.HaveEmptyDiff, registeredDevice) {
+			t.FailNow()
+		}
 
 		// Delete and assert it's gone.
 		_, err = client.Delete(ctx, &registeredDevice.EndDeviceIdentifiers, creds)
-		a.So(err, should.BeNil)
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
 		_, err = client.Get(ctx, &ttnpb.GetEndDeviceRequest{
 			EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
 			FieldMask: pbtypes.FieldMask{
