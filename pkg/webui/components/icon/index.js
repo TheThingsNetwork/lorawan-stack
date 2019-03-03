@@ -29,8 +29,8 @@ const hardcoded = {
   application: 'web_asset',
   gateway: 'router',
   organization: 'people',
-  payload_formats: 'code',
   api_keys: 'lock',
+  link: 'code',
   general_settings: 'settings',
 }
 

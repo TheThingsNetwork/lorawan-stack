@@ -41,6 +41,7 @@ export default defineMessages({
   generalSettings: 'General Settings',
   integrations: 'Integrations',
   keyId: 'Key ID',
+  link: 'Link',
   loading: 'Loading',
   login: 'Login',
   logout: 'Logout',

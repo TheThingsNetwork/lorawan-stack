@@ -67,6 +67,7 @@
   "lib.shared-messages.generalSettings": "General Settings",
   "lib.shared-messages.integrations": "Integrations",
   "lib.shared-messages.keyId": "Key ID",
+  "lib.shared-messages.link": "Link",
   "lib.shared-messages.loading": "Loading",
   "lib.shared-messages.login": "Login",
   "lib.shared-messages.logout": "Logout",
