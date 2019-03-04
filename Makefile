@@ -47,7 +47,7 @@ docs:
 
 dev-deps: go.deps js.dev-deps
 
-deps: go.deps sdk.deps sdk.js.build js.deps
+deps: go.deps js.deps sdk.deps sdk.js.build
 
 test: go.test js.test sdk.test
 
