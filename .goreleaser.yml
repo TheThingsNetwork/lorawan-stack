@@ -53,7 +53,6 @@ builds:
 
 archive:
   files:
-    - CODEOWNERS
     - LICENSE
     - README.md
     - doc/**/*
