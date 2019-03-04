@@ -28,6 +28,7 @@ const m = defineMessages({
   title: 'Please copy newly created API Key',
   subtitle: "You won't be able to view the key afterward",
   buttonMessage: 'I have copied the key',
+  grantedRights: 'Granted Rights',
   description: `Your API Key has been created successfully.
 Note: After closing this window, the value of the key secret will not be accessible anymore.
 Make sure to copy and store it in a safe place now.`,
@@ -52,6 +53,7 @@ const ApiKeyModal = function (props) {
       }}
     >
       <div className={style.left}>
+        <Message component="h4" content={m.grantedRights} />
         <ul>
           {rights.map(right => (
             <li key={right}>
