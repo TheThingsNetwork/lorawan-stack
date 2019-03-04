@@ -102,13 +102,19 @@ export class SafeInspector extends Component {
   }
 
   componentDidMount () {
+    const { disableResize } = this.props
     new clipboard(this.copyElem.current)
-    window.addEventListener('resize', this.handleWindowResize)
-    this.checkTruncateState()
+    if (!disableResize) {
+      window.addEventListener('resize', this.handleWindowResize)
+      this.checkTruncateState()
+    }
   }
 
   componentWillUmount () {
-    window.removeEventListener('resize', this.handleWindowResize)
+    const { disableResize } = this.props
+    if (!disableResize) {
+      window.removeEventListener('resize', this.handleWindowResize)
+    }
   }
 
   handleWindowResize () {
@@ -139,7 +145,13 @@ export class SafeInspector extends Component {
       copied,
     } = this.state
 
-    const { data, isBytes, hideable, small } = this.props
+    const {
+      className,
+      data,
+      isBytes,
+      hideable,
+      small,
+    } = this.props
 
     let formattedData = isBytes ? data.toUpperCase() : data
     let display = formattedData
@@ -156,7 +168,7 @@ export class SafeInspector extends Component {
       display = '•'.repeat(formattedData.length)
     }
 
-    const containerStyle = classnames(style.container, {
+    const containerStyle = classnames(className, style.container, {
       [style.containerSmall]: small,
       [style.containerHidden]: hidden,
     })
@@ -227,6 +239,7 @@ SafeInspector.defaultProps = {
   isBytes: true,
   initiallyVisible: false,
   hideable: true,
+  disableResize: false,
 }
 
 SafeInspector.propTypes = {
@@ -240,6 +253,8 @@ SafeInspector.propTypes = {
   hideable: PropTypes.bool,
   /** Whether a smaller style should be rendered (useful for display in tables) */
   small: PropTypes.bool,
+  /** Whether the component should resize when its data is truncated */
+  disableResize: PropTypes.bool,
 }
 
 export default SafeInspector

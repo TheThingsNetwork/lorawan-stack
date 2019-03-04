@@ -12,26 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const createGetRightsListActionType = name => (
-  `GET_${name}_RIGHTS_LIST`
-)
+.header
+  display: flex
+  justify-content: flex-start
+  align-items: center
+  flex-wrap: wrap
 
-export const createGetRightsListSuccessActionType = name => (
-  `GET_${name}_RIGHTS_LIST_SUCCESS`
-)
+  &-title
+    margin-right: $ls.xxs
 
-export const createGetRightsListFailureActionType = name => (
-  `GET_${name}_RIGHTS_LIST_FAILURE`
-)
-
-export const getRightsList = name => id => (
-  { type: createGetRightsListActionType(name), id }
-)
-
-export const getRightsListSuccess = name => rights => (
-  { type: createGetRightsListSuccessActionType(name), rights }
-)
-
-export const getRightsListFailure = name => error => (
-  { type: createGetRightsListFailureActionType(name), error }
-)

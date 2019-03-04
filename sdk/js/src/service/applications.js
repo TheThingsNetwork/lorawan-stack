@@ -15,6 +15,7 @@
 import Marshaler from '../util/marshaler'
 import Device from '../entity/device'
 import Application from '../entity/application'
+import ApiKeys from './api-keys'
 
 /**
  * Applications Class provides an abstraction on all applications and manages
@@ -35,6 +36,12 @@ class Applications {
       ? app => new Application(this, app, false)
       : undefined
 
+    this.ApiKeys = new ApiKeys(api.ApplicationAccess, {
+      list: 'application_id',
+      create: 'application_ids.application_id',
+      update: 'application_ids.application_id',
+    })
+
     this.getAll = this.getAll.bind(this)
     this.getById = this.getById.bind(this)
     this.getByOrganization = this.getByOrganization.bind(this)
@@ -44,12 +51,14 @@ class Applications {
     this.create = this.create.bind(this)
     this.deleteById = this.deleteById.bind(this)
     this.withId = this.withId.bind(this)
+    this.getRightsById = this.getRightsById.bind(this)
   }
 
   // Retrieval
 
   async getAll (params) {
     const result = await this._api.ApplicationRegistry.List({ query: params })
+
     return Marshaler.unwrapApplications(
       result,
       this._applicationTransform
@@ -138,6 +147,14 @@ class Applications {
     })
   }
 
+  async getRightsById (applicationId) {
+    const result = await this._api.ApplicationAccess.ListRights({
+      route: { application_id: applicationId },
+    })
+
+    return Marshaler.unwrapRights(result)
+  }
+
   // Shorthand to methods of single application
   withId (id) {
     const parent = this
@@ -154,14 +171,20 @@ class Applications {
         })
         return new Device(result, api)
       },
-      async getApiKeys () {
-        return api.ApplicationAccess.ListAPIKeys({ application_id: id })
+      async getApiKeys (params) {
+        return this.ApiKeys.getAll(id, params)
       },
       async getCollaborators () {
         return api.ApplicationAccess.ListCollaborators({ application_id: id })
       },
       async addApiKey (key) {
-        return api.ApplicationAccess.CreateAPIKey(idMask, key)
+        return this.ApiKeys.create(id, key)
+      },
+      async deleteApiKey (keyId) {
+        return this.ApiKeys.deleteById(id, keyId)
+      },
+      async updateApikey (keyId, patch) {
+        return this.ApiKeys.updateById(id, keyId, patch)
       },
       async addCollaborator (collaborator) {
         return api.ApplicationAccess.SetCollaborator(idMask, collaborator)

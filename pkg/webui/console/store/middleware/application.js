@@ -16,6 +16,7 @@ import { createLogic } from 'redux-logic'
 
 import api from '../../api'
 import * as application from '../actions/application'
+import * as applications from '../actions/applications'
 
 const getApplicationLogic = createLogic({
   type: [ application.GET_APP ],
@@ -41,7 +42,7 @@ const getApplicationApiKeysLogic = createLogic({
       dispatch(
         application.getApplicationApiKeysListSuccess(
           id,
-          res.applicationsApiKeys,
+          res.api_keys,
           res.totalCount
         )
       )
@@ -53,7 +54,20 @@ const getApplicationApiKeysLogic = createLogic({
   },
 })
 
+const getApplicationApiKeyDataLogic = createLogic({
+  type: application.GET_APP_API_KEY,
+  async process ({ getState, action }, dispatch, done) {
+    const { id } = action
+
+    dispatch(application.getApplicationApiKeysList(id))
+    dispatch(applications.getApplicationsRightsList(id))
+
+    done()
+  },
+})
+
 export default [
   getApplicationLogic,
   getApplicationApiKeysLogic,
+  getApplicationApiKeyDataLogic,
 ]

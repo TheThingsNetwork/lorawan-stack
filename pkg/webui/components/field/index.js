@@ -19,6 +19,7 @@ import { injectIntl } from 'react-intl'
 import PropTypes from '../../lib/prop-types'
 import from from '../../lib/from'
 import { warn } from '../../lib/log'
+import getByPath from '../../lib/get-by-path'
 
 import Icon from '../icon'
 import Input from '../input'
@@ -148,8 +149,8 @@ const Field = function (props) {
 
     // preserve default values for different inputs
     // make sure the checkbox component gets `false` as a falsy value
-    _value = values[name] || (type === 'checkbox' ? false : '')
-    _error = errors[name]
+    _value = getByPath(values, name) || (type === 'checkbox' ? false : '')
+    _error = getByPath(errors, name)
     _touched = touched[name]
     rest.value = _value
     rest.onChange = handleChange
@@ -268,4 +269,4 @@ const Err = function (props) {
 }
 
 export default injectIntl(Field)
-export { Field }
+export { Field, Err as FieldError }

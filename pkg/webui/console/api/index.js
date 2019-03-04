@@ -76,7 +76,10 @@ export default {
     create: ttnClient.Applications.create,
     update: ttnClient.Applications.updateById,
     apiKeys: {
-      list: stubs.application.apiKeys.list,
+      list: ttnClient.Applications.ApiKeys.getAll,
+      update: ttnClient.Applications.ApiKeys.updateById,
+      'delete': ttnClient.Applications.ApiKeys.deleteById,
+      create: ttnClient.Applications.ApiKeys.create,
     },
   },
   devices: {
@@ -88,6 +91,6 @@ export default {
     search: stubs.gateways.search,
   },
   rights: {
-    applications: stubs.rights.applications,
+    applications: ttnClient.Applications.getRightsById,
   },
 }

@@ -43,7 +43,7 @@ func (is *IdentityServer) listClientRights(ctx context.Context, ids *ttnpb.Clien
 	if !ok || cliRights == nil {
 		return &ttnpb.Rights{}, nil
 	}
-	return cliRights, nil
+	return cliRights.Intersect(ttnpb.AllClientRights), nil
 }
 
 func (is *IdentityServer) setClientCollaborator(ctx context.Context, req *ttnpb.SetClientCollaboratorRequest) (*types.Empty, error) {

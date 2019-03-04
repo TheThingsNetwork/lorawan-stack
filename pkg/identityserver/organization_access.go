@@ -46,7 +46,7 @@ func (is *IdentityServer) listOrganizationRights(ctx context.Context, ids *ttnpb
 	if !ok || orgRights == nil {
 		return &ttnpb.Rights{}, nil
 	}
-	return orgRights, nil
+	return orgRights.Intersect(ttnpb.AllEntityRights.Union(ttnpb.AllOrganizationRights)), nil
 }
 
 func (is *IdentityServer) createOrganizationAPIKey(ctx context.Context, req *ttnpb.CreateOrganizationAPIKeyRequest) (key *ttnpb.APIKey, err error) {

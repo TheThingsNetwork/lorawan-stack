@@ -17,6 +17,7 @@ import { Formik } from 'formik'
 import bind from 'autobind-decorator'
 
 import Field from '../field'
+import FieldGroup from '../field/group'
 import Button from '../button'
 import Notification from '../notification'
 import PropTypes from '../../lib/prop-types'
@@ -130,6 +131,11 @@ class InnerForm extends React.Component {
               onClick: handleReset,
             })
           }
+        } else if (Child.type === FieldGroup) {
+          return React.cloneElement(Child, {
+            ...Child.props,
+            errors,
+          })
         }
 
         return Child
@@ -185,13 +191,14 @@ const Form = ({
 )
 
 function recursiveMap (children, fn) {
-  return React.Children.map(children, function (child) {
-    if (!React.isValidElement(child)) {
-      return child
+  return React.Children.map(children, function (Child) {
+    if (!React.isValidElement(Child)) {
+      return Child
     }
 
+    let child = Child
     if (child.props.children) {
-      return React.cloneElement(child, {
+      child = React.cloneElement(child, {
         children: recursiveMap(child.props.children, fn),
       })
     }
