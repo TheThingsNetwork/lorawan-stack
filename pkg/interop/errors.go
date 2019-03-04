@@ -19,6 +19,7 @@ import (
 )
 
 var (
-	errUnknownMACVersion = errors.DefineInvalidArgument("unknown_mac_version", "unknown MAC version")
-	errInvalidLength = errors.DefineInvalidArgument("invalid_length", "invalid length")
+	errUnknownMACVersion  = errors.DefineInvalidArgument("unknown_mac_version", "unknown MAC version")
+	errInvalidLength      = errors.DefineInvalidArgument("invalid_length", "invalid length")
+	errInvalidRequestType = errors.DefineInvalidArgument("invalid_request_type", "invalid request type `{type}`")
 )

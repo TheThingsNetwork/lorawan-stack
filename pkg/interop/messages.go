@@ -28,12 +28,62 @@ type MessageHeader struct {
 	ReceiverToken   Buffer
 }
 
+// AnswerHeader returns the header of the answer message.
+func (h MessageHeader) AnswerHeader() (MessageHeader, error) {
+	var ansType MessageType
+	switch h.MessageType {
+	case MessageTypeJoinReq:
+		ansType = MessageTypeJoinAns
+	case MessageTypeRejoinReq:
+		ansType = MessageTypeRejoinAns
+	case MessageTypeAppSKeyReq:
+		ansType = MessageTypeAppSKeyAns
+	case MessageTypePRStartReq:
+		ansType = MessageTypePRStartAns
+	case MessageTypePRStopReq:
+		ansType = MessageTypePRStopAns
+	case MessageTypeHRStartReq:
+		ansType = MessageTypeHRStartAns
+	case MessageTypeHRStopReq:
+		ansType = MessageTypeHRStopAns
+	case MessageTypeHomeNSReq:
+		ansType = MessageTypeHomeNSAns
+	case MessageTypeProfileReq:
+		ansType = MessageTypeProfileAns
+	case MessageTypeXmitDataReq:
+		ansType = MessageTypeXmitDataAns
+	case MessageTypeXmitLocReq:
+		ansType = MessageTypeXmitLocAns
+	default:
+		return MessageHeader{}, errInvalidRequestType.WithAttributes("type", h.MessageType)
+	}
+	return MessageHeader{
+		ProtocolVersion: h.ProtocolVersion,
+		TransactionID:   h.TransactionID,
+		MessageType:     ansType,
+		ReceiverToken:   h.SenderToken,
+	}, nil
+}
+
 // NsJsMessageHeader contains the message header for NS to JS messages.
 type NsJsMessageHeader struct {
 	MessageHeader
 	SenderID types.NetID
 	// ReceiverID is a JoinEUI.
 	ReceiverID types.EUI64
+}
+
+// AnswerHeader returns the header of the answer message.
+func (h NsJsMessageHeader) AnswerHeader() (JsNsMessageHeader, error) {
+	header, err := h.MessageHeader.AnswerHeader()
+	if err != nil {
+		return JsNsMessageHeader{}, err
+	}
+	return JsNsMessageHeader{
+		MessageHeader: header,
+		SenderID:      h.ReceiverID,
+		ReceiverID:    h.SenderID,
+	}, nil
 }
 
 // JsNsMessageHeader contains the message header for JS to NS messages.
