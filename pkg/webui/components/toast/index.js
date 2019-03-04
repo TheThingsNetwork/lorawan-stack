@@ -48,7 +48,7 @@ ToastContainer.propTypes = {
   pauseOnHover: PropTypes.bool,
   closeOnClick: PropTypes.bool,
   pauseOnFocusLoss: PropTypes.bool,
-  transition: PropTypes.element,
+  transition: PropTypes.func,
 }
 
 ToastContainer.defaultProps = {
