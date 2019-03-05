@@ -8,6 +8,8 @@ replace github.com/alecthomas/gometalinter => github.com/alecthomas/gometalinter
 
 replace gopkg.in/alecthomas/kingpin.v3-unstable => gopkg.in/alecthomas/kingpin.v3-unstable v3.0.0-20171010053543-63abe20a23e2
 
+replace github.com/goreleaser/goreleaser => github.com/TheThingsIndustries/goreleaser v0.102.0-ttn
+
 require (
 	cloud.google.com/go v0.36.0 // indirect
 	github.com/Azure/azure-storage-blob-go v0.0.0-20190123011202-457680cc0804 // indirect
@@ -59,7 +61,6 @@ require (
 	github.com/jinzhu/gorm v1.9.2
 	github.com/jinzhu/inflection v0.0.0-20180308033659-04140366298a // indirect
 	github.com/jinzhu/now v0.0.0-20181116074157-8ec929ed50c3 // indirect
-	github.com/kamilsk/retry v0.0.0-20190129190859-56e8dbb8622b // indirect
 	github.com/kr/pretty v0.1.0
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/gommon v0.2.8
@@ -100,7 +101,6 @@ require (
 	github.com/spf13/pflag v1.0.3
 	github.com/spf13/viper v1.3.1
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
-	github.com/stretchr/testify v1.3.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v0.0.0-20170224212429-dcecefd839c4 // indirect
 	go.opencensus.io v0.19.0
