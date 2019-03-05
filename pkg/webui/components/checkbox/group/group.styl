@@ -26,6 +26,9 @@
   border-normal('bottom')
   border-radius: $br.s $br.s 0 0
   position: absolute
+  display: flex
+  align-items: center
+  justify-content: space-between
   top: 0
   left: 0
   padding: $cs.xs $cs.s
@@ -34,27 +37,17 @@
   background: inherit
   box-sizing: inherit
 
-  &-with-transfer
-    display: flex
-    align-items: center
-    justify-content: space-between
-
-    .header-count-label
-      padding-right: $cs.s
+  &-with-transfer.header-count-label
+    padding-right: $cs.s
 
   & > div
     display: flex
     justify-content: space-between
     align-items: center
-    flex-basis: 50%
 
   &-count-label
     text-align: right
-    flex-basis: 50%
     padding-right: 0
-
-  &-checkbox
-    margin-bottom: 0
 
 .body
   position: relative
@@ -91,6 +84,9 @@
     list-style: none
     background: inherit
 
+    li:not(:last-child)
+      margin-bottom: 0
+
     &-all,
     &-selected
       width: 100%
@@ -102,4 +98,4 @@
       border-normal('left')
 
     &-item
-      padding: $cs.xs $cs.s 0
+      padding: $cs.s

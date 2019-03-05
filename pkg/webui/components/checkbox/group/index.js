@@ -153,10 +153,10 @@ class CheckboxGroup extends React.Component {
             onChange={this.onSelectAll}
             value={allSelected}
           />
-          <span className={style.headerCountLabel}>
-            {`(${selectedCount}/${totalCount})`}
-          </span>
         </div>
+        <span className={style.headerCountLabel}>
+          {`(${selectedCount}/${totalCount})`}
+        </span>
         { transfer && <Message content={m.selections} />}
       </div>
     )

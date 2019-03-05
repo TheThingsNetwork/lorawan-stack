@@ -31,10 +31,12 @@
         margin-left: 30%
 
 .field
-  margin-bottom: $cs.l
   display: flex
   flex-wrap: wrap
   width: 100%
+
+  &:not(:only-child)
+    margin-bottom: $cs.l
 
   &.checkbox
     .component
@@ -50,6 +52,7 @@
       width: auto
       cursor: pointer
       vertical-align: middle
+      margin-bottom: 0
 
     .description
       order: 3
