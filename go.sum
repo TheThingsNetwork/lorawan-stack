@@ -28,6 +28,8 @@ github.com/PuerkitoBio/purell v1.1.0 h1:rmGxhojJlM0tuKtfdvliR84CFHljx9ag64t2xmVk
 github.com/PuerkitoBio/purell v1.1.0/go.mod h1:c11w/QuzBsJSee3cPx9rAFu61PvFxuPbtSwDGJws/X0=
 github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 h1:d+Bc7a5rLufV/sSk/8dngufqelfh6jnri85riMAaF/M=
 github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578/go.mod h1:uGdkoq3SwY9Y+13GIhn11/XLaGBb4BfwItxLd5jeuXE=
+github.com/TheThingsIndustries/goreleaser v0.102.0-ttn h1:bO0wxLdSlqVfTPwn20kDNiUR0UOQpnbyEZVqbe8ISRs=
+github.com/TheThingsIndustries/goreleaser v0.102.0-ttn/go.mod h1:gFykrGsDXTNvcYSMQH4lEpcxXHyE+7jSjf3hakwnBPQ=
 github.com/TheThingsIndustries/magepkg v0.0.0-20190214092847-6c0299b7c3ed h1:rsGbnyV9cP0ocol1W17uTbZ1iWcEeg+gp3ivzW6NQ6Q=
 github.com/TheThingsIndustries/magepkg v0.0.0-20190214092847-6c0299b7c3ed/go.mod h1:InVSk9cxzZR1y4QaHF4CbDQ/uFeoTnbJfnwiKM04UNo=
 github.com/TheThingsIndustries/mystique v0.0.0-20181023142449-f12a32cee6d6 h1:bU/mzNwvlF6Rn/5Qk9g8+/bSWmK2Iz+9XaemmJo4nBk=
@@ -216,10 +218,8 @@ github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af/go.mod h1:Nht
 github.com/jonboulle/clockwork v0.1.0/go.mod h1:Ii8DK3G1RaLaWxj9trq07+26W01tbo22gdxWY5EU2bo=
 github.com/jtolds/gls v4.2.1+incompatible/go.mod h1:QJZ7F/aHp+rZTRtaJ1ow/lLfFfVYBRgL+9YlvaHOwJU=
 github.com/julienschmidt/httprouter v1.2.0/go.mod h1:SYymIcj16QtmaHHD7aYtjjsJG7VTCxuUUipMqKk8s4w=
-github.com/kamilsk/retry v0.0.0-20181229152359-495c1d672c93 h1:aP888S37c3tqOCllQAxo5xDE+LJesxR0OH7zntgoPiM=
-github.com/kamilsk/retry v0.0.0-20181229152359-495c1d672c93/go.mod h1:vW4uuVWZOGWqkbtgGTNPGAiuN2nUBz0qYr4tb2ww4x8=
-github.com/kamilsk/retry v0.0.0-20190129190859-56e8dbb8622b h1:fcxSFm+2KesD/s6aOGcklSow+OLqLEfcHw+JrImetBA=
-github.com/kamilsk/retry v0.0.0-20190129190859-56e8dbb8622b/go.mod h1:vW4uuVWZOGWqkbtgGTNPGAiuN2nUBz0qYr4tb2ww4x8=
+github.com/kamilsk/retry/v4 v4.0.0 h1:XmnWZpK3FMoDGn28njHUkLzT92YRxAuV0GA0I+OPY6g=
+github.com/kamilsk/retry/v4 v4.0.0/go.mod h1:0af33qDvzbhQqdOBi7iOjEpmP4brbPmNZpo7chYlgcc=
 github.com/kisielk/gotool v1.0.0 h1:AV2c/EiW3KqPNT9ZKl07ehoAGi4C5/01Cfbblndcapg=
 github.com/kisielk/gotool v1.0.0/go.mod h1:XhKaO+MFFWcvkIS/tQcRk01m1F5IRFswLeQ+oQHNcck=
 github.com/konsorten/go-windows-terminal-sequences v0.0.0-20180402223658-b729f2633dfe/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
