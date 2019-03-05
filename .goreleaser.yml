@@ -128,5 +128,6 @@ dockers:
       - "thethingsnetwork/lorawan-stack:{{ .Major }}"
       - "thethingsnetwork/lorawan-stack:{{ .Major }}.{{ .Minor }}"
       - "thethingsnetwork/lorawan-stack:{{ .Major }}.{{ .Minor }}.{{ .Patch }}"
+      - "thethingsnetwork/lorawan-stack:{{ .Version }}"
     extra_files:
       - public
