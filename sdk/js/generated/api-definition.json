@@ -168,15 +168,44 @@
     },
     "DownlinkQueuePush": {
       "file": "lorawan-stack/api/applicationserver.proto",
-      "http": []
+      "http": [
+        {
+          "method": "post",
+          "pattern": "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/down/push",
+          "body": "*",
+          "parameters": [
+            "end_device_ids.application_ids.application_id",
+            "end_device_ids.device_id"
+          ]
+        }
+      ]
     },
     "DownlinkQueueReplace": {
       "file": "lorawan-stack/api/applicationserver.proto",
-      "http": []
+      "http": [
+        {
+          "method": "post",
+          "pattern": "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/down/replace",
+          "body": "*",
+          "parameters": [
+            "end_device_ids.application_ids.application_id",
+            "end_device_ids.device_id"
+          ]
+        }
+      ]
     },
     "DownlinkQueueList": {
       "file": "lorawan-stack/api/applicationserver.proto",
-      "http": []
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/as/applications/{application_ids.application_id}/devices/{device_id}/down",
+          "parameters": [
+            "application_ids.application_id",
+            "device_id"
+          ]
+        }
+      ]
     }
   },
   "As": {
@@ -185,9 +214,9 @@
       "http": [
         {
           "method": "get",
-          "pattern": "/as/applications/{application_id}/link",
+          "pattern": "/as/applications/{application_ids.application_id}/link",
           "parameters": [
-            "application_id"
+            "application_ids.application_id"
           ]
         }
       ]
@@ -216,9 +245,21 @@
           ]
         }
       ]
+    },
+    "GetLinkStats": {
+      "file": "lorawan-stack/api/applicationserver.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/as/applications/{application_id}/link/stats",
+          "parameters": [
+            "application_id"
+          ]
+        }
+      ]
     }
   },
-  "AsDeviceRegistry": {
+  "AsEndDeviceRegistry": {
     "Get": {
       "file": "lorawan-stack/api/applicationserver.proto",
       "http": [
@@ -240,8 +281,8 @@
           "pattern": "/as/applications/{end_device.ids.application_ids.application_id}/devices/{end_device.ids.device_id}",
           "body": "*",
           "parameters": [
-            "device.ids.application_ids.application_id",
-            "device.ids.device_id"
+            "end_device.ids.application_ids.application_id",
+            "end_device.ids.device_id"
           ]
         },
         {
@@ -249,7 +290,7 @@
           "pattern": "/as/applications/{end_device.ids.application_ids.application_id}/devices",
           "body": "*",
           "parameters": [
-            "device.ids.application_ids.application_id"
+            "end_device.ids.application_ids.application_id"
           ]
         }
       ]
@@ -263,6 +304,70 @@
           "parameters": [
             "application_ids.application_id",
             "device_id"
+          ]
+        }
+      ]
+    }
+  },
+  "ApplicationWebhookRegistry": {
+    "GetFormats": {
+      "file": "lorawan-stack/api/applicationserver_web.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/as/webhook-formats",
+          "parameters": []
+        }
+      ]
+    },
+    "Get": {
+      "file": "lorawan-stack/api/applicationserver_web.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/as/applications/{ids.application_ids.application_id}/webhooks/{ids.webhook_id}",
+          "parameters": [
+            "ids.application_ids.application_id",
+            "ids.webhook_id"
+          ]
+        }
+      ]
+    },
+    "List": {
+      "file": "lorawan-stack/api/applicationserver_web.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/as/applications/{application_ids.application_id}/webhooks",
+          "parameters": [
+            "application_ids.application_id"
+          ]
+        }
+      ]
+    },
+    "Set": {
+      "file": "lorawan-stack/api/applicationserver_web.proto",
+      "http": [
+        {
+          "method": "post",
+          "pattern": "/as/applications/{webhook.ids.application_ids.application_id}/webhooks/{webhook.ids.webhook_id}",
+          "body": "*",
+          "parameters": [
+            "webhook.ids.application_ids.application_id",
+            "webhook.ids.webhook_id"
+          ]
+        }
+      ]
+    },
+    "Delete": {
+      "file": "lorawan-stack/api/applicationserver_web.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/as/applications/{application_ids.application_id}/webhooks/{webhook_id}",
+          "parameters": [
+            "application_ids.application_id",
+            "webhook_id"
           ]
         }
       ]
@@ -392,12 +497,22 @@
     }
   },
   "ContactInfoRegistry": {
+    "RequestValidation": {
+      "file": "lorawan-stack/api/contact_info.proto",
+      "http": [
+        {
+          "method": "post",
+          "pattern": "/contact_info/validation",
+          "parameters": []
+        }
+      ]
+    },
     "Validate": {
       "file": "lorawan-stack/api/contact_info.proto",
       "http": [
         {
           "method": "patch",
-          "pattern": "/contact_info/validate",
+          "pattern": "/contact_info/validation",
           "parameters": []
         }
       ]
@@ -466,6 +581,19 @@
             "application_ids.application_id",
             "device_id"
           ]
+        }
+      ]
+    }
+  },
+  "Events": {
+    "Stream": {
+      "file": "lorawan-stack/api/events.proto",
+      "http": [
+        {
+          "method": "post",
+          "pattern": "/events",
+          "body": "*",
+          "parameters": []
         }
       ]
     }
@@ -588,6 +716,10 @@
         }
       ]
     },
+    "GetIdentifiersForEUI": {
+      "file": "lorawan-stack/api/gateway_services.proto",
+      "http": []
+    },
     "List": {
       "file": "lorawan-stack/api/gateway_services.proto",
       "http": [
@@ -641,7 +773,15 @@
   "Gs": {
     "GetGatewayConnectionStats": {
       "file": "lorawan-stack/api/gatewayserver.proto",
-      "http": []
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/gs/gateways/{gateway_id}/connection/stats",
+          "parameters": [
+            "gateway_id"
+          ]
+        }
+      ]
     }
   },
   "GtwGs": {
@@ -660,13 +800,35 @@
       "http": []
     }
   },
+  "EntityAccess": {
+    "AuthInfo": {
+      "file": "lorawan-stack/api/identityserver.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/auth_info",
+          "parameters": []
+        }
+      ]
+    }
+  },
+  "ApplicationCryptoService": {
+    "DeriveAppSKey": {
+      "file": "lorawan-stack/api/joinserver.proto",
+      "http": []
+    },
+    "GetAppKey": {
+      "file": "lorawan-stack/api/joinserver.proto",
+      "http": []
+    }
+  },
   "AsJs": {
     "GetAppSKey": {
       "file": "lorawan-stack/api/joinserver.proto",
       "http": []
     }
   },
-  "JsDeviceRegistry": {
+  "JsEndDeviceRegistry": {
     "Get": {
       "file": "lorawan-stack/api/joinserver.proto",
       "http": [
@@ -688,8 +850,8 @@
           "pattern": "/js/applications/{end_device.ids.application_ids.application_id}/devices/{end_device.ids.device_id}",
           "body": "*",
           "parameters": [
-            "device.ids.application_ids.application_id",
-            "device.ids.device_id"
+            "end_device.ids.application_ids.application_id",
+            "end_device.ids.device_id"
           ]
         },
         {
@@ -697,7 +859,20 @@
           "pattern": "/js/applications/{end_device.ids.application_ids.application_id}/devices",
           "body": "*",
           "parameters": [
-            "device.ids.application_ids.application_id"
+            "end_device.ids.application_ids.application_id"
+          ]
+        }
+      ]
+    },
+    "Provision": {
+      "file": "lorawan-stack/api/joinserver.proto",
+      "http": [
+        {
+          "method": "put",
+          "pattern": "/js/applications/{application_ids.application_id}/provision-devices",
+          "body": "*",
+          "parameters": [
+            "application_ids.application_id"
           ]
         }
       ]
@@ -714,6 +889,32 @@
           ]
         }
       ]
+    }
+  },
+  "NetworkCryptoService": {
+    "JoinRequestMIC": {
+      "file": "lorawan-stack/api/joinserver.proto",
+      "http": []
+    },
+    "JoinAcceptMIC": {
+      "file": "lorawan-stack/api/joinserver.proto",
+      "http": []
+    },
+    "EncryptJoinAccept": {
+      "file": "lorawan-stack/api/joinserver.proto",
+      "http": []
+    },
+    "EncryptRejoinAccept": {
+      "file": "lorawan-stack/api/joinserver.proto",
+      "http": []
+    },
+    "DeriveNwkSKeys": {
+      "file": "lorawan-stack/api/joinserver.proto",
+      "http": []
+    },
+    "GetNwkKey": {
+      "file": "lorawan-stack/api/joinserver.proto",
+      "http": []
     }
   },
   "NsJs": {
@@ -762,7 +963,7 @@
       "http": []
     }
   },
-  "NsDeviceRegistry": {
+  "NsEndDeviceRegistry": {
     "Get": {
       "file": "lorawan-stack/api/networkserver.proto",
       "http": [
@@ -784,8 +985,8 @@
           "pattern": "/ns/applications/{end_device.ids.application_ids.application_id}/devices/{end_device.ids.device_id}",
           "body": "*",
           "parameters": [
-            "device.ids.application_ids.application_id",
-            "device.ids.device_id"
+            "end_device.ids.application_ids.application_id",
+            "end_device.ids.device_id"
           ]
         },
         {
@@ -793,7 +994,7 @@
           "pattern": "/ns/applications/{end_device.ids.application_ids.application_id}/devices",
           "body": "*",
           "parameters": [
-            "device.ids.application_ids.application_id"
+            "end_device.ids.application_ids.application_id"
           ]
         }
       ]
@@ -807,6 +1008,60 @@
           "parameters": [
             "application_ids.application_id",
             "device_id"
+          ]
+        }
+      ]
+    }
+  },
+  "OAuthAuthorizationRegistry": {
+    "List": {
+      "file": "lorawan-stack/api/oauth_services.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/users/{user_ids.user_id}/authorizations",
+          "parameters": [
+            "user_ids.user_id"
+          ]
+        }
+      ]
+    },
+    "ListTokens": {
+      "file": "lorawan-stack/api/oauth_services.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/users/{user_ids.user_id}/authorizations/{client_ids.client_id}/tokens",
+          "parameters": [
+            "user_ids.user_id",
+            "client_ids.client_id"
+          ]
+        }
+      ]
+    },
+    "Delete": {
+      "file": "lorawan-stack/api/oauth_services.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/users/{user_ids.user_id}/authorizations/{client_ids.client_id}",
+          "parameters": [
+            "user_ids.user_id",
+            "client_ids.client_id"
+          ]
+        }
+      ]
+    },
+    "DeleteToken": {
+      "file": "lorawan-stack/api/oauth_services.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/users/{user_ids.user_id}/authorizations/{client_ids.client_id}/tokens/{id}",
+          "parameters": [
+            "user_ids.user_id",
+            "client_ids.client_id",
+            "id"
           ]
         }
       ]
@@ -1148,6 +1403,18 @@
         }
       ]
     },
+    "CreateTemporaryPassword": {
+      "file": "lorawan-stack/api/user_services.proto",
+      "http": [
+        {
+          "method": "post",
+          "pattern": "/users/{user_ids.user_id}/temporary_password",
+          "parameters": [
+            "user_ids.user_id"
+          ]
+        }
+      ]
+    },
     "UpdatePassword": {
       "file": "lorawan-stack/api/user_services.proto",
       "http": [
@@ -1169,6 +1436,33 @@
           "pattern": "/users/{user_id}",
           "parameters": [
             "user_id"
+          ]
+        }
+      ]
+    }
+  },
+  "UserSessionRegistry": {
+    "List": {
+      "file": "lorawan-stack/api/user_services.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/users/{user_ids.user_id}/sessions",
+          "parameters": [
+            "user_ids.user_id"
+          ]
+        }
+      ]
+    },
+    "Delete": {
+      "file": "lorawan-stack/api/user_services.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/users/{user_ids.user_id}/sessions/{session_id}",
+          "parameters": [
+            "user_ids.user_id",
+            "session_id"
           ]
         }
       ]
