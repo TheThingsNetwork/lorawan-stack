@@ -17,9 +17,11 @@ package networkserver_test
 import (
 	"context"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
+	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
@@ -114,523 +116,1154 @@ func TestLinkApplication(t *testing.T) {
 }
 
 func TestDownlinkQueueReplace(t *testing.T) {
-	ids := ttnpb.EndDeviceIdentifiers{
-		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-			ApplicationID: ApplicationID,
-		},
-		DeviceID: DeviceID,
-		JoinEUI:  &JoinEUI,
-		DevEUI:   &DevEUI,
-	}
-	ctx := test.Context()
-	authorizedCtx := rights.NewContext(ctx, rights.Rights{
-		ApplicationRights: map[string]*ttnpb.Rights{
-			unique.ID(ctx, ids.ApplicationIdentifiers): ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_LINK),
-		},
-	})
-	authorizedCtx = cluster.NewContext(authorizedCtx, errors.New("Cluster auth disabled"))
+	start := time.Now()
 
 	for _, tc := range []struct {
 		Name           string
-		Context        context.Context
-		Device         *ttnpb.EndDevice
+		ContextFunc    func(context.Context) context.Context
+		AddFunc        func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) error
+		SetByIDFunc    func(context.Context, ttnpb.ApplicationIdentifiers, string, []string, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
 		Request        *ttnpb.DownlinkQueueRequest
 		ErrorAssertion func(*testing.T, error) bool
+		AddCalls       uint64
+		SetByIDCalls   uint64
 	}{
 		{
-			Name:    "wrong auth",
-			Context: authorizedCtx,
-			Request: ttnpb.NewPopulatedDownlinkQueueRequest(test.Randy, false),
-			ErrorAssertion: func(t *testing.T, err error) bool {
-				a := assertions.New(t)
-				return a.So(err, should.BeError) && a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			Name: "No link rights",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
+							Rights: []ttnpb.Right{
+								ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC,
+							},
+						},
+					},
+				})
 			},
-		},
-		{
-			Name:    "no device",
-			Context: authorizedCtx,
+			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time) error {
+				err := errors.New("AddFunc must not be called")
+				test.MustTFromContext(ctx).Error(err)
+				return err
+			},
+			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+				err := errors.New("SetByIDFunc must not be called")
+				test.MustTFromContext(ctx).Error(err)
+				return nil, err
+			},
 			Request: &ttnpb.DownlinkQueueRequest{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: ids.ApplicationIdentifiers,
-					DeviceID:               "non-existent",
-					JoinEUI:                eui64Ptr(types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}),
-					DevEUI:                 eui64Ptr(types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}),
+					DeviceID:               "test-dev-id",
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
 				},
-				Downlinks: []*ttnpb.ApplicationDownlink{ttnpb.NewPopulatedApplicationDownlink(test.Randy, false)},
+				Downlinks: []*ttnpb.ApplicationDownlink{
+					{FCnt: 0},
+				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				if !assertions.New(t).So(errors.IsPermissionDenied(err), should.BeTrue) {
+					t.Errorf("Received error: %s", err)
+					return false
+				}
+				return true
+			},
+		},
+
+		{
+			Name: "Non-existing device",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
+							Rights: []ttnpb.Right{
+								ttnpb.RIGHT_APPLICATION_LINK,
+							},
+						},
+					},
+				})
+			},
+			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time) error {
+				err := errors.New("AddFunc must not be called")
+				test.MustTFromContext(ctx).Error(err)
+				return err
+			},
+			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
-				return a.So(err, should.BeError) && a.So(errors.IsNotFound(err), should.BeTrue)
-			},
-		},
-		{
-			Name:    "empty queue/empty request",
-			Context: authorizedCtx,
-			Device: &ttnpb.EndDevice{
-				EndDeviceIdentifiers:       ids,
-				QueuedApplicationDownlinks: nil,
-			},
-			Request: &ttnpb.DownlinkQueueRequest{
-				EndDeviceIdentifiers: ids,
-				Downlinks:            nil,
-			},
-		},
-		{
-			Name:    "empty queue/non-empty request",
-			Context: authorizedCtx,
-			Device: &ttnpb.EndDevice{
-				EndDeviceIdentifiers:       ids,
-				QueuedApplicationDownlinks: nil,
+				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
+				a.So(devID, should.Equal, "test-dev-id")
+				a.So(gets, should.HaveSameElementsDeep, []string{
+					"queued_application_downlinks",
+					"mac_state.device_class",
+				})
+
+				dev, sets, err := f(nil)
+				if !a.So(err, should.BeError) {
+					t.Error("Error was expected")
+					return nil, errors.New("Error was expected")
+				}
+				a.So(sets, should.BeNil)
+				a.So(dev, should.BeNil)
+				return nil, err
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
-				EndDeviceIdentifiers: ids,
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DeviceID:               "test-dev-id",
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+				},
 				Downlinks: []*ttnpb.ApplicationDownlink{
-					Downlinks[0],
-					Downlinks[2],
-					Downlinks[1],
+					{FCnt: 0},
 				},
 			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				if !assertions.New(t).So(errors.IsNotFound(err), should.BeTrue) {
+					t.Errorf("Received error: %s", err)
+					return false
+				}
+				return true
+			},
+			SetByIDCalls: 1,
 		},
+
 		{
-			Name:    "non-empty queue/empty request",
-			Context: authorizedCtx,
-			Device: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ids,
-				QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-					Downlinks[2],
-					Downlinks[1],
-					Downlinks[0],
-					Downlinks[4],
-				},
+			Name: "Valid request/replace/no MAC state",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
+							Rights: []ttnpb.Right{
+								ttnpb.RIGHT_APPLICATION_LINK,
+							},
+						},
+					},
+				})
+			},
+			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time) error {
+				err := errors.New("AddFunc must not be called")
+				test.MustTFromContext(ctx).Error(err)
+				return err
+			},
+			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
+				a.So(devID, should.Equal, "test-dev-id")
+				a.So(gets, should.HaveSameElementsDeep, []string{
+					"queued_application_downlinks",
+					"mac_state.device_class",
+				})
+
+				dev, sets, err := f(&ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						DeviceID:               "test-dev-id",
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+					},
+					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+						{FCnt: 1},
+						{FCnt: 2},
+						{FCnt: 3},
+						{FCnt: 5},
+					},
+				})
+				if !a.So(err, should.BeNil) {
+					return nil, err
+				}
+				a.So(sets, should.HaveSameElementsDeep, []string{
+					"queued_application_downlinks",
+				})
+				a.So(dev, should.Resemble, &ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						DeviceID:               "test-dev-id",
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+					},
+					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+						{FCnt: 0},
+						{FCnt: 42},
+					},
+				})
+				return dev, nil
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
-				EndDeviceIdentifiers: ids,
-			},
-		},
-		{
-			Name:    "non-empty queue/non-empty request",
-			Context: authorizedCtx,
-			Device: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ids,
-				QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-					Downlinks[2],
-					Downlinks[1],
-					Downlinks[0],
-					Downlinks[4],
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DeviceID:               "test-dev-id",
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
 				},
-			},
-			Request: &ttnpb.DownlinkQueueRequest{
-				EndDeviceIdentifiers: ids,
 				Downlinks: []*ttnpb.ApplicationDownlink{
-					Downlinks[0],
-					Downlinks[2],
-					Downlinks[1],
+					{FCnt: 0},
+					{FCnt: 42},
 				},
 			},
+			SetByIDCalls: 1,
+		},
+
+		{
+			Name: "Valid request/replace/Class A",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
+							Rights: []ttnpb.Right{
+								ttnpb.RIGHT_APPLICATION_LINK,
+							},
+						},
+					},
+				})
+			},
+			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time) error {
+				err := errors.New("AddFunc must not be called")
+				test.MustTFromContext(ctx).Error(err)
+				return err
+			},
+			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
+				a.So(devID, should.Equal, "test-dev-id")
+				a.So(gets, should.HaveSameElementsDeep, []string{
+					"queued_application_downlinks",
+					"mac_state.device_class",
+				})
+
+				dev, sets, err := f(&ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						DeviceID:               "test-dev-id",
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+					},
+					MACState: &ttnpb.MACState{
+						DeviceClass: ttnpb.CLASS_A,
+					},
+					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+						{FCnt: 1},
+						{FCnt: 2},
+						{FCnt: 3},
+						{FCnt: 5},
+					},
+				})
+				if !a.So(err, should.BeNil) {
+					return nil, err
+				}
+				a.So(sets, should.HaveSameElementsDeep, []string{
+					"queued_application_downlinks",
+				})
+				a.So(dev, should.Resemble, &ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						DeviceID:               "test-dev-id",
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+					},
+					MACState: &ttnpb.MACState{
+						DeviceClass: ttnpb.CLASS_A,
+					},
+					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+						{FCnt: 0},
+						{FCnt: 42},
+					},
+				})
+				return dev, nil
+			},
+			Request: &ttnpb.DownlinkQueueRequest{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DeviceID:               "test-dev-id",
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+				},
+				Downlinks: []*ttnpb.ApplicationDownlink{
+					{FCnt: 0},
+					{FCnt: 42},
+				},
+			},
+			SetByIDCalls: 1,
+		},
+
+		{
+			Name: "Valid request/replace/Class C",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
+							Rights: []ttnpb.Right{
+								ttnpb.RIGHT_APPLICATION_LINK,
+							},
+						},
+					},
+				})
+			},
+			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time) error {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(ids, should.Resemble, ttnpb.EndDeviceIdentifiers{
+					DeviceID:               "test-dev-id",
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+				})
+				a.So([]time.Time{start, at, time.Now()}, should.BeChronological)
+				return nil
+			},
+			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
+				a.So(devID, should.Equal, "test-dev-id")
+				a.So(gets, should.HaveSameElementsDeep, []string{
+					"queued_application_downlinks",
+					"mac_state.device_class",
+				})
+
+				dev, sets, err := f(&ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						DeviceID:               "test-dev-id",
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+					},
+					MACState: &ttnpb.MACState{
+						DeviceClass: ttnpb.CLASS_C,
+					},
+					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+						{FCnt: 1},
+						{FCnt: 2},
+						{FCnt: 3},
+						{FCnt: 5},
+					},
+				})
+				if !a.So(err, should.BeNil) {
+					return nil, err
+				}
+				a.So(sets, should.HaveSameElementsDeep, []string{
+					"queued_application_downlinks",
+				})
+				a.So(dev, should.Resemble, &ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						DeviceID:               "test-dev-id",
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+					},
+					MACState: &ttnpb.MACState{
+						DeviceClass: ttnpb.CLASS_C,
+					},
+					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+						{FCnt: 0},
+						{FCnt: 42},
+					},
+				})
+				return dev, nil
+			},
+			Request: &ttnpb.DownlinkQueueRequest{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DeviceID:               "test-dev-id",
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+				},
+				Downlinks: []*ttnpb.ApplicationDownlink{
+					{FCnt: 0},
+					{FCnt: 42},
+				},
+			},
+			AddCalls:     1,
+			SetByIDCalls: 1,
+		},
+
+		{
+			Name: "Valid request/delete/no MAC state",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
+							Rights: []ttnpb.Right{
+								ttnpb.RIGHT_APPLICATION_LINK,
+							},
+						},
+					},
+				})
+			},
+			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time) error {
+				err := errors.New("AddFunc must not be called")
+				test.MustTFromContext(ctx).Error(err)
+				return err
+			},
+			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
+				a.So(devID, should.Equal, "test-dev-id")
+				a.So(gets, should.HaveSameElementsDeep, []string{
+					"queued_application_downlinks",
+					"mac_state.device_class",
+				})
+
+				dev, sets, err := f(&ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						DeviceID:               "test-dev-id",
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+					},
+					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+						{FCnt: 1},
+						{FCnt: 2},
+						{FCnt: 3},
+						{FCnt: 5},
+					},
+				})
+				if !a.So(err, should.BeNil) {
+					return nil, err
+				}
+				a.So(sets, should.HaveSameElementsDeep, []string{
+					"queued_application_downlinks",
+				})
+				a.So(dev, should.Resemble, &ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						DeviceID:               "test-dev-id",
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+					},
+				})
+				return dev, nil
+			},
+			Request: &ttnpb.DownlinkQueueRequest{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DeviceID:               "test-dev-id",
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+				},
+			},
+			SetByIDCalls: 1,
+		},
+
+		{
+			Name: "Valid request/delete/Class A",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
+							Rights: []ttnpb.Right{
+								ttnpb.RIGHT_APPLICATION_LINK,
+							},
+						},
+					},
+				})
+			},
+			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time) error {
+				err := errors.New("AddFunc must not be called")
+				test.MustTFromContext(ctx).Error(err)
+				return err
+			},
+			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
+				a.So(devID, should.Equal, "test-dev-id")
+				a.So(gets, should.HaveSameElementsDeep, []string{
+					"queued_application_downlinks",
+					"mac_state.device_class",
+				})
+
+				dev, sets, err := f(&ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						DeviceID:               "test-dev-id",
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+					},
+					MACState: &ttnpb.MACState{
+						DeviceClass: ttnpb.CLASS_A,
+					},
+					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+						{FCnt: 1},
+						{FCnt: 2},
+						{FCnt: 3},
+						{FCnt: 5},
+					},
+				})
+				if !a.So(err, should.BeNil) {
+					return nil, err
+				}
+				a.So(sets, should.HaveSameElementsDeep, []string{
+					"queued_application_downlinks",
+				})
+				a.So(dev, should.Resemble, &ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						DeviceID:               "test-dev-id",
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+					},
+					MACState: &ttnpb.MACState{
+						DeviceClass: ttnpb.CLASS_A,
+					},
+				})
+				return dev, nil
+			},
+			Request: &ttnpb.DownlinkQueueRequest{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DeviceID:               "test-dev-id",
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+				},
+			},
+			SetByIDCalls: 1,
+		},
+
+		{
+			Name: "Valid request/delete/Class C",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
+							Rights: []ttnpb.Right{
+								ttnpb.RIGHT_APPLICATION_LINK,
+							},
+						},
+					},
+				})
+			},
+			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time) error {
+				err := errors.New("AddFunc must not be called")
+				test.MustTFromContext(ctx).Error(err)
+				return err
+			},
+			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
+				a.So(devID, should.Equal, "test-dev-id")
+				a.So(gets, should.HaveSameElementsDeep, []string{
+					"queued_application_downlinks",
+					"mac_state.device_class",
+				})
+
+				dev, sets, err := f(&ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						DeviceID:               "test-dev-id",
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+					},
+					MACState: &ttnpb.MACState{
+						DeviceClass: ttnpb.CLASS_C,
+					},
+					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+						{FCnt: 1},
+						{FCnt: 2},
+						{FCnt: 3},
+						{FCnt: 5},
+					},
+				})
+				if !a.So(err, should.BeNil) {
+					return nil, err
+				}
+				a.So(sets, should.HaveSameElementsDeep, []string{
+					"queued_application_downlinks",
+				})
+				a.So(dev, should.Resemble, &ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						DeviceID:               "test-dev-id",
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+					},
+					MACState: &ttnpb.MACState{
+						DeviceClass: ttnpb.CLASS_C,
+					},
+				})
+				return dev, nil
+			},
+			Request: &ttnpb.DownlinkQueueRequest{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DeviceID:               "test-dev-id",
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+				},
+			},
+			SetByIDCalls: 1,
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
-			redisClient, flush := test.NewRedis(t, "networkserver_test")
-			defer flush()
-			defer redisClient.Close()
-			devReg := &redis.DeviceRegistry{Redis: redisClient}
-
-			type addReq struct {
-				ctx   context.Context
-				devID ttnpb.EndDeviceIdentifiers
-				t     time.Time
-			}
-			addReqCh := make(chan addReq, 1)
+			var addCalls, setByIDCalls uint64
 
 			ns := test.Must(New(
 				component.MustNew(test.GetLogger(t), &component.Config{}),
 				&Config{
-					Devices:             devReg,
-					DeduplicationWindow: 42,
-					CooldownWindow:      42,
-					DownlinkTasks: &MockDownlinkTaskQueue{
-						AddFunc: func(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time) error {
-							addReqCh <- addReq{
-								ctx:   ctx,
-								devID: devID,
-								t:     t,
-							}
-							return nil
+					Devices: &MockDeviceRegistry{
+						SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+							atomic.AddUint64(&setByIDCalls, 1)
+							return tc.SetByIDFunc(ctx, appID, devID, gets, f)
 						},
 					},
+					DownlinkTasks: &MockDownlinkTaskQueue{
+						AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time) error {
+							atomic.AddUint64(&addCalls, 1)
+							return tc.AddFunc(ctx, ids, at)
+						},
+					},
+					DeduplicationWindow: 42,
+					CooldownWindow:      42,
 				})).(*NetworkServer)
+
+			ns.AddContextFiller(tc.ContextFunc)
+			ns.AddContextFiller(func(ctx context.Context) context.Context {
+				ctx, cancel := context.WithDeadline(ctx, time.Now().Add(Timeout))
+				_ = cancel
+				return ctx
+			})
+			ns.AddContextFiller(func(ctx context.Context) context.Context {
+				return test.ContextWithT(ctx, t)
+			})
 			test.Must(nil, ns.Start())
 			defer ns.Close()
 
-			start := time.Now()
+			req := deepcopy.Copy(tc.Request).(*ttnpb.DownlinkQueueRequest)
 
-			pb := CopyEndDevice(tc.Device)
-			if tc.Device != nil {
-				ret, err := CreateDevice(tc.Context, devReg, CopyEndDevice(tc.Device))
-				if !a.So(err, should.BeNil) {
-					t.FailNow()
-				}
-				a.So(ret.CreatedAt, should.HappenAfter, start)
-				a.So(ret.UpdatedAt, should.HappenAfter, start)
-				a.So(ret.UpdatedAt, should.Equal, ret.CreatedAt)
-				pb.CreatedAt = ret.CreatedAt
-				pb.UpdatedAt = ret.UpdatedAt
-				a.So(ret, should.Resemble, pb)
+			res, err := ttnpb.NewAsNsClient(ns.LoopbackConn()).DownlinkQueueReplace(test.Context(), req)
+			if tc.ErrorAssertion != nil && a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
+				a.So(res, should.BeNil)
+			} else if a.So(err, should.BeNil) {
+				a.So(res, should.Resemble, ttnpb.Empty)
 			}
-
-			_, err := ns.DownlinkQueueReplace(tc.Context, tc.Request)
-			if tc.ErrorAssertion != nil {
-				a.So(tc.ErrorAssertion(t, err), should.BeTrue)
-				return
-			}
-			a.So(err, should.BeNil)
-
-			if pb.MACState != nil && pb.MACState.DeviceClass == ttnpb.CLASS_C {
-				select {
-				case req := <-addReqCh:
-					a.So(req.ctx, should.HaveParentContext, tc.Context)
-					a.So(req.devID, should.Resemble, ids)
-					a.So([]time.Time{start, req.t, time.Now()}, should.BeChronological)
-
-				case <-time.After(Timeout):
-					t.Fatal("Timeout waiting for Add to be called")
-				}
-			} else {
-				a.So(addReqCh, should.BeEmpty)
-			}
-
-			pb.QueuedApplicationDownlinks = tc.Request.Downlinks
-
-			ret, err := devReg.GetByID(tc.Context, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel)
-			if !a.So(err, should.BeNil) {
-				t.FailNow()
-			}
-			a.So(ret.UpdatedAt, should.HappenAfter, pb.UpdatedAt)
-			pb.UpdatedAt = ret.UpdatedAt
-			a.So(ret, should.HaveEmptyDiff, pb)
+			a.So(req, should.Resemble, tc.Request)
+			a.So(setByIDCalls, should.Equal, tc.SetByIDCalls)
+			a.So(addCalls, should.Equal, tc.AddCalls)
 		})
 	}
 }
 
 func TestDownlinkQueuePush(t *testing.T) {
-	ids := ttnpb.EndDeviceIdentifiers{
-		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-			ApplicationID: ApplicationID,
-		},
-		DeviceID: DeviceID,
-		JoinEUI:  &JoinEUI,
-		DevEUI:   &DevEUI,
-	}
-	ctx := test.Context()
-	authorizedCtx := rights.NewContext(ctx, rights.Rights{
-		ApplicationRights: map[string]*ttnpb.Rights{
-			unique.ID(ctx, ids.ApplicationIdentifiers): ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_LINK),
-		},
-	})
-	authorizedCtx = cluster.NewContext(authorizedCtx, errors.New("Cluster auth disabled"))
+	start := time.Now()
 
 	for _, tc := range []struct {
 		Name           string
-		Context        context.Context
-		Device         *ttnpb.EndDevice
+		ContextFunc    func(context.Context) context.Context
+		AddFunc        func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) error
+		SetByIDFunc    func(context.Context, ttnpb.ApplicationIdentifiers, string, []string, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
 		Request        *ttnpb.DownlinkQueueRequest
 		ErrorAssertion func(*testing.T, error) bool
+		AddCalls       uint64
+		SetByIDCalls   uint64
 	}{
 		{
-			Name:    "wrong auth",
-			Context: authorizedCtx,
-			Request: ttnpb.NewPopulatedDownlinkQueueRequest(test.Randy, false),
-			ErrorAssertion: func(t *testing.T, err error) bool {
-				a := assertions.New(t)
-				return a.So(err, should.BeError) && a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			Name: "No link rights",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
+							Rights: []ttnpb.Right{
+								ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC,
+							},
+						},
+					},
+				})
 			},
-		},
-		{
-			Name:    "no device",
-			Context: authorizedCtx,
+			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time) error {
+				err := errors.New("AddFunc must not be called")
+				test.MustTFromContext(ctx).Error(err)
+				return err
+			},
+			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+				err := errors.New("SetByIDFunc must not be called")
+				test.MustTFromContext(ctx).Error(err)
+				return nil, err
+			},
 			Request: &ttnpb.DownlinkQueueRequest{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: ids.ApplicationIdentifiers,
-					DeviceID:               "non-existent",
-					JoinEUI:                eui64Ptr(types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}),
-					DevEUI:                 eui64Ptr(types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}),
+					DeviceID:               "test-dev-id",
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
 				},
-				Downlinks: []*ttnpb.ApplicationDownlink{ttnpb.NewPopulatedApplicationDownlink(test.Randy, false)},
+				Downlinks: []*ttnpb.ApplicationDownlink{
+					{FCnt: 0},
+				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				if !assertions.New(t).So(errors.IsPermissionDenied(err), should.BeTrue) {
+					t.Errorf("Received error: %s", err)
+					return false
+				}
+				return true
+			},
+		},
+
+		{
+			Name: "Non-existing device",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
+							Rights: []ttnpb.Right{
+								ttnpb.RIGHT_APPLICATION_LINK,
+							},
+						},
+					},
+				})
+			},
+			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time) error {
+				err := errors.New("AddFunc must not be called")
+				test.MustTFromContext(ctx).Error(err)
+				return err
+			},
+			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
-				return a.So(err, should.BeError) && a.So(errors.IsNotFound(err), should.BeTrue)
-			},
-		},
-		{
-			Name:    "empty queue/empty request",
-			Context: authorizedCtx,
-			Device: &ttnpb.EndDevice{
-				EndDeviceIdentifiers:       ids,
-				QueuedApplicationDownlinks: nil,
-			},
-			Request: &ttnpb.DownlinkQueueRequest{
-				EndDeviceIdentifiers: ids,
-				Downlinks:            nil,
-			},
-		},
-		{
-			Name:    "empty queue/non-empty request",
-			Context: authorizedCtx,
-			Device: &ttnpb.EndDevice{
-				EndDeviceIdentifiers:       ids,
-				QueuedApplicationDownlinks: nil,
+				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
+				a.So(devID, should.Equal, "test-dev-id")
+				a.So(gets, should.HaveSameElementsDeep, []string{
+					"queued_application_downlinks",
+					"mac_state.device_class",
+				})
+
+				dev, sets, err := f(nil)
+				if !a.So(err, should.BeError) {
+					t.Error("Error was expected")
+					return nil, errors.New("Error was expected")
+				}
+				a.So(sets, should.BeNil)
+				a.So(dev, should.BeNil)
+				return nil, err
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
-				EndDeviceIdentifiers: ids,
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DeviceID:               "test-dev-id",
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+				},
 				Downlinks: []*ttnpb.ApplicationDownlink{
-					Downlinks[0],
-					Downlinks[2],
-					Downlinks[1],
+					{FCnt: 0},
 				},
 			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				if !assertions.New(t).So(errors.IsNotFound(err), should.BeTrue) {
+					t.Errorf("Received error: %s", err)
+					return false
+				}
+				return true
+			},
+			SetByIDCalls: 1,
 		},
+
 		{
-			Name:    "non-empty queue/empty request",
-			Context: authorizedCtx,
-			Device: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ids,
-				QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-					Downlinks[2],
-					Downlinks[1],
-					Downlinks[0],
-					Downlinks[4],
-				},
+			Name: "Valid request/push/no MAC state",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
+							Rights: []ttnpb.Right{
+								ttnpb.RIGHT_APPLICATION_LINK,
+							},
+						},
+					},
+				})
+			},
+			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time) error {
+				err := errors.New("AddFunc must not be called")
+				test.MustTFromContext(ctx).Error(err)
+				return err
+			},
+			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
+				a.So(devID, should.Equal, "test-dev-id")
+				a.So(gets, should.HaveSameElementsDeep, []string{
+					"queued_application_downlinks",
+					"mac_state.device_class",
+				})
+
+				dev, sets, err := f(&ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						DeviceID:               "test-dev-id",
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+					},
+					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+						{FCnt: 1},
+						{FCnt: 2},
+						{FCnt: 3},
+						{FCnt: 5},
+					},
+				})
+				if !a.So(err, should.BeNil) {
+					return nil, err
+				}
+				a.So(sets, should.HaveSameElementsDeep, []string{
+					"queued_application_downlinks",
+				})
+				a.So(dev, should.Resemble, &ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						DeviceID:               "test-dev-id",
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+					},
+					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+						{FCnt: 1},
+						{FCnt: 2},
+						{FCnt: 3},
+						{FCnt: 5},
+						{FCnt: 0},
+						{FCnt: 42},
+					},
+				})
+				return dev, nil
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
-				EndDeviceIdentifiers: ids,
-			},
-		},
-		{
-			Name:    "non-empty queue/non-empty request",
-			Context: authorizedCtx,
-			Device: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ids,
-				QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-					Downlinks[2],
-					Downlinks[1],
-					Downlinks[0],
-					Downlinks[4],
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DeviceID:               "test-dev-id",
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
 				},
-			},
-			Request: &ttnpb.DownlinkQueueRequest{
-				EndDeviceIdentifiers: ids,
 				Downlinks: []*ttnpb.ApplicationDownlink{
-					Downlinks[0],
-					Downlinks[2],
-					Downlinks[1],
+					{FCnt: 0},
+					{FCnt: 42},
 				},
 			},
+			SetByIDCalls: 1,
+		},
+
+		{
+			Name: "Valid request/push/Class A",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
+							Rights: []ttnpb.Right{
+								ttnpb.RIGHT_APPLICATION_LINK,
+							},
+						},
+					},
+				})
+			},
+			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time) error {
+				err := errors.New("AddFunc must not be called")
+				test.MustTFromContext(ctx).Error(err)
+				return err
+			},
+			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
+				a.So(devID, should.Equal, "test-dev-id")
+				a.So(gets, should.HaveSameElementsDeep, []string{
+					"queued_application_downlinks",
+					"mac_state.device_class",
+				})
+
+				dev, sets, err := f(&ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						DeviceID:               "test-dev-id",
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+					},
+					MACState: &ttnpb.MACState{
+						DeviceClass: ttnpb.CLASS_A,
+					},
+					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+						{FCnt: 1},
+						{FCnt: 2},
+						{FCnt: 3},
+						{FCnt: 5},
+					},
+				})
+				if !a.So(err, should.BeNil) {
+					return nil, err
+				}
+				a.So(sets, should.HaveSameElementsDeep, []string{
+					"queued_application_downlinks",
+				})
+				a.So(dev, should.Resemble, &ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						DeviceID:               "test-dev-id",
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+					},
+					MACState: &ttnpb.MACState{
+						DeviceClass: ttnpb.CLASS_A,
+					},
+					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+						{FCnt: 1},
+						{FCnt: 2},
+						{FCnt: 3},
+						{FCnt: 5},
+						{FCnt: 0},
+						{FCnt: 42},
+					},
+				})
+				return dev, nil
+			},
+			Request: &ttnpb.DownlinkQueueRequest{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DeviceID:               "test-dev-id",
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+				},
+				Downlinks: []*ttnpb.ApplicationDownlink{
+					{FCnt: 0},
+					{FCnt: 42},
+				},
+			},
+			SetByIDCalls: 1,
+		},
+
+		{
+			Name: "Valid request/push/Class C",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
+							Rights: []ttnpb.Right{
+								ttnpb.RIGHT_APPLICATION_LINK,
+							},
+						},
+					},
+				})
+			},
+			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time) error {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(ids, should.Resemble, ttnpb.EndDeviceIdentifiers{
+					DeviceID:               "test-dev-id",
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+				})
+				a.So([]time.Time{start, at, time.Now()}, should.BeChronological)
+				return nil
+			},
+			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
+				a.So(devID, should.Equal, "test-dev-id")
+				a.So(gets, should.HaveSameElementsDeep, []string{
+					"queued_application_downlinks",
+					"mac_state.device_class",
+				})
+
+				dev, sets, err := f(&ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						DeviceID:               "test-dev-id",
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+					},
+					MACState: &ttnpb.MACState{
+						DeviceClass: ttnpb.CLASS_C,
+					},
+					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+						{FCnt: 1},
+						{FCnt: 2},
+						{FCnt: 3},
+						{FCnt: 5},
+					},
+				})
+				if !a.So(err, should.BeNil) {
+					return nil, err
+				}
+				a.So(sets, should.HaveSameElementsDeep, []string{
+					"queued_application_downlinks",
+				})
+				a.So(dev, should.Resemble, &ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						DeviceID:               "test-dev-id",
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+					},
+					MACState: &ttnpb.MACState{
+						DeviceClass: ttnpb.CLASS_C,
+					},
+					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+						{FCnt: 1},
+						{FCnt: 2},
+						{FCnt: 3},
+						{FCnt: 5},
+						{FCnt: 0},
+						{FCnt: 42},
+					},
+				})
+				return dev, nil
+			},
+			Request: &ttnpb.DownlinkQueueRequest{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DeviceID:               "test-dev-id",
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+				},
+				Downlinks: []*ttnpb.ApplicationDownlink{
+					{FCnt: 0},
+					{FCnt: 42},
+				},
+			},
+			AddCalls:     1,
+			SetByIDCalls: 1,
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
-			redisClient, flush := test.NewRedis(t, "networkserver_test")
-			defer flush()
-			defer redisClient.Close()
-			devReg := &redis.DeviceRegistry{Redis: redisClient}
-
-			type addReq struct {
-				ctx   context.Context
-				devID ttnpb.EndDeviceIdentifiers
-				t     time.Time
-			}
-			addReqCh := make(chan addReq, 1)
+			var addCalls, setByIDCalls uint64
 
 			ns := test.Must(New(
 				component.MustNew(test.GetLogger(t), &component.Config{}),
 				&Config{
-					Devices:             devReg,
-					DeduplicationWindow: 42,
-					CooldownWindow:      42,
-					DownlinkTasks: &MockDownlinkTaskQueue{
-						AddFunc: func(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time) error {
-							addReqCh <- addReq{
-								ctx:   ctx,
-								devID: devID,
-								t:     t,
-							}
-							return nil
+					Devices: &MockDeviceRegistry{
+						SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+							atomic.AddUint64(&setByIDCalls, 1)
+							return tc.SetByIDFunc(ctx, appID, devID, gets, f)
 						},
 					},
+					DownlinkTasks: &MockDownlinkTaskQueue{
+						AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time) error {
+							atomic.AddUint64(&addCalls, 1)
+							return tc.AddFunc(ctx, ids, at)
+						},
+					},
+					DeduplicationWindow: 42,
+					CooldownWindow:      42,
 				})).(*NetworkServer)
+
+			ns.AddContextFiller(tc.ContextFunc)
+			ns.AddContextFiller(func(ctx context.Context) context.Context {
+				ctx, cancel := context.WithDeadline(ctx, time.Now().Add(Timeout))
+				_ = cancel
+				return ctx
+			})
+			ns.AddContextFiller(func(ctx context.Context) context.Context {
+				return test.ContextWithT(ctx, t)
+			})
 			test.Must(nil, ns.Start())
 			defer ns.Close()
 
-			start := time.Now()
+			req := deepcopy.Copy(tc.Request).(*ttnpb.DownlinkQueueRequest)
 
-			pb := CopyEndDevice(tc.Device)
-			if tc.Device != nil {
-				ret, err := CreateDevice(tc.Context, devReg, CopyEndDevice(tc.Device))
-				if !a.So(err, should.BeNil) {
-					t.FailNow()
-				}
-				a.So(ret.CreatedAt, should.HappenAfter, start)
-				a.So(ret.UpdatedAt, should.HappenAfter, start)
-				a.So(ret.UpdatedAt, should.Equal, ret.CreatedAt)
-				pb.CreatedAt = ret.CreatedAt
-				pb.UpdatedAt = ret.UpdatedAt
-				a.So(ret, should.Resemble, pb)
+			res, err := ttnpb.NewAsNsClient(ns.LoopbackConn()).DownlinkQueuePush(test.Context(), req)
+			if tc.ErrorAssertion != nil && a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
+				a.So(res, should.BeNil)
+			} else if a.So(err, should.BeNil) {
+				a.So(res, should.Resemble, ttnpb.Empty)
 			}
-
-			_, err := ns.DownlinkQueuePush(tc.Context, tc.Request)
-			if tc.ErrorAssertion != nil {
-				a.So(tc.ErrorAssertion(t, err), should.BeTrue)
-				return
-			}
-			a.So(err, should.BeNil)
-
-			if pb.MACState != nil && pb.MACState.DeviceClass == ttnpb.CLASS_C {
-				select {
-				case req := <-addReqCh:
-					a.So(req.ctx, should.HaveParentContext, tc.Context)
-					a.So(req.devID, should.Resemble, ids)
-					a.So([]time.Time{start, req.t, time.Now()}, should.BeChronological)
-
-				case <-time.After(Timeout):
-					t.Fatal("Timeout waiting for Add to be called")
-				}
-			} else {
-				a.So(addReqCh, should.BeEmpty)
-			}
-
-			pb.QueuedApplicationDownlinks = append(pb.QueuedApplicationDownlinks, tc.Request.Downlinks...)
-
-			ret, err := devReg.GetByID(tc.Context, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel)
-			if !a.So(err, should.BeNil) {
-				t.FailNow()
-			}
-			a.So(ret.UpdatedAt, should.HappenAfter, pb.UpdatedAt)
-			pb.UpdatedAt = ret.UpdatedAt
-			a.So(ret, should.HaveEmptyDiff, pb)
+			a.So(req, should.Resemble, tc.Request)
+			a.So(setByIDCalls, should.Equal, tc.SetByIDCalls)
+			a.So(addCalls, should.Equal, tc.AddCalls)
 		})
 	}
 }
 
 func TestDownlinkQueueList(t *testing.T) {
-	ids := ttnpb.EndDeviceIdentifiers{
-		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-			ApplicationID: ApplicationID,
-		},
-		DeviceID: DeviceID,
-		JoinEUI:  &JoinEUI,
-		DevEUI:   &DevEUI,
-	}
-	ctx := test.Context()
-	authorizedCtx := rights.NewContext(ctx, rights.Rights{
-		ApplicationRights: map[string]*ttnpb.Rights{
-			unique.ID(ctx, ids.ApplicationIdentifiers): ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_LINK),
-		},
-	})
-	authorizedCtx = cluster.NewContext(authorizedCtx, errors.New("Cluster auth disabled"))
-
 	for _, tc := range []struct {
 		Name           string
-		Context        context.Context
-		Device         *ttnpb.EndDevice
+		ContextFunc    func(context.Context) context.Context
+		GetByIDFunc    func(context.Context, ttnpb.ApplicationIdentifiers, string, []string) (*ttnpb.EndDevice, error)
 		Request        *ttnpb.EndDeviceIdentifiers
+		Downlinks      *ttnpb.ApplicationDownlinks
 		ErrorAssertion func(*testing.T, error) bool
+		GetByIDCalls   uint64
 	}{
 		{
-			Name:    "wrong auth",
-			Context: authorizedCtx,
-			Request: ttnpb.NewPopulatedEndDeviceIdentifiers(test.Randy, false),
-			ErrorAssertion: func(t *testing.T, err error) bool {
-				a := assertions.New(t)
-				return a.So(err, should.BeError) && a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			Name: "No link rights",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
+							Rights: []ttnpb.Right{
+								ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC,
+							},
+						},
+					},
+				})
 			},
-		},
-		{
-			Name:    "no device",
-			Context: authorizedCtx,
+			GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string) (*ttnpb.EndDevice, error) {
+				err := errors.New("GetByIDFunc must not be called")
+				test.MustTFromContext(ctx).Error(err)
+				return nil, err
+			},
 			Request: &ttnpb.EndDeviceIdentifiers{
-				ApplicationIdentifiers: ids.ApplicationIdentifiers,
-				DeviceID:               "non-existent",
-				JoinEUI:                eui64Ptr(types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}),
-				DevEUI:                 eui64Ptr(types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}),
+				DeviceID:               "test-dev-id",
+				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				if !assertions.New(t).So(errors.IsPermissionDenied(err), should.BeTrue) {
+					t.Errorf("Received error: %s", err)
+					return false
+				}
+				return true
+			},
+		},
+
+		{
+			Name: "Valid request/empty queue",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
+							Rights: []ttnpb.Right{
+								ttnpb.RIGHT_APPLICATION_LINK,
+							},
+						},
+					},
+				})
+			},
+			GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string) (*ttnpb.EndDevice, error) {
+				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
-				return a.So(err, should.BeError) && a.So(errors.IsNotFound(err), should.BeTrue)
+				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
+				a.So(devID, should.Equal, "test-dev-id")
+				a.So(gets, should.HaveSameElementsDeep, []string{
+					"queued_application_downlinks",
+				})
+				return &ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						DeviceID:               "test-dev-id",
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+					},
+				}, nil
 			},
-		},
-		{
-			Name:    "empty queue",
-			Context: authorizedCtx,
-			Device: &ttnpb.EndDevice{
-				EndDeviceIdentifiers:       ids,
-				QueuedApplicationDownlinks: nil,
+			Request: &ttnpb.EndDeviceIdentifiers{
+				DeviceID:               "test-dev-id",
+				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
 			},
-			Request: &ids,
+			Downlinks:    &ttnpb.ApplicationDownlinks{},
+			GetByIDCalls: 1,
 		},
+
 		{
-			Name:    "non-empty queue",
-			Context: authorizedCtx,
-			Device: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ids,
-				QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-					Downlinks[2],
-					Downlinks[1],
-					Downlinks[0],
-					Downlinks[4],
+			Name: "Valid request/non-empty queue",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
+							Rights: []ttnpb.Right{
+								ttnpb.RIGHT_APPLICATION_LINK,
+							},
+						},
+					},
+				})
+			},
+			GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string) (*ttnpb.EndDevice, error) {
+				t := test.MustTFromContext(ctx)
+				a := assertions.New(t)
+				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
+				a.So(devID, should.Equal, "test-dev-id")
+				a.So(gets, should.HaveSameElementsDeep, []string{
+					"queued_application_downlinks",
+				})
+				return &ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						DeviceID:               "test-dev-id",
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+					},
+					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+						{FCnt: 0},
+						{FCnt: 42},
+					},
+				}, nil
+			},
+			Request: &ttnpb.EndDeviceIdentifiers{
+				DeviceID:               "test-dev-id",
+				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+			},
+			Downlinks: &ttnpb.ApplicationDownlinks{
+				Downlinks: []*ttnpb.ApplicationDownlink{
+					{FCnt: 0},
+					{FCnt: 42},
 				},
 			},
-			Request: &ids,
+			GetByIDCalls: 1,
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
-			redisClient, flush := test.NewRedis(t, "networkserver_test")
-			defer flush()
-			defer redisClient.Close()
-			devReg := &redis.DeviceRegistry{Redis: redisClient}
+			var getByIDCalls uint64
 
 			ns := test.Must(New(
 				component.MustNew(test.GetLogger(t), &component.Config{}),
 				&Config{
-					Devices:             devReg,
+					Devices: &MockDeviceRegistry{
+						GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string) (*ttnpb.EndDevice, error) {
+							atomic.AddUint64(&getByIDCalls, 1)
+							return tc.GetByIDFunc(ctx, appID, devID, gets)
+						},
+					},
+					DownlinkTasks:       &MockDownlinkTaskQueue{},
 					DeduplicationWindow: 42,
 					CooldownWindow:      42,
-					DownlinkTasks:       &MockDownlinkTaskQueue{},
 				})).(*NetworkServer)
+
+			ns.AddContextFiller(tc.ContextFunc)
+			ns.AddContextFiller(func(ctx context.Context) context.Context {
+				ctx, cancel := context.WithDeadline(ctx, time.Now().Add(Timeout))
+				_ = cancel
+				return ctx
+			})
+			ns.AddContextFiller(func(ctx context.Context) context.Context {
+				return test.ContextWithT(ctx, t)
+			})
 			test.Must(nil, ns.Start())
 			defer ns.Close()
 
-			pb := CopyEndDevice(tc.Device)
-			if tc.Device != nil {
-				start := time.Now()
-				ret, err := CreateDevice(tc.Context, devReg, CopyEndDevice(tc.Device))
-				if !a.So(err, should.BeNil) {
-					t.FailNow()
-				}
-				if !a.So(err, should.BeNil) {
-					t.FailNow()
-				}
-				a.So(ret.CreatedAt, should.HappenAfter, start)
-				a.So(ret.UpdatedAt, should.HappenAfter, start)
-				a.So(ret.UpdatedAt, should.Equal, ret.CreatedAt)
-				pb.CreatedAt = ret.CreatedAt
-				pb.UpdatedAt = ret.UpdatedAt
-				a.So(ret, should.Resemble, pb)
-			}
+			req := deepcopy.Copy(tc.Request).(*ttnpb.EndDeviceIdentifiers)
 
-			resp, err := ns.DownlinkQueueList(tc.Context, tc.Request)
-			if tc.ErrorAssertion != nil {
-				a.So(tc.ErrorAssertion(t, err), should.BeTrue)
-				a.So(resp, should.BeNil)
-				return
+			res, err := ttnpb.NewAsNsClient(ns.LoopbackConn()).DownlinkQueueList(test.Context(), req)
+			if tc.ErrorAssertion != nil && a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
+				a.So(res, should.BeNil)
+			} else if a.So(err, should.BeNil) {
+				a.So(res, should.Resemble, tc.Downlinks)
 			}
-			a.So(err, should.BeNil)
-			a.So(resp, should.HaveEmptyDiff, &ttnpb.ApplicationDownlinks{Downlinks: pb.QueuedApplicationDownlinks})
+			a.So(req, should.Resemble, tc.Request)
+			a.So(getByIDCalls, should.Equal, tc.GetByIDCalls)
 		})
 	}
 }
