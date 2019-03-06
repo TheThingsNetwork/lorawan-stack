@@ -24,6 +24,28 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
+var getPaths = []string{"ids", "created_at", "updated_at"}
+
+func cleanFieldMaskPaths(allowedPaths, requestedPaths, addPaths, removePaths []string) []string {
+	selected := make(map[string]struct{})
+	for _, path := range addPaths {
+		selected[path] = struct{}{}
+	}
+	for _, path := range requestedPaths {
+		selected[path] = struct{}{}
+	}
+	for _, path := range removePaths {
+		delete(selected, path)
+	}
+	out := make([]string, 0, len(selected))
+	for _, path := range allowedPaths {
+		if _, ok := selected[path]; ok {
+			out = append(out, path)
+		}
+	}
+	return out
+}
+
 func cleanContactInfo(info []*ttnpb.ContactInfo) {
 	for _, info := range info {
 		info.ValidatedAt = nil

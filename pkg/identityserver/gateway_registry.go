@@ -83,6 +83,7 @@ func (is *IdentityServer) getGateway(ctx context.Context, req *ttnpb.GetGatewayR
 	if err = is.RequireAuthenticated(ctx); err != nil {
 		return nil, err
 	}
+	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.GatewayFieldPathsNested, req.FieldMask.Paths, getPaths, nil)
 	if err = rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_INFO); err != nil {
 		if ttnpb.HasOnlyAllowedFields(req.FieldMask.Paths, ttnpb.PublicGatewayFields...) {
 			defer func() { gtw = gtw.PublicSafe() }()
@@ -130,6 +131,7 @@ func (is *IdentityServer) getGatewayIdentifiersForEUI(ctx context.Context, req *
 }
 
 func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatewaysRequest) (gtws *ttnpb.Gateways, err error) {
+	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.GatewayFieldPathsNested, req.FieldMask.Paths, getPaths, nil)
 	var gtwRights map[string]*ttnpb.Rights
 	if req.Collaborator == nil {
 		callerRights, _, err := is.getRights(ctx)
@@ -206,8 +208,11 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 	if err = rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC); err != nil {
 		return nil, err
 	}
-	if err := validateContactInfo(req.Gateway.ContactInfo); err != nil {
-		return nil, err
+	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.GatewayFieldPathsNested, req.FieldMask.Paths, nil, getPaths)
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "contact_info") {
+		if err := validateContactInfo(req.Gateway.ContactInfo); err != nil {
+			return nil, err
+		}
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		gtw, err = store.GetGatewayStore(db).UpdateGateway(ctx, &req.Gateway, &req.FieldMask)

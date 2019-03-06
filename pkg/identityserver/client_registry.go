@@ -111,6 +111,7 @@ func (is *IdentityServer) getClient(ctx context.Context, req *ttnpb.GetClientReq
 	if err = is.RequireAuthenticated(ctx); err != nil {
 		return nil, err
 	}
+	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.ClientFieldPathsNested, req.FieldMask.Paths, getPaths, nil)
 	if err = rights.RequireClient(ctx, req.ClientIdentifiers, ttnpb.RIGHT_CLIENT_ALL); err != nil {
 		if ttnpb.HasOnlyAllowedFields(req.FieldMask.Paths, ttnpb.PublicClientFields...) {
 			defer func() { cli = cli.PublicSafe() }()
@@ -138,6 +139,7 @@ func (is *IdentityServer) getClient(ctx context.Context, req *ttnpb.GetClientReq
 }
 
 func (is *IdentityServer) listClients(ctx context.Context, req *ttnpb.ListClientsRequest) (clis *ttnpb.Clients, err error) {
+	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.ClientFieldPathsNested, req.FieldMask.Paths, getPaths, nil)
 	var cliRights map[string]*ttnpb.Rights
 	if req.Collaborator == nil {
 		callerRights, _, err := is.getRights(ctx)
@@ -218,8 +220,11 @@ func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateCli
 	if err = rights.RequireClient(ctx, req.ClientIdentifiers, ttnpb.RIGHT_CLIENT_ALL); err != nil {
 		return nil, err
 	}
-	if err := validateContactInfo(req.Client.ContactInfo); err != nil {
-		return nil, err
+	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.ClientFieldPathsNested, req.FieldMask.Paths, nil, getPaths)
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "contact_info") {
+		if err := validateContactInfo(req.Client.ContactInfo); err != nil {
+			return nil, err
+		}
 	}
 	updatedByAdmin := is.UniversalRights(ctx).IncludesAll(ttnpb.RIGHT_USER_ALL)
 

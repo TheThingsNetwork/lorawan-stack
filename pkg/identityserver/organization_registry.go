@@ -84,6 +84,7 @@ func (is *IdentityServer) getOrganization(ctx context.Context, req *ttnpb.GetOrg
 	if err = is.RequireAuthenticated(ctx); err != nil {
 		return nil, err
 	}
+	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.OrganizationFieldPathsNested, req.FieldMask.Paths, getPaths, nil)
 	if err = rights.RequireOrganization(ctx, req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_INFO); err != nil {
 		if ttnpb.HasOnlyAllowedFields(req.FieldMask.Paths, ttnpb.PublicOrganizationFields...) {
 			defer func() { org = org.PublicSafe() }()
@@ -111,6 +112,7 @@ func (is *IdentityServer) getOrganization(ctx context.Context, req *ttnpb.GetOrg
 }
 
 func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.ListOrganizationsRequest) (orgs *ttnpb.Organizations, err error) {
+	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.OrganizationFieldPathsNested, req.FieldMask.Paths, getPaths, nil)
 	var orgRights map[string]*ttnpb.Rights
 	if req.Collaborator == nil {
 		callerRights, _, err := is.getRights(ctx)
@@ -185,8 +187,11 @@ func (is *IdentityServer) updateOrganization(ctx context.Context, req *ttnpb.Upd
 	if err = rights.RequireOrganization(ctx, req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_SETTINGS_BASIC); err != nil {
 		return nil, err
 	}
-	if err := validateContactInfo(req.Organization.ContactInfo); err != nil {
-		return nil, err
+	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.OrganizationFieldPathsNested, req.FieldMask.Paths, nil, getPaths)
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "contact_info") {
+		if err := validateContactInfo(req.Organization.ContactInfo); err != nil {
+			return nil, err
+		}
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		org, err = store.GetOrganizationStore(db).UpdateOrganization(ctx, &req.Organization, &req.FieldMask)
