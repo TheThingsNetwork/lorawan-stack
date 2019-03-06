@@ -1538,6 +1538,15 @@
       "file": "applicationserver.go"
     }
   },
+  "error:pkg/applicationserver:link": {
+    "translations": {
+      "en": "link failed"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "linking.go"
+    }
+  },
   "error:pkg/applicationserver:link_mode": {
     "translations": {
       "en": "invalid link mode `{value}`"

@@ -22,6 +22,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	"go.thethings.network/lorawan-stack/pkg/errorcontext"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -79,7 +80,7 @@ type link struct {
 	ttnpb.ApplicationIdentifiers
 	ttnpb.ApplicationLink
 	ctx    context.Context
-	cancel context.CancelFunc
+	cancel errorcontext.CancelFunc
 
 	conn      *grpc.ClientConn
 	connName  string
@@ -137,10 +138,13 @@ func (as *ApplicationServer) connectLink(ctx context.Context, link *link) error 
 	return nil
 }
 
-func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIdentifiers, target *ttnpb.ApplicationLink) error {
+func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIdentifiers, target *ttnpb.ApplicationLink) (err error) {
 	uid := unique.ID(ctx, ids)
 	ctx = log.NewContextWithField(ctx, "application_uid", uid)
-	ctx, cancel := context.WithCancel(ctx)
+	ctx, cancel := errorcontext.New(ctx)
+	defer func() {
+		cancel(err)
+	}()
 	l := &link{
 		ApplicationIdentifiers: ids,
 		ApplicationLink:        *target,
@@ -152,11 +156,11 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 		upCh:                   make(chan *ttnpb.ApplicationUp, linkBufferSize),
 	}
 	if _, loaded := as.links.LoadOrStore(uid, l); loaded {
-		cancel()
 		return errAlreadyLinked.WithAttributes("application_uid", uid)
 	}
-	defer func() {
-		cancel()
+	go func() {
+		<-ctx.Done()
+		as.linkErrors.Store(uid, ctx.Err())
 		as.links.Delete(uid)
 	}()
 	if err := as.connectLink(ctx, l); err != nil {
@@ -172,6 +176,9 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 	}
 	logger.Info("Linked")
 	registerLink(ctx, l)
+	defer func() {
+		registerUnlink(ctx, l, err)
+	}()
 
 	go l.run()
 	for _, sub := range as.defaultSubscribers {
@@ -190,8 +197,12 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 			} else {
 				logger.WithError(err).Warn("Link failed")
 			}
-			registerUnlink(ctx, l, err)
-			return err
+			select {
+			case <-ctx.Done():
+				return ctx.Err()
+			default:
+				return err
+			}
 		}
 		atomic.AddUint64(&l.ups, 1)
 		atomic.StoreInt64(&l.lastUpTime, time.Now().UnixNano())
@@ -228,17 +239,20 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 	}
 }
 
-var errNotLinked = errors.DefineNotFound("not_linked", "not linked to `{application_uid}`")
+var (
+	errNotLinked  = errors.DefineNotFound("not_linked", "not linked to `{application_uid}`")
+	errLinkFailed = errors.Define("link", "link failed")
+)
 
 func (as *ApplicationServer) cancelLink(ctx context.Context, ids ttnpb.ApplicationIdentifiers) error {
-	l, err := as.getLink(ctx, ids)
-	if err != nil {
-		return err
-	}
 	uid := unique.ID(ctx, ids)
-	log.FromContext(ctx).WithField("application_uid", uid).Debug("Unlinking")
-	l.cancel()
-	as.links.Delete(uid)
+	if val, ok := as.links.Load(uid); ok {
+		l := val.(*link)
+		log.FromContext(ctx).WithField("application_uid", uid).Debug("Unlinking")
+		l.cancel(context.Canceled)
+	} else {
+		as.linkErrors.Delete(uid)
+	}
 	return nil
 }
 
@@ -246,6 +260,11 @@ func (as *ApplicationServer) getLink(ctx context.Context, ids ttnpb.ApplicationI
 	uid := unique.ID(ctx, ids)
 	val, ok := as.links.Load(uid)
 	if !ok {
+		if val, ok := as.linkErrors.Load(uid); ok {
+			if err := val.(error); !errors.IsCanceled(err) {
+				return nil, errLinkFailed.WithCause(err)
+			}
+		}
 		return nil, errNotLinked.WithAttributes("application_uid", uid)
 	}
 	return val.(*link), nil
