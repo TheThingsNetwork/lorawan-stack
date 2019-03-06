@@ -344,21 +344,21 @@ message EndDevice {
   // the normal port inference (with DNS lookup, otherwise defaults) is used.
   // The connection shall be established with transport layer security (TLS).
   // Custom certificate authorities may be configured out-of-band.
-  string network_server_address = 9;
+  string network_server_address = 9 [(validator.field) = {regex: "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"}];
   // The address of the Application Server where this device is supposed to be registered.
   // Stored in Entity Registry and Join Server.
   // The typical format of the address is "host:port". If the port is omitted,
   // the normal port inference (with DNS lookup, otherwise defaults) is used.
   // The connection shall be established with transport layer security (TLS).
   // Custom certificate authorities may be configured out-of-band.
-  string application_server_address = 10;
+  string application_server_address = 10 [(validator.field) = {regex: "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"}];
   // The address of the Join Server where this device is supposed to be registered.
   // Stored in Entity Registry.
   // The typical format of the address is "host:port". If the port is omitted,
   // the normal port inference (with DNS lookup, otherwise defaults) is used.
   // The connection shall be established with transport layer security (TLS).
   // Custom certificate authorities may be configured out-of-band.
-  string join_server_address = 11;
+  string join_server_address = 11 [(validator.field) = {regex: "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"}];
 
   // Location of the device. Stored in Entity Registry.
   map<string,Location> locations = 12;
