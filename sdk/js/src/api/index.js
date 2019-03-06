@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import apiDefinition from '../../generated/api-definition.json'
-import Marshaler from '../util/marshaler'
 import Http from './http'
 
 /**
@@ -41,19 +40,17 @@ class Api {
       for (const rpcName of Object.keys(service)) {
         const rpc = service[rpcName]
 
-        this[serviceName][rpcName] = function (params = {}, body) {
-
-          const routeParams = params.route || {}
-          const queryParams = params.query || {}
+        this[serviceName][rpcName] = function ({ routeParams = {}, queryParams = {}, fieldMask = []}, payload) {
 
           const paramSignature = Object.keys(routeParams).sort().join()
-
           const endpoint = rpc.http.find(function (prospect) {
             return prospect.parameters.sort().join() === paramSignature
           })
 
           if (!endpoint) {
-            throw new Error('The parameter signature did not match the one of the rpc.')
+            throw new Error(`The parameter signature did not match the one of the rpc.
+Rpc: ${serviceName}.${rpcName}()
+Signature tried: ${paramSignature}`)
           }
 
           let route = endpoint.pattern
@@ -62,10 +59,7 @@ class Api {
             route = route.replace(`{${parameter}}`, routeParams[parameter])
           }
 
-          const searchQuery = Marshaler.query(queryParams)
-          route = searchQuery ? `${route}?${searchQuery}` : route
-
-          return connector[endpoint.method](route, body)
+          return connector[endpoint.method](route, payload, { queryParams, fieldMask })
         }
       }
     }

@@ -59,11 +59,15 @@ class Http {
     }
   }
 
-  async handleRequest (method, endpoint, rawPayload) {
-    const payload = rawPayload ? Marshaler.payload(rawPayload) : {}
+  async handleRequest (method, endpoint, payload = {}, config) {
     const component = this._parseStackComponent(endpoint)
     try {
-      return await this[component][method](endpoint, payload)
+      return await this[component]({
+        method,
+        url: endpoint,
+        data: payload,
+        ...config,
+      })
     } catch (err) {
       if ('response' in err && err.response && 'data' in err.response) {
         throw err.response.data
@@ -73,20 +77,37 @@ class Http {
     }
   }
 
-  async get (endpoint) {
-    return this.handleRequest('get', endpoint)
+  async get (endpoint, ...rest) {
+    const { fieldMask, queryParams } = rest[rest.length - 1]
+    const config = {}
+    if (fieldMask) {
+      config.params = { field_mask: fieldMask.paths.join(',') || fieldMask.join(',') }
+    }
+    if (queryParams) {
+      config.params = {
+        ...config.params,
+        ...queryParams,
+      }
+    }
+    return this.handleRequest('get', endpoint, undefined, config)
   }
 
   async post (endpoint, rawPayload) {
-    return this.handleRequest('post', endpoint, rawPayload)
+    const payload = Marshaler.payload(rawPayload, 'end_device')
+    return this.handleRequest('post', endpoint, payload)
   }
 
   async patch (endpoint, rawPayload) {
-    return this.handleRequest('patch', endpoint, rawPayload)
+    const payload = Marshaler.payload(rawPayload, 'end_device')
+    return this.handleRequest('patch', endpoint, payload)
   }
 
-  async put (endpoint, rawPayload) {
-    return this.handleRequest('put', endpoint, rawPayload)
+  async put (endpoint, rawPayload, { fieldMask }) {
+    const payload = Marshaler.payload(rawPayload, 'end_device')
+    if (fieldMask) {
+      payload.field_mask = fieldMask
+    }
+    return this.handleRequest('put', endpoint, payload)
   }
 
   async delete (endpoint) {
