@@ -34,15 +34,9 @@ import (
 )
 
 func (as *ApplicationServer) linkAll(ctx context.Context) error {
-	return as.linkRegistry.Range(
-		ctx,
-		[]string{
-			"network_server_address",
-			"api_key",
-			"default_formatters",
-		},
-		func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, target *ttnpb.ApplicationLink) bool {
-			as.startLinkTask(ctx, ids, target)
+	return as.linkRegistry.Range(ctx, nil,
+		func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, _ *ttnpb.ApplicationLink) bool {
+			as.startLinkTask(ctx, ids)
 			return true
 		},
 	)
@@ -50,10 +44,22 @@ func (as *ApplicationServer) linkAll(ctx context.Context) error {
 
 var linkBackoff = []time.Duration{100 * time.Millisecond, 1 * time.Second, 10 * time.Second}
 
-func (as *ApplicationServer) startLinkTask(ctx context.Context, ids ttnpb.ApplicationIdentifiers, target *ttnpb.ApplicationLink) {
+func (as *ApplicationServer) startLinkTask(ctx context.Context, ids ttnpb.ApplicationIdentifiers) {
 	ctx = log.NewContextWithField(ctx, "application_uid", unique.ID(ctx, ids))
 	as.StartTask(ctx, "link", func(ctx context.Context) error {
-		err := as.link(ctx, ids, target)
+		target, err := as.linkRegistry.Get(ctx, ids, []string{
+			"network_server_address",
+			"api_key",
+			"default_formatters",
+		})
+		if err != nil {
+			if !errors.IsNotFound(err) {
+				log.FromContext(ctx).WithError(err).Error("Failed to get link")
+			}
+			return nil
+		}
+
+		err = as.link(ctx, ids, target)
 		switch {
 		case errors.IsFailedPrecondition(err),
 			errors.IsUnauthenticated(err),
@@ -61,7 +67,8 @@ func (as *ApplicationServer) startLinkTask(ctx context.Context, ids ttnpb.Applic
 			errors.IsInvalidArgument(err):
 			log.FromContext(ctx).WithError(err).Warn("Failed to link")
 			return nil
-		case errors.IsCanceled(err), errors.IsAlreadyExists(err):
+		case errors.IsCanceled(err),
+			errors.IsAlreadyExists(err):
 			return nil
 		default:
 			return err
