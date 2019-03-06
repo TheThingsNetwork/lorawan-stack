@@ -24,7 +24,10 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-var getPaths = []string{"ids", "created_at", "updated_at"}
+var (
+	getPaths    = []string{"ids", "created_at", "updated_at"}
+	updatePaths = []string{"updated_at"}
+)
 
 func cleanFieldMaskPaths(allowedPaths, requestedPaths, addPaths, removePaths []string) []string {
 	selected := make(map[string]struct{})

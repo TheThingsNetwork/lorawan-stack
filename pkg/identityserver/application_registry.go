@@ -189,6 +189,9 @@ func (is *IdentityServer) updateApplication(ctx context.Context, req *ttnpb.Upda
 		return nil, err
 	}
 	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.ApplicationFieldPathsNested, req.FieldMask.Paths, nil, getPaths)
+	if len(req.FieldMask.Paths) == 0 {
+		req.FieldMask.Paths = updatePaths
+	}
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "contact_info") {
 		if err := validateContactInfo(req.Application.ContactInfo); err != nil {
 			return nil, err

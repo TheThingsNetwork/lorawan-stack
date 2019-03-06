@@ -263,6 +263,9 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 		return nil, err
 	}
 	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.UserFieldPathsNested, req.FieldMask.Paths, nil, getPaths)
+	if len(req.FieldMask.Paths) == 0 {
+		req.FieldMask.Paths = updatePaths
+	}
 	updatedByAdmin := is.UniversalRights(ctx).IncludesAll(ttnpb.RIGHT_USER_ALL)
 
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "password", "password_updated_at") {

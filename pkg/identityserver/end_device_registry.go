@@ -99,6 +99,9 @@ func (is *IdentityServer) updateEndDevice(ctx context.Context, req *ttnpb.Update
 		return nil, err
 	}
 	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.EndDeviceFieldPathsNested, req.FieldMask.Paths, nil, getPaths)
+	if len(req.FieldMask.Paths) == 0 {
+		req.FieldMask.Paths = updatePaths
+	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		dev, err = store.GetEndDeviceStore(db).UpdateEndDevice(ctx, &req.EndDevice, &req.FieldMask)
 		return err
