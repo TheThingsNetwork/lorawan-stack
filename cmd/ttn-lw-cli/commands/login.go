@@ -70,10 +70,11 @@ var (
 				}))
 
 				lis, err := net.Listen("tcp", ":11885")
-				defer lis.Close()
 				if err != nil {
+					logger.WithError(err).Error("Could not listen for OAuth callback. Try re-running this command with --callback=false")
 					return err
 				}
+				defer lis.Close()
 				go http.Serve(lis, nil)
 			} else {
 				oauth2Config.RedirectURL = "/oauth/code"
