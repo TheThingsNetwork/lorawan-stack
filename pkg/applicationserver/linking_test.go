@@ -39,7 +39,7 @@ func TestLink(t *testing.T) {
 	ctx := test.Context()
 	ns, nsAddr := startMockNS(ctx)
 
-	mask := []string{
+	paths := []string{
 		"network_server_address",
 		"api_key",
 		"default_formatters",
@@ -52,10 +52,10 @@ func TestLink(t *testing.T) {
 	defer flush()
 	defer redisClient.Close()
 	linkRegistry := &redis.LinkRegistry{Redis: redisClient}
-	linkRegistry.Set(ctx, app1, mask, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
+	linkRegistry.Set(ctx, app1, paths, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
 		return &ttnpb.ApplicationLink{
 			APIKey: "secret",
-		}, mask, nil
+		}, paths, nil
 	})
 
 	c := component.MustNew(test.GetLogger(t), &component.Config{
@@ -114,7 +114,7 @@ func TestLink(t *testing.T) {
 			_, err := as.GetLink(ctx, &ttnpb.GetApplicationLinkRequest{
 				ApplicationIdentifiers: app2,
 				FieldMask: pbtypes.FieldMask{
-					Paths: mask,
+					Paths: paths,
 				},
 			})
 			a.So(errors.IsNotFound(err), should.BeTrue)
@@ -126,7 +126,7 @@ func TestLink(t *testing.T) {
 				ApplicationIdentifiers: app2,
 				ApplicationLink:        link,
 				FieldMask: pbtypes.FieldMask{
-					Paths: mask,
+					Paths: paths,
 				},
 			})
 			a.So(err, should.BeNil)
@@ -139,7 +139,7 @@ func TestLink(t *testing.T) {
 			actual, err := as.GetLink(ctx, &ttnpb.GetApplicationLinkRequest{
 				ApplicationIdentifiers: app2,
 				FieldMask: pbtypes.FieldMask{
-					Paths: mask,
+					Paths: paths,
 				},
 			})
 			a.So(err, should.BeNil)
@@ -163,7 +163,7 @@ func TestLink(t *testing.T) {
 			_, err = as.GetLink(ctx, &ttnpb.GetApplicationLinkRequest{
 				ApplicationIdentifiers: app2,
 				FieldMask: pbtypes.FieldMask{
-					Paths: mask,
+					Paths: paths,
 				},
 			})
 			a.So(errors.IsNotFound(err), should.BeTrue)
