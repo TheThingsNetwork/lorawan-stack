@@ -22,4 +22,37 @@ var (
 	errUnknownMACVersion  = errors.DefineInvalidArgument("unknown_mac_version", "unknown MAC version")
 	errInvalidLength      = errors.DefineInvalidArgument("invalid_length", "invalid length")
 	errInvalidRequestType = errors.DefineInvalidArgument("invalid_request_type", "invalid request type `{type}`")
+
+	ErrNoAction           = defineError("no_action", ResultNoAction, "no action")
+	ErrMIC                = defineError("mic", ResultMICFailed, "MIC failed")
+	ErrFrameReplayed      = defineError("frame_replayed", ResultFrameReplayed, "frame replayed")
+	ErrJoinReq            = defineError("join_req", ResultJoinReqFailed, "join-request failed")
+	ErrNoRoamingAgreement = defineError("no_roaming_agreement", ResultNoRoamingAgreement, "no roaming agreement")
+	ErrDeviceRoaming      = defineError("device_roaming", ResultDevRoamingDisallowed, "device roaming disallowed")
+	ErrRoamingActivation  = defineError("roaming_activation", ResultRoamingActDisallowed, "roaming activation disallowed")
+	ErrActivation         = defineError("activation", ResultActivationDisallowed, "activation disallowed")
+	ErrUnknownDevEUI      = defineError("unknown_dev_eui", ResultUnknownDevEUI, "unknown DevEUI")
+	ErrUnknownDevAddr     = defineError("unknown_dev_addr", ResultUnknownDevAddr, "unknown DevAddr")
+	ErrUnknownSender      = defineError("unknown_sender", ResultUnknownSender, "unknown sender")
+	ErrUnknownReceiver    = defineError("unknown_receiver", ResultUnknownReceiver, "unknown receiver")
+	ErrDeferred           = defineError("deferred", ResultDeferred, "deferred")
+	ErrTransmitFailed     = defineError("transmit_failed", ResultXmitFailed, "transmit failed")
+	ErrFPort              = defineError("f_port", ResultInvalidFPort, "invalid FPort")
+	ErrProtocolVersion    = defineError("protocol_version", ResultInvalidProtocolVersion, "invalid protocol version")
+	ErrStaleDeviceProfile = defineError("stale_device_profile", ResultStaleDeviceProfile, "stale device profile")
+	ErrMalformedMessage   = defineError("malformed_message", ResultMalformedMessage, "malformed message")
+	ErrFrameSize          = defineError("frame_size", ResultFrameSizeError, "frame size error")
 )
+
+func defineError(name string, result Result, message string) ResultError {
+	return ResultError{
+		Definition: errors.Define(name, message),
+		Result:     result,
+	}
+}
+
+// ResultError is an error with LoRaWAN Backend Interfaces specified Result.
+type ResultError struct {
+	errors.Definition
+	Result Result
+}

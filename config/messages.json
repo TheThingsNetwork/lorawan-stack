@@ -3419,6 +3419,213 @@
       "file": "user_registry.go"
     }
   },
+  "error:pkg/interop:activation": {
+    "translations": {
+      "en": "activation disallowed"
+    },
+    "description": {
+      "package": "pkg/interop",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/interop:deferred": {
+    "translations": {
+      "en": "deferred"
+    },
+    "description": {
+      "package": "pkg/interop",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/interop:device_roaming": {
+    "translations": {
+      "en": "device roaming disallowed"
+    },
+    "description": {
+      "package": "pkg/interop",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/interop:f_port": {
+    "translations": {
+      "en": "invalid FPort"
+    },
+    "description": {
+      "package": "pkg/interop",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/interop:frame_replayed": {
+    "translations": {
+      "en": "frame replayed"
+    },
+    "description": {
+      "package": "pkg/interop",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/interop:frame_size": {
+    "translations": {
+      "en": "frame size error"
+    },
+    "description": {
+      "package": "pkg/interop",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/interop:invalid_length": {
+    "translations": {
+      "en": "invalid length"
+    },
+    "description": {
+      "package": "pkg/interop",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/interop:invalid_request_type": {
+    "translations": {
+      "en": "invalid request type `{type}`"
+    },
+    "description": {
+      "package": "pkg/interop",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/interop:join_req": {
+    "translations": {
+      "en": "join-request failed"
+    },
+    "description": {
+      "package": "pkg/interop",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/interop:malformed_message": {
+    "translations": {
+      "en": "malformed message"
+    },
+    "description": {
+      "package": "pkg/interop",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/interop:mic": {
+    "translations": {
+      "en": "MIC failed"
+    },
+    "description": {
+      "package": "pkg/interop",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/interop:no_action": {
+    "translations": {
+      "en": "no action"
+    },
+    "description": {
+      "package": "pkg/interop",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/interop:no_roaming_agreement": {
+    "translations": {
+      "en": "no roaming agreement"
+    },
+    "description": {
+      "package": "pkg/interop",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/interop:not_registered": {
+    "translations": {
+      "en": "not registered"
+    },
+    "description": {
+      "package": "pkg/interop",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/interop:protocol_version": {
+    "translations": {
+      "en": "invalid protocol version"
+    },
+    "description": {
+      "package": "pkg/interop",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/interop:roaming_activation": {
+    "translations": {
+      "en": "roaming activation disallowed"
+    },
+    "description": {
+      "package": "pkg/interop",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/interop:stale_device_profile": {
+    "translations": {
+      "en": "stale device profile"
+    },
+    "description": {
+      "package": "pkg/interop",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/interop:transmit_failed": {
+    "translations": {
+      "en": "transmit failed"
+    },
+    "description": {
+      "package": "pkg/interop",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/interop:unknown_dev_addr": {
+    "translations": {
+      "en": "unknown DevAddr"
+    },
+    "description": {
+      "package": "pkg/interop",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/interop:unknown_dev_eui": {
+    "translations": {
+      "en": "unknown DevEUI"
+    },
+    "description": {
+      "package": "pkg/interop",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/interop:unknown_mac_version": {
+    "translations": {
+      "en": "unknown MAC version"
+    },
+    "description": {
+      "package": "pkg/interop",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/interop:unknown_receiver": {
+    "translations": {
+      "en": "unknown receiver"
+    },
+    "description": {
+      "package": "pkg/interop",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/interop:unknown_sender": {
+    "translations": {
+      "en": "unknown sender"
+    },
+    "description": {
+      "package": "pkg/interop",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/joinserver/provisioning:entry": {
     "translations": {
       "en": "invalid entry"
@@ -3597,6 +3804,15 @@
     "description": {
       "package": "pkg/joinserver",
       "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:interop_not_implemented": {
+    "translations": {
+      "en": "interop endpoint not implemented"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "http_interop.go"
     }
   },
   "error:pkg/joinserver:invalid_identifiers": {
