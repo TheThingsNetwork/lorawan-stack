@@ -131,10 +131,6 @@ var (
 				return errNoApplicationID
 			}
 			paths := util.SelectFieldMask(cmd.Flags(), selectEndDeviceListFlags)
-			if len(paths) == 0 {
-				logger.Warnf("No fields selected, selecting %v", defaultGetPaths)
-				paths = append(paths, defaultGetPaths...)
-			}
 
 			is, err := api.Dial(ctx, config.IdentityServerAddress)
 			if err != nil {
@@ -161,10 +157,6 @@ var (
 				return err
 			}
 			paths := util.SelectFieldMask(cmd.Flags(), selectEndDeviceFlags)
-			if len(paths) == 0 {
-				logger.Warnf("No fields selected, selecting %v", defaultGetPaths)
-				paths = append(paths, defaultGetPaths...)
-			}
 
 			isPaths, nsPaths, asPaths, jsPaths := splitEndDeviceGetPaths(paths...)
 
