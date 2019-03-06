@@ -18,6 +18,7 @@ import { Col, Row, Container } from 'react-grid-system'
 
 import sharedMessages from '../../../lib/shared-messages'
 import Message from '../../../lib/components/message'
+import DateTime from '../../../lib/components/date-time'
 import DevicesTable from '../../containers/devices-table'
 
 import style from './application-overview.styl'
@@ -50,13 +51,13 @@ class ApplicationOverview extends React.Component {
             <strong className={style.key}>
               <Message content={sharedMessages.createdAt} />
             </strong>
-            <span className={style.value}>{created_at}</span>
+            <DateTime className={style.value} value={created_at} />
           </li>
           <li className={style.attributesEntry}>
             <strong className={style.key}>
               <Message content={sharedMessages.updatedAt} />
             </strong>
-            <span className={style.value}>{updated_at}</span>
+            <DateTime className={style.value} value={updated_at} />
           </li>
         </ul>
       </div>
