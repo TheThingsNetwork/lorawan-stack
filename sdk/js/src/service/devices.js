@@ -25,24 +25,25 @@ import deviceEntityMap from '../../generated/device-entity-map.json'
  * device data.
  */
 class Devices {
-  constructor (api, { applicationId, proxy = true }) {
+  constructor (api, { proxy = true }) {
+    if (!api) {
+      throw new Error('Cannot initialize device service without api object.')
+    }
     this._api = api
-    this._applicationId = applicationId
-    this._idMask = { route: { 'end_device.ids.application_ids.application_id': this._applicationId }}
     this._entityTransform = proxy
       ? app => new Device(this, app, false)
       : undefined
   }
 
-  _splitEntitySetPaths (paths, base = {}) {
+  _splitEntitySetPaths (paths, base) {
     return this._splitEntityPaths(paths, 'set', base)
   }
 
-  _splitEntityGetPaths (paths, base = {}) {
+  _splitEntityGetPaths (paths, base) {
     return this._splitEntityPaths(paths, 'get', base)
   }
 
-  _splitEntityPaths (paths, direction, base = {}) {
+  _splitEntityPaths (paths = [], direction, base = {}) {
     const result = base
     const retrieveIndex = direction === 'get' ? 0 : 1
 
@@ -50,6 +51,10 @@ class Devices {
       const subtree =
         traverse(deviceEntityMap).get(path)
         || traverse(deviceEntityMap).get([ path[0] ])
+
+      if (!subtree) {
+        throw new Error(`Invalid or unknown field mask path used: ${path}`)
+      }
 
       const definition = '_root' in subtree ? subtree._root[retrieveIndex] : subtree[retrieveIndex]
 
@@ -70,31 +75,41 @@ class Devices {
     const result = base
 
     for (const part of parts) {
-      for (const path of part.paths) {
-        traverse(result).set(path, traverse(part.record).get(path))
+      for (const path of part.paths || []) {
+        const val = traverse(part.record).get(path)
+        if (val) {
+          traverse(result).set(path, val)
+        }
       }
     }
 
     return result
   }
 
-  async getById (deviceId) {
-    const res = await this._api.EndDeviceRegistry.Get({
-      ...this._idMask,
-      device_id: deviceId,
-    })
+  async _setDevice (applicationId, device, create = false) {
+    const ids = device.ids
+    const deviceId = 'device_id' in ids && ids.device_id
+    const appId = applicationId || 'application_ids' in ids && ids.application_ids.application_id
 
-    return new Device(res, this)
-  }
+    if (!create && !deviceId) {
+      throw new Error('Missing device_id for update operation.')
+    }
 
-  async updateById (deviceId) {
-    return this._api.EndDeviceRegistry.Get({
-      ...this._idMask,
-      device_id: deviceId,
-    })
-  }
+    if (!appId) {
+      throw new Error('Missing application_id for device.')
+    }
 
-  async create (device, applicationId = this._applicationId) {
+    const mergeBase = create ? {
+      ns: [[ 'ids' ]],
+      as: [[ 'ids' ]],
+      js: [[ 'ids' ]],
+    } : {}
+
+    const params = {
+      routeParams: { 'end_device.ids.application_ids.application_id': appId },
+    }
+
+    // Extract the paths from the patch
     const paths = traverse(device).reduce(function (acc, node) {
       if (this.isLeaf) {
         acc.push(this.path)
@@ -102,66 +117,131 @@ class Devices {
       return acc
     }, [])
 
-    const requestTree = this._splitEntitySetPaths(paths, {
-      ns: [[ 'ids' ], [ 'created_at' ], [ 'updated_at' ]],
-      as: [[ 'ids' ], [ 'created_at' ], [ 'updated_at' ]],
-      js: [[ 'ids' ], [ 'created_at' ], [ 'updated_at' ]],
-    })
+    const requestTree = this._splitEntitySetPaths(paths, mergeBase)
 
-    const isResult = await this._api.EndDeviceRegistry.Create(
-      { route: { 'end_device.ids.application_ids.application_id': applicationId }},
-      { end_device: device }
-    )
+    let isResult = {}
+    if (create) {
+      isResult = await this._api.EndDeviceRegistry.Create(params, device)
+    }
 
-    let nsResult = {}
-    let asResult = {}
-    let jsResult = {}
+    params.routeParams['end_device.ids.device_id'] = 'data' in isResult ? isResult.data.ids.device_id : deviceId
+
+    const requests = new Array(3)
+
+    if (!create && 'is' in requestTree) {
+      isResult = await this._api.EndDeviceRegistry.Update({
+        ...params,
+        ...Marshaler.pathsToFieldMask(requestTree.is),
+      }, device)
+    }
 
     if ('ns' in requestTree) {
-      nsResult = await this._api.NsDeviceRegistry.Set({
-        route: {
-          'device.ids.application_ids.application_id': applicationId,
-        },
+      requests[0] = this._api.NsEndDeviceRegistry.Set({
+        ...params,
+        ...Marshaler.pathsToFieldMask(requestTree.ns),
+      }, device)
+    }
+    if ('as' in requestTree) {
+      requests[1] = this._api.AsEndDeviceRegistry.Set({
+        ...params,
+        ...Marshaler.pathsToFieldMask(requestTree.as),
+      }, device)
+    }
+    if ('js' in requestTree) {
+      requests[2] = this._api.JsEndDeviceRegistry.Set({
+        ...params,
+        ...Marshaler.pathsToFieldMask(requestTree.js),
+      }, device)
+    }
+
+    // TODO: Error handling
+    const setResults = (await Promise.all(requests))
+      .map(e => e ? Marshaler.payloadSingleResponse(e) : undefined)
+
+    const result = this._mergeEntity([
+      { record: Marshaler.payloadSingleResponse(isResult), paths: requestTree.is },
+      { record: setResults[0], paths: requestTree.ns },
+      { record: setResults[1], paths: requestTree.as },
+      { record: setResults[2], paths: requestTree.js },
+    ])
+
+    return result
+  }
+
+  async _getDevice (applicationId, deviceId, paths) {
+
+    if (!applicationId) {
+      throw new Error('Missing application_id for device.')
+    }
+
+    const requestTree = this._splitEntityGetPaths(paths)
+
+    const params = {
+      routeParams: {
+        'end_device_ids.application_ids.application_id': applicationId,
+        'end_device_ids.device_id': deviceId,
       },
-      {
-        device,
-        field_mask: Marshaler.fieldMask(requestTree.ns),
+    }
+
+    let isResult = {}
+    const requests = new Array(3)
+
+    if ('is' in requestTree) {
+      isResult = await this._api.EndDeviceRegistry.Get({
+        ...params,
+        ...Marshaler.pathsToFieldMask(requestTree.is),
+      })
+    }
+
+    if ('ns' in requestTree) {
+      requests[0] = this._api.NsEndDeviceRegistry.Get({
+        ...params,
+        ...Marshaler.pathsToFieldMask(requestTree.ns),
       })
     }
     if ('as' in requestTree) {
-      asResult = await this._api.AsDeviceRegistry.Set({
-        route: {
-          'device.ids.application_ids.application_id': applicationId,
-        },
-      },
-      {
-        device,
-        field_mask: Marshaler.fieldMask(requestTree.as),
+      requests[1] = this._api.AsEndDeviceRegistry.Get({
+        ...params,
+        ...Marshaler.pathsToFieldMask(requestTree.as),
       })
     }
     if ('js' in requestTree) {
-      jsResult = await this._api.JsDeviceRegistry.Set({
-        route: {
-          'device.ids.application_ids.application_id': applicationId,
-        },
-      },
-      {
-        device,
-        field_mask: Marshaler.fieldMask(requestTree.js),
+      requests[2] = this._api.JsEndDeviceRegistry.Get({
+        ...params,
+        ...Marshaler.pathsToFieldMask(requestTree.js),
       })
     }
 
+    // TODO: Error handling
+    const getResults = (await Promise.all(requests))
+      .map(e => e ? Marshaler.payloadSingleResponse(e) : undefined)
+
     const result = this._mergeEntity([
-      { record: isResult.data, paths: requestTree.is },
-      { record: nsResult.data, paths: requestTree.ns },
-      { record: asResult.data, paths: requestTree.as },
-      { record: jsResult.data, paths: requestTree.js },
+      { record: Marshaler.payloadSingleResponse(isResult), paths: requestTree.is },
+      { record: getResults[0], paths: requestTree.ns },
+      { record: getResults[1], paths: requestTree.as },
+      { record: getResults[2], paths: requestTree.js },
     ])
 
-    return Marshaler.unwrapDevice(
-      result,
-      this._entityTransform
-    )
+    return result
+  }
+
+  async getById (applicationId, deviceId, selector) {
+    const result = await this._getDevice(applicationId, deviceId, Marshaler.selectorToPaths(selector))
+
+    return result
+  }
+
+  async updateById (applicationId, deviceId, patch) {
+    const result = await this._setDevice(applicationId, patch, true)
+
+    return result
+  }
+
+  async create (applicationId, device) {
+    const result = await this._setDevice(applicationId, device, true)
+
+    return result
   }
 }
 
