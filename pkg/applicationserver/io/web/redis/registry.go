@@ -31,10 +31,18 @@ var (
 )
 
 func applyWebhookFieldMask(dst, src *ttnpb.ApplicationWebhook, paths ...string) (*ttnpb.ApplicationWebhook, error) {
+	paths = append(paths, "ids")
+
 	if dst == nil {
 		dst = &ttnpb.ApplicationWebhook{}
 	}
-	return dst, dst.SetFields(src, append(paths, "ids")...)
+	if err := dst.SetFields(src, paths...); err != nil {
+		return nil, err
+	}
+	if err := dst.ValidateFields(paths...); err != nil {
+		return nil, err
+	}
+	return dst, nil
 }
 
 // WebhookRegistry is a Redis webhook registry.

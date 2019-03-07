@@ -225,7 +225,7 @@ func (w *webhooks) validateAndFillIDs() echo.MiddlewareFunc {
 				ApplicationIdentifiers: appID,
 				WebhookID:              c.Param(webhookIDKey),
 			}
-			if err := hookID.Validate(); err != nil {
+			if err := hookID.ValidateFields(); err != nil {
 				return err
 			}
 			c.Set(webhookIDKey, hookID)
