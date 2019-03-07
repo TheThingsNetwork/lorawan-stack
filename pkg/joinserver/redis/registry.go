@@ -158,6 +158,12 @@ func (r *DeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devE
 				pb.DevEUI == nil || *pb.DevEUI != devEUI {
 				return errInvalidIdentifiers
 			}
+			if err := (&ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: pb.ApplicationIdentifiers,
+				DeviceID:               pb.DeviceID,
+			}).ValidateContext(ctx); err != nil {
+				return errInvalidIdentifiers.WithCause(err)
+			}
 
 			pb.UpdatedAt = time.Now().UTC()
 			sets = append(sets, "updated_at")
@@ -208,20 +214,18 @@ func (r *DeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devE
 				eid := ttnredis.Key(joinEUI.String(), devEUI.String())
 
 				if stored == nil {
-					if !updated.ApplicationIdentifiers.IsZero() && updated.DeviceID != "" {
-						ik := r.uidKey(unique.ID(ctx, updated.EndDeviceIdentifiers))
-						if err := tx.Watch(ik).Err(); err != nil {
-							return err
-						}
-						i, err := tx.Exists(ik).Result()
-						if err != nil {
-							return ttnredis.ConvertError(err)
-						}
-						if i != 0 {
-							return errDuplicateIdentifiers
-						}
-						p.SetNX(ik, r.euiKey(joinEUI, devEUI), 0)
+					ik := r.uidKey(unique.ID(ctx, updated.EndDeviceIdentifiers))
+					if err := tx.Watch(ik).Err(); err != nil {
+						return err
 					}
+					i, err := tx.Exists(ik).Result()
+					if err != nil {
+						return ttnredis.ConvertError(err)
+					}
+					if i != 0 {
+						return errDuplicateIdentifiers
+					}
+					p.SetNX(ik, r.euiKey(joinEUI, devEUI), 0)
 
 					if updatedPID != "" {
 						pk := r.provisionerKey(updated.ProvisionerID, updatedPID)
