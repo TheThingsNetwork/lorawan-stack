@@ -24,7 +24,7 @@ var errIdentifiers = errors.DefineInvalidArgument("identifiers", "invalid identi
 
 // ValidateContext wraps the generated validator with (optionally context-based) custom checks.
 func (ids *EndDeviceIdentifiers) ValidateContext(context.Context) error {
-	if err := ids.Validate(); err != nil {
+	if err := ids.ValidateFields(); err != nil {
 		return errIdentifiers.WithCause(err)
 	}
 	return nil
@@ -32,7 +32,7 @@ func (ids *EndDeviceIdentifiers) ValidateContext(context.Context) error {
 
 // ValidateContext wraps the generated validator with (optionally context-based) custom checks.
 func (ids *ApplicationIdentifiers) ValidateContext(context.Context) error {
-	if err := ids.Validate(); err != nil {
+	if err := ids.ValidateFields(); err != nil {
 		return errIdentifiers.WithCause(err)
 	}
 	return nil
@@ -40,7 +40,7 @@ func (ids *ApplicationIdentifiers) ValidateContext(context.Context) error {
 
 // ValidateContext wraps the generated validator with (optionally context-based) custom checks.
 func (ids *GatewayIdentifiers) ValidateContext(context.Context) error {
-	if err := ids.Validate(); err != nil {
+	if err := ids.ValidateFields(); err != nil {
 		return errIdentifiers.WithCause(err)
 	}
 	return nil
@@ -48,7 +48,7 @@ func (ids *GatewayIdentifiers) ValidateContext(context.Context) error {
 
 // ValidateContext wraps the generated validator with (optionally context-based) custom checks.
 func (ids *UserIdentifiers) ValidateContext(context.Context) error {
-	if err := ids.Validate(); err != nil {
+	if err := ids.ValidateFields(); err != nil {
 		return errIdentifiers.WithCause(err)
 	}
 	return nil

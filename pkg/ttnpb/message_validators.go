@@ -27,7 +27,7 @@ func (s TxSettings) ValidateContext(ctx context.Context) error {
 	if s.GetDataRateIndex() > math.MaxUint8 {
 		return errExpectedLowerOrEqual("TxDRIdx", math.MaxUint8)(s.GetDataRateIndex())
 	}
-	return s.Validate()
+	return s.ValidateFields()
 }
 
 // ValidateContext wraps the generated validator with (optionally context-based) custom checks.
@@ -35,7 +35,7 @@ func (p MACPayload) ValidateContext(context.Context) error {
 	if p.DevAddr.IsZero() {
 		return errMissing("DevAddr")
 	}
-	return p.Validate()
+	return p.ValidateFields()
 }
 
 // ValidateContext wraps the generated validator with (optionally context-based) custom checks.
@@ -46,7 +46,7 @@ func (p JoinRequestPayload) ValidateContext(context.Context) error {
 	if p.JoinEUI.IsZero() {
 		return errMissing("JoinEUI")
 	}
-	return p.Validate()
+	return p.ValidateFields()
 }
 
 var (
@@ -67,24 +67,24 @@ func (m *UplinkMessage) ValidateContext(context.Context) error {
 			if mp == nil {
 				return errMissing("MACPayload")
 			}
-			return mp.Validate()
+			return mp.ValidateFields()
 		case MType_JOIN_REQUEST:
 			jp := p.GetJoinRequestPayload()
 			if jp == nil {
 				return errMissing("JoinRequestPayload")
 			}
-			return jp.Validate()
+			return jp.ValidateFields()
 		case MType_REJOIN_REQUEST:
 			rp := p.GetRejoinRequestPayload()
 			if rp == nil {
 				return errMissing("RejoinRequestPayload")
 			}
-			return rp.Validate()
+			return rp.ValidateFields()
 		default:
 			return errExpectedUplinkMType.WithAttributes("result", p.GetMType().String())
 		}
 	}
-	return m.Validate()
+	return m.ValidateFields()
 }
 
 // ValidateContext wraps the generated validator with (optionally context-based) custom checks.
