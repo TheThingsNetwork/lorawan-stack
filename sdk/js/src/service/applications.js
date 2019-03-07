@@ -16,6 +16,7 @@ import Marshaler from '../util/marshaler'
 import Device from '../entity/device'
 import Application from '../entity/application'
 import ApiKeys from './api-keys'
+import Link from './link'
 
 /**
  * Applications Class provides an abstraction on all applications and manages
@@ -41,6 +42,7 @@ class Applications {
       create: 'application_ids.application_id',
       update: 'application_ids.application_id',
     })
+    this.Link = new Link(api.As)
 
     this.getAll = this.getAll.bind(this)
     this.getById = this.getById.bind(this)
@@ -188,6 +190,18 @@ class Applications {
       },
       async addCollaborator (collaborator) {
         return api.ApplicationAccess.SetCollaborator(idMask, collaborator)
+      },
+      async createLink (link) {
+        return this.Link.create(id, link)
+      },
+      async setLink (link, mask) {
+        return this.Link.set(id, link, mask)
+      },
+      async deleteLink () {
+        return this.Link.delete(id)
+      },
+      async getLinkStats () {
+        return this.Link.getStats(id)
       },
     }
   }

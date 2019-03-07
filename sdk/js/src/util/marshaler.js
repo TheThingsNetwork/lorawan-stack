@@ -89,6 +89,10 @@ class Marshaler {
   static fieldMask (fieldMask) {
     return { paths: fieldMask }
   }
+
+  static queryFieldMask (fields = []) {
+    return { 'field_mask.paths': fields }
+  }
 }
 
 export default Marshaler
