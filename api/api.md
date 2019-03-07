@@ -882,9 +882,9 @@ The As service manages the Application Server.
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | GetLink | [GetApplicationLinkRequest](#ttn.lorawan.v3.GetApplicationLinkRequest) | [ApplicationLink](#ttn.lorawan.v3.GetApplicationLinkRequest) |  |
-| SetLink | [SetApplicationLinkRequest](#ttn.lorawan.v3.SetApplicationLinkRequest) | [ApplicationLink](#ttn.lorawan.v3.SetApplicationLinkRequest) |  |
+| SetLink | [SetApplicationLinkRequest](#ttn.lorawan.v3.SetApplicationLinkRequest) | [ApplicationLink](#ttn.lorawan.v3.SetApplicationLinkRequest) | Set a link configuration from the Application Server a Network Server. This call returns immediately after setting the link configuration; it does not wait for a link to establish. To get link statistics or errors, use the `GetLinkStats` call. |
 | DeleteLink | [ApplicationIdentifiers](#ttn.lorawan.v3.ApplicationIdentifiers) | [.google.protobuf.Empty](#ttn.lorawan.v3.ApplicationIdentifiers) |  |
-| GetLinkStats | [ApplicationIdentifiers](#ttn.lorawan.v3.ApplicationIdentifiers) | [ApplicationLinkStats](#ttn.lorawan.v3.ApplicationIdentifiers) |  |
+| GetLinkStats | [ApplicationIdentifiers](#ttn.lorawan.v3.ApplicationIdentifiers) | [ApplicationLinkStats](#ttn.lorawan.v3.ApplicationIdentifiers) | GetLinkStats returns the link statistics. This call returns a NotFound error code if there is no link for the given application identifiers. This call returns the error code of the link error if linking to a Network Server failed. |
 
 
 <a name="ttn.lorawan.v3.AsEndDeviceRegistry"/>

@@ -72,6 +72,9 @@ service As {
     };
   };
 
+  // Set a link configuration from the Application Server a Network Server.
+  // This call returns immediately after setting the link configuration; it does not wait for a link to establish.
+  // To get link statistics or errors, use the `GetLinkStats` call.
   rpc SetLink(SetApplicationLinkRequest) returns (ApplicationLink) {
     option (google.api.http) = {
       put: "/as/applications/{application_ids.application_id}/link",
@@ -85,6 +88,9 @@ service As {
     };
   };
 
+  // GetLinkStats returns the link statistics.
+  // This call returns a NotFound error code if there is no link for the given application identifiers.
+  // This call returns the error code of the link error if linking to a Network Server failed.
   rpc GetLinkStats(ApplicationIdentifiers) returns (ApplicationLinkStats) {
     option (google.api.http) = {
       get: "/as/applications/{application_id}/link/stats"

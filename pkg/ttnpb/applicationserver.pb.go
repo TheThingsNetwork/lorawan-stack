@@ -55,7 +55,7 @@ type ApplicationLink struct {
 func (m *ApplicationLink) Reset()      { *m = ApplicationLink{} }
 func (*ApplicationLink) ProtoMessage() {}
 func (*ApplicationLink) Descriptor() ([]byte, []int) {
-	return fileDescriptor_applicationserver_86dcbbd9150e7f7b, []int{0}
+	return fileDescriptor_applicationserver_fd6744fee21f219e, []int{0}
 }
 func (m *ApplicationLink) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -115,7 +115,7 @@ type GetApplicationLinkRequest struct {
 func (m *GetApplicationLinkRequest) Reset()      { *m = GetApplicationLinkRequest{} }
 func (*GetApplicationLinkRequest) ProtoMessage() {}
 func (*GetApplicationLinkRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_applicationserver_86dcbbd9150e7f7b, []int{1}
+	return fileDescriptor_applicationserver_fd6744fee21f219e, []int{1}
 }
 func (m *GetApplicationLinkRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -162,7 +162,7 @@ type SetApplicationLinkRequest struct {
 func (m *SetApplicationLinkRequest) Reset()      { *m = SetApplicationLinkRequest{} }
 func (*SetApplicationLinkRequest) ProtoMessage() {}
 func (*SetApplicationLinkRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_applicationserver_86dcbbd9150e7f7b, []int{2}
+	return fileDescriptor_applicationserver_fd6744fee21f219e, []int{2}
 }
 func (m *SetApplicationLinkRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -218,7 +218,7 @@ type ApplicationLinkStats struct {
 func (m *ApplicationLinkStats) Reset()      { *m = ApplicationLinkStats{} }
 func (*ApplicationLinkStats) ProtoMessage() {}
 func (*ApplicationLinkStats) Descriptor() ([]byte, []int) {
-	return fileDescriptor_applicationserver_86dcbbd9150e7f7b, []int{3}
+	return fileDescriptor_applicationserver_fd6744fee21f219e, []int{3}
 }
 func (m *ApplicationLinkStats) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -451,8 +451,14 @@ const _ = grpc.SupportPackageIsVersion4
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type AsClient interface {
 	GetLink(ctx context.Context, in *GetApplicationLinkRequest, opts ...grpc.CallOption) (*ApplicationLink, error)
+	// Set a link configuration from the Application Server a Network Server.
+	// This call returns immediately after setting the link configuration; it does not wait for a link to establish.
+	// To get link statistics or errors, use the `GetLinkStats` call.
 	SetLink(ctx context.Context, in *SetApplicationLinkRequest, opts ...grpc.CallOption) (*ApplicationLink, error)
 	DeleteLink(ctx context.Context, in *ApplicationIdentifiers, opts ...grpc.CallOption) (*types.Empty, error)
+	// GetLinkStats returns the link statistics.
+	// This call returns a NotFound error code if there is no link for the given application identifiers.
+	// This call returns the error code of the link error if linking to a Network Server failed.
 	GetLinkStats(ctx context.Context, in *ApplicationIdentifiers, opts ...grpc.CallOption) (*ApplicationLinkStats, error)
 }
 
@@ -503,8 +509,14 @@ func (c *asClient) GetLinkStats(ctx context.Context, in *ApplicationIdentifiers,
 // AsServer is the server API for As service.
 type AsServer interface {
 	GetLink(context.Context, *GetApplicationLinkRequest) (*ApplicationLink, error)
+	// Set a link configuration from the Application Server a Network Server.
+	// This call returns immediately after setting the link configuration; it does not wait for a link to establish.
+	// To get link statistics or errors, use the `GetLinkStats` call.
 	SetLink(context.Context, *SetApplicationLinkRequest) (*ApplicationLink, error)
 	DeleteLink(context.Context, *ApplicationIdentifiers) (*types.Empty, error)
+	// GetLinkStats returns the link statistics.
+	// This call returns a NotFound error code if there is no link for the given application identifiers.
+	// This call returns the error code of the link error if linking to a Network Server failed.
 	GetLinkStats(context.Context, *ApplicationIdentifiers) (*ApplicationLinkStats, error)
 }
 
@@ -2120,13 +2132,13 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("lorawan-stack/api/applicationserver.proto", fileDescriptor_applicationserver_86dcbbd9150e7f7b)
+	proto.RegisterFile("lorawan-stack/api/applicationserver.proto", fileDescriptor_applicationserver_fd6744fee21f219e)
 }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/applicationserver.proto", fileDescriptor_applicationserver_86dcbbd9150e7f7b)
+	golang_proto.RegisterFile("lorawan-stack/api/applicationserver.proto", fileDescriptor_applicationserver_fd6744fee21f219e)
 }
 
-var fileDescriptor_applicationserver_86dcbbd9150e7f7b = []byte{
+var fileDescriptor_applicationserver_fd6744fee21f219e = []byte{
 	// 1257 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xc4, 0x97, 0x4f, 0x8c, 0x13, 0x55,
 	0x1c, 0xc7, 0xe7, 0x75, 0xcb, 0x2e, 0xfb, 0x50, 0xfe, 0x0c, 0x04, 0x77, 0xab, 0xbe, 0x6e, 0x06,
