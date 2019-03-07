@@ -3,10 +3,10 @@
 /.make,/.mage @htdvisser @rvolosatovs
 /api @johanstokking @htdvisser @rvolosatovs
 /cmd @johanstokking @htdvisser @rvolosatovs
-/doc @TheThingsIndustries/stack
-/config @TheThingsIndustries/stack
+/doc @TheThingsNetwork/stack
+/config @TheThingsNetwork/stack
 
-/pkg @TheThingsIndustries/stack
+/pkg @TheThingsNetwork/stack
 /pkg/auth @johanstokking @htdvisser
 /pkg/crypto @johanstokking @htdvisser
 /pkg/webui @bafonis @kschiffer
