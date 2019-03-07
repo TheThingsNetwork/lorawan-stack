@@ -15,7 +15,7 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
-import "github.com/mwitkow/go-proto-validators/validator.proto";
+import "github.com/lyft/protoc-gen-validate/validate/validate.proto";
 import "google/protobuf/duration.proto";
 import "lorawan-stack/api/keys.proto";
 import "lorawan-stack/api/lorawan.proto";
@@ -27,7 +27,7 @@ option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 message JoinRequest {
   option (gogoproto.populate) = false;
 
-  bytes raw_payload = 1 [(validator.field) = { length_eq: 23 }];
+  bytes raw_payload = 1 [(validate.rules).bytes = {len: 23}];
   Message payload = 2;
   bytes dev_addr = 3 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.DevAddr"];
   MACVersion selected_mac_version = 4 [(gogoproto.customname) = "SelectedMACVersion"];
@@ -41,7 +41,7 @@ message JoinRequest {
 }
 
 message JoinResponse {
-  bytes raw_payload = 1 [(validator.field) = { length_gt:16, length_lt: 34 }];
+  bytes raw_payload = 1 [(validate.rules).bytes = {min_len:17, max_len: 33}];
   SessionKeys session_keys = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
   google.protobuf.Duration lifetime = 3 [(gogoproto.nullable) = false, (gogoproto.stdduration) = true];
   repeated string correlation_ids = 4 [(gogoproto.customname) = "CorrelationIDs"];
