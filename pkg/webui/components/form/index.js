@@ -224,7 +224,7 @@ const fieldErrors = function (definition, error) {
       }
     })
 
-    return formatted
+    return Object.keys(formatted).length ? formatted : null
   }
 }
 
