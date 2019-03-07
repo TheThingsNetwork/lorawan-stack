@@ -32,6 +32,7 @@ func onlyPublicContactInfo(info []*ContactInfo) []*ContactInfo {
 var PublicEntityFields = []string{
 	"ids",
 	"created_at",
+	"updated_at",
 	"contact_info", // Note that this is filtered.
 }
 
