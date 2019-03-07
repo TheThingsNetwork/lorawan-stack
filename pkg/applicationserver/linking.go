@@ -169,12 +169,17 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 		<-ctx.Done()
 		as.linkErrors.Store(uid, ctx.Err())
 		as.links.Delete(uid)
+		if err := ctx.Err(); err != nil && !errors.IsCanceled(err) {
+			log.FromContext(ctx).WithError(err).Warn("Link failed")
+			registerLinkFail(ctx, l, err)
+		}
 	}()
 	if err := as.connectLink(ctx, l); err != nil {
 		return err
 	}
 	client := ttnpb.NewAsNsClient(l.conn)
-	logger := log.FromContext(ctx).WithField("network_server", l.connName)
+	ctx = log.NewContextWithField(ctx, "network_server", l.connName)
+	logger := log.FromContext(ctx)
 	logger.Debug("Linking")
 	stream, err := client.LinkApplication(ctx, l.callOpts...)
 	if err != nil {
@@ -182,9 +187,13 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 		return err
 	}
 	logger.Info("Linked")
-	registerLink(ctx, l)
-	defer func() {
-		registerUnlink(ctx, l, err)
+	registerLinkStart(ctx, l)
+	go func() {
+		<-ctx.Done()
+		if err := ctx.Err(); errors.IsCanceled(err) {
+			logger.Info("Unlinked")
+			registerLinkStop(ctx, l)
+		}
 	}()
 
 	go l.run()
@@ -199,11 +208,6 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 	for {
 		up, err := stream.Recv()
 		if err != nil {
-			if errors.IsCanceled(err) {
-				logger.Debug("Unlinked")
-			} else {
-				logger.WithError(err).Warn("Link failed")
-			}
 			select {
 			case <-ctx.Done():
 				return ctx.Err()
@@ -220,11 +224,6 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 
 		handleUpErr := as.handleUp(ctx, up, l)
 		if err := stream.Send(ttnpb.Empty); err != nil {
-			if errors.IsCanceled(err) {
-				logger.Debug("Unlinked")
-			} else {
-				logger.WithError(err).Warn("Link failed")
-			}
 			return err
 		}
 

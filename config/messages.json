@@ -4877,6 +4877,15 @@
       "file": "observability.go"
     }
   },
+  "event:as.link.fail": {
+    "translations": {
+      "en": "link fail"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "observability.go"
+    }
+  },
   "event:as.link.start": {
     "translations": {
       "en": "link start"

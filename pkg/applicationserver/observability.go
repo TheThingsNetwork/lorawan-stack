@@ -28,6 +28,7 @@ import (
 var (
 	evtLinkStart = events.Define("as.link.start", "link start")
 	evtLinkStop  = events.Define("as.link.stop", "link stop")
+	evtLinkFail  = events.Define("as.link.fail", "link fail")
 
 	evtApplicationSubscribe   = events.Define("as.application.subscribe", "application subscribe")
 	evtApplicationUnsubscribe = events.Define("as.application.unsubscribe", "application unsubscribe")
@@ -70,6 +71,14 @@ var asMetrics = &messageMetrics{
 			Subsystem: subsystem,
 			Name:      "links_stopped",
 			Help:      "Number of links stopped",
+		},
+		[]string{networkServer},
+	),
+	linksFailed: metrics.NewContextualCounterVec(
+		prometheus.CounterOpts{
+			Subsystem: subsystem,
+			Name:      "links_failed",
+			Help:      "Number of links failed",
 		},
 		[]string{networkServer},
 	),
@@ -146,6 +155,7 @@ func init() {
 type messageMetrics struct {
 	linksStarted         *metrics.ContextualCounterVec
 	linksStopped         *metrics.ContextualCounterVec
+	linksFailed          *metrics.ContextualCounterVec
 	subscriptionsStarted *metrics.ContextualCounterVec
 	subscriptionsStopped *metrics.ContextualCounterVec
 	uplinkReceived       *metrics.ContextualCounterVec
@@ -159,6 +169,7 @@ type messageMetrics struct {
 func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
 	m.linksStarted.Describe(ch)
 	m.linksStopped.Describe(ch)
+	m.linksFailed.Describe(ch)
 	m.subscriptionsStarted.Describe(ch)
 	m.subscriptionsStopped.Describe(ch)
 	m.uplinkReceived.Describe(ch)
@@ -172,6 +183,7 @@ func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
 func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 	m.linksStarted.Collect(ch)
 	m.linksStopped.Collect(ch)
+	m.linksFailed.Collect(ch)
 	m.subscriptionsStarted.Collect(ch)
 	m.subscriptionsStopped.Collect(ch)
 	m.uplinkReceived.Collect(ch)
@@ -182,14 +194,18 @@ func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 	m.downlinkDropped.Collect(ch)
 }
 
-func registerLink(ctx context.Context, link *link) {
+func registerLinkStart(ctx context.Context, link *link) {
 	events.Publish(evtLinkStart(ctx, link.ApplicationIdentifiers, nil))
 	asMetrics.linksStarted.WithLabelValues(ctx, link.NetworkServerAddress).Inc()
 }
 
-func registerUnlink(ctx context.Context, link *link, err error) {
-	events.Publish(evtLinkStop(ctx, link.ApplicationIdentifiers, err))
+func registerLinkStop(ctx context.Context, link *link) {
+	events.Publish(evtLinkStop(ctx, link.ApplicationIdentifiers, nil))
 	asMetrics.linksStopped.WithLabelValues(ctx, link.NetworkServerAddress).Inc()
+}
+
+func registerLinkFail(ctx context.Context, link *link, err error) {
+	events.Publish(evtLinkFail(ctx, link.ApplicationIdentifiers, err))
 }
 
 func registerSubscribe(ctx context.Context, sub *io.Subscription) {
