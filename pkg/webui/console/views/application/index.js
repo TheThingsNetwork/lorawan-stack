@@ -26,6 +26,7 @@ import Spinner from '../../../components/spinner'
 import ApplicationOverview from '../application-overview'
 import ApplicationGeneralSettings from '../application-general-settings'
 import ApplicationApiKeys from '../application-api-keys'
+import ApplicationLink from '../application-link'
 
 import { getApplication } from '../../store/actions/application'
 
@@ -59,9 +60,9 @@ import { getApplication } from '../../store/actions/application'
         icon: 'data',
       },
       {
-        title: sharedMessages.payload_formats,
-        path: `${matchedUrl}/payload-formats`,
-        icon: 'payload_formats',
+        title: sharedMessages.link,
+        path: `${matchedUrl}/link`,
+        icon: 'link',
       },
       {
         title: sharedMessages.integrations,
@@ -126,6 +127,7 @@ export default class Application extends React.Component {
         <Route exact path={`${match.path}`} component={ApplicationOverview} />
         <Route path={`${match.path}/general-settings`} component={ApplicationGeneralSettings} />
         <Route path={`${match.path}/api-keys`} component={ApplicationApiKeys} />
+        <Route path={`${match.path}/link`} component={ApplicationLink} />
       </Switch>
     )
   }
