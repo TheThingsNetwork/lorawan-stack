@@ -15,6 +15,7 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/mwitkow/go-proto-validators/validator.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
@@ -95,7 +96,7 @@ message Gateway {
   // the normal port inference (with DNS lookup, otherwise defaults) is used.
   // The connection shall be established with transport layer security (TLS).
   // Custom certificate authorities may be configured out-of-band.
-  string gateway_server_address = 9;
+  string gateway_server_address = 9 [(validator.field) = {regex: "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"}];
   bool auto_update = 10;
   string update_channel = 11;
   string frequency_plan_id = 12 [(gogoproto.customname) = "FrequencyPlanID"];

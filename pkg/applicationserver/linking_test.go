@@ -39,7 +39,7 @@ func TestLink(t *testing.T) {
 	ctx := test.Context()
 	ns, nsAddr := startMockNS(ctx)
 
-	mask := []string{
+	paths := []string{
 		"network_server_address",
 		"api_key",
 		"default_formatters",
@@ -48,14 +48,15 @@ func TestLink(t *testing.T) {
 	// app1 is added to the link registry, app2 will be linked at runtime.
 	app1 := ttnpb.ApplicationIdentifiers{ApplicationID: "app1"}
 	app2 := ttnpb.ApplicationIdentifiers{ApplicationID: "app2"}
+	app3 := ttnpb.ApplicationIdentifiers{ApplicationID: "app3"}
 	redisClient, flush := test.NewRedis(t, "applicationserver_test")
 	defer flush()
 	defer redisClient.Close()
 	linkRegistry := &redis.LinkRegistry{Redis: redisClient}
-	linkRegistry.Set(ctx, app1, mask, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
+	linkRegistry.Set(ctx, app1, paths, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
 		return &ttnpb.ApplicationLink{
-			APIKey: "secret",
-		}, mask, nil
+			APIKey: registeredApplicationKey,
+		}, paths, nil
 	})
 
 	c := component.MustNew(test.GetLogger(t), &component.Config{
@@ -90,85 +91,196 @@ func TestLink(t *testing.T) {
 	}
 
 	// app2: expect no link, set link, expect link, delete link and expect link to be gone.
-	for i, link := range []ttnpb.ApplicationLink{
-		{
-			// Cluster-local Network Server.
-			APIKey: "secret",
-		},
-		{
-			// External Network Server.
-			NetworkServerAddress: nsAddr,
-			APIKey:               "secret",
-		},
-	} {
-		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			ctx := rights.NewContext(ctx, rights.Rights{
-				ApplicationRights: map[string]*ttnpb.Rights{
-					unique.ID(ctx, app2): {
-						Rights: []ttnpb.Right{ttnpb.RIGHT_APPLICATION_LINK},
+	t.Run("Success", func(t *testing.T) {
+		for i, link := range []ttnpb.ApplicationLink{
+			{
+				// Cluster-local Network Server.
+				APIKey: registeredApplicationKey,
+			},
+			{
+				// External Network Server.
+				NetworkServerAddress: nsAddr,
+				APIKey:               registeredApplicationKey,
+			},
+		} {
+			t.Run(strconv.Itoa(i), func(t *testing.T) {
+				a := assertions.New(t)
+				ctx := rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, app2): {
+							Rights: []ttnpb.Right{ttnpb.RIGHT_APPLICATION_LINK},
+						},
 					},
-				},
-			})
+				})
 
-			// Expect no link.
-			_, err := as.GetLink(ctx, &ttnpb.GetApplicationLinkRequest{
-				ApplicationIdentifiers: app2,
-				FieldMask: pbtypes.FieldMask{
-					Paths: mask,
-				},
-			})
-			a.So(errors.IsNotFound(err), should.BeTrue)
-			_, err = as.GetLinkStats(ctx, &app2)
-			a.So(errors.IsNotFound(err), should.BeTrue)
+				// Expect no link.
+				_, err := as.GetLink(ctx, &ttnpb.GetApplicationLinkRequest{
+					ApplicationIdentifiers: app2,
+					FieldMask: pbtypes.FieldMask{
+						Paths: paths,
+					},
+				})
+				if !a.So(errors.IsNotFound(err), should.BeTrue) {
+					t.Fatalf("Unexpected error: %v", err)
+				}
+				_, err = as.GetLinkStats(ctx, &app2)
+				if !a.So(errors.IsNotFound(err), should.BeTrue) {
+					t.Fatalf("Unexpected error: %v", err)
+				}
 
-			// Set link, expect link to establish.
-			_, err = as.SetLink(ctx, &ttnpb.SetApplicationLinkRequest{
-				ApplicationIdentifiers: app2,
-				ApplicationLink:        link,
-				FieldMask: pbtypes.FieldMask{
-					Paths: mask,
-				},
-			})
-			a.So(err, should.BeNil)
-			select {
-			case ids := <-ns.linkCh:
-				a.So(ids, should.Resemble, app2)
-			case <-time.After(timeout):
-				t.Fatal("Expect link timeout")
-			}
-			actual, err := as.GetLink(ctx, &ttnpb.GetApplicationLinkRequest{
-				ApplicationIdentifiers: app2,
-				FieldMask: pbtypes.FieldMask{
-					Paths: mask,
-				},
-			})
-			a.So(err, should.BeNil)
-			a.So(*actual, should.Resemble, link)
-			stats, err := as.GetLinkStats(ctx, &app2)
-			a.So(err, should.BeNil)
-			a.So(stats.NetworkServerAddress, should.Equal, link.NetworkServerAddress)
+				// Set link, expect link to establish.
+				_, err = as.SetLink(ctx, &ttnpb.SetApplicationLinkRequest{
+					ApplicationIdentifiers: app2,
+					ApplicationLink:        link,
+					FieldMask: pbtypes.FieldMask{
+						Paths: paths,
+					},
+				})
+				if !a.So(err, should.BeNil) {
+					t.Fatalf("Unexpected error: %v", err)
+				}
+				select {
+				case ids := <-ns.linkCh:
+					a.So(ids, should.Resemble, app2)
+				case <-time.After(timeout):
+					t.Fatal("Expect link timeout")
+				}
+				actual, err := as.GetLink(ctx, &ttnpb.GetApplicationLinkRequest{
+					ApplicationIdentifiers: app2,
+					FieldMask: pbtypes.FieldMask{
+						Paths: paths,
+					},
+				})
+				if !a.So(err, should.BeNil) {
+					t.Fatalf("Unexpected error: %v", err)
+				}
+				a.So(*actual, should.Resemble, link)
+				stats, err := as.GetLinkStats(ctx, &app2)
+				if !a.So(err, should.BeNil) {
+					t.Fatalf("Unexpected error: %v", err)
+				}
+				a.So(stats.NetworkServerAddress, should.Equal, link.NetworkServerAddress)
 
-			// Wait for link to subscribe internally.
-			time.Sleep(timeout)
+				// Wait for link to subscribe internally.
+				time.Sleep(timeout)
 
-			// Delete link.
-			_, err = as.DeleteLink(ctx, &app2)
-			a.So(err, should.BeNil)
-			select {
-			case ids := <-ns.unlinkCh:
-				a.So(ids, should.Resemble, app2)
-			case <-time.After(timeout):
-				t.Fatal("Expect unlink timeout")
-			}
-			_, err = as.GetLink(ctx, &ttnpb.GetApplicationLinkRequest{
-				ApplicationIdentifiers: app2,
-				FieldMask: pbtypes.FieldMask{
-					Paths: mask,
-				},
+				// Delete link.
+				_, err = as.DeleteLink(ctx, &app2)
+				if !a.So(err, should.BeNil) {
+					t.Fatalf("Unexpected error: %v", err)
+				}
+				select {
+				case ids := <-ns.unlinkCh:
+					a.So(ids, should.Resemble, app2)
+				case <-time.After(timeout):
+					t.Fatal("Expect unlink timeout")
+				}
+				_, err = as.GetLink(ctx, &ttnpb.GetApplicationLinkRequest{
+					ApplicationIdentifiers: app2,
+					FieldMask: pbtypes.FieldMask{
+						Paths: paths,
+					},
+				})
+				if !a.So(errors.IsNotFound(err), should.BeTrue) {
+					t.Fatalf("Unexpected error: %v", err)
+				}
+				_, err = as.GetLinkStats(ctx, &app2)
+				if !a.So(errors.IsNotFound(err), should.BeTrue) {
+					t.Fatalf("Unexpected error: %v", err)
+				}
 			})
-			a.So(errors.IsNotFound(err), should.BeTrue)
-			_, err = as.GetLinkStats(ctx, &app2)
-			a.So(errors.IsNotFound(err), should.BeTrue)
-		})
-	}
+		}
+	})
+
+	// app3: expect no link, set link with invalid auth, expect error, delete link and expect link to be gone.
+	t.Run("InvalidAuth", func(t *testing.T) {
+		for i, link := range []ttnpb.ApplicationLink{
+			{
+				// Cluster-local Network Server.
+				APIKey: "invalid",
+			},
+			{
+				// External Network Server.
+				NetworkServerAddress: nsAddr,
+				APIKey:               "invalid",
+			},
+		} {
+			t.Run(strconv.Itoa(i), func(t *testing.T) {
+				a := assertions.New(t)
+				ctx := rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, app3): {
+							Rights: []ttnpb.Right{ttnpb.RIGHT_APPLICATION_LINK},
+						},
+					},
+				})
+
+				// Expect no link.
+				_, err := as.GetLink(ctx, &ttnpb.GetApplicationLinkRequest{
+					ApplicationIdentifiers: app3,
+					FieldMask: pbtypes.FieldMask{
+						Paths: paths,
+					},
+				})
+				if !a.So(errors.IsNotFound(err), should.BeTrue) {
+					t.Fatalf("Unexpected error: %v", err)
+				}
+				_, err = as.GetLinkStats(ctx, &app3)
+				if !a.So(errors.IsNotFound(err), should.BeTrue) {
+					t.Fatalf("Unexpected error: %v", err)
+				}
+
+				// Set link, expect link to establish.
+				_, err = as.SetLink(ctx, &ttnpb.SetApplicationLinkRequest{
+					ApplicationIdentifiers: app3,
+					ApplicationLink:        link,
+					FieldMask: pbtypes.FieldMask{
+						Paths: paths,
+					},
+				})
+				if !a.So(err, should.BeNil) {
+					t.Fatalf("Unexpected error: %v", err)
+				}
+				select {
+				case <-ns.linkCh:
+					t.Fatal("Expect no link with invalid authentication")
+				case <-time.After(timeout):
+				}
+
+				actual, err := as.GetLink(ctx, &ttnpb.GetApplicationLinkRequest{
+					ApplicationIdentifiers: app3,
+					FieldMask: pbtypes.FieldMask{
+						Paths: paths,
+					},
+				})
+				if !a.So(err, should.BeNil) {
+					t.Fatalf("Unexpected error: %v", err)
+				}
+				a.So(*actual, should.Resemble, link)
+				_, err = as.GetLinkStats(ctx, &app3)
+				if !a.So(err, should.NotBeNil) {
+					t.Fatalf("Unexpected error: %v", err)
+				}
+
+				// Delete link.
+				_, err = as.DeleteLink(ctx, &app3)
+				if !a.So(err, should.BeNil) {
+					t.Fatalf("Unexpected error: %v", err)
+				}
+				_, err = as.GetLink(ctx, &ttnpb.GetApplicationLinkRequest{
+					ApplicationIdentifiers: app3,
+					FieldMask: pbtypes.FieldMask{
+						Paths: paths,
+					},
+				})
+				if !a.So(errors.IsNotFound(err), should.BeTrue) {
+					t.Fatalf("Unexpected error: %v", err)
+				}
+				_, err = as.GetLinkStats(ctx, &app3)
+				if !a.So(errors.IsNotFound(err), should.BeTrue) {
+					t.Fatalf("Unexpected error: %v", err)
+				}
+			})
+		}
+	})
 }

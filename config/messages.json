@@ -1538,6 +1538,15 @@
       "file": "applicationserver.go"
     }
   },
+  "error:pkg/applicationserver:link": {
+    "translations": {
+      "en": "link failed"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "linking.go"
+    }
+  },
   "error:pkg/applicationserver:link_mode": {
     "translations": {
       "en": "invalid link mode `{value}`"
@@ -4862,6 +4871,15 @@
   "event:as.down.data.receive": {
     "translations": {
       "en": "receive downlink data message"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "observability.go"
+    }
+  },
+  "event:as.link.fail": {
+    "translations": {
+      "en": "link fail"
     },
     "description": {
       "package": "pkg/applicationserver",

@@ -96,7 +96,8 @@ func TestAuthentication(t *testing.T) {
 					client.Disconnect(uint(timeout / time.Millisecond))
 				}
 			} else {
-				a.So(ok, should.BeFalse)
+				a.So(ok, should.BeTrue)
+				a.So(token.Error(), should.NotBeNil)
 			}
 		})
 	}

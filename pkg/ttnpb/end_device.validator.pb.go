@@ -245,6 +245,9 @@ func (this *MACState_JoinAccept) Validate() error {
 	return nil
 }
 
+var _regex_EndDevice_NetworkServerAddress = regexp.MustCompile(`^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$`)
+var _regex_EndDevice_ApplicationServerAddress = regexp.MustCompile(`^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$`)
+var _regex_EndDevice_JoinServerAddress = regexp.MustCompile(`^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$`)
 var _regex_EndDevice_ProvisionerID = regexp.MustCompile(`^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$`)
 
 func (this *EndDevice) Validate() error {
@@ -262,6 +265,15 @@ func (this *EndDevice) Validate() error {
 		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.VersionIDs); err != nil {
 			return github_com_mwitkow_go_proto_validators.FieldError("VersionIDs", err)
 		}
+	}
+	if !_regex_EndDevice_NetworkServerAddress.MatchString(this.NetworkServerAddress) {
+		return github_com_mwitkow_go_proto_validators.FieldError("NetworkServerAddress", fmt.Errorf(`value '%v' must be a string conforming to regex "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"`, this.NetworkServerAddress))
+	}
+	if !_regex_EndDevice_ApplicationServerAddress.MatchString(this.ApplicationServerAddress) {
+		return github_com_mwitkow_go_proto_validators.FieldError("ApplicationServerAddress", fmt.Errorf(`value '%v' must be a string conforming to regex "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"`, this.ApplicationServerAddress))
+	}
+	if !_regex_EndDevice_JoinServerAddress.MatchString(this.JoinServerAddress) {
+		return github_com_mwitkow_go_proto_validators.FieldError("JoinServerAddress", fmt.Errorf(`value '%v' must be a string conforming to regex "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"`, this.JoinServerAddress))
 	}
 	// Validation of proto3 map<> fields is unsupported.
 	if this.RootKeys != nil {

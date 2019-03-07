@@ -29,7 +29,6 @@ func (as *ApplicationServer) GetLink(ctx context.Context, req *ttnpb.GetApplicat
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_LINK); err != nil {
 		return nil, err
 	}
-	// TODO: Validate field mask (https://github.com/TheThingsNetwork/lorawan-stack/issues/39)
 	return as.linkRegistry.Get(ctx, req.ApplicationIdentifiers, req.FieldMask.Paths)
 }
 
@@ -38,7 +37,6 @@ func (as *ApplicationServer) SetLink(ctx context.Context, req *ttnpb.SetApplicat
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_LINK); err != nil {
 		return nil, err
 	}
-	// TODO: Validate field mask (https://github.com/TheThingsNetwork/lorawan-stack/issues/39)
 	// Get all the fields here for starting the link task.
 	link, err := as.linkRegistry.Set(ctx, req.ApplicationIdentifiers, ttnpb.ApplicationLinkFieldPathsTopLevel,
 		func(link *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
@@ -51,8 +49,7 @@ func (as *ApplicationServer) SetLink(ctx context.Context, req *ttnpb.SetApplicat
 	if err := as.cancelLink(ctx, req.ApplicationIdentifiers); err != nil && !errors.IsNotFound(err) {
 		log.FromContext(ctx).WithError(err).Warn("Failed to cancel link")
 	}
-	linkCtx := as.Context()
-	as.startLinkTask(linkCtx, req.ApplicationIdentifiers, link)
+	as.startLinkTask(as.Context(), req.ApplicationIdentifiers)
 
 	res := &ttnpb.ApplicationLink{}
 	if err := res.SetFields(link, req.FieldMask.Paths...); err != nil {

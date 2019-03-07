@@ -57,6 +57,7 @@ type ApplicationServer struct {
 	webhooks       web.Webhooks
 
 	links              sync.Map
+	linkErrors         sync.Map
 	defaultSubscribers []*io.Subscription
 }
 

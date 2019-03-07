@@ -3,13 +3,15 @@
 
 package ttnpb // import "go.thethings.network/lorawan-stack/pkg/ttnpb"
 
+import regexp "regexp"
+import fmt "fmt"
 import github_com_mwitkow_go_proto_validators "github.com/mwitkow/go-proto-validators"
 import proto "github.com/gogo/protobuf/proto"
-import fmt "fmt"
 import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
 import _ "github.com/golang/protobuf/ptypes/struct"
 import _ "github.com/golang/protobuf/ptypes/timestamp"
+import _ "github.com/mwitkow/go-proto-validators"
 import _ "google.golang.org/genproto/protobuf/field_mask"
 
 import time "time"
@@ -53,6 +55,9 @@ func (this *GatewayVersion) Validate() error {
 	}
 	return nil
 }
+
+var _regex_Gateway_GatewayServerAddress = regexp.MustCompile(`^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$`)
+
 func (this *Gateway) Validate() error {
 	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.GatewayIdentifiers)); err != nil {
 		return github_com_mwitkow_go_proto_validators.FieldError("GatewayIdentifiers", err)
@@ -73,6 +78,9 @@ func (this *Gateway) Validate() error {
 	}
 	if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(this.GatewayVersionIdentifiers)); err != nil {
 		return github_com_mwitkow_go_proto_validators.FieldError("GatewayVersionIdentifiers", err)
+	}
+	if !_regex_Gateway_GatewayServerAddress.MatchString(this.GatewayServerAddress) {
+		return github_com_mwitkow_go_proto_validators.FieldError("GatewayServerAddress", fmt.Errorf(`value '%v' must be a string conforming to regex "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"`, this.GatewayServerAddress))
 	}
 	for _, item := range this.Antennas {
 		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(&(item)); err != nil {

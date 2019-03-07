@@ -160,13 +160,19 @@ func startMockNS(ctx context.Context) (*mockNS, string) {
 	return ns, lis.Addr().String()
 }
 
+var errPermissionDenied = errors.DefinePermissionDenied("permission_denied", "permission denied")
+
 func (ns *mockNS) LinkApplication(stream ttnpb.AsNs_LinkApplicationServer) error {
 	ctx := stream.Context()
+	md := rpcmetadata.FromIncomingContext(ctx)
 	ids := ttnpb.ApplicationIdentifiers{
-		ApplicationID: rpcmetadata.FromIncomingContext(ctx).ID,
+		ApplicationID: md.ID,
 	}
 	if err := ids.ValidateContext(ctx); err != nil {
 		return err
+	}
+	if md.AuthType != "Bearer" || md.AuthValue != registeredApplicationKey {
+		return errPermissionDenied
 	}
 
 	select {
