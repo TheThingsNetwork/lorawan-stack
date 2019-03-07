@@ -14,28 +14,14 @@
 
 package ttnpb
 
-import (
-	"context"
-	"fmt"
-	"math"
-
-	"go.thethings.network/lorawan-stack/pkg/errors"
-)
-
-// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
-func (s TxSettings) ValidateContext(ctx context.Context) error {
-	if s.GetDataRateIndex() > math.MaxUint8 {
-		return errExpectedLowerOrEqual("TxDRIdx", math.MaxUint8)(s.GetDataRateIndex())
-	}
-	return s.Validate()
-}
+import "context"
 
 // ValidateContext wraps the generated validator with (optionally context-based) custom checks.
 func (p MACPayload) ValidateContext(context.Context) error {
 	if p.DevAddr.IsZero() {
 		return errMissing("DevAddr")
 	}
-	return p.Validate()
+	return p.ValidateFields()
 }
 
 // ValidateContext wraps the generated validator with (optionally context-based) custom checks.
@@ -46,56 +32,5 @@ func (p JoinRequestPayload) ValidateContext(context.Context) error {
 	if p.JoinEUI.IsZero() {
 		return errMissing("JoinEUI")
 	}
-	return p.Validate()
-}
-
-var (
-	errExpectedUplinkMType = errors.DefineInvalidArgument("expected_uplink_mtype", "MType `{result}` is not an uplink MType")
-	errMissingRawPayload   = errors.DefineInvalidArgument("raw_payload", "missing raw payload")
-)
-
-// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
-func (m *UplinkMessage) ValidateContext(context.Context) error {
-	if p := m.GetPayload(); p.Payload == nil {
-		if len(m.GetRawPayload()) == 0 {
-			return errMissingRawPayload
-		}
-	} else {
-		switch p.GetMType() {
-		case MType_CONFIRMED_UP, MType_UNCONFIRMED_UP:
-			mp := p.GetMACPayload()
-			if mp == nil {
-				return errMissing("MACPayload")
-			}
-			return mp.Validate()
-		case MType_JOIN_REQUEST:
-			jp := p.GetJoinRequestPayload()
-			if jp == nil {
-				return errMissing("JoinRequestPayload")
-			}
-			return jp.Validate()
-		case MType_REJOIN_REQUEST:
-			rp := p.GetRejoinRequestPayload()
-			if rp == nil {
-				return errMissing("RejoinRequestPayload")
-			}
-			return rp.Validate()
-		default:
-			return errExpectedUplinkMType.WithAttributes("result", p.GetMType().String())
-		}
-	}
-	return m.Validate()
-}
-
-// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
-func (cmd *MACCommand) ValidateContext(context.Context) error {
-	return cmd.CID.Validate()
-}
-
-// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
-func (cid MACCommandIdentifier) Validate() error {
-	if cid < 0x00 || cid > 0xff {
-		return errExpectedBetween("CID", "0x00", "0xFF")(fmt.Sprintf("0x%X", int32(cid)))
-	}
-	return nil
+	return p.ValidateFields()
 }

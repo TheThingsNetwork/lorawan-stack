@@ -4472,7 +4472,8 @@
         },
         "bandwidth": {
           "type": "integer",
-          "format": "int64"
+          "format": "int64",
+          "description": "Bandwidth (Hz)."
         },
         "spreading_factor": {
           "type": "integer",
