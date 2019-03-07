@@ -1062,14 +1062,47 @@ func TestHandleJoin(t *testing.T) {
 
 			pb := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			ret, err := CreateDevice(authorizedCtx, devReg, deepcopy.Copy(pb).(*ttnpb.EndDevice))
-			a.So(err, should.BeNil)
-			a.So(ret.CreatedAt, should.Equal, ret.UpdatedAt)
+			start := time.Now()
+
+			ret, err := devReg.SetByEUI(authorizedCtx, *pb.JoinEUI, *pb.DevEUI,
+				[]string{
+					"created_at",
+					"last_dev_nonce",
+					"last_join_nonce",
+					"lorawan_version",
+					"network_server_address",
+					"provisioner_id",
+					"provisioning_data",
+					"root_keys",
+					"updated_at",
+					"used_dev_nonces",
+				},
+				func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+					if !a.So(stored, should.BeNil) {
+						t.Fatal("Registry is not empty")
+					}
+					return CopyEndDevice(pb), []string{
+						"last_dev_nonce",
+						"last_join_nonce",
+						"lorawan_version",
+						"network_server_address",
+						"provisioner_id",
+						"provisioning_data",
+						"root_keys",
+						"used_dev_nonces",
+					}, nil
+				},
+			)
+			if !a.So(err, should.BeNil) || !a.So(ret, should.NotBeNil) {
+				t.Fatalf("Failed to create device: %s", err)
+			}
+			a.So(ret.CreatedAt, should.HappenAfter, start)
+			a.So(ret.UpdatedAt, should.HappenAfter, start)
+			a.So(ret.UpdatedAt, should.Equal, ret.CreatedAt)
 			pb.CreatedAt = ret.CreatedAt
 			pb.UpdatedAt = ret.UpdatedAt
-			a.So(ret, should.Resemble, pb)
+			a.So(ret, should.HaveEmptyDiff, pb)
 
-			start := time.Now()
 			res, err := js.HandleJoin(authorizedCtx, deepcopy.Copy(tc.JoinRequest).(*ttnpb.JoinRequest))
 			if tc.ValidError != nil {
 				if !a.So(err, should.BeError) || !a.So(tc.ValidError(err), should.BeTrue) {
