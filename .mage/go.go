@@ -75,7 +75,17 @@ func (Go) packageDirs() (packageDirs []string, err error) {
 	if err != nil {
 		return nil, err
 	}
-	return strings.Split(strings.TrimSpace(dirs), "\n"), nil
+	all := strings.Split(strings.TrimSpace(dirs), "\n")
+	if selectedDirs == nil {
+		return all, nil
+	}
+	selected := make([]string, 0, len(all))
+	for _, dir := range all {
+		if selectedDirs[dir] {
+			selected = append(selected, dir)
+		}
+	}
+	return selected, nil
 }
 
 // Fmt formats and simplifies all Go files.
@@ -83,6 +93,9 @@ func (g Go) Fmt() error {
 	dirs, err := g.packageDirs()
 	if err != nil {
 		return err
+	}
+	if len(dirs) == 0 {
+		return nil
 	}
 	return sh.RunCmd("gofmt", "-w", "-s")(dirs...)
 }
@@ -93,6 +106,9 @@ func (g Go) Lint() error {
 	if err != nil {
 		return err
 	}
+	if len(dirs) == 0 {
+		return nil
+	}
 	return execGo("run", append([]string{"github.com/mgechev/revive", "-config=.revive.toml", "-formatter=stylish"}, dirs...)...)
 }
 
@@ -101,6 +117,9 @@ func (g Go) Misspell() error {
 	dirs, err := g.packageDirs()
 	if err != nil {
 		return err
+	}
+	if len(dirs) == 0 {
+		return nil
 	}
 	return execGo("run", append([]string{"github.com/client9/misspell/cmd/misspell", "-w"}, dirs...)...)
 }
@@ -111,6 +130,9 @@ func (g Go) Unconvert() error {
 	if err != nil {
 		return err
 	}
+	if len(dirs) == 0 {
+		return nil
+	}
 	return execGo("run", append([]string{"github.com/mdempsky/unconvert", "-safe", "-apply"}, dirs...)...)
 }
 
@@ -118,6 +140,10 @@ func (g Go) Unconvert() error {
 func (g Go) Quality() {
 	mg.Deps(g.Fmt, g.Misspell, g.Unconvert)
 	g.Lint() // Errors are allowed.
+}
+
+func init() {
+	preCommitChecks = append(preCommitChecks, Go.Quality)
 }
 
 // Test tests all Go packages.

@@ -150,6 +150,9 @@ func (h Headers) Check() error {
 			}
 			return nil
 		}
+		if selectedFiles != nil && !selectedFiles[path] {
+			return nil
+		}
 		if !headerFilter.match(path) {
 			return nil
 		}
@@ -167,4 +170,8 @@ func (h Headers) Check() error {
 		return checkErrs
 	}
 	return nil
+}
+
+func init() {
+	preCommitChecks = append(preCommitChecks, Headers.Check)
 }

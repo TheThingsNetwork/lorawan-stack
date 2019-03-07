@@ -22,6 +22,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/TheThingsIndustries/magepkg/git"
 	"github.com/magefile/mage/mg"
 )
 
@@ -66,9 +67,23 @@ func (g Git) UninstallHooks() error {
 	return nil
 }
 
+func (Git) selectStaged() error {
+	staged, err := git.StagedFiles()
+	if err != nil {
+		return err
+	}
+	selectedFiles, selectedDirs = make(map[string]bool), make(map[string]bool)
+	for _, file := range staged {
+		selectedFiles[file] = true
+		selectedDirs[filepath.Dir(file)] = true
+	}
+	return nil
+}
+
 var preCommitChecks []interface{}
 
 func (g Git) preCommit() error {
+	mg.Deps(g.selectStaged)
 	mg.Deps(preCommitChecks...)
 	return nil
 }
