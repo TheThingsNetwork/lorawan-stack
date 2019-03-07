@@ -16,10 +16,9 @@
 GO_PROTO_TYPES := any duration empty field_mask struct timestamp wrappers
 GO_PROTO_TYPE_CONVERSIONS = $(subst $(SPACE),$(COMMA),$(foreach type,$(GO_PROTO_TYPES),Mgoogle/protobuf/$(type).proto=github.com/gogo/protobuf/types))
 GO_PROTOC_FLAGS ?= \
-	--fieldmask_out=$(PROTOC_OUT) \
+	--fieldmask_out=lang=gogo,$(GO_PROTO_TYPE_CONVERSIONS):$(PROTOC_OUT) \
 	--gogottn_out=plugins=grpc,$(GO_PROTO_TYPE_CONVERSIONS):$(PROTOC_OUT) \
-	--grpc-gateway_out=$(GO_PROTO_TYPE_CONVERSIONS):$(PROTOC_OUT) \
-	--govalidators_out=gogoimport=true:$(PROTOC_OUT)
+	--grpc-gateway_out=$(GO_PROTO_TYPE_CONVERSIONS):$(PROTOC_OUT)
 
 go.protos: $(wildcard api/*.proto)
 	$(PROTOC) $(GO_PROTOC_FLAGS) $(API_PROTO_FILES) 2>&1 | grep -vE ' protoc-gen-gogo: WARNING: failed finding publicly imported dependency for \.ttn\.lorawan\.v3\..* used in' || true
