@@ -22,9 +22,9 @@ import PropTypes from '../../lib/prop-types'
 
 import style from './data-sheet.styl'
 
-const DataSheet = function ({ data }) {
+const DataSheet = function ({ className, data }) {
   return (
-    <table className={style.table}>
+    <table className={classnames(className, style.table)}>
       <tbody>
         { data.map(function (group, index) {
           return (
