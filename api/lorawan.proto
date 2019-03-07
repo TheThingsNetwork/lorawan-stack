@@ -15,7 +15,7 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
-import "github.com/mwitkow/go-proto-validators/validator.proto";
+import "github.com/lyft/protoc-gen-validate/validate/validate.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 import "lorawan-stack/api/identifiers.proto";
@@ -115,7 +115,7 @@ message MACPayload {
   option (gogoproto.populate) = false;
 
   FHDR f_hdr = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  uint32 f_port = 2 [(validator.field) = {int_lt: 256}];
+  uint32 f_port = 2 [(validate.rules).uint32 = {lt: 256}];
   bytes frm_payload = 3 [(gogoproto.customname) = "FRMPayload"];
   google.protobuf.Struct decoded_payload = 4;
 }
@@ -125,7 +125,7 @@ message FHDR {
 
   bytes dev_addr = 1 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.DevAddr"];
   FCtrl f_ctrl = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  uint32 f_cnt = 3 [(validator.field) = {int_lt: 65536}];
+  uint32 f_cnt = 3 [(validate.rules).uint32 = {lt: 65536}];
   bytes f_opts = 4;
 }
 
@@ -256,10 +256,10 @@ message TxSettings {
   bool invert_polarization = 6;
   // Index of the gateway channel that received the message.
   // Set by Gateway Server.
-  uint32 gateway_channel_index = 7 [(validator.field) = {int_lt: 256}];
+  uint32 gateway_channel_index = 7 [(validate.rules).uint32 = {lt: 256}];
   // Index of the device channel that received the message.
   // Set by Network Server.
-  uint32 device_channel_index = 8 [(validator.field) = {int_lt: 256}];
+  uint32 device_channel_index = 8 [(validate.rules).uint32 = {lt: 256}];
   // Send a CRC in the packet; only on uplink; on downlink, CRC should not be enabled.
   bool enable_crc = 9 [(gogoproto.customname) = "EnableCRC"];
   // Timestamp of the gateway concentrator when the uplink message was received, or when the downlink message should be transmitted (microseconds).
