@@ -46,10 +46,10 @@ class InnerForm extends React.Component {
     if (prev.error !== error) {
       const apiFieldErrors = fieldErrors(mapErrorsToFields, error)
       const { errors, ...restStatus } = status
+
       if (apiFieldErrors) {
         const forceTouched = Object.keys(apiFieldErrors)
           .reduce((acc, curr) => ({ ...acc, [curr]: true }), {})
-
         setTouched(forceTouched)
         setStatus({ errors: apiFieldErrors, ...restStatus })
       } else {
@@ -92,6 +92,7 @@ class InnerForm extends React.Component {
       children,
       horizontal,
       submitEnabledWhenInvalid,
+      resetEnabledAlways,
       validateOnBlur,
       validateOnChange,
       dirty,
@@ -125,9 +126,10 @@ class InnerForm extends React.Component {
               busy: isSubmitting,
             })
           } else if (Child.props.type === 'reset') {
+            const disabled = isSubmitting || (resetEnabledAlways ? false : !dirty)
             return React.cloneElement(Child, {
               ...Child.props,
-              disabled: isSubmitting || !dirty,
+              disabled,
               onClick: handleReset,
             })
           }
@@ -169,6 +171,7 @@ const Form = ({
   loading,
   horizontal,
   submitEnabledWhenInvalid,
+  resetEnabledAlways,
   validateOnBlur = true,
   validateOnChange = false,
   mapErrorsToFields = {},
@@ -184,6 +187,7 @@ const Form = ({
       info,
       horizontal,
       submitEnabledWhenInvalid,
+      resetEnabledAlways,
       loading,
       mapErrorsToFields,
     })}
@@ -240,6 +244,8 @@ Form.propTypes = {
   loading: PropTypes.bool,
   /** Field name to stack error name mappings, e.g. { id: 'invalid_id' } */
   mapErrorsToFields: PropTypes.object,
+  /** Whether the reset/cancel buttons stays enabled also when the form is not dirty */
+  resetEnabledAlways: PropTypes.bool,
 }
 
 export default Form
