@@ -9,13 +9,13 @@
 /pkg @TheThingsNetwork/stack-developers
 /pkg/auth @johanstokking @htdvisser
 /pkg/crypto @johanstokking @htdvisser
-/pkg/webui @bafonis @kschiffer
+/pkg/webui @bafonins @kschiffer
 
 /pkg/applicationserver @johanstokking
-/pkg/console @bafonis @kschiffer
+/pkg/console @bafonins @kschiffer
 /pkg/gatewayserver @johanstokking
 /pkg/networkserver @rvolosatovs
 /pkg/identityserver @htdvisser
 /pkg/joinserver @johanstokking @rvolosatovs
 
-/sdk/js @bafonis @kschiffer
+/sdk/js @bafonins @kschiffer
