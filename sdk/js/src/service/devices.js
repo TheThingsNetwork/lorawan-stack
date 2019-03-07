@@ -154,18 +154,23 @@ class Devices {
       }, device)
     }
 
-    // TODO: Error handling
-    const setResults = (await Promise.all(requests))
-      .map(e => e ? Marshaler.payloadSingleResponse(e) : undefined)
+    try {
+      const setResults = (await Promise.all(requests))
+        .map(e => e ? Marshaler.payloadSingleResponse(e) : undefined)
 
-    const result = this._mergeEntity([
-      { record: Marshaler.payloadSingleResponse(isResult), paths: requestTree.is },
-      { record: setResults[0], paths: requestTree.ns },
-      { record: setResults[1], paths: requestTree.as },
-      { record: setResults[2], paths: requestTree.js },
-    ])
+      const result = this._mergeEntity([
+        { record: Marshaler.payloadSingleResponse(isResult), paths: requestTree.is },
+        { record: setResults[0], paths: requestTree.ns },
+        { record: setResults[1], paths: requestTree.as },
+        { record: setResults[2], paths: requestTree.js },
+      ])
 
-    return result
+      return result
+    } catch (err) {
+      // Roll back changes
+      this._deleteDevice(appId, deviceId, Object.keys(requestTree))
+      throw new Error('Could not create device.')
+    }
   }
 
   async _getDevice (applicationId, deviceId, paths) {
@@ -224,6 +229,33 @@ class Devices {
     ])
 
     return result
+  }
+
+  async _deleteDevice (applicationId, deviceId, components = [ 'is', 'ns', 'as', 'js' ]) {
+    const requests = Array(4)
+
+    const params = {
+      routeParams: {
+        'application_ids.application_id': applicationId,
+        device_id: deviceId,
+      },
+    }
+
+    if (components.includes('is')) {
+      requests[0] = this._api.EndDeviceRegistry.Delete(params)
+    }
+    if (components.includes('ns')) {
+      requests[1] = this._api.NsEndDeviceRegistry.Delete(params)
+    }
+    if (components.includes('as')) {
+      requests[2] = this._api.AsEndDeviceRegistry.Delete(params)
+    }
+    if (components.includes('js')) {
+      requests[3] = this._api.JsEndDeviceRegistry.Delete(params)
+    }
+
+    const deleteResults = (await Promise.all(requests)).map(e => e ? e.status : false)
+    return deleteResults
   }
 
   async getById (applicationId, deviceId, selector) {
