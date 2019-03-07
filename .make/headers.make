@@ -17,6 +17,4 @@
 headers.check: $(MAGE)
 	@$(MAGE) headers:check
 
-PRE_COMMIT += headers.check
-
 # vim: ft=make

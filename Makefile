@@ -16,9 +16,6 @@ include .mage/mage.make
 
 HEADER_EXTRA_FILES = Makefile
 
-PRE_COMMIT = js.lint-staged styl.lint-staged snap.lint-staged
-COMMIT_MSG = git.commit-msg-log git.commit-msg-length git.commit-msg-empty git.commit-msg-prefix git.commit-msg-phrase git.commit-msg-casing git.commit-msg-imperative
-
 SUPPORT_LOCALES = en
 
 include .make/log.make
