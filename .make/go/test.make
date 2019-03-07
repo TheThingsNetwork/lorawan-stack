@@ -12,19 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# run tests
-go.test: go.min-version key.pem cert.pem
-	@$(log) "Running tests..."
-	$(GO) test $(GO_FLAGS) $(GO_TEST_FLAGS) ./...
+.PHONY: go.test
 
-$(GO_COVER_FILE): GO_TEST_FLAGS = $(GO_COVERALLS_FLAGS)
-$(GO_COVER_FILE):
-	$(MAKE) go.test
+go.test: $(MAGE) key.pem cert.pem
+	@$(MAGE) go:test
 
-$(GO_FILTERED_COVER_FILE): $(GO_COVER_FILE)
-	@cat $(GO_COVER_FILE) | grep -vE '\.pb(\.gw|\.fm|\.util\.fm)?\.go' > $(GO_FILTERED_COVER_FILE)
+coverage.out: go.test
 
-go.coveralls: $(GO_FILTERED_COVER_FILE)
-	@GO111MODULE=on $(GO) run github.com/mattn/goveralls -coverprofile=$(GO_FILTERED_COVER_FILE) -service=$${COVERALLS_SERVICE:-travis-ci} -repotoken $${COVERALLS_TOKEN:-""}
+.PHONY: go.coveralls
+
+go.coveralls: $(MAGE)
+	@$(MAGE) go:coveralls
 
 # vim: ft=make

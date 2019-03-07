@@ -26,7 +26,7 @@ go.protos: $(wildcard api/*.proto)
 	perl -i -pe 's:golang.org/x/net/context:context:' `find ./pkg -name '*pb.go' -or -name '*pb.gw.go' | grep -v 'vendor'`
 	GO111MODULE=on $(GO) run golang.org/x/tools/cmd/goimports -w $(PWD)/pkg/ttnpb
 	GO111MODULE=on $(GO) run github.com/mdempsky/unconvert -apply ./pkg/ttnpb
-	$(GO_FMT) -w -s $(PWD)/pkg/ttnpb
+	gofmt -w -s $(PWD)/pkg/ttnpb
 
 go.protos.clean:
 	find ./pkg/ttnpb -name '*.pb.go' -delete -or -name '*.pb.gw.go' -delete -or -name '*.pb.fm.go' -delete -or -name '*.pb.util.fm.go' -delete

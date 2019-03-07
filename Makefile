@@ -56,7 +56,7 @@ quality: go.quality js.quality styl.quality snap.quality
 build-all: $(MAGE)
 	@GO111MODULE=on $(GO) run github.com/goreleaser/goreleaser --snapshot --skip-publish
 
-clean: go.clean js.clean
+clean: js.clean
 	rm -rf dist
 
 translations: messages js.translations
