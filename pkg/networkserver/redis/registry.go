@@ -60,7 +60,7 @@ func (r *DeviceRegistry) addrKey(addr types.DevAddr) string {
 	return r.Redis.Key("addr", addr.String())
 }
 
-func (r *DeviceRegistry) euiKey(devEUI, joinEUI types.EUI64) string {
+func (r *DeviceRegistry) euiKey(joinEUI, devEUI types.EUI64) string {
 	return r.Redis.Key("eui", joinEUI.String(), devEUI.String())
 }
 
