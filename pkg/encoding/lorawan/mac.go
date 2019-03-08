@@ -867,16 +867,16 @@ var DefaultMACCommands = MACCommandSpec{
 		DownlinkLength: 3,
 		AppendDownlink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
 			pld := cmd.GetBeaconFreqReq()
-			if pld.Frequency > maxUint24 {
-				return nil, errExpectedLowerOrEqual("Frequency", maxUint24)(pld.Frequency)
+			if pld.Frequency < 100000 || pld.Frequency > maxUint24*100 {
+				return nil, errExpectedBetween("Frequency", 100000, maxUint24*100)(pld.Frequency)
 			}
-			b = appendUint64(b, pld.Frequency, 3)
+			b = appendUint64(b, pld.Frequency/100, 3)
 			return b, nil
 		},
 		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_BEACON_FREQ, "BeaconFreqReq", 3, func(b []byte, cmd *ttnpb.MACCommand) error {
 			cmd.Payload = &ttnpb.MACCommand_BeaconFreqReq_{
 				BeaconFreqReq: &ttnpb.MACCommand_BeaconFreqReq{
-					Frequency: parseUint64(b[0:3]),
+					Frequency: parseUint64(b[0:3]) * 100,
 				},
 			}
 			return nil
