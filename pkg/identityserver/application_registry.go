@@ -83,6 +83,7 @@ func (is *IdentityServer) getApplication(ctx context.Context, req *ttnpb.GetAppl
 	if err = is.RequireAuthenticated(ctx); err != nil {
 		return nil, err
 	}
+	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.ApplicationFieldPathsNested, req.FieldMask.Paths, getPaths, nil)
 	if err = rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_INFO); err != nil {
 		if ttnpb.HasOnlyAllowedFields(req.FieldMask.Paths, ttnpb.PublicApplicationFields...) {
 			defer func() { app = app.PublicSafe() }()
@@ -110,6 +111,7 @@ func (is *IdentityServer) getApplication(ctx context.Context, req *ttnpb.GetAppl
 }
 
 func (is *IdentityServer) listApplications(ctx context.Context, req *ttnpb.ListApplicationsRequest) (apps *ttnpb.Applications, err error) {
+	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.ApplicationFieldPathsNested, req.FieldMask.Paths, getPaths, nil)
 	var appRights map[string]*ttnpb.Rights
 	if req.Collaborator == nil {
 		callerRights, _, err := is.getRights(ctx)
@@ -186,8 +188,14 @@ func (is *IdentityServer) updateApplication(ctx context.Context, req *ttnpb.Upda
 	if err = rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC); err != nil {
 		return nil, err
 	}
-	if err := validateContactInfo(req.Application.ContactInfo); err != nil {
-		return nil, err
+	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.ApplicationFieldPathsNested, req.FieldMask.Paths, nil, getPaths)
+	if len(req.FieldMask.Paths) == 0 {
+		req.FieldMask.Paths = updatePaths
+	}
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "contact_info") {
+		if err := validateContactInfo(req.Application.ContactInfo); err != nil {
+			return nil, err
+		}
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		app, err = store.GetApplicationStore(db).UpdateApplication(ctx, &req.Application, &req.FieldMask)

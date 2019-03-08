@@ -68,10 +68,6 @@ var (
 		Short:   "List clients",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			paths := util.SelectFieldMask(cmd.Flags(), selectClientFlags)
-			if len(paths) == 0 {
-				logger.Warnf("No fields selected, selecting %v", defaultGetPaths)
-				paths = append(paths, defaultGetPaths...)
-			}
 
 			is, err := api.Dial(ctx, config.IdentityServerAddress)
 			if err != nil {
@@ -93,10 +89,7 @@ var (
 		Short: "Search for clients",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			paths := util.SelectFieldMask(cmd.Flags(), selectClientFlags)
-			if len(paths) == 0 {
-				logger.Warnf("No fields selected, selecting %v", defaultGetPaths)
-				paths = append(paths, defaultGetPaths...)
-			}
+
 			req := getSearchEntitiesRequest(cmd.Flags())
 			req.FieldMask.Paths = paths
 
@@ -122,10 +115,6 @@ var (
 				return errNoClientID
 			}
 			paths := util.SelectFieldMask(cmd.Flags(), selectClientFlags)
-			if len(paths) == 0 {
-				logger.Warnf("No fields selected, selecting %v", defaultGetPaths)
-				paths = append(paths, defaultGetPaths...)
-			}
 
 			is, err := api.Dial(ctx, config.IdentityServerAddress)
 			if err != nil {
