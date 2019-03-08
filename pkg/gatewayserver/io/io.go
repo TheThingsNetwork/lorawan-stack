@@ -178,7 +178,7 @@ var (
 	errRxEmpty          = errors.DefineFailedPrecondition("rx_empty", "settings empty")
 	errRxWindowSchedule = errors.Define("rx_window_schedule", "schedule in Rx window `{window}` failed")
 	errDataRate         = errors.DefineInvalidArgument("data_rate", "no data rate with index `{index}`")
-	errTooLong          = errors.DefineInvalidArgument("too_long", "the payload length `{payload_length}` exceeds maximum `{maximum_payload}` at data rate index `{data_rate_index}`")
+	errTooLong          = errors.DefineInvalidArgument("too_long", "the payload length `{payload_length}` exceeds maximum `{maximum_length}` at data rate index `{data_rate_index}`")
 	errTxSchedule       = errors.DefineAborted("tx_schedule", "failed to schedule")
 )
 
