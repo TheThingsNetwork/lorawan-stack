@@ -18,6 +18,7 @@ import traverse from 'traverse'
 import Marshaler from '../util/marshaler'
 import Device from '../entity/device'
 import deviceEntityMap from '../../generated/device-entity-map.json'
+import randomByteString from '../util/random-bytes'
 
 /**
  * Devices Class provides an abstraction on all devices and manages data
@@ -25,11 +26,12 @@ import deviceEntityMap from '../../generated/device-entity-map.json'
  * device data.
  */
 class Devices {
-  constructor (api, { proxy = true }) {
+  constructor (api, { proxy = true, stackConfig }) {
     if (!api) {
       throw new Error('Cannot initialize device service without api object.')
     }
     this._api = api
+    this._stackConfig = stackConfig
     this._entityTransform = proxy
       ? app => new Device(this, app, false)
       : undefined
@@ -270,8 +272,80 @@ class Devices {
     return result
   }
 
-  async create (applicationId, device) {
-    const result = await this._setDevice(applicationId, device, true)
+  async create (applicationId, device, { abp = false, setDefaults = true, withRootKeys = false } = {}) {
+    let dev = device
+
+    if (setDefaults) {
+      dev = {
+        application_server_address: this._stackConfig.as,
+        join_server_address: this._stackConfig.js,
+        network_server_address: this._stackConfig.ns,
+        ...device,
+      }
+    }
+
+    if (abp) {
+      const session = {
+        dev_addr: randomByteString(8), // TODO: Replace with proper generator
+        keys: {
+          session_key_id: randomByteString(16),
+          f_nwk_s_int_key: {
+            key: randomByteString(16, 'base64'),
+            kek_label: '',
+          },
+          app_s_key: {
+            key: randomByteString(16),
+            kek_label: '',
+          },
+        },
+      }
+      if (parseInt(device.lorawan_version.replace(/\D/g, '').padEnd(3, 0)) >= 110) {
+        session.keys.s_nwk_s_int_key = {
+          key: randomByteString(16, 'base64'),
+          kek_label: '',
+        }
+        session.keys.nwk_s_enc_key = {
+          key: randomByteString(16, 'base64'),
+          kek_label: '',
+        }
+      }
+
+      dev.session = {
+        ...session,
+        ...dev.session,
+      }
+
+      dev.supports_join = false
+
+    } else {
+      if ('provisioner_id' in dev && dev.provisioner_id !== '') {
+        throw new Error('Setting a provisioner with end device keys is not allowed.')
+      }
+      let root_keys = {}
+      if (withRootKeys) {
+        root_keys = {
+          root_key_id: 'ttn-lw-js-sdk-generated',
+          app_key: {
+            key: randomByteString(16),
+            kek_label: 'default',
+          },
+          nwk_key: {
+            key: randomByteString(16),
+            kek_label: 'default',
+          },
+        }
+      }
+
+      dev.root_keys = {
+        ...root_keys,
+        ...dev.root_keys,
+      }
+
+      dev.supports_join = true
+
+    }
+
+    const result = await this._setDevice(applicationId, dev, true)
 
     return result
   }

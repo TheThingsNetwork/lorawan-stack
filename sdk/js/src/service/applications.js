@@ -30,7 +30,7 @@ import Link from './link'
  *  should be proxied with the wrapper objects.
  */
 class Applications {
-  constructor (api, { defaultUserId, proxy = true }) {
+  constructor (api, { defaultUserId, stackConfig, proxy = true }) {
     this._defaultUserId = defaultUserId
     this._api = api
     this._proxy = proxy
@@ -44,7 +44,6 @@ class Applications {
     })
     this.Link = new Link(api.As)
     this.Devices = new Devices(api, { proxy })
-
   }
 
   _responseTransform (response) {
