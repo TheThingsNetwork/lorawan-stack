@@ -60,7 +60,14 @@ func (m *Message) ValidateFields(paths ...string) error {
 			}
 
 		case "mic":
-			// no validation rules for MIC
+
+			if len(m.GetMIC()) != 4 {
+				return MessageValidationError{
+					field:  "mic",
+					reason: "value length must be 4 bytes",
+				}
+			}
+
 		case "Payload":
 			if len(subs) == 0 {
 				subs = []string{
@@ -118,6 +125,11 @@ func (m *Message) ValidateFields(paths ...string) error {
 						}
 					}
 
+				default:
+					return MessageValidationError{
+						field:  "Payload",
+						reason: "value is required",
+					}
 				}
 			}
 		default:
@@ -199,9 +211,23 @@ func (m *MHDR) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "m_type":
-			// no validation rules for MType
+
+			if _, ok := MType_name[int32(m.GetMType())]; !ok {
+				return MHDRValidationError{
+					field:  "m_type",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "major":
-			// no validation rules for Major
+
+			if _, ok := Major_name[int32(m.GetMajor())]; !ok {
+				return MHDRValidationError{
+					field:  "major",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		default:
 			return MHDRValidationError{
 				field:  name,
@@ -303,7 +329,14 @@ func (m *MACPayload) ValidateFields(paths ...string) error {
 			}
 
 		case "frm_payload":
-			// no validation rules for FRMPayload
+
+			if len(m.GetFRMPayload()) > 249 {
+				return MACPayloadValidationError{
+					field:  "frm_payload",
+					reason: "value length must be at most 249 bytes",
+				}
+			}
+
 		case "decoded_payload":
 
 			if v, ok := interface{}(m.GetDecodedPayload()).(interface{ ValidateFields(...string) error }); ok {
@@ -1247,6 +1280,11 @@ func (m *DataRate) ValidateFields(paths ...string) error {
 						}
 					}
 
+				default:
+					return DataRateValidationError{
+						field:  "modulation",
+						reason: "value is required",
+					}
 				}
 			}
 		default:
@@ -1341,7 +1379,14 @@ func (m *TxSettings) ValidateFields(paths ...string) error {
 			}
 
 		case "data_rate_index":
-			// no validation rules for DataRateIndex
+
+			if _, ok := DataRateIndex_name[int32(m.GetDataRateIndex())]; !ok {
+				return TxSettingsValidationError{
+					field:  "data_rate_index",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "coding_rate":
 			// no validation rules for CodingRate
 		case "frequency":
@@ -1675,6 +1720,11 @@ func (m *DownlinkPath) ValidateFields(paths ...string) error {
 						}
 					}
 
+				default:
+					return DownlinkPathValidationError{
+						field:  "path",
+						reason: "value is required",
+					}
 				}
 			}
 		default:
@@ -1891,7 +1941,21 @@ func (m *MACCommand) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "cid":
-			// no validation rules for CID
+
+			if _, ok := _MACCommand_CID_NotInLookup[m.GetCID()]; ok {
+				return MACCommandValidationError{
+					field:  "cid",
+					reason: "value must not be in list [0]",
+				}
+			}
+
+			if _, ok := MACCommandIdentifier_name[int32(m.GetCID())]; !ok {
+				return MACCommandValidationError{
+					field:  "cid",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "payload":
 			if len(subs) == 0 {
 				subs = []string{
@@ -2263,6 +2327,11 @@ func (m *MACCommand) ValidateFields(paths ...string) error {
 						}
 					}
 
+				default:
+					return MACCommandValidationError{
+						field:  "payload",
+						reason: "value is required",
+					}
 				}
 			}
 		default:
@@ -2328,6 +2397,10 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = MACCommandValidationError{}
+
+var _MACCommand_CID_NotInLookup = map[MACCommandIdentifier]struct{}{
+	0: {},
+}
 
 // ValidateFields checks the field values on MACCommand_ResetInd with the rules
 // defined in the proto definition for this message. If any rules are

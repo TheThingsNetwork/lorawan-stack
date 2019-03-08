@@ -15,6 +15,7 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/lyft/protoc-gen-validate/validate/validate.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
 import "lorawan-stack/api/contact_info.proto";
@@ -40,9 +41,9 @@ enum GrantType {
 
 // An OAuth client on the network.
 message Client {
-  ClientIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
-  google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  ClientIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true, (validate.rules).message.required = true];
+  google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true, (validate.rules).message.required = true];
 
   string name = 4;
   string description = 5;
@@ -78,8 +79,8 @@ message Clients {
 }
 
 message GetClientRequest {
-  ClientIdentifiers client_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+  ClientIdentifiers client_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
 }
 
 message ListClientsRequest {
@@ -88,7 +89,7 @@ message ListClientsRequest {
   // where the user or organization is collaborator on.
 
   OrganizationOrUserIdentifiers collaborator = 1;
-  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   // Order the results by this field path (must be present in the field mask).
   // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
   string order = 3;
@@ -99,17 +100,17 @@ message ListClientsRequest {
 }
 
 message CreateClientRequest {
-  Client client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  Client client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   // Collaborator to grant all rights on the newly created client.
-  OrganizationOrUserIdentifiers collaborator = 2 [(gogoproto.nullable) = false];
+  OrganizationOrUserIdentifiers collaborator = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
 }
 
 message UpdateClientRequest {
-  Client client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+  Client client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
 }
 
 message SetClientCollaboratorRequest {
-  ClientIdentifiers client_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  Collaborator collaborator = 2 [(gogoproto.nullable) = false];
+  ClientIdentifiers client_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  Collaborator collaborator = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
 }

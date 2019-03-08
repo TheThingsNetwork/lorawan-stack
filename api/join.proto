@@ -27,7 +27,7 @@ option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 message JoinRequest {
   option (gogoproto.populate) = false;
 
-  bytes raw_payload = 1 [(validate.rules).bytes = {len: 23}];
+  bytes raw_payload = 1 [(validate.rules).bytes.len = 23];
   Message payload = 2;
   bytes dev_addr = 3 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.DevAddr"];
   MACVersion selected_mac_version = 4 [(gogoproto.customname) = "SelectedMACVersion"];

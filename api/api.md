@@ -1333,7 +1333,7 @@ PeerInfo
 | ----- | ---- | ----- | ----------- |
 | grpc_port | [uint32](#uint32) |  | Port on which the gRPC server is exposed. |
 | tls | [bool](#bool) |  | Indicates whether the gRPC server uses TLS. |
-| roles | [PeerInfo.Role](#ttn.lorawan.v3.PeerInfo.Role) | repeated | Roles of the peer () |
+| roles | [PeerInfo.Role](#ttn.lorawan.v3.PeerInfo.Role) | repeated | Roles of the peer. |
 | tags | [PeerInfo.TagsEntry](#ttn.lorawan.v3.PeerInfo.TagsEntry) | repeated | Tags of the peer |
 
 
@@ -1784,12 +1784,12 @@ This is used internally by the Network Server and is read only.
 | class_b_timeout | [google.protobuf.Duration](#google.protobuf.Duration) |  | Maximum delay for the device to answer a MAC request or a confirmed downlink frame. If unset, the default value from Network Server configuration will be used. |
 | ping_slot_periodicity | [MACSettings.PingSlotPeriodValue](#ttn.lorawan.v3.MACSettings.PingSlotPeriodValue) |  | Periodicity of the class B ping slot. If unset, the default value from Network Server configuration will be used. |
 | ping_slot_data_rate_index | [MACSettings.DataRateIndexValue](#ttn.lorawan.v3.MACSettings.DataRateIndexValue) |  | Data rate index of the class B ping slot. If unset, the default value from Network Server configuration will be used. |
-| ping_slot_frequency | [uint64](#uint64) |  | Frequency of the class B ping slot (Hz). If unset, the default value from Network Server configuration will be used. |
+| ping_slot_frequency | [google.protobuf.UInt64Value](#google.protobuf.UInt64Value) |  | Frequency of the class B ping slot (Hz). If unset, the default value from Network Server configuration will be used. |
 | class_c_timeout | [google.protobuf.Duration](#google.protobuf.Duration) |  | Maximum delay for the device to answer a MAC request or a confirmed downlink frame. If unset, the default value from Network Server configuration will be used. |
 | rx1_delay | [MACSettings.RxDelayValue](#ttn.lorawan.v3.MACSettings.RxDelayValue) |  | Class A Rx1 delay. If unset, the default value from Network Server configuration or regional parameters specification will be used. |
 | rx1_data_rate_offset | [google.protobuf.UInt32Value](#google.protobuf.UInt32Value) |  | Rx1 data rate offset. If unset, the default value from Network Server configuration will be used. |
 | rx2_data_rate_index | [MACSettings.DataRateIndexValue](#ttn.lorawan.v3.MACSettings.DataRateIndexValue) |  | Data rate index for Rx2. If unset, the default value from Network Server configuration or regional parameters specification will be used. |
-| rx2_frequency | [uint64](#uint64) |  | Frequency for Rx2 (Hz). If unset, the default value from Network Server configuration or regional parameters specification will be used. |
+| rx2_frequency | [google.protobuf.UInt64Value](#google.protobuf.UInt64Value) |  | Frequency for Rx2 (Hz). If unset, the default value from Network Server configuration or regional parameters specification will be used. |
 | factory_preset_frequencies | [uint64](#uint64) | repeated | List of factory-preset frequencies. If unset, the default value from Network Server configuration or regional parameters specification will be used. |
 | max_duty_cycle | [MACSettings.AggregatedDutyCycleValue](#ttn.lorawan.v3.MACSettings.AggregatedDutyCycleValue) |  | Maximum uplink duty cycle (of all channels). |
 | supports_32_bit_f_cnt | [google.protobuf.BoolValue](#google.protobuf.BoolValue) |  | Whether the device supports 32-bit frame counters. If unset, the default value from Network Server configuration will be used. |
@@ -1801,7 +1801,7 @@ This is used internally by the Network Server and is read only.
 | desired_rx1_delay | [MACSettings.RxDelayValue](#ttn.lorawan.v3.MACSettings.RxDelayValue) |  | The Rx1 delay Network Server should configure device to use via MAC commands or Join-Accept. If unset, the default value from Network Server configuration or regional parameters specification will be used. |
 | desired_rx1_data_rate_offset | [google.protobuf.UInt32Value](#google.protobuf.UInt32Value) |  | The Rx1 data rate offset Network Server should configure device to use via MAC commands or Join-Accept. If unset, the default value from Network Server configuration will be used. |
 | desired_rx2_data_rate_index | [MACSettings.DataRateIndexValue](#ttn.lorawan.v3.MACSettings.DataRateIndexValue) |  | The Rx2 data rate index Network Server should configure device to use via MAC commands or Join-Accept. If unset, the default value from frequency plan, Network Server configuration or regional parameters specification will be used. |
-| desired_rx2_frequency | [uint64](#uint64) |  | The Rx2 frequency index Network Server should configure device to use via MAC commands. If unset, the default value from frequency plan, Network Server configuration or regional parameters specification will be used. |
+| desired_rx2_frequency | [google.protobuf.UInt64Value](#google.protobuf.UInt64Value) |  | The Rx2 frequency index Network Server should configure device to use via MAC commands. If unset, the default value from frequency plan, Network Server configuration or regional parameters specification will be used. |
 
 
 
@@ -1905,7 +1905,7 @@ This is used internally by the Network Server and is read only.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payload | [bytes](#bytes) |  | Payload of the join-accept received from Join Server. |
+| raw_payload | [bytes](#bytes) |  | Payload of the join-accept received from Join Server. |
 | request | [JoinRequest](#ttn.lorawan.v3.JoinRequest) |  | JoinRequest sent to Join Server. |
 | keys | [SessionKeys](#ttn.lorawan.v3.SessionKeys) |  | Network session keys associated with the join. |
 

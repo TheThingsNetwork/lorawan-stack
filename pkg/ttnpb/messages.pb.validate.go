@@ -48,7 +48,14 @@ func (m *UplinkMessage) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "raw_payload":
-			// no validation rules for RawPayload
+
+			if l := len(m.GetRawPayload()); l < 6 || l > 255 {
+				return UplinkMessageValidationError{
+					field:  "raw_payload",
+					reason: "value length must be between 6 and 255 bytes, inclusive",
+				}
+			}
+
 		case "payload":
 
 			if v, ok := interface{}(m.GetPayload()).(interface{ ValidateFields(...string) error }); ok {
@@ -74,6 +81,13 @@ func (m *UplinkMessage) ValidateFields(paths ...string) error {
 			}
 
 		case "rx_metadata":
+
+			if len(m.GetRxMetadata()) < 1 {
+				return UplinkMessageValidationError{
+					field:  "rx_metadata",
+					reason: "value must contain at least 1 item(s)",
+				}
+			}
 
 			for idx, item := range m.GetRxMetadata() {
 				_, _ = idx, item
@@ -184,7 +198,14 @@ func (m *DownlinkMessage) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "raw_payload":
-			// no validation rules for RawPayload
+
+			if l := len(m.GetRawPayload()); l < 6 || l > 255 {
+				return DownlinkMessageValidationError{
+					field:  "raw_payload",
+					reason: "value length must be between 6 and 255 bytes, inclusive",
+				}
+			}
+
 		case "payload":
 
 			if v, ok := interface{}(m.GetPayload()).(interface{ ValidateFields(...string) error }); ok {
@@ -244,6 +265,11 @@ func (m *DownlinkMessage) ValidateFields(paths ...string) error {
 						}
 					}
 
+				default:
+					return DownlinkMessageValidationError{
+						field:  "settings",
+						reason: "value is required",
+					}
 				}
 			}
 		default:
@@ -328,7 +354,14 @@ func (m *TxAcknowledgment) ValidateFields(paths ...string) error {
 		case "correlation_ids":
 
 		case "result":
-			// no validation rules for Result
+
+			if _, ok := TxAcknowledgment_Result_name[int32(m.GetResult())]; !ok {
+				return TxAcknowledgmentValidationError{
+					field:  "result",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		default:
 			return TxAcknowledgmentValidationError{
 				field:  name,
@@ -411,7 +444,14 @@ func (m *ApplicationUplink) ValidateFields(paths ...string) error {
 		case "session_key_id":
 			// no validation rules for SessionKeyID
 		case "f_port":
-			// no validation rules for FPort
+
+			if m.GetFPort() >= 256 {
+				return ApplicationUplinkValidationError{
+					field:  "f_port",
+					reason: "value must be less than 256",
+				}
+			}
+
 		case "f_cnt":
 			// no validation rules for FCnt
 		case "frm_payload":
@@ -429,6 +469,13 @@ func (m *ApplicationUplink) ValidateFields(paths ...string) error {
 			}
 
 		case "rx_metadata":
+
+			if len(m.GetRxMetadata()) < 1 {
+				return ApplicationUplinkValidationError{
+					field:  "rx_metadata",
+					reason: "value must contain at least 1 item(s)",
+				}
+			}
 
 			for idx, item := range m.GetRxMetadata() {
 				_, _ = idx, item
@@ -752,7 +799,14 @@ func (m *ApplicationDownlink) ValidateFields(paths ...string) error {
 		case "session_key_id":
 			// no validation rules for SessionKeyID
 		case "f_port":
-			// no validation rules for FPort
+
+			if m.GetFPort() >= 256 {
+				return ApplicationDownlinkValidationError{
+					field:  "f_port",
+					reason: "value must be less than 256",
+				}
+			}
+
 		case "f_cnt":
 			// no validation rules for FCnt
 		case "frm_payload":
@@ -784,7 +838,14 @@ func (m *ApplicationDownlink) ValidateFields(paths ...string) error {
 			}
 
 		case "priority":
-			// no validation rules for Priority
+
+			if _, ok := TxSchedulePriority_name[int32(m.GetPriority())]; !ok {
+				return ApplicationDownlinkValidationError{
+					field:  "priority",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "correlation_ids":
 
 		default:
@@ -1074,6 +1135,13 @@ func (m *ApplicationInvalidatedDownlinks) ValidateFields(paths ...string) error 
 		switch name {
 		case "downlinks":
 
+			if len(m.GetDownlinks()) < 1 {
+				return ApplicationInvalidatedDownlinksValidationError{
+					field:  "downlinks",
+					reason: "value must contain at least 1 item(s)",
+				}
+			}
+
 			for idx, item := range m.GetDownlinks() {
 				_, _ = idx, item
 
@@ -1304,6 +1372,11 @@ func (m *ApplicationUp) ValidateFields(paths ...string) error {
 						}
 					}
 
+				default:
+					return ApplicationUpValidationError{
+						field:  "up",
+						reason: "value is required",
+					}
 				}
 			}
 		default:
@@ -1386,11 +1459,25 @@ func (m *MessagePayloadFormatters) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "up_formatter":
-			// no validation rules for UpFormatter
+
+			if _, ok := PayloadFormatter_name[int32(m.GetUpFormatter())]; !ok {
+				return MessagePayloadFormattersValidationError{
+					field:  "up_formatter",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "up_formatter_parameter":
 			// no validation rules for UpFormatterParameter
 		case "down_formatter":
-			// no validation rules for DownFormatter
+
+			if _, ok := PayloadFormatter_name[int32(m.GetDownFormatter())]; !ok {
+				return MessagePayloadFormattersValidationError{
+					field:  "down_formatter",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "down_formatter_parameter":
 			// no validation rules for DownFormatterParameter
 		default:
@@ -1488,6 +1575,13 @@ func (m *DownlinkQueueRequest) ValidateFields(paths ...string) error {
 			}
 
 		case "downlinks":
+
+			if len(m.GetDownlinks()) < 1 {
+				return DownlinkQueueRequestValidationError{
+					field:  "downlinks",
+					reason: "value must contain at least 1 item(s)",
+				}
+			}
 
 			for idx, item := range m.GetDownlinks() {
 				_, _ = idx, item

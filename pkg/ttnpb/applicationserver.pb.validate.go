@@ -395,7 +395,14 @@ func (m *ApplicationLinkStats) ValidateFields(paths ...string) error {
 			}
 
 		case "network_server_address":
-			// no validation rules for NetworkServerAddress
+
+			if !_ApplicationLinkStats_NetworkServerAddress_Pattern.MatchString(m.GetNetworkServerAddress()) {
+				return ApplicationLinkStatsValidationError{
+					field:  "network_server_address",
+					reason: "value does not match regex pattern \"^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\\\-]*[a-zA-Z0-9])\\\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$\"",
+				}
+			}
+
 		case "last_up_received_at":
 
 			if v, ok := interface{}(m.GetLastUpReceivedAt()).(interface{ ValidateFields(...string) error }); ok {
@@ -489,3 +496,5 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ApplicationLinkStatsValidationError{}
+
+var _ApplicationLinkStats_NetworkServerAddress_Pattern = regexp.MustCompile("^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$")

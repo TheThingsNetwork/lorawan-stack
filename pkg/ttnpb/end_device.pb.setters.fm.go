@@ -669,8 +669,7 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 			if src != nil {
 				dst.PingSlotFrequency = src.PingSlotFrequency
 			} else {
-				var zero uint64
-				dst.PingSlotFrequency = zero
+				dst.PingSlotFrequency = nil
 			}
 		case "class_c_timeout":
 			if len(subs) > 0 {
@@ -739,8 +738,7 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 			if src != nil {
 				dst.Rx2Frequency = src.Rx2Frequency
 			} else {
-				var zero uint64
-				dst.Rx2Frequency = zero
+				dst.Rx2Frequency = nil
 			}
 		case "factory_preset_frequencies":
 			if len(subs) > 0 {
@@ -884,8 +882,7 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 			if src != nil {
 				dst.DesiredRx2Frequency = src.DesiredRx2Frequency
 			} else {
-				var zero uint64
-				dst.DesiredRx2Frequency = zero
+				dst.DesiredRx2Frequency = nil
 			}
 
 		default:
@@ -1981,14 +1978,14 @@ func (dst *MACSettings_RxDelayValue) SetFields(src *MACSettings_RxDelayValue, pa
 func (dst *MACState_JoinAccept) SetFields(src *MACState_JoinAccept, paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
-		case "payload":
+		case "raw_payload":
 			if len(subs) > 0 {
-				return fmt.Errorf("'payload' has no subfields, but %s were specified", subs)
+				return fmt.Errorf("'raw_payload' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.Payload = src.Payload
+				dst.RawPayload = src.RawPayload
 			} else {
-				dst.Payload = nil
+				dst.RawPayload = nil
 			}
 		case "request":
 			if len(subs) > 0 {

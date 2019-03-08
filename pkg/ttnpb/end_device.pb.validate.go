@@ -167,35 +167,140 @@ func (m *MACParameters) ValidateFields(paths ...string) error {
 		case "downlink_dwell_time":
 			// no validation rules for DownlinkDwellTime
 		case "adr_data_rate_index":
-			// no validation rules for ADRDataRateIndex
+
+			if _, ok := DataRateIndex_name[int32(m.GetADRDataRateIndex())]; !ok {
+				return MACParametersValidationError{
+					field:  "adr_data_rate_index",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "adr_tx_power_index":
-			// no validation rules for ADRTxPowerIndex
+
+			if m.GetADRTxPowerIndex() > 15 {
+				return MACParametersValidationError{
+					field:  "adr_tx_power_index",
+					reason: "value must be less than or equal to 15",
+				}
+			}
+
 		case "adr_nb_trans":
-			// no validation rules for ADRNbTrans
+
+			if m.GetADRNbTrans() > 15 {
+				return MACParametersValidationError{
+					field:  "adr_nb_trans",
+					reason: "value must be less than or equal to 15",
+				}
+			}
+
 		case "adr_ack_limit":
-			// no validation rules for ADRAckLimit
+
+			if val := m.GetADRAckLimit(); val < 1 || val > 32768 {
+				return MACParametersValidationError{
+					field:  "adr_ack_limit",
+					reason: "value must be inside range [1, 32768]",
+				}
+			}
+
 		case "adr_ack_delay":
-			// no validation rules for ADRAckDelay
+
+			if val := m.GetADRAckDelay(); val < 1 || val > 32768 {
+				return MACParametersValidationError{
+					field:  "adr_ack_delay",
+					reason: "value must be inside range [1, 32768]",
+				}
+			}
+
 		case "rx1_delay":
-			// no validation rules for Rx1Delay
+
+			if _, ok := RxDelay_name[int32(m.GetRx1Delay())]; !ok {
+				return MACParametersValidationError{
+					field:  "rx1_delay",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "rx1_data_rate_offset":
-			// no validation rules for Rx1DataRateOffset
+
+			if m.GetRx1DataRateOffset() > 7 {
+				return MACParametersValidationError{
+					field:  "rx1_data_rate_offset",
+					reason: "value must be less than or equal to 7",
+				}
+			}
+
 		case "rx2_data_rate_index":
-			// no validation rules for Rx2DataRateIndex
+
+			if _, ok := DataRateIndex_name[int32(m.GetRx2DataRateIndex())]; !ok {
+				return MACParametersValidationError{
+					field:  "rx2_data_rate_index",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "rx2_frequency":
-			// no validation rules for Rx2Frequency
+
+			if val := m.GetRx2Frequency(); val < 100000 || val > 1677721600 {
+				return MACParametersValidationError{
+					field:  "rx2_frequency",
+					reason: "value must be inside range [100000, 1677721600]",
+				}
+			}
+
 		case "max_duty_cycle":
-			// no validation rules for MaxDutyCycle
+
+			if _, ok := AggregatedDutyCycle_name[int32(m.GetMaxDutyCycle())]; !ok {
+				return MACParametersValidationError{
+					field:  "max_duty_cycle",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "rejoin_time_periodicity":
-			// no validation rules for RejoinTimePeriodicity
+
+			if _, ok := RejoinTimeExponent_name[int32(m.GetRejoinTimePeriodicity())]; !ok {
+				return MACParametersValidationError{
+					field:  "rejoin_time_periodicity",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "rejoin_count_periodicity":
-			// no validation rules for RejoinCountPeriodicity
+
+			if _, ok := RejoinCountExponent_name[int32(m.GetRejoinCountPeriodicity())]; !ok {
+				return MACParametersValidationError{
+					field:  "rejoin_count_periodicity",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "ping_slot_frequency":
-			// no validation rules for PingSlotFrequency
+
+			if val := m.GetPingSlotFrequency(); val < 100000 || val > 1677721600 {
+				return MACParametersValidationError{
+					field:  "ping_slot_frequency",
+					reason: "value must be inside range [100000, 1677721600]",
+				}
+			}
+
 		case "ping_slot_data_rate_index":
-			// no validation rules for PingSlotDataRateIndex
+
+			if _, ok := DataRateIndex_name[int32(m.GetPingSlotDataRateIndex())]; !ok {
+				return MACParametersValidationError{
+					field:  "ping_slot_data_rate_index",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "beacon_frequency":
-			// no validation rules for BeaconFrequency
+
+			if val := m.GetBeaconFrequency(); val < 100000 || val > 1677721600 {
+				return MACParametersValidationError{
+					field:  "beacon_frequency",
+					reason: "value must be inside range [100000, 1677721600]",
+				}
+			}
+
 		case "channels":
 
 			for idx, item := range m.GetChannels() {
@@ -599,9 +704,23 @@ func (m *EndDeviceVersion) ValidateFields(paths ...string) error {
 			}
 
 		case "lorawan_version":
-			// no validation rules for LoRaWANVersion
+
+			if _, ok := MACVersion_name[int32(m.GetLoRaWANVersion())]; !ok {
+				return EndDeviceVersionValidationError{
+					field:  "lorawan_version",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "lorawan_phy_version":
-			// no validation rules for LoRaWANPHYVersion
+
+			if _, ok := PHYVersion_name[int32(m.GetLoRaWANPHYVersion())]; !ok {
+				return EndDeviceVersionValidationError{
+					field:  "lorawan_phy_version",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "frequency_plan_id":
 			// no validation rules for FrequencyPlanID
 		case "photos":
@@ -758,7 +877,18 @@ func (m *MACSettings) ValidateFields(paths ...string) error {
 			}
 
 		case "ping_slot_frequency":
-			// no validation rules for PingSlotFrequency
+
+			if wrapper := m.GetPingSlotFrequency(); wrapper != nil {
+
+				if val := wrapper.GetValue(); val < 100000 || val > 1677721600 {
+					return MACSettingsValidationError{
+						field:  "ping_slot_frequency",
+						reason: "value must be inside range [100000, 1677721600]",
+					}
+				}
+
+			}
+
 		case "class_c_timeout":
 
 			if v, ok := interface{}(m.GetClassCTimeout()).(interface{ ValidateFields(...string) error }); ok {
@@ -785,14 +915,15 @@ func (m *MACSettings) ValidateFields(paths ...string) error {
 
 		case "rx1_data_rate_offset":
 
-			if v, ok := interface{}(m.GetRx1DataRateOffset()).(interface{ ValidateFields(...string) error }); ok {
-				if err := v.ValidateFields(subs...); err != nil {
+			if wrapper := m.GetRx1DataRateOffset(); wrapper != nil {
+
+				if wrapper.GetValue() > 7 {
 					return MACSettingsValidationError{
 						field:  "rx1_data_rate_offset",
-						reason: "embedded message failed validation",
-						cause:  err,
+						reason: "value must be less than or equal to 7",
 					}
 				}
+
 			}
 
 		case "rx2_data_rate_index":
@@ -808,7 +939,18 @@ func (m *MACSettings) ValidateFields(paths ...string) error {
 			}
 
 		case "rx2_frequency":
-			// no validation rules for Rx2Frequency
+
+			if wrapper := m.GetRx2Frequency(); wrapper != nil {
+
+				if val := wrapper.GetValue(); val < 100000 || val > 1677721600 {
+					return MACSettingsValidationError{
+						field:  "rx2_frequency",
+						reason: "value must be inside range [100000, 1677721600]",
+					}
+				}
+
+			}
+
 		case "factory_preset_frequencies":
 
 		case "max_duty_cycle":
@@ -932,7 +1074,18 @@ func (m *MACSettings) ValidateFields(paths ...string) error {
 			}
 
 		case "desired_rx2_frequency":
-			// no validation rules for DesiredRx2Frequency
+
+			if wrapper := m.GetDesiredRx2Frequency(); wrapper != nil {
+
+				if val := wrapper.GetValue(); val < 100000 || val > 1677721600 {
+					return MACSettingsValidationError{
+						field:  "desired_rx2_frequency",
+						reason: "value must be inside range [100000, 1677721600]",
+					}
+				}
+
+			}
+
 		default:
 			return MACSettingsValidationError{
 				field:  name,
@@ -1037,9 +1190,23 @@ func (m *MACState) ValidateFields(paths ...string) error {
 			}
 
 		case "device_class":
-			// no validation rules for DeviceClass
+
+			if _, ok := Class_name[int32(m.GetDeviceClass())]; !ok {
+				return MACStateValidationError{
+					field:  "device_class",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "lorawan_version":
-			// no validation rules for LoRaWANVersion
+
+			if _, ok := MACVersion_name[int32(m.GetLoRaWANVersion())]; !ok {
+				return MACStateValidationError{
+					field:  "lorawan_version",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "last_confirmed_downlink_at":
 
 			if v, ok := interface{}(m.GetLastConfirmedDownlinkAt()).(interface{ ValidateFields(...string) error }); ok {
@@ -1055,7 +1222,14 @@ func (m *MACState) ValidateFields(paths ...string) error {
 		case "last_dev_status_f_cnt_up":
 			// no validation rules for LastDevStatusFCntUp
 		case "ping_slot_periodicity":
-			// no validation rules for PingSlotPeriodicity
+
+			if _, ok := PingSlotPeriod_name[int32(m.GetPingSlotPeriodicity())]; !ok {
+				return MACStateValidationError{
+					field:  "ping_slot_periodicity",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "pending_application_downlink":
 
 			if v, ok := interface{}(m.GetPendingApplicationDownlink()).(interface{ ValidateFields(...string) error }); ok {
@@ -1297,9 +1471,23 @@ func (m *EndDevice) ValidateFields(paths ...string) error {
 		case "supports_class_c":
 			// no validation rules for SupportsClassC
 		case "lorawan_version":
-			// no validation rules for LoRaWANVersion
+
+			if _, ok := MACVersion_name[int32(m.GetLoRaWANVersion())]; !ok {
+				return EndDeviceValidationError{
+					field:  "lorawan_version",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "lorawan_phy_version":
-			// no validation rules for LoRaWANPHYVersion
+
+			if _, ok := PHYVersion_name[int32(m.GetLoRaWANPHYVersion())]; !ok {
+				return EndDeviceValidationError{
+					field:  "lorawan_phy_version",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "frequency_plan_id":
 			// no validation rules for FrequencyPlanID
 		case "min_frequency":
@@ -1395,9 +1583,23 @@ func (m *EndDevice) ValidateFields(paths ...string) error {
 			}
 
 		case "power_state":
-			// no validation rules for PowerState
+
+			if _, ok := PowerState_name[int32(m.GetPowerState())]; !ok {
+				return EndDeviceValidationError{
+					field:  "power_state",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "battery_percentage":
-			// no validation rules for BatteryPercentage
+
+			if val := m.GetBatteryPercentage(); val < 0 || val > 1 {
+				return EndDeviceValidationError{
+					field:  "battery_percentage",
+					reason: "value must be inside range [0, 1]",
+				}
+			}
+
 		case "downlink_margin":
 			// no validation rules for DownlinkMargin
 		case "recent_adr_uplinks":
@@ -2211,13 +2413,41 @@ func (m *MACParameters_Channel) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "uplink_frequency":
-			// no validation rules for UplinkFrequency
+
+			if val := m.GetUplinkFrequency(); val < 100000 || val > 1677721600 {
+				return MACParameters_ChannelValidationError{
+					field:  "uplink_frequency",
+					reason: "value must be inside range [100000, 1677721600]",
+				}
+			}
+
 		case "downlink_frequency":
-			// no validation rules for DownlinkFrequency
+
+			if val := m.GetDownlinkFrequency(); val < 100000 || val > 1677721600 {
+				return MACParameters_ChannelValidationError{
+					field:  "downlink_frequency",
+					reason: "value must be inside range [100000, 1677721600]",
+				}
+			}
+
 		case "min_data_rate_index":
-			// no validation rules for MinDataRateIndex
+
+			if _, ok := DataRateIndex_name[int32(m.GetMinDataRateIndex())]; !ok {
+				return MACParameters_ChannelValidationError{
+					field:  "min_data_rate_index",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "max_data_rate_index":
-			// no validation rules for MaxDataRateIndex
+
+			if _, ok := DataRateIndex_name[int32(m.GetMaxDataRateIndex())]; !ok {
+				return MACParameters_ChannelValidationError{
+					field:  "max_data_rate_index",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "enable_uplink":
 			// no validation rules for EnableUplink
 		default:
@@ -2302,7 +2532,14 @@ func (m *MACSettings_DataRateIndexValue) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "value":
-			// no validation rules for Value
+
+			if _, ok := DataRateIndex_name[int32(m.GetValue())]; !ok {
+				return MACSettings_DataRateIndexValueValidationError{
+					field:  "value",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		default:
 			return MACSettings_DataRateIndexValueValidationError{
 				field:  name,
@@ -2386,7 +2623,14 @@ func (m *MACSettings_PingSlotPeriodValue) ValidateFields(paths ...string) error 
 		_ = subs
 		switch name {
 		case "value":
-			// no validation rules for Value
+
+			if _, ok := PingSlotPeriod_name[int32(m.GetValue())]; !ok {
+				return MACSettings_PingSlotPeriodValueValidationError{
+					field:  "value",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		default:
 			return MACSettings_PingSlotPeriodValueValidationError{
 				field:  name,
@@ -2470,7 +2714,14 @@ func (m *MACSettings_AggregatedDutyCycleValue) ValidateFields(paths ...string) e
 		_ = subs
 		switch name {
 		case "value":
-			// no validation rules for Value
+
+			if _, ok := AggregatedDutyCycle_name[int32(m.GetValue())]; !ok {
+				return MACSettings_AggregatedDutyCycleValueValidationError{
+					field:  "value",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		default:
 			return MACSettings_AggregatedDutyCycleValueValidationError{
 				field:  name,
@@ -2554,7 +2805,14 @@ func (m *MACSettings_RxDelayValue) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "value":
-			// no validation rules for Value
+
+			if _, ok := RxDelay_name[int32(m.GetValue())]; !ok {
+				return MACSettings_RxDelayValueValidationError{
+					field:  "value",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		default:
 			return MACSettings_RxDelayValueValidationError{
 				field:  name,
@@ -2637,12 +2895,12 @@ func (m *MACState_JoinAccept) ValidateFields(paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		_ = subs
 		switch name {
-		case "payload":
+		case "raw_payload":
 
-			if l := len(m.GetPayload()); l < 12 || l > 28 {
+			if l := len(m.GetRawPayload()); l < 17 || l > 33 {
 				return MACState_JoinAcceptValidationError{
-					field:  "payload",
-					reason: "value length must be between 12 and 28 bytes, inclusive",
+					field:  "raw_payload",
+					reason: "value length must be between 17 and 33 bytes, inclusive",
 				}
 			}
 

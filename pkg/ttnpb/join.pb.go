@@ -54,7 +54,7 @@ type JoinRequest struct {
 func (m *JoinRequest) Reset()      { *m = JoinRequest{} }
 func (*JoinRequest) ProtoMessage() {}
 func (*JoinRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_join_f76f829f08424de7, []int{0}
+	return fileDescriptor_join_7becf103040ee19c, []int{0}
 }
 func (m *JoinRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -144,7 +144,7 @@ type JoinResponse struct {
 func (m *JoinResponse) Reset()      { *m = JoinResponse{} }
 func (*JoinResponse) ProtoMessage() {}
 func (*JoinResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_join_f76f829f08424de7, []int{1}
+	return fileDescriptor_join_7becf103040ee19c, []int{1}
 }
 func (m *JoinResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1234,12 +1234,12 @@ var (
 	ErrIntOverflowJoin   = fmt.Errorf("proto: integer overflow")
 )
 
-func init() { proto.RegisterFile("lorawan-stack/api/join.proto", fileDescriptor_join_f76f829f08424de7) }
+func init() { proto.RegisterFile("lorawan-stack/api/join.proto", fileDescriptor_join_7becf103040ee19c) }
 func init() {
-	golang_proto.RegisterFile("lorawan-stack/api/join.proto", fileDescriptor_join_f76f829f08424de7)
+	golang_proto.RegisterFile("lorawan-stack/api/join.proto", fileDescriptor_join_7becf103040ee19c)
 }
 
-var fileDescriptor_join_f76f829f08424de7 = []byte{
+var fileDescriptor_join_7becf103040ee19c = []byte{
 	// 768 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x53, 0x3d, 0x6c, 0xdb, 0x46,
 	0x14, 0xbe, 0xb3, 0xf5, 0xe7, 0x93, 0xa1, 0x3a, 0x44, 0x91, 0xb0, 0x6a, 0x71, 0x54, 0x33, 0x09,

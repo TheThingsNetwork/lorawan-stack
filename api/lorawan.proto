@@ -27,8 +27,8 @@ option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 message Message {
   option (gogoproto.populate) = false;
 
-  MHDR m_hdr = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  bytes mic = 2 [(gogoproto.customname) = "MIC"];
+  MHDR m_hdr = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  bytes mic = 2 [(gogoproto.customname) = "MIC", (validate.rules).bytes.len = 4];
 
   // Payload represents either MACPayload, RejoinRequestPayload, JoinRequestPayload or JoinAcceptPayload
   // - MACPayload length is in range [7:M] bytes, where M is PHY specific.
@@ -36,6 +36,8 @@ message Message {
   // - JoinAcceptPayload length is either 12 or 28 bytes.
   // - RejoinRequestPayload length is 14 for Type 0 and 2, 19 for Type 1.
   oneof Payload {
+    option (validate.required) = true;
+
     MACPayload mac_payload = 3 [(gogoproto.customname) = "MACPayload"];
     JoinRequestPayload join_request_payload = 4;
     JoinAcceptPayload join_accept_payload = 5;
@@ -107,16 +109,16 @@ enum DataRateIndex {
 }
 
 message MHDR {
-  MType m_type = 1;
-  Major major = 2;
+  MType m_type = 1 [(validate.rules).enum.defined_only = true];
+  Major major = 2 [(validate.rules).enum.defined_only = true];
 }
 
 message MACPayload {
   option (gogoproto.populate) = false;
 
-  FHDR f_hdr = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  uint32 f_port = 2 [(validate.rules).uint32 = {lt: 256}];
-  bytes frm_payload = 3 [(gogoproto.customname) = "FRMPayload"];
+  FHDR f_hdr = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  uint32 f_port = 2 [(validate.rules).uint32.lt = 256];
+  bytes frm_payload = 3 [(gogoproto.customname) = "FRMPayload", (validate.rules).bytes.max_len = 249];
   google.protobuf.Struct decoded_payload = 4;
 }
 
@@ -231,6 +233,8 @@ message FSKDataRate {
 
 message DataRate {
   oneof modulation {
+    option (validate.required) = true;
+
     LoRaDataRate lora = 1 [(gogoproto.customname) = "LoRa"];
     FSKDataRate fsk = 2 [(gogoproto.customname) = "FSK"];
   };
@@ -245,7 +249,7 @@ message TxSettings {
   // Data rate.
   DataRate data_rate = 1 [(gogoproto.nullable) = false];
   // LoRaWAN data rate index.
-  DataRateIndex data_rate_index = 2;
+  DataRateIndex data_rate_index = 2 [(validate.rules).enum.defined_only = true];
   // LoRa coding rate.
   string coding_rate = 3;
   // Frequency (Hz).
@@ -284,6 +288,8 @@ message DownlinkPath {
   // Set uplink token for class A, B or C downlink to the uplink token received from the corresponding RxMetadata. Uplink tokens are opaque to the Network Server.
   // Set fixed to force using the specified gateway antenna identifiers for downlink. This can only be used for class B or C downlinks.
   oneof path {
+    option (validate.required) = true;
+
     bytes uplink_token = 1;
     GatewayAntennaIdentifiers fixed = 2;
   }
@@ -356,9 +362,11 @@ enum MACCommandIdentifier {
 }
 
 message MACCommand {
-  MACCommandIdentifier cid = 1 [(gogoproto.customname) = "CID"];
+  MACCommandIdentifier cid = 1 [(gogoproto.customname) = "CID", (validate.rules).enum = {defined_only: true, not_in:[0]}];
 
   oneof payload {
+    option (validate.required) = true;
+
     bytes raw_payload = 2;
     ResetInd reset_ind = 3;
     ResetConf reset_conf = 4;
