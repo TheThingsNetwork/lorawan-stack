@@ -71,12 +71,29 @@ func (r *DeviceRegistry) uidKey(uid string) string {
 	return r.Redis.Key("uid", uid)
 }
 
-func (r *DeviceRegistry) euiKey(devEUI, joinEUI types.EUI64) string {
+func (r *DeviceRegistry) euiKey(joinEUI, devEUI types.EUI64) string {
 	return r.Redis.Key("eui", joinEUI.String(), devEUI.String())
 }
 
 func (r *DeviceRegistry) provisionerKey(provisionerID, pid string) string {
 	return r.Redis.Key("provisioner", provisionerID, pid)
+}
+
+// GetByID gets device by appID, devID.
+func (r *DeviceRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, error) {
+	ids := ttnpb.EndDeviceIdentifiers{
+		ApplicationIdentifiers: appID,
+		DeviceID:               devID,
+	}
+	if err := ids.ValidateContext(ctx); err != nil {
+		return nil, err
+	}
+
+	pb := &ttnpb.EndDevice{}
+	if err := ttnredis.GetProto(r.Redis, r.uidKey(unique.ID(ctx, ids))).ScanProto(pb); err != nil {
+		return nil, err
+	}
+	return applyDeviceFieldMask(nil, pb, paths...)
 }
 
 // GetByEUI gets device by joinEUI, devEUI.
@@ -86,7 +103,7 @@ func (r *DeviceRegistry) GetByEUI(ctx context.Context, joinEUI types.EUI64, devE
 	}
 
 	pb := &ttnpb.EndDevice{}
-	if err := ttnredis.GetProto(r.Redis, r.euiKey(joinEUI, devEUI)).ScanProto(pb); err != nil {
+	if err := ttnredis.FindProto(r.Redis, r.euiKey(joinEUI, devEUI), r.uidKey).ScanProto(pb); err != nil {
 		return nil, err
 	}
 	return applyDeviceFieldMask(&ttnpb.EndDevice{}, pb, paths...)
@@ -100,7 +117,7 @@ func equalEUI(x, y *types.EUI64) bool {
 }
 
 // SetByEUI sets device by joinEUI, devEUI.
-func (r *DeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+func (r *DeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64, gets []string, f func(pb *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 	if joinEUI.IsZero() || devEUI.IsZero() {
 		return nil, errInvalidIdentifiers
 	}
@@ -108,7 +125,43 @@ func (r *DeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devE
 
 	var pb *ttnpb.EndDevice
 	err := r.Redis.Watch(func(tx *redis.Tx) error {
-		cmd := ttnredis.GetProto(tx, ek)
+		uid, err := tx.Get(ek).Result()
+		if err != nil {
+			return ttnredis.ConvertError(err)
+		}
+
+		ctx, err := unique.WithContext(ctx, uid)
+		if err != nil {
+			return err
+		}
+		ids, err := unique.ToDeviceID(uid)
+		if err != nil {
+			return err
+		}
+		pb, err = r.SetByID(ctx, ids.ApplicationIdentifiers, ids.DeviceID, gets, f)
+		return err
+	}, ek)
+	if err != nil {
+		return nil, err
+	}
+	return pb, nil
+}
+
+// SetByID sets device by appID, devID.
+func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(pb *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+	ids := ttnpb.EndDeviceIdentifiers{
+		ApplicationIdentifiers: appID,
+		DeviceID:               devID,
+	}
+	if err := ids.ValidateContext(ctx); err != nil {
+		return nil, err
+	}
+	uid := unique.ID(ctx, ids)
+	uk := r.uidKey(uid)
+
+	var pb *ttnpb.EndDevice
+	err := r.Redis.Watch(func(tx *redis.Tx) error {
+		cmd := ttnredis.GetProto(tx, uk)
 		stored := &ttnpb.EndDevice{}
 		if err := cmd.ScanProto(stored); errors.IsNotFound(err) {
 			stored = nil
@@ -140,9 +193,9 @@ func (r *DeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devE
 		var f func(redis.Pipeliner) error
 		if pb == nil {
 			f = func(p redis.Pipeliner) error {
-				p.Del(ek)
-				if !stored.ApplicationIdentifiers.IsZero() && stored.DeviceID != "" {
-					p.Del(r.uidKey(unique.ID(ctx, stored.EndDeviceIdentifiers)))
+				p.Del(uk)
+				if stored.JoinEUI != nil && stored.DevEUI != nil {
+					p.Del(r.euiKey(*stored.JoinEUI, *stored.DevEUI))
 				}
 				pid, err := provisionerUniqueID(stored)
 				if err != nil {
@@ -154,15 +207,8 @@ func (r *DeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devE
 				return nil
 			}
 		} else {
-			if pb.JoinEUI == nil || *pb.JoinEUI != joinEUI ||
-				pb.DevEUI == nil || *pb.DevEUI != devEUI {
+			if pb.ApplicationIdentifiers != appID || pb.DeviceID != devID || pb.JoinEUI == nil || pb.DevEUI == nil {
 				return errInvalidIdentifiers
-			}
-			if err := (&ttnpb.EndDeviceIdentifiers{
-				ApplicationIdentifiers: pb.ApplicationIdentifiers,
-				DeviceID:               pb.DeviceID,
-			}).ValidateContext(ctx); err != nil {
-				return errInvalidIdentifiers.WithCause(err)
 			}
 
 			pb.UpdatedAt = time.Now().UTC()
@@ -190,7 +236,6 @@ func (r *DeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devE
 				if err != nil {
 					return err
 				}
-
 				storedPID, err := provisionerUniqueID(stored)
 				if err != nil {
 					return err
@@ -211,42 +256,41 @@ func (r *DeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devE
 			}
 
 			f = func(p redis.Pipeliner) error {
-				eid := ttnredis.Key(joinEUI.String(), devEUI.String())
-
 				if stored == nil {
-					ik := r.uidKey(unique.ID(ctx, updated.EndDeviceIdentifiers))
-					if err := tx.Watch(ik).Err(); err != nil {
+					ek := r.euiKey(*pb.JoinEUI, *pb.DevEUI)
+					if err := tx.Watch(ek).Err(); err != nil {
 						return err
 					}
-					i, err := tx.Exists(ik).Result()
+					i, err := tx.Exists(ek).Result()
 					if err != nil {
 						return ttnredis.ConvertError(err)
 					}
 					if i != 0 {
 						return errDuplicateIdentifiers
 					}
-					p.SetNX(ik, r.euiKey(joinEUI, devEUI), 0)
-
-					if updatedPID != "" {
-						pk := r.provisionerKey(updated.ProvisionerID, updatedPID)
-						if err := tx.Watch(pk).Err(); err != nil {
-							return err
-						}
-						i, err := tx.Exists(pk).Result()
-						if err != nil {
-							return ttnredis.ConvertError(err)
-						}
-						if i != 0 {
-							return errAlreadyProvisioned
-						}
-						p.SetNX(pk, eid, 0)
-					}
+					p.SetNX(ek, uid, 0)
 				}
 
-				_, err := ttnredis.SetProto(p, ek, updated, 0)
+				if updatedPID != "" {
+					pk := r.provisionerKey(updated.ProvisionerID, updatedPID)
+					if err := tx.Watch(pk).Err(); err != nil {
+						return err
+					}
+					i, err := tx.Exists(pk).Result()
+					if err != nil {
+						return ttnredis.ConvertError(err)
+					}
+					if i != 0 {
+						return errAlreadyProvisioned
+					}
+					p.SetNX(pk, uid, 0)
+				}
+
+				_, err := ttnredis.SetProto(p, uk, updated, 0)
 				if err != nil {
 					return err
 				}
+
 				return nil
 			}
 		}
@@ -255,7 +299,7 @@ func (r *DeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devE
 			return err
 		}
 		return nil
-	}, ek)
+	}, uk)
 	if err != nil {
 		return nil, err
 	}

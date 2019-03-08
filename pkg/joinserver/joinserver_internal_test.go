@@ -40,7 +40,9 @@ type JsDeviceServer = jsEndDeviceRegistryServer
 
 type MockDeviceRegistry struct {
 	GetByEUIFunc func(context.Context, types.EUI64, types.EUI64, []string) (*ttnpb.EndDevice, error)
+	GetByIDFunc  func(context.Context, ttnpb.ApplicationIdentifiers, string, []string) (*ttnpb.EndDevice, error)
 	SetByEUIFunc func(context.Context, types.EUI64, types.EUI64, []string, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
+	SetByIDFunc  func(context.Context, ttnpb.ApplicationIdentifiers, string, []string, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
 }
 
 func (r *MockDeviceRegistry) GetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error) {
@@ -50,11 +52,25 @@ func (r *MockDeviceRegistry) GetByEUI(ctx context.Context, joinEUI types.EUI64, 
 	return r.GetByEUIFunc(ctx, joinEUI, devEUI, paths)
 }
 
+func (r *MockDeviceRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, error) {
+	if r.GetByIDFunc == nil {
+		return nil, errors.New("Not implemented")
+	}
+	return r.GetByIDFunc(ctx, appID, devID, paths)
+}
+
 func (r *MockDeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 	if r.SetByEUIFunc == nil {
 		return nil, errors.New("Not implemented")
 	}
 	return r.SetByEUIFunc(ctx, joinEUI, devEUI, paths, f)
+}
+
+func (r *MockDeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+	if r.SetByIDFunc == nil {
+		return nil, errors.New("Not implemented")
+	}
+	return r.SetByIDFunc(ctx, appID, devID, paths, f)
 }
 
 type MockKeyRegistry struct {

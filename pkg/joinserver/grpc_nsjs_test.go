@@ -1092,7 +1092,7 @@ func TestHandleJoin(t *testing.T) {
 
 			start := time.Now()
 
-			ret, err := devReg.SetByEUI(authorizedCtx, *pb.JoinEUI, *pb.DevEUI,
+			ret, err := devReg.SetByID(authorizedCtx, pb.ApplicationIdentifiers, pb.DeviceID,
 				[]string{
 					"created_at",
 					"last_dev_nonce",
