@@ -784,10 +784,10 @@ var DefaultMACCommands = MACCommandSpec{
 		AppendDownlink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
 			pld := cmd.GetPingSlotChannelReq()
 
-			if pld.Frequency > maxUint24 {
-				return nil, errExpectedLowerOrEqual("Frequency", maxUint24)(pld.Frequency)
+			if pld.Frequency < 100000 || pld.Frequency > maxUint24*100 {
+				return nil, errExpectedBetween("Frequency", 100000, maxUint24*100)(pld.Frequency)
 			}
-			b = appendUint64(b, pld.Frequency, 3)
+			b = appendUint64(b, pld.Frequency/100, 3)
 
 			if pld.DataRateIndex > 15 {
 				return nil, errExpectedLowerOrEqual("DataRateIndex", 15)(pld.DataRateIndex)
@@ -798,7 +798,7 @@ var DefaultMACCommands = MACCommandSpec{
 		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_PING_SLOT_CHANNEL, "PingSlotChannelReq", 4, func(b []byte, cmd *ttnpb.MACCommand) error {
 			cmd.Payload = &ttnpb.MACCommand_PingSlotChannelReq_{
 				PingSlotChannelReq: &ttnpb.MACCommand_PingSlotChannelReq{
-					Frequency:     parseUint64(b[0:3]),
+					Frequency:     parseUint64(b[0:3]) * 100,
 					DataRateIndex: ttnpb.DataRateIndex(b[3] & 0xf),
 				},
 			}
