@@ -68,7 +68,7 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 
 	start := time.Now()
 
-	ret, err = reg.SetByEUI(ctx, *pb.JoinEUI, *pb.DevEUI,
+	ret, err = reg.SetByID(ctx, pb.ApplicationIdentifiers, pb.DeviceID,
 		[]string{
 			"created_at",
 			"provisioner_id",
@@ -96,11 +96,14 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 	a.So(ret, should.HaveEmptyDiff, pb)
 
 	ret, err = reg.GetByEUI(ctx, *pb.EndDeviceIdentifiers.JoinEUI, *pb.EndDeviceIdentifiers.DevEUI, ttnpb.EndDeviceFieldPathsTopLevel)
-	a.So(err, should.BeNil)
+	if !a.So(err, should.BeNil) {
+		t.Fatalf("Failed to get device: %s", err)
+	}
 	a.So(ret, should.HaveEmptyDiff, pb)
 
 	pbOther := CopyEndDevice(pb)
-	pbOther.EndDeviceIdentifiers.DevEUI = &types.EUI64{0x43, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+	pbOther.DeviceID = "other-device"
+	pbOther.DevEUI = &types.EUI64{0x43, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
 
 	ret, err = reg.GetByEUI(ctx, *pbOther.EndDeviceIdentifiers.JoinEUI, *pbOther.EndDeviceIdentifiers.DevEUI, ttnpb.EndDeviceFieldPathsTopLevel)
 	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
@@ -108,7 +111,7 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 	}
 	a.So(ret, should.BeNil)
 
-	ret, err = reg.SetByEUI(ctx, *pbOther.JoinEUI, *pbOther.DevEUI,
+	ret, err = reg.SetByID(ctx, pbOther.ApplicationIdentifiers, pbOther.DeviceID,
 		[]string{
 			"created_at",
 			"provisioner_id",
@@ -129,7 +132,7 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 		t.Fatal("Device with conflicting provisioner unique ID created")
 	}
 
-	err = DeleteDevice(ctx, reg, *pb.EndDeviceIdentifiers.JoinEUI, *pb.EndDeviceIdentifiers.DevEUI)
+	err = DeleteDevice(ctx, reg, pb.ApplicationIdentifiers, pb.DeviceID)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -140,7 +143,7 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 	}
 	a.So(ret, should.BeNil)
 
-	ret, err = reg.SetByEUI(ctx, *pbOther.JoinEUI, *pbOther.DevEUI,
+	ret, err = reg.SetByID(ctx, pbOther.ApplicationIdentifiers, pbOther.DeviceID,
 		[]string{
 			"created_at",
 			"provisioner_id",
@@ -169,10 +172,12 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 	a.So(ret, should.HaveEmptyDiff, pbOther)
 
 	ret, err = reg.GetByEUI(ctx, *pbOther.EndDeviceIdentifiers.JoinEUI, *pbOther.EndDeviceIdentifiers.DevEUI, ttnpb.EndDeviceFieldPathsTopLevel)
-	a.So(err, should.BeNil)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
 	a.So(ret, should.HaveEmptyDiff, pbOther)
 
-	err = DeleteDevice(ctx, reg, *pbOther.EndDeviceIdentifiers.JoinEUI, *pbOther.EndDeviceIdentifiers.DevEUI)
+	err = DeleteDevice(ctx, reg, pbOther.ApplicationIdentifiers, pbOther.DeviceID)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
