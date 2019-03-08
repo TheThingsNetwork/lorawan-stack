@@ -22,6 +22,7 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/fetch"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 	httpmock "gopkg.in/jarcoal/httpmock.v1"
 )
@@ -86,7 +87,7 @@ func TestHTTPCache(t *testing.T) {
 	go s.ListenAndServe()
 	defer s.Close()
 
-	time.Sleep(10 * time.Millisecond)
+	time.Sleep(10 * test.Delay)
 
 	fetcher := fetch.FromHTTP(fmt.Sprintf("http://%s", s.Addr), true)
 
