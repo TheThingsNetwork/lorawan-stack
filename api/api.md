@@ -1905,7 +1905,7 @@ This is used internally by the Network Server and is read only.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| raw_payload | [bytes](#bytes) |  | Payload of the join-accept received from Join Server. |
+| payload | [bytes](#bytes) |  | Payload of the join-accept received from Join Server. |
 | request | [JoinRequest](#ttn.lorawan.v3.JoinRequest) |  | JoinRequest sent to Join Server. |
 | keys | [SessionKeys](#ttn.lorawan.v3.SessionKeys) |  | Network session keys associated with the join. |
 

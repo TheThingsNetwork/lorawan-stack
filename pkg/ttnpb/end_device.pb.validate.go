@@ -2895,11 +2895,11 @@ func (m *MACState_JoinAccept) ValidateFields(paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		_ = subs
 		switch name {
-		case "raw_payload":
+		case "payload":
 
-			if l := len(m.GetRawPayload()); l < 17 || l > 33 {
+			if l := len(m.GetPayload()); l < 17 || l > 33 {
 				return MACState_JoinAcceptValidationError{
-					field:  "raw_payload",
+					field:  "payload",
 					reason: "value length must be between 17 and 33 bytes, inclusive",
 				}
 			}

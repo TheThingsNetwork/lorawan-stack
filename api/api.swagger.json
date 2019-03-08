@@ -4905,7 +4905,7 @@
     "MACStateJoinAccept": {
       "type": "object",
       "properties": {
-        "raw_payload": {
+        "payload": {
           "type": "string",
           "format": "byte",
           "description": "Payload of the join-accept received from Join Server."

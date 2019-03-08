@@ -1978,14 +1978,14 @@ func (dst *MACSettings_RxDelayValue) SetFields(src *MACSettings_RxDelayValue, pa
 func (dst *MACState_JoinAccept) SetFields(src *MACState_JoinAccept, paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
-		case "raw_payload":
+		case "payload":
 			if len(subs) > 0 {
-				return fmt.Errorf("'raw_payload' has no subfields, but %s were specified", subs)
+				return fmt.Errorf("'payload' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.RawPayload = src.RawPayload
+				dst.Payload = src.Payload
 			} else {
-				dst.RawPayload = nil
+				dst.Payload = nil
 			}
 		case "request":
 			if len(subs) > 0 {
