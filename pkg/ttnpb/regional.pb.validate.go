@@ -303,9 +303,23 @@ func (m *ConcentratorConfig_LoRaStandardChannel) ValidateFields(paths ...string)
 		case "radio":
 			// no validation rules for Radio
 		case "bandwidth":
-			// no validation rules for Bandwidth
+
+			if _, ok := _ConcentratorConfig_LoRaStandardChannel_Bandwidth_InLookup[m.GetBandwidth()]; !ok {
+				return ConcentratorConfig_LoRaStandardChannelValidationError{
+					field:  "bandwidth",
+					reason: "value must be in list [125 250 500]",
+				}
+			}
+
 		case "spreading_factor":
-			// no validation rules for SpreadingFactor
+
+			if val := m.GetSpreadingFactor(); val < 7 || val > 12 {
+				return ConcentratorConfig_LoRaStandardChannelValidationError{
+					field:  "spreading_factor",
+					reason: "value must be inside range [7, 12]",
+				}
+			}
+
 		default:
 			return ConcentratorConfig_LoRaStandardChannelValidationError{
 				field:  name,
@@ -372,6 +386,12 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ConcentratorConfig_LoRaStandardChannelValidationError{}
+
+var _ConcentratorConfig_LoRaStandardChannel_Bandwidth_InLookup = map[uint32]struct{}{
+	125: {},
+	250: {},
+	500: {},
+}
 
 // ValidateFields checks the field values on ConcentratorConfig_FSKChannel with
 // the rules defined in the proto definition for this message. If any rules

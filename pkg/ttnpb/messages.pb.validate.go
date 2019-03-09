@@ -445,10 +445,10 @@ func (m *ApplicationUplink) ValidateFields(paths ...string) error {
 			// no validation rules for SessionKeyID
 		case "f_port":
 
-			if m.GetFPort() >= 256 {
+			if m.GetFPort() > 255 {
 				return ApplicationUplinkValidationError{
 					field:  "f_port",
-					reason: "value must be less than 256",
+					reason: "value must be less than or equal to 255",
 				}
 			}
 
@@ -800,10 +800,10 @@ func (m *ApplicationDownlink) ValidateFields(paths ...string) error {
 			// no validation rules for SessionKeyID
 		case "f_port":
 
-			if m.GetFPort() >= 256 {
+			if m.GetFPort() > 255 {
 				return ApplicationDownlinkValidationError{
 					field:  "f_port",
-					reason: "value must be less than 256",
+					reason: "value must be less than or equal to 255",
 				}
 			}
 

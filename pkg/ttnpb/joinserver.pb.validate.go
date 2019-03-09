@@ -351,7 +351,14 @@ func (m *CryptoServicePayloadRequest) ValidateFields(paths ...string) error {
 			}
 
 		case "lorawan_version":
-			// no validation rules for LoRaWANVersion
+
+			if _, ok := MACVersion_name[int32(m.GetLoRaWANVersion())]; !ok {
+				return CryptoServicePayloadRequestValidationError{
+					field:  "lorawan_version",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "payload":
 			// no validation rules for Payload
 		case "provisioner_id":
@@ -563,7 +570,14 @@ func (m *JoinAcceptMICRequest) ValidateFields(paths ...string) error {
 			}
 
 		case "join_request_type":
-			// no validation rules for JoinRequestType
+
+			if _, ok := RejoinType_name[int32(m.GetJoinRequestType())]; !ok {
+				return JoinAcceptMICRequestValidationError{
+					field:  "join_request_type",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "dev_nonce":
 			// no validation rules for DevNonce
 		default:
@@ -660,7 +674,14 @@ func (m *DeriveSessionKeysRequest) ValidateFields(paths ...string) error {
 			}
 
 		case "lorawan_version":
-			// no validation rules for LoRaWANVersion
+
+			if _, ok := MACVersion_name[int32(m.GetLoRaWANVersion())]; !ok {
+				return DeriveSessionKeysRequestValidationError{
+					field:  "lorawan_version",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "join_nonce":
 			// no validation rules for JoinNonce
 		case "dev_nonce":

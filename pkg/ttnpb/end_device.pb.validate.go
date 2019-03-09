@@ -303,6 +303,13 @@ func (m *MACParameters) ValidateFields(paths ...string) error {
 
 		case "channels":
 
+			if len(m.GetChannels()) < 1 {
+				return MACParametersValidationError{
+					field:  "channels",
+					reason: "value must contain at least 1 item(s)",
+				}
+			}
+
 			for idx, item := range m.GetChannels() {
 				_, _ = idx, item
 
@@ -1593,10 +1600,10 @@ func (m *EndDevice) ValidateFields(paths ...string) error {
 
 		case "battery_percentage":
 
-			if val := m.GetBatteryPercentage(); val < 0 || val > 1 {
+			if val := m.GetBatteryPercentage(); val < -1 || val > 1 {
 				return EndDeviceValidationError{
 					field:  "battery_percentage",
-					reason: "value must be inside range [0, 1]",
+					reason: "value must be inside range [-1, 1]",
 				}
 			}
 

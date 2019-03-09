@@ -632,7 +632,14 @@ func (m *Gateway) ValidateFields(paths ...string) error {
 		case "enforce_duty_cycle":
 			// no validation rules for EnforceDutyCycle
 		case "downlink_path_constraint":
-			// no validation rules for DownlinkPathConstraint
+
+			if _, ok := DownlinkPathConstraint_name[int32(m.GetDownlinkPathConstraint())]; !ok {
+				return GatewayValidationError{
+					field:  "downlink_path_constraint",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		default:
 			return GatewayValidationError{
 				field:  name,

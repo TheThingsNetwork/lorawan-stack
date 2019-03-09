@@ -2558,7 +2558,7 @@ func (dst *MACCommand_ForceRejoinReq) SetFields(src *MACCommand_ForceRejoinReq, 
 			if src != nil {
 				dst.RejoinType = src.RejoinType
 			} else {
-				var zero uint32
+				var zero RejoinType
 				dst.RejoinType = zero
 			}
 		case "data_rate_index":

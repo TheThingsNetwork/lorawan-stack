@@ -136,7 +136,14 @@ func (m *User) ValidateFields(paths ...string) error {
 		case "require_password_update":
 			// no validation rules for RequirePasswordUpdate
 		case "state":
-			// no validation rules for State
+
+			if _, ok := State_name[int32(m.GetState())]; !ok {
+				return UserValidationError{
+					field:  "state",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "admin":
 			// no validation rules for Admin
 		case "temporary_password":

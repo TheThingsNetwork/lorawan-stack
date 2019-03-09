@@ -104,7 +104,14 @@ func (m *RxMetadata) ValidateFields(paths ...string) error {
 			}
 
 		case "downlink_path_constraint":
-			// no validation rules for DownlinkPathConstraint
+
+			if _, ok := DownlinkPathConstraint_name[int32(m.GetDownlinkPathConstraint())]; !ok {
+				return RxMetadataValidationError{
+					field:  "downlink_path_constraint",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "uplink_token":
 			// no validation rules for UplinkToken
 		case "advanced":
@@ -199,15 +206,36 @@ func (m *Location) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "latitude":
-			// no validation rules for Latitude
+
+			if val := m.GetLatitude(); val < -90 || val > 90 {
+				return LocationValidationError{
+					field:  "latitude",
+					reason: "value must be inside range [-90, 90]",
+				}
+			}
+
 		case "longitude":
-			// no validation rules for Longitude
+
+			if val := m.GetLongitude(); val < -180 || val > 180 {
+				return LocationValidationError{
+					field:  "longitude",
+					reason: "value must be inside range [-180, 180]",
+				}
+			}
+
 		case "altitude":
 			// no validation rules for Altitude
 		case "accuracy":
 			// no validation rules for Accuracy
 		case "source":
-			// no validation rules for Source
+
+			if _, ok := LocationSource_name[int32(m.GetSource())]; !ok {
+				return LocationValidationError{
+					field:  "source",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		default:
 			return LocationValidationError{
 				field:  name,

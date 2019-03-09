@@ -111,7 +111,14 @@ func (m *Client) ValidateFields(paths ...string) error {
 		case "redirect_uris":
 
 		case "state":
-			// no validation rules for State
+
+			if _, ok := State_name[int32(m.GetState())]; !ok {
+				return ClientValidationError{
+					field:  "state",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "skip_authorization":
 			// no validation rules for SkipAuthorization
 		case "endorsed":

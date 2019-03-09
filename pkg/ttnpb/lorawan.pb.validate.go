@@ -321,10 +321,10 @@ func (m *MACPayload) ValidateFields(paths ...string) error {
 
 		case "f_port":
 
-			if m.GetFPort() >= 256 {
+			if m.GetFPort() > 255 {
 				return MACPayloadValidationError{
 					field:  "f_port",
-					reason: "value must be less than 256",
+					reason: "value must be less than or equal to 255",
 				}
 			}
 
@@ -443,15 +443,22 @@ func (m *FHDR) ValidateFields(paths ...string) error {
 
 		case "f_cnt":
 
-			if m.GetFCnt() >= 65536 {
+			if m.GetFCnt() > 65535 {
 				return FHDRValidationError{
 					field:  "f_cnt",
-					reason: "value must be less than 65536",
+					reason: "value must be less than or equal to 65535",
 				}
 			}
 
 		case "f_opts":
-			// no validation rules for FOpts
+
+			if len(m.GetFOpts()) > 15 {
+				return FHDRValidationError{
+					field:  "f_opts",
+					reason: "value length must be at most 15 bytes",
+				}
+			}
+
 		default:
 			return FHDRValidationError{
 				field:  name,
@@ -708,7 +715,14 @@ func (m *RejoinRequestPayload) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "rejoin_type":
-			// no validation rules for RejoinType
+
+			if _, ok := RejoinType_name[int32(m.GetRejoinType())]; !ok {
+				return RejoinRequestPayloadValidationError{
+					field:  "rejoin_type",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "net_id":
 			// no validation rules for NetID
 		case "join_eui":
@@ -819,7 +833,14 @@ func (m *JoinAcceptPayload) ValidateFields(paths ...string) error {
 			}
 
 		case "rx_delay":
-			// no validation rules for RxDelay
+
+			if _, ok := RxDelay_name[int32(m.GetRxDelay())]; !ok {
+				return JoinAcceptPayloadValidationError{
+					field:  "rx_delay",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "cf_list":
 
 			if v, ok := interface{}(m.GetCFList()).(interface{ ValidateFields(...string) error }); ok {
@@ -914,9 +935,23 @@ func (m *DLSettings) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "rx1_dr_offset":
-			// no validation rules for Rx1DROffset
+
+			if m.GetRx1DROffset() > 7 {
+				return DLSettingsValidationError{
+					field:  "rx1_dr_offset",
+					reason: "value must be less than or equal to 7",
+				}
+			}
+
 		case "rx2_dr":
-			// no validation rules for Rx2DR
+
+			if _, ok := DataRateIndex_name[int32(m.GetRx2DR())]; !ok {
+				return DLSettingsValidationError{
+					field:  "rx2_dr",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "opt_neg":
 			// no validation rules for OptNeg
 		default:
@@ -999,7 +1034,14 @@ func (m *CFList) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "type":
-			// no validation rules for Type
+
+			if _, ok := CFListType_name[int32(m.GetType())]; !ok {
+				return CFListValidationError{
+					field:  "type",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "freq":
 
 		case "ch_masks":
@@ -1084,9 +1126,23 @@ func (m *LoRaDataRate) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "bandwidth":
-			// no validation rules for Bandwidth
+
+			if _, ok := _LoRaDataRate_Bandwidth_InLookup[m.GetBandwidth()]; !ok {
+				return LoRaDataRateValidationError{
+					field:  "bandwidth",
+					reason: "value must be in list [125 250 500]",
+				}
+			}
+
 		case "spreading_factor":
-			// no validation rules for SpreadingFactor
+
+			if val := m.GetSpreadingFactor(); val < 7 || val > 12 {
+				return LoRaDataRateValidationError{
+					field:  "spreading_factor",
+					reason: "value must be inside range [7, 12]",
+				}
+			}
+
 		default:
 			return LoRaDataRateValidationError{
 				field:  name,
@@ -1150,6 +1206,12 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = LoRaDataRateValidationError{}
+
+var _LoRaDataRate_Bandwidth_InLookup = map[uint32]struct{}{
+	125: {},
+	250: {},
+	500: {},
+}
 
 // ValidateFields checks the field values on FSKDataRate with the rules defined
 // in the proto definition for this message. If any rules are violated, an
@@ -1397,19 +1459,19 @@ func (m *TxSettings) ValidateFields(paths ...string) error {
 			// no validation rules for InvertPolarization
 		case "gateway_channel_index":
 
-			if m.GetGatewayChannelIndex() >= 256 {
+			if m.GetGatewayChannelIndex() > 255 {
 				return TxSettingsValidationError{
 					field:  "gateway_channel_index",
-					reason: "value must be less than 256",
+					reason: "value must be less than or equal to 255",
 				}
 			}
 
 		case "device_channel_index":
 
-			if m.GetDeviceChannelIndex() >= 256 {
+			if m.GetDeviceChannelIndex() > 255 {
 				return TxSettingsValidationError{
 					field:  "device_channel_index",
-					reason: "value must be less than 256",
+					reason: "value must be less than or equal to 255",
 				}
 			}
 
@@ -1826,17 +1888,45 @@ func (m *TxRequest) ValidateFields(paths ...string) error {
 			}
 
 		case "rx1_delay":
-			// no validation rules for Rx1Delay
+
+			if _, ok := RxDelay_name[int32(m.GetRx1Delay())]; !ok {
+				return TxRequestValidationError{
+					field:  "rx1_delay",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "rx1_data_rate_index":
-			// no validation rules for Rx1DataRateIndex
+
+			if _, ok := DataRateIndex_name[int32(m.GetRx1DataRateIndex())]; !ok {
+				return TxRequestValidationError{
+					field:  "rx1_data_rate_index",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "rx1_frequency":
 			// no validation rules for Rx1Frequency
 		case "rx2_data_rate_index":
-			// no validation rules for Rx2DataRateIndex
+
+			if _, ok := DataRateIndex_name[int32(m.GetRx2DataRateIndex())]; !ok {
+				return TxRequestValidationError{
+					field:  "rx2_data_rate_index",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "rx2_frequency":
 			// no validation rules for Rx2Frequency
 		case "priority":
-			// no validation rules for Priority
+
+			if _, ok := TxSchedulePriority_name[int32(m.GetPriority())]; !ok {
+				return TxRequestValidationError{
+					field:  "priority",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "absolute_time":
 
 			if v, ok := interface{}(m.GetAbsoluteTime()).(interface{ ValidateFields(...string) error }); ok {
@@ -2418,7 +2508,21 @@ func (m *MACCommand_ResetInd) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "minor_version":
-			// no validation rules for MinorVersion
+
+			if _, ok := _MACCommand_ResetInd_MinorVersion_InLookup[m.GetMinorVersion()]; !ok {
+				return MACCommand_ResetIndValidationError{
+					field:  "minor_version",
+					reason: "value must be in list [1]",
+				}
+			}
+
+			if _, ok := Minor_name[int32(m.GetMinorVersion())]; !ok {
+				return MACCommand_ResetIndValidationError{
+					field:  "minor_version",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		default:
 			return MACCommand_ResetIndValidationError{
 				field:  name,
@@ -2485,6 +2589,10 @@ var _ interface {
 	ErrorName() string
 } = MACCommand_ResetIndValidationError{}
 
+var _MACCommand_ResetInd_MinorVersion_InLookup = map[Minor]struct{}{
+	1: {},
+}
+
 // ValidateFields checks the field values on MACCommand_ResetConf with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -2501,7 +2609,21 @@ func (m *MACCommand_ResetConf) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "minor_version":
-			// no validation rules for MinorVersion
+
+			if _, ok := _MACCommand_ResetConf_MinorVersion_InLookup[m.GetMinorVersion()]; !ok {
+				return MACCommand_ResetConfValidationError{
+					field:  "minor_version",
+					reason: "value must be in list [1]",
+				}
+			}
+
+			if _, ok := Minor_name[int32(m.GetMinorVersion())]; !ok {
+				return MACCommand_ResetConfValidationError{
+					field:  "minor_version",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		default:
 			return MACCommand_ResetConfValidationError{
 				field:  name,
@@ -2568,6 +2690,10 @@ var _ interface {
 	ErrorName() string
 } = MACCommand_ResetConfValidationError{}
 
+var _MACCommand_ResetConf_MinorVersion_InLookup = map[Minor]struct{}{
+	1: {},
+}
+
 // ValidateFields checks the field values on MACCommand_LinkCheckAns with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -2584,9 +2710,23 @@ func (m *MACCommand_LinkCheckAns) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "margin":
-			// no validation rules for Margin
+
+			if m.GetMargin() > 254 {
+				return MACCommand_LinkCheckAnsValidationError{
+					field:  "margin",
+					reason: "value must be less than or equal to 254",
+				}
+			}
+
 		case "gateway_count":
-			// no validation rules for GatewayCount
+
+			if m.GetGatewayCount() > 255 {
+				return MACCommand_LinkCheckAnsValidationError{
+					field:  "gateway_count",
+					reason: "value must be less than or equal to 255",
+				}
+			}
+
 		default:
 			return MACCommand_LinkCheckAnsValidationError{
 				field:  name,
@@ -2669,15 +2809,50 @@ func (m *MACCommand_LinkADRReq) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "data_rate_index":
-			// no validation rules for DataRateIndex
+
+			if _, ok := DataRateIndex_name[int32(m.GetDataRateIndex())]; !ok {
+				return MACCommand_LinkADRReqValidationError{
+					field:  "data_rate_index",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "tx_power_index":
-			// no validation rules for TxPowerIndex
+
+			if m.GetTxPowerIndex() > 15 {
+				return MACCommand_LinkADRReqValidationError{
+					field:  "tx_power_index",
+					reason: "value must be less than or equal to 15",
+				}
+			}
+
 		case "channel_mask":
 
+			if len(m.GetChannelMask()) > 16 {
+				return MACCommand_LinkADRReqValidationError{
+					field:  "channel_mask",
+					reason: "value must contain no more than 16 item(s)",
+				}
+			}
+
 		case "channel_mask_control":
-			// no validation rules for ChannelMaskControl
+
+			if m.GetChannelMaskControl() > 7 {
+				return MACCommand_LinkADRReqValidationError{
+					field:  "channel_mask_control",
+					reason: "value must be less than or equal to 7",
+				}
+			}
+
 		case "nb_trans":
-			// no validation rules for NbTrans
+
+			if m.GetNbTrans() > 15 {
+				return MACCommand_LinkADRReqValidationError{
+					field:  "nb_trans",
+					reason: "value must be less than or equal to 15",
+				}
+			}
+
 		default:
 			return MACCommand_LinkADRReqValidationError{
 				field:  name,
@@ -2847,7 +3022,14 @@ func (m *MACCommand_DutyCycleReq) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "max_duty_cycle":
-			// no validation rules for MaxDutyCycle
+
+			if _, ok := AggregatedDutyCycle_name[int32(m.GetMaxDutyCycle())]; !ok {
+				return MACCommand_DutyCycleReqValidationError{
+					field:  "max_duty_cycle",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		default:
 			return MACCommand_DutyCycleReqValidationError{
 				field:  name,
@@ -2930,11 +3112,32 @@ func (m *MACCommand_RxParamSetupReq) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "rx2_data_rate_index":
-			// no validation rules for Rx2DataRateIndex
+
+			if _, ok := DataRateIndex_name[int32(m.GetRx2DataRateIndex())]; !ok {
+				return MACCommand_RxParamSetupReqValidationError{
+					field:  "rx2_data_rate_index",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "rx1_data_rate_offset":
-			// no validation rules for Rx1DataRateOffset
+
+			if m.GetRx1DataRateOffset() > 7 {
+				return MACCommand_RxParamSetupReqValidationError{
+					field:  "rx1_data_rate_offset",
+					reason: "value must be less than or equal to 7",
+				}
+			}
+
 		case "rx2_frequency":
-			// no validation rules for Rx2Frequency
+
+			if val := m.GetRx2Frequency(); val < 100000 || val > 1677721600 {
+				return MACCommand_RxParamSetupReqValidationError{
+					field:  "rx2_frequency",
+					reason: "value must be inside range [100000, 1677721600]",
+				}
+			}
+
 		default:
 			return MACCommand_RxParamSetupReqValidationError{
 				field:  name,
@@ -3106,9 +3309,23 @@ func (m *MACCommand_DevStatusAns) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "battery":
-			// no validation rules for Battery
+
+			if m.GetBattery() > 255 {
+				return MACCommand_DevStatusAnsValidationError{
+					field:  "battery",
+					reason: "value must be less than or equal to 255",
+				}
+			}
+
 		case "margin":
-			// no validation rules for Margin
+
+			if val := m.GetMargin(); val < -32 || val > 31 {
+				return MACCommand_DevStatusAnsValidationError{
+					field:  "margin",
+					reason: "value must be inside range [-32, 31]",
+				}
+			}
+
 		default:
 			return MACCommand_DevStatusAnsValidationError{
 				field:  name,
@@ -3191,13 +3408,41 @@ func (m *MACCommand_NewChannelReq) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "channel_index":
-			// no validation rules for ChannelIndex
+
+			if m.GetChannelIndex() > 255 {
+				return MACCommand_NewChannelReqValidationError{
+					field:  "channel_index",
+					reason: "value must be less than or equal to 255",
+				}
+			}
+
 		case "frequency":
-			// no validation rules for Frequency
+
+			if val := m.GetFrequency(); val < 100000 || val > 1677721600 {
+				return MACCommand_NewChannelReqValidationError{
+					field:  "frequency",
+					reason: "value must be inside range [100000, 1677721600]",
+				}
+			}
+
 		case "min_data_rate_index":
-			// no validation rules for MinDataRateIndex
+
+			if _, ok := DataRateIndex_name[int32(m.GetMinDataRateIndex())]; !ok {
+				return MACCommand_NewChannelReqValidationError{
+					field:  "min_data_rate_index",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "max_data_rate_index":
-			// no validation rules for MaxDataRateIndex
+
+			if _, ok := DataRateIndex_name[int32(m.GetMaxDataRateIndex())]; !ok {
+				return MACCommand_NewChannelReqValidationError{
+					field:  "max_data_rate_index",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		default:
 			return MACCommand_NewChannelReqValidationError{
 				field:  name,
@@ -3367,9 +3612,23 @@ func (m *MACCommand_DLChannelReq) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "channel_index":
-			// no validation rules for ChannelIndex
+
+			if m.GetChannelIndex() > 255 {
+				return MACCommand_DLChannelReqValidationError{
+					field:  "channel_index",
+					reason: "value must be less than or equal to 255",
+				}
+			}
+
 		case "frequency":
-			// no validation rules for Frequency
+
+			if val := m.GetFrequency(); val < 100000 || val > 1677721600 {
+				return MACCommand_DLChannelReqValidationError{
+					field:  "frequency",
+					reason: "value must be inside range [100000, 1677721600]",
+				}
+			}
+
 		default:
 			return MACCommand_DLChannelReqValidationError{
 				field:  name,
@@ -3537,7 +3796,14 @@ func (m *MACCommand_RxTimingSetupReq) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "delay":
-			// no validation rules for Delay
+
+			if _, ok := RxDelay_name[int32(m.GetDelay())]; !ok {
+				return MACCommand_RxTimingSetupReqValidationError{
+					field:  "delay",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		default:
 			return MACCommand_RxTimingSetupReqValidationError{
 				field:  name,
@@ -3621,7 +3887,14 @@ func (m *MACCommand_TxParamSetupReq) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "max_eirp_index":
-			// no validation rules for MaxEIRPIndex
+
+			if _, ok := DeviceEIRP_name[int32(m.GetMaxEIRPIndex())]; !ok {
+				return MACCommand_TxParamSetupReqValidationError{
+					field:  "max_eirp_index",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "uplink_dwell_time":
 			// no validation rules for UplinkDwellTime
 		case "downlink_dwell_time":
@@ -3709,7 +3982,14 @@ func (m *MACCommand_RekeyInd) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "minor_version":
-			// no validation rules for MinorVersion
+
+			if _, ok := Minor_name[int32(m.GetMinorVersion())]; !ok {
+				return MACCommand_RekeyIndValidationError{
+					field:  "minor_version",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		default:
 			return MACCommand_RekeyIndValidationError{
 				field:  name,
@@ -3792,7 +4072,14 @@ func (m *MACCommand_RekeyConf) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "minor_version":
-			// no validation rules for MinorVersion
+
+			if _, ok := Minor_name[int32(m.GetMinorVersion())]; !ok {
+				return MACCommand_RekeyConfValidationError{
+					field:  "minor_version",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		default:
 			return MACCommand_RekeyConfValidationError{
 				field:  name,
@@ -3875,9 +4162,23 @@ func (m *MACCommand_ADRParamSetupReq) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "adr_ack_limit_exponent":
-			// no validation rules for ADRAckLimitExponent
+
+			if _, ok := ADRAckLimitExponent_name[int32(m.GetADRAckLimitExponent())]; !ok {
+				return MACCommand_ADRParamSetupReqValidationError{
+					field:  "adr_ack_limit_exponent",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "adr_ack_delay_exponent":
-			// no validation rules for ADRAckDelayExponent
+
+			if _, ok := ADRAckDelayExponent_name[int32(m.GetADRAckDelayExponent())]; !ok {
+				return MACCommand_ADRParamSetupReqValidationError{
+					field:  "adr_ack_delay_exponent",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		default:
 			return MACCommand_ADRParamSetupReqValidationError{
 				field:  name,
@@ -4055,13 +4356,41 @@ func (m *MACCommand_ForceRejoinReq) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "rejoin_type":
-			// no validation rules for RejoinType
+
+			if _, ok := RejoinType_name[int32(m.GetRejoinType())]; !ok {
+				return MACCommand_ForceRejoinReqValidationError{
+					field:  "rejoin_type",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "data_rate_index":
-			// no validation rules for DataRateIndex
+
+			if _, ok := DataRateIndex_name[int32(m.GetDataRateIndex())]; !ok {
+				return MACCommand_ForceRejoinReqValidationError{
+					field:  "data_rate_index",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "max_retries":
-			// no validation rules for MaxRetries
+
+			if m.GetMaxRetries() > 7 {
+				return MACCommand_ForceRejoinReqValidationError{
+					field:  "max_retries",
+					reason: "value must be less than or equal to 7",
+				}
+			}
+
 		case "period_exponent":
-			// no validation rules for PeriodExponent
+
+			if _, ok := RejoinPeriodExponent_name[int32(m.GetPeriodExponent())]; !ok {
+				return MACCommand_ForceRejoinReqValidationError{
+					field:  "period_exponent",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		default:
 			return MACCommand_ForceRejoinReqValidationError{
 				field:  name,
@@ -4145,9 +4474,23 @@ func (m *MACCommand_RejoinParamSetupReq) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "max_count_exponent":
-			// no validation rules for MaxCountExponent
+
+			if _, ok := RejoinCountExponent_name[int32(m.GetMaxCountExponent())]; !ok {
+				return MACCommand_RejoinParamSetupReqValidationError{
+					field:  "max_count_exponent",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		case "max_time_exponent":
-			// no validation rules for MaxTimeExponent
+
+			if _, ok := RejoinTimeExponent_name[int32(m.GetMaxTimeExponent())]; !ok {
+				return MACCommand_RejoinParamSetupReqValidationError{
+					field:  "max_time_exponent",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		default:
 			return MACCommand_RejoinParamSetupReqValidationError{
 				field:  name,
@@ -4315,7 +4658,14 @@ func (m *MACCommand_PingSlotInfoReq) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "period":
-			// no validation rules for Period
+
+			if _, ok := PingSlotPeriod_name[int32(m.GetPeriod())]; !ok {
+				return MACCommand_PingSlotInfoReqValidationError{
+					field:  "period",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		default:
 			return MACCommand_PingSlotInfoReqValidationError{
 				field:  name,
@@ -4399,9 +4749,23 @@ func (m *MACCommand_PingSlotChannelReq) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "frequency":
-			// no validation rules for Frequency
+
+			if val := m.GetFrequency(); val < 100000 || val > 1677721600 {
+				return MACCommand_PingSlotChannelReqValidationError{
+					field:  "frequency",
+					reason: "value must be inside range [100000, 1677721600]",
+				}
+			}
+
 		case "data_rate_index":
-			// no validation rules for DataRateIndex
+
+			if _, ok := DataRateIndex_name[int32(m.GetDataRateIndex())]; !ok {
+				return MACCommand_PingSlotChannelReqValidationError{
+					field:  "data_rate_index",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		default:
 			return MACCommand_PingSlotChannelReqValidationError{
 				field:  name,
@@ -4571,9 +4935,23 @@ func (m *MACCommand_BeaconTimingAns) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "delay":
-			// no validation rules for Delay
+
+			if m.GetDelay() > 65535 {
+				return MACCommand_BeaconTimingAnsValidationError{
+					field:  "delay",
+					reason: "value must be less than or equal to 65535",
+				}
+			}
+
 		case "channel_index":
-			// no validation rules for ChannelIndex
+
+			if m.GetChannelIndex() > 255 {
+				return MACCommand_BeaconTimingAnsValidationError{
+					field:  "channel_index",
+					reason: "value must be less than or equal to 255",
+				}
+			}
+
 		default:
 			return MACCommand_BeaconTimingAnsValidationError{
 				field:  name,
@@ -4657,7 +5035,14 @@ func (m *MACCommand_BeaconFreqReq) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "frequency":
-			// no validation rules for Frequency
+
+			if val := m.GetFrequency(); val < 100000 || val > 1677721600 {
+				return MACCommand_BeaconFreqReqValidationError{
+					field:  "frequency",
+					reason: "value must be inside range [100000, 1677721600]",
+				}
+			}
+
 		default:
 			return MACCommand_BeaconFreqReqValidationError{
 				field:  name,
@@ -4825,7 +5210,14 @@ func (m *MACCommand_DeviceModeInd) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "class":
-			// no validation rules for Class
+
+			if _, ok := Class_name[int32(m.GetClass())]; !ok {
+				return MACCommand_DeviceModeIndValidationError{
+					field:  "class",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		default:
 			return MACCommand_DeviceModeIndValidationError{
 				field:  name,
@@ -4909,7 +5301,14 @@ func (m *MACCommand_DeviceModeConf) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "class":
-			// no validation rules for Class
+
+			if _, ok := Class_name[int32(m.GetClass())]; !ok {
+				return MACCommand_DeviceModeConfValidationError{
+					field:  "class",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
 		default:
 			return MACCommand_DeviceModeConfValidationError{
 				field:  name,
