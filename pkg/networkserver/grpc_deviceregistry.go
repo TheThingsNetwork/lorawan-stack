@@ -100,7 +100,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.ping_slot_date_rate_index") && req.EndDevice.GetMACSettings().GetPingSlotDataRateIndex() == nil {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.ping_slot_date_rate_index")
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.ping_slot_frequency") && req.EndDevice.GetMACSettings().GetPingSlotFrequency() == 0 {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.ping_slot_frequency") && req.EndDevice.GetMACSettings().GetPingSlotFrequency() == nil {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.ping_slot_frequency")
 		}
 
@@ -117,7 +117,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.rx2_data_rate_index") && req.EndDevice.GetMACSettings().GetRx2DataRateIndex() == nil {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.rx2_data_rate_index")
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.rx2_frequency") && req.EndDevice.GetMACSettings().GetRx2Frequency() == 0 {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.rx2_frequency") && req.EndDevice.GetMACSettings().GetRx2Frequency() == nil {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.rx2_frequency")
 		}
 		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.factory_preset_frequencies") && len(req.EndDevice.GetMACSettings().GetFactoryPresetFrequencies()) == 0 {
@@ -156,7 +156,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.desired_rx2_data_rate_index") && req.EndDevice.GetMACSettings().GetDesiredRx2DataRateIndex() == nil {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.desired_rx2_data_rate_index")
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.desired_rx2_frequency") && req.EndDevice.GetMACSettings().GetDesiredRx2Frequency() == 0 {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.desired_rx2_frequency") && req.EndDevice.GetMACSettings().GetDesiredRx2Frequency() == nil {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.desired_rx2_frequency")
 		}
 

@@ -144,18 +144,18 @@ func resetMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttn
 	}
 
 	dev.MACState.CurrentParameters.Rx2Frequency = band.DefaultRx2Parameters.Frequency
-	if dev.GetMACSettings().GetRx2Frequency() != 0 {
-		dev.MACState.CurrentParameters.Rx2Frequency = dev.MACSettings.Rx2Frequency
-	} else if defaults.Rx2Frequency != 0 {
-		dev.MACState.CurrentParameters.Rx2Frequency = defaults.Rx2Frequency
+	if dev.GetMACSettings().GetRx2Frequency() != nil && dev.MACSettings.Rx2Frequency.Value != 0 {
+		dev.MACState.CurrentParameters.Rx2Frequency = dev.MACSettings.Rx2Frequency.Value
+	} else if defaults.Rx2Frequency != nil && dev.MACSettings.Rx2Frequency.Value != 0 {
+		dev.MACState.CurrentParameters.Rx2Frequency = defaults.Rx2Frequency.Value
 	}
 	dev.MACState.DesiredParameters.Rx2Frequency = dev.MACState.CurrentParameters.Rx2Frequency
-	if dev.MACSettings != nil && dev.GetMACSettings().GetDesiredRx2Frequency() != 0 {
-		dev.MACState.DesiredParameters.Rx2Frequency = dev.MACSettings.DesiredRx2Frequency
+	if dev.GetMACSettings().GetDesiredRx2Frequency() != nil && dev.MACSettings.Rx2Frequency.Value != 0 {
+		dev.MACState.DesiredParameters.Rx2Frequency = dev.MACSettings.DesiredRx2Frequency.Value
 	} else if fp.Rx2Channel != nil {
 		dev.MACState.DesiredParameters.Rx2Frequency = fp.Rx2Channel.Frequency
-	} else if defaults.DesiredRx2Frequency != 0 {
-		dev.MACState.DesiredParameters.Rx2Frequency = defaults.DesiredRx2Frequency
+	} else if defaults.DesiredRx2Frequency != nil && defaults.DesiredRx2Frequency.Value != 0 {
+		dev.MACState.DesiredParameters.Rx2Frequency = defaults.DesiredRx2Frequency.Value
 	}
 
 	dev.MACState.CurrentParameters.MaxDutyCycle = ttnpb.DUTY_CYCLE_1
@@ -171,10 +171,10 @@ func resetMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttn
 	dev.MACState.DesiredParameters.RejoinCountPeriodicity = dev.MACState.CurrentParameters.RejoinCountPeriodicity
 
 	dev.MACState.CurrentParameters.PingSlotFrequency = 0
-	if dev.GetMACSettings().GetPingSlotFrequency() != 0 {
-		dev.MACState.CurrentParameters.PingSlotFrequency = dev.MACSettings.PingSlotFrequency
-	} else if defaults.PingSlotFrequency != 0 {
-		dev.MACState.CurrentParameters.PingSlotFrequency = defaults.PingSlotFrequency
+	if dev.GetMACSettings().GetPingSlotFrequency() != nil && dev.MACSettings.PingSlotFrequency.Value != 0 {
+		dev.MACState.CurrentParameters.PingSlotFrequency = dev.MACSettings.PingSlotFrequency.Value
+	} else if defaults.PingSlotFrequency != nil && defaults.PingSlotFrequency.Value != 0 {
+		dev.MACState.CurrentParameters.PingSlotFrequency = defaults.PingSlotFrequency.Value
 	}
 	dev.MACState.DesiredParameters.PingSlotFrequency = dev.MACState.CurrentParameters.PingSlotFrequency
 	if fp.PingSlot != nil && fp.PingSlot.Frequency != 0 {
