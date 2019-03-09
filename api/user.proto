@@ -31,9 +31,9 @@ option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
 // User is the message that defines an user on the network.
 message User {
-  UserIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
-  google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  UserIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true, (validate.rules).message.required = true];
+  google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true, (validate.rules).message.required = true];
 
   string name = 4;
   string description = 5;
@@ -47,20 +47,20 @@ message User {
 
   // Only used on create; never returned on API calls.
   string password = 10;
-  google.protobuf.Timestamp password_updated_at = 11 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp password_updated_at = 11 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true, (validate.rules).message.required = true];
   bool require_password_update = 12;
 
   // The reviewing state of the user.
   // This field can only be modified by admins.
-  State state = 13;
+  State state = 13 [(validate.rules).enum.defined_only = true];
   // This user is an admin.
   // This field can only be modified by other admins.
   bool admin = 14;
 
   // The temporary password can only be used to update a user's password; never returned on API calls.
   string temporary_password = 15;
-  google.protobuf.Timestamp temporary_password_created_at = 16 [(gogoproto.nullable) = true, (gogoproto.stdtime) = true];
-  google.protobuf.Timestamp temporary_password_expires_at = 17 [(gogoproto.nullable) = true, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp temporary_password_created_at = 16 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp temporary_password_expires_at = 17 [(gogoproto.stdtime) = true];
 
   Picture profile_picture = 18;
 }
@@ -87,48 +87,48 @@ message Users {
 }
 
 message GetUserRequest {
-  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
 }
 
 message CreateUserRequest {
-  User user = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  User user = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   string invitation_token = 2;
 }
 
 message UpdateUserRequest {
-  User user = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+  User user = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
 }
 
 message CreateTemporaryPasswordRequest {
-  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
 }
 
 message UpdateUserPasswordRequest {
-  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   string new = 2;
   string old = 3;
 }
 
 message CreateUserAPIKeyRequest {
-  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   string name = 2;
   repeated Right rights = 3;
 }
 
 message UpdateUserAPIKeyRequest {
-  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  APIKey api_key = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  APIKey api_key = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
 }
 
 message Invitation {
   string email = 1;
   string token = 2;
 
-  google.protobuf.Timestamp expires_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
-  google.protobuf.Timestamp created_at = 4 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
-  google.protobuf.Timestamp updated_at = 5 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp expires_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true, (validate.rules).message.required = true];
+  google.protobuf.Timestamp created_at = 4 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true, (validate.rules).message.required = true];
+  google.protobuf.Timestamp updated_at = 5 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true, (validate.rules).message.required = true];
 
   google.protobuf.Timestamp accepted_at = 6 [(gogoproto.stdtime) = true];
   UserIdentifiers accepted_by = 7;
@@ -147,15 +147,15 @@ message DeleteInvitationRequest {
 }
 
 message UserSessionIdentifiers {
-  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   string session_id = 2 [(gogoproto.customname) = "SessionID"];
 }
 
 message UserSession {
-  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   string session_id = 2 [(gogoproto.customname) = "SessionID"];
-  google.protobuf.Timestamp created_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
-  google.protobuf.Timestamp updated_at = 4 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp created_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true, (validate.rules).message.required = true];
+  google.protobuf.Timestamp updated_at = 4 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true, (validate.rules).message.required = true];
   google.protobuf.Timestamp expires_at = 5 [(gogoproto.stdtime) = true];
 }
 
@@ -164,7 +164,7 @@ message UserSessions {
 }
 
 message ListUserSessionsRequest {
-  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   // Order the results by this field path (must be present in the field mask).
   // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
   string order = 2;

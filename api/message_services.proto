@@ -15,6 +15,7 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/lyft/protoc-gen-validate/validate/validate.proto";
 import "lorawan-stack/api/end_device.proto";
 import "lorawan-stack/api/identifiers.proto";
 import "lorawan-stack/api/messages.proto";
@@ -24,16 +25,16 @@ package ttn.lorawan.v3;
 option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
 message ProcessUplinkMessageRequest {
-  EndDeviceIdentifiers ids = 1 [(gogoproto.nullable) = false, (gogoproto.embed) = true];
-  EndDeviceVersionIdentifiers end_device_version_ids = 2 [(gogoproto.nullable) = false, (gogoproto.customname) = "EndDeviceVersionIDs"];
-  ApplicationUplink message = 3 [(gogoproto.nullable) = false];
+  EndDeviceIdentifiers ids = 1 [(gogoproto.nullable) = false, (gogoproto.embed) = true, (validate.rules).message.required = true];
+  EndDeviceVersionIdentifiers end_device_version_ids = 2 [(gogoproto.nullable) = false, (gogoproto.customname) = "EndDeviceVersionIDs", (validate.rules).message.required = true];
+  ApplicationUplink message = 3 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   string parameter = 4;
 }
 
 message ProcessDownlinkMessageRequest {
-  EndDeviceIdentifiers ids = 1 [(gogoproto.nullable) = false, (gogoproto.embed) = true];
-  EndDeviceVersionIdentifiers end_device_version_ids = 2 [(gogoproto.nullable) = false, (gogoproto.customname) = "EndDeviceVersionIDs"];
-  ApplicationDownlink message = 3 [(gogoproto.nullable) = false];
+  EndDeviceIdentifiers ids = 1 [(gogoproto.nullable) = false, (gogoproto.embed) = true, (validate.rules).message.required = true];
+  EndDeviceVersionIdentifiers end_device_version_ids = 2 [(gogoproto.nullable) = false, (gogoproto.customname) = "EndDeviceVersionIDs", (validate.rules).message.required = true];
+  ApplicationDownlink message = 3 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   string parameter = 4;
 }
 

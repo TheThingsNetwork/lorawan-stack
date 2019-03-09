@@ -15,6 +15,7 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/lyft/protoc-gen-validate/validate/validate.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 import "lorawan-stack/api/enums.proto";
@@ -27,7 +28,7 @@ option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 // Contains metadata for a received message. Each antenna that receives
 // a message corresponds to one RxMetadata.
 message RxMetadata {
-  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   uint32 antenna_index = 2;
   google.protobuf.Timestamp time = 3 [(gogoproto.stdtime) = true];
   // Gateway concentrator timestamp when the Rx finished (microseconds).
@@ -50,7 +51,7 @@ message RxMetadata {
   // Antenna location; injected by the Gateway Server.
   Location location = 13;
   // Gateway downlink path constraint; injected by the Gateway Server.
-  DownlinkPathConstraint downlink_path_constraint = 14;
+  DownlinkPathConstraint downlink_path_constraint = 14 [(validate.rules).enum.defined_only = true];
   // Uplink token to be included in the Tx request in class A downlink; injected by gateway, Gateway Server or fNS.
   bytes uplink_token = 15;
   // Advanced metadata fields
@@ -61,15 +62,15 @@ message RxMetadata {
 
 message Location {
   // The North–South position (degrees; -90 to +90), where 0 is the equator, North pole is positive, South pole is negative.
-  double latitude = 1;
+  double latitude = 1 [(validate.rules).double = {gte: -90, lte: 90}];
   // The East-West position (degrees; -180 to +180), where 0 is the Prime Meridian (Greenwich), East is positive , West is negative.
-  double longitude = 2;
+  double longitude = 2 [(validate.rules).double = {gte: -180, lte: 180}];
   // The altitude (meters), where 0 is the mean sea level.
   int32 altitude = 3;
   // The accuracy of the location (meters).
   int32 accuracy = 4;
   // Source of the location information.
-  LocationSource source = 5;
+  LocationSource source = 5 [(validate.rules).enum.defined_only = true];
 }
 
 enum LocationSource {

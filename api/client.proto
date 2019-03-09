@@ -58,7 +58,7 @@ message Client {
   repeated string redirect_uris = 9 [(gogoproto.customname) = "RedirectURIs"];
   // The reviewing state of the client.
   // This field can only be modified by admins.
-  State state = 10;
+  State state = 10 [(validate.rules).enum.defined_only = true];
   // If set, the authorization page will be skipped.
   // This field can only be modified by admins.
   bool skip_authorization = 11;

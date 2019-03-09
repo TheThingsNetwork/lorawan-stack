@@ -15,6 +15,7 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/lyft/protoc-gen-validate/validate/validate.proto";
 import "google/protobuf/duration.proto";
 import "lorawan-stack/api/gateway.proto";
 
@@ -34,8 +35,8 @@ message ConcentratorConfig {
     // Frequency (Hz).
     uint64 frequency = 1;
     uint32 radio = 2;
-    uint32 bandwidth = 3;
-    uint32 spreading_factor = 4;
+    uint32 bandwidth = 3 [(validate.rules).uint32 = {in: [125,250,500]}];
+    uint32 spreading_factor = 4 [(validate.rules).uint32 = {gte: 7, lte: 12}];
   }
   LoRaStandardChannel lora_standard_channel = 2 [(gogoproto.customname) = "LoRaStandardChannel"];
   message FSKChannel {

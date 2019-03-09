@@ -49,7 +49,7 @@ message Session {
   // Frame counter of the last confirmed downlink message sent. Network Server only.
   uint32 last_conf_f_cnt_down = 7;
   // Time when the session started. Network Server only.
-  google.protobuf.Timestamp started_at = 8 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp started_at = 8 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true, (validate.rules).message.required = true];
 }
 
 // MACParameters represent the parameters of the device's MAC layer (active or desired).
@@ -109,7 +109,7 @@ message MACParameters {
     bool enable_uplink = 5;
   }
   // Configured uplink channels and optionally Rx1 frequency.
-  repeated Channel channels = 19;
+  repeated Channel channels = 19 [(validate.rules).repeated.min_items = 1];
 }
 
 message EndDeviceBrand {
@@ -433,7 +433,7 @@ message EndDevice {
   // Latest-known battery percentage of the device.
   // Received via the DevStatus MAC command at last_dev_status_received_at or earlier.
   // Stored in Network Server.
-  float battery_percentage = 35 [(validate.rules).float = {gte: 0, lte:1}];
+  float battery_percentage = 35 [(validate.rules).float = {gte: -1, lte:1}];
   // Demodulation signal-to-noise ratio (dB).
   // Received via the DevStatus MAC command at last_dev_status_received_at.
   // Stored in Network Server.

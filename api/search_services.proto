@@ -15,6 +15,7 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/lyft/protoc-gen-validate/validate/validate.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/field_mask.proto";
 import "lorawan-stack/api/application.proto";
@@ -42,7 +43,7 @@ message SearchEntitiesRequest {
 
   reserved 5; // TODO: Add filter for approval state (admin only).
 
-  google.protobuf.FieldMask field_mask = 6 [(gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 6 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
 }
 
 // The EntityRegistrySearch service indexes entities in the various registries
@@ -81,7 +82,7 @@ service EntityRegistrySearch {
 }
 
 message SearchEndDevicesRequest {
-  ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
 
   // Find end devices where the ID contains this substring.
   string id_contains = 2 [(gogoproto.customname) = "IDContains"];
@@ -99,7 +100,7 @@ message SearchEndDevicesRequest {
   // Find end devices where the (hexadecimal) DevAddr contains this substring.
   string dev_addr_contains = 8 [(gogoproto.customname) = "DevAddrContains"];
 
-  google.protobuf.FieldMask field_mask = 9 [(gogoproto.nullable) = false];
+  google.protobuf.FieldMask field_mask = 9 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
 }
 
 // The EndDeviceRegistrySearch service indexes devices in the EndDeviceRegistry

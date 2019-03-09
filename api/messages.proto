@@ -156,7 +156,7 @@ message TxAcknowledgment {
 message ApplicationUplink {
   // Join Server issued identifier for the session keys used by this uplink.
   bytes session_key_id = 1 [(gogoproto.customname) = "SessionKeyID"];
-  uint32 f_port = 2 [(validate.rules).uint32.lt = 256];
+  uint32 f_port = 2 [(validate.rules).uint32.lte = 255];
   uint32 f_cnt = 3;
   bytes frm_payload = 4 [(gogoproto.customname) = "FRMPayload"];
   google.protobuf.Struct decoded_payload = 5;
@@ -187,7 +187,7 @@ message ApplicationDownlink {
 
   // Join Server issued identifier for the session keys used by this downlink.
   bytes session_key_id = 1 [(gogoproto.customname) = "SessionKeyID"];
-  uint32 f_port = 2 [(validate.rules).uint32.lt = 256];
+  uint32 f_port = 2 [(validate.rules).uint32.lte = 255];
   uint32 f_cnt = 3;
   bytes frm_payload = 4 [(gogoproto.customname) = "FRMPayload"];
   google.protobuf.Struct decoded_payload = 5;

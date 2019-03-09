@@ -113,7 +113,7 @@ message Gateway {
   // Enforcing gateway duty cycle is recommended for all gateways to respect spectrum regulations. Disable enforcing the
   // duty cycle only in controlled research and development environments.
   bool enforce_duty_cycle = 17;
-  DownlinkPathConstraint downlink_path_constraint = 18;
+  DownlinkPathConstraint downlink_path_constraint = 18 [(validate.rules).enum.defined_only = true];
 }
 
 message Gateways {
@@ -177,7 +177,7 @@ message GatewayAntenna {
   // gain is the antenna gain relative to this gateway, in dBi.
   float gain = 1;
   // location is the antenna's location.
-  Location location = 2 [(gogoproto.nullable) = false];
+  Location location = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   map<string,string> attributes = 3;
 }
 
