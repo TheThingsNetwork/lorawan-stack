@@ -26,7 +26,17 @@ func NewPopulatedDataRateIndex(r randyEndDevice, _ bool) DataRateIndex {
 	return DataRateIndex(r.Intn(16))
 }
 
-func NewPopulatedFHDR(r randyLorawan, easy bool) *FHDR {
+func NewPopulatedMACCommand_DevStatusAns(r randyLorawan, _ bool) *MACCommand_DevStatusAns {
+	out := &MACCommand_DevStatusAns{}
+	out.Battery = r.Uint32() % 256
+	out.Margin = r.Int31() % 32
+	if r.Intn(2) == 0 {
+		out.Margin *= -1
+	}
+	return out
+}
+
+func NewPopulatedFHDR(r randyLorawan, _ bool) *FHDR {
 	out := &FHDR{}
 	out.DevAddr = *types.NewPopulatedDevAddr(r)
 	out.FCtrl = *NewPopulatedFCtrl(r, false)

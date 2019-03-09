@@ -438,6 +438,8 @@ message MACCommand {
     bool rx2_frequency_ack = 3;
   }
   message DevStatusAns {
+    option (gogoproto.populate) = false;
+
     // Device battery status.
     // 0 indicates that the device is connected to an external power source.
     // 1..254 indicates a battery level.

@@ -146,8 +146,9 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 	return out
 }
 
+// NewPopulatedFrequency returns a uint64 in range [100000, 1677721600].
 func NewPopulatedFrequency(r randyEndDevice, _ bool) uint64 {
-	return uint64(r.Int63()) + uint64(r.Int63())
+	return 100000 + uint64(r.Int63()%(1677721600-100000))
 }
 
 func NewPopulatedMACParameters_Channel(r randyEndDevice, _ bool) *MACParameters_Channel {
@@ -170,10 +171,10 @@ func NewPopulatedMACParameters(r randyEndDevice, easy bool) *MACParameters {
 	out.UplinkDwellTime = r.Intn(2) == 0
 	out.DownlinkDwellTime = r.Intn(2) == 0
 	out.ADRDataRateIndex = NewPopulatedDataRateIndex(r, false)
-	out.ADRTxPowerIndex = r.Uint32()
-	out.ADRNbTrans = r.Uint32()
-	out.ADRAckLimit = r.Uint32()
-	out.ADRAckDelay = r.Uint32()
+	out.ADRTxPowerIndex = r.Uint32() % 16
+	out.ADRNbTrans = 1 + r.Uint32()%15
+	out.ADRAckLimit = 1 + r.Uint32()%32768
+	out.ADRAckDelay = 1 + r.Uint32()%32768
 	out.MaxDutyCycle = AggregatedDutyCycle([]int32{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}[r.Intn(16)])
 	out.Channels = make([]*MACParameters_Channel, r.Intn(255))
 	for i := range out.Channels {
