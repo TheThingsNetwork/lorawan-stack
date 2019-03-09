@@ -116,6 +116,150 @@ func equalEUI(x, y *types.EUI64) bool {
 	return x.Equal(*y)
 }
 
+func (r *DeviceRegistry) set(tx *redis.Tx, uid string, gets []string, f func(pb *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+	uk := r.uidKey(uid)
+
+	cmd := ttnredis.GetProto(tx, uk)
+	stored := &ttnpb.EndDevice{}
+	if err := cmd.ScanProto(stored); errors.IsNotFound(err) {
+		stored = nil
+	} else if err != nil {
+		return nil, err
+	}
+
+	var pb *ttnpb.EndDevice
+	var err error
+	if stored != nil {
+		pb = &ttnpb.EndDevice{}
+		if err := cmd.ScanProto(pb); err != nil {
+			return nil, err
+		}
+		pb, err = applyDeviceFieldMask(nil, pb, gets...)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	var sets []string
+	pb, sets, err = f(pb)
+	if err != nil {
+		return nil, err
+	}
+	if stored == nil && pb == nil {
+		return nil, nil
+	}
+
+	var pipelined func(redis.Pipeliner) error
+	if pb == nil {
+		pipelined = func(p redis.Pipeliner) error {
+			p.Del(uk)
+			if stored.JoinEUI != nil && stored.DevEUI != nil {
+				p.Del(r.euiKey(*stored.JoinEUI, *stored.DevEUI))
+			}
+			pid, err := provisionerUniqueID(stored)
+			if err != nil {
+				return err
+			}
+			if pid != "" {
+				p.Del(r.provisionerKey(stored.ProvisionerID, pid))
+			}
+			return nil
+		}
+	} else {
+		if pb.JoinEUI == nil || pb.DevEUI == nil {
+			return nil, errInvalidIdentifiers
+		}
+
+		pb.UpdatedAt = time.Now().UTC()
+		sets = append(sets, "updated_at")
+
+		updated := &ttnpb.EndDevice{}
+		var updatedPID string
+		if stored == nil {
+			pb.CreatedAt = pb.UpdatedAt
+			sets = append(sets, "created_at")
+
+			updated, err = applyDeviceFieldMask(updated, pb, sets...)
+			if err != nil {
+				return nil, err
+			}
+			updatedPID, err = provisionerUniqueID(updated)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			if err := cmd.ScanProto(updated); err != nil {
+				return nil, err
+			}
+			updated, err = applyDeviceFieldMask(updated, pb, sets...)
+			if err != nil {
+				return nil, err
+			}
+			storedPID, err := provisionerUniqueID(stored)
+			if err != nil {
+				return nil, err
+			}
+			updatedPID, err = provisionerUniqueID(updated)
+			if err != nil {
+				return nil, err
+			}
+			if !equalEUI(stored.JoinEUI, updated.JoinEUI) || !equalEUI(stored.DevEUI, updated.DevEUI) ||
+				stored.ApplicationIdentifiers != updated.ApplicationIdentifiers || stored.DeviceID != updated.DeviceID ||
+				storedPID != updatedPID {
+				return nil, errInvalidIdentifiers
+			}
+		}
+		pb, err = applyDeviceFieldMask(nil, updated, gets...)
+		if err != nil {
+			return nil, err
+		}
+
+		pipelined = func(p redis.Pipeliner) error {
+			if stored == nil {
+				ek := r.euiKey(*pb.JoinEUI, *pb.DevEUI)
+				if err := tx.Watch(ek).Err(); err != nil {
+					return err
+				}
+				i, err := tx.Exists(ek).Result()
+				if err != nil {
+					return ttnredis.ConvertError(err)
+				}
+				if i != 0 {
+					return errDuplicateIdentifiers
+				}
+				p.SetNX(ek, uid, 0)
+			}
+
+			if updatedPID != "" {
+				pk := r.provisionerKey(updated.ProvisionerID, updatedPID)
+				if err := tx.Watch(pk).Err(); err != nil {
+					return err
+				}
+				i, err := tx.Exists(pk).Result()
+				if err != nil {
+					return ttnredis.ConvertError(err)
+				}
+				if i != 0 {
+					return errAlreadyProvisioned
+				}
+				p.SetNX(pk, uid, 0)
+			}
+
+			_, err := ttnredis.SetProto(p, uk, updated, 0)
+			if err != nil {
+				return err
+			}
+
+			return nil
+		}
+	}
+	_, err = tx.Pipelined(pipelined)
+	if err != nil {
+		return nil, err
+	}
+	return pb, nil
+}
+
 // SetByEUI sets device by joinEUI, devEUI.
 func (r *DeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64, gets []string, f func(pb *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 	if joinEUI.IsZero() || devEUI.IsZero() {
@@ -129,16 +273,10 @@ func (r *DeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devE
 		if err != nil {
 			return ttnredis.ConvertError(err)
 		}
-
-		ctx, err := unique.WithContext(ctx, uid)
-		if err != nil {
-			return err
+		if err := tx.Watch(r.uidKey(uid)).Err(); err != nil {
+			return ttnredis.ConvertError(err)
 		}
-		ids, err := unique.ToDeviceID(uid)
-		if err != nil {
-			return err
-		}
-		pb, err = r.SetByID(ctx, ids.ApplicationIdentifiers, ids.DeviceID, gets, f)
+		pb, err = r.set(tx, uid, gets, f)
 		return err
 	}, ek)
 	if err != nil {
@@ -157,149 +295,22 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 		return nil, err
 	}
 	uid := unique.ID(ctx, ids)
-	uk := r.uidKey(uid)
 
 	var pb *ttnpb.EndDevice
 	err := r.Redis.Watch(func(tx *redis.Tx) error {
-		cmd := ttnredis.GetProto(tx, uk)
-		stored := &ttnpb.EndDevice{}
-		if err := cmd.ScanProto(stored); errors.IsNotFound(err) {
-			stored = nil
-		} else if err != nil {
-			return err
-		}
-
 		var err error
-		if stored != nil {
-			pb = &ttnpb.EndDevice{}
-			if err := cmd.ScanProto(pb); err != nil {
-				return err
-			}
-			pb, err = applyDeviceFieldMask(nil, pb, gets...)
+		pb, err = r.set(tx, uid, gets, func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+			updated, sets, err := f(stored)
 			if err != nil {
-				return err
+				return nil, nil, err
 			}
-		}
-
-		var sets []string
-		pb, sets, err = f(pb)
-		if err != nil {
-			return err
-		}
-		if stored == nil && pb == nil {
-			return nil
-		}
-
-		var f func(redis.Pipeliner) error
-		if pb == nil {
-			f = func(p redis.Pipeliner) error {
-				p.Del(uk)
-				if stored.JoinEUI != nil && stored.DevEUI != nil {
-					p.Del(r.euiKey(*stored.JoinEUI, *stored.DevEUI))
-				}
-				pid, err := provisionerUniqueID(stored)
-				if err != nil {
-					return err
-				}
-				if pid != "" {
-					p.Del(r.provisionerKey(stored.ProvisionerID, pid))
-				}
-				return nil
+			if updated != nil && (updated.ApplicationIdentifiers != appID || updated.DeviceID != devID) {
+				return nil, nil, errInvalidIdentifiers
 			}
-		} else {
-			if pb.ApplicationIdentifiers != appID || pb.DeviceID != devID || pb.JoinEUI == nil || pb.DevEUI == nil {
-				return errInvalidIdentifiers
-			}
-
-			pb.UpdatedAt = time.Now().UTC()
-			sets = append(sets, "updated_at")
-
-			updated := &ttnpb.EndDevice{}
-			var updatedPID string
-			if stored == nil {
-				pb.CreatedAt = pb.UpdatedAt
-				sets = append(sets, "created_at")
-
-				updated, err = applyDeviceFieldMask(updated, pb, sets...)
-				if err != nil {
-					return err
-				}
-				updatedPID, err = provisionerUniqueID(updated)
-				if err != nil {
-					return err
-				}
-			} else {
-				if err := cmd.ScanProto(updated); err != nil {
-					return err
-				}
-				updated, err = applyDeviceFieldMask(updated, pb, sets...)
-				if err != nil {
-					return err
-				}
-				storedPID, err := provisionerUniqueID(stored)
-				if err != nil {
-					return err
-				}
-				updatedPID, err = provisionerUniqueID(updated)
-				if err != nil {
-					return err
-				}
-				if !equalEUI(stored.JoinEUI, updated.JoinEUI) || !equalEUI(stored.DevEUI, updated.DevEUI) ||
-					stored.ApplicationIdentifiers != updated.ApplicationIdentifiers || stored.DeviceID != updated.DeviceID ||
-					storedPID != updatedPID {
-					return errInvalidIdentifiers
-				}
-			}
-			pb, err = applyDeviceFieldMask(nil, updated, gets...)
-			if err != nil {
-				return err
-			}
-
-			f = func(p redis.Pipeliner) error {
-				if stored == nil {
-					ek := r.euiKey(*pb.JoinEUI, *pb.DevEUI)
-					if err := tx.Watch(ek).Err(); err != nil {
-						return err
-					}
-					i, err := tx.Exists(ek).Result()
-					if err != nil {
-						return ttnredis.ConvertError(err)
-					}
-					if i != 0 {
-						return errDuplicateIdentifiers
-					}
-					p.SetNX(ek, uid, 0)
-				}
-
-				if updatedPID != "" {
-					pk := r.provisionerKey(updated.ProvisionerID, updatedPID)
-					if err := tx.Watch(pk).Err(); err != nil {
-						return err
-					}
-					i, err := tx.Exists(pk).Result()
-					if err != nil {
-						return ttnredis.ConvertError(err)
-					}
-					if i != 0 {
-						return errAlreadyProvisioned
-					}
-					p.SetNX(pk, uid, 0)
-				}
-
-				_, err := ttnredis.SetProto(p, uk, updated, 0)
-				if err != nil {
-					return err
-				}
-
-				return nil
-			}
-		}
-		_, err = tx.Pipelined(f)
-		if err != nil {
-			return err
-		}
-		return nil
-	}, uk)
+			return updated, sets, nil
+		})
+		return err
+	}, r.uidKey(uid))
 	if err != nil {
 		return nil, err
 	}
