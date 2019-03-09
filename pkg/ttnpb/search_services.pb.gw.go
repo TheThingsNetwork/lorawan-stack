@@ -9,10 +9,9 @@ It translates gRPC into RESTful JSON APIs.
 package ttnpb
 
 import (
+	"context"
 	"io"
 	"net/http"
-
-	"context"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
