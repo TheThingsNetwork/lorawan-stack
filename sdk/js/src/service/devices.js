@@ -160,10 +160,11 @@ class Devices {
     }, [])
 
     const requestTree = this._splitEntitySetPaths(paths, mergeBase)
+    const devicePayload = Marshaler.payload(device, 'end_device')
 
     let isResult = {}
     if (create) {
-      isResult = await this._api.EndDeviceRegistry.Create(params, device)
+      isResult = await this._api.EndDeviceRegistry.Create(params, devicePayload)
     }
 
     params.routeParams['end_device.ids.device_id'] = 'data' in isResult ? isResult.data.ids.device_id : deviceId
@@ -174,26 +175,26 @@ class Devices {
       isResult = await this._api.EndDeviceRegistry.Update({
         ...params,
         ...Marshaler.pathsToFieldMask(requestTree.is),
-      }, device)
+      }, devicePayload)
     }
 
     if ('ns' in requestTree) {
       requests[0] = this._api.NsEndDeviceRegistry.Set({
         ...params,
         ...Marshaler.pathsToFieldMask(requestTree.ns),
-      }, device)
+      }, devicePayload)
     }
     if ('as' in requestTree) {
       requests[1] = this._api.AsEndDeviceRegistry.Set({
         ...params,
         ...Marshaler.pathsToFieldMask(requestTree.as),
-      }, device)
+      }, devicePayload)
     }
     if ('js' in requestTree) {
       requests[2] = this._api.JsEndDeviceRegistry.Set({
         ...params,
         ...Marshaler.pathsToFieldMask(requestTree.js),
-      }, device)
+      }, devicePayload)
     }
 
     try {

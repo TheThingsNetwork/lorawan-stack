@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import axios from 'axios'
-import Marshaler from '../util/marshaler'
 
 /**
  * Http Class is a connector for the API that uses the HTTP bridge to connect.
@@ -101,18 +100,15 @@ class Http {
     return this.handleRequest('get', endpoint, undefined, config)
   }
 
-  async post (endpoint, rawPayload) {
-    const payload = Marshaler.payload(rawPayload, 'end_device')
+  async post (endpoint, payload) {
     return this.handleRequest('post', endpoint, payload)
   }
 
-  async patch (endpoint, rawPayload) {
-    const payload = Marshaler.payload(rawPayload, 'end_device')
+  async patch (endpoint, payload) {
     return this.handleRequest('patch', endpoint, payload)
   }
 
-  async put (endpoint, rawPayload, { fieldMask }) {
-    const payload = Marshaler.payload(rawPayload, 'end_device')
+  async put (endpoint, payload, { fieldMask }) {
     if (fieldMask) {
       payload.field_mask = fieldMask
     }
