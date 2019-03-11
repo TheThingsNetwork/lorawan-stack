@@ -30,7 +30,7 @@ const hardcoded = {
   gateway: 'router',
   organization: 'people',
   payload_formats: 'code',
-  access: 'lock',
+  api_keys: 'lock',
   general_settings: 'settings',
 }
 

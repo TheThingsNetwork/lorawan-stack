@@ -24,7 +24,7 @@ import sharedMessages from '../../../lib/shared-messages'
 const API_KEYS_TABLE_SIZE = 10
 
 @bind
-export default class ApplicationAccess extends React.Component {
+export default class ApplicationApiKeys extends React.Component {
 
   constructor (props) {
     super(props)
@@ -42,7 +42,7 @@ export default class ApplicationAccess extends React.Component {
     return (
       <Container>
         <Row>
-          <IntlHelmet title={sharedMessages.access} />
+          <IntlHelmet title={sharedMessages.apiKeys} />
           <Col sm={12}>
             <ApiKeysTable
               pageSize={API_KEYS_TABLE_SIZE}

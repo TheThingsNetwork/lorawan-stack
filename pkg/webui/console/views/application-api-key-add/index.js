@@ -18,7 +18,6 @@ import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
 import * as Yup from 'yup'
 import { replace } from 'connected-react-router'
-import { defineMessages } from 'react-intl'
 
 import Spinner from '../../../components/spinner'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
@@ -35,11 +34,7 @@ import ApiKeyModal from '../../containers/api-key-modal'
 import { getApplicationsRightsList } from '../../store/actions/applications'
 import api from '../../api'
 
-import style from './application-access-add.styl'
-
-const m = defineMessages({
-  accessAdd: 'Add Access Key',
-})
+import style from './application-api-key-add.styl'
 
 const validationSchema = Yup.object().shape({
   name: Yup.string()
@@ -62,18 +57,18 @@ const validationSchema = Yup.object().shape({
     rights: rights.applications.rights,
   }
 })
-@withBreadcrumb('apps.single.access.add', function (props) {
+@withBreadcrumb('apps.single.api-keys.add', function (props) {
   const appId = props.appId
   return (
     <Breadcrumb
-      path={`/console/applications/${appId}/access/add`}
+      path={`/console/applications/${appId}/api-keys/add`}
       icon="add"
       content={sharedMessages.add}
     />
   )
 })
 @bind
-export default class ApplicationAccessAdd extends React.Component {
+export default class ApplicationApiKeyAdd extends React.Component {
 
   state = {
     error: '',
@@ -91,7 +86,7 @@ export default class ApplicationAccessAdd extends React.Component {
     const { createdId } = this.state
 
     await this.setState({ modal: null })
-    dispatch(replace(`/console/applications/${appId}/access/${createdId}`))
+    dispatch(replace(`/console/applications/${appId}/api-keys/${createdId}`))
   }
 
   async handleSubmit (values, { resetForm }) {
@@ -172,8 +167,8 @@ export default class ApplicationAccessAdd extends React.Component {
         />
         <Row>
           <Col lg={8} md={12}>
-            <IntlHelmet title={m.accessAdd} />
-            <Message component="h2" content={m.accessAdd} />
+            <IntlHelmet title={sharedMessages.addApiKey} />
+            <Message component="h2" content={sharedMessages.add} />
           </Col>
         </Row>
         <Row>
@@ -202,7 +197,7 @@ export default class ApplicationAccessAdd extends React.Component {
                 {rightsItems}
               </FieldGroup>
               <div className={style.submitBar}>
-                <Button type="submit" message={sharedMessages.createAccessKey} />
+                <Button type="submit" message={sharedMessages.createApiKey} />
               </div>
             </Form>
           </Col>

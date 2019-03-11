@@ -25,7 +25,6 @@ import style from './api-keys-table.styl'
 const m = defineMessages({
   keyId: 'Key ID',
   grantedRights: 'Granted Rights',
-  add: 'Add Access Key',
 })
 
 const formatRight = function (right) {
@@ -77,7 +76,7 @@ export default class ApiKeysTable extends Component {
       <FetchTable
         entity="keys"
         headers={headers}
-        addMessage={m.add}
+        addMessage={sharedMessages.addApiKey}
         {...this.props}
       />
     )
