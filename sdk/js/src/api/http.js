@@ -76,18 +76,18 @@ class Http {
     }
   }
 
-  async get (endpoint, ...rest) {
-    const { fieldMask, queryParams } = rest[rest.length - 1]
+  async get (endpoint, { fieldMask, queryParams }) {
+    const config = {}
+
     let fieldMaskPath
     if (fieldMask) {
       if (typeof fieldMask === 'string') {
-        fieldMaskPath = fieldMask.paths.join(',')
-      } else if ('paths' in fieldMask && typeof fieldMask.paths === 'string') {
         fieldMaskPath = fieldMask.join(',')
+      } else if ('paths' in fieldMask) {
+        fieldMaskPath = fieldMask.paths.join(',')
       }
     }
 
-    const config = {}
     if (fieldMaskPath) {
       config.params = { field_mask: fieldMaskPath }
     }
@@ -97,6 +97,7 @@ class Http {
         ...queryParams,
       }
     }
+
     return this.handleRequest('get', endpoint, undefined, config)
   }
 

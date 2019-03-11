@@ -59,6 +59,14 @@ Signature tried: ${paramSignature}`)
             route = route.replace(`{${parameter}}`, routeParams[parameter])
           }
 
+          if (endpoint.method === 'delete') {
+            return connector.delete(route)
+          }
+
+          if (endpoint.method === 'get') {
+            return connector.get(route, { queryParams, fieldMask })
+          }
+
           return connector[endpoint.method](route, payload, { queryParams, fieldMask })
         }
       }
