@@ -65,7 +65,7 @@ jest.mock('./api', function () {
         }),
       },
       EndDeviceRegistry: {
-        Get: jest.fn().mockResolvedValue(mockDeviceData),
+        Get: jest.fn().mockResolvedValue({ data: mockDeviceData }),
       },
     }
   })
@@ -92,18 +92,10 @@ describe('SDK class', function () {
 
   test('retrieves device via app instance correctly', async function () {
     const app = await ttn.Applications.getById('test')
-    const device = await app.Devices.getById('test-device')
+    const device = await app.Devices.getById('test', 'test-device', 'ids')
 
     expect(app.Devices).toBeInstanceOf(Devices)
     expect(device).toBeDefined()
     expect(device).toBeInstanceOf(Device)
   })
-
-  test('retrieves device via shorthand correctly', async function () {
-    const device = await ttn.Applications.withId('test').getDevice('test-device')
-
-    expect(device).toBeDefined()
-    expect(device).toBeInstanceOf(Device)
-  })
-
 })

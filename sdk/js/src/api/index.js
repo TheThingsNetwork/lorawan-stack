@@ -40,7 +40,7 @@ class Api {
       for (const rpcName of Object.keys(service)) {
         const rpc = service[rpcName]
 
-        this[serviceName][rpcName] = function ({ routeParams = {}, queryParams = {}, fieldMask = []}, payload) {
+        this[serviceName][rpcName] = function ({ routeParams = {}, queryParams = {}, fieldMask = []} = {}, payload) {
 
           const paramSignature = Object.keys(routeParams).sort().join()
           const endpoint = rpc.http.find(function (prospect) {
