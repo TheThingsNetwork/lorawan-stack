@@ -117,12 +117,16 @@ class Devices {
     return result
   }
 
-  async _setDevice (applicationId, device, create = false) {
+  async _setDevice (applicationId, deviceId, device, create = false) {
     const ids = device.ids
-    const deviceId = 'device_id' in ids && ids.device_id
+    const devId = deviceId || 'device_id' in ids && ids.device_id
     const appId = applicationId || 'application_ids' in ids && ids.application_ids.application_id
 
-    if (!create && !deviceId) {
+    if (deviceId && ids && 'device_id' in deviceId && deviceId !== ids.device_id) {
+      throw new Error('Device ID mismatch.')
+    }
+
+    if (!create && !devId) {
       throw new Error('Missing device_id for update operation.')
     }
 
@@ -137,8 +141,15 @@ class Devices {
     } : {}
 
     const params = {
-      routeParams: { 'end_device.ids.application_ids.application_id': appId },
+      routeParams: {
+        'end_device.ids.application_ids.application_id': appId,
+      },
     }
+
+    if (!create) {
+      params.routeParams['end_device.ids.device_id'] = devId
+    }
+
 
     // Extract the paths from the patch
     const paths = traverse(device).reduce(function (acc, node) {
@@ -199,7 +210,9 @@ class Devices {
       return result
     } catch (err) {
       // Roll back changes
-      this._deleteDevice(appId, deviceId, Object.keys(requestTree))
+      if (create) {
+        this._deleteDevice(appId, deviceId, Object.keys(requestTree))
+      }
       throw new Error('Could not create device.')
     }
   }
@@ -288,8 +301,12 @@ class Devices {
     return deleteResults
   }
 
-  async getAll (applicationId, params) {
-    const response = await this._api.EndDeviceRegistry.List({ queryParams: params })
+  async getAll (applicationId, params, selector) {
+    const response = await this._api.EndDeviceRegistry.List({
+      routeParams: { 'application_ids.application_id': applicationId },
+      queryParams: params,
+      ...Marshaler.selectorToFieldMask(selector),
+    })
 
     return this._responseTransform(response)
   }
@@ -301,7 +318,11 @@ class Devices {
   }
 
   async updateById (applicationId, deviceId, patch) {
-    const response = await this._setDevice(applicationId, patch, true)
+    const response = await this._setDevice(applicationId, deviceId, patch)
+
+    if ('root_keys' in patch) {
+      patch.supports_join = true
+    }
 
     return this._responseTransform(response)
   }
@@ -379,7 +400,7 @@ class Devices {
 
     }
 
-    const response = await this._setDevice(applicationId, dev, true)
+    const response = await this._setDevice(applicationId, undefined, dev, true)
 
     return this._responseTransform(response)
   }
