@@ -311,7 +311,7 @@ class Devices {
     return this._responseTransform(response, false)
   }
 
-  async getById (applicationId, deviceId, selector) {
+  async getById (applicationId, deviceId, selector = [[ 'ids' ]]) {
     const response = await this._getDevice(applicationId, deviceId, Marshaler.selectorToPaths(selector))
 
     return this._responseTransform(response)
