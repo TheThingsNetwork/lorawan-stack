@@ -32,9 +32,16 @@ class Devices {
     }
     this._api = api
     this._stackConfig = stackConfig
-    this._entityTransform = proxy
-      ? app => new Device(this, app, false)
-      : undefined
+  }
+
+  _responseTransform (response) {
+    const isList = response instanceof Array
+    return Marshaler[isList ? 'unwrapDevices' : 'unwrapDevice'](
+      response,
+      this._proxy
+        ? app => new Device(this, app, false)
+        : undefined
+    )
   }
 
   _splitEntitySetPaths (paths, base) {
@@ -241,7 +248,6 @@ class Devices {
       })
     }
 
-    // TODO: Error handling
     const getResults = (await Promise.all(requests))
       .map(e => e ? Marshaler.payloadSingleResponse(e) : undefined)
 
@@ -282,16 +288,22 @@ class Devices {
     return deleteResults
   }
 
-  async getById (applicationId, deviceId, selector) {
-    const result = await this._getDevice(applicationId, deviceId, Marshaler.selectorToPaths(selector))
+  async getAll (applicationId, params) {
+    const response = await this._api.EndDeviceRegistry.List({ queryParams: params })
 
-    return result
+    return this._responseTransform(response)
+  }
+
+  async getById (applicationId, deviceId, selector) {
+    const response = await this._getDevice(applicationId, deviceId, Marshaler.selectorToPaths(selector))
+
+    return this._responseTransform(response)
   }
 
   async updateById (applicationId, deviceId, patch) {
-    const result = await this._setDevice(applicationId, patch, true)
+    const response = await this._setDevice(applicationId, patch, true)
 
-    return result
+    return this._responseTransform(response)
   }
 
   async create (applicationId, device, { abp = false, setDefaults = true, withRootKeys = false } = {}) {
@@ -367,7 +379,13 @@ class Devices {
 
     }
 
-    const result = await this._setDevice(applicationId, dev, true)
+    const response = await this._setDevice(applicationId, dev, true)
+
+    return this._responseTransform(response)
+  }
+
+  async deleteById (applicationId, deviceId) {
+    const result = this._deleteDevice(applicationId, deviceId)
 
     return result
   }
