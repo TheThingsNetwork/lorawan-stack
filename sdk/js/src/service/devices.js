@@ -14,6 +14,7 @@
 
 /* eslint-disable no-invalid-this */
 
+import { URL } from 'url'
 import traverse from 'traverse'
 import Marshaler from '../util/marshaler'
 import Device from '../entity/device'
@@ -212,7 +213,7 @@ class Devices {
     } catch (err) {
       // Roll back changes
       if (create) {
-        this._deleteDevice(appId, deviceId, Object.keys(requestTree))
+        this._deleteDevice(appId, devId, Object.keys(requestTree))
       }
       throw new Error('Could not create device.')
     }
@@ -333,9 +334,9 @@ class Devices {
 
     if (setDefaults) {
       dev = {
-        application_server_address: this._stackConfig.as,
-        join_server_address: this._stackConfig.js,
-        network_server_address: this._stackConfig.ns,
+        application_server_address: new URL(this._stackConfig.as).host,
+        join_server_address: new URL(this._stackConfig.js).host,
+        network_server_address: new URL(this._stackConfig.ns).host,
         ...device,
       }
     }
@@ -400,7 +401,6 @@ class Devices {
       dev.supports_join = true
 
     }
-
     const response = await this._setDevice(applicationId, undefined, dev, true)
 
     return this._responseTransform(response)
