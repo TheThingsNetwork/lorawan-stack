@@ -46,9 +46,8 @@ class Applications {
     this.Devices = new Devices(api, { proxy })
   }
 
-  _responseTransform (response) {
-    const isList = response instanceof Array
-    return Marshaler[isList ? 'unwrapApplications' : 'unwrapApplication'](
+  _responseTransform (response, single = true) {
+    return Marshaler[single ? 'unwrapApplication' : 'unwrapApplications'](
       response,
       this._proxy
         ? app => new Application(this, app, false)
@@ -61,7 +60,7 @@ class Applications {
   async getAll (params) {
     const response = await this._api.ApplicationRegistry.List({ queryParams: params })
 
-    return this._responseTransform(response)
+    return this._responseTransform(response, false)
   }
 
   async getById (id) {
@@ -93,7 +92,7 @@ class Applications {
       queryParams: params,
     })
 
-    return this._responseTransform(response)
+    return this._responseTransform(response, false)
   }
 
   // Update

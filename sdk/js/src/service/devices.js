@@ -32,14 +32,14 @@ class Devices {
     }
     this._api = api
     this._stackConfig = stackConfig
+    this._proxy = proxy
   }
 
-  _responseTransform (response) {
-    const isList = response instanceof Array
-    return Marshaler[isList ? 'unwrapDevices' : 'unwrapDevice'](
+  _responseTransform (response, single = true) {
+    return Marshaler[single ? 'unwrapDevice' : 'unwrapDevices'](
       response,
       this._proxy
-        ? app => new Device(this, app, false)
+        ? device => new Device(device, this._api)
         : undefined
     )
   }
@@ -308,7 +308,7 @@ class Devices {
       ...Marshaler.selectorToFieldMask(selector),
     })
 
-    return this._responseTransform(response)
+    return this._responseTransform(response, false)
   }
 
   async getById (applicationId, deviceId, selector) {
