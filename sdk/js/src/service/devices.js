@@ -73,14 +73,36 @@ class Devices {
     return result
   }
 
-  _mergeEntity (parts, base = {}) {
+  _mergeEntity (
+    parts,
+    base = {},
+    minimum = [[ 'ids' ], [ 'created_at' ], [ 'updated_at' ]]
+  ) {
     const result = base
 
     for (const part of parts) {
-      for (const path of part.paths || []) {
+      for (const path of part.paths ? [ ...minimum, ...part.paths ] : []) {
         const val = traverse(part.record).get(path)
         if (val) {
-          traverse(result).set(path, val)
+          if (typeof val === 'object') {
+            // In case of a whole sub-object being selected, write each leaf node
+            // explicitly to achieve a deep merge instead of object overrides
+            if (Object.keys(val).length === 0) {
+              // Ignore empty object values
+              continue
+            }
+            traverse(val).forEach(function (e) {
+              if (this.isLeaf) {
+                if (typeof e === 'object' && Object.keys(e).length === 0) {
+                  // Ignore empty object values
+                  return
+                }
+                traverse(result).set([ ...path, ...this.path ], e)
+              }
+            })
+          } else {
+            traverse(result).set(path, val)
+          }
         }
       }
     }
@@ -161,10 +183,10 @@ class Devices {
         .map(e => e ? Marshaler.payloadSingleResponse(e) : undefined)
 
       const result = this._mergeEntity([
-        { record: Marshaler.payloadSingleResponse(isResult), paths: requestTree.is },
         { record: setResults[0], paths: requestTree.ns },
         { record: setResults[1], paths: requestTree.as },
         { record: setResults[2], paths: requestTree.js },
+        { record: Marshaler.payloadSingleResponse(isResult), paths: requestTree.is },
       ])
 
       return result
@@ -224,10 +246,10 @@ class Devices {
       .map(e => e ? Marshaler.payloadSingleResponse(e) : undefined)
 
     const result = this._mergeEntity([
-      { record: Marshaler.payloadSingleResponse(isResult), paths: requestTree.is },
       { record: getResults[0], paths: requestTree.ns },
       { record: getResults[1], paths: requestTree.as },
       { record: getResults[2], paths: requestTree.js },
+      { record: Marshaler.payloadSingleResponse(isResult), paths: requestTree.is },
     ])
 
     return result
