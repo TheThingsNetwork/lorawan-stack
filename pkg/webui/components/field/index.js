@@ -205,10 +205,13 @@ Field.propTypes = {
   /** The field title, displayed with the input */
   title: PropTypes.oneOfType([
     PropTypes.node,
-    PropTypes.object,
+    PropTypes.message,
   ]).isRequired,
   /** An optional helper description displayed under the input */
-  description: PropTypes.node,
+  description: PropTypes.oneOfType([
+    PropTypes.node,
+    PropTypes.message,
+  ]),
   /** "name" prop applied to the input */
   name: PropTypes.string.isRequired,
   /**

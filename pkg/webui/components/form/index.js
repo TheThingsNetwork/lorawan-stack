@@ -46,10 +46,10 @@ class InnerForm extends React.Component {
     if (prev.error !== error) {
       const apiFieldErrors = fieldErrors(mapErrorsToFields, error)
       const { errors, ...restStatus } = status
+
       if (apiFieldErrors) {
         const forceTouched = Object.keys(apiFieldErrors)
           .reduce((acc, curr) => ({ ...acc, [curr]: true }), {})
-
         setTouched(forceTouched)
         setStatus({ errors: apiFieldErrors, ...restStatus })
       } else {
@@ -92,6 +92,7 @@ class InnerForm extends React.Component {
       children,
       horizontal,
       submitEnabledWhenInvalid,
+      resetEnabledAlways,
       validateOnBlur,
       validateOnChange,
       dirty,
@@ -125,9 +126,10 @@ class InnerForm extends React.Component {
               busy: isSubmitting,
             })
           } else if (Child.props.type === 'reset') {
+            const disabled = isSubmitting || (resetEnabledAlways ? false : !dirty)
             return React.cloneElement(Child, {
               ...Child.props,
-              disabled: isSubmitting || !dirty,
+              disabled,
               onClick: handleReset,
             })
           }
@@ -162,33 +164,43 @@ const formRender = ({ children, ...rest }) => function (props) {
   )
 }
 
-const Form = ({
-  children,
-  error,
-  info,
-  loading,
-  horizontal,
-  submitEnabledWhenInvalid,
-  validateOnBlur = true,
-  validateOnChange = false,
-  mapErrorsToFields = {},
-  ...rest
-}) => (
-  <Formik
-    {...rest}
-    validateOnBlur={validateOnBlur}
-    validateOnChange={validateOnChange}
-    render={formRender({
+class Form extends React.Component {
+  render () {
+    const {
       children,
       error,
       info,
+      loading,
       horizontal,
       submitEnabledWhenInvalid,
-      loading,
-      mapErrorsToFields,
-    })}
-  />
-)
+      resetEnabledAlways,
+      validateOnBlur = true,
+      validateOnChange = false,
+      mapErrorsToFields = {},
+      formikRef,
+      ...rest
+    } = this.props
+
+    return (
+      <Formik
+        {...rest}
+        ref={formikRef}
+        validateOnBlur={validateOnBlur}
+        validateOnChange={validateOnChange}
+        render={formRender({
+          children,
+          error,
+          info,
+          horizontal,
+          submitEnabledWhenInvalid,
+          resetEnabledAlways,
+          loading,
+          mapErrorsToFields,
+        })}
+      />
+    )
+  }
+}
 
 function recursiveMap (children, fn) {
   return React.Children.map(children, function (Child) {
@@ -240,6 +252,10 @@ Form.propTypes = {
   loading: PropTypes.bool,
   /** Field name to stack error name mappings, e.g. { id: 'invalid_id' } */
   mapErrorsToFields: PropTypes.object,
+  /** Whether the reset/cancel buttons stays enabled also when the form is not dirty */
+  resetEnabledAlways: PropTypes.bool,
+  /** A reference property passed to the formik component */
+  formikRef: PropTypes.shape({ current: PropTypes.instanceOf(Formik) }),
 }
 
 export default Form

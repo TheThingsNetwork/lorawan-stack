@@ -81,6 +81,12 @@ export default {
       'delete': ttnClient.Applications.ApiKeys.deleteById,
       create: ttnClient.Applications.ApiKeys.create,
     },
+    link: {
+      get: ttnClient.Applications.Link.get,
+      set: ttnClient.Applications.Link.set,
+      'delete': ttnClient.Applications.Link.delete,
+      stats: ttnClient.Applications.Link.getStats,
+    },
   },
   devices: {
     list: stubs.devices.list,

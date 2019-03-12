@@ -247,7 +247,7 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 
 var (
 	errNotLinked  = errors.DefineNotFound("not_linked", "not linked to `{application_uid}`")
-	errLinkFailed = errors.Define("link", "link failed")
+	errLinkFailed = errors.DefineAborted("link", "link failed")
 )
 
 func (as *ApplicationServer) cancelLink(ctx context.Context, ids ttnpb.ApplicationIdentifiers) error {

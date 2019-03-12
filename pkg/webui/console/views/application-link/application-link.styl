@@ -12,9 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/* eslint-disable import/prefer-default-export */
+.main
+  h3
+    margin-top: 0
 
-// alphanumeric, dashes, lowercase
-export const id = /^[a-z0-9]+(-[a-z0-9]+)*$/
-export const apiKey = /^NNSXS.[A-Z0-9]{39}.[A-Z0-9]{52}$/
-export const address = /^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$/
+.form
+  margin-top: $ls.xs
+
+.status
+  &-text
+    display: block
+    margin-bottom: $ls.xs
+  &-data
+    margin-bottom: $ls.xs
+
+.submit-bar
+  border-dark('top')
+  margin-bottom: $ls.s
+  display: flex
+  justify-content: space-between
+  background-color: $c-divider-subtle
+  padding: $cs.m
