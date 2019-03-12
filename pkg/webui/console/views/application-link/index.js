@@ -32,6 +32,7 @@ import IntlHelmet from '../../../lib/components/intl-helmet'
 import Spinner from '../../../components/spinner'
 import toast from '../../../components/toast'
 import DateTime from '../../../lib/components/date-time'
+import Icon from '../../../components/icon'
 
 import api from '../../api'
 
@@ -40,6 +41,9 @@ import style from './application-link.styl'
 const m = defineMessages({
   linkApplication: 'Link {appId}',
   linkStatistics: 'Statistics',
+  linkStatus: 'Link status',
+  linkStatusLinked: 'The application is linked successfully',
+  linkStatusUnLinked: 'The application is currently not linked to a Network Server',
   linkSuccess: 'Successfully linked',
   linkedSince: 'Linked Since',
   nsAddress: 'Network Server Address',
@@ -174,7 +178,10 @@ class ApplicationLink extends React.Component {
 
     if (!stats) {
       return (
-        null
+        <div className={style.status}>
+          <Message component="h3" content={m.linkStatus} />
+          <span className={style.statusText}><Icon icon="link_off" /> <Message content={m.linkStatusUnLinked} /></span>
+        </div>
       )
     }
 
@@ -198,16 +205,18 @@ class ApplicationLink extends React.Component {
     ]
 
     return (
-      <div className={style.statistics}>
+      <div className={style.status}>
+        <Message component="h3" content={m.linkStatus} />
+        <span className={style.statusText}><Icon icon="link" /> <Message content={m.linkStatusLinked} /></span>
         <DataSheet
-          className={style.statisticsData}
+          className={style.statusData}
           data={[{
             header: m.linkStatistics,
             items: dataSheetItems,
           }]}
         />
         <Button
-          type="reset"
+          onClick={this.handleUnlink}
           message={m.unlink}
           danger
           icon="link_off"
@@ -239,7 +248,7 @@ class ApplicationLink extends React.Component {
     }
 
     return (
-      <Container>
+      <Container className={style.main}>
         <Row>
           <Col lg={8} md={12}>
             <IntlHelmet
