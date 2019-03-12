@@ -15,6 +15,9 @@
 package interop
 
 import (
+	"net/http"
+
+	"github.com/labstack/echo"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
@@ -46,7 +49,7 @@ var (
 
 func defineError(name string, result Result, message string) ResultError {
 	return ResultError{
-		Definition: errors.Define(name, message),
+		Definition: errors.DefineInvalidArgument(name, message),
 		Result:     result,
 	}
 }
@@ -55,4 +58,28 @@ func defineError(name string, result Result, message string) ResultError {
 type ResultError struct {
 	errors.Definition
 	Result Result
+}
+
+// ErrorHandler is an echo.HTTPErrorHandler.
+func ErrorHandler(err error, c echo.Context) {
+	statusCode := errors.ToHTTPStatusCode(err)
+	resultErr, isResultErr := err.(ResultError)
+	if header, ok := c.Get(headerKey).(*RawMessageHeader); ok {
+		answerHeader, err := header.AnswerHeader()
+		if err != nil {
+			c.NoContent(http.StatusBadRequest)
+		} else if isResultErr {
+			c.JSON(statusCode, ErrorMessage{
+				RawMessageHeader: answerHeader,
+				Result:           resultErr.Result,
+			})
+		} else {
+			c.JSON(statusCode, ErrorMessage{
+				RawMessageHeader: answerHeader,
+				Result:           ResultOther,
+			})
+		}
+	} else {
+		c.NoContent(statusCode)
+	}
 }
