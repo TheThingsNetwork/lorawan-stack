@@ -81,12 +81,20 @@ const validationSchema = Yup.object().shape({
 @bind
 class ApplicationLink extends React.Component {
 
+  constructor (props) {
+    super(props)
+
+    this.form = React.createRef()
+  }
+
   state = {
     fetching: true,
     link: undefined,
     stats: undefined,
     error: '',
   }
+
+
 
   componentDidMount () {
     this.fetchLinkData()
@@ -150,7 +158,7 @@ class ApplicationLink extends React.Component {
     }
   }
 
-  async handleUnlink (_, { resetForm }) {
+  async handleUnlink () {
     const { appId } = this.props
 
     await this.setState({ error: '' })
@@ -169,7 +177,7 @@ class ApplicationLink extends React.Component {
     } catch (error) {
       await this.setState({ error })
     } finally {
-      resetForm()
+      this.form.current.resetForm({})
     }
   }
 
@@ -261,21 +269,16 @@ class ApplicationLink extends React.Component {
             />
           </Col>
         </Row>
-        <Row>
-          <Col lg={8} md={12}>
+        <Row className={style.form}>
+          <Col lg={6} md={12}>
+            <h3>Link settings</h3>
             <Form
+              formikRef={this.form}
               error={error}
-              horizontal
-              resetEnabledAlways
               onSubmit={this.handleLink}
-              onReset={this.handleUnlink}
               initialValues={initialValues}
               validationSchema={validationSchema}
             >
-              <Message
-                component="h4"
-                content={sharedMessages.general}
-              />
               <Field
                 type="text"
                 description={m.nsDescription}
@@ -284,17 +287,21 @@ class ApplicationLink extends React.Component {
                 autoFocus
               />
               <Field
-                type="text"
+                type="password"
                 required
                 name="api_key"
                 title={sharedMessages.apiKey}
               />
-              <Button
-                type="submit"
-                message={sharedMessages.saveChanges}
-              />
-              {this.statistics}
+              <div className={style.submitBar}>
+                <Button
+                  type="submit"
+                  message={sharedMessages.saveChanges}
+                />
+              </div>
             </Form>
+          </Col>
+          <Col lg={6} md={12}>
+            {this.statistics}
           </Col>
         </Row>
       </Container>
