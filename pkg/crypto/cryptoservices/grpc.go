@@ -63,7 +63,7 @@ func (s *networkRPCClient) JoinAcceptMIC(ctx context.Context, dev *ttnpb.EndDevi
 			ProvisionerID:        dev.ProvisionerID,
 			ProvisioningData:     dev.ProvisioningData,
 		},
-		JoinRequestType: uint32(joinReqType),
+		JoinRequestType: ttnpb.RejoinType(joinReqType),
 		DevNonce:        dn,
 	}, s.callOpts...)
 	if err != nil {
