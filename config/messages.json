@@ -2620,7 +2620,7 @@
   },
   "error:pkg/gatewayserver/io:too_long": {
     "translations": {
-      "en": "the payload length `{payload_length}` exceeds maximum `{maximum_payload}` at data rate index `{data_rate_index}`"
+      "en": "the payload length `{payload_length}` exceeds maximum `{maximum_length}` at data rate index `{data_rate_index}`"
     },
     "description": {
       "package": "pkg/gatewayserver/io",
