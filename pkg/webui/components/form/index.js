@@ -164,35 +164,43 @@ const formRender = ({ children, ...rest }) => function (props) {
   )
 }
 
-const Form = ({
-  children,
-  error,
-  info,
-  loading,
-  horizontal,
-  submitEnabledWhenInvalid,
-  resetEnabledAlways,
-  validateOnBlur = true,
-  validateOnChange = false,
-  mapErrorsToFields = {},
-  ...rest
-}) => (
-  <Formik
-    {...rest}
-    validateOnBlur={validateOnBlur}
-    validateOnChange={validateOnChange}
-    render={formRender({
+class Form extends React.Component {
+  render () {
+    const {
       children,
       error,
       info,
+      loading,
       horizontal,
       submitEnabledWhenInvalid,
       resetEnabledAlways,
-      loading,
-      mapErrorsToFields,
-    })}
-  />
-)
+      validateOnBlur = true,
+      validateOnChange = false,
+      mapErrorsToFields = {},
+      formikRef,
+      ...rest
+    } = this.props
+
+    return (
+      <Formik
+        {...rest}
+        ref={formikRef}
+        validateOnBlur={validateOnBlur}
+        validateOnChange={validateOnChange}
+        render={formRender({
+          children,
+          error,
+          info,
+          horizontal,
+          submitEnabledWhenInvalid,
+          resetEnabledAlways,
+          loading,
+          mapErrorsToFields,
+        })}
+      />
+    )
+  }
+}
 
 function recursiveMap (children, fn) {
   return React.Children.map(children, function (Child) {
@@ -246,6 +254,8 @@ Form.propTypes = {
   mapErrorsToFields: PropTypes.object,
   /** Whether the reset/cancel buttons stays enabled also when the form is not dirty */
   resetEnabledAlways: PropTypes.bool,
+  /** A reference property passed to the formik component */
+  formikRef: PropTypes.shape({ current: PropTypes.instanceOf(Formik) }),
 }
 
 export default Form
