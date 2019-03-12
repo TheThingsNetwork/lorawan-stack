@@ -15,6 +15,8 @@
 package interop
 
 import (
+	"bytes"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -26,73 +28,53 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-func handler(c echo.Context) error {
-	return nil
-}
-
-func TestGroup(t *testing.T) {
-	a := assertions.New(t)
-	s, err := New(test.Context(), config.Interop{})
-	if !a.So(err, should.BeNil) {
-		t.Fatal("Could not create an interop instance")
-	}
-
-	a.So(s.server, should.NotHaveRoute, "GET", "/")
-	s.GET("/", handler)
-	a.So(s.server, should.HaveRoute, "GET", "/")
-
-	a.So(s.server, should.NotHaveRoute, "POST", "/bar")
-	s.POST("/bar", handler)
-	a.So(s.server, should.NotHaveRoute, "GET", "/bar")
-	a.So(s.server, should.HaveRoute, "POST", "/bar")
-
-	{
-		grp := s.Group("/")
-		grp.GET("/baz", handler)
-		a.So(s.server, should.HaveRoute, "GET", "/baz")
-	}
-
-	{
-		grp := s.Group("/group")
-		grp.GET("/g", handler)
-		a.So(s.server, should.HaveRoute, "GET", "/group/g")
-
-		ggrp := grp.Group("/quu")
-		ggrp.GET("/q", handler)
-		a.So(s.server, should.HaveRoute, "GET", "/group/quu/q")
-	}
-}
-
 func TestServeHTTP(t *testing.T) {
-	a := assertions.New(t)
-	s, err := New(test.Context(), config.Interop{})
-	if !a.So(err, should.BeNil) {
-		t.Fatal("Could not create an interop instance")
+	for _, tc := range []struct {
+		Name              string
+		JS                JoinServer
+		hNS               HomeNetworkServer
+		sNS               ServingNetworkServer
+		fNS               ForwardingNetworkServer
+		AS                ApplicationServer
+		RequestBody       interface{}
+		ResponseAssertion func(*testing.T, *http.Response) bool
+	}{
+		{
+			Name: "Empty",
+			ResponseAssertion: func(t *testing.T, res *http.Response) bool {
+				a := assertions.New(t)
+				return a.So(res.StatusCode, should.Equal, http.StatusBadRequest)
+			},
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
+			s, err := New(test.Context(), config.Interop{})
+			if !a.So(err, should.BeNil) {
+				t.Fatal("Could not create an interop instance")
+			}
+			if tc.JS != nil {
+				s.RegisterJS(tc.JS)
+			}
+			if tc.hNS != nil {
+				s.RegisterHNS(tc.hNS)
+			}
+			if tc.sNS != nil {
+				s.RegisterSNS(tc.sNS)
+			}
+			if tc.AS != nil {
+				s.RegisterAS(tc.AS)
+			}
+			buf, err := json.Marshal(tc.RequestBody)
+			if !a.So(err, should.BeNil) {
+				t.Fatal("Failed to marshal request body")
+			}
+			req := httptest.NewRequest(echo.POST, "/", bytes.NewReader(buf))
+			rec := httptest.NewRecorder()
+			s.ServeHTTP(rec, req)
+			if !tc.ResponseAssertion(t, rec.Result()) {
+				t.FailNow()
+			}
+		})
 	}
-
-	// HTTP server returns 200 on valid route
-	{
-		req := httptest.NewRequest(echo.GET, "/", nil)
-		rec := httptest.NewRecorder()
-
-		s.GET("/", handler)
-
-		s.ServeHTTP(rec, req)
-
-		resp := rec.Result()
-		a.So(resp.StatusCode, should.Equal, http.StatusOK)
-	}
-}
-
-func TestRootGroup(t *testing.T) {
-	a := assertions.New(t)
-	s, err := New(test.Context(), config.Interop{})
-	if !a.So(err, should.BeNil) {
-		t.Fatal("Could not create an interop instance")
-	}
-
-	s.RootGroup("/sub")
-	a.So(s.server, should.NotHaveRoute, "GET", "/")
-	a.So(s.server, should.NotHaveRoute, "GET", "/sub/another")
-	a.So(s.server, should.HaveRoute, "GET", "/sub")
 }
