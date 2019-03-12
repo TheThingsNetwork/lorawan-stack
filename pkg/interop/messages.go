@@ -65,6 +65,32 @@ func (h MessageHeader) AnswerHeader() (MessageHeader, error) {
 	}, nil
 }
 
+// RawMessageHeader contains a message header with generic sender and receiver IDs.
+type RawMessageHeader struct {
+	MessageHeader
+	SenderID,
+	ReceiverID string
+}
+
+// AnswerHeader returns the header of the answer message.
+func (h RawMessageHeader) AnswerHeader() (RawMessageHeader, error) {
+	header, err := h.MessageHeader.AnswerHeader()
+	if err != nil {
+		return RawMessageHeader{}, err
+	}
+	return RawMessageHeader{
+		MessageHeader: header,
+		SenderID:      h.ReceiverID,
+		ReceiverID:    h.SenderID,
+	}, nil
+}
+
+// ErrorMessage is a message with raw header and a result field.
+type ErrorMessage struct {
+	RawMessageHeader
+	Result Result
+}
+
 // NsJsMessageHeader contains the message header for NS to JS messages.
 type NsJsMessageHeader struct {
 	MessageHeader
