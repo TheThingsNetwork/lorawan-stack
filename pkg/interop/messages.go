@@ -15,6 +15,11 @@
 package interop
 
 import (
+	"encoding/json"
+	"io/ioutil"
+	"net/http"
+
+	"github.com/labstack/echo"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
@@ -24,8 +29,8 @@ type MessageHeader struct {
 	ProtocolVersion string
 	TransactionID   uint32
 	MessageType     MessageType
-	SenderToken     Buffer
-	ReceiverToken   Buffer
+	SenderToken     Buffer `json:",omitempty"`
+	ReceiverToken   Buffer `json:",omitempty"`
 }
 
 // AnswerHeader returns the header of the answer message.
@@ -145,4 +150,48 @@ type JoinAns struct {
 	NwkSKey      *KeyEnvelope `json:",omitempty"`
 	AppSKey      *KeyEnvelope `json:",omitempty"`
 	SessionKeyID Buffer       `json:",omitempty"`
+}
+
+// ParseMessage parses the header and the message type of the request body.
+// This middleware sets the header in the context on the `headerKey` and the message on the `messageKey`.
+func ParseMessage() echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			buf, err := ioutil.ReadAll(c.Request().Body)
+			if err != nil {
+				return err
+			}
+			if len(buf) == 0 {
+				c.NoContent(http.StatusBadRequest)
+				return nil
+			}
+			var header RawMessageHeader
+			if err := json.Unmarshal(buf, &header); err != nil {
+				c.NoContent(http.StatusBadRequest)
+				return nil
+			}
+			if header.ProtocolVersion == "" || header.MessageType == "" {
+				c.NoContent(http.StatusBadRequest)
+				return nil
+			}
+			c.Set(headerKey, &header)
+			switch header.ProtocolVersion {
+			case "1.0", "1.1":
+			default:
+				return ErrProtocolVersion
+			}
+			var msg interface{}
+			switch header.MessageType {
+			case MessageTypeJoinReq:
+				msg = &JoinReq{}
+			default:
+				return ErrMalformedMessage
+			}
+			if err := json.Unmarshal(buf, msg); err != nil {
+				return ErrMalformedMessage
+			}
+			c.Set(messageKey, msg)
+			return next(c)
+		}
+	}
 }
