@@ -76,7 +76,7 @@ export default class ApplicationGeneralSettings extends React.Component {
     error: '',
   }
 
-  async handleSubmit (values, { resetForm }) {
+  async handleSubmit (values, { setSubmitting, resetForm }) {
     const { application } = this.props
 
     await this.setState({ error: '' })
@@ -92,8 +92,10 @@ export default class ApplicationGeneralSettings extends React.Component {
         type: toast.types.SUCCESS,
       })
     } catch (error) {
-      resetForm({ ...values })
       await this.setState(error)
+    } finally {
+      resetForm({ ...values })
+      setSubmitting(false)
     }
   }
 

@@ -18,7 +18,6 @@ import * as Yup from 'yup'
 import { connect } from 'react-redux'
 import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
-import { push } from 'connected-react-router'
 
 import Form from '../../../components/form'
 import Field from '../../../components/field'
@@ -47,9 +46,6 @@ const initialValues = {
   description: '',
 }
 
-// alphanumeric, dashes, lowercase
-const applicationIdRegexp = /^[a-z0-9]+(-[a-z0-9]+)*$/
-
 const validationSchema = Yup.object().shape({
   application_id: Yup.string()
     .matches(applicationIdRegexp, sharedMessages.validateAlphanum)
@@ -71,7 +67,6 @@ const validationSchema = Yup.object().shape({
     />
   )
 })
-
 @connect(({ user }) => ({
   userId: user.user.ids.user_id,
 }))
@@ -83,7 +78,7 @@ export default class Add extends React.Component {
   }
 
   async handleSubmit (values, { setSubmitting, setStatus, resetForm }) {
-    const { userId, dispatch } = this.props
+    const { userId } = this.props
 
     await this.setState({ error: '' })
 
@@ -95,8 +90,9 @@ export default class Add extends React.Component {
           description: values.description,
         })
 
-      const { ids: { application_id }} = result
-      dispatch(push(`/console/applications/${application_id}`))
+
+      const { ids: { application_id }, name, description } = result
+      resetForm({ application_id, name, description })
     } catch (error) {
       const { application_id, name, description } = values
       resetForm({ application_id, name, description })
