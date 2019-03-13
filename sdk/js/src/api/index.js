@@ -40,7 +40,7 @@ class Api {
       for (const rpcName of Object.keys(service)) {
         const rpc = service[rpcName]
 
-        this[serviceName][rpcName] = function ({ routeParams = {}, queryParams = {}, fieldMask = []} = {}, payload) {
+        this[serviceName][rpcName] = function ({ routeParams = {}} = {}, payload) {
 
           const paramSignature = Object.keys(routeParams).sort().join()
           const endpoint = rpc.http.find(function (prospect) {
@@ -59,15 +59,7 @@ Signature tried: ${paramSignature}`)
             route = route.replace(`{${parameter}}`, routeParams[parameter])
           }
 
-          if (endpoint.method === 'delete') {
-            return connector.delete(route)
-          }
-
-          if (endpoint.method === 'get') {
-            return connector.get(route, { queryParams, fieldMask })
-          }
-
-          return connector[endpoint.method](route, payload, { queryParams, fieldMask })
+          return connector[endpoint.method](route, payload)
         }
       }
     }

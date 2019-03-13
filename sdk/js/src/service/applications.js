@@ -58,15 +58,16 @@ class Applications {
   // Retrieval
 
   async getAll (params) {
-    const response = await this._api.ApplicationRegistry.List({ queryParams: params })
+    const response = await this._api.ApplicationRegistry.List(undefined, params)
 
     return this._responseTransform(response, false)
   }
 
-  async getById (id) {
+  async getById (id, selector) {
+    const fieldMask = Marshaler.selectorToFieldMask(selector)
     const response = await this._api.ApplicationRegistry.Get({
       routeParams: { 'application_ids.application_id': id },
-    })
+    }, fieldMask)
 
     return this._responseTransform(response)
   }

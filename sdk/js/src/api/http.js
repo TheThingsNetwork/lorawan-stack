@@ -76,26 +76,15 @@ class Http {
     }
   }
 
-  async get (endpoint, { fieldMask, queryParams }) {
+  async get (endpoint, params) {
+    // Convert payload to query params (should usually be field_mask only)
     const config = {}
-
-    let fieldMaskPath
-    if (fieldMask) {
-      if (typeof fieldMask === 'string') {
-        fieldMaskPath = fieldMask.join(',')
-      } else if ('paths' in fieldMask) {
-        fieldMaskPath = fieldMask.paths.join(',')
+    if (params && Object.keys(params).length > 0) {
+      if ('field_mask' in params) {
+        // Convert field mask prop to a query param friendly format
+        params.field_mask = params.field_mask.paths.join(',')
       }
-    }
-
-    if (fieldMaskPath) {
-      config.params = { field_mask: fieldMaskPath }
-    }
-    if (queryParams) {
-      config.params = {
-        ...config.params,
-        ...queryParams,
-      }
+      config.params = params
     }
 
     return this.handleRequest('get', endpoint, undefined, config)
@@ -109,10 +98,7 @@ class Http {
     return this.handleRequest('patch', endpoint, payload)
   }
 
-  async put (endpoint, payload, { fieldMask }) {
-    if (fieldMask) {
-      payload.field_mask = fieldMask
-    }
+  async put (endpoint, payload) {
     return this.handleRequest('put', endpoint, payload)
   }
 

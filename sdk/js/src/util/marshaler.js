@@ -110,7 +110,7 @@ class Marshaler {
     if (!paths) {
       return
     }
-    return { fieldMask: { paths: paths.map(e => e.join('.')) }}
+    return { field_mask: { paths: paths.map(e => e.join('.')) }}
   }
 
   /** This function will convert a selector parameter and convert it to a

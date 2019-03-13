@@ -173,29 +173,29 @@ class Devices {
     const requests = new Array(3)
 
     if (!create && 'is' in requestTree) {
-      isResult = await this._api.EndDeviceRegistry.Update({
-        ...params,
+      isResult = await this._api.EndDeviceRegistry.Update(params, {
+        ...devicePayload,
         ...Marshaler.pathsToFieldMask(requestTree.is),
-      }, devicePayload)
+      })
     }
 
     if ('ns' in requestTree) {
-      requests[0] = this._api.NsEndDeviceRegistry.Set({
-        ...params,
+      requests[0] = this._api.NsEndDeviceRegistry.Set(params, {
+        ...devicePayload,
         ...Marshaler.pathsToFieldMask(requestTree.ns),
-      }, devicePayload)
+      })
     }
     if ('as' in requestTree) {
-      requests[1] = this._api.AsEndDeviceRegistry.Set({
-        ...params,
+      requests[1] = this._api.AsEndDeviceRegistry.Set(params, {
+        ...devicePayload,
         ...Marshaler.pathsToFieldMask(requestTree.as),
-      }, devicePayload)
+      })
     }
     if ('js' in requestTree) {
-      requests[2] = this._api.JsEndDeviceRegistry.Set({
-        ...params,
+      requests[2] = this._api.JsEndDeviceRegistry.Set(params, {
+        ...devicePayload,
         ...Marshaler.pathsToFieldMask(requestTree.js),
-      }, devicePayload)
+      })
     }
 
     try {
@@ -238,29 +238,29 @@ class Devices {
     const requests = new Array(3)
 
     if ('is' in requestTree) {
-      isResult = await this._api.EndDeviceRegistry.Get({
-        ...params,
-        ...Marshaler.pathsToFieldMask(requestTree.is),
-      })
+      isResult = await this._api.EndDeviceRegistry.Get(
+        params,
+        Marshaler.pathsToFieldMask(requestTree.is),
+      )
     }
 
     if ('ns' in requestTree) {
-      requests[0] = this._api.NsEndDeviceRegistry.Get({
-        ...params,
-        ...Marshaler.pathsToFieldMask(requestTree.ns),
-      })
+      requests[0] = this._api.NsEndDeviceRegistry.Get(
+        params,
+        Marshaler.pathsToFieldMask(requestTree.ns),
+      )
     }
     if ('as' in requestTree) {
-      requests[1] = this._api.AsEndDeviceRegistry.Get({
-        ...params,
-        ...Marshaler.pathsToFieldMask(requestTree.as),
-      })
+      requests[1] = this._api.AsEndDeviceRegistry.Get(
+        params,
+        Marshaler.pathsToFieldMask(requestTree.as),
+      )
     }
     if ('js' in requestTree) {
-      requests[2] = this._api.JsEndDeviceRegistry.Get({
-        ...params,
-        ...Marshaler.pathsToFieldMask(requestTree.js),
-      })
+      requests[2] = this._api.JsEndDeviceRegistry.Get(
+        params,
+        Marshaler.pathsToFieldMask(requestTree.js),
+      )
     }
 
     const getResults = (await Promise.all(requests))
@@ -306,7 +306,8 @@ class Devices {
   async getAll (applicationId, params, selector) {
     const response = await this._api.EndDeviceRegistry.List({
       routeParams: { 'application_ids.application_id': applicationId },
-      queryParams: params,
+    }, {
+      ...params,
       ...Marshaler.selectorToFieldMask(selector),
     })
 
