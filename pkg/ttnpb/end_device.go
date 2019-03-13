@@ -16,18 +16,24 @@ package ttnpb
 
 import "context"
 
-// IsZero reports whether ids represent zero identifiers.
-func (ids ApplicationWebhookIdentifiers) IsZero() bool {
-	return ids.GetWebhookID() == "" &&
-		ids.GetApplicationID() == ""
-}
-
 // ValidateContext wraps the generated validator with (optionally context-based) custom checks.
-func (m *SetApplicationWebhookRequest) ValidateContext(context.Context) error {
+func (m *UpdateEndDeviceRequest) ValidateContext(context.Context) error {
 	if len(m.FieldMask.Paths) == 0 {
 		return m.ValidateFields()
 	}
-	return m.ValidateFields(append(fieldsWithPrefix("webhook", m.FieldMask.Paths...),
-		"webhook.ids",
+	return m.ValidateFields(append(fieldsWithPrefix("end_device", m.FieldMask.Paths...),
+		"end_device.ids.application_ids",
+		"end_device.ids.device_id",
+	)...)
+}
+
+// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
+func (m *SetEndDeviceRequest) ValidateContext(context.Context) error {
+	if len(m.FieldMask.Paths) == 0 {
+		return m.ValidateFields()
+	}
+	return m.ValidateFields(append(fieldsWithPrefix("end_device", m.FieldMask.Paths...),
+		"end_device.ids.application_ids",
+		"end_device.ids.device_id",
 	)...)
 }

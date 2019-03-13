@@ -4424,7 +4424,7 @@
     },
     "description": {
       "package": "pkg/ttnpb",
-      "file": "identifiers_validators.go"
+      "file": "identifiers.go"
     }
   },
   "error:pkg/ttnpb:missing_field": {
