@@ -33,9 +33,7 @@ class Applications {
   constructor (api, { defaultUserId, proxy = true }) {
     this._defaultUserId = defaultUserId
     this._api = api
-    this._applicationTransform = proxy
-      ? app => new Application(this, app, false)
-      : undefined
+    this._proxy = proxy
 
     this.ApiKeys = new ApiKeys(api.ApplicationAccess, {
       list: 'application_id',
@@ -59,64 +57,60 @@ class Applications {
 >>>>>>> 34741e7f7... util: Remove withId shorthand
   }
 
+  _responseTransform (response) {
+    const isList = response instanceof Array
+    return Marshaler[isList ? 'unwrapApplications' : 'unwrapApplication'](
+      response,
+      this._proxy
+        ? app => new Application(this, app, false)
+        : undefined
+    )
+  }
+
   // Retrieval
 
   async getAll (params) {
-    const result = await this._api.ApplicationRegistry.List({ query: params })
+    const response = await this._api.ApplicationRegistry.List({ query: params })
 
-    return Marshaler.unwrapApplications(
-      result,
-      this._applicationTransform
-    )
+    return this._responseTransform(response)
   }
 
   async getById (id) {
-    const result = await this._api.ApplicationRegistry.Get({
+    const response = await this._api.ApplicationRegistry.Get({
       route: { 'application_ids.application_id': id },
     })
 
-    return Marshaler.unwrapApplication(
-      result,
-      this._applicationTransform
-    )
+    return this._responseTransform(response)
   }
 
   async getByOrganization (organizationId) {
-    const result = this._api.ApplicationRegistry.List({
+    const response = this._api.ApplicationRegistry.List({
       route: { 'collaborator.organization_ids.organization_id': organizationId },
     })
 
-    return Marshaler.unwrapApplications(
-      result,
-      this._applicationTransform
-    )
+    return this._responseTransform(response)
   }
 
   async getByCollaborator (userId) {
-    const result = this._api.ApplicationRegistry.List({
+    const response = this._api.ApplicationRegistry.List({
       route: { 'collaborator.user_ids.user_id': userId },
     })
 
-    return Marshaler.unwrapApplications(
-      result,
-      this._applicationTransform
-    )
+    return this._responseTransform(response)
   }
 
   async search (params) {
-    const result = await this._api.EntityRegistrySearch.SearchApplications({
+    const response = await this._api.EntityRegistrySearch.SearchApplications({
       query: params,
     })
-    return Marshaler.unwrapApplications(
-      result,
-      this._applicationTransform
-    )
+
+    return this._responseTransform(response)
   }
 
   // Update
 
   async updateById (id, patch, mask = Marshaler.fieldMaskFromPatch(patch)) {
-    const result = await this._api.ApplicationRegistry.Update({
+    const response = await this._api.ApplicationRegistry.Update({
       route: {
         'application.ids.application_id': id,
       },
@@ -125,23 +119,17 @@ class Applications {
       application: patch,
       field_mask: Marshaler.fieldMask(mask),
     })
-    return Marshaler.unwrapApplication(
-      result,
-      this._applicationTransform
-    )
+    return this._responseTransform(response)
   }
 
   // Create
 
   async create (userId = this._defaultUserId, application) {
-    const result = await this._api.ApplicationRegistry.Create({
+    const response = await this._api.ApplicationRegistry.Create({
       route: { 'collaborator.user_ids.user_id': userId },
     },
     { application })
-    return Marshaler.unwrapApplication(
-      result,
-      this._applicationTransform
-    )
+    return this._responseTransform(response)
   }
 
   // Delete
