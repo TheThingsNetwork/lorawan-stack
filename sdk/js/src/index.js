@@ -14,6 +14,7 @@
 
 import Applications from './service/applications'
 import Application from './entity/application'
+import Devices from './service/devices'
 import Api from './api'
 
 class TtnLw {
@@ -29,6 +30,8 @@ class TtnLw {
 
     this.Applications = new Applications(this.api, { defaultUserId, proxy })
     this.Application = Application.bind(null, this.Applications)
+
+    this.Devices = new Devices(this.api, { defaultUserId, proxy })
   }
 }
 

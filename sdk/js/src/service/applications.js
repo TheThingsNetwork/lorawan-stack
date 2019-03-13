@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import Marshaler from '../util/marshaler'
-import Device from '../entity/device'
+import Devices from '../service/devices'
 import Application from '../entity/application'
 import ApiKeys from './api-keys'
 import Link from './link'
@@ -43,20 +43,8 @@ class Applications {
       },
     })
     this.Link = new Link(api.As)
-<<<<<<< HEAD
-=======
-    this.Device = new Device(api, { proxy })
+    this.Devices = new Devices(api, { proxy })
 
-    this.getAll = this.getAll.bind(this)
-    this.getById = this.getById.bind(this)
-    this.getByOrganization = this.getByOrganization.bind(this)
-    this.getByCollaborator = this.getByCollaborator.bind(this)
-    this.search = this.search.bind(this)
-    this.updateById = this.updateById.bind(this)
-    this.create = this.create.bind(this)
-    this.deleteById = this.deleteById.bind(this)
-    this.getRightsById = this.getRightsById.bind(this)
->>>>>>> 34741e7f7... util: Remove withId shorthand
   }
 
   _responseTransform (response) {

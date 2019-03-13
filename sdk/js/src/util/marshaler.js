@@ -90,6 +90,14 @@ class Marshaler {
     return this.payloadSingleResponse(result, transform)
   }
 
+  static unwrapDevices (result, transform) {
+    return this.payloadListResponse('end_devices', result, transform)
+  }
+
+  static unwrapDevice (result, transform) {
+    return this.payloadSingleResponse(result, transform)
+  }
+
   static fieldMaskFromPatch (patch) {
     return traverse(patch).paths().slice(1).map( e => e.join('.') )
   }

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import Marshaler from '../util/marshaler'
 import Device from '../entity/device'
 
 /**
@@ -20,15 +21,18 @@ import Device from '../entity/device'
  * device data.
  */
 class Devices {
-  constructor (api, applicationId) {
+  constructor (api, { applicationId, proxy = true }) {
     this._api = api
     this._applicationId = applicationId
-    this._idMask = { 'application_ids.application_id': this._applicationId }
+    this._idMask = { route: { 'end_device.ids.application_ids.application_id': this._applicationId }}
+    this._entityTransform = proxy
+      ? app => new Device(this, app, false)
+      : undefined
   }
 
   async getById (deviceId) {
     const res = await this._api.EndDeviceRegistry.Get({
-      ...this.idMask,
+      ...this._idMask,
       device_id: deviceId,
     })
 
@@ -37,9 +41,20 @@ class Devices {
 
   async updateById (deviceId) {
     return this._api.EndDeviceRegistry.Get({
-      ...this.idMask,
+      ...this._idMask,
       device_id: deviceId,
     })
+  }
+
+  async create (device, applicationId = this._applicationId) {
+    const result = await this._api.EndDeviceRegistry.Create(
+      { route: { 'end_device.ids.application_ids.application_id': applicationId }},
+      { end_device: device }
+    )
+    return Marshaler.unwrapDevice(
+      result,
+      this._entityTransform
+    )
   }
 }
 
