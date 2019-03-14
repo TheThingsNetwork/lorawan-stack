@@ -123,7 +123,7 @@ func (c *connection) setup(ctx context.Context) error {
 				logger.WithError(c.io.Context().Err()).Debug("Done sending downlink")
 				return
 			case down := <-c.io.Down():
-				buf, err := c.format.FromDownlink(down)
+				buf, err := c.format.FromDownlink(down, c.io.Gateway().GatewayIdentifiers)
 				if err != nil {
 					logger.WithError(err).Warn("Failed to marshal downlink message")
 					continue
@@ -270,7 +270,7 @@ func (c *connection) deliver(pkt *packet.PublishPacket) {
 	logger := log.FromContext(c.io.Context()).WithField("topic", pkt.TopicName)
 	switch {
 	case c.format.IsUplinkTopic(pkt.TopicParts):
-		up, err := c.format.ToUplink(pkt.Message)
+		up, err := c.format.ToUplink(pkt.Message, c.io.Gateway().GatewayIdentifiers)
 		if err != nil {
 			logger.WithError(err).Warn("Failed to unmarshal uplink message")
 			return
@@ -280,7 +280,7 @@ func (c *connection) deliver(pkt *packet.PublishPacket) {
 			logger.WithError(err).Warn("Failed to handle uplink message")
 		}
 	case c.format.IsStatusTopic(pkt.TopicParts):
-		status, err := c.format.ToStatus(pkt.Message)
+		status, err := c.format.ToStatus(pkt.Message, c.io.Gateway().GatewayIdentifiers)
 		if err != nil {
 			logger.WithError(err).Warn("Failed to unmarshal status message")
 			return
@@ -289,7 +289,7 @@ func (c *connection) deliver(pkt *packet.PublishPacket) {
 			logger.WithError(err).Warn("Failed to handle status message")
 		}
 	case c.format.IsTxAckTopic(pkt.TopicParts):
-		ack, err := c.format.ToTxAck(pkt.Message)
+		ack, err := c.format.ToTxAck(pkt.Message, c.io.Gateway().GatewayIdentifiers)
 		if err != nil {
 			logger.WithError(err).Warn("Failed to unmarshal Tx acknowledgment message")
 			return
