@@ -361,9 +361,9 @@ func downlinkPathsFromRecentUplinks(ups ...*ttnpb.UplinkMessage) []downlinkPath 
 // scheduleDownlinkByPaths attempts to schedule payload b using parameters in req for devID using paths.
 // scheduleDownlinkByPaths discards req.DownlinkPaths and mutates it arbitrarily.
 // scheduleDownlinkByPaths returns the scheduled downlink or error.
-func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *ttnpb.TxRequest, devID ttnpb.EndDeviceIdentifiers, b []byte, paths ...downlinkPath) (*ttnpb.DownlinkMessage, time.Duration, error) {
+func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *ttnpb.TxRequest, devID ttnpb.EndDeviceIdentifiers, b []byte, paths ...downlinkPath) (*ttnpb.DownlinkMessage, time.Time, error) {
 	if len(paths) == 0 {
-		return nil, 0, errNoPath
+		return nil, time.Time{}, errNoPath
 	}
 
 	logger := log.FromContext(ctx)
@@ -416,7 +416,7 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *ttnpb
 			errs = append(errs, err)
 			continue
 		}
-		return down, res.Delay, nil
+		return down, time.Now().Add(res.Delay), nil
 	}
 
 	for i, err := range errs {
@@ -425,7 +425,7 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *ttnpb
 		)
 	}
 	logger.Warn("All Gateway Servers failed to schedule downlink")
-	return nil, 0, errSchedule
+	return nil, time.Time{}, errSchedule
 }
 
 func (ns *NetworkServer) sendQueueInvalidationToAS(ctx context.Context, dev *ttnpb.EndDevice) (bool, error) {
@@ -697,7 +697,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						// NOTE: We must skip Rx1 if appDown.ClassBC.AbsoluteTime is set
 
 						if len(paths) > 0 {
-							down, delay, err := ns.scheduleDownlinkByPaths(
+							down, downAt, err := ns.scheduleDownlinkByPaths(
 								log.NewContext(ctx, logger.WithFields(log.Fields(
 									"attempt_rx1", true,
 									"attempt_rx2", false,
@@ -715,11 +715,8 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 								dev = devCopy
 								scheduleErr = true
 							} else {
-								if dev.MACState.DeviceClass == ttnpb.CLASS_C {
-									downAt := time.Now().Add(delay)
-									if nextDownlinkAt.Before(downAt) {
-										nextDownlinkAt = downAt
-									}
+								if dev.MACState.DeviceClass == ttnpb.CLASS_C && nextDownlinkAt.Before(downAt) {
+									nextDownlinkAt = downAt
 								}
 
 								if appDown == nil && len(dev.QueuedApplicationDownlinks) > 0 && dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
@@ -799,7 +796,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						paths = downlinkPathsFromRecentUplinks(dev.RecentUplinks...)
 					}
 
-					down, delay, err := ns.scheduleDownlinkByPaths(
+					down, downAt, err := ns.scheduleDownlinkByPaths(
 						log.NewContext(ctx, logger.WithFields(log.Fields(
 							"downlink_type", "data",
 							"attempt_rx1", false,
@@ -813,11 +810,8 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					if err != nil {
 						scheduleErr = true
 					} else {
-						if dev.MACState.DeviceClass == ttnpb.CLASS_C {
-							downAt := time.Now().Add(delay)
-							if nextDownlinkAt.Before(downAt) {
-								nextDownlinkAt = downAt
-							}
+						if dev.MACState.DeviceClass == ttnpb.CLASS_C && nextDownlinkAt.Before(downAt) {
+							nextDownlinkAt = downAt
 						}
 
 						if appDown == nil && len(dev.QueuedApplicationDownlinks) > 0 && dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
