@@ -23,7 +23,7 @@ const getApplicationLogic = createLogic({
   async process ({ getState, action }, dispatch, done) {
     const { id } = action
     try {
-      const app = await api.application.get(id)
+      const app = await api.application.get(id, 'name,description')
       dispatch(application.getApplicationSuccess(app))
     } catch (e) {
       dispatch(application.getApplicationFailure(e))
