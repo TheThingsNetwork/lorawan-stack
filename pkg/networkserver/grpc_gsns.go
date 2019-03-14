@@ -281,7 +281,7 @@ outer:
 
 		fNwkSIntKey, err := cryptoutil.UnwrapAES128Key(*dev.matchedSession.FNwkSIntKey, ns.KeyVault)
 		if err != nil {
-			logger.WithField("kek_label", dev.matchedSession.FNwkSIntKey.KEKLabel).WithError(err).Error("Failed to unwrap FNwkSIntKey, skipping...")
+			logger.WithField("kek_label", dev.matchedSession.FNwkSIntKey.KEKLabel).WithError(err).Warn("Failed to unwrap FNwkSIntKey, skipping...")
 			continue
 		}
 
@@ -301,7 +301,7 @@ outer:
 
 			sNwkSIntKey, err := cryptoutil.UnwrapAES128Key(*dev.matchedSession.SNwkSIntKey, ns.KeyVault)
 			if err != nil {
-				logger.WithField("kek_label", dev.matchedSession.SNwkSIntKey.KEKLabel).WithError(err).Error("Failed to unwrap SNwkSIntKey, skipping...")
+				logger.WithField("kek_label", dev.matchedSession.SNwkSIntKey.KEKLabel).WithError(err).Warn("Failed to unwrap SNwkSIntKey, skipping...")
 				continue
 			}
 
@@ -423,7 +423,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 		}
 		key, err := cryptoutil.UnwrapAES128Key(*ses.NwkSEncKey, ns.KeyVault)
 		if err != nil {
-			logger.WithField("kek_label", ses.NwkSEncKey.KEKLabel).WithError(err).Error("Failed to unwrap NwkSEncKey")
+			logger.WithField("kek_label", ses.NwkSEncKey.KEKLabel).WithError(err).Warn("Failed to unwrap NwkSEncKey")
 			return err
 		}
 
@@ -700,7 +700,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 			return stored, paths, nil
 		})
 	if err != nil && !handleErr {
-		logger.WithError(err).Error("Failed to update device in registry")
+		logger.WithError(err).Warn("Failed to update device in registry")
 		// TODO: Retry transaction. (https://github.com/TheThingsNetwork/lorawan-stack/issues/33)
 		registerDropDataUplink(ctx, &matched.EndDeviceIdentifiers, up, err)
 	}
@@ -769,7 +769,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 	)
 	if err != nil {
 		registerDropJoinRequest(ctx, nil, up, err)
-		logger.WithError(err).Error("Failed to load device from registry")
+		logger.WithError(err).Warn("Failed to load device from registry")
 		return err
 	}
 
@@ -790,7 +790,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 	ctx = log.NewContext(ctx, logger)
 
 	if err := resetMACState(dev, ns.FrequencyPlans, ns.defaultMACSettings); err != nil {
-		logger.WithError(err).Error("Failed to reset device's MAC state")
+		logger.WithError(err).Warn("Failed to reset device's MAC state")
 		return err
 	}
 
@@ -901,7 +901,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 			return dev, paths, nil
 		})
 	if err != nil && !resetErr {
-		logger.WithError(err).Error("Failed to update device in registry")
+		logger.WithError(err).Warn("Failed to update device in registry")
 		// TODO: Retry transaction. (https://github.com/TheThingsNetwork/lorawan-stack/issues/33)
 	}
 	if err != nil {
@@ -1004,7 +1004,7 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 		logger.Debug("Handling rejoin-request...")
 		return ttnpb.Empty, ns.handleRejoin(ctx, up, acc)
 	default:
-		logger.Error("Unmatched MType")
+		logger.Warn("Unmatched MType")
 		return ttnpb.Empty, nil
 	}
 }
