@@ -48,14 +48,7 @@ func (m *UplinkMessage) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "raw_payload":
-
-			if l := len(m.GetRawPayload()); l < 6 || l > 255 {
-				return UplinkMessageValidationError{
-					field:  "raw_payload",
-					reason: "value length must be between 6 and 255 bytes, inclusive",
-				}
-			}
-
+			// no validation rules for RawPayload
 		case "payload":
 
 			if v, ok := interface{}(m.GetPayload()).(interface{ ValidateFields(...string) error }); ok {
@@ -198,14 +191,7 @@ func (m *DownlinkMessage) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "raw_payload":
-
-			if l := len(m.GetRawPayload()); l < 6 || l > 255 {
-				return DownlinkMessageValidationError{
-					field:  "raw_payload",
-					reason: "value length must be between 6 and 255 bytes, inclusive",
-				}
-			}
-
+			// no validation rules for RawPayload
 		case "payload":
 
 			if v, ok := interface{}(m.GetPayload()).(interface{ ValidateFields(...string) error }); ok {

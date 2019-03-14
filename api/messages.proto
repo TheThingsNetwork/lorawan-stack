@@ -71,7 +71,7 @@ message UplinkMessage {
   //   - Lat: rx_metadata.location.latitude
   //   - Lon: rx_metadata.location.longitude
 
-  bytes raw_payload = 1 [(validate.rules).bytes = {min_len:6, max_len:255}];
+  bytes raw_payload = 1;
   Message payload = 2;
   TxSettings settings = 4 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   repeated RxMetadata rx_metadata = 5 [(validate.rules).repeated.min_items = 1];
@@ -124,7 +124,7 @@ message DownlinkMessage {
   //   - ID: request.gateway_ids.gateway_id
   //  - HiPriorityFlag: request.priority >= HIGH
 
-  bytes raw_payload = 1 [(validate.rules).bytes = {min_len:6, max_len:255}];
+  bytes raw_payload = 1;
   Message payload = 2;
   EndDeviceIdentifiers end_device_ids = 3 [(gogoproto.customname) = "EndDeviceIDs"];
   oneof settings {
