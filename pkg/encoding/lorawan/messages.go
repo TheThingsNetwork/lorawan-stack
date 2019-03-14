@@ -585,14 +585,12 @@ func GetUplinkMessageIdentifiers(msg *ttnpb.UplinkMessage) (ttnpb.EndDeviceIdent
 	if n == 0 {
 		return ttnpb.EndDeviceIdentifiers{}, errMissing("PHYPayload")
 	}
-	if msg.Payload == nil {
-		msg.Payload = &ttnpb.Message{}
-	}
-	if err := UnmarshalMHDR(msg.RawPayload[0:1], &msg.Payload.MHDR); err != nil {
+	var mhdr ttnpb.MHDR
+	if err := UnmarshalMHDR(msg.RawPayload[0:1], &mhdr); err != nil {
 		return ttnpb.EndDeviceIdentifiers{}, errFailedDecoding("MHDR").WithCause(err)
 	}
 	var ids ttnpb.EndDeviceIdentifiers
-	switch msg.Payload.MHDR.MType {
+	switch mhdr.MType {
 	case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:
 		if n < 12 {
 			return ttnpb.EndDeviceIdentifiers{}, errExpectedLengthHigherOrEqual("FHDR", 7)(n - 5)
@@ -637,6 +635,6 @@ func GetUplinkMessageIdentifiers(msg *ttnpb.UplinkMessage) (ttnpb.EndDeviceIdent
 		}
 		return ids, nil
 	default:
-		return ttnpb.EndDeviceIdentifiers{}, errUnknown("MType")(msg.Payload.MType.String())
+		return ttnpb.EndDeviceIdentifiers{}, errUnknown("MType")(mhdr.MType.String())
 	}
 }
