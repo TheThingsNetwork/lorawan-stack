@@ -1,0 +1,153 @@
+// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package shared
+
+import (
+	"testing"
+
+	"github.com/smartystreets/assertions"
+	"github.com/smartystreets/assertions/should"
+	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
+)
+
+func TestSX1301Conf(t *testing.T) {
+	a := assertions.New(t)
+	for _, tc := range []struct {
+		Name         string
+		FP           *frequencyplans.FrequencyPlan
+		SX1301Config SX1301Config
+	}{
+		{
+			"EU_863_870",
+			&frequencyplans.FrequencyPlan{
+				BandID: "EU_863_870",
+				UplinkChannels: []frequencyplans.Channel{
+					{Frequency: 868100000, Radio: 1, MinDataRate: 0, MaxDataRate: 5},
+					{Frequency: 868300000, Radio: 1, MinDataRate: 0, MaxDataRate: 5},
+					{Frequency: 868500000, Radio: 1, MinDataRate: 0, MaxDataRate: 5},
+					{Frequency: 867100000, Radio: 0, MinDataRate: 0, MaxDataRate: 5},
+					{Frequency: 867300000, Radio: 0, MinDataRate: 0, MaxDataRate: 5},
+					{Frequency: 867500000, Radio: 0, MinDataRate: 0, MaxDataRate: 5},
+					{Frequency: 867700000, Radio: 0, MinDataRate: 0, MaxDataRate: 5},
+					{Frequency: 867900000, Radio: 0, MinDataRate: 0, MaxDataRate: 5},
+				},
+				DownlinkChannels: []frequencyplans.Channel{
+					{Frequency: 868100000, Radio: 1, MinDataRate: 0, MaxDataRate: 5},
+					{Frequency: 868300000, Radio: 1, MinDataRate: 0, MaxDataRate: 5},
+					{Frequency: 868500000, Radio: 1, MinDataRate: 0, MaxDataRate: 5},
+					{Frequency: 867100000, Radio: 0, MinDataRate: 0, MaxDataRate: 5},
+					{Frequency: 867300000, Radio: 0, MinDataRate: 0, MaxDataRate: 5},
+					{Frequency: 867500000, Radio: 0, MinDataRate: 0, MaxDataRate: 5},
+					{Frequency: 867700000, Radio: 0, MinDataRate: 0, MaxDataRate: 5},
+					{Frequency: 867900000, Radio: 0, MinDataRate: 0, MaxDataRate: 5},
+				},
+				LoRaStandardChannel: &frequencyplans.LoRaStandardChannel{
+					Frequency: 868300000,
+					DataRate:  6,
+					Radio:     1,
+				},
+				FSKChannel: &frequencyplans.FSKChannel{
+					Frequency: 868800000,
+					DataRate:  7,
+					Radio:     1,
+				},
+				Radios: []frequencyplans.Radio{
+					{
+						Enable:     true,
+						ChipType:   "SX1257",
+						Frequency:  867500000,
+						RSSIOffset: -166,
+						TxConfiguration: &frequencyplans.RadioTxConfiguration{
+							MinFrequency: 863000000,
+							MaxFrequency: 870000000,
+						},
+					},
+					{
+						Enable:     true,
+						ChipType:   "SX1257",
+						RSSIOffset: -166,
+						Frequency:  868500000,
+					},
+				},
+				ClockSource: 1,
+			},
+			SX1301Config{
+				LoRaWANPublic: true,
+				ClockSource:   1,
+				AntennaGain:   0,
+				Radios: []RFConfig{
+					{
+						Enable:     true,
+						Type:       "SX1257",
+						Frequency:  867500000,
+						TxEnable:   true,
+						TxFreqMin:  863000000,
+						TxFreqMax:  870000000,
+						RSSIOffset: -166,
+					},
+					{
+						Enable: true, Type: "SX1257",
+						Frequency:  868500000,
+						TxEnable:   false,
+						TxFreqMin:  0,
+						TxFreqMax:  0,
+						RSSIOffset: -166,
+					},
+				},
+				Channels: []IFConfig{
+					{Description: "Lora MAC, 125kHz, all SF, 868.1 MHz", Enable: true, Radio: 1, IFValue: -400000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+					{Description: "Lora MAC, 125kHz, all SF, 868.3 MHz", Enable: true, Radio: 1, IFValue: -200000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+					{Description: "Lora MAC, 125kHz, all SF, 868.5 MHz", Enable: true, Radio: 1, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+					{Description: "Lora MAC, 125kHz, all SF, 867.1 MHz", Enable: true, Radio: 0, IFValue: -400000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+					{Description: "Lora MAC, 125kHz, all SF, 867.3 MHz", Enable: true, Radio: 0, IFValue: -200000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+					{Description: "Lora MAC, 125kHz, all SF, 867.5 MHz", Enable: true, Radio: 0, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+					{Description: "Lora MAC, 125kHz, all SF, 867.7 MHz", Enable: true, Radio: 0, IFValue: 200000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+					{Description: "Lora MAC, 125kHz, all SF, 867.9 MHz", Enable: true, Radio: 0, IFValue: 400000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+				},
+				LoRaStandardChannel: &IFConfig{Description: "Lora MAC, 250kHz, SF7, 868.3 MHz", Enable: true, Radio: 1, IFValue: -200000, Bandwidth: 250000, SpreadFactor: 7, Datarate: 0},
+				FSKChannel:          &IFConfig{Description: "FSK 50kbps, 868.8 MHz", Enable: true, Radio: 1, IFValue: 300000, Bandwidth: 125000, SpreadFactor: 0, Datarate: 50000},
+				TxLUTConfigs: []TxLUTConfig{
+					{Description: "TX gain table, index 0", PAGain: 0, MixGain: 8, RFPower: -6, DigGain: 0},
+					{Description: "TX gain table, index 1", PAGain: 0, MixGain: 10, RFPower: -3, DigGain: 0},
+					{Description: "TX gain table, index 2", PAGain: 0, MixGain: 12, RFPower: 0, DigGain: 0},
+					{Description: "TX gain table, index 3", PAGain: 1, MixGain: 8, RFPower: 3, DigGain: 0},
+					{Description: "TX gain table, index 4", PAGain: 1, MixGain: 10, RFPower: 6, DigGain: 0},
+					{Description: "TX gain table, index 5", PAGain: 1, MixGain: 12, RFPower: 10, DigGain: 0},
+					{Description: "TX gain table, index 6", PAGain: 1, MixGain: 13, RFPower: 11, DigGain: 0},
+					{Description: "TX gain table, index 7", PAGain: 2, MixGain: 9, RFPower: 12, DigGain: 0},
+					{Description: "TX gain table, index 8", PAGain: 1, MixGain: 15, RFPower: 13, DigGain: 0},
+					{Description: "TX gain table, index 9", PAGain: 2, MixGain: 10, RFPower: 14, DigGain: 0},
+					{Description: "TX gain table, index 10", PAGain: 2, MixGain: 11, RFPower: 16, DigGain: 0},
+					{Description: "TX gain table, index 11", PAGain: 3, MixGain: 9, RFPower: 20, DigGain: 0},
+					{Description: "TX gain table, index 12", PAGain: 3, MixGain: 10, RFPower: 23, DigGain: 0},
+					{Description: "TX gain table, index 13", PAGain: 3, MixGain: 11, RFPower: 25, DigGain: 0},
+					{Description: "TX gain table, index 14", PAGain: 3, MixGain: 12, RFPower: 26, DigGain: 0},
+					{Description: "TX gain table, index 15", PAGain: 3, MixGain: 14, RFPower: 27, DigGain: 0},
+				},
+			},
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			cfg, err := BuildSX1301Config(tc.FP)
+			if !a.So(err, should.BeNil) {
+				t.Fatalf("Unexpected error: %v", err)
+			}
+			if !(a.So(*cfg, should.Resemble, tc.SX1301Config)) {
+				t.Fatalf("Invalid config: %v", cfg)
+			}
+		})
+	}
+
+}

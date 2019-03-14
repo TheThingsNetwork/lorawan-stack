@@ -12,22 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package pfconfig implements the JSON configuration of Semtech's reference Packet Forwarder.
-package pfconfig
+// Package shared contains the configuration that is common to various gateway types.
+package shared
 
 import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"math"
+	"time"
 
+	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 )
-
-// Config represents the full configuration for Semtech's reference Packet Forwarder.
-type Config struct {
-	SX1301Conf  SX1301Config `json:"SX1301_conf"`
-	GatewayConf GatewayConf  `json:"gateway_conf"`
-}
 
 // SX1301Config contains the configuration for the SX1301 concentrator.
 // It marshals to compliant JSON, but does currently **not** unmarshal from it.
@@ -42,6 +40,11 @@ type SX1301Config struct {
 	FSKChannel          *IFConfig
 	TxLUTConfigs        []TxLUTConfig
 }
+
+var errUnmarshalNotImplemented = errors.DefineUnimplemented(
+	"unmarshal_not_implemented",
+	"unmarshaling SX1301 config is not implemented",
+)
 
 type kv struct {
 	key   string
@@ -107,11 +110,6 @@ func (c SX1301Config) MarshalJSON() ([]byte, error) {
 	}
 	return json.Marshal(m)
 }
-
-var errUnmarshalNotImplemented = errors.DefineUnimplemented(
-	"unmarshal_not_implemented",
-	"unmarshaling SX1301 config is not implemented",
-)
 
 // UnmarshalJSON implements json.Unmarshaler. It currently just errors because
 // unmarshaling is not supported.
@@ -215,11 +213,107 @@ func init() {
 	}
 }
 
-// GatewayConf contains the configuration for the gateway's server connection.
-type GatewayConf struct {
-	ServerAddress  string        `json:"server_address"`
-	ServerPortUp   uint32        `json:"serv_port_up"`
-	ServerPortDown uint32        `json:"serv_port_down"`
-	Enabled        bool          `json:"serv_enabled,omitempty"` // only used inside servers
-	Servers        []GatewayConf `json:"servers,omitempty"`
+// BuildSX1301Config builds the SX1301 configuration for the given frequency plan.
+func BuildSX1301Config(frequencyPlan *frequencyplans.FrequencyPlan) (*SX1301Config, error) {
+	band, err := band.GetByID(frequencyPlan.BandID)
+	if err != nil {
+		return nil, err
+	}
+
+	conf := new(SX1301Config)
+
+	conf.LoRaWANPublic = true
+	conf.ClockSource = frequencyPlan.ClockSource
+
+	if frequencyPlan.LBT != nil {
+		lbtConfig := &LBTConfig{
+			Enable:     true,
+			RSSITarget: frequencyPlan.LBT.RSSITarget,
+			RSSIOffset: frequencyPlan.LBT.RSSIOffset,
+		}
+		for i, channel := range frequencyPlan.DownlinkChannels {
+			if i > 7 {
+				break
+			}
+			lbtConfig.ChannelConfigs = append(lbtConfig.ChannelConfigs, LBTChannelConfig{
+				Frequency:            channel.Frequency,
+				ScanTimeMicroseconds: uint32(frequencyPlan.LBT.ScanTime / time.Microsecond),
+			})
+		}
+		conf.LBTConfig = lbtConfig
+	}
+
+	conf.Radios = make([]RFConfig, len(frequencyPlan.Radios))
+	for i, radio := range frequencyPlan.Radios {
+		rfConfig := RFConfig{
+			Enable:     radio.Enable,
+			Type:       radio.ChipType,
+			Frequency:  radio.Frequency,
+			RSSIOffset: radio.RSSIOffset,
+		}
+		if radio.TxConfiguration != nil {
+			rfConfig.TxEnable = true
+			rfConfig.TxFreqMin = radio.TxConfiguration.MinFrequency
+			rfConfig.TxFreqMax = radio.TxConfiguration.MaxFrequency
+			if radio.TxConfiguration.NotchFrequency != nil {
+				rfConfig.TxNotchFreq = *radio.TxConfiguration.NotchFrequency
+			}
+		}
+		conf.Radios[i] = rfConfig
+	}
+
+	numChannels := len(frequencyPlan.UplinkChannels)
+	if numChannels < 8 {
+		numChannels = 8
+	}
+	conf.Channels = make([]IFConfig, numChannels)
+	for i, channel := range frequencyPlan.UplinkChannels {
+		ifConfig := IFConfig{
+			Description: fmt.Sprintf("Lora MAC, 125kHz, all SF, %s MHz", formatFrequency(channel.Frequency)),
+			Enable:      true,
+			Radio:       channel.Radio,
+			IFValue:     int32(int64(channel.Frequency) - int64(conf.Radios[channel.Radio].Frequency)),
+		}
+		conf.Channels[i] = ifConfig
+	}
+
+	conf.LoRaStandardChannel = &IFConfig{Enable: false}
+	if channel := frequencyPlan.LoRaStandardChannel; channel != nil {
+		if lora := band.DataRates[channel.DataRate].Rate.GetLoRa(); lora != nil {
+			conf.LoRaStandardChannel = &IFConfig{
+				Description:  fmt.Sprintf("Lora MAC, %dkHz, SF%d, %s MHz", lora.Bandwidth/1000, lora.SpreadingFactor, formatFrequency(channel.Frequency)),
+				Enable:       true,
+				Radio:        channel.Radio,
+				IFValue:      int32(int64(channel.Frequency) - int64(conf.Radios[channel.Radio].Frequency)),
+				Bandwidth:    lora.Bandwidth,
+				SpreadFactor: uint8(lora.SpreadingFactor),
+			}
+		}
+	}
+
+	conf.FSKChannel = &IFConfig{Enable: false}
+	if channel := frequencyPlan.FSKChannel; channel != nil {
+		if fsk := band.DataRates[channel.DataRate].Rate.GetFSK(); fsk != nil {
+			conf.FSKChannel = &IFConfig{
+				Description: fmt.Sprintf("FSK %dkbps, %s MHz", fsk.BitRate/1000, formatFrequency(channel.Frequency)),
+				Enable:      true,
+				Radio:       channel.Radio,
+				IFValue:     int32(int64(channel.Frequency) - int64(conf.Radios[channel.Radio].Frequency)),
+				Bandwidth:   125000,
+				Datarate:    fsk.BitRate,
+			}
+		}
+	}
+
+	conf.TxLUTConfigs = defaultTxLUTConfigs
+
+	return conf, nil
+}
+
+func formatFrequency(frequency uint64) string {
+	freq := float64(frequency) / 1000000
+	if freq*10 == math.Floor(freq*10) {
+		return fmt.Sprintf("%.1f", freq)
+	}
+	return fmt.Sprintf("%g", freq)
 }

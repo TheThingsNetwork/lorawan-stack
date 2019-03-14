@@ -108,9 +108,9 @@ require (
 	gocloud.dev v0.9.0
 	golang.org/x/crypto v0.0.0-20190211182817-74369b46fc67
 	golang.org/x/image v0.0.0-20190209060608-ef4a1470e0dc // indirect
-	golang.org/x/net v0.0.0-20190206173232-65e2d4e15006
+	golang.org/x/net v0.0.0-20190311031020-56fb01167e7d
 	golang.org/x/oauth2 v0.0.0-20190211225200-5f6b76b7c9dd
-	golang.org/x/sys v0.0.0-20190209173611-3b5209105503 // indirect
+	golang.org/x/sys v0.0.0-20190310054646-10058d7d4faa // indirect
 	golang.org/x/tools v0.0.0-20190211224914-44bee7e801e4
 	google.golang.org/genproto v0.0.0-20190201180003-4b09977fb922
 	google.golang.org/grpc v1.18.0
