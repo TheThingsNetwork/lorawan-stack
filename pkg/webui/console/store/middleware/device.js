@@ -20,9 +20,9 @@ import * as device from '../actions/device'
 const getDeviceLogic = createLogic({
   type: [ device.GET_DEV ],
   async process ({ getState, action }, dispatch, done) {
-    const { id } = action
+    const { appId, deviceId, selector, options } = action
     try {
-      const dev = await api.v3.is.device.get(id)
+      const dev = await api.devices.get(appId, deviceId, selector, options)
       dispatch(device.getDeviceSuccess(dev))
     } catch (e) {
       dispatch(device.getDeviceFailure(e))

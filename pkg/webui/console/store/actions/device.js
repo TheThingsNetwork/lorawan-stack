@@ -16,8 +16,8 @@ export const GET_DEV = 'GET_DEVICE'
 export const GET_DEV_SUCCESS = 'GET_DEVICE_SUCCESS'
 export const GET_DEV_FAILURE = 'GET_DEVICE_FAILURE'
 
-export const getDevice = id => (
-  { type: GET_DEV, id }
+export const getDevice = (appId, deviceId, selector, options) => (
+  { type: GET_DEV, appId, deviceId, selector, options }
 )
 
 export const getDeviceSuccess = device => (
