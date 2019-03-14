@@ -71,7 +71,7 @@ func (protobufv2) FromDownlink(down *ttnpb.DownlinkMessage) ([]byte, error) {
 		return nil, errNotScheduled
 	}
 	lorawan := &legacyttnpb.LoRaWANTxConfiguration{}
-	if pld, ok := down.Payload.Payload.(*ttnpb.Message_MACPayload); ok {
+	if pld, ok := down.GetPayload().GetPayload().(*ttnpb.Message_MACPayload); ok {
 		lorawan.FCnt = pld.MACPayload.FHDR.FCnt
 	}
 	switch dr := settings.DataRate.Modulation.(type) {
