@@ -3716,6 +3716,15 @@
       "file": "registry.go"
     }
   },
+  "error:pkg/networkserver:application_downlink_too_long": {
+    "translations": {
+      "en": "application downlink payload is too long"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "downlink.go"
+    }
+  },
   "error:pkg/networkserver:channel_index": {
     "translations": {
       "en": "invalid channel index"
