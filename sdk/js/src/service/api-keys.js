@@ -15,7 +15,7 @@
 import Marshaler from '../util/marshaler'
 
 class ApiKeys {
-  constructor (registry, parentRoutes) {
+  constructor (registry, { parentRoutes }) {
     this._api = registry
     this._parentRoutes = parentRoutes
   }
