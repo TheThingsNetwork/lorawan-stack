@@ -67,25 +67,25 @@ export default {
     },
   },
   applications: {
-    list: ttnClient.Applications.getAll,
-    search: ttnClient.Applications.search,
+    list: ttnClient.Applications.getAll.bind(ttnClient.Applications),
+    search: ttnClient.Applications.search.bind(ttnClient.Applications),
   },
   application: {
-    get: ttnClient.Applications.getById,
-    'delete': ttnClient.Applications.deleteById,
-    create: ttnClient.Applications.create,
-    update: ttnClient.Applications.updateById,
+    get: ttnClient.Applications.getById.bind(ttnClient.Applications),
+    'delete': ttnClient.Applications.deleteById.bind(ttnClient.Applications),
+    create: ttnClient.Applications.create.bind(ttnClient.Applications),
+    update: ttnClient.Applications.updateById.bind(ttnClient.Applications),
     apiKeys: {
-      list: ttnClient.Applications.ApiKeys.getAll,
-      update: ttnClient.Applications.ApiKeys.updateById,
-      'delete': ttnClient.Applications.ApiKeys.deleteById,
-      create: ttnClient.Applications.ApiKeys.create,
+      list: ttnClient.Applications.ApiKeys.getAll.bind(ttnClient.Applications.ApiKeys),
+      update: ttnClient.Applications.ApiKeys.updateById.bind(ttnClient.Applications.ApiKeys),
+      'delete': ttnClient.Applications.ApiKeys.deleteById.bind(ttnClient.Applications.ApiKeys),
+      create: ttnClient.Applications.ApiKeys.create.bind(ttnClient.Applications.ApiKeys),
     },
     link: {
-      get: ttnClient.Applications.Link.get,
-      set: ttnClient.Applications.Link.set,
-      'delete': ttnClient.Applications.Link.delete,
-      stats: ttnClient.Applications.Link.getStats,
+      get: ttnClient.Applications.Link.get.bind(ttnClient.Applications.Link),
+      set: ttnClient.Applications.Link.set.bind(ttnClient.Applications.Link),
+      'delete': ttnClient.Applications.Link.delete.bind(ttnClient.Applications.Link),
+      stats: ttnClient.Applications.Link.getStats.bind(ttnClient.Applications.Link),
     },
   },
   devices: {
@@ -97,6 +97,6 @@ export default {
     search: stubs.gateways.search,
   },
   rights: {
-    applications: ttnClient.Applications.getRightsById,
+    applications: ttnClient.Applications.getRightsById.bind(ttnClient.Applications),
   },
 }
