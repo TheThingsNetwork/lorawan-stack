@@ -37,13 +37,17 @@ var (
 )
 
 func applyDeviceFieldMask(dst, src *ttnpb.EndDevice, paths ...string) (*ttnpb.EndDevice, error) {
+	paths = append(paths, "ids")
+
 	if dst == nil {
 		dst = &ttnpb.EndDevice{}
 	}
-	if err := dst.SetFields(src, append(paths, "ids")...); err != nil {
+	if err := dst.SetFields(src, paths...); err != nil {
 		return nil, err
 	}
-	// TODO: Validation after applying fieldmasks https://github.com/TheThingsNetwork/lorawan-stack/issues/51
+	if err := dst.ValidateFields(paths...); err != nil {
+		return nil, err
+	}
 	return dst, nil
 }
 
@@ -67,12 +71,29 @@ func (r *DeviceRegistry) uidKey(uid string) string {
 	return r.Redis.Key("uid", uid)
 }
 
-func (r *DeviceRegistry) euiKey(devEUI, joinEUI types.EUI64) string {
+func (r *DeviceRegistry) euiKey(joinEUI, devEUI types.EUI64) string {
 	return r.Redis.Key("eui", joinEUI.String(), devEUI.String())
 }
 
 func (r *DeviceRegistry) provisionerKey(provisionerID, pid string) string {
 	return r.Redis.Key("provisioner", provisionerID, pid)
+}
+
+// GetByID gets device by appID, devID.
+func (r *DeviceRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, error) {
+	ids := ttnpb.EndDeviceIdentifiers{
+		ApplicationIdentifiers: appID,
+		DeviceID:               devID,
+	}
+	if err := ids.ValidateContext(ctx); err != nil {
+		return nil, err
+	}
+
+	pb := &ttnpb.EndDevice{}
+	if err := ttnredis.GetProto(r.Redis, r.uidKey(unique.ID(ctx, ids))).ScanProto(pb); err != nil {
+		return nil, err
+	}
+	return applyDeviceFieldMask(nil, pb, paths...)
 }
 
 // GetByEUI gets device by joinEUI, devEUI.
@@ -82,7 +103,7 @@ func (r *DeviceRegistry) GetByEUI(ctx context.Context, joinEUI types.EUI64, devE
 	}
 
 	pb := &ttnpb.EndDevice{}
-	if err := ttnredis.GetProto(r.Redis, r.euiKey(joinEUI, devEUI)).ScanProto(pb); err != nil {
+	if err := ttnredis.FindProto(r.Redis, r.euiKey(joinEUI, devEUI), r.uidKey).ScanProto(pb); err != nil {
 		return nil, err
 	}
 	return applyDeviceFieldMask(&ttnpb.EndDevice{}, pb, paths...)
@@ -95,8 +116,152 @@ func equalEUI(x, y *types.EUI64) bool {
 	return x.Equal(*y)
 }
 
+func (r *DeviceRegistry) set(tx *redis.Tx, uid string, gets []string, f func(pb *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+	uk := r.uidKey(uid)
+
+	cmd := ttnredis.GetProto(tx, uk)
+	stored := &ttnpb.EndDevice{}
+	if err := cmd.ScanProto(stored); errors.IsNotFound(err) {
+		stored = nil
+	} else if err != nil {
+		return nil, err
+	}
+
+	var pb *ttnpb.EndDevice
+	var err error
+	if stored != nil {
+		pb = &ttnpb.EndDevice{}
+		if err := cmd.ScanProto(pb); err != nil {
+			return nil, err
+		}
+		pb, err = applyDeviceFieldMask(nil, pb, gets...)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	var sets []string
+	pb, sets, err = f(pb)
+	if err != nil {
+		return nil, err
+	}
+	if stored == nil && pb == nil {
+		return nil, nil
+	}
+
+	var pipelined func(redis.Pipeliner) error
+	if pb == nil {
+		pipelined = func(p redis.Pipeliner) error {
+			p.Del(uk)
+			if stored.JoinEUI != nil && stored.DevEUI != nil {
+				p.Del(r.euiKey(*stored.JoinEUI, *stored.DevEUI))
+			}
+			pid, err := provisionerUniqueID(stored)
+			if err != nil {
+				return err
+			}
+			if pid != "" {
+				p.Del(r.provisionerKey(stored.ProvisionerID, pid))
+			}
+			return nil
+		}
+	} else {
+		if pb.JoinEUI == nil || pb.DevEUI == nil {
+			return nil, errInvalidIdentifiers
+		}
+
+		pb.UpdatedAt = time.Now().UTC()
+		sets = append(sets, "updated_at")
+
+		updated := &ttnpb.EndDevice{}
+		var updatedPID string
+		if stored == nil {
+			pb.CreatedAt = pb.UpdatedAt
+			sets = append(sets, "created_at")
+
+			updated, err = applyDeviceFieldMask(updated, pb, sets...)
+			if err != nil {
+				return nil, err
+			}
+			updatedPID, err = provisionerUniqueID(updated)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			if err := cmd.ScanProto(updated); err != nil {
+				return nil, err
+			}
+			updated, err = applyDeviceFieldMask(updated, pb, sets...)
+			if err != nil {
+				return nil, err
+			}
+			storedPID, err := provisionerUniqueID(stored)
+			if err != nil {
+				return nil, err
+			}
+			updatedPID, err = provisionerUniqueID(updated)
+			if err != nil {
+				return nil, err
+			}
+			if !equalEUI(stored.JoinEUI, updated.JoinEUI) || !equalEUI(stored.DevEUI, updated.DevEUI) ||
+				stored.ApplicationIdentifiers != updated.ApplicationIdentifiers || stored.DeviceID != updated.DeviceID ||
+				storedPID != updatedPID {
+				return nil, errInvalidIdentifiers
+			}
+		}
+		pb, err = applyDeviceFieldMask(nil, updated, gets...)
+		if err != nil {
+			return nil, err
+		}
+
+		pipelined = func(p redis.Pipeliner) error {
+			if stored == nil {
+				ek := r.euiKey(*pb.JoinEUI, *pb.DevEUI)
+				if err := tx.Watch(ek).Err(); err != nil {
+					return err
+				}
+				i, err := tx.Exists(ek).Result()
+				if err != nil {
+					return ttnredis.ConvertError(err)
+				}
+				if i != 0 {
+					return errDuplicateIdentifiers
+				}
+				p.SetNX(ek, uid, 0)
+			}
+
+			if updatedPID != "" {
+				pk := r.provisionerKey(updated.ProvisionerID, updatedPID)
+				if err := tx.Watch(pk).Err(); err != nil {
+					return err
+				}
+				i, err := tx.Exists(pk).Result()
+				if err != nil {
+					return ttnredis.ConvertError(err)
+				}
+				if i != 0 {
+					return errAlreadyProvisioned
+				}
+				p.SetNX(pk, uid, 0)
+			}
+
+			_, err := ttnredis.SetProto(p, uk, updated, 0)
+			if err != nil {
+				return err
+			}
+
+			return nil
+		}
+	}
+	_, err = tx.Pipelined(pipelined)
+	if err != nil {
+		return nil, err
+	}
+	return pb, nil
+}
+
 // SetByEUI sets device by joinEUI, devEUI.
-func (r *DeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+func (r *DeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64, gets []string, f func(pb *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 	if joinEUI.IsZero() || devEUI.IsZero() {
 		return nil, errInvalidIdentifiers
 	}
@@ -104,149 +269,15 @@ func (r *DeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devE
 
 	var pb *ttnpb.EndDevice
 	err := r.Redis.Watch(func(tx *redis.Tx) error {
-		cmd := ttnredis.GetProto(tx, ek)
-		stored := &ttnpb.EndDevice{}
-		if err := cmd.ScanProto(stored); errors.IsNotFound(err) {
-			stored = nil
-		} else if err != nil {
-			return err
-		}
-
-		var err error
-		if stored != nil {
-			pb = &ttnpb.EndDevice{}
-			if err := cmd.ScanProto(pb); err != nil {
-				return err
-			}
-			pb, err = applyDeviceFieldMask(nil, pb, gets...)
-			if err != nil {
-				return err
-			}
-		}
-
-		var sets []string
-		pb, sets, err = f(pb)
+		uid, err := tx.Get(ek).Result()
 		if err != nil {
-			return err
+			return ttnredis.ConvertError(err)
 		}
-		if stored == nil && pb == nil {
-			return nil
+		if err := tx.Watch(r.uidKey(uid)).Err(); err != nil {
+			return ttnredis.ConvertError(err)
 		}
-
-		var f func(redis.Pipeliner) error
-		if pb == nil {
-			f = func(p redis.Pipeliner) error {
-				p.Del(ek)
-				if !stored.ApplicationIdentifiers.IsZero() && stored.DeviceID != "" {
-					p.Del(r.uidKey(unique.ID(ctx, stored.EndDeviceIdentifiers)))
-				}
-				pid, err := provisionerUniqueID(stored)
-				if err != nil {
-					return err
-				}
-				if pid != "" {
-					p.Del(r.provisionerKey(stored.ProvisionerID, pid))
-				}
-				return nil
-			}
-		} else {
-			if pb.JoinEUI == nil || *pb.JoinEUI != joinEUI ||
-				pb.DevEUI == nil || *pb.DevEUI != devEUI {
-				return errInvalidIdentifiers
-			}
-
-			pb.UpdatedAt = time.Now().UTC()
-			sets = append(sets, "updated_at")
-
-			updated := &ttnpb.EndDevice{}
-			var updatedPID string
-			if stored == nil {
-				pb.CreatedAt = pb.UpdatedAt
-				sets = append(sets, "created_at")
-
-				updated, err = applyDeviceFieldMask(updated, pb, sets...)
-				if err != nil {
-					return err
-				}
-				updatedPID, err = provisionerUniqueID(updated)
-				if err != nil {
-					return err
-				}
-			} else {
-				if err := cmd.ScanProto(updated); err != nil {
-					return err
-				}
-				updated, err = applyDeviceFieldMask(updated, pb, sets...)
-				if err != nil {
-					return err
-				}
-
-				storedPID, err := provisionerUniqueID(stored)
-				if err != nil {
-					return err
-				}
-				updatedPID, err = provisionerUniqueID(updated)
-				if err != nil {
-					return err
-				}
-				if !equalEUI(stored.JoinEUI, updated.JoinEUI) || !equalEUI(stored.DevEUI, updated.DevEUI) ||
-					stored.ApplicationIdentifiers != updated.ApplicationIdentifiers || stored.DeviceID != updated.DeviceID ||
-					storedPID != updatedPID {
-					return errInvalidIdentifiers
-				}
-			}
-			pb, err = applyDeviceFieldMask(nil, updated, gets...)
-			if err != nil {
-				return err
-			}
-
-			f = func(p redis.Pipeliner) error {
-				eid := ttnredis.Key(joinEUI.String(), devEUI.String())
-
-				if stored == nil {
-					if !updated.ApplicationIdentifiers.IsZero() && updated.DeviceID != "" {
-						ik := r.uidKey(unique.ID(ctx, updated.EndDeviceIdentifiers))
-						if err := tx.Watch(ik).Err(); err != nil {
-							return err
-						}
-						i, err := tx.Exists(ik).Result()
-						if err != nil {
-							return ttnredis.ConvertError(err)
-						}
-						if i != 0 {
-							return errDuplicateIdentifiers
-						}
-						p.SetNX(ik, r.euiKey(joinEUI, devEUI), 0)
-					}
-
-					if updatedPID != "" {
-						pk := r.provisionerKey(updated.ProvisionerID, updatedPID)
-						if err := tx.Watch(pk).Err(); err != nil {
-							return err
-						}
-						i, err := tx.Exists(pk).Result()
-						if err != nil {
-							return ttnredis.ConvertError(err)
-						}
-						if i != 0 {
-							return errAlreadyProvisioned
-						}
-						p.SetNX(pk, eid, 0)
-					}
-				}
-
-				_, err := ttnredis.SetProto(p, ek, updated, 0)
-				if err != nil {
-					return err
-				}
-				return nil
-			}
-		}
-		_, err = tx.Pipelined(f)
-		if err != nil {
-			return err
-		}
-		return nil
+		pb, err = r.set(tx, uid, gets, f)
+		return err
 	}, ek)
 	if err != nil {
 		return nil, err
@@ -254,11 +285,51 @@ func (r *DeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devE
 	return pb, nil
 }
 
+// SetByID sets device by appID, devID.
+func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(pb *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+	ids := ttnpb.EndDeviceIdentifiers{
+		ApplicationIdentifiers: appID,
+		DeviceID:               devID,
+	}
+	if err := ids.ValidateContext(ctx); err != nil {
+		return nil, err
+	}
+	uid := unique.ID(ctx, ids)
+
+	var pb *ttnpb.EndDevice
+	err := r.Redis.Watch(func(tx *redis.Tx) error {
+		var err error
+		pb, err = r.set(tx, uid, gets, func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+			updated, sets, err := f(stored)
+			if err != nil {
+				return nil, nil, err
+			}
+			if updated != nil && (updated.ApplicationIdentifiers != appID || updated.DeviceID != devID) {
+				return nil, nil, errInvalidIdentifiers
+			}
+			return updated, sets, nil
+		})
+		return err
+	}, r.uidKey(uid))
+	if err != nil {
+		return nil, err
+	}
+	return pb, nil
+}
+
 func applyKeyFieldMask(dst, src *ttnpb.SessionKeys, paths ...string) (*ttnpb.SessionKeys, error) {
+	paths = append(paths, "session_key_id")
+
 	if dst == nil {
 		dst = &ttnpb.SessionKeys{}
 	}
-	return dst, dst.SetFields(src, append(paths, "session_key_id")...)
+	if err := dst.SetFields(src, paths...); err != nil {
+		return nil, err
+	}
+	if err := dst.ValidateFields(paths...); err != nil {
+		return nil, err
+	}
+	return dst, nil
 }
 
 // KeyRegistry is an implementation of joinserver.KeyRegistry.

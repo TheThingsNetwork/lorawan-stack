@@ -22,11 +22,231 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
+// NewPopulatedFrequency returns a uint64 in range [100000, 1677721600].
+func NewPopulatedFrequency(r randyEndDevice, _ bool) uint64 {
+	return 100000 + uint64(r.Int63()%(1677721600-100000))
+}
+
 func NewPopulatedDataRateIndex(r randyEndDevice, _ bool) DataRateIndex {
 	return DataRateIndex(r.Intn(16))
 }
 
-func NewPopulatedFHDR(r randyLorawan, easy bool) *FHDR {
+func NewPopulatedChannelIndex(r randyEndDevice, _ bool) uint32 {
+	return r.Uint32() % 256
+}
+
+func NewPopulatedMACCommand_ResetInd(r randyLorawan, _ bool) *MACCommand_ResetInd {
+	out := &MACCommand_ResetInd{}
+	out.MinorVersion = MINOR_1
+	return out
+}
+
+func NewPopulatedMACCommand_ResetConf(r randyLorawan, _ bool) *MACCommand_ResetConf {
+	out := &MACCommand_ResetConf{}
+	out.MinorVersion = MINOR_1
+	return out
+}
+
+func NewPopulatedMACCommand_LinkCheckAns(r randyLorawan, _ bool) *MACCommand_LinkCheckAns {
+	out := &MACCommand_LinkCheckAns{}
+	out.Margin = r.Uint32() % 255
+	out.GatewayCount = r.Uint32() % 256
+	return out
+}
+
+func NewPopulatedMACCommand_LinkADRReq(r randyLorawan, easy bool) *MACCommand_LinkADRReq {
+	out := &MACCommand_LinkADRReq{}
+	out.DataRateIndex = NewPopulatedDataRateIndex(r, easy)
+	out.TxPowerIndex = r.Uint32() % 16
+	out.ChannelMask = make([]bool, r.Intn(17))
+	for i := 0; i < len(out.ChannelMask); i++ {
+		out.ChannelMask[i] = r.Intn(2) == 0
+	}
+	out.ChannelMaskControl = r.Uint32() % 8
+	out.NbTrans = r.Uint32() % 16
+	return out
+}
+
+func NewPopulatedMACCommand_RxParamSetupReq(r randyLorawan, easy bool) *MACCommand_RxParamSetupReq {
+	out := &MACCommand_RxParamSetupReq{}
+	out.Rx2DataRateIndex = NewPopulatedDataRateIndex(r, easy)
+	out.Rx1DataRateOffset = r.Uint32() % 8
+	out.Rx2Frequency = NewPopulatedFrequency(r, easy)
+	return out
+}
+
+func NewPopulatedMACCommand_DevStatusAns(r randyLorawan, _ bool) *MACCommand_DevStatusAns {
+	out := &MACCommand_DevStatusAns{}
+	out.Battery = r.Uint32() % 256
+	out.Margin = r.Int31() % 32
+	if r.Intn(2) == 0 {
+		out.Margin *= -1
+	}
+	return out
+}
+
+func NewPopulatedMACCommand_NewChannelReq(r randyLorawan, easy bool) *MACCommand_NewChannelReq {
+	out := &MACCommand_NewChannelReq{}
+	out.ChannelIndex = NewPopulatedChannelIndex(r, easy)
+	out.Frequency = NewPopulatedFrequency(r, easy)
+	out.MinDataRateIndex = NewPopulatedDataRateIndex(r, easy)
+	out.MaxDataRateIndex = NewPopulatedDataRateIndex(r, easy)
+	return out
+}
+
+func NewPopulatedMACCommand_DLChannelReq(r randyLorawan, easy bool) *MACCommand_DLChannelReq {
+	out := &MACCommand_DLChannelReq{}
+	out.ChannelIndex = NewPopulatedChannelIndex(r, easy)
+	out.Frequency = NewPopulatedFrequency(r, easy)
+	return out
+}
+
+func NewPopulatedMACCommand_ForceRejoinReq(r randyLorawan, easy bool) *MACCommand_ForceRejoinReq {
+	out := &MACCommand_ForceRejoinReq{}
+	out.RejoinType = RejoinType(r.Intn(3))
+	out.DataRateIndex = NewPopulatedDataRateIndex(r, easy)
+	out.MaxRetries = r.Uint32() % 8
+	out.PeriodExponent = RejoinPeriodExponent(r.Intn(8))
+	return out
+}
+
+func NewPopulatedMACCommand_PingSlotChannelReq(r randyLorawan, easy bool) *MACCommand_PingSlotChannelReq {
+	out := &MACCommand_PingSlotChannelReq{}
+	out.Frequency = NewPopulatedFrequency(r, easy)
+	out.DataRateIndex = NewPopulatedDataRateIndex(r, easy)
+	return out
+}
+
+func NewPopulatedMACCommand_BeaconTimingAns(r randyLorawan, easy bool) *MACCommand_BeaconTimingAns {
+	out := &MACCommand_BeaconTimingAns{}
+	out.Delay = r.Uint32() % 65536
+	out.ChannelIndex = r.Uint32() % 256
+	return out
+}
+
+func NewPopulatedMACCommand_BeaconFreqReq(r randyLorawan, easy bool) *MACCommand_BeaconFreqReq {
+	out := &MACCommand_BeaconFreqReq{}
+	out.Frequency = NewPopulatedFrequency(r, easy)
+	return out
+}
+
+func NewPopulatedMACCommand(r randyLorawan, easy bool) *MACCommand {
+	out := &MACCommand{}
+	out.CID = MACCommandIdentifier([]int32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 32}[r.Intn(20)])
+	switch out.CID {
+	case CID_RESET:
+		if r.Intn(2) == 1 {
+			out.Payload = &MACCommand_ResetInd_{ResetInd: NewPopulatedMACCommand_ResetInd(r, easy)}
+		} else {
+			out.Payload = &MACCommand_ResetConf_{ResetConf: NewPopulatedMACCommand_ResetConf(r, easy)}
+		}
+	case CID_LINK_CHECK:
+		if r.Intn(2) == 1 {
+			out.Payload = &MACCommand_LinkCheckAns_{LinkCheckAns: NewPopulatedMACCommand_LinkCheckAns(r, easy)}
+		}
+	case CID_LINK_ADR:
+		if r.Intn(2) == 1 {
+			out.Payload = &MACCommand_LinkADRReq_{LinkADRReq: NewPopulatedMACCommand_LinkADRReq(r, easy)}
+		} else {
+			out.Payload = &MACCommand_LinkADRAns_{LinkADRAns: NewPopulatedMACCommand_LinkADRAns(r, easy)}
+		}
+	case CID_DUTY_CYCLE:
+		if r.Intn(2) == 1 {
+			out.Payload = &MACCommand_DutyCycleReq_{DutyCycleReq: NewPopulatedMACCommand_DutyCycleReq(r, easy)}
+		}
+	case CID_RX_PARAM_SETUP:
+		if r.Intn(2) == 1 {
+			out.Payload = &MACCommand_RxParamSetupReq_{RxParamSetupReq: NewPopulatedMACCommand_RxParamSetupReq(r, easy)}
+		} else {
+			out.Payload = &MACCommand_RxParamSetupAns_{RxParamSetupAns: NewPopulatedMACCommand_RxParamSetupAns(r, easy)}
+		}
+	case CID_DEV_STATUS:
+		if r.Intn(2) == 1 {
+			out.Payload = &MACCommand_DevStatusAns_{DevStatusAns: NewPopulatedMACCommand_DevStatusAns(r, easy)}
+		}
+	case CID_NEW_CHANNEL:
+		if r.Intn(2) == 1 {
+			out.Payload = &MACCommand_NewChannelReq_{NewChannelReq: NewPopulatedMACCommand_NewChannelReq(r, easy)}
+		} else {
+			out.Payload = &MACCommand_NewChannelAns_{NewChannelAns: NewPopulatedMACCommand_NewChannelAns(r, easy)}
+		}
+	case CID_DL_CHANNEL:
+		if r.Intn(2) == 1 {
+			out.Payload = &MACCommand_DLChannelReq_{DLChannelReq: NewPopulatedMACCommand_DLChannelReq(r, easy)}
+		} else {
+			out.Payload = &MACCommand_DLChannelAns_{DLChannelAns: NewPopulatedMACCommand_DLChannelAns(r, easy)}
+		}
+	case CID_RX_TIMING_SETUP:
+		if r.Intn(2) == 1 {
+			out.Payload = &MACCommand_RxTimingSetupReq_{RxTimingSetupReq: NewPopulatedMACCommand_RxTimingSetupReq(r, easy)}
+		}
+	case CID_TX_PARAM_SETUP:
+		if r.Intn(2) == 1 {
+			out.Payload = &MACCommand_TxParamSetupReq_{TxParamSetupReq: NewPopulatedMACCommand_TxParamSetupReq(r, easy)}
+		}
+	case CID_REKEY:
+		if r.Intn(2) == 1 {
+			out.Payload = &MACCommand_RekeyInd_{RekeyInd: NewPopulatedMACCommand_RekeyInd(r, easy)}
+		} else {
+			out.Payload = &MACCommand_RekeyConf_{RekeyConf: NewPopulatedMACCommand_RekeyConf(r, easy)}
+		}
+	case CID_ADR_PARAM_SETUP:
+		if r.Intn(2) == 1 {
+			out.Payload = &MACCommand_ADRParamSetupReq_{ADRParamSetupReq: NewPopulatedMACCommand_ADRParamSetupReq(r, easy)}
+		}
+	case CID_DEVICE_TIME:
+		if r.Intn(2) == 1 {
+			out.Payload = &MACCommand_DeviceTimeAns_{DeviceTimeAns: NewPopulatedMACCommand_DeviceTimeAns(r, easy)}
+		}
+	case CID_FORCE_REJOIN:
+		if r.Intn(2) == 1 {
+			out.Payload = &MACCommand_ForceRejoinReq_{ForceRejoinReq: NewPopulatedMACCommand_ForceRejoinReq(r, easy)}
+		}
+	case CID_REJOIN_PARAM_SETUP:
+		if r.Intn(2) == 1 {
+			out.Payload = &MACCommand_RejoinParamSetupReq_{RejoinParamSetupReq: NewPopulatedMACCommand_RejoinParamSetupReq(r, easy)}
+		} else {
+			out.Payload = &MACCommand_RejoinParamSetupAns_{RejoinParamSetupAns: NewPopulatedMACCommand_RejoinParamSetupAns(r, easy)}
+		}
+	case CID_PING_SLOT_INFO:
+		if r.Intn(2) == 1 {
+			out.Payload = &MACCommand_PingSlotInfoReq_{PingSlotInfoReq: NewPopulatedMACCommand_PingSlotInfoReq(r, easy)}
+		}
+	case CID_PING_SLOT_CHANNEL:
+		if r.Intn(2) == 1 {
+			out.Payload = &MACCommand_PingSlotChannelReq_{PingSlotChannelReq: NewPopulatedMACCommand_PingSlotChannelReq(r, easy)}
+		} else {
+			out.Payload = &MACCommand_PingSlotChannelAns_{PingSlotChannelAns: NewPopulatedMACCommand_PingSlotChannelAns(r, easy)}
+		}
+	case CID_BEACON_TIMING:
+		if r.Intn(2) == 1 {
+			out.Payload = &MACCommand_BeaconTimingAns_{BeaconTimingAns: NewPopulatedMACCommand_BeaconTimingAns(r, easy)}
+		}
+	case CID_BEACON_FREQ:
+		if r.Intn(2) == 1 {
+			out.Payload = &MACCommand_BeaconFreqReq_{BeaconFreqReq: NewPopulatedMACCommand_BeaconFreqReq(r, easy)}
+		} else {
+			out.Payload = &MACCommand_BeaconFreqAns_{BeaconFreqAns: NewPopulatedMACCommand_BeaconFreqAns(r, easy)}
+		}
+	case CID_DEVICE_MODE:
+		if r.Intn(2) == 1 {
+			out.Payload = &MACCommand_DeviceModeInd_{DeviceModeInd: NewPopulatedMACCommand_DeviceModeInd(r, easy)}
+		} else {
+			out.Payload = &MACCommand_DeviceModeConf_{DeviceModeConf: NewPopulatedMACCommand_DeviceModeConf(r, easy)}
+		}
+	default:
+		if r.Intn(2) == 1 {
+			b := make([]byte, r.Intn(100))
+			for i := 0; i < len(b); i++ {
+				b[i] = byte(r.Int63())
+			}
+			out.Payload = &MACCommand_RawPayload{RawPayload: b}
+		}
+	}
+	return out
+}
+
+func NewPopulatedFHDR(r randyLorawan, _ bool) *FHDR {
 	out := &FHDR{}
 	out.DevAddr = *types.NewPopulatedDevAddr(r)
 	out.FCtrl = *NewPopulatedFCtrl(r, false)

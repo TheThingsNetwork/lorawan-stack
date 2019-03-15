@@ -15,7 +15,7 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
-import "github.com/mwitkow/go-proto-validators/validator.proto";
+import "github.com/lyft/protoc-gen-validate/validate/validate.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/field_mask.proto";
@@ -27,12 +27,12 @@ package ttn.lorawan.v3;
 option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
 message ApplicationWebhookIdentifiers {
-  ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  string webhook_id = 2 [(gogoproto.customname) = "WebhookID", (validator.field) = {regex: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , length_lt: 37}];
+  ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  string webhook_id = 2 [(gogoproto.customname) = "WebhookID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
 }
 
 message ApplicationWebhook {
-  ApplicationWebhookIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ApplicationWebhookIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
@@ -68,17 +68,17 @@ message ApplicationWebhookFormats {
 }
 
 message GetApplicationWebhookRequest {
-  ApplicationWebhookIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ApplicationWebhookIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
 }
 
 message ListApplicationWebhooksRequest {
-  ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
 }
 
 message SetApplicationWebhookRequest {
-  ApplicationWebhook webhook = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ApplicationWebhook webhook = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
 }
 

@@ -202,5 +202,81 @@ func TestEntityIdentifiers(t *testing.T) {
 	eID = ouID.EntityIdentifiers()
 	a.So(eID, should.NotBeNil)
 	a.So(eID.Identifiers(), should.Resemble, usrID)
+}
 
+func TestUserIdentifiersValidate(t *testing.T) {
+	a := assertions.New(t)
+
+	ids := UserIdentifiers{
+		UserID: "foo",
+		Email:  "foo@bar.com",
+	}
+	a.So(ids.ValidateFields(), should.BeNil)
+
+	ids = UserIdentifiers{
+		UserID: "foo",
+	}
+	a.So(ids.ValidateFields(), should.BeNil)
+
+	ids = UserIdentifiers{
+		Email: "foo@bar.com",
+	}
+	a.So(ids.ValidateFields(), should.NotBeNil)
+
+	ids = UserIdentifiers{}
+	err := ids.ValidateFields()
+	a.So(err, should.NotBeNil)
+
+	ids = UserIdentifiers{
+		UserID: "foo",
+		Email:  "foobar.com",
+	}
+	a.So(ids.ValidateFields(), should.BeNil)
+
+	ids = UserIdentifiers{
+		UserID: "_foo",
+		Email:  "foo@bar.com",
+	}
+	a.So(ids.ValidateFields(), should.NotBeNil)
+}
+
+func TestGatewayIdentifiersValidate(t *testing.T) {
+	a := assertions.New(t)
+
+	ids := GatewayIdentifiers{
+		GatewayID: "foo-gtw",
+		EUI:       &types.EUI64{0x26, 0x12, 0x34, 0x56, 0x42, 0x42, 0x42, 0x42},
+	}
+	a.So(ids.ValidateFields(), should.BeNil)
+
+	ids = GatewayIdentifiers{
+		GatewayID: "foo-gtw",
+	}
+	a.So(ids.ValidateFields(), should.BeNil)
+
+	ids = GatewayIdentifiers{
+		EUI: &types.EUI64{0x26, 0x12, 0x34, 0x56, 0x42, 0x42, 0x42, 0x42},
+	}
+	a.So(ids.ValidateFields(), should.NotBeNil)
+
+	ids = GatewayIdentifiers{}
+	err := ids.ValidateFields()
+	a.So(err, should.NotBeNil)
+
+	ids = GatewayIdentifiers{
+		GatewayID: "_foo-gtw",
+		EUI:       &types.EUI64{0x26, 0x12, 0x34, 0x56, 0x42, 0x42, 0x42, 0x42},
+	}
+	a.So(ids.ValidateFields(), should.NotBeNil)
+
+	ids = GatewayIdentifiers{
+		GatewayID: "foo-gtw",
+		EUI:       &types.EUI64{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+	}
+	a.So(ids.ValidateFields(), should.BeNil)
+
+	ids = GatewayIdentifiers{
+		EUI: new(types.EUI64),
+	}
+	a.So(ids.ValidateFields(), should.NotBeNil)
 }

@@ -15,6 +15,7 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/lyft/protoc-gen-validate/validate/validate.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
@@ -28,7 +29,7 @@ option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
 // Application is the message that defines an Application in the network.
 message Application {
-  ApplicationIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ApplicationIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
@@ -43,7 +44,7 @@ message Applications {
 }
 
 message GetApplicationRequest {
-  ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
 }
 
@@ -64,28 +65,28 @@ message ListApplicationsRequest {
 }
 
 message CreateApplicationRequest {
-  Application application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  Application application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   // Collaborator to grant all rights on the newly created application.
-  OrganizationOrUserIdentifiers collaborator = 2 [(gogoproto.nullable) = false];
+  OrganizationOrUserIdentifiers collaborator = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
 }
 
 message UpdateApplicationRequest {
-  Application application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  Application application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
 }
 
 message CreateApplicationAPIKeyRequest {
-  ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   string name = 2;
   repeated Right rights = 3;
 }
 
 message UpdateApplicationAPIKeyRequest {
-  ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  APIKey api_key = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  APIKey api_key = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
 }
 
 message SetApplicationCollaboratorRequest {
-  ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  Collaborator collaborator = 2 [(gogoproto.nullable) = false];
+  ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  Collaborator collaborator = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
 }

@@ -648,8 +648,8 @@ var DefaultMACCommands = MACCommandSpec{
 			v |= byte(pld.MaxRetries)
 			b = append(b, v)
 
-			if pld.RejoinType > 7 {
-				return nil, errExpectedLowerOrEqual("RejoinType", 7)(pld.RejoinType)
+			if pld.RejoinType > 2 {
+				return nil, errExpectedLowerOrEqual("RejoinType", 2)(pld.RejoinType)
 			}
 			// Second byte
 			v = byte(pld.RejoinType) << 4
@@ -666,7 +666,7 @@ var DefaultMACCommands = MACCommandSpec{
 				ForceRejoinReq: &ttnpb.MACCommand_ForceRejoinReq{
 					PeriodExponent: ttnpb.RejoinPeriodExponent(uint32(b[0] >> 3)),
 					MaxRetries:     uint32(b[0] & 0x7),
-					RejoinType:     uint32(b[1] >> 4),
+					RejoinType:     ttnpb.RejoinType(b[1] >> 4),
 					DataRateIndex:  ttnpb.DataRateIndex(b[1] & 0xf),
 				},
 			}
@@ -784,10 +784,10 @@ var DefaultMACCommands = MACCommandSpec{
 		AppendDownlink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
 			pld := cmd.GetPingSlotChannelReq()
 
-			if pld.Frequency > maxUint24 {
-				return nil, errExpectedLowerOrEqual("Frequency", maxUint24)(pld.Frequency)
+			if pld.Frequency < 100000 || pld.Frequency > maxUint24*100 {
+				return nil, errExpectedBetween("Frequency", 100000, maxUint24*100)(pld.Frequency)
 			}
-			b = appendUint64(b, pld.Frequency, 3)
+			b = appendUint64(b, pld.Frequency/100, 3)
 
 			if pld.DataRateIndex > 15 {
 				return nil, errExpectedLowerOrEqual("DataRateIndex", 15)(pld.DataRateIndex)
@@ -798,7 +798,7 @@ var DefaultMACCommands = MACCommandSpec{
 		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_PING_SLOT_CHANNEL, "PingSlotChannelReq", 4, func(b []byte, cmd *ttnpb.MACCommand) error {
 			cmd.Payload = &ttnpb.MACCommand_PingSlotChannelReq_{
 				PingSlotChannelReq: &ttnpb.MACCommand_PingSlotChannelReq{
-					Frequency:     parseUint64(b[0:3]),
+					Frequency:     parseUint64(b[0:3]) * 100,
 					DataRateIndex: ttnpb.DataRateIndex(b[3] & 0xf),
 				},
 			}
@@ -867,16 +867,16 @@ var DefaultMACCommands = MACCommandSpec{
 		DownlinkLength: 3,
 		AppendDownlink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
 			pld := cmd.GetBeaconFreqReq()
-			if pld.Frequency > maxUint24 {
-				return nil, errExpectedLowerOrEqual("Frequency", maxUint24)(pld.Frequency)
+			if pld.Frequency < 100000 || pld.Frequency > maxUint24*100 {
+				return nil, errExpectedBetween("Frequency", 100000, maxUint24*100)(pld.Frequency)
 			}
-			b = appendUint64(b, pld.Frequency, 3)
+			b = appendUint64(b, pld.Frequency/100, 3)
 			return b, nil
 		},
 		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_BEACON_FREQ, "BeaconFreqReq", 3, func(b []byte, cmd *ttnpb.MACCommand) error {
 			cmd.Payload = &ttnpb.MACCommand_BeaconFreqReq_{
 				BeaconFreqReq: &ttnpb.MACCommand_BeaconFreqReq{
-					Frequency: parseUint64(b[0:3]),
+					Frequency: parseUint64(b[0:3]) * 100,
 				},
 			}
 			return nil

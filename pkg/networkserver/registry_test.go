@@ -37,12 +37,10 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 
 	pb := &ttnpb.EndDevice{
 		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-			JoinEUI: &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-			DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-				ApplicationID: "test-app",
-			},
-			DeviceID: "test-dev",
+			JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+			DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"},
+			DeviceID:               "test-dev",
 		},
 		Session: &ttnpb.Session{
 			DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
@@ -83,9 +81,25 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 
 	start := time.Now()
 
-	ret, err = CreateDevice(ctx, reg, pb)
+	ret, err = reg.SetByID(ctx, pb.ApplicationIdentifiers, pb.DeviceID,
+		[]string{
+			"created_at",
+			"pending_session",
+			"session",
+			"updated_at",
+		},
+		func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+			if !a.So(stored, should.BeNil) {
+				t.Fatal("Registry is not empty")
+			}
+			return pb, []string{
+				"session",
+				"pending_session",
+			}, nil
+		},
+	)
 	if !a.So(err, should.BeNil) || !a.So(ret, should.NotBeNil) {
-		t.FailNow()
+		t.Fatalf("Failed to create device: %s", err)
 	}
 	a.So(ret.CreatedAt, should.HappenAfter, start)
 	a.So(ret.UpdatedAt, should.HappenAfter, start)
@@ -133,9 +147,25 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 	}
 	a.So(ret, should.BeNil)
 
-	ret, err = CreateDevice(ctx, reg, pbOther)
+	ret, err = reg.SetByID(ctx, pbOther.ApplicationIdentifiers, pbOther.DeviceID,
+		[]string{
+			"created_at",
+			"pending_session",
+			"session",
+			"updated_at",
+		},
+		func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+			if !a.So(stored, should.BeNil) {
+				t.Fatal("Registry is not empty")
+			}
+			return pbOther, []string{
+				"session",
+				"pending_session",
+			}, nil
+		},
+	)
 	if !a.So(err, should.BeNil) || !a.So(ret, should.NotBeNil) {
-		t.FailNow()
+		t.Fatalf("Failed to create device: %s", err)
 	}
 	a.So(ret.CreatedAt, should.HappenAfter, pb.CreatedAt)
 	a.So(ret.UpdatedAt, should.HappenAfter, pb.UpdatedAt)

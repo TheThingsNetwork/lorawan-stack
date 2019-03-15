@@ -18,6 +18,7 @@ import (
 	"context"
 	"time"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
@@ -89,13 +90,13 @@ func handleDevStatusAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MA
 		switch pld.Battery {
 		case 0:
 			dev.PowerState = ttnpb.PowerState_POWER_EXTERNAL
-			dev.BatteryPercentage = -1
+			dev.BatteryPercentage = nil
 		case 255:
 			dev.PowerState = ttnpb.PowerState_POWER_UNKNOWN
-			dev.BatteryPercentage = -1
+			dev.BatteryPercentage = nil
 		default:
 			dev.PowerState = ttnpb.PowerState_POWER_BATTERY
-			dev.BatteryPercentage = float32(pld.Battery-1) / 253
+			dev.BatteryPercentage = &pbtypes.FloatValue{Value: float32(pld.Battery-1) / 253}
 		}
 		dev.DownlinkMargin = pld.Margin
 		dev.LastDevStatusReceivedAt = &recvAt

@@ -108,3 +108,11 @@ func ProhibitFields(requested []string, search ...string) error {
 	}
 	return nil
 }
+
+func fieldsWithPrefix(prefix string, paths ...string) []string {
+	ret := make([]string, 0, len(paths))
+	for _, p := range paths {
+		ret = append(ret, prefix+"."+p)
+	}
+	return ret
+}

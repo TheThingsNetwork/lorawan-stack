@@ -72,12 +72,6 @@ func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		return nil, errUnsupportedLoRaWANVersion.WithAttributes("version", req.SelectedMACVersion)
 	}
 
-	if req.RawPayload == nil {
-		return nil, errNoPayload
-	}
-	if n := len(req.RawPayload); n != 23 {
-		return nil, errPayloadLengthMismatch.WithAttributes("length", n)
-	}
 	req.Payload = &ttnpb.Message{}
 	if err = lorawan.UnmarshalMessage(req.RawPayload, req.Payload); err != nil {
 		return nil, errDecodePayload.WithCause(err)
@@ -292,7 +286,27 @@ func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 				RawPayload:  append(b[:1], enc...),
 				SessionKeys: sessionKeys,
 			}
-			_, err = CreateKeys(ctx, srv.JS.keys, *dev.EndDeviceIdentifiers.DevEUI, &res.SessionKeys)
+			_, err = srv.JS.keys.SetByID(ctx, *dev.DevEUI, res.SessionKeys.SessionKeyID,
+				[]string{
+					"session_key_id",
+					"f_nwk_s_int_key",
+					"s_nwk_s_int_key",
+					"nwk_s_enc_key",
+					"app_s_key",
+				},
+				func(stored *ttnpb.SessionKeys) (*ttnpb.SessionKeys, []string, error) {
+					if stored != nil {
+						return nil, nil, errDuplicateIdentifiers
+					}
+					return &res.SessionKeys, []string{
+						"session_key_id",
+						"f_nwk_s_int_key",
+						"s_nwk_s_int_key",
+						"nwk_s_enc_key",
+						"app_s_key",
+					}, nil
+				},
+			)
 			if err != nil {
 				return nil, nil, err
 			}

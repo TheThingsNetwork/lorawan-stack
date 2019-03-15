@@ -17,6 +17,7 @@ package networkserver_test
 import (
 	"context"
 	"fmt"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -36,16 +37,14 @@ import (
 )
 
 func TestDeviceRegistryGet(t *testing.T) {
-	type getByIDCallKey struct{}
-
 	for _, tc := range []struct {
-		Name             string
-		ContextFunc      func(context.Context) context.Context
-		GetByIDFunc      func(context.Context, ttnpb.ApplicationIdentifiers, string, []string) (*ttnpb.EndDevice, error)
-		Request          *ttnpb.GetEndDeviceRequest
-		Device           *ttnpb.EndDevice
-		ErrorAssertion   func(*testing.T, error) bool
-		ContextAssertion func(context.Context) bool
+		Name           string
+		ContextFunc    func(context.Context) context.Context
+		GetByIDFunc    func(context.Context, ttnpb.ApplicationIdentifiers, string, []string) (*ttnpb.EndDevice, error)
+		Request        *ttnpb.GetEndDeviceRequest
+		Device         *ttnpb.EndDevice
+		ErrorAssertion func(*testing.T, error) bool
+		GetByIDCalls   uint64
 	}{
 		{
 			Name: "No device read rights",
@@ -60,7 +59,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 					},
 				})
 			},
-			GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, error) {
+			GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string) (*ttnpb.EndDevice, error) {
 				err := errors.New("GetByIDFunc must not be called")
 				test.MustTFromContext(ctx).Error(err)
 				return nil, err
@@ -83,10 +82,6 @@ func TestDeviceRegistryGet(t *testing.T) {
 				}
 				return true
 			},
-			ContextAssertion: func(ctx context.Context) bool {
-				a := assertions.New(test.MustTFromContext(ctx))
-				return a.So(test.MustCounterFromContext(ctx, getByIDCallKey{}), should.Equal, 0)
-			},
 		},
 
 		{
@@ -102,12 +97,11 @@ func TestDeviceRegistryGet(t *testing.T) {
 					},
 				})
 			},
-			GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, error) {
-				defer test.MustIncrementContextCounter(ctx, getByIDCallKey{}, 1)
+			GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string) (*ttnpb.EndDevice, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
-				a.So(paths, should.HaveSameElementsDeep, []string{
+				a.So(gets, should.HaveSameElementsDeep, []string{
 					"frequency_plan_id",
 				})
 				return &ttnpb.EndDevice{
@@ -134,30 +128,29 @@ func TestDeviceRegistryGet(t *testing.T) {
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
 				},
 			},
-			ContextAssertion: func(ctx context.Context) bool {
-				a := assertions.New(test.MustTFromContext(ctx))
-				return a.So(test.MustCounterFromContext(ctx, getByIDCallKey{}), should.Equal, 1)
-			},
+			GetByIDCalls: 1,
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
+			var getByIDCalls uint64
+
 			ns := test.Must(New(
 				component.MustNew(test.GetLogger(t), &component.Config{}),
 				&Config{
 					Devices: &MockDeviceRegistry{
-						GetByIDFunc: tc.GetByIDFunc,
+						GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string) (*ttnpb.EndDevice, error) {
+							atomic.AddUint64(&getByIDCalls, 1)
+							return tc.GetByIDFunc(ctx, appID, devID, gets)
+						},
 					},
+					DownlinkTasks:       &MockDownlinkTaskQueue{},
 					DeduplicationWindow: 42,
 					CooldownWindow:      42,
-					DownlinkTasks:       &MockDownlinkTaskQueue{},
 				})).(*NetworkServer)
 
 			ns.AddContextFiller(tc.ContextFunc)
-			ns.AddContextFiller(func(ctx context.Context) context.Context {
-				return test.ContextWithCounter(ctx, getByIDCallKey{})
-			})
 			ns.AddContextFiller(func(ctx context.Context) context.Context {
 				ctx, cancel := context.WithDeadline(ctx, time.Now().Add(Timeout))
 				_ = cancel
@@ -178,21 +171,20 @@ func TestDeviceRegistryGet(t *testing.T) {
 				a.So(dev, should.Resemble, tc.Device)
 			}
 			a.So(req, should.Resemble, tc.Request)
+			a.So(getByIDCalls, should.Equal, tc.GetByIDCalls)
 		})
 	}
 }
 
 func TestDeviceRegistrySet(t *testing.T) {
-	type setByIDCallKey struct{}
-
 	for _, tc := range []struct {
-		Name             string
-		ContextFunc      func(context.Context) context.Context
-		SetByIDFunc      func(context.Context, ttnpb.ApplicationIdentifiers, string, []string, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
-		Request          *ttnpb.SetEndDeviceRequest
-		Device           *ttnpb.EndDevice
-		ErrorAssertion   func(*testing.T, error) bool
-		ContextAssertion func(context.Context) bool
+		Name           string
+		ContextFunc    func(context.Context) context.Context
+		SetByIDFunc    func(context.Context, ttnpb.ApplicationIdentifiers, string, []string, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
+		Request        *ttnpb.SetEndDeviceRequest
+		Device         *ttnpb.EndDevice
+		ErrorAssertion func(*testing.T, error) bool
+		SetByIDCalls   uint64
 	}{
 		{
 			Name: "No device write rights",
@@ -241,10 +233,6 @@ func TestDeviceRegistrySet(t *testing.T) {
 				}
 				return true
 			},
-			ContextAssertion: func(ctx context.Context) bool {
-				a := assertions.New(test.MustTFromContext(ctx))
-				return a.So(test.MustCounterFromContext(ctx, setByIDCallKey{}), should.Equal, 0)
-			},
 		},
 
 		{
@@ -261,7 +249,6 @@ func TestDeviceRegistrySet(t *testing.T) {
 				})
 			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
-				defer test.MustIncrementContextCounter(ctx, setByIDCallKey{}, 1)
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
@@ -348,10 +335,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					ADRMargin: &pbtypes.FloatValue{Value: 4},
 				},
 			},
-			ContextAssertion: func(ctx context.Context) bool {
-				a := assertions.New(test.MustTFromContext(ctx))
-				return a.So(test.MustCounterFromContext(ctx, setByIDCallKey{}), should.Equal, 1)
-			},
+			SetByIDCalls: 1,
 		},
 
 		{
@@ -369,7 +353,6 @@ func TestDeviceRegistrySet(t *testing.T) {
 				})
 			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
-				defer test.MustIncrementContextCounter(ctx, setByIDCallKey{}, 1)
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
@@ -536,10 +519,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				}
 				return expected
 			}(),
-			ContextAssertion: func(ctx context.Context) bool {
-				a := assertions.New(test.MustTFromContext(ctx))
-				return a.So(test.MustCounterFromContext(ctx, setByIDCallKey{}), should.Equal, 1)
-			},
+			SetByIDCalls: 1,
 		},
 
 		{
@@ -556,7 +536,6 @@ func TestDeviceRegistrySet(t *testing.T) {
 				})
 			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
-				defer test.MustIncrementContextCounter(ctx, setByIDCallKey{}, 1)
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
@@ -714,10 +693,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				}
 				return expected
 			}(),
-			ContextAssertion: func(ctx context.Context) bool {
-				a := assertions.New(test.MustTFromContext(ctx))
-				return a.So(test.MustCounterFromContext(ctx, setByIDCallKey{}), should.Equal, 1)
-			},
+			SetByIDCalls: 1,
 		},
 
 		{
@@ -735,7 +711,6 @@ func TestDeviceRegistrySet(t *testing.T) {
 				})
 			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
-				defer test.MustIncrementContextCounter(ctx, setByIDCallKey{}, 1)
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
@@ -899,31 +874,30 @@ func TestDeviceRegistrySet(t *testing.T) {
 				}
 				return expected
 			}(),
-			ContextAssertion: func(ctx context.Context) bool {
-				a := assertions.New(test.MustTFromContext(ctx))
-				return a.So(test.MustCounterFromContext(ctx, setByIDCallKey{}), should.Equal, 1)
-			},
+			SetByIDCalls: 1,
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
+			var setByIDCalls uint64
+
 			ns := test.Must(New(
 				component.MustNew(test.GetLogger(t), &component.Config{}),
 				&Config{
 					Devices: &MockDeviceRegistry{
-						SetByIDFunc: tc.SetByIDFunc,
+						SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+							atomic.AddUint64(&setByIDCalls, 1)
+							return tc.SetByIDFunc(ctx, appID, devID, gets, f)
+						},
 					},
+					DownlinkTasks:       &MockDownlinkTaskQueue{},
 					DeduplicationWindow: 42,
 					CooldownWindow:      42,
-					DownlinkTasks:       &MockDownlinkTaskQueue{},
 				})).(*NetworkServer)
 			ns.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 
 			ns.AddContextFiller(tc.ContextFunc)
-			ns.AddContextFiller(func(ctx context.Context) context.Context {
-				return test.ContextWithCounter(ctx, setByIDCallKey{})
-			})
 			ns.AddContextFiller(func(ctx context.Context) context.Context {
 				ctx, cancel := context.WithDeadline(ctx, time.Now().Add(Timeout))
 				_ = cancel
@@ -935,29 +909,29 @@ func TestDeviceRegistrySet(t *testing.T) {
 			test.Must(nil, ns.Start())
 			defer ns.Close()
 
+			ctx := ns.FillContext(test.Context())
 			req := deepcopy.Copy(tc.Request).(*ttnpb.SetEndDeviceRequest)
 
-			dev, err := ttnpb.NewNsEndDeviceRegistryClient(ns.LoopbackConn()).Set(test.Context(), req)
+			dev, err := ttnpb.NewNsEndDeviceRegistryClient(ns.LoopbackConn()).Set(ctx, req)
 			if tc.ErrorAssertion != nil && a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
 				a.So(dev, should.BeNil)
 			} else if a.So(err, should.BeNil) {
 				a.So(dev, should.Resemble, tc.Device)
 			}
 			a.So(req, should.Resemble, tc.Request)
+			a.So(setByIDCalls, should.Equal, tc.SetByIDCalls)
 		})
 	}
 }
 
 func TestDeviceRegistryDelete(t *testing.T) {
-	type setByIDCallKey struct{}
-
 	for _, tc := range []struct {
-		Name             string
-		ContextFunc      func(context.Context) context.Context
-		SetByIDFunc      func(context.Context, ttnpb.ApplicationIdentifiers, string, []string, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
-		Request          *ttnpb.EndDeviceIdentifiers
-		ErrorAssertion   func(*testing.T, error) bool
-		ContextAssertion func(context.Context) bool
+		Name           string
+		ContextFunc    func(context.Context) context.Context
+		SetByIDFunc    func(context.Context, ttnpb.ApplicationIdentifiers, string, []string, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
+		Request        *ttnpb.EndDeviceIdentifiers
+		ErrorAssertion func(*testing.T, error) bool
+		SetByIDCalls   uint64
 	}{
 		{
 			Name: "No device write rights",
@@ -988,10 +962,6 @@ func TestDeviceRegistryDelete(t *testing.T) {
 				}
 				return true
 			},
-			ContextAssertion: func(ctx context.Context) bool {
-				a := assertions.New(test.MustTFromContext(ctx))
-				return a.So(test.MustCounterFromContext(ctx, setByIDCallKey{}), should.Equal, 0)
-			},
 		},
 
 		{
@@ -1008,7 +978,6 @@ func TestDeviceRegistryDelete(t *testing.T) {
 				})
 			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
-				defer test.MustIncrementContextCounter(ctx, setByIDCallKey{}, 1)
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
@@ -1027,10 +996,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 				DeviceID:               "test-dev-id",
 				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
 			},
-			ContextAssertion: func(ctx context.Context) bool {
-				a := assertions.New(test.MustTFromContext(ctx))
-				return a.So(test.MustCounterFromContext(ctx, setByIDCallKey{}), should.Equal, 1)
-			},
+			SetByIDCalls: 1,
 		},
 
 		{
@@ -1046,12 +1012,11 @@ func TestDeviceRegistryDelete(t *testing.T) {
 					},
 				})
 			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
-				defer test.MustIncrementContextCounter(ctx, setByIDCallKey{}, 1)
+			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
-				a.So(paths, should.BeNil)
+				a.So(gets, should.BeNil)
 
 				dev, sets, err := f(&ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -1070,30 +1035,29 @@ func TestDeviceRegistryDelete(t *testing.T) {
 				DeviceID:               "test-dev-id",
 				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
 			},
-			ContextAssertion: func(ctx context.Context) bool {
-				a := assertions.New(test.MustTFromContext(ctx))
-				return a.So(test.MustCounterFromContext(ctx, setByIDCallKey{}), should.Equal, 1)
-			},
+			SetByIDCalls: 1,
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
+			var setByIDCalls uint64
+
 			ns := test.Must(New(
 				component.MustNew(test.GetLogger(t), &component.Config{}),
 				&Config{
 					Devices: &MockDeviceRegistry{
-						SetByIDFunc: tc.SetByIDFunc,
+						SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+							atomic.AddUint64(&setByIDCalls, 1)
+							return tc.SetByIDFunc(ctx, appID, devID, gets, f)
+						},
 					},
+					DownlinkTasks:       &MockDownlinkTaskQueue{},
 					DeduplicationWindow: 42,
 					CooldownWindow:      42,
-					DownlinkTasks:       &MockDownlinkTaskQueue{},
 				})).(*NetworkServer)
 
 			ns.AddContextFiller(tc.ContextFunc)
-			ns.AddContextFiller(func(ctx context.Context) context.Context {
-				return test.ContextWithCounter(ctx, setByIDCallKey{})
-			})
 			ns.AddContextFiller(func(ctx context.Context) context.Context {
 				ctx, cancel := context.WithDeadline(ctx, time.Now().Add(Timeout))
 				_ = cancel
@@ -1114,6 +1078,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 				a.So(res, should.Resemble, ttnpb.Empty)
 			}
 			a.So(req, should.Resemble, tc.Request)
+			a.So(setByIDCalls, should.Equal, tc.SetByIDCalls)
 		})
 	}
 }

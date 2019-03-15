@@ -43,8 +43,10 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 
 	pb := &ttnpb.EndDevice{
 		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-			JoinEUI: &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-			DevEUI:  &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+			JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+			DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"},
+			DeviceID:               "test-dev",
 		},
 		ProvisionerID: "mock",
 		ProvisioningData: &pbtypes.Struct{
@@ -66,9 +68,25 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 
 	start := time.Now()
 
-	ret, err = CreateDevice(ctx, reg, pb)
+	ret, err = reg.SetByID(ctx, pb.ApplicationIdentifiers, pb.DeviceID,
+		[]string{
+			"created_at",
+			"provisioner_id",
+			"provisioning_data",
+			"updated_at",
+		},
+		func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+			if !a.So(stored, should.BeNil) {
+				t.Fatal("Registry is not empty")
+			}
+			return CopyEndDevice(pb), []string{
+				"provisioner_id",
+				"provisioning_data",
+			}, nil
+		},
+	)
 	if !a.So(err, should.BeNil) || !a.So(ret, should.NotBeNil) {
-		t.FailNow()
+		t.Fatalf("Failed to create device: %s", err)
 	}
 	a.So(ret.CreatedAt, should.HappenAfter, start)
 	a.So(ret.UpdatedAt, should.HappenAfter, start)
@@ -78,11 +96,14 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 	a.So(ret, should.HaveEmptyDiff, pb)
 
 	ret, err = reg.GetByEUI(ctx, *pb.EndDeviceIdentifiers.JoinEUI, *pb.EndDeviceIdentifiers.DevEUI, ttnpb.EndDeviceFieldPathsTopLevel)
-	a.So(err, should.BeNil)
+	if !a.So(err, should.BeNil) {
+		t.Fatalf("Failed to get device: %s", err)
+	}
 	a.So(ret, should.HaveEmptyDiff, pb)
 
 	pbOther := CopyEndDevice(pb)
-	pbOther.EndDeviceIdentifiers.DevEUI = &types.EUI64{0x43, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+	pbOther.DeviceID = "other-device"
+	pbOther.DevEUI = &types.EUI64{0x43, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
 
 	ret, err = reg.GetByEUI(ctx, *pbOther.EndDeviceIdentifiers.JoinEUI, *pbOther.EndDeviceIdentifiers.DevEUI, ttnpb.EndDeviceFieldPathsTopLevel)
 	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
@@ -90,12 +111,28 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 	}
 	a.So(ret, should.BeNil)
 
-	ret, err = CreateDevice(ctx, reg, pbOther)
-	if !a.So(errors.IsAlreadyExists(err), should.BeTrue) { // Conflicting provisioner unique ID.
-		t.FailNow()
+	ret, err = reg.SetByID(ctx, pbOther.ApplicationIdentifiers, pbOther.DeviceID,
+		[]string{
+			"created_at",
+			"provisioner_id",
+			"provisioning_data",
+			"updated_at",
+		},
+		func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+			if !a.So(stored, should.BeNil) {
+				t.Fatal("Registry is not empty")
+			}
+			return CopyEndDevice(pbOther), []string{
+				"provisioner_id",
+				"provisioning_data",
+			}, nil
+		},
+	)
+	if !a.So(errors.IsAlreadyExists(err), should.BeTrue) {
+		t.Fatal("Device with conflicting provisioner unique ID created")
 	}
 
-	err = DeleteDevice(ctx, reg, *pb.EndDeviceIdentifiers.JoinEUI, *pb.EndDeviceIdentifiers.DevEUI)
+	err = DeleteDevice(ctx, reg, pb.ApplicationIdentifiers, pb.DeviceID)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -106,9 +143,25 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 	}
 	a.So(ret, should.BeNil)
 
-	ret, err = CreateDevice(ctx, reg, pbOther)
+	ret, err = reg.SetByID(ctx, pbOther.ApplicationIdentifiers, pbOther.DeviceID,
+		[]string{
+			"created_at",
+			"provisioner_id",
+			"provisioning_data",
+			"updated_at",
+		},
+		func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+			if !a.So(stored, should.BeNil) {
+				t.Fatal("Registry is not empty")
+			}
+			return CopyEndDevice(pbOther), []string{
+				"provisioner_id",
+				"provisioning_data",
+			}, nil
+		},
+	)
 	if !a.So(err, should.BeNil) || !a.So(ret, should.NotBeNil) { // No more conflicts.
-		t.FailNow()
+		t.Fatalf("Failed to create device: %s", err)
 	}
 
 	a.So(ret.CreatedAt, should.HappenAfter, pb.CreatedAt)
@@ -119,10 +172,12 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 	a.So(ret, should.HaveEmptyDiff, pbOther)
 
 	ret, err = reg.GetByEUI(ctx, *pbOther.EndDeviceIdentifiers.JoinEUI, *pbOther.EndDeviceIdentifiers.DevEUI, ttnpb.EndDeviceFieldPathsTopLevel)
-	a.So(err, should.BeNil)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
 	a.So(ret, should.HaveEmptyDiff, pbOther)
 
-	err = DeleteDevice(ctx, reg, *pbOther.EndDeviceIdentifiers.JoinEUI, *pbOther.EndDeviceIdentifiers.DevEUI)
+	err = DeleteDevice(ctx, reg, pbOther.ApplicationIdentifiers, pbOther.DeviceID)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -200,11 +255,31 @@ func handleKeyRegistryTest(t *testing.T, reg KeyRegistry) {
 	}
 	a.So(ret, should.BeNil)
 
-	ret, err = CreateKeys(ctx, reg, devEUI, pb)
+	ret, err = reg.SetByID(ctx, devEUI, pb.SessionKeyID,
+		[]string{
+			"session_key_id",
+			"f_nwk_s_int_key",
+			"s_nwk_s_int_key",
+			"nwk_s_enc_key",
+			"app_s_key",
+		},
+		func(stored *ttnpb.SessionKeys) (*ttnpb.SessionKeys, []string, error) {
+			if !a.So(stored, should.BeNil) {
+				t.Fatal("Registry is not empty")
+			}
+			return CopySessionKeys(pb), []string{
+				"session_key_id",
+				"f_nwk_s_int_key",
+				"s_nwk_s_int_key",
+				"nwk_s_enc_key",
+				"app_s_key",
+			}, nil
+		},
+	)
 	if !a.So(err, should.BeNil) || !a.So(ret, should.NotBeNil) {
-		t.FailNow()
+		t.Fatalf("Failed to create keys: %s", err)
 	}
-	a.So(ret, should.HaveEmptyDiff, pb)
+	a.So(ret, should.Resemble, pb)
 
 	ret, err = reg.GetByID(ctx, devEUI, pb.SessionKeyID, ttnpb.SessionKeysFieldPathsTopLevel)
 	a.So(err, should.BeNil)
@@ -219,11 +294,31 @@ func handleKeyRegistryTest(t *testing.T, reg KeyRegistry) {
 	}
 	a.So(ret, should.BeNil)
 
-	ret, err = CreateKeys(ctx, reg, devEUIOther, pbOther)
+	ret, err = reg.SetByID(ctx, devEUIOther, pbOther.SessionKeyID,
+		[]string{
+			"session_key_id",
+			"f_nwk_s_int_key",
+			"s_nwk_s_int_key",
+			"nwk_s_enc_key",
+			"app_s_key",
+		},
+		func(stored *ttnpb.SessionKeys) (*ttnpb.SessionKeys, []string, error) {
+			if !a.So(stored, should.BeNil) {
+				t.Fatal("Registry is not empty")
+			}
+			return CopySessionKeys(pbOther), []string{
+				"session_key_id",
+				"f_nwk_s_int_key",
+				"s_nwk_s_int_key",
+				"nwk_s_enc_key",
+				"app_s_key",
+			}, nil
+		},
+	)
 	if !a.So(err, should.BeNil) || !a.So(ret, should.NotBeNil) {
-		t.FailNow()
+		t.Fatalf("Failed to create keys: %s", err)
 	}
-	a.So(ret, should.HaveEmptyDiff, pbOther)
+	a.So(ret, should.Resemble, pbOther)
 
 	ret, err = reg.GetByID(ctx, devEUIOther, pbOther.SessionKeyID, ttnpb.SessionKeysFieldPathsTopLevel)
 	a.So(err, should.BeNil)

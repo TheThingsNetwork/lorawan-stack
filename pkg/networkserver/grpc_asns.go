@@ -117,13 +117,14 @@ func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.Do
 		return nil, err
 	}
 
-	logger = logger.WithFields(log.Fields(
-		"device_class", dev.MACState.DeviceClass,
-		"queue_length", len(dev.QueuedApplicationDownlinks),
-	))
+	logger = logger.WithField("queue_length", len(dev.QueuedApplicationDownlinks))
+	if dev.MACState != nil {
+		logger = logger.WithField("device_class", dev.MACState.DeviceClass)
+	}
+
 	logger.Debug("Replaced application downlink queue")
 	if dev.MACState != nil && dev.MACState.DeviceClass != ttnpb.CLASS_A && len(dev.QueuedApplicationDownlinks) > 0 {
-		logger.WithField("device_class", dev.MACState.DeviceClass).Debug("Adding downlink task...")
+		logger.Debug("Adding downlink task...")
 		return ttnpb.Empty, ns.downlinkTasks.Add(ctx, req.EndDeviceIdentifiers, time.Now())
 	}
 	return ttnpb.Empty, nil
@@ -154,10 +155,11 @@ func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.Downl
 		return nil, err
 	}
 
-	logger = logger.WithFields(log.Fields(
-		"device_class", dev.MACState.DeviceClass,
-		"queue_length", len(dev.QueuedApplicationDownlinks),
-	))
+	logger = logger.WithField("queue_length", len(dev.QueuedApplicationDownlinks))
+	if dev.MACState != nil {
+		logger = logger.WithField("device_class", dev.MACState.DeviceClass)
+	}
+
 	logger.Debug("Pushed application downlink to queue")
 	if dev.MACState != nil && dev.MACState.DeviceClass != ttnpb.CLASS_A {
 		logger.Debug("Adding downlink task...")

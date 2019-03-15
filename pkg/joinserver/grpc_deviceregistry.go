@@ -34,12 +34,6 @@ type jsEndDeviceRegistryServer struct {
 
 // Get implements ttnpb.JsEndDeviceRegistryServer.
 func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest) (*ttnpb.EndDevice, error) {
-	if req.JoinEUI == nil || req.JoinEUI.IsZero() {
-		return nil, errNoJoinEUI
-	}
-	if req.DevEUI == nil || req.DevEUI.IsZero() {
-		return nil, errNoDevEUI
-	}
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
 		return nil, err
 	}
@@ -50,8 +44,7 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 		}
 		paths = append(paths, "provisioner_id", "provisioning_data")
 	}
-	// TODO: Validate field mask (https://github.com/TheThingsNetwork/lorawan-stack/issues/39)
-	dev, err := srv.JS.devices.GetByEUI(ctx, *req.EndDeviceIdentifiers.JoinEUI, *req.EndDeviceIdentifiers.DevEUI, paths)
+	dev, err := srv.JS.devices.GetByID(ctx, req.ApplicationIdentifiers, req.DeviceID, paths)
 	if errors.IsNotFound(err) {
 		return nil, errDeviceNotFound
 	}
@@ -129,11 +122,7 @@ func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndD
 			return nil, err
 		}
 	}
-	// TODO: Validate field mask (https://github.com/TheThingsNetwork/lorawan-stack/issues/39)
-	return srv.JS.devices.SetByEUI(ctx, *req.EndDevice.JoinEUI, *req.EndDevice.DevEUI, req.FieldMask.Paths, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
-		if dev != nil && !dev.ApplicationIdentifiers.Equal(req.EndDevice.ApplicationIdentifiers) {
-			return nil, nil, errInvalidIdentifiers
-		}
+	return srv.JS.devices.SetByID(ctx, req.EndDevice.ApplicationIdentifiers, req.EndDevice.DeviceID, req.FieldMask.Paths, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		return &req.EndDevice, req.FieldMask.Paths, nil
 	})
 }
@@ -260,16 +249,10 @@ func (srv jsEndDeviceRegistryServer) Provision(req *ttnpb.ProvisionEndDevicesReq
 
 // Delete implements ttnpb.JsEndDeviceRegistryServer.
 func (srv jsEndDeviceRegistryServer) Delete(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
-	if ids.JoinEUI == nil || ids.JoinEUI.IsZero() {
-		return nil, errNoJoinEUI
-	}
-	if ids.DevEUI == nil || ids.DevEUI.IsZero() {
-		return nil, errNoDevEUI
-	}
 	if err := rights.RequireApplication(ctx, ids.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
-	_, err := srv.JS.devices.SetByEUI(ctx, *ids.JoinEUI, *ids.DevEUI, nil, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+	_, err := srv.JS.devices.SetByID(ctx, ids.ApplicationIdentifiers, ids.DeviceID, nil, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		if dev == nil || !dev.ApplicationIdentifiers.Equal(ids.ApplicationIdentifiers) {
 			return nil, nil, errDeviceNotFound
 		}

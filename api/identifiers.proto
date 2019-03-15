@@ -15,7 +15,7 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
-import "github.com/mwitkow/go-proto-validators/validator.proto";
+import "github.com/lyft/protoc-gen-validate/validate/validate.proto";
 
 package ttn.lorawan.v3;
 
@@ -25,20 +25,20 @@ option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 message ApplicationIdentifiers {
   option (gogoproto.populate) = false;
 
-  string application_id = 1 [(gogoproto.customname) = "ApplicationID", (validator.field) = {regex: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , length_lt: 37}];
+  string application_id = 1 [(gogoproto.customname) = "ApplicationID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
 }
 
 message ClientIdentifiers {
   option (gogoproto.populate) = false;
 
-  string client_id = 1 [(gogoproto.customname) = "ClientID", (validator.field) = {regex: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , length_lt: 37}];
+  string client_id = 1 [(gogoproto.customname) = "ClientID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
 }
 
 message EndDeviceIdentifiers {
   option (gogoproto.populate) = false;
 
-  string device_id = 1 [(gogoproto.customname) = "DeviceID", (validator.field) = {regex: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , length_lt: 37}];
-  ApplicationIdentifiers application_ids = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  string device_id = 1 [(gogoproto.customname) = "DeviceID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
+  ApplicationIdentifiers application_ids = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   // The LoRaWAN DevEUI.
   bytes dev_eui = 4 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "DevEUI"];
   // The LoRaWAN JoinEUI (or AppEUI for LoRaWAN 1.0 end devices).
@@ -50,7 +50,7 @@ message EndDeviceIdentifiers {
 message GatewayIdentifiers {
   option (gogoproto.populate) = false;
 
-  string gateway_id = 1 [(gogoproto.customname) = "GatewayID", (validator.field) = {regex: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , length_lt: 37}];
+  string gateway_id = 1 [(gogoproto.customname) = "GatewayID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
 
   // Secondary identifier, which can only be used in specific requests.
   bytes eui = 2 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "EUI"];
@@ -60,14 +60,14 @@ message OrganizationIdentifiers {
   option (gogoproto.populate) = false;
 
   // This ID shares namespace with user IDs.
-  string organization_id = 1 [(gogoproto.customname) = "OrganizationID", (validator.field) = {regex: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , length_lt: 37}];
+  string organization_id = 1 [(gogoproto.customname) = "OrganizationID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
 }
 
 message UserIdentifiers {
   option (gogoproto.populate) = false;
 
   // This ID shares namespace with organization IDs.
-  string user_id = 1 [(gogoproto.customname) = "UserID", (validator.field) = {regex: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , length_lt: 37}];
+  string user_id = 1 [(gogoproto.customname) = "UserID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
 
   // Secondary identifier, which can only be used in specific requests.
   string email = 2;

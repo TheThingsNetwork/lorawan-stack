@@ -15,7 +15,7 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
-import "github.com/mwitkow/go-proto-validators/validator.proto";
+import "github.com/lyft/protoc-gen-validate/validate/validate.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 import "lorawan-stack/api/error.proto";
@@ -73,8 +73,8 @@ message UplinkMessage {
 
   bytes raw_payload = 1;
   Message payload = 2;
-  TxSettings settings = 4 [(gogoproto.nullable) = false];
-  repeated RxMetadata rx_metadata = 5;
+  TxSettings settings = 4 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  repeated RxMetadata rx_metadata = 5 [(validate.rules).repeated.min_items = 1];
   // Server time when a component received the message.
   // The Gateway Server, Network Server and Application Server may set this value to their local server time of reception.
   google.protobuf.Timestamp received_at = 6 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
@@ -128,6 +128,8 @@ message DownlinkMessage {
   Message payload = 2;
   EndDeviceIdentifiers end_device_ids = 3 [(gogoproto.customname) = "EndDeviceIDs"];
   oneof settings {
+    option (validate.required) = true;
+
     TxRequest request = 4;
     TxSettings scheduled = 5;
   }
@@ -148,23 +150,23 @@ message TxAcknowledgment {
     TX_POWER = 7;
     GPS_UNLOCKED = 8;
   }
-  Result result = 2;
+  Result result = 2 [(validate.rules).enum.defined_only = true];
 }
 
 message ApplicationUplink {
   // Join Server issued identifier for the session keys used by this uplink.
   bytes session_key_id = 1 [(gogoproto.customname) = "SessionKeyID"];
-  uint32 f_port = 2;
+  uint32 f_port = 2 [(validate.rules).uint32.lte = 255];
   uint32 f_cnt = 3;
   bytes frm_payload = 4 [(gogoproto.customname) = "FRMPayload"];
   google.protobuf.Struct decoded_payload = 5;
-  repeated RxMetadata rx_metadata = 6;
-  TxSettings settings = 7 [(gogoproto.nullable) = false];
+  repeated RxMetadata rx_metadata = 6 [(validate.rules).repeated.min_items = 1];
+  TxSettings settings = 7 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
 }
 
 message ApplicationLocation {
   string service = 1;
-  Location location = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  Location location = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   map<string,string> attributes = 3;
 }
 
@@ -185,7 +187,7 @@ message ApplicationDownlink {
 
   // Join Server issued identifier for the session keys used by this downlink.
   bytes session_key_id = 1 [(gogoproto.customname) = "SessionKeyID"];
-  uint32 f_port = 2;
+  uint32 f_port = 2 [(validate.rules).uint32.lte = 255];
   uint32 f_cnt = 3;
   bytes frm_payload = 4 [(gogoproto.customname) = "FRMPayload"];
   google.protobuf.Struct decoded_payload = 5;
@@ -208,7 +210,7 @@ message ApplicationDownlink {
   // If not set, this downlink message may be transmitted in class A, B and C.
   ClassBC class_b_c = 7;
   // Priority for scheduling the downlink message.
-  TxSchedulePriority priority = 8;
+  TxSchedulePriority priority = 8 [(validate.rules).enum.defined_only = true];
 
   repeated string correlation_ids = 9 [(gogoproto.customname) = "CorrelationIDs"];
 }
@@ -218,20 +220,22 @@ message ApplicationDownlinks {
 }
 
 message ApplicationDownlinkFailed {
-  ApplicationDownlink downlink = 1  [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  ErrorDetails error = 2 [(gogoproto.nullable) = false];
+  ApplicationDownlink downlink = 1  [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  ErrorDetails error = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
 }
 
 message ApplicationInvalidatedDownlinks {
-  repeated ApplicationDownlink downlinks = 1;
+  repeated ApplicationDownlink downlinks = 1 [(validate.rules).repeated.min_items = 1];
   uint32 last_f_cnt_down = 2;
 }
 
 message ApplicationUp {
-  EndDeviceIdentifiers end_device_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  EndDeviceIdentifiers end_device_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   repeated string correlation_ids = 2 [(gogoproto.customname) = "CorrelationIDs"];
 
   oneof up {
+    option (validate.required) = true;
+
     ApplicationUplink uplink_message = 3;
     ApplicationJoinAccept join_accept = 4;
     ApplicationDownlink downlink_ack = 5;
@@ -260,11 +264,11 @@ enum PayloadFormatter {
 
 message MessagePayloadFormatters {
   // Payload formatter for uplink messages, must be set together with its parameter.
-  PayloadFormatter up_formatter = 1;
+  PayloadFormatter up_formatter = 1 [(validate.rules).enum.defined_only = true];
   // Parameter for the up_formatter, must be set together.
   string up_formatter_parameter = 2;
   // Payload formatter for downlink messages, must be set together with its parameter.
-  PayloadFormatter down_formatter = 3;
+  PayloadFormatter down_formatter = 3 [(validate.rules).enum.defined_only = true];
   // Parameter for the down_formatter, must be set together.
   string down_formatter_parameter = 4;
 }

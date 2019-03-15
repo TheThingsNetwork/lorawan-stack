@@ -1333,7 +1333,7 @@ PeerInfo
 | ----- | ---- | ----- | ----------- |
 | grpc_port | [uint32](#uint32) |  | Port on which the gRPC server is exposed. |
 | tls | [bool](#bool) |  | Indicates whether the gRPC server uses TLS. |
-| roles | [PeerInfo.Role](#ttn.lorawan.v3.PeerInfo.Role) | repeated | Roles of the peer () |
+| roles | [PeerInfo.Role](#ttn.lorawan.v3.PeerInfo.Role) | repeated | Roles of the peer. |
 | tags | [PeerInfo.TagsEntry](#ttn.lorawan.v3.PeerInfo.TagsEntry) | repeated | Tags of the peer |
 
 
@@ -1543,7 +1543,7 @@ SDKs are responsible for combining (if desired) the three.
 | last_rj_count_1 | [uint32](#uint32) |  | Last Rejoin counter value used (type 1). Stored in Join Server. |
 | last_dev_status_received_at | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | Time when last DevStatus MAC command was received. Stored in Network Server. |
 | power_state | [PowerState](#ttn.lorawan.v3.PowerState) |  | The power state of the device; whether it is battery-powered or connected to an external power source. Received via the DevStatus MAC command at status_received_at. Stored in Network Server. |
-| battery_percentage | [float](#float) |  | Latest-known battery percentage of the device. Received via the DevStatus MAC command at last_dev_status_received_at or earlier. Stored in Network Server. |
+| battery_percentage | [google.protobuf.FloatValue](#google.protobuf.FloatValue) |  | Latest-known battery percentage of the device. Received via the DevStatus MAC command at last_dev_status_received_at or earlier. Stored in Network Server. |
 | downlink_margin | [int32](#int32) |  | Demodulation signal-to-noise ratio (dB). Received via the DevStatus MAC command at last_dev_status_received_at. Stored in Network Server. |
 | recent_adr_uplinks | [UplinkMessage](#ttn.lorawan.v3.UplinkMessage) | repeated | Recent uplink messages with ADR bit set to 1 sorted by time. Stored in Network Server. The field is reset each time an uplink message carrying MACPayload is received with ADR bit set to 0. The number of messages stored is in the range [0,20]; |
 | recent_uplinks | [UplinkMessage](#ttn.lorawan.v3.UplinkMessage) | repeated | Recent uplink messages sorted by time. Stored in Network Server. The number of messages stored may depend on configuration. |
@@ -1784,12 +1784,12 @@ This is used internally by the Network Server and is read only.
 | class_b_timeout | [google.protobuf.Duration](#google.protobuf.Duration) |  | Maximum delay for the device to answer a MAC request or a confirmed downlink frame. If unset, the default value from Network Server configuration will be used. |
 | ping_slot_periodicity | [MACSettings.PingSlotPeriodValue](#ttn.lorawan.v3.MACSettings.PingSlotPeriodValue) |  | Periodicity of the class B ping slot. If unset, the default value from Network Server configuration will be used. |
 | ping_slot_data_rate_index | [MACSettings.DataRateIndexValue](#ttn.lorawan.v3.MACSettings.DataRateIndexValue) |  | Data rate index of the class B ping slot. If unset, the default value from Network Server configuration will be used. |
-| ping_slot_frequency | [uint64](#uint64) |  | Frequency of the class B ping slot (Hz). If unset, the default value from Network Server configuration will be used. |
+| ping_slot_frequency | [google.protobuf.UInt64Value](#google.protobuf.UInt64Value) |  | Frequency of the class B ping slot (Hz). If unset, the default value from Network Server configuration will be used. |
 | class_c_timeout | [google.protobuf.Duration](#google.protobuf.Duration) |  | Maximum delay for the device to answer a MAC request or a confirmed downlink frame. If unset, the default value from Network Server configuration will be used. |
 | rx1_delay | [MACSettings.RxDelayValue](#ttn.lorawan.v3.MACSettings.RxDelayValue) |  | Class A Rx1 delay. If unset, the default value from Network Server configuration or regional parameters specification will be used. |
 | rx1_data_rate_offset | [google.protobuf.UInt32Value](#google.protobuf.UInt32Value) |  | Rx1 data rate offset. If unset, the default value from Network Server configuration will be used. |
 | rx2_data_rate_index | [MACSettings.DataRateIndexValue](#ttn.lorawan.v3.MACSettings.DataRateIndexValue) |  | Data rate index for Rx2. If unset, the default value from Network Server configuration or regional parameters specification will be used. |
-| rx2_frequency | [uint64](#uint64) |  | Frequency for Rx2 (Hz). If unset, the default value from Network Server configuration or regional parameters specification will be used. |
+| rx2_frequency | [google.protobuf.UInt64Value](#google.protobuf.UInt64Value) |  | Frequency for Rx2 (Hz). If unset, the default value from Network Server configuration or regional parameters specification will be used. |
 | factory_preset_frequencies | [uint64](#uint64) | repeated | List of factory-preset frequencies. If unset, the default value from Network Server configuration or regional parameters specification will be used. |
 | max_duty_cycle | [MACSettings.AggregatedDutyCycleValue](#ttn.lorawan.v3.MACSettings.AggregatedDutyCycleValue) |  | Maximum uplink duty cycle (of all channels). |
 | supports_32_bit_f_cnt | [google.protobuf.BoolValue](#google.protobuf.BoolValue) |  | Whether the device supports 32-bit frame counters. If unset, the default value from Network Server configuration will be used. |
@@ -1801,7 +1801,7 @@ This is used internally by the Network Server and is read only.
 | desired_rx1_delay | [MACSettings.RxDelayValue](#ttn.lorawan.v3.MACSettings.RxDelayValue) |  | The Rx1 delay Network Server should configure device to use via MAC commands or Join-Accept. If unset, the default value from Network Server configuration or regional parameters specification will be used. |
 | desired_rx1_data_rate_offset | [google.protobuf.UInt32Value](#google.protobuf.UInt32Value) |  | The Rx1 data rate offset Network Server should configure device to use via MAC commands or Join-Accept. If unset, the default value from Network Server configuration will be used. |
 | desired_rx2_data_rate_index | [MACSettings.DataRateIndexValue](#ttn.lorawan.v3.MACSettings.DataRateIndexValue) |  | The Rx2 data rate index Network Server should configure device to use via MAC commands or Join-Accept. If unset, the default value from frequency plan, Network Server configuration or regional parameters specification will be used. |
-| desired_rx2_frequency | [uint64](#uint64) |  | The Rx2 frequency index Network Server should configure device to use via MAC commands. If unset, the default value from frequency plan, Network Server configuration or regional parameters specification will be used. |
+| desired_rx2_frequency | [google.protobuf.UInt64Value](#google.protobuf.UInt64Value) |  | The Rx2 frequency index Network Server should configure device to use via MAC commands. If unset, the default value from frequency plan, Network Server configuration or regional parameters specification will be used. |
 
 
 
@@ -3156,7 +3156,7 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | payload_request | [CryptoServicePayloadRequest](#ttn.lorawan.v3.CryptoServicePayloadRequest) |  |  |
-| join_request_type | [uint32](#uint32) |  |  |
+| join_request_type | [RejoinType](#ttn.lorawan.v3.RejoinType) |  |  |
 | dev_nonce | [bytes](#bytes) |  |  |
 
 
@@ -3822,7 +3822,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| rejoin_type | [uint32](#uint32) |  |  |
+| rejoin_type | [RejoinType](#ttn.lorawan.v3.RejoinType) |  |  |
 | data_rate_index | [DataRateIndex](#ttn.lorawan.v3.DataRateIndex) |  |  |
 | max_retries | [uint32](#uint32) |  |  |
 | period_exponent | [RejoinPeriodExponent](#ttn.lorawan.v3.RejoinPeriodExponent) |  | Exponent e that configures the rejoin period = 32 * 2^e &#43; rand(0,32) seconds. |
@@ -5752,7 +5752,7 @@ where the user or organization is collaborator on.
 | ----- | ---- | ----- | ----------- |
 | frequency | [uint64](#uint64) |  | Frequency (Hz). |
 | radio | [uint32](#uint32) |  |  |
-| bandwidth | [uint32](#uint32) |  |  |
+| bandwidth | [uint32](#uint32) |  | Bandwidth (Hz). |
 | spreading_factor | [uint32](#uint32) |  |  |
 
 

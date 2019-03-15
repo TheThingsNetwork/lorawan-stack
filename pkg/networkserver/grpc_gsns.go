@@ -773,11 +773,11 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 		return err
 	}
 
-	defer func() {
+	defer func(dev *ttnpb.EndDevice) {
 		if err != nil {
 			registerDropJoinRequest(ctx, &dev.EndDeviceIdentifiers, up, err)
 		}
-	}()
+	}(dev)
 
 	logger = logger.WithField("device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers))
 	ctx = log.NewContext(ctx, logger)
@@ -855,10 +855,10 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 			"supports_class_b",
 			"supports_class_c",
 		},
-		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+		func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			var paths []string
 
-			if err := resetMACState(dev, ns.Component.FrequencyPlans, ns.defaultMACSettings); err != nil {
+			if err := resetMACState(stored, ns.Component.FrequencyPlans, ns.defaultMACSettings); err != nil {
 				resetErr = true
 				return nil, nil, err
 			}
@@ -868,37 +868,37 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 				keys.NwkSEncKey = keys.FNwkSIntKey
 				keys.SNwkSIntKey = keys.FNwkSIntKey
 			}
-			dev.MACState.QueuedJoinAccept = &ttnpb.MACState_JoinAccept{
+			stored.MACState.QueuedJoinAccept = &ttnpb.MACState_JoinAccept{
 				Keys:    keys,
 				Payload: resp.RawPayload,
 				Request: *req,
 			}
-			dev.MACState.RxWindowsAvailable = true
+			stored.MACState.RxWindowsAvailable = true
 			paths = append(paths, "mac_state")
 
-			upChIdx, err := searchUplinkChannel(up.Settings.Frequency, dev)
+			upChIdx, err := searchUplinkChannel(up.Settings.Frequency, stored)
 			if err != nil {
 				return nil, nil, err
 			}
 			up.Settings.DeviceChannelIndex = uint32(upChIdx)
 
-			upDRIdx, err := searchDataRate(up.Settings.DataRate, dev, ns.Component.FrequencyPlans)
+			upDRIdx, err := searchDataRate(up.Settings.DataRate, stored, ns.Component.FrequencyPlans)
 			if err != nil {
 				return nil, nil, err
 			}
 			up.Settings.DataRateIndex = upDRIdx
 
-			dev.RecentUplinks = append(dev.RecentUplinks, up)
-			if len(dev.RecentUplinks) > recentUplinkCount {
-				dev.RecentUplinks = append(dev.RecentUplinks[:0], dev.RecentUplinks[len(dev.RecentUplinks)-recentUplinkCount:]...)
+			stored.RecentUplinks = append(stored.RecentUplinks, up)
+			if len(stored.RecentUplinks) > recentUplinkCount {
+				stored.RecentUplinks = append(stored.RecentUplinks[:0], stored.RecentUplinks[len(stored.RecentUplinks)-recentUplinkCount:]...)
 			}
 			paths = append(paths, "recent_uplinks")
 
-			invalidatedQueue = dev.QueuedApplicationDownlinks
-			dev.QueuedApplicationDownlinks = nil
+			invalidatedQueue = stored.QueuedApplicationDownlinks
+			stored.QueuedApplicationDownlinks = nil
 			paths = append(paths, "queued_application_downlinks")
 
-			return dev, paths, nil
+			return stored, paths, nil
 		})
 	if err != nil && !resetErr {
 		logger.WithError(err).Error("Failed to update device in registry")
@@ -964,16 +964,15 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 
 	logger := log.FromContext(ctx)
 
+	up.Payload = &ttnpb.Message{}
+	if err := lorawan.UnmarshalMessage(up.RawPayload, up.Payload); err != nil {
+		return nil, errDecodePayload.WithCause(err)
+	}
+
 	if up.Payload.Major != ttnpb.Major_LORAWAN_R1 {
 		return nil, errUnsupportedLoRaWANVersion.WithAttributes(
 			"major", up.Payload.Major,
 		)
-	}
-
-	if up.Payload.Payload == nil {
-		if err := lorawan.UnmarshalMessage(up.RawPayload, up.Payload); err != nil {
-			return nil, errDecodePayload.WithCause(err)
-		}
 	}
 
 	logger.Debug("Deduplicating uplink...")

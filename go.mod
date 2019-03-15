@@ -65,6 +65,7 @@ require (
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/gommon v0.2.8
 	github.com/lib/pq v1.0.0
+	github.com/lyft/protoc-gen-validate v0.0.13
 	github.com/magefile/mage v1.8.0
 	github.com/mattn/go-colorable v0.1.0 // indirect
 	github.com/mattn/go-isatty v0.0.4
@@ -76,7 +77,6 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
-	github.com/mwitkow/go-proto-validators v0.0.0-20190212092829-1f388280e944
 	github.com/nicksnyder/go-i18n v1.10.0 // indirect
 	github.com/oklog/ulid v1.3.1
 	github.com/olekukonko/tablewriter v0.0.1 // indirect

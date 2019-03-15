@@ -15,6 +15,7 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/lyft/protoc-gen-validate/validate/validate.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 import "lorawan-stack/api/identifiers.proto";
@@ -27,8 +28,8 @@ option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
 message AuthInfoResponse {
   message APIKeyAccess {
-    APIKey api_key = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-    EntityIdentifiers entity_ids = 2 [(gogoproto.customname) = "EntityIDs", (gogoproto.nullable) = false];
+    APIKey api_key = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+    EntityIdentifiers entity_ids = 2 [(gogoproto.customname) = "EntityIDs", (gogoproto.nullable) = false, (validate.rules).message.required = true];
   }
   oneof access_method {
     AuthInfoResponse.APIKeyAccess api_key = 1 [(gogoproto.customname) = "APIKey"];

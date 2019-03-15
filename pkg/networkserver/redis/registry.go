@@ -33,13 +33,15 @@ var (
 )
 
 func applyDeviceFieldMask(dst, src *ttnpb.EndDevice, paths ...string) (*ttnpb.EndDevice, error) {
+	paths = append(paths, "ids")
+
 	if dst == nil {
 		dst = &ttnpb.EndDevice{}
 	}
-	if err := dst.SetFields(src, append(paths, "ids")...); err != nil {
+	if err := dst.SetFields(src, paths...); err != nil {
 		return nil, err
 	}
-	if err := dst.EndDeviceIdentifiers.Validate(); err != nil {
+	if err := dst.ValidateFields(paths...); err != nil {
 		return nil, err
 	}
 	return dst, nil
@@ -58,7 +60,7 @@ func (r *DeviceRegistry) addrKey(addr types.DevAddr) string {
 	return r.Redis.Key("addr", addr.String())
 }
 
-func (r *DeviceRegistry) euiKey(devEUI, joinEUI types.EUI64) string {
+func (r *DeviceRegistry) euiKey(joinEUI, devEUI types.EUI64) string {
 	return r.Redis.Key("eui", joinEUI.String(), devEUI.String())
 }
 

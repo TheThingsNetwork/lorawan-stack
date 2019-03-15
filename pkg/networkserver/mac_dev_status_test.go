@@ -18,6 +18,7 @@ import (
 	"testing"
 	"time"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/events"
@@ -75,7 +76,7 @@ func TestHandleDevStatusAns(t *testing.T) {
 			Error: errMACRequestNotFound,
 		},
 		{
-			Name: "battery 42/margin 4",
+			Name: "battery 42%/margin 4",
 			Device: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
 					LastDevStatusFCntUp: 2,
@@ -83,7 +84,7 @@ func TestHandleDevStatusAns(t *testing.T) {
 						ttnpb.CID_DEV_STATUS.MACCommand(),
 					},
 				},
-				BatteryPercentage: 44,
+				BatteryPercentage: &pbtypes.FloatValue{Value: 0.44},
 				PowerState:        ttnpb.PowerState_POWER_EXTERNAL,
 			},
 			Expected: &ttnpb.EndDevice{
@@ -92,7 +93,7 @@ func TestHandleDevStatusAns(t *testing.T) {
 					LastDevStatusFCntUp: 43,
 					PendingRequests:     []*ttnpb.MACCommand{},
 				},
-				BatteryPercentage: float32(42-1) / float32(253),
+				BatteryPercentage: &pbtypes.FloatValue{Value: float32(42-1) / float32(253)},
 				DownlinkMargin:    4,
 				PowerState:        ttnpb.PowerState_POWER_BATTERY,
 			},
@@ -121,7 +122,7 @@ func TestHandleDevStatusAns(t *testing.T) {
 						ttnpb.CID_DEV_STATUS.MACCommand(),
 					},
 				},
-				BatteryPercentage: 44,
+				BatteryPercentage: &pbtypes.FloatValue{Value: 0.44},
 				PowerState:        ttnpb.PowerState_POWER_BATTERY,
 			},
 			Expected: &ttnpb.EndDevice{
@@ -130,9 +131,8 @@ func TestHandleDevStatusAns(t *testing.T) {
 					LastDevStatusFCntUp: 43,
 					PendingRequests:     []*ttnpb.MACCommand{},
 				},
-				BatteryPercentage: -1,
-				DownlinkMargin:    20,
-				PowerState:        ttnpb.PowerState_POWER_EXTERNAL,
+				DownlinkMargin: 20,
+				PowerState:     ttnpb.PowerState_POWER_EXTERNAL,
 			},
 			Payload: &ttnpb.MACCommand_DevStatusAns{
 				Battery: 0,
@@ -159,7 +159,7 @@ func TestHandleDevStatusAns(t *testing.T) {
 						ttnpb.CID_DEV_STATUS.MACCommand(),
 					},
 				},
-				BatteryPercentage: 44,
+				BatteryPercentage: &pbtypes.FloatValue{Value: 0.44},
 				PowerState:        ttnpb.PowerState_POWER_BATTERY,
 			},
 			Expected: &ttnpb.EndDevice{
@@ -168,9 +168,8 @@ func TestHandleDevStatusAns(t *testing.T) {
 					LastDevStatusFCntUp: 43,
 					PendingRequests:     []*ttnpb.MACCommand{},
 				},
-				BatteryPercentage: -1,
-				DownlinkMargin:    -5,
-				PowerState:        ttnpb.PowerState_POWER_UNKNOWN,
+				DownlinkMargin: -5,
+				PowerState:     ttnpb.PowerState_POWER_UNKNOWN,
 			},
 			Payload: &ttnpb.MACCommand_DevStatusAns{
 				Battery: 255,

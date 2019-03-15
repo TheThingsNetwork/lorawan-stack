@@ -14,8 +14,20 @@
 
 package ttnpb
 
+import "context"
+
 // IsZero reports whether ids represent zero identifiers.
 func (ids ApplicationWebhookIdentifiers) IsZero() bool {
 	return ids.GetWebhookID() == "" &&
 		ids.GetApplicationID() == ""
+}
+
+// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
+func (m *SetApplicationWebhookRequest) ValidateContext(context.Context) error {
+	if len(m.FieldMask.Paths) == 0 {
+		return m.ValidateFields()
+	}
+	return m.ValidateFields(append(fieldsWithPrefix("webhook", m.FieldMask.Paths...),
+		"webhook.ids",
+	)...)
 }

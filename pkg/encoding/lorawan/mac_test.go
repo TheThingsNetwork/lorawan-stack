@@ -266,9 +266,9 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 				MaxRetries:     0x7,
 				PeriodExponent: 0x7,
 				DataRateIndex:  0xd,
-				RejoinType:     0x7,
+				RejoinType:     0x2,
 			},
-			[]byte{0x0E, 0x3f, 0x7d},
+			[]byte{0x0E, 0x3f, 0x2d},
 			false,
 		},
 		{
@@ -305,7 +305,7 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		{
 			"PingSlotChannelReq",
 			&ttnpb.MACCommand_PingSlotChannelReq{
-				Frequency:     0x42ffff,
+				Frequency:     0x1a2bff9c, // 0x42ffff * 100
 				DataRateIndex: 0xf,
 			},
 			[]byte{0x11, 0xff, 0xff, 0x42, 0xf},
@@ -338,7 +338,7 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		{
 			"BeaconFreqReq",
 			&ttnpb.MACCommand_BeaconFreqReq{
-				Frequency: 0x42ffff,
+				Frequency: 0x1a2bff9c, // 0x42ffff * 100
 			},
 			[]byte{0x13, 0xff, 0xff, 0x42},
 			false,

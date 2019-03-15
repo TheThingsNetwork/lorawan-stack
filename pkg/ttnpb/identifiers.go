@@ -15,8 +15,10 @@
 package ttnpb
 
 import (
+	"context"
 	"fmt"
 
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
@@ -359,4 +361,38 @@ func (ids EndDeviceIdentifiers) Copy(x *EndDeviceIdentifiers) *EndDeviceIdentifi
 		x.DevAddr = ids.DevAddr.Copy(&types.DevAddr{})
 	}
 	return x
+}
+
+var errIdentifiers = errors.DefineInvalidArgument("identifiers", "invalid identifiers")
+
+// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
+func (ids *EndDeviceIdentifiers) ValidateContext(context.Context) error {
+	if err := ids.ValidateFields(); err != nil {
+		return errIdentifiers.WithCause(err)
+	}
+	return nil
+}
+
+// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
+func (ids *ApplicationIdentifiers) ValidateContext(context.Context) error {
+	if err := ids.ValidateFields(); err != nil {
+		return errIdentifiers.WithCause(err)
+	}
+	return nil
+}
+
+// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
+func (ids *GatewayIdentifiers) ValidateContext(context.Context) error {
+	if err := ids.ValidateFields(); err != nil {
+		return errIdentifiers.WithCause(err)
+	}
+	return nil
+}
+
+// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
+func (ids *UserIdentifiers) ValidateContext(context.Context) error {
+	if err := ids.ValidateFields(); err != nil {
+		return errIdentifiers.WithCause(err)
+	}
+	return nil
 }
