@@ -964,16 +964,15 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 
 	logger := log.FromContext(ctx)
 
+	up.Payload = &ttnpb.Message{}
+	if err := lorawan.UnmarshalMessage(up.RawPayload, up.Payload); err != nil {
+		return nil, errDecodePayload.WithCause(err)
+	}
+
 	if up.Payload.Major != ttnpb.Major_LORAWAN_R1 {
 		return nil, errUnsupportedLoRaWANVersion.WithAttributes(
 			"major", up.Payload.Major,
 		)
-	}
-
-	if up.Payload.Payload == nil {
-		if err := lorawan.UnmarshalMessage(up.RawPayload, up.Payload); err != nil {
-			return nil, errDecodePayload.WithCause(err)
-		}
 	}
 
 	logger.Debug("Deduplicating uplink...")

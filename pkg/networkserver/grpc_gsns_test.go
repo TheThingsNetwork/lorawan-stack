@@ -453,6 +453,7 @@ func handleUplinkTest() func(t *testing.T) {
 					msg.Payload.MIC = nil
 					mic := test.Must(crypto.ComputeLegacyUplinkMIC(FNwkSIntKey, DevAddr, 0x42, test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte))).([4]byte)
 					msg.Payload.MIC = mic[:]
+
 					msg.RawPayload = test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte)
 
 					return msg
@@ -559,6 +560,7 @@ func handleUplinkTest() func(t *testing.T) {
 					msg.Payload.MIC = nil
 					mic := test.Must(crypto.ComputeLegacyUplinkMIC(FNwkSIntKey, DevAddr, 0x42, test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte))).([4]byte)
 					msg.Payload.MIC = mic[:]
+
 					msg.RawPayload = test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte)
 
 					return msg
@@ -668,6 +670,7 @@ func handleUplinkTest() func(t *testing.T) {
 					msg.Payload.MIC = nil
 					mic := test.Must(crypto.ComputeLegacyUplinkMIC(FNwkSIntKey, DevAddr, 0x42, test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte))).([4]byte)
 					msg.Payload.MIC = mic[:]
+
 					msg.RawPayload = test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte)
 
 					return msg
@@ -780,6 +783,7 @@ func handleUplinkTest() func(t *testing.T) {
 					msg.Payload.MIC = nil
 					mic := test.Must(crypto.ComputeLegacyUplinkMIC(FNwkSIntKey, DevAddr, 0x42, test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte))).([4]byte)
 					msg.Payload.MIC = mic[:]
+
 					msg.RawPayload = test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte)
 
 					return msg
@@ -1022,6 +1026,7 @@ func handleUplinkTest() func(t *testing.T) {
 						test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte)),
 					).([4]byte)
 					msg.Payload.MIC = mic[:]
+
 					msg.RawPayload = test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte)
 
 					return msg
@@ -1140,6 +1145,7 @@ func handleUplinkTest() func(t *testing.T) {
 						test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte)),
 					).([4]byte)
 					msg.Payload.MIC = mic[:]
+
 					msg.RawPayload = test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte)
 
 					return msg
@@ -1269,6 +1275,7 @@ func handleUplinkTest() func(t *testing.T) {
 						test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte)),
 					).([4]byte)
 					msg.Payload.MIC = mic[:]
+
 					msg.RawPayload = test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte)
 
 					return msg
@@ -1796,6 +1803,8 @@ func handleJoinTest() func(t *testing.T) {
 					jr.DevEUI = DevEUI
 					jr.JoinEUI = JoinEUI
 
+					msg.RawPayload = test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte)
+
 					return msg
 				}(),
 			},
@@ -1822,6 +1831,8 @@ func handleJoinTest() func(t *testing.T) {
 					jr := msg.Payload.GetJoinRequestPayload()
 					jr.DevEUI = DevEUI
 					jr.JoinEUI = JoinEUI
+
+					msg.RawPayload = test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte)
 
 					return msg
 				}(),
@@ -1850,6 +1861,8 @@ func handleJoinTest() func(t *testing.T) {
 					jr.DevEUI = DevEUI
 					jr.JoinEUI = JoinEUI
 
+					msg.RawPayload = test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte)
+
 					return msg
 				}(),
 			},
@@ -1877,6 +1890,8 @@ func handleJoinTest() func(t *testing.T) {
 					jr.DevEUI = DevEUI
 					jr.JoinEUI = JoinEUI
 
+					msg.RawPayload = test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte)
+
 					return msg
 				}(),
 			},
@@ -1903,6 +1918,8 @@ func handleJoinTest() func(t *testing.T) {
 					jr := msg.Payload.GetJoinRequestPayload()
 					jr.DevEUI = DevEUI
 					jr.JoinEUI = JoinEUI
+
+					msg.RawPayload = test.Must(lorawan.MarshalMessage(*msg.Payload)).([]byte)
 
 					return msg
 				}(),
