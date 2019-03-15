@@ -50,7 +50,6 @@ func enqueueDLChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, 
 			events.Publish(evtEnqueueDLChannelRequest(ctx, dev.EndDeviceIdentifiers, pld))
 		}
 		return cmds, uint16(len(cmds)), true
-
 	}, dev.MACState.PendingRequests...)
 	return maxDownLen, maxUpLen, ok
 }
@@ -77,7 +76,6 @@ func handleDLChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MA
 		}
 		dev.MACState.CurrentParameters.Channels[req.ChannelIndex].DownlinkFrequency = req.Frequency
 		return nil
-
 	}, dev.MACState.PendingRequests...)
 	return
 }

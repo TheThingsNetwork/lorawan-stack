@@ -74,7 +74,6 @@ func enqueueDevStatusReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, 
 
 		events.Publish(evtEnqueueDevStatusRequest(ctx, dev.EndDeviceIdentifiers, nil))
 		return []*ttnpb.MACCommand{ttnpb.CID_DEV_STATUS.MACCommand()}, 1, true
-
 	}, dev.MACState.PendingRequests...)
 	return maxDownLen, maxUpLen, ok
 }
@@ -102,7 +101,6 @@ func handleDevStatusAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MA
 		dev.LastDevStatusReceivedAt = &recvAt
 		dev.MACState.LastDevStatusFCntUp = fCntUp
 		return nil
-
 	}, dev.MACState.PendingRequests...)
 	return
 }

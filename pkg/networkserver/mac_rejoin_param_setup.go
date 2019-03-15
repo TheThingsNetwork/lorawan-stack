@@ -43,7 +43,6 @@ func enqueueRejoinParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDo
 		}
 		events.Publish(evtEnqueueRejoinParamSetupRequest(ctx, dev.EndDeviceIdentifiers, pld))
 		return []*ttnpb.MACCommand{pld.MACCommand()}, 1, true
-
 	}, dev.MACState.PendingRequests...)
 	return maxDownLen, maxUpLen, ok
 }
@@ -63,7 +62,6 @@ func handleRejoinParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice, pld *t
 			dev.MACState.CurrentParameters.RejoinTimePeriodicity = req.MaxTimeExponent
 		}
 		return nil
-
 	}, dev.MACState.PendingRequests...)
 	return
 }
