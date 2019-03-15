@@ -23,14 +23,14 @@ type protobuf struct {
 	topics.Layout
 }
 
-func (protobuf) FromDownlink(down *ttnpb.DownlinkMessage) ([]byte, error) {
+func (protobuf) FromDownlink(down *ttnpb.DownlinkMessage, _ ttnpb.GatewayIdentifiers) ([]byte, error) {
 	gwDown := &ttnpb.GatewayDown{
 		DownlinkMessage: down,
 	}
 	return gwDown.Marshal()
 }
 
-func (protobuf) ToUplink(message []byte) (*ttnpb.UplinkMessage, error) {
+func (protobuf) ToUplink(message []byte, _ ttnpb.GatewayIdentifiers) (*ttnpb.UplinkMessage, error) {
 	uplink := &ttnpb.UplinkMessage{}
 	if err := uplink.Unmarshal(message); err != nil {
 		return nil, err
@@ -38,7 +38,7 @@ func (protobuf) ToUplink(message []byte) (*ttnpb.UplinkMessage, error) {
 	return uplink, nil
 }
 
-func (protobuf) ToStatus(message []byte) (*ttnpb.GatewayStatus, error) {
+func (protobuf) ToStatus(message []byte, _ ttnpb.GatewayIdentifiers) (*ttnpb.GatewayStatus, error) {
 	status := &ttnpb.GatewayStatus{}
 	if err := status.Unmarshal(message); err != nil {
 		return nil, err
@@ -46,7 +46,7 @@ func (protobuf) ToStatus(message []byte) (*ttnpb.GatewayStatus, error) {
 	return status, nil
 }
 
-func (protobuf) ToTxAck(message []byte) (*ttnpb.TxAcknowledgment, error) {
+func (protobuf) ToTxAck(message []byte, _ ttnpb.GatewayIdentifiers) (*ttnpb.TxAcknowledgment, error) {
 	ack := &ttnpb.TxAcknowledgment{}
 	if err := ack.Unmarshal(message); err != nil {
 		return nil, err

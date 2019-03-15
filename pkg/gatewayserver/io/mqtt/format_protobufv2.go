@@ -65,13 +65,13 @@ type protobufv2 struct {
 	topics.Layout
 }
 
-func (protobufv2) FromDownlink(down *ttnpb.DownlinkMessage) ([]byte, error) {
+func (protobufv2) FromDownlink(down *ttnpb.DownlinkMessage, _ ttnpb.GatewayIdentifiers) ([]byte, error) {
 	settings := down.GetScheduled()
 	if settings == nil {
 		return nil, errNotScheduled
 	}
 	lorawan := &legacyttnpb.LoRaWANTxConfiguration{}
-	if pld, ok := down.Payload.Payload.(*ttnpb.Message_MACPayload); ok {
+	if pld, ok := down.GetPayload().GetPayload().(*ttnpb.Message_MACPayload); ok && pld != nil {
 		lorawan.FCnt = pld.MACPayload.FHDR.FCnt
 	}
 	switch dr := settings.DataRate.Modulation.(type) {
@@ -102,7 +102,7 @@ func (protobufv2) FromDownlink(down *ttnpb.DownlinkMessage) ([]byte, error) {
 	return v2downlink.Marshal()
 }
 
-func (protobufv2) ToUplink(message []byte) (*ttnpb.UplinkMessage, error) {
+func (protobufv2) ToUplink(message []byte, ids ttnpb.GatewayIdentifiers) (*ttnpb.UplinkMessage, error) {
 	v2uplink := &legacyttnpb.UplinkMessage{}
 	err := v2uplink.Unmarshal(message)
 	if err != nil {
@@ -162,9 +162,6 @@ func (protobufv2) ToUplink(message []byte) (*ttnpb.UplinkMessage, error) {
 		return nil, errModulation.WithAttributes("modulation", lorawanMetadata.Modulation)
 	}
 
-	ids := ttnpb.GatewayIdentifiers{
-		GatewayID: gwMetadata.GatewayID,
-	}
 	mdTime := time.Unix(0, gwMetadata.Time)
 	if antennas := gwMetadata.Antennas; len(antennas) > 0 {
 		for _, antenna := range antennas {
@@ -195,7 +192,7 @@ func (protobufv2) ToUplink(message []byte) (*ttnpb.UplinkMessage, error) {
 	return uplink, nil
 }
 
-func (protobufv2) ToStatus(message []byte) (*ttnpb.GatewayStatus, error) {
+func (protobufv2) ToStatus(message []byte, _ ttnpb.GatewayIdentifiers) (*ttnpb.GatewayStatus, error) {
 	v2status := &legacyttnpb.StatusMessage{}
 	err := v2status.Unmarshal(message)
 	if err != nil {
@@ -254,7 +251,7 @@ func (protobufv2) ToStatus(message []byte) (*ttnpb.GatewayStatus, error) {
 	}, nil
 }
 
-func (protobufv2) ToTxAck(message []byte) (*ttnpb.TxAcknowledgment, error) {
+func (protobufv2) ToTxAck(message []byte, _ ttnpb.GatewayIdentifiers) (*ttnpb.TxAcknowledgment, error) {
 	return nil, errNotSupported
 }
 

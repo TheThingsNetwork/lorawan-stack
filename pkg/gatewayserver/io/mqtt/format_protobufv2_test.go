@@ -31,6 +31,9 @@ import (
 func TestProtobufV2Downlink(t *testing.T) {
 	a := assertions.New(t)
 	pld, _ := base64.RawStdEncoding.DecodeString("YHBhYUoAAgABj9/clY414A")
+	ids := ttnpb.GatewayIdentifiers{
+		GatewayID: "gateway-id",
+	}
 	input := &ttnpb.DownlinkMessage{
 		RawPayload: pld,
 		Payload:    &ttnpb.Message{},
@@ -79,7 +82,7 @@ func TestProtobufV2Downlink(t *testing.T) {
 		t.Fatal("Could not marshal the v2 struct")
 	}
 
-	actualBuf, err := mqtt.ProtobufV2.FromDownlink(input)
+	actualBuf, err := mqtt.ProtobufV2.FromDownlink(input, ids)
 	if !a.So(err, should.BeNil) {
 		t.Fatal("Could not marshal the input v3 struct")
 	}
@@ -124,9 +127,12 @@ func TestProtobufV2Uplinks(t *testing.T) {
 		Timestamp: validV2Metadata.Timestamp,
 	}
 	nilTime := time.Unix(0, 0)
+	ids := ttnpb.GatewayIdentifiers{
+		GatewayID: "gateway-id",
+	}
 	validV3Metadata := []*ttnpb.RxMetadata{
 		{
-			GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "gateway-id"},
+			GatewayIdentifiers: ids,
 			RSSI:               -2,
 			SNR:                -75,
 			Time:               &nilTime,
@@ -211,7 +217,7 @@ func TestProtobufV2Uplinks(t *testing.T) {
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
-			res, err := mqtt.ProtobufV2.ToUplink(buf)
+			res, err := mqtt.ProtobufV2.ToUplink(buf, ids)
 			if tc.ErrorAssertion != nil {
 				if !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 					t.FailNow()
@@ -230,6 +236,9 @@ func TestProtobufV2Uplinks(t *testing.T) {
 }
 
 func TestProtobufV2Status(t *testing.T) {
+	ids := ttnpb.GatewayIdentifiers{
+		GatewayID: "gateway-id",
+	}
 	for _, tc := range []struct {
 		Name           string
 		input          *legacyttnpb.StatusMessage
@@ -361,7 +370,7 @@ func TestProtobufV2Status(t *testing.T) {
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
-			res, err := mqtt.ProtobufV2.ToStatus(buf)
+			res, err := mqtt.ProtobufV2.ToStatus(buf, ids)
 			if tc.ErrorAssertion != nil {
 				if !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 					t.FailNow()
