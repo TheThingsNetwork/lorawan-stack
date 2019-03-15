@@ -4,10 +4,6 @@ replace github.com/grpc-ecosystem/grpc-gateway => github.com/ThethingsIndustries
 
 replace github.com/robertkrimen/otto => github.com/ThethingsIndustries/otto v0.0.0-20181129100957-6ddbbb60554a
 
-replace github.com/alecthomas/gometalinter => github.com/alecthomas/gometalinter v3.0.0+incompatible
-
-replace gopkg.in/alecthomas/kingpin.v3-unstable => gopkg.in/alecthomas/kingpin.v3-unstable v3.0.0-20171010053543-63abe20a23e2
-
 replace github.com/goreleaser/goreleaser => github.com/TheThingsIndustries/goreleaser v0.102.0-ttn
 
 require (
@@ -18,7 +14,6 @@ require (
 	github.com/TheThingsIndustries/magepkg v0.0.0-20190214092847-6c0299b7c3ed
 	github.com/TheThingsIndustries/mystique v0.0.0-20181023142449-f12a32cee6d6
 	github.com/TheThingsNetwork/go-cayenne-lib v1.0.0
-	github.com/alecthomas/gometalinter v3.0.0+incompatible
 	github.com/aws/aws-sdk-go v1.16.32
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/certifi/gocertifi v0.0.0-20190105021004-abcd57078448 // indirect
@@ -38,7 +33,6 @@ require (
 	github.com/gogo/protobuf v1.2.0
 	github.com/golang/gddo v0.0.0-20181116215533-9bd4a3295021
 	github.com/golang/protobuf v1.2.0
-	github.com/google/shlex v0.0.0-20181106134648-c34317bd91bf // indirect
 	github.com/google/wire v0.2.1 // indirect
 	github.com/goreleaser/goreleaser v0.101.0
 	github.com/gorilla/securecookie v1.1.1
@@ -74,10 +68,10 @@ require (
 	github.com/mattn/go-zglob v0.0.1 // indirect
 	github.com/mattn/goveralls v0.0.2
 	github.com/mdempsky/unconvert v0.0.0-20190117010209-2db5a8ead8e7
+	github.com/mgechev/revive v0.0.0-20190301194522-6a62ee9f0248
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
-	github.com/nicksnyder/go-i18n v1.10.0 // indirect
 	github.com/oklog/ulid v1.3.1
 	github.com/olekukonko/tablewriter v0.0.1 // indirect
 	github.com/onsi/ginkgo v1.7.0 // indirect
@@ -114,7 +108,6 @@ require (
 	golang.org/x/tools v0.0.0-20190211224914-44bee7e801e4
 	google.golang.org/genproto v0.0.0-20190201180003-4b09977fb922
 	google.golang.org/grpc v1.18.0
-	gopkg.in/alecthomas/kingpin.v3-unstable v3.0.0-20180810215634-df19058c872c // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/jarcoal/httpmock.v1 v1.0.0-20190204112747-618f46f3f0c8
 	gopkg.in/mail.v2 v2.3.1 // indirect

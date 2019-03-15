@@ -46,7 +46,6 @@ func enqueueRxParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLe
 		}
 		events.Publish(evtEnqueueRxParamSetupRequest(ctx, dev.EndDeviceIdentifiers, pld))
 		return []*ttnpb.MACCommand{pld.MACCommand()}, 1, true
-
 	}, dev.MACState.PendingRequests...)
 	return maxDownLen, maxUpLen, ok
 }
@@ -73,7 +72,6 @@ func handleRxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb
 		dev.MACState.CurrentParameters.Rx2DataRateIndex = req.Rx2DataRateIndex
 		dev.MACState.CurrentParameters.Rx2Frequency = req.Rx2Frequency
 		return nil
-
 	}, dev.MACState.PendingRequests...)
 	return
 }

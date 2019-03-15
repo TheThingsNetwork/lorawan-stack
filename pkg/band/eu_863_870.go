@@ -18,10 +18,14 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
+//revive:disable:var-naming
+
 var eu_863_870 Band
 
 // EU_863_870 is the ID of the European 863-870Mhz band
 const EU_863_870 = "EU_863_870"
+
+//revive:enable:var-naming
 
 func init() {
 	defaultChannels := []Channel{

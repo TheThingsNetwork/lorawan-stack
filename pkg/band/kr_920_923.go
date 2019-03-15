@@ -18,10 +18,14 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
+//revive:disable:var-naming
+
 var kr_920_923 Band
 
 // KR_920_923 is the ID of the Korean frequency plan
 const KR_920_923 = "KR_920_923"
+
+//revive:enable:var-naming
 
 func init() {
 	defaultChannels := []Channel{

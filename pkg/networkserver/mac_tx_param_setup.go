@@ -46,7 +46,6 @@ func enqueueTxParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLe
 		}
 		events.Publish(evtEnqueueTxParamSetupRequest(ctx, dev.EndDeviceIdentifiers, pld))
 		return []*ttnpb.MACCommand{pld.MACCommand()}, 1, true
-
 	}, dev.MACState.PendingRequests...)
 	return maxDownLen, maxUpLen, ok
 }
@@ -65,7 +64,6 @@ func handleTxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (err error
 			dev.MACState.DesiredParameters.MaxEIRP = dev.MACState.CurrentParameters.MaxEIRP
 		}
 		return nil
-
 	}, dev.MACState.PendingRequests...)
 	return
 }

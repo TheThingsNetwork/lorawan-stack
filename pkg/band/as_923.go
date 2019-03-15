@@ -18,10 +18,14 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
+//revive:disable:var-naming
+
 var as_923 Band
 
 // AS_923 is the ID of the Asian 923Mhz band
 const AS_923 = "AS_923"
+
+//revive:enable:var-naming
 
 func init() {
 	defaultChannels := []Channel{

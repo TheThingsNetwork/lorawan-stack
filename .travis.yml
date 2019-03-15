@@ -28,17 +28,9 @@ matrix:
   - env: RUNTYPE=go.lint
     os: linux
 
-  - if: type = pull_request OR branch =~ ^master$
-    env: RUNTYPE=go.lint-extra
-    os: linux
-
   - if: tag IS present
     env: RUNTYPE=release
     os: linux
-
-  allow_failures:
-    - env: RUNTYPE=go.lint-extra
-
 
 services:
 - docker
@@ -101,10 +93,7 @@ script:
     make go.misspell
     make headers.check
     make messages
-  fi
-- |
-  if [[ "$RUNTYPE" == "go.lint-extra" ]]; then
-    make go.lint-travis
+    make go.lint
   fi
 - |
   if [[ "$RUNTYPE" == "release" ]]; then

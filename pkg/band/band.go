@@ -39,12 +39,16 @@ type dwellTimePayloadSizer struct {
 	DwellTime   uint16
 }
 
+//revive:disable:flag-parameter
+
 func (p dwellTimePayloadSizer) PayloadSize(dwellTime bool) uint16 {
 	if dwellTime {
 		return p.DwellTime
 	}
 	return p.NoDwellTime
 }
+
+//revive:enable:flag-parameter
 
 // DataRate indicates the properties of a band's data rate.
 type DataRate struct {
@@ -403,6 +407,8 @@ func equalChMasks(a, b []bool) bool {
 	return true
 }
 
+//revive:disable:flag-parameter
+
 func makeGenerateChMask72(supportChMaskCntl5 bool) func([]bool) ([]ChMaskCntlPair, error) {
 	return func(mask []bool) ([]ChMaskCntlPair, error) {
 		if len(mask) != 72 {
@@ -504,6 +510,8 @@ func makeGenerateChMask72(supportChMaskCntl5 bool) func([]bool) ([]ChMaskCntlPai
 		return generateChMaskMatrix(mask)
 	}
 }
+
+//revive:enable:flag-parameter
 
 func generateChMask96(mask []bool) ([]ChMaskCntlPair, error) {
 	if len(mask) != 96 {

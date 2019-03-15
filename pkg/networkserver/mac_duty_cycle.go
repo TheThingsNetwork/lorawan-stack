@@ -41,7 +41,6 @@ func enqueueDutyCycleReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, 
 		}
 		events.Publish(evtEnqueueDutyCycleRequest(ctx, dev.EndDeviceIdentifiers, pld))
 		return []*ttnpb.MACCommand{pld.MACCommand()}, 1, true
-
 	}, dev.MACState.PendingRequests...)
 	return maxDownLen, maxUpLen, ok
 }
@@ -54,7 +53,6 @@ func handleDutyCycleAns(ctx context.Context, dev *ttnpb.EndDevice) (err error) {
 
 		dev.MACState.CurrentParameters.MaxDutyCycle = req.MaxDutyCycle
 		return nil
-
 	}, dev.MACState.PendingRequests...)
 	return
 }

@@ -33,6 +33,7 @@ type Config struct {
 	DefaultMACSettings  MACSettingConfig       `name:"default-mac-settings" description:"Default MAC settings to fallback to if not specified by device, band or frequency plan"`
 }
 
+// MACSettingConfig defines MAC-layer configuration.
 type MACSettingConfig struct {
 	ADRMargin              *float32       `name:"adr-margin" description:"The default margin Network Server should add in ADR requests if not configured in device's MAC settings"`
 	DesiredRx1Delay        *ttnpb.RxDelay `name:"desired-rx1-delay" description:"Desired Rx1Delay value Network Server should use if not configured in device's MAC settings"`

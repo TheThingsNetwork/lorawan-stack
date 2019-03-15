@@ -55,7 +55,6 @@ func enqueueNewChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen,
 			events.Publish(evtEnqueueNewChannelRequest(ctx, dev.EndDeviceIdentifiers, pld))
 		}
 		return cmds, uint16(len(cmds)), true
-
 	}, dev.MACState.PendingRequests...)
 	return maxDownLen, maxUpLen, ok
 }
@@ -95,7 +94,6 @@ func handleNewChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.M
 		ch.MaxDataRateIndex = req.MaxDataRateIndex
 		ch.EnableUplink = true
 		return nil
-
 	}, dev.MACState.PendingRequests...)
 	return
 }

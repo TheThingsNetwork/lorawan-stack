@@ -89,7 +89,6 @@ func enqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, ma
 			events.Publish(evtEnqueueLinkADRRequest(ctx, dev.EndDeviceIdentifiers, pld))
 		}
 		return cmds, uplinksNeeded, true
-
 	}, dev.MACState.PendingRequests...)
 	return maxDownLen, maxUpLen, ok, nil
 }
@@ -160,9 +159,7 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 			}
 			dev.MACState.CurrentParameters.Channels[i].EnableUplink = masked
 		}
-
 		return nil
-
 	}, dev.MACState.PendingRequests...)
 	if err != nil {
 		return err

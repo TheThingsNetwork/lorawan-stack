@@ -43,7 +43,6 @@ func enqueueBeaconFreqReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen,
 		}
 		events.Publish(evtEnqueueBeaconFreqRequest(ctx, dev.EndDeviceIdentifiers, pld))
 		return []*ttnpb.MACCommand{pld.MACCommand()}, 1, true
-
 	}, dev.MACState.PendingRequests...)
 	return maxDownLen, maxUpLen, ok
 }
@@ -67,7 +66,6 @@ func handleBeaconFreqAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.M
 		}
 		dev.MACState.CurrentParameters.BeaconFrequency = req.Frequency
 		return nil
-
 	}, dev.MACState.PendingRequests...)
 	return
 }

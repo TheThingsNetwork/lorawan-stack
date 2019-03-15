@@ -18,10 +18,14 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
+//revive:disable:var-naming
+
 var cn_779_787 Band
 
 // CN_779_787 is the ID of the Chinese 779-787Mhz band
 const CN_779_787 = "CN_779_787"
+
+//revive:enable:var-naming
 
 func init() {
 	defaultChannels := []Channel{

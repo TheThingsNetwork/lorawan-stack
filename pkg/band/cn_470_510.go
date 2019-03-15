@@ -18,10 +18,14 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
+//revive:disable:var-naming
+
 var cn_470_510 Band
 
 // CN_470_510 is the ID of the Chinese 470-510Mhz band
 const CN_470_510 = "CN_470_510"
+
+//revive:enable:var-naming
 
 func init() {
 	uplinkChannels := make([]Channel, 0, 96)

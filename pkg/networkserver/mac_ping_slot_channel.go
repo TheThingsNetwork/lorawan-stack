@@ -43,7 +43,6 @@ func enqueuePingSlotChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDow
 		}
 		events.Publish(evtEnqueuePingSlotChannelRequest(ctx, dev.EndDeviceIdentifiers, pld))
 		return []*ttnpb.MACCommand{pld.MACCommand()}, 1, true
-
 	}, dev.MACState.PendingRequests...)
 	return maxDownLen, maxUpLen, ok
 }
@@ -61,7 +60,6 @@ func handlePingSlotChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *tt
 		dev.MACState.CurrentParameters.PingSlotDataRateIndex = req.DataRateIndex
 		dev.MACState.CurrentParameters.PingSlotFrequency = req.Frequency
 		return nil
-
 	}, dev.MACState.PendingRequests...)
 	return
 }
