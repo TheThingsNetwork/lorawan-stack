@@ -104,7 +104,7 @@ script:
   fi
 - |
   if [[ "$RUNTYPE" == "go.lint-extra" ]]; then
-    make go.lint-travis
+    make go.lint
   fi
 - |
   if [[ "$RUNTYPE" == "release" ]]; then

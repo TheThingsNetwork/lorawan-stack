@@ -23,7 +23,6 @@ GO_PATH ?= $(shell echo $(GOPATH) | awk -F':' '{ print $$1 }')
 # programs
 GO ?= go
 GO_FMT ?= gofmt
-GO_LINT_FILES = $(ALL_FILES) | $(only_go_lintable)
 
 # go flags
 ifdef ($(GO_TAGS))
@@ -56,9 +55,6 @@ only_pb = grep -E '\.pb\.go$$|\.pb\.gw\.go$$|pb_test.go$$'
 # select/remove test files
 no_test = grep -v '_test\.go$$'
 only_test = grep '_test\.go$$'
-
-# lintable files
-only_go_lintable = $(only_go) | $(no_vendor) | $(no_mock) | $(no_pb)
 
 # filter files to packages
 to_packages = sed 's:/[^/]*$$::' | sort | uniq

@@ -19,8 +19,7 @@ go.fmt:
 
 # lint all packages, exiting when errors occur
 go.lint:
-	@$(log) "Linting `$(GO_PACKAGES) | $(count)` go packages"
-	@CODE=0; GO111MODULE=on; $(GO) run github.com/alecthomas/gometalinter `$(GO_PACKAGES_ABSOLUTE)` 2> /dev/null || { CODE=1; }; exit $$CODE
+	@GO111MODULE=on $(GO) run github.com/mgechev/revive -config .revive.toml -formatter stylish ./pkg/... ./cmd/...
 
 # fix misspellings in all packages
 go.misspell:
@@ -31,10 +30,6 @@ go.misspell:
 go.unconvert:
 	@$(log) "Unconverting `$(GO_PACKAGES) | $(count)` go packages"
 	@[[ -z "`$(GO_PACKAGES) | GO111MODULE=on xargs $(GO) run github.com/mdempsky/unconvert -safe -apply | tee -a /dev/stderr`" ]]
-
-# lint changed packages in travis
-go.lint-travis: GO_PACKAGES = git diff --name-only HEAD $(TRAVIS_BRANCH) | $(to_packages)
-go.lint-travis: go.lint
 
 # run all quality on all files
 go.quality: go.fmt go.misspell go.unconvert go.lint
