@@ -72,12 +72,6 @@ func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		return nil, errUnsupportedLoRaWANVersion.WithAttributes("version", req.SelectedMACVersion)
 	}
 
-	if req.RawPayload == nil {
-		return nil, errNoPayload
-	}
-	if n := len(req.RawPayload); n != 23 {
-		return nil, errPayloadLengthMismatch.WithAttributes("length", n)
-	}
 	req.Payload = &ttnpb.Message{}
 	if err = lorawan.UnmarshalMessage(req.RawPayload, req.Payload); err != nil {
 		return nil, errDecodePayload.WithCause(err)
