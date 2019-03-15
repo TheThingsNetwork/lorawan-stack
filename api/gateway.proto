@@ -70,7 +70,7 @@ message GatewayVersion {
   option (gogoproto.populate) = false;
 
   // Version identifiers.
-  GatewayVersionIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  GatewayVersionIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
 
   // Photos contains file names of gateway photos.
   repeated string photos = 2;
@@ -80,7 +80,7 @@ message GatewayVersion {
 
 // Gateway is the message that defines a gateway on the network.
 message Gateway {
-  GatewayIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  GatewayIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
@@ -89,7 +89,7 @@ message Gateway {
   map<string,string> attributes = 6;
   repeated ContactInfo contact_info = 7;
 
-  GatewayVersionIdentifiers version_ids = 8 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  GatewayVersionIdentifiers version_ids = 8 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
 
   // The address of the Gateway Server to connect to.
   // The typical format of the address is "host:port". If the port is omitted,
@@ -113,7 +113,7 @@ message Gateway {
   // Enforcing gateway duty cycle is recommended for all gateways to respect spectrum regulations. Disable enforcing the
   // duty cycle only in controlled research and development environments.
   bool enforce_duty_cycle = 17;
-  DownlinkPathConstraint downlink_path_constraint = 18;
+  DownlinkPathConstraint downlink_path_constraint = 18 [(validate.rules).enum.defined_only = true];
 }
 
 message Gateways {
@@ -121,7 +121,7 @@ message Gateways {
 }
 
 message GetGatewayRequest {
-  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
 }
 
@@ -146,30 +146,30 @@ message ListGatewaysRequest {
 }
 
 message CreateGatewayRequest {
-  Gateway gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  Gateway gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   // Collaborator to grant all rights on the newly created gateway.
-  OrganizationOrUserIdentifiers collaborator = 2 [(gogoproto.nullable) = false];
+  OrganizationOrUserIdentifiers collaborator = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
 }
 
 message UpdateGatewayRequest {
-  Gateway gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  Gateway gateway = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
 }
 
 message CreateGatewayAPIKeyRequest {
-  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   string name = 2;
   repeated Right rights = 3;
 }
 
 message UpdateGatewayAPIKeyRequest {
-  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  APIKey api_key = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  APIKey api_key = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
 }
 
 message SetGatewayCollaboratorRequest {
-  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  Collaborator collaborator = 2 [(gogoproto.nullable) = false];
+  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  Collaborator collaborator = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
 }
 
 // GatewayAntenna is the message that defines a gateway antenna.
@@ -177,13 +177,13 @@ message GatewayAntenna {
   // gain is the antenna gain relative to this gateway, in dBi.
   float gain = 1;
   // location is the antenna's location.
-  Location location = 2 [(gogoproto.nullable) = false];
+  Location location = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   map<string,string> attributes = 3;
 }
 
 message GatewayStatus {
   // Current time of the gateway
-  google.protobuf.Timestamp time = 1 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp time = 1 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true, (validate.rules).message.required = true];
   // Boot time of the gateway
   // - can be left out to save bandwidth; old value will be kept
   google.protobuf.Timestamp boot_time = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];

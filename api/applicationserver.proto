@@ -39,20 +39,20 @@ message ApplicationLink {
 }
 
 message GetApplicationLinkRequest {
-  ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
 }
 
 message SetApplicationLinkRequest {
-  ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  ApplicationLink link = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  ApplicationLink link = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   google.protobuf.FieldMask field_mask = 3 [(gogoproto.nullable) = false];
 }
 
 // Link stats as monitored by the Application Server.
 message ApplicationLinkStats {
   google.protobuf.Timestamp linked_at = 1 [(gogoproto.stdtime) = true];
-  string network_server_address = 2;
+  string network_server_address = 2 [(validate.rules).string.pattern = "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"];
   // Timestamp when the last upstream message has been received from a Network Server.
   // This can be a join-accept, uplink message or downlink message event.
   google.protobuf.Timestamp last_up_received_at = 3 [(gogoproto.stdtime) = true];

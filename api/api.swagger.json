@@ -4619,8 +4619,7 @@
       "type": "object",
       "properties": {
         "rejoin_type": {
-          "type": "integer",
-          "format": "int64"
+          "$ref": "#/definitions/v3RejoinType"
         },
         "data_rate_index": {
           "$ref": "#/definitions/v3DataRateIndex"

@@ -15,6 +15,7 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/lyft/protoc-gen-validate/validate/validate.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
 import "lorawan-stack/api/contact_info.proto";
@@ -40,7 +41,7 @@ enum GrantType {
 
 // An OAuth client on the network.
 message Client {
-  ClientIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ClientIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
@@ -57,7 +58,7 @@ message Client {
   repeated string redirect_uris = 9 [(gogoproto.customname) = "RedirectURIs"];
   // The reviewing state of the client.
   // This field can only be modified by admins.
-  State state = 10;
+  State state = 10 [(validate.rules).enum.defined_only = true];
   // If set, the authorization page will be skipped.
   // This field can only be modified by admins.
   bool skip_authorization = 11;
@@ -78,7 +79,7 @@ message Clients {
 }
 
 message GetClientRequest {
-  ClientIdentifiers client_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ClientIdentifiers client_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
 }
 
@@ -99,17 +100,17 @@ message ListClientsRequest {
 }
 
 message CreateClientRequest {
-  Client client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  Client client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   // Collaborator to grant all rights on the newly created client.
-  OrganizationOrUserIdentifiers collaborator = 2 [(gogoproto.nullable) = false];
+  OrganizationOrUserIdentifiers collaborator = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
 }
 
 message UpdateClientRequest {
-  Client client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  Client client = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
 }
 
 message SetClientCollaboratorRequest {
-  ClientIdentifiers client_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
-  Collaborator collaborator = 2 [(gogoproto.nullable) = false];
+  ClientIdentifiers client_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  Collaborator collaborator = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
 }

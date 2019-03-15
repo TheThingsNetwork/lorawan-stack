@@ -3156,7 +3156,7 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | payload_request | [CryptoServicePayloadRequest](#ttn.lorawan.v3.CryptoServicePayloadRequest) |  |  |
-| join_request_type | [uint32](#uint32) |  |  |
+| join_request_type | [RejoinType](#ttn.lorawan.v3.RejoinType) |  |  |
 | dev_nonce | [bytes](#bytes) |  |  |
 
 
@@ -3822,7 +3822,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| rejoin_type | [uint32](#uint32) |  |  |
+| rejoin_type | [RejoinType](#ttn.lorawan.v3.RejoinType) |  |  |
 | data_rate_index | [DataRateIndex](#ttn.lorawan.v3.DataRateIndex) |  |  |
 | max_retries | [uint32](#uint32) |  |  |
 | period_exponent | [RejoinPeriodExponent](#ttn.lorawan.v3.RejoinPeriodExponent) |  | Exponent e that configures the rejoin period = 32 * 2^e &#43; rand(0,32) seconds. |

@@ -15,6 +15,7 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/lyft/protoc-gen-validate/validate/validate.proto";
 import "google/protobuf/duration.proto";
 import "lorawan-stack/api/gateway.proto";
 
@@ -34,6 +35,7 @@ message ConcentratorConfig {
     // Frequency (Hz).
     uint64 frequency = 1;
     uint32 radio = 2;
+    // Bandwidth (Hz).
     uint32 bandwidth = 3;
     uint32 spreading_factor = 4;
   }

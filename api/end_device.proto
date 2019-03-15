@@ -39,7 +39,7 @@ message Session {
   // Device Address, issued by the Network Server or chosen by device manufacturer in case of testing range (beginning with 00-03).
   // Known by Network Server, Application Server and Join Server. Owned by Network Server.
   bytes dev_addr = 2 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.DevAddr", (gogoproto.nullable) = false];
-  SessionKeys keys = 3 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  SessionKeys keys = 3 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   // Last uplink frame counter value used. Network Server only. Application Server assumes the Network Server checked it.
   uint32 last_f_cnt_up = 4;
   // Last network downlink frame counter value used. Network Server only.
@@ -64,52 +64,52 @@ message MACParameters {
   // Downlink dwell time is set (400ms).
   bool downlink_dwell_time = 3;
   // ADR: data rate index to use.
-  DataRateIndex adr_data_rate_index = 4 [(gogoproto.customname) = "ADRDataRateIndex"];
+  DataRateIndex adr_data_rate_index = 4 [(gogoproto.customname) = "ADRDataRateIndex", (validate.rules).enum.defined_only = true];
   // ADR: transmission power index to use.
-  uint32 adr_tx_power_index = 5 [(gogoproto.customname) = "ADRTxPowerIndex"];
+  uint32 adr_tx_power_index = 5 [(gogoproto.customname) = "ADRTxPowerIndex", (validate.rules).uint32.lte = 15];
   // ADR: number of retransmissions.
-  uint32 adr_nb_trans = 6 [(gogoproto.customname) = "ADRNbTrans"];
+  uint32 adr_nb_trans = 6 [(gogoproto.customname) = "ADRNbTrans", (validate.rules).uint32.lte = 15];
   // ADR: number of messages to wait before setting ADRAckReq.
-  uint32 adr_ack_limit = 7 [(gogoproto.customname) = "ADRAckLimit"];
+  uint32 adr_ack_limit = 7 [(gogoproto.customname) = "ADRAckLimit", (validate.rules).uint32 = {gte: 1, lte: 32768}];
   // ADR: number of messages to wait after setting ADRAckReq and before changing TxPower or DataRate.
-  uint32 adr_ack_delay = 8 [(gogoproto.customname) = "ADRAckDelay"];
+  uint32 adr_ack_delay = 8 [(gogoproto.customname) = "ADRAckDelay", (validate.rules).uint32 = {gte: 1, lte: 32768}];
   // Rx1 delay (Rx2 delay is Rx1 delay + 1 second).
-  RxDelay rx1_delay = 9;
+  RxDelay rx1_delay = 9 [(validate.rules).enum.defined_only = true];
   // Data rate offset for Rx1.
-  uint32 rx1_data_rate_offset = 10;
+  uint32 rx1_data_rate_offset = 10 [(validate.rules).uint32.lte = 7];
   // Data rate index for Rx2.
-  DataRateIndex rx2_data_rate_index = 11;
+  DataRateIndex rx2_data_rate_index = 11 [(validate.rules).enum.defined_only = true];
   // Frequency for Rx2 (Hz).
-  uint64 rx2_frequency = 12;
+  uint64 rx2_frequency = 12 [(validate.rules).uint64.gte = 100000];
   // Maximum uplink duty cycle (of all channels).
-  AggregatedDutyCycle max_duty_cycle = 13;
+  AggregatedDutyCycle max_duty_cycle = 13 [(validate.rules).enum.defined_only = true];
   // Time within which a rejoin-request must be sent.
-  RejoinTimeExponent rejoin_time_periodicity = 14;
+  RejoinTimeExponent rejoin_time_periodicity = 14 [(validate.rules).enum.defined_only = true];
   // Message count within which a rejoin-request must be sent.
-  RejoinCountExponent rejoin_count_periodicity = 15;
+  RejoinCountExponent rejoin_count_periodicity = 15 [(validate.rules).enum.defined_only = true];
   // Frequency of the class B ping slot (Hz).
-  uint64 ping_slot_frequency = 16;
+  uint64 ping_slot_frequency = 16 [(validate.rules).uint64 = {lte: 0, gte: 100000}];
   // Data rate index of the class B ping slot.
-  DataRateIndex ping_slot_data_rate_index = 17;
+  DataRateIndex ping_slot_data_rate_index = 17 [(validate.rules).enum.defined_only = true];
   // Frequency of the class B beacon (Hz).
-  uint64 beacon_frequency = 18;
+  uint64 beacon_frequency = 18 [(validate.rules).uint64 = {lte: 0, gte: 100000}];
 
   message Channel {
     option (gogoproto.populate) = false;
 
     // Uplink frequency of the channel (Hz).
-    uint64 uplink_frequency = 1;
+    uint64 uplink_frequency = 1 [(validate.rules).uint64.gte = 100000];
     // Downlink frequency of the channel (Hz).
-    uint64 downlink_frequency = 2;
+    uint64 downlink_frequency = 2 [(validate.rules).uint64.gte = 100000];
     // Index of the minimum data rate for uplink.
-    DataRateIndex min_data_rate_index = 3;
+    DataRateIndex min_data_rate_index = 3 [(validate.rules).enum.defined_only = true];
     // Index of the maximum data rate for uplink.
-    DataRateIndex max_data_rate_index = 4;
+    DataRateIndex max_data_rate_index = 4 [(validate.rules).enum.defined_only = true];
     // Channel can be used by device for uplink.
     bool enable_uplink = 5;
   }
   // Configured uplink channels and optionally Rx1 frequency.
-  repeated Channel channels = 19;
+  repeated Channel channels = 19 [(validate.rules).repeated.min_items = 1];
 }
 
 message EndDeviceBrand {
@@ -139,12 +139,12 @@ message EndDeviceVersion {
   option (gogoproto.populate) = false;
 
   // Version identifiers.
-  EndDeviceVersionIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  EndDeviceVersionIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
 
   // LoRaWAN MAC version.
-  MACVersion lorawan_version = 2 [(gogoproto.customname) = "LoRaWANVersion"];
+  MACVersion lorawan_version = 2 [(gogoproto.customname) = "LoRaWANVersion", (validate.rules).enum.defined_only = true];
   // LoRaWAN PHY version.
-  PHYVersion lorawan_phy_version = 3 [(gogoproto.customname) = "LoRaWANPHYVersion"];
+  PHYVersion lorawan_phy_version = 3 [(gogoproto.customname) = "LoRaWANPHYVersion", (validate.rules).enum.defined_only = true];
   // ID of the frequency plan used by this device.
   string frequency_plan_id = 4 [(gogoproto.customname) = "FrequencyPlanID"];
 
@@ -167,21 +167,21 @@ message EndDeviceVersion {
   bool resets_join_nonces = 12;
 
   // Default formatters defining the payload formats for this end device.
-  MessagePayloadFormatters default_formatters = 13 [(gogoproto.nullable) = false];
+  MessagePayloadFormatters default_formatters = 13 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
 }
 
 message MACSettings {
   message DataRateIndexValue {
-    DataRateIndex value = 1;
+    DataRateIndex value = 1 [(validate.rules).enum.defined_only = true];
   }
   message PingSlotPeriodValue {
-    PingSlotPeriod value = 1;
+    PingSlotPeriod value = 1 [(validate.rules).enum.defined_only = true];
   }
   message AggregatedDutyCycleValue {
-    AggregatedDutyCycle value = 1;
+    AggregatedDutyCycle value = 1 [(validate.rules).enum.defined_only = true];
   }
   message RxDelayValue {
-    RxDelay value = 1;
+    RxDelay value = 1 [(validate.rules).enum.defined_only = true];
   }
 
   // Maximum delay for the device to answer a MAC request or a confirmed downlink frame.
@@ -195,7 +195,7 @@ message MACSettings {
   DataRateIndexValue ping_slot_data_rate_index = 3;
   // Frequency of the class B ping slot (Hz).
   // If unset, the default value from Network Server configuration will be used.
-  uint64 ping_slot_frequency = 4;
+  google.protobuf.UInt64Value ping_slot_frequency = 4 [(validate.rules).uint64.gte = 100000];
 
   // Maximum delay for the device to answer a MAC request or a confirmed downlink frame.
   // If unset, the default value from Network Server configuration will be used.
@@ -206,13 +206,13 @@ message MACSettings {
   RxDelayValue rx1_delay = 6;
   // Rx1 data rate offset.
   // If unset, the default value from Network Server configuration will be used.
-  google.protobuf.UInt32Value rx1_data_rate_offset = 7;
+  google.protobuf.UInt32Value rx1_data_rate_offset = 7 [(validate.rules).uint32.lte = 7];
   // Data rate index for Rx2.
   // If unset, the default value from Network Server configuration or regional parameters specification will be used.
   DataRateIndexValue rx2_data_rate_index = 8;
   // Frequency for Rx2 (Hz).
   // If unset, the default value from Network Server configuration or regional parameters specification will be used.
-  uint64 rx2_frequency = 9;
+  google.protobuf.UInt64Value rx2_frequency = 9 [(validate.rules).uint64.gte = 100000];
   // List of factory-preset frequencies.
   // If unset, the default value from Network Server configuration or regional parameters specification will be used.
   repeated uint64 factory_preset_frequencies = 10;
@@ -252,7 +252,7 @@ message MACSettings {
   DataRateIndexValue desired_rx2_data_rate_index = 20;
   // The Rx2 frequency index Network Server should configure device to use via MAC commands.
   // If unset, the default value from frequency plan, Network Server configuration or regional parameters specification will be used.
-  uint64 desired_rx2_frequency = 21;
+  google.protobuf.UInt64Value desired_rx2_frequency = 21 [(validate.rules).uint64.gte = 100000];
 }
 
 // MACState represents the state of MAC layer of the device.
@@ -262,23 +262,23 @@ message MACState {
   option (gogoproto.populate) = false;
 
   // Current LoRaWAN MAC parameters.
-  MACParameters current_parameters = 1 [(gogoproto.nullable) = false];
+  MACParameters current_parameters = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   // Desired LoRaWAN MAC parameters.
-  MACParameters desired_parameters = 2 [(gogoproto.nullable) = false];
+  MACParameters desired_parameters = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
 
   // Currently active LoRaWAN device class
   // - Device class is A by default
   // - If device sets ClassB bit in uplink, this will be set to B
   // - If device sent DeviceModeInd MAC message, this will be set to that value
-  Class device_class = 3;
+  Class device_class = 3 [(validate.rules).enum.defined_only = true];
   // LoRaWAN MAC version.
-  MACVersion lorawan_version = 4 [(gogoproto.customname) = "LoRaWANVersion"];
+  MACVersion lorawan_version = 4 [(gogoproto.customname) = "LoRaWANVersion", (validate.rules).enum.defined_only = true];
   // Time when the last confirmed downlink message or MAC command was scheduled.
   google.protobuf.Timestamp last_confirmed_downlink_at = 5 [(gogoproto.stdtime) = true];
   // Frame counter value of last uplink containing DevStatusAns.
   uint32 last_dev_status_f_cnt_up = 6;
   // Periodicity of the class B ping slot.
-  PingSlotPeriod ping_slot_periodicity = 7;
+  PingSlotPeriod ping_slot_periodicity = 7 [(validate.rules).enum.defined_only = true];
   // A confirmed application downlink, for which an acknowledgment is expected to arrive.
   ApplicationDownlink pending_application_downlink = 8;
   // Queued MAC responses.
@@ -290,11 +290,11 @@ message MACState {
 
   message JoinAccept {
     // Payload of the join-accept received from Join Server.
-    bytes payload = 1 [(validate.rules).bytes = { min_len: 12, max_len: 28 }];
+    bytes payload = 1 [(validate.rules).bytes = {min_len: 17, max_len: 33}];
     // JoinRequest sent to Join Server.
-    JoinRequest request = 2 [(gogoproto.nullable) = false];
+    JoinRequest request = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
     // Network session keys associated with the join.
-    SessionKeys keys = 3 [(gogoproto.nullable) = false];
+    SessionKeys keys = 3 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   }
   // Queued join-accept.
   // Set each time a (re-)join request accept is received from Join Server and removed each time a downlink is scheduled.
@@ -321,7 +321,7 @@ enum PowerState {
 message EndDevice {
   option (gogoproto.populate) = false;
 
-  EndDeviceIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  EndDeviceIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
@@ -371,10 +371,10 @@ message EndDevice {
   bool supports_class_c = 14;
   // LoRaWAN MAC version. Stored in Network Server.
   // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
-  MACVersion lorawan_version = 15 [(gogoproto.customname) = "LoRaWANVersion"];
+  MACVersion lorawan_version = 15 [(gogoproto.customname) = "LoRaWANVersion", (validate.rules).enum.defined_only = true];
   // LoRaWAN PHY version. Stored in Network Server.
   // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
-  PHYVersion lorawan_phy_version = 16 [(gogoproto.customname) = "LoRaWANPHYVersion"];
+  PHYVersion lorawan_phy_version = 16 [(gogoproto.customname) = "LoRaWANPHYVersion", (validate.rules).enum.defined_only = true];
   // ID of the frequency plan used by this device.
   // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
   string frequency_plan_id = 17 [(gogoproto.customname) = "FrequencyPlanID"];
@@ -429,11 +429,11 @@ message EndDevice {
   // The power state of the device; whether it is battery-powered or connected to an external power source.
   // Received via the DevStatus MAC command at status_received_at.
   // Stored in Network Server.
-  PowerState power_state = 34;
+  PowerState power_state = 34 [(validate.rules).enum.defined_only = true];
   // Latest-known battery percentage of the device.
   // Received via the DevStatus MAC command at last_dev_status_received_at or earlier.
   // Stored in Network Server.
-  float battery_percentage = 35;
+  google.protobuf.FloatValue battery_percentage = 35 [(validate.rules).float = {gte: 0, lte: 1}];
   // Demodulation signal-to-noise ratio (dB).
   // Received via the DevStatus MAC command at last_dev_status_received_at.
   // Stored in Network Server.
@@ -468,21 +468,21 @@ message EndDevices {
 }
 
 message CreateEndDeviceRequest {
-  EndDevice end_device = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  EndDevice end_device = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
 }
 
 message UpdateEndDeviceRequest {
-  EndDevice end_device = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  EndDevice end_device = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
 }
 
 message GetEndDeviceRequest {
-  EndDeviceIdentifiers end_device_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  EndDeviceIdentifiers end_device_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
 }
 
 message ListEndDevicesRequest {
-  ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
   // Order the results by this field path (must be present in the field mask).
   // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
@@ -494,6 +494,6 @@ message ListEndDevicesRequest {
 }
 
 message SetEndDeviceRequest {
-  EndDevice end_device = 1 [(gogoproto.nullable) = false];
+  EndDevice end_device = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
 }

@@ -27,13 +27,13 @@ option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 message JoinRequest {
   option (gogoproto.populate) = false;
 
-  bytes raw_payload = 1 [(validate.rules).bytes = {len: 23}];
+  bytes raw_payload = 1 [(validate.rules).bytes.len = 23];
   Message payload = 2;
   bytes dev_addr = 3 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.DevAddr"];
   MACVersion selected_mac_version = 4 [(gogoproto.customname) = "SelectedMACVersion"];
   bytes net_id = 5 [(gogoproto.nullable) = false, (gogoproto.customname) = "NetID", (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.NetID"];
-  DLSettings downlink_settings = 6 [(gogoproto.nullable) = false];
-  RxDelay rx_delay = 7;
+  DLSettings downlink_settings = 6 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  RxDelay rx_delay = 7 [(validate.rules).enum.defined_only = true];
   // Optional CFList.
   CFList cf_list = 8 [(gogoproto.customname) = "CFList"];
   reserved 9; // Reserved for CFListType.
@@ -41,8 +41,8 @@ message JoinRequest {
 }
 
 message JoinResponse {
-  bytes raw_payload = 1 [(validate.rules).bytes = {min_len:17, max_len: 33}];
-  SessionKeys session_keys = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  bytes raw_payload = 1 [(validate.rules).bytes = {min_len: 17, max_len: 33}];
+  SessionKeys session_keys = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   google.protobuf.Duration lifetime = 3 [(gogoproto.nullable) = false, (gogoproto.stdduration) = true];
   repeated string correlation_ids = 4 [(gogoproto.customname) = "CorrelationIDs"];
 }

@@ -15,6 +15,7 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/lyft/protoc-gen-validate/validate/validate.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/field_mask.proto";
 import "lorawan-stack/api/application.proto";
@@ -81,7 +82,7 @@ service EntityRegistrySearch {
 }
 
 message SearchEndDevicesRequest {
-  ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
 
   // Find end devices where the ID contains this substring.
   string id_contains = 2 [(gogoproto.customname) = "IDContains"];
