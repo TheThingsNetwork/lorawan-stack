@@ -18,10 +18,14 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
+//revive:disable:var-naming
+
 var eu_433 Band
 
 // EU_433 is the ID of the European 433Mhz band
 const EU_433 = "EU_433"
+
+//revive:enable:var-naming
 
 func init() {
 	defaultChannels := []Channel{

@@ -18,10 +18,14 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
+//revive:disable:var-naming
+
 var in_865_867 Band
 
 // IN_865_867 is the ID of the Indian frequency plan
 const IN_865_867 = "IN_865_867"
+
+//revive:enable:var-naming
 
 func init() {
 	defaultChannels := []Channel{

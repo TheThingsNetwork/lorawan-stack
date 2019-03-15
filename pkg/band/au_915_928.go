@@ -18,10 +18,14 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
+//revive:disable:var-naming
+
 var au_915_928 Band
 
 // AU_915_928 is the ID of the Australian band
 const AU_915_928 = "AU_915_928"
+
+//revive:enable:var-naming
 
 func init() {
 	uplinkChannels := make([]Channel, 0, 72)

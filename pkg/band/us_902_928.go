@@ -18,10 +18,14 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
+//revive:disable:var-naming
+
 var us_902_928 Band
 
 // US_902_928 is the ID of the US frequency plan
 const US_902_928 = "US_902_928"
+
+//revive:enable:var-naming
 
 func init() {
 	uplinkChannels := make([]Channel, 0, 72)

@@ -18,10 +18,14 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
+//revive:disable:var-naming
+
 var ru_864_870 Band
 
 // RU_864_870 is the ID of the Russian frequency plan
 const RU_864_870 = "RU_864_870"
+
+//revive:enable:var-naming
 
 func init() {
 	defaultChannels := []Channel{
