@@ -648,8 +648,8 @@ var DefaultMACCommands = MACCommandSpec{
 			v |= byte(pld.MaxRetries)
 			b = append(b, v)
 
-			if pld.RejoinType > 7 {
-				return nil, errExpectedLowerOrEqual("RejoinType", 7)(pld.RejoinType)
+			if pld.RejoinType > 2 {
+				return nil, errExpectedLowerOrEqual("RejoinType", 2)(pld.RejoinType)
 			}
 			// Second byte
 			v = byte(pld.RejoinType) << 4
@@ -666,7 +666,7 @@ var DefaultMACCommands = MACCommandSpec{
 				ForceRejoinReq: &ttnpb.MACCommand_ForceRejoinReq{
 					PeriodExponent: ttnpb.RejoinPeriodExponent(uint32(b[0] >> 3)),
 					MaxRetries:     uint32(b[0] & 0x7),
-					RejoinType:     uint32(b[1] >> 4),
+					RejoinType:     ttnpb.RejoinType(b[1] >> 4),
 					DataRateIndex:  ttnpb.DataRateIndex(b[1] & 0xf),
 				},
 			}
