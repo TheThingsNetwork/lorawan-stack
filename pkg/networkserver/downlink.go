@@ -222,7 +222,7 @@ outer:
 		}
 		key, err := cryptoutil.UnwrapAES128Key(*dev.Session.NwkSEncKey, ns.KeyVault)
 		if err != nil {
-			logger.WithField("kek_label", dev.Session.NwkSEncKey.KEKLabel).WithError(err).Error("Failed to unwrap NwkSEncKey")
+			logger.WithField("kek_label", dev.Session.NwkSEncKey.KEKLabel).WithError(err).Warn("Failed to unwrap NwkSEncKey")
 			return nil, nil, err
 		}
 
@@ -278,7 +278,7 @@ outer:
 	}
 	key, err := cryptoutil.UnwrapAES128Key(*dev.Session.SNwkSIntKey, ns.KeyVault)
 	if err != nil {
-		logger.WithField("kek_label", dev.Session.SNwkSIntKey.KEKLabel).WithError(err).Error("Failed to unwrap SNwkSIntKey")
+		logger.WithField("kek_label", dev.Session.SNwkSIntKey.KEKLabel).WithError(err).Warn("Failed to unwrap SNwkSIntKey")
 		return nil, nil, err
 	}
 
@@ -844,7 +844,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 
 		case err != nil:
 			setErr = true
-			logger.WithError(err).Error("Failed to update device in registry")
+			logger.WithError(err).Warn("Failed to update device in registry")
 			return err
 		}
 
@@ -859,7 +859,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 		return nil
 	})
 	if err != nil && !setErr && !addErr && !scheduleErr {
-		ns.Logger().WithError(err).Error("Failed to pop device from downlink schedule")
+		ns.Logger().WithError(err).Warn("Failed to pop device from downlink schedule")
 	}
 	return err
 }
