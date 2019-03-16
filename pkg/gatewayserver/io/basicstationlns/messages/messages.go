@@ -34,7 +34,7 @@ const (
 	// Upstream types for messages from the Gateway
 	TypeUpstreamVersion              = "version"
 	TypeUpstreamJoinRequest          = "jreq"
-	TypeUpstreamJoinUplinkDataFrame  = "updf"
+	TypeUpstreamUplinkDataFrame      = "updf"
 	TypeUpstreamProprietaryDataFrame = "propdf"
 	TypeUpstreamTxConfirmation       = "dntxed"
 	TypeUpstreamTimeSync             = "timesync"
