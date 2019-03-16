@@ -229,7 +229,21 @@ func (s *srv) handleTraffic(c echo.Context) error {
 				logger.WithError(err).Warn("Failed to handle uplink message")
 			}
 
-		case messages.TypeUpstreamJoinUplinkDataFrame:
+		case messages.TypeUpstreamUplinkDataFrame:
+			var updf messages.UplinkDataFrame
+			if err := json.Unmarshal(data, &updf); err != nil {
+				logger.WithError(err).Debug("Failed to unmarshal uplink data frame")
+				return err
+			}
+			up, err := updf.ToUplinkMessage(ids, fp.BandID)
+			if err != nil {
+				logger.WithError(err).Debug("Failed to parse uplink data frame")
+				return err
+			}
+			if err := conn.HandleUp(&up); err != nil {
+				logger.WithError(err).Warn("Failed to handle uplink message")
+			}
+
 		case messages.TypeUpstreamTxConfirmation:
 		case messages.TypeUpstreamProprietaryDataFrame:
 		case messages.TypeUpstreamRemoteShell:
