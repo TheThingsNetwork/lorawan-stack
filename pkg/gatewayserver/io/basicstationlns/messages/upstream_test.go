@@ -26,7 +26,77 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-func TestGetUplinkMessage(t *testing.T) {
+type message interface {
+	MarshalJSON() ([]byte, error)
+}
+
+func TestMarshalJSON(t *testing.T) {
+
+	a := assertions.New(t)
+	for _, tc := range []struct {
+		Name             string
+		Message          message
+		MarshaledMessage []byte
+	}{
+		{
+			"JoinRequest",
+			JoinRequest{
+				MHdr:     0,
+				DevEUI:   basicstation.EUI{Prefix: "DevEui", EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
+				JoinEUI:  basicstation.EUI{Prefix: "JoinEui", EUI64: types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22}},
+				DevNonce: 18000,
+				MIC:      12345678,
+				RadioMetaData: RadioMetaData{
+					DataRate:  1,
+					Frequency: 868300000,
+					UpInfo: UpInfo{
+						RxTime: 1548059982,
+						XTime:  12666373963464220,
+						RSSI:   89,
+						SNR:    9.25,
+					},
+				},
+			},
+			[]byte("{\"msgtype\":\"jreq\",\"MHdr\":0,\"JoinEui\":\"joineui-2222:2222:2222:2222\",\"DevEui\":\"deveui-1111:1111:1111:1111\",\"DevNonce\":18000,\"MIC\":12345678,\"RefTime\":0,\"RadioMetaData\":{\"DR\":1,\"Freq\":868300000,\"upinfo\":{\"rxtime\":1548059982,\"rtcx\":0,\"xtime\":12666373963464220,\"gpstime\":0,\"rssi\":89,\"snr\":9.25}}}"),
+		},
+		{
+			"UplinkDataFrame",
+			UplinkDataFrame{
+				MHdr:       0x40,
+				DevAddr:    0x11223344,
+				FCtrl:      0x30,
+				FPort:      0x00,
+				FCnt:       25,
+				FOpts:      "FD",
+				FRMPayload: "Ymxhamthc25kJ3M=",
+				MIC:        12345678,
+				RadioMetaData: RadioMetaData{
+					DataRate:  1,
+					Frequency: 868300000,
+					UpInfo: UpInfo{
+						RxTime: 1548059982,
+						XTime:  12666373963464220,
+						RSSI:   89,
+						SNR:    9.25,
+					},
+				},
+			},
+			[]byte("{\"msgtype\":\"updf\",\"MHdr\":64,\"DevAddr\":287454020,\"FCtrl\":48,\"Fcnt\":25,\"FOpts\":\"FD\",\"FPort\":0,\"FRMPayload\":\"Ymxhamthc25kJ3M=\",\"MIC\":12345678,\"RefTime\":0,\"RadioMetaData\":{\"DR\":1,\"Freq\":868300000,\"upinfo\":{\"rxtime\":1548059982,\"rtcx\":0,\"xtime\":12666373963464220,\"gpstime\":0,\"rssi\":89,\"snr\":9.25}}}"),
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			msg, err := tc.Message.MarshalJSON()
+			if !(a.So(err, should.Resemble, nil)) {
+				t.Fatalf("Unexpected error: %v", err)
+			}
+			if !(a.So(msg, should.Resemble, tc.MarshaledMessage)) {
+				t.Fatalf("Unexpected message: %v", msg)
+			}
+		})
+	}
+}
+
+func TestJoinRequest(t *testing.T) {
 	a := assertions.New(t)
 	for _, tc := range []struct {
 		Name                  string
@@ -123,6 +193,159 @@ func TestGetUplinkMessage(t *testing.T) {
 			if !a.So(&payload, should.Resemble, msg.Payload) {
 				t.Fatalf("Invalid RawPayload: %v", msg.RawPayload)
 			}
+			msg.RawPayload = nil
+			if !(a.So(msg, should.Resemble, tc.ExpectedUplinkMessage)) {
+				t.Fatalf("Invalid UplinkMessage: %s", msg.RawPayload)
+			}
+		})
+	}
+}
+
+func TestGetUplinkDataFrame(t *testing.T) {
+	a := assertions.New(t)
+	for _, tc := range []struct {
+		Name                  string
+		UplinkDataFrame       UplinkDataFrame
+		GatewayIDs            ttnpb.GatewayIdentifiers
+		FreqPlanID            string
+		ExpectedUplinkMessage ttnpb.UplinkMessage
+		ExpectedError         error
+	}{
+		{
+			"Empty",
+			UplinkDataFrame{},
+			ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"},
+			"EU_863_870",
+			ttnpb.UplinkMessage{},
+			errUplinkDataFrame,
+		},
+		{
+			"ValidFrame",
+			UplinkDataFrame{
+				MHdr:       0x40,
+				DevAddr:    0x11223344,
+				FCtrl:      0x30,
+				FPort:      0x00,
+				FCnt:       25,
+				FOpts:      "FD",
+				FRMPayload: "Ymxhamthc25kJ3M=",
+				MIC:        12345678,
+				RadioMetaData: RadioMetaData{
+					DataRate:  1,
+					Frequency: 868300000,
+					UpInfo: UpInfo{
+						RxTime: 1548059982,
+						XTime:  12666373963464220,
+						RSSI:   89,
+						SNR:    9.25,
+					},
+				},
+			},
+			ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"},
+			"EU_863_870",
+			ttnpb.UplinkMessage{
+				Payload: &ttnpb.Message{
+					MHDR: ttnpb.MHDR{MType: ttnpb.MType_UNCONFIRMED_UP, Major: ttnpb.Major_LORAWAN_R1},
+					MIC:  []byte{0x4E, 0x61, 0xBC, 0x00},
+					Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{
+						FPort:      0,
+						FRMPayload: []byte("Ymxhamthc25kJ3M="),
+						FHDR: ttnpb.FHDR{
+							DevAddr: [4]byte{0x44, 0x33, 0x22, 0x11},
+							FCtrl: ttnpb.FCtrl{
+								Ack:    true,
+								ClassB: true,
+							},
+							FCnt:  25,
+							FOpts: []byte("FD"),
+						},
+					}}},
+				RxMetadata: []*ttnpb.RxMetadata{{
+					GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"},
+					Time:               &[]time.Time{time.Unix(1548059982, 0)}[0],
+					Timestamp:          (uint32)(12666373963464220 & 0xFFFFFFFF),
+					RSSI:               89,
+					SNR:                9.25,
+				},
+				},
+				Settings: ttnpb.TxSettings{
+					Frequency:     868300000,
+					DataRateIndex: 1,
+					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+						SpreadingFactor: 11,
+						Bandwidth:       125000,
+					}}},
+				},
+			},
+			nil,
+		},
+		{
+			"NegativeFPort",
+			UplinkDataFrame{
+				MHdr:       0x40,
+				DevAddr:    0x11223344,
+				FCtrl:      0x30,
+				FPort:      -1,
+				FCnt:       25,
+				FOpts:      "FD",
+				FRMPayload: "Ymxhamthc25kJ3M=",
+				MIC:        12345678,
+				RadioMetaData: RadioMetaData{
+					DataRate:  1,
+					Frequency: 868300000,
+					UpInfo: UpInfo{
+						RxTime: 1548059982,
+						XTime:  12666373963464220,
+						RSSI:   89,
+						SNR:    9.25,
+					},
+				},
+			},
+			ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"},
+			"EU_863_870",
+			ttnpb.UplinkMessage{
+				Payload: &ttnpb.Message{
+					MHDR: ttnpb.MHDR{MType: ttnpb.MType_UNCONFIRMED_UP, Major: ttnpb.Major_LORAWAN_R1},
+					MIC:  []byte{0x4E, 0x61, 0xBC, 0x00},
+					Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{
+						FPort:      0,
+						FRMPayload: []byte("Ymxhamthc25kJ3M="),
+						FHDR: ttnpb.FHDR{
+							DevAddr: [4]byte{0x44, 0x33, 0x22, 0x11},
+							FCtrl: ttnpb.FCtrl{
+								Ack:    true,
+								ClassB: true,
+							},
+							FCnt:  25,
+							FOpts: []byte("FD"),
+						},
+					}}},
+				RxMetadata: []*ttnpb.RxMetadata{{
+					GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"},
+					Time:               &[]time.Time{time.Unix(1548059982, 0)}[0],
+					Timestamp:          (uint32)(12666373963464220 & 0xFFFFFFFF),
+					RSSI:               89,
+					SNR:                9.25,
+				},
+				},
+				Settings: ttnpb.TxSettings{
+					Frequency:     868300000,
+					DataRateIndex: 1,
+					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+						SpreadingFactor: 11,
+						Bandwidth:       125000,
+					}}},
+				},
+			},
+			nil,
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			msg, err := tc.UplinkDataFrame.ToUplinkMessage(tc.GatewayIDs, tc.FreqPlanID)
+			if !(a.So(err, should.Resemble, tc.ExpectedError)) {
+				t.Fatalf("Unexpected error: %v", err)
+			}
+			msg.ReceivedAt = time.Time{}
 			msg.RawPayload = nil
 			if !(a.So(msg, should.Resemble, tc.ExpectedUplinkMessage)) {
 				t.Fatalf("Invalid UplinkMessage: %s", msg.RawPayload)
