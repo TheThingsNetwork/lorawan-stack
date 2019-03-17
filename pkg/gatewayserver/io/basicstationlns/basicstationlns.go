@@ -171,7 +171,25 @@ func (s *srv) handleTraffic(c echo.Context) error {
 		}
 	}()
 
-	// TODO: Start downlink processing in goroutine, see gRPC frontend.
+	// go func() {
+	// 	for {
+	// 		select {
+	// 		case <-conn.Context().Done():
+	// 			return
+	// 		case down := <-conn.Down():
+	// 			msg := &ttnpb.GatewayDown{
+	// 				DownlinkMessage: down,
+	// 			}
+	// 			logger.Info("Sending downlink message")
+	// 			// if err := link.Send(msg); err != nil {
+	// 			// 	logger.WithError(err).Warn("Failed to send message")
+	// 			// 	conn.Disconnect(err)
+	// 			// 	return
+	// 			}
+	// 		}
+	// 	}
+	// }()
+
 	for {
 		_, data, err := ws.ReadMessage()
 		if err != nil {
