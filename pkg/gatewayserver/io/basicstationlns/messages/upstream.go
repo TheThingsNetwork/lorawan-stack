@@ -30,12 +30,6 @@ var (
 	errUplinkDataFrame    = errors.Define("uplink_data_Frame", "invalid uplink data frame received")
 )
 
-// DataRates encodes the available datarates of the channel plan for the Station in the format below
-// [0] -> SF (Spreading Factor; Range: 7...12 for LoRa, 0 for FSK)
-// [1] -> BW (Bandwidth; 125/250/500 for LoRa, ignored for FSK)
-// [2] -> DNONLY (Downlink Only; 1 = true, 0 = false)
-type DataRates [16][3]int
-
 // UpInfo provides additional metadata on each upstream message.
 type UpInfo struct {
 	RxTime  int64   `json:"rxtime"`
@@ -65,7 +59,6 @@ type JoinRequest struct {
 }
 
 // MarshalJSON implements json.Marshaler.
-// TODO: Make MarshalJSON() messages generic.
 func (req JoinRequest) MarshalJSON() ([]byte, error) {
 	type Alias JoinRequest
 	return json.Marshal(struct {
@@ -103,6 +96,28 @@ func (updf UplinkDataFrame) MarshalJSON() ([]byte, error) {
 	})
 }
 
+// TxConfirmation is the LoRaWAN Join Request message from the BasicStation.
+type TxConfirmation struct {
+	Diid    int64            `json:"diid"`
+	DevEUI  basicstation.EUI `json:"DevEui"`
+	RCtx    int64            `json:"rctx"`
+	XTime   int64            `json:"xtime"`
+	TxTime  float64          `json:"txtime"`
+	GpsTime int64            `json:"gpstime"`
+}
+
+// MarshalJSON implements json.Marshaler.
+func (conf TxConfirmation) MarshalJSON() ([]byte, error) {
+	type Alias TxConfirmation
+	return json.Marshal(struct {
+		Type string `json:"msgtype"`
+		Alias
+	}{
+		Type:  TypeUpstreamTxConfirmation,
+		Alias: Alias(conf),
+	})
+}
+
 // ToUplinkMessage extracts fields from the basic station Join Request "jreq" message and converts them into an UplinkMessage for the network server.
 func (req *JoinRequest) ToUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID string) (ttnpb.UplinkMessage, error) {
 	up := ttnpb.UplinkMessage{}
@@ -133,13 +148,28 @@ func (req *JoinRequest) ToUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID str
 		return ttnpb.UplinkMessage{}, errJoinRequestMessage.WithCause(err)
 	}
 
+	timestamp := uint32(req.RadioMetaData.UpInfo.XTime & 0xFFFFFFFF)
+
+	ulToken := ttnpb.UplinkToken{
+		GatewayAntennaIdentifiers: ttnpb.GatewayAntennaIdentifiers{
+			GatewayIdentifiers: ids,
+			AntennaIndex:       uint32(req.RadioMetaData.UpInfo.RCtx),
+		},
+		Timestamp: timestamp,
+	}
+	ulTokenBytes, err := ulToken.Marshal()
+	if err != nil {
+		return ttnpb.UplinkMessage{}, errJoinRequestMessage.WithCause(err)
+	}
+
 	rxTime := time.Unix(req.RadioMetaData.UpInfo.RxTime, 0)
 	rxMetadata := &ttnpb.RxMetadata{
 		GatewayIdentifiers: ids,
 		Time:               &rxTime,
-		Timestamp:          uint32(req.RadioMetaData.UpInfo.XTime & 0xFFFFFFFF),
+		Timestamp:          timestamp,
 		RSSI:               req.RadioMetaData.UpInfo.RSSI,
 		SNR:                req.RadioMetaData.UpInfo.SNR,
+		UplinkToken:        ulTokenBytes,
 	}
 	up.RxMetadata = append(up.RxMetadata, rxMetadata)
 
@@ -152,6 +182,7 @@ func (req *JoinRequest) ToUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID str
 		DataRateIndex: ttnpb.DataRateIndex(req.RadioMetaData.DataRate),
 		DataRate:      loraDR,
 	}
+
 	return up, nil
 }
 
@@ -217,13 +248,28 @@ func (updf *UplinkDataFrame) ToUplinkMessage(ids ttnpb.GatewayIdentifiers, bandI
 		return ttnpb.UplinkMessage{}, errUplinkDataFrame.WithCause(err)
 	}
 
+	timestamp := uint32(updf.RadioMetaData.UpInfo.XTime & 0xFFFFFFFF)
+
+	ulToken := ttnpb.UplinkToken{
+		GatewayAntennaIdentifiers: ttnpb.GatewayAntennaIdentifiers{
+			GatewayIdentifiers: ids,
+			AntennaIndex:       uint32(updf.RadioMetaData.UpInfo.RCtx),
+		},
+		Timestamp: timestamp,
+	}
+	ulTokenBytes, err := ulToken.Marshal()
+	if err != nil {
+		return ttnpb.UplinkMessage{}, errJoinRequestMessage.WithCause(err)
+	}
+
 	rxTime := time.Unix(updf.RadioMetaData.UpInfo.RxTime, 0)
 	rxMetadata := &ttnpb.RxMetadata{
 		GatewayIdentifiers: ids,
 		Time:               &rxTime,
-		Timestamp:          uint32(updf.RadioMetaData.UpInfo.XTime & 0xFFFFFFFF),
+		Timestamp:          timestamp,
 		RSSI:               updf.RadioMetaData.UpInfo.RSSI,
 		SNR:                updf.RadioMetaData.UpInfo.SNR,
+		UplinkToken:        ulTokenBytes,
 	}
 	up.RxMetadata = append(up.RxMetadata, rxMetadata)
 
@@ -237,4 +283,12 @@ func (updf *UplinkDataFrame) ToUplinkMessage(ids ttnpb.GatewayIdentifiers, bandI
 		DataRate:      loraDR,
 	}
 	return up, nil
+}
+
+// ToTxAcknowledgment extracts fields from the basic station TxConfirmation "dntxed" message and converts them into a TxAcknowledgment for the network server.
+func (conf *TxConfirmation) ToTxAcknowledgment(ids ttnpb.GatewayIdentifiers, bandID string) (ttnpb.TxAcknowledgment, error) {
+	// TODO: How to correlate a TxAck to its corresponding downlink
+	return ttnpb.TxAcknowledgment{
+		Result: ttnpb.TxAcknowledgment_SUCCESS,
+	}, nil
 }

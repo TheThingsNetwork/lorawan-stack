@@ -2726,6 +2726,15 @@
       "file": "util.go"
     }
   },
+  "error:pkg/gatewayserver/io/basicstationlns/messages:downlink_message": {
+    "translations": {
+      "en": "could not translate downlink message"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/basicstationlns/messages",
+      "file": "downstream.go"
+    }
+  },
   "error:pkg/gatewayserver/io/basicstationlns/messages:frequency_plan": {
     "translations": {
       "en": "invalid frequency plan"
@@ -2741,7 +2750,16 @@
     },
     "description": {
       "package": "pkg/gatewayserver/io/basicstationlns/messages",
-      "file": "messages.go"
+      "file": "upstream.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/basicstationlns/messages:uplink_data_Frame": {
+    "translations": {
+      "en": "invalid uplink data frame received"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/basicstationlns/messages",
+      "file": "upstream.go"
     }
   },
   "error:pkg/gatewayserver/io/basicstationlns:empty_gateway_eui": {
