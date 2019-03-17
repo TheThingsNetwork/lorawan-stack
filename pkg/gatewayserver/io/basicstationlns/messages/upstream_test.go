@@ -83,6 +83,17 @@ func TestMarshalJSON(t *testing.T) {
 			},
 			[]byte("{\"msgtype\":\"updf\",\"MHdr\":64,\"DevAddr\":287454020,\"FCtrl\":48,\"Fcnt\":25,\"FOpts\":\"FD\",\"FPort\":0,\"FRMPayload\":\"Ymxhamthc25kJ3M=\",\"MIC\":12345678,\"RefTime\":0,\"RadioMetaData\":{\"DR\":1,\"Freq\":868300000,\"upinfo\":{\"rxtime\":1548059982,\"rtcx\":0,\"xtime\":12666373963464220,\"gpstime\":0,\"rssi\":89,\"snr\":9.25}}}"),
 		},
+		{
+			"TxConfirmation",
+			TxConfirmation{
+				Diid:    35,
+				DevEUI:  basicstation.EUI{Prefix: "DevEui", EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
+				XTime:   1552906698,
+				TxTime:  1552906698,
+				GpsTime: 1552906698,
+			},
+			[]byte("{\"msgtype\":\"dntxed\",\"diid\":35,\"DevEui\":\"deveui-1111:1111:1111:1111\",\"rctx\":0,\"xtime\":1552906698,\"txtime\":1552906698,\"gpstime\":1552906698}"),
+		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			msg, err := tc.Message.MarshalJSON()
@@ -123,6 +134,7 @@ func TestJoinRequest(t *testing.T) {
 				RxMetadata: []*ttnpb.RxMetadata{{
 					GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"},
 					Time:               &[]time.Time{time.Unix(0, 0)}[0],
+					UplinkToken:        []byte{10, 16, 10, 14, 10, 12, 116, 101, 115, 116, 45, 103, 97, 116, 101, 119, 97, 121},
 				}},
 				Settings: ttnpb.TxSettings{
 					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
@@ -168,6 +180,7 @@ func TestJoinRequest(t *testing.T) {
 					Timestamp:          (uint32)(12666373963464220 & 0xFFFFFFFF),
 					RSSI:               89,
 					SNR:                9.25,
+					UplinkToken:        []byte{10, 16, 10, 14, 10, 12, 116, 101, 115, 116, 45, 103, 97, 116, 101, 119, 97, 121, 16, 156, 252, 188, 5},
 				},
 				},
 				Settings: ttnpb.TxSettings{
@@ -201,7 +214,7 @@ func TestJoinRequest(t *testing.T) {
 	}
 }
 
-func TestGetUplinkDataFrame(t *testing.T) {
+func TestUplinkDataFrame(t *testing.T) {
 	a := assertions.New(t)
 	for _, tc := range []struct {
 		Name                  string
@@ -266,6 +279,7 @@ func TestGetUplinkDataFrame(t *testing.T) {
 					Timestamp:          (uint32)(12666373963464220 & 0xFFFFFFFF),
 					RSSI:               89,
 					SNR:                9.25,
+					UplinkToken:        []byte{10, 16, 10, 14, 10, 12, 116, 101, 115, 116, 45, 103, 97, 116, 101, 119, 97, 121, 16, 156, 252, 188, 5},
 				},
 				},
 				Settings: ttnpb.TxSettings{
@@ -326,6 +340,7 @@ func TestGetUplinkDataFrame(t *testing.T) {
 					Timestamp:          (uint32)(12666373963464220 & 0xFFFFFFFF),
 					RSSI:               89,
 					SNR:                9.25,
+					UplinkToken:        []byte{10, 16, 10, 14, 10, 12, 116, 101, 115, 116, 45, 103, 97, 116, 101, 119, 97, 121, 16, 156, 252, 188, 5},
 				},
 				},
 				Settings: ttnpb.TxSettings{
