@@ -52,6 +52,12 @@ const (
 	configHardwareSpecNoOfConcentrators = "1"
 )
 
+// DataRates encodes the available datarates of the channel plan for the Station in the format below
+// [0] -> SF (Spreading Factor; Range: 7...12 for LoRa, 0 for FSK)
+// [1] -> BW (Bandwidth; 125/250/500 for LoRa, ignored for FSK)
+// [2] -> DNONLY (Downlink Only; 1 = true, 0 = false)
+type DataRates [16][3]int
+
 // DiscoverQuery contains the unique identifier of the gateway.
 // This message is sent by the gateway.
 type DiscoverQuery struct {
