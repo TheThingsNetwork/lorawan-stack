@@ -20,11 +20,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/jarcoal/httpmock"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/fetch"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
-	httpmock "gopkg.in/jarcoal/httpmock.v1"
 )
 
 func TestHTTP(t *testing.T) {
