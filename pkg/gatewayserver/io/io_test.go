@@ -21,7 +21,6 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
-	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/mock"
@@ -43,27 +42,17 @@ func Test(t *testing.T) {
 	gs := mock.NewServer()
 
 	ids := ttnpb.GatewayIdentifiers{GatewayID: "foo-gateway"}
+	antennaGain := float32(3)
 	gtw := &ttnpb.Gateway{
 		GatewayIdentifiers: ids,
 		FrequencyPlanID:    "EU_863_870",
 		Antennas: []ttnpb.GatewayAntenna{
 			{
-				Gain: 3,
+				Gain: antennaGain,
 			},
 		},
 	}
 	gs.RegisterGateway(ctx, ids, gtw)
-	fp, err := gs.GetFrequencyPlan(ctx, ids)
-	if err != nil {
-		panic(err)
-	}
-	var maxEirp float32
-	if fp.MaxEIRP != nil {
-		maxEirp = *fp.MaxEIRP
-	} else {
-		band, _ := band.GetByID(fp.BandID)
-		maxEirp = band.DefaultMaxEIRP
-	}
 
 	gtwCtx := rights.NewContext(ctx, rights.Rights{
 		GatewayRights: map[string]*ttnpb.Rights{
@@ -136,6 +125,7 @@ func Test(t *testing.T) {
 		Message         *ttnpb.DownlinkMessage
 		ErrorAssertion  func(error) bool
 		DetailAssertion []func(error) bool
+		ExpectedEIRP    float32
 	}{
 		{
 			Name: "NoRequest",
@@ -172,6 +162,7 @@ func Test(t *testing.T) {
 					},
 				},
 			},
+			ExpectedEIRP: 16.15 - antennaGain,
 		},
 		{
 			Name: "ConflictClassA",
@@ -239,6 +230,7 @@ func Test(t *testing.T) {
 					},
 				},
 			},
+			ExpectedEIRP: 29.15 - antennaGain,
 		},
 		{
 			Name: "ValidClassC/FixedPath",
@@ -262,6 +254,7 @@ func Test(t *testing.T) {
 					},
 				},
 			},
+			ExpectedEIRP: 29.15 - antennaGain,
 		},
 		{
 			Name: "ValidClassC/AbsoluteTime",
@@ -286,6 +279,7 @@ func Test(t *testing.T) {
 					},
 				},
 			},
+			ExpectedEIRP: 29.15 - antennaGain,
 		},
 		{
 			Name: "NoPathClassC",
@@ -368,7 +362,7 @@ func Test(t *testing.T) {
 			case msg := <-frontend.Down:
 				scheduled := msg.GetScheduled()
 				a.So(scheduled, should.NotBeNil)
-				a.So(scheduled.TxPower, should.Equal, int32(maxEirp-gtw.Antennas[0].Gain))
+				a.So(scheduled.TxPower, should.Equal, tc.ExpectedEIRP)
 			case <-time.After(timeout):
 				t.Fatalf("Expected downlink message timeout")
 			}
