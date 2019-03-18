@@ -96,6 +96,7 @@ snapcraft:
   description: The Things Network Stack for LoRaWAN
   grade: devel
   confinement: strict
+  publish: true
 
 # TODO: Generate separate formulas for stack+CLI and CLI only.(https://github.com/TheThingsNetwork/lorawan-stack/issues/108)
 brew:
