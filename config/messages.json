@@ -4283,6 +4283,15 @@
       "file": "validator.go"
     }
   },
+  "error:pkg/rpcmiddleware/validator:no_validator": {
+    "translations": {
+      "en": "validator not defined"
+    },
+    "description": {
+      "package": "pkg/rpcmiddleware/validator",
+      "file": "validator.go"
+    }
+  },
   "error:pkg/rpcserver:rpc_recovered": {
     "translations": {
       "en": "Internal Server Error"
