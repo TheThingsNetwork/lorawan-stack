@@ -59,6 +59,8 @@ func convertError(err error) error {
 	return grpc.Errorf(codes.InvalidArgument, err.Error())
 }
 
+var errNoValidator = errors.DefineUnimplemented("no_validator", "validator not defined")
+
 func validateMessage(ctx context.Context, fullMethod string, msg interface{}) error {
 	if v, ok := msg.(interface {
 		GetFieldMask() types.FieldMask
@@ -75,6 +77,7 @@ func validateMessage(ctx context.Context, fullMethod string, msg interface{}) er
 		if err := v.ValidateContext(ctx); err != nil {
 			return convertError(err)
 		}
+		return nil
 
 	case interface {
 		Validate() error
@@ -82,6 +85,7 @@ func validateMessage(ctx context.Context, fullMethod string, msg interface{}) er
 		if err := v.Validate(); err != nil {
 			return convertError(err)
 		}
+		return nil
 
 	case interface {
 		ValidateFields(...string) error
@@ -89,9 +93,14 @@ func validateMessage(ctx context.Context, fullMethod string, msg interface{}) er
 		if err := v.ValidateFields(); err != nil {
 			return convertError(err)
 		}
+		return nil
 
+	case *types.Empty:
+		return nil
+
+	default:
+		return errNoValidator
 	}
-	return nil
 }
 
 // UnaryServerInterceptor returns a new unary server interceptor that validates
