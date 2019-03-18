@@ -1,5 +1,5 @@
 # Protocol Documentation
-<a name="top"/>
+<a name="top"></a>
 
 ## Table of Contents
 
@@ -531,7 +531,7 @@
 
 
 
-<a name="lorawan-stack/api/_api.proto"/>
+<a name="lorawan-stack/api/_api.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## lorawan-stack/api/_api.proto
@@ -547,14 +547,14 @@
 
 
 
-<a name="lorawan-stack/api/application.proto"/>
+<a name="lorawan-stack/api/application.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## lorawan-stack/api/application.proto
 
 
 
-<a name="ttn.lorawan.v3.Application"/>
+<a name="ttn.lorawan.v3.Application"></a>
 
 ### Application
 Application is the message that defines an Application in the network.
@@ -575,7 +575,7 @@ Application is the message that defines an Application in the network.
 
 
 
-<a name="ttn.lorawan.v3.Application.AttributesEntry"/>
+<a name="ttn.lorawan.v3.Application.AttributesEntry"></a>
 
 ### Application.AttributesEntry
 
@@ -591,7 +591,7 @@ Application is the message that defines an Application in the network.
 
 
 
-<a name="ttn.lorawan.v3.Applications"/>
+<a name="ttn.lorawan.v3.Applications"></a>
 
 ### Applications
 
@@ -606,7 +606,7 @@ Application is the message that defines an Application in the network.
 
 
 
-<a name="ttn.lorawan.v3.CreateApplicationAPIKeyRequest"/>
+<a name="ttn.lorawan.v3.CreateApplicationAPIKeyRequest"></a>
 
 ### CreateApplicationAPIKeyRequest
 
@@ -623,7 +623,7 @@ Application is the message that defines an Application in the network.
 
 
 
-<a name="ttn.lorawan.v3.CreateApplicationRequest"/>
+<a name="ttn.lorawan.v3.CreateApplicationRequest"></a>
 
 ### CreateApplicationRequest
 
@@ -639,7 +639,7 @@ Application is the message that defines an Application in the network.
 
 
 
-<a name="ttn.lorawan.v3.GetApplicationRequest"/>
+<a name="ttn.lorawan.v3.GetApplicationRequest"></a>
 
 ### GetApplicationRequest
 
@@ -655,7 +655,7 @@ Application is the message that defines an Application in the network.
 
 
 
-<a name="ttn.lorawan.v3.ListApplicationsRequest"/>
+<a name="ttn.lorawan.v3.ListApplicationsRequest"></a>
 
 ### ListApplicationsRequest
 By default we list all applications the caller has rights on.
@@ -676,7 +676,7 @@ where the user or organization is collaborator on.
 
 
 
-<a name="ttn.lorawan.v3.SetApplicationCollaboratorRequest"/>
+<a name="ttn.lorawan.v3.SetApplicationCollaboratorRequest"></a>
 
 ### SetApplicationCollaboratorRequest
 
@@ -692,7 +692,7 @@ where the user or organization is collaborator on.
 
 
 
-<a name="ttn.lorawan.v3.UpdateApplicationAPIKeyRequest"/>
+<a name="ttn.lorawan.v3.UpdateApplicationAPIKeyRequest"></a>
 
 ### UpdateApplicationAPIKeyRequest
 
@@ -708,7 +708,7 @@ where the user or organization is collaborator on.
 
 
 
-<a name="ttn.lorawan.v3.UpdateApplicationRequest"/>
+<a name="ttn.lorawan.v3.UpdateApplicationRequest"></a>
 
 ### UpdateApplicationRequest
 
@@ -733,7 +733,7 @@ where the user or organization is collaborator on.
 
 
 
-<a name="lorawan-stack/api/application_services.proto"/>
+<a name="lorawan-stack/api/application_services.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## lorawan-stack/api/application_services.proto
@@ -746,46 +746,46 @@ where the user or organization is collaborator on.
  
 
 
-<a name="ttn.lorawan.v3.ApplicationAccess"/>
+<a name="ttn.lorawan.v3.ApplicationAccess"></a>
 
 ### ApplicationAccess
 
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| ListRights | [ApplicationIdentifiers](#ttn.lorawan.v3.ApplicationIdentifiers) | [Rights](#ttn.lorawan.v3.ApplicationIdentifiers) |  |
-| CreateAPIKey | [CreateApplicationAPIKeyRequest](#ttn.lorawan.v3.CreateApplicationAPIKeyRequest) | [APIKey](#ttn.lorawan.v3.CreateApplicationAPIKeyRequest) |  |
-| ListAPIKeys | [ApplicationIdentifiers](#ttn.lorawan.v3.ApplicationIdentifiers) | [APIKeys](#ttn.lorawan.v3.ApplicationIdentifiers) |  |
-| UpdateAPIKey | [UpdateApplicationAPIKeyRequest](#ttn.lorawan.v3.UpdateApplicationAPIKeyRequest) | [APIKey](#ttn.lorawan.v3.UpdateApplicationAPIKeyRequest) | Update the rights of an existing application API key. To generate an API key, the CreateAPIKey should be used. To delete an API key, update it with zero rights. |
-| SetCollaborator | [SetApplicationCollaboratorRequest](#ttn.lorawan.v3.SetApplicationCollaboratorRequest) | [.google.protobuf.Empty](#ttn.lorawan.v3.SetApplicationCollaboratorRequest) | Setting a collaborator without rights, removes them. |
-| ListCollaborators | [ApplicationIdentifiers](#ttn.lorawan.v3.ApplicationIdentifiers) | [Collaborators](#ttn.lorawan.v3.ApplicationIdentifiers) |  |
+| ListRights | [ApplicationIdentifiers](#ttn.lorawan.v3.ApplicationIdentifiers) | [Rights](#ttn.lorawan.v3.Rights) |  |
+| CreateAPIKey | [CreateApplicationAPIKeyRequest](#ttn.lorawan.v3.CreateApplicationAPIKeyRequest) | [APIKey](#ttn.lorawan.v3.APIKey) |  |
+| ListAPIKeys | [ApplicationIdentifiers](#ttn.lorawan.v3.ApplicationIdentifiers) | [APIKeys](#ttn.lorawan.v3.APIKeys) |  |
+| UpdateAPIKey | [UpdateApplicationAPIKeyRequest](#ttn.lorawan.v3.UpdateApplicationAPIKeyRequest) | [APIKey](#ttn.lorawan.v3.APIKey) | Update the rights of an existing application API key. To generate an API key, the CreateAPIKey should be used. To delete an API key, update it with zero rights. |
+| SetCollaborator | [SetApplicationCollaboratorRequest](#ttn.lorawan.v3.SetApplicationCollaboratorRequest) | [.google.protobuf.Empty](#google.protobuf.Empty) | Setting a collaborator without rights, removes them. |
+| ListCollaborators | [ApplicationIdentifiers](#ttn.lorawan.v3.ApplicationIdentifiers) | [Collaborators](#ttn.lorawan.v3.Collaborators) |  |
 
 
-<a name="ttn.lorawan.v3.ApplicationRegistry"/>
+<a name="ttn.lorawan.v3.ApplicationRegistry"></a>
 
 ### ApplicationRegistry
 
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| Create | [CreateApplicationRequest](#ttn.lorawan.v3.CreateApplicationRequest) | [Application](#ttn.lorawan.v3.CreateApplicationRequest) | Create a new application. This also sets the given organization or user as first collaborator with all possible rights. |
-| Get | [GetApplicationRequest](#ttn.lorawan.v3.GetApplicationRequest) | [Application](#ttn.lorawan.v3.GetApplicationRequest) | Get the application with the given identifiers, selecting the fields given by the field mask. The method may return more or less fields, depending on the rights of the caller. |
-| List | [ListApplicationsRequest](#ttn.lorawan.v3.ListApplicationsRequest) | [Applications](#ttn.lorawan.v3.ListApplicationsRequest) | List applications. See request message for details. |
-| Update | [UpdateApplicationRequest](#ttn.lorawan.v3.UpdateApplicationRequest) | [Application](#ttn.lorawan.v3.UpdateApplicationRequest) |  |
-| Delete | [ApplicationIdentifiers](#ttn.lorawan.v3.ApplicationIdentifiers) | [.google.protobuf.Empty](#ttn.lorawan.v3.ApplicationIdentifiers) |  |
+| Create | [CreateApplicationRequest](#ttn.lorawan.v3.CreateApplicationRequest) | [Application](#ttn.lorawan.v3.Application) | Create a new application. This also sets the given organization or user as first collaborator with all possible rights. |
+| Get | [GetApplicationRequest](#ttn.lorawan.v3.GetApplicationRequest) | [Application](#ttn.lorawan.v3.Application) | Get the application with the given identifiers, selecting the fields given by the field mask. The method may return more or less fields, depending on the rights of the caller. |
+| List | [ListApplicationsRequest](#ttn.lorawan.v3.ListApplicationsRequest) | [Applications](#ttn.lorawan.v3.Applications) | List applications. See request message for details. |
+| Update | [UpdateApplicationRequest](#ttn.lorawan.v3.UpdateApplicationRequest) | [Application](#ttn.lorawan.v3.Application) |  |
+| Delete | [ApplicationIdentifiers](#ttn.lorawan.v3.ApplicationIdentifiers) | [.google.protobuf.Empty](#google.protobuf.Empty) |  |
 
  
 
 
 
-<a name="lorawan-stack/api/applicationserver.proto"/>
+<a name="lorawan-stack/api/applicationserver.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## lorawan-stack/api/applicationserver.proto
 
 
 
-<a name="ttn.lorawan.v3.ApplicationLink"/>
+<a name="ttn.lorawan.v3.ApplicationLink"></a>
 
 ### ApplicationLink
 
@@ -802,7 +802,7 @@ where the user or organization is collaborator on.
 
 
 
-<a name="ttn.lorawan.v3.ApplicationLinkStats"/>
+<a name="ttn.lorawan.v3.ApplicationLinkStats"></a>
 
 ### ApplicationLinkStats
 Link stats as monitored by the Application Server.
@@ -822,7 +822,7 @@ Link stats as monitored by the Application Server.
 
 
 
-<a name="ttn.lorawan.v3.GetApplicationLinkRequest"/>
+<a name="ttn.lorawan.v3.GetApplicationLinkRequest"></a>
 
 ### GetApplicationLinkRequest
 
@@ -838,7 +838,7 @@ Link stats as monitored by the Application Server.
 
 
 
-<a name="ttn.lorawan.v3.SetApplicationLinkRequest"/>
+<a name="ttn.lorawan.v3.SetApplicationLinkRequest"></a>
 
 ### SetApplicationLinkRequest
 
@@ -861,55 +861,55 @@ Link stats as monitored by the Application Server.
  
 
 
-<a name="ttn.lorawan.v3.AppAs"/>
+<a name="ttn.lorawan.v3.AppAs"></a>
 
 ### AppAs
 The AppAs service connects an application or integration to an Application Server.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| Subscribe | [ApplicationIdentifiers](#ttn.lorawan.v3.ApplicationIdentifiers) | [ApplicationUp](#ttn.lorawan.v3.ApplicationIdentifiers) |  |
-| DownlinkQueuePush | [DownlinkQueueRequest](#ttn.lorawan.v3.DownlinkQueueRequest) | [.google.protobuf.Empty](#ttn.lorawan.v3.DownlinkQueueRequest) |  |
-| DownlinkQueueReplace | [DownlinkQueueRequest](#ttn.lorawan.v3.DownlinkQueueRequest) | [.google.protobuf.Empty](#ttn.lorawan.v3.DownlinkQueueRequest) |  |
-| DownlinkQueueList | [EndDeviceIdentifiers](#ttn.lorawan.v3.EndDeviceIdentifiers) | [ApplicationDownlinks](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |
+| Subscribe | [ApplicationIdentifiers](#ttn.lorawan.v3.ApplicationIdentifiers) | [ApplicationUp](#ttn.lorawan.v3.ApplicationUp) stream |  |
+| DownlinkQueuePush | [DownlinkQueueRequest](#ttn.lorawan.v3.DownlinkQueueRequest) | [.google.protobuf.Empty](#google.protobuf.Empty) |  |
+| DownlinkQueueReplace | [DownlinkQueueRequest](#ttn.lorawan.v3.DownlinkQueueRequest) | [.google.protobuf.Empty](#google.protobuf.Empty) |  |
+| DownlinkQueueList | [EndDeviceIdentifiers](#ttn.lorawan.v3.EndDeviceIdentifiers) | [ApplicationDownlinks](#ttn.lorawan.v3.ApplicationDownlinks) |  |
 
 
-<a name="ttn.lorawan.v3.As"/>
+<a name="ttn.lorawan.v3.As"></a>
 
 ### As
 The As service manages the Application Server.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| GetLink | [GetApplicationLinkRequest](#ttn.lorawan.v3.GetApplicationLinkRequest) | [ApplicationLink](#ttn.lorawan.v3.GetApplicationLinkRequest) |  |
-| SetLink | [SetApplicationLinkRequest](#ttn.lorawan.v3.SetApplicationLinkRequest) | [ApplicationLink](#ttn.lorawan.v3.SetApplicationLinkRequest) | Set a link configuration from the Application Server a Network Server. This call returns immediately after setting the link configuration; it does not wait for a link to establish. To get link statistics or errors, use the `GetLinkStats` call. |
-| DeleteLink | [ApplicationIdentifiers](#ttn.lorawan.v3.ApplicationIdentifiers) | [.google.protobuf.Empty](#ttn.lorawan.v3.ApplicationIdentifiers) |  |
-| GetLinkStats | [ApplicationIdentifiers](#ttn.lorawan.v3.ApplicationIdentifiers) | [ApplicationLinkStats](#ttn.lorawan.v3.ApplicationIdentifiers) | GetLinkStats returns the link statistics. This call returns a NotFound error code if there is no link for the given application identifiers. This call returns the error code of the link error if linking to a Network Server failed. |
+| GetLink | [GetApplicationLinkRequest](#ttn.lorawan.v3.GetApplicationLinkRequest) | [ApplicationLink](#ttn.lorawan.v3.ApplicationLink) |  |
+| SetLink | [SetApplicationLinkRequest](#ttn.lorawan.v3.SetApplicationLinkRequest) | [ApplicationLink](#ttn.lorawan.v3.ApplicationLink) | Set a link configuration from the Application Server a Network Server. This call returns immediately after setting the link configuration; it does not wait for a link to establish. To get link statistics or errors, use the `GetLinkStats` call. |
+| DeleteLink | [ApplicationIdentifiers](#ttn.lorawan.v3.ApplicationIdentifiers) | [.google.protobuf.Empty](#google.protobuf.Empty) |  |
+| GetLinkStats | [ApplicationIdentifiers](#ttn.lorawan.v3.ApplicationIdentifiers) | [ApplicationLinkStats](#ttn.lorawan.v3.ApplicationLinkStats) | GetLinkStats returns the link statistics. This call returns a NotFound error code if there is no link for the given application identifiers. This call returns the error code of the link error if linking to a Network Server failed. |
 
 
-<a name="ttn.lorawan.v3.AsEndDeviceRegistry"/>
+<a name="ttn.lorawan.v3.AsEndDeviceRegistry"></a>
 
 ### AsEndDeviceRegistry
 The AsEndDeviceRegistry service allows clients to manage their end devices on the Application Server.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| Get | [GetEndDeviceRequest](#ttn.lorawan.v3.GetEndDeviceRequest) | [EndDevice](#ttn.lorawan.v3.GetEndDeviceRequest) | Get returns the device that matches the given identifiers. If there are multiple matches, an error will be returned. |
-| Set | [SetEndDeviceRequest](#ttn.lorawan.v3.SetEndDeviceRequest) | [EndDevice](#ttn.lorawan.v3.SetEndDeviceRequest) | Set creates or updates the device. |
-| Delete | [EndDeviceIdentifiers](#ttn.lorawan.v3.EndDeviceIdentifiers) | [.google.protobuf.Empty](#ttn.lorawan.v3.EndDeviceIdentifiers) | Delete deletes the device that matches the given identifiers. If there are multiple matches, an error will be returned. |
+| Get | [GetEndDeviceRequest](#ttn.lorawan.v3.GetEndDeviceRequest) | [EndDevice](#ttn.lorawan.v3.EndDevice) | Get returns the device that matches the given identifiers. If there are multiple matches, an error will be returned. |
+| Set | [SetEndDeviceRequest](#ttn.lorawan.v3.SetEndDeviceRequest) | [EndDevice](#ttn.lorawan.v3.EndDevice) | Set creates or updates the device. |
+| Delete | [EndDeviceIdentifiers](#ttn.lorawan.v3.EndDeviceIdentifiers) | [.google.protobuf.Empty](#google.protobuf.Empty) | Delete deletes the device that matches the given identifiers. If there are multiple matches, an error will be returned. |
 
  
 
 
 
-<a name="lorawan-stack/api/applicationserver_web.proto"/>
+<a name="lorawan-stack/api/applicationserver_web.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## lorawan-stack/api/applicationserver_web.proto
 
 
 
-<a name="ttn.lorawan.v3.ApplicationWebhook"/>
+<a name="ttn.lorawan.v3.ApplicationWebhook"></a>
 
 ### ApplicationWebhook
 
@@ -937,7 +937,7 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 
 
 
-<a name="ttn.lorawan.v3.ApplicationWebhook.HeadersEntry"/>
+<a name="ttn.lorawan.v3.ApplicationWebhook.HeadersEntry"></a>
 
 ### ApplicationWebhook.HeadersEntry
 
@@ -953,7 +953,7 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 
 
 
-<a name="ttn.lorawan.v3.ApplicationWebhook.Message"/>
+<a name="ttn.lorawan.v3.ApplicationWebhook.Message"></a>
 
 ### ApplicationWebhook.Message
 
@@ -968,7 +968,7 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 
 
 
-<a name="ttn.lorawan.v3.ApplicationWebhookFormats"/>
+<a name="ttn.lorawan.v3.ApplicationWebhookFormats"></a>
 
 ### ApplicationWebhookFormats
 
@@ -983,7 +983,7 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 
 
 
-<a name="ttn.lorawan.v3.ApplicationWebhookFormats.FormatsEntry"/>
+<a name="ttn.lorawan.v3.ApplicationWebhookFormats.FormatsEntry"></a>
 
 ### ApplicationWebhookFormats.FormatsEntry
 
@@ -999,7 +999,7 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 
 
 
-<a name="ttn.lorawan.v3.ApplicationWebhookIdentifiers"/>
+<a name="ttn.lorawan.v3.ApplicationWebhookIdentifiers"></a>
 
 ### ApplicationWebhookIdentifiers
 
@@ -1015,7 +1015,7 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 
 
 
-<a name="ttn.lorawan.v3.ApplicationWebhooks"/>
+<a name="ttn.lorawan.v3.ApplicationWebhooks"></a>
 
 ### ApplicationWebhooks
 
@@ -1030,7 +1030,7 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 
 
 
-<a name="ttn.lorawan.v3.GetApplicationWebhookRequest"/>
+<a name="ttn.lorawan.v3.GetApplicationWebhookRequest"></a>
 
 ### GetApplicationWebhookRequest
 
@@ -1046,7 +1046,7 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 
 
 
-<a name="ttn.lorawan.v3.ListApplicationWebhooksRequest"/>
+<a name="ttn.lorawan.v3.ListApplicationWebhooksRequest"></a>
 
 ### ListApplicationWebhooksRequest
 
@@ -1062,7 +1062,7 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 
 
 
-<a name="ttn.lorawan.v3.SetApplicationWebhookRequest"/>
+<a name="ttn.lorawan.v3.SetApplicationWebhookRequest"></a>
 
 ### SetApplicationWebhookRequest
 
@@ -1084,31 +1084,31 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
  
 
 
-<a name="ttn.lorawan.v3.ApplicationWebhookRegistry"/>
+<a name="ttn.lorawan.v3.ApplicationWebhookRegistry"></a>
 
 ### ApplicationWebhookRegistry
 
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| GetFormats | [.google.protobuf.Empty](#google.protobuf.Empty) | [ApplicationWebhookFormats](#google.protobuf.Empty) |  |
-| Get | [GetApplicationWebhookRequest](#ttn.lorawan.v3.GetApplicationWebhookRequest) | [ApplicationWebhook](#ttn.lorawan.v3.GetApplicationWebhookRequest) |  |
-| List | [ListApplicationWebhooksRequest](#ttn.lorawan.v3.ListApplicationWebhooksRequest) | [ApplicationWebhooks](#ttn.lorawan.v3.ListApplicationWebhooksRequest) |  |
-| Set | [SetApplicationWebhookRequest](#ttn.lorawan.v3.SetApplicationWebhookRequest) | [ApplicationWebhook](#ttn.lorawan.v3.SetApplicationWebhookRequest) |  |
-| Delete | [ApplicationWebhookIdentifiers](#ttn.lorawan.v3.ApplicationWebhookIdentifiers) | [.google.protobuf.Empty](#ttn.lorawan.v3.ApplicationWebhookIdentifiers) |  |
+| GetFormats | [.google.protobuf.Empty](#google.protobuf.Empty) | [ApplicationWebhookFormats](#ttn.lorawan.v3.ApplicationWebhookFormats) |  |
+| Get | [GetApplicationWebhookRequest](#ttn.lorawan.v3.GetApplicationWebhookRequest) | [ApplicationWebhook](#ttn.lorawan.v3.ApplicationWebhook) |  |
+| List | [ListApplicationWebhooksRequest](#ttn.lorawan.v3.ListApplicationWebhooksRequest) | [ApplicationWebhooks](#ttn.lorawan.v3.ApplicationWebhooks) |  |
+| Set | [SetApplicationWebhookRequest](#ttn.lorawan.v3.SetApplicationWebhookRequest) | [ApplicationWebhook](#ttn.lorawan.v3.ApplicationWebhook) |  |
+| Delete | [ApplicationWebhookIdentifiers](#ttn.lorawan.v3.ApplicationWebhookIdentifiers) | [.google.protobuf.Empty](#google.protobuf.Empty) |  |
 
  
 
 
 
-<a name="lorawan-stack/api/client.proto"/>
+<a name="lorawan-stack/api/client.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## lorawan-stack/api/client.proto
 
 
 
-<a name="ttn.lorawan.v3.Client"/>
+<a name="ttn.lorawan.v3.Client"></a>
 
 ### Client
 An OAuth client on the network.
@@ -1136,7 +1136,7 @@ An OAuth client on the network.
 
 
 
-<a name="ttn.lorawan.v3.Client.AttributesEntry"/>
+<a name="ttn.lorawan.v3.Client.AttributesEntry"></a>
 
 ### Client.AttributesEntry
 
@@ -1152,7 +1152,7 @@ An OAuth client on the network.
 
 
 
-<a name="ttn.lorawan.v3.Clients"/>
+<a name="ttn.lorawan.v3.Clients"></a>
 
 ### Clients
 
@@ -1167,7 +1167,7 @@ An OAuth client on the network.
 
 
 
-<a name="ttn.lorawan.v3.CreateClientRequest"/>
+<a name="ttn.lorawan.v3.CreateClientRequest"></a>
 
 ### CreateClientRequest
 
@@ -1183,7 +1183,7 @@ An OAuth client on the network.
 
 
 
-<a name="ttn.lorawan.v3.GetClientRequest"/>
+<a name="ttn.lorawan.v3.GetClientRequest"></a>
 
 ### GetClientRequest
 
@@ -1199,7 +1199,7 @@ An OAuth client on the network.
 
 
 
-<a name="ttn.lorawan.v3.ListClientsRequest"/>
+<a name="ttn.lorawan.v3.ListClientsRequest"></a>
 
 ### ListClientsRequest
 By default we list all OAuth clients the caller has rights on.
@@ -1220,7 +1220,7 @@ where the user or organization is collaborator on.
 
 
 
-<a name="ttn.lorawan.v3.SetClientCollaboratorRequest"/>
+<a name="ttn.lorawan.v3.SetClientCollaboratorRequest"></a>
 
 ### SetClientCollaboratorRequest
 
@@ -1236,7 +1236,7 @@ where the user or organization is collaborator on.
 
 
 
-<a name="ttn.lorawan.v3.UpdateClientRequest"/>
+<a name="ttn.lorawan.v3.UpdateClientRequest"></a>
 
 ### UpdateClientRequest
 
@@ -1254,7 +1254,7 @@ where the user or organization is collaborator on.
  
 
 
-<a name="ttn.lorawan.v3.GrantType"/>
+<a name="ttn.lorawan.v3.GrantType"></a>
 
 ### GrantType
 The OAuth2 flows an OAuth client can use to get an access token.
@@ -1274,7 +1274,7 @@ The OAuth2 flows an OAuth client can use to get an access token.
 
 
 
-<a name="lorawan-stack/api/client_services.proto"/>
+<a name="lorawan-stack/api/client_services.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## lorawan-stack/api/client_services.proto
@@ -1287,43 +1287,43 @@ The OAuth2 flows an OAuth client can use to get an access token.
  
 
 
-<a name="ttn.lorawan.v3.ClientAccess"/>
+<a name="ttn.lorawan.v3.ClientAccess"></a>
 
 ### ClientAccess
 
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| ListRights | [ClientIdentifiers](#ttn.lorawan.v3.ClientIdentifiers) | [Rights](#ttn.lorawan.v3.ClientIdentifiers) |  |
-| SetCollaborator | [SetClientCollaboratorRequest](#ttn.lorawan.v3.SetClientCollaboratorRequest) | [.google.protobuf.Empty](#ttn.lorawan.v3.SetClientCollaboratorRequest) | Set the rights of a collaborator on the OAuth client. Users or organizations are considered to be a collaborator if they have at least one right on the OAuth client. |
-| ListCollaborators | [ClientIdentifiers](#ttn.lorawan.v3.ClientIdentifiers) | [Collaborators](#ttn.lorawan.v3.ClientIdentifiers) |  |
+| ListRights | [ClientIdentifiers](#ttn.lorawan.v3.ClientIdentifiers) | [Rights](#ttn.lorawan.v3.Rights) |  |
+| SetCollaborator | [SetClientCollaboratorRequest](#ttn.lorawan.v3.SetClientCollaboratorRequest) | [.google.protobuf.Empty](#google.protobuf.Empty) | Set the rights of a collaborator on the OAuth client. Users or organizations are considered to be a collaborator if they have at least one right on the OAuth client. |
+| ListCollaborators | [ClientIdentifiers](#ttn.lorawan.v3.ClientIdentifiers) | [Collaborators](#ttn.lorawan.v3.Collaborators) |  |
 
 
-<a name="ttn.lorawan.v3.ClientRegistry"/>
+<a name="ttn.lorawan.v3.ClientRegistry"></a>
 
 ### ClientRegistry
 
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| Create | [CreateClientRequest](#ttn.lorawan.v3.CreateClientRequest) | [Client](#ttn.lorawan.v3.CreateClientRequest) | Create a new OAuth client. This also sets the given organization or user as first collaborator with all possible rights. |
-| Get | [GetClientRequest](#ttn.lorawan.v3.GetClientRequest) | [Client](#ttn.lorawan.v3.GetClientRequest) | Get the OAuth client with the given identifiers, selecting the fields given by the field mask. The method may return more or less fields, depending on the rights of the caller. |
-| List | [ListClientsRequest](#ttn.lorawan.v3.ListClientsRequest) | [Clients](#ttn.lorawan.v3.ListClientsRequest) | List OAuth clients. See request message for details. |
-| Update | [UpdateClientRequest](#ttn.lorawan.v3.UpdateClientRequest) | [Client](#ttn.lorawan.v3.UpdateClientRequest) |  |
-| Delete | [ClientIdentifiers](#ttn.lorawan.v3.ClientIdentifiers) | [.google.protobuf.Empty](#ttn.lorawan.v3.ClientIdentifiers) |  |
+| Create | [CreateClientRequest](#ttn.lorawan.v3.CreateClientRequest) | [Client](#ttn.lorawan.v3.Client) | Create a new OAuth client. This also sets the given organization or user as first collaborator with all possible rights. |
+| Get | [GetClientRequest](#ttn.lorawan.v3.GetClientRequest) | [Client](#ttn.lorawan.v3.Client) | Get the OAuth client with the given identifiers, selecting the fields given by the field mask. The method may return more or less fields, depending on the rights of the caller. |
+| List | [ListClientsRequest](#ttn.lorawan.v3.ListClientsRequest) | [Clients](#ttn.lorawan.v3.Clients) | List OAuth clients. See request message for details. |
+| Update | [UpdateClientRequest](#ttn.lorawan.v3.UpdateClientRequest) | [Client](#ttn.lorawan.v3.Client) |  |
+| Delete | [ClientIdentifiers](#ttn.lorawan.v3.ClientIdentifiers) | [.google.protobuf.Empty](#google.protobuf.Empty) |  |
 
  
 
 
 
-<a name="lorawan-stack/api/cluster.proto"/>
+<a name="lorawan-stack/api/cluster.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## lorawan-stack/api/cluster.proto
 
 
 
-<a name="ttn.lorawan.v3.PeerInfo"/>
+<a name="ttn.lorawan.v3.PeerInfo"></a>
 
 ### PeerInfo
 PeerInfo
@@ -1341,7 +1341,7 @@ PeerInfo
 
 
 
-<a name="ttn.lorawan.v3.PeerInfo.TagsEntry"/>
+<a name="ttn.lorawan.v3.PeerInfo.TagsEntry"></a>
 
 ### PeerInfo.TagsEntry
 
@@ -1359,7 +1359,7 @@ PeerInfo
  
 
 
-<a name="ttn.lorawan.v3.PeerInfo.Role"/>
+<a name="ttn.lorawan.v3.PeerInfo.Role"></a>
 
 ### PeerInfo.Role
 
@@ -1384,14 +1384,14 @@ PeerInfo
 
 
 
-<a name="lorawan-stack/api/contact_info.proto"/>
+<a name="lorawan-stack/api/contact_info.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## lorawan-stack/api/contact_info.proto
 
 
 
-<a name="ttn.lorawan.v3.ContactInfo"/>
+<a name="ttn.lorawan.v3.ContactInfo"></a>
 
 ### ContactInfo
 
@@ -1410,7 +1410,7 @@ PeerInfo
 
 
 
-<a name="ttn.lorawan.v3.ContactInfoValidation"/>
+<a name="ttn.lorawan.v3.ContactInfoValidation"></a>
 
 ### ContactInfoValidation
 
@@ -1432,7 +1432,7 @@ PeerInfo
  
 
 
-<a name="ttn.lorawan.v3.ContactMethod"/>
+<a name="ttn.lorawan.v3.ContactMethod"></a>
 
 ### ContactMethod
 
@@ -1445,7 +1445,7 @@ PeerInfo
 
 
 
-<a name="ttn.lorawan.v3.ContactType"/>
+<a name="ttn.lorawan.v3.ContactType"></a>
 
 ### ContactType
 
@@ -1463,28 +1463,28 @@ PeerInfo
  
 
 
-<a name="ttn.lorawan.v3.ContactInfoRegistry"/>
+<a name="ttn.lorawan.v3.ContactInfoRegistry"></a>
 
 ### ContactInfoRegistry
 
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| RequestValidation | [EntityIdentifiers](#ttn.lorawan.v3.EntityIdentifiers) | [ContactInfoValidation](#ttn.lorawan.v3.EntityIdentifiers) | Request validation for the non-validated contact info for the given entity. |
-| Validate | [ContactInfoValidation](#ttn.lorawan.v3.ContactInfoValidation) | [.google.protobuf.Empty](#ttn.lorawan.v3.ContactInfoValidation) | Validate confirms a contact info validation. |
+| RequestValidation | [EntityIdentifiers](#ttn.lorawan.v3.EntityIdentifiers) | [ContactInfoValidation](#ttn.lorawan.v3.ContactInfoValidation) | Request validation for the non-validated contact info for the given entity. |
+| Validate | [ContactInfoValidation](#ttn.lorawan.v3.ContactInfoValidation) | [.google.protobuf.Empty](#google.protobuf.Empty) | Validate confirms a contact info validation. |
 
  
 
 
 
-<a name="lorawan-stack/api/end_device.proto"/>
+<a name="lorawan-stack/api/end_device.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## lorawan-stack/api/end_device.proto
 
 
 
-<a name="ttn.lorawan.v3.CreateEndDeviceRequest"/>
+<a name="ttn.lorawan.v3.CreateEndDeviceRequest"></a>
 
 ### CreateEndDeviceRequest
 
@@ -1499,7 +1499,7 @@ PeerInfo
 
 
 
-<a name="ttn.lorawan.v3.EndDevice"/>
+<a name="ttn.lorawan.v3.EndDevice"></a>
 
 ### EndDevice
 Defines an End Device registration and its state on the network.
@@ -1558,7 +1558,7 @@ SDKs are responsible for combining (if desired) the three.
 
 
 
-<a name="ttn.lorawan.v3.EndDevice.AttributesEntry"/>
+<a name="ttn.lorawan.v3.EndDevice.AttributesEntry"></a>
 
 ### EndDevice.AttributesEntry
 
@@ -1574,7 +1574,7 @@ SDKs are responsible for combining (if desired) the three.
 
 
 
-<a name="ttn.lorawan.v3.EndDevice.LocationsEntry"/>
+<a name="ttn.lorawan.v3.EndDevice.LocationsEntry"></a>
 
 ### EndDevice.LocationsEntry
 
@@ -1590,7 +1590,7 @@ SDKs are responsible for combining (if desired) the three.
 
 
 
-<a name="ttn.lorawan.v3.EndDeviceBrand"/>
+<a name="ttn.lorawan.v3.EndDeviceBrand"></a>
 
 ### EndDeviceBrand
 
@@ -1608,7 +1608,7 @@ SDKs are responsible for combining (if desired) the three.
 
 
 
-<a name="ttn.lorawan.v3.EndDeviceModel"/>
+<a name="ttn.lorawan.v3.EndDeviceModel"></a>
 
 ### EndDeviceModel
 
@@ -1625,7 +1625,7 @@ SDKs are responsible for combining (if desired) the three.
 
 
 
-<a name="ttn.lorawan.v3.EndDeviceVersion"/>
+<a name="ttn.lorawan.v3.EndDeviceVersion"></a>
 
 ### EndDeviceVersion
 Template for creating end devices.
@@ -1652,7 +1652,7 @@ Template for creating end devices.
 
 
 
-<a name="ttn.lorawan.v3.EndDeviceVersionIdentifiers"/>
+<a name="ttn.lorawan.v3.EndDeviceVersionIdentifiers"></a>
 
 ### EndDeviceVersionIdentifiers
 Identifies an end device model with version information.
@@ -1670,7 +1670,7 @@ Identifies an end device model with version information.
 
 
 
-<a name="ttn.lorawan.v3.EndDevices"/>
+<a name="ttn.lorawan.v3.EndDevices"></a>
 
 ### EndDevices
 
@@ -1685,7 +1685,7 @@ Identifies an end device model with version information.
 
 
 
-<a name="ttn.lorawan.v3.GetEndDeviceRequest"/>
+<a name="ttn.lorawan.v3.GetEndDeviceRequest"></a>
 
 ### GetEndDeviceRequest
 
@@ -1701,7 +1701,7 @@ Identifies an end device model with version information.
 
 
 
-<a name="ttn.lorawan.v3.ListEndDevicesRequest"/>
+<a name="ttn.lorawan.v3.ListEndDevicesRequest"></a>
 
 ### ListEndDevicesRequest
 
@@ -1720,7 +1720,7 @@ Identifies an end device model with version information.
 
 
 
-<a name="ttn.lorawan.v3.MACParameters"/>
+<a name="ttn.lorawan.v3.MACParameters"></a>
 
 ### MACParameters
 MACParameters represent the parameters of the device&#39;s MAC layer (active or desired).
@@ -1754,7 +1754,7 @@ This is used internally by the Network Server and is read only.
 
 
 
-<a name="ttn.lorawan.v3.MACParameters.Channel"/>
+<a name="ttn.lorawan.v3.MACParameters.Channel"></a>
 
 ### MACParameters.Channel
 
@@ -1773,7 +1773,7 @@ This is used internally by the Network Server and is read only.
 
 
 
-<a name="ttn.lorawan.v3.MACSettings"/>
+<a name="ttn.lorawan.v3.MACSettings"></a>
 
 ### MACSettings
 
@@ -1808,7 +1808,7 @@ This is used internally by the Network Server and is read only.
 
 
 
-<a name="ttn.lorawan.v3.MACSettings.AggregatedDutyCycleValue"/>
+<a name="ttn.lorawan.v3.MACSettings.AggregatedDutyCycleValue"></a>
 
 ### MACSettings.AggregatedDutyCycleValue
 
@@ -1823,7 +1823,7 @@ This is used internally by the Network Server and is read only.
 
 
 
-<a name="ttn.lorawan.v3.MACSettings.DataRateIndexValue"/>
+<a name="ttn.lorawan.v3.MACSettings.DataRateIndexValue"></a>
 
 ### MACSettings.DataRateIndexValue
 
@@ -1838,7 +1838,7 @@ This is used internally by the Network Server and is read only.
 
 
 
-<a name="ttn.lorawan.v3.MACSettings.PingSlotPeriodValue"/>
+<a name="ttn.lorawan.v3.MACSettings.PingSlotPeriodValue"></a>
 
 ### MACSettings.PingSlotPeriodValue
 
@@ -1853,7 +1853,7 @@ This is used internally by the Network Server and is read only.
 
 
 
-<a name="ttn.lorawan.v3.MACSettings.RxDelayValue"/>
+<a name="ttn.lorawan.v3.MACSettings.RxDelayValue"></a>
 
 ### MACSettings.RxDelayValue
 
@@ -1868,7 +1868,7 @@ This is used internally by the Network Server and is read only.
 
 
 
-<a name="ttn.lorawan.v3.MACState"/>
+<a name="ttn.lorawan.v3.MACState"></a>
 
 ### MACState
 MACState represents the state of MAC layer of the device.
@@ -1897,7 +1897,7 @@ This is used internally by the Network Server and is read only.
 
 
 
-<a name="ttn.lorawan.v3.MACState.JoinAccept"/>
+<a name="ttn.lorawan.v3.MACState.JoinAccept"></a>
 
 ### MACState.JoinAccept
 
@@ -1914,7 +1914,7 @@ This is used internally by the Network Server and is read only.
 
 
 
-<a name="ttn.lorawan.v3.Session"/>
+<a name="ttn.lorawan.v3.Session"></a>
 
 ### Session
 
@@ -1935,7 +1935,7 @@ This is used internally by the Network Server and is read only.
 
 
 
-<a name="ttn.lorawan.v3.SetEndDeviceRequest"/>
+<a name="ttn.lorawan.v3.SetEndDeviceRequest"></a>
 
 ### SetEndDeviceRequest
 
@@ -1951,7 +1951,7 @@ This is used internally by the Network Server and is read only.
 
 
 
-<a name="ttn.lorawan.v3.UpdateEndDeviceRequest"/>
+<a name="ttn.lorawan.v3.UpdateEndDeviceRequest"></a>
 
 ### UpdateEndDeviceRequest
 
@@ -1969,7 +1969,7 @@ This is used internally by the Network Server and is read only.
  
 
 
-<a name="ttn.lorawan.v3.PowerState"/>
+<a name="ttn.lorawan.v3.PowerState"></a>
 
 ### PowerState
 Power state of the device.
@@ -1989,7 +1989,7 @@ Power state of the device.
 
 
 
-<a name="lorawan-stack/api/end_device_services.proto"/>
+<a name="lorawan-stack/api/end_device_services.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## lorawan-stack/api/end_device_services.proto
@@ -2002,24 +2002,24 @@ Power state of the device.
  
 
 
-<a name="ttn.lorawan.v3.EndDeviceRegistry"/>
+<a name="ttn.lorawan.v3.EndDeviceRegistry"></a>
 
 ### EndDeviceRegistry
 
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| Create | [CreateEndDeviceRequest](#ttn.lorawan.v3.CreateEndDeviceRequest) | [EndDevice](#ttn.lorawan.v3.CreateEndDeviceRequest) | Create a new end device within an application. |
-| Get | [GetEndDeviceRequest](#ttn.lorawan.v3.GetEndDeviceRequest) | [EndDevice](#ttn.lorawan.v3.GetEndDeviceRequest) | Get the end device with the given identifiers, selecting the fields given by the field mask. |
-| List | [ListEndDevicesRequest](#ttn.lorawan.v3.ListEndDevicesRequest) | [EndDevices](#ttn.lorawan.v3.ListEndDevicesRequest) | List applications. See request message for details. |
-| Update | [UpdateEndDeviceRequest](#ttn.lorawan.v3.UpdateEndDeviceRequest) | [EndDevice](#ttn.lorawan.v3.UpdateEndDeviceRequest) |  |
-| Delete | [EndDeviceIdentifiers](#ttn.lorawan.v3.EndDeviceIdentifiers) | [.google.protobuf.Empty](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |
+| Create | [CreateEndDeviceRequest](#ttn.lorawan.v3.CreateEndDeviceRequest) | [EndDevice](#ttn.lorawan.v3.EndDevice) | Create a new end device within an application. |
+| Get | [GetEndDeviceRequest](#ttn.lorawan.v3.GetEndDeviceRequest) | [EndDevice](#ttn.lorawan.v3.EndDevice) | Get the end device with the given identifiers, selecting the fields given by the field mask. |
+| List | [ListEndDevicesRequest](#ttn.lorawan.v3.ListEndDevicesRequest) | [EndDevices](#ttn.lorawan.v3.EndDevices) | List applications. See request message for details. |
+| Update | [UpdateEndDeviceRequest](#ttn.lorawan.v3.UpdateEndDeviceRequest) | [EndDevice](#ttn.lorawan.v3.EndDevice) |  |
+| Delete | [EndDeviceIdentifiers](#ttn.lorawan.v3.EndDeviceIdentifiers) | [.google.protobuf.Empty](#google.protobuf.Empty) |  |
 
  
 
 
 
-<a name="lorawan-stack/api/enums.proto"/>
+<a name="lorawan-stack/api/enums.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## lorawan-stack/api/enums.proto
@@ -2028,7 +2028,7 @@ Power state of the device.
  
 
 
-<a name="ttn.lorawan.v3.DownlinkPathConstraint"/>
+<a name="ttn.lorawan.v3.DownlinkPathConstraint"></a>
 
 ### DownlinkPathConstraint
 
@@ -2041,7 +2041,7 @@ Power state of the device.
 
 
 
-<a name="ttn.lorawan.v3.State"/>
+<a name="ttn.lorawan.v3.State"></a>
 
 ### State
 State enum defines states that an entity can be in.
@@ -2063,14 +2063,14 @@ State enum defines states that an entity can be in.
 
 
 
-<a name="lorawan-stack/api/error.proto"/>
+<a name="lorawan-stack/api/error.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## lorawan-stack/api/error.proto
 
 
 
-<a name="ttn.lorawan.v3.ErrorDetails"/>
+<a name="ttn.lorawan.v3.ErrorDetails"></a>
 
 ### ErrorDetails
 Error details that are communicated over gRPC (and HTTP) APIs.
@@ -2100,14 +2100,14 @@ The messages (for translation) are stored as &#34;error:&lt;namespace&gt;:&lt;na
 
 
 
-<a name="lorawan-stack/api/events.proto"/>
+<a name="lorawan-stack/api/events.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## lorawan-stack/api/events.proto
 
 
 
-<a name="ttn.lorawan.v3.Event"/>
+<a name="ttn.lorawan.v3.Event"></a>
 
 ### Event
 
@@ -2128,7 +2128,7 @@ The messages (for translation) are stored as &#34;error:&lt;namespace&gt;:&lt;na
 
 
 
-<a name="ttn.lorawan.v3.Event.ContextEntry"/>
+<a name="ttn.lorawan.v3.Event.ContextEntry"></a>
 
 ### Event.ContextEntry
 
@@ -2144,7 +2144,7 @@ The messages (for translation) are stored as &#34;error:&lt;namespace&gt;:&lt;na
 
 
 
-<a name="ttn.lorawan.v3.StreamEventsRequest"/>
+<a name="ttn.lorawan.v3.StreamEventsRequest"></a>
 
 ### StreamEventsRequest
 
@@ -2167,27 +2167,27 @@ The messages (for translation) are stored as &#34;error:&lt;namespace&gt;:&lt;na
  
 
 
-<a name="ttn.lorawan.v3.Events"/>
+<a name="ttn.lorawan.v3.Events"></a>
 
 ### Events
 The Events service serves events from the cluster.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| Stream | [StreamEventsRequest](#ttn.lorawan.v3.StreamEventsRequest) | [Event](#ttn.lorawan.v3.StreamEventsRequest) | Stream live events, optionally with a tail of historical events (depending on server support and retention policy). Events may arrive out-of-order. |
+| Stream | [StreamEventsRequest](#ttn.lorawan.v3.StreamEventsRequest) | [Event](#ttn.lorawan.v3.Event) stream | Stream live events, optionally with a tail of historical events (depending on server support and retention policy). Events may arrive out-of-order. |
 
  
 
 
 
-<a name="lorawan-stack/api/gateway.proto"/>
+<a name="lorawan-stack/api/gateway.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## lorawan-stack/api/gateway.proto
 
 
 
-<a name="ttn.lorawan.v3.CreateGatewayAPIKeyRequest"/>
+<a name="ttn.lorawan.v3.CreateGatewayAPIKeyRequest"></a>
 
 ### CreateGatewayAPIKeyRequest
 
@@ -2204,7 +2204,7 @@ The Events service serves events from the cluster.
 
 
 
-<a name="ttn.lorawan.v3.CreateGatewayRequest"/>
+<a name="ttn.lorawan.v3.CreateGatewayRequest"></a>
 
 ### CreateGatewayRequest
 
@@ -2220,7 +2220,7 @@ The Events service serves events from the cluster.
 
 
 
-<a name="ttn.lorawan.v3.Gateway"/>
+<a name="ttn.lorawan.v3.Gateway"></a>
 
 ### Gateway
 Gateway is the message that defines a gateway on the network.
@@ -2252,7 +2252,7 @@ Gateway is the message that defines a gateway on the network.
 
 
 
-<a name="ttn.lorawan.v3.Gateway.AttributesEntry"/>
+<a name="ttn.lorawan.v3.Gateway.AttributesEntry"></a>
 
 ### Gateway.AttributesEntry
 
@@ -2268,7 +2268,7 @@ Gateway is the message that defines a gateway on the network.
 
 
 
-<a name="ttn.lorawan.v3.GatewayAntenna"/>
+<a name="ttn.lorawan.v3.GatewayAntenna"></a>
 
 ### GatewayAntenna
 GatewayAntenna is the message that defines a gateway antenna.
@@ -2285,7 +2285,7 @@ GatewayAntenna is the message that defines a gateway antenna.
 
 
 
-<a name="ttn.lorawan.v3.GatewayAntenna.AttributesEntry"/>
+<a name="ttn.lorawan.v3.GatewayAntenna.AttributesEntry"></a>
 
 ### GatewayAntenna.AttributesEntry
 
@@ -2301,7 +2301,7 @@ GatewayAntenna is the message that defines a gateway antenna.
 
 
 
-<a name="ttn.lorawan.v3.GatewayBrand"/>
+<a name="ttn.lorawan.v3.GatewayBrand"></a>
 
 ### GatewayBrand
 
@@ -2319,7 +2319,7 @@ GatewayAntenna is the message that defines a gateway antenna.
 
 
 
-<a name="ttn.lorawan.v3.GatewayConnectionStats"/>
+<a name="ttn.lorawan.v3.GatewayConnectionStats"></a>
 
 ### GatewayConnectionStats
 Connection stats as monitored by the Gateway Server.
@@ -2341,7 +2341,7 @@ Connection stats as monitored by the Gateway Server.
 
 
 
-<a name="ttn.lorawan.v3.GatewayModel"/>
+<a name="ttn.lorawan.v3.GatewayModel"></a>
 
 ### GatewayModel
 
@@ -2358,7 +2358,7 @@ Connection stats as monitored by the Gateway Server.
 
 
 
-<a name="ttn.lorawan.v3.GatewayRadio"/>
+<a name="ttn.lorawan.v3.GatewayRadio"></a>
 
 ### GatewayRadio
 
@@ -2377,7 +2377,7 @@ Connection stats as monitored by the Gateway Server.
 
 
 
-<a name="ttn.lorawan.v3.GatewayRadio.TxConfiguration"/>
+<a name="ttn.lorawan.v3.GatewayRadio.TxConfiguration"></a>
 
 ### GatewayRadio.TxConfiguration
 
@@ -2394,7 +2394,7 @@ Connection stats as monitored by the Gateway Server.
 
 
 
-<a name="ttn.lorawan.v3.GatewayStatus"/>
+<a name="ttn.lorawan.v3.GatewayStatus"></a>
 
 ### GatewayStatus
 
@@ -2415,7 +2415,7 @@ Connection stats as monitored by the Gateway Server.
 
 
 
-<a name="ttn.lorawan.v3.GatewayStatus.MetricsEntry"/>
+<a name="ttn.lorawan.v3.GatewayStatus.MetricsEntry"></a>
 
 ### GatewayStatus.MetricsEntry
 
@@ -2431,7 +2431,7 @@ Connection stats as monitored by the Gateway Server.
 
 
 
-<a name="ttn.lorawan.v3.GatewayStatus.VersionsEntry"/>
+<a name="ttn.lorawan.v3.GatewayStatus.VersionsEntry"></a>
 
 ### GatewayStatus.VersionsEntry
 
@@ -2447,7 +2447,7 @@ Connection stats as monitored by the Gateway Server.
 
 
 
-<a name="ttn.lorawan.v3.GatewayVersion"/>
+<a name="ttn.lorawan.v3.GatewayVersion"></a>
 
 ### GatewayVersion
 Template for creating gateways.
@@ -2465,7 +2465,7 @@ Template for creating gateways.
 
 
 
-<a name="ttn.lorawan.v3.GatewayVersionIdentifiers"/>
+<a name="ttn.lorawan.v3.GatewayVersionIdentifiers"></a>
 
 ### GatewayVersionIdentifiers
 Identifies an end device model with version information.
@@ -2483,7 +2483,7 @@ Identifies an end device model with version information.
 
 
 
-<a name="ttn.lorawan.v3.Gateways"/>
+<a name="ttn.lorawan.v3.Gateways"></a>
 
 ### Gateways
 
@@ -2498,7 +2498,7 @@ Identifies an end device model with version information.
 
 
 
-<a name="ttn.lorawan.v3.GetGatewayIdentifiersForEUIRequest"/>
+<a name="ttn.lorawan.v3.GetGatewayIdentifiersForEUIRequest"></a>
 
 ### GetGatewayIdentifiersForEUIRequest
 
@@ -2513,7 +2513,7 @@ Identifies an end device model with version information.
 
 
 
-<a name="ttn.lorawan.v3.GetGatewayRequest"/>
+<a name="ttn.lorawan.v3.GetGatewayRequest"></a>
 
 ### GetGatewayRequest
 
@@ -2529,7 +2529,7 @@ Identifies an end device model with version information.
 
 
 
-<a name="ttn.lorawan.v3.ListGatewaysRequest"/>
+<a name="ttn.lorawan.v3.ListGatewaysRequest"></a>
 
 ### ListGatewaysRequest
 By default we list all gateways the caller has rights on.
@@ -2550,7 +2550,7 @@ where the user or organization is collaborator on.
 
 
 
-<a name="ttn.lorawan.v3.SetGatewayCollaboratorRequest"/>
+<a name="ttn.lorawan.v3.SetGatewayCollaboratorRequest"></a>
 
 ### SetGatewayCollaboratorRequest
 
@@ -2566,7 +2566,7 @@ where the user or organization is collaborator on.
 
 
 
-<a name="ttn.lorawan.v3.UpdateGatewayAPIKeyRequest"/>
+<a name="ttn.lorawan.v3.UpdateGatewayAPIKeyRequest"></a>
 
 ### UpdateGatewayAPIKeyRequest
 
@@ -2582,7 +2582,7 @@ where the user or organization is collaborator on.
 
 
 
-<a name="ttn.lorawan.v3.UpdateGatewayRequest"/>
+<a name="ttn.lorawan.v3.UpdateGatewayRequest"></a>
 
 ### UpdateGatewayRequest
 
@@ -2607,14 +2607,14 @@ where the user or organization is collaborator on.
 
 
 
-<a name="lorawan-stack/api/gateway_services.proto"/>
+<a name="lorawan-stack/api/gateway_services.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## lorawan-stack/api/gateway_services.proto
 
 
 
-<a name="ttn.lorawan.v3.PullGatewayConfigurationRequest"/>
+<a name="ttn.lorawan.v3.PullGatewayConfigurationRequest"></a>
 
 ### PullGatewayConfigurationRequest
 
@@ -2636,57 +2636,57 @@ where the user or organization is collaborator on.
  
 
 
-<a name="ttn.lorawan.v3.GatewayAccess"/>
+<a name="ttn.lorawan.v3.GatewayAccess"></a>
 
 ### GatewayAccess
 
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| ListRights | [GatewayIdentifiers](#ttn.lorawan.v3.GatewayIdentifiers) | [Rights](#ttn.lorawan.v3.GatewayIdentifiers) |  |
-| CreateAPIKey | [CreateGatewayAPIKeyRequest](#ttn.lorawan.v3.CreateGatewayAPIKeyRequest) | [APIKey](#ttn.lorawan.v3.CreateGatewayAPIKeyRequest) |  |
-| ListAPIKeys | [GatewayIdentifiers](#ttn.lorawan.v3.GatewayIdentifiers) | [APIKeys](#ttn.lorawan.v3.GatewayIdentifiers) |  |
-| UpdateAPIKey | [UpdateGatewayAPIKeyRequest](#ttn.lorawan.v3.UpdateGatewayAPIKeyRequest) | [APIKey](#ttn.lorawan.v3.UpdateGatewayAPIKeyRequest) | Update the rights of an existing gateway API key. To generate an API key, the CreateAPIKey should be used. To delete an API key, update it with zero rights. |
-| SetCollaborator | [SetGatewayCollaboratorRequest](#ttn.lorawan.v3.SetGatewayCollaboratorRequest) | [.google.protobuf.Empty](#ttn.lorawan.v3.SetGatewayCollaboratorRequest) | Set the rights of a collaborator on the gateway. Users or organizations are considered to be a collaborator if they have at least one right on the gateway. |
-| ListCollaborators | [GatewayIdentifiers](#ttn.lorawan.v3.GatewayIdentifiers) | [Collaborators](#ttn.lorawan.v3.GatewayIdentifiers) |  |
+| ListRights | [GatewayIdentifiers](#ttn.lorawan.v3.GatewayIdentifiers) | [Rights](#ttn.lorawan.v3.Rights) |  |
+| CreateAPIKey | [CreateGatewayAPIKeyRequest](#ttn.lorawan.v3.CreateGatewayAPIKeyRequest) | [APIKey](#ttn.lorawan.v3.APIKey) |  |
+| ListAPIKeys | [GatewayIdentifiers](#ttn.lorawan.v3.GatewayIdentifiers) | [APIKeys](#ttn.lorawan.v3.APIKeys) |  |
+| UpdateAPIKey | [UpdateGatewayAPIKeyRequest](#ttn.lorawan.v3.UpdateGatewayAPIKeyRequest) | [APIKey](#ttn.lorawan.v3.APIKey) | Update the rights of an existing gateway API key. To generate an API key, the CreateAPIKey should be used. To delete an API key, update it with zero rights. |
+| SetCollaborator | [SetGatewayCollaboratorRequest](#ttn.lorawan.v3.SetGatewayCollaboratorRequest) | [.google.protobuf.Empty](#google.protobuf.Empty) | Set the rights of a collaborator on the gateway. Users or organizations are considered to be a collaborator if they have at least one right on the gateway. |
+| ListCollaborators | [GatewayIdentifiers](#ttn.lorawan.v3.GatewayIdentifiers) | [Collaborators](#ttn.lorawan.v3.Collaborators) |  |
 
 
-<a name="ttn.lorawan.v3.GatewayConfigurator"/>
+<a name="ttn.lorawan.v3.GatewayConfigurator"></a>
 
 ### GatewayConfigurator
 
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| PullConfiguration | [PullGatewayConfigurationRequest](#ttn.lorawan.v3.PullGatewayConfigurationRequest) | [Gateway](#ttn.lorawan.v3.PullGatewayConfigurationRequest) |  |
+| PullConfiguration | [PullGatewayConfigurationRequest](#ttn.lorawan.v3.PullGatewayConfigurationRequest) | [Gateway](#ttn.lorawan.v3.Gateway) stream |  |
 
 
-<a name="ttn.lorawan.v3.GatewayRegistry"/>
+<a name="ttn.lorawan.v3.GatewayRegistry"></a>
 
 ### GatewayRegistry
 
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| Create | [CreateGatewayRequest](#ttn.lorawan.v3.CreateGatewayRequest) | [Gateway](#ttn.lorawan.v3.CreateGatewayRequest) | Create a new gateway. This also sets the given organization or user as first collaborator with all possible rights. |
-| Get | [GetGatewayRequest](#ttn.lorawan.v3.GetGatewayRequest) | [Gateway](#ttn.lorawan.v3.GetGatewayRequest) | Get the gateway with the given identifiers, selecting the fields given by the field mask. The method may return more or less fields, depending on the rights of the caller. |
-| GetIdentifiersForEUI | [GetGatewayIdentifiersForEUIRequest](#ttn.lorawan.v3.GetGatewayIdentifiersForEUIRequest) | [GatewayIdentifiers](#ttn.lorawan.v3.GetGatewayIdentifiersForEUIRequest) |  |
-| List | [ListGatewaysRequest](#ttn.lorawan.v3.ListGatewaysRequest) | [Gateways](#ttn.lorawan.v3.ListGatewaysRequest) | List gateways. See request message for details. |
-| Update | [UpdateGatewayRequest](#ttn.lorawan.v3.UpdateGatewayRequest) | [Gateway](#ttn.lorawan.v3.UpdateGatewayRequest) |  |
-| Delete | [GatewayIdentifiers](#ttn.lorawan.v3.GatewayIdentifiers) | [.google.protobuf.Empty](#ttn.lorawan.v3.GatewayIdentifiers) |  |
+| Create | [CreateGatewayRequest](#ttn.lorawan.v3.CreateGatewayRequest) | [Gateway](#ttn.lorawan.v3.Gateway) | Create a new gateway. This also sets the given organization or user as first collaborator with all possible rights. |
+| Get | [GetGatewayRequest](#ttn.lorawan.v3.GetGatewayRequest) | [Gateway](#ttn.lorawan.v3.Gateway) | Get the gateway with the given identifiers, selecting the fields given by the field mask. The method may return more or less fields, depending on the rights of the caller. |
+| GetIdentifiersForEUI | [GetGatewayIdentifiersForEUIRequest](#ttn.lorawan.v3.GetGatewayIdentifiersForEUIRequest) | [GatewayIdentifiers](#ttn.lorawan.v3.GatewayIdentifiers) |  |
+| List | [ListGatewaysRequest](#ttn.lorawan.v3.ListGatewaysRequest) | [Gateways](#ttn.lorawan.v3.Gateways) | List gateways. See request message for details. |
+| Update | [UpdateGatewayRequest](#ttn.lorawan.v3.UpdateGatewayRequest) | [Gateway](#ttn.lorawan.v3.Gateway) |  |
+| Delete | [GatewayIdentifiers](#ttn.lorawan.v3.GatewayIdentifiers) | [.google.protobuf.Empty](#google.protobuf.Empty) |  |
 
  
 
 
 
-<a name="lorawan-stack/api/gatewayserver.proto"/>
+<a name="lorawan-stack/api/gatewayserver.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## lorawan-stack/api/gatewayserver.proto
 
 
 
-<a name="ttn.lorawan.v3.GatewayDown"/>
+<a name="ttn.lorawan.v3.GatewayDown"></a>
 
 ### GatewayDown
 GatewayDown contains downlink messages for the gateway.
@@ -2701,7 +2701,7 @@ GatewayDown contains downlink messages for the gateway.
 
 
 
-<a name="ttn.lorawan.v3.GatewayUp"/>
+<a name="ttn.lorawan.v3.GatewayUp"></a>
 
 ### GatewayUp
 GatewayUp may contain zero or more uplink messages and/or a status message for the gateway.
@@ -2718,7 +2718,7 @@ GatewayUp may contain zero or more uplink messages and/or a status message for t
 
 
 
-<a name="ttn.lorawan.v3.ScheduleDownlinkResponse"/>
+<a name="ttn.lorawan.v3.ScheduleDownlinkResponse"></a>
 
 ### ScheduleDownlinkResponse
 
@@ -2739,48 +2739,48 @@ GatewayUp may contain zero or more uplink messages and/or a status message for t
  
 
 
-<a name="ttn.lorawan.v3.Gs"/>
+<a name="ttn.lorawan.v3.Gs"></a>
 
 ### Gs
 
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| GetGatewayConnectionStats | [GatewayIdentifiers](#ttn.lorawan.v3.GatewayIdentifiers) | [GatewayConnectionStats](#ttn.lorawan.v3.GatewayIdentifiers) | Get statistics about the current gateway connection to the Gateway Server. This is not persisted between reconnects. |
+| GetGatewayConnectionStats | [GatewayIdentifiers](#ttn.lorawan.v3.GatewayIdentifiers) | [GatewayConnectionStats](#ttn.lorawan.v3.GatewayConnectionStats) | Get statistics about the current gateway connection to the Gateway Server. This is not persisted between reconnects. |
 
 
-<a name="ttn.lorawan.v3.GtwGs"/>
+<a name="ttn.lorawan.v3.GtwGs"></a>
 
 ### GtwGs
 The GtwGs service connects a gateway to a Gateway Server.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| LinkGateway | [GatewayUp](#ttn.lorawan.v3.GatewayUp) | [GatewayDown](#ttn.lorawan.v3.GatewayUp) | Link the gateway to the Gateway Server. |
-| GetConcentratorConfig | [.google.protobuf.Empty](#google.protobuf.Empty) | [ConcentratorConfig](#google.protobuf.Empty) | GetConcentratorConfig associated to the gateway. |
+| LinkGateway | [GatewayUp](#ttn.lorawan.v3.GatewayUp) stream | [GatewayDown](#ttn.lorawan.v3.GatewayDown) stream | Link the gateway to the Gateway Server. |
+| GetConcentratorConfig | [.google.protobuf.Empty](#google.protobuf.Empty) | [ConcentratorConfig](#ttn.lorawan.v3.ConcentratorConfig) | GetConcentratorConfig associated to the gateway. |
 
 
-<a name="ttn.lorawan.v3.NsGs"/>
+<a name="ttn.lorawan.v3.NsGs"></a>
 
 ### NsGs
 The NsGs service connects a Network Server to a Gateway Server.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| ScheduleDownlink | [DownlinkMessage](#ttn.lorawan.v3.DownlinkMessage) | [ScheduleDownlinkResponse](#ttn.lorawan.v3.DownlinkMessage) | ScheduleDownlink instructs the Gateway Server to schedule a downlink message. The Gateway Server may refuse if there are any conflicts in the schedule or if a duty cycle prevents the gateway from transmitting. |
+| ScheduleDownlink | [DownlinkMessage](#ttn.lorawan.v3.DownlinkMessage) | [ScheduleDownlinkResponse](#ttn.lorawan.v3.ScheduleDownlinkResponse) | ScheduleDownlink instructs the Gateway Server to schedule a downlink message. The Gateway Server may refuse if there are any conflicts in the schedule or if a duty cycle prevents the gateway from transmitting. |
 
  
 
 
 
-<a name="lorawan-stack/api/identifiers.proto"/>
+<a name="lorawan-stack/api/identifiers.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## lorawan-stack/api/identifiers.proto
 
 
 
-<a name="ttn.lorawan.v3.ApplicationIdentifiers"/>
+<a name="ttn.lorawan.v3.ApplicationIdentifiers"></a>
 
 ### ApplicationIdentifiers
 
@@ -2795,7 +2795,7 @@ The NsGs service connects a Network Server to a Gateway Server.
 
 
 
-<a name="ttn.lorawan.v3.ClientIdentifiers"/>
+<a name="ttn.lorawan.v3.ClientIdentifiers"></a>
 
 ### ClientIdentifiers
 
@@ -2810,7 +2810,7 @@ The NsGs service connects a Network Server to a Gateway Server.
 
 
 
-<a name="ttn.lorawan.v3.CombinedIdentifiers"/>
+<a name="ttn.lorawan.v3.CombinedIdentifiers"></a>
 
 ### CombinedIdentifiers
 Combine the identifiers of multiple entities.
@@ -2826,7 +2826,7 @@ The main purpose of this message is its use in events.
 
 
 
-<a name="ttn.lorawan.v3.EndDeviceIdentifiers"/>
+<a name="ttn.lorawan.v3.EndDeviceIdentifiers"></a>
 
 ### EndDeviceIdentifiers
 
@@ -2845,7 +2845,7 @@ The main purpose of this message is its use in events.
 
 
 
-<a name="ttn.lorawan.v3.EntityIdentifiers"/>
+<a name="ttn.lorawan.v3.EntityIdentifiers"></a>
 
 ### EntityIdentifiers
 EntityIdentifiers contains one of the possible entity identifiers.
@@ -2865,7 +2865,7 @@ EntityIdentifiers contains one of the possible entity identifiers.
 
 
 
-<a name="ttn.lorawan.v3.GatewayIdentifiers"/>
+<a name="ttn.lorawan.v3.GatewayIdentifiers"></a>
 
 ### GatewayIdentifiers
 
@@ -2881,7 +2881,7 @@ EntityIdentifiers contains one of the possible entity identifiers.
 
 
 
-<a name="ttn.lorawan.v3.OrganizationIdentifiers"/>
+<a name="ttn.lorawan.v3.OrganizationIdentifiers"></a>
 
 ### OrganizationIdentifiers
 
@@ -2896,7 +2896,7 @@ EntityIdentifiers contains one of the possible entity identifiers.
 
 
 
-<a name="ttn.lorawan.v3.OrganizationOrUserIdentifiers"/>
+<a name="ttn.lorawan.v3.OrganizationOrUserIdentifiers"></a>
 
 ### OrganizationOrUserIdentifiers
 OrganizationOrUserIdentifiers contains either organization or user identifiers.
@@ -2912,7 +2912,7 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 
 
 
-<a name="ttn.lorawan.v3.UserIdentifiers"/>
+<a name="ttn.lorawan.v3.UserIdentifiers"></a>
 
 ### UserIdentifiers
 
@@ -2937,14 +2937,14 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 
 
 
-<a name="lorawan-stack/api/identityserver.proto"/>
+<a name="lorawan-stack/api/identityserver.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## lorawan-stack/api/identityserver.proto
 
 
 
-<a name="ttn.lorawan.v3.AuthInfoResponse"/>
+<a name="ttn.lorawan.v3.AuthInfoResponse"></a>
 
 ### AuthInfoResponse
 
@@ -2961,7 +2961,7 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 
 
 
-<a name="ttn.lorawan.v3.AuthInfoResponse.APIKeyAccess"/>
+<a name="ttn.lorawan.v3.AuthInfoResponse.APIKeyAccess"></a>
 
 ### AuthInfoResponse.APIKeyAccess
 
@@ -2983,27 +2983,27 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
  
 
 
-<a name="ttn.lorawan.v3.EntityAccess"/>
+<a name="ttn.lorawan.v3.EntityAccess"></a>
 
 ### EntityAccess
 
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| AuthInfo | [.google.protobuf.Empty](#google.protobuf.Empty) | [AuthInfoResponse](#google.protobuf.Empty) | AuthInfo returns information about the authentication that is used on the request. |
+| AuthInfo | [.google.protobuf.Empty](#google.protobuf.Empty) | [AuthInfoResponse](#ttn.lorawan.v3.AuthInfoResponse) | AuthInfo returns information about the authentication that is used on the request. |
 
  
 
 
 
-<a name="lorawan-stack/api/join.proto"/>
+<a name="lorawan-stack/api/join.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## lorawan-stack/api/join.proto
 
 
 
-<a name="ttn.lorawan.v3.JoinRequest"/>
+<a name="ttn.lorawan.v3.JoinRequest"></a>
 
 ### JoinRequest
 
@@ -3026,7 +3026,7 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 
 
 
-<a name="ttn.lorawan.v3.JoinResponse"/>
+<a name="ttn.lorawan.v3.JoinResponse"></a>
 
 ### JoinResponse
 
@@ -3053,14 +3053,14 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 
 
 
-<a name="lorawan-stack/api/joinserver.proto"/>
+<a name="lorawan-stack/api/joinserver.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## lorawan-stack/api/joinserver.proto
 
 
 
-<a name="ttn.lorawan.v3.AppSKeyResponse"/>
+<a name="ttn.lorawan.v3.AppSKeyResponse"></a>
 
 ### AppSKeyResponse
 
@@ -3075,7 +3075,7 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 
 
 
-<a name="ttn.lorawan.v3.CryptoServicePayloadRequest"/>
+<a name="ttn.lorawan.v3.CryptoServicePayloadRequest"></a>
 
 ### CryptoServicePayloadRequest
 
@@ -3094,7 +3094,7 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 
 
 
-<a name="ttn.lorawan.v3.CryptoServicePayloadResponse"/>
+<a name="ttn.lorawan.v3.CryptoServicePayloadResponse"></a>
 
 ### CryptoServicePayloadResponse
 
@@ -3109,7 +3109,7 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 
 
 
-<a name="ttn.lorawan.v3.DeriveSessionKeysRequest"/>
+<a name="ttn.lorawan.v3.DeriveSessionKeysRequest"></a>
 
 ### DeriveSessionKeysRequest
 
@@ -3130,7 +3130,7 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 
 
 
-<a name="ttn.lorawan.v3.GetRootKeysRequest"/>
+<a name="ttn.lorawan.v3.GetRootKeysRequest"></a>
 
 ### GetRootKeysRequest
 
@@ -3147,7 +3147,7 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 
 
 
-<a name="ttn.lorawan.v3.JoinAcceptMICRequest"/>
+<a name="ttn.lorawan.v3.JoinAcceptMICRequest"></a>
 
 ### JoinAcceptMICRequest
 
@@ -3164,7 +3164,7 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 
 
 
-<a name="ttn.lorawan.v3.NwkSKeysResponse"/>
+<a name="ttn.lorawan.v3.NwkSKeysResponse"></a>
 
 ### NwkSKeysResponse
 
@@ -3181,7 +3181,7 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 
 
 
-<a name="ttn.lorawan.v3.ProvisionEndDevicesRequest"/>
+<a name="ttn.lorawan.v3.ProvisionEndDevicesRequest"></a>
 
 ### ProvisionEndDevicesRequest
 
@@ -3201,7 +3201,7 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 
 
 
-<a name="ttn.lorawan.v3.ProvisionEndDevicesRequest.IdentifiersFromData"/>
+<a name="ttn.lorawan.v3.ProvisionEndDevicesRequest.IdentifiersFromData"></a>
 
 ### ProvisionEndDevicesRequest.IdentifiersFromData
 
@@ -3216,7 +3216,7 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 
 
 
-<a name="ttn.lorawan.v3.ProvisionEndDevicesRequest.IdentifiersList"/>
+<a name="ttn.lorawan.v3.ProvisionEndDevicesRequest.IdentifiersList"></a>
 
 ### ProvisionEndDevicesRequest.IdentifiersList
 
@@ -3232,7 +3232,7 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 
 
 
-<a name="ttn.lorawan.v3.ProvisionEndDevicesRequest.IdentifiersRange"/>
+<a name="ttn.lorawan.v3.ProvisionEndDevicesRequest.IdentifiersRange"></a>
 
 ### ProvisionEndDevicesRequest.IdentifiersRange
 
@@ -3248,7 +3248,7 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 
 
 
-<a name="ttn.lorawan.v3.SessionKeyRequest"/>
+<a name="ttn.lorawan.v3.SessionKeyRequest"></a>
 
 ### SessionKeyRequest
 
@@ -3270,77 +3270,77 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
  
 
 
-<a name="ttn.lorawan.v3.ApplicationCryptoService"/>
+<a name="ttn.lorawan.v3.ApplicationCryptoService"></a>
 
 ### ApplicationCryptoService
 Service for application layer cryptographic operations.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| DeriveAppSKey | [DeriveSessionKeysRequest](#ttn.lorawan.v3.DeriveSessionKeysRequest) | [AppSKeyResponse](#ttn.lorawan.v3.DeriveSessionKeysRequest) |  |
-| GetAppKey | [GetRootKeysRequest](#ttn.lorawan.v3.GetRootKeysRequest) | [KeyEnvelope](#ttn.lorawan.v3.GetRootKeysRequest) | Get the AppKey. Crypto Servers may return status code UNIMPLEMENTED when root keys are not exposed. |
+| DeriveAppSKey | [DeriveSessionKeysRequest](#ttn.lorawan.v3.DeriveSessionKeysRequest) | [AppSKeyResponse](#ttn.lorawan.v3.AppSKeyResponse) |  |
+| GetAppKey | [GetRootKeysRequest](#ttn.lorawan.v3.GetRootKeysRequest) | [KeyEnvelope](#ttn.lorawan.v3.KeyEnvelope) | Get the AppKey. Crypto Servers may return status code UNIMPLEMENTED when root keys are not exposed. |
 
 
-<a name="ttn.lorawan.v3.AsJs"/>
+<a name="ttn.lorawan.v3.AsJs"></a>
 
 ### AsJs
 The AsJs service connects an Application Server to a Join Server.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| GetAppSKey | [SessionKeyRequest](#ttn.lorawan.v3.SessionKeyRequest) | [AppSKeyResponse](#ttn.lorawan.v3.SessionKeyRequest) |  |
+| GetAppSKey | [SessionKeyRequest](#ttn.lorawan.v3.SessionKeyRequest) | [AppSKeyResponse](#ttn.lorawan.v3.AppSKeyResponse) |  |
 
 
-<a name="ttn.lorawan.v3.JsEndDeviceRegistry"/>
+<a name="ttn.lorawan.v3.JsEndDeviceRegistry"></a>
 
 ### JsEndDeviceRegistry
 The JsEndDeviceRegistry service allows clients to manage their end devices on the Join Server.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| Get | [GetEndDeviceRequest](#ttn.lorawan.v3.GetEndDeviceRequest) | [EndDevice](#ttn.lorawan.v3.GetEndDeviceRequest) | Get returns the device that matches the given identifiers. If there are multiple matches, an error will be returned. |
-| Set | [SetEndDeviceRequest](#ttn.lorawan.v3.SetEndDeviceRequest) | [EndDevice](#ttn.lorawan.v3.SetEndDeviceRequest) | Set creates or updates the device. |
-| Provision | [ProvisionEndDevicesRequest](#ttn.lorawan.v3.ProvisionEndDevicesRequest) | [EndDevice](#ttn.lorawan.v3.ProvisionEndDevicesRequest) | Provision returns end devices that are provisioned using the given vendor-specific data. The devices are not set in the registry. |
-| Delete | [EndDeviceIdentifiers](#ttn.lorawan.v3.EndDeviceIdentifiers) | [.google.protobuf.Empty](#ttn.lorawan.v3.EndDeviceIdentifiers) | Delete deletes the device that matches the given identifiers. If there are multiple matches, an error will be returned. |
+| Get | [GetEndDeviceRequest](#ttn.lorawan.v3.GetEndDeviceRequest) | [EndDevice](#ttn.lorawan.v3.EndDevice) | Get returns the device that matches the given identifiers. If there are multiple matches, an error will be returned. |
+| Set | [SetEndDeviceRequest](#ttn.lorawan.v3.SetEndDeviceRequest) | [EndDevice](#ttn.lorawan.v3.EndDevice) | Set creates or updates the device. |
+| Provision | [ProvisionEndDevicesRequest](#ttn.lorawan.v3.ProvisionEndDevicesRequest) | [EndDevice](#ttn.lorawan.v3.EndDevice) stream | Provision returns end devices that are provisioned using the given vendor-specific data. The devices are not set in the registry. |
+| Delete | [EndDeviceIdentifiers](#ttn.lorawan.v3.EndDeviceIdentifiers) | [.google.protobuf.Empty](#google.protobuf.Empty) | Delete deletes the device that matches the given identifiers. If there are multiple matches, an error will be returned. |
 
 
-<a name="ttn.lorawan.v3.NetworkCryptoService"/>
+<a name="ttn.lorawan.v3.NetworkCryptoService"></a>
 
 ### NetworkCryptoService
 Service for network layer cryptographic operations.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| JoinRequestMIC | [CryptoServicePayloadRequest](#ttn.lorawan.v3.CryptoServicePayloadRequest) | [CryptoServicePayloadResponse](#ttn.lorawan.v3.CryptoServicePayloadRequest) |  |
-| JoinAcceptMIC | [JoinAcceptMICRequest](#ttn.lorawan.v3.JoinAcceptMICRequest) | [CryptoServicePayloadResponse](#ttn.lorawan.v3.JoinAcceptMICRequest) |  |
-| EncryptJoinAccept | [CryptoServicePayloadRequest](#ttn.lorawan.v3.CryptoServicePayloadRequest) | [CryptoServicePayloadResponse](#ttn.lorawan.v3.CryptoServicePayloadRequest) |  |
-| EncryptRejoinAccept | [CryptoServicePayloadRequest](#ttn.lorawan.v3.CryptoServicePayloadRequest) | [CryptoServicePayloadResponse](#ttn.lorawan.v3.CryptoServicePayloadRequest) |  |
-| DeriveNwkSKeys | [DeriveSessionKeysRequest](#ttn.lorawan.v3.DeriveSessionKeysRequest) | [NwkSKeysResponse](#ttn.lorawan.v3.DeriveSessionKeysRequest) |  |
-| GetNwkKey | [GetRootKeysRequest](#ttn.lorawan.v3.GetRootKeysRequest) | [KeyEnvelope](#ttn.lorawan.v3.GetRootKeysRequest) | Get the NwkKey. Crypto Servers may return status code UNIMPLEMENTED when root keys are not exposed. |
+| JoinRequestMIC | [CryptoServicePayloadRequest](#ttn.lorawan.v3.CryptoServicePayloadRequest) | [CryptoServicePayloadResponse](#ttn.lorawan.v3.CryptoServicePayloadResponse) |  |
+| JoinAcceptMIC | [JoinAcceptMICRequest](#ttn.lorawan.v3.JoinAcceptMICRequest) | [CryptoServicePayloadResponse](#ttn.lorawan.v3.CryptoServicePayloadResponse) |  |
+| EncryptJoinAccept | [CryptoServicePayloadRequest](#ttn.lorawan.v3.CryptoServicePayloadRequest) | [CryptoServicePayloadResponse](#ttn.lorawan.v3.CryptoServicePayloadResponse) |  |
+| EncryptRejoinAccept | [CryptoServicePayloadRequest](#ttn.lorawan.v3.CryptoServicePayloadRequest) | [CryptoServicePayloadResponse](#ttn.lorawan.v3.CryptoServicePayloadResponse) |  |
+| DeriveNwkSKeys | [DeriveSessionKeysRequest](#ttn.lorawan.v3.DeriveSessionKeysRequest) | [NwkSKeysResponse](#ttn.lorawan.v3.NwkSKeysResponse) |  |
+| GetNwkKey | [GetRootKeysRequest](#ttn.lorawan.v3.GetRootKeysRequest) | [KeyEnvelope](#ttn.lorawan.v3.KeyEnvelope) | Get the NwkKey. Crypto Servers may return status code UNIMPLEMENTED when root keys are not exposed. |
 
 
-<a name="ttn.lorawan.v3.NsJs"/>
+<a name="ttn.lorawan.v3.NsJs"></a>
 
 ### NsJs
 The NsJs service connects a Network Server to a Join Server.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| HandleJoin | [JoinRequest](#ttn.lorawan.v3.JoinRequest) | [JoinResponse](#ttn.lorawan.v3.JoinRequest) |  |
-| GetNwkSKeys | [SessionKeyRequest](#ttn.lorawan.v3.SessionKeyRequest) | [NwkSKeysResponse](#ttn.lorawan.v3.SessionKeyRequest) |  |
+| HandleJoin | [JoinRequest](#ttn.lorawan.v3.JoinRequest) | [JoinResponse](#ttn.lorawan.v3.JoinResponse) |  |
+| GetNwkSKeys | [SessionKeyRequest](#ttn.lorawan.v3.SessionKeyRequest) | [NwkSKeysResponse](#ttn.lorawan.v3.NwkSKeysResponse) |  |
 
  
 
 
 
-<a name="lorawan-stack/api/keys.proto"/>
+<a name="lorawan-stack/api/keys.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## lorawan-stack/api/keys.proto
 
 
 
-<a name="ttn.lorawan.v3.KeyEnvelope"/>
+<a name="ttn.lorawan.v3.KeyEnvelope"></a>
 
 ### KeyEnvelope
 
@@ -3356,7 +3356,7 @@ The NsJs service connects a Network Server to a Join Server.
 
 
 
-<a name="ttn.lorawan.v3.RootKeys"/>
+<a name="ttn.lorawan.v3.RootKeys"></a>
 
 ### RootKeys
 Root keys for a LoRaWAN device.
@@ -3374,7 +3374,7 @@ These are stored on the Join Server.
 
 
 
-<a name="ttn.lorawan.v3.SessionKeys"/>
+<a name="ttn.lorawan.v3.SessionKeys"></a>
 
 ### SessionKeys
 Session keys for a LoRaWAN session.
@@ -3403,14 +3403,14 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="lorawan-stack/api/lorawan.proto"/>
+<a name="lorawan-stack/api/lorawan.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## lorawan-stack/api/lorawan.proto
 
 
 
-<a name="ttn.lorawan.v3.CFList"/>
+<a name="ttn.lorawan.v3.CFList"></a>
 
 ### CFList
 
@@ -3427,7 +3427,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.DLSettings"/>
+<a name="ttn.lorawan.v3.DLSettings"></a>
 
 ### DLSettings
 
@@ -3444,7 +3444,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.DataRate"/>
+<a name="ttn.lorawan.v3.DataRate"></a>
 
 ### DataRate
 
@@ -3460,7 +3460,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.DownlinkPath"/>
+<a name="ttn.lorawan.v3.DownlinkPath"></a>
 
 ### DownlinkPath
 
@@ -3476,7 +3476,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.FCtrl"/>
+<a name="ttn.lorawan.v3.FCtrl"></a>
 
 ### FCtrl
 
@@ -3495,7 +3495,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.FHDR"/>
+<a name="ttn.lorawan.v3.FHDR"></a>
 
 ### FHDR
 
@@ -3513,7 +3513,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.FSKDataRate"/>
+<a name="ttn.lorawan.v3.FSKDataRate"></a>
 
 ### FSKDataRate
 
@@ -3528,7 +3528,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.GatewayAntennaIdentifiers"/>
+<a name="ttn.lorawan.v3.GatewayAntennaIdentifiers"></a>
 
 ### GatewayAntennaIdentifiers
 
@@ -3544,7 +3544,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.JoinAcceptPayload"/>
+<a name="ttn.lorawan.v3.JoinAcceptPayload"></a>
 
 ### JoinAcceptPayload
 
@@ -3565,7 +3565,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.JoinRequestPayload"/>
+<a name="ttn.lorawan.v3.JoinRequestPayload"></a>
 
 ### JoinRequestPayload
 
@@ -3582,7 +3582,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.LoRaDataRate"/>
+<a name="ttn.lorawan.v3.LoRaDataRate"></a>
 
 ### LoRaDataRate
 
@@ -3598,7 +3598,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.MACCommand"/>
+<a name="ttn.lorawan.v3.MACCommand"></a>
 
 ### MACCommand
 
@@ -3644,7 +3644,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.MACCommand.ADRParamSetupReq"/>
+<a name="ttn.lorawan.v3.MACCommand.ADRParamSetupReq"></a>
 
 ### MACCommand.ADRParamSetupReq
 
@@ -3660,7 +3660,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.MACCommand.BeaconFreqAns"/>
+<a name="ttn.lorawan.v3.MACCommand.BeaconFreqAns"></a>
 
 ### MACCommand.BeaconFreqAns
 
@@ -3675,7 +3675,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.MACCommand.BeaconFreqReq"/>
+<a name="ttn.lorawan.v3.MACCommand.BeaconFreqReq"></a>
 
 ### MACCommand.BeaconFreqReq
 
@@ -3690,7 +3690,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.MACCommand.BeaconTimingAns"/>
+<a name="ttn.lorawan.v3.MACCommand.BeaconTimingAns"></a>
 
 ### MACCommand.BeaconTimingAns
 
@@ -3706,7 +3706,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.MACCommand.DLChannelAns"/>
+<a name="ttn.lorawan.v3.MACCommand.DLChannelAns"></a>
 
 ### MACCommand.DLChannelAns
 
@@ -3722,7 +3722,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.MACCommand.DLChannelReq"/>
+<a name="ttn.lorawan.v3.MACCommand.DLChannelReq"></a>
 
 ### MACCommand.DLChannelReq
 
@@ -3738,7 +3738,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.MACCommand.DevStatusAns"/>
+<a name="ttn.lorawan.v3.MACCommand.DevStatusAns"></a>
 
 ### MACCommand.DevStatusAns
 
@@ -3754,7 +3754,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.MACCommand.DeviceModeConf"/>
+<a name="ttn.lorawan.v3.MACCommand.DeviceModeConf"></a>
 
 ### MACCommand.DeviceModeConf
 
@@ -3769,7 +3769,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.MACCommand.DeviceModeInd"/>
+<a name="ttn.lorawan.v3.MACCommand.DeviceModeInd"></a>
 
 ### MACCommand.DeviceModeInd
 
@@ -3784,7 +3784,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.MACCommand.DeviceTimeAns"/>
+<a name="ttn.lorawan.v3.MACCommand.DeviceTimeAns"></a>
 
 ### MACCommand.DeviceTimeAns
 
@@ -3799,7 +3799,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.MACCommand.DutyCycleReq"/>
+<a name="ttn.lorawan.v3.MACCommand.DutyCycleReq"></a>
 
 ### MACCommand.DutyCycleReq
 
@@ -3814,7 +3814,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.MACCommand.ForceRejoinReq"/>
+<a name="ttn.lorawan.v3.MACCommand.ForceRejoinReq"></a>
 
 ### MACCommand.ForceRejoinReq
 
@@ -3832,7 +3832,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.MACCommand.LinkADRAns"/>
+<a name="ttn.lorawan.v3.MACCommand.LinkADRAns"></a>
 
 ### MACCommand.LinkADRAns
 
@@ -3849,7 +3849,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.MACCommand.LinkADRReq"/>
+<a name="ttn.lorawan.v3.MACCommand.LinkADRReq"></a>
 
 ### MACCommand.LinkADRReq
 
@@ -3868,7 +3868,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.MACCommand.LinkCheckAns"/>
+<a name="ttn.lorawan.v3.MACCommand.LinkCheckAns"></a>
 
 ### MACCommand.LinkCheckAns
 
@@ -3884,7 +3884,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.MACCommand.NewChannelAns"/>
+<a name="ttn.lorawan.v3.MACCommand.NewChannelAns"></a>
 
 ### MACCommand.NewChannelAns
 
@@ -3900,7 +3900,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.MACCommand.NewChannelReq"/>
+<a name="ttn.lorawan.v3.MACCommand.NewChannelReq"></a>
 
 ### MACCommand.NewChannelReq
 
@@ -3918,7 +3918,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.MACCommand.PingSlotChannelAns"/>
+<a name="ttn.lorawan.v3.MACCommand.PingSlotChannelAns"></a>
 
 ### MACCommand.PingSlotChannelAns
 
@@ -3934,7 +3934,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.MACCommand.PingSlotChannelReq"/>
+<a name="ttn.lorawan.v3.MACCommand.PingSlotChannelReq"></a>
 
 ### MACCommand.PingSlotChannelReq
 
@@ -3950,7 +3950,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.MACCommand.PingSlotInfoReq"/>
+<a name="ttn.lorawan.v3.MACCommand.PingSlotInfoReq"></a>
 
 ### MACCommand.PingSlotInfoReq
 
@@ -3965,7 +3965,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.MACCommand.RejoinParamSetupAns"/>
+<a name="ttn.lorawan.v3.MACCommand.RejoinParamSetupAns"></a>
 
 ### MACCommand.RejoinParamSetupAns
 
@@ -3980,7 +3980,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.MACCommand.RejoinParamSetupReq"/>
+<a name="ttn.lorawan.v3.MACCommand.RejoinParamSetupReq"></a>
 
 ### MACCommand.RejoinParamSetupReq
 
@@ -3996,7 +3996,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.MACCommand.RekeyConf"/>
+<a name="ttn.lorawan.v3.MACCommand.RekeyConf"></a>
 
 ### MACCommand.RekeyConf
 
@@ -4011,7 +4011,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.MACCommand.RekeyInd"/>
+<a name="ttn.lorawan.v3.MACCommand.RekeyInd"></a>
 
 ### MACCommand.RekeyInd
 
@@ -4026,7 +4026,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.MACCommand.ResetConf"/>
+<a name="ttn.lorawan.v3.MACCommand.ResetConf"></a>
 
 ### MACCommand.ResetConf
 
@@ -4041,7 +4041,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.MACCommand.ResetInd"/>
+<a name="ttn.lorawan.v3.MACCommand.ResetInd"></a>
 
 ### MACCommand.ResetInd
 
@@ -4056,7 +4056,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.MACCommand.RxParamSetupAns"/>
+<a name="ttn.lorawan.v3.MACCommand.RxParamSetupAns"></a>
 
 ### MACCommand.RxParamSetupAns
 
@@ -4073,7 +4073,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.MACCommand.RxParamSetupReq"/>
+<a name="ttn.lorawan.v3.MACCommand.RxParamSetupReq"></a>
 
 ### MACCommand.RxParamSetupReq
 
@@ -4090,7 +4090,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.MACCommand.RxTimingSetupReq"/>
+<a name="ttn.lorawan.v3.MACCommand.RxTimingSetupReq"></a>
 
 ### MACCommand.RxTimingSetupReq
 
@@ -4105,7 +4105,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.MACCommand.TxParamSetupReq"/>
+<a name="ttn.lorawan.v3.MACCommand.TxParamSetupReq"></a>
 
 ### MACCommand.TxParamSetupReq
 
@@ -4122,7 +4122,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.MACPayload"/>
+<a name="ttn.lorawan.v3.MACPayload"></a>
 
 ### MACPayload
 
@@ -4140,7 +4140,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.MHDR"/>
+<a name="ttn.lorawan.v3.MHDR"></a>
 
 ### MHDR
 
@@ -4156,7 +4156,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.Message"/>
+<a name="ttn.lorawan.v3.Message"></a>
 
 ### Message
 
@@ -4176,7 +4176,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.RejoinRequestPayload"/>
+<a name="ttn.lorawan.v3.RejoinRequestPayload"></a>
 
 ### RejoinRequestPayload
 
@@ -4195,7 +4195,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.TxRequest"/>
+<a name="ttn.lorawan.v3.TxRequest"></a>
 
 ### TxRequest
 TxRequest is a request for transmission.
@@ -4222,7 +4222,7 @@ Otherwise, the Gateway Server attempts to schedule the request and creates the T
 
 
 
-<a name="ttn.lorawan.v3.TxSettings"/>
+<a name="ttn.lorawan.v3.TxSettings"></a>
 
 ### TxSettings
 TxSettings contains the settings for a transmission.
@@ -4249,7 +4249,7 @@ On downlink, this is a scheduled transmission.
 
 
 
-<a name="ttn.lorawan.v3.UplinkToken"/>
+<a name="ttn.lorawan.v3.UplinkToken"></a>
 
 ### UplinkToken
 
@@ -4267,7 +4267,7 @@ On downlink, this is a scheduled transmission.
  
 
 
-<a name="ttn.lorawan.v3.ADRAckDelayExponent"/>
+<a name="ttn.lorawan.v3.ADRAckDelayExponent"></a>
 
 ### ADRAckDelayExponent
 
@@ -4293,7 +4293,7 @@ On downlink, this is a scheduled transmission.
 
 
 
-<a name="ttn.lorawan.v3.ADRAckLimitExponent"/>
+<a name="ttn.lorawan.v3.ADRAckLimitExponent"></a>
 
 ### ADRAckLimitExponent
 
@@ -4319,7 +4319,7 @@ On downlink, this is a scheduled transmission.
 
 
 
-<a name="ttn.lorawan.v3.AggregatedDutyCycle"/>
+<a name="ttn.lorawan.v3.AggregatedDutyCycle"></a>
 
 ### AggregatedDutyCycle
 
@@ -4345,7 +4345,7 @@ On downlink, this is a scheduled transmission.
 
 
 
-<a name="ttn.lorawan.v3.CFListType"/>
+<a name="ttn.lorawan.v3.CFListType"></a>
 
 ### CFListType
 
@@ -4357,7 +4357,7 @@ On downlink, this is a scheduled transmission.
 
 
 
-<a name="ttn.lorawan.v3.Class"/>
+<a name="ttn.lorawan.v3.Class"></a>
 
 ### Class
 
@@ -4370,7 +4370,7 @@ On downlink, this is a scheduled transmission.
 
 
 
-<a name="ttn.lorawan.v3.DataRateIndex"/>
+<a name="ttn.lorawan.v3.DataRateIndex"></a>
 
 ### DataRateIndex
 
@@ -4396,7 +4396,7 @@ On downlink, this is a scheduled transmission.
 
 
 
-<a name="ttn.lorawan.v3.DeviceEIRP"/>
+<a name="ttn.lorawan.v3.DeviceEIRP"></a>
 
 ### DeviceEIRP
 
@@ -4422,7 +4422,7 @@ On downlink, this is a scheduled transmission.
 
 
 
-<a name="ttn.lorawan.v3.MACCommandIdentifier"/>
+<a name="ttn.lorawan.v3.MACCommandIdentifier"></a>
 
 ### MACCommandIdentifier
 
@@ -4453,7 +4453,7 @@ On downlink, this is a scheduled transmission.
 
 
 
-<a name="ttn.lorawan.v3.MACVersion"/>
+<a name="ttn.lorawan.v3.MACVersion"></a>
 
 ### MACVersion
 
@@ -4468,7 +4468,7 @@ On downlink, this is a scheduled transmission.
 
 
 
-<a name="ttn.lorawan.v3.MType"/>
+<a name="ttn.lorawan.v3.MType"></a>
 
 ### MType
 
@@ -4486,7 +4486,7 @@ On downlink, this is a scheduled transmission.
 
 
 
-<a name="ttn.lorawan.v3.Major"/>
+<a name="ttn.lorawan.v3.Major"></a>
 
 ### Major
 
@@ -4497,7 +4497,7 @@ On downlink, this is a scheduled transmission.
 
 
 
-<a name="ttn.lorawan.v3.Minor"/>
+<a name="ttn.lorawan.v3.Minor"></a>
 
 ### Minor
 
@@ -4523,7 +4523,7 @@ On downlink, this is a scheduled transmission.
 
 
 
-<a name="ttn.lorawan.v3.PHYVersion"/>
+<a name="ttn.lorawan.v3.PHYVersion"></a>
 
 ### PHYVersion
 
@@ -4540,7 +4540,7 @@ On downlink, this is a scheduled transmission.
 
 
 
-<a name="ttn.lorawan.v3.PingSlotPeriod"/>
+<a name="ttn.lorawan.v3.PingSlotPeriod"></a>
 
 ### PingSlotPeriod
 
@@ -4558,7 +4558,7 @@ On downlink, this is a scheduled transmission.
 
 
 
-<a name="ttn.lorawan.v3.RejoinCountExponent"/>
+<a name="ttn.lorawan.v3.RejoinCountExponent"></a>
 
 ### RejoinCountExponent
 
@@ -4584,7 +4584,7 @@ On downlink, this is a scheduled transmission.
 
 
 
-<a name="ttn.lorawan.v3.RejoinPeriodExponent"/>
+<a name="ttn.lorawan.v3.RejoinPeriodExponent"></a>
 
 ### RejoinPeriodExponent
 
@@ -4602,7 +4602,7 @@ On downlink, this is a scheduled transmission.
 
 
 
-<a name="ttn.lorawan.v3.RejoinTimeExponent"/>
+<a name="ttn.lorawan.v3.RejoinTimeExponent"></a>
 
 ### RejoinTimeExponent
 
@@ -4628,7 +4628,7 @@ On downlink, this is a scheduled transmission.
 
 
 
-<a name="ttn.lorawan.v3.RejoinType"/>
+<a name="ttn.lorawan.v3.RejoinType"></a>
 
 ### RejoinType
 
@@ -4641,7 +4641,7 @@ On downlink, this is a scheduled transmission.
 
 
 
-<a name="ttn.lorawan.v3.RxDelay"/>
+<a name="ttn.lorawan.v3.RxDelay"></a>
 
 ### RxDelay
 
@@ -4667,7 +4667,7 @@ On downlink, this is a scheduled transmission.
 
 
 
-<a name="ttn.lorawan.v3.TxSchedulePriority"/>
+<a name="ttn.lorawan.v3.TxSchedulePriority"></a>
 
 ### TxSchedulePriority
 
@@ -4691,14 +4691,14 @@ On downlink, this is a scheduled transmission.
 
 
 
-<a name="lorawan-stack/api/message_services.proto"/>
+<a name="lorawan-stack/api/message_services.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## lorawan-stack/api/message_services.proto
 
 
 
-<a name="ttn.lorawan.v3.ProcessDownlinkMessageRequest"/>
+<a name="ttn.lorawan.v3.ProcessDownlinkMessageRequest"></a>
 
 ### ProcessDownlinkMessageRequest
 
@@ -4716,7 +4716,7 @@ On downlink, this is a scheduled transmission.
 
 
 
-<a name="ttn.lorawan.v3.ProcessUplinkMessageRequest"/>
+<a name="ttn.lorawan.v3.ProcessUplinkMessageRequest"></a>
 
 ### ProcessUplinkMessageRequest
 
@@ -4740,37 +4740,37 @@ On downlink, this is a scheduled transmission.
  
 
 
-<a name="ttn.lorawan.v3.DownlinkMessageProcessor"/>
+<a name="ttn.lorawan.v3.DownlinkMessageProcessor"></a>
 
 ### DownlinkMessageProcessor
 The DownlinkMessageProcessor service processes downlink messages.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| Process | [ProcessDownlinkMessageRequest](#ttn.lorawan.v3.ProcessDownlinkMessageRequest) | [ApplicationDownlink](#ttn.lorawan.v3.ProcessDownlinkMessageRequest) |  |
+| Process | [ProcessDownlinkMessageRequest](#ttn.lorawan.v3.ProcessDownlinkMessageRequest) | [ApplicationDownlink](#ttn.lorawan.v3.ApplicationDownlink) |  |
 
 
-<a name="ttn.lorawan.v3.UplinkMessageProcessor"/>
+<a name="ttn.lorawan.v3.UplinkMessageProcessor"></a>
 
 ### UplinkMessageProcessor
 The UplinkMessageProcessor service processes uplink messages.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| Process | [ProcessUplinkMessageRequest](#ttn.lorawan.v3.ProcessUplinkMessageRequest) | [ApplicationUplink](#ttn.lorawan.v3.ProcessUplinkMessageRequest) |  |
+| Process | [ProcessUplinkMessageRequest](#ttn.lorawan.v3.ProcessUplinkMessageRequest) | [ApplicationUplink](#ttn.lorawan.v3.ApplicationUplink) |  |
 
  
 
 
 
-<a name="lorawan-stack/api/messages.proto"/>
+<a name="lorawan-stack/api/messages.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## lorawan-stack/api/messages.proto
 
 
 
-<a name="ttn.lorawan.v3.ApplicationDownlink"/>
+<a name="ttn.lorawan.v3.ApplicationDownlink"></a>
 
 ### ApplicationDownlink
 
@@ -4793,7 +4793,7 @@ The UplinkMessageProcessor service processes uplink messages.
 
 
 
-<a name="ttn.lorawan.v3.ApplicationDownlink.ClassBC"/>
+<a name="ttn.lorawan.v3.ApplicationDownlink.ClassBC"></a>
 
 ### ApplicationDownlink.ClassBC
 
@@ -4809,7 +4809,7 @@ The UplinkMessageProcessor service processes uplink messages.
 
 
 
-<a name="ttn.lorawan.v3.ApplicationDownlinkFailed"/>
+<a name="ttn.lorawan.v3.ApplicationDownlinkFailed"></a>
 
 ### ApplicationDownlinkFailed
 
@@ -4825,7 +4825,7 @@ The UplinkMessageProcessor service processes uplink messages.
 
 
 
-<a name="ttn.lorawan.v3.ApplicationDownlinks"/>
+<a name="ttn.lorawan.v3.ApplicationDownlinks"></a>
 
 ### ApplicationDownlinks
 
@@ -4840,7 +4840,7 @@ The UplinkMessageProcessor service processes uplink messages.
 
 
 
-<a name="ttn.lorawan.v3.ApplicationInvalidatedDownlinks"/>
+<a name="ttn.lorawan.v3.ApplicationInvalidatedDownlinks"></a>
 
 ### ApplicationInvalidatedDownlinks
 
@@ -4856,7 +4856,7 @@ The UplinkMessageProcessor service processes uplink messages.
 
 
 
-<a name="ttn.lorawan.v3.ApplicationJoinAccept"/>
+<a name="ttn.lorawan.v3.ApplicationJoinAccept"></a>
 
 ### ApplicationJoinAccept
 
@@ -4874,7 +4874,7 @@ The UplinkMessageProcessor service processes uplink messages.
 
 
 
-<a name="ttn.lorawan.v3.ApplicationLocation"/>
+<a name="ttn.lorawan.v3.ApplicationLocation"></a>
 
 ### ApplicationLocation
 
@@ -4891,7 +4891,7 @@ The UplinkMessageProcessor service processes uplink messages.
 
 
 
-<a name="ttn.lorawan.v3.ApplicationLocation.AttributesEntry"/>
+<a name="ttn.lorawan.v3.ApplicationLocation.AttributesEntry"></a>
 
 ### ApplicationLocation.AttributesEntry
 
@@ -4907,7 +4907,7 @@ The UplinkMessageProcessor service processes uplink messages.
 
 
 
-<a name="ttn.lorawan.v3.ApplicationUp"/>
+<a name="ttn.lorawan.v3.ApplicationUp"></a>
 
 ### ApplicationUp
 
@@ -4932,7 +4932,7 @@ The UplinkMessageProcessor service processes uplink messages.
 
 
 
-<a name="ttn.lorawan.v3.ApplicationUplink"/>
+<a name="ttn.lorawan.v3.ApplicationUplink"></a>
 
 ### ApplicationUplink
 
@@ -4953,7 +4953,7 @@ The UplinkMessageProcessor service processes uplink messages.
 
 
 
-<a name="ttn.lorawan.v3.DownlinkMessage"/>
+<a name="ttn.lorawan.v3.DownlinkMessage"></a>
 
 ### DownlinkMessage
 Downlink message from the network to the end device
@@ -4973,7 +4973,7 @@ Downlink message from the network to the end device
 
 
 
-<a name="ttn.lorawan.v3.DownlinkQueueRequest"/>
+<a name="ttn.lorawan.v3.DownlinkQueueRequest"></a>
 
 ### DownlinkQueueRequest
 
@@ -4989,7 +4989,7 @@ Downlink message from the network to the end device
 
 
 
-<a name="ttn.lorawan.v3.MessagePayloadFormatters"/>
+<a name="ttn.lorawan.v3.MessagePayloadFormatters"></a>
 
 ### MessagePayloadFormatters
 
@@ -5007,7 +5007,7 @@ Downlink message from the network to the end device
 
 
 
-<a name="ttn.lorawan.v3.TxAcknowledgment"/>
+<a name="ttn.lorawan.v3.TxAcknowledgment"></a>
 
 ### TxAcknowledgment
 
@@ -5023,7 +5023,7 @@ Downlink message from the network to the end device
 
 
 
-<a name="ttn.lorawan.v3.UplinkMessage"/>
+<a name="ttn.lorawan.v3.UplinkMessage"></a>
 
 ### UplinkMessage
 Uplink message from the end device to the network
@@ -5045,7 +5045,7 @@ Uplink message from the end device to the network
  
 
 
-<a name="ttn.lorawan.v3.PayloadFormatter"/>
+<a name="ttn.lorawan.v3.PayloadFormatter"></a>
 
 ### PayloadFormatter
 
@@ -5062,7 +5062,7 @@ More payload formatters can be added. |
 
 
 
-<a name="ttn.lorawan.v3.TxAcknowledgment.Result"/>
+<a name="ttn.lorawan.v3.TxAcknowledgment.Result"></a>
 
 ### TxAcknowledgment.Result
 
@@ -5088,14 +5088,14 @@ More payload formatters can be added. |
 
 
 
-<a name="lorawan-stack/api/metadata.proto"/>
+<a name="lorawan-stack/api/metadata.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## lorawan-stack/api/metadata.proto
 
 
 
-<a name="ttn.lorawan.v3.Location"/>
+<a name="ttn.lorawan.v3.Location"></a>
 
 ### Location
 
@@ -5114,7 +5114,7 @@ More payload formatters can be added. |
 
 
 
-<a name="ttn.lorawan.v3.RxMetadata"/>
+<a name="ttn.lorawan.v3.RxMetadata"></a>
 
 ### RxMetadata
 Contains metadata for a received message. Each antenna that receives
@@ -5147,7 +5147,7 @@ a message corresponds to one RxMetadata.
  
 
 
-<a name="ttn.lorawan.v3.LocationSource"/>
+<a name="ttn.lorawan.v3.LocationSource"></a>
 
 ### LocationSource
 
@@ -5175,7 +5175,7 @@ More estimation methods can be added. |
 
 
 
-<a name="lorawan-stack/api/networkserver.proto"/>
+<a name="lorawan-stack/api/networkserver.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## lorawan-stack/api/networkserver.proto
@@ -5188,52 +5188,52 @@ More estimation methods can be added. |
  
 
 
-<a name="ttn.lorawan.v3.AsNs"/>
+<a name="ttn.lorawan.v3.AsNs"></a>
 
 ### AsNs
 The AsNs service connects an Application Server to a Network Server.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| LinkApplication | [.google.protobuf.Empty](#google.protobuf.Empty) | [ApplicationUp](#google.protobuf.Empty) |  |
-| DownlinkQueueReplace | [DownlinkQueueRequest](#ttn.lorawan.v3.DownlinkQueueRequest) | [.google.protobuf.Empty](#ttn.lorawan.v3.DownlinkQueueRequest) |  |
-| DownlinkQueuePush | [DownlinkQueueRequest](#ttn.lorawan.v3.DownlinkQueueRequest) | [.google.protobuf.Empty](#ttn.lorawan.v3.DownlinkQueueRequest) |  |
-| DownlinkQueueList | [EndDeviceIdentifiers](#ttn.lorawan.v3.EndDeviceIdentifiers) | [ApplicationDownlinks](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |
+| LinkApplication | [.google.protobuf.Empty](#google.protobuf.Empty) stream | [ApplicationUp](#ttn.lorawan.v3.ApplicationUp) stream |  |
+| DownlinkQueueReplace | [DownlinkQueueRequest](#ttn.lorawan.v3.DownlinkQueueRequest) | [.google.protobuf.Empty](#google.protobuf.Empty) |  |
+| DownlinkQueuePush | [DownlinkQueueRequest](#ttn.lorawan.v3.DownlinkQueueRequest) | [.google.protobuf.Empty](#google.protobuf.Empty) |  |
+| DownlinkQueueList | [EndDeviceIdentifiers](#ttn.lorawan.v3.EndDeviceIdentifiers) | [ApplicationDownlinks](#ttn.lorawan.v3.ApplicationDownlinks) |  |
 
 
-<a name="ttn.lorawan.v3.GsNs"/>
+<a name="ttn.lorawan.v3.GsNs"></a>
 
 ### GsNs
 The GsNs service connects a Gateway Server to a Network Server.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| HandleUplink | [UplinkMessage](#ttn.lorawan.v3.UplinkMessage) | [.google.protobuf.Empty](#ttn.lorawan.v3.UplinkMessage) |  |
+| HandleUplink | [UplinkMessage](#ttn.lorawan.v3.UplinkMessage) | [.google.protobuf.Empty](#google.protobuf.Empty) |  |
 
 
-<a name="ttn.lorawan.v3.NsEndDeviceRegistry"/>
+<a name="ttn.lorawan.v3.NsEndDeviceRegistry"></a>
 
 ### NsEndDeviceRegistry
 The NsEndDeviceRegistry service allows clients to manage their end devices on the Network Server.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| Get | [GetEndDeviceRequest](#ttn.lorawan.v3.GetEndDeviceRequest) | [EndDevice](#ttn.lorawan.v3.GetEndDeviceRequest) | Get returns the device that matches the given identifiers. If there are multiple matches, an error will be returned. |
-| Set | [SetEndDeviceRequest](#ttn.lorawan.v3.SetEndDeviceRequest) | [EndDevice](#ttn.lorawan.v3.SetEndDeviceRequest) | Set creates or updates the device. |
-| Delete | [EndDeviceIdentifiers](#ttn.lorawan.v3.EndDeviceIdentifiers) | [.google.protobuf.Empty](#ttn.lorawan.v3.EndDeviceIdentifiers) | Delete deletes the device that matches the given identifiers. If there are multiple matches, an error will be returned. |
+| Get | [GetEndDeviceRequest](#ttn.lorawan.v3.GetEndDeviceRequest) | [EndDevice](#ttn.lorawan.v3.EndDevice) | Get returns the device that matches the given identifiers. If there are multiple matches, an error will be returned. |
+| Set | [SetEndDeviceRequest](#ttn.lorawan.v3.SetEndDeviceRequest) | [EndDevice](#ttn.lorawan.v3.EndDevice) | Set creates or updates the device. |
+| Delete | [EndDeviceIdentifiers](#ttn.lorawan.v3.EndDeviceIdentifiers) | [.google.protobuf.Empty](#google.protobuf.Empty) | Delete deletes the device that matches the given identifiers. If there are multiple matches, an error will be returned. |
 
  
 
 
 
-<a name="lorawan-stack/api/oauth.proto"/>
+<a name="lorawan-stack/api/oauth.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## lorawan-stack/api/oauth.proto
 
 
 
-<a name="ttn.lorawan.v3.ListOAuthAccessTokensRequest"/>
+<a name="ttn.lorawan.v3.ListOAuthAccessTokensRequest"></a>
 
 ### ListOAuthAccessTokensRequest
 
@@ -5252,7 +5252,7 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 
 
 
-<a name="ttn.lorawan.v3.ListOAuthClientAuthorizationsRequest"/>
+<a name="ttn.lorawan.v3.ListOAuthClientAuthorizationsRequest"></a>
 
 ### ListOAuthClientAuthorizationsRequest
 
@@ -5270,7 +5270,7 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 
 
 
-<a name="ttn.lorawan.v3.OAuthAccessToken"/>
+<a name="ttn.lorawan.v3.OAuthAccessToken"></a>
 
 ### OAuthAccessToken
 
@@ -5292,7 +5292,7 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 
 
 
-<a name="ttn.lorawan.v3.OAuthAccessTokenIdentifiers"/>
+<a name="ttn.lorawan.v3.OAuthAccessTokenIdentifiers"></a>
 
 ### OAuthAccessTokenIdentifiers
 
@@ -5309,7 +5309,7 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 
 
 
-<a name="ttn.lorawan.v3.OAuthAccessTokens"/>
+<a name="ttn.lorawan.v3.OAuthAccessTokens"></a>
 
 ### OAuthAccessTokens
 
@@ -5324,7 +5324,7 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 
 
 
-<a name="ttn.lorawan.v3.OAuthAuthorizationCode"/>
+<a name="ttn.lorawan.v3.OAuthAuthorizationCode"></a>
 
 ### OAuthAuthorizationCode
 
@@ -5346,7 +5346,7 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 
 
 
-<a name="ttn.lorawan.v3.OAuthClientAuthorization"/>
+<a name="ttn.lorawan.v3.OAuthClientAuthorization"></a>
 
 ### OAuthClientAuthorization
 
@@ -5365,7 +5365,7 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 
 
 
-<a name="ttn.lorawan.v3.OAuthClientAuthorizationIdentifiers"/>
+<a name="ttn.lorawan.v3.OAuthClientAuthorizationIdentifiers"></a>
 
 ### OAuthClientAuthorizationIdentifiers
 
@@ -5381,7 +5381,7 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 
 
 
-<a name="ttn.lorawan.v3.OAuthClientAuthorizations"/>
+<a name="ttn.lorawan.v3.OAuthClientAuthorizations"></a>
 
 ### OAuthClientAuthorizations
 
@@ -5405,7 +5405,7 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 
 
 
-<a name="lorawan-stack/api/oauth_services.proto"/>
+<a name="lorawan-stack/api/oauth_services.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## lorawan-stack/api/oauth_services.proto
@@ -5418,30 +5418,30 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
  
 
 
-<a name="ttn.lorawan.v3.OAuthAuthorizationRegistry"/>
+<a name="ttn.lorawan.v3.OAuthAuthorizationRegistry"></a>
 
 ### OAuthAuthorizationRegistry
 
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| List | [ListOAuthClientAuthorizationsRequest](#ttn.lorawan.v3.ListOAuthClientAuthorizationsRequest) | [OAuthClientAuthorizations](#ttn.lorawan.v3.ListOAuthClientAuthorizationsRequest) |  |
-| ListTokens | [ListOAuthAccessTokensRequest](#ttn.lorawan.v3.ListOAuthAccessTokensRequest) | [OAuthAccessTokens](#ttn.lorawan.v3.ListOAuthAccessTokensRequest) |  |
-| Delete | [OAuthClientAuthorizationIdentifiers](#ttn.lorawan.v3.OAuthClientAuthorizationIdentifiers) | [.google.protobuf.Empty](#ttn.lorawan.v3.OAuthClientAuthorizationIdentifiers) |  |
-| DeleteToken | [OAuthAccessTokenIdentifiers](#ttn.lorawan.v3.OAuthAccessTokenIdentifiers) | [.google.protobuf.Empty](#ttn.lorawan.v3.OAuthAccessTokenIdentifiers) |  |
+| List | [ListOAuthClientAuthorizationsRequest](#ttn.lorawan.v3.ListOAuthClientAuthorizationsRequest) | [OAuthClientAuthorizations](#ttn.lorawan.v3.OAuthClientAuthorizations) |  |
+| ListTokens | [ListOAuthAccessTokensRequest](#ttn.lorawan.v3.ListOAuthAccessTokensRequest) | [OAuthAccessTokens](#ttn.lorawan.v3.OAuthAccessTokens) |  |
+| Delete | [OAuthClientAuthorizationIdentifiers](#ttn.lorawan.v3.OAuthClientAuthorizationIdentifiers) | [.google.protobuf.Empty](#google.protobuf.Empty) |  |
+| DeleteToken | [OAuthAccessTokenIdentifiers](#ttn.lorawan.v3.OAuthAccessTokenIdentifiers) | [.google.protobuf.Empty](#google.protobuf.Empty) |  |
 
  
 
 
 
-<a name="lorawan-stack/api/organization.proto"/>
+<a name="lorawan-stack/api/organization.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## lorawan-stack/api/organization.proto
 
 
 
-<a name="ttn.lorawan.v3.CreateOrganizationAPIKeyRequest"/>
+<a name="ttn.lorawan.v3.CreateOrganizationAPIKeyRequest"></a>
 
 ### CreateOrganizationAPIKeyRequest
 
@@ -5458,7 +5458,7 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 
 
 
-<a name="ttn.lorawan.v3.CreateOrganizationRequest"/>
+<a name="ttn.lorawan.v3.CreateOrganizationRequest"></a>
 
 ### CreateOrganizationRequest
 
@@ -5474,7 +5474,7 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 
 
 
-<a name="ttn.lorawan.v3.GetOrganizationRequest"/>
+<a name="ttn.lorawan.v3.GetOrganizationRequest"></a>
 
 ### GetOrganizationRequest
 
@@ -5490,7 +5490,7 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 
 
 
-<a name="ttn.lorawan.v3.ListOrganizationsRequest"/>
+<a name="ttn.lorawan.v3.ListOrganizationsRequest"></a>
 
 ### ListOrganizationsRequest
 By default we list all organizations the caller has rights on.
@@ -5511,7 +5511,7 @@ where the user or organization is collaborator on.
 
 
 
-<a name="ttn.lorawan.v3.Organization"/>
+<a name="ttn.lorawan.v3.Organization"></a>
 
 ### Organization
 
@@ -5532,7 +5532,7 @@ where the user or organization is collaborator on.
 
 
 
-<a name="ttn.lorawan.v3.Organization.AttributesEntry"/>
+<a name="ttn.lorawan.v3.Organization.AttributesEntry"></a>
 
 ### Organization.AttributesEntry
 
@@ -5548,7 +5548,7 @@ where the user or organization is collaborator on.
 
 
 
-<a name="ttn.lorawan.v3.Organizations"/>
+<a name="ttn.lorawan.v3.Organizations"></a>
 
 ### Organizations
 
@@ -5563,7 +5563,7 @@ where the user or organization is collaborator on.
 
 
 
-<a name="ttn.lorawan.v3.SetOrganizationCollaboratorRequest"/>
+<a name="ttn.lorawan.v3.SetOrganizationCollaboratorRequest"></a>
 
 ### SetOrganizationCollaboratorRequest
 
@@ -5579,7 +5579,7 @@ where the user or organization is collaborator on.
 
 
 
-<a name="ttn.lorawan.v3.UpdateOrganizationAPIKeyRequest"/>
+<a name="ttn.lorawan.v3.UpdateOrganizationAPIKeyRequest"></a>
 
 ### UpdateOrganizationAPIKeyRequest
 
@@ -5595,7 +5595,7 @@ where the user or organization is collaborator on.
 
 
 
-<a name="ttn.lorawan.v3.UpdateOrganizationRequest"/>
+<a name="ttn.lorawan.v3.UpdateOrganizationRequest"></a>
 
 ### UpdateOrganizationRequest
 
@@ -5620,7 +5620,7 @@ where the user or organization is collaborator on.
 
 
 
-<a name="lorawan-stack/api/organization_services.proto"/>
+<a name="lorawan-stack/api/organization_services.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## lorawan-stack/api/organization_services.proto
@@ -5633,46 +5633,46 @@ where the user or organization is collaborator on.
  
 
 
-<a name="ttn.lorawan.v3.OrganizationAccess"/>
+<a name="ttn.lorawan.v3.OrganizationAccess"></a>
 
 ### OrganizationAccess
 
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| ListRights | [OrganizationIdentifiers](#ttn.lorawan.v3.OrganizationIdentifiers) | [Rights](#ttn.lorawan.v3.OrganizationIdentifiers) |  |
-| CreateAPIKey | [CreateOrganizationAPIKeyRequest](#ttn.lorawan.v3.CreateOrganizationAPIKeyRequest) | [APIKey](#ttn.lorawan.v3.CreateOrganizationAPIKeyRequest) |  |
-| ListAPIKeys | [OrganizationIdentifiers](#ttn.lorawan.v3.OrganizationIdentifiers) | [APIKeys](#ttn.lorawan.v3.OrganizationIdentifiers) |  |
-| UpdateAPIKey | [UpdateOrganizationAPIKeyRequest](#ttn.lorawan.v3.UpdateOrganizationAPIKeyRequest) | [APIKey](#ttn.lorawan.v3.UpdateOrganizationAPIKeyRequest) | Update the rights of an existing organization API key. To generate an API key, the CreateAPIKey should be used. To delete an API key, update it with zero rights. |
-| SetCollaborator | [SetOrganizationCollaboratorRequest](#ttn.lorawan.v3.SetOrganizationCollaboratorRequest) | [.google.protobuf.Empty](#ttn.lorawan.v3.SetOrganizationCollaboratorRequest) | Set the rights of a collaborator (member) on the organization. Users are considered to be a collaborator if they have at least one right on the organization. Note that only users can collaborate (be member of) an organization. |
-| ListCollaborators | [OrganizationIdentifiers](#ttn.lorawan.v3.OrganizationIdentifiers) | [Collaborators](#ttn.lorawan.v3.OrganizationIdentifiers) |  |
+| ListRights | [OrganizationIdentifiers](#ttn.lorawan.v3.OrganizationIdentifiers) | [Rights](#ttn.lorawan.v3.Rights) |  |
+| CreateAPIKey | [CreateOrganizationAPIKeyRequest](#ttn.lorawan.v3.CreateOrganizationAPIKeyRequest) | [APIKey](#ttn.lorawan.v3.APIKey) |  |
+| ListAPIKeys | [OrganizationIdentifiers](#ttn.lorawan.v3.OrganizationIdentifiers) | [APIKeys](#ttn.lorawan.v3.APIKeys) |  |
+| UpdateAPIKey | [UpdateOrganizationAPIKeyRequest](#ttn.lorawan.v3.UpdateOrganizationAPIKeyRequest) | [APIKey](#ttn.lorawan.v3.APIKey) | Update the rights of an existing organization API key. To generate an API key, the CreateAPIKey should be used. To delete an API key, update it with zero rights. |
+| SetCollaborator | [SetOrganizationCollaboratorRequest](#ttn.lorawan.v3.SetOrganizationCollaboratorRequest) | [.google.protobuf.Empty](#google.protobuf.Empty) | Set the rights of a collaborator (member) on the organization. Users are considered to be a collaborator if they have at least one right on the organization. Note that only users can collaborate (be member of) an organization. |
+| ListCollaborators | [OrganizationIdentifiers](#ttn.lorawan.v3.OrganizationIdentifiers) | [Collaborators](#ttn.lorawan.v3.Collaborators) |  |
 
 
-<a name="ttn.lorawan.v3.OrganizationRegistry"/>
+<a name="ttn.lorawan.v3.OrganizationRegistry"></a>
 
 ### OrganizationRegistry
 
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| Create | [CreateOrganizationRequest](#ttn.lorawan.v3.CreateOrganizationRequest) | [Organization](#ttn.lorawan.v3.CreateOrganizationRequest) | Create a new organization. This also sets the given user as first collaborator with all possible rights. |
-| Get | [GetOrganizationRequest](#ttn.lorawan.v3.GetOrganizationRequest) | [Organization](#ttn.lorawan.v3.GetOrganizationRequest) | Get the organization with the given identifiers, selecting the fields given by the field mask. The method may return more or less fields, depending on the rights of the caller. |
-| List | [ListOrganizationsRequest](#ttn.lorawan.v3.ListOrganizationsRequest) | [Organizations](#ttn.lorawan.v3.ListOrganizationsRequest) | List organizations. See request message for details. |
-| Update | [UpdateOrganizationRequest](#ttn.lorawan.v3.UpdateOrganizationRequest) | [Organization](#ttn.lorawan.v3.UpdateOrganizationRequest) |  |
-| Delete | [OrganizationIdentifiers](#ttn.lorawan.v3.OrganizationIdentifiers) | [.google.protobuf.Empty](#ttn.lorawan.v3.OrganizationIdentifiers) |  |
+| Create | [CreateOrganizationRequest](#ttn.lorawan.v3.CreateOrganizationRequest) | [Organization](#ttn.lorawan.v3.Organization) | Create a new organization. This also sets the given user as first collaborator with all possible rights. |
+| Get | [GetOrganizationRequest](#ttn.lorawan.v3.GetOrganizationRequest) | [Organization](#ttn.lorawan.v3.Organization) | Get the organization with the given identifiers, selecting the fields given by the field mask. The method may return more or less fields, depending on the rights of the caller. |
+| List | [ListOrganizationsRequest](#ttn.lorawan.v3.ListOrganizationsRequest) | [Organizations](#ttn.lorawan.v3.Organizations) | List organizations. See request message for details. |
+| Update | [UpdateOrganizationRequest](#ttn.lorawan.v3.UpdateOrganizationRequest) | [Organization](#ttn.lorawan.v3.Organization) |  |
+| Delete | [OrganizationIdentifiers](#ttn.lorawan.v3.OrganizationIdentifiers) | [.google.protobuf.Empty](#google.protobuf.Empty) |  |
 
  
 
 
 
-<a name="lorawan-stack/api/regional.proto"/>
+<a name="lorawan-stack/api/regional.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## lorawan-stack/api/regional.proto
 
 
 
-<a name="ttn.lorawan.v3.ConcentratorConfig"/>
+<a name="ttn.lorawan.v3.ConcentratorConfig"></a>
 
 ### ConcentratorConfig
 
@@ -5693,7 +5693,7 @@ where the user or organization is collaborator on.
 
 
 
-<a name="ttn.lorawan.v3.ConcentratorConfig.Channel"/>
+<a name="ttn.lorawan.v3.ConcentratorConfig.Channel"></a>
 
 ### ConcentratorConfig.Channel
 
@@ -5709,7 +5709,7 @@ where the user or organization is collaborator on.
 
 
 
-<a name="ttn.lorawan.v3.ConcentratorConfig.FSKChannel"/>
+<a name="ttn.lorawan.v3.ConcentratorConfig.FSKChannel"></a>
 
 ### ConcentratorConfig.FSKChannel
 
@@ -5725,7 +5725,7 @@ where the user or organization is collaborator on.
 
 
 
-<a name="ttn.lorawan.v3.ConcentratorConfig.LBTConfiguration"/>
+<a name="ttn.lorawan.v3.ConcentratorConfig.LBTConfiguration"></a>
 
 ### ConcentratorConfig.LBTConfiguration
 
@@ -5742,7 +5742,7 @@ where the user or organization is collaborator on.
 
 
 
-<a name="ttn.lorawan.v3.ConcentratorConfig.LoRaStandardChannel"/>
+<a name="ttn.lorawan.v3.ConcentratorConfig.LoRaStandardChannel"></a>
 
 ### ConcentratorConfig.LoRaStandardChannel
 
@@ -5769,14 +5769,14 @@ where the user or organization is collaborator on.
 
 
 
-<a name="lorawan-stack/api/rights.proto"/>
+<a name="lorawan-stack/api/rights.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## lorawan-stack/api/rights.proto
 
 
 
-<a name="ttn.lorawan.v3.APIKey"/>
+<a name="ttn.lorawan.v3.APIKey"></a>
 
 ### APIKey
 
@@ -5794,7 +5794,7 @@ where the user or organization is collaborator on.
 
 
 
-<a name="ttn.lorawan.v3.APIKeys"/>
+<a name="ttn.lorawan.v3.APIKeys"></a>
 
 ### APIKeys
 
@@ -5809,7 +5809,7 @@ where the user or organization is collaborator on.
 
 
 
-<a name="ttn.lorawan.v3.Collaborator"/>
+<a name="ttn.lorawan.v3.Collaborator"></a>
 
 ### Collaborator
 
@@ -5825,7 +5825,7 @@ where the user or organization is collaborator on.
 
 
 
-<a name="ttn.lorawan.v3.Collaborators"/>
+<a name="ttn.lorawan.v3.Collaborators"></a>
 
 ### Collaborators
 
@@ -5840,7 +5840,7 @@ where the user or organization is collaborator on.
 
 
 
-<a name="ttn.lorawan.v3.Rights"/>
+<a name="ttn.lorawan.v3.Rights"></a>
 
 ### Rights
 
@@ -5857,7 +5857,7 @@ where the user or organization is collaborator on.
  
 
 
-<a name="ttn.lorawan.v3.Right"/>
+<a name="ttn.lorawan.v3.Right"></a>
 
 ### Right
 Right is the enum that defines all the different rights to do something in the network.
@@ -5930,14 +5930,14 @@ Right is the enum that defines all the different rights to do something in the n
 
 
 
-<a name="lorawan-stack/api/search_services.proto"/>
+<a name="lorawan-stack/api/search_services.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## lorawan-stack/api/search_services.proto
 
 
 
-<a name="ttn.lorawan.v3.SearchEndDevicesRequest"/>
+<a name="ttn.lorawan.v3.SearchEndDevicesRequest"></a>
 
 ### SearchEndDevicesRequest
 
@@ -5960,7 +5960,7 @@ Right is the enum that defines all the different rights to do something in the n
 
 
 
-<a name="ttn.lorawan.v3.SearchEndDevicesRequest.AttributesContainEntry"/>
+<a name="ttn.lorawan.v3.SearchEndDevicesRequest.AttributesContainEntry"></a>
 
 ### SearchEndDevicesRequest.AttributesContainEntry
 
@@ -5976,7 +5976,7 @@ Right is the enum that defines all the different rights to do something in the n
 
 
 
-<a name="ttn.lorawan.v3.SearchEntitiesRequest"/>
+<a name="ttn.lorawan.v3.SearchEntitiesRequest"></a>
 
 ### SearchEntitiesRequest
 This message is used for finding entities in the EntityRegistrySearch service.
@@ -5995,7 +5995,7 @@ This message is used for finding entities in the EntityRegistrySearch service.
 
 
 
-<a name="ttn.lorawan.v3.SearchEntitiesRequest.AttributesContainEntry"/>
+<a name="ttn.lorawan.v3.SearchEntitiesRequest.AttributesContainEntry"></a>
 
 ### SearchEntitiesRequest.AttributesContainEntry
 
@@ -6017,7 +6017,7 @@ This message is used for finding entities in the EntityRegistrySearch service.
  
 
 
-<a name="ttn.lorawan.v3.EndDeviceRegistrySearch"/>
+<a name="ttn.lorawan.v3.EndDeviceRegistrySearch"></a>
 
 ### EndDeviceRegistrySearch
 The EndDeviceRegistrySearch service indexes devices in the EndDeviceRegistry
@@ -6026,10 +6026,10 @@ This service is not implemented on all deployments.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| SearchEndDevices | [SearchEndDevicesRequest](#ttn.lorawan.v3.SearchEndDevicesRequest) | [EndDevices](#ttn.lorawan.v3.SearchEndDevicesRequest) |  |
+| SearchEndDevices | [SearchEndDevicesRequest](#ttn.lorawan.v3.SearchEndDevicesRequest) | [EndDevices](#ttn.lorawan.v3.EndDevices) |  |
 
 
-<a name="ttn.lorawan.v3.EntityRegistrySearch"/>
+<a name="ttn.lorawan.v3.EntityRegistrySearch"></a>
 
 ### EntityRegistrySearch
 The EntityRegistrySearch service indexes entities in the various registries
@@ -6038,24 +6038,24 @@ This service is not implemented on all deployments.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| SearchApplications | [SearchEntitiesRequest](#ttn.lorawan.v3.SearchEntitiesRequest) | [Applications](#ttn.lorawan.v3.SearchEntitiesRequest) |  |
-| SearchClients | [SearchEntitiesRequest](#ttn.lorawan.v3.SearchEntitiesRequest) | [Clients](#ttn.lorawan.v3.SearchEntitiesRequest) |  |
-| SearchGateways | [SearchEntitiesRequest](#ttn.lorawan.v3.SearchEntitiesRequest) | [Gateways](#ttn.lorawan.v3.SearchEntitiesRequest) |  |
-| SearchOrganizations | [SearchEntitiesRequest](#ttn.lorawan.v3.SearchEntitiesRequest) | [Organizations](#ttn.lorawan.v3.SearchEntitiesRequest) |  |
-| SearchUsers | [SearchEntitiesRequest](#ttn.lorawan.v3.SearchEntitiesRequest) | [Users](#ttn.lorawan.v3.SearchEntitiesRequest) |  |
+| SearchApplications | [SearchEntitiesRequest](#ttn.lorawan.v3.SearchEntitiesRequest) | [Applications](#ttn.lorawan.v3.Applications) |  |
+| SearchClients | [SearchEntitiesRequest](#ttn.lorawan.v3.SearchEntitiesRequest) | [Clients](#ttn.lorawan.v3.Clients) |  |
+| SearchGateways | [SearchEntitiesRequest](#ttn.lorawan.v3.SearchEntitiesRequest) | [Gateways](#ttn.lorawan.v3.Gateways) |  |
+| SearchOrganizations | [SearchEntitiesRequest](#ttn.lorawan.v3.SearchEntitiesRequest) | [Organizations](#ttn.lorawan.v3.Organizations) |  |
+| SearchUsers | [SearchEntitiesRequest](#ttn.lorawan.v3.SearchEntitiesRequest) | [Users](#ttn.lorawan.v3.Users) |  |
 
  
 
 
 
-<a name="lorawan-stack/api/user.proto"/>
+<a name="lorawan-stack/api/user.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## lorawan-stack/api/user.proto
 
 
 
-<a name="ttn.lorawan.v3.CreateTemporaryPasswordRequest"/>
+<a name="ttn.lorawan.v3.CreateTemporaryPasswordRequest"></a>
 
 ### CreateTemporaryPasswordRequest
 
@@ -6070,7 +6070,7 @@ This service is not implemented on all deployments.
 
 
 
-<a name="ttn.lorawan.v3.CreateUserAPIKeyRequest"/>
+<a name="ttn.lorawan.v3.CreateUserAPIKeyRequest"></a>
 
 ### CreateUserAPIKeyRequest
 
@@ -6087,7 +6087,7 @@ This service is not implemented on all deployments.
 
 
 
-<a name="ttn.lorawan.v3.CreateUserRequest"/>
+<a name="ttn.lorawan.v3.CreateUserRequest"></a>
 
 ### CreateUserRequest
 
@@ -6103,7 +6103,7 @@ This service is not implemented on all deployments.
 
 
 
-<a name="ttn.lorawan.v3.DeleteInvitationRequest"/>
+<a name="ttn.lorawan.v3.DeleteInvitationRequest"></a>
 
 ### DeleteInvitationRequest
 
@@ -6118,7 +6118,7 @@ This service is not implemented on all deployments.
 
 
 
-<a name="ttn.lorawan.v3.GetUserRequest"/>
+<a name="ttn.lorawan.v3.GetUserRequest"></a>
 
 ### GetUserRequest
 
@@ -6134,7 +6134,7 @@ This service is not implemented on all deployments.
 
 
 
-<a name="ttn.lorawan.v3.Invitation"/>
+<a name="ttn.lorawan.v3.Invitation"></a>
 
 ### Invitation
 
@@ -6155,7 +6155,7 @@ This service is not implemented on all deployments.
 
 
 
-<a name="ttn.lorawan.v3.Invitations"/>
+<a name="ttn.lorawan.v3.Invitations"></a>
 
 ### Invitations
 
@@ -6170,7 +6170,7 @@ This service is not implemented on all deployments.
 
 
 
-<a name="ttn.lorawan.v3.ListUserSessionsRequest"/>
+<a name="ttn.lorawan.v3.ListUserSessionsRequest"></a>
 
 ### ListUserSessionsRequest
 
@@ -6188,7 +6188,7 @@ This service is not implemented on all deployments.
 
 
 
-<a name="ttn.lorawan.v3.Picture"/>
+<a name="ttn.lorawan.v3.Picture"></a>
 
 ### Picture
 
@@ -6204,7 +6204,7 @@ This service is not implemented on all deployments.
 
 
 
-<a name="ttn.lorawan.v3.Picture.Embedded"/>
+<a name="ttn.lorawan.v3.Picture.Embedded"></a>
 
 ### Picture.Embedded
 
@@ -6220,7 +6220,7 @@ This service is not implemented on all deployments.
 
 
 
-<a name="ttn.lorawan.v3.Picture.SizesEntry"/>
+<a name="ttn.lorawan.v3.Picture.SizesEntry"></a>
 
 ### Picture.SizesEntry
 
@@ -6236,7 +6236,7 @@ This service is not implemented on all deployments.
 
 
 
-<a name="ttn.lorawan.v3.SendInvitationRequest"/>
+<a name="ttn.lorawan.v3.SendInvitationRequest"></a>
 
 ### SendInvitationRequest
 
@@ -6251,7 +6251,7 @@ This service is not implemented on all deployments.
 
 
 
-<a name="ttn.lorawan.v3.UpdateUserAPIKeyRequest"/>
+<a name="ttn.lorawan.v3.UpdateUserAPIKeyRequest"></a>
 
 ### UpdateUserAPIKeyRequest
 
@@ -6267,7 +6267,7 @@ This service is not implemented on all deployments.
 
 
 
-<a name="ttn.lorawan.v3.UpdateUserPasswordRequest"/>
+<a name="ttn.lorawan.v3.UpdateUserPasswordRequest"></a>
 
 ### UpdateUserPasswordRequest
 
@@ -6284,7 +6284,7 @@ This service is not implemented on all deployments.
 
 
 
-<a name="ttn.lorawan.v3.UpdateUserRequest"/>
+<a name="ttn.lorawan.v3.UpdateUserRequest"></a>
 
 ### UpdateUserRequest
 
@@ -6300,7 +6300,7 @@ This service is not implemented on all deployments.
 
 
 
-<a name="ttn.lorawan.v3.User"/>
+<a name="ttn.lorawan.v3.User"></a>
 
 ### User
 User is the message that defines an user on the network.
@@ -6332,7 +6332,7 @@ User is the message that defines an user on the network.
 
 
 
-<a name="ttn.lorawan.v3.User.AttributesEntry"/>
+<a name="ttn.lorawan.v3.User.AttributesEntry"></a>
 
 ### User.AttributesEntry
 
@@ -6348,7 +6348,7 @@ User is the message that defines an user on the network.
 
 
 
-<a name="ttn.lorawan.v3.UserSession"/>
+<a name="ttn.lorawan.v3.UserSession"></a>
 
 ### UserSession
 
@@ -6367,7 +6367,7 @@ User is the message that defines an user on the network.
 
 
 
-<a name="ttn.lorawan.v3.UserSessionIdentifiers"/>
+<a name="ttn.lorawan.v3.UserSessionIdentifiers"></a>
 
 ### UserSessionIdentifiers
 
@@ -6383,7 +6383,7 @@ User is the message that defines an user on the network.
 
 
 
-<a name="ttn.lorawan.v3.UserSessions"/>
+<a name="ttn.lorawan.v3.UserSessions"></a>
 
 ### UserSessions
 
@@ -6398,7 +6398,7 @@ User is the message that defines an user on the network.
 
 
 
-<a name="ttn.lorawan.v3.Users"/>
+<a name="ttn.lorawan.v3.Users"></a>
 
 ### Users
 
@@ -6422,7 +6422,7 @@ User is the message that defines an user on the network.
 
 
 
-<a name="lorawan-stack/api/user_services.proto"/>
+<a name="lorawan-stack/api/user_services.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## lorawan-stack/api/user_services.proto
@@ -6435,55 +6435,55 @@ User is the message that defines an user on the network.
  
 
 
-<a name="ttn.lorawan.v3.UserAccess"/>
+<a name="ttn.lorawan.v3.UserAccess"></a>
 
 ### UserAccess
 
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| ListRights | [UserIdentifiers](#ttn.lorawan.v3.UserIdentifiers) | [Rights](#ttn.lorawan.v3.UserIdentifiers) |  |
-| CreateAPIKey | [CreateUserAPIKeyRequest](#ttn.lorawan.v3.CreateUserAPIKeyRequest) | [APIKey](#ttn.lorawan.v3.CreateUserAPIKeyRequest) |  |
-| ListAPIKeys | [UserIdentifiers](#ttn.lorawan.v3.UserIdentifiers) | [APIKeys](#ttn.lorawan.v3.UserIdentifiers) |  |
-| UpdateAPIKey | [UpdateUserAPIKeyRequest](#ttn.lorawan.v3.UpdateUserAPIKeyRequest) | [APIKey](#ttn.lorawan.v3.UpdateUserAPIKeyRequest) | Update the rights of an existing user API key. To generate an API key, the CreateAPIKey should be used. To delete an API key, update it with zero rights. |
+| ListRights | [UserIdentifiers](#ttn.lorawan.v3.UserIdentifiers) | [Rights](#ttn.lorawan.v3.Rights) |  |
+| CreateAPIKey | [CreateUserAPIKeyRequest](#ttn.lorawan.v3.CreateUserAPIKeyRequest) | [APIKey](#ttn.lorawan.v3.APIKey) |  |
+| ListAPIKeys | [UserIdentifiers](#ttn.lorawan.v3.UserIdentifiers) | [APIKeys](#ttn.lorawan.v3.APIKeys) |  |
+| UpdateAPIKey | [UpdateUserAPIKeyRequest](#ttn.lorawan.v3.UpdateUserAPIKeyRequest) | [APIKey](#ttn.lorawan.v3.APIKey) | Update the rights of an existing user API key. To generate an API key, the CreateAPIKey should be used. To delete an API key, update it with zero rights. |
 
 
-<a name="ttn.lorawan.v3.UserInvitationRegistry"/>
+<a name="ttn.lorawan.v3.UserInvitationRegistry"></a>
 
 ### UserInvitationRegistry
 
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| Send | [SendInvitationRequest](#ttn.lorawan.v3.SendInvitationRequest) | [Invitation](#ttn.lorawan.v3.SendInvitationRequest) |  |
-| List | [.google.protobuf.Empty](#google.protobuf.Empty) | [Invitations](#google.protobuf.Empty) |  |
-| Delete | [DeleteInvitationRequest](#ttn.lorawan.v3.DeleteInvitationRequest) | [.google.protobuf.Empty](#ttn.lorawan.v3.DeleteInvitationRequest) |  |
+| Send | [SendInvitationRequest](#ttn.lorawan.v3.SendInvitationRequest) | [Invitation](#ttn.lorawan.v3.Invitation) |  |
+| List | [.google.protobuf.Empty](#google.protobuf.Empty) | [Invitations](#ttn.lorawan.v3.Invitations) |  |
+| Delete | [DeleteInvitationRequest](#ttn.lorawan.v3.DeleteInvitationRequest) | [.google.protobuf.Empty](#google.protobuf.Empty) |  |
 
 
-<a name="ttn.lorawan.v3.UserRegistry"/>
+<a name="ttn.lorawan.v3.UserRegistry"></a>
 
 ### UserRegistry
 
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| Create | [CreateUserRequest](#ttn.lorawan.v3.CreateUserRequest) | [User](#ttn.lorawan.v3.CreateUserRequest) | Register a new user. This method may be restricted by network settings. |
-| Get | [GetUserRequest](#ttn.lorawan.v3.GetUserRequest) | [User](#ttn.lorawan.v3.GetUserRequest) | Get the user with the given identifiers, selecting the fields given by the field mask. The method may return more or less fields, depending on the rights of the caller. |
-| Update | [UpdateUserRequest](#ttn.lorawan.v3.UpdateUserRequest) | [User](#ttn.lorawan.v3.UpdateUserRequest) |  |
-| CreateTemporaryPassword | [CreateTemporaryPasswordRequest](#ttn.lorawan.v3.CreateTemporaryPasswordRequest) | [.google.protobuf.Empty](#ttn.lorawan.v3.CreateTemporaryPasswordRequest) | Create a temporary password that can be used for updating a forgotten password. The generated password is sent to the user&#39;s email address. |
-| UpdatePassword | [UpdateUserPasswordRequest](#ttn.lorawan.v3.UpdateUserPasswordRequest) | [.google.protobuf.Empty](#ttn.lorawan.v3.UpdateUserPasswordRequest) |  |
-| Delete | [UserIdentifiers](#ttn.lorawan.v3.UserIdentifiers) | [.google.protobuf.Empty](#ttn.lorawan.v3.UserIdentifiers) |  |
+| Create | [CreateUserRequest](#ttn.lorawan.v3.CreateUserRequest) | [User](#ttn.lorawan.v3.User) | Register a new user. This method may be restricted by network settings. |
+| Get | [GetUserRequest](#ttn.lorawan.v3.GetUserRequest) | [User](#ttn.lorawan.v3.User) | Get the user with the given identifiers, selecting the fields given by the field mask. The method may return more or less fields, depending on the rights of the caller. |
+| Update | [UpdateUserRequest](#ttn.lorawan.v3.UpdateUserRequest) | [User](#ttn.lorawan.v3.User) |  |
+| CreateTemporaryPassword | [CreateTemporaryPasswordRequest](#ttn.lorawan.v3.CreateTemporaryPasswordRequest) | [.google.protobuf.Empty](#google.protobuf.Empty) | Create a temporary password that can be used for updating a forgotten password. The generated password is sent to the user&#39;s email address. |
+| UpdatePassword | [UpdateUserPasswordRequest](#ttn.lorawan.v3.UpdateUserPasswordRequest) | [.google.protobuf.Empty](#google.protobuf.Empty) |  |
+| Delete | [UserIdentifiers](#ttn.lorawan.v3.UserIdentifiers) | [.google.protobuf.Empty](#google.protobuf.Empty) |  |
 
 
-<a name="ttn.lorawan.v3.UserSessionRegistry"/>
+<a name="ttn.lorawan.v3.UserSessionRegistry"></a>
 
 ### UserSessionRegistry
 
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| List | [ListUserSessionsRequest](#ttn.lorawan.v3.ListUserSessionsRequest) | [UserSessions](#ttn.lorawan.v3.ListUserSessionsRequest) |  |
-| Delete | [UserSessionIdentifiers](#ttn.lorawan.v3.UserSessionIdentifiers) | [.google.protobuf.Empty](#ttn.lorawan.v3.UserSessionIdentifiers) |  |
+| List | [ListUserSessionsRequest](#ttn.lorawan.v3.ListUserSessionsRequest) | [UserSessions](#ttn.lorawan.v3.UserSessions) |  |
+| Delete | [UserSessionIdentifiers](#ttn.lorawan.v3.UserSessionIdentifiers) | [.google.protobuf.Empty](#google.protobuf.Empty) |  |
 
  
 
