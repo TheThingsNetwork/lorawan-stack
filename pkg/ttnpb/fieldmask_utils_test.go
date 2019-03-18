@@ -33,6 +33,27 @@ func TestTopLevelFields(t *testing.T) {
 	a.So(ttnpb.TopLevelFields(paths), should.Resemble, []string{"a", "b"})
 }
 
+func TestBottomLevelFields(t *testing.T) {
+	a := assertions.New(t)
+	paths := []string{
+		"a",
+		"b",
+		"b.c",
+		"d.e",
+		"f.g.h",
+		"f.g.h.i",
+		"f.g.h.i.j",
+		"f.g.h.i.k",
+	}
+	a.So(ttnpb.BottomLevelFields(paths), should.HaveSameElementsDeep, []string{
+		"a",
+		"b.c",
+		"d.e",
+		"f.g.h.i.j",
+		"f.g.h.i.k",
+	})
+}
+
 func TestHasOnlyAllowedFields(t *testing.T) {
 	a := assertions.New(t)
 	allowed := []string{
@@ -92,4 +113,40 @@ func TestFlattenPaths(t *testing.T) {
 		"e.f",
 	}
 	a.So(ttnpb.FlattenPaths(paths, []string{"a.b"}), should.Resemble, []string{"a", "a.b", "e.f"})
+}
+
+func TestContainsField(t *testing.T) {
+	a := assertions.New(t)
+	a.So(ttnpb.ContainsField("a.b", []string{"a.b", "c"}), should.BeTrue)
+	a.So(ttnpb.ContainsField("x", []string{"a.b", "c"}), should.BeFalse)
+}
+
+func TestAllowedFields(t *testing.T) {
+	a := assertions.New(t)
+	paths := []string{
+		"x",
+		"c.d",
+	}
+	allowedPaths := []string{
+		"a",
+		"a.b",
+		"c.d",
+	}
+	a.So(ttnpb.AllowedFields(paths, allowedPaths), should.Resemble, []string{"c.d"})
+}
+
+func TestAllowedBottomLevelFields(t *testing.T) {
+	a := assertions.New(t)
+	paths := []string{
+		"x",
+		"c",
+	}
+	allowedPaths := []string{
+		"a",
+		"a.b",
+		"c",
+		"c.d",
+		"c.e",
+	}
+	a.So(ttnpb.AllowedBottomLevelFields(paths, allowedPaths), should.HaveSameElementsDeep, []string{"c.d", "c.e"})
 }

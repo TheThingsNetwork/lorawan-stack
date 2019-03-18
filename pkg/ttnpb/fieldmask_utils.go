@@ -35,6 +35,26 @@ func TopLevelFields(paths []string) []string {
 	return out
 }
 
+// BottomLevelFields returns the unique bottom level fields of the given paths.
+func BottomLevelFields(paths []string) []string {
+	seen := make(map[string]struct{}, len(paths))
+	for _, path := range paths {
+		prefix := path
+		if i := strings.LastIndex(prefix, "."); i >= 0 {
+			prefix = prefix[:i]
+		}
+		if _, ok := seen[prefix]; ok {
+			delete(seen, prefix)
+		}
+		seen[path] = struct{}{}
+	}
+	out := make([]string, 0, len(seen))
+	for k := range seen {
+		out = append(out, k)
+	}
+	return out
+}
+
 // HasOnlyAllowedFields returns whether the given requested paths only contains paths that are allowed.
 // The requested fields (i.e. `a.b`) may be of a lower level than the allowed path (i.e. `a`).
 func HasOnlyAllowedFields(requested []string, allowed ...string) bool {
@@ -107,6 +127,44 @@ func ProhibitFields(requested []string, search ...string) error {
 		}
 	}
 	return nil
+}
+
+// ContainsField returns true if the given paths contains the field path.
+func ContainsField(path string, allowedPaths []string) bool {
+	for _, allowedPath := range allowedPaths {
+		if path == allowedPath {
+			return true
+		}
+	}
+	return false
+}
+
+// AllowedFields returns the paths from the given paths that are in the allowed paths.
+func AllowedFields(paths, allowedPaths []string) []string {
+	selectedPaths := make([]string, 0, len(paths))
+	for _, path := range paths {
+		if ContainsField(path, allowedPaths) {
+			selectedPaths = append(selectedPaths, path)
+			continue
+		}
+	}
+	return selectedPaths
+}
+
+// AllowedBottomLevelFields returns the bottom level paths from the given paths that are in the allowed paths.
+func AllowedBottomLevelFields(paths, allowedPaths []string) []string {
+	allowedPaths = BottomLevelFields(allowedPaths)
+	selectedPaths := make([]string, 0, len(allowedPaths))
+outer:
+	for _, allowedPath := range allowedPaths {
+		for _, path := range paths {
+			if allowedPath == path || strings.HasPrefix(allowedPath, path+".") {
+				selectedPaths = append(selectedPaths, allowedPath)
+				continue outer
+			}
+		}
+	}
+	return selectedPaths
 }
 
 func fieldsWithPrefix(prefix string, paths ...string) []string {
