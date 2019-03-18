@@ -1,0 +1,64 @@
+// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/* eslint-disable no-invalid-this */
+
+import traverse from 'traverse'
+
+/** Takes registry responses from different components and merges them into a
+* single entity record.
+* @param {Object} parts - An object containing the device record responded from
+* the registry and the paths that were requested from the component.
+* Shape: { record: …, paths: … }
+* @param {string} base - An optional base device record, that the merge will
+* take as base
+* @param {Object} minimum - Paths that will always be merged for all records
+* @returns {Object} The merged device record
+*/
+export default function mergeDevice (
+  parts,
+  base = {},
+  minimum = [[ 'ids' ], [ 'created_at' ], [ 'updated_at' ]]
+) {
+  const result = base
+
+  for (const part of parts) {
+    for (const path of part.paths ? [ ...minimum, ...part.paths ] : []) {
+      const val = traverse(part.record).get(path)
+      if (val) {
+        if (typeof val === 'object') {
+          // In case of a whole sub-object being selected, write each leaf node
+          // explicitly to achieve a deep merge instead of object overrides
+          if (Object.keys(val).length === 0) {
+            // Ignore empty object values
+            continue
+          }
+          traverse(val).forEach(function (e) {
+            if (this.isLeaf) {
+              if (typeof e === 'object' && Object.keys(e).length === 0) {
+                // Ignore empty object values
+                return
+              }
+              traverse(result).set([ ...path, ...this.path ], e)
+            }
+          })
+        } else {
+          traverse(result).set(path, val)
+        }
+      }
+    }
+  }
+
+  return result
+}

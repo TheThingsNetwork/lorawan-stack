@@ -18,8 +18,9 @@ import { URL } from 'url'
 import traverse from 'traverse'
 import Marshaler from '../../util/marshaler'
 import Device from '../../entity/device'
-import deviceEntityMap from '../../../generated/device-entity-map.json'
 import randomByteString from '../../util/random-bytes'
+import { splitSetPath, splitGetPath } from './split'
+import { mergeDevice } from './merge'
 
 /**
  * Devices Class provides an abstraction on all devices and manages data
@@ -43,79 +44,6 @@ class Devices {
         ? device => new Device(device, this._api)
         : undefined
     )
-  }
-
-  _splitEntitySetPaths (paths, base) {
-    return this._splitEntityPaths(paths, 'set', base)
-  }
-
-  _splitEntityGetPaths (paths, base) {
-    return this._splitEntityPaths(paths, 'get', base)
-  }
-
-  _splitEntityPaths (paths = [], direction, base = {}) {
-    const result = base
-    const retrieveIndex = direction === 'get' ? 0 : 1
-
-    for (const path of paths) {
-      const subtree =
-        traverse(deviceEntityMap).get(path)
-        || traverse(deviceEntityMap).get([ path[0] ])
-
-      if (!subtree) {
-        throw new Error(`Invalid or unknown field mask path used: ${path}`)
-      }
-
-      const definition = '_root' in subtree ? subtree._root[retrieveIndex] : subtree[retrieveIndex]
-
-      if (definition) {
-        if (definition instanceof Array) {
-          for (const component of definition) {
-            result[component] = !result[component] ? [ path ] : [ ...result[component], path ]
-          }
-        } else {
-          result[definition] = !result[definition] ? [ path ] : [ ...result[definition], path ]
-        }
-      }
-    }
-    return result
-  }
-
-  _mergeEntity (
-    parts,
-    base = {},
-    minimum = [[ 'ids' ], [ 'created_at' ], [ 'updated_at' ]]
-  ) {
-    const result = base
-
-    for (const part of parts) {
-      for (const path of part.paths ? [ ...minimum, ...part.paths ] : []) {
-        const val = traverse(part.record).get(path)
-        if (val) {
-          if (typeof val === 'object') {
-            // In case of a whole sub-object being selected, write each leaf node
-            // explicitly to achieve a deep merge instead of object overrides
-            if (Object.keys(val).length === 0) {
-              // Ignore empty object values
-              continue
-            }
-            traverse(val).forEach(function (e) {
-              if (this.isLeaf) {
-                if (typeof e === 'object' && Object.keys(e).length === 0) {
-                  // Ignore empty object values
-                  return
-                }
-                traverse(result).set([ ...path, ...this.path ], e)
-              }
-            })
-          } else {
-            traverse(result).set(path, val)
-          }
-        }
-      }
-    }
-
-    return result
   }
 
   async _setDevice (applicationId, deviceId, device, create = false) {
@@ -151,7 +79,6 @@ class Devices {
       params.routeParams['end_device.ids.device_id'] = devId
     }
 
-
     // Extract the paths from the patch
     const paths = traverse(device).reduce(function (acc, node) {
       if (this.isLeaf) {
@@ -160,7 +87,7 @@ class Devices {
       return acc
     }, [])
 
-    const requestTree = this._splitEntitySetPaths(paths, mergeBase)
+    const requestTree = splitSetPath(paths, mergeBase)
     const devicePayload = Marshaler.payload(device, 'end_device')
 
     let isResult = {}
@@ -202,7 +129,7 @@ class Devices {
       const setResults = (await Promise.all(requests))
         .map(e => e ? Marshaler.payloadSingleResponse(e) : undefined)
 
-      const result = this._mergeEntity([
+      const result = mergeDevice([
         { record: setResults[0], paths: requestTree.ns },
         { record: setResults[1], paths: requestTree.as },
         { record: setResults[2], paths: requestTree.js },
@@ -225,7 +152,7 @@ class Devices {
       throw new Error('Missing application_id for device.')
     }
 
-    const requestTree = this._splitEntityGetPaths(paths)
+    const requestTree = splitGetPaths(paths)
 
     const params = {
       routeParams: {
@@ -282,7 +209,7 @@ class Devices {
     const getResults = (await Promise.all(requests))
       .map(e => e ? Marshaler.payloadSingleResponse(e) : undefined)
 
-    const result = this._mergeEntity([
+    const result = mergeDevice([
       { record: getResults[0], paths: requestTree.ns },
       { record: getResults[1], paths: requestTree.as },
       { record: getResults[2], paths: requestTree.js },
