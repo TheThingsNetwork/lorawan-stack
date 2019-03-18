@@ -23,6 +23,9 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
+// eirpDelta is the delta between EIRP and ERP.
+const eirpDelta = 2.15
+
 // PayloadSizer abstracts the acceptable payload size depending on contextual parameters.
 type PayloadSizer interface {
 	PayloadSize(dwellTime bool) uint16
@@ -197,7 +200,7 @@ type SubBandParameters struct {
 	MinFrequency uint64
 	MaxFrequency uint64
 	DutyCycle    float32
-	MaxTxPower   float32
+	MaxEIRP      float32
 }
 
 // Comprises returns whether the duty cycle applies to the given frequency.

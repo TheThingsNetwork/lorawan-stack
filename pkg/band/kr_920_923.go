@@ -48,7 +48,7 @@ func init() {
 				MinFrequency: 920000000,
 				MaxFrequency: 923000000,
 				DutyCycle:    1,
-				MaxTxPower:   14.0,
+				MaxEIRP:      14.0 + eirpDelta,
 			},
 		},
 
