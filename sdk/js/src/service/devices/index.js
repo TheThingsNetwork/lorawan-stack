@@ -16,10 +16,10 @@
 
 import { URL } from 'url'
 import traverse from 'traverse'
-import Marshaler from '../util/marshaler'
-import Device from '../entity/device'
-import deviceEntityMap from '../../generated/device-entity-map.json'
-import randomByteString from '../util/random-bytes'
+import Marshaler from '../../util/marshaler'
+import Device from '../../entity/device'
+import deviceEntityMap from '../../../generated/device-entity-map.json'
+import randomByteString from '../../util/random-bytes'
 
 /**
  * Devices Class provides an abstraction on all devices and manages data
