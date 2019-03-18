@@ -78,6 +78,8 @@ func TestUnaryServerInterceptor(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()
 
+	testErr := errors.New("test")
+
 	RegisterAllowedFieldMaskPaths("/ttn.lorawan.v3.Test/Unary", "foo")
 
 	info := &grpc.UnaryServerInfo{FullMethod: "/ttn.lorawan.v3.Test/Unary"}
@@ -96,21 +98,25 @@ func TestUnaryServerInterceptor(t *testing.T) {
 	}
 
 	res, err = intercept(ctx, &msgWithValidate{testSubject{
-		err: errors.New("foo"),
+		err: testErr,
 	}}, info, handler)
-	a.So(err, should.BeError)
+	if a.So(err, should.BeError) {
+		a.So(err, should.Resemble, &testErr)
+	}
 
 	res, err = intercept(ctx, &msgWithValidateContext{}, info, handler)
 	if a.So(err, should.BeNil) {
 		a.So(res.(*testSubject).validateCalled, should.BeTrue)
-		a.So(res.(*testSubject).ctx, should.Equal, ctx)
 		a.So(res.(*testSubject).handlerCalled, should.BeTrue)
+		a.So(res.(*testSubject).ctx, should.Equal, ctx)
 	}
 
 	res, err = intercept(ctx, &msgWithValidateContext{testSubject{
-		err: errors.New("foo"),
+		err: testErr,
 	}}, info, handler)
-	a.So(err, should.BeError)
+	if a.So(err, should.BeError) {
+		a.So(err, should.Resemble, &testErr)
+	}
 
 	res, err = intercept(ctx, &msgWithFieldMask{
 		fieldMask: types.FieldMask{Paths: []string{"foo"}},
@@ -120,7 +126,9 @@ func TestUnaryServerInterceptor(t *testing.T) {
 	res, err = intercept(ctx, &msgWithFieldMask{
 		fieldMask: types.FieldMask{Paths: []string{"bar"}},
 	}, info, handler)
-	a.So(err, should.BeError)
+	if a.So(err, should.BeError) {
+		a.So(errors.IsInvalidArgument(err), should.BeTrue)
+	}
 }
 
 type ss struct {
@@ -140,6 +148,8 @@ func TestStreamServerInterceptor(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()
 
+	testErr := errors.New("test")
+
 	RegisterAllowedFieldMaskPaths("/ttn.lorawan.v3.Test/Stream", "foo")
 
 	info := &grpc.StreamServerInfo{FullMethod: "/ttn.lorawan.v3.Test/Stream"}
@@ -156,26 +166,32 @@ func TestStreamServerInterceptor(t *testing.T) {
 
 		subject = &msgWithValidate{}
 		err = stream.RecvMsg(subject)
-		a.So(err, should.BeNil)
-		a.So(subject.getResult().validateCalled, should.BeTrue)
+		if a.So(err, should.BeNil) {
+			a.So(subject.getResult().validateCalled, should.BeTrue)
+		}
 
 		subject = &msgWithValidate{testSubject{
-			err: errors.New("foo"),
+			err: testErr,
 		}}
 		err = stream.RecvMsg(subject)
-		a.So(err, should.BeError)
+		if a.So(err, should.BeError) {
+			a.So(err, should.Resemble, &testErr)
+		}
 
 		subject = &msgWithValidateContext{}
 		err = stream.RecvMsg(subject)
-		a.So(err, should.BeNil)
-		a.So(subject.getResult().validateCalled, should.BeTrue)
-		a.So(subject.getResult().ctx, should.Equal, ctx)
+		if a.So(err, should.BeNil) {
+			a.So(subject.getResult().validateCalled, should.BeTrue)
+			a.So(subject.getResult().ctx, should.Equal, ctx)
+		}
 
 		subject = &msgWithValidateContext{testSubject{
-			err: errors.New("foo"),
+			err: testErr,
 		}}
 		err = stream.RecvMsg(subject)
-		a.So(err, should.BeError)
+		if a.So(err, should.BeError) {
+			a.So(err, should.Resemble, &testErr)
+		}
 
 		subject = &msgWithFieldMask{
 			fieldMask: types.FieldMask{Paths: []string{"foo"}},
@@ -187,10 +203,11 @@ func TestStreamServerInterceptor(t *testing.T) {
 			fieldMask: types.FieldMask{Paths: []string{"bar"}},
 		}
 		err = stream.RecvMsg(subject)
-		a.So(err, should.BeError)
+		if a.So(err, should.BeError) {
+			a.So(errors.IsInvalidArgument(err), should.BeTrue)
+		}
 
 		return nil
 	})
-
 	a.So(err, should.BeNil)
 }
