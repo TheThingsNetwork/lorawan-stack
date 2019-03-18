@@ -309,7 +309,8 @@ type FrequencyPlan struct {
 	// Rx2Channel overrides the default band settings for Rx2.
 	Rx2Channel         *Channel `yaml:"rx2-channel,omitempty"`
 	DefaultRx2DataRate *uint8   `yaml:"rx2-default-data-rate,omitempty"`
-	MaxEIRP            *float32 `yaml:"max-eirp,omitempty"`
+	// MaxEIRP is the maximum EIRP as ceiling for any (sub-)band value.
+	MaxEIRP *float32 `yaml:"max-eirp,omitempty"`
 }
 
 // Extend returns the same frequency plan, with values overridden by the passed frequency plan.
