@@ -83,7 +83,7 @@ func FlattenPaths(paths, flatten []string) []string {
 	return res
 }
 
-var errMissingField = errors.Define("missing_field", "field {field} is missing")
+var errMissingField = errors.Define("missing_field", "field `{field}` is missing")
 
 // RequireFields returns nil if the given requested paths contain all of the given fields and error otherwise.
 // The requested fields (i.e. `a.b`) may be of a higher level than the search path (i.e. `a.b.c`).
@@ -96,7 +96,7 @@ func RequireFields(requested []string, search ...string) error {
 	return nil
 }
 
-var errProhibitedField = errors.Define("prohibited_field", "field {field} is prohibited")
+var errProhibitedField = errors.Define("prohibited_field", "field `{field}` is prohibited")
 
 // ProhibitFields returns nil if the given requested paths contain none of the given fields and error otherwise.
 // The requested fields (i.e. `a.b`) may be of a higher level than the search path (i.e. `a.b.c`).
