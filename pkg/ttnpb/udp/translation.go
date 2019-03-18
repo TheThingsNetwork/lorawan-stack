@@ -30,7 +30,8 @@ const (
 	lora  = "LORA"
 	fsk   = "FSK"
 
-	eirpDelta int32 = 2
+	// eirpDelta is the delta between EIRP and ERP.
+	eirpDelta = 2.15
 )
 
 var (
@@ -296,7 +297,7 @@ func ToDownlinkMessage(tx *TxPacket) (*ttnpb.DownlinkMessage, error) {
 		DataRate:           tx.DatR.DataRate,
 		Frequency:          uint64(tx.Freq * 1000000),
 		InvertPolarization: tx.IPol,
-		TxPower:            int32(tx.Powe) + eirpDelta,
+		TxPower:            float32(tx.Powe) + eirpDelta,
 		Timestamp:          tx.Tmst,
 	}
 	if lora := scheduled.DataRate.GetLoRa(); lora != nil {
@@ -328,7 +329,7 @@ func FromDownlinkMessage(msg *ttnpb.DownlinkMessage) (*TxPacket, error) {
 	tx := &TxPacket{
 		Freq: float64(scheduled.Frequency) / 1000000,
 		IPol: scheduled.InvertPolarization,
-		Powe: uint8(scheduled.TxPower) - uint8(eirpDelta),
+		Powe: uint8(scheduled.TxPower - eirpDelta),
 		Size: uint16(len(payload)),
 		Data: base64.StdEncoding.EncodeToString(payload),
 		Tmst: scheduled.Timestamp,
