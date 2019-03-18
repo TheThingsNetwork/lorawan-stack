@@ -50,7 +50,7 @@ func (e errorDetails) Cause() error {
 	return errorDetails{cause}
 }
 
-func errorDetailsToProto(e errors.ErrorDetails) *ErrorDetails {
+func ErrorDetailsToProto(e errors.ErrorDetails) *ErrorDetails {
 	attributes, err := gogoproto.Struct(e.PublicAttributes())
 	if err != nil {
 		panic(fmt.Sprintf("Failed to encode error attributes: %s", err)) // Likely a bug in ttn (invalid attribute type).
@@ -64,15 +64,23 @@ func errorDetailsToProto(e errors.ErrorDetails) *ErrorDetails {
 	}
 	if cause := e.Cause(); cause != nil {
 		if ttnErr, ok := errors.From(cause); ok {
-			proto.Cause = errorDetailsToProto(ttnErr)
+			proto.Cause = ErrorDetailsToProto(ttnErr)
 		}
 	}
 	return proto
 }
 
+func ErrorDetailsFromProto(e *ErrorDetails) errors.ErrorDetails {
+	d, ok := errors.From(errorDetails{ErrorDetails: e})
+	if !ok {
+		panic(fmt.Sprintf("Failed to decode error details")) // Likely a bug in ttn
+	}
+	return d
+}
+
 func init() {
 	errors.ErrorDetailsToProto = func(e errors.ErrorDetails) proto.Message {
-		return errorDetailsToProto(e)
+		return ErrorDetailsToProto(e)
 	}
 	errors.ErrorDetailsFromProto = func(msg ...proto.Message) (details errors.ErrorDetails, rest []proto.Message) {
 		var detailsMsg *ErrorDetails
@@ -84,8 +92,7 @@ func init() {
 				rest = append(rest, msg)
 			}
 		}
-		details, _ = errors.From(errorDetails{detailsMsg})
-		return
+		return ErrorDetailsFromProto(detailsMsg), rest
 	}
 }
 
