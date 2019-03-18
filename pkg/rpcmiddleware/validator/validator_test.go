@@ -38,6 +38,8 @@ func (t testSubject) getResult() *testSubject {
 	return &t
 }
 
+func (t *testSubject) ValidateFields(...string) error { return nil }
+
 type msgWithValidate struct {
 	testSubject
 }
@@ -64,6 +66,8 @@ type msgWithFieldMask struct {
 
 func (m *msgWithFieldMask) GetFieldMask() types.FieldMask { return m.fieldMask }
 
+func (m *msgWithFieldMask) ValidateFields(...string) error { return nil }
+
 func handler(ctx context.Context, req interface{}) (interface{}, error) {
 	res := req.(interface{ getResult() *testSubject }).getResult()
 	res.handlerCalled = true
@@ -81,29 +85,32 @@ func TestUnaryServerInterceptor(t *testing.T) {
 	intercept := UnaryServerInterceptor()
 
 	res, err := intercept(ctx, &testSubject{}, info, handler)
-	a.So(err, should.BeNil)
-	a.So(res.(*testSubject).handlerCalled, should.BeTrue)
+	if a.So(err, should.BeNil) {
+		a.So(res.(*testSubject).handlerCalled, should.BeTrue)
+	}
 
 	res, err = intercept(ctx, &msgWithValidate{}, info, handler)
-	a.So(err, should.BeNil)
-	a.So(res.(*testSubject).validateCalled, should.BeTrue)
-	a.So(res.(*testSubject).handlerCalled, should.BeTrue)
+	if a.So(err, should.BeNil) {
+		a.So(res.(*testSubject).validateCalled, should.BeTrue)
+		a.So(res.(*testSubject).handlerCalled, should.BeTrue)
+	}
 
 	res, err = intercept(ctx, &msgWithValidate{testSubject{
 		err: errors.New("foo"),
 	}}, info, handler)
-	a.So(err, should.NotBeNil)
+	a.So(err, should.BeError)
 
 	res, err = intercept(ctx, &msgWithValidateContext{}, info, handler)
-	a.So(err, should.BeNil)
-	a.So(res.(*testSubject).validateCalled, should.BeTrue)
-	a.So(res.(*testSubject).ctx, should.Equal, ctx)
-	a.So(res.(*testSubject).handlerCalled, should.BeTrue)
+	if a.So(err, should.BeNil) {
+		a.So(res.(*testSubject).validateCalled, should.BeTrue)
+		a.So(res.(*testSubject).ctx, should.Equal, ctx)
+		a.So(res.(*testSubject).handlerCalled, should.BeTrue)
+	}
 
 	res, err = intercept(ctx, &msgWithValidateContext{testSubject{
 		err: errors.New("foo"),
 	}}, info, handler)
-	a.So(err, should.NotBeNil)
+	a.So(err, should.BeError)
 
 	res, err = intercept(ctx, &msgWithFieldMask{
 		fieldMask: types.FieldMask{Paths: []string{"foo"}},
@@ -113,7 +120,7 @@ func TestUnaryServerInterceptor(t *testing.T) {
 	res, err = intercept(ctx, &msgWithFieldMask{
 		fieldMask: types.FieldMask{Paths: []string{"bar"}},
 	}, info, handler)
-	a.So(err, should.NotBeNil)
+	a.So(err, should.BeError)
 }
 
 type ss struct {
@@ -156,7 +163,7 @@ func TestStreamServerInterceptor(t *testing.T) {
 			err: errors.New("foo"),
 		}}
 		err = stream.RecvMsg(subject)
-		a.So(err, should.NotBeNil)
+		a.So(err, should.BeError)
 
 		subject = &msgWithValidateContext{}
 		err = stream.RecvMsg(subject)
@@ -168,7 +175,7 @@ func TestStreamServerInterceptor(t *testing.T) {
 			err: errors.New("foo"),
 		}}
 		err = stream.RecvMsg(subject)
-		a.So(err, should.NotBeNil)
+		a.So(err, should.BeError)
 
 		subject = &msgWithFieldMask{
 			fieldMask: types.FieldMask{Paths: []string{"foo"}},
@@ -180,7 +187,7 @@ func TestStreamServerInterceptor(t *testing.T) {
 			fieldMask: types.FieldMask{Paths: []string{"bar"}},
 		}
 		err = stream.RecvMsg(subject)
-		a.So(err, should.NotBeNil)
+		a.So(err, should.BeError)
 
 		return nil
 	})
