@@ -433,6 +433,7 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *ttnpb
 			errs = append(errs, err)
 			continue
 		}
+		logger.WithField("delay", res.Delay).Debug("Scheduled downlink")
 		return down, time.Now().Add(res.Delay), nil
 	}
 
@@ -854,9 +855,11 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 			return err
 
 		case err != nil && errors.Resemble(err, errNoDownlink):
+			logger.Debug("No downlink to send, skipping downlink slot...")
 			return nil
 
 		case err != nil && errors.Resemble(err, errScheduleTooSoon):
+			logger.Debug("Downlink scheduled too soon, skipping downlink slot...")
 			break
 
 		case err != nil:
@@ -868,6 +871,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 		if nextDownlinkAt.IsZero() {
 			return nil
 		}
+		logger.WithField("schedule_at", nextDownlinkAt).Debug("Adding device to downlink schedule...")
 		if err := ns.downlinkTasks.Add(ctx, devID, nextDownlinkAt, true); err != nil {
 			addErr = true
 			logger.WithError(err).Error("Failed to add device to downlink schedule")
