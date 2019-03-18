@@ -46,8 +46,6 @@ type DownlinkTaskQueue interface {
 	Pop(ctx context.Context, f func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) error) error
 }
 
-var errNoDownlink = errors.Define("no_downlink", "no downlink to send")
-
 const DefaultClassCTimeout = 15 * time.Second
 
 func deviceClassCTimeout(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) time.Duration {
@@ -59,6 +57,9 @@ func deviceClassCTimeout(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) time.
 	}
 	return DefaultClassCTimeout
 }
+
+var errApplicationDownlinkTooLong = errors.DefineInvalidArgument("application_downlink_too_long", "application downlink payload is too long")
+var errNoDownlink = errors.Define("no_downlink", "no downlink to send")
 
 // generateDownlink attempts to generate a downlink.
 // generateDownlink returns the marshaled payload of the downlink, application downlink, if included in the payload and error, if any.
@@ -193,7 +194,23 @@ outer:
 		down, dev.QueuedApplicationDownlinks = dev.QueuedApplicationDownlinks[0], dev.QueuedApplicationDownlinks[1:]
 
 		if len(down.FRMPayload) > int(maxDownLen) {
-			logger.Warn("Application downlink present, but the payload is too long, skipping...")
+			logger.Warn("Application downlink present, but the payload is too long, informing Application Server...")
+			ok, err := ns.handleASUplink(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, &ttnpb.ApplicationUp{
+				EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
+				CorrelationIDs:       append(events.CorrelationIDsFromContext(ctx), down.CorrelationIDs...),
+				Up: &ttnpb.ApplicationUp_DownlinkFailed{
+					DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
+						ApplicationDownlink: *down,
+						Error:               *ttnpb.ErrorDetailsToProto(errApplicationDownlinkTooLong),
+					},
+				},
+			})
+			if err != nil {
+				log.FromContext(ctx).WithError(err).Warn("Failed to inform Application Server that application downlink is too long")
+			} else if !ok {
+				log.FromContext(ctx).Warn("Application Server not found")
+			}
+
 			if !needsDownlink && len(cmdBuf) == 0 {
 				return nil, nil, errNoDownlink
 			}
