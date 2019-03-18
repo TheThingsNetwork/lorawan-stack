@@ -15,6 +15,8 @@
 $button($color)
   reset-button()
   one-liner()
+  display: inline-flex
+  align-items: center
   text-align: center
   background: $color
   border-radius: $br.s
@@ -87,8 +89,9 @@ $button($color)
 
 .button
   font: inherit
-  display: inline-block
   transition: color $ad.s, background $ad.s, border $ad.s, opacity $ad.s
+  text-decoration: none
+
   $button($c-active-blue)
 
   &.danger

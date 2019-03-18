@@ -49,6 +49,7 @@ class Button extends React.PureComponent {
       className,
       onClick,
       error,
+      link,
       ...rest
     } = this.props
 
@@ -64,8 +65,10 @@ class Button extends React.PureComponent {
       [style.large]: large,
     })
 
+    const Elem = 'href' in rest ? 'a' : 'button'
+
     return (
-      <button
+      <Elem
         className={buttonClassNames}
         onClick={this.handleClick}
         {...rest}
@@ -75,7 +78,7 @@ class Button extends React.PureComponent {
           {busy ? <Spinner className={style.spinner} small after={200} /> : null}
           {message ? <Message content={message} /> : null}
         </div>
-      </button>
+      </Elem>
     )
   }
 }
