@@ -137,3 +137,16 @@ func TestGenerateChMasksBands(t *testing.T) {
 		}
 	}
 }
+
+func TestFindSubBand(t *testing.T) {
+	a := assertions.New(t)
+
+	for _, b := range band.All {
+		for _, ch := range b.UplinkChannels {
+			sb, ok := b.FindSubBand(ch.Frequency)
+			a.So(ok, should.BeTrue)
+			a.So(sb.MinFrequency, should.BeLessThanOrEqualTo, ch.Frequency)
+			a.So(sb.MaxFrequency, should.BeGreaterThan, ch.Frequency)
+		}
+	}
+}

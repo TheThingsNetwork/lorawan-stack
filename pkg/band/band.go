@@ -270,6 +270,16 @@ func (b Band) Versions() []ttnpb.PHYVersion {
 	return versions
 }
 
+// FindSubBand returns the sub-band by frequency, if any.
+func (b Band) FindSubBand(frequency uint64) (SubBandParameters, bool) {
+	for _, sb := range b.SubBands {
+		if sb.Comprises(frequency) {
+			return sb, true
+		}
+	}
+	return SubBandParameters{}, false
+}
+
 func beaconChannelFromFrequencies(frequencies [8]uint32) func(float64) uint32 {
 	return func(beaconTime float64) uint32 {
 		floor := math.Floor(beaconTime / float64(128))
