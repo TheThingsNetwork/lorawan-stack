@@ -96,6 +96,41 @@ This will compile the front-end in `public`, the binaries for all supported plat
 >Note: The operating system and architecture represent the name of the directory in `dist` in which the binaries are placed.
 >For example, the binaries for Darwin x64 (macOS) will be located at `dist/darwin_amd64`.
 
+### Releasing
+
+Releasing a new version consists of the following steps:
+
+1. Bumping the version
+2. Writing the version files
+3. Creating the version bump commit
+4. Creating the version tag
+5. Building the release and pushing to package managers (this is done by CI)
+6. Edit the release notes
+
+Our development tooling helps with this process. The `mage` command has the following commands for version bumps:
+
+```
+version:bumpMajor      bumps a major version (from 3.4.5 -> 4.0.0).
+version:bumpMinor      bumps a minor version (from 3.4.5 -> 3.5.0).
+version:bumpPatch      bumps a patch version (from 3.4.5 -> 3.4.6).
+version:bumpRC         bumps a release candidate version (from 3.4.5-rc1 -> 3.4.5-rc2).
+version:bumpRelease    bumps a pre-release to a release version (from 3.4.5-rc1 -> 3.4.5).
+```
+
+These bumps can be combined (i.e. `version:bumpMinor version:bumpRC` bumps 3.4.5 -> 3.5.0-rc1). Apart from these bump commands, we have commands for writing version files (`version:files`), creating the bump commit (`version:commitBump`) and the version tag (`version:tag`).
+
+A typical release process is executed directly on the `master` branch and looks like this:
+
+```sh
+mage version:bumpPatch version:files version:commitBump version:tag // bump, write files, commit and tag.
+git push origin $(mage version:current) // push the tag
+git push origin master // push the master branch
+```
+
+Note that you must have sufficient repository rights to push to `master`.
+
+After pushing the tag, our CI system will start building the release. When this is done, you'll find a new release on the [releases page](https://github.com/TheThingsNetwork/lorawan-stack/releases). After this is done, you'll need to edit the release notes. The release process will do its best to generate release notes for us, but they typically require a bit of editing.
+
 #### API
 
 > Note: If you don't work on changes in the API you can skip this section.
