@@ -255,7 +255,7 @@ message TxSettings {
   // Frequency (Hz).
   uint64 frequency = 4;
   // Transmission power (dBm). Only on downlink.
-  int32 tx_power = 5;
+  float tx_power = 5;
   // Invert LoRa polarization; false for LoRaWAN uplink, true for downlink.
   bool invert_polarization = 6;
   // Index of the gateway channel that received the message.

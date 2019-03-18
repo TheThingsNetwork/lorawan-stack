@@ -842,7 +842,7 @@ func (dst *TxSettings) SetFields(src *TxSettings, paths ...string) error {
 			if src != nil {
 				dst.TxPower = src.TxPower
 			} else {
-				var zero int32
+				var zero float32
 				dst.TxPower = zero
 			}
 		case "invert_polarization":

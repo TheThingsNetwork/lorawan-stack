@@ -4236,7 +4236,7 @@ On downlink, this is a scheduled transmission.
 | data_rate_index | [DataRateIndex](#ttn.lorawan.v3.DataRateIndex) |  | LoRaWAN data rate index. |
 | coding_rate | [string](#string) |  | LoRa coding rate. |
 | frequency | [uint64](#uint64) |  | Frequency (Hz). |
-| tx_power | [int32](#int32) |  | Transmission power (dBm). Only on downlink. |
+| tx_power | [float](#float) |  | Transmission power (dBm). Only on downlink. |
 | invert_polarization | [bool](#bool) |  | Invert LoRa polarization; false for LoRaWAN uplink, true for downlink. |
 | gateway_channel_index | [uint32](#uint32) |  | Index of the gateway channel that received the message. Set by Gateway Server. |
 | device_channel_index | [uint32](#uint32) |  | Index of the device channel that received the message. Set by Network Server. |

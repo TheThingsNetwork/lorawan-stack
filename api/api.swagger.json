@@ -8514,8 +8514,8 @@
           "description": "Frequency (Hz)."
         },
         "tx_power": {
-          "type": "integer",
-          "format": "int32",
+          "type": "number",
+          "format": "float",
           "description": "Transmission power (dBm). Only on downlink."
         },
         "invert_polarization": {
