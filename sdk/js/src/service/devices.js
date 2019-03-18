@@ -219,7 +219,7 @@ class Devices {
     }
   }
 
-  async _getDevice (applicationId, deviceId, paths) {
+  async _getDevice (applicationId, deviceId, paths, ignoreNotFound) {
 
     if (!applicationId) {
       throw new Error('Missing application_id for device.')
@@ -237,6 +237,19 @@ class Devices {
     let isResult = {}
     const requests = new Array(3)
 
+    // Wrap the request to allow ignoring not found errors
+    const requestWrapper = async function (call, params, paths) {
+      try {
+        const res = await call(params, Marshaler.pathsToFieldMask(paths))
+        return res
+      } catch (err) {
+        if (ignoreNotFound && err.code === 5) {
+          return { end_device: {}}
+        }
+        throw err
+      }
+    }
+
     if ('is' in requestTree) {
       isResult = await this._api.EndDeviceRegistry.Get(
         params,
@@ -245,21 +258,24 @@ class Devices {
     }
 
     if ('ns' in requestTree) {
-      requests[0] = this._api.NsEndDeviceRegistry.Get(
+      requests[0] = await requestWrapper(
+        this._api.NsEndDeviceRegistry.Get,
         params,
-        Marshaler.pathsToFieldMask(requestTree.ns),
+        requestTree.ns,
       )
     }
     if ('as' in requestTree) {
-      requests[1] = this._api.AsEndDeviceRegistry.Get(
+      requests[1] = await requestWrapper(
+        this._api.AsEndDeviceRegistry.Get,
         params,
-        Marshaler.pathsToFieldMask(requestTree.as),
+        requestTree.as,
       )
     }
     if ('js' in requestTree) {
-      requests[2] = this._api.JsEndDeviceRegistry.Get(
+      requests[2] = await requestWrapper(
+        this._api.NsEndDeviceRegistry.Get,
         params,
-        Marshaler.pathsToFieldMask(requestTree.js),
+        requestTree.js,
       )
     }
 
@@ -314,8 +330,8 @@ class Devices {
     return this._responseTransform(response, false)
   }
 
-  async getById (applicationId, deviceId, selector = [[ 'ids' ]]) {
-    const response = await this._getDevice(applicationId, deviceId, Marshaler.selectorToPaths(selector))
+  async getById (applicationId, deviceId, selector = [[ 'ids' ]], { ignoreNotFound = false } = {}) {
+    const response = await this._getDevice(applicationId, deviceId, Marshaler.selectorToPaths(selector), ignoreNotFound)
 
     return this._responseTransform(response)
   }
