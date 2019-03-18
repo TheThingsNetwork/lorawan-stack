@@ -24,7 +24,7 @@ import { withEnv } from '../../lib/components/env'
  * Auth is a component that wraps a tree that requires the user
  * to be authenticated.
  *
- * If no user is authenticated, it renders the Landing view.
+ * If no user is authenticated, it renders the login view.
  */
 @withEnv
 @withRouter
@@ -47,10 +47,12 @@ class Auth extends React.PureComponent {
     }
 
     if (!Boolean(user)) {
+      const redirectPath = window.location.pathname.substring(env.app_root.length)
       return (
         <Redirect
           to={{
             pathname: `${env.app_root}/login`,
+            search: redirectPath && `?next=${redirectPath}`,
             state: { from: this.props.location.pathname },
           }}
         />
