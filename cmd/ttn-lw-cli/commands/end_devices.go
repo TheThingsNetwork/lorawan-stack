@@ -581,21 +581,21 @@ var (
 
 func init() {
 	util.FieldMaskFlags(&ttnpb.EndDevice{}).VisitAll(func(flag *pflag.Flag) {
-		if selectPath(flag.Name, getEndDeviceFromIS) {
+		if ttnpb.ContainsField(flag.Name, getEndDeviceFromIS) {
 			selectEndDeviceListFlags.AddFlag(flag)
 			selectEndDeviceFlags.AddFlag(flag)
-		} else if selectPath(flag.Name, getEndDeviceFromNS) ||
-			selectPath(flag.Name, getEndDeviceFromAS) ||
-			selectPath(flag.Name, getEndDeviceFromJS) {
+		} else if ttnpb.ContainsField(flag.Name, getEndDeviceFromNS) ||
+			ttnpb.ContainsField(flag.Name, getEndDeviceFromAS) ||
+			ttnpb.ContainsField(flag.Name, getEndDeviceFromJS) {
 			selectEndDeviceFlags.AddFlag(flag)
 		}
 	})
 
 	util.FieldFlags(&ttnpb.EndDevice{}).VisitAll(func(flag *pflag.Flag) {
-		if selectPath(flag.Name, setEndDeviceToIS) ||
-			selectPath(flag.Name, setEndDeviceToNS) ||
-			selectPath(flag.Name, setEndDeviceToAS) ||
-			selectPath(flag.Name, setEndDeviceToJS) {
+		if ttnpb.ContainsField(flag.Name, setEndDeviceToIS) ||
+			ttnpb.ContainsField(flag.Name, setEndDeviceToNS) ||
+			ttnpb.ContainsField(flag.Name, setEndDeviceToAS) ||
+			ttnpb.ContainsField(flag.Name, setEndDeviceToJS) {
 			setEndDeviceFlags.AddFlag(flag)
 		}
 	})

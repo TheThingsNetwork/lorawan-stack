@@ -23,15 +23,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-func selectPath(path string, allowedPaths []string) bool {
-	for _, allowedPath := range allowedPaths {
-		if path == allowedPath {
-			return true
-		}
-	}
-	return false
-}
-
 var (
 	getEndDeviceFromIS = ttnpb.AllowedFieldMaskPathsForRPC["/ttn.lorawan.v3.EndDeviceRegistry/Get"]
 	getEndDeviceFromNS = ttnpb.AllowedFieldMaskPathsForRPC["/ttn.lorawan.v3.NsEndDeviceRegistry/Get"]
@@ -43,31 +34,20 @@ var (
 	setEndDeviceToJS   = ttnpb.AllowedFieldMaskPathsForRPC["/ttn.lorawan.v3.JsEndDeviceRegistry/Set"]
 )
 
-func selectPaths(paths []string, allowedPaths []string) []string {
-	selectedPaths := make([]string, 0, len(paths))
-	for _, path := range paths {
-		if selectPath(path, allowedPaths) {
-			selectedPaths = append(selectedPaths, path)
-			continue
-		}
-	}
-	return selectedPaths
-}
-
 func splitEndDeviceGetPaths(paths ...string) (is, ns, as, js []string) {
-	is = selectPaths(paths, getEndDeviceFromIS)
-	ns = selectPaths(paths, getEndDeviceFromNS)
-	as = selectPaths(paths, getEndDeviceFromAS)
-	js = selectPaths(paths, getEndDeviceFromJS)
+	is = ttnpb.AllowedBottomLevelFields(paths, getEndDeviceFromIS)
+	ns = ttnpb.AllowedBottomLevelFields(paths, getEndDeviceFromNS)
+	as = ttnpb.AllowedBottomLevelFields(paths, getEndDeviceFromAS)
+	js = ttnpb.AllowedBottomLevelFields(paths, getEndDeviceFromJS)
 	return
 }
 
 func splitEndDeviceSetPaths(supportsJoin bool, paths ...string) (is, ns, as, js []string) {
-	is = selectPaths(paths, setEndDeviceToIS)
-	ns = selectPaths(paths, setEndDeviceToNS)
-	as = selectPaths(paths, setEndDeviceToAS)
+	is = ttnpb.AllowedFields(paths, setEndDeviceToIS)
+	ns = ttnpb.AllowedFields(paths, setEndDeviceToNS)
+	as = ttnpb.AllowedFields(paths, setEndDeviceToAS)
 	if supportsJoin {
-		js = selectPaths(paths, setEndDeviceToJS)
+		js = ttnpb.AllowedFields(paths, setEndDeviceToJS)
 	}
 	return
 }
