@@ -39,14 +39,6 @@ const m = defineMessages({
 }))
 @bind
 export default class Login extends React.PureComponent {
-
-  redirectToLogin () {
-    const { env, location } = this.props
-    const { from } = location.state || { from: env.app_root }
-
-    window.location = `${env.app_root}/api/auth/login?path=${from}`
-  }
-
   render () {
     const { user, env } = this.props
 
@@ -68,7 +60,10 @@ export default class Login extends React.PureComponent {
                 content={m.welcome}
               />
               <Message className={style.loginSub} content={m.login} />
-              <Button message={m.loginWithStackAccount} onClick={this.redirectToLogin} />
+              <Button
+                message={m.loginWithStackAccount}
+                href={env.page_data.authorize_url}
+              />
             </Col>
           </Row>
         </Container>
