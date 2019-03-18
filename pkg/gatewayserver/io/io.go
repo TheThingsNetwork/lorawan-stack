@@ -271,10 +271,10 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 			settings := ttnpb.TxSettings{
 				DataRateIndex: rx.dataRateIndex,
 				Frequency:     rx.frequency,
-				TxPower:       int32(maxEIRP),
+				TxPower:       maxEIRP,
 			}
 			if int(ids.AntennaIndex) < len(c.gateway.Antennas) {
-				settings.TxPower -= int32(c.gateway.Antennas[ids.AntennaIndex].Gain)
+				settings.TxPower -= c.gateway.Antennas[ids.AntennaIndex].Gain
 			}
 			settings.DataRate = dataRate
 			if dr := dataRate.GetLoRa(); dr != nil {
