@@ -4420,7 +4420,7 @@
   },
   "error:pkg/ttnpb:missing_field": {
     "translations": {
-      "en": "field {field} is missing"
+      "en": "field `{field}` is missing"
     },
     "description": {
       "package": "pkg/ttnpb",
@@ -4456,7 +4456,7 @@
   },
   "error:pkg/ttnpb:prohibited_field": {
     "translations": {
-      "en": "field {field} is prohibited"
+      "en": "field `{field}` is prohibited"
     },
     "description": {
       "package": "pkg/ttnpb",
