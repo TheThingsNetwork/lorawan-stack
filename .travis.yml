@@ -1,12 +1,9 @@
 sudo: required
-
 conditions: v1
 if: type = pull_request OR branch =~ ^master$ OR tag IS present
-
 language: go
-go: '1.11.x'
+go: 1.11.x
 go_import_path: go.thethings.network/lorawan-stack
-
 env:
   global:
   - YARN_CACHE_FOLDER=$HOME/.cache/yarn
@@ -17,21 +14,16 @@ matrix:
   include:
   - env: RUNTYPE=js.test
     os: linux
-
   - env: RUNTYPE=go.test GOARCH=amd64
     os: linux
-
   - if: type = pull_request OR branch =~ ^master$
     env: RUNTYPE=go.test GOARCH=386
     os: linux
-
   - env: RUNTYPE=go.lint
     os: linux
-
   - if: tag IS present
     env: RUNTYPE=release
     os: linux
-
 services:
 - docker
 addons:
@@ -39,13 +31,11 @@ addons:
     packages:
     - rpm
     - snapd
-
 cache:
   directories:
-  - $HOME/.cache/go-build
-  - $HOME/.cache/yarn
-  - $GOPATH/pkg/mod
-
+  - "$HOME/.cache/go-build"
+  - "$HOME/.cache/yarn"
+  - "$GOPATH/pkg/mod"
 before_install:
 - |
   if [[ ! -z "$encrypted_fc3d5d829302_key" ]]; then
@@ -64,11 +54,14 @@ before_install:
   fi
 - |
   if [[ "$RUNTYPE" == "release" ]]; then
+    openssl aes-256-cbc -K $encrypted_9b4a5498b653_key \
+                        -iv $encrypted_9b4a5498b653_iv \
+                        -in snap.login.enc \
+                        -out snap.login \
+                        -d
     sudo snap install snapcraft --classic
   fi
-
 install: true
-
 script:
 - |
   if [[ "$RUNTYPE" == "js.test" ]]; then
@@ -100,11 +93,16 @@ script:
     make deps
   fi
 - make git.diff
-
 after_success:
-- if [[ "$RUNTYPE" == "go.test" ]] && [[ "$GOARCH" == "amd64" ]]; then make go.coveralls; fi
-- if [[ "$RUNTYPE" == "release" ]]; then docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"; fi
-
+- |
+  if [[ "$RUNTYPE" == "go.test" ]] && [[ "$GOARCH" == "amd64" ]]; then
+    make go.coveralls
+  fi
+- |
+  if [[ "$RUNTYPE" == "release" ]]; then
+    docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+    snapcraft login --with snap.login
+  fi
 deploy:
 - provider: script
   skip_cleanup: true
