@@ -2573,6 +2573,15 @@
       "file": "io.go"
     }
   },
+  "error:pkg/gatewayserver/io:no_scheduler": {
+    "translations": {
+      "en": "no scheduler for the connection"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io",
+      "file": "io.go"
+    }
+  },
   "error:pkg/gatewayserver/io:no_uplink_token": {
     "translations": {
       "en": "no uplink token provided for class A downlink"

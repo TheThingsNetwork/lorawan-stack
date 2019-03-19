@@ -100,9 +100,6 @@ func (c *Connection) Disconnect(err error) {
 // Protocol returns the protocol used for the connection, i.e. grpc, mqtt or udp.
 func (c *Connection) Protocol() string { return c.protocol }
 
-// HasScheduler returns whether the connection has a scheduler.
-func (c *Connection) HasScheduler() bool { return c.scheduler != nil }
-
 // Gateway returns the gateway entity.
 func (c *Connection) Gateway() *ttnpb.Gateway { return c.gateway }
 
@@ -180,6 +177,7 @@ var (
 	errDataRate         = errors.DefineInvalidArgument("data_rate", "no data rate with index `{index}`")
 	errTooLong          = errors.DefineInvalidArgument("too_long", "the payload length `{payload_length}` exceeds maximum `{maximum_length}` at data rate index `{data_rate_index}`")
 	errTxSchedule       = errors.DefineAborted("tx_schedule", "failed to schedule")
+	errNoScheduler      = errors.DefineNotFound("no_scheduler", "no scheduler for the connection")
 )
 
 func getDownlinkPath(path *ttnpb.DownlinkPath, class ttnpb.Class) (ids ttnpb.GatewayAntennaIdentifiers, uplinkTimestamp uint32, err error) {
@@ -325,6 +323,8 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 		if errRxDetails != nil {
 			return 0, errTxSchedule.WithDetails(errRxDetails...)
 		}
+	} else {
+		return 0, errNoScheduler
 	}
 	select {
 	case <-c.ctx.Done():
