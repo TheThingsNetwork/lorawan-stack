@@ -478,9 +478,9 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 	var addErr bool
 	err := ns.downlinkTasks.Pop(ctx, func(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time) error {
 		logger := log.FromContext(ctx).WithFields(log.Fields(
-			"delay", time.Now().Sub(t),
 			"device_uid", unique.ID(ctx, devID),
 			"start_at", t,
+			"started_at", time.Now(),
 		))
 		ctx = log.NewContext(ctx, logger)
 		logger.Debug("Processing downlink task...")
