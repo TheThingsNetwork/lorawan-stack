@@ -144,12 +144,11 @@ We follow the [official go guidelines](https://github.com/golang/go/wiki/CodeRev
 | :------------------: | :-----: | :-----------------------------------------------------------: |
 | context              | ctx     | context.Context                                               |
 | mutex                | mu      | sync.Mutex                                                    |
-| configuration        | conf    | go.thethings.network/lorawan-stack/pkg/config.Config             |
-| logger               | logger  | go.thethings.network/lorawan-stack/pkg/log.Logger                |
-| message              | msg     | go.thethings.network/lorawan-stack/api/gateway.UplinkMessage     |
-| status               | st      | go.thethings.network/lorawan-stack/api/gateway.Status            |
-| server               | srv     | go.thethings.network/lorawan-stack/pkg/network-server.Server     |
-| EUI                  | eui     | go.thethings.network/lorawan-stack/pkg/types.DevEUI              |
+| configuration        | conf    | go.thethings.network/lorawan-stack/pkg/config.Config          |
+| logger               | logger  | go.thethings.network/lorawan-stack/pkg/log.Logger             |
+| message              | msg     | go.thethings.network/lorawan-stack/api/gateway.UplinkMessage  |
+| status               | st      | go.thethings.network/lorawan-stack/api/gateway.Status         |
+| server               | srv     | go.thethings.network/lorawan-stack/pkg/network-server.Server  |
 | ID                   | id      | string                                                        |
 | unique ID            | uid     | string                                                        |
 | counter              | cnt     | int                                                           |
@@ -159,6 +158,8 @@ We follow the [official go guidelines](https://github.com/golang/go/wiki/CodeRev
 | user                 | user    |                                                               |
 | transmit             | tx / Tx |                                                               |
 | receive              | rx / Rx |                                                               |
+
+The EUI naming scheme can be found in the well-known variable names section bellow.
 
 #### 2-word entities
 
@@ -186,7 +187,9 @@ meaning is obvious from the context.
 | gateway EUI                     | gtwEUI  |
 | application ID                  | appID   |
 | application EUI                 | appEUI  |
+| join EUI                        | joinEUI |
 | device ID                       | devID   |
+| device EUI                      | devEUI  |
 | user ID                         | userID  |
 
 ### Events
