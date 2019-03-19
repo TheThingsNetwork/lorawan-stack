@@ -33,15 +33,17 @@ export default function mergeDevice (
 ) {
   const result = base
 
+  // Cycle through all responses
   for (const part of parts) {
     for (const path of part.paths ? [ ...minimum, ...part.paths ] : []) {
+      // For each path requested, get the corresponding value of the device record
       const val = traverse(part.device).get(path)
       if (val) {
         if (typeof val === 'object') {
           // In case of a whole sub-object being selected, write each leaf node
-          // explicitly to achieve a deep merge instead of object overrides
+          // explicitly to achieve a deep merge instead of whole object overrides
           if (Object.keys(val).length === 0) {
-            // Ignore empty object values
+            // Ignore empty object values, as they might override legitimate values
             continue
           }
           traverse(val).forEach(function (e) {
@@ -50,10 +52,12 @@ export default function mergeDevice (
                 // Ignore empty object values
                 return
               }
+              // Write the sub object leaf into the result
               traverse(result).set([ ...path, ...this.path ], e)
             }
           })
         } else {
+          // In case of a simple leaf, just write it into the result
           traverse(result).set(path, val)
         }
       }

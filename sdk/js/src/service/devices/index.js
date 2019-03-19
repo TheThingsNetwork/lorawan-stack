@@ -63,6 +63,7 @@ class Devices {
       throw new Error('Missing application_id for device.')
     }
 
+    // Make sure to write at least the ids, in case of creation
     const mergeBase = create ? {
       ns: [[ 'ids' ]],
       as: [[ 'ids' ]],
@@ -73,10 +74,6 @@ class Devices {
       routeParams: {
         'end_device.ids.application_ids.application_id': appId,
       },
-    }
-
-    if (!create) {
-      params.routeParams['end_device.ids.device_id'] = devId
     }
 
     // Extract the paths from the patch
@@ -97,6 +94,8 @@ class Devices {
       delete requestTree.is
     }
 
+    // Write the device id param based on either the id of the newly created
+    // device, or the passed id argument
     params.routeParams['end_device.ids.device_id'] = 'data' in isResult ? isResult.ids.device_id : devId
 
     try {
@@ -116,6 +115,10 @@ class Devices {
 
     if (!applicationId) {
       throw new Error('Missing application_id for device.')
+    }
+
+    if (!deviceId) {
+      throw new Error('Missing device_id for device.')
     }
 
     const requestTree = splitGetPaths(paths)
