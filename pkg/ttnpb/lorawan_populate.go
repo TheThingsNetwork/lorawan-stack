@@ -335,11 +335,8 @@ func NewPopulatedTxSettings(r randyLorawan, easy bool) *TxSettings {
 		out.CodingRate = fmt.Sprintf("4/%d", r.Intn(4)+5)
 	}
 	out.Frequency = uint64(r.Uint32())
-	out.TxPower = r.Int31()
+	out.TxPower = float32(r.Int31())
 	out.CodingRate = fmt.Sprintf("4/%d", r.Intn(4)+5)
-	if r.Intn(2) == 0 {
-		out.TxPower *= -1
-	}
 	out.InvertPolarization = r.Intn(2) == 0
 	out.GatewayChannelIndex = r.Uint32() % 255
 	out.DataRateIndex = NewPopulatedDataRateIndex(r, false) % 6

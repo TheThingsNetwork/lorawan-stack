@@ -50,7 +50,7 @@ func TestProtobufV2Downlink(t *testing.T) {
 				CodingRate:    "4/5",
 				DataRateIndex: 0,
 				Frequency:     863000000,
-				TxPower:       15,
+				TxPower:       16.15,
 				Timestamp:     12000,
 			},
 		},
@@ -64,7 +64,7 @@ func TestProtobufV2Downlink(t *testing.T) {
 		Payload: pld,
 		GatewayConfiguration: legacyttnpb.GatewayTxConfiguration{
 			Frequency:             863000000,
-			Power:                 13,
+			Power:                 14,
 			PolarizationInversion: true,
 			Timestamp:             12000,
 		},

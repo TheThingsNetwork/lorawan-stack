@@ -27,8 +27,8 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb/udp"
 )
 
-// eirpDelta is the integer-rounded delta between EIRP and ERP.
-const eirpDelta = 2
+// eirpDelta is the delta between EIRP and ERP.
+const eirpDelta = 2.15
 
 var (
 	sourceToV3 = map[legacyttnpb.LocationMetadata_LocationSource]ttnpb.LocationSource{
@@ -90,7 +90,7 @@ func (protobufv2) FromDownlink(down *ttnpb.DownlinkMessage, _ ttnpb.GatewayIdent
 		Payload: down.RawPayload,
 		GatewayConfiguration: legacyttnpb.GatewayTxConfiguration{
 			Frequency:             settings.Frequency,
-			Power:                 settings.TxPower - eirpDelta,
+			Power:                 int32(settings.TxPower - eirpDelta),
 			PolarizationInversion: true,
 			RfChain:               0,
 			Timestamp:             settings.Timestamp,

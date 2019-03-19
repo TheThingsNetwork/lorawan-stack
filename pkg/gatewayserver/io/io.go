@@ -262,19 +262,21 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 					"data_rate_index", rx.dataRateIndex,
 				)
 			}
-			var maxEIRP float32
-			if c.fp.MaxEIRP != nil {
-				maxEIRP = *c.fp.MaxEIRP
-			} else {
-				maxEIRP = band.DefaultMaxEIRP
+			eirp := band.DefaultMaxEIRP
+			if sb, ok := band.FindSubBand(rx.frequency); ok {
+				eirp = sb.MaxEIRP
+			}
+			// TODO: Override with frequency plan's sub-band MaxEIRP (https://github.com/TheThingsNetwork/lorawan-stack/issues/300)
+			if c.fp.MaxEIRP != nil && *c.fp.MaxEIRP < eirp {
+				eirp = *c.fp.MaxEIRP
 			}
 			settings := ttnpb.TxSettings{
 				DataRateIndex: rx.dataRateIndex,
 				Frequency:     rx.frequency,
-				TxPower:       int32(maxEIRP),
+				TxPower:       eirp,
 			}
 			if int(ids.AntennaIndex) < len(c.gateway.Antennas) {
-				settings.TxPower -= int32(c.gateway.Antennas[ids.AntennaIndex].Gain)
+				settings.TxPower -= c.gateway.Antennas[ids.AntennaIndex].Gain
 			}
 			settings.DataRate = dataRate
 			if dr := dataRate.GetLoRa(); dr != nil {

@@ -50,28 +50,28 @@ func init() {
 				MinFrequency: 863000000,
 				MaxFrequency: 865000000,
 				DutyCycle:    0.001,
-				MaxTxPower:   14.0,
+				MaxEIRP:      14.0 + eirpDelta,
 			},
 			{
 				// Band L
 				MinFrequency: 865000000,
 				MaxFrequency: 868000000,
 				DutyCycle:    0.01,
-				MaxTxPower:   14.0,
+				MaxEIRP:      14.0 + eirpDelta,
 			},
 			{
 				// Band M
 				MinFrequency: 868000000,
 				MaxFrequency: 868600000,
 				DutyCycle:    0.01,
-				MaxTxPower:   14.0,
+				MaxEIRP:      14.0 + eirpDelta,
 			},
 			{
 				// Band N
 				MinFrequency: 868700000,
 				MaxFrequency: 869200000,
 				DutyCycle:    0.001,
-				MaxTxPower:   14.0,
+				MaxEIRP:      14.0 + eirpDelta,
 			},
 			// Band O is skipped intentionally
 			{
@@ -79,14 +79,14 @@ func init() {
 				MinFrequency: 869400000,
 				MaxFrequency: 869650000,
 				DutyCycle:    0.1,
-				MaxTxPower:   27.0,
+				MaxEIRP:      27.0 + eirpDelta,
 			},
 			{
 				// Band R
 				MinFrequency: 869700000,
 				MaxFrequency: 870000000,
 				DutyCycle:    0.01,
-				MaxTxPower:   14.0,
+				MaxEIRP:      14.0 + eirpDelta,
 			},
 		},
 

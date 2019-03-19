@@ -302,7 +302,7 @@ func TestDownlinkRoundtrip(t *testing.T) {
 						},
 					},
 				},
-				TxPower:            20,
+				TxPower:            16.15,
 				InvertPolarization: true,
 				Timestamp:          188700000,
 			},
