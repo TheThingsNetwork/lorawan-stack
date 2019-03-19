@@ -764,7 +764,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 			"lorawan_version",
 			"mac_settings",
 			"mac_state",
-			"session",
+			"session.dev_addr",
 		},
 	)
 	if err != nil {
@@ -849,7 +849,6 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 			"lorawan_version",
 			"mac_settings",
 			"mac_state",
-			"pending_session",
 			"queued_application_downlinks",
 			"recent_uplinks",
 			"supports_class_b",
