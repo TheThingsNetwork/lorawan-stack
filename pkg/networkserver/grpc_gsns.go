@@ -732,7 +732,9 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	} else {
 		registerForwardDataUplink(ctx, &matched.EndDeviceIdentifiers, up)
 	}
-	return ns.downlinkTasks.Add(ctx, matched.EndDeviceIdentifiers, time.Now().UTC(), true)
+	scheduleAt := time.Now().UTC()
+	logger.WithField("start_at", scheduleAt).Debug("Adding downlink task...")
+	return ns.downlinkTasks.Add(ctx, matched.EndDeviceIdentifiers, scheduleAt, true)
 }
 
 // newDevAddr generates a DevAddr for specified EndDevice.
@@ -931,7 +933,9 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 		return err
 	}
 
-	if err := ns.downlinkTasks.Add(ctx, dev.EndDeviceIdentifiers, time.Now().UTC(), true); err != nil {
+	scheduleAt := time.Now().UTC()
+	logger.WithField("start_at", scheduleAt).Debug("Adding downlink task...")
+	if err := ns.downlinkTasks.Add(ctx, dev.EndDeviceIdentifiers, scheduleAt, true); err != nil {
 		return err
 	}
 	return nil
