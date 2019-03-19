@@ -19,7 +19,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"math"
 	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/band"
@@ -87,9 +86,7 @@ func (c SX1301Config) MarshalJSON() ([]byte, error) {
 	var m orderedMap
 	m.add("lorawan_public", c.LoRaWANPublic)
 	m.add("clksrc", c.ClockSource)
-	m.add("clksrc_desc", "radio_1 provides clock to concentrator for most devices except MultiTech. For MultiTech set to 0.")
 	m.add("antenna_gain", c.AntennaGain)
-	m.add("antenna_gain_desc", "antenna gain, in dBi")
 	if c.LBTConfig != nil {
 		m.add("lbt_cfg", *c.LBTConfig)
 	}
@@ -145,7 +142,6 @@ type RFConfig struct {
 
 // IFConfig contains the configuration for one of the channels.
 type IFConfig struct {
-	Description  string `json:"desc"`
 	Enable       bool   `json:"enable"`
 	Radio        uint8  `json:"radio"`
 	IFValue      int32  `json:"if"`
@@ -157,10 +153,9 @@ type IFConfig struct {
 // MarshalJSON implements json.Marshaler
 func (c IFConfig) MarshalJSON() ([]byte, error) {
 	if !c.Enable {
-		return []byte(`{"desc": "disabled","enable": false}`), nil
+		return []byte(`{"enable": false}`), nil
 	}
 	return json.Marshal(struct {
-		Description  string `json:"desc"`
 		Enable       bool   `json:"enable"`
 		Radio        uint8  `json:"radio"`
 		IFValue      int32  `json:"if"`
@@ -168,7 +163,6 @@ func (c IFConfig) MarshalJSON() ([]byte, error) {
 		SpreadFactor uint8  `json:"spread_factor,omitempty"`
 		Datarate     uint32 `json:"datarate,omitempty"`
 	}{
-		Description:  c.Description,
 		Enable:       c.Enable,
 		Radio:        c.Radio,
 		IFValue:      c.IFValue,
@@ -180,11 +174,10 @@ func (c IFConfig) MarshalJSON() ([]byte, error) {
 
 // TxLUTConfig contains the configuration for the TX LUT ind
 type TxLUTConfig struct {
-	Description string `json:"desc"`
-	PAGain      int    `json:"pa_gain"`
-	MixGain     int    `json:"mix_gain"`
-	RFPower     int    `json:"rf_power"`
-	DigGain     int    `json:"dig_gain"`
+	PAGain  int `json:"pa_gain"`
+	MixGain int `json:"mix_gain"`
+	RFPower int `json:"rf_power"`
+	DigGain int `json:"dig_gain"`
 }
 
 var defaultTxLUTConfigs = []TxLUTConfig{
@@ -204,13 +197,6 @@ var defaultTxLUTConfigs = []TxLUTConfig{
 	{PAGain: 3, MixGain: 11, RFPower: 25},
 	{PAGain: 3, MixGain: 12, RFPower: 26},
 	{PAGain: 3, MixGain: 14, RFPower: 27},
-}
-
-func init() {
-	for i, config := range defaultTxLUTConfigs {
-		config.Description = fmt.Sprintf("TX gain table, index %d", i)
-		defaultTxLUTConfigs[i] = config
-	}
 }
 
 // BuildSX1301Config builds the SX1301 configuration for the given frequency plan.
@@ -269,10 +255,9 @@ func BuildSX1301Config(frequencyPlan *frequencyplans.FrequencyPlan) (*SX1301Conf
 	conf.Channels = make([]IFConfig, numChannels)
 	for i, channel := range frequencyPlan.UplinkChannels {
 		ifConfig := IFConfig{
-			Description: fmt.Sprintf("Lora MAC, 125kHz, all SF, %s MHz", formatFrequency(channel.Frequency)),
-			Enable:      true,
-			Radio:       channel.Radio,
-			IFValue:     int32(int64(channel.Frequency) - int64(conf.Radios[channel.Radio].Frequency)),
+			Enable:  true,
+			Radio:   channel.Radio,
+			IFValue: int32(int64(channel.Frequency) - int64(conf.Radios[channel.Radio].Frequency)),
 		}
 		conf.Channels[i] = ifConfig
 	}
@@ -281,7 +266,6 @@ func BuildSX1301Config(frequencyPlan *frequencyplans.FrequencyPlan) (*SX1301Conf
 	if channel := frequencyPlan.LoRaStandardChannel; channel != nil {
 		if lora := band.DataRates[channel.DataRate].Rate.GetLoRa(); lora != nil {
 			conf.LoRaStandardChannel = &IFConfig{
-				Description:  fmt.Sprintf("Lora MAC, %dkHz, SF%d, %s MHz", lora.Bandwidth/1000, lora.SpreadingFactor, formatFrequency(channel.Frequency)),
 				Enable:       true,
 				Radio:        channel.Radio,
 				IFValue:      int32(int64(channel.Frequency) - int64(conf.Radios[channel.Radio].Frequency)),
@@ -295,12 +279,11 @@ func BuildSX1301Config(frequencyPlan *frequencyplans.FrequencyPlan) (*SX1301Conf
 	if channel := frequencyPlan.FSKChannel; channel != nil {
 		if fsk := band.DataRates[channel.DataRate].Rate.GetFSK(); fsk != nil {
 			conf.FSKChannel = &IFConfig{
-				Description: fmt.Sprintf("FSK %dkbps, %s MHz", fsk.BitRate/1000, formatFrequency(channel.Frequency)),
-				Enable:      true,
-				Radio:       channel.Radio,
-				IFValue:     int32(int64(channel.Frequency) - int64(conf.Radios[channel.Radio].Frequency)),
-				Bandwidth:   125000,
-				Datarate:    fsk.BitRate,
+				Enable:    true,
+				Radio:     channel.Radio,
+				IFValue:   int32(int64(channel.Frequency) - int64(conf.Radios[channel.Radio].Frequency)),
+				Bandwidth: 125000,
+				Datarate:  fsk.BitRate,
 			}
 		}
 	}
@@ -308,12 +291,4 @@ func BuildSX1301Config(frequencyPlan *frequencyplans.FrequencyPlan) (*SX1301Conf
 	conf.TxLUTConfigs = defaultTxLUTConfigs
 
 	return conf, nil
-}
-
-func formatFrequency(frequency uint64) string {
-	freq := float64(frequency) / 1000000
-	if freq*10 == math.Floor(freq*10) {
-		return fmt.Sprintf("%.1f", freq)
-	}
-	return fmt.Sprintf("%g", freq)
 }
