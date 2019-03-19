@@ -35,10 +35,10 @@ var (
 )
 
 func splitEndDeviceGetPaths(paths ...string) (is, ns, as, js []string) {
-	is = ttnpb.AllowedBottomLevelFields(paths, getEndDeviceFromIS)
-	ns = ttnpb.AllowedBottomLevelFields(paths, getEndDeviceFromNS)
-	as = ttnpb.AllowedBottomLevelFields(paths, getEndDeviceFromAS)
-	js = ttnpb.AllowedBottomLevelFields(paths, getEndDeviceFromJS)
+	is = ttnpb.AllowedFields(paths, getEndDeviceFromIS)
+	ns = ttnpb.AllowedFields(paths, getEndDeviceFromNS)
+	as = ttnpb.AllowedFields(paths, getEndDeviceFromAS)
+	js = ttnpb.AllowedFields(paths, getEndDeviceFromJS)
 	return
 }
 
@@ -73,7 +73,7 @@ func getEndDevice(ids ttnpb.EndDeviceIdentifiers, nsPaths, asPaths, jsPaths []st
 				}
 				logger.WithError(err).Error("Could not get end device from Join Server")
 			} else {
-				res.SetFields(jsRes, jsPaths...)
+				res.SetFields(jsRes, ttnpb.AllowedBottomLevelFields(jsPaths, getEndDeviceFromJS)...)
 			}
 		}
 	}
@@ -96,7 +96,7 @@ func getEndDevice(ids ttnpb.EndDeviceIdentifiers, nsPaths, asPaths, jsPaths []st
 				}
 				logger.WithError(err).Error("Could not get end device from Application Server")
 			} else {
-				res.SetFields(asRes, asPaths...)
+				res.SetFields(asRes, ttnpb.AllowedBottomLevelFields(asPaths, getEndDeviceFromAS)...)
 			}
 		}
 	}
@@ -119,7 +119,7 @@ func getEndDevice(ids ttnpb.EndDeviceIdentifiers, nsPaths, asPaths, jsPaths []st
 				}
 				logger.WithError(err).Error("Could not get end device from Network Server")
 			} else {
-				res.SetFields(nsRes, nsPaths...)
+				res.SetFields(nsRes, ttnpb.AllowedBottomLevelFields(nsPaths, getEndDeviceFromNS)...)
 			}
 		}
 	}
