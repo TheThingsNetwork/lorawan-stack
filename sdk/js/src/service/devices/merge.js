@@ -20,7 +20,7 @@ import traverse from 'traverse'
 * single entity record.
 * @param {Object} parts - An object containing the device record responded from
 * the registry and the paths that were requested from the component.
-* Shape: { record: …, paths: … }
+* Shape: { device: …, paths: … }
 * @param {string} base - An optional base device record, that the merge will
 * take as base
 * @param {Object} minimum - Paths that will always be merged for all records
@@ -35,7 +35,7 @@ export default function mergeDevice (
 
   for (const part of parts) {
     for (const path of part.paths ? [ ...minimum, ...part.paths ] : []) {
-      const val = traverse(part.record).get(path)
+      const val = traverse(part.device).get(path)
       if (val) {
         if (typeof val === 'object') {
           // In case of a whole sub-object being selected, write each leaf node

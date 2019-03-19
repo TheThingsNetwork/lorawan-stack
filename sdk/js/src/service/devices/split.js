@@ -13,8 +13,8 @@
 // limitations under the License.
 
 import traverse from 'traverse'
+import Marshaler from '../../util/marshaler'
 import deviceEntityMap from '../../../generated/device-entity-map.json'
-
 
 /** Takes the requested paths of the device and returns a request tree. The
 * splitting is achieved by looking up path responsibilities as defined in the
@@ -74,3 +74,101 @@ export function splitGetPaths (paths, base) {
   return splitPaths(paths, 'get', base)
 }
 
+/** A wrapper function to obtain a request tree for reading values to a device
+* @param {Object} api - The Api object as passed to the service
+* @param {string} operation - The operation, an enum of 'set', 'get' and 'delete'
+* @param {string} requestTree - The request tree, as returned by the splitPaths
+* function
+* @param {Object} params - The parameters object to be passed to the requests
+* @param {Object} payload - The payload to be passed to the requests
+* @param {boolean} ignoreNotFound - A flag indicating whether not found errors
+* should be translated to an empty device instead of throwing
+* @returns {Object} An array of device registry responses together with the paths
+* (field_mask) that they were requested with
+*/
+export async function makeRequests (
+  api,
+  operation,
+  requestTree,
+  params,
+  payload,
+  ignoreNotFound = false
+) {
+  const isSet = operation === 'set'
+  const isDelete = operation === 'delete'
+  const rpcFunction = isSet ? 'Set' : isDelete ? 'Delete' : 'Get'
+
+  // Use a wrapper for the api calls to allow ignoring not found errors, if wished
+  const requestWrapper = async function (call, params, payload) {
+    try {
+      const res = await call(params, !isDelete ? payload : undefined)
+      return res
+    } catch (err) {
+      if (ignoreNotFound && err.code === 5) {
+        return { end_device: {}}
+      }
+      throw err
+    }
+  }
+
+  const requests = new Array(3)
+  let isResult
+
+  // Do a possible IS request first
+  if ('is' in requestTree) {
+    let func = isSet ? 'Update' : 'Get'
+    if (isDelete) {
+      func = 'Delete'
+    }
+    isResult = await requestWrapper(
+      api.EndDeviceRegistry[func],
+      params, {
+        ...payload,
+        ...Marshaler.pathsToFieldMask(requestTree.is),
+      }
+    )
+
+    isResult = Marshaler.payloadSingleResponse(isResult)
+  }
+
+  // Compose an array of possible api calls to NS, AS, JS
+  if ('ns' in requestTree) {
+    requests[0] = requestWrapper(api.NsEndDeviceRegistry[rpcFunction],
+      params, {
+        ...payload,
+        ...Marshaler.pathsToFieldMask(requestTree.ns),
+      }
+    )
+  }
+  if ('as' in requestTree) {
+    requests[1] = requestWrapper(api.AsEndDeviceRegistry[rpcFunction],
+      params, {
+        ...payload,
+        ...Marshaler.pathsToFieldMask(requestTree.as),
+      }
+    )
+  }
+  if ('js' in requestTree) {
+    requests[2] = requestWrapper(api.JsEndDeviceRegistry[rpcFunction],
+      params, {
+        ...payload,
+        ...Marshaler.pathsToFieldMask(requestTree.js),
+      }
+    )
+  }
+
+  // Run the requests in parallel and marshal the results
+  const responses = (await Promise.all(requests))
+    .map(e => e ? Marshaler.payloadSingleResponse(e) : undefined)
+
+  // Return a map of device registry responses together with the paths that were
+  // requested (field_mask)
+  const result = [
+    { device: responses[0], paths: requestTree.ns },
+    { device: responses[1], paths: requestTree.as },
+    { device: responses[2], paths: requestTree.js },
+    { device: isResult, paths: requestTree.is },
+  ]
+
+  return result
+}
