@@ -96,6 +96,7 @@
   "lib.shared-messages.name": "Xxxx",
   "lib.shared-messages.networkKey": "Xxxxxxx Xxx",
   "lib.shared-messages.noMatch": "Xx xxxxx xxxxxxx xxxx xxxxxxxx",
+  "lib.shared-messages.notAvailable": "x/x",
   "lib.shared-messages.ok": "Xx",
   "lib.shared-messages.organizations": "Xxxxxxxxxxxxx",
   "lib.shared-messages.overview": "Xxxxxxxx",
