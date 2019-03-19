@@ -141,6 +141,7 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 	cmdBuf := make([]byte, 0, maxDownLen)
 	for _, cmd := range cmds {
 		var err error
+		logger.WithField("cid", cmd.CID).Debug("Adding MAC command to buffer...")
 		cmdBuf, err = spec.AppendDownlink(cmdBuf, *cmd)
 
 		if err != nil {
@@ -472,12 +473,11 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 	var addErr bool
 	err := ns.downlinkTasks.Pop(ctx, func(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time) error {
 		logger := log.FromContext(ctx).WithFields(log.Fields(
-			"delay", time.Now().Sub(t),
 			"device_uid", unique.ID(ctx, devID),
-			"start_at", t,
+			"started_at", time.Now().UTC(),
 		))
 		ctx = log.NewContext(ctx, logger)
-		logger.Debug("Processing downlink task...")
+		logger.WithField("start_at", t).Debug("Processing downlink task...")
 
 		var sendInvalidation func() (bool, error)
 		var nextDownlinkAt time.Time
@@ -873,10 +873,10 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 		}
 
 		if !nextDownlinkAt.IsZero() {
-			logger.WithField("schedule_at", nextDownlinkAt).Debug("Adding device to downlink schedule...")
+			logger.WithField("start_at", nextDownlinkAt.UTC()).Debug("Adding downlink task...")
 			if err := ns.downlinkTasks.Add(ctx, devID, nextDownlinkAt, true); err != nil {
 				addErr = true
-				logger.WithError(err).Error("Failed to add device to downlink schedule")
+				logger.WithError(err).Error("Failed to add downlink task after downlink")
 				return err
 			}
 		}

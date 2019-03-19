@@ -87,11 +87,7 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 
 	pld := up.Payload.GetMACPayload()
 
-	logger := log.FromContext(ctx).WithFields(log.Fields(
-		"dev_addr", pld.DevAddr,
-		"uplink_f_cnt", pld.FCnt,
-		"payload_length", len(macPayloadBytes),
-	))
+	logger := log.FromContext(ctx)
 
 	type device struct {
 		*ttnpb.EndDevice
@@ -199,11 +195,10 @@ outer:
 			fCnt |= (dev.matchedSession.LastFCntUp + 0x10000) &^ 0xffff
 		}
 
-		logger = logger.WithFields(log.Fields(
+		logger := logger.WithFields(log.Fields(
 			"device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers),
 			"full_f_cnt_up", fCnt,
 			"last_f_cnt_up", dev.matchedSession.LastFCntUp,
-			"uplink_f_cnt_up", pld.FCnt,
 		))
 
 		resetsFCnt := false
@@ -359,7 +354,15 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	pld := up.Payload.GetMACPayload()
 
 	logger := log.FromContext(ctx).WithFields(log.Fields(
+		"ack", pld.Ack,
+		"adr", pld.ADR,
+		"adr_ack_req", pld.ADRAckReq,
+		"class_b", pld.ClassB,
 		"dev_addr", pld.DevAddr,
+		"f_cnt", pld.FCnt,
+		"f_opts_len", len(pld.FOpts),
+		"f_port", pld.FPort,
+		"frm_payload_len", len(pld.FRMPayload),
 	))
 	ctx = log.NewContext(ctx, logger)
 
@@ -426,7 +429,6 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 			logger.WithField("kek_label", ses.NwkSEncKey.KEKLabel).WithError(err).Warn("Failed to unwrap NwkSEncKey")
 			return err
 		}
-
 		mac, err = crypto.DecryptUplink(key, pld.DevAddr, pld.FCnt, mac)
 		if err != nil {
 			return errDecrypt.WithCause(err)
@@ -437,15 +439,19 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	for r := bytes.NewReader(mac); r.Len() > 0; {
 		cmd := &ttnpb.MACCommand{}
 		if err := lorawan.DefaultMACCommands.ReadUplink(r, cmd); err != nil {
-			logger.
-				WithField("unmarshaled", len(cmds)).
-				WithError(err).
-				Warn("Failed to unmarshal MAC commands")
+			logger.WithFields(log.Fields(
+				"bytes_left", r.Len(),
+				"mac_count", len(cmds),
+			)).WithError(err).Warn("Failed to unmarshal MAC command")
 			break
 		}
+		logger.WithField("cid", cmd.CID).Debug("Read MAC command")
 		cmds = append(cmds, cmd)
 	}
+	logger = logger.WithField("mac_count", len(cmds))
+	ctx = log.NewContext(ctx, logger)
 
+	logger.Debug("Waiting for deduplication window to close...")
 	select {
 	case <-ctx.Done():
 		return ctx.Err()
@@ -453,6 +459,9 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	}
 
 	up.RxMetadata = acc.Accumulated()
+	logger = logger.WithField("metadata_count", len(up.RxMetadata))
+	logger.Debug("Merged metadata")
+	ctx = log.NewContext(ctx, logger)
 	registerMergeMetadata(ctx, &matched.EndDeviceIdentifiers, up)
 
 	var handleErr bool
@@ -508,6 +517,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 				stored.Session = ses
 			} else if ses == matched.PendingSession {
 				// Device switched the session.
+				logger.Debug("Switching to pending session")
 				stored.PendingSession = ses
 				if stored.PendingSession.DevAddr != stored.MACState.PendingJoinRequest.DevAddr {
 					panic("Pending session does not match the join request")
@@ -586,6 +596,8 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 			for len(cmds) > 0 {
 				var cmd *ttnpb.MACCommand
 				cmd, cmds = cmds[0], cmds[1:]
+				logger := logger.WithField("cid", cmd.CID)
+				logger.Debug("Handling MAC command...")
 				switch cmd.CID {
 				case ttnpb.CID_RESET:
 					err = handleResetInd(ctx, stored, cmd.GetResetInd(), ns.FrequencyPlans, ns.defaultMACSettings)
@@ -595,6 +607,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 					pld := cmd.GetLinkADRAns()
 					dupCount := 0
 					if stored.MACState.LoRaWANVersion == ttnpb.MAC_V1_0_2 {
+						logger.Debug("Counting duplicates...")
 						for _, dup := range cmds {
 							if dup.CID != ttnpb.CID_LINK_ADR {
 								break
@@ -605,6 +618,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 							}
 							dupCount++
 						}
+						logger.WithField("duplicate_count", dupCount).Debug("Counted duplicates")
 					}
 					if err != nil {
 						break
@@ -713,6 +727,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	asCtx, cancel := context.WithTimeout(ctx, appQueueUpdateTimeout)
 	defer cancel()
 
+	logger.Debug("Sending uplink to Application Server...")
 	ok, err := ns.handleASUplink(asCtx, matched.EndDeviceIdentifiers.ApplicationIdentifiers, &ttnpb.ApplicationUp{
 		EndDeviceIdentifiers: matched.EndDeviceIdentifiers,
 		CorrelationIDs:       up.CorrelationIDs,
@@ -732,7 +747,9 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	} else {
 		registerForwardDataUplink(ctx, &matched.EndDeviceIdentifiers, up)
 	}
-	return ns.downlinkTasks.Add(ctx, matched.EndDeviceIdentifiers, time.Now().UTC(), true)
+	startAt := time.Now().UTC()
+	logger.WithField("start_at", startAt).Debug("Adding downlink task...")
+	return ns.downlinkTasks.Add(ctx, matched.EndDeviceIdentifiers, startAt, true)
 }
 
 // newDevAddr generates a DevAddr for specified EndDevice.
@@ -932,7 +949,9 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 		return err
 	}
 
-	if err := ns.downlinkTasks.Add(ctx, dev.EndDeviceIdentifiers, time.Now().UTC(), true); err != nil {
+	startAt := time.Now().UTC()
+	logger.WithField("start_at", startAt).Debug("Adding downlink task...")
+	if err := ns.downlinkTasks.Add(ctx, dev.EndDeviceIdentifiers, startAt, true); err != nil {
 		return err
 	}
 	return nil
@@ -959,11 +978,7 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 		fmt.Sprintf("ns:uplink:%s", events.NewCorrelationID()),
 	)...)
 	up.CorrelationIDs = events.CorrelationIDsFromContext(ctx)
-
 	up.ReceivedAt = time.Now().UTC()
-
-	logger := log.FromContext(ctx)
-
 	up.Payload = &ttnpb.Message{}
 	if err := lorawan.UnmarshalMessage(up.RawPayload, up.Payload); err != nil {
 		return nil, errDecodePayload.WithCause(err)
@@ -974,6 +989,13 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 			"major", up.Payload.Major,
 		)
 	}
+
+	logger := log.FromContext(ctx).WithFields(log.Fields(
+		"m_type", up.Payload.MType,
+		"major", up.Payload.Major,
+		"received_at", up.ReceivedAt,
+	))
+	ctx = log.NewContext(ctx, logger)
 
 	logger.Debug("Deduplicating uplink...")
 	acc, stopDedup, ok := ns.deduplicateUplink(ctx, up)

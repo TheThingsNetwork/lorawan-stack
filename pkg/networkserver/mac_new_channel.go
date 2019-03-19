@@ -18,6 +18,7 @@ import (
 	"context"
 
 	"go.thethings.network/lorawan-stack/pkg/events"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -50,6 +51,12 @@ func enqueueNewChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen,
 				MinDataRateIndex: ch.MinDataRateIndex,
 				MaxDataRateIndex: ch.MaxDataRateIndex,
 			}
+			log.FromContext(ctx).WithFields(log.Fields(
+				"index", pld.ChannelIndex,
+				"frequency", pld.Frequency,
+				"min_data_rate_index", pld.MinDataRateIndex,
+				"max_data_rate_index", pld.MaxDataRateIndex,
+			)).Debug("Enqueued NewChannelReq")
 			cmds = append(cmds, pld.MACCommand())
 
 			events.Publish(evtEnqueueNewChannelRequest(ctx, dev.EndDeviceIdentifiers, pld))
