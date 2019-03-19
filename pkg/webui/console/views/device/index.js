@@ -67,9 +67,10 @@ const tabs = [
 export default class Device extends React.Component {
 
   componentDidMount () {
-    const { dispatch, devId } = this.props
+    const { dispatch, devId, match } = this.props
+    const { appId } = match.params
 
-    dispatch(getDevice(devId))
+    dispatch(getDevice(appId, devId, 'name,description,session,version_ids', { ignoreNotFound: true }))
   }
 
   handleTabChange () {
