@@ -268,6 +268,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					"lorawan_phy_version",
 					"mac_settings",
 					"mac_state",
+					"pending_session",
 					"queued_application_downlinks",
 					"recent_downlinks",
 					"recent_uplinks",
@@ -305,7 +306,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
 				rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
 				rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint8))].DownlinkFrequency
-				payload, _, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
+				payload, _, _, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
 					band.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 					band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
 				)
@@ -379,7 +380,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					if rx1DRIdx < drIdx {
 						drIdx = rx1DRIdx
 					}
-					payload, _, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
+					payload, _, _, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
 						band.DataRates[drIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
 					)
@@ -692,6 +693,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					"lorawan_phy_version",
 					"mac_settings",
 					"mac_state",
+					"pending_session",
 					"queued_application_downlinks",
 					"recent_downlinks",
 					"recent_uplinks",
@@ -709,6 +711,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				a.So(err, should.BeNil)
 				a.So(paths, should.HaveSameElementsDeep, []string{
 					"mac_state",
+					"pending_session",
 					"queued_application_downlinks",
 					"recent_downlinks",
 					"session",
@@ -729,7 +732,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
 				rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
 				rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint8))].DownlinkFrequency
-				payload, _, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
+				payload, _, _, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
 					band.DataRates[rx1DRIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 					band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
 				)
@@ -799,7 +802,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
 					rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
 					rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint8))].DownlinkFrequency
-					payload, _, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
+					payload, _, _, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
 						band.DataRates[rx1DRIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
 					)
@@ -1105,6 +1108,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					"lorawan_phy_version",
 					"mac_settings",
 					"mac_state",
+					"pending_session",
 					"queued_application_downlinks",
 					"recent_downlinks",
 					"recent_uplinks",
@@ -1122,6 +1126,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				a.So(err, should.BeNil)
 				a.So(paths, should.HaveSameElementsDeep, []string{
 					"mac_state",
+					"pending_session",
 					"queued_application_downlinks",
 					"recent_downlinks",
 					"session",
@@ -1140,7 +1145,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					t.Fatal("Invalid context")
 				}
 				fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
-				rx2Payload, _, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
+				rx2Payload, _, _, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
 					band.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 					band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
 				)
@@ -1212,14 +1217,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 					fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
 					rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
 					rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint8))].DownlinkFrequency
-					rx1Payload, _, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
+					rx1Payload, _, _, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
 						band.DataRates[rx1DRIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
 					)
 					if !a.So(err, should.BeNil) {
 						t.Fatalf("Failed to generate Rx1 payload: %s", err)
 					}
-					rx2Payload, _, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
+					rx2Payload, _, _, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
 						band.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
 					)
@@ -1682,6 +1687,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					"lorawan_phy_version",
 					"mac_settings",
 					"mac_state",
+					"pending_session",
 					"queued_application_downlinks",
 					"recent_downlinks",
 					"recent_uplinks",
@@ -1699,6 +1705,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				a.So(err, should.BeNil)
 				a.So(paths, should.HaveSameElementsDeep, []string{
 					"mac_state",
+					"pending_session",
 					"queued_application_downlinks",
 					"recent_downlinks",
 					"session",
@@ -1717,7 +1724,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					t.Fatal("Invalid context")
 				}
 				fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
-				rx2Payload, _, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
+				rx2Payload, _, _, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
 					band.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 					band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
 				)
@@ -1792,14 +1799,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 					fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
 					rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
 					rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint8))].DownlinkFrequency
-					rx1Payload, _, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
+					rx1Payload, _, _, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
 						band.DataRates[rx1DRIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
 					)
 					if !a.So(err, should.BeNil) {
 						t.Fatalf("Failed to generate Rx1 payload: %s", err)
 					}
-					rx2Payload, _, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
+					rx2Payload, _, _, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
 						band.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
 					)
@@ -2263,6 +2270,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					"lorawan_phy_version",
 					"mac_settings",
 					"mac_state",
+					"pending_session",
 					"queued_application_downlinks",
 					"recent_downlinks",
 					"recent_uplinks",
@@ -3511,7 +3519,7 @@ func TestGenerateDownlink(t *testing.T) {
 
 			dev := CopyEndDevice(tc.Device)
 
-			b, appDown, err := ns.generateDownlink(tc.Context, dev, math.MaxUint16, math.MaxUint16)
+			b, _, appDown, err := ns.generateDownlink(tc.Context, dev, math.MaxUint16, math.MaxUint16)
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 				tc.Error == nil && !a.So(err, should.BeNil) {
 				t.FailNow()
