@@ -77,8 +77,13 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 		return nil, nil, errUnknownMACState
 	}
 
-	if dev.Session == nil {
+	var ses *ttnpb.Session
+	if dev.Session == nil && (dev.MACState.DeviceClass == ttnpb.CLASS_A || dev.PendingSession == nil) {
 		return nil, nil, errEmptySession
+	} else if dev.Session != nil {
+		ses = dev.Session
+	} else if dev.PendingSession != nil {
+		ses = dev.PendingSession
 	}
 
 	ctx = log.NewContextWithField(ctx, "device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers))
@@ -118,7 +123,7 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 		enqueueDutyCycleReq,
 		enqueueRxParamSetupReq,
 		func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) (uint16, uint16, bool) {
-			return enqueueDevStatusReq(ctx, dev, maxDownLen, maxUpLen, ns.defaultMACSettings)
+			return enqueueDevStatusReq(ctx, dev, maxDownLen, maxUpLen, ses, ns.defaultMACSettings)
 		},
 		enqueueRxTimingSetupReq,
 		enqueuePingSlotChannelReq,
@@ -178,11 +183,11 @@ outer:
 
 	pld := &ttnpb.MACPayload{
 		FHDR: ttnpb.FHDR{
-			DevAddr: dev.Session.DevAddr,
+			DevAddr: ses.DevAddr,
 			FCtrl: ttnpb.FCtrl{
 				Ack: up != nil && up.Payload.MHDR.MType == ttnpb.MType_CONFIRMED_UP,
 			},
-			FCnt: dev.Session.LastNFCntDown + 1,
+			FCnt: ses.LastNFCntDown + 1,
 		},
 	}
 	logger = logger.WithField("ack", pld.FHDR.FCtrl.Ack)
@@ -223,7 +228,7 @@ outer:
 				mType = ttnpb.MType_CONFIRMED_DOWN
 
 				dev.MACState.PendingApplicationDownlink = down
-				dev.Session.LastConfFCntDown = pld.FCnt
+				ses.LastConfFCntDown = pld.FCnt
 			}
 		}
 	}
@@ -234,16 +239,16 @@ outer:
 	))
 
 	if len(cmdBuf) > 0 && (pld.FPort == 0 || dev.MACState.LoRaWANVersion.EncryptFOpts()) {
-		if dev.Session.NwkSEncKey == nil || len(dev.Session.NwkSEncKey.Key) == 0 {
+		if ses.NwkSEncKey == nil || len(ses.NwkSEncKey.Key) == 0 {
 			return nil, nil, errUnknownNwkSEncKey
 		}
-		key, err := cryptoutil.UnwrapAES128Key(*dev.Session.NwkSEncKey, ns.KeyVault)
+		key, err := cryptoutil.UnwrapAES128Key(*ses.NwkSEncKey, ns.KeyVault)
 		if err != nil {
-			logger.WithField("kek_label", dev.Session.NwkSEncKey.KEKLabel).WithError(err).Warn("Failed to unwrap NwkSEncKey")
+			logger.WithField("kek_label", ses.NwkSEncKey.KEKLabel).WithError(err).Warn("Failed to unwrap NwkSEncKey")
 			return nil, nil, err
 		}
 
-		cmdBuf, err = crypto.EncryptDownlink(key, dev.Session.DevAddr, pld.FHDR.FCnt, cmdBuf)
+		cmdBuf, err = crypto.EncryptDownlink(key, ses.DevAddr, pld.FHDR.FCnt, cmdBuf)
 		if err != nil {
 			return nil, nil, errEncryptMAC.WithCause(err)
 		}
@@ -251,13 +256,13 @@ outer:
 
 	if pld.FPort == 0 {
 		pld.FRMPayload = cmdBuf
-		dev.Session.LastNFCntDown = pld.FCnt
+		ses.LastNFCntDown = pld.FCnt
 	} else {
 		pld.FHDR.FOpts = cmdBuf
 	}
 
-	if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 && pld.FCnt > dev.Session.LastNFCntDown {
-		dev.Session.LastNFCntDown = pld.FCnt
+	if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 && pld.FCnt > ses.LastNFCntDown {
+		ses.LastNFCntDown = pld.FCnt
 	}
 
 	pld.FHDR.FCtrl.FPending = fPending || len(dev.QueuedApplicationDownlinks) > 0
@@ -290,12 +295,12 @@ outer:
 	}
 	// NOTE: It is assumed, that b does not contain MIC.
 
-	if dev.Session.SNwkSIntKey == nil || len(dev.Session.SNwkSIntKey.Key) == 0 {
+	if ses.SNwkSIntKey == nil || len(ses.SNwkSIntKey.Key) == 0 {
 		return nil, nil, errUnknownSNwkSIntKey
 	}
-	key, err := cryptoutil.UnwrapAES128Key(*dev.Session.SNwkSIntKey, ns.KeyVault)
+	key, err := cryptoutil.UnwrapAES128Key(*ses.SNwkSIntKey, ns.KeyVault)
 	if err != nil {
-		logger.WithField("kek_label", dev.Session.SNwkSIntKey.KEKLabel).WithError(err).Warn("Failed to unwrap SNwkSIntKey")
+		logger.WithField("kek_label", ses.SNwkSIntKey.KEKLabel).WithError(err).Warn("Failed to unwrap SNwkSIntKey")
 		return nil, nil, err
 	}
 
@@ -303,7 +308,7 @@ outer:
 	if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 		mic, err = crypto.ComputeLegacyDownlinkMIC(
 			key,
-			dev.Session.DevAddr,
+			ses.DevAddr,
 			pld.FHDR.FCnt,
 			b,
 		)
@@ -314,7 +319,7 @@ outer:
 		}
 		mic, err = crypto.ComputeDownlinkMIC(
 			key,
-			dev.Session.DevAddr,
+			ses.DevAddr,
 			confFCnt,
 			pld.FHDR.FCnt,
 			b,
@@ -488,6 +493,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 				"lorawan_phy_version",
 				"mac_settings",
 				"mac_state",
+				"pending_session",
 				"queued_application_downlinks",
 				"recent_downlinks",
 				"recent_uplinks",
@@ -747,6 +753,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 								}
 								return dev, []string{
 									"mac_state",
+									"pending_session",
 									"queued_application_downlinks",
 									"recent_downlinks",
 									"session",
@@ -841,6 +848,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						}
 						return dev, []string{
 							"mac_state",
+							"pending_session",
 							"queued_application_downlinks",
 							"recent_downlinks",
 							"session",
