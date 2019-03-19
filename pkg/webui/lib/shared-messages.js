@@ -57,6 +57,7 @@ export default defineMessages({
   networkKey: 'Network Key',
   noDesc: 'This device has no description',
   noMatch: 'No items matched your criteria',
+  notAvailable: 'n/a',
   ok: 'Ok',
   organizations: 'Organizations',
   overview: 'Overview',

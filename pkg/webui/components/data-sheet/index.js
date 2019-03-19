@@ -19,6 +19,7 @@ import SafeInspector from '../safe-inspector'
 import Message from '../../lib/components/message'
 
 import PropTypes from '../../lib/prop-types'
+import sharedMessages from '../../lib/shared-messages'
 
 import style from './data-sheet.styl'
 
@@ -31,6 +32,9 @@ const DataSheet = function ({ className, data }) {
             <React.Fragment key={`${group.header}_${index}`}>
               <tr className={style.groupHeading}><th><Message content={group.header} /></th></tr>
               { group.items.map( function (item) {
+                if (!item) {
+                  return null
+                }
                 const keyId = typeof item.key === 'object' ? item.key.id : item.key
                 const subItems = item.subItems ? item.subItems.map((subItem, subIndex) => (
                   <DataSheetRow sub item={subItem} key={`${keyId}_${index}_${subIndex}`} />
@@ -60,9 +64,9 @@ DataSheet.propTypes = {
     /** A list of items for the group */
     items: PropTypes.arrayOf(PropTypes.shape({
       /** The key of the item */
-      key: PropTypes.message.isRequired,
+      key: PropTypes.message,
       /** The value of the item */
-      value: PropTypes.message.isRequired,
+      value: PropTypes.message,
       /** The type of the item, 'code', 'byte' or 'text' (default) */
       type: PropTypes.string,
       /** Whether this 'code' or 'byte' item should be hidden by default */
@@ -83,7 +87,7 @@ const DataSheetRow = function ({ item, sub }) {
   return (
     <tr className={rowStyle}>
       <th><Message content={item.key} /></th>
-      <td>{isSafeInspector ? (
+      <td>{item.value && isSafeInspector ? (
         <SafeInspector
           hideable={false || item.sensitive}
           isBytes={item.type === 'byte'}
@@ -91,7 +95,7 @@ const DataSheetRow = function ({ item, sub }) {
           data={item.value}
         />
       )
-        : item.value}</td>
+        : item.value || <Message className={style.notAvailable} content={sharedMessages.notAvailable} />}</td>
     </tr>
   )
 }
