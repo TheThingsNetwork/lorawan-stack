@@ -254,16 +254,11 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 			if err := updated.ValidateFields(sets...); err != nil {
 				return err
 			}
-			pb, err = applyDeviceFieldMask(nil, updated, gets...)
-			if err != nil {
-				return err
-			}
-
 			updatedAddrs := getDevAddrs(updated)
 
 			pipelined = func(p redis.Pipeliner) error {
 				if stored == nil && updated.JoinEUI != nil && updated.DevEUI != nil {
-					ek := r.euiKey(*pb.JoinEUI, *pb.DevEUI)
+					ek := r.euiKey(*updated.JoinEUI, *updated.DevEUI)
 					if err := tx.Watch(ek).Err(); err != nil {
 						return err
 					}
@@ -293,6 +288,11 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 				}
 				if updatedAddrs.current != nil && !equalAddr(updatedAddrs.current, storedAddrs.pending) && !equalAddr(updatedAddrs.current, storedAddrs.current) {
 					p.SAdd(r.addrKey(*updatedAddrs.current), uid)
+				}
+
+				pb, err = applyDeviceFieldMask(nil, updated, gets...)
+				if err != nil {
+					return err
 				}
 				return nil
 			}
