@@ -37,13 +37,7 @@ func applyDeviceFieldMask(dst, src *ttnpb.EndDevice, paths ...string) (*ttnpb.En
 	if dst == nil {
 		dst = &ttnpb.EndDevice{}
 	}
-	if err := dst.SetFields(src, paths...); err != nil {
-		return nil, err
-	}
-	if err := dst.ValidateFields(paths...); err != nil {
-		return nil, err
-	}
-	return dst, nil
+	return dst, dst.SetFields(src, paths...)
 }
 
 // DeviceRegistry is an implementation of networkserver.DeviceRegistry.
@@ -232,13 +226,15 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 
 			updated := &ttnpb.EndDevice{}
 			if stored == nil {
+				sets = append(sets,
+					"ids.application_ids",
+					"ids.device_id",
+				)
+
 				pb.CreatedAt = pb.UpdatedAt
 				sets = append(sets, "created_at")
 
-				updated, err = applyDeviceFieldMask(updated, pb, append(sets,
-					"ids.application_ids",
-					"ids.device_id",
-				)...)
+				updated, err = applyDeviceFieldMask(updated, pb, sets...)
 				if err != nil {
 					return err
 				}
@@ -254,6 +250,9 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 					stored.ApplicationIdentifiers != updated.ApplicationIdentifiers || stored.DeviceID != updated.DeviceID {
 					return errInvalidIdentifiers
 				}
+			}
+			if err := updated.ValidateFields(sets...); err != nil {
+				return err
 			}
 			pb, err = applyDeviceFieldMask(nil, updated, gets...)
 			if err != nil {
