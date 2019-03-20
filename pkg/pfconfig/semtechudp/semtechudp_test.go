@@ -17,6 +17,7 @@ package semtechudp
 import (
 	"encoding/json"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/kr/pretty"
@@ -55,6 +56,7 @@ func TestBuild(t *testing.T) {
 		if err != nil {
 			panic(err)
 		}
+		removeDescs(expectedMap)
 		configJSON, _ := json.Marshal(actual.(*Config))
 		var actualMap map[string]interface{}
 		json.Unmarshal(configJSON, &actualMap)
@@ -126,4 +128,16 @@ func TestBuild(t *testing.T) {
 		})
 	}
 
+}
+
+func removeDescs(m map[string]interface{}) {
+	for k, v := range m {
+		if strings.HasSuffix(k, "desc") {
+			delete(m, k)
+			continue
+		}
+		if subMap, ok := v.(map[string]interface{}); ok {
+			removeDescs(subMap)
+		}
+	}
 }
