@@ -20,6 +20,7 @@ import bind from 'autobind-decorator'
 import sharedMessages from '../../../lib/shared-messages'
 import Message from '../../../lib/components/message'
 import FetchTable from '../fetch-table'
+import DateTime from '../../../lib/components/date-time'
 
 import { getDevicesList, searchDevicesList } from '../../../console/store/actions/devices'
 
@@ -35,8 +36,15 @@ const headers = [
     displayName: m.deviceId,
   },
   {
-    name: 'description',
-    displayName: sharedMessages.description,
+    name: 'name',
+    displayName: sharedMessages.name,
+  },
+  {
+    name: 'created_at',
+    displayName: sharedMessages.created,
+    render (datetime) {
+      return <DateTime.Relative value={datetime} />
+    },
   },
 ]
 

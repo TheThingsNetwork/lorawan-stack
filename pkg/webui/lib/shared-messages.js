@@ -31,6 +31,7 @@ export default defineMessages({
   cancel: 'Cancel',
   collaborators: 'Collaborators',
   createApiKey: 'Create API Key',
+  created: 'Created',
   createdAt: 'Created at',
   data: 'Data',
   description: 'Description',

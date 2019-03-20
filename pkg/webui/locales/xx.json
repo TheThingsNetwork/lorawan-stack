@@ -71,6 +71,7 @@
   "lib.shared-messages.cancel": "Xxxxxx",
   "lib.shared-messages.collaborators": "Xxxxxxxxxxxxx",
   "lib.shared-messages.createApiKey": "Xxxxxx XXX Xxx",
+  "lib.shared-messages.created": "Xxxxxxx",
   "lib.shared-messages.createdAt": "Xxxxxxx xx",
   "lib.shared-messages.data": "Xxxx",
   "lib.shared-messages.description": "Xxxxxxxxxxx",

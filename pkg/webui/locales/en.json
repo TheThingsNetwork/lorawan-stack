@@ -71,6 +71,7 @@
   "lib.shared-messages.cancel": "Cancel",
   "lib.shared-messages.collaborators": "Collaborators",
   "lib.shared-messages.createApiKey": "Create API Key",
+  "lib.shared-messages.created": "Created",
   "lib.shared-messages.createdAt": "Created at",
   "lib.shared-messages.data": "Data",
   "lib.shared-messages.description": "Description",
