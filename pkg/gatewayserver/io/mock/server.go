@@ -86,8 +86,7 @@ func (s *server) Connect(ctx context.Context, frontend io.Frontend, ids ttnpb.Ga
 	if err != nil {
 		return nil, err
 	}
-	var scheduler *scheduling.Scheduler
-	scheduler, err = scheduling.NewScheduler(ctx, fp, true)
+	scheduler, err := scheduling.NewScheduler(ctx, fp, true)
 	if err != nil {
 		return nil, err
 	}

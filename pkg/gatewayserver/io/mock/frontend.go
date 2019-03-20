@@ -30,7 +30,6 @@ type Frontend struct {
 	Down   chan *ttnpb.DownlinkMessage
 }
 
-// Protocol ...
 func (*Frontend) Protocol() string { return "mock" }
 
 // ConnectFrontend connects a new mock front-end to the given server.
