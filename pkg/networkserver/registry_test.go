@@ -83,18 +83,20 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 
 	ret, err = reg.SetByID(ctx, pb.ApplicationIdentifiers, pb.DeviceID,
 		[]string{
-			"created_at",
+			"ids.dev_eui",
+			"ids.join_eui",
 			"pending_session",
 			"session",
-			"updated_at",
 		},
 		func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if !a.So(stored, should.BeNil) {
 				t.Fatal("Registry is not empty")
 			}
 			return pb, []string{
-				"session",
+				"ids.dev_eui",
+				"ids.join_eui",
 				"pending_session",
+				"session",
 			}, nil
 		},
 	)
@@ -149,18 +151,20 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 
 	ret, err = reg.SetByID(ctx, pbOther.ApplicationIdentifiers, pbOther.DeviceID,
 		[]string{
-			"created_at",
+			"ids.dev_eui",
+			"ids.join_eui",
 			"pending_session",
 			"session",
-			"updated_at",
 		},
 		func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if !a.So(stored, should.BeNil) {
 				t.Fatal("Registry is not empty")
 			}
 			return pbOther, []string{
-				"session",
+				"ids.dev_eui",
+				"ids.join_eui",
 				"pending_session",
+				"session",
 			}, nil
 		},
 	)
