@@ -151,7 +151,7 @@ func init() {
 		MaxTxPowerIndex: 14,
 
 		ImplementsCFList: true,
-		CFListType:       ttnpb.CFListType_FREQUENCIES,
+		CFListType:       ttnpb.CFListType_CHANNEL_MASKS,
 
 		Rx1Channel: channelIndexModulo(8),
 		Rx1DataRate: func(idx ttnpb.DataRateIndex, offset uint32, _ bool) (ttnpb.DataRateIndex, error) {
