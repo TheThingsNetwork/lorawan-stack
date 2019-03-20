@@ -165,7 +165,8 @@ func (s *Scheduler) ScheduleAnytime(ctx context.Context, payloadSize int, settin
 	if s.clock.IsSynced() {
 		now := s.clock.ServerTime(time.Now())
 		if settings.Timestamp == 0 && settings.Time == nil {
-			settings.Timestamp = uint32((time.Duration(now) + ScheduleTimeLong) / time.Microsecond)
+			target := time.Duration(now) + ScheduleTimeLong
+			settings.Timestamp = uint32(target / time.Microsecond)
 		} else if settings.Time != nil {
 			if delta := time.Duration(s.clock.GatewayTime(*settings.Time) - now); delta < ScheduleTimeShort {
 				t := settings.Time.Add(ScheduleTimeShort - delta)
@@ -208,8 +209,12 @@ func (s *Scheduler) ScheduleAnytime(ctx context.Context, payloadSize int, settin
 			i++
 			return em.t
 		}
-		// No emissions to schedule in between; schedule after last emission.
-		return s.emissions[len(s.emissions)-1].EndsWithOffAir(s.timeOffAir) + ConcentratorTime(QueueDelay)
+		// No emissions to schedule in between; schedule at timestamp or last transmission, whichever comes first.
+		afterLast := s.emissions[len(s.emissions)-1].EndsWithOffAir(s.timeOffAir) + ConcentratorTime(QueueDelay)
+		if afterLast > em.t {
+			return afterLast
+		}
+		return em.t
 	}
 	em, err = sb.ScheduleAnytime(em.d, next, priority)
 	if err != nil {

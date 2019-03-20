@@ -387,3 +387,57 @@ func TestScheduleAnytimeShort(t *testing.T) {
 		a.So(time.Duration(em.Starts()), should.AlmostEqual, scheduling.ScheduleTimeShort, test.Delay/1000)
 	}
 }
+
+func TestScheduleAnytimeClassC(t *testing.T) {
+	a := assertions.New(t)
+	ctx := test.Context()
+	fp := &frequencyplans.FrequencyPlan{
+		BandID: band.EU_863_870,
+		TimeOffAir: frequencyplans.TimeOffAir{
+			Duration: time.Second,
+		},
+		DwellTime: frequencyplans.DwellTime{
+			Downlinks: boolPtr(true),
+			Duration:  durationPtr(2 * time.Second),
+		},
+	}
+
+	scheduler, err := scheduling.NewScheduler(ctx, fp, true)
+	a.So(err, should.BeNil)
+
+	// Schedule a join-accept. The clock is not synced; this is scheduled in the past at 5 seconds.
+	_, err = scheduler.ScheduleAt(ctx, 10, ttnpb.TxSettings{
+		DataRate: ttnpb.DataRate{
+			Modulation: &ttnpb.DataRate_LoRa{
+				LoRa: &ttnpb.LoRaDataRate{
+					Bandwidth:       125000,
+					SpreadingFactor: 7,
+				},
+			},
+		},
+		CodingRate: "4/5",
+		Frequency:  868100000,
+		Timestamp:  5000000,
+	}, ttnpb.TxSchedulePriority_NORMAL)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+
+	// Fast forward 9 seconds.
+	scheduler.Sync(9000000, time.Now().Add(-3*time.Second))
+
+	em, err := scheduler.ScheduleAnytime(ctx, 10, ttnpb.TxSettings{
+		DataRate: ttnpb.DataRate{
+			Modulation: &ttnpb.DataRate_LoRa{
+				LoRa: &ttnpb.LoRaDataRate{
+					Bandwidth:       125000,
+					SpreadingFactor: 7,
+				},
+			},
+		},
+		CodingRate: "4/5",
+		Frequency:  869525000,
+	}, ttnpb.TxSchedulePriority_NORMAL)
+	a.So(err, should.BeNil)
+	a.So(time.Duration(em.Starts()), should.AlmostEqual, 12*time.Second+scheduling.ScheduleTimeLong, test.Delay>>6)
+}
