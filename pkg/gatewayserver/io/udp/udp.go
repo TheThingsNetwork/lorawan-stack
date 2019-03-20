@@ -76,8 +76,7 @@ type srv struct {
 	firewall    Firewall
 }
 
-func (*srv) Protocol() string   { return "udp" }
-func (*srv) HasScheduler() bool { return false }
+func (*srv) Protocol() string { return "udp" }
 
 // Start starts the UDP frontend.
 func Start(ctx context.Context, server io.Server, conn *net.UDPConn, config Config) {

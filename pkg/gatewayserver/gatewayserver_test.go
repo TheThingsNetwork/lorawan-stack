@@ -918,15 +918,8 @@ func TestGatewayServer(t *testing.T) {
 
 						select {
 						case msg := <-downCh:
-							conn, ok := gs.GetConnection(ctx, ids)
-							a.So(ok, should.BeTrue)
-							if conn.HasScheduler() {
-								settings := msg.DownlinkMessage.GetScheduled()
-								a.So(settings, should.NotBeNil)
-							} else {
-								request := msg.DownlinkMessage.GetRequest()
-								a.So(request, should.NotBeNil)
-							}
+							settings := msg.DownlinkMessage.GetScheduled()
+							a.So(settings, should.NotBeNil)
 						case <-time.After(timeout):
 							t.Fatal("Expected downlink timeout")
 						}
