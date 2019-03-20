@@ -112,8 +112,17 @@ var errBufferFull = errors.DefineInternal("buffer_full", "buffer is full")
 func (c *Connection) HandleUp(up *ttnpb.UplinkMessage) error {
 	if up.Settings.Time != nil {
 		c.scheduler.SyncWithGateway(up.Settings.Timestamp, up.ReceivedAt, *up.Settings.Time)
+		log.FromContext(c.ctx).WithFields(log.Fields(
+			"timestamp", up.Settings.Timestamp,
+			"server_time", up.ReceivedAt,
+			"gateway_time", *up.Settings.Time,
+		)).Debug("Syncronized server and gateway absolute time")
 	} else {
 		c.scheduler.Sync(up.Settings.Timestamp, up.ReceivedAt)
+		log.FromContext(c.ctx).WithFields(log.Fields(
+			"timestamp", up.Settings.Timestamp,
+			"server_time", up.ReceivedAt,
+		)).Debug("Synchronized server absolute time only")
 	}
 	for _, md := range up.RxMetadata {
 		if md.AntennaIndex != 0 {
@@ -316,14 +325,15 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 			msg.Settings = &ttnpb.DownlinkMessage_Scheduled{
 				Scheduled: &settings,
 			}
+			errRxDetails = nil
+			if now, ok := c.scheduler.Now(); ok {
+				logger = logger.WithField("now", now)
+				delay = time.Duration(em.Starts() - now)
+			}
 			logger.WithFields(log.Fields(
 				"starts", em.Starts(),
 				"duration", em.Duration(),
 			)).Debug("Scheduled downlink")
-			errRxDetails = nil
-			if now, ok := c.scheduler.Now(); ok {
-				delay = time.Duration(em.Starts() - now)
-			}
 			break
 		}
 		if errRxDetails != nil {
