@@ -86,13 +86,9 @@ func (s *server) Connect(ctx context.Context, frontend io.Frontend, ids ttnpb.Ga
 	if err != nil {
 		return nil, err
 	}
-	var scheduler *scheduling.Scheduler
-	if !frontend.HasScheduler() {
-		var err error
-		scheduler, err = scheduling.NewScheduler(ctx, fp, true)
-		if err != nil {
-			return nil, err
-		}
+	scheduler, err := scheduling.NewScheduler(ctx, fp, true)
+	if err != nil {
+		return nil, err
 	}
 	conn := io.NewConnection(ctx, frontend.Protocol(), gtw, fp, scheduler)
 	s.connections[unique.ID(ctx, ids)] = conn

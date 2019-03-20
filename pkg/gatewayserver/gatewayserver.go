@@ -293,12 +293,9 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 		return nil, err
 	}
 	var scheduler *scheduling.Scheduler
-	if !frontend.HasScheduler() {
-		var err error
-		scheduler, err = scheduling.NewScheduler(ctx, fp, gtw.EnforceDutyCycle)
-		if err != nil {
-			return nil, err
-		}
+	scheduler, err = scheduling.NewScheduler(ctx, fp, gtw.EnforceDutyCycle)
+	if err != nil {
+		return nil, err
 	}
 
 	conn := io.NewConnection(ctx, frontend.Protocol(), gtw, fp, scheduler)
