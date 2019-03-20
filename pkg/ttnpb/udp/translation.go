@@ -65,11 +65,11 @@ type UpstreamMetadata struct {
 func ToGatewayUp(data Data, md UpstreamMetadata) (*ttnpb.GatewayUp, error) {
 	up := &ttnpb.GatewayUp{}
 	up.UplinkMessages = make([]*ttnpb.UplinkMessage, 0)
-	for rxIndex, rx := range data.RxPacket {
+	for _, rx := range data.RxPacket {
 		if rx == nil {
 			continue
 		}
-		convertedRx, err := convertUplink(data, rxIndex, md)
+		convertedRx, err := convertUplink(*rx, md)
 		if err != nil {
 			return nil, err
 		}
@@ -149,12 +149,12 @@ func fineTimestampMetadata(rx RxPacket, gatewayID ttnpb.GatewayIdentifiers) []*t
 	return md
 }
 
-func convertUplink(data Data, rxIndex int, md UpstreamMetadata) (ttnpb.UplinkMessage, error) {
-	up := ttnpb.UplinkMessage{}
-	rx := *data.RxPacket[rxIndex]
-	up.Settings = ttnpb.TxSettings{
-		Frequency:           uint64(rx.Freq * 1000000),
-		GatewayChannelIndex: uint32(rx.Chan),
+func convertUplink(rx RxPacket, md UpstreamMetadata) (ttnpb.UplinkMessage, error) {
+	up := ttnpb.UplinkMessage{
+		Settings: ttnpb.TxSettings{
+			Frequency:           uint64(rx.Freq * 1000000),
+			GatewayChannelIndex: uint32(rx.Chan),
+		},
 	}
 
 	rawPayload, err := base64.RawStdEncoding.DecodeString(strings.TrimRight(rx.Data, "="))
@@ -167,6 +167,11 @@ func convertUplink(data Data, rxIndex int, md UpstreamMetadata) (ttnpb.UplinkMes
 		up.RxMetadata = fineTimestampMetadata(rx, md.ID)
 	} else {
 		up.RxMetadata = metadata(rx, md.ID)
+	}
+	for _, md := range up.RxMetadata {
+		if up.Settings.Timestamp == 0 || up.Settings.Timestamp > md.Timestamp {
+			up.Settings.Timestamp = md.Timestamp
+		}
 	}
 
 	if rx.Time != nil {
