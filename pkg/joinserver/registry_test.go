@@ -70,16 +70,18 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 
 	ret, err = reg.SetByID(ctx, pb.ApplicationIdentifiers, pb.DeviceID,
 		[]string{
-			"created_at",
+			"ids.dev_eui",
+			"ids.join_eui",
 			"provisioner_id",
 			"provisioning_data",
-			"updated_at",
 		},
 		func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if !a.So(stored, should.BeNil) {
 				t.Fatal("Registry is not empty")
 			}
 			return CopyEndDevice(pb), []string{
+				"ids.dev_eui",
+				"ids.join_eui",
 				"provisioner_id",
 				"provisioning_data",
 			}, nil
@@ -113,16 +115,18 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 
 	ret, err = reg.SetByID(ctx, pbOther.ApplicationIdentifiers, pbOther.DeviceID,
 		[]string{
-			"created_at",
+			"ids.dev_eui",
+			"ids.join_eui",
 			"provisioner_id",
 			"provisioning_data",
-			"updated_at",
 		},
 		func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if !a.So(stored, should.BeNil) {
 				t.Fatal("Registry is not empty")
 			}
 			return CopyEndDevice(pbOther), []string{
+				"ids.dev_eui",
+				"ids.join_eui",
 				"provisioner_id",
 				"provisioning_data",
 			}, nil
@@ -145,16 +149,18 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 
 	ret, err = reg.SetByID(ctx, pbOther.ApplicationIdentifiers, pbOther.DeviceID,
 		[]string{
-			"created_at",
+			"ids.dev_eui",
+			"ids.join_eui",
 			"provisioner_id",
 			"provisioning_data",
-			"updated_at",
 		},
 		func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if !a.So(stored, should.BeNil) {
 				t.Fatal("Registry is not empty")
 			}
 			return CopyEndDevice(pbOther), []string{
+				"ids.dev_eui",
+				"ids.join_eui",
 				"provisioner_id",
 				"provisioning_data",
 			}, nil
@@ -257,7 +263,6 @@ func handleKeyRegistryTest(t *testing.T, reg KeyRegistry) {
 
 	ret, err = reg.SetByID(ctx, devEUI, pb.SessionKeyID,
 		[]string{
-			"session_key_id",
 			"f_nwk_s_int_key",
 			"s_nwk_s_int_key",
 			"nwk_s_enc_key",
@@ -268,7 +273,6 @@ func handleKeyRegistryTest(t *testing.T, reg KeyRegistry) {
 				t.Fatal("Registry is not empty")
 			}
 			return CopySessionKeys(pb), []string{
-				"session_key_id",
 				"f_nwk_s_int_key",
 				"s_nwk_s_int_key",
 				"nwk_s_enc_key",
@@ -296,7 +300,6 @@ func handleKeyRegistryTest(t *testing.T, reg KeyRegistry) {
 
 	ret, err = reg.SetByID(ctx, devEUIOther, pbOther.SessionKeyID,
 		[]string{
-			"session_key_id",
 			"f_nwk_s_int_key",
 			"s_nwk_s_int_key",
 			"nwk_s_enc_key",
@@ -307,7 +310,6 @@ func handleKeyRegistryTest(t *testing.T, reg KeyRegistry) {
 				t.Fatal("Registry is not empty")
 			}
 			return CopySessionKeys(pbOther), []string{
-				"session_key_id",
 				"f_nwk_s_int_key",
 				"s_nwk_s_int_key",
 				"nwk_s_enc_key",

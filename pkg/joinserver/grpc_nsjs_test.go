@@ -1095,6 +1095,8 @@ func TestHandleJoin(t *testing.T) {
 			ret, err := devReg.SetByID(authorizedCtx, pb.ApplicationIdentifiers, pb.DeviceID,
 				[]string{
 					"created_at",
+					"ids.dev_eui",
+					"ids.join_eui",
 					"last_dev_nonce",
 					"last_join_nonce",
 					"lorawan_version",
@@ -1110,6 +1112,8 @@ func TestHandleJoin(t *testing.T) {
 						t.Fatal("Registry is not empty")
 					}
 					return CopyEndDevice(pb), []string{
+						"ids.dev_eui",
+						"ids.join_eui",
 						"last_dev_nonce",
 						"last_join_nonce",
 						"lorawan_version",
