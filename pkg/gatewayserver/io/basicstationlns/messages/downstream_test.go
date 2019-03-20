@@ -43,15 +43,15 @@ func TestDownlinkMessage(t *testing.T) {
 					DeviceID: "testdevice",
 					DevEUI:   eui64Ptr(types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}),
 				},
-				Settings: &ttnpb.DownlinkMessage_Request{
-					Request: &ttnpb.TxRequest{
-						Class:            ttnpb.CLASS_A,
-						Rx1Delay:         ttnpb.RxDelay(5),
-						Rx1DataRateIndex: 2,
-						Rx2DataRateIndex: 0,
-						Rx1Frequency:     868300000,
-						Rx2Frequency:     869525000,
-						Priority:         10,
+				Settings: &ttnpb.DownlinkMessage_Scheduled{
+					Scheduled: &ttnpb.TxSettings{
+						DataRateIndex: 2,
+						Frequency:     868500000,
+						RequestInfo: &ttnpb.RequestInfo{
+							Class:        ttnpb.CLASS_A,
+							RxWindow:     1,
+							AntennaIndex: 2,
+						},
 					},
 				},
 			},
@@ -60,12 +60,11 @@ func TestDownlinkMessage(t *testing.T) {
 				DevEUI:      basicstation.EUI{Prefix: "DevEui", EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
 				DeviceClass: 0,
 				Pdu:         "Ymxhamthc25kJ3M==",
-				RxDelay:     5,
-				Rx1DR:       2,
-				Rx2DR:       0,
-				Rx1Freq:     868300000,
-				Rx2Freq:     869525000,
-				Priority:    10,
+				RxDelay:     1,
+				Rx2DR:       2,
+				Rx2Freq:     868500000,
+				RCtx:        2,
+				Priority:    0,
 			},
 			nil,
 		},
@@ -76,6 +75,7 @@ func TestDownlinkMessage(t *testing.T) {
 			if !(a.So(err, should.BeNil)) {
 				t.Fatalf("Unexpected error: %v", err)
 			}
+			dnmsg.XTime = tc.LNSDownlinkMessage.XTime
 			if !(a.So(dnmsg, should.Resemble, tc.LNSDownlinkMessage)) {
 				t.Fatalf("Invalid DownlinkMessage: %v", dnmsg)
 			}
