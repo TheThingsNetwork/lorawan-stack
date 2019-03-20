@@ -117,6 +117,7 @@ const component = function (type) {
   case 'number':
   case 'password':
   case 'byte':
+  case 'textarea':
     return Input
 
   case 'select':

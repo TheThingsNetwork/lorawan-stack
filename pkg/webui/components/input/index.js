@@ -83,6 +83,8 @@ export default class Input extends React.Component {
     let Component = component
     if (type === 'byte') {
       Component = ByteInput
+    } else if (type === 'textarea') {
+      Component = 'textarea'
     }
 
     const v = valid && (Component.validate ? Component.validate(value, this.props) : true)

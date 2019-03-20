@@ -16,7 +16,6 @@
   border-input()
   box-sizing: border-box
   width: 100%
-  height: 2.3rem
   background: white
   border-radius: $br.s
   padding: 0
@@ -68,6 +67,7 @@
   display: inline-block
   flex-grow: 2
   z-index: 10
+  height: 2.3rem
 
   &[type='password']
     letter-spacing: 1px
@@ -110,3 +110,8 @@
 .icon
   nudge('down')
   padding-left: $cs.xs
+
+textarea.input
+  padding: $cs.xs
+  min-height: 5rem
+  height: auto
