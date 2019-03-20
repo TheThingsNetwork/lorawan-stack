@@ -39,10 +39,6 @@ const (
 type Frontend interface {
 	// Protocol returns the protocol used in the frontend.
 	Protocol() string
-	// HasScheduler indicates whether the gateway has a scheduler.
-	// If so, downlink requests are sent to the gateway.
-	// If not, the Gateway Server scheduler schedules the request, and the transmission settings are sent to the gateway.
-	HasScheduler() bool
 }
 
 // Server represents the Gateway Server to gateway frontends.
@@ -119,9 +115,6 @@ func (c *Connection) Disconnect(err error) {
 // Protocol returns the protocol used for the connection, i.e. grpc, mqtt or udp.
 func (c *Connection) Protocol() string { return c.protocol }
 
-// HasScheduler returns whether the connection has a scheduler.
-func (c *Connection) HasScheduler() bool { return c.scheduler != nil }
-
 // Gateway returns the gateway entity.
 func (c *Connection) Gateway() *ttnpb.Gateway { return c.gateway }
 
@@ -143,6 +136,7 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage) error {
 			"server_time", up.ReceivedAt,
 		)).Debug("Synchronized server absolute time only")
 	}
+
 	for _, md := range up.RxMetadata {
 		if md.AntennaIndex != 0 {
 			// TODO: Support downlink path to multiple antennas (https://github.com/TheThingsNetwork/lorawan-stack/issues/48)
@@ -241,40 +235,40 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 		return 0, errNotTxRequest
 	}
 	var delay time.Duration
-	// If the connection has no scheduler, scheduling is done by the gateway scheduler.
-	// Otherwise, scheduling is done by the Gateway Server scheduler. This converts TxRequest to TxSettings.
-	if c.scheduler != nil {
-		logger := log.FromContext(c.ctx).WithField("class", request.Class)
-		logger.Debug("Attempt to schedule downlink on gateway")
-		ids, uplinkTimestamp, err := getDownlinkPath(path, request.Class)
-		if err != nil {
-			return 0, err
+	logger := log.FromContext(c.ctx).WithField("class", request.Class)
+	logger.Debug("Attempt to schedule downlink on gateway")
+	ids, uplinkTimestamp, err := getDownlinkPath(path, request.Class)
+	if err != nil {
+		return 0, err
+	}
+	band, err := band.GetByID(c.fp.BandID)
+	if err != nil {
+		return 0, err
+	}
+	var errRxDetails []interface{}
+	for i, rx := range []struct {
+		dataRateIndex ttnpb.DataRateIndex
+		frequency     uint64
+		delay         time.Duration
+	}{
+		{
+			dataRateIndex: request.Rx1DataRateIndex,
+			frequency:     request.Rx1Frequency,
+			delay:         0,
+		},
+		{
+			dataRateIndex: request.Rx2DataRateIndex,
+			frequency:     request.Rx2Frequency,
+			delay:         time.Second,
+		},
+	} {
+		rx1Delay := time.Duration(request.Rx1Delay) * time.Second
+		if rx1Delay == 0 {
+			rx1Delay = time.Second // RX_DELAY_0 is valid, and 1 second.
 		}
 		phy, err := band.GetByID(c.fp.BandID)
 		if err != nil {
 			return 0, err
-		}
-		var errRxDetails []interface{}
-		for i, rx := range []struct {
-			dataRateIndex ttnpb.DataRateIndex
-			frequency     uint64
-			delay         time.Duration
-		}{
-			{
-				dataRateIndex: request.Rx1DataRateIndex,
-				frequency:     request.Rx1Frequency,
-				delay:         0,
-			},
-			{
-				dataRateIndex: request.Rx2DataRateIndex,
-				frequency:     request.Rx2Frequency,
-				delay:         time.Second,
-			},
-		} {
-			rx1Delay := time.Duration(request.Rx1Delay) * time.Second
-			if rx1Delay == 0 {
-				rx1Delay = time.Second // RX_DELAY_0 is valid, and 1 second.
-			}
 			rxDelay := rx1Delay + rx.delay
 			if rx.frequency == 0 {
 				errRxDetails = append(errRxDetails, errRxEmpty)
@@ -286,68 +280,84 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 				"data_rate_index", rx.dataRateIndex,
 			))
 			logger.Debug("Attempt to schedule downlink in receive window")
-			dataRate := phy.DataRates[rx.dataRateIndex].Rate
+			dataRate := band.DataRates[rx.dataRateIndex].Rate
 			if dataRate == (ttnpb.DataRate{}) {
 				return 0, errDataRate.WithAttributes("index", rx.dataRateIndex)
 			}
 			// The maximum payload size is MACPayload only; for PHYPayload take MHDR (1 byte) and MIC (4 bytes) into account.
-			maxPHYLength := phy.DataRates[rx.dataRateIndex].DefaultMaxSize.PayloadSize(c.fp.DwellTime.GetDownlinks()) + 5
+			maxPHYLength := band.DataRates[rx.dataRateIndex].DefaultMaxSize.PayloadSize(c.fp.DwellTime.GetDownlinks()) + 5
 			if len(msg.RawPayload) > int(maxPHYLength) {
 				return 0, errTooLong.WithAttributes(
 					"payload_length", len(msg.RawPayload),
 					"maximum_length", maxPHYLength,
 					"data_rate_index", rx.dataRateIndex,
 				)
-			}
-			eirp := phy.DefaultMaxEIRP
-			if sb, ok := phy.FindSubBand(rx.frequency); ok {
-				eirp = sb.MaxEIRP
-			}
-			if c.fp.MaxEIRP != nil && *c.fp.MaxEIRP < eirp {
-				eirp = *c.fp.MaxEIRP
-			}
-			settings := ttnpb.TxSettings{
-				DataRateIndex: rx.dataRateIndex,
-				Frequency:     rx.frequency,
-				Downlink: &ttnpb.TxSettings_Downlink{
-					TxPower:      eirp,
-					AntennaIndex: ids.AntennaIndex,
-				},
-			}
-			if int(ids.AntennaIndex) < len(c.gateway.Antennas) {
-				settings.Downlink.TxPower -= c.gateway.Antennas[ids.AntennaIndex].Gain
-			}
-			settings.DataRate = dataRate
-			if dr := dataRate.GetLoRa(); dr != nil {
-				settings.CodingRate = phy.LoRaCodingRate
-				settings.Downlink.InvertPolarization = true
-			}
-			var f func(context.Context, int, ttnpb.TxSettings, scheduling.RTTs, ttnpb.TxSchedulePriority) (scheduling.Emission, error)
-			switch request.Class {
-			case ttnpb.CLASS_A:
-				f = c.scheduler.ScheduleAt
-				settings.Timestamp = uplinkTimestamp + uint32(rxDelay/time.Microsecond)
-			case ttnpb.CLASS_B:
-				f = c.scheduler.ScheduleAnytime
-			case ttnpb.CLASS_C:
-				if request.AbsoluteTime != nil {
+				BadStmt
+
+				if dataRate == (ttnpb.DataRate{}) {
+					return 0, errDataRate.WithAttributes("index", rx.dataRateIndex)
+				}
+				// The maximum payload size is MACPayload only; for PHYPayload take MHDR (1 byte) and MIC (4 bytes) into account.
+				maxPHYLength := phy.DataRates[rx.dataRateIndex].DefaultMaxSize.PayloadSize(c.fp.DwellTime.GetDownlinks()) + 5
+				if len(msg.RawPayload) > int(maxPHYLength) {
+					return 0, errTooLong.WithAttributes(
+						"payload_length", len(msg.RawPayload),
+						"maximum_length", maxPHYLength,
+						"data_rate_index", rx.dataRateIndex,
+					)
+				}
+				eirp := phy.DefaultMaxEIRP
+				if sb, ok := phy.FindSubBand(rx.frequency); ok {
+					eirp = sb.MaxEIRP
+				}
+				if c.fp.MaxEIRP != nil && *c.fp.MaxEIRP < eirp {
+					eirp = *c.fp.MaxEIRP
+				}
+				settings := ttnpb.TxSettings{
+					DataRateIndex: rx.dataRateIndex,
+					Frequency:     rx.frequency,
+					Downlink: &ttnpb.TxSettings_Downlink{
+						TxPower:      eirp,
+						AntennaIndex: ids.AntennaIndex,
+					},
+				}
+				if int(ids.AntennaIndex) < len(c.gateway.Antennas) {
+					settings.Downlink.TxPower -= c.gateway.Antennas[ids.AntennaIndex].Gain
+				}
+				settings.DataRate = dataRate
+				if dr := dataRate.GetLoRa(); dr != nil {
+					settings.CodingRate = phy.LoRaCodingRate
+					settings.Downlink.InvertPolarization = true
+				}
+				var f func(context.Context, int, ttnpb.TxSettings, scheduling.RTTs, ttnpb.TxSchedulePriority) (scheduling.Emission, error)
+				switch request.Class {
+				case ttnpb.CLASS_A:
 					f = c.scheduler.ScheduleAt
 					abs := *request.AbsoluteTime
 					settings.Time = &abs
-				} else {
-					f = c.scheduler.ScheduleAnytime
 				}
-			default:
-				panic(fmt.Sprintf("proto: unexpected class %v in oneof", request.Class))
+
+				if err != nil {
+					logger.WithError(err).Debug("Failed to schedule downlink in Rx window")
+					errRxDetails = append(errRxDetails, errRxWindowSchedule.WithCause(err).WithAttributes("window", i+1))
+					continue
+				}
+				settings.Time = nil
+				settings.Timestamp = uint32(time.Duration(em.Starts()) / time.Microsecond)
+				msg.Settings = &ttnpb.DownlinkMessage_Scheduled{
+					Scheduled: &settings,
+				}
+				errRxDetails = nil
+				if now, ok := c.scheduler.Now(); ok {
+					logger = logger.WithField("now", now)
+					delay = time.Duration(em.Starts() - now)
+				}
+				logger.WithFields(log.Fields(
+					"starts", em.Starts(),
+					"duration", em.Duration(),
+				)).Debug("Scheduled downlink")
+				break
 			}
-			em, err := f(c.ctx, len(msg.RawPayload), settings, c.rtts, request.Priority)
-			if err != nil {
-				logger.WithError(err).Debug("Failed to schedule downlink in Rx window")
-				errRxDetails = append(errRxDetails, errRxWindowSchedule.WithCause(err).WithAttributes("window", i+1))
-				continue
-			}
-			settings.Time = nil
-			settings.Timestamp = uint32(time.Duration(em.Starts()) / time.Microsecond)
 			msg.Settings = &ttnpb.DownlinkMessage_Scheduled{
 				Scheduled: &settings,
 			}
@@ -365,21 +375,20 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 		if errRxDetails != nil {
 			return 0, errTxSchedule.WithDetails(errRxDetails...)
 		}
+		select {
+		case <-c.ctx.Done():
+			return 0, c.ctx.Err()
+		case c.downCh <- msg:
+			atomic.AddUint64(&c.downlinks, 1)
+			atomic.StoreInt64(&c.lastDownlinkTime, time.Now().UnixNano())
+		default:
+			return 0, errBufferFull
+		}
+		return delay, nil
 	}
-	select {
-	case <-c.ctx.Done():
-		return 0, c.ctx.Err()
-	case c.downCh <- msg:
-		atomic.AddUint64(&c.downlinks, 1)
-		atomic.StoreInt64(&c.lastDownlinkTime, time.Now().UnixNano())
-	default:
-		return 0, errBufferFull
-	}
-	return delay, nil
-}
 
-// Status returns the status channel.
-func (c *Connection) Status() <-chan *ttnpb.GatewayStatus {
+	// Status returns the status channel.
+	(func(c *Connection) Status)() <- BadExpr
 	return c.statusCh
 }
 

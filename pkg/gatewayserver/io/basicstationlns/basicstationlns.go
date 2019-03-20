@@ -20,7 +20,7 @@ import (
 	"fmt"
 
 	"github.com/gorilla/websocket"
-	"github.com/labstack/echo"
+	echo "github.com/labstack/echo/v4"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/basicstation"
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -42,8 +42,7 @@ type srv struct {
 	upgrader *websocket.Upgrader
 }
 
-func (*srv) Protocol() string   { return "basicstation" }
-func (*srv) HasScheduler() bool { return true }
+func (*srv) Protocol() string { return "basicstation" }
 
 // New returns a new Basic Station frontend that can be registered in the web server.
 func New(ctx context.Context, server io.Server) web.Registerer {
