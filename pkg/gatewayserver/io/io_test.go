@@ -69,7 +69,6 @@ func Test(t *testing.T) {
 	a.So(time.Since(conn.ConnectTime()), should.BeLessThan, timeout)
 	a.So(conn.Gateway(), should.Resemble, gtw)
 	a.So(conn.Protocol(), should.Equal, "mock")
-	a.So(conn.HasScheduler(), should.BeTrue)
 
 	{
 		frontend.Up <- &ttnpb.UplinkMessage{

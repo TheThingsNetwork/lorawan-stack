@@ -85,8 +85,7 @@ type connection struct {
 	io      *io.Connection
 }
 
-func (*connection) Protocol() string   { return "mqtt" }
-func (*connection) HasScheduler() bool { return false }
+func (*connection) Protocol() string { return "mqtt" }
 
 func (c *connection) setup(ctx context.Context) error {
 	ctx = auth.NewContextWithInterface(ctx, c)
