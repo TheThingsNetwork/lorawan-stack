@@ -1,6 +1,8 @@
-/* @johanstokking
+/ @johanstokking
 
-/.make,/.mage @htdvisser @rvolosatovs
+/.make @htdvisser @rvolosatovs
+/.mage @htdvisser @rvolosatovs
+
 /api @johanstokking @htdvisser @rvolosatovs
 /cmd @johanstokking @htdvisser @rvolosatovs
 /doc @TheThingsNetwork/stack-developers
