@@ -16,10 +16,10 @@ package messages
 
 import (
 	"encoding/json"
+	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/basicstation"
 	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -55,41 +55,35 @@ func (dnmsg DownlinkMessage) MarshalJSON() ([]byte, error) {
 
 // GetFromNSDownlinkMessage ...
 func (dnmsg *DownlinkMessage) GetFromNSDownlinkMessage(ids ttnpb.GatewayIdentifiers, down ttnpb.DownlinkMessage) error {
-	txReq := down.GetRequest()
+	scheduledMsg := down.GetScheduled()
 	dnmsg.DevEUI = basicstation.EUI{Prefix: "DevEui", EUI64: *down.EndDeviceIDs.DevEUI}
 	dnmsg.Pdu = string(down.GetRawPayload())
-	dnmsg.DeviceClass = uint(txReq.Class)
-	dnmsg.RxDelay = int(txReq.Rx1Delay)
 
-	//TODO: Check if this is from Band or FP
-	dnmsg.Rx1DR = int(txReq.Rx1DataRateIndex)
-	dnmsg.Rx1Freq = int(txReq.Rx1Frequency)
-	dnmsg.Rx2DR = int(txReq.Rx2DataRateIndex)
-	dnmsg.Rx2Freq = int(txReq.Rx2Frequency)
-
-	dnmsg.Priority = int(txReq.Priority)
-
-	//TODO: Use GS Scheduler similar to the other frontends:
-	for _, path := range txReq.DownlinkPaths {
-		fixedPath := path.GetFixed()
-		if fixedPath != nil {
-			if fixedPath.GatewayID == ids.GatewayID {
-				dnmsg.RCtx = int64(fixedPath.AntennaIndex)
-				break
-			}
-			continue
-		}
-		if token := path.GetUplinkToken(); len(token) == 0 {
-			antennaIDs, timestamp, err := io.ParseUplinkToken(token)
-			if err != nil {
-				return errDownlinkMessage
-			}
-			if antennaIDs.GatewayID == ids.GatewayID {
-				dnmsg.RCtx = int64(antennaIDs.AntennaIndex)
-				dnmsg.XTime = int64(timestamp)
-				break
-			}
-		}
+	// TODO: Use Class_B for absolute timebound scheduling
+	if (scheduledMsg.RequestInfo.Class == ttnpb.CLASS_A) || (scheduledMsg.RequestInfo.Class == ttnpb.CLASS_C) {
+		dnmsg.DeviceClass = uint(ttnpb.CLASS_A)
+	} else {
+		dnmsg.DeviceClass = uint(ttnpb.CLASS_B)
 	}
+
+	// TODO: Choose a Sane value
+	dnmsg.Priority = int(0)
+
+	// The gateway is made to think that it's RX2 even if the network chooses RX1.
+	// This way the network will enforce the chosen window instead of the gateway trying it's internal RX2.
+	dnmsg.Rx2DR = int(scheduledMsg.DataRateIndex)
+	dnmsg.Rx2Freq = int(scheduledMsg.Frequency)
+
+	dnmsg.RxDelay = 1
+
+	var xtime int64
+	if scheduledMsg.RequestInfo.RxWindow == 0 {
+		xtime = time.Now().Add(time.Duration(-1) * time.Minute).Unix()
+	} else {
+		xtime = time.Now().Add(time.Duration(-2) * time.Minute).Unix()
+	}
+	dnmsg.XTime = xtime
+	dnmsg.RCtx = int64(scheduledMsg.RequestInfo.AntennaIndex)
+
 	return nil
 }
