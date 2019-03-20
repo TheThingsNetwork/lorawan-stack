@@ -113,7 +113,7 @@ export default class Device extends React.Component {
           </Row>
         </Container>
         <Switch>
-          <Route exact path={`${match.path}`} component={DeviceOverview} />
+          <Route exact path={match.path} component={DeviceOverview} />
         </Switch>
       </React.Fragment>
     )
