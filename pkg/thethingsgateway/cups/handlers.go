@@ -17,12 +17,12 @@ package cups
 import (
 	"context"
 	"fmt"
-	"github.com/gogo/protobuf/types"
 	"net"
 	"net/http"
 	"net/url"
 	"strings"
 
+	"github.com/gogo/protobuf/types"
 	echo "github.com/labstack/echo/v4"
 	"go.thethings.network/lorawan-stack/pkg/pfconfig/shared"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
