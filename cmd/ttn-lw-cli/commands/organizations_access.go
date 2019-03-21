@@ -278,7 +278,12 @@ var (
 )
 
 var organizationRightsFlags = rightsFlags(func(flag string) bool {
-	return strings.HasPrefix(flag, "right-organization")
+	for _, entity := range []string{"application", "client", "gateway", "organization"} {
+		if strings.HasPrefix(flag, "right-"+entity) {
+			return true
+		}
+	}
+	return false
 })
 
 func init() {
