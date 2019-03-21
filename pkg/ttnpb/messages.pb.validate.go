@@ -428,7 +428,14 @@ func (m *ApplicationUplink) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "session_key_id":
-			// no validation rules for SessionKeyID
+
+			if len(m.GetSessionKeyID()) > 2048 {
+				return ApplicationUplinkValidationError{
+					field:  "session_key_id",
+					reason: "value length must be at most 2048 bytes",
+				}
+			}
+
 		case "f_port":
 
 			if m.GetFPort() > 255 {
@@ -691,7 +698,14 @@ func (m *ApplicationJoinAccept) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "session_key_id":
-			// no validation rules for SessionKeyID
+
+			if len(m.GetSessionKeyID()) > 2048 {
+				return ApplicationJoinAcceptValidationError{
+					field:  "session_key_id",
+					reason: "value length must be at most 2048 bytes",
+				}
+			}
+
 		case "app_s_key":
 
 			if v, ok := interface{}(m.GetAppSKey()).(interface{ ValidateFields(...string) error }); ok {
@@ -805,7 +819,14 @@ func (m *ApplicationDownlink) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "session_key_id":
-			// no validation rules for SessionKeyID
+
+			if len(m.GetSessionKeyID()) > 2048 {
+				return ApplicationDownlinkValidationError{
+					field:  "session_key_id",
+					reason: "value length must be at most 2048 bytes",
+				}
+			}
+
 		case "f_port":
 
 			if m.GetFPort() > 255 {

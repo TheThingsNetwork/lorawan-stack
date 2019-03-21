@@ -148,12 +148,12 @@ message DeleteInvitationRequest {
 
 message UserSessionIdentifiers {
   UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
-  string session_id = 2 [(gogoproto.customname) = "SessionID"];
+  string session_id = 2 [(gogoproto.customname) = "SessionID", (validate.rules).string.max_len = 64];
 }
 
 message UserSession {
   UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
-  string session_id = 2 [(gogoproto.customname) = "SessionID"];
+  string session_id = 2 [(gogoproto.customname) = "SessionID", (validate.rules).string.max_len = 64];
   google.protobuf.Timestamp created_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   google.protobuf.Timestamp updated_at = 4 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   google.protobuf.Timestamp expires_at = 5 [(gogoproto.stdtime) = true];

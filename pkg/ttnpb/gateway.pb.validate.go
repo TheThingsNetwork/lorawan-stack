@@ -135,9 +135,37 @@ func (m *GatewayModel) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "brand_id":
-			// no validation rules for BrandID
+
+			if utf8.RuneCountInString(m.GetBrandID()) > 36 {
+				return GatewayModelValidationError{
+					field:  "brand_id",
+					reason: "value length must be at most 36 runes",
+				}
+			}
+
+			if !_GatewayModel_BrandID_Pattern.MatchString(m.GetBrandID()) {
+				return GatewayModelValidationError{
+					field:  "brand_id",
+					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+				}
+			}
+
 		case "id":
-			// no validation rules for ID
+
+			if utf8.RuneCountInString(m.GetID()) > 36 {
+				return GatewayModelValidationError{
+					field:  "id",
+					reason: "value length must be at most 36 runes",
+				}
+			}
+
+			if !_GatewayModel_ID_Pattern.MatchString(m.GetID()) {
+				return GatewayModelValidationError{
+					field:  "id",
+					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+				}
+			}
+
 		case "name":
 			// no validation rules for Name
 		default:
@@ -204,6 +232,10 @@ var _ interface {
 	ErrorName() string
 } = GatewayModelValidationError{}
 
+var _GatewayModel_BrandID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+
+var _GatewayModel_ID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+
 // ValidateFields checks the field values on GatewayVersionIdentifiers with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -220,9 +252,37 @@ func (m *GatewayVersionIdentifiers) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "brand_id":
-			// no validation rules for BrandID
+
+			if utf8.RuneCountInString(m.GetBrandID()) > 36 {
+				return GatewayVersionIdentifiersValidationError{
+					field:  "brand_id",
+					reason: "value length must be at most 36 runes",
+				}
+			}
+
+			if !_GatewayVersionIdentifiers_BrandID_Pattern.MatchString(m.GetBrandID()) {
+				return GatewayVersionIdentifiersValidationError{
+					field:  "brand_id",
+					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+				}
+			}
+
 		case "model_id":
-			// no validation rules for ModelID
+
+			if utf8.RuneCountInString(m.GetModelID()) > 36 {
+				return GatewayVersionIdentifiersValidationError{
+					field:  "model_id",
+					reason: "value length must be at most 36 runes",
+				}
+			}
+
+			if !_GatewayVersionIdentifiers_ModelID_Pattern.MatchString(m.GetModelID()) {
+				return GatewayVersionIdentifiersValidationError{
+					field:  "model_id",
+					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+				}
+			}
+
 		case "hardware_version":
 			// no validation rules for HardwareVersion
 		case "firmware_version":
@@ -293,6 +353,10 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = GatewayVersionIdentifiersValidationError{}
+
+var _GatewayVersionIdentifiers_BrandID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+
+var _GatewayVersionIdentifiers_ModelID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
 // ValidateFields checks the field values on GatewayRadio with the rules
 // defined in the proto definition for this message. If any rules are
@@ -639,7 +703,14 @@ func (m *Gateway) ValidateFields(paths ...string) error {
 		case "update_channel":
 			// no validation rules for UpdateChannel
 		case "frequency_plan_id":
-			// no validation rules for FrequencyPlanID
+
+			if utf8.RuneCountInString(m.GetFrequencyPlanID()) > 64 {
+				return GatewayValidationError{
+					field:  "frequency_plan_id",
+					reason: "value length must be at most 64 runes",
+				}
+			}
+
 		case "antennas":
 
 			for idx, item := range m.Antennas {

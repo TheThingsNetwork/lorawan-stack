@@ -1869,7 +1869,14 @@ func (m *UserSessionIdentifiers) ValidateFields(paths ...string) error {
 			}
 
 		case "session_id":
-			// no validation rules for SessionID
+
+			if utf8.RuneCountInString(m.GetSessionID()) > 64 {
+				return UserSessionIdentifiersValidationError{
+					field:  "session_id",
+					reason: "value length must be at most 64 runes",
+				}
+			}
+
 		default:
 			return UserSessionIdentifiersValidationError{
 				field:  name,
@@ -1964,7 +1971,14 @@ func (m *UserSession) ValidateFields(paths ...string) error {
 			}
 
 		case "session_id":
-			// no validation rules for SessionID
+
+			if utf8.RuneCountInString(m.GetSessionID()) > 64 {
+				return UserSessionValidationError{
+					field:  "session_id",
+					reason: "value length must be at most 64 runes",
+				}
+			}
+
 		case "created_at":
 
 			if v, ok := interface{}(&m.CreatedAt).(interface{ ValidateFields(...string) error }); ok {

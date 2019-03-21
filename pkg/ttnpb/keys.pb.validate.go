@@ -131,7 +131,14 @@ func (m *RootKeys) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "root_key_id":
-			// no validation rules for RootKeyID
+
+			if utf8.RuneCountInString(m.GetRootKeyID()) > 2048 {
+				return RootKeysValidationError{
+					field:  "root_key_id",
+					reason: "value length must be at most 2048 runes",
+				}
+			}
+
 		case "app_key":
 
 			if v, ok := interface{}(m.GetAppKey()).(interface{ ValidateFields(...string) error }); ok {
@@ -236,7 +243,14 @@ func (m *SessionKeys) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "session_key_id":
-			// no validation rules for SessionKeyID
+
+			if len(m.GetSessionKeyID()) > 2048 {
+				return SessionKeysValidationError{
+					field:  "session_key_id",
+					reason: "value length must be at most 2048 bytes",
+				}
+			}
+
 		case "f_nwk_s_int_key":
 
 			if v, ok := interface{}(m.GetFNwkSIntKey()).(interface{ ValidateFields(...string) error }); ok {
