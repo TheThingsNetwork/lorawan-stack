@@ -38,7 +38,7 @@ func TestAddTask(t *testing.T) {
 	defer flush()
 	defer cl.Close()
 
-	err := AddTask(cl, cl.Key("testKey"), 10, "testPayload", time.Unix(0, 42))
+	err := AddTask(cl, cl.Key("testKey"), 10, "testPayload", time.Unix(0, 42), false)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -61,6 +61,43 @@ func TestAddTask(t *testing.T) {
 				Values: map[string]interface{}{
 					"start_at": fmt.Sprintf("%d", time.Unix(0, 42).UnixNano()),
 					"payload":  "testPayload",
+				},
+			})
+		}
+	}
+
+	err = AddTask(cl, cl.Key("testKey"), 10, "testPayload", time.Unix(0, 42), true)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+
+	rets, err = cl.Client.XRead(&redis.XReadArgs{
+		Streams: []string{InputTaskKey(cl.Key("testKey")), "0"},
+		Count:   10,
+		Block:   -1,
+	}).Result()
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+
+	if a.So(rets, should.HaveLength, 1) {
+		a.So(rets[0].Stream, should.Equal, InputTaskKey(cl.Key("testKey")))
+		if a.So(rets[0].Messages, should.HaveLength, 2) {
+			msg0 := rets[0].Messages[0]
+			a.So(msg0, should.Resemble, redis.XMessage{
+				ID: msg0.ID,
+				Values: map[string]interface{}{
+					"start_at": fmt.Sprintf("%d", time.Unix(0, 42).UnixNano()),
+					"payload":  "testPayload",
+				},
+			})
+			msg1 := rets[0].Messages[1]
+			a.So(msg1, should.Resemble, redis.XMessage{
+				ID: msg1.ID,
+				Values: map[string]interface{}{
+					"start_at": fmt.Sprintf("%d", time.Unix(0, 42).UnixNano()),
+					"payload":  "testPayload",
+					"replace":  "1",
 				},
 			})
 		}
@@ -499,7 +536,8 @@ func TestTaskQueue(t *testing.T) {
 		}
 	}()
 
-	ctx, _ := context.WithDeadline(test.Context(), time.Now().Add(-1))
+	ctx, ctxCancel := context.WithDeadline(test.Context(), time.Now().Add(-1))
+	defer ctxCancel()
 	req := newPopReq(ctx)
 	popReqCh <- req
 
@@ -528,7 +566,7 @@ func TestTaskQueue(t *testing.T) {
 	case <-time.After(10 * test.Delay):
 	}
 
-	err = q.Add("testPayload", time.Unix(0, 0))
+	err = q.Add("testPayload", time.Unix(0, 0), false)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -548,17 +586,37 @@ func TestTaskQueue(t *testing.T) {
 		t.Fatal("Timed out waiting for Pop to call f")
 	}
 
-	err = q.Add("0", time.Unix(0, 42))
+	err = q.Add("0", time.Unix(0, 42), false)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 
-	err = q.Add("1", time.Unix(42, 0))
+	err = q.Add("1", time.Now().Add(time.Hour), false)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 
-	err = q.Add("2", time.Unix(42, 42))
+	err = q.Add("1", time.Now().Add(2*time.Hour), true)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+
+	err = q.Add("1", time.Unix(13, 0), false)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+
+	err = q.Add("1", time.Unix(42, 0), true)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+
+	err = q.Add("2", time.Now().Add(42*time.Hour), true)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+
+	err = q.Add("2", time.Unix(42, 42), true)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -603,7 +661,7 @@ func TestTaskQueue(t *testing.T) {
 
 	cancel()
 	// Unblock DispatchTasks in Run()
-	err = q.Add("42", time.Unix(0, 0))
+	err = q.Add("42", time.Unix(0, 0), true)
 	a.So(err, should.BeNil)
 
 	select {
