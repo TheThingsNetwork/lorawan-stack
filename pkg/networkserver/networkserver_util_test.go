@@ -69,16 +69,16 @@ var _ DownlinkTaskQueue = MockDownlinkTaskQueue{}
 
 // MockDownlinkTaskQueue is a mock DownlinkTaskQueue used for testing.
 type MockDownlinkTaskQueue struct {
-	AddFunc func(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time) error
+	AddFunc func(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time, replace bool) error
 	PopFunc func(ctx context.Context, f func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) error) error
 }
 
 // Add calls AddFunc if set and returns nil otherwise.
-func (q MockDownlinkTaskQueue) Add(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time) error {
+func (q MockDownlinkTaskQueue) Add(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time, replace bool) error {
 	if q.AddFunc == nil {
 		return nil
 	}
-	return q.AddFunc(ctx, devID, t)
+	return q.AddFunc(ctx, devID, t, replace)
 }
 
 // Pop calls PopFunc if set and waits until read on ctx.Done() succeeds and returns ctx.Err() otherwise.

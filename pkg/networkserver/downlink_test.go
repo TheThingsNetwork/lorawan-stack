@@ -102,7 +102,7 @@ func handleDownlinkTaskQueueTest(t *testing.T, q DownlinkTaskQueue) {
 	case <-time.After(test.Delay):
 	}
 
-	err := q.Add(ctx, pbs[0], time.Unix(0, 0))
+	err := q.Add(ctx, pbs[0], time.Unix(0, 0), false)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -135,17 +135,37 @@ func handleDownlinkTaskQueueTest(t *testing.T, q DownlinkTaskQueue) {
 		t.Fatal("Timed out waiting for Pop to return")
 	}
 
-	err = q.Add(ctx, pbs[0], time.Unix(0, 42))
+	err = q.Add(ctx, pbs[0], time.Unix(0, 42), false)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 
-	err = q.Add(ctx, pbs[1], time.Unix(42, 0))
+	err = q.Add(ctx, pbs[1], time.Now().Add(time.Hour), false)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 
-	err = q.Add(ctx, pbs[2], time.Unix(42, 42))
+	err = q.Add(ctx, pbs[1], time.Now().Add(2*time.Hour), true)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+
+	err = q.Add(ctx, pbs[1], time.Unix(13, 0), false)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+
+	err = q.Add(ctx, pbs[1], time.Unix(42, 0), true)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+
+	err = q.Add(ctx, pbs[2], time.Now().Add(42*time.Hour), true)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+
+	err = q.Add(ctx, pbs[2], time.Unix(42, 42), true)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -226,7 +246,7 @@ func TestDownlinkTaskQueues(t *testing.T) {
 				return q, func() error {
 					cancel()
 					// Unblock DispatchTasks in Run()
-					err := q.Add(ctx, *ttnpb.NewPopulatedEndDeviceIdentifiers(test.Randy, false), time.Unix(0, 0))
+					err := q.Add(ctx, *ttnpb.NewPopulatedEndDeviceIdentifiers(test.Randy, false), time.Unix(0, 0), false)
 					a.So(err, should.BeNil)
 
 					select {
