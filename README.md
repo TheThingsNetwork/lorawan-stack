@@ -85,7 +85,8 @@ The easiest way to set up a private network is with the provided [`docker-compos
       --id console --name "Console" \
       --owner admin \
       --redirect-uri 'http://example.com:1885/console/oauth/callback' \
-      --redirect-uri 'https://example.com:8885/console/oauth/callback'
+      --redirect-uri 'https://example.com:8885/console/oauth/callback' \
+      --redirect-uri '/console/oauth/callback'
     ```
     Make sure to copy the value of the `secret` that is printed by this command.
 6. Export the Console's OAuth client secret or replace it in your `docker-compose.yml`:
