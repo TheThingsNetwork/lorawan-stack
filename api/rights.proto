@@ -153,7 +153,7 @@ enum Right {
 }
 
 message Rights {
-  repeated Right rights = 1;
+  repeated Right rights = 1 [(validate.rules).repeated.items.enum.defined_only = true];
 }
 
 message APIKey {
@@ -168,7 +168,7 @@ message APIKey {
   string name = 3 [(validate.rules).string.max_len = 50];
 
   // Rights that are granted to this API key.
-  repeated Right rights = 4;
+  repeated Right rights = 4 [(validate.rules).repeated.items.enum.defined_only = true];
 }
 
 message APIKeys {
@@ -177,7 +177,7 @@ message APIKeys {
 
 message Collaborator {
   OrganizationOrUserIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
-  repeated Right rights = 2;
+  repeated Right rights = 2 [(validate.rules).repeated.items.enum.defined_only = true];
 }
 
 message Collaborators {

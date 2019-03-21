@@ -49,6 +49,18 @@ func (m *Rights) ValidateFields(paths ...string) error {
 		switch name {
 		case "rights":
 
+			for idx, item := range m.GetRights() {
+				_, _ = idx, item
+
+				if _, ok := Right_name[int32(item)]; !ok {
+					return RightsValidationError{
+						field:  fmt.Sprintf("rights[%v]", idx),
+						reason: "value must be one of the defined enum values",
+					}
+				}
+
+			}
+
 		default:
 			return RightsValidationError{
 				field:  name,
@@ -142,6 +154,18 @@ func (m *APIKey) ValidateFields(paths ...string) error {
 			}
 
 		case "rights":
+
+			for idx, item := range m.GetRights() {
+				_, _ = idx, item
+
+				if _, ok := Right_name[int32(item)]; !ok {
+					return APIKeyValidationError{
+						field:  fmt.Sprintf("rights[%v]", idx),
+						reason: "value must be one of the defined enum values",
+					}
+				}
+
+			}
 
 		default:
 			return APIKeyValidationError{
@@ -331,6 +355,18 @@ func (m *Collaborator) ValidateFields(paths ...string) error {
 			}
 
 		case "rights":
+
+			for idx, item := range m.GetRights() {
+				_, _ = idx, item
+
+				if _, ok := Right_name[int32(item)]; !ok {
+					return CollaboratorValidationError{
+						field:  fmt.Sprintf("rights[%v]", idx),
+						reason: "value must be one of the defined enum values",
+					}
+				}
+
+			}
 
 		default:
 			return CollaboratorValidationError{

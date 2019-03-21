@@ -67,11 +67,11 @@ message Client {
   bool endorsed = 12;
   // OAuth flows that can be used for the client to get a token.
   // After a client is created, this field can only be modified by admins.
-  repeated GrantType grants = 13;
+  repeated GrantType grants = 13 [(validate.rules).repeated.items.enum.defined_only = true];
   // Rights denotes what rights the client will have access to.
   // Users that previously authorized this client will have to re-authorize the
   // client after rights are added to this list.
-  repeated Right rights = 14;
+  repeated Right rights = 14 [(validate.rules).repeated.items.enum.defined_only = true];
 }
 
 message Clients {

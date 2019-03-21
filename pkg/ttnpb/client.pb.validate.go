@@ -159,7 +159,31 @@ func (m *Client) ValidateFields(paths ...string) error {
 			// no validation rules for Endorsed
 		case "grants":
 
+			for idx, item := range m.GetGrants() {
+				_, _ = idx, item
+
+				if _, ok := GrantType_name[int32(item)]; !ok {
+					return ClientValidationError{
+						field:  fmt.Sprintf("grants[%v]", idx),
+						reason: "value must be one of the defined enum values",
+					}
+				}
+
+			}
+
 		case "rights":
+
+			for idx, item := range m.GetRights() {
+				_, _ = idx, item
+
+				if _, ok := Right_name[int32(item)]; !ok {
+					return ClientValidationError{
+						field:  fmt.Sprintf("rights[%v]", idx),
+						reason: "value must be one of the defined enum values",
+					}
+				}
+
+			}
 
 		default:
 			return ClientValidationError{

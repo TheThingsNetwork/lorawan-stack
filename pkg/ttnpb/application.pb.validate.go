@@ -768,6 +768,18 @@ func (m *CreateApplicationAPIKeyRequest) ValidateFields(paths ...string) error {
 
 		case "rights":
 
+			for idx, item := range m.GetRights() {
+				_, _ = idx, item
+
+				if _, ok := Right_name[int32(item)]; !ok {
+					return CreateApplicationAPIKeyRequestValidationError{
+						field:  fmt.Sprintf("rights[%v]", idx),
+						reason: "value must be one of the defined enum values",
+					}
+				}
+
+			}
+
 		default:
 			return CreateApplicationAPIKeyRequestValidationError{
 				field:  name,

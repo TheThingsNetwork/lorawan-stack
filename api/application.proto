@@ -78,7 +78,7 @@ message UpdateApplicationRequest {
 message CreateApplicationAPIKeyRequest {
   ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   string name = 2 [(validate.rules).string.max_len = 50];
-  repeated Right rights = 3;
+  repeated Right rights = 3 [(validate.rules).repeated.items.enum.defined_only = true];;
 }
 
 message UpdateApplicationAPIKeyRequest {
