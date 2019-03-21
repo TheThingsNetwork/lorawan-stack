@@ -4445,6 +4445,15 @@
       "file": "javascript.go"
     }
   },
+  "error:pkg/thethingsgateway/cups:unauthenticated": {
+    "translations": {
+      "en": "call was not authenticated"
+    },
+    "description": {
+      "package": "pkg/thethingsgateway/cups",
+      "file": "middleware.go"
+    }
+  },
   "error:pkg/ttnpb/udp:bandwidth": {
     "translations": {
       "en": "failed to parse bandwidth"
