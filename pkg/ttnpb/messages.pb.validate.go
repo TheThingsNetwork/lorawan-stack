@@ -586,7 +586,27 @@ func (m *ApplicationLocation) ValidateFields(paths ...string) error {
 			}
 
 		case "attributes":
-			// no validation rules for Attributes
+
+			for key, val := range m.GetAttributes() {
+				_ = val
+
+				if utf8.RuneCountInString(key) > 36 {
+					return ApplicationLocationValidationError{
+						field:  fmt.Sprintf("attributes[%v]", key),
+						reason: "value length must be at most 36 runes",
+					}
+				}
+
+				if !_ApplicationLocation_Attributes_Pattern.MatchString(key) {
+					return ApplicationLocationValidationError{
+						field:  fmt.Sprintf("attributes[%v]", key),
+						reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+					}
+				}
+
+				// no validation rules for Attributes[key]
+			}
+
 		default:
 			return ApplicationLocationValidationError{
 				field:  name,
@@ -652,6 +672,8 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ApplicationLocationValidationError{}
+
+var _ApplicationLocation_Attributes_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
 // ValidateFields checks the field values on ApplicationJoinAccept with the
 // rules defined in the proto definition for this message. If any rules are

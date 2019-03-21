@@ -133,7 +133,14 @@ func (m *APIKey) ValidateFields(paths ...string) error {
 		case "key":
 			// no validation rules for Key
 		case "name":
-			// no validation rules for Name
+
+			if utf8.RuneCountInString(m.GetName()) > 50 {
+				return APIKeyValidationError{
+					field:  "name",
+					reason: "value length must be at most 50 runes",
+				}
+			}
+
 		case "rights":
 
 		default:

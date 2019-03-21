@@ -165,7 +165,7 @@ message APIKey {
   string key = 2;
 
   // User-defined (friendly) name for the API key.
-  string name = 3;
+  string name = 3 [(validate.rules).string.max_len = 50];
 
   // Rights that are granted to this API key.
   repeated Right rights = 4;

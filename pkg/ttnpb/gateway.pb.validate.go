@@ -557,11 +557,45 @@ func (m *Gateway) ValidateFields(paths ...string) error {
 			}
 
 		case "name":
-			// no validation rules for Name
+
+			if utf8.RuneCountInString(m.GetName()) > 50 {
+				return GatewayValidationError{
+					field:  "name",
+					reason: "value length must be at most 50 runes",
+				}
+			}
+
 		case "description":
-			// no validation rules for Description
+
+			if utf8.RuneCountInString(m.GetDescription()) > 2000 {
+				return GatewayValidationError{
+					field:  "description",
+					reason: "value length must be at most 2000 runes",
+				}
+			}
+
 		case "attributes":
-			// no validation rules for Attributes
+
+			for key, val := range m.GetAttributes() {
+				_ = val
+
+				if utf8.RuneCountInString(key) > 36 {
+					return GatewayValidationError{
+						field:  fmt.Sprintf("attributes[%v]", key),
+						reason: "value length must be at most 36 runes",
+					}
+				}
+
+				if !_Gateway_Attributes_Pattern.MatchString(key) {
+					return GatewayValidationError{
+						field:  fmt.Sprintf("attributes[%v]", key),
+						reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+					}
+				}
+
+				// no validation rules for Attributes[key]
+			}
+
 		case "contact_info":
 
 			for idx, item := range m.GetContactInfo() {
@@ -703,6 +737,8 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = GatewayValidationError{}
+
+var _Gateway_Attributes_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
 var _Gateway_GatewayServerAddress_Pattern = regexp.MustCompile("^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$")
 
@@ -1340,7 +1376,14 @@ func (m *CreateGatewayAPIKeyRequest) ValidateFields(paths ...string) error {
 			}
 
 		case "name":
-			// no validation rules for Name
+
+			if utf8.RuneCountInString(m.GetName()) > 50 {
+				return CreateGatewayAPIKeyRequestValidationError{
+					field:  "name",
+					reason: "value length must be at most 50 runes",
+				}
+			}
+
 		case "rights":
 
 		default:
@@ -1652,7 +1695,27 @@ func (m *GatewayAntenna) ValidateFields(paths ...string) error {
 			}
 
 		case "attributes":
-			// no validation rules for Attributes
+
+			for key, val := range m.GetAttributes() {
+				_ = val
+
+				if utf8.RuneCountInString(key) > 36 {
+					return GatewayAntennaValidationError{
+						field:  fmt.Sprintf("attributes[%v]", key),
+						reason: "value length must be at most 36 runes",
+					}
+				}
+
+				if !_GatewayAntenna_Attributes_Pattern.MatchString(key) {
+					return GatewayAntennaValidationError{
+						field:  fmt.Sprintf("attributes[%v]", key),
+						reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+					}
+				}
+
+				// no validation rules for Attributes[key]
+			}
+
 		default:
 			return GatewayAntennaValidationError{
 				field:  name,
@@ -1717,6 +1780,8 @@ var _ interface {
 	ErrorName() string
 } = GatewayAntennaValidationError{}
 
+var _GatewayAntenna_Attributes_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+
 // ValidateFields checks the field values on GatewayStatus with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -1757,7 +1822,27 @@ func (m *GatewayStatus) ValidateFields(paths ...string) error {
 			}
 
 		case "versions":
-			// no validation rules for Versions
+
+			for key, val := range m.GetVersions() {
+				_ = val
+
+				if utf8.RuneCountInString(key) > 36 {
+					return GatewayStatusValidationError{
+						field:  fmt.Sprintf("versions[%v]", key),
+						reason: "value length must be at most 36 runes",
+					}
+				}
+
+				if !_GatewayStatus_Versions_Pattern.MatchString(key) {
+					return GatewayStatusValidationError{
+						field:  fmt.Sprintf("versions[%v]", key),
+						reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+					}
+				}
+
+				// no validation rules for Versions[key]
+			}
+
 		case "antenna_locations":
 
 			for idx, item := range m.GetAntennaLocations() {
@@ -1778,7 +1863,27 @@ func (m *GatewayStatus) ValidateFields(paths ...string) error {
 		case "ip":
 
 		case "metrics":
-			// no validation rules for Metrics
+
+			for key, val := range m.GetMetrics() {
+				_ = val
+
+				if utf8.RuneCountInString(key) > 36 {
+					return GatewayStatusValidationError{
+						field:  fmt.Sprintf("metrics[%v]", key),
+						reason: "value length must be at most 36 runes",
+					}
+				}
+
+				if !_GatewayStatus_Metrics_Pattern.MatchString(key) {
+					return GatewayStatusValidationError{
+						field:  fmt.Sprintf("metrics[%v]", key),
+						reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+					}
+				}
+
+				// no validation rules for Metrics[key]
+			}
+
 		case "advanced":
 
 			if v, ok := interface{}(m.GetAdvanced()).(interface{ ValidateFields(...string) error }); ok {
@@ -1854,6 +1959,10 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = GatewayStatusValidationError{}
+
+var _GatewayStatus_Versions_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+
+var _GatewayStatus_Metrics_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
 // ValidateFields checks the field values on GatewayConnectionStats with the
 // rules defined in the proto definition for this message. If any rules are

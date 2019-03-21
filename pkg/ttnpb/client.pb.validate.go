@@ -84,11 +84,45 @@ func (m *Client) ValidateFields(paths ...string) error {
 			}
 
 		case "name":
-			// no validation rules for Name
+
+			if utf8.RuneCountInString(m.GetName()) > 50 {
+				return ClientValidationError{
+					field:  "name",
+					reason: "value length must be at most 50 runes",
+				}
+			}
+
 		case "description":
-			// no validation rules for Description
+
+			if utf8.RuneCountInString(m.GetDescription()) > 2000 {
+				return ClientValidationError{
+					field:  "description",
+					reason: "value length must be at most 2000 runes",
+				}
+			}
+
 		case "attributes":
-			// no validation rules for Attributes
+
+			for key, val := range m.GetAttributes() {
+				_ = val
+
+				if utf8.RuneCountInString(key) > 36 {
+					return ClientValidationError{
+						field:  fmt.Sprintf("attributes[%v]", key),
+						reason: "value length must be at most 36 runes",
+					}
+				}
+
+				if !_Client_Attributes_Pattern.MatchString(key) {
+					return ClientValidationError{
+						field:  fmt.Sprintf("attributes[%v]", key),
+						reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+					}
+				}
+
+				// no validation rules for Attributes[key]
+			}
+
 		case "contact_info":
 
 			for idx, item := range m.GetContactInfo() {
@@ -190,6 +224,8 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ClientValidationError{}
+
+var _Client_Attributes_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
 // ValidateFields checks the field values on Clients with the rules defined in
 // the proto definition for this message. If any rules are violated, an error

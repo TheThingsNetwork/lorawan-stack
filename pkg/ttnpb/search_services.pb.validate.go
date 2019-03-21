@@ -54,7 +54,27 @@ func (m *SearchEntitiesRequest) ValidateFields(paths ...string) error {
 		case "description_contains":
 			// no validation rules for DescriptionContains
 		case "attributes_contain":
-			// no validation rules for AttributesContain
+
+			for key, val := range m.GetAttributesContain() {
+				_ = val
+
+				if utf8.RuneCountInString(key) > 36 {
+					return SearchEntitiesRequestValidationError{
+						field:  fmt.Sprintf("attributes_contain[%v]", key),
+						reason: "value length must be at most 36 runes",
+					}
+				}
+
+				if !_SearchEntitiesRequest_AttributesContain_Pattern.MatchString(key) {
+					return SearchEntitiesRequestValidationError{
+						field:  fmt.Sprintf("attributes_contain[%v]", key),
+						reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+					}
+				}
+
+				// no validation rules for AttributesContain[key]
+			}
+
 		case "field_mask":
 
 			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
@@ -133,6 +153,8 @@ var _ interface {
 	ErrorName() string
 } = SearchEntitiesRequestValidationError{}
 
+var _SearchEntitiesRequest_AttributesContain_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+
 // ValidateFields checks the field values on SearchEndDevicesRequest with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -167,7 +189,27 @@ func (m *SearchEndDevicesRequest) ValidateFields(paths ...string) error {
 		case "description_contains":
 			// no validation rules for DescriptionContains
 		case "attributes_contain":
-			// no validation rules for AttributesContain
+
+			for key, val := range m.GetAttributesContain() {
+				_ = val
+
+				if utf8.RuneCountInString(key) > 36 {
+					return SearchEndDevicesRequestValidationError{
+						field:  fmt.Sprintf("attributes_contain[%v]", key),
+						reason: "value length must be at most 36 runes",
+					}
+				}
+
+				if !_SearchEndDevicesRequest_AttributesContain_Pattern.MatchString(key) {
+					return SearchEndDevicesRequestValidationError{
+						field:  fmt.Sprintf("attributes_contain[%v]", key),
+						reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+					}
+				}
+
+				// no validation rules for AttributesContain[key]
+			}
+
 		case "dev_eui_contains":
 			// no validation rules for DevEUIContains
 		case "join_eui_contains":
@@ -251,3 +293,5 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = SearchEndDevicesRequestValidationError{}
+
+var _SearchEndDevicesRequest_AttributesContain_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")

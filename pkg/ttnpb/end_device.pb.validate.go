@@ -1425,11 +1425,45 @@ func (m *EndDevice) ValidateFields(paths ...string) error {
 			}
 
 		case "name":
-			// no validation rules for Name
+
+			if utf8.RuneCountInString(m.GetName()) > 50 {
+				return EndDeviceValidationError{
+					field:  "name",
+					reason: "value length must be at most 50 runes",
+				}
+			}
+
 		case "description":
-			// no validation rules for Description
+
+			if utf8.RuneCountInString(m.GetDescription()) > 2000 {
+				return EndDeviceValidationError{
+					field:  "description",
+					reason: "value length must be at most 2000 runes",
+				}
+			}
+
 		case "attributes":
-			// no validation rules for Attributes
+
+			for key, val := range m.GetAttributes() {
+				_ = val
+
+				if utf8.RuneCountInString(key) > 36 {
+					return EndDeviceValidationError{
+						field:  fmt.Sprintf("attributes[%v]", key),
+						reason: "value length must be at most 36 runes",
+					}
+				}
+
+				if !_EndDevice_Attributes_Pattern.MatchString(key) {
+					return EndDeviceValidationError{
+						field:  fmt.Sprintf("attributes[%v]", key),
+						reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+					}
+				}
+
+				// no validation rules for Attributes[key]
+			}
+
 		case "version_ids":
 
 			if v, ok := interface{}(m.GetVersionIDs()).(interface{ ValidateFields(...string) error }); ok {
@@ -1472,7 +1506,36 @@ func (m *EndDevice) ValidateFields(paths ...string) error {
 			}
 
 		case "locations":
-			// no validation rules for Locations
+
+			for key, val := range m.GetLocations() {
+				_ = val
+
+				if utf8.RuneCountInString(key) > 36 {
+					return EndDeviceValidationError{
+						field:  fmt.Sprintf("locations[%v]", key),
+						reason: "value length must be at most 36 runes",
+					}
+				}
+
+				if !_EndDevice_Locations_Pattern.MatchString(key) {
+					return EndDeviceValidationError{
+						field:  fmt.Sprintf("locations[%v]", key),
+						reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+					}
+				}
+
+				if v, ok := interface{}(val).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return EndDeviceValidationError{
+							field:  fmt.Sprintf("locations[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
 		case "supports_class_b":
 			// no validation rules for SupportsClassB
 		case "supports_class_c":
@@ -1785,11 +1848,15 @@ var _ interface {
 	ErrorName() string
 } = EndDeviceValidationError{}
 
+var _EndDevice_Attributes_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+
 var _EndDevice_NetworkServerAddress_Pattern = regexp.MustCompile("^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$")
 
 var _EndDevice_ApplicationServerAddress_Pattern = regexp.MustCompile("^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$")
 
 var _EndDevice_JoinServerAddress_Pattern = regexp.MustCompile("^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$")
+
+var _EndDevice_Locations_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
 var _EndDevice_ProvisionerID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$")
 
