@@ -79,7 +79,7 @@ message Picture {
   Embedded embedded = 1;
 
   // URLs of the picture for different sizes, if available on a CDN.
-  map<uint32,string> sizes = 2;
+  map<uint32,string> sizes = 2 [(validate.rules).map.values.string.uri_ref = true];
 }
 
 message Users {

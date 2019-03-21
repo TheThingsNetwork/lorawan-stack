@@ -513,7 +513,15 @@ func (m *OAuthAuthorizationCode) ValidateFields(paths ...string) error {
 		case "code":
 			// no validation rules for Code
 		case "redirect_uri":
-			// no validation rules for RedirectURI
+
+			if _, err := url.Parse(m.GetRedirectURI()); err != nil {
+				return OAuthAuthorizationCodeValidationError{
+					field:  "redirect_uri",
+					reason: "value must be a valid URI",
+					cause:  err,
+				}
+			}
+
 		case "state":
 			// no validation rules for State
 		case "created_at":

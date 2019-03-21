@@ -370,7 +370,22 @@ func (m *Picture) ValidateFields(paths ...string) error {
 			}
 
 		case "sizes":
-			// no validation rules for Sizes
+
+			for key, val := range m.GetSizes() {
+				_ = val
+
+				// no validation rules for Sizes[key]
+
+				if _, err := url.Parse(val); err != nil {
+					return PictureValidationError{
+						field:  fmt.Sprintf("sizes[%v]", key),
+						reason: "value must be a valid URI",
+						cause:  err,
+					}
+				}
+
+			}
+
 		default:
 			return PictureValidationError{
 				field:  name,
