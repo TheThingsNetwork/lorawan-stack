@@ -190,6 +190,12 @@ var (
 			}
 
 			device.SetFields(res, append(append(nsPaths, asPaths...), jsPaths...)...)
+			if device.CreatedAt.IsZero() || (!res.CreatedAt.IsZero() && res.CreatedAt.Before(res.CreatedAt)) {
+				device.CreatedAt = res.CreatedAt
+			}
+			if res.UpdatedAt.After(device.UpdatedAt) {
+				device.UpdatedAt = res.UpdatedAt
+			}
 
 			return io.Write(os.Stdout, config.OutputFormat, device)
 		},
@@ -351,6 +357,12 @@ var (
 			}
 
 			device.SetFields(res, append(append(nsPaths, asPaths...), jsPaths...)...)
+			if device.CreatedAt.IsZero() || (!res.CreatedAt.IsZero() && res.CreatedAt.Before(res.CreatedAt)) {
+				device.CreatedAt = res.CreatedAt
+			}
+			if res.UpdatedAt.After(device.UpdatedAt) {
+				device.UpdatedAt = res.UpdatedAt
+			}
 
 			return io.Write(os.Stdout, config.OutputFormat, &device)
 		}),
@@ -432,7 +444,6 @@ var (
 				return err
 			}
 
-			res.SetFields(&device, "ids")
 			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
