@@ -16,6 +16,7 @@ package cups
 
 import (
 	echo "github.com/labstack/echo/v4"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -23,6 +24,8 @@ const (
 	gatewayIDKey       = "gateway_id"
 	frequencyPlanIDKey = "frequency_plan_id"
 )
+
+var errUnauthenticated = errors.DefineUnauthenticated("unauthenticated", "call was not authenticated")
 
 // validateAndFillGatewayIDs checks if the request contains a valid gateway ID.
 func (s *Server) validateAndFillGatewayIDs() echo.MiddlewareFunc {
@@ -36,6 +39,19 @@ func (s *Server) validateAndFillGatewayIDs() echo.MiddlewareFunc {
 			}
 			c.Set(gatewayIDKey, gatewayIDs)
 
+			return next(c)
+		}
+	}
+}
+
+// checkAuthPresence checks if the request contains the Authorization header.
+func (s *Server) checkAuthPresence() echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			authHeader := c.Request().Header.Get(echo.HeaderAuthorization)
+			if authHeader == "" {
+				return errUnauthenticated
+			}
 			return next(c)
 		}
 	}
