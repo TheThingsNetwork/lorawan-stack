@@ -20,19 +20,21 @@ import (
 	echo "github.com/labstack/echo/v4"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/web"
-	"google.golang.org/grpc"
 )
 
 // Config is the configuration of the The Things Gateay CUPS server.
 type Config struct {
-	//TODO: Add default configuration here.
+	Default struct {
+		UpdateChannel string `name:"update-channel" description:"The default update channel that the gateways should use"`
+		MQTTServer    string `name:"mqtt-server" description:"The default MQTT server that the gateways should use"`
+		FirmwareURL   string `name:"firmware-url" description:"The default URL to the firmware storage"`
+	} `name:"default" description:"Default gateway settings"`
 }
 
 // NewServer returns a new CUPS server from this config on top of the component.
 func (conf Config) NewServer(c *component.Component) *Server {
-	s := NewServer(c)
+	s := NewServer(c, conf)
 	c.RegisterWeb(s)
 	return s
 }
@@ -41,7 +43,7 @@ func (conf Config) NewServer(c *component.Component) *Server {
 type Server struct {
 	component *component.Component
 
-	auth func(context.Context, types.EUI64, string) grpc.CallOption
+	config Config
 }
 
 const compatAPIPrefix = "/api/v2"
@@ -62,8 +64,9 @@ func (s *Server) RegisterRoutes(srv *web.Server) {
 }
 
 // NewServer returns a new CUPS server on top of the given gateway registry.
-func NewServer(c *component.Component) *Server {
+func NewServer(c *component.Component, conf Config) *Server {
 	return &Server{
 		component: c,
+		config:    conf,
 	}
 }

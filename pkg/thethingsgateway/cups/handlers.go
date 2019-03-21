@@ -57,7 +57,7 @@ func (s *Server) handleGatewayInfo(c echo.Context) error {
 		response := &gatewayInfoResponse{
 			FrequencyPlanID:  gateway.FrequencyPlanID,
 			FrequencyPlanURL: freqPlanURL.String(),
-			FirmwareURL:      adaptUpdateChannel(gateway.UpdateChannel),
+			FirmwareURL:      s.adaptUpdateChannel(gateway.UpdateChannel),
 			AutoUpdate:       gateway.AutoUpdate,
 		}
 		response.Router.MQTTAddress, err = adaptGatewayAddress(gateway.GatewayServerAddress)
@@ -86,15 +86,13 @@ func (s *Server) handleFreqPlanInfo(c echo.Context) error {
 	})
 }
 
-const defaultFirmwarePath = "https://thethingsproducts.blob.core.windows.net/the-things-gateway/v1"
-
 // adaptUpdateChannel prepends the default firmware path if the channel itself is not an URL.
-func adaptUpdateChannel(channel string) string {
+func (s *Server) adaptUpdateChannel(channel string) string {
 	if channel == "" {
-		return ""
+		channel = s.config.Default.UpdateChannel
 	}
 	if _, err := url.ParseRequestURI(channel); err != nil {
-		return fmt.Sprintf("%v/%v", defaultFirmwarePath, channel)
+		return fmt.Sprintf("%v/%v", s.config.Default.FirmwareURL, channel)
 	}
 	return channel
 }
