@@ -23,8 +23,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
-const defaultFirmwarePath = "https://thethingsproducts.blob.core.windows.net/the-things-gateway/v1"
-
 func TestAdaptUpdateChannel(t *testing.T) {
 	var conf Config
 	conf.Default.UpdateChannel = "stable"
