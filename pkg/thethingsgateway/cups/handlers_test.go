@@ -19,9 +19,18 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/component"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
+const defaultFirmwarePath = "https://thethingsproducts.blob.core.windows.net/the-things-gateway/v1"
+
 func TestAdaptUpdateChannel(t *testing.T) {
+	var conf Config
+	conf.Default.UpdateChannel = "stable"
+	conf.Default.FirmwareURL = defaultFirmwarePath
+	s := conf.NewServer(component.MustNew(test.GetLogger(t), &component.Config{}))
+
 	for _, tt := range []struct {
 		Name            string
 		Channel         string
@@ -30,7 +39,7 @@ func TestAdaptUpdateChannel(t *testing.T) {
 		{
 			Name:            "Empty channel",
 			Channel:         "",
-			ExpectedChannel: "",
+			ExpectedChannel: fmt.Sprintf("%v/%v", defaultFirmwarePath, "stable"),
 		},
 		{
 			Name:            "Default stable channel",
@@ -55,7 +64,7 @@ func TestAdaptUpdateChannel(t *testing.T) {
 	} {
 		t.Run(tt.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			a.So(adaptUpdateChannel(tt.Channel), assertions.ShouldEqual, tt.ExpectedChannel)
+			a.So(s.adaptUpdateChannel(tt.Channel), assertions.ShouldEqual, tt.ExpectedChannel)
 		})
 	}
 }
@@ -159,10 +168,10 @@ func TestAdaptAuthorization(t *testing.T) {
 			},
 		},
 		{
-			Name:          "Invalid authorization",
+			Name:          "Direct API Key",
 			Authorization: "InvalidKeyFormat",
 			Assert: func(a *assertions.Assertion, auth string) {
-				a.So(auth, assertions.ShouldEqual, "")
+				a.So(auth, assertions.ShouldEqual, "InvalidKeyFormat")
 			},
 		},
 		{
