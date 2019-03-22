@@ -33,6 +33,4 @@ const Select = function ({ value, className, ...rest }) {
   )
 }
 
-Select.propTypes = {}
-
 export default Select
