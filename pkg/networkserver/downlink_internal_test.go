@@ -306,7 +306,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
 				rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
 				rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint8))].DownlinkFrequency
-				payload, _, _, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
+				genDown, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
 					band.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 					band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
 				)
@@ -322,7 +322,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				expected.MACState.RxWindowsAvailable = false
 				expected.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{}
 				expected.RecentDownlinks = append(expected.RecentDownlinks, &ttnpb.DownlinkMessage{
-					RawPayload:     payload,
+					RawPayload:     genDown.Payload,
 					CorrelationIDs: ret.RecentDownlinks[0].CorrelationIDs,
 					EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
@@ -380,7 +380,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					if rx1DRIdx < drIdx {
 						drIdx = rx1DRIdx
 					}
-					payload, _, _, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
+					genDown, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
 						band.DataRates[drIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
 					)
@@ -415,7 +415,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 									a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID1")
 									a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID2")
 									a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
-										RawPayload:     payload,
+										RawPayload:     genDown.Payload,
 										CorrelationIDs: msg.CorrelationIDs,
 										EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
 											ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
@@ -453,7 +453,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID1")
 							a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID2")
 							a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
-								RawPayload:     payload,
+								RawPayload:     genDown.Payload,
 								CorrelationIDs: msg.CorrelationIDs,
 								EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
 									ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
@@ -500,7 +500,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID1")
 								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID2")
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
-									RawPayload:     payload,
+									RawPayload:     genDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
 									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
 										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
@@ -732,7 +732,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
 				rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
 				rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint8))].DownlinkFrequency
-				payload, _, _, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
+				genDown, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
 					band.DataRates[rx1DRIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 					band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
 				)
@@ -748,7 +748,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				expected.MACState.RxWindowsAvailable = false
 				expected.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{}
 				expected.RecentDownlinks = append(expected.RecentDownlinks, &ttnpb.DownlinkMessage{
-					RawPayload:     payload,
+					RawPayload:     genDown.Payload,
 					CorrelationIDs: ret.RecentDownlinks[0].CorrelationIDs,
 					EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
@@ -802,7 +802,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
 					rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
 					rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint8))].DownlinkFrequency
-					payload, _, _, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
+					genDown, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
 						band.DataRates[rx1DRIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
 					)
@@ -822,7 +822,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID1")
 								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID2")
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
-									RawPayload:     payload,
+									RawPayload:     genDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
 									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
 										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
@@ -863,7 +863,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID1")
 								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID2")
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
-									RawPayload:     payload,
+									RawPayload:     genDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
 									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
 										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
@@ -917,7 +917,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID1")
 								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID2")
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
-									RawPayload:     payload,
+									RawPayload:     genDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
 									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
 										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
@@ -1145,7 +1145,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					t.Fatal("Invalid context")
 				}
 				fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
-				rx2Payload, _, _, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
+				rx2GenDown, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
 					band.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 					band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
 				)
@@ -1161,7 +1161,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				expected.MACState.RxWindowsAvailable = false
 				expected.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{}
 				expected.RecentDownlinks = append(expected.RecentDownlinks, &ttnpb.DownlinkMessage{
-					RawPayload:     rx2Payload,
+					RawPayload:     rx2GenDown.Payload,
 					CorrelationIDs: ret.RecentDownlinks[0].CorrelationIDs,
 					EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
@@ -1217,14 +1217,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 					fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
 					rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
 					rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint8))].DownlinkFrequency
-					rx1Payload, _, _, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
+					rx1GenDown, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
 						band.DataRates[rx1DRIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
 					)
 					if !a.So(err, should.BeNil) {
 						t.Fatalf("Failed to generate Rx1 payload: %s", err)
 					}
-					rx2Payload, _, _, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
+					rx2GenDown, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
 						band.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
 					)
@@ -1244,7 +1244,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID1")
 								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID2")
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
-									RawPayload:     rx1Payload,
+									RawPayload:     rx1GenDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
 									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
 										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
@@ -1280,7 +1280,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID1")
 								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID2")
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
-									RawPayload:     rx2Payload,
+									RawPayload:     rx2GenDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
 									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
 										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
@@ -1317,7 +1317,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID1")
 								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID2")
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
-									RawPayload:     rx1Payload,
+									RawPayload:     rx1GenDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
 									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
 										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
@@ -1358,7 +1358,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID1")
 								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID2")
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
-									RawPayload:     rx1Payload,
+									RawPayload:     rx1GenDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
 									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
 										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
@@ -1395,7 +1395,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID1")
 								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID2")
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
-									RawPayload:     rx2Payload,
+									RawPayload:     rx2GenDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
 									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
 										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
@@ -1435,7 +1435,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID1")
 								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID2")
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
-									RawPayload:     rx2Payload,
+									RawPayload:     rx2GenDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
 									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
 										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
@@ -1724,7 +1724,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					t.Fatal("Invalid context")
 				}
 				fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
-				rx2Payload, _, _, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
+				rx2GenDown, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
 					band.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 					band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
 				)
@@ -1740,7 +1740,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				expected.MACState.RxWindowsAvailable = false
 				expected.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{}
 				expected.RecentDownlinks = append(expected.RecentDownlinks, &ttnpb.DownlinkMessage{
-					RawPayload:     rx2Payload,
+					RawPayload:     rx2GenDown.Payload,
 					CorrelationIDs: ret.RecentDownlinks[0].CorrelationIDs,
 					EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
@@ -1799,14 +1799,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 					fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
 					rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
 					rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint8))].DownlinkFrequency
-					rx1Payload, _, _, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
+					rx1GenDown, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
 						band.DataRates[rx1DRIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
 					)
 					if !a.So(err, should.BeNil) {
 						t.Fatalf("Failed to generate Rx1 payload: %s", err)
 					}
-					rx2Payload, _, _, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
+					rx2GenDown, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
 						band.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
 					)
@@ -1826,7 +1826,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID1")
 								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID2")
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
-									RawPayload:     rx1Payload,
+									RawPayload:     rx1GenDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
 									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
 										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
@@ -1865,7 +1865,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID1")
 								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID2")
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
-									RawPayload:     rx2Payload,
+									RawPayload:     rx2GenDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
 									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
 										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
@@ -1905,7 +1905,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID1")
 								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID2")
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
-									RawPayload:     rx1Payload,
+									RawPayload:     rx1GenDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
 									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
 										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
@@ -1952,7 +1952,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID1")
 								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID2")
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
-									RawPayload:     rx1Payload,
+									RawPayload:     rx1GenDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
 									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
 										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
@@ -1992,7 +1992,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID1")
 								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID2")
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
-									RawPayload:     rx2Payload,
+									RawPayload:     rx2GenDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
 									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
 										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
@@ -2038,7 +2038,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID1")
 								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID2")
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
-									RawPayload:     rx2Payload,
+									RawPayload:     rx2GenDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
 									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
 										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
@@ -3519,17 +3519,22 @@ func TestGenerateDownlink(t *testing.T) {
 
 			dev := CopyEndDevice(tc.Device)
 
-			b, _, appDown, err := ns.generateDownlink(tc.Context, dev, math.MaxUint16, math.MaxUint16)
-			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
-				tc.Error == nil && !a.So(err, should.BeNil) {
+			genDown, err := ns.generateDownlink(tc.Context, dev, math.MaxUint16, math.MaxUint16)
+			if tc.Error != nil {
+				a.So(err, should.EqualErrorOrDefinition, tc.Error)
+				a.So(genDown, should.BeNil)
+				return
+			}
+
+			if !a.So(err, should.BeNil) || !a.So(genDown, should.NotBeNil) {
 				t.FailNow()
 			}
 
-			a.So(b, should.Resemble, tc.Bytes)
+			a.So(genDown.Payload, should.Resemble, tc.Bytes)
 			if tc.ApplicationDownlinkAssertion != nil {
-				a.So(tc.ApplicationDownlinkAssertion(t, appDown), should.BeTrue)
+				a.So(tc.ApplicationDownlinkAssertion(t, genDown.ApplicationDownlink), should.BeTrue)
 			} else {
-				a.So(appDown, should.BeNil)
+				a.So(genDown.ApplicationDownlink, should.BeNil)
 			}
 
 			if tc.DeviceAssertion != nil {
