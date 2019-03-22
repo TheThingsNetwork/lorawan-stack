@@ -1399,9 +1399,10 @@ func handleUplinkTest() func(t *testing.T) {
 				asSendCh := make(chan asSendReq)
 
 				type downlinkTasksAddRequest struct {
-					ctx   context.Context
-					devID ttnpb.EndDeviceIdentifiers
-					t     time.Time
+					ctx     context.Context
+					devID   ttnpb.EndDeviceIdentifiers
+					t       time.Time
+					replace bool
 				}
 				downlinkAddCh := make(chan downlinkTasksAddRequest, 1)
 
@@ -1412,11 +1413,12 @@ func handleUplinkTest() func(t *testing.T) {
 						DeduplicationWindow: 42,
 						CooldownWindow:      42,
 						DownlinkTasks: &MockDownlinkTaskQueue{
-							AddFunc: func(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time) error {
+							AddFunc: func(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time, replace bool) error {
 								downlinkAddCh <- downlinkTasksAddRequest{
-									ctx:   ctx,
-									devID: devID,
-									t:     t,
+									ctx:     ctx,
+									devID:   devID,
+									t:       t,
+									replace: replace,
 								}
 								return nil
 							},
@@ -1602,6 +1604,7 @@ func handleUplinkTest() func(t *testing.T) {
 				case req := <-downlinkAddCh:
 					a.So(req.ctx, should.HaveParentContext, ctx)
 					a.So(req.devID, should.Resemble, pb.EndDeviceIdentifiers)
+					a.So(req.replace, should.BeTrue)
 					a.So([]time.Time{start, req.t, time.Now()}, should.BeChronological)
 
 				case <-time.After(Timeout):
@@ -1703,6 +1706,7 @@ func handleUplinkTest() func(t *testing.T) {
 					case req := <-downlinkAddCh:
 						a.So(req.ctx, should.HaveParentContext, ctx)
 						a.So(req.devID, should.Resemble, pb.EndDeviceIdentifiers)
+						a.So(req.replace, should.BeTrue)
 						a.So([]time.Time{start, req.t, time.Now()}, should.BeChronological)
 
 					case <-time.After(Timeout):
@@ -1990,9 +1994,10 @@ func handleJoinTest() func(t *testing.T) {
 				}
 
 				type downlinkTasksAddRequest struct {
-					ctx   context.Context
-					devID ttnpb.EndDeviceIdentifiers
-					t     time.Time
+					ctx     context.Context
+					devID   ttnpb.EndDeviceIdentifiers
+					t       time.Time
+					replace bool
 				}
 				downlinkAddCh := make(chan downlinkTasksAddRequest, 1)
 
@@ -2013,11 +2018,12 @@ func handleJoinTest() func(t *testing.T) {
 						NetID:   NetID,
 						Devices: devReg,
 						DownlinkTasks: &MockDownlinkTaskQueue{
-							AddFunc: func(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time) error {
+							AddFunc: func(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time, replace bool) error {
 								downlinkAddCh <- downlinkTasksAddRequest{
-									ctx:   ctx,
-									devID: devID,
-									t:     t,
+									ctx:     ctx,
+									devID:   devID,
+									t:       t,
+									replace: replace,
 								}
 								return nil
 							},
@@ -2236,6 +2242,7 @@ func handleJoinTest() func(t *testing.T) {
 				case req := <-downlinkAddCh:
 					a.So(req.ctx, should.HaveParentContext, ctx)
 					a.So(req.devID, should.Resemble, pb.EndDeviceIdentifiers)
+					a.So(req.replace, should.BeTrue)
 					a.So([]time.Time{start, req.t, time.Now()}, should.BeChronological)
 
 				case <-time.After(Timeout):
@@ -2328,6 +2335,7 @@ func handleJoinTest() func(t *testing.T) {
 					case req := <-downlinkAddCh:
 						a.So(req.ctx, should.HaveParentContext, ctx)
 						a.So(req.devID, should.Resemble, tc.Device.EndDeviceIdentifiers)
+						a.So(req.replace, should.BeTrue)
 						a.So([]time.Time{start, req.t, time.Now()}, should.BeChronological)
 
 					case <-time.After(Timeout):

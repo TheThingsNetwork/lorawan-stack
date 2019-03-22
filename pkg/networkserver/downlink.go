@@ -37,7 +37,7 @@ import (
 type DownlinkTaskQueue interface {
 	// Add adds downlink task for device identified by devID at time t.
 	// Implementations must ensure that Add returns fast.
-	Add(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time) error
+	Add(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time, replace bool) error
 
 	// Pop calls f on the most recent downlink task in the schedule, for which timestamp is in range [0, time.Now()],
 	// if such is available, otherwise it blocks until it is.
@@ -868,7 +868,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 		if nextDownlinkAt.IsZero() {
 			return nil
 		}
-		if err := ns.downlinkTasks.Add(ctx, devID, nextDownlinkAt); err != nil {
+		if err := ns.downlinkTasks.Add(ctx, devID, nextDownlinkAt, true); err != nil {
 			addErr = true
 			logger.WithError(err).Error("Failed to add device to downlink schedule")
 			return err

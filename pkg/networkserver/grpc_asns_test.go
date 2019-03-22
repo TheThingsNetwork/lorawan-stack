@@ -121,7 +121,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 	for _, tc := range []struct {
 		Name           string
 		ContextFunc    func(context.Context) context.Context
-		AddFunc        func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) error
+		AddFunc        func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time, bool) error
 		SetByIDFunc    func(context.Context, ttnpb.ApplicationIdentifiers, string, []string, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
 		Request        *ttnpb.DownlinkQueueRequest
 		ErrorAssertion func(*testing.T, error) bool
@@ -141,7 +141,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					},
 				})
 			},
-			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time) error {
+			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time, replace bool) error {
 				err := errors.New("AddFunc must not be called")
 				test.MustTFromContext(ctx).Error(err)
 				return err
@@ -182,7 +182,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					},
 				})
 			},
-			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time) error {
+			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time, replace bool) error {
 				err := errors.New("AddFunc must not be called")
 				test.MustTFromContext(ctx).Error(err)
 				return err
@@ -238,7 +238,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					},
 				})
 			},
-			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time) error {
+			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time, replace bool) error {
 				err := errors.New("AddFunc must not be called")
 				test.MustTFromContext(ctx).Error(err)
 				return err
@@ -308,7 +308,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					},
 				})
 			},
-			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time) error {
+			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time, replace bool) error {
 				err := errors.New("AddFunc must not be called")
 				test.MustTFromContext(ctx).Error(err)
 				return err
@@ -384,12 +384,13 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					},
 				})
 			},
-			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time) error {
+			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time, replace bool) error {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(ids, should.Resemble, ttnpb.EndDeviceIdentifiers{
 					DeviceID:               "test-dev-id",
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
 				})
+				a.So(replace, should.BeFalse)
 				a.So([]time.Time{start, at, time.Now()}, should.BeChronological)
 				return nil
 			},
@@ -465,7 +466,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					},
 				})
 			},
-			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time) error {
+			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time, replace bool) error {
 				err := errors.New("AddFunc must not be called")
 				test.MustTFromContext(ctx).Error(err)
 				return err
@@ -527,7 +528,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					},
 				})
 			},
-			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time) error {
+			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time, replace bool) error {
 				err := errors.New("AddFunc must not be called")
 				test.MustTFromContext(ctx).Error(err)
 				return err
@@ -595,7 +596,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					},
 				})
 			},
-			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time) error {
+			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time, replace bool) error {
 				err := errors.New("AddFunc must not be called")
 				test.MustTFromContext(ctx).Error(err)
 				return err
@@ -665,9 +666,9 @@ func TestDownlinkQueueReplace(t *testing.T) {
 						},
 					},
 					DownlinkTasks: &MockDownlinkTaskQueue{
-						AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time) error {
+						AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time, replace bool) error {
 							atomic.AddUint64(&addCalls, 1)
-							return tc.AddFunc(ctx, ids, at)
+							return tc.AddFunc(ctx, ids, at, replace)
 						},
 					},
 					DeduplicationWindow: 42,
@@ -707,7 +708,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 	for _, tc := range []struct {
 		Name           string
 		ContextFunc    func(context.Context) context.Context
-		AddFunc        func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) error
+		AddFunc        func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time, bool) error
 		SetByIDFunc    func(context.Context, ttnpb.ApplicationIdentifiers, string, []string, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
 		Request        *ttnpb.DownlinkQueueRequest
 		ErrorAssertion func(*testing.T, error) bool
@@ -727,7 +728,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 					},
 				})
 			},
-			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time) error {
+			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time, replace bool) error {
 				err := errors.New("AddFunc must not be called")
 				test.MustTFromContext(ctx).Error(err)
 				return err
@@ -768,7 +769,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 					},
 				})
 			},
-			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time) error {
+			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time, replace bool) error {
 				err := errors.New("AddFunc must not be called")
 				test.MustTFromContext(ctx).Error(err)
 				return err
@@ -824,7 +825,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 					},
 				})
 			},
-			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time) error {
+			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time, replace bool) error {
 				err := errors.New("AddFunc must not be called")
 				test.MustTFromContext(ctx).Error(err)
 				return err
@@ -898,7 +899,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 					},
 				})
 			},
-			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time) error {
+			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time, replace bool) error {
 				err := errors.New("AddFunc must not be called")
 				test.MustTFromContext(ctx).Error(err)
 				return err
@@ -978,12 +979,13 @@ func TestDownlinkQueuePush(t *testing.T) {
 					},
 				})
 			},
-			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time) error {
+			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time, replace bool) error {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(ids, should.Resemble, ttnpb.EndDeviceIdentifiers{
 					DeviceID:               "test-dev-id",
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
 				})
+				a.So(replace, should.BeFalse)
 				a.So([]time.Time{start, at, time.Now()}, should.BeChronological)
 				return nil
 			},
@@ -1065,9 +1067,9 @@ func TestDownlinkQueuePush(t *testing.T) {
 						},
 					},
 					DownlinkTasks: &MockDownlinkTaskQueue{
-						AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time) error {
+						AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time, replace bool) error {
 							atomic.AddUint64(&addCalls, 1)
-							return tc.AddFunc(ctx, ids, at)
+							return tc.AddFunc(ctx, ids, at, replace)
 						},
 					},
 					DeduplicationWindow: 42,

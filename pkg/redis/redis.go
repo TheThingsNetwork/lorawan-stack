@@ -185,6 +185,7 @@ func FindProtos(r redis.Cmdable, k string, keyCmd func(string) string) *ProtosCm
 
 const (
 	payloadKey = "payload"
+	replaceKey = "replace"
 	startAtKey = "start_at"
 )
 
@@ -219,9 +220,12 @@ func InitTaskGroup(r redis.Cmdable, group, k string) error {
 
 // AddTask adds a task identified by payload with timestamp startAt to the stream at InputTaskKey(k).
 // maxLen is the approximate length of the stream, to which it may be trimmed.
-func AddTask(r redis.Cmdable, k string, maxLen int64, payload string, startAt time.Time) error {
+func AddTask(r redis.Cmdable, k string, maxLen int64, payload string, startAt time.Time, replace bool) error {
 	m := make(map[string]interface{}, 2)
 	m[payloadKey] = payload
+	if replace {
+		m[replaceKey] = replace
+	}
 	if !startAt.IsZero() {
 		m[startAtKey] = startAt.UnixNano()
 	}
@@ -270,7 +274,8 @@ func DispatchTasks(r WatchCmdable, group, id string, maxLen int64, deadline time
 	if err != redis.Nil {
 		_, err := r.Pipelined(func(p redis.Pipeliner) error {
 			for i, ret := range rets {
-				zs := make([]redis.Z, 0, len(ret.Messages))
+				toAdd := make([]redis.Z, 0, len(ret.Messages))
+				toAddNX := make([]redis.Z, 0, len(ret.Messages))
 				toAck := make([]string, 0, len(ret.Messages))
 				for _, msg := range ret.Messages {
 					var score float64
@@ -280,11 +285,11 @@ func DispatchTasks(r WatchCmdable, group, id string, maxLen int64, deadline time
 							return errInvalidKeyValueType.WithAttributes("key", startAtKey)
 						}
 
-						i, err := strconv.ParseInt(s, 10, 64)
+						p, err := strconv.ParseInt(s, 10, 64)
 						if err != nil {
 							return errInvalidKeyValueType.WithAttributes("key", startAtKey).WithCause(err)
 						}
-						score = float64(i)
+						score = float64(p)
 					}
 
 					var member interface{}
@@ -297,13 +302,39 @@ func DispatchTasks(r WatchCmdable, group, id string, maxLen int64, deadline time
 					}
 
 					toAck = append(toAck, msg.ID)
-					zs = append(zs, redis.Z{
-						Member: member,
-						Score:  score,
-					})
+
+					var replace bool
+					if v, ok := msg.Values[replaceKey]; ok {
+						s, ok := v.(string)
+						if !ok {
+							return errInvalidKeyValueType.WithAttributes("key", replaceKey)
+						}
+
+						p, err := strconv.ParseBool(s)
+						if err != nil {
+							return errInvalidKeyValueType.WithAttributes("key", replaceKey).WithCause(err)
+						}
+						replace = p
+					}
+
+					if replace {
+						toAdd = append(toAdd, redis.Z{
+							Member: member,
+							Score:  score,
+						})
+					} else {
+						toAddNX = append(toAddNX, redis.Z{
+							Member: member,
+							Score:  score,
+						})
+					}
 				}
-				// TODO: Keep the minimum value in the set (https://github.com/TheThingsNetwork/lorawan-stack/issues/43)
-				p.ZAddNX(WaitingTaskKey(ks[i]), zs...)
+				if len(toAdd) > 0 {
+					p.ZAdd(WaitingTaskKey(ks[i]), toAdd...)
+				}
+				if len(toAddNX) > 0 {
+					p.ZAddNX(WaitingTaskKey(ks[i]), toAddNX...)
+				}
 				p.XAck(ret.Stream, group, toAck...)
 			}
 			return nil
@@ -472,8 +503,8 @@ func (q *TaskQueue) Run(ctx context.Context) error {
 }
 
 // Add adds a task s to the queue with a timestamp startAt.
-func (q *TaskQueue) Add(s string, startAt time.Time) error {
-	return AddTask(q.Redis, q.Key, q.MaxLen, s, startAt)
+func (q *TaskQueue) Add(s string, startAt time.Time, replace bool) error {
+	return AddTask(q.Redis, q.Key, q.MaxLen, s, startAt, replace)
 }
 
 // Pop calls f on the most recent task in the queue, for which timestamp is in range [0, time.Now()],

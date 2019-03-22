@@ -271,7 +271,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		return nil, err
 	}
 	if addDownlinkTask {
-		if err = ns.downlinkTasks.Add(ctx, dev.EndDeviceIdentifiers, time.Now()); err != nil {
+		if err = ns.downlinkTasks.Add(ctx, dev.EndDeviceIdentifiers, time.Now(), false); err != nil {
 			log.FromContext(ctx).WithError(err).Warn("Failed to add downlink task for device after set")
 		}
 	}
