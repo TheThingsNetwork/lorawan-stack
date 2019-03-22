@@ -71,6 +71,20 @@ storiesOf('Field', module)
       form={false}
     />
   ))
+  .add('Select', () => (
+    <Field
+      type="select"
+      name="foo"
+      title="Foo"
+      description="A Select field."
+      options={[
+        { value: 'amsterdam', label: 'Amsterdam' },
+        { value: 'berlin', label: 'Berlin' },
+        { value: 'dusseldorf', label: 'Düsseldorf' },
+      ]}
+      form={false}
+    />
+  ))
   .add('Error', () => (
     <Field
       name="email"
