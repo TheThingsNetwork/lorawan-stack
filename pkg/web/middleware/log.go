@@ -17,7 +17,7 @@ package middleware
 import (
 	"time"
 
-	"github.com/labstack/echo"
+	echo "github.com/labstack/echo/v4"
 	"go.thethings.network/lorawan-stack/pkg/errors/web"
 	"go.thethings.network/lorawan-stack/pkg/log"
 )

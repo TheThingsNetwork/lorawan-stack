@@ -19,7 +19,7 @@ import (
 	"net/url"
 
 	"github.com/PuerkitoBio/purell"
-	"github.com/labstack/echo"
+	echo "github.com/labstack/echo/v4"
 )
 
 // redirect are are the normalization flags that warrant a redirect.

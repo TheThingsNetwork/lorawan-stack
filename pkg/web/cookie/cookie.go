@@ -20,7 +20,7 @@ import (
 	"time"
 
 	"github.com/gorilla/securecookie"
-	"github.com/labstack/echo"
+	echo "github.com/labstack/echo/v4"
 )
 
 const (

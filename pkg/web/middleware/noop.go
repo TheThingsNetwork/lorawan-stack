@@ -14,7 +14,7 @@
 
 package middleware
 
-import "github.com/labstack/echo"
+import echo "github.com/labstack/echo/v4"
 
 // Noop is middleware that does nothing.
 func Noop(next echo.HandlerFunc) echo.HandlerFunc {

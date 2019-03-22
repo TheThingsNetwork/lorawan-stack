@@ -21,8 +21,8 @@ import (
 	"path"
 	"strings"
 
-	"github.com/labstack/echo"
-	echomiddleware "github.com/labstack/echo/middleware"
+	echo "github.com/labstack/echo/v4"
+	echomiddleware "github.com/labstack/echo/v4/middleware"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/log"

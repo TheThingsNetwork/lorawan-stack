@@ -20,8 +20,8 @@ import (
 	"net/http"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware"
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
+	echo "github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/rpclog"

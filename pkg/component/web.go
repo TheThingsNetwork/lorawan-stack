@@ -22,8 +22,8 @@ import (
 	"strings"
 
 	"github.com/heptiolabs/healthcheck"
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
+	echo "github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/metrics"
 	"go.thethings.network/lorawan-stack/pkg/web"

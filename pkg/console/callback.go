@@ -17,7 +17,7 @@ package console
 import (
 	"net/http"
 
-	"github.com/labstack/echo"
+	echo "github.com/labstack/echo/v4"
 )
 
 // Callback is the OAuth callback that accepts the authorization code

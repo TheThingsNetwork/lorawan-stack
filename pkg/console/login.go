@@ -17,7 +17,7 @@ package console
 import (
 	"net/http"
 
-	"github.com/labstack/echo"
+	echo "github.com/labstack/echo/v4"
 )
 
 // Login logs in the user by redirecting to the OAuth flow.

@@ -14,7 +14,7 @@
 
 package middleware
 
-import "github.com/labstack/echo"
+import echo "github.com/labstack/echo/v4"
 
 // Immutable set the Cache-Control header to make the resource immutable. This means the
 // client will never try to revalidate the resource.
