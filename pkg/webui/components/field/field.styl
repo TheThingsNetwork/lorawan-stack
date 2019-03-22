@@ -26,10 +26,12 @@
     .label
       width: 30%
       line-height: 2.2
-      margin-bottom: 0
 
     .description, .err, .warn
       margin-left: 30%
+
+    &.radio, &.checkbox
+      margin-bottom: 0
 
 .field
   margin-bottom: $cs.l
@@ -37,7 +39,11 @@
   flex-wrap: wrap
   width: 100%
 
-  &.checkbox
+  &:not(.horizontal)
+    .label
+      font-weight: 600
+
+  &.checkbox, &.radio
     .component
       order: 1
       width: .8rem
@@ -46,6 +52,7 @@
     .label
       one-liner()
       nudge('down')
+      font-weight: normal
       order: 2
       padding-left: $cs.xxs
       width: auto
@@ -56,9 +63,6 @@
       order: 3
       display: block
       width: 100%
-
-.title
-  font-weight: 600
 
 .reqicon
   display: none
@@ -75,6 +79,7 @@
   width:  100%
   flex-shrink: 0
   line-height: 1
+  user-select: none
 
 .description
   font-weight: normal
