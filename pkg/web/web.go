@@ -80,6 +80,7 @@ func New(ctx context.Context, config config.HTTP) (*Server, error) {
 		middleware.ID(""),
 		echomiddleware.BodyLimit("16M"),
 		echomiddleware.Secure(),
+		echomiddleware.Gzip(),
 		middleware.Recover(),
 		cookie.Cookies(blockKey, hashKey),
 	)
@@ -144,11 +145,7 @@ func (s *Server) RootGroup(prefix string, middleware ...echo.MiddlewareFunc) *ec
 func (s *Server) Static(prefix string, fs http.FileSystem, middleware ...echo.MiddlewareFunc) {
 	t := strings.TrimSuffix(prefix, "/")
 	path := path.Join(t, "*")
-	fileServer := http.StripPrefix(t, http.FileServer(fs))
-	handler := func(c echo.Context) error {
-		fileServer.ServeHTTP(c.Response().Writer, c.Request())
-		return nil
-	}
+	handler := echo.WrapHandler(http.StripPrefix(t, http.FileServer(fs)))
 	s.GET(path, handler, middleware...)
 	s.HEAD(path, handler, middleware...)
 }
