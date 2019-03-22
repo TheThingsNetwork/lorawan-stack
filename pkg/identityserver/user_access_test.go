@@ -168,6 +168,14 @@ func TestUserAccessCRUD(t *testing.T) {
 		a.So(rights.Rights, should.NotBeEmpty)
 		a.So(err, should.BeNil)
 
+		modifiedUserID := user.UserIdentifiers
+		modifiedUserID.UserID += "mod"
+
+		rights, err = reg.ListRights(ctx, &modifiedUserID, creds)
+		a.So(rights, should.NotBeNil)
+		a.So(rights.Rights, should.BeEmpty)
+		a.So(err, should.BeNil)
+
 		userAPIKeys := userAPIKeys(&user.UserIdentifiers)
 		sort.Slice(userAPIKeys.APIKeys, func(i int, j int) bool { return userAPIKeys.APIKeys[i].Name < userAPIKeys.APIKeys[j].Name })
 		apiKeys, err := reg.ListAPIKeys(ctx, &user.UserIdentifiers, creds)

@@ -207,6 +207,14 @@ func TestApplicationAccessCRUD(t *testing.T) {
 		a.So(rights.Rights, should.NotBeEmpty)
 		a.So(err, should.BeNil)
 
+		modifiedApplicationID := applicationID
+		modifiedApplicationID.ApplicationID += "mod"
+
+		rights, err = reg.ListRights(ctx, &modifiedApplicationID, creds)
+		a.So(rights, should.NotBeNil)
+		a.So(rights.Rights, should.BeEmpty)
+		a.So(err, should.BeNil)
+
 		applicationAPIKeys := applicationAPIKeys(&applicationID)
 		APIKeys, err := reg.ListAPIKeys(ctx, &applicationID, creds)
 

@@ -17,6 +17,10 @@ package identityserver
 import (
 	"context"
 
+	"github.com/gogo/protobuf/types"
+	"github.com/jinzhu/gorm"
+	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -44,6 +48,19 @@ func (is *IdentityServer) ApplicationRights(ctx context.Context, appIDs ttnpb.Ap
 			return rights.Union(universal), nil
 		}
 	}
+	if universal == nil {
+		return &ttnpb.Rights{}, nil
+	}
+	err = is.withDatabase(ctx, func(db *gorm.DB) error {
+		_, err := store.GetApplicationStore(db).GetApplication(ctx, &appIDs, &types.FieldMask{Paths: []string{"ids"}})
+		return err
+	})
+	if err != nil {
+		if errors.IsNotFound(err) {
+			return &ttnpb.Rights{}, nil
+		}
+		return nil, err
+	}
 	return universal, nil
 }
 
@@ -57,6 +74,19 @@ func (is *IdentityServer) ClientRights(ctx context.Context, cliIDs ttnpb.ClientI
 		if ids := ids.GetClientIDs(); ids != nil && ids.ClientID == cliIDs.ClientID {
 			return rights.Union(universal), nil
 		}
+	}
+	if universal == nil {
+		return &ttnpb.Rights{}, nil
+	}
+	err = is.withDatabase(ctx, func(db *gorm.DB) error {
+		_, err := store.GetClientStore(db).GetClient(ctx, &cliIDs, &types.FieldMask{Paths: []string{"ids"}})
+		return err
+	})
+	if err != nil {
+		if errors.IsNotFound(err) {
+			return &ttnpb.Rights{}, nil
+		}
+		return nil, err
 	}
 	return universal, nil
 }
@@ -72,6 +102,19 @@ func (is *IdentityServer) GatewayRights(ctx context.Context, gtwIDs ttnpb.Gatewa
 			return rights.Union(universal), nil
 		}
 	}
+	if universal == nil {
+		return &ttnpb.Rights{}, nil
+	}
+	err = is.withDatabase(ctx, func(db *gorm.DB) error {
+		_, err := store.GetGatewayStore(db).GetGateway(ctx, &gtwIDs, &types.FieldMask{Paths: []string{"ids"}})
+		return err
+	})
+	if err != nil {
+		if errors.IsNotFound(err) {
+			return &ttnpb.Rights{}, nil
+		}
+		return nil, err
+	}
 	return universal, nil
 }
 
@@ -86,6 +129,19 @@ func (is *IdentityServer) OrganizationRights(ctx context.Context, orgIDs ttnpb.O
 			return rights.Union(universal), nil
 		}
 	}
+	if universal == nil {
+		return &ttnpb.Rights{}, nil
+	}
+	err = is.withDatabase(ctx, func(db *gorm.DB) error {
+		_, err := store.GetOrganizationStore(db).GetOrganization(ctx, &orgIDs, &types.FieldMask{Paths: []string{"ids"}})
+		return err
+	})
+	if err != nil {
+		if errors.IsNotFound(err) {
+			return &ttnpb.Rights{}, nil
+		}
+		return nil, err
+	}
 	return universal, nil
 }
 
@@ -99,6 +155,19 @@ func (is *IdentityServer) UserRights(ctx context.Context, userIDs ttnpb.UserIden
 		if ids := ids.GetUserIDs(); ids != nil && ids.UserID == userIDs.UserID {
 			return rights.Union(universal), nil
 		}
+	}
+	if universal == nil {
+		return &ttnpb.Rights{}, nil
+	}
+	err = is.withDatabase(ctx, func(db *gorm.DB) error {
+		_, err := store.GetUserStore(db).GetUser(ctx, &userIDs, &types.FieldMask{Paths: []string{"ids"}})
+		return err
+	})
+	if err != nil {
+		if errors.IsNotFound(err) {
+			return &ttnpb.Rights{}, nil
+		}
+		return nil, err
 	}
 	return universal, nil
 }
