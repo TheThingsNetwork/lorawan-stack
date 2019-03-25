@@ -16,15 +16,37 @@ import React from 'react'
 import { storiesOf } from '@storybook/react'
 import { withInfo } from '@storybook/addon-info'
 
+import FieldGroup from './group'
 import { Field } from '.'
 
-storiesOf('Field', module)
-  .addDecorator((story, context) => withInfo({
-    inline: true,
-    header: false,
-    source: false,
-    propTables: [ Field ],
-  })(story)(context))
+const info = {
+  inline: true,
+  header: false,
+  source: false,
+  propTables: [ Field ],
+}
+
+const checkboxFields = [
+  <Field
+    type="radio"
+    value="foo"
+    title="Foo"
+    name="radio-story"
+    form={false}
+    key="one"
+  />,
+  <Field
+    type="radio"
+    value="bar"
+    title="Bar"
+    name="radio-story"
+    form={false}
+    key="two"
+  />,
+]
+
+storiesOf('Fields', module)
+  .addDecorator((story, context) => withInfo(info)(story)(context))
   .add('Default', () => (
     <Field
       title="Foo"
@@ -118,5 +140,49 @@ storiesOf('Field', module)
       warning="Insecure password"
       touched
       form={false}
+    />
+  ))
+
+storiesOf('Fields/Radio Buttons', module)
+  .addDecorator((story, context) => withInfo(info)(story)(context))
+  .add('Default', () => (
+    <FieldGroup
+      name="radio-story"
+      title="Radio Buttons"
+      children={checkboxFields}
+    />
+  ))
+  .add('Horizontal', () => (
+    <FieldGroup
+      name="radio-story"
+      title="Radio Buttons"
+      horizontal
+      children={checkboxFields}
+    />
+  ))
+  .add('Columns', () => (
+    <FieldGroup
+      name="radio-story"
+      title="Radio Buttons"
+      columns
+      children={checkboxFields}
+    />
+  ))
+  .add('Horizontal & Columns', () => (
+    <FieldGroup
+      name="radio-story"
+      title="Radio Buttons"
+      horizontal
+      columns
+      children={checkboxFields}
+    />
+  ))
+  .add('Horizontal & Error', () => (
+    <FieldGroup
+      name="radio-story"
+      title="Radio Buttons"
+      errors={{ 'radio-story': 'Test Error' }}
+      horizontal
+      children={checkboxFields}
     />
   ))
