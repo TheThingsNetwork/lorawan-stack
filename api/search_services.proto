@@ -39,7 +39,7 @@ message SearchEntitiesRequest {
   // Find entities where the description contains this substring.
   string description_contains = 3;
   // Find entities where the given attributes contain these substrings.
-  map<string,string> attributes_contain = 4;
+  map<string,string> attributes_contain = 4 [(validate.rules).map.keys.string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
 
   reserved 5; // TODO: Add filter for approval state (admin only).
 
@@ -91,7 +91,7 @@ message SearchEndDevicesRequest {
   // Find end devices where the description contains this substring.
   string description_contains = 4;
   // Find end devices where the given attributes contain these substrings.
-  map<string,string> attributes_contain = 5;
+  map<string,string> attributes_contain = 5 [(validate.rules).map.keys.string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
 
   // Find end devices where the (hexadecimal) DevEUI contains this substring.
   string dev_eui_contains = 6 [(gogoproto.customname) = "DevEUIContains"];

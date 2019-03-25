@@ -83,11 +83,45 @@ func (m *User) ValidateFields(paths ...string) error {
 			}
 
 		case "name":
-			// no validation rules for Name
+
+			if utf8.RuneCountInString(m.GetName()) > 50 {
+				return UserValidationError{
+					field:  "name",
+					reason: "value length must be at most 50 runes",
+				}
+			}
+
 		case "description":
-			// no validation rules for Description
+
+			if utf8.RuneCountInString(m.GetDescription()) > 2000 {
+				return UserValidationError{
+					field:  "description",
+					reason: "value length must be at most 2000 runes",
+				}
+			}
+
 		case "attributes":
-			// no validation rules for Attributes
+
+			for key, val := range m.GetAttributes() {
+				_ = val
+
+				if utf8.RuneCountInString(key) > 36 {
+					return UserValidationError{
+						field:  fmt.Sprintf("attributes[%v]", key),
+						reason: "value length must be at most 36 runes",
+					}
+				}
+
+				if !_User_Attributes_Pattern.MatchString(key) {
+					return UserValidationError{
+						field:  fmt.Sprintf("attributes[%v]", key),
+						reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+					}
+				}
+
+				// no validation rules for Attributes[key]
+			}
+
 		case "contact_info":
 
 			for idx, item := range m.GetContactInfo() {
@@ -306,6 +340,8 @@ var _ interface {
 	ErrorName() string
 } = UserValidationError{}
 
+var _User_Attributes_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+
 // ValidateFields checks the field values on Picture with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
 // is returned.
@@ -334,7 +370,22 @@ func (m *Picture) ValidateFields(paths ...string) error {
 			}
 
 		case "sizes":
-			// no validation rules for Sizes
+
+			for key, val := range m.GetSizes() {
+				_ = val
+
+				// no validation rules for Sizes[key]
+
+				if _, err := url.Parse(val); err != nil {
+					return PictureValidationError{
+						field:  fmt.Sprintf("sizes[%v]", key),
+						reason: "value must be a valid URI",
+						cause:  err,
+					}
+				}
+
+			}
+
 		default:
 			return PictureValidationError{
 				field:  name,
@@ -1018,8 +1069,27 @@ func (m *CreateUserAPIKeyRequest) ValidateFields(paths ...string) error {
 			}
 
 		case "name":
-			// no validation rules for Name
+
+			if utf8.RuneCountInString(m.GetName()) > 50 {
+				return CreateUserAPIKeyRequestValidationError{
+					field:  "name",
+					reason: "value length must be at most 50 runes",
+				}
+			}
+
 		case "rights":
+
+			for idx, item := range m.GetRights() {
+				_, _ = idx, item
+
+				if _, ok := Right_name[int32(item)]; !ok {
+					return CreateUserAPIKeyRequestValidationError{
+						field:  fmt.Sprintf("rights[%v]", idx),
+						reason: "value must be one of the defined enum values",
+					}
+				}
+
+			}
 
 		default:
 			return CreateUserAPIKeyRequestValidationError{
@@ -1799,7 +1869,14 @@ func (m *UserSessionIdentifiers) ValidateFields(paths ...string) error {
 			}
 
 		case "session_id":
-			// no validation rules for SessionID
+
+			if utf8.RuneCountInString(m.GetSessionID()) > 64 {
+				return UserSessionIdentifiersValidationError{
+					field:  "session_id",
+					reason: "value length must be at most 64 runes",
+				}
+			}
+
 		default:
 			return UserSessionIdentifiersValidationError{
 				field:  name,
@@ -1894,7 +1971,14 @@ func (m *UserSession) ValidateFields(paths ...string) error {
 			}
 
 		case "session_id":
-			// no validation rules for SessionID
+
+			if utf8.RuneCountInString(m.GetSessionID()) > 64 {
+				return UserSessionValidationError{
+					field:  "session_id",
+					reason: "value length must be at most 64 runes",
+				}
+			}
+
 		case "created_at":
 
 			if v, ok := interface{}(&m.CreatedAt).(interface{ ValidateFields(...string) error }); ok {

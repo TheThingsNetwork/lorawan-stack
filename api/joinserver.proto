@@ -31,7 +31,7 @@ option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
 message SessionKeyRequest {
   // Join Server issued identifier for the session keys.
-  bytes session_key_id = 1 [(gogoproto.customname) = "SessionKeyID"];
+  bytes session_key_id = 1 [(gogoproto.customname) = "SessionKeyID", (validate.rules).bytes.max_len = 2048];
   // LoRaWAN DevEUI.
   bytes dev_eui = 2 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "DevEUI"];
 }

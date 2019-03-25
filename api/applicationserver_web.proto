@@ -37,7 +37,7 @@ message ApplicationWebhook {
   google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
   // Base URL to which the message's path is appended.
-  string base_url = 4 [(gogoproto.customname) = "BaseURL"];
+  string base_url = 4 [(gogoproto.customname) = "BaseURL", (validate.rules).string.uri = true];
   // HTTP headers to use.
   map<string,string> headers = 5;
   // The format to use for the body.

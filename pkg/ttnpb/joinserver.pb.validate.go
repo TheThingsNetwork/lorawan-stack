@@ -48,7 +48,14 @@ func (m *SessionKeyRequest) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "session_key_id":
-			// no validation rules for SessionKeyID
+
+			if len(m.GetSessionKeyID()) > 2048 {
+				return SessionKeyRequestValidationError{
+					field:  "session_key_id",
+					reason: "value length must be at most 2048 bytes",
+				}
+			}
+
 		case "dev_eui":
 			// no validation rules for DevEUI
 		default:

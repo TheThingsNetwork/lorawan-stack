@@ -45,9 +45,9 @@ message Client {
   google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
-  string name = 4;
-  string description = 5;
-  map<string,string> attributes = 6;
+  string name = 4 [(validate.rules).string.max_len = 50];
+  string description = 5 [(validate.rules).string.max_len = 2000];
+  map<string,string> attributes = 6 [(validate.rules).map.keys.string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
   repeated ContactInfo contact_info = 7;
 
   // The client secret is only visible to collaborators of the client.
@@ -67,11 +67,11 @@ message Client {
   bool endorsed = 12;
   // OAuth flows that can be used for the client to get a token.
   // After a client is created, this field can only be modified by admins.
-  repeated GrantType grants = 13;
+  repeated GrantType grants = 13 [(validate.rules).repeated.items.enum.defined_only = true];
   // Rights denotes what rights the client will have access to.
   // Users that previously authorized this client will have to re-authorize the
   // client after rights are added to this list.
-  repeated Right rights = 14;
+  repeated Right rights = 14 [(validate.rules).repeated.items.enum.defined_only = true];
 }
 
 message Clients {

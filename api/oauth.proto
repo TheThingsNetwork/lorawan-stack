@@ -57,7 +57,7 @@ message OAuthAuthorizationCode {
   ClientIdentifiers client_ids = 2 [(gogoproto.customname) = "ClientIDs", (gogoproto.nullable) = false, (validate.rules).message.required = true];
   repeated Right rights = 3;
   string code = 4;
-  string redirect_uri = 5 [(gogoproto.customname) = "RedirectURI"];
+  string redirect_uri = 5 [(gogoproto.customname) = "RedirectURI", (validate.rules).string.uri_ref = true];
   string state = 6;
   google.protobuf.Timestamp created_at = 7 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   google.protobuf.Timestamp expires_at = 8 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];

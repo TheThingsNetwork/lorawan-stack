@@ -196,7 +196,20 @@ func (m *ApplicationWebhook) ValidateFields(paths ...string) error {
 			}
 
 		case "base_url":
-			// no validation rules for BaseURL
+
+			if uri, err := url.Parse(m.GetBaseURL()); err != nil {
+				return ApplicationWebhookValidationError{
+					field:  "base_url",
+					reason: "value must be a valid URI",
+					cause:  err,
+				}
+			} else if !uri.IsAbs() {
+				return ApplicationWebhookValidationError{
+					field:  "base_url",
+					reason: "value must be absolute",
+				}
+			}
+
 		case "headers":
 			// no validation rules for Headers
 		case "format":

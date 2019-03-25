@@ -38,15 +38,15 @@ message GatewayBrand {
 }
 
 message GatewayModel {
-  string brand_id = 1 [(gogoproto.customname) = "BrandID"];
-  string id = 2 [(gogoproto.customname) = "ID"];
+  string brand_id = 1 [(gogoproto.customname) = "BrandID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36}];
+  string id = 2 [(gogoproto.customname) = "ID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36}];
   string name = 3;
 }
 
 // Identifies an end device model with version information.
 message GatewayVersionIdentifiers {
-  string brand_id = 1 [(gogoproto.customname) = "BrandID"];
-  string model_id = 2 [(gogoproto.customname) = "ModelID"];
+  string brand_id = 1 [(gogoproto.customname) = "BrandID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36}];
+  string model_id = 2 [(gogoproto.customname) = "ModelID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36}];
   string hardware_version = 3;
   string firmware_version = 4;
 }
@@ -84,9 +84,9 @@ message Gateway {
   google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
-  string name = 4;
-  string description = 5;
-  map<string,string> attributes = 6;
+  string name = 4 [(validate.rules).string.max_len = 50];
+  string description = 5 [(validate.rules).string.max_len = 2000];
+  map<string,string> attributes = 6 [(validate.rules).map.keys.string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
   repeated ContactInfo contact_info = 7;
 
   GatewayVersionIdentifiers version_ids = 8 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
@@ -99,7 +99,7 @@ message Gateway {
   string gateway_server_address = 9 [(validate.rules).string.pattern = "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"];
   bool auto_update = 10;
   string update_channel = 11;
-  string frequency_plan_id = 12 [(gogoproto.customname) = "FrequencyPlanID"];
+  string frequency_plan_id = 12 [(gogoproto.customname) = "FrequencyPlanID", (validate.rules).string.max_len = 64];
   repeated GatewayAntenna antennas = 13 [(gogoproto.nullable) = false];
   // The status of this gateway may be publicly displayed.
   bool status_public = 14;
@@ -158,8 +158,8 @@ message UpdateGatewayRequest {
 
 message CreateGatewayAPIKeyRequest {
   GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
-  string name = 2;
-  repeated Right rights = 3;
+  string name = 2 [(validate.rules).string.max_len = 50];
+  repeated Right rights = 3 [(validate.rules).repeated.items.enum.defined_only = true];
 }
 
 message UpdateGatewayAPIKeyRequest {
@@ -178,7 +178,7 @@ message GatewayAntenna {
   float gain = 1;
   // location is the antenna's location.
   Location location = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
-  map<string,string> attributes = 3;
+  map<string,string> attributes = 3 [(validate.rules).map.keys.string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
 }
 
 message GatewayStatus {
@@ -196,7 +196,7 @@ message GatewayStatus {
   //     fpga: "48"
   //     dsp: "27"
   //     hal: "v2-3.5.0"
-  map<string,string> versions = 3;
+  map<string,string> versions = 3 [(validate.rules).map.keys.string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
   // Location of each gateway's antenna
   // - if left out, server uses registry-set location as fallback
   repeated Location antenna_locations = 4;
@@ -206,7 +206,7 @@ message GatewayStatus {
   // Metrics
   // - can be used for forwarding gateway metrics such as temperatures or performance metrics
   // - map keys are written in snake_case
-  map<string,float> metrics = 6;
+  map<string,float> metrics = 6 [(validate.rules).map.keys.string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
   // Advanced metadata fields
   // - can be used for advanced information or experimental features that are not yet formally defined in the API
   // - field names are written in snake_case

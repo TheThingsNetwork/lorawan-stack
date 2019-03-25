@@ -121,15 +121,15 @@ message EndDeviceBrand {
 }
 
 message EndDeviceModel {
-  string brand_id = 1 [(gogoproto.customname) = "BrandID"];
-  string id = 2 [(gogoproto.customname) = "ID"];
+  string brand_id = 1 [(gogoproto.customname) = "BrandID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36}];
+  string id = 2 [(gogoproto.customname) = "ID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36}];
   string name = 3;
 }
 
 // Identifies an end device model with version information.
 message EndDeviceVersionIdentifiers {
-  string brand_id = 1 [(gogoproto.customname) = "BrandID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$", max_len: 36}];
-  string model_id = 2 [(gogoproto.customname) = "ModelID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$", max_len: 36}];
+  string brand_id = 1 [(gogoproto.customname) = "BrandID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36}];
+  string model_id = 2 [(gogoproto.customname) = "ModelID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36}];
   string hardware_version = 3;
   string firmware_version = 4;
 }
@@ -146,7 +146,7 @@ message EndDeviceVersion {
   // LoRaWAN PHY version.
   PHYVersion lorawan_phy_version = 3 [(gogoproto.customname) = "LoRaWANPHYVersion", (validate.rules).enum.defined_only = true];
   // ID of the frequency plan used by this device.
-  string frequency_plan_id = 4 [(gogoproto.customname) = "FrequencyPlanID"];
+  string frequency_plan_id = 4 [(gogoproto.customname) = "FrequencyPlanID", (validate.rules).string.max_len = 64];
 
   // Photos contains file names of device photos.
   repeated string photos = 5;
@@ -326,17 +326,17 @@ message EndDevice {
   google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
   // Friendly name of the device. Stored in Entity Registry.
-  string name = 4;
+  string name = 4 [(validate.rules).string.max_len = 50];
   // Description of the device. Stored in Entity Registry.
-  string description = 5;
+  string description = 5 [(validate.rules).string.max_len = 2000];
   // Attributes of the device. Stored in Entity Registry.
-  map<string,string> attributes = 6;
+  map<string,string> attributes = 6 [(validate.rules).map.keys.string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
 
   // Version Identifiers. Stored in Entity Registry, Network Server and Application Server.
   EndDeviceVersionIdentifiers version_ids = 7 [(gogoproto.customname) = "VersionIDs"];
 
   // Default service profile. Stored in Entity Registry.
-  string service_profile_id = 8 [(gogoproto.customname) = "ServiceProfileID"];
+  string service_profile_id = 8 [(gogoproto.customname) = "ServiceProfileID", (validate.rules).string.max_len = 64];
 
   // The address of the Network Server where this device is supposed to be registered.
   // Stored in Entity Registry and Join Server.
@@ -361,7 +361,7 @@ message EndDevice {
   string join_server_address = 11 [(validate.rules).string.pattern = "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"];
 
   // Location of the device. Stored in Entity Registry.
-  map<string,Location> locations = 12;
+  map<string,Location> locations = 12 [(validate.rules).map.keys.string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
 
   // Whether the device supports class B.
   // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
@@ -377,7 +377,7 @@ message EndDevice {
   PHYVersion lorawan_phy_version = 16 [(gogoproto.customname) = "LoRaWANPHYVersion", (validate.rules).enum.defined_only = true];
   // ID of the frequency plan used by this device.
   // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
-  string frequency_plan_id = 17 [(gogoproto.customname) = "FrequencyPlanID"];
+  string frequency_plan_id = 17 [(gogoproto.customname) = "FrequencyPlanID", (validate.rules).string.max_len = 64];
   // Minimum frequency the device is capable of using (Hz). Stored in Network Server.
   // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
   uint64 min_frequency = 18;
