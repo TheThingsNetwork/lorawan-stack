@@ -80,7 +80,7 @@ func TestFooBarExampleServer(t *testing.T) {
 			err = stream.Send(&rpctest.Foo{Message: "foo"})
 			a.So(err, should.BeNil)
 			cancel()
-			_, err = stream.CloseAndRecv()
+			err = stream.RecvMsg(&rpctest.Bar{})
 			a.So(grpc.Code(err), should.Equal, codes.Canceled)
 		}
 
