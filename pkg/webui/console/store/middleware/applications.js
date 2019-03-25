@@ -48,6 +48,7 @@ const getApplicationsRightsLogic = createLogic({
   type: [
     applications.GET_APPS_RIGHTS_LIST,
     application.GET_APP_API_KEY_PAGE_DATA,
+    application.GET_APP_COLLABORATOR_PAGE_DATA,
   ],
   async process ({ getState, action }, dispatch, done) {
     const { id } = action
