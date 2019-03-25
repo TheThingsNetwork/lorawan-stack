@@ -19,8 +19,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
+	echo "github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/openshift/osin"
 	web_errors "go.thethings.network/lorawan-stack/pkg/errors/web"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"

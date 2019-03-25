@@ -15,7 +15,7 @@
 package web
 
 import (
-	"github.com/labstack/echo"
+	echo "github.com/labstack/echo/v4"
 )
 
 type redirector struct {

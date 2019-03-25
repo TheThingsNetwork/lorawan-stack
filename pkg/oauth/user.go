@@ -21,7 +21,7 @@ import (
 	"time"
 
 	"github.com/gogo/protobuf/types"
-	"github.com/labstack/echo"
+	echo "github.com/labstack/echo/v4"
 	"go.thethings.network/lorawan-stack/pkg/auth"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"

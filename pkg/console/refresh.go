@@ -18,7 +18,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/labstack/echo"
+	echo "github.com/labstack/echo/v4"
 	"golang.org/x/oauth2"
 )
 

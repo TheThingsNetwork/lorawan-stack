@@ -19,8 +19,8 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
+	echo "github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	web_errors "go.thethings.network/lorawan-stack/pkg/errors/web"

@@ -19,7 +19,7 @@ import (
 	"os"
 	"runtime/debug"
 
-	"github.com/labstack/echo"
+	echo "github.com/labstack/echo/v4"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 

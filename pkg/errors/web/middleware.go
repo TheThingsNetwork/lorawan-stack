@@ -20,7 +20,7 @@ import (
 	"sort"
 
 	"github.com/golang/gddo/httputil"
-	"github.com/labstack/echo"
+	echo "github.com/labstack/echo/v4"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	_ "go.thethings.network/lorawan-stack/pkg/ttnpb" // imported for side-effect of correct TTN error rendering.
 )

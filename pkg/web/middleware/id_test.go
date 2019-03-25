@@ -21,7 +21,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/labstack/echo"
+	echo "github.com/labstack/echo/v4"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )

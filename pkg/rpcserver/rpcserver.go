@@ -46,6 +46,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/validator"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"google.golang.org/grpc"
+	_ "google.golang.org/grpc/encoding/gzip" // Register gzip compression.
 	"google.golang.org/grpc/keepalive"
 	"google.golang.org/grpc/metadata"
 )
