@@ -89,11 +89,12 @@ class FieldGroup extends React.Component {
           component={titleComponent}
           content={title}
         />
-        {error && touched && <FieldError name={name} error={error} />}
         <div
           className={style.fields}
-          children={fields}
-        />
+        >
+          {fields}
+          {error && touched && <FieldError className={style.error} name={name} error={error} />}
+        </div>
       </div>
     )
   }
