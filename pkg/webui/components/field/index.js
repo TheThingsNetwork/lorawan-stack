@@ -24,6 +24,7 @@ import getByPath from '../../lib/get-by-path'
 import Icon from '../icon'
 import Input from '../input'
 import Checkbox from '../checkbox'
+import Select from '../select'
 import Message from '../../lib/components/message'
 
 import style from './field.styl'
@@ -60,10 +61,31 @@ const checkboxAllowedProps = [
   'disabled',
 ]
 
+const selectAllowedProps = [
+  'autoFocus',
+  'clearValue',
+  'getStyles',
+  'getValue',
+  'hasValue',
+  'isDisabled',
+  'isMulti',
+  'isRtl',
+  'isSearchable',
+  'onChange',
+  'options',
+  'placeholder',
+  'selectOption',
+  'selectProps',
+  'setValue',
+  'value',
+]
+
 const getAllowedPropsByType = function (type) {
   switch (type) {
   case 'checkbox':
     return checkboxAllowedProps
+  case 'select':
+    return selectAllowedProps
   default:
     return inputAllowedProps
   }
@@ -92,6 +114,9 @@ const component = function (type) {
   case 'password':
   case 'byte':
     return Input
+
+  case 'select':
+    return Select
 
   default:
     warn('No type matches', type)
