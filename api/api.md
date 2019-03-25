@@ -345,6 +345,7 @@
     - [MHDR](#ttn.lorawan.v3.MHDR)
     - [Message](#ttn.lorawan.v3.Message)
     - [RejoinRequestPayload](#ttn.lorawan.v3.RejoinRequestPayload)
+    - [Scheduled](#ttn.lorawan.v3.Scheduled)
     - [TxRequest](#ttn.lorawan.v3.TxRequest)
     - [TxSettings](#ttn.lorawan.v3.TxSettings)
     - [TxSettings.Downlink](#ttn.lorawan.v3.TxSettings.Downlink)
@@ -4375,6 +4376,22 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
+<a name="ttn.lorawan.v3.Scheduled"></a>
+
+### Scheduled
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| rx_window | [uint32](#uint32) |  |  |
+| class | [Class](#ttn.lorawan.v3.Class) |  |  |
+
+
+
+
+
+
 <a name="ttn.lorawan.v3.TxRequest"></a>
 
 ### TxRequest
@@ -4419,6 +4436,7 @@ On downlink, this is a scheduled transmission.
 | enable_crc | [bool](#bool) |  | Send a CRC in the packet; only on uplink; on downlink, CRC should not be enabled. |
 | timestamp | [uint32](#uint32) |  | Timestamp of the gateway concentrator when the uplink message was received, or when the downlink message should be transmitted (microseconds). On downlink, set timestamp to 0 and time to null to use immediate scheduling. |
 | time | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | Time of the gateway when the uplink message was received, or when the downlink message should be transmitted. For downlink, this requires the gateway to have GPS time synchronization. |
+<<<<<<< HEAD
 | downlink | [TxSettings.Downlink](#ttn.lorawan.v3.TxSettings.Downlink) |  | Transmission settings for downlink. |
 
 
@@ -4437,6 +4455,9 @@ Transmission settings for downlink.
 | antenna_index | [uint32](#uint32) |  | Index of the antenna on which the uplink was received and/or downlink must be sent. |
 | tx_power | [float](#float) |  | Transmission power (dBm). Only on downlink. |
 | invert_polarization | [bool](#bool) |  | Invert LoRa polarization; false for LoRaWAN uplink, true for downlink. |
+=======
+| scheduled | [Scheduled](#ttn.lorawan.v3.Scheduled) |  | Additional information on the scheduled downlink necessary for the BasicStation LNS gateways. |
+>>>>>>> api: Add additional fields to TxSettings
 
 
 

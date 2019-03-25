@@ -242,6 +242,12 @@ message DataRate {
   };
 }
 
+
+message Scheduled{
+  uint32 rx_window = 1;
+  Class class = 2;
+}
+
 // TxSettings contains the settings for a transmission.
 // This message is used on both uplink and downlink.
 // On downlink, this is a scheduled transmission.
