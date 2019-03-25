@@ -18,11 +18,6 @@ class ApiKeys {
   constructor (registry, parentRoutes) {
     this._api = registry
     this._parentRoutes = parentRoutes
-
-    this.getAll = this.getAll.bind(this)
-    this.create = this.create.bind(this)
-    this.deleteById = this.deleteById.bind(this)
-    this.updateById = this.updateById.bind(this)
   }
 
   async getAll (entityId, params) {

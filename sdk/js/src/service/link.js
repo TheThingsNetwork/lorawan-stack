@@ -17,11 +17,6 @@ import Marshaler from '../util/marshaler'
 class Link {
   constructor (registry) {
     this._api = registry
-
-    this.get = this.get.bind(this)
-    this.set = this.set.bind(this)
-    this.delete = this.delete.bind(this)
-    this.getStats = this.getStats.bind(this)
   }
 
   async get (appId, fieldMask) {
