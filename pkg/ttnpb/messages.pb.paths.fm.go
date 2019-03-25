@@ -69,6 +69,14 @@ var UplinkMessageFieldPathsNested = []string{
 	"settings.downlink.tx_power",
 	"settings.enable_crc",
 	"settings.frequency",
+<<<<<<< HEAD
+=======
+	"settings.gateway_channel_index",
+	"settings.invert_polarization",
+	"settings.scheduled",
+	"settings.scheduled.class",
+	"settings.scheduled.rx_window",
+>>>>>>> api: Add additional fields to TxSettings
 	"settings.time",
 	"settings.timestamp",
 }
@@ -165,6 +173,14 @@ var DownlinkMessageFieldPathsNested = []string{
 	"settings.scheduled.downlink.tx_power",
 	"settings.scheduled.enable_crc",
 	"settings.scheduled.frequency",
+<<<<<<< HEAD
+=======
+	"settings.scheduled.gateway_channel_index",
+	"settings.scheduled.invert_polarization",
+	"settings.scheduled.scheduled",
+	"settings.scheduled.scheduled.class",
+	"settings.scheduled.scheduled.rx_window",
+>>>>>>> api: Add additional fields to TxSettings
 	"settings.scheduled.time",
 	"settings.scheduled.timestamp",
 }
@@ -208,6 +224,14 @@ var ApplicationUplinkFieldPathsNested = []string{
 	"settings.downlink.tx_power",
 	"settings.enable_crc",
 	"settings.frequency",
+<<<<<<< HEAD
+=======
+	"settings.gateway_channel_index",
+	"settings.invert_polarization",
+	"settings.scheduled",
+	"settings.scheduled.class",
+	"settings.scheduled.rx_window",
+>>>>>>> api: Add additional fields to TxSettings
 	"settings.time",
 	"settings.timestamp",
 }
@@ -452,6 +476,14 @@ var ApplicationUpFieldPathsNested = []string{
 	"up.uplink_message.settings.downlink.tx_power",
 	"up.uplink_message.settings.enable_crc",
 	"up.uplink_message.settings.frequency",
+<<<<<<< HEAD
+=======
+	"up.uplink_message.settings.gateway_channel_index",
+	"up.uplink_message.settings.invert_polarization",
+	"up.uplink_message.settings.scheduled",
+	"up.uplink_message.settings.scheduled.class",
+	"up.uplink_message.settings.scheduled.rx_window",
+>>>>>>> api: Add additional fields to TxSettings
 	"up.uplink_message.settings.time",
 	"up.uplink_message.settings.timestamp",
 }

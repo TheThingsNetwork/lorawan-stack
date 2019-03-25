@@ -218,6 +218,15 @@ var DataRateFieldPathsNested = []string{
 var DataRateFieldPathsTopLevel = []string{
 	"modulation",
 }
+var ScheduledFieldPathsNested = []string{
+	"class",
+	"rx_window",
+}
+
+var ScheduledFieldPathsTopLevel = []string{
+	"class",
+	"rx_window",
+}
 var TxSettingsFieldPathsNested = []string{
 	"coding_rate",
 	"data_rate",
@@ -234,6 +243,14 @@ var TxSettingsFieldPathsNested = []string{
 	"downlink.tx_power",
 	"enable_crc",
 	"frequency",
+<<<<<<< HEAD
+=======
+	"gateway_channel_index",
+	"invert_polarization",
+	"scheduled",
+	"scheduled.class",
+	"scheduled.rx_window",
+>>>>>>> api: Add additional fields to TxSettings
 	"time",
 	"timestamp",
 }
@@ -245,6 +262,12 @@ var TxSettingsFieldPathsTopLevel = []string{
 	"downlink",
 	"enable_crc",
 	"frequency",
+<<<<<<< HEAD
+=======
+	"gateway_channel_index",
+	"invert_polarization",
+	"scheduled",
+>>>>>>> api: Add additional fields to TxSettings
 	"time",
 	"timestamp",
 }

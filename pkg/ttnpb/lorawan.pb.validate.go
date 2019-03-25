@@ -1386,6 +1386,89 @@ var _ interface {
 	ErrorName() string
 } = DataRateValidationError{}
 
+// ValidateFields checks the field values on Scheduled with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *Scheduled) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ScheduledFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "rx_window":
+			// no validation rules for RxWindow
+		case "class":
+			// no validation rules for Class
+		default:
+			return ScheduledValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ScheduledValidationError is the validation error returned by
+// Scheduled.ValidateFields if the designated constraints aren't met.
+type ScheduledValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ScheduledValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ScheduledValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ScheduledValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ScheduledValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ScheduledValidationError) ErrorName() string { return "ScheduledValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ScheduledValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sScheduled.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ScheduledValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ScheduledValidationError{}
+
 // ValidateFields checks the field values on TxSettings with the rules defined
 // in the proto definition for this message. If any rules are violated, an
 // error is returned.
@@ -1442,12 +1525,21 @@ func (m *TxSettings) ValidateFields(paths ...string) error {
 				}
 			}
 
+<<<<<<< HEAD
 		case "downlink":
 
 			if v, ok := interface{}(m.GetDownlink()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return TxSettingsValidationError{
 						field:  "downlink",
+=======
+		case "scheduled":
+
+			if v, ok := interface{}(m.GetScheduled()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return TxSettingsValidationError{
+						field:  "scheduled",
+>>>>>>> api: Add additional fields to TxSettings
 						reason: "embedded message failed validation",
 						cause:  err,
 					}
