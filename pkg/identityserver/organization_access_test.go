@@ -207,6 +207,14 @@ func TestOrganizationAccessCRUD(t *testing.T) {
 		a.So(rights.Rights, should.Contain, ttnpb.RIGHT_ORGANIZATION_ALL)
 		a.So(err, should.BeNil)
 
+		modifiedOrganizationID := organizationID
+		modifiedOrganizationID.OrganizationID += "mod"
+
+		rights, err = reg.ListRights(ctx, &modifiedOrganizationID, creds)
+		a.So(rights, should.NotBeNil)
+		a.So(rights.Rights, should.BeEmpty)
+		a.So(err, should.BeNil)
+
 		organizationAPIKeys := organizationAPIKeys(&organizationID)
 		APIKeys, err := reg.ListAPIKeys(ctx, &organizationID, creds)
 

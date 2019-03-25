@@ -130,6 +130,14 @@ func TestClientAccessCRUD(t *testing.T) {
 		a.So(rights.Rights, should.Contain, ttnpb.RIGHT_CLIENT_ALL)
 		a.So(err, should.BeNil)
 
+		modifiedClientID := clientID
+		modifiedClientID.ClientID += "mod"
+
+		rights, err = reg.ListRights(ctx, &modifiedClientID, creds)
+		a.So(rights, should.NotBeNil)
+		a.So(rights.Rights, should.BeEmpty)
+		a.So(err, should.BeNil)
+
 		collaborators, err := reg.ListCollaborators(ctx, &clientID, creds)
 
 		a.So(collaborators, should.NotBeNil)

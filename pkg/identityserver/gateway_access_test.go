@@ -207,6 +207,14 @@ func TestGatewayAccessCRUD(t *testing.T) {
 		a.So(rights.Rights, should.Contain, ttnpb.RIGHT_GATEWAY_ALL)
 		a.So(err, should.BeNil)
 
+		modifiedGatewayID := gatewayID
+		modifiedGatewayID.GatewayID += "mod"
+
+		rights, err = reg.ListRights(ctx, &modifiedGatewayID, userCreds)
+		a.So(rights, should.NotBeNil)
+		a.So(rights.Rights, should.BeEmpty)
+		a.So(err, should.BeNil)
+
 		gatewayAPIKeys := gatewayAPIKeys(&gatewayID)
 		APIKeys, err := reg.ListAPIKeys(ctx, &gatewayID, userCreds)
 
