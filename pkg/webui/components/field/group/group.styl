@@ -12,12 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.header
+.container
   display: flex
-  justify-content: flex-start
-  align-items: center
+  margin-bottom: $cs.l
+  flex-direction: column
+  &.horizontal
+    flex-direction: row
+    .header-title
+      width: 30%
+    .fields
+      width: 70%
+
+.container:not(.horizontal)
+  span.header-title
+    font-weight: 600
+
+.header-title
+  line-height: 2.2
+  margin-bottom: 0
+  flex-shrink: 0
+
+.fields
+  display: flex
   flex-wrap: wrap
+  margin-top: $cs.xs
+  margin-bottom: $cs.l * -1
 
-  &-title
-    margin-right: $ls.xxs
-
+  .field
+    margin-bottom: $cs.m
