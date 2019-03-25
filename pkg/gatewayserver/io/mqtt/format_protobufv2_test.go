@@ -50,8 +50,10 @@ func TestProtobufV2Downlink(t *testing.T) {
 				CodingRate:    "4/5",
 				DataRateIndex: 0,
 				Frequency:     863000000,
-				TxPower:       16.15,
-				Timestamp:     12000,
+				Downlink: &ttnpb.TxSettings_Downlink{
+					TxPower: 16.15,
+				},
+				Timestamp: 12000,
 			},
 		},
 	}

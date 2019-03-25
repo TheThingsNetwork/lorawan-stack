@@ -246,6 +246,16 @@ message DataRate {
 message TxSettings {
   option (gogoproto.populate) = false;
 
+  // Transmission settings for downlink.
+  message Downlink{
+    // Index of the antenna on which the uplink was received and/or downlink must be sent.
+    uint32 antenna_index = 1;
+      // Transmission power (dBm). Only on downlink.
+    float tx_power = 2;
+    // Invert LoRa polarization; false for LoRaWAN uplink, true for downlink.
+    bool invert_polarization = 3;
+  }
+
   // Data rate.
   DataRate data_rate = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   // LoRaWAN data rate index.
@@ -254,24 +264,16 @@ message TxSettings {
   string coding_rate = 3;
   // Frequency (Hz).
   uint64 frequency = 4;
-  // Transmission power (dBm). Only on downlink.
-  float tx_power = 5;
-  // Invert LoRa polarization; false for LoRaWAN uplink, true for downlink.
-  bool invert_polarization = 6;
-  // Index of the gateway channel that received the message.
-  // Set by Gateway Server.
-  uint32 gateway_channel_index = 7 [(validate.rules).uint32 = {lte: 255}];
-  // Index of the device channel that received the message.
-  // Set by Network Server.
-  uint32 device_channel_index = 8 [(validate.rules).uint32 = {lte: 255}];
   // Send a CRC in the packet; only on uplink; on downlink, CRC should not be enabled.
-  bool enable_crc = 9 [(gogoproto.customname) = "EnableCRC"];
+  bool enable_crc = 5 [(gogoproto.customname) = "EnableCRC"];
   // Timestamp of the gateway concentrator when the uplink message was received, or when the downlink message should be transmitted (microseconds).
   // On downlink, set timestamp to 0 and time to null to use immediate scheduling.
-  uint32 timestamp = 10;
+  uint32 timestamp = 6;
   // Time of the gateway when the uplink message was received, or when the downlink message should be transmitted.
   // For downlink, this requires the gateway to have GPS time synchronization.
-  google.protobuf.Timestamp time = 11 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp time = 7 [(gogoproto.stdtime) = true];
+  // Transmission settings for downlink.
+  Downlink downlink = 8;
 }
 
 message GatewayAntennaIdentifiers {

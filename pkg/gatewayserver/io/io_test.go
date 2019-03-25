@@ -362,7 +362,7 @@ func Test(t *testing.T) {
 			case msg := <-frontend.Down:
 				scheduled := msg.GetScheduled()
 				a.So(scheduled, should.NotBeNil)
-				a.So(scheduled.TxPower, should.Equal, tc.ExpectedEIRP)
+				a.So(scheduled.Downlink.TxPower, should.Equal, tc.ExpectedEIRP)
 			case <-time.After(timeout):
 				t.Fatalf("Expected downlink message timeout")
 			}

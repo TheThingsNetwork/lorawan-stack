@@ -90,7 +90,7 @@ func (protobufv2) FromDownlink(down *ttnpb.DownlinkMessage, _ ttnpb.GatewayIdent
 		Payload: down.RawPayload,
 		GatewayConfiguration: legacyttnpb.GatewayTxConfiguration{
 			Frequency:             settings.Frequency,
-			Power:                 int32(settings.TxPower - eirpDelta),
+			Power:                 int32(settings.Downlink.TxPower - eirpDelta),
 			PolarizationInversion: true,
 			RfChain:               0,
 			Timestamp:             settings.Timestamp,

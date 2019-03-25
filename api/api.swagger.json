@@ -5017,6 +5017,27 @@
       ],
       "default": "SUCCESS"
     },
+    "TxSettingsDownlink": {
+      "type": "object",
+      "properties": {
+        "antenna_index": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Index of the antenna on which the uplink was received and/or downlink must be sent."
+        },
+        "tx_power": {
+          "type": "number",
+          "format": "float",
+          "description": "Transmission power (dBm). Only on downlink."
+        },
+        "invert_polarization": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Invert LoRa polarization; false for LoRaWAN uplink, true for downlink."
+        }
+      },
+      "description": "Transmission settings for downlink."
+    },
     "lorawanv3Location": {
       "type": "object",
       "properties": {
@@ -8537,26 +8558,6 @@
           "format": "uint64",
           "description": "Frequency (Hz)."
         },
-        "tx_power": {
-          "type": "number",
-          "format": "float",
-          "description": "Transmission power (dBm). Only on downlink."
-        },
-        "invert_polarization": {
-          "type": "boolean",
-          "format": "boolean",
-          "description": "Invert LoRa polarization; false for LoRaWAN uplink, true for downlink."
-        },
-        "gateway_channel_index": {
-          "type": "integer",
-          "format": "int64",
-          "description": "Index of the gateway channel that received the message.\nSet by Gateway Server."
-        },
-        "device_channel_index": {
-          "type": "integer",
-          "format": "int64",
-          "description": "Index of the device channel that received the message.\nSet by Network Server."
-        },
         "enable_crc": {
           "type": "boolean",
           "format": "boolean",
@@ -8571,6 +8572,10 @@
           "type": "string",
           "format": "date-time",
           "description": "Time of the gateway when the uplink message was received, or when the downlink message should be transmitted.\nFor downlink, this requires the gateway to have GPS time synchronization."
+        },
+        "downlink": {
+          "$ref": "#/definitions/TxSettingsDownlink",
+          "description": "Transmission settings for downlink."
         }
       },
       "description": "TxSettings contains the settings for a transmission.\nThis message is used on both uplink and downlink.\nOn downlink, this is a scheduled transmission."
@@ -8728,6 +8733,16 @@
           "items": {
             "type": "string"
           }
+        },
+        "gateway_channel_index": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Index of the gateway channel that received the message.\nSet by Gateway Server."
+        },
+        "device_channel_index": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Index of the device channel that received the message.\nSet by Network Server."
         }
       },
       "title": "Uplink message from the end device to the network"

@@ -835,46 +835,6 @@ func (dst *TxSettings) SetFields(src *TxSettings, paths ...string) error {
 				var zero uint64
 				dst.Frequency = zero
 			}
-		case "tx_power":
-			if len(subs) > 0 {
-				return fmt.Errorf("'tx_power' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.TxPower = src.TxPower
-			} else {
-				var zero float32
-				dst.TxPower = zero
-			}
-		case "invert_polarization":
-			if len(subs) > 0 {
-				return fmt.Errorf("'invert_polarization' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.InvertPolarization = src.InvertPolarization
-			} else {
-				var zero bool
-				dst.InvertPolarization = zero
-			}
-		case "gateway_channel_index":
-			if len(subs) > 0 {
-				return fmt.Errorf("'gateway_channel_index' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.GatewayChannelIndex = src.GatewayChannelIndex
-			} else {
-				var zero uint32
-				dst.GatewayChannelIndex = zero
-			}
-		case "device_channel_index":
-			if len(subs) > 0 {
-				return fmt.Errorf("'device_channel_index' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.DeviceChannelIndex = src.DeviceChannelIndex
-			} else {
-				var zero uint32
-				dst.DeviceChannelIndex = zero
-			}
 		case "enable_crc":
 			if len(subs) > 0 {
 				return fmt.Errorf("'enable_crc' has no subfields, but %s were specified", subs)
@@ -903,6 +863,27 @@ func (dst *TxSettings) SetFields(src *TxSettings, paths ...string) error {
 				dst.Time = src.Time
 			} else {
 				dst.Time = nil
+			}
+		case "downlink":
+			if len(subs) > 0 {
+				newDst := dst.Downlink
+				if newDst == nil {
+					newDst = &TxSettings_Downlink{}
+					dst.Downlink = newDst
+				}
+				var newSrc *TxSettings_Downlink
+				if src != nil {
+					newSrc = src.Downlink
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Downlink = src.Downlink
+				} else {
+					dst.Downlink = nil
+				}
 			}
 
 		default:
@@ -1931,6 +1912,47 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 				default:
 					return fmt.Errorf("invalid oneof field: '%s.%s'", name, oneofName)
 				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *TxSettings_Downlink) SetFields(src *TxSettings_Downlink, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "antenna_index":
+			if len(subs) > 0 {
+				return fmt.Errorf("'antenna_index' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.AntennaIndex = src.AntennaIndex
+			} else {
+				var zero uint32
+				dst.AntennaIndex = zero
+			}
+		case "tx_power":
+			if len(subs) > 0 {
+				return fmt.Errorf("'tx_power' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.TxPower = src.TxPower
+			} else {
+				var zero float32
+				dst.TxPower = zero
+			}
+		case "invert_polarization":
+			if len(subs) > 0 {
+				return fmt.Errorf("'invert_polarization' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.InvertPolarization = src.InvertPolarization
+			} else {
+				var zero bool
+				dst.InvertPolarization = zero
 			}
 
 		default:
