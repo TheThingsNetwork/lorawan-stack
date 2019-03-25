@@ -1,0 +1,68 @@
+// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+.container
+  display: flex
+  position: relative
+  padding-left: 1rem + $cs.xs
+  margin-bottom: 12px
+  cursor: pointer
+  user-select: none
+
+  // Hide default radio button
+  input
+    position: absolute
+    opacity: 0
+    cursor: pointer
+
+  &:hover input ~ span
+    background-color: $c-backdrop
+
+  & input:checked ~ span
+    border-color: $c-input-border
+
+  &:hover input:checked ~ span, input:checked:focus ~ span
+      border-color: lighter($c-active-blue)
+
+  // Show the dot when checked
+  input:checked ~ span:after
+    display: block
+
+  input:focus ~ span
+    border-color: $c-active-blue
+
+// Custom radio button
+.dot
+  border-input()
+  border-radius: 1.08rem
+  position: absolute
+  top: 4px
+  left: 0
+  width: 1.08rem
+  height: 1.08rem
+
+  // Style the select-dot
+  &:after
+    content: ''
+    box-sizing: content-box
+    position: absolute
+    background-color: lighter($c-active-blue)
+    border-radius: 100%
+    display: none
+    left: 4px
+    top: 4px
+    width: 7px
+    height: 7px
+
+
