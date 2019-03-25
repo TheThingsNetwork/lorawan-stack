@@ -37,6 +37,7 @@ class FieldGroup extends React.Component {
       setFieldTouched,
       horizontal,
       touched,
+      columns,
     } = this.props
 
     const fields = React.Children.map(children, function (Child) {
@@ -54,7 +55,10 @@ class FieldGroup extends React.Component {
           id = `${name}.${fieldValue}`
           mapValues.checked = value === fieldValue
         }
-        const classNames = classnames(style.field, className)
+        const classNames = classnames(style.field, className, {
+          [style.columns]: columns,
+        })
+
         return React.cloneElement(Child, {
           ...Child.props,
           ...mapValues,
@@ -99,6 +103,8 @@ FieldGroup.propTypes = {
   name: PropTypes.string.isRequired,
   title: PropTypes.message,
   errors: PropTypes.object,
+  horizontal: PropTypes.bool,
+  columns: PropTypes.bool,
 }
 
 export default FieldGroup
