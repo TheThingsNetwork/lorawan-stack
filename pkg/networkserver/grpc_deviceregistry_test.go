@@ -913,13 +913,13 @@ func TestDeviceRegistrySet(t *testing.T) {
 			req := deepcopy.Copy(tc.Request).(*ttnpb.SetEndDeviceRequest)
 
 			dev, err := ttnpb.NewNsEndDeviceRegistryClient(ns.LoopbackConn()).Set(ctx, req)
+			a.So(setByIDCalls, should.Equal, tc.SetByIDCalls)
 			if tc.ErrorAssertion != nil && a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
 				a.So(dev, should.BeNil)
 			} else if a.So(err, should.BeNil) {
 				a.So(dev, should.Resemble, tc.Device)
 			}
 			a.So(req, should.Resemble, tc.Request)
-			a.So(setByIDCalls, should.Equal, tc.SetByIDCalls)
 		})
 	}
 }
@@ -1072,13 +1072,13 @@ func TestDeviceRegistryDelete(t *testing.T) {
 			req := deepcopy.Copy(tc.Request).(*ttnpb.EndDeviceIdentifiers)
 
 			res, err := ttnpb.NewNsEndDeviceRegistryClient(ns.LoopbackConn()).Delete(test.Context(), req)
+			a.So(setByIDCalls, should.Equal, tc.SetByIDCalls)
 			if tc.ErrorAssertion != nil && a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
 				a.So(res, should.BeNil)
 			} else if a.So(err, should.BeNil) {
 				a.So(res, should.Resemble, ttnpb.Empty)
 			}
 			a.So(req, should.Resemble, tc.Request)
-			a.So(setByIDCalls, should.Equal, tc.SetByIDCalls)
 		})
 	}
 }
