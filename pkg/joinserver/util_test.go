@@ -22,6 +22,11 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/joinserver/provisioning"
 	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
+)
+
+var (
+	Timeout = (1 << 8) * test.Delay
 )
 
 type byteToSerialNumber struct {
