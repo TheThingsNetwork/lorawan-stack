@@ -42,10 +42,17 @@ var ProcessUplinkMessageRequestFieldPathsNested = []string{
 =======
 	"message.settings.gateway_channel_index",
 	"message.settings.invert_polarization",
+<<<<<<< HEAD
 	"message.settings.scheduled",
 	"message.settings.scheduled.class",
 	"message.settings.scheduled.rx_window",
 >>>>>>> api: Add additional fields to TxSettings
+=======
+	"message.settings.request_info",
+	"message.settings.request_info.antenna_index",
+	"message.settings.request_info.class",
+	"message.settings.request_info.rx_window",
+>>>>>>> gs: Add values to TxSettings.Scheduled
 	"message.settings.time",
 	"message.settings.timestamp",
 	"parameter",

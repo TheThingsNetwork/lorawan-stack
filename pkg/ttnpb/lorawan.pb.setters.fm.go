@@ -784,7 +784,7 @@ func (dst *DataRate) SetFields(src *DataRate, paths ...string) error {
 	return nil
 }
 
-func (dst *Scheduled) SetFields(src *Scheduled, paths ...string) error {
+func (dst *RequestInfo) SetFields(src *RequestInfo, paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "rx_window":
@@ -796,6 +796,16 @@ func (dst *Scheduled) SetFields(src *Scheduled, paths ...string) error {
 			} else {
 				var zero uint32
 				dst.RxWindow = zero
+			}
+		case "antenna_index":
+			if len(subs) > 0 {
+				return fmt.Errorf("'antenna_index' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.AntennaIndex = src.AntennaIndex
+			} else {
+				var zero uint32
+				dst.AntennaIndex = zero
 			}
 		case "class":
 			if len(subs) > 0 {
@@ -896,6 +906,7 @@ func (dst *TxSettings) SetFields(src *TxSettings, paths ...string) error {
 				dst.Time = nil
 			}
 <<<<<<< HEAD
+<<<<<<< HEAD
 		case "downlink":
 			if len(subs) > 0 {
 				newDst := dst.Downlink
@@ -908,22 +919,30 @@ func (dst *TxSettings) SetFields(src *TxSettings, paths ...string) error {
 					newSrc = src.Downlink
 =======
 		case "scheduled":
+=======
+		case "request_info":
+>>>>>>> gs: Add values to TxSettings.Scheduled
 			if len(subs) > 0 {
-				newDst := dst.Scheduled
+				newDst := dst.RequestInfo
 				if newDst == nil {
-					newDst = &Scheduled{}
-					dst.Scheduled = newDst
+					newDst = &RequestInfo{}
+					dst.RequestInfo = newDst
 				}
-				var newSrc *Scheduled
+				var newSrc *RequestInfo
 				if src != nil {
+<<<<<<< HEAD
 					newSrc = src.Scheduled
 >>>>>>> api: Add additional fields to TxSettings
+=======
+					newSrc = src.RequestInfo
+>>>>>>> gs: Add values to TxSettings.Scheduled
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
+<<<<<<< HEAD
 <<<<<<< HEAD
 					dst.Downlink = src.Downlink
 				} else {
@@ -933,6 +952,11 @@ func (dst *TxSettings) SetFields(src *TxSettings, paths ...string) error {
 				} else {
 					dst.Scheduled = nil
 >>>>>>> api: Add additional fields to TxSettings
+=======
+					dst.RequestInfo = src.RequestInfo
+				} else {
+					dst.RequestInfo = nil
+>>>>>>> gs: Add values to TxSettings.Scheduled
 				}
 			}
 

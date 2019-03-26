@@ -218,12 +218,14 @@ var DataRateFieldPathsNested = []string{
 var DataRateFieldPathsTopLevel = []string{
 	"modulation",
 }
-var ScheduledFieldPathsNested = []string{
+var RequestInfoFieldPathsNested = []string{
+	"antenna_index",
 	"class",
 	"rx_window",
 }
 
-var ScheduledFieldPathsTopLevel = []string{
+var RequestInfoFieldPathsTopLevel = []string{
+	"antenna_index",
 	"class",
 	"rx_window",
 }
@@ -247,10 +249,17 @@ var TxSettingsFieldPathsNested = []string{
 =======
 	"gateway_channel_index",
 	"invert_polarization",
+<<<<<<< HEAD
 	"scheduled",
 	"scheduled.class",
 	"scheduled.rx_window",
 >>>>>>> api: Add additional fields to TxSettings
+=======
+	"request_info",
+	"request_info.antenna_index",
+	"request_info.class",
+	"request_info.rx_window",
+>>>>>>> gs: Add values to TxSettings.Scheduled
 	"time",
 	"timestamp",
 }
@@ -266,8 +275,12 @@ var TxSettingsFieldPathsTopLevel = []string{
 =======
 	"gateway_channel_index",
 	"invert_polarization",
+<<<<<<< HEAD
 	"scheduled",
 >>>>>>> api: Add additional fields to TxSettings
+=======
+	"request_info",
+>>>>>>> gs: Add values to TxSettings.Scheduled
 	"time",
 	"timestamp",
 }

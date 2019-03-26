@@ -243,9 +243,10 @@ message DataRate {
 }
 
 
-message Scheduled{
+message RequestInfo{
   uint32 rx_window = 1;
-  Class class = 2;
+  uint32 antenna_index = 2;
+  Class class = 3;
 }
 
 // TxSettings contains the settings for a transmission.

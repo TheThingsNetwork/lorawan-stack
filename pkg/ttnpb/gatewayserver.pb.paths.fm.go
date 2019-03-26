@@ -109,10 +109,17 @@ var GatewayDownFieldPathsNested = []string{
 =======
 	"downlink_message.settings.scheduled.gateway_channel_index",
 	"downlink_message.settings.scheduled.invert_polarization",
+<<<<<<< HEAD
 	"downlink_message.settings.scheduled.scheduled",
 	"downlink_message.settings.scheduled.scheduled.class",
 	"downlink_message.settings.scheduled.scheduled.rx_window",
 >>>>>>> api: Add additional fields to TxSettings
+=======
+	"downlink_message.settings.scheduled.request_info",
+	"downlink_message.settings.scheduled.request_info.antenna_index",
+	"downlink_message.settings.scheduled.request_info.class",
+	"downlink_message.settings.scheduled.request_info.rx_window",
+>>>>>>> gs: Add values to TxSettings.Scheduled
 	"downlink_message.settings.scheduled.time",
 	"downlink_message.settings.scheduled.timestamp",
 }
