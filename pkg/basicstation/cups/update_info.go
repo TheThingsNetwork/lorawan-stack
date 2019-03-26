@@ -241,9 +241,6 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 	if gtw.Attributes[lnsCredentialsCRCAttribute] != strconv.FormatUint(uint64(req.LNSCredentialsCRC), 10) {
 		if gtw.Attributes[lnsCredentialsAttribute] == "" {
 			registry := s.getAccess(ctx, &gtw.GatewayIdentifiers)
-			if gtw.Attributes[lnsCredentialsIDAttribute] != "" {
-				// TODO: Try deleting old LNS credentials.
-			}
 			apiKey, err := registry.CreateAPIKey(ctx, &ttnpb.CreateGatewayAPIKeyRequest{
 				GatewayIdentifiers: gtw.GatewayIdentifiers,
 				Name:               fmt.Sprintf("LNS Key, generated %s", time.Now().UTC().Format(time.RFC3339)),
@@ -254,6 +251,18 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 			}, authorization)
 			if err != nil {
 				return err
+			}
+			if gtw.Attributes[lnsCredentialsIDAttribute] != "" {
+				_, err = registry.UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
+					GatewayIdentifiers: gtw.GatewayIdentifiers,
+					APIKey: ttnpb.APIKey{
+						ID:     gtw.Attributes[lnsCredentialsIDAttribute],
+						Rights: nil,
+					},
+				}, authorization)
+				if err != nil {
+					return err
+				}
 			}
 			gtw.Attributes[lnsCredentialsIDAttribute] = apiKey.ID
 			gtw.Attributes[lnsCredentialsAttribute] = apiKey.Key
@@ -274,10 +283,8 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 		}
 	}
 	if gtw.AutoUpdate {
-		// TODO:
-		// Check Station, Model, Package
-		// Compare to version_ids, update_channel
-		// Get update data
+		// TODO: Compare the Station, Model, Package, version_ids and update_channel in order to check if any updates are required
+		// (https://github.com/TheThingsNetwork/lorawan-stack/issues/365)
 		var updateData []byte
 		if updateData != nil {
 			var (
