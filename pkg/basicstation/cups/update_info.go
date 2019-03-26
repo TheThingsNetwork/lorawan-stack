@@ -195,9 +195,6 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 	if gtw.Attributes[cupsCredentialsCRCAttribute] != strconv.FormatUint(uint64(req.CUPSCredentialsCRC), 10) {
 		if gtw.Attributes[cupsCredentialsAttribute] == "" {
 			registry := s.getAccess(ctx, &gtw.GatewayIdentifiers)
-			if gtw.Attributes[cupsCredentialsIDAttribute] != "" {
-				// TODO: Try deleting old CUPS credentials.
-			}
 			apiKey, err := registry.CreateAPIKey(ctx, &ttnpb.CreateGatewayAPIKeyRequest{
 				GatewayIdentifiers: gtw.GatewayIdentifiers,
 				Name:               fmt.Sprintf("CUPS Key, generated %s", time.Now().UTC().Format(time.RFC3339)),
@@ -210,6 +207,18 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 			}, authorization)
 			if err != nil {
 				return err
+			}
+			if gtw.Attributes[cupsCredentialsIDAttribute] != "" {
+				_, err = registry.UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
+					GatewayIdentifiers: gtw.GatewayIdentifiers,
+					APIKey: ttnpb.APIKey{
+						ID:     gtw.Attributes[cupsCredentialsIDAttribute],
+						Rights: nil,
+					},
+				}, authorization)
+				if err != nil {
+					return err
+				}
 			}
 			gtw.Attributes[cupsCredentialsIDAttribute] = apiKey.ID
 			gtw.Attributes[cupsCredentialsAttribute] = apiKey.Key
