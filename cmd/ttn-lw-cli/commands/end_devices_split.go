@@ -16,6 +16,7 @@ package commands
 
 import (
 	"context"
+	"strings"
 
 	"github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/api"
@@ -34,20 +35,36 @@ var (
 	setEndDeviceToJS   = ttnpb.AllowedFieldMaskPathsForRPC["/ttn.lorawan.v3.JsEndDeviceRegistry/Set"]
 )
 
+func nonImplicitPaths(paths ...string) []string {
+	nonImplicitPaths := make([]string, 0, len(paths))
+	for _, path := range paths {
+		if path == "ids" || strings.HasPrefix(path, "ids.") {
+			continue
+		}
+		if path == "created_at" || path == "updated_at" {
+			continue
+		}
+		nonImplicitPaths = append(nonImplicitPaths, path)
+	}
+	return nonImplicitPaths
+}
+
 func splitEndDeviceGetPaths(paths ...string) (is, ns, as, js []string) {
-	is = ttnpb.AllowedFields(paths, getEndDeviceFromIS)
-	ns = ttnpb.AllowedFields(paths, getEndDeviceFromNS)
-	as = ttnpb.AllowedFields(paths, getEndDeviceFromAS)
-	js = ttnpb.AllowedFields(paths, getEndDeviceFromJS)
+	nonImplicitPaths := nonImplicitPaths(paths...)
+	is = ttnpb.AllowedFields(nonImplicitPaths, getEndDeviceFromIS)
+	ns = ttnpb.AllowedFields(nonImplicitPaths, getEndDeviceFromNS)
+	as = ttnpb.AllowedFields(nonImplicitPaths, getEndDeviceFromAS)
+	js = ttnpb.AllowedFields(nonImplicitPaths, getEndDeviceFromJS)
 	return
 }
 
 func splitEndDeviceSetPaths(supportsJoin bool, paths ...string) (is, ns, as, js []string) {
-	is = ttnpb.AllowedFields(paths, setEndDeviceToIS)
-	ns = ttnpb.AllowedFields(paths, setEndDeviceToNS)
-	as = ttnpb.AllowedFields(paths, setEndDeviceToAS)
+	nonImplicitPaths := nonImplicitPaths(paths...)
+	is = ttnpb.AllowedFields(nonImplicitPaths, setEndDeviceToIS)
+	ns = ttnpb.AllowedFields(nonImplicitPaths, setEndDeviceToNS)
+	as = ttnpb.AllowedFields(nonImplicitPaths, setEndDeviceToAS)
 	if supportsJoin {
-		js = ttnpb.AllowedFields(paths, setEndDeviceToJS)
+		js = ttnpb.AllowedFields(nonImplicitPaths, setEndDeviceToJS)
 	}
 	return
 }
@@ -74,6 +91,12 @@ func getEndDevice(ids ttnpb.EndDeviceIdentifiers, nsPaths, asPaths, jsPaths []st
 				logger.WithError(err).Error("Could not get end device from Join Server")
 			} else {
 				res.SetFields(jsRes, ttnpb.AllowedBottomLevelFields(jsPaths, getEndDeviceFromJS)...)
+				if res.CreatedAt.IsZero() || (!jsRes.CreatedAt.IsZero() && jsRes.CreatedAt.Before(res.CreatedAt)) {
+					res.CreatedAt = jsRes.CreatedAt
+				}
+				if jsRes.UpdatedAt.After(res.UpdatedAt) {
+					res.UpdatedAt = jsRes.UpdatedAt
+				}
 			}
 		}
 	}
@@ -97,6 +120,12 @@ func getEndDevice(ids ttnpb.EndDeviceIdentifiers, nsPaths, asPaths, jsPaths []st
 				logger.WithError(err).Error("Could not get end device from Application Server")
 			} else {
 				res.SetFields(asRes, ttnpb.AllowedBottomLevelFields(asPaths, getEndDeviceFromAS)...)
+				if res.CreatedAt.IsZero() || (!asRes.CreatedAt.IsZero() && asRes.CreatedAt.Before(res.CreatedAt)) {
+					res.CreatedAt = asRes.CreatedAt
+				}
+				if asRes.UpdatedAt.After(res.UpdatedAt) {
+					res.UpdatedAt = asRes.UpdatedAt
+				}
 			}
 		}
 	}
@@ -120,6 +149,12 @@ func getEndDevice(ids ttnpb.EndDeviceIdentifiers, nsPaths, asPaths, jsPaths []st
 				logger.WithError(err).Error("Could not get end device from Network Server")
 			} else {
 				res.SetFields(nsRes, ttnpb.AllowedBottomLevelFields(nsPaths, getEndDeviceFromNS)...)
+				if res.CreatedAt.IsZero() || (!nsRes.CreatedAt.IsZero() && nsRes.CreatedAt.Before(res.CreatedAt)) {
+					res.CreatedAt = nsRes.CreatedAt
+				}
+				if nsRes.UpdatedAt.After(res.UpdatedAt) {
+					res.UpdatedAt = nsRes.UpdatedAt
+				}
 			}
 		}
 	}
@@ -129,6 +164,7 @@ func getEndDevice(ids ttnpb.EndDeviceIdentifiers, nsPaths, asPaths, jsPaths []st
 
 func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths []string, isCreate bool) (*ttnpb.EndDevice, error) {
 	var res ttnpb.EndDevice
+	res.SetFields(device, "ids", "created_at", "updated_at")
 
 	if len(isPaths) > 0 || isCreate {
 		is, err := api.Dial(ctx, config.IdentityServerAddress)
@@ -145,6 +181,12 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths []
 			return nil, err
 		}
 		res.SetFields(isRes, isPaths...)
+		if res.CreatedAt.IsZero() || (!isRes.CreatedAt.IsZero() && isRes.CreatedAt.Before(res.CreatedAt)) {
+			res.CreatedAt = isRes.CreatedAt
+		}
+		if isRes.UpdatedAt.After(res.UpdatedAt) {
+			res.UpdatedAt = isRes.UpdatedAt
+		}
 	}
 
 	if len(jsPaths) > 0 {
@@ -162,6 +204,12 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths []
 			return nil, err
 		}
 		res.SetFields(jsRes, jsPaths...)
+		if res.CreatedAt.IsZero() || (!jsRes.CreatedAt.IsZero() && jsRes.CreatedAt.Before(res.CreatedAt)) {
+			res.CreatedAt = jsRes.CreatedAt
+		}
+		if jsRes.UpdatedAt.After(res.UpdatedAt) {
+			res.UpdatedAt = jsRes.UpdatedAt
+		}
 	}
 
 	if len(nsPaths) > 0 || isCreate {
@@ -179,6 +227,12 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths []
 			return nil, err
 		}
 		res.SetFields(nsRes, nsPaths...)
+		if res.CreatedAt.IsZero() || (!nsRes.CreatedAt.IsZero() && nsRes.CreatedAt.Before(res.CreatedAt)) {
+			res.CreatedAt = nsRes.CreatedAt
+		}
+		if nsRes.UpdatedAt.After(res.UpdatedAt) {
+			res.UpdatedAt = nsRes.UpdatedAt
+		}
 	}
 
 	if len(asPaths) > 0 || isCreate {
@@ -196,6 +250,12 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths []
 			return nil, err
 		}
 		res.SetFields(asRes, asPaths...)
+		if res.CreatedAt.IsZero() || (!asRes.CreatedAt.IsZero() && asRes.CreatedAt.Before(res.CreatedAt)) {
+			res.CreatedAt = asRes.CreatedAt
+		}
+		if asRes.UpdatedAt.After(res.UpdatedAt) {
+			res.UpdatedAt = asRes.UpdatedAt
+		}
 	}
 
 	return &res, ctx.Err()
