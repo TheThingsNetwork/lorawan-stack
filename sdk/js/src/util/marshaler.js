@@ -66,8 +66,16 @@ class Marshaler {
     return { [entity]: transformedList, totalCount }
   }
 
-  static payloadSingleResponse ({ data }, transform) {
-    return transform ? transform(data) : data
+  static payloadSingleResponse (response, transform) {
+    if (typeof response !== 'object') {
+      throw new Error(`Invalid response type: ${typeof response}`)
+    }
+    if ('status' in response && response.status > 400) {
+      throw new Error(`Response status ${response.status}`)
+    }
+
+    const entity = response.data || response
+    return transform ? transform(entity) : entity
   }
 
   static unwrapRights (result, transform) {
@@ -84,6 +92,41 @@ class Marshaler {
 
   static fieldMaskFromPatch (patch) {
     return traverse(patch).paths().slice(1).map( e => e.join('.') )
+  }
+
+  /** This function will convert a paths object to a proper field mask.
+  * @param {Object} paths - The raw field mask as array and/or string.
+  * @returns {Object} The field mask object ready to be attached to a request.
+  */
+  static pathsToFieldMask (paths) {
+    if (!paths) {
+      return
+    }
+    return { fieldMask: { paths: paths.map(e => e.join('.')) }}
+  }
+
+  /** This function will convert a selector parameter and convert it to a
+  * streamlined array of paths.
+  * @param {Object} selector - The raw selector passed by the user
+  * @returns {Object} The field mask object ready to be attached to a request.
+  */
+  static selectorToPaths (selector) {
+    if (typeof selector === 'string') {
+      return selector.split(',').map(e => e.split('.'))
+    }
+    if (selector instanceof Array) {
+      return selector.map(e => typeof e === 'string' ? e.split('.') : e)
+    }
+    return selector
+  }
+
+  /** This function will convert a selector parameter and convert it to a
+  * proper field mask object, ready to be passed to the API.
+  * @param {Object} selector - The raw selector passed by the user
+  * @returns {Object} The field mask object ready to be attached to a request.
+  */
+  static selectorToFieldMask (selector) {
+    return this.pathsToFieldMask(this.selectorToPaths(selector))
   }
 
   static fieldMask (fieldMask) {
