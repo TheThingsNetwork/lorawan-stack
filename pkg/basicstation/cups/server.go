@@ -23,7 +23,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/labstack/echo"
+	echo "github.com/labstack/echo/v4"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
@@ -124,7 +124,7 @@ func (s *Server) getAccess(ctx context.Context, ids *ttnpb.GatewayIdentifiers) t
 type Option func(s *Server)
 
 // WithAuth sets the auth function for gateways that don't provide TTN auth.
-// When this auth method is used, the CUPS server will look up the _cups_credentials
+// When this auth method is used, the CUPS server will look up the cups-credentials
 // attribute in the gateway registry.
 func WithAuth(auth func(ctx context.Context, gatewayEUI types.EUI64, auth string) grpc.CallOption) Option {
 	return func(s *Server) {
@@ -132,7 +132,7 @@ func WithAuth(auth func(ctx context.Context, gatewayEUI types.EUI64, auth string
 	}
 }
 
-// WithExplicitEnable requires CUPS to be explicitly enabled with a _cups attribute
+// WithExplicitEnable requires CUPS to be explicitly enabled with a cups attribute
 // in the gateway registry.
 func WithExplicitEnable(enable bool) Option {
 	return func(s *Server) {

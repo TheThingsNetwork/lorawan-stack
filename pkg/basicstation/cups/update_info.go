@@ -28,7 +28,7 @@ import (
 	"time"
 
 	"github.com/gogo/protobuf/types"
-	"github.com/labstack/echo"
+	echo "github.com/labstack/echo/v4"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
@@ -38,18 +38,18 @@ import (
 )
 
 const (
-	cupsAttribute               = "_cups"
-	cupsURIAttribute            = "_cups_uri"
-	cupsLastSeenAttribute       = "_cups_last_seen"
-	cupsCredentialsIDAttribute  = "_cups_credentials_id"
-	cupsCredentialsAttribute    = "_cups_credentials"
-	cupsCredentialsCRCAttribute = "_cups_credentials_crc"
-	cupsStationAttribute        = "_cups_station"
-	cupsModelAttribute          = "_cups_model"
-	cupsPackageAttribute        = "_cups_package"
-	lnsCredentialsIDAttribute   = "_lns_credentials_id"
-	lnsCredentialsAttribute     = "_lns_credentials"
-	lnsCredentialsCRCAttribute  = "_lns_credentials_crc"
+	cupsAttribute               = "cups"
+	cupsURIAttribute            = "cups-uri"
+	cupsLastSeenAttribute       = "cups-last-seen"
+	cupsCredentialsIDAttribute  = "cups-credentials-id"
+	cupsCredentialsAttribute    = "cups-credentials"
+	cupsCredentialsCRCAttribute = "cups-credentials-crc"
+	cupsStationAttribute        = "cups-station"
+	cupsModelAttribute          = "cups-model"
+	cupsPackageAttribute        = "cups-package"
+	lnsCredentialsIDAttribute   = "lns-credentials-id"
+	lnsCredentialsAttribute     = "lns-credentials"
+	lnsCredentialsCRCAttribute  = "lns-credentials-crc"
 )
 
 var (
