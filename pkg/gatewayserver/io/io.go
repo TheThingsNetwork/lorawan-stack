@@ -288,8 +288,15 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 			settings := ttnpb.TxSettings{
 				DataRateIndex: rx.dataRateIndex,
 				Frequency:     rx.frequency,
+<<<<<<< HEAD
 				Downlink: &ttnpb.TxSettings_Downlink{
 					TxPower:      eirp,
+=======
+				TxPower:       eirp,
+				RequestInfo: &ttnpb.RequestInfo{
+					RxWindow:     uint32(i),
+					Class:        request.Class,
+>>>>>>> gs: Add values to TxSettings.Scheduled
 					AntennaIndex: ids.AntennaIndex,
 				},
 			}

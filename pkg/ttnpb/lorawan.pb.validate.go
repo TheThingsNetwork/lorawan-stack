@@ -1386,16 +1386,16 @@ var _ interface {
 	ErrorName() string
 } = DataRateValidationError{}
 
-// ValidateFields checks the field values on Scheduled with the rules defined
+// ValidateFields checks the field values on RequestInfo with the rules defined
 // in the proto definition for this message. If any rules are violated, an
 // error is returned.
-func (m *Scheduled) ValidateFields(paths ...string) error {
+func (m *RequestInfo) ValidateFields(paths ...string) error {
 	if m == nil {
 		return nil
 	}
 
 	if len(paths) == 0 {
-		paths = ScheduledFieldPathsNested
+		paths = RequestInfoFieldPathsNested
 	}
 
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
@@ -1403,10 +1403,12 @@ func (m *Scheduled) ValidateFields(paths ...string) error {
 		switch name {
 		case "rx_window":
 			// no validation rules for RxWindow
+		case "antenna_index":
+			// no validation rules for AntennaIndex
 		case "class":
 			// no validation rules for Class
 		default:
-			return ScheduledValidationError{
+			return RequestInfoValidationError{
 				field:  name,
 				reason: "invalid field path",
 			}
@@ -1415,9 +1417,9 @@ func (m *Scheduled) ValidateFields(paths ...string) error {
 	return nil
 }
 
-// ScheduledValidationError is the validation error returned by
-// Scheduled.ValidateFields if the designated constraints aren't met.
-type ScheduledValidationError struct {
+// RequestInfoValidationError is the validation error returned by
+// RequestInfo.ValidateFields if the designated constraints aren't met.
+type RequestInfoValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -1425,22 +1427,22 @@ type ScheduledValidationError struct {
 }
 
 // Field function returns field value.
-func (e ScheduledValidationError) Field() string { return e.field }
+func (e RequestInfoValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e ScheduledValidationError) Reason() string { return e.reason }
+func (e RequestInfoValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e ScheduledValidationError) Cause() error { return e.cause }
+func (e RequestInfoValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e ScheduledValidationError) Key() bool { return e.key }
+func (e RequestInfoValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e ScheduledValidationError) ErrorName() string { return "ScheduledValidationError" }
+func (e RequestInfoValidationError) ErrorName() string { return "RequestInfoValidationError" }
 
 // Error satisfies the builtin error interface
-func (e ScheduledValidationError) Error() string {
+func (e RequestInfoValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -1452,14 +1454,14 @@ func (e ScheduledValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sScheduled.%s: %s%s",
+		"invalid %sRequestInfo.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = ScheduledValidationError{}
+var _ error = RequestInfoValidationError{}
 
 var _ interface {
 	Field() string
@@ -1467,7 +1469,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = ScheduledValidationError{}
+} = RequestInfoValidationError{}
 
 // ValidateFields checks the field values on TxSettings with the rules defined
 // in the proto definition for this message. If any rules are violated, an
@@ -1526,6 +1528,7 @@ func (m *TxSettings) ValidateFields(paths ...string) error {
 			}
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 		case "downlink":
 
 			if v, ok := interface{}(m.GetDownlink()).(interface{ ValidateFields(...string) error }); ok {
@@ -1534,12 +1537,19 @@ func (m *TxSettings) ValidateFields(paths ...string) error {
 						field:  "downlink",
 =======
 		case "scheduled":
+=======
+		case "request_info":
+>>>>>>> gs: Add values to TxSettings.Scheduled
 
-			if v, ok := interface{}(m.GetScheduled()).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetRequestInfo()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return TxSettingsValidationError{
+<<<<<<< HEAD
 						field:  "scheduled",
 >>>>>>> api: Add additional fields to TxSettings
+=======
+						field:  "request_info",
+>>>>>>> gs: Add values to TxSettings.Scheduled
 						reason: "embedded message failed validation",
 						cause:  err,
 					}

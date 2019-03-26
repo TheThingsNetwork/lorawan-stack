@@ -345,7 +345,7 @@
     - [MHDR](#ttn.lorawan.v3.MHDR)
     - [Message](#ttn.lorawan.v3.Message)
     - [RejoinRequestPayload](#ttn.lorawan.v3.RejoinRequestPayload)
-    - [Scheduled](#ttn.lorawan.v3.Scheduled)
+    - [RequestInfo](#ttn.lorawan.v3.RequestInfo)
     - [TxRequest](#ttn.lorawan.v3.TxRequest)
     - [TxSettings](#ttn.lorawan.v3.TxSettings)
     - [TxSettings.Downlink](#ttn.lorawan.v3.TxSettings.Downlink)
@@ -4376,15 +4376,16 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 
 
-<a name="ttn.lorawan.v3.Scheduled"></a>
+<a name="ttn.lorawan.v3.RequestInfo"></a>
 
-### Scheduled
+### RequestInfo
 
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | rx_window | [uint32](#uint32) |  |  |
+| antenna_index | [uint32](#uint32) |  |  |
 | class | [Class](#ttn.lorawan.v3.Class) |  |  |
 
 
@@ -4437,6 +4438,7 @@ On downlink, this is a scheduled transmission.
 | timestamp | [uint32](#uint32) |  | Timestamp of the gateway concentrator when the uplink message was received, or when the downlink message should be transmitted (microseconds). On downlink, set timestamp to 0 and time to null to use immediate scheduling. |
 | time | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | Time of the gateway when the uplink message was received, or when the downlink message should be transmitted. For downlink, this requires the gateway to have GPS time synchronization. |
 <<<<<<< HEAD
+<<<<<<< HEAD
 | downlink | [TxSettings.Downlink](#ttn.lorawan.v3.TxSettings.Downlink) |  | Transmission settings for downlink. |
 
 
@@ -4458,6 +4460,9 @@ Transmission settings for downlink.
 =======
 | scheduled | [Scheduled](#ttn.lorawan.v3.Scheduled) |  | Additional information on the scheduled downlink necessary for the BasicStation LNS gateways. |
 >>>>>>> api: Add additional fields to TxSettings
+=======
+| request_info | [RequestInfo](#ttn.lorawan.v3.RequestInfo) |  | Additional information for the downlink from the original TxRequest; necessary for the BasicStation LNS gateways. |
+>>>>>>> gs: Add values to TxSettings.Scheduled
 
 
 
