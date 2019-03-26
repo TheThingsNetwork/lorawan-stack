@@ -27,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
@@ -36,8 +37,12 @@ import (
 func TestLink(t *testing.T) {
 	a := assertions.New(t)
 
+	registeredApplicationKey := "secret"
+
 	ctx := test.Context()
-	ns, nsAddr := startMockNS(ctx)
+	ns, nsAddr := startMockNS(ctx, func(md rpcmetadata.MD) bool {
+		return md.AuthType == "Bearer" && md.AuthValue == registeredApplicationKey
+	})
 
 	paths := []string{
 		"network_server_address",
@@ -85,7 +90,7 @@ func TestLink(t *testing.T) {
 		select {
 		case ids := <-ns.linkCh:
 			a.So(ids, should.Resemble, app1)
-		case <-time.After(timeout):
+		case <-time.After(Timeout):
 			t.Fatal("Expect link timeout")
 		}
 	}
@@ -142,7 +147,7 @@ func TestLink(t *testing.T) {
 				select {
 				case ids := <-ns.linkCh:
 					a.So(ids, should.Resemble, app2)
-				case <-time.After(timeout):
+				case <-time.After(Timeout):
 					t.Fatal("Expect link timeout")
 				}
 				actual, err := as.GetLink(ctx, &ttnpb.GetApplicationLinkRequest{
@@ -162,7 +167,7 @@ func TestLink(t *testing.T) {
 				a.So(stats.NetworkServerAddress, should.Equal, link.NetworkServerAddress)
 
 				// Wait for link to subscribe internally.
-				time.Sleep(timeout)
+				time.Sleep(Timeout)
 
 				// Delete link.
 				_, err = as.DeleteLink(ctx, &app2)
@@ -172,7 +177,7 @@ func TestLink(t *testing.T) {
 				select {
 				case ids := <-ns.unlinkCh:
 					a.So(ids, should.Resemble, app2)
-				case <-time.After(timeout):
+				case <-time.After(Timeout):
 					t.Fatal("Expect unlink timeout")
 				}
 				_, err = as.GetLink(ctx, &ttnpb.GetApplicationLinkRequest{
@@ -244,7 +249,7 @@ func TestLink(t *testing.T) {
 				select {
 				case <-ns.linkCh:
 					t.Fatal("Expect no link with invalid authentication")
-				case <-time.After(timeout):
+				case <-time.After(Timeout):
 				}
 
 				actual, err := as.GetLink(ctx, &ttnpb.GetApplicationLinkRequest{

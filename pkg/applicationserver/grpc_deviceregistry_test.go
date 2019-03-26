@@ -72,7 +72,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
 				FieldMask: pbtypes.FieldMask{
-					Paths: []string{"formatters"},
+					Paths: []string{"ids", "formatters"},
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
@@ -99,7 +99,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
 				FieldMask: pbtypes.FieldMask{
-					Paths: []string{"formatters"},
+					Paths: []string{"ids", "formatters"},
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
@@ -127,7 +127,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
 				FieldMask: pbtypes.FieldMask{
-					Paths: []string{"formatters"},
+					Paths: []string{"ids", "formatters"},
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
@@ -156,13 +156,13 @@ func TestDeviceRegistryGet(t *testing.T) {
 					},
 					DeviceID: registeredDeviceID,
 				})
-				a.So(paths, should.HaveSameElementsDeep, []string{"formatters"})
+				a.So(paths, should.HaveSameElementsDeep, []string{"ids", "formatters"})
 				return deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice), nil
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
 				FieldMask: pbtypes.FieldMask{
-					Paths: []string{"formatters"},
+					Paths: []string{"ids", "formatters"},
 				},
 			},
 			GetCalls: 1,
@@ -251,7 +251,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
 				EndDevice: deepcopy.Copy(*registeredDevice).(ttnpb.EndDevice),
 				FieldMask: pbtypes.FieldMask{
-					Paths: []string{"formatters"},
+					Paths: []string{"ids", "formatters"},
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
@@ -261,7 +261,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 		},
 
 		{
-			Name: "Invalid application",
+			Name: "Invalid application ID",
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
@@ -278,7 +278,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
 				EndDevice: deepcopy.Copy(*registeredDevice).(ttnpb.EndDevice),
 				FieldMask: pbtypes.FieldMask{
-					Paths: []string{"formatters"},
+					Paths: []string{"ids", "formatters"},
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
@@ -314,7 +314,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					},
 				},
 				FieldMask: pbtypes.FieldMask{
-					Paths: []string{"formatters"},
+					Paths: []string{"ids", "formatters"},
 				},
 			},
 			SetFunc: func(ctx context.Context, deviceIds ttnpb.EndDeviceIdentifiers, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
@@ -325,7 +325,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					},
 					DeviceID: "new-device",
 				})
-				a.So(paths, should.HaveSameElementsDeep, []string{"formatters"})
+				a.So(paths, should.HaveSameElementsDeep, []string{"ids", "formatters"})
 				dev, _, err := cb(nil)
 				return dev, err
 			},
@@ -361,13 +361,13 @@ func TestDeviceRegistrySet(t *testing.T) {
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
 				EndDevice: deepcopy.Copy(*registeredDevice).(ttnpb.EndDevice),
 				FieldMask: pbtypes.FieldMask{
-					Paths: []string{"formatters"},
+					Paths: []string{"ids", "formatters"},
 				},
 			},
 			SetFunc: func(ctx context.Context, deviceIds ttnpb.EndDeviceIdentifiers, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(deviceIds, should.Resemble, registeredDevice.EndDeviceIdentifiers)
-				a.So(paths, should.HaveSameElementsDeep, []string{"formatters"})
+				a.So(paths, should.HaveSameElementsDeep, []string{"ids", "formatters"})
 				dev, _, err := cb(deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice))
 				return dev, err
 			},

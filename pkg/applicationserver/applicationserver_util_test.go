@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package applicationserver
+package applicationserver_test
 
 import (
 	"context"
@@ -23,7 +23,7 @@ import (
 )
 
 var (
-	Timeout = (1 << 10) * test.Delay
+	Timeout = (1 << 8) * test.Delay
 )
 
 // MockDeviceRegistry is a mock DeviceRegistry used for testing.
