@@ -3,6 +3,10 @@ name: Feature request
 about: Suggest an idea for this project
 
 ---
+<!--
+Thanks for submitting a feature request. Please fill the template below,
+otherwise we will not be able to process this feature request.
+-->
 
 **Summary:** 
 <!-- Summarize the feature in a few sentences: -->
@@ -10,12 +14,15 @@ about: Suggest an idea for this project
 ...
 
 **Why do we need this?**
-<!-- Please explain the motivation, how it will be used, etc -->
+<!-- Please explain the motivation, how it will be used, etc. -->
 
 ...
 
 **What is already there? What do you see now?**
-<!-- Please attach (or link to) screenshots and logs if applicable -->
+<!--
+Please paste terminal output, upload logs (as .txt) or upload screenshots.
+Describe or link to related APIs, screen designs, packages, etc.
+-->
 
 ...
 
@@ -24,19 +31,20 @@ about: Suggest an idea for this project
 
 ...
 
-**How do you propose to implement this?**
+**Environment:**
 <!--
-If unsure, add the discussion label and (temporarily) assign the expert
-If you cannot assign people, please @mention the experts
+Your environment: OS/Browser/Gateway/Device/...? Versions? IDs/EUIs?
+Paste the output of "ttn-lw-cli version" or "ttn-lw-stack version" if applicable.
 -->
 
 ...
 
-**Environment:**
-<!-- Your environment: OS/Browser/Gateway/Device/...? Versions? IDs/EUIs? -->
+**How do you propose to implement this?**
+<!-- Please think about how this could be fixed. -->
 
 ...
 
-**What can you do yourself and what do you need help with?**
+**Can you do this yourself and submit a Pull Request?**
+<!-- You can also @mention experts if you need help with this. -->
 
 ...
