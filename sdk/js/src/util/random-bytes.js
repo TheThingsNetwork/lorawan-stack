@@ -12,24 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Applications from './service/applications'
-import Application from './entity/application'
-import Api from './api'
+import crypto from 'crypto'
 
-class TtnLw {
-  constructor (token, {
-    stackConfig,
-    connectionType,
-    defaultUserId,
-    proxy,
-    axiosConfig,
-  }) {
-    this.config = arguments.config
-    this.api = new Api(connectionType, stackConfig, axiosConfig, token)
-
-    this.Applications = new Applications(this.api, { defaultUserId, proxy, stackConfig })
-    this.Application = Application.bind(null, this.Applications)
-  }
+export default function randomByteString (len, type = 'hex') {
+  return crypto
+    .randomBytes(type === 'hex' ? Math.floor(len / 2) : len)
+    .toString(type)
 }
-
-export default TtnLw

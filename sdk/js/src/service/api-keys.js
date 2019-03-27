@@ -15,7 +15,7 @@
 import Marshaler from '../util/marshaler'
 
 class ApiKeys {
-  constructor (registry, parentRoutes) {
+  constructor (registry, { parentRoutes }) {
     this._api = registry
     this._parentRoutes = parentRoutes
   }
@@ -23,9 +23,8 @@ class ApiKeys {
   async getAll (entityId, params) {
     const entityIdRoute = this._parentRoutes.list
     const result = await this._api.ListAPIKeys({
-      route: { [entityIdRoute]: entityId },
-      query: params,
-    })
+      routeParams: { [entityIdRoute]: entityId },
+    }, params)
 
     return Marshaler.payloadListResponse('api_keys', result)
   }
@@ -33,7 +32,7 @@ class ApiKeys {
   async create (entityId, key) {
     const entityIdRoute = this._parentRoutes.create
     const result = await this._api.CreateAPIKey({
-      route: { [entityIdRoute]: entityId },
+      routeParams: { [entityIdRoute]: entityId },
     },
     {
       ...key,
@@ -51,7 +50,7 @@ class ApiKeys {
   async updateById (entityId, id, patch) {
     const entityIdRoute = this._parentRoutes.update
     const result = await this._api.UpdateAPIKey({
-      route: {
+      routeParams: {
         [entityIdRoute]: entityId,
         'api_key.id': id,
       },

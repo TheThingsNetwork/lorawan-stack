@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import Marshaler from '../util/marshaler'
-import Device from '../entity/device'
+import Devices from '../service/devices'
 import Application from '../entity/application'
 import ApiKeys from './api-keys'
 import Link from './link'
@@ -30,80 +30,77 @@ import Link from './link'
  *  should be proxied with the wrapper objects.
  */
 class Applications {
-  constructor (api, { defaultUserId, proxy = true }) {
+  constructor (api, { defaultUserId, stackConfig, proxy = true }) {
     this._defaultUserId = defaultUserId
     this._api = api
-    this._applicationTransform = proxy
-      ? app => new Application(this, app, false)
-      : undefined
+    this._proxy = proxy
 
     this.ApiKeys = new ApiKeys(api.ApplicationAccess, {
-      list: 'application_id',
-      create: 'application_ids.application_id',
-      update: 'application_ids.application_id',
+      parentRoutes: {
+        list: 'application_id',
+        create: 'application_ids.application_id',
+        update: 'application_ids.application_id',
+      },
     })
     this.Link = new Link(api.As)
+    this.Devices = new Devices(api, { proxy })
+  }
+
+  _responseTransform (response, single = true) {
+    return Marshaler[single ? 'unwrapApplication' : 'unwrapApplications'](
+      response,
+      this._proxy
+        ? app => new Application(this, app, false)
+        : undefined
+    )
   }
 
   // Retrieval
 
   async getAll (params) {
-    const result = await this._api.ApplicationRegistry.List({ query: params })
+    const response = await this._api.ApplicationRegistry.List(undefined, params)
 
-    return Marshaler.unwrapApplications(
-      result,
-      this._applicationTransform
-    )
+    return this._responseTransform(response, false)
   }
 
-  async getById (id) {
-    const result = await this._api.ApplicationRegistry.Get({
-      route: { 'application_ids.application_id': id },
-    })
+  async getById (id, selector) {
+    const fieldMask = Marshaler.selectorToFieldMask(selector)
+    const response = await this._api.ApplicationRegistry.Get({
+      routeParams: { 'application_ids.application_id': id },
+    }, fieldMask)
 
-    return Marshaler.unwrapApplication(
-      result,
-      this._applicationTransform
-    )
+    return this._responseTransform(response)
   }
 
   async getByOrganization (organizationId) {
-    const result = this._api.ApplicationRegistry.List({
-      route: { 'collaborator.organization_ids.organization_id': organizationId },
+    const response = this._api.ApplicationRegistry.List({
+      routeParams: { 'collaborator.organization_ids.organization_id': organizationId },
     })
 
-    return Marshaler.unwrapApplications(
-      result,
-      this._applicationTransform
-    )
+    return this._responseTransform(response)
   }
 
   async getByCollaborator (userId) {
-    const result = this._api.ApplicationRegistry.List({
-      route: { 'collaborator.user_ids.user_id': userId },
+    const response = this._api.ApplicationRegistry.List({
+      routeParams: { 'collaborator.user_ids.user_id': userId },
     })
 
-    return Marshaler.unwrapApplications(
-      result,
-      this._applicationTransform
-    )
+    return this._responseTransform(response)
   }
 
   async search (params) {
-    const result = await this._api.EntityRegistrySearch.SearchApplications({
-      query: params,
+    const response = await this._api.EntityRegistrySearch.SearchApplications({
+      queryParams: params,
     })
-    return Marshaler.unwrapApplications(
-      result,
-      this._applicationTransform
-    )
+
+    return this._responseTransform(response, false)
   }
 
   // Update
 
   async updateById (id, patch, mask = Marshaler.fieldMaskFromPatch(patch)) {
-    const result = await this._api.ApplicationRegistry.Update({
-      route: {
+    const response = await this._api.ApplicationRegistry.Update({
+      routeParams: {
         'application.ids.application_id': id,
       },
     },
@@ -112,7 +109,7 @@ class Applications {
       field_mask: Marshaler.fieldMask(mask),
     })
     return Marshaler.unwrapApplication(
-      result,
+      response,
       this._applicationTransform
     )
   }
@@ -120,79 +117,27 @@ class Applications {
   // Create
 
   async create (userId = this._defaultUserId, application) {
-    const result = await this._api.ApplicationRegistry.Create({
-      route: { 'collaborator.user_ids.user_id': userId },
+    const response = await this._api.ApplicationRegistry.Create({
+      routeParams: { 'collaborator.user_ids.user_id': userId },
     },
     { application })
-    return Marshaler.unwrapApplication(
-      result,
-      this._applicationTransform
-    )
+    return this._responseTransform(response)
   }
 
   // Delete
 
   async deleteById (applicationId) {
     return this._api.ApplicationRegistry.Delete({
-      route: { application_id: applicationId },
+      routeParams: { application_id: applicationId },
     })
   }
 
   async getRightsById (applicationId) {
     const result = await this._api.ApplicationAccess.ListRights({
-      route: { application_id: applicationId },
+      routeParams: { application_id: applicationId },
     })
 
     return Marshaler.unwrapRights(result)
-  }
-
-  // Shorthand to methods of single application
-  withId (id) {
-    const parent = this
-    const api = parent._api
-    const idMask = { 'application_ids.application_id': id }
-    return {
-      async getDevices () {
-        return api.EndDeviceRegistry.List(idMask)
-      },
-      async getDevice (deviceId) {
-        const result = await api.EndDeviceRegistry.Get({
-          'end_device_ids.application_ids.application_id': id,
-          device_id: deviceId,
-        })
-        return new Device(result, api)
-      },
-      async getApiKeys (params) {
-        return this.ApiKeys.getAll(id, params)
-      },
-      async getCollaborators () {
-        return api.ApplicationAccess.ListCollaborators({ application_id: id })
-      },
-      async addApiKey (key) {
-        return this.ApiKeys.create(id, key)
-      },
-      async deleteApiKey (keyId) {
-        return this.ApiKeys.deleteById(id, keyId)
-      },
-      async updateApikey (keyId, patch) {
-        return this.ApiKeys.updateById(id, keyId, patch)
-      },
-      async addCollaborator (collaborator) {
-        return api.ApplicationAccess.SetCollaborator(idMask, collaborator)
-      },
-      async createLink (link) {
-        return this.Link.create(id, link)
-      },
-      async setLink (link, mask) {
-        return this.Link.set(id, link, mask)
-      },
-      async deleteLink () {
-        return this.Link.delete(id)
-      },
-      async getLinkStats () {
-        return this.Link.getStats(id)
-      },
-    }
   }
 }
 

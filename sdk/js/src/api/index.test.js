@@ -66,10 +66,10 @@ describe('API', function () {
   })
 
   test('it applies parameters correctly', function () {
-    api.ApplicationRegistry.Create({ route: { 'collaborator.user_ids.user_id': 'test' }})
+    api.ApplicationRegistry.Create({ routeParams: { 'collaborator.user_ids.user_id': 'test' }}, { name: 'test-name' })
 
     expect(api._connector.post).toHaveBeenCalledTimes(1)
-    expect(api._connector.post).toHaveBeenCalledWith('/users/test/applications', undefined)
+    expect(api._connector.post).toHaveBeenCalledWith('/users/test/applications', { name: 'test-name' })
   })
 
   test('it throws when parameters mismatch', function () {
@@ -79,9 +79,9 @@ describe('API', function () {
   })
 
   test('it respects the search query', function () {
-    api.ApplicationRegistry.List({ query: { limit: 2, page: 1 }})
+    api.ApplicationRegistry.List(undefined, { limit: 2, page: 1 })
 
     expect(api._connector.get).toHaveBeenCalledTimes(1)
-    expect(api._connector.get).toHaveBeenCalledWith('/applications?limit=2&page=1', undefined)
+    expect(api._connector.get).toHaveBeenCalledWith('/applications', { limit: 2, page: 1 })
   })
 })

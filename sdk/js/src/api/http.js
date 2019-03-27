@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import axios from 'axios'
-import Marshaler from '../util/marshaler'
 
 /**
  * Http Class is a connector for the API that uses the HTTP bridge to connect.
@@ -59,11 +58,15 @@ class Http {
     }
   }
 
-  async handleRequest (method, endpoint, rawPayload) {
-    const payload = rawPayload ? Marshaler.payload(rawPayload) : {}
+  async handleRequest (method, endpoint, payload = {}, config) {
     const component = this._parseStackComponent(endpoint)
     try {
-      return await this[component][method](endpoint, payload)
+      return await this[component]({
+        method,
+        url: endpoint,
+        data: payload,
+        ...config,
+      })
     } catch (err) {
       if ('response' in err && err.response && 'data' in err.response) {
         throw err.response.data
@@ -73,20 +76,30 @@ class Http {
     }
   }
 
-  async get (endpoint) {
-    return this.handleRequest('get', endpoint)
+  async get (endpoint, params) {
+    // Convert payload to query params (should usually be field_mask only)
+    const config = {}
+    if (params && Object.keys(params).length > 0) {
+      if ('field_mask' in params) {
+        // Convert field mask prop to a query param friendly format
+        params.field_mask = params.field_mask.paths.join(',')
+      }
+      config.params = params
+    }
+
+    return this.handleRequest('get', endpoint, undefined, config)
   }
 
-  async post (endpoint, rawPayload) {
-    return this.handleRequest('post', endpoint, rawPayload)
+  async post (endpoint, payload) {
+    return this.handleRequest('post', endpoint, payload)
   }
 
-  async patch (endpoint, rawPayload) {
-    return this.handleRequest('patch', endpoint, rawPayload)
+  async patch (endpoint, payload) {
+    return this.handleRequest('patch', endpoint, payload)
   }
 
-  async put (endpoint, rawPayload) {
-    return this.handleRequest('put', endpoint, rawPayload)
+  async put (endpoint, payload) {
+    return this.handleRequest('put', endpoint, payload)
   }
 
   async delete (endpoint) {

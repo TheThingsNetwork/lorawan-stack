@@ -34,34 +34,24 @@ class Application extends Entity {
     this.Devices = new Devices(parent._api, this._id)
   }
 
-  // Collaborators
-
-  async getCollaborators () {
-    return this._parent.withId(this._id).getCollaborators()
-  }
-
-  async addCollaborator (collaborator) {
-    return this._parent.withId(this._id).setCollaborator(collaborator)
-  }
-
   // API Keys
 
-  async getApiKeys () {
-    return this._parent.withId(this._id).getApiKeys()
+  async getApiKeys (params) {
+    return this._parent.ApiKeys.getAll(this._id, params)
   }
 
   async addApiKey (key) {
-    return this._parent.withId(this._id).addApiKey(key)
+    return this._parent.ApiKeys.getAll(this._id, key)
   }
 
   // Devices
 
   async getDevice (deviceId) {
-    return this._parent.withId(this._id).getDevice(deviceId)
+    return this._parent.Devices.getById(this._id, deviceId)
   }
 
-  async getDevices () {
-    return this._parent.withId(this._id).getDevices()
+  async getDevices (params) {
+    return this._parent.Devices.getAll(this._id, params)
   }
 
   async save (userId) {
