@@ -286,9 +286,9 @@ func (updf *UplinkDataFrame) ToUplinkMessage(ids ttnpb.GatewayIdentifiers, bandI
 }
 
 // ToTxAcknowledgment extracts fields from the basic station TxConfirmation "dntxed" message and converts them into a TxAcknowledgment for the network server.
-func (conf *TxConfirmation) ToTxAcknowledgment(ids ttnpb.GatewayIdentifiers, bandID string) (ttnpb.TxAcknowledgment, error) {
-	// TODO: How to correlate a TxAck to its corresponding downlink
+func ToTxAcknowledgment(correlationIDs []string) ttnpb.TxAcknowledgment {
 	return ttnpb.TxAcknowledgment{
-		Result: ttnpb.TxAcknowledgment_SUCCESS,
-	}, nil
+		CorrelationIDs: correlationIDs,
+		Result:         ttnpb.TxAcknowledgment_SUCCESS,
+	}
 }
