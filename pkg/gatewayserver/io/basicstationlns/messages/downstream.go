@@ -53,8 +53,8 @@ func (dnmsg DownlinkMessage) MarshalJSON() ([]byte, error) {
 	})
 }
 
-// GetFromNSDownlinkMessage ...
-func (dnmsg *DownlinkMessage) GetFromNSDownlinkMessage(ids ttnpb.GatewayIdentifiers, down ttnpb.DownlinkMessage) error {
+// FromNSDownlinkMessage translates the ttnpb.DownlinkMessage to LNS DownlinkMessage "dnmsg".
+func (dnmsg *DownlinkMessage) FromNSDownlinkMessage(ids ttnpb.GatewayIdentifiers, down ttnpb.DownlinkMessage, dlToken int64) error {
 	scheduledMsg := down.GetScheduled()
 	dnmsg.DevEUI = basicstation.EUI{Prefix: "DevEui", EUI64: *down.EndDeviceIDs.DevEUI}
 	dnmsg.Pdu = string(down.GetRawPayload())
@@ -83,7 +83,9 @@ func (dnmsg *DownlinkMessage) GetFromNSDownlinkMessage(ids ttnpb.GatewayIdentifi
 		xtime = time.Now().Add(time.Duration(-2) * time.Minute).Unix()
 	}
 	dnmsg.XTime = xtime
+
 	dnmsg.RCtx = int64(scheduledMsg.RequestInfo.AntennaIndex)
+	dnmsg.Diid = dlToken
 
 	return nil
 }
