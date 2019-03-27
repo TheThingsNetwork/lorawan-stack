@@ -17,9 +17,10 @@ import { connect } from 'react-redux'
 import { Col, Row, Container } from 'react-grid-system'
 
 import sharedMessages from '../../../lib/shared-messages'
-import Message from '../../../lib/components/message'
 import DateTime from '../../../lib/components/date-time'
 import DevicesTable from '../../containers/devices-table'
+import DataSheet from '../../../components/data-sheet'
+
 
 import style from './application-overview.styl'
 
@@ -35,31 +36,30 @@ class ApplicationOverview extends React.Component {
   get applicationInfo () {
     const {
       ids,
+      name,
       description,
       created_at,
       updated_at,
     } = this.props.application
 
+    const sheetData = [
+      {
+        header: sharedMessages.generalInformation,
+        items: [
+          { key: sharedMessages.appId, value: ids.application_id, type: 'code', sensitive: false },
+          { key: sharedMessages.createdAt, value: <DateTime value={created_at} /> },
+          { key: sharedMessages.updatedAt, value: <DateTime value={updated_at} /> },
+        ],
+      },
+    ]
+
     return (
       <div>
-        <h2 className={style.id}>
-          {ids.application_id}
-        </h2>
-        <p>{description}</p>
-        <ul className={style.attributes}>
-          <li className={style.attributesEntry}>
-            <strong className={style.key}>
-              <Message content={sharedMessages.createdAt} />
-            </strong>
-            <DateTime className={style.value} value={created_at} />
-          </li>
-          <li className={style.attributesEntry}>
-            <strong className={style.key}>
-              <Message content={sharedMessages.updatedAt} />
-            </strong>
-            <DateTime className={style.value} value={updated_at} />
-          </li>
-        </ul>
+        <div className={style.title}>
+          <h2>{name || ids.application_id}</h2>
+          { description && <span className={style.description}>{description}</span> }
+        </div>
+        <DataSheet data={sheetData} />
       </div>
     )
   }
@@ -67,12 +67,15 @@ class ApplicationOverview extends React.Component {
   render () {
     return (
       <Container>
-        <Row className={style.head}>
+        <Row>
           <Col sm={12} lg={6}>
             {this.applicationInfo}
           </Col>
           <Col sm={12} lg={6}>
-            <div className={style.latestEvents}>Latest Events Placeholder</div>
+            <div className={style.latestEvents}>
+              <h4>Latest Data</h4>
+              <div>Activity Events Placeholder</div>
+            </div>
           </Col>
         </Row>
         <Row>
