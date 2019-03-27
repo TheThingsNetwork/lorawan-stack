@@ -28,17 +28,17 @@ var (
 
 // Config for the ttn-lw-cli binary.
 type Config struct {
-	conf.Base                `name:",squash"`
-	InputFormat              string `name:"input-format" description:"Input format"`
-	OutputFormat             string `name:"output-format" description:"Output format"`
-	OAuthServerAddress       string `name:"oauth-server-address" description:"OAuth Server Address"`
-	IdentityServerAddress    string `name:"identity-server-address" description:"Identity Server Address"`
-	GatewayServerAddress     string `name:"gateway-server-address" description:"Gateway Server Address"`
-	NetworkServerAddress     string `name:"network-server-address" description:"Network Server Address"`
-	ApplicationServerAddress string `name:"application-server-address" description:"Application Server Address"`
-	JoinServerAddress        string `name:"join-server-address" description:"Join Server Address"`
-	Insecure                 bool   `name:"insecure" description:"Connect without TLS"`
-	CA                       string `name:"ca" description:"CA certificate file"`
+	conf.Base                    `name:",squash"`
+	InputFormat                  string `name:"input-format" description:"Input format"`
+	OutputFormat                 string `name:"output-format" description:"Output format"`
+	OAuthServerAddress           string `name:"oauth-server-address" description:"OAuth Server Address"`
+	IdentityServerGRPCAddress    string `name:"identity-server-grpc-address" description:"Identity Server Address"`
+	GatewayServerGRPCAddress     string `name:"gateway-server-grpc-address" description:"Gateway Server Address"`
+	NetworkServerGRPCAddress     string `name:"network-server-grpc-address" description:"Network Server Address"`
+	ApplicationServerGRPCAddress string `name:"application-server-grpc-address" description:"Application Server Address"`
+	JoinServerGRPCAddress        string `name:"join-server-grpc-address" description:"Join Server Address"`
+	Insecure                     bool   `name:"insecure" description:"Connect without TLS"`
+	CA                           string `name:"ca" description:"CA certificate file"`
 }
 
 // DefaultConfig contains the default config for the ttn-lw-cli binary.
@@ -48,19 +48,19 @@ var DefaultConfig = Config{
 			Level: log.InfoLevel,
 		},
 	},
-	InputFormat:              "json",
-	OutputFormat:             "json",
-	OAuthServerAddress:       clusterHTTPAddress,
-	IdentityServerAddress:    clusterGRPCAddress,
-	GatewayServerAddress:     clusterGRPCAddress,
-	NetworkServerAddress:     clusterGRPCAddress,
-	ApplicationServerAddress: clusterGRPCAddress,
-	JoinServerAddress:        clusterGRPCAddress,
+	InputFormat:                  "json",
+	OutputFormat:                 "json",
+	OAuthServerAddress:           clusterHTTPAddress,
+	IdentityServerGRPCAddress:    clusterGRPCAddress,
+	GatewayServerGRPCAddress:     clusterGRPCAddress,
+	NetworkServerGRPCAddress:     clusterGRPCAddress,
+	ApplicationServerGRPCAddress: clusterGRPCAddress,
+	JoinServerGRPCAddress:        clusterGRPCAddress,
 }
 
 var configCommand = commands.Config(mgr)
 
 func init() {
-	versionCommand.PersistentPreRunE = preRun()
+	configCommand.PersistentPreRunE = preRun()
 	Root.AddCommand(configCommand)
 }

@@ -79,7 +79,7 @@ var (
 		Aliases: []string{"formats"},
 		Short:   "Get the available formats for application webhooks",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			as, err := api.Dial(ctx, config.ApplicationServerAddress)
+			as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
 			if err != nil {
 				return err
 			}
@@ -108,7 +108,7 @@ var (
 				})
 			}
 
-			as, err := api.Dial(ctx, config.ApplicationServerAddress)
+			as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
 			if err != nil {
 				return err
 			}
@@ -140,7 +140,7 @@ var (
 				})
 			}
 
-			as, err := api.Dial(ctx, config.ApplicationServerAddress)
+			as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
 			if err != nil {
 				return err
 			}
@@ -172,7 +172,7 @@ var (
 			}
 			webhook.ApplicationWebhookIdentifiers = *webhookID
 
-			as, err := api.Dial(ctx, config.ApplicationServerAddress)
+			as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
 			if err != nil {
 				return err
 			}
@@ -196,7 +196,7 @@ var (
 				return err
 			}
 
-			as, err := api.Dial(ctx, config.ApplicationServerAddress)
+			as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
 			if err != nil {
 				return err
 			}

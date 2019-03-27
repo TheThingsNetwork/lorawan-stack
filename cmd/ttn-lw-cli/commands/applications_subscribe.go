@@ -35,7 +35,7 @@ var (
 				return errNoApplicationID
 			}
 
-			as, err := api.Dial(ctx, config.ApplicationServerAddress)
+			as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
 			if err != nil {
 				return err
 			}

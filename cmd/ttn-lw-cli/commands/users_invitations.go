@@ -51,7 +51,7 @@ var (
 		Aliases: []string{"ls"},
 		Short:   "List user invitations",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
 			}
@@ -70,7 +70,7 @@ var (
 			if email == "" {
 				return errNoEmail
 			}
-			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
 			}
@@ -91,7 +91,7 @@ var (
 			if email == "" {
 				return errNoEmail
 			}
-			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
 			}

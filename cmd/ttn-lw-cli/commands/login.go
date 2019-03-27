@@ -125,7 +125,7 @@ var (
 		Short: "Logout",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if token, ok := cache.Get("oauth_token").(*oauth2.Token); ok && token != nil {
-				is, err := api.Dial(ctx, config.IdentityServerAddress)
+				is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 				if err != nil {
 					return err
 				}

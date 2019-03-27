@@ -73,7 +73,7 @@ func getEndDevice(ids ttnpb.EndDeviceIdentifiers, nsPaths, asPaths, jsPaths []st
 	var res ttnpb.EndDevice
 
 	if len(jsPaths) > 0 {
-		js, err := api.Dial(ctx, config.JoinServerAddress)
+		js, err := api.Dial(ctx, config.JoinServerGRPCAddress)
 		if err != nil {
 			if !continueOnError {
 				return nil, err
@@ -102,7 +102,7 @@ func getEndDevice(ids ttnpb.EndDeviceIdentifiers, nsPaths, asPaths, jsPaths []st
 	}
 
 	if len(asPaths) > 0 {
-		as, err := api.Dial(ctx, config.ApplicationServerAddress)
+		as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
 		if err != nil {
 			if !continueOnError {
 				return nil, err
@@ -131,7 +131,7 @@ func getEndDevice(ids ttnpb.EndDeviceIdentifiers, nsPaths, asPaths, jsPaths []st
 	}
 
 	if len(nsPaths) > 0 {
-		ns, err := api.Dial(ctx, config.NetworkServerAddress)
+		ns, err := api.Dial(ctx, config.NetworkServerGRPCAddress)
 		if err != nil {
 			if !continueOnError {
 				return nil, err
@@ -167,7 +167,7 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths []
 	res.SetFields(device, "ids", "created_at", "updated_at")
 
 	if len(isPaths) > 0 || isCreate {
-		is, err := api.Dial(ctx, config.IdentityServerAddress)
+		is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 		if err != nil {
 			return nil, err
 		}
@@ -190,7 +190,7 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths []
 	}
 
 	if len(jsPaths) > 0 {
-		js, err := api.Dial(ctx, config.JoinServerAddress)
+		js, err := api.Dial(ctx, config.JoinServerGRPCAddress)
 		if err != nil {
 			return nil, err
 		}
@@ -213,7 +213,7 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths []
 	}
 
 	if len(nsPaths) > 0 || isCreate {
-		ns, err := api.Dial(ctx, config.NetworkServerAddress)
+		ns, err := api.Dial(ctx, config.NetworkServerGRPCAddress)
 		if err != nil {
 			return nil, err
 		}
@@ -236,7 +236,7 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths []
 	}
 
 	if len(asPaths) > 0 || isCreate {
-		as, err := api.Dial(ctx, config.ApplicationServerAddress)
+		as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
 		if err != nil {
 			return nil, err
 		}
@@ -262,7 +262,7 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths []
 }
 
 func deleteEndDevice(ctx context.Context, devID *ttnpb.EndDeviceIdentifiers) error {
-	as, err := api.Dial(ctx, config.ApplicationServerAddress)
+	as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
 	if err != nil {
 		return err
 	}
@@ -273,7 +273,7 @@ func deleteEndDevice(ctx context.Context, devID *ttnpb.EndDeviceIdentifiers) err
 		return err
 	}
 
-	ns, err := api.Dial(ctx, config.NetworkServerAddress)
+	ns, err := api.Dial(ctx, config.NetworkServerGRPCAddress)
 	if err != nil {
 		return err
 	}
@@ -285,7 +285,7 @@ func deleteEndDevice(ctx context.Context, devID *ttnpb.EndDeviceIdentifiers) err
 	}
 
 	if devID.JoinEUI != nil && devID.DevEUI != nil {
-		js, err := api.Dial(ctx, config.JoinServerAddress)
+		js, err := api.Dial(ctx, config.JoinServerGRPCAddress)
 		if err != nil {
 			return err
 		}
@@ -297,7 +297,7 @@ func deleteEndDevice(ctx context.Context, devID *ttnpb.EndDeviceIdentifiers) err
 		}
 	}
 
-	is, err := api.Dial(ctx, config.IdentityServerAddress)
+	is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 	if err != nil {
 		return err
 	}

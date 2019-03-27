@@ -28,7 +28,7 @@ import (
 )
 
 func updateContactInfo(entityID *ttnpb.EntityIdentifiers, updater func([]*ttnpb.ContactInfo) ([]*ttnpb.ContactInfo, error)) ([]*ttnpb.ContactInfo, error) {
-	is, err := api.Dial(ctx, config.IdentityServerAddress)
+	is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 	if err != nil {
 		return nil, err
 	}

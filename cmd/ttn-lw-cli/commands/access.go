@@ -29,7 +29,7 @@ var (
 		Hidden: true,
 		Short:  "Get auth info",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
 			}
