@@ -109,6 +109,16 @@ class DeviceOverview extends React.Component {
           <Col md={12} lg={6}>
             {this.deviceInfo}
           </Col>
+          <Col md={12} lg={6}>
+            <div className={style.activityPlaceholder}>
+              <h4>Latest Data</h4>
+              <div>Activity Panel Placeholder</div>
+            </div>
+            <div className={style.locationPlaceholder}>
+              <h4>Location</h4>
+              <div>Location Map Placeholder</div>
+            </div>
+          </Col>
         </Row>
       </Container>
     )
