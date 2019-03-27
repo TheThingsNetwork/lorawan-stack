@@ -54,10 +54,89 @@ type connChannels struct {
 func TestApplicationServer(t *testing.T) {
 	a := assertions.New(t)
 
+	// This application will be added to the Entity Registry and to the link registry of the Application Server so that it
+	// links automatically on start to the Network Server.
+	registeredApplicationID := ttnpb.ApplicationIdentifiers{ApplicationID: "foo-app"}
+	registeredApplicationKey := "secret"
+	registeredApplicationFormatter := ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP
+	registeredApplicationWebhookID := ttnpb.ApplicationWebhookIdentifiers{
+		ApplicationIdentifiers: registeredApplicationID,
+		WebhookID:              "test",
+	}
+
+	// This device gets registered in the device registry of the Application Server.
+	registeredDevice := &ttnpb.EndDevice{
+		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+			ApplicationIdentifiers: registeredApplicationID,
+			DeviceID:               "foo-device",
+			JoinEUI:                eui64Ptr(types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+			DevEUI:                 eui64Ptr(types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+		},
+		VersionIDs: &ttnpb.EndDeviceVersionIdentifiers{
+			BrandID:         "thethingsproducts",
+			ModelID:         "thethingsnode",
+			HardwareVersion: "1.0",
+			FirmwareVersion: "1.1",
+		},
+		Formatters: &ttnpb.MessagePayloadFormatters{
+			UpFormatter:   ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,
+			DownFormatter: ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,
+		},
+	}
+
+	// This device does not get registered in the device registry of the Application Server and will be created on join
+	// and on uplink.
+	unregisteredDeviceID := ttnpb.EndDeviceIdentifiers{
+		ApplicationIdentifiers: registeredApplicationID,
+		DeviceID:               "bar-device",
+		JoinEUI:                eui64Ptr(types.EUI64{0x24, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+		DevEUI:                 eui64Ptr(types.EUI64{0x24, 0x24, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+	}
+
+	deviceRepositoryData := map[string][]byte{
+		"brands.yml": []byte(`version: '3'
+brands:
+thethingsproducts:
+  name: The Things Products
+  url: https://www.thethingsnetwork.org`),
+		"thethingsproducts/devices.yml": []byte(`version: '3'
+devices:
+  thethingsnode:
+    name: The Things Node`),
+		"thethingsproducts/thethingsnode/versions.yml": []byte(`version: '3'
+hardware_versions:
+  '1.0':
+    - firmware_version: 1.1
+      payload_format:
+        up:
+          type: javascript
+          parameter: decoder.js
+        down:
+          type: javascript
+          parameter: encoder.js`),
+		"thethingsproducts/thethingsnode/1.0/decoder.js": []byte(`function Decoder(payload, f_port) {
+	var sum = 0;
+	for (i = 0; i < payload.length; i++) {
+		sum += payload[i];
+	}
+	return {
+		sum: sum
+	};
+}`),
+		"thethingsproducts/thethingsnode/1.0/encoder.js": []byte(`function Encoder(payload, f_port) {
+	var res = [];
+	for (i = 0; i < payload.sum; i++) {
+		res[i] = 1;
+	}
+	return res;
+}`)}
+
 	ctx := test.Context()
 	is, isAddr := startMockIS(ctx)
 	js, jsAddr := startMockJS(ctx)
-	ns, nsAddr := startMockNS(ctx)
+	ns, nsAddr := startMockNS(ctx, func(md rpcmetadata.MD) bool {
+		return md.AuthType == "Bearer" && md.AuthValue == registeredApplicationKey
+	})
 
 	// Register the application in the Entity Registry.
 	is.add(ctx, registeredApplicationID, registeredApplicationKey)
@@ -152,7 +231,7 @@ func TestApplicationServer(t *testing.T) {
 		Webhooks: applicationserver.WebhooksConfig{
 			Registry:  webhookRegistry,
 			Target:    "direct",
-			Timeout:   timeout,
+			Timeout:   Timeout,
 			QueueSize: 1,
 		},
 	}
@@ -172,7 +251,7 @@ func TestApplicationServer(t *testing.T) {
 	mustHavePeer(ctx, c, ttnpb.PeerInfo_ENTITY_REGISTRY)
 
 	// Delay for the AS-NS link to establish.
-	time.Sleep(timeout)
+	time.Sleep(Timeout)
 
 	for _, ptc := range []struct {
 		Protocol         string
@@ -247,12 +326,12 @@ func TestApplicationServer(t *testing.T) {
 				clientOpts.SetUsername(unique.ID(ctx, ids))
 				clientOpts.SetPassword(key)
 				client := mqtt.NewClient(clientOpts)
-				if token := client.Connect(); !token.WaitTimeout(timeout) {
+				if token := client.Connect(); !token.WaitTimeout(Timeout) {
 					return errors.New("connect timeout")
 				} else if token.Error() != nil {
 					return token.Error()
 				}
-				defer client.Disconnect(uint(timeout / time.Millisecond))
+				defer client.Disconnect(uint(Timeout / time.Millisecond))
 				errCh := make(chan error, 1)
 				// Write downstream.
 				go func() {
@@ -428,7 +507,7 @@ func TestApplicationServer(t *testing.T) {
 				},
 			} {
 				t.Run(ctc.Name, func(t *testing.T) {
-					ctx, cancel := context.WithDeadline(ctx, time.Now().Add(timeout))
+					ctx, cancel := context.WithDeadline(ctx, time.Now().Add(Timeout))
 					chs := &connChannels{
 						up:          make(chan *ttnpb.ApplicationUp),
 						downPush:    make(chan *ttnpb.DownlinkQueueRequest),
@@ -467,7 +546,7 @@ func TestApplicationServer(t *testing.T) {
 				}
 			}()
 			// Wait for connection to establish.
-			time.Sleep(timeout)
+			time.Sleep(Timeout)
 
 			t.Run("Upstream", func(t *testing.T) {
 				ns.reset()
@@ -1222,7 +1301,7 @@ func TestApplicationServer(t *testing.T) {
 						select {
 						case msg := <-chs.up:
 							if tc.ExpectTimeout {
-								t.Fatalf("Expected timeout but got %v", msg)
+								t.Fatalf("Expected Timeout but got %v", msg)
 							} else {
 								if tc.AssertUp != nil {
 									tc.AssertUp(t, msg)
@@ -1230,7 +1309,7 @@ func TestApplicationServer(t *testing.T) {
 									t.Fatalf("Expected no upstream message but got %v", msg)
 								}
 							}
-						case <-time.After(timeout):
+						case <-time.After(Timeout):
 							if !tc.ExpectTimeout && tc.AssertUp != nil {
 								t.Fatal("Expected upstream timeout")
 							}
@@ -1286,7 +1365,7 @@ func TestApplicationServer(t *testing.T) {
 						if !ptc.SkipCheckDownErr && a.So(err, should.NotBeNil) {
 							a.So(errors.IsNotFound(err), should.BeTrue)
 						}
-					case <-time.After(timeout):
+					case <-time.After(Timeout):
 						t.Fatal("Expected downlink error timeout")
 					}
 				})
@@ -1327,7 +1406,7 @@ func TestApplicationServer(t *testing.T) {
 							if !a.So(err, should.BeNil) {
 								t.FailNow()
 							}
-						case <-time.After(timeout):
+						case <-time.After(Timeout):
 							t.Fatal("Expected downlink error timeout")
 						}
 					}
@@ -1378,7 +1457,7 @@ func TestApplicationServer(t *testing.T) {
 						if !a.So(err, should.BeNil) {
 							t.FailNow()
 						}
-					case <-time.After(timeout):
+					case <-time.After(Timeout):
 						t.Fatal("Expected downlink error timeout")
 					}
 					res, err := as.DownlinkQueueList(ctx, registeredDevice.EndDeviceIdentifiers)

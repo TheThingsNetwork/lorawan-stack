@@ -15,196 +15,562 @@
 package applicationserver_test
 
 import (
+	"context"
+	"sync/atomic"
 	"testing"
+	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
+	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/applicationserver"
-	"go.thethings.network/lorawan-stack/pkg/applicationserver/redis"
+	. "go.thethings.network/lorawan-stack/pkg/applicationserver"
+	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
-	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
-	"google.golang.org/grpc"
 )
 
-func TestDeviceRegistry(t *testing.T) {
-	a := assertions.New(t)
-
-	ctx := test.Context()
-	is, isAddr := startMockIS(ctx)
-
-	// Register the application in the Entity Registry.
-	is.add(ctx, registeredApplicationID, registeredApplicationKey)
-
-	redisClient, flush := test.NewRedis(t, "applicationserver_test")
-	defer flush()
-	defer redisClient.Close()
-	deviceRegistry := &redis.DeviceRegistry{Redis: redisClient}
-
-	c := component.MustNew(test.GetLogger(t), &component.Config{
-		ServiceBase: config.ServiceBase{
-			GRPC: config.GRPC{
-				Listen:                      ":9184",
-				AllowInsecureForCredentials: true,
+func TestDeviceRegistryGet(t *testing.T) {
+	registeredApplicationID := "foo-application"
+	registeredDeviceID := "foo-device"
+	registeredDevice := &ttnpb.EndDevice{
+		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+				ApplicationID: registeredApplicationID,
 			},
-			Cluster: config.Cluster{
-				IdentityServer: isAddr,
+			DeviceID: registeredDeviceID,
+		},
+		Formatters: &ttnpb.MessagePayloadFormatters{
+			UpFormatter:   ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,
+			DownFormatter: ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,
+		},
+	}
+	for _, tc := range []struct {
+		Name           string
+		ContextFunc    func(context.Context) context.Context
+		GetFunc        func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error)
+		DeviceRequest  *ttnpb.GetEndDeviceRequest
+		ErrorAssertion func(*testing.T, error) bool
+		GetCalls       uint64
+	}{
+		{
+			Name: "Permission denied",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: registeredApplicationID}): nil,
+					},
+				})
+			},
+			GetFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
+				test.MustTFromContext(ctx).Errorf("GetFunc must not be called")
+				return nil, errors.New("GetFunc must not be called")
+			},
+			DeviceRequest: &ttnpb.GetEndDeviceRequest{
+				EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
+				FieldMask: pbtypes.FieldMask{
+					Paths: []string{"ids", "formatters"},
+				},
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				a := assertions.New(t)
+				return a.So(errors.IsPermissionDenied(err), should.BeTrue)
 			},
 		},
-	})
-	config := &applicationserver.Config{
-		LinkMode: "explicit",
-		Devices:  deviceRegistry,
-	}
-	_, err := applicationserver.New(c, config)
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
 
-	test.Must(nil, c.Start())
-	defer c.Close()
-	mustHavePeer(ctx, c, ttnpb.PeerInfo_ENTITY_REGISTRY)
-
-	conn, err := grpc.Dial(":9184", grpc.WithInsecure(), grpc.WithBlock())
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
-	defer conn.Close()
-	creds := grpc.PerRPCCredentials(rpcmetadata.MD{
-		AuthType:      "Bearer",
-		AuthValue:     registeredApplicationKey,
-		AllowInsecure: true,
-	})
-	client := ttnpb.NewAsEndDeviceRegistryClient(conn)
-
-	// Unauthorized: no credentials.
-	{
-		_, err := client.Get(ctx, &ttnpb.GetEndDeviceRequest{
-			EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
-		})
-		a.So(errors.IsUnauthenticated(err), should.BeTrue)
-
-		_, err = client.Set(ctx, &ttnpb.SetEndDeviceRequest{
-			EndDevice: ttnpb.EndDevice{
+		{
+			Name: "Invalid application ID",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "bar-application"}): ttnpb.RightsFrom(
+							ttnpb.RIGHT_APPLICATION_DEVICES_READ,
+						),
+					},
+				})
+			},
+			GetFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
+				test.MustTFromContext(ctx).Errorf("GetFunc must not be called")
+				return nil, errors.New("GetFunc must not be called")
+			},
+			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
-				Formatters:           &ttnpb.MessagePayloadFormatters{},
+				FieldMask: pbtypes.FieldMask{
+					Paths: []string{"ids", "formatters"},
+				},
 			},
-			FieldMask: pbtypes.FieldMask{
-				Paths: []string{"formatters"},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				a := assertions.New(t)
+				return a.So(errors.IsPermissionDenied(err), should.BeTrue)
 			},
+		},
+
+		{
+			Name: "Not found",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: registeredApplicationID}): ttnpb.RightsFrom(
+							ttnpb.RIGHT_APPLICATION_DEVICES_READ,
+						),
+					},
+				})
+			},
+			GetFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(ids, should.Resemble, ids)
+				return nil, errNotFound
+			},
+			DeviceRequest: &ttnpb.GetEndDeviceRequest{
+				EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
+				FieldMask: pbtypes.FieldMask{
+					Paths: []string{"ids", "formatters"},
+				},
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				a := assertions.New(t)
+				return a.So(errors.IsNotFound(err), should.BeTrue)
+			},
+			GetCalls: 1,
+		},
+
+		{
+			Name: "Get",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: registeredApplicationID}): ttnpb.RightsFrom(
+							ttnpb.RIGHT_APPLICATION_DEVICES_READ,
+						),
+					},
+				})
+			},
+			GetFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(ids, should.Resemble, ttnpb.EndDeviceIdentifiers{
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+						ApplicationID: registeredApplicationID,
+					},
+					DeviceID: registeredDeviceID,
+				})
+				a.So(paths, should.HaveSameElementsDeep, []string{"ids", "formatters"})
+				return deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice), nil
+			},
+			DeviceRequest: &ttnpb.GetEndDeviceRequest{
+				EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
+				FieldMask: pbtypes.FieldMask{
+					Paths: []string{"ids", "formatters"},
+				},
+			},
+			GetCalls: 1,
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
+
+			var getCalls uint64
+
+			as := test.Must(New(component.MustNew(test.GetLogger(t), &component.Config{}),
+				&Config{
+					LinkMode: "explicit",
+					Devices: &MockDeviceRegistry{
+						GetFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
+							atomic.AddUint64(&getCalls, 1)
+							return tc.GetFunc(ctx, ids, paths)
+						},
+					},
+				})).(*ApplicationServer)
+
+			as.AddContextFiller(tc.ContextFunc)
+			as.AddContextFiller(func(ctx context.Context) context.Context {
+				ctx, cancel := context.WithDeadline(ctx, time.Now().Add(Timeout))
+				_ = cancel
+				return ctx
+			})
+			as.AddContextFiller(func(ctx context.Context) context.Context {
+				return test.ContextWithT(ctx, t)
+			})
+			test.Must(nil, as.Start())
+			defer as.Close()
+
+			ctx := as.FillContext(test.Context())
+			req := deepcopy.Copy(tc.DeviceRequest).(*ttnpb.GetEndDeviceRequest)
+
+			dev, err := ttnpb.NewAsEndDeviceRegistryClient(as.LoopbackConn()).Get(ctx, req)
+			a.So(getCalls, should.Equal, tc.GetCalls)
+			if tc.ErrorAssertion != nil && a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
+				a.So(dev, should.BeNil)
+			} else if a.So(err, should.BeNil) {
+				a.So(dev, should.Resemble, registeredDevice)
+			}
+			a.So(req, should.Resemble, tc.DeviceRequest)
 		})
-		a.So(errors.IsUnauthenticated(err), should.BeTrue)
-
-		_, err = client.Delete(ctx, &registeredDevice.EndDeviceIdentifiers)
-		a.So(errors.IsUnauthenticated(err), should.BeTrue)
 	}
+}
 
-	// Unauthorized: wrong application.
-	{
-		otherID := ttnpb.EndDeviceIdentifiers{
+func TestDeviceRegistrySet(t *testing.T) {
+	registeredApplicationID := "foo-application"
+	registeredDeviceID := "foo-device"
+	registeredDevice := &ttnpb.EndDevice{
+		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-				ApplicationID: "other-app",
+				ApplicationID: registeredApplicationID,
 			},
-			DeviceID: "other-device",
-		}
-
-		_, err := client.Get(ctx, &ttnpb.GetEndDeviceRequest{
-			EndDeviceIdentifiers: otherID,
-		}, creds)
-		a.So(errors.IsPermissionDenied(err), should.BeTrue)
-
-		_, err = client.Set(ctx, &ttnpb.SetEndDeviceRequest{
-			EndDevice: ttnpb.EndDevice{
-				EndDeviceIdentifiers: otherID,
-				Formatters:           &ttnpb.MessagePayloadFormatters{},
-			},
-			FieldMask: pbtypes.FieldMask{
-				Paths: []string{"formatters"},
-			},
-		}, creds)
-		a.So(errors.IsPermissionDenied(err), should.BeTrue)
-
-		_, err = client.Delete(ctx, &otherID, creds)
-		a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			DeviceID: registeredDeviceID,
+		},
+		Formatters: &ttnpb.MessagePayloadFormatters{
+			UpFormatter:   ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,
+			DownFormatter: ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,
+		},
 	}
+	for _, tc := range []struct {
+		Name            string
+		ContextFunc     func(context.Context) context.Context
+		SetFunc         func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
+		DeviceRequest   *ttnpb.SetEndDeviceRequest
+		ErrorAssertion  func(*testing.T, error) bool
+		DeviceAssertion func(*testing.T, *ttnpb.EndDevice) bool
+		SetCalls        uint64
+	}{
+		{
+			Name: "Permission denied",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: registeredApplicationID}): nil,
+					},
+				})
+			},
+			SetFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+				test.MustTFromContext(ctx).Errorf("SetFunc must not be called")
+				return nil, errors.New("SetFunc must not be called")
+			},
+			DeviceRequest: &ttnpb.SetEndDeviceRequest{
+				EndDevice: deepcopy.Copy(*registeredDevice).(ttnpb.EndDevice),
+				FieldMask: pbtypes.FieldMask{
+					Paths: []string{"ids", "formatters"},
+				},
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				a := assertions.New(t)
+				return a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			},
+		},
 
-	// Happy flow: create, update and delete.
-	{
-		// Assert the device doesn't exist yet.
-		_, err := client.Get(ctx, &ttnpb.GetEndDeviceRequest{
-			EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
-			FieldMask: pbtypes.FieldMask{
-				Paths: []string{"ids", "version_ids", "formatters"},
+		{
+			Name: "Invalid application ID",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "bar-application"}): ttnpb.RightsFrom(
+							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+						),
+					},
+				})
 			},
-		}, creds)
-		a.So(errors.IsNotFound(err), should.BeTrue)
+			SetFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+				test.MustTFromContext(ctx).Errorf("SetFunc must not be called")
+				return nil, errors.New("SetFunc must not be called")
+			},
+			DeviceRequest: &ttnpb.SetEndDeviceRequest{
+				EndDevice: deepcopy.Copy(*registeredDevice).(ttnpb.EndDevice),
+				FieldMask: pbtypes.FieldMask{
+					Paths: []string{"ids", "formatters"},
+				},
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				a := assertions.New(t)
+				return a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			},
+		},
 
-		// Create and assert resemblance.
-		_, err = client.Set(ctx, &ttnpb.SetEndDeviceRequest{
-			EndDevice: *registeredDevice,
-			FieldMask: pbtypes.FieldMask{
-				Paths: []string{"ids", "version_ids", "formatters"},
+		{
+			Name: "Create",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: registeredApplicationID}): {
+							Rights: []ttnpb.Right{
+								ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+							},
+						},
+					},
+				})
 			},
-		}, creds)
-		if !a.So(err, should.BeNil) {
-			t.FailNow()
-		}
-		dev, err := client.Get(ctx, &ttnpb.GetEndDeviceRequest{
-			EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
-			FieldMask: pbtypes.FieldMask{
-				Paths: []string{"ids", "version_ids", "formatters"},
+			DeviceRequest: &ttnpb.SetEndDeviceRequest{
+				EndDevice: ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+							ApplicationID: registeredApplicationID,
+						},
+						DeviceID: "new-device",
+					},
+					Formatters: &ttnpb.MessagePayloadFormatters{
+						UpFormatter:   ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP,
+						DownFormatter: ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP,
+					},
+				},
+				FieldMask: pbtypes.FieldMask{
+					Paths: []string{"ids", "formatters"},
+				},
 			},
-		}, creds)
-		if !a.So(err, should.BeNil) {
-			t.FailNow()
-		}
-		registeredDevice.CreatedAt = dev.CreatedAt
-		registeredDevice.UpdatedAt = dev.UpdatedAt
-		if !a.So(dev, should.HaveEmptyDiff, registeredDevice) {
-			t.FailNow()
-		}
+			SetFunc: func(ctx context.Context, deviceIds ttnpb.EndDeviceIdentifiers, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(deviceIds, should.Resemble, ttnpb.EndDeviceIdentifiers{
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+						ApplicationID: registeredApplicationID,
+					},
+					DeviceID: "new-device",
+				})
+				a.So(paths, should.HaveSameElementsDeep, []string{"ids", "formatters"})
+				dev, _, err := cb(nil)
+				return dev, err
+			},
+			DeviceAssertion: func(t *testing.T, dev *ttnpb.EndDevice) bool {
+				a := assertions.New(t)
+				return a.So(dev, should.Resemble, &ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+							ApplicationID: registeredApplicationID,
+						},
+						DeviceID: "new-device",
+					},
+					Formatters: &ttnpb.MessagePayloadFormatters{
+						UpFormatter:   ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP,
+						DownFormatter: ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP,
+					},
+				})
+			},
+			SetCalls: 1,
+		},
 
-		// Update and assert new value.
-		registeredDevice.Formatters.UpFormatter = ttnpb.PayloadFormatter_FORMATTER_NONE
-		_, err = client.Set(ctx, &ttnpb.SetEndDeviceRequest{
-			EndDevice: *registeredDevice,
-			FieldMask: pbtypes.FieldMask{
-				Paths: []string{"formatters"},
+		{
+			Name: "Set",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: registeredApplicationID}): ttnpb.RightsFrom(
+							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+						),
+					},
+				})
 			},
-		}, creds)
-		if !a.So(err, should.BeNil) {
-			t.FailNow()
-		}
-		dev, err = client.Get(ctx, &ttnpb.GetEndDeviceRequest{
-			EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
-			FieldMask: pbtypes.FieldMask{
-				Paths: []string{"ids", "version_ids", "formatters"},
+			DeviceRequest: &ttnpb.SetEndDeviceRequest{
+				EndDevice: deepcopy.Copy(*registeredDevice).(ttnpb.EndDevice),
+				FieldMask: pbtypes.FieldMask{
+					Paths: []string{"ids", "formatters"},
+				},
 			},
-		}, creds)
-		if !a.So(err, should.BeNil) {
-			t.FailNow()
-		}
-		registeredDevice.CreatedAt = dev.CreatedAt
-		registeredDevice.UpdatedAt = dev.UpdatedAt
-		if !a.So(dev, should.HaveEmptyDiff, registeredDevice) {
-			t.FailNow()
-		}
+			SetFunc: func(ctx context.Context, deviceIds ttnpb.EndDeviceIdentifiers, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(deviceIds, should.Resemble, registeredDevice.EndDeviceIdentifiers)
+				a.So(paths, should.HaveSameElementsDeep, []string{"ids", "formatters"})
+				dev, _, err := cb(deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice))
+				return dev, err
+			},
+			SetCalls: 1,
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
 
-		// Delete and assert it's gone.
-		_, err = client.Delete(ctx, &registeredDevice.EndDeviceIdentifiers, creds)
-		if !a.So(err, should.BeNil) {
-			t.FailNow()
-		}
-		_, err = client.Get(ctx, &ttnpb.GetEndDeviceRequest{
-			EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
-			FieldMask: pbtypes.FieldMask{
-				Paths: []string{"ids", "version_ids", "formatters"},
+			var setCalls uint64
+
+			as := test.Must(New(component.MustNew(test.GetLogger(t), &component.Config{}),
+				&Config{
+					LinkMode: "explicit",
+					Devices: &MockDeviceRegistry{
+						SetFunc: func(ctx context.Context, deviceIds ttnpb.EndDeviceIdentifiers, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+							atomic.AddUint64(&setCalls, 1)
+							return tc.SetFunc(ctx, deviceIds, paths, cb)
+						},
+					},
+				})).(*ApplicationServer)
+
+			as.AddContextFiller(tc.ContextFunc)
+			as.AddContextFiller(func(ctx context.Context) context.Context {
+				ctx, cancel := context.WithDeadline(ctx, time.Now().Add(Timeout))
+				_ = cancel
+				return ctx
+			})
+			as.AddContextFiller(func(ctx context.Context) context.Context {
+				return test.ContextWithT(ctx, t)
+			})
+			test.Must(nil, as.Start())
+			defer as.Close()
+
+			ctx := as.FillContext(test.Context())
+			req := deepcopy.Copy(tc.DeviceRequest).(*ttnpb.SetEndDeviceRequest)
+
+			dev, err := ttnpb.NewAsEndDeviceRegistryClient(as.LoopbackConn()).Set(ctx, req)
+			a.So(setCalls, should.Equal, tc.SetCalls)
+			if tc.ErrorAssertion != nil && a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
+				a.So(dev, should.BeNil)
+			} else if a.So(err, should.BeNil) {
+				if tc.DeviceAssertion != nil {
+					a.So(tc.DeviceAssertion(t, dev), should.BeTrue)
+				} else {
+					a.So(dev, should.Resemble, registeredDevice)
+				}
+			}
+			a.So(req, should.Resemble, tc.DeviceRequest)
+		})
+	}
+}
+
+func TestDeviceRegistryDelete(t *testing.T) {
+	registeredApplicationID := "foo-application"
+	registeredDeviceID := "foo-device"
+	registeredDevice := &ttnpb.EndDevice{
+		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+				ApplicationID: registeredApplicationID,
 			},
-		}, creds)
-		a.So(errors.IsNotFound(err), should.BeTrue)
+			DeviceID: registeredDeviceID,
+		},
+	}
+	for _, tc := range []struct {
+		Name           string
+		ContextFunc    func(context.Context) context.Context
+		SetFunc        func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
+		DeviceRequest  *ttnpb.EndDeviceIdentifiers
+		ErrorAssertion func(*testing.T, error) bool
+		SetCalls       uint64
+	}{
+		{
+			Name: "Permission denied",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: registeredApplicationID}): nil,
+					},
+				})
+			},
+			SetFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+				test.MustTFromContext(ctx).Errorf("SetFunc must not be called")
+				return nil, errors.New("SetFunc must not be called")
+			},
+			DeviceRequest: deepcopy.Copy(&registeredDevice.EndDeviceIdentifiers).(*ttnpb.EndDeviceIdentifiers),
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				a := assertions.New(t)
+				return a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			},
+		},
+
+		{
+			Name: "Invalid application ID",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "bar-application"}): ttnpb.RightsFrom(
+							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+						),
+					},
+				})
+			},
+			SetFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+				test.MustTFromContext(ctx).Errorf("SetFunc must not be called")
+				return nil, errors.New("SetFunc must not be called")
+			},
+			DeviceRequest: deepcopy.Copy(&registeredDevice.EndDeviceIdentifiers).(*ttnpb.EndDeviceIdentifiers),
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				a := assertions.New(t)
+				return a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			},
+		},
+
+		{
+			Name: "Not found",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: registeredApplicationID}): ttnpb.RightsFrom(
+							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+						),
+					},
+				})
+			},
+			SetFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+				t := test.MustTFromContext(ctx)
+				a := assertions.New(t)
+				a.So(ids, should.Resemble, registeredDevice.EndDeviceIdentifiers)
+				dev, sets, err := f(nil)
+				a.So(err, should.BeNil)
+				a.So(sets, should.BeNil)
+				a.So(dev, should.BeNil)
+				return nil, nil
+			},
+			DeviceRequest: deepcopy.Copy(&registeredDevice.EndDeviceIdentifiers).(*ttnpb.EndDeviceIdentifiers),
+			SetCalls:      1,
+		},
+
+		{
+			Name: "Delete",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: registeredApplicationID}): ttnpb.RightsFrom(
+							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+						),
+					},
+				})
+			},
+			SetFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+				t := test.MustTFromContext(ctx)
+				a := assertions.New(t)
+				a.So(ids, should.Resemble, registeredDevice.EndDeviceIdentifiers)
+				dev, sets, err := f(registeredDevice)
+				a.So(err, should.BeNil)
+				a.So(sets, should.BeNil)
+				a.So(dev, should.BeNil)
+				return nil, nil
+			},
+			DeviceRequest: deepcopy.Copy(&registeredDevice.EndDeviceIdentifiers).(*ttnpb.EndDeviceIdentifiers),
+			SetCalls:      1,
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
+
+			var setCalls uint64
+
+			as := test.Must(New(component.MustNew(test.GetLogger(t), &component.Config{}),
+				&Config{
+					LinkMode: "explicit",
+					Devices: &MockDeviceRegistry{
+						SetFunc: func(ctx context.Context, deviceIds ttnpb.EndDeviceIdentifiers, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+							atomic.AddUint64(&setCalls, 1)
+							return tc.SetFunc(ctx, deviceIds, paths, cb)
+						},
+					},
+				})).(*ApplicationServer)
+
+			as.AddContextFiller(tc.ContextFunc)
+			as.AddContextFiller(func(ctx context.Context) context.Context {
+				ctx, cancel := context.WithDeadline(ctx, time.Now().Add(Timeout))
+				_ = cancel
+				return ctx
+			})
+			as.AddContextFiller(func(ctx context.Context) context.Context {
+				return test.ContextWithT(ctx, t)
+			})
+			test.Must(nil, as.Start())
+			defer as.Close()
+
+			ctx := as.FillContext(test.Context())
+			req := deepcopy.Copy(tc.DeviceRequest).(*ttnpb.EndDeviceIdentifiers)
+
+			_, err := ttnpb.NewAsEndDeviceRegistryClient(as.LoopbackConn()).Delete(ctx, req)
+			a.So(setCalls, should.Equal, tc.SetCalls)
+			if tc.ErrorAssertion != nil {
+				a.So(tc.ErrorAssertion(t, err), should.BeTrue)
+			} else {
+				a.So(err, should.BeNil)
+			}
+			a.So(req, should.Resemble, tc.DeviceRequest)
+		})
 	}
 }

@@ -29,89 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/unique"
-	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"google.golang.org/grpc/metadata"
-)
-
-var (
-	// This application will be added to the Entity Registry and to the link registry of the Application Server so that it
-	// links automatically on start to the Network Server.
-	registeredApplicationID        = ttnpb.ApplicationIdentifiers{ApplicationID: "foo-app"}
-	registeredApplicationKey       = "secret"
-	registeredApplicationFormatter = ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP
-	registeredApplicationWebhookID = ttnpb.ApplicationWebhookIdentifiers{
-		ApplicationIdentifiers: registeredApplicationID,
-		WebhookID:              "test",
-	}
-
-	// This device gets registered in the device registry of the Application Server.
-	registeredDevice = &ttnpb.EndDevice{
-		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-			ApplicationIdentifiers: registeredApplicationID,
-			DeviceID:               "foo-device",
-			JoinEUI:                eui64Ptr(types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
-			DevEUI:                 eui64Ptr(types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
-		},
-		VersionIDs: &ttnpb.EndDeviceVersionIdentifiers{
-			BrandID:         "thethingsproducts",
-			ModelID:         "thethingsnode",
-			HardwareVersion: "1.0",
-			FirmwareVersion: "1.1",
-		},
-		Formatters: &ttnpb.MessagePayloadFormatters{
-			UpFormatter:   ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,
-			DownFormatter: ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,
-		},
-	}
-
-	// This device does not get registered in the device registry of the Application Server and will be created on join
-	// and on uplink.
-	unregisteredDeviceID = ttnpb.EndDeviceIdentifiers{
-		ApplicationIdentifiers: registeredApplicationID,
-		DeviceID:               "bar-device",
-		JoinEUI:                eui64Ptr(types.EUI64{0x24, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
-		DevEUI:                 eui64Ptr(types.EUI64{0x24, 0x24, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
-	}
-
-	timeout = (1 << 8) * test.Delay
-
-	deviceRepositoryData = map[string][]byte{
-		"brands.yml": []byte(`version: '3'
-brands:
-thethingsproducts:
-  name: The Things Products
-  url: https://www.thethingsnetwork.org`),
-		"thethingsproducts/devices.yml": []byte(`version: '3'
-devices:
-  thethingsnode:
-    name: The Things Node`),
-		"thethingsproducts/thethingsnode/versions.yml": []byte(`version: '3'
-hardware_versions:
-  '1.0':
-    - firmware_version: 1.1
-      payload_format:
-        up:
-          type: javascript
-          parameter: decoder.js
-        down:
-          type: javascript
-          parameter: encoder.js`),
-		"thethingsproducts/thethingsnode/1.0/decoder.js": []byte(`function Decoder(payload, f_port) {
-	var sum = 0;
-	for (i = 0; i < payload.length; i++) {
-		sum += payload[i];
-	}
-	return {
-		sum: sum
-	};
-}`),
-		"thethingsproducts/thethingsnode/1.0/encoder.js": []byte(`function Encoder(payload, f_port) {
-	var res = [];
-	for (i = 0; i < payload.sum; i++) {
-		res[i] = 1;
-	}
-	return res;
-}`)}
 )
 
 func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.PeerInfo_Role) {
@@ -141,14 +59,16 @@ type mockNS struct {
 	upCh            chan *ttnpb.ApplicationUp
 	downlinkQueueMu sync.RWMutex
 	downlinkQueue   map[string][]*ttnpb.ApplicationDownlink
+	validateAuth    func(rpcmetadata.MD) bool
 }
 
-func startMockNS(ctx context.Context) (*mockNS, string) {
+func startMockNS(ctx context.Context, validateAuth func(rpcmetadata.MD) bool) (*mockNS, string) {
 	ns := &mockNS{
 		linkCh:        make(chan ttnpb.ApplicationIdentifiers, 1),
 		unlinkCh:      make(chan ttnpb.ApplicationIdentifiers, 1),
 		upCh:          make(chan *ttnpb.ApplicationUp, 1),
 		downlinkQueue: make(map[string][]*ttnpb.ApplicationDownlink),
+		validateAuth:  validateAuth,
 	}
 	srv := rpcserver.New(ctx)
 	ttnpb.RegisterAsNsServer(srv.Server, ns)
@@ -171,7 +91,7 @@ func (ns *mockNS) LinkApplication(stream ttnpb.AsNs_LinkApplicationServer) error
 	if err := ids.ValidateContext(ctx); err != nil {
 		return err
 	}
-	if md.AuthType != "Bearer" || md.AuthValue != registeredApplicationKey {
+	if !ns.validateAuth(md) {
 		return errPermissionDenied
 	}
 
