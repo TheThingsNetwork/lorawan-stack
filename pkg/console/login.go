@@ -15,17 +15,22 @@
 package console
 
 import (
-	"net/http"
+	"regexp"
 
 	echo "github.com/labstack/echo/v4"
+	"go.thethings.network/lorawan-stack/pkg/webui"
 )
 
-// Login logs in the user by redirecting to the OAuth flow.
+// Login is a normal route but decorated with the auth url in the page data.
 func (console *Console) Login(c echo.Context) error {
 	path := c.QueryParam("path")
 
-	// Remove the old auth cookie.
-	console.removeAuthCookie(c)
+	var re = regexp.MustCompile(`(?m)^[/?#][a-z0-9/?&#-]+$`)
+	if re.MatchString(path) {
+		path = console.config.UI.CanonicalURL + path
+	} else {
+		path = console.config.UI.CanonicalURL
+	}
 
 	// Set state cookie.
 	state := newState(path)
@@ -33,5 +38,11 @@ func (console *Console) Login(c echo.Context) error {
 		return err
 	}
 
-	return c.Redirect(http.StatusFound, console.oauth.AuthCodeURL(state.Secret))
+	c.Set("page_data", struct {
+		LoginURI string `json:"authorize_url"`
+	}{
+		LoginURI: console.oauth.AuthCodeURL(state.Secret),
+	})
+
+	return webui.Template.Handler(c)
 }
