@@ -149,7 +149,6 @@ func (console *Console) RegisterRoutes(server *web.Server) {
 
 	api := group.Group("/api", middleware.CSRF())
 	api.GET("/auth/token", console.Token)
-	api.PUT("/auth/refresh", console.RefreshToken)
 	api.POST("/auth/logout", console.Logout)
 
 	page := group.Group("", middleware.CSRFWithConfig(middleware.CSRFConfig{

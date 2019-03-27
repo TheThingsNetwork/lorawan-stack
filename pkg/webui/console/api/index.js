@@ -44,9 +44,6 @@ export default {
     token () {
       return instance.get('/console/api/auth/token')
     },
-    refresh () {
-      return instance.put('/console/api/auth/refresh')
-    },
     logout () {
       return instance.post('/console/api/auth/logout')
     },

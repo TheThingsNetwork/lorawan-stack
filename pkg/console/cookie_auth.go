@@ -40,9 +40,9 @@ func (console *Console) AuthCookie() *cookie.Cookie {
 
 // authCookie is the shape of the authentication cookie.
 type authCookie struct {
-	AccessToken  string    `json:"access_token"`
-	RefreshToken string    `json:"-"`
-	Expiry       time.Time `json:"expiry"`
+	AccessToken  string
+	RefreshToken string
+	Expiry       time.Time
 }
 
 // setCookie sets the authCookie on the request.
