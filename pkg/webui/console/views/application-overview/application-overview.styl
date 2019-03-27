@@ -12,23 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.id
-  h2()
-  font-weight: bold
+.title
+  margin-bottom: $ls.m
 
-.head
-  margin-top: $ls.xs
+  h2
+    entity-title()
+    margin-bottom: 0
+
+  .description
+    display: block
+    margin-top: ($cs.xs * -1)
+    margin-bottom: $ls.s
 
 .table
   margin-top: $ls.xl
-
-.latest-events
-  border-normal()
-  padding: $ls.xl
-  margin-top: $ls.s
-  text-align: center
-  font-style: italic
-  color: $tc-subtle-gray
 
 .attributes
   list-style: none
@@ -46,3 +43,24 @@
 
   .value
     flex-basis:50%
+
+.latest-events
+  margin-top: $ls.m
+
+  h4
+    one-liner(block)
+    height: 1rem
+    margin: 0
+
+  div
+    border-normal()
+    box-sizing: border-box
+    display: flex
+    align-items: center
+    justify-content: center
+    width: 100%
+    height: 12rem
+    margin-top: $ls.xxs
+    text-align: center
+    font-style: italic
+    color: $tc-subtle-gray
