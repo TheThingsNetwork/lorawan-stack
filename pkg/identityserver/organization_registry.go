@@ -59,7 +59,7 @@ func (is *IdentityServer) createOrganization(ctx context.Context, req *ttnpb.Cre
 			ctx,
 			&req.Collaborator,
 			org.OrganizationIdentifiers.EntityIdentifiers(),
-			ttnpb.RightsFrom(ttnpb.RIGHT_ORGANIZATION_ALL),
+			ttnpb.RightsFrom(ttnpb.RIGHT_ALL),
 		); err != nil {
 			return err
 		}

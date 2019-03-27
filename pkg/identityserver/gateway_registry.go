@@ -58,7 +58,7 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 			ctx,
 			&req.Collaborator,
 			gtw.GatewayIdentifiers.EntityIdentifiers(),
-			ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_ALL),
+			ttnpb.RightsFrom(ttnpb.RIGHT_ALL),
 		); err != nil {
 			return err
 		}

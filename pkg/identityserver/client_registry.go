@@ -83,7 +83,7 @@ func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateCli
 			ctx,
 			&req.Collaborator,
 			cli.ClientIdentifiers.EntityIdentifiers(),
-			ttnpb.RightsFrom(ttnpb.RIGHT_CLIENT_ALL),
+			ttnpb.RightsFrom(ttnpb.RIGHT_ALL),
 		); err != nil {
 			return err
 		}
