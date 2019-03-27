@@ -52,6 +52,7 @@
   "console.views.application-link.index.statistics": "Statistics",
   "console.views.application-link.index.unlink": "Unlink",
   "console.views.application-link.index.unlinkSuccess": "Successfully unlinked",
+  "console.views.device.index.title": "%s - {deviceName} - The Things Network Console",
   "console.views.login.index.welcome": "Welcome to {stackConsole}",
   "console.views.login.index.login": "You need to be logged in to use this site",
   "console.views.login.index.loginWithStackAccount": "Login with your TTN Stack Account",

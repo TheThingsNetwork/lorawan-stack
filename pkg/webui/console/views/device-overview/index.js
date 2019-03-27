@@ -16,8 +16,12 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Col, Row, Container } from 'react-grid-system'
 
+import bind from 'autobind-decorator'
+
+import IntlHelmet from '../../../lib/components/intl-helmet'
 import Icon from '../../../components/icon'
 import DataSheet from '../../../components/data-sheet'
+import Message from '../../../lib/components/message'
 
 import style from './device-overview.styl'
 
@@ -26,6 +30,7 @@ import style from './device-overview.styl'
     device: device.device,
   }
 })
+@bind
 class DeviceOverview extends React.Component {
 
   get deviceInfo () {
@@ -87,7 +92,7 @@ class DeviceOverview extends React.Component {
       <div className={style.overviewInfo}>
         <div className={style.overviewInfoGeneral}>
           <span className={style.devId}>{ids.device_id}</span>
-          <span className={style.devDesc}>{description}</span>
+          <span className={style.devDesc}>{description || <Message content={m.noDesc} />}</span>
           <div className={style.connectivity}>
             <span className={style.activityDot} />
             <span className={style.lastSeen}>Last seen 2 secs. ago</span>
@@ -105,6 +110,9 @@ class DeviceOverview extends React.Component {
   render () {
     return (
       <Container>
+        <IntlHelmet
+          title={sharedMessages.overview}
+        />
         <Row className={style.head}>
           <Col md={12} lg={6}>
             {this.deviceInfo}

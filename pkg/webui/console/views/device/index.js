@@ -15,8 +15,8 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Switch, Route } from 'react-router'
-import { Helmet } from 'react-helmet'
 import { Col, Row, Container } from 'react-grid-system'
+import { defineMessages } from 'react-intl'
 
 import sharedMessages from '../../../lib/shared-messages'
 import Message from '../../../lib/components/message'
@@ -24,12 +24,17 @@ import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import Spinner from '../../../components/spinner'
 import Tabs from '../../../components/tabs'
+import IntlHelmet from '../../../lib/components/intl-helmet'
 
 import DeviceOverview from '../device-overview'
 
 import { getDevice } from '../../store/actions/device'
 
 import style from './device.styl'
+
+const m = defineMessages({
+  title: '%s - {deviceName} - The Things Network Console',
+})
 
 const tabs = [
   { title: 'Overview', name: 'overview' },
@@ -42,6 +47,7 @@ const tabs = [
 @connect(function ({ device, application }, props) {
   return {
     appName: application.application.name,
+    deviceName: device.device && device.device.name,
     devId: props.match.params.devId,
     fetching: device.fetching,
     error: device.error,
@@ -70,7 +76,7 @@ export default class Device extends React.Component {
   }
 
   render () {
-    const { fetching, error, match, appName, devId } = this.props
+    const { fetching, error, match, devId, deviceName } = this.props
 
     if (fetching) {
       return (
@@ -87,9 +93,8 @@ export default class Device extends React.Component {
 
     return (
       <React.Fragment>
-        <Helmet
-          titleTemplate={`%s - ${appName} - The Things Network Console`}
-          defaultTitle="Devices - The Things Network Console"
+        <IntlHelmet
+          titleTemplate={m.title} values={{ deviceName: deviceName || devId }}
         />
         <Container>
           <Row>

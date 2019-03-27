@@ -52,6 +52,7 @@
   "console.views.application-link.index.statistics": "Xxxxxxxxxx",
   "console.views.application-link.index.unlink": "Xxxxxx",
   "console.views.application-link.index.unlinkSuccess": "Xxxxxxxxxxxx xxxxxxxx",
+  "console.views.device.index.title": "%x - {deviceName} - Xxx Xxxxxx Xxxxxxx Xxxxxxx",
   "console.views.login.index.welcome": "Xxxxxxx xx {stackConsole}",
   "console.views.login.index.login": "Xxx xxxx xx xx xxxxxx xx xx xxx xxxx xxxx",
   "console.views.login.index.loginWithStackAccount": "Xxxxx xxxx xxxx XXX Xxxxx Xxxxxxx",
