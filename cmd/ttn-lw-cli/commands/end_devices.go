@@ -185,10 +185,22 @@ var (
 				return err
 			}
 
-			compareServerAddresses(device, config)
-
 			if len(jsPaths) > 0 && device.JoinServerAddress == "" {
 				logger.WithField("paths", jsPaths).Debug("No registered Join Server address, deselecting Join Server paths")
+				jsPaths = nil
+			}
+
+			nsMismatch, asMismatch, jsMismatch := compareServerAddresses(device, config)
+			if len(nsPaths) > 0 && nsMismatch {
+				logger.WithField("paths", nsPaths).Warn("Deselecting Network Server paths")
+				nsPaths = nil
+			}
+			if len(asPaths) > 0 && asMismatch {
+				logger.WithField("paths", asPaths).Warn("Deselecting Application Server paths")
+				asPaths = nil
+			}
+			if len(jsPaths) > 0 && jsMismatch {
+				logger.WithField("paths", jsPaths).Warn("Deselecting Join Server paths")
 				jsPaths = nil
 			}
 
@@ -449,7 +461,9 @@ var (
 				return errNoEndDeviceEUI
 			}
 
-			compareServerAddresses(existingDevice, config)
+			if nsMismatch, asMismatch, jsMismatch := compareServerAddresses(existingDevice, config); nsMismatch || asMismatch || jsMismatch {
+				return errAddressMismatch
+			}
 
 			res, err := setEndDevice(&device, isPaths, nsPaths, asPaths, jsPaths, false)
 			if err != nil {
@@ -595,7 +609,9 @@ var (
 				devID.DevEUI = existingDevice.DevEUI
 			}
 
-			compareServerAddresses(existingDevice, config)
+			if nsMismatch, asMismatch, jsMismatch := compareServerAddresses(existingDevice, config); nsMismatch || asMismatch || jsMismatch {
+				return errAddressMismatch
+			}
 
 			return deleteEndDevice(ctx, devID)
 		},
@@ -671,24 +687,30 @@ func getHost(address string) string {
 	return address
 }
 
-func compareServerAddresses(device *ttnpb.EndDevice, config *Config) {
+var errAddressMismatch = errors.DefineAborted("address_mismatch", "server address mismatch")
+
+func compareServerAddresses(device *ttnpb.EndDevice, config *Config) (nsMismatch, asMismatch, jsMismatch bool) {
 	nsHost, asHost, jsHost := getHost(config.NetworkServerGRPCAddress), getHost(config.ApplicationServerGRPCAddress), getHost(config.JoinServerGRPCAddress)
 	if host := getHost(device.NetworkServerAddress); host != "" && host != nsHost {
+		nsMismatch = true
 		logger.WithFields(log.Fields(
 			"configured", nsHost,
 			"registered", host,
 		)).Warn("Registered Network Server address does not match CLI configuration")
 	}
 	if host := getHost(device.ApplicationServerAddress); host != "" && host != asHost {
+		asMismatch = true
 		logger.WithFields(log.Fields(
 			"configured", asHost,
 			"registered", host,
 		)).Warn("Registered Application Server address does not match CLI configuration")
 	}
 	if host := getHost(device.JoinServerAddress); host != "" && host != jsHost {
+		jsMismatch = true
 		logger.WithFields(log.Fields(
 			"configured", jsHost,
 			"registered", host,
 		)).Warn("Registered Join Server address does not match CLI configuration")
 	}
+	return
 }
