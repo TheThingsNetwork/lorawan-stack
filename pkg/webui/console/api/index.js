@@ -89,8 +89,8 @@ export default {
     },
   },
   devices: {
-    list: stubs.devices.list,
-    search: stubs.devices.search,
+    list: ttnClient.Applications.Devices.getAll.bind(ttnClient.Applications.Devices),
+    get: ttnClient.Applications.Devices.getById.bind(ttnClient.Applications.Devices),
   },
   gateways: {
     list: stubs.gateways.list,
