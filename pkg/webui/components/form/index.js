@@ -21,6 +21,7 @@ import FieldGroup from '../field/group'
 import Button from '../button'
 import Notification from '../notification'
 import PropTypes from '../../lib/prop-types'
+import getByPath from '../../lib/get-by-path'
 
 @bind
 class InnerForm extends React.Component {
@@ -106,11 +107,14 @@ class InnerForm extends React.Component {
     const decoratedChildren = recursiveMap(children,
       function (Child) {
         if (Child.type === Field) {
+          const { name, value: originalValue } = Child.props
+          const value = name ? getByPath(values, name) : originalValue
+
           return React.cloneElement(Child, {
             setFieldValue,
             setFieldTouched,
             errors: { ...serverErrors, ...clientErrors },
-            values,
+            value,
             touched,
             horizontal,
             submitEnabledWhenInvalid,

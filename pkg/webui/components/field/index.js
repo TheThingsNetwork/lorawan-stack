@@ -148,7 +148,6 @@ const Field = function (props) {
     placeholder = props.title,
     description = null,
     error,
-    value,
     warning,
     touched,
     horizontal = false,
@@ -161,25 +160,25 @@ const Field = function (props) {
 
   // Underscored assignment due to naming conflict
 
-  let _value = props.value
   let _error = props.error
   let _touched = props.touched
   const formatMessage = content => typeof content === 'object' ? props.intl.formatMessage(content) : content
 
   if (form) {
     const {
-      values = {},
       errors = {},
     } = props
 
     // preserve default values for different inputs
-    // make sure the checkbox component gets `false` as a falsy value
-    _value = getByPath(values, name) || (type === 'checkbox' ? false : '')
     _error = getByPath(errors, name)
-    _touched = touched[name]
-    rest.value = _value
+    _touched = touched && touched[name]
     rest.onChange = handleChange
     rest.onBlur = handleBlur
+
+    // Dismiss non boolean values for checkboxes
+    if (type === 'checkbox') {
+      rest.value = typeof rest.value === 'boolean' ? rest.value : false
+    }
 
     // restore the rest object for future per component filtering
     rest.name = name
