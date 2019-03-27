@@ -100,8 +100,9 @@ func New(c *component.Component, config Config) (*Console, error) {
 		ClientSecret: console.config.OAuth.ClientSecret,
 		RedirectURL:  fmt.Sprintf("%s/oauth/callback", strings.TrimSuffix(console.config.UI.CanonicalURL, "/")),
 		Endpoint: oauth2.Endpoint{
-			TokenURL: console.config.OAuth.TokenURL,
-			AuthURL:  console.config.OAuth.AuthorizeURL,
+			TokenURL:  console.config.OAuth.TokenURL,
+			AuthURL:   console.config.OAuth.AuthorizeURL,
+			AuthStyle: oauth2.AuthStyleInParams,
 		},
 	}
 
