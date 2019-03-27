@@ -18,11 +18,43 @@ import (
 	"net/http"
 
 	echo "github.com/labstack/echo/v4"
+	"go.thethings.network/lorawan-stack/pkg/log"
+	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"google.golang.org/grpc"
 )
 
-// Logout logs out the user.
+// Logout invalidates the user's authorization and removes the auth cookie.
 func (console *Console) Logout(c echo.Context) error {
-	console.removeAuthCookie(c)
+	token, err := console.freshToken(c)
+	if err != nil {
+		return err
+	}
 
+	creds := grpc.PerRPCCredentials(rpcmetadata.MD{
+		AuthType:      "Bearer",
+		AuthValue:     token.AccessToken,
+		AllowInsecure: console.AllowInsecureForCredentials(),
+	})
+
+	ctx := c.Request().Context()
+	if peer := console.GetPeer(ctx, ttnpb.PeerInfo_ACCESS, nil); peer != nil {
+		if cc := peer.Conn(); cc != nil {
+			if res, err := ttnpb.NewEntityAccessClient(cc).AuthInfo(ctx, ttnpb.Empty, creds); err == nil {
+				if tokenInfo := res.GetOAuthAccessToken(); tokenInfo != nil {
+					_, err := ttnpb.NewOAuthAuthorizationRegistryClient(cc).DeleteToken(ctx, &ttnpb.OAuthAccessTokenIdentifiers{
+						UserIDs:   tokenInfo.UserIDs,
+						ClientIDs: tokenInfo.ClientIDs,
+						ID:        tokenInfo.ID,
+					}, creds)
+					if err != nil {
+						log.FromContext(ctx).WithError(err).Error("Could not invalidate access token")
+					}
+				}
+			}
+		}
+	}
+
+	console.removeAuthCookie(c)
 	return c.NoContent(http.StatusNoContent)
 }
