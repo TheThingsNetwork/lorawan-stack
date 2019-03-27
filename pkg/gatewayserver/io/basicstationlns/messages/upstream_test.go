@@ -368,3 +368,17 @@ func TestUplinkDataFrame(t *testing.T) {
 		})
 	}
 }
+
+func TestTxAck(t *testing.T) {
+	a := assertions.New(t)
+	correlationIDs := []string{"i3N84kvunPAS8wOmiEKbhsP62wNMRdmn", "deK3h59wUZhR0xb17eumTkauGQxoB5xn"}
+	res := ToTxAcknowledgment(correlationIDs)
+
+	if !(a.So(res, should.Resemble, ttnpb.TxAcknowledgment{
+		CorrelationIDs: correlationIDs,
+		Result:         ttnpb.TxAcknowledgment_SUCCESS,
+	})) {
+		t.Fatalf("Unexpected TxAck: %v", res)
+	}
+
+}

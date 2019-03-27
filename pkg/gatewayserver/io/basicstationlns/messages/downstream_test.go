@@ -36,7 +36,7 @@ func TestDownlinkMessage(t *testing.T) {
 		ExpectedError      error
 	}{
 		{
-			"ValidExample",
+			"Rx1Downlink",
 			ttnpb.DownlinkMessage{
 				RawPayload: []byte("Ymxhamthc25kJ3M=="),
 				EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
@@ -68,10 +68,76 @@ func TestDownlinkMessage(t *testing.T) {
 			},
 			nil,
 		},
+		{
+			"Rx2Downlink",
+			ttnpb.DownlinkMessage{
+				RawPayload: []byte("Ymxhamthc25kJ3M=="),
+				EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
+					DeviceID: "testdevice",
+					DevEUI:   eui64Ptr(types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}),
+				},
+				Settings: &ttnpb.DownlinkMessage_Scheduled{
+					Scheduled: &ttnpb.TxSettings{
+						DataRateIndex: 2,
+						Frequency:     869525000,
+						RequestInfo: &ttnpb.RequestInfo{
+							Class:        ttnpb.CLASS_C,
+							RxWindow:     2,
+							AntennaIndex: 2,
+						},
+					},
+				},
+			},
+			ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"},
+			DownlinkMessage{
+				DevEUI:      basicstation.EUI{Prefix: "DevEui", EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
+				DeviceClass: 0,
+				Pdu:         "Ymxhamthc25kJ3M==",
+				RxDelay:     1,
+				Rx2DR:       2,
+				Rx2Freq:     869525000,
+				RCtx:        2,
+				Priority:    0,
+			},
+			nil,
+		},
+		{
+			"Rx2ClassB",
+			ttnpb.DownlinkMessage{
+				RawPayload: []byte("Ymxhamthc25kJ3M=="),
+				EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
+					DeviceID: "testdevice",
+					DevEUI:   eui64Ptr(types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}),
+				},
+				Settings: &ttnpb.DownlinkMessage_Scheduled{
+					Scheduled: &ttnpb.TxSettings{
+						DataRateIndex: 2,
+						Frequency:     869525000,
+						RequestInfo: &ttnpb.RequestInfo{
+							Class:        ttnpb.CLASS_B,
+							RxWindow:     2,
+							AntennaIndex: 2,
+						},
+					},
+				},
+			},
+			ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"},
+			DownlinkMessage{
+				DevEUI:      basicstation.EUI{Prefix: "DevEui", EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
+				DeviceClass: 1,
+				Pdu:         "Ymxhamthc25kJ3M==",
+				RxDelay:     1,
+				Rx2DR:       2,
+				Rx2Freq:     869525000,
+				RCtx:        2,
+				Priority:    0,
+			},
+			nil,
+		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			dnmsg := DownlinkMessage{}
-			err := dnmsg.GetFromNSDownlinkMessage(tc.GatewayIDs, tc.NSDownlinkMessage)
+			err := dnmsg.FromNSDownlinkMessage(tc.GatewayIDs, tc.NSDownlinkMessage, 0)
 			if !(a.So(err, should.BeNil)) {
 				t.Fatalf("Unexpected error: %v", err)
 			}
