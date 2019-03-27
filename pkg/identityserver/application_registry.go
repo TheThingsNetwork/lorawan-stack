@@ -58,7 +58,7 @@ func (is *IdentityServer) createApplication(ctx context.Context, req *ttnpb.Crea
 			ctx,
 			&req.Collaborator,
 			app.ApplicationIdentifiers.EntityIdentifiers(),
-			ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_ALL),
+			ttnpb.RightsFrom(ttnpb.RIGHT_ALL),
 		); err != nil {
 			return err
 		}
