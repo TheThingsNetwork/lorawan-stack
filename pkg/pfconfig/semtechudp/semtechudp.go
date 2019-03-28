@@ -41,6 +41,16 @@ type GatewayConf struct {
 
 // Build builds a packet forwarder configuration for the given gateway, using the given frequency plan store.
 func Build(gateway *ttnpb.Gateway, store *frequencyplans.Store) (*Config, error) {
+	frequencyPlan, err := store.GetByID(gateway.FrequencyPlanID)
+	if err != nil {
+		return nil, err
+	}
+
+	return BuildSimple(gateway, frequencyPlan)
+}
+
+// BuildSimple builds a packet forwarder configuration for the given gateway, using the given frequency plan.
+func BuildSimple(gateway *ttnpb.Gateway, frequencyPlan *frequencyplans.FrequencyPlan) (*Config, error) {
 	var c Config
 
 	host, portStr, err := net.SplitHostPort(gateway.GatewayServerAddress)
@@ -57,10 +67,6 @@ func Build(gateway *ttnpb.Gateway, store *frequencyplans.Store) (*Config, error)
 	server.Enabled = true
 	c.GatewayConf.Servers = append(c.GatewayConf.Servers, server)
 
-	frequencyPlan, err := store.GetByID(gateway.FrequencyPlanID)
-	if err != nil {
-		return nil, err
-	}
 	sx1301Config, err := shared.BuildSX1301Config(frequencyPlan)
 	if err != nil {
 		return nil, err
