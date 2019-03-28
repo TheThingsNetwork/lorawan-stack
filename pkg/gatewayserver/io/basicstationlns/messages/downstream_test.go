@@ -57,7 +57,7 @@ func TestDownlinkMessage(t *testing.T) {
 			},
 			ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"},
 			DownlinkMessage{
-				DevEUI:      basicstation.EUI{Prefix: "DevEui", EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
+				DevEUI:      basicstation.EUI{EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
 				DeviceClass: 0,
 				Pdu:         "Ymxhamthc25kJ3M==",
 				RxDelay:     1,
@@ -90,7 +90,7 @@ func TestDownlinkMessage(t *testing.T) {
 			},
 			ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"},
 			DownlinkMessage{
-				DevEUI:      basicstation.EUI{Prefix: "DevEui", EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
+				DevEUI:      basicstation.EUI{EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
 				DeviceClass: 0,
 				Pdu:         "Ymxhamthc25kJ3M==",
 				RxDelay:     1,
@@ -123,7 +123,7 @@ func TestDownlinkMessage(t *testing.T) {
 			},
 			ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"},
 			DownlinkMessage{
-				DevEUI:      basicstation.EUI{Prefix: "DevEui", EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
+				DevEUI:      basicstation.EUI{EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
 				DeviceClass: 1,
 				Pdu:         "Ymxhamthc25kJ3M==",
 				RxDelay:     1,
