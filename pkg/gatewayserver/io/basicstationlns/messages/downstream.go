@@ -48,15 +48,16 @@ func (dnmsg DownlinkMessage) MarshalJSON() ([]byte, error) {
 		Type string `json:"msgtype"`
 		Alias
 	}{
-		Type:  TypeUpstreamJoinRequest,
+		Type:  TypeDownstreamDownlinkMessage,
 		Alias: Alias(dnmsg),
 	})
 }
 
 // FromNSDownlinkMessage translates the ttnpb.DownlinkMessage to LNS DownlinkMessage "dnmsg".
 func (dnmsg *DownlinkMessage) FromNSDownlinkMessage(ids ttnpb.GatewayIdentifiers, down ttnpb.DownlinkMessage, dlToken int64) error {
+	//TODO: Fix this based on https://github.com/TheThingsNetwork/lorawan-stack/pull/363
 	scheduledMsg := down.GetScheduled()
-	dnmsg.DevEUI = basicstation.EUI{Prefix: "DevEui", EUI64: *down.EndDeviceIDs.DevEUI}
+	dnmsg.DevEUI = basicstation.EUI{EUI64: *down.EndDeviceIDs.DevEUI}
 	dnmsg.Pdu = string(down.GetRawPayload())
 
 	// TODO: Use Class_B for absolute timebound scheduling
