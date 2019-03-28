@@ -94,6 +94,9 @@ func New(c *component.Component, conf *Config) (gs *GatewayServer, err error) {
 		udp.Start(lisCtx, gs, conn, conf.UDP.Config)
 	}
 
+	web := udp.StartWeb(gs.FillContext(gs.Context()), gs, conf.UDP.Config)
+	c.RegisterWeb(web)
+
 	for _, version := range []struct {
 		Format mqtt.Format
 		Config MQTTConfig
@@ -229,7 +232,6 @@ func (gs *GatewayServer) GetGateway(ctx context.Context, ids ttnpb.GatewayIdenti
 	if err != nil {
 		return nil, err
 	}
-
 	return gtw, nil
 }
 

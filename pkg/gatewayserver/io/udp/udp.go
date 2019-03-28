@@ -52,6 +52,8 @@ type Config struct {
 	ScheduleLateTime time.Duration `name:"schedule-late-time" description:"Time in advance to send downlink to the gateway when scheduling late"`
 	// AddrChangeBlock defines the time to block traffic when the address changes.
 	AddrChangeBlock time.Duration `name:"addr-change-block" description:"Time to block traffic when a gateway's address changes"`
+	// RequreAuth defines if the HTTP endpoints should require authentication or not.
+	RequireAuth bool `name:"require-auth" description:"Require authentication for the HTTP endpoints."`
 }
 
 // DefaultConfig contains the default configuration.
@@ -62,6 +64,7 @@ var DefaultConfig = Config{
 	ConnectionExpires:   5 * time.Minute,
 	ScheduleLateTime:    800 * time.Millisecond,
 	AddrChangeBlock:     5 * time.Minute,
+	RequireAuth:         true,
 }
 
 type srv struct {

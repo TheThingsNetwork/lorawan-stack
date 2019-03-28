@@ -48,6 +48,7 @@ var (
 		DownlinkPathExpires: 5 * timeout,
 		ConnectionExpires:   12 * timeout,
 		ScheduleLateTime:    0,
+		RequireAuth:         true,
 	}
 )
 
