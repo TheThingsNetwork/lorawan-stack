@@ -188,7 +188,7 @@ outer:
 
 		fCnt := pld.FCnt
 		switch {
-		case !supports32BitFCnt, fCnt > dev.matchedSession.LastFCntUp, fCnt == 0:
+		case !supports32BitFCnt, fCnt >= dev.matchedSession.LastFCntUp, fCnt == 0:
 		case fCnt > dev.matchedSession.LastFCntUp&0xffff:
 			fCnt |= dev.matchedSession.LastFCntUp &^ 0xffff
 		case dev.matchedSession.LastFCntUp < 0xffff0000:
@@ -213,7 +213,11 @@ outer:
 			(len(dev.RecentUplinks) == 0 || dev.PendingSession != nil) {
 			gap = 0
 		} else if !resetsFCnt {
-			if fCnt <= dev.matchedSession.LastFCntUp {
+			if fCnt == dev.matchedSession.LastFCntUp {
+				// TODO: Handle accordingly (https://github.com/TheThingsNetwork/lorawan-stack/issues/356)
+				logger.Debug("Possible uplink retransmission encountered, skipping...")
+				continue outer
+			} else if fCnt < dev.matchedSession.LastFCntUp {
 				logger.Debug("FCnt too low, skipping...")
 				continue outer
 			}
