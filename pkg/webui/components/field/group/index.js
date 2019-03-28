@@ -16,6 +16,7 @@ import React from 'react'
 
 import Message from '../../../lib/components/message'
 import PropTypes from '../../../lib/prop-types'
+import getByPath from '../../../lib/get-by-path'
 import Field, { FieldError } from '..'
 
 import style from './group.styl'
@@ -29,13 +30,25 @@ class FieldGroup extends React.Component {
       title,
       titleComponent = 'h4',
       errors,
+      value,
+      disabled,
+      setFieldValue,
+      setFieldTouched,
+      horizontal,
     } = this.props
+
     const fields = React.Children.map(children, function (Child) {
       if (React.isValidElement(Child) && Child.type === Field) {
         const fieldName = `${name}.${Child.props.name}`
+        const fieldValue = getByPath(value, Child.props.name)
         return React.cloneElement(Child, {
           ...Child.props,
           name: fieldName,
+          value: fieldValue,
+          disabled,
+          setFieldValue,
+          setFieldTouched,
+          horizontal,
         })
       }
 

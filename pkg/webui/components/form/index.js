@@ -138,9 +138,15 @@ class InnerForm extends React.Component {
             })
           }
         } else if (Child.type === FieldGroup) {
+          const { name } = Child.props
+          const value = name && getByPath(values, name)
           return React.cloneElement(Child, {
             ...Child.props,
+            setFieldValue,
+            setFieldTouched,
+            value,
             errors,
+            horizontal,
           })
         }
 
@@ -213,7 +219,7 @@ function recursiveMap (children, fn) {
     }
 
     let child = Child
-    if (child.props.children) {
+    if (child.props.children && child.type !== FieldGroup) {
       child = React.cloneElement(child, {
         children: recursiveMap(child.props.children, fn),
       })
