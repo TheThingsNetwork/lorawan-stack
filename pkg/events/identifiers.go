@@ -137,7 +137,7 @@ func (f *identifierFilter) Unsubscribe(ctx context.Context, ids ttnpb.Identifier
 func (f *identifierFilter) Notify(evt Event) {
 	var matched []Handler
 	f.mu.RLock()
-	for _, entityIDs := range evt.Identifiers().GetEntityIdentifiers() {
+	for _, entityIDs := range evt.Identifiers() {
 		switch ids := entityIDs.Identifiers().(type) {
 		case *ttnpb.ApplicationIdentifiers:
 			matched = append(matched, f.applicationIDs[unique.ID(evt.Context(), ids)]...)

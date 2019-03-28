@@ -5871,18 +5871,6 @@
         }
       }
     },
-    "v3CombinedIdentifiers": {
-      "type": "object",
-      "properties": {
-        "entity_identifiers": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v3EntityIdentifiers"
-          }
-        }
-      },
-      "description": "Combine the identifiers of multiple entities.\nThe main purpose of this message is its use in events."
-    },
     "v3ConcentratorConfig": {
       "type": "object",
       "properties": {
@@ -6633,7 +6621,10 @@
           "format": "date-time"
         },
         "identifiers": {
-          "$ref": "#/definitions/v3CombinedIdentifiers"
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3EntityIdentifiers"
+          }
         },
         "data": {
           "$ref": "#/definitions/protobufAny"

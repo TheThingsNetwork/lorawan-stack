@@ -7,7 +7,6 @@ var EventFieldPathsNested = []string{
 	"correlation_ids",
 	"data",
 	"identifiers",
-	"identifiers.entity_identifiers",
 	"name",
 	"origin",
 	"time",

@@ -2117,7 +2117,7 @@ The messages (for translation) are stored as &#34;error:&lt;namespace&gt;:&lt;na
 | ----- | ---- | ----- | ----------- |
 | name | [string](#string) |  |  |
 | time | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
-| identifiers | [CombinedIdentifiers](#ttn.lorawan.v3.CombinedIdentifiers) |  |  |
+| identifiers | [EntityIdentifiers](#ttn.lorawan.v3.EntityIdentifiers) | repeated |  |
 | data | [google.protobuf.Any](#google.protobuf.Any) |  |  |
 | correlation_ids | [string](#string) | repeated |  |
 | origin | [string](#string) |  |  |

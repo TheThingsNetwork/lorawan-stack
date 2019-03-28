@@ -32,24 +32,12 @@ func (dst *Event) SetFields(src *Event, paths ...string) error {
 			}
 		case "identifiers":
 			if len(subs) > 0 {
-				newDst := dst.Identifiers
-				if newDst == nil {
-					newDst = &CombinedIdentifiers{}
-					dst.Identifiers = newDst
-				}
-				var newSrc *CombinedIdentifiers
-				if src != nil {
-					newSrc = src.Identifiers
-				}
-				if err := newDst.SetFields(newSrc, subs...); err != nil {
-					return err
-				}
+				return fmt.Errorf("'identifiers' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Identifiers = src.Identifiers
 			} else {
-				if src != nil {
-					dst.Identifiers = src.Identifiers
-				} else {
-					dst.Identifiers = nil
-				}
+				dst.Identifiers = nil
 			}
 		case "data":
 			if len(subs) > 0 {
