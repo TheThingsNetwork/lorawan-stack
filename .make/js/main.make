@@ -80,7 +80,7 @@ js.dev-deps: $(MAGE)
 	@$(MAGE) js:devDeps
 
 # install dependencies
-js.deps: $(YARN)
+js.deps: $(MAGE)
 	@$(log) "Installing js dependencies"
 	@$(MAGE) js:deps
 
