@@ -21,6 +21,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/binary"
+	"fmt"
 	"math"
 
 	"go.thethings.network/lorawan-stack/pkg/basicstation"
@@ -67,6 +68,8 @@ func TLSCredentials(trust *x509.Certificate, client *tls.Certificate) ([]byte, e
 				return nil, err
 			}
 			out = append(out, privateKeyBytes...)
+		default:
+			return nil, errUnsupportedPrivateKey.WithAttributes("type", fmt.Sprintf("%T", client.PrivateKey))
 		}
 	}
 	return out, nil
@@ -81,7 +84,10 @@ func TokenCredentials(trust *x509.Certificate, authorization string) ([]byte, er
 	return out, nil
 }
 
-var errFieldLength = errors.Define("field_length", "length of `{field}` (`{length}`) exceeds maximum `{maximum}`")
+var (
+	errFieldLength           = errors.Define("field_length", "length of `{field}` (`{length}`) exceeds maximum `{maximum}`")
+	errUnsupportedPrivateKey = errors.Define("unsupported_private_key", "the private key type `{type}` is not supported")
+)
 
 // MarshalBinary implements encoding.BinaryMarshaler.
 func (r UpdateInfoResponse) MarshalBinary() ([]byte, error) {

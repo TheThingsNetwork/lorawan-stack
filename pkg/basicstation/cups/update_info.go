@@ -160,7 +160,7 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 		gtw.Attributes = make(map[string]string)
 	}
 
-	if s.requireExplicitEnable {
+	if s.requireExplicitEnable || gtw.Attributes[cupsAttribute] != "" {
 		if cups, _ := strconv.ParseBool(gtw.Attributes[cupsAttribute]); !cups {
 			return errCUPSNotEnabled.WithAttributes("gateway_uid", unique.ID(ctx, gtw.GatewayIdentifiers))
 		}
