@@ -42,8 +42,8 @@ func TestMarshalJSON(t *testing.T) {
 			"JoinRequest",
 			JoinRequest{
 				MHdr:     0,
-				DevEUI:   basicstation.EUI{Prefix: "DevEui", EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
-				JoinEUI:  basicstation.EUI{Prefix: "JoinEui", EUI64: types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22}},
+				DevEUI:   basicstation.EUI{EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
+				JoinEUI:  basicstation.EUI{EUI64: types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22}},
 				DevNonce: 18000,
 				MIC:      12345678,
 				RadioMetaData: RadioMetaData{
@@ -57,7 +57,7 @@ func TestMarshalJSON(t *testing.T) {
 					},
 				},
 			},
-			[]byte("{\"msgtype\":\"jreq\",\"MHdr\":0,\"JoinEui\":\"joineui-2222:2222:2222:2222\",\"DevEui\":\"deveui-1111:1111:1111:1111\",\"DevNonce\":18000,\"MIC\":12345678,\"RefTime\":0,\"RadioMetaData\":{\"DR\":1,\"Freq\":868300000,\"upinfo\":{\"rxtime\":1548059982,\"rtcx\":0,\"xtime\":12666373963464220,\"gpstime\":0,\"rssi\":89,\"snr\":9.25}}}"),
+			[]byte("{\"msgtype\":\"jreq\",\"MHdr\":0,\"JoinEui\":\"2222:2222:2222:2222\",\"DevEui\":\"1111:1111:1111:1111\",\"DevNonce\":18000,\"MIC\":12345678,\"RefTime\":0,\"RadioMetaData\":{\"DR\":1,\"Freq\":868300000,\"upinfo\":{\"rxtime\":1548059982,\"rtcx\":0,\"xtime\":12666373963464220,\"gpstime\":0,\"rssi\":89,\"snr\":9.25}}}"),
 		},
 		{
 			"UplinkDataFrame",
@@ -87,12 +87,12 @@ func TestMarshalJSON(t *testing.T) {
 			"TxConfirmation",
 			TxConfirmation{
 				Diid:    35,
-				DevEUI:  basicstation.EUI{Prefix: "DevEui", EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
+				DevEUI:  basicstation.EUI{EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
 				XTime:   1552906698,
 				TxTime:  1552906698,
 				GpsTime: 1552906698,
 			},
-			[]byte("{\"msgtype\":\"dntxed\",\"diid\":35,\"DevEui\":\"deveui-1111:1111:1111:1111\",\"rctx\":0,\"xtime\":1552906698,\"txtime\":1552906698,\"gpstime\":1552906698}"),
+			[]byte("{\"msgtype\":\"dntxed\",\"diid\":35,\"DevEui\":\"1111:1111:1111:1111\",\"rctx\":0,\"xtime\":1552906698,\"txtime\":1552906698,\"gpstime\":1552906698}"),
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -148,8 +148,8 @@ func TestJoinRequest(t *testing.T) {
 			"ValidJoinRequest",
 			JoinRequest{
 				MHdr:     0,
-				DevEUI:   basicstation.EUI{Prefix: "DevEui", EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
-				JoinEUI:  basicstation.EUI{Prefix: "JoinEui", EUI64: types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22}},
+				DevEUI:   basicstation.EUI{EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
+				JoinEUI:  basicstation.EUI{EUI64: types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22}},
 				DevNonce: 18000,
 				MIC:      12345678,
 				RadioMetaData: RadioMetaData{
