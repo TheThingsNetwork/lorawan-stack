@@ -4391,6 +4391,15 @@
       "file": "storage.go"
     }
   },
+  "error:pkg/pfconfig/shared:unmarshal_not_implemented": {
+    "translations": {
+      "en": "unmarshaling SX1301 config is not implemented"
+    },
+    "description": {
+      "package": "pkg/pfconfig/shared",
+      "file": "shared.go"
+    }
+  },
   "error:pkg/redis:not_found": {
     "translations": {
       "en": "entity not found"
