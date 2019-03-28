@@ -1916,6 +1916,69 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/basicstation/cups:cups_not_enabled": {
+    "translations": {
+      "en": "CUPS is not enabled for gateway `{gateway_uid}`"
+    },
+    "description": {
+      "package": "pkg/basicstation/cups",
+      "file": "update_info.go"
+    }
+  },
+  "error:pkg/basicstation/cups:field_length": {
+    "translations": {
+      "en": "length of `{field}` (`{length}`) exceeds maximum `{maximum}`"
+    },
+    "description": {
+      "package": "pkg/basicstation/cups",
+      "file": "messages.go"
+    }
+  },
+  "error:pkg/basicstation/cups:invalid_token": {
+    "translations": {
+      "en": "invalid provisioning token"
+    },
+    "description": {
+      "package": "pkg/basicstation/cups",
+      "file": "update_info.go"
+    }
+  },
+  "error:pkg/basicstation/cups:no_trust": {
+    "translations": {
+      "en": "no trusted certificate configured"
+    },
+    "description": {
+      "package": "pkg/basicstation/cups",
+      "file": "server.go"
+    }
+  },
+  "error:pkg/basicstation/cups:unauthenticated": {
+    "translations": {
+      "en": "call was not authenticated"
+    },
+    "description": {
+      "package": "pkg/basicstation/cups",
+      "file": "update_info.go"
+    }
+  },
+  "error:pkg/basicstation/cups:unsupported_private_key": {
+    "translations": {
+      "en": "the private key type `{type}` is not supported"
+    },
+    "description": {
+      "package": "pkg/basicstation/cups",
+      "file": "messages.go"
+    }
+  },
+  "error:pkg/basicstation:format": {
+    "translations": {
+      "en": "invalid format"
+    },
+    "description": {
+      "package": "pkg/basicstation",
+      "file": "eui.go"
+    }
+  },
   "error:pkg/blob:missing_config": {
     "translations": {
       "en": "missing blob store configuration"

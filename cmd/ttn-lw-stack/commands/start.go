@@ -42,7 +42,7 @@ var errUnknownComponent = errors.DefineInvalidArgument("unknown_component", "unk
 
 var (
 	startCommand = &cobra.Command{
-		Use:   "start [is|gs|ns|as|js|console|all]... [flags]",
+		Use:   "start [is|gs|ns|as|js|console|gcs|all]... [flags]",
 		Short: "Start the Network Stack",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var start struct {
@@ -52,6 +52,7 @@ var (
 				ApplicationServer bool
 				JoinServer        bool
 				Console           bool
+				GCS               bool
 			}
 			startDefault := len(args) == 0
 			for _, arg := range args {
@@ -68,6 +69,8 @@ var (
 					start.JoinServer = true
 				case "console":
 					start.Console = true
+				case "gcs":
+					start.GCS = true
 				case "all":
 					start.IdentityServer = true
 					start.GatewayServer = true
@@ -75,6 +78,7 @@ var (
 					start.ApplicationServer = true
 					start.JoinServer = true
 					start.Console = true
+					start.GCS = true
 				default:
 					return errUnknownComponent.WithAttributes("component", arg)
 				}
@@ -185,6 +189,12 @@ var (
 				}
 				_ = console
 				rootRedirect = web.Redirect("/", http.StatusFound, config.Console.UI.CanonicalURL)
+			}
+
+			if start.GCS {
+				logger.Info("Setting up GCS")
+				cups := config.GCS.BasicStation.NewServer(c)
+				_ = cups
 			}
 
 			if rootRedirect != nil {
