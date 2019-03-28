@@ -103,6 +103,7 @@ key.pem
 # Development data directory
 .dev/
 .env/
+.idea
 
 # Javascript test coverage
 /coverage

@@ -1,0 +1,24 @@
+baseURL = "http://example.org/3.0.0"
+languageCode = "en-us"
+title = "LoRaWAN Stack"
+theme = "hugo-theme-techdoc"
+
+enableGitInfo = true
+
+[frontmatter]
+date = [":git", "date", "publishDate", "lastmod"]
+lastmod = [":git", "lastmod", "date", "publishDate"]
+publishDate = ["publishDate", "date"]
+expiryDate = ["expiryDate"]
+
+
+[Params]
+
+    # Souce Code repository section
+    description = "The best around"
+    github_repository = "https://github.com/TheThingsNetwork/lorawan-stack"
+    version = "3.0.0"
+
+    # Documentation repository section
+    # documentation repository (set edit link to documentation repository)
+    github_doc_repository = "https://github.com/TheThingsNetwork/lorawan-stack/doc"
