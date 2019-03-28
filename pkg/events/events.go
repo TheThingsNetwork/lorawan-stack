@@ -37,7 +37,7 @@ type Event interface {
 	Context() context.Context
 	Name() string
 	Time() time.Time
-	Identifiers() *ttnpb.CombinedIdentifiers
+	Identifiers() []*ttnpb.EntityIdentifiers
 	Data() interface{}
 	CorrelationIDs() []string
 	Origin() string
@@ -116,7 +116,7 @@ func (e *event) UnmarshalJSON(data []byte) error {
 func (e event) Context() context.Context                { return e.ctx }
 func (e event) Name() string                            { return e.innerEvent.Name }
 func (e event) Time() time.Time                         { return e.innerEvent.Time }
-func (e event) Identifiers() *ttnpb.CombinedIdentifiers { return e.innerEvent.Identifiers }
+func (e event) Identifiers() []*ttnpb.EntityIdentifiers { return e.innerEvent.Identifiers }
 func (e event) Data() interface{}                       { return e.data }
 func (e event) CorrelationIDs() []string                { return e.innerEvent.CorrelationIDs }
 func (e event) Origin() string                          { return e.innerEvent.Origin }
@@ -148,7 +148,7 @@ func New(ctx context.Context, name string, identifiers ttnpb.Identifiers, data i
 		evt.innerEvent.CorrelationIDs = append(evt.innerEvent.CorrelationIDs, data.GetCorrelationIDs()...)
 	}
 	if identifiers != nil {
-		evt.innerEvent.Identifiers = identifiers.CombinedIdentifiers()
+		evt.innerEvent.Identifiers = identifiers.CombinedIdentifiers().GetEntityIdentifiers()
 	}
 	return evt
 }

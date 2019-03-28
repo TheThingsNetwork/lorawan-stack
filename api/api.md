@@ -2117,7 +2117,7 @@ The messages (for translation) are stored as &#34;error:&lt;namespace&gt;:&lt;na
 | ----- | ---- | ----- | ----------- |
 | name | [string](#string) |  |  |
 | time | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
-| identifiers | [CombinedIdentifiers](#ttn.lorawan.v3.CombinedIdentifiers) |  |  |
+| identifiers | [EntityIdentifiers](#ttn.lorawan.v3.EntityIdentifiers) | repeated |  |
 | data | [google.protobuf.Any](#google.protobuf.Any) |  |  |
 | correlation_ids | [string](#string) | repeated |  |
 | origin | [string](#string) |  |  |
@@ -2152,7 +2152,7 @@ The messages (for translation) are stored as &#34;error:&lt;namespace&gt;:&lt;na
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| identifiers | [CombinedIdentifiers](#ttn.lorawan.v3.CombinedIdentifiers) |  |  |
+| identifiers | [EntityIdentifiers](#ttn.lorawan.v3.EntityIdentifiers) | repeated |  |
 | tail | [uint32](#uint32) |  | If greater than zero, this will return historical events, up to this maximum when the stream starts. If used in combination with &#34;after&#34;, the limit that is reached first, is used. The availability of historical events depends on server support and retention policy. |
 | after | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | If not empty, this will return historical events after the given time when the stream starts. If used in combination with &#34;tail&#34;, the limit that is reached first, is used. The availability of historical events depends on server support and retention policy. |
 

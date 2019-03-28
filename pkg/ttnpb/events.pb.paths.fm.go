@@ -7,7 +7,6 @@ var EventFieldPathsNested = []string{
 	"correlation_ids",
 	"data",
 	"identifiers",
-	"identifiers.entity_identifiers",
 	"name",
 	"origin",
 	"time",
@@ -25,7 +24,6 @@ var EventFieldPathsTopLevel = []string{
 var StreamEventsRequestFieldPathsNested = []string{
 	"after",
 	"identifiers",
-	"identifiers.entity_identifiers",
 	"tail",
 }
 
