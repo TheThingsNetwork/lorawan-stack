@@ -24,6 +24,8 @@ matrix:
   - env: RUNTYPE=go.lint
   - env: RUNTYPE=release
     if: tag IS present OR (type != pull_request AND branch = master)
+  - env: RUNTYPE=doc
+    if: branch = master
 services:
 - docker
 cache:
@@ -80,6 +82,10 @@ install:
     sudo snap install snapcraft --classic
     $MAGE jsSDK:deps js:deps
   fi
+- |
+  if [[ "$RUNTYPE" == "doc" ]]; then
+    sudo apt-get install hugo
+  fi
 before_script:
 - |
   if [[ "$RUNTYPE" == "go.test" ]]; then
@@ -112,6 +118,7 @@ script:
 - if [[ "$RUNTYPE" == "go.test" ]]; then GO111MODULE=on go run ./cmd/ttn-lw-stack version; fi
 - if [[ "$RUNTYPE" == "go.test" ]]; then GO111MODULE=on go run ./cmd/ttn-lw-cli version; fi
 - if [[ "$RUNTYPE" == "release" ]]; then $MAGE version:files; fi
+- if [[ "$RUNTYPE" == "doc" ]]; then make docs-gen; fi
 - make git.diff
 after_success:
 - |
@@ -126,3 +133,11 @@ after_success:
       GO111MODULE=on go run github.com/goreleaser/goreleaser --snapshot --release-notes <(go run github.com/TheThingsIndustries/release-notes -owner TheThingsNetwork -repo lorawan-stack -id "release-notes" -head $(git rev-parse HEAD))
     fi
   fi
+deploy:
+- provider: pages
+  local_dir: doc/public
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN
+  keep_history: true
+  on:
+    branch: master
