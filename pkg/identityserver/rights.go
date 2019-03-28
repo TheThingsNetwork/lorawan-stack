@@ -19,7 +19,6 @@ import (
 
 	"github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
-	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
@@ -56,9 +55,6 @@ func (is *IdentityServer) ApplicationRights(ctx context.Context, appIDs ttnpb.Ap
 		return err
 	})
 	if err != nil {
-		if errors.IsNotFound(err) {
-			return &ttnpb.Rights{}, nil
-		}
 		return nil, err
 	}
 	return universal, nil
@@ -83,9 +79,6 @@ func (is *IdentityServer) ClientRights(ctx context.Context, cliIDs ttnpb.ClientI
 		return err
 	})
 	if err != nil {
-		if errors.IsNotFound(err) {
-			return &ttnpb.Rights{}, nil
-		}
 		return nil, err
 	}
 	return universal, nil
@@ -110,9 +103,6 @@ func (is *IdentityServer) GatewayRights(ctx context.Context, gtwIDs ttnpb.Gatewa
 		return err
 	})
 	if err != nil {
-		if errors.IsNotFound(err) {
-			return &ttnpb.Rights{}, nil
-		}
 		return nil, err
 	}
 	return universal, nil
@@ -137,9 +127,6 @@ func (is *IdentityServer) OrganizationRights(ctx context.Context, orgIDs ttnpb.O
 		return err
 	})
 	if err != nil {
-		if errors.IsNotFound(err) {
-			return &ttnpb.Rights{}, nil
-		}
 		return nil, err
 	}
 	return universal, nil
@@ -164,9 +151,6 @@ func (is *IdentityServer) UserRights(ctx context.Context, userIDs ttnpb.UserIden
 		return err
 	})
 	if err != nil {
-		if errors.IsNotFound(err) {
-			return &ttnpb.Rights{}, nil
-		}
 		return nil, err
 	}
 	return universal, nil
