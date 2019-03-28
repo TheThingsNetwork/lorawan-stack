@@ -43,7 +43,7 @@ class Applications {
       },
     })
     this.Link = new Link(api.As)
-    this.Devices = new Devices(api, { proxy })
+    this.Devices = new Devices(api, { proxy, stackConfig })
   }
 
   _responseTransform (response, single = true) {
