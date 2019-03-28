@@ -43,6 +43,7 @@ export default class Login extends React.PureComponent {
   render () {
     const { user, env } = this.props
     const { next } = Query.parse(location.search)
+    const redirectAppend = next ? `?next=${next}` : ''
 
     // dont show the login page if the user is already logged in
     if (Boolean(user)) {
@@ -64,7 +65,7 @@ export default class Login extends React.PureComponent {
               <Message className={style.loginSub} content={m.login} />
               <Button
                 message={m.loginWithStackAccount}
-                href={`${env.app_root}/login/ttn-stack?next=${next}`}
+                href={`${env.app_root}/login/ttn-stack${redirectAppend}`}
               />
             </Col>
           </Row>
