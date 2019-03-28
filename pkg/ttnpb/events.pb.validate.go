@@ -172,14 +172,19 @@ func (m *StreamEventsRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "identifiers":
 
-			if v, ok := interface{}(&m.Identifiers).(interface{ ValidateFields(...string) error }); ok {
-				if err := v.ValidateFields(subs...); err != nil {
-					return StreamEventsRequestValidationError{
-						field:  "identifiers",
-						reason: "embedded message failed validation",
-						cause:  err,
+			for idx, item := range m.GetIdentifiers() {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return StreamEventsRequestValidationError{
+							field:  fmt.Sprintf("identifiers[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
 					}
 				}
+
 			}
 
 		case "tail":

@@ -39,13 +39,13 @@ var eventsCommand = &cobra.Command{
 		addresses[config.ApplicationServerAddress] = true
 		addresses[config.JoinServerAddress] = true
 
-		ids := getCombinedIdentifiers(cmd.Flags())
-		if len(ids.GetEntityIdentifiers()) == 0 {
+		ids := getCombinedIdentifiers(cmd.Flags()).GetEntityIdentifiers()
+		if len(ids) == 0 {
 			return errNoIDs
 		}
 		tail, _ := cmd.Flags().GetUint32("tail")
 		req := &ttnpb.StreamEventsRequest{
-			Identifiers: *ids,
+			Identifiers: ids,
 			Tail:        tail,
 		}
 

@@ -339,7 +339,7 @@ func (m *OAuthClientAuthorizationIdentifiers) CombinedIdentifiers() *CombinedIde
 
 // CombinedIdentifiers implements Identifiers.
 func (m *StreamEventsRequest) CombinedIdentifiers() *CombinedIdentifiers {
-	return &m.Identifiers
+	return &CombinedIdentifiers{EntityIdentifiers: m.Identifiers}
 }
 
 // Copy stores a copy of ids in x and returns it.

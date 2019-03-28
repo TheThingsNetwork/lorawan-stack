@@ -25,7 +25,6 @@ var EventFieldPathsTopLevel = []string{
 var StreamEventsRequestFieldPathsNested = []string{
 	"after",
 	"identifiers",
-	"identifiers.entity_identifiers",
 	"tail",
 }
 

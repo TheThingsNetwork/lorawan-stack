@@ -101,21 +101,12 @@ func (dst *StreamEventsRequest) SetFields(src *StreamEventsRequest, paths ...str
 		switch name {
 		case "identifiers":
 			if len(subs) > 0 {
-				newDst := &dst.Identifiers
-				var newSrc *CombinedIdentifiers
-				if src != nil {
-					newSrc = &src.Identifiers
-				}
-				if err := newDst.SetFields(newSrc, subs...); err != nil {
-					return err
-				}
+				return fmt.Errorf("'identifiers' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Identifiers = src.Identifiers
 			} else {
-				if src != nil {
-					dst.Identifiers = src.Identifiers
-				} else {
-					var zero CombinedIdentifiers
-					dst.Identifiers = zero
-				}
+				dst.Identifiers = nil
 			}
 		case "tail":
 			if len(subs) > 0 {

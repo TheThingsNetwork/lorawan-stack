@@ -8431,7 +8431,10 @@
       "type": "object",
       "properties": {
         "identifiers": {
-          "$ref": "#/definitions/v3CombinedIdentifiers"
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3EntityIdentifiers"
+          }
         },
         "tail": {
           "type": "integer",

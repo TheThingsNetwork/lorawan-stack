@@ -36,7 +36,7 @@ message Event {
 }
 
 message StreamEventsRequest {
-  CombinedIdentifiers identifiers = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  repeated EntityIdentifiers identifiers = 1;
   // If greater than zero, this will return historical events, up to this maximum when the stream starts.
   // If used in combination with "after", the limit that is reached first, is used.
   // The availability of historical events depends on server support and retention policy.
