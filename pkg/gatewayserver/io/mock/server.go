@@ -20,6 +20,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
@@ -68,6 +69,18 @@ func (s *server) FillGatewayContext(ctx context.Context, ids ttnpb.GatewayIdenti
 	}
 	ids.GatewayID = fmt.Sprintf("eui-%v", strings.ToLower(ids.EUI.String()))
 	return ctx, ids, nil
+}
+
+// GetGateway implements io.Server.
+func (s *server) GetGateway(ctx context.Context, ids ttnpb.GatewayIdentifiers, fieldmask types.FieldMask) (*ttnpb.Gateway, error) {
+	if ids.IsZero() {
+		return nil, errors.New("the identifiers are zero")
+	}
+	gtw, ok := s.gateways[unique.ID(ctx, ids)]
+	if !ok {
+		return nil, errors.New("gateway not found")
+	}
+	return gtw, nil
 }
 
 // Connect implements io.Server.

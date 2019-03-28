@@ -20,6 +20,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/errorcontext"
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -35,6 +36,8 @@ const bufferSize = 10
 type Server interface {
 	// FillGatewayContext fills the given context and identifiers.
 	FillGatewayContext(ctx context.Context, ids ttnpb.GatewayIdentifiers) (context.Context, ttnpb.GatewayIdentifiers, error)
+	// GetGateway gets the specified gateway by the gateway identifiers.
+	GetGateway(ctx context.Context, ids ttnpb.GatewayIdentifiers, fieldmask types.FieldMask) (*ttnpb.Gateway, error)
 	// Connect connects a gateway by its identifiers to the Gateway Server, and returns a Connection for traffic and
 	// control.
 	Connect(ctx context.Context, protocol string, ids ttnpb.GatewayIdentifiers) (*Connection, error)

@@ -212,6 +212,27 @@ func (gs *GatewayServer) FillGatewayContext(ctx context.Context, ids ttnpb.Gatew
 	return ctx, ids, nil
 }
 
+// GetGateway gets the specified gateway by the gateway identifiers.
+func (gs *GatewayServer) GetGateway(ctx context.Context, ids ttnpb.GatewayIdentifiers, fieldmask types.FieldMask) (*ttnpb.Gateway, error) {
+	ctx = gs.FillContext(ctx)
+	if ids.IsZero() {
+		return nil, errEmptyIdentifiers
+	}
+	er := gs.GetPeer(ctx, ttnpb.PeerInfo_ENTITY_REGISTRY, nil)
+	if er == nil {
+		return nil, errEntityRegistryNotFound
+	}
+	gtw, err := ttnpb.NewGatewayRegistryClient(er.Conn()).Get(ctx, &ttnpb.GetGatewayRequest{
+		GatewayIdentifiers: ids,
+		FieldMask:          fieldmask,
+	}, gs.WithClusterAuth())
+	if err != nil {
+		return nil, err
+	}
+
+	return gtw, nil
+}
+
 var (
 	errGatewayNotRegistered = errors.DefineNotFound(
 		"gateway_not_registered",
