@@ -589,7 +589,8 @@ hardware_versions:
 						},
 						AssertDevice: func(t *testing.T, dev *ttnpb.EndDevice, queue []*ttnpb.ApplicationDownlink) {
 							a := assertions.New(t)
-							a.So(dev.Session, should.Resemble, &ttnpb.Session{
+							a.So(dev.Session, should.BeNil)
+							a.So(dev.PendingSession, should.Resemble, &ttnpb.Session{
 								DevAddr: types.DevAddr{0x11, 0x11, 0x11, 0x11},
 								SessionKeys: ttnpb.SessionKeys{
 									SessionKeyID: []byte{0x11},
@@ -599,10 +600,9 @@ hardware_versions:
 									},
 								},
 								LastAFCntDown: 0,
-								StartedAt:     dev.Session.StartedAt,
+								StartedAt:     dev.PendingSession.StartedAt,
 							})
-							a.So(dev.PendingSession, should.BeNil)
-							a.So(queue, should.HaveLength, 0)
+							a.So(queue, should.BeEmpty)
 						},
 					},
 					{
@@ -635,7 +635,8 @@ hardware_versions:
 						},
 						AssertDevice: func(t *testing.T, dev *ttnpb.EndDevice, queue []*ttnpb.ApplicationDownlink) {
 							a := assertions.New(t)
-							a.So(dev.Session, should.Resemble, &ttnpb.Session{
+							a.So(dev.Session, should.BeNil)
+							a.So(dev.PendingSession, should.Resemble, &ttnpb.Session{
 								DevAddr: types.DevAddr{0x22, 0x22, 0x22, 0x22},
 								SessionKeys: ttnpb.SessionKeys{
 									SessionKeyID: []byte{0x22},
@@ -645,10 +646,9 @@ hardware_versions:
 									},
 								},
 								LastAFCntDown: 0,
-								StartedAt:     dev.Session.StartedAt,
+								StartedAt:     dev.PendingSession.StartedAt,
 							})
-							a.So(dev.PendingSession, should.BeNil)
-							a.So(queue, should.HaveLength, 0)
+							a.So(queue, should.BeEmpty)
 						},
 					},
 					{
@@ -663,20 +663,6 @@ hardware_versions:
 										// AppSKey is []byte{0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33}
 										Key:      []byte{0x5, 0x81, 0xe1, 0x15, 0x8a, 0xc3, 0x13, 0x68, 0x5e, 0x8d, 0x15, 0xc0, 0x11, 0x92, 0x14, 0x49, 0x9f, 0xa0, 0xc6, 0xf1, 0xdb, 0x95, 0xff, 0xbd},
 										KEKLabel: "test",
-									},
-									InvalidatedDownlinks: []*ttnpb.ApplicationDownlink{
-										{
-											SessionKeyID: []byte{0x22},
-											FPort:        11,
-											FCnt:         11,
-											FRMPayload:   []byte{0x69, 0x65, 0x9f, 0x8f},
-										},
-										{
-											SessionKeyID: []byte{0x22},
-											FPort:        22,
-											FCnt:         22,
-											FRMPayload:   []byte{0xb, 0x8f, 0x94, 0xe6},
-										},
 									},
 								},
 							},
@@ -695,7 +681,8 @@ hardware_versions:
 						},
 						AssertDevice: func(t *testing.T, dev *ttnpb.EndDevice, queue []*ttnpb.ApplicationDownlink) {
 							a := assertions.New(t)
-							a.So(dev.Session, should.Resemble, &ttnpb.Session{
+							a.So(dev.Session, should.BeNil)
+							a.So(dev.PendingSession, should.Resemble, &ttnpb.Session{
 								DevAddr: types.DevAddr{0x33, 0x33, 0x33, 0x33},
 								SessionKeys: ttnpb.SessionKeys{
 									SessionKeyID: []byte{0x33},
@@ -704,24 +691,10 @@ hardware_versions:
 										KEKLabel: "test",
 									},
 								},
-								LastAFCntDown: 2,
-								StartedAt:     dev.Session.StartedAt,
+								LastAFCntDown: 0,
+								StartedAt:     dev.PendingSession.StartedAt,
 							})
-							a.So(dev.PendingSession, should.BeNil)
-							a.So(queue, should.Resemble, []*ttnpb.ApplicationDownlink{
-								{
-									SessionKeyID: []byte{0x33},
-									FPort:        11,
-									FCnt:         1,
-									FRMPayload:   []byte{0x1, 0x1, 0x1, 0x1},
-								},
-								{
-									SessionKeyID: []byte{0x33},
-									FPort:        22,
-									FCnt:         2,
-									FRMPayload:   []byte{0x2, 0x2, 0x2, 0x2},
-								},
-							})
+							a.So(queue, should.BeEmpty)
 						},
 					},
 					{
