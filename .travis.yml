@@ -84,7 +84,7 @@ install:
   fi
 - |
   if [[ "$RUNTYPE" == "doc" ]]; then
-    sudo apt-get install hugo
+    make docs-deps
   fi
 before_script:
 - |

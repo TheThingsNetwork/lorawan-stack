@@ -1,4 +1,4 @@
-baseURL = "http://example.org/3.0.0"
+baseURL = "http://localhost"
 languageCode = "en-us"
 title = "The Things Network Stack for LoRaWAN - V3"
 theme = "hugo-theme-techdoc"
@@ -11,11 +11,9 @@ lastmod = [":git", "lastmod", "date", "publishDate"]
 publishDate = ["publishDate", "date"]
 expiryDate = ["expiryDate"]
 
-
 [Params]
-
     # Souce Code repository section
-    description = "The best around"
+    description = "Open-source LoRaWAN network stack suitable for large, small, global and geo-distributed deployments."
     github_repository = "https://github.com/TheThingsNetwork/lorawan-stack"
     version = "3.0.0"
 
