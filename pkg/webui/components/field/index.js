@@ -245,7 +245,7 @@ Field.propTypes = {
   type: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.func,
-  ]).isRequired,
+  ]),
   /** Error to be displayed next to input */
   error: PropTypes.error,
   /** Warning to be displayed next to input */
