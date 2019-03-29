@@ -19,3 +19,12 @@ SHELL = bash
 
 include .mage/mage.make
 include .make/dev.make
+
+docs-gen:
+	hugo -s ./doc --baseUrl https://thethingsnetwork.github.io/lorawan-stack/$(GIT_TAG)/ -d public/$(GIT_TAG)
+
+docs-server:
+	hugo server -s ./doc
+
+doc-deps:
+	@echo https://gohugo.io/getting-started/installing
