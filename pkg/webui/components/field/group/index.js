@@ -18,7 +18,7 @@ import classnames from 'classnames'
 import Message from '../../../lib/components/message'
 import PropTypes from '../../../lib/prop-types'
 import getByPath from '../../../lib/get-by-path'
-import { FieldError } from '..'
+import Field, { Field as PureField, FieldError } from '..'
 
 import style from './group.styl'
 
@@ -27,7 +27,7 @@ class FieldGroup extends React.Component {
     const {
       className,
       children,
-      name,
+      name: groupName,
       title,
       titleComponent = 'span',
       error,
@@ -38,22 +38,24 @@ class FieldGroup extends React.Component {
       horizontal,
       touched,
       columns,
+      form = true,
     } = this.props
-
     const fields = React.Children.map(children, function (Child) {
-
-      if (React.isValidElement(Child) && Child.type.name === 'Field') {
-        const { type, value: fieldValue } = Child.props
-        let id, fieldName
-        const mapValues = {}
+      if (React.isValidElement(Child) && Child.type === Field || Child.type === PureField) {
+        const { type, value: fieldValue, name: fieldName } = Child.props
+        const appliedProps = {}
         if (type === 'checkbox') {
-          fieldName = id
-          id = `${name}.${fieldName}`
-          mapValues.value = getByPath(value, Child.props.name)
+          appliedProps.id = `${groupName}.${fieldName}`
+          appliedProps.name = appliedProps.id
+          if (form && value) {
+            appliedProps.value = getByPath(value, fieldName)
+          }
         } else if (type === 'radio') {
-          fieldName = name
-          id = `${name}.${fieldValue}`
-          mapValues.checked = value === fieldValue
+          appliedProps.name = groupName
+          appliedProps.id = `${groupName}.${fieldValue}`
+          if (form && value) {
+            appliedProps.checked = value === fieldValue
+          }
         }
         const classNames = classnames(style.field, className, {
           [style.columns]: columns,
@@ -61,17 +63,14 @@ class FieldGroup extends React.Component {
 
         return React.cloneElement(Child, {
           ...Child.props,
-          ...mapValues,
+          ...appliedProps,
           className: classNames,
-          name: fieldName,
-          value: fieldValue,
-          touches: name,
+          touches: groupName,
           disabled,
           setFieldValue,
           setFieldTouched,
           validateOnChange: true,
           horizontal,
-          id,
         })
       }
 

@@ -156,6 +156,9 @@ const Field = function (props) {
     if (validateOnChange) {
       setFieldTouched(touches, true)
     }
+    if (props.onChange) {
+      props.onChange(value)
+    }
   }
 
   const handleBlur = function (e) {
