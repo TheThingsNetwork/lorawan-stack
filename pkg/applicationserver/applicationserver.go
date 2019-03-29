@@ -409,7 +409,10 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 		"dev_eui", ids.DevEUI,
 		"session_key_id", joinAccept.SessionKeyID,
 	))
-	_, err := as.deviceRegistry.Set(ctx, ids, nil,
+	_, err := as.deviceRegistry.Set(ctx, ids,
+		[]string{
+			"session",
+		},
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			var mask []string
 			if dev == nil {
@@ -437,6 +440,18 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 				StartedAt: time.Now().UTC(),
 			}
 			mask = append(mask, "pending_session")
+			if !joinAccept.PendingSession && len(joinAccept.InvalidatedDownlinks) > 0 {
+				// The Network Server reset the downlink queue as the new security session invalidated it.
+				// The invalidated downlink queue is passed as part of the join-accept and the Application Server should recalculate it.
+				// This changes the LastAFCntDown in the session, so it should be run as part of the transaction.
+				logger := logger.WithField("count", len(joinAccept.InvalidatedDownlinks))
+				logger.Debug("Recalculating downlink queue to restore downlink queue on join")
+				if err := as.recalculateDownlinkQueue(ctx, dev, nil, joinAccept.InvalidatedDownlinks, 1, link); err != nil {
+					logger.WithError(err).Warn("Failed to recalculate downlink queue, items lost")
+				} else {
+					mask = append(mask, "session")
+				}
+			}
 			return dev, mask, nil
 		},
 	)
@@ -605,6 +620,9 @@ func (as *ApplicationServer) recalculateDownlinkQueue(ctx context.Context, dev *
 		"count", len(invalid),
 		"next_a_f_cnt_down", nextAFCntDown,
 	)).Debug("Recalculating downlink queue")
+	if dev.Session == nil || dev.Session.AppSKey == nil {
+		return errNoAppSKey
+	}
 	defer func() {
 		// If something fails, clear the downlink queue as an empty downlink queue is better than a downlink queue
 		// with items that are encrypted with the wrong AppSKey.
@@ -623,9 +641,6 @@ func (as *ApplicationServer) recalculateDownlinkQueue(ctx context.Context, dev *
 			}
 		}
 	}()
-	if dev.Session == nil || dev.Session.AppSKey == nil {
-		return errNoAppSKey
-	}
 	newAppSKey, err := cryptoutil.UnwrapAES128Key(*dev.Session.AppSKey, as.KeyVault)
 	if err != nil {
 		return err
