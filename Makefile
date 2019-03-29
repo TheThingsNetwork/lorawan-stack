@@ -27,4 +27,31 @@ docs-server:
 	hugo server -s ./doc
 
 doc-deps:
-	@echo https://gohugo.io/getting-started/installing
+	@git clone https://github.com/gohugoio/hugo.git
+	@cd hugo
+	@go install
+
+docs:
+	@rm -f doc/ttn-lw-{stack,cli}/*.{md,1,yaml}
+	@$(GO) run ./cmd/ttn-lw-stack gen-man-pages --log.level=error -o doc/ttn-lw-stack
+	@$(GO) run ./cmd/ttn-lw-stack gen-md-doc --log.level=error -o doc/ttn-lw-stack
+	@$(GO) run ./cmd/ttn-lw-stack gen-yaml-doc --log.level=error -o doc/ttn-lw-stack
+	@$(GO) run ./cmd/ttn-lw-cli gen-man-pages --log.level=error -o doc/ttn-lw-cli
+	@$(GO) run ./cmd/ttn-lw-cli gen-md-doc --log.level=error -o doc/ttn-lw-cli
+	@$(GO) run ./cmd/ttn-lw-cli gen-yaml-doc --log.level=error -o doc/ttn-lw-cli
+
+dev-deps: go.deps js.dev-deps
+
+deps: go.deps sdk.deps sdk.js.build js.deps # NOTE: js.deps needs to be AFTER sdk.js.build
+
+test: go.test js.test sdk.test
+
+quality: go.quality js.quality styl.quality snap.quality
+
+build-all: $(MAGE)
+	@GO111MODULE=on $(GO) run github.com/goreleaser/goreleaser --snapshot --skip-publish
+
+clean: go.clean js.clean
+	rm -rf dist
+
+translations: messages js.translations
