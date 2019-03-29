@@ -36,6 +36,7 @@ const Tabs = function ({
           title,
           name,
           icon,
+          narrow = false,
         } = tab
 
         return (
@@ -46,6 +47,7 @@ const Tabs = function ({
             name={name}
             disabled={disabled}
             onClick={onTabChange}
+            narrow={narrow}
           >
             {icon && <Icon icon={icon} className={style.icon} />}
             <Message content={title} />

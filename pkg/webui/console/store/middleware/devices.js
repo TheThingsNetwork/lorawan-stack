@@ -23,14 +23,12 @@ const getDevicesListLogic = createLogic({
     devices.SEARCH_DEVICES_LIST,
   ],
   async process ({ getState, action }, dispatch, done) {
-    const { appId, filters } = action
+    const { appId } = action
+    const { page, pageSize: limit } = action.filters
 
     try {
-      const data = filters.query
-        ? await api.devices.search(appId, filters)
-        : await api.devices.list(appId, filters)
-
-      dispatch(devices.getDevicesListSuccess(data.devices, data.totalCount))
+      const data = await api.devices.list(appId, { page, limit })
+      dispatch(devices.getDevicesListSuccess(data.end_devices, data.totalCount))
     } catch (error) {
       dispatch(devices.getDevicesListFailure(error))
     }

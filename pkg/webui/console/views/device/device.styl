@@ -12,8 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.breadcrumbs
-  color: $tc-subtle-gray
-  height: 3rem
+.title
+  margin: $ls.xxs 0
+  height: 2rem
   display: flex
-  align-items: center
+  align-items: flex-end
+
+.head
+  margin-top: 0
+
+.id
+  h2()
+  nudge('up', 3px)
+  line-height: .8
+  height: 1rem
+  white-space: no-break
+  margin: 0
+  font-weight: 600
+  display: inline-block
+
+.tabs
+  border-normal('bottom')
+  margin-top: $ls.s

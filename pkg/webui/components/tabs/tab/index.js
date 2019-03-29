@@ -37,11 +37,13 @@ class Tab extends React.PureComponent {
       name,
       active = false,
       disabled = false,
+      narrow,
       children,
       ...rest
     } = this.props
 
     const tabClassNames = classnames(className, style.tab, {
+      [style.tabNarrow]: narrow,
       [style.tabActive]: !disabled && active,
       [style.tabDefault]: !disabled && !active,
       [style.tabDisabled]: disabled,

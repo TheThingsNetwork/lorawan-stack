@@ -30,6 +30,8 @@ import ApplicationLink from '../application-link'
 
 import { getApplication } from '../../store/actions/application'
 
+import Devices from '../devices'
+
 @connect(function ({ application }, props) {
   return {
     appId: props.match.params.appId,
@@ -53,6 +55,7 @@ import { getApplication } from '../../store/actions/application'
         title: sharedMessages.devices,
         path: `${matchedUrl}/devices`,
         icon: 'devices',
+        exact: false,
       },
       {
         title: sharedMessages.data,
@@ -63,6 +66,11 @@ import { getApplication } from '../../store/actions/application'
         title: sharedMessages.link,
         path: `${matchedUrl}/link`,
         icon: 'link',
+      },
+      {
+        title: sharedMessages.payloadFormats,
+        path: `${matchedUrl}/payload-formats`,
+        icon: 'payload_formats',
       },
       {
         title: sharedMessages.integrations,
@@ -128,6 +136,7 @@ export default class Application extends React.Component {
         <Route path={`${match.path}/general-settings`} component={ApplicationGeneralSettings} />
         <Route path={`${match.path}/api-keys`} component={ApplicationApiKeys} />
         <Route path={`${match.path}/link`} component={ApplicationLink} />
+        <Route path={`${match.path}/devices`} component={Devices} />
       </Switch>
     )
   }

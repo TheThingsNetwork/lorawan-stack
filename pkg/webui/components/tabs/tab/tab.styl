@@ -19,9 +19,17 @@
   position: relative
   cursor: pointer
   user-select: none
+  color: $tc-subtle-gray
+  transition: color $ad.xs
+
+  &:hover
+    color: $tc-deep-gray
 
   &:not(:last-child)
     margin-bottom: 0
+
+  &-narrow
+    padding: $cs.l $cs.m
 
   &-disabled
     cursor: not-allowed
@@ -31,6 +39,5 @@
     pseudo-border-animated(3px, $c-divider)
 
   &-active
-    font-weight: 600
-
     pseudo-border(3px, $c-active-blue)
+    color: $c-active-blue

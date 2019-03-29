@@ -12,20 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.title
-  margin-bottom: $ls.m
+.overview-info
+  margin-top: $ls.xs
 
-  h2
-    entity-title()
-    margin-bottom: 0
-
-  .description
-    display: block
-    margin-top: ($cs.xs * -1)
-    margin-bottom: $ls.s
+  &-general
+    border-normal('bottom')
+    box-sizing: border-box
+    padding-bottom: 2.55rem
 
 .table
   margin-top: $ls.xl
+
+.latest-events
+  border-normal()
+  padding: $ls.xl
+  margin-top: $ls.s
+  text-align: center
+  font-style: italic
+  color: $tc-subtle-gray
 
 .attributes
   list-style: none
@@ -44,9 +48,16 @@
   .value
     flex-basis:50%
 
-.latest-events
-  margin-top: $ls.m
+.tabs
+  border-normal('bottom')
+  margin-top: $ls.s
 
+  &-general
+    border-normal('bottom')
+    box-sizing: border-box
+    padding-bottom: 2.55rem
+
+.locationPlaceholder, .activityPlaceholder
   h4
     one-liner(block)
     height: 1rem
@@ -59,8 +70,14 @@
     align-items: center
     justify-content: center
     width: 100%
-    height: 12rem
+    height: 16rem
     margin-top: $ls.xxs
     text-align: center
     font-style: italic
     color: $tc-subtle-gray
+
+.activityPlaceholder
+  margin-top: $ls.s
+
+.locationPlaceholder
+  margin-top: $ls.m

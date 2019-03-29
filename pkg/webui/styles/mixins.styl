@@ -148,12 +148,21 @@ h1()
 h2()
   font-size: $fs.xl
   line-height: $lh.xl
-  font-weight: 300
+  font-weight: 600
 
 h3()
   font-size: $fs.l
   line-height: $lh.l
   font-weight: 300
+
+entity-title()
+  h2()
+  line-height: 1
+  white-space: no-break
+  margin: $ls.xxs 0
+  height: 4rem
+  display: flex
+  align-items: center
 
 
 // One liner, sets line-height to 1, makes components spacing a lot easier.
