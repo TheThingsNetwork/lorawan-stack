@@ -179,16 +179,16 @@ const Field = function (props) {
     if (type === 'checkbox') {
       rest.value = typeof rest.value === 'boolean' ? rest.value : false
     }
-
-    // restore the rest object for future per component filtering
-    rest.name = name
-    rest.readOnly = readOnly
-    rest.disabled = disabled
-    rest.error = _touched && Boolean(_error)
-    rest.warning = Boolean(warning)
-    rest.type = type
-    rest.placeholder = placeholder ? formatMessage(placeholder) : ''
   }
+
+  // restore the rest object for future per component filtering
+  rest.name = name
+  rest.readOnly = readOnly
+  rest.disabled = disabled
+  rest.error = _touched && Boolean(_error)
+  rest.warning = Boolean(warning)
+  rest.type = type
+  rest.placeholder = placeholder ? formatMessage(placeholder) : ''
 
   const hasMessages = _touched && (_error || warning)
 
