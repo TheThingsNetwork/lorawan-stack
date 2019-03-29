@@ -1,6 +1,6 @@
 baseURL = "http://example.org/3.0.0"
 languageCode = "en-us"
-title = "LoRaWAN Stack"
+title = "The Things Network Stack for LoRaWAN - V3"
 theme = "hugo-theme-techdoc"
 
 enableGitInfo = true
@@ -21,4 +21,4 @@ expiryDate = ["expiryDate"]
 
     # Documentation repository section
     # documentation repository (set edit link to documentation repository)
-    github_doc_repository = "https://github.com/TheThingsNetwork/lorawan-stack/doc"
+    github_doc_repository = "https://github.com/TheThingsNetwork/lorawan-stack"
