@@ -639,7 +639,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								DataRateIndex: ttnpb.DATA_RATE_0,
 							},
 							CorrelationIDs: []string{"testCorrelationUpID1", "testCorrelationUpID2"},
-							ReceivedAt:     time.Now().Add(time.Hour),
+							ReceivedAt:     time.Now().Add(-time.Second),
 							Payload: &ttnpb.Message{
 								MHDR: ttnpb.MHDR{
 									MType: ttnpb.MType_UNCONFIRMED_UP,
@@ -1052,7 +1052,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								DataRateIndex: ttnpb.DATA_RATE_0,
 							},
 							CorrelationIDs: []string{"testCorrelationUpID1", "testCorrelationUpID2"},
-							ReceivedAt:     time.Now().Add(time.Hour),
+							ReceivedAt:     time.Now().Add(-time.Second),
 							Payload: &ttnpb.Message{
 								MHDR: ttnpb.MHDR{
 									MType: ttnpb.MType_UNCONFIRMED_UP,
