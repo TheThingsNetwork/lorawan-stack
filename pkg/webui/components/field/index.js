@@ -19,7 +19,6 @@ import { injectIntl } from 'react-intl'
 import PropTypes from '../../lib/prop-types'
 import from from '../../lib/from'
 import { warn } from '../../lib/log'
-import getByPath from '../../lib/get-by-path'
 
 import Icon from '../icon'
 import Input from '../input'
@@ -147,7 +146,6 @@ const Field = function (props) {
     title,
     placeholder = props.title,
     description = null,
-    error,
     warning,
     touched,
     horizontal = false,
@@ -159,21 +157,17 @@ const Field = function (props) {
   } = props
 
   // Underscored assignment due to naming conflict
-
-  let _error = props.error
-  let _touched = props.touched
+  let _error = rest.error
+  let _touched = touched
   const formatMessage = content => typeof content === 'object' ? props.intl.formatMessage(content) : content
 
   if (form) {
-    const {
-      errors = {},
-    } = props
-
     // preserve default values for different inputs
-    _error = getByPath(errors, name)
+    rest.value = rest.value || ''
     _touched = touched && touched[name]
     rest.onChange = handleChange
     rest.onBlur = handleBlur
+    _error = _touched && rest.error
 
     // Dismiss non boolean values for checkboxes
     if (type === 'checkbox') {
@@ -185,7 +179,7 @@ const Field = function (props) {
   rest.name = name
   rest.readOnly = readOnly
   rest.disabled = disabled
-  rest.error = _touched && Boolean(_error)
+  rest.error = Boolean(_error)
   rest.warning = Boolean(warning)
   rest.type = type
   rest.placeholder = placeholder ? formatMessage(placeholder) : ''
@@ -193,7 +187,7 @@ const Field = function (props) {
   const hasMessages = _touched && (_error || warning)
 
   const classname = classnames(className, style.field, style[type], ...from(style, {
-    error: _error,
+    error: rest.error,
     warning: warning && !_error,
     horizontal,
     required,

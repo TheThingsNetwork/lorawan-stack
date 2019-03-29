@@ -103,17 +103,19 @@ class InnerForm extends React.Component {
     const formError = status.formError || false
     const serverErrors = status.errors || {}
     const clientErrors = errors
+    const combinedErrors = { ...serverErrors, ...clientErrors }
 
     const decoratedChildren = recursiveMap(children,
       function (Child) {
         if (Child.type === Field) {
           const { name, value: originalValue } = Child.props
           const value = name ? getByPath(values, name) : originalValue
+          const fieldError = getByPath(combinedErrors, name)
 
           return React.cloneElement(Child, {
             setFieldValue,
             setFieldTouched,
-            errors: { ...serverErrors, ...clientErrors },
+            error: fieldError,
             value,
             touched,
             horizontal,
