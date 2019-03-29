@@ -126,7 +126,7 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 		}
 		n++
 
-		if !pld.ChannelMaskAck || !pld.DataRateIndexAck || !pld.TxPowerIndexAck {
+		if !pld.ChannelMaskAck && !pld.DataRateIndexAck && !pld.TxPowerIndexAck {
 			return nil
 		}
 
