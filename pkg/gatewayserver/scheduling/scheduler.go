@@ -46,10 +46,14 @@ var (
 
 // NewScheduler instantiates a new Scheduler for the given frequency plan.
 func NewScheduler(ctx context.Context, fp *frequencyplans.FrequencyPlan, enforceDutyCycle bool) (*Scheduler, error) {
+	toa := fp.TimeOffAir
+	if toa.Duration < QueueDelay {
+		toa.Duration = QueueDelay
+	}
 	s := &Scheduler{
 		clock:             &RolloverClock{},
 		respectsDwellTime: fp.RespectsDwellTime,
-		timeOffAir:        fp.TimeOffAir,
+		timeOffAir:        toa,
 	}
 	if enforceDutyCycle {
 		band, err := band.GetByID(fp.BandID)
@@ -128,7 +132,7 @@ func (s *Scheduler) ScheduleAt(ctx context.Context, payloadSize int, settings tt
 			if delta := time.Duration(s.clock.GatewayTime(*settings.Time) - now); delta < ScheduleTimeShort {
 				return Emission{}, errTooLate.WithAttributes("delta", delta)
 			}
-		} else if delta := time.Duration(s.clock.TimestampTime(settings.Timestamp) - s.clock.ServerTime(time.Now())); delta < ScheduleTimeShort {
+		} else if delta := time.Duration(s.clock.TimestampTime(settings.Timestamp) - now); delta < ScheduleTimeShort {
 			return Emission{}, errTooLate.WithAttributes("delta", delta)
 		}
 	}
@@ -141,7 +145,7 @@ func (s *Scheduler) ScheduleAt(ctx context.Context, payloadSize int, settings tt
 		return Emission{}, err
 	}
 	for _, other := range s.emissions {
-		if em.AfterWithOffAir(other, s.timeOffAir)-QueueDelay < 0 && em.BeforeWithOffAir(other, s.timeOffAir)-QueueDelay < 0 {
+		if em.OverlapsWithOffAir(other, s.timeOffAir) {
 			return Emission{}, errConflict
 		}
 	}
@@ -165,7 +169,8 @@ func (s *Scheduler) ScheduleAnytime(ctx context.Context, payloadSize int, settin
 	if s.clock.IsSynced() {
 		now := s.clock.ServerTime(time.Now())
 		if settings.Timestamp == 0 && settings.Time == nil {
-			settings.Timestamp = uint32((time.Duration(now) + ScheduleTimeLong) / time.Microsecond)
+			target := time.Duration(now) + ScheduleTimeLong
+			settings.Timestamp = uint32(target / time.Microsecond)
 		} else if settings.Time != nil {
 			if delta := time.Duration(s.clock.GatewayTime(*settings.Time) - now); delta < ScheduleTimeShort {
 				t := settings.Time.Add(ScheduleTimeShort - delta)
@@ -191,15 +196,13 @@ func (s *Scheduler) ScheduleAnytime(ctx context.Context, payloadSize int, settin
 		}
 		for i < len(s.emissions)-1 {
 			// Find a window between two emissions that does not conflict with either side.
-			prevConflicts := s.emissions[i].AfterWithOffAir(em, s.timeOffAir)-QueueDelay < 0
-			if prevConflicts {
+			if em.OverlapsWithOffAir(s.emissions[i], s.timeOffAir) {
 				// Schedule right after previous to resolve conflict.
-				em.t = s.emissions[i].EndsWithOffAir(s.timeOffAir) + ConcentratorTime(QueueDelay)
+				em.t = s.emissions[i].EndsWithOffAir(s.timeOffAir)
 			}
-			nextConflicts := em.BeforeWithOffAir(s.emissions[i+1], s.timeOffAir)-QueueDelay < 0
-			if nextConflicts {
-				// If it conflicts with the next, try the next window.
-				em.t = s.emissions[i+1].EndsWithOffAir(s.timeOffAir) + ConcentratorTime(QueueDelay)
+			if em.OverlapsWithOffAir(s.emissions[i+1], s.timeOffAir) {
+				// Schedule right after next to resolve conflict.
+				em.t = s.emissions[i+1].EndsWithOffAir(s.timeOffAir)
 				i++
 				continue
 			}
@@ -208,8 +211,12 @@ func (s *Scheduler) ScheduleAnytime(ctx context.Context, payloadSize int, settin
 			i++
 			return em.t
 		}
-		// No emissions to schedule in between; schedule after last emission.
-		return s.emissions[len(s.emissions)-1].EndsWithOffAir(s.timeOffAir) + ConcentratorTime(QueueDelay)
+		// No emissions to schedule in between; schedule at timestamp or last transmission, whichever comes first.
+		afterLast := s.emissions[len(s.emissions)-1].EndsWithOffAir(s.timeOffAir)
+		if afterLast > em.t {
+			return afterLast
+		}
+		return em.t
 	}
 	em, err = sb.ScheduleAnytime(em.d, next, priority)
 	if err != nil {

@@ -31,7 +31,7 @@ type Clock interface {
 	TimestampTime(timestamp uint32) ConcentratorTime
 }
 
-// RolloverClock is a Clock that takes roll-over of uint32 concentrator time into account.
+// RolloverClock is a Clock that takes roll-over of a uint32 microsecond concentrator time into account.
 type RolloverClock struct {
 	synced          bool
 	relative        uint32

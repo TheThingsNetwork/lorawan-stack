@@ -51,6 +51,8 @@ func TestEmission(t *testing.T) {
 	a.So(em.AfterWithOffAir(scheduling.NewEmission(scheduling.ConcentratorTime(7*time.Second), time.Second), toa), should.Equal, 0)
 	a.So(em.BeforeWithOffAir(scheduling.NewEmission(scheduling.ConcentratorTime(5*time.Second), time.Second), toa), should.BeLessThan, 0)
 	a.So(em.AfterWithOffAir(scheduling.NewEmission(scheduling.ConcentratorTime(5*time.Second), time.Second), toa), should.Equal, 2*time.Second)
+	a.So(em.OverlapsWithOffAir(scheduling.NewEmission(scheduling.ConcentratorTime(5*time.Second), time.Second), toa), should.BeFalse)
+	a.So(em.OverlapsWithOffAir(scheduling.NewEmission(scheduling.ConcentratorTime(13*time.Second), time.Second), toa), should.BeFalse)
 
 	// Conflicts.
 	a.So(em.BeforeWithOffAir(scheduling.NewEmission(scheduling.ConcentratorTime(9*time.Second), time.Second), toa), should.BeLessThan, 0)
@@ -59,6 +61,12 @@ func TestEmission(t *testing.T) {
 	a.So(em.AfterWithOffAir(scheduling.NewEmission(scheduling.ConcentratorTime(10*time.Second), time.Second), toa), should.BeLessThan, 0)
 	a.So(em.BeforeWithOffAir(scheduling.NewEmission(scheduling.ConcentratorTime(11*time.Second), time.Second), toa), should.BeLessThan, 0)
 	a.So(em.AfterWithOffAir(scheduling.NewEmission(scheduling.ConcentratorTime(11*time.Second), time.Second), toa), should.BeLessThan, 0)
+	a.So(em.OverlapsWithOffAir(scheduling.NewEmission(scheduling.ConcentratorTime(9*time.Second), time.Second), toa), should.BeTrue)
+	a.So(em.OverlapsWithOffAir(scheduling.NewEmission(scheduling.ConcentratorTime(10*time.Second), time.Second), toa), should.BeTrue)
+	a.So(em.OverlapsWithOffAir(scheduling.NewEmission(scheduling.ConcentratorTime(10500*time.Millisecond), 500*time.Millisecond), toa), should.BeTrue)
+	a.So(em.OverlapsWithOffAir(scheduling.NewEmission(scheduling.ConcentratorTime(11*time.Second), time.Second), toa), should.BeTrue)
+	a.So(em.OverlapsWithOffAir(scheduling.NewEmission(scheduling.ConcentratorTime(12*time.Second), time.Second), toa), should.BeTrue)
+	a.So(em.OverlapsWithOffAir(scheduling.NewEmission(scheduling.ConcentratorTime(6*time.Second), 6*time.Second), toa), should.BeTrue)
 }
 
 func TestEmissions(t *testing.T) {

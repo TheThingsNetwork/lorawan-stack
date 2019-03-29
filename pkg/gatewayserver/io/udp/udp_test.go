@@ -352,7 +352,10 @@ func TestTraffic(t *testing.T) {
 				ExpectConnect: false,
 				Path: &ttnpb.DownlinkPath{
 					Path: &ttnpb.DownlinkPath_UplinkToken{
-						UplinkToken: io.MustUplinkToken(ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: registeredGatewayID}, 5000000),
+						UplinkToken: io.MustUplinkToken(
+							ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: registeredGatewayID},
+							uint32(5*time.Second/time.Microsecond),
+						),
 					},
 				},
 				Message: &ttnpb.DownlinkMessage{
@@ -379,7 +382,10 @@ func TestTraffic(t *testing.T) {
 				ExpectConnect: false,
 				Path: &ttnpb.DownlinkPath{
 					Path: &ttnpb.DownlinkPath_UplinkToken{
-						UplinkToken: io.MustUplinkToken(ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: registeredGatewayID}, 10000000),
+						UplinkToken: io.MustUplinkToken(
+							ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: registeredGatewayID},
+							uint32(10*time.Second/time.Microsecond),
+						),
 					},
 				},
 				Message: &ttnpb.DownlinkMessage{
@@ -409,7 +415,7 @@ func TestTraffic(t *testing.T) {
 					Path: &ttnpb.DownlinkPath_UplinkToken{
 						UplinkToken: io.MustUplinkToken(
 							ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: registeredGatewayID},
-							uint32(testConfig.DownlinkPathExpires/time.Microsecond)*150/100,
+							uint32(150*test.Delay/time.Microsecond),
 						),
 					},
 				},
@@ -438,7 +444,10 @@ func TestTraffic(t *testing.T) {
 				SyncClock:     durationPtr(0),
 				Path: &ttnpb.DownlinkPath{
 					Path: &ttnpb.DownlinkPath_UplinkToken{
-						UplinkToken: io.MustUplinkToken(ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: registeredGatewayID}, 15000000),
+						UplinkToken: io.MustUplinkToken(
+							ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: registeredGatewayID},
+							uint32(15*time.Second/time.Microsecond),
+						),
 					},
 				},
 				Message: &ttnpb.DownlinkMessage{
