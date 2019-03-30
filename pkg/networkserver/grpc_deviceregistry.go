@@ -262,9 +262,6 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		}
 		sets = append(sets, "mac_state")
 
-		addDownlinkTask = req.EndDevice.MACState.DeviceClass != ttnpb.CLASS_A &&
-			(len(req.EndDevice.QueuedApplicationDownlinks) > 0 || !req.EndDevice.MACState.CurrentParameters.Equal(req.EndDevice.MACState.DesiredParameters))
-
 		return &req.EndDevice, sets, nil
 	})
 	if err != nil {
