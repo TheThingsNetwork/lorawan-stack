@@ -35,6 +35,7 @@ const maxGPSTime int64 = 1<<32 - 1
 // MACCommandDescriptor descibes a MAC command.
 type MACCommandDescriptor struct {
 	InitiatedByDevice bool
+	ExpectAnswer      bool
 	UplinkLength      uint16
 	DownlinkLength    uint16
 	AppendUplink      func(b []byte, cmd ttnpb.MACCommand) ([]byte, error)
@@ -63,6 +64,7 @@ func newMACUnmarshaler(cid ttnpb.MACCommandIdentifier, name string, n uint8, f f
 var DefaultMACCommands = MACCommandSpec{
 	ttnpb.CID_RESET: &MACCommandDescriptor{
 		InitiatedByDevice: true,
+		ExpectAnswer:      true,
 
 		UplinkLength: 1,
 		AppendUplink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
@@ -103,6 +105,7 @@ var DefaultMACCommands = MACCommandSpec{
 
 	ttnpb.CID_LINK_CHECK: &MACCommandDescriptor{
 		InitiatedByDevice: true,
+		ExpectAnswer:      true,
 
 		UplinkLength: 0,
 		AppendUplink: func(b []byte, _ ttnpb.MACCommand) ([]byte, error) {
@@ -135,6 +138,7 @@ var DefaultMACCommands = MACCommandSpec{
 
 	ttnpb.CID_LINK_ADR: &MACCommandDescriptor{
 		InitiatedByDevice: false,
+		ExpectAnswer:      true,
 
 		UplinkLength: 1,
 		AppendUplink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
@@ -212,6 +216,7 @@ var DefaultMACCommands = MACCommandSpec{
 
 	ttnpb.CID_DUTY_CYCLE: &MACCommandDescriptor{
 		InitiatedByDevice: false,
+		ExpectAnswer:      true,
 
 		UplinkLength: 0,
 		AppendUplink: func(b []byte, _ ttnpb.MACCommand) ([]byte, error) {
@@ -240,6 +245,7 @@ var DefaultMACCommands = MACCommandSpec{
 
 	ttnpb.CID_RX_PARAM_SETUP: &MACCommandDescriptor{
 		InitiatedByDevice: false,
+		ExpectAnswer:      true,
 
 		UplinkLength: 1,
 		AppendUplink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
@@ -298,6 +304,7 @@ var DefaultMACCommands = MACCommandSpec{
 
 	ttnpb.CID_DEV_STATUS: &MACCommandDescriptor{
 		InitiatedByDevice: false,
+		ExpectAnswer:      true,
 
 		UplinkLength: 2,
 		AppendUplink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
@@ -339,6 +346,7 @@ var DefaultMACCommands = MACCommandSpec{
 
 	ttnpb.CID_NEW_CHANNEL: &MACCommandDescriptor{
 		InitiatedByDevice: false,
+		ExpectAnswer:      true,
 
 		UplinkLength: 1,
 		AppendUplink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
@@ -403,6 +411,7 @@ var DefaultMACCommands = MACCommandSpec{
 
 	ttnpb.CID_RX_TIMING_SETUP: &MACCommandDescriptor{
 		InitiatedByDevice: false,
+		ExpectAnswer:      true,
 
 		UplinkLength: 0,
 		AppendUplink: func(b []byte, _ ttnpb.MACCommand) ([]byte, error) {
@@ -431,6 +440,7 @@ var DefaultMACCommands = MACCommandSpec{
 
 	ttnpb.CID_TX_PARAM_SETUP: &MACCommandDescriptor{
 		InitiatedByDevice: false,
+		ExpectAnswer:      true,
 
 		UplinkLength: 0,
 		AppendUplink: func(b []byte, _ ttnpb.MACCommand) ([]byte, error) {
@@ -466,6 +476,7 @@ var DefaultMACCommands = MACCommandSpec{
 
 	ttnpb.CID_DL_CHANNEL: &MACCommandDescriptor{
 		InitiatedByDevice: false,
+		ExpectAnswer:      true,
 
 		UplinkLength: 1,
 		AppendUplink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
@@ -517,6 +528,7 @@ var DefaultMACCommands = MACCommandSpec{
 
 	ttnpb.CID_REKEY: &MACCommandDescriptor{
 		InitiatedByDevice: true,
+		ExpectAnswer:      true,
 
 		UplinkLength: 1,
 		AppendUplink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
@@ -557,6 +569,7 @@ var DefaultMACCommands = MACCommandSpec{
 
 	ttnpb.CID_ADR_PARAM_SETUP: &MACCommandDescriptor{
 		InitiatedByDevice: false,
+		ExpectAnswer:      true,
 
 		UplinkLength: 0,
 		AppendUplink: func(b []byte, _ ttnpb.MACCommand) ([]byte, error) {
@@ -593,6 +606,7 @@ var DefaultMACCommands = MACCommandSpec{
 
 	ttnpb.CID_DEVICE_TIME: &MACCommandDescriptor{
 		InitiatedByDevice: true,
+		ExpectAnswer:      true,
 
 		UplinkLength: 0,
 		AppendUplink: func(b []byte, _ ttnpb.MACCommand) ([]byte, error) {
@@ -624,6 +638,7 @@ var DefaultMACCommands = MACCommandSpec{
 
 	ttnpb.CID_FORCE_REJOIN: &MACCommandDescriptor{
 		InitiatedByDevice: false,
+		ExpectAnswer:      false,
 
 		DownlinkLength: 2,
 		AppendDownlink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
@@ -669,6 +684,7 @@ var DefaultMACCommands = MACCommandSpec{
 
 	ttnpb.CID_REJOIN_PARAM_SETUP: &MACCommandDescriptor{
 		InitiatedByDevice: false,
+		ExpectAnswer:      true,
 
 		UplinkLength: 1,
 		AppendUplink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
@@ -719,6 +735,7 @@ var DefaultMACCommands = MACCommandSpec{
 
 	ttnpb.CID_PING_SLOT_INFO: &MACCommandDescriptor{
 		InitiatedByDevice: false,
+		ExpectAnswer:      true,
 
 		UplinkLength: 1,
 		AppendUplink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
@@ -748,6 +765,7 @@ var DefaultMACCommands = MACCommandSpec{
 
 	ttnpb.CID_PING_SLOT_CHANNEL: &MACCommandDescriptor{
 		InitiatedByDevice: false,
+		ExpectAnswer:      true,
 
 		UplinkLength: 1,
 		AppendUplink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
@@ -801,6 +819,7 @@ var DefaultMACCommands = MACCommandSpec{
 
 	ttnpb.CID_BEACON_TIMING: &MACCommandDescriptor{
 		InitiatedByDevice: false,
+		ExpectAnswer:      true,
 
 		UplinkLength: 0,
 		AppendUplink: func(b []byte, _ ttnpb.MACCommand) ([]byte, error) {
@@ -837,6 +856,7 @@ var DefaultMACCommands = MACCommandSpec{
 
 	ttnpb.CID_BEACON_FREQ: &MACCommandDescriptor{
 		InitiatedByDevice: false,
+		ExpectAnswer:      true,
 
 		UplinkLength: 1,
 		AppendUplink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
@@ -878,6 +898,7 @@ var DefaultMACCommands = MACCommandSpec{
 
 	ttnpb.CID_DEVICE_MODE: &MACCommandDescriptor{
 		InitiatedByDevice: false,
+		ExpectAnswer:      true,
 
 		UplinkLength: 1,
 		AppendUplink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
