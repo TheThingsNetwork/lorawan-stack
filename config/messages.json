@@ -2339,6 +2339,24 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/encoding/lorawan:mac_command_downlink": {
+    "translations": {
+      "en": "invalid downlink MAC command CID `{cid}`"
+    },
+    "description": {
+      "package": "pkg/encoding/lorawan",
+      "file": "mac.go"
+    }
+  },
+  "error:pkg/encoding/lorawan:mac_command_uplink": {
+    "translations": {
+      "en": "invalid uplink MAC command CID `{cid}`"
+    },
+    "description": {
+      "package": "pkg/encoding/lorawan",
+      "file": "mac.go"
+    }
+  },
   "error:pkg/encoding/lorawan:max_cflist_frequency": {
     "translations": {
       "en": "expected CFList frequency to be less or equal to 0xFFFFFF"
@@ -2348,15 +2366,6 @@
       "file": "messages.go"
     }
   },
-  "error:pkg/encoding/lorawan:unknown_cmd": {
-    "translations": {
-      "en": "unknown MAC command CID `{cid}`"
-    },
-    "description": {
-      "package": "pkg/encoding/lorawan",
-      "file": "mac.go"
-    }
-  },
   "error:pkg/encoding/lorawan:unknown_field": {
     "translations": {
       "en": "unknown `{lorawan_field}`"
@@ -2364,6 +2373,15 @@
     "description": {
       "package": "pkg/encoding/lorawan",
       "file": "errors.go"
+    }
+  },
+  "error:pkg/encoding/lorawan:unknown_mac_command": {
+    "translations": {
+      "en": "unknown MAC command CID `{cid}`"
+    },
+    "description": {
+      "package": "pkg/encoding/lorawan",
+      "file": "mac.go"
     }
   },
   "error:pkg/errors/web:http": {
