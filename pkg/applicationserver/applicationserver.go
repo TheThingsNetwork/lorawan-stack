@@ -263,7 +263,7 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 				encryptedItem := *item
 				encryptedItem.SessionKeyID = session.SessionKeyID
 				encryptedItem.FCnt = session.LastAFCntDown + 1
-				if err := as.encodeAndEncrypt(ctx, dev, &encryptedItem, link.DefaultFormatters); err != nil {
+				if err := as.encodeAndEncrypt(ctx, dev, session, &encryptedItem, link.DefaultFormatters); err != nil {
 					logger.WithError(err).Warn("Dropping downlink message; encoding and encryption failed")
 					return nil, nil, err
 				}
