@@ -223,7 +223,7 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 	// Otherwise, scheduling is done by the Gateway Server scheduler. This converts TxRequest to TxSettings.
 	if c.scheduler != nil {
 		logger := log.FromContext(c.ctx).WithField("class", request.Class)
-		logger.Debug("Attempting to schedule downlink on gateway")
+		logger.Debug("Attempt to schedule downlink on gateway")
 		ids, uplinkTimestamp, err := getDownlinkPath(path, request.Class)
 		if err != nil {
 			return 0, err
@@ -249,12 +249,6 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 				delay:         time.Second,
 			},
 		} {
-			logger := logger.WithFields(log.Fields(
-				"rx_window", i+1,
-				"frequency", rx.frequency,
-				"data_rate", rx.dataRateIndex,
-			))
-			logger.Debug("Attempting to schedule downlink in receive window")
 			rx1Delay := time.Duration(request.Rx1Delay) * time.Second
 			if rx1Delay == 0 {
 				rx1Delay = time.Second // RX_DELAY_0 is valid, and 1 second.
@@ -264,6 +258,12 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 				errRxDetails = append(errRxDetails, errRxEmpty)
 				continue
 			}
+			logger := logger.WithFields(log.Fields(
+				"rx_window", i+1,
+				"frequency", rx.frequency,
+				"data_rate_index", rx.dataRateIndex,
+			))
+			logger.Debug("Attempt to schedule downlink in receive window")
 			dataRate := band.DataRates[rx.dataRateIndex].Rate
 			if dataRate == (ttnpb.DataRate{}) {
 				return 0, errDataRate.WithAttributes("index", rx.dataRateIndex)
