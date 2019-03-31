@@ -163,27 +163,16 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 
 	var needsDownlink bool
 	var up *ttnpb.UplinkMessage
-	if dev.MACState.RxWindowsAvailable {
-	outer:
-		for i := len(dev.RecentUplinks) - 1; i >= 0; i-- {
-			switch dev.RecentUplinks[i].Payload.MHDR.MType {
-			case ttnpb.MType_UNCONFIRMED_UP:
-				up = dev.RecentUplinks[i]
-				if needsDownlink = up.Payload.GetMACPayload().FCtrl.ADRAckReq; needsDownlink {
-					logger.Debug("Need downlink for ADRAckReq")
-				}
-				break outer
-			case ttnpb.MType_CONFIRMED_UP:
-				up = dev.RecentUplinks[i]
-				needsDownlink = true
-				logger.Debug("Need downlink for confirmed uplink")
-				break outer
-			case ttnpb.MType_JOIN_REQUEST, ttnpb.MType_REJOIN_REQUEST:
-				up = dev.RecentUplinks[i]
-				break outer
-			default:
-				logger.WithField("m_type", up.Payload.MHDR.MType).Warn("Unknown MType stored in RecentUplinks")
+	if dev.MACState.RxWindowsAvailable && len(dev.RecentUplinks) > 0 {
+		up = dev.RecentUplinks[len(dev.RecentUplinks)-1]
+		switch up.Payload.MHDR.MType {
+		case ttnpb.MType_UNCONFIRMED_UP:
+			if needsDownlink = up.Payload.GetMACPayload().FCtrl.ADRAckReq; needsDownlink {
+				logger.Debug("Need downlink for ADRAckReq")
 			}
+		case ttnpb.MType_CONFIRMED_UP:
+			needsDownlink = true
+			logger.Debug("Need downlink for confirmed uplink")
 		}
 	}
 	if !needsDownlink &&
