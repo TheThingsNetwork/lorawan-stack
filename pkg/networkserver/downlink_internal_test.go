@@ -2729,7 +2729,8 @@ func TestGenerateDownlink(t *testing.T) {
 					DevAddr:                &DevAddr,
 				},
 				MACState: &ttnpb.MACState{
-					LoRaWANVersion: ttnpb.MAC_V1_1,
+					LoRaWANVersion:     ttnpb.MAC_V1_1,
+					RxWindowsAvailable: true,
 				},
 				Session: &ttnpb.Session{
 					DevAddr:       DevAddr,
@@ -2784,7 +2785,8 @@ func TestGenerateDownlink(t *testing.T) {
 						DevAddr:                &DevAddr,
 					},
 					MACState: &ttnpb.MACState{
-						LoRaWANVersion: ttnpb.MAC_V1_1,
+						LoRaWANVersion:     ttnpb.MAC_V1_1,
+						RxWindowsAvailable: true,
 					},
 					Session: &ttnpb.Session{
 						DevAddr:       DevAddr,
@@ -2826,7 +2828,8 @@ func TestGenerateDownlink(t *testing.T) {
 					DevAddr:                &DevAddr,
 				},
 				MACState: &ttnpb.MACState{
-					LoRaWANVersion: ttnpb.MAC_V1_1,
+					LoRaWANVersion:     ttnpb.MAC_V1_1,
+					RxWindowsAvailable: true,
 				},
 				Session: &ttnpb.Session{
 					DevAddr: DevAddr,
@@ -2892,7 +2895,8 @@ func TestGenerateDownlink(t *testing.T) {
 						DevAddr:                &DevAddr,
 					},
 					MACState: &ttnpb.MACState{
-						LoRaWANVersion: ttnpb.MAC_V1_1,
+						LoRaWANVersion:     ttnpb.MAC_V1_1,
+						RxWindowsAvailable: true,
 					},
 					Session: &ttnpb.Session{
 						DevAddr: DevAddr,
@@ -2928,7 +2932,8 @@ func TestGenerateDownlink(t *testing.T) {
 					DevAddr:                &DevAddr,
 				},
 				MACState: &ttnpb.MACState{
-					LoRaWANVersion: ttnpb.MAC_V1_1,
+					LoRaWANVersion:     ttnpb.MAC_V1_1,
+					RxWindowsAvailable: true,
 				},
 				Session: &ttnpb.Session{
 					DevAddr: DevAddr,
@@ -3000,7 +3005,8 @@ func TestGenerateDownlink(t *testing.T) {
 						DevAddr:                &DevAddr,
 					},
 					MACState: &ttnpb.MACState{
-						LoRaWANVersion: ttnpb.MAC_V1_1,
+						LoRaWANVersion:     ttnpb.MAC_V1_1,
+						RxWindowsAvailable: true,
 					},
 					Session: &ttnpb.Session{
 						DevAddr: DevAddr,
@@ -3158,7 +3164,8 @@ func TestGenerateDownlink(t *testing.T) {
 					DevAddr:                &DevAddr,
 				},
 				MACState: &ttnpb.MACState{
-					LoRaWANVersion: ttnpb.MAC_V1_1,
+					LoRaWANVersion:     ttnpb.MAC_V1_1,
+					RxWindowsAvailable: true,
 				},
 				Session: &ttnpb.Session{
 					DevAddr: DevAddr,
@@ -3237,6 +3244,7 @@ func TestGenerateDownlink(t *testing.T) {
 					},
 					MACState: &ttnpb.MACState{
 						LoRaWANVersion:          ttnpb.MAC_V1_1,
+						RxWindowsAvailable:      true,
 						LastConfirmedDownlinkAt: dev.MACState.LastConfirmedDownlinkAt,
 						PendingApplicationDownlink: &ttnpb.ApplicationDownlink{
 							Confirmed:  true,
