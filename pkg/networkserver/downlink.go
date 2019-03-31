@@ -144,14 +144,19 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 	}
 	cmds = append(cmds, dev.MACState.PendingRequests...)
 
+	mType := ttnpb.MType_UNCONFIRMED_DOWN
 	cmdBuf := make([]byte, 0, maxDownLen)
 	for _, cmd := range cmds {
+		logger := logger.WithField("cid", cmd.CID)
+		logger.Debug("Add MAC command to buffer")
 		var err error
-		logger.WithField("cid", cmd.CID).Debug("Add MAC command to buffer")
 		cmdBuf, err = spec.AppendDownlink(cmdBuf, *cmd)
-
 		if err != nil {
 			return nil, errEncodeMAC.WithCause(err)
+		}
+		if mType == ttnpb.MType_UNCONFIRMED_DOWN && spec[cmd.CID].ExpectAnswer && dev.MACState.DeviceClass == ttnpb.CLASS_C {
+			logger.Debug("Using confirmed downlink to get immediate answer")
+			mType = ttnpb.MType_CONFIRMED_DOWN
 		}
 	}
 	logger = logger.WithField("mac_count", len(cmds))
@@ -194,7 +199,6 @@ outer:
 	logger = logger.WithField("ack", pld.FHDR.FCtrl.Ack)
 
 	var appDown *ttnpb.ApplicationDownlink
-	mType := ttnpb.MType_UNCONFIRMED_DOWN
 	if len(cmdBuf) <= fOptsCapacity && len(dev.QueuedApplicationDownlinks) > 0 {
 		var down *ttnpb.ApplicationDownlink
 		down, dev.QueuedApplicationDownlinks = dev.QueuedApplicationDownlinks[0], dev.QueuedApplicationDownlinks[1:]
@@ -227,7 +231,6 @@ outer:
 			pld.FRMPayload = down.FRMPayload
 			if down.Confirmed {
 				mType = ttnpb.MType_CONFIRMED_DOWN
-
 				dev.MACState.PendingApplicationDownlink = down
 				dev.Session.LastConfFCntDown = pld.FCnt
 			}
