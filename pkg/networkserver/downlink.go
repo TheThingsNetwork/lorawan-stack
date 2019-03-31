@@ -496,6 +496,14 @@ func (ns *NetworkServer) sendQueueInvalidationToAS(ctx context.Context, dev *ttn
 	return ok, err
 }
 
+func appendRecentDownlink(recent []*ttnpb.DownlinkMessage, down *ttnpb.DownlinkMessage, window int) []*ttnpb.DownlinkMessage {
+	recent = append(recent, down)
+	if len(recent) > window {
+		recent = recent[len(recent)-window:]
+	}
+	return recent
+}
+
 // processDownlinkTask processes the most recent downlink task ready for execution, if such is available or wait until it is before processing it.
 // NOTE: ctx.Done() is not guaranteed to be respected by processDownlinkTask.
 func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
@@ -637,10 +645,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 								SessionKeys: dev.MACState.QueuedJoinAccept.Keys,
 							}
 							dev.MACState.QueuedJoinAccept = nil
-							dev.RecentDownlinks = append(dev.RecentDownlinks, down)
-							if len(dev.RecentDownlinks) > recentDownlinkCount {
-								dev.RecentDownlinks = append(dev.RecentDownlinks[:0], dev.RecentDownlinks[len(dev.RecentDownlinks)-recentDownlinkCount:]...)
-							}
+							dev.RecentDownlinks = appendRecentDownlink(dev.RecentDownlinks, down, recentDownlinkCount)
 							return dev, []string{
 								"ids.dev_addr",
 								"mac_state.pending_join_request",
@@ -708,10 +713,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 								sendInvalidation = func() (bool, error) { return ns.sendQueueInvalidationToAS(ctx, dev, genDown.FCnt) }
 							}
 							dev.MACState.RxWindowsAvailable = false
-							dev.RecentDownlinks = append(dev.RecentDownlinks, down)
-							if len(dev.RecentDownlinks) > recentDownlinkCount {
-								dev.RecentDownlinks = append(dev.RecentDownlinks[:0], dev.RecentDownlinks[len(dev.RecentDownlinks)-recentDownlinkCount:]...)
-							}
+							dev.RecentDownlinks = appendRecentDownlink(dev.RecentDownlinks, down, recentDownlinkCount)
 							return dev, []string{
 								"mac_state",
 								"queued_application_downlinks",
@@ -795,10 +797,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 									sendInvalidation = func() (bool, error) { return ns.sendQueueInvalidationToAS(ctx, dev, genDown.FCnt) }
 								}
 								dev.MACState.RxWindowsAvailable = false
-								dev.RecentDownlinks = append(dev.RecentDownlinks, down)
-								if len(dev.RecentDownlinks) > recentDownlinkCount {
-									dev.RecentDownlinks = append(dev.RecentDownlinks[:0], dev.RecentDownlinks[len(dev.RecentDownlinks)-recentDownlinkCount:]...)
-								}
+								dev.RecentDownlinks = appendRecentDownlink(dev.RecentDownlinks, down, recentDownlinkCount)
 								return dev, []string{
 									"mac_state",
 									"queued_application_downlinks",
@@ -889,10 +888,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						if genDown.ApplicationDownlink == nil && len(dev.QueuedApplicationDownlinks) > 0 && dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 							sendInvalidation = func() (bool, error) { return ns.sendQueueInvalidationToAS(ctx, dev, genDown.FCnt) }
 						}
-						dev.RecentDownlinks = append(dev.RecentDownlinks, down)
-						if len(dev.RecentDownlinks) > recentDownlinkCount {
-							dev.RecentDownlinks = append(dev.RecentDownlinks[:0], dev.RecentDownlinks[len(dev.RecentDownlinks)-recentDownlinkCount:]...)
-						}
+						dev.RecentDownlinks = appendRecentDownlink(dev.RecentDownlinks, down, recentDownlinkCount)
 						return dev, []string{
 							"mac_state",
 							"queued_application_downlinks",
