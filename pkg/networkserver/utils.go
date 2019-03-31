@@ -66,7 +66,7 @@ func resetMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttn
 
 	dev.MACState = &ttnpb.MACState{
 		LoRaWANVersion: dev.LoRaWANVersion,
-		DeviceClass: ttnpb.CLASS_A,
+		DeviceClass:    ttnpb.CLASS_A,
 	}
 
 	dev.MACState.CurrentParameters.MaxEIRP = band.DefaultMaxEIRP
