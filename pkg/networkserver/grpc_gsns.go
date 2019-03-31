@@ -354,6 +354,14 @@ outer:
 // MACHandler defines the behavior of a MAC command on a device.
 type MACHandler func(ctx context.Context, dev *ttnpb.EndDevice, pld []byte, up *ttnpb.UplinkMessage) error
 
+func appendRecentUplink(recent []*ttnpb.UplinkMessage, up *ttnpb.UplinkMessage, window int) []*ttnpb.UplinkMessage {
+	recent = append(recent, up)
+	if len(recent) > window {
+		recent = recent[len(recent)-window:]
+	}
+	return recent
+}
+
 func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessage, acc *metadataAccumulator) (err error) {
 	pld := up.Payload.GetMACPayload()
 
@@ -589,10 +597,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 			}
 			up.Settings.DataRateIndex = upDRIdx
 
-			stored.RecentUplinks = append(stored.RecentUplinks, up)
-			if len(stored.RecentUplinks) > recentUplinkCount {
-				stored.RecentUplinks = stored.RecentUplinks[len(stored.RecentUplinks)-recentUplinkCount+1:]
-			}
+			stored.RecentUplinks = appendRecentUplink(stored.RecentUplinks, up, recentUplinkCount)
 			paths = append(paths, "recent_uplinks")
 
 			if stored.MACState != nil {
@@ -918,10 +923,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 			}
 			up.Settings.DataRateIndex = upDRIdx
 
-			stored.RecentUplinks = append(stored.RecentUplinks, up)
-			if len(stored.RecentUplinks) > recentUplinkCount {
-				stored.RecentUplinks = append(stored.RecentUplinks[:0], stored.RecentUplinks[len(stored.RecentUplinks)-recentUplinkCount:]...)
-			}
+			stored.RecentUplinks = appendRecentUplink(stored.RecentUplinks, up, recentUplinkCount)
 			paths = append(paths, "recent_uplinks")
 
 			invalidatedQueue = stored.QueuedApplicationDownlinks
