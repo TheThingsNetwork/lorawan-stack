@@ -917,7 +917,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 		}
 
 		if !nextDownlinkAt.IsZero() {
-			logger.WithField("start_at", nextDownlinkAt.UTC()).Debug("Add downlink task")
+			logger.WithField("start_at", nextDownlinkAt.UTC()).Debug("Add downlink task after downlink")
 			if err := ns.downlinkTasks.Add(ctx, devID, nextDownlinkAt, true); err != nil {
 				addErr = true
 				logger.WithError(err).Error("Failed to add downlink task after downlink")

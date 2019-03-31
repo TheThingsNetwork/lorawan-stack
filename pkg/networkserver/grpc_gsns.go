@@ -766,7 +766,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 		registerForwardDataUplink(ctx, &matched.EndDeviceIdentifiers, up)
 	}
 	startAt := time.Now().UTC()
-	logger.WithField("start_at", startAt).Debug("Add downlink task")
+	logger.WithField("start_at", startAt).Debug("Add downlink task for class A downlink")
 	return ns.downlinkTasks.Add(ctx, matched.EndDeviceIdentifiers, startAt, true)
 }
 
@@ -965,7 +965,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 	}
 
 	startAt := time.Now().UTC()
-	logger.WithField("start_at", startAt).Debug("Add downlink task")
+	logger.WithField("start_at", startAt).Debug("Add downlink task for join-accept")
 	if err := ns.downlinkTasks.Add(ctx, dev.EndDeviceIdentifiers, startAt, true); err != nil {
 		return err
 	}
