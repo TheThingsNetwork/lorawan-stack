@@ -548,19 +548,20 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 				}
 
 				// NOTE: If no data uplink is found, we assume ADR is off on the device and, hence, data rate index 0 is used in computation.
-				maxUpLength := band.DataRates[0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks())
+				maxUpDRIdx := ttnpb.DATA_RATE_0
+			loop:
 				for i := len(dev.RecentUplinks) - 1; i >= 0; i-- {
 					switch dev.RecentUplinks[i].Payload.MHDR.MType {
 					case ttnpb.MType_JOIN_REQUEST:
-						break
-
+						break loop
 					case ttnpb.MType_UNCONFIRMED_UP, ttnpb.MType_CONFIRMED_UP:
 						if dev.RecentUplinks[i].Payload.GetMACPayload().FHDR.FCtrl.ADR {
-							maxUpLength = band.DataRates[dev.RecentUplinks[i].Settings.DataRateIndex].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks())
+							maxUpDRIdx = dev.RecentUplinks[i].Settings.DataRateIndex
 						}
-						break
+						break loop
 					}
 				}
+				maxUpLength := band.DataRates[maxUpDRIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks())
 
 				if dev.MACState.RxWindowsAvailable {
 					if len(dev.RecentUplinks) == 0 {
