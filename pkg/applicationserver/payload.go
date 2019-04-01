@@ -29,7 +29,10 @@ import (
 
 var errNoPayload = errors.Define("no_payload", "no payload")
 
-func (as *ApplicationServer) encodeAndEncrypt(ctx context.Context, dev *ttnpb.EndDevice, downlink *ttnpb.ApplicationDownlink, defaultFormatters *ttnpb.MessagePayloadFormatters) error {
+func (as *ApplicationServer) encodeAndEncrypt(ctx context.Context, dev *ttnpb.EndDevice, session *ttnpb.Session, downlink *ttnpb.ApplicationDownlink, defaultFormatters *ttnpb.MessagePayloadFormatters) error {
+	if session == nil || session.AppSKey == nil {
+		return errNoAppSKey
+	}
 	if downlink.FRMPayload == nil && downlink.DecodedPayload == nil {
 		return errNoPayload
 	}
@@ -47,11 +50,11 @@ func (as *ApplicationServer) encodeAndEncrypt(ctx context.Context, dev *ttnpb.En
 			}
 		}
 	}
-	appSKey, err := cryptoutil.UnwrapAES128Key(*dev.Session.AppSKey, as.KeyVault)
+	appSKey, err := cryptoutil.UnwrapAES128Key(*session.AppSKey, as.KeyVault)
 	if err != nil {
 		return err
 	}
-	frmPayload, err := crypto.EncryptDownlink(appSKey, dev.Session.DevAddr, downlink.FCnt, downlink.FRMPayload)
+	frmPayload, err := crypto.EncryptDownlink(appSKey, session.DevAddr, downlink.FCnt, downlink.FRMPayload)
 	if err != nil {
 		return err
 	}
@@ -60,7 +63,9 @@ func (as *ApplicationServer) encodeAndEncrypt(ctx context.Context, dev *ttnpb.En
 }
 
 func (as *ApplicationServer) decryptAndDecode(ctx context.Context, dev *ttnpb.EndDevice, uplink *ttnpb.ApplicationUplink, defaultFormatters *ttnpb.MessagePayloadFormatters) error {
-	logger := log.FromContext(ctx)
+	if dev.Session == nil || dev.Session.AppSKey == nil {
+		return errNoAppSKey
+	}
 	appSKey, err := cryptoutil.UnwrapAES128Key(*dev.Session.AppSKey, as.KeyVault)
 	if err != nil {
 		return err
@@ -79,7 +84,7 @@ func (as *ApplicationServer) decryptAndDecode(ctx context.Context, dev *ttnpb.En
 	}
 	if formatter != ttnpb.PayloadFormatter_FORMATTER_NONE {
 		if err := as.formatter.Decode(ctx, dev.EndDeviceIdentifiers, dev.VersionIDs, uplink, formatter, parameter); err != nil {
-			logger.WithError(err).Warn("Payload decoding failed")
+			log.FromContext(ctx).WithError(err).Warn("Payload decoding failed")
 			events.Publish(evtDecodeFailDataUp(ctx, dev.EndDeviceIdentifiers, err))
 		}
 	}
