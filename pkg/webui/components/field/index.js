@@ -124,25 +124,11 @@ const component = function (type) {
 }
 
 const Field = function (props) {
-
-  const handleChange = function (value) {
-    props.setFieldValue(props.name, value)
-    if (props.validateOnChange) {
-      props.setFieldTouched(props.touches || props.name, true)
-    }
-  }
-
-  const handleBlur = function (e) {
-    // Always regard inputs that never received a value as untouched (better UX)
-    if (e.target.value !== '' && props.validateOnBlur) {
-      props.setFieldTouched(props.touches || props.name, true)
-    }
-  }
-
   const {
     className,
     type = 'text',
     name = '',
+    touches = props.name,
     title,
     placeholder = props.title,
     description = null,
@@ -153,8 +139,26 @@ const Field = function (props) {
     readOnly = false,
     required = false,
     form = true,
+    validateOnBlur,
+    validateOnChange,
+    setFieldValue,
+    setFieldTouched,
     ...rest
   } = props
+
+  const handleChange = function (value) {
+    setFieldValue(name, value)
+    if (validateOnChange) {
+      setFieldTouched(touches, true)
+    }
+  }
+
+  const handleBlur = function (e) {
+    // Always regard inputs that never received a value as untouched (better UX)
+    if (e.target.value !== '' && validateOnBlur) {
+      setFieldTouched(touches, true)
+    }
+  }
 
   // Underscored assignment due to naming conflict
   let _error = rest.error
