@@ -63,7 +63,7 @@ export default class Login extends React.PureComponent {
                 content={m.welcome}
               />
               <Message className={style.loginSub} content={m.login} />
-              <Button
+              <Button.AnchorLink
                 message={m.loginWithStackAccount}
                 href={`${env.app_root}/login/ttn-stack${redirectAppend}`}
               />
