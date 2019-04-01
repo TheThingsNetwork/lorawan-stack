@@ -142,12 +142,14 @@ class InnerForm extends React.Component {
         } else if (Child.type === FieldGroup) {
           const { name } = Child.props
           const value = name && getByPath(values, name)
+          const groupError = getByPath(combinedErrors, name)
+          const groupTouched = getByPath(touched, name)
           return React.cloneElement(Child, {
             ...Child.props,
             setFieldValue,
             setFieldTouched,
+            error: groupError,
             value,
-            errors,
             horizontal,
           })
         }

@@ -29,7 +29,7 @@ class FieldGroup extends React.Component {
       name,
       title,
       titleComponent = 'h4',
-      errors,
+      error,
       value,
       disabled,
       setFieldValue,
@@ -55,8 +55,6 @@ class FieldGroup extends React.Component {
       return Child
     })
 
-
-    const error = errors[name]
     return (
       <div className={className}>
         <div className={style.header}>
