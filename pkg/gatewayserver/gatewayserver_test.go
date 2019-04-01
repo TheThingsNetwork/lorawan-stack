@@ -757,8 +757,10 @@ func TestGatewayServer(t *testing.T) {
 									},
 									CodingRate: "4/5",
 									Frequency:  869525000,
-									TxPower:    10,
-									Timestamp:  100,
+									Downlink: &ttnpb.TxSettings_Downlink{
+										TxPower: 10,
+									},
+									Timestamp: 100,
 								},
 							},
 						},

@@ -274,9 +274,11 @@ func TestFromDownlinkMessage(t *testing.T) {
 						},
 					},
 				},
-				TxPower:            20,
-				InvertPolarization: true,
-				Timestamp:          1886440700,
+				Downlink: &ttnpb.TxSettings_Downlink{
+					TxPower:            20,
+					InvertPolarization: true,
+				},
+				Timestamp: 1886440700,
 			},
 		},
 		RawPayload: []byte{0x7d, 0xf3, 0x8e},
@@ -303,9 +305,11 @@ func TestDownlinkRoundtrip(t *testing.T) {
 						},
 					},
 				},
-				TxPower:            16.15,
-				InvertPolarization: true,
-				Timestamp:          188700000,
+				Downlink: &ttnpb.TxSettings_Downlink{
+					TxPower:            16.15,
+					InvertPolarization: true,
+				},
+				Timestamp: 188700000,
 			},
 		},
 		RawPayload: []byte{0x7d, 0xf3, 0x8e},
@@ -324,7 +328,9 @@ func TestFromDownlinkMessageDummy(t *testing.T) {
 
 	msg := ttnpb.DownlinkMessage{
 		Settings: &ttnpb.DownlinkMessage_Scheduled{
-			Scheduled: &ttnpb.TxSettings{},
+			Scheduled: &ttnpb.TxSettings{
+				Downlink: &ttnpb.TxSettings_Downlink{},
+			},
 		},
 	}
 	_, err := udp.FromDownlinkMessage(&msg)

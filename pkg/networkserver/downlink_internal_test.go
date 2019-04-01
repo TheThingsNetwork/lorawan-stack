@@ -172,6 +172,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						ttnpb.NewPopulatedUplinkMessage(test.Randy, false),
 						ttnpb.NewPopulatedUplinkMessage(test.Randy, false),
 						{
+							DeviceChannelIndex: 3,
 							RxMetadata: []*ttnpb.RxMetadata{
 								{
 									GatewayIdentifiers:     gateways[1],
@@ -211,8 +212,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								},
 							},
 							Settings: ttnpb.TxSettings{
-								DataRateIndex:      ttnpb.DATA_RATE_0,
-								DeviceChannelIndex: 3,
+								DataRateIndex: ttnpb.DATA_RATE_0,
 							},
 							CorrelationIDs: []string{"testCorrelationUpID1", "testCorrelationUpID2"},
 							ReceivedAt:     time.Now().Add(time.Hour),
@@ -596,6 +596,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						ttnpb.NewPopulatedUplinkMessage(test.Randy, false),
 						ttnpb.NewPopulatedUplinkMessage(test.Randy, false),
 						{
+							DeviceChannelIndex: 3,
 							RxMetadata: []*ttnpb.RxMetadata{
 								{
 									GatewayIdentifiers:     gateways[1],
@@ -635,8 +636,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								},
 							},
 							Settings: ttnpb.TxSettings{
-								DataRateIndex:      ttnpb.DATA_RATE_0,
-								DeviceChannelIndex: 3,
+								DataRateIndex: ttnpb.DATA_RATE_0,
 							},
 							CorrelationIDs: []string{"testCorrelationUpID1", "testCorrelationUpID2"},
 							ReceivedAt:     time.Now().Add(time.Hour),
@@ -1009,6 +1009,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						ttnpb.NewPopulatedUplinkMessage(test.Randy, false),
 						ttnpb.NewPopulatedUplinkMessage(test.Randy, false),
 						{
+							DeviceChannelIndex: 3,
 							RxMetadata: []*ttnpb.RxMetadata{
 								{
 									GatewayIdentifiers:     gateways[1],
@@ -1048,8 +1049,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								},
 							},
 							Settings: ttnpb.TxSettings{
-								DataRateIndex:      ttnpb.DATA_RATE_0,
-								DeviceChannelIndex: 3,
+								DataRateIndex: ttnpb.DATA_RATE_0,
 							},
 							CorrelationIDs: []string{"testCorrelationUpID1", "testCorrelationUpID2"},
 							ReceivedAt:     time.Now().Add(time.Hour),
@@ -1562,6 +1562,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						ttnpb.NewPopulatedUplinkMessage(test.Randy, false),
 						ttnpb.NewPopulatedUplinkMessage(test.Randy, false),
 						{
+							DeviceChannelIndex: 3,
 							RxMetadata: []*ttnpb.RxMetadata{
 								{
 									GatewayIdentifiers:     gateways[1],
@@ -1601,8 +1602,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								},
 							},
 							Settings: ttnpb.TxSettings{
-								DataRateIndex:      ttnpb.DATA_RATE_0,
-								DeviceChannelIndex: 3,
+								DataRateIndex: ttnpb.DATA_RATE_0,
 							},
 							CorrelationIDs: []string{"testCorrelationUpID1", "testCorrelationUpID2"},
 							ReceivedAt:     time.Now().Add(time.Hour),
@@ -2167,6 +2167,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						ttnpb.NewPopulatedUplinkMessage(test.Randy, false),
 						ttnpb.NewPopulatedUplinkMessage(test.Randy, false),
 						{
+							DeviceChannelIndex: 3,
 							RxMetadata: []*ttnpb.RxMetadata{
 								{
 									GatewayIdentifiers:     gateways[1],
@@ -2206,8 +2207,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								},
 							},
 							Settings: ttnpb.TxSettings{
-								DataRateIndex:      ttnpb.DATA_RATE_0,
-								DeviceChannelIndex: 3,
+								DataRateIndex: ttnpb.DATA_RATE_0,
 							},
 							CorrelationIDs: []string{"testCorrelationUpID1", "testCorrelationUpID2"},
 							ReceivedAt:     time.Now().Add(time.Hour),

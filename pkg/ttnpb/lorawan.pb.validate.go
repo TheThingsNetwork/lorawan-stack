@@ -1426,28 +1426,6 @@ func (m *TxSettings) ValidateFields(paths ...string) error {
 			// no validation rules for CodingRate
 		case "frequency":
 			// no validation rules for Frequency
-		case "tx_power":
-			// no validation rules for TxPower
-		case "invert_polarization":
-			// no validation rules for InvertPolarization
-		case "gateway_channel_index":
-
-			if m.GetGatewayChannelIndex() > 255 {
-				return TxSettingsValidationError{
-					field:  "gateway_channel_index",
-					reason: "value must be less than or equal to 255",
-				}
-			}
-
-		case "device_channel_index":
-
-			if m.GetDeviceChannelIndex() > 255 {
-				return TxSettingsValidationError{
-					field:  "device_channel_index",
-					reason: "value must be less than or equal to 255",
-				}
-			}
-
 		case "enable_crc":
 			// no validation rules for EnableCRC
 		case "timestamp":
@@ -1458,6 +1436,18 @@ func (m *TxSettings) ValidateFields(paths ...string) error {
 				if err := v.ValidateFields(subs...); err != nil {
 					return TxSettingsValidationError{
 						field:  "time",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "downlink":
+
+			if v, ok := interface{}(m.GetDownlink()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return TxSettingsValidationError{
+						field:  "downlink",
 						reason: "embedded message failed validation",
 						cause:  err,
 					}
@@ -2459,6 +2449,93 @@ var _ interface {
 var _MACCommand_CID_NotInLookup = map[MACCommandIdentifier]struct{}{
 	0: {},
 }
+
+// ValidateFields checks the field values on TxSettings_Downlink with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *TxSettings_Downlink) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = TxSettings_DownlinkFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "antenna_index":
+			// no validation rules for AntennaIndex
+		case "tx_power":
+			// no validation rules for TxPower
+		case "invert_polarization":
+			// no validation rules for InvertPolarization
+		default:
+			return TxSettings_DownlinkValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// TxSettings_DownlinkValidationError is the validation error returned by
+// TxSettings_Downlink.ValidateFields if the designated constraints aren't met.
+type TxSettings_DownlinkValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e TxSettings_DownlinkValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e TxSettings_DownlinkValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e TxSettings_DownlinkValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e TxSettings_DownlinkValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e TxSettings_DownlinkValidationError) ErrorName() string {
+	return "TxSettings_DownlinkValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e TxSettings_DownlinkValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sTxSettings_Downlink.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = TxSettings_DownlinkValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = TxSettings_DownlinkValidationError{}
 
 // ValidateFields checks the field values on MACCommand_ResetInd with the rules
 // defined in the proto definition for this message. If any rules are

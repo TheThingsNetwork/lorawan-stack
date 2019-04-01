@@ -332,6 +332,7 @@
     - [RejoinRequestPayload](#ttn.lorawan.v3.RejoinRequestPayload)
     - [TxRequest](#ttn.lorawan.v3.TxRequest)
     - [TxSettings](#ttn.lorawan.v3.TxSettings)
+    - [TxSettings.Downlink](#ttn.lorawan.v3.TxSettings.Downlink)
     - [UplinkToken](#ttn.lorawan.v3.UplinkToken)
   
     - [ADRAckDelayExponent](#ttn.lorawan.v3.ADRAckDelayExponent)
@@ -4236,13 +4237,27 @@ On downlink, this is a scheduled transmission.
 | data_rate_index | [DataRateIndex](#ttn.lorawan.v3.DataRateIndex) |  | LoRaWAN data rate index. |
 | coding_rate | [string](#string) |  | LoRa coding rate. |
 | frequency | [uint64](#uint64) |  | Frequency (Hz). |
-| tx_power | [float](#float) |  | Transmission power (dBm). Only on downlink. |
-| invert_polarization | [bool](#bool) |  | Invert LoRa polarization; false for LoRaWAN uplink, true for downlink. |
-| gateway_channel_index | [uint32](#uint32) |  | Index of the gateway channel that received the message. Set by Gateway Server. |
-| device_channel_index | [uint32](#uint32) |  | Index of the device channel that received the message. Set by Network Server. |
 | enable_crc | [bool](#bool) |  | Send a CRC in the packet; only on uplink; on downlink, CRC should not be enabled. |
 | timestamp | [uint32](#uint32) |  | Timestamp of the gateway concentrator when the uplink message was received, or when the downlink message should be transmitted (microseconds). On downlink, set timestamp to 0 and time to null to use immediate scheduling. |
 | time | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | Time of the gateway when the uplink message was received, or when the downlink message should be transmitted. For downlink, this requires the gateway to have GPS time synchronization. |
+| downlink | [TxSettings.Downlink](#ttn.lorawan.v3.TxSettings.Downlink) |  | Transmission settings for downlink. |
+
+
+
+
+
+
+<a name="ttn.lorawan.v3.TxSettings.Downlink"></a>
+
+### TxSettings.Downlink
+Transmission settings for downlink.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| antenna_index | [uint32](#uint32) |  | Index of the antenna on which the uplink was received and/or downlink must be sent. |
+| tx_power | [float](#float) |  | Transmission power (dBm). Only on downlink. |
+| invert_polarization | [bool](#bool) |  | Invert LoRa polarization; false for LoRaWAN uplink, true for downlink. |
 
 
 
@@ -5037,6 +5052,8 @@ Uplink message from the end device to the network
 | rx_metadata | [RxMetadata](#ttn.lorawan.v3.RxMetadata) | repeated |  |
 | received_at | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | Server time when a component received the message. The Gateway Server, Network Server and Application Server may set this value to their local server time of reception. |
 | correlation_ids | [string](#string) | repeated |  |
+| gateway_channel_index | [uint32](#uint32) |  | Index of the gateway channel that received the message. Set by Gateway Server. |
+| device_channel_index | [uint32](#uint32) |  | Index of the device channel that received the message. Set by Network Server. |
 
 
 

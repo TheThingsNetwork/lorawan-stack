@@ -228,28 +228,25 @@ var TxSettingsFieldPathsNested = []string{
 	"data_rate.modulation.lora.bandwidth",
 	"data_rate.modulation.lora.spreading_factor",
 	"data_rate_index",
-	"device_channel_index",
+	"downlink",
+	"downlink.antenna_index",
+	"downlink.invert_polarization",
+	"downlink.tx_power",
 	"enable_crc",
 	"frequency",
-	"gateway_channel_index",
-	"invert_polarization",
 	"time",
 	"timestamp",
-	"tx_power",
 }
 
 var TxSettingsFieldPathsTopLevel = []string{
 	"coding_rate",
 	"data_rate",
 	"data_rate_index",
-	"device_channel_index",
+	"downlink",
 	"enable_crc",
 	"frequency",
-	"gateway_channel_index",
-	"invert_polarization",
 	"time",
 	"timestamp",
-	"tx_power",
 }
 var GatewayAntennaIdentifiersFieldPathsNested = []string{
 	"antenna_index",
@@ -410,6 +407,17 @@ var MACCommandFieldPathsNested = []string{
 var MACCommandFieldPathsTopLevel = []string{
 	"cid",
 	"payload",
+}
+var TxSettings_DownlinkFieldPathsNested = []string{
+	"antenna_index",
+	"invert_polarization",
+	"tx_power",
+}
+
+var TxSettings_DownlinkFieldPathsTopLevel = []string{
+	"antenna_index",
+	"invert_polarization",
+	"tx_power",
 }
 var MACCommand_ResetIndFieldPathsNested = []string{
 	"minor_version",

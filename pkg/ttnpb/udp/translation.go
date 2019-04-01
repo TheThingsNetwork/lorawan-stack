@@ -151,10 +151,13 @@ func fineTimestampMetadata(rx RxPacket, gatewayID ttnpb.GatewayIdentifiers) []*t
 
 func convertUplink(rx RxPacket, md UpstreamMetadata) (ttnpb.UplinkMessage, error) {
 	up := ttnpb.UplinkMessage{
+		GatewayChannelIndex: uint32(rx.Chan),
 		Settings: ttnpb.TxSettings{
-			Frequency:           uint64(rx.Freq * 1000000),
-			GatewayChannelIndex: uint32(rx.Chan),
+			Frequency: uint64(rx.Freq * 1000000),
 		},
+	}
+	up.Settings = ttnpb.TxSettings{
+		Frequency: uint64(rx.Freq * 1000000),
 	}
 
 	rawPayload, err := base64.RawStdEncoding.DecodeString(strings.TrimRight(rx.Data, "="))
@@ -272,7 +275,7 @@ func FromGatewayUp(up *ttnpb.GatewayUp) (rxs []*RxPacket, stat *Stat, ack *TxPac
 		}
 		rxs = append(rxs, &RxPacket{
 			Freq: float64(msg.Settings.Frequency) / 1000000,
-			Chan: uint8(msg.Settings.GatewayChannelIndex),
+			Chan: uint8(msg.GatewayChannelIndex),
 			Modu: modulation,
 			DatR: DataRate{msg.Settings.DataRate},
 			CodR: codr,
@@ -299,11 +302,13 @@ func FromGatewayUp(up *ttnpb.GatewayUp) (rxs []*RxPacket, stat *Stat, ack *TxPac
 // ToDownlinkMessage converts the UDP format to a downlink message.
 func ToDownlinkMessage(tx *TxPacket) (*ttnpb.DownlinkMessage, error) {
 	scheduled := &ttnpb.TxSettings{
-		DataRate:           tx.DatR.DataRate,
-		Frequency:          uint64(tx.Freq * 1000000),
-		InvertPolarization: tx.IPol,
-		TxPower:            float32(tx.Powe) + eirpDelta,
-		Timestamp:          tx.Tmst,
+		DataRate:  tx.DatR.DataRate,
+		Frequency: uint64(tx.Freq * 1000000),
+		Downlink: &ttnpb.TxSettings_Downlink{
+			InvertPolarization: tx.IPol,
+			TxPower:            float32(tx.Powe) + eirpDelta,
+		},
+		Timestamp: tx.Tmst,
 	}
 	if lora := scheduled.DataRate.GetLoRa(); lora != nil {
 		scheduled.CodingRate = tx.CodR
@@ -333,8 +338,8 @@ func FromDownlinkMessage(msg *ttnpb.DownlinkMessage) (*TxPacket, error) {
 	}
 	tx := &TxPacket{
 		Freq: float64(scheduled.Frequency) / 1000000,
-		IPol: scheduled.InvertPolarization,
-		Powe: uint8(scheduled.TxPower - eirpDelta),
+		IPol: scheduled.Downlink.InvertPolarization,
+		Powe: uint8(scheduled.Downlink.TxPower - eirpDelta),
 		Size: uint16(len(payload)),
 		Data: base64.StdEncoding.EncodeToString(payload),
 		Tmst: scheduled.Timestamp,

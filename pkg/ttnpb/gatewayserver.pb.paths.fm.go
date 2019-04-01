@@ -99,14 +99,14 @@ var GatewayDownFieldPathsNested = []string{
 	"downlink_message.settings.scheduled.data_rate.modulation.lora.bandwidth",
 	"downlink_message.settings.scheduled.data_rate.modulation.lora.spreading_factor",
 	"downlink_message.settings.scheduled.data_rate_index",
-	"downlink_message.settings.scheduled.device_channel_index",
+	"downlink_message.settings.scheduled.downlink",
+	"downlink_message.settings.scheduled.downlink.antenna_index",
+	"downlink_message.settings.scheduled.downlink.invert_polarization",
+	"downlink_message.settings.scheduled.downlink.tx_power",
 	"downlink_message.settings.scheduled.enable_crc",
 	"downlink_message.settings.scheduled.frequency",
-	"downlink_message.settings.scheduled.gateway_channel_index",
-	"downlink_message.settings.scheduled.invert_polarization",
 	"downlink_message.settings.scheduled.time",
 	"downlink_message.settings.scheduled.timestamp",
-	"downlink_message.settings.scheduled.tx_power",
 }
 
 var GatewayDownFieldPathsTopLevel = []string{

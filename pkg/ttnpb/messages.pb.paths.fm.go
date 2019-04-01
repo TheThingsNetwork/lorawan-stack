@@ -4,6 +4,8 @@ package ttnpb
 
 var UplinkMessageFieldPathsNested = []string{
 	"correlation_ids",
+	"device_channel_index",
+	"gateway_channel_index",
 	"payload",
 	"payload.Payload",
 	"payload.Payload.join_accept_payload",
@@ -61,18 +63,20 @@ var UplinkMessageFieldPathsNested = []string{
 	"settings.data_rate.modulation.lora.bandwidth",
 	"settings.data_rate.modulation.lora.spreading_factor",
 	"settings.data_rate_index",
-	"settings.device_channel_index",
+	"settings.downlink",
+	"settings.downlink.antenna_index",
+	"settings.downlink.invert_polarization",
+	"settings.downlink.tx_power",
 	"settings.enable_crc",
 	"settings.frequency",
-	"settings.gateway_channel_index",
-	"settings.invert_polarization",
 	"settings.time",
 	"settings.timestamp",
-	"settings.tx_power",
 }
 
 var UplinkMessageFieldPathsTopLevel = []string{
 	"correlation_ids",
+	"device_channel_index",
+	"gateway_channel_index",
 	"payload",
 	"raw_payload",
 	"received_at",
@@ -155,14 +159,14 @@ var DownlinkMessageFieldPathsNested = []string{
 	"settings.scheduled.data_rate.modulation.lora.bandwidth",
 	"settings.scheduled.data_rate.modulation.lora.spreading_factor",
 	"settings.scheduled.data_rate_index",
-	"settings.scheduled.device_channel_index",
+	"settings.scheduled.downlink",
+	"settings.scheduled.downlink.antenna_index",
+	"settings.scheduled.downlink.invert_polarization",
+	"settings.scheduled.downlink.tx_power",
 	"settings.scheduled.enable_crc",
 	"settings.scheduled.frequency",
-	"settings.scheduled.gateway_channel_index",
-	"settings.scheduled.invert_polarization",
 	"settings.scheduled.time",
 	"settings.scheduled.timestamp",
-	"settings.scheduled.tx_power",
 }
 
 var DownlinkMessageFieldPathsTopLevel = []string{
@@ -198,14 +202,14 @@ var ApplicationUplinkFieldPathsNested = []string{
 	"settings.data_rate.modulation.lora.bandwidth",
 	"settings.data_rate.modulation.lora.spreading_factor",
 	"settings.data_rate_index",
-	"settings.device_channel_index",
+	"settings.downlink",
+	"settings.downlink.antenna_index",
+	"settings.downlink.invert_polarization",
+	"settings.downlink.tx_power",
 	"settings.enable_crc",
 	"settings.frequency",
-	"settings.gateway_channel_index",
-	"settings.invert_polarization",
 	"settings.time",
 	"settings.timestamp",
-	"settings.tx_power",
 }
 
 var ApplicationUplinkFieldPathsTopLevel = []string{
@@ -439,14 +443,14 @@ var ApplicationUpFieldPathsNested = []string{
 	"up.uplink_message.settings.data_rate.modulation.lora.bandwidth",
 	"up.uplink_message.settings.data_rate.modulation.lora.spreading_factor",
 	"up.uplink_message.settings.data_rate_index",
-	"up.uplink_message.settings.device_channel_index",
+	"up.uplink_message.settings.downlink",
+	"up.uplink_message.settings.downlink.antenna_index",
+	"up.uplink_message.settings.downlink.invert_polarization",
+	"up.uplink_message.settings.downlink.tx_power",
 	"up.uplink_message.settings.enable_crc",
 	"up.uplink_message.settings.frequency",
-	"up.uplink_message.settings.gateway_channel_index",
-	"up.uplink_message.settings.invert_polarization",
 	"up.uplink_message.settings.time",
 	"up.uplink_message.settings.timestamp",
-	"up.uplink_message.settings.tx_power",
 }
 
 var ApplicationUpFieldPathsTopLevel = []string{

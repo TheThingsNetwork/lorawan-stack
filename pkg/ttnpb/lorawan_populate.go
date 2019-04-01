@@ -317,7 +317,12 @@ func NewPopulatedTxRequest(r randyLorawan, easy bool) *TxRequest {
 }
 
 func NewPopulatedTxSettings(r randyLorawan, easy bool) *TxSettings {
-	out := &TxSettings{}
+	out := &TxSettings{
+		Downlink: &TxSettings_Downlink{
+			TxPower:            float32(r.Int31()),
+			InvertPolarization: r.Intn(2) == 0,
+		},
+	}
 	switch r.Intn(2) {
 	case 0:
 		out.DataRate.Modulation = &DataRate_FSK{
@@ -335,10 +340,7 @@ func NewPopulatedTxSettings(r randyLorawan, easy bool) *TxSettings {
 		out.CodingRate = fmt.Sprintf("4/%d", r.Intn(4)+5)
 	}
 	out.Frequency = uint64(r.Uint32())
-	out.TxPower = float32(r.Int31())
 	out.CodingRate = fmt.Sprintf("4/%d", r.Intn(4)+5)
-	out.InvertPolarization = r.Intn(2) == 0
-	out.GatewayChannelIndex = r.Uint32() % 255
 	out.DataRateIndex = NewPopulatedDataRateIndex(r, false) % 6
 	return out
 }

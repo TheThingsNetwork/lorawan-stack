@@ -1573,7 +1573,7 @@ func handleUplinkTest() func(t *testing.T) {
 					msg := CopyUplinkMessage(tc.UplinkMessage)
 					msg.RxMetadata = md
 					msg.Settings.DataRateIndex = ttnpb.DATA_RATE_3
-					msg.Settings.DeviceChannelIndex = 2
+					msg.DeviceChannelIndex = 2
 
 					pb.RecentUplinks = append(pb.RecentUplinks, msg)
 					if len(pb.RecentUplinks) > RecentUplinkCount {
@@ -2189,7 +2189,7 @@ func handleJoinTest() func(t *testing.T) {
 
 						msg := CopyUplinkMessage(tc.UplinkMessage)
 						msg.RxMetadata = md
-						msg.Settings.DeviceChannelIndex = 2
+						msg.DeviceChannelIndex = 2
 						msg.Settings.DataRateIndex = ttnpb.DATA_RATE_3
 
 						pb.RecentUplinks = append(pb.RecentUplinks, msg)

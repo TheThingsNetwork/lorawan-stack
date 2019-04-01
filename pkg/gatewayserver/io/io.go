@@ -288,15 +288,18 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 			settings := ttnpb.TxSettings{
 				DataRateIndex: rx.dataRateIndex,
 				Frequency:     rx.frequency,
-				TxPower:       eirp,
+				Downlink: &ttnpb.TxSettings_Downlink{
+					TxPower:      eirp,
+					AntennaIndex: ids.AntennaIndex,
+				},
 			}
 			if int(ids.AntennaIndex) < len(c.gateway.Antennas) {
-				settings.TxPower -= c.gateway.Antennas[ids.AntennaIndex].Gain
+				settings.Downlink.TxPower -= c.gateway.Antennas[ids.AntennaIndex].Gain
 			}
 			settings.DataRate = dataRate
 			if dr := dataRate.GetLoRa(); dr != nil {
 				settings.CodingRate = "4/5"
-				settings.InvertPolarization = true
+				settings.Downlink.InvertPolarization = true
 			}
 			var f func(context.Context, int, ttnpb.TxSettings, ttnpb.TxSchedulePriority) (scheduling.Emission, error)
 			switch request.Class {

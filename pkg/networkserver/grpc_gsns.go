@@ -558,7 +558,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 			if err != nil {
 				return nil, nil, err
 			}
-			up.Settings.DeviceChannelIndex = uint32(upChIdx)
+			up.DeviceChannelIndex = uint32(upChIdx)
 
 			upDRIdx, err := searchDataRate(up.Settings.DataRate, stored, ns.Component.FrequencyPlans)
 			if err != nil {
@@ -880,7 +880,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 			if err != nil {
 				return nil, nil, err
 			}
-			up.Settings.DeviceChannelIndex = uint32(upChIdx)
+			up.DeviceChannelIndex = uint32(upChIdx)
 
 			upDRIdx, err := searchDataRate(up.Settings.DataRate, stored, ns.Component.FrequencyPlans)
 			if err != nil {

@@ -537,10 +537,10 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					up := dev.RecentUplinks[len(dev.RecentUplinks)-1]
 					ctx = events.ContextWithCorrelationID(ctx, up.CorrelationIDs...)
 
-					if up.Settings.DeviceChannelIndex > math.MaxUint8 {
+					if up.DeviceChannelIndex > math.MaxUint8 {
 						return nil, nil, errInvalidChannelIndex
 					}
-					rx1ChIdx, err := band.Rx1Channel(uint8(up.Settings.DeviceChannelIndex))
+					rx1ChIdx, err := band.Rx1Channel(uint8(up.DeviceChannelIndex))
 					if err != nil {
 						return nil, nil, err
 					}
