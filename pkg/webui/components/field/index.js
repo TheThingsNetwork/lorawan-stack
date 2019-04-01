@@ -128,14 +128,14 @@ const Field = function (props) {
   const handleChange = function (value) {
     props.setFieldValue(props.name, value)
     if (props.validateOnChange) {
-      props.setFieldTouched(props.name, true)
+      props.setFieldTouched(props.touches || props.name, true)
     }
   }
 
   const handleBlur = function (e) {
     // Always regard inputs that never received a value as untouched (better UX)
     if (e.target.value !== '' && props.validateOnBlur) {
-      props.setFieldTouched(props.name, true)
+      props.setFieldTouched(props.touches || props.name, true)
     }
   }
 
@@ -147,7 +147,7 @@ const Field = function (props) {
     placeholder = props.title,
     description = null,
     warning,
-    touched,
+    touched = false,
     horizontal = false,
     disabled = false,
     readOnly = false,
@@ -158,16 +158,14 @@ const Field = function (props) {
 
   // Underscored assignment due to naming conflict
   let _error = rest.error
-  let _touched = touched
   const formatMessage = content => typeof content === 'object' ? props.intl.formatMessage(content) : content
 
   if (form) {
     // preserve default values for different inputs
     rest.value = rest.value || ''
-    _touched = touched && touched[name]
-    rest.onChange = handleChange
+    rest.onChange = rest.onChange || handleChange
     rest.onBlur = handleBlur
-    _error = _touched && rest.error
+    _error = touched && rest.error
 
     // Dismiss non boolean values for checkboxes
     if (type === 'checkbox') {
@@ -184,7 +182,7 @@ const Field = function (props) {
   rest.type = type
   rest.placeholder = placeholder ? formatMessage(placeholder) : ''
 
-  const hasMessages = _touched && (_error || warning)
+  const hasMessages = touched && (_error || warning)
 
   const classname = classnames(className, style.field, style[type], ...from(style, {
     error: rest.error,
@@ -230,7 +228,7 @@ Field.propTypes = {
     PropTypes.node,
     PropTypes.message,
   ]),
-  /** "name" prop applied to the input */
+  /** "name" prop applied to the input, mapped to the form value object */
   name: PropTypes.string.isRequired,
   /**
    * The field type (eg. text, byte, password, checkbox), thunked values are
@@ -256,6 +254,9 @@ Field.propTypes = {
    * This is necessary to map form values correctly.
    */
   form: PropTypes.bool,
+  /** The value name that the field will set to touched (defaults to 'name' prop)
+   */
+  touches: PropTypes.string,
 }
 
 const Err = function (props) {

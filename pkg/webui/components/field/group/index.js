@@ -35,6 +35,7 @@ class FieldGroup extends React.Component {
       setFieldValue,
       setFieldTouched,
       horizontal,
+      touched,
     } = this.props
 
     const fields = React.Children.map(children, function (Child) {
@@ -45,9 +46,11 @@ class FieldGroup extends React.Component {
           ...Child.props,
           name: fieldName,
           value: fieldValue,
+          touches: name,
           disabled,
           setFieldValue,
           setFieldTouched,
+          validateOnChange: true,
           horizontal,
         })
       }
@@ -63,7 +66,7 @@ class FieldGroup extends React.Component {
             component={titleComponent}
             content={title}
           />
-          {error && <FieldError name={name} error={error} />}
+          {touched && error && <FieldError name={name} error={error} />}
         </div>
         {fields}
       </div>

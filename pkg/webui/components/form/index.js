@@ -111,13 +111,14 @@ class InnerForm extends React.Component {
           const { name, value: originalValue } = Child.props
           const value = name ? getByPath(values, name) : originalValue
           const fieldError = getByPath(combinedErrors, name)
+          const fieldTouched = getByPath(touched, name)
 
           return React.cloneElement(Child, {
             setFieldValue,
             setFieldTouched,
             error: fieldError,
+            touched: fieldTouched,
             value,
-            touched,
             horizontal,
             submitEnabledWhenInvalid,
             validateOnBlur,
@@ -148,6 +149,7 @@ class InnerForm extends React.Component {
             ...Child.props,
             setFieldValue,
             setFieldTouched,
+            touched: groupTouched,
             error: groupError,
             value,
             horizontal,
