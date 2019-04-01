@@ -14,6 +14,7 @@
 
 import React from 'react'
 import ReactSelect from 'react-select'
+import { injectIntl } from 'react-intl'
 
 import style from './select.styl'
 
@@ -21,16 +22,27 @@ import style from './select.styl'
 // See: https://github.com/JedWatson/react-select/issues/2841
 const getValue = (opts, val) => opts.find(o => o.value === val)
 
-const Select = function ({ value, className, ...rest }) {
+const Select = function ({ value, className, intl, options, ...rest }) {
   const classNames = className ? [ className, style.container ].join(' ') : style.container
+  const translatedOptions = options.map(function (option) {
+    const { label, labelValues = {}} = option
+    if (typeof label === 'object' && label.id && label.defaultMessage) {
+      return { ...option, label: intl.formatMessage(label, labelValues) }
+    }
+
+    return option
+  })
+
   return (
     <ReactSelect
       className={classNames}
       classNamePrefix="select"
-      value={getValue(rest.options, value)}
+      value={getValue(translatedOptions, value)}
+      options={translatedOptions}
       {...rest}
     />
   )
 }
 
-export default Select
+export default injectIntl(Select)
+export { Select }
