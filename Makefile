@@ -26,10 +26,9 @@ docs-gen:
 docs-server:
 	hugo server -s ./doc
 
-doc-deps:
-	@git clone https://github.com/gohugoio/hugo.git
-	@cd hugo
-	@go install
+docs-deps:
+	git submodule init
+	git submodule update doc/themes/hugo-theme-techdoc
 
 docs:
 	@rm -f doc/ttn-lw-{stack,cli}/*.{md,1,yaml}

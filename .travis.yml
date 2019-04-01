@@ -84,6 +84,7 @@ install:
   fi
 - |
   if [[ "$RUNTYPE" == "doc" ]]; then
+    sudo snap install hugo
     make docs-deps
   fi
 before_script:
