@@ -230,7 +230,7 @@ const fieldErrors = function (definition, error) {
         const err = {}
         err.id = error.message.split(' ')[0]
         err.defaultMessage = error.details[0].message_format || error.message.replace(/^.*\s/, '')
-        err.values = error.details[0].attribute
+        err.values = error.details[0].attributes
 
         formatted[fieldName] = err
       }
