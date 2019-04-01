@@ -58,11 +58,9 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	var addDownlinkTask bool
 	dev, err := ns.devices.SetByID(ctx, req.EndDevice.EndDeviceIdentifiers.ApplicationIdentifiers, req.EndDevice.EndDeviceIdentifiers.DeviceID, gets, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		if dev != nil {
-			addDownlinkTask = ttnpb.HasAnyField(req.FieldMask.Paths,
-				"mac_state.device_class",
-				"queued_application_downlinks",
-			) && req.EndDevice.MACState.DeviceClass != ttnpb.CLASS_A &&
-				(len(req.EndDevice.QueuedApplicationDownlinks) > 0 || !req.EndDevice.MACState.CurrentParameters.Equal(req.EndDevice.MACState.DesiredParameters))
+			addDownlinkTask = ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.device_class") &&
+				req.EndDevice.MACState.DeviceClass != ttnpb.CLASS_A &&
+				(len(dev.QueuedApplicationDownlinks) > 0 || !dev.MACState.CurrentParameters.Equal(dev.MACState.DesiredParameters))
 			return &req.EndDevice, req.FieldMask.Paths, nil
 		}
 
@@ -261,9 +259,6 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			return nil, nil, err
 		}
 		sets = append(sets, "mac_state")
-
-		addDownlinkTask = req.EndDevice.MACState.DeviceClass != ttnpb.CLASS_A &&
-			(len(req.EndDevice.QueuedApplicationDownlinks) > 0 || !req.EndDevice.MACState.CurrentParameters.Equal(req.EndDevice.MACState.DesiredParameters))
 
 		return &req.EndDevice, sets, nil
 	})

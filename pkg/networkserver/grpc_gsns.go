@@ -481,6 +481,8 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 			"pending_session",
 			"recent_uplinks",
 			"session",
+			"supports_class_b",
+			"supports_class_c",
 			"supports_join",
 		},
 		func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
@@ -527,6 +529,13 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 					panic("Pending session does not match the join request")
 				}
 				stored.EndDeviceIdentifiers.DevAddr = &stored.MACState.PendingJoinRequest.DevAddr
+				if stored.SupportsClassC {
+					stored.MACState.DeviceClass = ttnpb.CLASS_C
+				} else if stored.SupportsClassB {
+					stored.MACState.DeviceClass = ttnpb.CLASS_B
+				} else {
+					stored.MACState.DeviceClass = ttnpb.CLASS_A
+				}
 				stored.MACState.CurrentParameters.Rx1Delay = stored.MACState.PendingJoinRequest.RxDelay
 				stored.MACState.CurrentParameters.Rx1DataRateOffset = stored.MACState.PendingJoinRequest.DownlinkSettings.Rx1DROffset
 				stored.MACState.CurrentParameters.Rx2DataRateIndex = stored.MACState.PendingJoinRequest.DownlinkSettings.Rx2DR
