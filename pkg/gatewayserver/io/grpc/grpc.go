@@ -85,7 +85,7 @@ func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) (err error) {
 				msg := &ttnpb.GatewayDown{
 					DownlinkMessage: down,
 				}
-				logger.Info("Sending downlink message")
+				logger.Info("Send downlink message")
 				if err := link.Send(msg); err != nil {
 					logger.WithError(err).Warn("Failed to send message")
 					conn.Disconnect(err)

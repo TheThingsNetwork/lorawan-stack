@@ -180,10 +180,10 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 	client := ttnpb.NewAsNsClient(l.conn)
 	ctx = log.NewContextWithField(ctx, "network_server", l.connName)
 	logger := log.FromContext(ctx)
-	logger.Debug("Linking")
+	logger.Debug("Link")
 	stream, err := client.LinkApplication(ctx, l.callOpts...)
 	if err != nil {
-		logger.WithError(err).Warn("Linking failed")
+		logger.WithError(err).Warn("Link setup failed")
 		return err
 	}
 	logger.Info("Linked")
@@ -254,7 +254,7 @@ func (as *ApplicationServer) cancelLink(ctx context.Context, ids ttnpb.Applicati
 	uid := unique.ID(ctx, ids)
 	if val, ok := as.links.Load(uid); ok {
 		l := val.(*link)
-		log.FromContext(ctx).WithField("application_uid", uid).Debug("Unlinking")
+		log.FromContext(ctx).WithField("application_uid", uid).Debug("Unlink")
 		l.cancel(context.Canceled)
 	} else {
 		as.linkErrors.Delete(uid)

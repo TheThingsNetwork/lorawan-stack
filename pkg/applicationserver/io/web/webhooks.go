@@ -307,7 +307,7 @@ func (w *webhooks) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error
 			if req == nil {
 				return
 			}
-			logger.WithField("url", req.URL).Debug("Processing message")
+			logger.WithField("url", req.URL).Debug("Process message")
 			if err := w.target.Process(req); err != nil {
 				logger.WithError(err).Warn("Failed to process message")
 			}
@@ -395,7 +395,7 @@ func (w *webhooks) handleDown(c echo.Context, op func(io.Server, context.Context
 	if err != nil {
 		return err
 	}
-	logger.Debug("Performing downlink queue operation")
+	logger.Debug("Perform downlink queue operation")
 	if err := op(w.server, ctx, devID, items.Downlinks); err != nil {
 		return err
 	}

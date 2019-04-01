@@ -265,7 +265,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, protocol string, ids ttnpb
 		if !ok {
 			return nil, errNoFallbackFrequencyPlan.WithAttributes("gateway_uid", uid)
 		}
-		logger.Warn("Connecting unregistered gateway")
+		logger.Warn("Connect unregistered gateway")
 		gtw = &ttnpb.Gateway{
 			GatewayIdentifiers:     ids,
 			FrequencyPlanID:        fpID,
@@ -336,7 +336,7 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 				if ids.DevAddr != nil && !ids.DevAddr.IsZero() {
 					logger = logger.WithField("dev_addr", *ids.DevAddr)
 				}
-				logger.Debug("Dropping message")
+				logger.Debug("Drop message")
 				registerDropUplink(ctx, ids, conn.Gateway(), msg, err)
 			}
 			ids, err := lorawan.GetUplinkMessageIdentifiers(msg)
