@@ -77,6 +77,7 @@ export default class ApiKeysTable extends Component {
         entity="keys"
         headers={headers}
         addMessage={sharedMessages.addApiKey}
+        handlesPagination
         {...this.props}
       />
     )
