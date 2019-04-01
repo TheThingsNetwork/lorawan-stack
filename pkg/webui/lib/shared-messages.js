@@ -31,6 +31,7 @@ export default defineMessages({
   approve: 'Approve',
   cancel: 'Cancel',
   collaboratorEdit: 'Edit {collaboratorId}',
+  collaboratorEditRights: 'Edit rights of {collaboratorId}',
   collaborators: 'Collaborators',
   collaboratorId: 'Collaborator ID',
   createApiKey: 'Create API Key',

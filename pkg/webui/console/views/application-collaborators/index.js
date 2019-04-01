@@ -21,7 +21,7 @@ import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 
 import ApplicationCollaboratorsList from '../application-collaborators-list'
 import ApplicationCollaboratorAdd from '../application-collaborator-add'
-import ApplicationCollaboratorsEdit from '../application-collaborators-edit'
+import ApplicationCollaboratorEdit from '../application-collaborator-edit'
 
 @withBreadcrumb('apps.single.api-keys', function (props) {
   const { match } = props
@@ -44,7 +44,7 @@ export default class ApplicationCollaborators extends React.Component {
       <Switch>
         <Route exact path={`${match.path}`} component={ApplicationCollaboratorsList} />
         <Route path={`${match.path}/add`} component={ApplicationCollaboratorAdd} />
-        <Route path={`${match.path}/:collaboratorId`} component={ApplicationCollaboratorsEdit} />
+        <Route path={`${match.path}/:collaboratorId`} component={ApplicationCollaboratorEdit} />
       </Switch>
     )
   }
