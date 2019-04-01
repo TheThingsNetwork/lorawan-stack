@@ -47,6 +47,19 @@ class Tabular extends React.Component {
     this.props.onSortRequest('asc', newOrderBy)
   }
 
+  handlePagination (items = []) {
+    const { pageSize, page, handlesPagination, paginated } = this.props
+
+    if (paginated && handlesPagination) {
+      const from = pageSize * (page - 1)
+      const to = pageSize * page
+
+      return items.splice(from, to)
+    }
+
+    return items
+  }
+
   render () {
     const {
       className,
@@ -93,8 +106,9 @@ class Tabular extends React.Component {
       </Table.Row>
     )
 
-    const rows = data.length > 0 ? (
-      data.map( function (row, rowKey) {
+    const paginatedData = this.handlePagination(data)
+    const rows = paginatedData.length > 0 ? (
+      paginatedData.map( function (row, rowKey) {
         return (
           <Table.Row
             key={rowKey}
@@ -213,6 +227,12 @@ Tabular.propTypes = {
     sortable: PropTypes.bool,
     width: PropTypes.number,
   })),
+  /**
+   * A flag specifying whether the table should paginate entries.
+   * If true the component makes sure that the items are paginated, otherwise
+   * the user is responsible for passing the right number of items.
+   */
+  handlesPagination: PropTypes.bool,
 }
 
 export { Tabular as default, Table }
