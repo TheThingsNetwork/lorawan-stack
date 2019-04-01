@@ -1770,7 +1770,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 				gs3 := &MockNsGsServer{}
 				peer3 := test.Must(test.NewGRPCServerPeer(test.Context(), gs3, ttnpb.RegisterNsGsServer)).(cluster.Peer)
 				once := &sync.Once{}
-				var rx2 bool
 
 				return func(ctx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) cluster.Peer {
 					t := test.MustTFromContext(ctx)
@@ -1790,15 +1789,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 						t.Fatal("Invalid context")
 					}
 					fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
-					rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
-					rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint8))].DownlinkFrequency
-					rx1GenDown, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
-						band.DataRates[rx1DRIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
-						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
-					)
-					if !a.So(err, should.BeNil) {
-						t.Fatalf("Failed to generate Rx1 payload: %s", err)
-					}
 					rx2GenDown, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
 						band.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
@@ -1819,7 +1809,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID1")
 								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID2")
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
-									RawPayload:     rx1GenDown.Payload,
+									RawPayload:     rx2GenDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
 									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
 										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
@@ -1828,10 +1818,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 									},
 									Settings: &ttnpb.DownlinkMessage_Request{
 										Request: &ttnpb.TxRequest{
-											Class:            ttnpb.CLASS_A,
-											Rx1Delay:         ttnpb.RX_DELAY_3,
-											Rx1DataRateIndex: rx1DRIdx,
-											Rx1Frequency:     rx1Freq,
+											Class:            ttnpb.CLASS_C,
+											Rx2DataRateIndex: ttnpb.DATA_RATE_1,
+											Rx2Frequency:     42,
 											DownlinkPaths: []*ttnpb.DownlinkPath{
 												{
 													Path: &ttnpb.DownlinkPath_Fixed{
@@ -1898,93 +1887,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID1")
 								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID2")
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
-									RawPayload:     rx1GenDown.Payload,
-									CorrelationIDs: msg.CorrelationIDs,
-									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-										DeviceID:               DeviceID,
-										DevAddr:                &DevAddr,
-									},
-									Settings: &ttnpb.DownlinkMessage_Request{
-										Request: &ttnpb.TxRequest{
-											Class:            ttnpb.CLASS_A,
-											Rx1Delay:         ttnpb.RX_DELAY_3,
-											Rx1DataRateIndex: rx1DRIdx,
-											Rx1Frequency:     rx1Freq,
-											DownlinkPaths: []*ttnpb.DownlinkPath{
-												{
-													Path: &ttnpb.DownlinkPath_Fixed{
-														Fixed: &ttnpb.GatewayAntennaIdentifiers{
-															GatewayIdentifiers: gateways[1],
-															AntennaIndex:       3,
-														},
-													},
-												},
-												{
-													Path: &ttnpb.DownlinkPath_Fixed{
-														Fixed: &ttnpb.GatewayAntennaIdentifiers{
-															GatewayIdentifiers: gateways[2],
-															AntennaIndex:       1,
-														},
-													},
-												},
-											},
-										},
-									},
-								})
-								return nil, errors.New("ScheduleDownlink error")
-							},
-
-							func(_ context.Context, msg *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error) {
-								defer test.MustIncrementContextCounter(ctx, scheduleDownlinkCallKey{}, 1)
-
-								a.So(test.MustCounterFromContext(ctx, scheduleDownlinkCallKey{}), should.Equal, 2)
-								a.So(msg.CorrelationIDs, should.HaveLength, 5)
-								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationUpID1")
-								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationUpID2")
-								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID1")
-								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID2")
-								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
-									RawPayload:     rx1GenDown.Payload,
-									CorrelationIDs: msg.CorrelationIDs,
-									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-										DeviceID:               DeviceID,
-										DevAddr:                &DevAddr,
-									},
-									Settings: &ttnpb.DownlinkMessage_Request{
-										Request: &ttnpb.TxRequest{
-											Class:            ttnpb.CLASS_A,
-											Rx1Delay:         ttnpb.RX_DELAY_3,
-											Rx1DataRateIndex: rx1DRIdx,
-											Rx1Frequency:     rx1Freq,
-											DownlinkPaths: []*ttnpb.DownlinkPath{
-												{
-													Path: &ttnpb.DownlinkPath_Fixed{
-														Fixed: &ttnpb.GatewayAntennaIdentifiers{
-															GatewayIdentifiers: gateways[4],
-															AntennaIndex:       2,
-														},
-													},
-												},
-											},
-										},
-									},
-								})
-								rx2 = true
-								return nil, errors.New("ScheduleDownlink error")
-							},
-
-							func(_ context.Context, msg *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error) {
-								defer test.MustIncrementContextCounter(ctx, scheduleDownlinkCallKey{}, 1)
-
-								a.So(test.MustCounterFromContext(ctx, scheduleDownlinkCallKey{}), should.Equal, 3)
-								a.So(msg.CorrelationIDs, should.HaveLength, 5)
-								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationUpID1")
-								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationUpID2")
-								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID1")
-								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationAppDownID2")
-								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 									RawPayload:     rx2GenDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
 									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
@@ -2024,7 +1926,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							func(_ context.Context, msg *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error) {
 								defer test.MustIncrementContextCounter(ctx, scheduleDownlinkCallKey{}, 1)
 
-								a.So(test.MustCounterFromContext(ctx, scheduleDownlinkCallKey{}), should.Equal, 5)
+								a.So(test.MustCounterFromContext(ctx, scheduleDownlinkCallKey{}), should.Equal, 2)
 								a.So(msg.CorrelationIDs, should.HaveLength, 5)
 								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationUpID1")
 								a.So(msg.CorrelationIDs, should.Contain, "testCorrelationUpID2")
@@ -2063,43 +1965,23 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 					switch uid := unique.ID(ctx, ids); uid {
 					case unique.ID(ctx, gateways[0]):
-						if !rx2 {
-							a.So(test.MustCounterFromContext(ctx, getPeerCallKey{}), should.Equal, 0)
-						} else {
-							a.So(test.MustCounterFromContext(ctx, getPeerCallKey{}), should.Equal, 5)
-						}
+						a.So(test.MustCounterFromContext(ctx, getPeerCallKey{}), should.Equal, 0)
 						return nil
 
 					case unique.ID(ctx, gateways[1]):
-						if !rx2 {
-							a.So(test.MustCounterFromContext(ctx, getPeerCallKey{}), should.Equal, 1)
-						} else {
-							a.So(test.MustCounterFromContext(ctx, getPeerCallKey{}), should.Equal, 6)
-						}
+						a.So(test.MustCounterFromContext(ctx, getPeerCallKey{}), should.Equal, 1)
 						return peer124
 
 					case unique.ID(ctx, gateways[2]):
-						if !rx2 {
-							a.So(test.MustCounterFromContext(ctx, getPeerCallKey{}), should.Equal, 2)
-						} else {
-							a.So(test.MustCounterFromContext(ctx, getPeerCallKey{}), should.Equal, 7)
-						}
+						a.So(test.MustCounterFromContext(ctx, getPeerCallKey{}), should.Equal, 2)
 						return peer124
 
 					case unique.ID(ctx, gateways[3]):
-						if !rx2 {
-							a.So(test.MustCounterFromContext(ctx, getPeerCallKey{}), should.Equal, 3)
-						} else {
-							a.So(test.MustCounterFromContext(ctx, getPeerCallKey{}), should.Equal, 8)
-						}
+						a.So(test.MustCounterFromContext(ctx, getPeerCallKey{}), should.Equal, 3)
 						return peer3
 
 					case unique.ID(ctx, gateways[4]):
-						if !rx2 {
-							a.So(test.MustCounterFromContext(ctx, getPeerCallKey{}), should.Equal, 4)
-						} else {
-							a.So(test.MustCounterFromContext(ctx, getPeerCallKey{}), should.Equal, 9)
-						}
+						a.So(test.MustCounterFromContext(ctx, getPeerCallKey{}), should.Equal, 4)
 						return peer124
 
 					default:
@@ -2113,8 +1995,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				return a.So(test.MustCounterFromContext(ctx, popCallKey{}), should.Equal, 1) &&
 					a.So(test.MustCounterFromContext(ctx, setByIDCallKey{}), should.Equal, 1) &&
-					a.So(test.MustCounterFromContext(ctx, getPeerCallKey{}), should.Equal, 10) &&
-					a.So(test.MustCounterFromContext(ctx, scheduleDownlinkCallKey{}), should.Equal, 6)
+					a.So(test.MustCounterFromContext(ctx, getPeerCallKey{}), should.Equal, 5) &&
+					a.So(test.MustCounterFromContext(ctx, scheduleDownlinkCallKey{}), should.Equal, 3)
 			},
 		},
 

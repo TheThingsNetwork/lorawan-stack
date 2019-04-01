@@ -717,10 +717,18 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						}
 
 					default:
-						// Data downlink for Class B/C in Rx1
+						// Data downlink for Class B/C in Rx1 if available
 						req.Rx1Delay = dev.MACState.CurrentParameters.Rx1Delay
-						req.Rx1Frequency = rx1Freq
-						req.Rx1DataRateIndex = rx1DRIdx
+						rx1, _, paths := downlinkPathsForClassA(
+							dev.MACState.CurrentParameters.Rx1Delay,
+							dev.RecentUplinks...,
+						)
+						if rx1 {
+							req.Rx1Frequency = rx1Freq
+							req.Rx1DataRateIndex = rx1DRIdx
+						} else {
+							break
+						}
 
 						// NOTE: generateDownlink mutates the device, and since we may need to call it twice(Rx1/Rx2),
 						// we need to create a deep copy for the first call.
@@ -745,35 +753,16 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						}
 
 						if genDown.ApplicationDownlink != nil {
-							ctx = events.ContextWithCorrelationID(ctx, genDown.ApplicationDownlink.CorrelationIDs...)
-						}
-
-						var paths []downlinkPath
-						if genDown.ApplicationDownlink != nil && genDown.ApplicationDownlink.ClassBC != nil && genDown.ApplicationDownlink.ClassBC.AbsoluteTime == nil {
-							paths = make([]downlinkPath, 0, len(genDown.ApplicationDownlink.ClassBC.Gateways))
-							for _, gtw := range genDown.ApplicationDownlink.ClassBC.Gateways {
-								if gtw == nil || gtw.IsZero() {
-									continue
-								}
-								paths = append(paths, downlinkPath{
-									GatewayIdentifiers: gtw.GatewayIdentifiers,
-									DownlinkPath: &ttnpb.DownlinkPath{
-										Path: &ttnpb.DownlinkPath_Fixed{
-											Fixed: gtw,
-										},
-									},
-								})
-							}
-						} else if genDown.ApplicationDownlink == nil || genDown.ApplicationDownlink.ClassBC == nil {
-							rx1, _, classAPaths := downlinkPathsForClassA(
-								dev.MACState.CurrentParameters.Rx1Delay,
-								dev.RecentUplinks...,
-							)
-							if rx1 {
-								paths = classAPaths
+							if len(genDown.ApplicationDownlink.ClassBC.GetGateways()) > 0 ||
+								genDown.ApplicationDownlink.ClassBC.GetAbsoluteTime() != nil {
+								// Skip Rx1 when a fixed path or an absolute tranmission time is requested by the application.
+								// Gateway Server cannot schedule Rx1 on a fixed path as there is no uplink token.
+								// Also, it is highly unlikely and not verifiable by Network Server that Rx1 is at ClassBC.AbsoluteTime.
+								paths = nil
+							} else {
+								ctx = events.ContextWithCorrelationID(ctx, genDown.ApplicationDownlink.CorrelationIDs...)
 							}
 						}
-						// NOTE: We must skip Rx1 if genDown.ApplicationDownlink.ClassBC.AbsoluteTime is set
 
 						if len(paths) > 0 {
 							down, downAt, err := ns.scheduleDownlinkByPaths(
