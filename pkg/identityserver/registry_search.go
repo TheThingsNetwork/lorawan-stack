@@ -36,7 +36,7 @@ func (rs *registrySearch) SearchAllowed(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	if rs.adminOnly && !authInfo.UniversalRights.IncludesAll(ttnpb.RIGHT_ALL) {
+	if rs.adminOnly && !authInfo.IsAdmin {
 		return errSearchAdminOnly
 	}
 	return nil

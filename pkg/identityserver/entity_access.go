@@ -198,7 +198,8 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 
 	if user != nil {
 		if user.Admin {
-			res.UniversalRights = ttnpb.AllRights.Implied().Intersect(userRights)
+			res.IsAdmin = true
+			res.UniversalRights = ttnpb.AllAdminRights.Implied().Intersect(userRights)
 		}
 
 		if is.configFromContext(ctx).UserRegistration.ContactInfoValidation.Required && user.PrimaryEmailAddressValidatedAt == nil {
@@ -259,6 +260,15 @@ func (is *IdentityServer) UniversalRights(ctx context.Context) *ttnpb.Rights {
 		return info.GetUniversalRights()
 	}
 	return nil
+}
+
+// IsAdmin returns whether the caller is an admin.
+func (is *IdentityServer) IsAdmin(ctx context.Context) bool {
+	authInfo, err := is.authInfo(ctx)
+	if err != nil {
+		return false
+	}
+	return authInfo.IsAdmin
 }
 
 func restrictRights(info *ttnpb.AuthInfoResponse, rights *ttnpb.Rights) {

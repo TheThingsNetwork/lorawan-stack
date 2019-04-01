@@ -36,6 +36,7 @@ message AuthInfoResponse {
     OAuthAccessToken oauth_access_token = 2 [(gogoproto.customname) = "OAuthAccessToken"];
   }
   Rights universal_rights = 3;
+  bool is_admin = 4;
 }
 
 service EntityAccess {
