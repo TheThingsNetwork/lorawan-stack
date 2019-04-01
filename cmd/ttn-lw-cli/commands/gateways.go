@@ -78,6 +78,25 @@ var (
 		Aliases: []string{"gateway", "gtw", "g"},
 		Short:   "Gateway commands",
 	}
+	gatewaysListFrequencyPlans = &cobra.Command{
+		Use:               "list-frequency-plans",
+		Short:             "List available frequency plans for gateways",
+		PersistentPreRunE: preRun(),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			baseFrequency, _ := cmd.Flags().GetUint32("base-frequency")
+			gs, err := api.Dial(ctx, config.GatewayServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			res, err := ttnpb.NewConfigurationClient(gs).ListFrequencyPlans(ctx, &ttnpb.ListFrequencyPlansRequest{
+				BaseFrequency: baseFrequency,
+			})
+			if err != nil {
+				return err
+			}
+			return io.Write(os.Stdout, config.OutputFormat, res.FrequencyPlans)
+		},
+	}
 	gatewaysListCommand = &cobra.Command{
 		Use:     "list",
 		Aliases: []string{"ls"},
@@ -337,6 +356,8 @@ var (
 )
 
 func init() {
+	gatewaysListFrequencyPlans.Flags().Uint32("base-frequency", 0, "Base frequency in MHz for hardware support (433, 470, 868 or 915)")
+	gatewaysCommand.AddCommand(gatewaysListFrequencyPlans)
 	gatewaysListCommand.Flags().AddFlagSet(collaboratorFlags())
 	gatewaysListCommand.Flags().AddFlagSet(selectGatewayFlags)
 	gatewaysCommand.AddCommand(gatewaysListCommand)

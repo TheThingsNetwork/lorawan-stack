@@ -124,6 +124,25 @@ var (
 		Aliases: []string{"end-device", "devices", "device", "dev", "ed", "d"},
 		Short:   "End Device commands",
 	}
+	endDevicesListFrequencyPlans = &cobra.Command{
+		Use:               "list-frequency-plans",
+		Short:             "List available frequency plans for end devices",
+		PersistentPreRunE: preRun(),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			baseFrequency, _ := cmd.Flags().GetUint32("base-frequency")
+			gs, err := api.Dial(ctx, config.NetworkServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			res, err := ttnpb.NewConfigurationClient(gs).ListFrequencyPlans(ctx, &ttnpb.ListFrequencyPlansRequest{
+				BaseFrequency: baseFrequency,
+			})
+			if err != nil {
+				return err
+			}
+			return io.Write(os.Stdout, config.OutputFormat, res.FrequencyPlans)
+		},
+	}
 	endDevicesListCommand = &cobra.Command{
 		Use:     "list",
 		Aliases: []string{"ls"},
@@ -639,6 +658,8 @@ func init() {
 		}
 	})
 
+	endDevicesListFrequencyPlans.Flags().Uint32("base-frequency", 0, "Base frequency in MHz for hardware support (433, 470, 868 or 915)")
+	endDevicesCommand.AddCommand(endDevicesListFrequencyPlans)
 	endDevicesListCommand.Flags().AddFlagSet(applicationIDFlags())
 	endDevicesListCommand.Flags().AddFlagSet(selectEndDeviceListFlags)
 	endDevicesCommand.AddCommand(endDevicesListCommand)
