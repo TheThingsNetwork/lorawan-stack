@@ -93,6 +93,8 @@ var (
 				return shared.ErrInitializeBaseComponent.WithCause(err)
 			}
 
+			c.RegisterGRPC(component.NewConfigurationServer(c))
+
 			host, err := os.Hostname()
 			if err != nil {
 				return err
