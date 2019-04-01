@@ -1124,6 +1124,15 @@
       "file": "errors.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:address_mismatch": {
+    "translations": {
+      "en": "server address mismatch"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "end_devices.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/commands:antenna_index": {
     "translations": {
       "en": "index of antenna to update out of bounds"

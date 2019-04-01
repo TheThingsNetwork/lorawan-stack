@@ -69,7 +69,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			paths := util.SelectFieldMask(cmd.Flags(), selectApplicationFlags)
 
-			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
 			}
@@ -93,7 +93,7 @@ var (
 			req := getSearchEntitiesRequest(cmd.Flags())
 			req.FieldMask.Paths = paths
 
-			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
 			}
@@ -116,7 +116,7 @@ var (
 			}
 			paths := util.SelectFieldMask(cmd.Flags(), selectApplicationFlags)
 
-			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
 			}
@@ -159,7 +159,7 @@ var (
 				return errNoApplicationID
 			}
 
-			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
 			}
@@ -195,7 +195,7 @@ var (
 			application.Attributes = mergeAttributes(application.Attributes, cmd.Flags())
 			application.ApplicationIdentifiers = *appID
 
-			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
 			}
@@ -220,7 +220,7 @@ var (
 				return errNoApplicationID
 			}
 
-			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
 			}

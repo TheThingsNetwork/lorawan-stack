@@ -34,7 +34,7 @@ var (
 				return errNoUserID
 			}
 
-			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
 			}
@@ -61,7 +61,7 @@ var (
 				return errNoUserID
 			}
 
-			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
 			}
@@ -89,7 +89,7 @@ var (
 				return errNoAPIKeyRights
 			}
 
-			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
 			}
@@ -130,7 +130,7 @@ var (
 				return errNoAPIKeyRights
 			}
 
-			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
 			}
@@ -163,7 +163,7 @@ var (
 				return errNoUserID
 			}
 
-			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
 			}

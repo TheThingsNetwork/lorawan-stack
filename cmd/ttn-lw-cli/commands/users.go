@@ -75,7 +75,7 @@ var (
 			req := getSearchEntitiesRequest(cmd.Flags())
 			req.FieldMask.Paths = paths
 
-			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
 			}
@@ -98,7 +98,7 @@ var (
 			}
 			paths := util.SelectFieldMask(cmd.Flags(), selectUserFlags)
 
-			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
 			}
@@ -160,7 +160,7 @@ var (
 				}
 			}
 
-			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
 			}
@@ -202,7 +202,7 @@ var (
 				paths = append(paths, "profile_picture")
 			}
 
-			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
 			}
@@ -229,7 +229,7 @@ var (
 
 			usrID.Email, _ = cmd.Flags().GetString("email")
 
-			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
 			}
@@ -268,7 +268,7 @@ var (
 				new = string(pw)
 			}
 
-			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
 			}
@@ -293,7 +293,7 @@ var (
 				return errNoUserID
 			}
 
-			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
 			}

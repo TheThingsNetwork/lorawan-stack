@@ -85,7 +85,7 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			paths := util.SelectFieldMask(cmd.Flags(), selectGatewayFlags)
 
-			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
 			}
@@ -109,7 +109,7 @@ var (
 			req := getSearchEntitiesRequest(cmd.Flags())
 			req.FieldMask.Paths = paths
 
-			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
 			}
@@ -132,7 +132,7 @@ var (
 			}
 			paths := util.SelectFieldMask(cmd.Flags(), selectGatewayFlags)
 
-			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
 			}
@@ -202,7 +202,7 @@ var (
 			}
 			gateway.Antennas = []ttnpb.GatewayAntenna{antenna}
 
-			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
 			}
@@ -240,7 +240,7 @@ var (
 			gateway.Attributes = mergeAttributes(gateway.Attributes, cmd.Flags())
 			gateway.GatewayIdentifiers = *gtwID
 
-			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
 			}
@@ -294,7 +294,7 @@ var (
 				return err
 			}
 
-			is, err := api.Dial(ctx, config.IdentityServerAddress)
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
 			}
@@ -315,7 +315,7 @@ var (
 				return err
 			}
 
-			gs, err := api.Dial(ctx, config.GatewayServerAddress)
+			gs, err := api.Dial(ctx, config.GatewayServerGRPCAddress)
 			if err != nil {
 				return err
 			}

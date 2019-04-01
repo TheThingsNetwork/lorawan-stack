@@ -33,11 +33,11 @@ var eventsCommand = &cobra.Command{
 		var wg sync.WaitGroup
 
 		addresses := make(map[string]bool)
-		addresses[config.IdentityServerAddress] = true
-		addresses[config.GatewayServerAddress] = true
-		addresses[config.NetworkServerAddress] = true
-		addresses[config.ApplicationServerAddress] = true
-		addresses[config.JoinServerAddress] = true
+		addresses[config.IdentityServerGRPCAddress] = true
+		addresses[config.GatewayServerGRPCAddress] = true
+		addresses[config.NetworkServerGRPCAddress] = true
+		addresses[config.ApplicationServerGRPCAddress] = true
+		addresses[config.JoinServerGRPCAddress] = true
 
 		ids := getCombinedIdentifiers(cmd.Flags()).GetEntityIdentifiers()
 		if len(ids) == 0 {
