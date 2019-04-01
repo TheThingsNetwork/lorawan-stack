@@ -28,6 +28,8 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/console"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/events"
+	events_grpc "go.thethings.network/lorawan-stack/pkg/events/grpc"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver"
 	"go.thethings.network/lorawan-stack/pkg/identityserver"
 	"go.thethings.network/lorawan-stack/pkg/joinserver"
@@ -93,6 +95,7 @@ var (
 				return shared.ErrInitializeBaseComponent.WithCause(err)
 			}
 
+			c.RegisterGRPC(events_grpc.NewEventsServer(c.Context(), events.DefaultPubSub))
 			c.RegisterGRPC(component.NewConfigurationServer(c))
 
 			host, err := os.Hostname()
