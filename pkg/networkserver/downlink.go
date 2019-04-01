@@ -163,22 +163,16 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 
 	var needsDownlink bool
 	var up *ttnpb.UplinkMessage
-outer:
-	for i := len(dev.RecentUplinks) - 1; i >= 0; i-- {
-		switch dev.RecentUplinks[i].Payload.MHDR.MType {
+	if dev.MACState.RxWindowsAvailable && len(dev.RecentUplinks) > 0 {
+		up = dev.RecentUplinks[len(dev.RecentUplinks)-1]
+		switch up.Payload.MHDR.MType {
 		case ttnpb.MType_UNCONFIRMED_UP:
-			up = dev.RecentUplinks[i]
-			needsDownlink = up.Payload.GetMACPayload().FCtrl.ADRAckReq
-			break outer
+			if needsDownlink = up.Payload.GetMACPayload().FCtrl.ADRAckReq; needsDownlink {
+				logger.Debug("Need downlink for ADRAckReq")
+			}
 		case ttnpb.MType_CONFIRMED_UP:
-			up = dev.RecentUplinks[i]
 			needsDownlink = true
-			break outer
-		case ttnpb.MType_JOIN_REQUEST, ttnpb.MType_REJOIN_REQUEST:
-			up = dev.RecentUplinks[i]
-			break outer
-		default:
-			logger.WithField("m_type", up.Payload.MHDR.MType).Warn("Unknown MType stored in RecentUplinks")
+			logger.Debug("Need downlink for confirmed uplink")
 		}
 	}
 	if !needsDownlink &&
@@ -496,6 +490,14 @@ func (ns *NetworkServer) sendQueueInvalidationToAS(ctx context.Context, dev *ttn
 	return ok, err
 }
 
+func appendRecentDownlink(recent []*ttnpb.DownlinkMessage, down *ttnpb.DownlinkMessage, window int) []*ttnpb.DownlinkMessage {
+	recent = append(recent, down)
+	if len(recent) > window {
+		recent = recent[len(recent)-window:]
+	}
+	return recent
+}
+
 // processDownlinkTask processes the most recent downlink task ready for execution, if such is available or wait until it is before processing it.
 // NOTE: ctx.Done() is not guaranteed to be respected by processDownlinkTask.
 func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
@@ -548,19 +550,20 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 				}
 
 				// NOTE: If no data uplink is found, we assume ADR is off on the device and, hence, data rate index 0 is used in computation.
-				maxUpLength := band.DataRates[0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks())
+				maxUpDRIdx := ttnpb.DATA_RATE_0
+			loop:
 				for i := len(dev.RecentUplinks) - 1; i >= 0; i-- {
 					switch dev.RecentUplinks[i].Payload.MHDR.MType {
 					case ttnpb.MType_JOIN_REQUEST:
-						break
-
+						break loop
 					case ttnpb.MType_UNCONFIRMED_UP, ttnpb.MType_CONFIRMED_UP:
 						if dev.RecentUplinks[i].Payload.GetMACPayload().FHDR.FCtrl.ADR {
-							maxUpLength = band.DataRates[dev.RecentUplinks[i].Settings.DataRateIndex].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks())
+							maxUpDRIdx = dev.RecentUplinks[i].Settings.DataRateIndex
 						}
-						break
+						break loop
 					}
 				}
+				maxUpLength := band.DataRates[maxUpDRIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks())
 
 				if dev.MACState.RxWindowsAvailable {
 					if len(dev.RecentUplinks) == 0 {
@@ -636,10 +639,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 								SessionKeys: dev.MACState.QueuedJoinAccept.Keys,
 							}
 							dev.MACState.QueuedJoinAccept = nil
-							dev.RecentDownlinks = append(dev.RecentDownlinks, down)
-							if len(dev.RecentDownlinks) > recentDownlinkCount {
-								dev.RecentDownlinks = append(dev.RecentDownlinks[:0], dev.RecentDownlinks[len(dev.RecentDownlinks)-recentDownlinkCount:]...)
-							}
+							dev.RecentDownlinks = appendRecentDownlink(dev.RecentDownlinks, down, recentDownlinkCount)
 							return dev, []string{
 								"ids.dev_addr",
 								"mac_state.pending_join_request",
@@ -707,10 +707,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 								sendInvalidation = func() (bool, error) { return ns.sendQueueInvalidationToAS(ctx, dev, genDown.FCnt) }
 							}
 							dev.MACState.RxWindowsAvailable = false
-							dev.RecentDownlinks = append(dev.RecentDownlinks, down)
-							if len(dev.RecentDownlinks) > recentDownlinkCount {
-								dev.RecentDownlinks = append(dev.RecentDownlinks[:0], dev.RecentDownlinks[len(dev.RecentDownlinks)-recentDownlinkCount:]...)
-							}
+							dev.RecentDownlinks = appendRecentDownlink(dev.RecentDownlinks, down, recentDownlinkCount)
 							return dev, []string{
 								"mac_state",
 								"queued_application_downlinks",
@@ -794,10 +791,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 									sendInvalidation = func() (bool, error) { return ns.sendQueueInvalidationToAS(ctx, dev, genDown.FCnt) }
 								}
 								dev.MACState.RxWindowsAvailable = false
-								dev.RecentDownlinks = append(dev.RecentDownlinks, down)
-								if len(dev.RecentDownlinks) > recentDownlinkCount {
-									dev.RecentDownlinks = append(dev.RecentDownlinks[:0], dev.RecentDownlinks[len(dev.RecentDownlinks)-recentDownlinkCount:]...)
-								}
+								dev.RecentDownlinks = appendRecentDownlink(dev.RecentDownlinks, down, recentDownlinkCount)
 								return dev, []string{
 									"mac_state",
 									"queued_application_downlinks",
@@ -888,10 +882,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						if genDown.ApplicationDownlink == nil && len(dev.QueuedApplicationDownlinks) > 0 && dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 							sendInvalidation = func() (bool, error) { return ns.sendQueueInvalidationToAS(ctx, dev, genDown.FCnt) }
 						}
-						dev.RecentDownlinks = append(dev.RecentDownlinks, down)
-						if len(dev.RecentDownlinks) > recentDownlinkCount {
-							dev.RecentDownlinks = append(dev.RecentDownlinks[:0], dev.RecentDownlinks[len(dev.RecentDownlinks)-recentDownlinkCount:]...)
-						}
+						dev.RecentDownlinks = appendRecentDownlink(dev.RecentDownlinks, down, recentDownlinkCount)
 						return dev, []string{
 							"mac_state",
 							"queued_application_downlinks",
@@ -926,7 +917,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 		}
 
 		if !nextDownlinkAt.IsZero() {
-			logger.WithField("start_at", nextDownlinkAt.UTC()).Debug("Add downlink task")
+			logger.WithField("start_at", nextDownlinkAt.UTC()).Debug("Add downlink task after downlink")
 			if err := ns.downlinkTasks.Add(ctx, devID, nextDownlinkAt, true); err != nil {
 				addErr = true
 				logger.WithError(err).Error("Failed to add downlink task after downlink")
