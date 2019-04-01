@@ -147,7 +147,7 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 	cmdBuf := make([]byte, 0, maxDownLen)
 	for _, cmd := range cmds {
 		var err error
-		logger.WithField("cid", cmd.CID).Debug("Adding MAC command to buffer...")
+		logger.WithField("cid", cmd.CID).Debug("Add MAC command to buffer")
 		cmdBuf, err = spec.AppendDownlink(cmdBuf, *cmd)
 
 		if err != nil {
@@ -200,7 +200,7 @@ outer:
 		down, dev.QueuedApplicationDownlinks = dev.QueuedApplicationDownlinks[0], dev.QueuedApplicationDownlinks[1:]
 
 		if len(down.FRMPayload) > int(maxDownLen) {
-			logger.Warn("Application downlink present, but the payload is too long, informing Application Server...")
+			logger.Warn("Application downlink present, but the payload is too long, inform Application Server")
 			ok, err := ns.handleASUplink(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, &ttnpb.ApplicationUp{
 				EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 				CorrelationIDs:       append(events.CorrelationIDsFromContext(ctx), down.CorrelationIDs...),
@@ -437,7 +437,7 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *ttnpb
 			},
 		}
 
-		logger.WithField("path_count", len(req.DownlinkPaths)).Debug("Scheduling downlink...")
+		logger.WithField("path_count", len(req.DownlinkPaths)).Debug("Schedule downlink")
 		res, err := ttnpb.NewNsGsClient(a.peer.Conn()).ScheduleDownlink(ctx, down, ns.WithClusterAuth())
 		if err != nil {
 			errs = append(errs, err)
@@ -487,7 +487,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 			"started_at", time.Now().UTC(),
 		))
 		ctx = log.NewContext(ctx, logger)
-		logger.WithField("start_at", t).Debug("Processing downlink task...")
+		logger.WithField("start_at", t).Debug("Process downlink task")
 
 		var sendInvalidation func() (bool, error)
 		var nextDownlinkAt time.Time
@@ -866,12 +866,12 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 			return err
 
 		case err != nil && errors.Resemble(err, errNoDownlink):
-			logger.Debug("No downlink to send, skipping downlink slot...")
+			logger.Debug("No downlink to send, skip downlink slot")
 			return nil
 		}
 
 		if err != nil && errors.Resemble(err, errScheduleTooSoon) {
-			logger.Debug("Downlink scheduled too soon, skipping downlink slot...")
+			logger.Debug("Downlink scheduled too soon, skip downlink slot")
 		} else if err != nil {
 			setErr = true
 			logger.WithError(err).Warn("Failed to update device in registry")
@@ -883,7 +883,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 		}
 
 		if !nextDownlinkAt.IsZero() {
-			logger.WithField("start_at", nextDownlinkAt.UTC()).Debug("Adding downlink task...")
+			logger.WithField("start_at", nextDownlinkAt.UTC()).Debug("Add downlink task")
 			if err := ns.downlinkTasks.Add(ctx, devID, nextDownlinkAt, true); err != nil {
 				addErr = true
 				logger.WithError(err).Error("Failed to add downlink task after downlink")

@@ -130,7 +130,7 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 				if dev.MACState.GetPendingJoinRequest().GetCFList() != nil {
 					_, band, err := getDeviceBandVersion(dev, ns.FrequencyPlans)
 					if err != nil {
-						logger.WithError(err).Warn("Failed to get device's versioned band, skipping...")
+						logger.WithError(err).Warn("Failed to get device's versioned band, skip")
 						return true
 					}
 
@@ -150,7 +150,7 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 
 					case ttnpb.CFListType_CHANNEL_MASKS:
 						if len(dev.MACState.CurrentParameters.Channels) != len(dev.MACState.PendingJoinRequest.CFList.ChMasks) {
-							logger.Warn("Mismatch in CFList mask count and configured channel count, skipping...")
+							logger.Warn("Mismatch in CFList mask count and configured channel count, skip")
 							return true
 						}
 						for i, m := range dev.MACState.PendingJoinRequest.CFList.ChMasks {
@@ -215,10 +215,10 @@ outer:
 		} else if !resetsFCnt {
 			if fCnt == dev.matchedSession.LastFCntUp {
 				// TODO: Handle accordingly (https://github.com/TheThingsNetwork/lorawan-stack/issues/356)
-				logger.Debug("Possible uplink retransmission encountered, skipping...")
+				logger.Debug("Possible uplink retransmission encountered, skip")
 				continue outer
 			} else if fCnt < dev.matchedSession.LastFCntUp {
-				logger.Debug("FCnt too low, skipping...")
+				logger.Debug("FCnt too low, skip")
 				continue outer
 			}
 
@@ -227,11 +227,11 @@ outer:
 			if dev.MACState.LoRaWANVersion.HasMaxFCntGap() {
 				_, band, err := getDeviceBandVersion(dev.EndDevice, ns.FrequencyPlans)
 				if err != nil {
-					logger.WithError(err).Warn("Failed to get device's versioned band, skipping...")
+					logger.WithError(err).Warn("Failed to get device's versioned band, skip")
 					continue
 				}
 				if gap > uint32(band.MaxFCntGap) {
-					logger.Debug("FCnt gap too high, skipping...")
+					logger.Debug("FCnt gap too high, skip")
 					continue outer
 				}
 			}
@@ -257,7 +257,7 @@ outer:
 		return matching[i].gap < matching[j].gap
 	})
 
-	logger.WithField("device_count", len(matching)).Debug("Performing MIC checks on devices with matching frame counters...")
+	logger.WithField("device_count", len(matching)).Debug("Perform MIC checks on devices with matching frame counters")
 	for _, dev := range matching {
 		logger := logger.WithFields(log.Fields(
 			"device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers),
@@ -268,19 +268,19 @@ outer:
 			if len(dev.RecentDownlinks) == 0 {
 				// Uplink acknowledges a downlink, but no downlink was sent to the device,
 				// hence it must be the wrong device.
-				logger.Debug("Uplink contains ACK, but no downlink was sent to device, skipping...")
+				logger.Debug("Uplink contains ACK, but no downlink was sent to device, skip")
 				continue
 			}
 		}
 
 		if dev.matchedSession.FNwkSIntKey == nil || len(dev.matchedSession.FNwkSIntKey.Key) == 0 {
-			logger.Warn("Device missing FNwkSIntKey in registry, skipping...")
+			logger.Warn("Device missing FNwkSIntKey in registry, skip")
 			continue
 		}
 
 		fNwkSIntKey, err := cryptoutil.UnwrapAES128Key(*dev.matchedSession.FNwkSIntKey, ns.KeyVault)
 		if err != nil {
-			logger.WithField("kek_label", dev.matchedSession.FNwkSIntKey.KEKLabel).WithError(err).Warn("Failed to unwrap FNwkSIntKey, skipping...")
+			logger.WithField("kek_label", dev.matchedSession.FNwkSIntKey.KEKLabel).WithError(err).Warn("Failed to unwrap FNwkSIntKey, skip")
 			continue
 		}
 
@@ -294,13 +294,13 @@ outer:
 			)
 		} else {
 			if dev.matchedSession.SNwkSIntKey == nil || len(dev.matchedSession.SNwkSIntKey.Key) == 0 {
-				logger.Warn("Device missing SNwkSIntKey in registry, skipping...")
+				logger.Warn("Device missing SNwkSIntKey in registry, skip")
 				continue
 			}
 
 			sNwkSIntKey, err := cryptoutil.UnwrapAES128Key(*dev.matchedSession.SNwkSIntKey, ns.KeyVault)
 			if err != nil {
-				logger.WithField("kek_label", dev.matchedSession.SNwkSIntKey.KEKLabel).WithError(err).Warn("Failed to unwrap SNwkSIntKey, skipping...")
+				logger.WithField("kek_label", dev.matchedSession.SNwkSIntKey.KEKLabel).WithError(err).Warn("Failed to unwrap SNwkSIntKey, skip")
 				continue
 			}
 
@@ -370,7 +370,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	))
 	ctx = log.NewContext(ctx, logger)
 
-	logger.Debug("Matching device...")
+	logger.Debug("Match device")
 	matched, ses, err := ns.matchDevice(ctx, up)
 	if err != nil {
 		registerDropDataUplink(ctx, nil, up, err)
@@ -409,7 +409,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 		asCtx, cancel := context.WithTimeout(ctx, appQueueUpdateTimeout)
 		defer cancel()
 
-		logger.Debug("Sending downlink (n)ack to Application Server...")
+		logger.Debug("Send downlink (n)ack to Application Server")
 		ok, err := ns.handleASUplink(asCtx, matched.EndDeviceIdentifiers.ApplicationIdentifiers, asUp)
 		if err != nil {
 			return err
@@ -455,7 +455,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	logger = logger.WithField("mac_count", len(cmds))
 	ctx = log.NewContext(ctx, logger)
 
-	logger.Debug("Waiting for deduplication window to close...")
+	logger.Debug("Wait for deduplication window to close")
 	select {
 	case <-ctx.Done():
 		return ctx.Err()
@@ -485,7 +485,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 		},
 		func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if stored == nil {
-				logger.Warn("Device deleted during uplink handling, dropping...")
+				logger.Warn("Device deleted during uplink handling, drop")
 				handleErr = true
 				return nil, nil, errOutdatedData
 			}
@@ -497,7 +497,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 				storedSes = stored.PendingSession
 			}
 			if !bytes.Equal(storedSes.GetSessionKeyID(), ses.SessionKeyID) {
-				logger.Warn("Device changed session during uplink handling, dropping...")
+				logger.Warn("Device changed session during uplink handling, drop")
 				handleErr = true
 				return nil, nil, errOutdatedData
 			}
@@ -512,7 +512,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 				logger.WithFields(log.Fields(
 					"stored_f_cnt", storedSes.GetLastFCntUp(),
 					"got_f_cnt", ses.LastFCntUp,
-				)).Warn("A more recent uplink was received by device during uplink handling, dropping...")
+				)).Warn("A more recent uplink was received by device during uplink handling, drop")
 				handleErr = true
 				return nil, nil, errOutdatedData
 			}
@@ -521,7 +521,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 				stored.Session = ses
 			} else if ses == matched.PendingSession {
 				// Device switched the session.
-				logger.Debug("Switching to pending session")
+				logger.Debug("Switch to pending session")
 				stored.PendingSession = ses
 				if stored.PendingSession.DevAddr != stored.MACState.PendingJoinRequest.DevAddr {
 					panic("Pending session does not match the join request")
@@ -601,7 +601,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 				var cmd *ttnpb.MACCommand
 				cmd, cmds = cmds[0], cmds[1:]
 				logger := logger.WithField("cid", cmd.CID)
-				logger.Debug("Handling MAC command...")
+				logger.Debug("Handle MAC command")
 				switch cmd.CID {
 				case ttnpb.CID_RESET:
 					err = handleResetInd(ctx, stored, cmd.GetResetInd(), ns.FrequencyPlans, ns.defaultMACSettings)
@@ -611,7 +611,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 					pld := cmd.GetLinkADRAns()
 					dupCount := 0
 					if stored.MACState.LoRaWANVersion == ttnpb.MAC_V1_0_2 {
-						logger.Debug("Counting duplicates...")
+						logger.Debug("Count duplicates")
 						for _, dup := range cmds {
 							if dup.CID != ttnpb.CID_LINK_ADR {
 								break
@@ -670,7 +670,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 				default:
 					h, ok := ns.macHandlers.Load(cmd.CID)
 					if !ok {
-						logger.WithField("cid", cmd.CID).Warn("Unknown MAC command received, skipping the rest...")
+						logger.WithField("cid", cmd.CID).Warn("Unknown MAC command received, skip the rest")
 						break outer
 					}
 					err = h.(MACHandler)(ctx, stored, cmd.GetRawPayload(), up)
@@ -731,7 +731,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	asCtx, cancel := context.WithTimeout(ctx, appQueueUpdateTimeout)
 	defer cancel()
 
-	logger.Debug("Sending uplink to Application Server...")
+	logger.Debug("Send uplink to Application Server")
 	ok, err := ns.handleASUplink(asCtx, matched.EndDeviceIdentifiers.ApplicationIdentifiers, &ttnpb.ApplicationUp{
 		EndDeviceIdentifiers: matched.EndDeviceIdentifiers,
 		CorrelationIDs:       up.CorrelationIDs,
@@ -752,7 +752,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 		registerForwardDataUplink(ctx, &matched.EndDeviceIdentifiers, up)
 	}
 	startAt := time.Now().UTC()
-	logger.WithField("start_at", startAt).Debug("Adding downlink task...")
+	logger.WithField("start_at", startAt).Debug("Add downlink task")
 	return ns.downlinkTasks.Add(ctx, matched.EndDeviceIdentifiers, startAt, true)
 }
 
@@ -842,7 +842,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 		return err
 	}
 
-	logger.Debug("Sending join-request to Join Server...")
+	logger.Debug("Send join-request to Join Server")
 	resp, err := js.HandleJoin(ctx, req, ns.WithClusterAuth())
 	if err != nil {
 		logger.WithError(err).Warn("Join Server failed to handle join-request")
@@ -932,7 +932,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 	logger = logger.WithField(
 		"application_uid", unique.ID(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers),
 	)
-	logger.Debug("Sending join-accept to AS...")
+	logger.Debug("Send join-accept to AS")
 	_, err = ns.handleASUplink(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, &ttnpb.ApplicationUp{
 		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 			ApplicationIdentifiers: dev.EndDeviceIdentifiers.ApplicationIdentifiers,
@@ -954,7 +954,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 	}
 
 	startAt := time.Now().UTC()
-	logger.WithField("start_at", startAt).Debug("Adding downlink task...")
+	logger.WithField("start_at", startAt).Debug("Add downlink task")
 	if err := ns.downlinkTasks.Add(ctx, dev.EndDeviceIdentifiers, startAt, true); err != nil {
 		return err
 	}
@@ -1001,7 +1001,7 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	))
 	ctx = log.NewContext(ctx, logger)
 
-	logger.Debug("Deduplicating uplink...")
+	logger.Debug("Deduplicate uplink")
 	acc, stopDedup, ok := ns.deduplicateUplink(ctx, up)
 	if ok {
 		logger.Debug("Dropped duplicate uplink")
@@ -1011,7 +1011,7 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	registerReceiveUplink(ctx, up)
 
 	defer func(up *ttnpb.UplinkMessage) {
-		logger.Debug("Waiting for collection window to be closed...")
+		logger.Debug("Wait for collection window to be closed")
 		<-ns.collectionDone(ctx, up)
 		stopDedup()
 		logger.Debug("Collection window closed, stopped deduplication")
@@ -1020,13 +1020,13 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	up = deepcopy.Copy(up).(*ttnpb.UplinkMessage)
 	switch up.Payload.MType {
 	case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:
-		logger.Debug("Handling data uplink...")
+		logger.Debug("Handle data uplink")
 		return ttnpb.Empty, ns.handleUplink(ctx, up, acc)
 	case ttnpb.MType_JOIN_REQUEST:
-		logger.Debug("Handling join-request...")
+		logger.Debug("Handle join-request")
 		return ttnpb.Empty, ns.handleJoin(ctx, up, acc)
 	case ttnpb.MType_REJOIN_REQUEST:
-		logger.Debug("Handling rejoin-request...")
+		logger.Debug("Handle rejoin-request")
 		return ttnpb.Empty, ns.handleRejoin(ctx, up, acc)
 	default:
 		logger.Warn("Unmatched MType")
