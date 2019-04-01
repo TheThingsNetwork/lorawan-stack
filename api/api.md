@@ -95,6 +95,16 @@
   
   
 
+- [lorawan-stack/api/configuration_services.proto](#lorawan-stack/api/configuration_services.proto)
+    - [FrequencyPlanDescription](#ttn.lorawan.v3.FrequencyPlanDescription)
+    - [ListFrequencyPlansRequest](#ttn.lorawan.v3.ListFrequencyPlansRequest)
+    - [ListFrequencyPlansResponse](#ttn.lorawan.v3.ListFrequencyPlansResponse)
+  
+  
+  
+    - [Configuration](#ttn.lorawan.v3.Configuration)
+  
+
 - [lorawan-stack/api/contact_info.proto](#lorawan-stack/api/contact_info.proto)
     - [ContactInfo](#ttn.lorawan.v3.ContactInfo)
     - [ContactInfoValidation](#ttn.lorawan.v3.ContactInfoValidation)
@@ -1380,6 +1390,80 @@ PeerInfo
  
 
  
+
+ 
+
+
+
+<a name="lorawan-stack/api/configuration_services.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## lorawan-stack/api/configuration_services.proto
+
+
+
+<a name="ttn.lorawan.v3.FrequencyPlanDescription"></a>
+
+### FrequencyPlanDescription
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [string](#string) |  |  |
+| base_id | [string](#string) |  | The ID of the frequency that the current frequency plan is based on. |
+| name | [string](#string) |  |  |
+| base_frequency | [uint32](#uint32) |  | Base frequency in MHz for hardware support (433, 470, 868 or 915) |
+
+
+
+
+
+
+<a name="ttn.lorawan.v3.ListFrequencyPlansRequest"></a>
+
+### ListFrequencyPlansRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| base_frequency | [uint32](#uint32) |  | Optional base frequency in MHz for hardware support (433, 470, 868 or 915) |
+
+
+
+
+
+
+<a name="ttn.lorawan.v3.ListFrequencyPlansResponse"></a>
+
+### ListFrequencyPlansResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| frequency_plans | [FrequencyPlanDescription](#ttn.lorawan.v3.FrequencyPlanDescription) | repeated |  |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+
+<a name="ttn.lorawan.v3.Configuration"></a>
+
+### Configuration
+
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| ListFrequencyPlans | [ListFrequencyPlansRequest](#ttn.lorawan.v3.ListFrequencyPlansRequest) | [ListFrequencyPlansResponse](#ttn.lorawan.v3.ListFrequencyPlansResponse) |  |
 
  
 

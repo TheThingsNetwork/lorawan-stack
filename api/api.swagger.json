@@ -1460,6 +1460,32 @@
         ]
       }
     },
+    "/configuration/frequency-plans": {
+      "get": {
+        "operationId": "ListFrequencyPlans",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ListFrequencyPlansResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "base_frequency",
+            "description": "Optional base frequency in MHz for hardware support (433, 470, 868 or 915).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "Configuration"
+        ]
+      }
+    },
     "/contact_info/validation": {
       "post": {
         "operationId": "RequestValidation",
@@ -6723,6 +6749,26 @@
         }
       }
     },
+    "v3FrequencyPlanDescription": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "base_id": {
+          "type": "string",
+          "description": "The ID of the frequency that the current frequency plan is based on."
+        },
+        "name": {
+          "type": "string"
+        },
+        "base_frequency": {
+          "type": "integer",
+          "format": "int64",
+          "title": "Base frequency in MHz for hardware support (433, 470, 868 or 915)"
+        }
+      }
+    },
     "v3Gateway": {
       "type": "object",
       "properties": {
@@ -7165,6 +7211,17 @@
         "kek_label": {
           "type": "string",
           "description": "The label of the RFC 3394 key-encryption-key (KEK) that was used to encrypt the key."
+        }
+      }
+    },
+    "v3ListFrequencyPlansResponse": {
+      "type": "object",
+      "properties": {
+        "frequency_plans": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3FrequencyPlanDescription"
+          }
         }
       }
     },
