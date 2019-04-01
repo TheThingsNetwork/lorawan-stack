@@ -82,6 +82,10 @@ storiesOf('Button', module)
       <Button message="Default" large disabled />
       <br /><br />
       <Button message="Default" large busy />
+      <br /><br />
+      <Button.Link message="Router Link" to="/test" />
+      <br /><br />
+      <Button.AnchorLink message="Anchor Link" href="#" />
     </div>
   ))
   .add('Warning', () => (
