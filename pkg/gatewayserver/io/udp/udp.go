@@ -348,7 +348,7 @@ func (s *srv) handleDown(ctx context.Context, state *state) error {
 				sent:           time.Now(),
 			})
 			write := func() {
-				logger.Debug("Writing downlink message")
+				logger.Debug("Write downlink message")
 				if err := s.write(packet); err != nil {
 					logger.WithError(err).Warn("Failed to write downlink message")
 					// TODO: Report to Network Server: https://github.com/TheThingsNetwork/lorawan-stack/issues/76
@@ -367,7 +367,7 @@ func (s *srv) handleDown(ctx context.Context, state *state) error {
 				break
 			}
 			d := time.Until(gatewayTime.Add(-s.config.ScheduleLateTime))
-			logger.WithField("duration", d).Debug("Waiting to schedule downlink message late")
+			logger.WithField("duration", d).Debug("Wait to schedule downlink message late")
 			time.AfterFunc(d, write)
 		case <-healthCheck.C:
 			lastSeenPull := time.Unix(0, atomic.LoadInt64(&state.lastSeenPull))
