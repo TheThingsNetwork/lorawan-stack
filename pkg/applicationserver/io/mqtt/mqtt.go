@@ -112,7 +112,7 @@ func (c *connection) setup(ctx context.Context) error {
 				return
 			}
 			if pkt != nil {
-				logger.Debugf("Scheduling %s packet", packet.Name[pkt.PacketType()])
+				logger.Debugf("Schedule %s packet", packet.Name[pkt.PacketType()])
 				controlCh <- pkt
 			}
 		}
@@ -153,7 +153,7 @@ func (c *connection) setup(ctx context.Context) error {
 					logger.WithError(err).Warn("Failed to marshal upstream message")
 					continue
 				}
-				logger.Info("Publishing upstream message")
+				logger.Info("Publish upstream message")
 				c.session.Publish(&packet.PublishPacket{
 					TopicName:  topic.Join(topicParts),
 					TopicParts: topicParts,
@@ -180,7 +180,7 @@ func (c *connection) setup(ctx context.Context) error {
 				if !ok {
 					return
 				}
-				logger.Debug("Writing publish packet")
+				logger.Debug("Write publish packet")
 				err = c.mqtt.Send(pkt)
 			}
 			if err != nil {
@@ -323,7 +323,7 @@ func (c *connection) deliver(pkt *packet.PublishPacket) {
 	logger.WithFields(log.Fields(
 		"device_uid", unique.ID(c.io.Context(), ids),
 		"count", len(items.Downlinks),
-	)).Debug("Handling downlink messages")
+	)).Debug("Handle downlink messages")
 	if err := op(c.server, c.io.Context(), ids, items.Downlinks); err != nil {
 		logger.WithError(err).Warn("Failed to handle downlink messages")
 	}

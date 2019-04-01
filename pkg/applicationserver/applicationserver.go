@@ -264,7 +264,7 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 				encryptedItem.SessionKeyID = session.SessionKeyID
 				encryptedItem.FCnt = session.LastAFCntDown + 1
 				if err := as.encodeAndEncrypt(ctx, dev, session, &encryptedItem, link.DefaultFormatters); err != nil {
-					logger.WithError(err).Warn("Dropping downlink message; encoding and encryption failed")
+					logger.WithError(err).Warn("Drop downlink message; encoding and encryption failed")
 					return nil, nil, err
 				}
 				encryptedItem.DecodedPayload = nil
@@ -424,7 +424,7 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 				logger.Debug("Received AppSKey from Network Server")
 				appSKey = *joinAccept.AppSKey
 			} else {
-				logger.Debug("Fetching AppSKey from Join Server...")
+				logger.Debug("Fetch AppSKey from Join Server")
 				key, err := as.fetchAppSKey(ctx, ids, joinAccept.SessionKeyID)
 				if err != nil {
 					return nil, nil, errFetchAppSKey.WithCause(err)
@@ -481,7 +481,7 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 			if dev.Session == nil || !bytes.Equal(dev.Session.SessionKeyID, uplink.SessionKeyID) {
 				previousSession := dev.Session
 				if dev.PendingSession != nil && bytes.Equal(dev.PendingSession.SessionKeyID, uplink.SessionKeyID) {
-					logger.Debug("Switching to pending session")
+					logger.Debug("Switch to pending session")
 					dev.Session = dev.PendingSession
 					mask = append(mask, "session")
 				} else {
@@ -632,7 +632,7 @@ func (as *ApplicationServer) recalculateDownlinkQueue(ctx context.Context, dev *
 	if previousSession != nil {
 		logger = logger.WithField("previous_session_key_id", previousSession.SessionKeyID)
 	}
-	logger.Debug("Recalculating downlink queue")
+	logger.Debug("Recalculate downlink queue")
 	defer func() {
 		// If something fails, clear the downlink queue as an empty downlink queue is better than a downlink queue
 		// with items that are encrypted with the wrong AppSKey.
@@ -671,20 +671,20 @@ func (as *ApplicationServer) recalculateDownlinkQueue(ctx context.Context, dev *
 			}
 		}
 		if oldSession == nil || oldSession.AppSKey == nil {
-			logger.Warn("Dropping downlink message; session not found or AppSKey not available")
+			logger.Warn("Drop downlink message; session not found or AppSKey not available")
 			registerDropDownlink(ctx, dev.EndDeviceIdentifiers, oldItem, err)
 			continue
 		}
 		// TODO: Cache unwrapped keys (https://github.com/TheThingsNetwork/lorawan-stack/issues/36)
 		oldAppSKey, err := cryptoutil.UnwrapAES128Key(*oldSession.AppSKey, as.KeyVault)
 		if err != nil {
-			logger.WithError(err).Warn("Dropping downlink message; failed to unwrap AppSKey for decryption")
+			logger.WithError(err).Warn("Drop downlink message; failed to unwrap AppSKey for decryption")
 			registerDropDownlink(ctx, dev.EndDeviceIdentifiers, oldItem, err)
 			continue
 		}
 		frmPayload, err := crypto.DecryptDownlink(oldAppSKey, oldSession.DevAddr, oldItem.FCnt, oldItem.FRMPayload)
 		if err != nil {
-			logger.WithError(err).Warn("Dropping downlink message; failed to decrypt")
+			logger.WithError(err).Warn("Drop downlink message; failed to decrypt")
 			registerDropDownlink(ctx, dev.EndDeviceIdentifiers, oldItem, err)
 			continue
 		}
@@ -698,7 +698,7 @@ func (as *ApplicationServer) recalculateDownlinkQueue(ctx context.Context, dev *
 		}
 		newItem.FRMPayload, err = crypto.EncryptDownlink(newAppSKey, newSession.DevAddr, newItem.FCnt, frmPayload)
 		if err != nil {
-			logger.WithError(err).Warn("Dropping downlink message; failed to encrypt")
+			logger.WithError(err).Warn("Drop downlink message; failed to encrypt")
 			registerDropDownlink(ctx, dev.EndDeviceIdentifiers, oldItem, err)
 			continue
 		}
