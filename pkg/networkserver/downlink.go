@@ -376,6 +376,24 @@ func downlinkPathsFromMetadata(mds ...*ttnpb.RxMetadata) []downlinkPath {
 	return append(head, tail...)
 }
 
+// downlinkPathsForClassA returns the last paths, if any, of the given uplink messages.
+// This function returns whether class A downlink can be made in either window considering the given Rx delay.
+func downlinkPathsForClassA(rxDelay ttnpb.RxDelay, ups ...*ttnpb.UplinkMessage) (rx1, rx2 bool, paths []downlinkPath) {
+	if rxDelay == ttnpb.RX_DELAY_0 {
+		rxDelay = ttnpb.RX_DELAY_1
+	}
+	maxDelta := time.Duration(rxDelay) * time.Second
+	for i := len(ups) - 1; i >= 0; i-- {
+		up := ups[i]
+		delta := time.Now().Sub(up.ReceivedAt)
+		rx1, rx2 := delta < maxDelta, delta < maxDelta+time.Second
+		if paths := downlinkPathsFromMetadata(up.RxMetadata...); len(paths) > 0 {
+			return rx1, rx2, paths
+		}
+	}
+	return false, false, nil
+}
+
 func downlinkPathsFromRecentUplinks(ups ...*ttnpb.UplinkMessage) []downlinkPath {
 	for i := len(ups) - 1; i >= 0; i-- {
 		if paths := downlinkPathsFromMetadata(ups[i].RxMetadata...); len(paths) > 0 {
@@ -560,30 +578,39 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						dev.MACState.CurrentParameters.Channels[int(rx1ChIdx)].DownlinkFrequency == 0 {
 						return nil, nil, errCorruptedMACState
 					}
-
 					rx1DRIdx, err := band.Rx1DataRate(up.Settings.DataRateIndex, dev.MACState.CurrentParameters.Rx1DataRateOffset, dev.MACState.CurrentParameters.DownlinkDwellTime)
 					if err != nil {
 						return nil, nil, err
 					}
+					rx1Freq := dev.MACState.CurrentParameters.Channels[int(rx1ChIdx)].DownlinkFrequency
 
 					req := &ttnpb.TxRequest{
-						Class:            ttnpb.CLASS_A,
-						Rx1Delay:         dev.MACState.CurrentParameters.Rx1Delay,
-						Rx1Frequency:     dev.MACState.CurrentParameters.Channels[int(rx1ChIdx)].DownlinkFrequency,
-						Rx1DataRateIndex: rx1DRIdx,
+						Class: ttnpb.CLASS_A,
 					}
-
 					switch {
 					case dev.MACState.QueuedJoinAccept != nil:
 						// Join-accept downlink for Class A/B/C in Rx1/Rx2
 						req.Rx1Delay = ttnpb.RxDelay(band.JoinAcceptDelay1 / time.Second)
-						req.Rx2DataRateIndex = dev.MACState.CurrentParameters.Rx2DataRateIndex
-						req.Rx2Frequency = dev.MACState.CurrentParameters.Rx2Frequency
+						rx1, rx2, paths := downlinkPathsForClassA(
+							ttnpb.RxDelay(band.JoinAcceptDelay1/time.Second),
+							dev.RecentUplinks...,
+						)
+						if rx1 {
+							req.Rx1Frequency = rx1Freq
+							req.Rx1DataRateIndex = rx1DRIdx
+						}
+						if rx2 {
+							req.Rx2Frequency = dev.MACState.CurrentParameters.Rx2Frequency
+							req.Rx2DataRateIndex = dev.MACState.CurrentParameters.Rx2DataRateIndex
+						}
+						if !rx1 && !rx2 {
+							return nil, nil, errNoPath
+						}
 
 						down, _, err := ns.scheduleDownlinkByPaths(
 							log.NewContext(ctx, logger.WithFields(log.Fields(
-								"attempt_rx1", true,
-								"attempt_rx2", true,
+								"attempt_rx1", rx1,
+								"attempt_rx2", rx2,
 								"downlink_class", req.Class,
 								"downlink_type", "join-accept",
 								"rx1_delay", req.Rx1Delay,
@@ -594,7 +621,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 							req,
 							dev.EndDeviceIdentifiers,
 							dev.MACState.QueuedJoinAccept.Payload,
-							downlinkPathsFromRecentUplinks(dev.RecentUplinks...)...,
+							paths...,
 						)
 						if err != nil {
 							scheduleErr = true
@@ -622,8 +649,23 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 
 					case dev.MACState.DeviceClass == ttnpb.CLASS_A:
 						// Data downlink for Class A in Rx1/Rx2
-						req.Rx2DataRateIndex = dev.MACState.CurrentParameters.Rx2DataRateIndex
-						req.Rx2Frequency = dev.MACState.CurrentParameters.Rx2Frequency
+						req.Rx1Delay = dev.MACState.CurrentParameters.Rx1Delay
+						rx1, rx2, paths := downlinkPathsForClassA(
+							dev.MACState.CurrentParameters.Rx1Delay,
+							dev.RecentUplinks...,
+						)
+						if rx1 {
+							req.Rx1Frequency = rx1Freq
+							req.Rx1DataRateIndex = rx1DRIdx
+						}
+						if rx2 {
+							req.Rx2Frequency = dev.MACState.CurrentParameters.Rx2Frequency
+							req.Rx2DataRateIndex = dev.MACState.CurrentParameters.Rx2DataRateIndex
+						}
+						if !rx1 && !rx2 {
+							return nil, nil, errNoPath
+						}
+
 						minDR := req.Rx1DataRateIndex
 						if req.Rx2DataRateIndex < minDR {
 							minDR = req.Rx2DataRateIndex
@@ -641,8 +683,8 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 
 						down, _, err := ns.scheduleDownlinkByPaths(
 							log.NewContext(ctx, logger.WithFields(log.Fields(
-								"attempt_rx1", true,
-								"attempt_rx2", true,
+								"attempt_rx1", rx1,
+								"attempt_rx2", rx2,
 								"downlink_class", req.Class,
 								"downlink_type", "data",
 								"rx1_delay", req.Rx1Delay,
@@ -653,7 +695,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 							req,
 							dev.EndDeviceIdentifiers,
 							genDown.Payload,
-							downlinkPathsFromRecentUplinks(dev.RecentUplinks...)...,
+							paths...,
 						)
 						if err != nil {
 							scheduleErr = true
@@ -675,7 +717,18 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						}
 
 					default:
-						// Data downlink for Class B/C in Rx1
+						// Data downlink for Class B/C in Rx1 if available
+						req.Rx1Delay = dev.MACState.CurrentParameters.Rx1Delay
+						rx1, _, paths := downlinkPathsForClassA(
+							dev.MACState.CurrentParameters.Rx1Delay,
+							dev.RecentUplinks...,
+						)
+						if rx1 {
+							req.Rx1Frequency = rx1Freq
+							req.Rx1DataRateIndex = rx1DRIdx
+						} else {
+							break
+						}
 
 						// NOTE: generateDownlink mutates the device, and since we may need to call it twice(Rx1/Rx2),
 						// we need to create a deep copy for the first call.
@@ -700,29 +753,16 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						}
 
 						if genDown.ApplicationDownlink != nil {
-							ctx = events.ContextWithCorrelationID(ctx, genDown.ApplicationDownlink.CorrelationIDs...)
-						}
-
-						var paths []downlinkPath
-						if genDown.ApplicationDownlink != nil && genDown.ApplicationDownlink.ClassBC != nil && genDown.ApplicationDownlink.ClassBC.AbsoluteTime == nil {
-							paths = make([]downlinkPath, 0, len(genDown.ApplicationDownlink.ClassBC.Gateways))
-							for _, gtw := range genDown.ApplicationDownlink.ClassBC.Gateways {
-								if gtw == nil || gtw.IsZero() {
-									continue
-								}
-								paths = append(paths, downlinkPath{
-									GatewayIdentifiers: gtw.GatewayIdentifiers,
-									DownlinkPath: &ttnpb.DownlinkPath{
-										Path: &ttnpb.DownlinkPath_Fixed{
-											Fixed: gtw,
-										},
-									},
-								})
+							if len(genDown.ApplicationDownlink.ClassBC.GetGateways()) > 0 ||
+								genDown.ApplicationDownlink.ClassBC.GetAbsoluteTime() != nil {
+								// Skip Rx1 when a fixed path or an absolute tranmission time is requested by the application.
+								// Gateway Server cannot schedule Rx1 on a fixed path as there is no uplink token.
+								// Also, it is highly unlikely and not verifiable by Network Server that Rx1 is at ClassBC.AbsoluteTime.
+								paths = nil
+							} else {
+								ctx = events.ContextWithCorrelationID(ctx, genDown.ApplicationDownlink.CorrelationIDs...)
 							}
-						} else if genDown.ApplicationDownlink == nil || genDown.ApplicationDownlink.ClassBC == nil {
-							paths = downlinkPathsFromRecentUplinks(dev.RecentUplinks...)
 						}
-						// NOTE: We must skip Rx1 if genDown.ApplicationDownlink.ClassBC.AbsoluteTime is set
 
 						if len(paths) > 0 {
 							down, downAt, err := ns.scheduleDownlinkByPaths(
