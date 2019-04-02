@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 	"reflect"
+	"runtime/trace"
 	"strings"
 
 	"github.com/gogo/protobuf/types"
@@ -65,6 +66,7 @@ func selectGatewayFields(ctx context.Context, query *gorm.DB, fieldMask *types.F
 }
 
 func (s *gatewayStore) CreateGateway(ctx context.Context, gtw *ttnpb.Gateway) (*ttnpb.Gateway, error) {
+	defer trace.StartRegion(ctx, "create gateway").End()
 	gtwModel := Gateway{
 		GatewayID: gtw.GatewayID, // The ID is not mutated by fromPB.
 	}
@@ -80,6 +82,7 @@ func (s *gatewayStore) CreateGateway(ctx context.Context, gtw *ttnpb.Gateway) (*
 }
 
 func (s *gatewayStore) FindGateways(ctx context.Context, ids []*ttnpb.GatewayIdentifiers, fieldMask *types.FieldMask) ([]*ttnpb.Gateway, error) {
+	defer trace.StartRegion(ctx, "find gateways").End()
 	idStrings := make([]string, len(ids))
 	for i, id := range ids {
 		idStrings[i] = id.GetGatewayID()
@@ -106,6 +109,7 @@ func (s *gatewayStore) FindGateways(ctx context.Context, ids []*ttnpb.GatewayIde
 }
 
 func (s *gatewayStore) GetGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers, fieldMask *types.FieldMask) (*ttnpb.Gateway, error) {
+	defer trace.StartRegion(ctx, "get gateway").End()
 	query := s.db.Scopes(withContext(ctx), withGatewayID(id.GetGatewayID()))
 	if id.EUI != nil {
 		query = query.Scopes(withGatewayEUI(EUI64(*id.EUI)))
@@ -124,6 +128,7 @@ func (s *gatewayStore) GetGateway(ctx context.Context, id *ttnpb.GatewayIdentifi
 }
 
 func (s *gatewayStore) UpdateGateway(ctx context.Context, gtw *ttnpb.Gateway, fieldMask *types.FieldMask) (updated *ttnpb.Gateway, err error) {
+	defer trace.StartRegion(ctx, "update gateway").End()
 	query := s.db.Scopes(withContext(ctx), withGatewayID(gtw.GetGatewayID()))
 	query = selectGatewayFields(ctx, query, fieldMask)
 	var gtwModel Gateway
@@ -145,12 +150,12 @@ func (s *gatewayStore) UpdateGateway(ctx context.Context, gtw *ttnpb.Gateway, fi
 		}
 	}
 	if !reflect.DeepEqual(oldAttributes, gtwModel.Attributes) {
-		if err = replaceAttributes(s.db, "gateway", gtwModel.ID, oldAttributes, gtwModel.Attributes); err != nil {
+		if err = replaceAttributes(ctx, s.db, "gateway", gtwModel.ID, oldAttributes, gtwModel.Attributes); err != nil {
 			return nil, err
 		}
 	}
 	if !reflect.DeepEqual(oldAntennas, gtwModel.Antennas) {
-		if err = replaceGatewayAntennas(s.db, gtwModel.ID, oldAntennas, gtwModel.Antennas); err != nil {
+		if err = replaceGatewayAntennas(ctx, s.db, gtwModel.ID, oldAntennas, gtwModel.Antennas); err != nil {
 			return nil, err
 		}
 	}
@@ -160,5 +165,6 @@ func (s *gatewayStore) UpdateGateway(ctx context.Context, gtw *ttnpb.Gateway, fi
 }
 
 func (s *gatewayStore) DeleteGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers) error {
+	defer trace.StartRegion(ctx, "delete gateway").End()
 	return deleteEntity(ctx, s.db, id.EntityIdentifiers())
 }

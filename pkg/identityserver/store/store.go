@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"regexp"
+	"runtime/trace"
 	"strings"
 	"time"
 
@@ -63,6 +64,7 @@ func convertError(err error) error {
 
 // Transact executes f in a db transaction.
 func Transact(ctx context.Context, db *gorm.DB, f func(db *gorm.DB) error) (err error) {
+	defer trace.StartRegion(ctx, "database transaction").End()
 	tx := db.Begin()
 	defer func() {
 		if p := recover(); p != nil {

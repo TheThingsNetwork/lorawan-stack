@@ -16,6 +16,7 @@ package store
 
 import (
 	"context"
+	"runtime/trace"
 
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -31,6 +32,7 @@ type oauthStore struct {
 }
 
 func (s *oauthStore) GetAuthorization(ctx context.Context, userIDs *ttnpb.UserIdentifiers, clientIDs *ttnpb.ClientIdentifiers) (*ttnpb.OAuthClientAuthorization, error) {
+	defer trace.StartRegion(ctx, "get authorization").End()
 	client, err := findEntity(ctx, s.db, clientIDs.EntityIdentifiers(), "id")
 	if err != nil {
 		return nil, err
@@ -56,6 +58,7 @@ func (s *oauthStore) GetAuthorization(ctx context.Context, userIDs *ttnpb.UserId
 }
 
 func (s *oauthStore) Authorize(ctx context.Context, authorization *ttnpb.OAuthClientAuthorization) (*ttnpb.OAuthClientAuthorization, error) {
+	defer trace.StartRegion(ctx, "create or update authorization").End()
 	client, err := findEntity(ctx, s.db, authorization.ClientIDs.EntityIdentifiers(), "id")
 	if err != nil {
 		return nil, err
@@ -91,6 +94,7 @@ func (s *oauthStore) Authorize(ctx context.Context, authorization *ttnpb.OAuthCl
 }
 
 func (s *oauthStore) DeleteAuthorization(ctx context.Context, userIDs *ttnpb.UserIdentifiers, clientIDs *ttnpb.ClientIdentifiers) error {
+	defer trace.StartRegion(ctx, "delete authorization").End()
 	client, err := findEntity(ctx, s.db, clientIDs.EntityIdentifiers(), "id")
 	if err != nil {
 		return err
@@ -107,6 +111,7 @@ func (s *oauthStore) DeleteAuthorization(ctx context.Context, userIDs *ttnpb.Use
 }
 
 func (s *oauthStore) CreateAuthorizationCode(ctx context.Context, code *ttnpb.OAuthAuthorizationCode) error {
+	defer trace.StartRegion(ctx, "create authorization code").End()
 	client, err := findEntity(ctx, s.db, code.ClientIDs.EntityIdentifiers(), "id")
 	if err != nil {
 		return err
@@ -136,6 +141,7 @@ func (s *oauthStore) CreateAuthorizationCode(ctx context.Context, code *ttnpb.OA
 }
 
 func (s *oauthStore) GetAuthorizationCode(ctx context.Context, code string) (*ttnpb.OAuthAuthorizationCode, error) {
+	defer trace.StartRegion(ctx, "get authorization code").End()
 	if code == "" {
 		return nil, errAuthorizationCodeNotFound
 	}
@@ -155,6 +161,7 @@ func (s *oauthStore) DeleteAuthorizationCode(ctx context.Context, code string) e
 	if code == "" {
 		return errAuthorizationCodeNotFound
 	}
+	defer trace.StartRegion(ctx, "delete authorization code").End()
 	err := s.db.Scopes(withContext(ctx)).Where(AuthorizationCode{
 		Code: code,
 	}).Delete(&AuthorizationCode{}).Error
@@ -168,6 +175,7 @@ func (s *oauthStore) DeleteAuthorizationCode(ctx context.Context, code string) e
 }
 
 func (s *oauthStore) CreateAccessToken(ctx context.Context, token *ttnpb.OAuthAccessToken, previousID string) error {
+	defer trace.StartRegion(ctx, "create access token").End()
 	client, err := findEntity(ctx, s.db, token.ClientIDs.EntityIdentifiers(), "id")
 	if err != nil {
 		return err
@@ -201,6 +209,7 @@ func (s *oauthStore) GetAccessToken(ctx context.Context, id string) (*ttnpb.OAut
 	if id == "" {
 		return nil, errAccessTokenNotFound
 	}
+	defer trace.StartRegion(ctx, "get access token").End()
 	var tokenModel AccessToken
 	err := s.db.Scopes(withContext(ctx)).Where(AccessToken{
 		TokenID: id,
@@ -217,6 +226,7 @@ func (s *oauthStore) DeleteAccessToken(ctx context.Context, id string) error {
 	if id == "" {
 		return errAccessTokenNotFound
 	}
+	defer trace.StartRegion(ctx, "delete access token").End()
 	err := s.db.Scopes(withContext(ctx)).Where(AccessToken{
 		TokenID: id,
 	}).Delete(&AccessToken{}).Error

@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 	"reflect"
+	"runtime/trace"
 	"strings"
 
 	"github.com/gogo/protobuf/types"
@@ -66,6 +67,7 @@ func selectEndDeviceFields(ctx context.Context, query *gorm.DB, fieldMask *types
 }
 
 func (s *deviceStore) CreateEndDevice(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, error) {
+	defer trace.StartRegion(ctx, "create end device").End()
 	devModel := EndDevice{
 		ApplicationID: dev.ApplicationID, // The ApplicationID is not mutated by fromPB.
 		DeviceID:      dev.DeviceID,      // The DeviceID is not mutated by fromPB.
@@ -82,6 +84,7 @@ func (s *deviceStore) CreateEndDevice(ctx context.Context, dev *ttnpb.EndDevice)
 }
 
 func (s *deviceStore) findEndDevices(ctx context.Context, query *gorm.DB, fieldMask *types.FieldMask) ([]*ttnpb.EndDevice, error) {
+	defer trace.StartRegion(ctx, "find end devices").End()
 	query = selectEndDeviceFields(ctx, query, fieldMask)
 	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
 		countTotal(ctx, query.Model(EndDevice{}))
@@ -103,6 +106,7 @@ func (s *deviceStore) findEndDevices(ctx context.Context, query *gorm.DB, fieldM
 }
 
 func (s *deviceStore) ListEndDevices(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, fieldMask *types.FieldMask) ([]*ttnpb.EndDevice, error) {
+	// NOTE: tracing done in s.findEndDevices.
 	query := s.db.Scopes(withContext(ctx), withApplicationID(ids.GetApplicationID()))
 	return s.findEndDevices(ctx, query, fieldMask)
 }
@@ -110,6 +114,7 @@ func (s *deviceStore) ListEndDevices(ctx context.Context, ids *ttnpb.Application
 var errMultipleApplicationIDs = errors.DefineInvalidArgument("multiple_application_ids", "can not list devices for multiple application IDs")
 
 func (s *deviceStore) FindEndDevices(ctx context.Context, ids []*ttnpb.EndDeviceIdentifiers, fieldMask *types.FieldMask) ([]*ttnpb.EndDevice, error) {
+	// NOTE: tracing done in s.findEndDevices.
 	idStrings := make([]string, len(ids))
 	var applicationID string
 	for i, id := range ids {
@@ -124,6 +129,7 @@ func (s *deviceStore) FindEndDevices(ctx context.Context, ids []*ttnpb.EndDevice
 }
 
 func (s *deviceStore) GetEndDevice(ctx context.Context, id *ttnpb.EndDeviceIdentifiers, fieldMask *types.FieldMask) (*ttnpb.EndDevice, error) {
+	defer trace.StartRegion(ctx, "get end device").End()
 	query := s.db.Scopes(withContext(ctx), withApplicationID(id.GetApplicationID()), withDeviceID(id.GetDeviceID()))
 	query = selectEndDeviceFields(ctx, query, fieldMask)
 	var devModel EndDevice
@@ -139,6 +145,7 @@ func (s *deviceStore) GetEndDevice(ctx context.Context, id *ttnpb.EndDeviceIdent
 }
 
 func (s *deviceStore) UpdateEndDevice(ctx context.Context, dev *ttnpb.EndDevice, fieldMask *types.FieldMask) (updated *ttnpb.EndDevice, err error) {
+	defer trace.StartRegion(ctx, "update end device").End()
 	query := s.db.Scopes(withContext(ctx), withApplicationID(dev.GetApplicationID()), withDeviceID(dev.GetDeviceID()))
 	query = selectEndDeviceFields(ctx, query, fieldMask)
 	var devModel EndDevice
@@ -160,12 +167,12 @@ func (s *deviceStore) UpdateEndDevice(ctx context.Context, dev *ttnpb.EndDevice,
 		}
 	}
 	if !reflect.DeepEqual(oldAttributes, devModel.Attributes) {
-		if err = replaceAttributes(s.db, "device", devModel.ID, oldAttributes, devModel.Attributes); err != nil {
+		if err = replaceAttributes(ctx, s.db, "device", devModel.ID, oldAttributes, devModel.Attributes); err != nil {
 			return nil, err
 		}
 	}
 	if !reflect.DeepEqual(oldLocations, devModel.Locations) {
-		if err = replaceEndDeviceLocations(s.db, devModel.ID, oldLocations, devModel.Locations); err != nil {
+		if err = replaceEndDeviceLocations(ctx, s.db, devModel.ID, oldLocations, devModel.Locations); err != nil {
 			return nil, err
 		}
 	}
@@ -175,5 +182,6 @@ func (s *deviceStore) UpdateEndDevice(ctx context.Context, dev *ttnpb.EndDevice,
 }
 
 func (s *deviceStore) DeleteEndDevice(ctx context.Context, id *ttnpb.EndDeviceIdentifiers) error {
+	defer trace.StartRegion(ctx, "delete end device").End()
 	return deleteEntity(ctx, s.db, id.EntityIdentifiers())
 }

@@ -14,9 +14,15 @@
 
 package store
 
-import "github.com/jinzhu/gorm"
+import (
+	"context"
+	"runtime/trace"
 
-func replaceAttributes(db *gorm.DB, entityType, entityUUID string, old []Attribute, new []Attribute) (err error) {
+	"github.com/jinzhu/gorm"
+)
+
+func replaceAttributes(ctx context.Context, db *gorm.DB, entityType, entityUUID string, old []Attribute, new []Attribute) (err error) {
+	defer trace.StartRegion(ctx, "update attributes").End()
 	oldByUUID := make(map[string]Attribute, len(old))
 	for _, attr := range old {
 		oldByUUID[attr.ID] = attr

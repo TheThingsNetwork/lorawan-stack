@@ -16,6 +16,7 @@ package store
 
 import (
 	"context"
+	"runtime/trace"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -35,6 +36,7 @@ type invitationStore struct {
 var errInvitationAlreadySent = errors.DefineAlreadyExists("invitation_already_sent", "invitation already sent")
 
 func (s *invitationStore) CreateInvitation(ctx context.Context, invitation *ttnpb.Invitation) (*ttnpb.Invitation, error) {
+	defer trace.StartRegion(ctx, "create invitation").End()
 	model := Invitation{
 		Email:     invitation.Email,
 		Token:     invitation.Token,
@@ -52,6 +54,7 @@ func (s *invitationStore) CreateInvitation(ctx context.Context, invitation *ttnp
 }
 
 func (s *invitationStore) FindInvitations(ctx context.Context) ([]*ttnpb.Invitation, error) {
+	defer trace.StartRegion(ctx, "find invitations").End()
 	var invitationModels []Invitation
 	if err := s.db.Scopes(withContext(ctx)).Find(&invitationModels).Error; err != nil {
 		return nil, err
@@ -66,6 +69,7 @@ func (s *invitationStore) FindInvitations(ctx context.Context) ([]*ttnpb.Invitat
 var errInvitationNotFound = errors.DefineNotFound("invitation_not_found", "invitation not found")
 
 func (s *invitationStore) GetInvitation(ctx context.Context, token string) (*ttnpb.Invitation, error) {
+	defer trace.StartRegion(ctx, "get invitation").End()
 	var invitationModel Invitation
 	if err := s.db.Scopes(withContext(ctx)).Where(Invitation{Token: token}).First(&invitationModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
@@ -79,6 +83,7 @@ func (s *invitationStore) GetInvitation(ctx context.Context, token string) (*ttn
 var errInvitationAlreadyAccepted = errors.DefineAlreadyExists("invitation_already_accepted", "invitation already accepted")
 
 func (s *invitationStore) SetInvitationAcceptedBy(ctx context.Context, token string, acceptedByID *ttnpb.UserIdentifiers) error {
+	defer trace.StartRegion(ctx, "update invitation").End()
 	var invitationModel Invitation
 	if err := s.db.Scopes(withContext(ctx)).Where(Invitation{Token: token}).First(&invitationModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
@@ -105,6 +110,7 @@ func (s *invitationStore) SetInvitationAcceptedBy(ctx context.Context, token str
 }
 
 func (s *invitationStore) DeleteInvitation(ctx context.Context, email string) error {
+	defer trace.StartRegion(ctx, "delete invitation").End()
 	var invitationModel Invitation
 	if err := s.db.Scopes(withContext(ctx)).Where(Invitation{Email: email}).First(&invitationModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {

@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 	"reflect"
+	"runtime/trace"
 	"strings"
 
 	"github.com/gogo/protobuf/types"
@@ -70,6 +71,7 @@ func selectUserFields(ctx context.Context, query *gorm.DB, fieldMask *types.Fiel
 }
 
 func (s *userStore) CreateUser(ctx context.Context, usr *ttnpb.User) (*ttnpb.User, error) {
+	defer trace.StartRegion(ctx, "create user").End()
 	userModel := User{
 		Account: Account{UID: usr.UserID}, // The ID is not mutated by fromPB.
 	}
@@ -86,6 +88,7 @@ func (s *userStore) CreateUser(ctx context.Context, usr *ttnpb.User) (*ttnpb.Use
 }
 
 func (s *userStore) FindUsers(ctx context.Context, ids []*ttnpb.UserIdentifiers, fieldMask *types.FieldMask) ([]*ttnpb.User, error) {
+	defer trace.StartRegion(ctx, "find users").End()
 	idStrings := make([]string, len(ids))
 	for i, id := range ids {
 		idStrings[i] = id.GetUserID()
@@ -112,6 +115,7 @@ func (s *userStore) FindUsers(ctx context.Context, ids []*ttnpb.UserIdentifiers,
 }
 
 func (s *userStore) GetUser(ctx context.Context, id *ttnpb.UserIdentifiers, fieldMask *types.FieldMask) (*ttnpb.User, error) {
+	defer trace.StartRegion(ctx, "get user").End()
 	query := s.db.Scopes(withContext(ctx), withUserID(id.GetUserID()))
 	query = selectUserFields(ctx, query, fieldMask)
 	var userModel User
@@ -127,6 +131,7 @@ func (s *userStore) GetUser(ctx context.Context, id *ttnpb.UserIdentifiers, fiel
 }
 
 func (s *userStore) UpdateUser(ctx context.Context, usr *ttnpb.User, fieldMask *types.FieldMask) (updated *ttnpb.User, err error) {
+	defer trace.StartRegion(ctx, "update user").End()
 	query := s.db.Scopes(withContext(ctx), withUserID(usr.GetUserID()))
 	query = selectUserFields(ctx, query, fieldMask)
 	var userModel User
@@ -163,7 +168,7 @@ func (s *userStore) UpdateUser(ctx context.Context, usr *ttnpb.User, fieldMask *
 		}
 	}
 	if !reflect.DeepEqual(oldAttributes, userModel.Attributes) {
-		if err = replaceAttributes(s.db, "user", userModel.ID, oldAttributes, userModel.Attributes); err != nil {
+		if err = replaceAttributes(ctx, s.db, "user", userModel.ID, oldAttributes, userModel.Attributes); err != nil {
 			return nil, err
 		}
 	}
@@ -174,6 +179,7 @@ func (s *userStore) UpdateUser(ctx context.Context, usr *ttnpb.User, fieldMask *
 }
 
 func (s *userStore) DeleteUser(ctx context.Context, id *ttnpb.UserIdentifiers) (err error) {
+	defer trace.StartRegion(ctx, "delete user").End()
 	defer func() {
 		if err != nil && gorm.IsRecordNotFoundError(err) {
 			err = errNotFoundForID(id.EntityIdentifiers())

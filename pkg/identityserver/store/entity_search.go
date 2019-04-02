@@ -17,6 +17,7 @@ package store
 import (
 	"context"
 	"fmt"
+	"runtime/trace"
 
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -32,6 +33,8 @@ type entitySearch struct {
 }
 
 func (s *entitySearch) FindEntities(ctx context.Context, req *ttnpb.SearchEntitiesRequest, entityType string) ([]*ttnpb.EntityIdentifiers, error) {
+	defer trace.StartRegion(ctx, "find entities").End()
+
 	table := entityType + "s"
 	db := s.db.Scopes(withContext(ctx)).Table(table)
 	idField := fmt.Sprintf("%s_id", entityType)
