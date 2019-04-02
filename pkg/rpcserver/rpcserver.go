@@ -27,9 +27,10 @@ import (
 
 	"github.com/getsentry/raven-go"
 	"github.com/golang/protobuf/proto"
-	"github.com/grpc-ecosystem/go-grpc-middleware"
-	"github.com/grpc-ecosystem/go-grpc-middleware/recovery"
-	"github.com/grpc-ecosystem/go-grpc-middleware/tags"
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
+	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
+	grpc_opentracing "github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.opencensus.io/plugin/ocgrpc"
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -141,6 +142,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 		rpcfillcontext.StreamServerInterceptor(options.contextFillers...),
 		grpc_ctxtags.StreamServerInterceptor(ctxtagsOpts...),
 		rpcmiddleware.RequestIDStreamServerInterceptor(),
+		grpc_opentracing.StreamServerInterceptor(),
 		events.StreamServerInterceptor,
 		rpclog.StreamServerInterceptor(ctx),
 		metrics.StreamServerInterceptor,
@@ -154,6 +156,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 		rpcfillcontext.UnaryServerInterceptor(options.contextFillers...),
 		grpc_ctxtags.UnaryServerInterceptor(ctxtagsOpts...),
 		rpcmiddleware.RequestIDUnaryServerInterceptor(),
+		grpc_opentracing.UnaryServerInterceptor(),
 		events.UnaryServerInterceptor,
 		rpclog.UnaryServerInterceptor(ctx),
 		metrics.UnaryServerInterceptor,

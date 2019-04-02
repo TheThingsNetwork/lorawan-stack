@@ -24,6 +24,7 @@ import (
 	"strings"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	grpc_opentracing "github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
 	"go.opencensus.io/plugin/ocgrpc"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/metrics"
@@ -39,6 +40,7 @@ func DefaultDialOptions(ctx context.Context) []grpc.DialOption {
 	streamInterceptors := []grpc.StreamClientInterceptor{
 		errors.StreamClientInterceptor(),
 		metrics.StreamClientInterceptor,
+		grpc_opentracing.StreamClientInterceptor(),
 		rpclog.StreamClientInterceptor(ctx), // Gets logger from global context
 		warning.StreamClientInterceptor,
 	}
@@ -46,6 +48,7 @@ func DefaultDialOptions(ctx context.Context) []grpc.DialOption {
 	unaryInterceptors := []grpc.UnaryClientInterceptor{
 		errors.UnaryClientInterceptor(),
 		metrics.UnaryClientInterceptor,
+		grpc_opentracing.UnaryClientInterceptor(),
 		rpclog.UnaryClientInterceptor(ctx), // Gets logger from global context
 		warning.UnaryClientInterceptor,
 	}
