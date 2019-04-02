@@ -194,9 +194,7 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 
 	var appDown *ttnpb.ApplicationDownlink
 	if len(cmdBuf) <= fOptsCapacity && len(dev.QueuedApplicationDownlinks) > 0 {
-		var down *ttnpb.ApplicationDownlink
-		down, dev.QueuedApplicationDownlinks = dev.QueuedApplicationDownlinks[0], dev.QueuedApplicationDownlinks[1:]
-
+		down := dev.QueuedApplicationDownlinks[0]
 		if len(down.FRMPayload) > int(maxDownLen) {
 			logger.Warn("Application downlink present, but the payload is too long, inform Application Server")
 			ok, err := ns.handleASUplink(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, &ttnpb.ApplicationUp{
@@ -214,11 +212,31 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 			} else if !ok {
 				log.FromContext(ctx).Warn("Application Server not found")
 			}
-
+			if !needsDownlink && len(cmdBuf) == 0 {
+				return nil, errNoDownlink
+			}
+		} else if down.FCnt <= dev.Session.LastNFCntDown && dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+			logger.Warn("Application downlink FCnt is too low, inform Application Server")
+			ok, err := ns.handleASUplink(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, &ttnpb.ApplicationUp{
+				EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
+				CorrelationIDs:       events.CorrelationIDsFromContext(ctx),
+				Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
+					DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
+						Downlinks:    dev.QueuedApplicationDownlinks,
+						LastFCntDown: dev.Session.LastNFCntDown,
+					},
+				},
+			})
+			if err != nil {
+				logger.WithError(err).Warn("Failed to send application downlink queue invalidation to Application Server")
+			} else if !ok {
+				logger.Warn("Application Server not found")
+			}
 			if !needsDownlink && len(cmdBuf) == 0 {
 				return nil, errNoDownlink
 			}
 		} else {
+			dev.QueuedApplicationDownlinks = dev.QueuedApplicationDownlinks[1:]
 			appDown = down
 			pld.FHDR.FCnt = down.FCnt
 			pld.FPort = down.FPort
