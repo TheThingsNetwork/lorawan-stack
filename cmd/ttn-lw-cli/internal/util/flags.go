@@ -30,6 +30,28 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
+// DeprecateFlag deprecates a CLI flag.
+func DeprecateFlag(flagSet *pflag.FlagSet, old string, new string) {
+	if newFlag := flagSet.Lookup(new); newFlag != nil {
+		deprecated := *newFlag
+		deprecated.Name = old
+		deprecated.Usage = strings.Replace(deprecated.Usage, old, new, -1)
+		deprecated.Deprecated = fmt.Sprintf("use the %s flag", new)
+		deprecated.Hidden = true
+		flagSet.AddFlag(&deprecated)
+	}
+}
+
+// ForwardFlag forwards the flag value of old to new if new is not set while old is.
+func ForwardFlag(flagSet *pflag.FlagSet, old string, new string) {
+	if oldFlag := flagSet.Lookup(old); oldFlag != nil && oldFlag.Changed {
+		if newFlag := flagSet.Lookup(new); newFlag != nil && !newFlag.Changed {
+			newFlag.Value.Set(oldFlag.Value.String())
+			newFlag.Changed = true
+		}
+	}
+}
+
 var (
 	toDash       = strings.NewReplacer("_", "-")
 	toUnderscore = strings.NewReplacer("-", "_")
@@ -315,7 +337,7 @@ func SetFields(dst interface{}, flags *pflag.FlagSet, prefix ...string) error {
 	var flagValueErrorAttributes []interface{}
 	rv := reflect.Indirect(reflect.ValueOf(dst))
 	flags.VisitAll(func(flag *pflag.Flag) {
-		if !flag.Changed {
+		if flag.Deprecated != "" || !flag.Changed {
 			return
 		}
 		flagName := toUnderscore.Replace(flag.Name)
