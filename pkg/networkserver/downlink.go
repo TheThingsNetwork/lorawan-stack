@@ -46,6 +46,8 @@ type DownlinkTaskQueue interface {
 	Pop(ctx context.Context, f func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) error) error
 }
 
+// DefaultClassCTimeout is the default time-out for the device to respond to class C downlink messages.
+// When waiting for a response times out, the downlink message is considered lost, and the downlink task triggers again.
 const DefaultClassCTimeout = 15 * time.Second
 
 func deviceClassCTimeout(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) time.Duration {
