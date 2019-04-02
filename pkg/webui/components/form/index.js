@@ -108,8 +108,8 @@ class InnerForm extends React.Component {
     const decoratedChildren = recursiveMap(children,
       function (Child) {
         if (Child.type === Field) {
-          const { name, value: originalValue } = Child.props
-          const value = name ? getByPath(values, name) : originalValue
+          const { name } = Child.props
+          const value = getByPath(values, name)
           const fieldError = getByPath(combinedErrors, name)
           const fieldTouched = getByPath(touched, name)
 
@@ -142,7 +142,7 @@ class InnerForm extends React.Component {
           }
         } else if (Child.type === FieldGroup) {
           const { name } = Child.props
-          const value = name && getByPath(values, name)
+          const value = getByPath(values, name)
           const groupError = getByPath(combinedErrors, name)
           const groupTouched = getByPath(touched, name)
           return React.cloneElement(Child, {
