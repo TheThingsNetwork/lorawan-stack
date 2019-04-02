@@ -76,7 +76,7 @@ The easiest way to set up a private network is with the provided [`docker-compos
     docker-compose run --rm stack is-db create-oauth-client \
       --id cli --name "Command Line Interface" --no-secret \
       --owner admin \
-      --redirect-uri 'http://localhost:11885/oauth/callback' \
+      --redirect-uri 'local-callback' \
       --redirect-uri 'code'
     ```
 5. Register the Console as an OAuth client:

@@ -192,5 +192,6 @@ func (s *server) RegisterRoutes(server *web.Server) {
 
 	// No CSRF here:
 	group.GET("/code", webui.Template.Handler)
+	group.GET("/local-callback", s.redirectToLocal)
 	group.POST("/token", s.Token)
 }

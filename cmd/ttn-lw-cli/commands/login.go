@@ -48,7 +48,7 @@ var (
 			var token *oauth2.Token
 
 			if callback {
-				oauth2Config.RedirectURL = "http://localhost:11885/oauth/callback"
+				oauth2Config.RedirectURL = "local-callback" // NOTE: The "?port=11885" is implicit.
 
 				http.HandleFunc("/oauth/callback", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					if r.Method != http.MethodGet {
