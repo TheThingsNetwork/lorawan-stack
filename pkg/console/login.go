@@ -15,34 +15,26 @@
 package console
 
 import (
-	"regexp"
+	"net/http"
+	"strings"
 
 	echo "github.com/labstack/echo/v4"
-	"go.thethings.network/lorawan-stack/pkg/webui"
 )
 
-// Login is a normal route but decorated with the auth url in the page data.
+// Login redirects the user to the OAuth Authorize URL.
 func (console *Console) Login(c echo.Context) error {
-	path := c.QueryParam("path")
+	next := c.QueryParam("next")
 
-	var re = regexp.MustCompile(`(?m)^[/?#][a-z0-9/?&#-]+$`)
-	if re.MatchString(path) {
-		path = console.config.UI.CanonicalURL + path
-	} else {
-		path = console.config.UI.CanonicalURL
+	// Only allow relative paths.
+	if !strings.HasPrefix(next, "/") && !strings.HasPrefix(next, "#") && !strings.HasPrefix(next, "?") {
+		next = ""
 	}
 
 	// Set state cookie.
-	state := newState(path)
+	state := newState(next)
 	if err := console.setStateCookie(c, state); err != nil {
 		return err
 	}
 
-	c.Set("page_data", struct {
-		LoginURI string `json:"authorize_url"`
-	}{
-		LoginURI: console.oauth.AuthCodeURL(state.Secret),
-	})
-
-	return webui.Template.Handler(c)
+	return c.Redirect(http.StatusFound, console.oauth.AuthCodeURL(state.Secret))
 }

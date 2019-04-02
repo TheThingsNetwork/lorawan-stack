@@ -156,9 +156,10 @@ func (console *Console) RegisterRoutes(server *web.Server) {
 	}))
 	page.GET("/oauth/callback", console.Callback)
 
+	group.GET("/login/ttn-stack", console.Login)
+
 	if console.config.Mount != "" && console.config.Mount != "/" {
 		group.GET("", webui.Template.Handler, middleware.CSRF())
 	}
 	group.GET("/*", webui.Template.Handler, middleware.CSRF())
-	group.GET("/login", console.Login)
 }
