@@ -17,6 +17,7 @@ package oauth
 import (
 	"context"
 	"net/http"
+	"strings"
 	"time"
 
 	echo "github.com/labstack/echo/v4"
@@ -141,6 +142,10 @@ func (s *server) output(c echo.Context, resp *osin.Response) error {
 		location, err := resp.GetRedirectUrl()
 		if err != nil {
 			return err
+		}
+		uiMount := strings.TrimSuffix(s.config.UI.MountPath(), "/") + "/"
+		if strings.HasPrefix(location, "/") && !strings.HasPrefix(location, uiMount) {
+			location = uiMount + location
 		}
 		return c.Redirect(http.StatusFound, location)
 	}
