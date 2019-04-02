@@ -24,6 +24,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/pkg/browser"
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/api"
 	"go.thethings.network/lorawan-stack/pkg/auth"
@@ -80,7 +81,12 @@ var (
 				oauth2Config.RedirectURL = "code"
 			}
 
-			logger.Infof("Please go to %s", oauth2Config.AuthCodeURL(""))
+			authCodeURL := oauth2Config.AuthCodeURL("")
+			logger.Infof("Opening your browser on %s", authCodeURL)
+			if err = browser.OpenURL(authCodeURL); err != nil {
+				logger.WithError(err).Warn("Could not open your browser, you'll have to go there yourself")
+			}
+			logger.Info("After logging in and authorizing the CLI, we'll get an access token for future commands.")
 
 			if callback {
 				logger.Info("Waiting for your authorization...")
