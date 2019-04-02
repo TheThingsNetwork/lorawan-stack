@@ -17,6 +17,7 @@ package identityserver
 import (
 	"context"
 	"path"
+	"runtime/trace"
 	"strings"
 	"time"
 
@@ -390,7 +391,9 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 		if err != nil {
 			return err
 		}
+		region := trace.StartRegion(ctx, "validate old password")
 		valid, err := auth.Password(usr.Password).Validate(req.Old)
+		region.End()
 		if err != nil {
 			return err
 		}
@@ -403,7 +406,9 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 				events.Publish(evtUpdateUserIncorrectPassword(ctx, req.UserIdentifiers, nil))
 				return errIncorrectPassword
 			}
+			region := trace.StartRegion(ctx, "validate temporary password")
 			valid, err = auth.Password(usr.TemporaryPassword).Validate(req.Old)
+			region.End()
 			switch {
 			case err != nil:
 				return err

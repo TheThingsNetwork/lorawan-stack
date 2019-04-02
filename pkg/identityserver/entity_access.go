@@ -17,6 +17,7 @@ package identityserver
 import (
 	"context"
 	"fmt"
+	"runtime/trace"
 	"strings"
 	"time"
 
@@ -106,7 +107,9 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 				}
 				return err
 			}
+			region := trace.StartRegion(ctx, "validate api key")
 			valid, err := auth.Password(apiKey.GetKey()).Validate(tokenKey)
+			region.End()
 			if err != nil {
 				return err
 			}
@@ -142,7 +145,9 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 				}
 				return err
 			}
+			region := trace.StartRegion(ctx, "validate access token")
 			valid, err := auth.Password(accessToken.GetAccessToken()).Validate(tokenKey)
+			region.End()
 			if err != nil {
 				return err
 			}
