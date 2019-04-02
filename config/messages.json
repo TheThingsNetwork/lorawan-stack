@@ -1088,6 +1088,15 @@
       "file": "errors.go"
     }
   },
+  "error:cmd/internal/shared:initialize_gateway_configuration_server": {
+    "translations": {
+      "en": "could not initialize Gateway Configuration Server"
+    },
+    "description": {
+      "package": "cmd/internal/shared",
+      "file": "errors.go"
+    }
+  },
   "error:cmd/internal/shared:initialize_gateway_server": {
     "translations": {
       "en": "could not initialize Gateway Server"

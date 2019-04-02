@@ -30,6 +30,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	events_grpc "go.thethings.network/lorawan-stack/pkg/events/grpc"
+	"go.thethings.network/lorawan-stack/pkg/gatewayconfigurationserver"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver"
 	"go.thethings.network/lorawan-stack/pkg/identityserver"
 	"go.thethings.network/lorawan-stack/pkg/joinserver"
@@ -197,9 +198,12 @@ var (
 			}
 
 			if start.GCS {
-				logger.Info("Setting up GCS")
-				cups := config.GCS.BasicStation.NewServer(c)
-				_ = cups
+				logger.Info("Setting up Gateway Configuration Server")
+				gcs, err := gatewayconfigurationserver.New(c, &config.GCS)
+				if err != nil {
+					return shared.ErrInitializeGatewayConfigurationServer.WithCause(err)
+				}
+				_ = gcs
 			}
 
 			if rootRedirect != nil {

@@ -20,8 +20,8 @@ import (
 
 	"github.com/gogo/protobuf/types"
 	echo "github.com/labstack/echo/v4"
+	bs_cups "go.thethings.network/lorawan-stack/pkg/basicstation/cups"
 	"go.thethings.network/lorawan-stack/pkg/component"
-	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/pfconfig/semtechudp"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/web"
@@ -30,6 +30,8 @@ import (
 
 // Config contains the Gateway Configuration Server configuration.
 type Config struct {
+	// BasicStation defines the configuration for the BasicStation CUPS server.
+	BasicStation bs_cups.ServerConfig `name:"basic-station" description:"BasicStation CUPS server configuration."`
 	// RequreAuth defines if the HTTP endpoints should require authentication or not.
 	RequireAuth bool `name:"require-auth" description:"Require authentication for the HTTP endpoints."`
 }
@@ -66,6 +68,10 @@ func New(c *component.Component, conf *Config, opts ...Option) (*GatewayConfigur
 	for _, opt := range opts {
 		opt(gcs)
 	}
+
+	cups := conf.BasicStation.NewServer(c)
+	_ = cups
+
 	c.RegisterWeb(gcs)
 	return gcs, nil
 }
