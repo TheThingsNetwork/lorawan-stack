@@ -51,24 +51,22 @@ var (
 			if callback {
 				oauth2Config.RedirectURL = "local-callback" // NOTE: The "?port=11885" is implicit.
 
-				http.HandleFunc("/oauth/callback", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				http.HandleFunc("/oauth/callback", func(w http.ResponseWriter, r *http.Request) {
 					if r.Method != http.MethodGet {
 						http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 						return
 					}
 					token, err = oauth2Config.Exchange(ctx, r.URL.Query().Get("code"))
 					if err != nil {
-						msg := "Could not exchange OAuth access token"
-						logger.WithError(err).Error(msg)
+						logger.WithError(err).Error("Could not exchange OAuth access token")
 						w.WriteHeader(http.StatusUnauthorized)
-						w.Write([]byte(msg))
+						fmt.Fprintf(w, "The CLI could not exchange the OAuth access token: %v.\n", err)
 						return
 					}
-					msg := "Got OAuth access token"
-					logger.Info(msg)
-					w.Write([]byte(msg))
+					logger.Info("Successfully got an access token.")
+					fmt.Fprintln(w, "The CLI successfully got an access token. You can now close this window and return to the CLI.")
 					done()
-				}))
+				})
 
 				lis, err := net.Listen("tcp", ":11885")
 				if err != nil {
