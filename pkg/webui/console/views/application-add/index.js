@@ -118,6 +118,7 @@ export default class Add extends React.Component {
               mapErrorsToFields={{
                 id_taken: 'application_id',
                 identifiers: 'application_id',
+                blacklisted_id: 'application_id',
               }}
               horizontal
             >
