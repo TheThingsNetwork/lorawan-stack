@@ -258,9 +258,21 @@ Field.propTypes = {
    * This is necessary to map form values correctly.
    */
   form: PropTypes.bool,
+  /** A flag indicating whether the field has already received any input so far */
+  touched: PropTypes.bool,
   /** The value name that the field will set to touched (defaults to 'name' prop)
    */
   touches: PropTypes.string,
+  /** A flag indicating whether the field value should be validated when the
+   * input triggered a blur event */
+  validateOnBlur: PropTypes.bool,
+  /** A flag indicating whether the field value should be validated when the
+   * input triggered a change event */
+  validateOnChange: PropTypes.bool,
+  /** The passed (formik) function to change form data */
+  setFieldValue: PropTypes.func,
+  /** The passed (formik) function to set the touch value of a form data property */
+  setFieldTouched: PropTypes.func,
 }
 
 const Err = function (props) {
