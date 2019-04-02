@@ -496,6 +496,18 @@
       ]
     }
   },
+  "Configuration": {
+    "ListFrequencyPlans": {
+      "file": "lorawan-stack/api/configuration_services.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/configuration/frequency-plans",
+          "parameters": []
+        }
+      ]
+    }
+  },
   "ContactInfoRegistry": {
     "RequestValidation": {
       "file": "lorawan-stack/api/contact_info.proto",

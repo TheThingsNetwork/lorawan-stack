@@ -540,11 +540,27 @@ func (s *Store) fetchDescriptions() (frequencyPlanList, error) {
 	if err != nil {
 		return nil, errFetchFailed.WithCause(err)
 	}
-	descriptions := frequencyPlanList{}
+	var descriptions []*FrequencyPlanDescription
 	if err = yaml.Unmarshal(content, &descriptions); err != nil {
 		return nil, errParseFile.WithCause(err)
 	}
-	return descriptions, nil
+	descriptionsByID := make(map[string]*FrequencyPlanDescription, len(descriptions))
+	for _, description := range descriptions {
+		descriptionsByID[description.ID] = description
+	}
+	for _, description := range descriptions {
+		if description.BaseID != "" {
+			base := descriptionsByID[description.BaseID]
+			if description.BaseFrequency == 0 {
+				description.BaseFrequency = base.BaseFrequency
+			}
+		}
+	}
+	frequencyPlanList := make(frequencyPlanList, len(descriptions))
+	for i, description := range descriptions {
+		frequencyPlanList[i] = *description
+	}
+	return frequencyPlanList, nil
 }
 
 func (s *Store) descriptions() (frequencyPlanList, error) {
