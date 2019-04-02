@@ -7,7 +7,7 @@ draft: false
 
 ## <a name="running">Running the stack</a>
 
-Download our [Docker Compose configuration]({{ .Site.Params.github_repository }}) example. The stack can be run without any configuration, but for the purpose of this guide
+Download our [Docker Compose configuration]({{< reffile "docker-compose.yml" >}}) example. The stack can be run without any configuration, but for the purpose of this guide
 we provided you a basic one.
 
 With the `docker-compose.yml` file in the directory of your terminal prompt, enter the following commands to initialize the database, create the first user `admin`, create the CLI OAuth client and start the stack:

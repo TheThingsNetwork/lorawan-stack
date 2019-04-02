@@ -20,3 +20,4 @@ expiryDate = ["expiryDate"]
     # Documentation repository section
     # documentation repository (set edit link to documentation repository)
     github_doc_repository = "https://github.com/TheThingsNetwork/lorawan-stack"
+    source_url = "https://github.com/TheThingsNetwork/lorawan-stack/blob/master/"
