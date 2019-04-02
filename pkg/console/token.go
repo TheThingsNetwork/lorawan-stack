@@ -16,18 +16,57 @@ package console
 
 import (
 	"net/http"
+	"time"
 
 	echo "github.com/labstack/echo/v4"
+	"golang.org/x/oauth2"
 )
 
-// Token is the handler that allows the user to get their OAuth token.
-// It reads the token from the authorization cookie. If the cookie is not there,
-// it returns a 401 Unauthorized error.
-func (console *Console) Token(c echo.Context) error {
+func (console *Console) freshToken(c echo.Context) (*oauth2.Token, error) {
 	value, err := console.getAuthCookie(c)
+	if err != nil {
+		return nil, err
+	}
+
+	token := &oauth2.Token{
+		AccessToken:  value.AccessToken,
+		RefreshToken: value.RefreshToken,
+		Expiry:       value.Expiry,
+	}
+
+	freshToken, err := console.oauth.TokenSource(c.Request().Context(), token).Token()
+	if err != nil {
+		return nil, err
+	}
+
+	if freshToken.AccessToken != token.AccessToken {
+		err = console.setAuthCookie(c, authCookie{
+			AccessToken:  token.AccessToken,
+			RefreshToken: token.RefreshToken,
+			Expiry:       token.Expiry,
+		})
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return freshToken, nil
+}
+
+// Token is a handler that returns a valid OAuth token.
+// It reads the token from the authorization cookie and refreshes it if needed.
+// If the cookie is not there, it returns a 401 Unauthorized error.
+func (console *Console) Token(c echo.Context) error {
+	token, err := console.freshToken(c)
 	if err != nil {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, value)
+	return c.JSON(http.StatusOK, struct {
+		AccessToken string    `json:"access_token"`
+		Expiry      time.Time `json:"expiry"`
+	}{
+		AccessToken: token.AccessToken,
+		Expiry:      token.Expiry,
+	})
 }

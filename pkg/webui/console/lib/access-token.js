@@ -18,13 +18,10 @@ export default async function () {
   const storedToken = localStorage.accessToken ? JSON.parse(localStorage.accessToken) : undefined
   let token
 
-  if (!storedToken) {
-    // If we don't have a token stored, we want to retrieve it
+  if (!storedToken || Date.parse(storedToken.expiry) < Date.now()) {
+    // If we don't have a token stored or it's expired, we want to retrieve it
     const response = await api.console.token()
     token = response.data
-  } else if (Date.parse(storedToken.expiry) < Date.now()) {
-    // If we have a token, but it's expired, we want to refresh it
-    token = (await api.console.refresh()).data
   } else {
     // If we have a stored token and its valid, we want to use it
     return storedToken

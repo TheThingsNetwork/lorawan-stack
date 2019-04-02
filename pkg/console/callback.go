@@ -65,5 +65,5 @@ func (console *Console) Callback(c echo.Context) error {
 		return err
 	}
 
-	return c.Redirect(http.StatusFound, stateCookie.Path)
+	return c.Redirect(http.StatusFound, console.config.UI.CanonicalURL+stateCookie.Next)
 }

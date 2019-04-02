@@ -45,14 +45,14 @@ type state struct {
 	// Secret is the secret in the state.
 	Secret string
 
-	// Path is the path the user was trying to visit.
-	Path string
+	// Next is the path the user was trying to visit.
+	Next string
 }
 
-func newState(path string) state {
+func newState(next string) state {
 	return state{
 		Secret: random.String(16),
-		Path:   path,
+		Next:   next,
 	}
 }
 
@@ -65,10 +65,6 @@ func (console *Console) getStateCookie(c echo.Context) (state, error) {
 
 	if !ok {
 		return s, echo.NewHTTPError(http.StatusBadRequest, "No state cookie")
-	}
-
-	if s.Path == "" {
-		s.Path = "/"
 	}
 
 	return s, nil

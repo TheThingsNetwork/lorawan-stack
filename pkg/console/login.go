@@ -16,19 +16,22 @@ package console
 
 import (
 	"net/http"
+	"strings"
 
 	echo "github.com/labstack/echo/v4"
 )
 
-// Login logs in the user by redirecting to the OAuth flow.
+// Login redirects the user to the OAuth Authorize URL.
 func (console *Console) Login(c echo.Context) error {
-	path := c.QueryParam("path")
+	next := c.QueryParam("next")
 
-	// Remove the old auth cookie.
-	console.removeAuthCookie(c)
+	// Only allow relative paths.
+	if !strings.HasPrefix(next, "/") && !strings.HasPrefix(next, "#") && !strings.HasPrefix(next, "?") {
+		next = ""
+	}
 
 	// Set state cookie.
-	state := newState(path)
+	state := newState(next)
 	if err := console.setStateCookie(c, state); err != nil {
 		return err
 	}

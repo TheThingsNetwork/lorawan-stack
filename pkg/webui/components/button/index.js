@@ -15,6 +15,7 @@
 import React from 'react'
 import classnames from 'classnames'
 import bind from 'autobind-decorator'
+import { Link } from 'react-router-dom'
 
 import PropTypes from '../../lib/prop-types'
 import Spinner from '../spinner'
@@ -22,6 +23,40 @@ import Message from '../../lib/components/message'
 import Icon from '../icon'
 
 import style from './button.styl'
+
+function assembleClassnames ({
+  message,
+  danger,
+  warning,
+  secondary,
+  naked,
+  icon,
+  busy,
+  large,
+  className,
+  error,
+  link,
+}) {
+  return classnames(style.button, className, {
+    [style.danger]: danger,
+    [style.warning]: warning,
+    [style.secondary]: secondary,
+    [style.naked]: naked,
+    [style.busy]: busy,
+    [style.withIcon]: icon !== undefined && message,
+    [style.onlyIcon]: icon !== undefined && !message,
+    [style.error]: error && !busy,
+    [style.large]: large,
+  })
+}
+
+const buttonChildren = ({ icon, busy, message }) => (
+  <div className={style.content}>
+    {icon ? <Icon className={style.icon} nudgeUp icon={icon} /> : null}
+    {busy ? <Spinner className={style.spinner} small after={200} /> : null}
+    {message ? <Message content={message} /> : null}
+  </div>
+)
 
 @bind
 class Button extends React.PureComponent {
@@ -37,57 +72,51 @@ class Button extends React.PureComponent {
   }
 
   render () {
-    const {
-      message,
-      danger,
-      warning,
-      secondary,
-      naked,
-      icon,
-      busy,
-      large,
-      className,
-      onClick,
-      error,
-      ...rest
-    } = this.props
-
-    const buttonClassNames = classnames(style.button, className, {
-      [style.danger]: danger,
-      [style.warning]: warning,
-      [style.secondary]: secondary,
-      [style.naked]: naked,
-      [style.busy]: busy,
-      [style.withIcon]: icon !== undefined && message,
-      [style.onlyIcon]: icon !== undefined && !message,
-      [style.error]: error && !busy,
-      [style.large]: large,
-    })
-
+    const buttonClassNames = assembleClassnames(this.props)
     return (
       <button
         className={buttonClassNames}
         onClick={this.handleClick}
-        {...rest}
-      >
-        <div className={style.content}>
-          {icon ? <Icon className={style.icon} nudgeUp icon={icon} /> : null}
-          {busy ? <Spinner className={style.spinner} small after={200} /> : null}
-          {message ? <Message content={message} /> : null}
-        </div>
-      </button>
+        children={buttonChildren(this.props)}
+      />
     )
   }
 }
 
-Button.propTypes = {
+Button.defaultProps = {
+  onClick: () => null,
+}
+
+Button.Link = function (props) {
+  const buttonClassNames = assembleClassnames(props)
+  const { to } = props
+  return (
+    <Link
+      className={buttonClassNames}
+      to={to}
+      children={buttonChildren(props)}
+    />
+  )
+}
+
+Button.AnchorLink = function (props) {
+  const buttonClassNames = assembleClassnames(props)
+  const { target, title, name } = props
+  return (
+    <a
+      className={buttonClassNames}
+      href={props.href}
+      target={target}
+      title={title}
+      name={name}
+      children={buttonChildren(props)}
+    />
+  )
+}
+
+const commonPropTypes = {
   /** The message to be displayed within the button */
   message: PropTypes.message,
-  /**
-   * A click listener to be called when the button is pressed.
-   * Not called if the button is in the `busy` or `disabled` state.
-   */
-  onClick: PropTypes.func,
   /**
    * A flag specifying whether the `danger` styling should applied to the button
    */
@@ -126,8 +155,30 @@ Button.propTypes = {
   disabled: PropTypes.bool,
 }
 
-Button.defaultProps = {
-  onClick: () => null,
+Button.propTypes = {
+  /**
+   * A click listener to be called when the button is pressed.
+   * Not called if the button is in the `busy` or `disabled` state.
+   */
+  onClick: PropTypes.func,
+  ...commonPropTypes,
 }
 
+Button.Link.propTypes = {
+  /** The route to navigate to on click */
+  to: PropTypes.string,
+  ...commonPropTypes,
+}
+
+Button.AnchorLink.propTypes = {
+  /** The <a/>'s href prop */
+  href: PropTypes.string,
+  /** The <a/>'s title prop */
+  title: PropTypes.message,
+  /** The <a/>'s name prop */
+  name: PropTypes.string,
+  /** The <a/>'s target prop */
+  target: PropTypes.string,
+  ...commonPropTypes,
+}
 export default Button

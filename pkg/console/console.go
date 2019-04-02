@@ -100,8 +100,9 @@ func New(c *component.Component, config Config) (*Console, error) {
 		ClientSecret: console.config.OAuth.ClientSecret,
 		RedirectURL:  fmt.Sprintf("%s/oauth/callback", strings.TrimSuffix(console.config.UI.CanonicalURL, "/")),
 		Endpoint: oauth2.Endpoint{
-			TokenURL: console.config.OAuth.TokenURL,
-			AuthURL:  console.config.OAuth.AuthorizeURL,
+			TokenURL:  console.config.OAuth.TokenURL,
+			AuthURL:   console.config.OAuth.AuthorizeURL,
+			AuthStyle: oauth2.AuthStyleInParams,
 		},
 	}
 
@@ -148,14 +149,14 @@ func (console *Console) RegisterRoutes(server *web.Server) {
 
 	api := group.Group("/api", middleware.CSRF())
 	api.GET("/auth/token", console.Token)
-	api.PUT("/auth/refresh", console.RefreshToken)
-	api.GET("/auth/login", console.Login)
 	api.POST("/auth/logout", console.Logout)
 
 	page := group.Group("", middleware.CSRFWithConfig(middleware.CSRFConfig{
 		TokenLookup: "form:csrf",
 	}))
 	page.GET("/oauth/callback", console.Callback)
+
+	group.GET("/login/ttn-stack", console.Login)
 
 	if console.config.Mount != "" && console.config.Mount != "/" {
 		group.GET("", webui.Template.Handler, middleware.CSRF())

@@ -16,6 +16,7 @@ import axios from 'axios'
 import TTN from 'ttn-lw'
 
 import token from '../lib/access-token'
+import getCookieValue from '../../lib/cookie'
 import stubs from './stubs'
 
 const config = window.APP_CONFIG
@@ -33,33 +34,35 @@ const ttnClient = new TTN(token, {
   proxy: false,
 })
 
+const csrf = getCookieValue('_csrf')
+const instance = axios.create({
+  headers: { 'X-CSRF-Token': csrf },
+})
+
 export default {
   console: {
     token () {
-      return axios.get('/console/api/auth/token')
-    },
-    refresh () {
-      return axios.put('/console/api/auth/refresh')
+      return instance.get('/console/api/auth/token')
     },
     logout () {
-      return axios.post('/console/api/auth/logout')
+      return instance.post('/console/api/auth/logout')
     },
   },
   clients: {
     get (client_id) {
-      return axios.get(`/api/v3/is/clients/${client_id}`)
+      return instance.get(`/api/v3/is/clients/${client_id}`)
     },
   },
   users: {
     async get (userId) {
-      return axios.get(`/api/v3/users/${userId}`, {
+      return instance.get(`/api/v3/users/${userId}`, {
         headers: {
           Authorization: `Bearer ${(await token()).access_token}`,
         },
       })
     },
     async authInfo () {
-      return axios.get('/api/v3/auth_info', {
+      return instance.get('/api/v3/auth_info', {
         headers: {
           Authorization: `Bearer ${(await token()).access_token}`,
         },

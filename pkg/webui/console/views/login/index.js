@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
+import Query from 'query-string'
 import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
 import { defineMessages } from 'react-intl'
@@ -39,16 +40,10 @@ const m = defineMessages({
 }))
 @bind
 export default class Login extends React.PureComponent {
-
-  redirectToLogin () {
-    const { env, location } = this.props
-    const { from } = location.state || { from: env.app_root }
-
-    window.location = `${env.app_root}/api/auth/login?path=${from}`
-  }
-
   render () {
     const { user, env } = this.props
+    const { next } = Query.parse(location.search)
+    const redirectAppend = next ? `?next=${next}` : ''
 
     // dont show the login page if the user is already logged in
     if (Boolean(user)) {
@@ -68,7 +63,10 @@ export default class Login extends React.PureComponent {
                 content={m.welcome}
               />
               <Message className={style.loginSub} content={m.login} />
-              <Button message={m.loginWithStackAccount} onClick={this.redirectToLogin} />
+              <Button.AnchorLink
+                message={m.loginWithStackAccount}
+                href={`${env.app_root}/login/ttn-stack${redirectAppend}`}
+              />
             </Col>
           </Row>
         </Container>
