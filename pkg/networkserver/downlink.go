@@ -882,7 +882,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 			return err
 		}
 
-		if genDown != nil && genDown.ApplicationDownlink == nil && len(dev.QueuedApplicationDownlinks) > 0 && dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+		if genDown != nil && dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 			go func() {
 				logger.Debug("Send downlink queue invalidation to Application Server")
 				ok, err := ns.handleASUplink(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, &ttnpb.ApplicationUp{
