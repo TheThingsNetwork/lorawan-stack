@@ -190,5 +190,7 @@ func (s *server) RegisterRoutes(server *web.Server) {
 	}
 	group.GET("/*", webui.Template.Handler, middleware.CSRF())
 
-	group.POST("/token", s.Token) // No CSRF here.
+	// No CSRF here:
+	group.GET("/code", webui.Template.Handler)
+	group.POST("/token", s.Token)
 }

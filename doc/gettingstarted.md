@@ -77,7 +77,7 @@ With the `docker-compose.yml` file in the directory of your terminal prompt, ent
 $ docker-compose pull
 $ docker-compose run --rm stack is-db init
 $ docker-compose run --rm stack is-db create-admin-user --id admin --email admin@localhost
-$ docker-compose run --rm stack is-db create-oauth-client --id cli --name "Command Line Interface" --owner admin --no-secret --redirect-uri 'http://localhost:11885/oauth/callback' --redirect-uri '/oauth/code'
+$ docker-compose run --rm stack is-db create-oauth-client --id cli --name "Command Line Interface" --owner admin --no-secret --redirect-uri 'http://localhost:11885/oauth/callback' --redirect-uri 'code'
 $ docker-compose up
 ```
 

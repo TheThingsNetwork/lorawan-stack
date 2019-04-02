@@ -77,7 +77,7 @@ var (
 				defer lis.Close()
 				go http.Serve(lis, nil)
 			} else {
-				oauth2Config.RedirectURL = "/oauth/code"
+				oauth2Config.RedirectURL = "code"
 			}
 
 			logger.Infof("Please go to %s", oauth2Config.AuthCodeURL(""))
