@@ -136,8 +136,8 @@ func preRun(tasks ...func() error) func(cmd *cobra.Command, args []string) error
 		oauth2Config = &oauth2.Config{
 			ClientID: "cli",
 			Endpoint: oauth2.Endpoint{
-				AuthURL:   fmt.Sprintf("%s/oauth/authorize", config.OAuthServerAddress),
-				TokenURL:  fmt.Sprintf("%s/oauth/token", config.OAuthServerAddress),
+				AuthURL:   fmt.Sprintf("%s/authorize", config.OAuthServerAddress),
+				TokenURL:  fmt.Sprintf("%s/token", config.OAuthServerAddress),
 				AuthStyle: oauth2.AuthStyleInParams,
 			},
 		}

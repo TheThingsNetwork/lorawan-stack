@@ -50,7 +50,7 @@ var DefaultConfig = Config{
 	},
 	InputFormat:                  "json",
 	OutputFormat:                 "json",
-	OAuthServerAddress:           clusterHTTPAddress,
+	OAuthServerAddress:           clusterHTTPAddress + "/oauth",
 	IdentityServerGRPCAddress:    clusterGRPCAddress,
 	GatewayServerGRPCAddress:     clusterGRPCAddress,
 	NetworkServerGRPCAddress:     clusterGRPCAddress,

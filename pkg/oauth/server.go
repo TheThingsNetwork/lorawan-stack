@@ -17,6 +17,7 @@ package oauth
 import (
 	"context"
 	"net/http"
+	"strings"
 	"time"
 
 	echo "github.com/labstack/echo/v4"
@@ -142,6 +143,10 @@ func (s *server) output(c echo.Context, resp *osin.Response) error {
 		if err != nil {
 			return err
 		}
+		uiMount := strings.TrimSuffix(s.config.UI.MountPath(), "/") + "/"
+		if strings.HasPrefix(location, "/") && !strings.HasPrefix(location, uiMount) {
+			location = uiMount + location
+		}
 		return c.Redirect(http.StatusFound, location)
 	}
 	return c.JSON(resp.StatusCode, resp.Output)
@@ -185,5 +190,8 @@ func (s *server) RegisterRoutes(server *web.Server) {
 	}
 	group.GET("/*", webui.Template.Handler, middleware.CSRF())
 
-	group.POST("/token", s.Token) // No CSRF here.
+	// No CSRF here:
+	group.GET("/code", webui.Template.Handler)
+	group.GET("/local-callback", s.redirectToLocal)
+	group.POST("/token", s.Token)
 }
