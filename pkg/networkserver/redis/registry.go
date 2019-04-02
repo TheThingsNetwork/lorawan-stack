@@ -16,6 +16,7 @@ package redis
 
 import (
 	"context"
+	"runtime/trace"
 	"time"
 
 	"github.com/go-redis/redis"
@@ -74,6 +75,8 @@ func (r *DeviceRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIde
 		return nil, err
 	}
 
+	defer trace.StartRegion(ctx, "get end device by id").End()
+
 	pb := &ttnpb.EndDevice{}
 	if err := ttnredis.GetProto(r.Redis, r.uidKey(unique.ID(ctx, ids))).ScanProto(pb); err != nil {
 		return nil, err
@@ -82,7 +85,9 @@ func (r *DeviceRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIde
 }
 
 // GetByEUI gets device by joinEUI, devEUI.
-func (r *DeviceRegistry) GetByEUI(_ context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error) {
+func (r *DeviceRegistry) GetByEUI(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error) {
+	defer trace.StartRegion(ctx, "get end device by eui").End()
+
 	pb := &ttnpb.EndDevice{}
 	if err := ttnredis.FindProto(r.Redis, r.euiKey(joinEUI, devEUI), r.uidKey).ScanProto(pb); err != nil {
 		return nil, err
@@ -91,7 +96,9 @@ func (r *DeviceRegistry) GetByEUI(_ context.Context, joinEUI, devEUI types.EUI64
 }
 
 // RangeByAddr ranges over devices by addr.
-func (r *DeviceRegistry) RangeByAddr(addr types.DevAddr, paths []string, f func(*ttnpb.EndDevice) bool) error {
+func (r *DeviceRegistry) RangeByAddr(ctx context.Context, addr types.DevAddr, paths []string, f func(*ttnpb.EndDevice) bool) error {
+	defer trace.StartRegion(ctx, "range end devices by dev_addr").End()
+
 	return ttnredis.FindProtos(r.Redis, r.addrKey(addr), r.uidKey).Range(func() (proto.Message, func() (bool, error)) {
 		pb := &ttnpb.EndDevice{}
 		return pb, func() (bool, error) {
@@ -147,6 +154,8 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 	}
 	uid := unique.ID(ctx, ids)
 	uk := r.uidKey(uid)
+
+	defer trace.StartRegion(ctx, "set end device by id").End()
 
 	var pb *ttnpb.EndDevice
 	err := r.Redis.Watch(func(tx *redis.Tx) error {

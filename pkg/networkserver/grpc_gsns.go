@@ -98,7 +98,7 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 	}
 
 	var devs []device
-	if err := ns.devices.RangeByAddr(pld.DevAddr,
+	if err := ns.devices.RangeByAddr(ctx, pld.DevAddr,
 		[]string{
 			"frequency_plan_id",
 			"lorawan_phy_version",

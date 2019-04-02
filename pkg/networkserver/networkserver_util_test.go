@@ -96,7 +96,7 @@ var _ DeviceRegistry = MockDeviceRegistry{}
 type MockDeviceRegistry struct {
 	GetByEUIFunc    func(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error)
 	GetByIDFunc     func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, error)
-	RangeByAddrFunc func(devAddr types.DevAddr, paths []string, f func(*ttnpb.EndDevice) bool) error
+	RangeByAddrFunc func(ctx context.Context, devAddr types.DevAddr, paths []string, f func(*ttnpb.EndDevice) bool) error
 	SetByIDFunc     func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
 }
 
@@ -117,11 +117,11 @@ func (r MockDeviceRegistry) GetByID(ctx context.Context, appID ttnpb.Application
 }
 
 // RangeByAddr calls RangeByAddrFunc if set and returns error otherwise.
-func (r MockDeviceRegistry) RangeByAddr(devAddr types.DevAddr, paths []string, f func(*ttnpb.EndDevice) bool) error {
+func (r MockDeviceRegistry) RangeByAddr(ctx context.Context, devAddr types.DevAddr, paths []string, f func(*ttnpb.EndDevice) bool) error {
 	if r.RangeByAddrFunc == nil {
 		return errors.New("RangeByAddr not set")
 	}
-	return r.RangeByAddrFunc(devAddr, paths, f)
+	return r.RangeByAddrFunc(ctx, devAddr, paths, f)
 }
 
 // SetByID calls SetByIDFunc if set and returns nil, error otherwise.

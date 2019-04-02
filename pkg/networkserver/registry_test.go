@@ -64,7 +64,7 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 
 	var rets []*ttnpb.EndDevice
 	rets = nil
-	err = reg.RangeByAddr(pb.Session.DevAddr, ttnpb.EndDeviceFieldPathsTopLevel, func(dev *ttnpb.EndDevice) bool {
+	err = reg.RangeByAddr(ctx, pb.Session.DevAddr, ttnpb.EndDeviceFieldPathsTopLevel, func(dev *ttnpb.EndDevice) bool {
 		rets = append(rets, dev)
 		return true
 	})
@@ -72,7 +72,7 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 	a.So(rets, should.BeNil)
 
 	rets = nil
-	err = reg.RangeByAddr(pb.PendingSession.DevAddr, ttnpb.EndDeviceFieldPathsTopLevel, func(dev *ttnpb.EndDevice) bool {
+	err = reg.RangeByAddr(ctx, pb.PendingSession.DevAddr, ttnpb.EndDeviceFieldPathsTopLevel, func(dev *ttnpb.EndDevice) bool {
 		rets = append(rets, dev)
 		return true
 	})
@@ -116,7 +116,7 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 	a.So(err, should.BeNil)
 	a.So(ret, should.HaveEmptyDiff, pb)
 
-	err = reg.RangeByAddr(pb.Session.DevAddr, ttnpb.EndDeviceFieldPathsTopLevel, func(dev *ttnpb.EndDevice) bool {
+	err = reg.RangeByAddr(ctx, pb.Session.DevAddr, ttnpb.EndDeviceFieldPathsTopLevel, func(dev *ttnpb.EndDevice) bool {
 		rets = append(rets, dev)
 		return true
 	})
@@ -124,7 +124,7 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 	a.So(rets, should.HaveSameElementsDiff, []*ttnpb.EndDevice{pb})
 
 	rets = nil
-	err = reg.RangeByAddr(pb.PendingSession.DevAddr, ttnpb.EndDeviceFieldPathsTopLevel, func(dev *ttnpb.EndDevice) bool {
+	err = reg.RangeByAddr(ctx, pb.PendingSession.DevAddr, ttnpb.EndDeviceFieldPathsTopLevel, func(dev *ttnpb.EndDevice) bool {
 		rets = append(rets, dev)
 		return true
 	})
@@ -183,7 +183,7 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 	a.So(ret, should.Resemble, pbOther)
 
 	rets = nil
-	err = reg.RangeByAddr(pbOther.Session.DevAddr, ttnpb.EndDeviceFieldPathsTopLevel, func(dev *ttnpb.EndDevice) bool {
+	err = reg.RangeByAddr(ctx, pbOther.Session.DevAddr, ttnpb.EndDeviceFieldPathsTopLevel, func(dev *ttnpb.EndDevice) bool {
 		rets = append(rets, dev)
 		return true
 	})
@@ -191,7 +191,7 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 	a.So(rets, should.HaveSameElementsDiff, []*ttnpb.EndDevice{pb, pbOther})
 
 	rets = nil
-	err = reg.RangeByAddr(pbOther.PendingSession.DevAddr, ttnpb.EndDeviceFieldPathsTopLevel, func(dev *ttnpb.EndDevice) bool {
+	err = reg.RangeByAddr(ctx, pbOther.PendingSession.DevAddr, ttnpb.EndDeviceFieldPathsTopLevel, func(dev *ttnpb.EndDevice) bool {
 		rets = append(rets, dev)
 		return true
 	})
@@ -216,7 +216,7 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 	a.So(ret, should.BeNil)
 
 	rets = nil
-	err = reg.RangeByAddr(pb.Session.DevAddr, ttnpb.EndDeviceFieldPathsTopLevel, func(dev *ttnpb.EndDevice) bool {
+	err = reg.RangeByAddr(ctx, pb.Session.DevAddr, ttnpb.EndDeviceFieldPathsTopLevel, func(dev *ttnpb.EndDevice) bool {
 		rets = append(rets, dev)
 		return true
 	})
@@ -224,7 +224,7 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 	a.So(rets, should.HaveSameElementsDiff, []*ttnpb.EndDevice{pbOther})
 
 	rets = nil
-	err = reg.RangeByAddr(pb.PendingSession.DevAddr, ttnpb.EndDeviceFieldPathsTopLevel, func(dev *ttnpb.EndDevice) bool {
+	err = reg.RangeByAddr(ctx, pb.PendingSession.DevAddr, ttnpb.EndDeviceFieldPathsTopLevel, func(dev *ttnpb.EndDevice) bool {
 		rets = append(rets, dev)
 		return true
 	})
@@ -249,7 +249,7 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 	a.So(ret, should.BeNil)
 
 	rets = nil
-	err = reg.RangeByAddr(pbOther.Session.DevAddr, ttnpb.EndDeviceFieldPathsTopLevel, func(dev *ttnpb.EndDevice) bool {
+	err = reg.RangeByAddr(ctx, pbOther.Session.DevAddr, ttnpb.EndDeviceFieldPathsTopLevel, func(dev *ttnpb.EndDevice) bool {
 		rets = append(rets, dev)
 		return true
 	})
@@ -257,7 +257,7 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 	a.So(rets, should.BeNil)
 
 	rets = nil
-	err = reg.RangeByAddr(pbOther.PendingSession.DevAddr, ttnpb.EndDeviceFieldPathsTopLevel, func(dev *ttnpb.EndDevice) bool {
+	err = reg.RangeByAddr(ctx, pbOther.PendingSession.DevAddr, ttnpb.EndDeviceFieldPathsTopLevel, func(dev *ttnpb.EndDevice) bool {
 		rets = append(rets, dev)
 		return true
 	})
