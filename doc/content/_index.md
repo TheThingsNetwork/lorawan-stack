@@ -5,6 +5,6 @@ weight: 1
 draft: false
 --- 
 
-Welcome to The Things Network Stack for LoRaWAN - V3 !
+Welcome to The Things Network Stack for LoRaWAN !
 
 # WIP.....

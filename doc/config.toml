@@ -1,6 +1,6 @@
 baseURL = "http://localhost"
 languageCode = "en-us"
-title = "The Things Network Stack for LoRaWAN - V3"
+title = "The Things Network Stack for LoRaWAN"
 theme = "hugo-theme-techdoc"
 
 enableGitInfo = true
@@ -13,7 +13,7 @@ expiryDate = ["expiryDate"]
 
 [Params]
     # Souce Code repository section
-    description = "Open-source LoRaWAN network stack suitable for large, small, global and geo-distributed deployments."
+    description = "The Things Network Stack for LoRaWAN is an open-source LoRaWAN network stack suitable for large, global and geo-distributed public and private networks as well as smaller networks."
     github_repository = "https://github.com/TheThingsNetwork/lorawan-stack"
     version = "3.0.0"
 
