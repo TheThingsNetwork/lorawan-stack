@@ -48,7 +48,24 @@ func endDeviceIDFlags() *pflag.FlagSet {
 	flagSet.String("device-id", "", "")
 	flagSet.String("join-eui", "", "(hex)")
 	flagSet.String("dev-eui", "", "(hex)")
+	addDeprecatedDeviceFlags(flagSet)
 	return flagSet
+}
+
+func addDeprecatedDeviceFlags(flagSet *pflag.FlagSet) {
+	util.DeprecateFlag(flagSet, "app-eui", "join-eui")
+	util.DeprecateFlag(flagSet, "session.keys.nwk_s_key", "session.keys.f_nwk_s_int_key")
+	util.DeprecateFlag(flagSet, "pending_session.keys.nwk_s_key", "pending_session.keys.f_nwk_s_int_key")
+	util.DeprecateFlag(flagSet, "session.keys.nwk_s_key.key", "session.keys.f_nwk_s_int_key.key")
+	util.DeprecateFlag(flagSet, "pending_session.keys.nwk_s_key.key", "pending_session.keys.f_nwk_s_int_key.key")
+}
+
+func forwardDeprecatedDeviceFlags(flagSet *pflag.FlagSet) {
+	util.ForwardFlag(flagSet, "app-eui", "join-eui")
+	util.ForwardFlag(flagSet, "session.keys.nwk_s_key", "session.keys.f_nwk_s_int_key")
+	util.ForwardFlag(flagSet, "pending_session.keys.nwk_s_key", "pending_session.keys.f_nwk_s_int_key")
+	util.ForwardFlag(flagSet, "session.keys.nwk_s_key.key", "session.keys.f_nwk_s_int_key.key")
+	util.ForwardFlag(flagSet, "pending_session.keys.nwk_s_key.key", "pending_session.keys.f_nwk_s_int_key.key")
 }
 
 var (
@@ -60,6 +77,7 @@ var (
 )
 
 func getEndDeviceID(flagSet *pflag.FlagSet, args []string, requireID bool) (*ttnpb.EndDeviceIdentifiers, error) {
+	forwardDeprecatedDeviceFlags(flagSet)
 	applicationID, _ := flagSet.GetString("application-id")
 	deviceID, _ := flagSet.GetString("device-id")
 	switch len(args) {
@@ -148,6 +166,8 @@ var (
 		Aliases: []string{"ls"},
 		Short:   "List end devices",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			forwardDeprecatedDeviceFlags(cmd.Flags())
+
 			appID := getApplicationID(cmd.Flags(), args)
 			if appID == nil {
 				return errNoApplicationID
@@ -174,6 +194,8 @@ var (
 		Aliases: []string{"info"},
 		Short:   "Get an end device",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			forwardDeprecatedDeviceFlags(cmd.Flags())
+
 			devID, err := getEndDeviceID(cmd.Flags(), args, true)
 			if err != nil {
 				return err
@@ -244,6 +266,8 @@ var (
 		Aliases: []string{"add", "register"},
 		Short:   "Create an end device",
 		RunE: asBulk(func(cmd *cobra.Command, args []string) (err error) {
+			forwardDeprecatedDeviceFlags(cmd.Flags())
+
 			devID, err := getEndDeviceID(cmd.Flags(), args, false)
 			if err != nil {
 				return err
@@ -415,6 +439,8 @@ var (
 		Aliases: []string{"set"},
 		Short:   "Update an end device",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			forwardDeprecatedDeviceFlags(cmd.Flags())
+
 			devID, err := getEndDeviceID(cmd.Flags(), args, true)
 			if err != nil {
 				return err
@@ -649,6 +675,9 @@ func init() {
 		}
 	})
 
+	addDeprecatedDeviceFlags(selectEndDeviceListFlags)
+	addDeprecatedDeviceFlags(selectEndDeviceFlags)
+
 	util.FieldFlags(&ttnpb.EndDevice{}).VisitAll(func(flag *pflag.Flag) {
 		if ttnpb.ContainsField(flag.Name, setEndDeviceToIS) ||
 			ttnpb.ContainsField(flag.Name, setEndDeviceToNS) ||
@@ -657,6 +686,8 @@ func init() {
 			setEndDeviceFlags.AddFlag(flag)
 		}
 	})
+
+	addDeprecatedDeviceFlags(setEndDeviceFlags)
 
 	endDevicesListFrequencyPlans.Flags().Uint32("base-frequency", 0, "Base frequency in MHz for hardware support (433, 470, 868 or 915)")
 	endDevicesCommand.AddCommand(endDevicesListFrequencyPlans)
