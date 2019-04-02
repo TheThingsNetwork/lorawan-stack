@@ -5730,6 +5730,10 @@
         },
         "universal_rights": {
           "$ref": "#/definitions/v3Rights"
+        },
+        "is_admin": {
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },

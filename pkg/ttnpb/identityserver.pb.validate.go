@@ -59,6 +59,8 @@ func (m *AuthInfoResponse) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "is_admin":
+			// no validation rules for IsAdmin
 		case "access_method":
 			if len(subs) == 0 {
 				subs = []string{

@@ -36,8 +36,7 @@ var (
 )
 
 func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateClientRequest) (cli *ttnpb.Client, err error) {
-	createdByAdmin := is.UniversalRights(ctx).IncludesAll(ttnpb.RIGHT_USER_ALL)
-
+	createdByAdmin := is.IsAdmin(ctx)
 	if err = blacklist.Check(ctx, req.ClientID); err != nil {
 		return nil, err
 	}
@@ -229,7 +228,7 @@ func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateCli
 			return nil, err
 		}
 	}
-	updatedByAdmin := is.UniversalRights(ctx).IncludesAll(ttnpb.RIGHT_USER_ALL)
+	updatedByAdmin := is.IsAdmin(ctx)
 
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "grants") && !updatedByAdmin {
 		return nil, errUpdateClientAdminField.WithAttributes("field", "grants")

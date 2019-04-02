@@ -82,7 +82,7 @@ func (is *IdentityServer) validatePasswordStrength(ctx context.Context, password
 }
 
 func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserRequest) (usr *ttnpb.User, err error) {
-	createdByAdmin := is.UniversalRights(ctx).IncludesAll(ttnpb.RIGHT_USER_ALL)
+	createdByAdmin := is.IsAdmin(ctx)
 
 	if err = blacklist.Check(ctx, req.UserID); err != nil {
 		return nil, err
@@ -266,7 +266,7 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 	if len(req.FieldMask.Paths) == 0 {
 		req.FieldMask.Paths = updatePaths
 	}
-	updatedByAdmin := is.UniversalRights(ctx).IncludesAll(ttnpb.RIGHT_USER_ALL)
+	updatedByAdmin := is.IsAdmin(ctx)
 
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "password", "password_updated_at") {
 		return nil, errUpdateUserPasswordRequest

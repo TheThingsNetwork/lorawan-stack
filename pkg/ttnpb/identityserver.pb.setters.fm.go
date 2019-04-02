@@ -28,6 +28,16 @@ func (dst *AuthInfoResponse) SetFields(src *AuthInfoResponse, paths ...string) e
 					dst.UniversalRights = nil
 				}
 			}
+		case "is_admin":
+			if len(subs) > 0 {
+				return fmt.Errorf("'is_admin' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.IsAdmin = src.IsAdmin
+			} else {
+				var zero bool
+				dst.IsAdmin = zero
+			}
 
 		case "access_method":
 			if len(subs) == 0 && src == nil {

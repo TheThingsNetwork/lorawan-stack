@@ -2956,6 +2956,7 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | api_key | [AuthInfoResponse.APIKeyAccess](#ttn.lorawan.v3.AuthInfoResponse.APIKeyAccess) |  |  |
 | oauth_access_token | [OAuthAccessToken](#ttn.lorawan.v3.OAuthAccessToken) |  |  |
 | universal_rights | [Rights](#ttn.lorawan.v3.Rights) |  |  |
+| is_admin | [bool](#bool) |  |  |
 
 
 
