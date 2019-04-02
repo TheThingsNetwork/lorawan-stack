@@ -20,6 +20,7 @@ package validator
 
 import (
 	"context"
+	"runtime/trace"
 
 	"github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -65,15 +66,19 @@ func validateMessage(ctx context.Context, fullMethod string, msg interface{}) er
 	if v, ok := msg.(interface {
 		GetFieldMask() types.FieldMask
 	}); ok {
+		region := trace.StartRegion(ctx, "validate field mask")
 		if forbiddenPaths := forbiddenPaths(v.GetFieldMask().Paths, allowedFieldMaskPaths[fullMethod]); len(forbiddenPaths) > 0 {
+			region.End()
 			return errForbiddenFieldMaskPaths.WithAttributes("forbidden_paths", forbiddenPaths)
 		}
+		region.End()
 	}
 
 	switch v := msg.(type) {
 	case interface {
 		ValidateContext(context.Context) error
 	}:
+		defer trace.StartRegion(ctx, "validate with context").End()
 		if err := v.ValidateContext(ctx); err != nil {
 			return convertError(err)
 		}
@@ -82,6 +87,7 @@ func validateMessage(ctx context.Context, fullMethod string, msg interface{}) er
 	case interface {
 		Validate() error
 	}:
+		defer trace.StartRegion(ctx, "validate without context").End()
 		if err := v.Validate(); err != nil {
 			return convertError(err)
 		}
@@ -90,6 +96,7 @@ func validateMessage(ctx context.Context, fullMethod string, msg interface{}) er
 	case interface {
 		ValidateFields(...string) error
 	}:
+		defer trace.StartRegion(ctx, "validate fields").End()
 		if err := v.ValidateFields(); err != nil {
 			return convertError(err)
 		}
