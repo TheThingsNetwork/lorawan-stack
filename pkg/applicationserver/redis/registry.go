@@ -16,6 +16,7 @@ package redis
 
 import (
 	"context"
+	"runtime/trace"
 	"time"
 
 	"github.com/go-redis/redis"
@@ -65,6 +66,8 @@ func (r *DeviceRegistry) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 		return nil, err
 	}
 
+	defer trace.StartRegion(ctx, "get end device").End()
+
 	pb := &ttnpb.EndDevice{}
 	if err := ttnredis.GetProto(r.Redis, r.uidKey(unique.ID(ctx, ids))).ScanProto(pb); err != nil {
 		return nil, err
@@ -86,6 +89,8 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 	}
 	uid := unique.ID(ctx, ids)
 	uk := r.uidKey(uid)
+
+	defer trace.StartRegion(ctx, "set end device").End()
 
 	var pb *ttnpb.EndDevice
 	err := r.Redis.Watch(func(tx *redis.Tx) error {
@@ -218,6 +223,8 @@ func (r *LinkRegistry) appKey(uid string) string {
 
 // Get returns the link by the application identifiers.
 func (r *LinkRegistry) Get(ctx context.Context, ids ttnpb.ApplicationIdentifiers, paths []string) (*ttnpb.ApplicationLink, error) {
+	defer trace.StartRegion(ctx, "get link").End()
+
 	pb := &ttnpb.ApplicationLink{}
 	if err := ttnredis.GetProto(r.Redis, r.appKey(unique.ID(ctx, ids))).ScanProto(pb); err != nil {
 		return nil, err
@@ -229,6 +236,8 @@ var errApplicationUID = errors.DefineCorruption("application_uid", "invalid appl
 
 // Range ranges the links and calls the callback function, until false is returned.
 func (r *LinkRegistry) Range(ctx context.Context, paths []string, f func(context.Context, ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationLink) bool) error {
+	defer trace.StartRegion(ctx, "range links").End()
+
 	uids, err := r.Redis.SMembers(r.allKey()).Result()
 	if err != nil {
 		return err
@@ -259,6 +268,8 @@ func (r *LinkRegistry) Range(ctx context.Context, paths []string, f func(context
 
 // Set creates, updates or deletes the link by the application identifiers.
 func (r *LinkRegistry) Set(ctx context.Context, ids ttnpb.ApplicationIdentifiers, gets []string, f func(*ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error)) (*ttnpb.ApplicationLink, error) {
+	defer trace.StartRegion(ctx, "set link").End()
+
 	uid := unique.ID(ctx, ids)
 	uk := r.appKey(uid)
 	var pb *ttnpb.ApplicationLink
