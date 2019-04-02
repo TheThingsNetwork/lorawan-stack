@@ -54,7 +54,7 @@ class Tabular extends React.Component {
       const from = pageSize * (page - 1)
       const to = pageSize * page
 
-      return items.splice(from, to)
+      return items.slice(from, to)
     }
 
     return items
