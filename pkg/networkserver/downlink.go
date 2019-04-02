@@ -471,25 +471,6 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *ttnpb
 	return nil, time.Time{}, errSchedule
 }
 
-func (ns *NetworkServer) sendQueueInvalidationToAS(ctx context.Context, dev *ttnpb.EndDevice, fCnt uint32) (bool, error) {
-	ok, err := ns.handleASUplink(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, &ttnpb.ApplicationUp{
-		EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-		CorrelationIDs:       events.CorrelationIDsFromContext(ctx),
-		Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
-			DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
-				Downlinks:    dev.QueuedApplicationDownlinks,
-				LastFCntDown: fCnt,
-			},
-		},
-	})
-	if err != nil {
-		log.FromContext(ctx).WithError(err).Warn("Failed to send application downlink queue invalidation to Application Server")
-	} else if !ok {
-		log.FromContext(ctx).Warn("Application Server not found")
-	}
-	return ok, err
-}
-
 func appendRecentDownlink(recent []*ttnpb.DownlinkMessage, down *ttnpb.DownlinkMessage, window int) []*ttnpb.DownlinkMessage {
 	recent = append(recent, down)
 	if len(recent) > window {
@@ -512,9 +493,9 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 		ctx = log.NewContext(ctx, logger)
 		logger.WithField("start_at", t).Debug("Process downlink task")
 
-		var sendInvalidation func() (bool, error)
+		var genDown *generatedDownlink
 		var nextDownlinkAt time.Time
-		_, err := ns.devices.SetByID(ctx, devID.ApplicationIdentifiers, devID.DeviceID,
+		dev, err := ns.devices.SetByID(ctx, devID.ApplicationIdentifiers, devID.DeviceID,
 			[]string{
 				"frequency_plan_id",
 				"last_dev_status_received_at",
@@ -673,7 +654,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						if req.Rx2DataRateIndex < minDR {
 							minDR = req.Rx2DataRateIndex
 						}
-						genDown, err := ns.generateDownlink(ctx, dev,
+						genDown, err = ns.generateDownlink(ctx, dev,
 							band.DataRates[minDR].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 							maxUpLength,
 						)
@@ -703,9 +684,6 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						if err != nil {
 							scheduleErr = true
 						} else {
-							if genDown.ApplicationDownlink == nil && len(dev.QueuedApplicationDownlinks) > 0 && dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
-								sendInvalidation = func() (bool, error) { return ns.sendQueueInvalidationToAS(ctx, dev, genDown.FCnt) }
-							}
 							dev.MACState.RxWindowsAvailable = false
 							dev.RecentDownlinks = appendRecentDownlink(dev.RecentDownlinks, down, recentDownlinkCount)
 							return dev, []string{
@@ -734,7 +712,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						// we need to create a deep copy for the first call.
 						devCopy := deepcopy.Copy(dev).(*ttnpb.EndDevice)
 
-						genDown, err := ns.generateDownlink(ctx, dev,
+						genDown, err = ns.generateDownlink(ctx, dev,
 							band.DataRates[req.Rx1DataRateIndex].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 							maxUpLength,
 						)
@@ -786,10 +764,6 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 								if dev.MACState.DeviceClass == ttnpb.CLASS_C && nextDownlinkAt.Before(downAt) {
 									nextDownlinkAt = downAt
 								}
-
-								if genDown.ApplicationDownlink == nil && len(dev.QueuedApplicationDownlinks) > 0 && dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
-									sendInvalidation = func() (bool, error) { return ns.sendQueueInvalidationToAS(ctx, dev, genDown.FCnt) }
-								}
 								dev.MACState.RxWindowsAvailable = false
 								dev.RecentDownlinks = appendRecentDownlink(dev.RecentDownlinks, down, recentDownlinkCount)
 								return dev, []string{
@@ -817,7 +791,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						Rx2Frequency:     dev.MACState.CurrentParameters.Rx2Frequency,
 					}
 
-					genDown, err := ns.generateDownlink(ctx, dev,
+					genDown, err = ns.generateDownlink(ctx, dev,
 						band.DataRates[req.Rx2DataRateIndex].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 						maxUpLength,
 					)
@@ -878,10 +852,6 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						if dev.MACState.DeviceClass == ttnpb.CLASS_C && nextDownlinkAt.Before(downAt) {
 							nextDownlinkAt = downAt
 						}
-
-						if genDown.ApplicationDownlink == nil && len(dev.QueuedApplicationDownlinks) > 0 && dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
-							sendInvalidation = func() (bool, error) { return ns.sendQueueInvalidationToAS(ctx, dev, genDown.FCnt) }
-						}
 						dev.RecentDownlinks = appendRecentDownlink(dev.RecentDownlinks, down, recentDownlinkCount)
 						return dev, []string{
 							"mac_state",
@@ -912,8 +882,25 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 			return err
 		}
 
-		if sendInvalidation != nil {
-			go sendInvalidation()
+		if genDown != nil && genDown.ApplicationDownlink == nil && len(dev.QueuedApplicationDownlinks) > 0 && dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+			go func() {
+				logger.Debug("Send downlink queue invalidation to Application Server")
+				ok, err := ns.handleASUplink(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, &ttnpb.ApplicationUp{
+					EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
+					CorrelationIDs:       events.CorrelationIDsFromContext(ctx),
+					Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
+						DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
+							Downlinks:    dev.QueuedApplicationDownlinks,
+							LastFCntDown: genDown.FCnt,
+						},
+					},
+				})
+				if err != nil {
+					logger.WithError(err).Warn("Failed to send application downlink queue invalidation to Application Server")
+				} else if !ok {
+					logger.Warn("Application Server not found")
+				}
+			}()
 		}
 
 		if !nextDownlinkAt.IsZero() {
