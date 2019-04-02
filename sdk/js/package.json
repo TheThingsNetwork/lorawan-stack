@@ -7,10 +7,11 @@
   "license": "Apache-2.0",
   "private": false,
   "scripts": {
-    "build": "babel src -d dist",
-    "build:watch": "babel -w src -d dist",
+    "build": "rm -rf dist; babel src -d dist",
+    "build:watch": "rm -rf dist; babel -w src -d dist",
     "test": "node_modules/.bin/jest --testPathIgnorePatterns=/dist/",
-    "test:watch": "node_modules/.bin/jest --testPathIgnorePatterns=/dist/ --watch"
+    "test:watch": "node_modules/.bin/jest --testPathIgnorePatterns=/dist/ --watch",
+    "definitions": "mkdir -p ../../.cache; (cd ../.. && docker run --rm -v $PWD:$PWD -w $PWD htdvisser/protocontainer -I $(dirname $PWD) -I $PWD/vendor --doc_out=$PWD/sdk/js/generated --doc_opt=json,api.json --swagger_out=$PWD/.cache $PWD/api/*.proto); node dist/util/http-mapper.js"
   },
   "devDependencies": {
     "babel": "^6.23.0",

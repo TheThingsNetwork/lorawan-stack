@@ -7269,6 +7269,16 @@
               "fullType": "ttn.lorawan.v3.Rights",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "is_admin",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },
