@@ -17,6 +17,7 @@ import Devices from '../service/devices'
 import Application from '../entity/application'
 import ApiKeys from './api-keys'
 import Link from './link'
+import Collaborators from './collaborators'
 
 /**
  * Applications Class provides an abstraction on all applications and manages
@@ -44,6 +45,12 @@ class Applications {
     })
     this.Link = new Link(api.As)
     this.Devices = new Devices(api, { proxy, stackConfig })
+    this.Collaborators = new Collaborators(api.ApplicationAccess, {
+      parentRoutes: {
+        list: 'application_id',
+        set: 'application_ids.application_id',
+      },
+    })
   }
 
   _responseTransform (response, single = true) {
