@@ -18,6 +18,7 @@ package cayennelpp
 import (
 	"bytes"
 	"context"
+	"runtime/trace"
 
 	lpp "github.com/TheThingsNetwork/go-cayenne-lib/cayennelpp"
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -43,6 +44,8 @@ var (
 
 // Encode encodes the message's DecodedPayload to FRMPayload using CayenneLPP encoding.
 func (h *host) Encode(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, script string) error {
+	defer trace.StartRegion(ctx, "encode message").End()
+
 	decoded := msg.DecodedPayload
 	if decoded == nil {
 		return nil
@@ -70,6 +73,8 @@ func (h *host) Encode(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, versi
 
 // Decode decodes the message's FRMPayload to DecodedPayload using CayenneLPP decoding.
 func (h *host) Decode(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationUplink, script string) error {
+	defer trace.StartRegion(ctx, "decode message").End()
+
 	decoder := lpp.NewDecoder(bytes.NewBuffer(msg.FRMPayload))
 	m := decodedMap(make(map[string]interface{}))
 	if err := decoder.DecodeUplink(m); err != nil {

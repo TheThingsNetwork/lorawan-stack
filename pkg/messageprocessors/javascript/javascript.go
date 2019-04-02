@@ -19,6 +19,7 @@ import (
 	"context"
 	"fmt"
 	"reflect"
+	"runtime/trace"
 
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/gogoproto"
@@ -62,6 +63,8 @@ var (
 
 // Encode encodes the message's DecodedPayload to FRMPayload using the given script.
 func (h *host) Encode(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, script string) error {
+	defer trace.StartRegion(ctx, "encode message").End()
+
 	decoded := msg.DecodedPayload
 	if decoded == nil {
 		return nil
@@ -126,6 +129,8 @@ func (h *host) Encode(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, versi
 
 // Decode decodes the message's FRMPayload to DecodedPayload using the given script.
 func (h *host) Decode(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationUplink, script string) error {
+	defer trace.StartRegion(ctx, "decode message").End()
+
 	env := h.createEnvironment(ids, version)
 	env["payload"] = msg.FRMPayload
 	env["f_port"] = msg.FPort
