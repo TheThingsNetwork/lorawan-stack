@@ -101,17 +101,19 @@ func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.Do
 
 	logger := log.FromContext(ctx).WithField("device_uid", unique.ID(ctx, req.EndDeviceIdentifiers))
 
-	dev, err := ns.devices.SetByID(ctx, req.EndDeviceIdentifiers.ApplicationIdentifiers, req.EndDeviceIdentifiers.DeviceID, []string{
-		"queued_application_downlinks",
-		"mac_state.device_class",
-	},
+	dev, err := ns.devices.SetByID(ctx, req.EndDeviceIdentifiers.ApplicationIdentifiers, req.EndDeviceIdentifiers.DeviceID,
+		[]string{
+			"queued_application_downlinks",
+			"mac_state.device_class",
+		},
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if dev == nil {
 				return nil, nil, errDeviceNotFound
 			}
 			dev.QueuedApplicationDownlinks = req.Downlinks
 			return dev, []string{"queued_application_downlinks"}, nil
-		})
+		},
+	)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to replace application downlink queue")
 		return nil, err
@@ -121,7 +123,6 @@ func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.Do
 	if dev.MACState != nil {
 		logger = logger.WithField("device_class", dev.MACState.DeviceClass)
 	}
-
 	logger.Debug("Replaced application downlink queue")
 	if dev.MACState != nil && dev.MACState.DeviceClass != ttnpb.CLASS_A && len(dev.QueuedApplicationDownlinks) > 0 {
 		startAt := time.Now().UTC()
@@ -150,7 +151,8 @@ func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.Downl
 			}
 			dev.QueuedApplicationDownlinks = append(dev.QueuedApplicationDownlinks, req.Downlinks...)
 			return dev, []string{"queued_application_downlinks"}, nil
-		})
+		},
+	)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to push application downlink to queue")
 		return nil, err
@@ -160,7 +162,6 @@ func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.Downl
 	if dev.MACState != nil {
 		logger = logger.WithField("device_class", dev.MACState.DeviceClass)
 	}
-
 	logger.Debug("Pushed application downlink to queue")
 	if dev.MACState != nil && dev.MACState.DeviceClass != ttnpb.CLASS_A {
 		startAt := time.Now().UTC()
