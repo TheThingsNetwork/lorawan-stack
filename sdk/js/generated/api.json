@@ -745,12 +745,7 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validator.field": {
-                  "string_not_empty": true
-                }
-              }
+              "defaultValue": ""
             },
             {
               "name": "default_formatters",
@@ -1027,7 +1022,7 @@
             },
             {
               "name": "SetLink",
-              "description": "",
+              "description": "Set a link configuration from the Application Server a Network Server.\nThis call returns immediately after setting the link configuration; it does not wait for a link to establish.\nTo get link statistics or errors, use the `GetLinkStats` call.",
               "requestType": "SetApplicationLinkRequest",
               "requestLongType": "SetApplicationLinkRequest",
               "requestFullType": "ttn.lorawan.v3.SetApplicationLinkRequest",
@@ -1072,7 +1067,7 @@
             },
             {
               "name": "GetLinkStats",
-              "description": "",
+              "description": "GetLinkStats returns the link statistics.\nThis call returns a NotFound error code if there is no link for the given application identifiers.\nThis call returns the error code of the link error if linking to a Network Server failed.",
               "requestType": "ApplicationIdentifiers",
               "requestLongType": "ApplicationIdentifiers",
               "requestFullType": "ttn.lorawan.v3.ApplicationIdentifiers",
@@ -1469,13 +1464,7 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validator.field": {
-                  "regex": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$",
-                  "length_lt": 37
-                }
-              }
+              "defaultValue": ""
             }
           ]
         },
@@ -2455,7 +2444,7 @@
             },
             {
               "name": "roles",
-              "description": "Roles of the peer ()",
+              "description": "Roles of the peer.",
               "label": "repeated",
               "type": "Role",
               "longType": "PeerInfo.Role",
@@ -2508,6 +2497,144 @@
         }
       ],
       "services": []
+    },
+    {
+      "name": "lorawan-stack/api/configuration_services.proto",
+      "description": "",
+      "package": "ttn.lorawan.v3",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": true,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "FrequencyPlanDescription",
+          "longName": "FrequencyPlanDescription",
+          "fullName": "ttn.lorawan.v3.FrequencyPlanDescription",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "base_id",
+              "description": "The ID of the frequency that the current frequency plan is based on.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "name",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "base_frequency",
+              "description": "Base frequency in MHz for hardware support (433, 470, 868 or 915)",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ListFrequencyPlansRequest",
+          "longName": "ListFrequencyPlansRequest",
+          "fullName": "ttn.lorawan.v3.ListFrequencyPlansRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "base_frequency",
+              "description": "Optional base frequency in MHz for hardware support (433, 470, 868 or 915)",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ListFrequencyPlansResponse",
+          "longName": "ListFrequencyPlansResponse",
+          "fullName": "ttn.lorawan.v3.ListFrequencyPlansResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "frequency_plans",
+              "description": "",
+              "label": "repeated",
+              "type": "FrequencyPlanDescription",
+              "longType": "FrequencyPlanDescription",
+              "fullType": "ttn.lorawan.v3.FrequencyPlanDescription",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": [
+        {
+          "name": "Configuration",
+          "longName": "Configuration",
+          "fullName": "ttn.lorawan.v3.Configuration",
+          "description": "",
+          "methods": [
+            {
+              "name": "ListFrequencyPlans",
+              "description": "",
+              "requestType": "ListFrequencyPlansRequest",
+              "requestLongType": "ListFrequencyPlansRequest",
+              "requestFullType": "ttn.lorawan.v3.ListFrequencyPlansRequest",
+              "requestStreaming": false,
+              "responseType": "ListFrequencyPlansResponse",
+              "responseLongType": "ListFrequencyPlansResponse",
+              "responseFullType": "ttn.lorawan.v3.ListFrequencyPlansResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/configuration/frequency-plans"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
     },
     {
       "name": "lorawan-stack/api/contact_info.proto",
@@ -3169,9 +3296,9 @@
               "name": "battery_percentage",
               "description": "Latest-known battery percentage of the device.\nReceived via the DevStatus MAC command at last_dev_status_received_at or earlier.\nStored in Network Server.",
               "label": "",
-              "type": "float",
-              "longType": "float",
-              "fullType": "float",
+              "type": "FloatValue",
+              "longType": "google.protobuf.FloatValue",
+              "fullType": "google.protobuf.FloatValue",
               "ismap": false,
               "defaultValue": ""
             },
@@ -3243,13 +3370,7 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validator.field": {
-                  "regex": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$",
-                  "length_lt": 37
-                }
-              }
+              "defaultValue": ""
             },
             {
               "name": "provisioning_data",
@@ -3575,13 +3696,7 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validator.field": {
-                  "regex": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$",
-                  "length_lt": 37
-                }
-              }
+              "defaultValue": ""
             },
             {
               "name": "model_id",
@@ -3591,13 +3706,7 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validator.field": {
-                  "regex": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$",
-                  "length_lt": 37
-                }
-              }
+              "defaultValue": ""
             },
             {
               "name": "hardware_version",
@@ -4039,9 +4148,9 @@
               "name": "ping_slot_frequency",
               "description": "Frequency of the class B ping slot (Hz).\nIf unset, the default value from Network Server configuration will be used.",
               "label": "",
-              "type": "uint64",
-              "longType": "uint64",
-              "fullType": "uint64",
+              "type": "UInt64Value",
+              "longType": "google.protobuf.UInt64Value",
+              "fullType": "google.protobuf.UInt64Value",
               "ismap": false,
               "defaultValue": ""
             },
@@ -4089,9 +4198,9 @@
               "name": "rx2_frequency",
               "description": "Frequency for Rx2 (Hz).\nIf unset, the default value from Network Server configuration or regional parameters specification will be used.",
               "label": "",
-              "type": "uint64",
-              "longType": "uint64",
-              "fullType": "uint64",
+              "type": "UInt64Value",
+              "longType": "google.protobuf.UInt64Value",
+              "fullType": "google.protobuf.UInt64Value",
               "ismap": false,
               "defaultValue": ""
             },
@@ -4209,9 +4318,9 @@
               "name": "desired_rx2_frequency",
               "description": "The Rx2 frequency index Network Server should configure device to use via MAC commands.\nIf unset, the default value from frequency plan, Network Server configuration or regional parameters specification will be used.",
               "label": "",
-              "type": "uint64",
-              "longType": "uint64",
-              "fullType": "uint64",
+              "type": "UInt64Value",
+              "longType": "google.protobuf.UInt64Value",
+              "fullType": "google.protobuf.UInt64Value",
               "ismap": false,
               "defaultValue": ""
             }
@@ -4459,13 +4568,7 @@
               "longType": "bytes",
               "fullType": "bytes",
               "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validator.field": {
-                  "length_gt": 11,
-                  "length_lt": 29
-                }
-              }
+              "defaultValue": ""
             },
             {
               "name": "request",
@@ -4967,10 +5070,10 @@
             {
               "name": "identifiers",
               "description": "",
-              "label": "",
-              "type": "CombinedIdentifiers",
-              "longType": "CombinedIdentifiers",
-              "fullType": "ttn.lorawan.v3.CombinedIdentifiers",
+              "label": "repeated",
+              "type": "EntityIdentifiers",
+              "longType": "EntityIdentifiers",
+              "fullType": "ttn.lorawan.v3.EntityIdentifiers",
               "ismap": false,
               "defaultValue": ""
             },
@@ -5059,10 +5162,10 @@
             {
               "name": "identifiers",
               "description": "",
-              "label": "",
-              "type": "CombinedIdentifiers",
-              "longType": "CombinedIdentifiers",
-              "fullType": "ttn.lorawan.v3.CombinedIdentifiers",
+              "label": "repeated",
+              "type": "EntityIdentifiers",
+              "longType": "EntityIdentifiers",
+              "fullType": "ttn.lorawan.v3.EntityIdentifiers",
               "ismap": false,
               "defaultValue": ""
             },
@@ -6822,13 +6925,7 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validator.field": {
-                  "regex": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$",
-                  "length_lt": 37
-                }
-              }
+              "defaultValue": ""
             }
           ]
         },
@@ -6849,13 +6946,7 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validator.field": {
-                  "regex": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$",
-                  "length_lt": 37
-                }
-              }
+              "defaultValue": ""
             }
           ]
         },
@@ -6897,13 +6988,7 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validator.field": {
-                  "regex": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$",
-                  "length_lt": 37
-                }
-              }
+              "defaultValue": ""
             },
             {
               "name": "application_ids",
@@ -7035,13 +7120,7 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validator.field": {
-                  "regex": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$",
-                  "length_lt": 37
-                }
-              }
+              "defaultValue": ""
             },
             {
               "name": "eui",
@@ -7072,13 +7151,7 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validator.field": {
-                  "regex": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$",
-                  "length_lt": 37
-                }
-              }
+              "defaultValue": ""
             }
           ]
         },
@@ -7130,13 +7203,7 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validator.field": {
-                  "regex": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$",
-                  "length_lt": 37
-                }
-              }
+              "defaultValue": ""
             },
             {
               "name": "email",
@@ -7298,12 +7365,7 @@
               "longType": "bytes",
               "fullType": "bytes",
               "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validator.field": {
-                  "length_eq": 23
-                }
-              }
+              "defaultValue": ""
             },
             {
               "name": "payload",
@@ -7404,13 +7466,7 @@
               "longType": "bytes",
               "fullType": "bytes",
               "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validator.field": {
-                  "length_gt": 16,
-                  "length_lt": 34
-                }
-              }
+              "defaultValue": ""
             },
             {
               "name": "session_keys",
@@ -7526,13 +7582,7 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validator.field": {
-                  "regex": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$",
-                  "length_lt": 37
-                }
-              }
+              "defaultValue": ""
             },
             {
               "name": "provisioning_data",
@@ -7634,13 +7684,7 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validator.field": {
-                  "regex": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$",
-                  "length_lt": 37
-                }
-              }
+              "defaultValue": ""
             },
             {
               "name": "provisioning_data",
@@ -7681,13 +7725,7 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validator.field": {
-                  "regex": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$",
-                  "length_lt": 37
-                }
-              }
+              "defaultValue": ""
             },
             {
               "name": "provisioning_data",
@@ -7724,9 +7762,9 @@
               "name": "join_request_type",
               "description": "",
               "label": "",
-              "type": "uint32",
-              "longType": "uint32",
-              "fullType": "uint32",
+              "type": "RejoinType",
+              "longType": "RejoinType",
+              "fullType": "ttn.lorawan.v3.RejoinType",
               "ismap": false,
               "defaultValue": ""
             },
@@ -7810,13 +7848,7 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validator.field": {
-                  "regex": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$",
-                  "length_lt": 37
-                }
-              }
+              "defaultValue": ""
             },
             {
               "name": "provisioning_data",
@@ -9891,12 +9923,7 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validator.field": {
-                  "int_lt": 65536
-                }
-              }
+              "defaultValue": ""
             },
             {
               "name": "f_opts",
@@ -10740,9 +10767,9 @@
               "name": "rejoin_type",
               "description": "",
               "label": "",
-              "type": "uint32",
-              "longType": "uint32",
-              "fullType": "uint32",
+              "type": "RejoinType",
+              "longType": "RejoinType",
+              "fullType": "ttn.lorawan.v3.RejoinType",
               "ismap": false,
               "defaultValue": ""
             },
@@ -11383,12 +11410,7 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validator.field": {
-                  "int_lt": 256
-                }
-              }
+              "defaultValue": ""
             },
             {
               "name": "frm_payload",
@@ -11736,56 +11758,6 @@
               "defaultValue": ""
             },
             {
-              "name": "tx_power",
-              "description": "Transmission power (dBm). Only on downlink.",
-              "label": "",
-              "type": "int32",
-              "longType": "int32",
-              "fullType": "int32",
-              "ismap": false,
-              "defaultValue": ""
-            },
-            {
-              "name": "invert_polarization",
-              "description": "Invert LoRa polarization; false for LoRaWAN uplink, true for downlink.",
-              "label": "",
-              "type": "bool",
-              "longType": "bool",
-              "fullType": "bool",
-              "ismap": false,
-              "defaultValue": ""
-            },
-            {
-              "name": "gateway_channel_index",
-              "description": "Index of the gateway channel that received the message.\nSet by Gateway Server.",
-              "label": "",
-              "type": "uint32",
-              "longType": "uint32",
-              "fullType": "uint32",
-              "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validator.field": {
-                  "int_lt": 256
-                }
-              }
-            },
-            {
-              "name": "device_channel_index",
-              "description": "Index of the device channel that received the message.\nSet by Network Server.",
-              "label": "",
-              "type": "uint32",
-              "longType": "uint32",
-              "fullType": "uint32",
-              "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validator.field": {
-                  "int_lt": 256
-                }
-              }
-            },
-            {
               "name": "enable_crc",
               "description": "Send a CRC in the packet; only on uplink; on downlink, CRC should not be enabled.",
               "label": "",
@@ -11812,6 +11784,57 @@
               "type": "Timestamp",
               "longType": "google.protobuf.Timestamp",
               "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "downlink",
+              "description": "Transmission settings for downlink.",
+              "label": "",
+              "type": "Downlink",
+              "longType": "TxSettings.Downlink",
+              "fullType": "ttn.lorawan.v3.TxSettings.Downlink",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "Downlink",
+          "longName": "TxSettings.Downlink",
+          "fullName": "ttn.lorawan.v3.TxSettings.Downlink",
+          "description": "Transmission settings for downlink.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "antenna_index",
+              "description": "Index of the antenna on which the uplink was received and/or downlink must be sent.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "tx_power",
+              "description": "Transmission power (dBm). Only on downlink.",
+              "label": "",
+              "type": "float",
+              "longType": "float",
+              "fullType": "float",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "invert_polarization",
+              "description": "Invert LoRa polarization; false for LoRaWAN uplink, true for downlink.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
               "ismap": false,
               "defaultValue": ""
             }
@@ -12896,6 +12919,26 @@
               "type": "string",
               "longType": "string",
               "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "gateway_channel_index",
+              "description": "Index of the gateway channel that received the message.\nSet by Gateway Server.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "device_channel_index",
+              "description": "Index of the device channel that received the message.\nSet by Network Server.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
               "ismap": false,
               "defaultValue": ""
             }
@@ -14878,7 +14921,7 @@
             },
             {
               "name": "bandwidth",
-              "description": "",
+              "description": "Bandwidth (Hz).",
               "label": "",
               "type": "uint32",
               "longType": "uint32",
@@ -15857,12 +15900,7 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validator.field": {
-                  "string_not_empty": true
-                }
-              }
+              "defaultValue": ""
             }
           ]
         },
@@ -16160,12 +16198,7 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validator.field": {
-                  "string_not_empty": true
-                }
-              }
+              "defaultValue": ""
             }
           ]
         },
