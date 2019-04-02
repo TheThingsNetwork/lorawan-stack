@@ -624,6 +624,10 @@ func (as *ApplicationServer) recalculateDownlinkQueue(ctx context.Context, dev *
 	if newSession == nil || newSession.AppSKey == nil {
 		return errNoAppSKey
 	}
+	newSession.LastAFCntDown = nextAFCntDown - 1
+	if len(invalid) == 0 {
+		return nil
+	}
 	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"new_session_key_id", newSession.SessionKeyID,
 		"count", len(invalid),
@@ -655,7 +659,6 @@ func (as *ApplicationServer) recalculateDownlinkQueue(ctx context.Context, dev *
 	if err != nil {
 		return err
 	}
-	newSession.LastAFCntDown = nextAFCntDown - 1
 	valid := make([]*ttnpb.ApplicationDownlink, 0, len(invalid))
 	for _, oldItem := range invalid {
 		logger := logger.WithFields(log.Fields(
