@@ -15,23 +15,19 @@ env:
 matrix:
   include:
   - env: RUNTYPE=js
-    if: type = pull_request
   - env: RUNTYPE=go.test RUN_GOARCH=amd64
-    if: type = pull_request
   - env: RUNTYPE=go.test RUN_GOARCH=386
-    if: type = pull_request
   - env: RUNTYPE=go.lint
-    if: type = pull_request
   - env: RUNTYPE=release
     if: tag IS present OR (type != pull_request AND branch = master)
 services:
 - docker
 cache:
   directories:
-  - "$HOME/.cache/mage"
-  - "$HOME/.cache/go-build"
-  - "$HOME/.cache/yarn"
   - "$GOPATH/pkg/mod"
+  - "$HOME/.cache/go-build"
+  - "$HOME/.cache/mage"
+  - "$HOME/.cache/yarn"
 before_install:
 - |
   if [[ ! -z "$encrypted_fc3d5d829302_key" ]]; then
