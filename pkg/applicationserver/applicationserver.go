@@ -285,7 +285,21 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 		},
 	)
 	if err != nil {
+		var errorDetails ttnpb.ErrorDetails
+		if ttnErr, ok := err.(errors.ErrorDetails); ok {
+			errorDetails = *ttnpb.ErrorDetailsToProto(ttnErr)
+		}
 		for _, item := range items {
+			link.upCh <- &ttnpb.ApplicationUp{
+				EndDeviceIdentifiers: ids,
+				CorrelationIDs:       item.CorrelationIDs,
+				Up: &ttnpb.ApplicationUp_DownlinkFailed{
+					DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
+						ApplicationDownlink: *item,
+						Error:               errorDetails,
+					},
+				},
+			}
 			registerDropDownlink(ctx, ids, item, err)
 		}
 		return err
@@ -293,6 +307,13 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 	atomic.AddUint64(&link.downlinks, uint64(len(items)))
 	atomic.StoreInt64(&link.lastDownlinkTime, time.Now().UnixNano())
 	for _, item := range items {
+		link.upCh <- &ttnpb.ApplicationUp{
+			EndDeviceIdentifiers: ids,
+			CorrelationIDs:       item.CorrelationIDs,
+			Up: &ttnpb.ApplicationUp_DownlinkQueued{
+				DownlinkQueued: item,
+			},
+		}
 		registerForwardDownlink(ctx, ids, item, link.connName)
 	}
 	return nil
