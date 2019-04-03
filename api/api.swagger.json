@@ -8268,22 +8268,6 @@
       ],
       "default": "CONTEXT"
     },
-    "v3RequestInfo": {
-      "type": "object",
-      "properties": {
-        "rx_window": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "antenna_index": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "class": {
-          "$ref": "#/definitions/v3Class"
-        }
-      }
-    },
     "v3Right": {
       "type": "string",
       "enum": [
@@ -8782,21 +8766,9 @@
           "format": "date-time",
           "description": "Time of the gateway when the uplink message was received, or when the downlink message should be transmitted.\nFor downlink, this requires the gateway to have GPS time synchronization."
         },
-<<<<<<< HEAD
-<<<<<<< HEAD
         "downlink": {
           "$ref": "#/definitions/TxSettingsDownlink",
           "description": "Transmission settings for downlink."
-=======
-        "scheduled": {
-          "$ref": "#/definitions/v3Scheduled",
-          "description": "Additional information on the scheduled downlink necessary for the BasicStation LNS gateways."
->>>>>>> api: Add additional fields to TxSettings
-=======
-        "request_info": {
-          "$ref": "#/definitions/v3RequestInfo",
-          "description": "Additional information for the downlink from the original TxRequest; necessary for the BasicStation LNS gateways."
->>>>>>> gs: Add values to TxSettings.Scheduled
         }
       },
       "description": "TxSettings contains the settings for a transmission.\nThis message is used on both uplink and downlink.\nOn downlink, this is a scheduled transmission."

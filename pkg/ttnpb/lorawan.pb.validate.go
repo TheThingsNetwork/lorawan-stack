@@ -1527,29 +1527,12 @@ func (m *TxSettings) ValidateFields(paths ...string) error {
 				}
 			}
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 		case "downlink":
 
 			if v, ok := interface{}(m.GetDownlink()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return TxSettingsValidationError{
 						field:  "downlink",
-=======
-		case "scheduled":
-=======
-		case "request_info":
->>>>>>> gs: Add values to TxSettings.Scheduled
-
-			if v, ok := interface{}(m.GetRequestInfo()).(interface{ ValidateFields(...string) error }); ok {
-				if err := v.ValidateFields(subs...); err != nil {
-					return TxSettingsValidationError{
-<<<<<<< HEAD
-						field:  "scheduled",
->>>>>>> api: Add additional fields to TxSettings
-=======
-						field:  "request_info",
->>>>>>> gs: Add values to TxSettings.Scheduled
 						reason: "embedded message failed validation",
 						cause:  err,
 					}

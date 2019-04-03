@@ -905,8 +905,6 @@ func (dst *TxSettings) SetFields(src *TxSettings, paths ...string) error {
 			} else {
 				dst.Time = nil
 			}
-<<<<<<< HEAD
-<<<<<<< HEAD
 		case "downlink":
 			if len(subs) > 0 {
 				newDst := dst.Downlink
@@ -917,46 +915,15 @@ func (dst *TxSettings) SetFields(src *TxSettings, paths ...string) error {
 				var newSrc *TxSettings_Downlink
 				if src != nil {
 					newSrc = src.Downlink
-=======
-		case "scheduled":
-=======
-		case "request_info":
->>>>>>> gs: Add values to TxSettings.Scheduled
-			if len(subs) > 0 {
-				newDst := dst.RequestInfo
-				if newDst == nil {
-					newDst = &RequestInfo{}
-					dst.RequestInfo = newDst
-				}
-				var newSrc *RequestInfo
-				if src != nil {
-<<<<<<< HEAD
-					newSrc = src.Scheduled
->>>>>>> api: Add additional fields to TxSettings
-=======
-					newSrc = src.RequestInfo
->>>>>>> gs: Add values to TxSettings.Scheduled
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-<<<<<<< HEAD
-<<<<<<< HEAD
 					dst.Downlink = src.Downlink
 				} else {
 					dst.Downlink = nil
-=======
-					dst.Scheduled = src.Scheduled
-				} else {
-					dst.Scheduled = nil
->>>>>>> api: Add additional fields to TxSettings
-=======
-					dst.RequestInfo = src.RequestInfo
-				} else {
-					dst.RequestInfo = nil
->>>>>>> gs: Add values to TxSettings.Scheduled
 				}
 			}
 
