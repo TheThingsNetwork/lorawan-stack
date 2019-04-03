@@ -111,6 +111,11 @@ func (js Js) Deps() error {
 	return yarn("install", "--no-progress", "--production=false")
 }
 
+// Build runs all necessary commands to build the console bundles and files
+func (js Js) Build() {
+	mg.Deps(js.BuildDll, js.BuildMain)
+}
+
 // BuildMain runs the webpack command with the project config.
 func (js Js) BuildMain() error {
 	mg.Deps(js.Translations, js.BackendTranslations, js.BuildDll)
