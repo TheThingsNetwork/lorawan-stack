@@ -226,3 +226,9 @@ func (js Js) BackendTranslations() error {
 	}
 	return nil
 }
+
+func (js Js) Clean() {
+	sh.Rm(".cache")
+	sh.Rm("public")
+	sh.Rm("pkg/webui/locales/.backend")
+}
