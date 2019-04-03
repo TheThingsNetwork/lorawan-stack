@@ -1,6 +1,7 @@
 sudo: required
 conditions: v1
 if: type = pull_request OR branch =~ ^master$ OR tag IS present
+os: linux
 language: go
 go: 1.11.x
 go_import_path: go.thethings.network/lorawan-stack
@@ -14,17 +15,12 @@ env:
 matrix:
   include:
   - env: RUNTYPE=js.test
-    os: linux
   - env: RUNTYPE=go.test GOARCH=amd64
-    os: linux
   - if: type = pull_request OR branch =~ ^master$
     env: RUNTYPE=go.test GOARCH=386
-    os: linux
   - env: RUNTYPE=go.lint
-    os: linux
   - if: tag IS present
     env: RUNTYPE=release
-    os: linux
 services:
 - docker
 cache:
