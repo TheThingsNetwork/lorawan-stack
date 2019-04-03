@@ -69,7 +69,11 @@ script:
     make go.deps
     make dev.databases.start
     make dev.certs
-    make go.test
+    if [[ "$GOARCH" == "amd64" ]]; then
+      make go.coveralls
+    else
+      make go.test
+    fi
   fi
 - |
   if [[ "$RUNTYPE" == "go.lint" ]]; then
@@ -88,10 +92,6 @@ script:
   fi
 - make git.diff
 after_success:
-- |
-  if [[ "$RUNTYPE" == "go.test" ]] && [[ "$GOARCH" == "amd64" ]]; then
-    make go.coveralls
-  fi
 - |
   if [[ "$RUNTYPE" == "release" ]]; then
     docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
