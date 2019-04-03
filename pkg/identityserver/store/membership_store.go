@@ -16,6 +16,8 @@ package store
 
 import (
 	"context"
+	"fmt"
+	"runtime/trace"
 
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -32,6 +34,7 @@ type membershipStore struct {
 }
 
 func (s *membershipStore) FindMembers(ctx context.Context, entityID *ttnpb.EntityIdentifiers) (map[*ttnpb.OrganizationOrUserIdentifiers]*ttnpb.Rights, error) {
+	defer trace.StartRegion(ctx, fmt.Sprintf("find members of %s", entityID.EntityType())).End()
 	entity, err := findEntity(ctx, s.db, entityID, "id")
 	if err != nil {
 		return nil, err
@@ -50,6 +53,11 @@ func (s *membershipStore) FindMembers(ctx context.Context, entityID *ttnpb.Entit
 }
 
 func (s *membershipStore) FindMemberRights(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityType string) (map[*ttnpb.EntityIdentifiers]*ttnpb.Rights, error) {
+	entityTypeForTrace := entityType
+	if entityTypeForTrace == "" {
+		entityTypeForTrace = "all"
+	}
+	defer trace.StartRegion(ctx, fmt.Sprintf("find %s memberships for %s", entityTypeForTrace, id.EntityIdentifiers().EntityType())).End()
 	account, err := findAccount(ctx, s.db, id)
 	if err != nil {
 		return nil, err
@@ -73,6 +81,7 @@ var errAccountType = errors.DefineInvalidArgument(
 )
 
 func (s *membershipStore) SetMember(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityID *ttnpb.EntityIdentifiers, rights *ttnpb.Rights) (err error) {
+	defer trace.StartRegion(ctx, "update membership").End()
 	account, err := findAccount(ctx, s.db, id)
 	if err != nil {
 		return err

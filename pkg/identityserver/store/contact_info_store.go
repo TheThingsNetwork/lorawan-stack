@@ -16,6 +16,7 @@ package store
 
 import (
 	"context"
+	"runtime/trace"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -33,6 +34,7 @@ type contactInfoStore struct {
 }
 
 func (s *contactInfoStore) GetContactInfo(ctx context.Context, entityID *ttnpb.EntityIdentifiers) ([]*ttnpb.ContactInfo, error) {
+	defer trace.StartRegion(ctx, "get contact info").End()
 	entity, err := findEntity(ctx, s.db, entityID, "id")
 	if err != nil {
 		return nil, err
@@ -53,6 +55,7 @@ func (s *contactInfoStore) GetContactInfo(ctx context.Context, entityID *ttnpb.E
 }
 
 func (s *contactInfoStore) SetContactInfo(ctx context.Context, entityID *ttnpb.EntityIdentifiers, pb []*ttnpb.ContactInfo) ([]*ttnpb.ContactInfo, error) {
+	defer trace.StartRegion(ctx, "update contact info").End()
 	entity, err := findEntity(ctx, s.db, entityID, "id")
 	if err != nil {
 		return nil, err
@@ -142,6 +145,7 @@ func (s *contactInfoStore) SetContactInfo(ctx context.Context, entityID *ttnpb.E
 }
 
 func (s *contactInfoStore) CreateValidation(ctx context.Context, validation *ttnpb.ContactInfoValidation) (*ttnpb.ContactInfoValidation, error) {
+	defer trace.StartRegion(ctx, "create contact info validation").End()
 	var (
 		contactMethod ttnpb.ContactMethod
 		value         string
@@ -185,6 +189,7 @@ var (
 )
 
 func (s *contactInfoStore) Validate(ctx context.Context, validation *ttnpb.ContactInfoValidation) error {
+	defer trace.StartRegion(ctx, "validate contact info").End()
 	now := cleanTime(time.Now())
 
 	var model ContactInfoValidation

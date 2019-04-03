@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 	"reflect"
+	"runtime/trace"
 	"strings"
 
 	"github.com/gogo/protobuf/types"
@@ -63,6 +64,7 @@ func selectClientFields(ctx context.Context, query *gorm.DB, fieldMask *types.Fi
 }
 
 func (s *clientStore) CreateClient(ctx context.Context, cli *ttnpb.Client) (*ttnpb.Client, error) {
+	defer trace.StartRegion(ctx, "create client").End()
 	cliModel := Client{
 		ClientID: cli.ClientID, // The ID is not mutated by fromPB.
 	}
@@ -78,6 +80,7 @@ func (s *clientStore) CreateClient(ctx context.Context, cli *ttnpb.Client) (*ttn
 }
 
 func (s *clientStore) FindClients(ctx context.Context, ids []*ttnpb.ClientIdentifiers, fieldMask *types.FieldMask) ([]*ttnpb.Client, error) {
+	defer trace.StartRegion(ctx, "find clients").End()
 	idStrings := make([]string, len(ids))
 	for i, id := range ids {
 		idStrings[i] = id.GetClientID()
@@ -104,6 +107,7 @@ func (s *clientStore) FindClients(ctx context.Context, ids []*ttnpb.ClientIdenti
 }
 
 func (s *clientStore) GetClient(ctx context.Context, id *ttnpb.ClientIdentifiers, fieldMask *types.FieldMask) (*ttnpb.Client, error) {
+	defer trace.StartRegion(ctx, "get client").End()
 	query := s.db.Scopes(withContext(ctx), withClientID(id.GetClientID()))
 	query = selectClientFields(ctx, query, fieldMask)
 	var cliModel Client
@@ -119,6 +123,7 @@ func (s *clientStore) GetClient(ctx context.Context, id *ttnpb.ClientIdentifiers
 }
 
 func (s *clientStore) UpdateClient(ctx context.Context, cli *ttnpb.Client, fieldMask *types.FieldMask) (updated *ttnpb.Client, err error) {
+	defer trace.StartRegion(ctx, "update client").End()
 	query := s.db.Scopes(withContext(ctx), withClientID(cli.GetClientID()))
 	query = selectClientFields(ctx, query, fieldMask)
 	var cliModel Client
@@ -140,7 +145,7 @@ func (s *clientStore) UpdateClient(ctx context.Context, cli *ttnpb.Client, field
 		}
 	}
 	if !reflect.DeepEqual(oldAttributes, cliModel.Attributes) {
-		if err = replaceAttributes(s.db, "client", cliModel.ID, oldAttributes, cliModel.Attributes); err != nil {
+		if err = replaceAttributes(ctx, s.db, "client", cliModel.ID, oldAttributes, cliModel.Attributes); err != nil {
 			return nil, err
 		}
 	}
@@ -150,5 +155,6 @@ func (s *clientStore) UpdateClient(ctx context.Context, cli *ttnpb.Client, field
 }
 
 func (s *clientStore) DeleteClient(ctx context.Context, id *ttnpb.ClientIdentifiers) error {
+	defer trace.StartRegion(ctx, "delete client").End()
 	return deleteEntity(ctx, s.db, id.EntityIdentifiers())
 }

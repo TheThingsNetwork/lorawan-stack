@@ -14,9 +14,15 @@
 
 package store
 
-import "github.com/jinzhu/gorm"
+import (
+	"context"
+	"runtime/trace"
 
-func replaceEndDeviceLocations(db *gorm.DB, endDeviceUUID string, old []EndDeviceLocation, new []EndDeviceLocation) (err error) {
+	"github.com/jinzhu/gorm"
+)
+
+func replaceEndDeviceLocations(ctx context.Context, db *gorm.DB, endDeviceUUID string, old []EndDeviceLocation, new []EndDeviceLocation) (err error) {
+	defer trace.StartRegion(ctx, "update end device locations").End()
 	oldByUUID := make(map[string]EndDeviceLocation, len(old))
 	for _, loc := range old {
 		oldByUUID[loc.ID] = loc

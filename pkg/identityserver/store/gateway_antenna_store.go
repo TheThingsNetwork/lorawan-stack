@@ -15,10 +15,14 @@
 package store
 
 import (
+	"context"
+	"runtime/trace"
+
 	"github.com/jinzhu/gorm"
 )
 
-func replaceGatewayAntennas(db *gorm.DB, gatewayUUID string, old []GatewayAntenna, new []GatewayAntenna) (err error) {
+func replaceGatewayAntennas(ctx context.Context, db *gorm.DB, gatewayUUID string, old []GatewayAntenna, new []GatewayAntenna) (err error) {
+	defer trace.StartRegion(ctx, "update gateway antennas").End()
 	db = db.Where(GatewayAntenna{GatewayID: gatewayUUID})
 	if len(new) < len(old) {
 		if err = db.Where("\"index\" >= ?", len(new)).Delete(&GatewayAntenna{}).Error; err != nil {

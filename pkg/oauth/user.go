@@ -18,6 +18,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"runtime/trace"
 	"time"
 
 	"github.com/gogo/protobuf/types"
@@ -165,7 +166,9 @@ func (s *server) doLogin(ctx context.Context, userID, password string) error {
 	if err != nil {
 		return err
 	}
+	region := trace.StartRegion(ctx, "validate password")
 	ok, err := auth.Password(user.Password).Validate(password)
+	region.End()
 	if err != nil || !ok {
 		events.Publish(evtUserLoginFailed(ctx, user.UserIdentifiers, nil))
 		return errIncorrectPassword

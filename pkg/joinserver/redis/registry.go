@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
+	"runtime/trace"
 	"time"
 
 	"github.com/go-redis/redis"
@@ -89,6 +90,8 @@ func (r *DeviceRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIde
 		return nil, err
 	}
 
+	defer trace.StartRegion(ctx, "get end device by id").End()
+
 	pb := &ttnpb.EndDevice{}
 	if err := ttnredis.GetProto(r.Redis, r.uidKey(unique.ID(ctx, ids))).ScanProto(pb); err != nil {
 		return nil, err
@@ -101,6 +104,8 @@ func (r *DeviceRegistry) GetByEUI(ctx context.Context, joinEUI types.EUI64, devE
 	if joinEUI.IsZero() || devEUI.IsZero() {
 		return nil, errInvalidIdentifiers
 	}
+
+	defer trace.StartRegion(ctx, "get end device by eui").End()
 
 	pb := &ttnpb.EndDevice{}
 	if err := ttnredis.FindProto(r.Redis, r.euiKey(joinEUI, devEUI), r.uidKey).ScanProto(pb); err != nil {
@@ -267,6 +272,8 @@ func (r *DeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devE
 	}
 	ek := r.euiKey(joinEUI, devEUI)
 
+	defer trace.StartRegion(ctx, "set end device by eui").End()
+
 	var pb *ttnpb.EndDevice
 	err := r.Redis.Watch(func(tx *redis.Tx) error {
 		uid, err := tx.Get(ek).Result()
@@ -295,6 +302,8 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 		return nil, err
 	}
 	uid := unique.ID(ctx, ids)
+
+	defer trace.StartRegion(ctx, "set end device by id").End()
 
 	var pb *ttnpb.EndDevice
 	err := r.Redis.Watch(func(tx *redis.Tx) error {
@@ -347,6 +356,8 @@ func (r *KeyRegistry) GetByID(ctx context.Context, devEUI types.EUI64, id []byte
 		return nil, errInvalidIdentifiers
 	}
 
+	defer trace.StartRegion(ctx, "get session keys").End()
+
 	pb := &ttnpb.SessionKeys{}
 	if err := ttnredis.GetProto(r.Redis, r.idKey(devEUI, id)).ScanProto(pb); err != nil {
 		return nil, err
@@ -360,6 +371,8 @@ func (r *KeyRegistry) SetByID(ctx context.Context, devEUI types.EUI64, id []byte
 		return nil, errInvalidIdentifiers
 	}
 	ik := r.idKey(devEUI, id)
+
+	defer trace.StartRegion(ctx, "set session keys").End()
 
 	var pb *ttnpb.SessionKeys
 	err := r.Redis.Watch(func(tx *redis.Tx) error {

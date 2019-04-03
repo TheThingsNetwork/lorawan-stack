@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 	"reflect"
+	"runtime/trace"
 	"strings"
 
 	"github.com/gogo/protobuf/types"
@@ -67,6 +68,7 @@ func selectOrganizationFields(ctx context.Context, query *gorm.DB, fieldMask *ty
 }
 
 func (s *organizationStore) CreateOrganization(ctx context.Context, org *ttnpb.Organization) (*ttnpb.Organization, error) {
+	defer trace.StartRegion(ctx, "create organization").End()
 	orgModel := Organization{
 		Account: Account{UID: org.OrganizationID}, // The ID is not mutated by fromPB.
 	}
@@ -82,6 +84,7 @@ func (s *organizationStore) CreateOrganization(ctx context.Context, org *ttnpb.O
 }
 
 func (s *organizationStore) FindOrganizations(ctx context.Context, ids []*ttnpb.OrganizationIdentifiers, fieldMask *types.FieldMask) ([]*ttnpb.Organization, error) {
+	defer trace.StartRegion(ctx, "find organizations").End()
 	idStrings := make([]string, len(ids))
 	for i, id := range ids {
 		idStrings[i] = id.GetOrganizationID()
@@ -108,6 +111,7 @@ func (s *organizationStore) FindOrganizations(ctx context.Context, ids []*ttnpb.
 }
 
 func (s *organizationStore) GetOrganization(ctx context.Context, id *ttnpb.OrganizationIdentifiers, fieldMask *types.FieldMask) (*ttnpb.Organization, error) {
+	defer trace.StartRegion(ctx, "get organization").End()
 	query := s.db.Scopes(withContext(ctx), withOrganizationID(id.GetOrganizationID()))
 	query = selectOrganizationFields(ctx, query, fieldMask)
 	var orgModel Organization
@@ -123,6 +127,7 @@ func (s *organizationStore) GetOrganization(ctx context.Context, id *ttnpb.Organ
 }
 
 func (s *organizationStore) UpdateOrganization(ctx context.Context, org *ttnpb.Organization, fieldMask *types.FieldMask) (updated *ttnpb.Organization, err error) {
+	defer trace.StartRegion(ctx, "update organization").End()
 	query := s.db.Scopes(withContext(ctx), withOrganizationID(org.GetOrganizationID()))
 	query = selectOrganizationFields(ctx, query, fieldMask)
 	var orgModel Organization
@@ -144,7 +149,7 @@ func (s *organizationStore) UpdateOrganization(ctx context.Context, org *ttnpb.O
 		}
 	}
 	if !reflect.DeepEqual(oldAttributes, orgModel.Attributes) {
-		if err = replaceAttributes(s.db, "organization", orgModel.ID, oldAttributes, orgModel.Attributes); err != nil {
+		if err = replaceAttributes(ctx, s.db, "organization", orgModel.ID, oldAttributes, orgModel.Attributes); err != nil {
 			return nil, err
 		}
 	}
@@ -154,6 +159,7 @@ func (s *organizationStore) UpdateOrganization(ctx context.Context, org *ttnpb.O
 }
 
 func (s *organizationStore) DeleteOrganization(ctx context.Context, id *ttnpb.OrganizationIdentifiers) (err error) {
+	defer trace.StartRegion(ctx, "delete organization").End()
 	defer func() {
 		if err != nil && gorm.IsRecordNotFoundError(err) {
 			err = errNotFoundForID(id.EntityIdentifiers())

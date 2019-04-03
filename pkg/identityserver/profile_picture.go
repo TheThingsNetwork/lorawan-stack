@@ -20,6 +20,7 @@ import (
 	"crypto/md5"
 	"fmt"
 	"math/rand"
+	"runtime/trace"
 	"strings"
 	"time"
 
@@ -73,7 +74,9 @@ func (is *IdentityServer) processUserProfilePicture(ctx context.Context, usr *tt
 
 	// Embedded (uploaded) picture. Make square.
 	if usr.ProfilePicture.Embedded != nil && len(usr.ProfilePicture.Embedded.Data) > 0 {
+		region := trace.StartRegion(ctx, "make profile picture square")
 		usr.ProfilePicture, err = picture.MakeSquare(bytes.NewBuffer(usr.ProfilePicture.Embedded.Data), maxProfilePictureStoredDimensions)
+		region.End()
 		if err != nil {
 			return err
 		}
@@ -85,7 +88,10 @@ func (is *IdentityServer) processUserProfilePicture(ctx context.Context, usr *tt
 		return err
 	}
 	id := fmt.Sprintf("%s.%s", unique.ID(ctx, usr.UserIdentifiers), ulid.MustNew(ulid.Now(), profilePictureRand).String())
+
+	region := trace.StartRegion(ctx, "store profile picture")
 	usr.ProfilePicture, err = picture.Store(ctx, bucket, id, usr.ProfilePicture, profilePictureDimensions...)
+	region.End()
 	if err != nil {
 		return err
 	}

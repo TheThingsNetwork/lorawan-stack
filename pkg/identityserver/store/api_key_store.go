@@ -16,6 +16,7 @@ package store
 
 import (
 	"context"
+	"runtime/trace"
 
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -32,6 +33,7 @@ type apiKeyStore struct {
 }
 
 func (s *apiKeyStore) CreateAPIKey(ctx context.Context, entityID *ttnpb.EntityIdentifiers, key *ttnpb.APIKey) error {
+	defer trace.StartRegion(ctx, "create api key").End()
 	entity, err := findEntity(ctx, s.db, entityID, "id")
 	if err != nil {
 		return err
@@ -49,6 +51,7 @@ func (s *apiKeyStore) CreateAPIKey(ctx context.Context, entityID *ttnpb.EntityId
 }
 
 func (s *apiKeyStore) FindAPIKeys(ctx context.Context, entityID *ttnpb.EntityIdentifiers) ([]*ttnpb.APIKey, error) {
+	defer trace.StartRegion(ctx, "find api keys").End()
 	entity, err := findEntity(ctx, s.db, entityID, "id")
 	if err != nil {
 		return nil, err
@@ -67,6 +70,7 @@ func (s *apiKeyStore) FindAPIKeys(ctx context.Context, entityID *ttnpb.EntityIde
 var errAPIKeyEntity = errors.DefineCorruption("api_key_entity", "API key not linked to an entity")
 
 func (s *apiKeyStore) GetAPIKey(ctx context.Context, id string) (*ttnpb.EntityIdentifiers, *ttnpb.APIKey, error) {
+	defer trace.StartRegion(ctx, "get api key").End()
 	var keyModel APIKey
 	if err := s.db.Scopes(withContext(ctx)).Where(APIKey{APIKeyID: id}).First(&keyModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
@@ -90,6 +94,7 @@ func (s *apiKeyStore) GetAPIKey(ctx context.Context, id string) (*ttnpb.EntityId
 }
 
 func (s *apiKeyStore) UpdateAPIKey(ctx context.Context, entityID *ttnpb.EntityIdentifiers, key *ttnpb.APIKey) (*ttnpb.APIKey, error) {
+	defer trace.StartRegion(ctx, "update api key").End()
 	entity, err := findEntity(ctx, s.db, entityID, "id")
 	if err != nil {
 		return nil, err

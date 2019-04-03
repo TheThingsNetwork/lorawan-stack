@@ -17,6 +17,7 @@ package scheduling
 import (
 	"context"
 	"math"
+	"runtime/trace"
 	"sync"
 	"time"
 
@@ -124,6 +125,8 @@ var (
 
 // ScheduleAt attempts to schedule the given Tx settings with the given priority.
 func (s *Scheduler) ScheduleAt(ctx context.Context, payloadSize int, settings ttnpb.TxSettings, priority ttnpb.TxSchedulePriority) (Emission, error) {
+	defer trace.StartRegion(ctx, "schedule transmission").End()
+
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if s.clock.IsSynced() {
@@ -164,6 +167,8 @@ func (s *Scheduler) ScheduleAt(ctx context.Context, payloadSize int, settings tt
 // emission time is unknown. Therefore, when the time is set to Immediate, the estimated current concentrator time plus
 // ScheduleDelayLong will be used.
 func (s *Scheduler) ScheduleAnytime(ctx context.Context, payloadSize int, settings ttnpb.TxSettings, priority ttnpb.TxSchedulePriority) (Emission, error) {
+	defer trace.StartRegion(ctx, "schedule transmission at any time").End()
+
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if s.clock.IsSynced() {

@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 	"reflect"
+	"runtime/trace"
 	"strings"
 
 	"github.com/gogo/protobuf/types"
@@ -63,6 +64,7 @@ func selectApplicationFields(ctx context.Context, query *gorm.DB, fieldMask *typ
 }
 
 func (s *applicationStore) CreateApplication(ctx context.Context, app *ttnpb.Application) (*ttnpb.Application, error) {
+	defer trace.StartRegion(ctx, "create application").End()
 	appModel := Application{
 		ApplicationID: app.ApplicationID, // The ID is not mutated by fromPB.
 	}
@@ -78,6 +80,7 @@ func (s *applicationStore) CreateApplication(ctx context.Context, app *ttnpb.App
 }
 
 func (s *applicationStore) FindApplications(ctx context.Context, ids []*ttnpb.ApplicationIdentifiers, fieldMask *types.FieldMask) ([]*ttnpb.Application, error) {
+	defer trace.StartRegion(ctx, "find applications").End()
 	idStrings := make([]string, len(ids))
 	for i, id := range ids {
 		idStrings[i] = id.GetApplicationID()
@@ -104,6 +107,7 @@ func (s *applicationStore) FindApplications(ctx context.Context, ids []*ttnpb.Ap
 }
 
 func (s *applicationStore) GetApplication(ctx context.Context, id *ttnpb.ApplicationIdentifiers, fieldMask *types.FieldMask) (*ttnpb.Application, error) {
+	defer trace.StartRegion(ctx, "get application").End()
 	query := s.db.Scopes(withContext(ctx), withApplicationID(id.GetApplicationID()))
 	query = selectApplicationFields(ctx, query, fieldMask)
 	var appModel Application
@@ -119,6 +123,7 @@ func (s *applicationStore) GetApplication(ctx context.Context, id *ttnpb.Applica
 }
 
 func (s *applicationStore) UpdateApplication(ctx context.Context, app *ttnpb.Application, fieldMask *types.FieldMask) (updated *ttnpb.Application, err error) {
+	defer trace.StartRegion(ctx, "update application").End()
 	query := s.db.Scopes(withContext(ctx), withApplicationID(app.GetApplicationID()))
 	query = selectApplicationFields(ctx, query, fieldMask)
 	var appModel Application
@@ -140,7 +145,7 @@ func (s *applicationStore) UpdateApplication(ctx context.Context, app *ttnpb.App
 		}
 	}
 	if !reflect.DeepEqual(oldAttributes, appModel.Attributes) {
-		if err = replaceAttributes(s.db, "application", appModel.ID, oldAttributes, appModel.Attributes); err != nil {
+		if err = replaceAttributes(ctx, s.db, "application", appModel.ID, oldAttributes, appModel.Attributes); err != nil {
 			return nil, err
 		}
 	}
@@ -150,5 +155,6 @@ func (s *applicationStore) UpdateApplication(ctx context.Context, app *ttnpb.App
 }
 
 func (s *applicationStore) DeleteApplication(ctx context.Context, id *ttnpb.ApplicationIdentifiers) error {
+	defer trace.StartRegion(ctx, "delete application").End()
 	return deleteEntity(ctx, s.db, id.EntityIdentifiers())
 }

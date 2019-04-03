@@ -16,6 +16,7 @@ package rights
 
 import (
 	"context"
+	"runtime/trace"
 
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -49,6 +50,7 @@ const HookName = "rights-fetcher"
 // argument that implements the ttnpb.Identifiers interface.
 func Hook(next grpc.UnaryHandler) grpc.UnaryHandler {
 	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		defer trace.StartRegion(ctx, "fetch rights").End()
 		fetcher, ok := fetcherFromContext(ctx)
 		if !ok {
 			panic(errNoFetcher)

@@ -15,6 +15,7 @@
 package events
 
 import (
+	"runtime/trace"
 	"sync"
 
 	"github.com/gobwas/glob"
@@ -50,10 +51,15 @@ type handler struct {
 	Handler
 }
 
+type tracedEvent struct {
+	event Event
+	trace *trace.Region
+}
+
 type pubsub struct {
 	mu       sync.RWMutex
 	handlers []handler
-	events   chan Event
+	events   chan tracedEvent
 }
 
 // DefaultBufferSize is the default number of events that can be buffered before Publish starts to block.
@@ -62,7 +68,7 @@ const DefaultBufferSize = 64
 // NewPubSub returns a new event pubsub and starts a goroutine for handling.
 func NewPubSub(bufSize uint) PubSub {
 	e := &pubsub{
-		events: make(chan Event, bufSize),
+		events: make(chan tracedEvent, bufSize),
 	}
 	go e.Run()
 	return e
@@ -74,10 +80,11 @@ func (e *pubsub) Run() {
 		handlers := e.handlers
 		e.mu.RUnlock()
 		for _, l := range handlers {
-			if l.Match(evt.Name()) {
-				l.Notify(evt)
+			if l.Match(evt.event.Name()) {
+				l.Notify(evt.event)
 			}
 		}
+		evt.trace.End()
 	}
 }
 
@@ -116,7 +123,9 @@ func (e *pubsub) Unsubscribe(name string, hdl Handler) {
 
 func (e *pubsub) Publish(evt Event) {
 	localEvent := local(evt)
-	localEvent = localEvent.withCaller()
 	publishes.WithLabelValues(evt.Context(), evt.Name()).Inc()
-	e.events <- localEvent
+	e.events <- tracedEvent{
+		event: localEvent.withCaller(),
+		trace: trace.StartRegion(evt.Context(), "publish event"),
+	}
 }

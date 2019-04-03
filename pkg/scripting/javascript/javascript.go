@@ -17,6 +17,7 @@ package javascript
 
 import (
 	"context"
+	"runtime/trace"
 	"time"
 
 	"github.com/robertkrimen/otto"
@@ -37,6 +38,8 @@ var errRuntime = errors.Define("runtime", "runtime error")
 
 // Run executes the Javascript script in the environment env and returns the output.
 func (j *js) Run(ctx context.Context, script string, env map[string]interface{}) (val interface{}, err error) {
+	defer trace.StartRegion(ctx, "run javascript").End()
+
 	start := time.Now()
 	defer func() {
 		runLatency.Observe(time.Since(start).Seconds())
