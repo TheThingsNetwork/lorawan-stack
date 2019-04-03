@@ -109,6 +109,18 @@ func (m *JoinRequest) ValidateFields(paths ...string) error {
 
 		case "correlation_ids":
 
+			for idx, item := range m.GetCorrelationIDs() {
+				_, _ = idx, item
+
+				if utf8.RuneCountInString(item) > 100 {
+					return JoinRequestValidationError{
+						field:  fmt.Sprintf("correlation_ids[%v]", idx),
+						reason: "value length must be at most 100 runes",
+					}
+				}
+
+			}
+
 		default:
 			return JoinRequestValidationError{
 				field:  name,
@@ -222,6 +234,18 @@ func (m *JoinResponse) ValidateFields(paths ...string) error {
 			}
 
 		case "correlation_ids":
+
+			for idx, item := range m.GetCorrelationIDs() {
+				_, _ = idx, item
+
+				if utf8.RuneCountInString(item) > 100 {
+					return JoinResponseValidationError{
+						field:  fmt.Sprintf("correlation_ids[%v]", idx),
+						reason: "value length must be at most 100 runes",
+					}
+				}
+
+			}
 
 		default:
 			return JoinResponseValidationError{

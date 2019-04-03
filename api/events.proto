@@ -30,7 +30,7 @@ message Event {
   google.protobuf.Timestamp time = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true, (validate.rules).message.required = true];
   repeated EntityIdentifiers identifiers = 3;
   google.protobuf.Any data = 4;
-  repeated string correlation_ids = 5 [(gogoproto.customname) = "CorrelationIDs"];
+  repeated string correlation_ids = 5 [(gogoproto.customname) = "CorrelationIDs", (validate.rules).repeated.items.string.max_len = 100];
   string origin = 6;
   map<string,bytes> context = 7;
 }
