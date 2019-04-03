@@ -287,19 +287,42 @@ func (js Js) Test() error {
 // Lint runs eslint over frontend js files.
 func (js Js) Lint() error {
 	if mg.Verbose() {
-		fmt.Println("Running eslint")
+		fmt.Println("Running eslint on .js files")
 	}
 	eslint, err := js.eslint()
 	if err != nil {
 		return err
 	}
-	res, err := eslint("./pkg/webui", "--no-ignore", "--color")
+	res, err := eslint("./pkg/webui/**/*.js", "--no-ignore", "--color")
 
 	if res != "" {
 		fmt.Println(res)
 	}
 
 	return err
+}
+
+// LintSnap runs eslint over frontend snap files.
+func (js Js) LintSnap() error {
+	if mg.Verbose() {
+		fmt.Println("Running eslint on .snap files")
+	}
+	eslint, err := js.eslint()
+	if err != nil {
+		return err
+	}
+	res, err := eslint("./pkg/webui/**/*.snap", "--no-ignore", "--color")
+
+	if res != "" {
+		fmt.Println(res)
+	}
+
+	return err
+}
+
+// LintAll runs linters over js and snap files.
+func (js Js) LintAll() {
+	mg.Deps(js.Lint, js.LintSnap)
 }
 
 // Vulnerabilities runs yarn audit to check for vulnerable node packages.
