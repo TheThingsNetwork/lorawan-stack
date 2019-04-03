@@ -54,8 +54,7 @@ require (
 	github.com/jinzhu/gorm v1.9.4
 	github.com/jinzhu/now v1.0.0 // indirect
 	github.com/kr/pretty v0.1.0
-	github.com/labstack/echo v3.3.10+incompatible
-	github.com/labstack/echo/v4 v4.0.0-00010101000000-000000000000
+	github.com/labstack/echo/v4 v4.0.0
 	github.com/labstack/gommon v0.2.8
 	github.com/lib/pq v1.1.0
 	github.com/lyft/protoc-gen-validate v0.0.14
