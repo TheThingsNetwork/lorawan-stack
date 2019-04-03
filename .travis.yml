@@ -7,6 +7,7 @@ go_import_path: go.thethings.network/lorawan-stack
 env:
   global:
   - YARN_CACHE_FOLDER=$HOME/.cache/yarn
+  - MAGE=$HOME/.cache/mage/mage
   - TEST_SLOWDOWN=8
   - TEST_REDIS=1
   - PATH=/snap/bin:$PATH
@@ -33,6 +34,7 @@ addons:
     - snapd
 cache:
   directories:
+  - "$HOME/.cache/mage"
   - "$HOME/.cache/go-build"
   - "$HOME/.cache/yarn"
   - "$GOPATH/pkg/mod"

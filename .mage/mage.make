@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-MAGE := .mage/run
+MAGE ?= .mage/run
 
 $(MAGE): magefile.go $(wildcard .mage/*.go)
 	@command -v go > /dev/null || ($(error) Did you forget to install Go?)
