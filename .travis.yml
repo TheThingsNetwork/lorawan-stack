@@ -30,6 +30,13 @@ cache:
   - "$HOME/.cache/yarn"
 before_install:
 - |
+  if [[ "$TRAVIS_EVENT_TYPE" == "push" ]] && [[ "$TRAVIS_BRANCH" == "master" ]]; then
+    go clean -modcache
+    go clean -cache
+    rm -rf $HOME/.cache/mage/*
+    rm -rf $HOME/.cache/yarn/*
+  fi
+- |
   if [[ ! -z "$encrypted_fc3d5d829302_key" ]]; then
     openssl aes-256-cbc -K $encrypted_fc3d5d829302_key \
                         -iv $encrypted_fc3d5d829302_iv \
