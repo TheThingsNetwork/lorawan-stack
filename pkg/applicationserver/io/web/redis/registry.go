@@ -31,18 +31,10 @@ var (
 )
 
 func applyWebhookFieldMask(dst, src *ttnpb.ApplicationWebhook, paths ...string) (*ttnpb.ApplicationWebhook, error) {
-	paths = append(paths, "ids")
-
 	if dst == nil {
 		dst = &ttnpb.ApplicationWebhook{}
 	}
-	if err := dst.SetFields(src, paths...); err != nil {
-		return nil, err
-	}
-	if err := dst.ValidateFields(paths...); err != nil {
-		return nil, err
-	}
-	return dst, nil
+	return dst, dst.SetFields(src, paths...)
 }
 
 // WebhookRegistry is a Redis webhook registry.
@@ -70,7 +62,9 @@ func (r WebhookRegistry) Get(ctx context.Context, ids ttnpb.ApplicationWebhookId
 	if err := ttnredis.GetProto(r.Redis, r.idKey(unique.ID(ctx, ids.ApplicationIdentifiers), ids.WebhookID)).ScanProto(pb); err != nil {
 		return nil, err
 	}
-	return applyWebhookFieldMask(nil, pb, paths...)
+	return applyWebhookFieldMask(nil, pb, append(paths,
+		"ids",
+	)...)
 }
 
 // List implements WebhookRegistry.
@@ -80,7 +74,9 @@ func (r WebhookRegistry) List(ctx context.Context, ids ttnpb.ApplicationIdentifi
 	err := ttnredis.FindProtos(r.Redis, r.appKey(appUID), r.makeIDKeyFunc(appUID)).Range(func() (proto.Message, func() (bool, error)) {
 		pb := &ttnpb.ApplicationWebhook{}
 		return pb, func() (bool, error) {
-			pb, err := applyWebhookFieldMask(nil, pb, paths...)
+			pb, err := applyWebhookFieldMask(nil, pb, append(paths,
+				"ids",
+			)...)
 			if err != nil {
 				return false, err
 			}
@@ -98,6 +94,7 @@ func (r WebhookRegistry) List(ctx context.Context, ids ttnpb.ApplicationIdentifi
 func (r WebhookRegistry) Set(ctx context.Context, ids ttnpb.ApplicationWebhookIdentifiers, gets []string, f func(*ttnpb.ApplicationWebhook) (*ttnpb.ApplicationWebhook, []string, error)) (*ttnpb.ApplicationWebhook, error) {
 	appUID := unique.ID(ctx, ids.ApplicationIdentifiers)
 	ik := r.idKey(appUID, ids.WebhookID)
+
 	var pb *ttnpb.ApplicationWebhook
 	err := r.Redis.Watch(func(tx *redis.Tx) error {
 		cmd := ttnredis.GetProto(tx, ik)
@@ -107,6 +104,12 @@ func (r WebhookRegistry) Set(ctx context.Context, ids ttnpb.ApplicationWebhookId
 		} else if err != nil {
 			return err
 		}
+
+		gets = append(gets,
+			"created_at",
+			"ids",
+			"updated_at",
+		)
 
 		var err error
 		if stored != nil {
@@ -129,9 +132,9 @@ func (r WebhookRegistry) Set(ctx context.Context, ids ttnpb.ApplicationWebhookId
 			return nil
 		}
 
-		var f func(redis.Pipeliner) error
+		var pipelined func(redis.Pipeliner) error
 		if pb == nil {
-			f = func(p redis.Pipeliner) error {
+			pipelined = func(p redis.Pipeliner) error {
 				p.Del(ik)
 				p.SRem(r.appKey(appUID), stored.WebhookID)
 				return nil
@@ -146,6 +149,8 @@ func (r WebhookRegistry) Set(ctx context.Context, ids ttnpb.ApplicationWebhookId
 
 			updated := &ttnpb.ApplicationWebhook{}
 			if stored == nil {
+				sets = append(sets, "ids")
+
 				pb.CreatedAt = pb.UpdatedAt
 				sets = append(sets, "created_at")
 
@@ -165,20 +170,24 @@ func (r WebhookRegistry) Set(ctx context.Context, ids ttnpb.ApplicationWebhookId
 					return errInvalidIdentifiers
 				}
 			}
-			pb, err = applyWebhookFieldMask(nil, updated, gets...)
-			if err != nil {
+			if err := updated.ValidateFields(sets...); err != nil {
 				return err
 			}
 
-			f = func(p redis.Pipeliner) error {
+			pipelined = func(p redis.Pipeliner) error {
 				if _, err := ttnredis.SetProto(p, ik, updated, 0); err != nil {
 					return err
 				}
 				p.SAdd(r.appKey(appUID), updated.WebhookID)
 				return nil
 			}
+
+			pb, err = applyWebhookFieldMask(nil, updated, gets...)
+			if err != nil {
+				return err
+			}
 		}
-		_, err = tx.Pipelined(f)
+		_, err = tx.Pipelined(pipelined)
 		if err != nil {
 			return err
 		}

@@ -38,18 +38,10 @@ var (
 )
 
 func applyDeviceFieldMask(dst, src *ttnpb.EndDevice, paths ...string) (*ttnpb.EndDevice, error) {
-	paths = append(paths, "ids")
-
 	if dst == nil {
 		dst = &ttnpb.EndDevice{}
 	}
-	if err := dst.SetFields(src, paths...); err != nil {
-		return nil, err
-	}
-	if err := dst.ValidateFields(paths...); err != nil {
-		return nil, err
-	}
-	return dst, nil
+	return dst, dst.SetFields(src, paths...)
 }
 
 // DeviceRegistry is an implementation of joinserver.DeviceRegistry.
@@ -96,11 +88,14 @@ func (r *DeviceRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIde
 	if err := ttnredis.GetProto(r.Redis, r.uidKey(unique.ID(ctx, ids))).ScanProto(pb); err != nil {
 		return nil, err
 	}
-	return applyDeviceFieldMask(nil, pb, paths...)
+	return applyDeviceFieldMask(nil, pb, append(paths,
+		"ids.application_ids",
+		"ids.device_id",
+	)...)
 }
 
 // GetByEUI gets device by joinEUI, devEUI.
-func (r *DeviceRegistry) GetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error) {
+func (r *DeviceRegistry) GetByEUI(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error) {
 	if joinEUI.IsZero() || devEUI.IsZero() {
 		return nil, errInvalidIdentifiers
 	}
@@ -111,7 +106,12 @@ func (r *DeviceRegistry) GetByEUI(ctx context.Context, joinEUI types.EUI64, devE
 	if err := ttnredis.FindProto(r.Redis, r.euiKey(joinEUI, devEUI), r.uidKey).ScanProto(pb); err != nil {
 		return nil, err
 	}
-	return applyDeviceFieldMask(&ttnpb.EndDevice{}, pb, paths...)
+	return applyDeviceFieldMask(nil, pb, append(paths,
+		"ids.application_ids",
+		"ids.dev_eui",
+		"ids.device_id",
+		"ids.join_eui",
+	)...)
 }
 
 func equalEUI(x, y *types.EUI64) bool {
@@ -131,6 +131,13 @@ func (r *DeviceRegistry) set(tx *redis.Tx, uid string, gets []string, f func(pb 
 	} else if err != nil {
 		return nil, err
 	}
+
+	gets = append(gets,
+		"created_at",
+		"ids.application_ids",
+		"ids.device_id",
+		"updated_at",
+	)
 
 	var pb *ttnpb.EndDevice
 	var err error
@@ -181,6 +188,13 @@ func (r *DeviceRegistry) set(tx *redis.Tx, uid string, gets []string, f func(pb 
 		updated := &ttnpb.EndDevice{}
 		var updatedPID string
 		if stored == nil {
+			sets = append(sets,
+				"ids.application_ids",
+				"ids.dev_eui",
+				"ids.device_id",
+				"ids.join_eui",
+			)
+
 			pb.CreatedAt = pb.UpdatedAt
 			sets = append(sets, "created_at")
 
@@ -214,14 +228,13 @@ func (r *DeviceRegistry) set(tx *redis.Tx, uid string, gets []string, f func(pb 
 				return nil, errInvalidIdentifiers
 			}
 		}
-		pb, err = applyDeviceFieldMask(nil, updated, gets...)
-		if err != nil {
+		if err := updated.ValidateFields(sets...); err != nil {
 			return nil, err
 		}
 
 		pipelined = func(p redis.Pipeliner) error {
 			if stored == nil {
-				ek := r.euiKey(*pb.JoinEUI, *pb.DevEUI)
+				ek := r.euiKey(*updated.JoinEUI, *updated.DevEUI)
 				if err := tx.Watch(ek).Err(); err != nil {
 					return err
 				}
@@ -254,8 +267,11 @@ func (r *DeviceRegistry) set(tx *redis.Tx, uid string, gets []string, f func(pb 
 			if err != nil {
 				return err
 			}
-
 			return nil
+		}
+		pb, err = applyDeviceFieldMask(nil, updated, gets...)
+		if err != nil {
+			return nil, err
 		}
 	}
 	_, err = tx.Pipelined(pipelined)
@@ -283,7 +299,10 @@ func (r *DeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devE
 		if err := tx.Watch(r.uidKey(uid)).Err(); err != nil {
 			return ttnredis.ConvertError(err)
 		}
-		pb, err = r.set(tx, uid, gets, f)
+		pb, err = r.set(tx, uid, append(gets,
+			"ids.dev_eui",
+			"ids.join_eui",
+		), f)
 		return err
 	}, ek)
 	if err != nil {
@@ -327,15 +346,10 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 }
 
 func applyKeyFieldMask(dst, src *ttnpb.SessionKeys, paths ...string) (*ttnpb.SessionKeys, error) {
-	paths = append(paths, "session_key_id")
-
 	if dst == nil {
 		dst = &ttnpb.SessionKeys{}
 	}
 	if err := dst.SetFields(src, paths...); err != nil {
-		return nil, err
-	}
-	if err := dst.ValidateFields(paths...); err != nil {
 		return nil, err
 	}
 	return dst, nil
@@ -362,7 +376,7 @@ func (r *KeyRegistry) GetByID(ctx context.Context, devEUI types.EUI64, id []byte
 	if err := ttnredis.GetProto(r.Redis, r.idKey(devEUI, id)).ScanProto(pb); err != nil {
 		return nil, err
 	}
-	return applyKeyFieldMask(&ttnpb.SessionKeys{}, pb, paths...)
+	return applyKeyFieldMask(&ttnpb.SessionKeys{}, pb, append(paths, "session_key_id")...)
 }
 
 // SetByID sets session keys by devEUI, id.
@@ -383,6 +397,8 @@ func (r *KeyRegistry) SetByID(ctx context.Context, devEUI types.EUI64, id []byte
 		} else if err != nil {
 			return err
 		}
+
+		gets = append(gets, "session_key_id")
 
 		var err error
 		if stored != nil {
@@ -405,9 +421,9 @@ func (r *KeyRegistry) SetByID(ctx context.Context, devEUI types.EUI64, id []byte
 			return nil
 		}
 
-		var f func(redis.Pipeliner) error
+		var pipelined func(redis.Pipeliner) error
 		if pb == nil {
-			f = func(p redis.Pipeliner) error {
+			pipelined = func(p redis.Pipeliner) error {
 				p.Del(ik)
 				return nil
 			}
@@ -417,29 +433,41 @@ func (r *KeyRegistry) SetByID(ctx context.Context, devEUI types.EUI64, id []byte
 			}
 
 			updated := &ttnpb.SessionKeys{}
-			if stored != nil {
+			if stored == nil {
+				sets = append(sets, "session_key_id")
+				updated, err = applyKeyFieldMask(updated, pb, sets...)
+				if err != nil {
+					return err
+				}
+			} else {
 				if err := cmd.ScanProto(updated); err != nil {
 					return err
 				}
+				updated, err = applyKeyFieldMask(updated, pb, sets...)
+				if err != nil {
+					return err
+				}
+				if !bytes.Equal(updated.SessionKeyID, stored.SessionKeyID) {
+					return errInvalidIdentifiers
+				}
 			}
-			updated, err = applyKeyFieldMask(updated, pb, sets...)
-			if err != nil {
+			if err := updated.ValidateFields(sets...); err != nil {
 				return err
 			}
 
-			pb, err = applyKeyFieldMask(nil, updated, gets...)
-			if err != nil {
-				return err
-			}
-			f = func(p redis.Pipeliner) error {
+			pipelined = func(p redis.Pipeliner) error {
 				_, err := ttnredis.SetProto(p, ik, updated, 0)
 				if err != nil {
 					return err
 				}
 				return nil
 			}
+			pb, err = applyKeyFieldMask(nil, updated, gets...)
+			if err != nil {
+				return err
+			}
 		}
-		_, err = tx.Pipelined(f)
+		_, err = tx.Pipelined(pipelined)
 		if err != nil {
 			return err
 		}

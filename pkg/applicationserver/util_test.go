@@ -72,7 +72,7 @@ func startMockNS(ctx context.Context, validateAuth func(rpcmetadata.MD) bool) (*
 	}
 	srv := rpcserver.New(ctx)
 	ttnpb.RegisterAsNsServer(srv.Server, ns)
-	lis, err := net.Listen("tcp", ":0")
+	lis, err := net.Listen("tcp", "localhost:0")
 	if err != nil {
 		panic(err)
 	}

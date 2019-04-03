@@ -34,18 +34,10 @@ var (
 )
 
 func applyDeviceFieldMask(dst, src *ttnpb.EndDevice, paths ...string) (*ttnpb.EndDevice, error) {
-	paths = append(paths, "ids")
-
 	if dst == nil {
 		dst = &ttnpb.EndDevice{}
 	}
-	if err := dst.SetFields(src, paths...); err != nil {
-		return nil, err
-	}
-	if err := dst.ValidateFields(paths...); err != nil {
-		return nil, err
-	}
-	return dst, nil
+	return dst, dst.SetFields(src, paths...)
 }
 
 // DeviceRegistry is an implementation of networkserver.DeviceRegistry.
@@ -81,7 +73,10 @@ func (r *DeviceRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIde
 	if err := ttnredis.GetProto(r.Redis, r.uidKey(unique.ID(ctx, ids))).ScanProto(pb); err != nil {
 		return nil, err
 	}
-	return applyDeviceFieldMask(nil, pb, paths...)
+	return applyDeviceFieldMask(nil, pb, append(paths,
+		"ids.application_ids",
+		"ids.device_id",
+	)...)
 }
 
 // GetByEUI gets device by joinEUI, devEUI.
@@ -92,7 +87,12 @@ func (r *DeviceRegistry) GetByEUI(ctx context.Context, joinEUI, devEUI types.EUI
 	if err := ttnredis.FindProto(r.Redis, r.euiKey(joinEUI, devEUI), r.uidKey).ScanProto(pb); err != nil {
 		return nil, err
 	}
-	return applyDeviceFieldMask(nil, pb, paths...)
+	return applyDeviceFieldMask(nil, pb, append(paths,
+		"ids.application_ids",
+		"ids.dev_eui",
+		"ids.device_id",
+		"ids.join_eui",
+	)...)
 }
 
 // RangeByAddr ranges over devices by addr.
@@ -102,7 +102,11 @@ func (r *DeviceRegistry) RangeByAddr(ctx context.Context, addr types.DevAddr, pa
 	return ttnredis.FindProtos(r.Redis, r.addrKey(addr), r.uidKey).Range(func() (proto.Message, func() (bool, error)) {
 		pb := &ttnpb.EndDevice{}
 		return pb, func() (bool, error) {
-			pb, err := applyDeviceFieldMask(nil, pb, paths...)
+			pb, err := applyDeviceFieldMask(nil, pb, append(paths,
+				"ids.application_ids",
+				"ids.dev_addr",
+				"ids.device_id",
+			)...)
 			if err != nil {
 				return false, err
 			}
@@ -169,6 +173,13 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 
 		storedAddrs := getDevAddrs(stored)
 
+		gets = append(gets,
+			"created_at",
+			"ids.application_ids",
+			"ids.device_id",
+			"updated_at",
+		)
+
 		var err error
 		if stored != nil {
 			pb = &ttnpb.EndDevice{}
@@ -190,9 +201,9 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 			return nil
 		}
 
-		var f func(redis.Pipeliner) error
+		var pipelined func(redis.Pipeliner) error
 		if pb == nil {
-			f = func(p redis.Pipeliner) error {
+			pipelined = func(p redis.Pipeliner) error {
 				p.Del(uk)
 				if stored.JoinEUI != nil && stored.DevEUI != nil {
 					p.Del(r.euiKey(*stored.JoinEUI, *stored.DevEUI))
@@ -215,6 +226,11 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 
 			updated := &ttnpb.EndDevice{}
 			if stored == nil {
+				sets = append(sets,
+					"ids.application_ids",
+					"ids.device_id",
+				)
+
 				pb.CreatedAt = pb.UpdatedAt
 				sets = append(sets, "created_at")
 
@@ -235,16 +251,14 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 					return errInvalidIdentifiers
 				}
 			}
-			pb, err = applyDeviceFieldMask(nil, updated, gets...)
-			if err != nil {
+			if err := updated.ValidateFields(sets...); err != nil {
 				return err
 			}
-
 			updatedAddrs := getDevAddrs(updated)
 
-			f = func(p redis.Pipeliner) error {
+			pipelined = func(p redis.Pipeliner) error {
 				if stored == nil && updated.JoinEUI != nil && updated.DevEUI != nil {
-					ek := r.euiKey(*pb.JoinEUI, *pb.DevEUI)
+					ek := r.euiKey(*updated.JoinEUI, *updated.DevEUI)
 					if err := tx.Watch(ek).Err(); err != nil {
 						return err
 					}
@@ -275,10 +289,15 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 				if updatedAddrs.current != nil && !equalAddr(updatedAddrs.current, storedAddrs.pending) && !equalAddr(updatedAddrs.current, storedAddrs.current) {
 					p.SAdd(r.addrKey(*updatedAddrs.current), uid)
 				}
+
+				pb, err = applyDeviceFieldMask(nil, updated, gets...)
+				if err != nil {
+					return err
+				}
 				return nil
 			}
 		}
-		_, err = tx.Pipelined(f)
+		_, err = tx.Pipelined(pipelined)
 		if err != nil {
 			return err
 		}
