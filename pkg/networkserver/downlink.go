@@ -67,6 +67,7 @@ type generatedDownlink struct {
 	Payload             []byte
 	FCnt                uint32
 	ApplicationDownlink *ttnpb.ApplicationDownlink
+	Priority            ttnpb.TxSchedulePriority
 }
 
 // generateDownlink attempts to generate a downlink.
@@ -157,7 +158,7 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 			return nil, errEncodeMAC.WithCause(err)
 		}
 		if mType == ttnpb.MType_UNCONFIRMED_DOWN && spec[cmd.CID].ExpectAnswer && dev.MACState.DeviceClass == ttnpb.CLASS_C {
-			logger.Debug("Using confirmed downlink to get immediate answer")
+			logger.Debug("Use confirmed downlink to get immediate answer")
 			mType = ttnpb.MType_CONFIRMED_DOWN
 		}
 	}
@@ -352,11 +353,26 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 	}
 	b = append(b, mic[:]...)
 
-	logger.WithField("payload_length", len(b)).Debug("Generated downlink")
+	var priority ttnpb.TxSchedulePriority
+	if appDown != nil {
+		priority = appDown.Priority
+		if max := ns.downlinkPriorities.MaxApplicationDownlink; priority > max {
+			priority = max
+		}
+	}
+	if len(cmdBuf) > 0 && priority < ns.downlinkPriorities.MACCommands {
+		priority = ns.downlinkPriorities.MACCommands
+	}
+
+	logger.WithFields(log.Fields(
+		"payload_length", len(b),
+		"priority", priority,
+	)).Debug("Generated downlink")
 	return &generatedDownlink{
 		Payload:             b,
 		FCnt:                pld.FHDR.FCnt,
 		ApplicationDownlink: appDown,
+		Priority:            priority,
 	}, nil
 }
 
@@ -617,6 +633,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						if !rx1 && !rx2 {
 							return nil, nil, errNoPath
 						}
+						req.Priority = ns.downlinkPriorities.JoinAccept
 
 						down, _, err := ns.scheduleDownlinkByPaths(
 							log.NewContext(ctx, logger.WithFields(log.Fields(
@@ -685,6 +702,9 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						if err != nil {
 							return nil, nil, err
 						}
+
+						req.Priority = genDown.Priority
+
 						if genDown.ApplicationDownlink != nil {
 							ctx = events.ContextWithCorrelationID(ctx, genDown.ApplicationDownlink.CorrelationIDs...)
 						}
@@ -753,6 +773,8 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 								nextDownlinkAt = time.Now()
 							}
 						}
+
+						req.Priority = genDown.Priority
 
 						if genDown.ApplicationDownlink != nil {
 							if len(genDown.ApplicationDownlink.ClassBC.GetGateways()) > 0 ||
@@ -832,6 +854,8 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 							nextDownlinkAt = time.Now()
 						}
 					}
+
+					req.Priority = genDown.Priority
 
 					if genDown.ApplicationDownlink != nil {
 						ctx = events.ContextWithCorrelationID(ctx, genDown.ApplicationDownlink.CorrelationIDs...)
