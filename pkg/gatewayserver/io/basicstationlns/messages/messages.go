@@ -26,7 +26,7 @@ import (
 )
 
 var (
-	errFrequencyPlan = errors.Define("frequency_plan", "invalid frequency plan")
+	errFrequencyPlan = errors.DefineInvalidArgument("frequency_plan", "invalid frequency plan")
 )
 
 // Definition of message types

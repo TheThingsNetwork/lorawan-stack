@@ -61,11 +61,10 @@ func eui64Ptr(eui types.EUI64) *types.EUI64 { return &eui }
 
 func TestAuthentication(t *testing.T) {
 	// TODO: Test authentication. We're gonna provision authentication tokens, which may be API keys.
-	// https://github.com/TheThingsNetwork/lorawan-stack/issues/75
+	// https://github.com/TheThingsNetwork/lorawan-stack/issues/558
 }
 
 func TestDiscover(t *testing.T) {
-	a := assertions.New(t)
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 	ctx = newContextWithRightsFetcher(ctx)
 
@@ -79,9 +78,7 @@ func TestDiscover(t *testing.T) {
 	gs := mock.NewServer()
 	srv := New(ctx, gs)
 	c.RegisterWeb(srv)
-	if err := c.Start(); err != nil {
-		panic(err)
-	}
+	test.Must(nil, c.Start())
 	defer c.Close()
 
 	// Invalid Endpoints
@@ -89,16 +86,17 @@ func TestDiscover(t *testing.T) {
 		URL string
 	}{
 		{
-			"ws://localhost:8100/router-info",
+			URL: "ws://localhost:8100/router-info",
 		},
 		{
-			discoveryEndPoint + "/router-58a0:cbff:fe80:f8",
+			URL: discoveryEndPoint + "/router-58a0:cbff:fe80:f8",
 		},
 		{
-			discoveryEndPoint + "/eui-0101010101010101",
+			URL: discoveryEndPoint + "/eui-0101010101010101",
 		},
 	} {
 		t.Run(fmt.Sprintf("InvalidDiscoveryEndPoint/%d", i), func(t *testing.T) {
+			a := assertions.New(t)
 			_, res, err := websocket.DefaultDialer.Dial(tc.URL, nil)
 			if res.StatusCode != http.StatusNotFound {
 				t.Fatalf("Unexpected response received: %v", res.Status)
@@ -115,21 +113,22 @@ func TestDiscover(t *testing.T) {
 		Response messages.DiscoverResponse
 	}{
 		{
-			messages.DiscoverQuery{},
-			messages.DiscoverResponse{Error: "Invalid request"},
+			Query:    messages.DiscoverQuery{},
+			Response: messages.DiscoverResponse{Error: "Invalid request"},
 		},
 		{
-			struct{}{},
-			messages.DiscoverResponse{Error: "Invalid request"},
+			Query:    struct{}{},
+			Response: messages.DiscoverResponse{Error: "Invalid request"},
 		},
 		{
-			struct {
+			Query: struct {
 				EUI string `json:"route"`
 			}{EUI: `"01-02-03-04-05-06-07-08"`},
-			messages.DiscoverResponse{Error: "Invalid request"},
+			Response: messages.DiscoverResponse{Error: "Invalid request"},
 		},
 	} {
 		t.Run(fmt.Sprintf("InvalidQuery/%d", i), func(t *testing.T) {
+			a := assertions.New(t)
 			conn, _, err := websocket.DefaultDialer.Dial(discoveryEndPoint, nil)
 			if !a.So(err, should.BeNil) {
 				t.Fatalf("Connection failed: %v", err)
@@ -147,6 +146,10 @@ func TestDiscover(t *testing.T) {
 			go func() {
 				_, data, err := conn.ReadMessage()
 				if err != nil {
+					close(resCh)
+					if err == websocket.ErrBadHandshake {
+						return
+					}
 					t.Fatalf("Failed to read message: %v", err)
 				}
 				resCh <- data
@@ -168,22 +171,23 @@ func TestDiscover(t *testing.T) {
 		Query interface{}
 	}{
 		{
-			struct {
+			Query: struct {
 				EUI string `json:"router"`
 			}{EUI: `"01-02-03-04-05-06-07-08-09"`},
 		},
 		{
-			struct {
+			Query: struct {
 				EUI string `json:"router"`
 			}{EUI: `"01:02:03:04:05:06:07:08:09"`},
 		},
 		{
-			struct {
+			Query: struct {
 				EUI string `json:"router"`
 			}{EUI: `"01:02:03:04:05:06:07-08"`},
 		},
 	} {
 		t.Run(fmt.Sprintf("InvalidQuery/%d", i), func(t *testing.T) {
+			a := assertions.New(t)
 			conn, _, err := websocket.DefaultDialer.Dial(discoveryEndPoint, nil)
 			if !a.So(err, should.BeNil) {
 				t.Fatalf("Connection failed: %v", err)
@@ -197,24 +201,12 @@ func TestDiscover(t *testing.T) {
 				t.Fatalf("Failed to write message: %v", err)
 			}
 
-			resCh := make(chan []byte)
 			go func() {
-				_, data, err := conn.ReadMessage()
+				_, _, err := conn.ReadMessage()
 				if err == nil {
-					t.Logf("Failed to read message: %v", err)
-					t.FailNow()
+					t.Fatalf("Expected connection closure with error but received none")
 				}
-				resCh <- data
 			}()
-			select {
-			case res := <-resCh:
-				if len(res) != 0 {
-					t.Fatal("Expected empty response")
-				}
-			case <-time.After(timeout):
-				t.Log("Read message timeout")
-			}
-			conn.Close()
 		})
 	}
 
@@ -225,9 +217,9 @@ func TestDiscover(t *testing.T) {
 		Query       interface{}
 	}{
 		{
-			"1111111111111111",
-			types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11},
-			messages.DiscoverQuery{
+			EndPointEUI: "1111111111111111",
+			EUI:         types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11},
+			Query: messages.DiscoverQuery{
 				EUI: basicstation.EUI{
 					Prefix: "router",
 					EUI64:  types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11},
@@ -236,6 +228,7 @@ func TestDiscover(t *testing.T) {
 		},
 	} {
 		t.Run(fmt.Sprintf("ValidQuery/%d", i), func(t *testing.T) {
+			a := assertions.New(t)
 			conn, _, err := websocket.DefaultDialer.Dial(discoveryEndPoint, nil)
 			if !a.So(err, should.BeNil) {
 				t.Fatalf("Connection failed: %v", err)
@@ -253,8 +246,12 @@ func TestDiscover(t *testing.T) {
 			go func() {
 				_, data, err := conn.ReadMessage()
 				if err != nil {
-					t.Logf("Failed to read message: %v", err)
-					t.FailNow()
+					close(resCh)
+					if err == websocket.ErrBadHandshake {
+						return
+					} else {
+						t.Fatalf("Failed to read message: %v", err)
+					}
 				}
 				resCh <- data
 			}()
@@ -294,9 +291,7 @@ func TestVersion(t *testing.T) {
 	gs := mock.NewServer()
 	srv := New(ctx, gs)
 	c.RegisterWeb(srv)
-	if err := c.Start(); err != nil {
-		panic(err)
-	}
+	test.Must(nil, c.Start())
 	defer c.Close()
 	gs.RegisterGateway(ctx, registeredGatewayID, &registeredGateway)
 
@@ -312,8 +307,8 @@ func TestVersion(t *testing.T) {
 		ExpectedRouterConfig interface{}
 	}{
 		{
-			"VersionProd",
-			messages.Version{
+			Name: "VersionProd",
+			VersionQuery: messages.Version{
 				Station:  "test-station",
 				Firmware: "1.0.0",
 				Package:  "test-package",
@@ -321,7 +316,7 @@ func TestVersion(t *testing.T) {
 				Protocol: 2,
 				Features: []string{"prod", "gps"},
 			},
-			messages.RouterConfig{
+			ExpectedRouterConfig: messages.RouterConfig{
 				Region:         "EU863",
 				HardwareSpec:   "sx1301/1",
 				FrequencyRange: []int{863000000, 870000000},
@@ -338,8 +333,8 @@ func TestVersion(t *testing.T) {
 			},
 		},
 		{
-			"VersionDebug",
-			messages.Version{
+			Name: "VersionDebug",
+			VersionQuery: messages.Version{
 				Station:  "test-station",
 				Firmware: "1.0.0",
 				Package:  "test-package",
@@ -347,7 +342,7 @@ func TestVersion(t *testing.T) {
 				Protocol: 2,
 				Features: []string{"rmtsh", "gps"},
 			},
-			messages.RouterConfig{
+			ExpectedRouterConfig: messages.RouterConfig{
 				Region:         "EU863",
 				HardwareSpec:   "sx1301/1",
 				FrequencyRange: []int{863000000, 870000000},
@@ -368,6 +363,7 @@ func TestVersion(t *testing.T) {
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
 			reqVersion, err := json.Marshal(tc.VersionQuery)
 			if err != nil {
 				panic(err)
@@ -380,8 +376,7 @@ func TestVersion(t *testing.T) {
 			go func() {
 				_, data, err := conn.ReadMessage()
 				if err != nil {
-					t.Logf("Failed to read message: %v", err)
-					t.FailNow()
+					t.Fatalf("Failed to read message: %v", err)
 				}
 				resCh <- data
 			}()
@@ -414,9 +409,7 @@ func TestUplink(t *testing.T) {
 	gs := mock.NewServer()
 	srv := New(ctx, gs)
 	c.RegisterWeb(srv)
-	if err := c.Start(); err != nil {
-		panic(err)
-	}
+	test.Must(nil, c.Start())
 	defer c.Close()
 
 	gs.RegisterGateway(ctx, registeredGatewayID, &registeredGateway)
@@ -435,15 +428,15 @@ func TestUplink(t *testing.T) {
 	}
 
 	for _, tc := range []struct {
-		Name          string
-		TimeStamp     int64
-		Message       interface{}
-		UplinkMessage ttnpb.UplinkMessage
+		Name                  string
+		Timestamp             int64
+		Message               interface{}
+		ExpectedUplinkMessage ttnpb.UplinkMessage
 	}{
 		{
-			"JoinRequest",
-			12666373963464220,
-			messages.JoinRequest{
+			Name:      "JoinRequest",
+			Timestamp: 12666373963464220,
+			Message: messages.JoinRequest{
 				MHdr:     0,
 				DevEUI:   basicstation.EUI{Prefix: "DevEui", EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
 				JoinEUI:  basicstation.EUI{Prefix: "JoinEui", EUI64: types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22}},
@@ -460,7 +453,7 @@ func TestUplink(t *testing.T) {
 					},
 				},
 			},
-			ttnpb.UplinkMessage{
+			ExpectedUplinkMessage: ttnpb.UplinkMessage{
 				Payload: &ttnpb.Message{
 					MHDR: ttnpb.MHDR{MType: ttnpb.MType_JOIN_REQUEST, Major: ttnpb.Major_LORAWAN_R1},
 					MIC:  []byte{0x4E, 0x61, 0xBC, 0x00},
@@ -477,8 +470,7 @@ func TestUplink(t *testing.T) {
 					SNR:                9.25,
 				}},
 				Settings: ttnpb.TxSettings{
-					Frequency:     868300000,
-					DataRateIndex: 1,
+					Frequency: 868300000,
 					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 11,
 						Bandwidth:       125000,
@@ -488,6 +480,7 @@ func TestUplink(t *testing.T) {
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
 			req, err := json.Marshal(tc.Message)
 			if err != nil {
 				panic(err)
@@ -506,7 +499,7 @@ func TestUplink(t *testing.T) {
 				}
 				up.RawPayload = nil
 				up.RxMetadata[0].UplinkToken = nil
-				a.So(up, should.Resemble, &tc.UplinkMessage)
+				a.So(up, should.Resemble, &tc.ExpectedUplinkMessage)
 			case <-time.After(timeout):
 				t.Fatalf("Read message timeout")
 			}
@@ -530,9 +523,7 @@ func TestTraffic(t *testing.T) {
 	gs := mock.NewServer()
 	srv := New(ctx, gs)
 	c.RegisterWeb(srv)
-	if err := c.Start(); err != nil {
-		panic(err)
-	}
+	test.Must(nil, c.Start())
 	defer c.Close()
 
 	gs.RegisterGateway(ctx, registeredGatewayID, &registeredGateway)
@@ -553,16 +544,16 @@ func TestTraffic(t *testing.T) {
 	testState := TestState{}
 
 	for _, tc := range []struct {
-		Name             string
-		LNSUpstreamMsg   interface{}
-		LNSDownstreamMsg interface{}
-		NSUpstreamMsg    interface{}
-		NSDownlinkMsg    *ttnpb.DownlinkMessage
-		DownlinkPath     *ttnpb.DownlinkPath
+		Name                    string
+		InputBSUpstream         interface{}
+		InputNetworkDownstream  *ttnpb.DownlinkMessage
+		InputDownlinkPath       *ttnpb.DownlinkPath
+		ExpectedBSDownstream    interface{}
+		ExpectedNetworkUpstream interface{}
 	}{
 		{
-			"JoinRequest",
-			messages.JoinRequest{
+			Name: "JoinRequest",
+			InputBSUpstream: messages.JoinRequest{
 				MHdr:     0,
 				DevEUI:   basicstation.EUI{Prefix: "DevEui", EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
 				JoinEUI:  basicstation.EUI{Prefix: "JoinEui", EUI64: types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22}},
@@ -579,8 +570,7 @@ func TestTraffic(t *testing.T) {
 					},
 				},
 			},
-			nil,
-			ttnpb.UplinkMessage{
+			ExpectedNetworkUpstream: ttnpb.UplinkMessage{
 				Payload: &ttnpb.Message{
 					MHDR: ttnpb.MHDR{MType: ttnpb.MType_JOIN_REQUEST, Major: ttnpb.Major_LORAWAN_R1},
 					MIC:  []byte{0x4E, 0x61, 0xBC, 0x00},
@@ -597,20 +587,17 @@ func TestTraffic(t *testing.T) {
 					SNR:                9.25,
 				}},
 				Settings: ttnpb.TxSettings{
-					Frequency:     868300000,
-					DataRateIndex: 1,
+					Frequency: 868300000,
 					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 11,
 						Bandwidth:       125000,
 					}}},
 				},
 			},
-			nil,
-			nil,
 		},
 		{
-			"UplinkFrame",
-			messages.UplinkDataFrame{
+			Name: "UplinkFrame",
+			InputBSUpstream: messages.UplinkDataFrame{
 				MHdr:       0x40,
 				DevAddr:    0x11223344,
 				FCtrl:      0x30,
@@ -630,8 +617,7 @@ func TestTraffic(t *testing.T) {
 					},
 				},
 			},
-			nil,
-			ttnpb.UplinkMessage{
+			ExpectedNetworkUpstream: ttnpb.UplinkMessage{
 				Payload: &ttnpb.Message{
 					MHDR: ttnpb.MHDR{MType: ttnpb.MType_UNCONFIRMED_UP, Major: ttnpb.Major_LORAWAN_R1},
 					MIC:  []byte{0x4E, 0x61, 0xBC, 0x00},
@@ -656,32 +642,17 @@ func TestTraffic(t *testing.T) {
 					SNR:                9.25},
 				},
 				Settings: ttnpb.TxSettings{
-					Frequency:     868300000,
-					DataRateIndex: 1,
+					Frequency: 868300000,
 					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 11,
 						Bandwidth:       125000,
 					}}},
 				},
 			},
-			nil,
-			nil,
 		},
 		{
-			"Downlink",
-			nil,
-			messages.DownlinkMessage{
-				DevEUI:      basicstation.EUI{EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
-				DeviceClass: 0,
-				Diid:        1,
-				Pdu:         "Ymxhamthc25kJ3M==",
-				RxDelay:     1,
-				Rx2Freq:     868100000,
-				Rx2DR:       5,
-				XTime:       1553759666,
-			},
-			nil,
-			&ttnpb.DownlinkMessage{
+			Name: "Downlink",
+			InputNetworkDownstream: &ttnpb.DownlinkMessage{
 				RawPayload: []byte("Ymxhamthc25kJ3M=="),
 				EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
 					DeviceID: "testdevice",
@@ -698,38 +669,43 @@ func TestTraffic(t *testing.T) {
 				},
 				CorrelationIDs: []string{"correlation1", "correlation2"},
 			},
-			&ttnpb.DownlinkPath{
+
+			InputDownlinkPath: &ttnpb.DownlinkPath{
 				Path: &ttnpb.DownlinkPath_UplinkToken{
 					UplinkToken: io.MustUplinkToken(ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: registeredGatewayID}, 1553759666),
 				},
 			},
+			ExpectedBSDownstream: messages.DownlinkMessage{
+				DeviceClass: 0,
+				Diid:        0,
+				Pdu:         "Ymxhamthc25kJ3M==",
+				RxDelay:     1,
+				Rx2Freq:     868100000,
+				Rx2DR:       5,
+				XTime:       1553759666,
+				Priority:    25,
+			},
 		},
 		{
-			"FollowUpTxAck",
-			messages.TxConfirmation{
+			Name: "FollowUpTxAck",
+			InputBSUpstream: messages.TxConfirmation{
 				XTime: 1548059982,
 			},
-			nil,
-			ttnpb.TxAcknowledgment{
+			ExpectedNetworkUpstream: ttnpb.TxAcknowledgment{
 				Result: ttnpb.TxAcknowledgment_SUCCESS,
 			},
-			nil,
-			nil,
 		},
 		{
-			"RepeatedTxAck",
-			messages.TxConfirmation{
+			Name: "RepeatedTxAck",
+			ExpectedNetworkUpstream: messages.TxConfirmation{
 				XTime: 1548059982,
 			},
-			nil,
-			nil,
-			nil,
-			nil,
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
-			if tc.LNSUpstreamMsg != nil {
-				switch v := tc.LNSUpstreamMsg.(type) {
+			a := assertions.New(t)
+			if tc.InputBSUpstream != nil {
+				switch v := tc.InputBSUpstream.(type) {
 				case messages.TxConfirmation:
 					v.Diid = testState.Diid
 					req, err := json.Marshal(v)
@@ -745,7 +721,7 @@ func TestTraffic(t *testing.T) {
 							t.Fatalf("Invalid TxAck: %v", ack)
 						}
 					case <-time.After(timeout):
-						if tc.NSUpstreamMsg == nil {
+						if tc.ExpectedNetworkUpstream == nil {
 							t.Logf("Timedout as expected")
 						} else {
 							t.Fatalf("Read message timeout")
@@ -771,7 +747,7 @@ func TestTraffic(t *testing.T) {
 						}
 						up.RawPayload = nil
 						up.RxMetadata[0].UplinkToken = nil
-						expectedUp := tc.NSUpstreamMsg.(ttnpb.UplinkMessage)
+						expectedUp := tc.ExpectedNetworkUpstream.(ttnpb.UplinkMessage)
 						a.So(up, should.Resemble, &expectedUp)
 					case <-time.After(timeout):
 						t.Fatalf("Read message timeout")
@@ -779,31 +755,30 @@ func TestTraffic(t *testing.T) {
 				}
 			}
 
-			if tc.NSDownlinkMsg != nil {
-				if _, err := gsConn.SendDown(tc.DownlinkPath, tc.NSDownlinkMsg); err != nil {
+			if tc.InputNetworkDownstream != nil {
+				if _, err := gsConn.SendDown(tc.InputDownlinkPath, tc.InputNetworkDownstream); err != nil {
 					t.Fatalf("Failed to send downlink: %v", err)
 				}
-				testState.CorrelationIDs = tc.NSDownlinkMsg.CorrelationIDs
+				testState.CorrelationIDs = tc.InputNetworkDownstream.CorrelationIDs
 
 				resCh := make(chan []byte)
 				go func() {
 					_, data, err := wsConn.ReadMessage()
 					if err != nil {
-						t.Logf("Failed to read message: %v", err)
-						t.FailNow()
+						t.Fatalf("Failed to read message: %v", err)
 					}
 					resCh <- data
 				}()
 				select {
 				case res := <-resCh:
-					switch tc.LNSDownstreamMsg.(type) {
+					switch tc.ExpectedBSDownstream.(type) {
 					case messages.DownlinkMessage:
 						var msg messages.DownlinkMessage
 						if err := json.Unmarshal(res, &msg); err != nil {
 							t.Fatalf("Failed to unmarshal response `%s`: %v", string(res), err)
 						}
-						msg.XTime = tc.LNSDownstreamMsg.(messages.DownlinkMessage).XTime
-						if !a.So(msg, should.Resemble, tc.LNSDownstreamMsg.(messages.DownlinkMessage)) {
+						msg.XTime = tc.ExpectedBSDownstream.(messages.DownlinkMessage).XTime
+						if !a.So(msg, should.Resemble, tc.ExpectedBSDownstream.(messages.DownlinkMessage)) {
 							t.Fatalf("Incorrect Downlink received: %s", string(res))
 						}
 						testState.Diid = msg.Diid
