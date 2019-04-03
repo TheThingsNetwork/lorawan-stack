@@ -509,10 +509,10 @@ hardware_versions:
 				t.Run(ctc.Name, func(t *testing.T) {
 					ctx, cancel := context.WithDeadline(ctx, time.Now().Add(Timeout))
 					chs := &connChannels{
-						up:          make(chan *ttnpb.ApplicationUp),
+						up:          make(chan *ttnpb.ApplicationUp, 1),
 						downPush:    make(chan *ttnpb.DownlinkQueueRequest),
 						downReplace: make(chan *ttnpb.DownlinkQueueRequest),
-						downErr:     make(chan error),
+						downErr:     make(chan error, 1),
 					}
 					err := ptc.Connect(ctx, t, ctc.ID, ctc.Key, chs)
 					cancel()
@@ -530,10 +530,10 @@ hardware_versions:
 		t.Run(fmt.Sprintf("Traffic/%v", ptc.Protocol), func(t *testing.T) {
 			ctx, cancel := context.WithCancel(ctx)
 			chs := &connChannels{
-				up:          make(chan *ttnpb.ApplicationUp),
+				up:          make(chan *ttnpb.ApplicationUp, 1),
 				downPush:    make(chan *ttnpb.DownlinkQueueRequest),
 				downReplace: make(chan *ttnpb.DownlinkQueueRequest),
-				downErr:     make(chan error),
+				downErr:     make(chan error, 1),
 			}
 
 			wg := &sync.WaitGroup{}
@@ -1410,13 +1410,20 @@ hardware_versions:
 							},
 						},
 					}
+					time.Sleep(Timeout)
 					select {
 					case err := <-chs.downErr:
 						if !ptc.SkipCheckDownErr && a.So(err, should.NotBeNil) {
 							a.So(errors.IsNotFound(err), should.BeTrue)
 						}
-					case <-time.After(Timeout):
-						t.Fatal("Expected downlink error timeout")
+					default:
+						t.Fatal("Expected downlink error")
+					}
+					select {
+					case up := <-chs.up:
+						a.So(up.Up, should.HaveSameTypeAs, &ttnpb.ApplicationUp_DownlinkFailed{})
+					default:
+						t.Fatal("Expected upstream event")
 					}
 				})
 				t.Run("RegisteredDevice/Push", func(t *testing.T) {
@@ -1451,13 +1458,22 @@ hardware_versions:
 							EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
 							Downlinks:            items,
 						}
+						time.Sleep(Timeout)
 						select {
 						case err := <-chs.downErr:
 							if !a.So(err, should.BeNil) {
 								t.FailNow()
 							}
-						case <-time.After(Timeout):
-							t.Fatal("Expected downlink error timeout")
+						default:
+							t.Fatal("Expected downlink error")
+						}
+						for i := 0; i < len(items); i++ {
+							select {
+							case up := <-chs.up:
+								a.So(up.Up, should.HaveSameTypeAs, &ttnpb.ApplicationUp_DownlinkQueued{})
+							default:
+								t.Fatalf("Expected upstream event")
+							}
 						}
 					}
 					res, err := as.DownlinkQueueList(ctx, registeredDevice.EndDeviceIdentifiers)
@@ -1502,13 +1518,22 @@ hardware_versions:
 							},
 						},
 					}
+					time.Sleep(Timeout)
 					select {
 					case err := <-chs.downErr:
 						if !a.So(err, should.BeNil) {
 							t.FailNow()
 						}
-					case <-time.After(Timeout):
-						t.Fatal("Expected downlink error timeout")
+					default:
+						t.Fatal("Expected downlink error")
+					}
+					for i := 0; i < 2; i++ {
+						select {
+						case up := <-chs.up:
+							a.So(up.Up, should.HaveSameTypeAs, &ttnpb.ApplicationUp_DownlinkQueued{})
+						default:
+							t.Fatalf("Expected upstream event")
+						}
 					}
 					res, err := as.DownlinkQueueList(ctx, registeredDevice.EndDeviceIdentifiers)
 					if a.So(err, should.BeNil) && a.So(res, should.HaveLength, 2) {
