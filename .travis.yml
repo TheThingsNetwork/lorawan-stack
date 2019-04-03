@@ -16,9 +16,9 @@ matrix:
   include:
   - env: RUNTYPE=js
     if: type = pull_request
-  - env: RUNTYPE=go.test GOARCH=amd64
+  - env: RUNTYPE=go.test RUN_GOARCH=amd64
     if: type = pull_request
-  - env: RUNTYPE=go.test GOARCH=386
+  - env: RUNTYPE=go.test RUN_GOARCH=386
     if: type = pull_request
   - env: RUNTYPE=go.lint
     if: type = pull_request
@@ -93,10 +93,10 @@ script:
   fi
 - |
   if [[ "$RUNTYPE" == "go.test" ]]; then
-    if [[ "$GOARCH" == "amd64" ]]; then
-      make go.coveralls
+    if [[ "$RUN_GOARCH" == "amd64" ]]; then
+      GOARCH=$RUN_GOARCH make go.coveralls
     else
-      make go.test
+      GOARCH=$RUN_GOARCH make go.test
     fi
   fi
 - |
