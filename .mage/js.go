@@ -71,76 +71,46 @@ func yarn() (func(args ...string) error, error) {
 	}, nil
 }
 
-func (js Js) webpack() (func(args ...string) error, error) {
-	if _, err := os.Stat(nodeBin("webpack")); os.IsNotExist(err) {
-		if err = js.DevDeps(); err != nil {
-			return nil, err
-		}
-	}
-	return func(args ...string) error {
-		return sh.RunV(nodeBin("webpack"), args...)
-	}, nil
-}
-
-func (js Js) webpackServe() (func(args ...string) error, error) {
-	if _, err := os.Stat(nodeBin("webpack-dev-server")); os.IsNotExist(err) {
-		if err = js.DevDeps(); err != nil {
-			return nil, err
-		}
-	}
-	return func(args ...string) error {
-		return sh.RunV(nodeBin("webpack-dev-server"), args...)
-	}, nil
-}
-
 func (js Js) node() (func(args ...string) error, error) {
 	return func(args ...string) error {
 		return sh.Run("node", args...)
 	}, nil
 }
 
-func (js Js) babel() (func(args ...string) error, error) {
-	if _, err := os.Stat(nodeBin("babel")); os.IsNotExist(err) {
+func (js Js) execFromNodeBin(cmd string) (func(args ...string) error, error) {
+	if _, err := os.Stat(nodeBin(cmd)); os.IsNotExist(err) {
 		if err = js.DevDeps(); err != nil {
 			return nil, err
 		}
 	}
 	return func(args ...string) error {
-		return sh.Run(nodeBin("babel"), args...)
+		_, err := sh.Exec(nil, os.Stdout, os.Stderr, nodeBin(cmd), args...)
+		return err
 	}, nil
+}
+
+func (js Js) webpack() (func(args ...string) error, error) {
+	return js.execFromNodeBin("webpack")
+}
+
+func (js Js) webpackServe() (func(args ...string) error, error) {
+	return js.execFromNodeBin("webpack-dev-server")
+}
+
+func (js Js) babel() (func(args ...string) error, error) {
+	return js.execFromNodeBin("babel")
 }
 
 func (js Js) jest() (func(args ...string) error, error) {
-	if _, err := os.Stat(nodeBin("jest")); os.IsNotExist(err) {
-		if err = js.DevDeps(); err != nil {
-			return nil, err
-		}
-	}
-	return func(args ...string) error {
-		return sh.Run(nodeBin("jest"), args...)
-	}, nil
+	return js.execFromNodeBin("jest")
 }
 
-func (js Js) eslint() (func(args ...string) (string, error), error) {
-	if _, err := os.Stat(nodeBin("eslint")); os.IsNotExist(err) {
-		if err = js.DevDeps(); err != nil {
-			return nil, err
-		}
-	}
-	return func(args ...string) (string, error) {
-		return sh.Output(nodeBin("eslint"), args...)
-	}, nil
+func (js Js) eslint() (func(args ...string) error, error) {
+	return js.execFromNodeBin("eslint")
 }
 
-func (js Js) stylint() (func(args ...string) (string, error), error) {
-	if _, err := os.Stat(nodeBin("stylint")); os.IsNotExist(err) {
-		if err = js.DevDeps(); err != nil {
-			return nil, err
-		}
-	}
-	return func(args ...string) (string, error) {
-		return sh.Output(nodeBin("stylint"), args...)
-	}, nil
+func (js Js) stylint() (func(args ...string) error, error) {
+	return js.execFromNodeBin("stylint")
 }
 
 // DevDeps installs the javascript development dependencies.
@@ -293,13 +263,7 @@ func (js Js) Lint() error {
 	if err != nil {
 		return err
 	}
-	res, err := eslint("./pkg/webui/**/*.js", "--no-ignore", "--color")
-
-	if res != "" {
-		fmt.Println(res)
-	}
-
-	return err
+	return eslint("./pkg/webui/**/*.js", "--no-ignore", "--color")
 }
 
 // LintSnap runs eslint over frontend snap files.
@@ -311,13 +275,7 @@ func (js Js) LintSnap() error {
 	if err != nil {
 		return err
 	}
-	res, err := eslint("./pkg/webui/**/*.snap", "--no-ignore", "--color")
-
-	if res != "" {
-		fmt.Println(res)
-	}
-
-	return err
+	return eslint("./pkg/webui/**/*.snap", "--no-ignore", "--color")
 }
 
 // LintAll runs linters over js and snap files.
