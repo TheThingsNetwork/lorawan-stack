@@ -1,18 +1,38 @@
-/ @johanstokking
+# Root
+/ @johanstokking @htdvisser
+/CODEOWNERS @johanstokking
+/LICENSE @johanstokking
 
+# Clear common folders
+/doc
+/config
+/pkg
+
+# Dependencies
+/go.mod @johanstokking @htdvisser
+/go.sum @johanstokking @htdvisser
+
+# Build pipeline
+/Makefile @htdvisser @rvolosatovs
+/magefile.go @htdvisser @rvolosatovs
 /.make @htdvisser @rvolosatovs
 /.mage @htdvisser @rvolosatovs
 
+# API and CLI compatibility
 /api @johanstokking @htdvisser @rvolosatovs
-/cmd @johanstokking @htdvisser @rvolosatovs
-/doc @TheThingsNetwork/stack-developers
-/config @TheThingsNetwork/stack-developers
+/cmd @johanstokking @htdvisser
+/pkg/ttnpb @johanstokking @htdvisser @rvolosatovs
 
-/pkg @TheThingsNetwork/stack-developers
+# Security
 /pkg/auth @johanstokking @htdvisser
 /pkg/crypto @johanstokking @htdvisser
+
+# Shared components
+/pkg/component @johanstokking @htdvisser
+/pkg/types @johanstokking @htdvisser @rvolosatovs
 /pkg/webui @bafonins @kschiffer
 
+# Subsystems
 /pkg/applicationserver @johanstokking
 /pkg/console @bafonins @kschiffer
 /pkg/gatewayserver @johanstokking
@@ -20,4 +40,5 @@
 /pkg/identityserver @htdvisser
 /pkg/joinserver @johanstokking @rvolosatovs
 
+# SDKs
 /sdk/js @bafonins @kschiffer
