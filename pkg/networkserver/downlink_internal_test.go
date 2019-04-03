@@ -233,6 +233,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							FCnt:           42,
 							FRMPayload:     []byte("testPayload"),
 							CorrelationIDs: []string{"testCorrelationAppDownID1", "testCorrelationAppDownID2"},
+							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
 						},
 					},
 				})
@@ -338,6 +339,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx1Frequency:     rx1Freq,
 							Rx2DataRateIndex: ttnpb.DATA_RATE_1,
 							Rx2Frequency:     42,
+							Priority:         ttnpb.TxSchedulePriority_NORMAL,
 							DownlinkPaths: []*ttnpb.DownlinkPath{
 								{
 									Path: &ttnpb.DownlinkPath_UplinkToken{
@@ -431,6 +433,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 												Rx1Frequency:     rx1Freq,
 												Rx2DataRateIndex: ttnpb.DATA_RATE_1,
 												Rx2Frequency:     42,
+												Priority:         ttnpb.TxSchedulePriority_NORMAL,
 												DownlinkPaths: []*ttnpb.DownlinkPath{
 													{
 														Path: &ttnpb.DownlinkPath_UplinkToken{
@@ -469,6 +472,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 										Rx1Frequency:     rx1Freq,
 										Rx2DataRateIndex: ttnpb.DATA_RATE_1,
 										Rx2Frequency:     42,
+										Priority:         ttnpb.TxSchedulePriority_NORMAL,
 										DownlinkPaths: []*ttnpb.DownlinkPath{
 											{
 												Path: &ttnpb.DownlinkPath_UplinkToken{
@@ -516,6 +520,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 											Rx1Frequency:     rx1Freq,
 											Rx2DataRateIndex: ttnpb.DATA_RATE_1,
 											Rx2Frequency:     42,
+											Priority:         ttnpb.TxSchedulePriority_NORMAL,
 											DownlinkPaths: []*ttnpb.DownlinkPath{
 												{
 													Path: &ttnpb.DownlinkPath_UplinkToken{
@@ -658,6 +663,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							FCnt:           1,
 							FRMPayload:     []byte("testPayload"),
 							CorrelationIDs: []string{"testCorrelationAppDownID1", "testCorrelationAppDownID2"},
+							Priority:       ttnpb.TxSchedulePriority_LOW,
 						},
 					},
 				})
@@ -792,6 +798,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 												Rx1Frequency:     rx1Freq,
 												Rx2DataRateIndex: ttnpb.DATA_RATE_1,
 												Rx2Frequency:     42,
+												Priority:         ttnpb.TxSchedulePriority_LOW,
 												DownlinkPaths: []*ttnpb.DownlinkPath{
 													{
 														Path: &ttnpb.DownlinkPath_UplinkToken{
@@ -830,6 +837,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 										Rx1Frequency:     rx1Freq,
 										Rx2DataRateIndex: ttnpb.DATA_RATE_1,
 										Rx2Frequency:     42,
+										Priority:         ttnpb.TxSchedulePriority_LOW,
 										DownlinkPaths: []*ttnpb.DownlinkPath{
 											{
 												Path: &ttnpb.DownlinkPath_UplinkToken{
@@ -877,6 +885,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 											Rx1Frequency:     rx1Freq,
 											Rx2DataRateIndex: ttnpb.DATA_RATE_1,
 											Rx2Frequency:     42,
+											Priority:         ttnpb.TxSchedulePriority_LOW,
 											DownlinkPaths: []*ttnpb.DownlinkPath{
 												{
 													Path: &ttnpb.DownlinkPath_UplinkToken{
@@ -1018,6 +1027,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							FCnt:           42,
 							FRMPayload:     []byte("testPayload"),
 							CorrelationIDs: []string{"testCorrelationAppDownID1", "testCorrelationAppDownID2"},
+							Priority:       ttnpb.TxSchedulePriority_NORMAL,
 						},
 					},
 				})
@@ -1121,6 +1131,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx1Delay:         ttnpb.RX_DELAY_3,
 							Rx1DataRateIndex: rx1DRIdx,
 							Rx1Frequency:     rx1Freq,
+							Priority:         ttnpb.TxSchedulePriority_NORMAL,
 							DownlinkPaths: []*ttnpb.DownlinkPath{
 								{
 									Path: &ttnpb.DownlinkPath_UplinkToken{
@@ -1195,6 +1206,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 											Rx1Delay:         ttnpb.RX_DELAY_3,
 											Rx1DataRateIndex: rx1DRIdx,
 											Rx1Frequency:     rx1Freq,
+											Priority:         ttnpb.TxSchedulePriority_NORMAL,
 											DownlinkPaths: []*ttnpb.DownlinkPath{
 												{
 													Path: &ttnpb.DownlinkPath_UplinkToken{
@@ -1236,6 +1248,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 											Rx1Delay:         ttnpb.RX_DELAY_3,
 											Rx1DataRateIndex: rx1DRIdx,
 											Rx1Frequency:     rx1Freq,
+											Priority:         ttnpb.TxSchedulePriority_NORMAL,
 											DownlinkPaths: []*ttnpb.DownlinkPath{
 												{
 													Path: &ttnpb.DownlinkPath_UplinkToken{
@@ -1290,6 +1303,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 											Rx1Delay:         ttnpb.RX_DELAY_3,
 											Rx1DataRateIndex: rx1DRIdx,
 											Rx1Frequency:     rx1Freq,
+											Priority:         ttnpb.TxSchedulePriority_NORMAL,
 											DownlinkPaths: []*ttnpb.DownlinkPath{
 												{
 													Path: &ttnpb.DownlinkPath_UplinkToken{
@@ -2837,6 +2851,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx1Frequency:     rx1Freq,
 							Rx2DataRateIndex: ttnpb.DATA_RATE_1,
 							Rx2Frequency:     42,
+							Priority:         ttnpb.TxSchedulePriority_HIGH,
 							DownlinkPaths: []*ttnpb.DownlinkPath{
 								{
 									Path: &ttnpb.DownlinkPath_UplinkToken{
@@ -2906,6 +2921,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 												Rx1Frequency:     rx1Freq,
 												Rx2DataRateIndex: ttnpb.DATA_RATE_1,
 												Rx2Frequency:     42,
+												Priority:         ttnpb.TxSchedulePriority_HIGH,
 												DownlinkPaths: []*ttnpb.DownlinkPath{
 													{
 														Path: &ttnpb.DownlinkPath_UplinkToken{
@@ -2942,6 +2958,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 										Rx1Frequency:     rx1Freq,
 										Rx2DataRateIndex: ttnpb.DATA_RATE_1,
 										Rx2Frequency:     42,
+										Priority:         ttnpb.TxSchedulePriority_HIGH,
 										DownlinkPaths: []*ttnpb.DownlinkPath{
 											{
 												Path: &ttnpb.DownlinkPath_UplinkToken{
@@ -2986,6 +3003,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 											Rx1Delay:         ttnpb.RxDelay(band.JoinAcceptDelay1 / time.Second),
 											Rx1Frequency:     rx1Freq,
 											Rx2DataRateIndex: ttnpb.DATA_RATE_1,
+											Priority:         ttnpb.TxSchedulePriority_HIGH,
 											Rx2Frequency:     42,
 											DownlinkPaths: []*ttnpb.DownlinkPath{
 												{
@@ -3038,6 +3056,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 					CooldownWindow:      42,
 					DownlinkTasks: &MockDownlinkTaskQueue{
 						PopFunc: tc.PopFunc,
+					},
+					DownlinkPriorities: DownlinkPriorityConfig{
+						JoinAccept:             "high",
+						MACCommands:            "above_normal",
+						MaxApplicationDownlink: "normal",
 					},
 					Devices: &MockDeviceRegistry{
 						SetByIDFunc: tc.SetByIDFunc,
