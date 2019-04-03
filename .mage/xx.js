@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import icu from 'messageformat-parser'
+const icu = require('messageformat-parser')
 
 const stringify = function (token) {
   if (typeof token === 'string') {
@@ -50,6 +50,6 @@ const stringify = function (token) {
  * @param {string} format - The format string.
  * @returns {string} - The updated format.
  */
-export default function (format) {
+module.exports = function (format) {
   return icu.parse(format).map(stringify).join('')
 }

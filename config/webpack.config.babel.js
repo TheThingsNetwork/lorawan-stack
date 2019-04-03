@@ -237,7 +237,7 @@ export default {
         filepath: path.resolve(context, PUBLIC_DIR, 'libs.bundle.js'),
       }),
       new ShellPlugin({
-        onBuildExit: [ 'make js.gather-locales' ],
+        onBuildExit: [ 'mage js:translations' ],
       }),
     ],
   }),

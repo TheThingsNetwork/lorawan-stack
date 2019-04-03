@@ -110,7 +110,7 @@ func (js Js) Deps() error {
 	return yarn("install", "--no-progress", "--production=false")
 }
 
-// Webpack runs the webpack command with the project config.
+// BuildMain runs the webpack command with the project config.
 func (js Js) BuildMain() error {
 	if mg.Verbose() {
 		fmt.Println("Running Webpack")
@@ -120,4 +120,49 @@ func (js Js) BuildMain() error {
 		return err
 	}
 	return webpack("--config", "config/webpack.config.babel.js")
+}
+
+// BuildDll runs the webpack command with the dll config.
+func (js Js) BuildDll() error {
+	if mg.Verbose() {
+		fmt.Println("Running Webpack")
+	}
+	webpack, err := js.webpack()
+	if err != nil {
+		return err
+	}
+	return webpack("--config", "config/webpack.config.dll.babel.js")
+}
+
+// Messages extracts the frontend messages via babel
+func (js Js) Messages() error {
+	if mg.Verbose() {
+		fmt.Println("Extracting frontend messages")
+	}
+	babel, err := js.babel()
+	if err != nil {
+		return err
+	}
+	sh.Rm(".cache/messages")
+	sh.Run("mdir", "-p", "pkg/webui/locales")
+	return babel("-q", "pkg/webui")
+}
+
+// Translations builds the frontend locale files
+func (js Js) Translations() error {
+	node, err := js.node()
+	if err != nil {
+		return err
+	}
+	return node(".mage/translations.js")
+}
+
+// BackendTranslations builds the backend locale files
+func (js Js) BackendTranslations() error {
+	node, err := js.node()
+	if err != nil {
+		return err
+	}
+
+	return node(".mage/translations.js", "--backend-messages", "config/messages.json", "--locales", "pkg/webui/locales/.backend", "--backend-only")
 }
