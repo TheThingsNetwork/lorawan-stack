@@ -3986,6 +3986,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/networkserver:f_cnt_too_low": {
+    "translations": {
+      "en": "FCnt is too low"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/networkserver:field_mask": {
     "translations": {
       "en": "invalid field mask"
@@ -4232,6 +4241,15 @@
   "error:pkg/networkserver:unknown_s_nwk_s_int_key": {
     "translations": {
       "en": "SNwkSIntKey is unknown"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:unknown_session": {
+    "translations": {
+      "en": "unknown session"
     },
     "description": {
       "package": "pkg/networkserver",

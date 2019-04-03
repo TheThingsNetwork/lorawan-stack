@@ -15,6 +15,7 @@
 package networkserver
 
 import (
+	"bytes"
 	"context"
 	"time"
 
@@ -93,6 +94,38 @@ func (ns *NetworkServer) LinkApplication(link ttnpb.AsNs_LinkApplicationServer) 
 	}
 }
 
+// validateDownlinks validates the given end device's application downlink queue.
+// This function returns an error if any of the following checks fail:
+// - The MACState is unknown;
+// - An item's session is neither the device's session or pending session;
+// - An item's FCnt is not higher than the previous for the corresponding session;
+// - The LoRaWAN version is 1.0.x and an item's FCnt is not higher than the session's NFCntDown.
+func validateDownlinks(dev *ttnpb.EndDevice) error {
+	if dev.MACState == nil {
+		return errUnknownMACState
+	}
+	var prevSession, prevPendingSession *uint32
+	for _, item := range dev.QueuedApplicationDownlinks {
+		var prev **uint32
+		if dev.Session != nil && bytes.Equal(dev.Session.SessionKeyID, item.SessionKeyID) {
+			// In 1.0.x, NS and AS share FCntDown.
+			if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 && item.FCnt <= dev.Session.LastNFCntDown {
+				return errFCntTooLow
+			}
+			prev = &prevSession
+		} else if dev.PendingSession != nil && bytes.Equal(dev.PendingSession.SessionKeyID, item.SessionKeyID) {
+			prev = &prevPendingSession
+		} else {
+			return errUnknownSession
+		}
+		if *prev != nil && item.FCnt <= **prev {
+			return errFCntTooLow
+		}
+		*prev = &item.FCnt
+	}
+	return nil
+}
+
 // DownlinkQueueReplace is called by the Application Server to completely replace the downlink queue for a device.
 func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*pbtypes.Empty, error) {
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_LINK); err != nil {
@@ -101,17 +134,26 @@ func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.Do
 
 	logger := log.FromContext(ctx).WithField("device_uid", unique.ID(ctx, req.EndDeviceIdentifiers))
 
-	dev, err := ns.devices.SetByID(ctx, req.EndDeviceIdentifiers.ApplicationIdentifiers, req.EndDeviceIdentifiers.DeviceID, []string{
-		"queued_application_downlinks",
-		"mac_state.device_class",
-	},
+	dev, err := ns.devices.SetByID(ctx, req.EndDeviceIdentifiers.ApplicationIdentifiers, req.EndDeviceIdentifiers.DeviceID,
+		[]string{
+			"queued_application_downlinks",
+			"mac_state.device_class",
+			"mac_state.lorawan_version",
+			"pending_session.keys.session_key_id",
+			"session.last_n_f_cnt_down",
+			"session.keys.session_key_id",
+		},
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if dev == nil {
 				return nil, nil, errDeviceNotFound
 			}
 			dev.QueuedApplicationDownlinks = req.Downlinks
+			if err := validateDownlinks(dev); err != nil {
+				return nil, nil, err
+			}
 			return dev, []string{"queued_application_downlinks"}, nil
-		})
+		},
+	)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to replace application downlink queue")
 		return nil, err
@@ -121,7 +163,6 @@ func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.Do
 	if dev.MACState != nil {
 		logger = logger.WithField("device_class", dev.MACState.DeviceClass)
 	}
-
 	logger.Debug("Replaced application downlink queue")
 	if dev.MACState != nil && dev.MACState.DeviceClass != ttnpb.CLASS_A && len(dev.QueuedApplicationDownlinks) > 0 {
 		startAt := time.Now().UTC()
@@ -143,14 +184,22 @@ func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.Downl
 		[]string{
 			"queued_application_downlinks",
 			"mac_state.device_class",
+			"mac_state.lorawan_version",
+			"pending_session.keys.session_key_id",
+			"session.last_n_f_cnt_down",
+			"session.keys.session_key_id",
 		},
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if dev == nil {
 				return nil, nil, errDeviceNotFound
 			}
 			dev.QueuedApplicationDownlinks = append(dev.QueuedApplicationDownlinks, req.Downlinks...)
+			if err := validateDownlinks(dev); err != nil {
+				return nil, nil, err
+			}
 			return dev, []string{"queued_application_downlinks"}, nil
-		})
+		},
+	)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to push application downlink to queue")
 		return nil, err
@@ -160,7 +209,6 @@ func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.Downl
 	if dev.MACState != nil {
 		logger = logger.WithField("device_class", dev.MACState.DeviceClass)
 	}
-
 	logger.Debug("Pushed application downlink to queue")
 	if dev.MACState != nil && dev.MACState.DeviceClass != ttnpb.CLASS_A {
 		startAt := time.Now().UTC()

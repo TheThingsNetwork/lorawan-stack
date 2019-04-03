@@ -743,7 +743,7 @@ hardware_versions:
 										KEKLabel: "test",
 									},
 								},
-								LastAFCntDown: 1,
+								LastAFCntDown: 2,
 								StartedAt:     dev.Session.StartedAt,
 							})
 							a.So(dev.PendingSession, should.Resemble, &ttnpb.Session{
@@ -762,13 +762,13 @@ hardware_versions:
 								{
 									SessionKeyID: []byte{0x22},
 									FPort:        11,
-									FCnt:         0,
+									FCnt:         1,
 									FRMPayload:   []byte{0x1, 0x1, 0x1, 0x1},
 								},
 								{
 									SessionKeyID: []byte{0x22},
 									FPort:        22,
-									FCnt:         1,
+									FCnt:         2,
 									FRMPayload:   []byte{0x2, 0x2, 0x2, 0x2},
 								},
 							})
@@ -1119,7 +1119,7 @@ hardware_versions:
 										KEKLabel: "test",
 									},
 								},
-								LastAFCntDown: 1,
+								LastAFCntDown: 2,
 								StartedAt:     dev.Session.StartedAt,
 							})
 							a.So(dev.PendingSession, should.BeNil)
@@ -1127,13 +1127,13 @@ hardware_versions:
 								{
 									SessionKeyID: []byte{0x44},
 									FPort:        11,
-									FCnt:         0,
+									FCnt:         1,
 									FRMPayload:   []byte{0x1, 0x1, 0x1, 0x1},
 								},
 								{
 									SessionKeyID: []byte{0x44},
 									FPort:        22,
-									FCnt:         1,
+									FCnt:         2,
 									FRMPayload:   []byte{0x2, 0x2, 0x2, 0x2},
 								},
 							})
@@ -1282,7 +1282,7 @@ hardware_versions:
 										KEKLabel: "test",
 									},
 								},
-								LastAFCntDown: 1,
+								LastAFCntDown: 2,
 								StartedAt:     dev.Session.StartedAt,
 							})
 							a.So(dev.PendingSession, should.BeNil)
@@ -1290,13 +1290,13 @@ hardware_versions:
 								{
 									SessionKeyID: []byte{0x55},
 									FPort:        11,
-									FCnt:         0,
+									FCnt:         1,
 									FRMPayload:   []byte{0x1, 0x1, 0x1, 0x1},
 								},
 								{
 									SessionKeyID: []byte{0x55},
 									FPort:        22,
-									FCnt:         1,
+									FCnt:         2,
 									FRMPayload:   []byte{0x2, 0x2, 0x2, 0x2},
 								},
 							})

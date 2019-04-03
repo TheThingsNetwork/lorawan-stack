@@ -448,7 +448,7 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 				// This changes the LastAFCntDown in the session, so it should be run as part of the transaction.
 				logger := logger.WithField("count", len(joinAccept.InvalidatedDownlinks))
 				logger.Debug("Recalculating downlink queue to restore downlink queue on join")
-				if err := as.recalculateDownlinkQueue(ctx, dev, previousSession, joinAccept.InvalidatedDownlinks, 0, link); err != nil {
+				if err := as.recalculateDownlinkQueue(ctx, dev, previousSession, joinAccept.InvalidatedDownlinks, 1, link); err != nil {
 					logger.WithError(err).Warn("Failed to recalculate downlink queue, items lost")
 				} else {
 					mask = append(mask, "session")
@@ -521,7 +521,7 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 					} else {
 						events.Publish(evtLostQueueDataDown(ctx, ids, err))
 					}
-				} else if err := as.recalculateDownlinkQueue(ctx, dev, previousSession, res.Downlinks, 0, link); err != nil {
+				} else if err := as.recalculateDownlinkQueue(ctx, dev, previousSession, res.Downlinks, 1, link); err != nil {
 					log.WithError(err).Warn("Failed to recalculate downlink queue")
 				}
 			} else if dev.Session.AppSKey == nil {
@@ -624,6 +624,10 @@ func (as *ApplicationServer) recalculateDownlinkQueue(ctx context.Context, dev *
 	if newSession == nil || newSession.AppSKey == nil {
 		return errNoAppSKey
 	}
+	newSession.LastAFCntDown = nextAFCntDown - 1
+	if len(invalid) == 0 {
+		return nil
+	}
 	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"new_session_key_id", newSession.SessionKeyID,
 		"count", len(invalid),
@@ -655,7 +659,6 @@ func (as *ApplicationServer) recalculateDownlinkQueue(ctx context.Context, dev *
 	if err != nil {
 		return err
 	}
-	newSession.LastAFCntDown = nextAFCntDown - 1
 	valid := make([]*ttnpb.ApplicationDownlink, 0, len(invalid))
 	for _, oldItem := range invalid {
 		logger := logger.WithFields(log.Fields(
