@@ -57,6 +57,19 @@ Do you want to **contribute to the stack**? Your contributions are welcome! See 
 
 Are you new to LoRaWAN and The Things Network? See the general documentation at [thethingsnetwork.org/docs](https://www.thethingsnetwork.org/docs/).
 
+## Commitments and Releases
+
+Open source projects are great, but a stable and reliable open source ecosystem is even better. Therefore, we make the following commitments:
+
+1. We will not break the API towards gateways and applications within the major version. This includes how gateways communicate and how applications work with data
+2. We will upgrade storage from older versions within the major version. This means that you can migrate an older setup without losing data
+3. We will not break the public command-line interface and configuration within the major version. This means that you can safely build scripts and migrate configurations
+4. We will not break the API between components and events within minor versions. So at least the same minor versions of components are compatible with each other
+
+As we are continuously adding functionality in minor versions and fixing issues in patch versions, we are also introducing new configurations and new defaults. We therefore recommend reading the release notes before upgrading to a new version.
+
+You can find the releases and their notes on the [Releases page](https://github.com/TheThingsNetwork/lorawan-stack/releases).
+
 ## Support
 
 - The [forums](https://www.thethingsnetwork.org/forum) contain a massive amount of information and has great search
