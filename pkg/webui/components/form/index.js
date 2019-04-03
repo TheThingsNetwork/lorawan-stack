@@ -21,6 +21,7 @@ import FieldGroup from '../field/group'
 import Button from '../button'
 import Notification from '../notification'
 import PropTypes from '../../lib/prop-types'
+import getByPath from '../../lib/get-by-path'
 
 @bind
 class InnerForm extends React.Component {
@@ -102,16 +103,22 @@ class InnerForm extends React.Component {
     const formError = status.formError || false
     const serverErrors = status.errors || {}
     const clientErrors = errors
+    const combinedErrors = { ...serverErrors, ...clientErrors }
 
     const decoratedChildren = recursiveMap(children,
       function (Child) {
         if (Child.type === Field) {
+          const { name } = Child.props
+          const value = getByPath(values, name)
+          const fieldError = getByPath(combinedErrors, name)
+          const fieldTouched = getByPath(touched, name)
+
           return React.cloneElement(Child, {
             setFieldValue,
             setFieldTouched,
-            errors: { ...serverErrors, ...clientErrors },
-            values,
-            touched,
+            error: fieldError,
+            touched: fieldTouched,
+            value,
             horizontal,
             submitEnabledWhenInvalid,
             validateOnBlur,
@@ -134,9 +141,18 @@ class InnerForm extends React.Component {
             })
           }
         } else if (Child.type === FieldGroup) {
+          const { name } = Child.props
+          const value = getByPath(values, name)
+          const groupError = getByPath(combinedErrors, name)
+          const groupTouched = getByPath(touched, name)
           return React.cloneElement(Child, {
             ...Child.props,
-            errors,
+            setFieldValue,
+            setFieldTouched,
+            touched: groupTouched,
+            error: groupError,
+            value,
+            horizontal,
           })
         }
 
@@ -209,7 +225,7 @@ function recursiveMap (children, fn) {
     }
 
     let child = Child
-    if (child.props.children) {
+    if (child.props.children && child.type !== FieldGroup) {
       child = React.cloneElement(child, {
         children: recursiveMap(child.props.children, fn),
       })

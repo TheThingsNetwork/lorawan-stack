@@ -19,7 +19,6 @@ import { injectIntl } from 'react-intl'
 import PropTypes from '../../lib/prop-types'
 import from from '../../lib/from'
 import { warn } from '../../lib/log'
-import getByPath from '../../lib/get-by-path'
 
 import Icon from '../icon'
 import Input from '../input'
@@ -125,76 +124,72 @@ const component = function (type) {
 }
 
 const Field = function (props) {
-
-  const handleChange = function (value) {
-    props.setFieldValue(props.name, value)
-    if (props.validateOnChange) {
-      props.setFieldTouched(props.name, true)
-    }
-  }
-
-  const handleBlur = function (e) {
-    // Always regard inputs that never received a value as untouched (better UX)
-    if (e.target.value !== '' && props.validateOnBlur) {
-      props.setFieldTouched(props.name, true)
-    }
-  }
-
   const {
     className,
     type = 'text',
     name = '',
+    touches = props.name,
     title,
     placeholder = props.title,
     description = null,
-    error,
-    value,
     warning,
-    touched,
+    touched = false,
     horizontal = false,
     disabled = false,
     readOnly = false,
     required = false,
     form = true,
+    validateOnBlur,
+    validateOnChange,
+    setFieldValue,
+    setFieldTouched,
     ...rest
   } = props
 
-  // Underscored assignment due to naming conflict
+  const handleChange = function (value) {
+    setFieldValue(name, value)
+    if (validateOnChange) {
+      setFieldTouched(touches, true)
+    }
+  }
 
-  let _value = props.value
-  let _error = props.error
-  let _touched = props.touched
+  const handleBlur = function (e) {
+    // Always regard inputs that never received a value as untouched (better UX)
+    if (e.target.value !== '' && validateOnBlur) {
+      setFieldTouched(touches, true)
+    }
+  }
+
+  // Underscored assignment due to naming conflict
+  let _error = rest.error
   const formatMessage = content => typeof content === 'object' ? props.intl.formatMessage(content) : content
 
   if (form) {
-    const {
-      values = {},
-      errors = {},
-    } = props
-
     // preserve default values for different inputs
-    // make sure the checkbox component gets `false` as a falsy value
-    _value = getByPath(values, name) || (type === 'checkbox' ? false : '')
-    _error = getByPath(errors, name)
-    _touched = touched[name]
-    rest.value = _value
-    rest.onChange = handleChange
+    rest.value = rest.value || ''
+    rest.onChange = rest.onChange || handleChange
     rest.onBlur = handleBlur
+    _error = touched && rest.error
 
-    // restore the rest object for future per component filtering
-    rest.name = name
-    rest.readOnly = readOnly
-    rest.disabled = disabled
-    rest.error = _touched && Boolean(_error)
-    rest.warning = Boolean(warning)
-    rest.type = type
-    rest.placeholder = placeholder ? formatMessage(placeholder) : ''
+    // Dismiss non boolean values for checkboxes
+    if (type === 'checkbox') {
+      rest.value = typeof rest.value === 'boolean' ? rest.value : false
+    }
   }
 
-  const hasMessages = _touched && (_error || warning)
+  // restore the rest object for future per component filtering
+  rest.name = name
+  rest.readOnly = readOnly
+  rest.disabled = disabled
+  rest.error = Boolean(_error)
+  rest.warning = Boolean(warning)
+  rest.type = type
+  rest.placeholder = placeholder ? formatMessage(placeholder) : ''
+
+  const hasMessages = touched && (_error || warning)
 
   const classname = classnames(className, style.field, style[type], ...from(style, {
-    error: _error,
+    error: rest.error,
     warning: warning && !_error,
     horizontal,
     required,
@@ -237,7 +232,7 @@ Field.propTypes = {
     PropTypes.node,
     PropTypes.message,
   ]),
-  /** "name" prop applied to the input */
+  /** "name" prop applied to the input, mapped to the form value object */
   name: PropTypes.string.isRequired,
   /**
    * The field type (eg. text, byte, password, checkbox), thunked values are
@@ -246,7 +241,7 @@ Field.propTypes = {
   type: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.func,
-  ]).isRequired,
+  ]),
   /** Error to be displayed next to input */
   error: PropTypes.error,
   /** Warning to be displayed next to input */
@@ -263,6 +258,21 @@ Field.propTypes = {
    * This is necessary to map form values correctly.
    */
   form: PropTypes.bool,
+  /** A flag indicating whether the field has already received any input so far */
+  touched: PropTypes.bool,
+  /** The value name that the field will set to touched (defaults to 'name' prop)
+   */
+  touches: PropTypes.string,
+  /** A flag indicating whether the field value should be validated when the
+   * input triggered a blur event */
+  validateOnBlur: PropTypes.bool,
+  /** A flag indicating whether the field value should be validated when the
+   * input triggered a change event */
+  validateOnChange: PropTypes.bool,
+  /** The passed (formik) function to change form data */
+  setFieldValue: PropTypes.func,
+  /** The passed (formik) function to set the touch value of a form data property */
+  setFieldTouched: PropTypes.func,
 }
 
 const Err = function (props) {
