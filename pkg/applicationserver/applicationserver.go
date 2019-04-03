@@ -268,7 +268,7 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 					return nil, nil, err
 				}
 				encryptedItem.DecodedPayload = nil
-				encryptedItem.CorrelationIDs = events.CorrelationIDsFromContext(ctx)
+				encryptedItem.CorrelationIDs = item.CorrelationIDs
 				session.LastAFCntDown = encryptedItem.FCnt
 				encryptedItems = append(encryptedItems, &encryptedItem)
 			}
