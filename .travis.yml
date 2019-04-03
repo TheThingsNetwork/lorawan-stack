@@ -1,6 +1,6 @@
 sudo: required
 conditions: v1
-if: type = pull_request OR branch =~ ^master$ OR tag IS present
+if: type = pull_request OR branch = master OR tag IS present
 os: linux
 language: go
 go: 1.11.x
@@ -15,12 +15,15 @@ env:
 matrix:
   include:
   - env: RUNTYPE=js
+    if: type = pull_request
   - env: RUNTYPE=go.test GOARCH=amd64
-  - if: type = pull_request OR branch =~ ^master$
-    env: RUNTYPE=go.test GOARCH=386
+    if: type = pull_request
+  - env: RUNTYPE=go.test GOARCH=386
+    if: type = pull_request
   - env: RUNTYPE=go.lint
-  - if: tag IS present
-    env: RUNTYPE=release
+    if: type = pull_request
+  - env: RUNTYPE=release
+    if: tag IS present OR (type != pull_request AND branch = master)
 services:
 - docker
 cache:
@@ -113,4 +116,10 @@ deploy:
   script: GO111MODULE=on go run github.com/goreleaser/goreleaser
   on:
     tags: true
+    condition: $RUNTYPE = "release"
+- provider: script
+  skip_cleanup: true
+  script: GO111MODULE=on go run github.com/goreleaser/goreleaser --snapshot
+  on:
+    branch: master
     condition: $RUNTYPE = "release"
