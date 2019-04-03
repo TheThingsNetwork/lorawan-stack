@@ -14,7 +14,7 @@ env:
   - PATH=/snap/bin:$PATH
 matrix:
   include:
-  - env: RUNTYPE=js.test
+  - env: RUNTYPE=js
   - env: RUNTYPE=go.test GOARCH=amd64
   - if: type = pull_request OR branch =~ ^master$
     env: RUNTYPE=go.test GOARCH=386
@@ -58,10 +58,10 @@ install:
   fi
 script:
 - |
-  if [[ "$RUNTYPE" == "js.test" ]]; then
+  if [[ "$RUNTYPE" == "js" ]]; then
     make js.dev-deps js.deps sdk.deps
     make js.translations
-    make js.test sdk.test
+    make js sdk.test
     make js.lint
   fi
 - |
