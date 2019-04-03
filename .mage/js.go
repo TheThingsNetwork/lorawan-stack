@@ -28,10 +28,16 @@ import (
 
 func nodeBin(cmd string) string { return filepath.Join("node_modules", ".bin", cmd) }
 
+// DevDeps installs the javascript development dependencies.
+func devDeps() error {
+	_, err := yarn()
+	return err
+}
+
 // Js namespace.
 type Js mg.Namespace
 
-func (Js) installYarn() error {
+func installYarn() error {
 	packageJSONBytes, err := ioutil.ReadFile("package.json")
 	if err != nil {
 		return err
@@ -54,9 +60,9 @@ func (Js) installYarn() error {
 	return sh.RunV("npm", "install", "--no-package-lock", "--no-save", "--production=false", yarn)
 }
 
-func (js Js) yarn() (func(args ...string) error, error) {
+func yarn() (func(args ...string) error, error) {
 	if _, err := os.Stat(nodeBin("yarn")); os.IsNotExist(err) {
-		if err = js.installYarn(); err != nil {
+		if err = installYarn(); err != nil {
 			return nil, err
 		}
 	}
@@ -126,10 +132,20 @@ func (js Js) eslint() (func(args ...string) (string, error), error) {
 	}, nil
 }
 
+func (js Js) stylint() (func(args ...string) (string, error), error) {
+	if _, err := os.Stat(nodeBin("stylint")); os.IsNotExist(err) {
+		if err = js.DevDeps(); err != nil {
+			return nil, err
+		}
+	}
+	return func(args ...string) (string, error) {
+		return sh.Output(nodeBin("stylint"), args...)
+	}, nil
+}
+
 // DevDeps installs the javascript development dependencies.
 func (js Js) DevDeps() error {
-	_, err := js.yarn()
-	return err
+	return devDeps()
 }
 
 // Deps installs the javascript dependencies.
@@ -137,7 +153,7 @@ func (js Js) Deps() error {
 	if mg.Verbose() {
 		fmt.Println("Installing JS dependencies")
 	}
-	yarn, err := js.yarn()
+	yarn, err := yarn()
 	if err != nil {
 		return err
 	}
@@ -291,7 +307,7 @@ func (js Js) Vulnerabilities() error {
 	if mg.Verbose() {
 		fmt.Println("Checking for vulnerabilities")
 	}
-	yarn, err := js.yarn()
+	yarn, err := yarn()
 	if err != nil {
 		return err
 	}
