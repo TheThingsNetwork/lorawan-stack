@@ -104,6 +104,17 @@ func (js Js) babel() (func(args ...string) error, error) {
 	}, nil
 }
 
+func (js Js) jest() (func(args ...string) error, error) {
+	if _, err := os.Stat(nodeBin("jest")); os.IsNotExist(err) {
+		if err = js.DevDeps(); err != nil {
+			return nil, err
+		}
+	}
+	return func(args ...string) error {
+		return sh.Run(nodeBin("jest"), args...)
+	}, nil
+}
+
 // DevDeps installs the javascript development dependencies.
 func (js Js) DevDeps() error {
 	_, err := js.yarn()
@@ -232,4 +243,16 @@ func (js Js) Clean() {
 	sh.Rm(".cache")
 	sh.Rm("public")
 	sh.Rm("pkg/webui/locales/.backend")
+}
+
+// Test runs frontend jest tests
+func (js Js) Test() error {
+	if mg.Verbose() {
+		fmt.Println("Running Tests")
+	}
+	jest, err := js.jest()
+	if err != nil {
+		return err
+	}
+	return jest("./pkg/webui")
 }
