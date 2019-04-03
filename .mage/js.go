@@ -76,6 +76,17 @@ func (js Js) webpack() (func(args ...string) error, error) {
 	}, nil
 }
 
+func (js Js) webpackServe() (func(args ...string) error, error) {
+	if _, err := os.Stat(nodeBin("webpack-dev-server")); os.IsNotExist(err) {
+		if err = js.DevDeps(); err != nil {
+			return nil, err
+		}
+	}
+	return func(args ...string) error {
+		return sh.RunV(nodeBin("webpack-dev-server"), args...)
+	}, nil
+}
+
 func (js Js) node() (func(args ...string) error, error) {
 	return func(args ...string) error {
 		return sh.RunV("node", args...)
@@ -143,6 +154,24 @@ func (js Js) BuildDll() error {
 		return webpack("--config", "config/webpack.dll.babel.js")
 	}
 	return nil
+}
+
+// Serve builds necessary bundles and serves the console for development
+func (js Js) Serve() {
+	mg.Deps(js.BuildDll, js.ServeMain)
+}
+
+// ServeMain runs webpack-dev-server
+func (js Js) ServeMain() error {
+	mg.Deps(js.Translations, js.BackendTranslations, js.BuildDll)
+	if mg.Verbose() {
+		fmt.Println("Running Webpack for Main Bundle in watch mode…")
+	}
+	webpackServe, err := js.webpackServe()
+	if err != nil {
+		return err
+	}
+	return webpackServe("--config", "config/webpack.config.babel.js", "-w")
 }
 
 // Messages extracts the frontend messages via babel
