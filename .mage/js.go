@@ -115,6 +115,17 @@ func (js Js) jest() (func(args ...string) error, error) {
 	}, nil
 }
 
+func (js Js) eslint() (func(args ...string) (string, error), error) {
+	if _, err := os.Stat(nodeBin("eslint")); os.IsNotExist(err) {
+		if err = js.DevDeps(); err != nil {
+			return nil, err
+		}
+	}
+	return func(args ...string) (string, error) {
+		return sh.Output(nodeBin("eslint"), args...)
+	}, nil
+}
+
 // DevDeps installs the javascript development dependencies.
 func (js Js) DevDeps() error {
 	_, err := js.yarn()
@@ -255,4 +266,22 @@ func (js Js) Test() error {
 		return err
 	}
 	return jest("./pkg/webui")
+}
+
+// Lint runs eslint over frontend js files
+func (js Js) Lint() error {
+	if mg.Verbose() {
+		fmt.Println("Running eslint")
+	}
+	eslint, err := js.eslint()
+	if err != nil {
+		return err
+	}
+	res, err := eslint("./pkg/webui", "--no-ignore", "--color")
+
+	if res != "" {
+		fmt.Println(res)
+	}
+
+	return err
 }
