@@ -75,6 +75,23 @@ func (js Js) webpack() (func(args ...string) error, error) {
 	}, nil
 }
 
+func (js Js) node() (func(args ...string) error, error) {
+	return func(args ...string) error {
+		return sh.RunV("node", args...)
+	}, nil
+}
+
+func (js Js) babel() (func(args ...string) error, error) {
+	if _, err := os.Stat(nodeBin("babel")); os.IsNotExist(err) {
+		if err = js.DevDeps(); err != nil {
+			return nil, err
+		}
+	}
+	return func(args ...string) error {
+		return sh.Run(nodeBin("babel"), args...)
+	}, nil
+}
+
 // DevDeps installs the javascript development dependencies.
 func (js Js) DevDeps() error {
 	_, err := js.yarn()
