@@ -256,7 +256,7 @@ func (js Js) Clean() {
 	sh.Rm("pkg/webui/locales/.backend")
 }
 
-// Test runs frontend jest tests
+// Test runs frontend jest tests.
 func (js Js) Test() error {
 	if mg.Verbose() {
 		fmt.Println("Running Tests")
@@ -268,7 +268,7 @@ func (js Js) Test() error {
 	return jest("./pkg/webui")
 }
 
-// Lint runs eslint over frontend js files
+// Lint runs eslint over frontend js files.
 func (js Js) Lint() error {
 	if mg.Verbose() {
 		fmt.Println("Running eslint")
@@ -284,4 +284,16 @@ func (js Js) Lint() error {
 	}
 
 	return err
+}
+
+// Vulnerabilities runs yarn audit to check for vulnerable node packages.
+func (js Js) Vulnerabilities() error {
+	if mg.Verbose() {
+		fmt.Println("Checking for vulnerabilities")
+	}
+	yarn, err := js.yarn()
+	if err != nil {
+		return err
+	}
+	return yarn("audit")
 }
