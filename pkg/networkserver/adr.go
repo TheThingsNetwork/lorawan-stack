@@ -67,7 +67,7 @@ const safetyMargin = 2.5
 const drStep = 2.5
 
 // maxNbTrans is the maximum NbTrans parameter used by the algorithm.
-const maxNbTrans = 3
+const maxNbTrans = 1
 
 // optimalADRUplinkCount is the amount of uplinks required to ensure optimal results from the ADR algorithm.
 const optimalADRUplinkCount = 20
