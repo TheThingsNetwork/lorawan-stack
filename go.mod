@@ -61,7 +61,6 @@ require (
 	github.com/jinzhu/now v1.0.0 // indirect
 	github.com/kamilsk/retry/v4 v4.0.2 // indirect
 	github.com/kr/pretty v0.1.0
-	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/echo/v4 v4.0.0
 	github.com/labstack/gommon v0.2.8
 	github.com/lib/pq v1.0.0
