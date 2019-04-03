@@ -71,12 +71,15 @@ class Button extends React.PureComponent {
   }
 
   render () {
+    const { autoFocus, disabled, name, type, value } = this.props
+    const htmlProps = { autoFocus, disabled, name, type, value }
     const buttonClassNames = assembleClassnames(this.props)
     return (
       <button
         className={buttonClassNames}
         onClick={this.handleClick}
         children={buttonChildren(this.props)}
+        {...htmlProps}
       />
     )
   }
@@ -99,16 +102,15 @@ Button.Link = function (props) {
 }
 
 Button.AnchorLink = function (props) {
-  const buttonClassNames = assembleClassnames(props)
   const { target, title, name } = props
+  const htmlProps = { target, title, name }
+  const buttonClassNames = assembleClassnames(props)
   return (
     <a
       className={buttonClassNames}
       href={props.href}
-      target={target}
-      title={title}
-      name={name}
       children={buttonChildren(props)}
+      {...htmlProps}
     />
   )
 }
@@ -148,10 +150,19 @@ const commonPropTypes = {
    */
   busy: PropTypes.bool,
   /**
-   * A flag specifying whether the button in the `disabled` state and the appropriate
-   * styling should be applied.
+   * A flag specifying whether the button in the `disabled` state and the
+   * appropriate styling should be applied. Also passes the `disabled` html prop
+   * to the button element.
    */
   disabled: PropTypes.bool,
+  /** The html `name` prop passed to the <button /> element */
+  name: PropTypes.string,
+  /** The html `type` prop passed to the <button /> element */
+  type: PropTypes.string,
+  /** The html `value` prop passed to the <button /> element */
+  value: PropTypes.string,
+  /** The html `autofocus` prop passed to the <button /> element */
+  autoFocus: PropTypes.bool,
 }
 
 Button.propTypes = {
