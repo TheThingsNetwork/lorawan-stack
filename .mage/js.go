@@ -122,7 +122,7 @@ func (js Js) Deps() error {
 	return yarn("install", "--no-progress", "--production=false")
 }
 
-// Build runs all necessary commands to build the console bundles and files
+// Build runs all necessary commands to build the console bundles and files.
 func (js Js) Build() {
 	mg.Deps(js.BuildDll, js.BuildMain)
 }
@@ -156,7 +156,7 @@ func (js Js) BuildDll() error {
 	return nil
 }
 
-// Serve builds necessary bundles and serves the console for development
+// Serve builds necessary bundles and serves the console for development.
 func (js Js) Serve() {
 	mg.Deps(js.BuildDll, js.ServeMain)
 }
@@ -174,7 +174,7 @@ func (js Js) ServeMain() error {
 	return webpackServe("--config", "config/webpack.config.babel.js", "-w")
 }
 
-// Messages extracts the frontend messages via babel
+// Messages extracts the frontend messages via babel.
 func (js Js) Messages() error {
 	changed, err := target.Dir("./.cache/messages", "./pkg/webui/console")
 	if os.IsNotExist(err) || (err == nil && changed) {
@@ -192,7 +192,7 @@ func (js Js) Messages() error {
 	return nil
 }
 
-// Translations builds the frontend locale files
+// Translations builds the frontend locale files.
 func (js Js) Translations() error {
 	changed, err := target.Dir("./pkg/webui/locales/en.json", "./.cache/messages")
 	if os.IsNotExist(err) || (err == nil && changed) {
@@ -209,7 +209,7 @@ func (js Js) Translations() error {
 	return nil
 }
 
-// Translations builds the backend locale files
+// Translations builds the backend locale files.
 func (js Js) BackendTranslations() error {
 	changed, err := target.Path("./pkg/webui/locales/.backend/en.json", "./config/messages.json")
 	if os.IsNotExist(err) || (err == nil && changed) {
@@ -227,6 +227,7 @@ func (js Js) BackendTranslations() error {
 	return nil
 }
 
+// Clean will clear all generated files.
 func (js Js) Clean() {
 	sh.Rm(".cache")
 	sh.Rm("public")
