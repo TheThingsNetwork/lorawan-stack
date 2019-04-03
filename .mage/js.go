@@ -112,6 +112,7 @@ func (js Js) Deps() error {
 
 // BuildMain runs the webpack command with the project config.
 func (js Js) BuildMain() error {
+	mg.Deps(js.Translations, js.BackendTranslations, js.BuildDll)
 	if mg.Verbose() {
 		fmt.Println("Running Webpack")
 	}
@@ -150,6 +151,7 @@ func (js Js) Messages() error {
 
 // Translations builds the frontend locale files
 func (js Js) Translations() error {
+	mg.Deps(js.Messages)
 	node, err := js.node()
 	if err != nil {
 		return err
