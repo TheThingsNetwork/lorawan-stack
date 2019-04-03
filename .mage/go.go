@@ -179,7 +179,12 @@ func (Go) Cover() error {
 	return execGo("test", "-cover", "-covermode=atomic", "-coverprofile="+goCoverageFile, "-timeout=5m", "./...")
 }
 
-var coverallsIgnored = []string{".pb.go:", ".pb.gw.go:", ".fm.go:"}
+var coverallsIgnored = []string{
+	".fm.go:",
+	".pb.go:",
+	".pb.gw.go:",
+	".pb.validate.go",
+}
 
 // Coveralls sends the test coverage to Coveralls.
 func (Go) Coveralls() error {
