@@ -115,6 +115,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 	type getPeerCallKey struct{}
 	type scheduleDownlinkCallKey struct{}
 
+	now := time.Now()
+
 	for _, tc := range []struct {
 		Name             string
 		ContextFunc      func(context.Context) context.Context
@@ -215,7 +217,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								DataRateIndex: ttnpb.DATA_RATE_0,
 							},
 							CorrelationIDs: []string{"testCorrelationUpID1", "testCorrelationUpID2"},
-							ReceivedAt:     time.Now().Add(time.Hour),
+							ReceivedAt:     now.Add(-time.Second),
 							Payload: &ttnpb.Message{
 								MHDR: ttnpb.MHDR{
 									MType: ttnpb.MType_UNCONFIRMED_UP,
@@ -250,7 +252,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				err := f(ctx, ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
 					DeviceID:               DeviceID,
-				}, time.Now())
+				}, now)
 				a.So(err, should.BeNil)
 
 				return nil
@@ -640,7 +642,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								DataRateIndex: ttnpb.DATA_RATE_0,
 							},
 							CorrelationIDs: []string{"testCorrelationUpID1", "testCorrelationUpID2"},
-							ReceivedAt:     time.Now().Add(time.Hour),
+							ReceivedAt:     now.Add(-time.Second),
 							Payload: &ttnpb.Message{
 								MHDR: ttnpb.MHDR{
 									MType: ttnpb.MType_UNCONFIRMED_UP,
@@ -675,7 +677,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				err := f(ctx, ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
 					DeviceID:               DeviceID,
-				}, time.Now())
+				}, now)
 				a.So(err, should.BeNil)
 
 				return nil
@@ -1000,7 +1002,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								DataRateIndex: ttnpb.DATA_RATE_0,
 							},
 							CorrelationIDs: []string{"testCorrelationUpID1", "testCorrelationUpID2"},
-							ReceivedAt:     time.Now().Add(-time.Second),
+							ReceivedAt:     now.Add(-time.Second),
 							Payload: &ttnpb.Message{
 								MHDR: ttnpb.MHDR{
 									MType: ttnpb.MType_UNCONFIRMED_UP,
@@ -1035,7 +1037,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				err := f(ctx, ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
 					DeviceID:               DeviceID,
-				}, time.Now())
+				}, now)
 				a.So(err, should.BeNil)
 
 				return nil
@@ -1413,7 +1415,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								DataRateIndex: ttnpb.DATA_RATE_0,
 							},
 							CorrelationIDs: []string{"testCorrelationUpID1", "testCorrelationUpID2"},
-							ReceivedAt:     time.Now().Add(-time.Second),
+							ReceivedAt:     now.Add(-time.Second),
 							Payload: &ttnpb.Message{
 								MHDR: ttnpb.MHDR{
 									MType: ttnpb.MType_UNCONFIRMED_UP,
@@ -1448,7 +1450,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				err := f(ctx, ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
 					DeviceID:               DeviceID,
-				}, time.Now())
+				}, now)
 				a.So(err, should.BeNil)
 
 				return nil
@@ -1876,7 +1878,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		},
 
 		{
-			Name: "1.1/data downlink/Class C/Rx1,Rx2/application downlink/forced downlink path",
+			Name: "1.1/data downlink/Class C/Rx2/application downlink/forced downlink path",
 			ContextFunc: func(ctx context.Context) context.Context {
 				return context.WithValue(ctx, deviceKey{}, &ttnpb.EndDevice{
 					FrequencyPlanID: test.EUFrequencyPlanID,
@@ -1966,7 +1968,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								DataRateIndex: ttnpb.DATA_RATE_0,
 							},
 							CorrelationIDs: []string{"testCorrelationUpID1", "testCorrelationUpID2"},
-							ReceivedAt:     time.Now().Add(time.Hour),
+							ReceivedAt:     now.Add(-time.Second),
 							Payload: &ttnpb.Message{
 								MHDR: ttnpb.MHDR{
 									MType: ttnpb.MType_UNCONFIRMED_UP,
@@ -2025,7 +2027,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				err := f(ctx, ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
 					DeviceID:               DeviceID,
-				}, time.Now())
+				}, now)
 				a.So(err, should.BeNil)
 
 				return nil
@@ -2453,7 +2455,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								DataRateIndex: ttnpb.DATA_RATE_0,
 							},
 							CorrelationIDs: []string{"testCorrelationUpID1", "testCorrelationUpID2"},
-							ReceivedAt:     time.Now().Add(time.Hour),
+							ReceivedAt:     now.Add(-time.Second),
 							Payload: &ttnpb.Message{
 								MHDR: ttnpb.MHDR{
 									MType: ttnpb.MType_JOIN_REQUEST,
@@ -2488,7 +2490,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				err := f(ctx, ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
 					DeviceID:               DeviceID,
-				}, time.Now())
+				}, now)
 				a.So(err, should.BeNil)
 
 				return nil
@@ -2795,7 +2797,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				return test.ContextWithCounter(ctx, getPeerCallKey{})
 			})
 			ns.AddContextFiller(func(ctx context.Context) context.Context {
-				ctx, cancel := context.WithDeadline(ctx, time.Now().Add(Timeout))
+				ctx, cancel := context.WithDeadline(ctx, now.Add(Timeout))
 				_ = cancel
 				return ctx
 			})
