@@ -1,0 +1,11 @@
+{{ define "main" }}
+  <main>
+    <h1>{{ .Title }}</h1>
+    <ul>
+      {{ range .Pages}}
+        <h2>{{ .Title }}</h2>
+        {{ .Description }}
+      {{ end }}
+    </ul>
+  </main>
+{{ end }}
