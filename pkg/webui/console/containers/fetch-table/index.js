@@ -165,10 +165,26 @@ class FetchTable extends Component {
     dispatch(push(`${pathname}${itemPathPrefix}/add`))
   }
 
-  onItemClick (id) {
-    const { dispatch, pathname, items, entity, itemPathPrefix } = this.props
+  onItemClick (index) {
+    const {
+      dispatch,
+      pathname,
+      items,
+      entity,
+      itemPathPrefix,
+      handlesPagination,
+      pageSize,
+    } = this.props
+    const { page } = this.state
+
+    let itemIndex = index
+    if (handlesPagination) {
+      const pageNr = page - 1 // switch to 0-based pagination
+      itemIndex += pageSize * pageNr
+    }
+
     const entitySingle = entity.substr(0, entity.length - 1)
-    const item_id = items[id].id || items[id].ids[`${entitySingle}_id`]
+    const item_id = items[itemIndex].id || items[itemIndex].ids[`${entitySingle}_id`]
 
     dispatch(push(`${pathname}${itemPathPrefix}/${item_id}`))
   }
