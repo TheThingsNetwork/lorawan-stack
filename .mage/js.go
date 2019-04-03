@@ -23,6 +23,7 @@ import (
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
+	"github.com/magefile/mage/target"
 )
 
 func nodeBin(cmd string) string { return filepath.Join("node_modules", ".bin", cmd) }
@@ -123,48 +124,71 @@ func (js Js) BuildMain() error {
 	return webpack("--config", "config/webpack.config.babel.js")
 }
 
-// BuildDll runs the webpack command with the dll config.
+// BuildDll runs the webpack to build the DLL bundle
 func (js Js) BuildDll() error {
-	if mg.Verbose() {
-		fmt.Println("Running Webpack")
+	changed, err := target.Path("./public/libs.bundle.js", "./yarn.lock")
+	if os.IsNotExist(err) || (err == nil && changed) {
+		if mg.Verbose() {
+			fmt.Println("Running Webpack for DLL…")
+		}
+		webpack, err := js.webpack()
+		if err != nil {
+			return err
+		}
+		return webpack("--config", "config/webpack.dll.babel.js")
 	}
-	webpack, err := js.webpack()
-	if err != nil {
-		return err
-	}
-	return webpack("--config", "config/webpack.config.dll.babel.js")
+	return nil
 }
 
 // Messages extracts the frontend messages via babel
 func (js Js) Messages() error {
-	if mg.Verbose() {
-		fmt.Println("Extracting frontend messages")
+	changed, err := target.Dir("./.cache/messages", "./pkg/webui/console")
+	if os.IsNotExist(err) || (err == nil && changed) {
+		if mg.Verbose() {
+			fmt.Println("Extracting frontend messages…")
+		}
+		babel, err := js.babel()
+		if err != nil {
+			return err
+		}
+		sh.Rm(".cache/messages")
+		sh.Run("mdir", "-p", "pkg/webui/locales")
+		return babel("-q", "pkg/webui")
 	}
-	babel, err := js.babel()
-	if err != nil {
-		return err
-	}
-	sh.Rm(".cache/messages")
-	sh.Run("mdir", "-p", "pkg/webui/locales")
-	return babel("-q", "pkg/webui")
+	return nil
 }
 
 // Translations builds the frontend locale files
 func (js Js) Translations() error {
-	mg.Deps(js.Messages)
-	node, err := js.node()
-	if err != nil {
-		return err
+	changed, err := target.Dir("./pkg/webui/locales/en.json", "./.cache/messages")
+	if os.IsNotExist(err) || (err == nil && changed) {
+		mg.Deps(js.Messages)
+		if mg.Verbose() {
+			fmt.Println("Building frontend locale files…")
+		}
+		node, err := js.node()
+		if err != nil {
+			return err
+		}
+		return node(".mage/translations.js")
 	}
-	return node(".mage/translations.js")
+	return nil
 }
 
-// BackendTranslations builds the backend locale files
+// Translations builds the backend locale files
 func (js Js) BackendTranslations() error {
-	node, err := js.node()
-	if err != nil {
-		return err
-	}
+	changed, err := target.Path("./pkg/webui/locales/.backend/en.json", "./config/messages.json")
+	if os.IsNotExist(err) || (err == nil && changed) {
 
-	return node(".mage/translations.js", "--backend-messages", "config/messages.json", "--locales", "pkg/webui/locales/.backend", "--backend-only")
+		if mg.Verbose() {
+			fmt.Println("Building backend locale files…")
+		}
+		node, err := js.node()
+		if err != nil {
+			return err
+		}
+
+		return node(".mage/translations.js", "--backend-messages", "config/messages.json", "--locales", "pkg/webui/locales/.backend", "--backend-only")
+	}
+	return nil
 }
