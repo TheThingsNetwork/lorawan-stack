@@ -19,6 +19,7 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
@@ -42,40 +43,40 @@ func TestType(t *testing.T) {
 }
 
 func TestIsProduction(t *testing.T) {
-	a := assertions.New(t)
 	for _, tc := range []struct {
 		Name             string
 		Message          Version
 		ExpectedResponse bool
 	}{
 		{
-			"EmptyMessage",
-			Version{},
-			false,
+			Name:             "EmptyMessage",
+			Message:          Version{},
+			ExpectedResponse: false,
 		},
 		{
-			"EmptyMessage1",
-			Version{
+			Name: "EmptyMessage1",
+			Message: Version{
 				Features: []string{""},
 			},
-			false,
+			ExpectedResponse: false,
 		},
 		{
-			"NonProduction",
-			Version{
+			Name: "NonProduction",
+			Message: Version{
 				Features: []string{"gps", "rmtsh"},
 			},
-			false,
+			ExpectedResponse: false,
 		},
 		{
-			"Production",
-			Version{
+			Name: "Production",
+			Message: Version{
 				Features: []string{"prod"},
 			},
-			true,
+			ExpectedResponse: true,
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
 			a.So(tc.Message.IsProduction(), should.Equal, tc.ExpectedResponse)
 		})
 	}
@@ -83,33 +84,34 @@ func TestIsProduction(t *testing.T) {
 }
 
 func TestGetRouterConfig(t *testing.T) {
-	a := assertions.New(t)
 	for _, tc := range []struct {
-		Name          string
-		FP            frequencyplans.FrequencyPlan
-		Cfg           RouterConfig
-		IsProd        bool
-		ExpectedError error
+		Name           string
+		FrequencyPlan  frequencyplans.FrequencyPlan
+		Cfg            RouterConfig
+		IsProd         bool
+		ErrorAssertion func(err error) bool
 	}{
 		{
-			"NilFrequencyPlan",
-			frequencyplans.FrequencyPlan{},
-			RouterConfig{},
-			false,
-			errFrequencyPlan,
+			Name:          "NilFrequencyPlan",
+			FrequencyPlan: frequencyplans.FrequencyPlan{},
+			Cfg:           RouterConfig{},
+			ErrorAssertion: func(err error) bool {
+				return errors.Resemble(err, errFrequencyPlan)
+			},
 		},
 		{
-			"InvalidFrequencyPlan",
-			frequencyplans.FrequencyPlan{
+			Name: "InvalidFrequencyPlan",
+			FrequencyPlan: frequencyplans.FrequencyPlan{
 				BandID: "PinkFloyd",
 			},
-			RouterConfig{},
-			false,
-			errFrequencyPlan,
+			Cfg: RouterConfig{},
+			ErrorAssertion: func(err error) bool {
+				return errors.Resemble(err, errFrequencyPlan)
+			},
 		},
 		{
-			"ValidFrequencyPlan",
-			frequencyplans.FrequencyPlan{
+			Name: "ValidFrequencyPlan",
+			FrequencyPlan: frequencyplans.FrequencyPlan{
 				BandID: "US_902_928",
 				Radios: []frequencyplans.Radio{
 					{
@@ -128,7 +130,7 @@ func TestGetRouterConfig(t *testing.T) {
 					},
 				},
 			},
-			RouterConfig{
+			Cfg: RouterConfig{
 				Region:         "US902",
 				HardwareSpec:   "sx1301/1",
 				FrequencyRange: []int{909000000, 925000000},
@@ -149,12 +151,10 @@ func TestGetRouterConfig(t *testing.T) {
 				NoDutyCycle: true,
 				NoDwellTime: true,
 			},
-			false,
-			nil,
 		},
 		{
-			"ValidFrequencyPlanProd",
-			frequencyplans.FrequencyPlan{
+			Name: "ValidFrequencyPlanProd",
+			FrequencyPlan: frequencyplans.FrequencyPlan{
 				BandID: "US_902_928",
 				Radios: []frequencyplans.Radio{
 					{
@@ -173,7 +173,7 @@ func TestGetRouterConfig(t *testing.T) {
 					},
 				},
 			},
-			RouterConfig{
+			Cfg: RouterConfig{
 				Region:         "US902",
 				HardwareSpec:   "sx1301/1",
 				FrequencyRange: []int{909000000, 925000000},
@@ -191,17 +191,22 @@ func TestGetRouterConfig(t *testing.T) {
 					[3]int{7, 500, 0},
 				},
 			},
-			true,
-			nil,
+			IsProd: true,
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
-			cfg, err := GetRouterConfig(tc.FP, tc.IsProd)
-			if !(a.So(err, should.Resemble, tc.ExpectedError)) {
-				t.Fatalf("Unexpected error: %v", err)
-			}
-			if !(a.So(cfg, should.Resemble, tc.Cfg)) {
-				t.Fatalf("Invalid config: %v", cfg)
+			a := assertions.New(t)
+			cfg, err := GetRouterConfig(tc.FrequencyPlan, tc.IsProd)
+			if err != nil {
+				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
+					t.Fatalf("Unexpected error: %v", err)
+				}
+			} else if tc.ErrorAssertion != nil {
+				t.Fatalf("Expected error")
+			} else {
+				if !a.So(cfg, should.Resemble, tc.Cfg) {
+					t.Fatalf("Invalid config: %v", cfg)
+				}
 			}
 		})
 	}

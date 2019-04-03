@@ -38,6 +38,7 @@ type DownlinkMessage struct {
 	Rx2Freq     int              `json:"Rx2Freq"`
 	Priority    int              `json:"priority"`
 	XTime       int64            `json:"xtime"`
+	GpsTime     int64            `json:"gpstime"`
 	RCtx        int64            `json:"rctx"`
 }
 
@@ -53,40 +54,31 @@ func (dnmsg DownlinkMessage) MarshalJSON() ([]byte, error) {
 	})
 }
 
-// FromNSDownlinkMessage translates the ttnpb.DownlinkMessage to LNS DownlinkMessage "dnmsg".
-func (dnmsg *DownlinkMessage) FromNSDownlinkMessage(ids ttnpb.GatewayIdentifiers, down ttnpb.DownlinkMessage, dlToken int64) error {
-	//TODO: Fix this based on https://github.com/TheThingsNetwork/lorawan-stack/pull/363
+// FromDownlinkMessage translates the ttnpb.DownlinkMessage to LNS DownlinkMessage "dnmsg".
+func (dnmsg *DownlinkMessage) FromDownlinkMessage(ids ttnpb.GatewayIdentifiers, down ttnpb.DownlinkMessage, dlToken int64) {
 	scheduledMsg := down.GetScheduled()
-	dnmsg.DevEUI = basicstation.EUI{EUI64: *down.EndDeviceIDs.DevEUI}
 	dnmsg.Pdu = string(down.GetRawPayload())
+	dnmsg.RCtx = int64(scheduledMsg.Downlink.AntennaIndex)
+	dnmsg.Diid = dlToken
 
-	// TODO: Use Class_B for absolute timebound scheduling
-	if (scheduledMsg.RequestInfo.Class == ttnpb.CLASS_A) || (scheduledMsg.RequestInfo.Class == ttnpb.CLASS_C) {
-		dnmsg.DeviceClass = uint(ttnpb.CLASS_A)
-	} else {
-		dnmsg.DeviceClass = uint(ttnpb.CLASS_B)
-	}
+	// Chosen fixed values.
+	dnmsg.Priority = 25
+	dnmsg.RxDelay = 1
 
-	// TODO: Choose a Sane value
-	dnmsg.Priority = int(0)
-
-	// The gateway is made to think that it's RX2 even if the network chooses RX1.
-	// This way the network will enforce the chosen window instead of the gateway trying it's internal RX2.
+	// Fix the Tx Parameters since we don't use the gateway scheduler.
 	dnmsg.Rx2DR = int(scheduledMsg.DataRateIndex)
 	dnmsg.Rx2Freq = int(scheduledMsg.Frequency)
 
-	dnmsg.RxDelay = 1
-
-	var xtime int64
-	if scheduledMsg.RequestInfo.RxWindow == 0 {
-		xtime = time.Now().Add(time.Duration(-1) * time.Minute).Unix()
-	} else {
-		xtime = time.Now().Add(time.Duration(-2) * time.Minute).Unix()
+	// Always use the Basic Station ClassB mode for absolute time scheduling.
+	if scheduledMsg.Time != nil {
+		dnmsg.DeviceClass = uint(ttnpb.CLASS_B)
+		dnmsg.GpsTime = scheduledMsg.Time.Unix()
+		return
 	}
-	dnmsg.XTime = xtime
 
-	dnmsg.RCtx = int64(scheduledMsg.RequestInfo.AntennaIndex)
-	dnmsg.Diid = dlToken
-
-	return nil
+	dnmsg.DeviceClass = uint(ttnpb.CLASS_A)
+	// Estimate the xtime based on the timestamp; xtime = timestamp - (rxdelay+1).
+	t := time.Unix(int64(scheduledMsg.Timestamp), 0)
+	offset := time.Duration((dnmsg.RxDelay + 1)) * time.Second
+	dnmsg.XTime = t.Add(-offset).Unix()
 }

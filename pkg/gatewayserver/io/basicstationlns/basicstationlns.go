@@ -18,8 +18,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"sync"
-	"sync/atomic"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -28,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/basicstation"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
+	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/basicstationlns/correlations"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/basicstationlns/messages"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -35,28 +34,18 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/web"
 )
 
-const tokenExpiration = 15 * time.Second
+const tokenExpiration = 3 * time.Minute
 
 var (
 	errEmptyGatewayEUI           = errors.Define("empty_gateway_eui", "empty gateway EUI")
 	errMessageTypeNotImplemented = errors.DefineUnimplemented("message_type_not_implemented", "message of type `{type}` is not implemented")
 )
 
-// downlinkInfo is the information associated with a particular downlink
-type downlinkInfo struct {
-	correlationIDs []string
-	txTime         time.Time
-}
-
 type srv struct {
-	ctx      context.Context
-	server   io.Server
-	upgrader *websocket.Upgrader
-	// token is the unique token associated with each Downlink.
-	// It's passed to the BasicStation as the `diid` field and is returned as-is in the TxConfirmation if the downlink packet was put on air.
-	// This is a free-running counter that is allowed to overflow and is cleaned up periodically by the garbage collector.
-	token        int64
-	correlations sync.Map
+	correlations *correlations.DownlinkCorrelation
+	ctx          context.Context
+	server       io.Server
+	upgrader     *websocket.Upgrader
 }
 
 func (*srv) Protocol() string { return "basicstation" }
@@ -64,12 +53,14 @@ func (*srv) Protocol() string { return "basicstation" }
 // New returns a new Basic Station frontend that can be registered in the web server.
 func New(ctx context.Context, server io.Server) web.Registerer {
 	ctx = log.NewContextWithField(ctx, "namespace", "gatewayserver/io/basicstation")
+	dlCorrelations := correlations.New(ctx, tokenExpiration)
 	s := &srv{
-		ctx:      ctx,
-		server:   server,
-		upgrader: &websocket.Upgrader{},
+		ctx:          ctx,
+		server:       server,
+		upgrader:     &websocket.Upgrader{},
+		correlations: dlCorrelations,
 	}
-	go s.gc()
+	go s.correlations.GC()
 	return s
 }
 
@@ -145,6 +136,7 @@ func (s *srv) handleDiscover(c echo.Context) error {
 }
 
 func (s *srv) handleTraffic(c echo.Context) error {
+	receivedAt := time.Now()
 	uid := c.Param("uid")
 	ids, err := unique.ToGatewayID(uid)
 	if err != nil {
@@ -200,21 +192,17 @@ func (s *srv) handleTraffic(c echo.Context) error {
 			case <-conn.Context().Done():
 				return
 			case down := <-conn.Down():
-				s.createNextToken()
-				s.correlations.Store(s.token, downlinkInfo{
-					correlationIDs: down.GetCorrelationIDs(),
-					txTime:         time.Now(),
-				})
-
 				dnmsg := messages.DownlinkMessage{}
-				dnmsg.FromNSDownlinkMessage(ids, *down, s.token)
+				token := s.correlations.GenerateNextToken()
+				s.correlations.Store(token, down.GetCorrelationIDs())
+				dnmsg.FromDownlinkMessage(ids, *down, token)
 				msg, err := dnmsg.MarshalJSON()
 				if err != nil {
 					logger.WithError(err).Error("Failed to marshal downlink message")
 					continue
 				}
 
-				logger.Info("Sending downlink message")
+				logger.Info("Send downlink message")
 				if err := ws.WriteMessage(websocket.TextMessage, msg); err != nil {
 					logger.WithError(err).Error("Failed to send downlink message")
 				}
@@ -270,12 +258,12 @@ func (s *srv) handleTraffic(c echo.Context) error {
 				logger.WithError(err).Debug("Failed to unmarshal join-request message")
 				return err
 			}
-			up, err := jreq.ToUplinkMessage(ids, fp.BandID)
+			up, err := jreq.ToUplinkMessage(ids, fp.BandID, receivedAt)
 			if err != nil {
 				logger.WithError(err).Debug("Failed to parse join-request message")
 				return err
 			}
-			if err := conn.HandleUp(&up); err != nil {
+			if err := conn.HandleUp(up); err != nil {
 				logger.WithError(err).Warn("Failed to handle uplink message")
 			}
 
@@ -285,30 +273,30 @@ func (s *srv) handleTraffic(c echo.Context) error {
 				logger.WithError(err).Debug("Failed to unmarshal uplink data frame")
 				return err
 			}
-			up, err := updf.ToUplinkMessage(ids, fp.BandID)
+			up, err := updf.ToUplinkMessage(ids, fp.BandID, receivedAt)
 			if err != nil {
 				logger.WithError(err).Debug("Failed to parse uplink data frame")
 				return err
 			}
-			if err := conn.HandleUp(&up); err != nil {
+			if err := conn.HandleUp(up); err != nil {
 				logger.WithError(err).Warn("Failed to handle uplink message")
 			}
 
 		case messages.TypeUpstreamTxConfirmation:
 			var txConf messages.TxConfirmation
 			if err := json.Unmarshal(data, &txConf); err != nil {
-				logger.WithError(err).Debug("Failed to unmarshal tx acknowledgement frame")
+				logger.WithError(err).Debug("Failed to unmarshal Tx acknowledgement frame")
 				return err
 			}
-			if value, ok := s.correlations.Load(txConf.Diid); ok {
-				txAck := messages.ToTxAcknowledgment(value.(downlinkInfo).correlationIDs)
+			if ids := s.correlations.Fetch(txConf.Diid); ids != nil {
+				txAck := messages.ToTxAcknowledgment(ids)
 				if err := conn.HandleTxAck(&txAck); err != nil {
-					logger.WithError(err).Warn("Failed to handle uplink message")
+					logger.WithError(err).Warn("Failed to handle Tx acknowledgement message")
 				}
-				s.correlations.Delete(txConf.Diid)
 			} else {
 				logger.Debug("TxAck does not correspond to a downlink message or is received too late")
 			}
+
 		case messages.TypeUpstreamProprietaryDataFrame:
 			return errMessageTypeNotImplemented.WithAttributes("type", typ)
 		case messages.TypeUpstreamRemoteShell:
@@ -333,29 +321,5 @@ func writeDiscoverError(ctx context.Context, ws *websocket.Conn, msg string) {
 	}
 	if err := ws.WriteMessage(websocket.TextMessage, errMsg); err != nil {
 		logger.WithError(err).Debug("Failed to write error response message")
-	}
-}
-
-// createNextToken atomically increments the token value.
-func (s *srv) createNextToken() {
-	atomic.AddInt64(&s.token, 1)
-}
-
-// gc is the garbage collector that removes old items from the correlations map.
-func (s *srv) gc() {
-	gcTicker := time.NewTicker(tokenExpiration)
-	for {
-		select {
-		case <-s.ctx.Done():
-			gcTicker.Stop()
-			return
-		case <-gcTicker.C:
-			s.correlations.Range(func(key interface{}, value interface{}) bool {
-				if value.(downlinkInfo).txTime.Before(time.Now().Add(-tokenExpiration)) {
-					s.correlations.Delete(key)
-				}
-				return true
-			})
-		}
 	}
 }
