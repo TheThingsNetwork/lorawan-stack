@@ -64,6 +64,17 @@ func (js Js) yarn() (func(args ...string) error, error) {
 	}, nil
 }
 
+func (js Js) webpack() (func(args ...string) error, error) {
+	if _, err := os.Stat(nodeBin("webpack")); os.IsNotExist(err) {
+		if err = js.DevDeps(); err != nil {
+			return nil, err
+		}
+	}
+	return func(args ...string) error {
+		return sh.RunV(nodeBin("webpack"), args...)
+	}, nil
+}
+
 // DevDeps installs the javascript development dependencies.
 func (js Js) DevDeps() error {
 	_, err := js.yarn()
@@ -80,4 +91,16 @@ func (js Js) Deps() error {
 		return err
 	}
 	return yarn("install", "--no-progress", "--production=false")
+}
+
+// Webpack runs the webpack command with the project config.
+func (js Js) BuildMain() error {
+	if mg.Verbose() {
+		fmt.Println("Running Webpack")
+	}
+	webpack, err := js.webpack()
+	if err != nil {
+		return err
+	}
+	return webpack("--config", "config/webpack.config.babel.js")
 }
