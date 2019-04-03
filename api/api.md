@@ -5300,8 +5300,6 @@ On downlink, this is a scheduled transmission.
 | enable_crc | [bool](#bool) |  | Send a CRC in the packet; only on uplink; on downlink, CRC should not be enabled. |
 | timestamp | [uint32](#uint32) |  | Timestamp of the gateway concentrator when the uplink message was received, or when the downlink message should be transmitted (microseconds). On downlink, set timestamp to 0 and time to null to use immediate scheduling. |
 | time | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | Time of the gateway when the uplink message was received, or when the downlink message should be transmitted. For downlink, this requires the gateway to have GPS time synchronization. |
-<<<<<<< HEAD
-<<<<<<< HEAD
 | downlink | [TxSettings.Downlink](#ttn.lorawan.v3.TxSettings.Downlink) |  | Transmission settings for downlink. |
 
 
@@ -5320,12 +5318,6 @@ Transmission settings for downlink.
 | antenna_index | [uint32](#uint32) |  | Index of the antenna on which the uplink was received and/or downlink must be sent. |
 | tx_power | [float](#float) |  | Transmission power (dBm). Only on downlink. |
 | invert_polarization | [bool](#bool) |  | Invert LoRa polarization; false for LoRaWAN uplink, true for downlink. |
-=======
-| scheduled | [Scheduled](#ttn.lorawan.v3.Scheduled) |  | Additional information on the scheduled downlink necessary for the BasicStation LNS gateways. |
->>>>>>> api: Add additional fields to TxSettings
-=======
-| request_info | [RequestInfo](#ttn.lorawan.v3.RequestInfo) |  | Additional information for the downlink from the original TxRequest; necessary for the BasicStation LNS gateways. |
->>>>>>> gs: Add values to TxSettings.Scheduled
 
 
 

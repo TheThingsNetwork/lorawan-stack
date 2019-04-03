@@ -245,21 +245,6 @@ var TxSettingsFieldPathsNested = []string{
 	"downlink.tx_power",
 	"enable_crc",
 	"frequency",
-<<<<<<< HEAD
-=======
-	"gateway_channel_index",
-	"invert_polarization",
-<<<<<<< HEAD
-	"scheduled",
-	"scheduled.class",
-	"scheduled.rx_window",
->>>>>>> api: Add additional fields to TxSettings
-=======
-	"request_info",
-	"request_info.antenna_index",
-	"request_info.class",
-	"request_info.rx_window",
->>>>>>> gs: Add values to TxSettings.Scheduled
 	"time",
 	"timestamp",
 }
@@ -271,16 +256,6 @@ var TxSettingsFieldPathsTopLevel = []string{
 	"downlink",
 	"enable_crc",
 	"frequency",
-<<<<<<< HEAD
-=======
-	"gateway_channel_index",
-	"invert_polarization",
-<<<<<<< HEAD
-	"scheduled",
->>>>>>> api: Add additional fields to TxSettings
-=======
-	"request_info",
->>>>>>> gs: Add values to TxSettings.Scheduled
 	"time",
 	"timestamp",
 }
