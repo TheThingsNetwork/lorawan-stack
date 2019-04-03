@@ -838,9 +838,9 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					}
 
 					var paths []downlinkPath
-					if genDown.ApplicationDownlink != nil && genDown.ApplicationDownlink.ClassBC != nil {
-						paths = make([]downlinkPath, 0, len(genDown.ApplicationDownlink.ClassBC.Gateways))
-						for _, gtw := range genDown.ApplicationDownlink.ClassBC.Gateways {
+					if fixedPaths := genDown.ApplicationDownlink.GetClassBC().GetGateways(); len(fixedPaths) > 0 {
+						paths = make([]downlinkPath, 0, len(fixedPaths))
+						for _, gtw := range fixedPaths {
 							paths = append(paths, downlinkPath{
 								GatewayIdentifiers: gtw.GatewayIdentifiers,
 								DownlinkPath: &ttnpb.DownlinkPath{
@@ -851,12 +851,13 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 							})
 						}
 					} else {
-						if len(dev.RecentUplinks) == 0 {
+						paths = downlinkPathsFromRecentUplinks(dev.RecentUplinks...)
+						if len(paths) == 0 {
 							return nil, nil, errUplinkNotFound
 						}
-						up := dev.RecentUplinks[len(dev.RecentUplinks)-1]
-						ctx = events.ContextWithCorrelationID(ctx, up.CorrelationIDs...)
-						paths = downlinkPathsFromRecentUplinks(dev.RecentUplinks...)
+					}
+					if absTime := genDown.ApplicationDownlink.GetClassBC().GetAbsoluteTime(); absTime != nil {
+						req.AbsoluteTime = absTime
 					}
 
 					down, downAt, err := ns.scheduleDownlinkByPaths(
