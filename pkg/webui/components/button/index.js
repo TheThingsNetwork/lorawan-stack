@@ -35,7 +35,6 @@ function assembleClassnames ({
   large,
   className,
   error,
-  link,
 }) {
   return classnames(style.button, className, {
     [style.danger]: danger,
