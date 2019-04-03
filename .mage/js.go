@@ -89,7 +89,7 @@ func (js Js) webpackServe() (func(args ...string) error, error) {
 
 func (js Js) node() (func(args ...string) error, error) {
 	return func(args ...string) error {
-		return sh.RunV("node", args...)
+		return sh.Run("node", args...)
 	}, nil
 }
 
