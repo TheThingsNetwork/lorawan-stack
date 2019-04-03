@@ -64,7 +64,7 @@ require (
 	github.com/labstack/gommon v0.2.8
 	github.com/lib/pq v1.0.0
 	github.com/lyft/protoc-gen-validate v0.0.13
-	github.com/magefile/mage v1.8.0
+	github.com/magefile/mage v1.8.1-0.20190314142316-8dce728c572d
 	github.com/mattn/go-colorable v0.1.1 // indirect
 	github.com/mattn/go-isatty v0.0.7
 	github.com/mattn/go-runewidth v0.0.4 // indirect
