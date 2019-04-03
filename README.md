@@ -49,63 +49,13 @@ LoRaWAN is a protocol for low-power wide area networks. It allows for large scal
 
 ## Getting Started
 
-You want to get started? Fantastic! Here's an [extensive Getting Started guide](./doc/gettingstarted.md).
+You want to **install the stack**? Fantastic! Here's the [Getting Started guide](./doc/gettingstarted.md).
 
-The easiest way to set up a private network is with the provided [`docker-compose.yml`](docker-compose.yml).
+Do you want to **set op a local development environment**? See the [DEVELOPMENT.md](DEVELOPMENT.md) for instructions.
 
-0. Prerequisites
-    - Make sure you have [Docker](https://docs.docker.com/install/#supported-platforms) and [Docker Compose](https://docs.docker.com/compose/install/) installed.
-    - Make sure you have a TLS certificate and key ready. We'll expect a `cert.pem` and `key.pem`. For development, you can generate self-signed certificates with `make dev.certs`.
-1. Pull the Docker images:
-    ```sh
-    docker-compose pull
-    ```
-2. Initialize the database:
-    ```sh
-    docker-compose run --rm stack is-db init
-    ```
-3. Create the `admin` user:
-    ```sh
-    docker-compose run --rm stack is-db create-admin-user \
-      --id admin --email admin@example.com
-    ```
-    You can choose a different user ID if you want. If you do, make sure to use
-    that for `owner` below.
-4. Register the CLI as an OAuth client:
-    ```sh
-    docker-compose run --rm stack is-db create-oauth-client \
-      --id cli --name "Command Line Interface" --no-secret \
-      --owner admin \
-      --redirect-uri 'local-callback' \
-      --redirect-uri 'code'
-    ```
-5. Register the Console as an OAuth client:
-    ```sh
-    docker-compose run --rm stack is-db create-oauth-client \
-      --id console --name "Console" \
-      --owner admin \
-      --redirect-uri 'http://example.com:1885/console/oauth/callback' \
-      --redirect-uri 'https://example.com:8885/console/oauth/callback' \
-      --redirect-uri '/console/oauth/callback'
-    ```
-    Make sure to copy the value of the `secret` that is printed by this command.
-6. Export the Console's OAuth client secret or replace it in your `docker-compose.yml`:
-    ```sh
-    export TTN_LW_CONSOLE_OAUTH_CLIENT_SECRET=<PASTE SECRET HERE>
-    ```
-7. Run the Stack:
-    ```sh
-    docker-compose up
-    ```
+Do you want to **contribute to the stack**? Your contributions are welcome! See the guidelines in [CONTRIBUTING.md](CONTRIBUTING.md).
 
-[Read the full Getting Started guide here](./doc/gettingstarted.md)
-
-## Documentation
-
-- General documentation can be found at [thethingsnetwork.org/docs](https://www.thethingsnetwork.org/docs/)
-- Learn how to contribute in [CONTRIBUTING.md](CONTRIBUTING.md)
-- Setting up a development environment is documented in [DEVELOPMENT.md](DEVELOPMENT.md)
-- Documentation for the Go code can be found at [godoc.org](https://godoc.org/go.thethings.network/lorawan-stack)
+Are you new to LoRaWAN and The Things Network? See the general documentation at [thethingsnetwork.org/docs](https://www.thethingsnetwork.org/docs/).
 
 ## Support
 
