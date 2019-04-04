@@ -17,3 +17,7 @@ package gatewayserver
 var (
 	ErrSchedule = errSchedule
 )
+
+func init() {
+	connConcurrentUplinks = 1
+}
