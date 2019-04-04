@@ -18,6 +18,7 @@ In this guide we will get everything up and running on a server using Docker. If
 8. [Linking the application](#linkappserver)
 9. [Using the MQTT server](#mqtt)
 10. [Using webhooks](#webhooks)
+11. [Advanced: Events](#events)
 
 ## <a name="dependencies">Dependencies</a>
 
@@ -33,12 +34,6 @@ You can use the CLI on your local machine or on the server.
 
 ```bash
 $ brew install TheThingsNetwork/lorawan-stack/ttn-lw-stack
-```
-
-##### Ubuntu
-
-```bash
-$ sudo snap install ttn-lw-stack
 ```
 
 #### Binaries
@@ -78,7 +73,7 @@ With the `docker-compose.yml` file in the directory of your terminal prompt, ent
 ```bash
 $ docker-compose pull
 $ docker-compose run --rm stack is-db init
-$ docker-compose run --rm stack is-db create-admin-user
+$ docker-compose run --rm stack is-db create-admin-user \
   --id admin \
   --password admin \
   --email admin@localhost
@@ -107,7 +102,7 @@ A link will be provided to the OAuth login page where you can login using the cr
 Create the first gateway:
 
 ```bash
-$ ttn-lw-cli gateway create gtw1 \
+$ ttn-lw-cli gateways create gtw1 \
   --user-id admin \
   --frequency-plan-id EU_863_870 \
   --gateway-eui 00800000A00009EF \
@@ -123,7 +118,7 @@ This creates a gateway `gtw1` with the frequency plan `EU_863_870`, EUI `0080000
 Create the first application:
 
 ```bash
-$ ttn-lw-cli app create app1 --user-id admin
+$ ttn-lw-cli applications create app1 --user-id admin
 ```
 
 This creates an application `app1` with the `admin` user as collaborator.
@@ -149,7 +144,14 @@ This will create a LoRaWAN 1.0.2 end device `dev1` in application `app1`. The en
 It is also possible to register an ABP activated device using the `--abp` flag as follows:
 
 ```bash
-$ ttn-lw-cli end-devices create app1 dev2 --frequency-plan-id EU_863_870 --lorawan-version 1.0.2 --lorawan-phy-version 1.0.2-b --abp --session.dev-addr 00E4304D --session.keys.app-s-key.key A0CAD5A30036DBE03096EB67CA975BAA --session.keys.nwk_s_key.key B7F3E161BC9D4388E6C788A0C547F255
+$ ttn-lw-cli end-devices create app1 dev2 \
+  --frequency-plan-id EU_863_870 \
+  --lorawan-version 1.0.2 \
+  --lorawan-phy-version 1.0.2-b \
+  --abp \
+  --session.dev-addr 00E4304D \
+  --session.keys.app-s-key.key A0CAD5A30036DBE03096EB67CA975BAA \
+  --session.keys.nwk-s-key.key B7F3E161BC9D4388E6C788A0C547F255
 ```
 
 ## <a name="linkappserver">Linking the application</a>
@@ -157,7 +159,7 @@ $ ttn-lw-cli end-devices create app1 dev2 --frequency-plan-id EU_863_870 --loraw
 In order to send uplinks and receive downlinks from your device, you must link the Application Server to the Network Server. In order to do this, create an API key for the Application Server:
 
 ```bash
-$ ttn-lw-cli app api-keys create \
+$ ttn-lw-cli applications api-keys create \
   --application-id app1 \
   --right-application-link
 ```
@@ -167,7 +169,7 @@ The CLI will return an API key such as `NNSXS.VEEBURF3KR77ZR...`. This API key h
 You can now link the Application Server to the Network Server:
 
 ```bash
-$ ttn-lw-cli app link set app1 --api-key NNSXS.VEEBURF3KR77ZR..
+$ ttn-lw-cli applications link set app1 --api-key NNSXS.VEEBURF3KR77ZR..
 ```
 
 Your application is now linked. You can now use the builtin MQTT server and webhooks to receive uplink traffic and send downlink traffic.
@@ -177,7 +179,7 @@ Your application is now linked. You can now use the builtin MQTT server and webh
 In order to use the MQTT server you need to create a new API key to authenticate:
 
 ```bash
-$ ttn-lw-cli app api-keys create \
+$ ttn-lw-cli applications api-keys create \
   --application-id app1 \
   --right-application-traffic-read \
   --right-application-traffic-down-write
@@ -193,7 +195,17 @@ There are many MQTT clients available. Great clients are `mosquitto_pub` and `mo
 
 ### Subscribing to messages
 
-MQTT topics provided by the Application Server follow the format `v3/{application id}/devices/{device id}/{message type}`. While you could subscribe to separate topics, in this tutorial we use the wildcard topic `#` to subscribe to all messages.
+The Application Server publishes on the following topics:
+
+- `v3/{application id}/devices/{device id}/join`
+- `v3/{application id}/devices/{device id}/up`
+- `v3/{application id}/devices/{device id}/down/queued`
+- `v3/{application id}/devices/{device id}/down/sent`
+- `v3/{application id}/devices/{device id}/down/ack`
+- `v3/{application id}/devices/{device id}/down/nack`
+- `v3/{application id}/devices/{device id}/down/failed`
+
+While you could subscribe to separate topics, for the tutorial subscribe to `#` to subscribe to all messages.
 
 With your MQTT client subscribed, when a device joins the network, a `join` message gets published. For example, for a device ID `dev1`, the message will be published on the topic `v3/app1/devices/dev1/join` with the following contents:
 
@@ -291,11 +303,12 @@ For example, to send an unconfirmed downlink message to the device `dev1` in app
 }
 ```
 
+
 >If you use `mosquitto_pub`, use the following command:
 >
 >`$ mosquitto_pub -h localhost -t 'v3/app1/devices/dev1/down/push' -u app1 -P 'NNSXS.VEEBURF3KR77ZR..' -m '{"downlinks":[{"f_port": 15,"frm_payload":"vu8=","priority": "NORMAL",}]}' -d`
 
-The payload is base64 formatted, and it is possible to send multiple downlinks on a single push (since `downlinks` is an array). Instead of `push`, you can also use `replace` to replace the downlink queue.
+The payload is base64 formatted. It is also possible to send multiple downlink messages on a single push because `downlinks` is an array. Instead of `/push`, you can also use `/replace` to replace the downlink queue. Replacing with an empty array clears the downlink queue.
 
 >Note: if you do not specify a priority, the default priority `LOWEST` is used. You can specify `LOWEST`, `LOW`, `BELOW_NORMAL`, `NORMAL`, `ABOVE_NORMAL`, `HIGH` and `HIGHEST`.
 
@@ -328,13 +341,7 @@ Once the downlink gets acknowledged, a message is published to the topic `v3/{ap
   },
   "correlation_ids": [
     "my-correlation-id",
-    "as:conn:01D7HYP6YKJTZ9ADK25ESR2D33",
-    "as:downlink:01D7HYP6YMR93065JQ2M5SCQ95",
-    "gs:conn:01D7HYP23MMAW0Z5DDX8H1GS2K",
-    "gs:uplink:01D7HYP8CAG29MNE5VAY4P39WS",
-    "ns:uplink:01D7HYP8CDZNDQY6TA9R5PJHDW",
-    "rpc:/ttn.lorawan.v3.GsNs/HandleUplink:01D7HYP8CDYT09PJEW9BKP51BG",
-    "as:up:01D7HYP8CF8CN5ZK2D2MQB7MD1"
+    "..."
   ],
   "downlink_ack": {
     "session_key_id": "AWnj0318qrtJ7kbudd8Vmw==",
@@ -345,8 +352,7 @@ Once the downlink gets acknowledged, a message is published to the topic `v3/{ap
     "priority": "NORMAL",
     "correlation_ids": [
       "my-correlation-id",
-      "as:conn:01D7HYP6YKJTZ9ADK25ESR2D33",
-      "as:downlink:01D7HYP6YMR93065JQ2M5SCQ95"
+      "..."
     ]
   }
 }
@@ -393,7 +399,7 @@ Multicast sessions do not allow uplink. Therefore, you need to explicitly specif
 
 >Note: if you specify multiple gateways, the Network Server will try the gateways in the order specified. The first gateway with no conflicts and no duty-cycle limitation will send the message.
 
-## Listing the downlink queue
+### Listing the downlink queue
 
 The stack keeps a queue of downlink messages. Applications can keep pushing downlink messages or replace the queue with a list of downlink messages.
 
@@ -410,7 +416,8 @@ The webhooks feature allows the Application Server to send application related m
 Creating a webhook requires you to have an endpoint available as a message sink.
 
 ```bash
-$ ttn-lw-cli applications webhook set --application-id app1 \
+$ ttn-lw-cli applications webhook set \
+  --application-id app1 \
   --webhook-id wh1 \
   --format json \
   --base-url https://example.com/lorahooks \
@@ -418,11 +425,11 @@ $ ttn-lw-cli applications webhook set --application-id app1 \
   --uplink-message.path /up
 ```
 
-This will create an webhook `wh1` for the application `app1` with a base URL `https://example.com/lorahooks` with JSON formatting. The Application Server performs `POST` requests on the endpoint `https://example.com/lorahooks/join` for join-accepts and `https://example.com/lorahooks/up` for uplink messages.
+This will create a webhook `wh1` for the application `app1` with JSON formatting. The paths are appended to the base URL. So, the Application Server will perform `POST` requests on the endpoint `https://example.com/lorahooks/join` for join-accepts and `https://example.com/lorahooks/up` for uplink messages.
 
->Note: You can also specify URL paths for downlink events, see `ttn-lw-cli app webhook set --help` for more information.
+>Note: You can also specify URL paths for downlink events, just like MQTT. See `ttn-lw-cli applications webhook set --help` for more information.
 
-You can also send downlink messages through using webhooks. The path is `/v3/api/as/applications/{application_id}/webhooks/{webhook_id}/devices/{device_id}/down/push` (or `/replace`). Pass the API key as
+You can also send downlink messages using webhooks. The path is `/v3/api/as/applications/{application_id}/webhooks/{webhook_id}/devices/{device_id}/down/push` (or `/replace`). Pass the API key as
 bearer token on the `Authorization` header. For example:
 
 ```
@@ -436,7 +443,9 @@ $ curl http://localhost:1885/v3/api/as/applications/app1/webhooks/wh1/devices/de
 
 You have now set up The Things Network Stack V3! 🎉
 
-## Advanced: Events
+---
+
+## <a name="events">Advanced: Events</a>
 
 The stack generates lots of events that allow you to get insight in what is going on. You can subscribe to application, gateway, end device events, as well as to user, organization and OAuth client events.
 
@@ -453,17 +462,22 @@ $ ttn-lw-cli events subscribe --gateway-id gtw1 --application-id app1
 You can also get streaming events with `curl`. For this, you need an API key for the entities you want to watch, for example:
 
 ```bash
-$ ttn-lw-cli user api-key create --user-id admin --right-application-all --right-gateway-all
+$ ttn-lw-cli user api-key create \
+  --user-id admin \
+  --right-application-all \
+  --right-gateway-all
 ```
 
 With the created API key:
 
 ```
 $ curl http://localhost:1885/api/v3/events \
-  -X POST
+  -X POST \
   -H 'Authorization: Bearer NNSXS.BR55PTYILPPVXY..' \
   --data '{"identifiers":[{"application_ids":{"application_id":"app1"}},{"gateway_ids":{"gateway_id":"gtw1"}}]}'
 ```
+
+>Note: The created API key for events is highly privileged; do not use it if you don't need it for events.
 
 ### Example: join flow
 

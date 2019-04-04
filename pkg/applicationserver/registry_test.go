@@ -34,11 +34,17 @@ func handleLinkRegistryTest(t *testing.T, reg LinkRegistry) {
 	app1IDs := ttnpb.ApplicationIdentifiers{
 		ApplicationID: "app-1",
 	}
-	app1 := ttnpb.NewPopulatedApplicationLink(test.Randy, false)
+	app1 := &ttnpb.ApplicationLink{
+		APIKey:               "secret1",
+		NetworkServerAddress: "host1",
+	}
 	app2IDs := ttnpb.ApplicationIdentifiers{
 		ApplicationID: "app-2",
 	}
-	app2 := ttnpb.NewPopulatedApplicationLink(test.Randy, false)
+	app2 := &ttnpb.ApplicationLink{
+		APIKey:               "secret2",
+		NetworkServerAddress: "host2",
+	}
 
 	for ids, link := range map[ttnpb.ApplicationIdentifiers]*ttnpb.ApplicationLink{
 		app1IDs: app1,
