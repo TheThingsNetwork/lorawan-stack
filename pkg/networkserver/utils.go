@@ -209,8 +209,8 @@ func resetMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttn
 			})
 		}
 	} else if len(defaults.GetFactoryPresetFrequencies()) > 0 {
-		dev.MACState.CurrentParameters.Channels = make([]*ttnpb.MACParameters_Channel, 0, len(dev.MACSettings.FactoryPresetFrequencies))
-		for _, freq := range dev.MACSettings.FactoryPresetFrequencies {
+		dev.MACState.CurrentParameters.Channels = make([]*ttnpb.MACParameters_Channel, 0, len(defaults.FactoryPresetFrequencies))
+		for _, freq := range defaults.FactoryPresetFrequencies {
 			dev.MACState.CurrentParameters.Channels = append(dev.MACState.CurrentParameters.Channels, &ttnpb.MACParameters_Channel{
 				MinDataRateIndex:  0,
 				MaxDataRateIndex:  ttnpb.DATA_RATE_15,
