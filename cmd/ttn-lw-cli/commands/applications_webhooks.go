@@ -70,11 +70,12 @@ func getApplicationWebhookID(flagSet *pflag.FlagSet, args []string) (*ttnpb.Appl
 }
 
 var (
-	applicationsWebhookCommand = &cobra.Command{
-		Use:   "webhook",
-		Short: "Application webhook commands",
+	applicationsWebhooksCommand = &cobra.Command{
+		Use:     "webhooks",
+		Aliases: []string{"webhook"},
+		Short:   "Application webhooks commands",
 	}
-	applicationsWebhookGetFormatsCommand = &cobra.Command{
+	applicationsWebhooksGetFormatsCommand = &cobra.Command{
 		Use:     "get-formats",
 		Aliases: []string{"formats"},
 		Short:   "Get the available formats for application webhooks",
@@ -91,7 +92,7 @@ var (
 			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
-	applicationsWebhookGetCommand = &cobra.Command{
+	applicationsWebhooksGetCommand = &cobra.Command{
 		Use:     "get",
 		Aliases: []string{"info"},
 		Short:   "Get the properties of an application webhook",
@@ -123,7 +124,7 @@ var (
 			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
-	applicationsWebhookListCommand = &cobra.Command{
+	applicationsWebhooksListCommand = &cobra.Command{
 		Use:     "list",
 		Aliases: []string{"ls"},
 		Short:   "List application webhooks",
@@ -155,7 +156,7 @@ var (
 			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
-	applicationsWebhookSetCommand = &cobra.Command{
+	applicationsWebhooksSetCommand = &cobra.Command{
 		Use:     "set",
 		Aliases: []string{"update"},
 		Short:   "Set the properties of an application webhook",
@@ -187,7 +188,7 @@ var (
 			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
-	applicationsWebhookDeleteCommand = &cobra.Command{
+	applicationsWebhooksDeleteCommand = &cobra.Command{
 		Use:   "delete",
 		Short: "Delete an application webhook",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -211,17 +212,17 @@ var (
 )
 
 func init() {
-	applicationsWebhookCommand.AddCommand(applicationsWebhookGetFormatsCommand)
-	applicationsWebhookGetCommand.Flags().AddFlagSet(applicationWebhookIDFlags())
-	applicationsWebhookGetCommand.Flags().AddFlagSet(selectApplicationWebhookFlags)
-	applicationsWebhookCommand.AddCommand(applicationsWebhookGetCommand)
-	applicationsWebhookListCommand.Flags().AddFlagSet(applicationIDFlags())
-	applicationsWebhookListCommand.Flags().AddFlagSet(selectApplicationWebhookFlags)
-	applicationsWebhookCommand.AddCommand(applicationsWebhookListCommand)
-	applicationsWebhookSetCommand.Flags().AddFlagSet(applicationWebhookIDFlags())
-	applicationsWebhookSetCommand.Flags().AddFlagSet(setApplicationWebhookFlags)
-	applicationsWebhookCommand.AddCommand(applicationsWebhookSetCommand)
-	applicationsWebhookDeleteCommand.Flags().AddFlagSet(applicationWebhookIDFlags())
-	applicationsWebhookCommand.AddCommand(applicationsWebhookDeleteCommand)
-	applicationsCommand.AddCommand(applicationsWebhookCommand)
+	applicationsWebhooksCommand.AddCommand(applicationsWebhooksGetFormatsCommand)
+	applicationsWebhooksGetCommand.Flags().AddFlagSet(applicationWebhookIDFlags())
+	applicationsWebhooksGetCommand.Flags().AddFlagSet(selectApplicationWebhookFlags)
+	applicationsWebhooksCommand.AddCommand(applicationsWebhooksGetCommand)
+	applicationsWebhooksListCommand.Flags().AddFlagSet(applicationIDFlags())
+	applicationsWebhooksListCommand.Flags().AddFlagSet(selectApplicationWebhookFlags)
+	applicationsWebhooksCommand.AddCommand(applicationsWebhooksListCommand)
+	applicationsWebhooksSetCommand.Flags().AddFlagSet(applicationWebhookIDFlags())
+	applicationsWebhooksSetCommand.Flags().AddFlagSet(setApplicationWebhookFlags)
+	applicationsWebhooksCommand.AddCommand(applicationsWebhooksSetCommand)
+	applicationsWebhooksDeleteCommand.Flags().AddFlagSet(applicationWebhookIDFlags())
+	applicationsWebhooksCommand.AddCommand(applicationsWebhooksDeleteCommand)
+	applicationsCommand.AddCommand(applicationsWebhooksCommand)
 }
