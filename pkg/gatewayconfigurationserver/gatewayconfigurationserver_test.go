@@ -147,3 +147,8 @@ func newContextWithRightsFetcher(ctx context.Context) context.Context {
 		}),
 	)
 }
+
+func init() {
+	testConfig.TheThingsGateway.Default.FirmwareURL = "http://example.com"
+	testConfig.TheThingsGateway.Default.UpdateChannel = "stable"
+}
