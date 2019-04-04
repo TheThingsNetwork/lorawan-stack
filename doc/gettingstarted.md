@@ -28,6 +28,8 @@ The web interface Console is not yet available. So in this tutorial, we use the 
 
 You can use the CLI on your local machine or on the server.
 
+>Note: if you need help with any CLI command, use the `--help` flag to get a list of subcommands, flags and their description and aliases.
+
 #### Package managers (recommended)
 
 ##### macOS
@@ -68,14 +70,13 @@ By default, frequency plans are fetched by the stack from a [public GitHub repos
 
 You can run the stack using Docker or container orchestration solutions using Docker. An example [Docker Compose configuration](../docker-compose.yml) is available to get started quickly.
 
-With the `docker-compose.yml` file in the directory of your terminal prompt, enter the following commands to initialize the database, create the first user `admin` with password `admin`, create the CLI OAuth client and start the stack:
+With the `docker-compose.yml` file in the directory of your terminal prompt, enter the following commands to initialize the database, create the first user `admin`, create the CLI OAuth client and start the stack:
 
 ```bash
 $ docker-compose pull
 $ docker-compose run --rm stack is-db init
 $ docker-compose run --rm stack is-db create-admin-user \
   --id admin \
-  --password admin \
   --email admin@localhost
 $ docker-compose run --rm stack is-db create-oauth-client \
   --id cli \
@@ -95,11 +96,19 @@ The CLI needs to be logged on in order to create gateways, applications, devices
 $ ttn-lw-cli login
 ```
 
-A link will be provided to the OAuth login page where you can login using the credentials from the step ahead. Once you logged in in the browser, return to the terminal session to proceed.
+This will open the OAuth login page where you can login with your credentials. Once you logged in in the browser, return to the terminal session to proceed.
+
+If you run this command on a remote machine, pass `--callback=false` to get a link to login on your local machine.
 
 ## <a name="creategtw">Creating a gateway</a>
 
-Create the first gateway:
+First, list the available frequency plans:
+
+```
+$ ttn-lw-cli gateways list-frequency-plans
+```
+
+Then, create the first gateway with the chosen frequency plan:
 
 ```bash
 $ ttn-lw-cli gateways create gtw1 \
@@ -109,9 +118,9 @@ $ ttn-lw-cli gateways create gtw1 \
   --enforce-duty-cycle
 ```
 
-This creates a gateway `gtw1` with the frequency plan `EU_863_870`, EUI `00800000A00009EF`, respecting duty-cycle limitations and with the `admin` user as collaborator. You can now connect your gateway to the stack.
+This creates a gateway `gtw1` with user `admin` as collaborator, frequency plan `EU_863_870`, EUI `00800000A00009EF` and respecting duty-cycle limitations. You can now connect your gateway to the stack.
 
->Note: if you need help with any command of `ttn-lw-cli`, use the `--help` flag to get a list of subcommands, flags and their description and aliases.
+>Note: The CLI returns the created and updated entities by default in JSON. This can be useful in scripts.
 
 ## <a name="createapp">Creating an application</a>
 
@@ -127,7 +136,14 @@ Devices are created within applications.
 
 ## <a name="createdev">Creating a device</a>
 
-Creating a device with over-the-air-activation (OTAA) to be used with the stack:
+First, list the available frequency plans and LoRaWAN versions:
+
+```
+$ ttn-lw-cli end-devices list-frequency-plans
+$ ttn-lw-cli end-devices create --help
+```
+
+Then, to create an end device using over-the-air-activation (OTAA):
 
 ```bash
 $ ttn-lw-cli end-devices create app1 dev1 \
@@ -140,6 +156,10 @@ $ ttn-lw-cli end-devices create app1 dev1 \
 ```
 
 This will create a LoRaWAN 1.0.2 end device `dev1` in application `app1`. The end device should now be able to join the private network.
+
+>Note: All returned keys are base64 encoded. Also, the `AppEUI` is returned as `join_eui` (V3 uses LoRaWAN 1.1 terminology).
+
+>Hint: You can also pass `--with-root-keys` to have root keys generated.
 
 It is also possible to register an ABP activated device using the `--abp` flag as follows:
 
@@ -154,12 +174,17 @@ $ ttn-lw-cli end-devices create app1 dev2 \
   --session.keys.nwk-s-key.key B7F3E161BC9D4388E6C788A0C547F255
 ```
 
+>Note: All returned keys are base64 encoded. Also, `NwkSKey` is returned as `f_nwk_s_int_key` (V3 uses LoRaWAN 1.1 terminology).
+
+>Hint: You can also pass `--with-session` to have a session generated.
+
 ## <a name="linkappserver">Linking the application</a>
 
 In order to send uplinks and receive downlinks from your device, you must link the Application Server to the Network Server. In order to do this, create an API key for the Application Server:
 
 ```bash
 $ ttn-lw-cli applications api-keys create \
+  --name link \
   --application-id app1 \
   --right-application-link
 ```
@@ -180,10 +205,13 @@ In order to use the MQTT server you need to create a new API key to authenticate
 
 ```bash
 $ ttn-lw-cli applications api-keys create \
+  --name mqtt-client \
   --application-id app1 \
   --right-application-traffic-read \
   --right-application-traffic-down-write
 ```
+
+>Note: See `--help` to see more rights that your application may need.
 
 You can now login using an MQTT client with the application ID `app1` as user name and the newly generated API key as password.
 
@@ -303,12 +331,13 @@ For example, to send an unconfirmed downlink message to the device `dev1` in app
 }
 ```
 
+>Hint: Use [this handy tool](https://v2.cryptii.com/hexadecimal/base64) to convert hexadecimal to base64.
 
 >If you use `mosquitto_pub`, use the following command:
 >
 >`$ mosquitto_pub -h localhost -t 'v3/app1/devices/dev1/down/push' -u app1 -P 'NNSXS.VEEBURF3KR77ZR..' -m '{"downlinks":[{"f_port": 15,"frm_payload":"vu8=","priority": "NORMAL"}]}' -d`
 
-The payload is base64 formatted. It is also possible to send multiple downlink messages on a single push because `downlinks` is an array. Instead of `/push`, you can also use `/replace` to replace the downlink queue. Replacing with an empty array clears the downlink queue.
+It is also possible to send multiple downlink messages on a single push because `downlinks` is an array. Instead of `/push`, you can also use `/replace` to replace the downlink queue. Replacing with an empty array clears the downlink queue.
 
 >Note: if you do not specify a priority, the default priority `LOWEST` is used. You can specify `LOWEST`, `LOW`, `BELOW_NORMAL`, `NORMAL`, `ABOVE_NORMAL`, `HIGH` and `HIGHEST`.
 
@@ -365,7 +394,7 @@ Here you see the correlation ID `my-correlation-id` of your downlink message. Yo
 In order to send class C downlink messages to a single device, enable class C support for the end device using the following command:
 
 ```bash
-$ ttn-lw-cli end-devices set app1 dev1 --supports-class-c
+$ ttn-lw-cli end-devices update app1 dev1 --supports-class-c
 ```
 
 This will enable the class C downlink scheduling of the device. That's it! New downlink messages are now scheduled as soon as possible.
@@ -411,12 +440,20 @@ $ ttn-lw-cli end-devices downlink list app1 dev1
 
 ## <a name="webhooks">Using webhooks</a>
 
-The webhooks feature allows the Application Server to send application related messages to specific HTTP(S) endpoints. The `json` formatter uses the same format as the MQTT server described above.
+The webhooks feature allows the Application Server to send application related messages to specific HTTP(S) endpoints.
 
-Creating a webhook requires you to have an endpoint available as a message sink.
+To show supported formats, use:
+
+```
+$ ttn-lw-cli applications webhooks get-formats
+```
+
+The `json` formatter uses the same format as the MQTT server described above.
+
+Creating a webhook requires you to have an HTTP(S) endpoint available.
 
 ```bash
-$ ttn-lw-cli applications webhook set \
+$ ttn-lw-cli applications webhooks set \
   --application-id app1 \
   --webhook-id wh1 \
   --format json \
@@ -427,13 +464,13 @@ $ ttn-lw-cli applications webhook set \
 
 This will create a webhook `wh1` for the application `app1` with JSON formatting. The paths are appended to the base URL. So, the Application Server will perform `POST` requests on the endpoint `https://example.com/lorahooks/join` for join-accepts and `https://example.com/lorahooks/up` for uplink messages.
 
->Note: You can also specify URL paths for downlink events, just like MQTT. See `ttn-lw-cli applications webhook set --help` for more information.
+>Note: You can also specify URL paths for downlink events, just like MQTT. See `ttn-lw-cli applications webhooks set --help` for more information.
 
 You can also send downlink messages using webhooks. The path is `/v3/api/as/applications/{application_id}/webhooks/{webhook_id}/devices/{device_id}/down/push` (or `/replace`). Pass the API key as
 bearer token on the `Authorization` header. For example:
 
 ```
-$ curl http://localhost:1885/v3/api/as/applications/app1/webhooks/wh1/devices/dev1/down/push \
+$ curl http://localhost:1885/api/v3/as/applications/app1/webhooks/wh1/devices/dev1/down/push \
   -X POST \
   -H 'Authorization: Bearer NNSXS.VEEBURF3KR77ZR..' \
   --data '{"downlinks":[{"frm_payload":"vu8=","f_port":15,"priority":"NORMAL"}]}'
