@@ -58,7 +58,7 @@ var (
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewUserInvitationRegistryClient(is).List(ctx, &ttnpb.ListInvitationsRequest{
 				Limit: limit,
-				Page: page,
+				Page:  page,
 			}, opt)
 			if err != nil {
 				return err

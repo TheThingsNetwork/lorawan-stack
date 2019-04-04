@@ -112,8 +112,8 @@ var (
 			res, err := ttnpb.NewGatewayRegistryClient(is).List(ctx, &ttnpb.ListGatewaysRequest{
 				Collaborator: getCollaborator(cmd.Flags()),
 				FieldMask:    types.FieldMask{Paths: paths},
-				Limit: limit,
-				Page: page,
+				Limit:        limit,
+				Page:         page,
 			}, opt)
 			if err != nil {
 				return err

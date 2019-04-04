@@ -67,7 +67,7 @@ var (
 			}
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewClientAccessClient(is).ListCollaborators(ctx, &ttnpb.ListClientCollaboratorsRequest{
-				ClientIdentifiers: *cliID,Limit: limit, Page: page,
+				ClientIdentifiers: *cliID, Limit: limit, Page: page,
 			}, opt)
 			if err != nil {
 				return err

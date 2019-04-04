@@ -77,8 +77,8 @@ var (
 			res, err := ttnpb.NewOrganizationRegistryClient(is).List(ctx, &ttnpb.ListOrganizationsRequest{
 				Collaborator: getCollaborator(cmd.Flags()),
 				FieldMask:    types.FieldMask{Paths: paths},
-				Limit: limit,
-				Page: page,
+				Limit:        limit,
+				Page:         page,
 			}, opt)
 			if err != nil {
 				return err

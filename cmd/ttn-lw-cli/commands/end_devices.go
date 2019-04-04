@@ -182,8 +182,8 @@ var (
 			res, err := ttnpb.NewEndDeviceRegistryClient(is).List(ctx, &ttnpb.ListEndDevicesRequest{
 				ApplicationIdentifiers: *appID,
 				FieldMask:              pbtypes.FieldMask{Paths: paths},
-				Limit: limit,
-				Page: page,
+				Limit:                  limit,
+				Page:                   page,
 			}, opt)
 			if err != nil {
 				return err

@@ -67,7 +67,7 @@ var (
 			}
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewApplicationAccessClient(is).ListCollaborators(ctx, &ttnpb.ListApplicationCollaboratorsRequest{
-				ApplicationIdentifiers: *appID,Limit: limit, Page: page,
+				ApplicationIdentifiers: *appID, Limit: limit, Page: page,
 			}, opt)
 			if err != nil {
 				return err

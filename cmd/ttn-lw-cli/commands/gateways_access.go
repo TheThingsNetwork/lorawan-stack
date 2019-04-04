@@ -67,7 +67,7 @@ var (
 			}
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewGatewayAccessClient(is).ListCollaborators(ctx, &ttnpb.ListGatewayCollaboratorsRequest{
-				GatewayIdentifiers: *gtwID,Limit: limit, Page: page,
+				GatewayIdentifiers: *gtwID, Limit: limit, Page: page,
 			}, opt)
 			if err != nil {
 				return err
