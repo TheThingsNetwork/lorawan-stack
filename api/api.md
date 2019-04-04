@@ -516,6 +516,7 @@
     - [GetUserRequest](#ttn.lorawan.v3.GetUserRequest)
     - [Invitation](#ttn.lorawan.v3.Invitation)
     - [Invitations](#ttn.lorawan.v3.Invitations)
+    - [ListInvitationsRequest](#ttn.lorawan.v3.ListInvitationsRequest)
     - [ListUserAPIKeysRequest](#ttn.lorawan.v3.ListUserAPIKeysRequest)
     - [ListUserSessionsRequest](#ttn.lorawan.v3.ListUserSessionsRequest)
     - [Picture](#ttn.lorawan.v3.Picture)
@@ -6385,6 +6386,16 @@ This service is not implemented on all deployments.
 
 
 
+<a name="ttn.lorawan.v3.ListInvitationsRequest"></a>
+
+### ListInvitationsRequest
+
+
+
+
+
+
+
 <a name="ttn.lorawan.v3.ListUserAPIKeysRequest"></a>
 
 ### ListUserAPIKeysRequest
@@ -6686,7 +6697,7 @@ User is the message that defines an user on the network.
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | Send | [SendInvitationRequest](#ttn.lorawan.v3.SendInvitationRequest) | [Invitation](#ttn.lorawan.v3.Invitation) |  |
-| List | [.google.protobuf.Empty](#google.protobuf.Empty) | [Invitations](#ttn.lorawan.v3.Invitations) |  |
+| List | [ListInvitationsRequest](#ttn.lorawan.v3.ListInvitationsRequest) | [Invitations](#ttn.lorawan.v3.Invitations) |  |
 | Delete | [DeleteInvitationRequest](#ttn.lorawan.v3.DeleteInvitationRequest) | [.google.protobuf.Empty](#google.protobuf.Empty) |  |
 
 

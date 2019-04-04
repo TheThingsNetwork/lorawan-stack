@@ -111,7 +111,7 @@ service UserInvitationRegistry {
     };
   };
 
-  rpc List(google.protobuf.Empty) returns (Invitations) {
+  rpc List(ListInvitationsRequest) returns (Invitations) {
     option (google.api.http) = {
       get: "/invitations"
     };

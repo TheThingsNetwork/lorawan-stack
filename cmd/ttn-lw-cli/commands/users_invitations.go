@@ -55,7 +55,7 @@ var (
 			if err != nil {
 				return err
 			}
-			res, err := ttnpb.NewUserInvitationRegistryClient(is).List(ctx, ttnpb.Empty)
+			res, err := ttnpb.NewUserInvitationRegistryClient(is).List(ctx, &ttnpb.ListInvitationsRequest{})
 			if err != nil {
 				return err
 			}

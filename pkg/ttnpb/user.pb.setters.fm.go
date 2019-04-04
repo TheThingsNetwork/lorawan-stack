@@ -685,6 +685,16 @@ func (dst *Invitation) SetFields(src *Invitation, paths ...string) error {
 	return nil
 }
 
+func (dst *ListInvitationsRequest) SetFields(src *ListInvitationsRequest, paths ...string) error {
+	if len(paths) != 0 {
+		return fmt.Errorf("message ListInvitationsRequest has no fields, but paths %s were specified", paths)
+	}
+	if src != nil {
+		*dst = *src
+	}
+	return nil
+}
+
 func (dst *Invitations) SetFields(src *Invitations, paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {

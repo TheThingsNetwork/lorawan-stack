@@ -1556,6 +1556,72 @@ var _ interface {
 	ErrorName() string
 } = InvitationValidationError{}
 
+// ValidateFields checks the field values on ListInvitationsRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ListInvitationsRequest) ValidateFields(paths ...string) error {
+	if len(paths) > 0 {
+		return fmt.Errorf("message ListInvitationsRequest has no fields, but paths %s were specified", paths)
+	}
+	return nil
+}
+
+// ListInvitationsRequestValidationError is the validation error returned by
+// ListInvitationsRequest.ValidateFields if the designated constraints aren't met.
+type ListInvitationsRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListInvitationsRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListInvitationsRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListInvitationsRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListInvitationsRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListInvitationsRequestValidationError) ErrorName() string {
+	return "ListInvitationsRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListInvitationsRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListInvitationsRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListInvitationsRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListInvitationsRequestValidationError{}
+
 // ValidateFields checks the field values on Invitations with the rules defined
 // in the proto definition for this message. If any rules are violated, an
 // error is returned.

@@ -138,6 +138,10 @@ message Invitation {
   UserIdentifiers accepted_by = 7;
 }
 
+message ListInvitationsRequest {
+
+}
+
 message Invitations {
   repeated Invitation invitations = 1;
 }

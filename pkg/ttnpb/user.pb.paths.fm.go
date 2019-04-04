@@ -224,6 +224,8 @@ var InvitationFieldPathsTopLevel = []string{
 	"token",
 	"updated_at",
 }
+var ListInvitationsRequestFieldPathsNested []string
+var ListInvitationsRequestFieldPathsTopLevel []string
 var InvitationsFieldPathsNested = []string{
 	"invitations",
 }

@@ -13,7 +13,6 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/gogo/protobuf/types"
 	"github.com/golang/protobuf/proto"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/grpc-ecosystem/grpc-gateway/utilities"
@@ -390,7 +389,7 @@ func request_UserInvitationRegistry_Send_0(ctx context.Context, marshaler runtim
 }
 
 func request_UserInvitationRegistry_List_0(ctx context.Context, marshaler runtime.Marshaler, client UserInvitationRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq types.Empty
+	var protoReq ListInvitationsRequest
 	var metadata runtime.ServerMetadata
 
 	msg, err := client.List(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
