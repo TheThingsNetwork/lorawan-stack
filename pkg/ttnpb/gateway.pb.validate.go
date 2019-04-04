@@ -1446,6 +1446,10 @@ func (m *ListGatewayAPIKeysRequest) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "limit":
+			// no validation rules for Limit
+		case "page":
+			// no validation rules for Page
 		default:
 			return ListGatewayAPIKeysRequestValidationError{
 				field:  name,
@@ -1763,6 +1767,10 @@ func (m *ListGatewayCollaboratorsRequest) ValidateFields(paths ...string) error 
 				}
 			}
 
+		case "limit":
+			// no validation rules for Limit
+		case "page":
+			// no validation rules for Page
 		default:
 			return ListGatewayCollaboratorsRequestValidationError{
 				field:  name,

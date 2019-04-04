@@ -101,12 +101,16 @@ var UpdateOrganizationRequestFieldPathsTopLevel = []string{
 	"organization",
 }
 var ListOrganizationAPIKeysRequestFieldPathsNested = []string{
+	"limit",
 	"organization_ids",
 	"organization_ids.organization_id",
+	"page",
 }
 
 var ListOrganizationAPIKeysRequestFieldPathsTopLevel = []string{
+	"limit",
 	"organization_ids",
+	"page",
 }
 var CreateOrganizationAPIKeyRequestFieldPathsNested = []string{
 	"name",
@@ -135,12 +139,16 @@ var UpdateOrganizationAPIKeyRequestFieldPathsTopLevel = []string{
 	"organization_ids",
 }
 var ListOrganizationCollaboratorsRequestFieldPathsNested = []string{
+	"limit",
 	"organization_ids",
 	"organization_ids.organization_id",
+	"page",
 }
 
 var ListOrganizationCollaboratorsRequestFieldPathsTopLevel = []string{
+	"limit",
 	"organization_ids",
+	"page",
 }
 var SetOrganizationCollaboratorRequestFieldPathsNested = []string{
 	"collaborator",

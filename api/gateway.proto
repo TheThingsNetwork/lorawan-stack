@@ -158,6 +158,10 @@ message UpdateGatewayRequest {
 
 message ListGatewayAPIKeysRequest {
   GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  // Limit the number of results per page.
+  uint32 limit = 2;
+  // Page number for pagination. 0 is interpreted as 1.
+  uint32 page = 3;
 }
 
 message CreateGatewayAPIKeyRequest {
@@ -173,6 +177,10 @@ message UpdateGatewayAPIKeyRequest {
 
 message ListGatewayCollaboratorsRequest {
   GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  // Limit the number of results per page.
+  uint32 limit = 2;
+  // Page number for pagination. 0 is interpreted as 1.
+  uint32 page = 3;
 }
 
 message SetGatewayCollaboratorRequest {

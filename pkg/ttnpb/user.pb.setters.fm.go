@@ -491,6 +491,26 @@ func (dst *ListUserAPIKeysRequest) SetFields(src *ListUserAPIKeysRequest, paths 
 					dst.UserIdentifiers = zero
 				}
 			}
+		case "limit":
+			if len(subs) > 0 {
+				return fmt.Errorf("'limit' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Limit = src.Limit
+			} else {
+				var zero uint32
+				dst.Limit = zero
+			}
+		case "page":
+			if len(subs) > 0 {
+				return fmt.Errorf("'page' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Page = src.Page
+			} else {
+				var zero uint32
+				dst.Page = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
@@ -686,11 +706,32 @@ func (dst *Invitation) SetFields(src *Invitation, paths ...string) error {
 }
 
 func (dst *ListInvitationsRequest) SetFields(src *ListInvitationsRequest, paths ...string) error {
-	if len(paths) != 0 {
-		return fmt.Errorf("message ListInvitationsRequest has no fields, but paths %s were specified", paths)
-	}
-	if src != nil {
-		*dst = *src
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "limit":
+			if len(subs) > 0 {
+				return fmt.Errorf("'limit' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Limit = src.Limit
+			} else {
+				var zero uint32
+				dst.Limit = zero
+			}
+		case "page":
+			if len(subs) > 0 {
+				return fmt.Errorf("'page' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Page = src.Page
+			} else {
+				var zero uint32
+				dst.Page = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
 	}
 	return nil
 }

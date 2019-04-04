@@ -798,6 +798,10 @@ func (m *ListClientCollaboratorsRequest) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "limit":
+			// no validation rules for Limit
+		case "page":
+			// no validation rules for Page
 		default:
 			return ListClientCollaboratorsRequestValidationError{
 				field:  name,

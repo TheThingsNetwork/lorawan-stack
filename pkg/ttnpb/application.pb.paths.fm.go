@@ -103,10 +103,14 @@ var UpdateApplicationRequestFieldPathsTopLevel = []string{
 var ListApplicationAPIKeysRequestFieldPathsNested = []string{
 	"application_ids",
 	"application_ids.application_id",
+	"limit",
+	"page",
 }
 
 var ListApplicationAPIKeysRequestFieldPathsTopLevel = []string{
 	"application_ids",
+	"limit",
+	"page",
 }
 var CreateApplicationAPIKeyRequestFieldPathsNested = []string{
 	"application_ids",
@@ -137,10 +141,14 @@ var UpdateApplicationAPIKeyRequestFieldPathsTopLevel = []string{
 var ListApplicationCollaboratorsRequestFieldPathsNested = []string{
 	"application_ids",
 	"application_ids.application_id",
+	"limit",
+	"page",
 }
 
 var ListApplicationCollaboratorsRequestFieldPathsTopLevel = []string{
 	"application_ids",
+	"limit",
+	"page",
 }
 var SetApplicationCollaboratorRequestFieldPathsNested = []string{
 	"application_ids",

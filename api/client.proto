@@ -112,6 +112,10 @@ message UpdateClientRequest {
 
 message ListClientCollaboratorsRequest {
   ClientIdentifiers client_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  // Limit the number of results per page.
+  uint32 limit = 2;
+  // Page number for pagination. 0 is interpreted as 1.
+  uint32 page = 3;
 }
 
 message SetClientCollaboratorRequest {

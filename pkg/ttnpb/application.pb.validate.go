@@ -757,6 +757,10 @@ func (m *ListApplicationAPIKeysRequest) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "limit":
+			// no validation rules for Limit
+		case "page":
+			// no validation rules for Page
 		default:
 			return ListApplicationAPIKeysRequestValidationError{
 				field:  name,
@@ -1074,6 +1078,10 @@ func (m *ListApplicationCollaboratorsRequest) ValidateFields(paths ...string) er
 				}
 			}
 
+		case "limit":
+			// no validation rules for Limit
+		case "page":
+			// no validation rules for Page
 		default:
 			return ListApplicationCollaboratorsRequestValidationError{
 				field:  name,

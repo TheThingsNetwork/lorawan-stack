@@ -243,10 +243,14 @@ var ListGatewayAPIKeysRequestFieldPathsNested = []string{
 	"gateway_ids",
 	"gateway_ids.eui",
 	"gateway_ids.gateway_id",
+	"limit",
+	"page",
 }
 
 var ListGatewayAPIKeysRequestFieldPathsTopLevel = []string{
 	"gateway_ids",
+	"limit",
+	"page",
 }
 var CreateGatewayAPIKeyRequestFieldPathsNested = []string{
 	"gateway_ids",
@@ -280,10 +284,14 @@ var ListGatewayCollaboratorsRequestFieldPathsNested = []string{
 	"gateway_ids",
 	"gateway_ids.eui",
 	"gateway_ids.gateway_id",
+	"limit",
+	"page",
 }
 
 var ListGatewayCollaboratorsRequestFieldPathsTopLevel = []string{
 	"gateway_ids",
+	"limit",
+	"page",
 }
 var SetGatewayCollaboratorRequestFieldPathsNested = []string{
 	"collaborator",

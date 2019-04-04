@@ -684,6 +684,8 @@ Application is the message that defines an Application in the network.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | application_ids | [ApplicationIdentifiers](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
+| limit | [uint32](#uint32) |  | Limit the number of results per page. |
+| page | [uint32](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
 
 
 
@@ -699,6 +701,8 @@ Application is the message that defines an Application in the network.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | application_ids | [ApplicationIdentifiers](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
+| limit | [uint32](#uint32) |  | Limit the number of results per page. |
+| page | [uint32](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
 
 
 
@@ -1258,6 +1262,8 @@ An OAuth client on the network.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | client_ids | [ClientIdentifiers](#ttn.lorawan.v3.ClientIdentifiers) |  |  |
+| limit | [uint32](#uint32) |  | Limit the number of results per page. |
+| page | [uint32](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
 
 
 
@@ -2677,6 +2683,8 @@ Identifies an end device model with version information.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | gateway_ids | [GatewayIdentifiers](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
+| limit | [uint32](#uint32) |  | Limit the number of results per page. |
+| page | [uint32](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
 
 
 
@@ -2692,6 +2700,8 @@ Identifies an end device model with version information.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | gateway_ids | [GatewayIdentifiers](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
+| limit | [uint32](#uint32) |  | Limit the number of results per page. |
+| page | [uint32](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
 
 
 
@@ -5685,6 +5695,8 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | organization_ids | [OrganizationIdentifiers](#ttn.lorawan.v3.OrganizationIdentifiers) |  |  |
+| limit | [uint32](#uint32) |  | Limit the number of results per page. |
+| page | [uint32](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
 
 
 
@@ -5700,6 +5712,8 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | organization_ids | [OrganizationIdentifiers](#ttn.lorawan.v3.OrganizationIdentifiers) |  |  |
+| limit | [uint32](#uint32) |  | Limit the number of results per page. |
+| page | [uint32](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
 
 
 
@@ -6392,6 +6406,12 @@ This service is not implemented on all deployments.
 
 
 
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| limit | [uint32](#uint32) |  | Limit the number of results per page. |
+| page | [uint32](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+
+
 
 
 
@@ -6405,6 +6425,8 @@ This service is not implemented on all deployments.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | user_ids | [UserIdentifiers](#ttn.lorawan.v3.UserIdentifiers) |  |  |
+| limit | [uint32](#uint32) |  | Limit the number of results per page. |
+| page | [uint32](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
 
 
 

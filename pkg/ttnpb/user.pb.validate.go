@@ -1068,6 +1068,10 @@ func (m *ListUserAPIKeysRequest) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "limit":
+			// no validation rules for Limit
+		case "page":
+			// no validation rules for Page
 		default:
 			return ListUserAPIKeysRequestValidationError{
 				field:  name,
@@ -1560,8 +1564,27 @@ var _ interface {
 // rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
 func (m *ListInvitationsRequest) ValidateFields(paths ...string) error {
-	if len(paths) > 0 {
-		return fmt.Errorf("message ListInvitationsRequest has no fields, but paths %s were specified", paths)
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ListInvitationsRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "limit":
+			// no validation rules for Limit
+		case "page":
+			// no validation rules for Page
+		default:
+			return ListInvitationsRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
 	}
 	return nil
 }

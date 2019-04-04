@@ -758,6 +758,10 @@ func (m *ListOrganizationAPIKeysRequest) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "limit":
+			// no validation rules for Limit
+		case "page":
+			// no validation rules for Page
 		default:
 			return ListOrganizationAPIKeysRequestValidationError{
 				field:  name,
@@ -1075,6 +1079,10 @@ func (m *ListOrganizationCollaboratorsRequest) ValidateFields(paths ...string) e
 				}
 			}
 
+		case "limit":
+			// no validation rules for Limit
+		case "page":
+			// no validation rules for Page
 		default:
 			return ListOrganizationCollaboratorsRequestValidationError{
 				field:  name,

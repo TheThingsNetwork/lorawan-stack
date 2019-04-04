@@ -167,12 +167,16 @@ var UpdateUserPasswordRequestFieldPathsTopLevel = []string{
 	"user_ids",
 }
 var ListUserAPIKeysRequestFieldPathsNested = []string{
+	"limit",
+	"page",
 	"user_ids",
 	"user_ids.email",
 	"user_ids.user_id",
 }
 
 var ListUserAPIKeysRequestFieldPathsTopLevel = []string{
+	"limit",
+	"page",
 	"user_ids",
 }
 var CreateUserAPIKeyRequestFieldPathsNested = []string{
@@ -224,8 +228,15 @@ var InvitationFieldPathsTopLevel = []string{
 	"token",
 	"updated_at",
 }
-var ListInvitationsRequestFieldPathsNested []string
-var ListInvitationsRequestFieldPathsTopLevel []string
+var ListInvitationsRequestFieldPathsNested = []string{
+	"limit",
+	"page",
+}
+
+var ListInvitationsRequestFieldPathsTopLevel = []string{
+	"limit",
+	"page",
+}
 var InvitationsFieldPathsNested = []string{
 	"invitations",
 }
