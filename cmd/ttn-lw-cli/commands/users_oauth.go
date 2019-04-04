@@ -71,9 +71,14 @@ var (
 			if err != nil {
 				return err
 			}
+			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewOAuthAuthorizationRegistryClient(is).List(ctx, &ttnpb.ListOAuthClientAuthorizationsRequest{
-				UserIdentifiers: *usrID,
-			})
+				UserIdentifiers: *usrID, Limit: limit, Page: page,
+			}, opt)
+			if err != nil {
+				return err
+			}
+			getTotal()
 
 			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
@@ -139,10 +144,17 @@ var (
 			if err != nil {
 				return err
 			}
+			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewOAuthAuthorizationRegistryClient(is).ListTokens(ctx, &ttnpb.ListOAuthAccessTokensRequest{
 				UserIDs:   *usrID,
 				ClientIDs: *cliID,
-			})
+				Limit:     limit,
+				Page:      page,
+			}, opt)
+			if err != nil {
+				return err
+			}
+			getTotal()
 
 			return io.Write(os.Stdout, config.OutputFormat, res)
 		},

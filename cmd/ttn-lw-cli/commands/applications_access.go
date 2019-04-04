@@ -65,12 +65,14 @@ var (
 			if err != nil {
 				return err
 			}
+			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewApplicationAccessClient(is).ListCollaborators(ctx, &ttnpb.ListApplicationCollaboratorsRequest{
-				ApplicationIdentifiers: *appID,
-			})
+				ApplicationIdentifiers: *appID,Limit: limit, Page: page,
+			}, opt)
 			if err != nil {
 				return err
 			}
+			getTotal()
 
 			return io.Write(os.Stdout, config.OutputFormat, res.Collaborators)
 		},
@@ -161,12 +163,14 @@ var (
 			if err != nil {
 				return err
 			}
+			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewApplicationAccessClient(is).ListAPIKeys(ctx, &ttnpb.ListApplicationAPIKeysRequest{
-				ApplicationIdentifiers: *appID,
-			})
+				ApplicationIdentifiers: *appID, Limit: limit, Page: page,
+			}, opt)
 			if err != nil {
 				return err
 			}
+			getTotal()
 
 			return io.Write(os.Stdout, config.OutputFormat, res.APIKeys)
 		},
@@ -289,6 +293,7 @@ func init() {
 	applicationRights.Flags().AddFlagSet(applicationIDFlags())
 	applicationsCommand.AddCommand(applicationRights)
 
+	applicationCollaboratorsList.Flags().AddFlagSet(paginationFlags())
 	applicationCollaborators.AddCommand(applicationCollaboratorsList)
 	applicationCollaboratorsSet.Flags().AddFlagSet(collaboratorFlags())
 	applicationCollaboratorsSet.Flags().AddFlagSet(applicationRightsFlags)
@@ -298,6 +303,7 @@ func init() {
 	applicationCollaborators.PersistentFlags().AddFlagSet(applicationIDFlags())
 	applicationsCommand.AddCommand(applicationCollaborators)
 
+	applicationAPIKeysList.Flags().AddFlagSet(paginationFlags())
 	applicationAPIKeys.AddCommand(applicationAPIKeysList)
 	applicationAPIKeysCreate.Flags().String("name", "", "")
 	applicationAPIKeysCreate.Flags().AddFlagSet(applicationRightsFlags)

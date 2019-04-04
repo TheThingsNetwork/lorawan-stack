@@ -65,12 +65,14 @@ var (
 			if err != nil {
 				return err
 			}
+			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewGatewayAccessClient(is).ListCollaborators(ctx, &ttnpb.ListGatewayCollaboratorsRequest{
-				GatewayIdentifiers: *gtwID,
-			})
+				GatewayIdentifiers: *gtwID,Limit: limit, Page: page,
+			}, opt)
 			if err != nil {
 				return err
 			}
+			getTotal()
 
 			return io.Write(os.Stdout, config.OutputFormat, res.Collaborators)
 		},
@@ -161,12 +163,14 @@ var (
 			if err != nil {
 				return err
 			}
+			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewGatewayAccessClient(is).ListAPIKeys(ctx, &ttnpb.ListGatewayAPIKeysRequest{
-				GatewayIdentifiers: *gtwID,
-			})
+				GatewayIdentifiers: *gtwID, Limit: limit, Page: page,
+			}, opt)
 			if err != nil {
 				return err
 			}
+			getTotal()
 
 			return io.Write(os.Stdout, config.OutputFormat, res.APIKeys)
 		},
@@ -289,6 +293,7 @@ func init() {
 	gatewayRights.Flags().AddFlagSet(gatewayIDFlags())
 	gatewaysCommand.AddCommand(gatewayRights)
 
+	gatewayCollaboratorsList.Flags().AddFlagSet(paginationFlags())
 	gatewayCollaborators.AddCommand(gatewayCollaboratorsList)
 	gatewayCollaboratorsSet.Flags().AddFlagSet(collaboratorFlags())
 	gatewayCollaboratorsSet.Flags().AddFlagSet(gatewayRightsFlags)
@@ -298,6 +303,7 @@ func init() {
 	gatewayCollaborators.PersistentFlags().AddFlagSet(gatewayIDFlags())
 	gatewaysCommand.AddCommand(gatewayCollaborators)
 
+	gatewayAPIKeysList.Flags().AddFlagSet(paginationFlags())
 	gatewayAPIKeys.AddCommand(gatewayAPIKeysList)
 	gatewayAPIKeysCreate.Flags().String("name", "", "")
 	gatewayAPIKeysCreate.Flags().AddFlagSet(gatewayRightsFlags)
