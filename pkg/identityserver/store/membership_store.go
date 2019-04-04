@@ -39,8 +39,16 @@ func (s *membershipStore) FindMembers(ctx context.Context, entityID *ttnpb.Entit
 	if err != nil {
 		return nil, err
 	}
+	query := s.db.Where(&Membership{
+		EntityID:   entity.PrimaryKey(),
+		EntityType: entityTypeForID(entityID),
+	}).Preload("Account")
+	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
+		countTotal(ctx, query.Model(&Membership{}))
+		query = query.Limit(limit).Offset(offset)
+	}
 	var memberships []Membership
-	if err = s.db.Model(entity).Preload("Account").Association("Memberships").Find(&memberships).Error; err != nil {
+	if err = query.Find(&memberships).Error; err != nil {
 		return nil, err
 	}
 	membershipRights := make(map[*ttnpb.OrganizationOrUserIdentifiers]*ttnpb.Rights, len(memberships))

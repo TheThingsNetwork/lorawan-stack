@@ -56,8 +56,16 @@ func (s *apiKeyStore) FindAPIKeys(ctx context.Context, entityID *ttnpb.EntityIde
 	if err != nil {
 		return nil, err
 	}
+	query := s.db.Where(&APIKey{
+		EntityID:   entity.PrimaryKey(),
+		EntityType: entityTypeForID(entityID),
+	})
+	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
+		countTotal(ctx, query.Model(&APIKey{}))
+		query = query.Limit(limit).Offset(offset)
+	}
 	var keyModels []APIKey
-	if err = s.db.Model(entity).Association("APIKeys").Find(&keyModels).Error; err != nil {
+	if err = query.Find(&keyModels).Error; err != nil {
 		return nil, err
 	}
 	keyProtos := make([]*ttnpb.APIKey, len(keyModels))

@@ -56,7 +56,12 @@ func (s *invitationStore) CreateInvitation(ctx context.Context, invitation *ttnp
 func (s *invitationStore) FindInvitations(ctx context.Context) ([]*ttnpb.Invitation, error) {
 	defer trace.StartRegion(ctx, "find invitations").End()
 	var invitationModels []Invitation
-	if err := s.db.Scopes(withContext(ctx)).Find(&invitationModels).Error; err != nil {
+	query := s.db.Scopes(withContext(ctx))
+	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
+		countTotal(ctx, query.Model(&Invitation{}))
+		query = query.Limit(limit).Offset(offset)
+	}
+	if err := query.Find(&invitationModels).Error; err != nil {
 		return nil, err
 	}
 	invitationProtos := make([]*ttnpb.Invitation, len(invitationModels))
