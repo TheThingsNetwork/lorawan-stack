@@ -104,23 +104,32 @@ func (s *membershipStore) SetMember(ctx context.Context, id *ttnpb.OrganizationO
 	if err := ctx.Err(); err != nil { // Early exit if context canceled
 		return err
 	}
-	var memberships []Membership
-	if err = s.db.Model(entity).Association("Memberships").Find(&memberships).Error; err != nil {
+
+	query := s.db
+	var membership Membership
+	err = query.Where(&Membership{
+		AccountID:  account.PrimaryKey(),
+		EntityID:   entity.PrimaryKey(),
+		EntityType: entityTypeForID(entityID),
+	}).First(&membership).Error
+	if err == nil {
+		if len(rights.Rights) == 0 {
+			return query.Delete(&membership).Error
+		}
+		query = query.Select("rights", "updated_at")
+	} else if gorm.IsRecordNotFoundError(err) {
+		if len(rights.Rights) == 0 {
+			return err
+		}
+		membership = Membership{
+			AccountID:  account.PrimaryKey(),
+			EntityID:   entity.PrimaryKey(),
+			EntityType: entityTypeForID(entityID),
+		}
+		membership.SetContext(ctx)
+	} else {
 		return err
 	}
-	for _, membership := range memberships {
-		if membership.AccountID != account.ID {
-			continue
-		}
-		if len(rights.Rights) == 0 {
-			return s.db.Delete(&membership).Error
-		}
-		membership.Rights = Rights(*rights)
-		return s.db.Select("rights", "updated_at").Save(&membership).Error
-	}
-	return s.db.Model(entity).
-		Set("gorm:association_autoupdate", false). // otherwise it does UPDATE instead of INSERT
-		Association("Memberships").
-		Append(&Membership{AccountID: account.ID, Rights: Rights(*rights)}).
-		Error
+	membership.Rights = Rights(*rights)
+	return query.Save(&membership).Error
 }
