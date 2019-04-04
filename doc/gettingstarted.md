@@ -306,7 +306,7 @@ For example, to send an unconfirmed downlink message to the device `dev1` in app
 
 >If you use `mosquitto_pub`, use the following command:
 >
->`$ mosquitto_pub -h localhost -t 'v3/app1/devices/dev1/down/push' -u app1 -P 'NNSXS.VEEBURF3KR77ZR..' -m '{"downlinks":[{"f_port": 15,"frm_payload":"vu8=","priority": "NORMAL",}]}' -d`
+>`$ mosquitto_pub -h localhost -t 'v3/app1/devices/dev1/down/push' -u app1 -P 'NNSXS.VEEBURF3KR77ZR..' -m '{"downlinks":[{"f_port": 15,"frm_payload":"vu8=","priority": "NORMAL"}]}' -d`
 
 The payload is base64 formatted. It is also possible to send multiple downlink messages on a single push because `downlinks` is an array. Instead of `/push`, you can also use `/replace` to replace the downlink queue. Replacing with an empty array clears the downlink queue.
 
