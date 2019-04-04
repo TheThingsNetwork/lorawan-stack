@@ -44,6 +44,9 @@ import (
 	"google.golang.org/grpc"
 )
 
+// connConcurrentUplinks is the number of goroutines per gateway connection to handle upstream messages.
+var connConcurrentUplinks = 16
+
 // GatewayServer implements the Gateway Server component.
 //
 // The Gateway Server exposes the Gs, GtwGs and NsGs services and MQTT and UDP frontends for gateways.
@@ -315,58 +318,66 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 		registerGatewayDisconnect(ctx, ids)
 		logger.Info("Disconnected")
 	}()
-	for {
-		select {
-		case <-gs.Context().Done():
-			return
-		case <-ctx.Done():
-			return
-		case msg := <-conn.Up():
-			ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:uplink:%s", events.NewCorrelationID()))
-			msg.CorrelationIDs = append(msg.CorrelationIDs, events.CorrelationIDsFromContext(ctx)...)
-			registerReceiveUplink(ctx, conn.Gateway(), msg)
-			drop := func(ids ttnpb.EndDeviceIdentifiers, err error) {
-				logger := logger.WithError(err)
-				if ids.JoinEUI != nil && !ids.JoinEUI.IsZero() {
-					logger = logger.WithField("join_eui", *ids.JoinEUI)
+	wg := &sync.WaitGroup{}
+	for i := 0; i < connConcurrentUplinks; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for {
+				select {
+				case <-gs.Context().Done():
+					return
+				case <-ctx.Done():
+					return
+				case msg := <-conn.Up():
+					ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:uplink:%s", events.NewCorrelationID()))
+					msg.CorrelationIDs = append(msg.CorrelationIDs, events.CorrelationIDsFromContext(ctx)...)
+					registerReceiveUplink(ctx, conn.Gateway(), msg)
+					drop := func(ids ttnpb.EndDeviceIdentifiers, err error) {
+						logger := logger.WithError(err)
+						if ids.JoinEUI != nil && !ids.JoinEUI.IsZero() {
+							logger = logger.WithField("join_eui", *ids.JoinEUI)
+						}
+						if ids.DevEUI != nil && !ids.DevEUI.IsZero() {
+							logger = logger.WithField("dev_eui", *ids.DevEUI)
+						}
+						if ids.DevAddr != nil && !ids.DevAddr.IsZero() {
+							logger = logger.WithField("dev_addr", *ids.DevAddr)
+						}
+						logger.Debug("Drop message")
+						registerDropUplink(ctx, ids, conn.Gateway(), msg, err)
+					}
+					ids, err := lorawan.GetUplinkMessageIdentifiers(msg)
+					if err != nil {
+						drop(ttnpb.EndDeviceIdentifiers{}, err)
+						break
+					}
+					ns := gs.GetPeer(ctx, ttnpb.PeerInfo_NETWORK_SERVER, ids)
+					if ns == nil {
+						drop(ids, errNoNetworkServer)
+						break
+					}
+					if _, err := ttnpb.NewGsNsClient(ns.Conn()).HandleUplink(ctx, msg, gs.WithClusterAuth()); err != nil {
+						drop(ids, err)
+						break
+					}
+					registerForwardUplink(ctx, ids, conn.Gateway(), msg, ns.Name())
+				case status := <-conn.Status():
+					ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:status:%s", events.NewCorrelationID()))
+					registerReceiveStatus(ctx, conn.Gateway(), status)
+				case ack := <-conn.TxAck():
+					ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:tx_ack:%s", events.NewCorrelationID()))
+					ack.CorrelationIDs = append(ack.CorrelationIDs, events.CorrelationIDsFromContext(ctx)...)
+					if ack.Result == ttnpb.TxAcknowledgment_SUCCESS {
+						registerSuccessDownlink(ctx, conn.Gateway())
+					} else {
+						registerFailDownlink(ctx, conn.Gateway(), ack)
+					}
 				}
-				if ids.DevEUI != nil && !ids.DevEUI.IsZero() {
-					logger = logger.WithField("dev_eui", *ids.DevEUI)
-				}
-				if ids.DevAddr != nil && !ids.DevAddr.IsZero() {
-					logger = logger.WithField("dev_addr", *ids.DevAddr)
-				}
-				logger.Debug("Drop message")
-				registerDropUplink(ctx, ids, conn.Gateway(), msg, err)
 			}
-			ids, err := lorawan.GetUplinkMessageIdentifiers(msg)
-			if err != nil {
-				drop(ttnpb.EndDeviceIdentifiers{}, err)
-				break
-			}
-			ns := gs.GetPeer(ctx, ttnpb.PeerInfo_NETWORK_SERVER, ids)
-			if ns == nil {
-				drop(ids, errNoNetworkServer)
-				break
-			}
-			if _, err := ttnpb.NewGsNsClient(ns.Conn()).HandleUplink(ctx, msg, gs.WithClusterAuth()); err != nil {
-				drop(ids, err)
-				break
-			}
-			registerForwardUplink(ctx, ids, conn.Gateway(), msg, ns.Name())
-		case status := <-conn.Status():
-			ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:status:%s", events.NewCorrelationID()))
-			registerReceiveStatus(ctx, conn.Gateway(), status)
-		case ack := <-conn.TxAck():
-			ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:tx_ack:%s", events.NewCorrelationID()))
-			ack.CorrelationIDs = append(ack.CorrelationIDs, events.CorrelationIDsFromContext(ctx)...)
-			if ack.Result == ttnpb.TxAcknowledgment_SUCCESS {
-				registerSuccessDownlink(ctx, conn.Gateway())
-			} else {
-				registerFailDownlink(ctx, conn.Gateway(), ack)
-			}
-		}
+		}()
 	}
+	wg.Wait()
 }
 
 // GetFrequencyPlan gets the specified frequency plan by the gateway identifiers.
