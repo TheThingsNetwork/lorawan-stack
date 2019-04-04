@@ -46,8 +46,7 @@ func DeprecateFlag(flagSet *pflag.FlagSet, old string, new string) {
 func ForwardFlag(flagSet *pflag.FlagSet, old string, new string) {
 	if oldFlag := flagSet.Lookup(old); oldFlag != nil && oldFlag.Changed {
 		if newFlag := flagSet.Lookup(new); newFlag != nil && !newFlag.Changed {
-			newFlag.Value.Set(oldFlag.Value.String())
-			newFlag.Changed = true
+			flagSet.Set(new, oldFlag.Value.String())
 		}
 	}
 }
