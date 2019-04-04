@@ -23,6 +23,7 @@ import (
 	bs_cups "go.thethings.network/lorawan-stack/pkg/basicstation/cups"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/pfconfig/semtechudp"
+	ttg_cups "go.thethings.network/lorawan-stack/pkg/thethingsgateway/cups"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/web"
 	"google.golang.org/grpc/metadata"
@@ -30,8 +31,10 @@ import (
 
 // Config contains the Gateway Configuration Server configuration.
 type Config struct {
-	// BasicStation defines the configuration for the BasicStation CUPS server.
-	BasicStation bs_cups.ServerConfig `name:"basic-station" description:"BasicStation CUPS server configuration."`
+	// BasicStation defines the configuration for the BasicStation CUPS.
+	BasicStation bs_cups.ServerConfig `name:"basic-station" description:"BasicStation CUPS configuration."`
+	// TheThingsGateway defines the configuration for The Things Gateway CUPS.
+	TheThingsGateway ttg_cups.Config `name:"the-things-gateway" description:"The Things Gateway CUPS configuration."`
 	// RequreAuth defines if the HTTP endpoints should require authentication or not.
 	RequireAuth bool `name:"require-auth" description:"Require authentication for the HTTP endpoints."`
 }
@@ -69,8 +72,14 @@ func New(c *component.Component, conf *Config, opts ...Option) (*GatewayConfigur
 		opt(gcs)
 	}
 
-	cups := conf.BasicStation.NewServer(c)
-	_ = cups
+	bsCUPS := conf.BasicStation.NewServer(c)
+	_ = bsCUPS
+
+	ttgCUPS, err := conf.TheThingsGateway.NewServer(c)
+	if err != nil {
+		return nil, err
+	}
+	_ = ttgCUPS
 
 	c.RegisterWeb(gcs)
 	return gcs, nil
