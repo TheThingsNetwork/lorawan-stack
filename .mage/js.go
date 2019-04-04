@@ -83,8 +83,12 @@ func (js Js) execFromNodeBin(cmd string) (func(args ...string) error, error) {
 			return nil, err
 		}
 	}
+	out := os.Stdout
+	if !mg.Verbose() {
+		out = nil
+	}
 	return func(args ...string) error {
-		_, err := sh.Exec(nil, os.Stdout, os.Stderr, nodeBin(cmd), args...)
+		_, err := sh.Exec(nil, out, os.Stderr, nodeBin(cmd), args...)
 		return err
 	}, nil
 }
