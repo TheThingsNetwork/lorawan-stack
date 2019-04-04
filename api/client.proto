@@ -94,7 +94,7 @@ message ListClientsRequest {
   // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
   string order = 3;
   // Limit the number of results per page.
-  uint32 limit = 4;
+  uint32 limit = 4 [(validate.rules).uint32.lte = 1000];
   // Page number for pagination. 0 is interpreted as 1.
   uint32 page = 5;
 }
@@ -113,7 +113,7 @@ message UpdateClientRequest {
 message ListClientCollaboratorsRequest {
   ClientIdentifiers client_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   // Limit the number of results per page.
-  uint32 limit = 2;
+  uint32 limit = 2 [(validate.rules).uint32.lte = 1000];
   // Page number for pagination. 0 is interpreted as 1.
   uint32 page = 3;
 }

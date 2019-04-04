@@ -449,7 +449,14 @@ func (m *ListApplicationsRequest) ValidateFields(paths ...string) error {
 		case "order":
 			// no validation rules for Order
 		case "limit":
-			// no validation rules for Limit
+
+			if m.GetLimit() > 1000 {
+				return ListApplicationsRequestValidationError{
+					field:  "limit",
+					reason: "value must be less than or equal to 1000",
+				}
+			}
+
 		case "page":
 			// no validation rules for Page
 		default:
@@ -758,7 +765,14 @@ func (m *ListApplicationAPIKeysRequest) ValidateFields(paths ...string) error {
 			}
 
 		case "limit":
-			// no validation rules for Limit
+
+			if m.GetLimit() > 1000 {
+				return ListApplicationAPIKeysRequestValidationError{
+					field:  "limit",
+					reason: "value must be less than or equal to 1000",
+				}
+			}
+
 		case "page":
 			// no validation rules for Page
 		default:
@@ -1079,7 +1093,14 @@ func (m *ListApplicationCollaboratorsRequest) ValidateFields(paths ...string) er
 			}
 
 		case "limit":
-			// no validation rules for Limit
+
+			if m.GetLimit() > 1000 {
+				return ListApplicationCollaboratorsRequestValidationError{
+					field:  "limit",
+					reason: "value must be less than or equal to 1000",
+				}
+			}
+
 		case "page":
 			// no validation rules for Page
 		default:

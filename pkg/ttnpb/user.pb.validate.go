@@ -1069,7 +1069,14 @@ func (m *ListUserAPIKeysRequest) ValidateFields(paths ...string) error {
 			}
 
 		case "limit":
-			// no validation rules for Limit
+
+			if m.GetLimit() > 1000 {
+				return ListUserAPIKeysRequestValidationError{
+					field:  "limit",
+					reason: "value must be less than or equal to 1000",
+				}
+			}
+
 		case "page":
 			// no validation rules for Page
 		default:
@@ -1576,7 +1583,14 @@ func (m *ListInvitationsRequest) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "limit":
-			// no validation rules for Limit
+
+			if m.GetLimit() > 1000 {
+				return ListInvitationsRequestValidationError{
+					field:  "limit",
+					reason: "value must be less than or equal to 1000",
+				}
+			}
+
 		case "page":
 			// no validation rules for Page
 		default:
@@ -2387,7 +2401,14 @@ func (m *ListUserSessionsRequest) ValidateFields(paths ...string) error {
 		case "order":
 			// no validation rules for Order
 		case "limit":
-			// no validation rules for Limit
+
+			if m.GetLimit() > 1000 {
+				return ListUserSessionsRequestValidationError{
+					field:  "limit",
+					reason: "value must be less than or equal to 1000",
+				}
+			}
+
 		case "page":
 			// no validation rules for Page
 		default:

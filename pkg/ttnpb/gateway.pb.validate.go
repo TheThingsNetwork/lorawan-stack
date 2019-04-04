@@ -1140,7 +1140,14 @@ func (m *ListGatewaysRequest) ValidateFields(paths ...string) error {
 		case "order":
 			// no validation rules for Order
 		case "limit":
-			// no validation rules for Limit
+
+			if m.GetLimit() > 1000 {
+				return ListGatewaysRequestValidationError{
+					field:  "limit",
+					reason: "value must be less than or equal to 1000",
+				}
+			}
+
 		case "page":
 			// no validation rules for Page
 		default:
@@ -1447,7 +1454,14 @@ func (m *ListGatewayAPIKeysRequest) ValidateFields(paths ...string) error {
 			}
 
 		case "limit":
-			// no validation rules for Limit
+
+			if m.GetLimit() > 1000 {
+				return ListGatewayAPIKeysRequestValidationError{
+					field:  "limit",
+					reason: "value must be less than or equal to 1000",
+				}
+			}
+
 		case "page":
 			// no validation rules for Page
 		default:
@@ -1768,7 +1782,14 @@ func (m *ListGatewayCollaboratorsRequest) ValidateFields(paths ...string) error 
 			}
 
 		case "limit":
-			// no validation rules for Limit
+
+			if m.GetLimit() > 1000 {
+				return ListGatewayCollaboratorsRequestValidationError{
+					field:  "limit",
+					reason: "value must be less than or equal to 1000",
+				}
+			}
+
 		case "page":
 			// no validation rules for Page
 		default:
