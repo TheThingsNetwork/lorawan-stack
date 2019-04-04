@@ -30,9 +30,9 @@
       "http": [
         {
           "method": "get",
-          "pattern": "/applications/{application_id}/api-keys",
+          "pattern": "/applications/{application_ids.application_id}/api-keys",
           "parameters": [
-            "application_id"
+            "application_ids.application_id"
           ]
         }
       ]
@@ -69,9 +69,9 @@
       "http": [
         {
           "method": "get",
-          "pattern": "/applications/{application_id}/collaborators",
+          "pattern": "/applications/{application_ids.application_id}/collaborators",
           "parameters": [
-            "application_id"
+            "application_ids.application_id"
           ]
         }
       ]
@@ -404,9 +404,9 @@
       "http": [
         {
           "method": "get",
-          "pattern": "/clients/{client_id}/collaborators",
+          "pattern": "/clients/{client_ids.client_id}/collaborators",
           "parameters": [
-            "client_id"
+            "client_ids.client_id"
           ]
         }
       ]
@@ -641,9 +641,9 @@
       "http": [
         {
           "method": "get",
-          "pattern": "/gateways/{gateway_id}/api-keys",
+          "pattern": "/gateways/{gateway_ids.gateway_id}/api-keys",
           "parameters": [
-            "gateway_id"
+            "gateway_ids.gateway_id"
           ]
         }
       ]
@@ -680,9 +680,9 @@
       "http": [
         {
           "method": "get",
-          "pattern": "/gateways/{gateway_id}/collaborators",
+          "pattern": "/gateways/{gateway_ids.gateway_id}/collaborators",
           "parameters": [
-            "gateway_id"
+            "gateway_ids.gateway_id"
           ]
         }
       ]
@@ -1110,9 +1110,9 @@
       "http": [
         {
           "method": "get",
-          "pattern": "/organizations/{organization_id}/api-keys",
+          "pattern": "/organizations/{organization_ids.organization_id}/api-keys",
           "parameters": [
-            "organization_id"
+            "organization_ids.organization_id"
           ]
         }
       ]
@@ -1149,9 +1149,9 @@
       "http": [
         {
           "method": "get",
-          "pattern": "/organizations/{organization_id}/collaborators",
+          "pattern": "/organizations/{organization_ids.organization_id}/collaborators",
           "parameters": [
-            "organization_id"
+            "organization_ids.organization_id"
           ]
         }
       ]
@@ -1323,9 +1323,9 @@
       "http": [
         {
           "method": "get",
-          "pattern": "/users/{user_id}/api-keys",
+          "pattern": "/users/{user_ids.user_id}/api-keys",
           "parameters": [
-            "user_id"
+            "user_ids.user_id"
           ]
         }
       ]
