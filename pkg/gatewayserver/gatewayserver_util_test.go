@@ -68,6 +68,8 @@ func (ns *mockNS) HandleUplink(ctx context.Context, msg *ttnpb.UplinkMessage) (*
 }
 
 type mockIS struct {
+	ttnpb.GatewayRegistryServer
+	ttnpb.GatewayAccessServer
 	gateways     map[string]*ttnpb.Gateway
 	gatewayAuths map[string][]string
 }
@@ -147,34 +149,6 @@ func (is *mockIS) ListRights(ctx context.Context, ids *ttnpb.GatewayIdentifiers)
 		}
 	}
 	return
-}
-
-func (is *mockIS) Create(context.Context, *ttnpb.CreateGatewayRequest) (*ttnpb.Gateway, error) {
-	return nil, errors.New("not implemented")
-}
-func (is *mockIS) List(context.Context, *ttnpb.ListGatewaysRequest) (*ttnpb.Gateways, error) {
-	return nil, errors.New("not implemented")
-}
-func (is *mockIS) Update(context.Context, *ttnpb.UpdateGatewayRequest) (*ttnpb.Gateway, error) {
-	return nil, errors.New("not implemented")
-}
-func (is *mockIS) Delete(context.Context, *ttnpb.GatewayIdentifiers) (*pbtypes.Empty, error) {
-	return nil, errors.New("not implemented")
-}
-func (is *mockIS) CreateAPIKey(context.Context, *ttnpb.CreateGatewayAPIKeyRequest) (*ttnpb.APIKey, error) {
-	return nil, errors.New("not implemented")
-}
-func (is *mockIS) ListAPIKeys(context.Context, *ttnpb.GatewayIdentifiers) (*ttnpb.APIKeys, error) {
-	return nil, errors.New("not implemented")
-}
-func (is *mockIS) UpdateAPIKey(context.Context, *ttnpb.UpdateGatewayAPIKeyRequest) (*ttnpb.APIKey, error) {
-	return nil, errors.New("not implemented")
-}
-func (is *mockIS) SetCollaborator(context.Context, *ttnpb.SetGatewayCollaboratorRequest) (*pbtypes.Empty, error) {
-	return nil, errors.New("not implemented")
-}
-func (is *mockIS) ListCollaborators(context.Context, *ttnpb.GatewayIdentifiers) (*ttnpb.Collaborators, error) {
-	return nil, errors.New("not implemented")
 }
 
 func randomJoinRequestPayload(joinEUI, devEUI types.EUI64) []byte {
