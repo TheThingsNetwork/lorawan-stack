@@ -152,6 +152,7 @@ func init() {
 		// No LoRaWAN Regional Parameters 1.0.1
 		regionalParameters1_0_2RevA: bandIdentity,
 		regionalParameters1_0_2RevB: bandIdentity,
+		regionalParameters1_0_3RevA: bandIdentity,
 		regionalParameters1_1RevA:   bandIdentity,
 	}
 	All[AS_923] = as_923

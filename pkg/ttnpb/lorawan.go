@@ -97,25 +97,13 @@ func (v MACVersion) Compare(o MACVersion) int {
 // EncryptFOpts reports whether v requires MAC commands in FOpts to be encrypted.
 // EncryptFOpts panics, if v.Validate() returns non-nil error.
 func (v MACVersion) EncryptFOpts() bool {
-	switch v {
-	case MAC_V1_0, MAC_V1_0_1, MAC_V1_0_2, MAC_V1_0_3:
-		return false
-	case MAC_V1_1:
-		return true
-	}
-	panic(v.Validate())
+	return v.Compare(MAC_V1_1) >= 0
 }
 
 // HasMaxFCntGap reports whether v defines a MaxFCntGap.
 // HasMaxFCntGap panics, if v.Validate() returns non-nil error.
 func (v MACVersion) HasMaxFCntGap() bool {
-	switch v {
-	case MAC_V1_0, MAC_V1_0_1, MAC_V1_0_2, MAC_V1_0_3:
-		return true
-	case MAC_V1_1:
-		return false
-	}
-	panic(v.Validate())
+	return v.Compare(MAC_V1_1) < 0
 }
 
 // String implements fmt.Stringer.

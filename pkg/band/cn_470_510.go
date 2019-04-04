@@ -150,6 +150,7 @@ func init() {
 		regionalParameters1_0_1:     bandIdentity,
 		regionalParameters1_0_2RevA: bandIdentity,
 		regionalParameters1_0_2RevB: disableCFList1_0_2,
+		regionalParameters1_0_3RevA: bandIdentity,
 		regionalParameters1_1RevA:   bandIdentity,
 	}
 	All[CN_470_510] = cn_470_510

@@ -192,6 +192,7 @@ type Band struct {
 	regionalParameters1_0_1     versionSwap
 	regionalParameters1_0_2RevA versionSwap
 	regionalParameters1_0_2RevB versionSwap
+	regionalParameters1_0_3RevA versionSwap
 	regionalParameters1_1RevA   versionSwap
 }
 
@@ -233,6 +234,7 @@ func (b Band) downgrades() []swapParameters {
 	return []swapParameters{
 		{version: ttnpb.PHY_V1_1_REV_B, downgrade: bandIdentity},
 		{version: ttnpb.PHY_V1_1_REV_A, downgrade: b.regionalParameters1_1RevA},
+		{version: ttnpb.PHY_V1_0_3_REV_A, downgrade: b.regionalParameters1_0_3RevA},
 		{version: ttnpb.PHY_V1_0_2_REV_B, downgrade: b.regionalParameters1_0_2RevB},
 		{version: ttnpb.PHY_V1_0_2_REV_A, downgrade: b.regionalParameters1_0_2RevA},
 		{version: ttnpb.PHY_V1_0_1, downgrade: b.regionalParameters1_0_1},
