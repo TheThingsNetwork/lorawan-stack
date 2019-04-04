@@ -203,7 +203,7 @@ func (js Js) Messages() error {
 		}
 		sh.Rm(".cache/messages")
 		sh.Run("mdir", "-p", "pkg/webui/locales")
-		return babel("-q", "pkg/webui")
+		return babel("pkg/webui")
 	}
 	return nil
 }
