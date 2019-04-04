@@ -81,6 +81,13 @@ func (is *IdentityServer) listUserAPIKeys(ctx context.Context, req *ttnpb.ListUs
 	if err = rights.RequireUser(ctx, req.UserIdentifiers, ttnpb.RIGHT_USER_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
+	var total uint64
+	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)
+	defer func() {
+		if err == nil {
+			setTotalHeader(ctx, total)
+		}
+	}()
 	keys = &ttnpb.APIKeys{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		keys.APIKeys, err = store.GetAPIKeyStore(db).FindAPIKeys(ctx, req.EntityIdentifiers())

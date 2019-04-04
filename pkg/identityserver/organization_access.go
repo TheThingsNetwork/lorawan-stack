@@ -84,6 +84,13 @@ func (is *IdentityServer) listOrganizationAPIKeys(ctx context.Context, req *ttnp
 	if err = rights.RequireOrganization(ctx, req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
+	var total uint64
+	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)
+	defer func() {
+		if err == nil {
+			setTotalHeader(ctx, total)
+		}
+	}()
 	keys = &ttnpb.APIKeys{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		keys.APIKeys, err = store.GetAPIKeyStore(db).FindAPIKeys(ctx, req.EntityIdentifiers())
@@ -172,6 +179,13 @@ func (is *IdentityServer) listOrganizationCollaborators(ctx context.Context, req
 	if err = rights.RequireOrganization(ctx, req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS); err != nil {
 		return nil, err
 	}
+	var total uint64
+	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)
+	defer func() {
+		if err == nil {
+			setTotalHeader(ctx, total)
+		}
+	}()
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		memberRights, err := store.GetMembershipStore(db).FindMembers(ctx, req.EntityIdentifiers())
 		if err != nil {
