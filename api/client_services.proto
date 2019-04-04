@@ -92,9 +92,9 @@ service ClientAccess {
     };
   };
 
-  rpc ListCollaborators(ClientIdentifiers) returns (Collaborators) {
+  rpc ListCollaborators(ListClientCollaboratorsRequest) returns (Collaborators) {
     option (google.api.http) = {
-      get: "/clients/{client_id}/collaborators"
+      get: "/clients/{client_ids.client_id}/collaborators"
     };
   };
 }

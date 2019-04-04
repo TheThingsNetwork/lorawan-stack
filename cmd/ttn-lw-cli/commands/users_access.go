@@ -65,7 +65,9 @@ var (
 			if err != nil {
 				return err
 			}
-			res, err := ttnpb.NewUserAccessClient(is).ListAPIKeys(ctx, usrID)
+			res, err := ttnpb.NewUserAccessClient(is).ListAPIKeys(ctx, &ttnpb.ListUserAPIKeysRequest{
+				UserIdentifiers: *usrID,
+			})
 			if err != nil {
 				return err
 			}

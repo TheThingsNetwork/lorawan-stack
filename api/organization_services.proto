@@ -82,9 +82,9 @@ service OrganizationAccess {
     };
   };
 
-  rpc ListAPIKeys(OrganizationIdentifiers) returns (APIKeys) {
+  rpc ListAPIKeys(ListOrganizationAPIKeysRequest) returns (APIKeys) {
     option (google.api.http) = {
-      get: "/organizations/{organization_id}/api-keys"
+      get: "/organizations/{organization_ids.organization_id}/api-keys"
     };
   };
 
@@ -109,9 +109,9 @@ service OrganizationAccess {
     };
   };
 
-  rpc ListCollaborators(OrganizationIdentifiers) returns (Collaborators) {
+  rpc ListCollaborators(ListOrganizationCollaboratorsRequest) returns (Collaborators) {
     option (google.api.http) = {
-      get: "/organizations/{organization_id}/collaborators"
+      get: "/organizations/{organization_ids.organization_id}/collaborators"
     };
   };
 }

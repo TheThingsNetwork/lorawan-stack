@@ -1041,6 +1041,99 @@ var _ interface {
 	ErrorName() string
 } = UpdateUserPasswordRequestValidationError{}
 
+// ValidateFields checks the field values on ListUserAPIKeysRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ListUserAPIKeysRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ListUserAPIKeysRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "user_ids":
+
+			if v, ok := interface{}(&m.UserIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ListUserAPIKeysRequestValidationError{
+						field:  "user_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return ListUserAPIKeysRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ListUserAPIKeysRequestValidationError is the validation error returned by
+// ListUserAPIKeysRequest.ValidateFields if the designated constraints aren't met.
+type ListUserAPIKeysRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListUserAPIKeysRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListUserAPIKeysRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListUserAPIKeysRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListUserAPIKeysRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListUserAPIKeysRequestValidationError) ErrorName() string {
+	return "ListUserAPIKeysRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListUserAPIKeysRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListUserAPIKeysRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListUserAPIKeysRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListUserAPIKeysRequestValidationError{}
+
 // ValidateFields checks the field values on CreateUserAPIKeyRequest with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.

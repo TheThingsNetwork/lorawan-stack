@@ -313,6 +313,35 @@ func (dst *UpdateOrganizationRequest) SetFields(src *UpdateOrganizationRequest, 
 	return nil
 }
 
+func (dst *ListOrganizationAPIKeysRequest) SetFields(src *ListOrganizationAPIKeysRequest, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "organization_ids":
+			if len(subs) > 0 {
+				newDst := &dst.OrganizationIdentifiers
+				var newSrc *OrganizationIdentifiers
+				if src != nil {
+					newSrc = &src.OrganizationIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.OrganizationIdentifiers = src.OrganizationIdentifiers
+				} else {
+					var zero OrganizationIdentifiers
+					dst.OrganizationIdentifiers = zero
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *CreateOrganizationAPIKeyRequest) SetFields(src *CreateOrganizationAPIKeyRequest, paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
@@ -398,6 +427,35 @@ func (dst *UpdateOrganizationAPIKeyRequest) SetFields(src *UpdateOrganizationAPI
 				} else {
 					var zero APIKey
 					dst.APIKey = zero
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ListOrganizationCollaboratorsRequest) SetFields(src *ListOrganizationCollaboratorsRequest, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "organization_ids":
+			if len(subs) > 0 {
+				newDst := &dst.OrganizationIdentifiers
+				var newSrc *OrganizationIdentifiers
+				if src != nil {
+					newSrc = &src.OrganizationIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.OrganizationIdentifiers = src.OrganizationIdentifiers
+				} else {
+					var zero OrganizationIdentifiers
+					dst.OrganizationIdentifiers = zero
 				}
 			}
 

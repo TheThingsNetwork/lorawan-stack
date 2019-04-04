@@ -100,6 +100,14 @@ var UpdateApplicationRequestFieldPathsTopLevel = []string{
 	"application",
 	"field_mask",
 }
+var ListApplicationAPIKeysRequestFieldPathsNested = []string{
+	"application_ids",
+	"application_ids.application_id",
+}
+
+var ListApplicationAPIKeysRequestFieldPathsTopLevel = []string{
+	"application_ids",
+}
 var CreateApplicationAPIKeyRequestFieldPathsNested = []string{
 	"application_ids",
 	"application_ids.application_id",
@@ -124,6 +132,14 @@ var UpdateApplicationAPIKeyRequestFieldPathsNested = []string{
 
 var UpdateApplicationAPIKeyRequestFieldPathsTopLevel = []string{
 	"api_key",
+	"application_ids",
+}
+var ListApplicationCollaboratorsRequestFieldPathsNested = []string{
+	"application_ids",
+	"application_ids.application_id",
+}
+
+var ListApplicationCollaboratorsRequestFieldPathsTopLevel = []string{
 	"application_ids",
 }
 var SetApplicationCollaboratorRequestFieldPathsNested = []string{

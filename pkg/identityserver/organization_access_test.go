@@ -125,13 +125,17 @@ func TestOrganizationAccessPermissionDenied(t *testing.T) {
 		a.So(rights.Rights, should.BeEmpty)
 		a.So(err, should.BeNil)
 
-		APIKeys, err := reg.ListAPIKeys(ctx, &organizationID)
+		APIKeys, err := reg.ListAPIKeys(ctx, &ttnpb.ListOrganizationAPIKeysRequest{
+			OrganizationIdentifiers: organizationID,
+		})
 
 		a.So(APIKeys, should.BeNil)
 		a.So(err, should.NotBeNil)
 		a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
-		collaborators, err := reg.ListCollaborators(ctx, &organizationID)
+		collaborators, err := reg.ListCollaborators(ctx, &ttnpb.ListOrganizationCollaboratorsRequest{
+			OrganizationIdentifiers: organizationID,
+		})
 
 		a.So(collaborators, should.BeNil)
 		a.So(err, should.NotBeNil)
@@ -216,7 +220,9 @@ func TestOrganizationAccessCRUD(t *testing.T) {
 		a.So(err, should.BeNil)
 
 		organizationAPIKeys := organizationAPIKeys(&organizationID)
-		APIKeys, err := reg.ListAPIKeys(ctx, &organizationID, creds)
+		APIKeys, err := reg.ListAPIKeys(ctx, &ttnpb.ListOrganizationAPIKeysRequest{
+			OrganizationIdentifiers: organizationID,
+		}, creds)
 
 		a.So(APIKeys, should.NotBeNil)
 		a.So(len(APIKeys.APIKeys), should.Equal, len(organizationAPIKeys.APIKeys))
@@ -226,7 +232,9 @@ func TestOrganizationAccessCRUD(t *testing.T) {
 			a.So(APIkey.ID, should.Equal, organizationAPIKeys.APIKeys[i].ID)
 		}
 
-		collaborators, err := reg.ListCollaborators(ctx, &organizationID, creds)
+		collaborators, err := reg.ListCollaborators(ctx, &ttnpb.ListOrganizationCollaboratorsRequest{
+			OrganizationIdentifiers: organizationID,
+		}, creds)
 
 		a.So(collaborators, should.NotBeNil)
 		a.So(collaborators.Collaborators, should.NotBeEmpty)

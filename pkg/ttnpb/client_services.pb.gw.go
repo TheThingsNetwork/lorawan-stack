@@ -344,8 +344,12 @@ func request_ClientAccess_SetCollaborator_0(ctx context.Context, marshaler runti
 
 }
 
+var (
+	filter_ClientAccess_ListCollaborators_0 = &utilities.DoubleArray{Encoding: map[string]int{"client_ids": 0, "client_id": 1}, Base: []int{1, 1, 1, 0}, Check: []int{0, 1, 2, 3}}
+)
+
 func request_ClientAccess_ListCollaborators_0(ctx context.Context, marshaler runtime.Marshaler, client ClientAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq ClientIdentifiers
+	var protoReq ListClientCollaboratorsRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -355,15 +359,19 @@ func request_ClientAccess_ListCollaborators_0(ctx context.Context, marshaler run
 		_   = err
 	)
 
-	val, ok = pathParams["client_id"]
+	val, ok = pathParams["client_ids.client_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "client_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "client_ids.client_id")
 	}
 
-	protoReq.ClientID, err = runtime.String(val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "client_ids.client_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "client_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "client_ids.client_id", err)
+	}
+
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_ClientAccess_ListCollaborators_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := client.ListCollaborators(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -714,7 +722,7 @@ var (
 
 	pattern_ClientAccess_SetCollaborator_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"clients", "client_ids.client_id", "collaborators"}, ""))
 
-	pattern_ClientAccess_ListCollaborators_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"clients", "client_id", "collaborators"}, ""))
+	pattern_ClientAccess_ListCollaborators_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"clients", "client_ids.client_id", "collaborators"}, ""))
 )
 
 var (

@@ -65,7 +65,9 @@ var (
 			if err != nil {
 				return err
 			}
-			res, err := ttnpb.NewApplicationAccessClient(is).ListCollaborators(ctx, appID)
+			res, err := ttnpb.NewApplicationAccessClient(is).ListCollaborators(ctx, &ttnpb.ListApplicationCollaboratorsRequest{
+				ApplicationIdentifiers: *appID,
+			})
 			if err != nil {
 				return err
 			}
@@ -159,7 +161,9 @@ var (
 			if err != nil {
 				return err
 			}
-			res, err := ttnpb.NewApplicationAccessClient(is).ListAPIKeys(ctx, appID)
+			res, err := ttnpb.NewApplicationAccessClient(is).ListAPIKeys(ctx, &ttnpb.ListApplicationAPIKeysRequest{
+				ApplicationIdentifiers: *appID,
+			})
 			if err != nil {
 				return err
 			}

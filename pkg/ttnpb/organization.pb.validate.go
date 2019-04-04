@@ -731,6 +731,100 @@ var _ interface {
 	ErrorName() string
 } = UpdateOrganizationRequestValidationError{}
 
+// ValidateFields checks the field values on ListOrganizationAPIKeysRequest
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *ListOrganizationAPIKeysRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ListOrganizationAPIKeysRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "organization_ids":
+
+			if v, ok := interface{}(&m.OrganizationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ListOrganizationAPIKeysRequestValidationError{
+						field:  "organization_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return ListOrganizationAPIKeysRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ListOrganizationAPIKeysRequestValidationError is the validation error
+// returned by ListOrganizationAPIKeysRequest.ValidateFields if the designated
+// constraints aren't met.
+type ListOrganizationAPIKeysRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListOrganizationAPIKeysRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListOrganizationAPIKeysRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListOrganizationAPIKeysRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListOrganizationAPIKeysRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListOrganizationAPIKeysRequestValidationError) ErrorName() string {
+	return "ListOrganizationAPIKeysRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListOrganizationAPIKeysRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListOrganizationAPIKeysRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListOrganizationAPIKeysRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListOrganizationAPIKeysRequestValidationError{}
+
 // ValidateFields checks the field values on CreateOrganizationAPIKeyRequest
 // with the rules defined in the proto definition for this message. If any
 // rules are violated, an error is returned.
@@ -953,6 +1047,100 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = UpdateOrganizationAPIKeyRequestValidationError{}
+
+// ValidateFields checks the field values on
+// ListOrganizationCollaboratorsRequest with the rules defined in the proto
+// definition for this message. If any rules are violated, an error is returned.
+func (m *ListOrganizationCollaboratorsRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ListOrganizationCollaboratorsRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "organization_ids":
+
+			if v, ok := interface{}(&m.OrganizationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ListOrganizationCollaboratorsRequestValidationError{
+						field:  "organization_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return ListOrganizationCollaboratorsRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ListOrganizationCollaboratorsRequestValidationError is the validation error
+// returned by ListOrganizationCollaboratorsRequest.ValidateFields if the
+// designated constraints aren't met.
+type ListOrganizationCollaboratorsRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListOrganizationCollaboratorsRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListOrganizationCollaboratorsRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListOrganizationCollaboratorsRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListOrganizationCollaboratorsRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListOrganizationCollaboratorsRequestValidationError) ErrorName() string {
+	return "ListOrganizationCollaboratorsRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListOrganizationCollaboratorsRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListOrganizationCollaboratorsRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListOrganizationCollaboratorsRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListOrganizationCollaboratorsRequestValidationError{}
 
 // ValidateFields checks the field values on SetOrganizationCollaboratorRequest
 // with the rules defined in the proto definition for this message. If any

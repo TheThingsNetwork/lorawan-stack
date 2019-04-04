@@ -65,7 +65,9 @@ var (
 			if err != nil {
 				return err
 			}
-			res, err := ttnpb.NewOrganizationAccessClient(is).ListCollaborators(ctx, orgID)
+			res, err := ttnpb.NewOrganizationAccessClient(is).ListCollaborators(ctx, &ttnpb.ListOrganizationCollaboratorsRequest{
+				OrganizationIdentifiers: *orgID,
+			})
 			if err != nil {
 				return err
 			}
@@ -159,7 +161,9 @@ var (
 			if err != nil {
 				return err
 			}
-			res, err := ttnpb.NewOrganizationAccessClient(is).ListAPIKeys(ctx, orgID)
+			res, err := ttnpb.NewOrganizationAccessClient(is).ListAPIKeys(ctx, &ttnpb.ListOrganizationAPIKeysRequest{
+				OrganizationIdentifiers: *orgID,
+			})
 			if err != nil {
 				return err
 			}

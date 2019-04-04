@@ -65,7 +65,9 @@ var (
 			if err != nil {
 				return err
 			}
-			res, err := ttnpb.NewGatewayAccessClient(is).ListCollaborators(ctx, gtwID)
+			res, err := ttnpb.NewGatewayAccessClient(is).ListCollaborators(ctx, &ttnpb.ListGatewayCollaboratorsRequest{
+				GatewayIdentifiers: *gtwID,
+			})
 			if err != nil {
 				return err
 			}
@@ -159,7 +161,9 @@ var (
 			if err != nil {
 				return err
 			}
-			res, err := ttnpb.NewGatewayAccessClient(is).ListAPIKeys(ctx, gtwID)
+			res, err := ttnpb.NewGatewayAccessClient(is).ListAPIKeys(ctx, &ttnpb.ListGatewayAPIKeysRequest{
+				GatewayIdentifiers: *gtwID,
+			})
 			if err != nil {
 				return err
 			}

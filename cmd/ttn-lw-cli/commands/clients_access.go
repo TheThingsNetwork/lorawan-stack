@@ -65,7 +65,9 @@ var (
 			if err != nil {
 				return err
 			}
-			res, err := ttnpb.NewClientAccessClient(is).ListCollaborators(ctx, cliID)
+			res, err := ttnpb.NewClientAccessClient(is).ListCollaborators(ctx, &ttnpb.ListClientCollaboratorsRequest{
+				ClientIdentifiers: *cliID,
+			})
 			if err != nil {
 				return err
 			}

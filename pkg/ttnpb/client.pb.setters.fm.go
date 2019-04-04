@@ -380,6 +380,35 @@ func (dst *UpdateClientRequest) SetFields(src *UpdateClientRequest, paths ...str
 	return nil
 }
 
+func (dst *ListClientCollaboratorsRequest) SetFields(src *ListClientCollaboratorsRequest, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "client_ids":
+			if len(subs) > 0 {
+				newDst := &dst.ClientIdentifiers
+				var newSrc *ClientIdentifiers
+				if src != nil {
+					newSrc = &src.ClientIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ClientIdentifiers = src.ClientIdentifiers
+				} else {
+					var zero ClientIdentifiers
+					dst.ClientIdentifiers = zero
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *SetClientCollaboratorRequest) SetFields(src *SetClientCollaboratorRequest, paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {

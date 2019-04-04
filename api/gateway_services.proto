@@ -92,9 +92,9 @@ service GatewayAccess {
     };
   };
 
-  rpc ListAPIKeys(GatewayIdentifiers) returns (APIKeys) {
+  rpc ListAPIKeys(ListGatewayAPIKeysRequest) returns (APIKeys) {
     option (google.api.http) = {
-      get: "/gateways/{gateway_id}/api-keys"
+      get: "/gateways/{gateway_ids.gateway_id}/api-keys"
     };
   };
 
@@ -118,9 +118,9 @@ service GatewayAccess {
     };
   };
 
-  rpc ListCollaborators(GatewayIdentifiers) returns (Collaborators) {
+  rpc ListCollaborators(ListGatewayCollaboratorsRequest) returns (Collaborators) {
     option (google.api.http) = {
-      get: "/gateways/{gateway_id}/collaborators"
+      get: "/gateways/{gateway_ids.gateway_id}/collaborators"
     };
   };
 }

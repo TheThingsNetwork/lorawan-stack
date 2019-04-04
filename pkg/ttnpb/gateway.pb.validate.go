@@ -1419,6 +1419,100 @@ var _ interface {
 	ErrorName() string
 } = UpdateGatewayRequestValidationError{}
 
+// ValidateFields checks the field values on ListGatewayAPIKeysRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ListGatewayAPIKeysRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ListGatewayAPIKeysRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "gateway_ids":
+
+			if v, ok := interface{}(&m.GatewayIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ListGatewayAPIKeysRequestValidationError{
+						field:  "gateway_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return ListGatewayAPIKeysRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ListGatewayAPIKeysRequestValidationError is the validation error returned by
+// ListGatewayAPIKeysRequest.ValidateFields if the designated constraints
+// aren't met.
+type ListGatewayAPIKeysRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListGatewayAPIKeysRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListGatewayAPIKeysRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListGatewayAPIKeysRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListGatewayAPIKeysRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListGatewayAPIKeysRequestValidationError) ErrorName() string {
+	return "ListGatewayAPIKeysRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListGatewayAPIKeysRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListGatewayAPIKeysRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListGatewayAPIKeysRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListGatewayAPIKeysRequestValidationError{}
+
 // ValidateFields checks the field values on CreateGatewayAPIKeyRequest with
 // the rules defined in the proto definition for this message. If any rules
 // are violated, an error is returned.
@@ -1641,6 +1735,100 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = UpdateGatewayAPIKeyRequestValidationError{}
+
+// ValidateFields checks the field values on ListGatewayCollaboratorsRequest
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *ListGatewayCollaboratorsRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ListGatewayCollaboratorsRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "gateway_ids":
+
+			if v, ok := interface{}(&m.GatewayIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ListGatewayCollaboratorsRequestValidationError{
+						field:  "gateway_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return ListGatewayCollaboratorsRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ListGatewayCollaboratorsRequestValidationError is the validation error
+// returned by ListGatewayCollaboratorsRequest.ValidateFields if the
+// designated constraints aren't met.
+type ListGatewayCollaboratorsRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListGatewayCollaboratorsRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListGatewayCollaboratorsRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListGatewayCollaboratorsRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListGatewayCollaboratorsRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListGatewayCollaboratorsRequestValidationError) ErrorName() string {
+	return "ListGatewayCollaboratorsRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListGatewayCollaboratorsRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListGatewayCollaboratorsRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListGatewayCollaboratorsRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListGatewayCollaboratorsRequestValidationError{}
 
 // ValidateFields checks the field values on SetGatewayCollaboratorRequest with
 // the rules defined in the proto definition for this message. If any rules

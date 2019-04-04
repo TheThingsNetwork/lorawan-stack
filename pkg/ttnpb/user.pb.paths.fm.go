@@ -166,6 +166,15 @@ var UpdateUserPasswordRequestFieldPathsTopLevel = []string{
 	"old",
 	"user_ids",
 }
+var ListUserAPIKeysRequestFieldPathsNested = []string{
+	"user_ids",
+	"user_ids.email",
+	"user_ids.user_id",
+}
+
+var ListUserAPIKeysRequestFieldPathsTopLevel = []string{
+	"user_ids",
+}
 var CreateUserAPIKeyRequestFieldPathsNested = []string{
 	"name",
 	"rights",

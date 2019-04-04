@@ -125,13 +125,17 @@ func TestApplicationAccessPermissionDenied(t *testing.T) {
 		a.So(rights.Rights, should.BeEmpty)
 		a.So(err, should.BeNil)
 
-		APIKeys, err := reg.ListAPIKeys(ctx, &applicationID)
+		APIKeys, err := reg.ListAPIKeys(ctx, &ttnpb.ListApplicationAPIKeysRequest{
+			ApplicationIdentifiers: applicationID,
+		})
 
 		a.So(APIKeys, should.BeNil)
 		a.So(err, should.NotBeNil)
 		a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
-		collaborators, err := reg.ListCollaborators(ctx, &applicationID)
+		collaborators, err := reg.ListCollaborators(ctx, &ttnpb.ListApplicationCollaboratorsRequest{
+			ApplicationIdentifiers: applicationID,
+		})
 
 		a.So(collaborators, should.BeNil)
 		a.So(err, should.NotBeNil)
@@ -216,7 +220,9 @@ func TestApplicationAccessCRUD(t *testing.T) {
 		a.So(err, should.BeNil)
 
 		applicationAPIKeys := applicationAPIKeys(&applicationID)
-		APIKeys, err := reg.ListAPIKeys(ctx, &applicationID, creds)
+		APIKeys, err := reg.ListAPIKeys(ctx, &ttnpb.ListApplicationAPIKeysRequest{
+			ApplicationIdentifiers: applicationID,
+		}, creds)
 
 		a.So(APIKeys, should.NotBeNil)
 		a.So(err, should.BeNil)
@@ -226,7 +232,9 @@ func TestApplicationAccessCRUD(t *testing.T) {
 			a.So(APIkey.ID, should.Equal, applicationAPIKeys.APIKeys[i].ID)
 		}
 
-		collaborators, err := reg.ListCollaborators(ctx, &applicationID, creds)
+		collaborators, err := reg.ListCollaborators(ctx, &ttnpb.ListApplicationCollaboratorsRequest{
+			ApplicationIdentifiers: applicationID,
+		}, creds)
 
 		a.So(collaborators, should.NotBeNil)
 		a.So(collaborators.Collaborators, should.NotBeEmpty)

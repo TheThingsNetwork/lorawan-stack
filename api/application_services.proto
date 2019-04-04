@@ -89,9 +89,9 @@ service ApplicationAccess {
     };
   };
 
-  rpc ListAPIKeys(ApplicationIdentifiers) returns (APIKeys) {
+  rpc ListAPIKeys(ListApplicationAPIKeysRequest) returns (APIKeys) {
     option (google.api.http) = {
-      get: "/applications/{application_id}/api-keys"
+      get: "/applications/{application_ids.application_id}/api-keys"
     };
   };
 
@@ -113,9 +113,9 @@ service ApplicationAccess {
     };
   };
 
-  rpc ListCollaborators(ApplicationIdentifiers) returns (Collaborators) {
+  rpc ListCollaborators(ListApplicationCollaboratorsRequest) returns (Collaborators) {
     option (google.api.http) = {
-      get: "/applications/{application_id}/collaborators"
+      get: "/applications/{application_ids.application_id}/collaborators"
     };
   };
 }

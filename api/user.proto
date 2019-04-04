@@ -111,6 +111,10 @@ message UpdateUserPasswordRequest {
   string old = 3;
 }
 
+message ListUserAPIKeysRequest {
+  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+}
+
 message CreateUserAPIKeyRequest {
   UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   string name = 2 [(validate.rules).string.max_len = 50];
