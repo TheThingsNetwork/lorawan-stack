@@ -1328,7 +1328,7 @@
     },
     "description": {
       "package": "cmd/ttn-lw-cli/commands",
-      "file": "applications_webhook.go"
+      "file": "applications_webhooks.go"
     }
   },
   "error:cmd/ttn-lw-cli/commands:password_mismatch": {
