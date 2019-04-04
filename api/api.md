@@ -4659,6 +4659,7 @@ Transmission settings for downlink.
 | MAC_V1_0_1 | 2 |  |
 | MAC_V1_0_2 | 3 |  |
 | MAC_V1_1 | 4 |  |
+| MAC_V1_0_3 | 5 |  |
 
 
 
@@ -4731,6 +4732,7 @@ Transmission settings for downlink.
 | PHY_V1_0_2_REV_B | 4 |  |
 | PHY_V1_1_REV_A | 5 |  |
 | PHY_V1_1_REV_B | 6 |  |
+| PHY_V1_0_3_REV_A | 7 |  |
 
 
 
