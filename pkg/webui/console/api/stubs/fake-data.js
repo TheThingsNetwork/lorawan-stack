@@ -76,13 +76,12 @@ const applicationsApiKeys = applications.reduce(function (acc, curr, idx, apps) 
 
 const devices = [ ...new Array(DEVICES_COUNT).keys() ]
   .map(function () {
-    const app = applications[Math.floor(Math.random() * APPLICATIONS_COUNT)]
 
     return {
       ids: {
         device_id: faker.lorem.slug(),
         application_ids: {
-          application_id: app.ids.application_id,
+          application_id: '',
         },
         dev_eui: faker.random.alphaNumeric(16),
         join_eui: faker.random.alphaNumeric(16),
