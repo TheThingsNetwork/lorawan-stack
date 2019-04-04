@@ -62,7 +62,16 @@ func TestPagination(t *testing.T) {
 			func(t *testing.T) {
 				ctx := tc.md.ToIncomingContext(test.Context())
 
+				ctx = WithPagination(ctx, 0, 0, nil)
+
 				limit, offset := limitAndOffsetFromContext(ctx)
+
+				a.So(limit, should.Equal, tc.limit)
+				a.So(offset, should.Equal, tc.offset)
+
+				ctx = WithPagination(test.Context(), uint32(tc.md.Limit), uint32(tc.md.Page), nil)
+
+				limit, offset = limitAndOffsetFromContext(ctx)
 
 				a.So(limit, should.Equal, tc.limit)
 				a.So(offset, should.Equal, tc.offset)
@@ -78,7 +87,7 @@ func TestPagination(t *testing.T) {
 		setTotal(ctx, total)
 		a.So(totalCount, should.BeZeroValue)
 
-		ctx = SetTotalCount(ctx, &totalCount)
+		ctx = WithPagination(ctx, 5, 1, &totalCount)
 		a.So(totalCount, should.BeZeroValue)
 
 		setTotal(ctx, total)

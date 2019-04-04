@@ -21,7 +21,6 @@ import (
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"google.golang.org/grpc"
@@ -236,36 +235,33 @@ func TestOrganizationsPagination(t *testing.T) {
 
 		reg := ttnpb.NewOrganizationRegistryClient(cc)
 
-		md := rpcmetadata.MD{Limit: 2, Page: 1}
-		ctx := md.ToOutgoingContext(test.Context())
-
-		list, err := reg.List(ctx, &ttnpb.ListOrganizationsRequest{
+		list, err := reg.List(test.Context(), &ttnpb.ListOrganizationsRequest{
 			FieldMask:    types.FieldMask{Paths: []string{"name"}},
 			Collaborator: userID.OrganizationOrUserIdentifiers(),
+			Limit:        2,
+			Page:         1,
 		}, creds)
 
 		a.So(list, should.NotBeNil)
 		a.So(list.Organizations, should.HaveLength, 2)
 		a.So(err, should.BeNil)
 
-		md = rpcmetadata.MD{Limit: 2, Page: 2}
-		ctx = md.ToOutgoingContext(test.Context())
-
-		list, err = reg.List(ctx, &ttnpb.ListOrganizationsRequest{
+		list, err = reg.List(test.Context(), &ttnpb.ListOrganizationsRequest{
 			FieldMask:    types.FieldMask{Paths: []string{"name"}},
 			Collaborator: userID.OrganizationOrUserIdentifiers(),
+			Limit:        2,
+			Page:         2,
 		}, creds)
 
 		a.So(list, should.NotBeNil)
 		a.So(list.Organizations, should.HaveLength, 1)
 		a.So(err, should.BeNil)
 
-		md = rpcmetadata.MD{Limit: 2, Page: 3}
-		ctx = md.ToOutgoingContext(test.Context())
-
-		list, err = reg.List(ctx, &ttnpb.ListOrganizationsRequest{
+		list, err = reg.List(test.Context(), &ttnpb.ListOrganizationsRequest{
 			FieldMask:    types.FieldMask{Paths: []string{"name"}},
 			Collaborator: userID.OrganizationOrUserIdentifiers(),
+			Limit:        2,
+			Page:         3,
 		}, creds)
 
 		a.So(list, should.NotBeNil)

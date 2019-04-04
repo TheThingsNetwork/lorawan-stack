@@ -138,7 +138,7 @@ func (is *IdentityServer) listApplications(ctx context.Context, req *ttnpb.ListA
 		}
 	}
 	var total uint64
-	ctx = store.SetTotalCount(ctx, &total)
+	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)
 	defer func() {
 		if err == nil {
 			setTotalHeader(ctx, total)
