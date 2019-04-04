@@ -26,7 +26,8 @@ import (
 type Config struct {
 	Devices             DeviceRegistry         `name:"-"`
 	DownlinkTasks       DownlinkTaskQueue      `name:"-"`
-	NetID               types.NetID            `name:"net_id" description:"NetID of this Network Server"`
+	NetID               types.NetID            `name:"net-id" description:"NetID of this Network Server"`
+	DevAddrPrefixes     []types.DevAddrPrefix  `name:"dev-addr-prefixes" description:""` // TODO
 	DeduplicationWindow time.Duration          `name:"deduplication-window" description:"Time window during which, duplicate messages are collected for metadata"`
 	CooldownWindow      time.Duration          `name:"cooldown-window" description:"Time window starting right after deduplication window, during which, duplicate messages are discarded"`
 	DownlinkPriorities  DownlinkPriorityConfig `name:"downlink-priorities" description:"Downlink message priorities"`

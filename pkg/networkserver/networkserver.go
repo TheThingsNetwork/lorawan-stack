@@ -113,6 +113,8 @@ type NetworkServer struct {
 	devices DeviceRegistry
 
 	netID types.NetID
+	// TODO: Read from configuration
+	devAddrPrefixes []types.DevAddrPrefix
 
 	applicationServersMu *sync.RWMutex
 	applicationServers   map[string]*applicationUpStream
@@ -201,6 +203,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		Component:               c,
 		devices:                 conf.Devices,
 		netID:                   conf.NetID,
+		devAddrPrefixes:         conf.DevAddrPrefixes,
 		applicationServersMu:    &sync.RWMutex{},
 		applicationServers:      make(map[string]*applicationUpStream),
 		metadataAccumulators:    &sync.Map{},
