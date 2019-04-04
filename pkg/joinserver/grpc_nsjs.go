@@ -40,6 +40,7 @@ var supportedMACVersions = [...]ttnpb.MACVersion{
 	ttnpb.MAC_V1_0,
 	ttnpb.MAC_V1_0_1,
 	ttnpb.MAC_V1_0_2,
+	ttnpb.MAC_V1_0_3,
 	ttnpb.MAC_V1_1,
 }
 
@@ -125,8 +126,7 @@ func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			paths := make([]string, 0, 3)
 
 			dn := uint32(binary.BigEndian.Uint16(pld.DevNonce[:]))
-			switch req.SelectedMACVersion {
-			case ttnpb.MAC_V1_1:
+			if req.SelectedMACVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
 				if (dn != 0 || dev.LastDevNonce != 0 || dev.LastJoinNonce != 0) && !dev.ResetsJoinNonces {
 					if dn <= dev.LastDevNonce {
 						return nil, nil, errDevNonceTooSmall
@@ -137,7 +137,7 @@ func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 				}
 				dev.LastDevNonce = dn
 				paths = append(paths, "last_dev_nonce")
-			case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
+			} else {
 				i := sort.Search(len(dev.UsedDevNonces), func(i int) bool { return dev.UsedDevNonces[i] >= dn })
 				if i < len(dev.UsedDevNonces) && dev.UsedDevNonces[i] == dn {
 					return nil, nil, errReuseDevNonce
@@ -146,8 +146,6 @@ func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 				copy(dev.UsedDevNonces[i+1:], dev.UsedDevNonces[i:])
 				dev.UsedDevNonces[i] = dn
 				paths = append(paths, "used_dev_nonces")
-			default:
-				panic("This statement is unreachable. Fix version check.")
 			}
 
 			var b []byte
