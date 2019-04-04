@@ -363,7 +363,7 @@ func TestWebhooks(t *testing.T) {
 			} {
 				t.Run(tc.Name, func(t *testing.T) {
 					a := assertions.New(t)
-					url := fmt.Sprintf("http://%s/api/v3/as/applications/%s/webhooks/%s/down/%s/replace",
+					url := fmt.Sprintf("http://%s/api/v3/as/applications/%s/webhooks/%s/devices/%s/down/replace",
 						httpAddress, tc.ID.ApplicationID, registeredWebhookID, registeredDeviceID.DeviceID,
 					)
 					body := bytes.NewReader([]byte(`{"downlinks":[]}`))
