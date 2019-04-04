@@ -24,11 +24,7 @@ include .make/headers.make
 include .make/git.make
 include .make/go/main.make
 include .make/protos/main.make
-include .make/js/main.make
 include .make/dev.make
-include .make/styl/main.make
-include .make/snap/main.make
-include .make/sdk/main.make
 
 messages:
 	@$(GO) run ./cmd/internal/generate_i18n.go
@@ -42,13 +38,13 @@ docs:
 	@$(GO) run ./cmd/ttn-lw-cli gen-md-doc --log.level=error -o doc/ttn-lw-cli
 	@$(GO) run ./cmd/ttn-lw-cli gen-yaml-doc --log.level=error -o doc/ttn-lw-cli
 
-dev-deps: go.deps js.dev-deps
+dev-deps: go.deps
 
-deps: go.deps sdk.deps sdk.js.build js.deps # NOTE: js.deps needs to be AFTER sdk.js.build
+deps: go.deps
 
-test: go.test js.test sdk.test
+test: go.test
 
-quality: go.quality js.quality styl.quality snap.quality
+quality: go.quality
 
 build-all: $(MAGE)
 	@GO111MODULE=on $(GO) run github.com/goreleaser/goreleaser --snapshot --skip-publish
@@ -56,4 +52,4 @@ build-all: $(MAGE)
 clean: js.clean
 	rm -rf dist
 
-translations: messages js.translations
+translations: messages
