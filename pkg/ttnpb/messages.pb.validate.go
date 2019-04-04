@@ -111,6 +111,18 @@ func (m *UplinkMessage) ValidateFields(paths ...string) error {
 
 		case "correlation_ids":
 
+			for idx, item := range m.GetCorrelationIDs() {
+				_, _ = idx, item
+
+				if utf8.RuneCountInString(item) > 100 {
+					return UplinkMessageValidationError{
+						field:  fmt.Sprintf("correlation_ids[%v]", idx),
+						reason: "value length must be at most 100 runes",
+					}
+				}
+
+			}
+
 		case "gateway_channel_index":
 
 			if m.GetGatewayChannelIndex() > 255 {
@@ -236,6 +248,18 @@ func (m *DownlinkMessage) ValidateFields(paths ...string) error {
 
 		case "correlation_ids":
 
+			for idx, item := range m.GetCorrelationIDs() {
+				_, _ = idx, item
+
+				if utf8.RuneCountInString(item) > 100 {
+					return DownlinkMessageValidationError{
+						field:  fmt.Sprintf("correlation_ids[%v]", idx),
+						reason: "value length must be at most 100 runes",
+					}
+				}
+
+			}
+
 		case "settings":
 			if len(subs) == 0 {
 				subs = []string{
@@ -356,6 +380,18 @@ func (m *TxAcknowledgment) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "correlation_ids":
+
+			for idx, item := range m.GetCorrelationIDs() {
+				_, _ = idx, item
+
+				if utf8.RuneCountInString(item) > 100 {
+					return TxAcknowledgmentValidationError{
+						field:  fmt.Sprintf("correlation_ids[%v]", idx),
+						reason: "value length must be at most 100 runes",
+					}
+				}
+
+			}
 
 		case "result":
 
@@ -895,6 +931,18 @@ func (m *ApplicationDownlink) ValidateFields(paths ...string) error {
 
 		case "correlation_ids":
 
+			for idx, item := range m.GetCorrelationIDs() {
+				_, _ = idx, item
+
+				if utf8.RuneCountInString(item) > 100 {
+					return ApplicationDownlinkValidationError{
+						field:  fmt.Sprintf("correlation_ids[%v]", idx),
+						reason: "value length must be at most 100 runes",
+					}
+				}
+
+			}
+
 		default:
 			return ApplicationDownlinkValidationError{
 				field:  name,
@@ -1301,6 +1349,18 @@ func (m *ApplicationUp) ValidateFields(paths ...string) error {
 			}
 
 		case "correlation_ids":
+
+			for idx, item := range m.GetCorrelationIDs() {
+				_, _ = idx, item
+
+				if utf8.RuneCountInString(item) > 100 {
+					return ApplicationUpValidationError{
+						field:  fmt.Sprintf("correlation_ids[%v]", idx),
+						reason: "value length must be at most 100 runes",
+					}
+				}
+
+			}
 
 		case "up":
 			if len(subs) == 0 {

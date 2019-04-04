@@ -37,12 +37,12 @@ message JoinRequest {
   // Optional CFList.
   CFList cf_list = 8 [(gogoproto.customname) = "CFList"];
   reserved 9; // Reserved for CFListType.
-  repeated string correlation_ids = 10 [(gogoproto.customname) = "CorrelationIDs"];
+  repeated string correlation_ids = 10 [(gogoproto.customname) = "CorrelationIDs", (validate.rules).repeated.items.string.max_len = 100];
 }
 
 message JoinResponse {
   bytes raw_payload = 1 [(validate.rules).bytes = {min_len: 17, max_len: 33}];
   SessionKeys session_keys = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   google.protobuf.Duration lifetime = 3 [(gogoproto.nullable) = false, (gogoproto.stdduration) = true];
-  repeated string correlation_ids = 4 [(gogoproto.customname) = "CorrelationIDs"];
+  repeated string correlation_ids = 4 [(gogoproto.customname) = "CorrelationIDs", (validate.rules).repeated.items.string.max_len = 100];
 }

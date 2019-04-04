@@ -218,8 +218,8 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 		atomic.AddUint64(&l.ups, 1)
 		atomic.StoreInt64(&l.lastUpTime, time.Now().UnixNano())
 
-		ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("as:up:%s", events.NewCorrelationID()))
-		up.CorrelationIDs = append(up.CorrelationIDs, events.CorrelationIDsFromContext(ctx)...)
+		ctx := events.ContextWithCorrelationID(ctx, append(up.CorrelationIDs, fmt.Sprintf("as:up:%s", events.NewCorrelationID()))...)
+		up.CorrelationIDs = events.CorrelationIDsFromContext(ctx)
 		registerReceiveUp(ctx, up, l.connName)
 
 		handleUpErr := as.handleUp(ctx, up, l)

@@ -92,6 +92,18 @@ func (m *Event) ValidateFields(paths ...string) error {
 
 		case "correlation_ids":
 
+			for idx, item := range m.GetCorrelationIDs() {
+				_, _ = idx, item
+
+				if utf8.RuneCountInString(item) > 100 {
+					return EventValidationError{
+						field:  fmt.Sprintf("correlation_ids[%v]", idx),
+						reason: "value length must be at most 100 runes",
+					}
+				}
+
+			}
+
 		case "origin":
 			// no validation rules for Origin
 		case "context":
