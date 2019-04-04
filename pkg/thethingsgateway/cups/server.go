@@ -19,13 +19,9 @@ import (
 
 	echo "github.com/labstack/echo/v4"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/web"
-)
-
-const (
-	defaultFirmwarePath  = "https://thethingsproducts.blob.core.windows.net/the-things-gateway/v1"
-	defaultUpdateChannel = "stable"
 )
 
 // Config is the configuration of the The Things Gateay CUPS.
@@ -37,20 +33,25 @@ type Config struct {
 	} `name:"default" description:"Default gateway settings"`
 }
 
+var (
+	errNoDefaultFirmwarePath  = errors.Define("no_default_firmware_path", "no default firmware path specified")
+	errNoDefaultUpdateChannel = errors.Define("no_default_update_channel", "no default update channel specified")
+)
+
 // NewServer returns a new CUPS from this config on top of the component.
-func (conf Config) NewServer(c *component.Component, customOpts ...Option) *Server {
+func (conf Config) NewServer(c *component.Component, customOpts ...Option) (*Server, error) {
 	opts := []Option{
 		WithConfig(conf),
 	}
 	if conf.Default.FirmwareURL == "" {
-		opts = append(opts, WithDefaultFirmwareURL(defaultFirmwarePath))
+		return nil, errNoDefaultFirmwarePath
 	}
 	if conf.Default.UpdateChannel == "" {
-		opts = append(opts, WithDefaultUpdateChannel(defaultUpdateChannel))
+		return nil, errNoDefaultUpdateChannel
 	}
 	s := NewServer(c, append(opts, customOpts...)...)
 	c.RegisterWeb(s)
-	return s
+	return s, nil
 }
 
 // Server implements the CUPS endpoints used by The Things Gateway.

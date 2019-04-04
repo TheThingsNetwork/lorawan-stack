@@ -23,11 +23,19 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
+const (
+	testFirmwarePath  = "https://thethingsproducts.blob.core.windows.net/the-things-gateway/v1"
+	testUpdateChannel = "stable"
+)
+
 func TestAdaptUpdateChannel(t *testing.T) {
 	var conf Config
-	conf.Default.UpdateChannel = "stable"
-	conf.Default.FirmwareURL = defaultFirmwarePath
-	s := conf.NewServer(component.MustNew(test.GetLogger(t), &component.Config{}))
+	conf.Default.UpdateChannel = testUpdateChannel
+	conf.Default.FirmwareURL = testFirmwarePath
+	s, err := conf.NewServer(component.MustNew(test.GetLogger(t), &component.Config{}))
+	if err != nil {
+		t.Error(err)
+	}
 
 	for _, tt := range []struct {
 		Name            string
@@ -37,17 +45,17 @@ func TestAdaptUpdateChannel(t *testing.T) {
 		{
 			Name:            "Empty channel",
 			Channel:         "",
-			ExpectedChannel: fmt.Sprintf("%v/%v", defaultFirmwarePath, "stable"),
+			ExpectedChannel: fmt.Sprintf("%v/%v", testFirmwarePath, "stable"),
 		},
 		{
 			Name:            "Default stable channel",
 			Channel:         "stable",
-			ExpectedChannel: fmt.Sprintf("%v/%v", defaultFirmwarePath, "stable"),
+			ExpectedChannel: fmt.Sprintf("%v/%v", testFirmwarePath, "stable"),
 		},
 		{
 			Name:            "Default beta channel",
 			Channel:         "beta",
-			ExpectedChannel: fmt.Sprintf("%v/%v", defaultFirmwarePath, "beta"),
+			ExpectedChannel: fmt.Sprintf("%v/%v", testFirmwarePath, "beta"),
 		},
 		{
 			Name:            "Custom update channel",

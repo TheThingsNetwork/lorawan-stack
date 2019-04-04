@@ -151,7 +151,8 @@ func TestServer(t *testing.T) {
 
 			s := NewServer(component.MustNew(test.GetLogger(t), &component.Config{}), append([]Option{
 				WithRegistry(store),
-				WithDefaultFirmwareURL(defaultFirmwarePath),
+				WithDefaultFirmwareURL(testFirmwarePath),
+				WithDefaultUpdateChannel(testUpdateChannel),
 			}, tt.Options...)...)
 			req := httptest.NewRequest(http.MethodGet, "/api/v2/gateway/test-gateway", nil)
 			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
