@@ -73,13 +73,17 @@ var (
 			if err != nil {
 				return err
 			}
+			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewApplicationRegistryClient(is).List(ctx, &ttnpb.ListApplicationsRequest{
 				Collaborator: getCollaborator(cmd.Flags()),
 				FieldMask:    types.FieldMask{Paths: paths},
-			})
+				Limit:        limit,
+				Page:         page,
+			}, opt)
 			if err != nil {
 				return err
 			}
+			getTotal()
 
 			return io.Write(os.Stdout, config.OutputFormat, res.Applications)
 		},
@@ -244,6 +248,7 @@ var (
 func init() {
 	applicationsListCommand.Flags().AddFlagSet(collaboratorFlags())
 	applicationsListCommand.Flags().AddFlagSet(selectApplicationFlags)
+	applicationsListCommand.Flags().AddFlagSet(paginationFlags())
 	applicationsCommand.AddCommand(applicationsListCommand)
 	applicationsSearchCommand.Flags().AddFlagSet(searchFlags())
 	applicationsSearchCommand.Flags().AddFlagSet(selectApplicationFlags)

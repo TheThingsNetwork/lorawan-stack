@@ -80,13 +80,20 @@ func (is *IdentityServer) createApplicationAPIKey(ctx context.Context, req *ttnp
 	return key, nil
 }
 
-func (is *IdentityServer) listApplicationAPIKeys(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (keys *ttnpb.APIKeys, err error) {
-	if err = rights.RequireApplication(ctx, *ids, ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS); err != nil {
+func (is *IdentityServer) listApplicationAPIKeys(ctx context.Context, req *ttnpb.ListApplicationAPIKeysRequest) (keys *ttnpb.APIKeys, err error) {
+	if err = rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
+	var total uint64
+	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)
+	defer func() {
+		if err == nil {
+			setTotalHeader(ctx, total)
+		}
+	}()
 	keys = &ttnpb.APIKeys{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		keys.APIKeys, err = store.GetAPIKeyStore(db).FindAPIKeys(ctx, ids.EntityIdentifiers())
+		keys.APIKeys, err = store.GetAPIKeyStore(db).FindAPIKeys(ctx, req.EntityIdentifiers())
 		return err
 	})
 	if err != nil {
@@ -169,12 +176,19 @@ func (is *IdentityServer) setApplicationCollaborator(ctx context.Context, req *t
 	return ttnpb.Empty, nil
 }
 
-func (is *IdentityServer) listApplicationCollaborators(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (collaborators *ttnpb.Collaborators, err error) {
-	if err = rights.RequireApplication(ctx, *ids, ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS); err != nil {
+func (is *IdentityServer) listApplicationCollaborators(ctx context.Context, req *ttnpb.ListApplicationCollaboratorsRequest) (collaborators *ttnpb.Collaborators, err error) {
+	if err = rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS); err != nil {
 		return nil, err
 	}
+	var total uint64
+	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)
+	defer func() {
+		if err == nil {
+			setTotalHeader(ctx, total)
+		}
+	}()
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		memberRights, err := store.GetMembershipStore(db).FindMembers(ctx, ids.EntityIdentifiers())
+		memberRights, err := store.GetMembershipStore(db).FindMembers(ctx, req.EntityIdentifiers())
 		if err != nil {
 			return err
 		}
@@ -203,7 +217,7 @@ func (aa *applicationAccess) ListRights(ctx context.Context, req *ttnpb.Applicat
 func (aa *applicationAccess) CreateAPIKey(ctx context.Context, req *ttnpb.CreateApplicationAPIKeyRequest) (*ttnpb.APIKey, error) {
 	return aa.createApplicationAPIKey(ctx, req)
 }
-func (aa *applicationAccess) ListAPIKeys(ctx context.Context, req *ttnpb.ApplicationIdentifiers) (*ttnpb.APIKeys, error) {
+func (aa *applicationAccess) ListAPIKeys(ctx context.Context, req *ttnpb.ListApplicationAPIKeysRequest) (*ttnpb.APIKeys, error) {
 	return aa.listApplicationAPIKeys(ctx, req)
 }
 func (aa *applicationAccess) UpdateAPIKey(ctx context.Context, req *ttnpb.UpdateApplicationAPIKeyRequest) (*ttnpb.APIKey, error) {
@@ -212,6 +226,6 @@ func (aa *applicationAccess) UpdateAPIKey(ctx context.Context, req *ttnpb.Update
 func (aa *applicationAccess) SetCollaborator(ctx context.Context, req *ttnpb.SetApplicationCollaboratorRequest) (*types.Empty, error) {
 	return aa.setApplicationCollaborator(ctx, req)
 }
-func (aa *applicationAccess) ListCollaborators(ctx context.Context, req *ttnpb.ApplicationIdentifiers) (*ttnpb.Collaborators, error) {
+func (aa *applicationAccess) ListCollaborators(ctx context.Context, req *ttnpb.ListApplicationCollaboratorsRequest) (*ttnpb.Collaborators, error) {
 	return aa.listApplicationCollaborators(ctx, req)
 }

@@ -38,7 +38,7 @@ class Applications {
 
     this.ApiKeys = new ApiKeys(api.ApplicationAccess, {
       parentRoutes: {
-        list: 'application_id',
+        list: 'application_ids.application_id',
         create: 'application_ids.application_id',
         update: 'application_ids.application_id',
       },
@@ -47,7 +47,7 @@ class Applications {
     this.Devices = new Devices(api, { proxy, stackConfig })
     this.Collaborators = new Collaborators(api.ApplicationAccess, {
       parentRoutes: {
-        list: 'application_id',
+        list: 'application_ids.application_id',
         set: 'application_ids.application_id',
       },
     })

@@ -261,6 +261,88 @@
           ]
         },
         {
+          "name": "ListApplicationAPIKeysRequest",
+          "longName": "ListApplicationAPIKeysRequest",
+          "fullName": "ttn.lorawan.v3.ListApplicationAPIKeysRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "application_ids",
+              "description": "",
+              "label": "",
+              "type": "ApplicationIdentifiers",
+              "longType": "ApplicationIdentifiers",
+              "fullType": "ttn.lorawan.v3.ApplicationIdentifiers",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "limit",
+              "description": "Limit the number of results per page.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "page",
+              "description": "Page number for pagination. 0 is interpreted as 1.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ListApplicationCollaboratorsRequest",
+          "longName": "ListApplicationCollaboratorsRequest",
+          "fullName": "ttn.lorawan.v3.ListApplicationCollaboratorsRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "application_ids",
+              "description": "",
+              "label": "",
+              "type": "ApplicationIdentifiers",
+              "longType": "ApplicationIdentifiers",
+              "fullType": "ttn.lorawan.v3.ApplicationIdentifiers",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "limit",
+              "description": "Limit the number of results per page.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "page",
+              "description": "Page number for pagination. 0 is interpreted as 1.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "ListApplicationsRequest",
           "longName": "ListApplicationsRequest",
           "fullName": "ttn.lorawan.v3.ListApplicationsRequest",
@@ -483,9 +565,9 @@
             {
               "name": "ListAPIKeys",
               "description": "",
-              "requestType": "ApplicationIdentifiers",
-              "requestLongType": "ApplicationIdentifiers",
-              "requestFullType": "ttn.lorawan.v3.ApplicationIdentifiers",
+              "requestType": "ListApplicationAPIKeysRequest",
+              "requestLongType": "ListApplicationAPIKeysRequest",
+              "requestFullType": "ttn.lorawan.v3.ListApplicationAPIKeysRequest",
               "requestStreaming": false,
               "responseType": "APIKeys",
               "responseLongType": "APIKeys",
@@ -496,7 +578,7 @@
                   "rules": [
                     {
                       "method": "GET",
-                      "pattern": "/applications/{application_id}/api-keys"
+                      "pattern": "/applications/{application_ids.application_id}/api-keys"
                     }
                   ]
                 }
@@ -551,9 +633,9 @@
             {
               "name": "ListCollaborators",
               "description": "",
-              "requestType": "ApplicationIdentifiers",
-              "requestLongType": "ApplicationIdentifiers",
-              "requestFullType": "ttn.lorawan.v3.ApplicationIdentifiers",
+              "requestType": "ListApplicationCollaboratorsRequest",
+              "requestLongType": "ListApplicationCollaboratorsRequest",
+              "requestFullType": "ttn.lorawan.v3.ListApplicationCollaboratorsRequest",
               "requestStreaming": false,
               "responseType": "Collaborators",
               "responseLongType": "Collaborators",
@@ -564,7 +646,7 @@
                   "rules": [
                     {
                       "method": "GET",
-                      "pattern": "/applications/{application_id}/collaborators"
+                      "pattern": "/applications/{application_ids.application_id}/collaborators"
                     }
                   ]
                 }
@@ -2006,6 +2088,47 @@
           ]
         },
         {
+          "name": "ListClientCollaboratorsRequest",
+          "longName": "ListClientCollaboratorsRequest",
+          "fullName": "ttn.lorawan.v3.ListClientCollaboratorsRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "client_ids",
+              "description": "",
+              "label": "",
+              "type": "ClientIdentifiers",
+              "longType": "ClientIdentifiers",
+              "fullType": "ttn.lorawan.v3.ClientIdentifiers",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "limit",
+              "description": "Limit the number of results per page.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "page",
+              "description": "Page number for pagination. 0 is interpreted as 1.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "ListClientsRequest",
           "longName": "ListClientsRequest",
           "fullName": "ttn.lorawan.v3.ListClientsRequest",
@@ -2197,9 +2320,9 @@
             {
               "name": "ListCollaborators",
               "description": "",
-              "requestType": "ClientIdentifiers",
-              "requestLongType": "ClientIdentifiers",
-              "requestFullType": "ttn.lorawan.v3.ClientIdentifiers",
+              "requestType": "ListClientCollaboratorsRequest",
+              "requestLongType": "ListClientCollaboratorsRequest",
+              "requestFullType": "ttn.lorawan.v3.ListClientCollaboratorsRequest",
               "requestStreaming": false,
               "responseType": "Collaborators",
               "responseLongType": "Collaborators",
@@ -2210,7 +2333,7 @@
                   "rules": [
                     {
                       "method": "GET",
-                      "pattern": "/clients/{client_id}/collaborators"
+                      "pattern": "/clients/{client_ids.client_id}/collaborators"
                     }
                   ]
                 }
@@ -6207,6 +6330,88 @@
           ]
         },
         {
+          "name": "ListGatewayAPIKeysRequest",
+          "longName": "ListGatewayAPIKeysRequest",
+          "fullName": "ttn.lorawan.v3.ListGatewayAPIKeysRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "gateway_ids",
+              "description": "",
+              "label": "",
+              "type": "GatewayIdentifiers",
+              "longType": "GatewayIdentifiers",
+              "fullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "limit",
+              "description": "Limit the number of results per page.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "page",
+              "description": "Page number for pagination. 0 is interpreted as 1.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ListGatewayCollaboratorsRequest",
+          "longName": "ListGatewayCollaboratorsRequest",
+          "fullName": "ttn.lorawan.v3.ListGatewayCollaboratorsRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "gateway_ids",
+              "description": "",
+              "label": "",
+              "type": "GatewayIdentifiers",
+              "longType": "GatewayIdentifiers",
+              "fullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "limit",
+              "description": "Limit the number of results per page.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "page",
+              "description": "Page number for pagination. 0 is interpreted as 1.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "ListGatewaysRequest",
           "longName": "ListGatewaysRequest",
           "fullName": "ttn.lorawan.v3.ListGatewaysRequest",
@@ -6461,9 +6666,9 @@
             {
               "name": "ListAPIKeys",
               "description": "",
-              "requestType": "GatewayIdentifiers",
-              "requestLongType": "GatewayIdentifiers",
-              "requestFullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "requestType": "ListGatewayAPIKeysRequest",
+              "requestLongType": "ListGatewayAPIKeysRequest",
+              "requestFullType": "ttn.lorawan.v3.ListGatewayAPIKeysRequest",
               "requestStreaming": false,
               "responseType": "APIKeys",
               "responseLongType": "APIKeys",
@@ -6474,7 +6679,7 @@
                   "rules": [
                     {
                       "method": "GET",
-                      "pattern": "/gateways/{gateway_id}/api-keys"
+                      "pattern": "/gateways/{gateway_ids.gateway_id}/api-keys"
                     }
                   ]
                 }
@@ -6529,9 +6734,9 @@
             {
               "name": "ListCollaborators",
               "description": "",
-              "requestType": "GatewayIdentifiers",
-              "requestLongType": "GatewayIdentifiers",
-              "requestFullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "requestType": "ListGatewayCollaboratorsRequest",
+              "requestLongType": "ListGatewayCollaboratorsRequest",
+              "requestFullType": "ttn.lorawan.v3.ListGatewayCollaboratorsRequest",
               "requestStreaming": false,
               "responseType": "Collaborators",
               "responseLongType": "Collaborators",
@@ -6542,7 +6747,7 @@
                   "rules": [
                     {
                       "method": "GET",
-                      "pattern": "/gateways/{gateway_id}/collaborators"
+                      "pattern": "/gateways/{gateway_ids.gateway_id}/collaborators"
                     }
                   ]
                 }
@@ -14135,6 +14340,88 @@
           ]
         },
         {
+          "name": "ListOrganizationAPIKeysRequest",
+          "longName": "ListOrganizationAPIKeysRequest",
+          "fullName": "ttn.lorawan.v3.ListOrganizationAPIKeysRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "organization_ids",
+              "description": "",
+              "label": "",
+              "type": "OrganizationIdentifiers",
+              "longType": "OrganizationIdentifiers",
+              "fullType": "ttn.lorawan.v3.OrganizationIdentifiers",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "limit",
+              "description": "Limit the number of results per page.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "page",
+              "description": "Page number for pagination. 0 is interpreted as 1.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ListOrganizationCollaboratorsRequest",
+          "longName": "ListOrganizationCollaboratorsRequest",
+          "fullName": "ttn.lorawan.v3.ListOrganizationCollaboratorsRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "organization_ids",
+              "description": "",
+              "label": "",
+              "type": "OrganizationIdentifiers",
+              "longType": "OrganizationIdentifiers",
+              "fullType": "ttn.lorawan.v3.OrganizationIdentifiers",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "limit",
+              "description": "Limit the number of results per page.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "page",
+              "description": "Page number for pagination. 0 is interpreted as 1.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "ListOrganizationsRequest",
           "longName": "ListOrganizationsRequest",
           "fullName": "ttn.lorawan.v3.ListOrganizationsRequest",
@@ -14490,9 +14777,9 @@
             {
               "name": "ListAPIKeys",
               "description": "",
-              "requestType": "OrganizationIdentifiers",
-              "requestLongType": "OrganizationIdentifiers",
-              "requestFullType": "ttn.lorawan.v3.OrganizationIdentifiers",
+              "requestType": "ListOrganizationAPIKeysRequest",
+              "requestLongType": "ListOrganizationAPIKeysRequest",
+              "requestFullType": "ttn.lorawan.v3.ListOrganizationAPIKeysRequest",
               "requestStreaming": false,
               "responseType": "APIKeys",
               "responseLongType": "APIKeys",
@@ -14503,7 +14790,7 @@
                   "rules": [
                     {
                       "method": "GET",
-                      "pattern": "/organizations/{organization_id}/api-keys"
+                      "pattern": "/organizations/{organization_ids.organization_id}/api-keys"
                     }
                   ]
                 }
@@ -14558,9 +14845,9 @@
             {
               "name": "ListCollaborators",
               "description": "",
-              "requestType": "OrganizationIdentifiers",
-              "requestLongType": "OrganizationIdentifiers",
-              "requestFullType": "ttn.lorawan.v3.OrganizationIdentifiers",
+              "requestType": "ListOrganizationCollaboratorsRequest",
+              "requestLongType": "ListOrganizationCollaboratorsRequest",
+              "requestFullType": "ttn.lorawan.v3.ListOrganizationCollaboratorsRequest",
               "requestStreaming": false,
               "responseType": "Collaborators",
               "responseLongType": "Collaborators",
@@ -14571,7 +14858,7 @@
                   "rules": [
                     {
                       "method": "GET",
-                      "pattern": "/organizations/{organization_id}/collaborators"
+                      "pattern": "/organizations/{organization_ids.organization_id}/collaborators"
                     }
                   ]
                 }
@@ -16048,6 +16335,78 @@
           ]
         },
         {
+          "name": "ListInvitationsRequest",
+          "longName": "ListInvitationsRequest",
+          "fullName": "ttn.lorawan.v3.ListInvitationsRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "limit",
+              "description": "Limit the number of results per page.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "page",
+              "description": "Page number for pagination. 0 is interpreted as 1.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ListUserAPIKeysRequest",
+          "longName": "ListUserAPIKeysRequest",
+          "fullName": "ttn.lorawan.v3.ListUserAPIKeysRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "user_ids",
+              "description": "",
+              "label": "",
+              "type": "UserIdentifiers",
+              "longType": "UserIdentifiers",
+              "fullType": "ttn.lorawan.v3.UserIdentifiers",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "limit",
+              "description": "Limit the number of results per page.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "page",
+              "description": "Page number for pagination. 0 is interpreted as 1.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "ListUserSessionsRequest",
           "longName": "ListUserSessionsRequest",
           "fullName": "ttn.lorawan.v3.ListUserSessionsRequest",
@@ -16740,9 +17099,9 @@
             {
               "name": "ListAPIKeys",
               "description": "",
-              "requestType": "UserIdentifiers",
-              "requestLongType": "UserIdentifiers",
-              "requestFullType": "ttn.lorawan.v3.UserIdentifiers",
+              "requestType": "ListUserAPIKeysRequest",
+              "requestLongType": "ListUserAPIKeysRequest",
+              "requestFullType": "ttn.lorawan.v3.ListUserAPIKeysRequest",
               "requestStreaming": false,
               "responseType": "APIKeys",
               "responseLongType": "APIKeys",
@@ -16753,7 +17112,7 @@
                   "rules": [
                     {
                       "method": "GET",
-                      "pattern": "/users/{user_id}/api-keys"
+                      "pattern": "/users/{user_ids.user_id}/api-keys"
                     }
                   ]
                 }
@@ -16816,9 +17175,9 @@
             {
               "name": "List",
               "description": "",
-              "requestType": "Empty",
-              "requestLongType": ".google.protobuf.Empty",
-              "requestFullType": "google.protobuf.Empty",
+              "requestType": "ListInvitationsRequest",
+              "requestLongType": "ListInvitationsRequest",
+              "requestFullType": "ttn.lorawan.v3.ListInvitationsRequest",
               "requestStreaming": false,
               "responseType": "Invitations",
               "responseLongType": "Invitations",

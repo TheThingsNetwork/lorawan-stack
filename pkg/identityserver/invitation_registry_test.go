@@ -17,7 +17,6 @@ package identityserver
 import (
 	"testing"
 
-	"github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -39,8 +38,7 @@ func TestInvitationsPermissionDenied(t *testing.T) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
 
-		req := &types.Empty{}
-		listInvit, err := reg.List(ctx, req)
+		listInvit, err := reg.List(ctx, &ttnpb.ListInvitationsRequest{})
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
@@ -79,8 +77,7 @@ func TestInvitationsCRUD(t *testing.T) {
 			a.So(errors.IsAlreadyExists(err), should.BeTrue)
 		}
 
-		req := &types.Empty{}
-		invits, err := reg.List(ctx, req, creds)
+		invits, err := reg.List(ctx, &ttnpb.ListInvitationsRequest{}, creds)
 		a.So(err, should.BeNil)
 		a.So(invits.Invitations[0].Email, should.Equal, "foobar@example.com")
 
@@ -89,8 +86,7 @@ func TestInvitationsCRUD(t *testing.T) {
 		}, creds)
 		a.So(err, should.BeNil)
 
-		req = &types.Empty{}
-		invits, err = reg.List(ctx, req, creds)
+		invits, err = reg.List(ctx, &ttnpb.ListInvitationsRequest{}, creds)
 		a.So(err, should.BeNil)
 		a.So(invits.Invitations, should.BeEmpty)
 	})

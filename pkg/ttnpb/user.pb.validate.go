@@ -1041,6 +1041,110 @@ var _ interface {
 	ErrorName() string
 } = UpdateUserPasswordRequestValidationError{}
 
+// ValidateFields checks the field values on ListUserAPIKeysRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ListUserAPIKeysRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ListUserAPIKeysRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "user_ids":
+
+			if v, ok := interface{}(&m.UserIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ListUserAPIKeysRequestValidationError{
+						field:  "user_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "limit":
+
+			if m.GetLimit() > 1000 {
+				return ListUserAPIKeysRequestValidationError{
+					field:  "limit",
+					reason: "value must be less than or equal to 1000",
+				}
+			}
+
+		case "page":
+			// no validation rules for Page
+		default:
+			return ListUserAPIKeysRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ListUserAPIKeysRequestValidationError is the validation error returned by
+// ListUserAPIKeysRequest.ValidateFields if the designated constraints aren't met.
+type ListUserAPIKeysRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListUserAPIKeysRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListUserAPIKeysRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListUserAPIKeysRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListUserAPIKeysRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListUserAPIKeysRequestValidationError) ErrorName() string {
+	return "ListUserAPIKeysRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListUserAPIKeysRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListUserAPIKeysRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListUserAPIKeysRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListUserAPIKeysRequestValidationError{}
+
 // ValidateFields checks the field values on CreateUserAPIKeyRequest with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -1462,6 +1566,98 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = InvitationValidationError{}
+
+// ValidateFields checks the field values on ListInvitationsRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ListInvitationsRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ListInvitationsRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "limit":
+
+			if m.GetLimit() > 1000 {
+				return ListInvitationsRequestValidationError{
+					field:  "limit",
+					reason: "value must be less than or equal to 1000",
+				}
+			}
+
+		case "page":
+			// no validation rules for Page
+		default:
+			return ListInvitationsRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ListInvitationsRequestValidationError is the validation error returned by
+// ListInvitationsRequest.ValidateFields if the designated constraints aren't met.
+type ListInvitationsRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListInvitationsRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListInvitationsRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListInvitationsRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListInvitationsRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListInvitationsRequestValidationError) ErrorName() string {
+	return "ListInvitationsRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListInvitationsRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListInvitationsRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListInvitationsRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListInvitationsRequestValidationError{}
 
 // ValidateFields checks the field values on Invitations with the rules defined
 // in the proto definition for this message. If any rules are violated, an
@@ -2205,7 +2401,14 @@ func (m *ListUserSessionsRequest) ValidateFields(paths ...string) error {
 		case "order":
 			// no validation rules for Order
 		case "limit":
-			// no validation rules for Limit
+
+			if m.GetLimit() > 1000 {
+				return ListUserSessionsRequestValidationError{
+					field:  "limit",
+					reason: "value must be less than or equal to 1000",
+				}
+			}
+
 		case "page":
 			// no validation rules for Page
 		default:

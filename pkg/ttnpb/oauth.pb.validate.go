@@ -399,7 +399,14 @@ func (m *ListOAuthClientAuthorizationsRequest) ValidateFields(paths ...string) e
 		case "order":
 			// no validation rules for Order
 		case "limit":
-			// no validation rules for Limit
+
+			if m.GetLimit() > 1000 {
+				return ListOAuthClientAuthorizationsRequestValidationError{
+					field:  "limit",
+					reason: "value must be less than or equal to 1000",
+				}
+			}
+
 		case "page":
 			// no validation rules for Page
 		default:
@@ -997,7 +1004,14 @@ func (m *ListOAuthAccessTokensRequest) ValidateFields(paths ...string) error {
 		case "order":
 			// no validation rules for Order
 		case "limit":
-			// no validation rules for Limit
+
+			if m.GetLimit() > 1000 {
+				return ListOAuthAccessTokensRequestValidationError{
+					field:  "limit",
+					reason: "value must be less than or equal to 1000",
+				}
+			}
+
 		case "page":
 			// no validation rules for Page
 		default:

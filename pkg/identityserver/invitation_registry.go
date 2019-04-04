@@ -63,7 +63,7 @@ func (is *IdentityServer) sendInvitation(ctx context.Context, in *ttnpb.SendInvi
 	return invitation, nil
 }
 
-func (is *IdentityServer) listInvitations(ctx context.Context, _ *types.Empty) (invitations *ttnpb.Invitations, err error) {
+func (is *IdentityServer) listInvitations(ctx context.Context, req *ttnpb.ListInvitationsRequest) (invitations *ttnpb.Invitations, err error) {
 	authInfo, err := is.authInfo(ctx)
 	if err != nil {
 		return nil, err
@@ -106,7 +106,7 @@ type invitationRegistry struct {
 func (ir *invitationRegistry) Send(ctx context.Context, req *ttnpb.SendInvitationRequest) (*ttnpb.Invitation, error) {
 	return ir.sendInvitation(ctx, req)
 }
-func (ir *invitationRegistry) List(ctx context.Context, req *types.Empty) (*ttnpb.Invitations, error) {
+func (ir *invitationRegistry) List(ctx context.Context, req *ttnpb.ListInvitationsRequest) (*ttnpb.Invitations, error) {
 	return ir.listInvitations(ctx, req)
 }
 func (ir *invitationRegistry) Delete(ctx context.Context, req *ttnpb.DeleteInvitationRequest) (*types.Empty, error) {

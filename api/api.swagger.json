@@ -158,6 +158,44 @@
       }
     },
     "/applications/{application_ids.application_id}/api-keys": {
+      "get": {
+        "operationId": "ListAPIKeys",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3APIKeys"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Limit the number of results per page.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "page",
+            "description": "Page number for pagination. 0 is interpreted as 1.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "ApplicationAccess"
+        ]
+      },
       "post": {
         "operationId": "CreateAPIKey",
         "responses": {
@@ -230,6 +268,44 @@
       }
     },
     "/applications/{application_ids.application_id}/collaborators": {
+      "get": {
+        "operationId": "ListCollaborators",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3Collaborators"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Limit the number of results per page.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "page",
+            "description": "Page number for pagination. 0 is interpreted as 1.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "ApplicationAccess"
+        ]
+      },
       "put": {
         "summary": "Setting a collaborator without rights, removes them.",
         "operationId": "SetCollaborator",
@@ -395,54 +471,6 @@
         ],
         "tags": [
           "ApplicationRegistry"
-        ]
-      }
-    },
-    "/applications/{application_id}/api-keys": {
-      "get": {
-        "operationId": "ListAPIKeys",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v3APIKeys"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "application_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "ApplicationAccess"
-        ]
-      }
-    },
-    "/applications/{application_id}/collaborators": {
-      "get": {
-        "operationId": "ListCollaborators",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v3Collaborators"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "application_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "ApplicationAccess"
         ]
       }
     },
@@ -1357,6 +1385,44 @@
       }
     },
     "/clients/{client_ids.client_id}/collaborators": {
+      "get": {
+        "operationId": "ListCollaborators",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3Collaborators"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "client_ids.client_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Limit the number of results per page.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "page",
+            "description": "Page number for pagination. 0 is interpreted as 1.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "ClientAccess"
+        ]
+      },
       "put": {
         "operationId": "SetCollaborator",
         "responses": {
@@ -1409,30 +1475,6 @@
         ],
         "tags": [
           "ClientRegistry"
-        ]
-      }
-    },
-    "/clients/{client_id}/collaborators": {
-      "get": {
-        "operationId": "ListCollaborators",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v3Collaborators"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "client_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "ClientAccess"
         ]
       }
     },
@@ -1691,6 +1733,52 @@
       }
     },
     "/gateways/{gateway_ids.gateway_id}/api-keys": {
+      "get": {
+        "operationId": "ListAPIKeys",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3APIKeys"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "gateway_ids.gateway_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "gateway_ids.eui",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "limit",
+            "description": "Limit the number of results per page.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "page",
+            "description": "Page number for pagination. 0 is interpreted as 1.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "GatewayAccess"
+        ]
+      },
       "post": {
         "operationId": "CreateAPIKey",
         "responses": {
@@ -1762,6 +1850,52 @@
       }
     },
     "/gateways/{gateway_ids.gateway_id}/collaborators": {
+      "get": {
+        "operationId": "ListCollaborators",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3Collaborators"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "gateway_ids.gateway_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "gateway_ids.eui",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "limit",
+            "description": "Limit the number of results per page.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "page",
+            "description": "Page number for pagination. 0 is interpreted as 1.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "GatewayAccess"
+        ]
+      },
       "put": {
         "operationId": "SetCollaborator",
         "responses": {
@@ -1822,70 +1956,6 @@
         ],
         "tags": [
           "GatewayRegistry"
-        ]
-      }
-    },
-    "/gateways/{gateway_id}/api-keys": {
-      "get": {
-        "operationId": "ListAPIKeys",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v3APIKeys"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "gateway_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "eui",
-            "description": "Secondary identifier, which can only be used in specific requests.",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "format": "byte"
-          }
-        ],
-        "tags": [
-          "GatewayAccess"
-        ]
-      }
-    },
-    "/gateways/{gateway_id}/collaborators": {
-      "get": {
-        "operationId": "ListCollaborators",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v3Collaborators"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "gateway_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "eui",
-            "description": "Secondary identifier, which can only be used in specific requests.",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "format": "byte"
-          }
-        ],
-        "tags": [
-          "GatewayAccess"
         ]
       }
     },
@@ -1964,6 +2034,24 @@
             }
           }
         },
+        "parameters": [
+          {
+            "name": "limit",
+            "description": "Limit the number of results per page.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "page",
+            "description": "Page number for pagination. 0 is interpreted as 1.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
         "tags": [
           "UserInvitationRegistry"
         ]
@@ -2882,6 +2970,45 @@
       }
     },
     "/organizations/{organization_ids.organization_id}/api-keys": {
+      "get": {
+        "operationId": "ListAPIKeys",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3APIKeys"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Limit the number of results per page.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "page",
+            "description": "Page number for pagination. 0 is interpreted as 1.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "OrganizationAccess"
+        ]
+      },
       "post": {
         "operationId": "CreateAPIKey",
         "responses": {
@@ -2955,6 +3082,45 @@
       }
     },
     "/organizations/{organization_ids.organization_id}/collaborators": {
+      "get": {
+        "operationId": "ListCollaborators",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3Collaborators"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Limit the number of results per page.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "page",
+            "description": "Page number for pagination. 0 is interpreted as 1.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "OrganizationAccess"
+        ]
+      },
       "put": {
         "operationId": "SetCollaborator",
         "responses": {
@@ -3009,56 +3175,6 @@
         ],
         "tags": [
           "OrganizationRegistry"
-        ]
-      }
-    },
-    "/organizations/{organization_id}/api-keys": {
-      "get": {
-        "operationId": "ListAPIKeys",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v3APIKeys"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "organization_id",
-            "description": "This ID shares namespace with user IDs.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "OrganizationAccess"
-        ]
-      }
-    },
-    "/organizations/{organization_id}/collaborators": {
-      "get": {
-        "operationId": "ListCollaborators",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v3Collaborators"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "organization_id",
-            "description": "This ID shares namespace with user IDs.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "OrganizationAccess"
         ]
       }
     },
@@ -3935,6 +4051,52 @@
       }
     },
     "/users/{user_ids.user_id}/api-keys": {
+      "get": {
+        "operationId": "ListAPIKeys",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3APIKeys"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Limit the number of results per page.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "page",
+            "description": "Page number for pagination. 0 is interpreted as 1.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "UserAccess"
+        ]
+      },
       "post": {
         "operationId": "CreateAPIKey",
         "responses": {
@@ -4385,38 +4547,6 @@
         ],
         "tags": [
           "UserRegistry"
-        ]
-      }
-    },
-    "/users/{user_id}/api-keys": {
-      "get": {
-        "operationId": "ListAPIKeys",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v3APIKeys"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "user_id",
-            "description": "This ID shares namespace with organization IDs.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "email",
-            "description": "Secondary identifier, which can only be used in specific requests.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "UserAccess"
         ]
       }
     },

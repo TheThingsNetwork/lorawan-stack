@@ -73,13 +73,17 @@ var (
 			if err != nil {
 				return err
 			}
+			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewOrganizationRegistryClient(is).List(ctx, &ttnpb.ListOrganizationsRequest{
 				Collaborator: getCollaborator(cmd.Flags()),
 				FieldMask:    types.FieldMask{Paths: paths},
-			})
+				Limit:        limit,
+				Page:         page,
+			}, opt)
 			if err != nil {
 				return err
 			}
+			getTotal()
 
 			return io.Write(os.Stdout, config.OutputFormat, res.Organizations)
 		},
@@ -244,6 +248,7 @@ var (
 func init() {
 	organizationsListCommand.Flags().AddFlagSet(collaboratorFlags())
 	organizationsListCommand.Flags().AddFlagSet(selectOrganizationFlags)
+	organizationsListCommand.Flags().AddFlagSet(paginationFlags())
 	organizationsCommand.AddCommand(organizationsListCommand)
 	organizationsSearchCommand.Flags().AddFlagSet(searchFlags())
 	organizationsSearchCommand.Flags().AddFlagSet(selectOrganizationFlags)

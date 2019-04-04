@@ -77,13 +77,20 @@ func (is *IdentityServer) createUserAPIKey(ctx context.Context, req *ttnpb.Creat
 	return key, nil
 }
 
-func (is *IdentityServer) listUserAPIKeys(ctx context.Context, ids *ttnpb.UserIdentifiers) (keys *ttnpb.APIKeys, err error) {
-	if err = rights.RequireUser(ctx, *ids, ttnpb.RIGHT_USER_SETTINGS_API_KEYS); err != nil {
+func (is *IdentityServer) listUserAPIKeys(ctx context.Context, req *ttnpb.ListUserAPIKeysRequest) (keys *ttnpb.APIKeys, err error) {
+	if err = rights.RequireUser(ctx, req.UserIdentifiers, ttnpb.RIGHT_USER_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
+	var total uint64
+	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)
+	defer func() {
+		if err == nil {
+			setTotalHeader(ctx, total)
+		}
+	}()
 	keys = &ttnpb.APIKeys{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		keys.APIKeys, err = store.GetAPIKeyStore(db).FindAPIKeys(ctx, ids.EntityIdentifiers())
+		keys.APIKeys, err = store.GetAPIKeyStore(db).FindAPIKeys(ctx, req.EntityIdentifiers())
 		return err
 	})
 	if err != nil {
@@ -140,7 +147,7 @@ func (ua *userAccess) ListRights(ctx context.Context, req *ttnpb.UserIdentifiers
 func (ua *userAccess) CreateAPIKey(ctx context.Context, req *ttnpb.CreateUserAPIKeyRequest) (*ttnpb.APIKey, error) {
 	return ua.createUserAPIKey(ctx, req)
 }
-func (ua *userAccess) ListAPIKeys(ctx context.Context, req *ttnpb.UserIdentifiers) (*ttnpb.APIKeys, error) {
+func (ua *userAccess) ListAPIKeys(ctx context.Context, req *ttnpb.ListUserAPIKeysRequest) (*ttnpb.APIKeys, error) {
 	return ua.listUserAPIKeys(ctx, req)
 }
 func (ua *userAccess) UpdateAPIKey(ctx context.Context, req *ttnpb.UpdateUserAPIKeyRequest) (*ttnpb.APIKey, error) {

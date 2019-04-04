@@ -21,39 +21,55 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 )
 
-type totalKeyType struct{}
+type paginationOptionsKeyType struct{}
 
-var totalKey totalKeyType
+var paginationOptionsKey paginationOptionsKeyType
 
-// SetTotalCount instructs the store to set the total count of List operations
-// into total.
-func SetTotalCount(ctx context.Context, total *uint64) context.Context {
-	return context.WithValue(ctx, totalKey, total)
+type paginationOptions struct {
+	limit  uint32
+	offset uint32
+	total  *uint64
 }
 
-func limitAndOffsetFromContext(ctx context.Context) (limit uint64, offset uint64) {
+// WithPagination instructs the store to paginate the results, and set the total
+// number of results into total.
+func WithPagination(ctx context.Context, limit, page uint32, total *uint64) context.Context {
 	md := rpcmetadata.FromIncomingContext(ctx)
-	offset = (md.Page - 1) * md.Limit
-	if offset < 0 {
-		offset = 0
+	if limit == 0 && md.Limit != 0 {
+		limit = uint32(md.Limit)
 	}
-	return md.Limit, offset
+	if page == 0 && md.Page != 0 {
+		page = uint32(md.Page)
+	}
+	if page == 0 {
+		page = 1
+	}
+	return context.WithValue(ctx, paginationOptionsKey, paginationOptions{
+		limit:  limit,
+		offset: (page - 1) * limit,
+		total:  total,
+	})
 }
 
 // countTotal counts the total number of results (without limiting) and sets it
 // into the destination set by SetTotalCount.
 func countTotal(ctx context.Context, db *gorm.DB) {
-	if dest, ok := ctx.Value(totalKey).(*uint64); ok {
-		db.Count(dest)
+	if opts, ok := ctx.Value(paginationOptionsKey).(paginationOptions); ok && opts.total != nil {
+		db.Count(opts.total)
 	}
 }
 
 // setTotal sets the total number of results into the destination set by
 // SetTotalCount if not already set.
 func setTotal(ctx context.Context, total uint64) {
-	if dest, ok := ctx.Value(totalKey).(*uint64); ok {
-		if *dest == 0 {
-			*dest = total
-		}
+	if opts, ok := ctx.Value(paginationOptionsKey).(paginationOptions); ok && opts.total != nil && *opts.total == 0 {
+		*opts.total = total
 	}
+}
+
+func limitAndOffsetFromContext(ctx context.Context) (limit, offset uint32) {
+	if opts, ok := ctx.Value(paginationOptionsKey).(paginationOptions); ok {
+		return opts.limit, opts.offset
+	}
+	return
 }

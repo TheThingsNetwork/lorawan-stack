@@ -76,7 +76,9 @@ func TestClientAccessPermissionDenied(t *testing.T) {
 		a.So(rights.Rights, should.BeEmpty)
 		a.So(err, should.BeNil)
 
-		collaborators, err := reg.ListCollaborators(ctx, &clientID)
+		collaborators, err := reg.ListCollaborators(ctx, &ttnpb.ListClientCollaboratorsRequest{
+			ClientIdentifiers: clientID,
+		})
 
 		a.So(collaborators, should.BeNil)
 		a.So(err, should.NotBeNil)
@@ -138,7 +140,9 @@ func TestClientAccessCRUD(t *testing.T) {
 		a.So(rights.Rights, should.BeEmpty)
 		a.So(err, should.BeNil)
 
-		collaborators, err := reg.ListCollaborators(ctx, &clientID, creds)
+		collaborators, err := reg.ListCollaborators(ctx, &ttnpb.ListClientCollaboratorsRequest{
+			ClientIdentifiers: clientID,
+		}, creds)
 
 		a.So(collaborators, should.NotBeNil)
 		a.So(collaborators.Collaborators, should.NotBeEmpty)

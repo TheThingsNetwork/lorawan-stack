@@ -128,6 +128,18 @@ var UpdateClientRequestFieldPathsTopLevel = []string{
 	"client",
 	"field_mask",
 }
+var ListClientCollaboratorsRequestFieldPathsNested = []string{
+	"client_ids",
+	"client_ids.client_id",
+	"limit",
+	"page",
+}
+
+var ListClientCollaboratorsRequestFieldPathsTopLevel = []string{
+	"client_ids",
+	"limit",
+	"page",
+}
 var SetClientCollaboratorRequestFieldPathsNested = []string{
 	"client_ids",
 	"client_ids.client_id",

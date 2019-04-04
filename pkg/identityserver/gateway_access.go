@@ -80,13 +80,20 @@ func (is *IdentityServer) createGatewayAPIKey(ctx context.Context, req *ttnpb.Cr
 	return key, nil
 }
 
-func (is *IdentityServer) listGatewayAPIKeys(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (keys *ttnpb.APIKeys, err error) {
-	if err = rights.RequireGateway(ctx, *ids, ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS); err != nil {
+func (is *IdentityServer) listGatewayAPIKeys(ctx context.Context, req *ttnpb.ListGatewayAPIKeysRequest) (keys *ttnpb.APIKeys, err error) {
+	if err = rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
+	var total uint64
+	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)
+	defer func() {
+		if err == nil {
+			setTotalHeader(ctx, total)
+		}
+	}()
 	keys = &ttnpb.APIKeys{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		keys.APIKeys, err = store.GetAPIKeyStore(db).FindAPIKeys(ctx, ids.EntityIdentifiers())
+		keys.APIKeys, err = store.GetAPIKeyStore(db).FindAPIKeys(ctx, req.EntityIdentifiers())
 		return err
 	})
 	if err != nil {
@@ -169,12 +176,19 @@ func (is *IdentityServer) setGatewayCollaborator(ctx context.Context, req *ttnpb
 	return ttnpb.Empty, nil
 }
 
-func (is *IdentityServer) listGatewayCollaborators(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (collaborators *ttnpb.Collaborators, err error) {
-	if err = rights.RequireGateway(ctx, *ids, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS); err != nil {
+func (is *IdentityServer) listGatewayCollaborators(ctx context.Context, req *ttnpb.ListGatewayCollaboratorsRequest) (collaborators *ttnpb.Collaborators, err error) {
+	if err = rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS); err != nil {
 		return nil, err
 	}
+	var total uint64
+	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)
+	defer func() {
+		if err == nil {
+			setTotalHeader(ctx, total)
+		}
+	}()
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		memberRights, err := store.GetMembershipStore(db).FindMembers(ctx, ids.EntityIdentifiers())
+		memberRights, err := store.GetMembershipStore(db).FindMembers(ctx, req.EntityIdentifiers())
 		if err != nil {
 			return err
 		}
@@ -203,7 +217,7 @@ func (ga *gatewayAccess) ListRights(ctx context.Context, req *ttnpb.GatewayIdent
 func (ga *gatewayAccess) CreateAPIKey(ctx context.Context, req *ttnpb.CreateGatewayAPIKeyRequest) (*ttnpb.APIKey, error) {
 	return ga.createGatewayAPIKey(ctx, req)
 }
-func (ga *gatewayAccess) ListAPIKeys(ctx context.Context, req *ttnpb.GatewayIdentifiers) (*ttnpb.APIKeys, error) {
+func (ga *gatewayAccess) ListAPIKeys(ctx context.Context, req *ttnpb.ListGatewayAPIKeysRequest) (*ttnpb.APIKeys, error) {
 	return ga.listGatewayAPIKeys(ctx, req)
 }
 func (ga *gatewayAccess) UpdateAPIKey(ctx context.Context, req *ttnpb.UpdateGatewayAPIKeyRequest) (*ttnpb.APIKey, error) {
@@ -212,6 +226,6 @@ func (ga *gatewayAccess) UpdateAPIKey(ctx context.Context, req *ttnpb.UpdateGate
 func (ga *gatewayAccess) SetCollaborator(ctx context.Context, req *ttnpb.SetGatewayCollaboratorRequest) (*types.Empty, error) {
 	return ga.setGatewayCollaborator(ctx, req)
 }
-func (ga *gatewayAccess) ListCollaborators(ctx context.Context, req *ttnpb.GatewayIdentifiers) (*ttnpb.Collaborators, error) {
+func (ga *gatewayAccess) ListCollaborators(ctx context.Context, req *ttnpb.ListGatewayCollaboratorsRequest) (*ttnpb.Collaborators, error) {
 	return ga.listGatewayCollaborators(ctx, req)
 }

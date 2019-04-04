@@ -274,8 +274,12 @@ func request_OrganizationAccess_CreateAPIKey_0(ctx context.Context, marshaler ru
 
 }
 
+var (
+	filter_OrganizationAccess_ListAPIKeys_0 = &utilities.DoubleArray{Encoding: map[string]int{"organization_ids": 0, "organization_id": 1}, Base: []int{1, 1, 1, 0}, Check: []int{0, 1, 2, 3}}
+)
+
 func request_OrganizationAccess_ListAPIKeys_0(ctx context.Context, marshaler runtime.Marshaler, client OrganizationAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq OrganizationIdentifiers
+	var protoReq ListOrganizationAPIKeysRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -285,15 +289,19 @@ func request_OrganizationAccess_ListAPIKeys_0(ctx context.Context, marshaler run
 		_   = err
 	)
 
-	val, ok = pathParams["organization_id"]
+	val, ok = pathParams["organization_ids.organization_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "organization_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "organization_ids.organization_id")
 	}
 
-	protoReq.OrganizationID, err = runtime.String(val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "organization_ids.organization_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "organization_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "organization_ids.organization_id", err)
+	}
+
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_OrganizationAccess_ListAPIKeys_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := client.ListAPIKeys(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -382,8 +390,12 @@ func request_OrganizationAccess_SetCollaborator_0(ctx context.Context, marshaler
 
 }
 
+var (
+	filter_OrganizationAccess_ListCollaborators_0 = &utilities.DoubleArray{Encoding: map[string]int{"organization_ids": 0, "organization_id": 1}, Base: []int{1, 1, 1, 0}, Check: []int{0, 1, 2, 3}}
+)
+
 func request_OrganizationAccess_ListCollaborators_0(ctx context.Context, marshaler runtime.Marshaler, client OrganizationAccessClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq OrganizationIdentifiers
+	var protoReq ListOrganizationCollaboratorsRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -393,15 +405,19 @@ func request_OrganizationAccess_ListCollaborators_0(ctx context.Context, marshal
 		_   = err
 	)
 
-	val, ok = pathParams["organization_id"]
+	val, ok = pathParams["organization_ids.organization_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "organization_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "organization_ids.organization_id")
 	}
 
-	protoReq.OrganizationID, err = runtime.String(val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "organization_ids.organization_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "organization_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "organization_ids.organization_id", err)
+	}
+
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_OrganizationAccess_ListCollaborators_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := client.ListCollaborators(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -764,13 +780,13 @@ var (
 
 	pattern_OrganizationAccess_CreateAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_ids.organization_id", "api-keys"}, ""))
 
-	pattern_OrganizationAccess_ListAPIKeys_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_id", "api-keys"}, ""))
+	pattern_OrganizationAccess_ListAPIKeys_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_ids.organization_id", "api-keys"}, ""))
 
 	pattern_OrganizationAccess_UpdateAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"organizations", "organization_ids.organization_id", "api-keys", "api_key.id"}, ""))
 
 	pattern_OrganizationAccess_SetCollaborator_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_ids.organization_id", "collaborators"}, ""))
 
-	pattern_OrganizationAccess_ListCollaborators_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_id", "collaborators"}, ""))
+	pattern_OrganizationAccess_ListCollaborators_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_ids.organization_id", "collaborators"}, ""))
 )
 
 var (

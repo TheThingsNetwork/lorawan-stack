@@ -65,10 +65,14 @@ var (
 			if err != nil {
 				return err
 			}
-			res, err := ttnpb.NewUserAccessClient(is).ListAPIKeys(ctx, usrID)
+			limit, page, opt, getTotal := withPagination(cmd.Flags())
+			res, err := ttnpb.NewUserAccessClient(is).ListAPIKeys(ctx, &ttnpb.ListUserAPIKeysRequest{
+				UserIdentifiers: *usrID, Limit: limit, Page: page,
+			}, opt)
 			if err != nil {
 				return err
 			}
+			getTotal()
 
 			return io.Write(os.Stdout, config.OutputFormat, res.APIKeys)
 		},
@@ -196,6 +200,7 @@ func init() {
 	userRights.Flags().AddFlagSet(userIDFlags())
 	usersCommand.AddCommand(userRights)
 
+	userAPIKeysList.Flags().AddFlagSet(paginationFlags())
 	userAPIKeys.AddCommand(userAPIKeysList)
 	userAPIKeysCreate.Flags().String("name", "", "")
 	userAPIKeysCreate.Flags().AddFlagSet(userRightsFlags)

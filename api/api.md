@@ -16,6 +16,8 @@
     - [CreateApplicationAPIKeyRequest](#ttn.lorawan.v3.CreateApplicationAPIKeyRequest)
     - [CreateApplicationRequest](#ttn.lorawan.v3.CreateApplicationRequest)
     - [GetApplicationRequest](#ttn.lorawan.v3.GetApplicationRequest)
+    - [ListApplicationAPIKeysRequest](#ttn.lorawan.v3.ListApplicationAPIKeysRequest)
+    - [ListApplicationCollaboratorsRequest](#ttn.lorawan.v3.ListApplicationCollaboratorsRequest)
     - [ListApplicationsRequest](#ttn.lorawan.v3.ListApplicationsRequest)
     - [SetApplicationCollaboratorRequest](#ttn.lorawan.v3.SetApplicationCollaboratorRequest)
     - [UpdateApplicationAPIKeyRequest](#ttn.lorawan.v3.UpdateApplicationAPIKeyRequest)
@@ -69,6 +71,7 @@
     - [Clients](#ttn.lorawan.v3.Clients)
     - [CreateClientRequest](#ttn.lorawan.v3.CreateClientRequest)
     - [GetClientRequest](#ttn.lorawan.v3.GetClientRequest)
+    - [ListClientCollaboratorsRequest](#ttn.lorawan.v3.ListClientCollaboratorsRequest)
     - [ListClientsRequest](#ttn.lorawan.v3.ListClientsRequest)
     - [SetClientCollaboratorRequest](#ttn.lorawan.v3.SetClientCollaboratorRequest)
     - [UpdateClientRequest](#ttn.lorawan.v3.UpdateClientRequest)
@@ -198,6 +201,8 @@
     - [Gateways](#ttn.lorawan.v3.Gateways)
     - [GetGatewayIdentifiersForEUIRequest](#ttn.lorawan.v3.GetGatewayIdentifiersForEUIRequest)
     - [GetGatewayRequest](#ttn.lorawan.v3.GetGatewayRequest)
+    - [ListGatewayAPIKeysRequest](#ttn.lorawan.v3.ListGatewayAPIKeysRequest)
+    - [ListGatewayCollaboratorsRequest](#ttn.lorawan.v3.ListGatewayCollaboratorsRequest)
     - [ListGatewaysRequest](#ttn.lorawan.v3.ListGatewaysRequest)
     - [SetGatewayCollaboratorRequest](#ttn.lorawan.v3.SetGatewayCollaboratorRequest)
     - [UpdateGatewayAPIKeyRequest](#ttn.lorawan.v3.UpdateGatewayAPIKeyRequest)
@@ -446,6 +451,8 @@
     - [CreateOrganizationAPIKeyRequest](#ttn.lorawan.v3.CreateOrganizationAPIKeyRequest)
     - [CreateOrganizationRequest](#ttn.lorawan.v3.CreateOrganizationRequest)
     - [GetOrganizationRequest](#ttn.lorawan.v3.GetOrganizationRequest)
+    - [ListOrganizationAPIKeysRequest](#ttn.lorawan.v3.ListOrganizationAPIKeysRequest)
+    - [ListOrganizationCollaboratorsRequest](#ttn.lorawan.v3.ListOrganizationCollaboratorsRequest)
     - [ListOrganizationsRequest](#ttn.lorawan.v3.ListOrganizationsRequest)
     - [Organization](#ttn.lorawan.v3.Organization)
     - [Organization.AttributesEntry](#ttn.lorawan.v3.Organization.AttributesEntry)
@@ -509,6 +516,8 @@
     - [GetUserRequest](#ttn.lorawan.v3.GetUserRequest)
     - [Invitation](#ttn.lorawan.v3.Invitation)
     - [Invitations](#ttn.lorawan.v3.Invitations)
+    - [ListInvitationsRequest](#ttn.lorawan.v3.ListInvitationsRequest)
+    - [ListUserAPIKeysRequest](#ttn.lorawan.v3.ListUserAPIKeysRequest)
     - [ListUserSessionsRequest](#ttn.lorawan.v3.ListUserSessionsRequest)
     - [Picture](#ttn.lorawan.v3.Picture)
     - [Picture.Embedded](#ttn.lorawan.v3.Picture.Embedded)
@@ -666,6 +675,40 @@ Application is the message that defines an Application in the network.
 
 
 
+<a name="ttn.lorawan.v3.ListApplicationAPIKeysRequest"></a>
+
+### ListApplicationAPIKeysRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| application_ids | [ApplicationIdentifiers](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
+| limit | [uint32](#uint32) |  | Limit the number of results per page. |
+| page | [uint32](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+
+
+
+
+
+
+<a name="ttn.lorawan.v3.ListApplicationCollaboratorsRequest"></a>
+
+### ListApplicationCollaboratorsRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| application_ids | [ApplicationIdentifiers](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
+| limit | [uint32](#uint32) |  | Limit the number of results per page. |
+| page | [uint32](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+
+
+
+
+
+
 <a name="ttn.lorawan.v3.ListApplicationsRequest"></a>
 
 ### ListApplicationsRequest
@@ -766,10 +809,10 @@ where the user or organization is collaborator on.
 | ----------- | ------------ | ------------- | ------------|
 | ListRights | [ApplicationIdentifiers](#ttn.lorawan.v3.ApplicationIdentifiers) | [Rights](#ttn.lorawan.v3.Rights) |  |
 | CreateAPIKey | [CreateApplicationAPIKeyRequest](#ttn.lorawan.v3.CreateApplicationAPIKeyRequest) | [APIKey](#ttn.lorawan.v3.APIKey) |  |
-| ListAPIKeys | [ApplicationIdentifiers](#ttn.lorawan.v3.ApplicationIdentifiers) | [APIKeys](#ttn.lorawan.v3.APIKeys) |  |
+| ListAPIKeys | [ListApplicationAPIKeysRequest](#ttn.lorawan.v3.ListApplicationAPIKeysRequest) | [APIKeys](#ttn.lorawan.v3.APIKeys) |  |
 | UpdateAPIKey | [UpdateApplicationAPIKeyRequest](#ttn.lorawan.v3.UpdateApplicationAPIKeyRequest) | [APIKey](#ttn.lorawan.v3.APIKey) | Update the rights of an existing application API key. To generate an API key, the CreateAPIKey should be used. To delete an API key, update it with zero rights. |
 | SetCollaborator | [SetApplicationCollaboratorRequest](#ttn.lorawan.v3.SetApplicationCollaboratorRequest) | [.google.protobuf.Empty](#google.protobuf.Empty) | Setting a collaborator without rights, removes them. |
-| ListCollaborators | [ApplicationIdentifiers](#ttn.lorawan.v3.ApplicationIdentifiers) | [Collaborators](#ttn.lorawan.v3.Collaborators) |  |
+| ListCollaborators | [ListApplicationCollaboratorsRequest](#ttn.lorawan.v3.ListApplicationCollaboratorsRequest) | [Collaborators](#ttn.lorawan.v3.Collaborators) |  |
 
 
 <a name="ttn.lorawan.v3.ApplicationRegistry"></a>
@@ -1210,6 +1253,23 @@ An OAuth client on the network.
 
 
 
+<a name="ttn.lorawan.v3.ListClientCollaboratorsRequest"></a>
+
+### ListClientCollaboratorsRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| client_ids | [ClientIdentifiers](#ttn.lorawan.v3.ClientIdentifiers) |  |  |
+| limit | [uint32](#uint32) |  | Limit the number of results per page. |
+| page | [uint32](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+
+
+
+
+
+
 <a name="ttn.lorawan.v3.ListClientsRequest"></a>
 
 ### ListClientsRequest
@@ -1307,7 +1367,7 @@ The OAuth2 flows an OAuth client can use to get an access token.
 | ----------- | ------------ | ------------- | ------------|
 | ListRights | [ClientIdentifiers](#ttn.lorawan.v3.ClientIdentifiers) | [Rights](#ttn.lorawan.v3.Rights) |  |
 | SetCollaborator | [SetClientCollaboratorRequest](#ttn.lorawan.v3.SetClientCollaboratorRequest) | [.google.protobuf.Empty](#google.protobuf.Empty) | Set the rights of a collaborator on the OAuth client. Users or organizations are considered to be a collaborator if they have at least one right on the OAuth client. |
-| ListCollaborators | [ClientIdentifiers](#ttn.lorawan.v3.ClientIdentifiers) | [Collaborators](#ttn.lorawan.v3.Collaborators) |  |
+| ListCollaborators | [ListClientCollaboratorsRequest](#ttn.lorawan.v3.ListClientCollaboratorsRequest) | [Collaborators](#ttn.lorawan.v3.Collaborators) |  |
 
 
 <a name="ttn.lorawan.v3.ClientRegistry"></a>
@@ -2614,6 +2674,40 @@ Identifies an end device model with version information.
 
 
 
+<a name="ttn.lorawan.v3.ListGatewayAPIKeysRequest"></a>
+
+### ListGatewayAPIKeysRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| gateway_ids | [GatewayIdentifiers](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
+| limit | [uint32](#uint32) |  | Limit the number of results per page. |
+| page | [uint32](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+
+
+
+
+
+
+<a name="ttn.lorawan.v3.ListGatewayCollaboratorsRequest"></a>
+
+### ListGatewayCollaboratorsRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| gateway_ids | [GatewayIdentifiers](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
+| limit | [uint32](#uint32) |  | Limit the number of results per page. |
+| page | [uint32](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+
+
+
+
+
+
 <a name="ttn.lorawan.v3.ListGatewaysRequest"></a>
 
 ### ListGatewaysRequest
@@ -2730,10 +2824,10 @@ where the user or organization is collaborator on.
 | ----------- | ------------ | ------------- | ------------|
 | ListRights | [GatewayIdentifiers](#ttn.lorawan.v3.GatewayIdentifiers) | [Rights](#ttn.lorawan.v3.Rights) |  |
 | CreateAPIKey | [CreateGatewayAPIKeyRequest](#ttn.lorawan.v3.CreateGatewayAPIKeyRequest) | [APIKey](#ttn.lorawan.v3.APIKey) |  |
-| ListAPIKeys | [GatewayIdentifiers](#ttn.lorawan.v3.GatewayIdentifiers) | [APIKeys](#ttn.lorawan.v3.APIKeys) |  |
+| ListAPIKeys | [ListGatewayAPIKeysRequest](#ttn.lorawan.v3.ListGatewayAPIKeysRequest) | [APIKeys](#ttn.lorawan.v3.APIKeys) |  |
 | UpdateAPIKey | [UpdateGatewayAPIKeyRequest](#ttn.lorawan.v3.UpdateGatewayAPIKeyRequest) | [APIKey](#ttn.lorawan.v3.APIKey) | Update the rights of an existing gateway API key. To generate an API key, the CreateAPIKey should be used. To delete an API key, update it with zero rights. |
 | SetCollaborator | [SetGatewayCollaboratorRequest](#ttn.lorawan.v3.SetGatewayCollaboratorRequest) | [.google.protobuf.Empty](#google.protobuf.Empty) | Set the rights of a collaborator on the gateway. Users or organizations are considered to be a collaborator if they have at least one right on the gateway. |
-| ListCollaborators | [GatewayIdentifiers](#ttn.lorawan.v3.GatewayIdentifiers) | [Collaborators](#ttn.lorawan.v3.Collaborators) |  |
+| ListCollaborators | [ListGatewayCollaboratorsRequest](#ttn.lorawan.v3.ListGatewayCollaboratorsRequest) | [Collaborators](#ttn.lorawan.v3.Collaborators) |  |
 
 
 <a name="ttn.lorawan.v3.GatewayConfigurator"></a>
@@ -5592,6 +5686,40 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 
 
 
+<a name="ttn.lorawan.v3.ListOrganizationAPIKeysRequest"></a>
+
+### ListOrganizationAPIKeysRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| organization_ids | [OrganizationIdentifiers](#ttn.lorawan.v3.OrganizationIdentifiers) |  |  |
+| limit | [uint32](#uint32) |  | Limit the number of results per page. |
+| page | [uint32](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+
+
+
+
+
+
+<a name="ttn.lorawan.v3.ListOrganizationCollaboratorsRequest"></a>
+
+### ListOrganizationCollaboratorsRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| organization_ids | [OrganizationIdentifiers](#ttn.lorawan.v3.OrganizationIdentifiers) |  |  |
+| limit | [uint32](#uint32) |  | Limit the number of results per page. |
+| page | [uint32](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+
+
+
+
+
+
 <a name="ttn.lorawan.v3.ListOrganizationsRequest"></a>
 
 ### ListOrganizationsRequest
@@ -5744,10 +5872,10 @@ where the user or organization is collaborator on.
 | ----------- | ------------ | ------------- | ------------|
 | ListRights | [OrganizationIdentifiers](#ttn.lorawan.v3.OrganizationIdentifiers) | [Rights](#ttn.lorawan.v3.Rights) |  |
 | CreateAPIKey | [CreateOrganizationAPIKeyRequest](#ttn.lorawan.v3.CreateOrganizationAPIKeyRequest) | [APIKey](#ttn.lorawan.v3.APIKey) |  |
-| ListAPIKeys | [OrganizationIdentifiers](#ttn.lorawan.v3.OrganizationIdentifiers) | [APIKeys](#ttn.lorawan.v3.APIKeys) |  |
+| ListAPIKeys | [ListOrganizationAPIKeysRequest](#ttn.lorawan.v3.ListOrganizationAPIKeysRequest) | [APIKeys](#ttn.lorawan.v3.APIKeys) |  |
 | UpdateAPIKey | [UpdateOrganizationAPIKeyRequest](#ttn.lorawan.v3.UpdateOrganizationAPIKeyRequest) | [APIKey](#ttn.lorawan.v3.APIKey) | Update the rights of an existing organization API key. To generate an API key, the CreateAPIKey should be used. To delete an API key, update it with zero rights. |
 | SetCollaborator | [SetOrganizationCollaboratorRequest](#ttn.lorawan.v3.SetOrganizationCollaboratorRequest) | [.google.protobuf.Empty](#google.protobuf.Empty) | Set the rights of a collaborator (member) on the organization. Users are considered to be a collaborator if they have at least one right on the organization. Note that only users can collaborate (be member of) an organization. |
-| ListCollaborators | [OrganizationIdentifiers](#ttn.lorawan.v3.OrganizationIdentifiers) | [Collaborators](#ttn.lorawan.v3.Collaborators) |  |
+| ListCollaborators | [ListOrganizationCollaboratorsRequest](#ttn.lorawan.v3.ListOrganizationCollaboratorsRequest) | [Collaborators](#ttn.lorawan.v3.Collaborators) |  |
 
 
 <a name="ttn.lorawan.v3.OrganizationRegistry"></a>
@@ -6272,6 +6400,39 @@ This service is not implemented on all deployments.
 
 
 
+<a name="ttn.lorawan.v3.ListInvitationsRequest"></a>
+
+### ListInvitationsRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| limit | [uint32](#uint32) |  | Limit the number of results per page. |
+| page | [uint32](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+
+
+
+
+
+
+<a name="ttn.lorawan.v3.ListUserAPIKeysRequest"></a>
+
+### ListUserAPIKeysRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| user_ids | [UserIdentifiers](#ttn.lorawan.v3.UserIdentifiers) |  |  |
+| limit | [uint32](#uint32) |  | Limit the number of results per page. |
+| page | [uint32](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+
+
+
+
+
+
 <a name="ttn.lorawan.v3.ListUserSessionsRequest"></a>
 
 ### ListUserSessionsRequest
@@ -6546,7 +6707,7 @@ User is the message that defines an user on the network.
 | ----------- | ------------ | ------------- | ------------|
 | ListRights | [UserIdentifiers](#ttn.lorawan.v3.UserIdentifiers) | [Rights](#ttn.lorawan.v3.Rights) |  |
 | CreateAPIKey | [CreateUserAPIKeyRequest](#ttn.lorawan.v3.CreateUserAPIKeyRequest) | [APIKey](#ttn.lorawan.v3.APIKey) |  |
-| ListAPIKeys | [UserIdentifiers](#ttn.lorawan.v3.UserIdentifiers) | [APIKeys](#ttn.lorawan.v3.APIKeys) |  |
+| ListAPIKeys | [ListUserAPIKeysRequest](#ttn.lorawan.v3.ListUserAPIKeysRequest) | [APIKeys](#ttn.lorawan.v3.APIKeys) |  |
 | UpdateAPIKey | [UpdateUserAPIKeyRequest](#ttn.lorawan.v3.UpdateUserAPIKeyRequest) | [APIKey](#ttn.lorawan.v3.APIKey) | Update the rights of an existing user API key. To generate an API key, the CreateAPIKey should be used. To delete an API key, update it with zero rights. |
 
 
@@ -6558,7 +6719,7 @@ User is the message that defines an user on the network.
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | Send | [SendInvitationRequest](#ttn.lorawan.v3.SendInvitationRequest) | [Invitation](#ttn.lorawan.v3.Invitation) |  |
-| List | [.google.protobuf.Empty](#google.protobuf.Empty) | [Invitations](#ttn.lorawan.v3.Invitations) |  |
+| List | [ListInvitationsRequest](#ttn.lorawan.v3.ListInvitationsRequest) | [Invitations](#ttn.lorawan.v3.Invitations) |  |
 | Delete | [DeleteInvitationRequest](#ttn.lorawan.v3.DeleteInvitationRequest) | [.google.protobuf.Empty](#google.protobuf.Empty) |  |
 
 

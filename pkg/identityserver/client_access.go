@@ -82,12 +82,19 @@ func (is *IdentityServer) setClientCollaborator(ctx context.Context, req *ttnpb.
 	return ttnpb.Empty, nil
 }
 
-func (is *IdentityServer) listClientCollaborators(ctx context.Context, ids *ttnpb.ClientIdentifiers) (collaborators *ttnpb.Collaborators, err error) {
+func (is *IdentityServer) listClientCollaborators(ctx context.Context, req *ttnpb.ListClientCollaboratorsRequest) (collaborators *ttnpb.Collaborators, err error) {
 	if err = is.RequireAuthenticated(ctx); err != nil { // Client collaborators can be seen by all authenticated users.
 		return nil, err
 	}
+	var total uint64
+	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)
+	defer func() {
+		if err == nil {
+			setTotalHeader(ctx, total)
+		}
+	}()
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		memberRights, err := store.GetMembershipStore(db).FindMembers(ctx, ids.EntityIdentifiers())
+		memberRights, err := store.GetMembershipStore(db).FindMembers(ctx, req.EntityIdentifiers())
 		if err != nil {
 			return err
 		}
@@ -116,6 +123,6 @@ func (ca *clientAccess) ListRights(ctx context.Context, req *ttnpb.ClientIdentif
 func (ca *clientAccess) SetCollaborator(ctx context.Context, req *ttnpb.SetClientCollaboratorRequest) (*types.Empty, error) {
 	return ca.setClientCollaborator(ctx, req)
 }
-func (ca *clientAccess) ListCollaborators(ctx context.Context, req *ttnpb.ClientIdentifiers) (*ttnpb.Collaborators, error) {
+func (ca *clientAccess) ListCollaborators(ctx context.Context, req *ttnpb.ListClientCollaboratorsRequest) (*ttnpb.Collaborators, error) {
 	return ca.listClientCollaborators(ctx, req)
 }

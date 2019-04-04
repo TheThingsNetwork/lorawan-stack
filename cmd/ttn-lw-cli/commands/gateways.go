@@ -108,13 +108,17 @@ var (
 			if err != nil {
 				return err
 			}
+			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewGatewayRegistryClient(is).List(ctx, &ttnpb.ListGatewaysRequest{
 				Collaborator: getCollaborator(cmd.Flags()),
 				FieldMask:    types.FieldMask{Paths: paths},
-			})
+				Limit:        limit,
+				Page:         page,
+			}, opt)
 			if err != nil {
 				return err
 			}
+			getTotal()
 
 			return io.Write(os.Stdout, config.OutputFormat, res.Gateways)
 		},
@@ -360,6 +364,7 @@ func init() {
 	gatewaysCommand.AddCommand(gatewaysListFrequencyPlans)
 	gatewaysListCommand.Flags().AddFlagSet(collaboratorFlags())
 	gatewaysListCommand.Flags().AddFlagSet(selectGatewayFlags)
+	gatewaysListCommand.Flags().AddFlagSet(paginationFlags())
 	gatewaysCommand.AddCommand(gatewaysListCommand)
 	gatewaysSearchCommand.Flags().AddFlagSet(searchFlags())
 	gatewaysSearchCommand.Flags().AddFlagSet(selectGatewayFlags)

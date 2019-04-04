@@ -55,10 +55,16 @@ var (
 			if err != nil {
 				return err
 			}
-			res, err := ttnpb.NewUserInvitationRegistryClient(is).List(ctx, ttnpb.Empty)
+			limit, page, opt, getTotal := withPagination(cmd.Flags())
+			res, err := ttnpb.NewUserInvitationRegistryClient(is).List(ctx, &ttnpb.ListInvitationsRequest{
+				Limit: limit,
+				Page:  page,
+			}, opt)
 			if err != nil {
 				return err
 			}
+			getTotal()
+
 			return io.Write(os.Stdout, config.OutputFormat, res.Invitations)
 		},
 	}

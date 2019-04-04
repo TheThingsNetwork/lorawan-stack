@@ -65,10 +65,14 @@ var (
 			if err != nil {
 				return err
 			}
-			res, err := ttnpb.NewOrganizationAccessClient(is).ListCollaborators(ctx, orgID)
+			limit, page, opt, getTotal := withPagination(cmd.Flags())
+			res, err := ttnpb.NewOrganizationAccessClient(is).ListCollaborators(ctx, &ttnpb.ListOrganizationCollaboratorsRequest{
+				OrganizationIdentifiers: *orgID, Limit: limit, Page: page,
+			}, opt)
 			if err != nil {
 				return err
 			}
+			getTotal()
 
 			return io.Write(os.Stdout, config.OutputFormat, res.Collaborators)
 		},
@@ -159,10 +163,14 @@ var (
 			if err != nil {
 				return err
 			}
-			res, err := ttnpb.NewOrganizationAccessClient(is).ListAPIKeys(ctx, orgID)
+			limit, page, opt, getTotal := withPagination(cmd.Flags())
+			res, err := ttnpb.NewOrganizationAccessClient(is).ListAPIKeys(ctx, &ttnpb.ListOrganizationAPIKeysRequest{
+				OrganizationIdentifiers: *orgID, Limit: limit, Page: page,
+			}, opt)
 			if err != nil {
 				return err
 			}
+			getTotal()
 
 			return io.Write(os.Stdout, config.OutputFormat, res.APIKeys)
 		},
@@ -290,6 +298,7 @@ func init() {
 	organizationRights.Flags().AddFlagSet(organizationIDFlags())
 	organizationsCommand.AddCommand(organizationRights)
 
+	organizationCollaboratorsList.Flags().AddFlagSet(paginationFlags())
 	organizationCollaborators.AddCommand(organizationCollaboratorsList)
 	organizationCollaboratorsSet.Flags().AddFlagSet(collaboratorFlags())
 	organizationCollaboratorsSet.Flags().AddFlagSet(organizationRightsFlags)
@@ -299,6 +308,7 @@ func init() {
 	organizationCollaborators.PersistentFlags().AddFlagSet(organizationIDFlags())
 	organizationsCommand.AddCommand(organizationCollaborators)
 
+	organizationAPIKeysList.Flags().AddFlagSet(paginationFlags())
 	organizationAPIKeys.AddCommand(organizationAPIKeysList)
 	organizationAPIKeysCreate.Flags().String("name", "", "")
 	organizationAPIKeysCreate.Flags().AddFlagSet(organizationRightsFlags)

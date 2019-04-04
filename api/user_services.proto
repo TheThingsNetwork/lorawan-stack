@@ -86,9 +86,9 @@ service UserAccess {
     };
   };
 
-  rpc ListAPIKeys(UserIdentifiers) returns (APIKeys) {
+  rpc ListAPIKeys(ListUserAPIKeysRequest) returns (APIKeys) {
     option (google.api.http) = {
-      get: "/users/{user_id}/api-keys"
+      get: "/users/{user_ids.user_id}/api-keys"
     };
   };
 
@@ -111,7 +111,7 @@ service UserInvitationRegistry {
     };
   };
 
-  rpc List(google.protobuf.Empty) returns (Invitations) {
+  rpc List(ListInvitationsRequest) returns (Invitations) {
     option (google.api.http) = {
       get: "/invitations"
     };

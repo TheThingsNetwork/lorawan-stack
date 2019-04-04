@@ -65,10 +65,14 @@ var (
 			if err != nil {
 				return err
 			}
-			res, err := ttnpb.NewClientAccessClient(is).ListCollaborators(ctx, cliID)
+			limit, page, opt, getTotal := withPagination(cmd.Flags())
+			res, err := ttnpb.NewClientAccessClient(is).ListCollaborators(ctx, &ttnpb.ListClientCollaboratorsRequest{
+				ClientIdentifiers: *cliID, Limit: limit, Page: page,
+			}, opt)
 			if err != nil {
 				return err
 			}
+			getTotal()
 
 			return io.Write(os.Stdout, config.OutputFormat, res.Collaborators)
 		},
@@ -150,6 +154,7 @@ func init() {
 	clientRights.Flags().AddFlagSet(clientIDFlags())
 	clientsCommand.AddCommand(clientRights)
 
+	clientCollaboratorsList.Flags().AddFlagSet(paginationFlags())
 	clientCollaborators.AddCommand(clientCollaboratorsList)
 	clientCollaboratorsSet.Flags().AddFlagSet(collaboratorFlags())
 	clientCollaboratorsSet.Flags().AddFlagSet(clientRightsFlags)

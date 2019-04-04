@@ -178,13 +178,17 @@ var (
 			if err != nil {
 				return err
 			}
+			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewEndDeviceRegistryClient(is).List(ctx, &ttnpb.ListEndDevicesRequest{
 				ApplicationIdentifiers: *appID,
 				FieldMask:              pbtypes.FieldMask{Paths: paths},
-			})
+				Limit:                  limit,
+				Page:                   page,
+			}, opt)
 			if err != nil {
 				return err
 			}
+			getTotal()
 
 			return io.Write(os.Stdout, config.OutputFormat, res.EndDevices)
 		},
@@ -693,6 +697,7 @@ func init() {
 	endDevicesCommand.AddCommand(endDevicesListFrequencyPlans)
 	endDevicesListCommand.Flags().AddFlagSet(applicationIDFlags())
 	endDevicesListCommand.Flags().AddFlagSet(selectEndDeviceListFlags)
+	endDevicesListCommand.Flags().AddFlagSet(paginationFlags())
 	endDevicesCommand.AddCommand(endDevicesListCommand)
 	endDevicesGetCommand.Flags().AddFlagSet(endDeviceIDFlags())
 	endDevicesGetCommand.Flags().AddFlagSet(selectEndDeviceFlags)

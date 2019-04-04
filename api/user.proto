@@ -111,6 +111,14 @@ message UpdateUserPasswordRequest {
   string old = 3;
 }
 
+message ListUserAPIKeysRequest {
+  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  // Limit the number of results per page.
+  uint32 limit = 2 [(validate.rules).uint32.lte = 1000];
+  // Page number for pagination. 0 is interpreted as 1.
+  uint32 page = 3;
+}
+
 message CreateUserAPIKeyRequest {
   UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   string name = 2 [(validate.rules).string.max_len = 50];
@@ -132,6 +140,13 @@ message Invitation {
 
   google.protobuf.Timestamp accepted_at = 6 [(gogoproto.stdtime) = true];
   UserIdentifiers accepted_by = 7;
+}
+
+message ListInvitationsRequest {
+  // Limit the number of results per page.
+  uint32 limit = 1 [(validate.rules).uint32.lte = 1000];
+  // Page number for pagination. 0 is interpreted as 1.
+  uint32 page = 2;
 }
 
 message Invitations {
@@ -169,7 +184,7 @@ message ListUserSessionsRequest {
   // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
   string order = 2;
   // Limit the number of results per page.
-  uint32 limit = 3;
+  uint32 limit = 3 [(validate.rules).uint32.lte = 1000];
   // Page number for pagination. 0 is interpreted as 1.
   uint32 page = 4;
 }

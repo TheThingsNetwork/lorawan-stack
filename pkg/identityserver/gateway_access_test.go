@@ -125,13 +125,17 @@ func TestGatewayAccessPermissionDenied(t *testing.T) {
 		a.So(rights.Rights, should.BeEmpty)
 		a.So(err, should.BeNil)
 
-		APIKeys, err := reg.ListAPIKeys(ctx, &gatewayID)
+		APIKeys, err := reg.ListAPIKeys(ctx, &ttnpb.ListGatewayAPIKeysRequest{
+			GatewayIdentifiers: gatewayID,
+		})
 
 		a.So(APIKeys, should.BeNil)
 		a.So(err, should.NotBeNil)
 		a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
-		collaborators, err := reg.ListCollaborators(ctx, &gatewayID)
+		collaborators, err := reg.ListCollaborators(ctx, &ttnpb.ListGatewayCollaboratorsRequest{
+			GatewayIdentifiers: gatewayID,
+		})
 
 		a.So(collaborators, should.BeNil)
 		a.So(err, should.NotBeNil)
@@ -216,7 +220,9 @@ func TestGatewayAccessCRUD(t *testing.T) {
 		a.So(err, should.BeNil)
 
 		gatewayAPIKeys := gatewayAPIKeys(&gatewayID)
-		APIKeys, err := reg.ListAPIKeys(ctx, &gatewayID, userCreds)
+		APIKeys, err := reg.ListAPIKeys(ctx, &ttnpb.ListGatewayAPIKeysRequest{
+			GatewayIdentifiers: gatewayID,
+		}, userCreds)
 
 		a.So(APIKeys, should.NotBeNil)
 		a.So(len(APIKeys.APIKeys), should.Equal, len(gatewayAPIKeys.APIKeys))
@@ -226,7 +232,9 @@ func TestGatewayAccessCRUD(t *testing.T) {
 			a.So(APIkey.ID, should.Equal, gatewayAPIKeys.APIKeys[i].ID)
 		}
 
-		collaborators, err := reg.ListCollaborators(ctx, &gatewayID, userCreds)
+		collaborators, err := reg.ListCollaborators(ctx, &ttnpb.ListGatewayCollaboratorsRequest{
+			GatewayIdentifiers: gatewayID,
+		}, userCreds)
 
 		a.So(collaborators, should.NotBeNil)
 		a.So(collaborators.Collaborators, should.NotBeEmpty)
