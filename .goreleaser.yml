@@ -82,7 +82,7 @@ nfpm:
     - redis
     - cockroach
   files:
-    "public/**/*": "/var/lib/ttn/public"
+    "public/**/*": "/srv/ttn-lorawan/public"
 
 snapcraft:
   name: ttn-lw-stack
