@@ -42,6 +42,7 @@ $ brew install TheThingsNetwork/lorawan-stack/ttn-lw-stack
 
 ```bash
 $ sudo snap install ttn-lw-stack
+$ sudo snap alias ttn-lw-stack.ttn-lw-cli ttn-lw-cli
 ```
 
 #### Binaries
