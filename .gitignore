@@ -104,3 +104,6 @@ key.pem
 # Javascript test coverage
 /coverage
 /sdk/js/coverage
+
+# Release files
+/snap.login
