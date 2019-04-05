@@ -102,7 +102,7 @@ class FieldGroup extends React.Component {
 FieldGroup.propTypes = {
   name: PropTypes.string.isRequired,
   title: PropTypes.message,
-  errors: PropTypes.object,
+  error: PropTypes.error,
   horizontal: PropTypes.bool,
   columns: PropTypes.bool,
 }

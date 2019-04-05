@@ -181,7 +181,8 @@ storiesOf('Fields/Radio Buttons', module)
     <FieldGroup
       name="radio-story"
       title="Radio Buttons"
-      errors={{ 'radio-story': 'Test Error' }}
+      error="Test Error!"
+      touched
       horizontal
       children={checkboxFields}
     />
