@@ -76,7 +76,7 @@ outer:
 				continue outer
 			}
 		}
-		cfList.Freq = append(cfList.Freq, uint32(fpChannel.Frequency/100))
+		cfList.Freq = append(cfList.Freq, uint32(fpChannel.Frequency/phy.FreqMultiplier))
 		if len(cfList.Freq) == 5 {
 			break
 		}

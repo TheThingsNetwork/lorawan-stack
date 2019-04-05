@@ -25,14 +25,12 @@ import (
 	. "go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/gpstime"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func TestLoRaWANEncodingMAC(t *testing.T) {
-	phy, err := band.GetByID("EU_863_870")
-	if err != nil {
-		panic(err)
-	}
+	phy := test.Must(test.Must(band.GetByID(band.EU_863_870)).(band.Band).Version(ttnpb.PHY_V1_1_REV_B)).(band.Band)
 
 	for _, tc := range []struct {
 		Name    string

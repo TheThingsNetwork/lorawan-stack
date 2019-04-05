@@ -65,7 +65,7 @@ outer:
 
 		var found bool
 		for _, cfListFrequency := range cfList.Freq {
-			if uint64(cfListFrequency)*100 == channel.Frequency {
+			if uint64(cfListFrequency)*phy.FreqMultiplier == channel.Frequency {
 				found = true
 			}
 		}
