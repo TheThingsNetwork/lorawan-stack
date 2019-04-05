@@ -225,7 +225,7 @@ func (js Js) Translations() error {
 	return nil
 }
 
-// Translations builds the backend locale files.
+// BackendTranslations builds the backend locale files.
 func (js Js) BackendTranslations() error {
 	changed, err := target.Path("./pkg/webui/locales/.backend/en.json", "./config/messages.json")
 	if os.IsNotExist(err) || (err == nil && changed) {
@@ -243,7 +243,7 @@ func (js Js) BackendTranslations() error {
 	return nil
 }
 
-// Clean will clear all generated files.
+// Clean clears all generated files.
 func (js Js) Clean() {
 	sh.Rm(".cache")
 	sh.Rm("public")

@@ -22,7 +22,7 @@ import (
 	"github.com/magefile/mage/sh"
 )
 
-// Js namespace.
+// Styl namespace.
 type Styl mg.Namespace
 
 func (styl Styl) stylint() (func(args ...string) (string, error), error) {

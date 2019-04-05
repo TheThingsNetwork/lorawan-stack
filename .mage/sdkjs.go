@@ -59,7 +59,7 @@ func (sdkJs SdkJs) Deps() error {
 	return yarn("install", "--no-progress")
 }
 
-// Build will build the source files and output into 'dist'.
+// Build builds the source files and output into 'dist'.
 func (sdkJs SdkJs) Build() error {
 	if mg.Verbose() {
 		fmt.Println("Building JS SDK files…")
@@ -72,7 +72,7 @@ func (sdkJs SdkJs) Build() error {
 	return yarn("run", "build")
 }
 
-// Watch will build the source files in watch mode.
+// Watch builds the source files in watch mode.
 func (sdkJs SdkJs) Watch() error {
 	if mg.Verbose() {
 		fmt.Println("Building and watching JS SDK files…")
@@ -111,7 +111,7 @@ func (sdkJs SdkJs) TestWatch() error {
 	return yarn("run", "test:watch")
 }
 
-// Clean will clear all generated files.
+// Clean clears all generated files.
 func (sdkJs SdkJs) Clean() {
 	sh.Rm("./sdk/js/dist")
 }
