@@ -54,11 +54,7 @@ before_install:
   fi
 - |
   if [[ "$RUNTYPE" == "release" ]]; then
-    openssl aes-256-cbc -K $encrypted_82ec1379e985_key \
-                        -iv $encrypted_82ec1379e985_iv \
-                        -in snapcraft.login.enc \
-                        -out snapcraft.login \
-                        -d
+    openssl aes-256-cbc -K $encrypted_82ec1379e985_key -iv $encrypted_82ec1379e985_iv -in snapcraft.login.enc -out snapcraft.login -d
   fi
 install:
 - |
