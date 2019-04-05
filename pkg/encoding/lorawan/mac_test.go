@@ -21,6 +21,7 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/band"
 	. "go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/gpstime"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -28,6 +29,11 @@ import (
 )
 
 func TestLoRaWANEncodingMAC(t *testing.T) {
+	phy, err := band.GetByID("EU_863_870")
+	if err != nil {
+		panic(err)
+	}
+
 	for _, tc := range []struct {
 		Name    string
 		Payload interface {
@@ -388,13 +394,13 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 				reader = DefaultMACCommands.ReadDownlink
 			}
 
-			b, err := appender([]byte{}, *cmd)
+			b, err := appender(phy, []byte{}, *cmd)
 			if a.So(err, should.BeNil) {
 				a.So(b, should.Resemble, tc.Bytes)
 			}
 
 			cmd = &ttnpb.MACCommand{}
-			err = reader(bytes.NewReader(tc.Bytes), cmd)
+			err = reader(phy, bytes.NewReader(tc.Bytes), cmd)
 			if pld := cmd.GetDeviceTimeAns(); pld != nil {
 				pld.Time = pld.Time.UTC()
 			}
