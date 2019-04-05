@@ -41,20 +41,20 @@ func enqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, ma
 		return maxDownLen, maxUpLen, true, nil
 	}
 
-	_, band, err := getDeviceBandVersion(dev, fps)
+	_, phy, err := getDeviceBandVersion(dev, fps)
 	if err != nil {
 		return maxDownLen, maxUpLen, false, err
 	}
 
-	if len(dev.MACState.DesiredParameters.Channels) > int(band.MaxUplinkChannels) {
+	if len(dev.MACState.DesiredParameters.Channels) > int(phy.MaxUplinkChannels) {
 		return maxDownLen, maxUpLen, false, errCorruptedMACState
 	}
 
-	desiredChs := make([]bool, band.MaxUplinkChannels)
+	desiredChs := make([]bool, phy.MaxUplinkChannels)
 	for i, ch := range dev.MACState.DesiredParameters.Channels {
 		desiredChs[i] = ch.EnableUplink
 	}
-	desiredMasks, err := band.GenerateChMasks(desiredChs)
+	desiredMasks, err := phy.GenerateChMasks(desiredChs)
 	if err != nil {
 		return maxDownLen, maxUpLen, false, err
 	}
@@ -104,7 +104,7 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 		events.Publish(evtReceiveLinkADRAccept(ctx, dev.EndDeviceIdentifiers, pld))
 	}
 
-	_, band, err := getDeviceBandVersion(dev, fps)
+	_, phy, err := getDeviceBandVersion(dev, fps)
 	if err != nil {
 		return err
 	}
@@ -145,7 +145,7 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 			mask[i] = v
 		}
 
-		m, err := band.ParseChMask(mask, uint8(req.ChannelMaskControl))
+		m, err := phy.ParseChMask(mask, uint8(req.ChannelMaskControl))
 		if err != nil {
 			return err
 		}
