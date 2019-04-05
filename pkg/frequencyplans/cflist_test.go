@@ -48,7 +48,7 @@ func TestFrequenciesCFList(t *testing.T) {
 	cfList := frequencyplans.CFList(euFP, ttnpb.PHY_V1_1_REV_B)
 	a.So(cfList.Type, should.Equal, ttnpb.CFListType_FREQUENCIES)
 
-	euBand, err := band.GetByID(euFP.BandID)
+	phy, err := band.GetByID(euFP.BandID)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -57,7 +57,7 @@ func TestFrequenciesCFList(t *testing.T) {
 	var seen int
 outer:
 	for _, channel := range euFP.UplinkChannels {
-		for _, bandChannel := range euBand.UplinkChannels {
+		for _, bandChannel := range phy.UplinkChannels {
 			if bandChannel.Frequency == channel.Frequency {
 				continue outer
 			}

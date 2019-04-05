@@ -23,37 +23,37 @@ import (
 // This function returns nil if the CFList could not be computed, or if the
 // device does not support CFLists.
 func CFList(fp FrequencyPlan, version ttnpb.PHYVersion) *ttnpb.CFList {
-	band, err := band.GetByID(fp.BandID)
+	phy, err := band.GetByID(fp.BandID)
 	if err != nil {
 		return nil
 	}
 
-	band, err = band.Version(version)
+	phy, err = phy.Version(version)
 	if err != nil {
 		return nil
 	}
 
-	if !band.ImplementsCFList {
+	if !phy.ImplementsCFList {
 		return nil
 	}
 
-	switch band.CFListType {
+	switch phy.CFListType {
 	case ttnpb.CFListType_CHANNEL_MASKS:
-		return chMaskCFList(fp, band)
+		return chMaskCFList(fp, phy)
 	case ttnpb.CFListType_FREQUENCIES:
-		return frequenciesCFList(fp, band)
+		return frequenciesCFList(fp, phy)
 	default:
 		return nil
 	}
 }
 
-func chMaskCFList(fp FrequencyPlan, band band.Band) *ttnpb.CFList {
+func chMaskCFList(fp FrequencyPlan, phy band.Band) *ttnpb.CFList {
 	cfList := &ttnpb.CFList{
 		Type:    ttnpb.CFListType_CHANNEL_MASKS,
 		ChMasks: []bool{},
 	}
 
-	for _, bandChannel := range band.UplinkChannels {
+	for _, bandChannel := range phy.UplinkChannels {
 		var channelEnabled bool
 		for _, fpChannel := range fp.UplinkChannels {
 			if fpChannel.Frequency == bandChannel.Frequency {
@@ -66,12 +66,12 @@ func chMaskCFList(fp FrequencyPlan, band band.Band) *ttnpb.CFList {
 	return cfList
 }
 
-func frequenciesCFList(fp FrequencyPlan, band band.Band) *ttnpb.CFList {
+func frequenciesCFList(fp FrequencyPlan, phy band.Band) *ttnpb.CFList {
 	cfList := &ttnpb.CFList{Type: ttnpb.CFListType_FREQUENCIES}
 
 outer:
 	for _, fpChannel := range fp.UplinkChannels {
-		for _, bandChannel := range band.UplinkChannels {
+		for _, bandChannel := range phy.UplinkChannels {
 			if fpChannel.Frequency == bandChannel.Frequency {
 				continue outer
 			}
