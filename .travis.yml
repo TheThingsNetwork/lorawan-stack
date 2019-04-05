@@ -54,10 +54,10 @@ before_install:
   fi
 - |
   if [[ "$RUNTYPE" == "release" ]]; then
-    openssl aes-256-cbc -K $encrypted_9b4a5498b653_key \
-                        -iv $encrypted_9b4a5498b653_iv \
-                        -in snap.login.enc \
-                        -out snap.login \
+    openssl aes-256-cbc -K $encrypted_82ec1379e985_key \
+                        -iv $encrypted_82ec1379e985_iv \
+                        -in snapcraft.login.enc \
+                        -out snapcraft.login \
                         -d
     sudo snap install snapcraft --classic
   fi
@@ -101,7 +101,7 @@ after_success:
 - |
   if [[ "$RUNTYPE" == "release" ]]; then
     docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
-    snapcraft login --with snap.login
+    snapcraft login --with snapcraft.login
   fi
 deploy:
 - provider: script
