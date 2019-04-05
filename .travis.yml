@@ -27,11 +27,6 @@ matrix:
     os: linux
 services:
 - docker
-addons:
-  apt:
-    packages:
-    - rpm
-    - snapd
 cache:
   directories:
   - "$HOME/.cache/mage"
@@ -61,6 +56,8 @@ before_install:
 install:
 - |
   if [[ "$RUNTYPE" == "release" ]]; then
+    sudo apt-get -y update
+    sudo apt-get install -y rpm snapd
     sudo snap install snapcraft --classic
   fi
 script:
