@@ -23,13 +23,14 @@ import (
 
 // GetRequestMetadata returns the request metadata with per-rpc credentials
 func (m MD) GetRequestMetadata(ctx context.Context, uri ...string) (map[string]string, error) {
-	if m.AuthType == "" || m.AuthValue == "" {
-		return nil, nil
+	md := make(map[string]string)
+	if m.ID != "" {
+		md["id"] = m.ID
 	}
-	return map[string]string{
-		"id":            m.ID,
-		"authorization": m.AuthType + " " + m.AuthValue,
-	}, nil
+	if m.AuthType != "" && m.AuthValue != "" {
+		md["authorization"] = m.AuthType + " " + m.AuthValue
+	}
+	return md, nil
 }
 
 var errUnauthenticated = errors.DefineUnauthenticated("unauthenticated", "the context is not authenticated")
