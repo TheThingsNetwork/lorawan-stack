@@ -38,6 +38,12 @@ You can use the CLI on your local machine or on the server.
 $ brew install TheThingsNetwork/lorawan-stack/ttn-lw-stack
 ```
 
+##### Linux
+
+```bash
+$ sudo snap install ttn-lw-stack
+```
+
 #### Binaries
 
 If your operating system or package manager is not mentioned, please [download binaries](https://github.com/TheThingsNetwork/lorawan-stack/releases) for your operating system and processor architecture.

@@ -64,13 +64,7 @@ archive:
       format: zip
 
 changelog:
-  filters:
-      exclude:
-        - '^doc:'
-        - '^dev:'
-        - '^make:'
-        - '^ci:'
-        - '^Merge pull request'
+  skip: true
 
 release:
   prerelease: auto
@@ -94,7 +88,7 @@ snapcraft:
   name: ttn-lw-stack
   summary: The Things Network Stack for LoRaWAN
   description: The Things Network Stack for LoRaWAN
-  grade: devel
+  grade: stable
   confinement: strict
   publish: true
 
