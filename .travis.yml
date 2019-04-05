@@ -56,19 +56,40 @@ install:
     sudo apt-get install -y rpm snapd
     sudo snap install snapcraft --classic
   fi
-script:
 - |
   if [[ "$RUNTYPE" == "js" ]]; then
     make js.dev-deps js.deps sdk.deps
+  fi
+- |
+  if [[ "$RUNTYPE" =~ go. ]]; then
+    make go.deps
+  fi
+- |
+  if [[ "$RUNTYPE" == "release" ]]; then
+    make deps
+  fi
+before_script:
+- |
+  if [[ "$RUNTYPE" =~ go. ]]; then
+    make dev.databases.start
+    make dev.certs
+  fi
+script:
+- |
+  if [[ "$RUNTYPE" == "js" ]]; then
     make js.translations
-    make js sdk.test
+    make js.test sdk.test
     make js.lint
   fi
 - |
+  if [[ "$RUNTYPE" == "go.lint" ]]; then
+    make headers.check
+    make protos.clean protos
+    make go.quality
+    make messages
+  fi
+- |
   if [[ "$RUNTYPE" == "go.test" ]]; then
-    make go.deps
-    make dev.databases.start
-    make dev.certs
     if [[ "$GOARCH" == "amd64" ]]; then
       make go.coveralls
     else
@@ -76,19 +97,8 @@ script:
     fi
   fi
 - |
-  if [[ "$RUNTYPE" == "go.lint" ]]; then
-    make go.deps
-    make protos.clean protos
-    make go.unconvert
-    make go.fmt
-    make go.misspell
-    make headers.check
-    make messages
-    make go.lint
-  fi
-- |
   if [[ "$RUNTYPE" == "release" ]]; then
-    make deps
+    $MAGE version:files
   fi
 - make git.diff
 after_success:
