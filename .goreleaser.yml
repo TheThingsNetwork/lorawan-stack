@@ -64,13 +64,7 @@ archive:
       format: zip
 
 changelog:
-  filters:
-      exclude:
-        - '^doc:'
-        - '^dev:'
-        - '^make:'
-        - '^ci:'
-        - '^Merge pull request'
+  skip: true
 
 release:
   prerelease: auto
