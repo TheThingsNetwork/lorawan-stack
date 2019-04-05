@@ -25,7 +25,7 @@ import style from './group.styl'
 class FieldGroup extends React.Component {
   render () {
     const {
-      className,
+      className: groupClassName,
       children,
       name: groupName,
       title,
@@ -42,7 +42,7 @@ class FieldGroup extends React.Component {
     } = this.props
     const fields = React.Children.map(children, function (Child) {
       if (React.isValidElement(Child) && Child.type === Field || Child.type === PureField) {
-        const { type, value: fieldValue, name: fieldName } = Child.props
+        const { type, value: fieldValue, name: fieldName, className: fieldClassName } = Child.props
         const appliedProps = {}
         if (type === 'checkbox') {
           appliedProps.id = `${groupName}.${fieldName}`
@@ -57,7 +57,7 @@ class FieldGroup extends React.Component {
             appliedProps.checked = value === fieldValue
           }
         }
-        const classNames = classnames(style.field, className, {
+        const classNames = classnames(style.field, fieldClassName, {
           [style.columns]: columns,
         })
 
@@ -77,7 +77,7 @@ class FieldGroup extends React.Component {
       return Child
     })
 
-    const classNames = classnames(style.container, className, {
+    const classNames = classnames(style.container, groupClassName, {
       [style.horizontal]: horizontal,
     })
 
