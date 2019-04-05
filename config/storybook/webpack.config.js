@@ -16,7 +16,7 @@
 /* eslint-env node */
 /* eslint-disable import/no-commonjs */
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-require('babel-register')
+require('@babel/register')
 
 const config = require('../webpack.config.babel.js').default
 const development = process.env.NODE_ENV !== 'production'

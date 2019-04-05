@@ -1,0 +1,43 @@
+{
+  "presets": [
+    "@babel/preset-env",
+    "@babel/preset-react"
+  ],
+  "plugins": [
+    [
+      "@babel/plugin-transform-spread",
+      {
+        "loose": true
+      }
+    ],
+    [
+      "@babel/plugin-proposal-decorators",
+      {
+        "legacy": true
+      }
+    ],
+    "@babel/plugin-proposal-class-properties",
+    [
+      "@babel/plugin-transform-runtime",
+      {
+        "corejs": 2
+      }
+    ],
+    [
+      "react-intl-auto",
+      {
+        "extractComments": true,
+        "filebase": true,
+        "removePrefix": "pkg.webui"
+      }
+    ],
+    [
+      "react-intl",
+      {
+        "messagesDir": "./.cache/messages",
+        "extractSourceLocation": true
+      }
+    ],
+    "@babel/plugin-syntax-dynamic-import"
+  ]
+}
