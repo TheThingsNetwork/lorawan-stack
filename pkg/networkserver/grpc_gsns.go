@@ -143,8 +143,8 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 								break
 							}
 							dev.MACState.CurrentParameters.Channels = append(dev.MACState.CurrentParameters.Channels, &ttnpb.MACParameters_Channel{
-								UplinkFrequency:   uint64(freq * 100),
-								DownlinkFrequency: uint64(freq * 100),
+								UplinkFrequency:   uint64(freq) * phy.FreqMultiplier,
+								DownlinkFrequency: uint64(freq) * phy.FreqMultiplier,
 								MaxDataRateIndex:  ttnpb.DataRateIndex(phy.MaxADRDataRateIndex),
 								EnableUplink:      true,
 							})
@@ -577,8 +577,8 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 								break
 							}
 							stored.MACState.CurrentParameters.Channels = append(stored.MACState.CurrentParameters.Channels, &ttnpb.MACParameters_Channel{
-								UplinkFrequency:   uint64(freq * 100),
-								DownlinkFrequency: uint64(freq * 100),
+								UplinkFrequency:   uint64(freq) * phy.FreqMultiplier,
+								DownlinkFrequency: uint64(freq) * phy.FreqMultiplier,
 								MaxDataRateIndex:  ttnpb.DataRateIndex(phy.MaxADRDataRateIndex),
 								EnableUplink:      true,
 							})
