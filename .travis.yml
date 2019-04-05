@@ -59,9 +59,12 @@ before_install:
                         -in snapcraft.login.enc \
                         -out snapcraft.login \
                         -d
+  fi
+install:
+- |
+  if [[ "$RUNTYPE" == "release" ]]; then
     sudo snap install snapcraft --classic
   fi
-install: true
 script:
 - |
   if [[ "$RUNTYPE" == "js.test" ]]; then
