@@ -7838,7 +7838,8 @@
         "MAC_V1_0",
         "MAC_V1_0_1",
         "MAC_V1_0_2",
-        "MAC_V1_1"
+        "MAC_V1_1",
+        "MAC_V1_0_3"
       ],
       "default": "MAC_UNKNOWN"
     },
@@ -8090,7 +8091,8 @@
         "PHY_V1_0_2_REV_A",
         "PHY_V1_0_2_REV_B",
         "PHY_V1_1_REV_A",
-        "PHY_V1_1_REV_B"
+        "PHY_V1_1_REV_B",
+        "PHY_V1_0_3_REV_A"
       ],
       "default": "PHY_UNKNOWN"
     },

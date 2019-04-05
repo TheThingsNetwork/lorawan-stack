@@ -47,6 +47,8 @@ func (v MACVersion) String() string {
 		return "1.0.1"
 	case MAC_V1_0_2:
 		return "1.0.2"
+	case MAC_V1_0_3:
+		return "1.0.3"
 	case MAC_V1_1:
 		return "1.1.0"
 	}
@@ -69,6 +71,8 @@ func (v *MACVersion) UnmarshalText(b []byte) error {
 		*v = MAC_V1_0_2
 	case MAC_V1_0_2.String():
 		*v = MAC_V1_0_2
+	case MAC_V1_0_3.String():
+		*v = MAC_V1_0_3
 	case MAC_V1_1.String():
 		*v = MAC_V1_1
 	case MAC_UNKNOWN.String():
@@ -93,25 +97,13 @@ func (v MACVersion) Compare(o MACVersion) int {
 // EncryptFOpts reports whether v requires MAC commands in FOpts to be encrypted.
 // EncryptFOpts panics, if v.Validate() returns non-nil error.
 func (v MACVersion) EncryptFOpts() bool {
-	switch v {
-	case MAC_V1_0, MAC_V1_0_1, MAC_V1_0_2:
-		return false
-	case MAC_V1_1:
-		return true
-	}
-	panic(v.Validate())
+	return v.Compare(MAC_V1_1) >= 0
 }
 
 // HasMaxFCntGap reports whether v defines a MaxFCntGap.
 // HasMaxFCntGap panics, if v.Validate() returns non-nil error.
 func (v MACVersion) HasMaxFCntGap() bool {
-	switch v {
-	case MAC_V1_0, MAC_V1_0_1, MAC_V1_0_2:
-		return true
-	case MAC_V1_1:
-		return false
-	}
-	panic(v.Validate())
+	return v.Compare(MAC_V1_1) < 0
 }
 
 // String implements fmt.Stringer.
@@ -125,6 +117,8 @@ func (v PHYVersion) String() string {
 		return "1.0.2-a"
 	case PHY_V1_0_2_REV_B:
 		return "1.0.2-b"
+	case PHY_V1_0_3_REV_A:
+		return "1.0.3-a"
 	case PHY_V1_1_REV_A:
 		return "1.1.0-a"
 	case PHY_V1_1_REV_B:
@@ -149,6 +143,8 @@ func (v *PHYVersion) UnmarshalText(b []byte) error {
 		*v = PHY_V1_0_2_REV_A
 	case PHY_V1_0_2_REV_B.String():
 		*v = PHY_V1_0_2_REV_B
+	case PHY_V1_0_3_REV_A.String():
+		*v = PHY_V1_0_3_REV_A
 	case PHY_V1_1_REV_A.String():
 		*v = PHY_V1_1_REV_A
 	case PHY_V1_1_REV_B.String():

@@ -2672,7 +2672,7 @@ func NewPopulatedCryptoServicePayloadRequest(r randyJoinserver, easy bool) *Cryp
 	this := &CryptoServicePayloadRequest{}
 	v7 := NewPopulatedEndDeviceIdentifiers(r, easy)
 	this.EndDeviceIdentifiers = *v7
-	this.LoRaWANVersion = MACVersion([]int32{0, 1, 2, 3, 4}[r.Intn(5)])
+	this.LoRaWANVersion = MACVersion([]int32{0, 1, 2, 3, 4, 5}[r.Intn(6)])
 	v8 := r.Intn(100)
 	this.Payload = make([]byte, v8)
 	for i := 0; i < v8; i++ {
@@ -2715,7 +2715,7 @@ func NewPopulatedDeriveSessionKeysRequest(r randyJoinserver, easy bool) *DeriveS
 	this := &DeriveSessionKeysRequest{}
 	v12 := NewPopulatedEndDeviceIdentifiers(r, easy)
 	this.EndDeviceIdentifiers = *v12
-	this.LoRaWANVersion = MACVersion([]int32{0, 1, 2, 3, 4}[r.Intn(5)])
+	this.LoRaWANVersion = MACVersion([]int32{0, 1, 2, 3, 4, 5}[r.Intn(6)])
 	v13 := go_thethings_network_lorawan_stack_pkg_types.NewPopulatedJoinNonce(r)
 	this.JoinNonce = *v13
 	v14 := go_thethings_network_lorawan_stack_pkg_types.NewPopulatedDevNonce(r)
