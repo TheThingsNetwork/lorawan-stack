@@ -106,4 +106,4 @@ key.pem
 /sdk/js/coverage
 
 # Release files
-/snap.login
+/snapcraft.login
