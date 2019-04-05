@@ -150,6 +150,7 @@ func init() {
 		}(),
 		MaxTxPowerIndex: 14,
 
+		FreqMultiplier:   100,
 		ImplementsCFList: true,
 		CFListType:       ttnpb.CFListType_CHANNEL_MASKS,
 

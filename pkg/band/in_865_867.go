@@ -130,6 +130,7 @@ func init() {
 		GenerateChMasks: generateChMask16,
 		ParseChMask:     parseChMask16,
 
+		FreqMultiplier:   100,
 		ImplementsCFList: true,
 		CFListType:       ttnpb.CFListType_FREQUENCIES,
 

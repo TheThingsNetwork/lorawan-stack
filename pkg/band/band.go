@@ -139,6 +139,7 @@ type Band struct {
 
 	DataRates [16]DataRate
 
+	FreqMultiplier   uint64
 	ImplementsCFList bool
 	CFListType       ttnpb.CFListType
 
