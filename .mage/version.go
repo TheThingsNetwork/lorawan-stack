@@ -61,6 +61,9 @@ var packageJSONFilePaths = []string{"package.json", "sdk/js/package.json"}
 
 // Files writes the current version to files that contain version info and adds them to the Git index.
 func (Version) Files() error {
+	if mg.Verbose() {
+		fmt.Println("Writing version files")
+	}
 	mg.Deps(Version.getCurrent)
 	err := ioutil.WriteFile(goVersionFilePath, []byte(fmt.Sprintf(goVersionFile, currentVersion)), 0644)
 	if err != nil {
@@ -120,6 +123,9 @@ func bumpVersion(bump string) error {
 		}
 		newVersion.Pre = []semver.PRVersion{pre}
 	}
+	if mg.Verbose() {
+		fmt.Printf("Bumping version from %s to %s", version, newVersion)
+	}
 	currentVersion = fmt.Sprintf("v%s", newVersion)
 	return nil
 }
@@ -142,12 +148,18 @@ func (Version) BumpRC() error { return bumpVersion("rc") }
 // CommitBump creates a git commit for the version bump.
 func (Version) CommitBump() error {
 	mg.Deps(Version.getCurrent)
+	if mg.Verbose() {
+		fmt.Println("Creating version bump commit")
+	}
 	return git.Commit(fmt.Sprintf("all: Bump to version %s", strings.TrimPrefix(currentVersion, "v")))
 }
 
 // Tag creates a git tag for the current version.
 func (Version) Tag() error {
 	mg.Deps(Version.getCurrent)
+	if mg.Verbose() {
+		fmt.Println("Creating version tag")
+	}
 	version, err := semver.Parse(strings.TrimPrefix(currentVersion, "v"))
 	if err != nil {
 		return err

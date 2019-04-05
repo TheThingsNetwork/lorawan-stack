@@ -42,6 +42,9 @@ func execGo(cmd string, args ...string) error {
 
 // CheckVersion checks the installed Go version against the minimum version we support.
 func (Go) CheckVersion() error {
+	if mg.Verbose() {
+		fmt.Println("Checking Go version")
+	}
 	versionStr, err := sh.Output("go", "version")
 	if err != nil {
 		return err
@@ -97,6 +100,9 @@ func (g Go) Fmt() error {
 	if len(dirs) == 0 {
 		return nil
 	}
+	if mg.Verbose() {
+		fmt.Printf("Formatting and simplifying %d Go packages\n", len(dirs))
+	}
 	return sh.RunCmd("gofmt", "-w", "-s")(dirs...)
 }
 
@@ -108,6 +114,9 @@ func (g Go) Lint() error {
 	}
 	if len(dirs) == 0 {
 		return nil
+	}
+	if mg.Verbose() {
+		fmt.Printf("Linting %d Go packages\n", len(dirs))
 	}
 	return execGo("run", append([]string{"github.com/mgechev/revive", "-config=.revive.toml", "-formatter=stylish"}, dirs...)...)
 }
@@ -121,6 +130,9 @@ func (g Go) Misspell() error {
 	if len(dirs) == 0 {
 		return nil
 	}
+	if mg.Verbose() {
+		fmt.Printf("Fixing common spelling mistakes in %d Go packages\n", len(dirs))
+	}
 	return execGo("run", append([]string{"github.com/client9/misspell/cmd/misspell", "-w"}, dirs...)...)
 }
 
@@ -132,6 +144,9 @@ func (g Go) Unconvert() error {
 	}
 	if len(dirs) == 0 {
 		return nil
+	}
+	if mg.Verbose() {
+		fmt.Printf("Removing unnecessary type conversions from %d Go packages\n", len(dirs))
 	}
 	return execGo("run", append([]string{"github.com/mdempsky/unconvert", "-safe", "-apply"}, dirs...)...)
 }
@@ -148,6 +163,9 @@ func init() {
 
 // Test tests all Go packages.
 func (Go) Test() error {
+	if mg.Verbose() {
+		fmt.Println("Testing all Go packages")
+	}
 	return execGo("test", "./...")
 }
 
@@ -155,6 +173,9 @@ const goCoverageFile = "coverage.out"
 
 // Cover tests all Go packages and writes test coverage into the coverage file.
 func (Go) Cover() error {
+	if mg.Verbose() {
+		fmt.Println("Testing all Go packages with coverage")
+	}
 	return execGo("test", "-cover", "-covermode=atomic", "-coverprofile="+goCoverageFile, "-timeout=5m", "./...")
 }
 
@@ -163,6 +184,9 @@ var coverallsIgnored = []string{".pb.go:", ".pb.gw.go:", ".fm.go:"}
 // Coveralls sends the test coverage to Coveralls.
 func (Go) Coveralls() error {
 	mg.Deps(Go.Cover)
+	if mg.Verbose() {
+		fmt.Println("Filtering Go coverage output")
+	}
 	inFile, err := os.Open(goCoverageFile)
 	if err != nil {
 		return err
@@ -194,6 +218,9 @@ nextLine:
 	service := os.Getenv("COVERALLS_SERVICE")
 	if service == "" {
 		service = "travis-ci"
+	}
+	if mg.Verbose() {
+		fmt.Println("Sending Go coverage to Coveralls")
 	}
 	return execGo("run", "github.com/mattn/goveralls", "-coverprofile=coveralls_"+goCoverageFile, "-service="+service, "-repotoken="+os.Getenv("COVERALLS_TOKEN"))
 }

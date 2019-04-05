@@ -16,6 +16,7 @@ package ttnmage
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -46,6 +47,9 @@ func (Js) installYarn() error {
 	} else {
 		yarn = "yarn"
 	}
+	if mg.Verbose() {
+		fmt.Printf("Installing Yarn %s\n", yarn)
+	}
 	return sh.RunV("npm", "install", "--no-package-lock", "--no-save", "--production=false", yarn)
 }
 
@@ -68,6 +72,9 @@ func (js Js) DevDeps() error {
 
 // Deps installs the javascript dependencies.
 func (js Js) Deps() error {
+	if mg.Verbose() {
+		fmt.Println("Installing JS dependencies")
+	}
 	yarn, err := js.yarn()
 	if err != nil {
 		return err

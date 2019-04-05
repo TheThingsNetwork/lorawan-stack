@@ -30,6 +30,9 @@ import (
 type Git mg.Namespace
 
 func (Git) installHook(name string) (err error) {
+	if mg.Verbose() {
+		fmt.Printf("Installing %s hook\n", name)
+	}
 	f, err := os.OpenFile(filepath.Join(".git", "hooks", name), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0755)
 	if err != nil {
 		return err
@@ -60,6 +63,9 @@ func (g Git) InstallHooks() error {
 // UninstallHooks uninstalls git hooks.
 func (g Git) UninstallHooks() error {
 	for _, hook := range gitHooks {
+		if mg.Verbose() {
+			fmt.Printf("Uninstalling %s hook\n", hook)
+		}
 		if err := os.Remove(filepath.Join(".git", "hooks", hook)); err != nil && !os.IsNotExist(err) {
 			return err
 		}
@@ -83,6 +89,9 @@ func (Git) selectStaged() error {
 var preCommitChecks []interface{}
 
 func (g Git) preCommit() error {
+	if mg.Verbose() {
+		fmt.Println("Running pre-commit hook")
+	}
 	mg.Deps(g.selectStaged)
 	mg.Deps(preCommitChecks...)
 	return nil
@@ -107,6 +116,9 @@ var gitCommitPrefixes = []string{
 }
 
 func (Git) commitMsg(messageFile string) error {
+	if mg.Verbose() {
+		fmt.Println("Running commit-msg hook")
+	}
 	if messageFile == "" {
 		messageFile = ".git/COMMIT_EDITMSG"
 	}
@@ -193,7 +205,9 @@ func (g Git) RunHook() error {
 		}
 		return g.commitMsg(messageFile)
 	case "pre-push":
-		fmt.Println("running pre-push hook with", args)
+		if mg.Verbose() {
+			fmt.Println("Running pre-push hook with", args)
+		}
 		return nil
 	default:
 		return fmt.Errorf("Unknown hook %s", hook)
