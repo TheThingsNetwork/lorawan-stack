@@ -88,7 +88,7 @@ snapcraft:
   name: ttn-lw-stack
   summary: The Things Network Stack for LoRaWAN
   description: The Things Network Stack for LoRaWAN
-  grade: devel
+  grade: stable
   confinement: strict
   publish: true
 
