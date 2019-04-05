@@ -101,33 +101,33 @@ func (m MD) ToIncomingContext(ctx context.Context) context.Context {
 // FromMetadata returns the TTN metadata from metadata.MD
 func FromMetadata(md metadata.MD) (m MD) {
 	if id, ok := md["id"]; ok && len(id) > 0 {
-		m.ID = id[0]
+		m.ID = id[len(id)-1]
 	}
 	if authorization, ok := md["authorization"]; ok && len(authorization) > 0 {
-		if parts := strings.SplitN(authorization[0], " ", 2); len(parts) == 2 {
+		if parts := strings.SplitN(authorization[len(authorization)-1], " ", 2); len(parts) == 2 {
 			m.AuthType, m.AuthValue = parts[0], parts[1]
 		}
 	}
 	if serviceType, ok := md["service-type"]; ok && len(serviceType) > 0 {
-		m.ServiceType = serviceType[0]
+		m.ServiceType = serviceType[len(serviceType)-1]
 	}
 	if serviceVersion, ok := md["service-version"]; ok && len(serviceVersion) > 0 {
-		m.ServiceVersion = serviceVersion[0]
+		m.ServiceVersion = serviceVersion[len(serviceVersion)-1]
 	}
 	if netAddress, ok := md["net-address"]; ok && len(netAddress) > 0 {
-		m.NetAddress = netAddress[0]
+		m.NetAddress = netAddress[len(netAddress)-1]
 	}
 	if host, ok := md["host"]; ok && len(host) > 0 {
-		m.Host = host[0]
+		m.Host = host[len(host)-1]
 	}
 	if uri, ok := md["uri"]; ok && len(uri) > 0 {
-		m.URI = uri[0]
+		m.URI = uri[len(uri)-1]
 	}
 	if limit, ok := md["limit"]; ok && len(limit) > 0 {
-		m.Limit, _ = strconv.ParseUint(limit[0], 10, 64)
+		m.Limit, _ = strconv.ParseUint(limit[len(limit)-1], 10, 64)
 	}
 	if page, ok := md["page"]; ok && len(page) > 0 {
-		m.Page, _ = strconv.ParseUint(page[0], 10, 64)
+		m.Page, _ = strconv.ParseUint(page[len(page)-1], 10, 64)
 	}
 	return
 }
