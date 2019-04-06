@@ -21,7 +21,24 @@ import (
 
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/pkg/config"
+	"gopkg.in/yaml.v2"
 )
+
+type configYml map[string]interface{}
+
+func (c configYml) add(key string, value interface{}) {
+	k := strings.SplitN(key, ".", 2)
+	if len(k) > 1 {
+		sub, ok := c[k[0]]
+		if !ok {
+			sub = make(configYml)
+			c[k[0]] = sub
+		}
+		sub.(configYml).add(k[1], value)
+	} else {
+		c[k[0]] = value
+	}
+}
 
 // Config returns a command that prints the current configuration in the config manager.
 func Config(mgr *config.Manager) *cobra.Command {
@@ -36,6 +53,8 @@ func Config(mgr *config.Manager) *cobra.Command {
 				}
 			}
 			useEnv, _ := cmd.Flags().GetBool("env")
+			useYml, _ := cmd.Flags().GetBool("yml")
+			configYml := make(configYml)
 			joinSlice := func(s []string) string {
 				if useEnv {
 					return strings.Join(s, " ")
@@ -44,9 +63,15 @@ func Config(mgr *config.Manager) *cobra.Command {
 			}
 			for _, key := range mgr.AllKeys() {
 				flagOrEnv, val := key, mgr.Get(key)
-				if useEnv {
+				switch {
+				case useYml:
+					if key != "config" {
+						configYml.add(flagOrEnv, val)
+					}
+					continue
+				case useEnv:
 					flagOrEnv = mgr.EnvironmentForKey(flagOrEnv)
-				} else {
+				default:
 					flagOrEnv = "--" + flagOrEnv
 				}
 				var empty bool
@@ -87,9 +112,17 @@ func Config(mgr *config.Manager) *cobra.Command {
 					fmt.Fprintf(cmd.OutOrStdout(), "%"+strconv.Itoa(space)+"s=\"%v\"\n", flagOrEnv, val)
 				}
 			}
+			if useYml {
+				yaml, err := yaml.Marshal(configYml)
+				if err != nil {
+					return err
+				}
+				cmd.OutOrStdout().Write(yaml)
+			}
 			return nil
 		},
 	}
 	cmd.Flags().Bool("env", false, "print as environment")
+	cmd.Flags().Bool("yml", false, "print as yml")
 	return cmd
 }
