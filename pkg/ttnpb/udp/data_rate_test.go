@@ -51,8 +51,9 @@ func TestValidLoRaDataRateParsing(t *testing.T) {
 	a := assertions.New(t)
 
 	table := map[string]udp.DataRate{
-		"SF6BW125": {DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 6, Bandwidth: 125000}}}},
-		"SF9BW500": {DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 9, Bandwidth: 500000}}}},
+		"SF6BW125":   {DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 6, Bandwidth: 125000}}}},
+		"SF9BW500":   {DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 9, Bandwidth: 500000}}}},
+		"SF5BW31.25": {DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 5, Bandwidth: 31250}}}},
 	}
 	for dr, expected := range table {
 		actual, err := udp.ParseLoRaDataRate(dr)
@@ -80,6 +81,7 @@ func TestStringer(t *testing.T) {
 	table := map[udp.DataRate]string{
 		{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 6, Bandwidth: 125000}}}}: "SF6BW125",
 		{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 9, Bandwidth: 500000}}}}: "SF9BW500",
+		{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 5, Bandwidth: 31250}}}}:  "SF5BW31.25",
 		{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_FSK{FSK: &ttnpb.FSKDataRate{BitRate: 50000}}}}:                           "50000",
 	}
 
