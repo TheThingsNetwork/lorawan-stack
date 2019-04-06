@@ -13,15 +13,14 @@
 // limitations under the License.
 
 // Package toa provides methods for computing a LoRaWAN packet's time-on-air.
-// See http://www.semtech.com/images/datasheet/LoraDesignGuide_STD.pdf, page 7.
 package toa
 
 import (
 	"math"
 	"time"
 
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/validate"
 )
 
 // Compute computes the time-on-air for the given payload size and the TxSettings.
@@ -29,53 +28,70 @@ import (
 func Compute(payloadSize int, settings ttnpb.TxSettings) (d time.Duration, err error) {
 	switch dr := settings.DataRate.Modulation.(type) {
 	case *ttnpb.DataRate_LoRa:
-		return computeLoRa(payloadSize, dr.LoRa.Bandwidth, uint8(dr.LoRa.SpreadingFactor), settings.CodingRate)
+		return computeLoRa(payloadSize, settings.Frequency, uint8(dr.LoRa.SpreadingFactor), dr.LoRa.Bandwidth, settings.CodingRate)
 	case *ttnpb.DataRate_FSK:
-		return computeFSK(payloadSize, dr.FSK.BitRate), nil
+		return computeFSK(payloadSize, settings.Frequency, dr.FSK.BitRate)
 	default:
 		panic("invalid modulation")
 	}
 }
 
-var codingRates = map[string]float64{
-	"4/5": 1,
-	"4/6": 2,
-	"4/7": 3,
-	"4/8": 4,
-}
+var (
+	errBandwidth       = errors.DefineInvalidArgument("bandwidth", "invalid bandwidth")
+	errSpreadingFactor = errors.DefineInvalidArgument("spreading_factor", "invalid spreading factor")
+	errCodingRate      = errors.DefineInvalidArgument("coding_rate", "invalid coding rate")
+	errFrequency       = errors.DefineInvalidArgument("frequency", "invalid frequency")
+)
 
-func computeLoRa(payloadSize int, bandwidth uint32, spreadingFactor uint8, codingRate string) (time.Duration, error) {
-	err := validate.All(
-		validate.LoRaBandwidth(int(bandwidth/1000)),
-		validate.LoRaSpreadingFactor(int(spreadingFactor)),
-		validate.LoRaCodingRateString(codingRate),
-	)
-	if err != nil {
-		return 0, err
+func computeLoRa(payloadSize int, frequency uint64, spreadingFactor uint8, bandwidth uint32, codingRate string) (time.Duration, error) {
+	if spreadingFactor < 5 || spreadingFactor > 12 {
+		return 0, errSpreadingFactor
+	}
+	if bandwidth == 0 {
+		return 0, errBandwidth
 	}
 
-	cr := codingRates[codingRate]
-	bandwidth = bandwidth / 1000 // Bandwidth in KHz
+	switch {
+	case frequency < 1000000000:
+		// See http://www.semtech.com/images/datasheet/LoraDesignGuide_STD.pdf, page 7.
+		var cr float64
+		switch codingRate {
+		case "4/5":
+			cr = 1
+		case "4/6":
+			cr = 2
+		case "4/7":
+			cr = 3
+		case "4/8":
+			cr = 4
+		default:
+			return 0, errCodingRate
+		}
+		var de float64
+		if bandwidth == 125000 && (spreadingFactor == 11 || spreadingFactor == 12) {
+			de = 1.0
+		}
+		pl := float64(payloadSize)
+		floatSF := float64(spreadingFactor)
+		floatBW := float64(bandwidth) / 1000
+		h := 0.0 // 0 means header is enabled
+		tSym := math.Pow(2, floatSF) / floatBW
+		payloadNb := 8.0 + math.Max(0.0, math.Ceil((8.0*pl-4.0*floatSF+28.0+16.0-20.0*h)/(4.0*(floatSF-2.0*de)))*(cr+4.0))
+		timeOnAir := (payloadNb + 12.25) * tSym * 1000000 // in nanoseconds
+		return time.Duration(timeOnAir), nil
 
-	var de float64
-	if bandwidth == 125 && (spreadingFactor == 11 || spreadingFactor == 12) {
-		de = 1.0
+	default:
+		return 0, errFrequency
 	}
-
-	pl := float64(payloadSize)
-	floatBW := float64(bandwidth)
-	floatSF := float64(spreadingFactor)
-	h := 0.0 // 0 means header is enabled
-
-	tSym := math.Pow(2, floatSF) / floatBW
-
-	payloadNb := 8.0 + math.Max(0.0, math.Ceil((8.0*pl-4.0*floatSF+28.0+16.0-20.0*h)/(4.0*(floatSF-2.0*de)))*(cr+4.0))
-	timeOnAir := (payloadNb + 12.25) * tSym * 1000000 // in nanoseconds
-
-	return time.Duration(timeOnAir), nil
 }
 
-func computeFSK(payloadSize int, bitRate uint32) time.Duration {
-	timeOnAir := int64(time.Second) * (int64(payloadSize) + 5 + 3 + 1 + 2) * 8 / int64(bitRate)
-	return time.Duration(timeOnAir)
+func computeFSK(payloadSize int, frequency uint64, bitRate uint32) (time.Duration, error) {
+	switch {
+	case frequency < 1000000000:
+		timeOnAir := int64(time.Second) * (int64(payloadSize) + 5 + 3 + 1 + 2) * 8 / int64(bitRate)
+		return time.Duration(timeOnAir), nil
+
+	default:
+		return 0, errFrequency
+	}
 }
