@@ -195,6 +195,19 @@ func WithMACHandler(cid ttnpb.MACCommandIdentifier, fn MACHandler) Option {
 
 // New returns new NetworkServer.
 func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, error) {
+	devAddrPrefixes := conf.DevAddrPrefixes
+	if len(devAddrPrefixes) == 0 {
+		devAddr, err := types.NewDevAddr(conf.NetID, nil)
+		if err != nil {
+			return nil, err
+		}
+		devAddrPrefixes = []types.DevAddrPrefix{
+			{
+				DevAddr: devAddr,
+				Length:  uint8(32 - types.NwkAddrBits(conf.NetID)),
+			},
+		}
+	}
 	downlinkPriorities, err := conf.DownlinkPriorities.Parse()
 	if err != nil {
 		return nil, err
@@ -203,7 +216,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		Component:               c,
 		devices:                 conf.Devices,
 		netID:                   conf.NetID,
-		devAddrPrefixes:         conf.DevAddrPrefixes,
+		devAddrPrefixes:         devAddrPrefixes,
 		applicationServersMu:    &sync.RWMutex{},
 		applicationServers:      make(map[string]*applicationUpStream),
 		metadataAccumulators:    &sync.Map{},
