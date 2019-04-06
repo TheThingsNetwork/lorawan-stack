@@ -228,7 +228,7 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 		if err != nil {
 			return 0, err
 		}
-		band, err := band.GetByID(c.fp.BandID)
+		phy, err := band.GetByID(c.fp.BandID)
 		if err != nil {
 			return 0, err
 		}
@@ -264,12 +264,12 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 				"data_rate_index", rx.dataRateIndex,
 			))
 			logger.Debug("Attempt to schedule downlink in receive window")
-			dataRate := band.DataRates[rx.dataRateIndex].Rate
+			dataRate := phy.DataRates[rx.dataRateIndex].Rate
 			if dataRate == (ttnpb.DataRate{}) {
 				return 0, errDataRate.WithAttributes("index", rx.dataRateIndex)
 			}
 			// The maximum payload size is MACPayload only; for PHYPayload take MHDR (1 byte) and MIC (4 bytes) into account.
-			maxPHYLength := band.DataRates[rx.dataRateIndex].DefaultMaxSize.PayloadSize(c.fp.DwellTime.GetDownlinks()) + 5
+			maxPHYLength := phy.DataRates[rx.dataRateIndex].DefaultMaxSize.PayloadSize(c.fp.DwellTime.GetDownlinks()) + 5
 			if len(msg.RawPayload) > int(maxPHYLength) {
 				return 0, errTooLong.WithAttributes(
 					"payload_length", len(msg.RawPayload),
@@ -277,11 +277,10 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 					"data_rate_index", rx.dataRateIndex,
 				)
 			}
-			eirp := band.DefaultMaxEIRP
-			if sb, ok := band.FindSubBand(rx.frequency); ok {
+			eirp := phy.DefaultMaxEIRP
+			if sb, ok := phy.FindSubBand(rx.frequency); ok {
 				eirp = sb.MaxEIRP
 			}
-			// TODO: Override with frequency plan's sub-band MaxEIRP (https://github.com/TheThingsNetwork/lorawan-stack/issues/300)
 			if c.fp.MaxEIRP != nil && *c.fp.MaxEIRP < eirp {
 				eirp = *c.fp.MaxEIRP
 			}
@@ -298,7 +297,7 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 			}
 			settings.DataRate = dataRate
 			if dr := dataRate.GetLoRa(); dr != nil {
-				settings.CodingRate = "4/5"
+				settings.CodingRate = phy.LoRaCodingRate
 				settings.Downlink.InvertPolarization = true
 			}
 			var f func(context.Context, int, ttnpb.TxSettings, ttnpb.TxSchedulePriority) (scheduling.Emission, error)
