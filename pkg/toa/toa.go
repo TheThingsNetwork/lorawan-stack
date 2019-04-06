@@ -72,12 +72,12 @@ func computeLoRa(payloadSize int, frequency uint64, spreadingFactor uint8, bandw
 			de = 1.0
 		}
 		pl := float64(payloadSize)
-		floatSF := float64(spreadingFactor)
-		floatBW := float64(bandwidth) / 1000
+		sf := float64(spreadingFactor)
+		bw := float64(bandwidth) / 1000
 		h := 0.0 // 0 means header is enabled
-		tSym := math.Pow(2, floatSF) / floatBW
-		payloadNb := 8.0 + math.Max(0.0, math.Ceil((8.0*pl-4.0*floatSF+28.0+16.0-20.0*h)/(4.0*(floatSF-2.0*de)))*(cr+4.0))
-		timeOnAir := (payloadNb + 12.25) * tSym * 1000000 // in nanoseconds
+		tSym := math.Pow(2, sf) / bw
+		payloadNb := 8.0 + math.Max(0.0, math.Ceil((8.0*pl-4.0*sf+28.0+16.0-20.0*h)/(4.0*(sf-2.0*de)))*(cr+4.0))
+		timeOnAir := (payloadNb + 12.25) * tSym * 1000000
 		return time.Duration(timeOnAir), nil
 
 	default:
