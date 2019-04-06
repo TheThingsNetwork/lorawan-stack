@@ -28,9 +28,9 @@ import (
 func Compute(payloadSize int, settings ttnpb.TxSettings) (d time.Duration, err error) {
 	switch dr := settings.DataRate.Modulation.(type) {
 	case *ttnpb.DataRate_LoRa:
-		return computeLoRa(payloadSize, settings.Frequency, uint8(dr.LoRa.SpreadingFactor), dr.LoRa.Bandwidth, settings.CodingRate)
+		return computeLoRa(payloadSize, settings.Frequency, uint8(dr.LoRa.SpreadingFactor), dr.LoRa.Bandwidth, settings.CodingRate, settings.EnableCRC)
 	case *ttnpb.DataRate_FSK:
-		return computeFSK(payloadSize, settings.Frequency, dr.FSK.BitRate)
+		return computeFSK(payloadSize, settings.Frequency, dr.FSK.BitRate, settings.EnableCRC)
 	default:
 		panic("invalid modulation")
 	}
@@ -43,7 +43,7 @@ var (
 	errFrequency       = errors.DefineInvalidArgument("frequency", "invalid frequency")
 )
 
-func computeLoRa(payloadSize int, frequency uint64, spreadingFactor uint8, bandwidth uint32, codingRate string) (time.Duration, error) {
+func computeLoRa(payloadSize int, frequency uint64, spreadingFactor uint8, bandwidth uint32, codingRate string, crc bool) (time.Duration, error) {
 	if spreadingFactor < 5 || spreadingFactor > 12 {
 		return 0, errSpreadingFactor
 	}
@@ -85,7 +85,7 @@ func computeLoRa(payloadSize int, frequency uint64, spreadingFactor uint8, bandw
 	}
 }
 
-func computeFSK(payloadSize int, frequency uint64, bitRate uint32) (time.Duration, error) {
+func computeFSK(payloadSize int, frequency uint64, bitRate uint32, crc bool) (time.Duration, error) {
 	switch {
 	case frequency < 1000000000:
 		timeOnAir := int64(time.Second) * (int64(payloadSize) + 5 + 3 + 1 + 2) * 8 / int64(bitRate)
