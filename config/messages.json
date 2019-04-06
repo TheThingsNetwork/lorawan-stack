@@ -4427,6 +4427,42 @@
       "file": "javascript.go"
     }
   },
+  "error:pkg/toa:bandwidth": {
+    "translations": {
+      "en": "invalid bandwidth"
+    },
+    "description": {
+      "package": "pkg/toa",
+      "file": "toa.go"
+    }
+  },
+  "error:pkg/toa:coding_rate": {
+    "translations": {
+      "en": "invalid coding rate"
+    },
+    "description": {
+      "package": "pkg/toa",
+      "file": "toa.go"
+    }
+  },
+  "error:pkg/toa:frequency": {
+    "translations": {
+      "en": "invalid frequency"
+    },
+    "description": {
+      "package": "pkg/toa",
+      "file": "toa.go"
+    }
+  },
+  "error:pkg/toa:spreading_factor": {
+    "translations": {
+      "en": "invalid spreading factor"
+    },
+    "description": {
+      "package": "pkg/toa",
+      "file": "toa.go"
+    }
+  },
   "error:pkg/ttnpb/udp:bandwidth": {
     "translations": {
       "en": "failed to parse bandwidth"
@@ -4688,24 +4724,6 @@
       "file": "unique.go"
     }
   },
-  "error:pkg/validate:bandwidth": {
-    "translations": {
-      "en": "invalid bandwidth"
-    },
-    "description": {
-      "package": "pkg/validate",
-      "file": "lorawan.go"
-    }
-  },
-  "error:pkg/validate:coding_rate": {
-    "translations": {
-      "en": "invalid coding rate"
-    },
-    "description": {
-      "package": "pkg/validate",
-      "file": "lorawan.go"
-    }
-  },
   "error:pkg/validate:email": {
     "translations": {
       "en": "`{email}` is not a valid email."
@@ -4830,15 +4848,6 @@
     "description": {
       "package": "pkg/validate",
       "file": "validate.go"
-    }
-  },
-  "error:pkg/validate:spreading_factor": {
-    "translations": {
-      "en": "invalid spreading factor"
-    },
-    "description": {
-      "package": "pkg/validate",
-      "file": "lorawan.go"
     }
   },
   "error:pkg/web/middleware:http_recovered": {
