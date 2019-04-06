@@ -37,11 +37,11 @@ func getDeviceBandVersion(dev *ttnpb.EndDevice, fps *frequencyplans.Store) (*fre
 }
 
 func searchDataRate(dr ttnpb.DataRate, dev *ttnpb.EndDevice, fps *frequencyplans.Store) (ttnpb.DataRateIndex, error) {
-	_, band, err := getDeviceBandVersion(dev, fps)
+	_, phy, err := getDeviceBandVersion(dev, fps)
 	if err != nil {
 		return 0, err
 	}
-	for i, bDR := range band.DataRates {
+	for i, bDR := range phy.DataRates {
 		if bDR.Rate.Equal(dr) {
 			return ttnpb.DataRateIndex(i), nil
 		}
@@ -59,7 +59,7 @@ func searchUplinkChannel(freq uint64, dev *ttnpb.EndDevice) (uint8, error) {
 }
 
 func resetMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb.MACSettings) error {
-	fp, band, err := getDeviceBandVersion(dev, fps)
+	fp, phy, err := getDeviceBandVersion(dev, fps)
 	if err != nil {
 		return err
 	}
@@ -69,7 +69,7 @@ func resetMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttn
 		DeviceClass:    ttnpb.CLASS_A,
 	}
 
-	dev.MACState.CurrentParameters.MaxEIRP = band.DefaultMaxEIRP
+	dev.MACState.CurrentParameters.MaxEIRP = phy.DefaultMaxEIRP
 	dev.MACState.DesiredParameters.MaxEIRP = dev.MACState.CurrentParameters.MaxEIRP
 	if fp.MaxEIRP != nil && *fp.MaxEIRP > 0 && *fp.MaxEIRP < dev.MACState.CurrentParameters.MaxEIRP {
 		dev.MACState.DesiredParameters.MaxEIRP = *fp.MaxEIRP
@@ -90,13 +90,13 @@ func resetMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttn
 	dev.MACState.CurrentParameters.ADRNbTrans = 1
 	dev.MACState.DesiredParameters.ADRNbTrans = dev.MACState.CurrentParameters.ADRNbTrans
 
-	dev.MACState.CurrentParameters.ADRAckLimit = uint32(band.ADRAckLimit)
+	dev.MACState.CurrentParameters.ADRAckLimit = uint32(phy.ADRAckLimit)
 	dev.MACState.DesiredParameters.ADRAckLimit = dev.MACState.CurrentParameters.ADRAckLimit
 
-	dev.MACState.CurrentParameters.ADRAckDelay = uint32(band.ADRAckDelay)
+	dev.MACState.CurrentParameters.ADRAckDelay = uint32(phy.ADRAckDelay)
 	dev.MACState.DesiredParameters.ADRAckDelay = dev.MACState.CurrentParameters.ADRAckDelay
 
-	dev.MACState.CurrentParameters.Rx1Delay = ttnpb.RxDelay(band.ReceiveDelay1.Seconds())
+	dev.MACState.CurrentParameters.Rx1Delay = ttnpb.RxDelay(phy.ReceiveDelay1.Seconds())
 	if dev.GetMACSettings().GetRx1Delay() != nil {
 		dev.MACState.CurrentParameters.Rx1Delay = dev.MACSettings.Rx1Delay.Value
 	} else if defaults.Rx1Delay != nil {
@@ -122,7 +122,7 @@ func resetMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttn
 		dev.MACState.DesiredParameters.Rx1DataRateOffset = defaults.DesiredRx1DataRateOffset.Value
 	}
 
-	dev.MACState.CurrentParameters.Rx2DataRateIndex = band.DefaultRx2Parameters.DataRateIndex
+	dev.MACState.CurrentParameters.Rx2DataRateIndex = phy.DefaultRx2Parameters.DataRateIndex
 	if dev.GetMACSettings().GetRx2DataRateIndex() != nil {
 		dev.MACState.CurrentParameters.Rx2DataRateIndex = dev.MACSettings.Rx2DataRateIndex.Value
 	} else if defaults.Rx2DataRateIndex != nil {
@@ -137,7 +137,7 @@ func resetMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttn
 		dev.MACState.DesiredParameters.Rx2DataRateIndex = defaults.DesiredRx2DataRateIndex.Value
 	}
 
-	dev.MACState.CurrentParameters.Rx2Frequency = band.DefaultRx2Parameters.Frequency
+	dev.MACState.CurrentParameters.Rx2Frequency = phy.DefaultRx2Parameters.Frequency
 	if dev.GetMACSettings().GetRx2Frequency() != nil && dev.MACSettings.Rx2Frequency.Value != 0 {
 		dev.MACState.CurrentParameters.Rx2Frequency = dev.MACSettings.Rx2Frequency.Value
 	} else if defaults.Rx2Frequency != nil && dev.MACSettings.Rx2Frequency.Value != 0 {
@@ -189,9 +189,9 @@ func resetMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttn
 	dev.MACState.CurrentParameters.BeaconFrequency = 0
 	dev.MACState.DesiredParameters.BeaconFrequency = dev.MACState.CurrentParameters.BeaconFrequency
 
-	if len(band.DownlinkChannels) > len(band.UplinkChannels) || len(fp.DownlinkChannels) > len(fp.UplinkChannels) ||
-		len(band.UplinkChannels) > int(band.MaxUplinkChannels) || len(band.DownlinkChannels) > int(band.MaxDownlinkChannels) ||
-		len(fp.UplinkChannels) > int(band.MaxUplinkChannels) || len(fp.DownlinkChannels) > int(band.MaxDownlinkChannels) {
+	if len(phy.DownlinkChannels) > len(phy.UplinkChannels) || len(fp.DownlinkChannels) > len(fp.UplinkChannels) ||
+		len(phy.UplinkChannels) > int(phy.MaxUplinkChannels) || len(phy.DownlinkChannels) > int(phy.MaxDownlinkChannels) ||
+		len(fp.UplinkChannels) > int(phy.MaxUplinkChannels) || len(fp.DownlinkChannels) > int(phy.MaxDownlinkChannels) {
 		// NOTE: In case the spec changes and this assumption is not valid anymore,
 		// the implementation of this function won't be valid and has to be changed.
 		panic("uplink/downlink channel length is inconsistent")
@@ -220,8 +220,8 @@ func resetMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttn
 			})
 		}
 	} else {
-		dev.MACState.CurrentParameters.Channels = make([]*ttnpb.MACParameters_Channel, 0, len(band.UplinkChannels))
-		for _, upCh := range band.UplinkChannels {
+		dev.MACState.CurrentParameters.Channels = make([]*ttnpb.MACParameters_Channel, 0, len(phy.UplinkChannels))
+		for _, upCh := range phy.UplinkChannels {
 			dev.MACState.CurrentParameters.Channels = append(dev.MACState.CurrentParameters.Channels, &ttnpb.MACParameters_Channel{
 				MinDataRateIndex: upCh.MinDataRate,
 				MaxDataRateIndex: upCh.MaxDataRate,
@@ -229,20 +229,20 @@ func resetMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttn
 				EnableUplink:     true,
 			})
 		}
-		for i, downCh := range band.DownlinkChannels {
+		for i, downCh := range phy.DownlinkChannels {
 			dev.MACState.CurrentParameters.Channels[i].DownlinkFrequency = downCh.Frequency
 		}
 	}
 
-	dev.MACState.DesiredParameters.Channels = make([]*ttnpb.MACParameters_Channel, 0, len(band.UplinkChannels)+len(fp.UplinkChannels))
-	for _, upCh := range band.UplinkChannels {
+	dev.MACState.DesiredParameters.Channels = make([]*ttnpb.MACParameters_Channel, 0, len(phy.UplinkChannels)+len(fp.UplinkChannels))
+	for _, upCh := range phy.UplinkChannels {
 		dev.MACState.DesiredParameters.Channels = append(dev.MACState.DesiredParameters.Channels, &ttnpb.MACParameters_Channel{
 			MinDataRateIndex: upCh.MinDataRate,
 			MaxDataRateIndex: upCh.MaxDataRate,
 			UplinkFrequency:  upCh.Frequency,
 		})
 	}
-	for i, downCh := range band.DownlinkChannels {
+	for i, downCh := range phy.DownlinkChannels {
 		dev.MACState.DesiredParameters.Channels[i].DownlinkFrequency = downCh.Frequency
 	}
 

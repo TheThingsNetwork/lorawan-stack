@@ -130,7 +130,7 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 				}
 
 				if dev.MACState.GetPendingJoinRequest().GetCFList() != nil {
-					_, band, err := getDeviceBandVersion(dev, ns.FrequencyPlans)
+					_, phy, err := getDeviceBandVersion(dev, ns.FrequencyPlans)
 					if err != nil {
 						logger.WithError(err).Warn("Failed to get device's versioned band, skip")
 						return true
@@ -143,9 +143,9 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 								break
 							}
 							dev.MACState.CurrentParameters.Channels = append(dev.MACState.CurrentParameters.Channels, &ttnpb.MACParameters_Channel{
-								UplinkFrequency:   uint64(freq * 100),
-								DownlinkFrequency: uint64(freq * 100),
-								MaxDataRateIndex:  ttnpb.DataRateIndex(band.MaxADRDataRateIndex),
+								UplinkFrequency:   uint64(freq) * phy.FreqMultiplier,
+								DownlinkFrequency: uint64(freq) * phy.FreqMultiplier,
+								MaxDataRateIndex:  ttnpb.DataRateIndex(phy.MaxADRDataRateIndex),
 								EnableUplink:      true,
 							})
 						}
@@ -227,12 +227,12 @@ outer:
 			gap = fCnt - dev.matchedSession.LastFCntUp
 
 			if dev.MACState.LoRaWANVersion.HasMaxFCntGap() {
-				_, band, err := getDeviceBandVersion(dev.EndDevice, ns.FrequencyPlans)
+				_, phy, err := getDeviceBandVersion(dev.EndDevice, ns.FrequencyPlans)
 				if err != nil {
 					logger.WithError(err).Warn("Failed to get device's versioned band, skip")
 					continue
 				}
-				if gap > uint32(band.MaxFCntGap) {
+				if gap > uint32(phy.MaxFCntGap) {
 					logger.Debug("FCnt gap too high, skip")
 					continue outer
 				}
@@ -451,8 +451,12 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 
 	var cmds []*ttnpb.MACCommand
 	for r := bytes.NewReader(mac); r.Len() > 0; {
+		_, phy, err := getDeviceBandVersion(matched, ns.FrequencyPlans)
+		if err != nil {
+			return errUnknownBand.WithCause(err)
+		}
 		cmd := &ttnpb.MACCommand{}
-		if err := lorawan.DefaultMACCommands.ReadUplink(r, cmd); err != nil {
+		if err := lorawan.DefaultMACCommands.ReadUplink(phy, r, cmd); err != nil {
 			logger.WithFields(log.Fields(
 				"bytes_left", r.Len(),
 				"mac_count", len(cmds),
@@ -561,7 +565,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 					stored.MACState.LoRaWANVersion = ttnpb.MAC_V1_1
 				}
 				if stored.MACState.PendingJoinRequest.CFList != nil {
-					_, band, err := getDeviceBandVersion(stored, ns.FrequencyPlans)
+					_, phy, err := getDeviceBandVersion(stored, ns.FrequencyPlans)
 					if err != nil {
 						return nil, nil, err
 					}
@@ -573,9 +577,9 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 								break
 							}
 							stored.MACState.CurrentParameters.Channels = append(stored.MACState.CurrentParameters.Channels, &ttnpb.MACParameters_Channel{
-								UplinkFrequency:   uint64(freq * 100),
-								DownlinkFrequency: uint64(freq * 100),
-								MaxDataRateIndex:  ttnpb.DataRateIndex(band.MaxADRDataRateIndex),
+								UplinkFrequency:   uint64(freq) * phy.FreqMultiplier,
+								DownlinkFrequency: uint64(freq) * phy.FreqMultiplier,
+								MaxDataRateIndex:  ttnpb.DataRateIndex(phy.MaxADRDataRateIndex),
 								EnableUplink:      true,
 							})
 						}

@@ -143,6 +143,7 @@ func init() {
 			PingSlotChannels: cn470BeaconFrequencies[:],
 		},
 
+		FreqMultiplier:   100,
 		ImplementsCFList: true,
 		CFListType:       ttnpb.CFListType_CHANNEL_MASKS,
 

@@ -164,6 +164,7 @@ func init() {
 		GenerateChMasks: makeGenerateChMask72(true),
 		ParseChMask:     parseChMask72,
 
+		FreqMultiplier:   100,
 		ImplementsCFList: true,
 		CFListType:       ttnpb.CFListType_CHANNEL_MASKS,
 
