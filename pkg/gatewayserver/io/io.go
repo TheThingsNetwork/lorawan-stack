@@ -297,7 +297,7 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 			}
 			settings.DataRate = dataRate
 			if dr := dataRate.GetLoRa(); dr != nil {
-				settings.CodingRate = "4/5"
+				settings.CodingRate = phy.LoRaCodingRate
 				settings.Downlink.InvertPolarization = true
 			}
 			var f func(context.Context, int, ttnpb.TxSettings, ttnpb.TxSchedulePriority) (scheduling.Emission, error)
