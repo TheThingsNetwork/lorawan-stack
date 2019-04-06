@@ -80,6 +80,51 @@ func computeLoRa(payloadSize int, frequency uint64, spreadingFactor uint8, bandw
 		timeOnAir := (payloadNb + 12.25) * tSym * 1000000
 		return time.Duration(timeOnAir), nil
 
+	case frequency >= 2400000000 && frequency < 2500000000:
+		// See https://www.semtech.com/uploads/documents/DS_SX1280-1_V2.2.pdf, 7.4.4.2
+		nBitCRC := 0.0
+		if crc {
+			nBitCRC = 16.0
+		}
+		sf := float64(spreadingFactor)
+		bw := float64(bandwidth) / 1000
+		var cr float64
+		switch codingRate {
+		case "4/5":
+			cr = 5
+		case "4/6":
+			cr = 6
+		case "4/8":
+			cr = 8
+		default:
+			return 0, errCodingRate
+		}
+		var nBitHeaderSpace float64
+		var denominator float64
+		nPreamble := 8.0
+		if spreadingFactor < 7 {
+			nBitHeaderSpace = math.Floor((sf-5)/2) * 8
+			nPreamble += 6.25
+			denominator = 4 * sf
+		} else if spreadingFactor >= 7 && spreadingFactor <= 10 {
+			nBitHeaderSpace = math.Floor((sf-7)/2) * 8
+			nPreamble += 4.25
+			denominator = 4 * sf
+		} else {
+			nBitHeaderSpace = math.Floor((sf-7)/2) * 8
+			nPreamble += 4.25
+			denominator = 4 * (sf - 2)
+		}
+		var nSymbol float64
+		nBytePayload := float64(payloadSize)
+		if 8.0*nBytePayload+nBitCRC > nBitHeaderSpace {
+			nSymbol = nPreamble + 8.0 + math.Ceil(math.Max(0, 8*nBytePayload+nBitCRC-math.Min(nBitHeaderSpace, 8.0*nBytePayload))/denominator*cr)
+		} else {
+			nSymbol = nPreamble + 8.0 + math.Ceil(math.Max(0, 8*nBytePayload+nBitCRC-nBitHeaderSpace)/denominator*cr)
+		}
+		timeOnAir := math.Pow(2, sf) / bw * nSymbol * 1000000
+		return time.Duration(timeOnAir), nil
+
 	default:
 		return 0, errFrequency.New()
 	}
