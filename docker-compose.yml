@@ -5,7 +5,7 @@ services:
     entrypoint: ttn-lw-stack
     command: start
     environment:
-      - TTN_LW_HTPP_COOKIE_HASH_KEY
+      - TTN_LW_HTTP_COOKIE_HASH_KEY
       - TTN_LW_HTTP_COOKIE_BLOCK_KEY
       - TTN_LW_CLUSTER_KEYS
       - TTN_LW_FREQUENCY_PLANS_URL
