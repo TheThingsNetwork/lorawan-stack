@@ -112,8 +112,7 @@ type NetworkServer struct {
 
 	devices DeviceRegistry
 
-	netID types.NetID
-	// TODO: Read from configuration
+	netID           types.NetID
 	devAddrPrefixes []types.DevAddrPrefix
 
 	applicationServersMu *sync.RWMutex
