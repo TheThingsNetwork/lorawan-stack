@@ -450,6 +450,20 @@ func (prefix *DevAddrPrefix) Scan(src interface{}) error {
 	return prefix.UnmarshalText(data)
 }
 
+// FromConfigString implements the config.Configurable interface
+func (prefix DevAddrPrefix) FromConfigString(in string) (interface{}, error) {
+	p := new(DevAddrPrefix)
+	if err := p.UnmarshalText([]byte(in)); err != nil {
+		return nil, err
+	}
+	return p, nil
+}
+
+// ConfigString implements the config.Stringer interface
+func (prefix DevAddrPrefix) ConfigString() string {
+	return prefix.String()
+}
+
 // WithPrefix returns the DevAddr, but with the first length bits replaced by the Prefix.
 func (addr DevAddr) WithPrefix(prefix DevAddrPrefix) (prefixed DevAddr) {
 	k := uint(prefix.Length)
