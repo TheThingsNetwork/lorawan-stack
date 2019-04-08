@@ -36,7 +36,7 @@
 /pkg/applicationserver @johanstokking
 /pkg/console @bafonins @kschiffer
 /pkg/gatewayserver @johanstokking
-/pkg/networkserver @rvolosatovs
+/pkg/networkserver @johanstokking @rvolosatovs
 /pkg/identityserver @htdvisser
 /pkg/joinserver @johanstokking @rvolosatovs
 
