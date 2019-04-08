@@ -125,7 +125,7 @@ var (
 		},
 	}
 	applicationsWebhooksListCommand = &cobra.Command{
-		Use:     "list",
+		Use:     "list [application-id]",
 		Aliases: []string{"ls"},
 		Short:   "List application webhooks",
 		RunE: func(cmd *cobra.Command, args []string) error {

@@ -26,7 +26,7 @@ import (
 
 var (
 	applicationRights = &cobra.Command{
-		Use:   "rights",
+		Use:   "rights [application-id]",
 		Short: "List the rights to an application",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			appID := getApplicationID(cmd.Flags(), args)
@@ -52,7 +52,7 @@ var (
 		Short:   "Manage application collaborators",
 	}
 	applicationCollaboratorsList = &cobra.Command{
-		Use:     "list",
+		Use:     "list [application-id]",
 		Aliases: []string{"ls"},
 		Short:   "List application collaborators",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -150,7 +150,7 @@ var (
 		Short:   "Manage application API keys",
 	}
 	applicationAPIKeysList = &cobra.Command{
-		Use:     "list",
+		Use:     "list [application-id]",
 		Aliases: []string{"ls"},
 		Short:   "List application API keys",
 		RunE: func(cmd *cobra.Command, args []string) error {

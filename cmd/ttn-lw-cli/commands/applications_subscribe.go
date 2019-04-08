@@ -26,7 +26,7 @@ import (
 
 var (
 	applicationsSubscribeCommand = &cobra.Command{
-		Use:     "subscribe",
+		Use:     "subscribe [application-id]",
 		Aliases: []string{"sub"},
 		Short:   "Subscribe to application uplink",
 		RunE: func(cmd *cobra.Command, args []string) error {

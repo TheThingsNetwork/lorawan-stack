@@ -110,7 +110,7 @@ var (
 		},
 	}
 	applicationsGetCommand = &cobra.Command{
-		Use:     "get",
+		Use:     "get [application-id]",
 		Aliases: []string{"info"},
 		Short:   "Get an application",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -136,7 +136,7 @@ var (
 		},
 	}
 	applicationsCreateCommand = &cobra.Command{
-		Use:     "create",
+		Use:     "create [application-id]",
 		Aliases: []string{"add", "register"},
 		Short:   "Create an application",
 		RunE: asBulk(func(cmd *cobra.Command, args []string) (err error) {
@@ -179,7 +179,7 @@ var (
 		}),
 	}
 	applicationsUpdateCommand = &cobra.Command{
-		Use:     "update",
+		Use:     "update [application-id]",
 		Aliases: []string{"set"},
 		Short:   "Update an application",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -216,7 +216,7 @@ var (
 		},
 	}
 	applicationsDeleteCommand = &cobra.Command{
-		Use:   "delete",
+		Use:   "delete [application-id]",
 		Short: "Delete an application",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			appID := getApplicationID(cmd.Flags(), args)

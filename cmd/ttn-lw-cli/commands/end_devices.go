@@ -162,7 +162,7 @@ var (
 		},
 	}
 	endDevicesListCommand = &cobra.Command{
-		Use:     "list",
+		Use:     "list [application-id]",
 		Aliases: []string{"ls"},
 		Short:   "List end devices",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -526,7 +526,7 @@ var (
 		Use:   "provision",
 		Short: "Provision end devices using vendor-specific data",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			appID := getApplicationID(cmd.Flags(), args)
+			appID := getApplicationID(cmd.Flags(), nil)
 			if appID == nil {
 				return errNoApplicationID
 			}

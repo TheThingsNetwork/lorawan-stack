@@ -41,7 +41,7 @@ var (
 		Short: "Application link commands",
 	}
 	applicationsLinkGetCommand = &cobra.Command{
-		Use:     "get",
+		Use:     "get [application-id]",
 		Aliases: []string{"info"},
 		Short:   "Get the properties of an application link",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -73,7 +73,7 @@ var (
 		},
 	}
 	applicationsLinkSetCommand = &cobra.Command{
-		Use:     "set",
+		Use:     "set [application-id]",
 		Aliases: []string{"update"},
 		Short:   "Set the properties of an application link",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -108,7 +108,7 @@ var (
 		},
 	}
 	applicationsLinkDeleteCommand = &cobra.Command{
-		Use:   "delete",
+		Use:   "delete [application-id]",
 		Short: "Delete an application link",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			appID := getApplicationID(cmd.Flags(), args)
