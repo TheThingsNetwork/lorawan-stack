@@ -194,7 +194,7 @@ var (
 		},
 	}
 	endDevicesGetCommand = &cobra.Command{
-		Use:     "get",
+		Use:     "get [application-id] [device-id]",
 		Aliases: []string{"info"},
 		Short:   "Get an end device",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -266,7 +266,7 @@ var (
 		},
 	}
 	endDevicesCreateCommand = &cobra.Command{
-		Use:     "create",
+		Use:     "create [application-id] [device-id]",
 		Aliases: []string{"add", "register"},
 		Short:   "Create an end device",
 		RunE: asBulk(func(cmd *cobra.Command, args []string) (err error) {
@@ -439,7 +439,7 @@ var (
 		}),
 	}
 	endDevicesUpdateCommand = &cobra.Command{
-		Use:     "update",
+		Use:     "update [application-id] [device-id]",
 		Aliases: []string{"set"},
 		Short:   "Update an end device",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -618,7 +618,7 @@ var (
 		},
 	}
 	endDevicesDeleteCommand = &cobra.Command{
-		Use:   "delete",
+		Use:   "delete [application-id] [device-id]",
 		Short: "Delete an end device",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			devID, err := getEndDeviceID(cmd.Flags(), args, true)
