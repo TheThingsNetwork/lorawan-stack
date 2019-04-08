@@ -34,7 +34,7 @@ import diff from '../../../lib/diff'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import toast from '../../../components/toast'
 
-import { getApplicationApiKey } from '../../store/actions/application'
+import { getApplicationApiKeyPageData } from '../../store/actions/application'
 import api from '../../api'
 
 import style from './application-api-key-edit.styl'
@@ -103,7 +103,7 @@ export default class ApplicationApiKeyEdit extends React.Component {
   componentDidMount () {
     const { dispatch, appId } = this.props
 
-    dispatch(getApplicationApiKey(appId))
+    dispatch(getApplicationApiKeyPageData(appId))
   }
 
   async handleSubmit (values, { setSubmitting, resetForm }) {
