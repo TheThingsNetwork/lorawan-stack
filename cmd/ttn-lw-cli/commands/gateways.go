@@ -145,7 +145,7 @@ var (
 		},
 	}
 	gatewaysGetCommand = &cobra.Command{
-		Use:     "get",
+		Use:     "get [gateway-id]",
 		Aliases: []string{"info"},
 		Short:   "Get a gateway",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -183,7 +183,7 @@ var (
 		},
 	}
 	gatewaysCreateCommand = &cobra.Command{
-		Use:     "create",
+		Use:     "create [gateway-id]",
 		Aliases: []string{"add", "register"},
 		Short:   "Create a gateway",
 		RunE: asBulk(func(cmd *cobra.Command, args []string) (err error) {
@@ -242,7 +242,7 @@ var (
 	}
 	errAntennaIndex       = errors.DefineInvalidArgument("antenna_index", "index of antenna to update out of bounds")
 	gatewaysUpdateCommand = &cobra.Command{
-		Use:     "update",
+		Use:     "update [gateway-id]",
 		Aliases: []string{"set"},
 		Short:   "Update a gateway",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -309,7 +309,7 @@ var (
 		},
 	}
 	gatewaysDeleteCommand = &cobra.Command{
-		Use:   "delete",
+		Use:   "delete [gateway-id]",
 		Short: "Delete a gateway",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			gtwID, err := getGatewayID(cmd.Flags(), args, true)
@@ -330,7 +330,7 @@ var (
 		},
 	}
 	gatewaysConnectionStats = &cobra.Command{
-		Use:   "connection-stats",
+		Use:   "connection-stats [gateway-id]",
 		Short: "Get connection stats for a gateway",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			gtwID, err := getGatewayID(cmd.Flags(), args, true)
