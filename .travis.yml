@@ -75,6 +75,8 @@ script:
     make dev.databases.start
     make dev.certs
     make go.test
+    go run ./cmd/ttn-lw-stack version
+    go run ./cmd/ttn-lw-cli version
   fi
 - |
   if [[ "$RUNTYPE" == "go.lint" ]]; then
