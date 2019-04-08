@@ -33,6 +33,7 @@ import FieldGroup from '../../../components/field/group'
 import diff from '../../../lib/diff'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import toast from '../../../components/toast'
+import SubmitBar from '../../../components/submit-bar'
 
 import { getApplicationApiKey } from '../../store/actions/application'
 import api from '../../api'
@@ -229,7 +230,7 @@ export default class ApplicationApiKeyEdit extends React.Component {
               >
                 {rightsItems}
               </FieldGroup>
-              <div className={style.submitBar}>
+              <SubmitBar>
                 <Button type="submit" message={sharedMessages.saveChanges} />
                 <ModalButton
                   type="button"
@@ -245,7 +246,7 @@ export default class ApplicationApiKeyEdit extends React.Component {
                   }}
                   onApprove={this.handleDelete}
                 />
-              </div>
+              </SubmitBar>
             </Form>
           </Col>
         </Row>
