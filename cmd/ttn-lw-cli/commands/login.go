@@ -32,12 +32,54 @@ import (
 	"golang.org/x/oauth2"
 )
 
+func logout() error {
+	defer func() {
+		cache.Set("oauth_token", (*oauth2.Token)(nil))
+		cache.Set("api_key", "")
+	}()
+	refreshToken() // NOTE: ignore errors.
+	optionalAuth()
+	if token, ok := cache.Get("oauth_token").(*oauth2.Token); ok && token != nil {
+		is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+		if err != nil {
+			return err
+		}
+		if res, err := ttnpb.NewEntityAccessClient(is).AuthInfo(ctx, ttnpb.Empty); err == nil {
+			if tokenInfo := res.GetOAuthAccessToken(); tokenInfo != nil {
+				logger.Info("Revoking the old OAuth token...")
+				_, err := ttnpb.NewOAuthAuthorizationRegistryClient(is).DeleteToken(ctx, &ttnpb.OAuthAccessTokenIdentifiers{
+					UserIDs:   tokenInfo.UserIDs,
+					ClientIDs: tokenInfo.ClientIDs,
+					ID:        tokenInfo.ID,
+				})
+				if err != nil {
+					logger.Warn("Could not revoke the OAuth token on the server")
+					if time.Until(token.Expiry) > 0 {
+						logger.Warnf("The OAuth token expires at %s", token.Expiry.Truncate(time.Minute).Format(time.Kitchen))
+					}
+					if token.RefreshToken != "" {
+						logger.Warn("The OAuth token can still be refreshed after expiry")
+					}
+					logger.Warn("Contact support if this token was compromised")
+				}
+			}
+		}
+	}
+	if _, ok := cache.Get("api_key").(string); ok {
+		logger.Info("Removing API key from cache")
+		logger.Warn("Delete the API key if it was compromised")
+	}
+	return nil
+}
+
 var (
 	loginCommand = &cobra.Command{
 		Use:               "login",
 		Short:             "Login",
 		PersistentPreRunE: preRun(),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			logout()
+
 			ctx, done := context.WithCancel(ctx)
 			defer done()
 
@@ -125,44 +167,14 @@ var (
 		},
 	}
 	logoutCommand = &cobra.Command{
-		Use:   "logout",
-		Short: "Logout",
+		Use:               "logout",
+		Short:             "Logout",
+		PersistentPreRunE: preRun(),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if token, ok := cache.Get("oauth_token").(*oauth2.Token); ok && token != nil {
-				is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
-				if err != nil {
-					return err
-				}
-
-				if res, err := ttnpb.NewEntityAccessClient(is).AuthInfo(ctx, ttnpb.Empty); err == nil {
-					if tokenInfo := res.GetOAuthAccessToken(); tokenInfo != nil {
-						_, err := ttnpb.NewOAuthAuthorizationRegistryClient(is).DeleteToken(ctx, &ttnpb.OAuthAccessTokenIdentifiers{
-							UserIDs:   tokenInfo.UserIDs,
-							ClientIDs: tokenInfo.ClientIDs,
-							ID:        tokenInfo.ID,
-						})
-						if err != nil {
-							logger.Warn("We could not revoke the OAuth token on the server")
-							if time.Until(token.Expiry) > 0 {
-								logger.Warnf("The OAuth token expires at %s", token.Expiry.Truncate(time.Minute).Format(time.Kitchen))
-							}
-							if token.RefreshToken != "" {
-								logger.Warn("The OAuth token can still be refreshed after expiry")
-							}
-							logger.Warn("Please contact support if this token was compromised")
-						}
-					}
-				}
-
-				cache.Set("oauth_token", (*oauth2.Token)(nil))
-
-				logger.Info("Logged out")
+			if err := logout(); err != nil {
+				return err
 			}
-			if _, ok := cache.Get("api_key").(string); ok {
-				cache.Set("api_key", "")
-				logger.Info("Removed API key from cache")
-				logger.Warn("Make sure to delete the API key if it was compromised")
-			}
+			logger.Info("Logged out")
 			return nil
 		},
 	}
