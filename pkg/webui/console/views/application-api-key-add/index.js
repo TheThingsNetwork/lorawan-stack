@@ -83,10 +83,9 @@ export default class ApplicationApiKeyAdd extends React.Component {
 
   async handleApprove () {
     const { dispatch, appId } = this.props
-    const { createdId } = this.state
 
     await this.setState({ modal: null })
-    dispatch(replace(`/console/applications/${appId}/api-keys/${createdId}`))
+    dispatch(replace(`/console/applications/${appId}/api-keys`))
   }
 
   async handleSubmit (values, { resetForm }) {
@@ -103,7 +102,6 @@ export default class ApplicationApiKeyAdd extends React.Component {
     try {
       const created = await api.application.apiKeys.create(appId, key)
       await this.setState({
-        createdId: created.id,
         modal: {
           secret: created.key,
           rights: created.rights,
