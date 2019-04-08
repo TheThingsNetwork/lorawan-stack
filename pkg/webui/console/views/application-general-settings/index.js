@@ -30,10 +30,9 @@ import Button from '../../../components/button'
 import ModalButton from '../../../components/button/modal-button'
 import diff from '../../../lib/diff'
 import toast from '../../../components/toast'
+import SubmitBar from '../../../components/submit-bar'
 
 import api from '../../api'
-
-import style from './application-general-settings.styl'
 
 const m = defineMessages({
   basics: 'Basics',
@@ -149,10 +148,8 @@ export default class ApplicationGeneralSettings extends React.Component {
                 name="description"
                 type="text"
               />
-              <div className={style.submitBar}>
-                <div>
-                  <Button type="submit" message={sharedMessages.saveChanges} />
-                </div>
+              <SubmitBar>
+                <Button type="submit" message={sharedMessages.saveChanges} />
                 <ModalButton
                   type="button"
                   icon="delete"
@@ -162,7 +159,7 @@ export default class ApplicationGeneralSettings extends React.Component {
                   modalData={{ message: { values: { appName: application.name }, ...m.modalWarning }}}
                   onApprove={this.handleDelete}
                 />
-              </div>
+              </SubmitBar>
             </Form>
           </Col>
         </Row>
