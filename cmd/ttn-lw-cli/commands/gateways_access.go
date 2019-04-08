@@ -213,17 +213,17 @@ var (
 		},
 	}
 	gatewayAPIKeysUpdate = &cobra.Command{
-		Use:     "update",
+		Use:     "update [gateway-id] [api-key-id]",
 		Aliases: []string{"set"},
 		Short:   "Update a gateway API key",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			id := getAPIKeyID(cmd.Flags(), args)
-			if id == "" {
-				return errNoAPIKeyID
-			}
-			gtwID, err := getGatewayID(cmd.Flags(), nil, true)
+			gtwID, err := getGatewayID(cmd.Flags(), args[:1], true)
 			if err != nil {
 				return err
+			}
+			id := getAPIKeyID(cmd.Flags(), args, 1)
+			if id == "" {
+				return errNoAPIKeyID
 			}
 			name, _ := cmd.Flags().GetString("name")
 
@@ -252,17 +252,17 @@ var (
 		},
 	}
 	gatewayAPIKeysDelete = &cobra.Command{
-		Use:     "delete",
+		Use:     "delete [gateway-id] [api-key-id]",
 		Aliases: []string{"remove"},
 		Short:   "Delete a gateway API key",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			id := getAPIKeyID(cmd.Flags(), args)
-			if id == "" {
-				return errNoAPIKeyID
-			}
-			gtwID, err := getGatewayID(cmd.Flags(), nil, true)
+			gtwID, err := getGatewayID(cmd.Flags(), args[:1], true)
 			if err != nil {
 				return err
+			}
+			id := getAPIKeyID(cmd.Flags(), args, 1)
+			if id == "" {
+				return errNoAPIKeyID
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)

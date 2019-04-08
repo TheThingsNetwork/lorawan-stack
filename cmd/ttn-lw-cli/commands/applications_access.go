@@ -213,17 +213,17 @@ var (
 		},
 	}
 	applicationAPIKeysUpdate = &cobra.Command{
-		Use:     "update",
+		Use:     "update [application-id] [api-key-id]",
 		Aliases: []string{"set"},
 		Short:   "Update an application API key",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			id := getAPIKeyID(cmd.Flags(), args)
-			if id == "" {
-				return errNoAPIKeyID
-			}
-			appID := getApplicationID(cmd.Flags(), nil)
+			appID := getApplicationID(cmd.Flags(), args[:1])
 			if appID == nil {
 				return errNoApplicationID
+			}
+			id := getAPIKeyID(cmd.Flags(), args, 1)
+			if id == "" {
+				return errNoAPIKeyID
 			}
 			name, _ := cmd.Flags().GetString("name")
 
@@ -252,17 +252,17 @@ var (
 		},
 	}
 	applicationAPIKeysDelete = &cobra.Command{
-		Use:     "delete",
+		Use:     "delete [application-id] [api-key-id]",
 		Aliases: []string{"remove"},
 		Short:   "Delete an application API key",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			id := getAPIKeyID(cmd.Flags(), args)
-			if id == "" {
-				return errNoAPIKeyID
-			}
-			appID := getApplicationID(cmd.Flags(), nil)
+			appID := getApplicationID(cmd.Flags(), args[:1])
 			if appID == nil {
 				return errNoApplicationID
+			}
+			id := getAPIKeyID(cmd.Flags(), args, 1)
+			if id == "" {
+				return errNoAPIKeyID
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
