@@ -486,7 +486,6 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *ttnpb
 		req.DownlinkPaths = a.paths
 		down := &ttnpb.DownlinkMessage{
 			RawPayload:     b,
-			EndDeviceIDs:   &devID,
 			CorrelationIDs: events.CorrelationIDsFromContext(ctx),
 			Settings: &ttnpb.DownlinkMessage_Request{
 				Request: req,

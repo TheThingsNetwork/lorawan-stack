@@ -324,11 +324,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 				expected.RecentDownlinks = append(expected.RecentDownlinks, &ttnpb.DownlinkMessage{
 					RawPayload:     genDown.Payload,
 					CorrelationIDs: ret.RecentDownlinks[0].CorrelationIDs,
-					EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-						DeviceID:               DeviceID,
-						DevAddr:                &DevAddr,
-					},
 					Settings: &ttnpb.DownlinkMessage_Request{
 						Request: &ttnpb.TxRequest{
 							Class:            ttnpb.CLASS_A,
@@ -418,11 +413,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 									a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 										RawPayload:     genDown.Payload,
 										CorrelationIDs: msg.CorrelationIDs,
-										EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-											ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-											DeviceID:               DeviceID,
-											DevAddr:                &DevAddr,
-										},
 										Settings: &ttnpb.DownlinkMessage_Request{
 											Request: &ttnpb.TxRequest{
 												Class:            ttnpb.CLASS_A,
@@ -457,11 +447,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 							a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 								RawPayload:     genDown.Payload,
 								CorrelationIDs: msg.CorrelationIDs,
-								EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-									ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-									DeviceID:               DeviceID,
-									DevAddr:                &DevAddr,
-								},
 								Settings: &ttnpb.DownlinkMessage_Request{
 									Request: &ttnpb.TxRequest{
 										Class:            ttnpb.CLASS_A,
@@ -505,11 +490,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 									RawPayload:     genDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
-									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-										DeviceID:               DeviceID,
-										DevAddr:                &DevAddr,
-									},
 									Settings: &ttnpb.DownlinkMessage_Request{
 										Request: &ttnpb.TxRequest{
 											Class:            ttnpb.CLASS_A,
@@ -783,11 +763,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 									a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 										RawPayload:     genDown.Payload,
 										CorrelationIDs: msg.CorrelationIDs,
-										EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-											ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-											DeviceID:               DeviceID,
-											DevAddr:                &DevAddr,
-										},
 										Settings: &ttnpb.DownlinkMessage_Request{
 											Request: &ttnpb.TxRequest{
 												Class:            ttnpb.CLASS_A,
@@ -822,11 +797,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 							a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 								RawPayload:     genDown.Payload,
 								CorrelationIDs: msg.CorrelationIDs,
-								EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-									ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-									DeviceID:               DeviceID,
-									DevAddr:                &DevAddr,
-								},
 								Settings: &ttnpb.DownlinkMessage_Request{
 									Request: &ttnpb.TxRequest{
 										Class:            ttnpb.CLASS_A,
@@ -870,11 +840,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 									RawPayload:     genDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
-									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-										DeviceID:               DeviceID,
-										DevAddr:                &DevAddr,
-									},
 									Settings: &ttnpb.DownlinkMessage_Request{
 										Request: &ttnpb.TxRequest{
 											Class:            ttnpb.CLASS_A,
@@ -1118,11 +1083,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 				expected.RecentDownlinks = append(expected.RecentDownlinks, &ttnpb.DownlinkMessage{
 					RawPayload:     genDown.Payload,
 					CorrelationIDs: ret.RecentDownlinks[0].CorrelationIDs,
-					EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-						DeviceID:               DeviceID,
-						DevAddr:                &DevAddr,
-					},
 					Settings: &ttnpb.DownlinkMessage_Request{
 						Request: &ttnpb.TxRequest{
 							Class:            ttnpb.CLASS_A,
@@ -1193,11 +1153,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 									RawPayload:     genDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
-									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-										DeviceID:               DeviceID,
-										DevAddr:                &DevAddr,
-									},
 									Settings: &ttnpb.DownlinkMessage_Request{
 										Request: &ttnpb.TxRequest{
 											Class:            ttnpb.CLASS_A,
@@ -1235,11 +1190,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 									RawPayload:     genDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
-									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-										DeviceID:               DeviceID,
-										DevAddr:                &DevAddr,
-									},
 									Settings: &ttnpb.DownlinkMessage_Request{
 										Request: &ttnpb.TxRequest{
 											Class:            ttnpb.CLASS_A,
@@ -1290,11 +1240,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 									RawPayload:     genDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
-									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-										DeviceID:               DeviceID,
-										DevAddr:                &DevAddr,
-									},
 									Settings: &ttnpb.DownlinkMessage_Request{
 										Request: &ttnpb.TxRequest{
 											Class:            ttnpb.CLASS_A,
@@ -1533,11 +1478,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 				expected.RecentDownlinks = append(expected.RecentDownlinks, &ttnpb.DownlinkMessage{
 					RawPayload:     rx2GenDown.Payload,
 					CorrelationIDs: ret.RecentDownlinks[0].CorrelationIDs,
-					EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-						DeviceID:               DeviceID,
-						DevAddr:                &DevAddr,
-					},
 					Settings: &ttnpb.DownlinkMessage_Request{
 						Request: &ttnpb.TxRequest{
 							Class:            ttnpb.CLASS_C,
@@ -1616,11 +1556,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 									RawPayload:     rx1GenDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
-									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-										DeviceID:               DeviceID,
-										DevAddr:                &DevAddr,
-									},
 									Settings: &ttnpb.DownlinkMessage_Request{
 										Request: &ttnpb.TxRequest{
 											Class:            ttnpb.CLASS_A,
@@ -1652,11 +1587,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 									RawPayload:     rx2GenDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
-									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-										DeviceID:               DeviceID,
-										DevAddr:                &DevAddr,
-									},
 									Settings: &ttnpb.DownlinkMessage_Request{
 										Request: &ttnpb.TxRequest{
 											Class:            ttnpb.CLASS_C,
@@ -1689,11 +1619,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 									RawPayload:     rx1GenDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
-									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-										DeviceID:               DeviceID,
-										DevAddr:                &DevAddr,
-									},
 									Settings: &ttnpb.DownlinkMessage_Request{
 										Request: &ttnpb.TxRequest{
 											Class:            ttnpb.CLASS_A,
@@ -1730,11 +1655,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 									RawPayload:     rx1GenDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
-									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-										DeviceID:               DeviceID,
-										DevAddr:                &DevAddr,
-									},
 									Settings: &ttnpb.DownlinkMessage_Request{
 										Request: &ttnpb.TxRequest{
 											Class:            ttnpb.CLASS_A,
@@ -1767,11 +1687,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 									RawPayload:     rx2GenDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
-									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-										DeviceID:               DeviceID,
-										DevAddr:                &DevAddr,
-									},
 									Settings: &ttnpb.DownlinkMessage_Request{
 										Request: &ttnpb.TxRequest{
 											Class:            ttnpb.CLASS_C,
@@ -1807,11 +1722,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 									RawPayload:     rx2GenDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
-									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-										DeviceID:               DeviceID,
-										DevAddr:                &DevAddr,
-									},
 									Settings: &ttnpb.DownlinkMessage_Request{
 										Request: &ttnpb.TxRequest{
 											Class:            ttnpb.CLASS_C,
@@ -2035,11 +1945,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 				expected.RecentDownlinks = append(expected.RecentDownlinks, &ttnpb.DownlinkMessage{
 					RawPayload:     rx2GenDown.Payload,
 					CorrelationIDs: ret.RecentDownlinks[0].CorrelationIDs,
-					EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-						DeviceID:               DeviceID,
-						DevAddr:                &DevAddr,
-					},
 					Settings: &ttnpb.DownlinkMessage_Request{
 						Request: &ttnpb.TxRequest{
 							Class:            ttnpb.CLASS_C,
@@ -2108,11 +2013,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 									RawPayload:     rx2GenDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
-									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-										DeviceID:               DeviceID,
-										DevAddr:                &DevAddr,
-									},
 									Settings: &ttnpb.DownlinkMessage_Request{
 										Request: &ttnpb.TxRequest{
 											Class:            ttnpb.CLASS_C,
@@ -2379,11 +2279,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 				expected.RecentDownlinks = append(expected.RecentDownlinks, &ttnpb.DownlinkMessage{
 					RawPayload:     rx2GenDown.Payload,
 					CorrelationIDs: ret.RecentDownlinks[0].CorrelationIDs,
-					EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-						DeviceID:               DeviceID,
-						DevAddr:                &DevAddr,
-					},
 					Settings: &ttnpb.DownlinkMessage_Request{
 						Request: &ttnpb.TxRequest{
 							Class:            ttnpb.CLASS_C,
@@ -2455,11 +2350,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 									RawPayload:     rx2GenDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
-									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-										DeviceID:               DeviceID,
-										DevAddr:                &DevAddr,
-									},
 									Settings: &ttnpb.DownlinkMessage_Request{
 										Request: &ttnpb.TxRequest{
 											Class:            ttnpb.CLASS_C,
@@ -2493,11 +2383,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 									RawPayload:     rx2GenDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
-									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-										DeviceID:               DeviceID,
-										DevAddr:                &DevAddr,
-									},
 									Settings: &ttnpb.DownlinkMessage_Request{
 										Request: &ttnpb.TxRequest{
 											Class:            ttnpb.CLASS_C,
@@ -2533,11 +2418,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 									RawPayload:     rx2GenDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
-									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-										DeviceID:               DeviceID,
-										DevAddr:                &DevAddr,
-									},
 									Settings: &ttnpb.DownlinkMessage_Request{
 										Request: &ttnpb.TxRequest{
 											Class:            ttnpb.CLASS_C,
@@ -2579,11 +2459,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 									RawPayload:     rx2GenDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
-									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-										DeviceID:               DeviceID,
-										DevAddr:                &DevAddr,
-									},
 									Settings: &ttnpb.DownlinkMessage_Request{
 										Request: &ttnpb.TxRequest{
 											Class:            ttnpb.CLASS_C,
@@ -2836,11 +2711,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 				expected.RecentDownlinks = append(expected.RecentDownlinks, &ttnpb.DownlinkMessage{
 					RawPayload:     []byte("testJoinAccept"),
 					CorrelationIDs: ret.RecentDownlinks[0].CorrelationIDs,
-					EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-						DeviceID:               DeviceID,
-						DevAddr:                &DevAddr,
-					},
 					Settings: &ttnpb.DownlinkMessage_Request{
 						Request: &ttnpb.TxRequest{
 							Class:            ttnpb.CLASS_A,
@@ -2906,11 +2776,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 									a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 										RawPayload:     []byte("testJoinAccept"),
 										CorrelationIDs: msg.CorrelationIDs,
-										EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-											ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-											DeviceID:               DeviceID,
-											DevAddr:                &DevAddr,
-										},
 										Settings: &ttnpb.DownlinkMessage_Request{
 											Request: &ttnpb.TxRequest{
 												Class:            ttnpb.CLASS_A,
@@ -2943,11 +2808,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 							a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 								RawPayload:     []byte("testJoinAccept"),
 								CorrelationIDs: msg.CorrelationIDs,
-								EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-									ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-									DeviceID:               DeviceID,
-									DevAddr:                &DevAddr,
-								},
 								Settings: &ttnpb.DownlinkMessage_Request{
 									Request: &ttnpb.TxRequest{
 										Class:            ttnpb.CLASS_A,
@@ -2989,11 +2849,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 									RawPayload:     []byte("testJoinAccept"),
 									CorrelationIDs: msg.CorrelationIDs,
-									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-										DeviceID:               DeviceID,
-										DevAddr:                &DevAddr,
-									},
 									Settings: &ttnpb.DownlinkMessage_Request{
 										Request: &ttnpb.TxRequest{
 											Class:            ttnpb.CLASS_A,
