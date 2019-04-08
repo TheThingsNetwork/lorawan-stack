@@ -26,7 +26,7 @@ import (
 
 var (
 	organizationRights = &cobra.Command{
-		Use:   "rights",
+		Use:   "rights [organization-id]",
 		Short: "List the rights to an organization",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			orgID := getOrganizationID(cmd.Flags(), args)
@@ -52,7 +52,7 @@ var (
 		Short:   "Manage organization collaborators",
 	}
 	organizationCollaboratorsList = &cobra.Command{
-		Use:     "list",
+		Use:     "list [organization-id]",
 		Aliases: []string{"ls"},
 		Short:   "List organization collaborators",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -150,7 +150,7 @@ var (
 		Short:   "Manage organization API keys",
 	}
 	organizationAPIKeysList = &cobra.Command{
-		Use:     "list",
+		Use:     "list [organization-id]",
 		Aliases: []string{"ls"},
 		Short:   "List organization API keys",
 		RunE: func(cmd *cobra.Command, args []string) error {

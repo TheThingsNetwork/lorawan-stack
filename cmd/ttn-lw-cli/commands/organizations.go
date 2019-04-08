@@ -110,7 +110,7 @@ var (
 		},
 	}
 	organizationsGetCommand = &cobra.Command{
-		Use:     "get",
+		Use:     "get [organization-id]",
 		Aliases: []string{"info"},
 		Short:   "Get an organization",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -136,7 +136,7 @@ var (
 		},
 	}
 	organizationsCreateCommand = &cobra.Command{
-		Use:     "create",
+		Use:     "create [organization-id]",
 		Aliases: []string{"add", "register"},
 		Short:   "Create an organization",
 		RunE: asBulk(func(cmd *cobra.Command, args []string) (err error) {
@@ -179,7 +179,7 @@ var (
 		}),
 	}
 	organizationsUpdateCommand = &cobra.Command{
-		Use:     "update",
+		Use:     "update [organization-id]",
 		Aliases: []string{"set"},
 		Short:   "Update an organization",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -216,7 +216,7 @@ var (
 		},
 	}
 	organizationsDeleteCommand = &cobra.Command{
-		Use:   "delete",
+		Use:   "delete [organization-id]",
 		Short: "Delete an organization",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			orgID := getOrganizationID(cmd.Flags(), args)
