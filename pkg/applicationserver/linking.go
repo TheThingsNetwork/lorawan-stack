@@ -227,12 +227,6 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 			return err
 		}
 
-		if handleUpErr != nil {
-			logger.WithError(err).Warn("Failed to process upstream message")
-			registerDropUp(ctx, up, err)
-			continue
-		}
-
 		switch p := up.Up.(type) {
 		case *ttnpb.ApplicationUp_JoinAccept:
 			p.JoinAccept.AppSKey = nil
@@ -240,6 +234,13 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 		case *ttnpb.ApplicationUp_DownlinkQueueInvalidated:
 			continue
 		}
+
+		if handleUpErr != nil {
+			logger.WithError(err).Warn("Failed to process upstream message")
+			registerDropUp(ctx, up, err)
+			continue
+		}
+
 		l.upCh <- up
 		registerForwardUp(ctx, up)
 	}
