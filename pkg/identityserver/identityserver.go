@@ -160,6 +160,7 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 		hooks.RegisterUnaryHook("/ttn.lorawan.v3.UserAccess", hook.name, hook.middleware)
 	}
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.EntityAccess", cluster.HookName, c.ClusterAuthUnaryHook())
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.OAuthAuthorizationRegistry", rights.HookName, rights.Hook)
 
 	c.RegisterGRPC(is)
 	c.RegisterWeb(is.oauth)
@@ -187,6 +188,7 @@ func (is *IdentityServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterUserAccessServer(s, &userAccess{IdentityServer: is})
 	ttnpb.RegisterUserInvitationRegistryServer(s, &invitationRegistry{IdentityServer: is})
 	ttnpb.RegisterEntityRegistrySearchServer(s, &registrySearch{IdentityServer: is, adminOnly: true})
+	ttnpb.RegisterOAuthAuthorizationRegistryServer(s, &oauthRegistry{IdentityServer: is})
 	ttnpb.RegisterContactInfoRegistryServer(s, &contactInfoRegistry{IdentityServer: is})
 }
 
@@ -206,6 +208,7 @@ func (is *IdentityServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.Clien
 	ttnpb.RegisterUserAccessHandler(is.Context(), s, conn)
 	ttnpb.RegisterUserInvitationRegistryHandler(is.Context(), s, conn)
 	ttnpb.RegisterEntityRegistrySearchHandler(is.Context(), s, conn)
+	ttnpb.RegisterOAuthAuthorizationRegistryHandler(is.Context(), s, conn)
 	ttnpb.RegisterContactInfoRegistryHandler(is.Context(), s, conn)
 }
 

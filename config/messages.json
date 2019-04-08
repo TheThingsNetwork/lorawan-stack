@@ -3104,6 +3104,15 @@
       "file": "contact_info_store.go"
     }
   },
+  "error:pkg/identityserver:access_token_mismatch": {
+    "translations": {
+      "en": "access token ID did not match user or client identifiers"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "oauth_registry.go"
+    }
+  },
   "error:pkg/identityserver:api_key_not_found": {
     "translations": {
       "en": "API key not found"
