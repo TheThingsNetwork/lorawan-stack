@@ -65,7 +65,7 @@ func logout() error {
 			}
 		}
 	}
-	if _, ok := cache.Get("api_key").(string); ok {
+	if key, ok := cache.Get("api_key").(string); ok && key != "" {
 		logger.Info("Removing API key from cache")
 		logger.Warn("Delete the API key if it was compromised")
 	}

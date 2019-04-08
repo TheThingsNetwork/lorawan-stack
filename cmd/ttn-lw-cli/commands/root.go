@@ -176,7 +176,7 @@ func optionalAuth() error {
 }
 
 func requireAuth() error {
-	if apiKey, ok := cache.Get("api_key").(string); ok {
+	if apiKey, ok := cache.Get("api_key").(string); ok && apiKey != "" {
 		logger.Debug("Using API key")
 		api.SetAuth("bearer", apiKey)
 		return nil
