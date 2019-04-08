@@ -88,7 +88,7 @@ var (
 		},
 	}
 	usersGetCommand = &cobra.Command{
-		Use:     "get",
+		Use:     "get [user-id]",
 		Aliases: []string{"info"},
 		Short:   "Get a user",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -114,7 +114,7 @@ var (
 		},
 	}
 	usersCreateCommand = &cobra.Command{
-		Use:               "create",
+		Use:               "create [user-id]",
 		Aliases:           []string{"add", "register"},
 		Short:             "Create a user",
 		PersistentPreRunE: preRun(optionalAuth),
@@ -175,7 +175,7 @@ var (
 		}),
 	}
 	usersUpdateCommand = &cobra.Command{
-		Use:     "update",
+		Use:     "update [user-id]",
 		Aliases: []string{"set"},
 		Short:   "Update a user",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -219,7 +219,7 @@ var (
 		},
 	}
 	usersForgotPasswordCommand = &cobra.Command{
-		Use:   "forgot-password",
+		Use:   "forgot-password [user-id]",
 		Short: "Request a temporary user password",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			usrID := getUserID(cmd.Flags(), args)
@@ -241,7 +241,7 @@ var (
 		},
 	}
 	usersUpdatePasswordCommand = &cobra.Command{
-		Use:     "update-password",
+		Use:     "update-password [user-id]",
 		Aliases: []string{"change-password"},
 		Short:   "Update a user password",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -285,7 +285,7 @@ var (
 		},
 	}
 	usersDeleteCommand = &cobra.Command{
-		Use:   "delete",
+		Use:   "delete [user-id]",
 		Short: "Delete a user",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			usrID := getUserID(cmd.Flags(), args)

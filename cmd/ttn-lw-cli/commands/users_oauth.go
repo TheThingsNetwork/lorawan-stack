@@ -58,7 +58,7 @@ var (
 		Short: "Manage OAuth authorizations",
 	}
 	oauthAuthorizationsListCommand = &cobra.Command{
-		Use:     "list",
+		Use:     "list [user-id]",
 		Aliases: []string{"ls"},
 		Short:   "List OAuth authorizations",
 		RunE: func(cmd *cobra.Command, args []string) error {

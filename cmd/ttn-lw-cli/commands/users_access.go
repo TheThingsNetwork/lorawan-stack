@@ -26,7 +26,7 @@ import (
 
 var (
 	userRights = &cobra.Command{
-		Use:   "rights",
+		Use:   "rights [user-id]",
 		Short: "List the rights to a user",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			usrID := getUserID(cmd.Flags(), args)
@@ -52,7 +52,7 @@ var (
 		Short:   "Manage user API keys",
 	}
 	userAPIKeysList = &cobra.Command{
-		Use:     "list",
+		Use:     "list [user-id]",
 		Aliases: []string{"ls"},
 		Short:   "List user API keys",
 		RunE: func(cmd *cobra.Command, args []string) error {
