@@ -14,7 +14,11 @@
 
 package errors
 
-import "google.golang.org/grpc/status"
+import (
+	"fmt"
+
+	"google.golang.org/grpc/status"
+)
 
 // From returns an *Error if it can be derived from the given input.
 // For a nil error, false will be returned.
@@ -49,11 +53,20 @@ func From(err error) (out *Error, ok bool) {
 		var e Error
 		setErrorDetails(&e, err)
 		return &e, true
-	default:
-		if se, ok := err.(interface{ GRPCStatus() *status.Status }); ok {
-			err := FromGRPCStatus(se.GRPCStatus())
-			return &err, true
+	case interface{ GRPCStatus() *status.Status }:
+		e := FromGRPCStatus(err.GRPCStatus())
+		return &e, true
+	case validationError:
+		e := build(errValidation, 0).WithAttributes(
+			"field", err.Field(),
+			"reason", err.Reason(),
+			"name", err.ErrorName(),
+		)
+		if cause := err.Cause(); cause != nil {
+			e = e.WithCause(cause)
 		}
+		fmt.Println(e.StackTrace())
+		return &e, true
 	}
 	return nil, false
 }
