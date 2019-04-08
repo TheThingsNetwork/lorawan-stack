@@ -29,7 +29,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
-	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -785,15 +784,10 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 
 // newDevAddr generates a DevAddr for specified EndDevice.
 func (ns *NetworkServer) newDevAddr(context.Context, *ttnpb.EndDevice) types.DevAddr {
-	// TODO: Allow generating DevAddr from a prefix. (https://github.com/TheThingsNetwork/lorawan-stack/issues/130)
-	nwkAddr := make([]byte, types.NwkAddrLength(ns.netID))
-	random.Read(nwkAddr)
-	nwkAddr[0] &= 0xff >> (8 - types.NwkAddrBits(ns.netID)%8)
-	devAddr, err := types.NewDevAddr(ns.netID, nwkAddr)
-	if err != nil {
-		panic(errors.New("failed to create new DevAddr").WithCause(err))
-	}
-	return devAddr
+	var devAddr types.DevAddr
+	random.Read(devAddr[:])
+	prefix := ns.devAddrPrefixes[random.Intn(len(ns.devAddrPrefixes))]
+	return devAddr.WithPrefix(prefix)
 }
 
 func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage, acc *metadataAccumulator) (err error) {
