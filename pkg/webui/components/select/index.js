@@ -15,6 +15,7 @@
 import React from 'react'
 import ReactSelect from 'react-select'
 import { injectIntl } from 'react-intl'
+import bind from 'autobind-decorator'
 
 import style from './select.styl'
 
@@ -22,26 +23,49 @@ import style from './select.styl'
 // See: https://github.com/JedWatson/react-select/issues/2841
 const getValue = (opts, val) => opts.find(o => o.value === val)
 
-const Select = function ({ value, className, intl, options, ...rest }) {
-  const classNames = className ? [ className, style.container ].join(' ') : style.container
-  const translatedOptions = options.map(function (option) {
-    const { label, labelValues = {}} = option
-    if (typeof label === 'object' && label.id && label.defaultMessage) {
-      return { ...option, label: intl.formatMessage(label, labelValues) }
+@bind
+class Select extends React.PureComponent {
+
+  onChange ({ value }) {
+    const { onChange } = this.props
+
+    if (onChange) {
+      onChange(value)
     }
+  }
 
-    return option
-  })
+  render () {
+    const {
+      className,
+      options,
+      intl,
+      value,
+      onChange,
+      ...rest
+    } = this.props
 
-  return (
-    <ReactSelect
-      className={classNames}
-      classNamePrefix="select"
-      value={getValue(translatedOptions, value)}
-      options={translatedOptions}
-      {...rest}
-    />
-  )
+    const formatMessage = (label, values) => intl ? intl.formatMessage(label, values) : label
+    const classNames = className ? [ className, style.container ].join(' ') : style.container
+    const translatedOptions = options.map(function (option) {
+      const { label, labelValues = {}} = option
+      if (typeof label === 'object' && label.id && label.defaultMessage) {
+        return { ...option, label: formatMessage(label, labelValues) }
+      }
+
+      return option
+    })
+
+    return (
+      <ReactSelect
+        className={classNames}
+        classNamePrefix="select"
+        value={getValue(translatedOptions, value)}
+        options={translatedOptions}
+        onChange={this.onChange}
+        {...rest}
+      />
+    )
+  }
 }
 
 export default injectIntl(Select)
