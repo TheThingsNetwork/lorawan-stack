@@ -15,4 +15,9 @@
 package jsonpb
 
 // TTN returns the default TTN JSONPb marshaler.
-func TTN() *GoGoJSONPb { return &GoGoJSONPb{OrigName: true} }
+func TTN() *GoGoJSONPb {
+	return &GoGoJSONPb{
+		OrigName:    true,
+		EnumsAsInts: true,
+	}
+}
