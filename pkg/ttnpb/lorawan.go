@@ -183,6 +183,16 @@ func (v *DataRateIndex) UnmarshalText(b []byte) error {
 	return nil
 }
 
+// MarshalJSON implements json.Marshaler interface.
+func (v DataRateIndex) MarshalJSON() ([]byte, error) {
+	return v.MarshalText()
+}
+
+// UnmarshalJSON implements json.Unmarshaler interface.
+func (v *DataRateIndex) UnmarshalJSON(b []byte) error {
+	return v.UnmarshalText(b)
+}
+
 // String implements fmt.Stringer.
 func (v RxDelay) String() string {
 	return strconv.Itoa(int(v))
@@ -207,4 +217,14 @@ func (v *RxDelay) UnmarshalText(b []byte) error {
 	}
 	*v = RxDelay(i)
 	return nil
+}
+
+// MarshalJSON implements json.Marshaler interface.
+func (v RxDelay) MarshalJSON() ([]byte, error) {
+	return v.MarshalText()
+}
+
+// UnmarshalJSON implements json.Unmarshaler interface.
+func (v *RxDelay) UnmarshalJSON(b []byte) error {
+	return v.UnmarshalText(b)
 }
