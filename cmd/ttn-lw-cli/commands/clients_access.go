@@ -26,7 +26,7 @@ import (
 
 var (
 	clientRights = &cobra.Command{
-		Use:   "rights",
+		Use:   "rights [client-id]",
 		Short: "List the rights to a client",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliID := getClientID(cmd.Flags(), args)
@@ -52,7 +52,7 @@ var (
 		Short:   "Manage client collaborators",
 	}
 	clientCollaboratorsList = &cobra.Command{
-		Use:     "list",
+		Use:     "list [client-id]",
 		Aliases: []string{"ls"},
 		Short:   "List client collaborators",
 		RunE: func(cmd *cobra.Command, args []string) error {

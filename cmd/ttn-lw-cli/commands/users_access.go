@@ -26,7 +26,7 @@ import (
 
 var (
 	userRights = &cobra.Command{
-		Use:   "rights",
+		Use:   "rights [user-id]",
 		Short: "List the rights to a user",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			usrID := getUserID(cmd.Flags(), args)
@@ -52,7 +52,7 @@ var (
 		Short:   "Manage user API keys",
 	}
 	userAPIKeysList = &cobra.Command{
-		Use:     "list",
+		Use:     "list [user-id]",
 		Aliases: []string{"ls"},
 		Short:   "List user API keys",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -78,11 +78,11 @@ var (
 		},
 	}
 	userAPIKeysCreate = &cobra.Command{
-		Use:     "create",
+		Use:     "create [user-id]",
 		Aliases: []string{"add", "generate"},
 		Short:   "Create a user API key",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			usrID := getUserID(cmd.Flags(), nil)
+			usrID := getUserID(cmd.Flags(), args)
 			if usrID == nil {
 				return errNoUserID
 			}
@@ -115,17 +115,17 @@ var (
 		},
 	}
 	userAPIKeysUpdate = &cobra.Command{
-		Use:     "update",
+		Use:     "update [user-id] [api-key-id]",
 		Aliases: []string{"set"},
 		Short:   "Update a user API key",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			id := getAPIKeyID(cmd.Flags(), args)
-			if id == "" {
-				return errNoAPIKeyID
-			}
-			usrID := getUserID(cmd.Flags(), nil)
+			usrID := getUserID(cmd.Flags(), firstArgs(1, args...))
 			if usrID == nil {
 				return errNoUserID
+			}
+			id := getAPIKeyID(cmd.Flags(), args, 1)
+			if id == "" {
+				return errNoAPIKeyID
 			}
 			name, _ := cmd.Flags().GetString("name")
 
@@ -154,17 +154,17 @@ var (
 		},
 	}
 	userAPIKeysDelete = &cobra.Command{
-		Use:     "delete",
+		Use:     "delete [user-id] [api-key-id]",
 		Aliases: []string{"remove"},
 		Short:   "Delete a user API key",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			id := getAPIKeyID(cmd.Flags(), args)
-			if id == "" {
-				return errNoAPIKeyID
-			}
-			usrID := getUserID(cmd.Flags(), nil)
+			usrID := getUserID(cmd.Flags(), firstArgs(1, args...))
 			if usrID == nil {
 				return errNoUserID
+			}
+			id := getAPIKeyID(cmd.Flags(), args, 1)
+			if id == "" {
+				return errNoAPIKeyID
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)

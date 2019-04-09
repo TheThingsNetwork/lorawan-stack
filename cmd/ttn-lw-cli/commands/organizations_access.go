@@ -26,7 +26,7 @@ import (
 
 var (
 	organizationRights = &cobra.Command{
-		Use:   "rights",
+		Use:   "rights [organization-id]",
 		Short: "List the rights to an organization",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			orgID := getOrganizationID(cmd.Flags(), args)
@@ -52,7 +52,7 @@ var (
 		Short:   "Manage organization collaborators",
 	}
 	organizationCollaboratorsList = &cobra.Command{
-		Use:     "list",
+		Use:     "list [organization-id]",
 		Aliases: []string{"ls"},
 		Short:   "List organization collaborators",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -150,7 +150,7 @@ var (
 		Short:   "Manage organization API keys",
 	}
 	organizationAPIKeysList = &cobra.Command{
-		Use:     "list",
+		Use:     "list [organization-id]",
 		Aliases: []string{"ls"},
 		Short:   "List organization API keys",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -176,11 +176,11 @@ var (
 		},
 	}
 	organizationAPIKeysCreate = &cobra.Command{
-		Use:     "create",
+		Use:     "create [organization-id]",
 		Aliases: []string{"add", "generate"},
 		Short:   "Create an organization API key",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			orgID := getOrganizationID(cmd.Flags(), nil)
+			orgID := getOrganizationID(cmd.Flags(), args)
 			if orgID == nil {
 				return errNoOrganizationID
 			}
@@ -213,17 +213,17 @@ var (
 		},
 	}
 	organizationAPIKeysUpdate = &cobra.Command{
-		Use:     "update",
+		Use:     "update [organization-id] [api-key-id]",
 		Aliases: []string{"set"},
 		Short:   "Update an organization API key",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			id := getAPIKeyID(cmd.Flags(), args)
-			if id == "" {
-				return errNoAPIKeyID
-			}
-			orgID := getOrganizationID(cmd.Flags(), nil)
+			orgID := getOrganizationID(cmd.Flags(), firstArgs(1, args...))
 			if orgID == nil {
 				return errNoOrganizationID
+			}
+			id := getAPIKeyID(cmd.Flags(), args, 1)
+			if id == "" {
+				return errNoAPIKeyID
 			}
 			name, _ := cmd.Flags().GetString("name")
 
@@ -252,17 +252,17 @@ var (
 		},
 	}
 	organizationAPIKeysDelete = &cobra.Command{
-		Use:     "delete",
+		Use:     "delete [organization-id] [api-key-id]",
 		Aliases: []string{"remove"},
 		Short:   "Delete an organization API key",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			id := getAPIKeyID(cmd.Flags(), args)
-			if id == "" {
-				return errNoAPIKeyID
-			}
-			orgID := getOrganizationID(cmd.Flags(), nil)
+			orgID := getOrganizationID(cmd.Flags(), firstArgs(1, args...))
 			if orgID == nil {
 				return errNoOrganizationID
+			}
+			id := getAPIKeyID(cmd.Flags(), args, 1)
+			if id == "" {
+				return errNoAPIKeyID
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)

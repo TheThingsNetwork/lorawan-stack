@@ -93,7 +93,7 @@ var (
 		},
 	}
 	applicationsWebhooksGetCommand = &cobra.Command{
-		Use:     "get",
+		Use:     "get [application-id] [webhook-id]",
 		Aliases: []string{"info"},
 		Short:   "Get the properties of an application webhook",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -125,7 +125,7 @@ var (
 		},
 	}
 	applicationsWebhooksListCommand = &cobra.Command{
-		Use:     "list",
+		Use:     "list [application-id]",
 		Aliases: []string{"ls"},
 		Short:   "List application webhooks",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -157,7 +157,7 @@ var (
 		},
 	}
 	applicationsWebhooksSetCommand = &cobra.Command{
-		Use:     "set",
+		Use:     "set [application-id] [webhook-id]",
 		Aliases: []string{"update"},
 		Short:   "Set the properties of an application webhook",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -189,7 +189,7 @@ var (
 		},
 	}
 	applicationsWebhooksDeleteCommand = &cobra.Command{
-		Use:   "delete",
+		Use:   "delete [application-id] [webhook-id]",
 		Short: "Delete an application webhook",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			webhookID, err := getApplicationWebhookID(cmd.Flags(), args)

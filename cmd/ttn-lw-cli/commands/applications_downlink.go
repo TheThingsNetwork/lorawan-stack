@@ -34,7 +34,7 @@ var (
 		Short: "Application downlink commands",
 	}
 	applicationsDownlinkPushCommand = &cobra.Command{
-		Use:   "push",
+		Use:   "push [application-id] [device-id]",
 		Short: "Push to the application downlink queue",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			devID, err := getEndDeviceID(cmd.Flags(), args, true)
@@ -63,7 +63,7 @@ var (
 		},
 	}
 	applicationsDownlinkReplaceCommand = &cobra.Command{
-		Use:   "replace",
+		Use:   "replace [application-id] [device-id]",
 		Short: "Replace the application downlink queue",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			devID, err := getEndDeviceID(cmd.Flags(), args, true)
@@ -92,7 +92,7 @@ var (
 		},
 	}
 	applicationsDownlinkClearCommand = &cobra.Command{
-		Use:   "clear",
+		Use:   "clear [application-id] [device-id]",
 		Short: "Clear the application downlink queue",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			devID, err := getEndDeviceID(cmd.Flags(), args, true)
@@ -115,7 +115,7 @@ var (
 		},
 	}
 	applicationsDownlinkListCommand = &cobra.Command{
-		Use:   "list",
+		Use:   "list [application-id] [device-id]",
 		Short: "List the application downlink queue",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			devID, err := getEndDeviceID(cmd.Flags(), args, true)
