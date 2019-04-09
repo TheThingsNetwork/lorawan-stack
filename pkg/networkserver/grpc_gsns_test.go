@@ -1547,6 +1547,7 @@ func handleUplinkTest() func(t *testing.T) {
 					a.So(asUpReq.up, should.Resemble, &ttnpb.ApplicationUp{
 						EndDeviceIdentifiers: pb.EndDeviceIdentifiers,
 						CorrelationIDs:       asUpReq.up.CorrelationIDs,
+						ReceivedAt:           asUpReq.up.ReceivedAt,
 						Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
 							FCnt:         tc.NextFCntUp,
 							FPort:        tc.UplinkMessage.Payload.GetMACPayload().FPort,
@@ -1702,6 +1703,7 @@ func handleUplinkTest() func(t *testing.T) {
 						a.So(asUpReq.up, should.Resemble, &ttnpb.ApplicationUp{
 							EndDeviceIdentifiers: pb.EndDeviceIdentifiers,
 							CorrelationIDs:       asUpReq.up.CorrelationIDs,
+							ReceivedAt:           asUpReq.up.ReceivedAt,
 							Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
 								FCnt:         tc.NextFCntUp,
 								FPort:        tc.UplinkMessage.Payload.GetMACPayload().FPort,
@@ -2261,6 +2263,7 @@ func handleJoinTest() func(t *testing.T) {
 							JoinEUI:                pb.EndDeviceIdentifiers.JoinEUI,
 							DevAddr:                &expectedRequest.DevAddr,
 						},
+						ReceivedAt: up.ReceivedAt,
 						Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
 							AppSKey:              resp.SessionKeys.AppSKey,
 							SessionKeyID:         resp.SessionKeys.SessionKeyID,
@@ -2344,7 +2347,6 @@ func handleJoinTest() func(t *testing.T) {
 					select {
 					case up := <-asSendCh:
 						a.So(up.CorrelationIDs, should.NotBeEmpty)
-
 						a.So(up, should.HaveEmptyDiff, &ttnpb.ApplicationUp{
 							CorrelationIDs: up.CorrelationIDs,
 							EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -2354,6 +2356,7 @@ func handleJoinTest() func(t *testing.T) {
 								JoinEUI:                tc.Device.EndDeviceIdentifiers.JoinEUI,
 								ApplicationIdentifiers: tc.Device.EndDeviceIdentifiers.ApplicationIdentifiers,
 							},
+							ReceivedAt: up.ReceivedAt,
 							Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
 								AppSKey:      resp.SessionKeys.AppSKey,
 								SessionKeyID: resp.SessionKeys.SessionKeyID,
