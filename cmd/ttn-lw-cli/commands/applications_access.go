@@ -176,11 +176,11 @@ var (
 		},
 	}
 	applicationAPIKeysCreate = &cobra.Command{
-		Use:     "create",
+		Use:     "create [application-id]",
 		Aliases: []string{"add", "generate"},
 		Short:   "Create an application API key",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			appID := getApplicationID(cmd.Flags(), nil)
+			appID := getApplicationID(cmd.Flags(), args)
 			if appID == nil {
 				return errNoApplicationID
 			}

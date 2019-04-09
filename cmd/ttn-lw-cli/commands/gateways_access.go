@@ -176,11 +176,11 @@ var (
 		},
 	}
 	gatewayAPIKeysCreate = &cobra.Command{
-		Use:     "create",
+		Use:     "create [gateway-id]",
 		Aliases: []string{"add", "generate"},
 		Short:   "Create a gateway API key",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			gtwID, err := getGatewayID(cmd.Flags(), nil, true)
+			gtwID, err := getGatewayID(cmd.Flags(), args, true)
 			if err != nil {
 				return err
 			}

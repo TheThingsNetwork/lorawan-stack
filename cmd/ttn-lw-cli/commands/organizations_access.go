@@ -176,11 +176,11 @@ var (
 		},
 	}
 	organizationAPIKeysCreate = &cobra.Command{
-		Use:     "create",
+		Use:     "create [organization-id]",
 		Aliases: []string{"add", "generate"},
 		Short:   "Create an organization API key",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			orgID := getOrganizationID(cmd.Flags(), nil)
+			orgID := getOrganizationID(cmd.Flags(), args)
 			if orgID == nil {
 				return errNoOrganizationID
 			}

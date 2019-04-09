@@ -78,11 +78,11 @@ var (
 		},
 	}
 	userAPIKeysCreate = &cobra.Command{
-		Use:     "create",
+		Use:     "create [user-id]",
 		Aliases: []string{"add", "generate"},
 		Short:   "Create a user API key",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			usrID := getUserID(cmd.Flags(), nil)
+			usrID := getUserID(cmd.Flags(), args)
 			if usrID == nil {
 				return errNoUserID
 			}
