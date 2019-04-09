@@ -305,8 +305,8 @@ var (
 			return nil
 		},
 	}
-	usersContactInfoCommand = contactInfoCommands("user", func(cmd *cobra.Command) (*ttnpb.EntityIdentifiers, error) {
-		usrID := getUserID(cmd.Flags(), nil)
+	usersContactInfoCommand = contactInfoCommands("user", func(cmd *cobra.Command, args []string) (*ttnpb.EntityIdentifiers, error) {
+		usrID := getUserID(cmd.Flags(), args)
 		if usrID == nil {
 			return nil, errNoUserID
 		}

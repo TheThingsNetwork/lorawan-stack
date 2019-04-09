@@ -236,8 +236,8 @@ var (
 			return nil
 		},
 	}
-	organizationsContactInfoCommand = contactInfoCommands("organization", func(cmd *cobra.Command) (*ttnpb.EntityIdentifiers, error) {
-		orgID := getOrganizationID(cmd.Flags(), nil)
+	organizationsContactInfoCommand = contactInfoCommands("organization", func(cmd *cobra.Command, args []string) (*ttnpb.EntityIdentifiers, error) {
+		orgID := getOrganizationID(cmd.Flags(), args)
 		if orgID == nil {
 			return nil, errNoOrganizationID
 		}

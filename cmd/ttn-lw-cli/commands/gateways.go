@@ -350,8 +350,8 @@ var (
 			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
-	gatewaysContactInfoCommand = contactInfoCommands("gateway", func(cmd *cobra.Command) (*ttnpb.EntityIdentifiers, error) {
-		gtwID, err := getGatewayID(cmd.Flags(), nil, true)
+	gatewaysContactInfoCommand = contactInfoCommands("gateway", func(cmd *cobra.Command, args []string) (*ttnpb.EntityIdentifiers, error) {
+		gtwID, err := getGatewayID(cmd.Flags(), args, true)
 		if err != nil {
 			return nil, err
 		}

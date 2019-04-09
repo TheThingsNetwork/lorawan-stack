@@ -236,8 +236,8 @@ var (
 			return nil
 		},
 	}
-	applicationsContactInfoCommand = contactInfoCommands("application", func(cmd *cobra.Command) (*ttnpb.EntityIdentifiers, error) {
-		appID := getApplicationID(cmd.Flags(), nil)
+	applicationsContactInfoCommand = contactInfoCommands("application", func(cmd *cobra.Command, args []string) (*ttnpb.EntityIdentifiers, error) {
+		appID := getApplicationID(cmd.Flags(), args)
 		if appID == nil {
 			return nil, errNoApplicationID
 		}
