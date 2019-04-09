@@ -217,7 +217,7 @@ var (
 		Aliases: []string{"set"},
 		Short:   "Update an organization API key",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			orgID := getOrganizationID(cmd.Flags(), args[:1])
+			orgID := getOrganizationID(cmd.Flags(), firstArgs(1, args...))
 			if orgID == nil {
 				return errNoOrganizationID
 			}
@@ -256,7 +256,7 @@ var (
 		Aliases: []string{"remove"},
 		Short:   "Delete an organization API key",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			orgID := getOrganizationID(cmd.Flags(), args[:1])
+			orgID := getOrganizationID(cmd.Flags(), firstArgs(1, args...))
 			if orgID == nil {
 				return errNoOrganizationID
 			}

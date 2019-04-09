@@ -119,7 +119,7 @@ var (
 		Aliases: []string{"set"},
 		Short:   "Update a user API key",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			usrID := getUserID(cmd.Flags(), args[:1])
+			usrID := getUserID(cmd.Flags(), firstArgs(1, args...))
 			if usrID == nil {
 				return errNoUserID
 			}
@@ -158,7 +158,7 @@ var (
 		Aliases: []string{"remove"},
 		Short:   "Delete a user API key",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			usrID := getUserID(cmd.Flags(), args[:1])
+			usrID := getUserID(cmd.Flags(), firstArgs(1, args...))
 			if usrID == nil {
 				return errNoUserID
 			}

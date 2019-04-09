@@ -23,6 +23,13 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
+func firstArgs(i int, args ...string) []string {
+	if i > len(args) {
+		i = len(args)
+	}
+	return args[:i]
+}
+
 func collaboratorFlags() *pflag.FlagSet {
 	flagSet := &pflag.FlagSet{}
 	flagSet.String("user-id", "", "")

@@ -217,7 +217,7 @@ var (
 		Aliases: []string{"set"},
 		Short:   "Update a gateway API key",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			gtwID, err := getGatewayID(cmd.Flags(), args[:1], true)
+			gtwID, err := getGatewayID(cmd.Flags(), firstArgs(1, args...), true)
 			if err != nil {
 				return err
 			}
@@ -256,7 +256,7 @@ var (
 		Aliases: []string{"remove"},
 		Short:   "Delete a gateway API key",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			gtwID, err := getGatewayID(cmd.Flags(), args[:1], true)
+			gtwID, err := getGatewayID(cmd.Flags(), firstArgs(1, args...), true)
 			if err != nil {
 				return err
 			}

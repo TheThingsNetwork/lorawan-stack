@@ -217,7 +217,7 @@ var (
 		Aliases: []string{"set"},
 		Short:   "Update an application API key",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			appID := getApplicationID(cmd.Flags(), args[:1])
+			appID := getApplicationID(cmd.Flags(), firstArgs(1, args...))
 			if appID == nil {
 				return errNoApplicationID
 			}
@@ -256,7 +256,7 @@ var (
 		Aliases: []string{"remove"},
 		Short:   "Delete an application API key",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			appID := getApplicationID(cmd.Flags(), args[:1])
+			appID := getApplicationID(cmd.Flags(), firstArgs(1, args...))
 			if appID == nil {
 				return errNoApplicationID
 			}
