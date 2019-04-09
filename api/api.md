@@ -5113,6 +5113,7 @@ The UplinkMessageProcessor service processes uplink messages.
 | ----- | ---- | ----- | ----------- |
 | end_device_ids | [EndDeviceIdentifiers](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |  |
 | correlation_ids | [string](#string) | repeated |  |
+| received_at | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
 | uplink_message | [ApplicationUplink](#ttn.lorawan.v3.ApplicationUplink) |  |  |
 | join_accept | [ApplicationJoinAccept](#ttn.lorawan.v3.ApplicationJoinAccept) |  |  |
 | downlink_ack | [ApplicationDownlink](#ttn.lorawan.v3.ApplicationDownlink) |  |  |
@@ -5231,7 +5232,7 @@ Uplink message from the end device to the network
 | payload | [Message](#ttn.lorawan.v3.Message) |  |  |
 | settings | [TxSettings](#ttn.lorawan.v3.TxSettings) |  |  |
 | rx_metadata | [RxMetadata](#ttn.lorawan.v3.RxMetadata) | repeated |  |
-| received_at | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | Server time when a component received the message. The Gateway Server, Network Server and Application Server may set this value to their local server time of reception. |
+| received_at | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | Server time when a component received the message. The Gateway Server and Network Server set this value to their local server time of reception. |
 | correlation_ids | [string](#string) | repeated |  |
 | gateway_channel_index | [uint32](#uint32) |  | Index of the gateway channel that received the message. Set by Gateway Server. |
 | device_channel_index | [uint32](#uint32) |  | Index of the device channel that received the message. Set by Network Server. |

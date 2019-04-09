@@ -5703,6 +5703,10 @@
             "type": "string"
           }
         },
+        "received_at": {
+          "type": "string",
+          "format": "date-time"
+        },
         "uplink_message": {
           "$ref": "#/definitions/v3ApplicationUplink"
         },
@@ -8919,7 +8923,7 @@
         "received_at": {
           "type": "string",
           "format": "date-time",
-          "description": "Server time when a component received the message.\nThe Gateway Server, Network Server and Application Server may set this value to their local server time of reception."
+          "description": "Server time when a component received the message.\nThe Gateway Server and Network Server set this value to their local server time of reception."
         },
         "correlation_ids": {
           "type": "array",
