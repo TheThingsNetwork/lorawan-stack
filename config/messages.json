@@ -2402,6 +2402,15 @@
       "file": "attributes.go"
     }
   },
+  "error:pkg/errors:validation": {
+    "translations": {
+      "en": "invalid `{field}`: {reason}"
+    },
+    "description": {
+      "package": "pkg/errors",
+      "file": "validation.go"
+    }
+  },
   "error:pkg/fetch:fetch_file": {
     "translations": {
       "en": "could not fetch file `{filename}`"
