@@ -31,6 +31,28 @@ type oauthStore struct {
 	db *gorm.DB
 }
 
+func (s *oauthStore) ListAuthorizations(ctx context.Context, userIDs *ttnpb.UserIdentifiers) ([]*ttnpb.OAuthClientAuthorization, error) {
+	defer trace.StartRegion(ctx, "list authorizations").End()
+	user, err := findEntity(ctx, s.db, userIDs.EntityIdentifiers(), "id")
+	if err != nil {
+		return nil, err
+	}
+	var authModels []ClientAuthorization
+	err = s.db.Where(ClientAuthorization{
+		UserID: user.PrimaryKey(),
+	}).Preload("Client").Find(&authModels).Error
+	if err != nil {
+		return nil, err
+	}
+	authProtos := make([]*ttnpb.OAuthClientAuthorization, len(authModels))
+	for i, authModel := range authModels {
+		authProto := authModel.toPB()
+		authProto.UserIDs.UserID = userIDs.UserID
+		authProtos[i] = authProto
+	}
+	return authProtos, nil
+}
+
 func (s *oauthStore) GetAuthorization(ctx context.Context, userIDs *ttnpb.UserIdentifiers, clientIDs *ttnpb.ClientIdentifiers) (*ttnpb.OAuthClientAuthorization, error) {
 	defer trace.StartRegion(ctx, "get authorization").End()
 	client, err := findEntity(ctx, s.db, clientIDs.EntityIdentifiers(), "id")
@@ -50,6 +72,7 @@ func (s *oauthStore) GetAuthorization(ctx context.Context, userIDs *ttnpb.UserId
 		if gorm.IsRecordNotFoundError(err) {
 			return nil, errAuthorizationNotFound.WithAttributes("user_id", userIDs.UserID, "client_id", clientIDs.ClientID)
 		}
+		return nil, err
 	}
 	authProto := authModel.toPB()
 	authProto.ClientIDs.ClientID = clientIDs.ClientID
@@ -203,6 +226,36 @@ func (s *oauthStore) CreateAccessToken(ctx context.Context, token *ttnpb.OAuthAc
 		return query.Error
 	}
 	return nil
+}
+
+func (s *oauthStore) ListAccessTokens(ctx context.Context, userIDs *ttnpb.UserIdentifiers, clientIDs *ttnpb.ClientIdentifiers) ([]*ttnpb.OAuthAccessToken, error) {
+	defer trace.StartRegion(ctx, "list access tokens").End()
+	client, err := findEntity(ctx, s.db, clientIDs.EntityIdentifiers(), "id")
+	if err != nil {
+		return nil, err
+	}
+	user, err := findEntity(ctx, s.db, userIDs.EntityIdentifiers(), "id")
+	if err != nil {
+		return nil, err
+	}
+	var tokenModels []AccessToken
+	err = s.db.Scopes(withContext(ctx)).Where(AccessToken{
+		ClientAuthorization: ClientAuthorization{
+			ClientID: client.PrimaryKey(),
+			UserID:   user.PrimaryKey(),
+		},
+	}).Find(&tokenModels).Error
+	if err != nil {
+		return nil, err
+	}
+	tokenProtos := make([]*ttnpb.OAuthAccessToken, len(tokenModels))
+	for i, tokenModel := range tokenModels {
+		tokenProto := tokenModel.toPB()
+		tokenProto.ClientIDs.ClientID = clientIDs.ClientID
+		tokenProto.UserIDs.UserID = userIDs.UserID
+		tokenProtos[i] = tokenProto
+	}
+	return tokenProtos, nil
 }
 
 func (s *oauthStore) GetAccessToken(ctx context.Context, id string) (*ttnpb.OAuthAccessToken, error) {

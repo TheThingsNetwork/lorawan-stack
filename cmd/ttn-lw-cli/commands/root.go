@@ -154,7 +154,7 @@ func preRun(tasks ...func() error) func(cmd *cobra.Command, args []string) error
 func refreshToken() error {
 	if token, ok := cache.Get("oauth_token").(*oauth2.Token); ok && token != nil {
 		freshToken, err := oauth2Config.TokenSource(ctx, token).Token()
-		if freshToken != token {
+		if err == nil && freshToken != token {
 			cache.Set("oauth_token", freshToken)
 			if err := util.SaveCache(cache); err != nil {
 				return err
@@ -176,7 +176,7 @@ func optionalAuth() error {
 }
 
 func requireAuth() error {
-	if apiKey, ok := cache.Get("api_key").(string); ok {
+	if apiKey, ok := cache.Get("api_key").(string); ok && apiKey != "" {
 		logger.Debug("Using API key")
 		api.SetAuth("bearer", apiKey)
 		return nil

@@ -51,7 +51,7 @@ var errNoTokenID = errors.DefineInvalidArgument("no_token_id", "no token ID set"
 var (
 	oauthCommand = &cobra.Command{
 		Use:   "oauth",
-		Short: "Manage OAuth authorizations and tokens",
+		Short: "Manage OAuth authorizations and access tokens",
 	}
 	oauthAuthorizationsCommand = &cobra.Command{
 		Use:   "authorizations",
@@ -85,7 +85,7 @@ var (
 	}
 	oauthAuthorizationsDeleteCommand = &cobra.Command{
 		Use:   "delete",
-		Short: "Delete an OAuth authorization and all tokens",
+		Short: "Delete an OAuth authorization and all access tokens",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			usrID, cliID := getUserAndClientID(cmd.Flags(), args)
 			if usrID == nil {
@@ -123,14 +123,15 @@ var (
 			return err
 		},
 	}
-	oauthTokensCommand = &cobra.Command{
-		Use:   "tokens",
-		Short: "Manage OAuth tokens",
+	oauthAccessTokensCommand = &cobra.Command{
+		Use:     "access-tokens",
+		Aliases: []string{"tokens"},
+		Short:   "Manage OAuth tokens",
 	}
-	oauthTokensListCommand = &cobra.Command{
+	oauthAccessTokensListCommand = &cobra.Command{
 		Use:     "list",
 		Aliases: []string{"ls"},
-		Short:   "List OAuth tokens",
+		Short:   "List OAuth access tokens",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			usrID, cliID := getUserAndClientID(cmd.Flags(), args)
 			if usrID == nil {
@@ -159,9 +160,9 @@ var (
 			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
-	oauthTokensDeleteCommand = &cobra.Command{
+	oauthAccessTokensDeleteCommand = &cobra.Command{
 		Use:   "delete",
-		Short: "Delete an OAuth token",
+		Short: "Delete an OAuth access token",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			usrID, cliID := getUserAndClientID(cmd.Flags(), args)
 			if usrID == nil {
@@ -190,3 +191,21 @@ var (
 		},
 	}
 )
+
+func init() {
+	oauthAuthorizationsListCommand.Flags().AddFlagSet(userIDFlags())
+	oauthAuthorizationsCommand.AddCommand(oauthAuthorizationsListCommand)
+	oauthAuthorizationsDeleteCommand.Flags().AddFlagSet(userIDFlags())
+	oauthAuthorizationsDeleteCommand.Flags().AddFlagSet(clientIDFlags())
+	oauthAuthorizationsCommand.AddCommand(oauthAuthorizationsDeleteCommand)
+	oauthCommand.AddCommand(oauthAuthorizationsCommand)
+	oauthAccessTokensListCommand.Flags().AddFlagSet(userIDFlags())
+	oauthAccessTokensListCommand.Flags().AddFlagSet(clientIDFlags())
+	oauthAccessTokensCommand.AddCommand(oauthAccessTokensListCommand)
+	oauthAccessTokensDeleteCommand.Flags().AddFlagSet(userIDFlags())
+	oauthAccessTokensDeleteCommand.Flags().AddFlagSet(clientIDFlags())
+	oauthAccessTokensDeleteCommand.Flags().String("token-id", "", "")
+	oauthAccessTokensCommand.AddCommand(oauthAccessTokensDeleteCommand)
+	oauthCommand.AddCommand(oauthAccessTokensCommand)
+	usersCommand.AddCommand(oauthCommand)
+}
