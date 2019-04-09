@@ -51,16 +51,18 @@ func (e errorDetails) Cause() error {
 }
 
 func ErrorDetailsToProto(e errors.ErrorDetails) *ErrorDetails {
-	attributes, err := gogoproto.Struct(e.PublicAttributes())
-	if err != nil {
-		panic(fmt.Sprintf("Failed to encode error attributes: %s", err)) // Likely a bug in ttn (invalid attribute type).
-	}
 	proto := &ErrorDetails{
 		Namespace:     e.Namespace(),
 		Name:          e.Name(),
 		MessageFormat: e.MessageFormat(),
-		Attributes:    attributes,
 		CorrelationID: e.CorrelationID(),
+	}
+	if attributes := e.PublicAttributes(); len(attributes) > 0 {
+		attributesStruct, err := gogoproto.Struct(attributes)
+		if err != nil {
+			panic(fmt.Sprintf("Failed to encode error attributes: %s", err)) // Likely a bug in ttn (invalid attribute type).
+		}
+		proto.Attributes = attributesStruct
 	}
 	if cause := e.Cause(); cause != nil {
 		if ttnErr, ok := errors.From(cause); ok {

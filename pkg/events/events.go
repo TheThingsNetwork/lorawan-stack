@@ -166,11 +166,11 @@ func Proto(e Event) (*ttnpb.Event, error) {
 		var err error
 		if protoMessage, ok := evt.data.(proto.Message); ok {
 			pb.Data, err = types.MarshalAny(protoMessage)
-		} else if err, ok := evt.data.(error); ok {
-			if ttnErr, ok := errors.From(err); ok {
-				pb.Data, err = types.MarshalAny(ttnErr.GRPCStatus().Proto())
+		} else if errData, ok := evt.data.(error); ok {
+			if ttnErrData, ok := errors.From(errData); ok {
+				pb.Data, err = types.MarshalAny(ttnpb.ErrorDetailsToProto(ttnErrData))
 			} else {
-				pb.Data, err = types.MarshalAny(&types.StringValue{Value: err.Error()})
+				pb.Data, err = types.MarshalAny(&types.StringValue{Value: errData.Error()})
 			}
 		} else {
 			value, err := gogoproto.Value(evt.data)
