@@ -148,6 +148,7 @@ func getEndDevice(ids ttnpb.EndDeviceIdentifiers, nsPaths, asPaths, jsPaths []st
 				}
 				logger.WithError(err).Error("Could not get end device from Network Server")
 			} else {
+				res.SetFields(nsRes, "ids.dev_addr")
 				res.SetFields(nsRes, ttnpb.AllowedBottomLevelFields(nsPaths, getEndDeviceFromNS)...)
 				if res.CreatedAt.IsZero() || (!nsRes.CreatedAt.IsZero() && nsRes.CreatedAt.Before(res.CreatedAt)) {
 					res.CreatedAt = nsRes.CreatedAt

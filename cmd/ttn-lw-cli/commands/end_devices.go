@@ -254,6 +254,7 @@ var (
 				return err
 			}
 
+			device.SetFields(res, "ids.dev_addr")
 			device.SetFields(res, append(append(nsPaths, asPaths...), jsPaths...)...)
 			if device.CreatedAt.IsZero() || (!res.CreatedAt.IsZero() && res.CreatedAt.Before(res.CreatedAt)) {
 				device.CreatedAt = res.CreatedAt
