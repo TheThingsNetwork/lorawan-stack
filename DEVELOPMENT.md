@@ -4,7 +4,7 @@ The Things Network Stack components are primarily built in Go, while we use Node
 
 ## Development Environment
 
-The Things Network's development environment heavily relies on [`make`](https://www.gnu.org/software/make/). Under the hood, `make` calls other tools such as `git`, `go`, `yarn` etc. Recent versions are supported; Node v10.x and Go v1.11.5. Let's first make sure you have `go`, `node` and `yarn`:
+The Things Network's development environment heavily relies on [`make`](https://www.gnu.org/software/make/). Under the hood, `make` calls other tools such as `git`, `go`, `yarn` etc. Recent versions are supported; Node v10.x and Go v1.12.x. Let's first make sure you have `go`, `node` and `yarn`:
 
 On macOS using [Homebrew](https://brew.sh):
 
@@ -18,7 +18,7 @@ On Ubuntu (or on Windows [using the Windows Subsystem for Linux](https://www.mic
 curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
 sudo apt-get install -y build-essential nodejs
 
-curl -sSL https://dl.google.com/go/go1.11.5.linux-amd64.tar.gz | sudo tar -xz -C /usr/local
+curl -sSL https://dl.google.com/go/go1.12.3.linux-amd64.tar.gz | sudo tar -xz -C /usr/local
 sudo ln -s /usr/local/go/bin/* /usr/local/bin
 ```
 

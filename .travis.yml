@@ -2,7 +2,7 @@ sudo: required
 conditions: v1
 if: type = pull_request OR branch =~ ^master$ OR tag IS present
 language: go
-go: 1.11.x
+go: 1.12.x
 go_import_path: go.thethings.network/lorawan-stack
 env:
   global:
