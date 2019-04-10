@@ -12,26 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Applications from './service/applications'
-import Application from './entity/application'
-import Api from './api'
-import Token from './util/token'
+class Token {
 
-class TtnLw {
-  constructor (token, {
-    stackConfig,
-    connectionType,
-    defaultUserId,
-    proxy,
-    axiosConfig,
-  }) {
-    const tokenInstance = new Token(token)
-    this.config = arguments.config
-    this.api = new Api(connectionType, stackConfig, axiosConfig, tokenInstance.get())
+  constructor (token) {
+    /**
+     * Make sure it is possible to instantiate an instance
+     * of the class only once.
+     */
+    if (!!Token.instance) {
+      return Token.instance
+    }
 
-    this.Applications = new Applications(this.api, { defaultUserId, proxy, stackConfig })
-    this.Application = Application.bind(null, this.Applications)
+    if (this.token) {
+      return Token.instance
+    }
+
+    Token.instance = this
+    this.token = token
+
+    return this
+  }
+
+  get () {
+    return this.token
   }
 }
 
-export default TtnLw
+export default Token
