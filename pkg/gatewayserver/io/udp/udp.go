@@ -292,9 +292,8 @@ func (s *srv) handleUp(ctx context.Context, state *state, packet encoding.Packet
 				},
 			}
 		}
-		if v, ok := state.correlations.Load(packet.Token); ok {
-			sent := v.(downlinkSent)
-			msg.TxAcknowledgment.CorrelationIDs = sent.correlationIDs
+		if cids, _, ok := state.tokens.Get(uint16(packet.Token[0])<<8|uint16(packet.Token[1]), packet.ReceivedAt); ok {
+			msg.TxAcknowledgment.CorrelationIDs = cids
 		}
 		if err := state.io.HandleTxAck(msg.TxAcknowledgment); err != nil {
 			logger.WithError(err).Warn("Failed to handle Tx acknowledgement")
@@ -338,17 +337,14 @@ func (s *srv) handleDown(ctx context.Context, state *state) error {
 				GatewayAddr:     &downlinkPath.addr,
 				ProtocolVersion: downlinkPath.version,
 				PacketType:      encoding.PullResp,
-				Token:           state.nextToken(),
 				Data: &encoding.Data{
 					TxPacket: tx,
 				},
 			}
-			state.correlations.Store(packet.Token, downlinkSent{
-				correlationIDs: down.CorrelationIDs,
-				sent:           time.Now(),
-			})
 			write := func() {
 				logger.Debug("Write downlink message")
+				token := state.tokens.Next(down.CorrelationIDs, time.Now())
+				packet.Token = [2]byte{byte(token >> 8), byte(token)}
 				if err := s.write(packet); err != nil {
 					logger.WithError(err).Warn("Failed to write downlink message")
 					// TODO: Report to Network Server: https://github.com/TheThingsNetwork/lorawan-stack/issues/76
@@ -411,26 +407,11 @@ var errConnectionExpired = errors.Define("connection_expired", "connection expir
 func (s *srv) gc() {
 	logger := log.FromContext(s.ctx)
 	connectionsTicker := time.NewTicker(s.config.ConnectionExpires / 2)
-	correlationsTicker := time.NewTicker(tokenExpiration)
 	for {
 		select {
 		case <-s.ctx.Done():
 			connectionsTicker.Stop()
-			correlationsTicker.Stop()
 			return
-		case <-correlationsTicker.C:
-			start := time.Now()
-			s.connections.Range(func(_, v interface{}) bool {
-				state := v.(*state)
-				state.correlations.Range(func(k, v interface{}) bool {
-					ds := v.(downlinkSent)
-					if start.Sub(ds.sent) > tokenExpiration {
-						state.correlations.Delete(k)
-					}
-					return true
-				})
-				return true
-			})
 		case <-connectionsTicker.C:
 			s.connections.Range(func(k, v interface{}) bool {
 				state := v.(*state)
@@ -464,7 +445,6 @@ type state struct {
 	lastSeenPull  int64
 	lastSeenPush  int64
 	receivedTxAck uint32
-	pullRespToken uint32
 
 	ioWait chan struct{}
 	io     *io.Connection
@@ -474,17 +454,7 @@ type state struct {
 	startHandleDown   *sync.Once
 	startHandleDownMu sync.RWMutex
 
-	correlations sync.Map
-}
-
-type downlinkSent struct {
-	correlationIDs []string
-	sent           time.Time
-}
-
-func (s *state) nextToken() [2]byte {
-	val := atomic.AddUint32(&s.pullRespToken, 1)
-	return [2]byte{byte(val >> 8 & 0xff), byte(val & 0xff)}
+	tokens io.DownlinkTokens
 }
 
 var errNoClock = errors.DefineUnavailable("no_clock_sync", "no clock sync")
