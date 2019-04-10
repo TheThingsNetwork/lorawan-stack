@@ -138,13 +138,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 						DevAddr: DevAddr,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: FNwkSIntKey[:],
+								Key: &FNwkSIntKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: SNwkSIntKey[:],
+								Key: &SNwkSIntKey,
 							},
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey[:],
+								Key: &NwkSEncKey,
 							},
 						},
 					},
@@ -547,13 +547,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 						DevAddr: DevAddr,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: FNwkSIntKey[:],
+								Key: &FNwkSIntKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: SNwkSIntKey[:],
+								Key: &SNwkSIntKey,
 							},
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey[:],
+								Key: &NwkSEncKey,
 							},
 						},
 						LastNFCntDown: 42,
@@ -897,13 +897,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 						DevAddr: DevAddr,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: FNwkSIntKey[:],
+								Key: &FNwkSIntKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: SNwkSIntKey[:],
+								Key: &SNwkSIntKey,
 							},
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey[:],
+								Key: &NwkSEncKey,
 							},
 						},
 					},
@@ -1295,13 +1295,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 						DevAddr: DevAddr,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: FNwkSIntKey[:],
+								Key: &FNwkSIntKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: SNwkSIntKey[:],
+								Key: &SNwkSIntKey,
 							},
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey[:],
+								Key: &NwkSEncKey,
 							},
 						},
 					},
@@ -1813,13 +1813,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 						DevAddr: DevAddr,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: FNwkSIntKey[:],
+								Key: &FNwkSIntKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: SNwkSIntKey[:],
+								Key: &SNwkSIntKey,
 							},
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey[:],
+								Key: &NwkSEncKey,
 							},
 						},
 					},
@@ -2072,13 +2072,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 						DevAddr: DevAddr,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: FNwkSIntKey[:],
+								Key: &FNwkSIntKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: SNwkSIntKey[:],
+								Key: &SNwkSIntKey,
 							},
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey[:],
+								Key: &NwkSEncKey,
 							},
 						},
 					},
@@ -2533,13 +2533,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 						DevAddr: DevAddr,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: FNwkSIntKey[:],
+								Key: &FNwkSIntKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: SNwkSIntKey[:],
+								Key: &SNwkSIntKey,
 							},
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey[:],
+								Key: &NwkSEncKey,
 							},
 						},
 					},
@@ -3132,10 +3132,10 @@ func TestGenerateDownlink(t *testing.T) {
 					LastNFCntDown: 41,
 					SessionKeys: ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
-							Key: NwkSEncKey[:],
+							Key: &NwkSEncKey,
 						},
 						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: SNwkSIntKey[:],
+							Key: &SNwkSIntKey,
 						},
 					},
 				},
@@ -3189,10 +3189,10 @@ func TestGenerateDownlink(t *testing.T) {
 						LastNFCntDown: 42,
 						SessionKeys: ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey[:],
+								Key: &NwkSEncKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: SNwkSIntKey[:],
+								Key: &SNwkSIntKey,
 							},
 						},
 					},
@@ -3232,10 +3232,10 @@ func TestGenerateDownlink(t *testing.T) {
 					DevAddr: DevAddr,
 					SessionKeys: ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
-							Key: NwkSEncKey[:],
+							Key: &NwkSEncKey,
 						},
 						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: SNwkSIntKey[:],
+							Key: &SNwkSIntKey,
 						},
 					},
 				},
@@ -3300,10 +3300,10 @@ func TestGenerateDownlink(t *testing.T) {
 						DevAddr: DevAddr,
 						SessionKeys: ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey[:],
+								Key: &NwkSEncKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: SNwkSIntKey[:],
+								Key: &SNwkSIntKey,
 							},
 						},
 					},
@@ -3338,10 +3338,10 @@ func TestGenerateDownlink(t *testing.T) {
 					DevAddr: DevAddr,
 					SessionKeys: ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
-							Key: NwkSEncKey[:],
+							Key: &NwkSEncKey,
 						},
 						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: SNwkSIntKey[:],
+							Key: &SNwkSIntKey,
 						},
 					},
 				},
@@ -3412,10 +3412,10 @@ func TestGenerateDownlink(t *testing.T) {
 						DevAddr: DevAddr,
 						SessionKeys: ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey[:],
+								Key: &NwkSEncKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: SNwkSIntKey[:],
+								Key: &SNwkSIntKey,
 							},
 						},
 					},
@@ -3455,10 +3455,10 @@ func TestGenerateDownlink(t *testing.T) {
 					DevAddr: DevAddr,
 					SessionKeys: ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
-							Key: NwkSEncKey[:],
+							Key: &NwkSEncKey,
 						},
 						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: SNwkSIntKey[:],
+							Key: &SNwkSIntKey,
 						},
 					},
 				},
@@ -3536,10 +3536,10 @@ func TestGenerateDownlink(t *testing.T) {
 						LastConfFCntDown: 42,
 						SessionKeys: ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey[:],
+								Key: &NwkSEncKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: SNwkSIntKey[:],
+								Key: &SNwkSIntKey,
 							},
 						},
 					},
@@ -3574,10 +3574,10 @@ func TestGenerateDownlink(t *testing.T) {
 					DevAddr: DevAddr,
 					SessionKeys: ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
-							Key: NwkSEncKey[:],
+							Key: &NwkSEncKey,
 						},
 						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: SNwkSIntKey[:],
+							Key: &SNwkSIntKey,
 						},
 					},
 				},
@@ -3662,10 +3662,10 @@ func TestGenerateDownlink(t *testing.T) {
 						LastConfFCntDown: 42,
 						SessionKeys: ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey[:],
+								Key: &NwkSEncKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: SNwkSIntKey[:],
+								Key: &SNwkSIntKey,
 							},
 						},
 					},
@@ -3711,10 +3711,10 @@ func TestGenerateDownlink(t *testing.T) {
 					LastNFCntDown: 41,
 					SessionKeys: ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
-							Key: NwkSEncKey[:],
+							Key: &NwkSEncKey,
 						},
 						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: SNwkSIntKey[:],
+							Key: &SNwkSIntKey,
 						},
 					},
 				},
@@ -3781,10 +3781,10 @@ func TestGenerateDownlink(t *testing.T) {
 						LastNFCntDown: 42,
 						SessionKeys: ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey[:],
+								Key: &NwkSEncKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: SNwkSIntKey[:],
+								Key: &SNwkSIntKey,
 							},
 						},
 					},
@@ -3821,10 +3821,10 @@ func TestGenerateDownlink(t *testing.T) {
 					LastNFCntDown: 41,
 					SessionKeys: ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
-							Key: NwkSEncKey[:],
+							Key: &NwkSEncKey,
 						},
 						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: SNwkSIntKey[:],
+							Key: &SNwkSIntKey,
 						},
 					},
 				},
@@ -3889,10 +3889,10 @@ func TestGenerateDownlink(t *testing.T) {
 						LastNFCntDown: 42,
 						SessionKeys: ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey[:],
+								Key: &NwkSEncKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: SNwkSIntKey[:],
+								Key: &SNwkSIntKey,
 							},
 						},
 					},

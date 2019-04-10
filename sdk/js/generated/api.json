@@ -9272,6 +9272,11 @@
               "name": "MAC_V1_1",
               "number": "4",
               "description": ""
+            },
+            {
+              "name": "MAC_V1_0_3",
+              "number": "5",
+              "description": ""
             }
           ]
         },
@@ -9463,6 +9468,11 @@
             {
               "name": "PHY_V1_1_REV_B",
               "number": "6",
+              "description": ""
+            },
+            {
+              "name": "PHY_V1_0_3_REV_A",
+              "number": "7",
               "description": ""
             }
           ]

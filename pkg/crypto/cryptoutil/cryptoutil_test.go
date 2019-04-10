@@ -50,7 +50,7 @@ func TestWrapAES128Key(t *testing.T) {
 			Name: "WrapWithoutKEK",
 			Key:  appSKey,
 			Expected: ttnpb.KeyEnvelope{
-				Key: appSKey[:],
+				EncryptedKey: appSKey[:],
 			},
 		},
 		{
@@ -58,8 +58,8 @@ func TestWrapAES128Key(t *testing.T) {
 			Key:      appSKey,
 			KEKLabel: "skey",
 			Expected: ttnpb.KeyEnvelope{
-				Key:      cipherSKey,
-				KEKLabel: "skey",
+				EncryptedKey: cipherSKey,
+				KEKLabel:     "skey",
 			},
 		},
 	} {
@@ -80,23 +80,23 @@ func TestWrapAES128Key(t *testing.T) {
 		{
 			Name: "UnwrapWithoutKEK",
 			Envelope: ttnpb.KeyEnvelope{
-				Key: appSKey[:],
+				EncryptedKey: appSKey[:],
 			},
 			ExpectedKey: appSKey,
 		},
 		{
 			Name: "UnwrapWithKEK",
 			Envelope: ttnpb.KeyEnvelope{
-				Key:      cipherSKey,
-				KEKLabel: "skey",
+				KEKLabel:     "skey",
+				EncryptedKey: cipherSKey,
 			},
 			ExpectedKey: appSKey,
 		},
 		{
 			Name: "UnwrapInvalid",
 			Envelope: ttnpb.KeyEnvelope{
-				Key:      cipherOther,
-				KEKLabel: "other",
+				KEKLabel:     "other",
+				EncryptedKey: cipherOther,
 			},
 			ExpectedError: errors.IsInvalidArgument,
 		},

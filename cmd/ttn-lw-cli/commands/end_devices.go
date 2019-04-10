@@ -119,10 +119,16 @@ func getEndDeviceID(flagSet *pflag.FlagSet, args []string, requireID bool) (*ttn
 	return ids, nil
 }
 
-func generateKey(length int) []byte {
-	key := make([]byte, length)
-	random.Read(key)
-	return key
+func generateBytes(length int) []byte {
+	b := make([]byte, length)
+	random.Read(b)
+	return b
+}
+
+func generateKey() *types.AES128Key {
+	var key types.AES128Key
+	random.Read(key[:])
+	return &key
 }
 
 func generateDevAddr(netID types.NetID) (types.DevAddr, error) {
@@ -323,9 +329,9 @@ var (
 					device.Session = &ttnpb.Session{
 						DevAddr: devAddr,
 						SessionKeys: ttnpb.SessionKeys{
-							SessionKeyID: generateKey(16),
-							FNwkSIntKey:  &ttnpb.KeyEnvelope{Key: generateKey(16)},
-							AppSKey:      &ttnpb.KeyEnvelope{Key: generateKey(16)},
+							SessionKeyID: generateBytes(16),
+							FNwkSIntKey:  &ttnpb.KeyEnvelope{Key: generateKey()},
+							AppSKey:      &ttnpb.KeyEnvelope{Key: generateKey()},
 						},
 					}
 					paths = append(paths,
@@ -335,8 +341,8 @@ var (
 						"session.dev_addr",
 					)
 					if macVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
-						device.Session.SessionKeys.SNwkSIntKey = &ttnpb.KeyEnvelope{Key: generateKey(16)}
-						device.Session.SessionKeys.NwkSEncKey = &ttnpb.KeyEnvelope{Key: generateKey(16)}
+						device.Session.SessionKeys.SNwkSIntKey = &ttnpb.KeyEnvelope{Key: generateKey()}
+						device.Session.SessionKeys.NwkSEncKey = &ttnpb.KeyEnvelope{Key: generateKey()}
 						paths = append(paths,
 							"session.keys.s_nwk_s_int_key.key",
 							"session.keys.nwk_s_enc_key.key",
@@ -359,8 +365,8 @@ var (
 					// TODO: Set JoinEUI and DevEUI (https://github.com/TheThingsNetwork/lorawan-stack/issues/47).
 					device.RootKeys = &ttnpb.RootKeys{
 						RootKeyID: "ttn-lw-cli-generated",
-						AppKey:    &ttnpb.KeyEnvelope{Key: generateKey(16)},
-						NwkKey:    &ttnpb.KeyEnvelope{Key: generateKey(16)},
+						AppKey:    &ttnpb.KeyEnvelope{Key: generateKey()},
+						NwkKey:    &ttnpb.KeyEnvelope{Key: generateKey()},
 					}
 					paths = append(paths,
 						"root_keys.root_key_id",

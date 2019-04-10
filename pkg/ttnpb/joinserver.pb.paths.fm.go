@@ -13,12 +13,15 @@ var SessionKeyRequestFieldPathsTopLevel = []string{
 }
 var NwkSKeysResponseFieldPathsNested = []string{
 	"f_nwk_s_int_key",
+	"f_nwk_s_int_key.encrypted_key",
 	"f_nwk_s_int_key.kek_label",
 	"f_nwk_s_int_key.key",
 	"nwk_s_enc_key",
+	"nwk_s_enc_key.encrypted_key",
 	"nwk_s_enc_key.kek_label",
 	"nwk_s_enc_key.key",
 	"s_nwk_s_int_key",
+	"s_nwk_s_int_key.encrypted_key",
 	"s_nwk_s_int_key.kek_label",
 	"s_nwk_s_int_key.key",
 }
@@ -30,6 +33,7 @@ var NwkSKeysResponseFieldPathsTopLevel = []string{
 }
 var AppSKeyResponseFieldPathsNested = []string{
 	"app_s_key",
+	"app_s_key.encrypted_key",
 	"app_s_key.kek_label",
 	"app_s_key.key",
 }
