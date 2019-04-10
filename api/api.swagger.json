@@ -7340,11 +7340,15 @@
         "key": {
           "type": "string",
           "format": "byte",
-          "description": "The (encrypted) key."
+          "description": "The unencrypted AES key."
         },
         "kek_label": {
           "type": "string",
           "description": "The label of the RFC 3394 key-encryption-key (KEK) that was used to encrypt the key."
+        },
+        "encrypted_key": {
+          "type": "string",
+          "format": "byte"
         }
       }
     },

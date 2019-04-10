@@ -193,7 +193,7 @@ $ ttn-lw-cli end-devices create app1 dev1 \
 
 This will create a LoRaWAN 1.0.2 end device `dev1` in application `app1`. The end device should now be able to join the private network.
 
->Note: All returned keys are base64 encoded. Also, the `AppEUI` is returned as `join_eui` (V3 uses LoRaWAN 1.1 terminology).
+>Note: The `AppEUI` is returned as `join_eui` (V3 uses LoRaWAN 1.1 terminology).
 
 >Hint: You can also pass `--with-root-keys` to have root keys generated.
 
@@ -210,7 +210,7 @@ $ ttn-lw-cli end-devices create app1 dev2 \
   --session.keys.nwk-s-key.key B7F3E161BC9D4388E6C788A0C547F255
 ```
 
->Note: All returned keys are base64 encoded. Also, `NwkSKey` is returned as `f_nwk_s_int_key` (V3 uses LoRaWAN 1.1 terminology).
+>Note: The `NwkSKey` is returned as `f_nwk_s_int_key` (V3 uses LoRaWAN 1.1 terminology).
 
 >Hint: You can also pass `--with-session` to have a session generated.
 

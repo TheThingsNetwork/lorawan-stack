@@ -3528,8 +3528,9 @@ The NsJs service connects a Network Server to a Join Server.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| key | [bytes](#bytes) |  | The (encrypted) key. |
+| key | [bytes](#bytes) |  | The unencrypted AES key. |
 | kek_label | [string](#string) |  | The label of the RFC 3394 key-encryption-key (KEK) that was used to encrypt the key. |
+| encrypted_key | [bytes](#bytes) |  |  |
 
 
 
