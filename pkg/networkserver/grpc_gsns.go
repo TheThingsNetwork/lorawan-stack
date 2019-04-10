@@ -402,6 +402,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 				DeviceID:               matched.DeviceID,
 			},
 			CorrelationIDs: matched.MACState.PendingApplicationDownlink.CorrelationIDs,
+			ReceivedAt:     &up.ReceivedAt,
 		}
 
 		if pld.Ack {
@@ -761,6 +762,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	ok, err := ns.handleASUplink(asCtx, matched.EndDeviceIdentifiers.ApplicationIdentifiers, &ttnpb.ApplicationUp{
 		EndDeviceIdentifiers: matched.EndDeviceIdentifiers,
 		CorrelationIDs:       up.CorrelationIDs,
+		ReceivedAt:           &up.ReceivedAt,
 		Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
 			FCnt:         matched.Session.LastFCntUp,
 			FPort:        pld.FPort,
@@ -962,6 +964,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 			DevAddr:                &devAddr,
 		},
 		CorrelationIDs: up.CorrelationIDs,
+		ReceivedAt:     &up.ReceivedAt,
 		Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
 			AppSKey:              resp.SessionKeys.AppSKey,
 			InvalidatedDownlinks: invalidatedQueue,

@@ -333,6 +333,7 @@ var ApplicationUpFieldPathsNested = []string{
 	"end_device_ids.dev_eui",
 	"end_device_ids.device_id",
 	"end_device_ids.join_eui",
+	"received_at",
 	"up",
 	"up.downlink_ack",
 	"up.downlink_ack.class_b_c",
@@ -456,6 +457,7 @@ var ApplicationUpFieldPathsNested = []string{
 var ApplicationUpFieldPathsTopLevel = []string{
 	"correlation_ids",
 	"end_device_ids",
+	"received_at",
 	"up",
 }
 var MessagePayloadFormattersFieldPathsNested = []string{
