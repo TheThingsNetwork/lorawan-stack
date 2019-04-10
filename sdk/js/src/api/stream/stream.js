@@ -95,7 +95,6 @@ export default async function (payload, url = '/api/v3/events') {
           notify(listeners[EVENTS.ERROR], error)
           listeners = null
         })
-
     })
 
   return {
