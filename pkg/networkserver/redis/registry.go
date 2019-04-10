@@ -179,9 +179,9 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 			"created_at",
 			"ids.application_ids",
 			"ids.dev_addr",
+			"ids.dev_eui",
 			"ids.device_id",
 			"ids.join_eui",
-			"ids.dev_eui",
 			"updated_at",
 		)
 
@@ -234,9 +234,9 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 				sets = append(sets,
 					"ids.application_ids",
 					"ids.dev_addr",
+					"ids.dev_eui",
 					"ids.device_id",
 					"ids.join_eui",
-					"ids.dev_eui",
 				)
 
 				pb.CreatedAt = pb.UpdatedAt

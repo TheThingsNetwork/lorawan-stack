@@ -57,13 +57,6 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 
 	var addDownlinkTask bool
 	dev, err := ns.devices.SetByID(ctx, req.EndDevice.EndDeviceIdentifiers.ApplicationIdentifiers, req.EndDevice.EndDeviceIdentifiers.DeviceID, gets, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
-		if dev != nil {
-			addDownlinkTask = ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.device_class") &&
-				req.EndDevice.MACState.DeviceClass != ttnpb.CLASS_A &&
-				(len(dev.QueuedApplicationDownlinks) > 0 || !dev.MACState.CurrentParameters.Equal(dev.MACState.DesiredParameters))
-			return &req.EndDevice, req.FieldMask.Paths, nil
-		}
-
 		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.dev_addr") && (req.EndDevice.Session == nil || req.EndDevice.Session.DevAddr.IsZero()) {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "session.dev_addr")
 		}
@@ -161,6 +154,17 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		sets := append(req.FieldMask.Paths[:0:0], req.FieldMask.Paths...)
 		if ttnpb.HasAnyField(sets, "version_ids") {
 			// TODO: Apply version IDs (https://github.com/TheThingsIndustries/lorawan-stack/issues/1544)
+		}
+
+		if dev != nil {
+			if ttnpb.HasAnyField(req.FieldMask.Paths, "session.dev_addr") && !ttnpb.HasAnyField(req.FieldMask.Paths, "ids.dev_addr") {
+				req.EndDevice.DevAddr = &req.EndDevice.Session.DevAddr
+				sets = append(sets, "ids.dev_addr")
+			}
+			addDownlinkTask = ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.device_class") &&
+				req.EndDevice.MACState.DeviceClass != ttnpb.CLASS_A &&
+				(len(dev.QueuedApplicationDownlinks) > 0 || !dev.MACState.CurrentParameters.Equal(dev.MACState.DesiredParameters))
+			return &req.EndDevice, sets, nil
 		}
 
 		if err := ttnpb.RequireFields(sets,
