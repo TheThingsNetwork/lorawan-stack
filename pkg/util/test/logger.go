@@ -15,10 +15,9 @@
 package test
 
 import (
-	"fmt"
 	"os"
 	"sort"
-	"strings"
+	"strconv"
 	"testing"
 
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -58,94 +57,25 @@ func (f fields) sorted() fields {
 
 // GetLogger returns a logger for tests.
 func GetLogger(t testing.TB) log.Stack {
-	return &testLogger{t: t}
+	colorTerm, _ := strconv.ParseBool(os.Getenv("COLORTERM"))
+	logger, err := log.NewLogger(
+		log.WithLevel(log.DebugLevel),
+		log.WithHandler(log.NewCLI(os.Stdout, log.UseColor(colorTerm))),
+	)
+	if err != nil {
+		t.Fatalf("Could not get logger: %v", err)
+	}
+	return &testLogger{
+		stack:     logger,
+		Interface: logger.WithField("test_name", t.Name()),
+	}
 }
 
 type testLogger struct {
-	t      testing.TB
-	fields fields
+	stack *log.Logger
+	log.Interface
 }
 
-func (l *testLogger) Use(m log.Middleware) {}
-
-func (l *testLogger) format(level log.Level, msg string, v ...interface{}) string {
-	if len(v) > 0 {
-		msg = fmt.Sprintf(msg, v...)
-	}
-	levelStr := strings.ToUpper(level.String())
-	if colorTerm {
-		levelStr = fmt.Sprintf("\033[%dm%6s\033[0m", log.Colors[level], level)
-	}
-	formatted := fmt.Sprintf("%s %-40s", levelStr, msg)
-	if len(l.fields) > 0 {
-		for _, kv := range l.fields.unique().sorted() {
-			key := kv.k
-			if colorTerm {
-				key = fmt.Sprintf(" \033[%dm%s\033[0m", log.Colors[level], kv.k)
-			}
-			formatted += fmt.Sprintf(" %s=%v", key, kv.v)
-		}
-	}
-	return formatted
-}
-
-func (l *testLogger) Debug(msg string) {
-	l.t.Helper()
-	l.t.Log(l.format(log.DebugLevel, msg))
-}
-func (l *testLogger) Info(msg string) {
-	l.t.Helper()
-	l.t.Log(l.format(log.InfoLevel, msg))
-}
-func (l *testLogger) Warn(msg string) {
-	l.t.Helper()
-	l.t.Log(l.format(log.WarnLevel, msg))
-}
-func (l *testLogger) Error(msg string) {
-	l.t.Helper()
-	l.t.Log(l.format(log.ErrorLevel, msg))
-}
-func (l *testLogger) Fatal(msg string) {
-	l.t.Helper()
-	l.t.Log(l.format(log.FatalLevel, msg))
-}
-func (l *testLogger) Debugf(msg string, v ...interface{}) {
-	l.t.Helper()
-	l.t.Log(l.format(log.DebugLevel, msg, v...))
-}
-func (l *testLogger) Infof(msg string, v ...interface{}) {
-	l.t.Helper()
-	l.t.Log(l.format(log.InfoLevel, msg, v...))
-}
-func (l *testLogger) Warnf(msg string, v ...interface{}) {
-	l.t.Helper()
-	l.t.Log(l.format(log.WarnLevel, msg, v...))
-}
-func (l *testLogger) Errorf(msg string, v ...interface{}) {
-	l.t.Helper()
-	l.t.Log(l.format(log.ErrorLevel, msg, v...))
-}
-func (l *testLogger) Fatalf(msg string, v ...interface{}) {
-	l.t.Helper()
-	l.t.Log(l.format(log.FatalLevel, msg, v...))
-}
-func (l *testLogger) WithField(k string, v interface{}) log.Interface {
-	return &testLogger{
-		t:      l.t,
-		fields: append(l.fields, kv{k, v}),
-	}
-}
-func (l *testLogger) WithFields(f log.Fielder) log.Interface {
-	m := f.Fields()
-	fields := make([]kv, 0, len(m))
-	for k, v := range m {
-		fields = append(fields, kv{k, v})
-	}
-	return &testLogger{
-		t:      l.t,
-		fields: append(l.fields, fields...),
-	}
-}
-func (l *testLogger) WithError(err error) log.Interface {
-	return l.WithField("error", err)
+func (l *testLogger) Use(m log.Middleware) {
+	l.stack.Use(m)
 }
