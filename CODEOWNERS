@@ -42,3 +42,6 @@
 
 # SDKs
 /sdk/js @bafonins @kschiffer
+
+# Clear generated code
+/sdk/js/generated
