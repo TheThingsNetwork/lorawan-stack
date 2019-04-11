@@ -26,12 +26,12 @@ include .make/general.make
 include .make/git.make
 include .make/headers.make
 include .make/go/main.make
-include .make/protos/main.make
+include .make/sdk/main.make
 include .make/js/main.make
+include .make/protos/main.make
 include .make/dev.make
 include .make/styl/main.make
 include .make/snap/main.make
-include .make/sdk/main.make
 
 messages:
 	@$(GO) run ./cmd/internal/generate_i18n.go

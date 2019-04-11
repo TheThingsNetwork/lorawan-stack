@@ -18,10 +18,11 @@ API_PROTO_FILES = $(PWD)/api/'*.proto'
 
 PROTOC_OUT ?= /out
 
-PROTOC_DOCKER_IMAGE ?= thethingsindustries/protoc:3.1.2
+PROTOC_DOCKER_IMAGE ?= thethingsindustries/protoc:3.1.3-rc1
 PROTOC_DOCKER_ARGS = run --user `id -u` --rm \
                      --mount type=bind,src=$(PWD)/api,dst=$(PWD)/api \
                      --mount type=bind,src=$(PWD)/pkg/ttnpb,dst=$(PROTOC_OUT)/go.thethings.network/lorawan-stack/pkg/ttnpb \
+                     --mount type=bind,src=$(PWD)/sdk/js,dst=$(PWD)/sdk/js \
                      -w $(PWD)
 PROTOC ?= $(DOCKER) $(PROTOC_DOCKER_ARGS) $(PROTOC_DOCKER_IMAGE) -I$(shell dirname $(PWD))
 
@@ -44,10 +45,19 @@ markdown.protos: $(wildcard api/*.proto)
 markdown.protos.clean:
 	rm -f $(PWD)/api/api.md
 
+SDK_PROTOC_FLAGS ?= --doc_opt=json,api.json --doc_out=$(PWD)/sdk/js/generated
+
+sdk.protos: $(wildcard api/*.proto)
+	$(PROTOC) $(SDK_PROTOC_FLAGS) $(API_PROTO_FILES)
+	$(YARN_SDK) run definitions
+
+sdk.protos.clean:
+	rm -f $(PWD)/sdk/js/generated/api.json $(PWD)/sdk/js/generated/api-definition.json
+
 include .make/protos/go.make
 
-protos: go.protos swagger.protos markdown.protos
+protos: go.protos swagger.protos markdown.protos sdk.protos
 
-protos.clean: go.protos.clean swagger.protos.clean markdown.protos.clean
+protos.clean: go.protos.clean swagger.protos.clean markdown.protos.clean sdk.protos.clean
 
 # vim: ft=make
