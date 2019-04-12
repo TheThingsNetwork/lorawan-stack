@@ -14,7 +14,45 @@
 
 package ttnpb
 
-import "context"
+import (
+	"context"
+	"strconv"
+	"strings"
+)
+
+// MarshalText implements encoding.TextMarshaler interface.
+func (v PowerState) MarshalText() ([]byte, error) {
+	return []byte(v.String()), nil
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler interface.
+func (v *PowerState) UnmarshalText(b []byte) error {
+	s := string(b)
+	if i, ok := PowerState_value[s]; ok {
+		*v = PowerState(i)
+		return nil
+	}
+	if !strings.HasPrefix(s, "POWER_") {
+		if i, ok := PowerState_value["POWER_"+s]; ok {
+			*v = PowerState(i)
+			return nil
+		}
+	}
+	return errCouldNotParse("PowerState")(string(b))
+}
+
+// UnmarshalJSON implements json.Unmarshaler interface.
+func (v *PowerState) UnmarshalJSON(b []byte) error {
+	if len(b) > 2 && b[0] == '"' && b[len(b)-1] == '"' {
+		return v.UnmarshalText(b[1 : len(b)-1])
+	}
+	i, err := strconv.Atoi(string(b))
+	if err != nil {
+		return errCouldNotParse("PowerState")(string(b)).WithCause(err)
+	}
+	*v = PowerState(i)
+	return nil
+}
 
 // ValidateContext wraps the generated validator with (optionally context-based) custom checks.
 func (m *UpdateEndDeviceRequest) ValidateContext(context.Context) error {

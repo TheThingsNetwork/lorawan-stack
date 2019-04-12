@@ -15,51 +15,40 @@
 package ttnpb
 
 import (
-	"context"
 	"strconv"
 	"strings"
 )
 
 // MarshalText implements encoding.TextMarshaler interface.
-func (v GrantType) MarshalText() ([]byte, error) {
+func (v LocationSource) MarshalText() ([]byte, error) {
 	return []byte(v.String()), nil
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler interface.
-func (v *GrantType) UnmarshalText(b []byte) error {
+func (v *LocationSource) UnmarshalText(b []byte) error {
 	s := string(b)
-	if i, ok := GrantType_value[s]; ok {
-		*v = GrantType(i)
+	if i, ok := LocationSource_value[s]; ok {
+		*v = LocationSource(i)
 		return nil
 	}
-	if !strings.HasPrefix(s, "GRANT_") {
-		if i, ok := GrantType_value["GRANT_"+s]; ok {
-			*v = GrantType(i)
+	if !strings.HasPrefix(s, "SOURCE_") {
+		if i, ok := LocationSource_value["SOURCE_"+s]; ok {
+			*v = LocationSource(i)
 			return nil
 		}
 	}
-	return errCouldNotParse("GrantType")(string(b))
+	return errCouldNotParse("LocationSource")(string(b))
 }
 
 // UnmarshalJSON implements json.Unmarshaler interface.
-func (v *GrantType) UnmarshalJSON(b []byte) error {
+func (v *LocationSource) UnmarshalJSON(b []byte) error {
 	if len(b) > 2 && b[0] == '"' && b[len(b)-1] == '"' {
 		return v.UnmarshalText(b[1 : len(b)-1])
 	}
 	i, err := strconv.Atoi(string(b))
 	if err != nil {
-		return errCouldNotParse("GrantType")(string(b)).WithCause(err)
+		return errCouldNotParse("LocationSource")(string(b)).WithCause(err)
 	}
-	*v = GrantType(i)
+	*v = LocationSource(i)
 	return nil
-}
-
-// ValidateContext wraps the generated validator with (optionally context-based) custom checks.
-func (m *UpdateClientRequest) ValidateContext(context.Context) error {
-	if len(m.FieldMask.Paths) == 0 {
-		return m.ValidateFields()
-	}
-	return m.ValidateFields(append(fieldsWithPrefix("client", m.FieldMask.Paths...),
-		"client.ids",
-	)...)
 }

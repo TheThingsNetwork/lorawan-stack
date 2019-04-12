@@ -17,8 +17,43 @@ package ttnpb
 import (
 	"fmt"
 	"sort"
+	"strconv"
 	"strings"
 )
+
+// MarshalText implements encoding.TextMarshaler interface.
+func (v Right) MarshalText() ([]byte, error) {
+	return []byte(v.String()), nil
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler interface.
+func (v *Right) UnmarshalText(b []byte) error {
+	s := string(b)
+	if i, ok := Right_value[s]; ok {
+		*v = Right(i)
+		return nil
+	}
+	if !strings.HasPrefix(s, "RIGHT_") {
+		if i, ok := Right_value["RIGHT_"+s]; ok {
+			*v = Right(i)
+			return nil
+		}
+	}
+	return errCouldNotParse("Right")(string(b))
+}
+
+// UnmarshalJSON implements json.Unmarshaler interface.
+func (v *Right) UnmarshalJSON(b []byte) error {
+	if len(b) > 2 && b[0] == '"' && b[len(b)-1] == '"' {
+		return v.UnmarshalText(b[1 : len(b)-1])
+	}
+	i, err := strconv.Atoi(string(b))
+	if err != nil {
+		return errCouldNotParse("Right")(string(b)).WithCause(err)
+	}
+	*v = Right(i)
+	return nil
+}
 
 var (
 	AllUserRights         = &Rights{}
