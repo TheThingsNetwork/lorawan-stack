@@ -221,29 +221,27 @@ func resetMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttn
 		}
 	} else {
 		dev.MACState.CurrentParameters.Channels = make([]*ttnpb.MACParameters_Channel, 0, len(phy.UplinkChannels))
-		for _, upCh := range phy.UplinkChannels {
-			dev.MACState.CurrentParameters.Channels = append(dev.MACState.CurrentParameters.Channels, &ttnpb.MACParameters_Channel{
+		for i, upCh := range phy.UplinkChannels {
+			channel := &ttnpb.MACParameters_Channel{
 				MinDataRateIndex: upCh.MinDataRate,
 				MaxDataRateIndex: upCh.MaxDataRate,
 				UplinkFrequency:  upCh.Frequency,
 				EnableUplink:     true,
-			})
-		}
-		for i, downCh := range phy.DownlinkChannels {
-			dev.MACState.CurrentParameters.Channels[i].DownlinkFrequency = downCh.Frequency
+			}
+			channel.DownlinkFrequency = phy.DownlinkChannels[i%len(phy.DownlinkChannels)].Frequency
+			dev.MACState.CurrentParameters.Channels = append(dev.MACState.CurrentParameters.Channels, channel)
 		}
 	}
 
 	dev.MACState.DesiredParameters.Channels = make([]*ttnpb.MACParameters_Channel, 0, len(phy.UplinkChannels)+len(fp.UplinkChannels))
-	for _, upCh := range phy.UplinkChannels {
-		dev.MACState.DesiredParameters.Channels = append(dev.MACState.DesiredParameters.Channels, &ttnpb.MACParameters_Channel{
+	for i, upCh := range phy.UplinkChannels {
+		channel := &ttnpb.MACParameters_Channel{
 			MinDataRateIndex: upCh.MinDataRate,
 			MaxDataRateIndex: upCh.MaxDataRate,
 			UplinkFrequency:  upCh.Frequency,
-		})
-	}
-	for i, downCh := range phy.DownlinkChannels {
-		dev.MACState.DesiredParameters.Channels[i].DownlinkFrequency = downCh.Frequency
+		}
+		channel.DownlinkFrequency = phy.DownlinkChannels[i%len(phy.DownlinkChannels)].Frequency
+		dev.MACState.DesiredParameters.Channels = append(dev.MACState.DesiredParameters.Channels, channel)
 	}
 
 outerUp:
@@ -265,19 +263,13 @@ outerUp:
 		})
 	}
 
-outerDown:
-	for _, downCh := range fp.DownlinkChannels {
-		for _, ch := range dev.MACState.DesiredParameters.Channels {
-			switch ch.DownlinkFrequency {
-			case 0:
+	if len(fp.DownlinkChannels) > 0 {
+		for i, ch := range dev.MACState.DesiredParameters.Channels {
+			downCh := fp.DownlinkChannels[i%len(fp.DownlinkChannels)]
+			if downCh.Frequency != 0 {
 				ch.DownlinkFrequency = downCh.Frequency
-				continue outerDown
-
-			case downCh.Frequency:
-				continue outerDown
 			}
 		}
-		panic("uplink/downlink channel length is inconsistent")
 	}
 
 	return nil
