@@ -4,6 +4,8 @@ replace github.com/grpc-ecosystem/grpc-gateway => github.com/ThethingsIndustries
 
 replace github.com/robertkrimen/otto => github.com/ThethingsIndustries/otto v0.0.0-20181129100957-6ddbbb60554a
 
+replace github.com/labstack/echo/v4 => github.com/TheThingsIndustries/echo/v4 v4.0.1-0.20190409124425-ee570f243713
+
 replace github.com/golang/lint => golang.org/x/lint v0.0.0-20190313153728-d0100b6bd8b3
 
 replace github.com/testcontainers/testcontainer-go => github.com/testcontainers/testcontainers-go v0.0.2
