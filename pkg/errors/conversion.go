@@ -15,8 +15,6 @@
 package errors
 
 import (
-	"fmt"
-
 	"google.golang.org/grpc/status"
 )
 
@@ -65,7 +63,6 @@ func From(err error) (out *Error, ok bool) {
 		if cause := err.Cause(); cause != nil {
 			e = e.WithCause(cause)
 		}
-		fmt.Println(e.StackTrace())
 		return &e, true
 	}
 	return nil, false
