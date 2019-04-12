@@ -193,6 +193,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 			return nil
 		}),
 		runtime.WithMarshalerOption("*", jsonpb.TTN()),
+		runtime.WithMarshalerOption("text/event-stream", jsonpb.TTNEventStream()),
 		runtime.WithProtoErrorHandler(runtime.DefaultHTTPProtoErrorHandler),
 		runtime.WithMetadata(func(ctx context.Context, req *http.Request) metadata.MD {
 			md := rpcmetadata.MD{
