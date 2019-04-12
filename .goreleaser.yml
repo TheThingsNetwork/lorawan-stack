@@ -91,6 +91,11 @@ snapcraft:
   grade: stable
   confinement: strict
   publish: true
+  apps:
+    ttn-lw-stack:
+      plugs: [ home, network, network-bind ]
+    ttn-lw-cli:
+      plugs: [ home, network, network-bind ]
 
 # TODO: Generate separate formulas for stack+CLI and CLI only.(https://github.com/TheThingsNetwork/lorawan-stack/issues/108)
 brew:
