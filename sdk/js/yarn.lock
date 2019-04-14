@@ -179,6 +179,11 @@ array-unique@^0.3.2:
   resolved "https://registry.yarnpkg.com/array-unique/-/array-unique-0.3.2.tgz#a894b75d4bc4f6cd679ef3244a9fd8f46ae2d428"
   integrity sha1-qJS3XUvE9s1nnvMkSp/Y9Gri1Cg=
 
+arraybuffer-to-string@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/arraybuffer-to-string/-/arraybuffer-to-string-1.0.2.tgz#c373aa7bb0e6844d9a2bc9654c8889a9570a26e2"
+  integrity sha512-WbIYlLVmvIAyUBdQRRuyGOJRriOQy9OAsWcyURmsRQp9+g647hdMSS2VFKXbJLVw0daUu06hqwLXm9etVrXI9A==
+
 arrify@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/arrify/-/arrify-1.0.1.tgz#898508da2226f380df904728456849c1501a4b0d"
