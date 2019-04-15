@@ -20,6 +20,7 @@ import (
 
 	"github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/prometheus/client_golang/prometheus"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/stats"
 )
 
@@ -28,6 +29,11 @@ var serverMetrics = grpc_prometheus.NewServerMetrics()
 func init() {
 	serverMetrics.EnableHandlingTimeHistogram()
 	MustRegister(serverMetrics)
+}
+
+// InitializeServerMetrics initializes server metrics for the given gRPC server.
+func InitializeServerMetrics(s *grpc.Server) {
+	serverMetrics.InitializeMetrics(s)
 }
 
 // Server interceptors.
