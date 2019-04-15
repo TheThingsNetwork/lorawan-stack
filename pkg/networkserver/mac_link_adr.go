@@ -114,14 +114,14 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 		handler = handleMACResponse
 	}
 
-	if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_2) < 0 && dupCount != 0 {
+	if (dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_2) < 0 || dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0) && dupCount != 0 {
 		return errInvalidPayload
 	}
 
 	var n uint
 	var req *ttnpb.MACCommand_LinkADRReq
 	dev.MACState.PendingRequests, err = handler(ttnpb.CID_LINK_ADR, func(cmd *ttnpb.MACCommand) error {
-		if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_2) >= 0 && n > dupCount+1 {
+		if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_2) >= 0 && dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 && n > dupCount+1 {
 			return errInvalidPayload
 		}
 		n++
