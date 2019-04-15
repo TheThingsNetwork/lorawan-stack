@@ -86,7 +86,12 @@ func (c *Component) listenWeb() (err error) {
 		}
 		g := c.web.RootGroup("/metrics", middleware...)
 		g.GET("/", func(c echo.Context) error { return c.Redirect(http.StatusFound, strings.TrimSuffix(c.Path(), "/")) })
-		g.GET("", echo.WrapHandler(metrics.Exporter))
+		g.GET("", echo.WrapHandler(metrics.Exporter), func(next echo.HandlerFunc) echo.HandlerFunc {
+			return func(c echo.Context) error {
+				c.Request().Header.Del("Accept-Encoding")
+				return next(c)
+			}
+		})
 	}
 
 	if c.config.HTTP.Health.Enable {
