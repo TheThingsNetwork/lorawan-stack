@@ -30,6 +30,7 @@ import Message from '../../../lib/components/message'
 import FieldGroup from '../../../components/field/group'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import ApiKeyModal from '../../containers/api-key-modal'
+import SubmitBar from '../../../components/submit-bar'
 
 import { getApplicationsRightsList } from '../../store/actions/applications'
 import api from '../../api'
@@ -196,9 +197,9 @@ export default class ApplicationApiKeyAdd extends React.Component {
               >
                 {rightsItems}
               </FieldGroup>
-              <div className={style.submitBar}>
+              <SubmitBar>
                 <Button type="submit" message={sharedMessages.createApiKey} />
-              </div>
+              </SubmitBar>
             </Form>
           </Col>
         </Row>

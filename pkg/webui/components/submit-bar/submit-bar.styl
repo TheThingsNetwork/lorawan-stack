@@ -12,9 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.submit-bar
+.bar
   border-dark('top')
   display: flex
-  justify-content: space-between
+  align-items: center
   background-color: $c-divider-subtle
   padding: $cs.m
+
+  &-start
+    justify-content: flex-start
+
+  &-end
+    justify-content: flex-end
+
+  &-between
+    justify-content: space-between
+
+  &-around
+    justify-content: space-around
+
+  &-message
+    color: $tc-subtle-gray
