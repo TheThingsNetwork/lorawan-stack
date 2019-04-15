@@ -37,7 +37,7 @@ swagger.protos: $(wildcard api/*.proto)
 swagger.protos.clean:
 	rm -f $(PWD)/api/api.swagger.json
 
-MARKDOWN_PROTOC_FLAGS ?= --doc_opt=markdown,api.md --doc_out=$(PWD)/api
+MARKDOWN_PROTOC_FLAGS ?= --doc_opt=$(PWD)/api/api.md.tmpl,api.md --doc_out=$(PWD)/api
 
 markdown.protos: $(wildcard api/*.proto)
 	$(PROTOC) $(MARKDOWN_PROTOC_FLAGS) $(API_PROTO_FILES)
