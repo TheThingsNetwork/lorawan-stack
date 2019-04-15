@@ -18,7 +18,7 @@ API_PROTO_FILES = $(PWD)/api/'*.proto'
 
 PROTOC_OUT ?= /out
 
-PROTOC_DOCKER_IMAGE ?= thethingsindustries/protoc:3.1.3-rc1
+PROTOC_DOCKER_IMAGE ?= thethingsindustries/protoc:3.1.3
 PROTOC_DOCKER_ARGS = run --user `id -u` --rm \
                      --mount type=bind,src=$(PWD)/api,dst=$(PWD)/api \
                      --mount type=bind,src=$(PWD)/pkg/ttnpb,dst=$(PROTOC_OUT)/go.thethings.network/lorawan-stack/pkg/ttnpb \
