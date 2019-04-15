@@ -17,6 +17,7 @@ package metrics
 import (
 	"context"
 	"net"
+	"runtime/pprof"
 
 	"github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/prometheus/client_golang/prometheus"
@@ -117,6 +118,9 @@ func (hdl statsHandler) Collect(ch chan<- prometheus.Metric) {
 }
 
 func (hdl statsHandler) TagRPC(ctx context.Context, info *stats.RPCTagInfo) context.Context {
+	defer pprof.SetGoroutineLabels(ctx)
+	ctx = pprof.WithLabels(ctx, pprof.Labels("grpc.method", info.FullMethodName))
+	pprof.SetGoroutineLabels(ctx)
 	return ctx
 }
 
