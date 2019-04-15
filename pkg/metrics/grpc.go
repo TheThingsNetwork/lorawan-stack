@@ -27,7 +27,6 @@ import (
 var serverMetrics = grpc_prometheus.NewServerMetrics()
 
 func init() {
-	serverMetrics.EnableHandlingTimeHistogram()
 	MustRegister(serverMetrics)
 }
 
