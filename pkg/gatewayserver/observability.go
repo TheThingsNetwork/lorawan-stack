@@ -178,7 +178,7 @@ func registerForwardUplink(ctx context.Context, devIDs ttnpb.EndDeviceIdentifier
 func registerDropUplink(ctx context.Context, devIDs ttnpb.EndDeviceIdentifiers, gtw *ttnpb.Gateway, msg *ttnpb.UplinkMessage, err error) {
 	events.Publish(evtDropUp(ctx, gtw, err))
 	if ttnErr, ok := errors.From(err); ok {
-		gsMetrics.uplinkDropped.WithLabelValues(ctx, ttnErr.String()).Inc()
+		gsMetrics.uplinkDropped.WithLabelValues(ctx, ttnErr.FullName()).Inc()
 	} else {
 		gsMetrics.uplinkDropped.WithLabelValues(ctx, unknown).Inc()
 	}
