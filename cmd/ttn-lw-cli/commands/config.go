@@ -32,6 +32,7 @@ type Config struct {
 	ConfigID                     string `name:"config-id" description:"Configuration ID (if using multiple configurations)"`
 	InputFormat                  string `name:"input-format" description:"Input format"`
 	OutputFormat                 string `name:"output-format" description:"Output format"`
+	AllowUnknownHosts            bool   `name:"allow-unknown-hosts" description:"Allow sending credentials to unknown hosts"`
 	OAuthServerAddress           string `name:"oauth-server-address" description:"OAuth Server Address"`
 	IdentityServerGRPCAddress    string `name:"identity-server-grpc-address" description:"Identity Server Address"`
 	GatewayServerGRPCAddress     string `name:"gateway-server-grpc-address" description:"Gateway Server Address"`

@@ -155,6 +155,9 @@ func preRun(tasks ...func() error) func(cmd *cobra.Command, args []string) error
 var errUnknownHost = errors.DefineUnauthenticated("unknown_host", "unknown host `{host}` for current credentials", "known")
 
 func checkAuth() error {
+	if config.AllowUnknownHosts {
+		return nil
+	}
 	if knownHosts, ok := cache.Get("hosts").([]string); ok && len(knownHosts) > 0 {
 	nextHost:
 		for _, host := range config.getHosts() {
@@ -163,6 +166,8 @@ func checkAuth() error {
 					continue nextHost
 				}
 			}
+			logger.Errorf("Found an unknown host `%s` that was not configured when you logged in", host)
+			logger.Error("You may want to check your configuration, login/logout or use the --allow-unknown-hosts flag")
 			return errUnknownHost.WithAttributes("host", host, "known", knownHosts)
 		}
 	}
