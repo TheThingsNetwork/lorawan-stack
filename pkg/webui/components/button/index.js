@@ -100,6 +100,7 @@ Button.Link = function (props) {
     />
   )
 }
+Button.Link.displayName = 'Button.Link'
 
 Button.AnchorLink = function (props) {
   const { target, title, name } = props
@@ -114,6 +115,7 @@ Button.AnchorLink = function (props) {
     />
   )
 }
+Button.AnchorLink.displayName = 'Button.AnchorLink'
 
 const commonPropTypes = {
   /** The message to be displayed within the button */
