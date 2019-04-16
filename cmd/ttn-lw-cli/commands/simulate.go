@@ -44,8 +44,10 @@ type simulateMetadataParams struct {
 	LoRaWANPHYVersion ttnpb.PHYVersion `protobuf:"varint,6,opt,name=lorawan_phy_version,proto3,enum=ttn.lorawan.v3.MACVersion" json:"lorawan_phy_version"`
 	BandID            string           `protobuf:"bytes,7,opt,name=band_id,proto3,stdtime" json:"band_id,omitempty"`
 	Frequency         uint64           `protobuf:"varint,8,opt,name=frequency,proto3" json:"frequency,omitempty"`
-	Bandwidth         uint32           `protobuf:"varint,9,opt,name=bandwidth,proto3" json:"bandwidth,omitempty"`
-	SpreadingFactor   uint32           `protobuf:"varint,10,opt,name=spreading_factor,proto3" json:"spreading_factor,omitempty"`
+	ChannelIndex      uint32           `protobuf:"varint,9,opt,name=channel_index,proto3" json:"channel_index,omitempty"`
+	Bandwidth         uint32           `protobuf:"varint,10,opt,name=bandwidth,proto3" json:"bandwidth,omitempty"`
+	SpreadingFactor   uint32           `protobuf:"varint,11,opt,name=spreading_factor,proto3" json:"spreading_factor,omitempty"`
+	DataRateIndex     uint32           `protobuf:"varint,12,opt,name=data_rate_index,proto3" json:"data_rate_index,omitempty"`
 }
 
 func (m *simulateMetadataParams) setDefaults() error {
@@ -71,15 +73,29 @@ func (m *simulateMetadataParams) setDefaults() error {
 		return err
 	}
 	if m.Frequency == 0 {
-		m.Frequency = phy.UplinkChannels[0].Frequency
+		m.Frequency = phy.UplinkChannels[int(m.ChannelIndex)].Frequency
+	} else if m.ChannelIndex == 0 {
+		for i, ch := range phy.UplinkChannels {
+			if ch.Frequency == m.Frequency {
+				m.ChannelIndex = uint32(i)
+				break
+			}
+		}
 	}
 	if m.Bandwidth == 0 || m.SpreadingFactor == 0 {
-		drIdx := 0
+		drIdx := int(m.DataRateIndex)
 		if drIdx < int(phy.UplinkChannels[0].MinDataRate) || drIdx > int(phy.UplinkChannels[0].MaxDataRate) {
 			drIdx = int(phy.UplinkChannels[0].MaxDataRate)
 		}
 		dr := phy.DataRates[drIdx].Rate.GetLoRa()
 		m.SpreadingFactor, m.Bandwidth = dr.SpreadingFactor, dr.Bandwidth
+	} else if m.DataRateIndex == 0 {
+		for i, dr := range phy.DataRates {
+			if dr.Rate.GetLoRa().SpreadingFactor == m.SpreadingFactor && dr.Rate.GetLoRa().Bandwidth == m.Bandwidth {
+				m.DataRateIndex = uint32(i)
+				break
+			}
+		}
 	}
 	return nil
 }
