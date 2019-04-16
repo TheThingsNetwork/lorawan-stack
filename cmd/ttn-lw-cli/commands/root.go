@@ -54,7 +54,7 @@ var (
 		SilenceErrors:     true,
 		SilenceUsage:      true,
 		Short:             "The Things Network Command-line Interface",
-		PersistentPreRunE: preRun(refreshToken, requireAuth),
+		PersistentPreRunE: preRun(checkAuth, refreshToken, requireAuth),
 		PersistentPostRunE: func(cmd *cobra.Command, args []string) error {
 			// clean up the API
 			api.CloseAll()
@@ -149,6 +149,23 @@ func preRun(tasks ...func() error) func(cmd *cobra.Command, args []string) error
 		}
 		return nil
 	}
+}
+
+var errUnknownHost = errors.DefineUnauthenticated("unknown_host", "unknown host `{host}` for current credentials", "known")
+
+func checkAuth() error {
+	if knownHosts, ok := cache.Get("hosts").([]string); ok && len(knownHosts) > 0 {
+	nextHost:
+		for _, host := range config.getHosts() {
+			for _, knownHost := range knownHosts {
+				if host == knownHost {
+					continue nextHost
+				}
+			}
+			return errUnknownHost.WithAttributes("host", host, "known", knownHosts)
+		}
+	}
+	return nil
 }
 
 func refreshToken() error {
