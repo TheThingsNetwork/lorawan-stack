@@ -23,18 +23,26 @@ import (
 	"golang.org/x/oauth2"
 )
 
-type Cache struct {
+// AuthCache stores auth for the CLI.
+type AuthCache struct {
 	data struct {
 		OAuthToken *oauth2.Token          `json:"oauth_token,omitempty"`
+		APIKey     string                 `json:"api_key,omitempty"`
+		Hosts      []string               `json:"hosts,omitempty"`
 		Other      map[string]interface{} `json:"other,omitempty"`
 	}
 	changed bool
 }
 
-func (c *Cache) Get(key string) interface{} {
+// Get gets a key from the auth cache.
+func (c *AuthCache) Get(key string) interface{} {
 	switch key {
 	case "oauth_token":
 		return c.data.OAuthToken
+	case "api_key":
+		return c.data.APIKey
+	case "hosts":
+		return c.data.Hosts
 	default:
 		return getFromMap(c.data.Other, strings.Split(key, "."))
 	}
@@ -51,10 +59,15 @@ func getFromMap(m map[string]interface{}, path []string) interface{} {
 	return nil
 }
 
-func (c *Cache) Set(key string, value interface{}) {
+// Set sets keys in the auth cache.
+func (c *AuthCache) Set(key string, value interface{}) {
 	switch key {
 	case "oauth_token":
 		c.data.OAuthToken = value.(*oauth2.Token)
+	case "api_key":
+		c.data.APIKey = value.(string)
+	case "hosts":
+		c.data.Hosts = value.([]string)
 	default:
 		if c.data.Other == nil {
 			c.data.Other = make(map[string]interface{})
@@ -64,9 +77,37 @@ func (c *Cache) Set(key string, value interface{}) {
 	c.changed = true
 }
 
+// Unset unsets keys in the auth cache.
+func (c *AuthCache) Unset(keys ...string) {
+	for _, key := range keys {
+		c.unset(key)
+	}
+}
+
+func (c *AuthCache) unset(key string) {
+	switch key {
+	case "oauth_token":
+		c.data.OAuthToken = nil
+	case "api_key":
+		c.data.APIKey = ""
+	case "hosts":
+		c.data.Hosts = nil
+	default:
+		if c.data.Other == nil {
+			return
+		}
+		setInMap(c.data.Other, strings.Split(key, "."), nil)
+	}
+	c.changed = true
+}
+
 func setInMap(m map[string]interface{}, path []string, value interface{}) {
 	if len(path) == 1 {
-		m[path[0]] = value
+		if value == nil {
+			delete(m, path[0])
+		} else {
+			m[path[0]] = value
+		}
 	}
 	if m[path[0]] == nil {
 		m[path[0]] = make(map[string]interface{})
@@ -84,7 +125,8 @@ func cacheFile() string {
 	return filepath.Join(cacheDir, "ttn-lw-cli", "cache")
 }
 
-func GetCache() (cache Cache, err error) {
+// GetAuthCache gets the auth cache form the cache file.
+func GetAuthCache() (cache AuthCache, err error) {
 	cacheFile := cacheFile()
 	if cacheFile == "" {
 		return cache, nil
@@ -103,7 +145,8 @@ func GetCache() (cache Cache, err error) {
 	return cache, nil
 }
 
-func SaveCache(cache Cache) (err error) {
+// SaveAuthCache saves the auth cache to the cache file.
+func SaveAuthCache(cache AuthCache) (err error) {
 	if !cache.changed {
 		return nil
 	}

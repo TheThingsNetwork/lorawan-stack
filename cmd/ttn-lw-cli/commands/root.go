@@ -44,7 +44,7 @@ var (
 	config       = &Config{}
 	oauth2Config *oauth2.Config
 	ctx          = newContext(context.Background())
-	cache        util.Cache
+	cache        util.AuthCache
 
 	inputDecoder io.Decoder
 
@@ -59,7 +59,7 @@ var (
 			// clean up the API
 			api.CloseAll()
 
-			err := util.SaveCache(cache)
+			err := util.SaveAuthCache(cache)
 			if err != nil {
 				return err
 			}
@@ -93,7 +93,7 @@ func preRun(tasks ...func() error) func(cmd *cobra.Command, args []string) error
 		}
 
 		// get cache
-		cache, err = util.GetCache()
+		cache, err = util.GetAuthCache()
 		if err != nil {
 			return err
 		}
@@ -156,7 +156,7 @@ func refreshToken() error {
 		freshToken, err := oauth2Config.TokenSource(ctx, token).Token()
 		if err == nil && freshToken != token {
 			cache.Set("oauth_token", freshToken)
-			if err := util.SaveCache(cache); err != nil {
+			if err := util.SaveAuthCache(cache); err != nil {
 				return err
 			}
 		}

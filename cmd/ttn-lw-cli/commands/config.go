@@ -41,6 +41,17 @@ type Config struct {
 	CA                           string `name:"ca" description:"CA certificate file"`
 }
 
+func (c Config) getHosts() []string {
+	return getHosts(
+		c.OAuthServerAddress,
+		c.IdentityServerGRPCAddress,
+		c.GatewayServerGRPCAddress,
+		c.NetworkServerGRPCAddress,
+		c.ApplicationServerGRPCAddress,
+		c.JoinServerGRPCAddress,
+	)
+}
+
 // DefaultConfig contains the default config for the ttn-lw-cli binary.
 var DefaultConfig = Config{
 	Base: conf.Base{

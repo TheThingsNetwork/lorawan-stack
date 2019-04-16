@@ -17,10 +17,7 @@ package commands
 import (
 	"context"
 	stdio "io"
-	"net"
-	"net/url"
 	"os"
-	"strings"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
@@ -733,22 +730,6 @@ func init() {
 	endDevicesCommand.AddCommand(applicationsDownlinkCommand)
 
 	Root.AddCommand(endDevicesCommand)
-}
-
-func getHost(address string) string {
-	if strings.Contains(address, "://") {
-		url, err := url.Parse(address)
-		if err == nil {
-			address = url.Host
-		}
-	}
-	if strings.Contains(address, ":") {
-		host, _, err := net.SplitHostPort(address)
-		if err == nil {
-			return host
-		}
-	}
-	return address
 }
 
 var errAddressMismatch = errors.DefineAborted("address_mismatch", "server address mismatch")
