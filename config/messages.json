@@ -3131,6 +3131,15 @@
       "file": "entity_access.go"
     }
   },
+  "error:pkg/identityserver:application_has_devices": {
+    "translations": {
+      "en": "application still has `{count}` devices"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "application_registry.go"
+    }
+  },
   "error:pkg/identityserver:client_update_admin_field": {
     "translations": {
       "en": "only admins can update the `{field}` field"
