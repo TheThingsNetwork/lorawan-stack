@@ -22,6 +22,7 @@ import style from './toast.styl'
 const createToast = function () {
   const queue = []
   let toastId = null
+  let firstDispatched = false
 
   const show = function (toastOptions) {
     const { INFO, SUCCESS, ERROR, WARNING, DEFAULT } = toast.types
@@ -46,16 +47,20 @@ const createToast = function () {
   }
 
   const next = function () {
-    if (queue.length) {
-      const options = queue.shift()
-      show(options)
+    const hasNext = queue.length > 0
+
+    if (!hasNext) {
+      firstDispatched = false
+    } else if (hasNext && !t.isActive(toastId)) {
+      show(queue.shift())
     }
   }
 
   const toast = function (options) {
     queue.push(options)
 
-    if (!t.isActive(toastId)) {
+    if (!firstDispatched) {
+      firstDispatched = true
       next()
     }
   }
