@@ -47,7 +47,7 @@ const createToast = function () {
 
   const next = function () {
     if (queue.length) {
-      const options = queue.pop()
+      const options = queue.shift()
       show(options)
     }
   }
