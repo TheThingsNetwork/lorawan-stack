@@ -29,7 +29,7 @@ var (
 // Config for the ttn-lw-cli binary.
 type Config struct {
 	conf.Base                    `name:",squash"`
-	ConfigID                     string `name:"config-id" description:"Configuration ID (if using multiple configurations)"`
+	CredentialsID                string `name:"credentials-id" description:"Credentials ID (if using multiple configurations)"`
 	InputFormat                  string `name:"input-format" description:"Input format"`
 	OutputFormat                 string `name:"output-format" description:"Output format"`
 	AllowUnknownHosts            bool   `name:"allow-unknown-hosts" description:"Allow sending credentials to unknown hosts"`
