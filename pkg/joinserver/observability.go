@@ -84,7 +84,7 @@ func registerAcceptJoin(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.Jo
 func registerRejectJoin(ctx context.Context, req *ttnpb.JoinRequest, err error) {
 	events.Publish(evtRejectJoin(ctx, nil, err))
 	if ttnErr, ok := errors.From(err); ok {
-		jsMetrics.joinRejected.WithLabelValues(ctx, ttnErr.String()).Inc()
+		jsMetrics.joinRejected.WithLabelValues(ctx, ttnErr.FullName()).Inc()
 	} else {
 		jsMetrics.joinRejected.WithLabelValues(ctx, unknown).Inc()
 	}

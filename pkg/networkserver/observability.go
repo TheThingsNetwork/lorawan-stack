@@ -212,7 +212,7 @@ func registerDropDataUplink(ctx context.Context, devIDs *ttnpb.EndDeviceIdentifi
 	}
 
 	if ttnErr, ok := errors.From(err); ok {
-		nsMetrics.uplinkDropped.WithLabelValues(ctx, uplinkMTypeLabel(msg), ttnErr.String()).Inc()
+		nsMetrics.uplinkDropped.WithLabelValues(ctx, uplinkMTypeLabel(msg), ttnErr.FullName()).Inc()
 	} else {
 		nsMetrics.uplinkDropped.WithLabelValues(ctx, uplinkMTypeLabel(msg), unknown).Inc()
 	}
@@ -224,7 +224,7 @@ func registerDropJoinRequest(ctx context.Context, devIDs *ttnpb.EndDeviceIdentif
 	}
 
 	if ttnErr, ok := errors.From(err); ok {
-		nsMetrics.uplinkDropped.WithLabelValues(ctx, uplinkMTypeLabel(msg), ttnErr.String()).Inc()
+		nsMetrics.uplinkDropped.WithLabelValues(ctx, uplinkMTypeLabel(msg), ttnErr.FullName()).Inc()
 	} else {
 		nsMetrics.uplinkDropped.WithLabelValues(ctx, uplinkMTypeLabel(msg), unknown).Inc()
 	}
@@ -236,7 +236,7 @@ func registerDropRejoinRequest(ctx context.Context, devIDs *ttnpb.EndDeviceIdent
 	}
 
 	if ttnErr, ok := errors.From(err); ok {
-		nsMetrics.uplinkDropped.WithLabelValues(ctx, uplinkMTypeLabel(msg), ttnErr.String()).Inc()
+		nsMetrics.uplinkDropped.WithLabelValues(ctx, uplinkMTypeLabel(msg), ttnErr.FullName()).Inc()
 	} else {
 		nsMetrics.uplinkDropped.WithLabelValues(ctx, uplinkMTypeLabel(msg), unknown).Inc()
 	}

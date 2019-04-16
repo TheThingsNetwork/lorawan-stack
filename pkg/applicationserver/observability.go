@@ -254,7 +254,7 @@ func registerDropUp(ctx context.Context, msg *ttnpb.ApplicationUp, err error) {
 		events.Publish(evtDropDataUp(ctx, msg.EndDeviceIdentifiers, err))
 	}
 	if ttnErr, ok := errors.From(err); ok {
-		asMetrics.uplinkDropped.WithLabelValues(ctx, ttnErr.String()).Inc()
+		asMetrics.uplinkDropped.WithLabelValues(ctx, ttnErr.FullName()).Inc()
 	} else {
 		asMetrics.uplinkDropped.WithLabelValues(ctx, unknown).Inc()
 	}
@@ -273,7 +273,7 @@ func registerForwardDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 func registerDropDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink, err error) {
 	events.Publish(evtDropDataDown(ctx, ids, err))
 	if ttnErr, ok := errors.From(err); ok {
-		asMetrics.downlinkDropped.WithLabelValues(ctx, ttnErr.String()).Inc()
+		asMetrics.downlinkDropped.WithLabelValues(ctx, ttnErr.FullName()).Inc()
 	} else {
 		asMetrics.downlinkDropped.WithLabelValues(ctx, unknown).Inc()
 	}
