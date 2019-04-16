@@ -35,7 +35,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
-type simulateUplinkParams struct {
+type simulateMetadataParams struct {
 	RSSI              float32          `protobuf:"fixed32,1,opt,name=rssi,proto3" json:"rssi,omitempty"`
 	SNR               float32          `protobuf:"fixed32,2,opt,name=snr,proto3" json:"snr,omitempty"`
 	Timestamp         uint32           `protobuf:"varint,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
@@ -48,7 +48,7 @@ type simulateUplinkParams struct {
 	SpreadingFactor   uint32           `protobuf:"varint,10,opt,name=spreading_factor,proto3" json:"spreading_factor,omitempty"`
 }
 
-func (m *simulateUplinkParams) setDefaults() error {
+func (m *simulateMetadataParams) setDefaults() error {
 	if m.Time == nil || m.Time.IsZero() {
 		now := time.Now()
 		m.Time = &now
@@ -111,7 +111,7 @@ type simulateDataUplinkParams struct {
 }
 
 var (
-	simulateUplinkFlags      = util.FieldFlags(&simulateUplinkParams{})
+	simulateUplinkFlags      = util.FieldFlags(&simulateMetadataParams{})
 	simulateJoinRequestFlags = util.FieldFlags(&simulateJoinRequestParams{})
 	simulateDataUplinkFlags  = util.FieldFlags(&simulateDataUplinkParams{})
 )
@@ -129,7 +129,7 @@ func simulate(cmd *cobra.Command, forUp func(*ttnpb.UplinkMessage) error, forDow
 		return err
 	}
 
-	var uplinkParams simulateUplinkParams
+	var uplinkParams simulateMetadataParams
 	if err := util.SetFields(&uplinkParams, simulateUplinkFlags); err != nil {
 		return err
 	}
@@ -379,7 +379,7 @@ var (
 		Use:   "join-request",
 		Short: "Simulate a join request (EXPERIMENTAL)",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			var uplinkParams simulateUplinkParams
+			var uplinkParams simulateMetadataParams
 			if err := util.SetFields(&uplinkParams, simulateUplinkFlags); err != nil {
 				return err
 			}
@@ -457,7 +457,7 @@ var (
 		Use:   "uplink",
 		Short: "Simulate a data uplink (EXPERIMENTAL)",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			var uplinkParams simulateUplinkParams
+			var uplinkParams simulateMetadataParams
 			if err := util.SetFields(&uplinkParams, simulateUplinkFlags); err != nil {
 				return err
 			}
