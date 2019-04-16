@@ -43,7 +43,7 @@ const m = defineMessages({
   deleteKey: 'Delete Key',
   modalWarning:
     'Are you sure you want to delete the {keyName} API Key? Deleting an application API Key cannot be undone!',
-  keyEdit: 'Edit {keyName}',
+  keyEdit: 'Edit API Key',
   updateSuccess: 'Successfully updated API Key',
   deleteSuccess: 'Successfully deleted API Key',
 })
@@ -192,8 +192,8 @@ export default class ApplicationApiKeyEdit extends React.Component {
       <Container>
         <Row>
           <Col lg={8} md={12}>
-            <IntlHelmet title={m.keyEdit} values={{ keyName: apiKey.name || sharedMessages.apiKey }} />
-            <Message component="h2" content={sharedMessages.edit} />
+            <IntlHelmet title={m.keyEdit} />
+            <Message component="h2" content={m.keyEdit} />
           </Col>
         </Row>
         <Row>

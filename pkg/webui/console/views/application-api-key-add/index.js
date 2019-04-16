@@ -166,7 +166,7 @@ export default class ApplicationApiKeyAdd extends React.Component {
         <Row>
           <Col lg={8} md={12}>
             <IntlHelmet title={sharedMessages.addApiKey} />
-            <Message component="h2" content={sharedMessages.add} />
+            <Message component="h2" content={sharedMessages.addApiKey} />
           </Col>
         </Row>
         <Row>
