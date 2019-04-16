@@ -372,12 +372,12 @@ var (
 	simulateCommand = &cobra.Command{
 		Use:     "simulate",
 		Aliases: []string{"sim"},
-		Short:   "Simulation commands",
+		Short:   "Simulation commands (EXPERIMENTAL)",
 		Hidden:  true,
 	}
 	simulateJoinRequestCommand = &cobra.Command{
 		Use:   "join-request",
-		Short: "Simulate a join request",
+		Short: "Simulate a join request (EXPERIMENTAL)",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var uplinkParams simulateUplinkParams
 			if err := util.SetFields(&uplinkParams, simulateUplinkFlags); err != nil {
@@ -455,7 +455,7 @@ var (
 	}
 	simulateDataUplinkCommand = &cobra.Command{
 		Use:   "uplink",
-		Short: "Simulate a data uplink",
+		Short: "Simulate a data uplink (EXPERIMENTAL)",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var uplinkParams simulateUplinkParams
 			if err := util.SetFields(&uplinkParams, simulateUplinkFlags); err != nil {
