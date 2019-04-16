@@ -75,7 +75,7 @@ var (
 			}
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewOrganizationRegistryClient(is).List(ctx, &ttnpb.ListOrganizationsRequest{
-				Collaborator: getCollaborator(cmd.Flags()),
+				Collaborator: getUserID(cmd.Flags(), nil).OrganizationOrUserIdentifiers(),
 				FieldMask:    types.FieldMask{Paths: paths},
 				Limit:        limit,
 				Page:         page,
@@ -141,7 +141,7 @@ var (
 		Short:   "Create an organization",
 		RunE: asBulk(func(cmd *cobra.Command, args []string) (err error) {
 			orgID := getOrganizationID(cmd.Flags(), args)
-			collaborator := getCollaborator(cmd.Flags())
+			collaborator := getUserID(cmd.Flags(), nil).OrganizationOrUserIdentifiers()
 			if collaborator == nil {
 				return errNoCollaborator
 			}
