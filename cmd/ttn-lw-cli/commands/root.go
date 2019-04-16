@@ -97,6 +97,7 @@ func preRun(tasks ...func() error) func(cmd *cobra.Command, args []string) error
 		if err != nil {
 			return err
 		}
+		cache = cache.ForID(config.ConfigID)
 
 		// create logger
 		logger, err = log.NewLogger(

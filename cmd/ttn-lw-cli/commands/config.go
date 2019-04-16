@@ -29,6 +29,7 @@ var (
 // Config for the ttn-lw-cli binary.
 type Config struct {
 	conf.Base                    `name:",squash"`
+	ConfigID                     string `name:"config-id" description:"Configuration ID (if using multiple configurations)"`
 	InputFormat                  string `name:"input-format" description:"Input format"`
 	OutputFormat                 string `name:"output-format" description:"Output format"`
 	OAuthServerAddress           string `name:"oauth-server-address" description:"OAuth Server Address"`

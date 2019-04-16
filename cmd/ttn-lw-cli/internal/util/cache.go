@@ -23,28 +23,59 @@ import (
 	"golang.org/x/oauth2"
 )
 
+// AuthData is the stored auth data.
+type AuthData struct {
+	OAuthToken *oauth2.Token          `json:"oauth_token,omitempty"`
+	APIKey     string                 `json:"api_key,omitempty"`
+	Hosts      []string               `json:"hosts,omitempty"`
+	Other      map[string]interface{} `json:"other,omitempty"`
+}
+
 // AuthCache stores auth for the CLI.
 type AuthCache struct {
 	data struct {
-		OAuthToken *oauth2.Token          `json:"oauth_token,omitempty"`
-		APIKey     string                 `json:"api_key,omitempty"`
-		Hosts      []string               `json:"hosts,omitempty"`
-		Other      map[string]interface{} `json:"other,omitempty"`
+		AuthData
+		ByID map[string]*AuthData `json:"by_id"`
 	}
+	id      string
 	changed bool
+}
+
+// ForID returns the auth cache for the given ID.
+func (c AuthCache) ForID(id string) AuthCache {
+	clone := c
+	clone.id = id
+	return clone
+}
+
+func (c *AuthCache) getData() *AuthData {
+	data := &c.data.AuthData
+	if c.id != "" {
+		if c.data.ByID == nil {
+			c.data.ByID = make(map[string]*AuthData)
+		}
+		var ok bool
+		data, ok = c.data.ByID[c.id]
+		if !ok {
+			data = &AuthData{}
+			c.data.ByID[c.id] = data
+		}
+	}
+	return data
 }
 
 // Get gets a key from the auth cache.
 func (c *AuthCache) Get(key string) interface{} {
+	authData := c.getData()
 	switch key {
 	case "oauth_token":
-		return c.data.OAuthToken
+		return authData.OAuthToken
 	case "api_key":
-		return c.data.APIKey
+		return authData.APIKey
 	case "hosts":
-		return c.data.Hosts
+		return authData.Hosts
 	default:
-		return getFromMap(c.data.Other, strings.Split(key, "."))
+		return getFromMap(authData.Other, strings.Split(key, "."))
 	}
 }
 
@@ -61,18 +92,19 @@ func getFromMap(m map[string]interface{}, path []string) interface{} {
 
 // Set sets keys in the auth cache.
 func (c *AuthCache) Set(key string, value interface{}) {
+	authData := c.getData()
 	switch key {
 	case "oauth_token":
-		c.data.OAuthToken = value.(*oauth2.Token)
+		authData.OAuthToken = value.(*oauth2.Token)
 	case "api_key":
-		c.data.APIKey = value.(string)
+		authData.APIKey = value.(string)
 	case "hosts":
-		c.data.Hosts = value.([]string)
+		authData.Hosts = value.([]string)
 	default:
-		if c.data.Other == nil {
-			c.data.Other = make(map[string]interface{})
+		if authData.Other == nil {
+			authData.Other = make(map[string]interface{})
 		}
-		setInMap(c.data.Other, strings.Split(key, "."), value)
+		setInMap(authData.Other, strings.Split(key, "."), value)
 	}
 	c.changed = true
 }
@@ -85,18 +117,19 @@ func (c *AuthCache) Unset(keys ...string) {
 }
 
 func (c *AuthCache) unset(key string) {
+	authData := c.getData()
 	switch key {
 	case "oauth_token":
-		c.data.OAuthToken = nil
+		authData.OAuthToken = nil
 	case "api_key":
-		c.data.APIKey = ""
+		authData.APIKey = ""
 	case "hosts":
-		c.data.Hosts = nil
+		authData.Hosts = nil
 	default:
-		if c.data.Other == nil {
+		if authData.Other == nil {
 			return
 		}
-		setInMap(c.data.Other, strings.Split(key, "."), nil)
+		setInMap(authData.Other, strings.Split(key, "."), nil)
 	}
 	c.changed = true
 }
