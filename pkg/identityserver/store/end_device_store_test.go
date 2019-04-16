@@ -125,6 +125,10 @@ func TestEndDeviceStore(t *testing.T) {
 		a.So(got.CreatedAt, should.Equal, created.CreatedAt)
 		a.So(got.UpdatedAt, should.Equal, updated.UpdatedAt)
 
+		count, err := store.CountEndDevices(ctx, &deviceID.ApplicationIdentifiers)
+		a.So(err, should.BeNil)
+		a.So(count, should.Equal, 1)
+
 		list, err := store.ListEndDevices(ctx,
 			&deviceID.ApplicationIdentifiers,
 			&ptypes.FieldMask{Paths: []string{"name"}},
@@ -164,6 +168,10 @@ func TestEndDeviceStore(t *testing.T) {
 		a.So(createdNew.CreatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
 		a.So(createdNew.UpdatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
 
+		count, err = store.CountEndDevices(ctx, &deviceID.ApplicationIdentifiers)
+		a.So(err, should.BeNil)
+		a.So(count, should.Equal, 2)
+
 		list, err = store.ListEndDevices(ctx,
 			&deviceID.ApplicationIdentifiers,
 			nil,
@@ -199,6 +207,10 @@ func TestEndDeviceStore(t *testing.T) {
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
+
+		count, err = store.CountEndDevices(ctx, &deviceID.ApplicationIdentifiers)
+		a.So(err, should.BeNil)
+		a.So(count, should.Equal, 0)
 
 		list, err = store.ListEndDevices(ctx, &deviceID.ApplicationIdentifiers, nil)
 		a.So(err, should.BeNil)
