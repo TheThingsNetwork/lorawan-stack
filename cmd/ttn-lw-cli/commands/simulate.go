@@ -263,7 +263,7 @@ func processDownlink(dev *ttnpb.EndDevice) func(lastUpMsg *ttnpb.UplinkMessage, 
 			var expectedMIC [4]byte
 			if dev.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0 && joinAcceptPayload.OptNeg {
 				jsIntKey := crypto.DeriveJSIntKey(key, devEUI)
-				// TODO: Support RejoinRequest
+				// TODO: Support RejoinRequest (https://github.com/TheThingsNetwork/lorawan-stack/issues/536)
 				expectedMIC, err = crypto.ComputeJoinAcceptMIC(
 					jsIntKey,
 					0xFF,
@@ -447,7 +447,7 @@ var (
 					if err := processDownlink(joinRequest, downMsg); err != nil {
 						return err
 					}
-					_ = downMsg // TODO: Handle
+					// Here we can update a persistent end-device.
 					return nil
 				},
 			)
@@ -559,7 +559,7 @@ var (
 					if err := processDownlink(dataUplink, downMsg); err != nil {
 						return err
 					}
-					_ = downMsg // TODO: Handle
+					// Here we can update a persistent end-device.
 					return nil
 				},
 			)
