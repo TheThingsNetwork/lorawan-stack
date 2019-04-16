@@ -214,7 +214,7 @@ func simulate(cmd *cobra.Command, forUp func(*ttnpb.UplinkMessage) error, forDow
 			return err
 		}
 		timestampDifference := uint32(uint64(down.GetDownlinkMessage().GetScheduled().GetTimestamp()) + 1<<32 - uint64(upMsg.GetRxMetadata()[0].GetTimestamp()))
-		logger.Infof("Received downlink after %s for %s after uplink", time.Since(sendTime), time.Duration(timestampDifference)*1000)
+		logger.Infof("Received downlink (after %s) for transmission %s relative to uplink", time.Since(sendTime), time.Duration(timestampDifference)*1000)
 
 		if err = forDown(down.DownlinkMessage); err != nil {
 			return err
