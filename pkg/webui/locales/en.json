@@ -31,7 +31,7 @@
   "console.views.application-add.index.createApplication": "Create Application",
   "console.views.application-api-key-edit.index.deleteKey": "Delete Key",
   "console.views.application-api-key-edit.index.modalWarning": "Are you sure you want to delete the {keyName} API Key? Deleting an application API Key cannot be undone!",
-  "console.views.application-api-key-edit.index.keyEdit": "Edit {keyName}",
+  "console.views.application-api-key-edit.index.keyEdit": "Edit API Key",
   "console.views.application-api-key-edit.index.updateSuccess": "Successfully updated API Key",
   "console.views.application-api-key-edit.index.deleteSuccess": "Successfully deleted API Key",
   "console.views.application-general-settings.index.basics": "Basics",
