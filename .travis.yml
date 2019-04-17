@@ -61,6 +61,7 @@ install:
   if [[ "$RUNTYPE" == "release" ]]; then
     sudo snap install snapcraft --classic
   fi
+
 script:
 - |
   if [[ "$RUNTYPE" == "js.test" ]]; then
@@ -68,6 +69,9 @@ script:
     make js.translations
     make js.test sdk.test
     make js.lint
+    make sdk.js.build sdk.protos.clean sdk.protos
+    make swagger.protos.clean swagger.protos
+    make markdown.protos.clean markdown.protos
   fi
 - |
   if [[ "$RUNTYPE" == "go.test" ]]; then
@@ -81,13 +85,13 @@ script:
 - |
   if [[ "$RUNTYPE" == "go.lint" ]]; then
     make go.deps
-    make protos.clean protos
-    make go.unconvert
-    make go.fmt
-    make go.misspell
     make headers.check
     make messages
     make go.lint
+    make go.protos.clean go.protos
+    make go.unconvert
+    make go.fmt
+    make go.misspell
   fi
 - |
   if [[ "$RUNTYPE" == "release" ]]; then

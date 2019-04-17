@@ -14,9 +14,7 @@
 
 package ttnpb
 
-import (
-	"context"
-)
+import "context"
 
 // ValidateContext wraps the generated validator with (optionally context-based) custom checks.
 func (m *UpdateApplicationRequest) ValidateContext(context.Context) error {
