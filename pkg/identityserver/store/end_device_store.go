@@ -105,6 +105,13 @@ func (s *deviceStore) findEndDevices(ctx context.Context, query *gorm.DB, fieldM
 	return devProtos, nil
 }
 
+func (s *deviceStore) CountEndDevices(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (total uint64, err error) {
+	defer trace.StartRegion(ctx, "count end devices").End()
+	query := s.db.Model(EndDevice{}).Scopes(withContext(ctx), withApplicationID(ids.GetApplicationID()))
+	err = query.Count(&total).Error
+	return
+}
+
 func (s *deviceStore) ListEndDevices(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, fieldMask *types.FieldMask) ([]*ttnpb.EndDevice, error) {
 	// NOTE: tracing done in s.findEndDevices.
 	query := s.db.Scopes(withContext(ctx), withApplicationID(ids.GetApplicationID()))
