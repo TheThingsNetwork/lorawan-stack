@@ -26,3 +26,5 @@ mage: $(MAGE)
 INIT_RULES += mage
 
 include .mage/rules.make
+
+# vim: ft=make
