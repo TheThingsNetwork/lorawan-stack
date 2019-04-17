@@ -32,7 +32,7 @@ services:
       - cert.pem
       - key.pem
   cockroach:
-    image: cockroachdb/cockroach:v2.1.1
+    image: cockroachdb/cockroach:v2.1.6
     command: start --http-port 26256 --insecure
     volumes:
       - ${DEV_DATA_DIR:-.env/data}/cockroach:/cockroach/cockroach-data
@@ -40,7 +40,7 @@ services:
       - "127.0.0.1:26257:26257" # Cockroach
       - "127.0.0.1:26256:26256" # WebUI
   redis:
-    image: redis:5.0.1-alpine
+    image: redis:5.0.4-alpine
     command: redis-server --appendonly yes
     volumes:
       - ${DEV_DATA_DIR:-.env/data}/redis:/data
