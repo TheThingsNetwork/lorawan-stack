@@ -637,7 +637,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 				case ttnpb.CID_LINK_ADR:
 					pld := cmd.GetLinkADRAns()
 					dupCount := 0
-					if stored.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_2) >= 0 {
+					if stored.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_2) >= 0 && stored.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 						logger.Debug("Count duplicates")
 						for _, dup := range cmds {
 							if dup.CID != ttnpb.CID_LINK_ADR {
