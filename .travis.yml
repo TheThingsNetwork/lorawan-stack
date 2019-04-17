@@ -60,9 +60,8 @@ install:
 - |
   if [[ "$RUNTYPE" == "release" ]]; then
     sudo snap install snapcraft --classic
-  else
-    make protoc
   fi
+
 script:
 - |
   if [[ "$RUNTYPE" == "js.test" ]]; then
