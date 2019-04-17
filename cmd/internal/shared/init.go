@@ -14,11 +14,15 @@
 
 package shared
 
-import "go.thethings.network/lorawan-stack/pkg/config"
+import (
+	"context"
+
+	"go.thethings.network/lorawan-stack/pkg/config"
+)
 
 // Initialize global packages.
-func Initialize(config config.ServiceBase) error {
-	if err := InitializeEvents(config); err != nil {
+func Initialize(ctx context.Context, config config.ServiceBase) error {
+	if err := InitializeEvents(ctx, config); err != nil {
 		return err
 	}
 	return nil

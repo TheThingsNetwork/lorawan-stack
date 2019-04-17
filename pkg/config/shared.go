@@ -117,10 +117,17 @@ type Redis struct {
 // IsZero returns whether the Redis configuration is empty.
 func (r Redis) IsZero() bool { return r.Address == "" && r.Database == 0 && len(r.Namespace) == 0 }
 
+// CloudEvents represents configuration for the cloud events backend.
+type CloudEvents struct {
+	PublishURL   string `name:"publish-url" description:"URL for the topic to send events"`
+	SubscribeURL string `name:"subscribe-url" description:"URL for the subscription to receiving events"`
+}
+
 // Events represents configuration for the events system.
 type Events struct {
-	Backend string `name:"backend" description:"Backend to use for events (internal, redis)"`
-	Redis   Redis  `name:"redis"`
+	Backend string      `name:"backend" description:"Backend to use for events (internal, redis, cloud)"`
+	Redis   Redis       `name:"redis"`
+	Cloud   CloudEvents `name:"cloud"`
 }
 
 // Rights represents the configuration to apply when fetching entity rights.
