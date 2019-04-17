@@ -34,8 +34,7 @@ import (
 
 func logout() error {
 	defer func() {
-		cache.Set("oauth_token", (*oauth2.Token)(nil))
-		cache.Set("api_key", "")
+		cache.Unset("oauth_token", "api_key", "hosts")
 	}()
 	refreshToken() // NOTE: ignore errors.
 	optionalAuth()
@@ -79,6 +78,8 @@ var (
 		PersistentPreRunE: preRun(),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			logout()
+
+			cache.Set("hosts", config.getHosts())
 
 			ctx, done := context.WithCancel(ctx)
 			defer done()

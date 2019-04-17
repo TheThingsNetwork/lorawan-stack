@@ -29,8 +29,10 @@ var (
 // Config for the ttn-lw-cli binary.
 type Config struct {
 	conf.Base                    `name:",squash"`
+	CredentialsID                string `name:"credentials-id" description:"Credentials ID (if using multiple configurations)"`
 	InputFormat                  string `name:"input-format" description:"Input format"`
 	OutputFormat                 string `name:"output-format" description:"Output format"`
+	AllowUnknownHosts            bool   `name:"allow-unknown-hosts" description:"Allow sending credentials to unknown hosts"`
 	OAuthServerAddress           string `name:"oauth-server-address" description:"OAuth Server Address"`
 	IdentityServerGRPCAddress    string `name:"identity-server-grpc-address" description:"Identity Server Address"`
 	GatewayServerGRPCAddress     string `name:"gateway-server-grpc-address" description:"Gateway Server Address"`
@@ -39,6 +41,17 @@ type Config struct {
 	JoinServerGRPCAddress        string `name:"join-server-grpc-address" description:"Join Server Address"`
 	Insecure                     bool   `name:"insecure" description:"Connect without TLS"`
 	CA                           string `name:"ca" description:"CA certificate file"`
+}
+
+func (c Config) getHosts() []string {
+	return getHosts(
+		c.OAuthServerAddress,
+		c.IdentityServerGRPCAddress,
+		c.GatewayServerGRPCAddress,
+		c.NetworkServerGRPCAddress,
+		c.ApplicationServerGRPCAddress,
+		c.JoinServerGRPCAddress,
+	)
 }
 
 // DefaultConfig contains the default config for the ttn-lw-cli binary.

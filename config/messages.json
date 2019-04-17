@@ -1349,6 +1349,15 @@
       "file": "root.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:unknown_host": {
+    "translations": {
+      "en": "unknown host `{host}` for current credentials"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "root.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/internal/util:flag_value": {
     "translations": {
       "en": "invalid flag value"
