@@ -136,8 +136,9 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 			panic("Network Server scheduled an invalid LinkADR command")
 		}
 
-		if req.NbTrans > 0 {
+		if req.NbTrans > 0 && dev.MACState.CurrentParameters.ADRNbTrans != req.NbTrans {
 			dev.MACState.CurrentParameters.ADRNbTrans = req.NbTrans
+			dev.RecentADRUplinks = nil
 		}
 
 		var mask [16]bool
@@ -168,7 +169,10 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 		return nil
 	}
 
-	dev.MACState.CurrentParameters.ADRDataRateIndex = req.DataRateIndex
-	dev.MACState.CurrentParameters.ADRTxPowerIndex = req.TxPowerIndex
+	if dev.MACState.CurrentParameters.ADRDataRateIndex != req.DataRateIndex || dev.MACState.CurrentParameters.ADRTxPowerIndex != req.TxPowerIndex {
+		dev.MACState.CurrentParameters.ADRDataRateIndex = req.DataRateIndex
+		dev.MACState.CurrentParameters.ADRTxPowerIndex = req.TxPowerIndex
+		dev.RecentADRUplinks = nil
+	}
 	return nil
 }
