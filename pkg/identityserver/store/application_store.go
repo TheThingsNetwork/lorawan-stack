@@ -29,11 +29,11 @@ import (
 
 // GetApplicationStore returns an ApplicationStore on the given db (or transaction).
 func GetApplicationStore(db *gorm.DB) ApplicationStore {
-	return &applicationStore{db: db}
+	return &applicationStore{store: newStore(db)}
 }
 
 type applicationStore struct {
-	db *gorm.DB
+	*store
 }
 
 // selectApplicationFields selects relevant fields (based on fieldMask) and preloads details if needed.
@@ -69,10 +69,8 @@ func (s *applicationStore) CreateApplication(ctx context.Context, app *ttnpb.App
 		ApplicationID: app.ApplicationID, // The ID is not mutated by fromPB.
 	}
 	appModel.fromPB(app, nil)
-	appModel.SetContext(ctx)
-	query := s.db.Create(&appModel)
-	if query.Error != nil {
-		return nil, query.Error
+	if err := s.createEntity(ctx, &appModel); err != nil {
+		return nil, err
 	}
 	var appProto ttnpb.Application
 	appModel.toPB(&appProto, nil)
@@ -85,7 +83,7 @@ func (s *applicationStore) FindApplications(ctx context.Context, ids []*ttnpb.Ap
 	for i, id := range ids {
 		idStrings[i] = id.GetApplicationID()
 	}
-	query := s.db.Scopes(withContext(ctx), withApplicationID(idStrings...))
+	query := s.query(ctx, Application{}, withApplicationID(idStrings...))
 	query = selectApplicationFields(ctx, query, fieldMask)
 	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
 		countTotal(ctx, query.Model(&Application{}))
@@ -108,7 +106,7 @@ func (s *applicationStore) FindApplications(ctx context.Context, ids []*ttnpb.Ap
 
 func (s *applicationStore) GetApplication(ctx context.Context, id *ttnpb.ApplicationIdentifiers, fieldMask *types.FieldMask) (*ttnpb.Application, error) {
 	defer trace.StartRegion(ctx, "get application").End()
-	query := s.db.Scopes(withContext(ctx), withApplicationID(id.GetApplicationID()))
+	query := s.query(ctx, Application{}, withApplicationID(id.GetApplicationID()))
 	query = selectApplicationFields(ctx, query, fieldMask)
 	var appModel Application
 	if err := query.First(&appModel).Error; err != nil {
@@ -124,7 +122,7 @@ func (s *applicationStore) GetApplication(ctx context.Context, id *ttnpb.Applica
 
 func (s *applicationStore) UpdateApplication(ctx context.Context, app *ttnpb.Application, fieldMask *types.FieldMask) (updated *ttnpb.Application, err error) {
 	defer trace.StartRegion(ctx, "update application").End()
-	query := s.db.Scopes(withContext(ctx), withApplicationID(app.GetApplicationID()))
+	query := s.query(ctx, Application{}, withApplicationID(app.GetApplicationID()))
 	query = selectApplicationFields(ctx, query, fieldMask)
 	var appModel Application
 	if err = query.First(&appModel).Error; err != nil {
@@ -138,14 +136,11 @@ func (s *applicationStore) UpdateApplication(ctx context.Context, app *ttnpb.App
 	}
 	oldAttributes := appModel.Attributes
 	columns := appModel.fromPB(app, fieldMask)
-	if len(columns) > 0 {
-		query = s.db.Select(append(columns, "updated_at")).Save(&appModel)
-		if query.Error != nil {
-			return nil, query.Error
-		}
+	if err = s.updateEntity(ctx, &appModel, columns...); err != nil {
+		return nil, err
 	}
 	if !reflect.DeepEqual(oldAttributes, appModel.Attributes) {
-		if err = replaceAttributes(ctx, s.db, "application", appModel.ID, oldAttributes, appModel.Attributes); err != nil {
+		if err = s.replaceAttributes(ctx, "application", appModel.ID, oldAttributes, appModel.Attributes); err != nil {
 			return nil, err
 		}
 	}
@@ -156,5 +151,5 @@ func (s *applicationStore) UpdateApplication(ctx context.Context, app *ttnpb.App
 
 func (s *applicationStore) DeleteApplication(ctx context.Context, id *ttnpb.ApplicationIdentifiers) error {
 	defer trace.StartRegion(ctx, "delete application").End()
-	return deleteEntity(ctx, s.db, id.EntityIdentifiers())
+	return s.deleteEntity(ctx, id.EntityIdentifiers())
 }

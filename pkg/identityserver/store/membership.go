@@ -36,6 +36,10 @@ func init() {
 	registerModel(&Membership{})
 }
 
+func (s *store) findAccountMemberships(account *Account, entityType string) ([]*Membership, error) {
+	return findAccountMemberships(s.DB, account, entityType)
+}
+
 func findAccountMemberships(db *gorm.DB, account *Account, entityType string) ([]*Membership, error) {
 	query := db.Where(Membership{AccountID: account.ID})
 	if entityType != "" {
@@ -62,7 +66,11 @@ type polymorphicEntity struct {
 	EntityType string
 }
 
-func identifiers(db *gorm.DB, entities ...polymorphicEntity) (map[polymorphicEntity]*ttnpb.EntityIdentifiers, error) {
+func (s *store) findIdentifiers(entities ...polymorphicEntity) (map[polymorphicEntity]*ttnpb.EntityIdentifiers, error) {
+	return findIdentifiers(s.DB, entities...)
+}
+
+func findIdentifiers(db *gorm.DB, entities ...polymorphicEntity) (map[polymorphicEntity]*ttnpb.EntityIdentifiers, error) {
 	var err error
 	identifiers := make(map[polymorphicEntity]*ttnpb.EntityIdentifiers, len(entities))
 	for _, entityType := range []string{"application", "client", "gateway", "organization", "user"} {
@@ -111,12 +119,16 @@ func identifiers(db *gorm.DB, entities ...polymorphicEntity) (map[polymorphicEnt
 	return identifiers, nil
 }
 
+func (s *store) identifierRights(entityRights map[polymorphicEntity]Rights) (map[*ttnpb.EntityIdentifiers]*ttnpb.Rights, error) {
+	return identifierRights(s.DB, entityRights)
+}
+
 func identifierRights(db *gorm.DB, entityRights map[polymorphicEntity]Rights) (map[*ttnpb.EntityIdentifiers]*ttnpb.Rights, error) {
 	entities := make([]polymorphicEntity, 0, len(entityRights))
 	for entity := range entityRights {
 		entities = append(entities, entity)
 	}
-	identifiers, err := identifiers(db, entities...)
+	identifiers, err := findIdentifiers(db, entities...)
 	if err != nil {
 		return nil, err
 	}

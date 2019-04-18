@@ -25,20 +25,20 @@ import (
 
 // GetAPIKeyStore returns an APIKeyStore on the given db (or transaction).
 func GetAPIKeyStore(db *gorm.DB) APIKeyStore {
-	return &apiKeyStore{db: db}
+	return &apiKeyStore{store: newStore(db)}
 }
 
 type apiKeyStore struct {
-	db *gorm.DB
+	*store
 }
 
 func (s *apiKeyStore) CreateAPIKey(ctx context.Context, entityID *ttnpb.EntityIdentifiers, key *ttnpb.APIKey) error {
 	defer trace.StartRegion(ctx, "create api key").End()
-	entity, err := findEntity(ctx, s.db, entityID, "id")
+	entity, err := s.findEntity(ctx, entityID, "id")
 	if err != nil {
 		return err
 	}
-	model := APIKey{
+	model := &APIKey{
 		APIKeyID:   key.ID,
 		Key:        key.Key,
 		Rights:     Rights{Rights: key.Rights},
@@ -46,22 +46,21 @@ func (s *apiKeyStore) CreateAPIKey(ctx context.Context, entityID *ttnpb.EntityId
 		EntityID:   entity.PrimaryKey(),
 		EntityType: entityTypeForID(entityID),
 	}
-	model.SetContext(ctx)
-	return s.db.Create(&model).Error
+	return s.createEntity(ctx, model)
 }
 
 func (s *apiKeyStore) FindAPIKeys(ctx context.Context, entityID *ttnpb.EntityIdentifiers) ([]*ttnpb.APIKey, error) {
 	defer trace.StartRegion(ctx, "find api keys").End()
-	entity, err := findEntity(ctx, s.db, entityID, "id")
+	entity, err := s.findEntity(ctx, entityID, "id")
 	if err != nil {
 		return nil, err
 	}
-	query := s.db.Where(&APIKey{
+	query := s.query(ctx, APIKey{}).Where(&APIKey{
 		EntityID:   entity.PrimaryKey(),
 		EntityType: entityTypeForID(entityID),
 	})
 	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
-		countTotal(ctx, query.Model(&APIKey{}))
+		countTotal(ctx, query)
 		query = query.Limit(limit).Offset(offset)
 	}
 	var keyModels []APIKey
@@ -79,8 +78,9 @@ var errAPIKeyEntity = errors.DefineCorruption("api_key_entity", "API key not lin
 
 func (s *apiKeyStore) GetAPIKey(ctx context.Context, id string) (*ttnpb.EntityIdentifiers, *ttnpb.APIKey, error) {
 	defer trace.StartRegion(ctx, "get api key").End()
+	query := s.query(ctx, APIKey{})
 	var keyModel APIKey
-	if err := s.db.Scopes(withContext(ctx)).Where(APIKey{APIKeyID: id}).First(&keyModel).Error; err != nil {
+	if err := query.Where(APIKey{APIKeyID: id}).First(&keyModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return nil, nil, errAPIKeyNotFound
 		}
@@ -90,7 +90,7 @@ func (s *apiKeyStore) GetAPIKey(ctx context.Context, id string) (*ttnpb.EntityId
 		return nil, nil, err
 	}
 	k := polymorphicEntity{EntityType: keyModel.EntityType, EntityUUID: keyModel.EntityID}
-	identifiers, err := identifiers(s.db, k)
+	identifiers, err := s.findIdentifiers(k)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -103,12 +103,13 @@ func (s *apiKeyStore) GetAPIKey(ctx context.Context, id string) (*ttnpb.EntityId
 
 func (s *apiKeyStore) UpdateAPIKey(ctx context.Context, entityID *ttnpb.EntityIdentifiers, key *ttnpb.APIKey) (*ttnpb.APIKey, error) {
 	defer trace.StartRegion(ctx, "update api key").End()
-	entity, err := findEntity(ctx, s.db, entityID, "id")
+	entity, err := s.findEntity(ctx, entityID, "id")
 	if err != nil {
 		return nil, err
 	}
+	query := s.query(ctx, APIKey{})
 	var keyModel APIKey
-	err = s.db.Where(APIKey{
+	err = query.Where(APIKey{
 		APIKeyID:   key.ID,
 		EntityID:   entity.PrimaryKey(),
 		EntityType: entityTypeForID(entityID),
@@ -120,11 +121,11 @@ func (s *apiKeyStore) UpdateAPIKey(ctx context.Context, entityID *ttnpb.EntityId
 		return nil, err
 	}
 	if len(key.Rights) == 0 {
-		return nil, s.db.Delete(&keyModel).Error
+		return nil, query.Delete(&keyModel).Error
 	}
 	keyModel.Name = key.Name
 	keyModel.Rights = Rights{Rights: key.Rights}
-	if err = s.db.Select("name", "rights", "updated_at").Save(&keyModel).Error; err != nil {
+	if err = query.Select("name", "rights", "updated_at").Save(&keyModel).Error; err != nil {
 		return nil, err
 	}
 	return keyModel.toPB(), nil

@@ -24,16 +24,16 @@ import (
 
 // GetUserSessionStore returns an UserSessionStore on the given db (or transaction).
 func GetUserSessionStore(db *gorm.DB) UserSessionStore {
-	return &userSessionStore{db: db}
+	return &userSessionStore{store: newStore(db)}
 }
 
 type userSessionStore struct {
-	db *gorm.DB
+	*store
 }
 
 func (s *userSessionStore) CreateSession(ctx context.Context, sess *ttnpb.UserSession) (*ttnpb.UserSession, error) {
 	defer trace.StartRegion(ctx, "create user session").End()
-	user, err := findEntity(ctx, s.db, sess.UserIdentifiers.EntityIdentifiers(), "id")
+	user, err := s.findEntity(ctx, sess.UserIdentifiers.EntityIdentifiers(), "id")
 	if err != nil {
 		return nil, err
 	}
@@ -41,10 +41,8 @@ func (s *userSessionStore) CreateSession(ctx context.Context, sess *ttnpb.UserSe
 		UserID:    user.PrimaryKey(),
 		ExpiresAt: cleanTimePtr(sess.ExpiresAt),
 	}
-	sessionModel.SetContext(ctx)
-	query := s.db.Create(&sessionModel)
-	if query.Error != nil {
-		return nil, query.Error
+	if err = s.createEntity(ctx, &sessionModel); err != nil {
+		return nil, err
 	}
 	sessionProto := *sess
 	sessionModel.toPB(&sessionProto)
@@ -53,11 +51,11 @@ func (s *userSessionStore) CreateSession(ctx context.Context, sess *ttnpb.UserSe
 
 func (s *userSessionStore) FindSessions(ctx context.Context, userIDs *ttnpb.UserIdentifiers) ([]*ttnpb.UserSession, error) {
 	defer trace.StartRegion(ctx, "find user sessions").End()
-	user, err := findEntity(ctx, s.db, userIDs.EntityIdentifiers(), "id")
+	user, err := s.findEntity(ctx, userIDs.EntityIdentifiers(), "id")
 	if err != nil {
 		return nil, err
 	}
-	query := s.db.Where(UserSession{UserID: user.PrimaryKey()})
+	query := s.query(ctx, UserSession{}).Where(UserSession{UserID: user.PrimaryKey()})
 	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
 		countTotal(ctx, query.Model(UserSession{}))
 		query = query.Limit(limit).Offset(offset)
@@ -80,11 +78,11 @@ func (s *userSessionStore) FindSessions(ctx context.Context, userIDs *ttnpb.User
 
 func (s *userSessionStore) GetSession(ctx context.Context, userIDs *ttnpb.UserIdentifiers, sessionID string) (*ttnpb.UserSession, error) {
 	defer trace.StartRegion(ctx, "get user session").End()
-	user, err := findEntity(ctx, s.db, userIDs.EntityIdentifiers(), "id")
+	user, err := s.findEntity(ctx, userIDs.EntityIdentifiers(), "id")
 	if err != nil {
 		return nil, err
 	}
-	query := s.db.Where(UserSession{Model: Model{ID: sessionID}, UserID: user.PrimaryKey()})
+	query := s.query(ctx, UserSession{}).Where(UserSession{Model: Model{ID: sessionID}, UserID: user.PrimaryKey()})
 	var sessionModel UserSession
 	if err = query.Find(&sessionModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
@@ -100,11 +98,11 @@ func (s *userSessionStore) GetSession(ctx context.Context, userIDs *ttnpb.UserId
 
 func (s *userSessionStore) UpdateSession(ctx context.Context, sess *ttnpb.UserSession) (*ttnpb.UserSession, error) {
 	defer trace.StartRegion(ctx, "update user session").End()
-	user, err := findEntity(ctx, s.db, sess.UserIdentifiers.EntityIdentifiers(), "id")
+	user, err := s.findEntity(ctx, sess.UserIdentifiers.EntityIdentifiers(), "id")
 	if err != nil {
 		return nil, err
 	}
-	query := s.db.Where(UserSession{Model: Model{ID: sess.SessionID}, UserID: user.PrimaryKey()})
+	query := s.query(ctx, UserSession{}).Where(UserSession{Model: Model{ID: sess.SessionID}, UserID: user.PrimaryKey()})
 	var sessionModel UserSession
 	if err = query.Find(&sessionModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
@@ -113,7 +111,7 @@ func (s *userSessionStore) UpdateSession(ctx context.Context, sess *ttnpb.UserSe
 		return nil, err
 	}
 	sessionModel.fromPB(sess)
-	if err = s.db.Save(&sessionModel).Error; err != nil {
+	if err = s.updateEntity(ctx, &sessionModel); err != nil {
 		return nil, err
 	}
 	updated := &ttnpb.UserSession{}
@@ -123,10 +121,10 @@ func (s *userSessionStore) UpdateSession(ctx context.Context, sess *ttnpb.UserSe
 
 func (s *userSessionStore) DeleteSession(ctx context.Context, userIDs *ttnpb.UserIdentifiers, sessionID string) error {
 	defer trace.StartRegion(ctx, "delete user session").End()
-	user, err := findEntity(ctx, s.db, userIDs.EntityIdentifiers(), "id")
+	user, err := s.findEntity(ctx, userIDs.EntityIdentifiers(), "id")
 	if err != nil {
 		return err
 	}
-	query := s.db.Where(UserSession{Model: Model{ID: sessionID}, UserID: user.PrimaryKey()})
+	query := s.query(ctx, UserSession{}).Where(UserSession{Model: Model{ID: sessionID}, UserID: user.PrimaryKey()})
 	return query.Delete(&UserSession{}).Error
 }

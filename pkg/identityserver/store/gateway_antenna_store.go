@@ -21,6 +21,10 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+func (s *store) replaceGatewayAntennas(ctx context.Context, gatewayUUID string, old []GatewayAntenna, new []GatewayAntenna) error {
+	return replaceGatewayAntennas(ctx, s.DB, gatewayUUID, old, new)
+}
+
 func replaceGatewayAntennas(ctx context.Context, db *gorm.DB, gatewayUUID string, old []GatewayAntenna, new []GatewayAntenna) (err error) {
 	defer trace.StartRegion(ctx, "update gateway antennas").End()
 	db = db.Where(GatewayAntenna{GatewayID: gatewayUUID})

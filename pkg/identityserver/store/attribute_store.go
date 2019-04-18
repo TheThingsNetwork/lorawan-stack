@@ -21,6 +21,10 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+func (s *store) replaceAttributes(ctx context.Context, entityType, entityUUID string, old []Attribute, new []Attribute) (err error) {
+	return replaceAttributes(ctx, s.DB, entityType, entityUUID, old, new)
+}
+
 func replaceAttributes(ctx context.Context, db *gorm.DB, entityType, entityUUID string, old []Attribute, new []Attribute) (err error) {
 	defer trace.StartRegion(ctx, "update attributes").End()
 	oldByUUID := make(map[string]Attribute, len(old))
