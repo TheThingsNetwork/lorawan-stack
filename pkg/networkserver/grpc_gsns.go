@@ -726,9 +726,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 			stored.MACState.PendingJoinRequest = nil
 
 			paths = append(paths, "recent_adr_uplinks")
-			if !pld.FHDR.ADR ||
-				stored.MACSettings.GetUseADR() != nil && !stored.MACSettings.UseADR.Value ||
-				ns.defaultMACSettings.GetUseADR() != nil && !ns.defaultMACSettings.UseADR.Value {
+			if !pld.FHDR.ADR {
 				stored.RecentADRUplinks = nil
 				return stored, paths, nil
 			}
@@ -736,6 +734,16 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 			stored.RecentADRUplinks = append(stored.RecentADRUplinks, up)
 			if len(stored.RecentADRUplinks) > optimalADRUplinkCount {
 				stored.RecentADRUplinks = append(stored.RecentADRUplinks[:0], stored.RecentADRUplinks[len(stored.RecentADRUplinks)-recentUplinkCount:]...)
+			}
+
+			useADR := true
+			if stored.MACSettings.GetUseADR() != nil {
+				useADR = stored.MACSettings.UseADR.Value
+			} else if ns.defaultMACSettings.GetUseADR() != nil {
+				useADR = ns.defaultMACSettings.UseADR.Value
+			}
+			if !useADR {
+				return stored, paths, nil
 			}
 
 			if err := adaptDataRate(stored, ns.FrequencyPlans, ns.defaultMACSettings); err != nil {
