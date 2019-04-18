@@ -32,10 +32,11 @@ func TestEntitySearch(t *testing.T) {
 	WithDB(t, func(t *testing.T, db *gorm.DB) {
 		prepareTest(db, &Attribute{}, &Application{}, &Client{}, &Gateway{}, &Account{}, &User{}, &Organization{})
 
+		store := newStore(db)
 		s := GetEntitySearch(db)
 
 		for _, name := range []string{"foo", "bar"} {
-			db.Create(&Application{
+			store.createEntity(ctx, &Application{
 				ApplicationID: fmt.Sprintf("the-%s-app", name),
 				Name:          fmt.Sprintf("The %s application", name),
 				Description:   fmt.Sprintf("This application does %s stuff", name),
@@ -44,7 +45,7 @@ func TestEntitySearch(t *testing.T) {
 				},
 			})
 
-			db.Create(&Client{
+			store.createEntity(ctx, &Client{
 				ClientID:    fmt.Sprintf("the-%s-cli", name),
 				Name:        fmt.Sprintf("The %s client", name),
 				Description: fmt.Sprintf("This client does %s stuff", name),
@@ -53,7 +54,7 @@ func TestEntitySearch(t *testing.T) {
 				},
 			})
 
-			db.Create(&Gateway{
+			store.createEntity(ctx, &Gateway{
 				GatewayID:   fmt.Sprintf("the-%s-gtw", name),
 				Name:        fmt.Sprintf("The %s gateway", name),
 				Description: fmt.Sprintf("This gateway does %s stuff", name),
@@ -62,7 +63,7 @@ func TestEntitySearch(t *testing.T) {
 				},
 			})
 
-			db.Create(&User{
+			store.createEntity(ctx, &User{
 				Account: Account{
 					UID: fmt.Sprintf("the-%s-usr", name),
 				},
@@ -74,7 +75,7 @@ func TestEntitySearch(t *testing.T) {
 				PrimaryEmailAddress: fmt.Sprintf("%s@example.com", name),
 			})
 
-			db.Create(&Organization{
+			store.createEntity(ctx, &Organization{
 				Account: Account{
 					UID: fmt.Sprintf("the-%s-org", name),
 				},

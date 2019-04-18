@@ -38,12 +38,14 @@ func TestOAuthStore(t *testing.T) {
 			&Client{},
 			&Account{},
 		)
+
+		s := newStore(db)
 		store := GetOAuthStore(db)
 
-		db.Create(&User{Account: Account{UID: "test-user"}})
+		s.createEntity(ctx, &User{Account: Account{UID: "test-user"}})
 		userIDs := &ttnpb.UserIdentifiers{UserID: "test-user"}
 
-		db.Create(&Client{ClientID: "test-client"})
+		s.createEntity(ctx, &Client{ClientID: "test-client"})
 		clientIDs := &ttnpb.ClientIdentifiers{ClientID: "test-client"}
 
 		rights := []ttnpb.Right{ttnpb.RIGHT_ALL}
