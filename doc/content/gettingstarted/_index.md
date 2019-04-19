@@ -1,14 +1,18 @@
 ---
-title: "Quick Start"
+title: "Quick start"
 draft: false
 weight: 2
 --- 
 
-This is a guide for setting up a private LoRaWAN network using The Things Network Stack for LoRaWAN V3 on a server.
-If you already have some knowledge about how the stack works and if you are comfortable with a command line, this is the perfect place to start.
+This is a guide for setting up a private LoRaWAN Network Server using The Things Network Stack for LoRaWAN.
 
-In this guide we will get everything up and running on a server using [Docker](https://docs.docker.com/). So you can easily reproduce the same steps on any system nad deployment.
+In this guide we will get everything up and running using Docker. If you are comfortable with configuring servers and working with command line, this is the perfect place to start.
 
-**Note:**
-For now, the web interface Console is not available; in this tutorial, we will use the command-line interface (CLI) to manage the network.
+### CLI and stack
+
+The web interface Console is not yet available. So in this tutorial, we use the command-line interface (CLI) to manage the setup.
+
+The CLI can be configured to connect to your local machine or the cloud.
+
+>Note: if you need help with any CLI command, use the `--help` flag to get a list of subcommands, flags and their description and aliases.
 
