@@ -23,6 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/events/cloud"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 	_ "gocloud.dev/pubsub/mempubsub"
@@ -64,16 +65,31 @@ func TestCloudPubSub(t *testing.T) {
 
 	ctx := events.ContextWithCorrelationID(test.Context(), t.Name())
 
-	appID := &ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}
+	eui := types.EUI64{1, 2, 3, 4, 5, 6, 7, 8}
+	devAddr := types.DevAddr{1, 2, 3, 4}
+	appID := ttnpb.ApplicationIdentifiers{
+		ApplicationID: "test-app",
+	}
+	devID := ttnpb.EndDeviceIdentifiers{
+		ApplicationIdentifiers: appID,
+		DeviceID:               "test-dev",
+		DevEUI:                 &eui,
+		JoinEUI:                &eui,
+		DevAddr:                &devAddr,
+	}
+	gtwID := ttnpb.GatewayIdentifiers{
+		GatewayID: "test-gtw",
+		EUI:       &eui,
+	}
 
 	cloud.SetContentType(pubsub, "application/json")
 
-	pubsub.Publish(events.New(ctx, "cloud.test.evt0", appID, nil))
+	pubsub.Publish(events.New(ctx, "cloud.test.evt0", &appID, nil))
 	select {
 	case e := <-eventCh:
 		a.So(e.Name(), should.Equal, "cloud.test.evt0")
 		if a.So(e.Identifiers(), should.NotBeNil) && a.So(e.Identifiers(), should.HaveLength, 1) {
-			a.So(e.Identifiers()[0].GetApplicationIDs(), should.Resemble, appID)
+			a.So(e.Identifiers()[0].GetApplicationIDs(), should.Resemble, &appID)
 		}
 	case <-time.After(time.Second):
 		t.Error("Did not receive expected event")
@@ -82,12 +98,13 @@ func TestCloudPubSub(t *testing.T) {
 
 	cloud.SetContentType(pubsub, "application/protobuf")
 
-	pubsub.Publish(events.New(ctx, "cloud.test.evt1", appID, nil))
+	pubsub.Publish(events.New(ctx, "cloud.test.evt1", ttnpb.CombineIdentifiers(&devID, &gtwID), nil))
 	select {
 	case e := <-eventCh:
 		a.So(e.Name(), should.Equal, "cloud.test.evt1")
-		if a.So(e.Identifiers(), should.NotBeNil) && a.So(e.Identifiers(), should.HaveLength, 1) {
-			a.So(e.Identifiers()[0].GetApplicationIDs(), should.Resemble, appID)
+		if a.So(e.Identifiers(), should.NotBeNil) && a.So(e.Identifiers(), should.HaveLength, 2) {
+			a.So(e.Identifiers()[0].GetDeviceIDs(), should.Resemble, &devID)
+			a.So(e.Identifiers()[1].GetGatewayIDs(), should.Resemble, &gtwID)
 		}
 	case <-time.After(time.Second):
 		t.Error("Did not receive expected event")

@@ -18,6 +18,7 @@ package cloud
 import (
 	"context"
 	"encoding/json"
+	"strings"
 
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -95,6 +96,37 @@ func (ps *PubSub) Close() (err error) {
 	return err
 }
 
+func (ps *PubSub) getMetadata(evt events.Event) map[string]string {
+	ids := make(map[string][]string, 10)
+	for _, id := range evt.Identifiers() {
+		k := id.EntityType() + "_id"
+		ids[k] = append(ids[k], id.IDString())
+		if gtwID := id.GetGatewayIDs(); gtwID != nil {
+			ids["gateway_eui"] = append(ids["gateway_eui"], gtwID.EUI.String())
+		}
+		if devID := id.GetDeviceIDs(); devID != nil {
+			ids["application_id"] = append(ids["application_id"], devID.ApplicationID)
+			if devID.DevEUI != nil {
+				ids["dev_eui"] = append(ids["dev_eui"], devID.DevEUI.String())
+			}
+			if devID.JoinEUI != nil {
+				ids["join_eui"] = append(ids["join_eui"], devID.JoinEUI.String())
+			}
+			if devID.DevAddr != nil {
+				ids["dev_addr"] = append(ids["dev_addr"], devID.DevAddr.String())
+			}
+		}
+	}
+	md := make(map[string]string, len(ids)+3)
+	md["content-type"] = ps.contentType
+	md["event"] = evt.Name()
+	md["correlation_ids"] = strings.Join(evt.CorrelationIDs(), ",")
+	for k, v := range ids {
+		md[k] = strings.Join(v, ",")
+	}
+	return md
+}
+
 // Publish an event to Go Cloud.
 func (ps *PubSub) Publish(evt events.Event) {
 	var body []byte
@@ -116,9 +148,7 @@ func (ps *PubSub) Publish(evt events.Event) {
 		}
 	}
 	ps.topic.Send(evt.Context(), &pubsub.Message{
-		Metadata: map[string]string{
-			"content-type": ps.contentType,
-		},
-		Body: body,
+		Metadata: ps.getMetadata(evt),
+		Body:     body,
 	})
 }
