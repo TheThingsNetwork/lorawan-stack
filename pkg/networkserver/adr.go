@@ -108,6 +108,11 @@ loop:
 			fCntTrans++
 
 		default:
+			if v < fCnt {
+				// FCnt reset encountered
+				return lossRate(nbTrans, ups[i:]...)
+			}
+
 			if fCntTrans < nbTrans {
 				d := nbTrans - fCntTrans
 				lost += d

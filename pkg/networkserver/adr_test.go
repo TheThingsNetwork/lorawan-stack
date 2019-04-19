@@ -204,6 +204,18 @@ func TestLossRate(t *testing.T) {
 			NbTrans: 3,
 			Rate:    1. / 7.,
 		},
+		{
+			Uplinks: adrMatrixToUplinks([]adrMatrixRow{
+				{FCnt: 11},
+				{FCnt: 12},
+				{FCnt: 1},
+				{FCnt: 1},
+				{FCnt: 3},
+				{FCnt: 3},
+			}),
+			NbTrans: 3,
+			Rate:    3. / 7.,
+		},
 	} {
 		t.Run(func() string {
 			var ss []string
