@@ -26,11 +26,11 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-func TestResetMACState(t *testing.T) {
+func TestNewMACState(t *testing.T) {
 	for _, tc := range []struct {
 		Name               string
 		Device             *ttnpb.EndDevice
-		DeviceDiff         func(*ttnpb.EndDevice)
+		MACState           *ttnpb.MACState
 		FrequencyPlanStore *frequencyplans.Store
 		ErrorAssertion     func(*testing.T, error) bool
 	}{
@@ -46,31 +46,31 @@ func TestResetMACState(t *testing.T) {
 					},
 				},
 			},
-			DeviceDiff: func(dev *ttnpb.EndDevice) {
+			MACState: func() *ttnpb.MACState {
 				fp := test.Must(frequencyplans.NewStore(test.FrequencyPlansFetcher).GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
-				band := test.Must(band.GetByID(fp.BandID)).(band.Band)
-				dev.MACState = &ttnpb.MACState{
+				phy := test.Must(band.GetByID(fp.BandID)).(band.Band)
+				return &ttnpb.MACState{
 					DeviceClass:         ttnpb.CLASS_A,
 					LoRaWANVersion:      ttnpb.MAC_V1_1,
 					PingSlotPeriodicity: ttnpb.PING_EVERY_1S,
 					CurrentParameters: ttnpb.MACParameters{
-						ADRAckDelay:            uint32(band.ADRAckDelay),
-						ADRAckLimit:            uint32(band.ADRAckLimit),
+						ADRAckDelay:            uint32(phy.ADRAckDelay),
+						ADRAckLimit:            uint32(phy.ADRAckLimit),
 						ADRDataRateIndex:       0,
 						ADRNbTrans:             1,
 						ADRTxPowerIndex:        0,
 						BeaconFrequency:        0,
 						DownlinkDwellTime:      false,
 						MaxDutyCycle:           ttnpb.DUTY_CYCLE_1,
-						MaxEIRP:                band.DefaultMaxEIRP,
+						MaxEIRP:                phy.DefaultMaxEIRP,
 						PingSlotDataRateIndex:  ttnpb.DATA_RATE_0,
 						PingSlotFrequency:      0,
 						RejoinCountPeriodicity: ttnpb.REJOIN_COUNT_16,
 						RejoinTimePeriodicity:  ttnpb.REJOIN_TIME_0,
 						Rx1DataRateOffset:      0,
-						Rx1Delay:               ttnpb.RxDelay(band.ReceiveDelay1.Seconds()),
-						Rx2DataRateIndex:       band.DefaultRx2Parameters.DataRateIndex,
-						Rx2Frequency:           band.DefaultRx2Parameters.Frequency,
+						Rx1Delay:               ttnpb.RxDelay(phy.ReceiveDelay1.Seconds()),
+						Rx2DataRateIndex:       phy.DefaultRx2Parameters.DataRateIndex,
+						Rx2Frequency:           phy.DefaultRx2Parameters.Frequency,
 						UplinkDwellTime:        false,
 						Channels: []*ttnpb.MACParameters_Channel{
 							{
@@ -97,23 +97,23 @@ func TestResetMACState(t *testing.T) {
 						},
 					},
 					DesiredParameters: ttnpb.MACParameters{
-						ADRAckDelay:            uint32(band.ADRAckDelay),
-						ADRAckLimit:            uint32(band.ADRAckLimit),
+						ADRAckDelay:            uint32(phy.ADRAckDelay),
+						ADRAckLimit:            uint32(phy.ADRAckLimit),
 						ADRDataRateIndex:       0,
 						ADRNbTrans:             1,
 						ADRTxPowerIndex:        0,
 						BeaconFrequency:        0,
 						DownlinkDwellTime:      false,
 						MaxDutyCycle:           ttnpb.DUTY_CYCLE_1,
-						MaxEIRP:                band.DefaultMaxEIRP,
+						MaxEIRP:                phy.DefaultMaxEIRP,
 						PingSlotDataRateIndex:  ttnpb.DATA_RATE_0,
 						PingSlotFrequency:      0,
 						RejoinCountPeriodicity: ttnpb.REJOIN_COUNT_16,
 						RejoinTimePeriodicity:  ttnpb.REJOIN_TIME_0,
 						Rx1DataRateOffset:      0,
 						Rx1Delay:               ttnpb.RX_DELAY_13,
-						Rx2DataRateIndex:       band.DefaultRx2Parameters.DataRateIndex,
-						Rx2Frequency:           band.DefaultRx2Parameters.Frequency,
+						Rx2DataRateIndex:       phy.DefaultRx2Parameters.DataRateIndex,
+						Rx2Frequency:           phy.DefaultRx2Parameters.Frequency,
 						UplinkDwellTime:        false,
 						Channels: []*ttnpb.MACParameters_Channel{
 							{
@@ -175,7 +175,7 @@ func TestResetMACState(t *testing.T) {
 						},
 					},
 				}
-			},
+			}(),
 			FrequencyPlanStore: frequencyplans.NewStore(test.FrequencyPlansFetcher),
 		},
 		{
@@ -190,7 +190,7 @@ func TestResetMACState(t *testing.T) {
 					},
 				},
 			},
-			DeviceDiff: func() func(dev *ttnpb.EndDevice) {
+			MACState: func() *ttnpb.MACState {
 				var bandChannels []*ttnpb.MACParameters_Channel
 				for i := 0; i < 64; i++ {
 					bandChannels = append(bandChannels, &ttnpb.MACParameters_Channel{
@@ -212,73 +212,71 @@ func TestResetMACState(t *testing.T) {
 					bandChannels[i].DownlinkFrequency = uint64(923300000 + 600000*(i%8))
 				}
 
-				return func(dev *ttnpb.EndDevice) {
-					fp := test.Must(frequencyplans.NewStore(test.FrequencyPlansFetcher).GetByID(test.USFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
-					band := test.Must(band.GetByID(fp.BandID)).(band.Band)
-					dev.MACState = &ttnpb.MACState{
-						DeviceClass:         ttnpb.CLASS_A,
-						LoRaWANVersion:      ttnpb.MAC_V1_1,
-						PingSlotPeriodicity: ttnpb.PING_EVERY_1S,
-						CurrentParameters: ttnpb.MACParameters{
-							ADRAckDelay:            uint32(band.ADRAckDelay),
-							ADRAckLimit:            uint32(band.ADRAckLimit),
-							ADRDataRateIndex:       0,
-							ADRNbTrans:             1,
-							ADRTxPowerIndex:        0,
-							BeaconFrequency:        0,
-							DownlinkDwellTime:      false,
-							MaxDutyCycle:           ttnpb.DUTY_CYCLE_1,
-							MaxEIRP:                band.DefaultMaxEIRP,
-							PingSlotDataRateIndex:  ttnpb.DATA_RATE_0,
-							PingSlotFrequency:      0,
-							RejoinCountPeriodicity: ttnpb.REJOIN_COUNT_16,
-							RejoinTimePeriodicity:  ttnpb.REJOIN_TIME_0,
-							Rx1DataRateOffset:      0,
-							Rx1Delay:               ttnpb.RxDelay(band.ReceiveDelay1.Seconds()),
-							Rx2DataRateIndex:       band.DefaultRx2Parameters.DataRateIndex,
-							Rx2Frequency:           band.DefaultRx2Parameters.Frequency,
-							UplinkDwellTime:        false,
-							Channels:               deepcopy.Copy(bandChannels).([]*ttnpb.MACParameters_Channel),
-						},
-						DesiredParameters: ttnpb.MACParameters{
-							ADRAckDelay:            uint32(band.ADRAckDelay),
-							ADRAckLimit:            uint32(band.ADRAckLimit),
-							ADRDataRateIndex:       0,
-							ADRNbTrans:             1,
-							ADRTxPowerIndex:        0,
-							BeaconFrequency:        0,
-							DownlinkDwellTime:      false,
-							MaxDutyCycle:           ttnpb.DUTY_CYCLE_1,
-							MaxEIRP:                band.DefaultMaxEIRP,
-							PingSlotDataRateIndex:  ttnpb.DATA_RATE_0,
-							PingSlotFrequency:      0,
-							RejoinCountPeriodicity: ttnpb.REJOIN_COUNT_16,
-							RejoinTimePeriodicity:  ttnpb.REJOIN_TIME_0,
-							Rx1DataRateOffset:      0,
-							Rx1Delay:               ttnpb.RX_DELAY_13,
-							Rx2DataRateIndex:       band.DefaultRx2Parameters.DataRateIndex,
-							Rx2Frequency:           band.DefaultRx2Parameters.Frequency,
-							UplinkDwellTime:        false,
-							Channels: func() []*ttnpb.MACParameters_Channel {
-								ret := deepcopy.Copy(bandChannels).([]*ttnpb.MACParameters_Channel)
-								for _, ch := range ret {
-									switch ch.UplinkFrequency {
-									case 903900000,
-										904100000,
-										904300000,
-										904500000,
-										904700000,
-										904900000,
-										905100000,
-										905300000:
-										continue
-									}
-									ch.EnableUplink = false
+				fp := test.Must(frequencyplans.NewStore(test.FrequencyPlansFetcher).GetByID(test.USFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
+				phy := test.Must(band.GetByID(fp.BandID)).(band.Band)
+				return &ttnpb.MACState{
+					DeviceClass:         ttnpb.CLASS_A,
+					LoRaWANVersion:      ttnpb.MAC_V1_1,
+					PingSlotPeriodicity: ttnpb.PING_EVERY_1S,
+					CurrentParameters: ttnpb.MACParameters{
+						ADRAckDelay:            uint32(phy.ADRAckDelay),
+						ADRAckLimit:            uint32(phy.ADRAckLimit),
+						ADRDataRateIndex:       0,
+						ADRNbTrans:             1,
+						ADRTxPowerIndex:        0,
+						BeaconFrequency:        0,
+						DownlinkDwellTime:      false,
+						MaxDutyCycle:           ttnpb.DUTY_CYCLE_1,
+						MaxEIRP:                phy.DefaultMaxEIRP,
+						PingSlotDataRateIndex:  ttnpb.DATA_RATE_0,
+						PingSlotFrequency:      0,
+						RejoinCountPeriodicity: ttnpb.REJOIN_COUNT_16,
+						RejoinTimePeriodicity:  ttnpb.REJOIN_TIME_0,
+						Rx1DataRateOffset:      0,
+						Rx1Delay:               ttnpb.RxDelay(phy.ReceiveDelay1.Seconds()),
+						Rx2DataRateIndex:       phy.DefaultRx2Parameters.DataRateIndex,
+						Rx2Frequency:           phy.DefaultRx2Parameters.Frequency,
+						UplinkDwellTime:        false,
+						Channels:               deepcopy.Copy(bandChannels).([]*ttnpb.MACParameters_Channel),
+					},
+					DesiredParameters: ttnpb.MACParameters{
+						ADRAckDelay:            uint32(phy.ADRAckDelay),
+						ADRAckLimit:            uint32(phy.ADRAckLimit),
+						ADRDataRateIndex:       0,
+						ADRNbTrans:             1,
+						ADRTxPowerIndex:        0,
+						BeaconFrequency:        0,
+						DownlinkDwellTime:      false,
+						MaxDutyCycle:           ttnpb.DUTY_CYCLE_1,
+						MaxEIRP:                phy.DefaultMaxEIRP,
+						PingSlotDataRateIndex:  ttnpb.DATA_RATE_0,
+						PingSlotFrequency:      0,
+						RejoinCountPeriodicity: ttnpb.REJOIN_COUNT_16,
+						RejoinTimePeriodicity:  ttnpb.REJOIN_TIME_0,
+						Rx1DataRateOffset:      0,
+						Rx1Delay:               ttnpb.RX_DELAY_13,
+						Rx2DataRateIndex:       phy.DefaultRx2Parameters.DataRateIndex,
+						Rx2Frequency:           phy.DefaultRx2Parameters.Frequency,
+						UplinkDwellTime:        false,
+						Channels: func() []*ttnpb.MACParameters_Channel {
+							ret := deepcopy.Copy(bandChannels).([]*ttnpb.MACParameters_Channel)
+							for _, ch := range ret {
+								switch ch.UplinkFrequency {
+								case 903900000,
+									904100000,
+									904300000,
+									904500000,
+									904700000,
+									904900000,
+									905100000,
+									905300000:
+									continue
 								}
-								return ret
-							}(),
-						},
-					}
+								ch.EnableUplink = false
+							}
+							return ret
+						}(),
+					},
 				}
 			}(),
 			FrequencyPlanStore: frequencyplans.NewStore(test.FrequencyPlansFetcher),
@@ -289,18 +287,14 @@ func TestResetMACState(t *testing.T) {
 
 			pb := CopyEndDevice(tc.Device)
 
-			err := resetMACState(pb, tc.FrequencyPlanStore, ttnpb.MACSettings{})
+			macState, err := newMACState(pb, tc.FrequencyPlanStore, ttnpb.MACSettings{})
 			if tc.ErrorAssertion != nil {
 				a.So(tc.ErrorAssertion(t, err), should.BeTrue)
 			} else {
 				a.So(err, should.BeNil)
 			}
-
-			expected := CopyEndDevice(tc.Device)
-			if tc.DeviceDiff != nil {
-				tc.DeviceDiff(expected)
-			}
-			a.So(pb, should.Resemble, expected)
+			a.So(macState, should.Resemble, tc.MACState)
+			a.So(pb, should.Resemble, tc.Device)
 		})
 	}
 }

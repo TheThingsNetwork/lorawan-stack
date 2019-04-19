@@ -30,8 +30,8 @@ const (
 )
 
 var (
-	ResetMACState = resetMACState
-	TimePtr       = timePtr
+	NewMACState = newMACState
+	TimePtr     = timePtr
 
 	ErrNoDownlink     = errNoDownlink
 	ErrDeviceNotFound = errDeviceNotFound

@@ -1585,10 +1585,11 @@ func handleUplinkTest() func(t *testing.T) {
 					pb.CreatedAt = ret.CreatedAt
 					pb.UpdatedAt = ret.UpdatedAt
 					if pb.MACState == nil {
-						err := ResetMACState(pb, ns.FrequencyPlans, ttnpb.MACSettings{})
+						macState, err := NewMACState(pb, ns.FrequencyPlans, ttnpb.MACSettings{})
 						if !a.So(err, should.BeNil) {
 							t.FailNow()
 						}
+						pb.MACState = macState
 					}
 					pb.MACState.RxWindowsAvailable = true
 					pb.MACState.PendingApplicationDownlink = nil
@@ -2140,10 +2141,11 @@ func handleJoinTest() func(t *testing.T) {
 				pb.UpdatedAt = ret.UpdatedAt
 				a.So(ret, should.HaveEmptyDiff, pb)
 
-				err = ResetMACState(ret, ns.FrequencyPlans, ttnpb.MACSettings{})
+				macState, err := NewMACState(ret, ns.FrequencyPlans, ttnpb.MACSettings{})
 				if !a.So(err, should.BeNil) {
 					t.Fatalf("Failed to reset MAC state: %s", err)
 				}
+				ret.MACState = macState
 				pb = ret
 
 				expectedRequest := &ttnpb.JoinRequest{

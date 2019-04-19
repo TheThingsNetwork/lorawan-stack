@@ -58,136 +58,136 @@ func searchUplinkChannel(freq uint64, dev *ttnpb.EndDevice) (uint8, error) {
 	return 0, errUplinkChannelNotFound.WithAttributes("frequency", freq)
 }
 
-func resetMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb.MACSettings) error {
+func newMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb.MACSettings) (*ttnpb.MACState, error) {
 	fp, phy, err := getDeviceBandVersion(dev, fps)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	dev.MACState = &ttnpb.MACState{
+	st := &ttnpb.MACState{
 		LoRaWANVersion: dev.LoRaWANVersion,
 		DeviceClass:    ttnpb.CLASS_A,
 	}
 
-	dev.MACState.CurrentParameters.MaxEIRP = phy.DefaultMaxEIRP
-	dev.MACState.DesiredParameters.MaxEIRP = dev.MACState.CurrentParameters.MaxEIRP
-	if fp.MaxEIRP != nil && *fp.MaxEIRP > 0 && *fp.MaxEIRP < dev.MACState.CurrentParameters.MaxEIRP {
-		dev.MACState.DesiredParameters.MaxEIRP = *fp.MaxEIRP
+	st.CurrentParameters.MaxEIRP = phy.DefaultMaxEIRP
+	st.DesiredParameters.MaxEIRP = st.CurrentParameters.MaxEIRP
+	if fp.MaxEIRP != nil && *fp.MaxEIRP > 0 && *fp.MaxEIRP < st.CurrentParameters.MaxEIRP {
+		st.DesiredParameters.MaxEIRP = *fp.MaxEIRP
 	}
 
-	dev.MACState.CurrentParameters.UplinkDwellTime = false
-	dev.MACState.DesiredParameters.UplinkDwellTime = fp.DwellTime.GetUplinks()
+	st.CurrentParameters.UplinkDwellTime = false
+	st.DesiredParameters.UplinkDwellTime = fp.DwellTime.GetUplinks()
 
-	dev.MACState.CurrentParameters.DownlinkDwellTime = false
-	dev.MACState.DesiredParameters.DownlinkDwellTime = fp.DwellTime.GetDownlinks()
+	st.CurrentParameters.DownlinkDwellTime = false
+	st.DesiredParameters.DownlinkDwellTime = fp.DwellTime.GetDownlinks()
 
-	dev.MACState.CurrentParameters.ADRDataRateIndex = ttnpb.DATA_RATE_0
-	dev.MACState.DesiredParameters.ADRDataRateIndex = dev.MACState.CurrentParameters.ADRDataRateIndex
+	st.CurrentParameters.ADRDataRateIndex = ttnpb.DATA_RATE_0
+	st.DesiredParameters.ADRDataRateIndex = st.CurrentParameters.ADRDataRateIndex
 
-	dev.MACState.CurrentParameters.ADRTxPowerIndex = 0
-	dev.MACState.DesiredParameters.ADRTxPowerIndex = dev.MACState.CurrentParameters.ADRTxPowerIndex
+	st.CurrentParameters.ADRTxPowerIndex = 0
+	st.DesiredParameters.ADRTxPowerIndex = st.CurrentParameters.ADRTxPowerIndex
 
-	dev.MACState.CurrentParameters.ADRNbTrans = 1
-	dev.MACState.DesiredParameters.ADRNbTrans = dev.MACState.CurrentParameters.ADRNbTrans
+	st.CurrentParameters.ADRNbTrans = 1
+	st.DesiredParameters.ADRNbTrans = st.CurrentParameters.ADRNbTrans
 
-	dev.MACState.CurrentParameters.ADRAckLimit = uint32(phy.ADRAckLimit)
-	dev.MACState.DesiredParameters.ADRAckLimit = dev.MACState.CurrentParameters.ADRAckLimit
+	st.CurrentParameters.ADRAckLimit = uint32(phy.ADRAckLimit)
+	st.DesiredParameters.ADRAckLimit = st.CurrentParameters.ADRAckLimit
 
-	dev.MACState.CurrentParameters.ADRAckDelay = uint32(phy.ADRAckDelay)
-	dev.MACState.DesiredParameters.ADRAckDelay = dev.MACState.CurrentParameters.ADRAckDelay
+	st.CurrentParameters.ADRAckDelay = uint32(phy.ADRAckDelay)
+	st.DesiredParameters.ADRAckDelay = st.CurrentParameters.ADRAckDelay
 
-	dev.MACState.CurrentParameters.Rx1Delay = ttnpb.RxDelay(phy.ReceiveDelay1.Seconds())
+	st.CurrentParameters.Rx1Delay = ttnpb.RxDelay(phy.ReceiveDelay1.Seconds())
 	if dev.GetMACSettings().GetRx1Delay() != nil {
-		dev.MACState.CurrentParameters.Rx1Delay = dev.MACSettings.Rx1Delay.Value
+		st.CurrentParameters.Rx1Delay = dev.MACSettings.Rx1Delay.Value
 	} else if defaults.Rx1Delay != nil {
-		dev.MACState.CurrentParameters.Rx1Delay = defaults.Rx1Delay.Value
+		st.CurrentParameters.Rx1Delay = defaults.Rx1Delay.Value
 	}
-	dev.MACState.DesiredParameters.Rx1Delay = dev.MACState.CurrentParameters.Rx1Delay
+	st.DesiredParameters.Rx1Delay = st.CurrentParameters.Rx1Delay
 	if dev.GetMACSettings().GetDesiredRx1Delay() != nil {
-		dev.MACState.DesiredParameters.Rx1Delay = dev.MACSettings.DesiredRx1Delay.Value
+		st.DesiredParameters.Rx1Delay = dev.MACSettings.DesiredRx1Delay.Value
 	} else if defaults.DesiredRx1Delay != nil {
-		dev.MACState.DesiredParameters.Rx1Delay = defaults.DesiredRx1Delay.Value
+		st.DesiredParameters.Rx1Delay = defaults.DesiredRx1Delay.Value
 	}
 
-	dev.MACState.CurrentParameters.Rx1DataRateOffset = 0
+	st.CurrentParameters.Rx1DataRateOffset = 0
 	if dev.GetMACSettings().GetRx1DataRateOffset() != nil {
-		dev.MACState.CurrentParameters.Rx1DataRateOffset = dev.MACSettings.Rx1DataRateOffset.Value
+		st.CurrentParameters.Rx1DataRateOffset = dev.MACSettings.Rx1DataRateOffset.Value
 	} else if defaults.Rx1DataRateOffset != nil {
-		dev.MACState.CurrentParameters.Rx1DataRateOffset = defaults.Rx1DataRateOffset.Value
+		st.CurrentParameters.Rx1DataRateOffset = defaults.Rx1DataRateOffset.Value
 	}
-	dev.MACState.DesiredParameters.Rx1DataRateOffset = dev.MACState.CurrentParameters.Rx1DataRateOffset
+	st.DesiredParameters.Rx1DataRateOffset = st.CurrentParameters.Rx1DataRateOffset
 	if dev.GetMACSettings().GetDesiredRx1DataRateOffset() != nil {
-		dev.MACState.DesiredParameters.Rx1DataRateOffset = dev.MACSettings.DesiredRx1DataRateOffset.Value
+		st.DesiredParameters.Rx1DataRateOffset = dev.MACSettings.DesiredRx1DataRateOffset.Value
 	} else if defaults.DesiredRx1DataRateOffset != nil {
-		dev.MACState.DesiredParameters.Rx1DataRateOffset = defaults.DesiredRx1DataRateOffset.Value
+		st.DesiredParameters.Rx1DataRateOffset = defaults.DesiredRx1DataRateOffset.Value
 	}
 
-	dev.MACState.CurrentParameters.Rx2DataRateIndex = phy.DefaultRx2Parameters.DataRateIndex
+	st.CurrentParameters.Rx2DataRateIndex = phy.DefaultRx2Parameters.DataRateIndex
 	if dev.GetMACSettings().GetRx2DataRateIndex() != nil {
-		dev.MACState.CurrentParameters.Rx2DataRateIndex = dev.MACSettings.Rx2DataRateIndex.Value
+		st.CurrentParameters.Rx2DataRateIndex = dev.MACSettings.Rx2DataRateIndex.Value
 	} else if defaults.Rx2DataRateIndex != nil {
-		dev.MACState.CurrentParameters.Rx2DataRateIndex = defaults.Rx2DataRateIndex.Value
+		st.CurrentParameters.Rx2DataRateIndex = defaults.Rx2DataRateIndex.Value
 	}
-	dev.MACState.DesiredParameters.Rx2DataRateIndex = dev.MACState.CurrentParameters.Rx2DataRateIndex
+	st.DesiredParameters.Rx2DataRateIndex = st.CurrentParameters.Rx2DataRateIndex
 	if dev.GetMACSettings().GetDesiredRx2DataRateIndex() != nil {
-		dev.MACState.DesiredParameters.Rx2DataRateIndex = dev.MACSettings.DesiredRx2DataRateIndex.Value
+		st.DesiredParameters.Rx2DataRateIndex = dev.MACSettings.DesiredRx2DataRateIndex.Value
 	} else if fp.DefaultRx2DataRate != nil {
-		dev.MACState.DesiredParameters.Rx2DataRateIndex = ttnpb.DataRateIndex(*fp.DefaultRx2DataRate)
+		st.DesiredParameters.Rx2DataRateIndex = ttnpb.DataRateIndex(*fp.DefaultRx2DataRate)
 	} else if defaults.DesiredRx2DataRateIndex != nil {
-		dev.MACState.DesiredParameters.Rx2DataRateIndex = defaults.DesiredRx2DataRateIndex.Value
+		st.DesiredParameters.Rx2DataRateIndex = defaults.DesiredRx2DataRateIndex.Value
 	}
 
-	dev.MACState.CurrentParameters.Rx2Frequency = phy.DefaultRx2Parameters.Frequency
+	st.CurrentParameters.Rx2Frequency = phy.DefaultRx2Parameters.Frequency
 	if dev.GetMACSettings().GetRx2Frequency() != nil && dev.MACSettings.Rx2Frequency.Value != 0 {
-		dev.MACState.CurrentParameters.Rx2Frequency = dev.MACSettings.Rx2Frequency.Value
+		st.CurrentParameters.Rx2Frequency = dev.MACSettings.Rx2Frequency.Value
 	} else if defaults.Rx2Frequency != nil && dev.MACSettings.Rx2Frequency.Value != 0 {
-		dev.MACState.CurrentParameters.Rx2Frequency = defaults.Rx2Frequency.Value
+		st.CurrentParameters.Rx2Frequency = defaults.Rx2Frequency.Value
 	}
-	dev.MACState.DesiredParameters.Rx2Frequency = dev.MACState.CurrentParameters.Rx2Frequency
+	st.DesiredParameters.Rx2Frequency = st.CurrentParameters.Rx2Frequency
 	if dev.GetMACSettings().GetDesiredRx2Frequency() != nil && dev.MACSettings.Rx2Frequency.Value != 0 {
-		dev.MACState.DesiredParameters.Rx2Frequency = dev.MACSettings.DesiredRx2Frequency.Value
+		st.DesiredParameters.Rx2Frequency = dev.MACSettings.DesiredRx2Frequency.Value
 	} else if fp.Rx2Channel != nil {
-		dev.MACState.DesiredParameters.Rx2Frequency = fp.Rx2Channel.Frequency
+		st.DesiredParameters.Rx2Frequency = fp.Rx2Channel.Frequency
 	} else if defaults.DesiredRx2Frequency != nil && defaults.DesiredRx2Frequency.Value != 0 {
-		dev.MACState.DesiredParameters.Rx2Frequency = defaults.DesiredRx2Frequency.Value
+		st.DesiredParameters.Rx2Frequency = defaults.DesiredRx2Frequency.Value
 	}
 
-	dev.MACState.CurrentParameters.MaxDutyCycle = ttnpb.DUTY_CYCLE_1
+	st.CurrentParameters.MaxDutyCycle = ttnpb.DUTY_CYCLE_1
 	if dev.GetMACSettings().GetMaxDutyCycle() != nil {
-		dev.MACState.CurrentParameters.MaxDutyCycle = dev.MACSettings.MaxDutyCycle.Value
+		st.CurrentParameters.MaxDutyCycle = dev.MACSettings.MaxDutyCycle.Value
 	}
-	dev.MACState.DesiredParameters.MaxDutyCycle = dev.MACState.CurrentParameters.MaxDutyCycle
+	st.DesiredParameters.MaxDutyCycle = st.CurrentParameters.MaxDutyCycle
 
-	dev.MACState.CurrentParameters.RejoinTimePeriodicity = ttnpb.REJOIN_TIME_0
-	dev.MACState.DesiredParameters.RejoinTimePeriodicity = dev.MACState.CurrentParameters.RejoinTimePeriodicity
+	st.CurrentParameters.RejoinTimePeriodicity = ttnpb.REJOIN_TIME_0
+	st.DesiredParameters.RejoinTimePeriodicity = st.CurrentParameters.RejoinTimePeriodicity
 
-	dev.MACState.CurrentParameters.RejoinCountPeriodicity = ttnpb.REJOIN_COUNT_16
-	dev.MACState.DesiredParameters.RejoinCountPeriodicity = dev.MACState.CurrentParameters.RejoinCountPeriodicity
+	st.CurrentParameters.RejoinCountPeriodicity = ttnpb.REJOIN_COUNT_16
+	st.DesiredParameters.RejoinCountPeriodicity = st.CurrentParameters.RejoinCountPeriodicity
 
-	dev.MACState.CurrentParameters.PingSlotFrequency = 0
+	st.CurrentParameters.PingSlotFrequency = 0
 	if dev.GetMACSettings().GetPingSlotFrequency() != nil && dev.MACSettings.PingSlotFrequency.Value != 0 {
-		dev.MACState.CurrentParameters.PingSlotFrequency = dev.MACSettings.PingSlotFrequency.Value
+		st.CurrentParameters.PingSlotFrequency = dev.MACSettings.PingSlotFrequency.Value
 	} else if defaults.PingSlotFrequency != nil && defaults.PingSlotFrequency.Value != 0 {
-		dev.MACState.CurrentParameters.PingSlotFrequency = defaults.PingSlotFrequency.Value
+		st.CurrentParameters.PingSlotFrequency = defaults.PingSlotFrequency.Value
 	}
-	dev.MACState.DesiredParameters.PingSlotFrequency = dev.MACState.CurrentParameters.PingSlotFrequency
+	st.DesiredParameters.PingSlotFrequency = st.CurrentParameters.PingSlotFrequency
 	if fp.PingSlot != nil && fp.PingSlot.Frequency != 0 {
-		dev.MACState.DesiredParameters.PingSlotFrequency = fp.PingSlot.Frequency
+		st.DesiredParameters.PingSlotFrequency = fp.PingSlot.Frequency
 	}
 
-	dev.MACState.CurrentParameters.PingSlotDataRateIndex = ttnpb.DATA_RATE_0
+	st.CurrentParameters.PingSlotDataRateIndex = ttnpb.DATA_RATE_0
 	if dev.GetMACSettings().GetPingSlotDataRateIndex() != nil {
-		dev.MACState.CurrentParameters.PingSlotDataRateIndex = dev.MACSettings.PingSlotDataRateIndex.Value
+		st.CurrentParameters.PingSlotDataRateIndex = dev.MACSettings.PingSlotDataRateIndex.Value
 	} else if defaults.PingSlotDataRateIndex != nil {
-		dev.MACState.CurrentParameters.PingSlotDataRateIndex = defaults.PingSlotDataRateIndex.Value
+		st.CurrentParameters.PingSlotDataRateIndex = defaults.PingSlotDataRateIndex.Value
 	}
-	dev.MACState.DesiredParameters.PingSlotDataRateIndex = dev.MACState.CurrentParameters.PingSlotDataRateIndex
+	st.DesiredParameters.PingSlotDataRateIndex = st.CurrentParameters.PingSlotDataRateIndex
 	if fp.DefaultPingSlotDataRate != nil {
-		dev.MACState.DesiredParameters.PingSlotDataRateIndex = ttnpb.DataRateIndex(*fp.DefaultPingSlotDataRate)
+		st.DesiredParameters.PingSlotDataRateIndex = ttnpb.DataRateIndex(*fp.DefaultPingSlotDataRate)
 	}
 
-	dev.MACState.CurrentParameters.BeaconFrequency = 0
-	dev.MACState.DesiredParameters.BeaconFrequency = dev.MACState.CurrentParameters.BeaconFrequency
+	st.CurrentParameters.BeaconFrequency = 0
+	st.DesiredParameters.BeaconFrequency = st.CurrentParameters.BeaconFrequency
 
 	if len(phy.DownlinkChannels) > len(phy.UplinkChannels) || len(fp.DownlinkChannels) > len(fp.UplinkChannels) ||
 		len(phy.UplinkChannels) > int(phy.MaxUplinkChannels) || len(phy.DownlinkChannels) > int(phy.MaxDownlinkChannels) ||
@@ -198,9 +198,9 @@ func resetMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttn
 	}
 
 	if len(dev.GetMACSettings().GetFactoryPresetFrequencies()) > 0 {
-		dev.MACState.CurrentParameters.Channels = make([]*ttnpb.MACParameters_Channel, 0, len(dev.MACSettings.FactoryPresetFrequencies))
+		st.CurrentParameters.Channels = make([]*ttnpb.MACParameters_Channel, 0, len(dev.MACSettings.FactoryPresetFrequencies))
 		for _, freq := range dev.MACSettings.FactoryPresetFrequencies {
-			dev.MACState.CurrentParameters.Channels = append(dev.MACState.CurrentParameters.Channels, &ttnpb.MACParameters_Channel{
+			st.CurrentParameters.Channels = append(st.CurrentParameters.Channels, &ttnpb.MACParameters_Channel{
 				MinDataRateIndex:  0,
 				MaxDataRateIndex:  ttnpb.DATA_RATE_15,
 				UplinkFrequency:   freq,
@@ -209,9 +209,9 @@ func resetMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttn
 			})
 		}
 	} else if len(defaults.GetFactoryPresetFrequencies()) > 0 {
-		dev.MACState.CurrentParameters.Channels = make([]*ttnpb.MACParameters_Channel, 0, len(defaults.FactoryPresetFrequencies))
+		st.CurrentParameters.Channels = make([]*ttnpb.MACParameters_Channel, 0, len(defaults.FactoryPresetFrequencies))
 		for _, freq := range defaults.FactoryPresetFrequencies {
-			dev.MACState.CurrentParameters.Channels = append(dev.MACState.CurrentParameters.Channels, &ttnpb.MACParameters_Channel{
+			st.CurrentParameters.Channels = append(st.CurrentParameters.Channels, &ttnpb.MACParameters_Channel{
 				MinDataRateIndex:  0,
 				MaxDataRateIndex:  ttnpb.DATA_RATE_15,
 				UplinkFrequency:   freq,
@@ -220,7 +220,7 @@ func resetMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttn
 			})
 		}
 	} else {
-		dev.MACState.CurrentParameters.Channels = make([]*ttnpb.MACParameters_Channel, 0, len(phy.UplinkChannels))
+		st.CurrentParameters.Channels = make([]*ttnpb.MACParameters_Channel, 0, len(phy.UplinkChannels))
 		for i, upCh := range phy.UplinkChannels {
 			channel := &ttnpb.MACParameters_Channel{
 				MinDataRateIndex: upCh.MinDataRate,
@@ -229,11 +229,11 @@ func resetMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttn
 				EnableUplink:     true,
 			}
 			channel.DownlinkFrequency = phy.DownlinkChannels[i%len(phy.DownlinkChannels)].Frequency
-			dev.MACState.CurrentParameters.Channels = append(dev.MACState.CurrentParameters.Channels, channel)
+			st.CurrentParameters.Channels = append(st.CurrentParameters.Channels, channel)
 		}
 	}
 
-	dev.MACState.DesiredParameters.Channels = make([]*ttnpb.MACParameters_Channel, 0, len(phy.UplinkChannels)+len(fp.UplinkChannels))
+	st.DesiredParameters.Channels = make([]*ttnpb.MACParameters_Channel, 0, len(phy.UplinkChannels)+len(fp.UplinkChannels))
 	for i, upCh := range phy.UplinkChannels {
 		channel := &ttnpb.MACParameters_Channel{
 			MinDataRateIndex: upCh.MinDataRate,
@@ -241,12 +241,12 @@ func resetMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttn
 			UplinkFrequency:  upCh.Frequency,
 		}
 		channel.DownlinkFrequency = phy.DownlinkChannels[i%len(phy.DownlinkChannels)].Frequency
-		dev.MACState.DesiredParameters.Channels = append(dev.MACState.DesiredParameters.Channels, channel)
+		st.DesiredParameters.Channels = append(st.DesiredParameters.Channels, channel)
 	}
 
 outerUp:
 	for _, upCh := range fp.UplinkChannels {
-		for _, ch := range dev.MACState.DesiredParameters.Channels {
+		for _, ch := range st.DesiredParameters.Channels {
 			if ch.UplinkFrequency == upCh.Frequency {
 				ch.MinDataRateIndex = ttnpb.DataRateIndex(upCh.MinDataRate)
 				ch.MaxDataRateIndex = ttnpb.DataRateIndex(upCh.MaxDataRate)
@@ -255,7 +255,7 @@ outerUp:
 			}
 		}
 
-		dev.MACState.DesiredParameters.Channels = append(dev.MACState.DesiredParameters.Channels, &ttnpb.MACParameters_Channel{
+		st.DesiredParameters.Channels = append(st.DesiredParameters.Channels, &ttnpb.MACParameters_Channel{
 			MinDataRateIndex: ttnpb.DataRateIndex(upCh.MinDataRate),
 			MaxDataRateIndex: ttnpb.DataRateIndex(upCh.MaxDataRate),
 			UplinkFrequency:  upCh.Frequency,
@@ -264,7 +264,7 @@ outerUp:
 	}
 
 	if len(fp.DownlinkChannels) > 0 {
-		for i, ch := range dev.MACState.DesiredParameters.Channels {
+		for i, ch := range st.DesiredParameters.Channels {
 			downCh := fp.DownlinkChannels[i%len(fp.DownlinkChannels)]
 			if downCh.Frequency != 0 {
 				ch.DownlinkFrequency = downCh.Frequency
@@ -272,5 +272,5 @@ outerUp:
 		}
 	}
 
-	return nil
+	return st, nil
 }

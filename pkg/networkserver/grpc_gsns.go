@@ -610,9 +610,13 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 
 			if stored.MACState != nil {
 				stored.MACState.PendingApplicationDownlink = nil
-			} else if err := resetMACState(stored, ns.FrequencyPlans, ns.defaultMACSettings); err != nil {
-				handleErr = true
-				return nil, nil, err
+			} else {
+				macState, err := newMACState(stored, ns.FrequencyPlans, ns.defaultMACSettings)
+				if err != nil {
+					handleErr = true
+					return nil, nil, err
+				}
+				stored.MACState = macState
 			}
 			paths = append(paths, "mac_state")
 
@@ -835,10 +839,12 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 	logger = logger.WithField("dev_addr", devAddr)
 	ctx = log.NewContext(ctx, logger)
 
-	if err := resetMACState(dev, ns.FrequencyPlans, ns.defaultMACSettings); err != nil {
+	macState, err := newMACState(dev, ns.FrequencyPlans, ns.defaultMACSettings)
+	if err != nil {
 		logger.WithError(err).Warn("Failed to reset device's MAC state")
 		return err
 	}
+	dev.MACState = macState
 
 	fp, _, err := getDeviceBandVersion(dev, ns.FrequencyPlans)
 	if err != nil {
@@ -898,10 +904,12 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 		func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			var paths []string
 
-			if err := resetMACState(stored, ns.Component.FrequencyPlans, ns.defaultMACSettings); err != nil {
+			macState, err := newMACState(stored, ns.Component.FrequencyPlans, ns.defaultMACSettings)
+			if err != nil {
 				resetErr = true
 				return nil, nil, err
 			}
+			stored.MACState = macState
 
 			keys := resp.SessionKeys
 			if !req.DownlinkSettings.OptNeg {
