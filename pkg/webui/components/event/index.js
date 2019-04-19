@@ -18,6 +18,7 @@ import classnames from 'classnames'
 import Icon from '../icon'
 import DateTime from '../../lib/components/date-time'
 import PropTypes from '../../lib/prop-types'
+import CRUDEvent from './types/crud'
 
 import style from './event.styl'
 
@@ -86,5 +87,7 @@ Event.defaultProps = {
   icon: 'event',
   content: null,
 }
+
+Event.CRUD = CRUDEvent
 
 export default Event
