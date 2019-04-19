@@ -12,18 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import getByPath from '../../../lib/get-by-path'
-
-export const getEntityId = function (entity) {
-  let id
-  let selectorIndex = 0
-  while (!id) {
-    const selector = idSelectors[selectorIndex++]
-    id = selector(entity)
-  }
-
-  return id
-}
+import getByPath from '../get-by-path'
 
 export const getApplicationId = function (application = {}) {
   return getByPath(application, 'application_id')
@@ -57,3 +46,13 @@ const idSelectors = [
   getDeviceId,
 ]
 
+export const getEntityId = function (entity) {
+  let id
+  let selectorIndex = 0
+  while (!id && selectorIndex < idSelectors.length) {
+    const selector = idSelectors[selectorIndex++]
+    id = selector(entity)
+  }
+
+  return id
+}
