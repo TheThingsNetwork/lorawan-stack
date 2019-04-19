@@ -1381,6 +1381,27 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 					dst.MACState = nil
 				}
 			}
+		case "pending_mac_state":
+			if len(subs) > 0 {
+				newDst := dst.PendingMACState
+				if newDst == nil {
+					newDst = &MACState{}
+					dst.PendingMACState = newDst
+				}
+				var newSrc *MACState
+				if src != nil {
+					newSrc = src.PendingMACState
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.PendingMACState = src.PendingMACState
+				} else {
+					dst.PendingMACState = nil
+				}
+			}
 		case "session":
 			if len(subs) > 0 {
 				newDst := dst.Session

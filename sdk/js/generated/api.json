@@ -3842,6 +3842,16 @@
               "defaultValue": ""
             },
             {
+              "name": "pending_mac_state",
+              "description": "Pending MAC state of the device. Stored in Network Server.",
+              "label": "",
+              "type": "MACState",
+              "longType": "MACState",
+              "fullType": "ttn.lorawan.v3.MACState",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
               "name": "session",
               "description": "Current session of the device. Stored in Network Server and Application Server.",
               "label": "",

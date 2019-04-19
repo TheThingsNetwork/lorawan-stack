@@ -6588,6 +6588,10 @@
           "$ref": "#/definitions/v3MACState",
           "description": "MAC state of the device. Stored in Network Server."
         },
+        "pending_mac_state": {
+          "$ref": "#/definitions/v3MACState",
+          "description": "Pending MAC state of the device. Stored in Network Server."
+        },
         "session": {
           "$ref": "#/definitions/v3Session",
           "description": "Current session of the device. Stored in Network Server and Application Server."

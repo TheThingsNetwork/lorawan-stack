@@ -1659,6 +1659,18 @@ func (m *EndDevice) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "pending_mac_state":
+
+			if v, ok := interface{}(m.GetPendingMACState()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return EndDeviceValidationError{
+						field:  "pending_mac_state",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		case "session":
 
 			if v, ok := interface{}(m.GetSession()).(interface{ ValidateFields(...string) error }); ok {

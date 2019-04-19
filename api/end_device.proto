@@ -400,6 +400,8 @@ message EndDevice {
   MACSettings mac_settings = 24 [(gogoproto.customname) = "MACSettings"];
   // MAC state of the device. Stored in Network Server.
   MACState mac_state = 25 [(gogoproto.customname) = "MACState"];
+  // Pending MAC state of the device. Stored in Network Server.
+  MACState pending_mac_state = 44 [(gogoproto.customname) = "PendingMACState"];
   // Current session of the device. Stored in Network Server and Application Server.
   Session session = 26;
   // Pending session. Stored in Network Server and Application Server until RekeyInd is received.
