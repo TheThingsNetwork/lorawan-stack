@@ -5,44 +5,83 @@ weight: 4
 draft: false
 --- 
 
-## <a name="registergtw">Registering a gateway</a>
+The stack count a total of three things; gateways, application, devices. Each is highly tunable, don't hesitate go to check the [References](../../references) to see all possible settings.
+In this guide, we only use simple and standard configuration.
 
-By default, the stack allows unregistered gateways to connect, but without providing a default band. As such, it is highly recommended that each gateway is registered:
+## <a name="creategtw">Creating a gateway</a>
 
-```bash
-$ ttn-lw-cli gateway create gtw1 --user-id admin --frequency-plan-id EU_863_870 --gateway-eui 00800000A00009EF --enforce-duty-cycle
+First, list the available frequency plans:
+
+```
+$ ttn-lw-cli gateways list-frequency-plans
 ```
 
-This creates a gateway `gtw1` with the frequency plan `EU_863_870` and EUI `00800000A00009EF` that respects duty-cycle limitations. You can now connect your gateway to the stack.
-
-The frequency plan is fetched automatically from the [configured source](#frequencyplans).
-
->Note: if you need help with any command in `ttn-lw-cli`, use the `--help` flag to get a list of subcommands, flags and their description and aliases.
-
-## <a name="registerapp">Registering an application</a>
-
-In order to register a device, an application must be created first:
+Then, create the first gateway with the chosen frequency plan:
 
 ```bash
-$ ttn-lw-cli app create app1 --user-id admin
+$ ttn-lw-cli gateways create gtw1 \
+  --user-id admin \
+  --frequency-plan-id EU_863_870 \
+  --gateway-eui 00800000A00009EF \
+  --enforce-duty-cycle
 ```
 
-This creates an application `app1` for the user `admin`.
+This creates a gateway `gtw1` with user `admin` as collaborator, frequency plan `EU_863_870`, EUI `00800000A00009EF` and respecting duty-cycle limitations. You can now connect your gateway to the stack.
 
-## <a name="registerdev">Registering a device</a>
+>Note: The CLI returns the created and updated entities by default in JSON. This can be useful in scripts.
 
-You can now register an OTAA activated device to be used with the stack as follows:
+## <a name="createapp">Creating an application</a>
+
+Create the first application:
 
 ```bash
-$ ttn-lw-cli end-devices create app1 dev1 --dev-eui 0004A30B001C0530 --join-eui 800000000000000C --frequency-plan-id EU_863_870 --root-keys.app-key.key 752BAEC23EAE7964AF27C325F4C23C9A --lorawan-phy-version 1.0.2-b --lorawan-version 1.0.2
+$ ttn-lw-cli applications create app1 --user-id admin
 ```
 
-This will create an LoRaWAN 1.0.2 end device `dev1` with DevEUI `0004A30B001C0530`, AppEUI `800000000000000C` and AppKey `752BAEC23EAE7964AF27C325F4C23C9A`. After configuring the credentials in the end device, you should be able to join the private network.
+This creates an application `app1` with the `admin` user as collaborator.
+
+Devices are created within applications.
+
+## <a name="createdev">Creating a device</a>
+
+First, list the available frequency plans and LoRaWAN versions:
+
+```
+$ ttn-lw-cli end-devices list-frequency-plans
+$ ttn-lw-cli end-devices create --help
+```
+
+Then, to create an end device using over-the-air-activation (OTAA):
+
+```bash
+$ ttn-lw-cli end-devices create app1 dev1 \
+  --dev-eui 0004A30B001C0530 \
+  --app-eui 800000000000000C \
+  --frequency-plan-id EU_863_870 \
+  --root-keys.app-key.key 752BAEC23EAE7964AF27C325F4C23C9A \
+  --lorawan-version 1.0.2 \
+  --lorawan-phy-version 1.0.2-b
+```
+
+This will create a LoRaWAN 1.0.2 end device `dev1` in application `app1`. The end device should now be able to join the private network.
+
+>Note: The `AppEUI` is returned as `join_eui` (V3 uses LoRaWAN 1.1 terminology).
+
+>Hint: You can also pass `--with-root-keys` to have root keys generated.
 
 It is also possible to register an ABP activated device using the `--abp` flag as follows:
 
 ```bash
-$ ttn-lw-cli end-devices create app1 dev1 --frequency-plan-id EU_863_870 --lorawan-phy-version 1.0.2-b --lorawan-version 1.0.2 --abp --session.dev-addr 00E4304D --session.keys.app-s-key.key A0CAD5A30036DBE03096EB67CA975BAA --session.keys.f_nwk_s_int_key.key B7F3E161BC9D4388E6C788A0C547F255
+$ ttn-lw-cli end-devices create app1 dev2 \
+  --frequency-plan-id EU_863_870 \
+  --lorawan-version 1.0.2 \
+  --lorawan-phy-version 1.0.2-b \
+  --abp \
+  --session.dev-addr 00E4304D \
+  --session.keys.app-s-key.key A0CAD5A30036DBE03096EB67CA975BAA \
+  --session.keys.nwk-s-key.key B7F3E161BC9D4388E6C788A0C547F255
 ```
 
-This will create an LoRaWAN 1.0.2 end device `dev1` with DevAddr `00E4304D`, AppSKey `A0CAD5A30036DBE03096EB67CA975BAA` and NwkSKey `B7F3E161BC9D4388E6C788A0C547F255`.
+>Note: The `NwkSKey` is returned as `f_nwk_s_int_key` (V3 uses LoRaWAN 1.1 terminology).
+
+>Hint: You can also pass `--with-session` to have a session generated.

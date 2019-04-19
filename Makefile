@@ -27,7 +27,7 @@ docs-server:
 	hugo server -s ./doc
 
 docs-deps:
-	git submodule --init update doc/themes/hugo-theme-techdoc
+	git submodule update --init doc/themes/hugo-theme-techdoc
 
 docs:
 	@rm -f doc/ttn-lw-{stack,cli}/*.{md,1,yaml}

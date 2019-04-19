@@ -13,4 +13,6 @@ The CLI needs to be logged on in order to create gateways, applications, devices
 $ ttn-lw-cli login
 ```
 
-A link will be provided to the OAuth login page where you can login using the credentials from the step ahead. Once you logged in in the browser, return to the terminal session to proceed.
+This will open the OAuth login page where you can login with your credentials (here those will be the `admin` user and the password you enter when you started the stack). Once you logged in the browser, return to the terminal session to proceed.
+
+> If you run this command on a remote machine, pass `--callback=false` to get a link to login on your local machine.
