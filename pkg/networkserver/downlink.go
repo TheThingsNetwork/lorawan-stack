@@ -542,17 +542,24 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 				"lorawan_phy_version",
 				"mac_settings",
 				"mac_state",
+				"pending_mac_state",
 				"queued_application_downlinks",
 				"recent_downlinks",
 				"recent_uplinks",
 				"session",
 			},
 			func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
-				switch {
-				case dev == nil:
+				if dev == nil {
 					return nil, nil, errDeviceNotFound
+				}
 
-				case dev.MACState == nil:
+				switch {
+				case dev.PendingMACState != nil:
+					if !dev.PendingMACState.RxWindowsAvailable || dev.PendingMACState.QueuedJoinAccept == nil {
+						return dev, nil, nil
+					}
+
+				case dev.MACState == nil && dev.PendingMACState == nil:
 					return nil, nil, errUnknownMACState
 
 				case dev.MACState.DeviceClass == ttnpb.CLASS_A && !dev.MACState.RxWindowsAvailable:
@@ -563,7 +570,15 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					logger.Warn("Class B downlink task scheduled, but Rx windows are not available")
 					return dev, nil, nil
 				}
-				logger = logger.WithField("device_class", dev.MACState.DeviceClass)
+
+				macState := dev.MACState
+				if dev.PendingMACState != nil {
+					macState = dev.PendingMACState
+				}
+				logger = logger.WithFields(log.Fields(
+					"device_class", macState.DeviceClass,
+					"pending_mac_state", macState == dev.PendingMACState,
+				))
 
 				fp, phy, err := getDeviceBandVersion(dev, ns.FrequencyPlans)
 				if err != nil {
@@ -586,7 +601,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 				}
 				maxUpLength := phy.DataRates[maxUpDRIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks())
 
-				if dev.MACState.RxWindowsAvailable {
+				if macState.RxWindowsAvailable {
 					if len(dev.RecentUplinks) == 0 {
 						return nil, nil, errUplinkNotFound
 					}
@@ -600,23 +615,23 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					if err != nil {
 						return nil, nil, err
 					}
-					if uint(rx1ChIdx) >= uint(len(dev.MACState.CurrentParameters.Channels)) ||
-						dev.MACState.CurrentParameters.Channels[int(rx1ChIdx)] == nil ||
-						dev.MACState.CurrentParameters.Channels[int(rx1ChIdx)].DownlinkFrequency == 0 {
+					if uint(rx1ChIdx) >= uint(len(macState.CurrentParameters.Channels)) ||
+						macState.CurrentParameters.Channels[int(rx1ChIdx)] == nil ||
+						macState.CurrentParameters.Channels[int(rx1ChIdx)].DownlinkFrequency == 0 {
 						return nil, nil, errCorruptedMACState
 					}
-					rx1DRIdx, err := phy.Rx1DataRate(up.Settings.DataRateIndex, dev.MACState.CurrentParameters.Rx1DataRateOffset, dev.MACState.CurrentParameters.DownlinkDwellTime)
+					rx1DRIdx, err := phy.Rx1DataRate(up.Settings.DataRateIndex, macState.CurrentParameters.Rx1DataRateOffset, macState.CurrentParameters.DownlinkDwellTime)
 					if err != nil {
 						return nil, nil, err
 					}
-					rx1Freq := dev.MACState.CurrentParameters.Channels[int(rx1ChIdx)].DownlinkFrequency
+					rx1Freq := macState.CurrentParameters.Channels[int(rx1ChIdx)].DownlinkFrequency
 
 					req := &ttnpb.TxRequest{
 						Class: ttnpb.CLASS_A,
 					}
 					switch {
-					case dev.MACState.QueuedJoinAccept != nil:
-						// Join-accept downlink for Class A/B/C in Rx1/Rx2
+					case dev.PendingMACState != nil:
+						// Join-accept downlink for Class A/B/C device in Rx1/Rx2
 						req.Rx1Delay = ttnpb.RxDelay(phy.JoinAcceptDelay1 / time.Second)
 						rx1, rx2, paths := downlinkPathsForClassA(
 							ttnpb.RxDelay(phy.JoinAcceptDelay1/time.Second),
@@ -627,8 +642,8 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 							req.Rx1DataRateIndex = rx1DRIdx
 						}
 						if rx2 {
-							req.Rx2Frequency = dev.MACState.CurrentParameters.Rx2Frequency
-							req.Rx2DataRateIndex = dev.MACState.CurrentParameters.Rx2DataRateIndex
+							req.Rx2Frequency = dev.PendingMACState.CurrentParameters.Rx2Frequency
+							req.Rx2DataRateIndex = dev.PendingMACState.CurrentParameters.Rx2DataRateIndex
 						}
 						if !rx1 && !rx2 {
 							return nil, nil, errNoPath
@@ -648,29 +663,30 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 							))),
 							req,
 							dev.EndDeviceIdentifiers,
-							dev.MACState.QueuedJoinAccept.Payload,
+							dev.PendingMACState.QueuedJoinAccept.Payload,
 							paths...,
 						)
 						if err != nil {
 							scheduleErr = true
-						} else {
-							dev.MACState.RxWindowsAvailable = false
-							dev.MACState.PendingJoinRequest = &dev.MACState.QueuedJoinAccept.Request
-							dev.PendingSession = &ttnpb.Session{
-								DevAddr:     dev.MACState.QueuedJoinAccept.Request.DevAddr,
-								SessionKeys: dev.MACState.QueuedJoinAccept.Keys,
-							}
-							dev.MACState.QueuedJoinAccept = nil
-							dev.RecentDownlinks = appendRecentDownlink(dev.RecentDownlinks, down, recentDownlinkCount)
-							return dev, []string{
-								"ids.dev_addr",
-								"mac_state.pending_join_request",
-								"mac_state.queued_join_accept",
-								"mac_state.rx_windows_available",
-								"pending_session",
-								"recent_downlinks",
-							}, nil
+							return nil, nil, err
 						}
+
+						dev.PendingSession = &ttnpb.Session{
+							DevAddr:     dev.PendingMACState.QueuedJoinAccept.Request.DevAddr,
+							SessionKeys: dev.PendingMACState.QueuedJoinAccept.Keys,
+						}
+						dev.PendingMACState.PendingJoinRequest = &dev.PendingMACState.QueuedJoinAccept.Request
+						dev.PendingMACState.QueuedJoinAccept = nil
+						dev.PendingMACState.RxWindowsAvailable = false
+						dev.RecentDownlinks = appendRecentDownlink(dev.RecentDownlinks, down, recentDownlinkCount)
+						return dev, []string{
+							"pending_mac_state.pending_join_request",
+							"pending_mac_state.queued_join_accept",
+							"pending_mac_state.rx_windows_available",
+							"pending_session.dev_addr",
+							"pending_session.keys",
+							"recent_downlinks",
+						}, nil
 
 					case dev.MACState.DeviceClass == ttnpb.CLASS_A:
 						// Data downlink for Class A in Rx1/Rx2
@@ -823,9 +839,6 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						// Rx1 did not get scheduled, so we restore the original state of the device.
 						dev = devCopy
 					}
-				}
-				if dev.MACState.QueuedJoinAccept != nil {
-					return nil, nil, errSchedule
 				}
 
 				dev.MACState.RxWindowsAvailable = false

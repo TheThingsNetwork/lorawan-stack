@@ -49,8 +49,8 @@ func searchDataRate(dr ttnpb.DataRate, dev *ttnpb.EndDevice, fps *frequencyplans
 	return 0, errDataRateNotFound.WithAttributes("data_rate", dr)
 }
 
-func searchUplinkChannel(freq uint64, dev *ttnpb.EndDevice) (uint8, error) {
-	for i, ch := range dev.MACState.CurrentParameters.Channels {
+func searchUplinkChannel(freq uint64, st *ttnpb.MACState) (uint8, error) {
+	for i, ch := range st.CurrentParameters.Channels {
 		if ch.UplinkFrequency == freq {
 			return uint8(i), nil
 		}

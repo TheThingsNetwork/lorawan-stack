@@ -61,6 +61,9 @@ func TestHandleRekeyInd(t *testing.T) {
 				},
 			},
 			Expected: &ttnpb.EndDevice{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevAddr: &types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				},
 				SupportsJoin: true,
 				Session: &ttnpb.Session{
 					DevAddr:       types.DevAddr{0x42, 0xff, 0xff, 0xff},
@@ -110,6 +113,9 @@ func TestHandleRekeyInd(t *testing.T) {
 				},
 			},
 			Expected: &ttnpb.EndDevice{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevAddr: &types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				},
 				SupportsJoin: true,
 				Session: &ttnpb.Session{
 					DevAddr:       types.DevAddr{0x42, 0xff, 0xff, 0xff},
