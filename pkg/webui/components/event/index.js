@@ -20,6 +20,7 @@ import DateTime from '../../lib/components/date-time'
 import PropTypes from '../../lib/prop-types'
 import CRUDEvent from './types/crud'
 import DefaultEvent from './types/default'
+import MessageEvent from './types/message'
 
 import style from './event.styl'
 
@@ -91,5 +92,6 @@ Event.defaultProps = {
 
 Event.CRUD = CRUDEvent
 Event.Default = DefaultEvent
+Event.Message = MessageEvent
 
 export default Event
