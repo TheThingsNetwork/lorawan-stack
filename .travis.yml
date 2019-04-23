@@ -62,7 +62,7 @@ install:
   fi
 - |
   if [[ "$RUNTYPE" == "js" ]]; then
-    make js.dev-deps js.deps sdk.deps
+    make js.dev-deps js.deps sdk.js.deps
 - |
   if [[ "$RUNTYPE" == "release" ]]; then
     sudo apt-get -y update
@@ -80,9 +80,9 @@ script:
 - |
   if [[ "$RUNTYPE" == "js" ]]; then
     make js.translations
-    make js.test sdk.test
+    make js.test sdk.js.test
     make js.lint
-    make sdk.js.build sdk.protos.clean sdk.protos
+    make sdk.js.build sdk.js.protos.clean sdk.js.protos
     make swagger.protos.clean swagger.protos
     make markdown.protos.clean markdown.protos
   fi

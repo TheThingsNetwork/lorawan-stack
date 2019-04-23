@@ -153,32 +153,32 @@ js.translations: $(MAGE)
 js.vulnerabilities: $(MAGE)
 	@$(MAGE) js:vulnerabilities
 
-.PHONY: sdk.build
-sdk.build: $(MAGE)
+.PHONY: sdk.js.build
+sdk.js.build: $(MAGE)
 	@$(MAGE) sdkJs:build
 
-.PHONY: sdk.clean
-sdk.clean: $(MAGE)
+.PHONY: sdk.js.clean
+sdk.js.clean: $(MAGE)
 	@$(MAGE) sdkJs:clean
 
-.PHONY: sdk.deps
-sdk.deps: $(MAGE)
+.PHONY: sdk.js.deps
+sdk.js.deps: $(MAGE)
 	@$(MAGE) sdkJs:deps
 
-.PHONY: sdk.dev-deps
-sdk.dev-deps: $(MAGE)
+.PHONY: sdk.js.dev-deps
+sdk.js.dev-deps: $(MAGE)
 	@$(MAGE) sdkJs:devDeps
 
-.PHONY: sdk.test
-sdk.test: $(MAGE)
+.PHONY: sdk.js.test
+sdk.js.test: $(MAGE)
 	@$(MAGE) sdkJs:test
 
-.PHONY: sdk.test-watch
-sdk.test-watch: $(MAGE)
+.PHONY: sdk.js.test-watch
+sdk.js.test-watch: $(MAGE)
 	@$(MAGE) sdkJs:testWatch
 
-.PHONY: sdk.watch
-sdk.watch: $(MAGE)
+.PHONY: sdk.js.watch
+sdk.js.watch: $(MAGE)
 	@$(MAGE) sdkJs:watch
 
 .PHONY: styl.lint
