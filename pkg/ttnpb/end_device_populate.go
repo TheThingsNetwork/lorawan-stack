@@ -86,6 +86,8 @@ func NewPopulatedEndDevice(r randyEndDevice, easy bool) *EndDevice {
 		copy(out.EndDeviceIdentifiers.DevAddr[:], out.Session.DevAddr[:])
 	}
 
+	out.LoRaWANVersion = MAC_V1_1
+	out.LoRaWANPHYVersion = PHY_V1_1_REV_B
 	out.FrequencyPlanID = "EU_863_870"
 	out.MACSettings = NewPopulatedMACSettings(r, easy)
 	out.MACState = NewPopulatedMACState(r, easy)
