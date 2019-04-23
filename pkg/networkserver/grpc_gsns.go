@@ -201,12 +201,12 @@ outer:
 			gap = fCnt - dev.matchedSession.LastFCntUp
 
 			if dev.matchedMACState.LoRaWANVersion.HasMaxFCntGap() {
-				_, band, err := getDeviceBandVersion(dev.EndDevice, ns.FrequencyPlans)
+				_, phy, err := getDeviceBandVersion(dev.EndDevice, ns.FrequencyPlans)
 				if err != nil {
 					logger.WithError(err).Warn("Failed to get device's versioned band, skipping...")
 					continue
 				}
-				if gap > uint32(band.MaxFCntGap) {
+				if gap > uint32(phy.MaxFCntGap) {
 					logger.Debug("FCnt gap too high, skipping...")
 					continue outer
 				}
