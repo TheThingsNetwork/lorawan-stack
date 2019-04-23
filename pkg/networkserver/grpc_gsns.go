@@ -810,7 +810,6 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 			"lorawan_phy_version",
 			"lorawan_version",
 			"mac_settings",
-			"mac_state",
 			"session",
 		},
 	)
@@ -892,17 +891,9 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 	dev, err = ns.devices.SetByID(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, dev.EndDeviceIdentifiers.DeviceID,
 		[]string{
 			"frequency_plan_id",
-			"ids.dev_eui",
-			"ids.join_eui",
 			"lorawan_phy_version",
-			"lorawan_version",
-			"mac_settings",
-			"mac_state",
-			"pending_session",
 			"queued_application_downlinks",
 			"recent_uplinks",
-			"supports_class_b",
-			"supports_class_c",
 		},
 		func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			var paths []string
