@@ -182,7 +182,7 @@ outer:
 			"device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers),
 			"full_f_cnt_up", fCnt,
 			"last_f_cnt_up", dev.matchedSession.LastFCntUp,
-			"uplink_f_cnt_up", pld.FCnt,
+			"mac_version", dev.matchedMACState.LoRaWANVersion,
 		))
 
 		gap := uint32(math.MaxUint32)
@@ -195,7 +195,7 @@ outer:
 				logger.Debug("Possible uplink retransmission encountered, skip")
 				continue outer
 			} else if fCnt < dev.matchedSession.LastFCntUp {
-				logger.Debug("FCnt too low, skipping...")
+				logger.Debug("FCnt too low, skip")
 				continue outer
 			}
 			gap = fCnt - dev.matchedSession.LastFCntUp
@@ -203,11 +203,11 @@ outer:
 			if dev.matchedMACState.LoRaWANVersion.HasMaxFCntGap() {
 				_, phy, err := getDeviceBandVersion(dev.EndDevice, ns.FrequencyPlans)
 				if err != nil {
-					logger.WithError(err).Warn("Failed to get device's versioned band, skipping...")
+					logger.WithError(err).Warn("Failed to get device's versioned band, skip")
 					continue
 				}
 				if gap > uint32(phy.MaxFCntGap) {
-					logger.Debug("FCnt gap too high, skipping...")
+					logger.Debug("FCnt gap too high, skip")
 					continue outer
 				}
 			}
@@ -239,7 +239,11 @@ outer:
 	for _, dev := range matching {
 		logger := logger.WithFields(log.Fields(
 			"device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers),
+			"f_cnt_gap", dev.gap,
+			"full_f_cnt_up", dev.fCnt,
+			"last_f_cnt_up", dev.matchedSession.LastFCntUp,
 			"mac_version", dev.matchedMACState.LoRaWANVersion,
+			"pending_session", dev.matchedSession == dev.PendingSession,
 		))
 
 		if pld.Ack {
@@ -990,7 +994,7 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	registerReceiveUplink(ctx, up)
 
 	defer func(up *ttnpb.UplinkMessage) {
-		logger.Debug("Wait for collection window to be closed")
+		logger.Debug("Wait for collection window to close")
 		<-ns.collectionDone(ctx, up)
 		stopDedup()
 		logger.Debug("Collection window closed, stopped deduplication")

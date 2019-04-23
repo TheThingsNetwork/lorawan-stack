@@ -556,6 +556,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 				switch {
 				case dev.PendingMACState != nil:
 					if !dev.PendingMACState.RxWindowsAvailable || dev.PendingMACState.QueuedJoinAccept == nil {
+						logger.Debug("Pending MAC state is present, but Rx windows already answered, skip downlink slot")
 						return dev, nil, nil
 					}
 
