@@ -43,7 +43,7 @@ func TestUserSessionStore(t *testing.T) {
 		userIDs := ttnpb.UserIdentifiers{UserID: "test"}
 		doesNotExistIDs := ttnpb.UserIdentifiers{UserID: "does_not_exist"}
 
-		if err := db.Create(user).Error; err != nil {
+		if err := newStore(db).createEntity(ctx, user); err != nil {
 			panic(err)
 		}
 

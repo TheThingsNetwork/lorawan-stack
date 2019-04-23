@@ -26,20 +26,20 @@ import (
 
 // GetMembershipStore returns an MembershipStore on the given db (or transaction).
 func GetMembershipStore(db *gorm.DB) MembershipStore {
-	return &membershipStore{db: db}
+	return &membershipStore{store: newStore(db)}
 }
 
 type membershipStore struct {
-	db *gorm.DB
+	*store
 }
 
 func (s *membershipStore) FindMembers(ctx context.Context, entityID *ttnpb.EntityIdentifiers) (map[*ttnpb.OrganizationOrUserIdentifiers]*ttnpb.Rights, error) {
 	defer trace.StartRegion(ctx, fmt.Sprintf("find members of %s", entityID.EntityType())).End()
-	entity, err := findEntity(ctx, s.db, entityID, "id")
+	entity, err := s.findEntity(ctx, entityID, "id")
 	if err != nil {
 		return nil, err
 	}
-	query := s.db.Where(&Membership{
+	query := s.query(ctx, Membership{}).Where(&Membership{
 		EntityID:   entity.PrimaryKey(),
 		EntityType: entityTypeForID(entityID),
 	}).Preload("Account")
@@ -66,21 +66,21 @@ func (s *membershipStore) FindMemberRights(ctx context.Context, id *ttnpb.Organi
 		entityTypeForTrace = "all"
 	}
 	defer trace.StartRegion(ctx, fmt.Sprintf("find %s memberships for %s", entityTypeForTrace, id.EntityIdentifiers().EntityType())).End()
-	account, err := findAccount(ctx, s.db, id)
+	account, err := s.findAccount(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 	if err := ctx.Err(); err != nil { // Early exit if context canceled
 		return nil, err
 	}
-	memberships, err := findAccountMemberships(s.db, account, entityType)
+	memberships, err := s.findAccountMemberships(account, entityType)
 	if err != nil {
 		return nil, err
 	}
 	if err := ctx.Err(); err != nil { // Early exit if context canceled
 		return nil, err
 	}
-	return identifierRights(s.db, entityRightsForMemberships(memberships))
+	return s.identifierRights(entityRightsForMemberships(memberships))
 }
 
 var errAccountType = errors.DefineInvalidArgument(
@@ -90,11 +90,11 @@ var errAccountType = errors.DefineInvalidArgument(
 
 func (s *membershipStore) SetMember(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityID *ttnpb.EntityIdentifiers, rights *ttnpb.Rights) (err error) {
 	defer trace.StartRegion(ctx, "update membership").End()
-	account, err := findAccount(ctx, s.db, id)
+	account, err := s.findAccount(ctx, id)
 	if err != nil {
 		return err
 	}
-	entity, err := findEntity(ctx, s.db, entityID, "id")
+	entity, err := s.findEntity(ctx, entityID, "id")
 	if err != nil {
 		return err
 	}
@@ -105,7 +105,7 @@ func (s *membershipStore) SetMember(ctx context.Context, id *ttnpb.OrganizationO
 		return err
 	}
 
-	query := s.db
+	query := s.query(ctx, Membership{})
 	var membership Membership
 	err = query.Where(&Membership{
 		AccountID:  account.PrimaryKey(),

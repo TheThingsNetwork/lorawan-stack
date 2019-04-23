@@ -26,11 +26,11 @@ import (
 
 // GetInvitationStore returns an InvitationStore on the given db (or transaction).
 func GetInvitationStore(db *gorm.DB) InvitationStore {
-	return &invitationStore{db: db}
+	return &invitationStore{store: newStore(db)}
 }
 
 type invitationStore struct {
-	db *gorm.DB
+	*store
 }
 
 var errInvitationAlreadySent = errors.DefineAlreadyExists("invitation_already_sent", "invitation already sent")
@@ -42,8 +42,7 @@ func (s *invitationStore) CreateInvitation(ctx context.Context, invitation *ttnp
 		Token:     invitation.Token,
 		ExpiresAt: invitation.ExpiresAt,
 	}
-	model.SetContext(ctx)
-	if err := s.db.Create(&model).Error; err != nil {
+	if err := s.createEntity(ctx, &model); err != nil {
 		err = convertError(err)
 		if errors.IsAlreadyExists(err) {
 			return nil, errInvitationAlreadySent
@@ -56,7 +55,7 @@ func (s *invitationStore) CreateInvitation(ctx context.Context, invitation *ttnp
 func (s *invitationStore) FindInvitations(ctx context.Context) ([]*ttnpb.Invitation, error) {
 	defer trace.StartRegion(ctx, "find invitations").End()
 	var invitationModels []Invitation
-	query := s.db.Scopes(withContext(ctx))
+	query := s.query(ctx, Invitation{})
 	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
 		countTotal(ctx, query.Model(&Invitation{}))
 		query = query.Limit(limit).Offset(offset)
@@ -76,7 +75,7 @@ var errInvitationNotFound = errors.DefineNotFound("invitation_not_found", "invit
 func (s *invitationStore) GetInvitation(ctx context.Context, token string) (*ttnpb.Invitation, error) {
 	defer trace.StartRegion(ctx, "get invitation").End()
 	var invitationModel Invitation
-	if err := s.db.Scopes(withContext(ctx)).Where(Invitation{Token: token}).First(&invitationModel).Error; err != nil {
+	if err := s.query(ctx, Invitation{}).Where(Invitation{Token: token}).First(&invitationModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return nil, errInvitationNotFound
 		}
@@ -90,14 +89,14 @@ var errInvitationAlreadyAccepted = errors.DefineAlreadyExists("invitation_alread
 func (s *invitationStore) SetInvitationAcceptedBy(ctx context.Context, token string, acceptedByID *ttnpb.UserIdentifiers) error {
 	defer trace.StartRegion(ctx, "update invitation").End()
 	var invitationModel Invitation
-	if err := s.db.Scopes(withContext(ctx)).Where(Invitation{Token: token}).First(&invitationModel).Error; err != nil {
+	if err := s.query(ctx, Invitation{}).Where(Invitation{Token: token}).First(&invitationModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return errInvitationNotFound
 		}
 		return err
 	}
 
-	user, err := findEntity(ctx, s.db, acceptedByID.EntityIdentifiers(), "id")
+	user, err := s.findEntity(ctx, acceptedByID.EntityIdentifiers(), "id")
 	if err != nil {
 		return err
 	}
@@ -111,13 +110,13 @@ func (s *invitationStore) SetInvitationAcceptedBy(ctx context.Context, token str
 	acceptedAt := cleanTime(time.Now())
 	invitationModel.AcceptedAt = &acceptedAt
 
-	return s.db.Save(&invitationModel).Error
+	return s.updateEntity(ctx, &invitationModel)
 }
 
 func (s *invitationStore) DeleteInvitation(ctx context.Context, email string) error {
 	defer trace.StartRegion(ctx, "delete invitation").End()
 	var invitationModel Invitation
-	if err := s.db.Scopes(withContext(ctx)).Where(Invitation{Email: email}).First(&invitationModel).Error; err != nil {
+	if err := s.query(ctx, Invitation{}).Where(Invitation{Email: email}).First(&invitationModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return errInvitationNotFound
 		}
@@ -126,5 +125,5 @@ func (s *invitationStore) DeleteInvitation(ctx context.Context, email string) er
 	if invitationModel.AcceptedByID != nil {
 		return errInvitationAlreadyAccepted
 	}
-	return s.db.Delete(&invitationModel).Error
+	return s.query(ctx, Invitation{}).Delete(&invitationModel).Error
 }

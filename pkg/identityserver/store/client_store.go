@@ -29,11 +29,11 @@ import (
 
 // GetClientStore returns an ClientStore on the given db (or transaction).
 func GetClientStore(db *gorm.DB) ClientStore {
-	return &clientStore{db: db}
+	return &clientStore{store: newStore(db)}
 }
 
 type clientStore struct {
-	db *gorm.DB
+	*store
 }
 
 // selectClientFields selects relevant fields (based on fieldMask) and preloads details if needed.
@@ -69,10 +69,8 @@ func (s *clientStore) CreateClient(ctx context.Context, cli *ttnpb.Client) (*ttn
 		ClientID: cli.ClientID, // The ID is not mutated by fromPB.
 	}
 	cliModel.fromPB(cli, nil)
-	cliModel.SetContext(ctx)
-	query := s.db.Create(&cliModel)
-	if query.Error != nil {
-		return nil, query.Error
+	if err := s.createEntity(ctx, &cliModel); err != nil {
+		return nil, err
 	}
 	var cliProto ttnpb.Client
 	cliModel.toPB(&cliProto, nil)
@@ -85,7 +83,7 @@ func (s *clientStore) FindClients(ctx context.Context, ids []*ttnpb.ClientIdenti
 	for i, id := range ids {
 		idStrings[i] = id.GetClientID()
 	}
-	query := s.db.Scopes(withContext(ctx), withClientID(idStrings...))
+	query := s.query(ctx, Client{}, withClientID(idStrings...))
 	query = selectClientFields(ctx, query, fieldMask)
 	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
 		countTotal(ctx, query.Model(Client{}))
@@ -108,7 +106,7 @@ func (s *clientStore) FindClients(ctx context.Context, ids []*ttnpb.ClientIdenti
 
 func (s *clientStore) GetClient(ctx context.Context, id *ttnpb.ClientIdentifiers, fieldMask *types.FieldMask) (*ttnpb.Client, error) {
 	defer trace.StartRegion(ctx, "get client").End()
-	query := s.db.Scopes(withContext(ctx), withClientID(id.GetClientID()))
+	query := s.query(ctx, Client{}, withClientID(id.GetClientID()))
 	query = selectClientFields(ctx, query, fieldMask)
 	var cliModel Client
 	if err := query.First(&cliModel).Error; err != nil {
@@ -124,7 +122,7 @@ func (s *clientStore) GetClient(ctx context.Context, id *ttnpb.ClientIdentifiers
 
 func (s *clientStore) UpdateClient(ctx context.Context, cli *ttnpb.Client, fieldMask *types.FieldMask) (updated *ttnpb.Client, err error) {
 	defer trace.StartRegion(ctx, "update client").End()
-	query := s.db.Scopes(withContext(ctx), withClientID(cli.GetClientID()))
+	query := s.query(ctx, Client{}, withClientID(cli.GetClientID()))
 	query = selectClientFields(ctx, query, fieldMask)
 	var cliModel Client
 	if err = query.First(&cliModel).Error; err != nil {
@@ -138,14 +136,11 @@ func (s *clientStore) UpdateClient(ctx context.Context, cli *ttnpb.Client, field
 	}
 	oldAttributes := cliModel.Attributes
 	columns := cliModel.fromPB(cli, fieldMask)
-	if len(columns) > 0 {
-		query = s.db.Select(append(columns, "updated_at")).Save(&cliModel)
-		if query.Error != nil {
-			return nil, query.Error
-		}
+	if err = s.updateEntity(ctx, &cliModel, columns...); err != nil {
+		return nil, err
 	}
 	if !reflect.DeepEqual(oldAttributes, cliModel.Attributes) {
-		if err = replaceAttributes(ctx, s.db, "client", cliModel.ID, oldAttributes, cliModel.Attributes); err != nil {
+		if err = s.replaceAttributes(ctx, "client", cliModel.ID, oldAttributes, cliModel.Attributes); err != nil {
 			return nil, err
 		}
 	}
@@ -156,5 +151,5 @@ func (s *clientStore) UpdateClient(ctx context.Context, cli *ttnpb.Client, field
 
 func (s *clientStore) DeleteClient(ctx context.Context, id *ttnpb.ClientIdentifiers) error {
 	defer trace.StartRegion(ctx, "delete client").End()
-	return deleteEntity(ctx, s.db, id.EntityIdentifiers())
+	return s.deleteEntity(ctx, id.EntityIdentifiers())
 }

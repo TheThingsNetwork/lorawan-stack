@@ -29,11 +29,11 @@ import (
 
 // GetUserStore returns an UserStore on the given db (or transaction).
 func GetUserStore(db *gorm.DB) UserStore {
-	return &userStore{db: db}
+	return &userStore{store: newStore(db)}
 }
 
 type userStore struct {
-	db *gorm.DB
+	*store
 }
 
 // selectUserFields selects relevant fields (based on fieldMask) and preloads details if needed.
@@ -77,10 +77,8 @@ func (s *userStore) CreateUser(ctx context.Context, usr *ttnpb.User) (*ttnpb.Use
 	}
 	fieldMask := &types.FieldMask{Paths: append(defaultUserFieldMask.Paths, passwordField)}
 	userModel.fromPB(usr, fieldMask)
-	userModel.SetContext(ctx)
-	query := s.db.Create(&userModel)
-	if query.Error != nil {
-		return nil, query.Error
+	if err := s.createEntity(ctx, &userModel); err != nil {
+		return nil, err
 	}
 	var userProto ttnpb.User
 	userModel.toPB(&userProto, nil)
@@ -93,7 +91,7 @@ func (s *userStore) FindUsers(ctx context.Context, ids []*ttnpb.UserIdentifiers,
 	for i, id := range ids {
 		idStrings[i] = id.GetUserID()
 	}
-	query := s.db.Scopes(withContext(ctx), withUserID(idStrings...))
+	query := s.query(ctx, User{}, withUserID(idStrings...))
 	query = selectUserFields(ctx, query, fieldMask)
 	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
 		countTotal(ctx, query.Model(User{}))
@@ -116,7 +114,7 @@ func (s *userStore) FindUsers(ctx context.Context, ids []*ttnpb.UserIdentifiers,
 
 func (s *userStore) GetUser(ctx context.Context, id *ttnpb.UserIdentifiers, fieldMask *types.FieldMask) (*ttnpb.User, error) {
 	defer trace.StartRegion(ctx, "get user").End()
-	query := s.db.Scopes(withContext(ctx), withUserID(id.GetUserID()))
+	query := s.query(ctx, User{}, withUserID(id.GetUserID()))
 	query = selectUserFields(ctx, query, fieldMask)
 	var userModel User
 	if err := query.Preload("Account").First(&userModel).Error; err != nil {
@@ -132,7 +130,7 @@ func (s *userStore) GetUser(ctx context.Context, id *ttnpb.UserIdentifiers, fiel
 
 func (s *userStore) UpdateUser(ctx context.Context, usr *ttnpb.User, fieldMask *types.FieldMask) (updated *ttnpb.User, err error) {
 	defer trace.StartRegion(ctx, "update user").End()
-	query := s.db.Scopes(withContext(ctx), withUserID(usr.GetUserID()))
+	query := s.query(ctx, User{}, withUserID(usr.GetUserID()))
 	query = selectUserFields(ctx, query, fieldMask)
 	var userModel User
 	if err = query.First(&userModel).Error; err != nil {
@@ -149,26 +147,23 @@ func (s *userStore) UpdateUser(ctx context.Context, usr *ttnpb.User, fieldMask *
 	newProfilePicture := userModel.ProfilePicture
 	if newProfilePicture != oldProfilePicture {
 		if oldProfilePicture != nil {
-			if err = s.db.Delete(oldProfilePicture).Error; err != nil {
+			if err = s.query(ctx, Picture{}).Delete(oldProfilePicture).Error; err != nil {
 				return nil, err
 			}
 		}
 		if newProfilePicture != nil {
-			if err = s.db.Create(newProfilePicture).Error; err != nil {
+			if err = s.createEntity(ctx, &newProfilePicture); err != nil {
 				return nil, err
 			}
 			userModel.ProfilePictureID, userModel.ProfilePicture = &newProfilePicture.ID, nil
 			columns = append(columns, "profile_picture_id")
 		}
 	}
-	if len(columns) > 0 {
-		query = s.db.Select(append(columns, "updated_at")).Save(&userModel)
-		if query.Error != nil {
-			return nil, query.Error
-		}
+	if err = s.updateEntity(ctx, &userModel, columns...); err != nil {
+		return nil, err
 	}
 	if !reflect.DeepEqual(oldAttributes, userModel.Attributes) {
-		if err = replaceAttributes(ctx, s.db, "user", userModel.ID, oldAttributes, userModel.Attributes); err != nil {
+		if err = s.replaceAttributes(ctx, "user", userModel.ID, oldAttributes, userModel.Attributes); err != nil {
 			return nil, err
 		}
 	}
@@ -180,16 +175,5 @@ func (s *userStore) UpdateUser(ctx context.Context, usr *ttnpb.User, fieldMask *
 
 func (s *userStore) DeleteUser(ctx context.Context, id *ttnpb.UserIdentifiers) (err error) {
 	defer trace.StartRegion(ctx, "delete user").End()
-	defer func() {
-		if err != nil && gorm.IsRecordNotFoundError(err) {
-			err = errNotFoundForID(id.EntityIdentifiers())
-		}
-	}()
-	query := s.db.Scopes(withContext(ctx), withUserID(id.GetUserID()))
-	query = query.Select("users.id")
-	var userModel User
-	if err = query.First(&userModel).Error; err != nil {
-		return err
-	}
-	return s.db.Delete(&userModel).Error
+	return s.deleteEntity(ctx, id.EntityIdentifiers())
 }
