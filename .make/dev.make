@@ -16,9 +16,13 @@
 
 # Certificates
 
-dev.certs:
-	@$(log) "Generating certificates"
+cert.pem: key.pem
+
+key.pem:
 	@go run $(shell go env GOROOT)/src/crypto/tls/generate_cert.go -ca -host localhost
+
+.PHONY: dev.certs
+dev.certs: cert.pem
 
 INIT_RULES += dev.certs
 
@@ -48,8 +52,6 @@ dev.databases.sql: dev.databases.start
 
 dev.databases.redis-cli: dev.databases.start
 	@$(DEV_DOCKER_COMPOSE) exec redis redis-cli
-
-# Binaries
 
 dev.stack.init: dev.databases.start
 	@$(DEV_DOCKER_COMPOSE) run --rm stack is-db init
