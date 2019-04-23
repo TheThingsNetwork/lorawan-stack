@@ -16,6 +16,7 @@
 package commands
 
 import (
+	"context"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -30,6 +31,7 @@ import (
 var errMissingFlag = errors.DefineInvalidArgument("missing_flag", "missing CLI flag `{flag}`")
 
 var (
+	ctx    = context.Background()
 	logger *log.Logger
 	name   = "ttn-lw-stack"
 	mgr    = conf.InitializeWithDefaults(name, "ttn_lw", DefaultConfig)
@@ -59,8 +61,10 @@ var (
 				log.WithHandler(log.NewCLI(os.Stdout)),
 			)
 
+			ctx = log.NewContext(ctx, logger)
+
 			// initialize shared packages
-			if err := shared.Initialize(config.ServiceBase); err != nil {
+			if err := shared.Initialize(ctx, config.ServiceBase); err != nil {
 				return err
 			}
 

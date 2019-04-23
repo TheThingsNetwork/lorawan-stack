@@ -12,18 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package shared
+package cloud
 
-import (
-	"context"
-
-	"go.thethings.network/lorawan-stack/pkg/config"
-)
-
-// Initialize global packages.
-func Initialize(ctx context.Context, config config.ServiceBase) error {
-	if err := InitializeEvents(ctx, config); err != nil {
-		return err
-	}
-	return nil
+func SetContentType(ps *PubSub, contentType string) {
+	ps.contentType = contentType
 }
