@@ -123,6 +123,7 @@ class InnerForm extends React.Component {
             submitEnabledWhenInvalid,
             validateOnBlur,
             validateOnChange,
+            form: true,
             ...Child.props,
           })
         } else if (Child.type === Button) {

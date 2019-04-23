@@ -20,7 +20,7 @@
   cursor: pointer
   user-select: none
 
-  // Hide default checkbox
+  // Hide default radio button
   input
     position: absolute
     opacity: 0
@@ -30,42 +30,39 @@
     background-color: $c-backdrop
 
   & input:checked ~ span
-    border-color: $c-active-blue
-    background-color: $c-active-blue
+    border-color: $c-input-border
 
   &:hover input:checked ~ span, input:checked:focus ~ span
-      background-color: lighter($c-active-blue)
       border-color: lighter($c-active-blue)
 
-  // Show the checkmark when checked
+  // Show the dot when checked
   input:checked ~ span:after
     display: block
 
   input:focus ~ span
     border-color: $c-active-blue
 
-// Custom checkbox
-.checkmark
+// Custom radio button
+.dot
   border-input()
-  border-radius: $br.s
+  border-radius: 1.08rem
   position: absolute
   top: 4px
   left: 0
   width: 1.08rem
   height: 1.08rem
 
-  // Style the checkmark/indicator
+  // Style the select-dot
   &:after
     content: ''
+    box-sizing: content-box
     position: absolute
+    background-color: lighter($c-active-blue)
+    border-radius: 100%
     display: none
-    left: 5px
-    top: 1px
-    width: 3px
-    height: 9px
-    border: solid white
-    border-width: 0 2px 2px 0
-    -webkit-transform: rotate(45deg)
-    -ms-transform: rotate(45deg)
-    transform: rotate(45deg)
+    left: 4px
+    top: 4px
+    width: 7px
+    height: 7px
+
 

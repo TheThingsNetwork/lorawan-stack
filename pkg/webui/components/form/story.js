@@ -18,6 +18,7 @@ import { action } from '@storybook/addon-actions'
 import { withInfo } from '@storybook/addon-info'
 
 import Field from '../field'
+import FieldGroup from '../field/group'
 import Button from '../button'
 import Form from '.'
 
@@ -29,6 +30,11 @@ const handleSubmit = function (data, { setSubmitting }) {
 const containerStyles = {
   maxWidth: '300px',
 }
+
+const containerHorizontalStyles = {
+  maxWidth: '600px',
+}
+
 
 storiesOf('Form', module)
   .addDecorator((story, context) => withInfo({
@@ -51,48 +57,76 @@ storiesOf('Form', module)
           title="Username or Email"
           name="user_id"
           type="text"
-          form
         />
         <Field
           title="Password"
           name="password"
           type="password"
-          form
         />
         <Button type="submit" message="Login" />
         <Button naked message="Create an account" />
       </Form>
     </div>
   ))
-  .add('Rights selection', () => (
-    <div style={containerStyles}>
+  .add('Field Groups', () => (
+    <div style={containerHorizontalStyles}>
       <Form
         onSubmit={handleSubmit}
         initialValues={{
-          APPLICATION_RIGHT_READ: true,
-          APPLICATION_RIGHT_WRITE: false,
-          APPLICATION_RIGHT_DEVICE_READ: false,
+          'radio-story': 'foo',
+          'checkbox-story': { foo: true },
         }}
         submitEnabledWhenInvalid
+        horizontal
       >
-        <Field
-          type="checkbox"
-          title="Application Read"
-          name="APPLICATION_RIGHT_READ"
-          form
-        />
-        <Field
-          type="checkbox"
-          title="Application Write"
-          name="APPLICATION_RIGHT_WRITE"
-          form
-        />
-        <Field
-          type="checkbox"
-          title="Application Device Read"
-          name="APPLICATION_RIGHT_DEVICE_READ"
-          form
-        />
+        <FieldGroup
+          name="radio-story"
+          title="Radio Buttons"
+          columns
+        >
+          <Field
+            type="radio"
+            title="Foo"
+            value="foo"
+            name="foo"
+          />
+          <Field
+            type="radio"
+            title="Bar"
+            value="bar"
+            name="foo"
+          />
+          <Field
+            type="radio"
+            title="Baz"
+            value="baz"
+            name="foo"
+          />
+        </FieldGroup>
+        <FieldGroup
+          name="checkbox-story"
+          title="Checkboxes"
+          columns
+        >
+          <Field
+            type="checkbox"
+            title="Foo"
+            name="foo"
+            form
+          />
+          <Field
+            type="checkbox"
+            title="Bar"
+            name="bar"
+            form
+          />
+          <Field
+            type="checkbox"
+            title="Baz"
+            name="baz"
+            form
+          />
+        </FieldGroup>
         <Button type="submit" message="Save" />
       </Form>
     </div>
