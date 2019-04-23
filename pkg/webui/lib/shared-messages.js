@@ -60,6 +60,7 @@ export default defineMessages({
   general: 'General',
   generalInformation: 'General Information',
   generalSettings: 'General Settings',
+  genericError: 'An error unknown occurred. Please try again later.',
   integrations: 'Integrations',
   joinEUI: 'Join EUI',
   keyId: 'Key ID',
