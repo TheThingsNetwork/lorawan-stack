@@ -107,7 +107,7 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 		Component: c,
 		config:    config,
 	}
-	is.db, err = gorm.Open("postgres", is.config.DatabaseURI)
+	is.db, err = store.Open(is.Context(), is.config.DatabaseURI)
 	if err != nil {
 		return nil, err
 	}

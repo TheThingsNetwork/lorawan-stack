@@ -17,6 +17,7 @@ package store
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"path/filepath"
 	"regexp"
 	"runtime/trace"
@@ -115,6 +116,53 @@ func convertError(err error) error {
 		}
 	}
 	return errDatabase.WithCause(err)
+}
+
+// Open opens a new database connection.
+func Open(ctx context.Context, dsn string) (*gorm.DB, error) {
+	dbURI, err := url.Parse(dsn)
+	if err != nil {
+		return nil, err
+	}
+	dbName := strings.TrimPrefix(dbURI.Path, "/")
+	db, err := gorm.Open("postgres", dsn)
+	if err != nil {
+		return nil, err
+	}
+	db = db.Set("db:name", dbName)
+	var dbVersion string
+	err = db.Raw("SELECT version()").Row().Scan(&dbVersion)
+	if err != nil {
+		return nil, err
+	}
+	db = db.Set("db:version", dbVersion)
+	switch {
+	case strings.Contains(dbVersion, "CockroachDB"):
+		db = db.Set("db:kind", "CockroachDB")
+	case strings.Contains(dbVersion, "PostgreSQL"):
+		db = db.Set("db:kind", "PostgreSQL")
+	}
+	SetLogger(db, log.FromContext(ctx))
+	return db, nil
+}
+
+// Initialize initializes the database.
+func Initialize(db *gorm.DB) error {
+	if dbKind, ok := db.Get("db:kind"); ok {
+		switch dbKind {
+		case "CockroachDB":
+			if dbName, ok := db.Get("db:name"); ok {
+				if err := db.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s;", dbName)).Error; err != nil {
+					return err
+				}
+			}
+		case "PostgreSQL":
+			if err := db.Exec("CREATE EXTENSION IF NOT EXISTS pgcrypto").Error; err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
 
 // Transact executes f in a db transaction.

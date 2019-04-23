@@ -15,11 +15,6 @@
 package commands
 
 import (
-	"fmt"
-	"net/url"
-	"strings"
-
-	"github.com/jinzhu/gorm"
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 )
@@ -33,44 +28,24 @@ var (
 		Use:   "init",
 		Short: "Initialize the Identity Server database",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			dbURI, err := url.Parse(config.IS.DatabaseURI)
-			if err != nil {
-				return err
-			}
-			dbName := strings.TrimPrefix(dbURI.Path, "/")
-
 			logger.Info("Connecting to Identity Server database...")
-			db, err := gorm.Open("postgres", config.IS.DatabaseURI)
+			db, err := store.Open(ctx, config.IS.DatabaseURI)
 			if err != nil {
 				return err
 			}
 			defer db.Close()
-			store.SetLogger(db, logger)
 
-			var dbVersion string
-			err = db.Raw("SELECT version()").Row().Scan(&dbVersion)
-			if err != nil {
-				return err
+			if dbVersion, ok := db.Get("db:version"); ok {
+				logger.Infof("Detected database %s", dbVersion)
 			}
-			logger.Infof("Detected database %s", dbVersion)
 
-			logger.Infof("Creating database \"%s\"...", dbName)
-			err = db.Exec(fmt.Sprintf("CREATE DATABASE %s;", dbName)).Error
-			if err != nil {
+			logger.Info("Initializing database...")
+			if err = store.Initialize(db); err != nil {
 				return err
 			}
 
-			if !strings.Contains(dbVersion, "CockroachDB") {
-				logger.Infof("Enabling pgcrypto extension \"%s\"...", dbName)
-				err = db.Exec("CREATE EXTENSION IF NOT EXISTS pgcrypto").Error
-				if err != nil {
-					return err
-				}
-			}
-
-			logger.Infof("Creating tables in \"%s\"...", dbName)
-			err = store.AutoMigrate(db).Error
-			if err != nil {
+			logger.Info("Creating tables...")
+			if err = store.AutoMigrate(db).Error; err != nil {
 				return err
 			}
 
@@ -82,23 +57,19 @@ var (
 		Use:   "migrate",
 		Short: "Migrate the Identity Server database",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			dbURI, err := url.Parse(config.IS.DatabaseURI)
-			if err != nil {
-				return err
-			}
-			dbName := strings.TrimPrefix(dbURI.Path, "/")
-
 			logger.Info("Connecting to Identity Server database...")
-			db, err := gorm.Open("postgres", config.IS.DatabaseURI)
+			db, err := store.Open(ctx, config.IS.DatabaseURI)
 			if err != nil {
 				return err
 			}
 			defer db.Close()
-			store.SetLogger(db, logger)
 
-			logger.Infof("Migrating tables in \"%s\"...", dbName)
-			err = store.AutoMigrate(db).Error
-			if err != nil {
+			if dbVersion, ok := db.Get("db:version"); ok {
+				logger.Infof("Detected database %s", dbVersion)
+			}
+
+			logger.Info("Migrating tables...")
+			if err = store.AutoMigrate(db).Error; err != nil {
 				return err
 			}
 

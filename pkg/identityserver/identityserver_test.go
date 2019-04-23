@@ -21,7 +21,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
@@ -259,25 +258,28 @@ func userOrganizations(userID *ttnpb.UserIdentifiers) ttnpb.Organizations {
 }
 
 func getIdentityServer(t *testing.T) (*IdentityServer, *grpc.ClientConn) {
+	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 	setup.Do(func() {
 		dbAddress := os.Getenv("SQL_DB_ADDRESS")
 		if dbAddress == "" {
 			dbAddress = "localhost:26257"
 		}
-		dbName := os.Getenv("TEST_DB_NAME")
+		dbName := os.Getenv("TEST_DATABASE_NAME")
 		if dbName == "" {
-			dbName = "is_integration_test"
+			dbName = "ttn_lorawan_test"
 		}
 		dbConnString = fmt.Sprintf("postgresql://root@%s/%s?sslmode=disable", dbAddress, dbName)
-		db, err := gorm.Open("postgres", dbConnString)
+		db, err := store.Open(ctx, dbConnString)
 		if err != nil {
 			panic(err)
 		}
 		defer db.Close()
-		if err = db.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s;", dbName)).Error; err != nil {
+		if err = store.Initialize(db); err != nil {
 			panic(err)
 		}
-		store.AutoMigrate(db)
+		if err = store.AutoMigrate(db).Error; err != nil {
+			panic(err)
+		}
 		if err = store.Clear(db); err != nil {
 			panic(err)
 		}

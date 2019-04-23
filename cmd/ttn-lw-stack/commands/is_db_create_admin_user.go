@@ -20,7 +20,6 @@ import (
 	"time"
 
 	"github.com/howeyc/gopass"
-	"github.com/jinzhu/gorm"
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/pkg/auth"
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -40,12 +39,11 @@ var (
 			defer cancel()
 
 			logger.Info("Connecting to Identity Server database...")
-			db, err := gorm.Open("postgres", config.IS.DatabaseURI)
+			db, err := store.Open(ctx, config.IS.DatabaseURI)
 			if err != nil {
 				return err
 			}
 			defer db.Close()
-			store.SetLogger(db, logger)
 
 			userID, err := cmd.Flags().GetString("id")
 			if err != nil {

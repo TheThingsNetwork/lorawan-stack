@@ -10,14 +10,20 @@ services:
       - TTN_LW_CLUSTER_KEYS
       - TTN_LW_FREQUENCY_PLANS_URL
       - TTN_LW_CONSOLE_OAUTH_CLIENT_SECRET
+      # If using CockroachDB:
       - TTN_LW_IS_DATABASE_URI=postgres://root@cockroach:26257/${DEV_DATABASE_NAME:-ttn_lorawan}?sslmode=disable
+      # If using PostgreSQL:
+      # - TTN_LW_IS_DATABASE_URI=postgres://root@postgres:5432/${DEV_DATABASE_NAME:-ttn_lorawan}?sslmode=disable
       - TTN_LW_REDIS_ADDRESS=redis:6379
       - TTN_LW_TLS_CERTIFICATE=/run/secrets/cert.pem
       - TTN_LW_CA=/run/secrets/cert.pem
       - TTN_LW_TLS_KEY=/run/secrets/key.pem
     depends_on:
-      - cockroach
       - redis
+      # If using CockroachDB:
+      - cockroach
+      # If using PostgreSQL:
+      # - postgres
     ports:
       - "1882:1882"
       - "8882:8882"
@@ -31,6 +37,7 @@ services:
     secrets:
       - cert.pem
       - key.pem
+  # If using CockroachDB:
   cockroach:
     image: cockroachdb/cockroach:v2.1.6
     command: start --http-port 26256 --insecure
@@ -39,6 +46,17 @@ services:
     ports:
       - "127.0.0.1:26257:26257" # Cockroach
       - "127.0.0.1:26256:26256" # WebUI
+  # If using PostgreSQL:
+  # postgres:
+  #   image: postgres:11.2-alpine
+  #   environment:
+  #     - POSTGRES_PASSWORD=
+  #     - POSTGRES_USER=root
+  #     - POSTGRES_DB=${DEV_DATABASE_NAME:-ttn_lorawan}
+  #   volumes:
+  #     - ${DEV_DATA_DIR:-.env/data}/postgres:/var/lib/postgresql/data
+  #   ports:
+  #     - "127.0.0.1:5432:5432"
   redis:
     image: redis:5.0.4-alpine
     command: redis-server --appendonly yes
