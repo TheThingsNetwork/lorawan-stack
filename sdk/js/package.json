@@ -46,10 +46,11 @@
     "preset": "jest-preset-ttn"
   },
   "dependencies": {
+    "arraybuffer-to-string": "^1.0.2",
     "axios": "^0.18.0",
     "proxy-polyfill": "^0.3.0",
     "query-string": "^6.2.0",
     "traverse": "^0.6.6",
-    "arraybuffer-to-string": "^1.0.2"
+    "web-streams-polyfill": "^2.0.3"
   }
 }
