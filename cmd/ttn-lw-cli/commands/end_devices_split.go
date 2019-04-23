@@ -167,7 +167,7 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths []
 	var res ttnpb.EndDevice
 	res.SetFields(device, "ids", "created_at", "updated_at")
 
-	if len(isPaths) > 0 || isCreate {
+	if len(isPaths) > 0 && !isCreate {
 		is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 		if err != nil {
 			return nil, err
