@@ -13,16 +13,8 @@
 # limitations under the License.
 
 include .mage/mage.make
-
-HEADER_EXTRA_FILES = Makefile
-
-SUPPORT_LOCALES = en
-
-include .make/log.make
 include .make/general.make
-include .make/headers.make
 include .make/git.make
-include .make/go/main.make
 include .make/protos/main.make
 include .make/dev.make
 

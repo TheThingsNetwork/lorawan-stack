@@ -24,3 +24,5 @@ $(MAGE): magefile.go $(wildcard .mage/*.go)
 mage: $(MAGE)
 
 INIT_RULES += mage
+
+include .mage/rules.make
