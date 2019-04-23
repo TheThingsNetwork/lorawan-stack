@@ -73,5 +73,5 @@ You can find the releases and their notes on the [Releases page](https://github.
 ## Support
 
 - The [forums](https://www.thethingsnetwork.org/forum) contain a massive amount of information and has great search
-- You can chat on [Slack](http://thethingsnetwork.slack.com), an invite can be requested from your [account page](https://account.thethingsnetwork.org)
+- You can chat in the [#lorawan-stack channel on Slack](https://thethingsnetwork.slack.com/messages/CFVF7R4AH/). If you don't have a Slack account yet, you can create one by going to [ttn.fyi/slack-invite](https://ttn.fyi/slack-invite).
 - Hosted solutions, as well as commercial support and consultancy are offered by [The Things Industries](https://www.thethingsindustries.com)

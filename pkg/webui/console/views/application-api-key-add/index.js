@@ -30,6 +30,7 @@ import Message from '../../../lib/components/message'
 import FieldGroup from '../../../components/field/group'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import ApiKeyModal from '../../containers/api-key-modal'
+import SubmitBar from '../../../components/submit-bar'
 
 import { getApplicationsRightsList } from '../../store/actions/applications'
 import api from '../../api'
@@ -83,10 +84,9 @@ export default class ApplicationApiKeyAdd extends React.Component {
 
   async handleApprove () {
     const { dispatch, appId } = this.props
-    const { createdId } = this.state
 
     await this.setState({ modal: null })
-    dispatch(replace(`/console/applications/${appId}/api-keys/${createdId}`))
+    dispatch(replace(`/console/applications/${appId}/api-keys`))
   }
 
   async handleSubmit (values, { resetForm }) {
@@ -103,7 +103,6 @@ export default class ApplicationApiKeyAdd extends React.Component {
     try {
       const created = await api.application.apiKeys.create(appId, key)
       await this.setState({
-        createdId: created.id,
         modal: {
           secret: created.key,
           rights: created.rights,
@@ -168,7 +167,7 @@ export default class ApplicationApiKeyAdd extends React.Component {
         <Row>
           <Col lg={8} md={12}>
             <IntlHelmet title={sharedMessages.addApiKey} />
-            <Message component="h2" content={sharedMessages.add} />
+            <Message component="h2" content={sharedMessages.addApiKey} />
           </Col>
         </Row>
         <Row>
@@ -196,9 +195,9 @@ export default class ApplicationApiKeyAdd extends React.Component {
               >
                 {rightsItems}
               </FieldGroup>
-              <div className={style.submitBar}>
+              <SubmitBar>
                 <Button type="submit" message={sharedMessages.createApiKey} />
-              </div>
+              </SubmitBar>
             </Form>
           </Col>
         </Row>

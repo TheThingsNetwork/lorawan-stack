@@ -41,7 +41,15 @@
               "longType": "ApplicationIdentifiers",
               "fullType": "ttn.lorawan.v3.ApplicationIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "created_at",
@@ -71,7 +79,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 50
+                  }
+                ]
+              }
             },
             {
               "name": "description",
@@ -81,7 +97,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 2000
+                  }
+                ]
+              }
             },
             {
               "name": "attributes",
@@ -91,7 +115,19 @@
               "longType": "Application.AttributesEntry",
               "fullType": "ttn.lorawan.v3.Application.AttributesEntry",
               "ismap": true,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "map.keys.string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "map.keys.string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
             },
             {
               "name": "contact_info",
@@ -174,7 +210,15 @@
               "longType": "ApplicationIdentifiers",
               "fullType": "ttn.lorawan.v3.ApplicationIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "name",
@@ -184,7 +228,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 50
+                  }
+                ]
+              }
             },
             {
               "name": "rights",
@@ -194,7 +246,15 @@
               "longType": "Right",
               "fullType": "ttn.lorawan.v3.Right",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.items.enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -215,7 +275,15 @@
               "longType": "Application",
               "fullType": "ttn.lorawan.v3.Application",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "collaborator",
@@ -225,7 +293,15 @@
               "longType": "OrganizationOrUserIdentifiers",
               "fullType": "ttn.lorawan.v3.OrganizationOrUserIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -246,7 +322,15 @@
               "longType": "ApplicationIdentifiers",
               "fullType": "ttn.lorawan.v3.ApplicationIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "field_mask",
@@ -277,7 +361,15 @@
               "longType": "ApplicationIdentifiers",
               "fullType": "ttn.lorawan.v3.ApplicationIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "limit",
@@ -287,7 +379,15 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 1000
+                  }
+                ]
+              }
             },
             {
               "name": "page",
@@ -318,7 +418,15 @@
               "longType": "ApplicationIdentifiers",
               "fullType": "ttn.lorawan.v3.ApplicationIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "limit",
@@ -328,7 +436,15 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 1000
+                  }
+                ]
+              }
             },
             {
               "name": "page",
@@ -389,7 +505,15 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 1000
+                  }
+                ]
+              }
             },
             {
               "name": "page",
@@ -420,7 +544,15 @@
               "longType": "ApplicationIdentifiers",
               "fullType": "ttn.lorawan.v3.ApplicationIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "collaborator",
@@ -430,7 +562,15 @@
               "longType": "Collaborator",
               "fullType": "ttn.lorawan.v3.Collaborator",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -451,7 +591,15 @@
               "longType": "ApplicationIdentifiers",
               "fullType": "ttn.lorawan.v3.ApplicationIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "api_key",
@@ -461,7 +609,15 @@
               "longType": "APIKey",
               "fullType": "ttn.lorawan.v3.APIKey",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -482,7 +638,15 @@
               "longType": "Application",
               "fullType": "ttn.lorawan.v3.Application",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "field_mask",
@@ -817,7 +981,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.pattern",
+                    "value": "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"
+                  }
+                ]
+              }
             },
             {
               "name": "api_key",
@@ -827,7 +999,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.min_len",
+                    "value": 1
+                  }
+                ]
+              }
             },
             {
               "name": "default_formatters",
@@ -868,7 +1048,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.pattern",
+                    "value": "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"
+                  }
+                ]
+              }
             },
             {
               "name": "last_up_received_at",
@@ -929,7 +1117,15 @@
               "longType": "ApplicationIdentifiers",
               "fullType": "ttn.lorawan.v3.ApplicationIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "field_mask",
@@ -960,7 +1156,15 @@
               "longType": "ApplicationIdentifiers",
               "fullType": "ttn.lorawan.v3.ApplicationIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "link",
@@ -970,7 +1174,15 @@
               "longType": "ApplicationLink",
               "fullType": "ttn.lorawan.v3.ApplicationLink",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "field_mask",
@@ -1281,7 +1493,15 @@
               "longType": "ApplicationWebhookIdentifiers",
               "fullType": "ttn.lorawan.v3.ApplicationWebhookIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "created_at",
@@ -1311,7 +1531,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.uri",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "headers",
@@ -1536,7 +1764,15 @@
               "longType": "ApplicationIdentifiers",
               "fullType": "ttn.lorawan.v3.ApplicationIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "webhook_id",
@@ -1546,7 +1782,19 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
             }
           ]
         },
@@ -1588,7 +1836,15 @@
               "longType": "ApplicationWebhookIdentifiers",
               "fullType": "ttn.lorawan.v3.ApplicationWebhookIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "field_mask",
@@ -1619,7 +1875,15 @@
               "longType": "ApplicationIdentifiers",
               "fullType": "ttn.lorawan.v3.ApplicationIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "field_mask",
@@ -1650,7 +1914,15 @@
               "longType": "ApplicationWebhook",
               "fullType": "ttn.lorawan.v3.ApplicationWebhook",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "field_mask",
@@ -1839,7 +2111,15 @@
               "longType": "ClientIdentifiers",
               "fullType": "ttn.lorawan.v3.ClientIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "created_at",
@@ -1869,7 +2149,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 50
+                  }
+                ]
+              }
             },
             {
               "name": "description",
@@ -1879,7 +2167,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 2000
+                  }
+                ]
+              }
             },
             {
               "name": "attributes",
@@ -1889,7 +2185,19 @@
               "longType": "Client.AttributesEntry",
               "fullType": "ttn.lorawan.v3.Client.AttributesEntry",
               "ismap": true,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "map.keys.string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "map.keys.string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
             },
             {
               "name": "contact_info",
@@ -1929,7 +2237,15 @@
               "longType": "State",
               "fullType": "ttn.lorawan.v3.State",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "skip_authorization",
@@ -1959,7 +2275,15 @@
               "longType": "GrantType",
               "fullType": "ttn.lorawan.v3.GrantType",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.items.enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "rights",
@@ -1969,7 +2293,15 @@
               "longType": "Right",
               "fullType": "ttn.lorawan.v3.Right",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.items.enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -2042,7 +2374,15 @@
               "longType": "Client",
               "fullType": "ttn.lorawan.v3.Client",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "collaborator",
@@ -2052,7 +2392,15 @@
               "longType": "OrganizationOrUserIdentifiers",
               "fullType": "ttn.lorawan.v3.OrganizationOrUserIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -2073,7 +2421,15 @@
               "longType": "ClientIdentifiers",
               "fullType": "ttn.lorawan.v3.ClientIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "field_mask",
@@ -2104,7 +2460,15 @@
               "longType": "ClientIdentifiers",
               "fullType": "ttn.lorawan.v3.ClientIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "limit",
@@ -2114,7 +2478,15 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 1000
+                  }
+                ]
+              }
             },
             {
               "name": "page",
@@ -2175,7 +2547,15 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 1000
+                  }
+                ]
+              }
             },
             {
               "name": "page",
@@ -2206,7 +2586,15 @@
               "longType": "ClientIdentifiers",
               "fullType": "ttn.lorawan.v3.ClientIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "collaborator",
@@ -2216,7 +2604,15 @@
               "longType": "Collaborator",
               "fullType": "ttn.lorawan.v3.Collaborator",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -2237,7 +2633,15 @@
               "longType": "Client",
               "fullType": "ttn.lorawan.v3.Client",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "field_mask",
@@ -3062,7 +3466,15 @@
               "longType": "EndDevice",
               "fullType": "ttn.lorawan.v3.EndDevice",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -3083,7 +3495,15 @@
               "longType": "EndDeviceIdentifiers",
               "fullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "created_at",
@@ -3113,7 +3533,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 50
+                  }
+                ]
+              }
             },
             {
               "name": "description",
@@ -3123,7 +3551,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 2000
+                  }
+                ]
+              }
             },
             {
               "name": "attributes",
@@ -3133,7 +3569,19 @@
               "longType": "EndDevice.AttributesEntry",
               "fullType": "ttn.lorawan.v3.EndDevice.AttributesEntry",
               "ismap": true,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "map.keys.string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "map.keys.string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
             },
             {
               "name": "version_ids",
@@ -3153,7 +3601,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 64
+                  }
+                ]
+              }
             },
             {
               "name": "network_server_address",
@@ -3163,7 +3619,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.pattern",
+                    "value": "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"
+                  }
+                ]
+              }
             },
             {
               "name": "application_server_address",
@@ -3173,7 +3637,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.pattern",
+                    "value": "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"
+                  }
+                ]
+              }
             },
             {
               "name": "join_server_address",
@@ -3183,7 +3655,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.pattern",
+                    "value": "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"
+                  }
+                ]
+              }
             },
             {
               "name": "locations",
@@ -3193,7 +3673,19 @@
               "longType": "EndDevice.LocationsEntry",
               "fullType": "ttn.lorawan.v3.EndDevice.LocationsEntry",
               "ismap": true,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "map.keys.string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "map.keys.string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
             },
             {
               "name": "supports_class_b",
@@ -3223,7 +3715,15 @@
               "longType": "MACVersion",
               "fullType": "ttn.lorawan.v3.MACVersion",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "lorawan_phy_version",
@@ -3233,7 +3733,15 @@
               "longType": "PHYVersion",
               "fullType": "ttn.lorawan.v3.PHYVersion",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "frequency_plan_id",
@@ -3243,7 +3751,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 64
+                  }
+                ]
+              }
             },
             {
               "name": "min_frequency",
@@ -3413,7 +3929,15 @@
               "longType": "PowerState",
               "fullType": "ttn.lorawan.v3.PowerState",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "battery_percentage",
@@ -3423,7 +3947,19 @@
               "longType": "google.protobuf.FloatValue",
               "fullType": "google.protobuf.FloatValue",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "float.lte",
+                    "value": 1
+                  },
+                  {
+                    "name": "float.gte",
+                    "value": 0
+                  }
+                ]
+              }
             },
             {
               "name": "downlink_margin",
@@ -3493,7 +4029,19 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$"
+                  }
+                ]
+              }
             },
             {
               "name": "provisioning_data",
@@ -3637,7 +4185,19 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
             },
             {
               "name": "id",
@@ -3647,7 +4207,19 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
             },
             {
               "name": "name",
@@ -3678,7 +4250,15 @@
               "longType": "EndDeviceVersionIdentifiers",
               "fullType": "ttn.lorawan.v3.EndDeviceVersionIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "lorawan_version",
@@ -3688,7 +4268,15 @@
               "longType": "MACVersion",
               "fullType": "ttn.lorawan.v3.MACVersion",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "lorawan_phy_version",
@@ -3698,7 +4286,15 @@
               "longType": "PHYVersion",
               "fullType": "ttn.lorawan.v3.PHYVersion",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "frequency_plan_id",
@@ -3708,7 +4304,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 64
+                  }
+                ]
+              }
             },
             {
               "name": "photos",
@@ -3798,7 +4402,15 @@
               "longType": "MessagePayloadFormatters",
               "fullType": "ttn.lorawan.v3.MessagePayloadFormatters",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -3819,7 +4431,19 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
             },
             {
               "name": "model_id",
@@ -3829,7 +4453,19 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
             },
             {
               "name": "hardware_version",
@@ -3891,7 +4527,15 @@
               "longType": "EndDeviceIdentifiers",
               "fullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "field_mask",
@@ -3922,7 +4566,15 @@
               "longType": "ApplicationIdentifiers",
               "fullType": "ttn.lorawan.v3.ApplicationIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "field_mask",
@@ -3952,7 +4604,15 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 1000
+                  }
+                ]
+              }
             },
             {
               "name": "page",
@@ -4013,7 +4673,15 @@
               "longType": "DataRateIndex",
               "fullType": "ttn.lorawan.v3.DataRateIndex",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "adr_tx_power_index",
@@ -4023,7 +4691,15 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 15
+                  }
+                ]
+              }
             },
             {
               "name": "adr_nb_trans",
@@ -4033,7 +4709,15 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 15
+                  }
+                ]
+              }
             },
             {
               "name": "adr_ack_limit",
@@ -4043,7 +4727,19 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 32768
+                  },
+                  {
+                    "name": "uint32.gte",
+                    "value": 1
+                  }
+                ]
+              }
             },
             {
               "name": "adr_ack_delay",
@@ -4053,7 +4749,19 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 32768
+                  },
+                  {
+                    "name": "uint32.gte",
+                    "value": 1
+                  }
+                ]
+              }
             },
             {
               "name": "rx1_delay",
@@ -4063,7 +4771,15 @@
               "longType": "RxDelay",
               "fullType": "ttn.lorawan.v3.RxDelay",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "rx1_data_rate_offset",
@@ -4073,7 +4789,15 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 7
+                  }
+                ]
+              }
             },
             {
               "name": "rx2_data_rate_index",
@@ -4083,7 +4807,15 @@
               "longType": "DataRateIndex",
               "fullType": "ttn.lorawan.v3.DataRateIndex",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "rx2_frequency",
@@ -4093,7 +4825,15 @@
               "longType": "uint64",
               "fullType": "uint64",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint64.gte",
+                    "value": 100000
+                  }
+                ]
+              }
             },
             {
               "name": "max_duty_cycle",
@@ -4103,7 +4843,15 @@
               "longType": "AggregatedDutyCycle",
               "fullType": "ttn.lorawan.v3.AggregatedDutyCycle",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "rejoin_time_periodicity",
@@ -4113,7 +4861,15 @@
               "longType": "RejoinTimeExponent",
               "fullType": "ttn.lorawan.v3.RejoinTimeExponent",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "rejoin_count_periodicity",
@@ -4123,7 +4879,15 @@
               "longType": "RejoinCountExponent",
               "fullType": "ttn.lorawan.v3.RejoinCountExponent",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "ping_slot_frequency",
@@ -4133,7 +4897,19 @@
               "longType": "uint64",
               "fullType": "uint64",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint64.lte",
+                    "value": 0
+                  },
+                  {
+                    "name": "uint64.gte",
+                    "value": 100000
+                  }
+                ]
+              }
             },
             {
               "name": "ping_slot_data_rate_index",
@@ -4143,7 +4919,15 @@
               "longType": "DataRateIndex",
               "fullType": "ttn.lorawan.v3.DataRateIndex",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "beacon_frequency",
@@ -4153,7 +4937,19 @@
               "longType": "uint64",
               "fullType": "uint64",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint64.lte",
+                    "value": 0
+                  },
+                  {
+                    "name": "uint64.gte",
+                    "value": 100000
+                  }
+                ]
+              }
             },
             {
               "name": "channels",
@@ -4163,7 +4959,15 @@
               "longType": "MACParameters.Channel",
               "fullType": "ttn.lorawan.v3.MACParameters.Channel",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.min_items",
+                    "value": 1
+                  }
+                ]
+              }
             }
           ]
         },
@@ -4184,7 +4988,15 @@
               "longType": "uint64",
               "fullType": "uint64",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint64.gte",
+                    "value": 100000
+                  }
+                ]
+              }
             },
             {
               "name": "downlink_frequency",
@@ -4194,7 +5006,15 @@
               "longType": "uint64",
               "fullType": "uint64",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint64.gte",
+                    "value": 100000
+                  }
+                ]
+              }
             },
             {
               "name": "min_data_rate_index",
@@ -4204,7 +5024,15 @@
               "longType": "DataRateIndex",
               "fullType": "ttn.lorawan.v3.DataRateIndex",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "max_data_rate_index",
@@ -4214,7 +5042,15 @@
               "longType": "DataRateIndex",
               "fullType": "ttn.lorawan.v3.DataRateIndex",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "enable_uplink",
@@ -4275,7 +5111,15 @@
               "longType": "google.protobuf.UInt64Value",
               "fullType": "google.protobuf.UInt64Value",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint64.gte",
+                    "value": 100000
+                  }
+                ]
+              }
             },
             {
               "name": "class_c_timeout",
@@ -4305,7 +5149,15 @@
               "longType": "google.protobuf.UInt32Value",
               "fullType": "google.protobuf.UInt32Value",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 7
+                  }
+                ]
+              }
             },
             {
               "name": "rx2_data_rate_index",
@@ -4325,7 +5177,15 @@
               "longType": "google.protobuf.UInt64Value",
               "fullType": "google.protobuf.UInt64Value",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint64.gte",
+                    "value": 100000
+                  }
+                ]
+              }
             },
             {
               "name": "factory_preset_frequencies",
@@ -4445,7 +5305,15 @@
               "longType": "google.protobuf.UInt64Value",
               "fullType": "google.protobuf.UInt64Value",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint64.gte",
+                    "value": 100000
+                  }
+                ]
+              }
             }
           ]
         },
@@ -4466,7 +5334,15 @@
               "longType": "AggregatedDutyCycle",
               "fullType": "ttn.lorawan.v3.AggregatedDutyCycle",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -4487,7 +5363,15 @@
               "longType": "DataRateIndex",
               "fullType": "ttn.lorawan.v3.DataRateIndex",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -4508,7 +5392,15 @@
               "longType": "PingSlotPeriod",
               "fullType": "ttn.lorawan.v3.PingSlotPeriod",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -4529,7 +5421,15 @@
               "longType": "RxDelay",
               "fullType": "ttn.lorawan.v3.RxDelay",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -4550,7 +5450,15 @@
               "longType": "MACParameters",
               "fullType": "ttn.lorawan.v3.MACParameters",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "desired_parameters",
@@ -4560,7 +5468,15 @@
               "longType": "MACParameters",
               "fullType": "ttn.lorawan.v3.MACParameters",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "device_class",
@@ -4570,7 +5486,15 @@
               "longType": "Class",
               "fullType": "ttn.lorawan.v3.Class",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "lorawan_version",
@@ -4580,7 +5504,15 @@
               "longType": "MACVersion",
               "fullType": "ttn.lorawan.v3.MACVersion",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "last_confirmed_downlink_at",
@@ -4610,7 +5542,15 @@
               "longType": "PingSlotPeriod",
               "fullType": "ttn.lorawan.v3.PingSlotPeriod",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "pending_application_downlink",
@@ -4691,7 +5631,19 @@
               "longType": "bytes",
               "fullType": "bytes",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.min_len",
+                    "value": 17
+                  },
+                  {
+                    "name": "bytes.max_len",
+                    "value": 33
+                  }
+                ]
+              }
             },
             {
               "name": "request",
@@ -4701,7 +5653,15 @@
               "longType": "JoinRequest",
               "fullType": "ttn.lorawan.v3.JoinRequest",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "keys",
@@ -4711,7 +5671,15 @@
               "longType": "SessionKeys",
               "fullType": "ttn.lorawan.v3.SessionKeys",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -4742,7 +5710,15 @@
               "longType": "SessionKeys",
               "fullType": "ttn.lorawan.v3.SessionKeys",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "last_f_cnt_up",
@@ -4813,7 +5789,15 @@
               "longType": "EndDevice",
               "fullType": "ttn.lorawan.v3.EndDevice",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "field_mask",
@@ -4844,7 +5828,15 @@
               "longType": "EndDevice",
               "fullType": "ttn.lorawan.v3.EndDevice",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "field_mask",
@@ -5188,7 +6180,15 @@
               "longType": "google.protobuf.Timestamp",
               "fullType": "google.protobuf.Timestamp",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "identifiers",
@@ -5218,7 +6218,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.items.string.max_len",
+                    "value": 100
+                  }
+                ]
+              }
             },
             {
               "name": "origin",
@@ -5377,7 +6385,15 @@
               "longType": "GatewayIdentifiers",
               "fullType": "ttn.lorawan.v3.GatewayIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "name",
@@ -5387,7 +6403,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 50
+                  }
+                ]
+              }
             },
             {
               "name": "rights",
@@ -5397,7 +6421,15 @@
               "longType": "Right",
               "fullType": "ttn.lorawan.v3.Right",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.items.enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -5418,7 +6450,15 @@
               "longType": "Gateway",
               "fullType": "ttn.lorawan.v3.Gateway",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "collaborator",
@@ -5428,7 +6468,15 @@
               "longType": "OrganizationOrUserIdentifiers",
               "fullType": "ttn.lorawan.v3.OrganizationOrUserIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -5449,7 +6497,15 @@
               "longType": "GatewayIdentifiers",
               "fullType": "ttn.lorawan.v3.GatewayIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "created_at",
@@ -5479,7 +6535,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 50
+                  }
+                ]
+              }
             },
             {
               "name": "description",
@@ -5489,7 +6553,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 2000
+                  }
+                ]
+              }
             },
             {
               "name": "attributes",
@@ -5499,7 +6571,19 @@
               "longType": "Gateway.AttributesEntry",
               "fullType": "ttn.lorawan.v3.Gateway.AttributesEntry",
               "ismap": true,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "map.keys.string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "map.keys.string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
             },
             {
               "name": "contact_info",
@@ -5519,7 +6603,15 @@
               "longType": "GatewayVersionIdentifiers",
               "fullType": "ttn.lorawan.v3.GatewayVersionIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "gateway_server_address",
@@ -5529,7 +6621,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.pattern",
+                    "value": "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"
+                  }
+                ]
+              }
             },
             {
               "name": "auto_update",
@@ -5559,7 +6659,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 64
+                  }
+                ]
+              }
             },
             {
               "name": "antennas",
@@ -5619,7 +6727,15 @@
               "longType": "DownlinkPathConstraint",
               "fullType": "ttn.lorawan.v3.DownlinkPathConstraint",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -5681,7 +6797,15 @@
               "longType": "Location",
               "fullType": "ttn.lorawan.v3.Location",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "attributes",
@@ -5691,7 +6815,19 @@
               "longType": "GatewayAntenna.AttributesEntry",
               "fullType": "ttn.lorawan.v3.GatewayAntenna.AttributesEntry",
               "ismap": true,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "map.keys.string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "map.keys.string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
             }
           ]
         },
@@ -5885,7 +7021,19 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
             },
             {
               "name": "id",
@@ -5895,7 +7043,19 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
             },
             {
               "name": "name",
@@ -6028,7 +7188,15 @@
               "longType": "google.protobuf.Timestamp",
               "fullType": "google.protobuf.Timestamp",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "boot_time",
@@ -6048,7 +7216,19 @@
               "longType": "GatewayStatus.VersionsEntry",
               "fullType": "ttn.lorawan.v3.GatewayStatus.VersionsEntry",
               "ismap": true,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "map.keys.string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "map.keys.string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
             },
             {
               "name": "antenna_locations",
@@ -6078,7 +7258,19 @@
               "longType": "GatewayStatus.MetricsEntry",
               "fullType": "ttn.lorawan.v3.GatewayStatus.MetricsEntry",
               "ismap": true,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "map.keys.string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "map.keys.string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
             },
             {
               "name": "advanced",
@@ -6171,7 +7363,15 @@
               "longType": "GatewayVersionIdentifiers",
               "fullType": "ttn.lorawan.v3.GatewayVersionIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "photos",
@@ -6222,7 +7422,19 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
             },
             {
               "name": "model_id",
@@ -6232,7 +7444,19 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
             },
             {
               "name": "hardware_version",
@@ -6315,7 +7539,15 @@
               "longType": "GatewayIdentifiers",
               "fullType": "ttn.lorawan.v3.GatewayIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "field_mask",
@@ -6346,7 +7578,15 @@
               "longType": "GatewayIdentifiers",
               "fullType": "ttn.lorawan.v3.GatewayIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "limit",
@@ -6356,7 +7596,15 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 1000
+                  }
+                ]
+              }
             },
             {
               "name": "page",
@@ -6387,7 +7635,15 @@
               "longType": "GatewayIdentifiers",
               "fullType": "ttn.lorawan.v3.GatewayIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "limit",
@@ -6397,7 +7653,15 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 1000
+                  }
+                ]
+              }
             },
             {
               "name": "page",
@@ -6458,7 +7722,15 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 1000
+                  }
+                ]
+              }
             },
             {
               "name": "page",
@@ -6489,7 +7761,15 @@
               "longType": "GatewayIdentifiers",
               "fullType": "ttn.lorawan.v3.GatewayIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "collaborator",
@@ -6499,7 +7779,15 @@
               "longType": "Collaborator",
               "fullType": "ttn.lorawan.v3.Collaborator",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -6520,7 +7808,15 @@
               "longType": "GatewayIdentifiers",
               "fullType": "ttn.lorawan.v3.GatewayIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "api_key",
@@ -6530,7 +7826,15 @@
               "longType": "APIKey",
               "fullType": "ttn.lorawan.v3.APIKey",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -6551,7 +7855,15 @@
               "longType": "Gateway",
               "fullType": "ttn.lorawan.v3.Gateway",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "field_mask",
@@ -7012,7 +8324,15 @@
               "longType": "google.protobuf.Duration",
               "fullType": "google.protobuf.Duration",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         }
@@ -7130,7 +8450,19 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
             }
           ]
         },
@@ -7151,7 +8483,19 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
             }
           ]
         },
@@ -7193,7 +8537,19 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
             },
             {
               "name": "application_ids",
@@ -7203,7 +8559,15 @@
               "longType": "ApplicationIdentifiers",
               "fullType": "ttn.lorawan.v3.ApplicationIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "dev_eui",
@@ -7325,7 +8689,19 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
             },
             {
               "name": "eui",
@@ -7356,7 +8732,19 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
             }
           ]
         },
@@ -7408,7 +8796,19 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
             },
             {
               "name": "email",
@@ -7504,7 +8904,15 @@
               "longType": "APIKey",
               "fullType": "ttn.lorawan.v3.APIKey",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "entity_ids",
@@ -7514,7 +8922,15 @@
               "longType": "EntityIdentifiers",
               "fullType": "ttn.lorawan.v3.EntityIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         }
@@ -7580,7 +8996,10 @@
               "longType": "bytes",
               "fullType": "bytes",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": null
+              }
             },
             {
               "name": "payload",
@@ -7630,7 +9049,15 @@
               "longType": "DLSettings",
               "fullType": "ttn.lorawan.v3.DLSettings",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "rx_delay",
@@ -7640,7 +9067,15 @@
               "longType": "RxDelay",
               "fullType": "ttn.lorawan.v3.RxDelay",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "cf_list",
@@ -7660,7 +9095,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.items.string.max_len",
+                    "value": 100
+                  }
+                ]
+              }
             }
           ]
         },
@@ -7681,7 +9124,19 @@
               "longType": "bytes",
               "fullType": "bytes",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.min_len",
+                    "value": 17
+                  },
+                  {
+                    "name": "bytes.max_len",
+                    "value": 33
+                  }
+                ]
+              }
             },
             {
               "name": "session_keys",
@@ -7691,7 +9146,15 @@
               "longType": "SessionKeys",
               "fullType": "ttn.lorawan.v3.SessionKeys",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "lifetime",
@@ -7711,7 +9174,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.items.string.max_len",
+                    "value": 100
+                  }
+                ]
+              }
             }
           ]
         }
@@ -7746,7 +9217,15 @@
               "longType": "KeyEnvelope",
               "fullType": "ttn.lorawan.v3.KeyEnvelope",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -7767,7 +9246,15 @@
               "longType": "EndDeviceIdentifiers",
               "fullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "lorawan_version",
@@ -7777,7 +9264,15 @@
               "longType": "MACVersion",
               "fullType": "ttn.lorawan.v3.MACVersion",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "payload",
@@ -7797,7 +9292,19 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$"
+                  }
+                ]
+              }
             },
             {
               "name": "provisioning_data",
@@ -7849,7 +9356,15 @@
               "longType": "EndDeviceIdentifiers",
               "fullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "lorawan_version",
@@ -7859,7 +9374,15 @@
               "longType": "MACVersion",
               "fullType": "ttn.lorawan.v3.MACVersion",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "join_nonce",
@@ -7899,7 +9422,19 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$"
+                  }
+                ]
+              }
             },
             {
               "name": "provisioning_data",
@@ -7930,7 +9465,15 @@
               "longType": "EndDeviceIdentifiers",
               "fullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "provisioner_id",
@@ -7940,7 +9483,19 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$"
+                  }
+                ]
+              }
             },
             {
               "name": "provisioning_data",
@@ -7971,7 +9526,15 @@
               "longType": "CryptoServicePayloadRequest",
               "fullType": "ttn.lorawan.v3.CryptoServicePayloadRequest",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "join_request_type",
@@ -7981,7 +9544,15 @@
               "longType": "RejoinType",
               "fullType": "ttn.lorawan.v3.RejoinType",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "dev_nonce",
@@ -8012,7 +9583,15 @@
               "longType": "KeyEnvelope",
               "fullType": "ttn.lorawan.v3.KeyEnvelope",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "s_nwk_s_int_key",
@@ -8022,7 +9601,15 @@
               "longType": "KeyEnvelope",
               "fullType": "ttn.lorawan.v3.KeyEnvelope",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "nwk_s_enc_key",
@@ -8032,7 +9619,15 @@
               "longType": "KeyEnvelope",
               "fullType": "ttn.lorawan.v3.KeyEnvelope",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -8063,7 +9658,19 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
             },
             {
               "name": "provisioning_data",
@@ -8207,7 +9814,15 @@
               "longType": "bytes",
               "fullType": "bytes",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.max_len",
+                    "value": 2048
+                  }
+                ]
+              }
             },
             {
               "name": "dev_eui",
@@ -8514,7 +10129,7 @@
           "fields": [
             {
               "name": "key",
-              "description": "The (encrypted) key.",
+              "description": "The unencrypted AES key.",
               "label": "",
               "type": "bytes",
               "longType": "bytes",
@@ -8529,6 +10144,16 @@
               "type": "string",
               "longType": "string",
               "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "encrypted_key",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
               "ismap": false,
               "defaultValue": ""
             }
@@ -8551,7 +10176,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 2048
+                  }
+                ]
+              }
             },
             {
               "name": "app_key",
@@ -8592,7 +10225,15 @@
               "longType": "bytes",
               "fullType": "bytes",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.max_len",
+                    "value": 2048
+                  }
+                ]
+              }
             },
             {
               "name": "f_nwk_s_int_key",
@@ -9272,6 +10913,11 @@
               "name": "MAC_V1_1",
               "number": "4",
               "description": ""
+            },
+            {
+              "name": "MAC_V1_0_3",
+              "number": "5",
+              "description": ""
             }
           ]
         },
@@ -9463,6 +11109,11 @@
             {
               "name": "PHY_V1_1_REV_B",
               "number": "6",
+              "description": ""
+            },
+            {
+              "name": "PHY_V1_0_3_REV_A",
+              "number": "7",
               "description": ""
             }
           ]
@@ -9913,7 +11564,15 @@
               "longType": "CFListType",
               "fullType": "ttn.lorawan.v3.CFListType",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "freq",
@@ -9954,7 +11613,15 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 7
+                  }
+                ]
+              }
             },
             {
               "name": "rx2_dr",
@@ -9964,7 +11631,15 @@
               "longType": "DataRateIndex",
               "fullType": "ttn.lorawan.v3.DataRateIndex",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "opt_neg",
@@ -10128,7 +11803,15 @@
               "longType": "FCtrl",
               "fullType": "ttn.lorawan.v3.FCtrl",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "f_cnt",
@@ -10138,7 +11821,15 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 65535
+                  }
+                ]
+              }
             },
             {
               "name": "f_opts",
@@ -10148,7 +11839,15 @@
               "longType": "bytes",
               "fullType": "bytes",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.max_len",
+                    "value": 15
+                  }
+                ]
+              }
             }
           ]
         },
@@ -10190,7 +11889,15 @@
               "longType": "GatewayIdentifiers",
               "fullType": "ttn.lorawan.v3.GatewayIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "antenna_index",
@@ -10261,7 +11968,15 @@
               "longType": "DLSettings",
               "fullType": "ttn.lorawan.v3.DLSettings",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "rx_delay",
@@ -10271,7 +11986,15 @@
               "longType": "RxDelay",
               "fullType": "ttn.lorawan.v3.RxDelay",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "cf_list",
@@ -10374,7 +12097,15 @@
               "longType": "MACCommandIdentifier",
               "fullType": "ttn.lorawan.v3.MACCommandIdentifier",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "raw_payload",
@@ -10705,7 +12436,15 @@
               "longType": "ADRAckLimitExponent",
               "fullType": "ttn.lorawan.v3.ADRAckLimitExponent",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "adr_ack_delay_exponent",
@@ -10715,7 +12454,15 @@
               "longType": "ADRAckDelayExponent",
               "fullType": "ttn.lorawan.v3.ADRAckDelayExponent",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -10757,7 +12504,15 @@
               "longType": "uint64",
               "fullType": "uint64",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint64.gte",
+                    "value": 100000
+                  }
+                ]
+              }
             }
           ]
         },
@@ -10778,7 +12533,15 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 65535
+                  }
+                ]
+              }
             },
             {
               "name": "channel_index",
@@ -10788,7 +12551,15 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 255
+                  }
+                ]
+              }
             }
           ]
         },
@@ -10840,7 +12611,15 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 255
+                  }
+                ]
+              }
             },
             {
               "name": "frequency",
@@ -10850,7 +12629,15 @@
               "longType": "uint64",
               "fullType": "uint64",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint64.gte",
+                    "value": 100000
+                  }
+                ]
+              }
             }
           ]
         },
@@ -10871,7 +12658,15 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 255
+                  }
+                ]
+              }
             },
             {
               "name": "margin",
@@ -10881,7 +12676,19 @@
               "longType": "int32",
               "fullType": "int32",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "int32.lte",
+                    "value": 31
+                  },
+                  {
+                    "name": "int32.gte",
+                    "value": -32
+                  }
+                ]
+              }
             }
           ]
         },
@@ -10902,7 +12709,15 @@
               "longType": "Class",
               "fullType": "ttn.lorawan.v3.Class",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -10923,7 +12738,15 @@
               "longType": "Class",
               "fullType": "ttn.lorawan.v3.Class",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -10944,7 +12767,15 @@
               "longType": "google.protobuf.Timestamp",
               "fullType": "google.protobuf.Timestamp",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -10965,7 +12796,15 @@
               "longType": "AggregatedDutyCycle",
               "fullType": "ttn.lorawan.v3.AggregatedDutyCycle",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -10986,7 +12825,15 @@
               "longType": "RejoinType",
               "fullType": "ttn.lorawan.v3.RejoinType",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "data_rate_index",
@@ -10996,7 +12843,15 @@
               "longType": "DataRateIndex",
               "fullType": "ttn.lorawan.v3.DataRateIndex",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "max_retries",
@@ -11006,7 +12861,15 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 7
+                  }
+                ]
+              }
             },
             {
               "name": "period_exponent",
@@ -11016,7 +12879,15 @@
               "longType": "RejoinPeriodExponent",
               "fullType": "ttn.lorawan.v3.RejoinPeriodExponent",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -11078,7 +12949,15 @@
               "longType": "DataRateIndex",
               "fullType": "ttn.lorawan.v3.DataRateIndex",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "tx_power_index",
@@ -11088,7 +12967,15 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 15
+                  }
+                ]
+              }
             },
             {
               "name": "channel_mask",
@@ -11098,7 +12985,15 @@
               "longType": "bool",
               "fullType": "bool",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.max_items",
+                    "value": 16
+                  }
+                ]
+              }
             },
             {
               "name": "channel_mask_control",
@@ -11108,7 +13003,15 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 7
+                  }
+                ]
+              }
             },
             {
               "name": "nb_trans",
@@ -11118,7 +13021,15 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 15
+                  }
+                ]
+              }
             }
           ]
         },
@@ -11139,7 +13050,15 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 254
+                  }
+                ]
+              }
             },
             {
               "name": "gateway_count",
@@ -11149,7 +13068,15 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 255
+                  }
+                ]
+              }
             }
           ]
         },
@@ -11201,7 +13128,15 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 255
+                  }
+                ]
+              }
             },
             {
               "name": "frequency",
@@ -11211,7 +13146,15 @@
               "longType": "uint64",
               "fullType": "uint64",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint64.gte",
+                    "value": 100000
+                  }
+                ]
+              }
             },
             {
               "name": "min_data_rate_index",
@@ -11221,7 +13164,15 @@
               "longType": "DataRateIndex",
               "fullType": "ttn.lorawan.v3.DataRateIndex",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "max_data_rate_index",
@@ -11231,7 +13182,15 @@
               "longType": "DataRateIndex",
               "fullType": "ttn.lorawan.v3.DataRateIndex",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -11283,7 +13242,15 @@
               "longType": "uint64",
               "fullType": "uint64",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint64.gte",
+                    "value": 100000
+                  }
+                ]
+              }
             },
             {
               "name": "data_rate_index",
@@ -11293,7 +13260,15 @@
               "longType": "DataRateIndex",
               "fullType": "ttn.lorawan.v3.DataRateIndex",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -11314,7 +13289,15 @@
               "longType": "PingSlotPeriod",
               "fullType": "ttn.lorawan.v3.PingSlotPeriod",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -11356,7 +13339,15 @@
               "longType": "RejoinCountExponent",
               "fullType": "ttn.lorawan.v3.RejoinCountExponent",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "max_time_exponent",
@@ -11366,7 +13357,15 @@
               "longType": "RejoinTimeExponent",
               "fullType": "ttn.lorawan.v3.RejoinTimeExponent",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -11387,7 +13386,15 @@
               "longType": "Minor",
               "fullType": "ttn.lorawan.v3.Minor",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -11408,7 +13415,15 @@
               "longType": "Minor",
               "fullType": "ttn.lorawan.v3.Minor",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -11429,7 +13444,15 @@
               "longType": "Minor",
               "fullType": "ttn.lorawan.v3.Minor",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -11450,7 +13473,15 @@
               "longType": "Minor",
               "fullType": "ttn.lorawan.v3.Minor",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -11512,7 +13543,15 @@
               "longType": "DataRateIndex",
               "fullType": "ttn.lorawan.v3.DataRateIndex",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "rx1_data_rate_offset",
@@ -11522,7 +13561,15 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 7
+                  }
+                ]
+              }
             },
             {
               "name": "rx2_frequency",
@@ -11532,7 +13579,15 @@
               "longType": "uint64",
               "fullType": "uint64",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint64.gte",
+                    "value": 100000
+                  }
+                ]
+              }
             }
           ]
         },
@@ -11553,7 +13608,15 @@
               "longType": "RxDelay",
               "fullType": "ttn.lorawan.v3.RxDelay",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -11574,7 +13637,15 @@
               "longType": "DeviceEIRP",
               "fullType": "ttn.lorawan.v3.DeviceEIRP",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "uplink_dwell_time",
@@ -11615,7 +13686,15 @@
               "longType": "FHDR",
               "fullType": "ttn.lorawan.v3.FHDR",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "f_port",
@@ -11625,7 +13704,15 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 255
+                  }
+                ]
+              }
             },
             {
               "name": "frm_payload",
@@ -11666,7 +13753,15 @@
               "longType": "MType",
               "fullType": "ttn.lorawan.v3.MType",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "major",
@@ -11676,7 +13771,15 @@
               "longType": "Major",
               "fullType": "ttn.lorawan.v3.Major",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -11697,7 +13800,15 @@
               "longType": "MHDR",
               "fullType": "ttn.lorawan.v3.MHDR",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "mic",
@@ -11707,7 +13818,10 @@
               "longType": "bytes",
               "fullType": "bytes",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": null
+              }
             },
             {
               "name": "mac_payload",
@@ -11768,7 +13882,15 @@
               "longType": "RejoinType",
               "fullType": "ttn.lorawan.v3.RejoinType",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "net_id",
@@ -11849,7 +13971,15 @@
               "longType": "RxDelay",
               "fullType": "ttn.lorawan.v3.RxDelay",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "rx1_data_rate_index",
@@ -11859,7 +13989,15 @@
               "longType": "DataRateIndex",
               "fullType": "ttn.lorawan.v3.DataRateIndex",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "rx1_frequency",
@@ -11879,7 +14017,15 @@
               "longType": "DataRateIndex",
               "fullType": "ttn.lorawan.v3.DataRateIndex",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "rx2_frequency",
@@ -11899,7 +14045,15 @@
               "longType": "TxSchedulePriority",
               "fullType": "ttn.lorawan.v3.TxSchedulePriority",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "absolute_time",
@@ -11940,7 +14094,15 @@
               "longType": "DataRate",
               "fullType": "ttn.lorawan.v3.DataRate",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "data_rate_index",
@@ -11950,7 +14112,15 @@
               "longType": "DataRateIndex",
               "fullType": "ttn.lorawan.v3.DataRateIndex",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "coding_rate",
@@ -12072,7 +14242,15 @@
               "longType": "GatewayAntennaIdentifiers",
               "fullType": "ttn.lorawan.v3.GatewayAntennaIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "timestamp",
@@ -12117,7 +14295,15 @@
               "longType": "EndDeviceIdentifiers",
               "fullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "end_device_version_ids",
@@ -12127,7 +14313,15 @@
               "longType": "EndDeviceVersionIdentifiers",
               "fullType": "ttn.lorawan.v3.EndDeviceVersionIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "message",
@@ -12137,7 +14331,15 @@
               "longType": "ApplicationDownlink",
               "fullType": "ttn.lorawan.v3.ApplicationDownlink",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "parameter",
@@ -12168,7 +14370,15 @@
               "longType": "EndDeviceIdentifiers",
               "fullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "end_device_version_ids",
@@ -12178,7 +14388,15 @@
               "longType": "EndDeviceVersionIdentifiers",
               "fullType": "ttn.lorawan.v3.EndDeviceVersionIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "message",
@@ -12188,7 +14406,15 @@
               "longType": "ApplicationUplink",
               "fullType": "ttn.lorawan.v3.ApplicationUplink",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "parameter",
@@ -12361,7 +14587,15 @@
               "longType": "bytes",
               "fullType": "bytes",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.max_len",
+                    "value": 2048
+                  }
+                ]
+              }
             },
             {
               "name": "f_port",
@@ -12371,7 +14605,15 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 255
+                  }
+                ]
+              }
             },
             {
               "name": "f_cnt",
@@ -12431,7 +14673,15 @@
               "longType": "TxSchedulePriority",
               "fullType": "ttn.lorawan.v3.TxSchedulePriority",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "correlation_ids",
@@ -12441,7 +14691,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.items.string.max_len",
+                    "value": 100
+                  }
+                ]
+              }
             }
           ]
         },
@@ -12493,7 +14751,15 @@
               "longType": "ApplicationDownlink",
               "fullType": "ttn.lorawan.v3.ApplicationDownlink",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "error",
@@ -12503,7 +14769,15 @@
               "longType": "ErrorDetails",
               "fullType": "ttn.lorawan.v3.ErrorDetails",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -12545,7 +14819,15 @@
               "longType": "ApplicationDownlink",
               "fullType": "ttn.lorawan.v3.ApplicationDownlink",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.min_items",
+                    "value": 1
+                  }
+                ]
+              }
             },
             {
               "name": "last_f_cnt_down",
@@ -12576,7 +14858,15 @@
               "longType": "bytes",
               "fullType": "bytes",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.max_len",
+                    "value": 2048
+                  }
+                ]
+              }
             },
             {
               "name": "app_s_key",
@@ -12637,7 +14927,15 @@
               "longType": "Location",
               "fullType": "ttn.lorawan.v3.Location",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "attributes",
@@ -12647,7 +14945,19 @@
               "longType": "ApplicationLocation.AttributesEntry",
               "fullType": "ttn.lorawan.v3.ApplicationLocation.AttributesEntry",
               "ismap": true,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "map.keys.string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "map.keys.string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
             }
           ]
         },
@@ -12699,7 +15009,15 @@
               "longType": "EndDeviceIdentifiers",
               "fullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "correlation_ids",
@@ -12708,6 +15026,24 @@
               "type": "string",
               "longType": "string",
               "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.items.string.max_len",
+                    "value": 100
+                  }
+                ]
+              }
+            },
+            {
+              "name": "received_at",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
               "ismap": false,
               "defaultValue": ""
             },
@@ -12820,7 +15156,15 @@
               "longType": "bytes",
               "fullType": "bytes",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.max_len",
+                    "value": 2048
+                  }
+                ]
+              }
             },
             {
               "name": "f_port",
@@ -12830,7 +15174,15 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 255
+                  }
+                ]
+              }
             },
             {
               "name": "f_cnt",
@@ -12870,7 +15222,15 @@
               "longType": "RxMetadata",
               "fullType": "ttn.lorawan.v3.RxMetadata",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.min_items",
+                    "value": 1
+                  }
+                ]
+              }
             },
             {
               "name": "settings",
@@ -12880,7 +15240,15 @@
               "longType": "TxSettings",
               "fullType": "ttn.lorawan.v3.TxSettings",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -12951,7 +15319,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.items.string.max_len",
+                    "value": 100
+                  }
+                ]
+              }
             }
           ]
         },
@@ -13003,7 +15379,15 @@
               "longType": "PayloadFormatter",
               "fullType": "ttn.lorawan.v3.PayloadFormatter",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "up_formatter_parameter",
@@ -13023,7 +15407,15 @@
               "longType": "PayloadFormatter",
               "fullType": "ttn.lorawan.v3.PayloadFormatter",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "down_formatter_parameter",
@@ -13054,7 +15446,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.items.string.max_len",
+                    "value": 100
+                  }
+                ]
+              }
             },
             {
               "name": "result",
@@ -13064,7 +15464,15 @@
               "longType": "TxAcknowledgment.Result",
               "fullType": "ttn.lorawan.v3.TxAcknowledgment.Result",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -13105,7 +15513,15 @@
               "longType": "TxSettings",
               "fullType": "ttn.lorawan.v3.TxSettings",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "rx_metadata",
@@ -13115,11 +15531,19 @@
               "longType": "RxMetadata",
               "fullType": "ttn.lorawan.v3.RxMetadata",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.min_items",
+                    "value": 1
+                  }
+                ]
+              }
             },
             {
               "name": "received_at",
-              "description": "Server time when a component received the message.\nThe Gateway Server, Network Server and Application Server may set this value to their local server time of reception.",
+              "description": "Server time when a component received the message.\nThe Gateway Server and Network Server set this value to their local server time of reception.",
               "label": "",
               "type": "Timestamp",
               "longType": "google.protobuf.Timestamp",
@@ -13135,7 +15559,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.items.string.max_len",
+                    "value": 100
+                  }
+                ]
+              }
             },
             {
               "name": "gateway_channel_index",
@@ -13145,7 +15577,15 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 255
+                  }
+                ]
+              }
             },
             {
               "name": "device_channel_index",
@@ -13155,7 +15595,15 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 255
+                  }
+                ]
+              }
             }
           ]
         }
@@ -13244,7 +15692,19 @@
               "longType": "double",
               "fullType": "double",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "double.lte",
+                    "value": 90
+                  },
+                  {
+                    "name": "double.gte",
+                    "value": -90
+                  }
+                ]
+              }
             },
             {
               "name": "longitude",
@@ -13254,7 +15714,19 @@
               "longType": "double",
               "fullType": "double",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "double.lte",
+                    "value": 180
+                  },
+                  {
+                    "name": "double.gte",
+                    "value": -180
+                  }
+                ]
+              }
             },
             {
               "name": "altitude",
@@ -13284,7 +15756,15 @@
               "longType": "LocationSource",
               "fullType": "ttn.lorawan.v3.LocationSource",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -13305,7 +15785,15 @@
               "longType": "GatewayIdentifiers",
               "fullType": "ttn.lorawan.v3.GatewayIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "antenna_index",
@@ -13435,7 +15923,15 @@
               "longType": "DownlinkPathConstraint",
               "fullType": "ttn.lorawan.v3.DownlinkPathConstraint",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "uplink_token",
@@ -13660,7 +16156,15 @@
               "longType": "UserIdentifiers",
               "fullType": "ttn.lorawan.v3.UserIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "client_ids",
@@ -13670,7 +16174,15 @@
               "longType": "ClientIdentifiers",
               "fullType": "ttn.lorawan.v3.ClientIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "order",
@@ -13690,7 +16202,15 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 1000
+                  }
+                ]
+              }
             },
             {
               "name": "page",
@@ -13721,7 +16241,15 @@
               "longType": "UserIdentifiers",
               "fullType": "ttn.lorawan.v3.UserIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "order",
@@ -13741,7 +16269,15 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 1000
+                  }
+                ]
+              }
             },
             {
               "name": "page",
@@ -13772,7 +16308,15 @@
               "longType": "UserIdentifiers",
               "fullType": "ttn.lorawan.v3.UserIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "client_ids",
@@ -13782,7 +16326,15 @@
               "longType": "ClientIdentifiers",
               "fullType": "ttn.lorawan.v3.ClientIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "id",
@@ -13863,7 +16415,15 @@
               "longType": "UserIdentifiers",
               "fullType": "ttn.lorawan.v3.UserIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "client_ids",
@@ -13873,7 +16433,15 @@
               "longType": "ClientIdentifiers",
               "fullType": "ttn.lorawan.v3.ClientIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "id",
@@ -13925,7 +16493,15 @@
               "longType": "UserIdentifiers",
               "fullType": "ttn.lorawan.v3.UserIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "client_ids",
@@ -13935,7 +16511,15 @@
               "longType": "ClientIdentifiers",
               "fullType": "ttn.lorawan.v3.ClientIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "rights",
@@ -13965,7 +16549,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.uri_ref",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "state",
@@ -14016,7 +16608,15 @@
               "longType": "UserIdentifiers",
               "fullType": "ttn.lorawan.v3.UserIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "client_ids",
@@ -14026,7 +16626,15 @@
               "longType": "ClientIdentifiers",
               "fullType": "ttn.lorawan.v3.ClientIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "rights",
@@ -14077,7 +16685,15 @@
               "longType": "UserIdentifiers",
               "fullType": "ttn.lorawan.v3.UserIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "client_ids",
@@ -14087,7 +16703,15 @@
               "longType": "ClientIdentifiers",
               "fullType": "ttn.lorawan.v3.ClientIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -14253,7 +16877,15 @@
               "longType": "OrganizationIdentifiers",
               "fullType": "ttn.lorawan.v3.OrganizationIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "name",
@@ -14263,7 +16895,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 50
+                  }
+                ]
+              }
             },
             {
               "name": "rights",
@@ -14273,7 +16913,15 @@
               "longType": "Right",
               "fullType": "ttn.lorawan.v3.Right",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.items.enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -14294,7 +16942,15 @@
               "longType": "Organization",
               "fullType": "ttn.lorawan.v3.Organization",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "collaborator",
@@ -14304,7 +16960,15 @@
               "longType": "OrganizationOrUserIdentifiers",
               "fullType": "ttn.lorawan.v3.OrganizationOrUserIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -14325,7 +16989,15 @@
               "longType": "OrganizationIdentifiers",
               "fullType": "ttn.lorawan.v3.OrganizationIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "field_mask",
@@ -14356,7 +17028,15 @@
               "longType": "OrganizationIdentifiers",
               "fullType": "ttn.lorawan.v3.OrganizationIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "limit",
@@ -14366,7 +17046,15 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 1000
+                  }
+                ]
+              }
             },
             {
               "name": "page",
@@ -14397,7 +17085,15 @@
               "longType": "OrganizationIdentifiers",
               "fullType": "ttn.lorawan.v3.OrganizationIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "limit",
@@ -14407,7 +17103,15 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 1000
+                  }
+                ]
+              }
             },
             {
               "name": "page",
@@ -14468,7 +17172,15 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 1000
+                  }
+                ]
+              }
             },
             {
               "name": "page",
@@ -14499,7 +17211,15 @@
               "longType": "OrganizationIdentifiers",
               "fullType": "ttn.lorawan.v3.OrganizationIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "created_at",
@@ -14529,7 +17249,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 50
+                  }
+                ]
+              }
             },
             {
               "name": "description",
@@ -14539,7 +17267,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 2000
+                  }
+                ]
+              }
             },
             {
               "name": "attributes",
@@ -14549,7 +17285,19 @@
               "longType": "Organization.AttributesEntry",
               "fullType": "ttn.lorawan.v3.Organization.AttributesEntry",
               "ismap": true,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "map.keys.string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "map.keys.string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
             },
             {
               "name": "contact_info",
@@ -14632,7 +17380,15 @@
               "longType": "OrganizationIdentifiers",
               "fullType": "ttn.lorawan.v3.OrganizationIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "collaborator",
@@ -14642,7 +17398,15 @@
               "longType": "Collaborator",
               "fullType": "ttn.lorawan.v3.Collaborator",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -14663,7 +17427,15 @@
               "longType": "OrganizationIdentifiers",
               "fullType": "ttn.lorawan.v3.OrganizationIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "api_key",
@@ -14673,7 +17445,15 @@
               "longType": "APIKey",
               "fullType": "ttn.lorawan.v3.APIKey",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -14694,7 +17474,15 @@
               "longType": "Organization",
               "fullType": "ttn.lorawan.v3.Organization",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "field_mask",
@@ -15578,7 +18366,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 50
+                  }
+                ]
+              }
             },
             {
               "name": "rights",
@@ -15588,7 +18384,15 @@
               "longType": "Right",
               "fullType": "ttn.lorawan.v3.Right",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.items.enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -15630,7 +18434,15 @@
               "longType": "OrganizationOrUserIdentifiers",
               "fullType": "ttn.lorawan.v3.OrganizationOrUserIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "rights",
@@ -15640,7 +18452,15 @@
               "longType": "Right",
               "fullType": "ttn.lorawan.v3.Right",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.items.enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -15682,7 +18502,15 @@
               "longType": "Right",
               "fullType": "ttn.lorawan.v3.Right",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.items.enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         }
@@ -15717,7 +18545,15 @@
               "longType": "ApplicationIdentifiers",
               "fullType": "ttn.lorawan.v3.ApplicationIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "id_contains",
@@ -15757,7 +18593,19 @@
               "longType": "SearchEndDevicesRequest.AttributesContainEntry",
               "fullType": "ttn.lorawan.v3.SearchEndDevicesRequest.AttributesContainEntry",
               "ismap": true,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "map.keys.string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "map.keys.string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
             },
             {
               "name": "dev_eui_contains",
@@ -15879,7 +18727,19 @@
               "longType": "SearchEntitiesRequest.AttributesContainEntry",
               "fullType": "ttn.lorawan.v3.SearchEntitiesRequest.AttributesContainEntry",
               "ismap": true,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "map.keys.string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "map.keys.string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
             },
             {
               "name": "field_mask",
@@ -16104,7 +18964,15 @@
               "longType": "UserIdentifiers",
               "fullType": "ttn.lorawan.v3.UserIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -16125,7 +18993,15 @@
               "longType": "UserIdentifiers",
               "fullType": "ttn.lorawan.v3.UserIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "name",
@@ -16135,7 +19011,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 50
+                  }
+                ]
+              }
             },
             {
               "name": "rights",
@@ -16145,7 +19029,15 @@
               "longType": "Right",
               "fullType": "ttn.lorawan.v3.Right",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.items.enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -16166,7 +19058,15 @@
               "longType": "User",
               "fullType": "ttn.lorawan.v3.User",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "invitation_token",
@@ -16197,7 +19097,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.email",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -16218,7 +19126,15 @@
               "longType": "UserIdentifiers",
               "fullType": "ttn.lorawan.v3.UserIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "field_mask",
@@ -16249,7 +19165,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.email",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "token",
@@ -16351,7 +19275,15 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 1000
+                  }
+                ]
+              }
             },
             {
               "name": "page",
@@ -16382,7 +19314,15 @@
               "longType": "UserIdentifiers",
               "fullType": "ttn.lorawan.v3.UserIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "limit",
@@ -16392,7 +19332,15 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 1000
+                  }
+                ]
+              }
             },
             {
               "name": "page",
@@ -16423,7 +19371,15 @@
               "longType": "UserIdentifiers",
               "fullType": "ttn.lorawan.v3.UserIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "order",
@@ -16443,7 +19399,15 @@
               "longType": "uint32",
               "fullType": "uint32",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 1000
+                  }
+                ]
+              }
             },
             {
               "name": "page",
@@ -16484,7 +19448,15 @@
               "longType": "Picture.SizesEntry",
               "fullType": "ttn.lorawan.v3.Picture.SizesEntry",
               "ismap": true,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "map.values.string.uri_ref",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -16567,7 +19539,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.email",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -16588,7 +19568,15 @@
               "longType": "UserIdentifiers",
               "fullType": "ttn.lorawan.v3.UserIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "api_key",
@@ -16598,7 +19586,15 @@
               "longType": "APIKey",
               "fullType": "ttn.lorawan.v3.APIKey",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -16619,7 +19615,15 @@
               "longType": "UserIdentifiers",
               "fullType": "ttn.lorawan.v3.UserIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "new",
@@ -16660,7 +19664,15 @@
               "longType": "User",
               "fullType": "ttn.lorawan.v3.User",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "field_mask",
@@ -16691,7 +19703,15 @@
               "longType": "UserIdentifiers",
               "fullType": "ttn.lorawan.v3.UserIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "created_at",
@@ -16721,7 +19741,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 50
+                  }
+                ]
+              }
             },
             {
               "name": "description",
@@ -16731,7 +19759,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 2000
+                  }
+                ]
+              }
             },
             {
               "name": "attributes",
@@ -16741,7 +19777,19 @@
               "longType": "User.AttributesEntry",
               "fullType": "ttn.lorawan.v3.User.AttributesEntry",
               "ismap": true,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "map.keys.string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "map.keys.string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
             },
             {
               "name": "contact_info",
@@ -16761,7 +19809,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.email",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "primary_email_address_validated_at",
@@ -16811,7 +19867,15 @@
               "longType": "State",
               "fullType": "ttn.lorawan.v3.State",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "admin",
@@ -16913,7 +19977,15 @@
               "longType": "UserIdentifiers",
               "fullType": "ttn.lorawan.v3.UserIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "session_id",
@@ -16923,7 +19995,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 64
+                  }
+                ]
+              }
             },
             {
               "name": "created_at",
@@ -16974,7 +20054,15 @@
               "longType": "UserIdentifiers",
               "fullType": "ttn.lorawan.v3.UserIdentifiers",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "session_id",
@@ -16984,7 +20072,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 64
+                  }
+                ]
+              }
             }
           ]
         },

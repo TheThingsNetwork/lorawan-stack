@@ -712,6 +712,15 @@ func (dst *ApplicationUp) SetFields(src *ApplicationUp, paths ...string) error {
 			} else {
 				dst.CorrelationIDs = nil
 			}
+		case "received_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'received_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ReceivedAt = src.ReceivedAt
+			} else {
+				dst.ReceivedAt = nil
+			}
 
 		case "up":
 			if len(subs) == 0 && src == nil {

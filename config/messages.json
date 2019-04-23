@@ -1349,6 +1349,15 @@
       "file": "root.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:unknown_host": {
+    "translations": {
+      "en": "unknown host `{host}` for current credentials"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "root.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/internal/util:flag_value": {
     "translations": {
       "en": "invalid flag value"
@@ -2402,6 +2411,15 @@
       "file": "attributes.go"
     }
   },
+  "error:pkg/errors:validation": {
+    "translations": {
+      "en": "invalid `{field}`: {reason}"
+    },
+    "description": {
+      "package": "pkg/errors",
+      "file": "validation.go"
+    }
+  },
   "error:pkg/fetch:fetch_file": {
     "translations": {
       "en": "could not fetch file `{filename}`"
@@ -3104,6 +3122,15 @@
       "file": "contact_info_store.go"
     }
   },
+  "error:pkg/identityserver:access_token_mismatch": {
+    "translations": {
+      "en": "access token ID did not match user or client identifiers"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "oauth_registry.go"
+    }
+  },
   "error:pkg/identityserver:api_key_not_found": {
     "translations": {
       "en": "API key not found"
@@ -3111,6 +3138,15 @@
     "description": {
       "package": "pkg/identityserver",
       "file": "entity_access.go"
+    }
+  },
+  "error:pkg/identityserver:application_has_devices": {
+    "translations": {
+      "en": "application still has `{count}` devices"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "application_registry.go"
     }
   },
   "error:pkg/identityserver:client_update_admin_field": {
@@ -4427,6 +4463,42 @@
       "file": "javascript.go"
     }
   },
+  "error:pkg/toa:bandwidth": {
+    "translations": {
+      "en": "invalid bandwidth"
+    },
+    "description": {
+      "package": "pkg/toa",
+      "file": "toa.go"
+    }
+  },
+  "error:pkg/toa:coding_rate": {
+    "translations": {
+      "en": "invalid coding rate"
+    },
+    "description": {
+      "package": "pkg/toa",
+      "file": "toa.go"
+    }
+  },
+  "error:pkg/toa:frequency": {
+    "translations": {
+      "en": "invalid frequency"
+    },
+    "description": {
+      "package": "pkg/toa",
+      "file": "toa.go"
+    }
+  },
+  "error:pkg/toa:spreading_factor": {
+    "translations": {
+      "en": "invalid spreading factor"
+    },
+    "description": {
+      "package": "pkg/toa",
+      "file": "toa.go"
+    }
+  },
   "error:pkg/ttnpb/udp:bandwidth": {
     "translations": {
       "en": "failed to parse bandwidth"
@@ -4688,24 +4760,6 @@
       "file": "unique.go"
     }
   },
-  "error:pkg/validate:bandwidth": {
-    "translations": {
-      "en": "invalid bandwidth"
-    },
-    "description": {
-      "package": "pkg/validate",
-      "file": "lorawan.go"
-    }
-  },
-  "error:pkg/validate:coding_rate": {
-    "translations": {
-      "en": "invalid coding rate"
-    },
-    "description": {
-      "package": "pkg/validate",
-      "file": "lorawan.go"
-    }
-  },
   "error:pkg/validate:email": {
     "translations": {
       "en": "`{email}` is not a valid email."
@@ -4830,15 +4884,6 @@
     "description": {
       "package": "pkg/validate",
       "file": "validate.go"
-    }
-  },
-  "error:pkg/validate:spreading_factor": {
-    "translations": {
-      "en": "invalid spreading factor"
-    },
-    "description": {
-      "package": "pkg/validate",
-      "file": "lorawan.go"
     }
   },
   "error:pkg/web/middleware:http_recovered": {

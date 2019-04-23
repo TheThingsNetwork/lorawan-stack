@@ -211,10 +211,10 @@ func handleUplinkTest() func(t *testing.T) {
 					DevAddr: DevAddr,
 					SessionKeys: ttnpb.SessionKeys{
 						FNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: FNwkSIntKey[:],
+							Key: &FNwkSIntKey,
 						},
 						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: SNwkSIntKey[:],
+							Key: &SNwkSIntKey,
 						},
 					},
 				},
@@ -297,10 +297,10 @@ func handleUplinkTest() func(t *testing.T) {
 					DevAddr: DevAddr,
 					SessionKeys: ttnpb.SessionKeys{
 						FNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: FNwkSIntKey[:],
+							Key: &FNwkSIntKey,
 						},
 						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: SNwkSIntKey[:],
+							Key: &SNwkSIntKey,
 						},
 					},
 				},
@@ -440,10 +440,10 @@ func handleUplinkTest() func(t *testing.T) {
 						LastFCntUp: 0x41,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: FNwkSIntKey[:],
+								Key: &FNwkSIntKey,
 							},
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey[:],
+								Key: &NwkSEncKey,
 							},
 						},
 					},
@@ -547,10 +547,10 @@ func handleUplinkTest() func(t *testing.T) {
 						LastFCntUp: 0x42424249,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: FNwkSIntKey[:],
+								Key: &FNwkSIntKey,
 							},
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey[:],
+								Key: &NwkSEncKey,
 							},
 						},
 					},
@@ -652,10 +652,10 @@ func handleUplinkTest() func(t *testing.T) {
 						LastFCntUp: 0x41,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: FNwkSIntKey[:],
+								Key: &FNwkSIntKey,
 							},
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey[:],
+								Key: &NwkSEncKey,
 							},
 						},
 					},
@@ -765,10 +765,10 @@ func handleUplinkTest() func(t *testing.T) {
 						LastFCntUp: 0x42424249,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: FNwkSIntKey[:],
+								Key: &FNwkSIntKey,
 							},
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey[:],
+								Key: &NwkSEncKey,
 							},
 						},
 					},
@@ -874,13 +874,13 @@ func handleUplinkTest() func(t *testing.T) {
 						LastFCntUp: 0x41,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: FNwkSIntKey[:],
+								Key: &FNwkSIntKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: SNwkSIntKey[:],
+								Key: &SNwkSIntKey,
 							},
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey[:],
+								Key: &NwkSEncKey,
 							},
 						},
 					},
@@ -991,13 +991,13 @@ func handleUplinkTest() func(t *testing.T) {
 						LastConfFCntDown: 0x24,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: FNwkSIntKey[:],
+								Key: &FNwkSIntKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: SNwkSIntKey[:],
+								Key: &SNwkSIntKey,
 							},
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey[:],
+								Key: &NwkSEncKey,
 							},
 						},
 					},
@@ -1120,13 +1120,13 @@ func handleUplinkTest() func(t *testing.T) {
 						LastFCntUp: 0x42424249,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: FNwkSIntKey[:],
+								Key: &FNwkSIntKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: SNwkSIntKey[:],
+								Key: &SNwkSIntKey,
 							},
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey[:],
+								Key: &NwkSEncKey,
 							},
 						},
 					},
@@ -1241,13 +1241,13 @@ func handleUplinkTest() func(t *testing.T) {
 						LastConfFCntDown: 0x24,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: FNwkSIntKey[:],
+								Key: &FNwkSIntKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: SNwkSIntKey[:],
+								Key: &SNwkSIntKey,
 							},
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey[:],
+								Key: &NwkSEncKey,
 							},
 						},
 					},
@@ -1304,15 +1304,15 @@ func handleUplinkTest() func(t *testing.T) {
 
 				populateSessionKeys := func(s *ttnpb.Session) {
 					for s.SessionKeys.FNwkSIntKey == nil ||
-						len(s.SessionKeys.FNwkSIntKey.Key) == 0 ||
-						s.SessionKeys.FNwkSIntKey.KEKLabel == "" && bytes.Equal(s.SessionKeys.FNwkSIntKey.Key, FNwkSIntKey[:]) {
+						s.SessionKeys.FNwkSIntKey.Key.IsZero() ||
+						s.SessionKeys.FNwkSIntKey.KEKLabel == "" && *s.SessionKeys.FNwkSIntKey.Key == FNwkSIntKey {
 
 						s.SessionKeys.FNwkSIntKey = ttnpb.NewPopulatedKeyEnvelope(test.Randy, false)
 					}
 
 					for s.SessionKeys.SNwkSIntKey == nil ||
-						len(s.SessionKeys.SNwkSIntKey.Key) == 0 ||
-						s.SessionKeys.SNwkSIntKey.KEKLabel == "" && bytes.Equal(s.SessionKeys.SNwkSIntKey.Key, SNwkSIntKey[:]) {
+						s.SessionKeys.SNwkSIntKey.Key.IsZero() ||
+						s.SessionKeys.SNwkSIntKey.KEKLabel == "" && *s.SessionKeys.SNwkSIntKey.Key == SNwkSIntKey {
 
 						s.SessionKeys.SNwkSIntKey = ttnpb.NewPopulatedKeyEnvelope(test.Randy, false)
 					}
@@ -1547,6 +1547,7 @@ func handleUplinkTest() func(t *testing.T) {
 					a.So(asUpReq.up, should.Resemble, &ttnpb.ApplicationUp{
 						EndDeviceIdentifiers: pb.EndDeviceIdentifiers,
 						CorrelationIDs:       asUpReq.up.CorrelationIDs,
+						ReceivedAt:           asUpReq.up.ReceivedAt,
 						Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
 							FCnt:         tc.NextFCntUp,
 							FPort:        tc.UplinkMessage.Payload.GetMACPayload().FPort,
@@ -1702,6 +1703,7 @@ func handleUplinkTest() func(t *testing.T) {
 						a.So(asUpReq.up, should.Resemble, &ttnpb.ApplicationUp{
 							EndDeviceIdentifiers: pb.EndDeviceIdentifiers,
 							CorrelationIDs:       asUpReq.up.CorrelationIDs,
+							ReceivedAt:           asUpReq.up.ReceivedAt,
 							Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
 								FCnt:         tc.NextFCntUp,
 								FPort:        tc.UplinkMessage.Payload.GetMACPayload().FPort,
@@ -2261,6 +2263,7 @@ func handleJoinTest() func(t *testing.T) {
 							JoinEUI:                pb.EndDeviceIdentifiers.JoinEUI,
 							DevAddr:                &expectedRequest.DevAddr,
 						},
+						ReceivedAt: up.ReceivedAt,
 						Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
 							AppSKey:              resp.SessionKeys.AppSKey,
 							SessionKeyID:         resp.SessionKeys.SessionKeyID,
@@ -2344,7 +2347,6 @@ func handleJoinTest() func(t *testing.T) {
 					select {
 					case up := <-asSendCh:
 						a.So(up.CorrelationIDs, should.NotBeEmpty)
-
 						a.So(up, should.HaveEmptyDiff, &ttnpb.ApplicationUp{
 							CorrelationIDs: up.CorrelationIDs,
 							EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -2354,6 +2356,7 @@ func handleJoinTest() func(t *testing.T) {
 								JoinEUI:                tc.Device.EndDeviceIdentifiers.JoinEUI,
 								ApplicationIdentifiers: tc.Device.EndDeviceIdentifiers.ApplicationIdentifiers,
 							},
+							ReceivedAt: up.ReceivedAt,
 							Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
 								AppSKey:      resp.SessionKeys.AppSKey,
 								SessionKeyID: resp.SessionKeys.SessionKeyID,

@@ -16,7 +16,43 @@ package ttnpb
 
 import (
 	"context"
+	"strconv"
+	"strings"
 )
+
+// MarshalText implements encoding.TextMarshaler interface.
+func (v GrantType) MarshalText() ([]byte, error) {
+	return []byte(v.String()), nil
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler interface.
+func (v *GrantType) UnmarshalText(b []byte) error {
+	s := string(b)
+	if i, ok := GrantType_value[s]; ok {
+		*v = GrantType(i)
+		return nil
+	}
+	if !strings.HasPrefix(s, "GRANT_") {
+		if i, ok := GrantType_value["GRANT_"+s]; ok {
+			*v = GrantType(i)
+			return nil
+		}
+	}
+	return errCouldNotParse("GrantType")(string(b))
+}
+
+// UnmarshalJSON implements json.Unmarshaler interface.
+func (v *GrantType) UnmarshalJSON(b []byte) error {
+	if len(b) > 2 && b[0] == '"' && b[len(b)-1] == '"' {
+		return v.UnmarshalText(b[1 : len(b)-1])
+	}
+	i, err := strconv.Atoi(string(b))
+	if err != nil {
+		return errCouldNotParse("GrantType")(string(b)).WithCause(err)
+	}
+	*v = GrantType(i)
+	return nil
+}
 
 // ValidateContext wraps the generated validator with (optionally context-based) custom checks.
 func (m *UpdateClientRequest) ValidateContext(context.Context) error {

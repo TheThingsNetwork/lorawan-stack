@@ -15,6 +15,8 @@
 package events
 
 import (
+	"context"
+
 	"github.com/prometheus/client_golang/prometheus"
 	"go.thethings.network/lorawan-stack/pkg/metrics"
 )
@@ -47,6 +49,13 @@ var channelDropped = metrics.NewContextualCounterVec(
 	},
 	[]string{"name"},
 )
+
+func initMetrics(name string) {
+	ctx := context.Background()
+	publishes.WithLabelValues(ctx, name).Add(0)
+	subscriptions.WithLabelValues(name).Add(0)
+	channelDropped.WithLabelValues(ctx, name).Add(0)
+}
 
 func init() {
 	metrics.MustRegister(publishes, subscriptions, channelDropped)

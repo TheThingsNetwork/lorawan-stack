@@ -30,9 +30,11 @@ var (
 	ErrNoSNwkSIntKey     = errNoSNwkSIntKey
 	ErrRegistryOperation = errRegistryOperation
 	ErrReuseDevNonce     = errReuseDevNonce
-
-	KeyToBytes = keyToBytes
 )
+
+func KeyToBytes(key types.AES128Key) []byte { return key[:] }
+
+func KeyPtr(key types.AES128Key) *types.AES128Key { return &key }
 
 type AsJsServer = asJsServer
 type NsJsServer = nsJsServer

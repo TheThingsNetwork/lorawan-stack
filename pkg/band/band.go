@@ -139,6 +139,7 @@ type Band struct {
 
 	DataRates [16]DataRate
 
+	FreqMultiplier   uint64
 	ImplementsCFList bool
 	CFListType       ttnpb.CFListType
 
@@ -171,6 +172,9 @@ type Band struct {
 
 	// DefaultMaxEIRP in dBm
 	DefaultMaxEIRP float32
+
+	// LoRaCodingRate is the coding rate used for LoRa modulation.
+	LoRaCodingRate string
 
 	// Rx1Channel computes the Rx1 channel index.
 	Rx1Channel func(uint8) (uint8, error)

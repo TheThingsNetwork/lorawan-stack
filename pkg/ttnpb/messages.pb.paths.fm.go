@@ -239,6 +239,7 @@ var ApplicationLocationFieldPathsTopLevel = []string{
 }
 var ApplicationJoinAcceptFieldPathsNested = []string{
 	"app_s_key",
+	"app_s_key.encrypted_key",
 	"app_s_key.kek_label",
 	"app_s_key.key",
 	"invalidated_downlinks",
@@ -333,6 +334,7 @@ var ApplicationUpFieldPathsNested = []string{
 	"end_device_ids.dev_eui",
 	"end_device_ids.device_id",
 	"end_device_ids.join_eui",
+	"received_at",
 	"up",
 	"up.downlink_ack",
 	"up.downlink_ack.class_b_c",
@@ -412,6 +414,7 @@ var ApplicationUpFieldPathsNested = []string{
 	"up.downlink_sent.session_key_id",
 	"up.join_accept",
 	"up.join_accept.app_s_key",
+	"up.join_accept.app_s_key.encrypted_key",
 	"up.join_accept.app_s_key.kek_label",
 	"up.join_accept.app_s_key.key",
 	"up.join_accept.invalidated_downlinks",
@@ -456,6 +459,7 @@ var ApplicationUpFieldPathsNested = []string{
 var ApplicationUpFieldPathsTopLevel = []string{
 	"correlation_ids",
 	"end_device_ids",
+	"received_at",
 	"up",
 }
 var MessagePayloadFormattersFieldPathsNested = []string{

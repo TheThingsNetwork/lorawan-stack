@@ -28,7 +28,7 @@ func PrintStack(w io.Writer, err error) {
 		if i == 0 {
 			fmt.Fprintln(w, err)
 		} else {
-			fmt.Fprintf(w, "--- %s", err)
+			fmt.Fprintf(w, "--- %s\n", err)
 		}
 		for k, v := range errors.Attributes(err) {
 			fmt.Fprintf(os.Stderr, "    %s=%v\n", k, v)

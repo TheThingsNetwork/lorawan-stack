@@ -37,6 +37,7 @@ const hardcoded = {
   access: 'lock',
   general_settings: 'settings',
   location: 'place',
+  user: 'person',
 }
 
 const Icon = function ({

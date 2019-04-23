@@ -17,10 +17,7 @@ package commands
 import (
 	"context"
 	stdio "io"
-	"net"
-	"net/url"
 	"os"
-	"strings"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
@@ -119,10 +116,16 @@ func getEndDeviceID(flagSet *pflag.FlagSet, args []string, requireID bool) (*ttn
 	return ids, nil
 }
 
-func generateKey(length int) []byte {
-	key := make([]byte, length)
-	random.Read(key)
-	return key
+func generateBytes(length int) []byte {
+	b := make([]byte, length)
+	random.Read(b)
+	return b
+}
+
+func generateKey() *types.AES128Key {
+	var key types.AES128Key
+	random.Read(key[:])
+	return &key
 }
 
 func generateDevAddr(netID types.NetID) (types.DevAddr, error) {
@@ -162,7 +165,7 @@ var (
 		},
 	}
 	endDevicesListCommand = &cobra.Command{
-		Use:     "list",
+		Use:     "list [application-id]",
 		Aliases: []string{"ls"},
 		Short:   "List end devices",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -194,7 +197,7 @@ var (
 		},
 	}
 	endDevicesGetCommand = &cobra.Command{
-		Use:     "get",
+		Use:     "get [application-id] [device-id]",
 		Aliases: []string{"info"},
 		Short:   "Get an end device",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -222,6 +225,7 @@ var (
 			if err != nil {
 				return err
 			}
+			logger.WithField("paths", isPaths).Debug("Get EndDevice from Identity Server")
 			device, err := ttnpb.NewEndDeviceRegistryClient(is).Get(ctx, &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: *devID,
 				FieldMask:            pbtypes.FieldMask{Paths: isPaths},
@@ -254,6 +258,7 @@ var (
 				return err
 			}
 
+			device.SetFields(res, "ids.dev_addr")
 			device.SetFields(res, append(append(nsPaths, asPaths...), jsPaths...)...)
 			if device.CreatedAt.IsZero() || (!res.CreatedAt.IsZero() && res.CreatedAt.Before(res.CreatedAt)) {
 				device.CreatedAt = res.CreatedAt
@@ -266,7 +271,7 @@ var (
 		},
 	}
 	endDevicesCreateCommand = &cobra.Command{
-		Use:     "create",
+		Use:     "create [application-id] [device-id]",
 		Aliases: []string{"add", "register"},
 		Short:   "Create an end device",
 		RunE: asBulk(func(cmd *cobra.Command, args []string) (err error) {
@@ -322,9 +327,9 @@ var (
 					device.Session = &ttnpb.Session{
 						DevAddr: devAddr,
 						SessionKeys: ttnpb.SessionKeys{
-							SessionKeyID: generateKey(16),
-							FNwkSIntKey:  &ttnpb.KeyEnvelope{Key: generateKey(16)},
-							AppSKey:      &ttnpb.KeyEnvelope{Key: generateKey(16)},
+							SessionKeyID: generateBytes(16),
+							FNwkSIntKey:  &ttnpb.KeyEnvelope{Key: generateKey()},
+							AppSKey:      &ttnpb.KeyEnvelope{Key: generateKey()},
 						},
 					}
 					paths = append(paths,
@@ -334,8 +339,8 @@ var (
 						"session.dev_addr",
 					)
 					if macVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
-						device.Session.SessionKeys.SNwkSIntKey = &ttnpb.KeyEnvelope{Key: generateKey(16)}
-						device.Session.SessionKeys.NwkSEncKey = &ttnpb.KeyEnvelope{Key: generateKey(16)}
+						device.Session.SessionKeys.SNwkSIntKey = &ttnpb.KeyEnvelope{Key: generateKey()}
+						device.Session.SessionKeys.NwkSEncKey = &ttnpb.KeyEnvelope{Key: generateKey()}
 						paths = append(paths,
 							"session.keys.s_nwk_s_int_key.key",
 							"session.keys.nwk_s_enc_key.key",
@@ -358,8 +363,8 @@ var (
 					// TODO: Set JoinEUI and DevEUI (https://github.com/TheThingsNetwork/lorawan-stack/issues/47).
 					device.RootKeys = &ttnpb.RootKeys{
 						RootKeyID: "ttn-lw-cli-generated",
-						AppKey:    &ttnpb.KeyEnvelope{Key: generateKey(16)},
-						NwkKey:    &ttnpb.KeyEnvelope{Key: generateKey(16)},
+						AppKey:    &ttnpb.KeyEnvelope{Key: generateKey()},
+						NwkKey:    &ttnpb.KeyEnvelope{Key: generateKey()},
 					}
 					paths = append(paths,
 						"root_keys.root_key_id",
@@ -439,7 +444,7 @@ var (
 		}),
 	}
 	endDevicesUpdateCommand = &cobra.Command{
-		Use:     "update",
+		Use:     "update [application-id] [device-id]",
 		Aliases: []string{"set"},
 		Short:   "Update an end device",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -481,6 +486,7 @@ var (
 			if err != nil {
 				return err
 			}
+			logger.WithField("paths", isPaths).Debug("Get EndDevice from Identity Server")
 			existingDevice, err := ttnpb.NewEndDeviceRegistryClient(is).Get(ctx, &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: *devID,
 				FieldMask:            pbtypes.FieldMask{Paths: isPaths},
@@ -526,7 +532,7 @@ var (
 		Use:   "provision",
 		Short: "Provision end devices using vendor-specific data",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			appID := getApplicationID(cmd.Flags(), args)
+			appID := getApplicationID(cmd.Flags(), nil)
 			if appID == nil {
 				return errNoApplicationID
 			}
@@ -618,7 +624,7 @@ var (
 		},
 	}
 	endDevicesDeleteCommand = &cobra.Command{
-		Use:   "delete",
+		Use:   "delete [application-id] [device-id]",
 		Short: "Delete an end device",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			devID, err := getEndDeviceID(cmd.Flags(), args, true)
@@ -726,22 +732,6 @@ func init() {
 	endDevicesCommand.AddCommand(applicationsDownlinkCommand)
 
 	Root.AddCommand(endDevicesCommand)
-}
-
-func getHost(address string) string {
-	if strings.Contains(address, "://") {
-		url, err := url.Parse(address)
-		if err == nil {
-			address = url.Host
-		}
-	}
-	if strings.Contains(address, ":") {
-		host, _, err := net.SplitHostPort(address)
-		if err == nil {
-			return host
-		}
-	}
-	return address
 }
 
 var errAddressMismatch = errors.DefineAborted("address_mismatch", "server address mismatch")

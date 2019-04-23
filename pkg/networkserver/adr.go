@@ -85,6 +85,53 @@ func deviceADRMargin(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) float32 {
 	return DefaultADRMargin
 }
 
+func lossRate(nbTrans uint32, ups ...*ttnpb.UplinkMessage) float32 {
+	if len(ups) < 2 {
+		return 0
+	}
+
+	min := ups[0].Payload.GetMACPayload().FHDR.FCnt
+	max := ups[len(ups)-1].Payload.GetMACPayload().FHDR.FCnt
+
+	fCnt := min + 1
+	var fCntTrans uint32
+	var lost uint32
+	n := uint32(len(ups))
+
+loop:
+	for i := 0; i < len(ups); i++ {
+		switch v := ups[i].Payload.GetMACPayload().FHDR.FCnt; v {
+		case min:
+			continue
+
+		case fCnt:
+			fCntTrans++
+
+		default:
+			if v < fCnt {
+				// FCnt reset encountered
+				return lossRate(nbTrans, ups[i:]...)
+			}
+
+			if fCntTrans < nbTrans {
+				d := nbTrans - fCntTrans
+				lost += d
+				n += d
+			}
+			d := (v - fCnt - 1) * nbTrans
+			lost += d
+			n += d
+
+			if v == max {
+				break loop
+			}
+			fCnt = v
+			fCntTrans = 1
+		}
+	}
+	return float32(lost) / float32(n)
+}
+
 func adaptDataRate(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb.MACSettings) error {
 	ups := dev.RecentADRUplinks
 	if len(ups) == 0 {
@@ -100,7 +147,7 @@ func adaptDataRate(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttn
 		}
 	}
 
-	_, band, err := getDeviceBandVersion(dev, fps)
+	_, phy, err := getDeviceBandVersion(dev, fps)
 	if err != nil {
 		return err
 	}
@@ -131,7 +178,7 @@ func adaptDataRate(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttn
 
 	// As long as we have enough margin to increase the data rate, we do that.
 	// If we change the DR, we reset the Tx power.
-	for int(dev.MACState.DesiredParameters.ADRDataRateIndex) < int(band.MaxADRDataRateIndex) {
+	for int(dev.MACState.DesiredParameters.ADRDataRateIndex) < int(phy.MaxADRDataRateIndex) {
 		newMargin := margin - drStep
 		if newMargin < 0 {
 			break
@@ -142,8 +189,8 @@ func adaptDataRate(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttn
 	}
 
 	// If we still have margin left, we decrease the Tx power (increase the index).
-	for int(dev.MACState.DesiredParameters.ADRTxPowerIndex) < int(band.MaxTxPowerIndex) {
-		newMargin := margin - (band.TxOffset[dev.MACState.DesiredParameters.ADRTxPowerIndex] - band.TxOffset[dev.MACState.DesiredParameters.ADRTxPowerIndex+1])
+	for int(dev.MACState.DesiredParameters.ADRTxPowerIndex) < int(phy.MaxTxPowerIndex) {
+		newMargin := margin - (phy.TxOffset[dev.MACState.DesiredParameters.ADRTxPowerIndex] - phy.TxOffset[dev.MACState.DesiredParameters.ADRTxPowerIndex+1])
 		if newMargin < 0 {
 			break
 		}
@@ -157,13 +204,11 @@ func adaptDataRate(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttn
 	}
 
 	if len(ups) >= 2 {
-		lossRate := float32(up.Payload.GetMACPayload().FHDR.FCnt-ups[0].Payload.GetMACPayload().FHDR.FCnt-uint32(len(ups))) /
-			float32(up.Payload.GetMACPayload().FHDR.FCnt-ups[0].Payload.GetMACPayload().FHDR.FCnt)
-		switch {
-		case lossRate < 0.05:
+		switch r := lossRate(dev.MACState.CurrentParameters.ADRNbTrans, ups...); {
+		case r < 0.05:
 			dev.MACState.DesiredParameters.ADRNbTrans = 1 + dev.MACState.DesiredParameters.ADRNbTrans/3
-		case lossRate < 0.10:
-		case lossRate < 0.30:
+		case r < 0.10:
+		case r < 0.30:
 			dev.MACState.DesiredParameters.ADRNbTrans = 2 + dev.MACState.DesiredParameters.ADRNbTrans/2
 		default:
 			dev.MACState.DesiredParameters.ADRNbTrans = maxNbTrans

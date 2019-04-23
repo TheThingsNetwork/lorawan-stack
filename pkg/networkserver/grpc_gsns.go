@@ -29,7 +29,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
-	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -130,7 +129,7 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 				}
 
 				if dev.MACState.GetPendingJoinRequest().GetCFList() != nil {
-					_, band, err := getDeviceBandVersion(dev, ns.FrequencyPlans)
+					_, phy, err := getDeviceBandVersion(dev, ns.FrequencyPlans)
 					if err != nil {
 						logger.WithError(err).Warn("Failed to get device's versioned band, skip")
 						return true
@@ -143,9 +142,9 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 								break
 							}
 							dev.MACState.CurrentParameters.Channels = append(dev.MACState.CurrentParameters.Channels, &ttnpb.MACParameters_Channel{
-								UplinkFrequency:   uint64(freq * 100),
-								DownlinkFrequency: uint64(freq * 100),
-								MaxDataRateIndex:  ttnpb.DataRateIndex(band.MaxADRDataRateIndex),
+								UplinkFrequency:   uint64(freq) * phy.FreqMultiplier,
+								DownlinkFrequency: uint64(freq) * phy.FreqMultiplier,
+								MaxDataRateIndex:  ttnpb.DataRateIndex(phy.MaxADRDataRateIndex),
 								EnableUplink:      true,
 							})
 						}
@@ -227,12 +226,12 @@ outer:
 			gap = fCnt - dev.matchedSession.LastFCntUp
 
 			if dev.MACState.LoRaWANVersion.HasMaxFCntGap() {
-				_, band, err := getDeviceBandVersion(dev.EndDevice, ns.FrequencyPlans)
+				_, phy, err := getDeviceBandVersion(dev.EndDevice, ns.FrequencyPlans)
 				if err != nil {
 					logger.WithError(err).Warn("Failed to get device's versioned band, skip")
 					continue
 				}
-				if gap > uint32(band.MaxFCntGap) {
+				if gap > uint32(phy.MaxFCntGap) {
 					logger.Debug("FCnt gap too high, skip")
 					continue outer
 				}
@@ -403,6 +402,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 				DeviceID:               matched.DeviceID,
 			},
 			CorrelationIDs: matched.MACState.PendingApplicationDownlink.CorrelationIDs,
+			ReceivedAt:     &up.ReceivedAt,
 		}
 
 		if pld.Ack {
@@ -451,8 +451,12 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 
 	var cmds []*ttnpb.MACCommand
 	for r := bytes.NewReader(mac); r.Len() > 0; {
+		_, phy, err := getDeviceBandVersion(matched, ns.FrequencyPlans)
+		if err != nil {
+			return errUnknownBand.WithCause(err)
+		}
 		cmd := &ttnpb.MACCommand{}
-		if err := lorawan.DefaultMACCommands.ReadUplink(r, cmd); err != nil {
+		if err := lorawan.DefaultMACCommands.ReadUplink(phy, r, cmd); err != nil {
 			logger.WithFields(log.Fields(
 				"bytes_left", r.Len(),
 				"mac_count", len(cmds),
@@ -561,7 +565,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 					stored.MACState.LoRaWANVersion = ttnpb.MAC_V1_1
 				}
 				if stored.MACState.PendingJoinRequest.CFList != nil {
-					_, band, err := getDeviceBandVersion(stored, ns.FrequencyPlans)
+					_, phy, err := getDeviceBandVersion(stored, ns.FrequencyPlans)
 					if err != nil {
 						return nil, nil, err
 					}
@@ -573,9 +577,9 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 								break
 							}
 							stored.MACState.CurrentParameters.Channels = append(stored.MACState.CurrentParameters.Channels, &ttnpb.MACParameters_Channel{
-								UplinkFrequency:   uint64(freq * 100),
-								DownlinkFrequency: uint64(freq * 100),
-								MaxDataRateIndex:  ttnpb.DataRateIndex(band.MaxADRDataRateIndex),
+								UplinkFrequency:   uint64(freq) * phy.FreqMultiplier,
+								DownlinkFrequency: uint64(freq) * phy.FreqMultiplier,
+								MaxDataRateIndex:  ttnpb.DataRateIndex(phy.MaxADRDataRateIndex),
 								EnableUplink:      true,
 							})
 						}
@@ -633,7 +637,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 				case ttnpb.CID_LINK_ADR:
 					pld := cmd.GetLinkADRAns()
 					dupCount := 0
-					if stored.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_2) >= 0 {
+					if stored.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_2) >= 0 && stored.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 						logger.Debug("Count duplicates")
 						for _, dup := range cmds {
 							if dup.CID != ttnpb.CID_LINK_ADR {
@@ -722,9 +726,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 			stored.MACState.PendingJoinRequest = nil
 
 			paths = append(paths, "recent_adr_uplinks")
-			if !pld.FHDR.ADR ||
-				stored.MACSettings.GetUseADR() != nil && !stored.MACSettings.UseADR.Value ||
-				ns.defaultMACSettings.GetUseADR() != nil && !ns.defaultMACSettings.UseADR.Value {
+			if !pld.FHDR.ADR {
 				stored.RecentADRUplinks = nil
 				return stored, paths, nil
 			}
@@ -732,6 +734,16 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 			stored.RecentADRUplinks = append(stored.RecentADRUplinks, up)
 			if len(stored.RecentADRUplinks) > optimalADRUplinkCount {
 				stored.RecentADRUplinks = append(stored.RecentADRUplinks[:0], stored.RecentADRUplinks[len(stored.RecentADRUplinks)-recentUplinkCount:]...)
+			}
+
+			useADR := true
+			if stored.MACSettings.GetUseADR() != nil {
+				useADR = stored.MACSettings.UseADR.Value
+			} else if ns.defaultMACSettings.GetUseADR() != nil {
+				useADR = ns.defaultMACSettings.UseADR.Value
+			}
+			if !useADR {
+				return stored, paths, nil
 			}
 
 			if err := adaptDataRate(stored, ns.FrequencyPlans, ns.defaultMACSettings); err != nil {
@@ -758,6 +770,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	ok, err := ns.handleASUplink(asCtx, matched.EndDeviceIdentifiers.ApplicationIdentifiers, &ttnpb.ApplicationUp{
 		EndDeviceIdentifiers: matched.EndDeviceIdentifiers,
 		CorrelationIDs:       up.CorrelationIDs,
+		ReceivedAt:           &up.ReceivedAt,
 		Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
 			FCnt:         matched.Session.LastFCntUp,
 			FPort:        pld.FPort,
@@ -781,15 +794,10 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 
 // newDevAddr generates a DevAddr for specified EndDevice.
 func (ns *NetworkServer) newDevAddr(context.Context, *ttnpb.EndDevice) types.DevAddr {
-	// TODO: Allow generating DevAddr from a prefix. (https://github.com/TheThingsNetwork/lorawan-stack/issues/130)
-	nwkAddr := make([]byte, types.NwkAddrLength(ns.netID))
-	random.Read(nwkAddr)
-	nwkAddr[0] &= 0xff >> (8 - types.NwkAddrBits(ns.netID)%8)
-	devAddr, err := types.NewDevAddr(ns.netID, nwkAddr)
-	if err != nil {
-		panic(errors.New("failed to create new DevAddr").WithCause(err))
-	}
-	return devAddr
+	var devAddr types.DevAddr
+	random.Read(devAddr[:])
+	prefix := ns.devAddrPrefixes[random.Intn(len(ns.devAddrPrefixes))]
+	return devAddr.WithPrefix(prefix)
 }
 
 func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage, acc *metadataAccumulator) (err error) {
@@ -964,6 +972,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 			DevAddr:                &devAddr,
 		},
 		CorrelationIDs: up.CorrelationIDs,
+		ReceivedAt:     &up.ReceivedAt,
 		Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
 			AppSKey:              resp.SessionKeys.AppSKey,
 			InvalidatedDownlinks: invalidatedQueue,

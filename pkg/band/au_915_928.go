@@ -150,6 +150,9 @@ func init() {
 		}(),
 		MaxTxPowerIndex: 14,
 
+		LoRaCodingRate: "4/5",
+
+		FreqMultiplier:   100,
 		ImplementsCFList: true,
 		CFListType:       ttnpb.CFListType_CHANNEL_MASKS,
 

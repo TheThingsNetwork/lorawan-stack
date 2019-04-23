@@ -15,8 +15,8 @@
 import React from 'react'
 import classnames from 'classnames'
 import bind from 'autobind-decorator'
-import { Link } from 'react-router-dom'
 
+import Link from '../link'
 import PropTypes from '../../lib/prop-types'
 import Spinner from '../spinner'
 import Message from '../../lib/components/message'
@@ -100,13 +100,14 @@ Button.Link = function (props) {
     />
   )
 }
+Button.Link.displayName = 'Button.Link'
 
 Button.AnchorLink = function (props) {
   const { target, title, name } = props
   const htmlProps = { target, title, name }
   const buttonClassNames = assembleClassnames(props)
   return (
-    <a
+    <Link.Anchor
       className={buttonClassNames}
       href={props.href}
       children={buttonChildren(props)}
@@ -114,6 +115,7 @@ Button.AnchorLink = function (props) {
     />
   )
 }
+Button.AnchorLink.displayName = 'Button.AnchorLink'
 
 const commonPropTypes = {
   /** The message to be displayed within the button */
@@ -175,20 +177,12 @@ Button.propTypes = {
 }
 
 Button.Link.propTypes = {
-  /** The route to navigate to on click */
-  to: PropTypes.string,
   ...commonPropTypes,
+  ...Link.propTypes,
 }
 
 Button.AnchorLink.propTypes = {
-  /** The <a/>'s href prop */
-  href: PropTypes.string,
-  /** The <a/>'s title prop */
-  title: PropTypes.message,
-  /** The <a/>'s name prop */
-  name: PropTypes.string,
-  /** The <a/>'s target prop */
-  target: PropTypes.string,
   ...commonPropTypes,
+  ...Link.Anchor.propTypes,
 }
 export default Button

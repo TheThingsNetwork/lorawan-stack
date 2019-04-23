@@ -16,6 +16,7 @@ import { createLogic } from 'redux-logic'
 
 import api from '../../api'
 import * as applications from '../actions/applications'
+import * as application from '../actions/application'
 
 const getApplicationsLogic = createLogic({
   type: [
@@ -44,7 +45,11 @@ const getApplicationsLogic = createLogic({
 })
 
 const getApplicationsRightsLogic = createLogic({
-  type: applications.GET_APPS_RIGHTS_LIST,
+  type: [
+    applications.GET_APPS_RIGHTS_LIST,
+    application.GET_APP_API_KEY_PAGE_DATA,
+    application.GET_APP_COLLABORATOR_PAGE_DATA,
+  ],
   async process ({ getState, action }, dispatch, done) {
     const { id } = action
     try {

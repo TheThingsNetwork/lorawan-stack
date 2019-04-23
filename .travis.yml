@@ -3,7 +3,7 @@ conditions: v1
 if: type = pull_request OR branch = master OR tag IS present
 os: linux
 language: go
-go: 1.11.x
+go: 1.12.x
 go_import_path: go.thethings.network/lorawan-stack
 env:
   global:
@@ -57,26 +57,22 @@ before_install:
   fi
 install:
 - |
-  if [[ "$RUNTYPE" == "release" ]]; then
-    sudo apt-get -y update
-    sudo apt-get install -y rpm snapd
-    sudo snap install snapcraft --classic
-  fi
-- |
-  if [[ "$RUNTYPE" == "js" ]]; then
-    make js.dev-deps js.deps sdk.deps
-  fi
-- |
   if [[ "$RUNTYPE" =~ go. ]]; then
     make go.deps
   fi
 - |
+  if [[ "$RUNTYPE" == "js" ]]; then
+    make js.dev-deps js.deps sdk.deps
+- |
   if [[ "$RUNTYPE" == "release" ]]; then
+    sudo apt-get -y update
+    sudo apt-get install -y rpm snapd
+    sudo snap install snapcraft --classic
     make deps
   fi
 before_script:
 - |
-  if [[ "$RUNTYPE" =~ go. ]]; then
+  if [[ "$RUNTYPE" == "go.test" ]]; then
     make dev.databases.start
     make dev.certs
   fi
@@ -86,13 +82,19 @@ script:
     make js.translations
     make js.test sdk.test
     make js.lint
+    make sdk.js.build sdk.protos.clean sdk.protos
+    make swagger.protos.clean swagger.protos
+    make markdown.protos.clean markdown.protos
   fi
 - |
   if [[ "$RUNTYPE" == "go.lint" ]]; then
     make headers.check
-    make protos.clean protos
-    make go.quality
+    make go.protos.clean go.protos
     make messages
+    make go.lint
+    make go.unconvert
+    make go.fmt
+    make go.misspell
   fi
 - |
   if [[ "$RUNTYPE" == "go.test" ]]; then
@@ -101,6 +103,8 @@ script:
     else
       GOARCH=$RUN_GOARCH make go.test
     fi
+    go run ./cmd/ttn-lw-stack version
+    go run ./cmd/ttn-lw-cli version
   fi
 - |
   if [[ "$RUNTYPE" == "release" ]]; then

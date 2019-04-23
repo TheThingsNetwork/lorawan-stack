@@ -172,13 +172,6 @@ func TestResetMACState(t *testing.T) {
 								MaxDataRateIndex:  ttnpb.DATA_RATE_5,
 								EnableUplink:      true,
 							},
-							{
-								UplinkFrequency:   869525000,
-								DownlinkFrequency: 869525000,
-								MinDataRateIndex:  ttnpb.DATA_RATE_0,
-								MaxDataRateIndex:  ttnpb.DATA_RATE_5,
-								EnableUplink:      true,
-							},
 						},
 					},
 				}
@@ -215,8 +208,8 @@ func TestResetMACState(t *testing.T) {
 						EnableUplink:     true,
 					})
 				}
-				for i := 0; i < 8; i++ {
-					bandChannels[i].DownlinkFrequency = uint64(923300000 + 600000*i)
+				for i := 0; i < 72; i++ {
+					bandChannels[i].DownlinkFrequency = uint64(923300000 + 600000*(i%8))
 				}
 
 				return func(dev *ttnpb.EndDevice) {

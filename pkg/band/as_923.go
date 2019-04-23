@@ -105,6 +105,9 @@ func init() {
 		},
 		MaxTxPowerIndex: 7,
 
+		LoRaCodingRate: "4/5",
+
+		FreqMultiplier:   100,
 		ImplementsCFList: true,
 		CFListType:       ttnpb.CFListType_FREQUENCIES,
 

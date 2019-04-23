@@ -15,7 +15,6 @@
 package networkserver
 
 import (
-	"bytes"
 	"context"
 	"time"
 
@@ -34,10 +33,7 @@ func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest
 }
 
 func validABPSessionKey(key *ttnpb.KeyEnvelope) bool {
-	return key != nil &&
-		key.KEKLabel == "" &&
-		len(key.Key) == 16 &&
-		!bytes.Equal(key.Key, bytes.Repeat([]byte{0}, 16))
+	return key != nil && key.KEKLabel == "" && !key.Key.IsZero()
 }
 
 // Set implements NsEndDeviceRegistryServer.
@@ -57,36 +53,20 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 
 	var addDownlinkTask bool
 	dev, err := ns.devices.SetByID(ctx, req.EndDevice.EndDeviceIdentifiers.ApplicationIdentifiers, req.EndDevice.EndDeviceIdentifiers.DeviceID, gets, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
-		if dev != nil {
-			addDownlinkTask = ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.device_class") &&
-				req.EndDevice.MACState.DeviceClass != ttnpb.CLASS_A &&
-				(len(dev.QueuedApplicationDownlinks) > 0 || !dev.MACState.CurrentParameters.Equal(dev.MACState.DesiredParameters))
-			return &req.EndDevice, req.FieldMask.Paths, nil
-		}
-
 		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.dev_addr") && (req.EndDevice.Session == nil || req.EndDevice.Session.DevAddr.IsZero()) {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "session.dev_addr")
 		}
 		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.session_key_id") && (req.EndDevice.Session == nil || len(req.EndDevice.Session.SessionKeys.GetSessionKeyID()) == 0) {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "session.keys.session_key_id")
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.f_nwk_s_int_key.key") && (req.EndDevice.Session == nil || len(req.EndDevice.Session.SessionKeys.GetFNwkSIntKey().GetKey()) == 0) {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.f_nwk_s_int_key.key") && (req.EndDevice.Session == nil || req.EndDevice.Session.SessionKeys.GetFNwkSIntKey().GetKey().IsZero()) {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "session.keys.f_nwk_s_int_key.key")
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.f_nwk_s_int_key.kek_label") && (req.EndDevice.Session == nil || len(req.EndDevice.Session.SessionKeys.GetFNwkSIntKey().GetKEKLabel()) == 0) {
-			return nil, nil, errInvalidFieldValue.WithAttributes("field", "session.keys.f_nwk_s_int_key.kek_label")
-		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.s_nwk_s_int_key.key") && (req.EndDevice.Session == nil || len(req.EndDevice.Session.SessionKeys.GetSNwkSIntKey().GetKey()) == 0) {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.s_nwk_s_int_key.key") && (req.EndDevice.Session == nil || req.EndDevice.Session.SessionKeys.GetSNwkSIntKey().GetKey().IsZero()) {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "session.keys.s_nwk_s_int_key.key")
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.s_nwk_s_int_key.kek_label") && (req.EndDevice.Session == nil || len(req.EndDevice.Session.SessionKeys.GetSNwkSIntKey().GetKEKLabel()) == 0) {
-			return nil, nil, errInvalidFieldValue.WithAttributes("field", "session.keys.s_nwk_s_int_key.kek_label")
-		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.nwk_s_enc_key.key") && (req.EndDevice.Session == nil || len(req.EndDevice.Session.SessionKeys.GetNwkSEncKey().GetKey()) == 0) {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.nwk_s_enc_key.key") && (req.EndDevice.Session == nil || req.EndDevice.Session.SessionKeys.GetNwkSEncKey().GetKey().IsZero()) {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "session.keys.nwk_s_enc_key.key")
-		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.nwk_s_enc_key.kek_label") && (req.EndDevice.Session == nil || len(req.EndDevice.Session.SessionKeys.GetNwkSEncKey().GetKEKLabel()) == 0) {
-			return nil, nil, errInvalidFieldValue.WithAttributes("field", "session.keys.nwk_s_enc_key.kek_label")
 		}
 
 		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.class_b_timeout") && req.EndDevice.GetMACSettings().GetClassBTimeout() == nil {
@@ -161,6 +141,17 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		sets := append(req.FieldMask.Paths[:0:0], req.FieldMask.Paths...)
 		if ttnpb.HasAnyField(sets, "version_ids") {
 			// TODO: Apply version IDs (https://github.com/TheThingsIndustries/lorawan-stack/issues/1544)
+		}
+
+		if dev != nil {
+			if ttnpb.HasAnyField(req.FieldMask.Paths, "session.dev_addr") && !ttnpb.HasAnyField(req.FieldMask.Paths, "ids.dev_addr") {
+				req.EndDevice.DevAddr = &req.EndDevice.Session.DevAddr
+				sets = append(sets, "ids.dev_addr")
+			}
+			addDownlinkTask = ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.device_class") &&
+				req.EndDevice.MACState.DeviceClass != ttnpb.CLASS_A &&
+				(len(dev.QueuedApplicationDownlinks) > 0 || !dev.MACState.CurrentParameters.Equal(dev.MACState.DesiredParameters))
+			return &req.EndDevice, sets, nil
 		}
 
 		if err := ttnpb.RequireFields(sets,
@@ -241,9 +232,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			req.EndDevice.Session.SNwkSIntKey = req.EndDevice.Session.FNwkSIntKey
 			req.EndDevice.Session.NwkSEncKey = req.EndDevice.Session.FNwkSIntKey
 			sets = append(sets,
-				"session.keys.nwk_s_enc_key.kek_label",
 				"session.keys.nwk_s_enc_key.key",
-				"session.keys.s_nwk_s_int_key.kek_label",
 				"session.keys.s_nwk_s_int_key.key",
 			)
 		}

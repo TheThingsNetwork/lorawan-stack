@@ -53,15 +53,23 @@ If your operating system or package manager is not mentioned, please [download b
 
 By default, the stack requires a `cert.pem` and `key.pem`, in order to to serve content over TLS.
 
-+ To generate self-signed certificates for `localhost`, use the following commands. This requires a [Go environment setup](../DEVELOPMENT.md#development-environment).
+Typically you'll get these from a trusted Certificate Authority. We recommend [Let's Encrypt](https://letsencrypt.org/getting-started/) for free and trusted TLS certificates for your server. Use the "full chain" for `cert.pem` and the "private key" for `key.pem`.
+
+For local (development) deployments, you can generate self-signed certificates. If you have your [Go environment](../DEVELOPMENT.md#development-environment) set up, you can run the following command to generate a key and certificate for `localhost`:
 
 ```bash
-$ go run $(go env GOROOT)/src/crypto/tls/generate_cert.go -ca -host localhost 
-# The following command is not required on Windows.
-$ chmod 0444 ./key.pem
+$ go run $(go env GOROOT)/src/crypto/tls/generate_cert.go -ca -host localhost
 ```
 
-Keep in mind that self-signed certificates are not trusted by browsers and operating systems, resulting in warnings and sometimes in errors. Consider [Let's Encrypt](https://letsencrypt.org/getting-started/) for free and trusted TLS certificates for your server.
+In order for the user in our Docker container to read these files, you have to change the ownership of the certificate and key:
+
+```bash
+$ chown 886:886 ./cert.pem ./key.pem
+```
+
+> If you don't do this, you'll get an error saying something like `/run/secrets/key.pem: permission denied`.
+
+Keep in mind that self-signed certificates are not trusted by browsers and operating systems, resulting in warnings and errors such as `certificate signed by unknown authority` or `ERR_CERT_AUTHORITY_INVALID`. In most browsers you can add an exception for your self-signed certificate. You can configure the CLI to trust the certificate as well.
 
 ## <a name="configuration">Configuration</a>
 
@@ -72,6 +80,27 @@ Refer to the [networking documentation](networking.md) for the endpoints and por
 ### <a name="frequencyplans">Frequency plans</a>
 
 By default, frequency plans are fetched by the stack from a [public GitHub repository](https://github.com/TheThingsNetwork/lorawan-frequency-plans). To configure a local directory in offline environments, see the [configuration documentation](config.md) for more information.
+
+### <a name="cli-config">Command-line interface</a>
+
+The command-line interface has some built-in defaults, but you'll want to create a config file or set some environment variables to point it at your deployment.
+
+The recommended way to configure the CLI is with a `.ttn-lw-cli.yml` in your `$XDG_CONFIG_HOME` or `$HOME` directory. You can also put the config file in a different location, and pass it to the CLI as `-c path/to/config.yml`. In this guide we will use the following configuration file:
+
+```yml
+oauth-server-address: https://localhost:8885/oauth
+
+identity-server-grpc-address: localhost:8884
+gateway-server-grpc-address: localhost:8884
+network-server-grpc-address: localhost:8884
+application-server-grpc-address: localhost:8884
+join-server-grpc-address: localhost:8884
+
+ca: /path/to/your/cert.pem
+
+log:
+  level: info
+```
 
 ## <a name="running">Running the stack</a>
 
@@ -164,7 +193,7 @@ $ ttn-lw-cli end-devices create app1 dev1 \
 
 This will create a LoRaWAN 1.0.2 end device `dev1` in application `app1`. The end device should now be able to join the private network.
 
->Note: All returned keys are base64 encoded. Also, the `AppEUI` is returned as `join_eui` (V3 uses LoRaWAN 1.1 terminology).
+>Note: The `AppEUI` is returned as `join_eui` (V3 uses LoRaWAN 1.1 terminology).
 
 >Hint: You can also pass `--with-root-keys` to have root keys generated.
 
@@ -181,7 +210,7 @@ $ ttn-lw-cli end-devices create app1 dev2 \
   --session.keys.nwk-s-key.key B7F3E161BC9D4388E6C788A0C547F255
 ```
 
->Note: All returned keys are base64 encoded. Also, `NwkSKey` is returned as `f_nwk_s_int_key` (V3 uses LoRaWAN 1.1 terminology).
+>Note: The `NwkSKey` is returned as `f_nwk_s_int_key` (V3 uses LoRaWAN 1.1 terminology).
 
 >Hint: You can also pass `--with-session` to have a session generated.
 

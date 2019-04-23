@@ -129,6 +129,9 @@ func init() {
 		GenerateChMasks: generateChMask16,
 		ParseChMask:     parseChMask16,
 
+		LoRaCodingRate: "4/5",
+
+		FreqMultiplier:   100,
 		ImplementsCFList: true,
 		CFListType:       ttnpb.CFListType_FREQUENCIES,
 

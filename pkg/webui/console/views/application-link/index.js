@@ -33,6 +33,7 @@ import Spinner from '../../../components/spinner'
 import toast from '../../../components/toast'
 import DateTime from '../../../lib/components/date-time'
 import Icon from '../../../components/icon'
+import SubmitBar from '../../../components/submit-bar'
 
 import api from '../../api'
 
@@ -292,12 +293,12 @@ class ApplicationLink extends React.Component {
                 name="api_key"
                 title={sharedMessages.apiKey}
               />
-              <div className={style.submitBar}>
+              <SubmitBar>
                 <Button
                   type="submit"
                   message={sharedMessages.saveChanges}
                 />
-              </div>
+              </SubmitBar>
             </Form>
           </Col>
           <Col lg={6} md={12}>

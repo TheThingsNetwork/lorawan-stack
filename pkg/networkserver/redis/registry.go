@@ -75,6 +75,7 @@ func (r *DeviceRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIde
 	}
 	return applyDeviceFieldMask(nil, pb, append(paths,
 		"ids.application_ids",
+		"ids.dev_addr",
 		"ids.device_id",
 	)...)
 }
@@ -89,6 +90,7 @@ func (r *DeviceRegistry) GetByEUI(ctx context.Context, joinEUI, devEUI types.EUI
 	}
 	return applyDeviceFieldMask(nil, pb, append(paths,
 		"ids.application_ids",
+		"ids.dev_addr",
 		"ids.dev_eui",
 		"ids.device_id",
 		"ids.join_eui",
@@ -176,9 +178,10 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 		gets = append(gets,
 			"created_at",
 			"ids.application_ids",
+			"ids.dev_addr",
+			"ids.dev_eui",
 			"ids.device_id",
 			"ids.join_eui",
-			"ids.dev_eui",
 			"updated_at",
 		)
 
@@ -230,9 +233,10 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 			if stored == nil {
 				sets = append(sets,
 					"ids.application_ids",
+					"ids.dev_addr",
+					"ids.dev_eui",
 					"ids.device_id",
 					"ids.join_eui",
-					"ids.dev_eui",
 				)
 
 				pb.CreatedAt = pb.UpdatedAt

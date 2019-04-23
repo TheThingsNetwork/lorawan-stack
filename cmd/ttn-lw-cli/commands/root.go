@@ -44,7 +44,7 @@ var (
 	config       = &Config{}
 	oauth2Config *oauth2.Config
 	ctx          = newContext(context.Background())
-	cache        util.Cache
+	cache        util.AuthCache
 
 	inputDecoder io.Decoder
 
@@ -54,12 +54,12 @@ var (
 		SilenceErrors:     true,
 		SilenceUsage:      true,
 		Short:             "The Things Network Command-line Interface",
-		PersistentPreRunE: preRun(refreshToken, requireAuth),
+		PersistentPreRunE: preRun(checkAuth, refreshToken, requireAuth),
 		PersistentPostRunE: func(cmd *cobra.Command, args []string) error {
 			// clean up the API
 			api.CloseAll()
 
-			err := util.SaveCache(cache)
+			err := util.SaveAuthCache(cache)
 			if err != nil {
 				return err
 			}
@@ -93,10 +93,11 @@ func preRun(tasks ...func() error) func(cmd *cobra.Command, args []string) error
 		}
 
 		// get cache
-		cache, err = util.GetCache()
+		cache, err = util.GetAuthCache()
 		if err != nil {
 			return err
 		}
+		cache = cache.ForID(config.CredentialsID)
 
 		// create logger
 		logger, err = log.NewLogger(
@@ -151,12 +152,34 @@ func preRun(tasks ...func() error) func(cmd *cobra.Command, args []string) error
 	}
 }
 
+var errUnknownHost = errors.DefineUnauthenticated("unknown_host", "unknown host `{host}` for current credentials", "known")
+
+func checkAuth() error {
+	if config.AllowUnknownHosts {
+		return nil
+	}
+	if knownHosts, ok := cache.Get("hosts").([]string); ok && len(knownHosts) > 0 {
+	nextHost:
+		for _, host := range config.getHosts() {
+			for _, knownHost := range knownHosts {
+				if host == knownHost {
+					continue nextHost
+				}
+			}
+			logger.Errorf("Found an unknown host `%s` that was not configured when you logged in", host)
+			logger.Error("You may want to check your configuration, login/logout or use the --allow-unknown-hosts flag")
+			return errUnknownHost.WithAttributes("host", host, "known", knownHosts)
+		}
+	}
+	return nil
+}
+
 func refreshToken() error {
 	if token, ok := cache.Get("oauth_token").(*oauth2.Token); ok && token != nil {
 		freshToken, err := oauth2Config.TokenSource(ctx, token).Token()
-		if freshToken != token {
+		if err == nil && freshToken != token {
 			cache.Set("oauth_token", freshToken)
-			if err := util.SaveCache(cache); err != nil {
+			if err := util.SaveAuthCache(cache); err != nil {
 				return err
 			}
 		}
@@ -176,7 +199,7 @@ func optionalAuth() error {
 }
 
 func requireAuth() error {
-	if apiKey, ok := cache.Get("api_key").(string); ok {
+	if apiKey, ok := cache.Get("api_key").(string); ok && apiKey != "" {
 		logger.Debug("Using API key")
 		api.SetAuth("bearer", apiKey)
 		return nil

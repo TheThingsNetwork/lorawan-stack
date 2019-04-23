@@ -5703,6 +5703,10 @@
             "type": "string"
           }
         },
+        "received_at": {
+          "type": "string",
+          "format": "date-time"
+        },
         "uplink_message": {
           "$ref": "#/definitions/v3ApplicationUplink"
         },
@@ -7340,11 +7344,15 @@
         "key": {
           "type": "string",
           "format": "byte",
-          "description": "The (encrypted) key."
+          "description": "The unencrypted AES key."
         },
         "kek_label": {
           "type": "string",
           "description": "The label of the RFC 3394 key-encryption-key (KEK) that was used to encrypt the key."
+        },
+        "encrypted_key": {
+          "type": "string",
+          "format": "byte"
         }
       }
     },
@@ -8919,7 +8927,7 @@
         "received_at": {
           "type": "string",
           "format": "date-time",
-          "description": "Server time when a component received the message.\nThe Gateway Server, Network Server and Application Server may set this value to their local server time of reception."
+          "description": "Server time when a component received the message.\nThe Gateway Server and Network Server set this value to their local server time of reception."
         },
         "correlation_ids": {
           "type": "array",

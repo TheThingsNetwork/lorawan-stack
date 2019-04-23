@@ -69,7 +69,7 @@ var (
 		},
 	}
 	userInvitationsCreate = &cobra.Command{
-		Use:   "create",
+		Use:   "create [email]",
 		Short: "Create a user invitation",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			email := getEmail(cmd.Flags(), args)
@@ -90,7 +90,7 @@ var (
 		},
 	}
 	userInvitationsDelete = &cobra.Command{
-		Use:   "delete",
+		Use:   "delete [email]",
 		Short: "Delete a user invitation",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			email := getEmail(cmd.Flags(), args)

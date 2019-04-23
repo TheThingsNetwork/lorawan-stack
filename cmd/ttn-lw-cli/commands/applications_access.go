@@ -26,7 +26,7 @@ import (
 
 var (
 	applicationRights = &cobra.Command{
-		Use:   "rights",
+		Use:   "rights [application-id]",
 		Short: "List the rights to an application",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			appID := getApplicationID(cmd.Flags(), args)
@@ -52,7 +52,7 @@ var (
 		Short:   "Manage application collaborators",
 	}
 	applicationCollaboratorsList = &cobra.Command{
-		Use:     "list",
+		Use:     "list [application-id]",
 		Aliases: []string{"ls"},
 		Short:   "List application collaborators",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -150,7 +150,7 @@ var (
 		Short:   "Manage application API keys",
 	}
 	applicationAPIKeysList = &cobra.Command{
-		Use:     "list",
+		Use:     "list [application-id]",
 		Aliases: []string{"ls"},
 		Short:   "List application API keys",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -176,11 +176,11 @@ var (
 		},
 	}
 	applicationAPIKeysCreate = &cobra.Command{
-		Use:     "create",
+		Use:     "create [application-id]",
 		Aliases: []string{"add", "generate"},
 		Short:   "Create an application API key",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			appID := getApplicationID(cmd.Flags(), nil)
+			appID := getApplicationID(cmd.Flags(), args)
 			if appID == nil {
 				return errNoApplicationID
 			}
@@ -213,17 +213,17 @@ var (
 		},
 	}
 	applicationAPIKeysUpdate = &cobra.Command{
-		Use:     "update",
+		Use:     "update [application-id] [api-key-id]",
 		Aliases: []string{"set"},
 		Short:   "Update an application API key",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			id := getAPIKeyID(cmd.Flags(), args)
-			if id == "" {
-				return errNoAPIKeyID
-			}
-			appID := getApplicationID(cmd.Flags(), nil)
+			appID := getApplicationID(cmd.Flags(), firstArgs(1, args...))
 			if appID == nil {
 				return errNoApplicationID
+			}
+			id := getAPIKeyID(cmd.Flags(), args, 1)
+			if id == "" {
+				return errNoAPIKeyID
 			}
 			name, _ := cmd.Flags().GetString("name")
 
@@ -252,17 +252,17 @@ var (
 		},
 	}
 	applicationAPIKeysDelete = &cobra.Command{
-		Use:     "delete",
+		Use:     "delete [application-id] [api-key-id]",
 		Aliases: []string{"remove"},
 		Short:   "Delete an application API key",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			id := getAPIKeyID(cmd.Flags(), args)
-			if id == "" {
-				return errNoAPIKeyID
-			}
-			appID := getApplicationID(cmd.Flags(), nil)
+			appID := getApplicationID(cmd.Flags(), firstArgs(1, args...))
 			if appID == nil {
 				return errNoApplicationID
+			}
+			id := getAPIKeyID(cmd.Flags(), args, 1)
+			if id == "" {
+				return errNoAPIKeyID
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)

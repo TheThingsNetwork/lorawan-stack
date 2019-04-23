@@ -75,7 +75,7 @@ var (
 			}
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewOrganizationRegistryClient(is).List(ctx, &ttnpb.ListOrganizationsRequest{
-				Collaborator: getCollaborator(cmd.Flags()),
+				Collaborator: getUserID(cmd.Flags(), nil).OrganizationOrUserIdentifiers(),
 				FieldMask:    types.FieldMask{Paths: paths},
 				Limit:        limit,
 				Page:         page,
@@ -110,7 +110,7 @@ var (
 		},
 	}
 	organizationsGetCommand = &cobra.Command{
-		Use:     "get",
+		Use:     "get [organization-id]",
 		Aliases: []string{"info"},
 		Short:   "Get an organization",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -136,12 +136,12 @@ var (
 		},
 	}
 	organizationsCreateCommand = &cobra.Command{
-		Use:     "create",
+		Use:     "create [organization-id]",
 		Aliases: []string{"add", "register"},
 		Short:   "Create an organization",
 		RunE: asBulk(func(cmd *cobra.Command, args []string) (err error) {
 			orgID := getOrganizationID(cmd.Flags(), args)
-			collaborator := getCollaborator(cmd.Flags())
+			collaborator := getUserID(cmd.Flags(), nil).OrganizationOrUserIdentifiers()
 			if collaborator == nil {
 				return errNoCollaborator
 			}
@@ -179,7 +179,7 @@ var (
 		}),
 	}
 	organizationsUpdateCommand = &cobra.Command{
-		Use:     "update",
+		Use:     "update [organization-id]",
 		Aliases: []string{"set"},
 		Short:   "Update an organization",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -216,7 +216,7 @@ var (
 		},
 	}
 	organizationsDeleteCommand = &cobra.Command{
-		Use:   "delete",
+		Use:   "delete [organization-id]",
 		Short: "Delete an organization",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			orgID := getOrganizationID(cmd.Flags(), args)
@@ -236,8 +236,8 @@ var (
 			return nil
 		},
 	}
-	organizationsContactInfoCommand = contactInfoCommands("organization", func(cmd *cobra.Command) (*ttnpb.EntityIdentifiers, error) {
-		orgID := getOrganizationID(cmd.Flags(), nil)
+	organizationsContactInfoCommand = contactInfoCommands("organization", func(cmd *cobra.Command, args []string) (*ttnpb.EntityIdentifiers, error) {
+		orgID := getOrganizationID(cmd.Flags(), args)
 		if orgID == nil {
 			return nil, errNoOrganizationID
 		}

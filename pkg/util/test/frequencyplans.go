@@ -40,6 +40,15 @@ const (
 	EUFrequencyPlanID = "EU_863_870"
 	euFrequencyPlan   = `band-id: EU_863_870
 uplink-channels:
+- frequency: 868100000
+  min-data-rate: 0
+  max-data-rate: 5
+- frequency: 868300000
+  min-data-rate: 0
+  max-data-rate: 5
+- frequency: 868500000
+  min-data-rate: 0
+  max-data-rate: 5
 - frequency: 867100000
   min-data-rate: 0
   max-data-rate: 5
@@ -53,21 +62,18 @@ uplink-channels:
   min-data-rate: 0
   max-data-rate: 5
 - frequency: 867900000
-  min-data-rate: 0
-  max-data-rate: 5
-- frequency: 868100000
-  min-data-rate: 0
-  max-data-rate: 5
-- frequency: 868300000
-  min-data-rate: 0
-  max-data-rate: 5
-- frequency: 868500000
-  min-data-rate: 0
-  max-data-rate: 5
-- frequency: 869525000
   min-data-rate: 0
   max-data-rate: 5
 downlink-channels:
+- frequency: 868100000
+  min-data-rate: 0
+  max-data-rate: 5
+- frequency: 868300000
+  min-data-rate: 0
+  max-data-rate: 5
+- frequency: 868500000
+  min-data-rate: 0
+  max-data-rate: 5
 - frequency: 867100000
   min-data-rate: 0
   max-data-rate: 5
@@ -83,20 +89,8 @@ downlink-channels:
 - frequency: 867900000
   min-data-rate: 0
   max-data-rate: 5
-- frequency: 868100000
-  min-data-rate: 0
-  max-data-rate: 5
-- frequency: 868300000
-  min-data-rate: 0
-  max-data-rate: 5
-- frequency: 868500000
-  min-data-rate: 0
-  max-data-rate: 5
-- frequency: 869525000
-  min-data-rate: 0
-  max-data-rate: 5
 lora-standard-channel:
-  frequency: 863000000
+  frequency: 868300000
   data-rate: 6
 fsk-channel:
   frequency: 868800000

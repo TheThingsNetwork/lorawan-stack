@@ -23,6 +23,7 @@ import (
 	echo "github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/metrics"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/pkg/rpcserver"
@@ -44,6 +45,7 @@ func (c *Component) setupGRPC() (err error) {
 	for _, sub := range c.grpcSubsystems {
 		sub.RegisterServices(c.grpc.Server)
 	}
+	metrics.InitializeServerMetrics(c.grpc.Server)
 	c.logger.Debug("Starting loopback connection")
 	c.loopback, err = rpcserver.StartLoopback(c.ctx, c.grpc.Server)
 	if err != nil {

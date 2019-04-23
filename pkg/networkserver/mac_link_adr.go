@@ -41,20 +41,20 @@ func enqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, ma
 		return maxDownLen, maxUpLen, true, nil
 	}
 
-	_, band, err := getDeviceBandVersion(dev, fps)
+	_, phy, err := getDeviceBandVersion(dev, fps)
 	if err != nil {
 		return maxDownLen, maxUpLen, false, err
 	}
 
-	if len(dev.MACState.DesiredParameters.Channels) > int(band.MaxUplinkChannels) {
+	if len(dev.MACState.DesiredParameters.Channels) > int(phy.MaxUplinkChannels) {
 		return maxDownLen, maxUpLen, false, errCorruptedMACState
 	}
 
-	desiredChs := make([]bool, band.MaxUplinkChannels)
+	desiredChs := make([]bool, phy.MaxUplinkChannels)
 	for i, ch := range dev.MACState.DesiredParameters.Channels {
 		desiredChs[i] = ch.EnableUplink
 	}
-	desiredMasks, err := band.GenerateChMasks(desiredChs)
+	desiredMasks, err := phy.GenerateChMasks(desiredChs)
 	if err != nil {
 		return maxDownLen, maxUpLen, false, err
 	}
@@ -104,7 +104,7 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 		events.Publish(evtReceiveLinkADRAccept(ctx, dev.EndDeviceIdentifiers, pld))
 	}
 
-	_, band, err := getDeviceBandVersion(dev, fps)
+	_, phy, err := getDeviceBandVersion(dev, fps)
 	if err != nil {
 		return err
 	}
@@ -114,14 +114,14 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 		handler = handleMACResponse
 	}
 
-	if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_2) < 0 && dupCount != 0 {
+	if (dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_2) < 0 || dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0) && dupCount != 0 {
 		return errInvalidPayload
 	}
 
 	var n uint
 	var req *ttnpb.MACCommand_LinkADRReq
 	dev.MACState.PendingRequests, err = handler(ttnpb.CID_LINK_ADR, func(cmd *ttnpb.MACCommand) error {
-		if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_2) >= 0 && n > dupCount+1 {
+		if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_2) >= 0 && dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 && n > dupCount+1 {
 			return errInvalidPayload
 		}
 		n++
@@ -136,8 +136,9 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 			panic("Network Server scheduled an invalid LinkADR command")
 		}
 
-		if req.NbTrans > 0 {
+		if req.NbTrans > 0 && dev.MACState.CurrentParameters.ADRNbTrans != req.NbTrans {
 			dev.MACState.CurrentParameters.ADRNbTrans = req.NbTrans
+			dev.RecentADRUplinks = nil
 		}
 
 		var mask [16]bool
@@ -145,7 +146,7 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 			mask[i] = v
 		}
 
-		m, err := band.ParseChMask(mask, uint8(req.ChannelMaskControl))
+		m, err := phy.ParseChMask(mask, uint8(req.ChannelMaskControl))
 		if err != nil {
 			return err
 		}
@@ -168,7 +169,10 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 		return nil
 	}
 
-	dev.MACState.CurrentParameters.ADRDataRateIndex = req.DataRateIndex
-	dev.MACState.CurrentParameters.ADRTxPowerIndex = req.TxPowerIndex
+	if dev.MACState.CurrentParameters.ADRDataRateIndex != req.DataRateIndex || dev.MACState.CurrentParameters.ADRTxPowerIndex != req.TxPowerIndex {
+		dev.MACState.CurrentParameters.ADRDataRateIndex = req.DataRateIndex
+		dev.MACState.CurrentParameters.ADRTxPowerIndex = req.TxPowerIndex
+		dev.RecentADRUplinks = nil
+	}
 	return nil
 }

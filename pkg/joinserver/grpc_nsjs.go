@@ -44,10 +44,6 @@ var supportedMACVersions = [...]ttnpb.MACVersion{
 	ttnpb.MAC_V1_1,
 }
 
-func keyToBytes(k types.AES128Key) []byte {
-	return k[:]
-}
-
 // HandleJoin is called by the Network Server to join a device.
 func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (res *ttnpb.JoinResponse, err error) {
 	// TODO: Authorize using client TLS and application rights (https://github.com/TheThingsNetwork/lorawan-stack/issues/4)
@@ -254,29 +250,26 @@ func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			if err != nil {
 				return nil, nil, errDeriveAppSKey.WithCause(err)
 			}
+
 			sessionKeys := ttnpb.SessionKeys{
 				SessionKeyID: skID[:],
 				FNwkSIntKey: &ttnpb.KeyEnvelope{
 					// TODO: Encrypt key with NS KEK https://github.com/TheThingsNetwork/lorawan-stack/issues/5
-					Key:      nwkSKeys.FNwkSIntKey[:],
-					KEKLabel: "",
+					Key: &nwkSKeys.FNwkSIntKey,
 				},
 				AppSKey: &ttnpb.KeyEnvelope{
 					// TODO: Encrypt key with AS KEK https://github.com/TheThingsNetwork/lorawan-stack/issues/5
-					Key:      appSKey[:],
-					KEKLabel: "",
+					Key: &appSKey,
 				},
 			}
 			if req.SelectedMACVersion == ttnpb.MAC_V1_1 {
 				sessionKeys.SNwkSIntKey = &ttnpb.KeyEnvelope{
 					// TODO: Encrypt key with NS KEK https://github.com/TheThingsNetwork/lorawan-stack/issues/5
-					Key:      nwkSKeys.SNwkSIntKey[:],
-					KEKLabel: "",
+					Key: &nwkSKeys.SNwkSIntKey,
 				}
 				sessionKeys.NwkSEncKey = &ttnpb.KeyEnvelope{
 					// TODO: Encrypt key with NS KEK https://github.com/TheThingsNetwork/lorawan-stack/issues/5
-					Key:      nwkSKeys.NwkSEncKey[:],
-					KEKLabel: "",
+					Key: &nwkSKeys.NwkSEncKey,
 				}
 			}
 

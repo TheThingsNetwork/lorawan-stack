@@ -1,6 +1,6 @@
 {
   "name": "ttn-lw",
-  "version": "3.0.0",
+  "version": "3.0.2",
   "description": "The Things Network Stack for LoRaWAN JavaScript SDK",
   "url": "https://github.com/TheThingsNetwork/lorawan-stack/tree/master/sdk/js",
   "main": "dist/index.js",
@@ -11,7 +11,7 @@
     "build:watch": "rm -rf dist; babel -w src -d dist",
     "test": "node_modules/.bin/jest --testPathIgnorePatterns=/dist/",
     "test:watch": "node_modules/.bin/jest --testPathIgnorePatterns=/dist/ --watch",
-    "definitions": "mkdir -p ../../.cache; (cd ../.. && docker run --rm -v $PWD:$PWD -w $PWD htdvisser/protocontainer -I $(dirname $PWD) -I $PWD/vendor --doc_out=$PWD/sdk/js/generated --doc_opt=json,api.json --swagger_out=$PWD/.cache $PWD/api/*.proto); node dist/util/http-mapper.js"
+    "definitions": "node dist/util/http-mapper.js"
   },
   "devDependencies": {
     "babel": "^6.23.0",

@@ -15,8 +15,10 @@
 package networkserver
 
 import (
+	"fmt"
 	"math"
 	"math/rand"
+	"strings"
 	"testing"
 
 	pbtypes "github.com/gogo/protobuf/types"
@@ -27,7 +29,10 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-func newADRUplink(fCnt uint32, maxSNR float32, gtwCount uint, tx ttnpb.TxSettings) *ttnpb.UplinkMessage {
+func newADRUplink(fCnt uint32, maxSNR float32, gtwCount uint, confirmed bool, tx ttnpb.TxSettings) *ttnpb.UplinkMessage {
+	if gtwCount == 0 {
+		gtwCount = 1 + uint(rand.Int()%100)
+	}
 	mds := make([]*ttnpb.RxMetadata, 0, gtwCount)
 	for i := uint(0); i < gtwCount; i++ {
 		mds = append(mds, &ttnpb.RxMetadata{
@@ -37,7 +42,7 @@ func newADRUplink(fCnt uint32, maxSNR float32, gtwCount uint, tx ttnpb.TxSetting
 	mds[rand.Intn(len(mds))].SNR = maxSNR
 
 	mType := ttnpb.MType_UNCONFIRMED_UP
-	if rand.Int()%2 == 0 {
+	if confirmed {
 		mType = ttnpb.MType_CONFIRMED_UP
 	}
 
@@ -66,19 +71,162 @@ type adrMatrixRow struct {
 	FCnt         uint32
 	MaxSNR       float32
 	GtwDiversity uint
+	Confirmed    bool
 	TxSettings   ttnpb.TxSettings
 }
 
-func adrMatrixToUplinks(m []adrMatrixRow) (ups []*ttnpb.UplinkMessage) {
+func adrMatrixToUplinks(m []adrMatrixRow) []*ttnpb.UplinkMessage {
 	if len(m) > 20 {
 		panic("ADR matrix contains more than 20 rows")
 	}
 
-	ups = make([]*ttnpb.UplinkMessage, 0, 20)
+	ups := make([]*ttnpb.UplinkMessage, 0, 20)
 	for _, r := range m {
-		ups = append(ups, newADRUplink(r.FCnt, r.MaxSNR, r.GtwDiversity, r.TxSettings))
+		ups = append(ups, newADRUplink(r.FCnt, r.MaxSNR, r.GtwDiversity, r.Confirmed, r.TxSettings))
 	}
-	return
+	return ups
+}
+
+func TestLossRate(t *testing.T) {
+	for _, tc := range []struct {
+		Name    string
+		Uplinks []*ttnpb.UplinkMessage
+		NbTrans uint32
+		Rate    float32
+	}{
+		{
+			Uplinks: adrMatrixToUplinks([]adrMatrixRow{
+				{FCnt: 11},
+				{FCnt: 12},
+				{FCnt: 13},
+			}),
+			NbTrans: 1,
+		},
+		{
+			Uplinks: adrMatrixToUplinks([]adrMatrixRow{
+				{FCnt: 11},
+				{FCnt: 11},
+				{FCnt: 12},
+				{FCnt: 12},
+				{FCnt: 13},
+				{FCnt: 13},
+			}),
+			NbTrans: 2,
+		},
+		{
+			Uplinks: adrMatrixToUplinks([]adrMatrixRow{
+				{FCnt: 11},
+				{FCnt: 11},
+				{FCnt: 11},
+				{FCnt: 12},
+				{FCnt: 12},
+				{FCnt: 12},
+				{FCnt: 13},
+				{FCnt: 13},
+				{FCnt: 13},
+			}),
+			NbTrans: 3,
+		},
+		{
+			Uplinks: adrMatrixToUplinks([]adrMatrixRow{
+				{FCnt: 11},
+				{FCnt: 12},
+				{FCnt: 12},
+				{FCnt: 13},
+			}),
+			NbTrans: 2,
+		},
+		{
+			Uplinks: adrMatrixToUplinks([]adrMatrixRow{
+				{FCnt: 11},
+				{FCnt: 11},
+				{FCnt: 12},
+				{FCnt: 12},
+				{FCnt: 12},
+				{FCnt: 13},
+			}),
+			NbTrans: 3,
+		},
+		{
+			Uplinks: adrMatrixToUplinks([]adrMatrixRow{
+				{FCnt: 11},
+				{FCnt: 13},
+			}),
+			NbTrans: 1,
+			Rate:    1. / 3.,
+		},
+		{
+			Uplinks: adrMatrixToUplinks([]adrMatrixRow{
+				{FCnt: 11},
+				{FCnt: 14},
+			}),
+			NbTrans: 1,
+			Rate:    2. / 4.,
+		},
+		{
+			Uplinks: adrMatrixToUplinks([]adrMatrixRow{
+				{FCnt: 11},
+				{FCnt: 13},
+				{FCnt: 15},
+			}),
+			NbTrans: 1,
+			Rate:    2. / 5.,
+		},
+		{
+			Uplinks: adrMatrixToUplinks([]adrMatrixRow{
+				{FCnt: 11},
+				{FCnt: 11},
+				{FCnt: 12},
+				{FCnt: 13},
+				{FCnt: 13},
+			}),
+			NbTrans: 2,
+			Rate:    1. / 6.,
+		},
+		{
+			Uplinks: adrMatrixToUplinks([]adrMatrixRow{
+				{FCnt: 11},
+				{FCnt: 12},
+				{FCnt: 13},
+			}),
+			NbTrans: 2,
+			Rate:    1. / 4.,
+		},
+		{
+			Uplinks: adrMatrixToUplinks([]adrMatrixRow{
+				{FCnt: 11},
+				{FCnt: 12},
+				{FCnt: 12},
+				{FCnt: 13},
+				{FCnt: 13},
+				{FCnt: 13},
+			}),
+			NbTrans: 3,
+			Rate:    1. / 7.,
+		},
+		{
+			Uplinks: adrMatrixToUplinks([]adrMatrixRow{
+				{FCnt: 11},
+				{FCnt: 12},
+				{FCnt: 1},
+				{FCnt: 1},
+				{FCnt: 3},
+				{FCnt: 3},
+			}),
+			NbTrans: 3,
+			Rate:    3. / 7.,
+		},
+	} {
+		t.Run(func() string {
+			var ss []string
+			for _, up := range tc.Uplinks {
+				ss = append(ss, fmt.Sprintf("%d", up.Payload.GetMACPayload().FHDR.FCnt))
+			}
+			return fmt.Sprintf("NbTrans %d/%s", tc.NbTrans, strings.Join(ss, ","))
+		}(), func(t *testing.T) {
+			assertions.New(t).So(lossRate(tc.NbTrans, tc.Uplinks...), should.Equal, tc.Rate)
+		})
+	}
 }
 
 func TestAdaptDataRate(t *testing.T) {

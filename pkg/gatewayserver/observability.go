@@ -161,12 +161,12 @@ func registerGatewayDisconnect(ctx context.Context, ids ttnpb.GatewayIdentifiers
 }
 
 func registerReceiveStatus(ctx context.Context, gtw *ttnpb.Gateway, status *ttnpb.GatewayStatus) {
-	events.Publish(evtReceiveStatus(ctx, gtw, nil))
+	events.Publish(evtReceiveStatus(ctx, gtw, status))
 	gsMetrics.statusReceived.WithLabelValues(ctx, gtw.GatewayID).Inc()
 }
 
 func registerReceiveUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.UplinkMessage) {
-	events.Publish(evtReceiveUp(ctx, gtw, nil))
+	events.Publish(evtReceiveUp(ctx, gtw, msg))
 	gsMetrics.uplinkReceived.WithLabelValues(ctx, gtw.GatewayID).Inc()
 }
 
@@ -178,14 +178,14 @@ func registerForwardUplink(ctx context.Context, devIDs ttnpb.EndDeviceIdentifier
 func registerDropUplink(ctx context.Context, devIDs ttnpb.EndDeviceIdentifiers, gtw *ttnpb.Gateway, msg *ttnpb.UplinkMessage, err error) {
 	events.Publish(evtDropUp(ctx, gtw, err))
 	if ttnErr, ok := errors.From(err); ok {
-		gsMetrics.uplinkDropped.WithLabelValues(ctx, ttnErr.String()).Inc()
+		gsMetrics.uplinkDropped.WithLabelValues(ctx, ttnErr.FullName()).Inc()
 	} else {
 		gsMetrics.uplinkDropped.WithLabelValues(ctx, unknown).Inc()
 	}
 }
 
 func registerSendDownlink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.DownlinkMessage) {
-	events.Publish(evtSendDown(ctx, gtw, nil))
+	events.Publish(evtSendDown(ctx, gtw, msg))
 	gsMetrics.downlinkSent.WithLabelValues(ctx, gtw.GatewayID).Inc()
 }
 

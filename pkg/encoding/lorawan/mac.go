@@ -21,6 +21,7 @@ import (
 	"math"
 	"time"
 
+	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/gpstime"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -38,17 +39,17 @@ type MACCommandDescriptor struct {
 	ExpectAnswer      bool
 	UplinkLength      uint16
 	DownlinkLength    uint16
-	AppendUplink      func(b []byte, cmd ttnpb.MACCommand) ([]byte, error)
-	UnmarshalUplink   func(b []byte, cmd *ttnpb.MACCommand) error
-	AppendDownlink    func(b []byte, cmd ttnpb.MACCommand) ([]byte, error)
-	UnmarshalDownlink func(b []byte, cmd *ttnpb.MACCommand) error
+	AppendUplink      func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error)
+	UnmarshalUplink   func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error
+	AppendDownlink    func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error)
+	UnmarshalDownlink func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error
 }
 
 // MACCommandSpec maps the ttnpb.CID of MACCommand to a *MACCommandDescriptor.
 type MACCommandSpec map[ttnpb.MACCommandIdentifier]*MACCommandDescriptor
 
-func newMACUnmarshaler(cid ttnpb.MACCommandIdentifier, name string, n uint8, f func([]byte, *ttnpb.MACCommand) error) func(b []byte, cmd *ttnpb.MACCommand) error {
-	return func(b []byte, cmd *ttnpb.MACCommand) error {
+func newMACUnmarshaler(cid ttnpb.MACCommandIdentifier, name string, n uint8, f func(band.Band, []byte, *ttnpb.MACCommand) error) func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
+	return func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
 		if len(b) != int(n) {
 			return errExpectedLengthEqual(name, int(n))(len(b))
 		}
@@ -56,7 +57,7 @@ func newMACUnmarshaler(cid ttnpb.MACCommandIdentifier, name string, n uint8, f f
 		if f == nil {
 			return nil
 		}
-		return f(b, cmd)
+		return f(phy, b, cmd)
 	}
 }
 
@@ -67,7 +68,7 @@ var DefaultMACCommands = MACCommandSpec{
 		ExpectAnswer:      true,
 
 		UplinkLength: 1,
-		AppendUplink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
+		AppendUplink: func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
 			pld := cmd.GetResetInd()
 			if pld.MinorVersion > 15 {
 				return nil, errExpectedLowerOrEqual("MinorVersion", 15)(pld.MinorVersion)
@@ -75,7 +76,7 @@ var DefaultMACCommands = MACCommandSpec{
 			b = append(b, byte(pld.MinorVersion))
 			return b, nil
 		},
-		UnmarshalUplink: newMACUnmarshaler(ttnpb.CID_RESET, "ResetInd", 1, func(b []byte, cmd *ttnpb.MACCommand) error {
+		UnmarshalUplink: newMACUnmarshaler(ttnpb.CID_RESET, "ResetInd", 1, func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
 			cmd.Payload = &ttnpb.MACCommand_ResetInd_{
 				ResetInd: &ttnpb.MACCommand_ResetInd{
 					MinorVersion: ttnpb.Minor(b[0] & 0xf),
@@ -85,7 +86,7 @@ var DefaultMACCommands = MACCommandSpec{
 		}),
 
 		DownlinkLength: 1,
-		AppendDownlink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
+		AppendDownlink: func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
 			pld := cmd.GetResetConf()
 			if pld.MinorVersion > 15 {
 				return nil, errExpectedLowerOrEqual("MinorVersion", 15)(pld.MinorVersion)
@@ -93,7 +94,7 @@ var DefaultMACCommands = MACCommandSpec{
 			b = append(b, byte(pld.MinorVersion))
 			return b, nil
 		},
-		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_RESET, "ResetConf", 1, func(b []byte, cmd *ttnpb.MACCommand) error {
+		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_RESET, "ResetConf", 1, func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
 			cmd.Payload = &ttnpb.MACCommand_ResetConf_{
 				ResetConf: &ttnpb.MACCommand_ResetConf{
 					MinorVersion: ttnpb.Minor(b[0] & 0xf),
@@ -108,13 +109,13 @@ var DefaultMACCommands = MACCommandSpec{
 		ExpectAnswer:      true,
 
 		UplinkLength: 0,
-		AppendUplink: func(b []byte, _ ttnpb.MACCommand) ([]byte, error) {
+		AppendUplink: func(phy band.Band, b []byte, _ ttnpb.MACCommand) ([]byte, error) {
 			return b, nil
 		},
 		UnmarshalUplink: newMACUnmarshaler(ttnpb.CID_LINK_CHECK, "LinkCheckReq", 0, nil),
 
 		DownlinkLength: 2,
-		AppendDownlink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
+		AppendDownlink: func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
 			pld := cmd.GetLinkCheckAns()
 			if pld.Margin > 254 {
 				return nil, errExpectedLowerOrEqual("Margin", 254)(pld.Margin)
@@ -125,7 +126,7 @@ var DefaultMACCommands = MACCommandSpec{
 			b = append(b, byte(pld.Margin), byte(pld.GatewayCount))
 			return b, nil
 		},
-		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_LINK_CHECK, "LinkCheckAns", 2, func(b []byte, cmd *ttnpb.MACCommand) error {
+		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_LINK_CHECK, "LinkCheckAns", 2, func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
 			cmd.Payload = &ttnpb.MACCommand_LinkCheckAns_{
 				LinkCheckAns: &ttnpb.MACCommand_LinkCheckAns{
 					Margin:       uint32(b[0]),
@@ -141,7 +142,7 @@ var DefaultMACCommands = MACCommandSpec{
 		ExpectAnswer:      true,
 
 		UplinkLength: 1,
-		AppendUplink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
+		AppendUplink: func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
 			pld := cmd.GetLinkADRAns()
 			var status byte
 			if pld.ChannelMaskAck {
@@ -156,7 +157,7 @@ var DefaultMACCommands = MACCommandSpec{
 			b = append(b, status)
 			return b, nil
 		},
-		UnmarshalUplink: newMACUnmarshaler(ttnpb.CID_LINK_ADR, "LinkADRAns", 1, func(b []byte, cmd *ttnpb.MACCommand) error {
+		UnmarshalUplink: newMACUnmarshaler(ttnpb.CID_LINK_ADR, "LinkADRAns", 1, func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
 			cmd.Payload = &ttnpb.MACCommand_LinkADRAns_{
 				LinkADRAns: &ttnpb.MACCommand_LinkADRAns{
 					ChannelMaskAck:   b[0]&1 == 1,
@@ -168,7 +169,7 @@ var DefaultMACCommands = MACCommandSpec{
 		}),
 
 		DownlinkLength: 4,
-		AppendDownlink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
+		AppendDownlink: func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
 			pld := cmd.GetLinkADRReq()
 			if pld.DataRateIndex > 15 {
 				return nil, errExpectedLowerOrEqual("DataRateIndex", 15)(pld.DataRateIndex)
@@ -194,7 +195,7 @@ var DefaultMACCommands = MACCommandSpec{
 			b = append(b, byte((pld.ChannelMaskControl&0x7)<<4)^byte(pld.NbTrans&0xf))
 			return b, nil
 		},
-		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_LINK_ADR, "LinkADRReq", 4, func(b []byte, cmd *ttnpb.MACCommand) error {
+		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_LINK_ADR, "LinkADRReq", 4, func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
 			var chMask [16]bool
 			for i := uint8(0); i < 16; i++ {
 				if (b[1+i/8]>>(i%8))&1 == 1 {
@@ -219,13 +220,13 @@ var DefaultMACCommands = MACCommandSpec{
 		ExpectAnswer:      true,
 
 		UplinkLength: 0,
-		AppendUplink: func(b []byte, _ ttnpb.MACCommand) ([]byte, error) {
+		AppendUplink: func(phy band.Band, b []byte, _ ttnpb.MACCommand) ([]byte, error) {
 			return b, nil
 		},
 		UnmarshalUplink: newMACUnmarshaler(ttnpb.CID_DUTY_CYCLE, "DutyCycleAns", 0, nil),
 
 		DownlinkLength: 1,
-		AppendDownlink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
+		AppendDownlink: func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
 			pld := cmd.GetDutyCycleReq()
 			if pld.MaxDutyCycle > 15 {
 				return nil, errExpectedLowerOrEqual("MaxDutyCycle", 15)(pld.MaxDutyCycle)
@@ -233,7 +234,7 @@ var DefaultMACCommands = MACCommandSpec{
 			b = append(b, byte(pld.MaxDutyCycle))
 			return b, nil
 		},
-		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_DUTY_CYCLE, "DutyCycleReq", 1, func(b []byte, cmd *ttnpb.MACCommand) error {
+		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_DUTY_CYCLE, "DutyCycleReq", 1, func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
 			cmd.Payload = &ttnpb.MACCommand_DutyCycleReq_{
 				DutyCycleReq: &ttnpb.MACCommand_DutyCycleReq{
 					MaxDutyCycle: ttnpb.AggregatedDutyCycle(b[0] & 0xf),
@@ -248,7 +249,7 @@ var DefaultMACCommands = MACCommandSpec{
 		ExpectAnswer:      true,
 
 		UplinkLength: 1,
-		AppendUplink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
+		AppendUplink: func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
 			pld := cmd.GetRxParamSetupAns()
 			var v byte
 			if pld.Rx2FrequencyAck {
@@ -263,7 +264,7 @@ var DefaultMACCommands = MACCommandSpec{
 			b = append(b, v)
 			return b, nil
 		},
-		UnmarshalUplink: newMACUnmarshaler(ttnpb.CID_RX_PARAM_SETUP, "RxParamSetupAns", 1, func(b []byte, cmd *ttnpb.MACCommand) error {
+		UnmarshalUplink: newMACUnmarshaler(ttnpb.CID_RX_PARAM_SETUP, "RxParamSetupAns", 1, func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
 			cmd.Payload = &ttnpb.MACCommand_RxParamSetupAns_{
 				RxParamSetupAns: &ttnpb.MACCommand_RxParamSetupAns{
 					Rx2FrequencyAck:      b[0]&1 == 1,
@@ -275,7 +276,7 @@ var DefaultMACCommands = MACCommandSpec{
 		}),
 
 		DownlinkLength: 4,
-		AppendDownlink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
+		AppendDownlink: func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
 			pld := cmd.GetRxParamSetupReq()
 			if pld.Rx1DataRateOffset > 7 {
 				return nil, errExpectedLowerOrEqual("Rx1DROffset", 7)(pld.Rx1DataRateOffset)
@@ -284,18 +285,18 @@ var DefaultMACCommands = MACCommandSpec{
 				return nil, errExpectedLowerOrEqual("Rx2DR", 15)(pld.Rx2DataRateIndex)
 			}
 			b = append(b, byte(pld.Rx2DataRateIndex)|byte(pld.Rx1DataRateOffset<<4))
-			if pld.Rx2Frequency < 100000 || pld.Rx2Frequency > maxUint24*100 {
-				return nil, errExpectedBetween("Rx2Frequency", 100000, maxUint24*100)(pld.Rx2Frequency)
+			if pld.Rx2Frequency < 100000 || pld.Rx2Frequency > maxUint24*phy.FreqMultiplier {
+				return nil, errExpectedBetween("Rx2Frequency", 100000, maxUint24*phy.FreqMultiplier)(pld.Rx2Frequency)
 			}
-			b = appendUint64(b, pld.Rx2Frequency/100, 3)
+			b = appendUint64(b, pld.Rx2Frequency/phy.FreqMultiplier, 3)
 			return b, nil
 		},
-		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_RX_PARAM_SETUP, "RxParamSetupReq", 4, func(b []byte, cmd *ttnpb.MACCommand) error {
+		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_RX_PARAM_SETUP, "RxParamSetupReq", 4, func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
 			cmd.Payload = &ttnpb.MACCommand_RxParamSetupReq_{
 				RxParamSetupReq: &ttnpb.MACCommand_RxParamSetupReq{
 					Rx1DataRateOffset: uint32((b[0] >> 4) & 0x7),
 					Rx2DataRateIndex:  ttnpb.DataRateIndex(b[0] & 0xf),
-					Rx2Frequency:      parseUint64(b[1:4]) * 100,
+					Rx2Frequency:      parseUint64(b[1:4]) * phy.FreqMultiplier,
 				},
 			}
 			return nil
@@ -307,7 +308,7 @@ var DefaultMACCommands = MACCommandSpec{
 		ExpectAnswer:      true,
 
 		UplinkLength: 2,
-		AppendUplink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
+		AppendUplink: func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
 			pld := cmd.GetDevStatusAns()
 			if pld.Battery > math.MaxUint8 {
 				return nil, errExpectedLowerOrEqual("Battery", math.MaxUint8)(math.MaxUint8)
@@ -323,7 +324,7 @@ var DefaultMACCommands = MACCommandSpec{
 			}
 			return b, nil
 		},
-		UnmarshalUplink: newMACUnmarshaler(ttnpb.CID_DEV_STATUS, "DevStatusAns", 2, func(b []byte, cmd *ttnpb.MACCommand) error {
+		UnmarshalUplink: newMACUnmarshaler(ttnpb.CID_DEV_STATUS, "DevStatusAns", 2, func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
 			margin := int32(b[1] & 0x1f)
 			if (b[1]>>5)&1 == 1 {
 				margin = -margin - 1
@@ -338,7 +339,7 @@ var DefaultMACCommands = MACCommandSpec{
 		}),
 
 		DownlinkLength: 0,
-		AppendDownlink: func(b []byte, _ ttnpb.MACCommand) ([]byte, error) {
+		AppendDownlink: func(phy band.Band, b []byte, _ ttnpb.MACCommand) ([]byte, error) {
 			return b, nil
 		},
 		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_DEV_STATUS, "DevStatusReq", 0, nil),
@@ -349,7 +350,7 @@ var DefaultMACCommands = MACCommandSpec{
 		ExpectAnswer:      true,
 
 		UplinkLength: 1,
-		AppendUplink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
+		AppendUplink: func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
 			pld := cmd.GetNewChannelAns()
 			var v byte
 			if pld.FrequencyAck {
@@ -361,7 +362,7 @@ var DefaultMACCommands = MACCommandSpec{
 			b = append(b, v)
 			return b, nil
 		},
-		UnmarshalUplink: newMACUnmarshaler(ttnpb.CID_NEW_CHANNEL, "NewChannelAns", 1, func(b []byte, cmd *ttnpb.MACCommand) error {
+		UnmarshalUplink: newMACUnmarshaler(ttnpb.CID_NEW_CHANNEL, "NewChannelAns", 1, func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
 			cmd.Payload = &ttnpb.MACCommand_NewChannelAns_{
 				NewChannelAns: &ttnpb.MACCommand_NewChannelAns{
 					FrequencyAck: b[0]&1 == 1,
@@ -372,17 +373,17 @@ var DefaultMACCommands = MACCommandSpec{
 		}),
 
 		DownlinkLength: 5,
-		AppendDownlink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
+		AppendDownlink: func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
 			pld := cmd.GetNewChannelReq()
 			if pld.ChannelIndex > math.MaxUint8 {
 				return nil, errExpectedLowerOrEqual("ChannelIndex", math.MaxUint8)(pld.ChannelIndex)
 			}
 			b = append(b, byte(pld.ChannelIndex))
 
-			if pld.Frequency > maxUint24*100 {
-				return nil, errExpectedLowerOrEqual("Frequency", maxUint24*100)(pld.Frequency)
+			if pld.Frequency > maxUint24*phy.FreqMultiplier {
+				return nil, errExpectedLowerOrEqual("Frequency", maxUint24*phy.FreqMultiplier)(pld.Frequency)
 			}
-			b = appendUint64(b, pld.Frequency/100, 3)
+			b = appendUint64(b, pld.Frequency/phy.FreqMultiplier, 3)
 
 			if pld.MinDataRateIndex > 15 {
 				return nil, errExpectedLowerOrEqual("MinDataRateIndex", 15)(pld.MinDataRateIndex)
@@ -396,11 +397,11 @@ var DefaultMACCommands = MACCommandSpec{
 			b = append(b, v)
 			return b, nil
 		},
-		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_NEW_CHANNEL, "NewChannelReq", 5, func(b []byte, cmd *ttnpb.MACCommand) error {
+		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_NEW_CHANNEL, "NewChannelReq", 5, func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
 			cmd.Payload = &ttnpb.MACCommand_NewChannelReq_{
 				NewChannelReq: &ttnpb.MACCommand_NewChannelReq{
 					ChannelIndex:     uint32(b[0]),
-					Frequency:        parseUint64(b[1:4]) * 100,
+					Frequency:        parseUint64(b[1:4]) * phy.FreqMultiplier,
 					MinDataRateIndex: ttnpb.DataRateIndex(b[4] & 0xf),
 					MaxDataRateIndex: ttnpb.DataRateIndex(b[4] >> 4),
 				},
@@ -414,13 +415,13 @@ var DefaultMACCommands = MACCommandSpec{
 		ExpectAnswer:      true,
 
 		UplinkLength: 0,
-		AppendUplink: func(b []byte, _ ttnpb.MACCommand) ([]byte, error) {
+		AppendUplink: func(phy band.Band, b []byte, _ ttnpb.MACCommand) ([]byte, error) {
 			return b, nil
 		},
 		UnmarshalUplink: newMACUnmarshaler(ttnpb.CID_RX_TIMING_SETUP, "RxTimingSetupAns", 0, nil),
 
 		DownlinkLength: 1,
-		AppendDownlink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
+		AppendDownlink: func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
 			pld := cmd.GetRxTimingSetupReq()
 			if pld.Delay > 15 {
 				return nil, errExpectedLowerOrEqual("Delay", 15)(pld.Delay)
@@ -428,7 +429,7 @@ var DefaultMACCommands = MACCommandSpec{
 			b = append(b, byte(pld.Delay))
 			return b, nil
 		},
-		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_RX_TIMING_SETUP, "RxTimingSetupReq", 1, func(b []byte, cmd *ttnpb.MACCommand) error {
+		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_RX_TIMING_SETUP, "RxTimingSetupReq", 1, func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
 			cmd.Payload = &ttnpb.MACCommand_RxTimingSetupReq_{
 				RxTimingSetupReq: &ttnpb.MACCommand_RxTimingSetupReq{
 					Delay: ttnpb.RxDelay(b[0] & 0xf),
@@ -443,13 +444,13 @@ var DefaultMACCommands = MACCommandSpec{
 		ExpectAnswer:      true,
 
 		UplinkLength: 0,
-		AppendUplink: func(b []byte, _ ttnpb.MACCommand) ([]byte, error) {
+		AppendUplink: func(phy band.Band, b []byte, _ ttnpb.MACCommand) ([]byte, error) {
 			return b, nil
 		},
 		UnmarshalUplink: newMACUnmarshaler(ttnpb.CID_TX_PARAM_SETUP, "TxParamSetupAns", 0, nil),
 
 		DownlinkLength: 1,
-		AppendDownlink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
+		AppendDownlink: func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
 			pld := cmd.GetTxParamSetupReq()
 
 			v := byte(pld.MaxEIRPIndex)
@@ -462,7 +463,7 @@ var DefaultMACCommands = MACCommandSpec{
 			b = append(b, v)
 			return b, nil
 		},
-		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_TX_PARAM_SETUP, "TxParamSetupReq", 1, func(b []byte, cmd *ttnpb.MACCommand) error {
+		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_TX_PARAM_SETUP, "TxParamSetupReq", 1, func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
 			cmd.Payload = &ttnpb.MACCommand_TxParamSetupReq_{
 				TxParamSetupReq: &ttnpb.MACCommand_TxParamSetupReq{
 					MaxEIRPIndex:      ttnpb.DeviceEIRP(b[0] & 0xf),
@@ -479,7 +480,7 @@ var DefaultMACCommands = MACCommandSpec{
 		ExpectAnswer:      true,
 
 		UplinkLength: 1,
-		AppendUplink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
+		AppendUplink: func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
 			pld := cmd.GetDLChannelAns()
 			var v byte
 			if pld.ChannelIndexAck {
@@ -491,7 +492,7 @@ var DefaultMACCommands = MACCommandSpec{
 			b = append(b, v)
 			return b, nil
 		},
-		UnmarshalUplink: newMACUnmarshaler(ttnpb.CID_DL_CHANNEL, "DLChannelAns", 1, func(b []byte, cmd *ttnpb.MACCommand) error {
+		UnmarshalUplink: newMACUnmarshaler(ttnpb.CID_DL_CHANNEL, "DLChannelAns", 1, func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
 			cmd.Payload = &ttnpb.MACCommand_DLChannelAns_{
 				DLChannelAns: &ttnpb.MACCommand_DLChannelAns{
 					ChannelIndexAck: b[0]&1 == 1,
@@ -502,24 +503,24 @@ var DefaultMACCommands = MACCommandSpec{
 		}),
 
 		DownlinkLength: 4,
-		AppendDownlink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
+		AppendDownlink: func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
 			pld := cmd.GetDLChannelReq()
 			if pld.ChannelIndex > math.MaxUint8 {
 				return nil, errExpectedLowerOrEqual("ChannelIndex", math.MaxUint8)(pld.ChannelIndex)
 			}
 			b = append(b, byte(pld.ChannelIndex))
 
-			if pld.Frequency < 100000 || pld.Frequency > maxUint24*100 {
-				return nil, errExpectedBetween("Frequency", 100000, maxUint24*100)(pld.Frequency)
+			if pld.Frequency < 100000 || pld.Frequency > maxUint24*phy.FreqMultiplier {
+				return nil, errExpectedBetween("Frequency", 100000, maxUint24*phy.FreqMultiplier)(pld.Frequency)
 			}
-			b = appendUint64(b, pld.Frequency/100, 3)
+			b = appendUint64(b, pld.Frequency/phy.FreqMultiplier, 3)
 			return b, nil
 		},
-		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_DL_CHANNEL, "DLChannelReq", 4, func(b []byte, cmd *ttnpb.MACCommand) error {
+		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_DL_CHANNEL, "DLChannelReq", 4, func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
 			cmd.Payload = &ttnpb.MACCommand_DLChannelReq_{
 				DLChannelReq: &ttnpb.MACCommand_DLChannelReq{
 					ChannelIndex: uint32(b[0]),
-					Frequency:    parseUint64(b[1:4]) * 100,
+					Frequency:    parseUint64(b[1:4]) * phy.FreqMultiplier,
 				},
 			}
 			return nil
@@ -531,7 +532,7 @@ var DefaultMACCommands = MACCommandSpec{
 		ExpectAnswer:      true,
 
 		UplinkLength: 1,
-		AppendUplink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
+		AppendUplink: func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
 			pld := cmd.GetRekeyInd()
 			if pld.MinorVersion > 15 {
 				return nil, errExpectedLowerOrEqual("MinorVersion", 15)(pld.MinorVersion)
@@ -539,7 +540,7 @@ var DefaultMACCommands = MACCommandSpec{
 			b = append(b, byte(pld.MinorVersion))
 			return b, nil
 		},
-		UnmarshalUplink: newMACUnmarshaler(ttnpb.CID_REKEY, "RekeyInd", 1, func(b []byte, cmd *ttnpb.MACCommand) error {
+		UnmarshalUplink: newMACUnmarshaler(ttnpb.CID_REKEY, "RekeyInd", 1, func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
 			cmd.Payload = &ttnpb.MACCommand_RekeyInd_{
 				RekeyInd: &ttnpb.MACCommand_RekeyInd{
 					MinorVersion: ttnpb.Minor(b[0] & 0xf),
@@ -549,7 +550,7 @@ var DefaultMACCommands = MACCommandSpec{
 		}),
 
 		DownlinkLength: 1,
-		AppendDownlink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
+		AppendDownlink: func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
 			pld := cmd.GetRekeyConf()
 			if pld.MinorVersion > 15 {
 				return nil, errExpectedLowerOrEqual("MinorVersion", 15)(pld.MinorVersion)
@@ -557,7 +558,7 @@ var DefaultMACCommands = MACCommandSpec{
 			b = append(b, byte(pld.MinorVersion))
 			return b, nil
 		},
-		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_REKEY, "RekeyConf", 1, func(b []byte, cmd *ttnpb.MACCommand) error {
+		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_REKEY, "RekeyConf", 1, func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
 			cmd.Payload = &ttnpb.MACCommand_RekeyConf_{
 				RekeyConf: &ttnpb.MACCommand_RekeyConf{
 					MinorVersion: ttnpb.Minor(b[0] & 0xf),
@@ -572,13 +573,13 @@ var DefaultMACCommands = MACCommandSpec{
 		ExpectAnswer:      true,
 
 		UplinkLength: 0,
-		AppendUplink: func(b []byte, _ ttnpb.MACCommand) ([]byte, error) {
+		AppendUplink: func(phy band.Band, b []byte, _ ttnpb.MACCommand) ([]byte, error) {
 			return b, nil
 		},
 		UnmarshalUplink: newMACUnmarshaler(ttnpb.CID_ADR_PARAM_SETUP, "ADRParamSetupAns", 0, nil),
 
 		DownlinkLength: 1,
-		AppendDownlink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
+		AppendDownlink: func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
 			pld := cmd.GetADRParamSetupReq()
 			if 1 > pld.ADRAckDelayExponent || pld.ADRAckDelayExponent > 32768 {
 				return nil, errExpectedBetween("ADRAckDelay", 1, 32768)(pld.ADRAckDelayExponent)
@@ -593,7 +594,7 @@ var DefaultMACCommands = MACCommandSpec{
 			b = append(b, v)
 			return b, nil
 		},
-		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_ADR_PARAM_SETUP, "ADRParamSetupReq", 1, func(b []byte, cmd *ttnpb.MACCommand) error {
+		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_ADR_PARAM_SETUP, "ADRParamSetupReq", 1, func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
 			cmd.Payload = &ttnpb.MACCommand_ADRParamSetupReq_{
 				ADRParamSetupReq: &ttnpb.MACCommand_ADRParamSetupReq{
 					ADRAckDelayExponent: ttnpb.ADRAckDelayExponent(b[0] & 0xf),
@@ -609,13 +610,13 @@ var DefaultMACCommands = MACCommandSpec{
 		ExpectAnswer:      true,
 
 		UplinkLength: 0,
-		AppendUplink: func(b []byte, _ ttnpb.MACCommand) ([]byte, error) {
+		AppendUplink: func(phy band.Band, b []byte, _ ttnpb.MACCommand) ([]byte, error) {
 			return b, nil
 		},
 		UnmarshalUplink: newMACUnmarshaler(ttnpb.CID_DEVICE_TIME, "DeviceTimeReq", 0, nil),
 
 		DownlinkLength: 5,
-		AppendDownlink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
+		AppendDownlink: func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
 			pld := cmd.GetDeviceTimeAns()
 
 			sec := gpstime.ToGPS(pld.Time)
@@ -626,7 +627,7 @@ var DefaultMACCommands = MACCommandSpec{
 			b = append(b, byte(time.Duration(pld.Time.Nanosecond())/fractStep))
 			return b, nil
 		},
-		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_DEVICE_TIME, "DeviceTimeAns", 5, func(b []byte, cmd *ttnpb.MACCommand) error {
+		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_DEVICE_TIME, "DeviceTimeAns", 5, func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
 			cmd.Payload = &ttnpb.MACCommand_DeviceTimeAns_{
 				DeviceTimeAns: &ttnpb.MACCommand_DeviceTimeAns{
 					Time: gpstime.Parse(int64(parseUint32(b[0:4]))).Add(time.Duration(b[4]) * fractStep),
@@ -641,7 +642,7 @@ var DefaultMACCommands = MACCommandSpec{
 		ExpectAnswer:      false,
 
 		DownlinkLength: 2,
-		AppendDownlink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
+		AppendDownlink: func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
 			pld := cmd.GetForceRejoinReq()
 
 			if pld.PeriodExponent > 7 {
@@ -669,7 +670,7 @@ var DefaultMACCommands = MACCommandSpec{
 			b = append(b, v)
 			return b, nil
 		},
-		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_FORCE_REJOIN, "ForceRejoinReq", 2, func(b []byte, cmd *ttnpb.MACCommand) error {
+		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_FORCE_REJOIN, "ForceRejoinReq", 2, func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
 			cmd.Payload = &ttnpb.MACCommand_ForceRejoinReq_{
 				ForceRejoinReq: &ttnpb.MACCommand_ForceRejoinReq{
 					PeriodExponent: ttnpb.RejoinPeriodExponent(uint32(b[0] >> 3)),
@@ -687,7 +688,7 @@ var DefaultMACCommands = MACCommandSpec{
 		ExpectAnswer:      true,
 
 		UplinkLength: 1,
-		AppendUplink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
+		AppendUplink: func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
 			pld := cmd.GetRejoinParamSetupAns()
 
 			var v byte
@@ -697,7 +698,7 @@ var DefaultMACCommands = MACCommandSpec{
 			b = append(b, v)
 			return b, nil
 		},
-		UnmarshalUplink: newMACUnmarshaler(ttnpb.CID_REJOIN_PARAM_SETUP, "RejoinParamSetupAns", 1, func(b []byte, cmd *ttnpb.MACCommand) error {
+		UnmarshalUplink: newMACUnmarshaler(ttnpb.CID_REJOIN_PARAM_SETUP, "RejoinParamSetupAns", 1, func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
 			cmd.Payload = &ttnpb.MACCommand_RejoinParamSetupAns_{
 				RejoinParamSetupAns: &ttnpb.MACCommand_RejoinParamSetupAns{
 					MaxTimeExponentAck: b[0]&1 == 1,
@@ -707,7 +708,7 @@ var DefaultMACCommands = MACCommandSpec{
 		}),
 
 		DownlinkLength: 1,
-		AppendDownlink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
+		AppendDownlink: func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
 			pld := cmd.GetRejoinParamSetupReq()
 
 			if pld.MaxTimeExponent > 15 {
@@ -722,7 +723,7 @@ var DefaultMACCommands = MACCommandSpec{
 			b = append(b, v)
 			return b, nil
 		},
-		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_REJOIN_PARAM_SETUP, "RejoinParamSetupReq", 1, func(b []byte, cmd *ttnpb.MACCommand) error {
+		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_REJOIN_PARAM_SETUP, "RejoinParamSetupReq", 1, func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
 			cmd.Payload = &ttnpb.MACCommand_RejoinParamSetupReq_{
 				RejoinParamSetupReq: &ttnpb.MACCommand_RejoinParamSetupReq{
 					MaxTimeExponent:  ttnpb.RejoinTimeExponent(uint32(b[0] >> 4)),
@@ -738,7 +739,7 @@ var DefaultMACCommands = MACCommandSpec{
 		ExpectAnswer:      true,
 
 		UplinkLength: 1,
-		AppendUplink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
+		AppendUplink: func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
 			pld := cmd.GetPingSlotInfoReq()
 
 			if pld.Period > 7 {
@@ -747,7 +748,7 @@ var DefaultMACCommands = MACCommandSpec{
 			b = append(b, byte(pld.Period))
 			return b, nil
 		},
-		UnmarshalUplink: newMACUnmarshaler(ttnpb.CID_PING_SLOT_INFO, "PingSlotInfoReq", 1, func(b []byte, cmd *ttnpb.MACCommand) error {
+		UnmarshalUplink: newMACUnmarshaler(ttnpb.CID_PING_SLOT_INFO, "PingSlotInfoReq", 1, func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
 			cmd.Payload = &ttnpb.MACCommand_PingSlotInfoReq_{
 				PingSlotInfoReq: &ttnpb.MACCommand_PingSlotInfoReq{
 					Period: ttnpb.PingSlotPeriod(b[0] & 0x7),
@@ -757,7 +758,7 @@ var DefaultMACCommands = MACCommandSpec{
 		}),
 
 		DownlinkLength: 0,
-		AppendDownlink: func(b []byte, _ ttnpb.MACCommand) ([]byte, error) {
+		AppendDownlink: func(phy band.Band, b []byte, _ ttnpb.MACCommand) ([]byte, error) {
 			return b, nil
 		},
 		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_PING_SLOT_INFO, "PingSlotInfoAns", 0, nil),
@@ -768,7 +769,7 @@ var DefaultMACCommands = MACCommandSpec{
 		ExpectAnswer:      true,
 
 		UplinkLength: 1,
-		AppendUplink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
+		AppendUplink: func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
 			pld := cmd.GetPingSlotChannelAns()
 
 			var v byte
@@ -781,7 +782,7 @@ var DefaultMACCommands = MACCommandSpec{
 			b = append(b, v)
 			return b, nil
 		},
-		UnmarshalUplink: newMACUnmarshaler(ttnpb.CID_PING_SLOT_CHANNEL, "PingSlotChannelAns", 1, func(b []byte, cmd *ttnpb.MACCommand) error {
+		UnmarshalUplink: newMACUnmarshaler(ttnpb.CID_PING_SLOT_CHANNEL, "PingSlotChannelAns", 1, func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
 			cmd.Payload = &ttnpb.MACCommand_PingSlotChannelAns_{
 				PingSlotChannelAns: &ttnpb.MACCommand_PingSlotChannelAns{
 					FrequencyAck:     b[0]&1 == 1,
@@ -792,13 +793,13 @@ var DefaultMACCommands = MACCommandSpec{
 		}),
 
 		DownlinkLength: 4,
-		AppendDownlink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
+		AppendDownlink: func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
 			pld := cmd.GetPingSlotChannelReq()
 
-			if pld.Frequency < 100000 || pld.Frequency > maxUint24*100 {
-				return nil, errExpectedBetween("Frequency", 100000, maxUint24*100)(pld.Frequency)
+			if pld.Frequency < 100000 || pld.Frequency > maxUint24*phy.FreqMultiplier {
+				return nil, errExpectedBetween("Frequency", 100000, maxUint24*phy.FreqMultiplier)(pld.Frequency)
 			}
-			b = appendUint64(b, pld.Frequency/100, 3)
+			b = appendUint64(b, pld.Frequency/phy.FreqMultiplier, 3)
 
 			if pld.DataRateIndex > 15 {
 				return nil, errExpectedLowerOrEqual("DataRateIndex", 15)(pld.DataRateIndex)
@@ -806,10 +807,10 @@ var DefaultMACCommands = MACCommandSpec{
 			b = append(b, byte(pld.DataRateIndex))
 			return b, nil
 		},
-		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_PING_SLOT_CHANNEL, "PingSlotChannelReq", 4, func(b []byte, cmd *ttnpb.MACCommand) error {
+		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_PING_SLOT_CHANNEL, "PingSlotChannelReq", 4, func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
 			cmd.Payload = &ttnpb.MACCommand_PingSlotChannelReq_{
 				PingSlotChannelReq: &ttnpb.MACCommand_PingSlotChannelReq{
-					Frequency:     parseUint64(b[0:3]) * 100,
+					Frequency:     parseUint64(b[0:3]) * phy.FreqMultiplier,
 					DataRateIndex: ttnpb.DataRateIndex(b[3] & 0xf),
 				},
 			}
@@ -822,13 +823,13 @@ var DefaultMACCommands = MACCommandSpec{
 		ExpectAnswer:      true,
 
 		UplinkLength: 0,
-		AppendUplink: func(b []byte, _ ttnpb.MACCommand) ([]byte, error) {
+		AppendUplink: func(phy band.Band, b []byte, _ ttnpb.MACCommand) ([]byte, error) {
 			return b, nil
 		},
 		UnmarshalUplink: newMACUnmarshaler(ttnpb.CID_BEACON_TIMING, "BeaconTimingReq", 0, nil),
 
 		DownlinkLength: 3,
-		AppendDownlink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
+		AppendDownlink: func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
 			pld := cmd.GetBeaconTimingAns()
 
 			if pld.Delay > math.MaxUint16 {
@@ -843,7 +844,7 @@ var DefaultMACCommands = MACCommandSpec{
 
 			return b, nil
 		},
-		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_BEACON_TIMING, "BeaconTimingAns", 3, func(b []byte, cmd *ttnpb.MACCommand) error {
+		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_BEACON_TIMING, "BeaconTimingAns", 3, func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
 			cmd.Payload = &ttnpb.MACCommand_BeaconTimingAns_{
 				BeaconTimingAns: &ttnpb.MACCommand_BeaconTimingAns{
 					Delay:        parseUint32(b[0:2]),
@@ -859,7 +860,7 @@ var DefaultMACCommands = MACCommandSpec{
 		ExpectAnswer:      true,
 
 		UplinkLength: 1,
-		AppendUplink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
+		AppendUplink: func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
 			pld := cmd.GetBeaconFreqAns()
 			var v byte
 			if pld.FrequencyAck {
@@ -868,7 +869,7 @@ var DefaultMACCommands = MACCommandSpec{
 			b = append(b, v)
 			return b, nil
 		},
-		UnmarshalUplink: newMACUnmarshaler(ttnpb.CID_BEACON_FREQ, "BeaconFreqAns", 1, func(b []byte, cmd *ttnpb.MACCommand) error {
+		UnmarshalUplink: newMACUnmarshaler(ttnpb.CID_BEACON_FREQ, "BeaconFreqAns", 1, func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
 			cmd.Payload = &ttnpb.MACCommand_BeaconFreqAns_{
 				BeaconFreqAns: &ttnpb.MACCommand_BeaconFreqAns{
 					FrequencyAck: b[0]&1 == 1,
@@ -878,18 +879,18 @@ var DefaultMACCommands = MACCommandSpec{
 		}),
 
 		DownlinkLength: 3,
-		AppendDownlink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
+		AppendDownlink: func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
 			pld := cmd.GetBeaconFreqReq()
-			if pld.Frequency < 100000 || pld.Frequency > maxUint24*100 {
-				return nil, errExpectedBetween("Frequency", 100000, maxUint24*100)(pld.Frequency)
+			if pld.Frequency < 100000 || pld.Frequency > maxUint24*phy.FreqMultiplier {
+				return nil, errExpectedBetween("Frequency", 100000, maxUint24*phy.FreqMultiplier)(pld.Frequency)
 			}
-			b = appendUint64(b, pld.Frequency/100, 3)
+			b = appendUint64(b, pld.Frequency/phy.FreqMultiplier, 3)
 			return b, nil
 		},
-		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_BEACON_FREQ, "BeaconFreqReq", 3, func(b []byte, cmd *ttnpb.MACCommand) error {
+		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_BEACON_FREQ, "BeaconFreqReq", 3, func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
 			cmd.Payload = &ttnpb.MACCommand_BeaconFreqReq_{
 				BeaconFreqReq: &ttnpb.MACCommand_BeaconFreqReq{
-					Frequency: parseUint64(b[0:3]) * 100,
+					Frequency: parseUint64(b[0:3]) * phy.FreqMultiplier,
 				},
 			}
 			return nil
@@ -901,12 +902,12 @@ var DefaultMACCommands = MACCommandSpec{
 		ExpectAnswer:      true,
 
 		UplinkLength: 1,
-		AppendUplink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
+		AppendUplink: func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
 			pld := cmd.GetDeviceModeInd()
 			b = append(b, byte(pld.Class))
 			return b, nil
 		},
-		UnmarshalUplink: newMACUnmarshaler(ttnpb.CID_DEVICE_MODE, "DeviceModeInd", 1, func(b []byte, cmd *ttnpb.MACCommand) error {
+		UnmarshalUplink: newMACUnmarshaler(ttnpb.CID_DEVICE_MODE, "DeviceModeInd", 1, func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
 			cmd.Payload = &ttnpb.MACCommand_DeviceModeInd_{
 				DeviceModeInd: &ttnpb.MACCommand_DeviceModeInd{
 					Class: ttnpb.Class(b[0]),
@@ -916,12 +917,12 @@ var DefaultMACCommands = MACCommandSpec{
 		}),
 
 		DownlinkLength: 1,
-		AppendDownlink: func(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
+		AppendDownlink: func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
 			pld := cmd.GetDeviceModeConf()
 			b = append(b, byte(pld.Class))
 			return b, nil
 		},
-		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_DEVICE_MODE, "DeviceModeConf", 1, func(b []byte, cmd *ttnpb.MACCommand) error {
+		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_DEVICE_MODE, "DeviceModeConf", 1, func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
 			cmd.Payload = &ttnpb.MACCommand_DeviceModeConf_{
 				DeviceModeConf: &ttnpb.MACCommand_DeviceModeConf{
 					Class: ttnpb.Class(b[0]),
@@ -934,7 +935,7 @@ var DefaultMACCommands = MACCommandSpec{
 
 var errDecodingMACCommand = errors.DefineInvalidArgument("decoding_mac_command", "could not decode MAC command with CID `{cid}`")
 
-func (spec MACCommandSpec) read(r io.Reader, isUplink bool, cmd *ttnpb.MACCommand) error {
+func (spec MACCommandSpec) read(phy band.Band, r io.Reader, isUplink bool, cmd *ttnpb.MACCommand) error {
 	b := make([]byte, 1)
 	_, err := r.Read(b)
 	if err != nil {
@@ -960,7 +961,7 @@ func (spec MACCommandSpec) read(r io.Reader, isUplink bool, cmd *ttnpb.MACComman
 	}
 
 	var n uint16
-	var unmarshaler func(b []byte, cmd *ttnpb.MACCommand) error
+	var unmarshaler func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error
 	if isUplink {
 		n = desc.UplinkLength
 		unmarshaler = desc.UnmarshalUplink
@@ -978,20 +979,20 @@ func (spec MACCommandSpec) read(r io.Reader, isUplink bool, cmd *ttnpb.MACComman
 			return err
 		}
 	}
-	if err := unmarshaler(b, cmd); err != nil {
+	if err := unmarshaler(phy, b, cmd); err != nil {
 		return errDecodingMACCommand.WithAttributes("cid", fmt.Sprintf("0x%X", int32(ret.CID))).WithCause(err)
 	}
 	return nil
 }
 
 // ReadUplink reads an uplink MACCommand from r into cmd and returns any errors encountered.
-func (spec MACCommandSpec) ReadUplink(r io.Reader, cmd *ttnpb.MACCommand) error {
-	return spec.read(r, true, cmd)
+func (spec MACCommandSpec) ReadUplink(phy band.Band, r io.Reader, cmd *ttnpb.MACCommand) error {
+	return spec.read(phy, r, true, cmd)
 }
 
 // ReadDownlink reads a downlink MACCommand from r into cmd and returns any errors encountered.
-func (spec MACCommandSpec) ReadDownlink(r io.Reader, cmd *ttnpb.MACCommand) error {
-	return spec.read(r, false, cmd)
+func (spec MACCommandSpec) ReadDownlink(phy band.Band, r io.Reader, cmd *ttnpb.MACCommand) error {
+	return spec.read(phy, r, false, cmd)
 }
 
 var (
@@ -1001,14 +1002,14 @@ var (
 	errMACCommandDownlink = errors.DefineInvalidArgument("mac_command_downlink", "invalid downlink MAC command CID `{cid}`")
 )
 
-func (spec MACCommandSpec) append(b []byte, isUplink bool, cmd ttnpb.MACCommand) ([]byte, error) {
+func (spec MACCommandSpec) append(phy band.Band, b []byte, isUplink bool, cmd ttnpb.MACCommand) ([]byte, error) {
 	desc, ok := spec[cmd.CID]
 	if !ok || desc == nil {
 		return nil, errUnknownMACCommand.WithAttributes("cid", fmt.Sprintf("0x%X", int32(cmd.CID)))
 	}
 	b = append(b, byte(cmd.CID))
 
-	var appender func(b []byte, cmd ttnpb.MACCommand) ([]byte, error)
+	var appender func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error)
 	if isUplink {
 		appender = desc.AppendUplink
 		if appender == nil {
@@ -1021,7 +1022,7 @@ func (spec MACCommandSpec) append(b []byte, isUplink bool, cmd ttnpb.MACCommand)
 		}
 	}
 
-	b, err := appender(b, cmd)
+	b, err := appender(phy, b, cmd)
 	if err != nil {
 		return nil, errEncodingMACCommand.WithAttributes("cid", fmt.Sprintf("0x%X", int32(cmd.CID))).WithCause(err)
 	}
@@ -1029,11 +1030,11 @@ func (spec MACCommandSpec) append(b []byte, isUplink bool, cmd ttnpb.MACCommand)
 }
 
 // AppendUplink encodes uplink MAC command cmd, appends it to b and returns any errors encountered.
-func (spec MACCommandSpec) AppendUplink(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
-	return spec.append(b, true, cmd)
+func (spec MACCommandSpec) AppendUplink(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
+	return spec.append(phy, b, true, cmd)
 }
 
 // AppendDownlink encodes downlink MAC command cmd, appends it to b and returns any errors encountered.
-func (spec MACCommandSpec) AppendDownlink(b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
-	return spec.append(b, false, cmd)
+func (spec MACCommandSpec) AppendDownlink(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
+	return spec.append(phy, b, false, cmd)
 }

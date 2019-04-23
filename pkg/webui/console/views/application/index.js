@@ -27,6 +27,7 @@ import ApplicationOverview from '../application-overview'
 import ApplicationGeneralSettings from '../application-general-settings'
 import ApplicationApiKeys from '../application-api-keys'
 import ApplicationLink from '../application-link'
+import ApplicationCollaborators from '../application-collaborators'
 
 import { getApplication } from '../../store/actions/application'
 
@@ -81,6 +82,7 @@ import Devices from '../devices'
         title: sharedMessages.collaborators,
         path: `${matchedUrl}/collaborators`,
         icon: 'organization',
+        exact: false,
       },
       {
         title: sharedMessages.apiKeys,
@@ -137,6 +139,7 @@ export default class Application extends React.Component {
         <Route path={`${match.path}/api-keys`} component={ApplicationApiKeys} />
         <Route path={`${match.path}/link`} component={ApplicationLink} />
         <Route path={`${match.path}/devices`} component={Devices} />
+        <Route path={`${match.path}/collaborators`} component={ApplicationCollaborators} />
       </Switch>
     )
   }

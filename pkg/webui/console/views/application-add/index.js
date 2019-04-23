@@ -28,6 +28,7 @@ import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import sharedMessages from '../../../lib/shared-messages'
 import { id as applicationIdRegexp } from '../../lib/regexp'
+import SubmitBar from '../../../components/submit-bar'
 
 import api from '../../api'
 
@@ -142,9 +143,9 @@ export default class Add extends React.Component {
                 placeholder={m.appDescPlaceholder}
                 type="text"
               />
-              <div className={style.submitBar}>
+              <SubmitBar>
                 <Button type="submit" message={m.createApplication} />
-              </div>
+              </SubmitBar>
             </Form>
           </Col>
           <Col className={style.description} sm={12} md={4} xl={3}>

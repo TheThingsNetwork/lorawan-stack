@@ -144,11 +144,11 @@ func TestHandleJoin(t *testing.T) {
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
-						Key:      appKey[:],
+						Key:      &appKey,
 						KEKLabel: "",
 					},
 					NwkKey: &ttnpb.KeyEnvelope{
-						Key:      nwkKey[:],
+						Key:      &nwkKey,
 						KEKLabel: "",
 					},
 				},
@@ -205,7 +205,7 @@ func TestHandleJoin(t *testing.T) {
 					})...),
 				SessionKeys: ttnpb.SessionKeys{
 					AppSKey: &ttnpb.KeyEnvelope{
-						Key: KeyToBytes(crypto.DeriveAppSKey(
+						Key: KeyPtr(crypto.DeriveAppSKey(
 							appKey,
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -213,7 +213,7 @@ func TestHandleJoin(t *testing.T) {
 						KEKLabel: "",
 					},
 					SNwkSIntKey: &ttnpb.KeyEnvelope{
-						Key: KeyToBytes(crypto.DeriveSNwkSIntKey(
+						Key: KeyPtr(crypto.DeriveSNwkSIntKey(
 							nwkKey,
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -221,7 +221,7 @@ func TestHandleJoin(t *testing.T) {
 						KEKLabel: "",
 					},
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
-						Key: KeyToBytes(crypto.DeriveFNwkSIntKey(
+						Key: KeyPtr(crypto.DeriveFNwkSIntKey(
 							nwkKey,
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -229,7 +229,7 @@ func TestHandleJoin(t *testing.T) {
 						KEKLabel: "",
 					},
 					NwkSEncKey: &ttnpb.KeyEnvelope{
-						Key: KeyToBytes(crypto.DeriveNwkSEncKey(
+						Key: KeyPtr(crypto.DeriveNwkSEncKey(
 							nwkKey,
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -253,11 +253,11 @@ func TestHandleJoin(t *testing.T) {
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
-						Key:      appKey[:],
+						Key:      &appKey,
 						KEKLabel: "",
 					},
 					NwkKey: &ttnpb.KeyEnvelope{
-						Key:      nwkKey[:],
+						Key:      &nwkKey,
 						KEKLabel: "",
 					},
 				},
@@ -314,7 +314,7 @@ func TestHandleJoin(t *testing.T) {
 					})...),
 				SessionKeys: ttnpb.SessionKeys{
 					AppSKey: &ttnpb.KeyEnvelope{
-						Key: KeyToBytes(crypto.DeriveAppSKey(
+						Key: KeyPtr(crypto.DeriveAppSKey(
 							appKey,
 							types.JoinNonce{0x42, 0xff, 0xfe},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -322,7 +322,7 @@ func TestHandleJoin(t *testing.T) {
 						KEKLabel: "",
 					},
 					SNwkSIntKey: &ttnpb.KeyEnvelope{
-						Key: KeyToBytes(crypto.DeriveSNwkSIntKey(
+						Key: KeyPtr(crypto.DeriveSNwkSIntKey(
 							nwkKey,
 							types.JoinNonce{0x42, 0xff, 0xfe},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -330,7 +330,7 @@ func TestHandleJoin(t *testing.T) {
 						KEKLabel: "",
 					},
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
-						Key: KeyToBytes(crypto.DeriveFNwkSIntKey(
+						Key: KeyPtr(crypto.DeriveFNwkSIntKey(
 							nwkKey,
 							types.JoinNonce{0x42, 0xff, 0xfe},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -338,7 +338,7 @@ func TestHandleJoin(t *testing.T) {
 						KEKLabel: "",
 					},
 					NwkSEncKey: &ttnpb.KeyEnvelope{
-						Key: KeyToBytes(crypto.DeriveNwkSEncKey(
+						Key: KeyPtr(crypto.DeriveNwkSEncKey(
 							nwkKey,
 							types.JoinNonce{0x42, 0xff, 0xfe},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -363,11 +363,11 @@ func TestHandleJoin(t *testing.T) {
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
-						Key:      appKey[:],
+						Key:      &appKey,
 						KEKLabel: "",
 					},
 					NwkKey: &ttnpb.KeyEnvelope{
-						Key:      nwkKey[:],
+						Key:      &nwkKey,
 						KEKLabel: "",
 					},
 				},
@@ -417,7 +417,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
-						Key:      appKey[:],
+						Key:      &appKey,
 						KEKLabel: "",
 					},
 				},
@@ -474,7 +474,7 @@ func TestHandleJoin(t *testing.T) {
 					})...),
 				SessionKeys: ttnpb.SessionKeys{
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
-						Key: KeyToBytes(crypto.DeriveLegacyNwkSKey(
+						Key: KeyPtr(crypto.DeriveLegacyNwkSKey(
 							appKey,
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.NetID{0x42, 0xff, 0xff},
@@ -482,7 +482,7 @@ func TestHandleJoin(t *testing.T) {
 						KEKLabel: "",
 					},
 					AppSKey: &ttnpb.KeyEnvelope{
-						Key: KeyToBytes(crypto.DeriveLegacyAppSKey(
+						Key: KeyPtr(crypto.DeriveLegacyAppSKey(
 							appKey,
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.NetID{0x42, 0xff, 0xff},
@@ -505,7 +505,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
-						Key:      appKey[:],
+						Key:      &appKey,
 						KEKLabel: "",
 					},
 				},
@@ -562,7 +562,7 @@ func TestHandleJoin(t *testing.T) {
 					})...),
 				SessionKeys: ttnpb.SessionKeys{
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
-						Key: KeyToBytes(crypto.DeriveLegacyNwkSKey(
+						Key: KeyPtr(crypto.DeriveLegacyNwkSKey(
 							appKey,
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.NetID{0x42, 0xff, 0xff},
@@ -570,7 +570,7 @@ func TestHandleJoin(t *testing.T) {
 						KEKLabel: "",
 					},
 					AppSKey: &ttnpb.KeyEnvelope{
-						Key: KeyToBytes(crypto.DeriveLegacyAppSKey(
+						Key: KeyPtr(crypto.DeriveLegacyAppSKey(
 							appKey,
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.NetID{0x42, 0xff, 0xff},
@@ -593,7 +593,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
-						Key:      appKey[:],
+						Key:      &appKey,
 						KEKLabel: "",
 					},
 				},
@@ -650,7 +650,7 @@ func TestHandleJoin(t *testing.T) {
 					})...),
 				SessionKeys: ttnpb.SessionKeys{
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
-						Key: KeyToBytes(crypto.DeriveLegacyNwkSKey(
+						Key: KeyPtr(crypto.DeriveLegacyNwkSKey(
 							appKey,
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.NetID{0x42, 0xff, 0xff},
@@ -658,7 +658,7 @@ func TestHandleJoin(t *testing.T) {
 						KEKLabel: "",
 					},
 					AppSKey: &ttnpb.KeyEnvelope{
-						Key: KeyToBytes(crypto.DeriveLegacyAppSKey(
+						Key: KeyPtr(crypto.DeriveLegacyAppSKey(
 							appKey,
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.NetID{0x42, 0xff, 0xff},
@@ -683,7 +683,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
-						Key:      appKey[:],
+						Key:      &appKey,
 						KEKLabel: "",
 					},
 				},
@@ -740,7 +740,7 @@ func TestHandleJoin(t *testing.T) {
 					})...),
 				SessionKeys: ttnpb.SessionKeys{
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
-						Key: KeyToBytes(crypto.DeriveLegacyNwkSKey(
+						Key: KeyPtr(crypto.DeriveLegacyNwkSKey(
 							appKey,
 							types.JoinNonce{0x42, 0xff, 0xfe},
 							types.NetID{0x42, 0xff, 0xff},
@@ -748,7 +748,7 @@ func TestHandleJoin(t *testing.T) {
 						KEKLabel: "",
 					},
 					AppSKey: &ttnpb.KeyEnvelope{
-						Key: KeyToBytes(crypto.DeriveLegacyAppSKey(
+						Key: KeyPtr(crypto.DeriveLegacyAppSKey(
 							appKey,
 							types.JoinNonce{0x42, 0xff, 0xfe},
 							types.NetID{0x42, 0xff, 0xff},
@@ -773,7 +773,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
-						Key:      appKey[:],
+						Key:      &appKey,
 						KEKLabel: "",
 					},
 				},
@@ -824,7 +824,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
-						Key:      appKey[:],
+						Key:      &appKey,
 						KEKLabel: "",
 					},
 				},
@@ -860,7 +860,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
-						Key:      appKey[:],
+						Key:      &appKey,
 						KEKLabel: "",
 					},
 				},
@@ -902,7 +902,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
-						Key:      appKey[:],
+						Key:      &appKey,
 						KEKLabel: "",
 					},
 				},
@@ -945,7 +945,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
-						Key:      appKey[:],
+						Key:      &appKey,
 						KEKLabel: "",
 					},
 				},
@@ -992,7 +992,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
-						Key:      appKey[:],
+						Key:      &appKey,
 						KEKLabel: "",
 					},
 				},
@@ -1031,7 +1031,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
-						Key:      appKey[:],
+						Key:      &appKey,
 						KEKLabel: "",
 					},
 				},
@@ -1312,15 +1312,15 @@ func TestGetNwkSKeys(t *testing.T) {
 				return &ttnpb.SessionKeys{
 					SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
-						Key:      KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
-						KEKLabel: "FNwkSIntKey-kek",
+						Key:      KeyPtr(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
+						KEKLabel: "",
 					},
 					NwkSEncKey: &ttnpb.KeyEnvelope{
-						Key:      KeyToBytes(types.AES128Key{0x43, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
+						Key:      KeyPtr(types.AES128Key{0x43, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
 						KEKLabel: "NwkSEncKey-kek",
 					},
 					SNwkSIntKey: &ttnpb.KeyEnvelope{
-						Key:      KeyToBytes(types.AES128Key{0x44, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
+						Key:      KeyPtr(types.AES128Key{0x44, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
 						KEKLabel: "SNwkSIntKey-kek",
 					},
 				}, nil
@@ -1331,15 +1331,15 @@ func TestGetNwkSKeys(t *testing.T) {
 			},
 			KeyResponse: &ttnpb.NwkSKeysResponse{
 				FNwkSIntKey: ttnpb.KeyEnvelope{
-					Key:      KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
-					KEKLabel: "FNwkSIntKey-kek",
+					Key:      KeyPtr(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
+					KEKLabel: "",
 				},
 				NwkSEncKey: ttnpb.KeyEnvelope{
-					Key:      KeyToBytes(types.AES128Key{0x43, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
+					Key:      KeyPtr(types.AES128Key{0x43, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
 					KEKLabel: "NwkSEncKey-kek",
 				},
 				SNwkSIntKey: ttnpb.KeyEnvelope{
-					Key:      KeyToBytes(types.AES128Key{0x44, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
+					Key:      KeyPtr(types.AES128Key{0x44, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
 					KEKLabel: "SNwkSIntKey-kek",
 				},
 			},

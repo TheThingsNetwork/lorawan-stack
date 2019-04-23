@@ -67,14 +67,14 @@ func (d *DataRate) UnmarshalJSON(data []byte) error {
 
 var (
 	errDataRate = errors.DefineInvalidArgument("data_rate", "invalid data rate")
-	sfRegexp    = regexp.MustCompile("^SF(6|7|8|9|10|11|12)")
-	drRegexp    = regexp.MustCompile("BW(125|250|500)$")
+	sfRegexp    = regexp.MustCompile(`^SF([1-9]|10|11|12)BW`)
+	bwRegexp    = regexp.MustCompile(`BW(\d+(?:\.\d+)?)$`)
 )
 
 // String implements the Stringer interface.
 func (d DataRate) String() string {
 	if lora := d.GetLoRa(); lora != nil {
-		return fmt.Sprintf("SF%dBW%d", lora.SpreadingFactor, lora.Bandwidth/1000)
+		return fmt.Sprintf("SF%dBW%v", lora.SpreadingFactor, float32(lora.Bandwidth)/1000)
 	}
 	if fsk := d.GetFSK(); fsk != nil {
 		return fmt.Sprintf("%d", fsk.BitRate)
@@ -92,11 +92,11 @@ func ParseLoRaDataRate(dr string) (DataRate, error) {
 	if err != nil {
 		return DataRate{}, errDataRate
 	}
-	matches = drRegexp.FindStringSubmatch(dr)
+	matches = bwRegexp.FindStringSubmatch(dr)
 	if len(matches) != 2 {
 		return DataRate{}, errDataRate
 	}
-	bw, err := strconv.ParseUint(matches[1], 10, 64)
+	bw, err := strconv.ParseFloat(matches[1], 64)
 	if err != nil {
 		return DataRate{}, errDataRate
 	}

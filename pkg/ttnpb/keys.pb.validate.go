@@ -51,6 +51,8 @@ func (m *KeyEnvelope) ValidateFields(paths ...string) error {
 			// no validation rules for Key
 		case "kek_label":
 			// no validation rules for KEKLabel
+		case "encrypted_key":
+			// no validation rules for EncryptedKey
 		default:
 			return KeyEnvelopeValidationError{
 				field:  name,

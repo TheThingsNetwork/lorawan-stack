@@ -51,6 +51,7 @@ type ClientStore interface {
 // sufficient rights to perform the action.
 type EndDeviceStore interface {
 	CreateEndDevice(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, error)
+	CountEndDevices(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (uint64, error)
 	ListEndDevices(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, fieldMask *types.FieldMask) ([]*ttnpb.EndDevice, error)
 	FindEndDevices(ctx context.Context, ids []*ttnpb.EndDeviceIdentifiers, fieldMask *types.FieldMask) ([]*ttnpb.EndDevice, error)
 	GetEndDevice(ctx context.Context, id *ttnpb.EndDeviceIdentifiers, fieldMask *types.FieldMask) (*ttnpb.EndDevice, error)
@@ -142,6 +143,7 @@ type APIKeyStore interface {
 //
 // For internal use (by the OAuth server) only.
 type OAuthStore interface {
+	ListAuthorizations(ctx context.Context, userIDs *ttnpb.UserIdentifiers) ([]*ttnpb.OAuthClientAuthorization, error)
 	GetAuthorization(ctx context.Context, userIDs *ttnpb.UserIdentifiers, clientIDs *ttnpb.ClientIdentifiers) (*ttnpb.OAuthClientAuthorization, error)
 	Authorize(ctx context.Context, req *ttnpb.OAuthClientAuthorization) (authorization *ttnpb.OAuthClientAuthorization, err error)
 	DeleteAuthorization(ctx context.Context, userIDs *ttnpb.UserIdentifiers, clientIDs *ttnpb.ClientIdentifiers) error
@@ -151,6 +153,7 @@ type OAuthStore interface {
 	DeleteAuthorizationCode(ctx context.Context, code string) error
 
 	CreateAccessToken(ctx context.Context, token *ttnpb.OAuthAccessToken, previousID string) error
+	ListAccessTokens(ctx context.Context, userIDs *ttnpb.UserIdentifiers, clientIDs *ttnpb.ClientIdentifiers) ([]*ttnpb.OAuthAccessToken, error)
 	GetAccessToken(ctx context.Context, id string) (*ttnpb.OAuthAccessToken, error)
 	DeleteAccessToken(ctx context.Context, id string) error
 }

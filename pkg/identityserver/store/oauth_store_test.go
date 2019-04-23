@@ -26,7 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
-func TestOauthStore(t *testing.T) {
+func TestOAuthStore(t *testing.T) {
 	ctx := test.Context()
 
 	WithDB(t, func(t *testing.T, db *gorm.DB) {
@@ -80,6 +80,14 @@ func TestOauthStore(t *testing.T) {
 			a.So(created.ClientIDs.ClientID, should.Equal, "test-client")
 			a.So(got.CreatedAt, should.HappenAfter, start)
 			a.So(got.UpdatedAt, should.HappenAfter, start)
+
+			list, err := store.ListAuthorizations(ctx, userIDs)
+
+			a.So(list, should.NotBeNil)
+			a.So(err, should.BeNil)
+			if a.So(list, should.HaveLength, 1) {
+				a.So(list[0], should.Resemble, got)
+			}
 
 			err = store.DeleteAuthorization(ctx, userIDs, clientIDs)
 
@@ -208,6 +216,14 @@ func TestOauthStore(t *testing.T) {
 
 			for _, right := range rights {
 				a.So(got.Rights, should.Contain, right)
+			}
+
+			list, err := store.ListAccessTokens(ctx, userIDs, clientIDs)
+
+			a.So(list, should.NotBeNil)
+			a.So(err, should.BeNil)
+			if a.So(list, should.HaveLength, 1) {
+				a.So(list[0], should.Resemble, got)
 			}
 
 			err = store.DeleteAccessToken(ctx, tokenID)

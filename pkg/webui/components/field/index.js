@@ -24,6 +24,7 @@ import Icon from '../icon'
 import Input from '../input'
 import Checkbox from '../checkbox'
 import Select from '../select'
+import RadioButton from '../radio-button'
 import Message from '../../lib/components/message'
 
 import style from './field.styl'
@@ -58,6 +59,8 @@ const checkboxAllowedProps = [
   'onBlur',
   'onChange',
   'disabled',
+  'name',
+  'checked',
 ]
 
 const selectAllowedProps = [
@@ -82,6 +85,7 @@ const selectAllowedProps = [
 const getAllowedPropsByType = function (type) {
   switch (type) {
   case 'checkbox':
+  case 'radio':
     return checkboxAllowedProps
   case 'select':
     return selectAllowedProps
@@ -107,7 +111,8 @@ const component = function (type) {
   switch (type) {
   case 'checkbox':
     return Checkbox
-
+  case 'radio':
+    return RadioButton
   case 'text':
   case 'number':
   case 'password':
@@ -151,6 +156,9 @@ const Field = function (props) {
     if (validateOnChange) {
       setFieldTouched(touches, true)
     }
+    if (props.onChange) {
+      props.onChange(value)
+    }
   }
 
   const handleBlur = function (e) {
@@ -162,19 +170,18 @@ const Field = function (props) {
 
   // Underscored assignment due to naming conflict
   let _error = rest.error
+  const id = props.id || name
   const formatMessage = content => typeof content === 'object' ? props.intl.formatMessage(content) : content
-
   if (form) {
-    // preserve default values for different inputs
-    rest.value = rest.value || ''
-    rest.onChange = rest.onChange || handleChange
+    rest.onChange = handleChange
     rest.onBlur = handleBlur
     _error = touched && rest.error
 
-    // Dismiss non boolean values for checkboxes
-    if (type === 'checkbox') {
-      rest.value = typeof rest.value === 'boolean' ? rest.value : false
-    }
+  }
+
+  // Dismiss non boolean values for checkboxes
+  if (type === 'checkbox') {
+    rest.value = typeof rest.value === 'boolean' ? rest.value : false
   }
 
   // restore the rest object for future per component filtering
@@ -201,13 +208,13 @@ const Field = function (props) {
 
   return (
     <div className={classname}>
-      <label className={style.label} htmlFor={name}>
+      <label className={style.label} htmlFor={id}>
         <Message content={title} className={style.title} />
         <span className={style.reqicon}>&middot;</span>
       </label>
       <Component
         className={style.component}
-        id={name}
+        id={id}
         {...filterPropsByType(type, rest)}
       />
       {hasMessages
@@ -273,6 +280,10 @@ Field.propTypes = {
   setFieldValue: PropTypes.func,
   /** The passed (formik) function to set the touch value of a form data property */
   setFieldTouched: PropTypes.func,
+  /** Optional hook for change events of the field, handy for arbitrary actions
+   * connected to field changes.
+   */
+  onChange: PropTypes.func,
 }
 
 const Err = function (props) {
@@ -280,6 +291,7 @@ const Err = function (props) {
     error,
     warning,
     name,
+    className,
   } = props
 
   const content = error || warning || ''
@@ -287,7 +299,7 @@ const Err = function (props) {
 
   const icon = error ? 'error' : 'warning'
 
-  const classname = classnames(style.message, {
+  const classname = classnames(style.message, className, {
     [style.show]: content && content !== '',
     [style.hide]: !content || content === '',
     [style.err]: error,

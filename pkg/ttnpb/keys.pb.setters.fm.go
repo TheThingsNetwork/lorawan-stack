@@ -26,6 +26,15 @@ func (dst *KeyEnvelope) SetFields(src *KeyEnvelope, paths ...string) error {
 				var zero string
 				dst.KEKLabel = zero
 			}
+		case "encrypted_key":
+			if len(subs) > 0 {
+				return fmt.Errorf("'encrypted_key' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.EncryptedKey = src.EncryptedKey
+			} else {
+				dst.EncryptedKey = nil
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

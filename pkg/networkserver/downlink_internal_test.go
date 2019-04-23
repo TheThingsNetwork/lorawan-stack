@@ -85,9 +85,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		},
 	}
 
-	// NOTE: This is only valid under assumption that test.EUFrequencyPlanID uses 868,
-	// and that all devices in test cases use test.EUFrequencyPlanID as the frequency plan.
-	band := test.Must(test.Must(band.GetByID(band.EU_863_870)).(band.Band).Version(ttnpb.PHY_V1_1_REV_B)).(band.Band)
+	phy := test.Must(test.Must(band.GetByID(band.EU_863_870)).(band.Band).Version(ttnpb.PHY_V1_1_REV_B)).(band.Band)
 
 	channels := [16]*ttnpb.MACParameters_Channel{
 		ttnpb.NewPopulatedMACParameters_Channel(test.Randy, false),
@@ -140,13 +138,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 						DevAddr: DevAddr,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: FNwkSIntKey[:],
+								Key: &FNwkSIntKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: SNwkSIntKey[:],
+								Key: &SNwkSIntKey,
 							},
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey[:],
+								Key: &NwkSEncKey,
 							},
 						},
 					},
@@ -306,11 +304,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 					t.Fatal("Invalid context")
 				}
 				fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
-				rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
-				rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint8))].DownlinkFrequency
-				genDown, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
-					band.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
-					band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
+				rx1DRIdx := test.Must(phy.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
+				rx1Freq := channels[int(test.Must(phy.Rx1Channel(3)).(uint8))].DownlinkFrequency
+				genDown, err := ns.generateDownlink(ctx, CopyEndDevice(pb), phy,
+					phy.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
+					phy.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
 				)
 				if !a.So(err, should.BeNil) {
 					t.Fatalf("Failed to generate Rx2 payload: %s", err)
@@ -326,11 +324,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 				expected.RecentDownlinks = append(expected.RecentDownlinks, &ttnpb.DownlinkMessage{
 					RawPayload:     genDown.Payload,
 					CorrelationIDs: ret.RecentDownlinks[0].CorrelationIDs,
-					EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-						DeviceID:               DeviceID,
-						DevAddr:                &DevAddr,
-					},
 					Settings: &ttnpb.DownlinkMessage_Request{
 						Request: &ttnpb.TxRequest{
 							Class:            ttnpb.CLASS_A,
@@ -377,15 +370,15 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}
 
 					fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
-					rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
-					rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint8))].DownlinkFrequency
+					rx1DRIdx := test.Must(phy.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
+					rx1Freq := channels[int(test.Must(phy.Rx1Channel(3)).(uint8))].DownlinkFrequency
 					drIdx := ttnpb.DATA_RATE_1
 					if rx1DRIdx < drIdx {
 						drIdx = rx1DRIdx
 					}
-					genDown, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
-						band.DataRates[drIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
-						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
+					genDown, err := ns.generateDownlink(ctx, CopyEndDevice(pb), phy,
+						phy.DataRates[drIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
+						phy.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
 					)
 					if !a.So(err, should.BeNil) {
 						t.Fatalf("Failed to generate Rx2 payload: %s", err)
@@ -420,11 +413,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 									a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 										RawPayload:     genDown.Payload,
 										CorrelationIDs: msg.CorrelationIDs,
-										EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-											ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-											DeviceID:               DeviceID,
-											DevAddr:                &DevAddr,
-										},
 										Settings: &ttnpb.DownlinkMessage_Request{
 											Request: &ttnpb.TxRequest{
 												Class:            ttnpb.CLASS_A,
@@ -459,11 +447,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 							a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 								RawPayload:     genDown.Payload,
 								CorrelationIDs: msg.CorrelationIDs,
-								EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-									ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-									DeviceID:               DeviceID,
-									DevAddr:                &DevAddr,
-								},
 								Settings: &ttnpb.DownlinkMessage_Request{
 									Request: &ttnpb.TxRequest{
 										Class:            ttnpb.CLASS_A,
@@ -507,11 +490,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 									RawPayload:     genDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
-									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-										DeviceID:               DeviceID,
-										DevAddr:                &DevAddr,
-									},
 									Settings: &ttnpb.DownlinkMessage_Request{
 										Request: &ttnpb.TxRequest{
 											Class:            ttnpb.CLASS_A,
@@ -569,13 +547,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 						DevAddr: DevAddr,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: FNwkSIntKey[:],
+								Key: &FNwkSIntKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: SNwkSIntKey[:],
+								Key: &SNwkSIntKey,
 							},
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey[:],
+								Key: &NwkSEncKey,
 							},
 						},
 						LastNFCntDown: 42,
@@ -742,15 +720,15 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}
 
 					fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
-					rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
-					rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint8))].DownlinkFrequency
+					rx1DRIdx := test.Must(phy.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
+					rx1Freq := channels[int(test.Must(phy.Rx1Channel(3)).(uint8))].DownlinkFrequency
 					drIdx := ttnpb.DATA_RATE_1
 					if rx1DRIdx < drIdx {
 						drIdx = rx1DRIdx
 					}
-					genDown, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
-						band.DataRates[drIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
-						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
+					genDown, err := ns.generateDownlink(ctx, CopyEndDevice(pb), phy,
+						phy.DataRates[drIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
+						phy.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
 					)
 					if !a.So(err, should.BeNil) {
 						t.Fatalf("Failed to generate Rx2 payload: %s", err)
@@ -785,11 +763,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 									a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 										RawPayload:     genDown.Payload,
 										CorrelationIDs: msg.CorrelationIDs,
-										EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-											ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-											DeviceID:               DeviceID,
-											DevAddr:                &DevAddr,
-										},
 										Settings: &ttnpb.DownlinkMessage_Request{
 											Request: &ttnpb.TxRequest{
 												Class:            ttnpb.CLASS_A,
@@ -824,11 +797,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 							a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 								RawPayload:     genDown.Payload,
 								CorrelationIDs: msg.CorrelationIDs,
-								EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-									ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-									DeviceID:               DeviceID,
-									DevAddr:                &DevAddr,
-								},
 								Settings: &ttnpb.DownlinkMessage_Request{
 									Request: &ttnpb.TxRequest{
 										Class:            ttnpb.CLASS_A,
@@ -872,11 +840,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 									RawPayload:     genDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
-									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-										DeviceID:               DeviceID,
-										DevAddr:                &DevAddr,
-									},
 									Settings: &ttnpb.DownlinkMessage_Request{
 										Request: &ttnpb.TxRequest{
 											Class:            ttnpb.CLASS_A,
@@ -934,13 +897,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 						DevAddr: DevAddr,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: FNwkSIntKey[:],
+								Key: &FNwkSIntKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: SNwkSIntKey[:],
+								Key: &SNwkSIntKey,
 							},
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey[:],
+								Key: &NwkSEncKey,
 							},
 						},
 					},
@@ -1100,11 +1063,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 					t.Fatal("Invalid context")
 				}
 				fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
-				rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
-				rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint8))].DownlinkFrequency
-				genDown, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
-					band.DataRates[rx1DRIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
-					band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
+				rx1DRIdx := test.Must(phy.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
+				rx1Freq := channels[int(test.Must(phy.Rx1Channel(3)).(uint8))].DownlinkFrequency
+				genDown, err := ns.generateDownlink(ctx, CopyEndDevice(pb), phy,
+					phy.DataRates[rx1DRIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
+					phy.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
 				)
 				if !a.So(err, should.BeNil) {
 					t.Fatalf("Failed to generate Rx1 payload: %s", err)
@@ -1120,11 +1083,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 				expected.RecentDownlinks = append(expected.RecentDownlinks, &ttnpb.DownlinkMessage{
 					RawPayload:     genDown.Payload,
 					CorrelationIDs: ret.RecentDownlinks[0].CorrelationIDs,
-					EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-						DeviceID:               DeviceID,
-						DevAddr:                &DevAddr,
-					},
 					Settings: &ttnpb.DownlinkMessage_Request{
 						Request: &ttnpb.TxRequest{
 							Class:            ttnpb.CLASS_A,
@@ -1171,11 +1129,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 						t.Fatal("Invalid context")
 					}
 					fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
-					rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
-					rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint8))].DownlinkFrequency
-					genDown, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
-						band.DataRates[rx1DRIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
-						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
+					rx1DRIdx := test.Must(phy.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
+					rx1Freq := channels[int(test.Must(phy.Rx1Channel(3)).(uint8))].DownlinkFrequency
+					genDown, err := ns.generateDownlink(ctx, CopyEndDevice(pb), phy,
+						phy.DataRates[rx1DRIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
+						phy.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
 					)
 					if !a.So(err, should.BeNil) {
 						t.Fatalf("Failed to generate Rx1 payload: %s", err)
@@ -1195,11 +1153,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 									RawPayload:     genDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
-									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-										DeviceID:               DeviceID,
-										DevAddr:                &DevAddr,
-									},
 									Settings: &ttnpb.DownlinkMessage_Request{
 										Request: &ttnpb.TxRequest{
 											Class:            ttnpb.CLASS_A,
@@ -1237,11 +1190,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 									RawPayload:     genDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
-									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-										DeviceID:               DeviceID,
-										DevAddr:                &DevAddr,
-									},
 									Settings: &ttnpb.DownlinkMessage_Request{
 										Request: &ttnpb.TxRequest{
 											Class:            ttnpb.CLASS_A,
@@ -1292,11 +1240,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 									RawPayload:     genDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
-									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-										DeviceID:               DeviceID,
-										DevAddr:                &DevAddr,
-									},
 									Settings: &ttnpb.DownlinkMessage_Request{
 										Request: &ttnpb.TxRequest{
 											Class:            ttnpb.CLASS_A,
@@ -1352,13 +1295,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 						DevAddr: DevAddr,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: FNwkSIntKey[:],
+								Key: &FNwkSIntKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: SNwkSIntKey[:],
+								Key: &SNwkSIntKey,
 							},
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey[:],
+								Key: &NwkSEncKey,
 							},
 						},
 					},
@@ -1517,9 +1460,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 					t.Fatal("Invalid context")
 				}
 				fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
-				rx2GenDown, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
-					band.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
-					band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
+				rx2GenDown, err := ns.generateDownlink(ctx, CopyEndDevice(pb), phy,
+					phy.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
+					phy.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
 				)
 				if !a.So(err, should.BeNil) {
 					t.Fatalf("Failed to generate Rx2 payload: %s", err)
@@ -1535,11 +1478,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 				expected.RecentDownlinks = append(expected.RecentDownlinks, &ttnpb.DownlinkMessage{
 					RawPayload:     rx2GenDown.Payload,
 					CorrelationIDs: ret.RecentDownlinks[0].CorrelationIDs,
-					EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-						DeviceID:               DeviceID,
-						DevAddr:                &DevAddr,
-					},
 					Settings: &ttnpb.DownlinkMessage_Request{
 						Request: &ttnpb.TxRequest{
 							Class:            ttnpb.CLASS_C,
@@ -1587,18 +1525,18 @@ func TestProcessDownlinkTask(t *testing.T) {
 						t.Fatal("Invalid context")
 					}
 					fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
-					rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
-					rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint8))].DownlinkFrequency
-					rx1GenDown, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
-						band.DataRates[rx1DRIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
-						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
+					rx1DRIdx := test.Must(phy.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
+					rx1Freq := channels[int(test.Must(phy.Rx1Channel(3)).(uint8))].DownlinkFrequency
+					rx1GenDown, err := ns.generateDownlink(ctx, CopyEndDevice(pb), phy,
+						phy.DataRates[rx1DRIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
+						phy.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
 					)
 					if !a.So(err, should.BeNil) {
 						t.Fatalf("Failed to generate Rx1 payload: %s", err)
 					}
-					rx2GenDown, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
-						band.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
-						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
+					rx2GenDown, err := ns.generateDownlink(ctx, CopyEndDevice(pb), phy,
+						phy.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
+						phy.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
 					)
 					if !a.So(err, should.BeNil) {
 						t.Fatalf("Failed to generate Rx2 payload: %s", err)
@@ -1618,11 +1556,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 									RawPayload:     rx1GenDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
-									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-										DeviceID:               DeviceID,
-										DevAddr:                &DevAddr,
-									},
 									Settings: &ttnpb.DownlinkMessage_Request{
 										Request: &ttnpb.TxRequest{
 											Class:            ttnpb.CLASS_A,
@@ -1654,11 +1587,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 									RawPayload:     rx2GenDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
-									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-										DeviceID:               DeviceID,
-										DevAddr:                &DevAddr,
-									},
 									Settings: &ttnpb.DownlinkMessage_Request{
 										Request: &ttnpb.TxRequest{
 											Class:            ttnpb.CLASS_C,
@@ -1691,11 +1619,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 									RawPayload:     rx1GenDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
-									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-										DeviceID:               DeviceID,
-										DevAddr:                &DevAddr,
-									},
 									Settings: &ttnpb.DownlinkMessage_Request{
 										Request: &ttnpb.TxRequest{
 											Class:            ttnpb.CLASS_A,
@@ -1732,11 +1655,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 									RawPayload:     rx1GenDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
-									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-										DeviceID:               DeviceID,
-										DevAddr:                &DevAddr,
-									},
 									Settings: &ttnpb.DownlinkMessage_Request{
 										Request: &ttnpb.TxRequest{
 											Class:            ttnpb.CLASS_A,
@@ -1769,11 +1687,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 									RawPayload:     rx2GenDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
-									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-										DeviceID:               DeviceID,
-										DevAddr:                &DevAddr,
-									},
 									Settings: &ttnpb.DownlinkMessage_Request{
 										Request: &ttnpb.TxRequest{
 											Class:            ttnpb.CLASS_C,
@@ -1809,11 +1722,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 									RawPayload:     rx2GenDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
-									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-										DeviceID:               DeviceID,
-										DevAddr:                &DevAddr,
-									},
 									Settings: &ttnpb.DownlinkMessage_Request{
 										Request: &ttnpb.TxRequest{
 											Class:            ttnpb.CLASS_C,
@@ -1905,13 +1813,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 						DevAddr: DevAddr,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: FNwkSIntKey[:],
+								Key: &FNwkSIntKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: SNwkSIntKey[:],
+								Key: &SNwkSIntKey,
 							},
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey[:],
+								Key: &NwkSEncKey,
 							},
 						},
 					},
@@ -2019,9 +1927,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 					t.Fatal("Invalid context")
 				}
 				fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
-				rx2GenDown, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
-					band.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
-					band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
+				rx2GenDown, err := ns.generateDownlink(ctx, CopyEndDevice(pb), phy,
+					phy.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
+					phy.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
 				)
 				if !a.So(err, should.BeNil) {
 					t.Fatalf("Failed to generate Rx2 payload: %s", err)
@@ -2037,11 +1945,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 				expected.RecentDownlinks = append(expected.RecentDownlinks, &ttnpb.DownlinkMessage{
 					RawPayload:     rx2GenDown.Payload,
 					CorrelationIDs: ret.RecentDownlinks[0].CorrelationIDs,
-					EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-						DeviceID:               DeviceID,
-						DevAddr:                &DevAddr,
-					},
 					Settings: &ttnpb.DownlinkMessage_Request{
 						Request: &ttnpb.TxRequest{
 							Class:            ttnpb.CLASS_C,
@@ -2090,9 +1993,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 						t.Fatal("Invalid context")
 					}
 					fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
-					rx2GenDown, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
-						band.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
-						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
+					rx2GenDown, err := ns.generateDownlink(ctx, CopyEndDevice(pb), phy,
+						phy.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
+						phy.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
 					)
 					if !a.So(err, should.BeNil) {
 						t.Fatalf("Failed to generate Rx2 payload: %s", err)
@@ -2110,11 +2013,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 									RawPayload:     rx2GenDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
-									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-										DeviceID:               DeviceID,
-										DevAddr:                &DevAddr,
-									},
 									Settings: &ttnpb.DownlinkMessage_Request{
 										Request: &ttnpb.TxRequest{
 											Class:            ttnpb.CLASS_C,
@@ -2174,13 +2072,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 						DevAddr: DevAddr,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: FNwkSIntKey[:],
+								Key: &FNwkSIntKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: SNwkSIntKey[:],
+								Key: &SNwkSIntKey,
 							},
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey[:],
+								Key: &NwkSEncKey,
 							},
 						},
 					},
@@ -2363,9 +2261,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 					t.Fatal("Invalid context")
 				}
 				fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
-				rx2GenDown, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
-					band.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
-					band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
+				rx2GenDown, err := ns.generateDownlink(ctx, CopyEndDevice(pb), phy,
+					phy.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
+					phy.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
 				)
 				if !a.So(err, should.BeNil) {
 					t.Fatalf("Failed to generate Rx2 payload: %s", err)
@@ -2381,11 +2279,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 				expected.RecentDownlinks = append(expected.RecentDownlinks, &ttnpb.DownlinkMessage{
 					RawPayload:     rx2GenDown.Payload,
 					CorrelationIDs: ret.RecentDownlinks[0].CorrelationIDs,
-					EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-						DeviceID:               DeviceID,
-						DevAddr:                &DevAddr,
-					},
 					Settings: &ttnpb.DownlinkMessage_Request{
 						Request: &ttnpb.TxRequest{
 							Class:            ttnpb.CLASS_C,
@@ -2435,9 +2328,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 						t.Fatal("Invalid context")
 					}
 					fp := test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan)
-					rx2GenDown, err := ns.generateDownlink(ctx, CopyEndDevice(pb),
-						band.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
-						band.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
+					rx2GenDown, err := ns.generateDownlink(ctx, CopyEndDevice(pb), phy,
+						phy.DataRates[ttnpb.DATA_RATE_1].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
+						phy.DataRates[ttnpb.DATA_RATE_0].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks()),
 					)
 					if !a.So(err, should.BeNil) {
 						t.Fatalf("Failed to generate Rx2 payload: %s", err)
@@ -2457,11 +2350,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 									RawPayload:     rx2GenDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
-									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-										DeviceID:               DeviceID,
-										DevAddr:                &DevAddr,
-									},
 									Settings: &ttnpb.DownlinkMessage_Request{
 										Request: &ttnpb.TxRequest{
 											Class:            ttnpb.CLASS_C,
@@ -2495,11 +2383,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 									RawPayload:     rx2GenDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
-									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-										DeviceID:               DeviceID,
-										DevAddr:                &DevAddr,
-									},
 									Settings: &ttnpb.DownlinkMessage_Request{
 										Request: &ttnpb.TxRequest{
 											Class:            ttnpb.CLASS_C,
@@ -2535,11 +2418,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 									RawPayload:     rx2GenDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
-									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-										DeviceID:               DeviceID,
-										DevAddr:                &DevAddr,
-									},
 									Settings: &ttnpb.DownlinkMessage_Request{
 										Request: &ttnpb.TxRequest{
 											Class:            ttnpb.CLASS_C,
@@ -2581,11 +2459,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 									RawPayload:     rx2GenDown.Payload,
 									CorrelationIDs: msg.CorrelationIDs,
-									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-										DeviceID:               DeviceID,
-										DevAddr:                &DevAddr,
-									},
 									Settings: &ttnpb.DownlinkMessage_Request{
 										Request: &ttnpb.TxRequest{
 											Class:            ttnpb.CLASS_C,
@@ -2660,13 +2533,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 						DevAddr: DevAddr,
 						SessionKeys: ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: FNwkSIntKey[:],
+								Key: &FNwkSIntKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: SNwkSIntKey[:],
+								Key: &SNwkSIntKey,
 							},
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey[:],
+								Key: &NwkSEncKey,
 							},
 						},
 					},
@@ -2821,8 +2694,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 				a.So(ret.RecentDownlinks[0].CorrelationIDs, should.Contain, "testCorrelationUpID1")
 				a.So(ret.RecentDownlinks[0].CorrelationIDs, should.Contain, "testCorrelationUpID2")
 
-				rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
-				rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint8))].DownlinkFrequency
+				rx1DRIdx := test.Must(phy.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
+				rx1Freq := channels[int(test.Must(phy.Rx1Channel(3)).(uint8))].DownlinkFrequency
 
 				expected := CopyEndDevice(pb)
 				expected.MACState.PendingJoinRequest = &expected.MACState.QueuedJoinAccept.Request
@@ -2838,16 +2711,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 				expected.RecentDownlinks = append(expected.RecentDownlinks, &ttnpb.DownlinkMessage{
 					RawPayload:     []byte("testJoinAccept"),
 					CorrelationIDs: ret.RecentDownlinks[0].CorrelationIDs,
-					EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-						DeviceID:               DeviceID,
-						DevAddr:                &DevAddr,
-					},
 					Settings: &ttnpb.DownlinkMessage_Request{
 						Request: &ttnpb.TxRequest{
 							Class:            ttnpb.CLASS_A,
 							Rx1DataRateIndex: rx1DRIdx,
-							Rx1Delay:         ttnpb.RxDelay(band.JoinAcceptDelay1 / time.Second),
+							Rx1Delay:         ttnpb.RxDelay(phy.JoinAcceptDelay1 / time.Second),
 							Rx1Frequency:     rx1Freq,
 							Rx2DataRateIndex: ttnpb.DATA_RATE_1,
 							Rx2Frequency:     42,
@@ -2878,8 +2746,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 					defer test.MustIncrementContextCounter(ctx, getPeerCallKey{}, 1)
 
-					rx1DRIdx := test.Must(band.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
-					rx1Freq := channels[int(test.Must(band.Rx1Channel(3)).(uint8))].DownlinkFrequency
+					rx1DRIdx := test.Must(phy.Rx1DataRate(ttnpb.DATA_RATE_0, 2, false)).(ttnpb.DataRateIndex)
+					rx1Freq := channels[int(test.Must(phy.Rx1Channel(3)).(uint8))].DownlinkFrequency
 
 					switch uid := unique.ID(ctx, ids); uid {
 					case unique.ID(ctx, gateways[0]):
@@ -2908,16 +2776,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 									a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 										RawPayload:     []byte("testJoinAccept"),
 										CorrelationIDs: msg.CorrelationIDs,
-										EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-											ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-											DeviceID:               DeviceID,
-											DevAddr:                &DevAddr,
-										},
 										Settings: &ttnpb.DownlinkMessage_Request{
 											Request: &ttnpb.TxRequest{
 												Class:            ttnpb.CLASS_A,
 												Rx1DataRateIndex: rx1DRIdx,
-												Rx1Delay:         ttnpb.RxDelay(band.JoinAcceptDelay1 / time.Second),
+												Rx1Delay:         ttnpb.RxDelay(phy.JoinAcceptDelay1 / time.Second),
 												Rx1Frequency:     rx1Freq,
 												Rx2DataRateIndex: ttnpb.DATA_RATE_1,
 												Rx2Frequency:     42,
@@ -2945,16 +2808,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 							a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 								RawPayload:     []byte("testJoinAccept"),
 								CorrelationIDs: msg.CorrelationIDs,
-								EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-									ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-									DeviceID:               DeviceID,
-									DevAddr:                &DevAddr,
-								},
 								Settings: &ttnpb.DownlinkMessage_Request{
 									Request: &ttnpb.TxRequest{
 										Class:            ttnpb.CLASS_A,
 										Rx1DataRateIndex: rx1DRIdx,
-										Rx1Delay:         ttnpb.RxDelay(band.JoinAcceptDelay1 / time.Second),
+										Rx1Delay:         ttnpb.RxDelay(phy.JoinAcceptDelay1 / time.Second),
 										Rx1Frequency:     rx1Freq,
 										Rx2DataRateIndex: ttnpb.DATA_RATE_1,
 										Rx2Frequency:     42,
@@ -2991,16 +2849,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 								a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 									RawPayload:     []byte("testJoinAccept"),
 									CorrelationIDs: msg.CorrelationIDs,
-									EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
-										ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-										DeviceID:               DeviceID,
-										DevAddr:                &DevAddr,
-									},
 									Settings: &ttnpb.DownlinkMessage_Request{
 										Request: &ttnpb.TxRequest{
 											Class:            ttnpb.CLASS_A,
 											Rx1DataRateIndex: rx1DRIdx,
-											Rx1Delay:         ttnpb.RxDelay(band.JoinAcceptDelay1 / time.Second),
+											Rx1Delay:         ttnpb.RxDelay(phy.JoinAcceptDelay1 / time.Second),
 											Rx1Frequency:     rx1Freq,
 											Rx2DataRateIndex: ttnpb.DATA_RATE_1,
 											Priority:         ttnpb.TxSchedulePriority_HIGH,
@@ -3110,6 +2963,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 }
 
 func TestGenerateDownlink(t *testing.T) {
+	phy := test.Must(test.Must(band.GetByID(band.EU_863_870)).(band.Band).Version(ttnpb.PHY_V1_1_REV_B)).(band.Band)
+
 	encodeMessage := func(msg *ttnpb.Message, ver ttnpb.MACVersion, confFCnt uint32) []byte {
 		msg = deepcopy.Copy(msg).(*ttnpb.Message)
 		mac := msg.GetMACPayload()
@@ -3154,9 +3009,9 @@ func TestGenerateDownlink(t *testing.T) {
 		return append(b, mic[:]...)
 	}
 
-	encodeMAC := func(cmds ...*ttnpb.MACCommand) (b []byte) {
+	encodeMAC := func(phy band.Band, cmds ...*ttnpb.MACCommand) (b []byte) {
 		for _, cmd := range cmds {
-			b = test.Must(lorawan.DefaultMACCommands.AppendDownlink(b, *cmd)).([]byte)
+			b = test.Must(lorawan.DefaultMACCommands.AppendDownlink(phy, b, *cmd)).([]byte)
 		}
 		return
 	}
@@ -3184,6 +3039,7 @@ func TestGenerateDownlink(t *testing.T) {
 				},
 				Session:           ttnpb.NewPopulatedSession(test.Randy, false),
 				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+				FrequencyPlanID:   band.EU_863_870,
 				RecentUplinks: []*ttnpb.UplinkMessage{{
 					Payload: &ttnpb.Message{
 						MHDR: ttnpb.MHDR{
@@ -3215,6 +3071,7 @@ func TestGenerateDownlink(t *testing.T) {
 					LastFCntUp: 4,
 				},
 				LoRaWANPHYVersion:       ttnpb.PHY_V1_1_REV_B,
+				FrequencyPlanID:         band.EU_863_870,
 				LastDevStatusReceivedAt: TimePtr(time.Unix(42, 0)),
 				RecentUplinks: []*ttnpb.UplinkMessage{{
 					Payload: &ttnpb.Message{
@@ -3243,6 +3100,7 @@ func TestGenerateDownlink(t *testing.T) {
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
 				LoRaWANPHYVersion:       ttnpb.PHY_V1_1_REV_B,
+				FrequencyPlanID:         band.EU_863_870,
 				LastDevStatusReceivedAt: TimePtr(time.Now()),
 				Session:                 ttnpb.NewPopulatedSession(test.Randy, false),
 				RecentUplinks: []*ttnpb.UplinkMessage{{
@@ -3274,14 +3132,15 @@ func TestGenerateDownlink(t *testing.T) {
 					LastNFCntDown: 41,
 					SessionKeys: ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
-							Key: NwkSEncKey[:],
+							Key: &NwkSEncKey,
 						},
 						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: SNwkSIntKey[:],
+							Key: &SNwkSIntKey,
 						},
 					},
 				},
 				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+				FrequencyPlanID:   band.EU_863_870,
 				RecentUplinks: []*ttnpb.UplinkMessage{{
 					Payload: &ttnpb.Message{
 						MHDR: ttnpb.MHDR{
@@ -3330,14 +3189,15 @@ func TestGenerateDownlink(t *testing.T) {
 						LastNFCntDown: 42,
 						SessionKeys: ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey[:],
+								Key: &NwkSEncKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: SNwkSIntKey[:],
+								Key: &SNwkSIntKey,
 							},
 						},
 					},
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+					FrequencyPlanID:   band.EU_863_870,
 					RecentUplinks: []*ttnpb.UplinkMessage{{
 						Payload: &ttnpb.Message{
 							MHDR: ttnpb.MHDR{
@@ -3372,10 +3232,10 @@ func TestGenerateDownlink(t *testing.T) {
 					DevAddr: DevAddr,
 					SessionKeys: ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
-							Key: NwkSEncKey[:],
+							Key: &NwkSEncKey,
 						},
 						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: SNwkSIntKey[:],
+							Key: &SNwkSIntKey,
 						},
 					},
 				},
@@ -3388,6 +3248,7 @@ func TestGenerateDownlink(t *testing.T) {
 					},
 				},
 				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+				FrequencyPlanID:   band.EU_863_870,
 				RecentUplinks: []*ttnpb.UplinkMessage{{
 					Payload: &ttnpb.Message{
 						MHDR: ttnpb.MHDR{
@@ -3439,14 +3300,15 @@ func TestGenerateDownlink(t *testing.T) {
 						DevAddr: DevAddr,
 						SessionKeys: ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey[:],
+								Key: &NwkSEncKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: SNwkSIntKey[:],
+								Key: &SNwkSIntKey,
 							},
 						},
 					},
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+					FrequencyPlanID:   band.EU_863_870,
 					RecentUplinks: []*ttnpb.UplinkMessage{{
 						Payload: &ttnpb.Message{
 							MHDR: ttnpb.MHDR{
@@ -3476,10 +3338,10 @@ func TestGenerateDownlink(t *testing.T) {
 					DevAddr: DevAddr,
 					SessionKeys: ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
-							Key: NwkSEncKey[:],
+							Key: &NwkSEncKey,
 						},
 						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: SNwkSIntKey[:],
+							Key: &SNwkSIntKey,
 						},
 					},
 				},
@@ -3492,6 +3354,7 @@ func TestGenerateDownlink(t *testing.T) {
 					},
 				},
 				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+				FrequencyPlanID:   band.EU_863_870,
 				RecentUplinks: []*ttnpb.UplinkMessage{{
 					Payload: &ttnpb.Message{
 						MHDR: ttnpb.MHDR{
@@ -3549,14 +3412,15 @@ func TestGenerateDownlink(t *testing.T) {
 						DevAddr: DevAddr,
 						SessionKeys: ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey[:],
+								Key: &NwkSEncKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: SNwkSIntKey[:],
+								Key: &SNwkSIntKey,
 							},
 						},
 					},
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+					FrequencyPlanID:   band.EU_863_870,
 					RecentUplinks: []*ttnpb.UplinkMessage{{
 						Payload: &ttnpb.Message{
 							MHDR: ttnpb.MHDR{
@@ -3591,10 +3455,10 @@ func TestGenerateDownlink(t *testing.T) {
 					DevAddr: DevAddr,
 					SessionKeys: ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
-							Key: NwkSEncKey[:],
+							Key: &NwkSEncKey,
 						},
 						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: SNwkSIntKey[:],
+							Key: &SNwkSIntKey,
 						},
 					},
 				},
@@ -3607,6 +3471,7 @@ func TestGenerateDownlink(t *testing.T) {
 					},
 				},
 				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+				FrequencyPlanID:   band.EU_863_870,
 				RecentUplinks: []*ttnpb.UplinkMessage{{
 					Payload: &ttnpb.Message{
 						MHDR: ttnpb.MHDR{
@@ -3671,14 +3536,15 @@ func TestGenerateDownlink(t *testing.T) {
 						LastConfFCntDown: 42,
 						SessionKeys: ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey[:],
+								Key: &NwkSEncKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: SNwkSIntKey[:],
+								Key: &SNwkSIntKey,
 							},
 						},
 					},
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+					FrequencyPlanID:   band.EU_863_870,
 					RecentUplinks: []*ttnpb.UplinkMessage{{
 						Payload: &ttnpb.Message{
 							MHDR: ttnpb.MHDR{
@@ -3708,14 +3574,15 @@ func TestGenerateDownlink(t *testing.T) {
 					DevAddr: DevAddr,
 					SessionKeys: ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
-							Key: NwkSEncKey[:],
+							Key: &NwkSEncKey,
 						},
 						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: SNwkSIntKey[:],
+							Key: &SNwkSIntKey,
 						},
 					},
 				},
 				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+				FrequencyPlanID:   band.EU_863_870,
 				QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 					{
 						Confirmed:  true,
@@ -3795,14 +3662,15 @@ func TestGenerateDownlink(t *testing.T) {
 						LastConfFCntDown: 42,
 						SessionKeys: ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey[:],
+								Key: &NwkSEncKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: SNwkSIntKey[:],
+								Key: &SNwkSIntKey,
 							},
 						},
 					},
 					LoRaWANPHYVersion:          ttnpb.PHY_V1_1_REV_B,
+					FrequencyPlanID:            band.EU_863_870,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{},
 					RecentUplinks: []*ttnpb.UplinkMessage{{
 						Payload: &ttnpb.Message{
@@ -3843,13 +3711,15 @@ func TestGenerateDownlink(t *testing.T) {
 					LastNFCntDown: 41,
 					SessionKeys: ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
-							Key: NwkSEncKey[:],
+							Key: &NwkSEncKey,
 						},
 						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: SNwkSIntKey[:],
+							Key: &SNwkSIntKey,
 						},
 					},
 				},
+				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+				FrequencyPlanID:   band.EU_863_870,
 				RecentUplinks: []*ttnpb.UplinkMessage{{
 					Payload: &ttnpb.Message{
 						MHDR: ttnpb.MHDR{
@@ -3875,6 +3745,7 @@ func TestGenerateDownlink(t *testing.T) {
 						},
 						FPort: 0,
 						FRMPayload: encodeMAC(
+							phy,
 							ttnpb.CID_DEV_STATUS.MACCommand(),
 						),
 					},
@@ -3910,13 +3781,15 @@ func TestGenerateDownlink(t *testing.T) {
 						LastNFCntDown: 42,
 						SessionKeys: ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey[:],
+								Key: &NwkSEncKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: SNwkSIntKey[:],
+								Key: &SNwkSIntKey,
 							},
 						},
 					},
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+					FrequencyPlanID:   band.EU_863_870,
 					RecentUplinks: []*ttnpb.UplinkMessage{{
 						Payload: &ttnpb.Message{
 							MHDR: ttnpb.MHDR{
@@ -3948,13 +3821,15 @@ func TestGenerateDownlink(t *testing.T) {
 					LastNFCntDown: 41,
 					SessionKeys: ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
-							Key: NwkSEncKey[:],
+							Key: &NwkSEncKey,
 						},
 						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: SNwkSIntKey[:],
+							Key: &SNwkSIntKey,
 						},
 					},
 				},
+				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+				FrequencyPlanID:   band.EU_863_870,
 				RecentUplinks: []*ttnpb.UplinkMessage{{
 					Payload: &ttnpb.Message{
 						MHDR: ttnpb.MHDR{
@@ -3980,6 +3855,7 @@ func TestGenerateDownlink(t *testing.T) {
 						},
 						FPort: 0,
 						FRMPayload: encodeMAC(
+							phy,
 							ttnpb.CID_DEV_STATUS.MACCommand(),
 						),
 					},
@@ -4013,13 +3889,15 @@ func TestGenerateDownlink(t *testing.T) {
 						LastNFCntDown: 42,
 						SessionKeys: ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: NwkSEncKey[:],
+								Key: &NwkSEncKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: SNwkSIntKey[:],
+								Key: &SNwkSIntKey,
 							},
 						},
 					},
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+					FrequencyPlanID:   band.EU_863_870,
 					RecentUplinks: []*ttnpb.UplinkMessage{{
 						Payload: &ttnpb.Message{
 							MHDR: ttnpb.MHDR{
@@ -4055,8 +3933,12 @@ func TestGenerateDownlink(t *testing.T) {
 			defer ns.Close()
 
 			dev := CopyEndDevice(tc.Device)
+			_, phy, err := getDeviceBandVersion(dev, ns.FrequencyPlans)
+			if !a.So(err, should.BeNil) {
+				t.FailNow()
+			}
 
-			genDown, err := ns.generateDownlink(tc.Context, dev, math.MaxUint16, math.MaxUint16)
+			genDown, err := ns.generateDownlink(tc.Context, dev, phy, math.MaxUint16, math.MaxUint16)
 			if tc.Error != nil {
 				a.So(err, should.EqualErrorOrDefinition, tc.Error)
 				a.So(genDown, should.BeNil)

@@ -3,19 +3,23 @@
 package ttnpb
 
 var KeyEnvelopeFieldPathsNested = []string{
+	"encrypted_key",
 	"kek_label",
 	"key",
 }
 
 var KeyEnvelopeFieldPathsTopLevel = []string{
+	"encrypted_key",
 	"kek_label",
 	"key",
 }
 var RootKeysFieldPathsNested = []string{
 	"app_key",
+	"app_key.encrypted_key",
 	"app_key.kek_label",
 	"app_key.key",
 	"nwk_key",
+	"nwk_key.encrypted_key",
 	"nwk_key.kek_label",
 	"nwk_key.key",
 	"root_key_id",
@@ -28,15 +32,19 @@ var RootKeysFieldPathsTopLevel = []string{
 }
 var SessionKeysFieldPathsNested = []string{
 	"app_s_key",
+	"app_s_key.encrypted_key",
 	"app_s_key.kek_label",
 	"app_s_key.key",
 	"f_nwk_s_int_key",
+	"f_nwk_s_int_key.encrypted_key",
 	"f_nwk_s_int_key.kek_label",
 	"f_nwk_s_int_key.key",
 	"nwk_s_enc_key",
+	"nwk_s_enc_key.encrypted_key",
 	"nwk_s_enc_key.kek_label",
 	"nwk_s_enc_key.key",
 	"s_nwk_s_int_key",
+	"s_nwk_s_int_key.encrypted_key",
 	"s_nwk_s_int_key.kek_label",
 	"s_nwk_s_int_key.key",
 	"session_key_id",

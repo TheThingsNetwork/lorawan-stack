@@ -22,10 +22,11 @@ package ttn.lorawan.v3;
 option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
 message KeyEnvelope {
-  // The (encrypted) key.
-  bytes key = 1;
+  // The unencrypted AES key.
+  bytes key = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.AES128Key"];
   // The label of the RFC 3394 key-encryption-key (KEK) that was used to encrypt the key.
   string kek_label = 2 [(gogoproto.customname) = "KEKLabel"];
+  bytes encrypted_key = 3;
 }
 
 // Root keys for a LoRaWAN device.

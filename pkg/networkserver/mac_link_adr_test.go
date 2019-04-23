@@ -36,13 +36,48 @@ func TestHandleLinkADRAns(t *testing.T) {
 		Error            error
 	}{
 		{
-			Name:     "nil payload",
-			DupCount: 0,
+			Name: "nil payload",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
 				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
+				},
+				RecentADRUplinks: []*ttnpb.UplinkMessage{
+					{
+						Payload: &ttnpb.Message{
+							MHDR: ttnpb.MHDR{
+								MType: ttnpb.MType_UNCONFIRMED_UP,
+							},
+							Payload: &ttnpb.Message_MACPayload{
+								MACPayload: &ttnpb.MACPayload{
+									FHDR: ttnpb.FHDR{
+										FCtrl: ttnpb.FCtrl{
+											ADR: true,
+										},
+										FCnt: 42,
+									},
+								},
+							},
+						},
+					},
+					{
+						Payload: &ttnpb.Message{
+							MHDR: ttnpb.MHDR{
+								MType: ttnpb.MType_UNCONFIRMED_UP,
+							},
+							Payload: &ttnpb.Message_MACPayload{
+								MACPayload: &ttnpb.MACPayload{
+									FHDR: ttnpb.FHDR{
+										FCtrl: ttnpb.FCtrl{
+											ADR: true,
+										},
+										FCnt: 43,
+									},
+								},
+							},
+						},
+					},
 				},
 			},
 			Expected: &ttnpb.EndDevice{
@@ -51,21 +86,91 @@ func TestHandleLinkADRAns(t *testing.T) {
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
+				RecentADRUplinks: []*ttnpb.UplinkMessage{
+					{
+						Payload: &ttnpb.Message{
+							MHDR: ttnpb.MHDR{
+								MType: ttnpb.MType_UNCONFIRMED_UP,
+							},
+							Payload: &ttnpb.Message_MACPayload{
+								MACPayload: &ttnpb.MACPayload{
+									FHDR: ttnpb.FHDR{
+										FCtrl: ttnpb.FCtrl{
+											ADR: true,
+										},
+										FCnt: 42,
+									},
+								},
+							},
+						},
+					},
+					{
+						Payload: &ttnpb.Message{
+							MHDR: ttnpb.MHDR{
+								MType: ttnpb.MType_UNCONFIRMED_UP,
+							},
+							Payload: &ttnpb.Message_MACPayload{
+								MACPayload: &ttnpb.MACPayload{
+									FHDR: ttnpb.FHDR{
+										FCtrl: ttnpb.FCtrl{
+											ADR: true,
+										},
+										FCnt: 43,
+									},
+								},
+							},
+						},
+					},
+				},
 			},
-			Payload: nil,
 			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
 				return assertions.New(t).So(evs, should.BeEmpty)
 			},
 			Error: errNoPayload,
 		},
 		{
-			Name:     "no request",
-			DupCount: 0,
+			Name: "no request",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
 				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
+				},
+				RecentADRUplinks: []*ttnpb.UplinkMessage{
+					{
+						Payload: &ttnpb.Message{
+							MHDR: ttnpb.MHDR{
+								MType: ttnpb.MType_UNCONFIRMED_UP,
+							},
+							Payload: &ttnpb.Message_MACPayload{
+								MACPayload: &ttnpb.MACPayload{
+									FHDR: ttnpb.FHDR{
+										FCtrl: ttnpb.FCtrl{
+											ADR: true,
+										},
+										FCnt: 42,
+									},
+								},
+							},
+						},
+					},
+					{
+						Payload: &ttnpb.Message{
+							MHDR: ttnpb.MHDR{
+								MType: ttnpb.MType_UNCONFIRMED_UP,
+							},
+							Payload: &ttnpb.Message_MACPayload{
+								MACPayload: &ttnpb.MACPayload{
+									FHDR: ttnpb.FHDR{
+										FCtrl: ttnpb.FCtrl{
+											ADR: true,
+										},
+										FCnt: 43,
+									},
+								},
+							},
+						},
+					},
 				},
 			},
 			Expected: &ttnpb.EndDevice{
@@ -73,6 +178,42 @@ func TestHandleLinkADRAns(t *testing.T) {
 				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
+				},
+				RecentADRUplinks: []*ttnpb.UplinkMessage{
+					{
+						Payload: &ttnpb.Message{
+							MHDR: ttnpb.MHDR{
+								MType: ttnpb.MType_UNCONFIRMED_UP,
+							},
+							Payload: &ttnpb.Message_MACPayload{
+								MACPayload: &ttnpb.MACPayload{
+									FHDR: ttnpb.FHDR{
+										FCtrl: ttnpb.FCtrl{
+											ADR: true,
+										},
+										FCnt: 42,
+									},
+								},
+							},
+						},
+					},
+					{
+						Payload: &ttnpb.Message{
+							MHDR: ttnpb.MHDR{
+								MType: ttnpb.MType_UNCONFIRMED_UP,
+							},
+							Payload: &ttnpb.Message_MACPayload{
+								MACPayload: &ttnpb.MACPayload{
+									FHDR: ttnpb.FHDR{
+										FCtrl: ttnpb.FCtrl{
+											ADR: true,
+										},
+										FCnt: 43,
+									},
+								},
+							},
+						},
+					},
 				},
 			},
 			Payload: &ttnpb.MACCommand_LinkADRAns{
@@ -93,8 +234,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 			Error: errMACRequestNotFound,
 		},
 		{
-			Name:     "1 request/all ack",
-			DupCount: 0,
+			Name: "1 request/all ack",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
 				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
@@ -120,6 +260,11 @@ func TestHandleLinkADRAns(t *testing.T) {
 							},
 						}).MACCommand(),
 					},
+				},
+				RecentADRUplinks: []*ttnpb.UplinkMessage{
+					newADRUplink(42, -2, 2, true, ttnpb.TxSettings{}),
+					newADRUplink(43, -2, 2, false, ttnpb.TxSettings{}),
+					newADRUplink(44, -3, 2, false, ttnpb.TxSettings{}),
 				},
 			},
 			Expected: &ttnpb.EndDevice{
@@ -163,8 +308,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 			},
 		},
 		{
-			Name:     "1.1/2 requests/all ack",
-			DupCount: 0,
+			Name: "1.1/2 requests/all ack",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
 				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
@@ -211,6 +355,11 @@ func TestHandleLinkADRAns(t *testing.T) {
 							},
 						}).MACCommand(),
 					},
+				},
+				RecentADRUplinks: []*ttnpb.UplinkMessage{
+					newADRUplink(42, -2, 2, true, ttnpb.TxSettings{}),
+					newADRUplink(43, -2, 2, false, ttnpb.TxSettings{}),
+					newADRUplink(44, -3, 2, false, ttnpb.TxSettings{}),
 				},
 			},
 			Expected: &ttnpb.EndDevice{
@@ -308,6 +457,11 @@ func TestHandleLinkADRAns(t *testing.T) {
 						}).MACCommand(),
 					},
 				},
+				RecentADRUplinks: []*ttnpb.UplinkMessage{
+					newADRUplink(42, -2, 2, true, ttnpb.TxSettings{}),
+					newADRUplink(43, -2, 2, false, ttnpb.TxSettings{}),
+					newADRUplink(44, -3, 2, false, ttnpb.TxSettings{}),
+				},
 			},
 			Expected: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
@@ -355,8 +509,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 			},
 		},
 		{
-			Name:     "1.0/2 requests/all ack",
-			DupCount: 0,
+			Name: "1.0/2 requests/all ack",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
 				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
@@ -403,6 +556,11 @@ func TestHandleLinkADRAns(t *testing.T) {
 							},
 						}).MACCommand(),
 					},
+				},
+				RecentADRUplinks: []*ttnpb.UplinkMessage{
+					newADRUplink(42, -2, 2, true, ttnpb.TxSettings{}),
+					newADRUplink(43, -2, 2, false, ttnpb.TxSettings{}),
+					newADRUplink(44, -3, 2, false, ttnpb.TxSettings{}),
 				},
 			},
 			Expected: &ttnpb.EndDevice{

@@ -110,7 +110,7 @@ var (
 		},
 	}
 	clientsGetCommand = &cobra.Command{
-		Use:     "get",
+		Use:     "get [client-id]",
 		Aliases: []string{"info"},
 		Short:   "Get a client",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -136,7 +136,7 @@ var (
 		},
 	}
 	clientsCreateCommand = &cobra.Command{
-		Use:     "create",
+		Use:     "create [client-id]",
 		Aliases: []string{"add", "register"},
 		Short:   "Create a client",
 		RunE: asBulk(func(cmd *cobra.Command, args []string) (err error) {
@@ -183,7 +183,7 @@ var (
 		}),
 	}
 	clientsUpdateCommand = &cobra.Command{
-		Use:     "update",
+		Use:     "update [client-id]",
 		Aliases: []string{"set"},
 		Short:   "Update a client",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -220,7 +220,7 @@ var (
 		},
 	}
 	clientsDeleteCommand = &cobra.Command{
-		Use:   "delete",
+		Use:   "delete [client-id]",
 		Short: "Delete a client",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliID := getClientID(cmd.Flags(), args)
@@ -240,8 +240,8 @@ var (
 			return nil
 		},
 	}
-	clientsContactInfoCommand = contactInfoCommands("client", func(cmd *cobra.Command) (*ttnpb.EntityIdentifiers, error) {
-		cliID := getClientID(cmd.Flags(), nil)
+	clientsContactInfoCommand = contactInfoCommands("client", func(cmd *cobra.Command, args []string) (*ttnpb.EntityIdentifiers, error) {
+		cliID := getClientID(cmd.Flags(), args)
 		if cliID == nil {
 			return nil, errNoClientID
 		}

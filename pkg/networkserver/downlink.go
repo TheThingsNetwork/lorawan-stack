@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/mohae/deepcopy"
+	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
@@ -81,7 +82,7 @@ type generatedDownlink struct {
 // For example, a sequence of 'NewChannel' MAC commands could be generated for a
 // device operating in a region where a fixed channel plan is defined in case
 // dev.MACState.CurrentParameters.Channels is not equal to dev.MACState.DesiredParameters.Channels.
-func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) (*generatedDownlink, error) {
+func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, phy band.Band, maxDownLen, maxUpLen uint16) (*generatedDownlink, error) {
 	if dev.MACState == nil {
 		return nil, errUnknownMACState
 	}
@@ -153,7 +154,7 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 		logger := logger.WithField("cid", cmd.CID)
 		logger.Debug("Add MAC command to buffer")
 		var err error
-		cmdBuf, err = spec.AppendDownlink(cmdBuf, *cmd)
+		cmdBuf, err = spec.AppendDownlink(phy, cmdBuf, *cmd)
 		if err != nil {
 			return nil, errEncodeMAC.WithCause(err)
 		}
@@ -485,7 +486,6 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *ttnpb
 		req.DownlinkPaths = a.paths
 		down := &ttnpb.DownlinkMessage{
 			RawPayload:     b,
-			EndDeviceIDs:   &devID,
 			CorrelationIDs: events.CorrelationIDsFromContext(ctx),
 			Settings: &ttnpb.DownlinkMessage_Request{
 				Request: req,
@@ -565,7 +565,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 				}
 				logger = logger.WithField("device_class", dev.MACState.DeviceClass)
 
-				fp, band, err := getDeviceBandVersion(dev, ns.FrequencyPlans)
+				fp, phy, err := getDeviceBandVersion(dev, ns.FrequencyPlans)
 				if err != nil {
 					return nil, nil, errUnknownBand.WithCause(err)
 				}
@@ -584,7 +584,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						break loop
 					}
 				}
-				maxUpLength := band.DataRates[maxUpDRIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks())
+				maxUpLength := phy.DataRates[maxUpDRIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks())
 
 				if dev.MACState.RxWindowsAvailable {
 					if len(dev.RecentUplinks) == 0 {
@@ -596,7 +596,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					if up.DeviceChannelIndex > math.MaxUint8 {
 						return nil, nil, errInvalidChannelIndex
 					}
-					rx1ChIdx, err := band.Rx1Channel(uint8(up.DeviceChannelIndex))
+					rx1ChIdx, err := phy.Rx1Channel(uint8(up.DeviceChannelIndex))
 					if err != nil {
 						return nil, nil, err
 					}
@@ -605,7 +605,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						dev.MACState.CurrentParameters.Channels[int(rx1ChIdx)].DownlinkFrequency == 0 {
 						return nil, nil, errCorruptedMACState
 					}
-					rx1DRIdx, err := band.Rx1DataRate(up.Settings.DataRateIndex, dev.MACState.CurrentParameters.Rx1DataRateOffset, dev.MACState.CurrentParameters.DownlinkDwellTime)
+					rx1DRIdx, err := phy.Rx1DataRate(up.Settings.DataRateIndex, dev.MACState.CurrentParameters.Rx1DataRateOffset, dev.MACState.CurrentParameters.DownlinkDwellTime)
 					if err != nil {
 						return nil, nil, err
 					}
@@ -617,9 +617,9 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					switch {
 					case dev.MACState.QueuedJoinAccept != nil:
 						// Join-accept downlink for Class A/B/C in Rx1/Rx2
-						req.Rx1Delay = ttnpb.RxDelay(band.JoinAcceptDelay1 / time.Second)
+						req.Rx1Delay = ttnpb.RxDelay(phy.JoinAcceptDelay1 / time.Second)
 						rx1, rx2, paths := downlinkPathsForClassA(
-							ttnpb.RxDelay(band.JoinAcceptDelay1/time.Second),
+							ttnpb.RxDelay(phy.JoinAcceptDelay1/time.Second),
 							dev.RecentUplinks...,
 						)
 						if rx1 {
@@ -695,8 +695,8 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						if req.Rx2DataRateIndex < minDR {
 							minDR = req.Rx2DataRateIndex
 						}
-						genDown, err = ns.generateDownlink(ctx, dev,
-							band.DataRates[minDR].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
+						genDown, err = ns.generateDownlink(ctx, dev, phy,
+							phy.DataRates[minDR].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 							maxUpLength,
 						)
 						if err != nil {
@@ -756,8 +756,8 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						// we need to create a deep copy for the first call.
 						devCopy := deepcopy.Copy(dev).(*ttnpb.EndDevice)
 
-						genDown, err = ns.generateDownlink(ctx, dev,
-							band.DataRates[req.Rx1DataRateIndex].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
+						genDown, err = ns.generateDownlink(ctx, dev, phy,
+							phy.DataRates[req.Rx1DataRateIndex].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 							maxUpLength,
 						)
 						if err != nil {
@@ -837,8 +837,8 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						Rx2Frequency:     dev.MACState.CurrentParameters.Rx2Frequency,
 					}
 
-					genDown, err = ns.generateDownlink(ctx, dev,
-						band.DataRates[req.Rx2DataRateIndex].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
+					genDown, err = ns.generateDownlink(ctx, dev, phy,
+						phy.DataRates[req.Rx2DataRateIndex].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 						maxUpLength,
 					)
 					if err != nil {

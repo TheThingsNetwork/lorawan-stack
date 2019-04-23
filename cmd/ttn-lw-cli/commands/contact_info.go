@@ -111,15 +111,15 @@ var (
 	errMatchingContactInfoNotFound = errors.DefineAlreadyExists("contact_info_not_found", "matching contact info not found")
 )
 
-func contactInfoCommands(entity string, getID func(cmd *cobra.Command) (*ttnpb.EntityIdentifiers, error)) *cobra.Command {
+func contactInfoCommands(entity string, getID func(cmd *cobra.Command, args []string) (*ttnpb.EntityIdentifiers, error)) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "contact-info",
 		Short: fmt.Sprintf("Manage %s contact info", entity),
 	}
 	add := &cobra.Command{
-		Use: "add",
+		Use: fmt.Sprintf("add [%s-id]", entity),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			id, err := getID(cmd)
+			id, err := getID(cmd, args)
 			if err != nil {
 				return err
 			}
@@ -142,9 +142,9 @@ func contactInfoCommands(entity string, getID func(cmd *cobra.Command) (*ttnpb.E
 		},
 	}
 	remove := &cobra.Command{
-		Use: "remove",
+		Use: fmt.Sprintf("remove [%s-id]", entity),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			id, err := getID(cmd)
+			id, err := getID(cmd, args)
 			if err != nil {
 				return err
 			}

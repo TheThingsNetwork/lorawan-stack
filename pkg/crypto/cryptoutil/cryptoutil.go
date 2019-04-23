@@ -25,15 +25,17 @@ import (
 // If the KEK label is empty, the key will be returned in the clear.
 func WrapAES128Key(key types.AES128Key, kekLabel string, v crypto.KeyVault) (ttnpb.KeyEnvelope, error) {
 	if kekLabel == "" {
-		return ttnpb.KeyEnvelope{Key: key[:]}, nil
+		return ttnpb.KeyEnvelope{
+			EncryptedKey: key[:],
+		}, nil
 	}
 	wrapped, err := v.Wrap(key[:], kekLabel)
 	if err != nil {
 		return ttnpb.KeyEnvelope{}, err
 	}
 	return ttnpb.KeyEnvelope{
-		Key:      wrapped,
-		KEKLabel: kekLabel,
+		EncryptedKey: wrapped,
+		KEKLabel:     kekLabel,
 	}, nil
 }
 
@@ -41,21 +43,24 @@ var errInvalidLength = errors.DefineInvalidArgument("invalid_length", "invalid s
 
 // UnwrapAES128Key performs the RFC 3394 Unwrap algorithm on the given key envelope using the given key vault.
 // If the KEK label is empty, the key is assumed to be stored in the clear.
-func UnwrapAES128Key(wrapped ttnpb.KeyEnvelope, v crypto.KeyVault) (types.AES128Key, error) {
-	var key []byte
+func UnwrapAES128Key(wrapped ttnpb.KeyEnvelope, v crypto.KeyVault) (key types.AES128Key, err error) {
+	if wrapped.Key != nil {
+		return *wrapped.Key, nil
+	}
 	if wrapped.KEKLabel == "" {
-		key = wrapped.Key
-	} else {
-		var err error
-		key, err = v.Unwrap(wrapped.Key, wrapped.KEKLabel)
-		if err != nil {
-			return types.AES128Key{}, err
+		if len(wrapped.EncryptedKey) != 16 {
+			return key, errInvalidLength
 		}
+		copy(key[:], wrapped.EncryptedKey)
+	} else {
+		keyBytes, err := v.Unwrap(wrapped.EncryptedKey, wrapped.KEKLabel)
+		if err != nil {
+			return key, err
+		}
+		if len(keyBytes) != 16 {
+			return key, errInvalidLength
+		}
+		copy(key[:], keyBytes)
 	}
-	if len(key) != 16 {
-		return types.AES128Key{}, errInvalidLength
-	}
-	unwrapped := types.AES128Key{}
-	copy(unwrapped[:], key)
-	return unwrapped, nil
+	return key, nil
 }

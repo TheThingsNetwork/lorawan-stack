@@ -23,6 +23,13 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
+func firstArgs(i int, args ...string) []string {
+	if i > len(args) {
+		i = len(args)
+	}
+	return args[:i]
+}
+
 func collaboratorFlags() *pflag.FlagSet {
 	flagSet := &pflag.FlagSet{}
 	flagSet.String("user-id", "", "")
@@ -99,13 +106,13 @@ var (
 	errNoAPIKeyRights = errors.DefineInvalidArgument("no_api_key_rights", "no API key rights set")
 )
 
-func getAPIKeyID(flagSet *pflag.FlagSet, args []string) string {
+func getAPIKeyID(flagSet *pflag.FlagSet, args []string, i int) string {
 	var apiKeyID string
-	if len(args) > 0 {
-		if len(args) > 1 {
-			logger.Warn("multiple IDs found in arguments, considering only the first")
+	if len(args) > 0+i {
+		if len(args) > 1+i {
+			logger.Warn("multiple API key IDs found in arguments, considering only the first")
 		}
-		apiKeyID = args[0]
+		apiKeyID = args[0+i]
 	} else {
 		apiKeyID, _ = flagSet.GetString("api-key-id")
 	}

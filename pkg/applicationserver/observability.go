@@ -239,9 +239,9 @@ func registerReceiveUp(ctx context.Context, msg *ttnpb.ApplicationUp, ns string)
 func registerForwardUp(ctx context.Context, msg *ttnpb.ApplicationUp) {
 	switch msg.Up.(type) {
 	case *ttnpb.ApplicationUp_JoinAccept:
-		events.Publish(evtForwardJoinAccept(ctx, msg.EndDeviceIdentifiers, nil))
+		events.Publish(evtForwardJoinAccept(ctx, msg.EndDeviceIdentifiers, msg))
 	case *ttnpb.ApplicationUp_UplinkMessage:
-		events.Publish(evtForwardDataUp(ctx, msg.EndDeviceIdentifiers, nil))
+		events.Publish(evtForwardDataUp(ctx, msg.EndDeviceIdentifiers, msg))
 	}
 	asMetrics.uplinkForwarded.WithLabelValues(ctx, msg.ApplicationID).Inc()
 }
@@ -249,31 +249,31 @@ func registerForwardUp(ctx context.Context, msg *ttnpb.ApplicationUp) {
 func registerDropUp(ctx context.Context, msg *ttnpb.ApplicationUp, err error) {
 	switch msg.Up.(type) {
 	case *ttnpb.ApplicationUp_JoinAccept:
-		events.Publish(evtDropJoinAccept(ctx, msg.EndDeviceIdentifiers, nil))
+		events.Publish(evtDropJoinAccept(ctx, msg.EndDeviceIdentifiers, err))
 	case *ttnpb.ApplicationUp_UplinkMessage:
-		events.Publish(evtDropDataUp(ctx, msg.EndDeviceIdentifiers, nil))
+		events.Publish(evtDropDataUp(ctx, msg.EndDeviceIdentifiers, err))
 	}
 	if ttnErr, ok := errors.From(err); ok {
-		asMetrics.uplinkDropped.WithLabelValues(ctx, ttnErr.String()).Inc()
+		asMetrics.uplinkDropped.WithLabelValues(ctx, ttnErr.FullName()).Inc()
 	} else {
 		asMetrics.uplinkDropped.WithLabelValues(ctx, unknown).Inc()
 	}
 }
 
 func registerReceiveDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink) {
-	events.Publish(evtReceiveDataDown(ctx, ids, nil))
+	events.Publish(evtReceiveDataDown(ctx, ids, msg))
 	asMetrics.downlinkReceived.WithLabelValues(ctx, ids.ApplicationID).Inc()
 }
 
 func registerForwardDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink, ns string) {
-	events.Publish(evtForwardDataDown(ctx, ids, nil))
+	events.Publish(evtForwardDataDown(ctx, ids, msg))
 	asMetrics.downlinkForwarded.WithLabelValues(ctx, ns).Inc()
 }
 
 func registerDropDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink, err error) {
-	events.Publish(evtDropDataDown(ctx, ids, nil))
+	events.Publish(evtDropDataDown(ctx, ids, err))
 	if ttnErr, ok := errors.From(err); ok {
-		asMetrics.downlinkDropped.WithLabelValues(ctx, ttnErr.String()).Inc()
+		asMetrics.downlinkDropped.WithLabelValues(ctx, ttnErr.FullName()).Inc()
 	} else {
 		asMetrics.downlinkDropped.WithLabelValues(ctx, unknown).Inc()
 	}

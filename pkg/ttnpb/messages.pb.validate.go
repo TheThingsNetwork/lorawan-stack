@@ -1362,6 +1362,18 @@ func (m *ApplicationUp) ValidateFields(paths ...string) error {
 
 			}
 
+		case "received_at":
+
+			if v, ok := interface{}(m.GetReceivedAt()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationUpValidationError{
+						field:  "received_at",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		case "up":
 			if len(subs) == 0 {
 				subs = []string{

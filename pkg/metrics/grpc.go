@@ -17,17 +17,23 @@ package metrics
 import (
 	"context"
 	"net"
+	"runtime/pprof"
 
 	"github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/prometheus/client_golang/prometheus"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/stats"
 )
 
 var serverMetrics = grpc_prometheus.NewServerMetrics()
 
 func init() {
-	serverMetrics.EnableHandlingTimeHistogram()
 	MustRegister(serverMetrics)
+}
+
+// InitializeServerMetrics initializes server metrics for the given gRPC server.
+func InitializeServerMetrics(s *grpc.Server) {
+	serverMetrics.InitializeMetrics(s)
 }
 
 // Server interceptors.
@@ -112,6 +118,9 @@ func (hdl statsHandler) Collect(ch chan<- prometheus.Metric) {
 }
 
 func (hdl statsHandler) TagRPC(ctx context.Context, info *stats.RPCTagInfo) context.Context {
+	defer pprof.SetGoroutineLabels(ctx)
+	ctx = pprof.WithLabels(ctx, pprof.Labels("grpc.method", info.FullMethodName))
+	pprof.SetGoroutineLabels(ctx)
 	return ctx
 }
 
