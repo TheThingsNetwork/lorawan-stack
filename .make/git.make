@@ -12,46 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-GIT_TAG ?= `git describe --abbrev=0 --tags 2>/dev/null`
-
-GIT_RELATIVE_DIR=git rev-parse --show-prefix
-
-only_existing = (xargs ls -d 2>/dev/null || true)
-dot_prefixed = sed 's:^:./:'
-
-# All files that are not ignored by git
-ALL_FILES ?= git ls-files --cached --modified --others --killed --exclude-standard | $(only_existing) | $(dot_prefixed)
-
-# Get all files that are currently staged, except for deleted files
-STAGED_FILES = git diff --staged --name-only --diff-filter=d --relative=$$($(GIT_RELATIVE_DIR)) | $(only_existing) | $(dot_prefixed)
-
-.PHONY: git.hooks
-
-git.hooks: $(MAGE)
-	@$(MAGE) git:installHooks
-
-INIT_RULES += git.hooks
-
-.PHONY: git.hooks.remove
-
-git.hooks.remove: $(MAGE)
-	@$(MAGE) git:uninstallHooks
-
-.PHONY: git.pre-commit
-
-git.pre-commit: $(MAGE)
-	@HOOK=pre-commit $(MAGE) git:runHook
-
-.PHONY: git.commit-msg
-
-git.commit-msg: $(MAGE)
-	@HOOK=commit-msg $(MAGE) git:runHook
-
-.PHONY: git.pre-push
-
-git.pre-push: $(MAGE)
-	@HOOK=pre-push $(MAGE) git:runHook
-
 .PHONY: git.diff
 
 git.diff:
