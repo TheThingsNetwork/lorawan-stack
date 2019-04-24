@@ -45,15 +45,6 @@ markdown.protos: $(wildcard api/*.proto)
 markdown.protos.clean:
 	rm -f $(PWD)/api/api.md
 
-SDK_PROTOC_FLAGS ?= --doc_opt=json,api.json --doc_out=$(PWD)/sdk/js/generated
-
-sdk.js.protos: $(wildcard api/*.proto)
-	$(PROTOC) $(SDK_PROTOC_FLAGS) $(API_PROTO_FILES)
-	$(YARN_SDK) run definitions
-
-sdk.js.protos.clean:
-	rm -f $(PWD)/sdk/js/generated/api.json $(PWD)/sdk/js/generated/api-definition.json
-
 include .make/protos/go.make
 
 protos: go.protos swagger.protos markdown.protos sdk.js.protos

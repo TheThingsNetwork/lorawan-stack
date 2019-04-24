@@ -181,6 +181,18 @@ sdk.js.test-watch: $(MAGE)
 sdk.js.watch: $(MAGE)
 	@$(MAGE) sdkJs:watch
 
+.PHONY: sdk.js.protos
+sdk.js.protos: $(MAGE)
+	@$(MAGE) sdkJs:protos
+
+.PHONY: sdk.js.definitions
+sdk.js.definitions: $(MAGE)
+	@$(MAGE) sdkJs:definitions
+
+.PHONY: sdk.js.protos-clean
+sdk.js.protos-clean: $(MAGE)
+	@$(MAGE) sdkJs:cleanProtos
+
 .PHONY: styl.lint
 styl.lint: $(MAGE)
 	@$(MAGE) styl:lint
