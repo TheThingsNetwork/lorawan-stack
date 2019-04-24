@@ -120,7 +120,7 @@ func (sdkJs SdkJs) TestWatch() error {
 	return yarn("run", "test:watch")
 }
 
-// Clean clears all generated files.
+// Clean clears all transpiled files.
 func (sdkJs SdkJs) Clean() {
 	sh.Rm("./sdk/js/dist")
 }
@@ -174,4 +174,10 @@ func (sdkJs SdkJs) Definitions() error {
 		return yarn("run", "definitions")
 	}
 	return nil
+}
+
+// CleanProtos clears all generated proto files.
+func (sdkJs SdkJs) CleanProtos() {
+	sh.Rm("./sdk/js/generated/api.json")
+	sh.Rm("./sdk/js/generated/api-definition.json")
 }
