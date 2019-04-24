@@ -39,7 +39,7 @@ func WithDB(t *testing.T, f func(t *testing.T, db *gorm.DB)) {
 		}
 		dbName := os.Getenv("TEST_DATABASE_NAME")
 		if dbName == "" {
-			dbName = "ttn_lorawan_test"
+			dbName = "ttn_lorawan_is_store_test"
 		}
 		dbConnString = fmt.Sprintf("postgresql://root@%s/%s?sslmode=disable", dbAddress, dbName)
 		db, err := Open(test.Context(), dbConnString)
