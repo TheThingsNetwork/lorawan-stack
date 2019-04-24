@@ -405,6 +405,14 @@ var (
 				return err
 			}
 
+			if err := uplinkParams.LoRaWANVersion.Validate(); err != nil {
+				return errInvalidMACVerson
+			}
+
+			if err := uplinkParams.LoRaWANPHYVersion.Validate(); err != nil {
+				return errInvalidPHYVerson
+			}
+
 			processDownlink := processDownlink(&ttnpb.EndDevice{
 				LoRaWANVersion:    uplinkParams.LoRaWANVersion,
 				LoRaWANPHYVersion: uplinkParams.LoRaWANPHYVersion,
@@ -481,6 +489,14 @@ var (
 			var dataUplinkParams simulateDataUplinkParams
 			if err := util.SetFields(&dataUplinkParams, simulateDataUplinkFlags); err != nil {
 				return err
+			}
+
+			if err := uplinkParams.LoRaWANVersion.Validate(); err != nil {
+				return errInvalidMACVerson
+			}
+
+			if err := uplinkParams.LoRaWANPHYVersion.Validate(); err != nil {
+				return errInvalidPHYVerson
 			}
 
 			processDownlink := processDownlink(&ttnpb.EndDevice{
