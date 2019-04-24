@@ -185,3 +185,22 @@ func (sdkJs SdkJs) CleanProtos() {
 	sh.Rm("./sdk/js/generated/api.json")
 	sh.Rm("./sdk/js/generated/api-definition.json")
 }
+
+// Link links the local sdk package via `yarn link` to prevent caching issues.
+func (sdkJs SdkJs) Link() error {
+	if mg.Verbose() {
+		fmt.Println("Linking sdk package…")
+	}
+
+	y, err := yarn()
+	if err != nil {
+		return err
+	}
+
+	err = y("--cwd=./sdk/js", "link")
+	if err != nil {
+		return err
+	}
+
+	return y("link", "ttn-lw")
+}

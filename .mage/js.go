@@ -135,7 +135,12 @@ func (js Js) Deps() error {
 	if err != nil {
 		return err
 	}
-	return yarn("install", "--no-progress", "--production=false")
+	err = yarn("install", "--no-progress", "--production=false")
+	if err != nil {
+		return err
+	}
+	mg.Deps(SdkJs.Link)
+	return nil
 }
 
 // Build runs all necessary commands to build the console bundles and files.
