@@ -9,7 +9,6 @@ services:
       - TTN_LW_HTTP_COOKIE_BLOCK_KEY
       - TTN_LW_CLUSTER_KEYS
       - TTN_LW_FREQUENCY_PLANS_URL
-      - TTN_LW_CONSOLE_OAUTH_CLIENT_SECRET
       # If using CockroachDB:
       - TTN_LW_IS_DATABASE_URI=postgres://root@cockroach:26257/${DEV_DATABASE_NAME:-ttn_lorawan}?sslmode=disable
       # If using PostgreSQL:
