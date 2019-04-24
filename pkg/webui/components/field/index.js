@@ -134,6 +134,7 @@ const Field = function (props) {
     className,
     type = 'text',
     name = '',
+    key = props.name,
     touches = props.name,
     title,
     placeholder = props.title,
@@ -216,6 +217,7 @@ const Field = function (props) {
       <Component
         className={style.component}
         id={id}
+        key={key}
         {...filterPropsByType(type, rest)}
       />
       {hasMessages
