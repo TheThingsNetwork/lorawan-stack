@@ -1,4 +1,8 @@
 {
+  "components.events.widget.index.latestEvents": "Latest events",
+  "components.events.widget.index.seeAllActivity": "See all activity",
+  "components.events.widget.index.noEvents": "{entityId} has not sent any events recently",
+  "components.events.widget.index.unknown": "Unknown",
   "components.footer.index.footer": "You are the network. Let's build this thing together.",
   "components.navigation.side.side.hideSidebar": "Hide Sidebar",
   "components.safe-inspector.index.copied": "Copied to clipboard!",

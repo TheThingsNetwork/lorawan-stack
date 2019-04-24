@@ -1,4 +1,8 @@
 {
+  "components.events.widget.index.latestEvents": "Xxxxxx xxxxxx",
+  "components.events.widget.index.seeAllActivity": "Xxx xxx xxxxxxxx",
+  "components.events.widget.index.noEvents": "{entityId} xxx xxx xxxx xxx xxxxxx xxxxxxxx",
+  "components.events.widget.index.unknown": "Xxxxxxx",
   "components.footer.index.footer": "Xxx xxx xxx xxxxxxx. Xxx'x xxxxx xxxx xxxxx xxxxxxxx.",
   "components.navigation.side.side.hideSidebar": "Xxxx Xxxxxxx",
   "components.safe-inspector.index.copied": "Xxxxxx xx xxxxxxxxx!",
