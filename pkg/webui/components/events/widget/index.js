@@ -44,6 +44,7 @@ class EventsWidget extends React.PureComponent {
         <Component
           event={event}
           type={type}
+          widget
         />
       </List.Item>
     )
