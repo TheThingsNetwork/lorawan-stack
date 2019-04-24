@@ -15,7 +15,6 @@
 include .mage/mage.make
 include .make/general.make
 include .make/git.make
-include .make/protos/main.make
 include .make/dev.make
 
 messages:
