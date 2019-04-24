@@ -25,6 +25,7 @@ import style from './list.styl'
 
 @bind
 class List extends React.PureComponent {
+
   renderItem (item, index) {
     const { rowKey, renderItem, size } = this.props
 
@@ -49,6 +50,20 @@ class List extends React.PureComponent {
         style[`item-${size}`]
       ),
     })
+  }
+
+  get header () {
+    const { header, size } = this.props
+
+    if (!header) {
+      return null
+    }
+
+    return (
+      <div className={classnames(style.header, style[`item-${size}`])}>
+        {header}
+      </div>
+    )
   }
 
   renderItems () {
@@ -84,15 +99,21 @@ class List extends React.PureComponent {
       items,
     } = this.props
 
-    const cls = classnames(className, style.list, {
+    const cls = classnames(className, style.wrapper, {
       [style.listBordered]: bordered,
+    })
+
+    const listCls = classnames(style.list, {
       [style.listEmpty]: !items.length,
     })
 
     return (
-      <Component className={cls}>
-        {this.renderItems()}
-      </Component>
+      <div className={cls}>
+        {this.header}
+        <Component className={listCls}>
+          {this.renderItems()}
+        </Component>
+      </div>
     )
   }
 }
@@ -102,10 +123,11 @@ List.propTypes = {
   renderItem: PropTypes.func.isRequired,
   items: PropTypes.array,
   rowKey: PropTypes.oneOfType([ PropTypes.func, PropTypes.string ]),
-  component: PropTypes.string,
+  component: PropTypes.oneOf([ 'ol', 'ul' ]),
   bordered: PropTypes.bool,
   emptyMessage: PropTypes.message,
   emptyMessageValues: PropTypes.object,
+  header: PropTypes.node,
 }
 
 List.defaultProps = {
@@ -115,6 +137,7 @@ List.defaultProps = {
   bordered: false,
   emptyMessage: sharedMessages.noMatch,
   emptyMessageValues: {},
+  header: null,
 }
 
 List.Item = ListItem
