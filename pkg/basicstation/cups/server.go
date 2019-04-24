@@ -68,7 +68,7 @@ func (conf ServerConfig) NewServer(c *component.Component, customOpts ...Option)
 			})
 		}))
 	}
-	if tlsConfig, err := c.GetBaseConfig(c.Context()).TLS.Config(c.Context()); err == nil {
+	if tlsConfig, err := c.GetTLSConfig(c.Context()); err == nil {
 		opts = append(opts, WithRootCAs(tlsConfig.RootCAs))
 	}
 	s := NewServer(c, append(opts, customOpts...)...)

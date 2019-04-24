@@ -2042,6 +2042,24 @@
       "file": "listeners.go"
     }
   },
+  "error:pkg/component:missing_acme_dir": {
+    "translations": {
+      "en": "missing ACME storage directory"
+    },
+    "description": {
+      "package": "pkg/component",
+      "file": "acme.go"
+    }
+  },
+  "error:pkg/component:missing_acme_endpoint": {
+    "translations": {
+      "en": "missing ACME endpoint"
+    },
+    "description": {
+      "package": "pkg/component",
+      "file": "acme.go"
+    }
+  },
   "error:pkg/config:format": {
     "translations": {
       "en": "invalid format `{input}`"
