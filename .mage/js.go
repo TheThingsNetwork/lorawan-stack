@@ -140,7 +140,7 @@ func (js Js) Deps() error {
 
 // Build runs all necessary commands to build the console bundles and files.
 func (js Js) Build() {
-	mg.Deps(js.BuildDll, js.BuildMain)
+	mg.SerialDeps(js.Deps, SdkJs.Build, js.BuildDll, js.BuildMain)
 }
 
 // BuildMain runs the webpack command with the project config.
@@ -174,7 +174,7 @@ func (js Js) BuildDll() error {
 
 // Serve builds necessary bundles and serves the console for development.
 func (js Js) Serve() {
-	mg.Deps(js.BuildDll, js.ServeMain)
+	mg.Deps(js.ServeMain)
 }
 
 // ServeMain runs webpack-dev-server

@@ -31,7 +31,7 @@ func (sdkJs SdkJs) devDeps() error {
 	return err
 }
 
-// JsSDK namespace.
+// SdkJs namespace.
 type SdkJs mg.Namespace
 
 func (sdkJs SdkJs) yarn() (func(args ...string) error, error) {
@@ -59,17 +59,19 @@ func (sdkJs SdkJs) DevDeps() error {
 // Deps installs the javascript dependencies.
 func (sdkJs SdkJs) Deps() error {
 	if mg.Verbose() {
-		fmt.Println("Installing JS dependencies")
+		fmt.Println("Installing JS SDK dependencies")
 	}
 	yarn, err := sdkJs.yarn()
 	if err != nil {
 		return err
 	}
-	return yarn("add", "--no-progress")
+	return yarn("install", "--no-progress")
 }
 
 // Build builds the source files and output into 'dist'.
 func (sdkJs SdkJs) Build() error {
+	mg.SerialDeps(sdkJs.Deps, sdkJs.Definitions)
+
 	if mg.Verbose() {
 		fmt.Println("Building JS SDK files…")
 	}
@@ -83,6 +85,8 @@ func (sdkJs SdkJs) Build() error {
 
 // Watch builds the source files in watch mode.
 func (sdkJs SdkJs) Watch() error {
+	mg.SerialDeps(sdkJs.Deps, sdkJs.Definitions)
+
 	if mg.Verbose() {
 		fmt.Println("Building and watching JS SDK files…")
 	}
