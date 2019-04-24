@@ -54,6 +54,7 @@ export default {
   mode: production ? 'production' : 'development',
   externals: [ filterLocales ],
   stats: 'minimal',
+  target: 'web',
   node: {
     fs: 'empty',
     module: 'empty',

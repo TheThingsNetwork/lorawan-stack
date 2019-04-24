@@ -1662,6 +1662,11 @@ array.prototype.flatmap@^1.2.1:
     es-abstract "^1.10.0"
     function-bind "^1.1.1"
 
+arraybuffer-to-string@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/arraybuffer-to-string/-/arraybuffer-to-string-1.0.2.tgz#c373aa7bb0e6844d9a2bc9654c8889a9570a26e2"
+  integrity sha512-WbIYlLVmvIAyUBdQRRuyGOJRriOQy9OAsWcyURmsRQp9+g647hdMSS2VFKXbJLVw0daUu06hqwLXm9etVrXI9A==
+
 arrify@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/arrify/-/arrify-1.0.1.tgz#898508da2226f380df904728456849c1501a4b0d"
@@ -11057,12 +11062,14 @@ tslib@^1.9.0:
   integrity sha512-4krF8scpejhaOgqzBEcGM7yDIEfi0/8+8zDRZhNZZ2kjmHJ4hv3zCbQWxoJGz1iw5U0Jl0nma13xzHXcncMavQ==
 
 "ttn-lw@file:sdk/js":
-  version "3.0.0-rc1"
+  version "3.0.2"
   dependencies:
+    arraybuffer-to-string "^1.0.2"
     axios "^0.18.0"
     proxy-polyfill "^0.3.0"
     query-string "^6.2.0"
     traverse "^0.6.6"
+    web-streams-polyfill "^2.0.3"
 
 tty-browserify@0.0.0:
   version "0.0.0"
@@ -11455,6 +11462,11 @@ wcwidth@^1.0.0:
   integrity sha1-8LDc+RW8X/FSivrbLA4XtTLaL+g=
   dependencies:
     defaults "^1.0.3"
+
+web-streams-polyfill@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/web-streams-polyfill/-/web-streams-polyfill-2.0.3.tgz#0c396f069a5eedc96c711393b12f2c67cf283a00"
+  integrity sha512-pOqiHmL3RBAGS+SgOR42RbPU6nc8/n15N2rsOXFYHLnTfs2Z8QHs8AizOeOaYEnhwPN4+hu3M2D9XvAqzvt6MA==
 
 webidl-conversions@^3.0.0:
   version "3.0.1"

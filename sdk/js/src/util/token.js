@@ -12,27 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package jsonpb
+class Token {
 
-import "github.com/grpc-ecosystem/grpc-gateway/runtime"
+  constructor (token) {
+    /**
+     * Make sure it is possible to instantiate an instance
+     * of the class only once.
+     */
+    if (!!Token.instance) {
+      return Token.instance
+    }
 
-// TTN returns the default TTN JSONPb marshaler.
-func TTN() *GoGoJSONPb {
-	return &GoGoJSONPb{
-		OrigName:    true,
-		EnumsAsInts: true,
-	}
+    if (this.token) {
+      return Token.instance
+    }
+
+    Token.instance = this
+    this.token = token
+
+    return this
+  }
+
+  get () {
+    return this.token
+  }
 }
 
-// TTNEventStream returns a TTN JsonPb marshaler with double newlines for
-// text/event-stream compatibility.
-func TTNEventStream() runtime.Marshaler {
-	return &ttnEventStream{GoGoJSONPb: TTN()}
-}
-
-type ttnEventStream struct {
-	*GoGoJSONPb
-}
-
-func (s *ttnEventStream) ContentType() string { return "text/event-stream" }
-func (s *ttnEventStream) Delimiter() []byte   { return []byte{'\n', '\n'} }
+export default Token

@@ -4,6 +4,10 @@
   "description": "The Things Network Stack for LoRaWAN JavaScript SDK",
   "url": "https://github.com/TheThingsNetwork/lorawan-stack/tree/master/sdk/js",
   "main": "dist/index.js",
+  "browser": {
+    "./dist/api/stream/stream-node.js": "./dist/api/stream/stream.js",
+    "./src/api/stream/stream-node.js": "./src/api/stream/stream.js"
+  },
   "license": "Apache-2.0",
   "private": false,
   "scripts": {
@@ -42,9 +46,11 @@
     "preset": "jest-preset-ttn"
   },
   "dependencies": {
+    "arraybuffer-to-string": "^1.0.2",
     "axios": "^0.18.0",
     "proxy-polyfill": "^0.3.0",
     "query-string": "^6.2.0",
-    "traverse": "^0.6.6"
+    "traverse": "^0.6.6",
+    "web-streams-polyfill": "^2.0.3"
   }
 }

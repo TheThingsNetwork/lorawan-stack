@@ -5192,6 +5192,24 @@
       "file": "end_device_registry.go"
     }
   },
+  "event:events.stream.start": {
+    "translations": {
+      "en": "event stream start"
+    },
+    "description": {
+      "package": "pkg/events/grpc",
+      "file": "grpc.go"
+    }
+  },
+  "event:events.stream.stop": {
+    "translations": {
+      "en": "event stream stop"
+    },
+    "description": {
+      "package": "pkg/events/grpc",
+      "file": "grpc.go"
+    }
+  },
   "event:gateway.api-key.create": {
     "translations": {
       "en": "Create gateway API key"
