@@ -23,6 +23,8 @@ services:
       - cockroach
       # If using PostgreSQL:
       # - postgres
+    volumes:
+      - ./blob:/srv/ttn-lorawan/public/blob
     ports:
       - "1882:1882"
       - "8882:8882"
