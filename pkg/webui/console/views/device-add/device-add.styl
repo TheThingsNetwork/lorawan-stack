@@ -1,4 +1,4 @@
-// Copyright © 2018 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,21 +21,3 @@
   +media-query($bp.s)
     order: 2
     text-margin-bottom($ls.m)
-
-.description
-  aside
-    margin-bottom: $ls.m
-    +media-query-min($bp.s)
-      border-dark('left')
-      padding-left: $ls.s
-
-    p
-      eat-text-margins()
-
-.submit-bar
-  border-dark('top')
-  display: flex
-  justify-content: space-between
-  background-color: $c-divider-subtle
-  padding: $cs.m
-
