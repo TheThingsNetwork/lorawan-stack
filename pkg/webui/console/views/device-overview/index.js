@@ -36,10 +36,6 @@ const m = defineMessages({
   activationInfo: 'Activation Info',
   rootKeyId: 'Root Key ID',
   sessionInfo: 'Session Info',
-  fwdNtwkKey: 'FNwkSIntKey',
-  sNtwkSIKey: 'SNwkSIntKey',
-  ntwkSEncKey: 'NwkSEncKey',
-  appSKey: 'AppSKey',
   latestData: 'Latest Data',
 })
 
@@ -124,10 +120,10 @@ class DeviceOverview extends React.Component {
       header: m.sessionInfo,
       items: [
         { key: sharedMessages.devAddr, value: ids.dev_addr, type: 'byte', sensitive: false },
-        { key: m.fwdNtwkKey, value: f_nwk_s_int_key.key, type: 'code', sensitive: true },
-        { key: m.sNtwkSIKey, value: s_nwk_s_int_key.key, type: 'code', sensitive: true },
-        { key: m.ntwkSEncKey, value: nwk_s_enc_key.key, type: 'code', sensitive: true },
-        { key: m.appSKey, value: app_s_key.key, type: 'code', sensitive: true },
+        { key: sharedMessages.fwdNtwkKey, value: f_nwk_s_int_key.key, type: 'code', sensitive: true },
+        { key: sharedMessages.sNtwkSIKey, value: s_nwk_s_int_key.key, type: 'code', sensitive: true },
+        { key: sharedMessages.ntwkSEncKey, value: nwk_s_enc_key.key, type: 'code', sensitive: true },
+        { key: sharedMessages.appSKey, value: app_s_key.key, type: 'code', sensitive: true },
       ],
     })
 
