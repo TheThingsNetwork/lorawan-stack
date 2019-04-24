@@ -19,23 +19,27 @@ import Event from '../..'
 import PropTypes from '../../../../lib/prop-types'
 import { getEntityId } from '../../../../lib/selectors/id'
 
-const DefaultEvent = function (props) {
-  const { className, event } = props
+class DefaultEvent extends React.PureComponent {
 
-  const entityId = getEntityId(event.identifiers[0])
+  render () {
+    const { className, event, widget } = this.props
 
-  const content = (
-    <Message content={{ id: `event:${event.name}` }} />
-  )
+    const entityId = getEntityId(event.identifiers[0])
 
-  return (
-    <Event
-      className={className}
-      time={event.time}
-      content={content}
-      emitter={entityId}
-    />
-  )
+    const content = (
+      <Message content={{ id: `event:${event.name}` }} />
+    )
+
+    return (
+      <Event
+        className={className}
+        time={event.time}
+        content={content}
+        emitter={entityId}
+        widget={widget}
+      />
+    )
+  }
 }
 
 DefaultEvent.propTypes = {
@@ -45,6 +49,11 @@ DefaultEvent.propTypes = {
     identifiers: PropTypes.array.isRequired,
     data: PropTypes.object,
   }).isRequired,
+  widget: PropTypes.bool,
+}
+
+DefaultEvent.defaultProps = {
+  widget: false,
 }
 
 export default DefaultEvent

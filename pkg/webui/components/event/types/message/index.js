@@ -63,6 +63,11 @@ MessageEvent.propTypes = {
     data: PropTypes.object,
   }).isRequired,
   type: PropTypes.oneOf([ 'downlink', 'uplink' ]),
+  widget: PropTypes.bool,
+}
+
+MessageEvent.defaultProps = {
+  widget: false,
 }
 
 export default MessageEvent
