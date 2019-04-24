@@ -20,9 +20,14 @@ import (
 
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/pkg/auth"
+	"go.thethings.network/lorawan-stack/pkg/auth/pbkdf2"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/randutil"
 )
+
+func init() {
+	pbkdf2.SetDefaultIterations(10)
+}
 
 // NewPopulator returns a new database populator with a population of the given size.
 // It is seeded by the given seed.
