@@ -63,40 +63,33 @@ install:
   fi
 
 script:
-- |
-  if [[ "$RUNTYPE" == "js.test" ]]; then
-    make js.dev-deps js.deps sdk.deps
-    make js.translations
-    make js.test sdk.test
-    make js.lint
-    make sdk.js.build sdk.protos.clean sdk.protos
-    make swagger.protos.clean swagger.protos
-    make markdown.protos.clean markdown.protos
-  fi
-- |
-  if [[ "$RUNTYPE" == "go.test" ]]; then
-    make go.deps
-    make dev.databases.start
-    make dev.certs
-    make go.test
-    go run ./cmd/ttn-lw-stack version
-    go run ./cmd/ttn-lw-cli version
-  fi
-- |
-  if [[ "$RUNTYPE" == "go.lint" ]]; then
-    make go.deps
-    make headers.check
-    make messages
-    make go.lint
-    make go.protos.clean go.protos
-    make go.unconvert
-    make go.fmt
-    make go.misspell
-  fi
-- |
-  if [[ "$RUNTYPE" == "release" ]]; then
-    make deps
-  fi
+# JS Tests
+- if [[ "$RUNTYPE" == "js.test" ]]; then make js.dev-deps js.deps sdk.deps; fi
+- if [[ "$RUNTYPE" == "js.test" ]]; then make js.translations; fi
+- if [[ "$RUNTYPE" == "js.test" ]]; then make js.test sdk.test; fi
+- if [[ "$RUNTYPE" == "js.test" ]]; then make js.lint; fi
+- if [[ "$RUNTYPE" == "js.test" ]]; then make sdk.js.build sdk.protos.clean sdk.protos; fi
+- if [[ "$RUNTYPE" == "js.test" ]]; then make swagger.protos.clean swagger.protos; fi
+- if [[ "$RUNTYPE" == "js.test" ]]; then make markdown.protos.clean markdown.protos; fi
+# Go Tests
+- if [[ "$RUNTYPE" == "go.test" ]]; then make go.deps; fi
+- if [[ "$RUNTYPE" == "go.test" ]]; then make dev.databases.start; fi
+- if [[ "$RUNTYPE" == "go.test" ]]; then make dev.certs; fi
+- if [[ "$RUNTYPE" == "go.test" ]]; then make go.test; fi
+- if [[ "$RUNTYPE" == "go.test" ]]; then go run ./cmd/ttn-lw-stack version; fi
+- if [[ "$RUNTYPE" == "go.test" ]]; then go run ./cmd/ttn-lw-cli version; fi
+# Go Quality
+- if [[ "$RUNTYPE" == "go.lint" ]]; then make go.deps; fi
+- if [[ "$RUNTYPE" == "go.lint" ]]; then make headers.check; fi
+- if [[ "$RUNTYPE" == "go.lint" ]]; then make messages; fi
+- if [[ "$RUNTYPE" == "go.lint" ]]; then make go.lint; fi
+- if [[ "$RUNTYPE" == "go.lint" ]]; then make go.protos.clean go.protos; fi
+- if [[ "$RUNTYPE" == "go.lint" ]]; then make go.unconvert; fi
+- if [[ "$RUNTYPE" == "go.lint" ]]; then make go.fmt; fi
+- if [[ "$RUNTYPE" == "go.lint" ]]; then make go.misspell; fi
+# Release
+- if [[ "$RUNTYPE" == "release" ]]; then make deps; fi
+# Diff
 - make git.diff
 after_success:
 - |
