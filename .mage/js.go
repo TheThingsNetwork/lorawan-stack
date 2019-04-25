@@ -206,8 +206,12 @@ func (js Js) Messages() error {
 		if err != nil {
 			return err
 		}
-		sh.Rm(".cache/messages")
-		sh.Run("mdir", "-p", "pkg/webui/locales")
+		if err = sh.Rm(".cache/messages"); err != nil {
+			return err
+		}
+		if err = os.MkdirAll("pkg/webui/locales", 0755); err != nil {
+			return err
+		}
 		return babel("pkg/webui")
 	}
 	return nil
