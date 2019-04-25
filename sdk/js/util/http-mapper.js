@@ -13,9 +13,10 @@
 // limitations under the License.
 
 /* eslint-disable no-console */
+/* eslint-disable import/no-commonjs */
 
-import fs from 'fs'
-import api from '../../generated/api.json'
+const fs = require('fs')
+const api = require('../generated/api.json')
 
 function map (files) {
   const result = {}
@@ -50,7 +51,7 @@ function map (files) {
 }
 
 
-fs.writeFile(`${__dirname}/../../generated/api-definition.json`, JSON.stringify(map(api.files), null, 2), function (err) {
+fs.writeFile(`${__dirname}/../generated/api-definition.json`, JSON.stringify(map(api.files), null, 2), function (err) {
   if (err) {
     return console.error(err)
   }
