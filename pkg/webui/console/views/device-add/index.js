@@ -16,6 +16,7 @@ import React, { Component } from 'react'
 import { Container, Col, Row } from 'react-grid-system'
 import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
+import { push } from 'connected-react-router'
 
 import Form from '../../../components/form'
 import Field from '../../../components/field'
@@ -26,6 +27,8 @@ import FieldGroup from '../../../components/field/group'
 import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import SubmitBar from '../../../components/submit-bar'
+
+import api from '../../api'
 
 import sharedMessages from '../../../lib/shared-messages'
 import m from './messages'
@@ -51,7 +54,45 @@ export default class DeviceAdd extends Component {
     otaa: true,
   }
 
-  handleSubmit (values) {
+  async handleSubmit (values, { setSubmitting, resetForm }) {
+    const { match, dispatch } = this.props
+    const { appId } = match.params
+
+    const device = {
+      ...values,
+      frequency_plan_id: 'EU_863_870',
+    }
+
+    // Clean values based on activation mode
+    if (device.activation_mode === 'otaa') {
+      delete device.mac_settings
+      delete device.session
+    } else {
+      delete device.ids.join_eui
+      delete device.ids.dev_eui
+      delete device.root_keys
+      delete device.resets_join_nonces
+      if (device.session.dev_addr) {
+        device.ids.dev_addr = device.session.dev_addr
+      }
+    }
+    delete device.activation_mode
+
+    await this.setState({ error: '' })
+    try {
+      const result = await api.devices.create(appId, device, {
+        abp: values.activation_mode === 'abp',
+        withRootKeys: true,
+      })
+
+      const { ids: { device_id }} = result
+      dispatch(push(`/console/applications/${appId}/devices/${device_id}`))
+    } catch (error) {
+      resetForm(values)
+      const err = error instanceof Error ? sharedMessages.genericError : error
+
+      await this.setState({ error: err })
+    }
   }
 
   handleOTAASelect () {
