@@ -24,6 +24,7 @@ import (
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
+	"github.com/magefile/mage/target"
 	"github.com/pkg/errors"
 )
 
@@ -72,6 +73,7 @@ func withProtoc(f func(pCtx *protocContext, protoc func(...string) error) error)
 	return f(pCtx, protoc)
 }
 
+// Go generates Go protos.
 func (p Proto) Go(context.Context) error {
 	if err := withProtoc(func(pCtx *protocContext, protoc func(...string) error) error {
 		var convs []string
@@ -110,6 +112,7 @@ func (p Proto) Go(context.Context) error {
 	return sh.RunV("gofmt", "-w", "-s", ttnpb)
 }
 
+// GoClean removes generated Go protos.
 func (p Proto) GoClean(context.Context) error {
 	return filepath.Walk(filepath.Join("pkg", "ttnpb"), func(path string, _ os.FileInfo, err error) error {
 		if err != nil {
@@ -127,7 +130,15 @@ func (p Proto) GoClean(context.Context) error {
 	})
 }
 
+// Swagger generates Swagger protos.
 func (p Proto) Swagger(context.Context) error {
+	changed, err := target.Glob(filepath.Join("api", "api.swagger.json"), filepath.Join("api", "*.proto"))
+	if err != nil {
+		return errors.Wrap(err, "failed checking modtime")
+	}
+	if !changed {
+		return nil
+	}
 	return withProtoc(func(pCtx *protocContext, protoc func(...string) error) error {
 		if err := protoc(
 			fmt.Sprintf("--swagger_out=allow_merge,merge_file_name=api:%s/api", pCtx.WorkingDirectory),
@@ -139,11 +150,20 @@ func (p Proto) Swagger(context.Context) error {
 	})
 }
 
+// SwaggerClean removes generated Swagger protos.
 func (p Proto) SwaggerClean(context.Context) error {
 	return sh.Rm(filepath.Join("api", "api.swagger.json"))
 }
 
+// Markdown generates Markdown protos.
 func (p Proto) Markdown(context.Context) error {
+	changed, err := target.Glob(filepath.Join("api", "api.md"), filepath.Join("api", "*.proto"))
+	if err != nil {
+		return errors.Wrap(err, "failed checking modtime")
+	}
+	if !changed {
+		return nil
+	}
 	return withProtoc(func(pCtx *protocContext, protoc func(...string) error) error {
 		if err := protoc(
 			fmt.Sprintf("--doc_opt=%s/api/api.md.tmpl,api.md --doc_out=%s/api", pCtx.WorkingDirectory, pCtx.WorkingDirectory),
@@ -155,11 +175,20 @@ func (p Proto) Markdown(context.Context) error {
 	})
 }
 
+// MarkdownClean removes generated Markdown protos.
 func (p Proto) MarkdownClean(context.Context) error {
 	return sh.Rm(filepath.Join("api", "api.md"))
 }
 
+// SdkJs generates SDK JS protos.
 func (p Proto) SdkJs(context.Context) error {
+	changed, err := target.Glob(filepath.Join("sdk", "js", "generated", "api.json"), filepath.Join("api", "*.proto"))
+	if err != nil {
+		return errors.Wrap(err, "failed checking modtime")
+	}
+	if !changed {
+		return nil
+	}
 	return withProtoc(func(pCtx *protocContext, protoc func(...string) error) error {
 		if err := protoc(
 			fmt.Sprintf("--doc_opt=json,api.json --doc_out=%s/sdk/js/generated", pCtx.WorkingDirectory),
@@ -171,16 +200,17 @@ func (p Proto) SdkJs(context.Context) error {
 	})
 }
 
+// SdkJsClean removes generated SDK JS protos.
 func (p Proto) SdkJsClean(context.Context) error {
 	return sh.Rm(filepath.Join("sdk", "js", "generated", "api.json"))
 }
 
-func (p Proto) Clean(ctx context.Context) error {
-	mg.CtxDeps(ctx, Proto.GoClean, Proto.SwaggerClean, Proto.MarkdownClean, Proto.SdkJsClean)
-	return nil
+// All generates protos.
+func (p Proto) All(ctx context.Context) {
+	mg.CtxDeps(ctx, Proto.Go, Proto.Swagger, Proto.Markdown, Proto.SdkJs)
 }
 
-func (p Proto) All(ctx context.Context) {
-	mg.CtxDeps(ctx, Proto.Clean)
-	mg.CtxDeps(ctx, Proto.Go, Proto.Swagger, Proto.Markdown, Proto.SdkJs)
+// SdkJsClean removes generated protos.
+func (p Proto) Clean(ctx context.Context) {
+	mg.CtxDeps(ctx, Proto.GoClean, Proto.SwaggerClean, Proto.MarkdownClean, Proto.SdkJsClean)
 }
