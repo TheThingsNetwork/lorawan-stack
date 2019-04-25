@@ -26,12 +26,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-// DevDeps installs the javascript SDK development dependencies.
-func (sdkJs SdkJs) devDeps() error {
-	_, err := sdkJs.yarn()
-	return err
-}
-
 // SdkJs namespace.
 type SdkJs mg.Namespace
 
@@ -44,11 +38,6 @@ func (sdkJs SdkJs) yarn() (func(args ...string) error, error) {
 	return func(args ...string) error {
 		return sh.Run(nodeBin("yarn"), append([]string{fmt.Sprintf("--cwd=%s", filepath.Join("sdk", "js"))}, args...)...)
 	}, nil
-}
-
-// DevDeps installs the javascript development dependencies.
-func (sdkJs SdkJs) DevDeps() error {
-	return sdkJs.devDeps()
 }
 
 // Deps installs the javascript dependencies.
