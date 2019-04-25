@@ -153,6 +153,46 @@ js.translations: $(MAGE)
 js.vulnerabilities: $(MAGE)
 	@$(MAGE) js:vulnerabilities
 
+.PHONY: proto.all
+proto.all: $(MAGE)
+	@$(MAGE) proto:all
+
+.PHONY: proto.clean
+proto.clean: $(MAGE)
+	@$(MAGE) proto:clean
+
+.PHONY: proto.go
+proto.go: $(MAGE)
+	@$(MAGE) proto:go
+
+.PHONY: proto.go.clean
+proto.go.clean: $(MAGE)
+	@$(MAGE) proto:goClean
+
+.PHONY: proto.markdown
+proto.markdown: $(MAGE)
+	@$(MAGE) proto:markdown
+
+.PHONY: proto.markdown.clean
+proto.markdown.clean: $(MAGE)
+	@$(MAGE) proto:markdownClean
+
+.PHONY: proto.sdk.js
+proto.sdk.js: $(MAGE)
+	@$(MAGE) proto:sdkJs
+
+.PHONY: proto.sdk.js.clean
+proto.sdk.js.clean: $(MAGE)
+	@$(MAGE) proto:sdkJsClean
+
+.PHONY: proto.swagger
+proto.swagger: $(MAGE)
+	@$(MAGE) proto:swagger
+
+.PHONY: proto.swagger.clean
+proto.swagger.clean: $(MAGE)
+	@$(MAGE) proto:swaggerClean
+
 .PHONY: sdk.js.build
 sdk.js.build: $(MAGE)
 	@$(MAGE) sdkJs:build
@@ -181,17 +221,9 @@ sdk.js.test-watch: $(MAGE)
 sdk.js.watch: $(MAGE)
 	@$(MAGE) sdkJs:watch
 
-.PHONY: sdk.js.protos
-sdk.js.protos: $(MAGE)
-	@$(MAGE) sdkJs:protos
-
 .PHONY: sdk.js.definitions
 sdk.js.definitions: $(MAGE)
 	@$(MAGE) sdkJs:definitions
-
-.PHONY: sdk.js.protos-clean
-sdk.js.protos-clean: $(MAGE)
-	@$(MAGE) sdkJs:cleanProtos
 
 .PHONY: styl.lint
 styl.lint: $(MAGE)

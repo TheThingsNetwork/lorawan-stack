@@ -81,11 +81,11 @@ script:
 - if [[ "$RUNTYPE" == "js" ]]; then make js.translations; fi
 - if [[ "$RUNTYPE" == "js" ]]; then make js.test sdk.js.test; fi
 - if [[ "$RUNTYPE" == "js" ]]; then make js.lint; fi
-- if [[ "$RUNTYPE" == "js" ]]; then make sdk.js.build sdk.js.protos.clean sdk.js.protos; fi
-- if [[ "$RUNTYPE" == "js" ]]; then make swagger.protos.clean swagger.protos; fi
-- if [[ "$RUNTYPE" == "js" ]]; then make markdown.protos.clean markdown.protos; fi
+- if [[ "$RUNTYPE" == "js" ]]; then make proto.sdk.js.clean proto.sdk.js sdk.js.build; fi
+- if [[ "$RUNTYPE" == "js" ]]; then make proto.swagger.clean proto.swagger; fi
+- if [[ "$RUNTYPE" == "js" ]]; then make proto.markdown.clean proto.markdown; fi
 - if [[ "$RUNTYPE" == "go.lint" ]]; then make headers.check; fi
-- if [[ "$RUNTYPE" == "go.lint" ]]; then make go.protos.clean go.protos; fi
+- if [[ "$RUNTYPE" == "go.lint" ]]; then make proto.go.clean proto.go; fi
 - if [[ "$RUNTYPE" == "go.lint" ]]; then make messages; fi
 - if [[ "$RUNTYPE" == "go.lint" ]]; then make go.lint; fi
 - if [[ "$RUNTYPE" == "go.lint" ]]; then make go.unconvert; fi
