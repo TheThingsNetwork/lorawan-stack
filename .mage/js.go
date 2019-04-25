@@ -139,13 +139,13 @@ func (js Js) Deps() error {
 	if err != nil {
 		return err
 	}
-	mg.Deps(SdkJs.Link)
+	mg.Deps(JsSDK.Link)
 	return nil
 }
 
 // Build runs all necessary commands to build the console bundles and files.
 func (js Js) Build() {
-	mg.SerialDeps(js.Deps, SdkJs.Build, js.BuildDll, js.BuildMain)
+	mg.SerialDeps(js.Deps, JsSDK.Build, js.BuildDll, js.BuildMain)
 }
 
 // BuildMain runs the webpack command with the project config.
