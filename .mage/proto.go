@@ -175,7 +175,12 @@ func (p Proto) SdkJsClean(context.Context) error {
 	return sh.Rm(filepath.Join("sdk", "js", "generated", "api.json"))
 }
 
+func (p Proto) Clean(ctx context.Context) error {
+	mg.CtxDeps(ctx, Proto.GoClean, Proto.SwaggerClean, Proto.MarkdownClean, Proto.SdkJsClean)
+	return nil
+}
+
 func (p Proto) All(ctx context.Context) {
-	mg.CtxDeps(ctx, p.GoClean, p.SwaggerClean, p.MarkdownClean, p.SdkJsClean)
-	mg.CtxDeps(ctx, p.Go, p.Swagger, p.Markdown, p.SdkJs)
+	mg.CtxDeps(ctx, Proto.Clean)
+	mg.CtxDeps(ctx, Proto.Go, Proto.Swagger, Proto.Markdown, Proto.SdkJs)
 }
