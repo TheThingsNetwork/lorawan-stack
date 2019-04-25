@@ -58,7 +58,7 @@ before_install:
     openssl aes-256-cbc -K $encrypted_82ec1379e985_key -iv $encrypted_82ec1379e985_iv -in snapcraft.login.enc -out snapcraft.login -d
   fi
 install:
-- go run github.com/magefile/mage -compile $MAGE
+- GO111MODULE=on go run github.com/magefile/mage -compile $MAGE
 - |
   if [[ "$RUNTYPE" == "js" ]]; then
     $MAGE js:devDeps js:deps jsSDK:deps
