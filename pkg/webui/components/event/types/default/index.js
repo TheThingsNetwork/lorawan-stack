@@ -43,12 +43,7 @@ class DefaultEvent extends React.PureComponent {
 }
 
 DefaultEvent.propTypes = {
-  event: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    time: PropTypes.string.isRequired,
-    identifiers: PropTypes.array.isRequired,
-    data: PropTypes.object,
-  }).isRequired,
+  event: PropTypes.event.isRequired,
   widget: PropTypes.bool,
 }
 

@@ -56,12 +56,7 @@ class MessageEvent extends React.PureComponent {
 }
 
 MessageEvent.propTypes = {
-  event: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    time: PropTypes.string.isRequired,
-    identifiers: PropTypes.array.isRequired,
-    data: PropTypes.object,
-  }).isRequired,
+  event: PropTypes.event.isRequired,
   type: PropTypes.oneOf([ 'downlink', 'uplink' ]),
   widget: PropTypes.bool,
 }
