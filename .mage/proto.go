@@ -25,7 +25,8 @@ import (
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 	"github.com/magefile/mage/target"
-	"github.com/pkg/errors"
+	"golang.org/x/exp/errors"
+	errfmt "golang.org/x/exp/errors/fmt"
 )
 
 const protocVersion = "3.1.3"
@@ -43,11 +44,11 @@ type protocContext struct {
 func makeProtoc() (func(...string) error, *protocContext, error) {
 	wd, err := os.Getwd()
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "failed to get working directory")
+		return nil, nil, errfmt.Errorf("failed to get working directory: %w", err)
 	}
 	usr, err := user.Current()
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "failed to get user")
+		return nil, nil, errfmt.Errorf("failed to get user: %w", err)
 	}
 	return sh.RunCmd("docker", "run",
 			"--rm",
@@ -88,7 +89,7 @@ func (p Proto) Go(context.Context) error {
 			fmt.Sprintf("--grpc-gateway_out=%s:%s", convStr, protocOut),
 			fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),
 		); err != nil {
-			return errors.Wrap(err, "failed to generate protos")
+			return errfmt.Errorf("failed to generate protos: %w", err)
 		}
 		return nil
 	}); err != nil {
@@ -96,18 +97,18 @@ func (p Proto) Go(context.Context) error {
 	}
 
 	if err := sh.RunV(filepath.Join(".mage", "scripts", "fix-grpc-gateway-names.sh"), "api"); err != nil {
-		return errors.Wrap(err, "failed to fix gRPC-gateway names")
+		return errfmt.Errorf("failed to fix gRPC-gateway names: %w", err)
 	}
 
 	ttnpb, err := filepath.Abs(filepath.Join("pkg", "ttnpb"))
 	if err != nil {
-		return errors.Wrap(err, "failed to construct absolute path to pkg/ttnpb")
+		return errfmt.Errorf("failed to construct absolute path to pkg/ttnpb: %w", err)
 	}
 	if err := execGo("run", "golang.org/x/tools/cmd/goimports", "-w", ttnpb); err != nil {
-		return errors.Wrap(err, "failed to run goimports on generated code")
+		return errfmt.Errorf("failed to run goimports on generated code: %w", err)
 	}
 	if err := execGo("run", "github.com/mdempsky/unconvert", "-apply", ttnpb); err != nil {
-		return errors.Wrap(err, "failed to run unconvert on generated code")
+		return errfmt.Errorf("failed to run unconvert on generated code: %w", err)
 	}
 	return sh.RunV("gofmt", "-w", "-s", ttnpb)
 }
@@ -134,7 +135,7 @@ func (p Proto) GoClean(context.Context) error {
 func (p Proto) Swagger(context.Context) error {
 	changed, err := target.Glob(filepath.Join("api", "api.swagger.json"), filepath.Join("api", "*.proto"))
 	if err != nil {
-		return errors.Wrap(err, "failed checking modtime")
+		return errfmt.Errorf("failed checking modtime: %w", err)
 	}
 	if !changed {
 		return nil
@@ -144,7 +145,7 @@ func (p Proto) Swagger(context.Context) error {
 			fmt.Sprintf("--swagger_out=allow_merge,merge_file_name=api:%s/api", pCtx.WorkingDirectory),
 			fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),
 		); err != nil {
-			return errors.Wrap(err, "failed to generate protos")
+			return errfmt.Errorf("failed to generate protos: %w", err)
 		}
 		return nil
 	})
@@ -159,7 +160,7 @@ func (p Proto) SwaggerClean(context.Context) error {
 func (p Proto) Markdown(context.Context) error {
 	changed, err := target.Glob(filepath.Join("api", "api.md"), filepath.Join("api", "*.proto"))
 	if err != nil {
-		return errors.Wrap(err, "failed checking modtime")
+		return errfmt.Errorf("failed checking modtime: %w", err)
 	}
 	if !changed {
 		return nil
@@ -169,7 +170,7 @@ func (p Proto) Markdown(context.Context) error {
 			fmt.Sprintf("--doc_opt=%s/api/api.md.tmpl,api.md --doc_out=%s/api", pCtx.WorkingDirectory, pCtx.WorkingDirectory),
 			fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),
 		); err != nil {
-			return errors.Wrap(err, "failed to generate protos")
+			return errfmt.Errorf("failed to generate protos: %w", err)
 		}
 		return nil
 	})
@@ -184,7 +185,7 @@ func (p Proto) MarkdownClean(context.Context) error {
 func (p Proto) JsSDK(context.Context) error {
 	changed, err := target.Glob(filepath.Join("sdk", "js", "generated", "api.json"), filepath.Join("api", "*.proto"))
 	if err != nil {
-		return errors.Wrap(err, "failed checking modtime")
+		return errfmt.Errorf("failed checking modtime: %w", err)
 	}
 	if !changed {
 		return nil
@@ -194,7 +195,7 @@ func (p Proto) JsSDK(context.Context) error {
 			fmt.Sprintf("--doc_opt=json,api.json --doc_out=%s/sdk/js/generated", pCtx.WorkingDirectory),
 			fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),
 		); err != nil {
-			return errors.Wrap(err, "failed to generate protos")
+			return errfmt.Errorf("failed to generate protos: %w", err)
 		}
 		return nil
 	})
@@ -210,7 +211,7 @@ func (p Proto) All(ctx context.Context) {
 	mg.CtxDeps(ctx, Proto.Go, Proto.Swagger, Proto.Markdown, Proto.JsSDK)
 }
 
-// JsSDKClean removes generated protos.
+// Clean removes generated protos.
 func (p Proto) Clean(ctx context.Context) {
 	mg.CtxDeps(ctx, Proto.GoClean, Proto.SwaggerClean, Proto.MarkdownClean, Proto.JsSDKClean)
 }

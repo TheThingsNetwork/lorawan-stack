@@ -16,7 +16,6 @@ package ttnmage
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -24,6 +23,7 @@ import (
 
 	"github.com/TheThingsIndustries/magepkg/git"
 	"github.com/magefile/mage/mg"
+	"golang.org/x/exp/errors"
 )
 
 // Git namespace.
