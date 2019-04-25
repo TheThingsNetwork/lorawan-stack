@@ -15,14 +15,14 @@
 package ttnmage
 
 import (
+	"context"
 	"fmt"
 	"os"
-	"os/user"
 	"path/filepath"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
-	"github.com/magefile/mage/target"
+	"github.com/pkg/errors"
 )
 
 // DevDeps installs the javascript SDK development dependencies.
@@ -42,12 +42,6 @@ func (sdkJs SdkJs) yarn() (func(args ...string) error, error) {
 	}
 	return func(args ...string) error {
 		return sh.Run(nodeBin("yarn"), append([]string{"--cwd=sdk/js"}, args...)...)
-	}, nil
-}
-
-func (sdkJs SdkJs) docker() (func(args ...string) error, error) {
-	return func(args ...string) error {
-		return sh.Run("docker", args...)
 	}, nil
 }
 
@@ -126,64 +120,26 @@ func (sdkJs SdkJs) TestWatch() error {
 
 // Clean clears all transpiled files.
 func (sdkJs SdkJs) Clean() {
+	mg.Deps(SdkJs.DefinitionsClean)
 	sh.Rm("./sdk/js/dist")
 }
 
-// Protos generates the api.json for the JS SDK
-func (sdkJs SdkJs) Protos() error {
-	if mg.Verbose() {
-		fmt.Println("Extracting api definitions from protos…")
-	}
-
-	docker, err := sdkJs.docker()
+// Definitions extracts the api-definition.json from the proto generated api.json.
+func (sdkJs SdkJs) Definitions(context.Context) error {
+	mg.Deps(Proto.SdkJs)
+	yarn, err := yarn()
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to construct yarn command")
 	}
-	PWD, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-	u, err := user.Current()
-	if err != nil {
-		return err
-	}
-	PWD_PARENT := filepath.Dir(PWD)
-
-	PROTOC_DOCKER_IMAGE := "thethingsindustries/protoc:3.1.3"
-	SDK_PROTOC_FLAGS := "--doc_opt=json,api.json --doc_out=" + PWD + "/sdk/js/generated"
-	API_PROTO_FILES := PWD + "/api/*.proto"
-
-	return docker(
-		"run", "--user", u.Uid, "--rm",
-		"--mount", "type=bind,src="+PWD+"/api,dst="+PWD+"/api",
-		"--mount", "type=bind,src="+PWD+"/pkg/ttnpb,dst=/out/go.thethings.network/lorawan-stack/pkg/ttnpb",
-		"--mount", "type=bind,src="+PWD+"/sdk/js,dst="+PWD+"/sdk/js",
-		"-w", PWD, PROTOC_DOCKER_IMAGE, "-I"+PWD_PARENT, SDK_PROTOC_FLAGS, API_PROTO_FILES,
-	)
-}
-
-// Definitions extracts the api-definition.json from the proto generated api.json
-func (sdkJs SdkJs) Definitions() error {
-	mg.Deps(sdkJs.Protos)
-	changed, err := target.Path("./sdk/js/generated/api-definition.json", "./sdk/js/generated/api.json")
-	if os.IsNotExist(err) || (err == nil && changed) {
-		if mg.Verbose() {
-			fmt.Println("Extracting api definitions from protos…")
-		}
-		yarn, err := sdkJs.yarn()
-		if err != nil {
-			return err
-		}
-
-		return yarn("run", "definitions")
+	if err := yarn("--cwd=./sdk/js", "run", "definitions"); err != nil {
+		return errors.Wrap(err, "failed to generate definitions")
 	}
 	return nil
 }
 
-// CleanProtos clears all generated proto files.
-func (sdkJs SdkJs) CleanProtos() {
-	sh.Rm("./sdk/js/generated/api.json")
-	sh.Rm("./sdk/js/generated/api-definition.json")
+// DefinitionsClean removes the generated api-definition.json.
+func (sdkJs SdkJs) DefinitionsClean(context.Context) error {
+	return sh.Rm(filepath.Join("sdk", "js", "generated", "api-definition.json"))
 }
 
 // Link links the local sdk package via `yarn link` to prevent caching issues.
