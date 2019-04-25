@@ -13,17 +13,129 @@
 // limitations under the License.
 
 import React from 'react'
+import bind from 'autobind-decorator'
 
+import Button from '../button'
+import Message from '../../lib/components/message'
+import List from '../list'
+import getEventComponentByName from '../event/types'
+import sharedMessages from '../../lib/shared-messages'
+import PropTypes from '../../lib/prop-types'
 import EventsWidget from './widget'
 
+import style from './events.styl'
+
+@bind
 class Events extends React.PureComponent {
 
+  renderEvent (event) {
+    const { component: Component, type } = getEventComponentByName(event.name)
+
+    return (
+      <List.Item className={style.event}>
+        <Component
+          event={event}
+          type={type}
+        />
+      </List.Item>
+    )
+  }
+
+  onPause () {
+    const { onPause } = this.props
+
+    onPause()
+  }
+
+  onClear () {
+    const { onClear } = this.props
+
+    onClear()
+  }
+
+  getEventkey (event) {
+    return `${event.time}-${event.name}`
+  }
+
   render () {
-    // TODO: implement the events component
-    return <div>events</div>
+    const {
+      className,
+      events,
+      paused,
+      onClear,
+      onPause,
+    } = this.props
+
+    const header = (
+      <Header
+        paused={paused}
+        onPause={onPause}
+        onClear={onClear}
+      />
+    )
+
+    return (
+      <List
+        bordered
+        className={className}
+        listClassName={style.list}
+        header={header}
+        items={events}
+        renderItem={this.renderEvent}
+        rowKey={this.getEventkey}
+      />
+    )
   }
 }
 
+Events.propTypes = {
+  events: PropTypes.arrayOf(PropTypes.event),
+  paused: PropTypes.bool.isRequired,
+  onPause: PropTypes.func.isRequired,
+  onClear: PropTypes.func.isRequired,
+}
+
+Events.defaultProps = {
+  events: [],
+}
+
 Events.Widget = EventsWidget
+
+const Header = function (props) {
+  const {
+    paused,
+    onPause,
+    onClear,
+  } = props
+
+  const pauseMessage = paused ? sharedMessages.resume : sharedMessages.pause
+  const pauseIcon = paused ? 'play_arrow' : 'pause'
+
+  return (
+    <div className={style.header}>
+      <div className={style.headerColumns}>
+        <Message className={style.headerColumnsTime} content={sharedMessages.time} />
+        <Message className={style.headerColumnsId} content={sharedMessages.entityId} />
+        <Message content={sharedMessages.data} />
+      </div>
+      <div className={style.headerActions}>
+        <Button
+          onClick={onPause}
+          message={pauseMessage}
+          naked
+          secondary
+          icon={pauseIcon}
+        />
+        <Button
+          onClick={onClear}
+          message={sharedMessages.clear}
+          naked
+          secondary
+          icon="delete"
+        />
+      </div>
+    </div>
+  )
+}
 
 export default Events
