@@ -1,7 +1,6 @@
 {
   "components.events.widget.index.latestEvents": "Latest events",
   "components.events.widget.index.seeAllActivity": "See all activity",
-  "components.events.widget.index.noEvents": "{entityId} has not sent any events recently",
   "components.events.widget.index.unknown": "Unknown",
   "components.footer.index.footer": "You are the network. Let's build this thing together.",
   "components.navigation.side.side.hideSidebar": "Hide Sidebar",
@@ -124,6 +123,7 @@
   "lib.shared-messages.name": "Name",
   "lib.shared-messages.networkKey": "Network Key",
   "lib.shared-messages.noDesc": "This device has no description",
+  "lib.shared-messages.noEvents": "{entityId} has not sent any events recently",
   "lib.shared-messages.noMatch": "No items matched your criteria",
   "lib.shared-messages.notAvailable": "n/a",
   "lib.shared-messages.ok": "Ok",

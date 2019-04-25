@@ -64,6 +64,7 @@ class Events extends React.PureComponent {
       paused,
       onClear,
       onPause,
+      emitterId,
     } = this.props
 
     const header = (
@@ -83,6 +84,8 @@ class Events extends React.PureComponent {
         items={events}
         renderItem={this.renderEvent}
         rowKey={this.getEventkey}
+        emptyMessage={sharedMessages.noEvents}
+        emptyMessageValues={{ entityId: emitterId }}
       />
     )
   }
@@ -91,6 +94,7 @@ class Events extends React.PureComponent {
 Events.propTypes = {
   events: PropTypes.arrayOf(PropTypes.event),
   paused: PropTypes.bool.isRequired,
+  emitterId: PropTypes.string.isRequired,
   onPause: PropTypes.func.isRequired,
   onClear: PropTypes.func.isRequired,
 }

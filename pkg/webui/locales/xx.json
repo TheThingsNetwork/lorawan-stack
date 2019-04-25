@@ -1,7 +1,6 @@
 {
   "components.events.widget.index.latestEvents": "Xxxxxx xxxxxx",
   "components.events.widget.index.seeAllActivity": "Xxx xxx xxxxxxxx",
-  "components.events.widget.index.noEvents": "{entityId} xxx xxx xxxx xxx xxxxxx xxxxxxxx",
   "components.events.widget.index.unknown": "Xxxxxxx",
   "components.footer.index.footer": "Xxx xxx xxx xxxxxxx. Xxx'x xxxxx xxxx xxxxx xxxxxxxx.",
   "components.navigation.side.side.hideSidebar": "Xxxx Xxxxxxx",
@@ -124,6 +123,7 @@
   "lib.shared-messages.name": "Xxxx",
   "lib.shared-messages.networkKey": "Xxxxxxx Xxx",
   "lib.shared-messages.noDesc": "Xxxx xxxxxx xxx xx xxxxxxxxxxx",
+  "lib.shared-messages.noEvents": "{entityId} xxx xxx xxxx xxx xxxxxx xxxxxxxx",
   "lib.shared-messages.noMatch": "Xx xxxxx xxxxxxx xxxx xxxxxxxx",
   "lib.shared-messages.notAvailable": "x/x",
   "lib.shared-messages.ok": "Xx",

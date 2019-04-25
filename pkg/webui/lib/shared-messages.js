@@ -65,6 +65,7 @@ export default defineMessages({
   name: 'Name',
   networkKey: 'Network Key',
   noDesc: 'This device has no description',
+  noEvents: '{entityId} has not sent any events recently',
   noMatch: 'No items matched your criteria',
   notAvailable: 'n/a',
   ok: 'Ok',
