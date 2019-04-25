@@ -70,7 +70,7 @@ export default class Device extends React.Component {
     const { dispatch, devId, match } = this.props
     const { appId } = match.params
 
-    dispatch(getDevice(appId, devId, 'name,description,session,version_ids', { ignoreNotFound: true }))
+    dispatch(getDevice(appId, devId, 'name,description,session,version_ids,root_keys', { ignoreNotFound: true }))
   }
 
   handleTabChange () {
