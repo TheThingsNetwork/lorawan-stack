@@ -17,6 +17,7 @@ import React from 'react'
 import Message from '../message'
 
 import PropTypes from '../../prop-types'
+import sharedMessages from '../../shared-messages'
 
 const ErrorMessage = function ({ content, ...rest }) {
 
@@ -30,9 +31,12 @@ const ErrorMessage = function ({ content, ...rest }) {
     props.content.id = content.message.split(' ')[0]
     props.content.defaultMessage = content.details[0].message_format || content.message.replace(/^.*\s/, '')
     props.values = content.details[0].attributes
-  } else {
+  } else if (typeof content === 'object' && content.id && content.defaultMessage) {
     // Fall back to normal message
     props.content = content
+  } else {
+    // Fall back to generic error message
+    props.content = sharedMessages.genericError
   }
 
   return <Message {...props} />
