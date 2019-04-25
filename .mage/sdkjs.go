@@ -26,10 +26,10 @@ import (
 	"github.com/pkg/errors"
 )
 
-// SdkJs namespace.
-type SdkJs mg.Namespace
+// JsSDK namespace.
+type JsSDK mg.Namespace
 
-func (sdkJs SdkJs) yarn() (func(args ...string) error, error) {
+func (k JsSDK) yarn() (func(args ...string) error, error) {
 	if _, err := os.Stat(nodeBin("yarn")); os.IsNotExist(err) {
 		if err = installYarn(); err != nil {
 			return nil, err
@@ -40,12 +40,12 @@ func (sdkJs SdkJs) yarn() (func(args ...string) error, error) {
 	}, nil
 }
 
-// Deps installs the javascript dependencies.
-func (sdkJs SdkJs) Deps() error {
+// Deps installs the javascript SDK dependencies.
+func (k JsSDK) Deps() error {
 	if mg.Verbose() {
 		fmt.Println("Installing JS SDK dependencies")
 	}
-	yarn, err := sdkJs.yarn()
+	yarn, err := k.yarn()
 	if err != nil {
 		return err
 	}
@@ -53,13 +53,13 @@ func (sdkJs SdkJs) Deps() error {
 }
 
 // Build builds the source files and output into 'dist'.
-func (sdkJs SdkJs) Build() error {
-	mg.SerialDeps(SdkJs.Deps, SdkJs.Definitions)
+func (k JsSDK) Build() error {
+	mg.SerialDeps(JsSDK.Deps, JsSDK.Definitions)
 
 	if mg.Verbose() {
 		fmt.Println("Building JS SDK files…")
 	}
-	yarn, err := sdkJs.yarn()
+	yarn, err := k.yarn()
 	if err != nil {
 		return err
 	}
@@ -68,13 +68,13 @@ func (sdkJs SdkJs) Build() error {
 }
 
 // Watch builds the source files in watch mode.
-func (sdkJs SdkJs) Watch() error {
-	mg.SerialDeps(SdkJs.Deps, SdkJs.Definitions)
+func (k JsSDK) Watch() error {
+	mg.SerialDeps(JsSDK.Deps, JsSDK.Definitions)
 
 	if mg.Verbose() {
 		fmt.Println("Building and watching JS SDK files…")
 	}
-	yarn, err := sdkJs.yarn()
+	yarn, err := k.yarn()
 	if err != nil {
 		return err
 	}
@@ -83,11 +83,11 @@ func (sdkJs SdkJs) Watch() error {
 }
 
 // Test runs jest unit tests.
-func (sdkJs SdkJs) Test() error {
+func (k JsSDK) Test() error {
 	if mg.Verbose() {
 		fmt.Println("Running JS SDK tests…")
 	}
-	yarn, err := sdkJs.yarn()
+	yarn, err := k.yarn()
 	if err != nil {
 		return err
 	}
@@ -96,11 +96,11 @@ func (sdkJs SdkJs) Test() error {
 }
 
 // TestWatch runs jest unit tests in watch mode.
-func (sdkJs SdkJs) TestWatch() error {
+func (k JsSDK) TestWatch() error {
 	if mg.Verbose() {
 		fmt.Println("Running JS SDK tests in watch mode…")
 	}
-	yarn, err := sdkJs.yarn()
+	yarn, err := k.yarn()
 	if err != nil {
 		return err
 	}
@@ -109,14 +109,14 @@ func (sdkJs SdkJs) TestWatch() error {
 }
 
 // Clean clears all transpiled files.
-func (sdkJs SdkJs) Clean() {
-	mg.Deps(SdkJs.DefinitionsClean)
+func (k JsSDK) Clean() {
+	mg.Deps(JsSDK.DefinitionsClean)
 	sh.Rm(filepath.Join("sdk", "js", "dist"))
 }
 
 // Definitions extracts the api-definition.json from the proto generated api.json.
-func (sdkJs SdkJs) Definitions() error {
-	mg.Deps(Proto.SdkJs)
+func (k JsSDK) Definitions() error {
+	mg.Deps(Proto.JsSDK)
 	changed, err := target.Path(filepath.Join("sdk", "js", "generated", "api-definition.json"), filepath.Join("sdk", "js", "generated", "api.json"))
 	if err != nil {
 		return errors.Wrap(err, "failed checking modtime")
@@ -127,7 +127,7 @@ func (sdkJs SdkJs) Definitions() error {
 	if mg.Verbose() {
 		fmt.Println("Extracting api definitions from protos…")
 	}
-	yarn, err := sdkJs.yarn()
+	yarn, err := k.yarn()
 	if err != nil {
 		return errors.Wrap(err, "failed constructing yarn command")
 	}
@@ -135,12 +135,12 @@ func (sdkJs SdkJs) Definitions() error {
 }
 
 // DefinitionsClean removes the generated api-definition.json.
-func (sdkJs SdkJs) DefinitionsClean(context.Context) error {
+func (k JsSDK) DefinitionsClean(context.Context) error {
 	return sh.Rm(filepath.Join("sdk", "js", "generated", "api-definition.json"))
 }
 
 // Link links the local sdk package via `yarn link` to prevent caching issues.
-func (sdkJs SdkJs) Link() error {
+func (k JsSDK) Link() error {
 	if mg.Verbose() {
 		fmt.Println("Linking sdk package…")
 	}

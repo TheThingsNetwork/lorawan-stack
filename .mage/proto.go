@@ -180,8 +180,8 @@ func (p Proto) MarkdownClean(context.Context) error {
 	return sh.Rm(filepath.Join("api", "api.md"))
 }
 
-// SdkJs generates SDK JS protos.
-func (p Proto) SdkJs(context.Context) error {
+// JsSDK generates javascript SDK protos.
+func (p Proto) JsSDK(context.Context) error {
 	changed, err := target.Glob(filepath.Join("sdk", "js", "generated", "api.json"), filepath.Join("api", "*.proto"))
 	if err != nil {
 		return errors.Wrap(err, "failed checking modtime")
@@ -200,17 +200,17 @@ func (p Proto) SdkJs(context.Context) error {
 	})
 }
 
-// SdkJsClean removes generated SDK JS protos.
-func (p Proto) SdkJsClean(context.Context) error {
+// JsSDKClean removes generated javascript SDK protos.
+func (p Proto) JsSDKClean(context.Context) error {
 	return sh.Rm(filepath.Join("sdk", "js", "generated", "api.json"))
 }
 
 // All generates protos.
 func (p Proto) All(ctx context.Context) {
-	mg.CtxDeps(ctx, Proto.Go, Proto.Swagger, Proto.Markdown, Proto.SdkJs)
+	mg.CtxDeps(ctx, Proto.Go, Proto.Swagger, Proto.Markdown, Proto.JsSDK)
 }
 
-// SdkJsClean removes generated protos.
+// JsSDKClean removes generated protos.
 func (p Proto) Clean(ctx context.Context) {
-	mg.CtxDeps(ctx, Proto.GoClean, Proto.SwaggerClean, Proto.MarkdownClean, Proto.SdkJsClean)
+	mg.CtxDeps(ctx, Proto.GoClean, Proto.SwaggerClean, Proto.MarkdownClean, Proto.JsSDKClean)
 }
