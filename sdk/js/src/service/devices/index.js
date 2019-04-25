@@ -188,12 +188,13 @@ class Devices {
 
   async create (applicationId, device, { abp = false, setDefaults = true, withRootKeys = false } = {}) {
     let dev = device
+    const Url = URL ? URL : window.URL
 
     if (setDefaults) {
       dev = {
-        application_server_address: new URL(this._stackConfig.as).host,
-        join_server_address: new URL(this._stackConfig.js).host,
-        network_server_address: new URL(this._stackConfig.ns).host,
+        application_server_address: new Url(this._stackConfig.as).host,
+        join_server_address: new Url(this._stackConfig.js).host,
+        network_server_address: new Url(this._stackConfig.ns).host,
         ...device,
       }
     }
