@@ -23,7 +23,7 @@ exports[`SideNavigationItem is collapsable should match snapshot 1`] = `
       ]
     }
     onClick={[Function]}
-    onExpand={[Function]}
+    onExpand={[MockFunction]}
     title="test-title"
   />
 </li>
