@@ -42,7 +42,7 @@ func (sdkJs SdkJs) yarn() (func(args ...string) error, error) {
 		}
 	}
 	return func(args ...string) error {
-		return sh.Run(nodeBin("yarn"), append([]string{"--cwd=sdk/js"}, args...)...)
+		return sh.Run(nodeBin("yarn"), append([]string{fmt.Sprintf("--cwd=%s", filepath.Join("sdk", "js"))}, args...)...)
 	}, nil
 }
 
@@ -122,7 +122,7 @@ func (sdkJs SdkJs) TestWatch() error {
 // Clean clears all transpiled files.
 func (sdkJs SdkJs) Clean() {
 	mg.Deps(SdkJs.DefinitionsClean)
-	sh.Rm("./sdk/js/dist")
+	sh.Rm(filepath.Join("sdk", "js", "dist"))
 }
 
 // Definitions extracts the api-definition.json from the proto generated api.json.
@@ -161,7 +161,7 @@ func (sdkJs SdkJs) Link() error {
 		return err
 	}
 
-	err = y("--cwd=./sdk/js", "link")
+	err = y(fmt.Sprintf("--cwd=%s", filepath.Join("sdk", "js")), "link")
 	if err != nil {
 		return err
 	}
