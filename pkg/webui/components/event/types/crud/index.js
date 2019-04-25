@@ -69,7 +69,7 @@ CRUDEvent.propTypes = {
     identifiers: PropTypes.array.isRequired,
     data: PropTypes.object,
   }).isRequired,
-  widget: PropTypes.widget,
+  widget: PropTypes.bool,
 }
 
 CRUDEvent.defaultProps = {
