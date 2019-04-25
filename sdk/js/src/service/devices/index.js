@@ -94,6 +94,11 @@ class Devices {
       delete requestTree.is
     }
 
+    // Do not query JS when the device is ABP
+    if (!device.supports_join) {
+      delete requestTree.js
+    }
+
     // Write the device id param based on either the id of the newly created
     // device, or the passed id argument
     params.routeParams['end_device.ids.device_id'] = 'data' in isResult ? isResult.ids.device_id : devId
