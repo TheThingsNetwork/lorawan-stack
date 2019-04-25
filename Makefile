@@ -34,7 +34,7 @@ test: go.test
 
 quality: go.quality
 
-build-all: $(MAGE)
+build-all:
 	@GO111MODULE=on $(GO) run github.com/goreleaser/goreleaser --snapshot --skip-publish
 
 clean: js.clean
