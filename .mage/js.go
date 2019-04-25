@@ -102,7 +102,15 @@ func (js Js) webpackServe() (func(args ...string) error, error) {
 }
 
 func (js Js) babel() (func(args ...string) error, error) {
-	return js.execFromNodeBin("babel")
+	if _, err := os.Stat(nodeBin("babel")); os.IsNotExist(err) {
+		if err = js.DevDeps(); err != nil {
+			return nil, err
+		}
+	}
+	return func(args ...string) error {
+		_, err := sh.Exec(nil, nil, os.Stderr, nodeBin("babel"), args...)
+		return err
+	}, nil
 }
 
 func (js Js) jest() (func(args ...string) error, error) {
