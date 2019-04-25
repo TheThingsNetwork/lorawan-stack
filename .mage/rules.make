@@ -81,6 +81,10 @@ go.test: $(MAGE) dev.certs
 go.unconvert: $(MAGE)
 	@$(MAGE) go:unconvert
 
+.PHONY: go.messages
+go.messages: $(MAGE)
+	@$(MAGE) go:messages
+
 .PHONY: headers.check
 headers.check: $(MAGE)
 	@$(MAGE) headers:check

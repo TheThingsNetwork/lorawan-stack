@@ -17,9 +17,6 @@ include .make/general.make
 include .make/git.make
 include .make/dev.make
 
-messages:
-	@$(GO) run ./cmd/internal/generate_i18n.go
-
 docs:
 	@rm -f doc/ttn-lw-{stack,cli}/*.{md,1,yaml}
 	@$(GO) run ./cmd/ttn-lw-stack gen-man-pages --log.level=error -o doc/ttn-lw-stack

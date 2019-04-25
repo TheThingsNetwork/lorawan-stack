@@ -86,7 +86,7 @@ script:
 - if [[ "$RUNTYPE" == "js" ]]; then make proto.markdown.clean proto.markdown; fi
 - if [[ "$RUNTYPE" == "go.lint" ]]; then make headers.check; fi
 - if [[ "$RUNTYPE" == "go.lint" ]]; then make proto.go.clean proto.go; fi
-- if [[ "$RUNTYPE" == "go.lint" ]]; then make messages; fi
+- if [[ "$RUNTYPE" == "go.lint" ]]; then make go.messages; fi
 - if [[ "$RUNTYPE" == "go.lint" ]]; then make go.lint; fi
 - if [[ "$RUNTYPE" == "go.lint" ]]; then make go.unconvert; fi
 - if [[ "$RUNTYPE" == "go.lint" ]]; then make go.fmt; fi
