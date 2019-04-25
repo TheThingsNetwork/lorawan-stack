@@ -17,44 +17,56 @@ package store
 import (
 	"fmt"
 	"os"
-	"strings"
+	"sync"
 	"testing"
-	"time"
 
 	"github.com/jinzhu/gorm"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
+var (
+	setup        sync.Once
+	dbConnString string
+)
+
 func WithDB(t *testing.T, f func(t *testing.T, db *gorm.DB)) {
-	dbAddress := os.Getenv("SQL_DB_ADDRESS")
-	if dbAddress == "" {
-		dbAddress = "localhost:26257"
-	}
-	dbName := os.Getenv("TEST_DB_NAME")
-	randomDB := false
-	if dbName == "" {
-		dbName = fmt.Sprintf("%s_%d", strings.ToLower(t.Name()), time.Now().UnixNano())
-		randomDB = true
-	}
-	dbConnString := fmt.Sprintf("postgresql://root@%s/%s?sslmode=disable", dbAddress, dbName)
-	db, err := gorm.Open("postgres", dbConnString)
+	ctx := log.NewContext(test.Context(), test.GetLogger(t))
+	setup.Do(func() {
+		dbAddress := os.Getenv("SQL_DB_ADDRESS")
+		if dbAddress == "" {
+			dbAddress = "localhost:26257"
+		}
+		dbName := os.Getenv("TEST_DATABASE_NAME")
+		if dbName == "" {
+			dbName = "ttn_lorawan_is_store_test"
+		}
+		dbConnString = fmt.Sprintf("postgresql://root@%s/%s?sslmode=disable", dbAddress, dbName)
+		db, err := Open(test.Context(), dbConnString)
+		if err != nil {
+			panic(err)
+		}
+		defer db.Close()
+		if err = Initialize(db); err != nil {
+			panic(err)
+		}
+		if err = AutoMigrate(db).Error; err != nil {
+			panic(err)
+		}
+		if err = Clear(db); err != nil {
+			panic(err)
+		}
+	})
+	db, err := Open(ctx, dbConnString)
 	if err != nil {
 		panic(err)
 	}
 	defer db.Close()
-	SetLogger(db, test.GetLogger(t))
 	db = db.Debug()
-	if err := db.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s;", dbName)).Error; err != nil {
-		panic(err)
-	}
-	if randomDB {
-		defer db.Exec(fmt.Sprintf("DROP DATABASE %s CASCADE;", dbName))
-	}
 	f(t, db)
 }
 
 func prepareTest(db *gorm.DB, models ...interface{}) {
-	db.AutoMigrate(models...)
 	if err := clear(db, models...); err != nil {
 		panic(err)
 	}

@@ -14,6 +14,8 @@
 
 package jsonpb
 
+import "github.com/grpc-ecosystem/grpc-gateway/runtime"
+
 // TTN returns the default TTN JSONPb marshaler.
 func TTN() *GoGoJSONPb {
 	return &GoGoJSONPb{
@@ -21,3 +23,16 @@ func TTN() *GoGoJSONPb {
 		EnumsAsInts: true,
 	}
 }
+
+// TTNEventStream returns a TTN JsonPb marshaler with double newlines for
+// text/event-stream compatibility.
+func TTNEventStream() runtime.Marshaler {
+	return &ttnEventStream{GoGoJSONPb: TTN()}
+}
+
+type ttnEventStream struct {
+	*GoGoJSONPb
+}
+
+func (s *ttnEventStream) ContentType() string { return "text/event-stream" }
+func (s *ttnEventStream) Delimiter() []byte   { return []byte{'\n', '\n'} }

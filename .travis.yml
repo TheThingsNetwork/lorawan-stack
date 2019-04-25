@@ -63,6 +63,7 @@ install:
 - |
   if [[ "$RUNTYPE" == "js" ]]; then
     make js.dev-deps js.deps sdk.js.deps
+  fi
 - |
   if [[ "$RUNTYPE" == "release" ]]; then
     sudo apt-get -y update
@@ -77,25 +78,19 @@ before_script:
     make dev.certs
   fi
 script:
-- |
-  if [[ "$RUNTYPE" == "js" ]]; then
-    make js.translations
-    make js.test sdk.js.test
-    make js.lint
-    make sdk.js.build sdk.js.protos.clean sdk.js.protos
-    make swagger.protos.clean swagger.protos
-    make markdown.protos.clean markdown.protos
-  fi
-- |
-  if [[ "$RUNTYPE" == "go.lint" ]]; then
-    make headers.check
-    make go.protos.clean go.protos
-    make messages
-    make go.lint
-    make go.unconvert
-    make go.fmt
-    make go.misspell
-  fi
+- if [[ "$RUNTYPE" == "js" ]]; then make js.translations; fi
+- if [[ "$RUNTYPE" == "js" ]]; then make js.test sdk.js.test; fi
+- if [[ "$RUNTYPE" == "js" ]]; then make js.lint; fi
+- if [[ "$RUNTYPE" == "js" ]]; then make sdk.js.build sdk.js.protos.clean sdk.js.protos; fi
+- if [[ "$RUNTYPE" == "js" ]]; then make swagger.protos.clean swagger.protos; fi
+- if [[ "$RUNTYPE" == "js" ]]; then make markdown.protos.clean markdown.protos; fi
+- if [[ "$RUNTYPE" == "go.lint" ]]; then make headers.check; fi
+- if [[ "$RUNTYPE" == "go.lint" ]]; then make go.protos.clean go.protos; fi
+- if [[ "$RUNTYPE" == "go.lint" ]]; then make messages; fi
+- if [[ "$RUNTYPE" == "go.lint" ]]; then make go.lint; fi
+- if [[ "$RUNTYPE" == "go.lint" ]]; then make go.unconvert; fi
+- if [[ "$RUNTYPE" == "go.lint" ]]; then make go.fmt; fi
+- if [[ "$RUNTYPE" == "go.lint" ]]; then make go.misspell; fi
 - |
   if [[ "$RUNTYPE" == "go.test" ]]; then
     if [[ "$RUN_GOARCH" == "amd64" ]]; then
@@ -103,13 +98,10 @@ script:
     else
       GOARCH=$RUN_GOARCH make go.test
     fi
-    go run ./cmd/ttn-lw-stack version
-    go run ./cmd/ttn-lw-cli version
   fi
-- |
-  if [[ "$RUNTYPE" == "release" ]]; then
-    $MAGE version:files
-  fi
+- if [[ "$RUNTYPE" == "go.test" ]]; then go run ./cmd/ttn-lw-stack version; fi
+- if [[ "$RUNTYPE" == "go.test" ]]; then go run ./cmd/ttn-lw-cli version; fi
+- if [[ "$RUNTYPE" == "release" ]]; then $MAGE version:files; fi
 - make git.diff
 after_success:
 - |

@@ -15,6 +15,7 @@
 import Applications from './service/applications'
 import Application from './entity/application'
 import Api from './api'
+import Token from './util/token'
 
 class TtnLw {
   constructor (token, {
@@ -24,8 +25,9 @@ class TtnLw {
     proxy,
     axiosConfig,
   }) {
+    const tokenInstance = new Token(token)
     this.config = arguments.config
-    this.api = new Api(connectionType, stackConfig, axiosConfig, token)
+    this.api = new Api(connectionType, stackConfig, axiosConfig, tokenInstance.get())
 
     this.Applications = new Applications(this.api, { defaultUserId, proxy, stackConfig })
     this.Application = Application.bind(null, this.Applications)

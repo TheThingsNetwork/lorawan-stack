@@ -35,12 +35,11 @@ var (
 			defer cancel()
 
 			logger.Info("Connecting to Identity Server database...")
-			db, err := gorm.Open("postgres", config.IS.DatabaseURI)
+			db, err := store.Open(ctx, config.IS.DatabaseURI)
 			if err != nil {
 				return err
 			}
 			defer db.Close()
-			store.SetLogger(db, logger)
 
 			clientID, err := cmd.Flags().GetString("id")
 			if err != nil {

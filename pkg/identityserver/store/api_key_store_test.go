@@ -36,18 +36,20 @@ func TestAPIKeyStore(t *testing.T) {
 			&Account{}, &User{}, &Organization{},
 			&Application{}, &Client{}, &Gateway{},
 		)
+
+		s := newStore(db)
 		store := GetAPIKeyStore(db)
 
-		db.Create(&User{Account: Account{UID: "test-user"}})
+		s.createEntity(ctx, &User{Account: Account{UID: "test-user"}})
 		userIDs := &ttnpb.UserIdentifiers{UserID: "test-user"}
 
-		db.Create(&Organization{Account: Account{UID: "test-org"}})
+		s.createEntity(ctx, &Organization{Account: Account{UID: "test-org"}})
 		orgIDs := &ttnpb.OrganizationIdentifiers{OrganizationID: "test-org"}
 
-		db.Create(&Application{ApplicationID: "test-app"})
+		s.createEntity(ctx, &Application{ApplicationID: "test-app"})
 		appIDs := &ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}
 
-		db.Create(&Gateway{GatewayID: "test-gtw"})
+		s.createEntity(ctx, &Gateway{GatewayID: "test-gtw"})
 		gtwIDs := &ttnpb.GatewayIdentifiers{GatewayID: "test-gtw"}
 
 		for _, tt := range []struct {

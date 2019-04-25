@@ -34,6 +34,7 @@ const workersPerCPU = 2
 func NewEventsServer(ctx context.Context, pubsub events.PubSub) *EventsServer {
 	srv := &EventsServer{
 		ctx:    ctx,
+		pubsub: pubsub,
 		events: make(events.Channel, 256),
 		filter: events.NewIdentifierFilter(),
 	}
@@ -72,9 +73,15 @@ type marshaledEvent struct {
 // EventsServer streams events from a PubSub over gRPC.
 type EventsServer struct {
 	ctx    context.Context
+	pubsub events.PubSub
 	events events.Channel
 	filter events.IdentifierFilter
 }
+
+var (
+	evtStreamStart = events.Define("events.stream.start", "event stream start")
+	evtStreamStop  = events.Define("events.stream.stop", "event stream stop")
+)
 
 // Stream implements the EventsServer interface.
 func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Events_StreamServer) (err error) {
@@ -112,6 +119,9 @@ func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Eve
 	if req.Tail > 0 || req.After != nil {
 		warning.Add(ctx, "Historical events not implemented")
 	}
+
+	srv.pubsub.Publish(evtStreamStart(ctx, req, req))
+	defer srv.pubsub.Publish(evtStreamStop(ctx, req, req))
 
 	for {
 		select {

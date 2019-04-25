@@ -21,6 +21,10 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+func (s *store) replaceEndDeviceLocations(ctx context.Context, endDeviceUUID string, old []EndDeviceLocation, new []EndDeviceLocation) error {
+	return replaceEndDeviceLocations(ctx, s.DB, endDeviceUUID, old, new)
+}
+
 func replaceEndDeviceLocations(ctx context.Context, db *gorm.DB, endDeviceUUID string, old []EndDeviceLocation, new []EndDeviceLocation) (err error) {
 	defer trace.StartRegion(ctx, "update end device locations").End()
 	oldByUUID := make(map[string]EndDeviceLocation, len(old))

@@ -17,6 +17,7 @@ package store
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"path/filepath"
 	"regexp"
 	"runtime/trace"
@@ -29,6 +30,61 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
+
+func newStore(db *gorm.DB) *store { return &store{DB: db} }
+
+type store struct {
+	DB *gorm.DB
+}
+
+func (s *store) query(ctx context.Context, model interface{}, funcs ...func(*gorm.DB) *gorm.DB) *gorm.DB {
+	query := s.DB.Model(model).Scopes(withContext(ctx))
+	if len(funcs) > 0 {
+		query = query.Scopes(funcs...)
+	}
+	return query
+}
+
+func (s *store) findEntity(ctx context.Context, entityID *ttnpb.EntityIdentifiers, fields ...string) (modelInterface, error) {
+	model := modelForID(entityID)
+	query := s.query(ctx, model, withID(entityID))
+	if len(fields) == 1 && fields[0] == "id" {
+		fields[0] = s.DB.NewScope(model).TableName() + ".id"
+	}
+	if len(fields) > 0 {
+		query = query.Select(fields)
+	}
+	if err := query.First(model).Error; err != nil {
+		if gorm.IsRecordNotFoundError(err) {
+			return nil, errNotFoundForID(entityID)
+		}
+		return nil, convertError(err)
+	}
+	return model, nil
+}
+
+func (s *store) createEntity(ctx context.Context, model interface{}) error {
+	if model, ok := model.(modelInterface); ok {
+		model.SetContext(ctx)
+	}
+	return s.DB.Create(model).Error
+}
+
+func (s *store) updateEntity(ctx context.Context, model interface{}, columns ...string) error {
+	query := s.query(ctx, model)
+	if len(columns) > 0 {
+		query = query.Select(append(columns, "updated_at"))
+	}
+	return query.Save(model).Error
+}
+
+func (s *store) deleteEntity(ctx context.Context, entityID *ttnpb.EntityIdentifiers) error {
+	model, err := s.findEntity(ctx, entityID, "id")
+	if err != nil {
+		return err
+	}
+	return s.DB.Delete(model).Error
+}
 
 var (
 	errDatabase      = errors.DefineInternal("database", "database error")
@@ -60,6 +116,53 @@ func convertError(err error) error {
 		}
 	}
 	return errDatabase.WithCause(err)
+}
+
+// Open opens a new database connection.
+func Open(ctx context.Context, dsn string) (*gorm.DB, error) {
+	dbURI, err := url.Parse(dsn)
+	if err != nil {
+		return nil, err
+	}
+	dbName := strings.TrimPrefix(dbURI.Path, "/")
+	db, err := gorm.Open("postgres", dsn)
+	if err != nil {
+		return nil, err
+	}
+	db = db.Set("db:name", dbName)
+	var dbVersion string
+	err = db.Raw("SELECT version()").Row().Scan(&dbVersion)
+	if err != nil {
+		return nil, err
+	}
+	db = db.Set("db:version", dbVersion)
+	switch {
+	case strings.Contains(dbVersion, "CockroachDB"):
+		db = db.Set("db:kind", "CockroachDB")
+	case strings.Contains(dbVersion, "PostgreSQL"):
+		db = db.Set("db:kind", "PostgreSQL")
+	}
+	SetLogger(db, log.FromContext(ctx))
+	return db, nil
+}
+
+// Initialize initializes the database.
+func Initialize(db *gorm.DB) error {
+	if dbKind, ok := db.Get("db:kind"); ok {
+		switch dbKind {
+		case "CockroachDB":
+			if dbName, ok := db.Get("db:name"); ok {
+				if err := db.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s;", dbName)).Error; err != nil {
+					return err
+				}
+			}
+		case "PostgreSQL":
+			if err := db.Exec("CREATE EXTENSION IF NOT EXISTS pgcrypto").Error; err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
 
 // Transact executes f in a db transaction.
@@ -126,24 +229,6 @@ func modelForID(id *ttnpb.EntityIdentifiers) modelInterface {
 	}
 }
 
-func findEntity(ctx context.Context, db *gorm.DB, entityID *ttnpb.EntityIdentifiers, fields ...string) (modelInterface, error) {
-	query := db.Scopes(withContext(ctx), withID(entityID))
-	entity := modelForID(entityID)
-	if len(fields) == 1 && fields[0] == "id" {
-		fields[0] = entityTypeForID(entityID) + "s.id"
-	}
-	if len(fields) > 0 {
-		query = query.Select(fields)
-	}
-	if err := query.First(entity).Error; err != nil {
-		if gorm.IsRecordNotFoundError(err) {
-			return nil, errNotFoundForID(entityID)
-		}
-		return nil, convertError(err)
-	}
-	return entity, nil
-}
-
 var (
 	errApplicationNotFound  = errors.DefineNotFound("application_not_found", "application `{application_id}` not found")
 	errClientNotFound       = errors.DefineNotFound("client_not_found", "client `{client_id}` not found")
@@ -177,14 +262,6 @@ func errNotFoundForID(entityID *ttnpb.EntityIdentifiers) error {
 	default:
 		panic(fmt.Sprintf("can't find errNotFound for id type %T", id))
 	}
-}
-
-func deleteEntity(ctx context.Context, db *gorm.DB, entityID *ttnpb.EntityIdentifiers) error {
-	err := db.Scopes(withContext(ctx), withID(entityID)).Delete(modelForID(entityID)).Error
-	if gorm.IsRecordNotFoundError(err) {
-		return errNotFoundForID(entityID)
-	}
-	return err
 }
 
 // SetLogger sets the database logger.

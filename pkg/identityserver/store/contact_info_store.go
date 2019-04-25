@@ -26,21 +26,21 @@ import (
 
 // GetContactInfoStore returns an ContactInfoStore on the given db (or transaction).
 func GetContactInfoStore(db *gorm.DB) ContactInfoStore {
-	return &contactInfoStore{db: db}
+	return &contactInfoStore{store: newStore(db)}
 }
 
 type contactInfoStore struct {
-	db *gorm.DB
+	*store
 }
 
 func (s *contactInfoStore) GetContactInfo(ctx context.Context, entityID *ttnpb.EntityIdentifiers) ([]*ttnpb.ContactInfo, error) {
 	defer trace.StartRegion(ctx, "get contact info").End()
-	entity, err := findEntity(ctx, s.db, entityID, "id")
+	entity, err := s.findEntity(ctx, entityID, "id")
 	if err != nil {
 		return nil, err
 	}
 	var models []ContactInfo
-	err = s.db.Where(ContactInfo{
+	err = s.query(ctx, ContactInfo{}).Where(ContactInfo{
 		EntityType: entityTypeForID(entityID),
 		EntityID:   entity.PrimaryKey(),
 	}).Find(&models).Error
@@ -56,14 +56,14 @@ func (s *contactInfoStore) GetContactInfo(ctx context.Context, entityID *ttnpb.E
 
 func (s *contactInfoStore) SetContactInfo(ctx context.Context, entityID *ttnpb.EntityIdentifiers, pb []*ttnpb.ContactInfo) ([]*ttnpb.ContactInfo, error) {
 	defer trace.StartRegion(ctx, "update contact info").End()
-	entity, err := findEntity(ctx, s.db, entityID, "id")
+	entity, err := s.findEntity(ctx, entityID, "id")
 	if err != nil {
 		return nil, err
 	}
 	entityType, entityUUID := entityTypeForID(entityID), entity.PrimaryKey()
 
 	var existing []ContactInfo
-	err = s.db.Where(ContactInfo{
+	err = s.query(ctx, ContactInfo{}).Where(ContactInfo{
 		EntityType: entityType,
 		EntityID:   entityUUID,
 	}).Find(&existing).Error
@@ -116,19 +116,19 @@ func (s *contactInfoStore) SetContactInfo(ctx context.Context, entityID *ttnpb.E
 
 	for _, info := range toCreate {
 		info.EntityType, info.EntityID = entityType, entityUUID
-		if err = s.db.Save(&info).Error; err != nil {
+		if err = s.createEntity(ctx, info); err != nil {
 			return nil, err
 		}
 	}
 
 	for _, info := range toUpdate {
-		if err = s.db.Save(&info).Error; err != nil {
+		if err = s.query(ctx, ContactInfo{}).Save(&info).Error; err != nil {
 			return nil, err
 		}
 	}
 
 	if len(toDelete) > 0 {
-		if err = s.db.Where("id in (?)", toDelete).Delete(&ContactInfo{}).Error; err != nil {
+		if err = s.query(ctx, ContactInfo{}).Where("id in (?)", toDelete).Delete(&ContactInfo{}).Error; err != nil {
 			return nil, err
 		}
 	}
@@ -160,7 +160,7 @@ func (s *contactInfoStore) CreateValidation(ctx context.Context, validation *ttn
 			panic("inconsistent contact info in validation")
 		}
 	}
-	entity, err := findEntity(ctx, s.db, validation.Entity, "id")
+	entity, err := s.findEntity(ctx, validation.Entity, "id")
 	if err != nil {
 		return nil, err
 	}
@@ -171,10 +171,8 @@ func (s *contactInfoStore) CreateValidation(ctx context.Context, validation *ttn
 	model.ContactMethod = int(contactMethod)
 	model.Value = value
 
-	model.SetContext(ctx)
-	query := s.db.Create(&model)
-	if query.Error != nil {
-		return nil, query.Error
+	if err = s.createEntity(ctx, &model); err != nil {
+		return nil, err
 	}
 
 	pb := model.toPB()
@@ -193,7 +191,7 @@ func (s *contactInfoStore) Validate(ctx context.Context, validation *ttnpb.Conta
 	now := cleanTime(time.Now())
 
 	var model ContactInfoValidation
-	err := s.db.Scopes(withContext(ctx)).Where(ContactInfoValidation{
+	err := s.query(ctx, ContactInfoValidation{}).Where(ContactInfoValidation{
 		Reference: validation.ID,
 		Token:     validation.Token,
 	}).Find(&model).Error
@@ -208,7 +206,7 @@ func (s *contactInfoStore) Validate(ctx context.Context, validation *ttnpb.Conta
 		return errValidationTokenExpired
 	}
 
-	err = s.db.Model(ContactInfo{}).Scopes(withContext(ctx)).Where(ContactInfo{
+	err = s.query(ctx, ContactInfo{}).Where(ContactInfo{
 		EntityID:      model.EntityID,
 		EntityType:    model.EntityType,
 		ContactMethod: model.ContactMethod,
@@ -221,7 +219,7 @@ func (s *contactInfoStore) Validate(ctx context.Context, validation *ttnpb.Conta
 	}
 
 	if model.EntityType == "user" && model.ContactMethod == int(ttnpb.CONTACT_METHOD_EMAIL) {
-		err = s.db.Model(User{}).Scopes(withContext(ctx)).Where(User{
+		err = s.query(ctx, User{}).Where(User{
 			Model: Model{ID: model.EntityID},
 		}).Where(User{
 			PrimaryEmailAddress: model.Value,
@@ -233,5 +231,5 @@ func (s *contactInfoStore) Validate(ctx context.Context, validation *ttnpb.Conta
 		}
 	}
 
-	return s.db.Delete(&model).Error
+	return s.query(ctx, ContactInfoValidation{}).Delete(&model).Error
 }

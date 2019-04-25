@@ -20,8 +20,8 @@ import axios from 'axios'
 class Http {
   constructor (token, stackConfig, axiosConfig = {}) {
     const headers = axiosConfig.headers || {}
-    let Authorization = null
 
+    let Authorization = null
     if (typeof token === 'string') {
       Authorization = `Bearer ${token}`
     }

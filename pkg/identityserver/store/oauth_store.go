@@ -24,21 +24,21 @@ import (
 
 // GetOAuthStore returns an OAuthStore on the given db (or transaction).
 func GetOAuthStore(db *gorm.DB) OAuthStore {
-	return &oauthStore{db: db}
+	return &oauthStore{store: newStore(db)}
 }
 
 type oauthStore struct {
-	db *gorm.DB
+	*store
 }
 
 func (s *oauthStore) ListAuthorizations(ctx context.Context, userIDs *ttnpb.UserIdentifiers) ([]*ttnpb.OAuthClientAuthorization, error) {
 	defer trace.StartRegion(ctx, "list authorizations").End()
-	user, err := findEntity(ctx, s.db, userIDs.EntityIdentifiers(), "id")
+	user, err := s.findEntity(ctx, userIDs.EntityIdentifiers(), "id")
 	if err != nil {
 		return nil, err
 	}
 	var authModels []ClientAuthorization
-	err = s.db.Where(ClientAuthorization{
+	err = s.query(ctx, ClientAuthorization{}).Where(ClientAuthorization{
 		UserID: user.PrimaryKey(),
 	}).Preload("Client").Find(&authModels).Error
 	if err != nil {
@@ -55,16 +55,16 @@ func (s *oauthStore) ListAuthorizations(ctx context.Context, userIDs *ttnpb.User
 
 func (s *oauthStore) GetAuthorization(ctx context.Context, userIDs *ttnpb.UserIdentifiers, clientIDs *ttnpb.ClientIdentifiers) (*ttnpb.OAuthClientAuthorization, error) {
 	defer trace.StartRegion(ctx, "get authorization").End()
-	client, err := findEntity(ctx, s.db, clientIDs.EntityIdentifiers(), "id")
+	client, err := s.findEntity(ctx, clientIDs.EntityIdentifiers(), "id")
 	if err != nil {
 		return nil, err
 	}
-	user, err := findEntity(ctx, s.db, userIDs.EntityIdentifiers(), "id")
+	user, err := s.findEntity(ctx, userIDs.EntityIdentifiers(), "id")
 	if err != nil {
 		return nil, err
 	}
 	var authModel ClientAuthorization
-	err = s.db.Where(ClientAuthorization{
+	err = s.query(ctx, ClientAuthorization{}).Where(ClientAuthorization{
 		ClientID: client.PrimaryKey(),
 		UserID:   user.PrimaryKey(),
 	}).First(&authModel).Error
@@ -82,16 +82,16 @@ func (s *oauthStore) GetAuthorization(ctx context.Context, userIDs *ttnpb.UserId
 
 func (s *oauthStore) Authorize(ctx context.Context, authorization *ttnpb.OAuthClientAuthorization) (*ttnpb.OAuthClientAuthorization, error) {
 	defer trace.StartRegion(ctx, "create or update authorization").End()
-	client, err := findEntity(ctx, s.db, authorization.ClientIDs.EntityIdentifiers(), "id")
+	client, err := s.findEntity(ctx, authorization.ClientIDs.EntityIdentifiers(), "id")
 	if err != nil {
 		return nil, err
 	}
-	user, err := findEntity(ctx, s.db, authorization.UserIDs.EntityIdentifiers(), "id")
+	user, err := s.findEntity(ctx, authorization.UserIDs.EntityIdentifiers(), "id")
 	if err != nil {
 		return nil, err
 	}
 	var authModel ClientAuthorization
-	err = s.db.Where(ClientAuthorization{
+	err = s.query(ctx, ClientAuthorization{}).Where(ClientAuthorization{
 		ClientID: client.PrimaryKey(),
 		UserID:   user.PrimaryKey(),
 	}).First(&authModel).Error
@@ -106,7 +106,7 @@ func (s *oauthStore) Authorize(ctx context.Context, authorization *ttnpb.OAuthCl
 		authModel.SetContext(ctx)
 	}
 	authModel.Rights = Rights{Rights: authorization.Rights}
-	query := s.db.Save(&authModel)
+	query := s.query(ctx, ClientAuthorization{}).Save(&authModel)
 	if query.Error != nil {
 		return nil, query.Error
 	}
@@ -118,15 +118,15 @@ func (s *oauthStore) Authorize(ctx context.Context, authorization *ttnpb.OAuthCl
 
 func (s *oauthStore) DeleteAuthorization(ctx context.Context, userIDs *ttnpb.UserIdentifiers, clientIDs *ttnpb.ClientIdentifiers) error {
 	defer trace.StartRegion(ctx, "delete authorization").End()
-	client, err := findEntity(ctx, s.db, clientIDs.EntityIdentifiers(), "id")
+	client, err := s.findEntity(ctx, clientIDs.EntityIdentifiers(), "id")
 	if err != nil {
 		return err
 	}
-	user, err := findEntity(ctx, s.db, userIDs.EntityIdentifiers(), "id")
+	user, err := s.findEntity(ctx, userIDs.EntityIdentifiers(), "id")
 	if err != nil {
 		return err
 	}
-	err = s.db.Where(ClientAuthorization{
+	err = s.query(ctx, ClientAuthorization{}).Where(ClientAuthorization{
 		ClientID: client.PrimaryKey(),
 		UserID:   user.PrimaryKey(),
 	}).Delete(&ClientAuthorization{}).Error
@@ -135,11 +135,11 @@ func (s *oauthStore) DeleteAuthorization(ctx context.Context, userIDs *ttnpb.Use
 
 func (s *oauthStore) CreateAuthorizationCode(ctx context.Context, code *ttnpb.OAuthAuthorizationCode) error {
 	defer trace.StartRegion(ctx, "create authorization code").End()
-	client, err := findEntity(ctx, s.db, code.ClientIDs.EntityIdentifiers(), "id")
+	client, err := s.findEntity(ctx, code.ClientIDs.EntityIdentifiers(), "id")
 	if err != nil {
 		return err
 	}
-	user, err := findEntity(ctx, s.db, code.UserIDs.EntityIdentifiers(), "id")
+	user, err := s.findEntity(ctx, code.UserIDs.EntityIdentifiers(), "id")
 	if err != nil {
 		return err
 	}
@@ -154,13 +154,8 @@ func (s *oauthStore) CreateAuthorizationCode(ctx context.Context, code *ttnpb.OA
 		State:       code.State,
 		ExpiresAt:   code.ExpiresAt,
 	}
-	codeModel.SetContext(ctx)
 	codeModel.CreatedAt = cleanTime(code.CreatedAt)
-	query := s.db.Save(&codeModel)
-	if query.Error != nil {
-		return query.Error
-	}
-	return nil
+	return s.createEntity(ctx, &codeModel)
 }
 
 func (s *oauthStore) GetAuthorizationCode(ctx context.Context, code string) (*ttnpb.OAuthAuthorizationCode, error) {
@@ -169,7 +164,7 @@ func (s *oauthStore) GetAuthorizationCode(ctx context.Context, code string) (*tt
 		return nil, errAuthorizationCodeNotFound
 	}
 	var codeModel AuthorizationCode
-	err := s.db.Scopes(withContext(ctx)).Where(AuthorizationCode{
+	err := s.query(ctx, AuthorizationCode{}).Where(AuthorizationCode{
 		Code: code,
 	}).Preload("Client").Preload("User.Account").First(&codeModel).Error
 	if err != nil {
@@ -185,7 +180,7 @@ func (s *oauthStore) DeleteAuthorizationCode(ctx context.Context, code string) e
 		return errAuthorizationCodeNotFound
 	}
 	defer trace.StartRegion(ctx, "delete authorization code").End()
-	err := s.db.Scopes(withContext(ctx)).Where(AuthorizationCode{
+	err := s.query(ctx, AuthorizationCode{}).Where(AuthorizationCode{
 		Code: code,
 	}).Delete(&AuthorizationCode{}).Error
 	if err != nil {
@@ -199,11 +194,11 @@ func (s *oauthStore) DeleteAuthorizationCode(ctx context.Context, code string) e
 
 func (s *oauthStore) CreateAccessToken(ctx context.Context, token *ttnpb.OAuthAccessToken, previousID string) error {
 	defer trace.StartRegion(ctx, "create access token").End()
-	client, err := findEntity(ctx, s.db, token.ClientIDs.EntityIdentifiers(), "id")
+	client, err := s.findEntity(ctx, token.ClientIDs.EntityIdentifiers(), "id")
 	if err != nil {
 		return err
 	}
-	user, err := findEntity(ctx, s.db, token.UserIDs.EntityIdentifiers(), "id")
+	user, err := s.findEntity(ctx, token.UserIDs.EntityIdentifiers(), "id")
 	if err != nil {
 		return err
 	}
@@ -219,27 +214,22 @@ func (s *oauthStore) CreateAccessToken(ctx context.Context, token *ttnpb.OAuthAc
 		RefreshToken: token.RefreshToken,
 		ExpiresAt:    token.ExpiresAt,
 	}
-	tokenModel.SetContext(ctx)
 	tokenModel.CreatedAt = cleanTime(token.CreatedAt)
-	query := s.db.Save(&tokenModel)
-	if query.Error != nil {
-		return query.Error
-	}
-	return nil
+	return s.createEntity(ctx, &tokenModel)
 }
 
 func (s *oauthStore) ListAccessTokens(ctx context.Context, userIDs *ttnpb.UserIdentifiers, clientIDs *ttnpb.ClientIdentifiers) ([]*ttnpb.OAuthAccessToken, error) {
 	defer trace.StartRegion(ctx, "list access tokens").End()
-	client, err := findEntity(ctx, s.db, clientIDs.EntityIdentifiers(), "id")
+	client, err := s.findEntity(ctx, clientIDs.EntityIdentifiers(), "id")
 	if err != nil {
 		return nil, err
 	}
-	user, err := findEntity(ctx, s.db, userIDs.EntityIdentifiers(), "id")
+	user, err := s.findEntity(ctx, userIDs.EntityIdentifiers(), "id")
 	if err != nil {
 		return nil, err
 	}
 	var tokenModels []AccessToken
-	err = s.db.Scopes(withContext(ctx)).Where(AccessToken{
+	err = s.query(ctx, AccessToken{}).Where(AccessToken{
 		ClientAuthorization: ClientAuthorization{
 			ClientID: client.PrimaryKey(),
 			UserID:   user.PrimaryKey(),
@@ -264,7 +254,7 @@ func (s *oauthStore) GetAccessToken(ctx context.Context, id string) (*ttnpb.OAut
 	}
 	defer trace.StartRegion(ctx, "get access token").End()
 	var tokenModel AccessToken
-	err := s.db.Scopes(withContext(ctx)).Where(AccessToken{
+	err := s.query(ctx, AccessToken{}).Where(AccessToken{
 		TokenID: id,
 	}).Preload("Client").Preload("User.Account").First(&tokenModel).Error
 	if err != nil {
@@ -280,7 +270,7 @@ func (s *oauthStore) DeleteAccessToken(ctx context.Context, id string) error {
 		return errAccessTokenNotFound
 	}
 	defer trace.StartRegion(ctx, "delete access token").End()
-	err := s.db.Scopes(withContext(ctx)).Where(AccessToken{
+	err := s.query(ctx, AccessToken{}).Where(AccessToken{
 		TokenID: id,
 	}).Delete(&AccessToken{}).Error
 	if err != nil {

@@ -29,11 +29,11 @@ import (
 
 // GetOrganizationStore returns an OrganizationStore on the given db (or transaction).
 func GetOrganizationStore(db *gorm.DB) OrganizationStore {
-	return &organizationStore{db: db}
+	return &organizationStore{store: newStore(db)}
 }
 
 type organizationStore struct {
-	db *gorm.DB
+	*store
 }
 
 // selectOrganizationFields selects relevant fields (based on fieldMask) and preloads details if needed.
@@ -73,10 +73,8 @@ func (s *organizationStore) CreateOrganization(ctx context.Context, org *ttnpb.O
 		Account: Account{UID: org.OrganizationID}, // The ID is not mutated by fromPB.
 	}
 	orgModel.fromPB(org, nil)
-	orgModel.SetContext(ctx)
-	query := s.db.Create(&orgModel)
-	if query.Error != nil {
-		return nil, query.Error
+	if err := s.createEntity(ctx, &orgModel); err != nil {
+		return nil, err
 	}
 	var orgProto ttnpb.Organization
 	orgModel.toPB(&orgProto, nil)
@@ -89,7 +87,7 @@ func (s *organizationStore) FindOrganizations(ctx context.Context, ids []*ttnpb.
 	for i, id := range ids {
 		idStrings[i] = id.GetOrganizationID()
 	}
-	query := s.db.Scopes(withContext(ctx), withOrganizationID(idStrings...))
+	query := s.query(ctx, Organization{}, withOrganizationID(idStrings...))
 	query = selectOrganizationFields(ctx, query, fieldMask)
 	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
 		countTotal(ctx, query.Model(Organization{}))
@@ -112,7 +110,7 @@ func (s *organizationStore) FindOrganizations(ctx context.Context, ids []*ttnpb.
 
 func (s *organizationStore) GetOrganization(ctx context.Context, id *ttnpb.OrganizationIdentifiers, fieldMask *types.FieldMask) (*ttnpb.Organization, error) {
 	defer trace.StartRegion(ctx, "get organization").End()
-	query := s.db.Scopes(withContext(ctx), withOrganizationID(id.GetOrganizationID()))
+	query := s.query(ctx, Organization{}, withOrganizationID(id.GetOrganizationID()))
 	query = selectOrganizationFields(ctx, query, fieldMask)
 	var orgModel Organization
 	if err := query.Preload("Account").First(&orgModel).Error; err != nil {
@@ -128,7 +126,7 @@ func (s *organizationStore) GetOrganization(ctx context.Context, id *ttnpb.Organ
 
 func (s *organizationStore) UpdateOrganization(ctx context.Context, org *ttnpb.Organization, fieldMask *types.FieldMask) (updated *ttnpb.Organization, err error) {
 	defer trace.StartRegion(ctx, "update organization").End()
-	query := s.db.Scopes(withContext(ctx), withOrganizationID(org.GetOrganizationID()))
+	query := s.query(ctx, Organization{}, withOrganizationID(org.GetOrganizationID()))
 	query = selectOrganizationFields(ctx, query, fieldMask)
 	var orgModel Organization
 	if err = query.Preload("Account").First(&orgModel).Error; err != nil {
@@ -142,14 +140,11 @@ func (s *organizationStore) UpdateOrganization(ctx context.Context, org *ttnpb.O
 	}
 	oldAttributes := orgModel.Attributes
 	columns := orgModel.fromPB(org, fieldMask)
-	if len(columns) > 0 {
-		query = s.db.Select(append(columns, "updated_at")).Save(&orgModel)
-		if query.Error != nil {
-			return nil, query.Error
-		}
+	if err = s.updateEntity(ctx, &orgModel, columns...); err != nil {
+		return nil, err
 	}
 	if !reflect.DeepEqual(oldAttributes, orgModel.Attributes) {
-		if err = replaceAttributes(ctx, s.db, "organization", orgModel.ID, oldAttributes, orgModel.Attributes); err != nil {
+		if err = s.replaceAttributes(ctx, "organization", orgModel.ID, oldAttributes, orgModel.Attributes); err != nil {
 			return nil, err
 		}
 	}
@@ -160,16 +155,5 @@ func (s *organizationStore) UpdateOrganization(ctx context.Context, org *ttnpb.O
 
 func (s *organizationStore) DeleteOrganization(ctx context.Context, id *ttnpb.OrganizationIdentifiers) (err error) {
 	defer trace.StartRegion(ctx, "delete organization").End()
-	defer func() {
-		if err != nil && gorm.IsRecordNotFoundError(err) {
-			err = errNotFoundForID(id.EntityIdentifiers())
-		}
-	}()
-	query := s.db.Scopes(withContext(ctx), withOrganizationID(id.GetOrganizationID()))
-	query = query.Select("organizations.id")
-	var orgModel Organization
-	if err = query.First(&orgModel).Error; err != nil {
-		return err
-	}
-	return s.db.Delete(&orgModel).Error
+	return s.deleteEntity(ctx, id.EntityIdentifiers())
 }

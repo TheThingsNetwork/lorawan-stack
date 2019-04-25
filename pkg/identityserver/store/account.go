@@ -38,6 +38,10 @@ func init() {
 	registerModel(&Account{})
 }
 
+func (s *store) findAccount(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers) (*Account, error) {
+	return findAccount(ctx, s.DB, id)
+}
+
 func findAccount(ctx context.Context, db *gorm.DB, id *ttnpb.OrganizationOrUserIdentifiers) (*Account, error) {
 	entityID := id.EntityIdentifiers()
 	var account Account

@@ -15,6 +15,7 @@
 import Marshaler from '../util/marshaler'
 import Devices from '../service/devices'
 import Application from '../entity/application'
+import stream from '../api/stream/stream-node'
 import ApiKeys from './api-keys'
 import Link from './link'
 import Collaborators from './collaborators'
@@ -35,6 +36,7 @@ class Applications {
     this._defaultUserId = defaultUserId
     this._api = api
     this._proxy = proxy
+    this._stackConfig = stackConfig
 
     this.ApiKeys = new ApiKeys(api.ApplicationAccess, {
       parentRoutes: {
@@ -145,6 +147,21 @@ class Applications {
     })
 
     return Marshaler.unwrapRights(result)
+  }
+
+  // Events Stream
+
+  async openStream (identifiers, tail, after) {
+    const eventsUrl = `${this._stackConfig.as}/events`
+    const payload = {
+      identifiers: identifiers.map(id => ({
+        application_ids: { application_id: id },
+      })),
+      tail,
+      after,
+    }
+
+    return stream(payload, eventsUrl)
   }
 }
 

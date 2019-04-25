@@ -34,25 +34,27 @@ func TestMembershipStore(t *testing.T) {
 			&Account{}, &User{}, &Organization{},
 			&Application{}, &Client{}, &Gateway{},
 		)
+
+		s := newStore(db)
 		store := GetMembershipStore(db)
 
 		usr := &User{Account: Account{UID: "test-user"}}
-		db.Create(usr)
+		s.createEntity(ctx, usr)
 		usrIDs := usr.Account.OrganizationOrUserIdentifiers()
 
 		org := &Organization{Account: Account{UID: "test-org"}}
-		db.Create(org)
+		s.createEntity(ctx, org)
 		orgIDs := org.Account.OrganizationOrUserIdentifiers()
 
-		db.Create(&Application{ApplicationID: "test-app"})
-		db.Create(&Client{ClientID: "test-cli"})
-		db.Create(&Gateway{GatewayID: "test-gtw"})
+		s.createEntity(ctx, &Application{ApplicationID: "test-app"})
+		s.createEntity(ctx, &Client{ClientID: "test-cli"})
+		s.createEntity(ctx, &Gateway{GatewayID: "test-gtw"})
 
-		db.Create(&User{Account: Account{UID: "other-user"}})
-		db.Create(&Organization{Account: Account{UID: "other-org"}})
-		db.Create(&Application{ApplicationID: "other-app"})
-		db.Create(&Client{ClientID: "other-cli"})
-		db.Create(&Gateway{GatewayID: "other-gtw"})
+		s.createEntity(ctx, &User{Account: Account{UID: "other-user"}})
+		s.createEntity(ctx, &Organization{Account: Account{UID: "other-org"}})
+		s.createEntity(ctx, &Application{ApplicationID: "other-app"})
+		s.createEntity(ctx, &Client{ClientID: "other-cli"})
+		s.createEntity(ctx, &Gateway{GatewayID: "other-gtw"})
 
 		for _, tt := range []struct {
 			Name              string
