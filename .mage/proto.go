@@ -36,7 +36,7 @@ type Proto mg.Namespace
 
 type protocContext struct {
 	WorkingDirectory string
-	Uid, Gid         string
+	UID, GID         string
 }
 
 func makeProtoc() (func(...string) error, *protocContext, error) {
@@ -59,8 +59,8 @@ func makeProtoc() (func(...string) error, *protocContext, error) {
 			fmt.Sprintf("-I%s", filepath.Dir(wd)),
 		), &protocContext{
 			WorkingDirectory: wd,
-			Uid:              usr.Uid,
-			Gid:              usr.Gid,
+			UID:              usr.Uid,
+			GID:              usr.Gid,
 		}, nil
 }
 
@@ -72,7 +72,7 @@ func withProtoc(f func(pCtx *protocContext, protoc func(...string) error) error)
 	return f(pCtx, protoc)
 }
 
-func (p Proto) Go(ctx context.Context) error {
+func (p Proto) Go(context.Context) error {
 	if err := withProtoc(func(pCtx *protocContext, protoc func(...string) error) error {
 		var convs []string
 		for _, t := range []string{"any", "duration", "empty", "field_mask", "struct", "timestamp", "wrappers"} {
@@ -110,7 +110,7 @@ func (p Proto) Go(ctx context.Context) error {
 	return sh.RunV("gofmt", "-w", "-s", ttnpb)
 }
 
-func (p Proto) GoClean(ctx context.Context) error {
+func (p Proto) GoClean(context.Context) error {
 	return filepath.Walk(filepath.Join("pkg", "ttnpb"), func(path string, _ os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -127,7 +127,7 @@ func (p Proto) GoClean(ctx context.Context) error {
 	})
 }
 
-func (p Proto) Swagger(ctx context.Context) error {
+func (p Proto) Swagger(context.Context) error {
 	return withProtoc(func(pCtx *protocContext, protoc func(...string) error) error {
 		if err := protoc(
 			fmt.Sprintf("--swagger_out=allow_merge,merge_file_name=api:%s/api", pCtx.WorkingDirectory),
@@ -139,11 +139,11 @@ func (p Proto) Swagger(ctx context.Context) error {
 	})
 }
 
-func (p Proto) SwaggerClean(ctx context.Context) error {
+func (p Proto) SwaggerClean(context.Context) error {
 	return sh.Rm(filepath.Join("api", "api.swagger.json"))
 }
 
-func (p Proto) Markdown(ctx context.Context) error {
+func (p Proto) Markdown(context.Context) error {
 	return withProtoc(func(pCtx *protocContext, protoc func(...string) error) error {
 		if err := protoc(
 			fmt.Sprintf("--doc_opt=%s/api/api.md.tmpl,api.md --doc_out=%s/api", pCtx.WorkingDirectory, pCtx.WorkingDirectory),
@@ -155,12 +155,12 @@ func (p Proto) Markdown(ctx context.Context) error {
 	})
 }
 
-func (p Proto) MarkdownClean(ctx context.Context) error {
+func (p Proto) MarkdownClean(context.Context) error {
 	return sh.Rm(filepath.Join("api", "api.md"))
 }
 
-func (p Proto) JsSDK(ctx context.Context) error {
-	if err := withProtoc(func(pCtx *protocContext, protoc func(...string) error) error {
+func (p Proto) SdkJs(context.Context) error {
+	return withProtoc(func(pCtx *protocContext, protoc func(...string) error) error {
 		if err := protoc(
 			fmt.Sprintf("--doc_opt=json,api.json --doc_out=%s/sdk/js/generated", pCtx.WorkingDirectory),
 			fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),
@@ -168,29 +168,14 @@ func (p Proto) JsSDK(ctx context.Context) error {
 			return errors.Wrap(err, "failed to generate protos")
 		}
 		return nil
-	}); err != nil {
-		return err
-	}
-	yarn, err := yarn()
-	if err != nil {
-		return errors.Wrap(err, "failed to construct yarn command")
-	}
-	if err := yarn("--cwd=./sdk/js", "run", "definitions"); err != nil {
-		return errors.Wrap(err, "failed to generate definitions")
-	}
-	return nil
+	})
 }
 
-func (p Proto) JsSDKClean(ctx context.Context) error {
-	for _, f := range []string{"api.json", "api-definition.json"} {
-		if err := sh.Rm(filepath.Join("sdk", "js", "generated", f)); err != nil {
-			return err
-		}
-	}
-	return nil
+func (p Proto) SdkJsClean(context.Context) error {
+	return sh.Rm(filepath.Join("sdk", "js", "generated", "api.json"))
 }
 
 func (p Proto) All(ctx context.Context) {
-	mg.CtxDeps(ctx, p.GoClean, p.SwaggerClean, p.MarkdownClean, p.JsSDKClean)
-	mg.CtxDeps(ctx, p.Go, p.Swagger, p.Markdown, p.JsSDK)
+	mg.CtxDeps(ctx, p.GoClean, p.SwaggerClean, p.MarkdownClean, p.SdkJsClean)
+	mg.CtxDeps(ctx, p.Go, p.Swagger, p.Markdown, p.SdkJs)
 }
