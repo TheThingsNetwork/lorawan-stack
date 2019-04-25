@@ -41,3 +41,6 @@ clean: js.clean
 	rm -rf dist
 
 translations: messages
+
+%:
+	$(MAGE) ${@}
