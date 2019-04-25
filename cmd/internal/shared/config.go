@@ -35,6 +35,9 @@ var DefaultLogConfig = config.Log{
 var DefaultTLSConfig = config.TLS{
 	Certificate: "cert.pem",
 	Key:         "key.pem",
+	ACME: config.ACME{
+		Endpoint: "https://acme-v01.api.letsencrypt.org/directory",
+	},
 }
 
 // DefaultClusterConfig is the default cluster configuration.
