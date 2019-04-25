@@ -178,7 +178,7 @@ const Field = function (props) {
     rest.onChange = handleChange
     rest.onBlur = handleBlur
     _error = touched && rest.error
-
+    rest.value = rest.value || ''
   }
 
   // Dismiss non boolean values for checkboxes
