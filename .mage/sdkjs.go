@@ -22,6 +22,7 @@ import (
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
+	"github.com/magefile/mage/target"
 	"github.com/pkg/errors"
 )
 
@@ -125,16 +126,23 @@ func (sdkJs SdkJs) Clean() {
 }
 
 // Definitions extracts the api-definition.json from the proto generated api.json.
-func (sdkJs SdkJs) Definitions(context.Context) error {
+func (sdkJs SdkJs) Definitions() error {
 	mg.Deps(Proto.SdkJs)
-	yarn, err := yarn()
+	changed, err := target.Path(filepath.Join("sdk", "js", "generated", "api-definition.json"), filepath.Join("sdk", "js", "generated", "api.json"))
 	if err != nil {
-		return errors.Wrap(err, "failed to construct yarn command")
+		return errors.Wrap(err, "failed checking modtime")
 	}
-	if err := yarn("--cwd=./sdk/js", "run", "definitions"); err != nil {
-		return errors.Wrap(err, "failed to generate definitions")
+	if !changed {
+		return nil
 	}
-	return nil
+	if mg.Verbose() {
+		fmt.Println("Extracting api definitions from protos…")
+	}
+	yarn, err := sdkJs.yarn()
+	if err != nil {
+		return errors.Wrap(err, "failed constructing yarn command")
+	}
+	return yarn("run", "definitions")
 }
 
 // DefinitionsClean removes the generated api-definition.json.
