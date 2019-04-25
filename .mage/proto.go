@@ -24,7 +24,7 @@ import (
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	"github.com/pkg/errors"
 )
 
 const protocVersion = "3.1.3"
@@ -42,11 +42,11 @@ type protocContext struct {
 func makeProtoc() (func(...string) error, *protocContext, error) {
 	wd, err := os.Getwd()
 	if err != nil {
-		return nil, nil, errors.New("failed to get working directory").WithCause(err)
+		return nil, nil, errors.Wrap(err, "failed to get working directory")
 	}
 	usr, err := user.Current()
 	if err != nil {
-		return nil, nil, errors.New("failed to get user").WithCause(err)
+		return nil, nil, errors.Wrap(err, "failed to get user")
 	}
 	return sh.RunCmd("docker", "run",
 			"--rm",
@@ -86,7 +86,7 @@ func (p Proto) Go(ctx context.Context) error {
 			fmt.Sprintf("--grpc-gateway_out=%s:%s", convStr, protocOut),
 			fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),
 		); err != nil {
-			return errors.New("failed to generate protos").WithCause(err)
+			return errors.Wrap(err, "failed to generate protos")
 		}
 		return nil
 	}); err != nil {
@@ -94,18 +94,18 @@ func (p Proto) Go(ctx context.Context) error {
 	}
 
 	if err := sh.RunV(filepath.Join(".mage", "scripts", "fix-grpc-gateway-names.sh"), "api"); err != nil {
-		return errors.New("failed to fix gRPC-gateway names").WithCause(err)
+		return errors.Wrap(err, "failed to fix gRPC-gateway names")
 	}
 
 	ttnpb, err := filepath.Abs(filepath.Join("pkg", "ttnpb"))
 	if err != nil {
-		return errors.New("failed to construct absolute path to pkg/ttnpb").WithCause(err)
+		return errors.Wrap(err, "failed to construct absolute path to pkg/ttnpb")
 	}
 	if err := execGo("run", "golang.org/x/tools/cmd/goimports", "-w", ttnpb); err != nil {
-		return errors.New("failed to run goimports on generated code").WithCause(err)
+		return errors.Wrap(err, "failed to run goimports on generated code")
 	}
 	if err := execGo("run", "github.com/mdempsky/unconvert", "-apply", ttnpb); err != nil {
-		return errors.New("failed to run unconvert on generated code").WithCause(err)
+		return errors.Wrap(err, "failed to run unconvert on generated code")
 	}
 	return sh.RunV("gofmt", "-w", "-s", ttnpb)
 }
@@ -133,7 +133,7 @@ func (p Proto) Swagger(ctx context.Context) error {
 			fmt.Sprintf("--swagger_out=allow_merge,merge_file_name=api:%s/api", pCtx.WorkingDirectory),
 			fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),
 		); err != nil {
-			return errors.New("failed to generate protos").WithCause(err)
+			return errors.Wrap(err, "failed to generate protos")
 		}
 		return nil
 	})
@@ -149,7 +149,7 @@ func (p Proto) Markdown(ctx context.Context) error {
 			fmt.Sprintf("--doc_opt=%s/api/api.md.tmpl,api.md --doc_out=%s/api", pCtx.WorkingDirectory, pCtx.WorkingDirectory),
 			fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),
 		); err != nil {
-			return errors.New("failed to generate protos").WithCause(err)
+			return errors.Wrap(err, "failed to generate protos")
 		}
 		return nil
 	})
@@ -165,7 +165,7 @@ func (p Proto) JsSDK(ctx context.Context) error {
 			fmt.Sprintf("--doc_opt=json,api.json --doc_out=%s/sdk/js/generated", pCtx.WorkingDirectory),
 			fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),
 		); err != nil {
-			return errors.New("failed to generate protos").WithCause(err)
+			return errors.Wrap(err, "failed to generate protos")
 		}
 		return nil
 	}); err != nil {
@@ -173,10 +173,10 @@ func (p Proto) JsSDK(ctx context.Context) error {
 	}
 	yarn, err := yarn()
 	if err != nil {
-		return errors.New("failed to construct yarn command").WithCause(err)
+		return errors.Wrap(err, "failed to construct yarn command")
 	}
 	if err := yarn("--cwd=./sdk/js", "run", "definitions"); err != nil {
-		return errors.New("failed to generate definitions").WithCause(err)
+		return errors.Wrap(err, "failed to generate definitions")
 	}
 	return nil
 }
