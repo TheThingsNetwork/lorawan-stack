@@ -46,8 +46,9 @@ class List extends React.PureComponent {
       ...renderedItem.props,
       key: actualRowKey,
       className: classnames(
-        renderedItem.props.className,
-        style[`item-${size}`]
+        renderedItem.props.className, {
+          [style[`item-${size}`]]: size !== 'none',
+        }
       ),
     })
   }
@@ -97,13 +98,14 @@ class List extends React.PureComponent {
       component: Component,
       bordered,
       items,
+      listClassName,
     } = this.props
 
     const cls = classnames(className, style.wrapper, {
       [style.listBordered]: bordered,
     })
 
-    const listCls = classnames(style.list, {
+    const listCls = classnames(style.list, listClassName, {
       [style.listEmpty]: !items.length,
     })
 
@@ -119,8 +121,8 @@ class List extends React.PureComponent {
 }
 
 List.propTypes = {
-  size: PropTypes.oneOf([ 'small', 'default', 'large' ]),
-  renderItem: PropTypes.func.isRequired,
+  size: PropTypes.oneOf([ 'small', 'default', 'large', 'none' ]),
+  renderItem: PropTypes.func,
   items: PropTypes.array,
   rowKey: PropTypes.oneOfType([ PropTypes.func, PropTypes.string ]),
   component: PropTypes.oneOf([ 'ol', 'ul' ]),
@@ -128,6 +130,7 @@ List.propTypes = {
   emptyMessage: PropTypes.message,
   emptyMessageValues: PropTypes.object,
   header: PropTypes.node,
+  listClassName: PropTypes.string,
 }
 
 List.defaultProps = {
@@ -138,6 +141,8 @@ List.defaultProps = {
   emptyMessage: sharedMessages.noMatch,
   emptyMessageValues: {},
   header: null,
+  renderItem: (item, index) => (<List.Item key={index}>{item}</List.Item>),
+  footer: null,
 }
 
 List.Item = ListItem
