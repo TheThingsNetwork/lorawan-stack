@@ -64,7 +64,7 @@ func (sdkJs SdkJs) Deps() error {
 
 // Build builds the source files and output into 'dist'.
 func (sdkJs SdkJs) Build() error {
-	mg.SerialDeps(sdkJs.Deps, sdkJs.Definitions)
+	mg.SerialDeps(SdkJs.Deps, SdkJs.Definitions)
 
 	if mg.Verbose() {
 		fmt.Println("Building JS SDK files…")
@@ -79,7 +79,7 @@ func (sdkJs SdkJs) Build() error {
 
 // Watch builds the source files in watch mode.
 func (sdkJs SdkJs) Watch() error {
-	mg.SerialDeps(sdkJs.Deps, sdkJs.Definitions)
+	mg.SerialDeps(SdkJs.Deps, SdkJs.Definitions)
 
 	if mg.Verbose() {
 		fmt.Println("Building and watching JS SDK files…")
