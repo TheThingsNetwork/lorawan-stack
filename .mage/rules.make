@@ -12,40 +12,37 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-.PHONY: git.hooks
-
-git.hooks: $(MAGE)
+.PHONY: git.install-hooks
+git.install-hooks: $(MAGE)
 	@$(MAGE) git:installHooks
 
-INIT_RULES += git.hooks
+INIT_RULES += git.install-hooks
 
-.PHONY: git.hooks.remove
-
-git.hooks.remove: $(MAGE)
+.PHONY: git.uninstall-hooks
+git.uninstall-hooks: $(MAGE)
 	@$(MAGE) git:uninstallHooks
 
 .PHONY: git.pre-commit
-
-git.pre-commit: $(MAGE)
+git.pre-commit: $(MAGE) # NOTE: DO NOT CHANGE - will break previously installed git hooks.
 	@HOOK=pre-commit $(MAGE) git:runHook
 
 .PHONY: git.commit-msg
-
-git.commit-msg: $(MAGE)
+git.commit-msg: $(MAGE) # NOTE: DO NOT CHANGE - will break previously installed git hooks.
 	@HOOK=commit-msg $(MAGE) git:runHook
 
 .PHONY: git.pre-push
-
-git.pre-push: $(MAGE)
+git.pre-push: $(MAGE) # NOTE: DO NOT CHANGE - will break previously installed git hooks.
 	@HOOK=pre-push $(MAGE) git:runHook
 
-.PHONY: go.min-version
-go.min-version: $(MAGE)
+.PHONY: go.check-version
+go.check-version: $(MAGE)
 	@$(MAGE) go:checkVersion
 
 .PHONY: go.deps
 go.deps:
 	@GO111MODULE=on go mod vendor
+
+DEPS_RULES += go.deps
 
 coverage.out: go.cover
 
@@ -73,9 +70,13 @@ go.misspell: $(MAGE)
 go.quality: $(MAGE)
 	@$(MAGE) go:quality
 
+QUALITY_RULES += go.quality
+
 .PHONY: go.test
 go.test: $(MAGE) dev.certs
 	@$(MAGE) go:test
+
+TEST_RULES += go.test
 
 .PHONY: go.unconvert
 go.unconvert: $(MAGE)
@@ -97,6 +98,8 @@ js.backend-translations: $(MAGE)
 js.build: $(MAGE)
 	@$(MAGE) js:build
 
+BUILD_RULES += js.build
+
 .PHONY: js.build-dll
 js.build-dll: $(MAGE)
 	@$(MAGE) js:buildDll
@@ -109,9 +112,13 @@ js.build-main: $(MAGE)
 js.clean: $(MAGE)
 	@$(MAGE) js:clean
 
+CLEAN_RULES += js.clean
+
 .PHONY: js.deps
 js.deps: $(MAGE)
 	@$(MAGE) js:deps
+
+DEPS_RULES += js.deps
 
 .PHONY: js.dev-deps
 js.dev-deps: $(MAGE)
@@ -124,6 +131,8 @@ js.lint: $(MAGE)
 .PHONY: js.lint-all
 js.lint-all: $(MAGE)
 	@$(MAGE) js:lintAll
+
+QUALITY_RULES += js.lint-all
 
 .PHONY: js.lint-snap
 js.lint-snap: $(MAGE)
@@ -148,6 +157,8 @@ js.storybook: $(MAGE)
 .PHONY: js.test
 js.test: $(MAGE)
 	@$(MAGE) js:test
+
+TEST_RULES += js.test
 
 .PHONY: js.translations
 js.translations: $(MAGE)
@@ -189,8 +200,8 @@ proto.markdown.clean: $(MAGE)
 proto.sdk.js: $(MAGE)
 	@$(MAGE) proto:sdkJs
 
-.PHONY: proto.sdk.js.clean
-proto.sdk.js.clean: $(MAGE)
+.PHONY: proto.js.sdk.clean
+proto.js.sdk.clean: $(MAGE)
 	@$(MAGE) proto:sdkJsClean
 
 .PHONY: proto.swagger
@@ -201,38 +212,46 @@ proto.swagger: $(MAGE)
 proto.swagger.clean: $(MAGE)
 	@$(MAGE) proto:swaggerClean
 
-.PHONY: sdk.js.build
-sdk.js.build: $(MAGE)
-	@$(MAGE) sdkJs:build
+.PHONY: js.sdk.build
+js.sdk.build: $(MAGE)
+	@$(MAGE) jsSDK:build
 
-.PHONY: sdk.js.clean
-sdk.js.clean: $(MAGE)
-	@$(MAGE) sdkJs:clean
+.PHONY: js.sdk.clean
+js.sdk.clean: $(MAGE)
+	@$(MAGE) jsSDK:clean
 
-.PHONY: sdk.js.deps
-sdk.js.deps: $(MAGE)
-	@$(MAGE) sdkJs:deps
+CLEAN_RULES += js.sdk.clean
 
-.PHONY: sdk.js.dev-deps
-sdk.js.dev-deps: $(MAGE)
-	@$(MAGE) sdkJs:devDeps
+.PHONY: js.sdk.deps
+js.sdk.deps: $(MAGE)
+	@$(MAGE) jsSDK:deps
 
-.PHONY: sdk.js.test
-sdk.js.test: $(MAGE)
-	@$(MAGE) sdkJs:test
+DEPS_RULES += js.sdk.deps
 
-.PHONY: sdk.js.test-watch
-sdk.js.test-watch: $(MAGE)
-	@$(MAGE) sdkJs:testWatch
+.PHONY: js.sdk.dev-deps
+js.sdk.dev-deps: $(MAGE)
+	@$(MAGE) jsSDK:devDeps
 
-.PHONY: sdk.js.watch
-sdk.js.watch: $(MAGE)
-	@$(MAGE) sdkJs:watch
+.PHONY: js.sdk.test
+js.sdk.test: $(MAGE)
+	@$(MAGE) jsSDK:test
 
-.PHONY: sdk.js.definitions
-sdk.js.definitions: $(MAGE)
-	@$(MAGE) sdkJs:definitions
+TEST_RULES += js.sdk.test
+
+.PHONY: js.sdk.test-watch
+js.sdk.test-watch: $(MAGE)
+	@$(MAGE) jsSDK:testWatch
+
+.PHONY: js.sdk.watch
+js.sdk.watch: $(MAGE)
+	@$(MAGE) jsSDK:watch
+
+.PHONY: js.sdk.definitions
+js.sdk.definitions: $(MAGE)
+	@$(MAGE) jsSDK:definitions
 
 .PHONY: styl.lint
 styl.lint: $(MAGE)
 	@$(MAGE) styl:lint
+
+QUALITY_RULES += styl.lint
