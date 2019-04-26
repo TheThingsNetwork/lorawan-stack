@@ -412,6 +412,6 @@ func (c *Connection) DownStats() (total uint64, t time.Time, ok bool) {
 }
 
 // RTTStats returns the recorded round-trip time statistics.
-func (c *Connection) RTTStats() (min, max, avg time.Duration, count int) {
+func (c *Connection) RTTStats() (min, max, median time.Duration, count int) {
 	return c.rtts.Stats()
 }
