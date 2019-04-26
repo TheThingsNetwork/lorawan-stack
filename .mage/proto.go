@@ -36,6 +36,11 @@ const protocOut = "/out"
 // Proto namespace.
 type Proto mg.Namespace
 
+// Image pulls the proto image.
+func (Proto) Image(context.Context) error {
+	return sh.Run("docker", "pull", fmt.Sprintf("thethingsindustries/protoc:%s", protocVersion))
+}
+
 type protocContext struct {
 	WorkingDirectory string
 	UID, GID         string
@@ -67,6 +72,7 @@ func makeProtoc() (func(...string) error, *protocContext, error) {
 }
 
 func withProtoc(f func(pCtx *protocContext, protoc func(...string) error) error) error {
+	mg.Deps(Proto.Image)
 	protoc, pCtx, err := makeProtoc()
 	if err != nil {
 		return errors.New("failed to construct protoc command")
@@ -208,6 +214,7 @@ func (p Proto) JsSDKClean(context.Context) error {
 
 // All generates protos.
 func (p Proto) All(ctx context.Context) {
+	mg.CtxDeps(ctx, Proto.Image)
 	mg.CtxDeps(ctx, Proto.Go, Proto.Swagger, Proto.Markdown, Proto.JsSDK)
 }
 

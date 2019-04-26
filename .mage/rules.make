@@ -157,6 +157,10 @@ js.translations: $(MAGE)
 js.vulnerabilities: $(MAGE)
 	@$(MAGE) js:vulnerabilities
 
+.PHONY: proto.image
+proto.image: $(MAGE)
+	@$(MAGE) proto:image
+
 .PHONY: proto.all
 proto.all: $(MAGE)
 	@$(MAGE) proto:all
