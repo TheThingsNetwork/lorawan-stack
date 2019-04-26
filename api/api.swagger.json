@@ -4667,6 +4667,24 @@
         }
       }
     },
+    "GatewayConnectionStatsRoundTripTimes": {
+      "type": "object",
+      "properties": {
+        "min": {
+          "type": "string"
+        },
+        "max": {
+          "type": "string"
+        },
+        "median": {
+          "type": "string"
+        },
+        "count": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
     "GatewayRadioTxConfiguration": {
       "type": "object",
       "properties": {
@@ -7053,6 +7071,9 @@
         "downlink_count": {
           "type": "string",
           "format": "uint64"
+        },
+        "round_trip_times": {
+          "$ref": "#/definitions/GatewayConnectionStatsRoundTripTimes"
         }
       },
       "description": "Connection stats as monitored by the Gateway Server."

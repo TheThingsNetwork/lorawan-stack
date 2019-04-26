@@ -116,6 +116,7 @@
   - [Message `GatewayAntenna.AttributesEntry`](#ttn.lorawan.v3.GatewayAntenna.AttributesEntry)
   - [Message `GatewayBrand`](#ttn.lorawan.v3.GatewayBrand)
   - [Message `GatewayConnectionStats`](#ttn.lorawan.v3.GatewayConnectionStats)
+  - [Message `GatewayConnectionStats.RoundTripTimes`](#ttn.lorawan.v3.GatewayConnectionStats.RoundTripTimes)
   - [Message `GatewayModel`](#ttn.lorawan.v3.GatewayModel)
   - [Message `GatewayRadio`](#ttn.lorawan.v3.GatewayRadio)
   - [Message `GatewayRadio.TxConfiguration`](#ttn.lorawan.v3.GatewayRadio.TxConfiguration)
@@ -1845,6 +1846,24 @@ Connection stats as monitored by the Gateway Server.
 | `uplink_count` | [`uint64`](#uint64) |  |  |
 | `last_downlink_received_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 | `downlink_count` | [`uint64`](#uint64) |  |  |
+| `round_trip_times` | [`GatewayConnectionStats.RoundTripTimes`](#ttn.lorawan.v3.GatewayConnectionStats.RoundTripTimes) |  |  |
+
+### <a name="ttn.lorawan.v3.GatewayConnectionStats.RoundTripTimes">Message `GatewayConnectionStats.RoundTripTimes`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `min` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  |  |
+| `max` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  |  |
+| `median` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  |  |
+| `count` | [`uint32`](#uint32) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `min` | <p>`message.required`: `true`</p> |
+| `max` | <p>`message.required`: `true`</p> |
+| `median` | <p>`message.required`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.GatewayModel">Message `GatewayModel`</a>
 
