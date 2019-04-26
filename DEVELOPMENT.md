@@ -28,10 +28,11 @@ If you are unfamiliar with forking projects on GitHub or cloning them locally, p
 
 ### Getting started
 
-As most of the tasks will be managed by `make` we will first initialize the tooling. You might want to run this commands from time to time:
+As most of the tasks will be managed by `make` and `mage` we will first initialize the tooling. You might want to run this commands from time to time:
 
 ```sh
 make init
+make deps
 ```
 
 For convenience, you can initialize the development databases with some defaults.
@@ -142,7 +143,7 @@ From the `.proto` files, we generate code using the `protoc` compiler. As we pla
 The actual commands for compilation are handled by our Makefile, so the only thing you have to execute, is:
 
 ```sh
-make protos.clean protos
+make proto.clean proto.all
 ```
 
 #### Folder Structure
