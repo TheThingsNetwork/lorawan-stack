@@ -29,7 +29,10 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-const bufferSize = 10
+const (
+	bufferSize = 1 << 4
+	maxRTTs    = 1 << 5
+)
 
 // Server represents the Gateway Server to gateway frontends.
 type Server interface {
@@ -64,6 +67,7 @@ type Connection struct {
 	gateway   *ttnpb.Gateway
 	fp        *frequencyplans.FrequencyPlan
 	scheduler *scheduling.Scheduler
+	rtts      *rtts
 
 	upCh     chan *ttnpb.UplinkMessage
 	downCh   chan *ttnpb.DownlinkMessage
@@ -81,6 +85,7 @@ func NewConnection(ctx context.Context, protocol string, gateway *ttnpb.Gateway,
 		gateway:     gateway,
 		fp:          fp,
 		scheduler:   scheduler,
+		rtts:        newRTTs(maxRTTs),
 		upCh:        make(chan *ttnpb.UplinkMessage, bufferSize),
 		downCh:      make(chan *ttnpb.DownlinkMessage, bufferSize),
 		statusCh:    make(chan *ttnpb.GatewayStatus, bufferSize),
@@ -401,4 +406,9 @@ func (c *Connection) DownStats() (total uint64, t time.Time, ok bool) {
 		t = time.Unix(0, atomic.LoadInt64(&c.lastDownlinkTime))
 	}
 	return
+}
+
+// RTTStats returns the recorded round-trip time statistics.
+func (c *Connection) RTTStats() (min, max, avg time.Duration, count int) {
+	return c.rtts.Stats()
 }
