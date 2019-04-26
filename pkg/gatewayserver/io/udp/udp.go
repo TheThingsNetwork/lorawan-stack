@@ -292,11 +292,16 @@ func (s *srv) handleUp(ctx context.Context, state *state, packet encoding.Packet
 				},
 			}
 		}
-		if cids, _, ok := state.tokens.Get(uint16(packet.Token[0])<<8|uint16(packet.Token[1]), packet.ReceivedAt); ok {
+		var rtt *time.Duration
+		if cids, delta, ok := state.tokens.Get(uint16(packet.Token[0])<<8|uint16(packet.Token[1]), packet.ReceivedAt); ok {
 			msg.TxAcknowledgment.CorrelationIDs = cids
+			rtt = &delta
 		}
 		if err := state.io.HandleTxAck(msg.TxAcknowledgment); err != nil {
 			logger.WithError(err).Warn("Failed to handle Tx acknowledgement")
+		}
+		if rtt != nil {
+			state.io.RecordRTT(*rtt)
 		}
 		// TODO: Send event to NS (https://github.com/TheThingsNetwork/lorawan-stack/issues/76)
 	}

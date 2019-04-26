@@ -184,6 +184,9 @@ func (c *Connection) HandleTxAck(ack *ttnpb.TxAcknowledgment) error {
 	return nil
 }
 
+// RecordRTT records the given round-trip time.
+func (c *Connection) RecordRTT(d time.Duration) { c.rtts.Record(d) }
+
 var (
 	errNotAllowed       = errors.DefineFailedPrecondition("not_allowed", "downlink not allowed")
 	errNotTxRequest     = errors.DefineInvalidArgument("not_tx_request", "downlink message is not a Tx request")
