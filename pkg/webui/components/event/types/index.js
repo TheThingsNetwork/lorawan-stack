@@ -20,6 +20,12 @@ const getEventActionByName = function (name) {
   return names[names.length - 1]
 }
 
+const getEventDataType = function (type) {
+  const entries = type.split('.')
+
+  return entries[entries.length - 1]
+}
+
 const getEventComponentByName = function (name) {
   const action = getEventActionByName(name)
 
@@ -43,4 +49,8 @@ const getEventComponentByName = function (name) {
   return { component, type }
 }
 
-export { getEventComponentByName as default, getEventActionByName }
+export {
+  getEventComponentByName as default,
+  getEventActionByName,
+  getEventDataType,
+}
