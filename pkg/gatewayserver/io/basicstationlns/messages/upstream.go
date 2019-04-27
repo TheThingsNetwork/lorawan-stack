@@ -15,6 +15,7 @@
 package messages
 
 import (
+	"encoding/binary"
 	"encoding/json"
 	"math"
 	"time"
@@ -22,6 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/basicstation"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
@@ -29,6 +31,7 @@ import (
 var (
 	errJoinRequestMessage = errors.Define("join_request_message", "invalid join-request message received")
 	errUplinkDataFrame    = errors.Define("uplink_data_Frame", "invalid uplink data frame received")
+	errUplinkMessage      = errors.Define("uplink_message", "invalid uplink message received")
 )
 
 // UpInfo provides additional metadata on each upstream message.
@@ -187,7 +190,59 @@ func (req *JoinRequest) ToUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID str
 	return &up, nil
 }
 
-// ToUplinkMessage extracts fields from the basic station Join Request "jreq" message and converts them into an UplinkMessage for the network server.
+// FromUplinkMessage extracts fields from ttnpb.UplinkMessage and creates the Basic Station Join Request Frame.
+func (req *JoinRequest) FromUplinkMessage(ids ttnpb.GatewayIdentifiers, up *ttnpb.UplinkMessage, bandID string) error {
+	payload := up.GetPayload()
+	if payload == nil {
+		return errUplinkMessage
+	}
+
+	req.MHdr = (uint(payload.MHDR.GetMType()) << 5) | uint(payload.MHDR.GetMajor())
+	req.MIC = int32(binary.LittleEndian.Uint32(payload.MIC[:]))
+	jreqPayload := payload.GetJoinRequestPayload()
+	if jreqPayload == nil {
+		return errUplinkMessage
+	}
+
+	req.DevEUI = basicstation.EUI{
+		EUI64: jreqPayload.DevEUI,
+	}
+
+	req.JoinEUI = basicstation.EUI{
+		EUI64: jreqPayload.JoinEUI,
+	}
+
+	devNonce, err := jreqPayload.DevNonce.Marshal()
+	if err != nil {
+		return err
+	}
+	req.DevNonce = uint(binary.LittleEndian.Uint16(devNonce[:]))
+
+	dr, err := getDataRateIndexFromDataRate(bandID, up.Settings.GetDataRate())
+	if err != nil {
+		return err
+	}
+	rxMetadata := up.RxMetadata[0]
+	antennaIDs, _, err := io.ParseUplinkToken(rxMetadata.UplinkToken)
+	if err != nil {
+		return err
+	}
+
+	req.RadioMetaData = RadioMetaData{
+		DataRate:  dr,
+		Frequency: up.Settings.GetFrequency(),
+		UpInfo: UpInfo{
+			RCtx:   int64(antennaIDs.AntennaIndex),
+			XTime:  int64(rxMetadata.Timestamp),
+			RSSI:   rxMetadata.RSSI,
+			SNR:    rxMetadata.SNR,
+			RxTime: float64(rxMetadata.Time.Unix()) + float64(rxMetadata.Time.Nanosecond())/(1e9),
+		},
+	}
+	return nil
+}
+
+// ToUplinkMessage extracts fields from the basic station Uplink Data Frame "updf" message and converts them into an UplinkMessage for the network server.
 func (updf *UplinkDataFrame) ToUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID string, receivedAt time.Time) (*ttnpb.UplinkMessage, error) {
 	var up ttnpb.UplinkMessage
 	up.ReceivedAt = receivedAt
@@ -212,14 +267,8 @@ func (updf *UplinkDataFrame) ToUplinkMessage(ids ttnpb.GatewayIdentifiers, bandI
 		fPort = uint32(updf.FPort)
 	}
 
-	devAddrBytes, err := getInt32AsByteSlice(updf.DevAddr)
-	if err != nil {
-		return nil, errUplinkDataFrame.WithCause(err)
-	}
 	var devAddr types.DevAddr
-	if err := devAddr.UnmarshalBinary(devAddrBytes); err != nil {
-		return nil, errUplinkDataFrame.WithCause(err)
-	}
+	devAddr.UnmarshalNumber(uint32(updf.DevAddr))
 
 	var fctrl ttnpb.FCtrl
 	if err := lorawan.UnmarshalFCtrl([]byte{byte(updf.FCtrl)}, &fctrl, true); err != nil {
@@ -282,6 +331,55 @@ func (updf *UplinkDataFrame) ToUplinkMessage(ids ttnpb.GatewayIdentifiers, bandI
 		DataRate:  loraDR,
 	}
 	return &up, nil
+}
+
+// FromUplinkMessage extracts fields from ttnpb.UplinkMessage and creates the Basic Station UplinkDataFrame.
+func (updf *UplinkDataFrame) FromUplinkMessage(ids ttnpb.GatewayIdentifiers, up *ttnpb.UplinkMessage, bandID string) error {
+	payload := up.GetPayload()
+	if payload == nil {
+		return errUplinkMessage
+	}
+
+	updf.MHdr = (uint(payload.MHDR.GetMType()) << 5) | uint(payload.MHDR.GetMajor())
+
+	macPayload := payload.GetMACPayload()
+	if macPayload == nil {
+		return errUplinkMessage
+	}
+
+	updf.FPort = int(macPayload.GetFPort())
+
+	updf.DevAddr = int32(macPayload.DevAddr.MarshalNumber())
+	updf.FOpts = string(macPayload.GetFOpts())
+
+	updf.FCtrl = getFCtrlAsUint(macPayload.FCtrl)
+	updf.FCnt = uint(macPayload.GetFCnt())
+	updf.FRMPayload = string(macPayload.GetFRMPayload())
+	updf.MIC = int32(binary.LittleEndian.Uint32(payload.MIC[:]))
+
+	dr, err := getDataRateIndexFromDataRate(bandID, up.Settings.GetDataRate())
+	if err != nil {
+		return err
+	}
+
+	rxMetadata := up.RxMetadata[0]
+	antennaIDs, _, err := io.ParseUplinkToken(rxMetadata.UplinkToken)
+	if err != nil {
+		return err
+	}
+
+	updf.RadioMetaData = RadioMetaData{
+		DataRate:  dr,
+		Frequency: up.Settings.GetFrequency(),
+		UpInfo: UpInfo{
+			RCtx:   int64(antennaIDs.AntennaIndex),
+			XTime:  int64(rxMetadata.Timestamp),
+			RSSI:   rxMetadata.RSSI,
+			SNR:    rxMetadata.SNR,
+			RxTime: float64(rxMetadata.Time.Unix()) + float64(rxMetadata.Time.Nanosecond())/(1e9),
+		},
+	}
+	return nil
 }
 
 // ToTxAcknowledgment extracts fields from the basic station TxConfirmation "dntxed" message and converts them into a TxAcknowledgment for the network server.
