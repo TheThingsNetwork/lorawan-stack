@@ -24,16 +24,16 @@ import (
 )
 
 func timePtr(time time.Time) *time.Time { return &time }
-func TestDownlinkMessage(t *testing.T) {
+func TestFromDownlinkMessage(t *testing.T) {
 	for _, tc := range []struct {
 		Name                    string
-		NSDownlinkMessage       ttnpb.DownlinkMessage
+		DownlinkMessage         ttnpb.DownlinkMessage
 		GatewayIDs              ttnpb.GatewayIdentifiers
 		ExpectedDownlinkMessage DownlinkMessage
 	}{
 		{
 			Name: "SampleDownlink",
-			NSDownlinkMessage: ttnpb.DownlinkMessage{
+			DownlinkMessage: ttnpb.DownlinkMessage{
 				RawPayload: []byte("Ymxhamthc25kJ3M=="),
 				EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
 					DeviceID: "testdevice",
@@ -63,7 +63,7 @@ func TestDownlinkMessage(t *testing.T) {
 		},
 		{
 			Name: "WithAbsoluteTime",
-			NSDownlinkMessage: ttnpb.DownlinkMessage{
+			DownlinkMessage: ttnpb.DownlinkMessage{
 				RawPayload: []byte("Ymxhamthc25kJ3M=="),
 				EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
 					DeviceID: "testdevice",
@@ -95,9 +95,81 @@ func TestDownlinkMessage(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 			dnmsg := DownlinkMessage{}
-			dnmsg.FromDownlinkMessage(tc.GatewayIDs, tc.NSDownlinkMessage, 0)
+			dnmsg.FromDownlinkMessage(tc.GatewayIDs, tc.DownlinkMessage, 0)
 			if !a.So(dnmsg, should.Resemble, tc.ExpectedDownlinkMessage) {
 				t.Fatalf("Invalid DownlinkMessage: %v", dnmsg)
+			}
+		})
+	}
+}
+
+func TestToDownlinkMessage(t *testing.T) {
+	for _, tc := range []struct {
+		Name                    string
+		DownlinkMessage         DownlinkMessage
+		GatewayIDs              ttnpb.GatewayIdentifiers
+		ExpectedDownlinkMessage ttnpb.DownlinkMessage
+	}{
+		{
+			Name:       "SampleDownlink",
+			GatewayIDs: ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"},
+			DownlinkMessage: DownlinkMessage{
+				DeviceClass: 0,
+				Pdu:         "Ymxhamthc25kJ3M==",
+				RxDelay:     1,
+				Rx2DR:       2,
+				Rx2Freq:     868500000,
+				RCtx:        2,
+				Priority:    25,
+				XTime:       1554300785,
+			},
+			ExpectedDownlinkMessage: ttnpb.DownlinkMessage{
+				RawPayload: []byte("Ymxhamthc25kJ3M=="),
+				Settings: &ttnpb.DownlinkMessage_Scheduled{
+					Scheduled: &ttnpb.TxSettings{
+						DataRateIndex: 2,
+						Frequency:     868500000,
+						Downlink: &ttnpb.TxSettings_Downlink{
+							AntennaIndex: 2,
+						},
+						Timestamp: 1554300785,
+					},
+				},
+			},
+		},
+		{
+			Name:       "WithAbsoluteTime",
+			GatewayIDs: ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"},
+			DownlinkMessage: DownlinkMessage{
+				DeviceClass: 1,
+				Pdu:         "Ymxhamthc25kJ3M==",
+				RxDelay:     1,
+				Rx2DR:       2,
+				Rx2Freq:     869525000,
+				RCtx:        2,
+				Priority:    25,
+				GpsTime:     1554300787,
+			},
+			ExpectedDownlinkMessage: ttnpb.DownlinkMessage{
+				RawPayload: []byte("Ymxhamthc25kJ3M=="),
+				Settings: &ttnpb.DownlinkMessage_Scheduled{
+					Scheduled: &ttnpb.TxSettings{
+						DataRateIndex: 2,
+						Frequency:     869525000,
+						Downlink: &ttnpb.TxSettings_Downlink{
+							AntennaIndex: 2,
+						},
+						Time: timePtr(time.Unix(1554300787, 0)),
+					},
+				},
+			},
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
+			dlMesg := tc.DownlinkMessage.ToDownlinkMessage(tc.GatewayIDs)
+			if !a.So(dlMesg, should.Resemble, tc.ExpectedDownlinkMessage) {
+				t.Fatalf("Invalid DownlinkMessage: %v", dlMesg)
 			}
 		})
 	}
