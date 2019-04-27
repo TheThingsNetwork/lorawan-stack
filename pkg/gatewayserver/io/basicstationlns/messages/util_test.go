@@ -15,6 +15,7 @@
 package messages
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/smartystreets/assertions"
@@ -129,4 +130,132 @@ func TestGetDataRateFromDataRateIndex(t *testing.T) {
 		})
 
 	}
+}
+
+func TestGetDataRateIndexFromDataRate(t *testing.T) {
+	for _, tc := range []struct {
+		Name                  string
+		BandID                string
+		DataRate              ttnpb.DataRate
+		ExpectedDataRateIndex int
+		ErrorAssertion        func(error) bool
+	}{
+		{
+			Name:   "Valid_EU",
+			BandID: "EU_863_870",
+			DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+				SpreadingFactor: 7,
+				Bandwidth:       125000,
+			}}},
+			ExpectedDataRateIndex: 5,
+		},
+		{
+			Name:   "Valid_EU_FSK",
+			BandID: "EU_863_870",
+			DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_FSK{FSK: &ttnpb.FSKDataRate{
+				BitRate: 50000,
+			}}},
+			ExpectedDataRateIndex: 7,
+		},
+		{
+			Name:   "Invalid_EU",
+			BandID: "EU_863_870",
+			DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+				SpreadingFactor: 11,
+				Bandwidth:       250000,
+			}}},
+			ErrorAssertion: func(err error) bool {
+				return errors.Resemble(err, errDataRate)
+			},
+		},
+		{
+			Name:     "Empty",
+			BandID:   "EU_863_870",
+			DataRate: ttnpb.DataRate{},
+			ErrorAssertion: func(err error) bool {
+				return errors.Resemble(err, errDataRate)
+			},
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
+			drIndex, err := getDataRateIndexFromDataRate(tc.BandID, tc.DataRate)
+			if err != nil {
+				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
+					t.Fatalf("Unexpected error: %v", err)
+				}
+			} else if tc.ErrorAssertion != nil {
+				t.Fatalf("Expected error")
+			} else {
+				if !a.So(drIndex, should.Resemble, tc.ExpectedDataRateIndex) {
+					t.Fatalf("Invalid datarate: %v", drIndex)
+				}
+			}
+		})
+
+	}
+}
+
+func TestGetFCtrlAsUint(t *testing.T) {
+	for _, tc := range []struct {
+		ADR           bool
+		ADRAckReq     bool
+		Ack           bool
+		FPending      bool
+		ClassB        bool
+		ExpectedFCtrl uint
+	}{
+		{
+			ExpectedFCtrl: 0x00,
+		},
+		{
+			ADR:           true,
+			ExpectedFCtrl: 0x80,
+		},
+		{
+			ADRAckReq:     true,
+			ExpectedFCtrl: 0x40,
+		},
+		{
+			Ack:           true,
+			ExpectedFCtrl: 0x20,
+		},
+		{
+			FPending:      true,
+			ExpectedFCtrl: 0x10,
+		},
+		{
+			ClassB:        true,
+			ExpectedFCtrl: 0x10,
+		},
+		{
+			ADR:           true,
+			ADRAckReq:     true,
+			Ack:           true,
+			FPending:      true,
+			ExpectedFCtrl: 0xF0,
+		},
+		{
+			ADR:           true,
+			ADRAckReq:     true,
+			Ack:           true,
+			ClassB:        true,
+			ExpectedFCtrl: 0xF0,
+		},
+	} {
+		t.Run(fmt.Sprintf("%T", tc), func(t *testing.T) {
+			a := assertions.New(t)
+			fCtrl := getFCtrlAsUint(ttnpb.FCtrl{
+				ADR:       tc.ADR,
+				ADRAckReq: tc.ADRAckReq,
+				Ack:       tc.Ack,
+				FPending:  tc.FPending,
+				ClassB:    tc.ClassB,
+			})
+			if !a.So(fCtrl, should.Equal, tc.ExpectedFCtrl) {
+				t.Fatalf("Invalid FCtrl: %v", fCtrl)
+			}
+		})
+	}
+
 }

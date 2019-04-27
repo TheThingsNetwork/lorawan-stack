@@ -82,3 +82,27 @@ func (dnmsg *DownlinkMessage) FromDownlinkMessage(ids ttnpb.GatewayIdentifiers, 
 	offset := time.Duration((dnmsg.RxDelay + 1)) * time.Second
 	dnmsg.XTime = t.Add(-offset).Unix()
 }
+
+// ToDownlinkMessage translates the LNS DownlinkMessage "dnmsg" to ttnpb.DownlinkMessage.
+func (dnmsg *DownlinkMessage) ToDownlinkMessage(ids ttnpb.GatewayIdentifiers) ttnpb.DownlinkMessage {
+	// var dlMesg ttnpb.DownlinkMessage
+	var absTime *time.Time
+	if dnmsg.GpsTime != 0 {
+		val := time.Unix(dnmsg.GpsTime, 0)
+		absTime = &val
+	}
+	return ttnpb.DownlinkMessage{
+		RawPayload: []byte(dnmsg.Pdu),
+		Settings: &ttnpb.DownlinkMessage_Scheduled{
+			Scheduled: &ttnpb.TxSettings{
+				DataRateIndex: ttnpb.DataRateIndex(dnmsg.Rx2DR),
+				Frequency:     uint64(dnmsg.Rx2Freq),
+				Downlink: &ttnpb.TxSettings_Downlink{
+					AntennaIndex: uint32(dnmsg.RCtx),
+				},
+				Timestamp: uint32(dnmsg.XTime),
+				Time:      absTime,
+			},
+		},
+	}
+}
