@@ -31,7 +31,11 @@ func nodeBin(cmd string) string { return filepath.Join("node_modules", ".bin", c
 // DevDeps installs the javascript development dependencies.
 func devDeps() error {
 	_, err := yarn()
-	return err
+	if err != nil {
+		return err
+	}
+	mg.Deps(Js.Deps)
+	return nil
 }
 
 // Js namespace.
@@ -136,18 +140,25 @@ func (js Js) DevDeps() error {
 
 // Deps installs the javascript dependencies.
 func (js Js) Deps() error {
-	if mg.Verbose() {
-		fmt.Println("Installing JS dependencies")
+	files, readErr := ioutil.ReadDir("node_modules")
+	changed, targetErr := target.Dir("node_modules", "./package.json", "./yarn.lock")
+	// Check whether package.json/yarn.lock are newer than node_modules
+	// and whether it is not only yarn that is installed via DevDeps()
+	if readErr != nil || os.IsNotExist(targetErr) || (targetErr == nil && changed) || len(files) <= 4 {
+		if mg.Verbose() {
+			fmt.Println("Installing JS dependencies")
+		}
+		yarn, err := yarn()
+		if err != nil {
+			return err
+		}
+		err = yarn("install", "--no-progress", "--production=false")
+		if err != nil {
+			return err
+		}
+		mg.Deps(JsSDK.Link)
+		return nil
 	}
-	yarn, err := yarn()
-	if err != nil {
-		return err
-	}
-	err = yarn("install", "--no-progress", "--production=false")
-	if err != nil {
-		return err
-	}
-	mg.Deps(JsSDK.Link)
 	return nil
 }
 

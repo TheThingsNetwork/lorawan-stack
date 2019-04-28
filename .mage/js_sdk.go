@@ -42,29 +42,37 @@ func (k JsSDK) yarn() (func(args ...string) error, error) {
 
 // Deps installs the javascript SDK dependencies.
 func (k JsSDK) Deps() error {
-	if mg.Verbose() {
-		fmt.Println("Installing JS SDK dependencies")
+	changed, err := target.Dir("./sdk/js/node_modules", "./sdk/js/package.json", "./sdk/js/yarn.lock")
+	if os.IsNotExist(err) || (err == nil && changed) {
+		if mg.Verbose() {
+			fmt.Println("Installing JS SDK dependencies")
+		}
+		yarn, err := k.yarn()
+		if err != nil {
+			return err
+		}
+		return yarn("install", "--no-progress")
 	}
-	yarn, err := k.yarn()
-	if err != nil {
-		return err
-	}
-	return yarn("install", "--no-progress")
+	return nil
 }
 
 // Build builds the source files and output into 'dist'.
 func (k JsSDK) Build() error {
-	mg.SerialDeps(JsSDK.Deps, JsSDK.Definitions)
+	changed, err := target.Dir("./sdk/js/dist", "./sdk/js/src")
+	if os.IsNotExist(err) || (err == nil && changed) {
+		mg.SerialDeps(JsSDK.Deps, JsSDK.Definitions)
 
-	if mg.Verbose() {
-		fmt.Println("Building JS SDK files…")
-	}
-	yarn, err := k.yarn()
-	if err != nil {
-		return err
-	}
+		if mg.Verbose() {
+			fmt.Println("Building JS SDK files…")
+		}
+		yarn, err := k.yarn()
+		if err != nil {
+			return err
+		}
 
-	return yarn("run", "build")
+		return yarn("run", "build")
+	}
+	return nil
 }
 
 // Watch builds the source files in watch mode.
