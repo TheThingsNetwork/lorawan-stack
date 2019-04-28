@@ -330,7 +330,6 @@ func (js Js) Storybook() error {
 	if mg.Verbose() {
 		fmt.Println("Serving storybook…")
 	}
-	mg.Deps(js.Build)
 	storybook, err := js.storybook()
 	if err != nil {
 		return err
