@@ -276,7 +276,12 @@ func (js Js) BackendTranslations() error {
 func (js Js) Clean() {
 	sh.Rm(".cache")
 	sh.Rm("public")
-	sh.Rm("pkg/webui/locales/.backend")
+	sh.Rm(filepath.Join("pkg", "webui", "locales", ".backend"))
+}
+
+// CleanDeps removes all installed node packages (rm -rf node_modules).
+func (js Js) CleanDeps() {
+	sh.Rm("node_modules")
 }
 
 // Test runs frontend jest tests.

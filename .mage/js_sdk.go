@@ -122,6 +122,11 @@ func (k JsSDK) Clean() {
 	sh.Rm(filepath.Join("sdk", "js", "dist"))
 }
 
+// CleanDeps removes all installed node packages (rm -rf node_modules).
+func (j JsSDK) CleanDeps() {
+	sh.Rm(filepath.Join("sdk", "js", "node_modules"))
+}
+
 // Definitions extracts the api-definition.json from the proto generated api.json.
 func (k JsSDK) Definitions() error {
 	mg.Deps(Proto.JsSDK)
