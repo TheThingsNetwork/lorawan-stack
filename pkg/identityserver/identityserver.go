@@ -31,6 +31,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/oauth"
 	"go.thethings.network/lorawan-stack/pkg/redis"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
+	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"google.golang.org/grpc"
 )
@@ -144,6 +145,7 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 		name       string
 		middleware hooks.UnaryHandlerMiddleware
 	}{
+		{rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("identityserver")},
 		{cluster.HookName, c.ClusterAuthUnaryHook()},
 		{rights.HookName, rights.Hook},
 	} {
@@ -159,7 +161,9 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 		hooks.RegisterUnaryHook("/ttn.lorawan.v3.UserRegistry", hook.name, hook.middleware)
 		hooks.RegisterUnaryHook("/ttn.lorawan.v3.UserAccess", hook.name, hook.middleware)
 	}
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.EntityAccess", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("identityserver"))
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.EntityAccess", cluster.HookName, c.ClusterAuthUnaryHook())
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.OAuthAuthorizationRegistry", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("identityserver"))
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.OAuthAuthorizationRegistry", rights.HookName, rights.Hook)
 
 	c.RegisterGRPC(is)
