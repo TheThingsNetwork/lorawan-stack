@@ -151,6 +151,11 @@ export default class DeviceAdd extends Component {
           placeholder={m.leaveBlankPlaceholder}
           description={m.appSKeyDescription}
         />
+        <Field
+          title={m.resetsFCnt}
+          name="mac_settings.resets_f_cnt"
+          type="checkbox"
+        />
       </React.Fragment>
     )
   }
@@ -232,8 +237,12 @@ export default class DeviceAdd extends Component {
                   activation_mode: 'otaa',
                   lorawan_version: undefined,
                   lorawan_phy_version: undefined,
+                  resets_join_nonces: false,
                   root_keys: {},
                   session: {},
+                  mac_settings: {
+                    resets_f_cnt: false,
+                  },
                 }
               }
               mapErrorsToFields={{

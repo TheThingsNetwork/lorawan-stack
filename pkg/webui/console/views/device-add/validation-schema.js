@@ -61,6 +61,9 @@ export default Yup.object().shape({
       key: Yup.string().length(16 * 2, m.validate32), // 16 Byte hex
     }),
   }),
+  mac_state: Yup.object().shape({
+    resets_f_cnt: Yup.boolean(),
+  }),
   name: Yup.string()
     .min(2, sharedMessages.validateTooShort)
     .max(50, sharedMessages.validateTooLong),
