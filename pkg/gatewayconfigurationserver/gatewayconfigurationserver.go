@@ -43,10 +43,6 @@ type Config struct {
 type GatewayConfigurationServer struct {
 	*component.Component
 	config *Config
-
-	registry ttnpb.GatewayRegistryClient
-
-	ctx context.Context
 }
 
 // RegisterRoutes registers the web frontend routes.
@@ -62,14 +58,10 @@ func (gcs *GatewayConfigurationServer) RegisterRoutes(server *web.Server) {
 }
 
 // New returns new *GatewayConfigurationServer.
-func New(c *component.Component, conf *Config, opts ...Option) (*GatewayConfigurationServer, error) {
+func New(c *component.Component, conf *Config) (*GatewayConfigurationServer, error) {
 	gcs := &GatewayConfigurationServer{
 		Component: c,
 		config:    conf,
-		ctx:       c.Context(),
-	}
-	for _, opt := range opts {
-		opt(gcs)
 	}
 
 	bsCUPS := conf.BasicStation.NewServer(c)
@@ -85,27 +77,11 @@ func New(c *component.Component, conf *Config, opts ...Option) (*GatewayConfigur
 	return gcs, nil
 }
 
-// Option represents a Gateway Configuration Server option.
-type Option func(gcs *GatewayConfigurationServer)
-
-// WithRegistry sets the gateway registry for the given server.
-func WithRegistry(registry ttnpb.GatewayRegistryClient) Option {
-	return func(gcs *GatewayConfigurationServer) {
-		gcs.registry = registry
-	}
-}
-
-// WithContext sets the context for the given server.
-func WithContext(ctx context.Context) Option {
-	return func(gcs *GatewayConfigurationServer) {
-		gcs.ctx = ctx
-	}
-}
-
 func (gcs *GatewayConfigurationServer) handleGetGlobalConfig(c echo.Context) error {
 	ctx := gcs.getContext(c)
 	gtwID := c.Get(gatewayIDKey).(ttnpb.GatewayIdentifiers)
-	gtw, err := gcs.getRegistry(ctx).Get(ctx, &ttnpb.GetGatewayRequest{
+	registry := ttnpb.NewGatewayRegistryClient(gcs.GetPeer(ctx, ttnpb.PeerInfo_ENTITY_REGISTRY, nil).Conn())
+	gtw, err := registry.Get(ctx, &ttnpb.GetGatewayRequest{
 		GatewayIdentifiers: gtwID,
 		FieldMask: types.FieldMask{
 			Paths: []string{
@@ -134,11 +110,4 @@ func (gcs *GatewayConfigurationServer) getContext(c echo.Context) context.Contex
 		md = metadata.Join(ctxMd, md)
 	}
 	return metadata.NewIncomingContext(ctx, md)
-}
-
-func (gcs *GatewayConfigurationServer) getRegistry(ctx context.Context) ttnpb.GatewayRegistryClient {
-	if gcs.registry != nil {
-		return gcs.registry
-	}
-	return ttnpb.NewGatewayRegistryClient(gcs.GetPeer(ctx, ttnpb.PeerInfo_ENTITY_REGISTRY, nil).Conn())
 }

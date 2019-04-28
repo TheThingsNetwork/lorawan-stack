@@ -16,10 +16,11 @@ package gatewayconfigurationserver_test
 
 import (
 	"context"
+	"net"
 
 	"github.com/gogo/protobuf/types"
+	"go.thethings.network/lorawan-stack/pkg/rpcserver"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"google.golang.org/grpc"
 )
 
 type mockGatewayClientData struct {
@@ -38,14 +39,6 @@ type mockGatewayClientData struct {
 		Update               *ttnpb.UpdateGatewayRequest
 		List                 *ttnpb.ListGatewaysRequest
 		Delete               *ttnpb.GatewayIdentifiers
-	}
-	opts struct {
-		GetIdentifiersForEUI []grpc.CallOption
-		Create               []grpc.CallOption
-		Get                  []grpc.CallOption
-		Update               []grpc.CallOption
-		List                 []grpc.CallOption
-		Delete               []grpc.CallOption
 	}
 	res struct {
 		GetIdentifiersForEUI *ttnpb.GatewayIdentifiers
@@ -66,39 +59,54 @@ type mockGatewayClientData struct {
 }
 
 type mockGatewayClient struct {
+	ttnpb.GatewayRegistryServer
+	ttnpb.GatewayAccessServer
 	mockGatewayClientData
+}
+
+func startMockIS(ctx context.Context) (*mockGatewayClient, string) {
+	is := &mockGatewayClient{}
+	srv := rpcserver.New(ctx)
+	ttnpb.RegisterGatewayRegistryServer(srv.Server, is)
+	ttnpb.RegisterGatewayAccessServer(srv.Server, is)
+	lis, err := net.Listen("tcp", ":0")
+	if err != nil {
+		panic(err)
+	}
+	go srv.Serve(lis)
+	return is, lis.Addr().String()
 }
 
 func (m *mockGatewayClient) reset() {
 	m.mockGatewayClientData = mockGatewayClientData{}
 }
 
-func (m *mockGatewayClient) GetIdentifiersForEUI(ctx context.Context, in *ttnpb.GetGatewayIdentifiersForEUIRequest, opts ...grpc.CallOption) (*ttnpb.GatewayIdentifiers, error) {
-	m.ctx.GetIdentifiersForEUI, m.req.GetIdentifiersForEUI, m.opts.GetIdentifiersForEUI = ctx, in, opts
+func (m *mockGatewayClient) GetIdentifiersForEUI(ctx context.Context, in *ttnpb.GetGatewayIdentifiersForEUIRequest) (*ttnpb.GatewayIdentifiers, error) {
+	m.ctx.GetIdentifiersForEUI, m.req.GetIdentifiersForEUI = ctx, in
 	return m.res.GetIdentifiersForEUI, m.err.GetIdentifiersForEUI
 }
 
-func (m *mockGatewayClient) Create(ctx context.Context, in *ttnpb.CreateGatewayRequest, opts ...grpc.CallOption) (*ttnpb.Gateway, error) {
-	m.ctx.Create, m.req.Create, m.opts.Create = ctx, in, opts
+func (m *mockGatewayClient) Create(ctx context.Context, in *ttnpb.CreateGatewayRequest) (*ttnpb.Gateway, error) {
+	m.ctx.Create, m.req.Create = ctx, in
 	return m.res.Create, m.err.Create
 }
 
-func (m *mockGatewayClient) Get(ctx context.Context, in *ttnpb.GetGatewayRequest, opts ...grpc.CallOption) (*ttnpb.Gateway, error) {
-	m.ctx.Get, m.req.Get, m.opts.Get = ctx, in, opts
+func (m *mockGatewayClient) Get(ctx context.Context, in *ttnpb.GetGatewayRequest) (*ttnpb.Gateway, error) {
+	m.ctx.Get, m.req.Get = ctx, in
 	return m.res.Get, m.err.Get
 }
 
-func (m *mockGatewayClient) Update(ctx context.Context, in *ttnpb.UpdateGatewayRequest, opts ...grpc.CallOption) (*ttnpb.Gateway, error) {
-	m.ctx.Update, m.req.Update, m.opts.Update = ctx, in, opts
+func (m *mockGatewayClient) Update(ctx context.Context, in *ttnpb.UpdateGatewayRequest) (*ttnpb.Gateway, error) {
+	m.ctx.Update, m.req.Update = ctx, in
 	return m.res.Update, m.err.Update
 }
 
-func (m *mockGatewayClient) Delete(ctx context.Context, ids *ttnpb.GatewayIdentifiers, opts ...grpc.CallOption) (*types.Empty, error) {
-	m.ctx.Delete, m.req.Delete, m.opts.Delete = ctx, ids, opts
+func (m *mockGatewayClient) Delete(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*types.Empty, error) {
+	m.ctx.Delete, m.req.Delete = ctx, ids
 	return m.res.Delete, m.err.Delete
 }
 
-func (m *mockGatewayClient) List(ctx context.Context, in *ttnpb.ListGatewaysRequest, opts ...grpc.CallOption) (*ttnpb.Gateways, error) {
-	m.ctx.List, m.req.List, m.opts.List = ctx, in, opts
+func (m *mockGatewayClient) List(ctx context.Context, in *ttnpb.ListGatewaysRequest) (*ttnpb.Gateways, error) {
+	m.ctx.List, m.req.List = ctx, in
 	return m.res.List, m.err.List
 }

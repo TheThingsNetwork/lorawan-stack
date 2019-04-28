@@ -28,7 +28,7 @@ import (
 func (gcs *GatewayConfigurationServer) handleError() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			ctx := gcs.ctx
+			ctx := gcs.getContext(c)
 			err := next(c)
 			if err == nil || c.Response().Committed {
 				return err
@@ -50,7 +50,7 @@ const (
 func (gcs *GatewayConfigurationServer) validateAndFillIDs() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			ctx := gcs.ctx
+			ctx := gcs.getContext(c)
 			gtwID := ttnpb.GatewayIdentifiers{
 				GatewayID: c.Param(gatewayIDKey),
 			}
@@ -67,7 +67,7 @@ func (gcs *GatewayConfigurationServer) validateAndFillIDs() echo.MiddlewareFunc 
 func (gcs *GatewayConfigurationServer) requireGatewayRights(required ...ttnpb.Right) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			ctx := gcs.ctx
+			ctx := gcs.getContext(c)
 			gtwID := c.Get(gatewayIDKey).(ttnpb.GatewayIdentifiers)
 			md := metadata.New(map[string]string{
 				"id":            gtwID.GatewayID,

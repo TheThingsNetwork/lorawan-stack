@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
@@ -48,8 +49,8 @@ func TestWeb(t *testing.T) {
 	a := assertions.New(t)
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 
-	gs := &mockGatewayClient{}
-	gs.res.Get = &ttnpb.Gateway{
+	is, isAddr := startMockIS(ctx)
+	is.res.Get = &ttnpb.Gateway{
 		GatewayIdentifiers:   registeredGatewayID,
 		FrequencyPlanID:      "EU_863_870",
 		GatewayServerAddress: "localhost",
@@ -64,21 +65,26 @@ func TestWeb(t *testing.T) {
 			FrequencyPlans: config.FrequencyPlansConfig{
 				URL: "https://raw.githubusercontent.com/TheThingsNetwork/lorawan-frequency-plans/master",
 			},
+			Cluster: config.Cluster{
+				IdentityServer: isAddr,
+			},
 		},
 	}
 	c := component.MustNew(test.GetLogger(t), conf)
-	ctx = c.FillContext(ctx)
+	c.AddContextFiller(func(ctx context.Context) context.Context {
+		ctx = newContextWithRightsFetcher(ctx)
+		return ctx
+	})
 
-	gcs, err := New(c, testConfig, []Option{
-		WithRegistry(gs),
-		WithContext(newContextWithRightsFetcher(ctx)),
-	}...)
+	gcs, err := New(c, testConfig)
 	a.So(err, should.BeNil)
 	a.So(gcs, should.NotBeNil)
 
 	err = c.Start()
 	a.So(err, should.BeNil)
 	defer c.Close()
+
+	mustHavePeer(ctx, c, ttnpb.PeerInfo_ENTITY_REGISTRY)
 
 	t.Run("Authorization", func(t *testing.T) {
 		for _, tc := range []struct {
@@ -146,6 +152,16 @@ func newContextWithRightsFetcher(ctx context.Context) context.Context {
 			return
 		}),
 	)
+}
+
+func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.PeerInfo_Role) {
+	for i := 0; i < 20; i++ {
+		time.Sleep(20 * time.Millisecond)
+		if peer := c.GetPeer(ctx, role, nil); peer != nil {
+			return
+		}
+	}
+	panic("could not connect to peer")
 }
 
 func init() {
