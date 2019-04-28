@@ -149,19 +149,25 @@ func (k JsSDK) DefinitionsClean(context.Context) error {
 
 // Link links the local sdk package via `yarn link` to prevent caching issues.
 func (k JsSDK) Link() error {
-	if mg.Verbose() {
-		fmt.Println("Linking sdk package…")
-	}
+	fileInfo, err := os.Lstat("./node_modules/ttn-lw")
 
-	y, err := yarn()
-	if err != nil {
-		return err
-	}
+	if err != nil || fileInfo.Mode()&os.ModeSymlink != os.ModeSymlink {
+		// SDK package is not yet linked
+		if mg.Verbose() {
+			fmt.Println("Linking sdk package…")
+		}
 
-	err = y(fmt.Sprintf("--cwd=%s", filepath.Join("sdk", "js")), "link")
-	if err != nil {
-		return err
-	}
+		y, err := yarn()
+		if err != nil {
+			return err
+		}
 
-	return y("link", "ttn-lw")
+		err = y(fmt.Sprintf("--cwd=%s", filepath.Join("sdk", "js")), "link")
+		if err != nil {
+			return err
+		}
+
+		return y("link", "ttn-lw")
+	}
+	return nil
 }
