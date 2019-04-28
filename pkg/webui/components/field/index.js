@@ -164,9 +164,9 @@ const Field = function (props) {
   }
 
   const handleBlur = function (e) {
-    // Always regard inputs that never received a value as untouched (better UX)
-    if (e.target.value !== '' && validateOnBlur) {
-      setFieldTouched(touches, true)
+    if (validateOnBlur) {
+      // Always regard inputs that never received a value as untouched (better UX)
+      setFieldTouched(touches, e.target.value !== '')
     }
   }
 
