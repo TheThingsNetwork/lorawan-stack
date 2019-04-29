@@ -51,7 +51,7 @@ func (k JsSDK) Deps() error {
 		if err != nil {
 			return err
 		}
-		return yarn("install", "--no-progress")
+		return yarn("install", "--no-progress", "--production=false")
 	}
 	return nil
 }
