@@ -53,11 +53,17 @@ var connConcurrentUplinks = 16
 // The Gateway Server exposes the Gs, GtwGs and NsGs services and MQTT and UDP frontends for gateways.
 type GatewayServer struct {
 	*component.Component
+	ctx context.Context
 	io.Server
 
 	config *Config
 
 	connections sync.Map
+}
+
+// Context returns the context of the Gateway Server.
+func (gs *GatewayServer) Context() context.Context {
+	return gs.ctx
 }
 
 var (
@@ -72,10 +78,11 @@ var (
 func New(c *component.Component, conf *Config) (gs *GatewayServer, err error) {
 	gs = &GatewayServer{
 		Component: c,
+		ctx:       log.NewContextWithField(c.Context(), "namespace", "gatewayserver"),
 		config:    conf,
 	}
 
-	ctx, cancel := context.WithCancel(c.Context())
+	ctx, cancel := context.WithCancel(gs.Context())
 	defer func() {
 		if err != nil {
 			cancel()

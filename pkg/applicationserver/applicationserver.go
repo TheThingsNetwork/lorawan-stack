@@ -49,6 +49,7 @@ import (
 // The Application Server exposes the As, AppAs and AsEndDeviceRegistry services.
 type ApplicationServer struct {
 	*component.Component
+	ctx context.Context
 
 	linkMode       LinkMode
 	linkRegistry   LinkRegistry
@@ -59,6 +60,11 @@ type ApplicationServer struct {
 	links              sync.Map
 	linkErrors         sync.Map
 	defaultSubscribers []*io.Subscription
+}
+
+// Context returns the context of the Application Server.
+func (as *ApplicationServer) Context() context.Context {
+	return as.ctx
 }
 
 var (
@@ -76,6 +82,7 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 	}
 	as = &ApplicationServer{
 		Component:      c,
+		ctx:            log.NewContextWithField(c.Context(), "namespace", "applicationserver"),
 		linkMode:       linkMode,
 		linkRegistry:   conf.Links,
 		deviceRegistry: conf.Devices,
@@ -92,7 +99,7 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		},
 	}
 
-	ctx, cancel := context.WithCancel(c.Context())
+	ctx, cancel := context.WithCancel(as.Context())
 	defer func() {
 		if err != nil {
 			cancel()

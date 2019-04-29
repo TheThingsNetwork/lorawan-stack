@@ -28,6 +28,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/email/sendgrid"
 	"go.thethings.network/lorawan-stack/pkg/email/smtp"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/oauth"
 	"go.thethings.network/lorawan-stack/pkg/redis"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
@@ -79,11 +80,17 @@ type Config struct {
 // OAuth clients, Gateways, Organizations and Users.
 type IdentityServer struct {
 	*component.Component
+	ctx    context.Context
 	config *Config
 	db     *gorm.DB
 	oauth  oauth.Server
 
 	redis *redis.Client
+}
+
+// Context returns the context of the Identity Server.
+func (is *IdentityServer) Context() context.Context {
+	return is.ctx
 }
 
 // SetRedisCache configures the given redis instance for caching.
@@ -106,6 +113,7 @@ func (is *IdentityServer) configFromContext(ctx context.Context) *Config {
 func New(c *component.Component, config *Config) (is *IdentityServer, err error) {
 	is = &IdentityServer{
 		Component: c,
+		ctx:       log.NewContextWithField(c.Context(), "namespace", "identityserver"),
 		config:    config,
 	}
 	is.db, err = store.Open(is.Context(), is.config.DatabaseURI)

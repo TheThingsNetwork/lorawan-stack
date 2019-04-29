@@ -27,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -110,6 +111,7 @@ type DownlinkPriorities struct {
 // The Network Server exposes the GsNs, AsNs, DeviceRegistry and ApplicationDownlinkQueue services.
 type NetworkServer struct {
 	*component.Component
+	ctx context.Context
 
 	devices DeviceRegistry
 
@@ -136,6 +138,11 @@ type NetworkServer struct {
 	handleASUplink func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, up *ttnpb.ApplicationUp) (bool, error)
 
 	defaultMACSettings ttnpb.MACSettings
+}
+
+// Context returns the context of the Network Server.
+func (ns *NetworkServer) Context() context.Context {
+	return ns.ctx
 }
 
 // Option configures the NetworkServer.
@@ -214,6 +221,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 	}
 	ns := &NetworkServer{
 		Component:               c,
+		ctx:                     log.NewContextWithField(c.Context(), "namespace", "networkserver"),
 		devices:                 conf.Devices,
 		netID:                   conf.NetID,
 		devAddrPrefixes:         devAddrPrefixes,
