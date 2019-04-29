@@ -29,16 +29,26 @@ import (
 	errfmt "golang.org/x/exp/errors/fmt"
 )
 
-const protocVersion = "3.1.3"
+const (
+	protocName    = "thethingsindustries/protoc"
+	protocVersion = "3.1.3"
 
-const protocOut = "/out"
+	protocOut = "/out"
+)
 
 // Proto namespace.
 type Proto mg.Namespace
 
 // Image pulls the proto image.
 func (Proto) Image(context.Context) error {
-	return sh.Run("docker", "pull", fmt.Sprintf("thethingsindustries/protoc:%s", protocVersion))
+	out, err := sh.Output("docker", "images", "-q", fmt.Sprintf("%s:%s", protocName, protocVersion))
+	if err != nil {
+		return errfmt.Errorf("failed to query docker images: %s", err)
+	}
+	if len(out) > 0 {
+		return nil
+	}
+	return sh.Run("docker", "pull", fmt.Sprintf("%s:%s", protocName, protocVersion))
 }
 
 type protocContext struct {
@@ -47,6 +57,8 @@ type protocContext struct {
 }
 
 func makeProtoc() (func(...string) error, *protocContext, error) {
+	mg.Deps(Proto.Image)
+
 	wd, err := os.Getwd()
 	if err != nil {
 		return nil, nil, errfmt.Errorf("failed to get working directory: %w", err)
@@ -62,7 +74,7 @@ func makeProtoc() (func(...string) error, *protocContext, error) {
 			"--mount", fmt.Sprintf("type=bind,src=%s,dst=%s/go.thethings.network/lorawan-stack/pkg/ttnpb", filepath.Join(wd, "pkg", "ttnpb"), protocOut),
 			"--mount", fmt.Sprintf("type=bind,src=%s,dst=%s/sdk/js", filepath.Join(wd, "sdk", "js"), wd),
 			"-w", wd,
-			fmt.Sprintf("thethingsindustries/protoc:%s", protocVersion),
+			fmt.Sprintf("%s:%s", protocName, protocVersion),
 			fmt.Sprintf("-I%s", filepath.Dir(wd)),
 		), &protocContext{
 			WorkingDirectory: wd,
@@ -72,7 +84,6 @@ func makeProtoc() (func(...string) error, *protocContext, error) {
 }
 
 func withProtoc(f func(pCtx *protocContext, protoc func(...string) error) error) error {
-	mg.Deps(Proto.Image)
 	protoc, pCtx, err := makeProtoc()
 	if err != nil {
 		return errors.New("failed to construct protoc command")
@@ -214,7 +225,6 @@ func (p Proto) JsSDKClean(context.Context) error {
 
 // All generates protos.
 func (p Proto) All(ctx context.Context) {
-	mg.CtxDeps(ctx, Proto.Image)
 	mg.CtxDeps(ctx, Proto.Go, Proto.Swagger, Proto.Markdown, Proto.JsSDK)
 }
 
