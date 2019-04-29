@@ -19,6 +19,8 @@ Closes #0000, References #0000, etc.
 
 #### Notes for Reviewers:
 <!--
+NOTE: This section is optional.
+
 Motivate briefly why it is implemented this way, if that deviates from the
 implementation proposal in the referenced issues.
 - How should your reviewers approach this pull request?
@@ -29,6 +31,8 @@ implementation proposal in the referenced issues.
 
 #### Release Notes:
 <!--
+NOTE: This section is optional.
+
 Any notes that we need to include in the Release Notes for the next release.
 These notes are formatted as bullet points, written in past tense, and will be
 combined with the labels of this Pull Request.
