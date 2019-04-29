@@ -22,7 +22,13 @@ import { getEntityId } from '../../../../lib/selectors/id'
 class DefaultEvent extends React.PureComponent {
 
   render () {
-    const { className, event, widget } = this.props
+    const {
+      className,
+      event,
+      widget,
+      overviewClassName,
+      expandedClassName,
+    } = this.props
 
     const entityId = getEntityId(event.identifiers[0])
 
@@ -33,6 +39,8 @@ class DefaultEvent extends React.PureComponent {
     return (
       <Event
         className={className}
+        overviewClassName={overviewClassName}
+        expandedClassName={expandedClassName}
         time={event.time}
         content={content}
         emitter={entityId}

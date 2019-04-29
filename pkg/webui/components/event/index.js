@@ -122,6 +122,7 @@ class Event extends React.PureComponent {
       widget,
       emitter,
       time,
+      expandedClassName,
     } = this.props
     const {
       expanded,
@@ -134,7 +135,7 @@ class Event extends React.PureComponent {
     const formattedData = JSON.stringify(data, null, 2)
 
     return (
-      <div>
+      <div className={expandedClassName}>
         <Message content={m.eventData} component="h4" />
         <CodeEditor
           readOnly

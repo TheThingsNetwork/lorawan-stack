@@ -28,7 +28,14 @@ import style from './message.styl'
 class MessageEvent extends React.PureComponent {
 
   render () {
-    const { className, event, type, widget } = this.props
+    const {
+      className,
+      event,
+      type,
+      widget,
+      overviewClassName,
+      expandedClassName,
+    } = this.props
 
     const entityId = getEntityId(event.identifiers[0])
     const icon = type === 'downlink' ? 'event_downlink' : 'event_uplink'
@@ -44,6 +51,8 @@ class MessageEvent extends React.PureComponent {
     return (
       <Event
         className={className}
+        overviewClassName={overviewClassName}
+        expandedClassName={expandedClassName}
         icon={eventIcon}
         time={event.time}
         emitter={entityId}

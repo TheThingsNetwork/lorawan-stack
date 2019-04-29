@@ -32,8 +32,10 @@ class Events extends React.PureComponent {
     const { component: Component, type } = getEventComponentByName(event.name)
 
     return (
-      <List.Item className={style.event}>
+      <List.Item className={style.listItem}>
         <Component
+          overviewClassName={style.event}
+          expandedClassName={style.eventData}
           event={event}
           type={type}
         />
@@ -78,6 +80,7 @@ class Events extends React.PureComponent {
     return (
       <List
         bordered
+        size="none"
         className={className}
         listClassName={style.list}
         header={header}

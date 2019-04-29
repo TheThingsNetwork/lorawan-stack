@@ -27,7 +27,13 @@ import style from './crud.styl'
 class CRUDEvent extends React.PureComponent {
 
   render () {
-    const { className, event, widget } = this.props
+    const {
+      className,
+      event,
+      widget,
+      overviewClassName,
+      expandedClassName,
+    } = this.props
 
     const entityId = getEntityId(event.identifiers[0])
     const eventAction = getEventActionByName(event.name)
@@ -52,6 +58,8 @@ class CRUDEvent extends React.PureComponent {
     return (
       <Event
         className={className}
+        overviewClassName={overviewClassName}
+        expandedClassName={expandedClassName}
         icon={icon}
         time={event.time}
         emitter={entityId}
