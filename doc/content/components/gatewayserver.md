@@ -1,6 +1,5 @@
 ---
 title: "Gateway Server"
-draft: false
 weight: 4
 --- 
 

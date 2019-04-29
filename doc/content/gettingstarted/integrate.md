@@ -1,8 +1,7 @@
 ---
-title: "Connect things"
+title: "Integrate Things"
 description: ""
-weight: 6
-draft: false
+weight: 7
 ---
 
 ## <a name="webhooks">Using webhooks</a>

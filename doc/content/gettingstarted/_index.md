@@ -1,6 +1,6 @@
 ---
-title: "Quick start"
-draft: false
+title: "Quick Start"
+
 weight: 2
 --- 
 

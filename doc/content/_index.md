@@ -2,7 +2,6 @@
 title: "Home"
 description: ""
 weight: 1
-draft: false
 --- 
 
 [![Build Status](https://travis-ci.com/TheThingsNetwork/lorawan-stack.svg?branch=master)](https://travis-ci.com/TheThingsNetwork/lorawan-stack) [![Coverage Status](https://coveralls.io/repos/github/TheThingsNetwork/lorawan-stack/badge.svg?branch=master)](https://coveralls.io/github/TheThingsNetwork/lorawan-stack?branch=master)

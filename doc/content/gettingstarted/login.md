@@ -1,8 +1,7 @@
 ---
 title: "Login"
 description: ""
-weight: 3
-draft: false
+weight: 4
 ---
 
 ## <a name="login">Login using the CLI</a>

@@ -2,7 +2,6 @@
 title: "Install"
 description: ""
 weight: 1
-draft: false
 --- 
  
 ## macOS

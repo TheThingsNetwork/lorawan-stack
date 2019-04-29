@@ -1,8 +1,7 @@
 ---
-title: "Register things"
+title: "Register Things"
 description: ""
-weight: 4
-draft: false
+weight: 5
 --- 
 
 The stack count a total of three things; gateways, application, devices. Each is highly tunable, don't hesitate go to check the [References](../../references) to see all possible settings.

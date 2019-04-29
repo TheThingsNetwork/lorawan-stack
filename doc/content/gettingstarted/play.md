@@ -1,8 +1,7 @@
 ---
 title: "Play with things"
 description: "Connect to the MQTT broker to receive uplinks and send downlinks"
-weight: 5
-draft: false
+weight: 6
 --- 
 
 ## <a name="linkappserver">Linking the application</a>

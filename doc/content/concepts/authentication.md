@@ -1,6 +1,5 @@
 ---
 title: "Authentication"
-draft: false
 weight: 3
 --- 
 

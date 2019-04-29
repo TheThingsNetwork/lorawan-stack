@@ -1,7 +1,6 @@
 ---
 title: "Configuration"
 description: "List of different configuration options available for the stack"
-draft: false
 weight: 3
 --- 
 
