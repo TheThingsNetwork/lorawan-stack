@@ -19,7 +19,9 @@ import (
 )
 
 // DefaultGatewayConfigurationServerConfig is the default configuration for the Application Server.
-var DefaultGatewayConfigurationServerConfig = gatewayconfigurationserver.Config{}
+var DefaultGatewayConfigurationServerConfig = gatewayconfigurationserver.Config{
+	RequireAuth: true,
+}
 
 func init() {
 	DefaultGatewayConfigurationServerConfig.TheThingsGateway.Default.UpdateChannel = "stable"

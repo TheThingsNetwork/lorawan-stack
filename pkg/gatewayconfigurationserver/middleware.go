@@ -15,37 +15,12 @@
 package gatewayconfigurationserver
 
 import (
-	"strings"
-
 	echo "github.com/labstack/echo/v4"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
-	web_errors "go.thethings.network/lorawan-stack/pkg/errors/web"
-	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"google.golang.org/grpc/metadata"
 )
 
-func (gcs *GatewayConfigurationServer) handleError() echo.MiddlewareFunc {
-	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			ctx := gcs.getContext(c)
-			err := next(c)
-			if err == nil || c.Response().Committed {
-				return err
-			}
-			log.FromContext(ctx).WithError(err).Debug("HTTP request failed")
-			statusCode, err := web_errors.ProcessError(err)
-			if strings.Contains(c.Request().Header.Get(echo.HeaderAccept), "application/json") {
-				return c.JSON(statusCode, err)
-			}
-			return c.String(statusCode, err.Error())
-		}
-	}
-}
-
-const (
-	gatewayIDKey = "gateway_id"
-)
+const gatewayIDKey = "gateway_id"
 
 func (gcs *GatewayConfigurationServer) validateAndFillIDs() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
@@ -69,14 +44,6 @@ func (gcs *GatewayConfigurationServer) requireGatewayRights(required ...ttnpb.Ri
 		return func(c echo.Context) error {
 			ctx := gcs.getContext(c)
 			gtwID := c.Get(gatewayIDKey).(ttnpb.GatewayIdentifiers)
-			md := metadata.New(map[string]string{
-				"id":            gtwID.GatewayID,
-				"authorization": c.Request().Header.Get(echo.HeaderAuthorization),
-			})
-			if ctxMd, ok := metadata.FromIncomingContext(ctx); ok {
-				md = metadata.Join(ctxMd, md)
-			}
-			ctx = metadata.NewIncomingContext(ctx, md)
 			if err := rights.RequireGateway(ctx, gtwID, required...); err != nil {
 				return err
 			}
