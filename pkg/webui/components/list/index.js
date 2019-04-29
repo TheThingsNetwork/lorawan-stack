@@ -67,6 +67,20 @@ class List extends React.PureComponent {
     )
   }
 
+  get footer () {
+    const { footer, size } = this.props
+
+    if (!footer) {
+      return null
+    }
+
+    return (
+      <div className={classnames(style.footer, style[`item-${size}`])}>
+        {footer}
+      </div>
+    )
+  }
+
   renderItems () {
     const {
       items,
@@ -115,6 +129,7 @@ class List extends React.PureComponent {
         <Component className={listCls}>
           {this.renderItems()}
         </Component>
+        {this.footer}
       </div>
     )
   }
@@ -131,6 +146,7 @@ List.propTypes = {
   emptyMessageValues: PropTypes.object,
   header: PropTypes.node,
   listClassName: PropTypes.string,
+  footer: PropTypes.node,
 }
 
 List.defaultProps = {
@@ -141,7 +157,7 @@ List.defaultProps = {
   emptyMessage: sharedMessages.noMatch,
   emptyMessageValues: {},
   header: null,
-  renderItem: (item, index) => (<List.Item key={index}>{item}</List.Item>),
+  renderItem: () => null,
   footer: null,
 }
 
