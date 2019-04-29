@@ -1187,6 +1187,15 @@
       "file": "end_devices.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:mac_version": {
+    "translations": {
+      "en": "LoRaWAN MAC version is invalid"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "end_devices.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/commands:no_api_key_id": {
     "translations": {
       "en": "no API key ID set"
@@ -1338,6 +1347,15 @@
     "description": {
       "package": "cmd/ttn-lw-cli/commands",
       "file": "users.go"
+    }
+  },
+  "error:cmd/ttn-lw-cli/commands:phy_version": {
+    "translations": {
+      "en": "LoRaWAN PHY version is invalid"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "end_devices.go"
     }
   },
   "error:cmd/ttn-lw-cli/commands:unauthenticated": {
