@@ -170,7 +170,7 @@ func TestServer(t *testing.T) {
 			}
 			middleware := []echo.MiddlewareFunc{
 				s.validateAndFillGatewayIDs(),
-				s.checkAuthPresence(),
+				s.requireAuth(),
 			}
 
 			handler := s.handleGatewayInfo

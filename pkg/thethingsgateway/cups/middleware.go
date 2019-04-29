@@ -44,8 +44,8 @@ func (s *Server) validateAndFillGatewayIDs() echo.MiddlewareFunc {
 	}
 }
 
-// checkAuthPresence checks if the request contains the Authorization header.
-func (s *Server) checkAuthPresence() echo.MiddlewareFunc {
+// requireAuth checks if the request contains the Authorization header.
+func (s *Server) requireAuth() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			authHeader := c.Request().Header.Get(echo.HeaderAuthorization)

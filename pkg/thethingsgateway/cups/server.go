@@ -117,7 +117,7 @@ func (s *Server) RegisterRoutes(srv *web.Server) {
 		return s.handleGatewayInfo(c)
 	}, []echo.MiddlewareFunc{
 		s.validateAndFillGatewayIDs(),
-		s.checkAuthPresence(),
+		s.requireAuth(),
 	}...)
 	group.GET("/frequency-plans/:frequency_plan_id", func(c echo.Context) error {
 		return s.handleFreqPlanInfo(c)
