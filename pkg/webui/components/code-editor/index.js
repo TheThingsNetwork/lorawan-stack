@@ -132,7 +132,7 @@ CodeEditor.propTypes = {
   language: PropTypes.oneOf([ 'javascript', 'json' ]),
   /** The name of the editor (should be unique) */
   name: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
+  onChange: PropTypes.func,
   onFocus: PropTypes.func,
   onBlur: PropTypes.func,
   /** The current value of the editor */
