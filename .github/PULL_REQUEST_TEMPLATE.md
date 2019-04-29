@@ -3,7 +3,7 @@ Thanks for submitting a pull request. Please fill the template below,
 otherwise we will not be able to process this pull request.
 -->
 
-#### Summary:
+#### Summary
 <!--
 A short summary, referencing related issues:
 Closes #0000, References #0000, etc.
@@ -11,13 +11,13 @@ Closes #0000, References #0000, etc.
 
 ...
 
-#### Changes:
+#### Changes
 <!-- What are the changes made in this pull request? -->
 
 - ...
 - ...
 
-#### Notes for Reviewers:
+#### Notes for Reviewers
 <!--
 NOTE: This section is optional.
 
@@ -29,7 +29,7 @@ implementation proposal in the referenced issues.
 
 ...
 
-#### Release Notes:
+#### Release Notes
 <!--
 NOTE: This section is optional.
 

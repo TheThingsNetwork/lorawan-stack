@@ -3,12 +3,12 @@ Thanks for submitting an issue. Please fill the template below,
 otherwise we will not be able to process this issue.
 -->
 
-#### Summary:
+#### Summary
 <!-- Summarize the issue in a few sentences: -->
 
 ...
 
-#### Steps to Reproduce:
+#### Steps to Reproduce
 <!-- How can we reproduce the problem? How should the feature work? -->
 
 1. ...

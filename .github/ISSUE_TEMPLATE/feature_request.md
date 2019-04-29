@@ -8,7 +8,7 @@ Thanks for submitting a feature request. Please fill the template below,
 otherwise we will not be able to process this feature request.
 -->
 
-#### Summary:
+#### Summary
 <!-- Summarize the feature in a few sentences: -->
 
 ...
@@ -31,7 +31,7 @@ Describe or link to related APIs, screen designs, packages, etc.
 
 ...
 
-#### Environment:
+#### Environment
 <!--
 Your environment: OS/Browser/Gateway/Device/...? Versions? IDs/EUIs?
 Paste the output of "ttn-lw-cli version" or "ttn-lw-stack version" if applicable.

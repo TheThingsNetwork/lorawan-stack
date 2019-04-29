@@ -8,12 +8,12 @@ Thanks for submitting a bug report. Please fill the template below,
 otherwise we will not be able to process this bug report.
 -->
 
-#### Summary:
+#### Summary
 <!-- Summarize the problem in a few sentences: -->
 
 ...
 
-#### Steps to Reproduce:
+#### Steps to Reproduce
 <!-- How can we reproduce the problem? -->
 
 1. ...
@@ -37,7 +37,7 @@ Please paste terminal output, upload logs (as .txt) or upload screenshots.
 
 ...
 
-#### Environment:
+#### Environment
 <!--
 Your environment: OS/Browser/Gateway/Device/...? Versions? IDs/EUIs?
 Paste the output of "ttn-lw-cli version" or "ttn-lw-stack version" if applicable.
