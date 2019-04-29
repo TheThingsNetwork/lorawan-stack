@@ -30,7 +30,10 @@ func TestConcentratorClock(t *testing.T) {
 
 	clock.SyncWithGateway(10000000, time.Unix(10, 0), time.Unix(0, 0)) // The gateway has no idea of time.
 	a.So(clock.ServerTime(time.Unix(10, 100)), should.Equal, 10000000*time.Microsecond+100)
-	a.So(clock.GatewayTime(time.Unix(0, 100)), should.Equal, 10000000*time.Microsecond+100)
+
+	gatewayTime, ok := clock.GatewayTime(time.Unix(0, 100))
+	a.So(gatewayTime, should.Equal, 10000000*time.Microsecond+100)
+	a.So(ok, should.BeTrue)
 
 	{
 		// Test first roll-over to 4299967295 us (math.MaxUint32 + 5000000).

@@ -43,7 +43,7 @@ func TestScheduleAt(t *testing.T) {
 			Duration:  durationPtr(2 * time.Second),
 		},
 	}
-	scheduler, err := scheduling.NewScheduler(ctx, fp, true)
+	scheduler, err := scheduling.NewScheduler(ctx, fp, true, nil)
 	a.So(err, should.BeNil)
 	scheduler.SyncWithGateway(0, time.Now(), time.Unix(0, 0))
 
@@ -246,7 +246,7 @@ func TestScheduleAnytime(t *testing.T) {
 			Duration:  durationPtr(2 * time.Second),
 		},
 	}
-	scheduler, err := scheduling.NewScheduler(ctx, fp, true)
+	scheduler, err := scheduling.NewScheduler(ctx, fp, true, nil)
 	a.So(err, should.BeNil)
 	scheduler.SyncWithGateway(0, time.Now(), time.Unix(0, 0))
 
@@ -356,7 +356,7 @@ func TestScheduleAnytimeShort(t *testing.T) {
 
 	// Gateway time; too late (100 ms).
 	{
-		scheduler, err := scheduling.NewScheduler(ctx, fp, true)
+		scheduler, err := scheduling.NewScheduler(ctx, fp, true, nil)
 		a.So(err, should.BeNil)
 		scheduler.SyncWithGateway(0, time.Now(), time.Unix(0, 0))
 		em, err := scheduler.ScheduleAnytime(ctx, 10, settingsAt(869525000, 7, timePtr(time.Unix(0, int64(100*time.Millisecond))), 0), ttnpb.TxSchedulePriority_NORMAL)
@@ -366,7 +366,7 @@ func TestScheduleAnytimeShort(t *testing.T) {
 
 	// Timestamp; too late (100 ms).
 	{
-		scheduler, err := scheduling.NewScheduler(ctx, fp, true)
+		scheduler, err := scheduling.NewScheduler(ctx, fp, true, nil)
 		a.So(err, should.BeNil)
 		scheduler.SyncWithGateway(0, time.Now(), time.Unix(0, 0))
 		em, err := scheduler.ScheduleAnytime(ctx, 10, settingsAt(869525000, 7, nil, 100*1000), ttnpb.TxSchedulePriority_NORMAL)
@@ -389,10 +389,14 @@ func TestScheduleAnytimeClassC(t *testing.T) {
 		},
 	}
 
-	scheduler, err := scheduling.NewScheduler(ctx, fp, true)
+	timeSource := &mockTimeSource{
+		Time: time.Unix(0, 0),
+	}
+	scheduler, err := scheduling.NewScheduler(ctx, fp, true, timeSource)
 	a.So(err, should.BeNil)
+	scheduler.Sync(0, timeSource.Time)
 
-	// Schedule a join-accept. The clock is not synced; this is scheduled at 5 seconds.
+	// Schedule a join-accept.
 	_, err = scheduler.ScheduleAt(ctx, 10, ttnpb.TxSettings{
 		DataRate: ttnpb.DataRate{
 			Modulation: &ttnpb.DataRate_LoRa{
@@ -429,7 +433,8 @@ func TestScheduleAnytimeClassC(t *testing.T) {
 	}
 
 	// Fast forward 9 seconds.
-	scheduler.Sync(9000000, time.Now().Add(-3*time.Second))
+	timeSource.Time = time.Unix(9, 0)
+	scheduler.Sync(9000000, timeSource.Time)
 
 	// Schedule any time.
 	em, err := scheduler.ScheduleAnytime(ctx, 10, ttnpb.TxSettings{
@@ -445,5 +450,5 @@ func TestScheduleAnytimeClassC(t *testing.T) {
 		Frequency:  869525000,
 	}, ttnpb.TxSchedulePriority_HIGHEST)
 	a.So(err, should.BeNil)
-	a.So(time.Duration(em.Starts()), should.AlmostEqual, 12*time.Second+scheduling.ScheduleTimeLong, test.Delay>>6)
+	a.So(time.Duration(em.Starts()), should.Equal, 9*time.Second+scheduling.ScheduleTimeLong)
 }
