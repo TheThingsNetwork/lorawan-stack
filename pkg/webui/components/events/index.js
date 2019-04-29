@@ -14,16 +14,24 @@
 
 import React from 'react'
 import bind from 'autobind-decorator'
+import classnames from 'classnames'
+import { defineMessages } from 'react-intl'
 
 import Button from '../button'
 import Message from '../../lib/components/message'
 import List from '../list'
+import Icon from '../icon'
 import getEventComponentByName from '../event/types'
 import sharedMessages from '../../lib/shared-messages'
 import PropTypes from '../../lib/prop-types'
 import EventsWidget from './widget'
 
 import style from './events.styl'
+
+const m = defineMessages({
+  truncated: 'Events have been truncated',
+  showing: 'Showing all available events',
+})
 
 @bind
 class Events extends React.PureComponent {
@@ -67,7 +75,14 @@ class Events extends React.PureComponent {
       onClear,
       onPause,
       emitterId,
+      limit,
     } = this.props
+
+    let limitedEvents = events
+    const truncated = events.length > limit
+    if (truncated) {
+      limitedEvents = events.slice(0, limit)
+    }
 
     const header = (
       <Header
@@ -77,6 +92,10 @@ class Events extends React.PureComponent {
       />
     )
 
+    const footer = (
+      <Footer truncated={truncated} />
+    )
+
     return (
       <List
         bordered
@@ -84,7 +103,8 @@ class Events extends React.PureComponent {
         className={className}
         listClassName={style.list}
         header={header}
-        items={events}
+        footer={footer}
+        items={limitedEvents}
         renderItem={this.renderEvent}
         rowKey={this.getEventkey}
         emptyMessage={sharedMessages.noEvents}
@@ -100,10 +120,12 @@ Events.propTypes = {
   emitterId: PropTypes.string.isRequired,
   onPause: PropTypes.func.isRequired,
   onClear: PropTypes.func.isRequired,
+  limit: PropTypes.number,
 }
 
 Events.defaultProps = {
   events: [],
+  limit: 100,
 }
 
 Events.Widget = EventsWidget
@@ -141,6 +163,33 @@ const Header = function (props) {
           icon="delete"
         />
       </div>
+    </div>
+  )
+}
+
+const Footer = function (props) {
+  const {
+    truncated,
+  } = props
+
+  return (
+    <div className={classnames(style.footer, {
+      [style.footerTruncated]: truncated,
+    })}
+    >
+      {
+        truncated ? (
+          <React.Fragment>
+            <Icon icon="warning" />
+            <Message
+              content="Events have been truncated"
+              className={style.footerTruncatedText}
+            />
+          </React.Fragment>
+        ) : (
+          <Message content={m.showing} />
+        )
+      }
     </div>
   )
 }

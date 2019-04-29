@@ -105,12 +105,6 @@ class DynamicExample extends React.Component {
       function () {
         if (!self.state.paused) {
           self.setState(function (prev) {
-            const events = prev.emittedEvents
-            const size = events.length
-            if (prev.emittedEvents.length >= 100) {
-              return { emittedEvents: [ getRandomEvent(), ...events.slice(0, size - 1) ]}
-            }
-
             return { emittedEvents: [ getRandomEvent(), ...prev.emittedEvents ]}
           })
         }

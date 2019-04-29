@@ -12,8 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.header
+.header,
+.footer
   padding: $cs.xs $cs.s
+
+.header
   position: relative
   display: flex
   align-items: center
@@ -39,6 +42,18 @@
     position: absolute
     right: 0
 
+.footer
+  display: flex
+  justify-content: center
+  align-items: center
+  font-size: $fs.s
+  color: $tc-subtle-gray
+
+  &-truncated
+    color: $c-warning
+
+    &-text
+      margin-left: $cs.xxs
 
 .list
   min-height: 500px
