@@ -121,7 +121,7 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage) error {
 			"timestamp", up.Settings.Timestamp,
 			"server_time", up.ReceivedAt,
 			"gateway_time", *up.Settings.Time,
-		)).Debug("Syncronized server and gateway absolute time")
+		)).Debug("Synchronized server and gateway absolute time")
 	} else {
 		c.scheduler.Sync(up.Settings.Timestamp, up.ReceivedAt)
 		log.FromContext(c.ctx).WithFields(log.Fields(
