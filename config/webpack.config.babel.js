@@ -182,6 +182,7 @@ export default {
   },
   plugins: env({
     all: [
+      new HashOutput(),
       new webpack.NamedModulesPlugin(),
       new webpack.NamedChunksPlugin(),
       new webpack.EnvironmentPlugin({
@@ -221,7 +222,6 @@ export default {
       }),
       // Copy static assets to output directory
       new CopyWebpackPlugin([ `${src}/assets/static` ]),
-      new HashOutput(),
     ],
     development: [
       new webpack.HotModuleReplacementPlugin(),
