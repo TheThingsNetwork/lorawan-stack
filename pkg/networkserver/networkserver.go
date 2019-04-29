@@ -312,7 +312,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 	hooks.RegisterStreamHook("/ttn.lorawan.v3.AsNs", cluster.HookName, c.ClusterAuthStreamHook())
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.AsNs", cluster.HookName, c.ClusterAuthUnaryHook())
 
-	ns.RegisterTask("process_downlink", func(ctx context.Context) error {
+	ns.RegisterTask(ns.Context(), "process_downlink", func(ctx context.Context) error {
 		for {
 			select {
 			case <-ctx.Done():
