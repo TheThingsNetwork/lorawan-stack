@@ -264,23 +264,27 @@ function env (obj = {}) {
     return obj
   }
 
-  const all = obj.all || {}
-  const dev = obj.development || {}
-  const prod = obj.production || {}
+  const all = obj.all
+  const dev = obj.development
+  const prod = obj.production
 
   if (Array.isArray(all) || Array.isArray(dev) || Array.isArray(prod)) {
+
     return [
-      ...all,
-      ...(production ? prod : dev),
+      ...all || [],
+      ...(production ? prod || [] : dev || []),
     ]
   }
 
-  if (typeof dev !== 'object' || typeof prod !== 'object') {
+  if (
+    dev !== undefined && typeof dev !== 'object'
+    || prod !== undefined && typeof prod !== 'object'
+  ) {
     return production ? prod : dev
   }
 
   return {
-    ...all,
-    ...(production ? prod : dev),
+    ...all || {},
+    ...(production ? prod || {} : dev || {}),
   }
 }
