@@ -195,7 +195,7 @@ const Field = function (props) {
   rest.type = type
   rest.placeholder = placeholder ? formatMessage(placeholder) : ''
 
-  const hasMessages = touched && (_error || warning)
+  const hasMessages = (touched && _error) || warning
 
   const classname = classnames(className, style.field, style[type], ...from(style, {
     error: rest.error,
