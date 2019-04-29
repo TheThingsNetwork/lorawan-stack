@@ -52,6 +52,8 @@ export default class DeviceAdd extends Component {
   state = {
     error: '',
     otaa: true,
+    resets_join_nonces: false,
+    resets_f_cnt: false,
   }
 
   async handleSubmit (values, { setSubmitting, resetForm }) {
@@ -103,7 +105,16 @@ export default class DeviceAdd extends Component {
     this.setState({ otaa: false })
   }
 
+  handleResetsJoinNoncesChange (event) {
+    this.setState({ resets_join_nonces: event })
+  }
+
+  handleResetsFrameCountersChange (event) {
+    this.setState({ resets_f_cnt: event })
+  }
+
   get ABPSection () {
+    const { resets_f_cnt } = this.state
     return (
       <React.Fragment>
         <Field
@@ -153,6 +164,8 @@ export default class DeviceAdd extends Component {
         />
         <Field
           title={m.resetsFCnt}
+          onChange={this.handleResetsFrameCountersChange}
+          warning={resets_f_cnt ? m.resetWarning : undefined}
           name="mac_settings.resets_f_cnt"
           type="checkbox"
         />
@@ -161,6 +174,7 @@ export default class DeviceAdd extends Component {
   }
 
   get OTAASection () {
+    const { resets_join_nonces } = this.state
     return (
       <React.Fragment>
         <Field
@@ -203,6 +217,8 @@ export default class DeviceAdd extends Component {
         />
         <Field
           title={m.resetsJoinNonces}
+          onChange={this.handleResetsJoinNoncesChange}
+          warning={resets_join_nonces ? m.resetWarning : undefined}
           name="resets_join_nonces"
           type="checkbox"
         />
