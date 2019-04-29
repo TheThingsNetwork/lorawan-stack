@@ -20,10 +20,10 @@ import (
 
 	"github.com/gogo/protobuf/types"
 	echo "github.com/labstack/echo/v4"
-	bs_cups "go.thethings.network/lorawan-stack/pkg/basicstation/cups"
+	bscups "go.thethings.network/lorawan-stack/pkg/basicstation/cups"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/pfconfig/semtechudp"
-	ttg_cups "go.thethings.network/lorawan-stack/pkg/thethingsgateway/cups"
+	ttgcups "go.thethings.network/lorawan-stack/pkg/thethingsgateway/cups"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/web"
 	"google.golang.org/grpc/metadata"
@@ -32,9 +32,9 @@ import (
 // Config contains the Gateway Configuration Server configuration.
 type Config struct {
 	// BasicStation defines the configuration for the BasicStation CUPS.
-	BasicStation bs_cups.ServerConfig `name:"basic-station" description:"BasicStation CUPS configuration."`
+	BasicStation bscups.ServerConfig `name:"basic-station" description:"BasicStation CUPS configuration."`
 	// TheThingsGateway defines the configuration for The Things Gateway CUPS.
-	TheThingsGateway ttg_cups.Config `name:"the-things-gateway" description:"The Things Gateway CUPS configuration."`
+	TheThingsGateway ttgcups.Config `name:"the-things-gateway" description:"The Things Gateway CUPS configuration."`
 	// RequreAuth defines if the HTTP endpoints should require authentication or not.
 	RequireAuth bool `name:"require-auth" description:"Require authentication for the HTTP endpoints."`
 }
@@ -54,7 +54,7 @@ func (gcs *GatewayConfigurationServer) RegisterRoutes(server *web.Server) {
 		middleware = append(middleware, gcs.requireGatewayRights(ttnpb.RIGHT_GATEWAY_INFO))
 	}
 	group := server.Group(ttnpb.HTTPAPIPrefix+"/gcs/gateways/:gateway_id", middleware...)
-	group.GET("/global_conf.json", gcs.handleGetGlobalConfig)
+	group.GET("/semtechudp/global_conf.json", gcs.handleGetGlobalConfig)
 }
 
 // New returns new *GatewayConfigurationServer.

@@ -114,7 +114,7 @@ func TestWeb(t *testing.T) {
 		} {
 			t.Run(tc.Name, func(t *testing.T) {
 				a := assertions.New(t)
-				url := fmt.Sprintf("http://%s/api/v3/gcs/gateways/%s/global_conf.json",
+				url := fmt.Sprintf("http://%s/api/v3/gcs/gateways/%s/semtechudp/global_conf.json",
 					httpAddress, tc.ID.GatewayID,
 				)
 				body := bytes.NewReader([]byte(`{"downlinks":[]}`))
