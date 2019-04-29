@@ -100,8 +100,6 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 	if err := ns.devices.RangeByAddr(ctx, pld.DevAddr,
 		[]string{
 			"frequency_plan_id",
-			"ids.dev_eui",
-			"ids.join_eui",
 			"lorawan_phy_version",
 			"mac_settings.resets_f_cnt",
 			"mac_settings.supports_32_bit_f_cnt",
@@ -487,9 +485,6 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 		[]string{
 			"downlink_margin",
 			"frequency_plan_id",
-			"ids.dev_addr",
-			"ids.dev_eui",
-			"ids.join_eui",
 			"last_dev_status_received_at",
 			"lorawan_phy_version",
 			"lorawan_version",
