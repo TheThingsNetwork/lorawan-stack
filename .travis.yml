@@ -7,6 +7,7 @@ go: 1.12.x
 go_import_path: go.thethings.network/lorawan-stack
 env:
   global:
+  - GOPROXY=https://proxy.golang.org
   - YARN_CACHE_FOLDER=$HOME/.cache/yarn
   - MAGE=$HOME/.cache/mage/mage
   - TEST_SLOWDOWN=8
