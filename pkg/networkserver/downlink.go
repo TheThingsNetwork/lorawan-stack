@@ -544,9 +544,10 @@ func appendRecentDownlink(recent []*ttnpb.DownlinkMessage, down *ttnpb.DownlinkM
 
 // downlinkRxDelay returns the RxDelay value, which should be used to answer up.
 func downlinkRxDelay(phy band.Band, macState *ttnpb.MACState, up *ttnpb.UplinkMessage) (del ttnpb.RxDelay) {
-	if up.Payload.MHDR.MType == ttnpb.MType_JOIN_REQUEST {
+	switch up.Payload.MHDR.MType {
+	case ttnpb.MType_JOIN_REQUEST, ttnpb.MType_REJOIN_REQUEST:
 		del = ttnpb.RxDelay(phy.JoinAcceptDelay1 / time.Second)
-	} else {
+	default:
 		del = macState.CurrentParameters.Rx1Delay
 	}
 	if del == ttnpb.RX_DELAY_0 {
@@ -661,7 +662,9 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						return nil, nil, errUplinkNotFound
 					}
 					up := dev.RecentUplinks[len(dev.RecentUplinks)-1]
-					if up.Payload.MHDR.MType != ttnpb.MType_JOIN_REQUEST {
+					switch up.Payload.MHDR.MType {
+					case ttnpb.MType_JOIN_REQUEST, ttnpb.MType_REJOIN_REQUEST:
+					default:
 						return nil, nil, errUplinkNotFound
 					}
 					ctx := events.ContextWithCorrelationID(ctx, up.CorrelationIDs...)
@@ -729,7 +732,9 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						return nil, nil, errUplinkNotFound
 					}
 					up := dev.RecentUplinks[len(dev.RecentUplinks)-1]
-					if up.Payload.MHDR.MType != ttnpb.MType_CONFIRMED_UP && up.Payload.MHDR.MType != ttnpb.MType_UNCONFIRMED_UP {
+					switch up.Payload.MHDR.MType {
+					case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP, ttnpb.MType_REJOIN_REQUEST:
+					default:
 						return nil, nil, errUplinkNotFound
 					}
 					ctx = events.ContextWithCorrelationID(ctx, up.CorrelationIDs...)
