@@ -37,6 +37,8 @@ const Tabs = function ({
           name,
           icon,
           narrow = false,
+          link,
+          exact,
         } = tab
 
         return (
@@ -48,6 +50,8 @@ const Tabs = function ({
             disabled={disabled}
             onClick={onTabChange}
             narrow={narrow}
+            link={link}
+            exact={exact}
           >
             {icon && <Icon icon={icon} className={style.icon} />}
             <Message content={title} />
@@ -60,7 +64,7 @@ const Tabs = function ({
 
 Tabs.propTypes = {
   /** The name of the active tab */
-  active: PropTypes.string.isRequired,
+  active: PropTypes.string,
   /** A list of tabs */
   tabs: PropTypes.arrayOf(PropTypes.shape({
     title: PropTypes.message.isRequired,
@@ -72,7 +76,7 @@ Tabs.propTypes = {
    * A click handler to be called when the selected tab changes. Passes
    * the name of the new active tab as an argument.
    */
-  onTabChange: PropTypes.func.isRequired,
+  onTabChange: PropTypes.func,
 }
 
 export default Tabs

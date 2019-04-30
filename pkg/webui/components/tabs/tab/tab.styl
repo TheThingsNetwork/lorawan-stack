@@ -14,6 +14,9 @@
 
 .tab
   display: inline-block
+
+.tab-item
+  display: inline-block
   padding: $cs.s $cs.l
   text-align: center
   position: relative
@@ -35,7 +38,7 @@
     cursor: not-allowed
     opacity: .4
 
-  &-default
+  &-default:not(.tab-item-active)
     pseudo-border-animated(3px, $c-divider)
 
   &-active

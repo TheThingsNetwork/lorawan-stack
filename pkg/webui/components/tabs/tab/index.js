@@ -16,6 +16,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import bind from 'autobind-decorator'
+import { NavLink } from 'react-router-dom'
 
 import style from './tab.styl'
 
@@ -39,24 +40,41 @@ class Tab extends React.PureComponent {
       disabled = false,
       narrow,
       children,
+      link,
+      exact = true,
       ...rest
     } = this.props
 
-    const tabClassNames = classnames(className, style.tab, {
-      [style.tabNarrow]: narrow,
-      [style.tabActive]: !disabled && active,
-      [style.tabDefault]: !disabled && !active,
-      [style.tabDisabled]: disabled,
+    const tabItemClassNames = classnames(className, style.tabItem, {
+      [style.tabItemNarrow]: narrow,
+      [style.tabItemActive]: !disabled && active,
+      [style.tabItemDefault]: !disabled && !active,
+      [style.tabItemDisabled]: disabled,
     })
+
+    const Component = link ? NavLink : 'span'
+    const props = {
+      role: 'button',
+      className: tabItemClassNames,
+      children,
+    }
+    if (link) {
+      props.exact = exact
+      props.to = link
+      props.activeClassName = style.tabItemActive
+    } else {
+      props.onClick = this.handleClick
+    }
 
     return (
       <li
         {...rest}
-        role="button"
-        onClick={this.handleClick}
-        className={tabClassNames}
+        className={style.tab}
       >
-        {children}
+        <Component
+          {...props}
+          children={children}
+        />
       </li>
     )
   }
@@ -67,7 +85,7 @@ Tab.propTypes = {
    * A click handler to be called when the selected tab changes. Passes
    * the name of the new active tab as an argument.
    */
-  onClick: PropTypes.func.isRequired,
+  onClick: PropTypes.func,
   /** A flag specifying whether the tab is active */
   active: PropTypes.bool,
   /** A flag specifying whether the tab is disabled */
