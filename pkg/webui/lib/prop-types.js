@@ -43,4 +43,11 @@ PropTypes.link = PropTypes.shape({
   exact: PropTypes.bool,
 })
 
+PropTypes.event = PropTypes.shape({
+  name: PropTypes.string.isRequired,
+  time: PropTypes.string.isRequired,
+  identifiers: PropTypes.array.isRequired,
+  data: PropTypes.object,
+})
+
 export default PropTypes

@@ -24,12 +24,12 @@ import PropTypes from '../../../lib/prop-types'
 import getEventComponentByName from '../../event/types'
 
 import DateTime from '../../../lib/components/date-time'
+import sharedMessages from '../../../lib/shared-messages'
 import style from './widget.styl'
 
 const m = defineMessages({
   latestEvents: 'Latest events',
   seeAllActivity: 'See all activity',
-  noEvents: '{entityId} has not sent any events recently',
   unknown: 'Unknown',
 })
 
@@ -44,6 +44,7 @@ class EventsWidget extends React.PureComponent {
         <Component
           event={event}
           type={type}
+          widget
         />
       </List.Item>
     )
@@ -99,11 +100,11 @@ class EventsWidget extends React.PureComponent {
         </div>
         <List
           bordered
-          className={style.list}
+          listClassName={style.list}
           size="small"
           items={truncatedEvents}
           renderItem={this.renderEvent}
-          emptyMessage={m.noEvents}
+          emptyMessage={sharedMessages.noEvents}
           emptyMessageValues={{ entityId: emitterId }}
         />
       </aside>

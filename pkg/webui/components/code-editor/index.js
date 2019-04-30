@@ -20,6 +20,7 @@ import bind from 'autobind-decorator'
 import PropTypes from '../../lib/prop-types'
 
 import 'brace/mode/javascript'
+import 'brace/mode/json'
 import './ttn-theme'
 
 import style from './code-editor.styl'
@@ -128,10 +129,10 @@ class CodeEditor extends React.Component {
 
 CodeEditor.propTypes = {
   /** The language to highlight */
-  language: PropTypes.oneOf([ 'javascript', '' ]),
+  language: PropTypes.oneOf([ 'javascript', 'json' ]),
   /** The name of the editor (should be unique) */
   name: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
+  onChange: PropTypes.func,
   onFocus: PropTypes.func,
   onBlur: PropTypes.func,
   /** The current value of the editor */

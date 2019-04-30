@@ -25,6 +25,7 @@ import style from './list.styl'
 
 @bind
 class List extends React.PureComponent {
+
   renderItem (item, index) {
     const { rowKey, renderItem, size } = this.props
 
@@ -45,10 +46,39 @@ class List extends React.PureComponent {
       ...renderedItem.props,
       key: actualRowKey,
       className: classnames(
-        renderedItem.props.className,
-        style[`item-${size}`]
+        renderedItem.props.className, {
+          [style[`item-${size}`]]: size !== 'none',
+        }
       ),
     })
+  }
+
+  get header () {
+    const { header, size } = this.props
+
+    if (!header) {
+      return null
+    }
+
+    return (
+      <div className={classnames(style.header, style[`item-${size}`])}>
+        {header}
+      </div>
+    )
+  }
+
+  get footer () {
+    const { footer, size } = this.props
+
+    if (!footer) {
+      return null
+    }
+
+    return (
+      <div className={classnames(style.footer, style[`item-${size}`])}>
+        {footer}
+      </div>
+    )
   }
 
   renderItems () {
@@ -82,30 +112,41 @@ class List extends React.PureComponent {
       component: Component,
       bordered,
       items,
+      listClassName,
     } = this.props
 
-    const cls = classnames(className, style.list, {
+    const cls = classnames(className, style.wrapper, {
       [style.listBordered]: bordered,
+    })
+
+    const listCls = classnames(style.list, listClassName, {
       [style.listEmpty]: !items.length,
     })
 
     return (
-      <Component className={cls}>
-        {this.renderItems()}
-      </Component>
+      <div className={cls}>
+        {this.header}
+        <Component className={listCls}>
+          {this.renderItems()}
+        </Component>
+        {this.footer}
+      </div>
     )
   }
 }
 
 List.propTypes = {
-  size: PropTypes.oneOf([ 'small', 'default', 'large' ]),
-  renderItem: PropTypes.func.isRequired,
+  size: PropTypes.oneOf([ 'small', 'default', 'large', 'none' ]),
+  renderItem: PropTypes.func,
   items: PropTypes.array,
   rowKey: PropTypes.oneOfType([ PropTypes.func, PropTypes.string ]),
-  component: PropTypes.string,
+  component: PropTypes.oneOf([ 'ol', 'ul' ]),
   bordered: PropTypes.bool,
   emptyMessage: PropTypes.message,
   emptyMessageValues: PropTypes.object,
+  header: PropTypes.node,
+  listClassName: PropTypes.string,
+  footer: PropTypes.node,
 }
 
 List.defaultProps = {
@@ -115,6 +156,9 @@ List.defaultProps = {
   bordered: false,
   emptyMessage: sharedMessages.noMatch,
   emptyMessageValues: {},
+  header: null,
+  renderItem: () => null,
+  footer: null,
 }
 
 List.Item = ListItem

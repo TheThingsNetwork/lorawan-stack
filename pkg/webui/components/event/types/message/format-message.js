@@ -12,41 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.wrapper
-  height: 100%
-  width: 100%
+import { getEventDataType } from '..'
 
-.list
-  padding: 0
+const formatMessageData = function (data) {
+  if (!data) {
+    return null
+  }
 
-  &-bordered
-    border-normal()
-    border-radius: $br.s
+  const { '@type': t, ...rest } = data
+  const type = getEventDataType(t)
 
-  &-empty
-    display: flex
-    justify-content: center
-    align-items: center
-    color: $tc-subtle-gray
+  switch (type) {
+  case 'UplinkMessage':
+  case 'DownlinkMessage':
+  case 'ApplicationUp':
+    return rest
+  default:
+    return null
+  }
+}
 
-ul.list,
-ol.list
-  list-style: none
-  margin: 0
-
-.header
-  border-normal('bottom')
-
-.footer
-  border-normal('top')
-
-.item,
-.header
-  &-small
-    padding: $cs.xxs $cs.xs
-
-  &-default
-    padding: $cs.xs $cs.s
-
-  &-large
-    padding: $cs.s $cs.m
+export { formatMessageData as default }

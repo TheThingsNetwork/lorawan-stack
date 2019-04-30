@@ -13,47 +13,65 @@
 // limitations under the License.
 
 import React from 'react'
+import bind from 'autobind-decorator'
 
 import Event from '../..'
 import Message from '../../../../lib/components/message'
 import Icon from '../../../icon'
 import PropTypes from '../../../../lib/prop-types'
 import { getEntityId } from '../../../../lib/selectors/id'
+import formatMessageData from './format-message'
 
 import style from './message.styl'
 
-const MessageEvent = function (props) {
-  const { className, event, type } = props
+@bind
+class MessageEvent extends React.PureComponent {
 
-  const entityId = getEntityId(event.identifiers[0])
-  const icon = type === 'downlink' ? 'event_downlink' : 'event_uplink'
+  render () {
+    const {
+      className,
+      event,
+      type,
+      widget,
+      overviewClassName,
+      expandedClassName,
+    } = this.props
 
-  const eventContent = (
-    <Message content={{ id: `event:${event.name}` }} />
-  )
-  const eventIcon = (
-    <Icon icon={icon} className={style.messageIcon} />
-  )
+    const entityId = getEntityId(event.identifiers[0])
+    const icon = type === 'downlink' ? 'event_downlink' : 'event_uplink'
+    const data = formatMessageData(event.data)
 
-  return (
-    <Event
-      className={className}
-      icon={eventIcon}
-      time={event.time}
-      emitter={entityId}
-      content={eventContent}
-    />
-  )
+    const eventContent = (
+      <Message content={{ id: `event:${event.name}` }} />
+    )
+    const eventIcon = (
+      <Icon icon={icon} className={style.messageIcon} />
+    )
+
+    return (
+      <Event
+        className={className}
+        overviewClassName={overviewClassName}
+        expandedClassName={expandedClassName}
+        icon={eventIcon}
+        time={event.time}
+        emitter={entityId}
+        content={eventContent}
+        data={data}
+        widget={widget}
+      />
+    )
+  }
 }
 
 MessageEvent.propTypes = {
-  event: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    time: PropTypes.string.isRequired,
-    identifiers: PropTypes.array.isRequired,
-    data: PropTypes.object,
-  }).isRequired,
+  event: PropTypes.event.isRequired,
   type: PropTypes.oneOf([ 'downlink', 'uplink' ]),
+  widget: PropTypes.bool,
+}
+
+MessageEvent.defaultProps = {
+  widget: false,
 }
 
 export default MessageEvent

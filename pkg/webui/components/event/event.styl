@@ -12,32 +12,42 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.event
+.expandable
+  cursor: pointer
+
+.overview
+  position: relative
+  display: flex
+  align-items: center
+  justify-content: flex-start
   font-family: $font-family-mono
   font-size: $fs.s
-
-  &-header
-    display: flex
-    align-items: center
-    flex-wrap: nowrap
 
   &-icon
     nudge('up', 1px)
     margin-right: $cs.xs
     font-size: 1.1rem
 
-    &-default
+    &-default,
+    &-expand
       color: $c-icon-fill
+
+    &-expand
+      right: 0
+      top: 50%
+      transform: translateY(-50%)
+      position: absolute
 
   &-time
     color: $tc-subtle-gray
-    margin-right: $cs.s
+    padding-right: $cs.s
 
   &-emitter
-    min-width: 4rem
+    flex-basis: 20%
+    min-width: 7rem
+    text-overflow: ellipsis
     white-space: nowrap
     overflow: hidden
-    text-overflow: ellipsis
     margin-right: $cs.s
 
   &-content

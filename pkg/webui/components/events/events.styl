@@ -1,0 +1,83 @@
+// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+.header,
+.footer
+  padding: $cs.xs $cs.s
+
+.header
+  position: relative
+  display: flex
+  align-items: center
+  justify-content: space-between
+
+  &-columns
+    width: 100%
+    display: flex
+    align-items: center
+    justify-content: flex-start
+    font-weight: 600
+
+    &-time
+      margin-left: 1.6rem
+
+    &-id
+      flex-basis: 20%
+      min-width: 7rem
+      margin-left: 2.8rem
+      margin-right: $cs.s
+
+  &-actions
+    position: absolute
+    right: 0
+
+.footer
+  display: flex
+  justify-content: center
+  align-items: center
+  font-size: $fs.s
+  color: $tc-subtle-gray
+
+  &-truncated
+    color: $c-warning
+
+    &-text
+      margin-left: $cs.xxs
+
+.list
+  min-height: 500px
+  height: 70vh
+  overflow-y: scroll
+
+  &-item
+    transition: background-color $ad.s linear
+
+    &:hover
+      background-color: $c-backdrop
+
+.event,
+.event-data
+  padding: $cs.xs $cs.s
+
++media-query($bp.xs)
+  .header
+    flex-direction: column
+
+    &-actions
+      position: static
+      order: 1
+      align-self: flex-end
+
+    &-columns
+      order: 2

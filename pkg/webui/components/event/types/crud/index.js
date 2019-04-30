@@ -24,47 +24,59 @@ import { getEventActionByName } from '..'
 
 import style from './crud.styl'
 
-const CRUDEvent = function (props) {
-  const { className, event } = props
+class CRUDEvent extends React.PureComponent {
 
-  const entityId = getEntityId(event.identifiers[0])
-  const eventAction = getEventActionByName(event.name)
+  render () {
+    const {
+      className,
+      event,
+      widget,
+      overviewClassName,
+      expandedClassName,
+    } = this.props
 
-  let icon = null
+    const entityId = getEntityId(event.identifiers[0])
+    const eventAction = getEventActionByName(event.name)
 
-  if (eventAction === 'create') {
-    icon = <Icon icon="event_create" className={style.create} />
-  } else if (eventAction === 'delete') {
-    icon = <Icon icon="event_delete" className={style.delete} />
-  } else if (eventAction === 'update') {
-    icon = <Icon icon="event_update" />
-  } else {
-    warn(`Unknown event name: ${event.name}`)
-    icon = <Icon icon="event" />
+    let icon = null
+
+    if (eventAction === 'create') {
+      icon = <Icon icon="event_create" className={style.create} />
+    } else if (eventAction === 'delete') {
+      icon = <Icon icon="event_delete" className={style.delete} />
+    } else if (eventAction === 'update') {
+      icon = <Icon icon="event_update" />
+    } else {
+      warn(`Unknown event name: ${event.name}`)
+      icon = <Icon icon="event" />
+    }
+
+    const content = (
+      <Message content={{ id: `event:${event.name}` }} />
+    )
+
+    return (
+      <Event
+        className={className}
+        overviewClassName={overviewClassName}
+        expandedClassName={expandedClassName}
+        icon={icon}
+        time={event.time}
+        emitter={entityId}
+        content={content}
+        widget={widget}
+      />
+    )
   }
-
-  const content = (
-    <Message content={{ id: `event:${event.name}` }} />
-  )
-
-  return (
-    <Event
-      className={className}
-      icon={icon}
-      time={event.time}
-      emitter={entityId}
-      content={content}
-    />
-  )
 }
 
 CRUDEvent.propTypes = {
-  event: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    time: PropTypes.string.isRequired,
-    identifiers: PropTypes.array.isRequired,
-    data: PropTypes.object,
-  }).isRequired,
+  event: PropTypes.event.isRequired,
+  widget: PropTypes.bool,
+}
+
+CRUDEvent.defaultProps = {
+  widget: false,
 }
 
 export default CRUDEvent
