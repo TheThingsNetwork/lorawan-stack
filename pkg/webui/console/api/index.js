@@ -107,4 +107,8 @@ export default {
   rights: {
     applications: ttnClient.Applications.getRightsById.bind(ttnClient.Applications),
   },
+  configuration: {
+    listNsFrequencyPlans: ttnClient.Configuration.listNsFrequencyPlans.bind(ttnClient.Configuration),
+    listGsFrequencyPlans: ttnClient.Configuration.listGsFrequencyPlans.bind(ttnClient.Configuration),
+  },
 }
