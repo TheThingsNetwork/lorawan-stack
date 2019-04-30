@@ -202,7 +202,7 @@ const readMessages = async function () {
 }
 
 /**
- * Read and parse (and marshal) the backend messages, coming from `./mage go.messages`
+ * Read and parse (and marshal) the backend messages, coming from `./mage go:messages`
  *
  * @returns {Object} - The backend messages, keyed by message id.
  */
