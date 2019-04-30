@@ -87,6 +87,11 @@ func TestTypes(t *testing.T) {
 			a.So(err, should.BeNil)
 			a.So(marshaled, should.Resemble, bytes)
 
+			// Unmarshal
+			err = sub.Unmarshal(bytes)
+			a.So(err, should.BeNil)
+			a.So(sub.String(), should.Equal, string(text))
+
 			// UnmarshalJSON
 			err = sub.UnmarshalJSON(json)
 			a.So(err, should.BeNil)
