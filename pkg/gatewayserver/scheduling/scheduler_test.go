@@ -48,15 +48,16 @@ func TestScheduleAt(t *testing.T) {
 	}
 	scheduler, err := scheduling.NewScheduler(ctx, fp, true, timeSource)
 	a.So(err, should.BeNil)
-	scheduler.SyncWithGateway(0, timeSource.Time, time.Unix(0, 0))
 
 	for i, tc := range []struct {
-		PayloadSize   int
-		Settings      ttnpb.TxSettings
-		Priority      ttnpb.TxSchedulePriority
-		MaxRTT        *time.Duration
-		ExpectedToa   time.Duration
-		ExpectedError *errors.Definition
+		SyncWithGateway bool
+		PayloadSize     int
+		Settings        ttnpb.TxSettings
+		Priority        ttnpb.TxSchedulePriority
+		MaxRTT          *time.Duration
+		AverageRTT      *time.Duration
+		ExpectedToa     time.Duration
+		ExpectedError   *errors.Definition
 	}{
 		{
 			PayloadSize: 10,
@@ -79,7 +80,8 @@ func TestScheduleAt(t *testing.T) {
 			ExpectedError: &scheduling.ErrTooLate,
 		},
 		{
-			PayloadSize: 51,
+			SyncWithGateway: true,
+			PayloadSize:     51,
 			Settings: ttnpb.TxSettings{
 				DataRate: ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_LoRa{
@@ -120,7 +122,8 @@ func TestScheduleAt(t *testing.T) {
 			ExpectedError: &scheduling.ErrTooLate,
 		},
 		{
-			PayloadSize: 51,
+			SyncWithGateway: true,
+			PayloadSize:     51,
 			Settings: ttnpb.TxSettings{
 				DataRate: ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_LoRa{
@@ -259,6 +262,11 @@ func TestScheduleAt(t *testing.T) {
 	} {
 		tcok := t.Run(strconv.Itoa(i), func(t *testing.T) {
 			a := assertions.New(t)
+			if tc.SyncWithGateway {
+				scheduler.SyncWithGateway(0, timeSource.Time, time.Unix(0, 0))
+			} else {
+				scheduler.Sync(0, timeSource.Time)
+			}
 			d, err := toa.Compute(tc.PayloadSize, tc.Settings)
 			a.So(err, should.BeNil)
 			a.So(d, should.Equal, tc.ExpectedToa)

@@ -48,6 +48,7 @@ func (c *RolloverClock) Sync(timestamp uint32, server time.Time) {
 	c.absolute = c.TimestampTime(timestamp)
 	c.relative = timestamp
 	c.server = server
+	c.gateway = nil
 	c.synced = true
 }
 
