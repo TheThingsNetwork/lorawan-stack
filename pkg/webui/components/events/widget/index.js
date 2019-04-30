@@ -100,7 +100,7 @@ class EventsWidget extends React.PureComponent {
         </div>
         <List
           bordered
-          className={style.list}
+          listClassName={style.list}
           size="small"
           items={truncatedEvents}
           renderItem={this.renderEvent}
