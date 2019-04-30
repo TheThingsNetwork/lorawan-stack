@@ -19,5 +19,5 @@ var (
 )
 
 func init() {
-	connConcurrentUplinks = 1
+	maxUpstreamHandlers = 1
 }
