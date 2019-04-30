@@ -104,7 +104,7 @@ func Config(mgr *config.Manager) *cobra.Command {
 					}
 				}
 				if empty {
-					continue
+					val = ""
 				}
 				if useEnv {
 					fmt.Fprintf(cmd.OutOrStdout(), "%s=\"%v\"\n", flagOrEnv, val)
