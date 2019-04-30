@@ -18,7 +18,6 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"fmt"
-	"math"
 	"strconv"
 	"strings"
 
@@ -94,35 +93,6 @@ func (eui *EUI64) UnmarshalNumber(n uint64) {
 type EUI64Prefix struct {
 	EUI64  EUI64
 	Length uint8
-}
-
-// NbItems returns the number of items that this prefix encapsulates.
-func (prefix EUI64Prefix) NbItems() uint64 {
-	return uint64(math.Pow(2, float64(64-prefix.Length)))
-}
-
-// FirstEUI64Covered returns the first EUI64 covered, in the numeric order.
-func (prefix EUI64Prefix) FirstEUI64Covered() EUI64 {
-	return prefix.EUI64.Mask(prefix.Length)
-}
-
-func (prefix EUI64Prefix) firstNumericEUI64Covered() uint64 {
-	return prefix.FirstEUI64Covered().MarshalNumber()
-}
-
-func (prefix EUI64Prefix) lastNumericEUI64Covered() uint64 {
-	return prefix.firstNumericEUI64Covered() + prefix.NbItems() - 1
-}
-
-// LastEUI64Covered returns the last EUI64 covered, in the numeric order.
-func (prefix EUI64Prefix) LastEUI64Covered() EUI64 {
-	result := EUI64{}
-
-	lastEUI64Numeric := prefix.lastNumericEUI64Covered()
-	hex := fmt.Sprintf("%08X", lastEUI64Numeric)
-	result.UnmarshalText([]byte(hex))
-
-	return result
 }
 
 // IsZero returns true iff the type is zero.

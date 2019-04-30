@@ -239,28 +239,6 @@ func TestDevAddrPrefix_UnmarshalText(t *testing.T) {
 	a.So(prefix.Length, should.Equal, 7)
 }
 
-func TestDevAddrPrefix_NbItems(t *testing.T) {
-	a := assertions.New(t)
-
-	var prefix DevAddrPrefix
-
-	err := prefix.UnmarshalText([]byte("26000000/7"))
-	a.So(err, should.BeNil)
-	a.So(prefix.NbItems(), should.Equal, 33554432)
-
-	err = prefix.UnmarshalText([]byte("27000000/0"))
-	a.So(err, should.BeNil)
-	a.So(prefix.NbItems(), should.Equal, uint64(4294967296))
-
-	err = prefix.UnmarshalText([]byte("27000000/32"))
-	a.So(err, should.BeNil)
-	a.So(prefix.NbItems(), should.Equal, 1)
-
-	err = prefix.UnmarshalText([]byte("01000000/7"))
-	a.So(err, should.BeNil)
-	a.So(prefix.NbItems(), should.Equal, 33554432)
-}
-
 func TestDevAddr_number(t *testing.T) {
 	a := assertions.New(t)
 
@@ -281,49 +259,4 @@ func TestDevAddr_number(t *testing.T) {
 	var addr4 DevAddr
 	addr4.UnmarshalNumber(637534208)
 	a.So(addr4, should.Equal, addr1)
-}
-
-func TestDevAddrPrefix_numbers(t *testing.T) {
-	a := assertions.New(t)
-
-	var prefix1 DevAddrPrefix
-	err := prefix1.UnmarshalText([]byte("26000000/7"))
-	a.So(err, should.BeNil)
-	a.So(prefix1.firstNumericDevAddrCovered(), should.Equal, 637534208)
-	a.So(prefix1.FirstDevAddrCovered(), should.Equal, DevAddr{0x26, 0x00, 0x00, 0x00})
-	a.So(prefix1.LastDevAddrCovered(), should.Equal, DevAddr{0x27, 0xff, 0xff, 0xff})
-	a.So(prefix1.lastNumericDevAddrCovered(), should.Equal, 671088639)
-	a.So(prefix1.NbItems(), should.Equal, 33554432)
-
-	var prefix2 DevAddrPrefix
-	err = prefix2.UnmarshalText([]byte("27000000/7"))
-	a.So(err, should.BeNil)
-	a.So(prefix2.firstNumericDevAddrCovered(), should.Equal, 637534208)
-	a.So(prefix2.FirstDevAddrCovered(), should.Equal, DevAddr{0x26, 0x00, 0x00, 0x00})
-
-	var prefix3 DevAddrPrefix
-	err = prefix3.UnmarshalText([]byte("27000000/8"))
-	a.So(err, should.BeNil)
-	a.So(prefix3.firstNumericDevAddrCovered(), should.Equal, 654311424)
-	a.So(prefix3.FirstDevAddrCovered(), should.Equal, DevAddr{0x27, 0x00, 0x00, 0x00})
-
-	var prefix4 DevAddrPrefix
-	err = prefix4.UnmarshalText([]byte("27000000/0"))
-	a.So(err, should.BeNil)
-	a.So(prefix4.firstNumericDevAddrCovered(), should.Equal, 0)
-	a.So(prefix4.FirstDevAddrCovered(), should.Equal, DevAddr{0x00, 0x00, 0x00, 0x00})
-	a.So(prefix4.LastDevAddrCovered(), should.Equal, DevAddr{0xff, 0xff, 0xff, 0xff})
-	a.So(prefix4.lastNumericDevAddrCovered(), should.Equal, uint64(4294967295))
-	a.So(prefix4.NbItems(), should.Equal, uint64(4294967296))
-
-	var prefix5 DevAddrPrefix
-	err = prefix5.UnmarshalText([]byte("01000000/7"))
-	a.So(err, should.BeNil)
-	a.So(prefix5.firstNumericDevAddrCovered(), should.Equal, 0)
-	a.So(prefix5.FirstDevAddrCovered(), should.Equal, DevAddr{0x00, 0x00, 0x00, 0x00})
-	a.So(prefix5.LastDevAddrCovered(), should.Equal, DevAddr{0x01, 0xff, 0xff, 0xff})
-	a.So(prefix5.lastNumericDevAddrCovered(), should.Equal, 33554431)
-	a.So(prefix5.NbItems(), should.Equal, 33554432)
-
-	a.So(prefix1.firstNumericDevAddrCovered(), should.Equal, prefix2.firstNumericDevAddrCovered())
 }

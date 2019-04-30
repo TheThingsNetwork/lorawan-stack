@@ -20,7 +20,6 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"fmt"
-	"math"
 	"strconv"
 	"strings"
 )
@@ -240,35 +239,6 @@ func NewDevAddr(netID NetID, nwkAddr []byte) (addr DevAddr, err error) {
 type DevAddrPrefix struct {
 	DevAddr DevAddr
 	Length  uint8
-}
-
-// NbItems returns the number of items that this prefix encapsulates.
-func (prefix DevAddrPrefix) NbItems() uint64 {
-	return uint64(math.Pow(2, float64(32-prefix.Length)))
-}
-
-// FirstDevAddrCovered returns the first DevAddr covered, in the numeric order.
-func (prefix DevAddrPrefix) FirstDevAddrCovered() DevAddr {
-	return prefix.DevAddr.Mask(prefix.Length)
-}
-
-func (prefix DevAddrPrefix) firstNumericDevAddrCovered() uint32 {
-	return prefix.FirstDevAddrCovered().MarshalNumber()
-}
-
-func (prefix DevAddrPrefix) lastNumericDevAddrCovered() uint32 {
-	return prefix.firstNumericDevAddrCovered() + uint32(prefix.NbItems()-1)
-}
-
-// LastDevAddrCovered returns the last DevAddr covered, in the numeric order.
-func (prefix DevAddrPrefix) LastDevAddrCovered() DevAddr {
-	result := DevAddr{}
-
-	lastDevAddrNumeric := prefix.lastNumericDevAddrCovered()
-	hex := fmt.Sprintf("%08X", lastDevAddrNumeric)
-	result.UnmarshalText([]byte(hex))
-
-	return result
 }
 
 // IsZero returns true iff the type is zero.
