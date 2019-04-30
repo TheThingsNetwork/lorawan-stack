@@ -46,7 +46,7 @@ dev.stack.init: dev.databases.start
 .PHONY: git.diff
 git.diff:
 	@if [[ ! -z "`git diff`" ]]; then \
-		$(err) "Previous operations have created changes that were not recorded in the repository. Please make those changes on your local machine before pushing them to the repository:"; \
+		echo "Previous operations have created changes that were not recorded in the repository. Please make those changes on your local machine before pushing them to the repository:"; \
 		git diff; \
 		exit 1; \
 	fi
