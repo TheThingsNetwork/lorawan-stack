@@ -60,6 +60,10 @@ func (g Git) InstallHooks() error {
 	return nil
 }
 
+func init() {
+	initDeps = append(initDeps, Git.InstallHooks)
+}
+
 // UninstallHooks uninstalls git hooks.
 func (g Git) UninstallHooks() error {
 	for _, hook := range gitHooks {

@@ -58,7 +58,7 @@ before_install:
     openssl aes-256-cbc -K $encrypted_82ec1379e985_key -iv $encrypted_82ec1379e985_iv -in snapcraft.login.enc -out snapcraft.login -d
   fi
 install:
-- GO111MODULE=on go run github.com/magefile/mage -compile $MAGE
+- make init
 - |
   if [[ "$RUNTYPE" == "js" ]]; then
     $MAGE js:devDeps js:deps jsSDK:deps
@@ -76,7 +76,7 @@ before_script:
   if [[ "$RUNTYPE" == "go.test" ]]; then
     set -e
     make dev.databases.start
-    make dev.certs
+    $MAGE dev:certs
   fi
 script:
 - if [[ "$RUNTYPE" == "js" ]]; then $MAGE proto:swaggerClean proto:swagger; fi
