@@ -15,5 +15,7 @@
 .PHONY: default
 default: init
 
+SHELL = bash
+
 include .mage/mage.make
 include .make/dev.make
