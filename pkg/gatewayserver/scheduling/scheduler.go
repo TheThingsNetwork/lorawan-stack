@@ -59,6 +59,11 @@ func (systemTimeSource) Now() time.Time { return time.Now() }
 // SystemTimeSource is a TimeSource that uses the local system time.
 var SystemTimeSource = &systemTimeSource{}
 
+// RTTs provides round-trip times.
+type RTTs interface {
+	Stats() (min, max, median time.Duration, count int)
+}
+
 // NewScheduler instantiates a new Scheduler for the given frequency plan.
 // If no time source is specified, the system time is used.
 func NewScheduler(ctx context.Context, fp *frequencyplans.FrequencyPlan, enforceDutyCycle bool, timeSource TimeSource) (*Scheduler, error) {
@@ -140,13 +145,20 @@ var (
 )
 
 // ScheduleAt attempts to schedule the given Tx settings with the given priority.
-func (s *Scheduler) ScheduleAt(ctx context.Context, payloadSize int, settings ttnpb.TxSettings, priority ttnpb.TxSchedulePriority) (Emission, error) {
+// If there are round-trip times available, the maximum value will be used instead of ScheduleTimeShort.
+func (s *Scheduler) ScheduleAt(ctx context.Context, payloadSize int, settings ttnpb.TxSettings, rtts RTTs, priority ttnpb.TxSchedulePriority) (Emission, error) {
 	defer trace.StartRegion(ctx, "schedule transmission").End()
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if !s.clock.IsSynced() {
 		return Emission{}, errNoClockSync
+	}
+	minScheduleTime := ScheduleTimeShort
+	if rtts != nil {
+		if _, max, _, n := rtts.Stats(); n > 0 {
+			minScheduleTime = max + QueueDelay
+		}
 	}
 	var starts ConcentratorTime
 	now := s.clock.ServerTime(s.timeSource.Now())
@@ -159,7 +171,7 @@ func (s *Scheduler) ScheduleAt(ctx context.Context, payloadSize int, settings tt
 	} else {
 		starts = s.clock.TimestampTime(settings.Timestamp)
 	}
-	if delta := time.Duration(starts - now); delta < ScheduleTimeShort {
+	if delta := time.Duration(starts - now); delta < minScheduleTime {
 		return Emission{}, errTooLate.WithAttributes("delta", delta)
 	}
 	sb, err := s.findSubBand(settings.Frequency)
@@ -183,19 +195,26 @@ func (s *Scheduler) ScheduleAt(ctx context.Context, payloadSize int, settings tt
 }
 
 // ScheduleAnytime attempts to schedule the given Tx settings with the given priority from the time in the settings.
+// If there are round-trip times available, the maximum value will be used instead of ScheduleTimeShort.
 // This method returns the emission.
 //
 // The scheduler does not support immediate scheduling, i.e. sending a message to the gateway that should be transmitted
 // immediately. The reason for this is that this scheduler cannot determine conflicts or enforce duty-cycle when the
 // emission time is unknown. Therefore, when the time is set to Immediate, the estimated current concentrator time plus
 // ScheduleDelayLong will be used.
-func (s *Scheduler) ScheduleAnytime(ctx context.Context, payloadSize int, settings ttnpb.TxSettings, priority ttnpb.TxSchedulePriority) (Emission, error) {
+func (s *Scheduler) ScheduleAnytime(ctx context.Context, payloadSize int, settings ttnpb.TxSettings, rtts RTTs, priority ttnpb.TxSchedulePriority) (Emission, error) {
 	defer trace.StartRegion(ctx, "schedule transmission at any time").End()
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if !s.clock.IsSynced() {
 		return Emission{}, errNoClockSync
+	}
+	minScheduleTime := ScheduleTimeShort
+	if rtts != nil {
+		if _, max, _, n := rtts.Stats(); n > 0 {
+			minScheduleTime = max + QueueDelay
+		}
 	}
 	var starts ConcentratorTime
 	now := s.clock.ServerTime(s.timeSource.Now())
@@ -208,14 +227,14 @@ func (s *Scheduler) ScheduleAnytime(ctx context.Context, payloadSize int, settin
 		if !ok {
 			return Emission{}, errNoAbsoluteGatewayTime
 		}
-		if delta := ScheduleTimeShort - time.Duration(starts-now); delta > 0 {
+		if delta := minScheduleTime - time.Duration(starts-now); delta > 0 {
 			starts += ConcentratorTime(delta)
 			t := settings.Time.Add(delta)
 			settings.Time = &t
 		}
 	} else {
 		starts = s.clock.TimestampTime(settings.Timestamp)
-		if delta := ScheduleTimeShort - time.Duration(starts-now); delta > 0 {
+		if delta := minScheduleTime - time.Duration(starts-now); delta > 0 {
 			starts += ConcentratorTime(delta)
 			settings.Timestamp += uint32(delta / time.Microsecond)
 		}

@@ -45,6 +45,21 @@ func (c *mockClock) TimestampTime(timestamp uint32) scheduling.ConcentratorTime 
 	return c.t + scheduling.ConcentratorTime(time.Duration(timestamp)*time.Microsecond)
 }
 
+type mockRTTs struct {
+	Min,
+	Max,
+	Median time.Duration
+	Count int
+}
+
+func (r *mockRTTs) Stats() (min, max, median time.Duration, count int) {
+	min = r.Min
+	max = r.Max
+	median = r.Median
+	count = r.Count
+	return
+}
+
 func boolPtr(v bool) *bool                       { return &v }
 func durationPtr(d time.Duration) *time.Duration { return &d }
 func timePtr(t time.Time) *time.Time             { return &t }

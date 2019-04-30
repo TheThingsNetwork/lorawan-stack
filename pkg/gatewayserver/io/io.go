@@ -308,7 +308,7 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 				settings.CodingRate = phy.LoRaCodingRate
 				settings.Downlink.InvertPolarization = true
 			}
-			var f func(context.Context, int, ttnpb.TxSettings, ttnpb.TxSchedulePriority) (scheduling.Emission, error)
+			var f func(context.Context, int, ttnpb.TxSettings, scheduling.RTTs, ttnpb.TxSchedulePriority) (scheduling.Emission, error)
 			switch request.Class {
 			case ttnpb.CLASS_A:
 				f = c.scheduler.ScheduleAt
@@ -326,7 +326,7 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 			default:
 				panic(fmt.Sprintf("proto: unexpected class %v in oneof", request.Class))
 			}
-			em, err := f(c.ctx, len(msg.RawPayload), settings, request.Priority)
+			em, err := f(c.ctx, len(msg.RawPayload), settings, c.rtts, request.Priority)
 			if err != nil {
 				logger.WithError(err).Debug("Failed to schedule downlink in Rx window")
 				errRxDetails = append(errRxDetails, errRxWindowSchedule.WithCause(err).WithAttributes("window", i+1))
