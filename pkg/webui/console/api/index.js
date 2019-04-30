@@ -102,8 +102,7 @@ export default {
     get: ttnClient.Applications.Devices.getById.bind(ttnClient.Applications.Devices),
   },
   gateways: {
-    list: stubs.gateways.list,
-    search: stubs.gateways.search,
+    list: ttnClient.Gateways.getAll.bind(ttnClient.Gateways),
   },
   rights: {
     applications: ttnClient.Applications.getRightsById.bind(ttnClient.Applications),
