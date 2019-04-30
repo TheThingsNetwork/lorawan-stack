@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-.PHONY: default
-default: init
+docs-gen:
+	hugo -s ./doc --baseUrl https://thethingsnetwork.github.io/lorawan-stack/$(GIT_TAG)/ -d public/$(GIT_TAG)
 
-SHELL = bash
+docs-server:
+	hugo server -s ./doc
 
-include .mage/mage.make
-include .make/dev.make
-include .make/doc.make
+docs-deps:
+	git submodule update --init doc/themes/hugo-theme-techdoc
