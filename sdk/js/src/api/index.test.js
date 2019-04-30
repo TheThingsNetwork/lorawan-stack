@@ -69,7 +69,7 @@ describe('API', function () {
     api.ApplicationRegistry.Create({ routeParams: { 'collaborator.user_ids.user_id': 'test' }}, { name: 'test-name' })
 
     expect(api._connector.post).toHaveBeenCalledTimes(1)
-    expect(api._connector.post).toHaveBeenCalledWith('/users/test/applications', { name: 'test-name' })
+    expect(api._connector.post).toHaveBeenCalledWith('/users/test/applications', undefined, { name: 'test-name' })
   })
 
   test('it throws when parameters mismatch', function () {
@@ -82,6 +82,6 @@ describe('API', function () {
     api.ApplicationRegistry.List(undefined, { limit: 2, page: 1 })
 
     expect(api._connector.get).toHaveBeenCalledTimes(1)
-    expect(api._connector.get).toHaveBeenCalledWith('/applications', { limit: 2, page: 1 })
+    expect(api._connector.get).toHaveBeenCalledWith('/applications', undefined, { limit: 2, page: 1 })
   })
 })
