@@ -45,6 +45,7 @@ var defaultTaskBackoff = [...]time.Duration{
 }
 
 type task struct {
+	ctx     context.Context
 	id      string
 	fn      TaskFunc
 	restart TaskRestart
@@ -52,8 +53,9 @@ type task struct {
 }
 
 // RegisterTask registers a task, optionally with restart policy and backoff, to be started after the component started.
-func (c *Component) RegisterTask(id string, fn TaskFunc, restart TaskRestart, backoff ...time.Duration) {
+func (c *Component) RegisterTask(ctx context.Context, id string, fn TaskFunc, restart TaskRestart, backoff ...time.Duration) {
 	c.tasks = append(c.tasks, task{
+		ctx:     ctx,
 		id:      id,
 		fn:      fn,
 		restart: restart,
@@ -104,6 +106,6 @@ func (c *Component) StartTask(ctx context.Context, id string, fn TaskFunc, resta
 
 func (c *Component) startTasks() {
 	for _, t := range c.tasks {
-		c.StartTask(c.ctx, t.id, t.fn, t.restart, 0.1, t.backoff...)
+		c.StartTask(t.ctx, t.id, t.fn, t.restart, 0.1, t.backoff...)
 	}
 }

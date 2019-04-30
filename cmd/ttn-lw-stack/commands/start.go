@@ -143,7 +143,7 @@ var (
 				if err != nil {
 					return shared.ErrInitializeNetworkServer.WithCause(err)
 				}
-				ns.Component.RegisterTask("queue_downlink", nsDownlinkTasks.Run, component.TaskRestartOnFailure)
+				ns.Component.RegisterTask(ns.Context(), "queue_downlink", nsDownlinkTasks.Run, component.TaskRestartOnFailure)
 			}
 
 			if start.ApplicationServer || startDefault {

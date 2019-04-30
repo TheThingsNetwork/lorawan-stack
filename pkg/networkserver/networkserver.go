@@ -27,7 +27,9 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
+	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/unique"
@@ -109,6 +111,7 @@ type DownlinkPriorities struct {
 // The Network Server exposes the GsNs, AsNs, DeviceRegistry and ApplicationDownlinkQueue services.
 type NetworkServer struct {
 	*component.Component
+	ctx context.Context
 
 	devices DeviceRegistry
 
@@ -135,6 +138,11 @@ type NetworkServer struct {
 	handleASUplink func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, up *ttnpb.ApplicationUp) (bool, error)
 
 	defaultMACSettings ttnpb.MACSettings
+}
+
+// Context returns the context of the Network Server.
+func (ns *NetworkServer) Context() context.Context {
+	return ns.ctx
 }
 
 // Option configures the NetworkServer.
@@ -213,6 +221,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 	}
 	ns := &NetworkServer{
 		Component:               c,
+		ctx:                     log.NewContextWithField(c.Context(), "namespace", "networkserver"),
 		devices:                 conf.Devices,
 		netID:                   conf.NetID,
 		devAddrPrefixes:         devAddrPrefixes,
@@ -296,11 +305,14 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		}
 	}
 
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.GsNs", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("networkserver"))
+	hooks.RegisterStreamHook("/ttn.lorawan.v3.AsNs", rpclog.NamespaceHook, rpclog.StreamNamespaceHook("networkserver"))
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.AsNs", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("networkserver"))
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.GsNs", cluster.HookName, c.ClusterAuthUnaryHook())
 	hooks.RegisterStreamHook("/ttn.lorawan.v3.AsNs", cluster.HookName, c.ClusterAuthStreamHook())
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.AsNs", cluster.HookName, c.ClusterAuthUnaryHook())
 
-	ns.RegisterTask("process_downlink", func(ctx context.Context) error {
+	ns.RegisterTask(ns.Context(), "process_downlink", func(ctx context.Context) error {
 		for {
 			select {
 			case <-ctx.Done():

@@ -16,6 +16,7 @@
 package joinserver
 
 import (
+	"context"
 	"io"
 	"math/rand"
 	"sync"
@@ -25,7 +26,9 @@ import (
 	"github.com/oklog/ulid"
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
+	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"google.golang.org/grpc"
@@ -43,6 +46,7 @@ type Config struct {
 // The Join Server exposes the NsJs and DeviceRegistry services.
 type JoinServer struct {
 	*component.Component
+	ctx context.Context
 
 	devices DeviceRegistry
 	keys    KeyRegistry
@@ -59,10 +63,16 @@ type JoinServer struct {
 	}
 }
 
+// Context returns the context of the Join Server.
+func (js *JoinServer) Context() context.Context {
+	return js.ctx
+}
+
 // New returns new *JoinServer.
 func New(c *component.Component, conf *Config) (*JoinServer, error) {
 	js := &JoinServer{
 		Component: c,
+		ctx:       log.NewContextWithField(c.Context(), "namespace", "joinserver"),
 
 		devices: conf.Devices,
 		keys:    conf.Keys,
@@ -78,6 +88,8 @@ func New(c *component.Component, conf *Config) (*JoinServer, error) {
 	js.grpc.nsJs = nsJsServer{JS: js}
 
 	// TODO: Support authentication from non-cluster-local NS and AS (https://github.com/TheThingsNetwork/lorawan-stack/issues/4).
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.NsJs", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("joinserver"))
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.AsJs", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("joinserver"))
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.NsJs", cluster.HookName, c.ClusterAuthUnaryHook())
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.AsJs", cluster.HookName, c.ClusterAuthUnaryHook())
 
