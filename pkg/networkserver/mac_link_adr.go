@@ -77,13 +77,13 @@ func enqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, ma
 			return nil, 0, false
 		}
 		cmds := make([]*ttnpb.MACCommand, 0, len(desiredMasks))
-		for _, m := range desiredMasks {
+		for i, m := range desiredMasks {
 			pld := &ttnpb.MACCommand_LinkADRReq{
 				DataRateIndex:      dev.MACState.DesiredParameters.ADRDataRateIndex,
 				NbTrans:            dev.MACState.DesiredParameters.ADRNbTrans,
 				TxPowerIndex:       dev.MACState.DesiredParameters.ADRTxPowerIndex,
 				ChannelMaskControl: uint32(m.Cntl),
-				ChannelMask:        m.Mask[:],
+				ChannelMask:        desiredMasks[i].Mask[:],
 			}
 			cmds = append(cmds, pld.MACCommand())
 			events.Publish(evtEnqueueLinkADRRequest(ctx, dev.EndDeviceIdentifiers, pld))
