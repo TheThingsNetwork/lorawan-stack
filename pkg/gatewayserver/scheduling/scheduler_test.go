@@ -48,11 +48,11 @@ func TestScheduleAt(t *testing.T) {
 	scheduler.SyncWithGateway(0, time.Now(), time.Unix(0, 0))
 
 	for i, tc := range []struct {
-		PayloadSize    int
-		Settings       ttnpb.TxSettings
-		Priority       ttnpb.TxSchedulePriority
-		ExpectedToa    time.Duration
-		ErrorAssertion *errors.Definition
+		PayloadSize   int
+		Settings      ttnpb.TxSettings
+		Priority      ttnpb.TxSchedulePriority
+		ExpectedToa   time.Duration
+		ExpectedError *errors.Definition
 	}{
 		{
 			PayloadSize: 10,
@@ -69,10 +69,10 @@ func TestScheduleAt(t *testing.T) {
 				Frequency:  869525000,
 				Timestamp:  100,
 			},
-			ExpectedToa: 41216 * time.Microsecond,
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
+			ExpectedToa: 41216 * time.Microsecond,
 			// Too late for transmission.
-			ErrorAssertion: &scheduling.ErrTooLate,
+			ExpectedError: &scheduling.ErrTooLate,
 		},
 		{
 			PayloadSize: 51,
@@ -89,10 +89,10 @@ func TestScheduleAt(t *testing.T) {
 				Frequency:  869525000,
 				Time:       timePtr(time.Unix(0, int64(100*time.Millisecond))),
 			},
-			ExpectedToa: 2465792 * time.Microsecond,
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
+			ExpectedToa: 2465792 * time.Microsecond,
 			// Too late for transmission.
-			ErrorAssertion: &scheduling.ErrTooLate,
+			ExpectedError: &scheduling.ErrTooLate,
 		},
 		{
 			PayloadSize: 51,
@@ -109,10 +109,10 @@ func TestScheduleAt(t *testing.T) {
 				Frequency:  869525000,
 				Timestamp:  20000000,
 			},
+			Priority:    ttnpb.TxSchedulePriority_NORMAL,
 			ExpectedToa: 2465792 * time.Microsecond,
-			Priority:    ttnpb.TxSchedulePriority_NORMAL,
 			// Exceeding dwell time of 2 seconds.
-			ErrorAssertion: &scheduling.ErrDwellTime,
+			ExpectedError: &scheduling.ErrDwellTime,
 		},
 		{
 			PayloadSize: 10,
@@ -129,8 +129,8 @@ func TestScheduleAt(t *testing.T) {
 				Frequency:  869525000,
 				Timestamp:  20000000,
 			},
-			ExpectedToa: 41216 * time.Microsecond,
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
+			ExpectedToa: 41216 * time.Microsecond,
 		},
 		{
 			PayloadSize: 10,
@@ -147,10 +147,10 @@ func TestScheduleAt(t *testing.T) {
 				Frequency:  869525000,
 				Timestamp:  20000000,
 			},
-			ExpectedToa: 41216 * time.Microsecond,
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
+			ExpectedToa: 41216 * time.Microsecond,
 			// Overlapping with previous transmission.
-			ErrorAssertion: &scheduling.ErrConflict,
+			ExpectedError: &scheduling.ErrConflict,
 		},
 		{
 			PayloadSize: 10,
@@ -167,10 +167,10 @@ func TestScheduleAt(t *testing.T) {
 				Frequency:  869525000,
 				Timestamp:  20000000,
 			},
-			ExpectedToa: 41216 * time.Microsecond,
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
+			ExpectedToa: 41216 * time.Microsecond,
 			// Right after previous transmission; not respecting time-off-air.
-			ErrorAssertion: &scheduling.ErrConflict,
+			ExpectedError: &scheduling.ErrConflict,
 		},
 		{
 			PayloadSize: 10,
@@ -187,8 +187,8 @@ func TestScheduleAt(t *testing.T) {
 				Frequency:  869525000,
 				Timestamp:  20000000 + 41216 + 1000000, // time-on-air + time-off-air.
 			},
-			ExpectedToa: 41216 * time.Microsecond,
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
+			ExpectedToa: 41216 * time.Microsecond,
 		},
 		{
 			PayloadSize: 20,
@@ -205,10 +205,10 @@ func TestScheduleAt(t *testing.T) {
 				Frequency:  868100000,
 				Timestamp:  30000000, // In next duty-cycle window; discard previous.
 			},
-			ExpectedToa: 1318912 * time.Microsecond,
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
+			ExpectedToa: 1318912 * time.Microsecond,
 			// Exceeds duty-cycle limitation of 1% in 868.0 - 868.6.
-			ErrorAssertion: &scheduling.ErrDutyCycle,
+			ExpectedError: &scheduling.ErrDutyCycle,
 		},
 	} {
 		tcok := t.Run(strconv.Itoa(i), func(t *testing.T) {
@@ -217,14 +217,10 @@ func TestScheduleAt(t *testing.T) {
 			a.So(err, should.BeNil)
 			a.So(d, should.Equal, tc.ExpectedToa)
 			_, err = scheduler.ScheduleAt(ctx, tc.PayloadSize, tc.Settings, tc.Priority)
-			if err != nil && tc.ErrorAssertion == nil {
+			if tc.ExpectedError == nil {
 				a.So(err, should.BeNil)
-			} else if err != nil {
-				if !a.So(err, should.HaveSameErrorDefinitionAs, *tc.ErrorAssertion) {
-					t.Fatalf("Unexpected error: %v", err)
-				}
-			} else {
-				a.So(err, should.BeNil)
+			} else if !a.So(err, should.HaveSameErrorDefinitionAs, *tc.ExpectedError) {
+				t.Fatalf("Unexpected error: %v", err)
 			}
 		})
 		if !tcok {
