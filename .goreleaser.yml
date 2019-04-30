@@ -1,9 +1,5 @@
 project_name: lorawan-stack
 
-before:
-  hooks:
-  - make js.build
-
 builds:
   - main: ./cmd/ttn-lw-stack
     binary: ttn-lw-stack

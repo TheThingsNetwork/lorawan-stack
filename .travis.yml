@@ -115,13 +115,17 @@ after_success:
 deploy:
 - provider: script
   skip_cleanup: true
-  script: GO111MODULE=on go run github.com/goreleaser/goreleaser
+  script:
+  - $MAGE js:build
+  - GO111MODULE=on go run github.com/goreleaser/goreleaser
   on:
     tags: true
     condition: $RUNTYPE = "release"
 - provider: script
   skip_cleanup: true
-  script: GO111MODULE=on go run github.com/goreleaser/goreleaser --snapshot
+  script:
+  - $MAGE js:build
+  - GO111MODULE=on go run github.com/goreleaser/goreleaser --snapshot
   on:
     branch: master
     condition: $RUNTYPE = "release"
