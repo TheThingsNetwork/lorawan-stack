@@ -28,6 +28,8 @@ import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import SubmitBar from '../../../components/submit-bar'
 
+import { getNsFrequencyPlans } from '../../store/actions/configuration'
+
 import api from '../../api'
 
 import sharedMessages from '../../../lib/shared-messages'
@@ -46,7 +48,12 @@ import style from './device-add.styl'
     />
   )
 })
-@connect()
+@connect(function ({ configuration }, props) {
+  return {
+    nsFrequencyPlans: configuration.nsFrequencyPlans,
+    frequencyPlanError: configuration.error,
+  }
+})
 @bind
 export default class DeviceAdd extends Component {
   state = {
@@ -56,14 +63,18 @@ export default class DeviceAdd extends Component {
     resets_f_cnt: false,
   }
 
+  async componentDidMount () {
+    const { dispatch, nsFrequencyPlans } = this.props
+    if (!nsFrequencyPlans) {
+      // Retrieve only when not already in state
+      dispatch(getNsFrequencyPlans())
+    }
+  }
+
   async handleSubmit (values, { setSubmitting, resetForm }) {
     const { match, dispatch } = this.props
     const { appId } = match.params
-
-    const device = {
-      ...values,
-      frequency_plan_id: 'EU_863_870',
-    }
+    const device = Object.assign({}, values)
 
     // Clean values based on activation mode
     if (device.activation_mode === 'otaa') {
@@ -228,6 +239,11 @@ export default class DeviceAdd extends Component {
 
   render () {
     const { error, otaa } = this.state
+    const { nsFrequencyPlans, frequencyPlanError } = this.props
+    let frequencyPlanOptions = []
+    if (nsFrequencyPlans && !frequencyPlanError) {
+      frequencyPlanOptions = nsFrequencyPlans.map(e => ({ value: e.id, label: e.name }))
+    }
 
     return (
       <Container>
@@ -253,6 +269,7 @@ export default class DeviceAdd extends Component {
                   activation_mode: 'otaa',
                   lorawan_version: undefined,
                   lorawan_phy_version: undefined,
+                  frequency_plan_id: undefined,
                   resets_join_nonces: false,
                   root_keys: {},
                   session: {},
@@ -320,6 +337,14 @@ export default class DeviceAdd extends Component {
                   { value: 'PHY_V1_1_REV_A', label: 'PHY V1.1 REV A' },
                   { value: 'PHY_V1_1_REV_B', label: 'PHY V1.1 REV B' },
                 ]}
+              />
+              <Field
+                title={sharedMessages.frequencyPlan}
+                name="frequency_plan_id"
+                type="select"
+                required
+                options={frequencyPlanOptions}
+                warning={Boolean(frequencyPlanError) ? m.couldNotRetrieveFrequencyPlans : undefined}
               />
               <Field
                 title={m.supportsClassC}

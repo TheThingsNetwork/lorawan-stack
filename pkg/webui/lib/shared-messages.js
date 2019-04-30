@@ -54,6 +54,7 @@ export default defineMessages({
   edit: 'Edit',
   email: 'Email',
   entityId: 'Entity ID',
+  frequencyPlan: 'Frequency Plan',
   fwdNtwkKey: 'FNwkSIntKey',
   gateways: 'Gateways',
   general: 'General',

@@ -71,6 +71,7 @@ export default Yup.object().shape({
     .max(2000, sharedMessages.validateTooLong),
   lorawan_version: Yup.string().required(sharedMessages.validateRequired),
   lorawan_phy_version: Yup.string().required(sharedMessages.validateRequired),
+  frequency_plan_id: Yup.string().required(sharedMessages.validateRequired),
   supports_class_c: Yup.boolean(),
   activation_mode: Yup.string().required(),
   supports_join_nonces: Yup.boolean(),
