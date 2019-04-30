@@ -2691,7 +2691,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					"pending_mac_state.queued_join_accept",
 					"pending_mac_state.rx_windows_available",
 					"pending_session.dev_addr",
-					"pending_session.session_keys",
+					"pending_session.keys",
 					"recent_downlinks",
 				})
 				if !a.So(ret, should.NotBeNil) || !a.So(ret.RecentDownlinks, should.HaveLength, 1) {
