@@ -28,11 +28,10 @@ If you are unfamiliar with forking projects on GitHub or cloning them locally, p
 
 ### Getting started
 
-As most of the tasks will be managed by `make` and `mage` we will first initialize the tooling. You might want to run this commands from time to time:
+As most of the tasks will be managed by `make` and `mage` we will first initialize the tooling. You may want to run this commands from time to time:
 
 ```sh
 make init
-make deps
 ```
 
 For convenience, you can initialize the development databases with some defaults.
@@ -73,7 +72,7 @@ You can use `make dev.databases.redis-cli` to enter a Redis-CLI shell.
 ### Testing
 
 ```sh
-make test
+./mage go:test js:test jsSDK:test
 ```
 
 ### Building
@@ -82,22 +81,18 @@ There is a single binary for the server, `ttn-lw-stack`, as well as a binary for
 
 We provide binary releases for all supported platforms, including packages for various package managers at https://github.com/TheThingsNetwork/lorawan-stack/releases. We suggest you use the compiled packages we provide in production scenarios.
 
-For development/testing purposes we suggest either running required binaries via `go run` (e.g. `go run ./cmd/ttn-lw-cli` from repository root for CLI), or using `go build` directly. Note, that frontend (if used) needs to be built manually via `make js.build` before `go build` or `go run` commands are run.
+For development/testing purposes we suggest either running required binaries via `go run` (e.g. `go run ./cmd/ttn-lw-cli` from repository root for CLI), or using `go build` directly. Note, that the frontend (if used) needs to be built via `./mage js:build` before `go build` or `go run` commands are run.
 
-If you must, you can build all arifacts with the following command:
+### Releasing
 
-```
-make clean build-all
-```
+If you want, you can build a release snapshot with `./mage buildSnapshot`.
 
 >Note: You will at least need to have [`rpm`](http://rpm5.org/) and [`snapcraft`](https://snapcraft.io/) in your `PATH`.
 
-This will compile the front-end in `public`, the binaries for all supported platforms, `deb`, `rpm` and Snapcraft packages, release archives in `dist`,  as well as Docker images.
+This will compile binaries for all supported platforms, `deb`, `rpm` and Snapcraft packages, release archives in `dist`, as well as Docker images.
 
 >Note: The operating system and architecture represent the name of the directory in `dist` in which the binaries are placed.
 >For example, the binaries for Darwin x64 (macOS) will be located at `dist/darwin_amd64`.
-
-### Releasing
 
 Releasing a new version consists of the following steps:
 
@@ -143,7 +138,7 @@ From the `.proto` files, we generate code using the `protoc` compiler. As we pla
 The actual commands for compilation are handled by our Makefile, so the only thing you have to execute, is:
 
 ```sh
-make proto.clean proto.all
+./mage proto:clean proto:all
 ```
 
 #### Folder Structure
