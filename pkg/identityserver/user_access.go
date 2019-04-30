@@ -29,9 +29,9 @@ import (
 )
 
 var (
-	evtCreateUserAPIKey = events.Define("user.api-key.create", "Create user API key")
-	evtUpdateUserAPIKey = events.Define("user.api-key.update", "Update user API key")
-	evtDeleteUserAPIKey = events.Define("user.api-key.delete", "Delete user API key")
+	evtCreateUserAPIKey = events.Define("user.api-key.create", "create user API key")
+	evtUpdateUserAPIKey = events.Define("user.api-key.update", "update user API key")
+	evtDeleteUserAPIKey = events.Define("user.api-key.delete", "delete user API key")
 )
 
 func (is *IdentityServer) listUserRights(ctx context.Context, ids *ttnpb.UserIdentifiers) (*ttnpb.Rights, error) {

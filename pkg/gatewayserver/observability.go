@@ -25,8 +25,8 @@ import (
 )
 
 var (
-	evtGatewayConnect    = events.Define("gs.gateway.connect", "gateway connect")
-	evtGatewayDisconnect = events.Define("gs.gateway.disconnect", "gateway disconnect")
+	evtGatewayConnect    = events.Define("gs.gateway.connect", "connect gateway")
+	evtGatewayDisconnect = events.Define("gs.gateway.disconnect", "disconnect gateway")
 
 	evtReceiveStatus = events.Define("gs.status.receive", "receive gateway status")
 
@@ -35,8 +35,8 @@ var (
 	evtForwardUp = events.Define("gs.up.forward", "forward uplink message")
 
 	evtSendDown      = events.Define("gs.down.send", "send downlink message")
-	evtTxSuccessDown = events.Define("gs.down.tx.success", "downlink message transmit success")
-	evtTxFailureDown = events.Define("gs.down.tx.fail", "downlink message transmit fail")
+	evtTxSuccessDown = events.Define("gs.down.tx.success", "transmit downlink message successful")
+	evtTxFailureDown = events.Define("gs.down.tx.fail", "transmit downlink message failure")
 )
 
 const (

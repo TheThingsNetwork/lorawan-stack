@@ -38,11 +38,11 @@ import (
 )
 
 var (
-	evtCreateUser = events.Define("user.create", "Create user")
-	evtUpdateUser = events.Define("user.update", "Update user")
-	evtDeleteUser = events.Define("user.delete", "Delete user")
+	evtCreateUser = events.Define("user.create", "create user")
+	evtUpdateUser = events.Define("user.update", "update user")
+	evtDeleteUser = events.Define("user.delete", "delete user")
 
-	evtUpdateUserIncorrectPassword = events.Define("user.update.incorrect_password", "Incorrect password for user update")
+	evtUpdateUserIncorrectPassword = events.Define("user.update.incorrect_password", "update user failure: incorrect password")
 )
 
 var (

@@ -26,17 +26,17 @@ import (
 )
 
 var (
-	evtLinkStart = events.Define("as.link.start", "link start")
-	evtLinkStop  = events.Define("as.link.stop", "link stop")
-	evtLinkFail  = events.Define("as.link.fail", "link fail")
+	evtLinkStart = events.Define("as.link.start", "start link")
+	evtLinkStop  = events.Define("as.link.stop", "stop link")
+	evtLinkFail  = events.Define("as.link.fail", "fail link")
 
-	evtApplicationSubscribe   = events.Define("as.application.subscribe", "application subscribe")
-	evtApplicationUnsubscribe = events.Define("as.application.unsubscribe", "application unsubscribe")
+	evtApplicationSubscribe   = events.Define("as.application.subscribe", "subscribe application")
+	evtApplicationUnsubscribe = events.Define("as.application.unsubscribe", "unsubscribe application")
 
 	evtReceiveDataUp    = events.Define("as.up.data.receive", "receive uplink data message")
 	evtDropDataUp       = events.Define("as.up.data.drop", "drop uplink data message")
 	evtForwardDataUp    = events.Define("as.up.data.forward", "forward uplink data message")
-	evtDecodeFailDataUp = events.Define("as.up.data.decode.fail", "decode uplink data message fail")
+	evtDecodeFailDataUp = events.Define("as.up.data.decode.fail", "decode uplink data message failure")
 
 	evtReceiveJoinAccept = events.Define("as.up.join.receive", "receive join-accept message")
 	evtDropJoinAccept    = events.Define("as.up.join.drop", "drop join-accept message")
@@ -45,7 +45,7 @@ var (
 	evtReceiveDataDown      = events.Define("as.down.data.receive", "receive downlink data message")
 	evtDropDataDown         = events.Define("as.down.data.drop", "drop downlink data message")
 	evtForwardDataDown      = events.Define("as.down.data.forward", "forward downlink data message")
-	evtLostQueueDataDown    = events.Define("as.down.data.queue.lost", "lost downlink data queue")
+	evtLostQueueDataDown    = events.Define("as.down.data.queue.lost", "lose downlink data queue")
 	evtInvalidQueueDataDown = events.Define("as.down.data.queue.invalid", "invalid downlink data queue")
 )
 

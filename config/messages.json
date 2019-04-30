@@ -4960,7 +4960,7 @@
   },
   "event:application.api-key.create": {
     "translations": {
-      "en": "Create application API key"
+      "en": "create application API key"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -4969,7 +4969,7 @@
   },
   "event:application.api-key.delete": {
     "translations": {
-      "en": "Delete application API key"
+      "en": "delete application API key"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -4978,7 +4978,7 @@
   },
   "event:application.api-key.update": {
     "translations": {
-      "en": "Update application API key"
+      "en": "update application API key"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -4987,7 +4987,7 @@
   },
   "event:application.collaborator.delete": {
     "translations": {
-      "en": "Delete application collaborator"
+      "en": "delete application collaborator"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -4996,7 +4996,7 @@
   },
   "event:application.collaborator.update": {
     "translations": {
-      "en": "Update application collaborator"
+      "en": "update application collaborator"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -5005,7 +5005,7 @@
   },
   "event:application.create": {
     "translations": {
-      "en": "Create application"
+      "en": "create application"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -5014,7 +5014,7 @@
   },
   "event:application.delete": {
     "translations": {
-      "en": "Delete application"
+      "en": "delete application"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -5023,7 +5023,7 @@
   },
   "event:application.update": {
     "translations": {
-      "en": "Update application"
+      "en": "update application"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -5032,7 +5032,7 @@
   },
   "event:as.application.subscribe": {
     "translations": {
-      "en": "application subscribe"
+      "en": "subscribe application"
     },
     "description": {
       "package": "pkg/applicationserver",
@@ -5041,7 +5041,7 @@
   },
   "event:as.application.unsubscribe": {
     "translations": {
-      "en": "application unsubscribe"
+      "en": "unsubscribe application"
     },
     "description": {
       "package": "pkg/applicationserver",
@@ -5077,7 +5077,7 @@
   },
   "event:as.down.data.queue.lost": {
     "translations": {
-      "en": "lost downlink data queue"
+      "en": "lose downlink data queue"
     },
     "description": {
       "package": "pkg/applicationserver",
@@ -5095,7 +5095,7 @@
   },
   "event:as.link.fail": {
     "translations": {
-      "en": "link fail"
+      "en": "fail link"
     },
     "description": {
       "package": "pkg/applicationserver",
@@ -5104,7 +5104,7 @@
   },
   "event:as.link.start": {
     "translations": {
-      "en": "link start"
+      "en": "start link"
     },
     "description": {
       "package": "pkg/applicationserver",
@@ -5113,7 +5113,7 @@
   },
   "event:as.link.stop": {
     "translations": {
-      "en": "link stop"
+      "en": "stop link"
     },
     "description": {
       "package": "pkg/applicationserver",
@@ -5122,7 +5122,7 @@
   },
   "event:as.up.data.decode.fail": {
     "translations": {
-      "en": "decode uplink data message fail"
+      "en": "decode uplink data message failure"
     },
     "description": {
       "package": "pkg/applicationserver",
@@ -5185,7 +5185,7 @@
   },
   "event:client.collaborator.delete": {
     "translations": {
-      "en": "Delete client collaborator"
+      "en": "delete client collaborator"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -5194,7 +5194,7 @@
   },
   "event:client.collaborator.update": {
     "translations": {
-      "en": "Update client collaborator"
+      "en": "update client collaborator"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -5203,7 +5203,7 @@
   },
   "event:client.create": {
     "translations": {
-      "en": "Create OAuth client"
+      "en": "create OAuth client"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -5212,7 +5212,7 @@
   },
   "event:client.delete": {
     "translations": {
-      "en": "Delete OAuth client"
+      "en": "delete OAuth client"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -5221,7 +5221,7 @@
   },
   "event:client.update": {
     "translations": {
-      "en": "Update OAuth client"
+      "en": "update OAuth client"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -5230,7 +5230,7 @@
   },
   "event:end_device.create": {
     "translations": {
-      "en": "Create end device"
+      "en": "create end device"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -5239,7 +5239,7 @@
   },
   "event:end_device.delete": {
     "translations": {
-      "en": "Delete end device"
+      "en": "delete end device"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -5248,7 +5248,7 @@
   },
   "event:end_device.update": {
     "translations": {
-      "en": "Update end device"
+      "en": "update end device"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -5257,7 +5257,7 @@
   },
   "event:events.stream.start": {
     "translations": {
-      "en": "event stream start"
+      "en": "start event stream"
     },
     "description": {
       "package": "pkg/events/grpc",
@@ -5266,7 +5266,7 @@
   },
   "event:events.stream.stop": {
     "translations": {
-      "en": "event stream stop"
+      "en": "stop event stream"
     },
     "description": {
       "package": "pkg/events/grpc",
@@ -5275,7 +5275,7 @@
   },
   "event:gateway.api-key.create": {
     "translations": {
-      "en": "Create gateway API key"
+      "en": "create gateway API key"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -5284,7 +5284,7 @@
   },
   "event:gateway.api-key.delete": {
     "translations": {
-      "en": "Delete gateway API key"
+      "en": "delete gateway API key"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -5293,7 +5293,7 @@
   },
   "event:gateway.api-key.update": {
     "translations": {
-      "en": "Update gateway API key"
+      "en": "update gateway API key"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -5302,7 +5302,7 @@
   },
   "event:gateway.collaborator.delete": {
     "translations": {
-      "en": "Delete gateway collaborator"
+      "en": "delete gateway collaborator"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -5311,7 +5311,7 @@
   },
   "event:gateway.collaborator.update": {
     "translations": {
-      "en": "Update gateway collaborator"
+      "en": "update gateway collaborator"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -5320,7 +5320,7 @@
   },
   "event:gateway.create": {
     "translations": {
-      "en": "Create gateway"
+      "en": "create gateway"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -5329,7 +5329,7 @@
   },
   "event:gateway.delete": {
     "translations": {
-      "en": "Delete gateway"
+      "en": "delete gateway"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -5338,7 +5338,7 @@
   },
   "event:gateway.update": {
     "translations": {
-      "en": "Update gateway"
+      "en": "update gateway"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -5356,7 +5356,7 @@
   },
   "event:gs.down.tx.fail": {
     "translations": {
-      "en": "downlink message transmit fail"
+      "en": "transmit downlink message failure"
     },
     "description": {
       "package": "pkg/gatewayserver",
@@ -5365,7 +5365,7 @@
   },
   "event:gs.down.tx.success": {
     "translations": {
-      "en": "downlink message transmit success"
+      "en": "transmit downlink message successful"
     },
     "description": {
       "package": "pkg/gatewayserver",
@@ -5374,7 +5374,7 @@
   },
   "event:gs.gateway.connect": {
     "translations": {
-      "en": "gateway connect"
+      "en": "connect gateway"
     },
     "description": {
       "package": "pkg/gatewayserver",
@@ -5383,7 +5383,7 @@
   },
   "event:gs.gateway.disconnect": {
     "translations": {
-      "en": "gateway disconnect"
+      "en": "disconnect gateway"
     },
     "description": {
       "package": "pkg/gatewayserver",
@@ -5428,7 +5428,7 @@
   },
   "event:invitation.create": {
     "translations": {
-      "en": "Create invitation"
+      "en": "create invitation"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -5959,7 +5959,7 @@
   },
   "event:oauth.user.login": {
     "translations": {
-      "en": "successful user login"
+      "en": "login user successful"
     },
     "description": {
       "package": "pkg/oauth",
@@ -5968,7 +5968,7 @@
   },
   "event:oauth.user.login_failed": {
     "translations": {
-      "en": "failed user login"
+      "en": "login user failure"
     },
     "description": {
       "package": "pkg/oauth",
@@ -5977,7 +5977,7 @@
   },
   "event:oauth.user.logout": {
     "translations": {
-      "en": "user logout"
+      "en": "logout user"
     },
     "description": {
       "package": "pkg/oauth",
@@ -5986,7 +5986,7 @@
   },
   "event:organization.api-key.create": {
     "translations": {
-      "en": "Create organization API key"
+      "en": "create organization API key"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -5995,7 +5995,7 @@
   },
   "event:organization.api-key.delete": {
     "translations": {
-      "en": "Delete organization API key"
+      "en": "delete organization API key"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -6004,7 +6004,7 @@
   },
   "event:organization.api-key.update": {
     "translations": {
-      "en": "Update organization API key"
+      "en": "update organization API key"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -6013,7 +6013,7 @@
   },
   "event:organization.collaborator.delete": {
     "translations": {
-      "en": "Delete organization collaborator"
+      "en": "delete organization collaborator"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -6022,7 +6022,7 @@
   },
   "event:organization.collaborator.update": {
     "translations": {
-      "en": "Update organization collaborator"
+      "en": "update organization collaborator"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -6031,7 +6031,7 @@
   },
   "event:organization.create": {
     "translations": {
-      "en": "Create organization"
+      "en": "create organization"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -6040,7 +6040,7 @@
   },
   "event:organization.delete": {
     "translations": {
-      "en": "Delete organization"
+      "en": "delete organization"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -6049,7 +6049,7 @@
   },
   "event:organization.update": {
     "translations": {
-      "en": "Update organization"
+      "en": "update organization"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -6058,7 +6058,7 @@
   },
   "event:user.api-key.create": {
     "translations": {
-      "en": "Create user API key"
+      "en": "create user API key"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -6067,7 +6067,7 @@
   },
   "event:user.api-key.delete": {
     "translations": {
-      "en": "Delete user API key"
+      "en": "delete user API key"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -6076,7 +6076,7 @@
   },
   "event:user.api-key.update": {
     "translations": {
-      "en": "Update user API key"
+      "en": "update user API key"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -6085,7 +6085,7 @@
   },
   "event:user.create": {
     "translations": {
-      "en": "Create user"
+      "en": "create user"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -6094,7 +6094,7 @@
   },
   "event:user.delete": {
     "translations": {
-      "en": "Delete user"
+      "en": "delete user"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -6103,7 +6103,7 @@
   },
   "event:user.update": {
     "translations": {
-      "en": "Update user"
+      "en": "update user"
     },
     "description": {
       "package": "pkg/identityserver",
@@ -6112,7 +6112,7 @@
   },
   "event:user.update.incorrect_password": {
     "translations": {
-      "en": "Incorrect password for user update"
+      "en": "update user failure: incorrect password"
     },
     "description": {
       "package": "pkg/identityserver",
