@@ -15,7 +15,6 @@
 package types
 
 import (
-	"database/sql/driver"
 	"encoding/hex"
 	"strings"
 )
@@ -72,18 +71,4 @@ func (dn DevNonce) MarshalText() ([]byte, error) { return marshalTextBytes(dn[:]
 func (dn *DevNonce) UnmarshalText(data []byte) error {
 	*dn = [2]byte{}
 	return unmarshalTextBytes(dn[:], data)
-}
-
-// Value implements driver.Valuer interface.
-func (dn DevNonce) Value() (driver.Value, error) {
-	return dn.MarshalText()
-}
-
-// Scan implements sql.Scanner interface.
-func (dn *DevNonce) Scan(src interface{}) error {
-	data, ok := src.([]byte)
-	if !ok {
-		return errScanArgumentType
-	}
-	return dn.UnmarshalText(data)
 }

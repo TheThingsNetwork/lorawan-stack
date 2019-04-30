@@ -15,11 +15,9 @@
 package types
 
 import (
-	"database/sql/driver"
 	"encoding/binary"
 	"encoding/hex"
 	"fmt"
-	"math"
 	"strconv"
 	"strings"
 
@@ -80,20 +78,6 @@ func (eui *EUI64) UnmarshalText(data []byte) error {
 	return unmarshalTextBytes(eui[:], data)
 }
 
-// Value implements driver.Valuer interface.
-func (eui EUI64) Value() (driver.Value, error) {
-	return eui.MarshalText()
-}
-
-// Scan implements sql.Scanner interface.
-func (eui *EUI64) Scan(src interface{}) error {
-	data, ok := src.([]byte)
-	if !ok {
-		return errScanArgumentType
-	}
-	return eui.UnmarshalText(data)
-}
-
 // MarshalNumber returns the EUI64 in a decimal form.
 func (eui EUI64) MarshalNumber() uint64 {
 	return binary.BigEndian.Uint64(eui[:])
@@ -105,65 +89,10 @@ func (eui *EUI64) UnmarshalNumber(n uint64) {
 	binary.BigEndian.PutUint64(eui[:], n)
 }
 
-// Before returns true if the EUI64 is strictly inferior to the EUI64 passed as an argument.
-func (eui EUI64) Before(a EUI64) bool {
-	if eui.MarshalNumber() < a.MarshalNumber() {
-		return true
-	}
-	return false
-}
-
-// After returns true if the EUI64 is strictly superior to the EUI64 passed as an argument.
-func (eui EUI64) After(a EUI64) bool {
-	if eui.MarshalNumber() > a.MarshalNumber() {
-		return true
-	}
-	return false
-}
-
-// BeforeOrEqual returns true if the EUI64 is inferior or equal to the EUI64 passed as an argument.
-func (eui EUI64) BeforeOrEqual(a EUI64) bool {
-	return eui == a || eui.Before(a)
-}
-
-// AfterOrEqual returns true if the EUI64 is superior or equal to the EUI64 passed as an argument.
-func (eui EUI64) AfterOrEqual(a EUI64) bool {
-	return eui == a || eui.After(a)
-}
-
 // EUI64Prefix is an EUI64 with a prefix length.
 type EUI64Prefix struct {
 	EUI64  EUI64
 	Length uint8
-}
-
-// NbItems returns the number of items that this prefix encapsulates.
-func (prefix EUI64Prefix) NbItems() uint64 {
-	return uint64(math.Pow(2, float64(64-prefix.Length)))
-}
-
-// FirstEUI64Covered returns the first EUI64 covered, in the numeric order.
-func (prefix EUI64Prefix) FirstEUI64Covered() EUI64 {
-	return prefix.EUI64.Mask(prefix.Length)
-}
-
-func (prefix EUI64Prefix) firstNumericEUI64Covered() uint64 {
-	return prefix.FirstEUI64Covered().MarshalNumber()
-}
-
-func (prefix EUI64Prefix) lastNumericEUI64Covered() uint64 {
-	return prefix.firstNumericEUI64Covered() + prefix.NbItems() - 1
-}
-
-// LastEUI64Covered returns the last EUI64 covered, in the numeric order.
-func (prefix EUI64Prefix) LastEUI64Covered() EUI64 {
-	result := EUI64{}
-
-	lastEUI64Numeric := prefix.lastNumericEUI64Covered()
-	hex := fmt.Sprintf("%08X", lastEUI64Numeric)
-	result.UnmarshalText([]byte(hex))
-
-	return result
 }
 
 // IsZero returns true iff the type is zero.
@@ -290,20 +219,6 @@ func (prefix *EUI64Prefix) UnmarshalText(data []byte) error {
 		prefix.Length = (data[17]-'0')*10 + (data[18] - '0')
 	}
 	return nil
-}
-
-// Value implements driver.Valuer interface.
-func (prefix EUI64Prefix) Value() (driver.Value, error) {
-	return prefix.MarshalText()
-}
-
-// Scan implements sql.Scanner interface.
-func (prefix *EUI64Prefix) Scan(src interface{}) error {
-	data, ok := src.([]byte)
-	if !ok {
-		return errScanArgumentType
-	}
-	return prefix.UnmarshalText(data)
 }
 
 // FromConfigString implements the config.Configurable interface

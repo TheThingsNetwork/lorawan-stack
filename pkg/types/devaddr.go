@@ -17,11 +17,9 @@ package types
 import (
 	"go.thethings.network/lorawan-stack/pkg/errors"
 
-	"database/sql/driver"
 	"encoding/binary"
 	"encoding/hex"
 	"fmt"
-	"math"
 	"strconv"
 	"strings"
 )
@@ -86,20 +84,6 @@ func (addr *DevAddr) UnmarshalText(data []byte) error {
 	return unmarshalTextBytes(addr[:], data)
 }
 
-// Value implements sql.Valuer interface.
-func (addr DevAddr) Value() (driver.Value, error) {
-	return addr.MarshalText()
-}
-
-// Scan implements sql.Scanner interface.
-func (addr *DevAddr) Scan(src interface{}) error {
-	data, ok := src.([]byte)
-	if !ok {
-		return errScanArgumentType
-	}
-	return addr.UnmarshalText(data)
-}
-
 // MarshalNumber returns the DevAddr in a decimal form.
 func (addr DevAddr) MarshalNumber() uint32 {
 	return binary.BigEndian.Uint32(addr[:])
@@ -109,32 +93,6 @@ func (addr DevAddr) MarshalNumber() uint32 {
 func (addr *DevAddr) UnmarshalNumber(n uint32) {
 	*addr = [4]byte{}
 	binary.BigEndian.PutUint32(addr[:], n)
-}
-
-// Before returns true if the DevAddr is strictly inferior to the DevAddr passed as an argument.
-func (addr DevAddr) Before(a DevAddr) bool {
-	if addr.MarshalNumber() < a.MarshalNumber() {
-		return true
-	}
-	return false
-}
-
-// After returns true if the DevAddr is strictly superior to the DevAddr passed as an argument.
-func (addr DevAddr) After(a DevAddr) bool {
-	if addr.MarshalNumber() > a.MarshalNumber() {
-		return true
-	}
-	return false
-}
-
-// BeforeOrEqual returns true if the DevAddr is inferior or equal to the DevAddr passed as an argument.
-func (addr DevAddr) BeforeOrEqual(a DevAddr) bool {
-	return addr == a || addr.Before(a)
-}
-
-// AfterOrEqual returns true if the DevAddr is superior or equal to the DevAddr passed as an argument.
-func (addr DevAddr) AfterOrEqual(a DevAddr) bool {
-	return addr == a || addr.After(a)
 }
 
 // HasValidNetIDType returns true if the DevAddr has NetID type, which is valid and compliant with LoRaWAN specification.
@@ -283,35 +241,6 @@ type DevAddrPrefix struct {
 	Length  uint8
 }
 
-// NbItems returns the number of items that this prefix encapsulates.
-func (prefix DevAddrPrefix) NbItems() uint64 {
-	return uint64(math.Pow(2, float64(32-prefix.Length)))
-}
-
-// FirstDevAddrCovered returns the first DevAddr covered, in the numeric order.
-func (prefix DevAddrPrefix) FirstDevAddrCovered() DevAddr {
-	return prefix.DevAddr.Mask(prefix.Length)
-}
-
-func (prefix DevAddrPrefix) firstNumericDevAddrCovered() uint32 {
-	return prefix.FirstDevAddrCovered().MarshalNumber()
-}
-
-func (prefix DevAddrPrefix) lastNumericDevAddrCovered() uint32 {
-	return prefix.firstNumericDevAddrCovered() + uint32(prefix.NbItems()-1)
-}
-
-// LastDevAddrCovered returns the last DevAddr covered, in the numeric order.
-func (prefix DevAddrPrefix) LastDevAddrCovered() DevAddr {
-	result := DevAddr{}
-
-	lastDevAddrNumeric := prefix.lastNumericDevAddrCovered()
-	hex := fmt.Sprintf("%08X", lastDevAddrNumeric)
-	result.UnmarshalText([]byte(hex))
-
-	return result
-}
-
 // IsZero returns true iff the type is zero.
 func (prefix DevAddrPrefix) IsZero() bool { return prefix.Length == 0 }
 
@@ -434,20 +363,6 @@ func (prefix *DevAddrPrefix) UnmarshalText(data []byte) error {
 		prefix.Length = (data[9]-'0')*10 + (data[10] - '0')
 	}
 	return nil
-}
-
-// Value implements driver.Valuer interface.
-func (prefix DevAddrPrefix) Value() (driver.Value, error) {
-	return prefix.MarshalText()
-}
-
-// Scan implements sql.Scanner interface.
-func (prefix *DevAddrPrefix) Scan(src interface{}) error {
-	data, ok := src.([]byte)
-	if !ok {
-		return errScanArgumentType
-	}
-	return prefix.UnmarshalText(data)
 }
 
 // FromConfigString implements the config.Configurable interface

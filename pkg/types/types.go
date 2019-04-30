@@ -19,7 +19,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors"
 
 	"bytes"
-	"database/sql/driver"
 	"encoding/hex"
 )
 
@@ -38,8 +37,6 @@ type Interface interface {
 	UnmarshalBinary(data []byte) error
 	MarshalText() ([]byte, error)
 	UnmarshalText(data []byte) error
-	Value() (driver.Value, error)
-	Scan(src interface{}) error
 }
 
 var (
