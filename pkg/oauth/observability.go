@@ -19,9 +19,9 @@ import (
 )
 
 var (
-	evtUserLogin       = events.Define("oauth.user.login", "successful user login")
-	evtUserLoginFailed = events.Define("oauth.user.login_failed", "failed user login")
-	evtUserLogout      = events.Define("oauth.user.logout", "user logout")
+	evtUserLogin       = events.Define("oauth.user.login", "login user successful")
+	evtUserLoginFailed = events.Define("oauth.user.login_failed", "login user failure")
+	evtUserLogout      = events.Define("oauth.user.logout", "logout user")
 	evtAuthorize       = events.Define("oauth.authorize", "authorize OAuth client")
 	evtTokenExchange   = events.Define("oauth.token.exchange", "exchange OAuth access token")
 )

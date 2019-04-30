@@ -30,11 +30,11 @@ import (
 )
 
 var (
-	evtCreateOrganizationAPIKey       = events.Define("organization.api-key.create", "Create organization API key")
-	evtUpdateOrganizationAPIKey       = events.Define("organization.api-key.update", "Update organization API key")
-	evtDeleteOrganizationAPIKey       = events.Define("organization.api-key.delete", "Delete organization API key")
-	evtUpdateOrganizationCollaborator = events.Define("organization.collaborator.update", "Update organization collaborator")
-	evtDeleteOrganizationCollaborator = events.Define("organization.collaborator.delete", "Delete organization collaborator")
+	evtCreateOrganizationAPIKey       = events.Define("organization.api-key.create", "create organization API key")
+	evtUpdateOrganizationAPIKey       = events.Define("organization.api-key.update", "update organization API key")
+	evtDeleteOrganizationAPIKey       = events.Define("organization.api-key.delete", "delete organization API key")
+	evtUpdateOrganizationCollaborator = events.Define("organization.collaborator.update", "update organization collaborator")
+	evtDeleteOrganizationCollaborator = events.Define("organization.collaborator.delete", "delete organization collaborator")
 )
 
 func (is *IdentityServer) listOrganizationRights(ctx context.Context, ids *ttnpb.OrganizationIdentifiers) (*ttnpb.Rights, error) {

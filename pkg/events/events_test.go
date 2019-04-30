@@ -127,7 +127,7 @@ func Example() {
 	// Defining the event is not mandatory, but will be needed in order to translate the descriptions.
 	// Event names are lowercase snake_case and can be dot-separated as component.subsystem.subsystem.event
 	// Event descriptions are short descriptions of what the event means.
-	var adrSendEvent = events.Define("ns.mac.adr.send_req", "Send ADR Request")
+	var adrSendEvent = events.Define("ns.mac.adr.send_req", "send ADR request")
 
 	// These variables come from the request or you got them from the db or something.
 	var (

@@ -79,8 +79,8 @@ type EventsServer struct {
 }
 
 var (
-	evtStreamStart = events.Define("events.stream.start", "event stream start")
-	evtStreamStop  = events.Define("events.stream.stop", "event stream stop")
+	evtStreamStart = events.Define("events.stream.start", "start event stream")
+	evtStreamStop  = events.Define("events.stream.stop", "stop event stream")
 )
 
 // Stream implements the EventsServer interface.
