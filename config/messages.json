@@ -1088,6 +1088,15 @@
       "file": "errors.go"
     }
   },
+  "error:cmd/internal/shared:initialize_gateway_configuration_server": {
+    "translations": {
+      "en": "could not initialize Gateway Configuration Server"
+    },
+    "description": {
+      "package": "cmd/internal/shared",
+      "file": "errors.go"
+    }
+  },
   "error:cmd/internal/shared:initialize_gateway_server": {
     "translations": {
       "en": "could not initialize Gateway Server"
@@ -4409,6 +4418,15 @@
       "file": "storage.go"
     }
   },
+  "error:pkg/pfconfig/shared:unmarshal_not_implemented": {
+    "translations": {
+      "en": "unmarshaling SX1301 config is not implemented"
+    },
+    "description": {
+      "package": "pkg/pfconfig/shared",
+      "file": "shared.go"
+    }
+  },
   "error:pkg/redis:not_found": {
     "translations": {
       "en": "entity not found"
@@ -4479,6 +4497,33 @@
     "description": {
       "package": "pkg/scripting/javascript",
       "file": "javascript.go"
+    }
+  },
+  "error:pkg/thethingsgateway/cups:no_default_firmware_path": {
+    "translations": {
+      "en": "no default firmware path specified"
+    },
+    "description": {
+      "package": "pkg/thethingsgateway/cups",
+      "file": "server.go"
+    }
+  },
+  "error:pkg/thethingsgateway/cups:no_default_update_channel": {
+    "translations": {
+      "en": "no default update channel specified"
+    },
+    "description": {
+      "package": "pkg/thethingsgateway/cups",
+      "file": "server.go"
+    }
+  },
+  "error:pkg/thethingsgateway/cups:unauthenticated": {
+    "translations": {
+      "en": "call was not authenticated"
+    },
+    "description": {
+      "package": "pkg/thethingsgateway/cups",
+      "file": "middleware.go"
     }
   },
   "error:pkg/toa:bandwidth": {
