@@ -76,7 +76,6 @@ before_script:
   if [[ "$RUNTYPE" == "go.test" ]]; then
     set -e
     make dev.databases.start
-    $MAGE dev:certs
   fi
 script:
 - if [[ "$RUNTYPE" == "js" ]]; then $MAGE proto:swaggerClean proto:swagger; fi

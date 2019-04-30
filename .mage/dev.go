@@ -15,12 +15,11 @@
 package ttnmage
 
 import (
+	"os"
 	"path"
 	"runtime"
 
 	"github.com/magefile/mage/mg"
-	"github.com/magefile/mage/target"
-	errfmt "golang.org/x/exp/errors/fmt"
 )
 
 // Dev namespace.
@@ -28,12 +27,10 @@ type Dev mg.Namespace
 
 // Certificates generates certificates for development.
 func (Dev) Certificates() error {
-	changed, err := target.Glob("{key,cert}.pem")
-	if err != nil {
-		return errfmt.Errorf("failed checking modtime: %w", err)
-	}
-	if !changed {
-		return nil
+	if _, err := os.Stat("key.pem"); err == nil {
+		if _, err := os.Stat("cert.pem"); err == nil {
+			return nil
+		}
 	}
 	return execGo("run", path.Join(runtime.GOROOT(), "src", "crypto", "tls", "generate_cert.go"), "-ca", "-host", "localhost")
 }
