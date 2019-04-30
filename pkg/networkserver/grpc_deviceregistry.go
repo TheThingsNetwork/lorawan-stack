@@ -168,8 +168,8 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		if err := req.EndDevice.LoRaWANVersion.Validate(); err != nil {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "lorawan_version").WithCause(err)
 		}
-		if req.EndDevice.LoRaWANPHYVersion == ttnpb.PHY_UNKNOWN {
-			return nil, nil, errInvalidFieldValue.WithAttributes("field", "lorawan_phy_version")
+		if err := req.EndDevice.LoRaWANPHYVersion.Validate(); err != nil {
+			return nil, nil, errInvalidFieldValue.WithAttributes("field", "lorawan_phy_version").WithCause(err)
 		}
 
 		if ttnpb.HasAnyField(sets, "supports_class_b") && req.EndDevice.SupportsClassB {

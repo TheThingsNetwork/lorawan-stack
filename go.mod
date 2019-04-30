@@ -15,6 +15,7 @@ require (
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/TheThingsIndustries/magepkg v0.0.0-20190214092847-6c0299b7c3ed
 	github.com/TheThingsIndustries/mystique v0.0.0-20181023142449-f12a32cee6d6
+	github.com/TheThingsIndustries/release-notes v0.0.1
 	github.com/TheThingsNetwork/go-cayenne-lib v1.0.0
 	github.com/aws/aws-sdk-go v1.19.12
 	github.com/blang/semver v3.5.1+incompatible
@@ -83,8 +84,8 @@ require (
 	go.thethings.network/lorawan-stack-legacy v0.0.0-20190118141410-68812c833a78
 	gocloud.dev v0.12.0
 	golang.org/x/crypto v0.0.0-20190411191339-88737f569e3a
-	golang.org/x/exp/errors v0.0.0-20190424083841-8c7d1c524af6
-	golang.org/x/net v0.0.0-20190415214537-1da14a5a36f2
+	golang.org/x/exp/errors v0.0.0-20190426045226-199475d76704
+	golang.org/x/net v0.0.0-20190424112056-4829fb13d2c6
 	golang.org/x/oauth2 v0.0.0-20190402181905-9f3314589c9a
 	golang.org/x/tools v0.0.0-20190417005754-4ca4b55e2050
 	google.golang.org/genproto v0.0.0-20190415143225-d1146b9035b9

@@ -690,6 +690,19 @@ func (v MACVersion) HasMaxFCntGap() bool {
 	return v.Compare(MAC_V1_1) < 0
 }
 
+// Validate reports whether v represents a valid PHYVersion.
+func (v PHYVersion) Validate() error {
+	if v < 1 || v >= PHYVersion(len(PHYVersion_name)) {
+		return errExpectedBetween("PHYVersion", 1, len(PHYVersion_name)-1)(v)
+	}
+
+	_, err := semver.Parse(v.String())
+	if err != nil {
+		return errParsingSemanticVersion(v.String()).WithCause(err)
+	}
+	return nil
+}
+
 // String implements fmt.Stringer.
 func (v PHYVersion) String() string {
 	switch v {
@@ -709,6 +722,17 @@ func (v PHYVersion) String() string {
 		return "1.1.0-b"
 	}
 	return "unknown"
+}
+
+// Compare compares PHYVersions v to o:
+// -1 == v is less than o
+// 0 == v is equal to o
+// 1 == v is greater than o
+// Compare panics, if v.Validate() returns non-nil error.
+func (v PHYVersion) Compare(o PHYVersion) int {
+	return semver.MustParse(v.String()).Compare(
+		semver.MustParse(o.String()),
+	)
 }
 
 func init() {

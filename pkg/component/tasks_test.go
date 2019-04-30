@@ -37,6 +37,7 @@ func init() {
 
 func TestTasks(t *testing.T) {
 	a := assertions.New(t)
+	ctx := test.Context()
 
 	c, err := New(test.GetLogger(t), &Config{})
 	a.So(err, should.BeNil)
@@ -44,7 +45,7 @@ func TestTasks(t *testing.T) {
 	// Register a one-off task.
 	oneOffWg := sync.WaitGroup{}
 	oneOffWg.Add(1)
-	c.RegisterTask("one_off", func(_ context.Context) error {
+	c.RegisterTask(ctx, "one_off", func(_ context.Context) error {
 		oneOffWg.Done()
 		return nil
 	}, TaskRestartNever)
@@ -52,7 +53,7 @@ func TestTasks(t *testing.T) {
 	restartingWg := sync.WaitGroup{}
 	restartingWg.Add(5)
 	i := 0
-	c.RegisterTask("restarts", func(_ context.Context) error {
+	c.RegisterTask(ctx, "restarts", func(_ context.Context) error {
 		i++
 		if i <= 5 {
 			restartingWg.Done()
@@ -64,7 +65,7 @@ func TestTasks(t *testing.T) {
 	failingWg := sync.WaitGroup{}
 	failingWg.Add(1)
 	j := 0
-	c.RegisterTask("restarts_on_failure", func(_ context.Context) error {
+	c.RegisterTask(ctx, "restarts_on_failure", func(_ context.Context) error {
 		j++
 		if j < 5 {
 			return errors.New("failed")

@@ -94,6 +94,11 @@ class Devices {
       delete requestTree.is
     }
 
+    // Do not query JS when the device is ABP
+    if (!device.supports_join) {
+      delete requestTree.js
+    }
+
     // Write the device id param based on either the id of the newly created
     // device, or the passed id argument
     params.routeParams['end_device.ids.device_id'] = 'data' in isResult ? isResult.ids.device_id : devId
@@ -183,12 +188,13 @@ class Devices {
 
   async create (applicationId, device, { abp = false, setDefaults = true, withRootKeys = false } = {}) {
     let dev = device
+    const Url = URL ? URL : window.URL
 
     if (setDefaults) {
       dev = {
-        application_server_address: new URL(this._stackConfig.as).host,
-        join_server_address: new URL(this._stackConfig.js).host,
-        network_server_address: new URL(this._stackConfig.ns).host,
+        application_server_address: new Url(this._stackConfig.as).host,
+        join_server_address: new Url(this._stackConfig.js).host,
+        network_server_address: new Url(this._stackConfig.ns).host,
         ...device,
       }
     }
@@ -199,29 +205,34 @@ class Devices {
         keys: {
           session_key_id: randomByteString(16),
           f_nwk_s_int_key: {
-            key: randomByteString(16, 'base64'),
-            kek_label: '',
+            key: randomByteString(32),
           },
           app_s_key: {
-            key: randomByteString(16),
-            kek_label: '',
+            key: randomByteString(32),
           },
         },
       }
       if (parseInt(device.lorawan_version.replace(/\D/g, '').padEnd(3, 0)) >= 110) {
         session.keys.s_nwk_s_int_key = {
-          key: randomByteString(16, 'base64'),
-          kek_label: '',
+          key: randomByteString(32),
         }
         session.keys.nwk_s_enc_key = {
-          key: randomByteString(16, 'base64'),
-          kek_label: '',
+          key: randomByteString(32),
         }
+      }
+
+      let providedKeys = {}
+      if (dev.session && dev.session.keys) {
+        providedKeys = dev.session.keys
       }
 
       dev.session = {
         ...session,
         ...dev.session,
+        keys: {
+          ...session.keys,
+          ...providedKeys,
+        },
       }
 
       dev.supports_join = false
@@ -235,12 +246,10 @@ class Devices {
         root_keys = {
           root_key_id: 'ttn-lw-js-sdk-generated',
           app_key: {
-            key: randomByteString(16),
-            kek_label: 'default',
+            key: randomByteString(32),
           },
           nwk_key: {
-            key: randomByteString(16),
-            kek_label: 'default',
+            key: randomByteString(32),
           },
         }
       }
