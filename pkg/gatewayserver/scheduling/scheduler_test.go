@@ -44,7 +44,7 @@ func TestScheduleAt(t *testing.T) {
 		},
 	}
 	timeSource := &mockTimeSource{
-		Time: time.Now(),
+		Time: time.Unix(0, 0),
 	}
 	scheduler, err := scheduling.NewScheduler(ctx, fp, true, timeSource)
 	a.So(err, should.BeNil)
@@ -55,8 +55,9 @@ func TestScheduleAt(t *testing.T) {
 		Settings        ttnpb.TxSettings
 		Priority        ttnpb.TxSchedulePriority
 		MaxRTT          *time.Duration
-		AverageRTT      *time.Duration
+		MedianRTT       *time.Duration
 		ExpectedToa     time.Duration
+		ExpectedStarts  scheduling.ConcentratorTime
 		ExpectedError   *errors.Definition
 	}{
 		{
@@ -164,6 +165,46 @@ func TestScheduleAt(t *testing.T) {
 			ExpectedError: &scheduling.ErrDwellTime,
 		},
 		{
+			PayloadSize: 16,
+			Settings: ttnpb.TxSettings{
+				DataRate: ttnpb.DataRate{
+					Modulation: &ttnpb.DataRate_LoRa{
+						LoRa: &ttnpb.LoRaDataRate{
+							Bandwidth:       125000,
+							SpreadingFactor: 7,
+						},
+					},
+				},
+				CodingRate: "4/5",
+				Frequency:  868100000,
+				Time:       timePtr(time.Unix(0, int64(1*time.Second))),
+			},
+			Priority:       ttnpb.TxSchedulePriority_HIGHEST,
+			MedianRTT:      durationPtr(200 * time.Millisecond),
+			ExpectedToa:    51456 * time.Microsecond,
+			ExpectedStarts: 1000000000 - 200000000/2,
+		},
+		{
+			SyncWithGateway: true,
+			PayloadSize:     16,
+			Settings: ttnpb.TxSettings{
+				DataRate: ttnpb.DataRate{
+					Modulation: &ttnpb.DataRate_LoRa{
+						LoRa: &ttnpb.LoRaDataRate{
+							Bandwidth:       125000,
+							SpreadingFactor: 7,
+						},
+					},
+				},
+				CodingRate: "4/5",
+				Frequency:  868100000,
+				Time:       timePtr(time.Unix(0, int64(1*time.Minute))),
+			},
+			Priority:       ttnpb.TxSchedulePriority_HIGHEST,
+			ExpectedToa:    51456 * time.Microsecond,
+			ExpectedStarts: 60000000000,
+		},
+		{
 			PayloadSize: 10,
 			Settings: ttnpb.TxSettings{
 				DataRate: ttnpb.DataRate{
@@ -178,8 +219,9 @@ func TestScheduleAt(t *testing.T) {
 				Frequency:  869525000,
 				Timestamp:  20000000,
 			},
-			Priority:    ttnpb.TxSchedulePriority_NORMAL,
-			ExpectedToa: 41216 * time.Microsecond,
+			Priority:       ttnpb.TxSchedulePriority_NORMAL,
+			ExpectedToa:    41216 * time.Microsecond,
+			ExpectedStarts: 20000000000,
 		},
 		{
 			PayloadSize: 10,
@@ -236,8 +278,9 @@ func TestScheduleAt(t *testing.T) {
 				Frequency:  869525000,
 				Timestamp:  20000000 + 41216 + 1000000, // time-on-air + time-off-air.
 			},
-			Priority:    ttnpb.TxSchedulePriority_NORMAL,
-			ExpectedToa: 41216 * time.Microsecond,
+			Priority:       ttnpb.TxSchedulePriority_NORMAL,
+			ExpectedToa:    41216 * time.Microsecond,
+			ExpectedStarts: 20000000000 + 41216000 + 1000000000,
 		},
 		{
 			PayloadSize: 20,
@@ -270,19 +313,26 @@ func TestScheduleAt(t *testing.T) {
 			d, err := toa.Compute(tc.PayloadSize, tc.Settings)
 			a.So(err, should.BeNil)
 			a.So(d, should.Equal, tc.ExpectedToa)
-			var rtts scheduling.RTTs
+			rtts := &mockRTTs{}
 			if tc.MaxRTT != nil {
-				rtts = &mockRTTs{
-					Max:   *tc.MaxRTT,
-					Count: 1,
+				rtts.Max = *tc.MaxRTT
+				rtts.Count = 1
+			}
+			if tc.MedianRTT != nil {
+				rtts.Median = *tc.MedianRTT
+				rtts.Count = 1
+			}
+			em, err := scheduler.ScheduleAt(ctx, tc.PayloadSize, tc.Settings, rtts, tc.Priority)
+			if tc.ExpectedError != nil {
+				if !a.So(err, should.HaveSameErrorDefinitionAs, *tc.ExpectedError) {
+					t.Fatalf("Unexpected error: %v", err)
 				}
+				return
 			}
-			_, err = scheduler.ScheduleAt(ctx, tc.PayloadSize, tc.Settings, rtts, tc.Priority)
-			if tc.ExpectedError == nil {
-				a.So(err, should.BeNil)
-			} else if !a.So(err, should.HaveSameErrorDefinitionAs, *tc.ExpectedError) {
-				t.Fatalf("Unexpected error: %v", err)
+			if !a.So(err, should.BeNil) {
+				t.FailNow()
 			}
+			a.So(em.Starts(), should.Equal, tc.ExpectedStarts)
 		})
 		if !tcok {
 			t.FailNow()

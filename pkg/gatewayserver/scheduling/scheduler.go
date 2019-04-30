@@ -154,10 +154,12 @@ func (s *Scheduler) ScheduleAt(ctx context.Context, payloadSize int, settings tt
 	if !s.clock.IsSynced() {
 		return Emission{}, errNoClockSync
 	}
-	minScheduleTime := ScheduleTimeShort
+	var minScheduleTime = ScheduleTimeShort
+	var medianRTT *time.Duration
 	if rtts != nil {
-		if _, max, _, n := rtts.Stats(); n > 0 {
+		if _, max, median, n := rtts.Stats(); n > 0 {
 			minScheduleTime = max + QueueDelay
+			medianRTT = &median
 		}
 	}
 	var starts ConcentratorTime
@@ -166,7 +168,11 @@ func (s *Scheduler) ScheduleAt(ctx context.Context, payloadSize int, settings tt
 		var ok bool
 		starts, ok = s.clock.GatewayTime(*settings.Time)
 		if !ok {
-			return Emission{}, errNoAbsoluteGatewayTime
+			if medianRTT != nil {
+				starts = s.clock.ServerTime(*settings.Time) - ConcentratorTime(*medianRTT/2)
+			} else {
+				return Emission{}, errNoAbsoluteGatewayTime
+			}
 		}
 	} else {
 		starts = s.clock.TimestampTime(settings.Timestamp)
