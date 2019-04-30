@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import Applications from './service/applications'
+import Configuration from './service/configuration'
 import Application from './entity/application'
 import Api from './api'
 import Token from './util/token'
@@ -31,6 +32,8 @@ class TtnLw {
 
     this.Applications = new Applications(this.api, { defaultUserId, proxy, stackConfig })
     this.Application = Application.bind(null, this.Applications)
+
+    this.Configuration = new Configuration(this.api.Configuration)
   }
 }
 

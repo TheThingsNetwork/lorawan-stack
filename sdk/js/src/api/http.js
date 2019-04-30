@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import axios from 'axios'
+import { STACK_COMPONENTS } from '../util/constants'
 
 /**
  * Http Class is a connector for the API that uses the HTTP bridge to connect.
@@ -58,10 +59,10 @@ class Http {
     }
   }
 
-  async handleRequest (method, endpoint, payload = {}, config) {
-    const component = this._parseStackComponent(endpoint)
+  async handleRequest (method, endpoint, component, payload = {}, config) {
+    const parsedComponent = component || this._parseStackComponent(endpoint)
     try {
-      return await this[component]({
+      return await this[parsedComponent]({
         method,
         url: endpoint,
         data: payload,
@@ -76,7 +77,7 @@ class Http {
     }
   }
 
-  async get (endpoint, params) {
+  async get (endpoint, component, params) {
     // Convert payload to query params (should usually be field_mask only)
     const config = {}
     if (params && Object.keys(params).length > 0) {
@@ -87,23 +88,23 @@ class Http {
       config.params = params
     }
 
-    return this.handleRequest('get', endpoint, undefined, config)
+    return this.handleRequest('get', endpoint, component, undefined, config)
   }
 
-  async post (endpoint, payload) {
-    return this.handleRequest('post', endpoint, payload)
+  async post (endpoint, component, payload) {
+    return this.handleRequest('post', endpoint, component, payload)
   }
 
-  async patch (endpoint, payload) {
-    return this.handleRequest('patch', endpoint, payload)
+  async patch (endpoint, component, payload) {
+    return this.handleRequest('patch', endpoint, component, payload)
   }
 
-  async put (endpoint, payload) {
-    return this.handleRequest('put', endpoint, payload)
+  async put (endpoint, component, payload) {
+    return this.handleRequest('put', endpoint, component, payload)
   }
 
-  async delete (endpoint) {
-    return this.handleRequest('delete', endpoint)
+  async delete (endpoint, component) {
+    return this.handleRequest('delete', component, endpoint)
   }
 
   /**
@@ -114,15 +115,7 @@ class Http {
   _parseStackComponent (endpoint) {
     try {
       const component = endpoint.split('/')[1]
-      switch (component) {
-      case 'as':
-      case 'gs':
-      case 'js':
-      case 'ns':
-        return component
-      default:
-        return 'is'
-      }
+      return STACK_COMPONENTS.includes(component) ? component : 'is'
     } catch (err) {
       throw new Error('Unable to extract the stack component:', endpoint)
     }
