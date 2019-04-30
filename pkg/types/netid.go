@@ -15,7 +15,6 @@
 package types
 
 import (
-	"database/sql/driver"
 	"encoding/hex"
 	"strings"
 
@@ -76,20 +75,6 @@ func (id NetID) MarshalText() ([]byte, error) { return marshalTextBytes(id[:]) }
 func (id *NetID) UnmarshalText(data []byte) error {
 	*id = [3]byte{}
 	return unmarshalTextBytes(id[:], data)
-}
-
-// Value implements driver.Valuer interface.
-func (id NetID) Value() (driver.Value, error) {
-	return id.MarshalText()
-}
-
-// Scan implements sql.Scanner interface.
-func (id *NetID) Scan(src interface{}) error {
-	data, ok := src.([]byte)
-	if !ok {
-		return errScanArgumentType
-	}
-	return id.UnmarshalText(data)
 }
 
 // Type returns NetID type.

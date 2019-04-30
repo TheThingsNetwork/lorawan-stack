@@ -15,7 +15,6 @@
 package types
 
 import (
-	"database/sql/driver"
 	"encoding/binary"
 	"encoding/hex"
 	"fmt"
@@ -80,20 +79,6 @@ func (eui *EUI64) UnmarshalText(data []byte) error {
 	return unmarshalTextBytes(eui[:], data)
 }
 
-// Value implements driver.Valuer interface.
-func (eui EUI64) Value() (driver.Value, error) {
-	return eui.MarshalText()
-}
-
-// Scan implements sql.Scanner interface.
-func (eui *EUI64) Scan(src interface{}) error {
-	data, ok := src.([]byte)
-	if !ok {
-		return errScanArgumentType
-	}
-	return eui.UnmarshalText(data)
-}
-
 // MarshalNumber returns the EUI64 in a decimal form.
 func (eui EUI64) MarshalNumber() uint64 {
 	return binary.BigEndian.Uint64(eui[:])
@@ -103,32 +88,6 @@ func (eui EUI64) MarshalNumber() uint64 {
 func (eui *EUI64) UnmarshalNumber(n uint64) {
 	*eui = [8]byte{}
 	binary.BigEndian.PutUint64(eui[:], n)
-}
-
-// Before returns true if the EUI64 is strictly inferior to the EUI64 passed as an argument.
-func (eui EUI64) Before(a EUI64) bool {
-	if eui.MarshalNumber() < a.MarshalNumber() {
-		return true
-	}
-	return false
-}
-
-// After returns true if the EUI64 is strictly superior to the EUI64 passed as an argument.
-func (eui EUI64) After(a EUI64) bool {
-	if eui.MarshalNumber() > a.MarshalNumber() {
-		return true
-	}
-	return false
-}
-
-// BeforeOrEqual returns true if the EUI64 is inferior or equal to the EUI64 passed as an argument.
-func (eui EUI64) BeforeOrEqual(a EUI64) bool {
-	return eui == a || eui.Before(a)
-}
-
-// AfterOrEqual returns true if the EUI64 is superior or equal to the EUI64 passed as an argument.
-func (eui EUI64) AfterOrEqual(a EUI64) bool {
-	return eui == a || eui.After(a)
 }
 
 // EUI64Prefix is an EUI64 with a prefix length.
@@ -290,20 +249,6 @@ func (prefix *EUI64Prefix) UnmarshalText(data []byte) error {
 		prefix.Length = (data[17]-'0')*10 + (data[18] - '0')
 	}
 	return nil
-}
-
-// Value implements driver.Valuer interface.
-func (prefix EUI64Prefix) Value() (driver.Value, error) {
-	return prefix.MarshalText()
-}
-
-// Scan implements sql.Scanner interface.
-func (prefix *EUI64Prefix) Scan(src interface{}) error {
-	data, ok := src.([]byte)
-	if !ok {
-		return errScanArgumentType
-	}
-	return prefix.UnmarshalText(data)
 }
 
 // FromConfigString implements the config.Configurable interface
