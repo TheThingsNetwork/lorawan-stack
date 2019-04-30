@@ -93,6 +93,9 @@ node_modules/
 /stories
 /pkg/webui/locales/.backend
 
+# Development tooling
+/mage
+
 # Keypair
 cert.pem
 key.pem

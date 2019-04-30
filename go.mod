@@ -57,7 +57,7 @@ require (
 	github.com/labstack/gommon v0.2.8
 	github.com/lib/pq v1.1.0
 	github.com/lyft/protoc-gen-validate v0.0.14
-	github.com/magefile/mage v1.8.0
+	github.com/magefile/mage v1.8.1-0.20190314142316-8dce728c572d
 	github.com/mattn/go-isatty v0.0.7
 	github.com/mattn/goveralls v0.0.2
 	github.com/mdempsky/unconvert v0.0.0-20190325185700-2f5dc3378ed3
@@ -84,6 +84,7 @@ require (
 	go.thethings.network/lorawan-stack-legacy v0.0.0-20190118141410-68812c833a78
 	gocloud.dev v0.12.0
 	golang.org/x/crypto v0.0.0-20190411191339-88737f569e3a
+	golang.org/x/exp/errors v0.0.0-20190426045226-199475d76704
 	golang.org/x/net v0.0.0-20190424112056-4829fb13d2c6
 	golang.org/x/oauth2 v0.0.0-20190402181905-9f3314589c9a
 	golang.org/x/tools v0.0.0-20190417005754-4ca4b55e2050

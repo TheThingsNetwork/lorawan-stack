@@ -15,12 +15,12 @@
 /* global process */
 /* eslint-disable no-alert, no-console */
 
-import fs from 'fs'
-import path from 'path'
-import yargs from 'yargs'
-import mkdirp from 'mkdirp'
-import g from 'glob'
-import xx from './xx'
+const fs = require('fs')
+const path = require('path')
+const yargs = require('yargs')
+const mkdirp = require('mkdirp')
+const g = require('glob')
+const xx = require('./xx')
 
 const argv = yargs.argv
 const env = process.env
@@ -202,7 +202,7 @@ const readMessages = async function () {
 }
 
 /**
- * Read and parse (and marshal) the backend messages, coming from `make go.translations`
+ * Read and parse (and marshal) the backend messages, coming from `./mage go:messages`
  *
  * @returns {Object} - The backend messages, keyed by message id.
  */

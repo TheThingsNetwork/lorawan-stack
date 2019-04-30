@@ -14,14 +14,6 @@
 
 # This makefile contains utilities for development purposes.
 
-# Certificates
-
-dev.certs:
-	@$(log) "Generating certificates"
-	@go run $(shell go env GOROOT)/src/crypto/tls/generate_cert.go -ca -host localhost
-
-INIT_RULES += dev.certs
-
 # Databases
 
 DEV_DATABASES ?= cockroach redis
@@ -29,15 +21,11 @@ DEV_DATABASE_NAME ?= ttn_lorawan_dev
 DEV_DATA_DIR ?= .dev/data
 DEV_DOCKER_COMPOSE := DEV_DATA_DIR=$(DEV_DATA_DIR) DEV_DATABASE_NAME=$(DEV_DATABASE_NAME) docker-compose -p lorawan-stack-dev
 
-dev.check-docker-compose:
-	@command -v docker > /dev/null || ($(err) It looks like Docker is not installed)
-	@command -v docker-compose > /dev/null || ($(err) It looks like Docker Compose is not installed)
-
-dev.databases.start: dev.check-docker-compose
+dev.databases.start:
 	@$(DEV_DOCKER_COMPOSE) up -d $(DEV_DATABASES)
 	@$(DEV_DOCKER_COMPOSE) ps
 
-dev.databases.stop: dev.check-docker-compose
+dev.databases.stop:
 	@$(DEV_DOCKER_COMPOSE) stop $(DEV_DATABASES)
 
 dev.databases.erase: dev.databases.stop
@@ -49,12 +37,18 @@ dev.databases.sql: dev.databases.start
 dev.databases.redis-cli: dev.databases.start
 	@$(DEV_DOCKER_COMPOSE) exec redis redis-cli
 
-# Binaries
-
 dev.stack.init: dev.databases.start
 	@$(DEV_DOCKER_COMPOSE) run --rm stack is-db init
 	@$(DEV_DOCKER_COMPOSE) run --rm stack is-db create-admin-user --id admin --email admin@localhost --password admin
 	@$(DEV_DOCKER_COMPOSE) run --rm stack is-db create-oauth-client --id cli --name "Command Line Interface" --owner admin --no-secret --redirect-uri 'local-callback' --redirect-uri 'code'
 	@$(DEV_DOCKER_COMPOSE) run --rm stack is-db create-oauth-client --id console --name "Console" --owner admin --secret console --redirect-uri 'https://localhost:8885/console/oauth/callback' --redirect-uri 'http://localhost:1885/console/oauth/callback' --redirect-uri '/console/oauth/callback'
+
+.PHONY: git.diff
+git.diff:
+	@if [[ ! -z "`git diff`" ]]; then \
+		$(err) "Previous operations have created changes that were not recorded in the repository. Please make those changes on your local machine before pushing them to the repository:"; \
+		git diff; \
+		exit 1; \
+	fi
 
 # vim: ft=make

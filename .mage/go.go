@@ -15,7 +15,9 @@
 package ttnmage
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 
@@ -29,8 +31,20 @@ type Go mg.Namespace
 
 var minGoVersion = "1.11.4"
 
+var goModuleEnv = map[string]string{
+	"GO111MODULE": "on",
+}
+
+func execGo(cmd string, args ...string) error {
+	_, err := sh.Exec(goModuleEnv, os.Stdout, os.Stderr, "go", append([]string{cmd}, args...)...)
+	return err
+}
+
 // CheckVersion checks the installed Go version against the minimum version we support.
 func (Go) CheckVersion() error {
+	if mg.Verbose() {
+		fmt.Println("Checking Go version")
+	}
 	versionStr, err := sh.Output("go", "version")
 	if err != nil {
 		return err
@@ -48,4 +62,175 @@ func (Go) CheckVersion() error {
 		return fmt.Errorf("Your version of Go (%s) is not supported. Please install Go %s or later", versionStr, minGoVersion)
 	}
 	return nil
+}
+
+var goPackageDirs []string
+
+func (Go) packageDirs() (packageDirs []string, err error) {
+	if goPackageDirs != nil {
+		return goPackageDirs, nil
+	}
+	defer func() {
+		goPackageDirs = packageDirs
+	}()
+
+	dirs, err := sh.OutputWith(goModuleEnv, "go", "list", "-f", "{{.Dir}}", "./...")
+	if err != nil {
+		return nil, err
+	}
+	all := strings.Split(strings.TrimSpace(dirs), "\n")
+	if selectedDirs == nil {
+		return all, nil
+	}
+	selected := make([]string, 0, len(all))
+	for _, dir := range all {
+		if selectedDirs[dir] {
+			selected = append(selected, dir)
+		}
+	}
+	return selected, nil
+}
+
+// Fmt formats and simplifies all Go files.
+func (g Go) Fmt() error {
+	dirs, err := g.packageDirs()
+	if err != nil {
+		return err
+	}
+	if len(dirs) == 0 {
+		return nil
+	}
+	if mg.Verbose() {
+		fmt.Printf("Formatting and simplifying %d Go packages\n", len(dirs))
+	}
+	return sh.RunCmd("gofmt", "-w", "-s")(dirs...)
+}
+
+// Lint lints all Go files.
+func (g Go) Lint() error {
+	dirs, err := g.packageDirs()
+	if err != nil {
+		return err
+	}
+	if len(dirs) == 0 {
+		return nil
+	}
+	if mg.Verbose() {
+		fmt.Printf("Linting %d Go packages\n", len(dirs))
+	}
+	return execGo("run", append([]string{"github.com/mgechev/revive", "-config=.revive.toml", "-formatter=stylish"}, dirs...)...)
+}
+
+// Misspell fixes common spelling mistakes in Go files.
+func (g Go) Misspell() error {
+	dirs, err := g.packageDirs()
+	if err != nil {
+		return err
+	}
+	if len(dirs) == 0 {
+		return nil
+	}
+	if mg.Verbose() {
+		fmt.Printf("Fixing common spelling mistakes in %d Go packages\n", len(dirs))
+	}
+	return execGo("run", append([]string{"github.com/client9/misspell/cmd/misspell", "-w"}, dirs...)...)
+}
+
+// Unconvert removes unnecessary type conversions from Go files.
+func (g Go) Unconvert() error {
+	dirs, err := g.packageDirs()
+	if err != nil {
+		return err
+	}
+	if len(dirs) == 0 {
+		return nil
+	}
+	if mg.Verbose() {
+		fmt.Printf("Removing unnecessary type conversions from %d Go packages\n", len(dirs))
+	}
+	return execGo("run", append([]string{"github.com/mdempsky/unconvert", "-safe", "-apply"}, dirs...)...)
+}
+
+// Quality runs code quality checks on Go files.
+func (g Go) Quality() {
+	mg.Deps(g.Fmt, g.Misspell, g.Unconvert)
+	g.Lint() // Errors are allowed.
+}
+
+func init() {
+	preCommitChecks = append(preCommitChecks, Go.Quality)
+}
+
+// Test tests all Go packages.
+func (Go) Test() error {
+	if mg.Verbose() {
+		fmt.Println("Testing all Go packages")
+	}
+	return execGo("test", "./...")
+}
+
+const goCoverageFile = "coverage.out"
+
+// Cover tests all Go packages and writes test coverage into the coverage file.
+func (Go) Cover() error {
+	if mg.Verbose() {
+		fmt.Println("Testing all Go packages with coverage")
+	}
+	return execGo("test", "-cover", "-covermode=atomic", "-coverprofile="+goCoverageFile, "-timeout=5m", "./...")
+}
+
+var coverallsIgnored = []string{
+	".fm.go:",
+	".pb.go:",
+	".pb.gw.go:",
+	".pb.validate.go",
+}
+
+// Coveralls sends the test coverage to Coveralls.
+func (Go) Coveralls() error {
+	mg.Deps(Go.Cover)
+	if mg.Verbose() {
+		fmt.Println("Filtering Go coverage output")
+	}
+	inFile, err := os.Open(goCoverageFile)
+	if err != nil {
+		return err
+	}
+	outFile, err := os.OpenFile("coveralls_"+goCoverageFile, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		outFile.Close()
+		os.Remove("coveralls_" + goCoverageFile)
+	}()
+	s := bufio.NewScanner(inFile)
+nextLine:
+	for s.Scan() {
+		line := s.Text()
+		for _, suffix := range coverallsIgnored {
+			if strings.Contains(line, suffix) {
+				continue nextLine
+			}
+		}
+		if _, err = fmt.Fprintln(outFile, line); err != nil {
+			return err
+		}
+	}
+	if err = outFile.Close(); err != nil {
+		return err
+	}
+	service := os.Getenv("COVERALLS_SERVICE")
+	if service == "" {
+		service = "travis-ci"
+	}
+	if mg.Verbose() {
+		fmt.Println("Sending Go coverage to Coveralls")
+	}
+	return execGo("run", "github.com/mattn/goveralls", "-coverprofile=coveralls_"+goCoverageFile, "-service="+service, "-repotoken="+os.Getenv("COVERALLS_TOKEN"))
+}
+
+// Messages builds the file with translatable messages in Go code.
+func (g Go) Messages() error {
+	return execGo("run", "./cmd/internal/generate_i18n.go")
 }

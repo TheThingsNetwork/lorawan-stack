@@ -17,6 +17,11 @@ globals:
   mount: true
   snapshotDiff: true
 
+parserOptions:
+  ecmaFeatures:
+    # Remove after migration
+    legacyDecorators: true
+
 rules:
   jest/no-large-snapshots:
     - warn

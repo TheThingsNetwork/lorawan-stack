@@ -6,27 +6,29 @@
   "repository": "https://github.com/TheThingsNetwork/ttn.git",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@babel/core": "~7.0.0",
+    "@babel/cli": "^7.0.0",
+    "@babel/core": "^7.0.0",
+    "@babel/plugin-proposal-class-properties": "^7.0.0",
+    "@babel/plugin-proposal-decorators": "^7.0.0",
+    "@babel/plugin-syntax-dynamic-import": "^7.2.0",
+    "@babel/plugin-transform-runtime": "^7.0.0",
+    "@babel/plugin-transform-spread": "^7.2.2",
+    "@babel/preset-env": "^7.0.0",
+    "@babel/preset-react": "^7.0.0",
+    "@babel/register": "^7.0.0",
+    "@babel/runtime-corejs2": "^7.4.3",
     "@storybook/addon-actions": "4.0.0-alpha.23",
     "@storybook/addon-console": "^1.0.4",
     "@storybook/addon-info": "4.0.0-alpha.23",
     "@storybook/addon-links": "4.0.0-alpha.23",
     "@storybook/react": "4.0.0-alpha.23",
-    "add-asset-html-webpack-plugin": "^2.1.3",
-    "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.0",
-    "babel-eslint": "^8.2.2",
-    "babel-jest": "^21.2.0",
-    "babel-loader": "^7.1.2",
+    "add-asset-html-webpack-plugin": "^3.1.3",
+    "babel-eslint": "^9.0.0",
+    "babel-jest": "^24.7.1",
+    "babel-loader": "^8.0.0",
     "babel-plugin-react-intl": "^2.3.1",
     "babel-plugin-react-intl-auto": "^1.0.0",
-    "babel-plugin-transform-class-properties": "^6.24.1",
-    "babel-plugin-transform-decorators-legacy": "^1.3.4",
-    "babel-plugin-transform-runtime": "^6.23.0",
-    "babel-preset-env": "^1.6.0",
-    "babel-preset-react": "^6.24.1",
-    "babel-preset-stage-0": "^6.24.1",
-    "babel-register": "^6.26.0",
+    "babel-upgrade": "^1.0.1",
     "clean-webpack-plugin": "^0.1.17",
     "copy-webpack-plugin": "^4.5.3",
     "css-hot-loader": "^1.3.9",
@@ -46,7 +48,7 @@
     "file-loader": "^1.1.11",
     "html-webpack-plugin": "^3.2.0",
     "identity-obj-proxy": "^3.0.0",
-    "jest": "^21.2.1",
+    "jest": "^24.7.1",
     "js-yaml": "^3.10.0",
     "json": "^9.0.6",
     "messageformat-parser": "^2.0.0",
@@ -62,36 +64,9 @@
     "webpack-cli": "^3.1.2",
     "webpack-dev-server": "^3.1.10",
     "webpack-plugin-hash-output": "^3.1.0",
-    "webpack-shell-plugin": "0.4.5",
+    "webpack-shell-plugin": "https://github.com/cdeutsch/webpack-shell-plugin.git#bee537d",
     "yargs": "^12.0.1",
     "yarn": "1.12.3"
-  },
-  "babel": {
-    "presets": [
-      "env",
-      "stage-0",
-      "react"
-    ],
-    "plugins": [
-      "transform-decorators-legacy",
-      "transform-class-properties",
-      "transform-runtime",
-      [
-        "react-intl-auto",
-        {
-          "extractComments": true,
-          "filebase": true,
-          "removePrefix": "pkg.webui"
-        }
-      ],
-      [
-        "react-intl",
-        {
-          "messagesDir": "./.cache/messages",
-          "extractSourceLocation": true
-        }
-      ]
-    ]
   },
   "dependencies": {
     "autobind-decorator": "^2.1.0",
@@ -125,6 +100,9 @@
     "ttn-lw": "file:sdk/js",
     "ulid": "^2.3.0",
     "yup": "^0.26.6"
+  },
+  "babel": {
+    "extends": "./config/.babelrc"
   },
   "jest": {
     "setupFiles": [

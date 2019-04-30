@@ -1,42 +1,42 @@
 sudo: required
 conditions: v1
-if: type = pull_request OR branch =~ ^master$ OR tag IS present
+if: type = pull_request OR branch = master OR tag IS present
+os: linux
 language: go
 go: 1.12.x
 go_import_path: go.thethings.network/lorawan-stack
 env:
   global:
   - YARN_CACHE_FOLDER=$HOME/.cache/yarn
+  - MAGE=$HOME/.cache/mage/mage
   - TEST_SLOWDOWN=8
   - TEST_REDIS=1
   - PATH=/snap/bin:$PATH
 matrix:
   include:
-  - env: RUNTYPE=js.test
-    os: linux
-  - env: RUNTYPE=go.test GOARCH=amd64
-    os: linux
-  - if: type = pull_request OR branch =~ ^master$
-    env: RUNTYPE=go.test GOARCH=386
-    os: linux
+  - env: RUNTYPE=js
+  - env: RUNTYPE=go.test RUN_GOARCH=amd64
+  - env: RUNTYPE=go.test RUN_GOARCH=386
   - env: RUNTYPE=go.lint
-    os: linux
-  - if: tag IS present
-    env: RUNTYPE=release
-    os: linux
+  - env: RUNTYPE=release
+    if: tag IS present OR (type != pull_request AND branch = master)
 services:
 - docker
-addons:
-  apt:
-    packages:
-    - rpm
-    - snapd
 cache:
   directories:
-  - "$HOME/.cache/go-build"
-  - "$HOME/.cache/yarn"
   - "$GOPATH/pkg/mod"
+  - "$HOME/.cache/go-build"
+  - "$HOME/.cache/mage"
+  - "$HOME/.cache/yarn"
 before_install:
+- |
+  if [[ "$TRAVIS_EVENT_TYPE" == "push" ]] && [[ "$TRAVIS_BRANCH" == "master" ]]; then
+    set -e
+    go clean -modcache
+    go clean -cache
+    rm -rf $HOME/.cache/mage/*
+    rm -rf $HOME/.cache/yarn/*
+  fi
 - |
   if [[ ! -z "$encrypted_fc3d5d829302_key" ]]; then
     openssl aes-256-cbc -K $encrypted_fc3d5d829302_key \
@@ -47,6 +47,7 @@ before_install:
   fi
 - |
   if [[ "$RUNTYPE" == "go.test" ]]; then
+    set -e
     sudo rm /usr/local/bin/docker-compose
     curl -L https://github.com/docker/compose/releases/download/1.23.2/docker-compose-$(uname -s)-$(uname -m) > docker-compose
     chmod +x docker-compose
@@ -57,54 +58,73 @@ before_install:
     openssl aes-256-cbc -K $encrypted_82ec1379e985_key -iv $encrypted_82ec1379e985_iv -in snapcraft.login.enc -out snapcraft.login -d
   fi
 install:
+- make init
+- |
+  if [[ "$RUNTYPE" == "js" ]]; then
+    $MAGE js:devDeps js:deps jsSDK:deps
+  fi
 - |
   if [[ "$RUNTYPE" == "release" ]]; then
+    set -e
+    sudo apt-get -y update
+    sudo apt-get install -y rpm snapd
     sudo snap install snapcraft --classic
+    $MAGE jsSDK:deps js:deps
   fi
-
+before_script:
+- |
+  if [[ "$RUNTYPE" == "go.test" ]]; then
+    set -e
+    make dev.databases.start
+  fi
 script:
-# JS Tests
-- if [[ "$RUNTYPE" == "js.test" ]]; then make js.dev-deps js.deps sdk.deps; fi
-- if [[ "$RUNTYPE" == "js.test" ]]; then make js.translations; fi
-- if [[ "$RUNTYPE" == "js.test" ]]; then make js.test sdk.test; fi
-- if [[ "$RUNTYPE" == "js.test" ]]; then make js.lint; fi
-- if [[ "$RUNTYPE" == "js.test" ]]; then make sdk.js.build sdk.protos.clean sdk.protos; fi
-- if [[ "$RUNTYPE" == "js.test" ]]; then make swagger.protos.clean swagger.protos; fi
-- if [[ "$RUNTYPE" == "js.test" ]]; then make markdown.protos.clean markdown.protos; fi
-# Go Tests
-- if [[ "$RUNTYPE" == "go.test" ]]; then make go.deps; fi
-- if [[ "$RUNTYPE" == "go.test" ]]; then make dev.databases.start; fi
-- if [[ "$RUNTYPE" == "go.test" ]]; then make dev.certs; fi
-- if [[ "$RUNTYPE" == "go.test" ]]; then make go.test; fi
-- if [[ "$RUNTYPE" == "go.test" ]]; then go run ./cmd/ttn-lw-stack version; fi
-- if [[ "$RUNTYPE" == "go.test" ]]; then go run ./cmd/ttn-lw-cli version; fi
-# Go Quality
-- if [[ "$RUNTYPE" == "go.lint" ]]; then make go.deps; fi
-- if [[ "$RUNTYPE" == "go.lint" ]]; then make headers.check; fi
-- if [[ "$RUNTYPE" == "go.lint" ]]; then make messages; fi
-- if [[ "$RUNTYPE" == "go.lint" ]]; then make go.lint; fi
-- if [[ "$RUNTYPE" == "go.lint" ]]; then make go.protos.clean go.protos; fi
-- if [[ "$RUNTYPE" == "go.lint" ]]; then make go.unconvert; fi
-- if [[ "$RUNTYPE" == "go.lint" ]]; then make go.fmt; fi
-- if [[ "$RUNTYPE" == "go.lint" ]]; then make go.misspell; fi
-# Release
-- if [[ "$RUNTYPE" == "release" ]]; then make deps; fi
-# Diff
+- if [[ "$RUNTYPE" == "js" ]]; then $MAGE proto:swaggerClean proto:swagger; fi
+- if [[ "$RUNTYPE" == "js" ]]; then $MAGE proto:markdownClean proto:markdown; fi
+- if [[ "$RUNTYPE" == "js" ]]; then $MAGE proto:jsSDKClean proto:jsSDK; fi
+- if [[ "$RUNTYPE" == "js" ]]; then $MAGE jsSDK:clean jsSDK:build; fi
+- if [[ "$RUNTYPE" == "js" ]]; then $MAGE js:translations; fi
+- if [[ "$RUNTYPE" == "js" ]]; then $MAGE js:test jsSDK:test; fi
+- if [[ "$RUNTYPE" == "js" ]]; then $MAGE js:lint; fi
+- if [[ "$RUNTYPE" == "go.lint" ]]; then $MAGE headers:check; fi
+- if [[ "$RUNTYPE" == "go.lint" ]]; then $MAGE proto:goClean proto:go; fi
+- if [[ "$RUNTYPE" == "go.lint" ]]; then $MAGE go:messages; fi
+- if [[ "$RUNTYPE" == "go.lint" ]]; then $MAGE go:lint; fi
+- if [[ "$RUNTYPE" == "go.lint" ]]; then $MAGE go:unconvert; fi
+- if [[ "$RUNTYPE" == "go.lint" ]]; then $MAGE go:fmt; fi
+- if [[ "$RUNTYPE" == "go.lint" ]]; then $MAGE go:misspell; fi
+- |
+  if [[ "$RUNTYPE" == "go.test" ]]; then
+    if [[ "$RUN_GOARCH" == "amd64" ]]; then
+      GOARCH=$RUN_GOARCH $MAGE go:coveralls
+    else
+      GOARCH=$RUN_GOARCH $MAGE go:test
+    fi
+  fi
+- if [[ "$RUNTYPE" == "go.test" ]]; then GO111MODULE=on go run ./cmd/ttn-lw-stack version; fi
+- if [[ "$RUNTYPE" == "go.test" ]]; then GO111MODULE=on go run ./cmd/ttn-lw-cli version; fi
+- if [[ "$RUNTYPE" == "release" ]]; then $MAGE version:files; fi
 - make git.diff
 after_success:
 - |
-  if [[ "$RUNTYPE" == "go.test" ]] && [[ "$GOARCH" == "amd64" ]]; then
-    make go.coveralls
-  fi
-- |
   if [[ "$RUNTYPE" == "release" ]]; then
+    set -e
     docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
     snapcraft login --with snapcraft.login
   fi
 deploy:
 - provider: script
   skip_cleanup: true
-  script: GO111MODULE=on go run github.com/goreleaser/goreleaser --release-notes <(go run github.com/TheThingsIndustries/release-notes -owner TheThingsNetwork -repo lorawan-stack -id "release-notes" -head $(git rev-parse HEAD))
+  script:
+  - $MAGE js:build
+  - GO111MODULE=on go run github.com/goreleaser/goreleaser --release-notes <(go run github.com/TheThingsIndustries/release-notes -owner TheThingsNetwork -repo lorawan-stack -id "release-notes" -head $(git rev-parse HEAD))
   on:
     tags: true
+    condition: $RUNTYPE = "release"
+- provider: script
+  skip_cleanup: true
+  script:
+  - $MAGE js:build
+  - GO111MODULE=on go run github.com/goreleaser/goreleaser --snapshot --release-notes <(go run github.com/TheThingsIndustries/release-notes -owner TheThingsNetwork -repo lorawan-stack -id "release-notes" -head $(git rev-parse HEAD))
+  on:
+    branch: master
     condition: $RUNTYPE = "release"

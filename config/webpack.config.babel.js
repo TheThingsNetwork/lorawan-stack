@@ -182,6 +182,7 @@ export default {
   },
   plugins: env({
     all: [
+      new HashOutput(),
       new webpack.NamedModulesPlugin(),
       new webpack.NamedChunksPlugin(),
       new webpack.EnvironmentPlugin({
@@ -221,7 +222,6 @@ export default {
       }),
       // Copy static assets to output directory
       new CopyWebpackPlugin([ `${src}/assets/static` ]),
-      new HashOutput(),
     ],
     development: [
       new webpack.HotModuleReplacementPlugin(),
@@ -238,7 +238,7 @@ export default {
         filepath: path.resolve(context, PUBLIC_DIR, 'libs.bundle.js'),
       }),
       new ShellPlugin({
-        onBuildExit: [ 'make js.gather-locales' ],
+        onBuildExit: [ 'mage js:translations' ],
       }),
     ],
   }),
@@ -264,23 +264,27 @@ function env (obj = {}) {
     return obj
   }
 
-  const all = obj.all || {}
-  const dev = obj.development || {}
-  const prod = obj.production || {}
+  const all = obj.all
+  const dev = obj.development
+  const prod = obj.production
 
   if (Array.isArray(all) || Array.isArray(dev) || Array.isArray(prod)) {
+
     return [
-      ...all,
-      ...(production ? prod : dev),
+      ...all || [],
+      ...(production ? prod || [] : dev || []),
     ]
   }
 
-  if (typeof dev !== 'object' || typeof prod !== 'object') {
+  if (
+    dev !== undefined && typeof dev !== 'object'
+    || prod !== undefined && typeof prod !== 'object'
+  ) {
     return production ? prod : dev
   }
 
   return {
-    ...all,
-    ...(production ? prod : dev),
+    ...all || {},
+    ...(production ? prod || {} : dev || {}),
   }
 }

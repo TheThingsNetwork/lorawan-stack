@@ -15,7 +15,7 @@
     "build:watch": "rm -rf dist; babel -w src -d dist",
     "test": "node_modules/.bin/jest --testPathIgnorePatterns=/dist/",
     "test:watch": "node_modules/.bin/jest --testPathIgnorePatterns=/dist/ --watch",
-    "definitions": "node dist/util/http-mapper.js"
+    "definitions": "node util/http-mapper.js"
   },
   "devDependencies": {
     "babel": "^6.23.0",
