@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import apiDefinition from '../../generated/api-definition.json'
+import { STACK_COMPONENTS } from '../util/constants'
 import Http from './http'
 
 /**
@@ -39,7 +40,15 @@ class Api {
       for (const rpcName of Object.keys(service)) {
         const rpc = service[rpcName]
 
-        this[serviceName][rpcName] = function ({ routeParams = {}} = {}, payload) {
+        this[serviceName][rpcName] = function ({ routeParams = {}, component } = {}, payload) {
+
+          const componentType = typeof component
+          if (componentType === 'string' && !STACK_COMPONENTS.includes(component)) {
+            throw new Error(`Unknown stack component: ${component}`)
+          }
+          if (component && componentType !== 'string') {
+            throw new Error(`Invalid component argument type: ${typeof componentType}`)
+          }
 
           const paramSignature = Object.keys(routeParams).sort().join()
           const endpoint = rpc.http.find(function (prospect) {
@@ -58,7 +67,7 @@ Signature tried: ${paramSignature}`)
             route = route.replace(`{${parameter}}`, routeParams[parameter])
           }
 
-          return connector[endpoint.method](route, payload)
+          return connector[endpoint.method](route, component, payload)
         }
       }
     }
