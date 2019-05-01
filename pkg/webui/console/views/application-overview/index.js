@@ -20,7 +20,7 @@ import sharedMessages from '../../../lib/shared-messages'
 import DateTime from '../../../lib/components/date-time'
 import DevicesTable from '../../containers/devices-table'
 import DataSheet from '../../../components/data-sheet'
-
+import ApplicationEvents from '../../containers/application-events'
 
 import style from './application-overview.styl'
 
@@ -65,6 +65,8 @@ class ApplicationOverview extends React.Component {
   }
 
   render () {
+    const { appId } = this.props.match.params
+
     return (
       <Container>
         <Row>
@@ -73,8 +75,10 @@ class ApplicationOverview extends React.Component {
           </Col>
           <Col sm={12} lg={6}>
             <div className={style.latestEvents}>
-              <h4>Latest Data</h4>
-              <div>Activity Events Placeholder</div>
+              <ApplicationEvents
+                appId={appId}
+                widget
+              />
             </div>
           </Col>
         </Row>
