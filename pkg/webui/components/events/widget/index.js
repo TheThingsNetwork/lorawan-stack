@@ -133,4 +133,13 @@ EventsWidget.defaultProps = {
   limit: 5,
 }
 
+const CONNECTION_STATUS = Object.freeze({
+  GOOD: 'good',
+  BAD: 'bad',
+  MEDIOCRE: 'mediocre',
+  UNKNOWN: 'unknown',
+})
+
+EventsWidget.CONNECTION_STATUS = CONNECTION_STATUS
+
 export default EventsWidget
