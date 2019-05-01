@@ -290,7 +290,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, protocol string, ids ttnpb
 	if err != nil {
 		return nil, err
 	}
-	scheduler, err := scheduling.NewScheduler(ctx, fp, gtw.EnforceDutyCycle)
+	scheduler, err := scheduling.NewScheduler(ctx, fp, gtw.EnforceDutyCycle, nil)
 	if err != nil {
 		return nil, err
 	}

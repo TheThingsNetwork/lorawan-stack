@@ -1177,6 +1177,27 @@ func (dst *GatewayConnectionStats) SetFields(src *GatewayConnectionStats, paths 
 				var zero uint64
 				dst.DownlinkCount = zero
 			}
+		case "round_trip_times":
+			if len(subs) > 0 {
+				newDst := dst.RoundTripTimes
+				if newDst == nil {
+					newDst = &GatewayConnectionStats_RoundTripTimes{}
+					dst.RoundTripTimes = newDst
+				}
+				var newSrc *GatewayConnectionStats_RoundTripTimes
+				if src != nil {
+					newSrc = src.RoundTripTimes
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.RoundTripTimes = src.RoundTripTimes
+				} else {
+					dst.RoundTripTimes = nil
+				}
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
@@ -1217,6 +1238,57 @@ func (dst *GatewayRadio_TxConfiguration) SetFields(src *GatewayRadio_TxConfigura
 			} else {
 				var zero uint64
 				dst.NotchFrequency = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *GatewayConnectionStats_RoundTripTimes) SetFields(src *GatewayConnectionStats_RoundTripTimes, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "min":
+			if len(subs) > 0 {
+				return fmt.Errorf("'min' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Min = src.Min
+			} else {
+				var zero time.Duration
+				dst.Min = zero
+			}
+		case "max":
+			if len(subs) > 0 {
+				return fmt.Errorf("'max' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Max = src.Max
+			} else {
+				var zero time.Duration
+				dst.Max = zero
+			}
+		case "median":
+			if len(subs) > 0 {
+				return fmt.Errorf("'median' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Median = src.Median
+			} else {
+				var zero time.Duration
+				dst.Median = zero
+			}
+		case "count":
+			if len(subs) > 0 {
+				return fmt.Errorf("'count' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Count = src.Count
+			} else {
+				var zero uint32
+				dst.Count = zero
 			}
 
 		default:

@@ -20,6 +20,14 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/scheduling"
 )
 
+type mockTimeSource struct {
+	time.Time
+}
+
+func (s *mockTimeSource) Now() time.Time {
+	return s.Time
+}
+
 type mockClock struct {
 	t scheduling.ConcentratorTime
 }
@@ -30,11 +38,26 @@ func (c *mockClock) IsSynced() bool {
 func (c *mockClock) ServerTime(_ time.Time) scheduling.ConcentratorTime {
 	return c.t
 }
-func (c *mockClock) GatewayTime(t time.Time) scheduling.ConcentratorTime {
-	return scheduling.ConcentratorTime(t.Sub(time.Unix(0, 0)))
+func (c *mockClock) GatewayTime(t time.Time) (scheduling.ConcentratorTime, bool) {
+	return scheduling.ConcentratorTime(t.Sub(time.Unix(0, 0))), true
 }
 func (c *mockClock) TimestampTime(timestamp uint32) scheduling.ConcentratorTime {
 	return c.t + scheduling.ConcentratorTime(time.Duration(timestamp)*time.Microsecond)
+}
+
+type mockRTTs struct {
+	Min,
+	Max,
+	Median time.Duration
+	Count int
+}
+
+func (r *mockRTTs) Stats() (min, max, median time.Duration, count int) {
+	min = r.Min
+	max = r.Max
+	median = r.Median
+	count = r.Count
+	return
 }
 
 func boolPtr(v bool) *bool                       { return &v }

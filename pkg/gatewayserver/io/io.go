@@ -29,7 +29,10 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-const bufferSize = 10
+const (
+	bufferSize = 1 << 4
+	maxRTTs    = 1 << 5
+)
 
 // Server represents the Gateway Server to gateway frontends.
 type Server interface {
@@ -64,6 +67,7 @@ type Connection struct {
 	gateway   *ttnpb.Gateway
 	fp        *frequencyplans.FrequencyPlan
 	scheduler *scheduling.Scheduler
+	rtts      *rtts
 
 	upCh     chan *ttnpb.UplinkMessage
 	downCh   chan *ttnpb.DownlinkMessage
@@ -81,6 +85,7 @@ func NewConnection(ctx context.Context, protocol string, gateway *ttnpb.Gateway,
 		gateway:     gateway,
 		fp:          fp,
 		scheduler:   scheduler,
+		rtts:        newRTTs(maxRTTs),
 		upCh:        make(chan *ttnpb.UplinkMessage, bufferSize),
 		downCh:      make(chan *ttnpb.DownlinkMessage, bufferSize),
 		statusCh:    make(chan *ttnpb.GatewayStatus, bufferSize),
@@ -116,7 +121,7 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage) error {
 			"timestamp", up.Settings.Timestamp,
 			"server_time", up.ReceivedAt,
 			"gateway_time", *up.Settings.Time,
-		)).Debug("Syncronized server and gateway absolute time")
+		)).Debug("Synchronized server and gateway absolute time")
 	} else {
 		c.scheduler.Sync(up.Settings.Timestamp, up.ReceivedAt)
 		log.FromContext(c.ctx).WithFields(log.Fields(
@@ -178,6 +183,9 @@ func (c *Connection) HandleTxAck(ack *ttnpb.TxAcknowledgment) error {
 	}
 	return nil
 }
+
+// RecordRTT records the given round-trip time.
+func (c *Connection) RecordRTT(d time.Duration) { c.rtts.Record(d) }
 
 var (
 	errNotAllowed       = errors.DefineFailedPrecondition("not_allowed", "downlink not allowed")
@@ -300,7 +308,7 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 				settings.CodingRate = phy.LoRaCodingRate
 				settings.Downlink.InvertPolarization = true
 			}
-			var f func(context.Context, int, ttnpb.TxSettings, ttnpb.TxSchedulePriority) (scheduling.Emission, error)
+			var f func(context.Context, int, ttnpb.TxSettings, scheduling.RTTs, ttnpb.TxSchedulePriority) (scheduling.Emission, error)
 			switch request.Class {
 			case ttnpb.CLASS_A:
 				f = c.scheduler.ScheduleAt
@@ -318,7 +326,7 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 			default:
 				panic(fmt.Sprintf("proto: unexpected class %v in oneof", request.Class))
 			}
-			em, err := f(c.ctx, len(msg.RawPayload), settings, request.Priority)
+			em, err := f(c.ctx, len(msg.RawPayload), settings, c.rtts, request.Priority)
 			if err != nil {
 				logger.WithError(err).Debug("Failed to schedule downlink in Rx window")
 				errRxDetails = append(errRxDetails, errRxWindowSchedule.WithCause(err).WithAttributes("window", i+1))
@@ -401,4 +409,9 @@ func (c *Connection) DownStats() (total uint64, t time.Time, ok bool) {
 		t = time.Unix(0, atomic.LoadInt64(&c.lastDownlinkTime))
 	}
 	return
+}
+
+// RTTStats returns the recorded round-trip time statistics.
+func (c *Connection) RTTStats() (min, max, median time.Duration, count int) {
+	return c.rtts.Stats()
 }

@@ -16,6 +16,7 @@ syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "github.com/lyft/protoc-gen-validate/validate/validate.proto";
+import "google/protobuf/duration.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
@@ -239,4 +240,12 @@ message GatewayConnectionStats {
   uint64 uplink_count = 6;
   google.protobuf.Timestamp last_downlink_received_at = 7 [(gogoproto.stdtime) = true];
   uint64 downlink_count = 8;
+
+  message RoundTripTimes {
+    google.protobuf.Duration min = 1 [(gogoproto.nullable) = false, (gogoproto.stdduration) = true, (validate.rules).message.required = true];
+    google.protobuf.Duration max = 2 [(gogoproto.nullable) = false, (gogoproto.stdduration) = true, (validate.rules).message.required = true];
+    google.protobuf.Duration median = 3 [(gogoproto.nullable) = false, (gogoproto.stdduration) = true, (validate.rules).message.required = true];
+    uint32 count = 4;
+  }
+  RoundTripTimes round_trip_times = 9;
 }

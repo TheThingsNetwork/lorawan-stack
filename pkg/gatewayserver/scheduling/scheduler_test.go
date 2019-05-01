@@ -43,16 +43,22 @@ func TestScheduleAt(t *testing.T) {
 			Duration:  durationPtr(2 * time.Second),
 		},
 	}
-	scheduler, err := scheduling.NewScheduler(ctx, fp, true)
+	timeSource := &mockTimeSource{
+		Time: time.Unix(0, 0),
+	}
+	scheduler, err := scheduling.NewScheduler(ctx, fp, true, timeSource)
 	a.So(err, should.BeNil)
-	scheduler.SyncWithGateway(0, time.Now(), time.Unix(0, 0))
 
 	for i, tc := range []struct {
-		PayloadSize    int
-		Settings       ttnpb.TxSettings
-		Priority       ttnpb.TxSchedulePriority
-		ExpectedToa    time.Duration
-		ErrorAssertion *errors.Definition
+		SyncWithGateway bool
+		PayloadSize     int
+		Settings        ttnpb.TxSettings
+		Priority        ttnpb.TxSchedulePriority
+		MaxRTT          *time.Duration
+		MedianRTT       *time.Duration
+		ExpectedToa     time.Duration
+		ExpectedStarts  scheduling.ConcentratorTime
+		ExpectedError   *errors.Definition
 	}{
 		{
 			PayloadSize: 10,
@@ -69,13 +75,14 @@ func TestScheduleAt(t *testing.T) {
 				Frequency:  869525000,
 				Timestamp:  100,
 			},
-			ExpectedToa: 41216 * time.Microsecond,
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
-			// Too late for transmission.
-			ErrorAssertion: &scheduling.ErrTooLate,
+			ExpectedToa: 41216 * time.Microsecond,
+			// Too late for transmission with ScheduleTimeShort.
+			ExpectedError: &scheduling.ErrTooLate,
 		},
 		{
-			PayloadSize: 51,
+			SyncWithGateway: true,
+			PayloadSize:     51,
 			Settings: ttnpb.TxSettings{
 				DataRate: ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_LoRa{
@@ -89,10 +96,53 @@ func TestScheduleAt(t *testing.T) {
 				Frequency:  869525000,
 				Time:       timePtr(time.Unix(0, int64(100*time.Millisecond))),
 			},
-			ExpectedToa: 2465792 * time.Microsecond,
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
-			// Too late for transmission.
-			ErrorAssertion: &scheduling.ErrTooLate,
+			ExpectedToa: 2465792 * time.Microsecond,
+			// Too late for transmission with ScheduleTimeShort.
+			ExpectedError: &scheduling.ErrTooLate,
+		},
+		{
+			PayloadSize: 10,
+			Settings: ttnpb.TxSettings{
+				DataRate: ttnpb.DataRate{
+					Modulation: &ttnpb.DataRate_LoRa{
+						LoRa: &ttnpb.LoRaDataRate{
+							Bandwidth:       125000,
+							SpreadingFactor: 7,
+						},
+					},
+				},
+				CodingRate: "4/5",
+				Frequency:  869525000,
+				Timestamp:  300000,
+			},
+			Priority:    ttnpb.TxSchedulePriority_NORMAL,
+			MaxRTT:      durationPtr(500 * time.Millisecond),
+			ExpectedToa: 41216 * time.Microsecond,
+			// Too late for transmission with RTT.
+			ExpectedError: &scheduling.ErrTooLate,
+		},
+		{
+			SyncWithGateway: true,
+			PayloadSize:     51,
+			Settings: ttnpb.TxSettings{
+				DataRate: ttnpb.DataRate{
+					Modulation: &ttnpb.DataRate_LoRa{
+						LoRa: &ttnpb.LoRaDataRate{
+							Bandwidth:       125000,
+							SpreadingFactor: 12,
+						},
+					},
+				},
+				CodingRate: "4/5",
+				Frequency:  869525000,
+				Time:       timePtr(time.Unix(0, int64(300*time.Millisecond))),
+			},
+			Priority:    ttnpb.TxSchedulePriority_NORMAL,
+			MaxRTT:      durationPtr(500 * time.Millisecond),
+			ExpectedToa: 2465792 * time.Microsecond,
+			// Too late for transmission with RTT.
+			ExpectedError: &scheduling.ErrTooLate,
 		},
 		{
 			PayloadSize: 51,
@@ -109,10 +159,50 @@ func TestScheduleAt(t *testing.T) {
 				Frequency:  869525000,
 				Timestamp:  20000000,
 			},
+			Priority:    ttnpb.TxSchedulePriority_NORMAL,
 			ExpectedToa: 2465792 * time.Microsecond,
-			Priority:    ttnpb.TxSchedulePriority_NORMAL,
 			// Exceeding dwell time of 2 seconds.
-			ErrorAssertion: &scheduling.ErrDwellTime,
+			ExpectedError: &scheduling.ErrDwellTime,
+		},
+		{
+			PayloadSize: 16,
+			Settings: ttnpb.TxSettings{
+				DataRate: ttnpb.DataRate{
+					Modulation: &ttnpb.DataRate_LoRa{
+						LoRa: &ttnpb.LoRaDataRate{
+							Bandwidth:       125000,
+							SpreadingFactor: 7,
+						},
+					},
+				},
+				CodingRate: "4/5",
+				Frequency:  868100000,
+				Time:       timePtr(time.Unix(0, int64(1*time.Second))),
+			},
+			Priority:       ttnpb.TxSchedulePriority_HIGHEST,
+			MedianRTT:      durationPtr(200 * time.Millisecond),
+			ExpectedToa:    51456 * time.Microsecond,
+			ExpectedStarts: 1000000000 - 200000000/2,
+		},
+		{
+			SyncWithGateway: true,
+			PayloadSize:     16,
+			Settings: ttnpb.TxSettings{
+				DataRate: ttnpb.DataRate{
+					Modulation: &ttnpb.DataRate_LoRa{
+						LoRa: &ttnpb.LoRaDataRate{
+							Bandwidth:       125000,
+							SpreadingFactor: 7,
+						},
+					},
+				},
+				CodingRate: "4/5",
+				Frequency:  868100000,
+				Time:       timePtr(time.Unix(0, int64(1*time.Minute))),
+			},
+			Priority:       ttnpb.TxSchedulePriority_HIGHEST,
+			ExpectedToa:    51456 * time.Microsecond,
+			ExpectedStarts: 60000000000,
 		},
 		{
 			PayloadSize: 10,
@@ -129,8 +219,9 @@ func TestScheduleAt(t *testing.T) {
 				Frequency:  869525000,
 				Timestamp:  20000000,
 			},
-			ExpectedToa: 41216 * time.Microsecond,
-			Priority:    ttnpb.TxSchedulePriority_NORMAL,
+			Priority:       ttnpb.TxSchedulePriority_NORMAL,
+			ExpectedToa:    41216 * time.Microsecond,
+			ExpectedStarts: 20000000000,
 		},
 		{
 			PayloadSize: 10,
@@ -147,10 +238,10 @@ func TestScheduleAt(t *testing.T) {
 				Frequency:  869525000,
 				Timestamp:  20000000,
 			},
-			ExpectedToa: 41216 * time.Microsecond,
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
+			ExpectedToa: 41216 * time.Microsecond,
 			// Overlapping with previous transmission.
-			ErrorAssertion: &scheduling.ErrConflict,
+			ExpectedError: &scheduling.ErrConflict,
 		},
 		{
 			PayloadSize: 10,
@@ -167,10 +258,10 @@ func TestScheduleAt(t *testing.T) {
 				Frequency:  869525000,
 				Timestamp:  20000000,
 			},
-			ExpectedToa: 41216 * time.Microsecond,
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
+			ExpectedToa: 41216 * time.Microsecond,
 			// Right after previous transmission; not respecting time-off-air.
-			ErrorAssertion: &scheduling.ErrConflict,
+			ExpectedError: &scheduling.ErrConflict,
 		},
 		{
 			PayloadSize: 10,
@@ -187,8 +278,9 @@ func TestScheduleAt(t *testing.T) {
 				Frequency:  869525000,
 				Timestamp:  20000000 + 41216 + 1000000, // time-on-air + time-off-air.
 			},
-			ExpectedToa: 41216 * time.Microsecond,
-			Priority:    ttnpb.TxSchedulePriority_NORMAL,
+			Priority:       ttnpb.TxSchedulePriority_NORMAL,
+			ExpectedToa:    41216 * time.Microsecond,
+			ExpectedStarts: 20000000000 + 41216000 + 1000000000,
 		},
 		{
 			PayloadSize: 20,
@@ -205,27 +297,42 @@ func TestScheduleAt(t *testing.T) {
 				Frequency:  868100000,
 				Timestamp:  30000000, // In next duty-cycle window; discard previous.
 			},
-			ExpectedToa: 1318912 * time.Microsecond,
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
+			ExpectedToa: 1318912 * time.Microsecond,
 			// Exceeds duty-cycle limitation of 1% in 868.0 - 868.6.
-			ErrorAssertion: &scheduling.ErrDutyCycle,
+			ExpectedError: &scheduling.ErrDutyCycle,
 		},
 	} {
 		tcok := t.Run(strconv.Itoa(i), func(t *testing.T) {
 			a := assertions.New(t)
+			if tc.SyncWithGateway {
+				scheduler.SyncWithGateway(0, timeSource.Time, time.Unix(0, 0))
+			} else {
+				scheduler.Sync(0, timeSource.Time)
+			}
 			d, err := toa.Compute(tc.PayloadSize, tc.Settings)
 			a.So(err, should.BeNil)
 			a.So(d, should.Equal, tc.ExpectedToa)
-			_, err = scheduler.ScheduleAt(ctx, tc.PayloadSize, tc.Settings, tc.Priority)
-			if err != nil && tc.ErrorAssertion == nil {
-				a.So(err, should.BeNil)
-			} else if err != nil {
-				if !a.So(err, should.HaveSameErrorDefinitionAs, *tc.ErrorAssertion) {
+			rtts := &mockRTTs{}
+			if tc.MaxRTT != nil {
+				rtts.Max = *tc.MaxRTT
+				rtts.Count = 1
+			}
+			if tc.MedianRTT != nil {
+				rtts.Median = *tc.MedianRTT
+				rtts.Count = 1
+			}
+			em, err := scheduler.ScheduleAt(ctx, tc.PayloadSize, tc.Settings, rtts, tc.Priority)
+			if tc.ExpectedError != nil {
+				if !a.So(err, should.HaveSameErrorDefinitionAs, *tc.ExpectedError) {
 					t.Fatalf("Unexpected error: %v", err)
 				}
-			} else {
-				a.So(err, should.BeNil)
+				return
 			}
+			if !a.So(err, should.BeNil) {
+				t.FailNow()
+			}
+			a.So(em.Starts(), should.Equal, tc.ExpectedStarts)
 		})
 		if !tcok {
 			t.FailNow()
@@ -246,7 +353,7 @@ func TestScheduleAnytime(t *testing.T) {
 			Duration:  durationPtr(2 * time.Second),
 		},
 	}
-	scheduler, err := scheduling.NewScheduler(ctx, fp, true)
+	scheduler, err := scheduling.NewScheduler(ctx, fp, true, nil)
 	a.So(err, should.BeNil)
 	scheduler.SyncWithGateway(0, time.Now(), time.Unix(0, 0))
 
@@ -270,11 +377,11 @@ func TestScheduleAnytime(t *testing.T) {
 	// Time-on-air is 41216 us, time-off-air is 1000000 us.
 	// 1: [1000000, 2041216]
 	// 2: [4000000, 5041216]
-	_, err = scheduler.ScheduleAt(ctx, 10, settingsAt(869525000, 7, 1000000), ttnpb.TxSchedulePriority_NORMAL)
+	_, err = scheduler.ScheduleAt(ctx, 10, settingsAt(869525000, 7, 1000000), nil, ttnpb.TxSchedulePriority_NORMAL)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	_, err = scheduler.ScheduleAt(ctx, 10, settingsAt(869525000, 7, 4000000), ttnpb.TxSchedulePriority_NORMAL)
+	_, err = scheduler.ScheduleAt(ctx, 10, settingsAt(869525000, 7, 4000000), nil, ttnpb.TxSchedulePriority_NORMAL)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -285,7 +392,7 @@ func TestScheduleAnytime(t *testing.T) {
 	// 1: [1000000, 2041216]
 	// 3: [2041216, 3082432]
 	// 2: [4000000, 5041216]
-	em, err := scheduler.ScheduleAnytime(ctx, 10, settingsAt(869525000, 7, 1000000), ttnpb.TxSchedulePriority_NORMAL)
+	em, err := scheduler.ScheduleAnytime(ctx, 10, settingsAt(869525000, 7, 1000000), nil, ttnpb.TxSchedulePriority_NORMAL)
 	if !a.So(err, should.BeNil) || !a.So(em.Starts(), should.Equal, 2041216*time.Microsecond) {
 		t.FailNow()
 	}
@@ -297,7 +404,7 @@ func TestScheduleAnytime(t *testing.T) {
 	// 3: [2041216, 3082432]
 	// 2: [4000000, 5041216]
 	// 4: [5041216, 5082432]
-	em, err = scheduler.ScheduleAnytime(ctx, 10, settingsAt(869525000, 7, 1000000), ttnpb.TxSchedulePriority_NORMAL)
+	em, err = scheduler.ScheduleAnytime(ctx, 10, settingsAt(869525000, 7, 1000000), nil, ttnpb.TxSchedulePriority_NORMAL)
 	if !a.So(err, should.BeNil) || !a.So(em.Starts(), should.Equal, 5041216*time.Microsecond) {
 		t.FailNow()
 	}
@@ -311,7 +418,7 @@ func TestScheduleAnytime(t *testing.T) {
 	// 2: [4000000, 5041216]
 	// 4: [5041216, 5082432]
 	// 5: [14091200, 15082432]
-	em, err = scheduler.ScheduleAnytime(ctx, 10, settingsAt(869525000, 12, 1000000), ttnpb.TxSchedulePriority_HIGHEST)
+	em, err = scheduler.ScheduleAnytime(ctx, 10, settingsAt(869525000, 12, 1000000), nil, ttnpb.TxSchedulePriority_HIGHEST)
 	if !a.So(err, should.BeNil) || !a.So(em.Starts(), should.Equal, 14091200*time.Microsecond) {
 		t.FailNow()
 	}
@@ -319,7 +426,7 @@ func TestScheduleAnytime(t *testing.T) {
 	// Try schedule another transmission from 1000000 us.
 	// Time-on-air is 991232 us, time-off-air is 1000000 us.
 	// It's 9.91% in a 1% duty-cycle sub-band, so it hits the duty-cycle limitation.
-	_, err = scheduler.ScheduleAnytime(ctx, 10, settingsAt(868100000, 12, 1000000), ttnpb.TxSchedulePriority_HIGHEST)
+	_, err = scheduler.ScheduleAnytime(ctx, 10, settingsAt(868100000, 12, 1000000), nil, ttnpb.TxSchedulePriority_HIGHEST)
 	a.So(err, should.HaveSameErrorDefinitionAs, scheduling.ErrDutyCycle)
 }
 
@@ -354,24 +461,64 @@ func TestScheduleAnytimeShort(t *testing.T) {
 		}
 	}
 
-	// Gateway time; too late (100 ms).
+	// Gateway time; too late (100 ms) without RTT.
 	{
-		scheduler, err := scheduling.NewScheduler(ctx, fp, true)
+		timeSource := &mockTimeSource{
+			Time: time.Now(),
+		}
+		scheduler, err := scheduling.NewScheduler(ctx, fp, true, timeSource)
 		a.So(err, should.BeNil)
-		scheduler.SyncWithGateway(0, time.Now(), time.Unix(0, 0))
-		em, err := scheduler.ScheduleAnytime(ctx, 10, settingsAt(869525000, 7, timePtr(time.Unix(0, int64(100*time.Millisecond))), 0), ttnpb.TxSchedulePriority_NORMAL)
+		scheduler.SyncWithGateway(0, timeSource.Time, time.Unix(0, 0))
+		em, err := scheduler.ScheduleAnytime(ctx, 10, settingsAt(869525000, 7, timePtr(time.Unix(0, int64(100*time.Millisecond))), 0), nil, ttnpb.TxSchedulePriority_NORMAL)
 		a.So(err, should.BeNil)
-		a.So(time.Duration(em.Starts()), should.AlmostEqual, scheduling.ScheduleTimeShort, test.Delay>>6)
+		a.So(time.Duration(em.Starts()), should.Equal, scheduling.ScheduleTimeShort)
 	}
 
-	// Timestamp; too late (100 ms).
+	// Gateway time; too late (10 ms) with RTT.
 	{
-		scheduler, err := scheduling.NewScheduler(ctx, fp, true)
+		timeSource := &mockTimeSource{
+			Time: time.Now(),
+		}
+		scheduler, err := scheduling.NewScheduler(ctx, fp, true, timeSource)
 		a.So(err, should.BeNil)
-		scheduler.SyncWithGateway(0, time.Now(), time.Unix(0, 0))
-		em, err := scheduler.ScheduleAnytime(ctx, 10, settingsAt(869525000, 7, nil, 100*1000), ttnpb.TxSchedulePriority_NORMAL)
+		scheduler.SyncWithGateway(0, timeSource.Time, time.Unix(0, 0))
+		rtts := &mockRTTs{
+			Max:   40 * time.Millisecond,
+			Count: 1,
+		}
+		em, err := scheduler.ScheduleAnytime(ctx, 10, settingsAt(869525000, 7, timePtr(time.Unix(0, int64(10*time.Millisecond))), 0), rtts, ttnpb.TxSchedulePriority_NORMAL)
 		a.So(err, should.BeNil)
-		a.So(time.Duration(em.Starts()), should.AlmostEqual, scheduling.ScheduleTimeShort, test.Delay/1000)
+		a.So(time.Duration(em.Starts()), should.Equal, 40*time.Millisecond+scheduling.QueueDelay)
+	}
+
+	// Timestamp; too late (100 ms) without RTT.
+	{
+		timeSource := &mockTimeSource{
+			Time: time.Now(),
+		}
+		scheduler, err := scheduling.NewScheduler(ctx, fp, true, timeSource)
+		a.So(err, should.BeNil)
+		scheduler.SyncWithGateway(0, timeSource.Time, time.Unix(0, 0))
+		em, err := scheduler.ScheduleAnytime(ctx, 10, settingsAt(869525000, 7, nil, 100*1000), nil, ttnpb.TxSchedulePriority_NORMAL)
+		a.So(err, should.BeNil)
+		a.So(time.Duration(em.Starts()), should.Equal, scheduling.ScheduleTimeShort)
+	}
+
+	// Timestamp; too late (10 ms) with RTT.
+	{
+		timeSource := &mockTimeSource{
+			Time: time.Now(),
+		}
+		scheduler, err := scheduling.NewScheduler(ctx, fp, true, timeSource)
+		a.So(err, should.BeNil)
+		scheduler.SyncWithGateway(0, timeSource.Time, time.Unix(0, 0))
+		rtts := &mockRTTs{
+			Max:   40 * time.Millisecond,
+			Count: 1,
+		}
+		em, err := scheduler.ScheduleAnytime(ctx, 10, settingsAt(869525000, 7, nil, 10*1000), rtts, ttnpb.TxSchedulePriority_NORMAL)
+		a.So(err, should.BeNil)
+		a.So(time.Duration(em.Starts()), should.Equal, 40*time.Millisecond+scheduling.QueueDelay)
 	}
 }
 
@@ -389,10 +536,14 @@ func TestScheduleAnytimeClassC(t *testing.T) {
 		},
 	}
 
-	scheduler, err := scheduling.NewScheduler(ctx, fp, true)
+	timeSource := &mockTimeSource{
+		Time: time.Unix(0, 0),
+	}
+	scheduler, err := scheduling.NewScheduler(ctx, fp, true, timeSource)
 	a.So(err, should.BeNil)
+	scheduler.Sync(0, timeSource.Time)
 
-	// Schedule a join-accept. The clock is not synced; this is scheduled at 5 seconds.
+	// Schedule a join-accept.
 	_, err = scheduler.ScheduleAt(ctx, 10, ttnpb.TxSettings{
 		DataRate: ttnpb.DataRate{
 			Modulation: &ttnpb.DataRate_LoRa{
@@ -405,7 +556,7 @@ func TestScheduleAnytimeClassC(t *testing.T) {
 		CodingRate: "4/5",
 		Frequency:  868100000,
 		Timestamp:  5000000,
-	}, ttnpb.TxSchedulePriority_HIGHEST)
+	}, nil, ttnpb.TxSchedulePriority_HIGHEST)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -423,13 +574,14 @@ func TestScheduleAnytimeClassC(t *testing.T) {
 		CodingRate: "4/5",
 		Frequency:  868100000,
 		Timestamp:  7000000,
-	}, ttnpb.TxSchedulePriority_HIGHEST)
+	}, nil, ttnpb.TxSchedulePriority_HIGHEST)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 
 	// Fast forward 9 seconds.
-	scheduler.Sync(9000000, time.Now().Add(-3*time.Second))
+	timeSource.Time = time.Unix(9, 0)
+	scheduler.Sync(9000000, timeSource.Time)
 
 	// Schedule any time.
 	em, err := scheduler.ScheduleAnytime(ctx, 10, ttnpb.TxSettings{
@@ -443,7 +595,7 @@ func TestScheduleAnytimeClassC(t *testing.T) {
 		},
 		CodingRate: "4/5",
 		Frequency:  869525000,
-	}, ttnpb.TxSchedulePriority_HIGHEST)
+	}, nil, ttnpb.TxSchedulePriority_HIGHEST)
 	a.So(err, should.BeNil)
-	a.So(time.Duration(em.Starts()), should.AlmostEqual, 12*time.Second+scheduling.ScheduleTimeLong, test.Delay>>6)
+	a.So(time.Duration(em.Starts()), should.Equal, 9*time.Second+scheduling.ScheduleTimeLong)
 }
