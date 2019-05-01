@@ -28,7 +28,7 @@ import sharedMessages from '../../../lib/shared-messages'
 import style from './widget.styl'
 
 const m = defineMessages({
-  latestEvents: 'Latest events',
+  latestEvents: 'Latest Events',
   seeAllActivity: 'See all activity',
   unknown: 'Unknown',
 })
