@@ -1198,6 +1198,7 @@ SDKs are responsible for combining (if desired) the three.
 | `net_id` | [`bytes`](#bytes) |  | Home NetID. Stored in Join Server. |
 | `mac_settings` | [`MACSettings`](#ttn.lorawan.v3.MACSettings) |  | Settings for how the Network Server handles MAC layer for this device. Stored in Network Server. |
 | `mac_state` | [`MACState`](#ttn.lorawan.v3.MACState) |  | MAC state of the device. Stored in Network Server. |
+| `pending_mac_state` | [`MACState`](#ttn.lorawan.v3.MACState) |  | Pending MAC state of the device. Stored in Network Server. |
 | `session` | [`Session`](#ttn.lorawan.v3.Session) |  | Current session of the device. Stored in Network Server and Application Server. |
 | `pending_session` | [`Session`](#ttn.lorawan.v3.Session) |  | Pending session. Stored in Network Server and Application Server until RekeyInd is received. |
 | `last_dev_nonce` | [`uint32`](#uint32) |  | Last DevNonce used. This field is only used for devices using LoRaWAN version 1.1 and later. Stored in Join Server. |

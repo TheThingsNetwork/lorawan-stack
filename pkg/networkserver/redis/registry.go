@@ -76,7 +76,9 @@ func (r *DeviceRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIde
 	return applyDeviceFieldMask(nil, pb, append(paths,
 		"ids.application_ids",
 		"ids.dev_addr",
+		"ids.dev_eui",
 		"ids.device_id",
+		"ids.join_eui",
 	)...)
 }
 
@@ -107,7 +109,9 @@ func (r *DeviceRegistry) RangeByAddr(ctx context.Context, addr types.DevAddr, pa
 			pb, err := applyDeviceFieldMask(nil, pb, append(paths,
 				"ids.application_ids",
 				"ids.dev_addr",
+				"ids.dev_eui",
 				"ids.device_id",
+				"ids.join_eui",
 			)...)
 			if err != nil {
 				return false, err

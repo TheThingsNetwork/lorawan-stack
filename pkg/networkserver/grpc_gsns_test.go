@@ -1585,10 +1585,11 @@ func handleUplinkTest() func(t *testing.T) {
 					pb.CreatedAt = ret.CreatedAt
 					pb.UpdatedAt = ret.UpdatedAt
 					if pb.MACState == nil {
-						err := ResetMACState(pb, ns.FrequencyPlans, ttnpb.MACSettings{})
+						macState, err := NewMACState(pb, ns.FrequencyPlans, ttnpb.MACSettings{})
 						if !a.So(err, should.BeNil) {
 							t.FailNow()
 						}
+						pb.MACState = macState
 					}
 					pb.MACState.RxWindowsAvailable = true
 					pb.MACState.PendingApplicationDownlink = nil
@@ -1810,7 +1811,7 @@ func handleJoinTest() func(t *testing.T) {
 			UplinkMessage *ttnpb.UplinkMessage
 		}{
 			{
-				"1.1/nil session",
+				"1.1/no pending session",
 				&ttnpb.EndDevice{
 					LoRaWANVersion:    ttnpb.MAC_V1_1,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
@@ -1837,7 +1838,7 @@ func handleJoinTest() func(t *testing.T) {
 				}(),
 			},
 			{
-				"1.1/active session",
+				"1.1/pending session",
 				&ttnpb.EndDevice{
 					LoRaWANVersion:    ttnpb.MAC_V1_1,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
@@ -1848,8 +1849,8 @@ func handleJoinTest() func(t *testing.T) {
 						DeviceID:               DeviceID,
 					},
 					FrequencyPlanID: test.EUFrequencyPlanID,
-					Session:         ttnpb.NewPopulatedSession(test.Randy, false),
-					MACState:        ttnpb.NewPopulatedMACState(test.Randy, false),
+					PendingSession:  ttnpb.NewPopulatedSession(test.Randy, false),
+					PendingMACState: ttnpb.NewPopulatedMACState(test.Randy, false),
 				},
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
@@ -1877,8 +1878,8 @@ func handleJoinTest() func(t *testing.T) {
 						DeviceID:               DeviceID,
 					},
 					FrequencyPlanID: test.EUFrequencyPlanID,
-					Session:         ttnpb.NewPopulatedSession(test.Randy, false),
-					MACState:        ttnpb.NewPopulatedMACState(test.Randy, false),
+					PendingSession:  ttnpb.NewPopulatedSession(test.Randy, false),
+					PendingMACState: ttnpb.NewPopulatedMACState(test.Randy, false),
 				},
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
@@ -1906,8 +1907,8 @@ func handleJoinTest() func(t *testing.T) {
 						DeviceID:               DeviceID,
 					},
 					FrequencyPlanID: test.EUFrequencyPlanID,
-					Session:         ttnpb.NewPopulatedSession(test.Randy, false),
-					MACState:        ttnpb.NewPopulatedMACState(test.Randy, false),
+					PendingSession:  ttnpb.NewPopulatedSession(test.Randy, false),
+					PendingMACState: ttnpb.NewPopulatedMACState(test.Randy, false),
 				},
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
@@ -1935,8 +1936,8 @@ func handleJoinTest() func(t *testing.T) {
 						DeviceID:               DeviceID,
 					},
 					FrequencyPlanID: test.EUFrequencyPlanID,
-					Session:         ttnpb.NewPopulatedSession(test.Randy, false),
-					MACState:        ttnpb.NewPopulatedMACState(test.Randy, false),
+					PendingSession:  ttnpb.NewPopulatedSession(test.Randy, false),
+					PendingMACState: ttnpb.NewPopulatedMACState(test.Randy, false),
 				},
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
@@ -2102,13 +2103,11 @@ func handleJoinTest() func(t *testing.T) {
 					[]string{
 						"created_at",
 						"frequency_plan_id",
-						"ids.dev_addr",
-						"ids.dev_eui",
-						"ids.join_eui",
 						"lorawan_phy_version",
 						"lorawan_version",
 						"mac_settings",
 						"mac_state",
+						"pending_mac_state",
 						"pending_session",
 						"recent_downlinks",
 						"session",
@@ -2120,13 +2119,11 @@ func handleJoinTest() func(t *testing.T) {
 						}
 						return CopyEndDevice(tc.Device), []string{
 							"frequency_plan_id",
-							"ids.dev_addr",
-							"ids.dev_eui",
-							"ids.join_eui",
 							"lorawan_phy_version",
 							"lorawan_version",
 							"mac_settings",
 							"mac_state",
+							"pending_mac_state",
 							"pending_session",
 							"recent_downlinks",
 							"session",
@@ -2140,10 +2137,11 @@ func handleJoinTest() func(t *testing.T) {
 				pb.UpdatedAt = ret.UpdatedAt
 				a.So(ret, should.HaveEmptyDiff, pb)
 
-				err = ResetMACState(ret, ns.FrequencyPlans, ttnpb.MACSettings{})
+				macState, err := NewMACState(ret, ns.FrequencyPlans, ttnpb.MACSettings{})
 				if !a.So(err, should.BeNil) {
 					t.Fatalf("Failed to reset MAC state: %s", err)
 				}
+				ret.PendingMACState = macState
 				pb = ret
 
 				expectedRequest := &ttnpb.JoinRequest{
@@ -2151,13 +2149,38 @@ func handleJoinTest() func(t *testing.T) {
 					Payload:            CopyUplinkMessage(tc.UplinkMessage).Payload,
 					NetID:              NetID,
 					SelectedMACVersion: pb.LoRaWANVersion,
-					RxDelay:            pb.MACState.DesiredParameters.Rx1Delay,
+					RxDelay:            pb.PendingMACState.DesiredParameters.Rx1Delay,
 					CFList:             frequencyplans.CFList(*test.Must(ns.FrequencyPlans.GetByID(test.EUFrequencyPlanID)).(*frequencyplans.FrequencyPlan), pb.LoRaWANPHYVersion),
 					DownlinkSettings: ttnpb.DLSettings{
-						Rx1DROffset: pb.MACState.DesiredParameters.Rx1DataRateOffset,
-						Rx2DR:       pb.MACState.DesiredParameters.Rx2DataRateIndex,
+						Rx1DROffset: pb.PendingMACState.DesiredParameters.Rx1DataRateOffset,
+						Rx2DR:       pb.PendingMACState.DesiredParameters.Rx2DataRateIndex,
 						OptNeg:      pb.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0,
 					},
+				}
+				if expectedRequest.CFList != nil {
+					switch expectedRequest.CFList.Type {
+					case ttnpb.CFListType_FREQUENCIES:
+						phy := test.Must(test.Must(band.GetByID(pb.FrequencyPlanID)).(band.Band).Version(pb.LoRaWANPHYVersion)).(band.Band)
+						for _, freq := range expectedRequest.CFList.Freq {
+							if freq == 0 {
+								break
+							}
+							pb.PendingMACState.CurrentParameters.Channels = append(pb.PendingMACState.CurrentParameters.Channels, &ttnpb.MACParameters_Channel{
+								UplinkFrequency:   uint64(freq * 100),
+								DownlinkFrequency: uint64(freq * 100),
+								MaxDataRateIndex:  ttnpb.DataRateIndex(phy.MaxADRDataRateIndex),
+								EnableUplink:      true,
+							})
+						}
+
+					case ttnpb.CFListType_CHANNEL_MASKS:
+						if len(pb.PendingMACState.CurrentParameters.Channels) != len(expectedRequest.CFList.ChMasks) {
+							t.Fatal("Mismatch in CFList mask length and pending MAC state channel count")
+						}
+						for i, m := range expectedRequest.CFList.ChMasks {
+							pb.PendingMACState.CurrentParameters.Channels[i].EnableUplink = m
+						}
+					}
 				}
 
 				ctx := context.WithValue(authorizedCtx, struct{}{}, 42)
@@ -2213,8 +2236,8 @@ func handleJoinTest() func(t *testing.T) {
 							t.FailNow()
 						}
 
-						pb.MACState.RxWindowsAvailable = true
-						pb.MACState.QueuedJoinAccept = &ttnpb.MACState_JoinAccept{
+						pb.PendingMACState.RxWindowsAvailable = true
+						pb.PendingMACState.QueuedJoinAccept = &ttnpb.MACState_JoinAccept{
 							Payload: resp.RawPayload,
 							Request: *deepcopy.Copy(expectedRequest).(*ttnpb.JoinRequest),
 							Keys:    *keys,

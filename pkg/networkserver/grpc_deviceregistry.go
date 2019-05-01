@@ -244,9 +244,11 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			sets = append(sets, "session.started_at")
 		}
 
-		if err := resetMACState(&req.EndDevice, ns.FrequencyPlans, ns.defaultMACSettings); err != nil {
+		macState, err := newMACState(&req.EndDevice, ns.FrequencyPlans, ns.defaultMACSettings)
+		if err != nil {
 			return nil, nil, err
 		}
+		req.EndDevice.MACState = macState
 		sets = append(sets, "mac_state")
 
 		return &req.EndDevice, sets, nil

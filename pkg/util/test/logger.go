@@ -58,8 +58,12 @@ func (f fields) sorted() fields {
 // GetLogger returns a logger for tests.
 func GetLogger(t testing.TB) log.Stack {
 	colorTerm, _ := strconv.ParseBool(os.Getenv("COLORTERM"))
+	level := log.InfoLevel
+	if testing.Verbose() {
+		level = log.DebugLevel
+	}
 	logger, err := log.NewLogger(
-		log.WithLevel(log.DebugLevel),
+		log.WithLevel(level),
 		log.WithHandler(log.NewCLI(os.Stdout, log.UseColor(colorTerm))),
 	)
 	if err != nil {

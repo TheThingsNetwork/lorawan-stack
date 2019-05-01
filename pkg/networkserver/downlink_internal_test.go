@@ -269,6 +269,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					"lorawan_phy_version",
 					"mac_settings",
 					"mac_state",
+					"pending_mac_state",
 					"queued_application_downlinks",
 					"recent_downlinks",
 					"recent_uplinks",
@@ -679,6 +680,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					"lorawan_phy_version",
 					"mac_settings",
 					"mac_state",
+					"pending_mac_state",
 					"queued_application_downlinks",
 					"recent_downlinks",
 					"recent_uplinks",
@@ -1028,6 +1030,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					"lorawan_phy_version",
 					"mac_settings",
 					"mac_state",
+					"pending_mac_state",
 					"queued_application_downlinks",
 					"recent_downlinks",
 					"recent_uplinks",
@@ -1425,6 +1428,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					"lorawan_phy_version",
 					"mac_settings",
 					"mac_state",
+					"pending_mac_state",
 					"queued_application_downlinks",
 					"recent_downlinks",
 					"recent_uplinks",
@@ -1894,6 +1898,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					"lorawan_phy_version",
 					"mac_settings",
 					"mac_state",
+					"pending_mac_state",
 					"queued_application_downlinks",
 					"recent_downlinks",
 					"recent_uplinks",
@@ -2226,6 +2231,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					"lorawan_phy_version",
 					"mac_settings",
 					"mac_state",
+					"pending_mac_state",
 					"queued_application_downlinks",
 					"recent_downlinks",
 					"recent_uplinks",
@@ -2544,7 +2550,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						},
 					},
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
-					MACState: &ttnpb.MACState{
+					PendingMACState: &ttnpb.MACState{
 						CurrentParameters: ttnpb.MACParameters{
 							Rx1DataRateOffset: 2,
 							Rx2DataRateIndex:  ttnpb.DATA_RATE_1,
@@ -2664,6 +2670,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					"lorawan_phy_version",
 					"mac_settings",
 					"mac_state",
+					"pending_mac_state",
 					"queued_application_downlinks",
 					"recent_downlinks",
 					"recent_uplinks",
@@ -2680,11 +2687,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 				ret, paths, err := f(CopyEndDevice(pb))
 				a.So(err, should.BeNil)
 				a.So(paths, should.HaveSameElementsDeep, []string{
-					"ids.dev_addr",
-					"mac_state.pending_join_request",
-					"mac_state.queued_join_accept",
-					"mac_state.rx_windows_available",
-					"pending_session",
+					"pending_mac_state.pending_join_request",
+					"pending_mac_state.queued_join_accept",
+					"pending_mac_state.rx_windows_available",
+					"pending_session.dev_addr",
+					"pending_session.keys",
 					"recent_downlinks",
 				})
 				if !a.So(ret, should.NotBeNil) || !a.So(ret.RecentDownlinks, should.HaveLength, 1) {
@@ -2698,16 +2705,16 @@ func TestProcessDownlinkTask(t *testing.T) {
 				rx1Freq := channels[int(test.Must(phy.Rx1Channel(3)).(uint8))].DownlinkFrequency
 
 				expected := CopyEndDevice(pb)
-				expected.MACState.PendingJoinRequest = &expected.MACState.QueuedJoinAccept.Request
+				expected.PendingMACState.PendingJoinRequest = &expected.PendingMACState.QueuedJoinAccept.Request
 				expected.PendingSession = &ttnpb.Session{
-					DevAddr:     expected.MACState.QueuedJoinAccept.Request.DevAddr,
-					SessionKeys: expected.MACState.QueuedJoinAccept.Keys,
+					DevAddr:     expected.PendingMACState.QueuedJoinAccept.Request.DevAddr,
+					SessionKeys: expected.PendingMACState.QueuedJoinAccept.Keys,
 				}
-				expected.MACState.PendingApplicationDownlink = nil
-				expected.MACState.PendingRequests = nil
-				expected.MACState.QueuedJoinAccept = nil
-				expected.MACState.QueuedResponses = nil
-				expected.MACState.RxWindowsAvailable = false
+				expected.PendingMACState.PendingApplicationDownlink = nil
+				expected.PendingMACState.PendingRequests = nil
+				expected.PendingMACState.QueuedJoinAccept = nil
+				expected.PendingMACState.QueuedResponses = nil
+				expected.PendingMACState.RxWindowsAvailable = false
 				expected.RecentDownlinks = append(expected.RecentDownlinks, &ttnpb.DownlinkMessage{
 					RawPayload:     []byte("testJoinAccept"),
 					CorrelationIDs: ret.RecentDownlinks[0].CorrelationIDs,
