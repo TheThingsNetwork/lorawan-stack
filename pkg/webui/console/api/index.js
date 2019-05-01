@@ -77,6 +77,7 @@ export default {
     'delete': ttnClient.Applications.deleteById.bind(ttnClient.Applications),
     create: ttnClient.Applications.create.bind(ttnClient.Applications),
     update: ttnClient.Applications.updateById.bind(ttnClient.Applications),
+    eventsSubscribe: ttnClient.Applications.openStream.bind(ttnClient.Applications),
     apiKeys: {
       list: ttnClient.Applications.ApiKeys.getAll.bind(ttnClient.Applications.ApiKeys),
       update: ttnClient.Applications.ApiKeys.updateById.bind(ttnClient.Applications.ApiKeys),
