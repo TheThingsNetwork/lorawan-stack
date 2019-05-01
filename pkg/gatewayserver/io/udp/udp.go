@@ -356,14 +356,14 @@ func (s *srv) handleDown(ctx context.Context, state *state) error {
 				}
 			}
 			canImmediate := atomic.LoadUint32(&state.receivedTxAck) == 1
-			preferLate := state.io.Gateway().ScheduleDownlinkLate
-			if canImmediate || !preferLate {
+			forceLate := state.io.Gateway().ScheduleDownlinkLate
+			if canImmediate && !forceLate {
 				write()
 				break
 			}
 			gatewayTime, err := state.clock(tx.Tmst)
 			if err != nil {
-				logger.Warn("Schedule late preferred but no gateway clock available")
+				logger.Warn("Schedule late forced but no gateway clock available")
 				write()
 				break
 			}
