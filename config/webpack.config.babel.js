@@ -31,9 +31,7 @@ const {
   CONTEXT = '.',
   CACHE_DIR = '.cache',
   PUBLIC_DIR = 'public',
-  NODE_ENV = 'development',
-  VERSION = '?.?.?',
-  GIT_TAG,
+  NODE_ENV = 'production',
   SUPPORT_LOCALES = 'en',
   DEFAULT_LOCALE = 'en',
 } = process.env
@@ -42,7 +40,8 @@ const DEV_SERVER_BUILD = process.env.DEV_SERVER_BUILD && process.env.DEV_SERVER_
 const ASSETS_ROOT = '/assets'
 
 const context = path.resolve(CONTEXT)
-const production = NODE_ENV === 'production'
+const production = NODE_ENV !== 'development'
+
 const src = path.resolve('.', 'pkg/webui')
 const include = [ src ]
 const modules = [ path.resolve(context, 'node_modules') ]
@@ -187,7 +186,6 @@ export default {
       new webpack.NamedChunksPlugin(),
       new webpack.EnvironmentPlugin({
         NODE_ENV,
-        VERSION: VERSION || GIT_TAG || 'unknown',
       }),
       new webpack.DefinePlugin({
         'process.predefined.DEFAULT_MESSAGES':
