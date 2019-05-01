@@ -177,7 +177,7 @@ func (h Headers) Check() error {
 	err := filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
 		if info.IsDir() {
 			switch path {
-			case ".cache", ".dev", ".env", ".git", "dist", "node_modules", "public", "sdk/js/dist", "sdk/js/node_modules", "vendor":
+			case ".cache", ".dev", ".env", ".git", "dist", "node_modules", "public", "sdk/js/dist", "sdk/js/node_modules", "vendor", "doc/themes/hugo-theme-techdoc":
 				return filepath.SkipDir
 			}
 			return nil

@@ -84,6 +84,9 @@ install:
   fi
 - |
   if [[ "$RUNTYPE" == "doc" ]]; then
+    set -e
+    sudo apt-get -y update
+    sudo apt-get install -y snapd
     sudo snap install hugo
     make docs-deps
   fi
