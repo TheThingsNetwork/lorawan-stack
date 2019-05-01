@@ -27,6 +27,7 @@ import configuration from './configuration'
 import createNamedApiKeysReducer from './api-keys'
 import createNamedRightsReducer from './rights'
 import createNamedCollaboratorsReducer from './collaborators'
+import createNamedEventsReducer from './events'
 
 export default combineReducers({
   user,
@@ -46,5 +47,8 @@ export default combineReducers({
   }),
   collaborators: combineReducers({
     applications: createNamedCollaboratorsReducer(APPLICATION_SHARED_NAME),
+  }),
+  events: combineReducers({
+    applications: createNamedEventsReducer(APPLICATION_SHARED_NAME),
   }),
 })
