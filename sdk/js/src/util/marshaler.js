@@ -98,6 +98,10 @@ class Marshaler {
     return this.payloadSingleResponse(result, transform)
   }
 
+  static unwrapGateways (result, transform) {
+    return this.payloadListResponse('gateways', result, transform)
+  }
+
   static fieldMaskFromPatch (patch) {
     return traverse(patch).paths().slice(1).map( e => e.join('.') )
   }

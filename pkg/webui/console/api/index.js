@@ -17,7 +17,6 @@ import TTN from 'ttn-lw'
 
 import token from '../lib/access-token'
 import getCookieValue from '../../lib/cookie'
-import stubs from './stubs'
 
 const config = window.APP_CONFIG
 const stack = {
@@ -102,8 +101,7 @@ export default {
     get: ttnClient.Applications.Devices.getById.bind(ttnClient.Applications.Devices),
   },
   gateways: {
-    list: stubs.gateways.list,
-    search: stubs.gateways.search,
+    list: ttnClient.Gateways.getAll.bind(ttnClient.Gateways),
   },
   rights: {
     applications: ttnClient.Applications.getRightsById.bind(ttnClient.Applications),
