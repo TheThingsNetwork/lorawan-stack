@@ -28,8 +28,13 @@ import ApplicationGeneralSettings from '../application-general-settings'
 import ApplicationApiKeys from '../application-api-keys'
 import ApplicationLink from '../application-link'
 import ApplicationCollaborators from '../application-collaborators'
+import ApplicationData from '../application-data'
 
-import { getApplication } from '../../store/actions/application'
+import {
+  getApplication,
+  startApplicationEventsStream,
+  stopApplicationEventsStream,
+} from '../../store/actions/application'
 
 import Devices from '../devices'
 
@@ -40,7 +45,12 @@ import Devices from '../devices'
     application: application.application,
     error: application.error,
   }
-})
+},
+dispatch => ({
+  startStream: id => dispatch(startApplicationEventsStream(id)),
+  stopStream: id => dispatch(stopApplicationEventsStream(id)),
+  getApplication: id => dispatch(getApplication(id)),
+}))
 @withSideNavigation(function (props) {
   const matchedUrl = props.match.url
 
@@ -111,9 +121,16 @@ import Devices from '../devices'
 export default class Application extends React.Component {
 
   componentDidMount () {
-    const { dispatch, appId } = this.props
+    const { appId, startStream, getApplication } = this.props
 
-    dispatch(getApplication(appId))
+    getApplication(appId)
+    startStream(appId)
+  }
+
+  componentWillUnmount () {
+    const { appId, stopStream } = this.props
+
+    stopStream(appId)
   }
 
   render () {
@@ -140,6 +157,7 @@ export default class Application extends React.Component {
         <Route path={`${match.path}/link`} component={ApplicationLink} />
         <Route path={`${match.path}/devices`} component={Devices} />
         <Route path={`${match.path}/collaborators`} component={ApplicationCollaborators} />
+        <Route path={`${match.path}/data`} component={ApplicationData} />
       </Switch>
     )
   }
