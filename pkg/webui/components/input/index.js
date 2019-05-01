@@ -83,6 +83,8 @@ export default class Input extends React.Component {
     let Component = component
     if (type === 'byte') {
       Component = ByteInput
+    } else if (type === 'textarea') {
+      Component = 'textarea'
     }
 
     const v = valid && (Component.validate ? Component.validate(value, this.props) : true)
@@ -129,7 +131,8 @@ export default class Input extends React.Component {
   }
 
   onChange (evt) {
-    this.props.onChange(evt.target.value)
+    const { value } = evt.target
+    this.props.onChange(value !== '' ? value : undefined)
   }
 
   onKeyDown (evt) {

@@ -82,3 +82,6 @@ storiesOf('Input', module)
   .add('Byte read-only', () => (
     <Example type="byte" min={1} max={5} value="A0BF49A464" readOnly />
   ))
+  .add('Textarea', () => (
+    <Example component="textarea" />
+  ))

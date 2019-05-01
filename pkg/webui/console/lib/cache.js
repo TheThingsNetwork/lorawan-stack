@@ -12,24 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import client from './client'
-import user from './user'
-import init from './init'
-import applications from './applications'
-import application from './application'
-import devices from './devices'
-import device from './device'
-import gateways from './gateways'
-import configuration from './configuration'
+export function get (key) {
+  const value = localStorage.getItem(key)
+  try {
+    return JSON.parse(value)
+  } catch (e) {
+    return value
+  }
+}
 
-export default [
-  client,
-  ...user,
-  init,
-  ...applications,
-  ...application,
-  ...devices,
-  ...device,
-  ...gateways,
-  ...configuration,
-]
+export function set (key, val) {
+  const value = JSON.stringify(val)
+  localStorage.setItem(key, value)
+}
+
+export function remove (key) {
+  return localStorage.removeItem(key)
+}
+
+export function clearAll () {
+  return localStorage.clear()
+}

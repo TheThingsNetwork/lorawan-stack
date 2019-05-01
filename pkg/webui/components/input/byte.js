@@ -20,6 +20,8 @@ import MaskedInput from 'react-text-mask'
 
 import style from './input.styl'
 
+const PLACEHOLDER_CHAR = '·'
+
 const hex = /[0-9a-f]/i
 
 const masks = {}
@@ -44,7 +46,7 @@ const upper = function (str) {
 }
 
 const clean = function (str) {
-  return str.replace(/[ \u2000]/g, '')
+  return str.replace(new RegExp(`[ ${PLACEHOLDER_CHAR}]`, 'g'), '')
 }
 
 const Placeholder = function (props) {
@@ -71,7 +73,7 @@ const Placeholder = function (props) {
         return ' '
       }
 
-      return '·'
+      return PLACEHOLDER_CHAR
     })
     .join('')
 
@@ -126,7 +128,7 @@ export default class ByteInput extends React.Component {
         className={classnames(className, style.byte)}
         value={value}
         mask={mask(min, max)}
-        placeholderChar={'\u2000'}
+        placeholderChar={PLACEHOLDER_CHAR}
         keepCharPositions={false}
         pipe={upper}
         onChange={this.onChange}

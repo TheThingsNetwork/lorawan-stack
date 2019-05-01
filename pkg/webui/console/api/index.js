@@ -99,11 +99,16 @@ export default {
   devices: {
     list: ttnClient.Applications.Devices.getAll.bind(ttnClient.Applications.Devices),
     get: ttnClient.Applications.Devices.getById.bind(ttnClient.Applications.Devices),
+    create: ttnClient.Applications.Devices.create.bind(ttnClient.Applications.Devices),
   },
   gateways: {
     list: ttnClient.Gateways.getAll.bind(ttnClient.Gateways),
   },
   rights: {
     applications: ttnClient.Applications.getRightsById.bind(ttnClient.Applications),
+  },
+  configuration: {
+    listNsFrequencyPlans: ttnClient.Configuration.listNsFrequencyPlans.bind(ttnClient.Configuration),
+    listGsFrequencyPlans: ttnClient.Configuration.listGsFrequencyPlans.bind(ttnClient.Configuration),
   },
 }
