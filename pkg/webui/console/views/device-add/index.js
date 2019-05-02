@@ -310,7 +310,7 @@ export default class DeviceAdd extends Component {
               />
               <Message
                 component="h4"
-                content={m.lorawanOptions}
+                content={sharedMessages.lorawanOptions}
               />
               <Field
                 title={sharedMessages.macVersion}

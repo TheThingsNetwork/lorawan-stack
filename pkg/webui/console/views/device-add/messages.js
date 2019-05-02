@@ -15,7 +15,6 @@
 import { defineMessages } from 'react-intl'
 
 export default defineMessages({
-  lorawanOptions: 'LoRaWAN Options',
   activationSettings: 'Activation Settings',
   createDevice: 'Create Device',
   deviceIdPlaceholder: 'my-new-device',
