@@ -75,7 +75,7 @@ var (
 
 func init() {
 	Root.PersistentFlags().AddFlagSet(mgr.Flags())
-	Root.AddCommand(version.Print(name))
+	Root.AddCommand(version.Print(Root))
 	Root.AddCommand(commands.GenManPages(Root))
 	Root.AddCommand(commands.GenMDDoc(Root))
 	Root.AddCommand(commands.GenYAMLDoc(Root))
