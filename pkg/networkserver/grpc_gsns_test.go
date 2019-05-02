@@ -1658,7 +1658,7 @@ func handleUplinkTest() func(t *testing.T) {
 						errch <- err
 					}()
 
-					if pb.GetMACSettings().GetResetsFCnt() == nil || !pb.MACSettings.ResetsFCnt.Value {
+					if pb.MACState != nil && pb.MACState.CurrentParameters.ADRNbTrans <= 1 {
 						close(deduplicationDoneCh)
 						_ = sendUplinkDuplicates(t, ns, collectionDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
 						close(collectionDoneCh)
