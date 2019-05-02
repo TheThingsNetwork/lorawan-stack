@@ -84,7 +84,7 @@ func (dnmsg *DownlinkMessage) FromDownlinkMessage(ids ttnpb.GatewayIdentifiers, 
 }
 
 // ToDownlinkMessage translates the LNS DownlinkMessage "dnmsg" to ttnpb.DownlinkMessage.
-func (dnmsg *DownlinkMessage) ToDownlinkMessage(ids ttnpb.GatewayIdentifiers) ttnpb.DownlinkMessage {
+func (dnmsg *DownlinkMessage) ToDownlinkMessage() ttnpb.DownlinkMessage {
 	// var dlMesg ttnpb.DownlinkMessage
 	var absTime *time.Time
 	if dnmsg.GpsTime != 0 {

@@ -16,6 +16,7 @@ package messages
 
 import (
 	"encoding/binary"
+	"encoding/hex"
 	"encoding/json"
 	"math"
 	"time"
@@ -165,12 +166,16 @@ func (req *JoinRequest) ToUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID str
 		return nil, err
 	}
 
+	var rxTime *time.Time
 	sec, nsec := math.Modf(req.RadioMetaData.UpInfo.RxTime)
-	rxTime := time.Unix(int64(sec), int64(nsec*(1e9)))
+	if sec != 0 {
+		val := time.Unix(int64(sec), int64(nsec*(1e9)))
+		rxTime = &val
+	}
 
 	rxMetadata := &ttnpb.RxMetadata{
 		GatewayIdentifiers: ids,
-		Time:               &rxTime,
+		Time:               rxTime,
 		Timestamp:          timestamp,
 		RSSI:               req.RadioMetaData.UpInfo.RSSI,
 		SNR:                req.RadioMetaData.UpInfo.SNR,
@@ -178,25 +183,34 @@ func (req *JoinRequest) ToUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID str
 	}
 	up.RxMetadata = append(up.RxMetadata, rxMetadata)
 
-	loraDR, err := getDataRateFromIndex(bandID, req.RadioMetaData.DataRate)
+	dataRate, isLora, err := getDataRateFromIndex(bandID, req.RadioMetaData.DataRate)
 	if err != nil {
 		return nil, errJoinRequestMessage.WithCause(err)
 	}
+
+	var codingRate string
+	if isLora {
+		codingRate = "4/5"
+	}
+
 	up.Settings = ttnpb.TxSettings{
-		Frequency: req.RadioMetaData.Frequency,
-		DataRate:  loraDR,
+		Frequency:  req.RadioMetaData.Frequency,
+		DataRate:   dataRate,
+		CodingRate: codingRate,
+		Timestamp:  timestamp,
+		Time:       rxTime,
 	}
 
 	return &up, nil
 }
 
 // FromUplinkMessage extracts fields from ttnpb.UplinkMessage and creates the Basic Station Join Request Frame.
-func (req *JoinRequest) FromUplinkMessage(ids ttnpb.GatewayIdentifiers, up *ttnpb.UplinkMessage, bandID string) error {
-	payload := up.GetPayload()
-	if payload == nil {
+func (req *JoinRequest) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID string) error {
+	var payload ttnpb.Message
+	err := lorawan.UnmarshalMessage(up.RawPayload, &payload)
+	if err != nil {
 		return errUplinkMessage
 	}
-
 	req.MHdr = (uint(payload.MHDR.GetMType()) << 5) | uint(payload.MHDR.GetMajor())
 	req.MIC = int32(binary.LittleEndian.Uint32(payload.MIC[:]))
 	jreqPayload := payload.GetJoinRequestPayload()
@@ -228,6 +242,10 @@ func (req *JoinRequest) FromUplinkMessage(ids ttnpb.GatewayIdentifiers, up *ttnp
 		return err
 	}
 
+	var rxTime float64
+	if rxMetadata.Time != nil {
+		rxTime = float64(rxMetadata.Time.Unix()) + float64(rxMetadata.Time.Nanosecond())/(1e9)
+	}
 	req.RadioMetaData = RadioMetaData{
 		DataRate:  dr,
 		Frequency: up.Settings.GetFrequency(),
@@ -236,7 +254,7 @@ func (req *JoinRequest) FromUplinkMessage(ids ttnpb.GatewayIdentifiers, up *ttnp
 			XTime:  int64(rxMetadata.Timestamp),
 			RSSI:   rxMetadata.RSSI,
 			SNR:    rxMetadata.SNR,
-			RxTime: float64(rxMetadata.Time.Unix()) + float64(rxMetadata.Time.Nanosecond())/(1e9),
+			RxTime: rxTime,
 		},
 	}
 	return nil
@@ -275,17 +293,27 @@ func (updf *UplinkDataFrame) ToUplinkMessage(ids ttnpb.GatewayIdentifiers, bandI
 		return nil, errUplinkDataFrame.WithCause(err)
 	}
 
+	decFRMPayload, err := hex.DecodeString(updf.FRMPayload)
+	if err != nil {
+		return nil, errUplinkDataFrame.WithCause(err)
+	}
+
+	decFOpts, err := hex.DecodeString(updf.FOpts)
+	if err != nil {
+		return nil, errUplinkDataFrame.WithCause(err)
+	}
+
 	up.Payload = &ttnpb.Message{
 		MHDR: parsedMHDR,
 		MIC:  micBytes,
 		Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{
 			FPort:      fPort,
-			FRMPayload: []byte(updf.FRMPayload),
+			FRMPayload: decFRMPayload,
 			FHDR: ttnpb.FHDR{
 				DevAddr: devAddr,
 				FCtrl:   fctrl,
 				FCnt:    uint32(updf.FCnt),
-				FOpts:   []byte(updf.FOpts),
+				FOpts:   decFOpts,
 			},
 		}},
 	}
@@ -309,12 +337,16 @@ func (updf *UplinkDataFrame) ToUplinkMessage(ids ttnpb.GatewayIdentifiers, bandI
 		return nil, errJoinRequestMessage.WithCause(err)
 	}
 
+	var rxTime *time.Time
 	sec, nsec := math.Modf(updf.RadioMetaData.UpInfo.RxTime)
-	rxTime := time.Unix(int64(sec), int64(nsec*(1e9)))
+	if sec != 0 {
+		val := time.Unix(int64(sec), int64(nsec*(1e9)))
+		rxTime = &val
+	}
 
 	rxMetadata := &ttnpb.RxMetadata{
 		GatewayIdentifiers: ids,
-		Time:               &rxTime,
+		Time:               rxTime,
 		Timestamp:          timestamp,
 		RSSI:               updf.RadioMetaData.UpInfo.RSSI,
 		SNR:                updf.RadioMetaData.UpInfo.SNR,
@@ -322,24 +354,33 @@ func (updf *UplinkDataFrame) ToUplinkMessage(ids ttnpb.GatewayIdentifiers, bandI
 	}
 	up.RxMetadata = append(up.RxMetadata, rxMetadata)
 
-	loraDR, err := getDataRateFromIndex(bandID, updf.RadioMetaData.DataRate)
+	dataRate, isLora, err := getDataRateFromIndex(bandID, updf.RadioMetaData.DataRate)
 	if err != nil {
 		return nil, errUplinkDataFrame.WithCause(err)
 	}
+
+	var codingRate string
+	if isLora {
+		codingRate = "4/5"
+	}
+
 	up.Settings = ttnpb.TxSettings{
-		Frequency: updf.RadioMetaData.Frequency,
-		DataRate:  loraDR,
+		Frequency:  updf.RadioMetaData.Frequency,
+		DataRate:   dataRate,
+		CodingRate: codingRate,
+		Timestamp:  timestamp,
+		Time:       rxTime,
 	}
 	return &up, nil
 }
 
 // FromUplinkMessage extracts fields from ttnpb.UplinkMessage and creates the Basic Station UplinkDataFrame.
-func (updf *UplinkDataFrame) FromUplinkMessage(ids ttnpb.GatewayIdentifiers, up *ttnpb.UplinkMessage, bandID string) error {
-	payload := up.GetPayload()
-	if payload == nil {
+func (updf *UplinkDataFrame) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID string) error {
+	var payload ttnpb.Message
+	err := lorawan.UnmarshalMessage(up.RawPayload, &payload)
+	if err != nil {
 		return errUplinkMessage
 	}
-
 	updf.MHdr = (uint(payload.MHDR.GetMType()) << 5) | uint(payload.MHDR.GetMajor())
 
 	macPayload := payload.GetMACPayload()
@@ -350,11 +391,11 @@ func (updf *UplinkDataFrame) FromUplinkMessage(ids ttnpb.GatewayIdentifiers, up 
 	updf.FPort = int(macPayload.GetFPort())
 
 	updf.DevAddr = int32(macPayload.DevAddr.MarshalNumber())
-	updf.FOpts = string(macPayload.GetFOpts())
+	updf.FOpts = hex.EncodeToString(macPayload.GetFOpts())
 
 	updf.FCtrl = getFCtrlAsUint(macPayload.FCtrl)
 	updf.FCnt = uint(macPayload.GetFCnt())
-	updf.FRMPayload = string(macPayload.GetFRMPayload())
+	updf.FRMPayload = hex.EncodeToString(macPayload.GetFRMPayload())
 	updf.MIC = int32(binary.LittleEndian.Uint32(payload.MIC[:]))
 
 	dr, err := getDataRateIndexFromDataRate(bandID, up.Settings.GetDataRate())
@@ -368,6 +409,11 @@ func (updf *UplinkDataFrame) FromUplinkMessage(ids ttnpb.GatewayIdentifiers, up 
 		return err
 	}
 
+	var rxTime float64
+	if rxMetadata.Time != nil {
+		rxTime = float64(rxMetadata.Time.Unix()) + float64(rxMetadata.Time.Nanosecond())/(1e9)
+	}
+
 	updf.RadioMetaData = RadioMetaData{
 		DataRate:  dr,
 		Frequency: up.Settings.GetFrequency(),
@@ -376,7 +422,7 @@ func (updf *UplinkDataFrame) FromUplinkMessage(ids ttnpb.GatewayIdentifiers, up 
 			XTime:  int64(rxMetadata.Timestamp),
 			RSSI:   rxMetadata.RSSI,
 			SNR:    rxMetadata.SNR,
-			RxTime: float64(rxMetadata.Time.Unix()) + float64(rxMetadata.Time.Nanosecond())/(1e9),
+			RxTime: rxTime,
 		},
 	}
 	return nil
