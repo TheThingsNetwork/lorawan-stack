@@ -280,6 +280,18 @@ outer:
 				continue
 			}
 
+			drIdx, err := searchDataRate(up.Settings.DataRate, match.Device, ns.FrequencyPlans)
+			if err != nil {
+				logger.WithError(err).Debug("Failed to determine data rate index of uplink")
+				continue
+			}
+
+			chIdx, err := searchUplinkChannel(up.Settings.Frequency, match.MACState)
+			if err != nil {
+				logger.WithError(err).Debug("Failed to determine channel index of uplink")
+				continue
+			}
+
 			sNwkSIntKey, err := cryptoutil.UnwrapAES128Key(*match.Session.SNwkSIntKey, ns.KeyVault)
 			if err != nil {
 				logger.WithField("kek_label", match.Session.SNwkSIntKey.KEKLabel).WithError(err).Warn("Failed to unwrap SNwkSIntKey, skip")
@@ -290,19 +302,6 @@ outer:
 			if pld.Ack {
 				confFCnt = match.Session.LastConfFCntDown
 			}
-
-			drIdx, err := searchDataRate(up.Settings.DataRate, match.Device, ns.FrequencyPlans)
-			if err != nil {
-				logger.WithError(err).Warn("Failed to determine data rate index of uplink")
-				continue
-			}
-
-			chIdx, err := searchUplinkChannel(up.Settings.Frequency, match.MACState)
-			if err != nil {
-				logger.WithError(err).Warn("Failed to determine channel index of uplink")
-				continue
-			}
-
 			computedMIC, err = crypto.ComputeUplinkMIC(
 				sNwkSIntKey,
 				fNwkSIntKey,
