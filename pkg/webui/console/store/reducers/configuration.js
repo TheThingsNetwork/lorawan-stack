@@ -52,13 +52,13 @@ const configuration = function (state = defaultState, action) {
     return {
       ...state,
       fetching: true,
-      nsFrequencyPlans: undefined,
+      gsFrequencyPlans: undefined,
     }
   case GET_GS_FREQUENCY_PLANS_SUCCESS:
     return {
       ...state,
       fetching: false,
-      nsFrequencyPlans: action.frequencyPlans,
+      gsFrequencyPlans: action.frequencyPlans,
     }
   case GET_GS_FREQUENCY_PLANS_FAILURE:
     return {
