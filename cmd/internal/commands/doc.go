@@ -47,7 +47,7 @@ func GenManPages(root *cobra.Command) *cobra.Command {
 			return doc.GenManTree(root, &doc.GenManHeader{
 				Title:   strings.ToUpper(root.Name()),
 				Section: "1",
-				Manual:  "The Things Network Stack for LoRaWAN",
+				Manual:  root.Root().Short,
 				Source:  "TTN",
 			}, dir)
 		},
