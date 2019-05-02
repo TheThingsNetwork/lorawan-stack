@@ -25,3 +25,15 @@ export const nsFrequencyPlansSelector = function (state) {
 
   return store.nsFrequencyPlans || []
 }
+
+export const errorSelector = function (state) {
+  const store = storeSelector(state)
+
+  return store.error
+}
+
+export const fetchingSelector = function (state) {
+  const store = storeSelector(state)
+
+  return store.fetching
+}
