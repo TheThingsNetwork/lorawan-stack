@@ -26,7 +26,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/basicstation"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
-	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/basicstationlns/correlations"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/basicstationlns/messages"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -42,10 +41,9 @@ var (
 )
 
 type srv struct {
-	correlations *correlations.DownlinkCorrelation
-	ctx          context.Context
-	server       io.Server
-	upgrader     *websocket.Upgrader
+	ctx      context.Context
+	server   io.Server
+	upgrader *websocket.Upgrader
 }
 
 func (*srv) Protocol() string { return "basicstation" }
@@ -53,15 +51,11 @@ func (*srv) Protocol() string { return "basicstation" }
 // New returns a new Basic Station frontend that can be registered in the web server.
 func New(ctx context.Context, server io.Server) web.Registerer {
 	ctx = log.NewContextWithField(ctx, "namespace", "gatewayserver/io/basicstation")
-	dlCorrelations := correlations.New(ctx, tokenExpiration)
-	s := &srv{
-		ctx:          ctx,
-		server:       server,
-		upgrader:     &websocket.Upgrader{},
-		correlations: dlCorrelations,
+	return &srv{
+		ctx:      ctx,
+		server:   server,
+		upgrader: &websocket.Upgrader{},
 	}
-	go s.correlations.GC()
-	return s
 }
 
 func (s *srv) RegisterRoutes(server *web.Server) {
@@ -136,7 +130,6 @@ func (s *srv) handleDiscover(c echo.Context) error {
 }
 
 func (s *srv) handleTraffic(c echo.Context) error {
-	receivedAt := time.Now()
 	uid := c.Param("uid")
 	ids, err := unique.ToGatewayID(uid)
 	if err != nil {
@@ -170,6 +163,7 @@ func (s *srv) handleTraffic(c echo.Context) error {
 			},
 		},
 	})
+
 	conn, err := s.server.Connect(ctx, s, ids)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to connect")
@@ -193,9 +187,8 @@ func (s *srv) handleTraffic(c echo.Context) error {
 				return
 			case down := <-conn.Down():
 				dnmsg := messages.DownlinkMessage{}
-				token := s.correlations.GenerateNextToken()
-				s.correlations.Store(token, down.GetCorrelationIDs())
-				dnmsg.FromDownlinkMessage(ids, *down, token)
+				//TODO: Add Token check after rebasing https://github.com/TheThingsNetwork/lorawan-stack/pull/589
+				dnmsg.FromDownlinkMessage(ids, *down, 0x00)
 				msg, err := dnmsg.MarshalJSON()
 				if err != nil {
 					logger.WithError(err).Error("Failed to marshal downlink message")
@@ -205,25 +198,28 @@ func (s *srv) handleTraffic(c echo.Context) error {
 				logger.Info("Send downlink message")
 				if err := ws.WriteMessage(websocket.TextMessage, msg); err != nil {
 					logger.WithError(err).Error("Failed to send downlink message")
+					conn.Disconnect(err)
 				}
 			}
 		}
 	}()
-
 	for {
 		_, data, err := ws.ReadMessage()
 		if err != nil {
 			logger.WithError(err).Debug("Failed to read message")
-			return err
+			conn.Disconnect(err)
+			return nil
 		}
+
 		typ, err := messages.Type(data)
 		if err != nil {
 			logger.WithError(err).Debug("Failed to parse message type")
-			return err
+			continue
 		}
 		logger = logger.WithFields(log.Fields(
 			"upstream_type", typ,
 		))
+		receivedAt := time.Now()
 
 		switch typ {
 		case messages.TypeUpstreamVersion:
@@ -255,13 +251,13 @@ func (s *srv) handleTraffic(c echo.Context) error {
 		case messages.TypeUpstreamJoinRequest:
 			var jreq messages.JoinRequest
 			if err := json.Unmarshal(data, &jreq); err != nil {
-				logger.WithError(err).Debug("Failed to unmarshal join-request message")
-				return err
+				logger.WithError(err).Warn("Failed to unmarshal join-request message")
+				return nil
 			}
 			up, err := jreq.ToUplinkMessage(ids, fp.BandID, receivedAt)
 			if err != nil {
 				logger.WithError(err).Debug("Failed to parse join-request message")
-				return err
+				return nil
 			}
 			if err := conn.HandleUp(up); err != nil {
 				logger.WithError(err).Warn("Failed to handle uplink message")
@@ -270,13 +266,13 @@ func (s *srv) handleTraffic(c echo.Context) error {
 		case messages.TypeUpstreamUplinkDataFrame:
 			var updf messages.UplinkDataFrame
 			if err := json.Unmarshal(data, &updf); err != nil {
-				logger.WithError(err).Debug("Failed to unmarshal uplink data frame")
-				return err
+				logger.WithError(err).Warn("Failed to unmarshal uplink data frame")
+				return nil
 			}
 			up, err := updf.ToUplinkMessage(ids, fp.BandID, receivedAt)
 			if err != nil {
 				logger.WithError(err).Debug("Failed to parse uplink data frame")
-				return err
+				return nil
 			}
 			if err := conn.HandleUp(up); err != nil {
 				logger.WithError(err).Warn("Failed to handle uplink message")
@@ -285,16 +281,13 @@ func (s *srv) handleTraffic(c echo.Context) error {
 		case messages.TypeUpstreamTxConfirmation:
 			var txConf messages.TxConfirmation
 			if err := json.Unmarshal(data, &txConf); err != nil {
-				logger.WithError(err).Debug("Failed to unmarshal Tx acknowledgement frame")
-				return err
+				logger.WithError(err).Warn("Failed to unmarshal Tx acknowledgement frame")
+				return nil
 			}
-			if ids := s.correlations.Fetch(txConf.Diid); ids != nil {
-				txAck := messages.ToTxAcknowledgment(ids)
-				if err := conn.HandleTxAck(&txAck); err != nil {
-					logger.WithError(err).Warn("Failed to handle Tx acknowledgement message")
-				}
-			} else {
-				logger.Debug("TxAck does not correspond to a downlink message or is received too late")
+			//TODO: Add Token check after rebasing https://github.com/TheThingsNetwork/lorawan-stack/pull/589
+			txAck := messages.ToTxAcknowledgment(nil)
+			if err := conn.HandleTxAck(&txAck); err != nil {
+				logger.WithError(err).Warn("Failed to handle Tx acknowledgement message")
 			}
 
 		case messages.TypeUpstreamProprietaryDataFrame:

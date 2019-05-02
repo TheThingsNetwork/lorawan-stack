@@ -2582,6 +2582,15 @@
       "file": "frequencyplans.go"
     }
   },
+  "error:pkg/gatewayserver/io/basicstationlns/messages:data_rate": {
+    "translations": {
+      "en": "data rate not found"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/basicstationlns/messages",
+      "file": "util.go"
+    }
+  },
   "error:pkg/gatewayserver/io/basicstationlns/messages:data_rate_index": {
     "translations": {
       "en": "data rate index is out of range"
@@ -2621,6 +2630,15 @@
   "error:pkg/gatewayserver/io/basicstationlns/messages:uplink_data_Frame": {
     "translations": {
       "en": "invalid uplink data frame received"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/basicstationlns/messages",
+      "file": "upstream.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/basicstationlns/messages:uplink_message": {
+    "translations": {
+      "en": "invalid uplink message received"
     },
     "description": {
       "package": "pkg/gatewayserver/io/basicstationlns/messages",
