@@ -27,12 +27,12 @@ func print(k, v string) {
 }
 
 // Print version information.
-func Print(command string) *cobra.Command {
+func Print(root *cobra.Command) *cobra.Command {
 	return &cobra.Command{
 		Use:   "version",
 		Short: "Print version information",
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Printf("The Things Network Stack for LoRaWAN: %s\n", command)
+			fmt.Printf("%s: %s\n", root.Short, root.Name())
 			print("Version", version.TTN)
 			if version.BuildDate != "" {
 				print("Build date", version.BuildDate)

@@ -217,7 +217,7 @@ func requireAuth() error {
 }
 
 var (
-	versionCommand     = version.Print(name)
+	versionCommand     = version.Print(Root)
 	genManPagesCommand = commands.GenManPages(Root)
 	genMDDocCommand    = commands.GenMDDoc(Root)
 	ganYAMLDocCommand  = commands.GenYAMLDoc(Root)
