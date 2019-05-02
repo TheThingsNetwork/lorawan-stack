@@ -34,7 +34,45 @@ const m = defineMessages({
 })
 
 @bind
-class Events extends React.PureComponent {
+class Events extends React.Component {
+
+  state = {
+    paused: false,
+  }
+
+  shouldComponentUpdate (nextProps, nextState) {
+    const { paused } = this.state
+    const {
+      events,
+      emitterId,
+      onClear,
+      limit,
+    } = this.props
+
+    if (
+      emitterId !== nextProps.emitterId
+      || limit !== nextProps.limit
+      || onClear !== nextProps.onClear
+      || paused !== nextState.paused
+    ) {
+      return true
+    }
+
+    const newEvents = events !== nextProps.events
+    const clearedEvents = newEvents && nextProps.events.length === 0
+
+    // rerender component if cleared events when in the `paused` state
+    if (clearedEvents && paused) {
+      return true
+    }
+
+    // do not rerender component on new events when in the `paused` state
+    if (newEvents && paused) {
+      return false
+    }
+
+    return newEvents
+  }
 
   renderEvent (event) {
     const { component: Component, type } = getEventComponentByName(event.name)
@@ -52,9 +90,7 @@ class Events extends React.PureComponent {
   }
 
   onPause () {
-    const { onPause } = this.props
-
-    onPause()
+    this.setState(prev => ({ paused: !prev.paused }))
   }
 
   onClear () {
@@ -71,12 +107,11 @@ class Events extends React.PureComponent {
     const {
       className,
       events,
-      paused,
       onClear,
-      onPause,
       emitterId,
       limit,
     } = this.props
+    const { paused } = this.state
 
     let limitedEvents = events
     const truncated = events.length > limit
@@ -87,7 +122,7 @@ class Events extends React.PureComponent {
     const header = (
       <Header
         paused={paused}
-        onPause={onPause}
+        onPause={this.onPause}
         onClear={onClear}
       />
     )
@@ -116,9 +151,7 @@ class Events extends React.PureComponent {
 
 Events.propTypes = {
   events: PropTypes.arrayOf(PropTypes.event),
-  paused: PropTypes.bool.isRequired,
   emitterId: PropTypes.string.isRequired,
-  onPause: PropTypes.func.isRequired,
   onClear: PropTypes.func.isRequired,
   limit: PropTypes.number,
 }

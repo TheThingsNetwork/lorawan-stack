@@ -12,37 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.title
-  margin-bottom: $ls.m
+const storeSelector = (state, props) => state[props.id]
 
-  h2
-    entity-title()
-    margin-bottom: 0
+export const eventsSelector = entity => function (state, props) {
+  const store = storeSelector(state.events[entity], props)
 
-  .description
-    display: block
-    margin-top: ($cs.xs * -1)
-    margin-bottom: $ls.s
+  return store ? store.events : []
+}
 
-.table
-  margin-top: $ls.xl
+export const statusSelector = entity => function (state, props) {
+  const store = storeSelector(state.events[entity], props)
 
-.attributes
-  list-style: none
-  padding: 0
+  return store ? store.status : 'unknown'
+}
 
-  &-entry
-    display: flex
-    align-content: center
-    &:not(.last-child)
-      text-margin-bottom($cs.s)
+export const errorSelector = entity => function (state, props) {
+  const store = storeSelector(state.events[entity], props)
 
-  .key
-    flex-basis: 50%
-    font-weight: bold
-
-  .value
-    flex-basis:50%
-
-.latest-events
-  margin-top: $ls.m
+  return store ? store.error : false
+}

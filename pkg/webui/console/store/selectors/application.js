@@ -12,37 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.title
-  margin-bottom: $ls.m
+import {
+  eventsSelector,
+  errorSelector as eventsErrorSelector,
+  statusSelector as eventsStatusSelector,
+} from './events'
 
-  h2
-    entity-title()
-    margin-bottom: 0
+const ENTITY = 'applications'
 
-  .description
-    display: block
-    margin-top: ($cs.xs * -1)
-    margin-bottom: $ls.s
+export const applicationEventsSelector = eventsSelector(ENTITY)
 
-.table
-  margin-top: $ls.xl
+export const applicationEventsErrorSelector = eventsErrorSelector(ENTITY)
 
-.attributes
-  list-style: none
-  padding: 0
-
-  &-entry
-    display: flex
-    align-content: center
-    &:not(.last-child)
-      text-margin-bottom($cs.s)
-
-  .key
-    flex-basis: 50%
-    font-weight: bold
-
-  .value
-    flex-basis:50%
-
-.latest-events
-  margin-top: $ls.m
+export const applicationEventsStatusSelector = eventsStatusSelector(ENTITY)

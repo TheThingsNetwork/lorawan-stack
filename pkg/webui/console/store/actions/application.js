@@ -34,6 +34,19 @@ import {
   getCollaborator,
 } from '../actions/collaborators'
 
+import {
+  startEventsStream,
+  createStartEventsStreamActionType,
+  startEventsStreamSuccess,
+  createStartEventsStreamSuccessActionType,
+  startEventsStreamFailure,
+  createStartEventsStreamFailureActionType,
+  stopEventsStream,
+  createStopEventsStreamActionType,
+  clearEvents,
+  createClearEventsActionType,
+} from '../actions/events'
+
 export const SHARED_NAME = 'APPLICATION'
 
 export const GET_APP = 'GET_APPLICATION'
@@ -47,6 +60,11 @@ export const GET_APP_COLLABORATOR_PAGE_DATA = createGetCollaboratorActionType(SH
 export const GET_APP_COLLABORATORS_LIST = createGetCollaboratorsListActionType(SHARED_NAME)
 export const GET_APP_COLLABORATORS_LIST_SUCCESS = createGetCollaboratorsListSuccessActionType(SHARED_NAME)
 export const GET_APP_COLLABORATORS_LIST_FAILURE = createGetCollaboratorsListFailureActionType(SHARED_NAME)
+export const START_APP_EVENT_STREAM = createStartEventsStreamActionType(SHARED_NAME)
+export const START_APP_EVENT_STREAM_SUCCESS = createStartEventsStreamSuccessActionType(SHARED_NAME)
+export const START_APP_EVENT_STREAM_FAILURE = createStartEventsStreamFailureActionType(SHARED_NAME)
+export const STOP_APP_EVENT_STREAM = createStopEventsStreamActionType(SHARED_NAME)
+export const CLEAR_APP_EVENTS = createClearEventsActionType(SHARED_NAME)
 
 export const getApplication = id => (
   { type: GET_APP, id }
@@ -75,3 +93,13 @@ export const getApplicationCollaboratorsListSuccess = getCollaboratorsListSucces
 export const getApplicationCollaboratorsListFailure = getCollaboratorsListFailure(SHARED_NAME)
 
 export const getApplicationCollaboratorPageData = getCollaborator(SHARED_NAME)
+
+export const startApplicationEventsStream = startEventsStream(SHARED_NAME)
+
+export const startApplicationEventsStreamSuccess = startEventsStreamSuccess(SHARED_NAME)
+
+export const startApplicationEventsStreamFailure = startEventsStreamFailure(SHARED_NAME)
+
+export const stopApplicationEventsStream = stopEventsStream(SHARED_NAME)
+
+export const clearApplicationEventsStream = clearEvents(SHARED_NAME)
