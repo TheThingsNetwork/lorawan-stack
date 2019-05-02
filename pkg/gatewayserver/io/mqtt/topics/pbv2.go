@@ -16,6 +16,22 @@ package topics
 
 type v2 struct{}
 
+func (v2) BirthTopic(uid string) []string {
+	return []string{"connect"}
+}
+
+func (v2) IsBirthTopic(path []string) bool {
+	return len(path) == 1 && path[0] == "connect"
+}
+
+func (v2) LastWillTopic(uid string) []string {
+	return []string{"disconnect"}
+}
+
+func (v2) IsLastWillTopic(path []string) bool {
+	return len(path) == 1 && path[0] == "disconnect"
+}
+
 func (v2) UplinkTopic(uid string) []string {
 	return []string{uid, "up"}
 }

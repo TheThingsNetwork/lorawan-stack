@@ -223,6 +223,8 @@ func (c *connection) Connect(ctx context.Context, info *auth.Info) (context.Cont
 			c.format.DownlinkTopic(uid),
 		},
 		writes: [][]string{
+			c.format.BirthTopic(uid),
+			c.format.LastWillTopic(uid),
 			c.format.UplinkTopic(uid),
 			c.format.StatusTopic(uid),
 			c.format.TxAckTopic(uid),
@@ -269,6 +271,8 @@ func (c *connection) CanWrite(info *auth.Info, topicParts ...string) bool {
 func (c *connection) deliver(pkt *packet.PublishPacket) {
 	logger := log.FromContext(c.io.Context()).WithField("topic", pkt.TopicName)
 	switch {
+	case c.format.IsBirthTopic(pkt.TopicParts):
+	case c.format.IsLastWillTopic(pkt.TopicParts):
 	case c.format.IsUplinkTopic(pkt.TopicParts):
 		up, err := c.format.ToUplink(pkt.Message, c.io.Gateway().GatewayIdentifiers)
 		if err != nil {
@@ -297,5 +301,7 @@ func (c *connection) deliver(pkt *packet.PublishPacket) {
 		if err := c.io.HandleTxAck(ack); err != nil {
 			logger.WithError(err).Warn("Failed to handle Tx acknowledgment message")
 		}
+	default:
+		logger.Debug("Publish to invalid topic")
 	}
 }

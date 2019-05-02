@@ -18,6 +18,22 @@ const topicV3 = "v3"
 
 type v3 struct{}
 
+func (v3) BirthTopic(uid string) []string {
+	return nil
+}
+
+func (v3) IsBirthTopic(path []string) bool {
+	return false
+}
+
+func (v3) LastWillTopic(uid string) []string {
+	return nil
+}
+
+func (v3) IsLastWillTopic(path []string) bool {
+	return false
+}
+
 func (v3) UplinkTopic(uid string) []string {
 	return []string{topicV3, uid, "up"}
 }
