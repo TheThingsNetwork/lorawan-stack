@@ -102,7 +102,7 @@ func init() {
 	AllRights = AllRights.Sorted()
 }
 
-// Implied returns the Right together with its implied rights.
+// Implied returns the Right's implied rights.
 func (r Right) Implied() *Rights {
 	// NOTE: Changes here require the documentation in rights.proto to be updated.
 	switch r {
@@ -110,8 +110,12 @@ func (r Right) Implied() *Rights {
 		return AllUserRights
 	case RIGHT_APPLICATION_ALL:
 		return AllApplicationRights
+	case RIGHT_APPLICATION_LINK:
+		return RightsFrom(RIGHT_APPLICATION_INFO)
 	case RIGHT_GATEWAY_ALL:
 		return AllGatewayRights
+	case RIGHT_GATEWAY_LINK:
+		return RightsFrom(RIGHT_GATEWAY_INFO)
 	case RIGHT_ORGANIZATION_ALL:
 		return AllOrganizationRights
 	case RIGHT_ALL:

@@ -18277,7 +18277,7 @@
             {
               "name": "RIGHT_APPLICATION_LINK",
               "number": "27",
-              "description": "The right to link as Application to a Network Server for traffic exchange,\ni.e. read uplink and write downlink (API keys only).\nThis right is typically only given to an Application Server."
+              "description": "The right to link as Application to a Network Server for traffic exchange,\ni.e. read uplink and write downlink (API keys only).\nThis right is typically only given to an Application Server.\nThis right implies RIGHT_APPLICATION_INFO."
             },
             {
               "name": "RIGHT_APPLICATION_ALL",
@@ -18327,7 +18327,7 @@
             {
               "name": "RIGHT_GATEWAY_LINK",
               "number": "37",
-              "description": "The right to link as Gateway to a Gateway Server for traffic exchange,\ni.e. write uplink and read downlink (API keys only)"
+              "description": "The right to link as Gateway to a Gateway Server for traffic exchange,\ni.e. write uplink and read downlink (API keys only)\nThis right is typically only given to a gateway.\nThis right implies RIGHT_GATEWAY_INFO."
             },
             {
               "name": "RIGHT_GATEWAY_STATUS_READ",
