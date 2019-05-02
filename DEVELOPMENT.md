@@ -166,15 +166,132 @@ The actual commands for compilation are handled by our Makefile, so the only thi
 ├── pkg                 contains all libraries used in the TTN stack for LoRaWAN
 │   ├── component       contains the base component; all other components extend this component
 │   ├── config          package for configuration using config files, environment and CLI flags
+│   ├── console         package that provides the web server for the console
 │   ├── errors          package for rich errors that include metadata and cross API boundaries
 │   ├── log             package for logging
 │   ├── messages        contains non-proto messages (such as the messages that are sent over MQTT)
 │   ├── metrics         package for metrics collection
 │   ├── ttnpb           contains generated code from our protocol buffer definitions and some helper functions
 │   ├── types           contains primitive types
+│   ├── webui           contains js code for the console and oauth provider
 │   └── ...
 ├── public              frontend code will be compiled to this folder - not added to git
 ├── release             binaries will be compiled to this folder - not added to git
 └── sdk                 source code for our SDKs
     └── js              source code for our JavaScript SDK
+```
+
+
+## Frontend
+### Introduction
+The Things Network Stack for LoRaWAN includes two frontend applications: the **Console** and **OAuth Provider**. Both applications use [React](https://reactjs.org/) as frontend framework. The `console` and `oauth` packages of the backend expose their respective web servers and handle all logic that cannot be done in the browser. Otherwise both applications are single page applications (SPA) that run entirely in the browser.
+
+#### Console
+The Console is the official management application of the stack. It can be used to register applications, end devices or gateways, monitor network traffic, or configure network related options, among other things. The console uses an OAuth access token to communicate with the stack.
+
+#### OAuth
+The OAuth app provides the necessary frontend for the OAuth provider of the stack. It is used e.g. to display the authorization screen that users get prompted with when they want to authorize a third-party app to access the stack.
+
+### Building the frontend
+You can control whether to build the frontend for production or development by setting the `$NODE_ENV` environment variable to either `development` or `production`. The frontend can then be built using:
+
+```sh
+mage js:build
+```
+
+This will initiate the following actions:
+
+* Install a version-fixed binary of `yarn`
+* Install JS SDK node dependencies via `yarn`
+* Build the JS SDK
+* Extract backend locale messages
+* Install frontend node dependencies via `yarn`
+* Build the frontend (using `webpack`) and output into `/public`
+
+The difference of a development build includes:
+
+* Including source maps
+* Using DLL bundle for modules to reduce build time
+* A couple of special build options to improve usage with `webpack-dev-server`
+
+After successfully running the build command, the stack has all necessary files to run the Console and OAuth provider applications.
+
+### Development
+#### Serving the frontend for development
+For development purposes, the frontend can be run using `webpack-dev-server`. After following the [Getting Started](#getting-started) section to initialize the stack and doing an initial build of the frontend via `mage js:build`, it can be served using:
+
+```sh
+export NODE_ENV=development
+mage js:serve
+```
+
+The development server runs on `http://localhost:8080` and will proxy all api calls to port `1885`. The serve command watches any changes inside `pkg/webui` and refreshes automatically. 
+In order to set up the stack to support running the frontend via `webpack-dev-server`, the following environment setup is needed:
+
+```
+NODE_ENV=development
+TTN_LW_LOG_LEVEL=debug
+TTN_LW_IS_OAUTH_UI_JS_FILE=libs.bundle.js,oauth.js
+TTN_LW_CONSOLE_UI_JS_FILE=libs.bundle.js,console.js
+TTN_LW_CONSOLE_UI_CANONICAL_URL=http://localhost:8080/console
+TTN_LW_CONSOLE_OAUTH_AUTHORIZE_URL=http://localhost:8080/oauth/authorize
+TTN_LW_CONSOLE_OAUTH_TOKEN_URL=http://localhost:8080/oauth/token
+TTN_LW_IS_OAUTH_UI_CANONICAL_URL=http://localhost:8080/oauth
+TTN_LW_IS_EMAIL_NETWORK_IDENTITY_SERVER_URL=http://localhost:8080/oauth.js
+TTN_LW_CONSOLE_UI_ASSETS_BASE_URL=http://localhost:8080/assets
+```
+*Note: We recommend using an environment switcher like [`direnv`](https://direnv.net/) to help you setting up environments for different tasks easily.*  
+All of the configuration options above can also be set using configuration files or runtime flags. For more info in this regard, [see this guide](https://github.com/TheThingsNetwork/lorawan-stack/blob/master/doc/config.md).
+
+#### Testing
+For frontend testing, we use [`jest`](https://jestjs.io/en/). We currently don't enforce any coverage minimum, but consider testing for complex logic. We use both snapshot testing for React Components with [`enzyme`](https://airbnb.io/enzyme/) and plain `jest` testing for arbitrary logic.
+
+To run the frontend tests, use:
+
+```sh
+mage js:test
+```
+
+### Internationalization (i18n)
+The Things Network Stack for LoRaWAN employs i18n to provide usage experience in different languages. As such, also the frontend uses translatable messages. For this purpose we use [`react-intl`](https://github.com/yahoo/react-intl), which helps us greatly to define text messages used in the frontend.
+The workflow for defining messages is as follows:
+
+1. Add a `react-intl` message using `intl.defineMessages({…})`
+  * This can be done either inline, or by adding it to `pkg/webui/lib/shared-messages.js`
+2. Use the message in components (e.g. `sharedMessage.myMessage`)
+
+After adding messages this way, it needs to be added the locales file `pkg/webui/locales/*.js` by using:
+
+```sh
+mage js:translations
+```
+*Note: When using `mage js:serve`, this command will be run automatically after any change*
+
+The message definitions in `pkg/webui/locales` can be used to provide translations in other languages (e.g. `fr.js`). Keep in mind that locale files are checked in and commited, any discrepancy in the locales file with the defined messages will lead to a CI failure.
+
+### Frontend Folder Structure
+⟶ `pkg/webui`
+
+```
+.
+├── assets            assets (eg. vectors, images) used by the frontend
+├── components        react components shared throughout the frontend
+├── console           root of the console application
+│   ├── api           api definitions to communicate with the stack
+│   ├── containers    container components
+│   ├── lib           utility classes and functions
+│   ├── store         redux actions, reducers and logic middlewares
+│   ├── views         whole view components of the console (~pages)
+├── containers        global react container components
+├── lib               global utility classes and functions
+├── locales           frontend and backend locale jsons used for i18n
+├── oauth             root of the oauth application
+│   ├── api           api definitions to communicate with the stack
+│   ├── store         redux actions, reducers and logic middlewares
+│   ├── views         whole view components of the oauth provider (~pages)
+├── styles            global stylus (~css) styles and mixins
+├── console.js        entry point of the console app
+├── oauth.js          entry point of the oauth app
+├── manifest.go       generated manifest of the frontend, containing file hashes
+├── template.go       go template module used to render the frontend HTML
 ```
