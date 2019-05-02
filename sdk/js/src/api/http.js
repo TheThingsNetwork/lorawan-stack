@@ -104,7 +104,7 @@ class Http {
   }
 
   async delete (endpoint, component) {
-    return this.handleRequest('delete', component, endpoint)
+    return this.handleRequest('delete', endpoint, component)
   }
 
   /**
