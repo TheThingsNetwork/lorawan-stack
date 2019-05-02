@@ -178,10 +178,10 @@ func TestJoinRequest(t *testing.T) {
 					}}},
 				RxMetadata: []*ttnpb.RxMetadata{{
 					GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"},
-					Time:               &[]time.Time{time.Unix(0, 0)}[0],
 					UplinkToken:        []byte{10, 16, 10, 14, 10, 12, 116, 101, 115, 116, 45, 103, 97, 116, 101, 119, 97, 121},
 				}},
 				Settings: ttnpb.TxSettings{
+					CodingRate: "4/5",
 					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 12,
 						Bandwidth:       125000,
@@ -228,7 +228,10 @@ func TestJoinRequest(t *testing.T) {
 				},
 				},
 				Settings: ttnpb.TxSettings{
-					Frequency: 868300000,
+					Frequency:  868300000,
+					Time:       &[]time.Time{time.Unix(1548059982, 0)}[0],
+					Timestamp:  (uint32)(12666373963464220 & 0xFFFFFFFF),
+					CodingRate: "4/5",
 					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 11,
 						Bandwidth:       125000,
@@ -289,7 +292,7 @@ func TestUplinkDataFrame(t *testing.T) {
 				FPort:      0x00,
 				FCnt:       25,
 				FOpts:      "FD",
-				FRMPayload: "Ymxhamthc25kJ3M=",
+				FRMPayload: "5fcc",
 				MIC:        12345678,
 				RadioMetaData: RadioMetaData{
 					DataRate:  1,
@@ -310,7 +313,7 @@ func TestUplinkDataFrame(t *testing.T) {
 					MIC:  []byte{0x4E, 0x61, 0xBC, 0x00},
 					Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{
 						FPort:      0,
-						FRMPayload: []byte("Ymxhamthc25kJ3M="),
+						FRMPayload: []byte{0x5F, 0xCC},
 						FHDR: ttnpb.FHDR{
 							DevAddr: [4]byte{0x11, 0x22, 0x33, 0x44},
 							FCtrl: ttnpb.FCtrl{
@@ -318,7 +321,7 @@ func TestUplinkDataFrame(t *testing.T) {
 								ClassB: true,
 							},
 							FCnt:  25,
-							FOpts: []byte("FD"),
+							FOpts: []byte{0xFD},
 						},
 					}}},
 				RxMetadata: []*ttnpb.RxMetadata{{
@@ -331,7 +334,10 @@ func TestUplinkDataFrame(t *testing.T) {
 				},
 				},
 				Settings: ttnpb.TxSettings{
-					Frequency: 868300000,
+					Timestamp:  (uint32)(12666373963464220 & 0xFFFFFFFF),
+					Time:       &[]time.Time{time.Unix(1548059982, 0)}[0],
+					CodingRate: "4/5",
+					Frequency:  868300000,
 					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 11,
 						Bandwidth:       125000,
@@ -348,7 +354,7 @@ func TestUplinkDataFrame(t *testing.T) {
 				FPort:      -1,
 				FCnt:       25,
 				FOpts:      "FD",
-				FRMPayload: "Ymxhamthc25kJ3M=",
+				FRMPayload: "5fcc",
 				MIC:        12345678,
 				RadioMetaData: RadioMetaData{
 					DataRate:  1,
@@ -369,7 +375,7 @@ func TestUplinkDataFrame(t *testing.T) {
 					MIC:  []byte{0x4E, 0x61, 0xBC, 0x00},
 					Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{
 						FPort:      0,
-						FRMPayload: []byte("Ymxhamthc25kJ3M="),
+						FRMPayload: []byte{0x5F, 0xCC},
 						FHDR: ttnpb.FHDR{
 							DevAddr: [4]byte{0x11, 0x22, 0x33, 0x44},
 							FCtrl: ttnpb.FCtrl{
@@ -377,7 +383,7 @@ func TestUplinkDataFrame(t *testing.T) {
 								ClassB: true,
 							},
 							FCnt:  25,
-							FOpts: []byte("FD"),
+							FOpts: []byte{0xFD},
 						},
 					}}},
 				RxMetadata: []*ttnpb.RxMetadata{{
@@ -390,7 +396,10 @@ func TestUplinkDataFrame(t *testing.T) {
 				},
 				},
 				Settings: ttnpb.TxSettings{
-					Frequency: 868300000,
+					Frequency:  868300000,
+					Timestamp:  (uint32)(12666373963464220 & 0xFFFFFFFF),
+					Time:       &[]time.Time{time.Unix(1548059982, 0)}[0],
+					CodingRate: "4/5",
 					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 11,
 						Bandwidth:       125000,
@@ -430,7 +439,6 @@ func TestFromUplinkDataFrame(t *testing.T) {
 		{
 			Name:                    "Empty",
 			ExpectedUplinkDataFrame: UplinkDataFrame{},
-			GatewayIDs:              ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"},
 			FrequencyPlanID:         "EU_863_870",
 			UplinkMessage:           ttnpb.UplinkMessage{},
 			ErrorAssertion: func(err error) bool {
@@ -440,22 +448,26 @@ func TestFromUplinkDataFrame(t *testing.T) {
 		{
 			Name: "ValidFrame",
 			UplinkMessage: ttnpb.UplinkMessage{
+				RawPayload: []byte{0x40, 0xff, 0xff, 0xff, 0x42, 0xb2, 0x42, 0xff, 0xfe, 0xff, 0x42, 0xfe, 0xff, 0x42, 0xff, 0xff, 0x0f},
 				Payload: &ttnpb.Message{
-					MHDR: ttnpb.MHDR{MType: ttnpb.MType_UNCONFIRMED_UP, Major: ttnpb.Major_LORAWAN_R1},
-					MIC:  []byte{0x4E, 0x61, 0xBC, 0x00},
+					MHDR: ttnpb.MHDR{MType: ttnpb.MType_UNCONFIRMED_UP, Major: 0},
 					Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{
-						FPort:      0,
-						FRMPayload: []byte("Ymxhamthc25kJ3M="),
 						FHDR: ttnpb.FHDR{
-							DevAddr: [4]byte{0x44, 0x33, 0x22, 0x11},
+							DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 							FCtrl: ttnpb.FCtrl{
-								Ack:    true,
-								ClassB: true,
+								ADR:       true,
+								ADRAckReq: false,
+								Ack:       true,
+								ClassB:    true,
+								FPending:  false,
 							},
-							FCnt:  25,
-							FOpts: []byte("FD"),
+							FCnt:  0xff42,
+							FOpts: []byte{0xfe, 0xff},
 						},
-					}}},
+						FPort:      0x42,
+						FRMPayload: []byte{0xfe, 0xff},
+					}},
+					MIC: []byte{0x42, 0xff, 0xff, 0x0f}},
 				RxMetadata: []*ttnpb.RxMetadata{{
 					GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"},
 					Time:               &[]time.Time{time.Unix(1548059982, 0)}[0],
@@ -473,17 +485,16 @@ func TestFromUplinkDataFrame(t *testing.T) {
 					}}},
 				},
 			},
-			GatewayIDs:      ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"},
 			FrequencyPlanID: "EU_863_870",
 			ExpectedUplinkDataFrame: UplinkDataFrame{
 				MHdr:       0x40,
-				DevAddr:    0x44332211,
-				FCtrl:      0x30,
-				FPort:      0x00,
-				FCnt:       25,
-				FOpts:      "FD",
-				FRMPayload: "Ymxhamthc25kJ3M=",
-				MIC:        12345678,
+				DevAddr:    0x42ffffff,
+				FCtrl:      0xb0,
+				FPort:      0x42,
+				FCnt:       0xff42,
+				FOpts:      "feff",
+				FRMPayload: "feff",
+				MIC:        268435266,
 				RadioMetaData: RadioMetaData{
 					DataRate:  1,
 					Frequency: 868300000,
@@ -500,7 +511,7 @@ func TestFromUplinkDataFrame(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 			var updf UplinkDataFrame
-			err := updf.FromUplinkMessage(tc.GatewayIDs, &tc.UplinkMessage, tc.FrequencyPlanID)
+			err := updf.FromUplinkMessage(&tc.UplinkMessage, tc.FrequencyPlanID)
 			if err != nil {
 				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 					t.Fatalf("Unexpected error: %v", err)
@@ -520,7 +531,6 @@ func TestJreqFromUplinkDataFrame(t *testing.T) {
 	for _, tc := range []struct {
 		Name                string
 		UplinkMessage       ttnpb.UplinkMessage
-		GatewayIDs          ttnpb.GatewayIdentifiers
 		FrequencyPlanID     string
 		ExpectedJoinRequest JoinRequest
 		ErrorAssertion      func(err error) bool
@@ -528,7 +538,6 @@ func TestJreqFromUplinkDataFrame(t *testing.T) {
 		{
 			Name:                "Empty",
 			ExpectedJoinRequest: JoinRequest{},
-			GatewayIDs:          ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"},
 			FrequencyPlanID:     "EU_863_870",
 			UplinkMessage:       ttnpb.UplinkMessage{},
 			ErrorAssertion: func(err error) bool {
@@ -538,14 +547,15 @@ func TestJreqFromUplinkDataFrame(t *testing.T) {
 		{
 			Name: "ValidFrame",
 			UplinkMessage: ttnpb.UplinkMessage{
+				RawPayload: []byte{0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0xff, 0x42, 0x42, 0xff, 0xff, 0x0f},
 				Payload: &ttnpb.Message{
-					MHDR: ttnpb.MHDR{MType: ttnpb.MType_JOIN_REQUEST, Major: ttnpb.Major_LORAWAN_R1},
-					MIC:  []byte{0x4E, 0x61, 0xBC, 0x00},
+					MHDR: ttnpb.MHDR{MType: ttnpb.MType_JOIN_REQUEST, Major: 0},
 					Payload: &ttnpb.Message_JoinRequestPayload{JoinRequestPayload: &ttnpb.JoinRequestPayload{
-						JoinEUI:  types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22},
-						DevEUI:   types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11},
-						DevNonce: [2]byte{0x50, 0x46},
-					}}},
+						JoinEUI:  types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+						DevEUI:   types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+						DevNonce: types.DevNonce{0x42, 0xff},
+					}},
+					MIC: []byte{0x42, 0xff, 0xff, 0x0f}},
 				RxMetadata: []*ttnpb.RxMetadata{{
 					GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"},
 					Time:               &[]time.Time{time.Unix(1548059982, 0)}[0],
@@ -563,14 +573,13 @@ func TestJreqFromUplinkDataFrame(t *testing.T) {
 					}}},
 				},
 			},
-			GatewayIDs:      ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"},
 			FrequencyPlanID: "EU_863_870",
 			ExpectedJoinRequest: JoinRequest{
 				MHdr:     0,
-				DevEUI:   basicstation.EUI{EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
-				JoinEUI:  basicstation.EUI{EUI64: types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22}},
-				DevNonce: 18000,
-				MIC:      12345678,
+				DevEUI:   basicstation.EUI{EUI64: types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}},
+				JoinEUI:  basicstation.EUI{EUI64: types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}},
+				DevNonce: 65346,
+				MIC:      268435266,
 				RadioMetaData: RadioMetaData{
 					DataRate:  1,
 					Frequency: 868300000,
@@ -587,7 +596,7 @@ func TestJreqFromUplinkDataFrame(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 			var jreq JoinRequest
-			err := jreq.FromUplinkMessage(tc.GatewayIDs, &tc.UplinkMessage, tc.FrequencyPlanID)
+			err := jreq.FromUplinkMessage(&tc.UplinkMessage, tc.FrequencyPlanID)
 			if err != nil {
 				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 					t.Fatalf("Unexpected error: %v", err)

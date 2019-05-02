@@ -84,12 +84,14 @@ func TestGetDataRateFromDataRateIndex(t *testing.T) {
 		Name             string
 		BandID           string
 		DataRateIndex    int
+		IsLora           bool
 		ExpectedDataRate ttnpb.DataRate
 		ErrorAssertion   func(error) bool
 	}{
 		{
 			Name:   "Valid_EU",
 			BandID: "EU_863_870",
+			IsLora: true,
 			ExpectedDataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
 				SpreadingFactor: 12,
 				Bandwidth:       125000,
@@ -98,6 +100,7 @@ func TestGetDataRateFromDataRateIndex(t *testing.T) {
 		{
 			Name:          "Valid_EU_FSK",
 			BandID:        "EU_863_870",
+			IsLora:        false,
 			DataRateIndex: 7,
 			ExpectedDataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_FSK{FSK: &ttnpb.FSKDataRate{
 				BitRate: 50000,
@@ -115,7 +118,7 @@ func TestGetDataRateFromDataRateIndex(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			dr, err := getDataRateFromIndex(tc.BandID, tc.DataRateIndex)
+			dr, isLora, err := getDataRateFromIndex(tc.BandID, tc.DataRateIndex)
 			if err != nil {
 				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 					t.Fatalf("Unexpected error: %v", err)
@@ -123,7 +126,7 @@ func TestGetDataRateFromDataRateIndex(t *testing.T) {
 			} else if tc.ErrorAssertion != nil {
 				t.Fatalf("Expected error")
 			} else {
-				if !a.So(dr, should.Resemble, tc.ExpectedDataRate) {
+				if !a.So(dr, should.Resemble, tc.ExpectedDataRate) || !a.So(isLora, should.Resemble, tc.IsLora) {
 					t.Fatalf("Invalid datarate: %v", dr)
 				}
 			}

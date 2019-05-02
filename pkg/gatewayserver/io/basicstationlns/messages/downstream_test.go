@@ -107,12 +107,10 @@ func TestToDownlinkMessage(t *testing.T) {
 	for _, tc := range []struct {
 		Name                    string
 		DownlinkMessage         DownlinkMessage
-		GatewayIDs              ttnpb.GatewayIdentifiers
 		ExpectedDownlinkMessage ttnpb.DownlinkMessage
 	}{
 		{
-			Name:       "SampleDownlink",
-			GatewayIDs: ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"},
+			Name: "SampleDownlink",
 			DownlinkMessage: DownlinkMessage{
 				DeviceClass: 0,
 				Pdu:         "Ymxhamthc25kJ3M==",
@@ -138,8 +136,7 @@ func TestToDownlinkMessage(t *testing.T) {
 			},
 		},
 		{
-			Name:       "WithAbsoluteTime",
-			GatewayIDs: ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"},
+			Name: "WithAbsoluteTime",
 			DownlinkMessage: DownlinkMessage{
 				DeviceClass: 1,
 				Pdu:         "Ymxhamthc25kJ3M==",
@@ -167,7 +164,7 @@ func TestToDownlinkMessage(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			dlMesg := tc.DownlinkMessage.ToDownlinkMessage(tc.GatewayIDs)
+			dlMesg := tc.DownlinkMessage.ToDownlinkMessage()
 			if !a.So(dlMesg, should.Resemble, tc.ExpectedDownlinkMessage) {
 				t.Fatalf("Invalid DownlinkMessage: %v", dlMesg)
 			}
