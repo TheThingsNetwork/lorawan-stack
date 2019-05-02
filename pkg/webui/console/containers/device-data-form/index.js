@@ -245,10 +245,11 @@ class DeviceDataForm extends Component {
           type="select"
           required
           options={[
-            { value: 'MAC_V1_0', label: 'MAC V1.0' },
-            { value: 'MAC_V1_0_1', label: 'MAC V1.0.1' },
-            { value: 'MAC_V1_0_2', label: 'MAC V1.0.2' },
-            { value: 'MAC_V1_1', label: 'MAC V1.1' },
+            { value: '1.0.0', label: 'MAC V1.0' },
+            { value: '1.0.1', label: 'MAC V1.0.1' },
+            { value: '1.0.2', label: 'MAC V1.0.2' },
+            { value: '1.0.3', label: 'MAC V1.0.3' },
+            { value: '1.1.0', label: 'MAC V1.1' },
           ]}
         />
         <Field
@@ -257,12 +258,13 @@ class DeviceDataForm extends Component {
           type="select"
           required
           options={[
-            { value: 'PHY_V1_0', label: 'PHY V1.0' },
-            { value: 'PHY_V1_0_1', label: 'PHY V1.0.1' },
-            { value: 'PHY_V1_0_2_REV_A', label: 'PHY V1.0.2 REV A' },
-            { value: 'PHY_V1_0_2_REV_B', label: 'PHY V1.0.2 REV B' },
-            { value: 'PHY_V1_1_REV_A', label: 'PHY V1.1 REV A' },
-            { value: 'PHY_V1_1_REV_B', label: 'PHY V1.1 REV B' },
+            { value: '1.0.0', label: 'PHY V1.0' },
+            { value: '1.0.1', label: 'PHY V1.0.1' },
+            { value: '1.0.2-a', label: 'PHY V1.0.2 REV A' },
+            { value: '1.0.2-b', label: 'PHY V1.0.2 REV B' },
+            { value: '1.0.3-a', label: 'PHY V1.0.3 REV A' },
+            { value: '1.1.0-a', label: 'PHY V1.1 REV A' },
+            { value: '1.1.0-b', label: 'PHY V1.1 REV B' },
           ]}
         />
         <FrequencyPlansSelect
