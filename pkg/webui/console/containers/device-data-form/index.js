@@ -36,7 +36,7 @@ import validationSchema from './validation-schema'
   }
 })
 @bind
-export default class DeviceDataForm extends Component {
+class DeviceDataForm extends Component {
   state = {
     error: '',
     otaa: true,
@@ -174,7 +174,25 @@ export default class DeviceDataForm extends Component {
 
   render () {
     const { error, otaa } = this.state
-    const { handleSubmit } = this.props
+    const { handleSubmit, initialValues } = this.props
+
+    const emptyValues = {
+      ids: {
+        device_id: undefined,
+        join_eui: undefined,
+        dev_eui: undefined,
+      },
+      activation_mode: 'otaa',
+      lorawan_version: undefined,
+      lorawan_phy_version: undefined,
+      frequency_plan_id: undefined,
+      resets_join_nonces: false,
+      root_keys: {},
+      session: {},
+      mac_settings: {
+        resets_f_cnt: false,
+      },
+    }
 
     return (
       <Form
@@ -183,25 +201,10 @@ export default class DeviceDataForm extends Component {
         validationSchema={validationSchema}
         submitEnabledWhenInvalid
         isInitialValid={false}
-        initialValues={
-          {
-            ids: {
-              device_id: undefined,
-              join_eui: undefined,
-              dev_eui: undefined,
-            },
-            activation_mode: 'otaa',
-            lorawan_version: undefined,
-            lorawan_phy_version: undefined,
-            frequency_plan_id: undefined,
-            resets_join_nonces: false,
-            root_keys: {},
-            session: {},
-            mac_settings: {
-              resets_f_cnt: false,
-            },
-          }
-        }
+        initialValues={{
+          ...emptyValues,
+          ...initialValues,
+        }}
         mapErrorsToFields={{
           id_taken: 'application_id',
           identifiers: 'application_id',
@@ -316,6 +319,9 @@ DeviceDataForm.defaultProps = {
   initialValues: {},
   update: false,
   error: '',
+
+DeviceDataForm.defaultProps = {
+  initialValues: {},
 }
 
 export default DeviceDataForm
