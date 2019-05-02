@@ -64,8 +64,8 @@ type TxPacket struct {
 	Tmms *uint64      `json:"tmms,omitempty"` // Send packet at a certain GPS time (GPS synchronization required)
 	Time *CompactTime `json:"time,omitempty"` // Send packet at a certain time (GPS synchronization required)
 	Freq float64      `json:"freq"`           // Tx central frequency in MHz (unsigned float, Hz precision)
-	Brd  uint8        `json:"brd"`            // Concentrator board used for Tx (unsigned integer)
-	Ant  uint8        `json:"ant"`            // Concentrator antenna used for Tx (unsigned integer)
+	Brd  uint8        `json:"brd,omitempty"`  // Concentrator board used for Tx (unsigned integer)
+	Ant  uint8        `json:"ant,omitempty"`  // Concentrator antenna used for Tx (unsigned integer)
 	RFCh uint8        `json:"rfch"`           // Concentrator "RF chain" used for Tx (unsigned integer)
 	Powe uint8        `json:"powe"`           // Tx output power in dBm (unsigned integer, dBm precision)
 	Modu string       `json:"modu"`           // Modulation identifier "LORA" or "FSK"
