@@ -15,6 +15,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import bind from 'autobind-decorator'
+import classnames from 'classnames'
 
 import style from './checkbox.styl'
 
@@ -28,8 +29,12 @@ class Checkbox extends React.PureComponent {
   render () {
     const { value, onChange, ...rest } = this.props
 
+    const classNames = classnames(style.container, {
+      [style.disabled]: rest.disabled,
+    })
+
     return (
-      <label className={style.container}>
+      <label className={classNames}>
         <input
           className={style.input}
           type="checkbox"
