@@ -95,3 +95,20 @@ func (s *Subscription) SendUp(up *ttnpb.ApplicationUp) error {
 func (s *Subscription) Up() <-chan *ttnpb.ApplicationUp {
 	return s.upCh
 }
+
+// CleanDownlinks returns a copy of the given downlink items with only the fields that can be set by the application.
+func CleanDownlinks(items []*ttnpb.ApplicationDownlink) []*ttnpb.ApplicationDownlink {
+	res := make([]*ttnpb.ApplicationDownlink, 0, len(items))
+	for _, item := range items {
+		res = append(res, &ttnpb.ApplicationDownlink{
+			FPort:          item.FPort,
+			FRMPayload:     item.FRMPayload,
+			DecodedPayload: item.DecodedPayload,
+			ClassBC:        item.ClassBC,
+			Priority:       item.Priority,
+			Confirmed:      item.Confirmed,
+			CorrelationIDs: item.CorrelationIDs,
+		})
+	}
+	return res
+}
