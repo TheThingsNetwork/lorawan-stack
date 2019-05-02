@@ -25,9 +25,9 @@ import SubmitBar from '../../../components/submit-bar'
 import FrequencyPlansSelect from '../../containers/freq-plans-select'
 
 import sharedMessages from '../../../lib/shared-messages'
+import PropTypes from '../../../lib/prop-types'
 import m from './messages'
 import validationSchema from './validation-schema'
-
 
 @connect(function ({ configuration }, props) {
   return {
@@ -38,7 +38,6 @@ import validationSchema from './validation-schema'
 @bind
 class DeviceDataForm extends Component {
   state = {
-    error: '',
     otaa: true,
     resets_join_nonces: false,
     resets_f_cnt: false,
@@ -122,6 +121,7 @@ class DeviceDataForm extends Component {
 
   get OTAASection () {
     const { resets_join_nonces } = this.state
+    const { update } = this.props
     return (
       <React.Fragment>
         <Field
@@ -132,6 +132,7 @@ class DeviceDataForm extends Component {
           max={8}
           placeholder={m.joinEUIPlaceholder}
           required
+          disabled={update}
         />
         <Field
           title={sharedMessages.devEUI}
@@ -142,6 +143,7 @@ class DeviceDataForm extends Component {
           placeholder={m.deviceEUIPlaceholder}
           description={m.deviceEUIDescription}
           required
+          disabled={update}
         />
         <Field
           title={sharedMessages.nwkKey}
@@ -173,8 +175,8 @@ class DeviceDataForm extends Component {
   }
 
   render () {
-    const { error, otaa } = this.state
-    const { handleSubmit, initialValues } = this.props
+    const { otaa } = this.state
+    const { onSubmit, initialValues, update, error } = this.props
 
     const emptyValues = {
       ids: {
@@ -222,6 +224,7 @@ class DeviceDataForm extends Component {
           description={m.deviceIdDescription}
           autoFocus
           required
+          disabled={update}
         />
         <Field
           title={sharedMessages.devName}
@@ -286,6 +289,7 @@ class DeviceDataForm extends Component {
         <FieldGroup
           title={m.activationMode}
           name="activation_mode"
+          disabled={update}
           columns
         >
           <Field
@@ -321,9 +325,6 @@ DeviceDataForm.defaultProps = {
   initialValues: {},
   update: false,
   error: '',
-
-DeviceDataForm.defaultProps = {
-  initialValues: {},
 }
 
 export default DeviceDataForm
