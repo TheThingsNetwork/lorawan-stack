@@ -153,7 +153,7 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 		return nil, err
 	}
 	if len(addrMatches) == 0 {
-		logger.Warn("No device matched DevAddr")
+		logger.Debug("No device matched DevAddr")
 		return nil, errDeviceNotFound
 	}
 
@@ -363,7 +363,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	matched, err := ns.matchDevice(ctx, up)
 	if err != nil {
 		registerDropDataUplink(ctx, nil, up, err)
-		log.FromContext(ctx).WithError(err).Warn("Failed to match device")
+		logger.WithError(err).Debug("Failed to match device")
 		return errDeviceNotFound.WithCause(err)
 	}
 
