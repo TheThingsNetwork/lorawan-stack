@@ -373,7 +373,7 @@ func (s *srv) handleDown(ctx context.Context, state *state) error {
 		case <-healthCheck.C:
 			lastSeenPull := time.Unix(0, atomic.LoadInt64(&state.lastSeenPull))
 			if time.Since(lastSeenPull) > s.config.DownlinkPathExpires {
-				logger.Warn("Downlink path expired")
+				logger.Debug("Downlink path expired")
 				s.server.UnclaimDownlink(ctx, state.io.Gateway().GatewayIdentifiers)
 				state.lastDownlinkPath.Store(downlinkPath{})
 				state.startHandleDownMu.Lock()
@@ -426,7 +426,7 @@ func (s *srv) gc() {
 					if time.Since(lastSeenPush) > s.config.ConnectionExpires {
 						select {
 						case <-state.ioWait:
-							logger.WithField("gateway_eui", k.(types.EUI64)).Warn("Connection expired")
+							logger.WithField("gateway_eui", k.(types.EUI64)).Debug("Connection expired")
 							s.connections.Delete(k)
 							state.io.Disconnect(errConnectionExpired)
 						default:
