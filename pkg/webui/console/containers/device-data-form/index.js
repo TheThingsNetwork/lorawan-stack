@@ -40,8 +40,14 @@ class DeviceDataForm extends Component {
   constructor (props) {
     super(props)
 
+    const { initialValues } = this.props
+    let otaa = true
+    if (initialValues.ids) {
+      otaa = Boolean(initialValues.supports_join)
+    }
+
     this.state = {
-      otaa: Boolean(this.props.initialValues.supports_join),
+      otaa,
       resets_join_nonces: false,
       resets_f_cnt: false,
     }
