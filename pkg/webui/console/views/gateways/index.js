@@ -16,6 +16,7 @@ import React from 'react'
 import { Switch, Route } from 'react-router-dom'
 
 import GatewaysList from '../gateways-list'
+import GatewayAdd from '../gateway-add'
 
 import sharedMessages from '../../../lib/shared-messages'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
@@ -33,9 +34,11 @@ export default class Gateways extends React.Component {
 
   render () {
     const { path } = this.props.match
+
     return (
       <Switch>
         <Route exact path={`${path}`} component={GatewaysList} />
+        <Route path={`${path}/add`} component={GatewayAdd} />
       </Switch>
     )
   }
