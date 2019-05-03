@@ -41,7 +41,7 @@ const m = defineMessages({
 export default class DeviceGeneralSettings extends React.Component {
 
   state = {
-    error: undefined,
+    error: '',
   }
 
   async handleSubmit (values, { setSubmitting, resetForm }) {
