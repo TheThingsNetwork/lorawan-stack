@@ -163,19 +163,19 @@ func (s *Scheduler) ScheduleAt(ctx context.Context, payloadSize int, settings tt
 		}
 	}
 	var starts ConcentratorTime
-	now := s.clock.ServerTime(s.timeSource.Now())
+	now := s.clock.FromServerTime(s.timeSource.Now())
 	if settings.Time != nil {
 		var ok bool
-		starts, ok = s.clock.GatewayTime(*settings.Time)
+		starts, ok = s.clock.FromGatewayTime(*settings.Time)
 		if !ok {
 			if medianRTT != nil {
-				starts = s.clock.ServerTime(*settings.Time) - ConcentratorTime(*medianRTT/2)
+				starts = s.clock.FromServerTime(*settings.Time) - ConcentratorTime(*medianRTT/2)
 			} else {
 				return Emission{}, errNoAbsoluteGatewayTime
 			}
 		}
 	} else {
-		starts = s.clock.TimestampTime(settings.Timestamp)
+		starts = s.clock.FromTimestampTime(settings.Timestamp)
 	}
 	if delta := time.Duration(starts - now); delta < minScheduleTime {
 		return Emission{}, errTooLate.WithAttributes("delta", delta)
@@ -223,13 +223,13 @@ func (s *Scheduler) ScheduleAnytime(ctx context.Context, payloadSize int, settin
 		}
 	}
 	var starts ConcentratorTime
-	now := s.clock.ServerTime(s.timeSource.Now())
+	now := s.clock.FromServerTime(s.timeSource.Now())
 	if settings.Timestamp == 0 && settings.Time == nil {
 		starts = now + ConcentratorTime(ScheduleTimeLong)
 		settings.Timestamp = uint32(time.Duration(starts) / time.Microsecond)
 	} else if settings.Time != nil {
 		var ok bool
-		starts, ok = s.clock.GatewayTime(*settings.Time)
+		starts, ok = s.clock.FromGatewayTime(*settings.Time)
 		if !ok {
 			return Emission{}, errNoAbsoluteGatewayTime
 		}
@@ -239,7 +239,7 @@ func (s *Scheduler) ScheduleAnytime(ctx context.Context, payloadSize int, settin
 			settings.Time = &t
 		}
 	} else {
-		starts = s.clock.TimestampTime(settings.Timestamp)
+		starts = s.clock.FromTimestampTime(settings.Timestamp)
 		if delta := minScheduleTime - time.Duration(starts-now); delta > 0 {
 			starts += ConcentratorTime(delta)
 			settings.Timestamp += uint32(delta / time.Microsecond)
@@ -314,5 +314,5 @@ func (s *Scheduler) Now() (ConcentratorTime, bool) {
 	if !s.clock.IsSynced() {
 		return 0, false
 	}
-	return s.clock.ServerTime(s.timeSource.Now()), true
+	return s.clock.FromServerTime(s.timeSource.Now()), true
 }
