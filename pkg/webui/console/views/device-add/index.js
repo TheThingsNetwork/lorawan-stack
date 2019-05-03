@@ -65,7 +65,7 @@ export default class DeviceAdd extends Component {
 
     await this.setState({ error: '' })
     try {
-      const result = await api.devices.create(appId, device, {
+      const result = await api.device.create(appId, device, {
         abp: values.activation_mode === 'abp',
         withRootKeys: true,
       })

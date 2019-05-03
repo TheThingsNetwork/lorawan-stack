@@ -67,7 +67,7 @@ export default class DeviceGeneralSettings extends React.Component {
     try {
       const { ids: { device_id }} = this.props.device
       const changed = diff(device, updatedDevice)
-      await api.devices.update(appId, device_id, changed)
+      await api.device.update(appId, device_id, changed)
 
       resetForm(values)
       toast({
