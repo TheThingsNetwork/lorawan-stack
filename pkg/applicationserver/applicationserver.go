@@ -60,6 +60,11 @@ type ApplicationServer struct {
 	links              sync.Map
 	linkErrors         sync.Map
 	defaultSubscribers []*io.Subscription
+
+	grpc struct {
+		asDevices asEndDeviceRegistryServer
+		appAs     ttnpb.AppAsServer
+	}
 }
 
 // Context returns the context of the Application Server.
@@ -98,6 +103,11 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 			},
 		},
 	}
+
+	as.grpc.asDevices = asEndDeviceRegistryServer{
+		registry: as.deviceRegistry,
+	}
+	as.grpc.appAs = iogrpc.New(as)
 
 	ctx, cancel := context.WithCancel(as.Context())
 	defer func() {
@@ -168,10 +178,8 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 // RegisterServices registers services provided by as at s.
 func (as *ApplicationServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterAsServer(s, as)
-	ttnpb.RegisterAsEndDeviceRegistryServer(s, &deviceRegistryRPC{
-		registry: as.deviceRegistry,
-	})
-	ttnpb.RegisterAppAsServer(s, iogrpc.New(as))
+	ttnpb.RegisterAsEndDeviceRegistryServer(s, as.grpc.asDevices)
+	ttnpb.RegisterAppAsServer(s, as.grpc.appAs)
 	if as.webhooks != nil {
 		ttnpb.RegisterApplicationWebhookRegistryServer(s, web.NewWebhookRegistryRPC(as.webhooks.Registry()))
 	}
@@ -181,6 +189,7 @@ func (as *ApplicationServer) RegisterServices(s *grpc.Server) {
 func (as *ApplicationServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
 	ttnpb.RegisterAsHandler(as.Context(), s, conn)
 	ttnpb.RegisterAsEndDeviceRegistryHandler(as.Context(), s, conn)
+	ttnpb.RegisterAppAsHandler(as.Context(), s, conn)
 	if as.webhooks != nil {
 		ttnpb.RegisterApplicationWebhookRegistryHandler(as.Context(), s, conn)
 	}

@@ -22,12 +22,12 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-type deviceRegistryRPC struct {
+type asEndDeviceRegistryServer struct {
 	registry DeviceRegistry
 }
 
 // Get implements ttnpb.AsEndDeviceRegistryServer.
-func (r *deviceRegistryRPC) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest) (*ttnpb.EndDevice, error) {
+func (r asEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest) (*ttnpb.EndDevice, error) {
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
 		return nil, err
 	}
@@ -35,7 +35,7 @@ func (r *deviceRegistryRPC) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequ
 }
 
 // Set implements ttnpb.AsEndDeviceRegistryServer.
-func (r *deviceRegistryRPC) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest) (*ttnpb.EndDevice, error) {
+func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest) (*ttnpb.EndDevice, error) {
 	if err := rights.RequireApplication(ctx, req.EndDevice.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func (r *deviceRegistryRPC) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequ
 }
 
 // Delete implements ttnpb.AsEndDeviceRegistryServer.
-func (r *deviceRegistryRPC) Delete(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
+func (r asEndDeviceRegistryServer) Delete(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
 	if err := rights.RequireApplication(ctx, ids.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
