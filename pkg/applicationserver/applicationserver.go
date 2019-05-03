@@ -329,13 +329,13 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 // DownlinkQueuePush pushes the given downlink messages to the end device's application downlink queue.
 // This operation changes FRMPayload in the given items.
 func (as *ApplicationServer) DownlinkQueuePush(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, items []*ttnpb.ApplicationDownlink) error {
-	return as.downlinkQueueOp(ctx, ids, items, ttnpb.AsNsClient.DownlinkQueuePush)
+	return as.downlinkQueueOp(ctx, ids, io.CleanDownlinks(items), ttnpb.AsNsClient.DownlinkQueuePush)
 }
 
 // DownlinkQueueReplace replaces the end device's application downlink queue with the given downlink messages.
 // This operation changes FRMPayload in the given items.
 func (as *ApplicationServer) DownlinkQueueReplace(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, items []*ttnpb.ApplicationDownlink) error {
-	return as.downlinkQueueOp(ctx, ids, items, ttnpb.AsNsClient.DownlinkQueueReplace)
+	return as.downlinkQueueOp(ctx, ids, io.CleanDownlinks(items), ttnpb.AsNsClient.DownlinkQueueReplace)
 }
 
 var errNoAppSKey = errors.DefineCorruption("no_app_s_key", "no AppSKey")
@@ -725,6 +725,7 @@ func (as *ApplicationServer) recalculateDownlinkQueue(ctx context.Context, dev *
 			FCnt:           newSession.LastAFCntDown + 1,
 			Confirmed:      oldItem.Confirmed,
 			ClassBC:        oldItem.ClassBC,
+			Priority:       oldItem.Priority,
 			CorrelationIDs: oldItem.CorrelationIDs,
 		}
 		newItem.FRMPayload, err = crypto.EncryptDownlink(newAppSKey, newSession.DevAddr, newItem.FCnt, frmPayload)

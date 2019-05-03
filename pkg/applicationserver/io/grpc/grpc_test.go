@@ -208,7 +208,7 @@ func TestTraffic(t *testing.T) {
 						FCnt:           100, // This gets discarded.
 						FRMPayload:     []byte{0x01, 0x01, 0x01},
 						Confirmed:      true,
-						CorrelationIDs: []string{"test"}, // This gets discarded.
+						CorrelationIDs: []string{"test"},
 					},
 					{
 						FPort:      2,
@@ -236,9 +236,10 @@ func TestTraffic(t *testing.T) {
 			a.So(res.Downlinks, should.HaveLength, 3)
 			a.So(res.Downlinks, should.Resemble, []*ttnpb.ApplicationDownlink{
 				{
-					FPort:      1,
-					Confirmed:  true,
-					FRMPayload: []byte{0x01, 0x01, 0x01},
+					FPort:          1,
+					Confirmed:      true,
+					FRMPayload:     []byte{0x01, 0x01, 0x01},
+					CorrelationIDs: []string{"test"},
 				},
 				{
 					FPort:      2,
