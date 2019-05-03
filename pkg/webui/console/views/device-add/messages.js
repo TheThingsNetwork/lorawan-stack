@@ -41,5 +41,4 @@ export default defineMessages({
   otaa: 'Over The Air Activation (OTAA)',
   abp: 'Activation By Personalization (ABP)',
   resetWarning: 'Reseting is insecure and makes your device susceptible for replay attacks',
-  couldNotRetrieveFrequencyPlans: 'Could not retrieve the list of available frequency plans',
 })
