@@ -24,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
+	"go.thethings.network/lorawan-stack/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	encoding "go.thethings.network/lorawan-stack/pkg/ttnpb/udp"
@@ -231,9 +232,10 @@ func (s *srv) handleUp(ctx context.Context, state *state, packet encoding.Packet
 		IP: packet.GatewayAddr.IP.String(),
 	}
 
+	now := time.Now()
 	switch packet.PacketType {
 	case encoding.PullData:
-		atomic.StoreInt64(&state.lastSeenPull, time.Now().UnixNano())
+		atomic.StoreInt64(&state.lastSeenPull, now.UnixNano())
 		state.lastDownlinkPath.Store(downlinkPath{
 			addr:    *packet.GatewayAddr,
 			version: packet.ProtocolVersion,
@@ -245,7 +247,7 @@ func (s *srv) handleUp(ctx context.Context, state *state, packet encoding.Packet
 		state.startHandleDownMu.RUnlock()
 
 	case encoding.PushData:
-		atomic.StoreInt64(&state.lastSeenPush, time.Now().UnixNano())
+		atomic.StoreInt64(&state.lastSeenPush, now.UnixNano())
 		if len(packet.Data.RxPacket) > 0 {
 			var timestamp uint32
 			for _, pkt := range packet.Data.RxPacket {
@@ -253,7 +255,9 @@ func (s *srv) handleUp(ctx context.Context, state *state, packet encoding.Packet
 					timestamp = pkt.Tmst
 				}
 			}
-			state.syncClock(timestamp)
+			state.clockMu.Lock()
+			state.clock.Sync(timestamp, now)
+			state.clockMu.Unlock()
 		}
 		msg, err := encoding.ToGatewayUp(*packet.Data, md)
 		if err != nil {
@@ -273,7 +277,7 @@ func (s *srv) handleUp(ctx context.Context, state *state, packet encoding.Packet
 		}
 
 	case encoding.TxAck:
-		atomic.StoreInt64(&state.lastSeenPull, time.Now().UnixNano())
+		atomic.StoreInt64(&state.lastSeenPull, now.UnixNano())
 		if atomic.CompareAndSwapUint32(&state.receivedTxAck, 0, 1) {
 			logger.Debug("Received Tx acknowledgement, JIT queue supported")
 		}
@@ -361,13 +365,16 @@ func (s *srv) handleDown(ctx context.Context, state *state) error {
 				write()
 				break
 			}
-			gatewayTime, err := state.clock(tx.Tmst)
-			if err != nil {
+			state.clockMu.RLock()
+			if !state.clock.IsSynced() {
+				state.clockMu.RUnlock()
 				logger.Warn("Schedule late forced but no gateway clock available")
 				write()
 				break
 			}
-			d := time.Until(gatewayTime.Add(-s.config.ScheduleLateTime))
+			serverTime := state.clock.ToServerTime(state.clock.FromTimestampTime(tx.Tmst))
+			state.clockMu.RUnlock()
+			d := time.Until(serverTime.Add(-s.config.ScheduleLateTime))
 			logger.WithField("duration", d).Debug("Wait to schedule downlink message late")
 			time.AfterFunc(d, write)
 		case <-healthCheck.C:
@@ -445,8 +452,7 @@ type downlinkPath struct {
 }
 
 type state struct {
-	// Align for sync/atomic, time are Unix ns
-	timeOffset    int64
+	// Align for sync/atomic, timestamps are Unix ns.
 	lastSeenPull  int64
 	lastSeenPush  int64
 	receivedTxAck uint32
@@ -454,6 +460,9 @@ type state struct {
 	ioWait chan struct{}
 	io     *io.Connection
 	ioErr  error
+
+	clock   scheduling.RolloverClock
+	clockMu sync.RWMutex
 
 	lastDownlinkPath  atomic.Value // downlinkPath
 	startHandleDown   *sync.Once
@@ -463,28 +472,3 @@ type state struct {
 }
 
 var errNoClock = errors.DefineUnavailable("no_clock_sync", "no clock sync")
-
-// clock gets the synchronized time for a timestamp (in microseconds). The clock should be synchronized using
-// syncClock, otherwise an error is returned.
-func (s *state) clock(timestamp uint32) (t time.Time, err error) {
-	offset := atomic.LoadInt64(&s.timeOffset)
-	if offset == 0 {
-		return time.Time{}, errNoClock
-	}
-	t = time.Unix(0, 0)
-	t = t.Add(time.Duration(int64(timestamp)*1000 + offset))
-	if t.Before(time.Now()) {
-		t = t.Add(time.Duration(int64(1<<32) * 1000))
-	}
-	return
-}
-
-// syncClock synchronizes the clock with the timestamp (in microseconds) and the local system time.
-func (s *state) syncClock(timestamp uint32) {
-	t := time.Now().Add(-time.Duration(timestamp) * time.Microsecond)
-	log.FromContext(s.io.Context()).WithFields(log.Fields(
-		"time", t,
-		"timestamp", timestamp,
-	)).Debug("Synchronized gateway timestamp")
-	atomic.StoreInt64(&s.timeOffset, t.UnixNano())
-}
