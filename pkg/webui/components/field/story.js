@@ -119,6 +119,16 @@ storiesOf('Fields', module)
       form={false}
     />
   ))
+  .add('Boolean Disabled', () => (
+    <Field
+      type="checkbox"
+      name="foo"
+      title="Foo"
+      description="Foo field."
+      form={false}
+      disabled
+    />
+  ))
   .add('Boolean Error', () => (
     <Field
       type="checkbox"
@@ -150,6 +160,14 @@ storiesOf('Fields/Radio Buttons', module)
       name="radio-story"
       title="Radio Buttons"
       children={checkboxFields}
+    />
+  ))
+  .add('Disabled', () => (
+    <FieldGroup
+      name="radio-story"
+      title="Radio Buttons"
+      children={checkboxFields}
+      disabled
     />
   ))
   .add('Horizontal', () => (
