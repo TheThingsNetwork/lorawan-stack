@@ -45,8 +45,8 @@ var (
 	testConfig = Config{
 		PacketHandlers:      2,
 		PacketBuffer:        10,
-		DownlinkPathExpires: 5 * timeout,
-		ConnectionExpires:   12 * timeout,
+		DownlinkPathExpires: 8 * timeout,
+		ConnectionExpires:   20 * timeout,
 		ScheduleLateTime:    0,
 	}
 )
@@ -355,7 +355,7 @@ func TestTraffic(t *testing.T) {
 					Path: &ttnpb.DownlinkPath_UplinkToken{
 						UplinkToken: io.MustUplinkToken(
 							ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: registeredGatewayID},
-							uint32(150*test.Delay/time.Microsecond),
+							uint32(300*test.Delay/time.Microsecond),
 						),
 					},
 				},
@@ -381,12 +381,12 @@ func TestTraffic(t *testing.T) {
 				Packet:        generatePullData(eui2),
 				AckOK:         true,
 				ExpectConnect: false,
-				SyncClock:     1*time.Second + 150*test.Delay, // Rx1 delay + start time
+				SyncClock:     1*time.Second + 300*test.Delay, // Rx1 delay + start time
 				Path: &ttnpb.DownlinkPath{
 					Path: &ttnpb.DownlinkPath_UplinkToken{
 						UplinkToken: io.MustUplinkToken(
 							ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: registeredGatewayID},
-							uint32(300*test.Delay/time.Microsecond),
+							uint32(600*test.Delay/time.Microsecond),
 						),
 					},
 				},
@@ -417,7 +417,7 @@ func TestTraffic(t *testing.T) {
 					Path: &ttnpb.DownlinkPath_UplinkToken{
 						UplinkToken: io.MustUplinkToken(
 							ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: registeredGatewayID},
-							uint32((15*time.Second+150*test.Delay)/time.Microsecond),
+							uint32((15*time.Second+300*test.Delay)/time.Microsecond),
 						),
 					},
 				},
@@ -464,7 +464,7 @@ func TestTraffic(t *testing.T) {
 					t.SkipNow()
 				}
 
-				// Sync the clock at 0, i.e. approximate time.Now().
+				// Sync the clock at the given time.
 				var clockSynced time.Time
 				packet := generatePushData(eui2, false, tc.SyncClock)
 				buf, err = packet.MarshalBinary()
@@ -489,10 +489,9 @@ func TestTraffic(t *testing.T) {
 				}
 
 				// Set expected time for the pull response.
-				expectedTime := time.Now()
+				expectedTime := clockSynced
 				if tc.ScheduledLate {
 					expectedTime = expectedTime.Add(-tc.SyncClock)
-					expectedTime = expectedTime.Add(-time.Since(clockSynced))
 					expectedTime = expectedTime.Add(time.Duration(tc.Message.GetScheduled().Timestamp) * time.Microsecond)
 					expectedTime = expectedTime.Add(-testConfig.ScheduleLateTime)
 				}
