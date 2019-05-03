@@ -469,9 +469,9 @@ func TestScheduleAnytimeShort(t *testing.T) {
 		scheduler, err := scheduling.NewScheduler(ctx, fp, true, timeSource)
 		a.So(err, should.BeNil)
 		scheduler.SyncWithGateway(0, timeSource.Time, time.Unix(0, 0))
-		em, err := scheduler.ScheduleAnytime(ctx, 10, settingsAt(869525000, 7, timePtr(time.Unix(0, int64(100*time.Millisecond))), 0), nil, ttnpb.TxSchedulePriority_NORMAL)
+		em, err := scheduler.ScheduleAnytime(ctx, 10, settingsAt(869525000, 7, nil, 0), nil, ttnpb.TxSchedulePriority_NORMAL)
 		a.So(err, should.BeNil)
-		a.So(time.Duration(em.Starts()), should.Equal, scheduling.ScheduleTimeShort)
+		a.So(time.Duration(em.Starts()), should.Equal, scheduling.ScheduleTimeLong)
 	}
 
 	// Gateway time; too late (10 ms) with RTT.
@@ -486,9 +486,9 @@ func TestScheduleAnytimeShort(t *testing.T) {
 			Max:   40 * time.Millisecond,
 			Count: 1,
 		}
-		em, err := scheduler.ScheduleAnytime(ctx, 10, settingsAt(869525000, 7, timePtr(time.Unix(0, int64(10*time.Millisecond))), 0), rtts, ttnpb.TxSchedulePriority_NORMAL)
+		em, err := scheduler.ScheduleAnytime(ctx, 10, settingsAt(869525000, 7, nil, 0), rtts, ttnpb.TxSchedulePriority_NORMAL)
 		a.So(err, should.BeNil)
-		a.So(time.Duration(em.Starts()), should.Equal, 40*time.Millisecond+scheduling.QueueDelay)
+		a.So(time.Duration(em.Starts()), should.Equal, scheduling.ScheduleTimeLong)
 	}
 
 	// Timestamp; too late (100 ms) without RTT.

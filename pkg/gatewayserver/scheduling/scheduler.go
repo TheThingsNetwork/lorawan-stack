@@ -216,7 +216,7 @@ func (s *Scheduler) ScheduleAnytime(ctx context.Context, payloadSize int, settin
 	if !s.clock.IsSynced() {
 		return Emission{}, errNoClockSync
 	}
-	minScheduleTime := ScheduleTimeShort
+	var minScheduleTime = ScheduleTimeShort
 	if rtts != nil {
 		if _, max, _, n := rtts.Stats(); n > 0 {
 			minScheduleTime = max + QueueDelay
@@ -224,20 +224,9 @@ func (s *Scheduler) ScheduleAnytime(ctx context.Context, payloadSize int, settin
 	}
 	var starts ConcentratorTime
 	now := s.clock.FromServerTime(s.timeSource.Now())
-	if settings.Timestamp == 0 && settings.Time == nil {
+	if settings.Timestamp == 0 {
 		starts = now + ConcentratorTime(ScheduleTimeLong)
 		settings.Timestamp = uint32(time.Duration(starts) / time.Microsecond)
-	} else if settings.Time != nil {
-		var ok bool
-		starts, ok = s.clock.FromGatewayTime(*settings.Time)
-		if !ok {
-			return Emission{}, errNoAbsoluteGatewayTime
-		}
-		if delta := minScheduleTime - time.Duration(starts-now); delta > 0 {
-			starts += ConcentratorTime(delta)
-			t := settings.Time.Add(delta)
-			settings.Time = &t
-		}
 	} else {
 		starts = s.clock.FromTimestampTime(settings.Timestamp)
 		if delta := minScheduleTime - time.Duration(starts-now); delta > 0 {
