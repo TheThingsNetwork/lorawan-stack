@@ -27,8 +27,7 @@ import FieldGroup from '../../../components/field/group'
 import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import SubmitBar from '../../../components/submit-bar'
-
-import { getNsFrequencyPlans } from '../../store/actions/configuration'
+import FrequencyPlansSelect from '../../containers/freq-plans-select'
 
 import api from '../../api'
 
@@ -48,12 +47,7 @@ import style from './device-add.styl'
     />
   )
 })
-@connect(function ({ configuration }, props) {
-  return {
-    nsFrequencyPlans: configuration.nsFrequencyPlans,
-    frequencyPlanError: configuration.error,
-  }
-})
+@connect()
 @bind
 export default class DeviceAdd extends Component {
   state = {
@@ -61,14 +55,6 @@ export default class DeviceAdd extends Component {
     otaa: true,
     resets_join_nonces: false,
     resets_f_cnt: false,
-  }
-
-  async componentDidMount () {
-    const { dispatch, nsFrequencyPlans } = this.props
-    if (!nsFrequencyPlans) {
-      // Retrieve only when not already in state
-      dispatch(getNsFrequencyPlans())
-    }
   }
 
   async handleSubmit (values, { setSubmitting, resetForm }) {
@@ -239,11 +225,6 @@ export default class DeviceAdd extends Component {
 
   render () {
     const { error, otaa } = this.state
-    const { nsFrequencyPlans, frequencyPlanError } = this.props
-    let frequencyPlanOptions = []
-    if (nsFrequencyPlans && !frequencyPlanError) {
-      frequencyPlanOptions = nsFrequencyPlans.map(e => ({ value: e.id, label: e.name }))
-    }
 
     return (
       <Container>
@@ -310,7 +291,7 @@ export default class DeviceAdd extends Component {
               />
               <Message
                 component="h4"
-                content={m.lorawanOptions}
+                content={sharedMessages.lorawanOptions}
               />
               <Field
                 title={sharedMessages.macVersion}
@@ -338,13 +319,11 @@ export default class DeviceAdd extends Component {
                   { value: 'PHY_V1_1_REV_B', label: 'PHY V1.1 REV B' },
                 ]}
               />
-              <Field
-                title={sharedMessages.frequencyPlan}
+              <FrequencyPlansSelect
+                source="ns"
                 name="frequency_plan_id"
-                type="select"
                 required
-                options={frequencyPlanOptions}
-                warning={Boolean(frequencyPlanError) ? m.couldNotRetrieveFrequencyPlans : undefined}
+                horizontal
               />
               <Field
                 title={m.supportsClassC}

@@ -73,6 +73,7 @@ const selectAllowedProps = [
   'isMulti',
   'isRtl',
   'isSearchable',
+  'isLoading',
   'onChange',
   'options',
   'placeholder',
@@ -80,6 +81,7 @@ const selectAllowedProps = [
   'selectProps',
   'setValue',
   'value',
+  'menuPlacement',
 ]
 
 const getAllowedPropsByType = function (type) {

@@ -18,9 +18,21 @@ import * as configuration from '../actions/configuration'
 import { get as cacheGet, set as cacheSet } from '../../lib/cache'
 import api from '../../api'
 
+import {
+  nsFrequencyPlansSelector,
+  gsFrequencyPlansSelector,
+} from '../selectors/configuration'
 
 const getNsFrequencyPlansLogic = createLogic({
   type: configuration.GET_NS_FREQUENCY_PLANS,
+  validate ({ getState, action }, allow, reject) {
+    const plansNs = nsFrequencyPlansSelector(getState())
+    if (plansNs && plansNs.length) {
+      reject()
+    } else {
+      allow(action)
+    }
+  },
   async process ({ getState, action }, dispatch, done) {
     let frequencyPlans = cacheGet('ns_frequency_plans')
     try {
@@ -39,6 +51,14 @@ const getNsFrequencyPlansLogic = createLogic({
 
 const getGsFrequencyPlansLogic = createLogic({
   type: configuration.GET_GS_FREQUENCY_PLANS,
+  validate ({ getState, action }, allow, reject) {
+    const plansGs = gsFrequencyPlansSelector(getState())
+    if (plansGs && plansGs.length) {
+      reject()
+    } else {
+      allow(action)
+    }
+  },
   async process ({ getState, action }, dispatch, done) {
     let frequencyPlans = cacheGet('gs_frequency_plans')
     try {
