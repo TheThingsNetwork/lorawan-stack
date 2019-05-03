@@ -136,9 +136,11 @@ class Applications {
   // Delete
 
   async deleteById (applicationId) {
-    return this._api.ApplicationRegistry.Delete({
+    const response = await this._api.ApplicationRegistry.Delete({
       routeParams: { application_id: applicationId },
     })
+
+    return Marshaler.payloadSingleResponse(response)
   }
 
   async getRightsById (applicationId) {
