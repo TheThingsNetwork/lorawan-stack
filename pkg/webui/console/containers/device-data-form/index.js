@@ -37,10 +37,14 @@ import validationSchema from './validation-schema'
 })
 @bind
 class DeviceDataForm extends Component {
-  state = {
-    otaa: true,
-    resets_join_nonces: false,
-    resets_f_cnt: false,
+  constructor (props) {
+    super(props)
+
+    this.state = {
+      otaa: Boolean(this.props.initialValues.supports_join),
+      resets_join_nonces: false,
+      resets_f_cnt: false,
+    }
   }
 
   handleOTAASelect () {
@@ -196,6 +200,12 @@ class DeviceDataForm extends Component {
       },
     }
 
+    const formValues = {
+      ...emptyValues,
+      ...initialValues,
+      activation_mode: otaa ? 'otaa' : 'abp',
+    }
+
     return (
       <Form
         error={error}
@@ -203,10 +213,7 @@ class DeviceDataForm extends Component {
         validationSchema={validationSchema}
         submitEnabledWhenInvalid
         isInitialValid={false}
-        initialValues={{
-          ...emptyValues,
-          ...initialValues,
-        }}
+        initialValues={formValues}
         mapErrorsToFields={{
           id_taken: 'application_id',
           identifiers: 'application_id',

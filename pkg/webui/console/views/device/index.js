@@ -76,6 +76,7 @@ export default class Device extends React.Component {
         'mac_settings.resets_f_cnt',
         'resets_join_nonces',
         'supports_class_c',
+        'supports_join',
         'lorawan_version',
         'lorawan_phy_version',
       ],
