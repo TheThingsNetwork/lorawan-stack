@@ -105,6 +105,12 @@ export default {
   gateways: {
     list: ttnClient.Gateways.getAll.bind(ttnClient.Gateways),
   },
+  gateway: {
+    get: ttnClient.Gateways.getById.bind(ttnClient.Gateways),
+    'delete': ttnClient.Gateways.deleteById.bind(ttnClient.Gateways),
+    create: ttnClient.Gateways.create.bind(ttnClient.Gateways),
+    update: ttnClient.Gateways.updateById.bind(ttnClient.Gateways),
+  },
   rights: {
     applications: ttnClient.Applications.getRightsById.bind(ttnClient.Applications),
   },
