@@ -74,6 +74,14 @@ class Gateways {
 
     return Marshaler.payloadSingleResponse(response)
   }
+
+  async getStatisticsById (id) {
+    const response = await this._api.Gs.GetGatewayConnectionStats({
+      routeParams: { gateway_id: id },
+    })
+
+    return Marshaler.payloadSingleResponse(response)
+  }
 }
 
 export default Gateways
