@@ -23,6 +23,7 @@ import application from './application'
 import devices from './devices'
 import device from './device'
 import gateways from './gateways'
+import gateway from './gateway'
 import configuration from './configuration'
 import createNamedApiKeysReducer from './api-keys'
 import createNamedRightsReducer from './rights'
@@ -38,6 +39,7 @@ export default combineReducers({
   devices,
   device,
   gateways,
+  gateway,
   configuration,
   apiKeys: combineReducers({
     applications: createNamedApiKeysReducer(APPLICATION_SHARED_NAME),
