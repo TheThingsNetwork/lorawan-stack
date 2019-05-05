@@ -24,6 +24,7 @@ import (
 )
 
 func timePtr(time time.Time) *time.Time { return &time }
+
 func TestFromDownlinkMessage(t *testing.T) {
 	for _, tc := range []struct {
 		Name                    string

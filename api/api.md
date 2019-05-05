@@ -252,6 +252,7 @@
   - [Message `MHDR`](#ttn.lorawan.v3.MHDR)
   - [Message `Message`](#ttn.lorawan.v3.Message)
   - [Message `RejoinRequestPayload`](#ttn.lorawan.v3.RejoinRequestPayload)
+  - [Message `RequestInfo`](#ttn.lorawan.v3.RequestInfo)
   - [Message `TxRequest`](#ttn.lorawan.v3.TxRequest)
   - [Message `TxSettings`](#ttn.lorawan.v3.TxSettings)
   - [Message `TxSettings.Downlink`](#ttn.lorawan.v3.TxSettings.Downlink)
@@ -3542,6 +3543,14 @@ Only the components for which the keys were meant, will have the key-encryption-
 | Field | Validations |
 | ----- | ----------- |
 | `rejoin_type` | <p>`enum.defined_only`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.RequestInfo">Message `RequestInfo`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `rx_window` | [`uint32`](#uint32) |  |  |
+| `antenna_index` | [`uint32`](#uint32) |  |  |
+| `class` | [`Class`](#ttn.lorawan.v3.Class) |  |  |
 
 ### <a name="ttn.lorawan.v3.TxRequest">Message `TxRequest`</a>
 

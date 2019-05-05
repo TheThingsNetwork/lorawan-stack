@@ -33,8 +33,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/web"
 )
 
-const tokenExpiration = 3 * time.Minute
-
 var (
 	errEmptyGatewayEUI           = errors.Define("empty_gateway_eui", "empty gateway EUI")
 	errMessageTypeNotImplemented = errors.DefineUnimplemented("message_type_not_implemented", "message of type `{type}` is not implemented")

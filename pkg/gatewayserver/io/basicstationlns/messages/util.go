@@ -17,15 +17,19 @@ package messages
 import (
 	"bytes"
 	"encoding/binary"
+	"encoding/hex"
 	"reflect"
+	"strings"
 
 	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
 var errDataRateIndex = errors.Define("data_rate_index", "data rate index is out of range")
 var errDataRate = errors.DefineNotFound("data_rate", "data rate not found")
+var errUID = errors.DefineInvalidArgument("uid", "invalid uid `{uid}`")
 
 func getInt32AsByteSlice(value int32) ([]byte, error) {
 	b := new(bytes.Buffer)
@@ -115,4 +119,22 @@ func getDataRatesFromBandID(id string) (DataRates, error) {
 		}
 	}
 	return drs, nil
+}
+
+// GetEUIfromUID extracts the Gateway EUI from the UID.
+func GetEUIfromUID(uid string) (*types.EUI64, error) {
+	s := strings.Split(uid, "-")
+	if len(s) != 2 || s[0] != "eui" {
+		return nil, errUID.WithAttributes("uid", uid)
+	}
+	euiBytes, err := hex.DecodeString(s[1])
+	if err != nil {
+		return nil, errUID.WithAttributes("uid", uid)
+	}
+	var eui types.EUI64
+	err = eui.Unmarshal(euiBytes)
+	if err != nil {
+		return nil, errUID.WithAttributes("uid", uid)
+	}
+	return &eui, nil
 }

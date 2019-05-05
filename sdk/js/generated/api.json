@@ -15133,6 +15133,47 @@
           ]
         },
         {
+          "name": "RequestInfo",
+          "longName": "RequestInfo",
+          "fullName": "ttn.lorawan.v3.RequestInfo",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "rx_window",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "antenna_index",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "class",
+              "description": "",
+              "label": "",
+              "type": "Class",
+              "longType": "Class",
+              "fullType": "ttn.lorawan.v3.Class",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "TxRequest",
           "longName": "TxRequest",
           "fullName": "ttn.lorawan.v3.TxRequest",
