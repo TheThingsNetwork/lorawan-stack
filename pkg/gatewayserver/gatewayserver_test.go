@@ -123,12 +123,14 @@ func TestGatewayServer(t *testing.T) {
 	}, registeredGatewayKey)
 
 	for _, ptc := range []struct {
-		Protocol  string
-		ValidAuth func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool
-		Link      func(ctx context.Context, t *testing.T, ids ttnpb.GatewayIdentifiers, key string, upCh <-chan *ttnpb.GatewayUp, downCh chan<- *ttnpb.GatewayDown) error
+		Protocol       string
+		SupportsStatus bool
+		ValidAuth      func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool
+		Link           func(ctx context.Context, t *testing.T, ids ttnpb.GatewayIdentifiers, key string, upCh <-chan *ttnpb.GatewayUp, downCh chan<- *ttnpb.GatewayDown) error
 	}{
 		{
-			Protocol: "grpc",
+			Protocol:       "grpc",
+			SupportsStatus: true,
 			ValidAuth: func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool {
 				return ids.GatewayID == registeredGatewayID && key == registeredGatewayKey
 			},
@@ -188,7 +190,8 @@ func TestGatewayServer(t *testing.T) {
 			},
 		},
 		{
-			Protocol: "mqtt",
+			Protocol:       "mqtt",
+			SupportsStatus: true,
 			ValidAuth: func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool {
 				return ids.GatewayID == registeredGatewayID && key == registeredGatewayKey
 			},
@@ -272,7 +275,8 @@ func TestGatewayServer(t *testing.T) {
 			},
 		},
 		{
-			Protocol: "udp",
+			Protocol:       "udp",
+			SupportsStatus: true,
 			ValidAuth: func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool {
 				return ids.EUI != nil
 			},
@@ -402,14 +406,15 @@ func TestGatewayServer(t *testing.T) {
 			},
 		},
 		{
-			Protocol: "basicstation",
+			Protocol:       "basicstation",
+			SupportsStatus: false,
 			ValidAuth: func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool {
-				// TODO: Add basic Auth header check
-				return ids.GatewayID != ""
+				// TODO: Add basic Auth header check (https://github.com/TheThingsNetwork/lorawan-stack/issues/74#issue-404431141)
+				return ids.EUI != nil
 			},
 			Link: func(ctx context.Context, t *testing.T, ids ttnpb.GatewayIdentifiers, key string, upCh <-chan *ttnpb.GatewayUp, downCh chan<- *ttnpb.GatewayDown) error {
-				if ids.EUI != nil {
-					// TODO: Add basic Auth header check
+				// TODO: Add basic Auth header check (https://github.com/TheThingsNetwork/lorawan-stack/issues/74#issue-404431141)
+				if ids.EUI == nil {
 					t.SkipNow()
 				}
 				wsConn, _, err := websocket.DefaultDialer.Dial("ws://0.0.0.0:1885/api/v3/gs/io/basicstation/traffic/"+registeredGatewayID, nil)
@@ -429,7 +434,7 @@ func TestGatewayServer(t *testing.T) {
 							for _, uplink := range msg.UplinkMessages {
 								var payload ttnpb.Message
 								if err := lorawan.UnmarshalMessage(uplink.RawPayload, &payload); err != nil {
-									t.Logf("Failed to unmarshal Uplink Message. Skipping...")
+									// Ignore invalid uplinks
 									continue
 								}
 								var bsUpstream []byte
@@ -577,11 +582,8 @@ func TestGatewayServer(t *testing.T) {
 			downCh := make(chan *ttnpb.GatewayDown)
 			ids := ttnpb.GatewayIdentifiers{
 				GatewayID: registeredGatewayID,
+				EUI:       &registeredGatewayEUI,
 			}
-			if ptc.Protocol == "udp" {
-				ids.EUI = &registeredGatewayEUI
-			}
-
 			// Setup a stats client with independent context to query whether the gateway is connected and statistics on
 			// upstream and downstream.
 			statsConn, err := grpc.Dial(":9187", append(rpcclient.DefaultDialOptions(test.Context()), grpc.WithInsecure(), grpc.WithBlock())...)
@@ -799,7 +801,12 @@ func TestGatewayServer(t *testing.T) {
 						case <-time.After(timeout):
 							t.Fatalf("Failed to send message to upstream channel")
 						}
-						uplinkCount += len(tc.Up.UplinkMessages)
+						if ptc.SupportsStatus {
+							uplinkCount += len(tc.Up.UplinkMessages)
+						} else {
+							// If the protocol does not support Status Messages, then count only the uplinks.
+							uplinkCount += len(tc.Forwards)
+						}
 
 						for _, msgIdx := range tc.Forwards {
 							select {
@@ -836,7 +843,7 @@ func TestGatewayServer(t *testing.T) {
 								t.Fatal("Expected Tx acknowledgment event timeout")
 							}
 						}
-						if tc.Up.GatewayStatus != nil && ptc.Protocol != "basicstation" {
+						if tc.Up.GatewayStatus != nil && ptc.SupportsStatus {
 							select {
 							case <-upEvents["gs.status.receive"]:
 							case <-time.After(timeout):
@@ -851,14 +858,9 @@ func TestGatewayServer(t *testing.T) {
 						if !a.So(err, should.BeNil) {
 							t.FailNow()
 						}
+						a.So(stats.UplinkCount, should.Equal, uplinkCount)
 
-						if ptc.Protocol == "basicstation" {
-							a.So(stats.UplinkCount, should.BeBetweenOrEqual, uplinkCount-2, uplinkCount)
-						} else {
-							a.So(stats.UplinkCount, should.Equal, uplinkCount)
-						}
-
-						if tc.Up.GatewayStatus != nil && ptc.Protocol != "basicstation" {
+						if tc.Up.GatewayStatus != nil && ptc.SupportsStatus {
 							if !a.So(stats.LastStatus, should.NotBeNil) {
 								t.FailNow()
 							}

@@ -33,6 +33,7 @@ var (
 	errJoinRequestMessage = errors.Define("join_request_message", "invalid join-request message received")
 	errUplinkDataFrame    = errors.Define("uplink_data_Frame", "invalid uplink data frame received")
 	errUplinkMessage      = errors.Define("uplink_message", "invalid uplink message received")
+	errGatewayID          = errors.Define("gateway_id", "invalid gateway ID `{id}`")
 )
 
 // UpInfo provides additional metadata on each upstream message.
@@ -171,6 +172,11 @@ func (req *JoinRequest) ToUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID str
 	if sec != 0 {
 		val := time.Unix(int64(sec), int64(nsec*(1e9)))
 		rxTime = &val
+	}
+
+	ids.EUI, err = GetEUIfromUID(ids.GatewayID)
+	if err != nil {
+		return nil, errGatewayID.WithAttributes("id", ids.GatewayID).WithCause(err)
 	}
 
 	rxMetadata := &ttnpb.RxMetadata{
@@ -324,6 +330,11 @@ func (updf *UplinkDataFrame) ToUplinkMessage(ids ttnpb.GatewayIdentifiers, bandI
 	}
 
 	timestamp := uint32(updf.RadioMetaData.UpInfo.XTime & 0xFFFFFFFF)
+
+	ids.EUI, err = GetEUIfromUID(ids.GatewayID)
+	if err != nil {
+		return nil, errGatewayID.WithAttributes("id", ids.GatewayID).WithCause(err)
+	}
 
 	ulToken := ttnpb.UplinkToken{
 		GatewayAntennaIdentifiers: ttnpb.GatewayAntennaIdentifiers{
