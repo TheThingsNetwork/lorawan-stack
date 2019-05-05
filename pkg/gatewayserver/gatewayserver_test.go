@@ -123,12 +123,14 @@ func TestGatewayServer(t *testing.T) {
 	}, registeredGatewayKey)
 
 	for _, ptc := range []struct {
-		Protocol  string
-		ValidAuth func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool
-		Link      func(ctx context.Context, t *testing.T, ids ttnpb.GatewayIdentifiers, key string, upCh <-chan *ttnpb.GatewayUp, downCh chan<- *ttnpb.GatewayDown) error
+		Protocol                string
+		GatewayStatusMsgSupport bool
+		ValidAuth               func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool
+		Link                    func(ctx context.Context, t *testing.T, ids ttnpb.GatewayIdentifiers, key string, upCh <-chan *ttnpb.GatewayUp, downCh chan<- *ttnpb.GatewayDown) error
 	}{
 		{
-			Protocol: "grpc",
+			Protocol:                "grpc",
+			GatewayStatusMsgSupport: true,
 			ValidAuth: func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool {
 				return ids.GatewayID == registeredGatewayID && key == registeredGatewayKey
 			},
@@ -188,7 +190,8 @@ func TestGatewayServer(t *testing.T) {
 			},
 		},
 		{
-			Protocol: "mqtt",
+			Protocol:                "mqtt",
+			GatewayStatusMsgSupport: true,
 			ValidAuth: func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool {
 				return ids.GatewayID == registeredGatewayID && key == registeredGatewayKey
 			},
@@ -272,7 +275,8 @@ func TestGatewayServer(t *testing.T) {
 			},
 		},
 		{
-			Protocol: "udp",
+			Protocol:                "udp",
+			GatewayStatusMsgSupport: true,
 			ValidAuth: func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool {
 				return ids.EUI != nil
 			},
@@ -402,14 +406,15 @@ func TestGatewayServer(t *testing.T) {
 			},
 		},
 		{
-			Protocol: "basicstation",
+			Protocol:                "basicstation",
+			GatewayStatusMsgSupport: false,
 			ValidAuth: func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool {
 				// TODO: Add basic Auth header check
-				return ids.GatewayID != ""
+				return ids.EUI != nil
 			},
 			Link: func(ctx context.Context, t *testing.T, ids ttnpb.GatewayIdentifiers, key string, upCh <-chan *ttnpb.GatewayUp, downCh chan<- *ttnpb.GatewayDown) error {
-				if ids.EUI != nil {
-					// TODO: Add basic Auth header check
+				// TODO: Add basic Auth header check
+				if ids.EUI == nil {
 					t.SkipNow()
 				}
 				wsConn, _, err := websocket.DefaultDialer.Dial("ws://0.0.0.0:1885/api/v3/gs/io/basicstation/traffic/"+registeredGatewayID, nil)
@@ -577,11 +582,8 @@ func TestGatewayServer(t *testing.T) {
 			downCh := make(chan *ttnpb.GatewayDown)
 			ids := ttnpb.GatewayIdentifiers{
 				GatewayID: registeredGatewayID,
+				EUI:       &registeredGatewayEUI,
 			}
-			if ptc.Protocol == "udp" {
-				ids.EUI = &registeredGatewayEUI
-			}
-
 			// Setup a stats client with independent context to query whether the gateway is connected and statistics on
 			// upstream and downstream.
 			statsConn, err := grpc.Dial(":9187", append(rpcclient.DefaultDialOptions(test.Context()), grpc.WithInsecure(), grpc.WithBlock())...)
@@ -623,9 +625,10 @@ func TestGatewayServer(t *testing.T) {
 					upEvents[event] = ch
 				}
 				for _, tc := range []struct {
-					Name     string
-					Up       *ttnpb.GatewayUp
-					Forwards []int // Indices of uplink messages in Up that are being forwarded.
+					Name               string
+					Up                 *ttnpb.GatewayUp
+					StatusMsgSupported bool
+					Forwards           []int // Indices of uplink messages in Up that are being forwarded.
 				}{
 					{
 						Name: "GatewayStatus",
@@ -634,6 +637,7 @@ func TestGatewayServer(t *testing.T) {
 								Time: time.Unix(424242, 0),
 							},
 						},
+						StatusMsgSupported: ptc.GatewayStatusMsgSupport,
 					},
 					{
 						Name: "TxAck",
@@ -642,6 +646,7 @@ func TestGatewayServer(t *testing.T) {
 								Result: ttnpb.TxAcknowledgment_SUCCESS,
 							},
 						},
+						StatusMsgSupported: ptc.GatewayStatusMsgSupport,
 					},
 					{
 						Name: "OneValidLoRa",
@@ -673,7 +678,8 @@ func TestGatewayServer(t *testing.T) {
 								},
 							},
 						},
-						Forwards: []int{0},
+						Forwards:           []int{0},
+						StatusMsgSupported: ptc.GatewayStatusMsgSupport,
 					},
 					{
 						Name: "OneValidFSK",
@@ -703,7 +709,8 @@ func TestGatewayServer(t *testing.T) {
 								},
 							},
 						},
-						Forwards: []int{0},
+						Forwards:           []int{0},
+						StatusMsgSupported: ptc.GatewayStatusMsgSupport,
 					},
 					{
 						Name: "OneGarbageWithStatus",
@@ -789,7 +796,8 @@ func TestGatewayServer(t *testing.T) {
 								Time: time.Unix(4242424, 0),
 							},
 						},
-						Forwards: []int{1, 2},
+						Forwards:           []int{1, 2},
+						StatusMsgSupported: ptc.GatewayStatusMsgSupport,
 					},
 				} {
 					t.Run(tc.Name, func(t *testing.T) {
@@ -836,7 +844,7 @@ func TestGatewayServer(t *testing.T) {
 								t.Fatal("Expected Tx acknowledgment event timeout")
 							}
 						}
-						if tc.Up.GatewayStatus != nil && ptc.Protocol != "basicstation" {
+						if tc.Up.GatewayStatus != nil && tc.StatusMsgSupported {
 							select {
 							case <-upEvents["gs.status.receive"]:
 							case <-time.After(timeout):
@@ -852,13 +860,14 @@ func TestGatewayServer(t *testing.T) {
 							t.FailNow()
 						}
 
-						if ptc.Protocol == "basicstation" {
-							a.So(stats.UplinkCount, should.BeBetweenOrEqual, uplinkCount-2, uplinkCount)
-						} else {
+						if tc.StatusMsgSupported {
 							a.So(stats.UplinkCount, should.Equal, uplinkCount)
+						} else {
+							// For protocols that doesn't support GatewayStatus messages, there will be one less uplink.
+							a.So(stats.UplinkCount, should.BeBetweenOrEqual, uplinkCount-2, uplinkCount)
 						}
 
-						if tc.Up.GatewayStatus != nil && ptc.Protocol != "basicstation" {
+						if tc.Up.GatewayStatus != nil && tc.StatusMsgSupported {
 							if !a.So(stats.LastStatus, should.NotBeNil) {
 								t.FailNow()
 							}
