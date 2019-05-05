@@ -15,6 +15,7 @@
 import { combineReducers } from 'redux'
 import { SHARED_NAME as APPLICATION_SHARED_NAME } from '../actions/application'
 import { SHARED_NAME as APPLICATIONS_SHARED_NAME } from '../actions/applications'
+import { SHARED_NAME as GATEWAY_SHARED_NAME } from '../actions/gateway'
 import user from './user'
 import client from './client'
 import init from './init'
@@ -52,5 +53,6 @@ export default combineReducers({
   }),
   events: combineReducers({
     applications: createNamedEventsReducer(APPLICATION_SHARED_NAME),
+    gateways: createNamedEventsReducer(GATEWAY_SHARED_NAME),
   }),
 })

@@ -19,13 +19,15 @@ import api from '../../api'
 import * as gateway from '../actions/gateway'
 import { gsConfigSelector } from '../../../lib/selectors/env'
 import { gatewaySelector } from '../selectors/gateway'
+import createEventsConnectLogic from './events'
 
 const getGatewayLogic = createLogic({
   type: gateway.GET_GTW,
   async process ({ action }, dispatch, done) {
     const { id, meta = {}} = action
     try {
-      const gtw = await api.gateway.get(id, 'name,description')
+      const selectors = meta.selectors || ''
+      const gtw = await api.gateway.get(id, selectors)
       dispatch(gateway.getGatewaySuccess(gtw))
     } catch (error) {
       dispatch(gateway.getGatewayFailure(error))
@@ -112,4 +114,5 @@ export default [
   getGatewayLogic,
   startGatewayStatisticsLogic,
   updateGatewayStatisticsLogic,
+  ...createEventsConnectLogic(gateway.SHARED_NAME, 'gateway'),
 ]

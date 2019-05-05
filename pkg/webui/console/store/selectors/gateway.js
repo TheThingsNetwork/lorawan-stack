@@ -12,6 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {
+  eventsSelector,
+  errorSelector as eventsErrorSelector,
+  statusSelector as eventsStatusSelector,
+} from './events'
+
+const ENTITY = 'gateways'
+
 const storeSelector = state => state.gateway
 
 export const gatewaySelector = state => storeSelector(state).gateway
@@ -57,3 +65,9 @@ export const statisticsIsFetchingSelector = function (state) {
 
   return store.fetching
 }
+
+export const gatewayEventsSelector = eventsSelector(ENTITY)
+
+export const gatewayEventsErrorSelector = eventsErrorSelector(ENTITY)
+
+export const gatewayEventsStatusSelector = eventsStatusSelector(ENTITY)
