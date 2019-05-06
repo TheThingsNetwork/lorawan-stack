@@ -22,7 +22,7 @@ const getDeviceLogic = createLogic({
   async process ({ getState, action }, dispatch, done) {
     const { appId, deviceId, selector, options } = action
     try {
-      const dev = await api.devices.get(appId, deviceId, selector, options)
+      const dev = await api.device.get(appId, deviceId, selector, options)
       dispatch(device.getDeviceSuccess(dev))
     } catch (e) {
       dispatch(device.getDeviceFailure(e))

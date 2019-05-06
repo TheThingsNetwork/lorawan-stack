@@ -79,6 +79,7 @@ class FieldGroup extends React.Component {
 
     const classNames = classnames(style.container, groupClassName, {
       [style.horizontal]: horizontal,
+      [style.disabled]: disabled,
     })
 
     return (

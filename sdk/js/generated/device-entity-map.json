@@ -32,7 +32,7 @@
   "uses_32_bit_f_cnt": ["ns", "ns"],
   "session": {
     "_root": [["ns", "as"], "read_only"],
-    "dev_addr": ["ns", "ns"],
+    "dev_addr": ["ns", ["ns", "as"]],
     "last_f_cnt_down": ["ns", "ns"],
     "last_f_cnt_up": ["ns", "ns"],
     "last_conf_f_cnt_down": ["ns", "ns"],

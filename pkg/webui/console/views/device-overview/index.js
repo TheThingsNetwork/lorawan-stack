@@ -28,11 +28,6 @@ import DateTime from '../../../lib/components/date-time'
 import style from './device-overview.styl'
 
 const m = defineMessages({
-  hardware: 'Hardware',
-  brand: 'Brand',
-  model: 'Model',
-  hardwareVersion: 'Hardware version',
-  firmwareVersion: 'Firmware Version',
   activationInfo: 'Activation Info',
   rootKeyId: 'Root Key ID',
   sessionInfo: 'Session Info',
@@ -81,12 +76,12 @@ class DeviceOverview extends React.Component {
     // Add version info, if it is available
     if (Object.keys(version_ids).length > 0) {
       sheetData.push({
-        header: m.hardware,
+        header: sharedMessages.hardware,
         items: [
-          { key: m.brand, value: version_ids.brand_id },
-          { key: m.model, value: version_ids.model_id },
-          { key: m.hardwareVersion, value: version_ids.hardware_version },
-          { key: m.firmwareVersion, value: version_ids.firmware_version },
+          { key: sharedMessages.brand, value: version_ids.brand_id },
+          { key: sharedMessages.model, value: version_ids.model_id },
+          { key: sharedMessages.hardwareVersion, value: version_ids.hardware_version },
+          { key: sharedMessages.firmwareVersion, value: version_ids.firmware_version },
         ],
       })
     }

@@ -34,9 +34,18 @@
   flex-wrap: wrap
   width: 100%
 
+  &.disabled
+    .label
+      opacity: .4
+      cursor: not-allowed
+
   &:not(.horizontal)
     .label
       font-weight: 600
+
+  &.checkbox:not(.disabled), &.radio:not(.disabled)
+    .label
+      cursor: pointer
 
   &.checkbox, &.radio
     .component
@@ -52,7 +61,6 @@
       order: 2
       padding-left: $cs.xxs
       width: auto
-      cursor: pointer
       vertical-align: middle
 
     .description
