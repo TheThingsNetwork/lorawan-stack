@@ -84,7 +84,7 @@ class ApplicationOverview extends React.Component {
         </Row>
         <Row>
           <Col sm={12} className={style.table}>
-            <DevicesTable pageSize={DEVICES_TABLE_SIZE} />
+            <DevicesTable pageSize={DEVICES_TABLE_SIZE} devicePathPrefix="/devices" />
           </Col>
         </Row>
       </Container>
