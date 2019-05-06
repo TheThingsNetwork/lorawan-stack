@@ -23,7 +23,7 @@ import (
 
 	"github.com/TheThingsIndustries/magepkg/git"
 	"github.com/magefile/mage/mg"
-	"golang.org/x/exp/errors"
+	"golang.org/x/xerrors"
 )
 
 // Git namespace.
@@ -136,7 +136,7 @@ func (Git) commitMsg(messageFile string) error {
 	commitMsg := s.Text()
 
 	if commitMsg == "" {
-		return errors.New("commit message must not be empty")
+		return xerrors.New("commit message must not be empty")
 	}
 
 	if strings.HasPrefix(commitMsg, "fixup! ") || strings.HasPrefix(commitMsg, "Merge ") {
@@ -146,7 +146,7 @@ func (Git) commitMsg(messageFile string) error {
 	// Check length:
 	switch {
 	case len(commitMsg) > 72:
-		return errors.New("commit message must be shorter than 72 characters")
+		return xerrors.New("commit message must be shorter than 72 characters")
 	case len(commitMsg) > 50:
 		// TODO: Warn.
 	}
