@@ -35,7 +35,12 @@ var goModuleEnv = map[string]string{
 	"GO111MODULE": "on",
 }
 
+var goTags = os.Getenv("GO_TAGS")
+
 func execGo(cmd string, args ...string) error {
+	if goTags != "" {
+		args = append([]string{fmt.Sprintf("-tags=%s", goTags)}, args...)
+	}
 	_, err := sh.Exec(goModuleEnv, os.Stdout, os.Stderr, "go", append([]string{cmd}, args...)...)
 	return err
 }
