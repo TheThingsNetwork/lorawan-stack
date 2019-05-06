@@ -94,7 +94,7 @@ func (ids EntityIdentifiers) IDString() string {
 	case *EntityIdentifiers_ClientIDs:
 		return oneof.ClientIDs.GetClientID()
 	case *EntityIdentifiers_DeviceIDs:
-		return fmt.Sprintf("%s:%s", oneof.DeviceIDs.GetApplicationID(), oneof.DeviceIDs.GetDeviceID())
+		return fmt.Sprintf("%s.%s", oneof.DeviceIDs.GetApplicationID(), oneof.DeviceIDs.GetDeviceID())
 	case *EntityIdentifiers_GatewayIDs:
 		return oneof.GatewayIDs.GetGatewayID()
 	case *EntityIdentifiers_OrganizationIDs:
