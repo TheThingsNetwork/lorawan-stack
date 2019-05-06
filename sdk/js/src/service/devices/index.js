@@ -51,7 +51,7 @@ class Devices {
     const devId = deviceId || 'device_id' in ids && ids.device_id
     const appId = applicationId || 'application_ids' in ids && ids.application_ids.application_id
 
-    if (deviceId && ids && 'device_id' in deviceId && deviceId !== ids.device_id) {
+    if (deviceId && ids && 'device_id' in ids && deviceId !== ids.device_id) {
       throw new Error('Device ID mismatch.')
     }
 
@@ -94,9 +94,35 @@ class Devices {
       delete requestTree.is
     }
 
+    // Retrieve join information if not present
+    if (!create && !('supports_join' in device)) {
+      try {
+        const res = await this._getDevice(appId, devId, [[ 'supports_join' ]])
+        device.supports_join = res.supports_join
+      } catch (err) {
+        throw new Error('Could not retrieve join information of the device')
+      }
+    }
+
     // Do not query JS when the device is ABP
     if (!device.supports_join) {
       delete requestTree.js
+    }
+
+    // Retrieve necessary EUIs in case of a join server query being necessary
+    if ('js' in requestTree) {
+      if (!create && (!ids || !ids.join_eui || !ids.dev_eui)) {
+        try {
+          const res = await this._getDevice(appId, devId, [[ 'ids', 'join_eui' ], [ 'ids', 'dev_eui' ]])
+          device.ids = {
+            ...device.ids,
+            join_eui: res.ids.join_eui,
+            dev_eui: res.ids.dev_eui,
+          }
+        } catch (err) {
+          throw new Error('Could not update Join Server data on a device without Join EUI or Dev EUI')
+        }
+      }
     }
 
     // Write the device id param based on either the id of the newly created
