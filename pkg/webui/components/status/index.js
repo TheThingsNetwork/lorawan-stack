@@ -42,7 +42,13 @@ const Status = function ({
       className: classnames(label.props.className, style.statusLabel),
     })
   } else {
-    statusLabel = <Message className={style.statusLabel} content={label} />
+    statusLabel = (
+      <Message
+        className={style.statusLabel}
+        content={label}
+        values={labelValues}
+      />
+    )
   }
 
   return (
