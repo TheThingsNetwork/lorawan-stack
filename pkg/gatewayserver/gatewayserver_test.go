@@ -123,14 +123,14 @@ func TestGatewayServer(t *testing.T) {
 	}, registeredGatewayKey)
 
 	for _, ptc := range []struct {
-		Protocol                string
-		GatewayStatusMsgSupport bool
-		ValidAuth               func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool
-		Link                    func(ctx context.Context, t *testing.T, ids ttnpb.GatewayIdentifiers, key string, upCh <-chan *ttnpb.GatewayUp, downCh chan<- *ttnpb.GatewayDown) error
+		Protocol       string
+		SupportsStatus bool
+		ValidAuth      func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool
+		Link           func(ctx context.Context, t *testing.T, ids ttnpb.GatewayIdentifiers, key string, upCh <-chan *ttnpb.GatewayUp, downCh chan<- *ttnpb.GatewayDown) error
 	}{
 		{
-			Protocol:                "grpc",
-			GatewayStatusMsgSupport: true,
+			Protocol:       "grpc",
+			SupportsStatus: true,
 			ValidAuth: func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool {
 				return ids.GatewayID == registeredGatewayID && key == registeredGatewayKey
 			},
@@ -190,8 +190,8 @@ func TestGatewayServer(t *testing.T) {
 			},
 		},
 		{
-			Protocol:                "mqtt",
-			GatewayStatusMsgSupport: true,
+			Protocol:       "mqtt",
+			SupportsStatus: true,
 			ValidAuth: func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool {
 				return ids.GatewayID == registeredGatewayID && key == registeredGatewayKey
 			},
@@ -275,8 +275,8 @@ func TestGatewayServer(t *testing.T) {
 			},
 		},
 		{
-			Protocol:                "udp",
-			GatewayStatusMsgSupport: true,
+			Protocol:       "udp",
+			SupportsStatus: true,
 			ValidAuth: func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool {
 				return ids.EUI != nil
 			},
@@ -406,14 +406,14 @@ func TestGatewayServer(t *testing.T) {
 			},
 		},
 		{
-			Protocol:                "basicstation",
-			GatewayStatusMsgSupport: false,
+			Protocol:       "basicstation",
+			SupportsStatus: false,
 			ValidAuth: func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool {
-				// TODO: Add basic Auth header check
+				// TODO: Add basic Auth header check (https://github.com/TheThingsNetwork/lorawan-stack/issues/74#issue-404431141)
 				return ids.EUI != nil
 			},
 			Link: func(ctx context.Context, t *testing.T, ids ttnpb.GatewayIdentifiers, key string, upCh <-chan *ttnpb.GatewayUp, downCh chan<- *ttnpb.GatewayDown) error {
-				// TODO: Add basic Auth header check
+				// TODO: Add basic Auth header check (https://github.com/TheThingsNetwork/lorawan-stack/issues/74#issue-404431141)
 				if ids.EUI == nil {
 					t.SkipNow()
 				}
@@ -434,7 +434,7 @@ func TestGatewayServer(t *testing.T) {
 							for _, uplink := range msg.UplinkMessages {
 								var payload ttnpb.Message
 								if err := lorawan.UnmarshalMessage(uplink.RawPayload, &payload); err != nil {
-									t.Logf("Failed to unmarshal Uplink Message. Skipping...")
+									// Ignore invalid uplinks
 									continue
 								}
 								var bsUpstream []byte
@@ -625,10 +625,9 @@ func TestGatewayServer(t *testing.T) {
 					upEvents[event] = ch
 				}
 				for _, tc := range []struct {
-					Name               string
-					Up                 *ttnpb.GatewayUp
-					StatusMsgSupported bool
-					Forwards           []int // Indices of uplink messages in Up that are being forwarded.
+					Name     string
+					Up       *ttnpb.GatewayUp
+					Forwards []int // Indices of uplink messages in Up that are being forwarded.
 				}{
 					{
 						Name: "GatewayStatus",
@@ -637,7 +636,6 @@ func TestGatewayServer(t *testing.T) {
 								Time: time.Unix(424242, 0),
 							},
 						},
-						StatusMsgSupported: ptc.GatewayStatusMsgSupport,
 					},
 					{
 						Name: "TxAck",
@@ -646,7 +644,6 @@ func TestGatewayServer(t *testing.T) {
 								Result: ttnpb.TxAcknowledgment_SUCCESS,
 							},
 						},
-						StatusMsgSupported: ptc.GatewayStatusMsgSupport,
 					},
 					{
 						Name: "OneValidLoRa",
@@ -678,8 +675,7 @@ func TestGatewayServer(t *testing.T) {
 								},
 							},
 						},
-						Forwards:           []int{0},
-						StatusMsgSupported: ptc.GatewayStatusMsgSupport,
+						Forwards: []int{0},
 					},
 					{
 						Name: "OneValidFSK",
@@ -709,8 +705,7 @@ func TestGatewayServer(t *testing.T) {
 								},
 							},
 						},
-						Forwards:           []int{0},
-						StatusMsgSupported: ptc.GatewayStatusMsgSupport,
+						Forwards: []int{0},
 					},
 					{
 						Name: "OneGarbageWithStatus",
@@ -796,8 +791,7 @@ func TestGatewayServer(t *testing.T) {
 								Time: time.Unix(4242424, 0),
 							},
 						},
-						Forwards:           []int{1, 2},
-						StatusMsgSupported: ptc.GatewayStatusMsgSupport,
+						Forwards: []int{1, 2},
 					},
 				} {
 					t.Run(tc.Name, func(t *testing.T) {
@@ -807,7 +801,12 @@ func TestGatewayServer(t *testing.T) {
 						case <-time.After(timeout):
 							t.Fatalf("Failed to send message to upstream channel")
 						}
-						uplinkCount += len(tc.Up.UplinkMessages)
+						if ptc.SupportsStatus {
+							uplinkCount += len(tc.Up.UplinkMessages)
+						} else {
+							// If the protocol does not support Status Messages, then count only the uplinks.
+							uplinkCount += len(tc.Forwards)
+						}
 
 						for _, msgIdx := range tc.Forwards {
 							select {
@@ -844,7 +843,7 @@ func TestGatewayServer(t *testing.T) {
 								t.Fatal("Expected Tx acknowledgment event timeout")
 							}
 						}
-						if tc.Up.GatewayStatus != nil && tc.StatusMsgSupported {
+						if tc.Up.GatewayStatus != nil && ptc.SupportsStatus {
 							select {
 							case <-upEvents["gs.status.receive"]:
 							case <-time.After(timeout):
@@ -859,15 +858,9 @@ func TestGatewayServer(t *testing.T) {
 						if !a.So(err, should.BeNil) {
 							t.FailNow()
 						}
+						a.So(stats.UplinkCount, should.Equal, uplinkCount)
 
-						if tc.StatusMsgSupported {
-							a.So(stats.UplinkCount, should.Equal, uplinkCount)
-						} else {
-							// For protocols that doesn't support GatewayStatus messages, there will be one less uplink.
-							a.So(stats.UplinkCount, should.BeBetweenOrEqual, uplinkCount-2, uplinkCount)
-						}
-
-						if tc.Up.GatewayStatus != nil && tc.StatusMsgSupported {
+						if tc.Up.GatewayStatus != nil && ptc.SupportsStatus {
 							if !a.So(stats.LastStatus, should.NotBeNil) {
 								t.FailNow()
 							}
