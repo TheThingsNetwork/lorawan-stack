@@ -182,7 +182,7 @@ func TestScheduleAt(t *testing.T) {
 			Priority:       ttnpb.TxSchedulePriority_HIGHEST,
 			MedianRTT:      durationPtr(200 * time.Millisecond),
 			ExpectedToa:    51456 * time.Microsecond,
-			ExpectedStarts: 1000000000 - 200000000/2,
+			ExpectedStarts: 1000000000 - 200000000/2 - 51456000,
 		},
 		{
 			SyncWithGateway: true,
@@ -202,7 +202,7 @@ func TestScheduleAt(t *testing.T) {
 			},
 			Priority:       ttnpb.TxSchedulePriority_HIGHEST,
 			ExpectedToa:    51456 * time.Microsecond,
-			ExpectedStarts: 60000000000,
+			ExpectedStarts: 60000000000 - 51456000,
 		},
 		{
 			PayloadSize: 10,

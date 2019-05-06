@@ -174,6 +174,12 @@ func (s *Scheduler) ScheduleAt(ctx context.Context, payloadSize int, settings tt
 				return Emission{}, errNoAbsoluteGatewayTime
 			}
 		}
+		// Assume that the absolute time is the time of arrival, not time of transmission.
+		toa, err := toa.Compute(payloadSize, settings)
+		if err != nil {
+			return Emission{}, err
+		}
+		starts -= ConcentratorTime(toa)
 	} else {
 		starts = s.clock.TimestampTime(settings.Timestamp)
 	}
