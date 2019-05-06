@@ -67,7 +67,6 @@ func TestGatewayServer(t *testing.T) {
 	ctx := test.Context()
 	is, isAddr := startMockIS(ctx)
 	ns, nsAddr := startMockNS(ctx)
-	_ = ns
 
 	c := component.MustNew(test.GetLogger(t), &component.Config{
 		ServiceBase: config.ServiceBase{
