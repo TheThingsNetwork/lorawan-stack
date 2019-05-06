@@ -28,9 +28,10 @@ import Form from '../../../components/form'
 import Field from '../../../components/field'
 import SubmitBar from '../../../components/submit-bar'
 import Button from '../../../components/button'
-import { id as gatewayIdRegexp } from '../../lib/regexp'
+import { id as gatewayIdRegexp, address as addressRegexp } from '../../lib/regexp'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import FrequencyPlansSelect from '../../containers/freq-plans-select'
+import { withEnv } from '../../../lib/components/env'
 
 import api from '../../api'
 
@@ -42,11 +43,8 @@ const m = defineMessages({
   dutyCycle: 'Enforce Duty Cycle',
   gatewayIdPlaceholder: 'my-new-gateway',
   createGateway: 'Create Gateway',
+  gsServerAddressDescription: 'The address of the Gateway Server to connect to',
 })
-
-const initialValues = {
-  enforce_duty_cycle: true,
-}
 
 const validationSchema = Yup.object().shape({
   ids: Yup.object().shape({
@@ -65,8 +63,11 @@ const validationSchema = Yup.object().shape({
     .max(2000, sharedMessages.validateTooLong),
   frequency_plan_id: Yup.string()
     .required(sharedMessages.validateRequired),
+  gateway_server_address: Yup.string()
+    .matches(addressRegexp, sharedMessages.validateAddressFormat),
 })
 
+@withEnv
 @withBreadcrumb('gateways.add', function () {
   return (
     <Breadcrumb
@@ -110,6 +111,19 @@ export default class GatewayAdd extends React.Component {
 
   render () {
     const { error } = this.state
+    const { env } = this.props
+
+    const gs = env.config.gs
+
+    let gsServerAddress = ''
+    if (gs.enabled) {
+      gsServerAddress = new URL(gs.base_url).host
+    }
+
+    const initialValues = {
+      enforce_duty_cycle: true,
+      gateway_server_address: gsServerAddress,
+    }
 
     return (
       <Container>
@@ -157,6 +171,13 @@ export default class GatewayAdd extends React.Component {
                 title={sharedMessages.gatewayDescription}
                 name="description"
                 type="textarea"
+              />
+              <Field
+                title={sharedMessages.gatewayServerAddress}
+                description={m.gsServerAddressDescription}
+                placeholder={sharedMessages.addressPlaceholder}
+                name="gateway_server_address"
+                type="text"
               />
               <Message
                 component="h4"
