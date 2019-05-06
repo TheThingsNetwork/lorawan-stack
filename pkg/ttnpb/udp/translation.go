@@ -344,12 +344,11 @@ func FromDownlinkMessage(msg *ttnpb.DownlinkMessage) (*TxPacket, error) {
 		Data: base64.StdEncoding.EncodeToString(payload),
 		Tmst: scheduled.Timestamp,
 	}
-	if scheduled.Timestamp == 0 {
-		tx.Imme = true
-	}
 	if scheduled.Time != nil {
 		gpsTime := uint64(gpstime.ToGPS(*scheduled.Time))
 		tx.Tmms = &gpsTime
+	} else if scheduled.Timestamp == 0 {
+		tx.Imme = true
 	}
 
 	tx.DatR.DataRate = scheduled.DataRate

@@ -75,7 +75,7 @@ func (sb *SubBand) gc(ctx context.Context) error {
 			ticker.Stop()
 			return ctx.Err()
 		case <-ticker.C:
-			from := sb.clock.ServerTime(time.Now()) - ConcentratorTime(DutyCycleWindow)
+			from := sb.clock.FromServerTime(time.Now()) - ConcentratorTime(DutyCycleWindow)
 			sb.mu.Lock()
 			expired := 0
 			for _, em := range sb.emissions {
@@ -103,7 +103,7 @@ func (sb *SubBand) sum(from, to ConcentratorTime) time.Duration {
 
 // DutyCycleUtilization returns the utilization as a fraction of the available duty-cycle.
 func (sb *SubBand) DutyCycleUtilization() float32 {
-	now := sb.clock.ServerTime(time.Now())
+	now := sb.clock.FromServerTime(time.Now())
 	sb.mu.RLock()
 	val := sb.sum(now-ConcentratorTime(DutyCycleWindow), now)
 	sb.mu.RUnlock()

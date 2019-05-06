@@ -23,12 +23,14 @@ import (
 type Clock interface {
 	// IsSynced returns whether the clock is synchronized.
 	IsSynced() bool
-	// ServerTime returns an indication of the concentrator time at the given server time.
-	ServerTime(server time.Time) ConcentratorTime
-	// GatewayTime returns an indication of the concentrator time at the given gateway time if available.
-	GatewayTime(time.Time) (ConcentratorTime, bool)
-	// TimestampTime returns the concentrator time for the given timestamp.
-	TimestampTime(timestamp uint32) ConcentratorTime
+	// FromServerTime returns an indication of the concentrator time at the given server time.
+	FromServerTime(time.Time) ConcentratorTime
+	// ToServerTime returns an indication of the server time at the given concentrator time.
+	ToServerTime(ConcentratorTime) time.Time
+	// FromGatewayTime returns an indication of the concentrator time at the given gateway time if available.
+	FromGatewayTime(time.Time) (ConcentratorTime, bool)
+	// FromTimestampTime returns the concentrator time for the given timestamp.
+	FromTimestampTime(timestamp uint32) ConcentratorTime
 }
 
 // RolloverClock is a Clock that takes roll-over of a uint32 microsecond concentrator time into account.
@@ -45,7 +47,7 @@ func (c *RolloverClock) IsSynced() bool { return c.synced }
 
 // Sync synchronizes the clock with the given concentrator time v and the server time.
 func (c *RolloverClock) Sync(timestamp uint32, server time.Time) {
-	c.absolute = c.TimestampTime(timestamp)
+	c.absolute = c.FromTimestampTime(timestamp)
 	c.relative = timestamp
 	c.server = server
 	c.gateway = nil
@@ -59,21 +61,26 @@ func (c *RolloverClock) SyncWithGateway(timestamp uint32, server, gateway time.T
 	c.gateway = &gateway
 }
 
-// ServerTime implements Clock.
-func (c *RolloverClock) ServerTime(server time.Time) ConcentratorTime {
+// FromServerTime implements Clock.
+func (c *RolloverClock) FromServerTime(server time.Time) ConcentratorTime {
 	return c.absolute + ConcentratorTime(server.Sub(c.server))
 }
 
-// GatewayTime implements Clock.
-func (c *RolloverClock) GatewayTime(gateway time.Time) (ConcentratorTime, bool) {
+// ToServerTime implements Clock.
+func (c *RolloverClock) ToServerTime(t ConcentratorTime) time.Time {
+	return c.server.Add(time.Duration(t - c.absolute))
+}
+
+// FromGatewayTime implements Clock.
+func (c *RolloverClock) FromGatewayTime(gateway time.Time) (ConcentratorTime, bool) {
 	if c.gateway == nil {
 		return 0, false
 	}
 	return c.absolute + ConcentratorTime(gateway.Sub(*c.gateway)), true
 }
 
-// TimestampTime implements Clock.
-func (c *RolloverClock) TimestampTime(timestamp uint32) ConcentratorTime {
+// FromTimestampTime implements Clock.
+func (c *RolloverClock) FromTimestampTime(timestamp uint32) ConcentratorTime {
 	passed := int64(timestamp) - int64(c.relative)
 	if passed < 0 {
 		passed += math.MaxUint32
