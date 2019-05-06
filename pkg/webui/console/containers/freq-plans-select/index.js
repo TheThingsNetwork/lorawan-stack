@@ -112,6 +112,7 @@ class FrequencyPlansSelect extends React.PureComponent {
     const fieldOptions = this.getOptions()
     const fieldError = getIn(this.props.formik.errors, name)
     const fieldTouched = getIn(this.props.formik.touched, name)
+    const fieldValue = getIn(this.props.formik.values, name)
 
     return (
       <Field
@@ -119,6 +120,7 @@ class FrequencyPlansSelect extends React.PureComponent {
         type="select"
         options={fieldOptions}
         name={name}
+        value={fieldValue}
         required={required}
         title={title}
         autoFocus={autoFocus}
