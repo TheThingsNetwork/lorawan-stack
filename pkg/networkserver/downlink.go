@@ -622,10 +622,11 @@ loop:
 	return phy.DataRates[maxUpDRIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks())
 }
 
+const gsScheduleWindow = 30 * time.Second
+
 // processDownlinkTask processes the most recent downlink task ready for execution, if such is available or wait until it is before processing it.
 // NOTE: ctx.Done() is not guaranteed to be respected by processDownlinkTask.
 func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
-	var scheduleErr bool
 	var setErr bool
 	var addErr bool
 	err := ns.downlinkTasks.Pop(ctx, func(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time) error {
@@ -681,6 +682,10 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					// Join-accept downlink for Class A/B/C device in Rx1/Rx2
 					rxDelay := downlinkRxDelay(phy, dev.PendingMACState, up)
 					rx1, rx2, paths := downlinkPathsForClassA(rxDelay, dev.RecentUplinks...)
+					if len(paths) == 0 {
+						return nil, nil, errNoPath
+					}
+
 					req, err := txRequestFromUplink(phy, dev.PendingMACState, rx1, rx2, up)
 					if err != nil {
 						return nil, nil, err
@@ -698,7 +703,6 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						paths...,
 					)
 					if err != nil {
-						scheduleErr = true
 						return nil, nil, err
 					}
 
@@ -753,6 +757,10 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						// Data downlink for Class A in Rx1/Rx2
 						rxDelay := downlinkRxDelay(phy, dev.MACState, up)
 						rx1, rx2, paths := downlinkPathsForClassA(rxDelay, dev.RecentUplinks...)
+						if len(paths) == 0 {
+							return nil, nil, errNoPath
+						}
+
 						req, err := txRequestFromUplink(phy, dev.MACState, rx1, rx2, up)
 						if err != nil {
 							return nil, nil, err
@@ -797,25 +805,25 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 							paths...,
 						)
 						if err != nil {
-							scheduleErr = true
-						} else {
-							dev.MACState.RxWindowsAvailable = false
-							dev.RecentDownlinks = appendRecentDownlink(dev.RecentDownlinks, down, recentDownlinkCount)
-							return dev, []string{
-								"mac_state",
-								"queued_application_downlinks",
-								"recent_downlinks",
-								"session",
-							}, nil
+							return nil, nil, err
 						}
+						dev.MACState.RxWindowsAvailable = false
+						dev.RecentDownlinks = appendRecentDownlink(dev.RecentDownlinks, down, recentDownlinkCount)
+						return dev, []string{
+							"mac_state",
+							"queued_application_downlinks",
+							"recent_downlinks",
+							"session",
+						}, nil
 
 					default:
 						// Data downlink for Class B/C in Rx1 if available
 						rxDelay := downlinkRxDelay(phy, dev.MACState, up)
 						rx1, _, paths := downlinkPathsForClassA(rxDelay, dev.RecentUplinks...)
-						if !rx1 {
+						if !rx1 || len(paths) == 0 {
 							break
 						}
+
 						req, err := txRequestFromUplink(phy, dev.MACState, true, false, up)
 						if err != nil {
 							return nil, nil, err
@@ -869,7 +877,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						)
 						if err != nil {
 							dev = devCopy
-							scheduleErr = true
+							logger.WithError(err).Debug("Failed to schedule class B/C downlink in Rx1, attempt Rx2")
 						} else {
 							if dev.MACState.DeviceClass == ttnpb.CLASS_C && nextDownlinkAt.Before(downAt) {
 								nextDownlinkAt = downAt
@@ -886,107 +894,123 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					}
 				}
 
-				dev.MACState.RxWindowsAvailable = false
-				if dev.MACState.DeviceClass == ttnpb.CLASS_B || dev.MACState.DeviceClass == ttnpb.CLASS_C {
-					// Data downlink for Class B/C in Rx2
-					req := &ttnpb.TxRequest{
-						Class:            dev.MACState.DeviceClass,
-						Rx2DataRateIndex: dev.MACState.CurrentParameters.Rx2DataRateIndex,
-						Rx2Frequency:     dev.MACState.CurrentParameters.Rx2Frequency,
-					}
+				// Data downlink for Class B/C in Rx2
+				req := &ttnpb.TxRequest{
+					Class:            dev.MACState.DeviceClass,
+					Rx2DataRateIndex: dev.MACState.CurrentParameters.Rx2DataRateIndex,
+					Rx2Frequency:     dev.MACState.CurrentParameters.Rx2Frequency,
+				}
 
-					genDown, err = ns.generateDownlink(ctx, dev, phy,
-						phy.DataRates[req.Rx2DataRateIndex].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
-						maxUpLength,
-					)
-					if err != nil {
-						if errors.Resemble(err, errScheduleTooSoon) {
-							nextDownlinkAt = dev.MACState.LastConfirmedDownlinkAt.Add(deviceClassCTimeout(dev, ns.defaultMACSettings))
-						}
-						return nil, nil, err
+				genDown, err = ns.generateDownlink(ctx, dev, phy,
+					phy.DataRates[req.Rx2DataRateIndex].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
+					maxUpLength,
+				)
+				if err != nil {
+					if errors.Resemble(err, errScheduleTooSoon) {
+						nextDownlinkAt = dev.MACState.LastConfirmedDownlinkAt.Add(deviceClassCTimeout(dev, ns.defaultMACSettings))
 					}
-					if dev.MACState.DeviceClass == ttnpb.CLASS_C {
-						if dev.MACState.LastConfirmedDownlinkAt != nil {
-							nextDownlinkAt = dev.MACState.LastConfirmedDownlinkAt.Add(deviceClassCTimeout(dev, ns.defaultMACSettings))
-						} else {
-							nextDownlinkAt = time.Now()
-						}
-					}
-
-					if genDown.ApplicationDownlink != nil {
-						ctx = events.ContextWithCorrelationID(ctx, genDown.ApplicationDownlink.CorrelationIDs...)
-					}
-					req.Priority = genDown.Priority
-
-					var paths []downlinkPath
-					if fixedPaths := genDown.ApplicationDownlink.GetClassBC().GetGateways(); len(fixedPaths) > 0 {
-						paths = make([]downlinkPath, 0, len(fixedPaths))
-						for _, gtw := range fixedPaths {
-							paths = append(paths, downlinkPath{
-								GatewayIdentifiers: gtw.GatewayIdentifiers,
-								DownlinkPath: &ttnpb.DownlinkPath{
-									Path: &ttnpb.DownlinkPath_Fixed{
-										Fixed: gtw,
-									},
-								},
-							})
-						}
+					return nil, nil, err
+				}
+				if dev.MACState.DeviceClass == ttnpb.CLASS_C {
+					if dev.MACState.LastConfirmedDownlinkAt != nil {
+						nextDownlinkAt = dev.MACState.LastConfirmedDownlinkAt.Add(deviceClassCTimeout(dev, ns.defaultMACSettings))
 					} else {
-						paths = downlinkPathsFromRecentUplinks(dev.RecentUplinks...)
-						if len(paths) == 0 {
-							return nil, nil, errUplinkNotFound
-						}
-					}
-					if absTime := genDown.ApplicationDownlink.GetClassBC().GetAbsoluteTime(); absTime != nil {
-						req.AbsoluteTime = absTime
-					}
-
-					down, downAt, err := ns.scheduleDownlinkByPaths(
-						log.NewContext(ctx, loggerWithTxRequestFields(logger, req, false, true).WithFields(log.Fields(
-							"downlink_type", "data",
-						))),
-						req,
-						dev.EndDeviceIdentifiers,
-						genDown.Payload,
-						paths...,
-					)
-					if err != nil {
-						scheduleErr = true
-					} else {
-						if dev.MACState.DeviceClass == ttnpb.CLASS_C && nextDownlinkAt.Before(downAt) {
-							nextDownlinkAt = downAt
-						}
-						dev.RecentDownlinks = appendRecentDownlink(dev.RecentDownlinks, down, recentDownlinkCount)
-						return dev, []string{
-							"mac_state",
-							"queued_application_downlinks",
-							"recent_downlinks",
-							"session",
-						}, nil
+						nextDownlinkAt = time.Now()
 					}
 				}
-				return nil, nil, errSchedule
+
+				if genDown.ApplicationDownlink != nil {
+					ctx = events.ContextWithCorrelationID(ctx, genDown.ApplicationDownlink.CorrelationIDs...)
+				}
+				req.Priority = genDown.Priority
+
+				var paths []downlinkPath
+				if fixedPaths := genDown.ApplicationDownlink.GetClassBC().GetGateways(); len(fixedPaths) > 0 {
+					paths = make([]downlinkPath, 0, len(fixedPaths))
+					for _, gtw := range fixedPaths {
+						paths = append(paths, downlinkPath{
+							GatewayIdentifiers: gtw.GatewayIdentifiers,
+							DownlinkPath: &ttnpb.DownlinkPath{
+								Path: &ttnpb.DownlinkPath_Fixed{
+									Fixed: gtw,
+								},
+							},
+						})
+					}
+				} else {
+					paths = downlinkPathsFromRecentUplinks(dev.RecentUplinks...)
+					if len(paths) == 0 {
+						return nil, nil, errNoPath
+					}
+				}
+				if absTime := genDown.ApplicationDownlink.GetClassBC().GetAbsoluteTime(); absTime != nil {
+					if absTime.After(time.Now().Add(gsScheduleWindow)) {
+						nextDownlinkAt = absTime.Add(-gsScheduleWindow)
+						return nil, nil, errScheduleTooSoon
+					}
+					req.AbsoluteTime = absTime
+				}
+
+				down, downAt, err := ns.scheduleDownlinkByPaths(
+					log.NewContext(ctx, loggerWithTxRequestFields(logger, req, false, true).WithFields(log.Fields(
+						"downlink_type", "data",
+					))),
+					req,
+					dev.EndDeviceIdentifiers,
+					genDown.Payload,
+					paths...,
+				)
+				if err != nil {
+					return nil, nil, err
+				}
+
+				if dev.MACState.DeviceClass == ttnpb.CLASS_C && nextDownlinkAt.Before(downAt) {
+					nextDownlinkAt = downAt
+				}
+				dev.MACState.RxWindowsAvailable = false
+				dev.RecentDownlinks = appendRecentDownlink(dev.RecentDownlinks, down, recentDownlinkCount)
+				return dev, []string{
+					"mac_state",
+					"queued_application_downlinks",
+					"recent_downlinks",
+					"session",
+				}, nil
 			},
 		)
 
 		switch {
-		case scheduleErr:
-			return err
-
 		case err != nil && errors.Resemble(err, errNoDownlink):
 			logger.Debug("No downlink to send, skip downlink slot")
 			return nil
-		}
 
-		if err != nil && errors.Resemble(err, errScheduleTooSoon) {
+		case err != nil && errors.Resemble(err, errNoPath):
+			logger.Warn("No downlink path available, skip downlink slot")
+			return nil
+
+		case err != nil && errors.Resemble(err, errUplinkNotFound):
+			logger.Warn("Uplink preceding downlink not found, skip downlink slot")
+			return nil
+
+		case err != nil && errors.Resemble(err, errInvalidChannelIndex):
+			logger.Warn("Invalid channel index in preceding uplink, skip downlink slot")
+			return nil
+
+		case err != nil && errors.Resemble(err, errCorruptedMACState):
+			logger.Error("Corrupted MAC state, skip downlink slot")
+			return nil
+
+		case err != nil && errors.Resemble(err, errSchedule):
+			// The error is already logged.
+
+		case err != nil && errors.Resemble(err, errScheduleTooSoon):
 			logger.Debug("Downlink scheduled too soon, skip downlink slot")
-		} else if err != nil {
+
+		case err != nil:
 			setErr = true
 			logger.WithError(err).Warn("Failed to update device in registry")
 			return err
-		}
 
-		if genDown != nil && dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+		case genDown != nil && dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0:
 			go func() {
 				logger.Debug("Send downlink queue invalidation to Application Server")
 				ok, err := ns.handleASUplink(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, &ttnpb.ApplicationUp{
@@ -1008,17 +1032,17 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 		}
 
 		if !nextDownlinkAt.IsZero() {
-			logger.WithField("start_at", nextDownlinkAt.UTC()).Debug("Add downlink task after downlink")
+			logger.WithField("start_at", nextDownlinkAt.UTC()).Debug("Add downlink task after downlink slot")
 			if err := ns.downlinkTasks.Add(ctx, devID, nextDownlinkAt, true); err != nil {
 				addErr = true
-				logger.WithError(err).Error("Failed to add downlink task after downlink")
+				logger.WithError(err).Error("Failed to add downlink task after downlink slot")
 				return err
 			}
 		}
 		return nil
 	})
-	if err != nil && !setErr && !addErr && !scheduleErr {
-		ns.Logger().WithError(err).Warn("Failed to pop device from downlink schedule")
+	if err != nil && !setErr && !addErr {
+		log.FromContext(ctx).WithError(err).Warn("Failed to pop device from downlink schedule")
 	}
 	return err
 }
