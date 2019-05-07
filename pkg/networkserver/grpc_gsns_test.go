@@ -2146,7 +2146,6 @@ func handleJoinTest() func(t *testing.T) {
 
 				expectedRequest := &ttnpb.JoinRequest{
 					RawPayload:         append(tc.UplinkMessage.RawPayload[:0:0], tc.UplinkMessage.RawPayload...),
-					Payload:            CopyUplinkMessage(tc.UplinkMessage).Payload,
 					NetID:              NetID,
 					SelectedMACVersion: pb.LoRaWANVersion,
 					RxDelay:            pb.PendingMACState.DesiredParameters.Rx1Delay,
