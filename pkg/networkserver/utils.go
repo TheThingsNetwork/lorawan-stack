@@ -15,10 +15,26 @@
 package networkserver
 
 import (
+	"time"
+
 	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
+
+func timePtr(t time.Time) *time.Time {
+	return &t
+}
+
+func deviceUseADR(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) bool {
+	if dev.MACSettings != nil && dev.MACSettings.UseADR != nil {
+		return dev.MACSettings.UseADR.Value
+	}
+	if defaults.UseADR != nil {
+		return defaults.UseADR.Value
+	}
+	return true
+}
 
 func getDeviceBandVersion(dev *ttnpb.EndDevice, fps *frequencyplans.Store) (*frequencyplans.FrequencyPlan, band.Band, error) {
 	fp, err := fps.GetByID(dev.FrequencyPlanID)
