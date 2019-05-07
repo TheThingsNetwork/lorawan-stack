@@ -118,7 +118,7 @@ export default defineMessages({
   traffic: 'Traffic',
   type: 'Type',
   unknown: 'Unknown',
-  updatedAt: 'Updated at',
+  updatedAt: 'Last updated at',
   uplinksReceived: 'Uplinks Received',
   user: 'User',
   userId: 'User ID',
