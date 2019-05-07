@@ -153,7 +153,7 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 		return nil, err
 	}
 	if len(addrMatches) == 0 {
-		logger.Warn("No device matched DevAddr")
+		logger.Debug("No device matched DevAddr")
 		return nil, errDeviceNotFound
 	}
 
@@ -280,6 +280,18 @@ outer:
 				continue
 			}
 
+			drIdx, err := searchDataRate(up.Settings.DataRate, match.Device, ns.FrequencyPlans)
+			if err != nil {
+				logger.WithError(err).Debug("Failed to determine data rate index of uplink")
+				continue
+			}
+
+			chIdx, err := searchUplinkChannel(up.Settings.Frequency, match.MACState)
+			if err != nil {
+				logger.WithError(err).Debug("Failed to determine channel index of uplink")
+				continue
+			}
+
 			sNwkSIntKey, err := cryptoutil.UnwrapAES128Key(*match.Session.SNwkSIntKey, ns.KeyVault)
 			if err != nil {
 				logger.WithField("kek_label", match.Session.SNwkSIntKey.KEKLabel).WithError(err).Warn("Failed to unwrap SNwkSIntKey, skip")
@@ -290,19 +302,6 @@ outer:
 			if pld.Ack {
 				confFCnt = match.Session.LastConfFCntDown
 			}
-
-			drIdx, err := searchDataRate(up.Settings.DataRate, match.Device, ns.FrequencyPlans)
-			if err != nil {
-				logger.WithError(err).Warn("Failed to determine data rate index of uplink")
-				continue
-			}
-
-			chIdx, err := searchUplinkChannel(up.Settings.Frequency, match.MACState)
-			if err != nil {
-				logger.WithError(err).Warn("Failed to determine channel index of uplink")
-				continue
-			}
-
 			computedMIC, err = crypto.ComputeUplinkMIC(
 				sNwkSIntKey,
 				fNwkSIntKey,
@@ -364,7 +363,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	matched, err := ns.matchDevice(ctx, up)
 	if err != nil {
 		registerDropDataUplink(ctx, nil, up, err)
-		log.FromContext(ctx).WithError(err).Warn("Failed to match device")
+		logger.WithError(err).Debug("Failed to match device")
 		return errDeviceNotFound.WithCause(err)
 	}
 
@@ -779,7 +778,6 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 		CorrelationIDs:     events.CorrelationIDsFromContext(ctx),
 		DevAddr:            devAddr,
 		NetID:              ns.netID,
-		Payload:            up.Payload,
 		RawPayload:         up.RawPayload,
 		RxDelay:            macState.DesiredParameters.Rx1Delay,
 		SelectedMACVersion: dev.LoRaWANVersion, // Assume NS version is always higher than the version of the device
@@ -835,6 +833,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 	}
 	logger.Debug("Join-accept received from Join Server")
 
+	ctx = events.ContextWithCorrelationID(ctx, resp.CorrelationIDs...)
 	keys := resp.SessionKeys
 	if !req.DownlinkSettings.OptNeg {
 		keys.NwkSEncKey = keys.FNwkSIntKey
@@ -914,7 +913,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 			JoinEUI:                dev.EndDeviceIdentifiers.JoinEUI,
 			DevAddr:                &devAddr,
 		},
-		CorrelationIDs: up.CorrelationIDs,
+		CorrelationIDs: events.CorrelationIDsFromContext(ctx),
 		ReceivedAt:     &up.ReceivedAt,
 		Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
 			AppSKey:              resp.SessionKeys.AppSKey,
