@@ -55,16 +55,16 @@ func encrypt(key types.AES128Key, dir uint8, addr types.DevAddr, fCnt uint32, pa
 // - The payload contains the FRMPayload bytes
 // - For FPort>0, the AppSKey is used
 // - For FPort=0, the NwkSEncKey/NwkSKey is used
-func EncryptUplink(appSKey types.AES128Key, addr types.DevAddr, fCnt uint32, payload []byte) ([]byte, error) {
-	return encrypt(appSKey, 0, addr, fCnt, payload)
+func EncryptUplink(key types.AES128Key, addr types.DevAddr, fCnt uint32, payload []byte) ([]byte, error) {
+	return encrypt(key, 0, addr, fCnt, payload)
 }
 
 // DecryptUplink decrypts an uplink payload
 // - The payload contains the FRMPayload bytes
 // - For FPort>0, the AppSKey is used
 // - For FPort=0, the NwkSEncKey/NwkSKey is used
-func DecryptUplink(appSKey types.AES128Key, addr types.DevAddr, fCnt uint32, payload []byte) ([]byte, error) {
-	return encrypt(appSKey, 0, addr, fCnt, payload)
+func DecryptUplink(key types.AES128Key, addr types.DevAddr, fCnt uint32, payload []byte) ([]byte, error) {
+	return encrypt(key, 0, addr, fCnt, payload)
 }
 
 // EncryptDownlink encrypts a downlink payload
