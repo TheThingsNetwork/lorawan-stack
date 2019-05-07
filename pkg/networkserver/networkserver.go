@@ -44,10 +44,6 @@ const (
 	fOptsCapacity = 15
 )
 
-func timePtr(t time.Time) *time.Time {
-	return &t
-}
-
 // WindowEndFunc is a function, which is used by Network Server to determine the end of deduplication and cooldown windows.
 type WindowEndFunc func(ctx context.Context, up *ttnpb.UplinkMessage) <-chan time.Time
 
