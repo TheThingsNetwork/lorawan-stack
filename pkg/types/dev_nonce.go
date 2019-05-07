@@ -19,7 +19,9 @@ import (
 	"strings"
 )
 
-// DevNonce is randomly generated in the join procedure.
+// DevNonce is device nonce used in the join procedure.
+// - If LoRaWAN version <1.1 - it is randomly generated.
+// - If LoRaWAN version >=1.1 - it is a scrictly increasing counter.
 type DevNonce [2]byte
 
 // IsZero returns true iff the type is zero.
