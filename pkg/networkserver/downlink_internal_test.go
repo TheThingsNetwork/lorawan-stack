@@ -3174,6 +3174,7 @@ func TestGenerateDownlink(t *testing.T) {
 							DevAddr: DevAddr,
 							FCtrl: ttnpb.FCtrl{
 								Ack: true,
+								ADR: true,
 							},
 							FCnt: 42,
 						},
@@ -3276,6 +3277,7 @@ func TestGenerateDownlink(t *testing.T) {
 							DevAddr: DevAddr,
 							FCtrl: ttnpb.FCtrl{
 								Ack: false,
+								ADR: true,
 							},
 							FCnt: 42,
 						},
@@ -3388,6 +3390,7 @@ func TestGenerateDownlink(t *testing.T) {
 							DevAddr: DevAddr,
 							FCtrl: ttnpb.FCtrl{
 								Ack: true,
+								ADR: true,
 							},
 							FCnt: 42,
 						},
@@ -3499,6 +3502,7 @@ func TestGenerateDownlink(t *testing.T) {
 							DevAddr: DevAddr,
 							FCtrl: ttnpb.FCtrl{
 								Ack: false,
+								ADR: true,
 							},
 							FCnt: 42,
 						},
@@ -3624,6 +3628,7 @@ func TestGenerateDownlink(t *testing.T) {
 							DevAddr: DevAddr,
 							FCtrl: ttnpb.FCtrl{
 								Ack: true,
+								ADR: true,
 							},
 							FCnt: 42,
 						},
@@ -3747,6 +3752,7 @@ func TestGenerateDownlink(t *testing.T) {
 							DevAddr: DevAddr,
 							FCtrl: ttnpb.FCtrl{
 								Ack: false,
+								ADR: true,
 							},
 							FCnt: 42,
 						},
@@ -3857,6 +3863,7 @@ func TestGenerateDownlink(t *testing.T) {
 							DevAddr: DevAddr,
 							FCtrl: ttnpb.FCtrl{
 								Ack: false,
+								ADR: true,
 							},
 							FCnt: 42,
 						},

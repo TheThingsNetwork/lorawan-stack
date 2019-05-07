@@ -660,13 +660,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 			}
 			stored.RecentADRUplinks = appendRecentUplink(stored.RecentADRUplinks, up, optimalADRUplinkCount)
 
-			useADR := true
-			if stored.MACSettings.GetUseADR() != nil {
-				useADR = stored.MACSettings.UseADR.Value
-			} else if ns.defaultMACSettings.GetUseADR() != nil {
-				useADR = ns.defaultMACSettings.UseADR.Value
-			}
-			if !useADR {
+			if !deviceUseADR(stored, ns.defaultMACSettings) {
 				return stored, paths, nil
 			}
 
