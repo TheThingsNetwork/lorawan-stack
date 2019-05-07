@@ -42,19 +42,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-var _ ttnpb.NsGsServer = &MockNsGsServer{}
-
-type MockNsGsServer struct {
-	ScheduleDownlinkFunc func(context.Context, *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error)
-}
-
-func (m *MockNsGsServer) ScheduleDownlink(ctx context.Context, msg *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error) {
-	if m.ScheduleDownlinkFunc == nil {
-		return nil, nil
-	}
-	return m.ScheduleDownlinkFunc(ctx, msg)
-}
-
 func makeScheduleDownlinkSequence(fs ...func(ctx context.Context, msg *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error)) func(ctx context.Context, msg *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error) {
 	var i uint64
 	return func(ctx context.Context, msg *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error) {
