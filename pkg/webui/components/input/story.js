@@ -85,3 +85,6 @@ storiesOf('Input', module)
   .add('Textarea', () => (
     <Example component="textarea" />
   ))
+  .add('With Spinner', () => (
+    <Example icon="search" loading />
+  ))
