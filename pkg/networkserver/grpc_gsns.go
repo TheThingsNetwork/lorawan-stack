@@ -833,6 +833,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 	}
 	logger.Debug("Join-accept received from Join Server")
 
+	ctx = events.ContextWithCorrelationID(ctx, resp.CorrelationIDs...)
 	keys := resp.SessionKeys
 	if !req.DownlinkSettings.OptNeg {
 		keys.NwkSEncKey = keys.FNwkSIntKey
@@ -912,7 +913,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 			JoinEUI:                dev.EndDeviceIdentifiers.JoinEUI,
 			DevAddr:                &devAddr,
 		},
-		CorrelationIDs: up.CorrelationIDs,
+		CorrelationIDs: events.CorrelationIDsFromContext(ctx),
 		ReceivedAt:     &up.ReceivedAt,
 		Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
 			AppSKey:              resp.SessionKeys.AppSKey,
