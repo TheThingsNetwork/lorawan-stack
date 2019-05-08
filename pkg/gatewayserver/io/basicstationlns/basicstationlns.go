@@ -43,6 +43,7 @@ type srv struct {
 	ctx      context.Context
 	server   io.Server
 	upgrader *websocket.Upgrader
+	tokens   io.DownlinkTokens
 }
 
 func (*srv) Protocol() string { return "basicstation" }
@@ -215,8 +216,7 @@ func (s *srv) handleTraffic(c echo.Context) error {
 				return
 			case down := <-conn.Down():
 				dnmsg := messages.DownlinkMessage{}
-				//TODO: Add Token check after rebasing https://github.com/TheThingsNetwork/lorawan-stack/pull/589
-				dnmsg.FromDownlinkMessage(ids, *down, 0x00)
+				dnmsg.FromDownlinkMessage(ids, *down, int64(s.tokens.Next(down.CorrelationIDs, time.Now())))
 				msg, err := dnmsg.MarshalJSON()
 				if err != nil {
 					logger.WithError(err).Error("Failed to marshal downlink message")
@@ -312,12 +312,14 @@ func (s *srv) handleTraffic(c echo.Context) error {
 				logger.WithError(err).Warn("Failed to unmarshal Tx acknowledgement frame")
 				return nil
 			}
-			//TODO: Add Token check after rebasing https://github.com/TheThingsNetwork/lorawan-stack/pull/589
-			txAck := messages.ToTxAcknowledgment(nil)
-			if err := conn.HandleTxAck(&txAck); err != nil {
-				logger.WithError(err).Warn("Failed to handle Tx acknowledgement message")
+			if correlationIDs, _, ok := s.tokens.Get(uint16(txConf.Diid), receivedAt); ok {
+				txAck := messages.ToTxAcknowledgment(correlationIDs)
+				if err := conn.HandleTxAck(&txAck); err != nil {
+					logger.Warn("Failed to handle Tx acknowledgement message")
+				}
+			} else {
+				logger.Warn("TxAck either does not correspond to a downlink message or arrived too late")
 			}
-
 		case messages.TypeUpstreamProprietaryDataFrame:
 			return errMessageTypeNotImplemented.WithAttributes("type", typ)
 		case messages.TypeUpstreamRemoteShell:

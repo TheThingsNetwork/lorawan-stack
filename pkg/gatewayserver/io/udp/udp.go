@@ -32,8 +32,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/unique"
 )
 
-const tokenExpiration = 3 * time.Minute
-
 // Config contains configuration settings for the UDP gateway frontend.
 // Use DefaultConfig for recommended settings.
 type Config struct {
