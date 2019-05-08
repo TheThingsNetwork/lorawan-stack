@@ -19,7 +19,7 @@ import api from '../../api'
 import * as gateway from '../actions/gateway'
 import { gsConfigSelector } from '../../../lib/selectors/env'
 import { gatewaySelector } from '../selectors/gateway'
-import createEventsConnectLogic from './events'
+import createEventsConnectLogics from './events'
 
 const getGatewayLogic = createLogic({
   type: gateway.GET_GTW,
@@ -114,5 +114,5 @@ export default [
   getGatewayLogic,
   startGatewayStatisticsLogic,
   updateGatewayStatisticsLogic,
-  ...createEventsConnectLogic(gateway.SHARED_NAME, 'gateway'),
+  ...createEventsConnectLogics(gateway.SHARED_NAME, 'gateway'),
 ]

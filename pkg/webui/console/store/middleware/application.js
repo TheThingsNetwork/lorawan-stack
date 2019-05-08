@@ -16,7 +16,7 @@ import { createLogic } from 'redux-logic'
 
 import api from '../../api'
 import * as application from '../actions/application'
-import createEventsConnectLogic from './events'
+import createEventsConnectLogics from './events'
 
 const getApplicationLogic = createLogic({
   type: [ application.GET_APP ],
@@ -99,5 +99,5 @@ export default [
   getApplicationLogic,
   getApplicationApiKeysLogic,
   getApplicationCollaboratorsLogic,
-  ...createEventsConnectLogic(application.SHARED_NAME, 'application'),
+  ...createEventsConnectLogics(application.SHARED_NAME, 'application'),
 ]

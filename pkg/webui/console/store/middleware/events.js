@@ -30,7 +30,7 @@ import {
   applicationEventsStatusSelector,
 } from '../selectors/application'
 
-const createEventsConnectLogic = function (name, entity) {
+const createEventsConnectLogics = function (name, entity) {
   const START_EVENTS = createStartEventsStreamActionType(name)
   const START_EVENTS_FAILURE = createStartEventsStreamFailureActionType(name)
   const STOP_EVENTS = createStopEventsStreamActionType(name)
@@ -104,4 +104,4 @@ const createEventsConnectLogic = function (name, entity) {
   ]
 }
 
-export default createEventsConnectLogic
+export default createEventsConnectLogics
