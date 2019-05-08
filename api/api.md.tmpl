@@ -97,7 +97,7 @@
 | ----------- | ------ | ------- | ---- |
 {{- range $service.MethodsWithOption "google.api.http" }}{{ $method := . }}
 {{- range (.Option "google.api.http").Rules }}
-| `{{ $method.Name }}` | `{{ .Method }}` | `/api/v3/{{ .Pattern }}` | {{ with .Body }}`{{ . }}`{{ end }} |
+| `{{ $method.Name }}` | `{{ .Method }}` | `/api/v3{{ .Pattern }}` | {{ with .Body }}`{{ . }}`{{ end }} |
 {{- end -}}
 {{- end -}}
 {{ end -}}
