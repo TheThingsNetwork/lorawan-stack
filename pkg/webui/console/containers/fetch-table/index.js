@@ -60,7 +60,8 @@ const filterValidator = function (filters) {
 }
 
 @connect(function (state, props) {
-  const base = props.baseDataSelector(state)
+  const base = props.baseDataSelector(state, props)
+
   return {
     items: base[props.entity] || [],
     totalCount: base.totalCount || 0,
