@@ -77,6 +77,7 @@ export default class ApiKeysTable extends Component {
       pageSize,
       baseDataSelector,
       getItemsAction,
+      entityId,
     } = this.props
 
     return (
@@ -88,6 +89,7 @@ export default class ApiKeysTable extends Component {
         pageSize={pageSize}
         baseDataSelector={baseDataSelector}
         getItemsAction={getItemsAction}
+        id={entityId}
       />
     )
   }
@@ -97,4 +99,5 @@ ApiKeysTable.propTypes = {
   pageSize: PropTypes.number.isRequired,
   baseDataSelector: PropTypes.func.isRequired,
   getItemsAction: PropTypes.func.isRequired,
+  entityId: PropTypes.string,
 }
