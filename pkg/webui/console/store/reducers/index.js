@@ -44,6 +44,7 @@ export default combineReducers({
   configuration,
   apiKeys: combineReducers({
     applications: createNamedApiKeysReducer(APPLICATION_SHARED_NAME),
+    gateways: createNamedApiKeysReducer(GATEWAY_SHARED_NAME),
   }),
   rights: combineReducers({
     applications: createNamedRightsReducer(APPLICATIONS_SHARED_NAME),

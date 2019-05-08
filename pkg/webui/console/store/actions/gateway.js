@@ -13,6 +13,15 @@
 // limitations under the License.
 
 import {
+  getApiKeysList,
+  createGetApiKeysListActionType,
+  getApiKeysListFailure,
+  createGetApiKeysListFailureActionType,
+  getApiKeysListSuccess,
+  createGetApiKeysListSuccessActionType,
+} from '../actions/api-keys'
+
+import {
   startEventsStream,
   createStartEventsStreamActionType,
   startEventsStreamSuccess,
@@ -41,6 +50,9 @@ export const START_GTW_EVENT_STREAM_SUCCESS = createStartEventsStreamSuccessActi
 export const START_GTW_EVENT_STREAM_FAILURE = createStartEventsStreamFailureActionType(SHARED_NAME)
 export const STOP_GTW_EVENT_STREAM = createStopEventsStreamActionType(SHARED_NAME)
 export const CLEAR_GTW_EVENTS = createClearEventsActionType(SHARED_NAME)
+export const GET_GTW_API_KEYS_LIST = createGetApiKeysListActionType(SHARED_NAME)
+export const GET_GTW_API_KEYS_LIST_SUCCESS = createGetApiKeysListSuccessActionType(SHARED_NAME)
+export const GET_GTW_API_KEYS_LIST_FAILURE = createGetApiKeysListFailureActionType(SHARED_NAME)
 
 export const getGateway = (id, meta) => (
   { type: GET_GTW, id, meta }
@@ -87,3 +99,10 @@ export const startGatewayEventsStreamFailure = startEventsStreamFailure(SHARED_N
 export const stopGatewayEventsStream = stopEventsStream(SHARED_NAME)
 
 export const clearGatewayEventsStream = clearEvents(SHARED_NAME)
+
+export const getGatewayApiKeysList = getApiKeysList(SHARED_NAME)
+
+export const getGatewayApiKeysListSuccess = getApiKeysListSuccess(SHARED_NAME)
+
+export const getGatewayApiKeysListFailure = getApiKeysListFailure(SHARED_NAME)
+
