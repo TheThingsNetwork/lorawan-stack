@@ -15,6 +15,7 @@
 import { combineReducers } from 'redux'
 import { SHARED_NAME as APPLICATION_SHARED_NAME } from '../actions/application'
 import { SHARED_NAME as APPLICATIONS_SHARED_NAME } from '../actions/applications'
+import { SHARED_NAME as GATEWAY_SHARED_NAME } from '../actions/gateway'
 import user from './user'
 import client from './client'
 import init from './init'
@@ -23,6 +24,7 @@ import application from './application'
 import devices from './devices'
 import device from './device'
 import gateways from './gateways'
+import gateway from './gateway'
 import configuration from './configuration'
 import createNamedApiKeysReducer from './api-keys'
 import createNamedRightsReducer from './rights'
@@ -38,6 +40,7 @@ export default combineReducers({
   devices,
   device,
   gateways,
+  gateway,
   configuration,
   apiKeys: combineReducers({
     applications: createNamedApiKeysReducer(APPLICATION_SHARED_NAME),
@@ -50,5 +53,6 @@ export default combineReducers({
   }),
   events: combineReducers({
     applications: createNamedEventsReducer(APPLICATION_SHARED_NAME),
+    gateways: createNamedEventsReducer(GATEWAY_SHARED_NAME),
   }),
 })

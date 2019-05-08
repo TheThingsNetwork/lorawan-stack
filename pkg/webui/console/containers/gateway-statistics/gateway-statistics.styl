@@ -12,26 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import client from './client'
-import user from './user'
-import init from './init'
-import applications from './applications'
-import application from './application'
-import devices from './devices'
-import device from './device'
-import gateways from './gateways'
-import gateway from './gateway'
-import configuration from './configuration'
+.container
+  display: flex
+  flex-wrap: nowrap
 
-export default [
-  client,
-  ...user,
-  init,
-  ...applications,
-  ...application,
-  ...devices,
-  ...device,
-  ...gateways,
-  ...gateway,
-  ...configuration,
-]
+  .message-count:last-child
+    margin-left: $cs.m
+
+.status
+  margin-right: $cs.m
+
+.last-seen
+  margin: 0 $cs.xxs 0 $cs.xs
+
+.message-count
+  .icon
+    color: $c-active-blue
+
+.icon
+  nudge('up')

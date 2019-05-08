@@ -17,6 +17,7 @@ import { Switch, Route } from 'react-router-dom'
 
 import GatewaysList from '../gateways-list'
 import GatewayAdd from '../gateway-add'
+import Gateway from '../gateway'
 
 import sharedMessages from '../../../lib/shared-messages'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
@@ -39,6 +40,7 @@ export default class Gateways extends React.Component {
       <Switch>
         <Route exact path={`${path}`} component={GatewaysList} />
         <Route path={`${path}/add`} component={GatewayAdd} />
+        <Route path={`${path}/:gtwId`} component={Gateway} />
       </Switch>
     )
   }

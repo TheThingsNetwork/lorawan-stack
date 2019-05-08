@@ -113,6 +113,8 @@ export default {
     'delete': ttnClient.Gateways.deleteById.bind(ttnClient.Gateways),
     create: ttnClient.Gateways.create.bind(ttnClient.Gateways),
     update: ttnClient.Gateways.updateById.bind(ttnClient.Gateways),
+    stats: ttnClient.Gateways.getStatisticsById.bind(ttnClient.Gateways),
+    eventsSubscribe: ttnClient.Gateways.openStream.bind(ttnClient.Gateways),
   },
   rights: {
     applications: ttnClient.Applications.getRightsById.bind(ttnClient.Applications),

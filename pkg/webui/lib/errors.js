@@ -12,26 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import client from './client'
-import user from './user'
-import init from './init'
-import applications from './applications'
-import application from './application'
-import devices from './devices'
-import device from './device'
-import gateways from './gateways'
-import gateway from './gateway'
-import configuration from './configuration'
+/**
+ * Tests whether the grpc error represents the not found erorr.
+ * @param {Object} error - The error object to be tested.
+ * @returns {boolean} `true` if `error` represents the not found error,
+ * `false` otherwise.
+ */
+export const isNotFoundError = error => (
+  error && error.code && error.code === 5
+)
 
-export default [
-  client,
-  ...user,
-  init,
-  ...applications,
-  ...application,
-  ...devices,
-  ...device,
-  ...gateways,
-  ...gateway,
-  ...configuration,
-]
+/**
+ * Tests wether `error` is translated.
+ * @param {Object} error - The error to be tested.
+ * @returns {boolean} `true` if `error` is translated, `false` otherwise.
+ */
+export const isErrorTranslated = error => (
+  typeof error === 'object' && error.id && error.defaultMessage
+)

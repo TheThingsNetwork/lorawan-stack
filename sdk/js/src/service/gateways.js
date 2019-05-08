@@ -13,11 +13,13 @@
 // limitations under the License.
 
 import Marshaler from '../util/marshaler'
+import stream from '../api/stream/stream-node'
 
 class Gateways {
   constructor (api, { defaultUserId, stackConfig, proxy = true }) {
     this._api = api
     this._defaultUserId = defaultUserId
+    this._stackConfig = stackConfig
   }
 
   // Retrieval
@@ -73,6 +75,29 @@ class Gateways {
     })
 
     return Marshaler.payloadSingleResponse(response)
+  }
+
+  async getStatisticsById (id) {
+    const response = await this._api.Gs.GetGatewayConnectionStats({
+      routeParams: { gateway_id: id },
+    })
+
+    return Marshaler.payloadSingleResponse(response)
+  }
+
+  // Events Stream
+
+  async openStream (identifiers, tail, after) {
+    const eventsUrl = `${this._stackConfig.as}/events`
+    const payload = {
+      identifiers: identifiers.map(id => ({
+        gateway_ids: { gateway_id: id },
+      })),
+      tail,
+      after,
+    }
+
+    return stream(payload, eventsUrl)
   }
 }
 
