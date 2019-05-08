@@ -60,6 +60,7 @@ func TestFromDownlinkMessage(t *testing.T) {
 				RCtx:        2,
 				Priority:    25,
 				XTime:       1554300785,
+				MuxTime:     1554300787.123456,
 			},
 		},
 		{
@@ -90,13 +91,14 @@ func TestFromDownlinkMessage(t *testing.T) {
 				RCtx:        2,
 				Priority:    25,
 				GpsTime:     1554300787,
+				MuxTime:     1554300787.123456,
 			},
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 			dnmsg := DownlinkMessage{}
-			dnmsg.FromDownlinkMessage(tc.GatewayIDs, tc.DownlinkMessage, 0)
+			dnmsg.FromDownlinkMessage(tc.GatewayIDs, tc.DownlinkMessage, 0, time.Unix(1554300787, 123456000))
 			if !a.So(dnmsg, should.Resemble, tc.ExpectedDownlinkMessage) {
 				t.Fatalf("Invalid DownlinkMessage: %v", dnmsg)
 			}

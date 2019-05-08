@@ -35,6 +35,7 @@ type server struct {
 	*component.Component
 	store          *frequencyplans.Store
 	gateways       map[string]*ttnpb.Gateway
+	gatewayAuths   map[string][]string
 	connections    map[string]*io.Connection
 	connectionsCh  chan *io.Connection
 	downlinkClaims sync.Map
@@ -45,7 +46,7 @@ type Server interface {
 	io.Server
 
 	HasDownlinkClaim(context.Context, ttnpb.GatewayIdentifiers) bool
-	RegisterGateway(ctx context.Context, ids ttnpb.GatewayIdentifiers, gateway *ttnpb.Gateway)
+	RegisterGateway(ctx context.Context, ids ttnpb.GatewayIdentifiers, gateway *ttnpb.Gateway, authToken string)
 	GetConnection(ctx context.Context, ids ttnpb.GatewayIdentifiers) *io.Connection
 	Connections() <-chan *io.Connection
 }
@@ -56,6 +57,7 @@ func NewServer(c *component.Component) Server {
 		Component:     c,
 		store:         frequencyplans.NewStore(test.FrequencyPlansFetcher),
 		gateways:      make(map[string]*ttnpb.Gateway),
+		gatewayAuths:  make(map[string][]string),
 		connections:   make(map[string]*io.Connection),
 		connectionsCh: make(chan *io.Connection, 10),
 	}
@@ -131,8 +133,12 @@ func (s *server) HasDownlinkClaim(ctx context.Context, ids ttnpb.GatewayIdentifi
 	return ok
 }
 
-func (s *server) RegisterGateway(ctx context.Context, ids ttnpb.GatewayIdentifiers, gateway *ttnpb.Gateway) {
-	s.gateways[unique.ID(ctx, ids)] = gateway
+func (s *server) RegisterGateway(ctx context.Context, ids ttnpb.GatewayIdentifiers, gateway *ttnpb.Gateway, authToken string) {
+	uid := unique.ID(ctx, ids)
+	if authToken != "" {
+		s.gatewayAuths[uid] = []string{fmt.Sprintf("Bearer %v", authToken)}
+	}
+	s.gateways[uid] = gateway
 }
 
 func (s *server) GetConnection(ctx context.Context, ids ttnpb.GatewayIdentifiers) *io.Connection {

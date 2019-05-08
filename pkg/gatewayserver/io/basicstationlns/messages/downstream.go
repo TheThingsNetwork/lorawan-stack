@@ -40,6 +40,7 @@ type DownlinkMessage struct {
 	XTime       int64            `json:"xtime"`
 	GpsTime     int64            `json:"gpstime"`
 	RCtx        int64            `json:"rctx"`
+	MuxTime     float64          `json:"MuxTime"`
 }
 
 // MarshalJSON implements json.Marshaler.
@@ -55,7 +56,7 @@ func (dnmsg DownlinkMessage) MarshalJSON() ([]byte, error) {
 }
 
 // FromDownlinkMessage translates the ttnpb.DownlinkMessage to LNS DownlinkMessage "dnmsg".
-func (dnmsg *DownlinkMessage) FromDownlinkMessage(ids ttnpb.GatewayIdentifiers, down ttnpb.DownlinkMessage, dlToken int64) {
+func (dnmsg *DownlinkMessage) FromDownlinkMessage(ids ttnpb.GatewayIdentifiers, down ttnpb.DownlinkMessage, dlToken int64, dlTime time.Time) {
 	scheduledMsg := down.GetScheduled()
 	dnmsg.Pdu = string(down.GetRawPayload())
 	dnmsg.RCtx = int64(scheduledMsg.Downlink.AntennaIndex)
@@ -68,6 +69,9 @@ func (dnmsg *DownlinkMessage) FromDownlinkMessage(ids ttnpb.GatewayIdentifiers, 
 	// Fix the Tx Parameters since we don't use the gateway scheduler.
 	dnmsg.Rx2DR = int(scheduledMsg.DataRateIndex)
 	dnmsg.Rx2Freq = int(scheduledMsg.Frequency)
+
+	//Add the MuxTime for RTT measurement
+	dnmsg.MuxTime = float64(dlTime.Unix()) + float64(dlTime.Nanosecond())/(1e9)
 
 	// Always use the Basic Station ClassB mode for absolute time scheduling.
 	if scheduledMsg.Time != nil {
