@@ -38,11 +38,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-type TestState struct {
-	Diid           int64
-	CorrelationIDs []string
-}
-
 var (
 	registeredGatewayUID = "0101010101010101"
 	registeredGatewayID  = ttnpb.GatewayIdentifiers{GatewayID: "eui-" + registeredGatewayUID}
@@ -426,8 +421,6 @@ func TestTraffic(t *testing.T) {
 		t.Fatal("Connection timeout")
 	}
 
-	testState := TestState{}
-
 	for _, tc := range []struct {
 		Name                    string
 		InputBSUpstream         interface{}
@@ -572,7 +565,7 @@ func TestTraffic(t *testing.T) {
 			},
 			ExpectedBSDownstream: messages.DownlinkMessage{
 				DeviceClass: 0,
-				Diid:        0,
+				Diid:        1,
 				Pdu:         "Ymxhamthc25kJ3M==",
 				RxDelay:     1,
 				Rx2Freq:     868100000,
@@ -584,20 +577,32 @@ func TestTraffic(t *testing.T) {
 		{
 			Name: "FollowUpTxAck",
 			InputBSUpstream: messages.TxConfirmation{
+				Diid:  1,
 				XTime: 1548059982,
 			},
 			ExpectedNetworkUpstream: ttnpb.TxAcknowledgment{
-				Result: ttnpb.TxAcknowledgment_SUCCESS,
+				CorrelationIDs: []string{"correlation1", "correlation2"},
+				Result:         ttnpb.TxAcknowledgment_SUCCESS,
 			},
 		},
 		{
 			Name: "RepeatedTxAck",
 			InputBSUpstream: messages.TxConfirmation{
+				Diid:  1,
 				XTime: 1548059982,
 			},
 			ExpectedNetworkUpstream: ttnpb.TxAcknowledgment{
-				Result: ttnpb.TxAcknowledgment_SUCCESS,
+				CorrelationIDs: []string{"correlation1", "correlation2"},
+				Result:         ttnpb.TxAcknowledgment_SUCCESS,
 			},
+		},
+		{
+			Name: "RandomTxAck",
+			InputBSUpstream: messages.TxConfirmation{
+				Diid:  2,
+				XTime: 1548059982,
+			},
+			ExpectedNetworkUpstream: nil,
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -605,7 +610,6 @@ func TestTraffic(t *testing.T) {
 			if tc.InputBSUpstream != nil {
 				switch v := tc.InputBSUpstream.(type) {
 				case messages.TxConfirmation:
-					v.Diid = testState.Diid
 					req, err := json.Marshal(v)
 					if err != nil {
 						panic(err)
@@ -620,7 +624,7 @@ func TestTraffic(t *testing.T) {
 						}
 					case <-time.After(timeout):
 						if tc.ExpectedNetworkUpstream == nil {
-							t.Logf("Timedout as expected")
+							t.Logf("Timed-out as expected")
 						} else {
 							t.Fatalf("Read message timeout")
 						}
@@ -657,7 +661,6 @@ func TestTraffic(t *testing.T) {
 				if _, err := gsConn.SendDown(tc.InputDownlinkPath, tc.InputNetworkDownstream); err != nil {
 					t.Fatalf("Failed to send downlink: %v", err)
 				}
-				testState.CorrelationIDs = tc.InputNetworkDownstream.CorrelationIDs
 
 				resCh := make(chan []byte)
 				go func() {
@@ -679,7 +682,6 @@ func TestTraffic(t *testing.T) {
 						if !a.So(msg, should.Resemble, tc.ExpectedBSDownstream.(messages.DownlinkMessage)) {
 							t.Fatalf("Incorrect Downlink received: %s", string(res))
 						}
-						testState.Diid = msg.Diid
 					}
 				case <-time.After(timeout):
 					t.Fatalf("Read message timeout")
