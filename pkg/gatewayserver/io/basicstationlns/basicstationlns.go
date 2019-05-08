@@ -31,6 +31,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/web"
+	"google.golang.org/grpc/metadata"
 )
 
 var (
@@ -137,11 +138,40 @@ func (s *srv) handleTraffic(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	ctx = log.NewContextWithField(s.ctx, "gateway_uid", uid)
+
+	auth := c.Request().Header.Get(echo.HeaderAuthorization)
+	if auth != "" {
+		md := metadata.New(map[string]string{
+			"id":            ids.GatewayID,
+			"authorization": fmt.Sprintf("Bearer %s", auth),
+		})
+		if ctxMd, ok := metadata.FromIncomingContext(ctx); ok {
+			md = metadata.Join(ctxMd, md)
+		}
+		ctx = metadata.NewIncomingContext(ctx, md)
+	} else {
+		// Unauthenticated basic station gateways are handled similar to EUI-only udp gateways.
+		ids.EUI, err = messages.GetEUIfromUID(uid)
+		if err != nil {
+			return err
+		}
+		ids.GatewayID = ""
+	}
+
 	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"endpoint", "traffic",
 		"remote_addr", c.Request().RemoteAddr,
 	))
+
+	ctx, ids, err = s.server.FillGatewayContext(ctx, ids)
+	if err != nil {
+		logger.WithError(err).Debug("Failed to fill gateway context")
+		return err
+	}
+
+	uid = unique.ID(ctx, ids)
+	ctx = log.NewContextWithField(ctx, "gateway_uid", uid)
+
 	fp, err := s.server.GetFrequencyPlan(ctx, ids)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to get frequency plan")
