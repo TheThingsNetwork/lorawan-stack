@@ -110,6 +110,7 @@ type TxConfirmation struct {
 	XTime   int64            `json:"xtime"`
 	TxTime  float64          `json:"txtime"`
 	GpsTime int64            `json:"gpstime"`
+	RefTime float64          `json:"RefTime,omitempty"`
 }
 
 // MarshalJSON implements json.Marshaler.
