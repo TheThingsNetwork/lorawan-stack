@@ -52,7 +52,7 @@ func Test(t *testing.T) {
 			},
 		},
 	}
-	gs.RegisterGateway(ctx, ids, gtw)
+	gs.RegisterGateway(ctx, ids, gtw, "secrettoken")
 
 	gtwCtx := rights.NewContext(ctx, rights.Rights{
 		GatewayRights: map[string]*ttnpb.Rights{
