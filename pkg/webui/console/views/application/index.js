@@ -134,11 +134,10 @@ export default class Application extends React.Component {
   }
 
   render () {
-    const { fetching, error, match, application } = this.props
+    const { fetching, match, error, application } = this.props
 
-    // show any application fetching error, e.g. not found, not rights, etc
     if (error) {
-      return 'ERROR'
+      throw error
     }
 
     if (fetching || !application) {
