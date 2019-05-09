@@ -371,8 +371,9 @@ func handleUplinkTest() func(t *testing.T) {
 					MACState: &ttnpb.MACState{
 						LoRaWANVersion: ttnpb.MAC_V1_0,
 						CurrentParameters: ttnpb.MACParameters{
-							ADRAckLimit:  1,
 							ADRAckDelay:  1,
+							ADRAckLimit:  1,
+							ADRNbTrans:   1,
 							Rx2Frequency: 100000,
 							Channels: []*ttnpb.MACParameters_Channel{
 								{
@@ -397,8 +398,9 @@ func handleUplinkTest() func(t *testing.T) {
 							},
 						},
 						DesiredParameters: ttnpb.MACParameters{
-							ADRAckLimit:  1,
 							ADRAckDelay:  1,
+							ADRAckLimit:  1,
+							ADRNbTrans:   1,
 							Rx2Frequency: 100000,
 							Channels: []*ttnpb.MACParameters_Channel{
 								{
@@ -478,8 +480,9 @@ func handleUplinkTest() func(t *testing.T) {
 					MACState: &ttnpb.MACState{
 						LoRaWANVersion: ttnpb.MAC_V1_0,
 						CurrentParameters: ttnpb.MACParameters{
-							ADRAckLimit:  1,
 							ADRAckDelay:  1,
+							ADRAckLimit:  1,
+							ADRNbTrans:   1,
 							Rx2Frequency: 100000,
 							Channels: []*ttnpb.MACParameters_Channel{
 								{
@@ -506,6 +509,7 @@ func handleUplinkTest() func(t *testing.T) {
 						DesiredParameters: ttnpb.MACParameters{
 							ADRAckLimit:  1,
 							ADRAckDelay:  1,
+							ADRNbTrans:   1,
 							Rx2Frequency: 100000,
 							Channels: []*ttnpb.MACParameters_Channel{
 								{
@@ -585,6 +589,7 @@ func handleUplinkTest() func(t *testing.T) {
 						CurrentParameters: ttnpb.MACParameters{
 							ADRAckLimit:  1,
 							ADRAckDelay:  1,
+							ADRNbTrans:   1,
 							Rx2Frequency: 100000,
 							Channels: []*ttnpb.MACParameters_Channel{
 								{
@@ -611,6 +616,7 @@ func handleUplinkTest() func(t *testing.T) {
 						DesiredParameters: ttnpb.MACParameters{
 							ADRAckLimit:  1,
 							ADRAckDelay:  1,
+							ADRNbTrans:   1,
 							Rx2Frequency: 100000,
 							Channels: []*ttnpb.MACParameters_Channel{
 								{
@@ -698,6 +704,7 @@ func handleUplinkTest() func(t *testing.T) {
 						CurrentParameters: ttnpb.MACParameters{
 							ADRAckLimit:  1,
 							ADRAckDelay:  1,
+							ADRNbTrans:   1,
 							Rx2Frequency: 100000,
 							Channels: []*ttnpb.MACParameters_Channel{
 								{
@@ -724,6 +731,7 @@ func handleUplinkTest() func(t *testing.T) {
 						DesiredParameters: ttnpb.MACParameters{
 							ADRAckLimit:  1,
 							ADRAckDelay:  1,
+							ADRNbTrans:   1,
 							Rx2Frequency: 100000,
 							Channels: []*ttnpb.MACParameters_Channel{
 								{
@@ -807,6 +815,7 @@ func handleUplinkTest() func(t *testing.T) {
 						CurrentParameters: ttnpb.MACParameters{
 							ADRAckLimit:  1,
 							ADRAckDelay:  1,
+							ADRNbTrans:   1,
 							Rx2Frequency: 100000,
 							Channels: []*ttnpb.MACParameters_Channel{
 								{
@@ -833,6 +842,7 @@ func handleUplinkTest() func(t *testing.T) {
 						DesiredParameters: ttnpb.MACParameters{
 							ADRAckLimit:  1,
 							ADRAckDelay:  1,
+							ADRNbTrans:   1,
 							Rx2Frequency: 100000,
 							Channels: []*ttnpb.MACParameters_Channel{
 								{
@@ -923,6 +933,7 @@ func handleUplinkTest() func(t *testing.T) {
 						CurrentParameters: ttnpb.MACParameters{
 							ADRAckLimit:  1,
 							ADRAckDelay:  1,
+							ADRNbTrans:   1,
 							Rx2Frequency: 100000,
 							Channels: []*ttnpb.MACParameters_Channel{
 								{
@@ -949,6 +960,7 @@ func handleUplinkTest() func(t *testing.T) {
 						DesiredParameters: ttnpb.MACParameters{
 							ADRAckLimit:  1,
 							ADRAckDelay:  1,
+							ADRNbTrans:   1,
 							Rx2Frequency: 100000,
 							Channels: []*ttnpb.MACParameters_Channel{
 								{
@@ -1053,6 +1065,7 @@ func handleUplinkTest() func(t *testing.T) {
 						CurrentParameters: ttnpb.MACParameters{
 							ADRAckLimit:  1,
 							ADRAckDelay:  1,
+							ADRNbTrans:   1,
 							Rx2Frequency: 100000,
 							Channels: []*ttnpb.MACParameters_Channel{
 								{
@@ -1079,6 +1092,7 @@ func handleUplinkTest() func(t *testing.T) {
 						DesiredParameters: ttnpb.MACParameters{
 							ADRAckLimit:  1,
 							ADRAckDelay:  1,
+							ADRNbTrans:   1,
 							Rx2Frequency: 100000,
 							Channels: []*ttnpb.MACParameters_Channel{
 								{
@@ -1173,6 +1187,7 @@ func handleUplinkTest() func(t *testing.T) {
 						CurrentParameters: ttnpb.MACParameters{
 							ADRAckLimit:  1,
 							ADRAckDelay:  1,
+							ADRNbTrans:   1,
 							Rx2Frequency: 100000,
 							Channels: []*ttnpb.MACParameters_Channel{
 								{
@@ -1199,6 +1214,7 @@ func handleUplinkTest() func(t *testing.T) {
 						DesiredParameters: ttnpb.MACParameters{
 							ADRAckLimit:  1,
 							ADRAckDelay:  1,
+							ADRNbTrans:   1,
 							Rx2Frequency: 100000,
 							Channels: []*ttnpb.MACParameters_Channel{
 								{
