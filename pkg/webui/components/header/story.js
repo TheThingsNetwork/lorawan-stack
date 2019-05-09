@@ -30,12 +30,12 @@ const items = [
   {
     title: 'Profile Settings',
     icon: 'settings',
-    link: '/profile-settings',
+    path: '/profile-settings',
   },
   {
     title: 'Logout',
     icon: 'power_settings_new',
-    link: '/logout',
+    path: '/logout',
   },
 ]
 

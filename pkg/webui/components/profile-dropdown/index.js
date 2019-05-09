@@ -109,7 +109,7 @@ const Dropdown = ({ items }) => (
         <li className={styles.dropdownItem} key={item.title.id || item.title}>
           { item.action
             ? <button onClick={item.action} onKeyPress={item.action} role="tab" tabIndex="0">{icon}<Message content={item.title} /></button>
-            : <Link to={item.link}>{icon}<Message content={item.title} /></Link>
+            : <Link to={item.path}>{icon}<Message content={item.title} /></Link>
           }
         </li>
       )

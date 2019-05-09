@@ -52,7 +52,7 @@ const defaultDropdownItems = handleLogout => [
   {
     title: sharedMessages.profileSettings,
     icon: 'settings',
-    link: '/profile-settings',
+    path: '/profile-settings',
   },
   {
     title: sharedMessages.logout,
