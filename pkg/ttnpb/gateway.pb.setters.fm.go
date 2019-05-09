@@ -772,6 +772,45 @@ func (dst *ListGatewayAPIKeysRequest) SetFields(src *ListGatewayAPIKeysRequest, 
 	return nil
 }
 
+func (dst *GetGatewayAPIKeyRequest) SetFields(src *GetGatewayAPIKeyRequest, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "gateway_ids":
+			if len(subs) > 0 {
+				newDst := &dst.GatewayIdentifiers
+				var newSrc *GatewayIdentifiers
+				if src != nil {
+					newSrc = &src.GatewayIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.GatewayIdentifiers = src.GatewayIdentifiers
+				} else {
+					var zero GatewayIdentifiers
+					dst.GatewayIdentifiers = zero
+				}
+			}
+		case "key_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'key_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.KeyID = src.KeyID
+			} else {
+				var zero string
+				dst.KeyID = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *CreateGatewayAPIKeyRequest) SetFields(src *CreateGatewayAPIKeyRequest, paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {

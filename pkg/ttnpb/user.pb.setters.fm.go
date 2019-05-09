@@ -519,6 +519,45 @@ func (dst *ListUserAPIKeysRequest) SetFields(src *ListUserAPIKeysRequest, paths 
 	return nil
 }
 
+func (dst *GetUserAPIKeyRequest) SetFields(src *GetUserAPIKeyRequest, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "user_ids":
+			if len(subs) > 0 {
+				newDst := &dst.UserIdentifiers
+				var newSrc *UserIdentifiers
+				if src != nil {
+					newSrc = &src.UserIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.UserIdentifiers = src.UserIdentifiers
+				} else {
+					var zero UserIdentifiers
+					dst.UserIdentifiers = zero
+				}
+			}
+		case "key_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'key_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.KeyID = src.KeyID
+			} else {
+				var zero string
+				dst.KeyID = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *CreateUserAPIKeyRequest) SetFields(src *CreateUserAPIKeyRequest, paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {

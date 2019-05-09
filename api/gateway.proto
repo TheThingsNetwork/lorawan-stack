@@ -165,6 +165,12 @@ message ListGatewayAPIKeysRequest {
   uint32 page = 3;
 }
 
+message GetGatewayAPIKeyRequest {
+  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  // Unique public identifier for the API key.
+  string key_id = 2 [(gogoproto.customname) = "KeyID"];
+}
+
 message CreateGatewayAPIKeyRequest {
   GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   string name = 2 [(validate.rules).string.max_len = 50];

@@ -11,6 +11,7 @@
   - [Message `Applications`](#ttn.lorawan.v3.Applications)
   - [Message `CreateApplicationAPIKeyRequest`](#ttn.lorawan.v3.CreateApplicationAPIKeyRequest)
   - [Message `CreateApplicationRequest`](#ttn.lorawan.v3.CreateApplicationRequest)
+  - [Message `GetApplicationAPIKeyRequest`](#ttn.lorawan.v3.GetApplicationAPIKeyRequest)
   - [Message `GetApplicationRequest`](#ttn.lorawan.v3.GetApplicationRequest)
   - [Message `ListApplicationAPIKeysRequest`](#ttn.lorawan.v3.ListApplicationAPIKeysRequest)
   - [Message `ListApplicationCollaboratorsRequest`](#ttn.lorawan.v3.ListApplicationCollaboratorsRequest)
@@ -126,6 +127,7 @@
   - [Message `GatewayVersion`](#ttn.lorawan.v3.GatewayVersion)
   - [Message `GatewayVersionIdentifiers`](#ttn.lorawan.v3.GatewayVersionIdentifiers)
   - [Message `Gateways`](#ttn.lorawan.v3.Gateways)
+  - [Message `GetGatewayAPIKeyRequest`](#ttn.lorawan.v3.GetGatewayAPIKeyRequest)
   - [Message `GetGatewayIdentifiersForEUIRequest`](#ttn.lorawan.v3.GetGatewayIdentifiersForEUIRequest)
   - [Message `GetGatewayRequest`](#ttn.lorawan.v3.GetGatewayRequest)
   - [Message `ListGatewayAPIKeysRequest`](#ttn.lorawan.v3.ListGatewayAPIKeysRequest)
@@ -302,6 +304,7 @@
 - [File `lorawan-stack/api/organization.proto`](#lorawan-stack/api/organization.proto)
   - [Message `CreateOrganizationAPIKeyRequest`](#ttn.lorawan.v3.CreateOrganizationAPIKeyRequest)
   - [Message `CreateOrganizationRequest`](#ttn.lorawan.v3.CreateOrganizationRequest)
+  - [Message `GetOrganizationAPIKeyRequest`](#ttn.lorawan.v3.GetOrganizationAPIKeyRequest)
   - [Message `GetOrganizationRequest`](#ttn.lorawan.v3.GetOrganizationRequest)
   - [Message `ListOrganizationAPIKeysRequest`](#ttn.lorawan.v3.ListOrganizationAPIKeysRequest)
   - [Message `ListOrganizationCollaboratorsRequest`](#ttn.lorawan.v3.ListOrganizationCollaboratorsRequest)
@@ -340,6 +343,7 @@
   - [Message `CreateUserAPIKeyRequest`](#ttn.lorawan.v3.CreateUserAPIKeyRequest)
   - [Message `CreateUserRequest`](#ttn.lorawan.v3.CreateUserRequest)
   - [Message `DeleteInvitationRequest`](#ttn.lorawan.v3.DeleteInvitationRequest)
+  - [Message `GetUserAPIKeyRequest`](#ttn.lorawan.v3.GetUserAPIKeyRequest)
   - [Message `GetUserRequest`](#ttn.lorawan.v3.GetUserRequest)
   - [Message `Invitation`](#ttn.lorawan.v3.Invitation)
   - [Message `Invitations`](#ttn.lorawan.v3.Invitations)
@@ -435,6 +439,19 @@ Application is the message that defines an Application in the network.
 | ----- | ----------- |
 | `application` | <p>`message.required`: `true`</p> |
 | `collaborator` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.GetApplicationAPIKeyRequest">Message `GetApplicationAPIKeyRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
+| `key_id` | [`string`](#string) |  | Unique public identifier for the API key. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `application_ids` | <p>`message.required`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.GetApplicationRequest">Message `GetApplicationRequest`</a>
 
@@ -549,6 +566,7 @@ where the user or organization is collaborator on.
 | `ListRights` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) | [`Rights`](#ttn.lorawan.v3.Rights) |  |
 | `CreateAPIKey` | [`CreateApplicationAPIKeyRequest`](#ttn.lorawan.v3.CreateApplicationAPIKeyRequest) | [`APIKey`](#ttn.lorawan.v3.APIKey) |  |
 | `ListAPIKeys` | [`ListApplicationAPIKeysRequest`](#ttn.lorawan.v3.ListApplicationAPIKeysRequest) | [`APIKeys`](#ttn.lorawan.v3.APIKeys) |  |
+| `GetAPIKey` | [`GetApplicationAPIKeyRequest`](#ttn.lorawan.v3.GetApplicationAPIKeyRequest) | [`APIKey`](#ttn.lorawan.v3.APIKey) |  |
 | `UpdateAPIKey` | [`UpdateApplicationAPIKeyRequest`](#ttn.lorawan.v3.UpdateApplicationAPIKeyRequest) | [`APIKey`](#ttn.lorawan.v3.APIKey) | Update the rights of an existing application API key. To generate an API key, the CreateAPIKey should be used. To delete an API key, update it with zero rights. |
 | `SetCollaborator` | [`SetApplicationCollaboratorRequest`](#ttn.lorawan.v3.SetApplicationCollaboratorRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Setting a collaborator without rights, removes them. |
 | `ListCollaborators` | [`ListApplicationCollaboratorsRequest`](#ttn.lorawan.v3.ListApplicationCollaboratorsRequest) | [`Collaborators`](#ttn.lorawan.v3.Collaborators) |  |
@@ -560,6 +578,7 @@ where the user or organization is collaborator on.
 | `ListRights` | `GET` | `/api/v3//applications/{application_id}/rights` |  |
 | `CreateAPIKey` | `POST` | `/api/v3//applications/{application_ids.application_id}/api-keys` | `*` |
 | `ListAPIKeys` | `GET` | `/api/v3//applications/{application_ids.application_id}/api-keys` |  |
+| `GetAPIKey` | `GET` | `/api/v3//applications/{application_ids.application_id}/api-keys/{key_id}` |  |
 | `UpdateAPIKey` | `PUT` | `/api/v3//applications/{application_ids.application_id}/api-keys/{api_key.id}` | `*` |
 | `SetCollaborator` | `PUT` | `/api/v3//applications/{application_ids.application_id}/collaborators` | `*` |
 | `ListCollaborators` | `GET` | `/api/v3//applications/{application_ids.application_id}/collaborators` |  |
@@ -1974,6 +1993,19 @@ Identifies an end device model with version information.
 | ----- | ---- | ----- | ----------- |
 | `gateways` | [`Gateway`](#ttn.lorawan.v3.Gateway) | repeated |  |
 
+### <a name="ttn.lorawan.v3.GetGatewayAPIKeyRequest">Message `GetGatewayAPIKeyRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `gateway_ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
+| `key_id` | [`string`](#string) |  | Unique public identifier for the API key. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `gateway_ids` | <p>`message.required`: `true`</p> |
+
 ### <a name="ttn.lorawan.v3.GetGatewayIdentifiersForEUIRequest">Message `GetGatewayIdentifiersForEUIRequest`</a>
 
 | Field | Type | Label | Description |
@@ -2100,6 +2132,7 @@ where the user or organization is collaborator on.
 | `ListRights` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | [`Rights`](#ttn.lorawan.v3.Rights) |  |
 | `CreateAPIKey` | [`CreateGatewayAPIKeyRequest`](#ttn.lorawan.v3.CreateGatewayAPIKeyRequest) | [`APIKey`](#ttn.lorawan.v3.APIKey) |  |
 | `ListAPIKeys` | [`ListGatewayAPIKeysRequest`](#ttn.lorawan.v3.ListGatewayAPIKeysRequest) | [`APIKeys`](#ttn.lorawan.v3.APIKeys) |  |
+| `GetAPIKey` | [`GetGatewayAPIKeyRequest`](#ttn.lorawan.v3.GetGatewayAPIKeyRequest) | [`APIKey`](#ttn.lorawan.v3.APIKey) |  |
 | `UpdateAPIKey` | [`UpdateGatewayAPIKeyRequest`](#ttn.lorawan.v3.UpdateGatewayAPIKeyRequest) | [`APIKey`](#ttn.lorawan.v3.APIKey) | Update the rights of an existing gateway API key. To generate an API key, the CreateAPIKey should be used. To delete an API key, update it with zero rights. |
 | `SetCollaborator` | [`SetGatewayCollaboratorRequest`](#ttn.lorawan.v3.SetGatewayCollaboratorRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Set the rights of a collaborator on the gateway. Users or organizations are considered to be a collaborator if they have at least one right on the gateway. |
 | `ListCollaborators` | [`ListGatewayCollaboratorsRequest`](#ttn.lorawan.v3.ListGatewayCollaboratorsRequest) | [`Collaborators`](#ttn.lorawan.v3.Collaborators) |  |
@@ -2111,6 +2144,7 @@ where the user or organization is collaborator on.
 | `ListRights` | `GET` | `/api/v3//gateways/{gateway_id}/rights` |  |
 | `CreateAPIKey` | `POST` | `/api/v3//gateways/{gateway_ids.gateway_id}/api-keys` | `*` |
 | `ListAPIKeys` | `GET` | `/api/v3//gateways/{gateway_ids.gateway_id}/api-keys` |  |
+| `GetAPIKey` | `GET` | `/api/v3//gateways/{gateway_ids.gateway_id}/api-keys/{key_id}` |  |
 | `UpdateAPIKey` | `PUT` | `/api/v3//gateways/{gateway_ids.gateway_id}/api-keys/{api_key.id}` | `*` |
 | `SetCollaborator` | `PUT` | `/api/v3//gateways/{gateway_ids.gateway_id}/collaborators` | `*` |
 | `ListCollaborators` | `GET` | `/api/v3//gateways/{gateway_ids.gateway_id}/collaborators` |  |
@@ -4249,6 +4283,19 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 | `organization` | <p>`message.required`: `true`</p> |
 | `collaborator` | <p>`message.required`: `true`</p> |
 
+### <a name="ttn.lorawan.v3.GetOrganizationAPIKeyRequest">Message `GetOrganizationAPIKeyRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `organization_ids` | [`OrganizationIdentifiers`](#ttn.lorawan.v3.OrganizationIdentifiers) |  |  |
+| `key_id` | [`string`](#string) |  | Unique public identifier for the API key. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `organization_ids` | <p>`message.required`: `true`</p> |
+
 ### <a name="ttn.lorawan.v3.GetOrganizationRequest">Message `GetOrganizationRequest`</a>
 
 | Field | Type | Label | Description |
@@ -4396,6 +4443,7 @@ where the user or organization is collaborator on.
 | `ListRights` | [`OrganizationIdentifiers`](#ttn.lorawan.v3.OrganizationIdentifiers) | [`Rights`](#ttn.lorawan.v3.Rights) |  |
 | `CreateAPIKey` | [`CreateOrganizationAPIKeyRequest`](#ttn.lorawan.v3.CreateOrganizationAPIKeyRequest) | [`APIKey`](#ttn.lorawan.v3.APIKey) |  |
 | `ListAPIKeys` | [`ListOrganizationAPIKeysRequest`](#ttn.lorawan.v3.ListOrganizationAPIKeysRequest) | [`APIKeys`](#ttn.lorawan.v3.APIKeys) |  |
+| `GetAPIKey` | [`GetOrganizationAPIKeyRequest`](#ttn.lorawan.v3.GetOrganizationAPIKeyRequest) | [`APIKey`](#ttn.lorawan.v3.APIKey) |  |
 | `UpdateAPIKey` | [`UpdateOrganizationAPIKeyRequest`](#ttn.lorawan.v3.UpdateOrganizationAPIKeyRequest) | [`APIKey`](#ttn.lorawan.v3.APIKey) | Update the rights of an existing organization API key. To generate an API key, the CreateAPIKey should be used. To delete an API key, update it with zero rights. |
 | `SetCollaborator` | [`SetOrganizationCollaboratorRequest`](#ttn.lorawan.v3.SetOrganizationCollaboratorRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Set the rights of a collaborator (member) on the organization. Users are considered to be a collaborator if they have at least one right on the organization. Note that only users can collaborate (be member of) an organization. |
 | `ListCollaborators` | [`ListOrganizationCollaboratorsRequest`](#ttn.lorawan.v3.ListOrganizationCollaboratorsRequest) | [`Collaborators`](#ttn.lorawan.v3.Collaborators) |  |
@@ -4407,6 +4455,7 @@ where the user or organization is collaborator on.
 | `ListRights` | `GET` | `/api/v3//organizations/{organization_id}/rights` |  |
 | `CreateAPIKey` | `POST` | `/api/v3//organizations/{organization_ids.organization_id}/api-keys` | `*` |
 | `ListAPIKeys` | `GET` | `/api/v3//organizations/{organization_ids.organization_id}/api-keys` |  |
+| `GetAPIKey` | `GET` | `/api/v3//organizations/{organization_ids.organization_id}/api-keys/{key_id}` |  |
 | `UpdateAPIKey` | `PUT` | `/api/v3//organizations/{organization_ids.organization_id}/api-keys/{api_key.id}` | `*` |
 | `SetCollaborator` | `PUT` | `/api/v3//organizations/{organization_ids.organization_id}/collaborators` | `*` |
 | `ListCollaborators` | `GET` | `/api/v3//organizations/{organization_ids.organization_id}/collaborators` |  |
@@ -4746,6 +4795,19 @@ This service is not implemented on all deployments.
 | ----- | ----------- |
 | `email` | <p>`string.email`: `true`</p> |
 
+### <a name="ttn.lorawan.v3.GetUserAPIKeyRequest">Message `GetUserAPIKeyRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `user_ids` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) |  |  |
+| `key_id` | [`string`](#string) |  | Unique public identifier for the API key. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `user_ids` | <p>`message.required`: `true`</p> |
+
 ### <a name="ttn.lorawan.v3.GetUserRequest">Message `GetUserRequest`</a>
 
 | Field | Type | Label | Description |
@@ -5002,6 +5064,7 @@ User is the message that defines an user on the network.
 | `ListRights` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) | [`Rights`](#ttn.lorawan.v3.Rights) |  |
 | `CreateAPIKey` | [`CreateUserAPIKeyRequest`](#ttn.lorawan.v3.CreateUserAPIKeyRequest) | [`APIKey`](#ttn.lorawan.v3.APIKey) |  |
 | `ListAPIKeys` | [`ListUserAPIKeysRequest`](#ttn.lorawan.v3.ListUserAPIKeysRequest) | [`APIKeys`](#ttn.lorawan.v3.APIKeys) |  |
+| `GetAPIKey` | [`GetUserAPIKeyRequest`](#ttn.lorawan.v3.GetUserAPIKeyRequest) | [`APIKey`](#ttn.lorawan.v3.APIKey) |  |
 | `UpdateAPIKey` | [`UpdateUserAPIKeyRequest`](#ttn.lorawan.v3.UpdateUserAPIKeyRequest) | [`APIKey`](#ttn.lorawan.v3.APIKey) | Update the rights of an existing user API key. To generate an API key, the CreateAPIKey should be used. To delete an API key, update it with zero rights. |
 
 #### HTTP bindings
@@ -5011,6 +5074,7 @@ User is the message that defines an user on the network.
 | `ListRights` | `GET` | `/api/v3//users/{user_id}/rights` |  |
 | `CreateAPIKey` | `POST` | `/api/v3//users/{user_ids.user_id}/api-keys` | `*` |
 | `ListAPIKeys` | `GET` | `/api/v3//users/{user_ids.user_id}/api-keys` |  |
+| `GetAPIKey` | `GET` | `/api/v3//users/{user_ids.user_id}/api-keys/{key_id}` |  |
 | `UpdateAPIKey` | `PUT` | `/api/v3//users/{user_ids.user_id}/api-keys/{api_key.id}` | `*` |
 
 ### <a name="ttn.lorawan.v3.UserInvitationRegistry">Service `UserInvitationRegistry`</a>

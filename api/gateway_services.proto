@@ -98,6 +98,12 @@ service GatewayAccess {
     };
   };
 
+  rpc GetAPIKey(GetGatewayAPIKeyRequest) returns (APIKey) {
+    option (google.api.http) = {
+      get: "/gateways/{gateway_ids.gateway_id}/api-keys/{key_id}"
+    };
+  };
+
   // Update the rights of an existing gateway API key. To generate an API key,
   // the CreateAPIKey should be used. To delete an API key, update it
   // with zero rights.

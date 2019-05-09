@@ -112,6 +112,16 @@ var ListOrganizationAPIKeysRequestFieldPathsTopLevel = []string{
 	"organization_ids",
 	"page",
 }
+var GetOrganizationAPIKeyRequestFieldPathsNested = []string{
+	"key_id",
+	"organization_ids",
+	"organization_ids.organization_id",
+}
+
+var GetOrganizationAPIKeyRequestFieldPathsTopLevel = []string{
+	"key_id",
+	"organization_ids",
+}
 var CreateOrganizationAPIKeyRequestFieldPathsNested = []string{
 	"name",
 	"organization_ids",

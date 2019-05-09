@@ -88,6 +88,12 @@ service OrganizationAccess {
     };
   };
 
+  rpc GetAPIKey(GetOrganizationAPIKeyRequest) returns (APIKey) {
+    option (google.api.http) = {
+      get: "/organizations/{organization_ids.organization_id}/api-keys/{key_id}"
+    };
+  };
+
   // Update the rights of an existing organization API key. To generate an API key,
   // the CreateAPIKey should be used. To delete an API key, update it
   // with zero rights.

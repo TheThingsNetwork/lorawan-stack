@@ -252,6 +252,17 @@ var ListGatewayAPIKeysRequestFieldPathsTopLevel = []string{
 	"limit",
 	"page",
 }
+var GetGatewayAPIKeyRequestFieldPathsNested = []string{
+	"gateway_ids",
+	"gateway_ids.eui",
+	"gateway_ids.gateway_id",
+	"key_id",
+}
+
+var GetGatewayAPIKeyRequestFieldPathsTopLevel = []string{
+	"gateway_ids",
+	"key_id",
+}
 var CreateGatewayAPIKeyRequestFieldPathsNested = []string{
 	"gateway_ids",
 	"gateway_ids.eui",

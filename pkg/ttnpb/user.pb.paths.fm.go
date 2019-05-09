@@ -179,6 +179,17 @@ var ListUserAPIKeysRequestFieldPathsTopLevel = []string{
 	"page",
 	"user_ids",
 }
+var GetUserAPIKeyRequestFieldPathsNested = []string{
+	"key_id",
+	"user_ids",
+	"user_ids.email",
+	"user_ids.user_id",
+}
+
+var GetUserAPIKeyRequestFieldPathsTopLevel = []string{
+	"key_id",
+	"user_ids",
+}
 var CreateUserAPIKeyRequestFieldPathsNested = []string{
 	"name",
 	"rights",

@@ -362,6 +362,45 @@ func (dst *ListOrganizationAPIKeysRequest) SetFields(src *ListOrganizationAPIKey
 	return nil
 }
 
+func (dst *GetOrganizationAPIKeyRequest) SetFields(src *GetOrganizationAPIKeyRequest, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "organization_ids":
+			if len(subs) > 0 {
+				newDst := &dst.OrganizationIdentifiers
+				var newSrc *OrganizationIdentifiers
+				if src != nil {
+					newSrc = &src.OrganizationIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.OrganizationIdentifiers = src.OrganizationIdentifiers
+				} else {
+					var zero OrganizationIdentifiers
+					dst.OrganizationIdentifiers = zero
+				}
+			}
+		case "key_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'key_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.KeyID = src.KeyID
+			} else {
+				var zero string
+				dst.KeyID = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *CreateOrganizationAPIKeyRequest) SetFields(src *CreateOrganizationAPIKeyRequest, paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
