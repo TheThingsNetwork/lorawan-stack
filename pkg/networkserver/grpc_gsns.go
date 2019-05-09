@@ -225,6 +225,7 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 			}
 
 			logger = logger.WithFields(log.Fields(
+				"f_cnt_gap", 0,
 				"full_f_cnt_up", match.Session.LastFCntUp,
 				"transmission", trans,
 			))
@@ -271,7 +272,7 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 				fCntReset:     true,
 				gap:           gap,
 				matchedDevice: match,
-				logger:        logger,
+				logger:        logger.WithField("f_cnt_gap", gap),
 			})
 
 		default:
@@ -298,12 +299,18 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 					fCntReset:     true,
 					gap:           gap,
 					matchedDevice: match,
-					logger:        logger.WithField("full_f_cnt_up", pld.FCnt),
+					logger: logger.WithFields(log.Fields(
+						"f_cnt_gap", gap,
+						"full_f_cnt_up", pld.FCnt,
+					)),
 				})
 			}
 
-			logger = logger.WithField("full_f_cnt_up", fCnt)
 			gap := fCnt - match.Session.LastFCntUp
+			logger = logger.WithFields(log.Fields(
+				"f_cnt_gap", gap,
+				"full_f_cnt_up", fCnt,
+			))
 			if match.MACState.LoRaWANVersion.HasMaxFCntGap() && uint(gap) > phy.MaxFCntGap {
 				logger.Debug("FCnt gap too high, skip")
 				continue
@@ -328,7 +335,7 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 
 	logger.WithField("device_count", len(matched)).Debug("Perform MIC checks on devices with matching frame counters")
 	for _, match := range matched {
-		logger := match.logger.WithField("f_cnt_gap", match.gap)
+		logger := match.logger
 
 		if pld.Ack {
 			if len(match.Device.RecentDownlinks) == 0 {
@@ -438,10 +445,10 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 		"adr_ack_req", pld.ADRAckReq,
 		"class_b", pld.ClassB,
 		"dev_addr", pld.DevAddr,
-		"f_cnt", pld.FCnt,
 		"f_opts_len", len(pld.FOpts),
 		"f_port", pld.FPort,
 		"frm_payload_len", len(pld.FRMPayload),
+		"uplink_f_cnt", pld.FCnt,
 	))
 	ctx = log.NewContext(ctx, logger)
 
@@ -538,7 +545,6 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	logger = logger.WithField("mac_count", len(cmds))
 	ctx = log.NewContext(ctx, logger)
 
-	logger.Debug("Wait for deduplication window to close")
 	select {
 	case <-ctx.Done():
 		return ctx.Err()
@@ -1076,10 +1082,9 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	registerReceiveUplink(ctx, up)
 
 	defer func(up *ttnpb.UplinkMessage) {
-		logger.Debug("Wait for collection window to close")
 		<-ns.collectionDone(ctx, up)
 		stopDedup()
-		logger.Debug("Collection window closed, stopped deduplication")
+		logger.Debug("Done deduplicating uplink")
 	}(up)
 
 	up = deepcopy.Copy(up).(*ttnpb.UplinkMessage)
