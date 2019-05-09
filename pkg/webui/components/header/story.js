@@ -21,6 +21,9 @@ import Header from '.'
 
 const user = {
   name: 'kschiffer',
+  ids: {
+    user_id: 'ksc300',
+  },
 }
 
 const items = [
