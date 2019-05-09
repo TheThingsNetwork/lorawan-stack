@@ -16,37 +16,18 @@ import React from 'react'
 import { Container, Col, Row } from 'react-grid-system'
 import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
-import * as Yup from 'yup'
 import { replace } from 'connected-react-router'
 
 import Spinner from '../../../components/spinner'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import sharedMessages from '../../../lib/shared-messages'
-import Form from '../../../components/form'
-import Field from '../../../components/field'
-import Button from '../../../components/button'
 import Message from '../../../lib/components/message'
-import FieldGroup from '../../../components/field/group'
 import IntlHelmet from '../../../lib/components/intl-helmet'
-import ApiKeyModal from '../../containers/api-key-modal'
-import SubmitBar from '../../../components/submit-bar'
+import { ApiKeyCreateForm } from '../../../components/api-key-form'
 
 import { getApplicationsRightsList } from '../../store/actions/applications'
 import api from '../../api'
-
-import style from './application-api-key-add.styl'
-
-const validationSchema = Yup.object().shape({
-  name: Yup.string()
-    .min(2, sharedMessages.validateTooShort)
-    .max(50, sharedMessages.validateTooLong),
-  rights: Yup.object().test(
-    'rights',
-    sharedMessages.validateRights,
-    values => Object.values(values).reduce((acc, curr) => acc || curr, false)
-  ),
-})
 
 @connect(function ({ rights }, props) {
   const appId = props.match.params.appId
@@ -71,9 +52,10 @@ const validationSchema = Yup.object().shape({
 @bind
 export default class ApplicationApiKeyAdd extends React.Component {
 
-  state = {
-    error: '',
-    modal: null,
+  constructor (props) {
+    super(props)
+
+    this.createApplicationKey = key => api.application.apiKeys.create(props.appId, key)
   }
 
   componentDidMount () {
@@ -82,44 +64,14 @@ export default class ApplicationApiKeyAdd extends React.Component {
     dispatch(getApplicationsRightsList(appId))
   }
 
-  async handleApprove () {
+  handleApprove () {
     const { dispatch, appId } = this.props
 
-    await this.setState({ modal: null })
     dispatch(replace(`/console/applications/${appId}/api-keys`))
-  }
-
-  async handleSubmit (values, { resetForm }) {
-    const { name, rights } = values
-    const { appId } = this.props
-
-    const key = {
-      name,
-      rights: Object.keys(rights).filter(r => rights[r]),
-    }
-
-    await this.setState({ error: '' })
-
-    try {
-      const created = await api.application.apiKeys.create(appId, key)
-      await this.setState({
-        modal: {
-          secret: created.key,
-          rights: created.rights,
-          onComplete: this.handleApprove,
-          approval: false,
-        },
-      })
-      resetForm(values)
-    } catch (error) {
-      resetForm(values)
-      await this.setState(error)
-    }
   }
 
   render () {
     const { rights, fetching, error } = this.props
-    const { modal } = this.state
 
     if (error) {
       return 'ERROR'
@@ -129,41 +81,8 @@ export default class ApplicationApiKeyAdd extends React.Component {
       return <Spinner center />
     }
 
-    const { rightsItems, rightsValues } = rights.reduce(
-      function (acc, right) {
-        acc.rightsItems.push(
-          <Field
-            className={style.rightLabel}
-            key={right}
-            name={right}
-            type="checkbox"
-            title={{ id: `enum:${right}` }}
-            form
-          />
-        )
-        acc.rightsValues[right] = false
-
-        return acc
-      },
-      {
-        rightsItems: [],
-        rightsValues: {},
-      }
-    )
-
-    const modalProps = modal ? modal : {}
-    const initialFormValues = {
-      name: '',
-      rights: rightsValues,
-    }
-
     return (
       <Container>
-        <ApiKeyModal
-          {...modalProps}
-          visible={!!modal}
-          approval={false}
-        />
         <Row>
           <Col lg={8} md={12}>
             <IntlHelmet title={sharedMessages.addApiKey} />
@@ -172,33 +91,11 @@ export default class ApplicationApiKeyAdd extends React.Component {
         </Row>
         <Row>
           <Col lg={8} md={12}>
-            <Form
-              horizontal
-              error={this.state.error}
-              onSubmit={this.handleSubmit}
-              initialValues={initialFormValues}
-              validationSchema={validationSchema}
-            >
-              <Message
-                component="h4"
-                content={sharedMessages.generalInformation}
-              />
-              <Field
-                title={sharedMessages.name}
-                name="name"
-                type="text"
-                autoFocus
-              />
-              <FieldGroup
-                name="rights"
-                title={sharedMessages.rights}
-              >
-                {rightsItems}
-              </FieldGroup>
-              <SubmitBar>
-                <Button type="submit" message={sharedMessages.createApiKey} />
-              </SubmitBar>
-            </Form>
+            <ApiKeyCreateForm
+              rights={rights}
+              onCreate={this.createApplicationKey}
+              onCreateSuccess={this.handleApprove}
+            />
           </Col>
         </Row>
       </Container>
