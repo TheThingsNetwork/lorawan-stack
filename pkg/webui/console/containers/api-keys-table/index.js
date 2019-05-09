@@ -18,6 +18,7 @@ import { defineMessages } from 'react-intl'
 import Tag from '../../../components/tag'
 import TagGroup from '../../../components/tag/group'
 import FetchTable from '../fetch-table'
+import PropTypes from '../../../lib/prop-types'
 
 import sharedMessages from '../../../lib/shared-messages'
 import style from './api-keys-table.styl'
@@ -72,15 +73,31 @@ const headers = [
 
 export default class ApiKeysTable extends Component {
   render () {
+    const {
+      pageSize,
+      baseDataSelector,
+      getItemsAction,
+      entityId,
+    } = this.props
+
     return (
       <FetchTable
         entity="keys"
         headers={headers}
         addMessage={sharedMessages.addApiKey}
         handlesPagination
-        {...this.props}
+        pageSize={pageSize}
+        baseDataSelector={baseDataSelector}
+        getItemsAction={getItemsAction}
+        id={entityId}
       />
     )
   }
 }
 
+ApiKeysTable.propTypes = {
+  pageSize: PropTypes.number.isRequired,
+  baseDataSelector: PropTypes.func.isRequired,
+  getItemsAction: PropTypes.func.isRequired,
+  entityId: PropTypes.string,
+}

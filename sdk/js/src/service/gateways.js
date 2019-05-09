@@ -14,12 +14,20 @@
 
 import Marshaler from '../util/marshaler'
 import stream from '../api/stream/stream-node'
+import ApiKeys from './api-keys'
 
 class Gateways {
   constructor (api, { defaultUserId, stackConfig, proxy = true }) {
     this._api = api
     this._defaultUserId = defaultUserId
     this._stackConfig = stackConfig
+    this.ApiKeys = new ApiKeys(api.GatewayAccess, {
+      parentRoutes: {
+        list: 'gateway_ids.gateway_id',
+        create: 'gateway_ids.gateway_id',
+        update: 'gateway_ids.gateway_id',
+      },
+    })
   }
 
   // Retrieval

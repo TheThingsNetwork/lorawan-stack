@@ -24,6 +24,7 @@ import Spinner from '../../../components/spinner'
 import Message from '../../../lib/components/message'
 
 import GatewayOverview from '../gateway-overview'
+import GatewayApiKeys from '../gateway-api-keys'
 
 import {
   getGateway,
@@ -63,11 +64,18 @@ dispatch => ({
         path: matchedUrl,
         icon: 'overview',
       },
+      {
+        title: sharedMessages.apiKeys,
+        path: `${matchedUrl}/api-keys`,
+        icon: 'api_keys',
+        exact: false,
+      },
     ],
   }
 })
-@withBreadcrumb('gtws.single', function (props) {
+@withBreadcrumb('gateways.single', function (props) {
   const { gtwId } = props
+
   return (
     <Breadcrumb
       path={`/console/gateways/${gtwId}`}
@@ -120,6 +128,7 @@ export default class Gateway extends React.Component {
     return (
       <Switch>
         <Route exact path={`${match.path}`} component={GatewayOverview} />
+        <Route exact path={`${match.path}/api-keys`} component={GatewayApiKeys} />
       </Switch>
     )
   }
