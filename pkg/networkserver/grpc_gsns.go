@@ -187,12 +187,6 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 	matched := make([]device, 0, len(addrMatches))
 
 	for _, match := range addrMatches {
-		if pld.FCnt == 0 && match.Session.LastFCntUp == 0 && (len(match.Device.RecentUplinks) == 0 || match.Device.PendingSession != nil) {
-			matched = append(matched, device{
-				matchedDevice: match,
-			})
-		}
-
 		supports32BitFCnt := true
 		if match.Device.GetMACSettings().GetSupports32BitFCnt() != nil {
 			supports32BitFCnt = match.Device.MACSettings.Supports32BitFCnt.Value
