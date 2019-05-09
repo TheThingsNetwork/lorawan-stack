@@ -233,7 +233,7 @@ To disable class C scheduling, set reset with `--supports-class-c=false`.
 
 Multicast messages are downlinks messages which are sent to multiple devices that share the same security context. In the Network Server, this is an ABP session. See [creating a device](#createdev) for learning how to create an ABP device.
 
-Multicast sessions do not allow uplink. Therefore, you need to explicitly specify the gateway(s) to send messages from, using the `class_b_c` field:
+Multicast sessions do not allow uplink. Therefore, you need to explicitly specify the gateway(s) to send messages to, using the `class_b_c` field:
 
 ```json
 {
@@ -256,7 +256,7 @@ Multicast sessions do not allow uplink. Therefore, you need to explicitly specif
 
 ### Listing the downlink queue
 
-The stack keeps a queue of downlink messages. Applications can keep pushing downlink messages or replace the queue with a list of downlink messages.
+The stack keeps a queue of downlink messages. Applications can add one or more downlink messages to the end of the queue(push) or replace the complete queue with one or more downlink messages.
 
 You can see what is in the queue;
 

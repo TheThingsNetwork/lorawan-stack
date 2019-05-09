@@ -21,7 +21,7 @@ weight: 1
  
  If your operating system or package manager is not mentioned, please [download binaries](https://github.com/TheThingsNetwork/lorawan-stack/releases) for your operating system and processor architecture.
 
-> In the unforeseen event none of our release are compatible with your system you can build the stack from source, see [DEVELOPMENT.md]({{< reffile "DEVELOPMENT.md" >}}) on the git repository.
+> In the unforeseen event none of our release are compatible with your system you can build the stack from source, see [DEVELOPMENT.md]({{< reffile "DEVELOPMENT.md" >}}) in the git repository.
 
 ## Certificates
  
