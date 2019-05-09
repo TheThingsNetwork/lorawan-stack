@@ -1,5 +1,5 @@
 ---
-title: "ADV - Events"
+title: "Events"
 description: ""
 weight: 8
 ---

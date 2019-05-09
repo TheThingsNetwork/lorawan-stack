@@ -1,5 +1,5 @@
 ---
-title: "Integrate Things"
+title: "Integrate"
 description: ""
 weight: 7
 ---

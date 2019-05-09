@@ -1,5 +1,5 @@
 ---
-title: "Play with things"
+title: "Send and receive data"
 description: "Connect to the MQTT broker to receive uplinks and send downlinks"
 weight: 6
 --- 

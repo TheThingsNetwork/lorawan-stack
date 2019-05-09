@@ -1,10 +1,10 @@
 ---
-title: "Register Things"
+title: "Register gateways and devices"
 description: ""
 weight: 5
 --- 
 
-The stack count a total of three things; gateways, application, devices. Each is highly tunable, don't hesitate go to check the [References](../../references) to see all possible settings.
+The stack counts a total of three entity; gateways, application, devices. Each is highly tunable, don't hesitate go to check the [References](../../references) to see all possible settings.
 In this guide, we only use simple and standard configuration.
 
 ## <a name="creategtw">Creating a gateway</a>
