@@ -17,6 +17,7 @@ package ttnpb
 import (
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/blang/semver"
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -595,6 +596,24 @@ func (v *RxDelay) UnmarshalJSON(b []byte) error {
 		return errCouldNotParse("RxDelay")(string(b)).WithCause(err)
 	}
 	*v = RxDelay(i)
+	return nil
+}
+
+// Duration returns v as time.Duration.
+func (v RxDelay) Duration() time.Duration {
+	switch v {
+	case RX_DELAY_0, RX_DELAY_1:
+		return time.Second
+	default:
+		return time.Duration(v) * time.Second
+	}
+}
+
+// Validate reports whether v represents a valid RxDelay.
+func (v RxDelay) Validate() error {
+	if v < 0 || v >= RxDelay(len(RxDelay_name)) {
+		return errExpectedBetween("RxDelay", 1, len(RxDelay_name)-1)(v)
+	}
 	return nil
 }
 
