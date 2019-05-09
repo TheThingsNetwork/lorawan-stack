@@ -48,6 +48,15 @@ func TestUserAccessNotFound(t *testing.T) {
 			Name: "test-user-api-key-name",
 		}
 
+		got, err := reg.GetAPIKey(ctx, &ttnpb.GetUserAPIKeyRequest{
+			UserIdentifiers: userID,
+			KeyID:           apiKey.ID,
+		}, creds)
+
+		a.So(got, should.BeNil)
+		a.So(err, should.NotBeNil)
+		a.So(errors.IsNotFound(err), should.BeTrue)
+
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateUserAPIKeyRequest{
 			UserIdentifiers: userID,
 			APIKey:          apiKey,
@@ -98,6 +107,7 @@ func TestUserAccessPermissionDenied(t *testing.T) {
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID := population.Users[defaultUserIdx].UserIdentifiers
+		APIKeyID := userAPIKeys(&userID).APIKeys[0].ID
 
 		reg := ttnpb.NewUserAccessClient(cc)
 
@@ -107,6 +117,15 @@ func TestUserAccessPermissionDenied(t *testing.T) {
 		a.So(rights.Rights, should.BeEmpty)
 		a.So(err, should.BeNil)
 
+		APIKey, err := reg.GetAPIKey(ctx, &ttnpb.GetUserAPIKeyRequest{
+			UserIdentifiers: userID,
+			KeyID:           APIKeyID,
+		})
+
+		a.So(APIKey, should.BeNil)
+		a.So(err, should.NotBeNil)
+		a.So(errors.IsPermissionDenied(err), should.BeTrue)
+
 		APIKeys, err := reg.ListAPIKeys(ctx, &ttnpb.ListUserAPIKeysRequest{
 			UserIdentifiers: userID,
 		})
@@ -115,7 +134,7 @@ func TestUserAccessPermissionDenied(t *testing.T) {
 		a.So(err, should.NotBeNil)
 		a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
-		APIKey, err := reg.CreateAPIKey(ctx, &ttnpb.CreateUserAPIKeyRequest{
+		APIKey, err = reg.CreateAPIKey(ctx, &ttnpb.CreateUserAPIKeyRequest{
 			UserIdentifiers: userID,
 			Name:            "test-api-key-name",
 			Rights:          []ttnpb.Right{ttnpb.RIGHT_ALL},
@@ -179,6 +198,18 @@ func TestUserAccessCRUD(t *testing.T) {
 		a.So(err, should.BeNil)
 
 		userAPIKeys := userAPIKeys(&user.UserIdentifiers)
+		userKey := userAPIKeys.APIKeys[0]
+
+		APIKey, err := reg.GetAPIKey(ctx, &ttnpb.GetUserAPIKeyRequest{
+			UserIdentifiers: user.UserIdentifiers,
+			KeyID:           userKey.ID,
+		}, creds)
+
+		a.So(APIKey, should.NotBeNil)
+		a.So(err, should.BeNil)
+		a.So(APIKey.ID, should.Equal, userKey.ID)
+		a.So(APIKey.Key, should.BeEmpty)
+
 		sort.Slice(userAPIKeys.APIKeys, func(i int, j int) bool { return userAPIKeys.APIKeys[i].Name < userAPIKeys.APIKeys[j].Name })
 		apiKeys, err := reg.ListAPIKeys(ctx, &ttnpb.ListUserAPIKeysRequest{
 			UserIdentifiers: user.UserIdentifiers,
