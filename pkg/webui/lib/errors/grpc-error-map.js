@@ -12,21 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/**
- * Tests whether the grpc error represents the not found erorr.
- * @param {Object} error - The error object to be tested.
- * @returns {boolean} `true` if `error` represents the not found error,
- * `false` otherwise.
- */
-export const isNotFoundError = error => (
-  error && error.code && error.code === 5
-)
+/* eslint-disable quote-props */
 
-/**
- * Tests wether `error` is translated.
- * @param {Object} error - The error to be tested.
- * @returns {boolean} `true` if `error` is translated, `false` otherwise.
- */
-export const isErrorTranslated = error => (
-  typeof error === 'object' && error.id && error.defaultMessage
-)
+// Source: https://github.com/grpc/grpc/blob/master/doc/statuscodes.md
+
+const errorMap = {
+  '0': '200',
+  '1': '499',
+  '2': '500',
+  '3': '400',
+  '4': '504',
+  '5': '404',
+  '6': '409',
+  '7': '403',
+  '8': '429',
+  '9': '400',
+  '10': '409',
+  '11': '400',
+  '12': '501',
+  '13': '500',
+  '14': '503',
+  '15': '500',
+  '16': '401',
+}
+
+export default function getHttpErrorFromRpcError (rpcError) {
+  if (typeof rpcError !== 'string' && typeof rpcError !== 'number') {
+    return undefined
+  }
+
+  return errorMap[rpcError] || '520' // Fallback to 520 Unknown
+}
