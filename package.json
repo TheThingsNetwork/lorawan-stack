@@ -98,6 +98,7 @@
     "redux-logic": "^0.15.0",
     "ttn-lw": "file:sdk/js",
     "ulid": "^2.3.0",
+    "url-polyfill": "^1.1.5",
     "yup": "^0.26.6"
   },
   "babel": {
