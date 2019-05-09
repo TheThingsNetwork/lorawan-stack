@@ -24,7 +24,7 @@ import Icon from '../../../components/icon'
 import DateTime from '../../../lib/components/date-time'
 import Message from '../../../lib/components/message'
 import Button from '../../../components/button'
-import { isNotFoundError, isErrorTranslated } from '../../../lib/errors'
+import { isNotFoundError, isTranslated } from '../../../lib/errors/utils'
 
 import {
   statisticsSelector,
@@ -66,7 +66,7 @@ class GatewayStatistic extends React.PureComponent {
     } else if (fetching) {
       statusIndicator = 'mediocre'
       message = sharedMessages.connecting
-    } else if (error && error.message && isErrorTranslated(error.message)) {
+    } else if (error && error.message && isTranslated(error.message)) {
       statusIndicator = 'unknown'
       message = error.message
     } else if (statistics) {
