@@ -13,11 +13,22 @@
 // limitations under the License.
 
 import React from 'react'
+import classnames from 'classnames'
 
 import Message from '../message'
 
 import PropTypes from '../../prop-types'
 import sharedMessages from '../../shared-messages'
+
+import {
+  isBackend,
+  isTranslated,
+  getBackendErrorId,
+  getBackendErrorDefaultMessage,
+  getBackendErrorMessageAttributes,
+} from '../../errors/utils'
+
+import style from './error-message.styl'
 
 const ErrorMessage = function ({ content, ...rest }) {
 
@@ -27,11 +38,12 @@ const ErrorMessage = function ({ content, ...rest }) {
   }
 
   // Check if it is a error message and transform it to a intl message
-  if (typeof content === 'object' && !('id' in content) && content.message && content.details) {
-    props.content.id = content.message.split(' ')[0]
-    props.content.defaultMessage = content.details[0].message_format || content.message.replace(/^.*\s/, '')
-    props.values = content.details[0].attributes
-  } else if (typeof content === 'object' && content.id && content.defaultMessage) {
+  if (isBackend(content)) {
+    props.content.id = getBackendErrorId(content)
+    props.content.defaultMessage = getBackendErrorDefaultMessage(content)
+    props.values = getBackendErrorMessageAttributes(content)
+    props.className = classnames(rest.className, style.message)
+  } else if (isTranslated(content)) {
     // Fall back to normal message
     props.content = content
   } else {
@@ -44,8 +56,8 @@ const ErrorMessage = function ({ content, ...rest }) {
 
 ErrorMessage.propTypes = {
   /**
-   * Content contains the error message data, returned from the backend. It will
-   * be marshalled into a `react-intl` message and then output as such. Can also
+   * Content contains the error data. It will be marshalled into a `react-intl`
+   * message in case of backend errors and then output as such. Can also
    * be a usual message type, in case of frontend-defined errors.
    */
   content: PropTypes.error,
