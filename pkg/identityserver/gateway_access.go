@@ -105,6 +105,26 @@ func (is *IdentityServer) listGatewayAPIKeys(ctx context.Context, req *ttnpb.Lis
 	return keys, nil
 }
 
+func (is *IdentityServer) getGatewayAPIKey(ctx context.Context, req *ttnpb.GetGatewayAPIKeyRequest) (key *ttnpb.APIKey, err error) {
+	if err = rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS); err != nil {
+		return nil, err
+	}
+
+	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+		_, key, err = store.GetAPIKeyStore(db).GetAPIKey(ctx, req.KeyID)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	key.Key = ""
+	return key, nil
+}
+
 func (is *IdentityServer) updateGatewayAPIKey(ctx context.Context, req *ttnpb.UpdateGatewayAPIKeyRequest) (key *ttnpb.APIKey, err error) {
 	// Require that caller has rights to manage API keys.
 	if err = rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS); err != nil {
@@ -219,6 +239,9 @@ func (ga *gatewayAccess) CreateAPIKey(ctx context.Context, req *ttnpb.CreateGate
 }
 func (ga *gatewayAccess) ListAPIKeys(ctx context.Context, req *ttnpb.ListGatewayAPIKeysRequest) (*ttnpb.APIKeys, error) {
 	return ga.listGatewayAPIKeys(ctx, req)
+}
+func (ga *gatewayAccess) GetAPIKey(ctx context.Context, req *ttnpb.GetGatewayAPIKeyRequest) (*ttnpb.APIKey, error) {
+	return ga.getGatewayAPIKey(ctx, req)
 }
 func (ga *gatewayAccess) UpdateAPIKey(ctx context.Context, req *ttnpb.UpdateGatewayAPIKeyRequest) (*ttnpb.APIKey, error) {
 	return ga.updateGatewayAPIKey(ctx, req)
