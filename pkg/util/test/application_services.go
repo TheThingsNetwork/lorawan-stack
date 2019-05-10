@@ -16,6 +16,8 @@ package test
 
 import (
 	"context"
+	"testing"
+	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -86,4 +88,53 @@ func (m MockApplicationAccessServer) ListCollaborators(ctx context.Context, req 
 		return &ttnpb.Collaborators{}, nil
 	}
 	return m.ListCollaboratorsFunc(ctx, req)
+}
+
+type ApplicationAccessListRightsResponse struct {
+	Response *ttnpb.Rights
+	Error    error
+}
+type ApplicationAccessListRightsRequest struct {
+	Context  context.Context
+	Message  *ttnpb.ApplicationIdentifiers
+	Response chan<- ApplicationAccessListRightsResponse
+}
+
+func MakeApplicationAccessListRightsChFunc(reqCh chan<- ApplicationAccessListRightsRequest) func(context.Context, *ttnpb.ApplicationIdentifiers) (*ttnpb.Rights, error) {
+	return func(ctx context.Context, msg *ttnpb.ApplicationIdentifiers) (*ttnpb.Rights, error) {
+		respCh := make(chan ApplicationAccessListRightsResponse)
+		reqCh <- ApplicationAccessListRightsRequest{
+			Context:  ctx,
+			Message:  msg,
+			Response: respCh,
+		}
+		resp := <-respCh
+		return resp.Response, resp.Error
+	}
+}
+
+func AssertListRightsRequest(t *testing.T, reqCh <-chan ApplicationAccessListRightsRequest, timeout time.Duration, assert func(ctx context.Context, ids ttnpb.Identifiers) bool, rights ...ttnpb.Right) bool {
+	t.Helper()
+	select {
+	case req := <-reqCh:
+		if !assert(req.Context, req.Message) {
+			return false
+		}
+		select {
+		case req.Response <- ApplicationAccessListRightsResponse{
+			Response: &ttnpb.Rights{
+				Rights: rights,
+			},
+		}:
+			return true
+
+		case <-time.After(timeout):
+			t.Error("Timed out while waiting for ApplicationAccess.ListRights response to be processed")
+			return false
+		}
+
+	case <-time.After(timeout):
+		t.Error("Timed out while waiting for ApplicationAccess.ListRights request to arrive")
+		return false
+	}
 }
