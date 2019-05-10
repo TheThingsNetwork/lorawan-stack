@@ -33,6 +33,16 @@ type TLS struct {
 	RootCA      string `name:"root-ca" description:"Location of TLS root CA certificate (optional)"`
 	Certificate string `name:"certificate" description:"Location of TLS certificate"`
 	Key         string `name:"key" description:"Location of TLS private key"`
+	ACME        ACME   `name:"acme"`
+}
+
+// ACME represents ACME configuration.
+type ACME struct {
+	Enable   bool     `name:"enable" description:"Enable automated certificate management (ACME)"`
+	Endpoint string   `name:"endpoint" description:"ACME endpoint"`
+	Dir      string   `name:"dir" description:"Location of ACME storage directory"`
+	Email    string   `name:"email" description:"Email address to register with the ACME account"`
+	Hosts    []string `name:"hosts" description:"Hosts to enable automatic certificates for"`
 }
 
 var errNoKeyPair = errors.DefineFailedPrecondition("no_key_pair", "no TLS key pair")

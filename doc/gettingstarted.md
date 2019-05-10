@@ -53,7 +53,14 @@ If your operating system or package manager is not mentioned, please [download b
 
 By default, the stack requires a `cert.pem` and `key.pem`, in order to to serve content over TLS.
 
-Typically you'll get these from a trusted Certificate Authority. We recommend [Let's Encrypt](https://letsencrypt.org/getting-started/) for free and trusted TLS certificates for your server. Use the "full chain" for `cert.pem` and the "private key" for `key.pem`.
+Typically you'll get these from a trusted Certificate Authority. Use the "full chain" for `cert.pem` and the "private key" for `key.pem`. The stack also has support for automated certificate management (ACME). This allows you to easily get trusted TLS certificates for your server from [Let's Encrypt](https://letsencrypt.org/getting-started/). If you want this, you'll need to create an `acme` directory that the stack can write in:
+
+```bash
+$ mkdir ./acme
+$ chown 886:886 ./acme
+```
+
+> If you don't do this, you'll get an error saying something like `open /var/lib/acme/acme_account+key<...>: permission denied`.
 
 For local (development) deployments, you can generate self-signed certificates. If you have your [Go environment](../DEVELOPMENT.md#development-environment) set up, you can run the following command to generate a key and certificate for `localhost`:
 
@@ -73,7 +80,7 @@ Keep in mind that self-signed certificates are not trusted by browsers and opera
 
 ## <a name="configuration">Configuration</a>
 
-The stack can be started without passing any configuration. However, there are a lot of things you can configure. See [configuration documentation](config.md) for more information.
+The stack can be started for development without passing any configuration. However, there are a lot of things you can configure. See [configuration documentation](config.md) for more information. In this guide we'll set some environment variables in `docker-compose.yml`. These environment variables will configure the stack as a development server on `localhost`. For setting up up a public server or for requesting certificates from an ACME provider such as Let's Encrypt, take a closer look at the comments in `docker-compose.yml`.
 
 Refer to the [networking documentation](networking.md) for the endpoints and ports that the stack uses by default.
 

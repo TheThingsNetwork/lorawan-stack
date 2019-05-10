@@ -17,6 +17,7 @@ package component
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"os"
 	"os/signal"
@@ -36,6 +37,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/rpcserver"
 	"go.thethings.network/lorawan-stack/pkg/version"
 	"go.thethings.network/lorawan-stack/pkg/web"
+	"golang.org/x/crypto/acme/autocert"
 	"google.golang.org/grpc"
 )
 
@@ -52,6 +54,9 @@ type Component struct {
 
 	config        *Config
 	getBaseConfig func(ctx context.Context) config.ServiceBase
+
+	acme    *autocert.Manager
+	acmeTLS *tls.Config // TLS configuration if ACME is used.
 
 	logger log.Stack
 	sentry *raven.Client
@@ -142,6 +147,10 @@ func New(logger log.Stack, config *Config, opts ...Option) (*Component, error) {
 
 	c.web, err = web.New(c.ctx, config.HTTP)
 	if err != nil {
+		return nil, err
+	}
+
+	if err := c.initACME(); err != nil {
 		return nil, err
 	}
 

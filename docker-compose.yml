@@ -9,21 +9,35 @@ services:
       - TTN_LW_HTTP_COOKIE_BLOCK_KEY
       - TTN_LW_CLUSTER_KEYS
       - TTN_LW_FREQUENCY_PLANS_URL
-      - TTN_LW_CONSOLE_OAUTH_CLIENT_SECRET
       # If using CockroachDB:
       - TTN_LW_IS_DATABASE_URI=postgres://root@cockroach:26257/${DEV_DATABASE_NAME:-ttn_lorawan}?sslmode=disable
       # If using PostgreSQL:
       # - TTN_LW_IS_DATABASE_URI=postgres://root@postgres:5432/${DEV_DATABASE_NAME:-ttn_lorawan}?sslmode=disable
       - TTN_LW_REDIS_ADDRESS=redis:6379
+      # If using (self) signed certificates:
       - TTN_LW_TLS_CERTIFICATE=/run/secrets/cert.pem
       - TTN_LW_CA=/run/secrets/cert.pem
       - TTN_LW_TLS_KEY=/run/secrets/key.pem
+      # If using Let's Encrypt for "example.com":
+      # - TTN_LW_TLS_ACME_DIR=/var/lib/acme
+      # - TTN_LW_TLS_ACME_EMAIL=you@example.com
+      # - TTN_LW_TLS_ACME_ENABLE=true
+      # - TTN_LW_TLS_ACME_HOSTS=example.com
+      # If it's a public server on "example.com":
+      # - TTN_LW_IS_EMAIL_NETWORK_IDENTITY_SERVER_URL=https://example.com/oauth
+      # - TTN_LW_IS_OAUTH_UI_CANONICAL_URL=https://example.com/oauth
+      # - TTN_LW_HTTP_METRICS_PASSWORD=<set a password>
+      # - TTN_LW_HTTP_PPROF_PASSWORD=<set a password>
     depends_on:
       - redis
       # If using CockroachDB:
       - cockroach
       # If using PostgreSQL:
       # - postgres
+    volumes:
+      - ./blob:/srv/ttn-lorawan/public/blob
+      # If using Let's Encrypt:
+      # - ./acme:/var/lib/acme
     ports:
       - "1882:1882"
       - "8882:8882"
@@ -33,7 +47,11 @@ services:
       - "8884:8884"
       - "1885:1885"
       - "8885:8885"
+      # If deploying on a public server:
+      # - "80:1885"
+      # - "443:8885"
       - "1700:1700/udp"
+    # If using (self) signed certificates:
     secrets:
       - cert.pem
       - key.pem
@@ -64,6 +82,7 @@ services:
       - ${DEV_DATA_DIR:-.env/data}/redis:/data
     ports:
       - "127.0.0.1:6379:6379"
+# If using (self) signed certificates:
 secrets:
   cert.pem:
     file: ./cert.pem
