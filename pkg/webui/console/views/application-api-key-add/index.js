@@ -27,16 +27,21 @@ import IntlHelmet from '../../../lib/components/intl-helmet'
 import { ApiKeyCreateForm } from '../../../components/api-key-form'
 
 import { getApplicationsRightsList } from '../../store/actions/applications'
+import {
+  applicationRightsSelector,
+  applicationRightsErrorSelector,
+  applicationRightsFetchingSelector,
+} from '../../store/selectors/application'
 import api from '../../api'
 
-@connect(function ({ rights }, props) {
+@connect(function (state, props) {
   const appId = props.match.params.appId
 
   return {
     appId,
-    fetching: rights.applications.fetching,
-    error: rights.applications.error,
-    rights: rights.applications.rights,
+    fetching: applicationRightsFetchingSelector(state, props),
+    error: applicationRightsErrorSelector(state, props),
+    rights: applicationRightsSelector(state, props),
   }
 })
 @withBreadcrumb('apps.single.api-keys.add', function (props) {

@@ -27,27 +27,31 @@ import IntlHelmet from '../../../lib/components/intl-helmet'
 import { ApiKeyEditForm } from '../../../components/api-key-form'
 
 import { getApplicationApiKeyPageData } from '../../store/actions/application'
+import {
+  applicationRightsSelector,
+  applicationRightsErrorSelector,
+  applicationRightsFetchingSelector,
+} from '../../store/selectors/application'
 import api from '../../api'
 
-@connect(function ({ apiKeys, rights }, props) {
+@connect(function (state, props) {
   const { appId, apiKeyId } = props.match.params
 
-  const keysFetching = apiKeys.applications.fetching
-  const rightsFetching = rights.applications.fetching
-  const keysError = apiKeys.applications.error
-  const rightsError = rights.applications.error
+  const keysFetching = state.apiKeys.applications.fetching
+  const rightsFetching = applicationRightsFetchingSelector(state, props)
+  const keysError = state.apiKeys.applications.error
+  const rightsError = applicationRightsErrorSelector(state, props)
 
-  const appKeys = apiKeys.applications[appId]
+  const appKeys = state.apiKeys.applications[appId]
   const apiKey = appKeys ? appKeys.keys.find(k => k.id === apiKeyId) : undefined
 
-  const appRights = rights.applications
-  const rs = appRights ? appRights.rights : []
+  const rights = applicationRightsSelector(state, props)
 
   return {
     keyId: apiKeyId,
     appId,
     apiKey,
-    rights: rs,
+    rights,
     fetching: keysFetching || rightsFetching,
     error: keysError || rightsError,
   }

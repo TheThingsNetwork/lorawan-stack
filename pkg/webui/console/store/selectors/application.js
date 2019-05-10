@@ -18,6 +18,12 @@ import {
   statusSelector as eventsStatusSelector,
 } from './events'
 
+import {
+  rightsSelector,
+  errorSelector as rightsErrorSelector,
+  fetchingSelector as rightsFetchingSelector,
+} from './rights'
+
 const ENTITY = 'applications'
 
 export const applicationEventsSelector = eventsSelector(ENTITY)
@@ -25,3 +31,10 @@ export const applicationEventsSelector = eventsSelector(ENTITY)
 export const applicationEventsErrorSelector = eventsErrorSelector(ENTITY)
 
 export const applicationEventsStatusSelector = eventsStatusSelector(ENTITY)
+
+export const applicationRightsSelector = rightsSelector(ENTITY)
+
+export const applicationRightsErrorSelector = rightsErrorSelector(ENTITY)
+
+export const applicationRightsFetchingSelector = rightsFetchingSelector(ENTITY)
+
