@@ -48,4 +48,4 @@ You have now set up The Things Network Stack V3! 🎉
 
 ### Go further
 
-* [Events](../../concepts/events)
+* [Events]({{< ref "concepts/events" >}})
