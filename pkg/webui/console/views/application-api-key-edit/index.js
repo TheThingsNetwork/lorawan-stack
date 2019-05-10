@@ -31,20 +31,22 @@ import {
   applicationRightsSelector,
   applicationRightsErrorSelector,
   applicationRightsFetchingSelector,
+  applicationKeySelector,
+  applicationKeysErrorSelector,
+  applicationKeysFetchingSelector,
 } from '../../store/selectors/application'
+
 import api from '../../api'
 
 @connect(function (state, props) {
   const { appId, apiKeyId } = props.match.params
+  const ids = { id: appId, keyId: apiKeyId }
 
-  const keysFetching = state.apiKeys.applications.fetching
+  const keysFetching = applicationKeysFetchingSelector(state, ids)
   const rightsFetching = applicationRightsFetchingSelector(state, props)
-  const keysError = state.apiKeys.applications.error
+  const keysError = applicationKeysErrorSelector(state, ids)
   const rightsError = applicationRightsErrorSelector(state, props)
-
-  const appKeys = state.apiKeys.applications[appId]
-  const apiKey = appKeys ? appKeys.keys.find(k => k.id === apiKeyId) : undefined
-
+  const apiKey = applicationKeySelector(state, ids)
   const rights = applicationRightsSelector(state, props)
 
   return {

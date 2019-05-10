@@ -24,6 +24,16 @@ export const apiKeysSelector = entity => function (state, props) {
   return store ? store.keys : []
 }
 
+export const apiKeySelector = function (entity) {
+  const keysSelector = apiKeysSelector(entity)
+
+  return function (state, props) {
+    const keys = keysSelector(state, props)
+
+    return keys.find(key => key.id === props.keyId)
+  }
+}
+
 export const totalCountSelector = entity => function (state, props) {
   const store = storeSelector(state.totalCount[entity], props)
 
