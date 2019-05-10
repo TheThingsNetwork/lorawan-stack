@@ -834,7 +834,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 	)
 	if err != nil {
 		registerDropJoinRequest(ctx, nil, up, err)
-		logger.WithError(err).Warn("Failed to load device from registry")
+		logger.WithError(err).Debug("Failed to load device from registry")
 		return err
 	}
 
