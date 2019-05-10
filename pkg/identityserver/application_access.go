@@ -105,6 +105,26 @@ func (is *IdentityServer) listApplicationAPIKeys(ctx context.Context, req *ttnpb
 	return keys, nil
 }
 
+func (is *IdentityServer) getApplicationAPIKey(ctx context.Context, req *ttnpb.GetApplicationAPIKeyRequest) (key *ttnpb.APIKey, err error) {
+	if err = rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS); err != nil {
+		return nil, err
+	}
+
+	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+		_, key, err = store.GetAPIKeyStore(db).GetAPIKey(ctx, req.KeyID)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	key.Key = ""
+	return key, nil
+}
+
 func (is *IdentityServer) updateApplicationAPIKey(ctx context.Context, req *ttnpb.UpdateApplicationAPIKeyRequest) (key *ttnpb.APIKey, err error) {
 	// Require that caller has rights to manage API keys.
 	if err = rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS); err != nil {
@@ -219,6 +239,9 @@ func (aa *applicationAccess) CreateAPIKey(ctx context.Context, req *ttnpb.Create
 }
 func (aa *applicationAccess) ListAPIKeys(ctx context.Context, req *ttnpb.ListApplicationAPIKeysRequest) (*ttnpb.APIKeys, error) {
 	return aa.listApplicationAPIKeys(ctx, req)
+}
+func (aa *applicationAccess) GetAPIKey(ctx context.Context, req *ttnpb.GetApplicationAPIKeyRequest) (*ttnpb.APIKey, error) {
+	return aa.getApplicationAPIKey(ctx, req)
 }
 func (aa *applicationAccess) UpdateAPIKey(ctx context.Context, req *ttnpb.UpdateApplicationAPIKeyRequest) (*ttnpb.APIKey, error) {
 	return aa.updateApplicationAPIKey(ctx, req)

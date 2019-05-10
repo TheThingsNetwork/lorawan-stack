@@ -85,6 +85,12 @@ message ListOrganizationAPIKeysRequest {
   uint32 page = 3;
 }
 
+message GetOrganizationAPIKeyRequest {
+  OrganizationIdentifiers organization_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  // Unique public identifier for the API key.
+  string key_id = 2 [(gogoproto.customname) = "KeyID"];
+}
+
 message CreateOrganizationAPIKeyRequest {
   OrganizationIdentifiers organization_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   string name = 2 [(validate.rules).string.max_len = 50];

@@ -37,6 +37,19 @@
         }
       ]
     },
+    "GetAPIKey": {
+      "file": "lorawan-stack/api/application_services.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/applications/{application_ids.application_id}/api-keys/{key_id}",
+          "parameters": [
+            "application_ids.application_id",
+            "key_id"
+          ]
+        }
+      ]
+    },
     "UpdateAPIKey": {
       "file": "lorawan-stack/api/application_services.proto",
       "http": [
@@ -648,6 +661,19 @@
         }
       ]
     },
+    "GetAPIKey": {
+      "file": "lorawan-stack/api/gateway_services.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/gateways/{gateway_ids.gateway_id}/api-keys/{key_id}",
+          "parameters": [
+            "gateway_ids.gateway_id",
+            "key_id"
+          ]
+        }
+      ]
+    },
     "UpdateAPIKey": {
       "file": "lorawan-stack/api/gateway_services.proto",
       "http": [
@@ -1117,6 +1143,19 @@
         }
       ]
     },
+    "GetAPIKey": {
+      "file": "lorawan-stack/api/organization_services.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/organizations/{organization_ids.organization_id}/api-keys/{key_id}",
+          "parameters": [
+            "organization_ids.organization_id",
+            "key_id"
+          ]
+        }
+      ]
+    },
     "UpdateAPIKey": {
       "file": "lorawan-stack/api/organization_services.proto",
       "http": [
@@ -1326,6 +1365,19 @@
           "pattern": "/users/{user_ids.user_id}/api-keys",
           "parameters": [
             "user_ids.user_id"
+          ]
+        }
+      ]
+    },
+    "GetAPIKey": {
+      "file": "lorawan-stack/api/user_services.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/users/{user_ids.user_id}/api-keys/{key_id}",
+          "parameters": [
+            "user_ids.user_id",
+            "key_id"
           ]
         }
       ]

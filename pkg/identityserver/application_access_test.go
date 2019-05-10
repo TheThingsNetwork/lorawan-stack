@@ -51,6 +51,15 @@ func TestApplicationAccessNotFound(t *testing.T) {
 			Name: "test-application-api-key-name",
 		}
 
+		got, err := reg.GetAPIKey(ctx, &ttnpb.GetApplicationAPIKeyRequest{
+			ApplicationIdentifiers: applicationID,
+			KeyID:                  apiKey.ID,
+		}, creds)
+
+		a.So(got, should.BeNil)
+		a.So(err, should.NotBeNil)
+		a.So(errors.IsNotFound(err), should.BeTrue)
+
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
 			ApplicationIdentifiers: applicationID,
 			APIKey:                 apiKey,
@@ -116,6 +125,7 @@ func TestApplicationAccessPermissionDenied(t *testing.T) {
 		userID := defaultUser.UserIdentifiers
 		applicationID := userApplications(&userID).Applications[0].ApplicationIdentifiers
 		collaboratorID := collaboratorUser.UserIdentifiers.OrganizationOrUserIdentifiers()
+		APIKeyID := applicationAPIKeys(&applicationID).APIKeys[0].ID
 
 		reg := ttnpb.NewApplicationAccessClient(cc)
 
@@ -124,6 +134,15 @@ func TestApplicationAccessPermissionDenied(t *testing.T) {
 		a.So(rights, should.NotBeNil)
 		a.So(rights.Rights, should.BeEmpty)
 		a.So(err, should.BeNil)
+
+		APIKey, err := reg.GetAPIKey(ctx, &ttnpb.GetApplicationAPIKeyRequest{
+			ApplicationIdentifiers: applicationID,
+			KeyID:                  APIKeyID,
+		})
+
+		a.So(APIKey, should.BeNil)
+		a.So(err, should.NotBeNil)
+		a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
 		APIKeys, err := reg.ListAPIKeys(ctx, &ttnpb.ListApplicationAPIKeysRequest{
 			ApplicationIdentifiers: applicationID,
@@ -142,7 +161,7 @@ func TestApplicationAccessPermissionDenied(t *testing.T) {
 		a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
 		APIKeyName := "test-application-api-key-name"
-		APIKey, err := reg.CreateAPIKey(ctx, &ttnpb.CreateApplicationAPIKeyRequest{
+		APIKey, err = reg.CreateAPIKey(ctx, &ttnpb.CreateApplicationAPIKeyRequest{
 			ApplicationIdentifiers: applicationID,
 			Name:                   APIKeyName,
 			Rights:                 []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL},
@@ -220,6 +239,18 @@ func TestApplicationAccessCRUD(t *testing.T) {
 		a.So(err, should.BeNil)
 
 		applicationAPIKeys := applicationAPIKeys(&applicationID)
+		applicationKey := applicationAPIKeys.APIKeys[0]
+
+		APIKey, err := reg.GetAPIKey(ctx, &ttnpb.GetApplicationAPIKeyRequest{
+			ApplicationIdentifiers: applicationID,
+			KeyID:                  applicationKey.ID,
+		}, creds)
+
+		a.So(APIKey, should.NotBeNil)
+		a.So(err, should.BeNil)
+		a.So(APIKey.ID, should.Equal, applicationKey.ID)
+		a.So(APIKey.Key, should.BeEmpty)
+
 		APIKeys, err := reg.ListAPIKeys(ctx, &ttnpb.ListApplicationAPIKeysRequest{
 			ApplicationIdentifiers: applicationID,
 		}, creds)
@@ -241,7 +272,7 @@ func TestApplicationAccessCRUD(t *testing.T) {
 		a.So(err, should.BeNil)
 
 		APIKeyName := "test-application-api-key-name"
-		APIKey, err := reg.CreateAPIKey(ctx, &ttnpb.CreateApplicationAPIKeyRequest{
+		APIKey, err = reg.CreateAPIKey(ctx, &ttnpb.CreateApplicationAPIKeyRequest{
 			ApplicationIdentifiers: applicationID,
 			Name:                   APIKeyName,
 			Rights:                 []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL},

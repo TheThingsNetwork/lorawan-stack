@@ -842,6 +842,102 @@ var _ interface {
 	ErrorName() string
 } = ListApplicationAPIKeysRequestValidationError{}
 
+// ValidateFields checks the field values on GetApplicationAPIKeyRequest with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *GetApplicationAPIKeyRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = GetApplicationAPIKeyRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "application_ids":
+
+			if v, ok := interface{}(&m.ApplicationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return GetApplicationAPIKeyRequestValidationError{
+						field:  "application_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "key_id":
+			// no validation rules for KeyID
+		default:
+			return GetApplicationAPIKeyRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// GetApplicationAPIKeyRequestValidationError is the validation error returned
+// by GetApplicationAPIKeyRequest.ValidateFields if the designated constraints
+// aren't met.
+type GetApplicationAPIKeyRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetApplicationAPIKeyRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetApplicationAPIKeyRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetApplicationAPIKeyRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetApplicationAPIKeyRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetApplicationAPIKeyRequestValidationError) ErrorName() string {
+	return "GetApplicationAPIKeyRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetApplicationAPIKeyRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetApplicationAPIKeyRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetApplicationAPIKeyRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetApplicationAPIKeyRequestValidationError{}
+
 // ValidateFields checks the field values on CreateApplicationAPIKeyRequest
 // with the rules defined in the proto definition for this message. If any
 // rules are violated, an error is returned.

@@ -51,6 +51,15 @@ func TestGatewayAccessNotFound(t *testing.T) {
 			Name: "test-gateway-api-key-name",
 		}
 
+		got, err := reg.GetAPIKey(ctx, &ttnpb.GetGatewayAPIKeyRequest{
+			GatewayIdentifiers: gatewayID,
+			KeyID:              apiKey.ID,
+		}, creds)
+
+		a.So(got, should.BeNil)
+		a.So(err, should.NotBeNil)
+		a.So(errors.IsNotFound(err), should.BeTrue)
+
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
 			GatewayIdentifiers: gatewayID,
 			APIKey:             apiKey,
@@ -116,6 +125,7 @@ func TestGatewayAccessPermissionDenied(t *testing.T) {
 		userID := defaultUser.UserIdentifiers
 		gatewayID := userGateways(&userID).Gateways[0].GatewayIdentifiers
 		collaboratorID := collaboratorUser.UserIdentifiers.OrganizationOrUserIdentifiers()
+		APIKeyID := gatewayAPIKeys(&gatewayID).APIKeys[0].ID
 
 		reg := ttnpb.NewGatewayAccessClient(cc)
 
@@ -124,6 +134,15 @@ func TestGatewayAccessPermissionDenied(t *testing.T) {
 		a.So(rights, should.NotBeNil)
 		a.So(rights.Rights, should.BeEmpty)
 		a.So(err, should.BeNil)
+
+		APIKey, err := reg.GetAPIKey(ctx, &ttnpb.GetGatewayAPIKeyRequest{
+			GatewayIdentifiers: gatewayID,
+			KeyID:              APIKeyID,
+		})
+
+		a.So(APIKey, should.BeNil)
+		a.So(err, should.NotBeNil)
+		a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
 		APIKeys, err := reg.ListAPIKeys(ctx, &ttnpb.ListGatewayAPIKeysRequest{
 			GatewayIdentifiers: gatewayID,
@@ -142,7 +161,7 @@ func TestGatewayAccessPermissionDenied(t *testing.T) {
 		a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
 		APIKeyName := "test-gateway-api-key-name"
-		APIKey, err := reg.CreateAPIKey(ctx, &ttnpb.CreateGatewayAPIKeyRequest{
+		APIKey, err = reg.CreateAPIKey(ctx, &ttnpb.CreateGatewayAPIKeyRequest{
 			GatewayIdentifiers: gatewayID,
 			Name:               APIKeyName,
 			Rights:             []ttnpb.Right{ttnpb.RIGHT_GATEWAY_ALL},
@@ -220,6 +239,18 @@ func TestGatewayAccessCRUD(t *testing.T) {
 		a.So(err, should.BeNil)
 
 		gatewayAPIKeys := gatewayAPIKeys(&gatewayID)
+		gatewayKey := gatewayAPIKeys.APIKeys[0]
+
+		APIKey, err := reg.GetAPIKey(ctx, &ttnpb.GetGatewayAPIKeyRequest{
+			GatewayIdentifiers: gatewayID,
+			KeyID:              gatewayKey.ID,
+		}, userCreds)
+
+		a.So(APIKey, should.NotBeNil)
+		a.So(err, should.BeNil)
+		a.So(APIKey.ID, should.Equal, gatewayKey.ID)
+		a.So(APIKey.Key, should.BeEmpty)
+
 		APIKeys, err := reg.ListAPIKeys(ctx, &ttnpb.ListGatewayAPIKeysRequest{
 			GatewayIdentifiers: gatewayID,
 		}, userCreds)
@@ -241,7 +272,7 @@ func TestGatewayAccessCRUD(t *testing.T) {
 		a.So(err, should.BeNil)
 
 		APIKeyName := "test-gateway-api-key-name"
-		APIKey, err := reg.CreateAPIKey(ctx, &ttnpb.CreateGatewayAPIKeyRequest{
+		APIKey, err = reg.CreateAPIKey(ctx, &ttnpb.CreateGatewayAPIKeyRequest{
 			GatewayIdentifiers: gatewayID,
 			Name:               APIKeyName,
 			Rights:             []ttnpb.Right{ttnpb.RIGHT_GATEWAY_ALL},

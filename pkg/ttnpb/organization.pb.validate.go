@@ -843,6 +843,102 @@ var _ interface {
 	ErrorName() string
 } = ListOrganizationAPIKeysRequestValidationError{}
 
+// ValidateFields checks the field values on GetOrganizationAPIKeyRequest with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *GetOrganizationAPIKeyRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = GetOrganizationAPIKeyRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "organization_ids":
+
+			if v, ok := interface{}(&m.OrganizationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return GetOrganizationAPIKeyRequestValidationError{
+						field:  "organization_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "key_id":
+			// no validation rules for KeyID
+		default:
+			return GetOrganizationAPIKeyRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// GetOrganizationAPIKeyRequestValidationError is the validation error returned
+// by GetOrganizationAPIKeyRequest.ValidateFields if the designated
+// constraints aren't met.
+type GetOrganizationAPIKeyRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetOrganizationAPIKeyRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetOrganizationAPIKeyRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetOrganizationAPIKeyRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetOrganizationAPIKeyRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetOrganizationAPIKeyRequestValidationError) ErrorName() string {
+	return "GetOrganizationAPIKeyRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetOrganizationAPIKeyRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetOrganizationAPIKeyRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetOrganizationAPIKeyRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetOrganizationAPIKeyRequestValidationError{}
+
 // ValidateFields checks the field values on CreateOrganizationAPIKeyRequest
 // with the rules defined in the proto definition for this message. If any
 // rules are violated, an error is returned.

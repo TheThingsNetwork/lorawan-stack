@@ -95,6 +95,12 @@ service ApplicationAccess {
     };
   };
 
+  rpc GetAPIKey(GetApplicationAPIKeyRequest) returns (APIKey) {
+    option (google.api.http) = {
+      get: "/applications/{application_ids.application_id}/api-keys/{key_id}"
+    };
+  };
+
   // Update the rights of an existing application API key. To generate an API key,
   // the CreateAPIKey should be used. To delete an API key, update it
   // with zero rights.

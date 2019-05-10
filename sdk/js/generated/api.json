@@ -306,6 +306,45 @@
           ]
         },
         {
+          "name": "GetApplicationAPIKeyRequest",
+          "longName": "GetApplicationAPIKeyRequest",
+          "fullName": "ttn.lorawan.v3.GetApplicationAPIKeyRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "application_ids",
+              "description": "",
+              "label": "",
+              "type": "ApplicationIdentifiers",
+              "longType": "ApplicationIdentifiers",
+              "fullType": "ttn.lorawan.v3.ApplicationIdentifiers",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "key_id",
+              "description": "Unique public identifier for the API key.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "GetApplicationRequest",
           "longName": "GetApplicationRequest",
           "fullName": "ttn.lorawan.v3.GetApplicationRequest",
@@ -743,6 +782,28 @@
                     {
                       "method": "GET",
                       "pattern": "/applications/{application_ids.application_id}/api-keys"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "GetAPIKey",
+              "description": "",
+              "requestType": "GetApplicationAPIKeyRequest",
+              "requestLongType": "GetApplicationAPIKeyRequest",
+              "requestFullType": "ttn.lorawan.v3.GetApplicationAPIKeyRequest",
+              "requestStreaming": false,
+              "responseType": "APIKey",
+              "responseLongType": "APIKey",
+              "responseFullType": "ttn.lorawan.v3.APIKey",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/applications/{application_ids.application_id}/api-keys/{key_id}"
                     }
                   ]
                 }
@@ -7597,6 +7658,45 @@
           ]
         },
         {
+          "name": "GetGatewayAPIKeyRequest",
+          "longName": "GetGatewayAPIKeyRequest",
+          "fullName": "ttn.lorawan.v3.GetGatewayAPIKeyRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "gateway_ids",
+              "description": "",
+              "label": "",
+              "type": "GatewayIdentifiers",
+              "longType": "GatewayIdentifiers",
+              "fullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "key_id",
+              "description": "Unique public identifier for the API key.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "GetGatewayIdentifiersForEUIRequest",
           "longName": "GetGatewayIdentifiersForEUIRequest",
           "fullName": "ttn.lorawan.v3.GetGatewayIdentifiersForEUIRequest",
@@ -8087,6 +8187,28 @@
                     {
                       "method": "GET",
                       "pattern": "/gateways/{gateway_ids.gateway_id}/api-keys"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "GetAPIKey",
+              "description": "",
+              "requestType": "GetGatewayAPIKeyRequest",
+              "requestLongType": "GetGatewayAPIKeyRequest",
+              "requestFullType": "ttn.lorawan.v3.GetGatewayAPIKeyRequest",
+              "requestStreaming": false,
+              "responseType": "APIKey",
+              "responseLongType": "APIKey",
+              "responseFullType": "ttn.lorawan.v3.APIKey",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/gateways/{gateway_ids.gateway_id}/api-keys/{key_id}"
                     }
                   ]
                 }
@@ -17068,6 +17190,45 @@
           ]
         },
         {
+          "name": "GetOrganizationAPIKeyRequest",
+          "longName": "GetOrganizationAPIKeyRequest",
+          "fullName": "ttn.lorawan.v3.GetOrganizationAPIKeyRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "organization_ids",
+              "description": "",
+              "label": "",
+              "type": "OrganizationIdentifiers",
+              "longType": "OrganizationIdentifiers",
+              "fullType": "ttn.lorawan.v3.OrganizationIdentifiers",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "key_id",
+              "description": "Unique public identifier for the API key.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "GetOrganizationRequest",
           "longName": "GetOrganizationRequest",
           "fullName": "ttn.lorawan.v3.GetOrganizationRequest",
@@ -17674,6 +17835,28 @@
                     {
                       "method": "GET",
                       "pattern": "/organizations/{organization_ids.organization_id}/api-keys"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "GetAPIKey",
+              "description": "",
+              "requestType": "GetOrganizationAPIKeyRequest",
+              "requestLongType": "GetOrganizationAPIKeyRequest",
+              "requestFullType": "ttn.lorawan.v3.GetOrganizationAPIKeyRequest",
+              "requestStreaming": false,
+              "responseType": "APIKey",
+              "responseLongType": "APIKey",
+              "responseFullType": "ttn.lorawan.v3.APIKey",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/organizations/{organization_ids.organization_id}/api-keys/{key_id}"
                     }
                   ]
                 }
@@ -19205,6 +19388,45 @@
           ]
         },
         {
+          "name": "GetUserAPIKeyRequest",
+          "longName": "GetUserAPIKeyRequest",
+          "fullName": "ttn.lorawan.v3.GetUserAPIKeyRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "user_ids",
+              "description": "",
+              "label": "",
+              "type": "UserIdentifiers",
+              "longType": "UserIdentifiers",
+              "fullType": "ttn.lorawan.v3.UserIdentifiers",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "key_id",
+              "description": "Unique public identifier for the API key.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "GetUserRequest",
           "longName": "GetUserRequest",
           "fullName": "ttn.lorawan.v3.GetUserRequest",
@@ -20304,6 +20526,28 @@
                     {
                       "method": "GET",
                       "pattern": "/users/{user_ids.user_id}/api-keys"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "GetAPIKey",
+              "description": "",
+              "requestType": "GetUserAPIKeyRequest",
+              "requestLongType": "GetUserAPIKeyRequest",
+              "requestFullType": "ttn.lorawan.v3.GetUserAPIKeyRequest",
+              "requestStreaming": false,
+              "responseType": "APIKey",
+              "responseLongType": "APIKey",
+              "responseFullType": "ttn.lorawan.v3.APIKey",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/users/{user_ids.user_id}/api-keys/{key_id}"
                     }
                   ]
                 }

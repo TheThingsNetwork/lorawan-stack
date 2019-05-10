@@ -105,6 +105,26 @@ func (is *IdentityServer) listOrganizationAPIKeys(ctx context.Context, req *ttnp
 	return keys, nil
 }
 
+func (is *IdentityServer) getOrganizationAPIKey(ctx context.Context, req *ttnpb.GetOrganizationAPIKeyRequest) (key *ttnpb.APIKey, err error) {
+	if err = rights.RequireOrganization(ctx, req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS); err != nil {
+		return nil, err
+	}
+
+	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+		_, key, err = store.GetAPIKeyStore(db).GetAPIKey(ctx, req.KeyID)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	key.Key = ""
+	return key, nil
+}
+
 func (is *IdentityServer) updateOrganizationAPIKey(ctx context.Context, req *ttnpb.UpdateOrganizationAPIKeyRequest) (key *ttnpb.APIKey, err error) {
 	// Require that caller has rights to manage API keys.
 	if err = rights.RequireOrganization(ctx, req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS); err != nil {
@@ -218,6 +238,9 @@ func (oa *organizationAccess) CreateAPIKey(ctx context.Context, req *ttnpb.Creat
 }
 func (oa *organizationAccess) ListAPIKeys(ctx context.Context, req *ttnpb.ListOrganizationAPIKeysRequest) (*ttnpb.APIKeys, error) {
 	return oa.listOrganizationAPIKeys(ctx, req)
+}
+func (oa *organizationAccess) GetAPIKey(ctx context.Context, req *ttnpb.GetOrganizationAPIKeyRequest) (*ttnpb.APIKey, error) {
+	return oa.getOrganizationAPIKey(ctx, req)
 }
 func (oa *organizationAccess) UpdateAPIKey(ctx context.Context, req *ttnpb.UpdateOrganizationAPIKeyRequest) (*ttnpb.APIKey, error) {
 	return oa.updateOrganizationAPIKey(ctx, req)

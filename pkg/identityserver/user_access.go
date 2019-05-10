@@ -102,6 +102,26 @@ func (is *IdentityServer) listUserAPIKeys(ctx context.Context, req *ttnpb.ListUs
 	return keys, nil
 }
 
+func (is *IdentityServer) getUserAPIKey(ctx context.Context, req *ttnpb.GetUserAPIKeyRequest) (key *ttnpb.APIKey, err error) {
+	if err = rights.RequireUser(ctx, req.UserIdentifiers, ttnpb.RIGHT_USER_SETTINGS_API_KEYS); err != nil {
+		return nil, err
+	}
+
+	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+		_, key, err = store.GetAPIKeyStore(db).GetAPIKey(ctx, req.KeyID)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	key.Key = ""
+	return key, nil
+}
+
 func (is *IdentityServer) updateUserAPIKey(ctx context.Context, req *ttnpb.UpdateUserAPIKeyRequest) (key *ttnpb.APIKey, err error) {
 	// Require that caller has rights to manage API keys.
 	if err = rights.RequireUser(ctx, req.UserIdentifiers, ttnpb.RIGHT_USER_SETTINGS_API_KEYS); err != nil {
@@ -143,6 +163,9 @@ type userAccess struct {
 
 func (ua *userAccess) ListRights(ctx context.Context, req *ttnpb.UserIdentifiers) (*ttnpb.Rights, error) {
 	return ua.listUserRights(ctx, req)
+}
+func (ua *userAccess) GetAPIKey(ctx context.Context, req *ttnpb.GetUserAPIKeyRequest) (*ttnpb.APIKey, error) {
+	return ua.getUserAPIKey(ctx, req)
 }
 func (ua *userAccess) CreateAPIKey(ctx context.Context, req *ttnpb.CreateUserAPIKeyRequest) (*ttnpb.APIKey, error) {
 	return ua.createUserAPIKey(ctx, req)

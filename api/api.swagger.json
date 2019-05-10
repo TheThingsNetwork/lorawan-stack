@@ -267,6 +267,37 @@
         ]
       }
     },
+    "/applications/{application_ids.application_id}/api-keys/{key_id}": {
+      "get": {
+        "operationId": "GetAPIKey",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3APIKey"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "key_id",
+            "description": "Unique public identifier for the API key.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ApplicationAccess"
+        ]
+      }
+    },
     "/applications/{application_ids.application_id}/collaborators": {
       "get": {
         "operationId": "ListCollaborators",
@@ -1849,6 +1880,45 @@
         ]
       }
     },
+    "/gateways/{gateway_ids.gateway_id}/api-keys/{key_id}": {
+      "get": {
+        "operationId": "GetAPIKey",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3APIKey"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "gateway_ids.gateway_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "key_id",
+            "description": "Unique public identifier for the API key.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "gateway_ids.eui",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          }
+        ],
+        "tags": [
+          "GatewayAccess"
+        ]
+      }
+    },
     "/gateways/{gateway_ids.gateway_id}/collaborators": {
       "get": {
         "operationId": "ListCollaborators",
@@ -3081,6 +3151,38 @@
         ]
       }
     },
+    "/organizations/{organization_ids.organization_id}/api-keys/{key_id}": {
+      "get": {
+        "operationId": "GetAPIKey",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3APIKey"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "key_id",
+            "description": "Unique public identifier for the API key.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "OrganizationAccess"
+        ]
+      }
+    },
     "/organizations/{organization_ids.organization_id}/collaborators": {
       "get": {
         "operationId": "ListCollaborators",
@@ -4162,6 +4264,45 @@
             "schema": {
               "$ref": "#/definitions/v3UpdateUserAPIKeyRequest"
             }
+          }
+        ],
+        "tags": [
+          "UserAccess"
+        ]
+      }
+    },
+    "/users/{user_ids.user_id}/api-keys/{key_id}": {
+      "get": {
+        "operationId": "GetAPIKey",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3APIKey"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "key_id",
+            "description": "Unique public identifier for the API key.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
