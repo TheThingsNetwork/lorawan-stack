@@ -22,4 +22,5 @@ import (
 type Formatter interface {
 	FromUp(*ttnpb.ApplicationUp) ([]byte, error)
 	ToDownlinks([]byte) (*ttnpb.ApplicationDownlinks, error)
+	ToDownlinkQueueOperation([]byte) (*ttnpb.DownlinkQueueOperation, error)
 }

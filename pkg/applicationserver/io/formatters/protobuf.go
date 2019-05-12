@@ -30,5 +30,13 @@ func (protobuf) ToDownlinks(buf []byte) (*ttnpb.ApplicationDownlinks, error) {
 	return res, nil
 }
 
+func (protobuf) ToDownlinkQueueOperation(buf []byte) (*ttnpb.DownlinkQueueOperation, error) {
+	res := &ttnpb.DownlinkQueueOperation{}
+	if err := res.Unmarshal(buf); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
 // Protobuf is a formatter that uses proto marshaling.
 var Protobuf Formatter = &protobuf{}

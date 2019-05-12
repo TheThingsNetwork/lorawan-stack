@@ -275,10 +275,12 @@
   - [Message `ApplicationUp`](#ttn.lorawan.v3.ApplicationUp)
   - [Message `ApplicationUplink`](#ttn.lorawan.v3.ApplicationUplink)
   - [Message `DownlinkMessage`](#ttn.lorawan.v3.DownlinkMessage)
+  - [Message `DownlinkQueueOperation`](#ttn.lorawan.v3.DownlinkQueueOperation)
   - [Message `DownlinkQueueRequest`](#ttn.lorawan.v3.DownlinkQueueRequest)
   - [Message `MessagePayloadFormatters`](#ttn.lorawan.v3.MessagePayloadFormatters)
   - [Message `TxAcknowledgment`](#ttn.lorawan.v3.TxAcknowledgment)
   - [Message `UplinkMessage`](#ttn.lorawan.v3.UplinkMessage)
+  - [Enum `DownlinkQueueOperation.Operation`](#ttn.lorawan.v3.DownlinkQueueOperation.Operation)
   - [Enum `PayloadFormatter`](#ttn.lorawan.v3.PayloadFormatter)
   - [Enum `TxAcknowledgment.Result`](#ttn.lorawan.v3.TxAcknowledgment.Result)
 - [File `lorawan-stack/api/metadata.proto`](#lorawan-stack/api/metadata.proto)
@@ -3901,6 +3903,21 @@ Downlink message from the network to the end device
 | ----- | ----------- |
 | `correlation_ids` | <p>`repeated.items.string.max_len`: `100`</p> |
 
+### <a name="ttn.lorawan.v3.DownlinkQueueOperation">Message `DownlinkQueueOperation`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `end_device_ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |  |
+| `operation` | [`DownlinkQueueOperation.Operation`](#ttn.lorawan.v3.DownlinkQueueOperation.Operation) |  |  |
+| `downlinks` | [`ApplicationDownlink`](#ttn.lorawan.v3.ApplicationDownlink) | repeated |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `end_device_ids` | <p>`message.required`: `true`</p> |
+| `operation` | <p>`enum.defined_only`: `true`</p> |
+
 ### <a name="ttn.lorawan.v3.DownlinkQueueRequest">Message `DownlinkQueueRequest`</a>
 
 | Field | Type | Label | Description |
@@ -3962,6 +3979,13 @@ Uplink message from the end device to the network
 | `correlation_ids` | <p>`repeated.items.string.max_len`: `100`</p> |
 | `gateway_channel_index` | <p>`uint32.lte`: `255`</p> |
 | `device_channel_index` | <p>`uint32.lte`: `255`</p> |
+
+### <a name="ttn.lorawan.v3.DownlinkQueueOperation.Operation">Enum `DownlinkQueueOperation.Operation`</a>
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| `PUSH` | 0 |  |
+| `REPLACE` | 1 |  |
 
 ### <a name="ttn.lorawan.v3.PayloadFormatter">Enum `PayloadFormatter`</a>
 

@@ -26,8 +26,10 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io"
+	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/formatters"
 	iogrpc "go.thethings.network/lorawan-stack/pkg/applicationserver/io/grpc"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/mqtt"
+	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/web"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
@@ -41,6 +43,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/messageprocessors/javascript"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
+	_ "gocloud.dev/pubsub/natspubsub" // NATS backend for PubSub.
 	"google.golang.org/grpc"
 )
 
@@ -153,6 +156,14 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		as.webhooks = webhooks
 		as.defaultSubscribers = append(as.defaultSubscribers, webhooks.NewSubscription())
 		c.RegisterWeb(webhooks)
+	}
+
+	if len(conf.PubSub.PublishURLs) > 0 {
+		pubsub, err := pubsub.Start(as.Context(), as, formatters.JSON, conf.PubSub.PublishURLs, conf.PubSub.SubscribeURLs)
+		if err != nil {
+			return nil, err
+		}
+		as.defaultSubscribers = append(as.defaultSubscribers, pubsub...)
 	}
 
 	c.RegisterGRPC(as)

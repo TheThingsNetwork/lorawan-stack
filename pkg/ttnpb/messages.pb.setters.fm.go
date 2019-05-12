@@ -682,6 +682,54 @@ func (dst *ApplicationInvalidatedDownlinks) SetFields(src *ApplicationInvalidate
 	return nil
 }
 
+func (dst *DownlinkQueueOperation) SetFields(src *DownlinkQueueOperation, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "end_device_ids":
+			if len(subs) > 0 {
+				newDst := &dst.EndDeviceIdentifiers
+				var newSrc *EndDeviceIdentifiers
+				if src != nil {
+					newSrc = &src.EndDeviceIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.EndDeviceIdentifiers = src.EndDeviceIdentifiers
+				} else {
+					var zero EndDeviceIdentifiers
+					dst.EndDeviceIdentifiers = zero
+				}
+			}
+		case "operation":
+			if len(subs) > 0 {
+				return fmt.Errorf("'operation' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Operation = src.Operation
+			} else {
+				var zero DownlinkQueueOperation_Operation
+				dst.Operation = zero
+			}
+		case "downlinks":
+			if len(subs) > 0 {
+				return fmt.Errorf("'downlinks' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Downlinks = src.Downlinks
+			} else {
+				dst.Downlinks = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *ApplicationUp) SetFields(src *ApplicationUp, paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
