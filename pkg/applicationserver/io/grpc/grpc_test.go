@@ -28,13 +28,14 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 var (
-	registeredApplicationUID = "test-app"
 	registeredApplicationID  = ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}
+	registeredApplicationUID = unique.ID(test.Context(), registeredApplicationID)
 	registeredApplicationKey = "test-key"
 
 	timeout = 10 * test.Delay

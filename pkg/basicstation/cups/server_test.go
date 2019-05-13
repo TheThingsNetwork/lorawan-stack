@@ -311,7 +311,8 @@ func TestServer(t *testing.T) {
 				WithAuth(mockAuthFunc),
 				WithRegistries(store, store),
 			}, tt.Options...)...)
-			req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(updateInfoRequest))
+			req := httptest.NewRequest(http.MethodPost, "/update-info", strings.NewReader(updateInfoRequest))
+			req = req.WithContext(test.Context())
 			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 			req.Header.Set(echo.HeaderAuthorization, "random string")
 			if tt.RequestSetup != nil {

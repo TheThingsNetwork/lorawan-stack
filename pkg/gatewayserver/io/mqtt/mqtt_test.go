@@ -30,13 +30,14 @@ import (
 	. "go.thethings.network/lorawan-stack/pkg/gatewayserver/io/mqtt"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 var (
-	registeredGatewayUID = "test-gateway"
 	registeredGatewayID  = ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"}
+	registeredGatewayUID = unique.ID(test.Context(), registeredGatewayID)
 	registeredGatewayKey = "test-key"
 
 	timeout = 10 * test.Delay

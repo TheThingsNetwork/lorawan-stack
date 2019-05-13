@@ -19,6 +19,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 
@@ -36,8 +37,8 @@ import (
 )
 
 var (
-	registeredGatewayUID = "test-gateway"
 	registeredGatewayID  = ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"}
+	registeredGatewayUID = unique.ID(test.Context(), registeredGatewayID)
 	registeredGatewayKey = "test-key"
 
 	testConfig = &Config{
@@ -114,20 +115,18 @@ func TestWeb(t *testing.T) {
 		} {
 			t.Run(tc.Name, func(t *testing.T) {
 				a := assertions.New(t)
-				url := fmt.Sprintf("http://%s/api/v3/gcs/gateways/%s/semtechudp/global_conf.json",
-					httpAddress, tc.ID.GatewayID,
+				url := fmt.Sprintf(
+					"/api/v3/gcs/gateways/%s/semtechudp/global_conf.json",
+					tc.ID.GatewayID,
 				)
 				body := bytes.NewReader([]byte(`{"downlinks":[]}`))
-				req, err := http.NewRequest(http.MethodGet, url, body)
-				if !a.So(err, should.BeNil) {
-					t.FailNow()
-				}
+				req := httptest.NewRequest(http.MethodGet, url, body)
+				req = req.WithContext(test.Context())
 				req.Header.Set("Content-Type", "application/json")
 				req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", tc.Key))
-				res, err := http.DefaultClient.Do(req)
-				if !a.So(err, should.BeNil) {
-					t.FailNow()
-				}
+				rec := httptest.NewRecorder()
+				c.ServeHTTP(rec, req)
+				res := rec.Result()
 				a.So(res.StatusCode, should.Equal, tc.ExpectCode)
 			})
 		}
