@@ -24,7 +24,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/cluster"
@@ -43,6 +43,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 	"google.golang.org/grpc"
 )
@@ -56,6 +57,7 @@ type GatewayServer struct {
 	io.Server
 
 	requireRegisteredGateways bool
+	forward                   map[string][]types.DevAddrPrefix
 
 	connections sync.Map
 }
@@ -75,10 +77,15 @@ var (
 
 // New returns new *GatewayServer.
 func New(c *component.Component, conf *Config) (gs *GatewayServer, err error) {
+	forward, err := conf.ForwardDevAddrPrefixes()
+	if err != nil {
+		return nil, err
+	}
 	gs = &GatewayServer{
 		Component:                 c,
 		ctx:                       log.NewContextWithField(c.Context(), "namespace", "gatewayserver"),
 		requireRegisteredGateways: conf.RequireRegisteredGateways,
+		forward:                   forward,
 	}
 
 	ctx, cancel := context.WithCancel(gs.Context())
@@ -261,7 +268,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, protocol string, ids ttnpb
 	}
 	gtw, err := ttnpb.NewGatewayRegistryClient(er.Conn()).Get(ctx, &ttnpb.GetGatewayRequest{
 		GatewayIdentifiers: ids,
-		FieldMask: types.FieldMask{
+		FieldMask: pbtypes.FieldMask{
 			Paths: []string{
 				"frequency_plan_id",
 				"schedule_downlink_late",
@@ -438,7 +445,7 @@ func (gs *GatewayServer) GetFrequencyPlan(ctx context.Context, ids ttnpb.Gateway
 	}
 	gtw, err := ttnpb.NewGatewayRegistryClient(er.Conn()).Get(ctx, &ttnpb.GetGatewayRequest{
 		GatewayIdentifiers: ids,
-		FieldMask:          types.FieldMask{Paths: []string{"frequency_plan_id"}},
+		FieldMask:          pbtypes.FieldMask{Paths: []string{"frequency_plan_id"}},
 	}, callOpt)
 	var fpID string
 	if err == nil {
