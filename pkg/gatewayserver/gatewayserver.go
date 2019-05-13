@@ -55,7 +55,7 @@ type GatewayServer struct {
 	ctx context.Context
 	io.Server
 
-	config *Config
+	requireRegisteredGateways bool
 
 	connections sync.Map
 }
@@ -76,9 +76,9 @@ var (
 // New returns new *GatewayServer.
 func New(c *component.Component, conf *Config) (gs *GatewayServer, err error) {
 	gs = &GatewayServer{
-		Component: c,
-		ctx:       log.NewContextWithField(c.Context(), "namespace", "gatewayserver"),
-		config:    conf,
+		Component:                 c,
+		ctx:                       log.NewContextWithField(c.Context(), "namespace", "gatewayserver"),
+		requireRegisteredGateways: conf.RequireRegisteredGateways,
 	}
 
 	ctx, cancel := context.WithCancel(gs.Context())
@@ -208,7 +208,7 @@ func (gs *GatewayServer) FillGatewayContext(ctx context.Context, ids ttnpb.Gatew
 		if err == nil {
 			ids = *extIDs
 		} else if errors.IsNotFound(err) {
-			if gs.config.RequireRegisteredGateways {
+			if gs.requireRegisteredGateways {
 				return nil, ttnpb.GatewayIdentifiers{}, errGatewayEUINotRegistered.WithAttributes("eui", *ids.EUI).WithCause(err)
 			}
 			ids.GatewayID = fmt.Sprintf("eui-%v", strings.ToLower(ids.EUI.String()))
@@ -271,7 +271,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, protocol string, ids ttnpb
 		},
 	}, callOpt)
 	if errors.IsNotFound(err) {
-		if gs.config.RequireRegisteredGateways {
+		if gs.requireRegisteredGateways {
 			return nil, errGatewayNotRegistered.WithAttributes("gateway_uid", uid).WithCause(err)
 		}
 		fpID, ok := frequencyplans.FallbackIDFromContext(ctx)
