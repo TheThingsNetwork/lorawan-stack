@@ -97,8 +97,7 @@ func TestFromDownlinkMessage(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			dnmsg := DownlinkMessage{}
-			dnmsg.FromDownlinkMessage(tc.GatewayIDs, tc.DownlinkMessage, 0, time.Unix(1554300787, 123456000))
+			dnmsg := FromDownlinkMessage(tc.GatewayIDs, tc.DownlinkMessage, 0, time.Unix(1554300787, 123456000))
 			if !a.So(dnmsg, should.Resemble, tc.ExpectedDownlinkMessage) {
 				t.Fatalf("Invalid DownlinkMessage: %v", dnmsg)
 			}
