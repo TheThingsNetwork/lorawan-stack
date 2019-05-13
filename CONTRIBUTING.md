@@ -260,7 +260,7 @@ Translations of frontend messages are located in `pkg/webui/locales`.
 
 We do our utmost best to build secure systems, but we're human too, so we sometimes make mistakes. If you find any vulnerability in our systems, please contact us directly. We can be reached on Slack, by email and a number of other communication platforms.
 
-- Johan Stokking - [keybase.io/johanstokking](https://keybase.io/johanstokking) `5D21A572255E61C6`
+- Johan Stokking - [keybase.io/johanstokking](https://keybase.io/johanstokking) `EE80D01EB2BE7EC8`
 - Hylke Visser - [keybase.io/htdvisser](https://keybase.io/htdvisser) `A115FF80DC8A2270`
 
 Our email addresses follow the pattern `<firstname>@thethingsnetwork.org`.
