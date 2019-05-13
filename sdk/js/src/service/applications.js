@@ -40,6 +40,7 @@ class Applications {
 
     this.ApiKeys = new ApiKeys(api.ApplicationAccess, {
       parentRoutes: {
+        get: 'application_ids.application_id',
         list: 'application_ids.application_id',
         create: 'application_ids.application_id',
         update: 'application_ids.application_id',
