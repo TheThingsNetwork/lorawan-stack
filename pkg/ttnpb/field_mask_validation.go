@@ -75,10 +75,10 @@ var AllowedFieldMaskPathsForRPC = map[string][]string{
 	"/ttn.lorawan.v3.As/SetLink": ApplicationLinkFieldPathsNested,
 
 	// Clients:
-	"/ttn.lorawan.v3.ClientRegistry/Get":                 ClientFieldPathsNested,
-	"/ttn.lorawan.v3.ClientRegistry/List":                ClientFieldPathsNested,
+	"/ttn.lorawan.v3.ClientRegistry/Get":                 omitFields(ClientFieldPathsNested, "secret"),
+	"/ttn.lorawan.v3.ClientRegistry/List":                omitFields(ClientFieldPathsNested, "secret"),
 	"/ttn.lorawan.v3.ClientRegistry/Update":              ClientFieldPathsNested,
-	"/ttn.lorawan.v3.EntityRegistrySearch/SearchClients": ClientFieldPathsNested,
+	"/ttn.lorawan.v3.EntityRegistrySearch/SearchClients": omitFields(ClientFieldPathsNested, "secret"),
 
 	// End Devices:
 	"/ttn.lorawan.v3.AsEndDeviceRegistry/Get": {
@@ -553,7 +553,21 @@ var AllowedFieldMaskPathsForRPC = map[string][]string{
 	"/ttn.lorawan.v3.EntityRegistrySearch/SearchOrganizations": OrganizationFieldPathsNested,
 
 	// Users:
-	"/ttn.lorawan.v3.UserRegistry/Get":                 UserFieldPathsNested,
-	"/ttn.lorawan.v3.UserRegistry/Update":              UserFieldPathsNested,
-	"/ttn.lorawan.v3.EntityRegistrySearch/SearchUsers": UserFieldPathsNested,
+	"/ttn.lorawan.v3.UserRegistry/Get":                 omitFields(UserFieldPathsNested, "password", "temporary_password"),
+	"/ttn.lorawan.v3.UserRegistry/Update":              omitFields(UserFieldPathsNested, "password", "temporary_password"),
+	"/ttn.lorawan.v3.EntityRegistrySearch/SearchUsers": omitFields(UserFieldPathsNested, "password", "temporary_password"),
+}
+
+func omitFields(fields []string, fieldsToOmit ...string) []string {
+	out := make([]string, 0, len(fields))
+nextField:
+	for _, field := range fields {
+		for _, fieldToOmit := range fieldsToOmit {
+			if field == fieldToOmit {
+				continue nextField
+			}
+		}
+		out = append(out, field)
+	}
+	return out
 }

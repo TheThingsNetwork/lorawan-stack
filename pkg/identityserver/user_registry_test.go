@@ -22,7 +22,6 @@ import (
 	"github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
-	"go.thethings.network/lorawan-stack/pkg/auth"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
@@ -194,26 +193,13 @@ func TestUsersWeakPassword(t *testing.T) {
 		a.So(err, should.NotBeNil)
 		a.So(errors.IsInvalidArgument(err), should.BeTrue)
 
-		pwUpdated, err := reg.Get(ctx, &ttnpb.GetUserRequest{
+		afterUpdate, err := reg.Get(ctx, &ttnpb.GetUserRequest{
 			UserIdentifiers: user.UserIdentifiers,
-			FieldMask:       types.FieldMask{Paths: []string{"password", "password_updated_at"}},
+			FieldMask:       types.FieldMask{Paths: []string{"password_updated_at"}},
 		}, creds)
 
 		a.So(err, should.BeNil)
-
-		oldPasswordMatch, err := auth.Password(pwUpdated.Password).Validate(oldPassword)
-		if err != nil {
-			panic(err)
-		}
-		newPasswordMatch, _ := auth.Password(pwUpdated.Password).Validate(newPassword)
-		if err != nil {
-			panic(err)
-		}
-
-		a.So(pwUpdated, should.NotBeNil)
-		a.So(oldPasswordMatch, should.BeTrue)
-		a.So(newPasswordMatch, should.BeFalse)
-		a.So(pwUpdated.PasswordUpdatedAt, should.Equal, user.PasswordUpdatedAt)
+		a.So(afterUpdate.PasswordUpdatedAt, should.Equal, user.PasswordUpdatedAt)
 	})
 }
 
@@ -284,26 +270,13 @@ func TestUsersCRUD(t *testing.T) {
 
 		a.So(err, should.BeNil)
 
-		pwUpdated, err := reg.Get(ctx, &ttnpb.GetUserRequest{
+		afterUpdate, err := reg.Get(ctx, &ttnpb.GetUserRequest{
 			UserIdentifiers: user.UserIdentifiers,
-			FieldMask:       types.FieldMask{Paths: []string{"password", "password_updated_at"}},
+			FieldMask:       types.FieldMask{Paths: []string{"password_updated_at"}},
 		}, creds)
 
 		a.So(err, should.BeNil)
-
-		oldPasswordMatch, err := auth.Password(pwUpdated.Password).Validate(oldPassword)
-		if err != nil {
-			panic(err)
-		}
-		newPasswordMatch, _ := auth.Password(pwUpdated.Password).Validate(newPassword)
-		if err != nil {
-			panic(err)
-		}
-
-		a.So(pwUpdated, should.NotBeNil)
-		a.So(oldPasswordMatch, should.BeFalse)
-		a.So(newPasswordMatch, should.BeTrue)
-		a.So(pwUpdated.PasswordUpdatedAt, should.HappenAfter, passwordUpdateTime)
+		a.So(afterUpdate.PasswordUpdatedAt, should.HappenAfter, passwordUpdateTime)
 
 		_, err = reg.Delete(ctx, &user.UserIdentifiers, creds)
 		a.So(err, should.BeNil)
