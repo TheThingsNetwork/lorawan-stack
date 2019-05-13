@@ -16,6 +16,7 @@ import { createLogic } from 'redux-logic'
 
 import api from '../../api'
 import * as gateways from '../actions/gateways'
+import * as gateway from '../actions/gateway'
 
 const getGatewaysLogic = createLogic({
   type: [
@@ -47,6 +48,7 @@ const getGatewaysLogic = createLogic({
 const getGatewaysRightsLogic = createLogic({
   type: [
     gateways.GET_GTWS_RIGHTS_LIST,
+    gateway.GET_GTW_API_KEY_PAGE_DATA,
   ],
   async process ({ action }, dispatch, done) {
     const { id } = action

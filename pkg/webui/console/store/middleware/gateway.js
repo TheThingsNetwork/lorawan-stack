@@ -111,7 +111,10 @@ const updateGatewayStatisticsLogic = createLogic({
 })
 
 const getGatewayApiKeysLogic = createLogic({
-  type: gateway.GET_GTW_API_KEYS_LIST,
+  type: [
+    gateway.GET_GTW_API_KEY_PAGE_DATA,
+    gateway.GET_GTW_API_KEYS_LIST,
+  ],
   async process ({ action }, dispatch, done) {
     const { id, params } = action
     try {
