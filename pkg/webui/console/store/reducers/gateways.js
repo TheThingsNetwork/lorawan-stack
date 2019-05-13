@@ -17,7 +17,6 @@ import {
   SEARCH_GTWS_LIST,
   GET_GTWS_LIST_SUCCESS,
   GET_GTWS_LIST_FAILURE,
-  CHANGE_GTWS_PAGE,
 } from '../actions/gateways'
 
 const defaultState = {
@@ -55,11 +54,6 @@ const gateways = function (state = defaultState, action) {
       fetching: false,
       fetchingSearch: false,
       error: action.error,
-    }
-  case CHANGE_GTWS_PAGE:
-    return {
-      ...state,
-      fetching: true,
     }
   default:
     return state

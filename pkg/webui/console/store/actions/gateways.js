@@ -16,9 +16,8 @@ export const GET_GTWS_LIST = 'GET_GATEWAYS_LIST'
 export const SEARCH_GTWS_LIST = 'SEARCH_GATEWAYS_LIST'
 export const GET_GTWS_LIST_SUCCESS = 'GET_GATEWAYS_LIST_SUCCESS'
 export const GET_GTWS_LIST_FAILURE = 'GET_GATEWAYS_LIST_FAILURE'
-export const CHANGE_GTWS_PAGE = 'CHANGE_GATEWAYS_PAGE'
-export const CHANGE_GTWS_ORDER = 'CHANGE_GATEWAYS_ORDER'
-export const CHANGE_GTWS_SEARCH = 'CHANGE_GATEWAYS_SEARCH'
+
+export const SHARED_NAME = 'GATEWAYS'
 
 export const getGatewaysList = filters => (
   { type: GET_GTWS_LIST, filters }
@@ -34,16 +33,4 @@ export const getGatewaysSuccess = (gateways, totalCount) => (
 
 export const getGatewaysFailure = error => (
   { type: GET_GTWS_LIST_FAILURE, error }
-)
-
-export const changeGatewaysPage = page => (
-  { type: CHANGE_GTWS_PAGE, page }
-)
-
-export const changeGatewaysOrder = (order, orderBy) => (
-  { type: CHANGE_GTWS_ORDER, order, orderBy }
-)
-
-export const changeGatewaysSearch = query => (
-  { type: CHANGE_GTWS_SEARCH, query }
 )
