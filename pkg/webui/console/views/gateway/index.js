@@ -128,7 +128,7 @@ export default class Gateway extends React.Component {
     return (
       <Switch>
         <Route exact path={`${match.path}`} component={GatewayOverview} />
-        <Route exact path={`${match.path}/api-keys`} component={GatewayApiKeys} />
+        <Route path={`${match.path}/api-keys`} component={GatewayApiKeys} />
       </Switch>
     )
   }
