@@ -51,6 +51,7 @@ func (s *membershipStore) FindMembers(ctx context.Context, entityID *ttnpb.Entit
 	if err = query.Find(&memberships).Error; err != nil {
 		return nil, err
 	}
+	setTotal(ctx, uint64(len(memberships)))
 	membershipRights := make(map[*ttnpb.OrganizationOrUserIdentifiers]*ttnpb.Rights, len(memberships))
 	for _, membership := range memberships {
 		ids := membership.Account.OrganizationOrUserIdentifiers()
