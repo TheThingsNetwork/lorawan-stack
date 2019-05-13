@@ -74,7 +74,7 @@ func ToClientID(uid string) (id ttnpb.ClientIdentifiers, err error) {
 func ToDeviceID(uid string) (id ttnpb.EndDeviceIdentifiers, err error) {
 	sepIdx := strings.Index(uid, ".")
 	if sepIdx == -1 {
-		return ttnpb.EndDeviceIdentifiers{}, errFormat.WithAttributes("uid", uid)
+		return ttnpb.EndDeviceIdentifiers{}, errFormat.WithAttributes("value", uid)
 	}
 	id.ApplicationIdentifiers.ApplicationID = uid[:sepIdx]
 	id.DeviceID = uid[sepIdx+1:]
