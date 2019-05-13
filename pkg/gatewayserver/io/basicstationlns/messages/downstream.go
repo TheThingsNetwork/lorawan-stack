@@ -56,7 +56,8 @@ func (dnmsg DownlinkMessage) MarshalJSON() ([]byte, error) {
 }
 
 // FromDownlinkMessage translates the ttnpb.DownlinkMessage to LNS DownlinkMessage "dnmsg".
-func (dnmsg *DownlinkMessage) FromDownlinkMessage(ids ttnpb.GatewayIdentifiers, down ttnpb.DownlinkMessage, dlToken int64, dlTime time.Time) {
+func FromDownlinkMessage(ids ttnpb.GatewayIdentifiers, down ttnpb.DownlinkMessage, dlToken int64, dlTime time.Time) DownlinkMessage {
+	var dnmsg DownlinkMessage
 	scheduledMsg := down.GetScheduled()
 	dnmsg.Pdu = string(down.GetRawPayload())
 	dnmsg.RCtx = int64(scheduledMsg.Downlink.AntennaIndex)
@@ -77,7 +78,7 @@ func (dnmsg *DownlinkMessage) FromDownlinkMessage(ids ttnpb.GatewayIdentifiers, 
 	if scheduledMsg.Time != nil {
 		dnmsg.DeviceClass = uint(ttnpb.CLASS_B)
 		dnmsg.GpsTime = scheduledMsg.Time.Unix()
-		return
+		return dnmsg
 	}
 
 	dnmsg.DeviceClass = uint(ttnpb.CLASS_A)
@@ -85,6 +86,8 @@ func (dnmsg *DownlinkMessage) FromDownlinkMessage(ids ttnpb.GatewayIdentifiers, 
 	t := time.Unix(int64(scheduledMsg.Timestamp), 0)
 	offset := time.Duration((dnmsg.RxDelay + 1)) * time.Second
 	dnmsg.XTime = t.Add(-offset).Unix()
+
+	return dnmsg
 }
 
 // ToDownlinkMessage translates the LNS DownlinkMessage "dnmsg" to ttnpb.DownlinkMessage.

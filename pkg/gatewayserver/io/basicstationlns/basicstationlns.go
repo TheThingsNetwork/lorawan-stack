@@ -30,6 +30,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/basicstationlns/messages"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/web"
 	"google.golang.org/grpc/metadata"
 )
@@ -153,27 +154,24 @@ func (s *srv) handleTraffic(c echo.Context) error {
 		return err
 	}
 
-	ctx = log.NewContextWithField(ctx, "gateway_id", ids.GatewayID)
+	if auth == "" {
+		ctx = rights.NewContext(ctx, rights.Rights{
+			GatewayRights: map[string]*ttnpb.Rights{
+				id: {
+					Rights: []ttnpb.Right{ttnpb.RIGHT_GATEWAY_LINK},
+				},
+			},
+		})
+	}
+
+	uid := unique.ID(ctx, ids)
+	ctx = log.NewContextWithField(ctx, "gateway_uid", uid)
 
 	fp, err := s.server.GetFrequencyPlan(ctx, ids)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to get frequency plan")
 		return err
 	}
-	ws, err := s.upgrader.Upgrade(c.Response(), c.Request(), nil)
-	if err != nil {
-		logger.WithError(err).Debug("Failed to upgrade request to websocket connection")
-		return err
-	}
-	defer ws.Close()
-
-	ctx = rights.NewContext(ctx, rights.Rights{
-		GatewayRights: map[string]*ttnpb.Rights{
-			id: {
-				Rights: []ttnpb.Right{ttnpb.RIGHT_GATEWAY_LINK},
-			},
-		},
-	})
 
 	conn, err := s.server.Connect(ctx, s, ids)
 	if err != nil {
@@ -190,6 +188,13 @@ func (s *srv) handleTraffic(c echo.Context) error {
 		}
 	}()
 
+	ws, err := s.upgrader.Upgrade(c.Response(), c.Request(), nil)
+	if err != nil {
+		logger.WithError(err).Debug("Failed to upgrade request to websocket connection")
+		return err
+	}
+	defer ws.Close()
+
 	// Process downlinks in a separate go routine
 	go func() {
 		for {
@@ -197,9 +202,8 @@ func (s *srv) handleTraffic(c echo.Context) error {
 			case <-conn.Context().Done():
 				return
 			case down := <-conn.Down():
-				dnmsg := messages.DownlinkMessage{}
 				dlTime := time.Now()
-				dnmsg.FromDownlinkMessage(ids, *down, int64(s.tokens.Next(down.CorrelationIDs, dlTime)), dlTime)
+				dnmsg := messages.FromDownlinkMessage(ids, *down, int64(s.tokens.Next(down.CorrelationIDs, dlTime)), dlTime)
 				msg, err := dnmsg.MarshalJSON()
 				if err != nil {
 					logger.WithError(err).Error("Failed to marshal downlink message")
@@ -300,13 +304,13 @@ func (s *srv) handleTraffic(c echo.Context) error {
 			if cids, _, ok := s.tokens.Get(uint16(txConf.Diid), receivedAt); ok {
 				txAck := messages.ToTxAcknowledgment(cids)
 				if err := conn.HandleTxAck(&txAck); err != nil {
-					logger.Warn("Failed to handle Tx acknowledgement message")
+					logger.WithFields(log.Fields("diid", txConf.Diid)).Debug("Failed to handle Tx acknowledgement")
 				}
 			} else {
 				logger.Warn("TxAck either does not correspond to a downlink message or arrived too late")
 			}
 			recordRTT(conn, receivedAt, txConf.RefTime)
-			
+
 		case messages.TypeUpstreamProprietaryDataFrame:
 			return errMessageTypeNotImplemented.WithAttributes("type", typ)
 		case messages.TypeUpstreamRemoteShell:
