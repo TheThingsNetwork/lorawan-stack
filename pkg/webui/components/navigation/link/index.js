@@ -17,6 +17,8 @@ import classnames from 'classnames'
 
 import { NavLink } from 'react-router-dom'
 
+import Link from '../../link'
+
 import PropTypes from '../../../lib/prop-types'
 import style from './link.styl'
 
@@ -43,6 +45,21 @@ const NavigationLink = function ({
   )
 }
 
+const NavigationAnchorLink = function ({
+  className,
+  children,
+  path,
+  ...rest
+}) {
+  return (
+    <Link.Anchor
+      href={path}
+      className={classnames(className, style.link)}
+      children={children}
+    />
+  )
+}
+
 NavigationLink.propTypes = {
   /** The path for a link */
   path: PropTypes.string.isRequired,
@@ -55,4 +72,4 @@ NavigationLink.propTypes = {
   exact: PropTypes.bool.isRequired,
 }
 
-export default NavigationLink
+export { NavigationLink as default, NavigationAnchorLink }
