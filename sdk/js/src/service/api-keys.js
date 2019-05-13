@@ -20,6 +20,15 @@ class ApiKeys {
     this._parentRoutes = parentRoutes
   }
 
+  async getById (entityId, id) {
+    const entityIdRoute = this._parentRoutes.get
+    const result = await this._api.GetAPIKey({
+      routeParams: { [entityIdRoute]: entityId, key_id: id },
+    })
+
+    return Marshaler.payloadSingleResponse(result)
+  }
+
   async getAll (entityId, params) {
     const entityIdRoute = this._parentRoutes.list
     const result = await this._api.ListAPIKeys({
