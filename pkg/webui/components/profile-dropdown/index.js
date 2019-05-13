@@ -14,10 +14,10 @@
 
 import React from 'react'
 import bind from 'autobind-decorator'
-import { Link } from 'react-router-dom'
 
 import Icon from '../icon'
 import Message from '../../lib/components/message'
+import Link from '../link'
 import PropTypes from '../../lib/prop-types'
 
 import styles from './profile-dropdown.styl'
@@ -80,7 +80,7 @@ export default class ProfileDropdown extends React.PureComponent {
   }
 
   render () {
-    const { userId, dropdownItems, ...rest } = this.props
+    const { userId, dropdownItems, anchored, ...rest } = this.props
 
     return (
       <div
@@ -95,22 +95,33 @@ export default class ProfileDropdown extends React.PureComponent {
         <div className={styles.profilePicture} />
         <span className={styles.id}>{userId}</span>
         <Icon icon="arrow_drop_down" />
-        { this.state.expanded && <Dropdown items={dropdownItems} />}
+        { this.state.expanded && <Dropdown items={dropdownItems} anchored={anchored} />}
       </div>
     )
   }
 }
 
-const Dropdown = ({ items }) => (
+const Dropdown = ({ items, anchored }) => (
   <ul className={styles.dropdown}>
     { items.map( function (item) {
       const icon = item.icon && <Icon className={styles.icon} icon={item.icon} />
+      const ItemElement = item.action
+        ? (
+          <button
+            onClick={item.action}
+            onKeyPress={item.action}
+            role="tab"
+            tabIndex="0"
+          >
+            {icon}
+            <Message content={item.title} />
+          </button>)
+        : anchored
+          ? <Link.Anchor href={item.path}>{icon}<Message content={item.title} /></Link.Anchor>
+          : <Link to={item.path}>{icon}<Message content={item.title} /></Link>
       return (
         <li className={styles.dropdownItem} key={item.title.id || item.title}>
-          { item.action
-            ? <button onClick={item.action} onKeyPress={item.action} role="tab" tabIndex="0">{icon}<Message content={item.title} /></button>
-            : <Link to={item.path}>{icon}<Message content={item.title} /></Link>
-          }
+          { ItemElement }
         </li>
       )
     }
@@ -132,6 +143,8 @@ Dropdown.propTypes = {
     path: PropTypes.string,
     action: PropTypes.func,
   })),
+  /** Flag identifying whether link should be rendered as plain anchor link */
+  anchored: PropTypes.bool,
 }
 
 export { Dropdown }
