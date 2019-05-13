@@ -44,6 +44,25 @@ const getGatewaysLogic = createLogic({
   },
 })
 
+const getGatewaysRightsLogic = createLogic({
+  type: [
+    gateways.GET_GTWS_RIGHTS_LIST,
+  ],
+  async process ({ action }, dispatch, done) {
+    const { id } = action
+    try {
+      const result = await api.rights.gateways(id)
+
+      dispatch(gateways.getGatewaysRightsListSuccess(result.rights.sort()))
+    } catch (error) {
+      dispatch(gateways.getGatewaysRightsListFailure(error))
+    }
+
+    done()
+  },
+})
+
 export default [
   getGatewaysLogic,
+  getGatewaysRightsLogic,
 ]
