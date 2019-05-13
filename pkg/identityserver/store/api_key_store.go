@@ -67,6 +67,7 @@ func (s *apiKeyStore) FindAPIKeys(ctx context.Context, entityID *ttnpb.EntityIde
 	if err = query.Find(&keyModels).Error; err != nil {
 		return nil, err
 	}
+	setTotal(ctx, uint64(len(keyModels)))
 	keyProtos := make([]*ttnpb.APIKey, len(keyModels))
 	for i, apiKey := range keyModels {
 		keyProtos[i] = apiKey.toPB()
