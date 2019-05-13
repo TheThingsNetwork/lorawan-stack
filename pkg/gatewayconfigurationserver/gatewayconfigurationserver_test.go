@@ -36,8 +36,8 @@ import (
 )
 
 var (
-	registeredGatewayUID = "test-gateway"
 	registeredGatewayID  = ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"}
+	registeredGatewayUID = unique.ID(test.Context(), registeredGatewayID)
 	registeredGatewayKey = "test-key"
 
 	testConfig = &Config{
