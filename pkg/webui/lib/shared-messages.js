@@ -57,6 +57,7 @@ export default defineMessages({
   disconnected: 'Disconnected',
   downlinksScheduled: 'Downlinks (re)scheduled',
   edit: 'Edit',
+  keyEdit: 'Edit API Key',
   email: 'Email',
   entityId: 'Entity ID',
   firmwareVersion: 'Firmware Version',

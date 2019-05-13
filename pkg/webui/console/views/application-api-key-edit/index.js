@@ -16,69 +16,44 @@ import React from 'react'
 import { connect } from 'react-redux'
 import bind from 'autobind-decorator'
 import { Container, Col, Row } from 'react-grid-system'
-import { defineMessages } from 'react-intl'
-import * as Yup from 'yup'
 import { replace } from 'connected-react-router'
 
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import sharedMessages from '../../../lib/shared-messages'
-import Form from '../../../components/form'
-import Field from '../../../components/field'
-import Button from '../../../components/button'
 import Spinner from '../../../components/spinner'
-import ModalButton from '../../../components/button/modal-button'
 import Message from '../../../lib/components/message'
-import FieldGroup from '../../../components/field/group'
-import diff from '../../../lib/diff'
 import IntlHelmet from '../../../lib/components/intl-helmet'
-import toast from '../../../components/toast'
-import SubmitBar from '../../../components/submit-bar'
+import { ApiKeyEditForm } from '../../../components/api-key-form'
 
 import { getApplicationApiKeyPageData } from '../../store/actions/application'
+import {
+  applicationRightsSelector,
+  applicationRightsErrorSelector,
+  applicationRightsFetchingSelector,
+  applicationKeySelector,
+  applicationKeysErrorSelector,
+  applicationKeysFetchingSelector,
+} from '../../store/selectors/application'
+
 import api from '../../api'
 
-import style from './application-api-key-edit.styl'
-
-const m = defineMessages({
-  deleteKey: 'Delete Key',
-  modalWarning:
-    'Are you sure you want to delete the {keyName} API Key? Deleting an application API Key cannot be undone!',
-  keyEdit: 'Edit API Key',
-  updateSuccess: 'Successfully updated API Key',
-  deleteSuccess: 'Successfully deleted API Key',
-})
-
-const validationSchema = Yup.object().shape({
-  name: Yup.string()
-    .min(2, sharedMessages.validateTooShort)
-    .max(50, sharedMessages.validateTooLong),
-  rights: Yup.object().test(
-    'rights',
-    sharedMessages.validateRights,
-    values => Object.values(values).reduce((acc, curr) => acc || curr, false)
-  ),
-})
-
-@connect(function ({ apiKeys, rights }, props) {
+@connect(function (state, props) {
   const { appId, apiKeyId } = props.match.params
+  const ids = { id: appId, keyId: apiKeyId }
 
-  const keysFetching = apiKeys.applications.fetching
-  const rightsFetching = rights.applications.fetching
-  const keysError = apiKeys.applications.error
-  const rightsError = rights.applications.error
-
-  const appKeys = apiKeys.applications[appId]
-  const apiKey = appKeys ? appKeys.keys.find(k => k.id === apiKeyId) : undefined
-
-  const appRights = rights.applications
-  const rs = appRights ? appRights.rights : []
+  const keysFetching = applicationKeysFetchingSelector(state, ids)
+  const rightsFetching = applicationRightsFetchingSelector(state, props)
+  const keysError = applicationKeysErrorSelector(state, ids)
+  const rightsError = applicationRightsErrorSelector(state, props)
+  const apiKey = applicationKeySelector(state, ids)
+  const rights = applicationRightsSelector(state, props)
 
   return {
     keyId: apiKeyId,
     appId,
     apiKey,
-    rights: rs,
+    rights,
     fetching: keysFetching || rightsFetching,
     error: keysError || rightsError,
   }
@@ -97,8 +72,15 @@ const validationSchema = Yup.object().shape({
 @bind
 export default class ApplicationApiKeyEdit extends React.Component {
 
-  state = {
-    error: '',
+  constructor (props) {
+    super(props)
+
+    this.deleteApplicationKey = id => api.application.apiKeys.delete(props.appId, id)
+    this.editApplicationKey = key => api.application.apiKeys.update(
+      props.appId,
+      props.apiKey.id,
+      key
+    )
   }
 
   componentDidMount () {
@@ -107,47 +89,10 @@ export default class ApplicationApiKeyEdit extends React.Component {
     dispatch(getApplicationApiKeyPageData(appId))
   }
 
-  async handleSubmit (values, { setSubmitting, resetForm }) {
-    const { name, rights } = values
-    const { appId, apiKey } = this.props
+  onDeleteSuccess () {
+    const { appId, dispatch } = this.props
 
-    const changed = diff({ name: apiKey.name }, { name })
-    changed.rights = Object.keys(rights).filter(r => rights[r])
-
-    await this.setState({ error: '' })
-
-    try {
-      await api.application.apiKeys.update(
-        appId,
-        apiKey.id,
-        changed
-      )
-      resetForm({ ...values })
-      toast({
-        message: m.updateSuccess,
-        type: toast.types.SUCCESS,
-      })
-    } catch (error) {
-      resetForm({ ...values })
-      await this.setState(error)
-    }
-  }
-
-  async handleDelete () {
-    const { dispatch, appId, keyId } = this.props
-
-    await this.setState({ error: '' })
-
-    try {
-      await api.application.apiKeys.delete(appId, keyId)
-      toast({
-        message: m.deleteSuccess,
-        type: toast.types.SUCCESS,
-      })
-      dispatch(replace(`/console/applications/${appId}/api-keys`))
-    } catch (error) {
-      await this.setState(error)
-    }
+    dispatch(replace(`/console/applications/${appId}/api-keys`))
   }
 
   render () {
@@ -161,93 +106,23 @@ export default class ApplicationApiKeyEdit extends React.Component {
       return <Spinner center />
     }
 
-    const { rightsItems, rightsValues } = rights.reduce(
-      function (acc, right) {
-        acc.rightsItems.push(
-          <Field
-            className={style.rightLabel}
-            key={right}
-            name={right}
-            type="checkbox"
-            title={{ id: `enum:${right}` }}
-            form
-          />
-        )
-        acc.rightsValues[right] = apiKey.rights.includes(right)
-
-        return acc
-      },
-      {
-        rightsItems: [],
-        rightsValues: {},
-      }
-    )
-
-    const initialFormValues = {
-      id: apiKey.id,
-      name: apiKey.name,
-      rights: { ...rightsValues },
-    }
-
     return (
       <Container>
         <Row>
           <Col lg={8} md={12}>
-            <IntlHelmet title={m.keyEdit} />
-            <Message component="h2" content={m.keyEdit} />
+            <IntlHelmet title={sharedMessages.keyEdit} />
+            <Message component="h2" content={sharedMessages.keyEdit} />
           </Col>
         </Row>
         <Row>
           <Col lg={8} md={12}>
-            <Form
-              horizontal
-              error={this.state.error}
-              onSubmit={this.handleSubmit}
-              initialValues={initialFormValues}
-              validationSchema={validationSchema}
-            >
-              <Message
-                component="h4"
-                content={sharedMessages.generalInformation}
-              />
-              <Field
-                title={sharedMessages.keyId}
-                required
-                valid
-                disabled
-                name="id"
-                type="text"
-              />
-              <Field
-                title={sharedMessages.name}
-                name="name"
-                type="text"
-                autoFocus
-              />
-              <FieldGroup
-                name="rights"
-                title={sharedMessages.rights}
-              >
-                {rightsItems}
-              </FieldGroup>
-              <SubmitBar>
-                <Button type="submit" message={sharedMessages.saveChanges} />
-                <ModalButton
-                  type="button"
-                  icon="delete"
-                  danger
-                  naked
-                  message={m.deleteKey}
-                  modalData={{
-                    message: {
-                      values: { keyName: apiKey.name ? `"${apiKey.name}"` : '' },
-                      ...m.modalWarning,
-                    },
-                  }}
-                  onApprove={this.handleDelete}
-                />
-              </SubmitBar>
-            </Form>
+            <ApiKeyEditForm
+              rights={rights}
+              apiKey={apiKey}
+              onEdit={this.editApplicationKey}
+              onDelete={this.deleteApplicationKey}
+              onDeleteSuccess={this.onDeleteSuccess}
+            />
           </Col>
         </Row>
       </Container>

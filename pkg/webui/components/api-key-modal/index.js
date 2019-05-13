@@ -15,12 +15,12 @@
 import React from 'react'
 import { defineMessages } from 'react-intl'
 
-import PortalledModal from '../../../components/modal/portalled'
-import SafeInspector from '../../../components/safe-inspector'
-import Icon from '../../../components/icon'
-import Message from '../../../lib/components/message'
-import sharedMessages from '../../../lib/shared-messages'
-import PropTypes from '../../../lib/prop-types'
+import PortalledModal from '../modal/portalled'
+import SafeInspector from '../safe-inspector'
+import Icon from '../icon'
+import Message from '../../lib/components/message'
+import sharedMessages from '../../lib/shared-messages'
+import PropTypes from '../../lib/prop-types'
 
 import style from './api-key-modal.styl'
 
