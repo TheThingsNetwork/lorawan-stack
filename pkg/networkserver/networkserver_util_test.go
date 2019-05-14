@@ -16,14 +16,15 @@ package networkserver
 
 import (
 	"context"
-	"errors"
 	"testing"
 	"time"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/mohae/deepcopy"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
+	"google.golang.org/grpc"
 )
 
 const (
@@ -74,21 +75,60 @@ type MockDownlinkTaskQueue struct {
 	PopFunc func(ctx context.Context, f func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) error) error
 }
 
-// Add calls AddFunc if set and returns nil otherwise.
-func (q MockDownlinkTaskQueue) Add(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time, replace bool) error {
-	if q.AddFunc == nil {
-		return nil
+// Add calls AddFunc if set and panics otherwise.
+func (m MockDownlinkTaskQueue) Add(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time, replace bool) error {
+	if m.AddFunc == nil {
+		panic("Add called, but not set")
 	}
-	return q.AddFunc(ctx, devID, t, replace)
+	return m.AddFunc(ctx, devID, t, replace)
 }
 
-// Pop calls PopFunc if set and waits until read on ctx.Done() succeeds and returns ctx.Err() otherwise.
-func (q MockDownlinkTaskQueue) Pop(ctx context.Context, f func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) error) error {
-	if q.PopFunc == nil {
-		<-ctx.Done()
-		return ctx.Err()
+// Pop calls PopFunc if set and panics otherwise.
+func (m MockDownlinkTaskQueue) Pop(ctx context.Context, f func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) error) error {
+	if m.PopFunc == nil {
+		panic("Pop called, but not set")
 	}
-	return q.PopFunc(ctx, f)
+	return m.PopFunc(ctx, f)
+}
+
+type DownlinkTaskAddRequest struct {
+	Context     context.Context
+	Identifiers ttnpb.EndDeviceIdentifiers
+	Time        time.Time
+	Replace     bool
+	Response    chan<- error
+}
+
+func MakeDownlinkTaskAddChFunc(reqCh chan<- DownlinkTaskAddRequest) func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time, bool) error {
+	return func(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time, replace bool) error {
+		respCh := make(chan error)
+		reqCh <- DownlinkTaskAddRequest{
+			Context:     ctx,
+			Identifiers: devID,
+			Time:        t,
+			Replace:     replace,
+			Response:    respCh,
+		}
+		return <-respCh
+	}
+}
+
+type DownlinkTaskPopRequest struct {
+	Context  context.Context
+	Func     func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) error
+	Response chan<- error
+}
+
+func MakeDownlinkTaskPopChFunc(reqCh chan<- DownlinkTaskPopRequest) func(context.Context, func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) error) error {
+	return func(ctx context.Context, f func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) error) error {
+		respCh := make(chan error)
+		reqCh <- DownlinkTaskPopRequest{
+			Context:  ctx,
+			Func:     f,
+			Response: respCh,
+		}
+		return <-respCh
+	}
 }
 
 var _ DeviceRegistry = MockDeviceRegistry{}
@@ -101,36 +141,36 @@ type MockDeviceRegistry struct {
 	SetByIDFunc     func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
 }
 
-// GetByEUI calls GetByEUIFunc if set and returns nil, error otherwise.
-func (r MockDeviceRegistry) GetByEUI(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error) {
-	if r.GetByEUIFunc == nil {
-		return nil, errors.New("GetByEUI must not be called")
+// GetByEUI calls GetByEUIFunc if set and panics otherwise.
+func (m MockDeviceRegistry) GetByEUI(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error) {
+	if m.GetByEUIFunc == nil {
+		panic("GetByEUI called, but not set")
 	}
-	return r.GetByEUIFunc(ctx, joinEUI, devEUI, paths)
+	return m.GetByEUIFunc(ctx, joinEUI, devEUI, paths)
 }
 
-// GetByID calls GetByIDFunc if set and returns nil, error otherwise.
-func (r MockDeviceRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, error) {
-	if r.GetByIDFunc == nil {
-		return nil, errors.New("GetByID must not be called")
+// GetByID calls GetByIDFunc if set and panics otherwise.
+func (m MockDeviceRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, error) {
+	if m.GetByIDFunc == nil {
+		panic("GetByID called, but not set")
 	}
-	return r.GetByIDFunc(ctx, appID, devID, paths)
+	return m.GetByIDFunc(ctx, appID, devID, paths)
 }
 
-// RangeByAddr calls RangeByAddrFunc if set and returns error otherwise.
-func (r MockDeviceRegistry) RangeByAddr(ctx context.Context, devAddr types.DevAddr, paths []string, f func(*ttnpb.EndDevice) bool) error {
-	if r.RangeByAddrFunc == nil {
-		return errors.New("RangeByAddr must not be called")
+// RangeByAddr calls RangeByAddrFunc if set and panics otherwise.
+func (m MockDeviceRegistry) RangeByAddr(ctx context.Context, devAddr types.DevAddr, paths []string, f func(*ttnpb.EndDevice) bool) error {
+	if m.RangeByAddrFunc == nil {
+		panic("RangeByAddr called, but not set")
 	}
-	return r.RangeByAddrFunc(ctx, devAddr, paths, f)
+	return m.RangeByAddrFunc(ctx, devAddr, paths, f)
 }
 
-// SetByID calls SetByIDFunc if set and returns nil, error otherwise.
-func (r MockDeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
-	if r.SetByIDFunc == nil {
-		return nil, errors.New("SetByID must not be called")
+// SetByID calls SetByIDFunc if set and panics otherwise.
+func (m MockDeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+	if m.SetByIDFunc == nil {
+		panic("SetByID called, but not set")
 	}
-	return r.SetByIDFunc(ctx, appID, devID, paths, f)
+	return m.SetByIDFunc(ctx, appID, devID, paths, f)
 }
 
 var _ ttnpb.NsJsServer = &MockNsJsServer{}
@@ -140,18 +180,20 @@ type MockNsJsServer struct {
 	GetNwkSKeysFunc func(context.Context, *ttnpb.SessionKeyRequest) (*ttnpb.NwkSKeysResponse, error)
 }
 
-func (js *MockNsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error) {
-	if js.HandleJoinFunc == nil {
-		return nil, errors.New("HandleJoin must not be called")
+// HandleJoin calls HandleJoinFunc if set and panics otherwise.
+func (m MockNsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error) {
+	if m.HandleJoinFunc == nil {
+		panic("HandleJoin called, but not set")
 	}
-	return js.HandleJoinFunc(ctx, req)
+	return m.HandleJoinFunc(ctx, req)
 }
 
-func (js *MockNsJsServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.NwkSKeysResponse, error) {
-	if js.GetNwkSKeysFunc == nil {
-		return nil, errors.New("GetNwkSKeys must not be called")
+// GetNwkSKeys calls GetNwkSKeysFunc if set and panics otherwise.
+func (m MockNsJsServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.NwkSKeysResponse, error) {
+	if m.GetNwkSKeysFunc == nil {
+		panic("GetNwkSKeys called, but not set")
 	}
-	return js.GetNwkSKeysFunc(ctx, req)
+	return m.GetNwkSKeysFunc(ctx, req)
 }
 
 type HandleJoinResponse struct {
@@ -183,27 +225,28 @@ type MockNsGsServer struct {
 	ScheduleDownlinkFunc func(context.Context, *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error)
 }
 
-func (m *MockNsGsServer) ScheduleDownlink(ctx context.Context, msg *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error) {
+// ScheduleDownlink calls ScheduleDownlinkFunc if set and panics otherwise.
+func (m MockNsGsServer) ScheduleDownlink(ctx context.Context, msg *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error) {
 	if m.ScheduleDownlinkFunc == nil {
-		return nil, nil
+		panic("ScheduleDownlink called, but not set")
 	}
 	return m.ScheduleDownlinkFunc(ctx, msg)
 }
 
-type ScheduleDownlinkResponse struct {
+type NsGsScheduleDownlinkResponse struct {
 	Response *ttnpb.ScheduleDownlinkResponse
 	Error    error
 }
-type ScheduleDownlinkRequest struct {
+type NsGsScheduleDownlinkRequest struct {
 	Context  context.Context
 	Message  *ttnpb.DownlinkMessage
-	Response chan<- ScheduleDownlinkResponse
+	Response chan<- NsGsScheduleDownlinkResponse
 }
 
-func MakeScheduleDownlinkChFunc(reqCh chan<- ScheduleDownlinkRequest) func(context.Context, *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error) {
+func MakeNsGsScheduleDownlinkChFunc(reqCh chan<- NsGsScheduleDownlinkRequest) func(context.Context, *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error) {
 	return func(ctx context.Context, msg *ttnpb.DownlinkMessage) (*ttnpb.ScheduleDownlinkResponse, error) {
-		respCh := make(chan ScheduleDownlinkResponse)
-		reqCh <- ScheduleDownlinkRequest{
+		respCh := make(chan NsGsScheduleDownlinkResponse)
+		reqCh <- NsGsScheduleDownlinkRequest{
 			Context:  ctx,
 			Message:  msg,
 			Response: respCh,
@@ -213,7 +256,7 @@ func MakeScheduleDownlinkChFunc(reqCh chan<- ScheduleDownlinkRequest) func(conte
 	}
 }
 
-func AssertScheduleDownlinkRequest(t *testing.T, reqCh <-chan ScheduleDownlinkRequest, timeout time.Duration, assert func(ctx context.Context, msg *ttnpb.DownlinkMessage) bool, resp ScheduleDownlinkResponse) bool {
+func AssertNsGsScheduleDownlinkRequest(t *testing.T, reqCh <-chan NsGsScheduleDownlinkRequest, timeout time.Duration, assert func(ctx context.Context, msg *ttnpb.DownlinkMessage) bool, resp NsGsScheduleDownlinkResponse) bool {
 	t.Helper()
 	select {
 	case req := <-reqCh:
@@ -251,4 +294,52 @@ func MakeWindowEndChFunc(reqCh chan<- WindowEndRequest) func(ctx context.Context
 		}
 		return respCh
 	}
+}
+
+var _ ttnpb.AsNs_LinkApplicationServer = &MockAsNsLinkApplicationStream{}
+
+type MockAsNsLinkApplicationStream struct {
+	*test.MockServerStream
+	SendFunc func(*ttnpb.ApplicationUp) error
+	RecvFunc func() (*pbtypes.Empty, error)
+}
+
+// Send calls SendFunc if set and panics otherwise.
+func (m MockAsNsLinkApplicationStream) Send(msg *ttnpb.ApplicationUp) error {
+	if m.SendFunc == nil {
+		panic("Send called, but not set")
+	}
+	return m.SendFunc(msg)
+}
+
+// Recv calls RecvFunc if set and panics otherwise.
+func (m MockAsNsLinkApplicationStream) Recv() (*pbtypes.Empty, error) {
+	if m.RecvFunc == nil {
+		panic("Recv called, but not set")
+	}
+	return m.RecvFunc()
+}
+
+var _ ttnpb.NsJsClient = &MockNsJsClient{}
+
+type MockNsJsClient struct {
+	*test.MockClientStream
+	HandleJoinFunc  func(context.Context, *ttnpb.JoinRequest, ...grpc.CallOption) (*ttnpb.JoinResponse, error)
+	GetNwkSKeysFunc func(context.Context, *ttnpb.SessionKeyRequest, ...grpc.CallOption) (*ttnpb.NwkSKeysResponse, error)
+}
+
+// HandleJoin calls HandleJoinFunc if set and panics otherwise.
+func (m MockNsJsClient) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, opts ...grpc.CallOption) (*ttnpb.JoinResponse, error) {
+	if m.HandleJoinFunc == nil {
+		panic("HandleJoin called, but not set")
+	}
+	return m.HandleJoinFunc(ctx, req, opts...)
+}
+
+// GetNwkSKeys calls GetNwkSKeysFunc if set and panics otherwise.
+func (m MockNsJsClient) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequest, opts ...grpc.CallOption) (*ttnpb.NwkSKeysResponse, error) {
+	if m.GetNwkSKeysFunc == nil {
+		panic("GetNwkSKeys called, but not set")
+	}
+	return m.GetNwkSKeysFunc(ctx, req, opts...)
 }

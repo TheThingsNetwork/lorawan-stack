@@ -35,42 +35,42 @@ type MockPeer struct {
 	TagsFunc    func() map[string]string
 }
 
-// Name calls NameFunc if set and returns empty string otherwise.
+// Name calls NameFunc if set and panics otherwise.
 func (m MockPeer) Name() string {
 	if m.NameFunc == nil {
-		return ""
+		panic("Name called, but not set")
 	}
 	return m.NameFunc()
 }
 
-// Conn calls ConnFunc if set and returns nil otherwise.
+// Conn calls ConnFunc if set and panics otherwise.
 func (m MockPeer) Conn() *grpc.ClientConn {
 	if m.ConnFunc == nil {
-		return nil
+		panic("Conn called, but not set")
 	}
 	return m.ConnFunc()
 }
 
-// HasRole calls HasRoleFunc if set and returns false otherwise.
+// HasRole calls HasRoleFunc if set and panics otherwise.
 func (m MockPeer) HasRole(r ttnpb.PeerInfo_Role) bool {
 	if m.HasRoleFunc == nil {
-		return false
+		panic("HasRole called, but not set")
 	}
 	return m.HasRoleFunc(r)
 }
 
-// Roles calls RolesFunc if set and returns nil otherwise.
+// Roles calls RolesFunc if set and panics otherwise.
 func (m MockPeer) Roles() []ttnpb.PeerInfo_Role {
 	if m.RolesFunc == nil {
-		return nil
+		panic("Roles called, but not set")
 	}
 	return m.RolesFunc()
 }
 
-// Tags calls TagsFunc if set and returns nil otherwise.
+// Tags calls TagsFunc if set and panics otherwise.
 func (m MockPeer) Tags() map[string]string {
 	if m.TagsFunc == nil {
-		return nil
+		panic("Tags called, but not set")
 	}
 	return m.TagsFunc()
 }
@@ -108,89 +108,89 @@ type MockCluster struct {
 	WithVerifiedSourceFunc func(ctx context.Context) context.Context
 }
 
-// Join calls JoinFunc if set and returns nil otherwise.
+// Join calls JoinFunc if set and panics otherwise.
 func (m MockCluster) Join() error {
 	if m.JoinFunc == nil {
-		return nil
+		panic("Join called, but not set")
 	}
 	return m.JoinFunc()
 }
 
-// Leave calls LeaveFunc if set and returns nil otherwise.
+// Leave calls LeaveFunc if set and panics otherwise.
 func (m MockCluster) Leave() error {
 	if m.LeaveFunc == nil {
-		return nil
+		panic("Leave called, but not set")
 	}
 	return m.LeaveFunc()
 }
 
-// GetPeers calls GetPeersFunc if set and returns nil otherwise.
+// GetPeers calls GetPeersFunc if set and panics otherwise.
 func (m MockCluster) GetPeers(ctx context.Context, role ttnpb.PeerInfo_Role) []cluster.Peer {
 	if m.GetPeersFunc == nil {
-		return nil
+		panic("GetPeers called, but not set")
 	}
 	return m.GetPeersFunc(ctx, role)
 }
 
-// GetPeer calls GetPeerFunc if set and returns nil otherwise.
+// GetPeer calls GetPeerFunc if set and panics otherwise.
 func (m MockCluster) GetPeer(ctx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) cluster.Peer {
 	if m.GetPeerFunc == nil {
-		return nil
+		panic("GetPeer called, but not set")
 	}
 	return m.GetPeerFunc(ctx, role, ids)
 }
 
-// ClaimIDs calls ClaimIDsFunc if set and returns nil otherwise.
+// ClaimIDs calls ClaimIDsFunc if set and panics otherwise.
 func (m MockCluster) ClaimIDs(ctx context.Context, ids ttnpb.Identifiers) error {
 	if m.ClaimIDsFunc == nil {
-		return nil
+		panic("ClaimIDs called, but not set")
 	}
 	return m.ClaimIDsFunc(ctx, ids)
 }
 
-// UnclaimIDs calls UnclaimIDsFunc if set and returns nil otherwise.
+// UnclaimIDs calls UnclaimIDsFunc if set and panics otherwise.
 func (m MockCluster) UnclaimIDs(ctx context.Context, ids ttnpb.Identifiers) error {
 	if m.UnclaimIDsFunc == nil {
-		return nil
+		panic("UnclaimIDs called, but not set")
 	}
 	return m.UnclaimIDsFunc(ctx, ids)
 }
 
-// TLS calls TLSFunc if s et and returns false otherwise.
+// TLS calls TLSFunc if set and panics otherwise.
 func (m MockCluster) TLS() bool {
 	if m.TLSFunc == nil {
-		return false
+		panic("TLS called, but not set")
 	}
 	return m.TLSFunc()
 }
 
-// Auth calls AuthFunc if set and returns grpc.EmptyCallOption{} otherwise.
+// Auth calls AuthFunc if set and panics otherwise.
 func (m MockCluster) Auth() grpc.CallOption {
 	if m.AuthFunc == nil {
-		return grpc.EmptyCallOption{}
+		panic("Auth called, but not set")
 	}
 	return m.AuthFunc()
 }
 
-// WithVerifiedSource calls WithVerifiedSourceFunc if set and returns ctx otherwise.
+// WithVerifiedSource calls WithVerifiedSourceFunc if set and panics otherwise.
 func (m MockCluster) WithVerifiedSource(ctx context.Context) context.Context {
 	if m.WithVerifiedSourceFunc == nil {
-		return ctx
+		panic("WithVerifiedSource called, but not set")
 	}
 	return m.WithVerifiedSourceFunc(ctx)
 }
 
-type GetPeerRequest struct {
+type ClusterGetPeerRequest struct {
 	Context     context.Context
 	Role        ttnpb.PeerInfo_Role
 	Identifiers ttnpb.Identifiers
 	Response    chan<- cluster.Peer
 }
 
-func MakeGetPeerChFunc(reqCh chan<- GetPeerRequest) func(context.Context, ttnpb.PeerInfo_Role, ttnpb.Identifiers) cluster.Peer {
+func MakeClusterGetPeerChFunc(reqCh chan<- ClusterGetPeerRequest) func(context.Context, ttnpb.PeerInfo_Role, ttnpb.Identifiers) cluster.Peer {
 	return func(ctx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) cluster.Peer {
 		respCh := make(chan cluster.Peer)
-		reqCh <- GetPeerRequest{
+		reqCh <- ClusterGetPeerRequest{
 			Context:     ctx,
 			Role:        role,
 			Identifiers: ids,
@@ -200,7 +200,21 @@ func MakeGetPeerChFunc(reqCh chan<- GetPeerRequest) func(context.Context, ttnpb.
 	}
 }
 
-func AssertGetPeerRequest(t *testing.T, reqCh <-chan GetPeerRequest, timeout time.Duration, assert func(ctx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) bool, peer cluster.Peer) bool {
+type ClusterJoinRequest struct {
+	Response chan<- error
+}
+
+func MakeClusterJoinChFunc(reqCh chan<- ClusterJoinRequest) func() error {
+	return func() error {
+		respCh := make(chan error)
+		reqCh <- ClusterJoinRequest{
+			Response: respCh,
+		}
+		return <-respCh
+	}
+}
+
+func AssertClusterGetPeerRequest(t *testing.T, reqCh <-chan ClusterGetPeerRequest, timeout time.Duration, assert func(ctx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) bool, peer cluster.Peer) bool {
 	t.Helper()
 	select {
 	case req := <-reqCh:

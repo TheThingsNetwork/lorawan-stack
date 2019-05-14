@@ -17,7 +17,6 @@ package applicationserver_test
 import (
 	"context"
 
-	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 )
@@ -32,18 +31,18 @@ type MockDeviceRegistry struct {
 	SetFunc func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
 }
 
-// Get calls GetFunc if set and returns nil, error otherwise.
+// Get calls GetFunc if set and panics otherwise.
 func (r MockDeviceRegistry) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
 	if r.GetFunc == nil {
-		return nil, errors.New("GetFunc not set")
+		panic("Get called, but not set")
 	}
 	return r.GetFunc(ctx, ids, paths)
 }
 
-// Set calls SetFunc if set and returns nil, error otherwise.
+// Set calls SetFunc if set and panics otherwise.
 func (r MockDeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 	if r.SetFunc == nil {
-		return nil, errors.New("SetFunc not set")
+		panic("Set called, but not set")
 	}
 	return r.SetFunc(ctx, ids, paths, f)
 }

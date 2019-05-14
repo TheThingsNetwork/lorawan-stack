@@ -1758,28 +1758,6 @@ func handleUplinkTest() func(t *testing.T) {
 	}
 }
 
-var _ ttnpb.NsJsClient = &MockNsJsClient{}
-
-type MockNsJsClient struct {
-	*test.MockClientStream
-	HandleJoinFunc  func(context.Context, *ttnpb.JoinRequest, ...grpc.CallOption) (*ttnpb.JoinResponse, error)
-	GetNwkSKeysFunc func(context.Context, *ttnpb.SessionKeyRequest, ...grpc.CallOption) (*ttnpb.NwkSKeysResponse, error)
-}
-
-func (js *MockNsJsClient) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, opts ...grpc.CallOption) (*ttnpb.JoinResponse, error) {
-	if js.HandleJoinFunc == nil {
-		return nil, errors.New("HandleJoinFunc not set")
-	}
-	return js.HandleJoinFunc(ctx, req, opts...)
-}
-
-func (js *MockNsJsClient) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequest, opts ...grpc.CallOption) (*ttnpb.NwkSKeysResponse, error) {
-	if js.GetNwkSKeysFunc == nil {
-		return nil, errors.New("GetNwkSKeysFunc not set")
-	}
-	return js.GetNwkSKeysFunc(ctx, req, opts...)
-}
-
 func handleJoinTest() func(t *testing.T) {
 	return func(t *testing.T) {
 		authorizedCtx := clusterauth.NewContext(test.Context(), nil)

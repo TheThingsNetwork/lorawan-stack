@@ -30,25 +30,28 @@ type MockEventPubSub struct {
 	UnsubscribeFunc func(string, events.Handler)
 }
 
-func (ps *MockEventPubSub) Publish(ev events.Event) {
-	if ps.PublishFunc == nil {
-		return
+// Publish calls PublishFunc if set and panics otherwise.
+func (m MockEventPubSub) Publish(ev events.Event) {
+	if m.PublishFunc == nil {
+		panic("Publish called, but not set")
 	}
-	ps.PublishFunc(ev)
+	m.PublishFunc(ev)
 }
 
-func (ps *MockEventPubSub) Subscribe(name string, hdl events.Handler) error {
-	if ps.SubscribeFunc == nil {
-		return nil
+// Subscribe calls SubscribeFunc if set and panics otherwise.
+func (m MockEventPubSub) Subscribe(name string, hdl events.Handler) error {
+	if m.SubscribeFunc == nil {
+		panic("Subscribe called, but not set")
 	}
-	return ps.SubscribeFunc(name, hdl)
+	return m.SubscribeFunc(name, hdl)
 }
 
-func (ps *MockEventPubSub) Unsubscribe(name string, hdl events.Handler) {
-	if ps.UnsubscribeFunc == nil {
-		return
+// Unsubscribe calls UnsubscribeFunc if set and panics otherwise.
+func (m MockEventPubSub) Unsubscribe(name string, hdl events.Handler) {
+	if m.UnsubscribeFunc == nil {
+		panic("Unsubscribe called, but not set")
 	}
-	ps.UnsubscribeFunc(name, hdl)
+	m.UnsubscribeFunc(name, hdl)
 }
 
 // TODO(#1008) Move collectEvents to the test package

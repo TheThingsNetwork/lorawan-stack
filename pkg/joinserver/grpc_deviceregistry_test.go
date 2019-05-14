@@ -1476,7 +1476,7 @@ type mockJsEndDeviceRegistryProvisionServer struct {
 
 func (s *mockJsEndDeviceRegistryProvisionServer) Send(up *ttnpb.EndDevice) error {
 	if s.SendFunc == nil {
-		return nil
+		panic("Send called, but not set")
 	}
 	return s.SendFunc(up)
 }

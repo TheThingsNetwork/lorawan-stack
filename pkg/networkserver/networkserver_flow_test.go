@@ -58,7 +58,7 @@ func newJSPeer(ctx context.Context, js interface {
 	return test.Must(test.NewGRPCServerPeer(ctx, js, ttnpb.RegisterNsJsServer)).(cluster.Peer)
 }
 
-func assertLinkApplication(t *testing.T, ctx context.Context, conn *grpc.ClientConn, getPeerCh <-chan test.GetPeerRequest, timeout time.Duration, appID string) (ttnpb.AsNs_LinkApplicationClient, bool) {
+func assertLinkApplication(t *testing.T, ctx context.Context, conn *grpc.ClientConn, getPeerCh <-chan test.ClusterGetPeerRequest, timeout time.Duration, appID string) (ttnpb.AsNs_LinkApplicationClient, bool) {
 	t.Helper()
 
 	a := assertions.New(t)
@@ -86,7 +86,7 @@ func assertLinkApplication(t *testing.T, ctx context.Context, conn *grpc.ClientC
 		wg.Done()
 	}()
 
-	if !a.So(test.AssertGetPeerRequest(t, getPeerCh, Timeout,
+	if !a.So(test.AssertClusterGetPeerRequest(t, getPeerCh, Timeout,
 		func(ctx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) bool {
 			return a.So(role, should.Equal, ttnpb.PeerInfo_ACCESS) && a.So(ids, should.BeNil)
 		},
@@ -115,7 +115,7 @@ func assertLinkApplication(t *testing.T, ctx context.Context, conn *grpc.ClientC
 	return link, a.So(err, should.BeNil)
 }
 
-func assertSetDevice(t *testing.T, ctx context.Context, conn *grpc.ClientConn, getPeerCh <-chan test.GetPeerRequest, timeout time.Duration, appID string, req *ttnpb.SetEndDeviceRequest) (*ttnpb.EndDevice, bool) {
+func assertSetDevice(t *testing.T, ctx context.Context, conn *grpc.ClientConn, getPeerCh <-chan test.ClusterGetPeerRequest, timeout time.Duration, appID string, req *ttnpb.SetEndDeviceRequest) (*ttnpb.EndDevice, bool) {
 	t.Helper()
 
 	a := assertions.New(t)
@@ -142,7 +142,7 @@ func assertSetDevice(t *testing.T, ctx context.Context, conn *grpc.ClientConn, g
 		wg.Done()
 	}()
 
-	if !a.So(test.AssertGetPeerRequest(t, getPeerCh, Timeout,
+	if !a.So(test.AssertClusterGetPeerRequest(t, getPeerCh, Timeout,
 		func(ctx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) bool {
 			return a.So(role, should.Equal, ttnpb.PeerInfo_ACCESS) && a.So(ids, should.BeNil)
 		},
@@ -174,7 +174,7 @@ func assertSetDevice(t *testing.T, ctx context.Context, conn *grpc.ClientConn, g
 func handleOTAAClassA868FlowTest(t *testing.T, reg DeviceRegistry, tq DownlinkTaskQueue) {
 	a := assertions.New(t)
 
-	getPeerCh := make(chan test.GetPeerRequest)
+	getPeerCh := make(chan test.ClusterGetPeerRequest)
 
 	collectionDoneCh := make(chan WindowEndRequest)
 	deduplicationDoneCh := make(chan WindowEndRequest)
@@ -203,7 +203,7 @@ func handleOTAAClassA868FlowTest(t *testing.T, reg DeviceRegistry, tq DownlinkTa
 					})
 				}
 				return &test.MockCluster{
-					GetPeerFunc: test.MakeGetPeerChFunc(getPeerCh),
+					GetPeerFunc: test.MakeClusterGetPeerChFunc(getPeerCh),
 					WithVerifiedSourceFunc: func(ctx context.Context) context.Context {
 						return clusterauth.NewContext(ctx, nil)
 					},
@@ -345,7 +345,7 @@ func handleOTAAClassA868FlowTest(t *testing.T, reg DeviceRegistry, tq DownlinkTa
 			close(handleUplinkErrCh)
 		}()
 
-		a.So(test.AssertGetPeerRequest(t, getPeerCh, Timeout,
+		a.So(test.AssertClusterGetPeerRequest(t, getPeerCh, Timeout,
 			func(ctx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) bool {
 				return a.So(role, should.Equal, ttnpb.PeerInfo_JOIN_SERVER) &&
 					a.So(ids, should.Resemble, ttnpb.EndDeviceIdentifiers{
@@ -476,7 +476,7 @@ func handleOTAAClassA868FlowTest(t *testing.T, reg DeviceRegistry, tq DownlinkTa
 			t.Fatal("Timed out while waiting for HandleUplink to return")
 		}
 
-		a.So(test.AssertGetPeerRequest(t, getPeerCh, Timeout,
+		a.So(test.AssertClusterGetPeerRequest(t, getPeerCh, Timeout,
 			func(ctx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) bool {
 				return a.So(role, should.Equal, ttnpb.PeerInfo_GATEWAY_SERVER) &&
 					a.So(ids, should.Resemble, ttnpb.GatewayIdentifiers{
@@ -662,7 +662,7 @@ func handleOTAAClassA868FlowTest(t *testing.T, reg DeviceRegistry, tq DownlinkTa
 			t.Fatal("Timed out while waiting for HandleUplink to return")
 		}
 
-		a.So(test.AssertGetPeerRequest(t, getPeerCh, Timeout,
+		a.So(test.AssertClusterGetPeerRequest(t, getPeerCh, Timeout,
 			func(ctx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) bool {
 				return a.So(role, should.Equal, ttnpb.PeerInfo_GATEWAY_SERVER) &&
 					a.So(ids, should.Resemble, ttnpb.GatewayIdentifiers{
