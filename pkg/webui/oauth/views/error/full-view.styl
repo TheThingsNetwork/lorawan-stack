@@ -1,0 +1,37 @@
+// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+.full-view-error
+  height: 100%
+  background: url('../../../assets/img/layout/bg/ttn-console-bg.png') no-repeat
+  background-size: 160vh
+  background-position: 40vw 20%
+  padding-top: 20vh
+  +media-query($bp.m)
+    background-size: 140vh
+    background-position: 60vw 20%
+  +media-query($bp.s)
+    background-size: 160vh
+    background-position: 0vw 20vh
+
+  &-header
+    h2()
+    margin-bottom: $cs.xs
+    +media-query($bp.s)
+      margin-top: $ls.l
+
+  &-sub
+    one-liner()
+    display: block
+    margin-bottom: $cs.xl
