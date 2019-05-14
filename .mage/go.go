@@ -16,6 +16,7 @@ package ttnmage
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"os"
 	"strconv"
@@ -37,12 +38,28 @@ var goModuleEnv = map[string]string{
 
 var goTags = os.Getenv("GO_TAGS")
 
-func execGo(cmd string, args ...string) error {
+func buildGoArgs(cmd string, args ...string) []string {
 	if goTags != "" {
 		args = append([]string{fmt.Sprintf("-tags=%s", goTags)}, args...)
 	}
-	_, err := sh.Exec(goModuleEnv, os.Stdout, os.Stderr, "go", append([]string{cmd}, args...)...)
+	return append([]string{cmd}, args...)
+}
+
+func execGo(cmd string, args ...string) error {
+	_, err := sh.Exec(goModuleEnv, os.Stdout, os.Stderr, "go", buildGoArgs(cmd, args...)...)
 	return err
+}
+
+func outputGo(cmd string, args ...string) (string, error) {
+	if goTags != "" {
+		args = append([]string{fmt.Sprintf("-tags=%s", goTags)}, args...)
+	}
+	var buf bytes.Buffer
+	_, err := sh.Exec(goModuleEnv, &buf, os.Stderr, "go", buildGoArgs(cmd, args...)...)
+	if err != nil {
+		return "", err
+	}
+	return buf.String(), nil
 }
 
 // CheckVersion checks the installed Go version against the minimum version we support.
@@ -50,7 +67,7 @@ func (Go) CheckVersion() error {
 	if mg.Verbose() {
 		fmt.Println("Checking Go version")
 	}
-	versionStr, err := sh.Output("go", "version")
+	versionStr, err := outputGo("version")
 	if err != nil {
 		return err
 	}
@@ -79,7 +96,7 @@ func (Go) packageDirs() (packageDirs []string, err error) {
 		goPackageDirs = packageDirs
 	}()
 
-	dirs, err := sh.OutputWith(goModuleEnv, "go", "list", "-f", "{{.Dir}}", "./...")
+	dirs, err := outputGo("list", "-f", "{{.Dir}}", "./...")
 	if err != nil {
 		return nil, err
 	}
