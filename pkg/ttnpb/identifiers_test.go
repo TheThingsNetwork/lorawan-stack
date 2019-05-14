@@ -65,7 +65,7 @@ func TestIdentifiersIsZero(t *testing.T) {
 func TestCombinedIdentifiers(t *testing.T) {
 	a := assertions.New(t)
 
-	for _, msg := range []Identifiers{
+	for _, msg := range []interface{ CombinedIdentifiers() *CombinedIdentifiers }{
 		NewPopulatedApplicationIdentifiers(test.Randy, true),
 		NewPopulatedClientIdentifiers(test.Randy, true),
 		NewPopulatedEndDeviceIdentifiers(test.Randy, true),
