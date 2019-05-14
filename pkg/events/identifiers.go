@@ -22,12 +22,16 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/unique"
 )
 
+type CombinedIdentifiers interface {
+	CombinedIdentifiers() *ttnpb.CombinedIdentifiers
+}
+
 // IdentifierFilter can be used as a layer on top of a PubSub to filter events
 // based on the identifiers they contain.
 type IdentifierFilter interface {
 	Handler
-	Subscribe(ctx context.Context, ids ttnpb.Identifiers, handler Handler)
-	Unsubscribe(ctx context.Context, ids ttnpb.Identifiers, handler Handler)
+	Subscribe(ctx context.Context, ids CombinedIdentifiers, handler Handler)
+	Unsubscribe(ctx context.Context, ids CombinedIdentifiers, handler Handler)
 }
 
 // NewIdentifierFilter returns a new IdentifierFilter (see interface).
@@ -61,7 +65,7 @@ type identifierFilter struct {
 	userIDs         map[string][]Handler
 }
 
-func (f *identifierFilter) Subscribe(ctx context.Context, ids ttnpb.Identifiers, handler Handler) {
+func (f *identifierFilter) Subscribe(ctx context.Context, ids CombinedIdentifiers, handler Handler) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	for _, entityIDs := range ids.CombinedIdentifiers().GetEntityIdentifiers() {
@@ -94,7 +98,7 @@ func removeHandler(handlers []Handler, toRemove Handler) []Handler {
 	return updated
 }
 
-func (f *identifierFilter) Unsubscribe(ctx context.Context, ids ttnpb.Identifiers, handler Handler) {
+func (f *identifierFilter) Unsubscribe(ctx context.Context, ids CombinedIdentifiers, handler Handler) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	for _, entityIDs := range ids.CombinedIdentifiers().GetEntityIdentifiers() {
