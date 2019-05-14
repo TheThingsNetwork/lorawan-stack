@@ -55,7 +55,9 @@ func Hook(next grpc.UnaryHandler) grpc.UnaryHandler {
 		if !ok {
 			panic(errNoFetcher)
 		}
-		ids, ok := req.(ttnpb.Identifiers)
+		ids, ok := req.(interface {
+			CombinedIdentifiers() *ttnpb.CombinedIdentifiers
+		})
 		if !ok {
 			return next(ctx, req)
 		}
