@@ -147,7 +147,7 @@ func (is *IdentityServer) listClients(ctx context.Context, req *ttnpb.ListClient
 		}
 		cliRights = make(map[string]*ttnpb.Rights, len(callerRights))
 		for ids, rights := range callerRights {
-			if ids := ids.GetClientIDs(); ids != nil {
+			if ids.EntityType() == "client" {
 				cliRights[unique.ID(ctx, ids)] = rights
 			}
 		}

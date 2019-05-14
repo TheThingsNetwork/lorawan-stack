@@ -49,7 +49,7 @@ var requestAccessKey requestAccessKeyType
 
 type requestAccess struct {
 	authInfo     *ttnpb.AuthInfoResponse
-	entityRights map[*ttnpb.EntityIdentifiers]*ttnpb.Rights
+	entityRights map[ttnpb.Identifiers]*ttnpb.Rights
 }
 
 func (is *IdentityServer) withRequestAccessCache(ctx context.Context) context.Context {
@@ -121,11 +121,11 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 			res.AccessMethod = &ttnpb.AuthInfoResponse_APIKey{
 				APIKey: &ttnpb.AuthInfoResponse_APIKeyAccess{
 					APIKey:    *apiKey,
-					EntityIDs: *ids,
+					EntityIDs: *ids.EntityIdentifiers(),
 				},
 			}
-			if userIDs := ids.GetUserIDs(); userIDs != nil {
-				user, err = store.GetUserStore(db).GetUser(ctx, userIDs, userFieldMask)
+			if ids.EntityType() == "user" {
+				user, err = store.GetUserStore(db).GetUser(ctx, ids.Identifiers().(*ttnpb.UserIdentifiers), userFieldMask)
 				if err != nil {
 					if errors.IsNotFound(err) {
 						return errAPIKeyNotFound.WithCause(err)
@@ -285,16 +285,16 @@ func restrictRights(info *ttnpb.AuthInfoResponse, rights *ttnpb.Rights) {
 	info.UniversalRights = info.UniversalRights.Intersect(rights)
 }
 
-func entityRights(authInfo *ttnpb.AuthInfoResponse) (*ttnpb.EntityIdentifiers, *ttnpb.Rights) {
+func entityRights(authInfo *ttnpb.AuthInfoResponse) (ttnpb.Identifiers, *ttnpb.Rights) {
 	if apiKey := authInfo.GetAPIKey(); apiKey != nil {
-		return &apiKey.EntityIDs, ttnpb.RightsFrom(apiKey.Rights...)
+		return apiKey.EntityIDs.Identifiers(), ttnpb.RightsFrom(apiKey.Rights...)
 	} else if accessToken := authInfo.GetOAuthAccessToken(); accessToken != nil {
-		return accessToken.UserIDs.EntityIdentifiers(), ttnpb.RightsFrom(accessToken.Rights...)
+		return &accessToken.UserIDs, ttnpb.RightsFrom(accessToken.Rights...)
 	}
 	return nil, nil
 }
 
-func (is *IdentityServer) entityRights(ctx context.Context, authInfo *ttnpb.AuthInfoResponse) (res map[*ttnpb.EntityIdentifiers]*ttnpb.Rights, err error) {
+func (is *IdentityServer) entityRights(ctx context.Context, authInfo *ttnpb.AuthInfoResponse) (res map[ttnpb.Identifiers]*ttnpb.Rights, err error) {
 	if access, ok := ctx.Value(requestAccessKey).(*requestAccess); ok {
 		if access.entityRights != nil {
 			return access.entityRights, nil
@@ -310,7 +310,7 @@ func (is *IdentityServer) entityRights(ctx context.Context, authInfo *ttnpb.Auth
 	if ids == nil {
 		return nil, nil
 	}
-	entityRights := make(map[*ttnpb.EntityIdentifiers]*ttnpb.Rights)
+	entityRights := make(map[ttnpb.Identifiers]*ttnpb.Rights)
 	entityRights[ids] = rights
 	memberRights, err := is.memberRights(ctx, ids)
 	if err != nil {
@@ -322,17 +322,14 @@ func (is *IdentityServer) entityRights(ctx context.Context, authInfo *ttnpb.Auth
 	return entityRights, nil
 }
 
-func (is *IdentityServer) memberRights(ctx context.Context, ids *ttnpb.EntityIdentifiers) (entityRights map[*ttnpb.EntityIdentifiers]*ttnpb.Rights, err error) {
-	var ouIDs *ttnpb.OrganizationOrUserIdentifiers
-	switch ids := ids.Identifiers().(type) {
-	case *ttnpb.OrganizationIdentifiers:
-		ouIDs = ids.OrganizationOrUserIdentifiers()
-	case *ttnpb.UserIdentifiers:
-		ouIDs = ids.OrganizationOrUserIdentifiers()
-	}
-	if ouIDs == nil {
+func (is *IdentityServer) memberRights(ctx context.Context, ids ttnpb.Identifiers) (entityRights map[ttnpb.Identifiers]*ttnpb.Rights, err error) {
+	orgOrUsr, ok := ids.(interface {
+		OrganizationOrUserIdentifiers() *ttnpb.OrganizationOrUserIdentifiers
+	})
+	if !ok {
 		return nil, nil
 	}
+	ouIDs := orgOrUsr.OrganizationOrUserIdentifiers()
 
 	memberships := is.cachedMembershipsForAccount(ctx, ouIDs)
 	if memberships == nil {
@@ -351,15 +348,15 @@ func (is *IdentityServer) memberRights(ctx context.Context, ids *ttnpb.EntityIde
 		}()
 	}
 
-	entityRights = make(map[*ttnpb.EntityIdentifiers]*ttnpb.Rights)
+	entityRights = make(map[ttnpb.Identifiers]*ttnpb.Rights)
 	for ids, rights := range memberships {
-		entityRights[ids] = rights
+		entityRights[ids.Identifiers()] = rights
 		subMemberRights, err := is.memberRights(ctx, ids)
 		if err != nil {
 			return nil, err
 		}
 		for ids, memberRights := range subMemberRights {
-			entityRights[ids] = memberRights.Implied().Intersect(rights.Implied())
+			entityRights[ids.Identifiers()] = memberRights.Implied().Intersect(rights.Implied())
 		}
 	}
 	return entityRights, nil

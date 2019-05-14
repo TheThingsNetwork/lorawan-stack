@@ -121,7 +121,7 @@ func (is *IdentityServer) listApplications(ctx context.Context, req *ttnpb.ListA
 		}
 		appRights = make(map[string]*ttnpb.Rights, len(callerRights))
 		for ids, rights := range callerRights {
-			if ids := ids.GetApplicationIDs(); ids != nil {
+			if ids.EntityType() == "application" {
 				appRights[unique.ID(ctx, ids)] = rights
 			}
 		}

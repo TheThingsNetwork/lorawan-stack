@@ -121,7 +121,7 @@ func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.List
 		}
 		orgRights = make(map[string]*ttnpb.Rights, len(callerRights))
 		for ids, rights := range callerRights {
-			if ids := ids.GetOrganizationIDs(); ids != nil {
+			if ids.EntityType() == "organization" {
 				orgRights[unique.ID(ctx, ids)] = rights
 			}
 		}

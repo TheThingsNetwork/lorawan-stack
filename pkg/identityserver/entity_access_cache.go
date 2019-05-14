@@ -24,7 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/unique"
 )
 
-func (is *IdentityServer) cachedMembershipsForAccount(ctx context.Context, ouIDs *ttnpb.OrganizationOrUserIdentifiers) map[*ttnpb.EntityIdentifiers]*ttnpb.Rights {
+func (is *IdentityServer) cachedMembershipsForAccount(ctx context.Context, ouIDs *ttnpb.OrganizationOrUserIdentifiers) map[ttnpb.Identifiers]*ttnpb.Rights {
 	if is.redis == nil || is.config.AuthCache.MembershipTTL == 0 {
 		return nil
 	}
@@ -39,7 +39,7 @@ func (is *IdentityServer) cachedMembershipsForAccount(ctx context.Context, ouIDs
 	if len(hash) == 0 {
 		return nil
 	}
-	entityRights := make(map[*ttnpb.EntityIdentifiers]*ttnpb.Rights, len(hash))
+	entityRights := make(map[ttnpb.Identifiers]*ttnpb.Rights, len(hash))
 	for k, v := range hash {
 		var entity ttnpb.EntityIdentifiers
 		var rights ttnpb.Rights
@@ -49,7 +49,7 @@ func (is *IdentityServer) cachedMembershipsForAccount(ctx context.Context, ouIDs
 		if err = ttnredis.UnmarshalProto(v, &rights); err != nil {
 			return nil
 		}
-		entityRights[&entity] = &rights
+		entityRights[entity.Identifiers()] = &rights
 	}
 	return entityRights
 }
@@ -64,7 +64,7 @@ func (is *IdentityServer) invalidateCachedMembershipsForAccount(ctx context.Cont
 	}
 }
 
-func (is *IdentityServer) cacheMembershipsForAccount(ctx context.Context, ouIDs *ttnpb.OrganizationOrUserIdentifiers, entityRights map[*ttnpb.EntityIdentifiers]*ttnpb.Rights) {
+func (is *IdentityServer) cacheMembershipsForAccount(ctx context.Context, ouIDs *ttnpb.OrganizationOrUserIdentifiers, entityRights map[ttnpb.Identifiers]*ttnpb.Rights) {
 	if is.redis == nil || is.config.AuthCache.MembershipTTL == 0 {
 		return
 	}
@@ -73,7 +73,7 @@ func (is *IdentityServer) cacheMembershipsForAccount(ctx context.Context, ouIDs 
 	}
 	hash := make(map[string]interface{}, len(entityRights))
 	for entity, rights := range entityRights {
-		k, err := ttnredis.MarshalProto(entity)
+		k, err := ttnredis.MarshalProto(entity.EntityIdentifiers())
 		if err != nil {
 			return
 		}

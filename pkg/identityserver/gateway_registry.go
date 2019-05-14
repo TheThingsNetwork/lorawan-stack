@@ -140,7 +140,7 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 		}
 		gtwRights = make(map[string]*ttnpb.Rights, len(callerRights))
 		for ids, rights := range callerRights {
-			if ids := ids.GetGatewayIDs(); ids != nil {
+			if ids.EntityType() == "gateway" {
 				gtwRights[unique.ID(ctx, ids)] = rights
 			}
 		}
