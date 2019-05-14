@@ -32,15 +32,7 @@ var errFormat = errors.DefineInvalidArgument("format", "invalid format in value 
 // The reason for panicking is that taking the unique identifier of a nil or
 // zero value may result in unexpected and potentially harmful behavior.
 func ID(ctx context.Context, id ttnpb.Identifiers) (res string) {
-	if idStringer, ok := id.(interface{ IDString() string }); ok {
-		res = idStringer.IDString()
-	} else {
-		eids := id.CombinedIdentifiers().EntityIdentifiers
-		if len(eids) != 1 {
-			panic(fmt.Errorf("failed to determine unique ID: invalid number of identifiers for unique ID"))
-		}
-		res = eids[0].IDString()
-	}
+	res = id.IDString()
 	if res == "" || strings.HasPrefix(res, ".") || strings.HasSuffix(res, ".") {
 		panic(fmt.Errorf("failed to determine unique ID: the primary identifier is invalid"))
 	}

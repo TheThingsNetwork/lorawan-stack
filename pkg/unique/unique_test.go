@@ -27,15 +27,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-type customIdentifiers struct {
-}
-
-func (c customIdentifiers) IsZero() bool { return false }
-
-func (c customIdentifiers) CombinedIdentifiers() *ttnpb.CombinedIdentifiers {
-	return &ttnpb.CombinedIdentifiers{}
-}
-
 func TestValidity(t *testing.T) {
 	eui := types.EUI64{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01}
 	for _, tc := range []ttnpb.Identifiers{
@@ -66,8 +57,6 @@ func TestValidity(t *testing.T) {
 		ttnpb.OrganizationIdentifiers{},
 		(*ttnpb.UserIdentifiers)(nil),
 		ttnpb.UserIdentifiers{},
-		customIdentifiers{},
-		&customIdentifiers{},
 	} {
 		t.Run(fmt.Sprintf("%T", tc), func(t *testing.T) {
 			a := assertions.New(t)
@@ -167,7 +156,7 @@ func TestRoundtrip(t *testing.T) {
 			if tc.Parser != nil {
 				parsed, err := tc.Parser(tc.Expected)
 				if a.So(err, should.BeNil) {
-					a.So(parsed.CombinedIdentifiers(), should.Resemble, tc.ID.CombinedIdentifiers())
+					a.So(parsed.EntityIdentifiers(), should.Resemble, tc.ID.EntityIdentifiers())
 				}
 			}
 		})
