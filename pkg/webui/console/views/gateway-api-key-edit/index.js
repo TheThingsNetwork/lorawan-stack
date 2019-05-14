@@ -104,7 +104,7 @@ export default class GatewayApiKeyEdit extends React.Component {
     const { apiKey, rights, fetching, error } = this.props
 
     if (error) {
-      return 'ERROR'
+      throw error
     }
 
     if (fetching || !apiKey) {
