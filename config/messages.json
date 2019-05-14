@@ -2888,6 +2888,15 @@
       "file": "gatewayserver.go"
     }
   },
+  "error:pkg/gatewayserver:host_handle": {
+    "translations": {
+      "en": "host `{host}` failed to handle message"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "gatewayserver.go"
+    }
+  },
   "error:pkg/gatewayserver:listen_frontend": {
     "translations": {
       "en": "failed to start frontend listener `{protocol}` on address `{address}`"

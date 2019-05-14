@@ -81,6 +81,9 @@ func New(c *component.Component, conf *Config) (gs *GatewayServer, err error) {
 	if err != nil {
 		return nil, err
 	}
+	if len(forward) == 0 {
+		forward[""] = []types.DevAddrPrefix{{}}
+	}
 	gs = &GatewayServer{
 		Component:                 c,
 		ctx:                       log.NewContextWithField(c.Context(), "namespace", "gatewayserver"),
@@ -321,7 +324,10 @@ func (gs *GatewayServer) GetConnection(ctx context.Context, ids ttnpb.GatewayIde
 	return conn.(*io.Connection), true
 }
 
-var errNoNetworkServer = errors.DefineNotFound("no_network_server", "no Network Server found to handle message")
+var (
+	errNoNetworkServer = errors.DefineNotFound("no_network_server", "no Network Server found to handle message")
+	errHostHandle      = errors.Define("host_handle", "host `{host}` failed to handle message")
+)
 
 var (
 	// maxUpstreamHandlers is the maximum number of goroutines per gateway connection to handle upstream messages.
@@ -341,9 +347,22 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 		logger.Info("Disconnected")
 	}()
 
+	type handler interface {
+		HandleUplink(context.Context, *ttnpb.UplinkMessage, ...grpc.CallOption) (*pbtypes.Empty, error)
+	}
+	type host struct {
+		name     string
+		handler  func(ids *ttnpb.EndDeviceIdentifiers) handler
+		callOpts []grpc.CallOption
+	}
+	type item struct {
+		val  interface{}
+		host *host
+	}
+
 	wg := &sync.WaitGroup{}
 	handlers := int32(0)
-	handleCh := make(chan interface{})
+	handleCh := make(chan item)
 	handleFn := func() {
 		defer wg.Done()
 		defer atomic.AddInt32(&handlers, -1)
@@ -354,7 +373,7 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 			case <-time.After(upstreamHandlerIdleTimeout):
 				return
 			case item := <-handleCh:
-				switch msg := item.(type) {
+				switch msg := item.val.(type) {
 				case *ttnpb.UplinkMessage:
 					ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:uplink:%s", events.NewCorrelationID()))
 					msg.CorrelationIDs = append(msg.CorrelationIDs, events.CorrelationIDsFromContext(ctx)...)
@@ -378,16 +397,15 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 						drop(ttnpb.EndDeviceIdentifiers{}, err)
 						break
 					}
-					ns := gs.GetPeer(ctx, ttnpb.PeerInfo_NETWORK_SERVER, ids)
-					if ns == nil {
-						drop(ids, errNoNetworkServer)
+					handler := item.host.handler(&ids)
+					if handler == nil {
 						break
 					}
-					if _, err := ttnpb.NewGsNsClient(ns.Conn()).HandleUplink(ctx, msg, gs.WithClusterAuth()); err != nil {
-						drop(ids, err)
+					if _, err := handler.HandleUplink(ctx, msg, item.host.callOpts...); err != nil {
+						drop(ids, errHostHandle.WithCause(err).WithAttributes("host", item.host.name))
 						break
 					}
-					registerForwardUplink(ctx, ids, conn.Gateway(), msg, ns.Name())
+					registerForwardUplink(ctx, ids, conn.Gateway(), msg, item.host.name)
 
 				case *ttnpb.GatewayStatus:
 					ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:status:%s", events.NewCorrelationID()))
@@ -406,25 +424,64 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 		}
 	}
 
+	hosts := make([]*host, 0, len(gs.forward))
+	for name, prefixes := range gs.forward {
+		passDevAddr := func(devAddr types.DevAddr) bool {
+			for _, prefix := range prefixes {
+				if devAddr.HasPrefix(prefix) {
+					return true
+				}
+			}
+			return false
+		}
+		if name == "" {
+			// Cluster Network Server; filter based on DevAddr and pass all join-requests.
+			hosts = append(hosts, &host{
+				name: name,
+				handler: func(ids *ttnpb.EndDeviceIdentifiers) handler {
+					if ids != nil && ids.DevAddr != nil && !passDevAddr(*ids.DevAddr) {
+						return nil
+					}
+					ns := gs.GetPeer(ctx, ttnpb.PeerInfo_NETWORK_SERVER, ids)
+					if ns == nil {
+						logger.Warn("Cluster Network Server unavailable for upstream traffic")
+						return nil
+					}
+					return ttnpb.NewGsNsClient(ns.Conn())
+				},
+				callOpts: []grpc.CallOption{gs.WithClusterAuth()},
+			})
+		} else {
+			// Packet Broker; filter based on DevAddr and filter all join-requests.
+			// TODO: Offload traffic to Packet Broker (https://github.com/TheThingsNetwork/lorawan-stack/issues/671)
+		}
+	}
+
 	defer wg.Wait()
 	for {
-		var item interface{}
+		var val interface{}
 		select {
 		case <-ctx.Done():
 			return
-		case item = <-conn.Up():
-		case item = <-conn.Status():
-		case item = <-conn.TxAck():
+		case val = <-conn.Up():
+		case val = <-conn.Status():
+		case val = <-conn.TxAck():
 		}
-		select {
-		case handleCh <- item:
-		default:
-			if atomic.LoadInt32(&handlers) < maxUpstreamHandlers {
-				atomic.AddInt32(&handlers, 1)
-				wg.Add(1)
-				go handleFn()
+		for _, host := range hosts {
+			item := item{
+				val:  val,
+				host: host,
 			}
-			handleCh <- item
+			select {
+			case handleCh <- item:
+			default:
+				if atomic.LoadInt32(&handlers) < maxUpstreamHandlers {
+					atomic.AddInt32(&handlers, 1)
+					wg.Add(1)
+					go handleFn()
+				}
+				handleCh <- item
+			}
 		}
 	}
 }
