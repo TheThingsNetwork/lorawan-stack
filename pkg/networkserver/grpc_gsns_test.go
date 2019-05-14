@@ -65,26 +65,26 @@ type UplinkHandler interface {
 	HandleUplink(context.Context, *ttnpb.UplinkMessage) (*pbtypes.Empty, error)
 }
 
-func sendUplinkDuplicates(t *testing.T, h UplinkHandler, windowEndCh chan windowEnd, ctx context.Context, msg *ttnpb.UplinkMessage, n int) []*ttnpb.RxMetadata {
+func sendUplinkDuplicates(t *testing.T, h UplinkHandler, windowEndCh chan WindowEndRequest, ctx context.Context, msg *ttnpb.UplinkMessage, n int) []*ttnpb.RxMetadata {
 	t.Helper()
 
 	a := assertions.New(t)
 
-	var weCh chan<- time.Time
+	var weResp chan<- time.Time
 	select {
-	case we := <-windowEndCh:
+	case weReq := <-windowEndCh:
 		msg := CopyUplinkMessage(msg)
 
-		a.So(we.msg.ReceivedAt, should.HappenBefore, time.Now())
-		msg.ReceivedAt = we.msg.ReceivedAt
+		a.So(weReq.Message.ReceivedAt, should.HappenBefore, time.Now())
+		msg.ReceivedAt = weReq.Message.ReceivedAt
 
-		a.So(we.msg.CorrelationIDs, should.NotBeEmpty)
-		msg.CorrelationIDs = we.msg.CorrelationIDs
+		a.So(weReq.Message.CorrelationIDs, should.NotBeEmpty)
+		msg.CorrelationIDs = weReq.Message.CorrelationIDs
 
-		a.So(we.msg, should.Resemble, msg)
-		a.So(we.ctx, should.HaveParentContext, ctx)
+		a.So(weReq.Message, should.Resemble, msg)
+		a.So(weReq.Context, should.HaveParentContext, ctx)
 
-		weCh = we.ch
+		weResp = weReq.Response
 
 	case <-time.After(Timeout):
 		t.Fatal("Timed out while waiting for window end request to arrive")
@@ -123,7 +123,7 @@ func sendUplinkDuplicates(t *testing.T, h UplinkHandler, windowEndCh chan window
 			}
 
 			select {
-			case weCh <- time.Now():
+			case weResp <- time.Now():
 
 			case <-time.After(Timeout):
 				t.Fatal("Timed out while waiting for metadata collection to stop")
@@ -141,12 +141,6 @@ func sendUplinkDuplicates(t *testing.T, h UplinkHandler, windowEndCh chan window
 		mds = append(mds, md)
 	}
 	return mds
-}
-
-type windowEnd struct {
-	ctx context.Context
-	msg *ttnpb.UplinkMessage
-	ch  chan<- time.Time
 }
 
 func handleUplinkTest() func(t *testing.T) {
@@ -1421,14 +1415,24 @@ func handleUplinkTest() func(t *testing.T) {
 					a.So(ret, should.Resemble, pb)
 				}
 
-				deduplicationDoneCh := make(chan windowEnd, 1)
-				collectionDoneCh := make(chan windowEnd, 1)
+				deduplicationDoneCh := make(chan WindowEndRequest, 1)
+				defer func() {
+					close(deduplicationDoneCh)
+				}()
+
+				collectionDoneCh := make(chan WindowEndRequest, 1)
+				defer func() {
+					close(collectionDoneCh)
+				}()
 
 				type asSendReq struct {
 					up    *ttnpb.ApplicationUp
 					errch chan error
 				}
 				asSendCh := make(chan asSendReq)
+				defer func() {
+					close(asSendCh)
+				}()
 
 				type downlinkTasksAddRequest struct {
 					ctx     context.Context
@@ -1456,16 +1460,8 @@ func handleUplinkTest() func(t *testing.T) {
 							},
 						},
 					},
-					WithDeduplicationDoneFunc(func(ctx context.Context, msg *ttnpb.UplinkMessage) <-chan time.Time {
-						ch := make(chan time.Time, 1)
-						deduplicationDoneCh <- windowEnd{ctx, msg, ch}
-						return ch
-					}),
-					WithCollectionDoneFunc(func(ctx context.Context, msg *ttnpb.UplinkMessage) <-chan time.Time {
-						ch := make(chan time.Time, 1)
-						collectionDoneCh <- windowEnd{ctx, msg, ch}
-						return ch
-					}),
+					WithCollectionDoneFunc(MakeWindowEndChFunc(collectionDoneCh)),
+					WithDeduplicationDoneFunc(MakeWindowEndChFunc(deduplicationDoneCh)),
 					WithASUplinkHandler(func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, up *ttnpb.ApplicationUp) (bool, error) {
 						req := asSendReq{
 							up:    up,
@@ -1541,8 +1537,8 @@ func handleUplinkTest() func(t *testing.T) {
 						}
 						close(req.errch)
 
-					case we := <-collectionDoneCh:
-						close(we.ch)
+					case weReq := <-collectionDoneCh:
+						close(weReq.Response)
 						err := <-errch
 						a.So(err, should.BeNil)
 						t.Fatalf("Downlink (n)ack not sent to AS: %v", errors.Stack(err))
@@ -1574,8 +1570,8 @@ func handleUplinkTest() func(t *testing.T) {
 						}},
 					})
 
-				case we := <-collectionDoneCh:
-					close(we.ch)
+				case weReq := <-collectionDoneCh:
+					close(weReq.Response)
 					a.So(<-errch, should.BeNil)
 					t.Fatal("Uplink not sent to AS")
 
@@ -1637,7 +1633,6 @@ func handleUplinkTest() func(t *testing.T) {
 					t.FailNow()
 				}
 
-				close(deduplicationDoneCh)
 				close(asUpReq.errch)
 
 				select {
@@ -1652,7 +1647,6 @@ func handleUplinkTest() func(t *testing.T) {
 				}
 
 				_ = sendUplinkDuplicates(t, ns, collectionDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
-				close(collectionDoneCh)
 
 				select {
 				case err := <-errch:
@@ -1665,9 +1659,6 @@ func handleUplinkTest() func(t *testing.T) {
 				t.Run("after cooldown window", func(t *testing.T) {
 					a := assertions.New(t)
 
-					deduplicationDoneCh = make(chan windowEnd, 1)
-					collectionDoneCh = make(chan windowEnd, 1)
-
 					errch := make(chan error, 1)
 					go func() {
 						_, err = ns.HandleUplink(ctx, CopyUplinkMessage(tc.UplinkMessage))
@@ -1675,9 +1666,7 @@ func handleUplinkTest() func(t *testing.T) {
 					}()
 
 					if pb.MACState != nil && pb.MACState.CurrentParameters.ADRNbTrans <= 1 {
-						close(deduplicationDoneCh)
 						_ = sendUplinkDuplicates(t, ns, collectionDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
-						close(collectionDoneCh)
 
 						select {
 						case err := <-errch:
@@ -1693,15 +1682,15 @@ func handleUplinkTest() func(t *testing.T) {
 					if pb.MACState != nil && pb.MACState.PendingApplicationDownlink != nil {
 						select {
 						case req := <-asSendCh:
+							close(req.errch)
 							if tc.UplinkMessage.Payload.GetMACPayload().Ack {
 								a.So(req.up.GetDownlinkAck(), should.Resemble, pb.MACState.PendingApplicationDownlink)
 							} else {
 								a.So(req.up.GetDownlinkNack(), should.Resemble, pb.MACState.PendingApplicationDownlink)
 							}
-							close(req.errch)
 
-						case we := <-collectionDoneCh:
-							close(we.ch)
+						case weReq := <-collectionDoneCh:
+							close(weReq.Response)
 							a.So(<-errch, should.BeNil)
 							t.Fatal("Downlink (n)ack not sent to AS")
 
@@ -1731,8 +1720,8 @@ func handleUplinkTest() func(t *testing.T) {
 							}},
 						})
 
-					case we := <-collectionDoneCh:
-						close(we.ch)
+					case weReq := <-collectionDoneCh:
+						close(weReq.Response)
 						a.So(<-errch, should.BeNil)
 						t.Fatal("Uplink not sent to AS")
 
@@ -1740,7 +1729,6 @@ func handleUplinkTest() func(t *testing.T) {
 						t.Fatal("Timed out while waiting for uplink to be sent to AS")
 					}
 
-					close(deduplicationDoneCh)
 					close(asUpReq.errch)
 
 					select {
@@ -2048,10 +2036,25 @@ func handleJoinTest() func(t *testing.T) {
 				}
 				downlinkAddCh := make(chan downlinkTasksAddRequest, 1)
 
-				deduplicationDoneCh := make(chan windowEnd, 1)
-				collectionDoneCh := make(chan windowEnd, 1)
+				deduplicationDoneCh := make(chan WindowEndRequest, 1)
+				defer func() {
+					close(deduplicationDoneCh)
+				}()
+
+				collectionDoneCh := make(chan WindowEndRequest, 1)
+				defer func() {
+					close(collectionDoneCh)
+				}()
+
 				handleJoinCh := make(chan handleJoinRequest, 1)
+				defer func() {
+					close(handleJoinCh)
+				}()
+
 				asSendCh := make(chan *ttnpb.ApplicationUp)
+				defer func() {
+					close(asSendCh)
+				}()
 
 				keys := ttnpb.NewPopulatedSessionKeys(test.Randy, false)
 				if tc.Device.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
@@ -2076,16 +2079,8 @@ func handleJoinTest() func(t *testing.T) {
 							},
 						},
 					},
-					WithDeduplicationDoneFunc(func(ctx context.Context, msg *ttnpb.UplinkMessage) <-chan time.Time {
-						ch := make(chan time.Time, 1)
-						deduplicationDoneCh <- windowEnd{ctx, msg, ch}
-						return ch
-					}),
-					WithCollectionDoneFunc(func(ctx context.Context, msg *ttnpb.UplinkMessage) <-chan time.Time {
-						ch := make(chan time.Time, 1)
-						collectionDoneCh <- windowEnd{ctx, msg, ch}
-						return ch
-					}),
+					WithCollectionDoneFunc(MakeWindowEndChFunc(collectionDoneCh)),
+					WithDeduplicationDoneFunc(MakeWindowEndChFunc(deduplicationDoneCh)),
 					WithNsJsClientFunc(func(ctx context.Context, id ttnpb.EndDeviceIdentifiers) (ttnpb.NsJsClient, error) {
 						return &MockNsJsClient{
 							GetNwkSKeysFunc: func(ctx context.Context, req *ttnpb.SessionKeyRequest, _ ...grpc.CallOption) (*ttnpb.NwkSKeysResponse, error) {
@@ -2226,18 +2221,16 @@ func handleJoinTest() func(t *testing.T) {
 					req.ch <- resp
 					req.errch <- nil
 
-				case we := <-collectionDoneCh:
-					close(we.ch)
+				case weReq := <-collectionDoneCh:
+					close(weReq.Response)
 					a.So(<-errch, should.BeNil)
 					t.Fatal("Join-request not sent to JS")
 
 				case <-time.After(Timeout):
-					t.Fatal("Timed out while waiting for join to be sent to JS")
+					t.Fatal("Timed out while waiting for join-request to be sent to JS")
 				}
 
 				md := sendUplinkDuplicates(t, ns, deduplicationDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
-
-				close(deduplicationDoneCh)
 
 				select {
 				case up := <-asSendCh:
@@ -2310,7 +2303,7 @@ func handleJoinTest() func(t *testing.T) {
 					})
 
 				case <-time.After(Timeout):
-					t.Fatal("Timed out while waiting for join to be sent to AS")
+					t.Fatal("Timed out while waiting for join-request to be sent to AS")
 				}
 
 				select {
@@ -2325,7 +2318,6 @@ func handleJoinTest() func(t *testing.T) {
 				}
 
 				_ = sendUplinkDuplicates(t, ns, collectionDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
-				close(collectionDoneCh)
 
 				select {
 				case err := <-errch:
@@ -2334,9 +2326,6 @@ func handleJoinTest() func(t *testing.T) {
 				case <-time.After(Timeout):
 					t.Fatal("Timed out while waiting for HandleUplink to return")
 				}
-
-				deduplicationDoneCh = make(chan windowEnd, 1)
-				collectionDoneCh = make(chan windowEnd, 1)
 
 				t.Run("after cooldown window", func(t *testing.T) {
 					a := assertions.New(t)
@@ -2371,11 +2360,10 @@ func handleJoinTest() func(t *testing.T) {
 						t.Fatal("Join not sent to JS")
 
 					case <-time.After(Timeout):
-						t.Fatal("Timed out while waiting for join to be sent to JS")
+						t.Fatal("Timed out while waiting for join-request to be sent to JS")
 					}
 
 					_ = sendUplinkDuplicates(t, ns, deduplicationDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
-					close(deduplicationDoneCh)
 
 					pb, err = devReg.GetByID(ctx, pb.EndDeviceIdentifiers.ApplicationIdentifiers, pb.EndDeviceIdentifiers.DeviceID, ttnpb.EndDeviceFieldPathsTopLevel)
 					if !a.So(err, should.BeNil) {
@@ -2402,7 +2390,7 @@ func handleJoinTest() func(t *testing.T) {
 						})
 
 					case <-time.After(Timeout):
-						t.Fatal("Timed out while waiting for join to be sent to AS")
+						t.Fatal("Timed out while waiting for join-request to be sent to AS")
 					}
 
 					pb.EndDeviceIdentifiers.DevAddr = &expectedRequest.DevAddr
@@ -2418,7 +2406,6 @@ func handleJoinTest() func(t *testing.T) {
 					}
 
 					_ = sendUplinkDuplicates(t, ns, collectionDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
-					close(collectionDoneCh)
 
 					select {
 					case err := <-errch:
