@@ -15,62 +15,53 @@
 import React from 'react'
 
 import { Route, Switch, withRouter } from 'react-router-dom'
-import { connect } from 'react-redux'
 import bind from 'autobind-decorator'
 import { Helmet } from 'react-helmet'
 
 import { withEnv } from '../../../lib/components/env'
+import ErrorView from '../../../lib/components/error-view'
 import SideNavigation from '../../../components/navigation/side'
-import Header from '../../../components/header'
+import Header from '../../containers/header'
 import Footer from '../../../components/footer'
 import Landing from '../landing'
 import Login from '../login'
-
-import { logout } from '../../store/actions/user'
+import FullViewError from '../error'
 
 import style from './app.styl'
 
 @withRouter
 @withEnv
-@connect(state => ({
-  user: state.user.user,
-}))
 @bind
 export default class ConsoleApp extends React.Component {
-
-  handleLogout () {
-    const { dispatch } = this.props
-    dispatch(logout())
-  }
-
   render () {
     const {
-      user,
       env,
     } = this.props
 
     return (
-      <div className={style.app}>
-        <Helmet
-          titleTemplate="%s - Console - TTN Stack"
-          defaultTitle="TTN Stack Console"
-        />
-        <div id="modal-container" />
-        <Header className={style.header} user={user} handleLogout={this.handleLogout} />
-        <main className={style.main}>
-          <div>
-            <SideNavigation />
-          </div>
-          <div className={style.content}>
-            <Switch>
-              {/* routes for registration, privacy policy, other public pages */}
-              <Route path={`${env.app_root}/login`} component={Login} />
-              <Route path={env.app_root} component={Landing} />
-            </Switch>
-          </div>
-        </main>
-        <Footer className={style.footer} />
-      </div>
+      <ErrorView ErrorComponent={FullViewError}>
+        <div className={style.app}>
+          <Helmet
+            titleTemplate="%s - Console - TTN Stack"
+            defaultTitle="TTN Stack Console"
+          />
+          <div id="modal-container" />
+          <Header className={style.header} />
+          <main className={style.main}>
+            <div>
+              <SideNavigation />
+            </div>
+            <div className={style.content}>
+              <Switch>
+                {/* routes for registration, privacy policy, other public pages */}
+                <Route path={`${env.app_root}/login`} component={Login} />
+                <Route path={env.app_root} component={Landing} />
+              </Switch>
+            </div>
+          </main>
+          <Footer className={style.footer} />
+        </div>
+      </ErrorView>
     )
   }
 }
