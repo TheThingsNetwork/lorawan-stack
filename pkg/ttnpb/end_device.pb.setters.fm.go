@@ -1605,6 +1605,16 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 			} else {
 				dst.ProvisioningData = nil
 			}
+		case "multicast":
+			if len(subs) > 0 {
+				return fmt.Errorf("'multicast' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Multicast = src.Multicast
+			} else {
+				var zero bool
+				dst.Multicast = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
