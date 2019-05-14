@@ -14,7 +14,7 @@
 
 import React from 'react'
 
-import { Route, Switch, withRouter } from 'react-router-dom'
+import { Route, Switch } from 'react-router-dom'
 import bind from 'autobind-decorator'
 import { Helmet } from 'react-helmet'
 
@@ -29,7 +29,6 @@ import FullViewError from '../error'
 
 import style from './app.styl'
 
-@withRouter
 @withEnv
 @bind
 export default class ConsoleApp extends React.Component {

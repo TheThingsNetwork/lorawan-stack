@@ -14,6 +14,7 @@
 
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
 import bind from 'autobind-decorator'
 
 import { logout } from '../../store/actions/user'
@@ -21,6 +22,7 @@ import PropTypes from '../../../lib/prop-types'
 
 import HeaderComponent from '../../../components/header'
 
+@withRouter
 @connect(state => ({
   user: state.user.user,
 }))
