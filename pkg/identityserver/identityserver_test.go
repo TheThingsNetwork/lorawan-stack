@@ -185,9 +185,9 @@ func userApplications(userID *ttnpb.UserIdentifiers) ttnpb.Applications {
 	applications := []*ttnpb.Application{}
 	for _, app := range population.Applications {
 		for id, collaborators := range population.Memberships {
-			if app.EntityIdentifiers().IDString() == id.IDString() {
+			if app.IDString() == id.IDString() {
 				for _, collaborator := range collaborators {
-					if collaborator.EntityIdentifiers().IDString() == userID.GetUserID() {
+					if collaborator.IDString() == userID.GetUserID() {
 						applications = append(applications, app)
 					}
 				}
@@ -204,9 +204,9 @@ func userClients(userID *ttnpb.UserIdentifiers) ttnpb.Clients {
 	clients := []*ttnpb.Client{}
 	for _, client := range population.Clients {
 		for id, collaborators := range population.Memberships {
-			if client.EntityIdentifiers().IDString() == id.IDString() {
+			if client.IDString() == id.IDString() {
 				for _, collaborator := range collaborators {
-					if collaborator.EntityIdentifiers().IDString() == userID.GetUserID() {
+					if collaborator.IDString() == userID.GetUserID() {
 						clients = append(clients, client)
 					}
 				}
@@ -223,9 +223,9 @@ func userGateways(userID *ttnpb.UserIdentifiers) ttnpb.Gateways {
 	gateways := []*ttnpb.Gateway{}
 	for _, gateway := range population.Gateways {
 		for id, collaborators := range population.Memberships {
-			if gateway.EntityIdentifiers().IDString() == id.IDString() {
+			if gateway.IDString() == id.IDString() {
 				for _, collaborator := range collaborators {
-					if collaborator.EntityIdentifiers().IDString() == userID.GetUserID() {
+					if collaborator.IDString() == userID.GetUserID() {
 						gateways = append(gateways, gateway)
 					}
 				}
@@ -242,9 +242,9 @@ func userOrganizations(userID *ttnpb.UserIdentifiers) ttnpb.Organizations {
 	organizations := []*ttnpb.Organization{}
 	for _, organization := range population.Organizations {
 		for id, collaborators := range population.Memberships {
-			if organization.EntityIdentifiers().IDString() == id.IDString() {
+			if organization.IDString() == id.IDString() {
 				for _, collaborator := range collaborators {
-					if collaborator.EntityIdentifiers().IDString() == userID.GetUserID() {
+					if collaborator.IDString() == userID.GetUserID() {
 						organizations = append(organizations, organization)
 					}
 				}

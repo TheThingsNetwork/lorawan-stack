@@ -32,9 +32,9 @@ func init() {
 	userID := paginationUser.UserIdentifiers
 	for _, gw := range population.Gateways {
 		for id, collaborators := range population.Memberships {
-			if gw.EntityIdentifiers().IDString() == id.IDString() {
+			if gw.IDString() == id.IDString() {
 				for i, collaborator := range collaborators {
-					if collaborator.EntityIdentifiers().IDString() == userID.GetUserID() {
+					if collaborator.IDString() == userID.GetUserID() {
 						collaborators = collaborators[:i+copy(collaborators[i:], collaborators[i+1:])]
 					}
 				}
