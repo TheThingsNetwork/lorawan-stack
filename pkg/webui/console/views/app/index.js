@@ -20,6 +20,7 @@ import { Helmet } from 'react-helmet'
 
 import { withEnv } from '../../../lib/components/env'
 import ErrorView from '../../../lib/components/error-view'
+import { pageDataSelector } from '../../../lib/selectors/env'
 import SideNavigation from '../../../components/navigation/side'
 import Header from '../../containers/header'
 import Footer from '../../../components/footer'
@@ -36,6 +37,12 @@ export default class ConsoleApp extends React.Component {
     const {
       env,
     } = this.props
+
+    const pageData = pageDataSelector(env)
+
+    if (pageData && pageData.error) {
+      return <FullViewError error={pageData.error} />
+    }
 
     return (
       <ErrorView ErrorComponent={FullViewError}>
