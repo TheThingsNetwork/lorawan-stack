@@ -2888,6 +2888,15 @@
       "file": "gatewayserver.go"
     }
   },
+  "error:pkg/gatewayserver:host_handle": {
+    "translations": {
+      "en": "host `{host}` failed to handle message"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "gatewayserver.go"
+    }
+  },
   "error:pkg/gatewayserver:listen_frontend": {
     "translations": {
       "en": "failed to start frontend listener `{protocol}` on address `{address}`"
@@ -2900,6 +2909,15 @@
   "error:pkg/gatewayserver:no_fallback_frequency_plan": {
     "translations": {
       "en": "gateway `{gateway_uid}` is not registered and no fallback frequency plan defined"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "gatewayserver.go"
+    }
+  },
+  "error:pkg/gatewayserver:no_forward_to_host": {
+    "translations": {
+      "en": "no forward to host `{host}`"
     },
     "description": {
       "package": "pkg/gatewayserver",
