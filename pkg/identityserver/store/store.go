@@ -45,7 +45,7 @@ func (s *store) query(ctx context.Context, model interface{}, funcs ...func(*gor
 	return query
 }
 
-func (s *store) findEntity(ctx context.Context, entityID *ttnpb.EntityIdentifiers, fields ...string) (modelInterface, error) {
+func (s *store) findEntity(ctx context.Context, entityID ttnpb.Identifiers, fields ...string) (modelInterface, error) {
 	model := modelForID(entityID)
 	query := s.query(ctx, model, withID(entityID))
 	if len(fields) == 1 && fields[0] == "id" {
@@ -78,7 +78,7 @@ func (s *store) updateEntity(ctx context.Context, model interface{}, columns ...
 	return query.Save(model).Error
 }
 
-func (s *store) deleteEntity(ctx context.Context, entityID *ttnpb.EntityIdentifiers) error {
+func (s *store) deleteEntity(ctx context.Context, entityID ttnpb.Identifiers) error {
 	model, err := s.findEntity(ctx, entityID, "id")
 	if err != nil {
 		return err
@@ -191,41 +191,26 @@ func Transact(ctx context.Context, db *gorm.DB, f func(db *gorm.DB) error) (err 
 	return f(tx)
 }
 
-func entityTypeForID(id *ttnpb.EntityIdentifiers) string {
-	switch id := id.Identifiers().(type) {
-	case *ttnpb.ApplicationIdentifiers:
-		return "application"
-	case *ttnpb.ClientIdentifiers:
-		return "client"
-	case *ttnpb.EndDeviceIdentifiers:
-		return "device"
-	case *ttnpb.GatewayIdentifiers:
-		return "gateway"
-	case *ttnpb.OrganizationIdentifiers:
-		return "organization"
-	case *ttnpb.UserIdentifiers:
-		return "user"
-	default:
-		panic(fmt.Sprintf("can't find entity type for id type %T", id))
-	}
+func entityTypeForID(id ttnpb.Identifiers) string {
+	return strings.Replace(id.EntityType(), " ", "_", -1)
 }
 
-func modelForID(id *ttnpb.EntityIdentifiers) modelInterface {
-	switch id := id.Identifiers().(type) {
-	case *ttnpb.ApplicationIdentifiers:
+func modelForID(id ttnpb.Identifiers) modelInterface {
+	switch t := entityTypeForID(id); t {
+	case "application":
 		return &Application{}
-	case *ttnpb.ClientIdentifiers:
+	case "client":
 		return &Client{}
-	case *ttnpb.EndDeviceIdentifiers:
+	case "end_device":
 		return &EndDevice{}
-	case *ttnpb.GatewayIdentifiers:
+	case "gateway":
 		return &Gateway{}
-	case *ttnpb.OrganizationIdentifiers:
+	case "organization":
 		return &Organization{}
-	case *ttnpb.UserIdentifiers:
+	case "user":
 		return &User{}
 	default:
-		panic(fmt.Sprintf("can't find model for id type %T", id))
+		panic(fmt.Sprintf("can't find model for entity type %s", t))
 	}
 }
 
@@ -245,22 +230,23 @@ var (
 	errAPIKeyNotFound = errors.DefineNotFound("api_key_not_found", "API key not found")
 )
 
-func errNotFoundForID(entityID *ttnpb.EntityIdentifiers) error {
-	switch id := entityID.Identifiers().(type) {
-	case *ttnpb.ApplicationIdentifiers:
-		return errApplicationNotFound.WithAttributes("application_id", id.ApplicationID)
-	case *ttnpb.ClientIdentifiers:
-		return errClientNotFound.WithAttributes("client_id", id.ClientID)
-	case *ttnpb.EndDeviceIdentifiers:
-		return errEndDeviceNotFound.WithAttributes("application_id", id.ApplicationID, "device_id", id.DeviceID)
-	case *ttnpb.GatewayIdentifiers:
-		return errGatewayNotFound.WithAttributes("gateway_id", id.GatewayID)
-	case *ttnpb.OrganizationIdentifiers:
-		return errOrganizationNotFound.WithAttributes("organization_id", id.OrganizationID)
-	case *ttnpb.UserIdentifiers:
-		return errUserNotFound.WithAttributes("user_id", id.UserID)
+func errNotFoundForID(id ttnpb.Identifiers) error {
+	switch t := entityTypeForID(id); t {
+	case "application":
+		return errApplicationNotFound.WithAttributes("application_id", id.IDString())
+	case "client":
+		return errClientNotFound.WithAttributes("client_id", id.IDString())
+	case "end_device":
+		appID, devID := splitEndDeviceIDString(id.IDString())
+		return errEndDeviceNotFound.WithAttributes("application_id", appID, "device_id", devID)
+	case "gateway":
+		return errGatewayNotFound.WithAttributes("gateway_id", id.IDString())
+	case "organization":
+		return errOrganizationNotFound.WithAttributes("organization_id", id.IDString())
+	case "user":
+		return errUserNotFound.WithAttributes("user_id", id.IDString())
 	default:
-		panic(fmt.Sprintf("can't find errNotFound for id type %T", id))
+		panic(fmt.Sprintf("can't find errNotFound for entity type %s", t))
 	}
 }
 

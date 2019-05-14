@@ -115,7 +115,7 @@ func (s *organizationStore) GetOrganization(ctx context.Context, id *ttnpb.Organ
 	var orgModel Organization
 	if err := query.Preload("Account").First(&orgModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return nil, errNotFoundForID(id.EntityIdentifiers())
+			return nil, errNotFoundForID(id)
 		}
 		return nil, err
 	}
@@ -131,7 +131,7 @@ func (s *organizationStore) UpdateOrganization(ctx context.Context, org *ttnpb.O
 	var orgModel Organization
 	if err = query.Preload("Account").First(&orgModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return nil, errNotFoundForID(org.OrganizationIdentifiers.EntityIdentifiers())
+			return nil, errNotFoundForID(org.OrganizationIdentifiers)
 		}
 		return nil, err
 	}
@@ -155,5 +155,5 @@ func (s *organizationStore) UpdateOrganization(ctx context.Context, org *ttnpb.O
 
 func (s *organizationStore) DeleteOrganization(ctx context.Context, id *ttnpb.OrganizationIdentifiers) (err error) {
 	defer trace.StartRegion(ctx, "delete organization").End()
-	return s.deleteEntity(ctx, id.EntityIdentifiers())
+	return s.deleteEntity(ctx, id)
 }

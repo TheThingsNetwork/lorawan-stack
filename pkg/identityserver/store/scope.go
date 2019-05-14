@@ -17,6 +17,7 @@ package store
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -138,20 +139,25 @@ func withUserID(id ...string) func(*gorm.DB) *gorm.DB {
 	}
 }
 
-func withID(entityID *ttnpb.EntityIdentifiers) func(*gorm.DB) *gorm.DB {
-	switch id := entityID.Identifiers().(type) {
-	case *ttnpb.ApplicationIdentifiers:
-		return withApplicationID(id.ApplicationID)
-	case *ttnpb.ClientIdentifiers:
-		return withClientID(id.ClientID)
-	case *ttnpb.EndDeviceIdentifiers:
-		return withApplicationAndDeviceID(id.ApplicationID, id.DeviceID)
-	case *ttnpb.GatewayIdentifiers:
-		return withGatewayID(id.GatewayID)
-	case *ttnpb.OrganizationIdentifiers:
-		return withOrganizationID(id.OrganizationID)
-	case *ttnpb.UserIdentifiers:
-		return withUserID(id.UserID)
+func splitEndDeviceIDString(s string) (appID string, devID string) {
+	sepIdx := strings.Index(s, ".")
+	return s[:sepIdx], s[sepIdx+1:]
+}
+
+func withID(id ttnpb.Identifiers) func(*gorm.DB) *gorm.DB {
+	switch entityTypeForID(id) {
+	case "application":
+		return withApplicationID(id.IDString())
+	case "client":
+		return withClientID(id.IDString())
+	case "end_device":
+		return withApplicationAndDeviceID(splitEndDeviceIDString(id.IDString()))
+	case "gateway":
+		return withGatewayID(id.IDString())
+	case "organization":
+		return withOrganizationID(id.IDString())
+	case "user":
+		return withUserID(id.IDString())
 	default:
 		panic(fmt.Sprintf("can't find scope for id type %T", id))
 	}

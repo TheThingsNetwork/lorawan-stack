@@ -119,24 +119,24 @@ type UserSessionStore interface {
 //   for (entity_type,entity_id) and (account_id,[entityType]).
 type MembershipStore interface {
 	// Find direct members and rights of the given entity.
-	FindMembers(ctx context.Context, entityID *ttnpb.EntityIdentifiers) (map[*ttnpb.OrganizationOrUserIdentifiers]*ttnpb.Rights, error)
+	FindMembers(ctx context.Context, entityID ttnpb.Identifiers) (map[*ttnpb.OrganizationOrUserIdentifiers]*ttnpb.Rights, error)
 	// Find direct member rights of the given organization or user. The entityType may be omitted.
-	FindMemberRights(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityType string) (map[*ttnpb.EntityIdentifiers]*ttnpb.Rights, error)
+	FindMemberRights(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityType string) (map[ttnpb.Identifiers]*ttnpb.Rights, error)
 	// Set member rights on an entity. Rights can be deleted by not passing any rights.
-	SetMember(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityID *ttnpb.EntityIdentifiers, rights *ttnpb.Rights) error
+	SetMember(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityID ttnpb.Identifiers, rights *ttnpb.Rights) error
 }
 
 // APIKeyStore interface for storing API keys for entities (applications,
 // clients, gateways, organizations or users).
 type APIKeyStore interface {
 	// Create a new API key for the given entity.
-	CreateAPIKey(ctx context.Context, entityID *ttnpb.EntityIdentifiers, key *ttnpb.APIKey) error
+	CreateAPIKey(ctx context.Context, entityID ttnpb.Identifiers, key *ttnpb.APIKey) error
 	// Find API keys of the given entity.
-	FindAPIKeys(ctx context.Context, entityID *ttnpb.EntityIdentifiers) ([]*ttnpb.APIKey, error)
+	FindAPIKeys(ctx context.Context, entityID ttnpb.Identifiers) ([]*ttnpb.APIKey, error)
 	// Get an API key by its ID.
-	GetAPIKey(ctx context.Context, id string) (*ttnpb.EntityIdentifiers, *ttnpb.APIKey, error)
+	GetAPIKey(ctx context.Context, id string) (ttnpb.Identifiers, *ttnpb.APIKey, error)
 	// Update key rights on an entity. Rights can be deleted by not passing any rights, in which case the returned API key will be nil.
-	UpdateAPIKey(ctx context.Context, entityID *ttnpb.EntityIdentifiers, key *ttnpb.APIKey) (*ttnpb.APIKey, error)
+	UpdateAPIKey(ctx context.Context, entityID ttnpb.Identifiers, key *ttnpb.APIKey) (*ttnpb.APIKey, error)
 }
 
 // OAuthStore interface for the OAuth server.
@@ -169,13 +169,13 @@ type InvitationStore interface {
 
 // EntitySearch interface for searching entities.
 type EntitySearch interface {
-	FindEntities(ctx context.Context, req *ttnpb.SearchEntitiesRequest, entityType string) ([]*ttnpb.EntityIdentifiers, error)
+	FindEntities(ctx context.Context, req *ttnpb.SearchEntitiesRequest, entityType string) ([]ttnpb.Identifiers, error)
 }
 
 // ContactInfoStore interface for contact info validation.
 type ContactInfoStore interface {
-	GetContactInfo(ctx context.Context, entityID *ttnpb.EntityIdentifiers) ([]*ttnpb.ContactInfo, error)
-	SetContactInfo(ctx context.Context, entityID *ttnpb.EntityIdentifiers, contactInfo []*ttnpb.ContactInfo) ([]*ttnpb.ContactInfo, error)
+	GetContactInfo(ctx context.Context, entityID ttnpb.Identifiers) ([]*ttnpb.ContactInfo, error)
+	SetContactInfo(ctx context.Context, entityID ttnpb.Identifiers, contactInfo []*ttnpb.ContactInfo) ([]*ttnpb.ContactInfo, error)
 	CreateValidation(ctx context.Context, validation *ttnpb.ContactInfoValidation) (*ttnpb.ContactInfoValidation, error)
 	// Confirm a validation. Only the ID and Token need to be set.
 	Validate(ctx context.Context, validation *ttnpb.ContactInfoValidation) error

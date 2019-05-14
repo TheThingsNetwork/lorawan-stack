@@ -96,7 +96,7 @@ func (s *invitationStore) SetInvitationAcceptedBy(ctx context.Context, token str
 		return err
 	}
 
-	user, err := s.findEntity(ctx, acceptedByID.EntityIdentifiers(), "id")
+	user, err := s.findEntity(ctx, acceptedByID, "id")
 	if err != nil {
 		return err
 	}

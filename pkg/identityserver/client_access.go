@@ -59,7 +59,7 @@ func (is *IdentityServer) setClientCollaborator(ctx context.Context, req *ttnpb.
 		return store.GetMembershipStore(db).SetMember(
 			ctx,
 			&req.Collaborator.OrganizationOrUserIdentifiers,
-			req.ClientIdentifiers.EntityIdentifiers(),
+			req.ClientIdentifiers,
 			ttnpb.RightsFrom(req.Collaborator.Rights...),
 		)
 	})
@@ -94,7 +94,7 @@ func (is *IdentityServer) listClientCollaborators(ctx context.Context, req *ttnp
 		}
 	}()
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		memberRights, err := store.GetMembershipStore(db).FindMembers(ctx, req.EntityIdentifiers())
+		memberRights, err := store.GetMembershipStore(db).FindMembers(ctx, req.ClientIdentifiers)
 		if err != nil {
 			return err
 		}

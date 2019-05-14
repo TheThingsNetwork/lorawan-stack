@@ -81,14 +81,14 @@ func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateCli
 		if err = store.GetMembershipStore(db).SetMember(
 			ctx,
 			&req.Collaborator,
-			cli.ClientIdentifiers.EntityIdentifiers(),
+			cli.ClientIdentifiers,
 			ttnpb.RightsFrom(ttnpb.RIGHT_ALL),
 		); err != nil {
 			return err
 		}
 		if len(req.ContactInfo) > 0 {
 			cleanContactInfo(req.ContactInfo)
-			cli.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, cli.EntityIdentifiers(), req.ContactInfo)
+			cli.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, cli.ClientIdentifiers, req.ContactInfo)
 			if err != nil {
 				return err
 			}
@@ -124,7 +124,7 @@ func (is *IdentityServer) getClient(ctx context.Context, req *ttnpb.GetClientReq
 			return err
 		}
 		if ttnpb.HasAnyField(req.FieldMask.Paths, "contact_info") {
-			cli.ContactInfo, err = store.GetContactInfoStore(db).GetContactInfo(ctx, cli.EntityIdentifiers())
+			cli.ContactInfo, err = store.GetContactInfoStore(db).GetContactInfo(ctx, cli.ClientIdentifiers)
 			if err != nil {
 				return err
 			}
@@ -241,7 +241,7 @@ func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateCli
 		}
 		if ttnpb.HasAnyField(req.FieldMask.Paths, "contact_info") {
 			cleanContactInfo(req.ContactInfo)
-			cli.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, cli.EntityIdentifiers(), req.ContactInfo)
+			cli.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, cli.ClientIdentifiers, req.ContactInfo)
 			if err != nil {
 				return err
 			}

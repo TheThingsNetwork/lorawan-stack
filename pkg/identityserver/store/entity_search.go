@@ -32,7 +32,7 @@ type entitySearch struct {
 	db *gorm.DB
 }
 
-func (s *entitySearch) FindEntities(ctx context.Context, req *ttnpb.SearchEntitiesRequest, entityType string) ([]*ttnpb.EntityIdentifiers, error) {
+func (s *entitySearch) FindEntities(ctx context.Context, req *ttnpb.SearchEntitiesRequest, entityType string) ([]ttnpb.Identifiers, error) {
 	defer trace.StartRegion(ctx, "find entities").End()
 
 	table := entityType + "s"
@@ -71,19 +71,19 @@ func (s *entitySearch) FindEntities(ctx context.Context, req *ttnpb.SearchEntiti
 		return nil, nil
 	}
 
-	identifiers := make([]*ttnpb.EntityIdentifiers, len(entities))
+	identifiers := make([]ttnpb.Identifiers, len(entities))
 	for i, entity := range entities {
 		switch entityType {
 		case "application":
-			identifiers[i] = ttnpb.ApplicationIdentifiers{ApplicationID: entity.ID}.EntityIdentifiers()
+			identifiers[i] = ttnpb.ApplicationIdentifiers{ApplicationID: entity.ID}
 		case "client":
-			identifiers[i] = ttnpb.ClientIdentifiers{ClientID: entity.ID}.EntityIdentifiers()
+			identifiers[i] = ttnpb.ClientIdentifiers{ClientID: entity.ID}
 		case "gateway":
-			identifiers[i] = ttnpb.GatewayIdentifiers{GatewayID: entity.ID}.EntityIdentifiers()
+			identifiers[i] = ttnpb.GatewayIdentifiers{GatewayID: entity.ID}
 		case "organization":
-			identifiers[i] = ttnpb.OrganizationIdentifiers{OrganizationID: entity.ID}.EntityIdentifiers()
+			identifiers[i] = ttnpb.OrganizationIdentifiers{OrganizationID: entity.ID}
 		case "user":
-			identifiers[i] = ttnpb.UserIdentifiers{UserID: entity.ID}.EntityIdentifiers()
+			identifiers[i] = ttnpb.UserIdentifiers{UserID: entity.ID}
 		}
 	}
 

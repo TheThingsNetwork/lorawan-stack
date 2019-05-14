@@ -41,40 +41,40 @@ func TestAPIKeyStore(t *testing.T) {
 		store := GetAPIKeyStore(db)
 
 		s.createEntity(ctx, &User{Account: Account{UID: "test-user"}})
-		userIDs := &ttnpb.UserIdentifiers{UserID: "test-user"}
+		userIDs := ttnpb.UserIdentifiers{UserID: "test-user"}
 
 		s.createEntity(ctx, &Organization{Account: Account{UID: "test-org"}})
-		orgIDs := &ttnpb.OrganizationIdentifiers{OrganizationID: "test-org"}
+		orgIDs := ttnpb.OrganizationIdentifiers{OrganizationID: "test-org"}
 
 		s.createEntity(ctx, &Application{ApplicationID: "test-app"})
-		appIDs := &ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}
+		appIDs := ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}
 
 		s.createEntity(ctx, &Gateway{GatewayID: "test-gtw"})
-		gtwIDs := &ttnpb.GatewayIdentifiers{GatewayID: "test-gtw"}
+		gtwIDs := ttnpb.GatewayIdentifiers{GatewayID: "test-gtw"}
 
 		for _, tt := range []struct {
 			Name        string
-			Identifiers *ttnpb.EntityIdentifiers
+			Identifiers ttnpb.Identifiers
 			Rights      []ttnpb.Right
 		}{
 			{
 				Name:        "Application",
-				Identifiers: appIDs.EntityIdentifiers(),
+				Identifiers: appIDs,
 				Rights:      []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL},
 			},
 			{
 				Name:        "Gateway",
-				Identifiers: gtwIDs.EntityIdentifiers(),
+				Identifiers: gtwIDs,
 				Rights:      []ttnpb.Right{ttnpb.RIGHT_GATEWAY_ALL},
 			},
 			{
 				Name:        "Organization",
-				Identifiers: orgIDs.EntityIdentifiers(),
+				Identifiers: orgIDs,
 				Rights:      []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL, ttnpb.RIGHT_GATEWAY_ALL},
 			},
 			{
 				Name:        "User",
-				Identifiers: userIDs.EntityIdentifiers(),
+				Identifiers: userIDs,
 				Rights:      []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL, ttnpb.RIGHT_GATEWAY_ALL},
 			},
 		} {

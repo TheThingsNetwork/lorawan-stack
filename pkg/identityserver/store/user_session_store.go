@@ -33,7 +33,7 @@ type userSessionStore struct {
 
 func (s *userSessionStore) CreateSession(ctx context.Context, sess *ttnpb.UserSession) (*ttnpb.UserSession, error) {
 	defer trace.StartRegion(ctx, "create user session").End()
-	user, err := s.findEntity(ctx, sess.UserIdentifiers.EntityIdentifiers(), "id")
+	user, err := s.findEntity(ctx, sess.UserIdentifiers, "id")
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +51,7 @@ func (s *userSessionStore) CreateSession(ctx context.Context, sess *ttnpb.UserSe
 
 func (s *userSessionStore) FindSessions(ctx context.Context, userIDs *ttnpb.UserIdentifiers) ([]*ttnpb.UserSession, error) {
 	defer trace.StartRegion(ctx, "find user sessions").End()
-	user, err := s.findEntity(ctx, userIDs.EntityIdentifiers(), "id")
+	user, err := s.findEntity(ctx, userIDs, "id")
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +78,7 @@ func (s *userSessionStore) FindSessions(ctx context.Context, userIDs *ttnpb.User
 
 func (s *userSessionStore) GetSession(ctx context.Context, userIDs *ttnpb.UserIdentifiers, sessionID string) (*ttnpb.UserSession, error) {
 	defer trace.StartRegion(ctx, "get user session").End()
-	user, err := s.findEntity(ctx, userIDs.EntityIdentifiers(), "id")
+	user, err := s.findEntity(ctx, userIDs, "id")
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +98,7 @@ func (s *userSessionStore) GetSession(ctx context.Context, userIDs *ttnpb.UserId
 
 func (s *userSessionStore) UpdateSession(ctx context.Context, sess *ttnpb.UserSession) (*ttnpb.UserSession, error) {
 	defer trace.StartRegion(ctx, "update user session").End()
-	user, err := s.findEntity(ctx, sess.UserIdentifiers.EntityIdentifiers(), "id")
+	user, err := s.findEntity(ctx, sess.UserIdentifiers, "id")
 	if err != nil {
 		return nil, err
 	}
@@ -121,7 +121,7 @@ func (s *userSessionStore) UpdateSession(ctx context.Context, sess *ttnpb.UserSe
 
 func (s *userSessionStore) DeleteSession(ctx context.Context, userIDs *ttnpb.UserIdentifiers, sessionID string) error {
 	defer trace.StartRegion(ctx, "delete user session").End()
-	user, err := s.findEntity(ctx, userIDs.EntityIdentifiers(), "id")
+	user, err := s.findEntity(ctx, userIDs, "id")
 	if err != nil {
 		return err
 	}

@@ -111,7 +111,7 @@ func (s *applicationStore) GetApplication(ctx context.Context, id *ttnpb.Applica
 	var appModel Application
 	if err := query.First(&appModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return nil, errNotFoundForID(id.EntityIdentifiers())
+			return nil, errNotFoundForID(id)
 		}
 		return nil, err
 	}
@@ -127,7 +127,7 @@ func (s *applicationStore) UpdateApplication(ctx context.Context, app *ttnpb.App
 	var appModel Application
 	if err = query.First(&appModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return nil, errNotFoundForID(app.ApplicationIdentifiers.EntityIdentifiers())
+			return nil, errNotFoundForID(app.ApplicationIdentifiers)
 		}
 		return nil, err
 	}
@@ -151,5 +151,5 @@ func (s *applicationStore) UpdateApplication(ctx context.Context, app *ttnpb.App
 
 func (s *applicationStore) DeleteApplication(ctx context.Context, id *ttnpb.ApplicationIdentifiers) error {
 	defer trace.StartRegion(ctx, "delete application").End()
-	return s.deleteEntity(ctx, id.EntityIdentifiers())
+	return s.deleteEntity(ctx, id)
 }

@@ -43,21 +43,21 @@ func TestContactInfoStore(t *testing.T) {
 
 		s := GetContactInfoStore(db)
 
-		contactInfo, err := s.GetContactInfo(ctx, app.EntityIdentifiers())
+		contactInfo, err := s.GetContactInfo(ctx, app.ApplicationIdentifiers)
 		a.So(err, should.BeNil)
 		a.So(contactInfo, should.BeEmpty)
 
-		_, err = s.SetContactInfo(ctx, app.EntityIdentifiers(), []*ttnpb.ContactInfo{
+		_, err = s.SetContactInfo(ctx, app.ApplicationIdentifiers, []*ttnpb.ContactInfo{
 			{ContactType: ttnpb.CONTACT_TYPE_TECHNICAL, ContactMethod: ttnpb.CONTACT_METHOD_EMAIL, Value: "foo@example.com", ValidatedAt: &now},
 			{ContactType: ttnpb.CONTACT_TYPE_BILLING, ContactMethod: ttnpb.CONTACT_METHOD_EMAIL, Value: "admin@example.com"},
 		})
 		a.So(err, should.BeNil)
 
-		contactInfo, err = s.GetContactInfo(ctx, app.EntityIdentifiers())
+		contactInfo, err = s.GetContactInfo(ctx, app.ApplicationIdentifiers)
 		a.So(err, should.BeNil)
 		a.So(contactInfo, should.HaveLength, 2)
 
-		_, err = s.SetContactInfo(ctx, app.EntityIdentifiers(), []*ttnpb.ContactInfo{
+		_, err = s.SetContactInfo(ctx, app.ApplicationIdentifiers, []*ttnpb.ContactInfo{
 			{ContactType: ttnpb.CONTACT_TYPE_TECHNICAL, ContactMethod: ttnpb.CONTACT_METHOD_EMAIL, Value: "bar@example.com"},
 			{ContactType: ttnpb.CONTACT_TYPE_TECHNICAL, ContactMethod: ttnpb.CONTACT_METHOD_EMAIL, Value: "foo@example.com"},
 			{ContactType: ttnpb.CONTACT_TYPE_ABUSE, ContactMethod: ttnpb.CONTACT_METHOD_EMAIL, Value: "foo@example.com"},
@@ -66,7 +66,7 @@ func TestContactInfoStore(t *testing.T) {
 		})
 		a.So(err, should.BeNil)
 
-		contactInfo, err = s.GetContactInfo(ctx, app.EntityIdentifiers())
+		contactInfo, err = s.GetContactInfo(ctx, app.ApplicationIdentifiers)
 		a.So(err, should.BeNil)
 		a.So(contactInfo, should.HaveLength, 5)
 
@@ -94,7 +94,7 @@ func TestContactInfoValidation(t *testing.T) {
 
 		s := GetContactInfoStore(db)
 
-		info, err := s.SetContactInfo(ctx, usr.EntityIdentifiers(), []*ttnpb.ContactInfo{
+		info, err := s.SetContactInfo(ctx, usr.UserIdentifiers, []*ttnpb.ContactInfo{
 			{ContactMethod: ttnpb.CONTACT_METHOD_EMAIL, Value: "foo@example.com"},
 		})
 		a.So(err, should.BeNil)
@@ -116,7 +116,7 @@ func TestContactInfoValidation(t *testing.T) {
 		})
 		a.So(err, should.BeNil)
 
-		info, err = s.GetContactInfo(ctx, usr.EntityIdentifiers())
+		info, err = s.GetContactInfo(ctx, usr)
 		a.So(err, should.BeNil)
 		if a.So(info, should.HaveLength, 1) {
 			a.So(info[0].ValidatedAt, should.NotBeNil)
