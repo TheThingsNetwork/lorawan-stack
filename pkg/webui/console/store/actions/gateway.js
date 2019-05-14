@@ -19,6 +19,8 @@ import {
   createGetApiKeysListFailureActionType,
   getApiKeysListSuccess,
   createGetApiKeysListSuccessActionType,
+  getApiKey,
+  createGetApiKeyActionType,
 } from '../actions/api-keys'
 
 import {
@@ -53,6 +55,7 @@ export const CLEAR_GTW_EVENTS = createClearEventsActionType(SHARED_NAME)
 export const GET_GTW_API_KEYS_LIST = createGetApiKeysListActionType(SHARED_NAME)
 export const GET_GTW_API_KEYS_LIST_SUCCESS = createGetApiKeysListSuccessActionType(SHARED_NAME)
 export const GET_GTW_API_KEYS_LIST_FAILURE = createGetApiKeysListFailureActionType(SHARED_NAME)
+export const GET_GTW_API_KEY_PAGE_DATA = createGetApiKeyActionType(SHARED_NAME)
 
 export const getGateway = (id, meta) => (
   { type: GET_GTW, id, meta }
@@ -106,3 +109,4 @@ export const getGatewayApiKeysListSuccess = getApiKeysListSuccess(SHARED_NAME)
 
 export const getGatewayApiKeysListFailure = getApiKeysListFailure(SHARED_NAME)
 
+export const getGatewayApiKeyPageData = getApiKey(SHARED_NAME)

@@ -93,6 +93,14 @@ class Gateways {
     return Marshaler.payloadSingleResponse(response)
   }
 
+  async getRightsById (gatewayId) {
+    const result = await this._api.GatewayAccess.ListRights({
+      routeParams: { gateway_id: gatewayId },
+    })
+
+    return Marshaler.unwrapRights(result)
+  }
+
   // Events Stream
 
   async openStream (identifiers, tail, after) {

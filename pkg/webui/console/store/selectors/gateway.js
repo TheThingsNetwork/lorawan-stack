@@ -19,11 +19,18 @@ import {
 } from './events'
 
 import {
+  apiKeySelector,
   apiKeysStoreSelector,
   fetchingSelector as apiKeysFetchingSelector,
   errorSelector as apiKeysErrorSelector,
   totalCountSelector as apiKeysTotalCountSelector,
 } from './api-keys'
+
+import {
+  rightsSelector,
+  errorSelector as rightsErrorSelector,
+  fetchingSelector as rightsFetchingSelector,
+} from './rights'
 
 const ENTITY = 'gateways'
 
@@ -81,8 +88,16 @@ export const gatewayEventsStatusSelector = eventsStatusSelector(ENTITY)
 
 export const gatewayApiKeysStoreSelector = apiKeysStoreSelector(ENTITY)
 
+export const gatewayKeySelector = apiKeySelector(ENTITY)
+
 export const gatewayTotalCountSelector = apiKeysTotalCountSelector(ENTITY)
 
-export const gatewayErrorSelector = apiKeysErrorSelector(ENTITY)
+export const gatewayKeysErrorSelector = apiKeysErrorSelector(ENTITY)
 
-export const gatewayFetchingSelector = apiKeysFetchingSelector(ENTITY)
+export const gatewayKeysFetchingSelector = apiKeysFetchingSelector(ENTITY)
+
+export const gatewayRightsSelector = rightsSelector(ENTITY)
+
+export const gatewayRightsErrorSelector = rightsErrorSelector(ENTITY)
+
+export const gatewayRightsFetchingSelector = rightsFetchingSelector(ENTITY)

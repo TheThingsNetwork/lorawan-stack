@@ -20,6 +20,8 @@ import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 
 import GatewayApiKeysList from '../gateway-api-keys-list'
+import GatewayApiKeyAdd from '../gateway-api-key-add'
+import GatewayApiKeyEdit from '../gateway-api-key-edit'
 
 @withBreadcrumb('gateways.single.api-keys', function (props) {
   const gtwId = props.match.params.gtwId
@@ -40,6 +42,8 @@ export default class GatewayApiKeys extends React.Component {
     return (
       <Switch>
         <Route exact path={`${match.path}`} component={GatewayApiKeysList} />
+        <Route path={`${match.path}/add`} component={GatewayApiKeyAdd} />
+        <Route path={`${match.path}/:apiKeyId`} component={GatewayApiKeyEdit} />
       </Switch>
     )
   }
