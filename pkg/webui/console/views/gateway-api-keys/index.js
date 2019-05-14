@@ -18,6 +18,8 @@ import { Switch, Route } from 'react-router'
 import sharedMessages from '../../../lib/shared-messages'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
+import ErrorView from '../../../lib/components/error-view'
+import SubViewError from '../error/sub-view'
 
 import GatewayApiKeysList from '../gateway-api-keys-list'
 import GatewayApiKeyAdd from '../gateway-api-key-add'
@@ -40,11 +42,13 @@ export default class GatewayApiKeys extends React.Component {
     const { match } = this.props
 
     return (
-      <Switch>
-        <Route exact path={`${match.path}`} component={GatewayApiKeysList} />
-        <Route path={`${match.path}/add`} component={GatewayApiKeyAdd} />
-        <Route path={`${match.path}/:apiKeyId`} component={GatewayApiKeyEdit} />
-      </Switch>
+      <ErrorView ErrorComponent={SubViewError}>
+        <Switch>
+          <Route exact path={`${match.path}`} component={GatewayApiKeysList} />
+          <Route path={`${match.path}/add`} component={GatewayApiKeyAdd} />
+          <Route path={`${match.path}/:apiKeyId`} component={GatewayApiKeyEdit} />
+        </Switch>
+      </ErrorView>
     )
   }
 }
