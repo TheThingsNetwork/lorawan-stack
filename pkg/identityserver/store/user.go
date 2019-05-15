@@ -64,7 +64,7 @@ func init() {
 // SetContext sets the context on both the Model and Account.
 func (usr *User) SetContext(ctx context.Context) {
 	usr.Model.SetContext(ctx)
-	usr.Account.Model.SetContext(ctx)
+	usr.Account.SetContext(ctx)
 }
 
 // functions to set fields from the user model into the user proto.
