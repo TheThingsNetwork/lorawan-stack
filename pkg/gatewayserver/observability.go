@@ -70,7 +70,7 @@ var gsMetrics = &messageMetrics{
 			Name:      "uplink_received_total",
 			Help:      "Total number of received uplinks",
 		},
-		[]string{gatewayID},
+		[]string{networkServer, gatewayID},
 	),
 	uplinkForwarded: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
@@ -86,7 +86,7 @@ var gsMetrics = &messageMetrics{
 			Name:      "uplink_dropped_total",
 			Help:      "Total number of dropped uplinks",
 		},
-		[]string{"error"},
+		[]string{networkServer, "error"},
 	),
 	uplinkFailed: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
@@ -177,9 +177,9 @@ func registerReceiveStatus(ctx context.Context, gtw *ttnpb.Gateway, status *ttnp
 	gsMetrics.statusReceived.WithLabelValues(ctx, gtw.GatewayID).Inc()
 }
 
-func registerReceiveUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.UplinkMessage) {
+func registerReceiveUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.UplinkMessage, ns string) {
 	events.Publish(evtReceiveUp(ctx, gtw, msg))
-	gsMetrics.uplinkReceived.WithLabelValues(ctx, gtw.GatewayID).Inc()
+	gsMetrics.uplinkReceived.WithLabelValues(ctx, ns, gtw.GatewayID).Inc()
 }
 
 func registerForwardUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.UplinkMessage, ns string) {
@@ -187,12 +187,12 @@ func registerForwardUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.U
 	gsMetrics.uplinkForwarded.WithLabelValues(ctx, ns).Inc()
 }
 
-func registerDropUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.UplinkMessage, err error) {
+func registerDropUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.UplinkMessage, ns string, err error) {
 	events.Publish(evtDropUp(ctx, gtw, err))
 	if ttnErr, ok := errors.From(err); ok {
-		gsMetrics.uplinkDropped.WithLabelValues(ctx, ttnErr.FullName()).Inc()
+		gsMetrics.uplinkDropped.WithLabelValues(ctx, ns, ttnErr.FullName()).Inc()
 	} else {
-		gsMetrics.uplinkDropped.WithLabelValues(ctx, unknown).Inc()
+		gsMetrics.uplinkDropped.WithLabelValues(ctx, ns, unknown).Inc()
 	}
 }
 
