@@ -134,7 +134,7 @@ export default class Device extends React.Component {
         <Container>
           <Row>
             <Col lg={12}>
-              <h2 className={style.title}>{devId}</h2>
+              <h2 className={style.title}>{deviceName || devId}</h2>
               <Tabs
                 narrow
                 tabs={tabs}
