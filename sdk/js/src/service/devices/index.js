@@ -18,6 +18,7 @@ import { URL } from 'url'
 import traverse from 'traverse'
 import Marshaler from '../../util/marshaler'
 import Device from '../../entity/device'
+import stream from '../../api/stream/stream-node'
 import randomByteString from '../../util/random-bytes'
 import { splitSetPaths, splitGetPaths, makeRequests } from './split'
 import mergeDevice from './merge'
@@ -297,6 +298,21 @@ class Devices {
     const result = this._deleteDevice(applicationId, deviceId)
 
     return result
+  }
+
+  // Events Stream
+
+  async openStream (identifiers, tail, after) {
+    const eventsUrl = `${this._stackConfig.as}/events`
+    const payload = {
+      identifiers: identifiers.map(ids => ({
+        device_ids: ids,
+      })),
+      tail,
+      after,
+    }
+
+    return stream(payload, eventsUrl)
   }
 }
 
