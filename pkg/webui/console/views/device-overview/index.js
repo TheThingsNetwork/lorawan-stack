@@ -147,10 +147,6 @@ class DeviceOverview extends React.Component {
           </Col>
           <Col md={12} lg={6}>
             <DeviceEvents devIds={devIds} widget />
-            <div className={style.locationPlaceholder}>
-              <h4><Message content={sharedMessages.location} /></h4>
-              <div>Location Map Placeholder</div>
-            </div>
           </Col>
         </Row>
       </Container>
