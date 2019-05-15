@@ -33,7 +33,7 @@ type membershipStore struct {
 	*store
 }
 
-func (s *membershipStore) FindMembers(ctx context.Context, entityID *ttnpb.EntityIdentifiers) (map[*ttnpb.OrganizationOrUserIdentifiers]*ttnpb.Rights, error) {
+func (s *membershipStore) FindMembers(ctx context.Context, entityID ttnpb.Identifiers) (map[*ttnpb.OrganizationOrUserIdentifiers]*ttnpb.Rights, error) {
 	defer trace.StartRegion(ctx, fmt.Sprintf("find members of %s", entityID.EntityType())).End()
 	entity, err := s.findEntity(ctx, entityID, "id")
 	if err != nil {
@@ -61,12 +61,12 @@ func (s *membershipStore) FindMembers(ctx context.Context, entityID *ttnpb.Entit
 	return membershipRights, nil
 }
 
-func (s *membershipStore) FindMemberRights(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityType string) (map[*ttnpb.EntityIdentifiers]*ttnpb.Rights, error) {
+func (s *membershipStore) FindMemberRights(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityType string) (map[ttnpb.Identifiers]*ttnpb.Rights, error) {
 	entityTypeForTrace := entityType
 	if entityTypeForTrace == "" {
 		entityTypeForTrace = "all"
 	}
-	defer trace.StartRegion(ctx, fmt.Sprintf("find %s memberships for %s", entityTypeForTrace, id.EntityIdentifiers().EntityType())).End()
+	defer trace.StartRegion(ctx, fmt.Sprintf("find %s memberships for %s", entityTypeForTrace, id.EntityType())).End()
 	account, err := s.findAccount(ctx, id)
 	if err != nil {
 		return nil, err
@@ -89,7 +89,7 @@ var errAccountType = errors.DefineInvalidArgument(
 	"account of type `{account_type}` can not collaborate on `{entity_type}`",
 )
 
-func (s *membershipStore) SetMember(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityID *ttnpb.EntityIdentifiers, rights *ttnpb.Rights) (err error) {
+func (s *membershipStore) SetMember(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityID ttnpb.Identifiers, rights *ttnpb.Rights) (err error) {
 	defer trace.StartRegion(ctx, "update membership").End()
 	account, err := s.findAccount(ctx, id)
 	if err != nil {

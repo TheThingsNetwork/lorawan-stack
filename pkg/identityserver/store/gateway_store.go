@@ -116,7 +116,7 @@ func (s *gatewayStore) GetGateway(ctx context.Context, id *ttnpb.GatewayIdentifi
 	var gtwModel Gateway
 	if err := query.First(&gtwModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return nil, errNotFoundForID(id.EntityIdentifiers())
+			return nil, errNotFoundForID(id)
 		}
 		return nil, err
 	}
@@ -132,7 +132,7 @@ func (s *gatewayStore) UpdateGateway(ctx context.Context, gtw *ttnpb.Gateway, fi
 	var gtwModel Gateway
 	if err = query.First(&gtwModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return nil, errNotFoundForID(gtw.GatewayIdentifiers.EntityIdentifiers())
+			return nil, errNotFoundForID(gtw.GatewayIdentifiers)
 		}
 		return nil, err
 	}
@@ -161,5 +161,5 @@ func (s *gatewayStore) UpdateGateway(ctx context.Context, gtw *ttnpb.Gateway, fi
 
 func (s *gatewayStore) DeleteGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers) error {
 	defer trace.StartRegion(ctx, "delete gateway").End()
-	return s.deleteEntity(ctx, id.EntityIdentifiers())
+	return s.deleteEntity(ctx, id)
 }

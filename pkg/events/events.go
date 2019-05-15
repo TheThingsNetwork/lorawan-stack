@@ -133,7 +133,7 @@ func init() {
 // Event identifiers identify the TTN entities that are related to the event.
 // System events have nil identifiers.
 // Event data will in most cases be marshaled to JSON, but ideally is a proto message.
-func New(ctx context.Context, name string, identifiers ttnpb.Identifiers, data interface{}) Event {
+func New(ctx context.Context, name string, identifiers CombinedIdentifiers, data interface{}) Event {
 	evt := &event{
 		ctx: ctx,
 		innerEvent: ttnpb.Event{

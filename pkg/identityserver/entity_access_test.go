@@ -99,10 +99,10 @@ func TestEntityAccess(t *testing.T) {
 
 			ctx := log.NewContext(ctx, is.Logger())
 
-			entityRights, err := is.memberRights(ctx, adminUser.EntityIdentifiers())
+			entityRights, err := is.memberRights(ctx, adminUser)
 			a.So(err, should.BeNil)
 
-			cachedEntityRights, err := is.memberRights(ctx, adminUser.EntityIdentifiers())
+			cachedEntityRights, err := is.memberRights(ctx, adminUser)
 			a.So(err, should.BeNil)
 
 			a.So(len(cachedEntityRights), should.Equal, len(entityRights))

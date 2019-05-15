@@ -58,14 +58,14 @@ func (is *IdentityServer) createApplication(ctx context.Context, req *ttnpb.Crea
 		if err = store.GetMembershipStore(db).SetMember(
 			ctx,
 			&req.Collaborator,
-			app.ApplicationIdentifiers.EntityIdentifiers(),
+			app.ApplicationIdentifiers,
 			ttnpb.RightsFrom(ttnpb.RIGHT_ALL),
 		); err != nil {
 			return err
 		}
 		if len(req.ContactInfo) > 0 {
 			cleanContactInfo(req.ContactInfo)
-			app.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, app.EntityIdentifiers(), req.ContactInfo)
+			app.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, app.ApplicationIdentifiers, req.ContactInfo)
 			if err != nil {
 				return err
 			}
@@ -98,7 +98,7 @@ func (is *IdentityServer) getApplication(ctx context.Context, req *ttnpb.GetAppl
 			return err
 		}
 		if ttnpb.HasAnyField(req.FieldMask.Paths, "contact_info") {
-			app.ContactInfo, err = store.GetContactInfoStore(db).GetContactInfo(ctx, app.EntityIdentifiers())
+			app.ContactInfo, err = store.GetContactInfoStore(db).GetContactInfo(ctx, app.ApplicationIdentifiers)
 			if err != nil {
 				return err
 			}
@@ -121,7 +121,7 @@ func (is *IdentityServer) listApplications(ctx context.Context, req *ttnpb.ListA
 		}
 		appRights = make(map[string]*ttnpb.Rights, len(callerRights))
 		for ids, rights := range callerRights {
-			if ids := ids.GetApplicationIDs(); ids != nil {
+			if ids.EntityType() == "application" {
 				appRights[unique.ID(ctx, ids)] = rights
 			}
 		}
@@ -205,7 +205,7 @@ func (is *IdentityServer) updateApplication(ctx context.Context, req *ttnpb.Upda
 		}
 		if ttnpb.HasAnyField(req.FieldMask.Paths, "contact_info") {
 			cleanContactInfo(req.ContactInfo)
-			app.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, app.EntityIdentifiers(), req.ContactInfo)
+			app.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, app.ApplicationIdentifiers, req.ContactInfo)
 			if err != nil {
 				return err
 			}

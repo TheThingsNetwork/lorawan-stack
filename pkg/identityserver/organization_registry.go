@@ -58,14 +58,14 @@ func (is *IdentityServer) createOrganization(ctx context.Context, req *ttnpb.Cre
 		if err = store.GetMembershipStore(db).SetMember(
 			ctx,
 			&req.Collaborator,
-			org.OrganizationIdentifiers.EntityIdentifiers(),
+			org.OrganizationIdentifiers,
 			ttnpb.RightsFrom(ttnpb.RIGHT_ALL),
 		); err != nil {
 			return err
 		}
 		if len(req.ContactInfo) > 0 {
 			cleanContactInfo(req.ContactInfo)
-			org.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, org.EntityIdentifiers(), req.ContactInfo)
+			org.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, org.OrganizationIdentifiers, req.ContactInfo)
 			if err != nil {
 				return err
 			}
@@ -98,7 +98,7 @@ func (is *IdentityServer) getOrganization(ctx context.Context, req *ttnpb.GetOrg
 			return err
 		}
 		if ttnpb.HasAnyField(req.FieldMask.Paths, "contact_info") {
-			org.ContactInfo, err = store.GetContactInfoStore(db).GetContactInfo(ctx, org.EntityIdentifiers())
+			org.ContactInfo, err = store.GetContactInfoStore(db).GetContactInfo(ctx, org.OrganizationIdentifiers)
 			if err != nil {
 				return err
 			}
@@ -121,7 +121,7 @@ func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.List
 		}
 		orgRights = make(map[string]*ttnpb.Rights, len(callerRights))
 		for ids, rights := range callerRights {
-			if ids := ids.GetOrganizationIDs(); ids != nil {
+			if ids.EntityType() == "organization" {
 				orgRights[unique.ID(ctx, ids)] = rights
 			}
 		}
@@ -203,7 +203,7 @@ func (is *IdentityServer) updateOrganization(ctx context.Context, req *ttnpb.Upd
 		}
 		if ttnpb.HasAnyField(req.FieldMask.Paths, "contact_info") {
 			cleanContactInfo(req.ContactInfo)
-			org.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, org.EntityIdentifiers(), req.ContactInfo)
+			org.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, org.OrganizationIdentifiers, req.ContactInfo)
 			if err != nil {
 				return err
 			}

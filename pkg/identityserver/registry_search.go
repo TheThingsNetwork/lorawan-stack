@@ -55,7 +55,7 @@ func (rs *registrySearch) SearchApplications(ctx context.Context, req *ttnpb.Sea
 		}
 		var ids []*ttnpb.ApplicationIdentifiers
 		for _, id := range entityIDs {
-			id := id.GetApplicationIDs()
+			id := id.Identifiers().(*ttnpb.ApplicationIdentifiers)
 			if rights.RequireApplication(ctx, *id, ttnpb.RIGHT_APPLICATION_INFO) == nil {
 				ids = append(ids, id)
 			}
@@ -88,7 +88,7 @@ func (rs *registrySearch) SearchClients(ctx context.Context, req *ttnpb.SearchEn
 		}
 		var ids []*ttnpb.ClientIdentifiers
 		for _, id := range entityIDs {
-			id := id.GetClientIDs()
+			id := id.Identifiers().(*ttnpb.ClientIdentifiers)
 			if rights.RequireClient(ctx, *id, ttnpb.RIGHT_CLIENT_ALL) == nil {
 				ids = append(ids, id)
 			}
@@ -121,7 +121,7 @@ func (rs *registrySearch) SearchGateways(ctx context.Context, req *ttnpb.SearchE
 		}
 		var ids []*ttnpb.GatewayIdentifiers
 		for _, id := range entityIDs {
-			id := id.GetGatewayIDs()
+			id := id.Identifiers().(*ttnpb.GatewayIdentifiers)
 			if rights.RequireGateway(ctx, *id, ttnpb.RIGHT_GATEWAY_INFO) == nil {
 				ids = append(ids, id)
 			}
@@ -154,7 +154,7 @@ func (rs *registrySearch) SearchOrganizations(ctx context.Context, req *ttnpb.Se
 		}
 		var ids []*ttnpb.OrganizationIdentifiers
 		for _, id := range entityIDs {
-			id := id.GetOrganizationIDs()
+			id := id.Identifiers().(*ttnpb.OrganizationIdentifiers)
 			if rights.RequireOrganization(ctx, *id, ttnpb.RIGHT_ORGANIZATION_INFO) == nil {
 				ids = append(ids, id)
 			}
@@ -187,7 +187,7 @@ func (rs *registrySearch) SearchUsers(ctx context.Context, req *ttnpb.SearchEnti
 		}
 		var ids []*ttnpb.UserIdentifiers
 		for _, id := range entityIDs {
-			id := id.GetUserIDs()
+			id := id.Identifiers().(*ttnpb.UserIdentifiers)
 			if rights.RequireUser(ctx, *id, ttnpb.RIGHT_USER_INFO) == nil {
 				ids = append(ids, id)
 			}

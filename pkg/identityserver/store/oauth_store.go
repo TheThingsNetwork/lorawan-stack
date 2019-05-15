@@ -33,7 +33,7 @@ type oauthStore struct {
 
 func (s *oauthStore) ListAuthorizations(ctx context.Context, userIDs *ttnpb.UserIdentifiers) ([]*ttnpb.OAuthClientAuthorization, error) {
 	defer trace.StartRegion(ctx, "list authorizations").End()
-	user, err := s.findEntity(ctx, userIDs.EntityIdentifiers(), "id")
+	user, err := s.findEntity(ctx, userIDs, "id")
 	if err != nil {
 		return nil, err
 	}
@@ -55,11 +55,11 @@ func (s *oauthStore) ListAuthorizations(ctx context.Context, userIDs *ttnpb.User
 
 func (s *oauthStore) GetAuthorization(ctx context.Context, userIDs *ttnpb.UserIdentifiers, clientIDs *ttnpb.ClientIdentifiers) (*ttnpb.OAuthClientAuthorization, error) {
 	defer trace.StartRegion(ctx, "get authorization").End()
-	client, err := s.findEntity(ctx, clientIDs.EntityIdentifiers(), "id")
+	client, err := s.findEntity(ctx, clientIDs, "id")
 	if err != nil {
 		return nil, err
 	}
-	user, err := s.findEntity(ctx, userIDs.EntityIdentifiers(), "id")
+	user, err := s.findEntity(ctx, userIDs, "id")
 	if err != nil {
 		return nil, err
 	}
@@ -82,11 +82,11 @@ func (s *oauthStore) GetAuthorization(ctx context.Context, userIDs *ttnpb.UserId
 
 func (s *oauthStore) Authorize(ctx context.Context, authorization *ttnpb.OAuthClientAuthorization) (*ttnpb.OAuthClientAuthorization, error) {
 	defer trace.StartRegion(ctx, "create or update authorization").End()
-	client, err := s.findEntity(ctx, authorization.ClientIDs.EntityIdentifiers(), "id")
+	client, err := s.findEntity(ctx, authorization.ClientIDs, "id")
 	if err != nil {
 		return nil, err
 	}
-	user, err := s.findEntity(ctx, authorization.UserIDs.EntityIdentifiers(), "id")
+	user, err := s.findEntity(ctx, authorization.UserIDs, "id")
 	if err != nil {
 		return nil, err
 	}
@@ -118,11 +118,11 @@ func (s *oauthStore) Authorize(ctx context.Context, authorization *ttnpb.OAuthCl
 
 func (s *oauthStore) DeleteAuthorization(ctx context.Context, userIDs *ttnpb.UserIdentifiers, clientIDs *ttnpb.ClientIdentifiers) error {
 	defer trace.StartRegion(ctx, "delete authorization").End()
-	client, err := s.findEntity(ctx, clientIDs.EntityIdentifiers(), "id")
+	client, err := s.findEntity(ctx, clientIDs, "id")
 	if err != nil {
 		return err
 	}
-	user, err := s.findEntity(ctx, userIDs.EntityIdentifiers(), "id")
+	user, err := s.findEntity(ctx, userIDs, "id")
 	if err != nil {
 		return err
 	}
@@ -135,11 +135,11 @@ func (s *oauthStore) DeleteAuthorization(ctx context.Context, userIDs *ttnpb.Use
 
 func (s *oauthStore) CreateAuthorizationCode(ctx context.Context, code *ttnpb.OAuthAuthorizationCode) error {
 	defer trace.StartRegion(ctx, "create authorization code").End()
-	client, err := s.findEntity(ctx, code.ClientIDs.EntityIdentifiers(), "id")
+	client, err := s.findEntity(ctx, code.ClientIDs, "id")
 	if err != nil {
 		return err
 	}
-	user, err := s.findEntity(ctx, code.UserIDs.EntityIdentifiers(), "id")
+	user, err := s.findEntity(ctx, code.UserIDs, "id")
 	if err != nil {
 		return err
 	}
@@ -194,11 +194,11 @@ func (s *oauthStore) DeleteAuthorizationCode(ctx context.Context, code string) e
 
 func (s *oauthStore) CreateAccessToken(ctx context.Context, token *ttnpb.OAuthAccessToken, previousID string) error {
 	defer trace.StartRegion(ctx, "create access token").End()
-	client, err := s.findEntity(ctx, token.ClientIDs.EntityIdentifiers(), "id")
+	client, err := s.findEntity(ctx, token.ClientIDs, "id")
 	if err != nil {
 		return err
 	}
-	user, err := s.findEntity(ctx, token.UserIDs.EntityIdentifiers(), "id")
+	user, err := s.findEntity(ctx, token.UserIDs, "id")
 	if err != nil {
 		return err
 	}
@@ -220,11 +220,11 @@ func (s *oauthStore) CreateAccessToken(ctx context.Context, token *ttnpb.OAuthAc
 
 func (s *oauthStore) ListAccessTokens(ctx context.Context, userIDs *ttnpb.UserIdentifiers, clientIDs *ttnpb.ClientIdentifiers) ([]*ttnpb.OAuthAccessToken, error) {
 	defer trace.StartRegion(ctx, "list access tokens").End()
-	client, err := s.findEntity(ctx, clientIDs.EntityIdentifiers(), "id")
+	client, err := s.findEntity(ctx, clientIDs, "id")
 	if err != nil {
 		return nil, err
 	}
-	user, err := s.findEntity(ctx, userIDs.EntityIdentifiers(), "id")
+	user, err := s.findEntity(ctx, userIDs, "id")
 	if err != nil {
 		return nil, err
 	}

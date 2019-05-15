@@ -23,7 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-func (is *IdentityServer) getRights(ctx context.Context) (entity map[*ttnpb.EntityIdentifiers]*ttnpb.Rights, universal *ttnpb.Rights, err error) {
+func (is *IdentityServer) getRights(ctx context.Context) (entity map[ttnpb.Identifiers]*ttnpb.Rights, universal *ttnpb.Rights, err error) {
 	authInfo, err := is.authInfo(ctx)
 	if err != nil {
 		return nil, nil, err
@@ -43,7 +43,7 @@ func (is *IdentityServer) ApplicationRights(ctx context.Context, appIDs ttnpb.Ap
 		return nil, err
 	}
 	for ids, rights := range entity {
-		if ids := ids.GetApplicationIDs(); ids != nil && ids.ApplicationID == appIDs.ApplicationID {
+		if ids.EntityType() == "application" && ids.IDString() == appIDs.IDString() {
 			return rights.Union(universal), nil
 		}
 	}
@@ -67,7 +67,7 @@ func (is *IdentityServer) ClientRights(ctx context.Context, cliIDs ttnpb.ClientI
 		return nil, err
 	}
 	for ids, rights := range entity {
-		if ids := ids.GetClientIDs(); ids != nil && ids.ClientID == cliIDs.ClientID {
+		if ids.EntityType() == "client" && ids.IDString() == cliIDs.IDString() {
 			return rights.Union(universal), nil
 		}
 	}
@@ -91,7 +91,7 @@ func (is *IdentityServer) GatewayRights(ctx context.Context, gtwIDs ttnpb.Gatewa
 		return nil, err
 	}
 	for ids, rights := range entity {
-		if ids := ids.GetGatewayIDs(); ids != nil && ids.GatewayID == gtwIDs.GatewayID {
+		if ids.EntityType() == "gateway" && ids.IDString() == gtwIDs.IDString() {
 			return rights.Union(universal), nil
 		}
 	}
@@ -115,7 +115,7 @@ func (is *IdentityServer) OrganizationRights(ctx context.Context, orgIDs ttnpb.O
 		return nil, err
 	}
 	for ids, rights := range entity {
-		if ids := ids.GetOrganizationIDs(); ids != nil && ids.OrganizationID == orgIDs.OrganizationID {
+		if ids.EntityType() == "organization" && ids.IDString() == orgIDs.IDString() {
 			return rights.Union(universal), nil
 		}
 	}
@@ -139,7 +139,7 @@ func (is *IdentityServer) UserRights(ctx context.Context, userIDs ttnpb.UserIden
 		return nil, err
 	}
 	for ids, rights := range entity {
-		if ids := ids.GetUserIDs(); ids != nil && ids.UserID == userIDs.UserID {
+		if ids.EntityType() == "user" && ids.IDString() == userIDs.IDString() {
 			return rights.Union(universal), nil
 		}
 	}

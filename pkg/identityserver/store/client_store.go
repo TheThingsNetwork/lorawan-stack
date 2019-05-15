@@ -111,7 +111,7 @@ func (s *clientStore) GetClient(ctx context.Context, id *ttnpb.ClientIdentifiers
 	var cliModel Client
 	if err := query.First(&cliModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return nil, errNotFoundForID(id.EntityIdentifiers())
+			return nil, errNotFoundForID(id)
 		}
 		return nil, err
 	}
@@ -127,7 +127,7 @@ func (s *clientStore) UpdateClient(ctx context.Context, cli *ttnpb.Client, field
 	var cliModel Client
 	if err = query.First(&cliModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return nil, errNotFoundForID(cli.ClientIdentifiers.EntityIdentifiers())
+			return nil, errNotFoundForID(cli.ClientIdentifiers)
 		}
 		return nil, err
 	}
@@ -151,5 +151,5 @@ func (s *clientStore) UpdateClient(ctx context.Context, cli *ttnpb.Client, field
 
 func (s *clientStore) DeleteClient(ctx context.Context, id *ttnpb.ClientIdentifiers) error {
 	defer trace.StartRegion(ctx, "delete client").End()
-	return s.deleteEntity(ctx, id.EntityIdentifiers())
+	return s.deleteEntity(ctx, id)
 }

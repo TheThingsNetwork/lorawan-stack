@@ -19,13 +19,12 @@ import (
 	"fmt"
 
 	"go.thethings.network/lorawan-stack/pkg/i18n"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 const i18nPrefix = "event"
 
 // Definition of a registered event.
-type Definition func(ctx context.Context, identifiers ttnpb.Identifiers, data interface{}) Event
+type Definition func(ctx context.Context, identifiers CombinedIdentifiers, data interface{}) Event
 
 // Definitions of registered events.
 // Events that are defined in init() funcs will be collected for translation.
@@ -40,7 +39,7 @@ func defineSkip(name, description string, skip uint) Definition {
 	i18n.Define(fmt.Sprintf("%s:%s", i18nPrefix, name), description).SetSource(1 + skip)
 	Definitions[name] = description
 	initMetrics(name)
-	return func(ctx context.Context, identifiers ttnpb.Identifiers, data interface{}) Event {
+	return func(ctx context.Context, identifiers CombinedIdentifiers, data interface{}) Event {
 		return New(ctx, name, identifiers, data)
 	}
 }

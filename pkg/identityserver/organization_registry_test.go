@@ -32,9 +32,9 @@ func init() {
 	// remove organizations assigned to the user by the populator
 	for _, organization := range population.Organizations {
 		for id, collaborators := range population.Memberships {
-			if organization.EntityIdentifiers().IDString() == id.IDString() {
+			if organization.IDString() == id.IDString() {
 				for i, collaborator := range collaborators {
-					if collaborator.EntityIdentifiers().IDString() == userID.GetUserID() {
+					if collaborator.IDString() == userID.GetUserID() {
 						population.Memberships[id] = collaborators[:i+copy(collaborators[i:], collaborators[i+1:])]
 					}
 				}

@@ -164,7 +164,7 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 		}
 
 		if len(req.ContactInfo) > 0 {
-			usr.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, usr.EntityIdentifiers(), req.ContactInfo)
+			usr.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, usr.UserIdentifiers, req.ContactInfo)
 			if err != nil {
 				return err
 			}
@@ -227,7 +227,7 @@ func (is *IdentityServer) getUser(ctx context.Context, req *ttnpb.GetUserRequest
 			return err
 		}
 		if ttnpb.HasAnyField(req.FieldMask.Paths, "contact_info") {
-			usr.ContactInfo, err = store.GetContactInfoStore(db).GetContactInfo(ctx, usr.EntityIdentifiers())
+			usr.ContactInfo, err = store.GetContactInfoStore(db).GetContactInfo(ctx, usr.UserIdentifiers)
 			if err != nil {
 				return err
 			}
@@ -313,7 +313,7 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 		updatingPrimaryEmailAddress := ttnpb.HasAnyField(req.FieldMask.Paths, "primary_email_address")
 		if updatingContactInfo || updatingPrimaryEmailAddress {
 			if updatingContactInfo {
-				contactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, req.User.EntityIdentifiers(), req.ContactInfo)
+				contactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, req.User.UserIdentifiers, req.ContactInfo)
 				if err != nil {
 					return err
 				}
@@ -321,7 +321,7 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 			}
 			if updatingPrimaryEmailAddress {
 				if !updatingContactInfo {
-					contactInfo, err = store.GetContactInfoStore(db).GetContactInfo(ctx, req.User.EntityIdentifiers())
+					contactInfo, err = store.GetContactInfoStore(db).GetContactInfo(ctx, req.User.UserIdentifiers)
 					if err != nil {
 						return err
 					}

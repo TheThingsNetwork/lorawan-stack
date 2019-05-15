@@ -119,7 +119,7 @@ func (s *userStore) GetUser(ctx context.Context, id *ttnpb.UserIdentifiers, fiel
 	var userModel User
 	if err := query.Preload("Account").First(&userModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return nil, errNotFoundForID(id.EntityIdentifiers())
+			return nil, errNotFoundForID(id)
 		}
 		return nil, err
 	}
@@ -135,7 +135,7 @@ func (s *userStore) UpdateUser(ctx context.Context, usr *ttnpb.User, fieldMask *
 	var userModel User
 	if err = query.First(&userModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return nil, errNotFoundForID(usr.UserIdentifiers.EntityIdentifiers())
+			return nil, errNotFoundForID(usr.UserIdentifiers)
 		}
 		return nil, err
 	}
@@ -175,5 +175,5 @@ func (s *userStore) UpdateUser(ctx context.Context, usr *ttnpb.User, fieldMask *
 
 func (s *userStore) DeleteUser(ctx context.Context, id *ttnpb.UserIdentifiers) (err error) {
 	defer trace.StartRegion(ctx, "delete user").End()
-	return s.deleteEntity(ctx, id.EntityIdentifiers())
+	return s.deleteEntity(ctx, id)
 }

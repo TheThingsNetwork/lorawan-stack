@@ -66,13 +66,13 @@ type polymorphicEntity struct {
 	EntityType string
 }
 
-func (s *store) findIdentifiers(entities ...polymorphicEntity) (map[polymorphicEntity]*ttnpb.EntityIdentifiers, error) {
+func (s *store) findIdentifiers(entities ...polymorphicEntity) (map[polymorphicEntity]ttnpb.Identifiers, error) {
 	return findIdentifiers(s.DB, entities...)
 }
 
-func findIdentifiers(db *gorm.DB, entities ...polymorphicEntity) (map[polymorphicEntity]*ttnpb.EntityIdentifiers, error) {
+func findIdentifiers(db *gorm.DB, entities ...polymorphicEntity) (map[polymorphicEntity]ttnpb.Identifiers, error) {
 	var err error
-	identifiers := make(map[polymorphicEntity]*ttnpb.EntityIdentifiers, len(entities))
+	identifiers := make(map[polymorphicEntity]ttnpb.Identifiers, len(entities))
 	for _, entityType := range []string{"application", "client", "gateway", "organization", "user"} {
 		uuids := make([]string, 0, len(entities))
 		for _, entity := range entities {
@@ -104,26 +104,26 @@ func findIdentifiers(db *gorm.DB, entities ...polymorphicEntity) (map[polymorphi
 			entity := polymorphicEntity{EntityType: entityType, EntityUUID: result.UUID}
 			switch entityType {
 			case "application":
-				identifiers[entity] = ttnpb.ApplicationIdentifiers{ApplicationID: result.FriendlyID}.EntityIdentifiers()
+				identifiers[entity] = ttnpb.ApplicationIdentifiers{ApplicationID: result.FriendlyID}
 			case "client":
-				identifiers[entity] = ttnpb.ClientIdentifiers{ClientID: result.FriendlyID}.EntityIdentifiers()
+				identifiers[entity] = ttnpb.ClientIdentifiers{ClientID: result.FriendlyID}
 			case "gateway":
-				identifiers[entity] = ttnpb.GatewayIdentifiers{GatewayID: result.FriendlyID}.EntityIdentifiers()
+				identifiers[entity] = ttnpb.GatewayIdentifiers{GatewayID: result.FriendlyID}
 			case "organization":
-				identifiers[entity] = ttnpb.OrganizationIdentifiers{OrganizationID: result.FriendlyID}.EntityIdentifiers()
+				identifiers[entity] = ttnpb.OrganizationIdentifiers{OrganizationID: result.FriendlyID}
 			case "user":
-				identifiers[entity] = ttnpb.UserIdentifiers{UserID: result.FriendlyID}.EntityIdentifiers()
+				identifiers[entity] = ttnpb.UserIdentifiers{UserID: result.FriendlyID}
 			}
 		}
 	}
 	return identifiers, nil
 }
 
-func (s *store) identifierRights(entityRights map[polymorphicEntity]Rights) (map[*ttnpb.EntityIdentifiers]*ttnpb.Rights, error) {
+func (s *store) identifierRights(entityRights map[polymorphicEntity]Rights) (map[ttnpb.Identifiers]*ttnpb.Rights, error) {
 	return identifierRights(s.DB, entityRights)
 }
 
-func identifierRights(db *gorm.DB, entityRights map[polymorphicEntity]Rights) (map[*ttnpb.EntityIdentifiers]*ttnpb.Rights, error) {
+func identifierRights(db *gorm.DB, entityRights map[polymorphicEntity]Rights) (map[ttnpb.Identifiers]*ttnpb.Rights, error) {
 	entities := make([]polymorphicEntity, 0, len(entityRights))
 	for entity := range entityRights {
 		entities = append(entities, entity)
@@ -132,7 +132,7 @@ func identifierRights(db *gorm.DB, entityRights map[polymorphicEntity]Rights) (m
 	if err != nil {
 		return nil, err
 	}
-	identifierRights := make(map[*ttnpb.EntityIdentifiers]*ttnpb.Rights, len(entityRights))
+	identifierRights := make(map[ttnpb.Identifiers]*ttnpb.Rights, len(entityRights))
 	for entity, rights := range entityRights {
 		ids, ok := identifiers[entity]
 		if !ok {

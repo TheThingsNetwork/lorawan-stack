@@ -31,9 +31,9 @@ func init() {
 	userID := paginationUser.UserIdentifiers
 	for _, client := range population.Clients {
 		for id, collaborators := range population.Memberships {
-			if client.EntityIdentifiers().IDString() == id.IDString() {
+			if client.IDString() == id.IDString() {
 				for i, collaborator := range collaborators {
-					if collaborator.EntityIdentifiers().IDString() == userID.GetUserID() {
+					if collaborator.IDString() == userID.GetUserID() {
 						collaborators = collaborators[:i+copy(collaborators[i:], collaborators[i+1:])]
 					}
 				}
