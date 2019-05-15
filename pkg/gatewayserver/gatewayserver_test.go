@@ -53,7 +53,7 @@ var (
 	unregisteredGatewayID  = "eui-bbff000000000000"
 	unregisteredGatewayEUI = types.EUI64{0xBB, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
 
-	timeout = (1 << 4) * test.Delay
+	timeout = (1 << 5) * test.Delay
 )
 
 func TestGatewayServer(t *testing.T) {
