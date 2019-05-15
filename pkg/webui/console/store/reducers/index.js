@@ -35,6 +35,7 @@ import createNamedEventsReducer from './events'
 import createNamedApiKeyReducer from './api-key'
 import link from './link'
 import fetching from './ui/fetching'
+import error from './ui/error'
 
 export default combineReducers({
   user,
@@ -68,5 +69,6 @@ export default combineReducers({
   }),
   ui: combineReducers({
     fetching,
+    error,
   }),
 })
