@@ -5453,6 +5453,15 @@
       "file": "observability.go"
     }
   },
+  "event:gs.up.fail": {
+    "translations": {
+      "en": "fail to handle uplink message"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "observability.go"
+    }
+  },
   "event:gs.up.forward": {
     "translations": {
       "en": "forward uplink message"
