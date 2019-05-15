@@ -23,7 +23,7 @@ import (
 var DefaultGatewayServerConfig = gatewayserver.Config{
 	RequireRegisteredGateways: false,
 	Forward: map[string][]string{
-		"": []string{"00000000/0"},
+		"": {"00000000/0"},
 	},
 	UDP: gatewayserver.UDPConfig{
 		Config: udp.DefaultConfig,

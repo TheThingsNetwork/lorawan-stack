@@ -29,15 +29,15 @@ func TestConfig(t *testing.T) {
 	{
 		conf := gatewayserver.Config{
 			Forward: map[string][]string{
-				"":                []string{"00000000/0"},
-				"packetbroker.io": []string{"00000000/3", "26000000/7"},
+				"":                {"00000000/0"},
+				"packetbroker.io": {"00000000/3", "26000000/7"},
 			},
 		}
 		forward, err := conf.ForwardDevAddrPrefixes()
 		a.So(err, should.BeNil)
 		a.So(forward, should.HaveEmptyDiff, map[string][]types.DevAddrPrefix{
-			"": []types.DevAddrPrefix{{}},
-			"packetbroker.io": []types.DevAddrPrefix{
+			"": {{}},
+			"packetbroker.io": {
 				{DevAddr: types.DevAddr{}, Length: 3},
 				{DevAddr: types.DevAddr{0x26, 0x0, 0x0, 0x0}, Length: 7},
 			},
@@ -47,7 +47,7 @@ func TestConfig(t *testing.T) {
 	{
 		conf := gatewayserver.Config{
 			Forward: map[string][]string{
-				"packetbroker.io": []string{"00000000/3", "invalid"},
+				"packetbroker.io": {"00000000/3", "invalid"},
 			},
 		}
 		_, err := conf.ForwardDevAddrPrefixes()
