@@ -381,7 +381,7 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 				ctx := item.ctx
 				switch msg := item.val.(type) {
 				case *ttnpb.UplinkMessage:
-					registerReceiveUplink(ctx, conn.Gateway(), msg)
+					registerReceiveUplink(ctx, conn.Gateway(), msg, host.name)
 					drop := func(ids ttnpb.EndDeviceIdentifiers, err error) {
 						logger := logger.WithError(err)
 						if ids.JoinEUI != nil && !ids.JoinEUI.IsZero() {
@@ -394,7 +394,7 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 							logger = logger.WithField("dev_addr", *ids.DevAddr)
 						}
 						logger.Debug("Drop message")
-						registerDropUplink(ctx, conn.Gateway(), msg, err)
+						registerDropUplink(ctx, conn.Gateway(), msg, host.name, err)
 					}
 					ids, err := lorawan.GetUplinkMessageIdentifiers(msg)
 					if err != nil {
