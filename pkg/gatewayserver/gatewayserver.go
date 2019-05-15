@@ -352,6 +352,7 @@ type upstreamHost struct {
 }
 
 type upstreamItem struct {
+	ctx  context.Context
 	val  interface{}
 	host *upstreamHost
 }
@@ -377,10 +378,9 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 			case <-time.After(upstreamHandlerIdleTimeout):
 				return
 			case item := <-host.handleCh:
+				ctx := item.ctx
 				switch msg := item.val.(type) {
 				case *ttnpb.UplinkMessage:
-					ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:uplink:%s", events.NewCorrelationID()))
-					msg.CorrelationIDs = append(msg.CorrelationIDs, events.CorrelationIDsFromContext(ctx)...)
 					registerReceiveUplink(ctx, conn.Gateway(), msg)
 					drop := func(ids ttnpb.EndDeviceIdentifiers, err error) {
 						logger := logger.WithError(err)
@@ -412,12 +412,9 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 					registerForwardUplink(ctx, conn.Gateway(), msg, item.host.name)
 
 				case *ttnpb.GatewayStatus:
-					ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:status:%s", events.NewCorrelationID()))
 					registerReceiveStatus(ctx, conn.Gateway(), msg)
 
 				case *ttnpb.TxAcknowledgment:
-					ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:tx_ack:%s", events.NewCorrelationID()))
-					msg.CorrelationIDs = append(msg.CorrelationIDs, events.CorrelationIDsFromContext(ctx)...)
 					if msg.Result == ttnpb.TxAcknowledgment_SUCCESS {
 						registerSuccessDownlink(ctx, conn.Gateway())
 					} else {
@@ -467,16 +464,26 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 	}
 
 	for {
+		ctx := ctx
 		var val interface{}
 		select {
 		case <-ctx.Done():
 			return
-		case val = <-conn.Up():
-		case val = <-conn.Status():
-		case val = <-conn.TxAck():
+		case msg := <-conn.Up():
+			ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:uplink:%s", events.NewCorrelationID()))
+			msg.CorrelationIDs = append(msg.CorrelationIDs, events.CorrelationIDsFromContext(ctx)...)
+			val = msg
+		case msg := <-conn.Status():
+			ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:status:%s", events.NewCorrelationID()))
+			val = msg
+		case msg := <-conn.TxAck():
+			ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:tx_ack:%s", events.NewCorrelationID()))
+			msg.CorrelationIDs = append(msg.CorrelationIDs, events.CorrelationIDsFromContext(ctx)...)
+			val = msg
 		}
 		for _, host := range hosts {
 			item := upstreamItem{
+				ctx:  ctx,
 				val:  val,
 				host: host,
 			}
