@@ -21,11 +21,14 @@ import { Helmet } from 'react-helmet'
 
 import WithLocale from '../../../lib/components/with-locale'
 import { EnvProvider } from '../../../lib/components/env'
+import { pageDataSelector } from '../../../lib/selectors/env'
+import ErrorView from '../../../lib/components/error-view'
 
 import Landing from '../landing'
 import Login from '../login'
 import Authorize from '../authorize'
 import CreateAccount from '../create-account'
+import FullViewError from '../error'
 import createStore from '../../store'
 import Init from '../../../lib/components/init'
 import Code from '../code'
@@ -39,8 +42,17 @@ const env = {
   page_data: window.PAGE_DATA,
 }
 
+const GenericNotFound = () => <FullViewError error={{ statusCode: 404 }} />
+
 export default class OAuthApp extends React.PureComponent {
   render () {
+
+    const pageData = pageDataSelector(env)
+
+    if (pageData && pageData.error) {
+      return <FullViewError error={pageData.error} />
+    }
+
     return (
       <EnvProvider env={env}>
         <Provider store={store}>
@@ -50,15 +62,18 @@ export default class OAuthApp extends React.PureComponent {
               defaultTitle="TTN Stack Account"
             />
             <WithLocale>
-              <ConnectedRouter history={history}>
-                <Switch>
-                  <Route path="/oauth" exact component={Landing} />
-                  <Route path="/oauth/login" component={Login} />
-                  <Route path="/oauth/authorize" component={Authorize} />
-                  <Route path="/oauth/register" component={CreateAccount} />
-                  <Route path="/oauth/code" component={Code} />
-                </Switch>
-              </ConnectedRouter>
+              <ErrorView ErrorComponent={FullViewError}>
+                <ConnectedRouter history={history}>
+                  <Switch>
+                    <Route path="/oauth" exact component={Landing} />
+                    <Route path="/oauth/login" component={Login} />
+                    <Route path="/oauth/authorize" component={Authorize} />
+                    <Route path="/oauth/register" component={CreateAccount} />
+                    <Route path="/oauth/code" component={Code} />
+                    <Route component={GenericNotFound} />
+                  </Switch>
+                </ConnectedRouter>
+              </ErrorView>
             </WithLocale>
           </Init>
         </Provider>

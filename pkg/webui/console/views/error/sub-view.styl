@@ -12,23 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.footer
-  border-normal('top')
-  display: flex
-  justify-content: space-between
-  padding: $cs.s
-  color: $tc-subtle-gray
-  flex: none
-  +media-query($bp.s)
-    background-color: white
+.title
+  margin-top: $ls.l
 
-.link
-  text-decoration: underline
-  color: $tc-subtle-gray
-  margin-left: $ls.xxs
+  span
+    nudge('up', 4px)
+    color: $c-error
+    margin-right: $cs.s
 
-  &:first-of-type
-    margin-left: 0
+  h2
+    display: inline
 
-  &:hover
-    color: $tc-deep-gray
+.button
+  margin-top: $ls.m

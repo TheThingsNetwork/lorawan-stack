@@ -69,6 +69,7 @@ const Header = function ({
   user,
   searchable,
   handleSearchRequest = () => null,
+  anchored = false,
   ...rest
 }) {
   const isGuest = !Boolean(user)
@@ -84,11 +85,19 @@ const Header = function ({
           <React.Fragment>
             <div className={styles.left}>
               <div className={styles.logo}><Logo /></div>
-              <NavigationBar className={styles.navList} entries={navigationEntries} />
+              <NavigationBar
+                className={styles.navList}
+                entries={navigationEntries}
+                anchored={anchored}
+              />
             </div>
             <div className={styles.right}>
               { searchable && <Input icon="search" onEnter={handleSearchRequest} /> }
-              <ProfileDropdown dropdownItems={dropdownItems || defaultDropdownItems} userId={user.ids.user_id} />
+              <ProfileDropdown
+                dropdownItems={dropdownItems || defaultDropdownItems}
+                userId={user.ids.user_id}
+                anchored={anchored}
+              />
             </div>
           </React.Fragment>
         )
@@ -129,6 +138,8 @@ Header.propTypes = {
     action: PropTypes.func,
     icon: PropTypes.string,
   })),
+  /** Flag identifying whether links should be rendered as plain anchor link */
+  anchored: PropTypes.bool,
   /**
   * A handler for when the user clicks the logout button
   */

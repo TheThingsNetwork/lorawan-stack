@@ -12,23 +12,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.footer
-  border-normal('top')
-  display: flex
-  justify-content: space-between
-  padding: $cs.s
-  color: $tc-subtle-gray
-  flex: none
-  +media-query($bp.s)
-    background-color: white
+import React from 'react'
 
-.link
-  text-decoration: underline
-  color: $tc-subtle-gray
-  margin-left: $ls.xxs
+import PropTypes from '../../lib/prop-types'
 
-  &:first-of-type
-    margin-left: 0
+class ErrorView extends React.Component {
+  state = {
+    error: undefined,
+    hasCaught: false,
+  }
 
-  &:hover
-    color: $tc-deep-gray
+  componentDidCatch (error) {
+    this.setState({
+      hasCaught: true,
+      error,
+    })
+  }
+
+  render () {
+    const { children, ErrorComponent } = this.props
+    const { hasCaught, error } = this.state
+
+    if (hasCaught) {
+      return (
+        <ErrorComponent error={error} />
+      )
+    }
+
+    return React.Children.only(children)
+  }
+}
+
+ErrorView.propTypes = {
+  ErrorComponent: PropTypes.func.isRequired,
+}
+
+export default ErrorView

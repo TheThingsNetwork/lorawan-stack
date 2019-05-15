@@ -97,7 +97,7 @@ export default class Device extends React.Component {
 
     // show any device fetching error, e.g. not found, no rights, etc
     if (error) {
-      return 'ERROR'
+      throw error
     }
 
     const basePath = `/console/applications/${appId}/devices/${devId}`

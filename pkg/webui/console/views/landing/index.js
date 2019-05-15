@@ -23,8 +23,11 @@ import Applications from '../applications'
 import Gateways from '../gateways'
 import Organizations from '../organizations'
 import { ToastContainer } from '../../../components/toast'
+import { FullViewErrorInner } from '../error'
 
 import style from './landing.styl'
+
+const GenericNotFound = () => <FullViewErrorInner error={{ statusCode: 404 }} />
 
 export default class Landing extends React.PureComponent {
 
@@ -39,17 +42,17 @@ export default class Landing extends React.PureComponent {
           </Container>
         </div>
         <div className={style.contentContainer}>
-          <Switch>
-            <WithAuth>
+          <WithAuth>
+            <Switch>
               <Route exact path={`${path}`} component={Overview} />
               <Route path={`${path}/applications`} component={Applications} />
               <Route path={`${path}/gateways`} component={Gateways} />
               <Route path={`${path}/organizations`} component={Organizations} />
-            </WithAuth>
-          </Switch>
+              <Route component={GenericNotFound} />
+            </Switch>
+          </WithAuth>
         </div>
       </div>
-      // TODO:  render not found
     )
   }
 }

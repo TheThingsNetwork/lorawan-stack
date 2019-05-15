@@ -12,21 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/**
- * Tests whether the grpc error represents the not found erorr.
- * @param {Object} error - The error object to be tested.
- * @returns {boolean} `true` if `error` represents the not found error,
- * `false` otherwise.
- */
-export const isNotFoundError = error => (
-  error && error.code && error.code === 5
-)
+.full-view-error
+  height: 100%
+  background: url('../../../assets/img/layout/bg/ttn-console-bg.png') no-repeat
+  background-size: 160vh
+  background-position: 40vw 20%
+  padding-top: 20vh
+  +media-query($bp.m)
+    background-size: 140vh
+    background-position: 60vw 20%
+  +media-query($bp.s)
+    background-size: 160vh
+    background-position: 0vw 20vh
 
-/**
- * Tests wether `error` is translated.
- * @param {Object} error - The error to be tested.
- * @returns {boolean} `true` if `error` is translated, `false` otherwise.
- */
-export const isErrorTranslated = error => (
-  typeof error === 'object' && error.id && error.defaultMessage
-)
+  &-header
+    h2()
+    margin-bottom: $cs.xs
+    +media-query($bp.s)
+      margin-top: $ls.l
+
+  &-sub
+    one-liner()
+    display: block
+    margin-bottom: $cs.xl

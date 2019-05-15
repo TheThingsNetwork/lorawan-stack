@@ -15,7 +15,7 @@
 import React from 'react'
 import classnames from 'classnames'
 
-import NavigationLink from '../link'
+import NavigationLink, { NavigationAnchorLink } from '../link'
 import Message from '../../../lib/components/message'
 import Icon from '../../icon'
 import PropTypes from '../../../lib/prop-types'
@@ -25,6 +25,7 @@ import style from './bar.styl'
 const NavigationBar = function ({
   className,
   entries,
+  anchored,
 }) {
   return (
     <nav className={classnames(className, style.bar)}>
@@ -36,8 +37,10 @@ const NavigationBar = function ({
           exact = false,
         } = entry
 
+        const Component = anchored ? NavigationAnchorLink : NavigationLink
+
         return (
-          <NavigationLink
+          <Component
             key={index}
             path={path}
             exact={exact}
@@ -46,7 +49,7 @@ const NavigationBar = function ({
           >
             {icon && <Icon icon={icon} className={style.icon} />}
             <Message content={title} />
-          </NavigationLink>
+          </Component>
         )
       })}
     </nav>
@@ -67,6 +70,8 @@ NavigationBar.propTypes = {
     icon: PropTypes.string,
     exact: PropTypes.bool,
   })),
+  /** Flag identifying whether links should be rendered as plain anchor link */
+  anchored: PropTypes.bool,
 }
 
 NavigationBar.defaultProps = {

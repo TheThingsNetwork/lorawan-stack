@@ -111,7 +111,7 @@ export default class ApplicationCollaboratorAdd extends React.Component {
     const { rights, fetching, error } = this.props
 
     if (error) {
-      return 'ERROR'
+      throw error
     }
 
     if (fetching && !rights.length) {

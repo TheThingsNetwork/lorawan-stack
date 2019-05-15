@@ -18,6 +18,8 @@ import { Switch, Route } from 'react-router'
 import sharedMessages from '../../../lib/shared-messages'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
+import ErrorView from '../../../lib/components/error-view'
+import SubViewError from '../error/sub-view'
 
 import ApplicationApiKeysList from '../application-api-keys-list'
 import ApplicationApiKeyEdit from '../application-api-key-edit'
@@ -40,11 +42,13 @@ export default class ApplicationAccess extends React.Component {
   render () {
     const { match } = this.props
     return (
-      <Switch>
-        <Route exact path={`${match.path}`} component={ApplicationApiKeysList} />
-        <Route path={`${match.path}/add`} component={ApplicationApiKeyAdd} />
-        <Route path={`${match.path}/:apiKeyId`} component={ApplicationApiKeyEdit} />
-      </Switch>
+      <ErrorView ErrorComponent={SubViewError}>
+        <Switch>
+          <Route exact path={`${match.path}`} component={ApplicationApiKeysList} />
+          <Route path={`${match.path}/add`} component={ApplicationApiKeyAdd} />
+          <Route path={`${match.path}/:apiKeyId`} component={ApplicationApiKeyEdit} />
+        </Switch>
+      </ErrorView>
     )
   }
 }

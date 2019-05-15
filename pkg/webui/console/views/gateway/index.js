@@ -114,7 +114,7 @@ export default class Gateway extends React.Component {
 
     // show any gateway fetching error, e.g. not found, no rights, etc
     if (error) {
-      return 'ERROR'
+      throw error
     }
 
     if (fetching || !gateway) {

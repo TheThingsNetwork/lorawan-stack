@@ -12,23 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.footer
-  border-normal('top')
+.wrapper
   display: flex
-  justify-content: space-between
-  padding: $cs.s
-  color: $tc-subtle-gray
-  flex: none
+  flex-direction: column
+  height: 100%
+
+.full-view-error
+  height: 100%
+  background: url('../../../assets/img/layout/bg/ttn-console-bg.png') no-repeat
+  background-size: 160vh
+  background-position: 40vw 20%
+  padding-top: 20vh
+  +media-query($bp.m)
+    background-size: 140vh
+    background-position: 60vw 20%
   +media-query($bp.s)
-    background-color: white
+    background-size: 160vh
+    background-position: 0vw 20vh
 
-.link
-  text-decoration: underline
-  color: $tc-subtle-gray
-  margin-left: $ls.xxs
+  &-header
+    h2()
+    margin-bottom: $cs.xs
+    +media-query($bp.s)
+      margin-top: $ls.l
 
-  &:first-of-type
-    margin-left: 0
-
-  &:hover
-    color: $tc-deep-gray
+  &-sub
+    one-liner()
+    display: block
+    margin-bottom: $cs.xl

@@ -18,6 +18,8 @@ import { Switch, Route } from 'react-router'
 import sharedMessages from '../../../lib/shared-messages'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
+import ErrorView from '../../../lib/components/error-view'
+import SubViewError from '../error/sub-view'
 
 import ApplicationCollaboratorsList from '../application-collaborators-list'
 import ApplicationCollaboratorAdd from '../application-collaborator-add'
@@ -41,11 +43,13 @@ export default class ApplicationCollaborators extends React.Component {
     const { match } = this.props
 
     return (
-      <Switch>
-        <Route exact path={`${match.path}`} component={ApplicationCollaboratorsList} />
-        <Route path={`${match.path}/add`} component={ApplicationCollaboratorAdd} />
-        <Route path={`${match.path}/:collaboratorId`} component={ApplicationCollaboratorEdit} />
-      </Switch>
+      <ErrorView ErrorComponent={SubViewError}>
+        <Switch>
+          <Route exact path={`${match.path}`} component={ApplicationCollaboratorsList} />
+          <Route path={`${match.path}/add`} component={ApplicationCollaboratorAdd} />
+          <Route path={`${match.path}/:collaboratorId`} component={ApplicationCollaboratorEdit} />
+        </Switch>
+      </ErrorView>
     )
   }
 }

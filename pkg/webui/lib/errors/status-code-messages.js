@@ -12,23 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.footer
-  border-normal('top')
-  display: flex
-  justify-content: space-between
-  padding: $cs.s
-  color: $tc-subtle-gray
-  flex: none
-  +media-query($bp.s)
-    background-color: white
+/* eslint-disable quote-props */
 
-.link
-  text-decoration: underline
-  color: $tc-subtle-gray
-  margin-left: $ls.xxs
+import { defineMessages } from 'react-intl'
 
-  &:first-of-type
-    margin-left: 0
-
-  &:hover
-    color: $tc-deep-gray
+export default defineMessages({
+  '4××': 'Client Error',
+  '400': 'Bad Request',
+  '401': 'Unauthorized',
+  '403': 'Forbidden',
+  '404': 'Not Found',
+  '409': 'Conflict',
+  '429': 'Too Many Requests',
+  '499': 'Client Closed Request',
+  '5××': 'Server Error',
+  '500': 'Internal Server Error',
+  '501': 'Not Implemented',
+  '503': 'Service Unavailable',
+  '504': 'Gateway Timeout',
+  '520': 'Unknown Error',
+})
