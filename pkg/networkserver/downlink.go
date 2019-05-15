@@ -363,7 +363,7 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 			priority = max
 		}
 	}
-	if len(cmdBuf) > 0 && priority < ns.downlinkPriorities.MACCommands {
+	if (pld.FPort == 0 || len(cmdBuf) > 0) && priority < ns.downlinkPriorities.MACCommands {
 		priority = ns.downlinkPriorities.MACCommands
 	}
 
