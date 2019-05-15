@@ -105,8 +105,6 @@ func (org *Organization) fromPB(pb *ttnpb.Organization, fieldMask *types.FieldMa
 			setter(org, pb)
 			if columnNames, ok := organizationColumnNames[path]; ok {
 				columns = append(columns, columnNames...)
-			} else {
-				columns = append(columns, path)
 			}
 			continue
 		}

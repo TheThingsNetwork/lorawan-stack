@@ -96,8 +96,6 @@ func (app *Application) fromPB(pb *ttnpb.Application, fieldMask *types.FieldMask
 			setter(app, pb)
 			if columnNames, ok := applicationColumnNames[path]; ok {
 				columns = append(columns, columnNames...)
-			} else {
-				columns = append(columns, path)
 			}
 			continue
 		}

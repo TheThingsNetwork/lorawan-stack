@@ -185,8 +185,6 @@ func (usr *User) fromPB(pb *ttnpb.User, fieldMask *types.FieldMask) (columns []s
 			setter(usr, pb)
 			if columnNames, ok := userColumnNames[path]; ok {
 				columns = append(columns, columnNames...)
-			} else {
-				columns = append(columns, path)
 			}
 			continue
 		}

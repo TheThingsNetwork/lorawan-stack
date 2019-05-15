@@ -128,8 +128,6 @@ func (cli *Client) fromPB(pb *ttnpb.Client, fieldMask *types.FieldMask) (columns
 			setter(cli, pb)
 			if columnNames, ok := clientColumnNames[path]; ok {
 				columns = append(columns, columnNames...)
-			} else {
-				columns = append(columns, path)
 			}
 			continue
 		}
