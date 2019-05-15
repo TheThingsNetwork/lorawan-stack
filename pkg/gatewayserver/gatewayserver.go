@@ -337,6 +337,24 @@ var (
 	upstreamHandlerIdleTimeout = (1 << 6) * time.Millisecond
 )
 
+type upstreamHandler interface {
+	HandleUplink(context.Context, *ttnpb.UplinkMessage, ...grpc.CallOption) (*pbtypes.Empty, error)
+}
+
+type upstreamHost struct {
+	name     string
+	handler  func(ids *ttnpb.EndDeviceIdentifiers) upstreamHandler
+	callOpts []grpc.CallOption
+	handlers int32
+	handleWg sync.WaitGroup
+	handleCh chan upstreamItem
+}
+
+type upstreamItem struct {
+	val  interface{}
+	host *upstreamHost
+}
+
 func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 	ctx := conn.Context()
 	logger := log.FromContext(ctx)
@@ -348,32 +366,16 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 		logger.Info("Disconnected")
 	}()
 
-	type handler interface {
-		HandleUplink(context.Context, *ttnpb.UplinkMessage, ...grpc.CallOption) (*pbtypes.Empty, error)
-	}
-	type host struct {
-		name     string
-		handler  func(ids *ttnpb.EndDeviceIdentifiers) handler
-		callOpts []grpc.CallOption
-	}
-	type item struct {
-		val  interface{}
-		host *host
-	}
-
-	wg := &sync.WaitGroup{}
-	handlers := int32(0)
-	handleCh := make(chan item)
-	handleFn := func() {
-		defer wg.Done()
-		defer atomic.AddInt32(&handlers, -1)
+	handleFn := func(host *upstreamHost) {
+		defer host.handleWg.Done()
+		defer atomic.AddInt32(&host.handlers, -1)
 		for {
 			select {
 			case <-ctx.Done():
 				return
 			case <-time.After(upstreamHandlerIdleTimeout):
 				return
-			case item := <-handleCh:
+			case item := <-host.handleCh:
 				switch msg := item.val.(type) {
 				case *ttnpb.UplinkMessage:
 					ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:uplink:%s", events.NewCorrelationID()))
@@ -426,7 +428,7 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 		}
 	}
 
-	hosts := make([]*host, 0, len(gs.forward))
+	hosts := make([]*upstreamHost, 0, len(gs.forward))
 	for name, prefixes := range gs.forward {
 		passDevAddr := func(devAddr types.DevAddr) bool {
 			for _, prefix := range prefixes {
@@ -438,9 +440,9 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 		}
 		if name == "" {
 			// Cluster Network Server; filter based on DevAddr and pass all join-requests.
-			hosts = append(hosts, &host{
-				name: name,
-				handler: func(ids *ttnpb.EndDeviceIdentifiers) handler {
+			hosts = append(hosts, &upstreamHost{
+				name: "cluster",
+				handler: func(ids *ttnpb.EndDeviceIdentifiers) upstreamHandler {
 					if ids != nil && ids.DevAddr != nil && !passDevAddr(*ids.DevAddr) {
 						return nil
 					}
@@ -452,6 +454,7 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 					return ttnpb.NewGsNsClient(ns.Conn())
 				},
 				callOpts: []grpc.CallOption{gs.WithClusterAuth()},
+				handleCh: make(chan upstreamItem),
 			})
 		} else {
 			// Packet Broker; filter based on DevAddr and filter all join-requests.
@@ -459,7 +462,10 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 		}
 	}
 
-	defer wg.Wait()
+	for _, host := range hosts {
+		defer host.handleWg.Wait()
+	}
+
 	for {
 		var val interface{}
 		select {
@@ -470,19 +476,19 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 		case val = <-conn.TxAck():
 		}
 		for _, host := range hosts {
-			item := item{
+			item := upstreamItem{
 				val:  val,
 				host: host,
 			}
 			select {
-			case handleCh <- item:
+			case host.handleCh <- item:
 			default:
-				if atomic.LoadInt32(&handlers) < maxUpstreamHandlers {
-					atomic.AddInt32(&handlers, 1)
-					wg.Add(1)
-					go handleFn()
+				if atomic.LoadInt32(&host.handlers) < maxUpstreamHandlers {
+					atomic.AddInt32(&host.handlers, 1)
+					host.handleWg.Add(1)
+					go handleFn(host)
 				}
-				handleCh <- item
+				host.handleCh <- item
 			}
 		}
 	}
