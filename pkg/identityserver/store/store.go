@@ -72,9 +72,7 @@ func (s *store) createEntity(ctx context.Context, model interface{}) error {
 
 func (s *store) updateEntity(ctx context.Context, model interface{}, columns ...string) error {
 	query := s.query(ctx, model)
-	if len(columns) > 0 {
-		query = query.Select(append(columns, "updated_at"))
-	}
+	query = query.Select(append(columns, "updated_at"))
 	return query.Save(model).Error
 }
 
