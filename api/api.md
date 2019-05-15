@@ -3756,7 +3756,7 @@ The UplinkMessageProcessor service processes uplink messages.
 | Field | Validations |
 | ----- | ----------- |
 | `session_key_id` | <p>`bytes.max_len`: `2048`</p> |
-| `f_port` | <p>`uint32.lte`: `255`</p> |
+| `f_port` | <p>`uint32.lte`: `255`</p><p>`uint32.gte`: `1`</p> |
 | `priority` | <p>`enum.defined_only`: `true`</p> |
 | `correlation_ids` | <p>`repeated.items.string.max_len`: `100`</p> |
 
@@ -3878,7 +3878,7 @@ The UplinkMessageProcessor service processes uplink messages.
 | Field | Validations |
 | ----- | ----------- |
 | `session_key_id` | <p>`bytes.max_len`: `2048`</p> |
-| `f_port` | <p>`uint32.lte`: `255`</p> |
+| `f_port` | <p>`uint32.lte`: `255`</p><p>`uint32.gte`: `1`</p> |
 | `rx_metadata` | <p>`repeated.min_items`: `1`</p> |
 | `settings` | <p>`message.required`: `true`</p> |
 
