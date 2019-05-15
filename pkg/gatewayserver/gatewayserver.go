@@ -410,16 +410,6 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 						break
 					}
 					registerForwardUplink(ctx, conn.Gateway(), msg, item.host.name)
-
-				case *ttnpb.GatewayStatus:
-					registerReceiveStatus(ctx, conn.Gateway(), msg)
-
-				case *ttnpb.TxAcknowledgment:
-					if msg.Result == ttnpb.TxAcknowledgment_SUCCESS {
-						registerSuccessDownlink(ctx, conn.Gateway())
-					} else {
-						registerFailDownlink(ctx, conn.Gateway(), msg)
-					}
 				}
 			}
 		}
@@ -475,11 +465,18 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 			val = msg
 		case msg := <-conn.Status():
 			ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:status:%s", events.NewCorrelationID()))
-			val = msg
+			registerReceiveStatus(ctx, conn.Gateway(), msg)
+			continue
 		case msg := <-conn.TxAck():
 			ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:tx_ack:%s", events.NewCorrelationID()))
 			msg.CorrelationIDs = append(msg.CorrelationIDs, events.CorrelationIDsFromContext(ctx)...)
-			val = msg
+			if msg.Result == ttnpb.TxAcknowledgment_SUCCESS {
+				registerSuccessDownlink(ctx, conn.Gateway())
+			} else {
+				registerFailDownlink(ctx, conn.Gateway(), msg)
+			}
+			// TODO: Send Tx acknowledgement upstream (https://github.com/TheThingsNetwork/lorawan-stack/issues/76)
+			continue
 		}
 		for _, host := range hosts {
 			item := upstreamItem{
