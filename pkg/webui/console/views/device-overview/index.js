@@ -24,6 +24,9 @@ import IntlHelmet from '../../../lib/components/intl-helmet'
 import Message from '../../../lib/components/message'
 import DataSheet from '../../../components/data-sheet'
 import DateTime from '../../../lib/components/date-time'
+import DeviceEvents from '../../containers/device-events'
+
+import { getDeviceId } from '../../../lib/selectors/id'
 
 import style from './device-overview.styl'
 
@@ -132,6 +135,9 @@ class DeviceOverview extends React.Component {
   }
 
   render () {
+    const { device } = this.props
+    const devId = getDeviceId(device)
+
     return (
       <Container>
         <IntlHelmet
@@ -142,10 +148,7 @@ class DeviceOverview extends React.Component {
             {this.deviceInfo}
           </Col>
           <Col md={12} lg={6}>
-            <div className={style.activityPlaceholder}>
-              <h4><Message content={m.latestData} /></h4>
-              <div>Activity Panel Placeholder</div>
-            </div>
+            <DeviceEvents devId={devId} widget />
             <div className={style.locationPlaceholder}>
               <h4><Message content={sharedMessages.location} /></h4>
               <div>Location Map Placeholder</div>
