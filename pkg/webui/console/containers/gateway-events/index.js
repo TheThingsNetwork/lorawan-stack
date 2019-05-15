@@ -44,7 +44,7 @@ class GatewayEvents extends React.Component {
         eventsSelector={gatewayEventsSelector}
         statusSelector={gatewayEventsStatusSelector}
         onClear={onClear}
-        toAllUrl={`/console/gatways/${gtwId}/data`}
+        toAllUrl={`/console/gateways/${gtwId}/data`}
       />
     )
   }
