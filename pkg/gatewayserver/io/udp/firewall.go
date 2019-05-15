@@ -68,10 +68,8 @@ func (v *memoryFirewall) filter(packet encoding.Packet, store *sync.Map) bool {
 	val, ok := store.Load(eui)
 	if ok {
 		a := val.(addrTime)
-		if a.UDPAddr.String() != packet.GatewayAddr.String() {
-			if a.lastSeen.Add(v.addrChangeBlock).After(now) {
-				return false
-			}
+		if a.UDPAddr.String() != packet.GatewayAddr.String() && a.lastSeen.Add(v.addrChangeBlock).After(now) {
+			return false
 		}
 	}
 	store.Store(eui, addrTime{
@@ -83,9 +81,9 @@ func (v *memoryFirewall) filter(packet encoding.Packet, store *sync.Map) bool {
 
 func (v *memoryFirewall) Filter(packet encoding.Packet) bool {
 	switch packet.PacketType {
-	case encoding.PullData, encoding.TxAck:
+	case encoding.PullData:
 		return v.filter(packet, &v.pull)
-	case encoding.PushData:
+	case encoding.PushData, encoding.TxAck:
 		return v.filter(packet, &v.push)
 	}
 	return false
