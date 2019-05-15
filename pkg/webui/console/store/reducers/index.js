@@ -34,6 +34,7 @@ import createNamedCollaboratorsReducer from './collaborators'
 import createNamedEventsReducer from './events'
 import createNamedApiKeyReducer from './api-key'
 import link from './link'
+import fetching from './ui/fetching'
 
 export default combineReducers({
   user,
@@ -64,5 +65,8 @@ export default combineReducers({
     applications: createNamedEventsReducer(APPLICATION_SHARED_NAME),
     devices: createNamedEventsReducer(DEVICE_SHARED_NAME),
     gateways: createNamedEventsReducer(GATEWAY_SHARED_NAME),
+  }),
+  ui: combineReducers({
+    fetching,
   }),
 })
