@@ -42,6 +42,8 @@ const env = {
   page_data: window.PAGE_DATA,
 }
 
+const GenericNotFound = () => <FullViewError error={{ statusCode: 404 }} />
+
 export default class OAuthApp extends React.PureComponent {
   render () {
 
@@ -68,6 +70,7 @@ export default class OAuthApp extends React.PureComponent {
                     <Route path="/oauth/authorize" component={Authorize} />
                     <Route path="/oauth/register" component={CreateAccount} />
                     <Route path="/oauth/code" component={Code} />
+                    <Route component={GenericNotFound} />
                   </Switch>
                 </ConnectedRouter>
               </ErrorView>
