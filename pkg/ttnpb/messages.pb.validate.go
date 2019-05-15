@@ -492,10 +492,17 @@ func (m *ApplicationUplink) ValidateFields(paths ...string) error {
 
 		case "f_port":
 
-			if m.GetFPort() > 255 {
+			if val := m.GetFPort(); val < 1 || val > 255 {
 				return ApplicationUplinkValidationError{
 					field:  "f_port",
-					reason: "value must be less than or equal to 255",
+					reason: "value must be inside range [1, 255]",
+				}
+			}
+
+			if _, ok := _ApplicationUplink_FPort_NotInLookup[m.GetFPort()]; ok {
+				return ApplicationUplinkValidationError{
+					field:  "f_port",
+					reason: "value must not be in list [224]",
 				}
 			}
 
@@ -616,6 +623,10 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ApplicationUplinkValidationError{}
+
+var _ApplicationUplink_FPort_NotInLookup = map[uint32]struct{}{
+	224: {},
+}
 
 // ValidateFields checks the field values on ApplicationLocation with the rules
 // defined in the proto definition for this message. If any rules are
@@ -883,10 +894,17 @@ func (m *ApplicationDownlink) ValidateFields(paths ...string) error {
 
 		case "f_port":
 
-			if m.GetFPort() > 255 {
+			if val := m.GetFPort(); val < 1 || val > 255 {
 				return ApplicationDownlinkValidationError{
 					field:  "f_port",
-					reason: "value must be less than or equal to 255",
+					reason: "value must be inside range [1, 255]",
+				}
+			}
+
+			if _, ok := _ApplicationDownlink_FPort_NotInLookup[m.GetFPort()]; ok {
+				return ApplicationDownlinkValidationError{
+					field:  "f_port",
+					reason: "value must not be in list [224]",
 				}
 			}
 
@@ -1008,6 +1026,10 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ApplicationDownlinkValidationError{}
+
+var _ApplicationDownlink_FPort_NotInLookup = map[uint32]struct{}{
+	224: {},
+}
 
 // ValidateFields checks the field values on ApplicationDownlinks with the
 // rules defined in the proto definition for this message. If any rules are

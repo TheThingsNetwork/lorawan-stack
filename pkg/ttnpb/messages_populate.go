@@ -123,7 +123,7 @@ func NewPopulatedDownlinkMessage(r randyMessages, easy bool) *DownlinkMessage {
 
 func NewPopulatedApplicationDownlink(r randyMessages, _ bool) *ApplicationDownlink {
 	out := &ApplicationDownlink{}
-	out.FPort = 1 + uint32(r.Intn(254))
+	out.FPort = 1 + uint32(r.Intn(222))
 	out.FCnt = r.Uint32() % math.MaxUint16
 	out.FRMPayload = make([]byte, r.Intn(255))
 	for i := range out.FRMPayload {
