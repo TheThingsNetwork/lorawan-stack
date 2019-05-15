@@ -26,8 +26,6 @@ import DataSheet from '../../../components/data-sheet'
 import DateTime from '../../../lib/components/date-time'
 import DeviceEvents from '../../containers/device-events'
 
-import { getDeviceId } from '../../../lib/selectors/id'
-
 import style from './device-overview.styl'
 
 const m = defineMessages({
@@ -136,7 +134,7 @@ class DeviceOverview extends React.Component {
 
   render () {
     const { device } = this.props
-    const devId = getDeviceId(device)
+    const devIds = device && device.ids
 
     return (
       <Container>
@@ -148,7 +146,7 @@ class DeviceOverview extends React.Component {
             {this.deviceInfo}
           </Col>
           <Col md={12} lg={6}>
-            <DeviceEvents devId={devId} widget />
+            <DeviceEvents devIds={devIds} widget />
             <div className={style.locationPlaceholder}>
               <h4><Message content={sharedMessages.location} /></h4>
               <div>Location Map Placeholder</div>

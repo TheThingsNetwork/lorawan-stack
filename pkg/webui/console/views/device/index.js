@@ -29,7 +29,10 @@ import IntlHelmet from '../../../lib/components/intl-helmet'
 import DeviceOverview from '../device-overview'
 import DeviceGeneralSettings from '../device-general-settings'
 
-import { getDevice } from '../../store/actions/device'
+import {
+  getDevice,
+  stopDeviceEventsStream,
+} from '../../store/actions/device'
 
 import style from './device.styl'
 
@@ -41,11 +44,16 @@ const m = defineMessages({
   return {
     appName: application.application.name,
     deviceName: device.device && device.device.name,
+    devIds: device.device && device.device.ids,
     devId: props.match.params.devId,
     fetching: device.fetching,
     error: device.error,
   }
-})
+}, dispatch => ({
+  getDevice: (appId, devId, selectors, config) =>
+    dispatch(getDevice(appId, devId, selectors, config)),
+  stopStream: id => dispatch(stopDeviceEventsStream(id)),
+}))
 @withBreadcrumb('device.single', function (props) {
   const { devId } = props
   const { appId } = props.match.params
@@ -60,10 +68,10 @@ const m = defineMessages({
 export default class Device extends React.Component {
 
   componentDidMount () {
-    const { dispatch, devId, match } = this.props
+    const { getDevice, devId, match } = this.props
     const { appId } = match.params
 
-    dispatch(getDevice(
+    getDevice(
       appId,
       devId,
       [
@@ -80,8 +88,15 @@ export default class Device extends React.Component {
         'lorawan_version',
         'lorawan_phy_version',
       ],
-      { ignoreNotFound: true }))
+      { ignoreNotFound: true })
   }
+
+  componentWillUnmount () {
+    const { devIds, stopStream } = this.props
+
+    stopStream(devIds)
+  }
+
 
   render () {
     const { fetching, error, match, devId, deviceName } = this.props
