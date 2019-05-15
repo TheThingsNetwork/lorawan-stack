@@ -29,7 +29,7 @@ func (Docs) Gen() error {
 		"hugo",
 		"-s", "./doc",
 		"--baseUrl", "https://thethingsnetwork.github.io/lorawan-stack/"+currentVersion+"/",
-		"-d", "public/$(GIT_TAG)")
+		"-d", "public/"+currentVersion)
 }
 
 // Docs Install documentation dependencies

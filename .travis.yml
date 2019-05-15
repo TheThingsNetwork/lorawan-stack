@@ -88,7 +88,7 @@ install:
     sudo apt-get -y update
     sudo apt-get install -y snapd
     sudo snap install hugo
-    make docs-deps
+    $MAGE docs:deps
   fi
 before_script:
 - |
@@ -122,7 +122,7 @@ script:
 - if [[ "$RUNTYPE" == "go.test" ]]; then GO111MODULE=on go run ./cmd/ttn-lw-stack version; fi
 - if [[ "$RUNTYPE" == "go.test" ]]; then GO111MODULE=on go run ./cmd/ttn-lw-cli version; fi
 - if [[ "$RUNTYPE" == "release" ]]; then $MAGE version:files; fi
-- if [[ "$RUNTYPE" == "doc" ]]; then make docs-gen; fi
+- if [[ "$RUNTYPE" == "doc" ]]; then $MAGE docs:gen; fi
 - make git.diff
 after_success:
 - |
