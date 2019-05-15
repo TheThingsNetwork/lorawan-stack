@@ -333,7 +333,9 @@ var (
 	// maxUpstreamHandlers is the maximum number of goroutines per gateway connection to handle upstream messages.
 	maxUpstreamHandlers = int32(1 << 5)
 	// upstreamHandlerIdleTimeout is the duration after which an idle upstream handler stops to save resources.
-	upstreamHandlerIdleTimeout = (1 << 6) * time.Millisecond
+	upstreamHandlerIdleTimeout = (1 << 7) * time.Millisecond
+	// upstreamHandlerBusyTimeout is the duration after traffic gets dropped if all upstream handlers are busy.
+	upstreamHandlerBusyTimeout = (1 << 6) * time.Millisecond
 )
 
 type upstreamHandler interface {
@@ -486,7 +488,11 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 					host.handleWg.Add(1)
 					go handleFn(host)
 				}
-				host.handleCh <- item
+				select {
+				case host.handleCh <- item:
+				case <-time.After(upstreamHandlerBusyTimeout):
+					logger.WithField("host", host).Warn("Upstream handlers busy, drop message")
+				}
 			}
 		}
 	}
