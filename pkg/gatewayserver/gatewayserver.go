@@ -394,7 +394,7 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 							logger = logger.WithField("dev_addr", *ids.DevAddr)
 						}
 						logger.Debug("Drop message")
-						registerDropUplink(ctx, ids, conn.Gateway(), msg, err)
+						registerDropUplink(ctx, conn.Gateway(), msg, err)
 					}
 					ids, err := lorawan.GetUplinkMessageIdentifiers(msg)
 					if err != nil {
@@ -409,7 +409,7 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 						drop(ids, errHostHandle.WithCause(err).WithAttributes("host", item.host.name))
 						break
 					}
-					registerForwardUplink(ctx, ids, conn.Gateway(), msg, item.host.name)
+					registerForwardUplink(ctx, conn.Gateway(), msg, item.host.name)
 
 				case *ttnpb.GatewayStatus:
 					ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:status:%s", events.NewCorrelationID()))
@@ -492,6 +492,10 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 				case host.handleCh <- item:
 				case <-time.After(upstreamHandlerBusyTimeout):
 					logger.WithField("host", host).Warn("Upstream handlers busy, drop message")
+					switch msg := val.(type) {
+					case *ttnpb.UplinkMessage:
+						registerFailUplink(ctx, conn.Gateway(), msg, host.name)
+					}
 				}
 			}
 		}
