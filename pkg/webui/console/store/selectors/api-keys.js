@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const storeSelector = (state, props) => state[props.id]
+const storeSelector = (state, props) => state[props.id] || {}
 
 export const apiKeysStoreSelector = entity => (state, props) => (
   storeSelector(state.apiKeys[entity], props) || {}
@@ -21,7 +21,7 @@ export const apiKeysStoreSelector = entity => (state, props) => (
 export const apiKeysSelector = entity => function (state, props) {
   const store = storeSelector(state.apiKeys[entity], props)
 
-  return store ? store.keys : []
+  return store.keys ? store.keys : []
 }
 
 export const apiKeySelector = function (entity) {
