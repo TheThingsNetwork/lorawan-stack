@@ -2915,15 +2915,6 @@
       "file": "gatewayserver.go"
     }
   },
-  "error:pkg/gatewayserver:no_forward_to_host": {
-    "translations": {
-      "en": "no forward to host `{host}`"
-    },
-    "description": {
-      "package": "pkg/gatewayserver",
-      "file": "gatewayserver.go"
-    }
-  },
   "error:pkg/gatewayserver:no_network_server": {
     "translations": {
       "en": "no Network Server found to handle message"

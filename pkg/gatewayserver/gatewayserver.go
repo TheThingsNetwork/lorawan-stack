@@ -326,7 +326,6 @@ func (gs *GatewayServer) GetConnection(ctx context.Context, ids ttnpb.GatewayIde
 
 var (
 	errNoNetworkServer = errors.DefineNotFound("no_network_server", "no Network Server found to handle message")
-	errNoForwardToHost = errors.DefineFailedPrecondition("no_forward_to_host", "no forward to host `{host}`")
 	errHostHandle      = errors.Define("host_handle", "host `{host}` failed to handle message")
 )
 
@@ -404,7 +403,6 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 					}
 					handler := item.host.handler(&ids)
 					if handler == nil {
-						drop(ids, errNoForwardToHost.WithAttributes("host", item.host.name))
 						break
 					}
 					if _, err := handler.HandleUplink(ctx, msg, item.host.callOpts...); err != nil {
