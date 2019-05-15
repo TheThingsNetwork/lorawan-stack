@@ -191,6 +191,8 @@ var (
 			if err != nil {
 				return err
 			}
+			paths := util.UpdateFieldMask(cmd.Flags(), setGatewayFlags, attributesFlags())
+
 			collaborator := getCollaborator(cmd.Flags())
 			if collaborator == nil {
 				return errNoCollaborator
@@ -217,6 +219,14 @@ var (
 
 			if gateway.GatewayID == "" {
 				return errNoGatewayID
+			}
+
+			setDefaults, _ := cmd.Flags().GetBool("defaults")
+			if setDefaults {
+				gateway.GatewayServerAddress = getHost(config.GatewayServerGRPCAddress)
+				paths = append(paths,
+					"gateway_server_address",
+				)
 			}
 
 			var antenna ttnpb.GatewayAntenna
@@ -377,6 +387,7 @@ func init() {
 	gatewaysCreateCommand.Flags().AddFlagSet(setGatewayFlags)
 	gatewaysCreateCommand.Flags().AddFlagSet(setGatewayAntennaFlags)
 	gatewaysCreateCommand.Flags().AddFlagSet(attributesFlags())
+	gatewaysCreateCommand.Flags().Bool("defaults", true, "configure gateway with default gateway server address")
 	gatewaysCommand.AddCommand(gatewaysCreateCommand)
 	gatewaysUpdateCommand.Flags().AddFlagSet(gatewayIDFlags())
 	gatewaysUpdateCommand.Flags().AddFlagSet(setGatewayFlags)
