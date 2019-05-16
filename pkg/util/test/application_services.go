@@ -16,8 +16,6 @@ package test
 
 import (
 	"context"
-	"testing"
-	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -113,10 +111,12 @@ func MakeApplicationAccessListRightsChFunc(reqCh chan<- ApplicationAccessListRig
 	}
 }
 
-func AssertListRightsRequest(t *testing.T, reqCh <-chan ApplicationAccessListRightsRequest, timeout time.Duration, assert func(ctx context.Context, ids ttnpb.Identifiers) bool, rights ...ttnpb.Right) bool {
+func AssertListRightsRequest(ctx context.Context, reqCh <-chan ApplicationAccessListRightsRequest, assert func(ctx context.Context, ids ttnpb.Identifiers) bool, rights ...ttnpb.Right) bool {
+	t := MustTFromContext(ctx)
 	t.Helper()
 	select {
 	case req := <-reqCh:
+		t.Log("ApplicationAccess.ListRights called")
 		if !assert(req.Context, req.Message) {
 			return false
 		}
@@ -128,13 +128,13 @@ func AssertListRightsRequest(t *testing.T, reqCh <-chan ApplicationAccessListRig
 		}:
 			return true
 
-		case <-time.After(timeout):
+		case <-ctx.Done():
 			t.Error("Timed out while waiting for ApplicationAccess.ListRights response to be processed")
 			return false
 		}
 
-	case <-time.After(timeout):
-		t.Error("Timed out while waiting for ApplicationAccess.ListRights request to arrive")
+	case <-ctx.Done():
+		t.Error("Timed out while waiting for ApplicationAccess.ListRights to be called")
 		return false
 	}
 }

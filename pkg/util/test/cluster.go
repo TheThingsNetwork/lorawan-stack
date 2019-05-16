@@ -17,8 +17,6 @@ package test
 import (
 	"context"
 	"reflect"
-	"testing"
-	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/rpcserver"
@@ -180,6 +178,20 @@ func (m MockCluster) WithVerifiedSource(ctx context.Context) context.Context {
 	return m.WithVerifiedSourceFunc(ctx)
 }
 
+type ClusterAuthRequest struct {
+	Response chan<- grpc.CallOption
+}
+
+func MakeClusterAuthChFunc(reqCh chan<- ClusterAuthRequest) func() grpc.CallOption {
+	return func() grpc.CallOption {
+		respCh := make(chan grpc.CallOption)
+		reqCh <- ClusterAuthRequest{
+			Response: respCh,
+		}
+		return <-respCh
+	}
+}
+
 type ClusterGetPeerRequest struct {
 	Context     context.Context
 	Role        ttnpb.PeerInfo_Role
@@ -214,24 +226,64 @@ func MakeClusterJoinChFunc(reqCh chan<- ClusterJoinRequest) func() error {
 	}
 }
 
-func AssertClusterGetPeerRequest(t *testing.T, reqCh <-chan ClusterGetPeerRequest, timeout time.Duration, assert func(ctx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) bool, peer cluster.Peer) bool {
+func ClusterJoinNilFunc() error { return nil }
+
+func AssertClusterAuthRequest(ctx context.Context, reqCh <-chan ClusterAuthRequest, resp grpc.CallOption) bool {
+	t := MustTFromContext(ctx)
+	t.Helper()
+	select {
+	case <-ctx.Done():
+		t.Error("Timed out while waiting for Cluster.Auth to be called")
+		return false
+
+	case req := <-reqCh:
+		t.Log("Cluster.Auth called")
+		select {
+		case <-ctx.Done():
+			t.Error("Timed out while waiting for Cluster.Auth response to be processed")
+			return false
+
+		case req.Response <- resp:
+			return true
+		}
+	}
+}
+
+func AssertClusterGetPeerRequest(ctx context.Context, reqCh <-chan ClusterGetPeerRequest, assert func(ctx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) bool, resp cluster.Peer) bool {
+	t := MustTFromContext(ctx)
 	t.Helper()
 	select {
 	case req := <-reqCh:
+		t.Log("Cluster.GetPeer called")
 		if !assert(req.Context, req.Role, req.Identifiers) {
 			return false
 		}
 		select {
-		case req.Response <- peer:
+		case req.Response <- resp:
 			return true
 
-		case <-time.After(timeout):
-			t.Error("Timed out while waiting for cluster.GetPeer response to be processed")
+		case <-ctx.Done():
+			t.Error("Timed out while waiting for Cluster.GetPeer response to be processed")
 			return false
 		}
 
-	case <-time.After(timeout):
-		t.Error("Timed out while waiting for cluster.GetPeer request to arrive")
+	case <-ctx.Done():
+		t.Error("Timed out while waiting for Cluster.GetPeer to be called")
 		return false
 	}
+}
+
+func AssertClusterGetPeerRequestSequence(ctx context.Context, reqCh <-chan ClusterGetPeerRequest, peers []cluster.Peer, assertions ...func(context.Context, ttnpb.PeerInfo_Role, ttnpb.Identifiers) bool) bool {
+	t := MustTFromContext(ctx)
+	t.Helper()
+	if len(peers) != len(assertions) {
+		panic("Length mismatch between peers and assertions")
+	}
+	for i, p := range peers {
+		if !AssertClusterGetPeerRequest(ctx, reqCh, assertions[i], p) {
+			t.Errorf("Cluster.GetPeer assertion failed for peer %d", i)
+			return false
+		}
+	}
+	return true
 }
