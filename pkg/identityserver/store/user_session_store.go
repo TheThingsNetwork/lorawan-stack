@@ -110,8 +110,8 @@ func (s *userSessionStore) UpdateSession(ctx context.Context, sess *ttnpb.UserSe
 		}
 		return nil, err
 	}
-	sessionModel.fromPB(sess)
-	if err = s.updateEntity(ctx, &sessionModel); err != nil {
+	columns := sessionModel.fromPB(sess)
+	if err = s.updateEntity(ctx, &sessionModel, columns...); err != nil {
 		return nil, err
 	}
 	updated := &ttnpb.UserSession{}

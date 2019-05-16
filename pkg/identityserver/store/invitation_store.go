@@ -110,7 +110,7 @@ func (s *invitationStore) SetInvitationAcceptedBy(ctx context.Context, token str
 	acceptedAt := cleanTime(time.Now())
 	invitationModel.AcceptedAt = &acceptedAt
 
-	return s.updateEntity(ctx, &invitationModel)
+	return s.updateEntity(ctx, &invitationModel, "accepted_by_id", "accepted_at")
 }
 
 func (s *invitationStore) DeleteInvitation(ctx context.Context, email string) error {

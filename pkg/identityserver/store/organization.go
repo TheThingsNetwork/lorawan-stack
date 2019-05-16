@@ -44,7 +44,7 @@ func init() {
 // SetContext sets the context on the organization model and the embedded account model.
 func (org *Organization) SetContext(ctx context.Context) {
 	org.Model.SetContext(ctx)
-	org.Account.Model.SetContext(ctx)
+	org.Account.SetContext(ctx)
 }
 
 // functions to set fields from the organization model into the organization proto.
@@ -105,8 +105,6 @@ func (org *Organization) fromPB(pb *ttnpb.Organization, fieldMask *types.FieldMa
 			setter(org, pb)
 			if columnNames, ok := organizationColumnNames[path]; ok {
 				columns = append(columns, columnNames...)
-			} else {
-				columns = append(columns, path)
 			}
 			continue
 		}

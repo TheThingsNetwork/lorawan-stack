@@ -41,6 +41,7 @@ func (sess UserSession) toPB(pb *ttnpb.UserSession) {
 	pb.ExpiresAt = cleanTimePtr(sess.ExpiresAt)
 }
 
-func (sess *UserSession) fromPB(pb *ttnpb.UserSession) {
+func (sess *UserSession) fromPB(pb *ttnpb.UserSession) []string {
 	sess.ExpiresAt = cleanTimePtr(pb.ExpiresAt)
+	return []string{"expires_at"}
 }
