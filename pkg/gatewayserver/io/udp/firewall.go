@@ -15,6 +15,7 @@
 package udp
 
 import (
+	"bytes"
 	"context"
 	"net"
 	"sync"
@@ -29,19 +30,18 @@ type Firewall interface {
 }
 
 type addrTime struct {
-	net.UDPAddr
+	net.IP
 	lastSeen time.Time
 }
 
 type memoryFirewall struct {
-	push            sync.Map
-	pull            sync.Map
+	m               sync.Map
 	addrChangeBlock time.Duration
 }
 
 // NewMemoryFirewall returns an in-memory Firewall.
 func NewMemoryFirewall(ctx context.Context, addrChangeBlock time.Duration) Firewall {
-	v := &memoryFirewall{
+	f := &memoryFirewall{
 		addrChangeBlock: addrChangeBlock,
 	}
 	go func() {
@@ -52,56 +52,40 @@ func NewMemoryFirewall(ctx context.Context, addrChangeBlock time.Duration) Firew
 				ticker.Stop()
 				return
 			case <-ticker.C:
-				v.gc()
+				f.gc()
 			}
 		}
 	}()
-	return v
+	return f
 }
 
-func (v *memoryFirewall) filter(packet encoding.Packet, store *sync.Map) bool {
+func (f *memoryFirewall) Filter(packet encoding.Packet) bool {
 	if packet.GatewayEUI == nil || packet.GatewayAddr == nil {
 		return false
 	}
 	now := time.Now().UTC()
 	eui := *packet.GatewayEUI
-	val, ok := store.Load(eui)
+	val, ok := f.m.Load(eui)
 	if ok {
 		a := val.(addrTime)
-		if a.UDPAddr.String() != packet.GatewayAddr.String() {
-			if a.lastSeen.Add(v.addrChangeBlock).After(now) {
-				return false
-			}
+		if !bytes.Equal(a.IP, packet.GatewayAddr.IP) && a.lastSeen.Add(f.addrChangeBlock).After(now) {
+			return false
 		}
 	}
-	store.Store(eui, addrTime{
-		UDPAddr:  *packet.GatewayAddr,
+	f.m.Store(eui, addrTime{
+		IP:       packet.GatewayAddr.IP,
 		lastSeen: now,
 	})
 	return true
 }
 
-func (v *memoryFirewall) Filter(packet encoding.Packet) bool {
-	switch packet.PacketType {
-	case encoding.PullData, encoding.TxAck:
-		return v.filter(packet, &v.pull)
-	case encoding.PushData:
-		return v.filter(packet, &v.push)
-	}
-	return false
-}
-
-func (v *memoryFirewall) gc() {
+func (f *memoryFirewall) gc() {
 	now := time.Now().UTC()
-	gcStore := func(store *sync.Map) {
-		store.Range(func(k, val interface{}) bool {
-			a := val.(addrTime)
-			if a.lastSeen.Add(v.addrChangeBlock).Before(now) {
-				store.Delete(k)
-			}
-			return true
-		})
-	}
-	gcStore(&v.pull)
-	gcStore(&v.push)
+	f.m.Range(func(k, val interface{}) bool {
+		a := val.(addrTime)
+		if a.lastSeen.Add(f.addrChangeBlock).Before(now) {
+			f.m.Delete(k)
+		}
+		return true
+	})
 }
