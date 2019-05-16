@@ -34,6 +34,16 @@ func init() {
 		{Frequency: 922500000, MinDataRate: 0, MaxDataRate: 5},
 	}
 	krBeaconChannel := uint32(923100000)
+
+	downlinkDRTable := [6][6]ttnpb.DataRateIndex{
+		{0, 0, 0, 0, 0, 0},
+		{1, 0, 0, 0, 0, 0},
+		{2, 1, 0, 0, 0, 0},
+		{3, 2, 1, 0, 0, 0},
+		{4, 3, 2, 1, 0, 0},
+		{5, 4, 3, 2, 1, 0},
+	}
+
 	kr_920_923 = Band{
 		ID: KR_920_923,
 
@@ -101,18 +111,13 @@ func init() {
 
 		Rx1Channel: channelIndexIdentity,
 		Rx1DataRate: func(idx ttnpb.DataRateIndex, offset uint32, _ bool) (ttnpb.DataRateIndex, error) {
+			if idx > 5 {
+				return 0, errDataRateIndexTooHigh.WithAttributes("max", 5)
+			}
 			if offset > 5 {
 				return 0, errDataRateOffsetTooHigh.WithAttributes("max", 5)
 			}
-
-			si := int(uint32(idx) - offset)
-			switch {
-			case si <= 0:
-				return 0, nil
-			case si >= 5:
-				return 5, nil
-			}
-			return ttnpb.DataRateIndex(si), nil
+			return downlinkDRTable[idx][offset], nil
 		},
 
 		GenerateChMasks: generateChMask16,

@@ -117,11 +117,11 @@ func init() {
 				return 0, errDataRateOffsetTooHigh.WithAttributes("max", 7)
 			}
 
-			so := int(offset)
+			so := int8(offset)
 			if so > 5 {
 				so = 5 - so
 			}
-			si := int(idx) - so
+			si := int8(idx) - so
 
 			minDR := uint32(0)
 			if dwellTime {
@@ -129,7 +129,7 @@ func init() {
 			}
 
 			switch {
-			case si <= int(minDR):
+			case si <= int8(minDR):
 				return ttnpb.DataRateIndex(minDR), nil
 			case si >= 5:
 				return 5, nil

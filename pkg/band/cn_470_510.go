@@ -46,6 +46,15 @@ func init() {
 		})
 	}
 
+	downlinkDRTable := [6][6]ttnpb.DataRateIndex{
+		{0, 0, 0, 0, 0, 0},
+		{1, 0, 0, 0, 0, 0},
+		{2, 1, 0, 0, 0, 0},
+		{3, 2, 1, 0, 0, 0},
+		{4, 3, 2, 1, 0, 0},
+		{5, 4, 3, 2, 1, 0},
+	}
+
 	cn_470_510 = Band{
 		ID: CN_470_510,
 
@@ -120,15 +129,7 @@ func init() {
 			if offset > 5 {
 				return 0, errDataRateOffsetTooHigh.WithAttributes("max", 5)
 			}
-
-			si := int(uint32(idx) - offset)
-			switch {
-			case si <= 0:
-				return 0, nil
-			case si >= 5:
-				return 5, nil
-			}
-			return ttnpb.DataRateIndex(si), nil
+			return downlinkDRTable[idx][offset], nil
 		},
 
 		GenerateChMasks: generateChMask96,
