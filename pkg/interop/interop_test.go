@@ -24,6 +24,8 @@ import (
 	echo "github.com/labstack/echo/v4"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/config"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
@@ -44,6 +46,24 @@ func TestServeHTTP(t *testing.T) {
 			ResponseAssertion: func(t *testing.T, res *http.Response) bool {
 				a := assertions.New(t)
 				return a.So(res.StatusCode, should.Equal, http.StatusBadRequest)
+			},
+		},
+		{
+			Name: "JoinReq/NotRegistered",
+			RequestBody: &JoinReq{
+				NsJsMessageHeader: NsJsMessageHeader{
+					MessageHeader: MessageHeader{
+						MessageType:     MessageTypeJoinReq,
+						ProtocolVersion: "1.1",
+					},
+					SenderID:   types.NetID{0x0, 0x0, 0x13},
+					ReceiverID: types.EUI64{0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
+				},
+				MACVersion: MACVersion(ttnpb.MAC_V1_0_3),
+			},
+			ResponseAssertion: func(t *testing.T, res *http.Response) bool {
+				a := assertions.New(t)
+				return a.So(res.StatusCode, should.Equal, http.StatusNotFound)
 			},
 		},
 	} {
