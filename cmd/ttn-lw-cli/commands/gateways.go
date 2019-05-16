@@ -24,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/io"
 	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/util"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	ttntypes "go.thethings.network/lorawan-stack/pkg/types"
 )
@@ -204,9 +205,19 @@ var (
 					return err
 				}
 			}
+
+			setDefaults, _ := cmd.Flags().GetBool("defaults")
+			if setDefaults {
+				gateway.GatewayServerAddress = getHost(config.GatewayServerGRPCAddress)
+				paths = append(paths,
+					"gateway_server_address",
+				)
+			}
+
 			if err = util.SetFields(&gateway, setGatewayFlags); err != nil {
 				return err
 			}
+
 			gateway.Attributes = mergeAttributes(gateway.Attributes, cmd.Flags())
 			if gtwID != nil {
 				if gtwID.GatewayID != "" {
@@ -219,14 +230,6 @@ var (
 
 			if gateway.GatewayID == "" {
 				return errNoGatewayID
-			}
-
-			setDefaults, _ := cmd.Flags().GetBool("defaults")
-			if setDefaults {
-				gateway.GatewayServerAddress = getHost(config.GatewayServerGRPCAddress)
-				paths = append(paths,
-					"gateway_server_address",
-				)
 			}
 
 			var antenna ttnpb.GatewayAntenna
@@ -348,10 +351,28 @@ var (
 				return err
 			}
 
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+
+			gateway, err := ttnpb.NewGatewayRegistryClient(is).Get(ctx, &ttnpb.GetGatewayRequest{
+				GatewayIdentifiers: *gtwID,
+				FieldMask:          types.FieldMask{Paths: []string{"gateway_server_address"}},
+			})
+			if err != nil {
+				return err
+			}
+
+			if gsMismatch := compareServerAddressGateway(gateway, config); gsMismatch {
+				return errAddressMismatchGateway
+			}
+
 			gs, err := api.Dial(ctx, config.GatewayServerGRPCAddress)
 			if err != nil {
 				return err
 			}
+
 			res, err := ttnpb.NewGsClient(gs).GetGatewayConnectionStats(ctx, gtwID)
 			if err != nil {
 				return err
@@ -404,4 +425,18 @@ func init() {
 	gatewaysContactInfoCommand.PersistentFlags().AddFlagSet(gatewayIDFlags())
 	gatewaysCommand.AddCommand(gatewaysContactInfoCommand)
 	Root.AddCommand(gatewaysCommand)
+}
+
+var errAddressMismatchGateway = errors.DefineAborted("gateway_server_address_mismatch", "gateway server address mismatch")
+
+func compareServerAddressGateway(gateway *ttnpb.Gateway, config *Config) (gsMismatch bool) {
+	gsHost := getHost(config.GatewayServerGRPCAddress)
+	if host := getHost(gateway.GatewayServerAddress); host != "" && host != gsHost {
+		gsMismatch = true
+		logger.WithFields(log.Fields(
+			"configured", gsHost,
+			"registered", host,
+		)).Warn("Registered Gateway Server address does not match CLI configuration")
+	}
+	return
 }
