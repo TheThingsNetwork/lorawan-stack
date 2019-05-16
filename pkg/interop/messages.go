@@ -19,7 +19,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/labstack/echo"
+	echo "github.com/labstack/echo/v4"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
