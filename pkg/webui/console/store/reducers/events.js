@@ -23,6 +23,8 @@ import {
   createClearEventsActionType,
 } from '../actions/events'
 
+import { getDeviceId } from '../../../lib/selectors/id'
+
 const defaultState = {
   events: [],
   error: false,
@@ -93,6 +95,10 @@ const createNamedEventsReducer = function (reducerName = '') {
       return state
     }
 
+    const id = typeof action.id === 'object'
+      ? getDeviceId(action.id)
+      : action.id
+
     switch (action.type) {
     case START_EVENTS:
     case START_EVENTS_FAILURE:
@@ -103,7 +109,7 @@ const createNamedEventsReducer = function (reducerName = '') {
     case CLEAR_EVENTS:
       return {
         ...state,
-        [action.id]: event(state[action.id], action),
+        [id]: event(state[id], action),
       }
     default:
       return state

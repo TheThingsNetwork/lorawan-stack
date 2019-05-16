@@ -22,6 +22,7 @@ export const getApplicationId = function (application = {}) {
 
 export const getDeviceId = function (device = {}) {
   return getByPath(device, 'device_id')
+    || getByPath(device, 'ids.device_id')
     || getByPath(device, 'device_ids.device_id')
 }
 

@@ -17,51 +17,55 @@ import { connect } from 'react-redux'
 import bind from 'autobind-decorator'
 
 import PropTypes from '../../../lib/prop-types'
+import { getApplicationId, getDeviceId } from '../../../lib/selectors/id'
 import EventsSubscription from '../../containers/events-subscription'
 
 import {
-  clearGatewayEventsStream,
-} from '../../store/actions/gateway'
+  clearDeviceEventsStream,
+} from '../../store/actions/device'
 
 import {
-  gatewayEventsSelector,
-  gatewayEventsStatusSelector,
-} from '../../store/selectors/gateway'
+  deviceEventsSelector,
+  deviceEventsStatusSelector,
+} from '../../store/selectors/device'
 
+@connect(
+  null,
+  (dispatch, ownProps) => ({
+    onClear: () => dispatch(clearDeviceEventsStream(ownProps.devIds)),
+  }))
 @bind
-class GatewayEvents extends React.Component {
+class DeviceEvents extends React.Component {
   render () {
     const {
-      gtwId,
+      devIds,
       widget,
       onClear,
     } = this.props
 
+    const devId = getDeviceId(devIds)
+    const appId = getApplicationId(devIds)
+
     return (
       <EventsSubscription
-        id={gtwId}
+        id={devId}
         widget={widget}
-        eventsSelector={gatewayEventsSelector}
-        statusSelector={gatewayEventsStatusSelector}
+        eventsSelector={deviceEventsSelector}
+        statusSelector={deviceEventsStatusSelector}
         onClear={onClear}
-        toAllUrl={`/console/gateways/${gtwId}/data`}
+        toAllUrl={`/console/applications/${appId}/devices/${devId}/data`}
       />
     )
   }
 }
 
-GatewayEvents.propTypes = {
-  gtwId: PropTypes.string.isRequired,
-  onClear: PropTypes.func.isRequired,
+DeviceEvents.propTypes = {
+  devIds: PropTypes.object.isRequired,
   widget: PropTypes.bool,
 }
 
-GatewayEvents.defaultProps = {
+DeviceEvents.defaultProps = {
   widget: false,
 }
 
-export default connect(
-  null,
-  (dispatch, ownProps) => ({
-    onClear: () => dispatch(clearGatewayEventsStream(ownProps.gtwId)),
-  }))(GatewayEvents)
+export default DeviceEvents

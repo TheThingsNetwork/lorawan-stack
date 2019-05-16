@@ -17,6 +17,7 @@ import { SHARED_NAME as APPLICATION_SHARED_NAME } from '../actions/application'
 import { SHARED_NAME as APPLICATIONS_SHARED_NAME } from '../actions/applications'
 import { SHARED_NAME as GATEWAY_SHARED_NAME } from '../actions/gateway'
 import { SHARED_NAME as GATEWAYS_SHARED_NAME } from '../actions/gateways'
+import { SHARED_NAME as DEVICE_SHARED_NAME } from '../actions/device'
 import user from './user'
 import client from './client'
 import init from './init'
@@ -56,6 +57,7 @@ export default combineReducers({
   }),
   events: combineReducers({
     applications: createNamedEventsReducer(APPLICATION_SHARED_NAME),
+    devices: createNamedEventsReducer(DEVICE_SHARED_NAME),
     gateways: createNamedEventsReducer(GATEWAY_SHARED_NAME),
   }),
 })
