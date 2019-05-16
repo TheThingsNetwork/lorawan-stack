@@ -31,16 +31,24 @@ import (
 func TestMemoryFirewall(t *testing.T) {
 	ctx := test.Context()
 
-	block := 10 * time.Millisecond
+	block := 10 * test.Delay
 	v := NewMemoryFirewall(ctx, block)
 
 	eui1 := types.EUI64{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01}
 	eui2 := types.EUI64{0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02}
-	addr1 := net.UDPAddr{
+	upAddr1 := net.UDPAddr{
 		IP:   []byte{0x01, 0x01, 0x01, 0x01},
 		Port: 1,
 	}
-	addr2 := net.UDPAddr{
+	downAddr1 := net.UDPAddr{
+		IP:   []byte{0x01, 0x01, 0x01, 0x01},
+		Port: 2,
+	}
+	upAddr2 := net.UDPAddr{
+		IP:   []byte{0x02, 0x02, 0x02, 0x02},
+		Port: 1,
+	}
+	downAddr2 := net.UDPAddr{
 		IP:   []byte{0x02, 0x02, 0x02, 0x02},
 		Port: 2,
 	}
@@ -56,7 +64,7 @@ func TestMemoryFirewall(t *testing.T) {
 	}{
 		{
 			Packet: encoding.Packet{
-				GatewayAddr: &addr1,
+				GatewayAddr: &downAddr1,
 				PacketType:  encoding.PullData,
 			},
 			OK: false, // no EUI
@@ -71,23 +79,31 @@ func TestMemoryFirewall(t *testing.T) {
 		{
 			Packet: encoding.Packet{
 				GatewayEUI:  &eui1,
-				GatewayAddr: &addr1,
+				GatewayAddr: &downAddr1,
 				PacketType:  encoding.PullData,
 			},
-			OK: true, // first time 1
+			OK: true, // downstream 1
 		},
 		{
 			Packet: encoding.Packet{
 				GatewayEUI:  &eui1,
-				GatewayAddr: &addr1,
+				GatewayAddr: &downAddr1,
 				PacketType:  encoding.PullData,
 			},
-			OK: true, // second time 1 with same address
+			OK: true, // second time downstream 1 with same address
+		},
+		{
+			Packet: encoding.Packet{
+				GatewayEUI:  &eui1,
+				GatewayAddr: &upAddr1,
+				PacketType:  encoding.PushData,
+			},
+			OK: true, // upstream 1 with same address
 		},
 		{
 			Packet: encoding.Packet{
 				GatewayEUI:  &eui2,
-				GatewayAddr: &addr2,
+				GatewayAddr: &downAddr2,
 				PacketType:  encoding.PullData,
 			},
 			OK: true, // first time downlink from 2
@@ -95,7 +111,7 @@ func TestMemoryFirewall(t *testing.T) {
 		{
 			Packet: encoding.Packet{
 				GatewayEUI:  &eui2,
-				GatewayAddr: &addr3,
+				GatewayAddr: &upAddr2,
 				PacketType:  encoding.PushData,
 			},
 			OK: true, // first time uplink from 2
