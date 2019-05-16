@@ -24,8 +24,6 @@ import (
 )
 
 func TestRx1DataRate(t *testing.T) {
-	a := assertions.New(t)
-
 	for _, tc := range []struct {
 		bandID string
 
@@ -37,84 +35,88 @@ func TestRx1DataRate(t *testing.T) {
 	}{
 		{
 			bandID:       "AU_915_928",
-			validIndexes: []ttnpb.DataRateIndex{0, 3, 5}, invalidIndexes: []ttnpb.DataRateIndex{8, 10},
-			validOffsets: []uint32{0, 3, 4}, invalidOffsets: []uint32{10},
+			validIndexes: []ttnpb.DataRateIndex{0, 1, 2, 3, 4, 5, 6}, invalidIndexes: []ttnpb.DataRateIndex{7, 8, 9, 10, 11, 12, 13, 14, 15},
+			validOffsets: []uint32{0, 1, 2, 3, 4, 5}, invalidOffsets: []uint32{6, 7, 8, 9, 10, 11, 12, 13, 14, 15},
 		},
 		{
 			bandID:       "AS_923",
-			validIndexes: []ttnpb.DataRateIndex{0, 5, 11, 13},
-			validOffsets: []uint32{0, 2, 7}, invalidOffsets: []uint32{8},
+			validIndexes: []ttnpb.DataRateIndex{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15},
+			validOffsets: []uint32{0, 1, 2, 3, 4, 5, 6, 7}, invalidOffsets: []uint32{8, 9, 10, 11, 12, 13, 14, 15},
 		},
 		{
 			bandID:       "CN_470_510",
-			validIndexes: []ttnpb.DataRateIndex{0, 5}, invalidIndexes: []ttnpb.DataRateIndex{7, 10},
-			validOffsets: []uint32{0, 2, 5}, invalidOffsets: []uint32{8},
+			validIndexes: []ttnpb.DataRateIndex{0, 1, 2, 3, 4, 5}, invalidIndexes: []ttnpb.DataRateIndex{6, 7, 8, 9, 10, 11, 12, 13, 14, 15},
+			validOffsets: []uint32{0, 1, 2, 3, 4, 5}, invalidOffsets: []uint32{6, 7, 8, 9, 10, 11, 12, 13, 14, 15},
 		},
 		{
 			bandID:       "CN_779_787",
-			validIndexes: []ttnpb.DataRateIndex{0, 5}, invalidIndexes: []ttnpb.DataRateIndex{10},
-			validOffsets: []uint32{0, 2, 5}, invalidOffsets: []uint32{8},
+			validIndexes: []ttnpb.DataRateIndex{0, 1, 2, 3, 4, 5, 6, 7}, invalidIndexes: []ttnpb.DataRateIndex{8, 9, 10, 11, 12, 13, 14, 15},
+			validOffsets: []uint32{0, 1, 2, 3, 4, 5}, invalidOffsets: []uint32{6, 7, 8, 9, 10, 11, 12, 13, 14, 15},
 		},
 		{
 			bandID:       "EU_433",
-			validIndexes: []ttnpb.DataRateIndex{0, 5}, invalidIndexes: []ttnpb.DataRateIndex{10},
-			validOffsets: []uint32{0, 2, 5}, invalidOffsets: []uint32{8},
+			validIndexes: []ttnpb.DataRateIndex{0, 1, 2, 3, 4, 5, 6, 7}, invalidIndexes: []ttnpb.DataRateIndex{8, 9, 10, 11, 12, 13, 14, 15},
+			validOffsets: []uint32{0, 1, 2, 3, 4, 5}, invalidOffsets: []uint32{6, 7, 8, 9, 10, 11, 12, 13, 14, 15},
 		},
 		{
 			bandID:       "EU_863_870",
-			validIndexes: []ttnpb.DataRateIndex{0, 5, 7}, invalidIndexes: []ttnpb.DataRateIndex{8},
-			validOffsets: []uint32{0, 2, 5}, invalidOffsets: []uint32{6, 8},
+			validIndexes: []ttnpb.DataRateIndex{0, 1, 2, 3, 4, 5, 6, 7}, invalidIndexes: []ttnpb.DataRateIndex{8, 9, 10, 11, 12, 13, 14, 15},
+			validOffsets: []uint32{0, 1, 2, 3, 4, 5}, invalidOffsets: []uint32{6, 7, 8, 9, 10, 11, 12, 13, 14, 15},
 		},
 		{
 			bandID:       "IN_865_867",
-			validIndexes: []ttnpb.DataRateIndex{0, 5, 11, 13},
-			validOffsets: []uint32{0, 2, 5}, invalidOffsets: []uint32{6, 8},
+			validIndexes: []ttnpb.DataRateIndex{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15},
+			validOffsets: []uint32{0, 1, 2, 3, 4, 5, 6, 7}, invalidOffsets: []uint32{8, 9, 10, 11, 12, 13, 14, 15},
 		},
 		{
 			bandID:       "KR_920_923",
-			validIndexes: []ttnpb.DataRateIndex{0, 5, 11, 13},
-			validOffsets: []uint32{0, 2, 5}, invalidOffsets: []uint32{6, 8},
+			validIndexes: []ttnpb.DataRateIndex{0, 1, 2, 3, 4, 5}, invalidIndexes: []ttnpb.DataRateIndex{6, 7, 8, 9, 10, 11, 12, 13, 14, 15},
+			validOffsets: []uint32{0, 1, 2, 3, 4, 5}, invalidOffsets: []uint32{6, 7, 8, 9, 10, 11, 12, 13, 14, 15},
 		},
 		{
 			bandID:       "RU_864_870",
-			validIndexes: []ttnpb.DataRateIndex{0, 5, 11, 13},
-			validOffsets: []uint32{0, 2, 5}, invalidOffsets: []uint32{6, 8},
+			validIndexes: []ttnpb.DataRateIndex{0, 1, 2, 3, 4, 5, 6, 7}, invalidIndexes: []ttnpb.DataRateIndex{8, 9, 10, 11, 12, 13, 14, 15},
+			validOffsets: []uint32{0, 1, 2, 3, 4, 5}, invalidOffsets: []uint32{6, 7, 8, 9, 10, 11, 12, 13, 14, 15},
 		},
 		{
 			bandID:       "US_902_928",
-			validIndexes: []ttnpb.DataRateIndex{0, 4}, invalidIndexes: []ttnpb.DataRateIndex{5, 10},
-			validOffsets: []uint32{0, 2, 3}, invalidOffsets: []uint32{4, 6, 8},
+			validIndexes: []ttnpb.DataRateIndex{0, 1, 2, 3, 4}, invalidIndexes: []ttnpb.DataRateIndex{5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15},
+			validOffsets: []uint32{0, 1, 2, 3}, invalidOffsets: []uint32{4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15},
 		},
 	} {
-		b, err := band.GetByID(tc.bandID)
-		if !a.So(err, should.BeNil) {
-			t.Fatalf("Error when getting band %s: %s", tc.bandID, err)
-		}
+		t.Run(tc.bandID, func(t *testing.T) {
+			a := assertions.New(t)
 
-		for _, validIndex := range tc.validIndexes {
-			for _, validOffset := range tc.validOffsets {
-				_, err := b.Rx1DataRate(validIndex, validOffset, true)
-				if !a.So(err, should.BeNil) {
-					t.Fatalf("Computing Rx1 data rate should have succeeded with index %d and offset %d", validIndex, validOffset)
+			b, err := band.GetByID(tc.bandID)
+			if !a.So(err, should.BeNil) {
+				t.Fatalf("Error when getting band %s: %s", tc.bandID, err)
+			}
+
+			for _, validIndex := range tc.validIndexes {
+				for _, validOffset := range tc.validOffsets {
+					_, err := b.Rx1DataRate(validIndex, validOffset, true)
+					if !a.So(err, should.BeNil) {
+						t.Fatalf("Computing Rx1 data rate should have succeeded with index %d and offset %d", validIndex, validOffset)
+					}
 				}
 			}
-		}
-		for _, invalidIndex := range tc.invalidIndexes {
-			for _, offset := range append(tc.validOffsets, tc.invalidOffsets...) {
-				_, err := b.Rx1DataRate(invalidIndex, offset, true)
-				if !a.So(err, should.NotBeNil) {
-					t.Fatalf("Computing Rx1 data rate should not have succeeded with index %d and offset %d", invalidIndex, offset)
+			for _, invalidIndex := range tc.invalidIndexes {
+				for _, offset := range append(tc.validOffsets, tc.invalidOffsets...) {
+					_, err := b.Rx1DataRate(invalidIndex, offset, true)
+					if !a.So(err, should.NotBeNil) {
+						t.Fatalf("Computing Rx1 data rate should not have succeeded with index %d and offset %d", invalidIndex, offset)
+					}
 				}
 			}
-		}
-		for _, index := range append(tc.validIndexes, tc.invalidIndexes...) {
-			for _, invalidOffset := range tc.invalidOffsets {
-				_, err := b.Rx1DataRate(index, invalidOffset, true)
-				if !a.So(err, should.NotBeNil) {
-					t.Fatalf("Computing Rx1 data rate should not have succeeded with index %d and offset %d", index, invalidOffset)
+			for _, index := range append(tc.validIndexes, tc.invalidIndexes...) {
+				for _, invalidOffset := range tc.invalidOffsets {
+					_, err := b.Rx1DataRate(index, invalidOffset, true)
+					if !a.So(err, should.NotBeNil) {
+						t.Fatalf("Computing Rx1 data rate should not have succeeded with index %d and offset %d", index, invalidOffset)
+					}
 				}
 			}
-		}
+		})
 	}
 }
 
