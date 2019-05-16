@@ -57,6 +57,12 @@ type ForwardingNetworkServer interface {
 type ApplicationServer interface {
 }
 
+type noopServer struct{}
+
+func (noopServer) JoinRequest(req *JoinReq) (*JoinAns, error) {
+	return nil, errNotRegistered
+}
+
 // Server is the server.
 type Server struct {
 	rootGroup *echo.Group
@@ -86,6 +92,7 @@ func New(ctx context.Context, config config.Interop) (*Server, error) {
 		middleware.Recover(),
 	)
 
+	noop := &noopServer{}
 	s := &Server{
 		rootGroup: server.Group(
 			"",
@@ -95,6 +102,11 @@ func New(ctx context.Context, config config.Interop) (*Server, error) {
 		),
 		config: config,
 		server: server,
+		js:     noop,
+		hNS:    noop,
+		sNS:    noop,
+		fNS:    noop,
+		as:     noop,
 	}
 
 	// In 1.0, NS, JS and AS receive messages on the root path.
@@ -139,9 +151,16 @@ func (s *Server) RegisterAS(as ApplicationServer) {
 }
 
 func (s *Server) handleRequest(c echo.Context) error {
-	msg := c.Get(messageKey)
-	_ = msg
-	return nil
+	var ans interface{}
+	var err error
+	switch req := c.Get(messageKey).(type) {
+	case *JoinReq:
+		ans, err = s.js.JoinRequest(req)
+	}
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, ans)
 }
 
 func (s *Server) handleNsRequest(c echo.Context) error {
