@@ -278,7 +278,11 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 			return nil, err
 		}
 
-		cmdBuf, err = crypto.EncryptDownlink(key, dev.Session.DevAddr, pld.FHDR.FCnt, cmdBuf)
+		fCnt := pld.FHDR.FCnt
+		if pld.FPort != 0 {
+			fCnt = dev.Session.LastNFCntDown
+		}
+		cmdBuf, err = crypto.EncryptDownlink(key, dev.Session.DevAddr, fCnt, cmdBuf)
 		if err != nil {
 			return nil, errEncryptMAC.WithCause(err)
 		}
