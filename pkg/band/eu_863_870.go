@@ -34,6 +34,18 @@ func init() {
 		{Frequency: 868500000, MinDataRate: 0, MaxDataRate: 5},
 	}
 	euBeaconChannel := uint32(869525000)
+
+	downlinkDRTable := [8][6]ttnpb.DataRateIndex{
+		{0, 0, 0, 0, 0, 0},
+		{1, 0, 0, 0, 0, 0},
+		{2, 1, 0, 0, 0, 0},
+		{3, 2, 1, 0, 0, 0},
+		{4, 3, 2, 1, 0, 0},
+		{5, 4, 3, 2, 1, 0},
+		{6, 5, 4, 3, 2, 1},
+		{7, 6, 5, 4, 3, 2},
+	}
+
 	eu_863_870 = Band{
 		ID: EU_863_870,
 
@@ -152,15 +164,7 @@ func init() {
 			if offset > 5 {
 				return 0, errDataRateOffsetTooHigh.WithAttributes("max", 5)
 			}
-
-			si := int(uint32(idx) - offset)
-			switch {
-			case si <= 0:
-				return 0, nil
-			case si >= 7:
-				return 7, nil
-			}
-			return ttnpb.DataRateIndex(si), nil
+			return downlinkDRTable[idx][offset], nil
 		},
 
 		GenerateChMasks: generateChMask16,
