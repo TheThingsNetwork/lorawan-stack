@@ -115,6 +115,7 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 		maxDownLen -= desc.DownlinkLength
 	}
 
+	dev.MACState.QueuedResponses = nil
 	dev.MACState.PendingRequests = dev.MACState.PendingRequests[:0]
 
 	maxDownLen, maxUpLen, ok, err := enqueueLinkADRReq(ctx, dev, maxDownLen, maxUpLen, ns.FrequencyPlans)
