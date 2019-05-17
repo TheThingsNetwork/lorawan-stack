@@ -15,9 +15,6 @@
 package component
 
 import (
-	"context"
-	"crypto/tls"
-
 	echo "github.com/labstack/echo/v4"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"golang.org/x/crypto/acme"
@@ -48,23 +45,6 @@ func (c *Component) initACME() error {
 		},
 		Email: c.config.TLS.ACME.Email,
 	}
-	c.acmeTLS = &tls.Config{
-		GetCertificate:           c.acme.GetCertificate,
-		PreferServerCipherSuites: true,
-		MinVersion:               tls.VersionTLS12,
-		NextProtos: []string{
-			"h2", "http/1.1",
-			acme.ALPNProto,
-		},
-	}
 	c.web.Any(".well-known/acme-challenge/*", echo.WrapHandler(c.acme.HTTPHandler(nil)))
 	return nil
-}
-
-// GetTLSConfig gets the component's TLS config.
-func (c *Component) GetTLSConfig(ctx context.Context) (*tls.Config, error) {
-	if c.acmeTLS != nil {
-		return c.acmeTLS, nil
-	}
-	return c.config.TLS.Config(ctx)
 }

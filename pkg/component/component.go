@@ -17,7 +17,6 @@ package component
 
 import (
 	"context"
-	"crypto/tls"
 	"fmt"
 	"net/http"
 	"os"
@@ -57,8 +56,7 @@ type Component struct {
 	config        *Config
 	getBaseConfig func(ctx context.Context) config.ServiceBase
 
-	acme    *autocert.Manager
-	acmeTLS *tls.Config // TLS configuration if ACME is used.
+	acme *autocert.Manager
 
 	logger log.Stack
 	sentry *raven.Client
