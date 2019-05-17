@@ -19,7 +19,7 @@ import (
 	"net"
 	"net/http"
 
-	"github.com/grpc-ecosystem/go-grpc-middleware"
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	echo "github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -69,18 +69,18 @@ func (c *Component) serveGRPC(lis net.Listener) error {
 	return c.grpc.Serve(lis)
 }
 
-func (c *Component) grpcListenerConfigs() []endpoint {
-	return []endpoint{
-		{toNativeListener: Listener.TCP, address: c.config.GRPC.Listen, protocol: "gRPC"},
-		{toNativeListener: Listener.TLS, address: c.config.GRPC.ListenTLS, protocol: "gRPC/tls"},
+func (c *Component) grpcEndpoints() []Endpoint {
+	return []Endpoint{
+		NewTCPEndpoint(c.config.GRPC.Listen, "gRPC"),
+		NewTLSEndpoint(c.config.GRPC.ListenTLS, "gRPC"),
 	}
 }
 
 func (c *Component) listenGRPC() (err error) {
-	return c.serveOnListeners(c.grpcListenerConfigs(), (*Component).serveGRPC, "grpc")
+	return c.serveOnEndpoints(c.grpcEndpoints(), (*Component).serveGRPC, "grpc")
 }
 
-// RegisterGRPC registers a gRPC subsystem to the component
+// RegisterGRPC registers a gRPC subsystem to the component.
 func (c *Component) RegisterGRPC(s rpcserver.Registerer) {
 	if c.grpc == nil {
 		c.initGRPC()

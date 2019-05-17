@@ -127,38 +127,25 @@ func New(c *component.Component, conf *Config) (gs *GatewayServer, err error) {
 			Config: conf.MQTTV2,
 		},
 	} {
-		for _, lis := range []struct {
-			Listen   string
-			Protocol string
-			Net      func(component.Listener) (net.Listener, error)
-		}{
-			{
-				Listen:   version.Config.Listen,
-				Protocol: "tcp",
-				Net:      component.Listener.TCP,
-			},
-			{
-				Listen:   version.Config.ListenTLS,
-				Protocol: "tls",
-				Net:      component.Listener.TLS,
-			},
+		for _, endpoint := range []component.Endpoint{
+			component.NewTCPEndpoint(version.Config.Listen, "MQTT"),
+			component.NewTLSEndpoint(version.Config.ListenTLS, "MQTT"),
 		} {
-			if lis.Listen == "" {
+			if endpoint.Address() == "" {
 				continue
 			}
-			var componentLis component.Listener
-			var netLis net.Listener
-			componentLis, err = gs.ListenTCP(lis.Listen)
+			l, err := gs.ListenTCP(endpoint.Address())
+			var lis net.Listener
 			if err == nil {
-				netLis, err = lis.Net(componentLis)
+				lis, err = endpoint.Listen(l)
 			}
 			if err != nil {
 				return nil, errListenFrontend.WithCause(err).WithAttributes(
-					"protocol", lis.Protocol,
-					"address", lis.Listen,
+					"address", endpoint.Address(),
+					"protocol", endpoint.Protocol(),
 				)
 			}
-			mqtt.Start(ctx, gs, netLis, version.Format, lis.Protocol)
+			mqtt.Start(ctx, gs, lis, version.Format, endpoint.Protocol())
 		}
 	}
 

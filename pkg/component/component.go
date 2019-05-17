@@ -17,11 +17,12 @@ package component
 
 import (
 	"context"
-	"crypto/tls"
 	"fmt"
+	"net/http"
 	"os"
 	"os/signal"
 	"sort"
+	"strings"
 	"syscall"
 
 	"github.com/getsentry/raven-go"
@@ -55,8 +56,7 @@ type Component struct {
 	config        *Config
 	getBaseConfig func(ctx context.Context) config.ServiceBase
 
-	acme    *autocert.Manager
-	acmeTLS *tls.Config // TLS configuration if ACME is used.
+	acme *autocert.Manager
 
 	logger log.Stack
 	sentry *raven.Client
@@ -240,12 +240,12 @@ func (c *Component) Start() (err error) {
 	}
 	c.logger.Debug("Started gRPC server")
 
-	c.logger.Debug("Starting HTTP server...")
+	c.logger.Debug("Starting web server...")
 	if err = c.listenWeb(); err != nil {
-		c.logger.WithError(err).Error("Could not start HTTP server")
+		c.logger.WithError(err).Error("Could not start web server")
 		return err
 	}
-	c.logger.Debug("Started HTTP server")
+	c.logger.Debug("Started web server")
 
 	c.logger.Debug("Initializing cluster...")
 	if err := c.initCluster(); err != nil {
@@ -318,4 +318,15 @@ func (c *Component) Close() {
 // over insecure transports.
 func (c *Component) AllowInsecureForCredentials() bool {
 	return c.config.GRPC.AllowInsecureForCredentials
+}
+
+// ServeHTTP serves an HTTP request.
+// If the Content-Type is application/grpc, the request is routed to gRPC.
+// Otherwise, the request is routed to the default web server.
+func (c *Component) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if r.ProtoMajor == 2 && strings.Contains(r.Header.Get("Content-Type"), "application/grpc") {
+		c.grpc.Server.ServeHTTP(w, r)
+	} else {
+		c.web.ServeHTTP(w, r)
+	}
 }

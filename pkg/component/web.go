@@ -50,19 +50,20 @@ func (c *Component) RegisterReadinessCheck(name string, check healthcheck.Check)
 	c.healthHandler.AddReadinessCheck(name, check)
 }
 
-func (c *Component) serveHTTP(lis net.Listener) error {
+func (c *Component) serveWeb(lis net.Listener) error {
 	return http.Serve(lis, c)
 }
 
-func (c *Component) httpListenerConfigs() []endpoint {
-	return []endpoint{
-		{toNativeListener: Listener.TCP, address: c.config.HTTP.Listen, protocol: "HTTP"},
-		{toNativeListener: Listener.TLS, address: c.config.HTTP.ListenTLS, protocol: "HTTPS"},
+func (c *Component) webEndpoints() []Endpoint {
+	return []Endpoint{
+		NewTCPEndpoint(c.config.HTTP.Listen, "Web"),
+		NewTLSEndpoint(c.config.HTTP.ListenTLS, "Web"),
 	}
 }
 
+// listenWeb starts the web listeners on the addresses and endpoints configured in the HTTP section.
 func (c *Component) listenWeb() (err error) {
-	err = c.serveOnListeners(c.httpListenerConfigs(), (*Component).serveHTTP, "web")
+	err = c.serveOnEndpoints(c.webEndpoints(), (*Component).serveWeb, "web")
 	if err != nil {
 		return
 	}
@@ -122,12 +123,4 @@ func (c *Component) basicAuth(username, password string) echo.MiddlewareFunc {
 		}
 		return true, nil
 	})
-}
-
-func (c *Component) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if r.ProtoMajor == 2 && strings.Contains(r.Header.Get("Content-Type"), "application/grpc") {
-		c.grpc.Server.ServeHTTP(w, r)
-	} else {
-		c.web.ServeHTTP(w, r)
-	}
 }

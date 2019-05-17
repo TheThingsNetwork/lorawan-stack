@@ -42,29 +42,29 @@ func TestGroup(t *testing.T) {
 		t.Fatal("Could not create a web instance")
 	}
 
-	a.So(s, ShouldNotHaveRoute, "GET", "/")
+	a.So(s.server, should.NotHaveRoute, "GET", "/")
 	s.GET("/", handler)
-	a.So(s, ShouldHaveRoute, "GET", "/")
+	a.So(s.server, should.HaveRoute, "GET", "/")
 
-	a.So(s, ShouldNotHaveRoute, "POST", "/bar")
+	a.So(s.server, should.NotHaveRoute, "POST", "/bar")
 	s.POST("/bar", handler)
-	a.So(s, ShouldNotHaveRoute, "GET", "/bar")
-	a.So(s, ShouldHaveRoute, "POST", "/bar")
+	a.So(s.server, should.NotHaveRoute, "GET", "/bar")
+	a.So(s.server, should.HaveRoute, "POST", "/bar")
 
 	{
 		grp := s.Group("/")
 		grp.GET("/baz", handler)
-		a.So(s, ShouldHaveRoute, "GET", "/baz")
+		a.So(s.server, should.HaveRoute, "GET", "/baz")
 	}
 
 	{
 		grp := s.Group("/group")
 		grp.GET("/g", handler)
-		a.So(s, ShouldHaveRoute, "GET", "/group/g")
+		a.So(s.server, should.HaveRoute, "GET", "/group/g")
 
 		ggrp := grp.Group("/quu")
 		ggrp.GET("/q", handler)
-		a.So(s, ShouldHaveRoute, "GET", "/group/quu/q")
+		a.So(s.server, should.HaveRoute, "GET", "/group/quu/q")
 	}
 }
 
@@ -72,13 +72,12 @@ func TestIsZeros(t *testing.T) {
 	a := assertions.New(t)
 	{
 		res := isZeros([]byte{0, 0, 0, 0, 0})
-		a.So(res, assertions.ShouldBeTrue)
+		a.So(res, should.BeTrue)
 	}
 	{
 		res := isZeros([]byte{0, 0, 0, 1, 0})
-		a.So(res, assertions.ShouldBeFalse)
+		a.So(res, should.BeFalse)
 	}
-
 }
 
 func TestServeHTTP(t *testing.T) {
@@ -110,9 +109,9 @@ func TestRootGroup(t *testing.T) {
 	}
 
 	s.RootGroup("/sub")
-	a.So(s, ShouldNotHaveRoute, "GET", "/")
-	a.So(s, ShouldNotHaveRoute, "GET", "/sub/another")
-	a.So(s, ShouldHaveRoute, "GET", "/sub")
+	a.So(s.server, should.NotHaveRoute, "GET", "/")
+	a.So(s.server, should.NotHaveRoute, "GET", "/sub/another")
+	a.So(s.server, should.HaveRoute, "GET", "/sub")
 }
 
 func TestStatic(t *testing.T) {
