@@ -19,7 +19,7 @@ import (
 	"net"
 	"net/http"
 
-	"github.com/grpc-ecosystem/go-grpc-middleware"
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	echo "github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -69,10 +69,10 @@ func (c *Component) serveGRPC(lis net.Listener) error {
 	return c.grpc.Serve(lis)
 }
 
-func (c *Component) grpcEndpoints() []endpoint {
-	return []endpoint{
-		{listen: Listener.TCP, address: c.config.GRPC.Listen, protocol: "gRPC"},
-		{listen: Listener.TLS, address: c.config.GRPC.ListenTLS, protocol: "gRPC/tls"},
+func (c *Component) grpcEndpoints() []Endpoint {
+	return []Endpoint{
+		NewTCPEndpoint(c.config.GRPC.Listen, "gRPC"),
+		NewTLSEndpoint(c.config.GRPC.ListenTLS, "gRPC"),
 	}
 }
 

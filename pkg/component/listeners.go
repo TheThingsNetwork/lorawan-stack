@@ -30,7 +30,7 @@ var (
 
 // Listener that accepts multiple protocols on the same port
 type Listener interface {
-	TLS() (net.Listener, error)
+	TLS(opts ...TLSConfigOption) (net.Listener, error)
 	TCP() (net.Listener, error)
 	Close() error
 }
@@ -45,11 +45,11 @@ type listener struct {
 	tlsUsed bool
 }
 
-func (l *listener) TLS() (net.Listener, error) {
+func (l *listener) TLS(opts ...TLSConfigOption) (net.Listener, error) {
 	if l.tlsUsed {
 		return nil, errors.New("TLS listener already in use")
 	}
-	config, err := l.c.GetTLSConfig(l.c.Context())
+	config, err := l.c.GetTLSConfig(l.c.Context(), opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -106,15 +106,45 @@ func (c *Component) ListenUDP(address string) (*net.UDPConn, error) {
 	return net.ListenUDP("udp", udpAddr)
 }
 
-type endpoint struct {
-	listen   func(Listener) (net.Listener, error)
+// Endpoint represents an endpoint that can be listened on.
+type Endpoint interface {
+	Address() string
+	Protocol() string
+	Listen(Listener) (net.Listener, error)
+}
+
+type tcpEndpoint struct {
 	address  string
 	protocol string
 }
 
-func (c *Component) serveOnEndpoints(endpoints []endpoint, serve func(*Component, net.Listener) error, namespace string) error {
+// NewTCPEndpoint returns a new TCP endpoint.
+func NewTCPEndpoint(address, protocol string) Endpoint {
+	return &tcpEndpoint{address, protocol}
+}
+
+func (e tcpEndpoint) Address() string                       { return e.address }
+func (e tcpEndpoint) Protocol() string                      { return e.protocol }
+func (tcpEndpoint) Listen(l Listener) (net.Listener, error) { return l.TCP() }
+
+type tlsEndpoint struct {
+	address    string
+	protocol   string
+	configOpts []TLSConfigOption
+}
+
+// NewTLSEndpoint returns a new TLS endpoint.
+func NewTLSEndpoint(address, protocol string, configOpts ...TLSConfigOption) Endpoint {
+	return &tlsEndpoint{address, protocol, configOpts}
+}
+
+func (e tlsEndpoint) Address() string                         { return e.address }
+func (e tlsEndpoint) Protocol() string                        { return e.protocol + "/tls" }
+func (e tlsEndpoint) Listen(l Listener) (net.Listener, error) { return l.TLS(e.configOpts...) }
+
+func (c *Component) serveOnEndpoints(endpoints []Endpoint, serve func(*Component, net.Listener) error, namespace string) error {
 	for _, endpoint := range endpoints {
-		if endpoint.address == "" {
+		if endpoint.Address() == "" {
 			continue
 		}
 		err := c.serveOnEndpoint(endpoint, serve, namespace)
@@ -125,21 +155,25 @@ func (c *Component) serveOnEndpoints(endpoints []endpoint, serve func(*Component
 	return nil
 }
 
-func (c *Component) serveOnEndpoint(endpoint endpoint, serve func(*Component, net.Listener) error, namespace string) error {
-	l, err := c.ListenTCP(endpoint.address)
+func (c *Component) serveOnEndpoint(endpoint Endpoint, serve func(*Component, net.Listener) error, namespace string) error {
+	l, err := c.ListenTCP(endpoint.Address())
 	if err != nil {
-		return errListenEndpoint.WithAttributes("endpoint", endpoint.address).WithCause(err)
+		return errListenEndpoint.WithAttributes("endpoint", endpoint.Address()).WithCause(err)
 	}
-	lis, err := endpoint.listen(l)
+	lis, err := endpoint.Listen(l)
 	if err != nil {
-		return errListener.WithAttributes("protocol", endpoint.protocol).WithCause(err)
+		return errListener.WithAttributes("protocol", endpoint.Protocol()).WithCause(err)
 	}
-	logger := log.FromContext(c.ctx).WithFields(log.Fields("namespace", namespace, "address", endpoint.address))
-	logger.Infof("Listening for %s connections", endpoint.protocol)
+	logger := log.FromContext(c.ctx).WithFields(log.Fields(
+		"namespace", namespace,
+		"address", endpoint.Address(),
+		"protocol", endpoint.Protocol(),
+	))
+	logger.Info("Listening for connections")
 	go func() {
 		err := serve(c, lis)
 		if err != nil && c.ctx.Err() == nil {
-			logger.WithError(err).Errorf("Error serving %s on %s", endpoint.protocol, lis.Addr())
+			logger.WithError(err).Error("Failed to serve")
 		}
 	}()
 	return nil
