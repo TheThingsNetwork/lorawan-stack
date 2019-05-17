@@ -26,7 +26,10 @@ import style from './input.styl'
 export default class Input extends React.Component {
   static propTypes = {
     icon: PropTypes.string,
-    value: PropTypes.string,
+    value: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number,
+    ]),
     onFocus: PropTypes.func,
     onBlur: PropTypes.func,
     onChange: PropTypes.func,
