@@ -88,6 +88,7 @@ export default class Device extends React.Component {
         'supports_join',
         'lorawan_version',
         'lorawan_phy_version',
+        'locations',
       ],
       { ignoreNotFound: true })
   }
