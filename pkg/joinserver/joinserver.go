@@ -26,6 +26,7 @@ import (
 	"github.com/oklog/ulid"
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	"go.thethings.network/lorawan-stack/pkg/interop"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/rpclog"
@@ -61,6 +62,7 @@ type JoinServer struct {
 		asJs      asJsServer
 		jsDevices jsEndDeviceRegistryServer
 	}
+	interop interopServer
 }
 
 // Context returns the context of the Join Server.
@@ -86,6 +88,7 @@ func New(c *component.Component, conf *Config) (*JoinServer, error) {
 	js.grpc.jsDevices = jsEndDeviceRegistryServer{JS: js}
 	js.grpc.asJs = asJsServer{JS: js}
 	js.grpc.nsJs = nsJsServer{JS: js}
+	js.interop = interopServer{JS: js}
 
 	// TODO: Support authentication from non-cluster-local NS and AS (https://github.com/TheThingsNetwork/lorawan-stack/issues/4).
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.NsJs", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("joinserver"))
@@ -94,6 +97,7 @@ func New(c *component.Component, conf *Config) (*JoinServer, error) {
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.AsJs", cluster.HookName, c.ClusterAuthUnaryHook())
 
 	c.RegisterGRPC(js)
+	c.RegisterInterop(js)
 	return js, nil
 }
 
@@ -112,4 +116,9 @@ func (js *JoinServer) RegisterServices(s *grpc.Server) {
 // RegisterHandlers registers gRPC handlers.
 func (js *JoinServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
 	ttnpb.RegisterJsEndDeviceRegistryHandler(js.Context(), s, conn)
+}
+
+// RegisterInterop registers the NS-JS and AS-JS interop services.
+func (js *JoinServer) RegisterInterop(srv *interop.Server) {
+	srv.RegisterJS(js.interop)
 }

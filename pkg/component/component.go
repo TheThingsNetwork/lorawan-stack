@@ -33,6 +33,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/fillcontext"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
+	"go.thethings.network/lorawan-stack/pkg/interop"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/log/middleware/sentry"
 	"go.thethings.network/lorawan-stack/pkg/rpcserver"
@@ -69,6 +70,9 @@ type Component struct {
 
 	web           *web.Server
 	webSubsystems []web.Registerer
+
+	interop           *interop.Server
+	interopSubsystems []interop.Registerer
 
 	healthHandler healthcheck.Handler
 
@@ -154,6 +158,11 @@ func New(logger log.Stack, config *Config, opts ...Option) (*Component, error) {
 		return nil, err
 	}
 
+	c.interop, err = interop.New(c.ctx, config.Interop)
+	if err != nil {
+		return nil, err
+	}
+
 	c.initRights()
 
 	c.initGRPC()
@@ -231,6 +240,11 @@ func (c *Component) Start() (err error) {
 		sub.RegisterRoutes(c.web)
 	}
 
+	c.logger.Debug("Initializing interop server...")
+	for _, sub := range c.interopSubsystems {
+		sub.RegisterInterop(c.interop)
+	}
+
 	if c.grpc != nil {
 		c.logger.Debug("Starting gRPC server...")
 		if err = c.listenGRPC(); err != nil {
@@ -246,6 +260,12 @@ func (c *Component) Start() (err error) {
 		return err
 	}
 	c.logger.Debug("Started web server")
+
+	c.logger.Debug("Starting interop server")
+	if err = c.listenInterop(); err != nil {
+		c.logger.WithError(err).Error("Could not start interop server")
+	}
+	c.logger.Debug("Started interop server")
 
 	c.logger.Debug("Initializing cluster...")
 	if err := c.initCluster(); err != nil {

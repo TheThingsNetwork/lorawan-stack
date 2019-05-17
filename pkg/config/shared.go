@@ -106,6 +106,11 @@ type HTTP struct {
 	Health    Health           `name:"health"`
 }
 
+// Interop represents the interoperability through LoRaWAN Backend Interfaces configuration.
+type Interop struct {
+	ListenTLS string `name:"listen-tls" description:"Address for the interop server to listen on"`
+}
+
 // Redis represents Redis configuration.
 type Redis struct {
 	Address   string   `name:"address" description:"Address of the Redis server"`
@@ -241,6 +246,7 @@ type ServiceBase struct {
 	Events           Events                 `name:"events"`
 	GRPC             GRPC                   `name:"grpc"`
 	HTTP             HTTP                   `name:"http"`
+	Interop          Interop                `name:"interop"`
 	TLS              TLS                    `name:"tls"`
 	Sentry           Sentry                 `name:"sentry"`
 	Blob             Blob                   `name:"blob"`
