@@ -932,6 +932,21 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}:
 				}
 
+				if !AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(reqCtx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time, replace bool) bool {
+					return a.So(reqCtx, should.HaveParentContextOrEqual, ctx) &&
+						a.So(devID, should.Resemble, ttnpb.EndDeviceIdentifiers{
+							ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+							DeviceID:               "test-dev-id",
+						}) &&
+						a.So(replace, should.BeTrue) &&
+						a.So(t, should.Resemble, setDevice.MACState.LastConfirmedDownlinkAt.Add(42*time.Second))
+				},
+					nil,
+				) {
+					t.Error("Downlink task add assertion failed")
+					return false
+				}
+
 				select {
 				case <-ctx.Done():
 					t.Error("Timed out while waiting for DownlinkTasks.Pop callback to return")
