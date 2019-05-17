@@ -14,6 +14,7 @@
 
 import {
   GET_DEV,
+  UPDATE_DEV,
   GET_DEV_SUCCESS,
   GET_DEV_FAILURE,
 } from '../actions/device'
@@ -32,6 +33,14 @@ const device = function (state = defaultState, action) {
       fetching: true,
       device: undefined,
       error: false,
+    }
+  case UPDATE_DEV:
+    return {
+      ...state,
+      device: {
+        ...state.device,
+        ...action.patch,
+      },
     }
   case GET_DEV_SUCCESS:
     return {
