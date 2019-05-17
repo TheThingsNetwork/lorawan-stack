@@ -16,11 +16,11 @@ package networkserver
 
 import (
 	"context"
-	"testing"
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/mohae/deepcopy"
+	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
@@ -63,8 +63,59 @@ func CopyUplinkMessage(pb *ttnpb.UplinkMessage) *ttnpb.UplinkMessage {
 	return deepcopy.Copy(pb).(*ttnpb.UplinkMessage)
 }
 
+// CopyMACParameters returns a deep copy of ttnpb.MACParameters pb.
+func CopyMACParameters(pb *ttnpb.MACParameters) *ttnpb.MACParameters {
+	return deepcopy.Copy(pb).(*ttnpb.MACParameters)
+}
+
+// CopySessionKeys returns a deep copy of ttnpb.SessionKeys pb.
+func CopySessionKeys(pb *ttnpb.SessionKeys) *ttnpb.SessionKeys {
+	return deepcopy.Copy(pb).(*ttnpb.SessionKeys)
+}
+
 func DurationPtr(v time.Duration) *time.Duration {
 	return &v
+}
+
+func MakeEU868Channels(chs ...*ttnpb.MACParameters_Channel) []*ttnpb.MACParameters_Channel {
+	return append([]*ttnpb.MACParameters_Channel{
+		{
+			UplinkFrequency:   868100000,
+			DownlinkFrequency: 868100000,
+			MinDataRateIndex:  ttnpb.DATA_RATE_0,
+			MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+		},
+		{
+			UplinkFrequency:   868300000,
+			DownlinkFrequency: 868300000,
+			MinDataRateIndex:  ttnpb.DATA_RATE_0,
+			MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+		},
+		{
+			UplinkFrequency:   868500000,
+			DownlinkFrequency: 868500000,
+			MinDataRateIndex:  ttnpb.DATA_RATE_0,
+			MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+		},
+	}, chs...)
+}
+
+func NewISPeer(ctx context.Context, is interface {
+	ttnpb.ApplicationAccessServer
+}) cluster.Peer {
+	return test.Must(test.NewGRPCServerPeer(ctx, is, ttnpb.RegisterApplicationAccessServer)).(cluster.Peer)
+}
+
+func NewGSPeer(ctx context.Context, gs interface {
+	ttnpb.NsGsServer
+}) cluster.Peer {
+	return test.Must(test.NewGRPCServerPeer(ctx, gs, ttnpb.RegisterNsGsServer)).(cluster.Peer)
+}
+
+func NewJSPeer(ctx context.Context, js interface {
+	ttnpb.NsJsServer
+}) cluster.Peer {
+	return test.Must(test.NewGRPCServerPeer(ctx, js, ttnpb.RegisterNsJsServer)).(cluster.Peer)
 }
 
 var _ DownlinkTaskQueue = MockDownlinkTaskQueue{}
@@ -131,6 +182,12 @@ func MakeDownlinkTaskPopChFunc(reqCh chan<- DownlinkTaskPopRequest) func(context
 	}
 }
 
+// DownlinkTaskPopBlockFunc is DownlinkTasks.Pop function, which blocks until context is done and returns nil.
+func DownlinkTaskPopBlockFunc(ctx context.Context, _ func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) error) error {
+	<-ctx.Done()
+	return nil
+}
+
 var _ DeviceRegistry = MockDeviceRegistry{}
 
 // MockDeviceRegistry is a mock DeviceRegistry used for testing.
@@ -173,6 +230,35 @@ func (m MockDeviceRegistry) SetByID(ctx context.Context, appID ttnpb.Application
 	return m.SetByIDFunc(ctx, appID, devID, paths, f)
 }
 
+type DeviceRegistrySetByIDResponse struct {
+	Device *ttnpb.EndDevice
+	Error  error
+}
+type DeviceRegistrySetByIDRequest struct {
+	Context                context.Context
+	ApplicationIdentifiers ttnpb.ApplicationIdentifiers
+	DeviceID               string
+	Paths                  []string
+	Func                   func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)
+	Response               chan<- DeviceRegistrySetByIDResponse
+}
+
+func MakeDeviceRegistrySetByIDChFunc(reqCh chan<- DeviceRegistrySetByIDRequest) func(context.Context, ttnpb.ApplicationIdentifiers, string, []string, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+	return func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+		respCh := make(chan DeviceRegistrySetByIDResponse)
+		reqCh <- DeviceRegistrySetByIDRequest{
+			Context:                ctx,
+			ApplicationIdentifiers: appID,
+			DeviceID:               devID,
+			Paths:                  paths,
+			Func:                   f,
+			Response:               respCh,
+		}
+		resp := <-respCh
+		return resp.Device, resp.Error
+	}
+}
+
 var _ ttnpb.NsJsServer = &MockNsJsServer{}
 
 type MockNsJsServer struct {
@@ -196,20 +282,20 @@ func (m MockNsJsServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRe
 	return m.GetNwkSKeysFunc(ctx, req)
 }
 
-type HandleJoinResponse struct {
+type NsJsHandleJoinResponse struct {
 	Response *ttnpb.JoinResponse
 	Error    error
 }
-type HandleJoinRequest struct {
+type NsJsHandleJoinRequest struct {
 	Context  context.Context
 	Message  *ttnpb.JoinRequest
-	Response chan<- HandleJoinResponse
+	Response chan<- NsJsHandleJoinResponse
 }
 
-func MakeHandleJoinChFunc(reqCh chan<- HandleJoinRequest) func(context.Context, *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error) {
+func MakeNsJsHandleJoinChFunc(reqCh chan<- NsJsHandleJoinRequest) func(context.Context, *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error) {
 	return func(ctx context.Context, msg *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error) {
-		respCh := make(chan HandleJoinResponse)
-		reqCh <- HandleJoinRequest{
+		respCh := make(chan NsJsHandleJoinResponse)
+		reqCh <- NsJsHandleJoinRequest{
 			Context:  ctx,
 			Message:  msg,
 			Response: respCh,
@@ -217,6 +303,30 @@ func MakeHandleJoinChFunc(reqCh chan<- HandleJoinRequest) func(context.Context, 
 		resp := <-respCh
 		return resp.Response, resp.Error
 	}
+}
+
+var _ ttnpb.NsJsClient = &MockNsJsClient{}
+
+type MockNsJsClient struct {
+	*test.MockClientStream
+	HandleJoinFunc  func(context.Context, *ttnpb.JoinRequest, ...grpc.CallOption) (*ttnpb.JoinResponse, error)
+	GetNwkSKeysFunc func(context.Context, *ttnpb.SessionKeyRequest, ...grpc.CallOption) (*ttnpb.NwkSKeysResponse, error)
+}
+
+// HandleJoin calls HandleJoinFunc if set and panics otherwise.
+func (m MockNsJsClient) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, opts ...grpc.CallOption) (*ttnpb.JoinResponse, error) {
+	if m.HandleJoinFunc == nil {
+		panic("HandleJoin called, but not set")
+	}
+	return m.HandleJoinFunc(ctx, req, opts...)
+}
+
+// GetNwkSKeys calls GetNwkSKeysFunc if set and panics otherwise.
+func (m MockNsJsClient) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequest, opts ...grpc.CallOption) (*ttnpb.NwkSKeysResponse, error) {
+	if m.GetNwkSKeysFunc == nil {
+		panic("GetNwkSKeys called, but not set")
+	}
+	return m.GetNwkSKeysFunc(ctx, req, opts...)
 }
 
 var _ ttnpb.NsGsServer = &MockNsGsServer{}
@@ -253,28 +363,6 @@ func MakeNsGsScheduleDownlinkChFunc(reqCh chan<- NsGsScheduleDownlinkRequest) fu
 		}
 		resp := <-respCh
 		return resp.Response, resp.Error
-	}
-}
-
-func AssertNsGsScheduleDownlinkRequest(t *testing.T, reqCh <-chan NsGsScheduleDownlinkRequest, timeout time.Duration, assert func(ctx context.Context, msg *ttnpb.DownlinkMessage) bool, resp NsGsScheduleDownlinkResponse) bool {
-	t.Helper()
-	select {
-	case req := <-reqCh:
-		if !assert(req.Context, req.Message) {
-			return false
-		}
-		select {
-		case req.Response <- resp:
-			return true
-
-		case <-time.After(timeout):
-			t.Error("Timed out while waiting for NsGs.ScheduleDownlink response to be processed")
-			return false
-		}
-
-	case <-time.After(timeout):
-		t.Error("Timed out while waiting for NsGs.ScheduleDownlink request to arrive")
-		return false
 	}
 }
 
@@ -320,26 +408,85 @@ func (m MockAsNsLinkApplicationStream) Recv() (*pbtypes.Empty, error) {
 	return m.RecvFunc()
 }
 
-var _ ttnpb.NsJsClient = &MockNsJsClient{}
+func AssertDownlinkTaskAddRequest(ctx context.Context, reqCh <-chan DownlinkTaskAddRequest, assert func(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time, replace bool) bool, resp error) bool {
+	t := test.MustTFromContext(ctx)
+	t.Helper()
+	select {
+	case <-ctx.Done():
+		t.Error("Timed out while waiting for DownlinkTasks.Add to be called")
+		return false
 
-type MockNsJsClient struct {
-	*test.MockClientStream
-	HandleJoinFunc  func(context.Context, *ttnpb.JoinRequest, ...grpc.CallOption) (*ttnpb.JoinResponse, error)
-	GetNwkSKeysFunc func(context.Context, *ttnpb.SessionKeyRequest, ...grpc.CallOption) (*ttnpb.NwkSKeysResponse, error)
+	case req := <-reqCh:
+		if !assert(req.Context, req.Identifiers, req.Time, req.Replace) {
+			return false
+		}
+		select {
+		case <-ctx.Done():
+			t.Error("Timed out while waiting for DownlinkTasks.Add response to be processed")
+			return false
+
+		case req.Response <- resp:
+			return true
+		}
+	}
 }
 
-// HandleJoin calls HandleJoinFunc if set and panics otherwise.
-func (m MockNsJsClient) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, opts ...grpc.CallOption) (*ttnpb.JoinResponse, error) {
-	if m.HandleJoinFunc == nil {
-		panic("HandleJoin called, but not set")
+func AssertNsJsHandleJoinRequest(ctx context.Context, reqCh <-chan NsJsHandleJoinRequest, assert func(ctx context.Context, msg *ttnpb.JoinRequest) bool, resp NsJsHandleJoinResponse) bool {
+	t := test.MustTFromContext(ctx)
+	t.Helper()
+	select {
+	case <-ctx.Done():
+		t.Error("Timed out while waiting for NsJs.HandleJoin to be called")
+		return false
+
+	case req := <-reqCh:
+		if !assert(req.Context, req.Message) {
+			return false
+		}
+		select {
+		case <-ctx.Done():
+			t.Error("Timed out while waiting for NsJs.HandleJoin response to be processed")
+			return false
+
+		case req.Response <- resp:
+			return true
+		}
 	}
-	return m.HandleJoinFunc(ctx, req, opts...)
 }
 
-// GetNwkSKeys calls GetNwkSKeysFunc if set and panics otherwise.
-func (m MockNsJsClient) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequest, opts ...grpc.CallOption) (*ttnpb.NwkSKeysResponse, error) {
-	if m.GetNwkSKeysFunc == nil {
-		panic("GetNwkSKeys called, but not set")
+func AssertAuthNsJsHandleJoinRequest(ctx context.Context, authReqCh <-chan test.ClusterAuthRequest, joinReqCh <-chan NsJsHandleJoinRequest, joinAssert func(ctx context.Context, msg *ttnpb.JoinRequest) bool, authResp grpc.CallOption, joinResp NsJsHandleJoinResponse) bool {
+	if !test.AssertClusterAuthRequest(ctx, authReqCh, authResp) {
+		return false
 	}
-	return m.GetNwkSKeysFunc(ctx, req, opts...)
+	return AssertNsJsHandleJoinRequest(ctx, joinReqCh, joinAssert, joinResp)
+}
+
+func AssertNsGsScheduleDownlinkRequest(ctx context.Context, reqCh <-chan NsGsScheduleDownlinkRequest, assert func(ctx context.Context, msg *ttnpb.DownlinkMessage) bool, resp NsGsScheduleDownlinkResponse) bool {
+	t := test.MustTFromContext(ctx)
+	t.Helper()
+	select {
+	case <-ctx.Done():
+		t.Error("Timed out while waiting for NsGs.ScheduleDownlink to be called")
+		return false
+
+	case req := <-reqCh:
+		if !assert(req.Context, req.Message) {
+			return false
+		}
+		select {
+		case <-ctx.Done():
+			t.Error("Timed out while waiting for NsGs.ScheduleDownlink response to be processed")
+			return false
+
+		case req.Response <- resp:
+			return true
+		}
+	}
+}
+
+func AssertAuthNsGsScheduleDownlinkRequest(ctx context.Context, authReqCh <-chan test.ClusterAuthRequest, scheduleReqCh <-chan NsGsScheduleDownlinkRequest, scheduleAssert func(ctx context.Context, msg *ttnpb.DownlinkMessage) bool, authResp grpc.CallOption, scheduleResp NsGsScheduleDownlinkResponse) bool {
+	if !test.AssertClusterAuthRequest(ctx, authReqCh, authResp) {
+		return false
+	}
+	return AssertNsGsScheduleDownlinkRequest(ctx, scheduleReqCh, scheduleAssert, scheduleResp)
 }

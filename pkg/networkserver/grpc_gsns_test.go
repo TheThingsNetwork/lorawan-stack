@@ -161,7 +161,9 @@ func handleUplinkTest() func(t *testing.T) {
 					Devices:             devReg,
 					DeduplicationWindow: 42,
 					CooldownWindow:      42,
-					DownlinkTasks:       &MockDownlinkTaskQueue{},
+					DownlinkTasks: &MockDownlinkTaskQueue{
+						PopFunc: DownlinkTaskPopBlockFunc,
+					},
 				})).(*NetworkServer)
 			ns.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 			test.Must(nil, ns.Start())
@@ -185,7 +187,9 @@ func handleUplinkTest() func(t *testing.T) {
 					Devices:             devReg,
 					DeduplicationWindow: 42,
 					CooldownWindow:      42,
-					DownlinkTasks:       &MockDownlinkTaskQueue{},
+					DownlinkTasks: &MockDownlinkTaskQueue{
+						PopFunc: DownlinkTaskPopBlockFunc,
+					},
 				})).(*NetworkServer)
 			ns.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 			test.Must(nil, ns.Start())
@@ -271,7 +275,9 @@ func handleUplinkTest() func(t *testing.T) {
 					Devices:             devReg,
 					DeduplicationWindow: 42,
 					CooldownWindow:      42,
-					DownlinkTasks:       &MockDownlinkTaskQueue{},
+					DownlinkTasks: &MockDownlinkTaskQueue{
+						PopFunc: DownlinkTaskPopBlockFunc,
+					},
 				})).(*NetworkServer)
 			ns.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 			test.Must(nil, ns.Start())
@@ -1449,6 +1455,7 @@ func handleUplinkTest() func(t *testing.T) {
 						DeduplicationWindow: 42,
 						CooldownWindow:      42,
 						DownlinkTasks: &MockDownlinkTaskQueue{
+							PopFunc: DownlinkTaskPopBlockFunc,
 							AddFunc: func(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time, replace bool) error {
 								downlinkAddCh <- downlinkTasksAddRequest{
 									ctx:     ctx,
@@ -1776,7 +1783,9 @@ func handleJoinTest() func(t *testing.T) {
 					Devices:             devReg,
 					DeduplicationWindow: 42,
 					CooldownWindow:      42,
-					DownlinkTasks:       &MockDownlinkTaskQueue{},
+					DownlinkTasks: &MockDownlinkTaskQueue{
+						PopFunc: DownlinkTaskPopBlockFunc,
+					},
 				})).(*NetworkServer)
 			ns.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 			test.Must(nil, ns.Start())
@@ -2046,6 +2055,7 @@ func handleJoinTest() func(t *testing.T) {
 						NetID:   NetID,
 						Devices: devReg,
 						DownlinkTasks: &MockDownlinkTaskQueue{
+							PopFunc: DownlinkTaskPopBlockFunc,
 							AddFunc: func(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time, replace bool) error {
 								downlinkAddCh <- downlinkTasksAddRequest{
 									ctx:     ctx,
@@ -2420,7 +2430,9 @@ func TestHandleUplink(t *testing.T) {
 			Devices:             devReg,
 			DeduplicationWindow: 42,
 			CooldownWindow:      42,
-			DownlinkTasks:       &MockDownlinkTaskQueue{},
+			DownlinkTasks: &MockDownlinkTaskQueue{
+				PopFunc: DownlinkTaskPopBlockFunc,
+			},
 		},
 	)).(*NetworkServer)
 	test.Must(nil, ns.Start())

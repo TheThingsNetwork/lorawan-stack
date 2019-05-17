@@ -35,7 +35,9 @@ func TestNewDevAddr(t *testing.T) {
 				NetID:               types.NetID{0x00, 0x00, 0x13},
 				DeduplicationWindow: 42,
 				CooldownWindow:      42,
-				DownlinkTasks:       &MockDownlinkTaskQueue{},
+				DownlinkTasks: &MockDownlinkTaskQueue{
+					PopFunc: DownlinkTaskPopBlockFunc,
+				},
 			})).(*NetworkServer)
 
 		if !a.So(ns.devAddrPrefixes, should.HaveLength, 1) {
@@ -72,7 +74,9 @@ func TestNewDevAddr(t *testing.T) {
 				},
 				DeduplicationWindow: 42,
 				CooldownWindow:      42,
-				DownlinkTasks:       &MockDownlinkTaskQueue{},
+				DownlinkTasks: &MockDownlinkTaskQueue{
+					PopFunc: DownlinkTaskPopBlockFunc,
+				},
 			})).(*NetworkServer)
 
 		seen := map[types.DevAddrPrefix]int{}
