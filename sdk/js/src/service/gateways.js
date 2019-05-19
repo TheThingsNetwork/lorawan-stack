@@ -23,6 +23,7 @@ class Gateways {
     this._stackConfig = stackConfig
     this.ApiKeys = new ApiKeys(api.GatewayAccess, {
       parentRoutes: {
+        get: 'gateway_ids.gateway_id',
         list: 'gateway_ids.gateway_id',
         create: 'gateway_ids.gateway_id',
         update: 'gateway_ids.gateway_id',
