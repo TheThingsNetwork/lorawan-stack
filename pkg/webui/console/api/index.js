@@ -118,6 +118,7 @@ export default {
     stats: ttnClient.Gateways.getStatisticsById.bind(ttnClient.Gateways),
     eventsSubscribe: ttnClient.Gateways.openStream.bind(ttnClient.Gateways),
     apiKeys: {
+      get: ttnClient.Gateways.ApiKeys.getById.bind(ttnClient.Gateways.ApiKeys),
       list: ttnClient.Gateways.ApiKeys.getAll.bind(ttnClient.Gateways.ApiKeys),
       update: ttnClient.Gateways.ApiKeys.updateById.bind(ttnClient.Gateways.ApiKeys),
       'delete': ttnClient.Gateways.ApiKeys.deleteById.bind(ttnClient.Gateways.ApiKeys),
