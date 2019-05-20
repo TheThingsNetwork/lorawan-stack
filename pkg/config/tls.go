@@ -60,7 +60,7 @@ func (t TLS) Config(ctx context.Context) (*tls.Config, error) {
 		if err != nil {
 			return err
 		}
-		cv.Store([]tls.Certificate{cert})
+		cv.Store(&cert)
 		logger.Debug("Loaded TLS certificate")
 		return nil
 	}
@@ -98,19 +98,8 @@ func (t TLS) Config(ctx context.Context) (*tls.Config, error) {
 
 	return &tls.Config{
 		RootCAs: rootCAs,
-		GetConfigForClient: func(info *tls.ClientHelloInfo) (*tls.Config, error) {
-			tlsConfig := &tls.Config{
-				Certificates:             cv.Load().([]tls.Certificate),
-				PreferServerCipherSuites: true,
-				MinVersion:               tls.VersionTLS12,
-			}
-			for _, proto := range info.SupportedProtos {
-				if proto == "h2" {
-					tlsConfig.NextProtos = []string{"h2"}
-					break
-				}
-			}
-			return tlsConfig, nil
+		GetCertificate: func(info *tls.ClientHelloInfo) (*tls.Certificate, error) {
+			return cv.Load().(*tls.Certificate), nil
 		},
 	}, nil
 }

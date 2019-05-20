@@ -43,23 +43,33 @@ func WithTLSClientAuth(auth tls.ClientAuthType, cas *x509.CertPool, verify func(
 	})
 }
 
+// WithNextProtos appends the given protocols to NextProtos.
+func WithNextProtos(protos ...string) TLSConfigOption {
+	return TLSConfigOptionFunc(func(c *tls.Config) {
+		c.NextProtos = append(c.NextProtos, protos...)
+	})
+}
+
 // GetTLSConfig gets the component's TLS config and applies the given options.
-func (c *Component) GetTLSConfig(ctx context.Context, opts ...TLSConfigOption) (conf *tls.Config, err error) {
+func (c *Component) GetTLSConfig(ctx context.Context, opts ...TLSConfigOption) (*tls.Config, error) {
+	var conf *tls.Config
 	if c.acme != nil {
 		conf = &tls.Config{
-			GetCertificate:           c.acme.GetCertificate,
-			PreferServerCipherSuites: true,
-			MinVersion:               tls.VersionTLS12,
-			NextProtos: []string{
-				"h2", "http/1.1",
-				acme.ALPNProto,
-			},
+			GetCertificate: c.acme.GetCertificate,
 		}
-	} else if conf, err = c.config.TLS.Config(ctx); err != nil {
-		return
+		opts = append(opts, WithNextProtos(acme.ALPNProto))
+	} else {
+		var err error
+		conf, err = c.config.TLS.Config(ctx)
+		if err != nil {
+			return nil, err
+		}
 	}
+	conf.MinVersion = tls.VersionTLS12
+	conf.NextProtos = []string{"h2", "http/1.1"}
+	conf.PreferServerCipherSuites = true
 	for _, opt := range opts {
 		opt.apply(conf)
 	}
-	return
+	return conf, nil
 }
