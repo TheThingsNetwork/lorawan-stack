@@ -89,7 +89,6 @@ func New(ctx context.Context, config config.Interop) (*Server, error) {
 	server.Use(
 		middleware.ID("interop"),
 		echomiddleware.BodyLimit("16M"),
-		echomiddleware.Secure(),
 		middleware.Recover(),
 	)
 
