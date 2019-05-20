@@ -94,21 +94,43 @@ func TestInteropTLS(t *testing.T) {
 		}},
 	}
 
-	req := &interop.JoinReq{
-		NsJsMessageHeader: interop.NsJsMessageHeader{
-			MessageHeader: interop.MessageHeader{
-				MessageType:     interop.MessageTypeJoinReq,
-				ProtocolVersion: "1.1",
+	// Correct SenderID.
+	{
+		req := &interop.JoinReq{
+			NsJsMessageHeader: interop.NsJsMessageHeader{
+				MessageHeader: interop.MessageHeader{
+					MessageType:     interop.MessageTypeJoinReq,
+					ProtocolVersion: "1.1",
+				},
+				SenderID:   types.NetID{0x0, 0x0, 0x1},
+				ReceiverID: types.EUI64{0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
 			},
-			SenderID:   types.NetID{0x0, 0x0, 0x1},
-			ReceiverID: types.EUI64{0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
-		},
-		MACVersion: interop.MACVersion(ttnpb.MAC_V1_0_3),
+			MACVersion: interop.MACVersion(ttnpb.MAC_V1_0_3),
+		}
+		buf, err := json.Marshal(req)
+		a.So(err, should.BeNil)
+		res, err := client.Post("https://localhost:9188", "application/json", bytes.NewReader(buf))
+		a.So(err, should.BeNil)
+		a.So(res.StatusCode, should.Equal, http.StatusOK)
 	}
-	buf, err := json.Marshal(req)
-	a.So(err, should.BeNil)
-	res, err := client.Post("https://localhost:9188", "application/json", bytes.NewReader(buf))
-	a.So(err, should.BeNil)
-	defer res.Body.Close()
-	a.So(res.StatusCode, should.Equal, http.StatusOK)
+
+	// Wrong SenderID.
+	{
+		req := &interop.JoinReq{
+			NsJsMessageHeader: interop.NsJsMessageHeader{
+				MessageHeader: interop.MessageHeader{
+					MessageType:     interop.MessageTypeJoinReq,
+					ProtocolVersion: "1.1",
+				},
+				SenderID:   types.NetID{0x0, 0x0, 0x2},
+				ReceiverID: types.EUI64{0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
+			},
+			MACVersion: interop.MACVersion(ttnpb.MAC_V1_0_3),
+		}
+		buf, err := json.Marshal(req)
+		a.So(err, should.BeNil)
+		res, err := client.Post("https://localhost:9188", "application/json", bytes.NewReader(buf))
+		a.So(err, should.BeNil)
+		a.So(res.StatusCode, should.Equal, http.StatusForbidden)
+	}
 }

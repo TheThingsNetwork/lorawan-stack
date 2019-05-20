@@ -15,6 +15,7 @@
 package interop
 
 import (
+	"crypto/x509"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -192,6 +193,29 @@ func parseMessage() echo.MiddlewareFunc {
 			}
 			c.Set(messageKey, msg)
 			return next(c)
+		}
+	}
+}
+
+// verifySenderID verifies whether the SenderID of the message is authorized for the request according to the given
+// trusted certificates per sender.
+func verifySenderID(senderClientCAs map[string][]*x509.Certificate) echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			header := c.Get(headerKey).(*RawMessageHeader)
+			if state := c.Request().TLS; state != nil {
+				for _, chain := range state.VerifiedChains {
+					for _, cert := range chain {
+						for _, senderCA := range senderClientCAs[header.SenderID] {
+							if cert.Equal(senderCA) {
+								return next(c)
+							}
+						}
+					}
+				}
+			}
+			c.NoContent(http.StatusForbidden)
+			return nil
 		}
 	}
 }
