@@ -210,7 +210,7 @@ func TestParseMessage(t *testing.T) {
 				}
 				c.NoContent(http.StatusOK)
 				return nil
-			}, ParseMessage())
+			}, parseMessage())
 
 			req := httptest.NewRequest(echo.POST, "/", bytes.NewReader(tc.Request))
 			rec := httptest.NewRecorder()

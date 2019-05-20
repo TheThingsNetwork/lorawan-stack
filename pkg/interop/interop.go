@@ -98,7 +98,7 @@ func New(ctx context.Context, config config.Interop) (*Server, error) {
 			"",
 			middleware.Log(logger),
 			middleware.Normalize(middleware.RedirectPermanent),
-			ParseMessage(),
+			parseMessage(),
 		),
 		config: config,
 		server: server,

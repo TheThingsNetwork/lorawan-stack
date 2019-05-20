@@ -152,9 +152,9 @@ type JoinAns struct {
 	SessionKeyID Buffer       `json:",omitempty"`
 }
 
-// ParseMessage parses the header and the message type of the request body.
+// parseMessage parses the header and the message type of the request body.
 // This middleware sets the header in the context on the `headerKey` and the message on the `messageKey`.
-func ParseMessage() echo.MiddlewareFunc {
+func parseMessage() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			buf, err := ioutil.ReadAll(c.Request().Body)
