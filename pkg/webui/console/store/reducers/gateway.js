@@ -16,6 +16,7 @@ import {
   GET_GTW,
   GET_GTW_SUCCESS,
   GET_GTW_FAILURE,
+  UPDATE_GTW,
   START_GTW_STATS,
   UPDATE_GTW_STATS,
   UPDATE_GTW_STATS_SUCCESS,
@@ -91,6 +92,14 @@ const gateway = function (state = defaultState, action) {
       ...state,
       fetching: false,
       error: action.error,
+    }
+  case UPDATE_GTW:
+    return {
+      ...state,
+      gateway: {
+        ...state.gateway,
+        ...action.patch,
+      },
     }
   case START_GTW_STATS:
   case UPDATE_GTW_STATS:
