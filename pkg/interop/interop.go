@@ -16,6 +16,7 @@ package interop
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	echo "github.com/labstack/echo/v4"
@@ -156,6 +157,8 @@ func (s *Server) handleRequest(c echo.Context) error {
 	switch req := c.Get(messageKey).(type) {
 	case *JoinReq:
 		ans, err = s.js.JoinRequest(req)
+	default:
+		panic(fmt.Sprintf("unexpected message type %T", c.Get(messageKey)))
 	}
 	if err != nil {
 		return err
