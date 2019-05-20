@@ -108,7 +108,8 @@ type HTTP struct {
 
 // Interop represents the interoperability through LoRaWAN Backend Interfaces configuration.
 type Interop struct {
-	ListenTLS string `name:"listen-tls" description:"Address for the interop server to listen on"`
+	ListenTLS       string            `name:"listen-tls" description:"Address for the interop server to listen on"`
+	SenderClientCAs map[string]string `name:"sender-client-cas" description:"Path to PEM encoded file with client CAs of sender IDs to trust"`
 }
 
 // Redis represents Redis configuration.

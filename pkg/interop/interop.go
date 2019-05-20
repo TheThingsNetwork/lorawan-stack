@@ -16,7 +16,10 @@ package interop
 
 import (
 	"context"
+	"crypto/x509"
+	"encoding/pem"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 
 	echo "github.com/labstack/echo/v4"
@@ -66,6 +69,8 @@ func (noopServer) JoinRequest(req *JoinReq) (*JoinAns, error) {
 
 // Server is the server.
 type Server struct {
+	SenderClientCAs map[string][]*x509.Certificate
+
 	rootGroup *echo.Group
 	server    *echo.Echo
 	config    config.Interop
@@ -92,8 +97,32 @@ func New(ctx context.Context, config config.Interop) (*Server, error) {
 		middleware.Recover(),
 	)
 
+	senderClientCAs := make(map[string][]*x509.Certificate)
+	for senderID, filename := range config.SenderClientCAs {
+		pemCerts, err := ioutil.ReadFile(filename)
+		if err != nil {
+			return nil, err
+		}
+		for len(pemCerts) > 0 {
+			var block *pem.Block
+			block, pemCerts = pem.Decode(pemCerts)
+			if block == nil {
+				break
+			}
+			if block.Type != "CERTIFICATE" || len(block.Headers) != 0 {
+				continue
+			}
+			cert, err := x509.ParseCertificate(block.Bytes)
+			if err != nil {
+				return nil, err
+			}
+			senderClientCAs[senderID] = append(senderClientCAs[senderID], cert)
+		}
+	}
+
 	noop := &noopServer{}
 	s := &Server{
+		SenderClientCAs: senderClientCAs,
 		rootGroup: server.Group(
 			"",
 			middleware.Log(logger),

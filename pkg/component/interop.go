@@ -15,6 +15,8 @@
 package component
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"net"
 	"net/http"
 
@@ -33,8 +35,14 @@ func (c *Component) serveInterop(lis net.Listener) error {
 }
 
 func (c *Component) interopEndpoints() []Endpoint {
+	certPool := x509.NewCertPool()
+	for _, certs := range c.interop.SenderClientCAs {
+		for _, cert := range certs {
+			certPool.AddCert(cert)
+		}
+	}
 	return []Endpoint{
-		NewTLSEndpoint(c.config.Interop.ListenTLS, "Interop"),
+		NewTLSEndpoint(c.config.Interop.ListenTLS, "Interop", WithTLSClientAuth(tls.RequireAndVerifyClientCert, certPool, nil)),
 	}
 }
 
