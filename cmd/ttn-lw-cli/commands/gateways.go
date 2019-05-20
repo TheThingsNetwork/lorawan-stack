@@ -206,11 +206,18 @@ var (
 				}
 			}
 
-			setDefaults, _ := cmd.Flags().GetBool("defaults")
-			if setDefaults {
+			if setDefaults, _ := cmd.Flags().GetBool("defaults"); setDefaults {
 				gateway.GatewayServerAddress = getHost(config.GatewayServerGRPCAddress)
+				gateway.AutoUpdate = true
+				gateway.EnforceDutyCycle = true
+				gateway.StatusPublic = true
+				gateway.LocationPublic = true
 				paths = append(paths,
 					"gateway_server_address",
+					"auto_update",
+					"enforce_duty_cycle",
+					"status_public",
+					"location_public",
 				)
 			}
 
@@ -408,7 +415,7 @@ func init() {
 	gatewaysCreateCommand.Flags().AddFlagSet(setGatewayFlags)
 	gatewaysCreateCommand.Flags().AddFlagSet(setGatewayAntennaFlags)
 	gatewaysCreateCommand.Flags().AddFlagSet(attributesFlags())
-	gatewaysCreateCommand.Flags().Bool("defaults", true, "configure gateway with default gateway server address")
+	gatewaysCreateCommand.Flags().Bool("defaults", true, "configure gateway with defaults")
 	gatewaysCommand.AddCommand(gatewaysCreateCommand)
 	gatewaysUpdateCommand.Flags().AddFlagSet(gatewayIDFlags())
 	gatewaysUpdateCommand.Flags().AddFlagSet(setGatewayFlags)
