@@ -1,69 +1,425 @@
 {
-  "ids": ["is", "is"],
-  "name": ["is", "is"],
-  "description": ["is", "is"],
+  "application_server_address": [["is", "js"], ["is", "js"]],
   "attributes": ["is", "is"],
-  "locations": ["is", "is"],
-  "version_ids": ["is", "is"],
-  "service_profile_id": ["is", "is"],
-  "application_server_address": ["is", ["is", "js"]],
+  "created_at": [["is", "ns"], "read_only"],
+  "description": ["is", "is"],
+  "ids": {
+    "_root": [["is", "as", "ns", "js"], ["is", "as", "ns", "js"]],
+    "application_ids": {
+      "_root": [["is", "as", "ns", "js"], ["as", "ns", "js"]],
+      "application_id": [["is", "as", "ns", "js"], ["as", "ns", "js"]]
+    },
+    "dev_eui": [["is", "as", "ns", "js"], ["is", "as", "ns", "js"]],
+    "device_id": [["is", "as", "ns", "js"], ["as", "ns", "js"]],
+    "join_eui": [["is", "as", "ns", "js"], ["is", "as", "ns", "js"]],
+    "dev_addr": [["ns", "js"], ["ns", "js"]]
+  },
   "join_server_address": ["is", "is"],
-  "network_server_address": ["is", ["is", "js"]],
-  "battery_percentage": ["ns", "read_only"],
-  "default_class": ["ns", "ns"],
-  "default_mac_parameters": ["ns", "ns"],
-  "downlink_margin": ["ns", "read_only"],
-  "frequency_plan_id": ["ns", "ns"],
-  "last_dev_status_received_at": ["ns", "read_only"],
-  "lorawan_phy_version": ["ns", "ns"],
-  "lorawan_version": ["ns", "ns"],
-  "mac_settings": ["ns", "ns"],
-  "mac_state": ["ns", "read_only"],
-  "max_frequency": ["ns", "ns"],
-  "min_frequency": ["ns", "ns"],
-  "power_state": ["ns", "read_only"],
-  "recent_downlinks": ["ns", "read_only"],
-  "recent_uplinks": ["ns", "read_only"],
-  "resets_f_cnt": ["ns", "ns"],
-  "resets_join_nonces": ["js", "js"],
-  "supports_class_b": ["ns", "ns"],
-  "supports_class_c": ["ns", "ns"],
-  "supports_join": ["ns", "ns"],
-  "uses_32_bit_f_cnt": ["ns", "ns"],
-  "session": {
-    "_root": [["ns", "as"], "read_only"],
-    "dev_addr": ["ns", ["ns", "as"]],
-    "last_f_cnt_down": ["ns", "ns"],
-    "last_f_cnt_up": ["ns", "ns"],
-    "last_conf_f_cnt_down": ["ns", "ns"],
-    "last_a_f_cnt_down": ["as", "as"],
-    "started_at": ["ns", "ns"],
+  "locations": ["is", "is"],
+  "name": ["is", "is"],
+  "network_server_address": [["is", "js"], ["is", "js"]],
+  "service_profile_id": ["is", "is"],
+  "updated_at": [["is", "ns"], "read_only"],
+  "version_ids": {
+    "_root": [["is", "as", "ns"], ["is", "as", "ns"]],
+    "brand_id": [["is", "as", "ns"], ["is", "as", "ns"]],
+    "firmware_version": [["is", "as", "ns"], ["is", "as", "ns"]],
+    "hardware_version": [["is", "as", "ns"], ["is", "as", "ns"]],
+    "model_id": [["is", "as", "ns"], ["is", "as", "ns"]]
+  },
+  "formatters": {
+    "_root": ["as", "as"],
+    "down_formatter": ["as", "as"],
+    "down_formatter_parameter": ["as", "as"],
+    "up_formatter": ["as", "as"],
+    "up_formatter_parameter": ["as", "as"]
+  },
+  "pending_session": {
+    "_root": [["as", "ns"], "read_only"],
+    "dev_addr": [["as", "ns"], "read_only"],
     "keys": {
-      "_root": [["ns", "as"], "read_only"],
+      "_root": [["as", "ns"], "read_only"],
+      "app_s_key": {
+        "_root": ["as", "read_only"],
+        "key": ["as", "read_only"]
+      },
+      "session_key_id": [["as", "ns"], "read_only"],
       "f_nwk_s_int_key": {
         "_root": ["ns", "read_only"],
-        "key": ["ns", "ns"],
-        "label": ["ns", "read_only"]
+        "key": ["ns", "read_only"]
       },
       "nwk_s_enc_key": {
         "_root": ["ns", "read_only"],
-        "key": ["ns", "ns"],
-        "label": ["ns", "read_only"]
+        "key": ["ns", "read_only"]
       },
       "s_nwk_s_int_key": {
         "_root": ["ns", "read_only"],
-        "key": ["ns", "ns"],
-        "label": ["ns", "read_only"]
-      },
-      "app_s_key": {
-        "_root": ["as", "read_only"],
-        "key": ["as", "as"],
-        "label": ["as", "read_only"]
+        "key": ["ns", "read_only"]
       }
-    }
+    },
+    "last_a_f_cnt_down": ["as", "read_only"],
+    "last_conf_f_cnt_down": ["ns", "read_only"],
+    "last_f_cnt_up": ["ns", "read_only"],
+    "last_n_f_cnt_down": ["ns", "read_only"]
   },
-  "formatters": ["as", "as"],
+  "session": {
+    "_root": [["as", "ns"], "read_only"],
+    "dev_addr": [["as", "ns"], ["as", "ns"]],
+    "keys": {
+      "_root": [["as", "ns"], "read_only"],
+      "app_s_key": {
+        "_root": ["as", "as"],
+        "key": ["as", "as"]
+      },
+      "session_key_id": [["as", "ns"], ["as", "ns"]],
+      "f_nwk_s_int_key": {
+        "_root": ["ns", "ns"],
+        "key": ["ns", "ns"]
+      },
+      "nwk_s_enc_key": {
+        "_root": ["ns", "ns"],
+        "key": ["ns", "ns"]
+      },
+      "s_nwk_s_int_key": {
+        "_root": ["ns", "ns"],
+        "key": ["ns", "ns"]
+      }
+    },
+    "last_a_f_cnt_down": ["as", "as"],
+    "last_conf_f_cnt_down": ["ns", "ns"],
+    "last_f_cnt_up": ["ns", "ns"],
+    "last_n_f_cnt_down": ["ns", "ns"],
+    "started_at": ["ns", "ns"]
+  },
+  "battery_percentage": ["ns", "ns"],
+  "downlink_margin": ["ns", "ns"],
+  "frequency_plan_id": ["ns", "ns"],
+  "lorawan_phy_version": ["ns", "ns"],
+  "lorawan_version": ["ns", "ns"],
+  "mac_settings": {
+    "_root": ["ns", "ns"],
+    "adr_margin": ["ns", "ns"],
+    "class_b_timeout": ["ns", "ns"],
+    "class_c_timeout": ["ns", "ns"],
+    "desired_rx1_data_rate_offset": ["ns", "ns"],
+    "desired_rx1_delay": {
+      "_root": ["ns", "ns"],
+      "value": ["ns", "ns"]
+    },
+    "desired_rx2_data_rate_index": {
+      "_root": ["ns", "ns"],
+      "value": ["ns", "ns"]
+    },
+    "desired_rx2_frequency": ["ns", "ns"],
+    "factory_preset_frequencies": ["ns", "ns"],
+    "max_duty_cycle": {
+      "_root": ["ns", "ns"],
+      "value": ["ns", "ns"]
+    },
+    "ping_slot_data_rate_index": {
+      "_root": ["ns", "ns"],
+      "value": ["ns", "ns"]
+    },
+    "ping_slot_frequency": ["ns", "ns"],
+    "ping_slot_periodicity": {
+      "_root": ["ns", "ns"],
+      "value": ["ns", "ns"]
+    },
+    "resets_f_cnt": ["ns", "ns"],
+    "rx1_data_rate_offset": ["ns", "ns"],
+    "rx1_delay": {
+      "_root": ["ns", "ns"],
+      "value": ["ns", "ns"]
+    },
+    "rx2_data_rate_index": {
+      "_root": ["ns", "ns"],
+      "value": ["ns", "ns"]
+    },
+    "rx2_frequency": ["ns", "ns"],
+    "status_count_periodicity": ["ns", "ns"],
+    "status_time_periodicity": ["ns", "ns"],
+    "supports_32_bit_f_cnt": ["ns", "ns"],
+    "use_adr": ["ns", "ns"]
+  },
+  "mac_state": {
+    "_root": ["ns", "read_only"],
+    "current_parameters": {
+      "_root": ["ns", "read_only"],
+      "adr_ack_delay": ["ns", "read_only"],
+      "adr_ack_limit": ["ns", "read_only"],
+      "adr_data_rate_index": ["ns", "read_only"],
+      "adr_nb_trans": ["ns", "read_only"],
+      "adr_tx_power_index": ["ns", "read_only"],
+      "beacon_frequency": ["ns", "read_only"],
+      "channels": ["ns", "read_only"],
+      "downlink_dwell_time": ["ns", "read_only"],
+      "max_duty_cycle": ["ns", "read_only"],
+      "max_eirp": ["ns", "read_only"],
+      "ping_slot_data_rate_index": ["ns", "read_only"],
+      "ping_slot_frequency": ["ns", "read_only"],
+      "rejoin_count_periodicity": ["ns", "read_only"],
+      "rejoin_time_periodicity": ["ns", "read_only"],
+      "rx1_data_rate_offset": ["ns", "read_only"],
+      "rx1_delay": ["ns", "read_only"],
+      "rx2_data_rate_index": ["ns", "read_only"],
+      "rx2_frequency": ["ns", "read_only"],
+      "uplink_dwell_time": ["ns", "read_only"]
+    },
+    "desired_parameters": {
+      "_root": ["ns", "read_only"],
+      "adr_ack_delay": ["ns", "read_only"],
+      "adr_ack_limit": ["ns", "read_only"],
+      "adr_data_rate_index": ["ns", "read_only"],
+      "adr_nb_trans": ["ns", "read_only"],
+      "adr_tx_power_index": ["ns", "read_only"],
+      "beacon_frequency": ["ns", "read_only"],
+      "channels": ["ns", "read_only"],
+      "downlink_dwell_time": ["ns", "read_only"],
+      "max_duty_cycle": ["ns", "read_only"],
+      "max_eirp": ["ns", "read_only"],
+      "ping_slot_data_rate_index": ["ns", "read_only"],
+      "ping_slot_frequency": ["ns", "read_only"],
+      "rejoin_count_periodicity": ["ns", "read_only"],
+      "rejoin_time_periodicity": ["ns", "read_only"],
+      "rx1_data_rate_offset": ["ns", "read_only"],
+      "rx1_delay": ["ns", "read_only"],
+      "rx2_data_rate_index": ["ns", "read_only"],
+      "rx2_frequency": ["ns", "read_only"],
+      "uplink_dwell_time": ["ns", "read_only"]
+    },
+    "device_class": ["ns", "ns"],
+    "last_confirmed_downlink_at": ["ns", "read_only"],
+    "last_dev_status_f_cnt_up": ["ns", "read_only"],
+    "lorawan_version": ["ns", "ns"],
+    "pending_application_downlink": {
+      "_root": ["ns", "read_only"],
+      "class_b_c": {
+        "_root": ["ns", "read_only"],
+        "absolute_time": ["ns", "read_only"],
+        "gateways": ["ns", "read_only"]
+      },
+      "confirmed": ["ns", "read_only"],
+      "correlation_ids": ["ns", "read_only"],
+      "decoded_payload": ["ns", "read_only"],
+      "f_cnt": ["ns", "read_only"],
+      "f_port": ["ns", "read_only"],
+      "frm_payload": ["ns", "read_only"],
+      "priority": ["ns", "read_only"],
+      "session_key_id": ["ns", "read_only"]
+    },
+    "pending_join_request": {
+      "_root": ["ns", "read_only"],
+      "cf_list": {
+        "_root": ["ns", "read_only"],
+        "ch_masks": ["ns", "read_only"],
+        "freq": ["ns", "read_only"],
+        "type": ["ns", "read_only"]
+      },
+      "correlation_ids": ["ns", "read_only"],
+      "dev_addr": ["ns", "read_only"],
+      "downlink_settings": {
+        "_root": ["ns", "read_only"],
+        "opt_neg": ["ns", "read_only"],
+        "rx1_dr_offset": ["ns", "read_only"],
+        "rx2_dr": ["ns", "read_only"]
+      },
+      "net_id": ["ns", "read_only"],
+      "payload": {
+        "_root": ["ns", "read_only"],
+        "Payload": {
+          "_root": ["ns", "read_only"],
+          "join_accept_payload": {
+            "_root": ["ns", "read_only"],
+            "cf_list": {
+              "_root": ["ns", "read_only"],
+              "ch_masks": ["ns", "read_only"],
+              "freq": ["ns", "read_only"],
+              "type": ["ns", "read_only"]
+            },
+            "dev_addr": ["ns", "read_only"],
+            "dl_settings": {
+              "_root": ["ns", "read_only"],
+              "opt_neg": ["ns", "read_only"],
+              "rx1_dr_offset": ["ns", "read_only"],
+              "rx2_dr": ["ns", "read_only"]
+            },
+            "encrypted": ["ns", "read_only"],
+            "join_nonce": ["ns", "read_only"],
+            "net_id": ["ns", "read_only"],
+            "rx_delay": ["ns", "read_only"]
+          },
+          "join_request_payload": {
+            "_root": ["ns", "read_only"],
+            "dev_eui": ["ns", "read_only"],
+            "dev_nonce": ["ns", "read_only"],
+            "join_eui": ["ns", "read_only"]
+          },
+          "mac_payload": {
+            "_root": ["ns", "read_only"],
+            "decoded_payload": ["ns", "read_only"],
+            "f_hdr": {
+              "_root": ["ns", "read_only"],
+              "dev_addr": ["ns", "read_only"],
+              "f_cnt": ["ns", "read_only"],
+              "f_ctrl": {
+                "_root": ["ns", "read_only"],
+                "ack": ["ns", "read_only"],
+                "adr": ["ns", "read_only"],
+                "adr_ack_req": ["ns", "read_only"],
+                "class_b": ["ns", "read_only"],
+                "f_pending": ["ns", "read_only"]
+              },
+              "f_opts": ["ns", "read_only"]
+            },
+            "f_port": ["ns", "read_only"],
+            "frm_payload": ["ns", "read_only"]
+          },
+          "rejoin_request_payload": {
+            "_root": ["ns", "read_only"],
+            "dev_eui": ["ns", "read_only"],
+            "join_eui": ["ns", "read_only"],
+            "net_id": ["ns", "read_only"],
+            "rejoin_cnt": ["ns", "read_only"],
+            "rejoin_type": ["ns", "read_only"]
+          }
+        },
+        "m_hdr": {
+          "_root": ["ns", "read_only"],
+          "m_type": ["ns", "read_only"],
+          "major": ["ns", "read_only"]
+        },
+        "mic": ["ns", "read_only"]
+      },
+      "raw_payload": ["ns", "read_only"],
+      "rx_delay": ["ns", "read_only"],
+      "selected_mac_version": ["ns", "read_only"]
+    },
+    "pending_requests": ["ns", "read_only"],
+    "ping_slot_periodicity": ["ns", "ns"],
+    "queued_join_accept": {
+      "_root": ["ns", "read_only"],
+      "keys": {
+        "_root": ["ns", "read_only"],
+        "app_s_key": {
+          "_root": ["ns", "read_only"],
+          "key": ["ns", "read_only"]
+        },
+        "f_nwk_s_int_key": {
+          "_root": ["ns", "read_only"],
+          "key": ["ns", "read_only"]
+        },
+        "nwk_s_enc_key": {
+          "_root": ["ns", "read_only"],
+          "key": ["ns", "read_only"]
+        },
+        "s_nwk_s_int_key": {
+          "_root": ["ns", "read_only"],
+          "key": ["ns", "read_only"]
+        },
+        "session_key_id": ["ns", "read_only"]
+      },
+      "payload": ["ns", "read_only"],
+      "request": {
+        "_root": ["ns", "read_only"],
+        "cf_list": {
+          "_root": ["ns", "read_only"],
+          "ch_masks": ["ns", "read_only"],
+          "freq": ["ns", "read_only"],
+          "type": ["ns", "read_only"]
+        },
+        "correlation_ids": ["ns", "read_only"],
+        "dev_addr": ["ns", "read_only"],
+        "downlink_settings": {
+          "_root": ["ns", "read_only"],
+          "opt_neg": ["ns", "read_only"],
+          "rx1_dr_offset": ["ns", "read_only"],
+          "rx2_dr": ["ns", "read_only"]
+        },
+        "net_id": ["ns", "read_only"],
+        "payload": {
+          "_root": ["ns", "read_only"],
+          "Payload": {
+            "_root": ["ns", "read_only"],
+            "join_accept_payload": {
+              "_root": ["ns", "read_only"],
+              "cf_list": {
+                "_root": ["ns", "read_only"],
+                "ch_masks": ["ns", "read_only"],
+                "freq": ["ns", "read_only"],
+                "type": ["ns", "read_only"]
+              },
+              "dev_addr": ["ns", "read_only"],
+              "dl_settings": {
+                "_root": ["ns", "read_only"],
+                "opt_neg": ["ns", "read_only"],
+                "rx1_dr_offset": ["ns", "read_only"],
+                "rx2_dr": ["ns", "read_only"]
+              },
+              "encrypted": ["ns", "read_only"],
+              "join_nonce": ["ns", "read_only"],
+              "net_id": ["ns", "read_only"],
+              "rx_delay": ["ns", "read_only"]
+            },
+            "join_request_payload": {
+              "_root": ["ns", "read_only"],
+              "dev_eui": ["ns", "read_only"],
+              "dev_nonce": ["ns", "read_only"],
+              "join_eui": ["ns", "read_only"]
+            },
+            "mac_payload": {
+              "_root": ["ns", "read_only"],
+              "decoded_payload": ["ns", "read_only"],
+              "f_hdr": {
+                "_root": ["ns", "read_only"],
+                "dev_addr": ["ns", "read_only"],
+                "f_cnt": ["ns", "read_only"],
+                "f_ctrl": {
+                  "_root": ["ns", "read_only"],
+                  "ack": ["ns", "read_only"],
+                  "adr": ["ns", "read_only"],
+                  "adr_ack_req": ["ns", "read_only"],
+                  "class_b": ["ns", "read_only"],
+                  "f_pending": ["ns", "read_only"]
+                },
+                "f_opts": ["ns", "read_only"]
+              },
+              "f_port": ["ns", "read_only"],
+              "frm_payload": ["ns", "read_only"]
+            },
+            "rejoin_request_payload": {
+              "_root": ["ns", "read_only"],
+              "dev_eui": ["ns", "read_only"],
+              "join_eui": ["ns", "read_only"],
+              "net_id": ["ns", "read_only"],
+              "rejoin_cnt": ["ns", "read_only"],
+              "rejoin_type": ["ns", "read_only"]
+            }
+          },
+          "m_hdr": {
+            "_root": ["ns", "read_only"],
+            "m_type": ["ns", "read_only"],
+            "major": ["ns", "read_only"]
+          },
+          "mic": ["ns", "read_only"]
+        },
+        "raw_payload": ["ns", "read_only"],
+        "rx_delay": ["ns", "read_only"],
+        "selected_mac_version": ["ns", "read_only"]
+      }
+    },
+    "queued_responses": ["ns", "read_only"],
+    "rx_windows_available": ["ns", "read_only"]
+  },
+  "max_frequency": ["ns", "ns"],
+  "min_frequency": ["ns", "ns"],
+  "power_state": ["ns", "ns"],
   "queued_application_downlinks": ["ns", "read_only"],
+  "recent_adr_uplinks": ["ns", "read_only"],
+  "recent_downlinks": ["ns", "read_only"],
+  "recent_uplinks": ["ns", "read_only"],
+  "supports_class_b": ["ns", "ns"],
+  "supports_class_c": ["ns", "ns"],
+  "supports_join": ["ns", "ns"],
   "last_dev_nonce": ["js", "js"],
   "last_join_nonce": ["js", "js"],
   "last_rj_count_0": ["js", "js"],
@@ -72,6 +428,17 @@
   "provisioner_id": ["js", "js"],
   "provisioning_data": ["js", "js"],
   "resets_join_nonces": ["js", "js"],
-  "root_keys": ["js", "js"],
+  "root_keys": {
+    "_root": ["js", "js"],
+    "app_key": {
+      "_root": ["js", "js"],
+      "key": ["js", "js"]
+    },
+    "nwk_key": {
+      "_root": ["js", "js"],
+      "key": ["js", "js"]
+    },
+    "root_key_id": ["js", "js"]
+  },
   "used_dev_nonces": ["js", "js"]
 }

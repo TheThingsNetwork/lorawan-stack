@@ -67,6 +67,15 @@ jest.mock('./api', function () {
       EndDeviceRegistry: {
         Get: jest.fn().mockResolvedValue({ data: mockDeviceData }),
       },
+      NsEndDeviceRegistry: {
+        Get: jest.fn().mockResolvedValue({ data: mockDeviceData }),
+      },
+      AsEndDeviceRegistry: {
+        Get: jest.fn().mockResolvedValue({ data: mockDeviceData }),
+      },
+      JsEndDeviceRegistry: {
+        Get: jest.fn().mockResolvedValue({ data: mockDeviceData }),
+      },
     }
   })
 })
