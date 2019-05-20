@@ -17,3 +17,4 @@ The Things Network Stack uses a port per protocol, with a TLS counterpart when a
 | Application data, events | MQTT | API key, token | 1883 | 8883 |
 | Management, data, events | gRPC | API key, token | 1884 | 8884 |
 | Management | HTTP | API key, token | 1885 | 8885 |
+| Backend Interfaces | HTTP | Custom | N/A | 8886 |
