@@ -144,11 +144,9 @@ func (s *oauthStore) CreateAuthorizationCode(ctx context.Context, code *ttnpb.OA
 		return err
 	}
 	codeModel := AuthorizationCode{
-		ClientAuthorization: ClientAuthorization{
-			ClientID: client.PrimaryKey(),
-			UserID:   user.PrimaryKey(),
-			Rights:   Rights{Rights: code.Rights},
-		},
+		ClientID:    client.PrimaryKey(),
+		UserID:      user.PrimaryKey(),
+		Rights:      Rights{Rights: code.Rights},
 		Code:        code.Code,
 		RedirectURI: code.RedirectURI,
 		State:       code.State,
@@ -203,11 +201,9 @@ func (s *oauthStore) CreateAccessToken(ctx context.Context, token *ttnpb.OAuthAc
 		return err
 	}
 	tokenModel := AccessToken{
-		ClientAuthorization: ClientAuthorization{
-			ClientID: client.PrimaryKey(),
-			UserID:   user.PrimaryKey(),
-			Rights:   Rights{Rights: token.Rights},
-		},
+		ClientID:     client.PrimaryKey(),
+		UserID:       user.PrimaryKey(),
+		Rights:       Rights{Rights: token.Rights},
 		TokenID:      token.ID,
 		PreviousID:   previousID,
 		AccessToken:  token.AccessToken,
@@ -230,10 +226,8 @@ func (s *oauthStore) ListAccessTokens(ctx context.Context, userIDs *ttnpb.UserId
 	}
 	var tokenModels []AccessToken
 	err = s.query(ctx, AccessToken{}).Where(AccessToken{
-		ClientAuthorization: ClientAuthorization{
-			ClientID: client.PrimaryKey(),
-			UserID:   user.PrimaryKey(),
-		},
+		ClientID: client.PrimaryKey(),
+		UserID:   user.PrimaryKey(),
 	}).Find(&tokenModels).Error
 	if err != nil {
 		return nil, err

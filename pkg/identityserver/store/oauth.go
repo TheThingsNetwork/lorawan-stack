@@ -50,8 +50,17 @@ func (a ClientAuthorization) toPB() *ttnpb.OAuthClientAuthorization {
 
 // AuthorizationCode model.
 type AuthorizationCode struct {
-	ClientAuthorization
-	Code        string `gorm:"type:VARCHAR;unique_index;not null"`
+	Model
+
+	Client   *Client
+	ClientID string `gorm:"type:UUID;index;not null"`
+
+	User   *User
+	UserID string `gorm:"type:UUID;index;not null"`
+
+	Rights Rights `gorm:"type:INT ARRAY"`
+
+	Code        string `gorm:"type:VARCHAR;unique_index:authorization_code_code_index;not null"`
 	RedirectURI string `gorm:"type:VARCHAR;column:redirect_uri"`
 	State       string `gorm:"type:VARCHAR"`
 	ExpiresAt   time.Time
@@ -77,7 +86,15 @@ func (a AuthorizationCode) toPB() *ttnpb.OAuthAuthorizationCode {
 
 // AccessToken model.
 type AccessToken struct {
-	ClientAuthorization
+	Model
+
+	Client   *Client
+	ClientID string `gorm:"type:UUID;index;not null"`
+
+	User   *User
+	UserID string `gorm:"type:UUID;index;not null"`
+
+	Rights Rights `gorm:"type:INT ARRAY"`
 
 	TokenID string `gorm:"type:VARCHAR;unique_index:access_token_id_index;not null"`
 
