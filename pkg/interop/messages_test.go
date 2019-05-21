@@ -160,8 +160,7 @@ func TestParseMessage(t *testing.T) {
 				"DevAddr": "01020304",
 				"DLSettings": "010203040506",
 				"RxDelay": 5,
-				"CFList": "010203040506",
-				"CFListType": 1
+				"CFList": "010203040506"
 			}`),
 			RequestHeaderAssertion: func(t *testing.T, header RawMessageHeader) bool {
 				a := assertions.New(t)
@@ -187,7 +186,6 @@ func TestParseMessage(t *testing.T) {
 					DLSettings: Buffer{0x1, 0x2, 0x3, 0x4, 0x5, 0x6},
 					RxDelay:    ttnpb.RX_DELAY_5,
 					CFList:     Buffer{0x1, 0x2, 0x3, 0x4, 0x5, 0x6},
-					CFListType: ttnpb.CFListType_CHANNEL_MASKS,
 				})
 			},
 			ResponseAssertion: func(t *testing.T, statusCode int, data []byte) bool {

@@ -136,7 +136,6 @@ type JoinReq struct {
 	DLSettings Buffer
 	RxDelay    ttnpb.RxDelay
 	CFList     Buffer
-	CFListType ttnpb.CFListType
 }
 
 // JoinAns is an answer to a JoinReq message.
