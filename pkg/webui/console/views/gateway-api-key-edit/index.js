@@ -26,7 +26,8 @@ import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import { ApiKeyEditForm } from '../../../components/api-key-form'
 
-import { getGatewayApiKeyPageData } from '../../store/actions/gateway'
+import { getGatewayApiKey } from '../../store/actions/gateway'
+import { getGatewaysRightsList } from '../../store/actions/gateways'
 import { getGatewayId } from '../../../lib/selectors/id'
 import {
   gatewaySelector,
@@ -34,8 +35,8 @@ import {
   gatewayRightsErrorSelector,
   gatewayRightsFetchingSelector,
   gatewayKeySelector,
-  gatewayKeysErrorSelector,
-  gatewayKeysFetchingSelector,
+  gatewayKeyErrorSelector,
+  gatewayKeyFetchingSelector,
 } from '../../store/selectors/gateway'
 
 import api from '../../api'
@@ -45,12 +46,10 @@ import api from '../../api'
   const gtwId = getGatewayId(gateway)
   const apiKeyId = props.match.params.apiKeyId
 
-  const ids = { id: gtwId, keyId: apiKeyId }
-
-  const keysFetching = gatewayKeysFetchingSelector(state, ids)
+  const keyFetching = gatewayKeyFetchingSelector(state)
   const rightsFetching = gatewayRightsFetchingSelector(state, props)
-  const keysError = gatewayKeysErrorSelector(state, ids)
-  const apiKey = gatewayKeySelector(state, ids)
+  const keyError = gatewayKeyErrorSelector(state)
+  const apiKey = gatewayKeySelector(state)
   const rightsError = gatewayRightsErrorSelector(state, props)
   const rights = gatewayRightsSelector(state, props)
 
@@ -59,10 +58,17 @@ import api from '../../api'
     gtwId,
     apiKey,
     rights,
-    fetching: keysFetching || rightsFetching,
-    error: keysError || rightsError,
+    fetching: keyFetching || rightsFetching,
+    error: keyError || rightsError,
   }
-})
+},
+dispatch => ({
+  loadPageData (gtwId, apiKeyId) {
+    dispatch(getGatewayApiKey(gtwId, apiKeyId))
+    dispatch(getGatewaysRightsList(gtwId))
+  },
+  deleteSuccess: gtwId => dispatch(replace(`/console/gateways/${gtwId}/api-keys`)),
+}))
 @withBreadcrumb('gtws.single.api-keys.edit', function (props) {
   const { gtwId, keyId } = props
 
@@ -83,21 +89,21 @@ export default class GatewayApiKeyEdit extends React.Component {
     this.deleteGatewayKey = id => api.gateway.apiKeys.delete(props.gtwId, id)
     this.editGatewayKey = key => api.gateway.apiKeys.update(
       props.gtwId,
-      props.apiKey.id,
+      props.keyId,
       key
     )
   }
 
   componentDidMount () {
-    const { dispatch, gtwId } = this.props
+    const { loadPageData, gtwId, keyId } = this.props
 
-    dispatch(getGatewayApiKeyPageData(gtwId))
+    loadPageData(gtwId, keyId)
   }
 
   onDeleteSuccess () {
-    const { gtwId, dispatch } = this.props
+    const { gtwId, deleteSuccess } = this.props
 
-    dispatch(replace(`/console/gateways/${gtwId}/api-keys`))
+    deleteSuccess(gtwId)
   }
 
   render () {
