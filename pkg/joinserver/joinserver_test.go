@@ -23,7 +23,6 @@ import (
 
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
-	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -57,8 +56,7 @@ func mustEncryptJoinAccept(key types.AES128Key, pld []byte) []byte {
 
 func TestHandleJoin(t *testing.T) {
 	a := assertions.New(t)
-
-	authorizedCtx := clusterauth.NewContext(test.Context(), nil)
+	ctx := test.Context()
 
 	redisClient, flush := test.NewRedis(t, "joinserver_test")
 	defer flush()
@@ -67,55 +65,53 @@ func TestHandleJoin(t *testing.T) {
 	keyReg := &redis.KeyRegistry{Redis: redisClient}
 
 	c := component.MustNew(test.GetLogger(t), &component.Config{})
-	js := NsJsServer{
-		JS: test.Must(New(
-			c,
-			&Config{
-				Devices:         devReg,
-				Keys:            keyReg,
-				JoinEUIPrefixes: joinEUIPrefixes,
-			},
-		)).(*JoinServer),
-	}
+	js := test.Must(New(
+		c,
+		&Config{
+			Devices:         devReg,
+			Keys:            keyReg,
+			JoinEUIPrefixes: joinEUIPrefixes,
+		},
+	)).(*JoinServer)
 	test.Must(nil, c.Start())
 
 	// Invalid payload.
 	req := ttnpb.NewPopulatedJoinRequest(test.Randy, false)
 	req.Payload = ttnpb.NewPopulatedMessageDownlink(test.Randy, *types.NewPopulatedAES128Key(test.Randy), false)
-	res, err := js.HandleJoin(authorizedCtx, req)
+	res, err := js.HandleJoin(ctx, req)
 	a.So(err, should.NotBeNil)
 	a.So(res, should.BeNil)
 
 	// No payload.
 	req = ttnpb.NewPopulatedJoinRequest(test.Randy, false)
 	req.Payload.Payload = nil
-	res, err = js.HandleJoin(authorizedCtx, req)
+	res, err = js.HandleJoin(ctx, req)
 	a.So(err, should.NotBeNil)
 	a.So(res, should.BeNil)
 
 	// JoinEUI out of range.
 	req = ttnpb.NewPopulatedJoinRequest(test.Randy, false)
 	req.Payload.GetJoinRequestPayload().JoinEUI = types.EUI64{0x11, 0x12, 0x13, 0x14, 0x42, 0x42, 0x42, 0x42}
-	res, err = js.HandleJoin(authorizedCtx, req)
+	res, err = js.HandleJoin(ctx, req)
 	a.So(err, should.NotBeNil)
 	a.So(res, should.BeNil)
 
 	// Empty JoinEUI.
 	req = ttnpb.NewPopulatedJoinRequest(test.Randy, false)
 	req.Payload.GetJoinRequestPayload().JoinEUI = types.EUI64{}
-	res, err = js.HandleJoin(authorizedCtx, req)
+	res, err = js.HandleJoin(ctx, req)
 	a.So(err, should.NotBeNil)
 	a.So(res, should.BeNil)
 
 	// Empty DevEUI.
 	req = ttnpb.NewPopulatedJoinRequest(test.Randy, false)
 	req.Payload.GetJoinRequestPayload().DevEUI = types.EUI64{}
-	res, err = js.HandleJoin(authorizedCtx, req)
+	res, err = js.HandleJoin(ctx, req)
 	a.So(err, should.NotBeNil)
 	a.So(res, should.BeNil)
 
 	// Random payload is invalid.
-	res, err = js.HandleJoin(authorizedCtx, ttnpb.NewPopulatedJoinRequest(test.Randy, false))
+	res, err = js.HandleJoin(ctx, ttnpb.NewPopulatedJoinRequest(test.Randy, false))
 	a.So(err, should.NotBeNil)
 	a.So(res, should.BeNil)
 
@@ -1076,23 +1072,21 @@ func TestHandleJoin(t *testing.T) {
 			keyReg := &redis.KeyRegistry{Redis: redisClient}
 
 			c := component.MustNew(test.GetLogger(t), &component.Config{})
-			js := NsJsServer{
-				JS: test.Must(New(
-					c,
-					&Config{
-						Devices:         devReg,
-						Keys:            keyReg,
-						JoinEUIPrefixes: joinEUIPrefixes,
-					},
-				)).(*JoinServer),
-			}
+			js := test.Must(New(
+				c,
+				&Config{
+					Devices:         devReg,
+					Keys:            keyReg,
+					JoinEUIPrefixes: joinEUIPrefixes,
+				},
+			)).(*JoinServer)
 			test.Must(nil, c.Start())
 
 			pb := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
 			start := time.Now()
 
-			ret, err := devReg.SetByID(authorizedCtx, pb.ApplicationIdentifiers, pb.DeviceID,
+			ret, err := devReg.SetByID(ctx, pb.ApplicationIdentifiers, pb.DeviceID,
 				[]string{
 					"created_at",
 					"ids.dev_eui",
@@ -1135,7 +1129,7 @@ func TestHandleJoin(t *testing.T) {
 			pb.UpdatedAt = ret.UpdatedAt
 			a.So(ret, should.HaveEmptyDiff, pb)
 
-			res, err := js.HandleJoin(authorizedCtx, deepcopy.Copy(tc.JoinRequest).(*ttnpb.JoinRequest))
+			res, err := js.HandleJoin(ctx, deepcopy.Copy(tc.JoinRequest).(*ttnpb.JoinRequest))
 			if tc.ValidError != nil {
 				if !a.So(err, should.BeError) || !a.So(tc.ValidError(err), should.BeTrue) {
 					t.Fatalf("Received an unexpected error: %s", err)
@@ -1152,7 +1146,7 @@ func TestHandleJoin(t *testing.T) {
 			expectedResp.SessionKeyID = res.SessionKeyID
 			a.So(res, should.Resemble, expectedResp)
 
-			ret, err = devReg.GetByEUI(authorizedCtx, *pb.EndDeviceIdentifiers.JoinEUI, *pb.EndDeviceIdentifiers.DevEUI, ttnpb.EndDeviceFieldPathsTopLevel)
+			ret, err = devReg.GetByEUI(ctx, *pb.EndDeviceIdentifiers.JoinEUI, *pb.EndDeviceIdentifiers.DevEUI, ttnpb.EndDeviceFieldPathsTopLevel)
 			if !a.So(err, should.BeNil) || !a.So(ret, should.NotBeNil) {
 				t.FailNow()
 			}
@@ -1176,7 +1170,7 @@ func TestHandleJoin(t *testing.T) {
 			}
 			a.So(ret, should.HaveEmptyDiff, pb)
 
-			res, err = js.HandleJoin(authorizedCtx, deepcopy.Copy(tc.JoinRequest).(*ttnpb.JoinRequest))
+			res, err = js.HandleJoin(ctx, deepcopy.Copy(tc.JoinRequest).(*ttnpb.JoinRequest))
 			a.So(err, should.BeError)
 			a.So(res, should.BeNil)
 		})
@@ -1188,8 +1182,6 @@ func TestGetNwkSKeys(t *testing.T) {
 
 	for _, tc := range []struct {
 		Name string
-
-		Context func(context.Context) context.Context
 
 		GetByID     func(context.Context, types.EUI64, []byte, []string) (*ttnpb.SessionKeys, error)
 		KeyRequest  *ttnpb.SessionKeyRequest
@@ -1348,21 +1340,16 @@ func TestGetNwkSKeys(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
-			ctx := clusterauth.NewContext(test.ContextWithT(test.Context(), t), nil)
-			if tc.Context != nil {
-				ctx = tc.Context(ctx)
-			}
+			ctx := test.ContextWithT(test.Context(), t)
 
 			c := component.MustNew(test.GetLogger(t), &component.Config{})
-			js := NsJsServer{
-				JS: test.Must(New(
-					c,
-					&Config{
-						Keys:    &MockKeyRegistry{GetByIDFunc: tc.GetByID},
-						Devices: &MockDeviceRegistry{},
-					},
-				)).(*JoinServer),
-			}
+			js := test.Must(New(
+				c,
+				&Config{
+					Keys:    &MockKeyRegistry{GetByIDFunc: tc.GetByID},
+					Devices: &MockDeviceRegistry{},
+				},
+			)).(*JoinServer)
 			test.Must(nil, c.Start())
 			res, err := js.GetNwkSKeys(ctx, tc.KeyRequest)
 
