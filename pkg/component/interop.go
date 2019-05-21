@@ -42,6 +42,7 @@ func (c *Component) interopEndpoints() []Endpoint {
 		}
 	}
 	return []Endpoint{
+		// TODO: Enable TCP endpoint (https://github.com/TheThingsNetwork/lorawan-stack/issues/717)
 		NewTLSEndpoint(c.config.Interop.ListenTLS, "Interop", WithTLSClientAuth(tls.RequireAndVerifyClientCert, certPool, nil)),
 	}
 }

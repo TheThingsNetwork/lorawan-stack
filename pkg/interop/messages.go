@@ -214,6 +214,7 @@ func verifySenderID(senderClientCAs map[string][]*x509.Certificate) echo.Middlew
 					}
 				}
 			}
+			// TODO: Check headers (https://github.com/TheThingsNetwork/lorawan-stack/issues/717)
 			c.NoContent(http.StatusForbidden)
 			return nil
 		}
