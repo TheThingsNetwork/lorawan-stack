@@ -2321,6 +2321,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/encoding/lorawan:encoded_field_length_equal": {
+    "translations": {
+      "en": "`{lorawan_field}` encoded length `{value}` should be `{expected}`"
+    },
+    "description": {
+      "package": "pkg/encoding/lorawan",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/encoding/lorawan:encoded_field_length_multiple_choices": {
     "translations": {
       "en": "`{lorawan_field}` encoded length `{value}` should be equal to `{expected_1}` or `{expected_2}`"
