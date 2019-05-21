@@ -16,6 +16,10 @@ package interop
 
 import (
 	"context"
+	"crypto/x509"
+	"encoding/pem"
+	"fmt"
+	"io/ioutil"
 	"net/http"
 
 	echo "github.com/labstack/echo/v4"
@@ -65,6 +69,8 @@ func (noopServer) JoinRequest(req *JoinReq) (*JoinAns, error) {
 
 // Server is the server.
 type Server struct {
+	SenderClientCAs map[string][]*x509.Certificate
+
 	rootGroup *echo.Group
 	server    *echo.Echo
 	config    config.Interop
@@ -88,17 +94,45 @@ func New(ctx context.Context, config config.Interop) (*Server, error) {
 	server.Use(
 		middleware.ID("interop"),
 		echomiddleware.BodyLimit("16M"),
-		echomiddleware.Secure(),
 		middleware.Recover(),
 	)
 
+	senderClientCAs := make(map[string][]*x509.Certificate)
+	for senderID, filename := range config.SenderClientCAs {
+		pemCerts, err := ioutil.ReadFile(filename)
+		if err != nil {
+			return nil, err
+		}
+		for len(pemCerts) > 0 {
+			var block *pem.Block
+			block, pemCerts = pem.Decode(pemCerts)
+			if block == nil {
+				break
+			}
+			if block.Type != "CERTIFICATE" || len(block.Headers) != 0 {
+				continue
+			}
+			cert, err := x509.ParseCertificate(block.Bytes)
+			if err != nil {
+				return nil, err
+			}
+			senderClientCAs[senderID] = append(senderClientCAs[senderID], cert)
+		}
+	}
+	getSenderClientCAs := func(sourceID string) []*x509.Certificate {
+		// TODO: Lookup client CAs by sender ID (https://github.com/TheThingsNetwork/lorawan-stack/issues/718)
+		return senderClientCAs[sourceID]
+	}
+
 	noop := &noopServer{}
 	s := &Server{
+		SenderClientCAs: senderClientCAs,
 		rootGroup: server.Group(
 			"",
 			middleware.Log(logger),
 			middleware.Normalize(middleware.RedirectPermanent),
-			ParseMessage(),
+			parseMessage(),
+			verifySenderID(getSenderClientCAs),
 		),
 		config: config,
 		server: server,
@@ -156,6 +190,8 @@ func (s *Server) handleRequest(c echo.Context) error {
 	switch req := c.Get(messageKey).(type) {
 	case *JoinReq:
 		ans, err = s.js.JoinRequest(req)
+	default:
+		panic(fmt.Sprintf("unexpected message type %T", c.Get(messageKey)))
 	}
 	if err != nil {
 		return err

@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"testing"
 	"time"
 
@@ -37,27 +36,6 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
-
-var (
-	certPem string
-	keyPem  string
-)
-
-func init() {
-	certPem = "cert.pem"
-	if _, err := os.Stat(certPem); err != nil {
-		certPem = "../../cert.pem"
-	}
-	keyPem = "key.pem"
-	if _, err := os.Stat(keyPem); err != nil {
-		keyPem = "../../key.pem"
-	}
-	for _, filepath := range []string{certPem, keyPem} {
-		if _, err := os.Stat(filepath); err != nil {
-			panic(fmt.Sprintf("could not retrieve information about the %s file - if you haven't generated it, generate it with `./mage dev:certificates`.", filepath))
-		}
-	}
-}
 
 func TestNew(t *testing.T) {
 	a := assertions.New(t)
@@ -156,8 +134,8 @@ func TestHTTP(t *testing.T) {
 
 		config.HTTP.Listen = ""
 		config.HTTP.ListenTLS = httpsAddress
-		config.TLS.Certificate = certPem
-		config.TLS.Key = keyPem
+		config.TLS.Certificate = "testdata/servercert.pem"
+		config.TLS.Key = "testdata/serverkey.pem"
 
 		c, err := component.New(test.GetLogger(t), &config)
 		a.So(err, should.BeNil)
@@ -167,7 +145,7 @@ func TestHTTP(t *testing.T) {
 		a.So(err, should.BeNil)
 
 		certPool := x509.NewCertPool()
-		certContent, err := ioutil.ReadFile(config.TLS.Certificate)
+		certContent, err := ioutil.ReadFile("testdata/serverca.pem")
 		a.So(err, should.BeNil)
 		certPool.AppendCertsFromPEM(certContent)
 		client := http.Client{Transport: &http.Transport{
@@ -237,8 +215,8 @@ func TestGRPC(t *testing.T) {
 
 		config := baseConfig
 		config.ServiceBase.GRPC.ListenTLS = fmt.Sprintf("0.0.0.0:%d", grpcPort)
-		config.TLS.Certificate = certPem
-		config.TLS.Key = keyPem
+		config.TLS.Certificate = "testdata/servercert.pem"
+		config.TLS.Key = "testdata/serverkey.pem"
 
 		c, err := component.New(test.GetLogger(t), &config)
 		a.So(err, should.BeNil)

@@ -15,6 +15,7 @@
 package interop
 
 import (
+	"crypto/x509"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -152,9 +153,9 @@ type JoinAns struct {
 	SessionKeyID Buffer       `json:",omitempty"`
 }
 
-// ParseMessage parses the header and the message type of the request body.
+// parseMessage parses the header and the message type of the request body.
 // This middleware sets the header in the context on the `headerKey` and the message on the `messageKey`.
-func ParseMessage() echo.MiddlewareFunc {
+func parseMessage() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			buf, err := ioutil.ReadAll(c.Request().Body)
@@ -192,6 +193,35 @@ func ParseMessage() echo.MiddlewareFunc {
 			}
 			c.Set(messageKey, msg)
 			return next(c)
+		}
+	}
+}
+
+// verifySenderID verifies whether the SenderID of the message is authorized for the request according to the trusted
+// certificates that are provided through the given callback.
+func verifySenderID(getSenderClientCAs func(string) []*x509.Certificate) echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			header := c.Get(headerKey).(*RawMessageHeader)
+			senderClientCAs := getSenderClientCAs(header.SenderID)
+			if len(senderClientCAs) == 0 {
+				c.NoContent(http.StatusForbidden)
+				return nil
+			}
+			if state := c.Request().TLS; state != nil {
+				for _, chain := range state.VerifiedChains {
+					for _, cert := range chain {
+						for _, senderCA := range senderClientCAs {
+							if cert.Equal(senderCA) {
+								return next(c)
+							}
+						}
+					}
+				}
+			}
+			// TODO: Check headers (https://github.com/TheThingsNetwork/lorawan-stack/issues/717)
+			c.NoContent(http.StatusForbidden)
+			return nil
 		}
 	}
 }

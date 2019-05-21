@@ -16,12 +16,14 @@ package interop
 
 import (
 	"bytes"
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	echo "github.com/labstack/echo/v4"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -49,6 +51,24 @@ func TestServeHTTP(t *testing.T) {
 			},
 		},
 		{
+			Name: "JoinReq/InvalidSenderID",
+			RequestBody: &JoinReq{
+				NsJsMessageHeader: NsJsMessageHeader{
+					MessageHeader: MessageHeader{
+						MessageType:     MessageTypeJoinReq,
+						ProtocolVersion: "1.1",
+					},
+					SenderID:   types.NetID{0x0, 0x0, 0x02},
+					ReceiverID: types.EUI64{0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
+				},
+				MACVersion: MACVersion(ttnpb.MAC_V1_0_3),
+			},
+			ResponseAssertion: func(t *testing.T, res *http.Response) bool {
+				a := assertions.New(t)
+				return a.So(res.StatusCode, should.Equal, http.StatusForbidden)
+			},
+		},
+		{
 			Name: "JoinReq/NotRegistered",
 			RequestBody: &JoinReq{
 				NsJsMessageHeader: NsJsMessageHeader{
@@ -56,7 +76,7 @@ func TestServeHTTP(t *testing.T) {
 						MessageType:     MessageTypeJoinReq,
 						ProtocolVersion: "1.1",
 					},
-					SenderID:   types.NetID{0x0, 0x0, 0x13},
+					SenderID:   types.NetID{0x0, 0x0, 0x01},
 					ReceiverID: types.EUI64{0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
 				},
 				MACVersion: MACVersion(ttnpb.MAC_V1_0_3),
@@ -69,7 +89,11 @@ func TestServeHTTP(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			s, err := New(test.Context(), config.Interop{})
+			s, err := New(test.Context(), config.Interop{
+				SenderClientCAs: map[string]string{
+					"000001": "testdata/clientca.pem",
+				},
+			})
 			if !a.So(err, should.BeNil) {
 				t.Fatal("Could not create an interop instance")
 			}
@@ -85,14 +109,37 @@ func TestServeHTTP(t *testing.T) {
 			if tc.AS != nil {
 				s.RegisterAS(tc.AS)
 			}
+
+			clientRootCAsPem, err := ioutil.ReadFile("testdata/clientca.pem")
+			if err != nil {
+				t.Fatalf("Failed to read CA: %v", err)
+			}
+			clientRootCAs := x509.NewCertPool()
+			clientRootCAs.AppendCertsFromPEM(clientRootCAsPem)
+			srv := httptest.NewUnstartedServer(s)
+			srv.TLS = &tls.Config{
+				ClientAuth: tls.RequireAndVerifyClientCert,
+				ClientCAs:  clientRootCAs,
+			}
+			srv.StartTLS()
+			defer srv.Close()
+
+			clientCert, err := tls.LoadX509KeyPair("testdata/clientcert.pem", "testdata/clientkey.pem")
+			if !a.So(err, should.BeNil) {
+				t.Fatal("Failed to load client certificate")
+			}
+			client := srv.Client()
+			client.Transport.(*http.Transport).TLSClientConfig.Certificates = []tls.Certificate{clientCert}
+
 			buf, err := json.Marshal(tc.RequestBody)
 			if !a.So(err, should.BeNil) {
 				t.Fatal("Failed to marshal request body")
 			}
-			req := httptest.NewRequest(echo.POST, "/", bytes.NewReader(buf))
-			rec := httptest.NewRecorder()
-			s.ServeHTTP(rec, req)
-			if !tc.ResponseAssertion(t, rec.Result()) {
+			res, err := client.Post(srv.URL, "application/json", bytes.NewReader(buf))
+			if !a.So(err, should.BeNil) {
+				t.Fatal("Request failed")
+			}
+			if !tc.ResponseAssertion(t, res) {
 				t.FailNow()
 			}
 		})
