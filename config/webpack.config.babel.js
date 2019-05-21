@@ -54,6 +54,7 @@ export default {
   externals: [ filterLocales ],
   stats: 'minimal',
   target: 'web',
+  devtool: production ? false : 'eval-source-map',
   node: {
     fs: 'empty',
     module: 'empty',
