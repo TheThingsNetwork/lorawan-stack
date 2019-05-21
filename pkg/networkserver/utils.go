@@ -17,6 +17,7 @@ package networkserver
 import (
 	"time"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -91,11 +92,15 @@ func newMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb
 		macState.DesiredParameters.MaxEIRP = *fp.MaxEIRP
 	}
 
-	macState.CurrentParameters.UplinkDwellTime = false
-	macState.DesiredParameters.UplinkDwellTime = fp.DwellTime.GetUplinks()
+	macState.CurrentParameters.UplinkDwellTime = nil
+	if phy.TxParamSetupReqSupport {
+		macState.DesiredParameters.UplinkDwellTime = &pbtypes.BoolValue{Value: fp.DwellTime.GetUplinks()}
+	}
 
-	macState.CurrentParameters.DownlinkDwellTime = false
-	macState.DesiredParameters.DownlinkDwellTime = fp.DwellTime.GetDownlinks()
+	macState.CurrentParameters.DownlinkDwellTime = nil
+	if phy.TxParamSetupReqSupport {
+		macState.DesiredParameters.DownlinkDwellTime = &pbtypes.BoolValue{Value: fp.DwellTime.GetDownlinks()}
+	}
 
 	macState.CurrentParameters.ADRDataRateIndex = ttnpb.DATA_RATE_0
 	macState.DesiredParameters.ADRDataRateIndex = macState.CurrentParameters.ADRDataRateIndex

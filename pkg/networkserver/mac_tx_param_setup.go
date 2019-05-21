@@ -17,6 +17,7 @@ package networkserver
 import (
 	"context"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -29,8 +30,12 @@ var (
 
 func enqueueTxParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) (uint16, uint16, bool) {
 	if dev.MACState.DesiredParameters.MaxEIRP == dev.MACState.CurrentParameters.MaxEIRP &&
-		dev.MACState.DesiredParameters.DownlinkDwellTime == dev.MACState.CurrentParameters.DownlinkDwellTime &&
-		dev.MACState.DesiredParameters.UplinkDwellTime == dev.MACState.CurrentParameters.UplinkDwellTime {
+		(dev.MACState.DesiredParameters.UplinkDwellTime == nil ||
+			dev.MACState.CurrentParameters.UplinkDwellTime != nil &&
+				dev.MACState.DesiredParameters.UplinkDwellTime.Value == dev.MACState.CurrentParameters.UplinkDwellTime.Value) &&
+		(dev.MACState.DesiredParameters.DownlinkDwellTime == nil ||
+			dev.MACState.CurrentParameters.DownlinkDwellTime != nil &&
+				dev.MACState.DesiredParameters.DownlinkDwellTime.Value == dev.MACState.CurrentParameters.DownlinkDwellTime.Value) {
 		return maxDownLen, maxUpLen, true
 	}
 
@@ -41,8 +46,8 @@ func enqueueTxParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLe
 		}
 		pld := &ttnpb.MACCommand_TxParamSetupReq{
 			MaxEIRPIndex:      lorawan.Float32ToDeviceEIRP(dev.MACState.DesiredParameters.MaxEIRP),
-			DownlinkDwellTime: dev.MACState.DesiredParameters.DownlinkDwellTime,
-			UplinkDwellTime:   dev.MACState.DesiredParameters.UplinkDwellTime,
+			DownlinkDwellTime: dev.MACState.DesiredParameters.DownlinkDwellTime.GetValue(),
+			UplinkDwellTime:   dev.MACState.DesiredParameters.UplinkDwellTime.GetValue(),
 		}
 		events.Publish(evtEnqueueTxParamSetupRequest(ctx, dev.EndDeviceIdentifiers, pld))
 		return []*ttnpb.MACCommand{pld.MACCommand()}, 1, true
@@ -56,9 +61,9 @@ func handleTxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (err error
 	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_TX_PARAM_SETUP, func(cmd *ttnpb.MACCommand) error {
 		req := cmd.GetTxParamSetupReq()
 
-		dev.MACState.CurrentParameters.DownlinkDwellTime = req.DownlinkDwellTime
-		dev.MACState.CurrentParameters.UplinkDwellTime = req.UplinkDwellTime
 		dev.MACState.CurrentParameters.MaxEIRP = lorawan.DeviceEIRPToFloat32(req.MaxEIRPIndex)
+		dev.MACState.CurrentParameters.DownlinkDwellTime = &pbtypes.BoolValue{Value: req.DownlinkDwellTime}
+		dev.MACState.CurrentParameters.UplinkDwellTime = &pbtypes.BoolValue{Value: req.UplinkDwellTime}
 
 		if lorawan.Float32ToDeviceEIRP(dev.MACState.DesiredParameters.MaxEIRP) == req.MaxEIRPIndex {
 			dev.MACState.DesiredParameters.MaxEIRP = dev.MACState.CurrentParameters.MaxEIRP
