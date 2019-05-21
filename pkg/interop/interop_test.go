@@ -65,7 +65,12 @@ func TestServeHTTP(t *testing.T) {
 			},
 			ResponseAssertion: func(t *testing.T, res *http.Response) bool {
 				a := assertions.New(t)
-				return a.So(res.StatusCode, should.Equal, http.StatusForbidden)
+				if !a.So(res.StatusCode, should.Equal, http.StatusBadRequest) {
+					return false
+				}
+				var msg ErrorMessage
+				err := json.NewDecoder(res.Body).Decode(&msg)
+				return a.So(err, should.BeNil) && a.So(msg.Result, should.Equal, ResultUnknownSender)
 			},
 		},
 		{

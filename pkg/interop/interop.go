@@ -205,6 +205,5 @@ func (s *Server) handleRequest(c echo.Context) error {
 
 func (s *Server) handleNsRequest(c echo.Context) error {
 	// TODO: Implement LoRaWAN roaming (https://github.com/TheThingsNetwork/lorawan-stack/issues/230)
-	c.NoContent(http.StatusNotFound)
-	return nil
+	return echo.NewHTTPError(http.StatusNotFound)
 }

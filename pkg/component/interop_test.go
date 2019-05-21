@@ -132,6 +132,11 @@ func TestInteropTLS(t *testing.T) {
 		a.So(err, should.BeNil)
 		res, err := client.Post("https://localhost:9188", "application/json", bytes.NewReader(buf))
 		a.So(err, should.BeNil)
-		a.So(res.StatusCode, should.Equal, http.StatusForbidden)
+		a.So(res.StatusCode, should.Equal, http.StatusBadRequest)
+		var msg interop.ErrorMessage
+		if !a.So(json.NewDecoder(res.Body).Decode(&msg), should.BeNil) {
+			t.FailNow()
+		}
+		a.So(msg.Result, should.Equal, interop.ResultUnknownSender)
 	}
 }

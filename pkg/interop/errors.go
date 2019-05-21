@@ -48,36 +48,38 @@ var (
 	ErrFrameSize          = defineError("frame_size", ResultFrameSizeError, "frame size error")
 )
 
-func defineError(name string, result Result, message string) ResultError {
-	return ResultError{
-		Definition: errors.DefineInvalidArgument(name, message),
-		Result:     result,
-	}
-}
+var errorResults = make(map[string]Result)
 
-// ResultError is an error with LoRaWAN Backend Interfaces specified Result.
-type ResultError struct {
-	errors.Definition
-	Result Result
+func defineError(name string, result Result, message string) errors.Definition {
+	definition := errors.DefineInvalidArgument(name, message)
+	errorResults[definition.FullName()] = result
+	return definition
 }
 
 // ErrorHandler is an echo.HTTPErrorHandler.
 func ErrorHandler(err error, c echo.Context) {
-	statusCode := errors.ToHTTPStatusCode(err)
-	resultErr, isResultErr := err.(ResultError)
+	if httpErr, ok := err.(*echo.HTTPError); ok {
+		c.JSON(httpErr.Code, httpErr.Message)
+		return
+	}
+
+	result := ResultOther
+	statusCode := http.StatusInternalServerError
+	if ttnErr, ok := errors.From(err); ok {
+		if val, ok := errorResults[ttnErr.FullName()]; ok {
+			result = val
+		}
+		statusCode = errors.ToHTTPStatusCode(err)
+	}
+
 	if header, ok := c.Get(headerKey).(*RawMessageHeader); ok {
 		answerHeader, err := header.AnswerHeader()
 		if err != nil {
 			c.NoContent(http.StatusBadRequest)
-		} else if isResultErr {
-			c.JSON(statusCode, ErrorMessage{
-				RawMessageHeader: answerHeader,
-				Result:           resultErr.Result,
-			})
 		} else {
 			c.JSON(statusCode, ErrorMessage{
 				RawMessageHeader: answerHeader,
-				Result:           ResultOther,
+				Result:           result,
 			})
 		}
 	} else {
