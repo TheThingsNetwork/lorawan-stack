@@ -22,8 +22,18 @@ import (
 // Docs namespace
 type Docs mg.Namespace
 
-// Gen Generates static website from the doc in doc/public/$version
+// Gen Generates static website from the doc in doc/public
 func (Docs) Gen() error {
+	mg.Deps(Version.getCurrent)
+	return sh.RunV(
+		"cp",
+		"-s", "./doc",
+		"--baseUrl", "https://thethingsnetwork.github.io/lorawan-stack/",
+		"-d", "public/")
+}
+
+// Gen Generates static website from the doc in doc/public/$version
+func (Docs) GenVersion() error {
 	mg.Deps(Version.getCurrent)
 	return sh.RunV(
 		"hugo",

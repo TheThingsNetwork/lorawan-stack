@@ -137,10 +137,7 @@ after_success:
       GO111MODULE=on go run github.com/goreleaser/goreleaser --snapshot --release-notes <(go run github.com/TheThingsIndustries/release-notes -owner TheThingsNetwork -repo lorawan-stack -id "release-notes" -head $(git rev-parse HEAD))
     fi
   fi
-- |
-  if [[ "$RUNTYPE" == "doc" ]]; then
-    ./doc/generate-redirect.sh && mv index.html ./doc/public
-  fi
+- if [[ "$RUNTYPE" == "doc" ]]; then $MAGE docs:genVersion fi
 deploy:
 - provider: pages
   local_dir: doc/public
