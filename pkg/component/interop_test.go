@@ -16,6 +16,7 @@ package component_test
 
 import (
 	"bytes"
+	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
@@ -40,7 +41,7 @@ func (m mockInterop) RegisterInterop(s *interop.Server) {
 	s.RegisterJS(m)
 }
 
-func (m mockInterop) JoinRequest(req *interop.JoinReq) (*interop.JoinAns, error) {
+func (m mockInterop) JoinRequest(ctx context.Context, req *interop.JoinReq) (*interop.JoinAns, error) {
 	ansHeader, err := req.AnswerHeader()
 	if err != nil {
 		return nil, err

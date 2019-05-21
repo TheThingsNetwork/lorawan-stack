@@ -15,6 +15,8 @@
 package joinserver
 
 import (
+	"context"
+
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/interop"
 )
@@ -25,6 +27,6 @@ type interopServer struct {
 
 var errInteropNotImplemented = errors.DefineUnimplemented("interop_not_implemented", "interop endpoint not implemented")
 
-func (srv interopServer) JoinRequest(req *interop.JoinReq) (*interop.JoinAns, error) {
+func (srv interopServer) JoinRequest(ctx context.Context, req *interop.JoinReq) (*interop.JoinAns, error) {
 	return nil, errInteropNotImplemented
 }
