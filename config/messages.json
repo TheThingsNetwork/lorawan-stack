@@ -3824,15 +3824,6 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/joinserver:interop_not_implemented": {
-    "translations": {
-      "en": "interop endpoint not implemented"
-    },
-    "description": {
-      "package": "pkg/joinserver",
-      "file": "http_interop.go"
-    }
-  },
   "error:pkg/joinserver:invalid_identifiers": {
     "translations": {
       "en": "invalid identifiers"
