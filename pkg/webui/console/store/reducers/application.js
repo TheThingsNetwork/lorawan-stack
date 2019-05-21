@@ -13,39 +13,15 @@
 // limitations under the License.
 
 import {
-  GET_APP,
   GET_APP_SUCCESS,
-  GET_APP_FAILURE,
 } from '../actions/application'
 
-const defaultState = {
-  fetching: false,
-  error: undefined,
-  application: undefined,
-  link: {},
-}
+const defaultState = null
 
 const application = function (state = defaultState, action) {
   switch (action.type) {
-  case GET_APP:
-    return {
-      ...state,
-      fetching: true,
-      application: undefined,
-      error: undefined,
-    }
   case GET_APP_SUCCESS:
-    return {
-      ...state,
-      fetching: false,
-      application: action.application,
-    }
-  case GET_APP_FAILURE:
-    return {
-      ...state,
-      fetching: false,
-      error: action.error,
-    }
+    return action.application
   default:
     return state
   }
