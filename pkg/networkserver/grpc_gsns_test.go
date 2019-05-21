@@ -161,7 +161,9 @@ func handleUplinkTest() func(t *testing.T) {
 					Devices:             devReg,
 					DeduplicationWindow: 42,
 					CooldownWindow:      42,
-					DownlinkTasks:       &MockDownlinkTaskQueue{},
+					DownlinkTasks: &MockDownlinkTaskQueue{
+						PopFunc: DownlinkTaskPopBlockFunc,
+					},
 				})).(*NetworkServer)
 			ns.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 			test.Must(nil, ns.Start())
@@ -185,7 +187,9 @@ func handleUplinkTest() func(t *testing.T) {
 					Devices:             devReg,
 					DeduplicationWindow: 42,
 					CooldownWindow:      42,
-					DownlinkTasks:       &MockDownlinkTaskQueue{},
+					DownlinkTasks: &MockDownlinkTaskQueue{
+						PopFunc: DownlinkTaskPopBlockFunc,
+					},
 				})).(*NetworkServer)
 			ns.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 			test.Must(nil, ns.Start())
@@ -271,7 +275,9 @@ func handleUplinkTest() func(t *testing.T) {
 					Devices:             devReg,
 					DeduplicationWindow: 42,
 					CooldownWindow:      42,
-					DownlinkTasks:       &MockDownlinkTaskQueue{},
+					DownlinkTasks: &MockDownlinkTaskQueue{
+						PopFunc: DownlinkTaskPopBlockFunc,
+					},
 				})).(*NetworkServer)
 			ns.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 			test.Must(nil, ns.Start())
@@ -1449,6 +1455,7 @@ func handleUplinkTest() func(t *testing.T) {
 						DeduplicationWindow: 42,
 						CooldownWindow:      42,
 						DownlinkTasks: &MockDownlinkTaskQueue{
+							PopFunc: DownlinkTaskPopBlockFunc,
 							AddFunc: func(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time, replace bool) error {
 								downlinkAddCh <- downlinkTasksAddRequest{
 									ctx:     ctx,
@@ -1758,28 +1765,6 @@ func handleUplinkTest() func(t *testing.T) {
 	}
 }
 
-var _ ttnpb.NsJsClient = &MockNsJsClient{}
-
-type MockNsJsClient struct {
-	*test.MockClientStream
-	HandleJoinFunc  func(context.Context, *ttnpb.JoinRequest, ...grpc.CallOption) (*ttnpb.JoinResponse, error)
-	GetNwkSKeysFunc func(context.Context, *ttnpb.SessionKeyRequest, ...grpc.CallOption) (*ttnpb.NwkSKeysResponse, error)
-}
-
-func (js *MockNsJsClient) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, opts ...grpc.CallOption) (*ttnpb.JoinResponse, error) {
-	if js.HandleJoinFunc == nil {
-		return nil, errors.New("HandleJoinFunc not set")
-	}
-	return js.HandleJoinFunc(ctx, req, opts...)
-}
-
-func (js *MockNsJsClient) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequest, opts ...grpc.CallOption) (*ttnpb.NwkSKeysResponse, error) {
-	if js.GetNwkSKeysFunc == nil {
-		return nil, errors.New("GetNwkSKeysFunc not set")
-	}
-	return js.GetNwkSKeysFunc(ctx, req, opts...)
-}
-
 func handleJoinTest() func(t *testing.T) {
 	return func(t *testing.T) {
 		authorizedCtx := clusterauth.NewContext(test.Context(), nil)
@@ -1798,7 +1783,9 @@ func handleJoinTest() func(t *testing.T) {
 					Devices:             devReg,
 					DeduplicationWindow: 42,
 					CooldownWindow:      42,
-					DownlinkTasks:       &MockDownlinkTaskQueue{},
+					DownlinkTasks: &MockDownlinkTaskQueue{
+						PopFunc: DownlinkTaskPopBlockFunc,
+					},
 				})).(*NetworkServer)
 			ns.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 			test.Must(nil, ns.Start())
@@ -2068,6 +2055,7 @@ func handleJoinTest() func(t *testing.T) {
 						NetID:   NetID,
 						Devices: devReg,
 						DownlinkTasks: &MockDownlinkTaskQueue{
+							PopFunc: DownlinkTaskPopBlockFunc,
 							AddFunc: func(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time, replace bool) error {
 								downlinkAddCh <- downlinkTasksAddRequest{
 									ctx:     ctx,
@@ -2442,7 +2430,9 @@ func TestHandleUplink(t *testing.T) {
 			Devices:             devReg,
 			DeduplicationWindow: 42,
 			CooldownWindow:      42,
-			DownlinkTasks:       &MockDownlinkTaskQueue{},
+			DownlinkTasks: &MockDownlinkTaskQueue{
+				PopFunc: DownlinkTaskPopBlockFunc,
+			},
 		},
 	)).(*NetworkServer)
 	test.Must(nil, ns.Start())

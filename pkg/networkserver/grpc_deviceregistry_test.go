@@ -145,7 +145,9 @@ func TestDeviceRegistryGet(t *testing.T) {
 							return tc.GetByIDFunc(ctx, appID, devID, gets)
 						},
 					},
-					DownlinkTasks:       &MockDownlinkTaskQueue{},
+					DownlinkTasks: &MockDownlinkTaskQueue{
+						PopFunc: DownlinkTaskPopBlockFunc,
+					},
 					DeduplicationWindow: 42,
 					CooldownWindow:      42,
 				})).(*NetworkServer)
@@ -894,7 +896,9 @@ func TestDeviceRegistrySet(t *testing.T) {
 							return tc.SetByIDFunc(ctx, appID, devID, gets, f)
 						},
 					},
-					DownlinkTasks:       &MockDownlinkTaskQueue{},
+					DownlinkTasks: &MockDownlinkTaskQueue{
+						PopFunc: DownlinkTaskPopBlockFunc,
+					},
 					DeduplicationWindow: 42,
 					CooldownWindow:      42,
 				})).(*NetworkServer)
@@ -1055,7 +1059,9 @@ func TestDeviceRegistryDelete(t *testing.T) {
 							return tc.SetByIDFunc(ctx, appID, devID, gets, f)
 						},
 					},
-					DownlinkTasks:       &MockDownlinkTaskQueue{},
+					DownlinkTasks: &MockDownlinkTaskQueue{
+						PopFunc: DownlinkTaskPopBlockFunc,
+					},
 					DeduplicationWindow: 42,
 					CooldownWindow:      42,
 				})).(*NetworkServer)

@@ -238,7 +238,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		}
 
 		if ttnpb.HasAnyField(sets, "session.started_at") && req.EndDevice.GetSession().GetStartedAt().IsZero() {
-			return nil, nil, errInvalidFieldValue.WithAttributes("field", "session.started_at")
+			return nil, nil, errInvalidFieldValue.WithAttributes("field", "session.tarted_at")
 		} else if !ttnpb.HasAnyField(sets, "session.started_at") {
 			req.EndDevice.Session.StartedAt = time.Now().UTC()
 			sets = append(sets, "session.started_at")

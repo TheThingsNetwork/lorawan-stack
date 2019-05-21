@@ -27,28 +27,28 @@ type MockStream struct {
 	RecvMsgFunc func(m interface{}) error
 }
 
-// Context calls s.ContextFunc.
-func (s *MockStream) Context() context.Context {
-	if s == nil || s.ContextFunc == nil {
-		return nil
+// Context calls ContextFunc if set and panics otherwise.
+func (m MockStream) Context() context.Context {
+	if m.ContextFunc == nil {
+		panic("Context called, but not set")
 	}
-	return s.ContextFunc()
+	return m.ContextFunc()
 }
 
-// SendMsg calls s.SendMsgFunc.
-func (s *MockStream) SendMsg(m interface{}) error {
-	if s == nil || s.SendMsgFunc == nil {
-		return nil
+// SendMsg calls SendMsgFunc if set and panics otherwise.
+func (m MockStream) SendMsg(msg interface{}) error {
+	if m.SendMsgFunc == nil {
+		panic("SendMsg called, but not set")
 	}
-	return s.SendMsgFunc(m)
+	return m.SendMsgFunc(msg)
 }
 
-// RecvMsg calls s.RecvMsgFunc.
-func (s *MockStream) RecvMsg(m interface{}) error {
-	if s == nil || s.RecvMsgFunc == nil {
-		return nil
+// RecvMsg calls RecvMsgFunc if set and panics otherwise.
+func (m MockStream) RecvMsg(msg interface{}) error {
+	if m.RecvMsgFunc == nil {
+		panic("RecvMsg called, but not set")
 	}
-	return s.RecvMsgFunc(m)
+	return m.RecvMsgFunc(msg)
 }
 
 // MockServerStream is a mock grpc.ServerStream.
@@ -59,28 +59,28 @@ type MockServerStream struct {
 	SetTrailerFunc func(md metadata.MD)
 }
 
-// SetHeader calls s.SetHeaderFunc.
-func (s *MockServerStream) SetHeader(md metadata.MD) error {
-	if s == nil || s.SetHeaderFunc == nil {
-		return nil
+// SetHeader calls SetHeaderFunc if set and panics otherwise.
+func (m MockServerStream) SetHeader(md metadata.MD) error {
+	if m.SetHeaderFunc == nil {
+		panic("SetHeader called, but not set")
 	}
-	return s.SetHeaderFunc(md)
+	return m.SetHeaderFunc(md)
 }
 
-// SendHeader calls s.SendHeaderFunc.
-func (s *MockServerStream) SendHeader(md metadata.MD) error {
-	if s == nil || s.SendHeaderFunc == nil {
-		return nil
+// SendHeader calls SendHeaderFunc if set and panics otherwise.
+func (m MockServerStream) SendHeader(md metadata.MD) error {
+	if m.SendHeaderFunc == nil {
+		panic("SendHeader called, but not set")
 	}
-	return s.SendHeaderFunc(md)
+	return m.SendHeaderFunc(md)
 }
 
-// SetTrailer calls s.SetTrailerFunc.
-func (s *MockServerStream) SetTrailer(md metadata.MD) {
-	if s == nil || s.SetTrailerFunc == nil {
-		return
+// SetTrailer calls SetTrailerFunc if set and panics otherwise.
+func (m MockServerStream) SetTrailer(md metadata.MD) {
+	if m.SetTrailerFunc == nil {
+		panic("X called, but not set")
 	}
-	s.SetTrailerFunc(md)
+	m.SetTrailerFunc(md)
 }
 
 // MockClientStream is a mock grpc.ClientStream.
@@ -91,28 +91,28 @@ type MockClientStream struct {
 	CloseSendFunc func() error
 }
 
-// Header calls s.HeaderFunc.
-func (s *MockClientStream) Header() (metadata.MD, error) {
-	if s == nil || s.HeaderFunc == nil {
-		return metadata.MD{}, nil
+// Header calls HeaderFunc if set and panics otherwise.
+func (m MockClientStream) Header() (metadata.MD, error) {
+	if m.HeaderFunc == nil {
+		panic("Header called, but not set")
 	}
-	return s.HeaderFunc()
+	return m.HeaderFunc()
 }
 
-// Trailer calls s.TrailerFunc.
-func (s *MockClientStream) Trailer() metadata.MD {
-	if s == nil || s.TrailerFunc == nil {
-		return metadata.MD{}
+// Trailer calls TrailerFunc if set and panics otherwise.
+func (m MockClientStream) Trailer() metadata.MD {
+	if m.TrailerFunc == nil {
+		panic("Trailer called, but not set")
 	}
-	return s.TrailerFunc()
+	return m.TrailerFunc()
 }
 
-// CloseSend calls s.CloseSendFunc.
-func (s *MockClientStream) CloseSend() error {
-	if s == nil || s.CloseSendFunc == nil {
-		return nil
+// CloseSend calls CloseSendFunc if set and panics otherwise.
+func (m MockClientStream) CloseSend() error {
+	if m.CloseSendFunc == nil {
+		panic("CloseSend called, but not set")
 	}
-	return s.CloseSendFunc()
+	return m.CloseSendFunc()
 }
 
 // MockServerTransportStream is a mock grpc.ServerTransportStream.
@@ -122,25 +122,18 @@ type MockServerTransportStream struct {
 	SetTrailerFunc func(metadata.MD) error
 }
 
-// Method calls s.MethodFunc.
-func (s *MockServerTransportStream) Method() string {
-	if s == nil || s.MethodFunc == nil {
-		return ""
+// Method calls MethodFunc if set and panics otherwise.
+func (m MockServerTransportStream) Method() string {
+	if m.MethodFunc == nil {
+		panic("Method called, but not set")
 	}
-	return s.MethodFunc()
+	return m.MethodFunc()
 }
 
-// SetTrailer calls s.SetTrailerFunc or s.MockServerStream.SetTrailer if s.SetTrailerFunc is nil.
-func (s *MockServerTransportStream) SetTrailer(md metadata.MD) error {
-	if s == nil {
-		return nil
+// SetTrailer calls SetTrailerFunc if set and panics otherwise.
+func (m MockServerTransportStream) SetTrailer(md metadata.MD) error {
+	if m.SetTrailerFunc == nil {
+		panic("SetTrailer called, but not set")
 	}
-
-	if s.SetTrailerFunc != nil {
-		return s.SetTrailerFunc(md)
-	}
-	if s.MockServerStream != nil {
-		s.MockServerStream.SetTrailer(md)
-	}
-	return nil
+	return m.SetTrailerFunc(md)
 }

@@ -40,25 +40,8 @@ import (
 	"google.golang.org/grpc"
 )
 
-func newISPeer(ctx context.Context, is interface {
-	ttnpb.ApplicationAccessServer
-}) cluster.Peer {
-	return test.Must(test.NewGRPCServerPeer(ctx, is, ttnpb.RegisterApplicationAccessServer)).(cluster.Peer)
-}
-
-func newGSPeer(ctx context.Context, gs interface {
-	ttnpb.NsGsServer
-}) cluster.Peer {
-	return test.Must(test.NewGRPCServerPeer(ctx, gs, ttnpb.RegisterNsGsServer)).(cluster.Peer)
-}
-
-func newJSPeer(ctx context.Context, js interface {
-	ttnpb.NsJsServer
-}) cluster.Peer {
-	return test.Must(test.NewGRPCServerPeer(ctx, js, ttnpb.RegisterNsJsServer)).(cluster.Peer)
-}
-
-func assertLinkApplication(t *testing.T, ctx context.Context, conn *grpc.ClientConn, getPeerCh <-chan test.GetPeerRequest, timeout time.Duration, appID string) (ttnpb.AsNs_LinkApplicationClient, bool) {
+func AssertLinkApplication(ctx context.Context, conn *grpc.ClientConn, getPeerCh <-chan test.ClusterGetPeerRequest, appID string) (ttnpb.AsNs_LinkApplicationClient, bool) {
+	t := test.MustTFromContext(ctx)
 	t.Helper()
 
 	a := assertions.New(t)
@@ -86,18 +69,18 @@ func assertLinkApplication(t *testing.T, ctx context.Context, conn *grpc.ClientC
 		wg.Done()
 	}()
 
-	if !a.So(test.AssertGetPeerRequest(t, getPeerCh, Timeout,
+	if !a.So(test.AssertClusterGetPeerRequest(ctx, getPeerCh,
 		func(ctx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) bool {
 			return a.So(role, should.Equal, ttnpb.PeerInfo_ACCESS) && a.So(ids, should.BeNil)
 		},
-		newISPeer(ctx, &test.MockApplicationAccessServer{
+		NewISPeer(ctx, &test.MockApplicationAccessServer{
 			ListRightsFunc: test.MakeApplicationAccessListRightsChFunc(listRightsCh),
 		}),
 	), should.BeTrue) {
 		return nil, false
 	}
 
-	if !a.So(test.AssertListRightsRequest(t, listRightsCh, Timeout,
+	if !a.So(test.AssertListRightsRequest(ctx, listRightsCh,
 		func(ctx context.Context, ids ttnpb.Identifiers) bool {
 			md := rpcmetadata.FromIncomingContext(ctx)
 			return a.So(md.AuthType, should.Equal, "Bearer") &&
@@ -108,14 +91,15 @@ func assertLinkApplication(t *testing.T, ctx context.Context, conn *grpc.ClientC
 		return nil, false
 	}
 
-	if !a.So(test.WaitTimeout(Timeout, wg.Wait), should.BeTrue) {
+	if !a.So(test.WaitContext(ctx, wg.Wait), should.BeTrue) {
 		t.Error("Timed out while waiting for AS link to open")
 		return nil, false
 	}
 	return link, a.So(err, should.BeNil)
 }
 
-func assertSetDevice(t *testing.T, ctx context.Context, conn *grpc.ClientConn, getPeerCh <-chan test.GetPeerRequest, timeout time.Duration, appID string, req *ttnpb.SetEndDeviceRequest) (*ttnpb.EndDevice, bool) {
+func AssertSetDevice(ctx context.Context, conn *grpc.ClientConn, getPeerCh <-chan test.ClusterGetPeerRequest, appID string, req *ttnpb.SetEndDeviceRequest) (*ttnpb.EndDevice, bool) {
+	t := test.MustTFromContext(ctx)
 	t.Helper()
 
 	a := assertions.New(t)
@@ -142,18 +126,18 @@ func assertSetDevice(t *testing.T, ctx context.Context, conn *grpc.ClientConn, g
 		wg.Done()
 	}()
 
-	if !a.So(test.AssertGetPeerRequest(t, getPeerCh, Timeout,
+	if !a.So(test.AssertClusterGetPeerRequest(ctx, getPeerCh,
 		func(ctx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) bool {
 			return a.So(role, should.Equal, ttnpb.PeerInfo_ACCESS) && a.So(ids, should.BeNil)
 		},
-		newISPeer(ctx, &test.MockApplicationAccessServer{
+		NewISPeer(ctx, &test.MockApplicationAccessServer{
 			ListRightsFunc: test.MakeApplicationAccessListRightsChFunc(listRightsCh),
 		}),
 	), should.BeTrue) {
 		return nil, false
 	}
 
-	if !a.So(test.AssertListRightsRequest(t, listRightsCh, Timeout,
+	if !a.So(test.AssertListRightsRequest(ctx, listRightsCh,
 		func(ctx context.Context, ids ttnpb.Identifiers) bool {
 			md := rpcmetadata.FromIncomingContext(ctx)
 			return a.So(md.AuthType, should.Equal, "Bearer") &&
@@ -164,17 +148,19 @@ func assertSetDevice(t *testing.T, ctx context.Context, conn *grpc.ClientConn, g
 		return nil, false
 	}
 
-	if !a.So(test.WaitTimeout(Timeout, wg.Wait), should.BeTrue) {
-		t.Error("Timed out while waiting for device to be created")
+	if !a.So(test.WaitContext(ctx, wg.Wait), should.BeTrue) {
+		t.Error("Timed out while waiting for device to be set")
 		return nil, false
 	}
 	return dev, a.So(err, should.BeNil)
 }
 
-func handleOTAAClassA868FlowTest(t *testing.T, reg DeviceRegistry, tq DownlinkTaskQueue) {
+func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, tq DownlinkTaskQueue) {
+	t := test.MustTFromContext(ctx)
 	a := assertions.New(t)
 
-	getPeerCh := make(chan test.GetPeerRequest)
+	authCh := make(chan test.ClusterAuthRequest)
+	getPeerCh := make(chan test.ClusterGetPeerRequest)
 
 	collectionDoneCh := make(chan WindowEndRequest)
 	deduplicationDoneCh := make(chan WindowEndRequest)
@@ -203,7 +189,9 @@ func handleOTAAClassA868FlowTest(t *testing.T, reg DeviceRegistry, tq DownlinkTa
 					})
 				}
 				return &test.MockCluster{
-					GetPeerFunc: test.MakeGetPeerChFunc(getPeerCh),
+					AuthFunc:    test.MakeClusterAuthChFunc(authCh),
+					GetPeerFunc: test.MakeClusterGetPeerChFunc(getPeerCh),
+					JoinFunc:    test.ClusterJoinNilFunc,
 					WithVerifiedSourceFunc: func(ctx context.Context) context.Context {
 						return clusterauth.NewContext(ctx, nil)
 					},
@@ -233,14 +221,14 @@ func handleOTAAClassA868FlowTest(t *testing.T, reg DeviceRegistry, tq DownlinkTa
 	conn := ns.LoopbackConn()
 
 	start := time.Now()
-	ctx := test.Context()
 
-	link, ok := assertLinkApplication(t, ctx, conn, getPeerCh, Timeout, "test-app-id")
+	link, ok := AssertLinkApplication(ctx, conn, getPeerCh, "test-app-id")
 	if !a.So(ok, should.BeTrue) || !a.So(link, should.NotBeNil) {
-		t.Fatal("Failed to link application")
+		t.Error("Failed to link application")
+		return
 	}
 
-	dev, ok := assertSetDevice(t, ctx, conn, getPeerCh, Timeout, "test-app-id", &ttnpb.SetEndDeviceRequest{
+	dev, ok := AssertSetDevice(ctx, conn, getPeerCh, "test-app-id", &ttnpb.SetEndDeviceRequest{
 		EndDevice: ttnpb.EndDevice{
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 				DeviceID:               "test-dev-id",
@@ -249,8 +237,8 @@ func handleOTAAClassA868FlowTest(t *testing.T, reg DeviceRegistry, tq DownlinkTa
 				DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 			},
 			FrequencyPlanID:   test.EUFrequencyPlanID,
-			LoRaWANPHYVersion: ttnpb.PHY_V1_0,
-			LoRaWANVersion:    ttnpb.MAC_V1_0,
+			LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
+			LoRaWANVersion:    ttnpb.MAC_V1_0_2,
 			SupportsJoin:      true,
 		},
 		FieldMask: pbtypes.FieldMask{
@@ -263,8 +251,10 @@ func handleOTAAClassA868FlowTest(t *testing.T, reg DeviceRegistry, tq DownlinkTa
 		},
 	})
 	if !a.So(ok, should.BeTrue) || !a.So(dev, should.NotBeNil) {
-		t.Fatal("Failed to create device")
+		t.Error("Failed to create device")
+		return
 	}
+	t.Log("Device created")
 	a.So(dev.CreatedAt, should.HappenAfter, start)
 	a.So(dev.UpdatedAt, should.Equal, dev.CreatedAt)
 	a.So([]time.Time{start, dev.CreatedAt, time.Now()}, should.BeChronological)
@@ -276,21 +266,21 @@ func handleOTAAClassA868FlowTest(t *testing.T, reg DeviceRegistry, tq DownlinkTa
 			DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 		},
 		FrequencyPlanID:   test.EUFrequencyPlanID,
-		LoRaWANPHYVersion: ttnpb.PHY_V1_0,
-		LoRaWANVersion:    ttnpb.MAC_V1_0,
+		LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
+		LoRaWANVersion:    ttnpb.MAC_V1_0_2,
 		SupportsJoin:      true,
 		CreatedAt:         dev.CreatedAt,
 		UpdatedAt:         dev.UpdatedAt,
 	})
 
-	scheduleDownlinkCh := make(chan ScheduleDownlinkRequest)
-	gsPeer := newGSPeer(test.Context(), &MockNsGsServer{
-		ScheduleDownlinkFunc: MakeScheduleDownlinkChFunc(scheduleDownlinkCh),
+	scheduleDownlinkCh := make(chan NsGsScheduleDownlinkRequest)
+	gsPeer := NewGSPeer(ctx, &MockNsGsServer{
+		ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlinkCh),
 	})
 
-	handleJoinCh := make(chan HandleJoinRequest)
-	jsPeer := newJSPeer(test.Context(), &MockNsJsServer{
-		HandleJoinFunc: MakeHandleJoinChFunc(handleJoinCh),
+	handleJoinCh := make(chan NsJsHandleJoinRequest)
+	jsPeer := NewJSPeer(ctx, &MockNsJsServer{
+		HandleJoinFunc: MakeNsJsHandleJoinChFunc(handleJoinCh),
 	})
 	gsns := ttnpb.NewGsNsClient(conn)
 
@@ -298,7 +288,7 @@ func handleOTAAClassA868FlowTest(t *testing.T, reg DeviceRegistry, tq DownlinkTa
 	fNwkSIntKey := types.AES128Key{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
 
 	var devAddr types.DevAddr
-	t.Run("join-request", func(t *testing.T) {
+	if !t.Run("join-request", func(t *testing.T) {
 		a := assertions.New(t)
 
 		uplink := &ttnpb.UplinkMessage{
@@ -341,11 +331,12 @@ func handleOTAAClassA868FlowTest(t *testing.T, reg DeviceRegistry, tq DownlinkTa
 		handleUplinkErrCh := make(chan error)
 		go func() {
 			_, err := gsns.HandleUplink(ctx, uplink)
+			t.Logf("HandleUplink returned %v", err)
 			handleUplinkErrCh <- err
 			close(handleUplinkErrCh)
 		}()
 
-		a.So(test.AssertGetPeerRequest(t, getPeerCh, Timeout,
+		if !a.So(test.AssertClusterGetPeerRequest(ctx, getPeerCh,
 			func(ctx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) bool {
 				return a.So(role, should.Equal, ttnpb.PeerInfo_JOIN_SERVER) &&
 					a.So(ids, should.Resemble, ttnpb.EndDeviceIdentifiers{
@@ -356,33 +347,33 @@ func handleOTAAClassA868FlowTest(t *testing.T, reg DeviceRegistry, tq DownlinkTa
 					})
 			},
 			jsPeer,
-		), should.BeTrue)
+		), should.BeTrue) {
+			return
+		}
 
-		select {
-		case req := <-handleJoinCh:
-			if !a.So(req.Message, should.NotBeNil) {
-				t.Fatal("Nil join-request sent to JS")
-			}
-
-			a.So(req.Message.CorrelationIDs, should.Contain, "GsNs-1")
-			a.So(req.Message.CorrelationIDs, should.Contain, "GsNs-2")
-			a.So(req.Message.CorrelationIDs, should.HaveLength, 4)
-			a.So(req.Message.DevAddr, should.NotBeEmpty)
-			a.So(req.Message.DevAddr.NwkID(), should.Resemble, netID.ID())
-			a.So(req.Message.DevAddr.NetIDType(), should.Equal, netID.Type())
-			a.So(req.Message, should.Resemble, &ttnpb.JoinRequest{
-				RawPayload:         uplink.RawPayload,
-				DevAddr:            req.Message.DevAddr,
-				SelectedMACVersion: ttnpb.MAC_V1_0,
-				NetID:              netID,
-				RxDelay:            ttnpb.RX_DELAY_6,
-				CFList: &ttnpb.CFList{
-					Type: ttnpb.CFListType_FREQUENCIES,
-					Freq: []uint32{8671000, 8673000, 8675000, 8677000, 8679000},
-				},
-				CorrelationIDs: req.Message.CorrelationIDs,
-			})
-			req.Response <- HandleJoinResponse{
+		if !a.So(AssertAuthNsJsHandleJoinRequest(ctx, authCh, handleJoinCh, func(ctx context.Context, req *ttnpb.JoinRequest) bool {
+			devAddr = req.DevAddr
+			return a.So(req.CorrelationIDs, should.Contain, "GsNs-1") &&
+				a.So(req.CorrelationIDs, should.Contain, "GsNs-2") &&
+				a.So(req.CorrelationIDs, should.HaveLength, 4) &&
+				a.So(req.DevAddr, should.NotBeEmpty) &&
+				a.So(req.DevAddr.NwkID(), should.Resemble, netID.ID()) &&
+				a.So(req.DevAddr.NetIDType(), should.Equal, netID.Type()) &&
+				a.So(req, should.Resemble, &ttnpb.JoinRequest{
+					RawPayload:         uplink.RawPayload,
+					DevAddr:            req.DevAddr,
+					SelectedMACVersion: ttnpb.MAC_V1_0_2,
+					NetID:              netID,
+					RxDelay:            ttnpb.RX_DELAY_6,
+					CFList: &ttnpb.CFList{
+						Type: ttnpb.CFListType_FREQUENCIES,
+						Freq: []uint32{8671000, 8673000, 8675000, 8677000, 8679000},
+					},
+					CorrelationIDs: req.CorrelationIDs,
+				})
+		},
+			&grpc.EmptyCallOption{},
+			NsJsHandleJoinResponse{
 				Response: &ttnpb.JoinResponse{
 					RawPayload: bytes.Repeat([]byte{0x42}, 33),
 					SessionKeys: ttnpb.SessionKeys{
@@ -396,31 +387,33 @@ func handleOTAAClassA868FlowTest(t *testing.T, reg DeviceRegistry, tq DownlinkTa
 					},
 					CorrelationIDs: []string{"NsJs-1", "NsJs-2"},
 				},
-			}
-			devAddr = req.Message.DevAddr
-
-		case <-time.After(Timeout):
-			t.Fatal("Timed out while waiting for join-request to be sent to JS")
+			},
+		), should.BeTrue) {
+			t.Error("Join-request send assertion failed")
+			return
 		}
 
 		select {
+		case <-ctx.Done():
+			t.Error("Timed out while waiting for deduplication window to close")
+			return
+
 		case req := <-deduplicationDoneCh:
 			req.Response <- time.Now()
 			close(req.Response)
-
-		case <-time.After(Timeout):
-			t.Fatal("Timed out while waiting for deduplication window to close")
 		}
 
 		var asUp *ttnpb.ApplicationUp
 		var err error
-		if !a.So(test.WaitTimeout(Timeout, func() {
+		if !a.So(test.WaitContext(ctx, func() {
 			asUp, err = link.Recv()
 		}), should.BeTrue) {
-			t.Fatal("Timed out while waiting for join-accept to be sent to AS")
+			t.Error("Timed out while waiting for join-accept to be sent to AS")
+			return
 		}
 		if !a.So(err, should.BeNil) {
-			t.Fatalf("Failed to receive AS uplink: %s", err)
+			t.Errorf("Failed to receive AS uplink: %s", err)
+			return
 		}
 		a.So(asUp.CorrelationIDs, should.Contain, "GsNs-1")
 		a.So(asUp.CorrelationIDs, should.Contain, "GsNs-2")
@@ -448,13 +441,15 @@ func handleOTAAClassA868FlowTest(t *testing.T, reg DeviceRegistry, tq DownlinkTa
 			}},
 		})
 
-		if !a.So(test.WaitTimeout(Timeout, func() {
+		if !a.So(test.WaitContext(ctx, func() {
 			err = link.Send(ttnpb.Empty)
 		}), should.BeTrue) {
-			t.Fatal("Timed out while waiting for NS to process AS response")
+			t.Error("Timed out while waiting for NS to process AS response")
+			return
 		}
 		if !a.So(err, should.BeNil) {
-			t.Fatalf("Failed to send AS uplink response: %s", err)
+			t.Errorf("Failed to send AS uplink response: %s", err)
+			return
 		}
 
 		select {
@@ -462,21 +457,24 @@ func handleOTAAClassA868FlowTest(t *testing.T, reg DeviceRegistry, tq DownlinkTa
 			req.Response <- time.Now()
 			close(req.Response)
 
-		case <-time.After(Timeout):
-			t.Fatal("Timed out while waiting for collection window to close")
+		case <-ctx.Done():
+			t.Error("Timed out while waiting for collection window to close")
+			return
 		}
 
 		select {
 		case err := <-handleUplinkErrCh:
 			if !a.So(err, should.BeNil) {
-				t.Fatalf("Failed to handle uplink: %s", err)
+				t.Errorf("Failed to handle uplink: %s", err)
+				return
 			}
 
-		case <-time.After(Timeout):
-			t.Fatal("Timed out while waiting for HandleUplink to return")
+		case <-ctx.Done():
+			t.Error("Timed out while waiting for HandleUplink to return")
+			return
 		}
 
-		a.So(test.AssertGetPeerRequest(t, getPeerCh, Timeout,
+		a.So(test.AssertClusterGetPeerRequest(ctx, getPeerCh,
 			func(ctx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) bool {
 				return a.So(role, should.Equal, ttnpb.PeerInfo_GATEWAY_SERVER) &&
 					a.So(ids, should.Resemble, ttnpb.GatewayIdentifiers{
@@ -486,7 +484,7 @@ func handleOTAAClassA868FlowTest(t *testing.T, reg DeviceRegistry, tq DownlinkTa
 			gsPeer,
 		), should.BeTrue)
 
-		a.So(AssertScheduleDownlinkRequest(t, scheduleDownlinkCh, Timeout,
+		a.So(AssertAuthNsGsScheduleDownlinkRequest(ctx, authCh, scheduleDownlinkCh,
 			func(ctx context.Context, msg *ttnpb.DownlinkMessage) bool {
 				return a.So(msg.CorrelationIDs, should.Contain, "GsNs-1") &&
 					a.So(msg.CorrelationIDs, should.Contain, "GsNs-2") &&
@@ -514,11 +512,15 @@ func handleOTAAClassA868FlowTest(t *testing.T, reg DeviceRegistry, tq DownlinkTa
 						CorrelationIDs: msg.CorrelationIDs,
 					})
 			},
-			ScheduleDownlinkResponse{
+			&grpc.EmptyCallOption{},
+			NsGsScheduleDownlinkResponse{
 				Response: &ttnpb.ScheduleDownlinkResponse{},
 			},
 		), should.BeTrue)
-	})
+	}) {
+		t.Error("Join-accept schedule assertion failed")
+		return
+	}
 
 	t.Logf("Device successfully joined. DevAddr: %s", devAddr)
 
@@ -574,6 +576,7 @@ func handleOTAAClassA868FlowTest(t *testing.T, reg DeviceRegistry, tq DownlinkTa
 		handleUplinkErrCh := make(chan error)
 		go func() {
 			_, err := gsns.HandleUplink(ctx, uplink)
+			t.Logf("HandleUplink returned %v", err)
 			handleUplinkErrCh <- err
 			close(handleUplinkErrCh)
 		}()
@@ -583,19 +586,22 @@ func handleOTAAClassA868FlowTest(t *testing.T, reg DeviceRegistry, tq DownlinkTa
 			req.Response <- time.Now()
 			close(req.Response)
 
-		case <-time.After(Timeout):
-			t.Fatal("Timed out while waiting for deduplication window to close")
+		case <-ctx.Done():
+			t.Error("Timed out while waiting for deduplication window to close")
+			return
 		}
 
 		var asUp *ttnpb.ApplicationUp
 		var err error
-		if !a.So(test.WaitTimeout(Timeout, func() {
+		if !a.So(test.WaitContext(ctx, func() {
 			asUp, err = link.Recv()
 		}), should.BeTrue) {
-			t.Fatal("Timed out while waiting for uplink to be sent to AS")
+			t.Error("Timed out while waiting for uplink to be sent to AS")
+			return
 		}
 		if !a.So(err, should.BeNil) {
-			t.Fatalf("Failed to receive AS uplink: %s", err)
+			t.Errorf("Failed to receive AS uplink: %s", err)
+			return
 		}
 		a.So(asUp.CorrelationIDs, should.Contain, "GsNs-1")
 		a.So(asUp.CorrelationIDs, should.Contain, "GsNs-2")
@@ -634,13 +640,15 @@ func handleOTAAClassA868FlowTest(t *testing.T, reg DeviceRegistry, tq DownlinkTa
 			}},
 		})
 
-		if !a.So(test.WaitTimeout(Timeout, func() {
+		if !a.So(test.WaitContext(ctx, func() {
 			err = link.Send(ttnpb.Empty)
 		}), should.BeTrue) {
-			t.Fatal("Timed out while waiting for NS to process AS response")
+			t.Error("Timed out while waiting for NS to process AS response")
+			return
 		}
 		if !a.So(err, should.BeNil) {
-			t.Fatalf("Failed to send AS uplink response: %s", err)
+			t.Errorf("Failed to send AS uplink response: %s", err)
+			return
 		}
 
 		select {
@@ -648,21 +656,24 @@ func handleOTAAClassA868FlowTest(t *testing.T, reg DeviceRegistry, tq DownlinkTa
 			req.Response <- time.Now()
 			close(req.Response)
 
-		case <-time.After(Timeout):
-			t.Fatal("Timed out while waiting for collection window to close")
+		case <-ctx.Done():
+			t.Error("Timed out while waiting for collection window to close")
+			return
 		}
 
 		select {
 		case err := <-handleUplinkErrCh:
 			if !a.So(err, should.BeNil) {
-				t.Fatalf("Failed to handle uplink: %s", err)
+				t.Errorf("Failed to handle uplink: %s", err)
+				return
 			}
 
-		case <-time.After(Timeout):
-			t.Fatal("Timed out while waiting for HandleUplink to return")
+		case <-ctx.Done():
+			t.Error("Timed out while waiting for HandleUplink to return")
+			return
 		}
 
-		a.So(test.AssertGetPeerRequest(t, getPeerCh, Timeout,
+		a.So(test.AssertClusterGetPeerRequest(ctx, getPeerCh,
 			func(ctx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) bool {
 				return a.So(role, should.Equal, ttnpb.PeerInfo_GATEWAY_SERVER) &&
 					a.So(ids, should.Resemble, ttnpb.GatewayIdentifiers{
@@ -672,7 +683,7 @@ func handleOTAAClassA868FlowTest(t *testing.T, reg DeviceRegistry, tq DownlinkTa
 			gsPeer,
 		), should.BeTrue)
 
-		a.So(AssertScheduleDownlinkRequest(t, scheduleDownlinkCh, Timeout,
+		a.So(AssertAuthNsGsScheduleDownlinkRequest(ctx, authCh, scheduleDownlinkCh,
 			func(ctx context.Context, msg *ttnpb.DownlinkMessage) bool {
 				return a.So(msg.CorrelationIDs, should.Contain, "GsNs-1") &&
 					a.So(msg.CorrelationIDs, should.Contain, "GsNs-2") &&
@@ -722,7 +733,8 @@ func handleOTAAClassA868FlowTest(t *testing.T, reg DeviceRegistry, tq DownlinkTa
 						CorrelationIDs: msg.CorrelationIDs,
 					})
 			},
-			ScheduleDownlinkResponse{
+			&grpc.EmptyCallOption{},
+			NsGsScheduleDownlinkResponse{
 				Response: &ttnpb.ScheduleDownlinkResponse{},
 			},
 		), should.BeTrue)
@@ -765,7 +777,8 @@ func TestFlow(t *testing.T) {
 						DeviceID:               "test",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test"},
 					}, time.Now(), false); err != nil {
-						t.Fatalf("Failed to add mock device to task queue: %s", err)
+						t.Errorf("Failed to add mock device to task queue: %s", err)
+						return err
 					}
 					runErr := <-errch
 					flush()
@@ -781,12 +794,10 @@ func TestFlow(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 
-			for flow, handleFlowTest := range map[string]func(*testing.T, DeviceRegistry, DownlinkTaskQueue){
-				"Class A/OTAA/EU868": handleOTAAClassA868FlowTest,
+			for flow, handleFlowTest := range map[string]func(context.Context, DeviceRegistry, DownlinkTaskQueue){
+				"Class A/OTAA/EU868/1.0.2": handleOTAAClassA868FlowTest1_0_2,
 			} {
 				t.Run(flow, func(t *testing.T) {
-					t.Parallel()
-
 					reg, regClose := tc.NewRegistry(t)
 					if regClose != nil {
 						defer func() {
@@ -804,7 +815,11 @@ func TestFlow(t *testing.T) {
 							}
 						}()
 					}
-					handleFlowTest(t, reg, tq)
+
+					ctx := test.ContextWithT(test.Context(), t)
+					ctx, cancel := context.WithTimeout(ctx, (1<<7)*test.Delay)
+					defer cancel()
+					handleFlowTest(ctx, reg, tq)
 				})
 			}
 		})

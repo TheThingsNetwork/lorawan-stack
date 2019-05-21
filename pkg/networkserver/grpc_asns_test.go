@@ -56,7 +56,9 @@ func TestLinkApplication(t *testing.T) {
 			Devices:             devReg,
 			DeduplicationWindow: 42,
 			CooldownWindow:      42,
-			DownlinkTasks:       &MockDownlinkTaskQueue{},
+			DownlinkTasks: &MockDownlinkTaskQueue{
+				PopFunc: DownlinkTaskPopBlockFunc,
+			},
 		})).(*NetworkServer)
 	test.Must(nil, ns.Start())
 	defer ns.Close()
@@ -747,6 +749,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 							atomic.AddUint64(&addCalls, 1)
 							return tc.AddFunc(ctx, ids, at, replace)
 						},
+						PopFunc: DownlinkTaskPopBlockFunc,
 					},
 					DeduplicationWindow: 42,
 					CooldownWindow:      42,
@@ -1427,6 +1430,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 							atomic.AddUint64(&addCalls, 1)
 							return tc.AddFunc(ctx, ids, at, replace)
 						},
+						PopFunc: DownlinkTaskPopBlockFunc,
 					},
 					DeduplicationWindow: 42,
 					CooldownWindow:      42,
@@ -1600,7 +1604,9 @@ func TestDownlinkQueueList(t *testing.T) {
 							return tc.GetByIDFunc(ctx, appID, devID, gets)
 						},
 					},
-					DownlinkTasks:       &MockDownlinkTaskQueue{},
+					DownlinkTasks: &MockDownlinkTaskQueue{
+						PopFunc: DownlinkTaskPopBlockFunc,
+					},
 					DeduplicationWindow: 42,
 					CooldownWindow:      42,
 				})).(*NetworkServer)

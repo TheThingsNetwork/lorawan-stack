@@ -58,3 +58,6 @@ func (n noop) WithFields(Fielder) Interface { return n }
 
 // WithError implements log.Interface.
 func (n noop) WithError(error) Interface { return n }
+
+// Use implements log.Stack
+func (n noop) Use(Middleware) {}

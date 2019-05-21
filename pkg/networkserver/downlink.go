@@ -115,6 +115,7 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 		maxDownLen -= desc.DownlinkLength
 	}
 
+	dev.MACState.QueuedResponses = nil
 	dev.MACState.PendingRequests = dev.MACState.PendingRequests[:0]
 
 	maxDownLen, maxUpLen, ok, err := enqueueLinkADRReq(ctx, dev, maxDownLen, maxUpLen, ns.FrequencyPlans)
@@ -159,7 +160,10 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 		if err != nil {
 			return nil, errEncodeMAC.WithCause(err)
 		}
-		if mType == ttnpb.MType_UNCONFIRMED_DOWN && spec[cmd.CID].ExpectAnswer && dev.MACState.DeviceClass == ttnpb.CLASS_C {
+		if mType == ttnpb.MType_UNCONFIRMED_DOWN &&
+			spec[cmd.CID].ExpectAnswer &&
+			dev.MACState.DeviceClass == ttnpb.CLASS_C &&
+			dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 			logger.Debug("Use confirmed downlink to get immediate answer")
 			mType = ttnpb.MType_CONFIRMED_DOWN
 		}
@@ -274,7 +278,11 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 			return nil, err
 		}
 
-		cmdBuf, err = crypto.EncryptDownlink(key, dev.Session.DevAddr, pld.FHDR.FCnt, cmdBuf)
+		fCnt := pld.FHDR.FCnt
+		if pld.FPort != 0 {
+			fCnt = dev.Session.LastNFCntDown
+		}
+		cmdBuf, err = crypto.EncryptDownlink(key, dev.Session.DevAddr, fCnt, cmdBuf)
 		if err != nil {
 			return nil, errEncryptMAC.WithCause(err)
 		}

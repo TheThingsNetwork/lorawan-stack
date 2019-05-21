@@ -19,7 +19,6 @@ import (
 	"fmt"
 
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
-	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
@@ -35,14 +34,14 @@ type mockGtwGsLinkServerStream struct {
 
 func (s *mockGtwGsLinkServerStream) Send(down *ttnpb.GatewayDown) error {
 	if s.SendFunc == nil {
-		return nil
+		panic("Send called, but not set")
 	}
 	return s.SendFunc(down)
 }
 
 func (s *mockGtwGsLinkServerStream) Recv() (*ttnpb.GatewayUp, error) {
 	if s.RecvFunc == nil {
-		return nil, errors.New("not implemented")
+		panic("Recv called, but not set")
 	}
 	return s.RecvFunc()
 }

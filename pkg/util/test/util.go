@@ -15,6 +15,7 @@
 package test
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"strconv"
@@ -67,25 +68,49 @@ func MustMultiple(vs ...interface{}) []interface{} {
 	return vs[:n-1]
 }
 
-// WaitTimeout returns true if fn returns after at most d or false otherwise.
-// An example of a fn, for which this is useful would be Wait method of sync.WaitGroup.
-// Note, this function leaks a goroutine if fn never returns.
-func WaitTimeout(d time.Duration, fn func()) (ok bool) {
+// WaitTimeout returns true if f returns after at most d or false otherwise.
+// An example of a f, for which this is useful would be Wait method of sync.WaitGroup.
+// Note, this function leaks a goroutine if f never returns.
+func WaitTimeout(d time.Duration, f func()) (ok bool) {
 	done := make(chan struct{})
-
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
-
 	go func() {
 		wg.Done()
-
-		fn()
+		f()
 		close(done)
 	}()
 	wg.Wait()
 
 	select {
 	case <-time.After(d):
+		return false
+	case <-done:
+		return true
+	}
+}
+
+// WaitDeadline returns WaitTimeout(time.Until(t), f).
+func WaitDeadline(t time.Time, f func()) (ok bool) {
+	return WaitTimeout(time.Until(t), f)
+}
+
+// WaitContext returns true if f returns before <-ctx.Done() or false otherwise.
+// An example of a f, for which this is useful would be Wait method of sync.WaitGroup.
+// Note, this function leaks a goroutine if f never returns.
+func WaitContext(ctx context.Context, f func()) (ok bool) {
+	done := make(chan struct{})
+	wg := &sync.WaitGroup{}
+	wg.Add(1)
+	go func() {
+		wg.Done()
+		f()
+		close(done)
+	}()
+	wg.Wait()
+
+	select {
+	case <-ctx.Done():
 		return false
 	case <-done:
 		return true

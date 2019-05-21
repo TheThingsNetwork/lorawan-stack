@@ -17,7 +17,6 @@ package joinserver
 import (
 	"context"
 
-	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
@@ -47,32 +46,36 @@ type MockDeviceRegistry struct {
 	SetByIDFunc  func(context.Context, ttnpb.ApplicationIdentifiers, string, []string, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
 }
 
-func (r *MockDeviceRegistry) GetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error) {
-	if r.GetByEUIFunc == nil {
-		return nil, errors.New("Not implemented")
+// GetByEUI calls GetByEUIFunc if set and panics otherwise.
+func (m MockDeviceRegistry) GetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error) {
+	if m.GetByEUIFunc == nil {
+		panic("GetByEUI called, but not set")
 	}
-	return r.GetByEUIFunc(ctx, joinEUI, devEUI, paths)
+	return m.GetByEUIFunc(ctx, joinEUI, devEUI, paths)
 }
 
-func (r *MockDeviceRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, error) {
-	if r.GetByIDFunc == nil {
-		return nil, errors.New("Not implemented")
+// GetByID calls GetByIDFunc if set and panics otherwise.
+func (m MockDeviceRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, error) {
+	if m.GetByIDFunc == nil {
+		panic("GetByID called, but not set")
 	}
-	return r.GetByIDFunc(ctx, appID, devID, paths)
+	return m.GetByIDFunc(ctx, appID, devID, paths)
 }
 
-func (r *MockDeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
-	if r.SetByEUIFunc == nil {
-		return nil, errors.New("Not implemented")
+// SetByEUI calls SetByEUIFunc if set and panics otherwise.
+func (m MockDeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+	if m.SetByEUIFunc == nil {
+		panic("SetByEUI called, but not set")
 	}
-	return r.SetByEUIFunc(ctx, joinEUI, devEUI, paths, f)
+	return m.SetByEUIFunc(ctx, joinEUI, devEUI, paths, f)
 }
 
-func (r *MockDeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
-	if r.SetByIDFunc == nil {
-		return nil, errors.New("Not implemented")
+// SetByID calls SetByIDFunc if set and panics otherwise.
+func (m MockDeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+	if m.SetByIDFunc == nil {
+		panic("SetByID called, but not set")
 	}
-	return r.SetByIDFunc(ctx, appID, devID, paths, f)
+	return m.SetByIDFunc(ctx, appID, devID, paths, f)
 }
 
 type MockKeyRegistry struct {
@@ -80,16 +83,18 @@ type MockKeyRegistry struct {
 	SetByIDFunc func(context.Context, types.EUI64, []byte, []string, func(*ttnpb.SessionKeys) (*ttnpb.SessionKeys, []string, error)) (*ttnpb.SessionKeys, error)
 }
 
-func (r *MockKeyRegistry) GetByID(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
-	if r.GetByIDFunc == nil {
-		return nil, errors.New("Not implemented")
+// GetByID calls GetByIDFunc if set and panics otherwise.
+func (m MockKeyRegistry) GetByID(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
+	if m.GetByIDFunc == nil {
+		panic("GetByID called, but not set")
 	}
-	return r.GetByIDFunc(ctx, devEUI, id, paths)
+	return m.GetByIDFunc(ctx, devEUI, id, paths)
 }
 
-func (r *MockKeyRegistry) SetByID(ctx context.Context, devEUI types.EUI64, id []byte, paths []string, f func(*ttnpb.SessionKeys) (*ttnpb.SessionKeys, []string, error)) (*ttnpb.SessionKeys, error) {
-	if r.SetByIDFunc == nil {
-		return nil, errors.New("Not implemented")
+// SetByID calls SetByIDFunc if set and panics otherwise.
+func (m MockKeyRegistry) SetByID(ctx context.Context, devEUI types.EUI64, id []byte, paths []string, f func(*ttnpb.SessionKeys) (*ttnpb.SessionKeys, []string, error)) (*ttnpb.SessionKeys, error) {
+	if m.SetByIDFunc == nil {
+		panic("SetByID called, but not set")
 	}
-	return r.SetByIDFunc(ctx, devEUI, id, paths, f)
+	return m.SetByIDFunc(ctx, devEUI, id, paths, f)
 }

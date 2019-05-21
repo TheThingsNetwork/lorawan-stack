@@ -136,11 +136,6 @@ type NetworkServer struct {
 	defaultMACSettings ttnpb.MACSettings
 }
 
-// Context returns the context of the Network Server.
-func (ns *NetworkServer) Context() context.Context {
-	return ns.ctx
-}
-
 // Option configures the NetworkServer.
 type Option func(ns *NetworkServer)
 
@@ -168,7 +163,7 @@ func WithNsJsClientFunc(f NsJsClientFunc) Option {
 	}
 }
 
-// WithASUplinkHandler overrides the default function called, for sending the uplink to AS.
+// WithASUplinkHandler overrides the default function called, which is used for sending the uplink to AS.
 func WithASUplinkHandler(f func(context.Context, ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationUp) (bool, error)) Option {
 	return func(ns *NetworkServer) {
 		ns.handleASUplink = f
@@ -324,6 +319,11 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 
 	c.RegisterGRPC(ns)
 	return ns, nil
+}
+
+// Context returns the context of the Network Server.
+func (ns *NetworkServer) Context() context.Context {
+	return ns.ctx
 }
 
 // RegisterServices registers services provided by ns at s.

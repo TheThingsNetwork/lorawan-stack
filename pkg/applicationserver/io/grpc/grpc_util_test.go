@@ -33,7 +33,7 @@ type mockAppAsLinkServerStream struct {
 
 func (s *mockAppAsLinkServerStream) Send(up *ttnpb.ApplicationUp) error {
 	if s.SendFunc == nil {
-		return nil
+		panic("Send called, but not set")
 	}
 	return s.SendFunc(up)
 }
