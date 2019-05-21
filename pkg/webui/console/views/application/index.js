@@ -79,7 +79,7 @@ dispatch => ({
         icon: 'link',
       },
       {
-        title: sharedMessages.payloadFormats,
+        title: sharedMessages.payloadFormatters,
         path: `${matchedUrl}/payload-formats`,
         icon: 'payload_formats',
       },
