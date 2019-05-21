@@ -758,3 +758,260 @@ func TestTraffic(t *testing.T) {
 	}
 
 }
+
+func TestRTT(t *testing.T) {
+	a := assertions.New(t)
+	ctx := log.NewContext(test.Context(), test.GetLogger(t))
+
+	c := component.MustNew(test.GetLogger(t), &component.Config{
+		ServiceBase: config.ServiceBase{
+			HTTP: config.HTTP{
+				Listen: ":8100",
+			},
+		},
+	})
+	gs := mock.NewServer()
+	srv := New(ctx, gs)
+	c.RegisterWeb(srv)
+	test.Must(nil, c.Start())
+	defer c.Close()
+
+	gs.RegisterGateway(ctx, registeredGatewayID, &registeredGateway)
+
+	wsConn, _, err := websocket.DefaultDialer.Dial(testTrafficEndPoint, nil)
+	if !a.So(err, should.BeNil) {
+		t.Fatalf("Connection failed: %v", err)
+	}
+	defer wsConn.Close()
+
+	var gsConn *io.Connection
+	select {
+	case gsConn = <-gs.Connections():
+	case <-time.After(timeout):
+		t.Fatal("Connection timeout")
+	}
+
+	var MuxTime, RxTime float64
+	for _, tc := range []struct {
+		Name                   string
+		InputBSUpstream        interface{}
+		InputNetworkDownstream *ttnpb.DownlinkMessage
+		InputDownlinkPath      *ttnpb.DownlinkPath
+		WaitTime               time.Duration
+		ExpectedRTTStatsCount  int
+	}{
+		{
+			Name: "JoinRequest",
+			InputBSUpstream: messages.JoinRequest{
+				MHdr:     0,
+				DevEUI:   basicstation.EUI{Prefix: "DevEui", EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
+				JoinEUI:  basicstation.EUI{Prefix: "JoinEui", EUI64: types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22}},
+				DevNonce: 18000,
+				MIC:      12345678,
+				RadioMetaData: messages.RadioMetaData{
+					DataRate:  1,
+					Frequency: 868300000,
+					UpInfo: messages.UpInfo{
+						RxTime: 1548059982,
+						XTime:  12666373963464220,
+						RSSI:   89,
+						SNR:    9.25,
+					},
+				},
+			},
+			ExpectedRTTStatsCount: 0,
+		},
+		{
+			Name: "Downlink",
+			InputNetworkDownstream: &ttnpb.DownlinkMessage{
+				RawPayload: []byte("Ymxhamthc25kJ3M=="),
+				EndDeviceIDs: &ttnpb.EndDeviceIdentifiers{
+					DeviceID: "testdevice",
+					DevEUI:   eui64Ptr(types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}),
+				},
+				Settings: &ttnpb.DownlinkMessage_Request{
+					Request: &ttnpb.TxRequest{
+						Class:            ttnpb.CLASS_A,
+						Priority:         ttnpb.TxSchedulePriority_NORMAL,
+						Rx1Delay:         ttnpb.RX_DELAY_1,
+						Rx1DataRateIndex: 5,
+						Rx1Frequency:     868100000,
+					},
+				},
+				CorrelationIDs: []string{"correlation1", "correlation2"},
+			},
+
+			InputDownlinkPath: &ttnpb.DownlinkPath{
+				Path: &ttnpb.DownlinkPath_UplinkToken{
+					UplinkToken: io.MustUplinkToken(ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: registeredGatewayID}, 1553759666),
+				},
+			},
+		},
+		{
+			Name: "FollowUpTxAck",
+			InputBSUpstream: messages.TxConfirmation{
+				Diid:  1,
+				XTime: 1548059982,
+			},
+			ExpectedRTTStatsCount: 1,
+			WaitTime:              1 << 4 * test.Delay,
+		},
+		{
+			Name: "RepeatedTxAck",
+			InputBSUpstream: messages.TxConfirmation{
+				Diid:  1,
+				XTime: 1548059982,
+			},
+			ExpectedRTTStatsCount: 2,
+			WaitTime:              0,
+		},
+		{
+			Name: "UplinkFrame",
+			InputBSUpstream: messages.UplinkDataFrame{
+				MHdr:       0x40,
+				DevAddr:    0x11223344,
+				FCtrl:      0x30,
+				FPort:      0x00,
+				FCnt:       25,
+				FOpts:      "FD",
+				FRMPayload: "5fcc",
+				MIC:        12345678,
+				RadioMetaData: messages.RadioMetaData{
+					DataRate:  1,
+					Frequency: 868300000,
+					UpInfo: messages.UpInfo{
+						RxTime: 1548059982,
+						XTime:  12666373963464220,
+						RSSI:   89,
+						SNR:    9.25,
+					},
+				},
+			},
+			ExpectedRTTStatsCount: 3,
+			WaitTime:              1 << 3 * test.Delay,
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
+			if tc.InputBSUpstream != nil {
+				switch v := tc.InputBSUpstream.(type) {
+				case messages.TxConfirmation:
+					if MuxTime != 0 {
+						time.Sleep(tc.WaitTime)
+						now := float64(time.Now().UnixNano()) / float64(time.Second)
+						v.RefTime = now - RxTime + MuxTime
+					}
+					req, err := json.Marshal(v)
+					if err != nil {
+						panic(err)
+					}
+					if err := wsConn.WriteMessage(websocket.TextMessage, req); err != nil {
+						t.Fatalf("Failed to write message: %v", err)
+					}
+					select {
+					case ack := <-gsConn.TxAck():
+						if ack.Result != ttnpb.TxAcknowledgment_SUCCESS {
+							t.Fatalf("Tx Acknowledgement failed")
+						}
+					case <-time.After(timeout):
+						t.Fatalf("Read message timeout")
+					}
+
+				case messages.UplinkDataFrame:
+					if MuxTime != 0 {
+						time.Sleep(tc.WaitTime)
+						now := float64(time.Now().UnixNano()) / float64(time.Second)
+						v.RefTime = now - RxTime + MuxTime
+					}
+					req, err := json.Marshal(v)
+					if err != nil {
+						panic(err)
+					}
+					if err := wsConn.WriteMessage(websocket.TextMessage, req); err != nil {
+						t.Fatalf("Failed to write message: %v", err)
+					}
+					select {
+					case up := <-gsConn.Up():
+						var payload ttnpb.Message
+						a.So(lorawan.UnmarshalMessage(up.RawPayload, &payload), should.BeNil)
+						if !a.So(&payload, should.Resemble, up.Payload) {
+							t.Fatalf("Invalid RawPayload: %v", up.RawPayload)
+						}
+					case <-time.After(timeout):
+						t.Fatalf("Read message timeout")
+					}
+
+				case messages.JoinRequest:
+					if MuxTime != 0 {
+						time.Sleep(tc.WaitTime)
+						now := float64(time.Now().Unix()) + float64(time.Now().Nanosecond())/(1e9)
+						v.RefTime = now - RxTime + MuxTime
+					}
+					req, err := json.Marshal(v)
+					if err != nil {
+						panic(err)
+					}
+					if err := wsConn.WriteMessage(websocket.TextMessage, req); err != nil {
+						t.Fatalf("Failed to write message: %v", err)
+					}
+					select {
+					case up := <-gsConn.Up():
+						var payload ttnpb.Message
+						a.So(lorawan.UnmarshalMessage(up.RawPayload, &payload), should.BeNil)
+						if !a.So(&payload, should.Resemble, up.Payload) {
+							t.Fatalf("Invalid RawPayload: %v", up.RawPayload)
+						}
+					case <-time.After(timeout):
+						t.Fatalf("Read message timeout")
+					}
+				}
+
+				if MuxTime > 0 {
+					// Atleast one downlink is needed for the first muxtime
+					min, max, median, count := gsConn.RTTStats()
+					if !a.So(count, should.Equal, tc.ExpectedRTTStatsCount) {
+						t.Fatalf("Incorrect Stats entries recorded: %d", count)
+					}
+					if !a.So(min, should.BeGreaterThan, 0) {
+						t.Fatalf("Incorrect min: %s", min)
+					}
+					if tc.ExpectedRTTStatsCount > 1 {
+						if !a.So(max, should.BeGreaterThan, min) {
+							t.Fatalf("Incorrect max: %s", max)
+						}
+						if !a.So(median, should.BeBetween, min, max) {
+							t.Fatalf("Incorrect median: %s", median)
+						}
+					}
+				}
+			}
+
+			if tc.InputNetworkDownstream != nil {
+				if _, err := gsConn.SendDown(tc.InputDownlinkPath, tc.InputNetworkDownstream); err != nil {
+					t.Fatalf("Failed to send downlink: %v", err)
+				}
+
+				resCh := make(chan []byte)
+				go func() {
+					_, data, err := wsConn.ReadMessage()
+					if err != nil {
+						t.Fatalf("Failed to read message: %v", err)
+					}
+					resCh <- data
+				}()
+				select {
+				case res := <-resCh:
+					var msg messages.DownlinkMessage
+					if err := json.Unmarshal(res, &msg); err != nil {
+						t.Fatalf("Failed to unmarshal response `%s`: %v", string(res), err)
+					}
+					MuxTime = msg.MuxTime
+					RxTime = float64(time.Now().Unix()) + float64(time.Now().Nanosecond())/(1e9)
+				case <-time.After(timeout):
+					t.Fatalf("Read message timeout")
+				}
+			}
+		})
+	}
+
+}
