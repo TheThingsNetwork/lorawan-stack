@@ -32,7 +32,7 @@ func ID(prefix string) echo.MiddlewareFunc {
 	gen := newID(prefix)
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			id := c.Request().Header.Get("X-Request-ID")
+			id := c.Request().Header.Get(echo.HeaderXRequestID)
 
 			if id == "" {
 				var err error
@@ -41,9 +41,9 @@ func ID(prefix string) echo.MiddlewareFunc {
 					return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Failed to generate request ID: %s", err))
 				}
 			}
-			c.Request().Header.Set("X-Request-ID", id)
+			c.Request().Header.Set(echo.HeaderXRequestID, id)
 			c.Request().Header.Set("Grpc-Metadata-Request-ID", id)
-			c.Response().Header().Set("X-Request-ID", id)
+			c.Response().Header().Set(echo.HeaderXRequestID, id)
 			return next(c)
 		}
 	}
