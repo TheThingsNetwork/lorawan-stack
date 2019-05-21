@@ -36,15 +36,20 @@ import {
   startApplicationEventsStream,
   stopApplicationEventsStream,
 } from '../../store/actions/application'
+import {
+  selectSelectedApplication,
+  selectApplicationError,
+  selectApplicationFetching,
+} from '../../store/selectors/application'
 
 import Devices from '../devices'
 
-@connect(function ({ application }, props) {
+@connect(function (state, props) {
   return {
     appId: props.match.params.appId,
-    fetching: application.fetching,
-    application: application.application,
-    error: application.error,
+    fetching: selectApplicationFetching(state),
+    application: selectSelectedApplication(state),
+    error: selectApplicationError(state),
   }
 },
 dispatch => ({

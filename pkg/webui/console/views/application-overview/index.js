@@ -22,13 +22,15 @@ import DevicesTable from '../../containers/devices-table'
 import DataSheet from '../../../components/data-sheet'
 import ApplicationEvents from '../../containers/application-events'
 
+import { selectSelectedApplication } from '../../store/selectors/application'
+
 import style from './application-overview.styl'
 
 const DEVICES_TABLE_SIZE = 5
 
-@connect(function ({ application }, props) {
+@connect(function (state) {
   return {
-    application: application.application,
+    application: selectSelectedApplication(state),
   }
 })
 class ApplicationOverview extends React.Component {

@@ -25,11 +25,11 @@ import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import PayloadFormattersForm from '../../components/payload-formatters-form'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import PAYLOAD_FORMATTER_TYPES from '../../constants/formatter-types'
-import { getApplicationId } from '../../../lib/selectors/id'
 import { updateApplicationLinkSuccess } from '../../store/actions/link'
 import {
   selectApplicationIsLinked,
   selectApplicationLinkFormatters,
+  selectSelectedApplicationId,
 } from '../../store/selectors/application'
 
 import api from '../../api'
@@ -40,11 +40,10 @@ const m = defineMessages({
 })
 
 @connect(function (state) {
-  const application = state.application.application
   const formatters = selectApplicationLinkFormatters(state) || {}
 
   return {
-    appId: getApplicationId(application),
+    appId: selectSelectedApplicationId(state),
     linked: selectApplicationIsLinked(state) || false,
     formatters,
   }

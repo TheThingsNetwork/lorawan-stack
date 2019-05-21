@@ -46,8 +46,8 @@ import {
   selectApplicationLinkStats,
   selectApplicationLinkFetching,
   selectApplicationLinkError,
+  selectSelectedApplicationId,
 } from '../../store/selectors/application'
-import { getApplicationId } from '../../../lib/selectors/id'
 
 import api from '../../api'
 
@@ -79,10 +79,8 @@ const validationSchema = Yup.object().shape({
 })
 
 @connect(function (state) {
-  const application = state.application.application
-
   return {
-    appId: getApplicationId(application),
+    appId: selectSelectedApplicationId(state),
     link: selectApplicationLink(state),
     stats: selectApplicationLinkStats(state),
     fetching: selectApplicationLinkFetching(state),
@@ -95,12 +93,14 @@ dispatch => ({
   updateLinkSuccess: (link, stats) => dispatch(updateApplicationLinkSuccess(link, stats)),
   deleteLinkSuccess: () => dispatch(deleteApplicationLinkSuccess()),
 }))
+@connect(function (state, props) {
+  return {
+  }
+})
 @withBreadcrumb('apps.single.link', function (props) {
-  const { appId } = props
-
   return (
     <Breadcrumb
-      path={`/console/applications/${appId}/link`}
+      path={`/console/applications/${props.appId}/link`}
       icon="link"
       content={sharedMessages.link}
     />
