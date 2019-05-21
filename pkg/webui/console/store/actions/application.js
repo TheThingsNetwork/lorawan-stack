@@ -19,8 +19,6 @@ import {
   createGetApiKeysListFailureActionType,
   getApiKeysListSuccess,
   createGetApiKeysListSuccessActionType,
-  getApiKey,
-  createGetApiKeyActionType,
 } from '../actions/api-keys'
 
 import {
@@ -47,6 +45,15 @@ import {
   createClearEventsActionType,
 } from '../actions/events'
 
+import {
+  getApiKey,
+  createGetApiKeyActionType,
+  getApiKeySuccess,
+  createGetApiKeySuccessActionType,
+  getApiKeyFailure,
+  createGetApiKeyFailureActionType,
+} from './api-key'
+
 export const SHARED_NAME = 'APPLICATION'
 
 export const GET_APP = 'GET_APPLICATION'
@@ -55,7 +62,9 @@ export const GET_APP_FAILURE = 'GET_APPLICATION_FAILURE'
 export const GET_APP_API_KEYS_LIST = createGetApiKeysListActionType(SHARED_NAME)
 export const GET_APP_API_KEYS_LIST_SUCCESS = createGetApiKeysListSuccessActionType(SHARED_NAME)
 export const GET_APP_API_KEYS_LIST_FAILURE = createGetApiKeysListFailureActionType(SHARED_NAME)
-export const GET_APP_API_KEY_PAGE_DATA = createGetApiKeyActionType(SHARED_NAME)
+export const GET_APP_API_KEY = createGetApiKeyActionType(SHARED_NAME)
+export const GET_APP_API_KEY_SUCCESS = createGetApiKeySuccessActionType(SHARED_NAME)
+export const GET_APP_API_KEY_FAILURE = createGetApiKeyFailureActionType(SHARED_NAME)
 export const GET_APP_COLLABORATOR_PAGE_DATA = createGetCollaboratorActionType(SHARED_NAME)
 export const GET_APP_COLLABORATORS_LIST = createGetCollaboratorsListActionType(SHARED_NAME)
 export const GET_APP_COLLABORATORS_LIST_SUCCESS = createGetCollaboratorsListSuccessActionType(SHARED_NAME)
@@ -84,7 +93,11 @@ export const getApplicationApiKeysListSuccess = getApiKeysListSuccess(SHARED_NAM
 
 export const getApplicationApiKeysListFailure = getApiKeysListFailure(SHARED_NAME)
 
-export const getApplicationApiKeyPageData = getApiKey(SHARED_NAME)
+export const getApplicationApiKey = getApiKey(SHARED_NAME)
+
+export const getApplicationApiKeySuccess = getApiKeySuccess(SHARED_NAME)
+
+export const getApplicationApiKeyFailure = getApiKeyFailure(SHARED_NAME)
 
 export const getApplicationCollaboratorsList = getCollaboratorsList(SHARED_NAME)
 

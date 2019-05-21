@@ -34,10 +34,7 @@ const getApplicationLogic = createLogic({
 })
 
 const getApplicationApiKeysLogic = createLogic({
-  type: [
-    application.GET_APP_API_KEYS_LIST,
-    application.GET_APP_API_KEY_PAGE_DATA,
-  ],
+  type: application.GET_APP_API_KEYS_LIST,
   async process ({ getState, action }, dispatch, done) {
     const { id, params } = action
     try {
@@ -51,6 +48,21 @@ const getApplicationApiKeysLogic = createLogic({
       )
     } catch (e) {
       dispatch(application.getApplicationApiKeysListFailure(id, e))
+    }
+
+    done()
+  },
+})
+
+const getApplicationApiKeyLogic = createLogic({
+  type: application.GET_APP_API_KEY,
+  async process ({ action }, dispatch, done) {
+    const { entityId, keyId } = action
+    try {
+      const key = await api.application.apiKeys.get(entityId, keyId)
+      dispatch(application.getApplicationApiKeySuccess(key))
+    } catch (error) {
+      dispatch(application.getApplicationApiKeyFailure(error))
     }
 
     done()
@@ -98,6 +110,7 @@ const getApplicationCollaboratorsLogic = createLogic({
 export default [
   getApplicationLogic,
   getApplicationApiKeysLogic,
+  getApplicationApiKeyLogic,
   getApplicationCollaboratorsLogic,
   ...createEventsConnectLogics(application.SHARED_NAME, 'application'),
 ]

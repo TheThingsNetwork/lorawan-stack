@@ -32,6 +32,7 @@ import createNamedApiKeysReducer from './api-keys'
 import createNamedRightsReducer from './rights'
 import createNamedCollaboratorsReducer from './collaborators'
 import createNamedEventsReducer from './events'
+import createNamedApiKeyReducer from './api-key'
 
 export default combineReducers({
   user,
@@ -45,6 +46,7 @@ export default combineReducers({
   gateway,
   configuration,
   apiKeys: combineReducers({
+    application: createNamedApiKeyReducer(APPLICATION_SHARED_NAME),
     applications: createNamedApiKeysReducer(APPLICATION_SHARED_NAME),
     gateways: createNamedApiKeysReducer(GATEWAY_SHARED_NAME),
   }),
