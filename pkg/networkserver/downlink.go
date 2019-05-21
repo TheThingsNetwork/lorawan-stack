@@ -118,36 +118,58 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 	dev.MACState.QueuedResponses = nil
 	dev.MACState.PendingRequests = dev.MACState.PendingRequests[:0]
 
-	maxDownLen, maxUpLen, ok, err := enqueueLinkADRReq(ctx, dev, maxDownLen, maxUpLen, ns.FrequencyPlans)
-	if err != nil {
-		return nil, err
+	enqueuers := make([]func(context.Context, *ttnpb.EndDevice, uint16, uint16) (uint16, uint16, bool), 0, 13)
+	if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0) >= 0 {
+		enqueuers = append(enqueuers,
+			enqueueDutyCycleReq,
+			enqueueRxParamSetupReq,
+			func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) (uint16, uint16, bool) {
+				return enqueueDevStatusReq(ctx, dev, maxDownLen, maxUpLen, ns.defaultMACSettings)
+			},
+			enqueueNewChannelReq,
+			func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) (uint16, uint16, bool) {
+				// NOTE: LinkADRReq must be enqueued after NewChannelReq.
+				newMaxDownLen, newMaxUpLen, ok, err := enqueueLinkADRReq(ctx, dev, maxDownLen, maxUpLen, ns.FrequencyPlans)
+				if err != nil {
+					logger.WithError(err).Error("Failed to enqueue LinkADRReq")
+					return maxDownLen, maxUpLen, false
+				}
+				return newMaxDownLen, newMaxUpLen, ok
+			},
+			enqueueRxTimingSetupReq,
+		)
+		if dev.MACState.DeviceClass == ttnpb.CLASS_B {
+			enqueuers = append(enqueuers,
+				enqueuePingSlotChannelReq,
+				enqueueBeaconFreqReq,
+			)
+		}
 	}
-	fPending := !ok
-	for _, f := range []func(context.Context, *ttnpb.EndDevice, uint16, uint16) (uint16, uint16, bool){
-		// LoRaWAN 1.0+
-		enqueueNewChannelReq,
-		enqueueDutyCycleReq,
-		enqueueRxParamSetupReq,
-		func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) (uint16, uint16, bool) {
-			return enqueueDevStatusReq(ctx, dev, maxDownLen, maxUpLen, ns.defaultMACSettings)
-		},
-		enqueueRxTimingSetupReq,
-		enqueuePingSlotChannelReq,
-		enqueueBeaconFreqReq,
+	if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_2) >= 0 {
+		if phy.TxParamSetupReqSupport {
+			enqueuers = append(enqueuers,
+				enqueueTxParamSetupReq,
+			)
+		}
+		enqueuers = append(enqueuers,
+			enqueueDLChannelReq,
+		)
+	}
+	if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
+		enqueuers = append(enqueuers,
+			enqueueADRParamSetupReq,
+			enqueueForceRejoinReq,
+			enqueueRejoinParamSetupReq,
+		)
+	}
 
-		// LoRaWAN 1.0.2+
-		enqueueTxParamSetupReq,
-		enqueueDLChannelReq,
-
-		// LoRaWAN 1.1+
-		enqueueADRParamSetupReq,
-		enqueueForceRejoinReq,
-		enqueueRejoinParamSetupReq,
-	} {
+	var fPending bool
+	for _, f := range enqueuers {
 		var ok bool
 		maxDownLen, maxUpLen, ok = f(ctx, dev, maxDownLen, maxUpLen)
 		fPending = fPending || !ok
 	}
+
 	cmds = append(cmds, dev.MACState.PendingRequests...)
 
 	mType := ttnpb.MType_UNCONFIRMED_DOWN
@@ -589,7 +611,7 @@ func txRequestFromUplink(phy band.Band, macState *ttnpb.MACState, rx1, rx2 bool,
 			macState.CurrentParameters.Channels[int(rx1ChIdx)].DownlinkFrequency == 0 {
 			return nil, errCorruptedMACState
 		}
-		rx1DRIdx, err := phy.Rx1DataRate(up.Settings.DataRateIndex, macState.CurrentParameters.Rx1DataRateOffset, macState.CurrentParameters.DownlinkDwellTime)
+		rx1DRIdx, err := phy.Rx1DataRate(up.Settings.DataRateIndex, macState.CurrentParameters.Rx1DataRateOffset, macState.CurrentParameters.DownlinkDwellTime.GetValue())
 		if err != nil {
 			return nil, err
 		}
