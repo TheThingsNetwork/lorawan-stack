@@ -51,8 +51,9 @@ func Log(logger log.Interface) echo.MiddlewareFunc {
 
 			var statusCode int
 			if err != nil {
-				statusCode, err = web.ProcessError(err)
-				logger = logger.WithError(err)
+				var processedErr error
+				statusCode, processedErr = web.ProcessError(err)
+				logger = logger.WithError(processedErr)
 			} else {
 				res := c.Response()
 				statusCode = res.Status
