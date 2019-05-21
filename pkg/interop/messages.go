@@ -197,16 +197,21 @@ func parseMessage() echo.MiddlewareFunc {
 	}
 }
 
-// verifySenderID verifies whether the SenderID of the message is authorized for the request according to the given
-// trusted certificates per sender.
-func verifySenderID(senderClientCAs map[string][]*x509.Certificate) echo.MiddlewareFunc {
+// verifySenderID verifies whether the SenderID of the message is authorized for the request according to the trusted
+// certificates that are provided through the given callback.
+func verifySenderID(getSenderClientCAs func(string) []*x509.Certificate) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			header := c.Get(headerKey).(*RawMessageHeader)
+			senderClientCAs := getSenderClientCAs(header.SenderID)
+			if len(senderClientCAs) == 0 {
+				c.NoContent(http.StatusForbidden)
+				return nil
+			}
 			if state := c.Request().TLS; state != nil {
 				for _, chain := range state.VerifiedChains {
 					for _, cert := range chain {
-						for _, senderCA := range senderClientCAs[header.SenderID] {
+						for _, senderCA := range senderClientCAs {
 							if cert.Equal(senderCA) {
 								return next(c)
 							}
