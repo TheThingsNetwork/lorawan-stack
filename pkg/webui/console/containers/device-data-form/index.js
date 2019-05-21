@@ -320,7 +320,10 @@ class DeviceDataForm extends Component {
         </FieldGroup>
         {otaa ? this.OTAASection : this.ABPSection}
         <SubmitBar>
-          <Button type="submit" message={m.createDevice} />
+          <Button
+            type="submit"
+            message={update ? sharedMessages.saveChanges : m.createDevice}
+          />
         </SubmitBar>
       </Form>
     )
