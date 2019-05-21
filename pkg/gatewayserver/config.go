@@ -40,6 +40,8 @@ type BasicStationConfig struct {
 type Config struct {
 	RequireRegisteredGateways bool `name:"require-registered-gateways" description:"Require the gateways to be registered in the Identity Server"`
 
+	Forward map[string][]string `name:"forward" description:"Forward the DevAddr prefixes to the specified hosts"`
+
 	MQTT         MQTTConfig         `name:"mqtt"`
 	MQTTV2       MQTTConfig         `name:"mqtt-v2"`
 	UDP          UDPConfig          `name:"udp"`
