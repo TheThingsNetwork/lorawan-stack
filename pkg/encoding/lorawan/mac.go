@@ -37,11 +37,17 @@ const maxGPSTime int64 = 1<<32 - 1
 type MACCommandDescriptor struct {
 	InitiatedByDevice bool
 	ExpectAnswer      bool
-	UplinkLength      uint16
-	DownlinkLength    uint16
-	AppendUplink      func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error)
-	UnmarshalUplink   func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error
-	AppendDownlink    func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error)
+	// UplinkLength is length of uplink payload.
+	UplinkLength uint16
+	// DownlinkLength is length of downlink payload.
+	DownlinkLength uint16
+	// AppendUplink appends uplink payload of cmd to b.
+	AppendUplink func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error)
+	// UnmarshalUplink unmarshals uplink payload b into cmd.
+	UnmarshalUplink func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error
+	// AppendDownlink appends uplink payload of cmd to b.
+	AppendDownlink func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error)
+	// UnmarshalDownlink unmarshals downlink payload b into cmd.
 	UnmarshalDownlink func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error
 }
 
