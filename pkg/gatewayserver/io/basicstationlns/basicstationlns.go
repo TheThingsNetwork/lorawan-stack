@@ -304,10 +304,10 @@ func (s *srv) handleTraffic(c echo.Context) error {
 			if cids, _, ok := s.tokens.Get(uint16(txConf.Diid), receivedAt); ok {
 				txAck := messages.ToTxAcknowledgment(cids)
 				if err := conn.HandleTxAck(&txAck); err != nil {
-					logger.WithFields(log.Fields("diid", txConf.Diid)).Debug("Failed to handle Tx acknowledgement")
+					logger.WithField("diid", txConf.Diid).Debug("Failed to handle Tx acknowledgement")
 				}
 			} else {
-				logger.Warn("TxAck either does not correspond to a downlink message or arrived too late")
+				logger.WithField("diid", txConf.Diid).Debug("Tx acknowledgement either does not correspond to a downlink message or arrived too late")
 			}
 			recordRTT(conn, receivedAt, txConf.RefTime)
 
