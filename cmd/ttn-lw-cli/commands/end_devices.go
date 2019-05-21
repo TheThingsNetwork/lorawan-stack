@@ -241,7 +241,7 @@ var (
 				jsPaths = nil
 			}
 
-			nsMismatch, asMismatch, jsMismatch := compareServerAddresses(device, config)
+			nsMismatch, asMismatch, jsMismatch := compareServerAddressesEndDevice(device, config)
 			if len(nsPaths) > 0 && nsMismatch {
 				logger.WithField("paths", nsPaths).Warn("Deselecting Network Server paths")
 				nsPaths = nil
@@ -522,8 +522,8 @@ var (
 				return errNoEndDeviceEUI
 			}
 
-			if nsMismatch, asMismatch, jsMismatch := compareServerAddresses(existingDevice, config); nsMismatch || asMismatch || jsMismatch {
-				return errAddressMismatch
+			if nsMismatch, asMismatch, jsMismatch := compareServerAddressesEndDevice(existingDevice, config); nsMismatch || asMismatch || jsMismatch {
+				return errAddressMismatchEndDevice
 			}
 
 			res, err := setEndDevice(&device, isPaths, nsPaths, asPaths, jsPaths, false)
@@ -670,8 +670,8 @@ var (
 				devID.DevEUI = existingDevice.DevEUI
 			}
 
-			if nsMismatch, asMismatch, jsMismatch := compareServerAddresses(existingDevice, config); nsMismatch || asMismatch || jsMismatch {
-				return errAddressMismatch
+			if nsMismatch, asMismatch, jsMismatch := compareServerAddressesEndDevice(existingDevice, config); nsMismatch || asMismatch || jsMismatch {
+				return errAddressMismatchEndDevice
 			}
 
 			return deleteEndDevice(ctx, devID)
@@ -740,9 +740,9 @@ func init() {
 	Root.AddCommand(endDevicesCommand)
 }
 
-var errAddressMismatch = errors.DefineAborted("address_mismatch", "server address mismatch")
+var errAddressMismatchEndDevice = errors.DefineAborted("end_device_server_address_mismatch", "network/application/join server address mismatch")
 
-func compareServerAddresses(device *ttnpb.EndDevice, config *Config) (nsMismatch, asMismatch, jsMismatch bool) {
+func compareServerAddressesEndDevice(device *ttnpb.EndDevice, config *Config) (nsMismatch, asMismatch, jsMismatch bool) {
 	nsHost, asHost, jsHost := getHost(config.NetworkServerGRPCAddress), getHost(config.ApplicationServerGRPCAddress), getHost(config.JoinServerGRPCAddress)
 	if host := getHost(device.NetworkServerAddress); host != "" && host != nsHost {
 		nsMismatch = true

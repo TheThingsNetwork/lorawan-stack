@@ -1133,15 +1133,6 @@
       "file": "errors.go"
     }
   },
-  "error:cmd/ttn-lw-cli/commands:address_mismatch": {
-    "translations": {
-      "en": "server address mismatch"
-    },
-    "description": {
-      "package": "cmd/ttn-lw-cli/commands",
-      "file": "end_devices.go"
-    }
-  },
   "error:cmd/ttn-lw-cli/commands:antenna_index": {
     "translations": {
       "en": "index of antenna to update out of bounds"
@@ -1185,6 +1176,24 @@
     "description": {
       "package": "cmd/ttn-lw-cli/commands",
       "file": "end_devices.go"
+    }
+  },
+  "error:cmd/ttn-lw-cli/commands:end_device_server_address_mismatch": {
+    "translations": {
+      "en": "network/application/join server address mismatch"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "end_devices.go"
+    }
+  },
+  "error:cmd/ttn-lw-cli/commands:gateway_server_address_mismatch": {
+    "translations": {
+      "en": "gateway server address mismatch"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "gateways.go"
     }
   },
   "error:cmd/ttn-lw-cli/commands:inconsistent_end_device_eui": {
