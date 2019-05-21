@@ -16,6 +16,7 @@ package interop
 
 import (
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -144,8 +145,32 @@ func (b *Buffer) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// KeyEnvelope contains a wrapped session key.
-type KeyEnvelope struct {
-	KEKLabel string
-	AESKey   Buffer
+// KeyEnvelope contains a (encrypted) key.
+type KeyEnvelope ttnpb.KeyEnvelope
+
+// MarshalJSON marshals the key envelope to JSON.
+func (k KeyEnvelope) MarshalJSON() ([]byte, error) {
+	return json.Marshal(struct {
+		KEKLabel string
+		AESKey   Buffer
+	}{
+		KEKLabel: k.KEKLabel,
+		AESKey:   Buffer(k.EncryptedKey),
+	})
+}
+
+// UnmarshalJSON unmarshals the key envelope from JSON.
+func (k *KeyEnvelope) UnmarshalJSON(data []byte) error {
+	aux := struct {
+		KEKLabel string
+		AESKey   Buffer
+	}{}
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+	*k = KeyEnvelope{
+		KEKLabel:     aux.KEKLabel,
+		EncryptedKey: aux.AESKey,
+	}
+	return nil
 }

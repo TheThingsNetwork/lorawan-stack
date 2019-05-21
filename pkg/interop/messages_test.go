@@ -158,7 +158,7 @@ func TestParseMessage(t *testing.T) {
 				"PHYPayload": "010203040506",
 				"DevEUI": "0102030405060708",
 				"DevAddr": "01020304",
-				"DLSettings": "010203040506",
+				"DLSettings": "FF",
 				"RxDelay": 5,
 				"CFList": "010203040506"
 			}`),
@@ -183,9 +183,64 @@ func TestParseMessage(t *testing.T) {
 					PHYPayload: Buffer{0x1, 0x2, 0x3, 0x4, 0x5, 0x6},
 					DevEUI:     types.EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
 					DevAddr:    types.DevAddr{0x1, 0x2, 0x3, 0x4},
-					DLSettings: Buffer{0x1, 0x2, 0x3, 0x4, 0x5, 0x6},
+					DLSettings: Buffer{0xff},
 					RxDelay:    ttnpb.RX_DELAY_5,
 					CFList:     Buffer{0x1, 0x2, 0x3, 0x4, 0x5, 0x6},
+				})
+			},
+			ResponseAssertion: func(t *testing.T, statusCode int, data []byte) bool {
+				a := assertions.New(t)
+				return a.So(statusCode, should.Equal, http.StatusOK)
+			},
+		},
+		{
+			Name: "ValidJoinAns",
+			Request: []byte(`{
+				"ProtocolVersion": "1.0",
+				"MessageType": "JoinAns",
+				"SenderID": "0102030405060708",
+				"ReceiverID": "010203",
+				"SenderToken": "01",
+				"PHYPayload": "010203040506",
+				"Result": "Success",
+				"Lifetime": 3600,
+				"NwkSKey": {
+					"KEKLabel": "",
+					"AESKey": "000102030405060708090A0B0C0D0E0F"
+				},
+				"AppSKey": {
+					"KEKLabel": "",
+					"AESKey": "000102030405060708090A0B0C0D0E0F"
+				},
+				"SessionKeyID": "01020304"
+			}`),
+			RequestHeaderAssertion: func(t *testing.T, header RawMessageHeader) bool {
+				a := assertions.New(t)
+				return a.So(header.MessageType, should.Equal, "JoinAns")
+			},
+			RequestMessageAssertion: func(t *testing.T, msg interface{}) bool {
+				a := assertions.New(t)
+				return a.So(msg, should.Resemble, &JoinAns{
+					JsNsMessageHeader: JsNsMessageHeader{
+						MessageHeader: MessageHeader{
+							ProtocolVersion: "1.0",
+							MessageType:     MessageTypeJoinAns,
+							SenderToken:     []byte{0x1},
+							TransactionID:   0,
+						},
+						SenderID:   types.EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
+						ReceiverID: types.NetID{0x1, 0x2, 0x3},
+					},
+					PHYPayload: Buffer{0x1, 0x2, 0x3, 0x4, 0x5, 0x6},
+					Result:     ResultSuccess,
+					Lifetime:   3600,
+					NwkSKey: (*KeyEnvelope)(&ttnpb.KeyEnvelope{
+						EncryptedKey: []byte{0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf},
+					}),
+					AppSKey: (*KeyEnvelope)(&ttnpb.KeyEnvelope{
+						EncryptedKey: []byte{0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf},
+					}),
+					SessionKeyID: []byte{0x1, 0x2, 0x3, 0x4},
 				})
 			},
 			ResponseAssertion: func(t *testing.T, statusCode int, data []byte) bool {

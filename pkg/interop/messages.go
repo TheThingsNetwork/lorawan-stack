@@ -181,6 +181,8 @@ func parseMessage() echo.MiddlewareFunc {
 			switch header.MessageType {
 			case MessageTypeJoinReq:
 				msg = &JoinReq{}
+			case MessageTypeJoinAns:
+				msg = &JoinAns{}
 			default:
 				return ErrMalformedMessage
 			}
