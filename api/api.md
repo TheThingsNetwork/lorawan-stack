@@ -1388,8 +1388,6 @@ This is used internally by the Network Server and is read only.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `max_eirp` | [`float`](#float) |  | Maximum EIRP (dBm). |
-| `uplink_dwell_time` | [`bool`](#bool) |  | Uplink dwell time is set (400ms). |
-| `downlink_dwell_time` | [`bool`](#bool) |  | Downlink dwell time is set (400ms). |
 | `adr_data_rate_index` | [`DataRateIndex`](#ttn.lorawan.v3.DataRateIndex) |  | ADR: data rate index to use. |
 | `adr_tx_power_index` | [`uint32`](#uint32) |  | ADR: transmission power index to use. |
 | `adr_nb_trans` | [`uint32`](#uint32) |  | ADR: number of retransmissions. |
@@ -1406,6 +1404,8 @@ This is used internally by the Network Server and is read only.
 | `ping_slot_data_rate_index` | [`DataRateIndex`](#ttn.lorawan.v3.DataRateIndex) |  | Data rate index of the class B ping slot. |
 | `beacon_frequency` | [`uint64`](#uint64) |  | Frequency of the class B beacon (Hz). |
 | `channels` | [`MACParameters.Channel`](#ttn.lorawan.v3.MACParameters.Channel) | repeated | Configured uplink channels and optionally Rx1 frequency. |
+| `uplink_dwell_time` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  | Whether uplink dwell time is set (400ms). If this field is not set, then the value is either unknown or irrelevant(Network Server cannot modify it). |
+| `downlink_dwell_time` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  | Whether downlink dwell time is set (400ms). If this field is not set, then the value is either unknown or irrelevant(Network Server cannot modify it). |
 
 #### Field Rules
 

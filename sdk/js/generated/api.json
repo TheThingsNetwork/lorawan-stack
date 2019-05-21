@@ -4717,26 +4717,6 @@
               "defaultValue": ""
             },
             {
-              "name": "uplink_dwell_time",
-              "description": "Uplink dwell time is set (400ms).",
-              "label": "",
-              "type": "bool",
-              "longType": "bool",
-              "fullType": "bool",
-              "ismap": false,
-              "defaultValue": ""
-            },
-            {
-              "name": "downlink_dwell_time",
-              "description": "Downlink dwell time is set (400ms).",
-              "label": "",
-              "type": "bool",
-              "longType": "bool",
-              "fullType": "bool",
-              "ismap": false,
-              "defaultValue": ""
-            },
-            {
               "name": "adr_data_rate_index",
               "description": "ADR: data rate index to use.",
               "label": "",
@@ -5039,6 +5019,26 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "uplink_dwell_time",
+              "description": "Whether uplink dwell time is set (400ms).\nIf this field is not set, then the value is either unknown or irrelevant(Network Server cannot modify it).",
+              "label": "",
+              "type": "BoolValue",
+              "longType": "google.protobuf.BoolValue",
+              "fullType": "google.protobuf.BoolValue",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "downlink_dwell_time",
+              "description": "Whether downlink dwell time is set (400ms).\nIf this field is not set, then the value is either unknown or irrelevant(Network Server cannot modify it).",
+              "label": "",
+              "type": "BoolValue",
+              "longType": "google.protobuf.BoolValue",
+              "fullType": "google.protobuf.BoolValue",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },

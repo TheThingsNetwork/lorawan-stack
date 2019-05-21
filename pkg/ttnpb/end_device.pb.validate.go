@@ -162,10 +162,6 @@ func (m *MACParameters) ValidateFields(paths ...string) error {
 		switch name {
 		case "max_eirp":
 			// no validation rules for MaxEIRP
-		case "uplink_dwell_time":
-			// no validation rules for UplinkDwellTime
-		case "downlink_dwell_time":
-			// no validation rules for DownlinkDwellTime
 		case "adr_data_rate_index":
 
 			if _, ok := DataRateIndex_name[int32(m.GetADRDataRateIndex())]; !ok {
@@ -323,6 +319,30 @@ func (m *MACParameters) ValidateFields(paths ...string) error {
 					}
 				}
 
+			}
+
+		case "uplink_dwell_time":
+
+			if v, ok := interface{}(m.GetUplinkDwellTime()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MACParametersValidationError{
+						field:  "uplink_dwell_time",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "downlink_dwell_time":
+
+			if v, ok := interface{}(m.GetDownlinkDwellTime()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MACParametersValidationError{
+						field:  "downlink_dwell_time",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
 			}
 
 		default:

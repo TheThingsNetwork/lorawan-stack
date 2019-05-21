@@ -112,26 +112,6 @@ func (dst *MACParameters) SetFields(src *MACParameters, paths ...string) error {
 				var zero float32
 				dst.MaxEIRP = zero
 			}
-		case "uplink_dwell_time":
-			if len(subs) > 0 {
-				return fmt.Errorf("'uplink_dwell_time' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.UplinkDwellTime = src.UplinkDwellTime
-			} else {
-				var zero bool
-				dst.UplinkDwellTime = zero
-			}
-		case "downlink_dwell_time":
-			if len(subs) > 0 {
-				return fmt.Errorf("'downlink_dwell_time' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.DownlinkDwellTime = src.DownlinkDwellTime
-			} else {
-				var zero bool
-				dst.DownlinkDwellTime = zero
-			}
 		case "adr_data_rate_index":
 			if len(subs) > 0 {
 				return fmt.Errorf("'adr_data_rate_index' has no subfields, but %s were specified", subs)
@@ -290,6 +270,24 @@ func (dst *MACParameters) SetFields(src *MACParameters, paths ...string) error {
 				dst.Channels = src.Channels
 			} else {
 				dst.Channels = nil
+			}
+		case "uplink_dwell_time":
+			if len(subs) > 0 {
+				return fmt.Errorf("'uplink_dwell_time' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.UplinkDwellTime = src.UplinkDwellTime
+			} else {
+				dst.UplinkDwellTime = nil
+			}
+		case "downlink_dwell_time":
+			if len(subs) > 0 {
+				return fmt.Errorf("'downlink_dwell_time' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DownlinkDwellTime = src.DownlinkDwellTime
+			} else {
+				dst.DownlinkDwellTime = nil
 			}
 
 		default:
