@@ -41,6 +41,7 @@ import style from './application-link.styl'
 
 const m = defineMessages({
   linkApplication: 'Link {appId}',
+  linkSettings: 'Link settings',
   linkStatistics: 'Statistics',
   linkStatus: 'Link status',
   linkStatusLinked: 'The application is linked successfully',
@@ -272,7 +273,7 @@ class ApplicationLink extends React.Component {
         </Row>
         <Row className={style.form}>
           <Col lg={6} md={12}>
-            <h3>Link settings</h3>
+            <Message component="h3" content={m.linkSettings} />
             <Form
               formikRef={this.form}
               error={error}
