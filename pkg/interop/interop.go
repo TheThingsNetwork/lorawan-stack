@@ -24,6 +24,7 @@ import (
 
 	echo "github.com/labstack/echo/v4"
 	echomiddleware "github.com/labstack/echo/v4/middleware"
+	"go.thethings.network/lorawan-stack/pkg/auth"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -188,6 +189,9 @@ func (s *Server) RegisterAS(as ApplicationServer) {
 func (s *Server) handleRequest(c echo.Context) error {
 	cid := fmt.Sprintf("interop:%s:%s", c.Request().URL.Path, c.Request().Header.Get(echo.HeaderXRequestID))
 	ctx := events.ContextWithCorrelationID(c.Request().Context(), cid)
+	if state := c.Request().TLS; state != nil {
+		ctx = auth.NewContextWithX509DN(ctx, state.PeerCertificates[0].Subject)
+	}
 
 	var ans interface{}
 	var err error
