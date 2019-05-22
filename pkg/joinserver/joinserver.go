@@ -23,11 +23,14 @@ import (
 	"math"
 	"math/rand"
 	"sort"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/oklog/ulid"
+	"go.thethings.network/lorawan-stack/pkg/auth"
+	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoservices"
@@ -140,6 +143,12 @@ var supportedMACVersions = [...]ttnpb.MACVersion{
 
 // HandleJoin handles the given join-request.
 func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (res *ttnpb.JoinResponse, err error) {
+	if _, ok := auth.X509DNFromContext(ctx); !ok {
+		if err := clusterauth.Authorized(ctx); err != nil {
+			return nil, err
+		}
+	}
+
 	logger := log.FromContext(ctx)
 	defer func() {
 		if err != nil {
@@ -201,6 +210,8 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		[]string{
 			"last_dev_nonce",
 			"last_join_nonce",
+			"net_id",
+			"network_server_address",
 			"resets_join_nonces",
 			"root_keys",
 			"used_dev_nonces",
@@ -208,6 +219,18 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			"provisioning_data",
 		},
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+			if dn, ok := auth.X509DNFromContext(ctx); ok {
+				if dev.NetID == nil {
+					return nil, nil, errNoNetID
+				}
+				if !req.NetID.Equal(*dev.NetID) {
+					return nil, nil, errNetIDMismatch.WithAttributes("net_id", req.NetID)
+				}
+				if addr := strings.ToLower(dev.NetworkServerAddress); addr != "" && addr != dn.CommonName {
+					return nil, nil, errAddressNotAuthorized.WithAttributes("address", dn.CommonName)
+				}
+			}
+
 			paths := make([]string, 0, 3)
 
 			dn := uint32(binary.BigEndian.Uint16(pld.DevNonce[:]))

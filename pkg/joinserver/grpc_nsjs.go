@@ -27,10 +27,6 @@ type nsJsServer struct {
 
 // HandleJoin is called by the Network Server to join a device.
 func (srv nsJsServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (res *ttnpb.JoinResponse, err error) {
-	// TODO: Authorize using client TLS and application rights (https://github.com/TheThingsNetwork/lorawan-stack/issues/4)
-	if err := clusterauth.Authorized(ctx); err != nil {
-		return nil, err
-	}
 	return srv.JS.HandleJoin(ctx, req)
 }
 

@@ -38,8 +38,6 @@ import (
 
 var errNotFound = errors.DefineNotFound("not_found", "not found")
 
-func eui64Ptr(eui types.EUI64) *types.EUI64 { return &eui }
-
 func TestDeviceRegistryGet(t *testing.T) {
 	registeredApplicationID := "foo-application"
 	registeredDeviceID := "foo-device"

@@ -3698,6 +3698,15 @@
       "file": "registry.go"
     }
   },
+  "error:pkg/joinserver:address_not_authorized": {
+    "translations": {
+      "en": "address `{address}` is not authorized for the entity"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/joinserver:check_mic": {
     "translations": {
       "en": "MIC check failed"
@@ -3860,6 +3869,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/joinserver:net_id_mismatch": {
+    "translations": {
+      "en": "NetID `{net_id}` does not match"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/joinserver:no_app_key": {
     "translations": {
       "en": "no AppKey specified"
@@ -3917,6 +3935,15 @@
   "error:pkg/joinserver:no_join_request": {
     "translations": {
       "en": "no JoinRequest specified"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:no_net_id": {
+    "translations": {
+      "en": "no NetID specified"
     },
     "description": {
       "package": "pkg/joinserver",
@@ -4034,6 +4061,15 @@
   "error:pkg/joinserver:reuse_dev_nonce": {
     "translations": {
       "en": "DevNonce has already been used"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:unauthenticated": {
+    "translations": {
+      "en": "unauthenticated"
     },
     "description": {
       "package": "pkg/joinserver",
