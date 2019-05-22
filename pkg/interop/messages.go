@@ -129,6 +129,35 @@ type JsNsMessageHeader struct {
 	ReceiverNSID types.NetID
 }
 
+// AsJsMessageHeader contains the message header for AS to JS messages.
+type AsJsMessageHeader struct {
+	MessageHeader
+	SenderID Buffer
+	// ReceiverID is a JoinEUI.
+	ReceiverID types.EUI64
+}
+
+// AnswerHeader returns the header of the answer message.
+func (h AsJsMessageHeader) AnswerHeader() (JsAsMessageHeader, error) {
+	header, err := h.MessageHeader.AnswerHeader()
+	if err != nil {
+		return JsAsMessageHeader{}, err
+	}
+	return JsAsMessageHeader{
+		MessageHeader: header,
+		SenderID:      h.ReceiverID,
+		ReceiverID:    h.SenderID,
+	}, nil
+}
+
+// JsAsMessageHeader contains the message header for JS to AS messages.
+type JsAsMessageHeader struct {
+	MessageHeader
+	// SenderID is a JoinEUI.
+	SenderID   types.EUI64
+	ReceiverID Buffer
+}
+
 // JoinReq is a join-request message.
 type JoinReq struct {
 	NsJsMessageHeader
@@ -153,6 +182,22 @@ type JoinAns struct {
 	NwkSKey      *KeyEnvelope `json:",omitempty"`
 	AppSKey      *KeyEnvelope `json:",omitempty"`
 	SessionKeyID Buffer       `json:",omitempty"`
+}
+
+// AppSKeyReq is a AppSKey request message.
+type AppSKeyReq struct {
+	AsJsMessageHeader
+	DevEUI       types.EUI64
+	SessionKeyID Buffer
+}
+
+// AppSKeyAns is an answer to an AppSKeyReq message.
+type AppSKeyAns struct {
+	JsAsMessageHeader
+	Result       Result
+	DevEUI       types.EUI64
+	AppSKey      KeyEnvelope
+	SessionKeyID Buffer
 }
 
 // parseMessage parses the header and the message type of the request body.
@@ -186,6 +231,10 @@ func parseMessage() echo.MiddlewareFunc {
 				msg = &JoinReq{}
 			case MessageTypeJoinAns:
 				msg = &JoinAns{}
+			case MessageTypeAppSKeyReq:
+				msg = &AppSKeyReq{}
+			case MessageTypeAppSKeyAns:
+				msg = &AppSKeyAns{}
 			default:
 				return ErrMalformedMessage
 			}

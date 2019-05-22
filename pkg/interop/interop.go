@@ -45,6 +45,7 @@ type Registerer interface {
 // JoinServer represents a Join Server.
 type JoinServer interface {
 	JoinRequest(context.Context, *JoinReq) (*JoinAns, error)
+	AppSKeyRequest(context.Context, *AppSKeyReq) (*AppSKeyAns, error)
 }
 
 // HomeNetworkServer represents a Home Network Server.
@@ -66,6 +67,10 @@ type ApplicationServer interface {
 type noopServer struct{}
 
 func (noopServer) JoinRequest(context.Context, *JoinReq) (*JoinAns, error) {
+	return nil, errNotRegistered
+}
+
+func (noopServer) AppSKeyRequest(context.Context, *AppSKeyReq) (*AppSKeyAns, error) {
 	return nil, errNotRegistered
 }
 

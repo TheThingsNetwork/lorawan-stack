@@ -252,6 +252,89 @@ func TestParseMessage(t *testing.T) {
 				return a.So(statusCode, should.Equal, http.StatusOK)
 			},
 		},
+		{
+			Name: "ValidAppSKeyReq",
+			Request: []byte(`{
+				"ProtocolVersion": "1.0",
+				"MessageType": "AppSKeyReq",
+				"SenderID": "01020304",
+				"ReceiverID": "0102030405060708",
+				"SenderToken": "01",
+				"DevEUI": "0102030405060708",
+				"SessionKeyID": "01020304"
+			}`),
+			RequestHeaderAssertion: func(t *testing.T, header RawMessageHeader) bool {
+				a := assertions.New(t)
+				return a.So(header.MessageType, should.Equal, "AppSKeyReq")
+			},
+			RequestMessageAssertion: func(t *testing.T, msg interface{}) bool {
+				a := assertions.New(t)
+				return a.So(msg, should.Resemble, &AppSKeyReq{
+					AsJsMessageHeader: AsJsMessageHeader{
+						MessageHeader: MessageHeader{
+							ProtocolVersion: "1.0",
+							MessageType:     MessageTypeAppSKeyReq,
+							SenderToken:     []byte{0x1},
+							TransactionID:   0,
+						},
+						SenderID:   Buffer{0x1, 0x2, 0x3, 0x4},
+						ReceiverID: types.EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
+					},
+					DevEUI:       types.EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
+					SessionKeyID: []byte{0x1, 0x2, 0x3, 0x4},
+				})
+			},
+			ResponseAssertion: func(t *testing.T, statusCode int, data []byte) bool {
+				a := assertions.New(t)
+				return a.So(statusCode, should.Equal, http.StatusOK)
+			},
+		},
+		{
+			Name: "ValidAppSKeyAns",
+			Request: []byte(`{
+				"ProtocolVersion": "1.0",
+				"MessageType": "AppSKeyAns",
+				"SenderID": "0102030405060708",
+				"ReceiverID": "01020304",
+				"SenderToken": "01",
+				"Result": "Success",
+				"DevEUI": "0102030405060708",
+				"AppSKey": {
+					"KEKLabel": "",
+					"AESKey": "000102030405060708090A0B0C0D0E0F"
+				},
+				"SessionKeyID": "01020304"
+			}`),
+			RequestHeaderAssertion: func(t *testing.T, header RawMessageHeader) bool {
+				a := assertions.New(t)
+				return a.So(header.MessageType, should.Equal, "AppSKeyAns")
+			},
+			RequestMessageAssertion: func(t *testing.T, msg interface{}) bool {
+				a := assertions.New(t)
+				return a.So(msg, should.Resemble, &AppSKeyAns{
+					JsAsMessageHeader: JsAsMessageHeader{
+						MessageHeader: MessageHeader{
+							ProtocolVersion: "1.0",
+							MessageType:     MessageTypeAppSKeyAns,
+							SenderToken:     []byte{0x1},
+							TransactionID:   0,
+						},
+						SenderID:   types.EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
+						ReceiverID: Buffer{0x1, 0x2, 0x3, 0x4},
+					},
+					Result: ResultSuccess,
+					DevEUI: types.EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
+					AppSKey: KeyEnvelope{
+						EncryptedKey: []byte{0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf},
+					},
+					SessionKeyID: []byte{0x1, 0x2, 0x3, 0x4},
+				})
+			},
+			ResponseAssertion: func(t *testing.T, statusCode int, data []byte) bool {
+				a := assertions.New(t)
+				return a.So(statusCode, should.Equal, http.StatusOK)
+			},
+		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			server := echo.New()
