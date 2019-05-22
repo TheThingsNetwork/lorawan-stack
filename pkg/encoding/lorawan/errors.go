@@ -22,6 +22,7 @@ var (
 	errDecode                       = errors.Define("decode", "could not decode `{lorawan_field}`")
 	errEncode                       = errors.Define("encode", "could not encode `{lorawan_field}`")
 	errEncodedFieldLengthBound      = errors.DefineInvalidArgument("encoded_field_length_bound", "`{lorawan_field}` encoded length `{value}` should between `{min}` and `{max}`", valueKey)
+	errEncodedFieldLengthEqual      = errors.DefineInvalidArgument("encoded_field_length_equal", "`{lorawan_field}` encoded length `{value}` should be `{expected}`", valueKey)
 	errEncodedFieldLengthTwoChoices = errors.DefineInvalidArgument("encoded_field_length_multiple_choices", "`{lorawan_field}` encoded length `{value}` should be equal to `{expected_1}` or `{expected_2}`", valueKey)
 	errFieldBound                   = errors.DefineInvalidArgument("field_bound", "`{lorawan_field}` should be between `{min}` and `{max}`", valueKey)
 	errFieldHasMax                  = errors.DefineInvalidArgument("field_with_max", "`{lorawan_field}` value `{value}` should be lower or equal to `{max}`", valueKey)
@@ -69,7 +70,7 @@ func errExpectedLengthEncodedBound(lorawanField string, min, max interface{}) va
 }
 
 func errExpectedLengthEncodedEqual(lorawanField string, expected interface{}) valueErr {
-	return unexpectedValue(errEncodedFieldLengthBound.WithAttributes("lorawan_field", lorawanField, "expected", expected))
+	return unexpectedValue(errEncodedFieldLengthEqual.WithAttributes("lorawan_field", lorawanField, "expected", expected))
 }
 
 func errExpectedLengthEncodedTwoChoices(lorawanField string, expected1, expected2 interface{}) valueErr {

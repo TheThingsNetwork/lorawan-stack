@@ -16,6 +16,7 @@ package interop
 
 import (
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -56,27 +57,27 @@ const (
 type Result string
 
 const (
-	ResultSuccess                = "Success"
-	ResultNoAction               = "NoAction"
-	ResultMICFailed              = "MICFailed"
-	ResultFrameReplayed          = "FrameReplayed"
-	ResultJoinReqFailed          = "JoinReqFailed"
-	ResultNoRoamingAgreement     = "NoRoamingAgreement"
-	ResultDevRoamingDisallowed   = "DevRoamingDisallowed"
-	ResultRoamingActDisallowed   = "RoamingActDisallowed"
-	ResultActivationDisallowed   = "ActivationDisallowed"
-	ResultUnknownDevEUI          = "UnknownDevEUI"
-	ResultUnknownDevAddr         = "UnknownDevAddr"
-	ResultUnknownSender          = "UnknownSender"
-	ResultUnknownReceiver        = "UnknownReceiver"
-	ResultDeferred               = "Deferred"
-	ResultXmitFailed             = "XmitFailed"
-	ResultInvalidFPort           = "InvalidFPort"
-	ResultInvalidProtocolVersion = "InvalidProtocolVersion"
-	ResultStaleDeviceProfile     = "StaleDeviceProfile"
-	ResultMalformedMessage       = "MalformedMessage"
-	ResultFrameSizeError         = "FrameSizeError"
-	ResultOther                  = "Other"
+	ResultSuccess                Result = "Success"
+	ResultNoAction               Result = "NoAction"
+	ResultMICFailed              Result = "MICFailed"
+	ResultFrameReplayed          Result = "FrameReplayed"
+	ResultJoinReqFailed          Result = "JoinReqFailed"
+	ResultNoRoamingAgreement     Result = "NoRoamingAgreement"
+	ResultDevRoamingDisallowed   Result = "DevRoamingDisallowed"
+	ResultRoamingActDisallowed   Result = "RoamingActDisallowed"
+	ResultActivationDisallowed   Result = "ActivationDisallowed"
+	ResultUnknownDevEUI          Result = "UnknownDevEUI"
+	ResultUnknownDevAddr         Result = "UnknownDevAddr"
+	ResultUnknownSender          Result = "UnknownSender"
+	ResultUnknownReceiver        Result = "UnknownReceiver"
+	ResultDeferred               Result = "Deferred"
+	ResultXmitFailed             Result = "XmitFailed"
+	ResultInvalidFPort           Result = "InvalidFPort"
+	ResultInvalidProtocolVersion Result = "InvalidProtocolVersion"
+	ResultStaleDeviceProfile     Result = "StaleDeviceProfile"
+	ResultMalformedMessage       Result = "MalformedMessage"
+	ResultFrameSizeError         Result = "FrameSizeError"
+	ResultOther                  Result = "Other"
 )
 
 // MACVersion is the MAC version.
@@ -144,8 +145,32 @@ func (b *Buffer) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// KeyEnvelope contains a wrapped session key.
-type KeyEnvelope struct {
-	KEKLabel string
-	AESKey   Buffer
+// KeyEnvelope contains a (encrypted) key.
+type KeyEnvelope ttnpb.KeyEnvelope
+
+// MarshalJSON marshals the key envelope to JSON.
+func (k KeyEnvelope) MarshalJSON() ([]byte, error) {
+	return json.Marshal(struct {
+		KEKLabel string
+		AESKey   Buffer
+	}{
+		KEKLabel: k.KEKLabel,
+		AESKey:   Buffer(k.EncryptedKey),
+	})
+}
+
+// UnmarshalJSON unmarshals the key envelope from JSON.
+func (k *KeyEnvelope) UnmarshalJSON(data []byte) error {
+	aux := struct {
+		KEKLabel string
+		AESKey   Buffer
+	}{}
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+	*k = KeyEnvelope{
+		KEKLabel:     aux.KEKLabel,
+		EncryptedKey: aux.AESKey,
+	}
+	return nil
 }

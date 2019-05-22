@@ -24,7 +24,9 @@ import (
 
 	echo "github.com/labstack/echo/v4"
 	echomiddleware "github.com/labstack/echo/v4/middleware"
+	"go.thethings.network/lorawan-stack/pkg/auth"
 	"go.thethings.network/lorawan-stack/pkg/config"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/web"
 	"go.thethings.network/lorawan-stack/pkg/web/middleware"
@@ -42,7 +44,7 @@ type Registerer interface {
 
 // JoinServer represents a Join Server.
 type JoinServer interface {
-	JoinRequest(req *JoinReq) (*JoinAns, error)
+	JoinRequest(context.Context, *JoinReq) (*JoinAns, error)
 }
 
 // HomeNetworkServer represents a Home Network Server.
@@ -63,7 +65,7 @@ type ApplicationServer interface {
 
 type noopServer struct{}
 
-func (noopServer) JoinRequest(req *JoinReq) (*JoinAns, error) {
+func (noopServer) JoinRequest(context.Context, *JoinReq) (*JoinAns, error) {
 	return nil, errNotRegistered
 }
 
@@ -92,7 +94,7 @@ func New(ctx context.Context, config config.Interop) (*Server, error) {
 	server.HTTPErrorHandler = ErrorHandler
 
 	server.Use(
-		middleware.ID("interop"),
+		middleware.ID(""),
 		echomiddleware.BodyLimit("16M"),
 		middleware.Recover(),
 	)
@@ -119,9 +121,9 @@ func New(ctx context.Context, config config.Interop) (*Server, error) {
 			senderClientCAs[senderID] = append(senderClientCAs[senderID], cert)
 		}
 	}
-	getSenderClientCAs := func(sourceID string) []*x509.Certificate {
+	getSenderClientCAs := func(senderID string) []*x509.Certificate {
 		// TODO: Lookup client CAs by sender ID (https://github.com/TheThingsNetwork/lorawan-stack/issues/718)
-		return senderClientCAs[sourceID]
+		return senderClientCAs[senderID]
 	}
 
 	noop := &noopServer{}
@@ -185,11 +187,17 @@ func (s *Server) RegisterAS(as ApplicationServer) {
 }
 
 func (s *Server) handleRequest(c echo.Context) error {
+	cid := fmt.Sprintf("interop:%s:%s", c.Request().URL.Path, c.Request().Header.Get(echo.HeaderXRequestID))
+	ctx := events.ContextWithCorrelationID(c.Request().Context(), cid)
+	if state := c.Request().TLS; state != nil {
+		ctx = auth.NewContextWithX509DN(ctx, state.PeerCertificates[0].Subject)
+	}
+
 	var ans interface{}
 	var err error
 	switch req := c.Get(messageKey).(type) {
 	case *JoinReq:
-		ans, err = s.js.JoinRequest(req)
+		ans, err = s.js.JoinRequest(ctx, req)
 	default:
 		panic(fmt.Sprintf("unexpected message type %T", c.Get(messageKey)))
 	}
@@ -201,6 +209,5 @@ func (s *Server) handleRequest(c echo.Context) error {
 
 func (s *Server) handleNsRequest(c echo.Context) error {
 	// TODO: Implement LoRaWAN roaming (https://github.com/TheThingsNetwork/lorawan-stack/issues/230)
-	c.NoContent(http.StatusNotFound)
-	return nil
+	return echo.NewHTTPError(http.StatusNotFound)
 }

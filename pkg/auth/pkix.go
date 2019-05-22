@@ -12,21 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package joinserver
+package auth
 
 import (
 	"context"
-
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/interop"
+	"crypto/x509/pkix"
 )
 
-type interopServer struct {
-	JS *JoinServer
+type x509DNKeyType struct{}
+
+var x509DNKey x509DNKeyType
+
+// NewContextWithX509DN returns a new context with the given distinguished name.
+func NewContextWithX509DN(ctx context.Context, name pkix.Name) context.Context {
+	return context.WithValue(ctx, x509DNKey, name)
 }
 
-var errInteropNotImplemented = errors.DefineUnimplemented("interop_not_implemented", "interop endpoint not implemented")
-
-func (srv interopServer) JoinRequest(ctx context.Context, req *interop.JoinReq) (*interop.JoinAns, error) {
-	return nil, errInteropNotImplemented
+// X509DNFromContext returns the distinguished from the given context.
+func X509DNFromContext(ctx context.Context) (pkix.Name, bool) {
+	if name, ok := ctx.Value(x509DNKey).(pkix.Name); ok {
+		return name, true
+	}
+	return pkix.Name{}, false
 }

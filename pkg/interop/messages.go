@@ -136,7 +136,6 @@ type JoinReq struct {
 	DLSettings Buffer
 	RxDelay    ttnpb.RxDelay
 	CFList     Buffer
-	CFListType ttnpb.CFListType
 }
 
 // JoinAns is an answer to a JoinReq message.
@@ -163,17 +162,14 @@ func parseMessage() echo.MiddlewareFunc {
 				return err
 			}
 			if len(buf) == 0 {
-				c.NoContent(http.StatusBadRequest)
-				return nil
+				return echo.NewHTTPError(http.StatusBadRequest)
 			}
 			var header RawMessageHeader
 			if err := json.Unmarshal(buf, &header); err != nil {
-				c.NoContent(http.StatusBadRequest)
-				return nil
+				return echo.NewHTTPError(http.StatusBadRequest)
 			}
 			if header.ProtocolVersion == "" || header.MessageType == "" {
-				c.NoContent(http.StatusBadRequest)
-				return nil
+				return echo.NewHTTPError(http.StatusBadRequest)
 			}
 			c.Set(headerKey, &header)
 			switch header.ProtocolVersion {
@@ -185,6 +181,8 @@ func parseMessage() echo.MiddlewareFunc {
 			switch header.MessageType {
 			case MessageTypeJoinReq:
 				msg = &JoinReq{}
+			case MessageTypeJoinAns:
+				msg = &JoinAns{}
 			default:
 				return ErrMalformedMessage
 			}
@@ -205,8 +203,7 @@ func verifySenderID(getSenderClientCAs func(string) []*x509.Certificate) echo.Mi
 			header := c.Get(headerKey).(*RawMessageHeader)
 			senderClientCAs := getSenderClientCAs(header.SenderID)
 			if len(senderClientCAs) == 0 {
-				c.NoContent(http.StatusForbidden)
-				return nil
+				return ErrUnknownSender
 			}
 			if state := c.Request().TLS; state != nil {
 				for _, chain := range state.VerifiedChains {
@@ -220,8 +217,7 @@ func verifySenderID(getSenderClientCAs func(string) []*x509.Certificate) echo.Mi
 				}
 			}
 			// TODO: Check headers (https://github.com/TheThingsNetwork/lorawan-stack/issues/717)
-			c.NoContent(http.StatusForbidden)
-			return nil
+			return echo.NewHTTPError(http.StatusForbidden)
 		}
 	}
 }
