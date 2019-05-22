@@ -200,6 +200,20 @@ type AppSKeyAns struct {
 	SessionKeyID Buffer
 }
 
+// HomeNSReq is a NetID request message.
+type HomeNSReq struct {
+	NsJsMessageHeader
+	DevEUI types.EUI64
+}
+
+// HomeNSAns is an answer to a HomeNSReq message.
+type HomeNSAns struct {
+	JsNsMessageHeader
+	Result Result
+	HNSID  types.NetID
+	HNetID types.NetID
+}
+
 // parseMessage parses the header and the message type of the request body.
 // This middleware sets the header in the context on the `headerKey` and the message on the `messageKey`.
 func parseMessage() echo.MiddlewareFunc {
@@ -235,6 +249,10 @@ func parseMessage() echo.MiddlewareFunc {
 				msg = &AppSKeyReq{}
 			case MessageTypeAppSKeyAns:
 				msg = &AppSKeyAns{}
+			case MessageTypeHomeNSReq:
+				msg = &HomeNSReq{}
+			case MessageTypeHomeNSAns:
+				msg = &HomeNSAns{}
 			default:
 				return ErrMalformedMessage
 			}

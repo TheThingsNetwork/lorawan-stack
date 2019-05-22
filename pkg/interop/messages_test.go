@@ -335,6 +335,84 @@ func TestParseMessage(t *testing.T) {
 				return a.So(statusCode, should.Equal, http.StatusOK)
 			},
 		},
+		{
+			Name: "ValidHomeNSReq",
+			Request: []byte(`{
+				"ProtocolVersion": "1.0",
+				"MessageType": "HomeNSReq",
+				"SenderID": "010203",
+				"ReceiverID": "0102030405060708",
+				"SenderNSID": "010203",
+				"SenderToken": "01",
+				"DevEUI": "0102030405060708"
+			}`),
+			RequestHeaderAssertion: func(t *testing.T, header RawMessageHeader) bool {
+				a := assertions.New(t)
+				return a.So(header.MessageType, should.Equal, "HomeNSReq")
+			},
+			RequestMessageAssertion: func(t *testing.T, msg interface{}) bool {
+				a := assertions.New(t)
+				return a.So(msg, should.Resemble, &HomeNSReq{
+					NsJsMessageHeader: NsJsMessageHeader{
+						MessageHeader: MessageHeader{
+							ProtocolVersion: "1.0",
+							MessageType:     MessageTypeHomeNSReq,
+							SenderToken:     []byte{0x1},
+							TransactionID:   0,
+						},
+						SenderID:   types.NetID{0x1, 0x2, 0x3},
+						ReceiverID: types.EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
+						SenderNSID: types.NetID{0x1, 0x2, 0x3},
+					},
+					DevEUI: types.EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
+				})
+			},
+			ResponseAssertion: func(t *testing.T, statusCode int, data []byte) bool {
+				a := assertions.New(t)
+				return a.So(statusCode, should.Equal, http.StatusOK)
+			},
+		},
+		{
+			Name: "ValidHomeNSAns",
+			Request: []byte(`{
+				"ProtocolVersion": "1.0",
+				"MessageType": "HomeNSAns",
+				"SenderID": "0102030405060708",
+				"ReceiverID": "010203",
+				"ReceiverNSID": "010203",
+				"SenderToken": "01",
+				"Result": "Success",
+				"HNSID": "42FFFF",
+				"HNetID": "42FFFF"
+			}`),
+			RequestHeaderAssertion: func(t *testing.T, header RawMessageHeader) bool {
+				a := assertions.New(t)
+				return a.So(header.MessageType, should.Equal, "HomeNSAns")
+			},
+			RequestMessageAssertion: func(t *testing.T, msg interface{}) bool {
+				a := assertions.New(t)
+				return a.So(msg, should.Resemble, &HomeNSAns{
+					JsNsMessageHeader: JsNsMessageHeader{
+						MessageHeader: MessageHeader{
+							ProtocolVersion: "1.0",
+							MessageType:     MessageTypeHomeNSAns,
+							SenderToken:     []byte{0x1},
+							TransactionID:   0,
+						},
+						SenderID:     types.EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
+						ReceiverID:   types.NetID{0x1, 0x2, 0x3},
+						ReceiverNSID: types.NetID{0x1, 0x2, 0x3},
+					},
+					Result: ResultSuccess,
+					HNSID:  types.NetID{0x42, 0xff, 0xff},
+					HNetID: types.NetID{0x42, 0xff, 0xff},
+				})
+			},
+			ResponseAssertion: func(t *testing.T, statusCode int, data []byte) bool {
+				a := assertions.New(t)
+				return a.So(statusCode, should.Equal, http.StatusOK)
+			},
+		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			server := echo.New()
