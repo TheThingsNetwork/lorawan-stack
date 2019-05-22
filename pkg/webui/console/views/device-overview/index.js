@@ -29,9 +29,9 @@ import DeviceEvents from '../../containers/device-events'
 import style from './device-overview.styl'
 
 const m = defineMessages({
-  activationInfo: 'Activation Info',
+  activationInfo: 'Activation Information',
   rootKeyId: 'Root Key ID',
-  sessionInfo: 'Session Info',
+  sessionInfo: 'Session Information',
   latestData: 'Latest Data',
 })
 
