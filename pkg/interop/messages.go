@@ -103,6 +103,7 @@ type NsJsMessageHeader struct {
 	SenderID types.NetID
 	// ReceiverID is a JoinEUI.
 	ReceiverID types.EUI64
+	SenderNSID types.NetID
 }
 
 // AnswerHeader returns the header of the answer message.
@@ -115,6 +116,7 @@ func (h NsJsMessageHeader) AnswerHeader() (JsNsMessageHeader, error) {
 		MessageHeader: header,
 		SenderID:      h.ReceiverID,
 		ReceiverID:    h.SenderID,
+		ReceiverNSID:  h.SenderNSID,
 	}, nil
 }
 
@@ -122,8 +124,9 @@ func (h NsJsMessageHeader) AnswerHeader() (JsNsMessageHeader, error) {
 type JsNsMessageHeader struct {
 	MessageHeader
 	// SenderID is a JoinEUI.
-	SenderID   types.EUI64
-	ReceiverID types.NetID
+	SenderID     types.EUI64
+	ReceiverID   types.NetID
+	ReceiverNSID types.NetID
 }
 
 // JoinReq is a join-request message.
