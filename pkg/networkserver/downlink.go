@@ -573,30 +573,15 @@ func appendRecentDownlink(recent []*ttnpb.DownlinkMessage, down *ttnpb.DownlinkM
 	return recent
 }
 
-// downlinkRxDelay returns the RxDelay value, which should be used to answer up.
-func downlinkRxDelay(phy band.Band, macState *ttnpb.MACState, up *ttnpb.UplinkMessage) (del ttnpb.RxDelay) {
-	switch up.Payload.MHDR.MType {
-	case ttnpb.MType_JOIN_REQUEST, ttnpb.MType_REJOIN_REQUEST:
-		del = ttnpb.RxDelay(phy.JoinAcceptDelay1 / time.Second)
-	default:
-		del = macState.CurrentParameters.Rx1Delay
-	}
-	if del == ttnpb.RX_DELAY_0 {
-		return ttnpb.RX_DELAY_1
-	}
-	return del
-}
-
 // txRequestFromUplink return the Class A TxRequest, which can be used to answer up.
-// txRequestFromUplink uses downlinkRxDelay to determine RxDelay.
 // txRequestFromUplink does not set the priority.
-func txRequestFromUplink(phy band.Band, macState *ttnpb.MACState, rx1, rx2 bool, up *ttnpb.UplinkMessage) (*ttnpb.TxRequest, error) {
+func txRequestFromUplink(phy band.Band, macState *ttnpb.MACState, rx1, rx2 bool, rxDelay ttnpb.RxDelay, up *ttnpb.UplinkMessage) (*ttnpb.TxRequest, error) {
 	if !rx1 && !rx2 {
 		return nil, errNoPath
 	}
 	req := &ttnpb.TxRequest{
 		Class:    ttnpb.CLASS_A,
-		Rx1Delay: downlinkRxDelay(phy, macState, up),
+		Rx1Delay: rxDelay,
 	}
 	if rx1 {
 		if up.DeviceChannelIndex > math.MaxUint8 {
@@ -701,14 +686,15 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					}
 					ctx := events.ContextWithCorrelationID(ctx, up.CorrelationIDs...)
 
+					rxDelay := ttnpb.RxDelay(phy.JoinAcceptDelay1 / time.Second)
+
 					// Join-accept downlink for Class A/B/C device in Rx1/Rx2
-					rxDelay := downlinkRxDelay(phy, dev.PendingMACState, up)
 					rx1, rx2, paths := downlinkPathsForClassA(rxDelay, dev.RecentUplinks...)
 					if len(paths) == 0 {
 						return nil, nil, errNoPath
 					}
 
-					req, err := txRequestFromUplink(phy, dev.PendingMACState, rx1, rx2, up)
+					req, err := txRequestFromUplink(phy, dev.PendingMACState, rx1, rx2, rxDelay, up)
 					if err != nil {
 						return nil, nil, err
 					}
@@ -766,9 +752,18 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					if len(dev.RecentUplinks) == 0 {
 						return nil, nil, errUplinkNotFound
 					}
+					var rxDelay ttnpb.RxDelay
 					up := dev.RecentUplinks[len(dev.RecentUplinks)-1]
 					switch up.Payload.MHDR.MType {
-					case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP, ttnpb.MType_REJOIN_REQUEST:
+					case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:
+						rxDelay = dev.MACState.CurrentParameters.Rx1Delay
+						if rxDelay == ttnpb.RX_DELAY_0 {
+							rxDelay = ttnpb.RX_DELAY_1
+						}
+
+					case ttnpb.MType_REJOIN_REQUEST:
+						rxDelay = ttnpb.RxDelay(phy.JoinAcceptDelay1 / time.Second)
+
 					default:
 						return nil, nil, errUplinkNotFound
 					}
@@ -777,13 +772,12 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					switch {
 					case dev.MACState.DeviceClass == ttnpb.CLASS_A:
 						// Data downlink for Class A in Rx1/Rx2
-						rxDelay := downlinkRxDelay(phy, dev.MACState, up)
 						rx1, rx2, paths := downlinkPathsForClassA(rxDelay, dev.RecentUplinks...)
 						if len(paths) == 0 {
 							return nil, nil, errNoPath
 						}
 
-						req, err := txRequestFromUplink(phy, dev.MACState, rx1, rx2, up)
+						req, err := txRequestFromUplink(phy, dev.MACState, rx1, rx2, rxDelay, up)
 						if err != nil {
 							return nil, nil, err
 						}
@@ -840,13 +834,12 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 
 					default:
 						// Data downlink for Class B/C in Rx1 if available
-						rxDelay := downlinkRxDelay(phy, dev.MACState, up)
 						rx1, _, paths := downlinkPathsForClassA(rxDelay, dev.RecentUplinks...)
 						if !rx1 || len(paths) == 0 {
 							break
 						}
 
-						req, err := txRequestFromUplink(phy, dev.MACState, true, false, up)
+						req, err := txRequestFromUplink(phy, dev.MACState, true, false, rxDelay, up)
 						if err != nil {
 							return nil, nil, err
 						}
