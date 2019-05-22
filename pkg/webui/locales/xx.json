@@ -106,6 +106,7 @@
   "console.views.gateway-add.index.gatewayIdPlaceholder": "xx-xxx-xxxxxxx",
   "console.views.gateway-add.index.createGateway": "Xxxxxx Xxxxxxx",
   "console.views.gateway-add.index.gsServerAddressDescription": "Xxx xxxxxxx xx xxx Xxxxxxx Xxxxxx xx xxxxxxx xx",
+  "console.views.gateway-location.index.setGatewayLocation": "Xxx xxxxxxx xxxxxxx xxxxxxxx",
   "console.views.login.index.welcome": "Xxxxxxx xx {stackConsole}",
   "console.views.login.index.login": "Xxx xxxx xx xx xxxxxx xx xx xxx xxxx xxxx",
   "console.views.login.index.loginWithStackAccount": "Xxxxx xxxx xxxx XXX Xxxxx Xxxxxxx",
