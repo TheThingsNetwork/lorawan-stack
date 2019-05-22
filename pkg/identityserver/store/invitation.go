@@ -24,8 +24,8 @@ import (
 type Invitation struct {
 	Model
 
-	Email     string `gorm:"type:VARCHAR;unique_index;not null"`
-	Token     string `gorm:"type:VARCHAR;unique_index;not null"`
+	Email     string `gorm:"type:VARCHAR;unique_index:invitation_email_index;not null"`
+	Token     string `gorm:"type:VARCHAR;unique_index:invitation_token_index;not null"`
 	ExpiresAt time.Time
 
 	AcceptedBy   *User
