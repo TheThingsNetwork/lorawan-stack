@@ -120,9 +120,9 @@ func New(ctx context.Context, config config.Interop) (*Server, error) {
 			senderClientCAs[senderID] = append(senderClientCAs[senderID], cert)
 		}
 	}
-	getSenderClientCAs := func(sourceID string) []*x509.Certificate {
+	getSenderClientCAs := func(senderID string) []*x509.Certificate {
 		// TODO: Lookup client CAs by sender ID (https://github.com/TheThingsNetwork/lorawan-stack/issues/718)
-		return senderClientCAs[sourceID]
+		return senderClientCAs[senderID]
 	}
 
 	noop := &noopServer{}
