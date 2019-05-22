@@ -28,6 +28,7 @@ import {
 export const SHARED_NAME = 'DEVICE'
 
 export const GET_DEV = 'GET_DEVICE'
+export const UPDATE_DEV = 'UPDATE_DEVICE'
 export const GET_DEV_SUCCESS = 'GET_DEVICE_SUCCESS'
 export const GET_DEV_FAILURE = 'GET_DEVICE_FAILURE'
 export const START_DEVICE_EVENT_STREAM = createStartEventsStreamActionType(SHARED_NAME)
@@ -38,6 +39,10 @@ export const CLEAR_DEVICE_EVENTS = createClearEventsActionType(SHARED_NAME)
 
 export const getDevice = (appId, deviceId, selector, options) => (
   { type: GET_DEV, appId, deviceId, selector, options }
+)
+
+export const updateDevice = (appId, deviceId, patch) => (
+  { type: UPDATE_DEV, appId, deviceId, patch }
 )
 
 export const getDeviceSuccess = device => (

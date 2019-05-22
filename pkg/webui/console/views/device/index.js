@@ -29,6 +29,7 @@ import IntlHelmet from '../../../lib/components/intl-helmet'
 import DeviceOverview from '../device-overview'
 import DeviceData from '../device-data'
 import DeviceGeneralSettings from '../device-general-settings'
+import DeviceLocation from '../device-location'
 
 import {
   getDevice,
@@ -88,6 +89,7 @@ export default class Device extends React.Component {
         'supports_join',
         'lorawan_version',
         'lorawan_phy_version',
+        'locations',
       ],
       { ignoreNotFound: true })
   }
@@ -121,7 +123,7 @@ export default class Device extends React.Component {
     const tabs = [
       { title: sharedMessages.overview, name: 'overview', link: basePath },
       { title: sharedMessages.data, name: 'data', link: `${basePath}/data` },
-      { title: sharedMessages.location, name: 'location' },
+      { title: sharedMessages.location, name: 'location', link: `${basePath}/location` },
       { title: sharedMessages.payloadFormats, name: 'develop' },
       { title: sharedMessages.generalSettings, name: 'general-settings', link: `${basePath}/general-settings` },
     ]
@@ -146,6 +148,7 @@ export default class Device extends React.Component {
         <Switch>
           <Route exact path={basePath} component={DeviceOverview} />
           <Route exact path={`${basePath}/data`} component={DeviceData} />
+          <Route exact path={`${basePath}/location`} component={DeviceLocation} />
           <Route exact path={`${basePath}/general-settings`} component={DeviceGeneralSettings} />
         </Switch>
       </React.Fragment>
