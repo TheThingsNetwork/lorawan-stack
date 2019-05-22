@@ -199,7 +199,7 @@ func (s *Server) handleRequest(c echo.Context) error {
 	case *JoinReq:
 		ans, err = s.js.JoinRequest(ctx, req)
 	default:
-		panic(fmt.Sprintf("unexpected message type %T", c.Get(messageKey)))
+		return ErrMalformedMessage
 	}
 	if err != nil {
 		return err
