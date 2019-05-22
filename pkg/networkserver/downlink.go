@@ -1032,7 +1032,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 			logger.WithError(err).Warn("Failed to update device in registry")
 			return err
 
-		case genDown != nil && dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0:
+		case genDown != nil && genDown.ApplicationDownlink == nil && dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0:
 			go func() {
 				logger.Debug("Send downlink queue invalidation to Application Server")
 				ok, err := ns.handleASUplink(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, &ttnpb.ApplicationUp{
