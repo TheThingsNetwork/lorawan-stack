@@ -45,7 +45,57 @@ const checkboxFields = [
   />,
 ]
 
-storiesOf('Fields', module)
+storiesOf('Fields/Select', module)
+  .addDecorator((story, context) => withInfo(info)(story)(context))
+  .add('Default', () => (
+    <Field
+      type="select"
+      name="foo"
+      title="Foo"
+      description="A Select field."
+      options={[
+        { value: 'amsterdam', label: 'Amsterdam' },
+        { value: 'berlin', label: 'Berlin' },
+        { value: 'dusseldorf', label: 'Düsseldorf' },
+      ]}
+      form={false}
+    />
+  ))
+
+storiesOf('Fields/Boolean', module)
+  .addDecorator((story, context) => withInfo(info)(story)(context))
+  .add('Default', () => (
+    <Field
+      type="checkbox"
+      name="foo"
+      title="Foo"
+      description="Foo field."
+      form={false}
+    />
+  ))
+  .add('Disabled', () => (
+    <Field
+      type="checkbox"
+      name="foo"
+      title="Foo"
+      description="Foo field."
+      form={false}
+      disabled
+    />
+  ))
+  .add('Error', () => (
+    <Field
+      type="checkbox"
+      name="foo"
+      title="Foo"
+      description="Foo field."
+      error="Are you sure?"
+      touched
+      form={false}
+    />
+  ))
+
+storiesOf('Fields/Inputs', module)
   .addDecorator((story, context) => withInfo(info)(story)(context))
   .add('Default', () => (
     <Field
@@ -73,7 +123,6 @@ storiesOf('Fields', module)
         form={false}
       />
     </div>
-
   ))
   .add('Number', () => (
     <Field
@@ -81,62 +130,6 @@ storiesOf('Fields', module)
       name="foo"
       description="Foo is a field containing a number"
       type="number"
-      form={false}
-    />
-  ))
-  .add('Boolean', () => (
-    <Field
-      type="checkbox"
-      name="foo"
-      title="Foo"
-      description="Foo field."
-      form={false}
-    />
-  ))
-  .add('Select', () => (
-    <Field
-      type="select"
-      name="foo"
-      title="Foo"
-      description="A Select field."
-      options={[
-        { value: 'amsterdam', label: 'Amsterdam' },
-        { value: 'berlin', label: 'Berlin' },
-        { value: 'dusseldorf', label: 'Düsseldorf' },
-      ]}
-      form={false}
-    />
-  ))
-  .add('Error', () => (
-    <Field
-      name="email"
-      title="Email Address"
-      description="Your email address"
-      value="foo?@bar.com"
-      type="text"
-      error="Invalid email address"
-      touched
-      form={false}
-    />
-  ))
-  .add('Boolean Disabled', () => (
-    <Field
-      type="checkbox"
-      name="foo"
-      title="Foo"
-      description="Foo field."
-      form={false}
-      disabled
-    />
-  ))
-  .add('Boolean Error', () => (
-    <Field
-      type="checkbox"
-      name="foo"
-      title="Foo"
-      description="Foo field."
-      error="Are you sure?"
-      touched
       form={false}
     />
   ))
@@ -148,6 +141,18 @@ storiesOf('Fields', module)
       value="123456"
       type="password"
       warning="Insecure password"
+      touched
+      form={false}
+    />
+  ))
+  .add('Error', () => (
+    <Field
+      name="email"
+      title="Email Address"
+      description="Your email address"
+      value="foo?@bar.com"
+      type="text"
+      error="Invalid email address"
       touched
       form={false}
     />
