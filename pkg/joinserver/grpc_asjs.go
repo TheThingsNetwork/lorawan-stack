@@ -31,19 +31,5 @@ func (srv asJsServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 	if err := clusterauth.Authorized(ctx); err != nil {
 		return nil, err
 	}
-
-	ks, err := srv.JS.keys.GetByID(ctx, req.DevEUI, req.SessionKeyID,
-		[]string{
-			"app_s_key",
-		},
-	)
-	if err != nil {
-		return nil, errRegistryOperation.WithCause(err)
-	}
-	if ks.AppSKey == nil {
-		return nil, errNoAppSKey
-	}
-	return &ttnpb.AppSKeyResponse{
-		AppSKey: *ks.AppSKey,
-	}, nil
+	return srv.JS.GetAppSKey(ctx, req)
 }

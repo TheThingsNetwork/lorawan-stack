@@ -52,6 +52,28 @@ func (m mockInterop) JoinRequest(ctx context.Context, req *interop.JoinReq) (*in
 	}, nil
 }
 
+func (m mockInterop) AppSKeyRequest(ctx context.Context, req *interop.AppSKeyReq) (*interop.AppSKeyAns, error) {
+	ansHeader, err := req.AnswerHeader()
+	if err != nil {
+		return nil, err
+	}
+	return &interop.AppSKeyAns{
+		JsAsMessageHeader: ansHeader,
+		Result:            interop.ResultSuccess,
+	}, nil
+}
+
+func (m mockInterop) HomeNSRequest(ctx context.Context, req *interop.HomeNSReq) (*interop.HomeNSAns, error) {
+	ansHeader, err := req.AnswerHeader()
+	if err != nil {
+		return nil, err
+	}
+	return &interop.HomeNSAns{
+		JsNsMessageHeader: ansHeader,
+		Result:            interop.ResultSuccess,
+	}, nil
+}
+
 func TestInteropTLS(t *testing.T) {
 	a := assertions.New(t)
 

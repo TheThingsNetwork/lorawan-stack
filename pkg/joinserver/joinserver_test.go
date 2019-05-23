@@ -1655,3 +1655,121 @@ func TestGetNwkSKeys(t *testing.T) {
 		})
 	}
 }
+
+func TestGetAppSKey(t *testing.T) {
+	ctx := test.Context()
+	
+	errTest := errors.New("test")
+
+	for _, tc := range []struct {
+		Name string
+		ContextFunc func(context.Context) context.Context
+
+		GetByID     func(context.Context, types.EUI64, []byte, []string) (*ttnpb.SessionKeys, error)
+		KeyRequest  *ttnpb.SessionKeyRequest
+		KeyResponse *ttnpb.AppSKeyResponse
+
+		ErrorAssertion func(*testing.T, error) bool
+	}{
+		{
+			Name: "Registry error",
+			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
+			GetByID: func(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
+				a.So(id, should.Resemble, []byte{0x11, 0x22, 0x33, 0x44})
+				a.So(paths, should.HaveSameElementsDeep, []string{
+					"app_s_key",
+				})
+				return nil, errTest
+			},
+			KeyRequest: &ttnpb.SessionKeyRequest{
+				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
+			},
+			KeyResponse: nil,
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				a := assertions.New(t)
+				if !a.So(err, should.EqualErrorOrDefinition, ErrRegistryOperation.WithCause(errTest)) {
+					t.FailNow()
+				}
+				return a.So(errors.IsInternal(err), should.BeTrue)
+			},
+		},
+		{
+			Name: "Missing AppSKey",
+			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
+			GetByID: func(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
+				a.So(id, should.Resemble, []byte{0x11, 0x22, 0x33, 0x44})
+				a.So(paths, should.HaveSameElementsDeep, []string{
+					"app_s_key",
+				})
+				return &ttnpb.SessionKeys{}, nil
+			},
+			KeyRequest: &ttnpb.SessionKeyRequest{
+				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
+			},
+			KeyResponse: nil,
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.EqualErrorOrDefinition, ErrNoAppSKey)
+			},
+		},
+		{
+			Name: "Matching request",
+			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
+			GetByID: func(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
+				a.So(id, should.Resemble, []byte{0x11, 0x22, 0x33, 0x44})
+				a.So(paths, should.HaveSameElementsDeep, []string{
+					"app_s_key",
+				})
+				return &ttnpb.SessionKeys{
+					SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
+					AppSKey: &ttnpb.KeyEnvelope{
+						EncryptedKey: KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
+						KEKLabel:     "test-kek",
+					},
+				}, nil
+			},
+			KeyRequest: &ttnpb.SessionKeyRequest{
+				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
+			},
+			KeyResponse: &ttnpb.AppSKeyResponse{
+				AppSKey: ttnpb.KeyEnvelope{
+					EncryptedKey: KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
+					KEKLabel:     "test-kek",
+				},
+			},
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
+			ctx := test.ContextWithT(tc.ContextFunc(ctx), t)
+
+			js := test.Must(New(
+				component.MustNew(test.GetLogger(t), &component.Config{}),
+				&Config{
+					Keys:    &MockKeyRegistry{GetByIDFunc: tc.GetByID},
+					Devices: &MockDeviceRegistry{},
+				},
+			)).(*JoinServer)
+			res, err := js.GetAppSKey(ctx, tc.KeyRequest)
+
+			if tc.ErrorAssertion != nil {
+				if !tc.ErrorAssertion(t, err) {
+					t.Errorf("Received unexpected error: %s", err)
+				}
+				a.So(res, should.BeNil)
+				return
+			}
+
+			a.So(err, should.BeNil)
+			a.So(res, should.Resemble, tc.KeyResponse)
+		})
+	}
+}

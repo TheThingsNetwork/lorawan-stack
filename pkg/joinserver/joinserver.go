@@ -464,3 +464,26 @@ func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequ
 		SNwkSIntKey: *ks.SNwkSIntKey,
 	}, nil
 }
+
+// GetAppSKey returns the requested application session key.
+func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.AppSKeyResponse, error) {
+	ks, err := js.keys.GetByID(ctx, req.DevEUI, req.SessionKeyID,
+		[]string{
+			"app_s_key",
+		},
+	)
+	if err != nil {
+		return nil, errRegistryOperation.WithCause(err)
+	}
+	if ks.AppSKey == nil {
+		return nil, errNoAppSKey
+	}
+	return &ttnpb.AppSKeyResponse{
+		AppSKey: *ks.AppSKey,
+	}, nil
+}
+
+// GetHomeNetID returns the requested NetID.
+func (js *JoinServer) GetHomeNetID(context.Context, types.EUI64) (*types.NetID, error) {
+	panic("not implemented")
+}
