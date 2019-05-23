@@ -1468,11 +1468,11 @@ func TestHandleJoin(t *testing.T) {
 
 func TestGetNwkSKeys(t *testing.T) {
 	ctx := test.Context()
-	
+
 	errTest := errors.New("test")
 
 	for _, tc := range []struct {
-		Name string
+		Name        string
 		ContextFunc func(context.Context) context.Context
 
 		GetByID     func(context.Context, types.EUI64, []byte, []string) (*ttnpb.SessionKeys, error)
@@ -1482,7 +1482,7 @@ func TestGetNwkSKeys(t *testing.T) {
 		ErrorAssertion func(*testing.T, error) bool
 	}{
 		{
-			Name: "Registry error",
+			Name:        "Registry error",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
 			GetByID: func(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
@@ -1509,7 +1509,7 @@ func TestGetNwkSKeys(t *testing.T) {
 			},
 		},
 		{
-			Name: "No SNwkSIntKey",
+			Name:        "No SNwkSIntKey",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
 			GetByID: func(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
@@ -1535,7 +1535,7 @@ func TestGetNwkSKeys(t *testing.T) {
 			},
 		},
 		{
-			Name: "No NwkSEncKey",
+			Name:        "No NwkSEncKey",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
 			GetByID: func(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
@@ -1561,7 +1561,7 @@ func TestGetNwkSKeys(t *testing.T) {
 			},
 		},
 		{
-			Name: "No FNwkSIntKey",
+			Name:        "No FNwkSIntKey",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
 			GetByID: func(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
@@ -1587,7 +1587,7 @@ func TestGetNwkSKeys(t *testing.T) {
 			},
 		},
 		{
-			Name: "Matching request",
+			Name:        "Matching request",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
 			GetByID: func(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
@@ -1665,11 +1665,11 @@ func TestGetNwkSKeys(t *testing.T) {
 
 func TestGetAppSKey(t *testing.T) {
 	ctx := test.Context()
-	
+
 	errTest := errors.New("test")
 
 	for _, tc := range []struct {
-		Name string
+		Name        string
 		ContextFunc func(context.Context) context.Context
 
 		GetByID     func(context.Context, types.EUI64, []byte, []string) (*ttnpb.SessionKeys, error)
@@ -1679,7 +1679,7 @@ func TestGetAppSKey(t *testing.T) {
 		ErrorAssertion func(*testing.T, error) bool
 	}{
 		{
-			Name: "Registry error",
+			Name:        "Registry error",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
 			GetByID: func(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
@@ -1704,7 +1704,7 @@ func TestGetAppSKey(t *testing.T) {
 			},
 		},
 		{
-			Name: "Missing AppSKey",
+			Name:        "Missing AppSKey",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
 			GetByID: func(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
@@ -1725,7 +1725,7 @@ func TestGetAppSKey(t *testing.T) {
 			},
 		},
 		{
-			Name: "Matching request",
+			Name:        "Matching request",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
 			GetByID: func(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
@@ -1777,6 +1777,94 @@ func TestGetAppSKey(t *testing.T) {
 
 			a.So(err, should.BeNil)
 			a.So(res, should.Resemble, tc.KeyResponse)
+		})
+	}
+}
+
+func TestGetHomeNetID(t *testing.T) {
+	ctx := test.Context()
+
+	errTest := errors.New("test")
+
+	for _, tc := range []struct {
+		Name        string
+		ContextFunc func(context.Context) context.Context
+
+		GetByEUI func(context.Context, types.EUI64, types.EUI64, []string) (*ttnpb.EndDevice, error)
+		JoinEUI  types.EUI64
+		DevEUI   types.EUI64
+		Response *types.NetID
+
+		ErrorAssertion func(*testing.T, error) bool
+	}{
+		{
+			Name:        "Registry error",
+			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
+			GetByEUI: func(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(joinEUI, should.Resemble, types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
+				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
+				a.So(paths, should.HaveSameElementsDeep, []string{
+					"net_id",
+					"network_server_address",
+				})
+				return nil, errTest
+			},
+			JoinEUI: types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+			DevEUI:  types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				a := assertions.New(t)
+				if !a.So(err, should.EqualErrorOrDefinition, ErrRegistryOperation.WithCause(errTest)) {
+					t.FailNow()
+				}
+				return a.So(errors.IsInternal(err), should.BeTrue)
+			},
+		},
+		{
+			Name:        "Matching request",
+			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
+			GetByEUI: func(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(joinEUI, should.Resemble, types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
+				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
+				a.So(paths, should.HaveSameElementsDeep, []string{
+					"net_id",
+					"network_server_address",
+				})
+				return &ttnpb.EndDevice{
+					NetID:                &types.NetID{0x42, 0xff, 0xff},
+					NetworkServerAddress: nsAddr,
+				}, nil
+			},
+			JoinEUI:  types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+			DevEUI:   types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+			Response: &types.NetID{0x42, 0xff, 0xff},
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
+			ctx := test.ContextWithT(tc.ContextFunc(ctx), t)
+
+			js := test.Must(New(
+				component.MustNew(test.GetLogger(t), &component.Config{}),
+				&Config{
+					Devices: &MockDeviceRegistry{
+						GetByEUIFunc: tc.GetByEUI,
+					},
+				},
+			)).(*JoinServer)
+			netID, err := js.GetHomeNetID(ctx, tc.JoinEUI, tc.DevEUI)
+
+			if tc.ErrorAssertion != nil {
+				if !tc.ErrorAssertion(t, err) {
+					t.Errorf("Received unexpected error: %s", err)
+				}
+				a.So(netID, should.BeNil)
+				return
+			}
+
+			a.So(err, should.BeNil)
+			a.So(netID, should.Resemble, tc.Response)
 		})
 	}
 }

@@ -524,6 +524,22 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 }
 
 // GetHomeNetID returns the requested NetID.
-func (js *JoinServer) GetHomeNetID(context.Context, types.EUI64) (*types.NetID, error) {
-	panic("not implemented")
+func (js *JoinServer) GetHomeNetID(ctx context.Context, joinEUI, devEUI types.EUI64) (*types.NetID, error) {
+	if _, ok := auth.X509DNFromContext(ctx); !ok {
+		if err := clusterauth.Authorized(ctx); err != nil {
+			return nil, err
+		}
+	}
+
+	dev, err := js.devices.GetByEUI(ctx, joinEUI, devEUI,
+		[]string{
+			"net_id",
+			"network_server_address",
+		},
+	)
+	if err != nil {
+		return nil, errRegistryOperation.WithCause(err)
+	}
+
+	return dev.NetID, nil
 }
