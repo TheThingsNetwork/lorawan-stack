@@ -41,6 +41,7 @@ export const SHARED_NAME = 'GATEWAY'
 export const GET_GTW = 'GET_GATEWAY'
 export const GET_GTW_SUCCESS = 'GET_GATEWAY_SUCCESS'
 export const GET_GTW_FAILURE = 'GET_GATEWAY_FAILURE'
+export const UPDATE_GTW = 'UPDATE_GATEWAY'
 export const START_GTW_STATS = 'START_GATEWAY_STATISTICS'
 export const STOP_GTW_STATS = 'STOP_GATEWAY_STATISTICS'
 export const UPDATE_GTW_STATS = 'UPDATE_GATEWAY_STATISTICS'
@@ -67,6 +68,10 @@ export const getGatewaySuccess = gateway => (
 
 export const getGatewayFailure = error => (
   { type: GET_GTW_FAILURE, error }
+)
+
+export const updateGateway = (id, patch) => (
+  { type: UPDATE_GTW, id, patch }
 )
 
 export const startGatewayStatistics = (id, meta) => (

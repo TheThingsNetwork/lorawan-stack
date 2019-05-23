@@ -25,6 +25,7 @@ import Message from '../../../lib/components/message'
 
 import GatewayOverview from '../gateway-overview'
 import GatewayApiKeys from '../gateway-api-keys'
+import GatewayLocation from '../gateway-location'
 
 import {
   getGateway,
@@ -65,6 +66,11 @@ dispatch => ({
         icon: 'overview',
       },
       {
+        title: sharedMessages.location,
+        path: `${matchedUrl}/location`,
+        icon: 'location',
+      },
+      {
         title: sharedMessages.apiKeys,
         path: `${matchedUrl}/api-keys`,
         icon: 'api_keys',
@@ -99,6 +105,7 @@ export default class Gateway extends React.Component {
         'frequency_plan_id',
         'gateway_server_address',
         'enforce_duty_cycle',
+        'antennas',
       ],
     })
   }
@@ -129,6 +136,7 @@ export default class Gateway extends React.Component {
       <Switch>
         <Route exact path={`${match.path}`} component={GatewayOverview} />
         <Route path={`${match.path}/api-keys`} component={GatewayApiKeys} />
+        <Route path={`${match.path}/location`} component={GatewayLocation} />
       </Switch>
     )
   }
