@@ -4,11 +4,13 @@ package ttnpb
 
 var SessionKeyRequestFieldPathsNested = []string{
 	"dev_eui",
+	"join_eui",
 	"session_key_id",
 }
 
 var SessionKeyRequestFieldPathsTopLevel = []string{
 	"dev_eui",
+	"join_eui",
 	"session_key_id",
 }
 var NwkSKeysResponseFieldPathsNested = []string{

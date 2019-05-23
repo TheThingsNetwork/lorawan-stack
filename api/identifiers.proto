@@ -41,7 +41,7 @@ message EndDeviceIdentifiers {
   ApplicationIdentifiers application_ids = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   // The LoRaWAN DevEUI.
   bytes dev_eui = 4 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "DevEUI"];
-  // The LoRaWAN JoinEUI (or AppEUI for LoRaWAN 1.0 end devices).
+  // The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices).
   bytes join_eui = 5 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "JoinEUI"];
   // The LoRaWAN DevAddr.
   bytes dev_addr = 6 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.DevAddr"];
