@@ -18,6 +18,7 @@ package joinserver
 import (
 	"bytes"
 	"context"
+	"crypto/x509/pkix"
 	"encoding/binary"
 	"io"
 	"math"
@@ -141,6 +142,13 @@ var supportedMACVersions = [...]ttnpb.MACVersion{
 	ttnpb.MAC_V1_1,
 }
 
+func validateCaller(dn pkix.Name, addr string) error {
+	if addr := strings.ToLower(addr); addr != "" && addr != dn.CommonName {
+		return errAddressNotAuthorized.WithAttributes("address", dn.CommonName)
+	}
+	return nil
+}
+
 // HandleJoin handles the given join-request.
 func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (res *ttnpb.JoinResponse, err error) {
 	if _, ok := auth.X509DNFromContext(ctx); !ok {
@@ -226,8 +234,8 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 				if !req.NetID.Equal(*dev.NetID) {
 					return nil, nil, errNetIDMismatch.WithAttributes("net_id", req.NetID)
 				}
-				if addr := strings.ToLower(dev.NetworkServerAddress); addr != "" && addr != dn.CommonName {
-					return nil, nil, errAddressNotAuthorized.WithAttributes("address", dn.CommonName)
+				if err := validateCaller(dn, dev.NetworkServerAddress); err != nil {
+					return nil, nil, err
 				}
 			}
 
