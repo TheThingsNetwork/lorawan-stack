@@ -98,6 +98,7 @@ class InnerForm extends React.Component {
       validateOnChange,
       dirty,
       status = {},
+      disabled: formDisabled,
     } = this.props
 
     const formError = status.formError || false
@@ -112,6 +113,7 @@ class InnerForm extends React.Component {
           const value = getByPath(values, name)
           const fieldError = getByPath(combinedErrors, name)
           const fieldTouched = getByPath(touched, name)
+          const fieldDisabled = Child.props.disabled
 
           return React.cloneElement(Child, {
             setFieldValue,
@@ -124,13 +126,15 @@ class InnerForm extends React.Component {
             validateOnBlur,
             validateOnChange,
             form: true,
+            disabled: formDisabled || fieldDisabled,
             ...Child.props,
           })
         } else if (Child.type === Button) {
           if (Child.props.type === 'submit') {
+            const buttonDisabled = isSubmitting || !submitEnabledWhenInvalid && !isValid
             return React.cloneElement(Child, {
               ...Child.props,
-              disabled: isSubmitting || !submitEnabledWhenInvalid && !isValid,
+              disabled: formDisabled || buttonDisabled,
               busy: isSubmitting,
             })
           } else if (Child.props.type === 'reset') {
@@ -146,6 +150,8 @@ class InnerForm extends React.Component {
           const value = getByPath(values, name)
           const groupError = getByPath(combinedErrors, name)
           const groupTouched = getByPath(touched, name)
+          const groupDisabled = Child.props.disabled
+
           return React.cloneElement(Child, {
             ...Child.props,
             setFieldValue,
@@ -154,6 +160,7 @@ class InnerForm extends React.Component {
             error: groupError,
             value,
             horizontal,
+            disabled: formDisabled || groupDisabled,
           })
         }
 
@@ -195,6 +202,7 @@ class Form extends React.Component {
       validateOnChange = false,
       mapErrorsToFields = {},
       formikRef,
+      disabled,
       ...rest
     } = this.props
 
@@ -213,6 +221,7 @@ class Form extends React.Component {
           resetEnabledAlways,
           loading,
           mapErrorsToFields,
+          disabled,
         })}
       />
     )
@@ -273,6 +282,12 @@ Form.propTypes = {
   resetEnabledAlways: PropTypes.bool,
   /** A reference property passed to the formik component */
   formikRef: PropTypes.shape({ current: PropTypes.instanceOf(Formik) }),
+  /** Whether the form items should be in the `disabled` state */
+  disabled: PropTypes.bool,
+}
+
+Form.defaultProps = {
+  disabled: false,
 }
 
 export default Form
