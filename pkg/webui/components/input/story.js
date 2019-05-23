@@ -33,12 +33,15 @@ class Example extends React.Component {
   }
 
   render () {
-    const { valid, ...props } = this.props
+    const { type, valid, ...props } = this.props
     const { value } = this.state
 
+    const Component = type === 'toggled' ? Input.Toggled : Input
+
     return (
-      <Input
+      <Component
         {...props}
+        type={type}
         onChange={this.onChange}
         valid={valid || (Boolean(value) && value.length > 5)}
         value={value}
@@ -81,6 +84,9 @@ storiesOf('Input', module)
   ))
   .add('Byte read-only', () => (
     <Example type="byte" min={1} max={5} value="A0BF49A464" readOnly />
+  ))
+  .add('Toggled', () => (
+    <Example type="toggled" enabledMessage="Enabled" />
   ))
   .add('Textarea', () => (
     <Example component="textarea" />
