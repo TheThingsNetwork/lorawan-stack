@@ -170,19 +170,9 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 	ns := test.Must(New(
 		component.MustNew(
 			test.GetLogger(t),
-			&component.Config{
-				ServiceBase: config.ServiceBase{
-					GRPC: config.GRPC{
-						AllowInsecureForCredentials: true,
-					},
-				},
-			},
+			&component.Config{},
 			component.WithClusterNew(func(_ context.Context, conf *config.ServiceBase, registerers ...rpcserver.Registerer) (cluster.Cluster, error) {
-				a.So(conf, should.Resemble, &config.ServiceBase{
-					GRPC: config.GRPC{
-						AllowInsecureForCredentials: true,
-					},
-				})
+				a.So(conf, should.Resemble, &config.ServiceBase{})
 				if a.So(registerers, should.HaveLength, 1) {
 					a.So(registerers[0].Roles(), should.Resemble, []ttnpb.PeerInfo_Role{
 						ttnpb.PeerInfo_NETWORK_SERVER,
