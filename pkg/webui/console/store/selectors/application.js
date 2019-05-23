@@ -39,6 +39,13 @@ import { createErrorSelector } from './error'
 
 const ENTITY = 'applications'
 const ENTITY_SINGLE = 'application'
+const storeSelector = state => state.application
+
+export const applicationSelector = state => storeSelector(state).application
+
+export const fetchingSelector = state => storeSelector(state).fetching || false
+
+export const errorSelector = state => storeSelector(state).error
 
 const selectApplicationStore = state => state.application
 

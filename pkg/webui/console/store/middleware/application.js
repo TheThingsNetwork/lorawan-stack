@@ -18,6 +18,8 @@ import { isNotFoundError } from '../../../lib/errors/utils'
 import api from '../../api'
 import * as application from '../actions/application'
 import * as link from '../actions/link'
+import * as webhooks from '../actions/webhooks'
+import * as webhook from '../actions/webhook'
 import createEventsConnectLogics from './events'
 
 const getApplicationLogic = createLogic({
@@ -136,11 +138,43 @@ const getApplicationLinkLogic = createLogic({
   },
 })
 
+const getWebhookLogic = createLogic({
+  type: webhook.GET_WEBHOOK,
+  async process ({ action }, dispatch, done) {
+    const { appId, webhookId, meta: { selector }} = action
+    try {
+      const res = await api.application.webhooks.get(appId, webhookId, selector)
+      dispatch(webhook.getWebhookSuccess(res))
+    } catch (e) {
+      dispatch(webhook.getWebhookFailure(e))
+    }
+
+    done()
+  },
+})
+
+const getWebhooksLogic = createLogic({
+  type: webhooks.GET_WEBHOOKS_LIST,
+  async process ({ action }, dispatch, done) {
+    const { appId } = action
+    try {
+      const res = await api.application.webhooks.list(appId)
+      dispatch(webhooks.getWebhooksListSuccess(res.webhooks, res.totalCount))
+    } catch (e) {
+      dispatch(webhooks.getWebhooksListFailure(e))
+    }
+
+    done()
+  },
+})
+
 export default [
   getApplicationLogic,
   getApplicationApiKeysLogic,
   getApplicationApiKeyLogic,
   getApplicationCollaboratorsLogic,
+  getWebhooksLogic,
+  getWebhookLogic,
   ...createEventsConnectLogics(application.SHARED_NAME, 'application'),
   getApplicationLinkLogic,
 ]

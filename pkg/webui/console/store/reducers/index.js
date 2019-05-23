@@ -36,6 +36,8 @@ import createNamedApiKeyReducer from './api-key'
 import link from './link'
 import fetching from './ui/fetching'
 import error from './ui/error'
+import webhook from './webhook'
+import webhooks from './webhooks'
 
 export default combineReducers({
   user,
@@ -48,6 +50,8 @@ export default combineReducers({
   device,
   gateways,
   gateway,
+  webhook,
+  webhooks,
   configuration,
   apiKeys: combineReducers({
     application: createNamedApiKeyReducer(APPLICATION_SHARED_NAME),
