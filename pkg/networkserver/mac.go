@@ -31,7 +31,7 @@ func enqueueMACCommand(cid ttnpb.MACCommandIdentifier, maxDownLen, maxUpLen uint
 	if len(enq) > int(maxDown) || nUp > maxUp {
 		panic("invalid amount of MAC commands enqueued")
 	}
-	return append(cmds, enq...), maxDownLen - uint16(len(enq))*desc.DownlinkLength, maxUpLen - nUp*desc.UplinkLength, ok
+	return append(cmds, enq...), maxDownLen - uint16(len(enq))*(1+desc.DownlinkLength), maxUpLen - nUp*(1+desc.UplinkLength), ok
 }
 
 // handleMACResponse searches for first command in cmds with CID equal to cid and calls f with found value as argument.
