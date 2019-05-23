@@ -19,6 +19,7 @@ import stream from '../api/stream/stream-node'
 import ApiKeys from './api-keys'
 import Link from './link'
 import Collaborators from './collaborators'
+import Webhooks from './webhooks'
 
 /**
  * Applications Class provides an abstraction on all applications and manages
@@ -54,6 +55,7 @@ class Applications {
         set: 'application_ids.application_id',
       },
     })
+    this.Webhooks = new Webhooks(api.ApplicationWebhookRegistry)
   }
 
   _responseTransform (response, single = true) {
