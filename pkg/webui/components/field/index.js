@@ -136,7 +136,8 @@ const component = function (type) {
   case 'byte':
   case 'textarea':
     return Input
-
+  case 'toggled-input':
+    return Input.Toggled
   case 'select':
     return Select
 

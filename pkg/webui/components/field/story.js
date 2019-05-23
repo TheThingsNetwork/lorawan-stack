@@ -157,6 +157,17 @@ storiesOf('Fields/Inputs', module)
       form={false}
     />
   ))
+  .add('Toggled', () => (
+    <Field
+      name="uplink_message"
+      title="Uplink Message"
+      type="toggled-input"
+      value={{ enabled: true, value: '/path/to/webhook' }}
+      form={false}
+      touched
+      horizontal
+    />
+  ))
 
 storiesOf('Fields/Radio Buttons', module)
   .addDecorator((story, context) => withInfo(info)(story)(context))
