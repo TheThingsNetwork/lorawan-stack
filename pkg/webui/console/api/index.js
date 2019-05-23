@@ -97,6 +97,13 @@ export default {
       update: ttnClient.Applications.Collaborators.update.bind(ttnClient.Applications.Collaborators),
       remove: ttnClient.Applications.Collaborators.remove.bind(ttnClient.Applications.Collaborators),
     },
+    webhooks: {
+      list: ttnClient.Applications.Webhooks.getAll.bind(ttnClient.Applications.Webhooks),
+      get: ttnClient.Applications.Webhooks.getById.bind(ttnClient.Applications.Webhooks),
+      create: ttnClient.Applications.Webhooks.create.bind(ttnClient.Applications.Webhooks),
+      update: ttnClient.Applications.Webhooks.updateById.bind(ttnClient.Applications.Webhooks),
+      'delete': ttnClient.Applications.Webhooks.deleteById.bind(ttnClient.Applications.Webhooks),
+    },
   },
   devices: {
     list: ttnClient.Applications.Devices.getAll.bind(ttnClient.Applications.Devices),
