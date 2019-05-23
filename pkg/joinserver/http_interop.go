@@ -23,10 +23,13 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/interop"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
 type interopHandler interface {
 	HandleJoin(context.Context, *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error)
+	GetHomeNetID(context.Context, types.EUI64, types.EUI64) (*types.NetID, error)
+	GetAppSKey(context.Context, *ttnpb.SessionKeyRequest) (*ttnpb.AppSKeyResponse, error)
 }
 
 type interopServer struct {
@@ -96,4 +99,30 @@ func (srv interopServer) JoinRequest(ctx context.Context, req *interop.JoinReq) 
 		ans.NwkSEncKey = (*interop.KeyEnvelope)(res.NwkSEncKey)
 	}
 	return ans, nil
+}
+
+func (srv interopServer) HomeNSRequest(ctx context.Context, req *interop.HomeNSReq) (*interop.HomeNSAns, error) {
+	ctx = log.NewContextWithField(ctx, "namespace", "joinserver/interop")
+
+	netID, err := srv.JS.GetHomeNetID(ctx, req.ReceiverID, req.DevEUI)
+	if err != nil {
+		return nil, err
+	}
+	if netID == nil {
+		return nil, interop.ErrActivation
+	}
+
+	header, err := req.AnswerHeader()
+	if err != nil {
+		return nil, interop.ErrMalformedMessage.WithCause(err)
+	}
+	return &interop.HomeNSAns{
+		JsNsMessageHeader: header,
+		HNSID:             *netID,
+		HNetID:            *netID,
+	}, nil
+}
+
+func (interopServer) AppSKeyRequest(context.Context, *interop.AppSKeyReq) (*interop.AppSKeyAns, error) {
+	return nil, nil
 }
