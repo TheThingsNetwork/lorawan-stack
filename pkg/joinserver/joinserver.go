@@ -445,6 +445,22 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 
 // GetNwkSKeys returns the requested network session keys.
 func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.NwkSKeysResponse, error) {
+	if dn, ok := auth.X509DNFromContext(ctx); ok {
+		dev, err := js.devices.GetByEUI(ctx, req.JoinEUI, req.DevEUI,
+			[]string{
+				"network_server_address",
+			},
+		)
+		if err != nil {
+			return nil, errRegistryOperation.WithCause(err)
+		}
+		if err := validateCaller(dn, dev.NetworkServerAddress); err != nil {
+			return nil, err
+		}
+	} else if err := clusterauth.Authorized(ctx); err != nil {
+		return nil, err
+	}
+
 	ks, err := js.keys.GetByID(ctx, req.DevEUI, req.SessionKeyID,
 		[]string{
 			"f_nwk_s_int_key",
@@ -475,6 +491,22 @@ func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequ
 
 // GetAppSKey returns the requested application session key.
 func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.AppSKeyResponse, error) {
+	if dn, ok := auth.X509DNFromContext(ctx); ok {
+		dev, err := js.devices.GetByEUI(ctx, req.JoinEUI, req.DevEUI,
+			[]string{
+				"application_server_address",
+			},
+		)
+		if err != nil {
+			return nil, errRegistryOperation.WithCause(err)
+		}
+		if err := validateCaller(dn, dev.ApplicationServerAddress); err != nil {
+			return nil, err
+		}
+	} else if err := clusterauth.Authorized(ctx); err != nil {
+		return nil, err
+	}
+
 	ks, err := js.keys.GetByID(ctx, req.DevEUI, req.SessionKeyID,
 		[]string{
 			"app_s_key",

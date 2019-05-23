@@ -1467,10 +1467,13 @@ func TestHandleJoin(t *testing.T) {
 }
 
 func TestGetNwkSKeys(t *testing.T) {
+	ctx := test.Context()
+	
 	errTest := errors.New("test")
 
 	for _, tc := range []struct {
 		Name string
+		ContextFunc func(context.Context) context.Context
 
 		GetByID     func(context.Context, types.EUI64, []byte, []string) (*ttnpb.SessionKeys, error)
 		KeyRequest  *ttnpb.SessionKeyRequest
@@ -1480,6 +1483,7 @@ func TestGetNwkSKeys(t *testing.T) {
 	}{
 		{
 			Name: "Registry error",
+			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
 			GetByID: func(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
@@ -1506,6 +1510,7 @@ func TestGetNwkSKeys(t *testing.T) {
 		},
 		{
 			Name: "No SNwkSIntKey",
+			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
 			GetByID: func(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
@@ -1531,6 +1536,7 @@ func TestGetNwkSKeys(t *testing.T) {
 		},
 		{
 			Name: "No NwkSEncKey",
+			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
 			GetByID: func(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
@@ -1556,6 +1562,7 @@ func TestGetNwkSKeys(t *testing.T) {
 		},
 		{
 			Name: "No FNwkSIntKey",
+			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
 			GetByID: func(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
@@ -1581,6 +1588,7 @@ func TestGetNwkSKeys(t *testing.T) {
 		},
 		{
 			Name: "Matching request",
+			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
 			GetByID: func(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
@@ -1628,8 +1636,7 @@ func TestGetNwkSKeys(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-
-			ctx := test.ContextWithT(test.Context(), t)
+			ctx := test.ContextWithT(tc.ContextFunc(ctx), t)
 
 			c := component.MustNew(test.GetLogger(t), &component.Config{})
 			js := test.Must(New(
