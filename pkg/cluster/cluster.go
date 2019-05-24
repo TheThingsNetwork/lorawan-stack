@@ -203,7 +203,6 @@ var errPeerConnection = errors.Define(
 
 func (c *cluster) Join() (err error) {
 	options := rpcclient.DefaultDialOptions(c.ctx)
-	// TODO: Use custom WithBalancer DialOption?
 	if c.tls {
 		options = append(options, grpc.WithTransportCredentials(credentials.NewTLS(c.tlsConfig)))
 	} else {
