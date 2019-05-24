@@ -44,6 +44,8 @@ const hardcoded = {
   event_update: 'edit',
   event_uplink: 'arrow_drop_up',
   event_downlink: 'arrow_drop_down',
+  uplink: 'trending_up',
+  downlink: 'trending_down',
 }
 
 const Icon = function ({
