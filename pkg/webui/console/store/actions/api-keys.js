@@ -43,7 +43,3 @@ export const getApiKeysListSuccess = name => (id, keys, totalCount) => (
 export const getApiKeysListFailure = name => (id, error) => (
   { type: createGetApiKeysListFailureActionType(name), id, error }
 )
-
-export const getApiKey = name => id => (
-  { type: createGetApiKeyActionType(name), id }
-)

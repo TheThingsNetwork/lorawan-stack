@@ -78,8 +78,7 @@ class EditForm extends React.Component {
       await onDelete(apiKey.id)
       await this.handleDeleteSuccess(apiKey.id)
     } catch (error) {
-      await this.setState(error)
-      await this.onDeleteFailure(error)
+      await this.handleDeleteFailure(error)
     }
   }
 
@@ -96,7 +95,7 @@ class EditForm extends React.Component {
   async handleDeleteFailure (error) {
     const { onDeleteFailure } = this.props
 
-    await this.setState(error)
+    await this.setState({ error })
     await onDeleteFailure(error)
   }
 

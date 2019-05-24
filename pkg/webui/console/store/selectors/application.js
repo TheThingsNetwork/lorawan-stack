@@ -25,13 +25,19 @@ import {
 } from './rights'
 
 import {
-  apiKeySelector,
   apiKeysSelector,
   errorSelector as apiKeysErrorSelector,
   fetchingSelector as apiKeysFetchingSelector,
 } from './api-keys'
 
+import {
+  apiKeySelector,
+  fetchingSelector as apiKeyFetchingSelector,
+  errorSelector as apiKeyErrorSelector,
+} from './api-key'
+
 const ENTITY = 'applications'
+const ENTITY_SINGLE = 'application'
 
 export const applicationEventsSelector = eventsSelector(ENTITY)
 
@@ -47,8 +53,12 @@ export const applicationRightsFetchingSelector = rightsFetchingSelector(ENTITY)
 
 export const applicationKeysSelector = apiKeysSelector(ENTITY)
 
-export const applicationKeySelector = apiKeySelector(ENTITY)
-
 export const applicationKeysErrorSelector = apiKeysErrorSelector(ENTITY)
 
 export const applicationKeysFetchingSelector = apiKeysFetchingSelector(ENTITY)
+
+export const applicationKeySelector = apiKeySelector(ENTITY_SINGLE)
+
+export const applicationKeyFetchingSelector = apiKeyFetchingSelector(ENTITY_SINGLE)
+
+export const applicationKeyErrorSelector = apiKeyErrorSelector(ENTITY_SINGLE)

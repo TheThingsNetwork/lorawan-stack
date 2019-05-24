@@ -26,27 +26,27 @@ import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import { ApiKeyEditForm } from '../../../components/api-key-form'
 
-import { getApplicationApiKeyPageData } from '../../store/actions/application'
+import { getApplicationApiKey } from '../../store/actions/application'
+import { getApplicationsRightsList } from '../../store/actions/applications'
 import {
   applicationRightsSelector,
   applicationRightsErrorSelector,
   applicationRightsFetchingSelector,
   applicationKeySelector,
-  applicationKeysErrorSelector,
-  applicationKeysFetchingSelector,
+  applicationKeyErrorSelector,
+  applicationKeyFetchingSelector,
 } from '../../store/selectors/application'
 
 import api from '../../api'
 
 @connect(function (state, props) {
   const { appId, apiKeyId } = props.match.params
-  const ids = { id: appId, keyId: apiKeyId }
 
-  const keysFetching = applicationKeysFetchingSelector(state, ids)
+  const keyFetching = applicationKeyFetchingSelector(state)
   const rightsFetching = applicationRightsFetchingSelector(state, props)
-  const keysError = applicationKeysErrorSelector(state, ids)
+  const keyError = applicationKeyErrorSelector(state)
   const rightsError = applicationRightsErrorSelector(state, props)
-  const apiKey = applicationKeySelector(state, ids)
+  const apiKey = applicationKeySelector(state)
   const rights = applicationRightsSelector(state, props)
 
   return {
@@ -54,10 +54,17 @@ import api from '../../api'
     appId,
     apiKey,
     rights,
-    fetching: keysFetching || rightsFetching,
-    error: keysError || rightsError,
+    fetching: keyFetching || rightsFetching,
+    error: keyError || rightsError,
   }
-})
+},
+dispatch => ({
+  loadPageData (appId, apiKeyId) {
+    dispatch(getApplicationApiKey(appId, apiKeyId))
+    dispatch(getApplicationsRightsList(appId))
+  },
+  deleteSuccess: appId => dispatch(replace(`/console/applications/${appId}/api-keys`)),
+}))
 @withBreadcrumb('apps.single.api-keys.edit', function (props) {
   const { appId, keyId } = props
 
@@ -78,21 +85,21 @@ export default class ApplicationApiKeyEdit extends React.Component {
     this.deleteApplicationKey = id => api.application.apiKeys.delete(props.appId, id)
     this.editApplicationKey = key => api.application.apiKeys.update(
       props.appId,
-      props.apiKey.id,
+      props.keyId,
       key
     )
   }
 
   componentDidMount () {
-    const { dispatch, appId } = this.props
+    const { loadPageData, appId, keyId } = this.props
 
-    dispatch(getApplicationApiKeyPageData(appId))
+    loadPageData(appId, keyId)
   }
 
   onDeleteSuccess () {
-    const { appId, dispatch } = this.props
+    const { appId, deleteSuccess } = this.props
 
-    dispatch(replace(`/console/applications/${appId}/api-keys`))
+    deleteSuccess(appId)
   }
 
   render () {

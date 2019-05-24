@@ -79,6 +79,7 @@ export default {
     update: ttnClient.Applications.updateById.bind(ttnClient.Applications),
     eventsSubscribe: ttnClient.Applications.openStream.bind(ttnClient.Applications),
     apiKeys: {
+      get: ttnClient.Applications.ApiKeys.getById.bind(ttnClient.Applications.ApiKeys),
       list: ttnClient.Applications.ApiKeys.getAll.bind(ttnClient.Applications.ApiKeys),
       update: ttnClient.Applications.ApiKeys.updateById.bind(ttnClient.Applications.ApiKeys),
       'delete': ttnClient.Applications.ApiKeys.deleteById.bind(ttnClient.Applications.ApiKeys),
@@ -117,6 +118,7 @@ export default {
     stats: ttnClient.Gateways.getStatisticsById.bind(ttnClient.Gateways),
     eventsSubscribe: ttnClient.Gateways.openStream.bind(ttnClient.Gateways),
     apiKeys: {
+      get: ttnClient.Gateways.ApiKeys.getById.bind(ttnClient.Gateways.ApiKeys),
       list: ttnClient.Gateways.ApiKeys.getAll.bind(ttnClient.Gateways.ApiKeys),
       update: ttnClient.Gateways.ApiKeys.updateById.bind(ttnClient.Gateways.ApiKeys),
       'delete': ttnClient.Gateways.ApiKeys.deleteById.bind(ttnClient.Gateways.ApiKeys),

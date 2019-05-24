@@ -111,10 +111,7 @@ const updateGatewayStatisticsLogic = createLogic({
 })
 
 const getGatewayApiKeysLogic = createLogic({
-  type: [
-    gateway.GET_GTW_API_KEY_PAGE_DATA,
-    gateway.GET_GTW_API_KEYS_LIST,
-  ],
+  type: gateway.GET_GTW_API_KEYS_LIST,
   async process ({ action }, dispatch, done) {
     const { id, params } = action
     try {
@@ -134,10 +131,26 @@ const getGatewayApiKeysLogic = createLogic({
   },
 })
 
+const getGatewayApiKeyLogic = createLogic({
+  type: gateway.GET_GTW_API_KEY,
+  async process ({ action }, dispatch, done) {
+    const { entityId, keyId } = action
+    try {
+      const key = await api.gateway.apiKeys.get(entityId, keyId)
+      dispatch(gateway.getGatewayApiKeySuccess(key))
+    } catch (error) {
+      dispatch(gateway.getGatewayApiKeyFailure(error))
+    }
+
+    done()
+  },
+})
+
 export default [
   getGatewayLogic,
   startGatewayStatisticsLogic,
   updateGatewayStatisticsLogic,
   ...createEventsConnectLogics(gateway.SHARED_NAME, 'gateway'),
   getGatewayApiKeysLogic,
+  getGatewayApiKeyLogic,
 ]
