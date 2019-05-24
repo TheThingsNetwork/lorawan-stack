@@ -44,7 +44,7 @@ import { getDeviceId } from '../../../lib/selectors/id'
   )
 })
 @bind
-export default class DeviceGeneralSettings extends React.Component {
+export default class Data extends React.Component {
   render () {
     const { devIds } = this.props
 
@@ -54,7 +54,7 @@ export default class DeviceGeneralSettings extends React.Component {
           title={sharedMessages.data}
         />
         <Row>
-          <Col sm={12} md={12} lg={8} xl={8}>
+          <Col sm={12}>
             <DeviceEvents
               devIds={devIds}
             />
