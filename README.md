@@ -29,7 +29,7 @@ LoRaWAN is a protocol for low-power wide area networks. It allows for large scal
 - LoRaWAN Join Server
   - [x] Supports OTAA session key derivation
   - [x] Supports external crypto services
-  - [ ] Implements LoRaWAN Back-end Interfaces 1.0
+  - [x] Implements LoRaWAN Back-end Interfaces 1.0 and 1.1 draft 3
 - OAuth 2.0 Identity Server
   - [x] User management
   - [x] Entity management
