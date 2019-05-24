@@ -40,7 +40,7 @@ require (
 	github.com/gregjones/httpcache v0.0.0-20190212212710-3befbb6ad0cc
 	github.com/grpc-ecosystem/go-grpc-middleware v1.0.0
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
-	github.com/grpc-ecosystem/grpc-gateway v1.6.2
+	github.com/grpc-ecosystem/grpc-gateway v1.8.5
 	github.com/heptiolabs/healthcheck v0.0.0-20180807145615-6ff867650f40
 	github.com/howeyc/gopass v0.0.0-20170109162249-bf9dde6d0d2c
 	github.com/jacobsa/crypto v0.0.0-20190317225127-9f44e2d11115
@@ -64,6 +64,8 @@ require (
 	github.com/mgechev/revive v0.0.0-20190416071613-796760d728e1
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
+	github.com/nats-io/nats-server v1.4.1
+	github.com/nats-io/nats.go v1.7.2
 	github.com/oklog/ulid v1.3.1
 	github.com/openshift/osin v1.0.1
 	github.com/pkg/browser v0.0.0-20180916011732-0a3d74bf9ce4
@@ -82,7 +84,7 @@ require (
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	go.opencensus.io v0.20.2
 	go.thethings.network/lorawan-stack-legacy v0.0.0-20190118141410-68812c833a78
-	gocloud.dev v0.12.0
+	gocloud.dev v0.13.0
 	golang.org/x/crypto v0.0.0-20190411191339-88737f569e3a
 	golang.org/x/net v0.0.0-20190424112056-4829fb13d2c6
 	golang.org/x/oauth2 v0.0.0-20190402181905-9f3314589c9a
