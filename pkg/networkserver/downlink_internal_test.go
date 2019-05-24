@@ -932,6 +932,21 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}:
 				}
 
+				if !AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(reqCtx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time, replace bool) bool {
+					return a.So(reqCtx, should.HaveParentContextOrEqual, ctx) &&
+						a.So(devID, should.Resemble, ttnpb.EndDeviceIdentifiers{
+							ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+							DeviceID:               "test-dev-id",
+						}) &&
+						a.So(replace, should.BeTrue) &&
+						a.So(t, should.Resemble, setDevice.MACState.LastConfirmedDownlinkAt.Add(42*time.Second))
+				},
+					nil,
+				) {
+					t.Error("Downlink task add assertion failed")
+					return false
+				}
+
 				select {
 				case <-ctx.Done():
 					t.Error("Timed out while waiting for DownlinkTasks.Pop callback to return")
@@ -1241,6 +1256,183 @@ func TestProcessDownlinkTask(t *testing.T) {
 						}) &&
 						a.So(replace, should.BeTrue) &&
 						a.So(t, should.Resemble, setDevice.MACState.LastConfirmedDownlinkAt.Add(42*time.Second))
+				},
+					nil,
+				) {
+					t.Error("Downlink task add assertion failed")
+					return false
+				}
+
+				select {
+				case <-ctx.Done():
+					t.Error("Timed out while waiting for DownlinkTasks.Pop callback to return")
+
+				case resp := <-popFuncRespCh:
+					a.So(resp, should.BeNil)
+				}
+				close(popFuncRespCh)
+
+				select {
+				case <-ctx.Done():
+					t.Error("Timed out while waiting for DownlinkTasks.Pop response to be processed")
+
+				case popRespCh <- nil:
+				}
+
+				return true
+			},
+		},
+
+		{
+			Name: "application downlink/Class C/absolute time outside window",
+			DownlinkPriorities: DownlinkPriorities{
+				JoinAccept:             ttnpb.TxSchedulePriority_HIGHEST,
+				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
+				MaxApplicationDownlink: ttnpb.TxSchedulePriority_NORMAL,
+			},
+			Handler: func(ctx context.Context, env Environment) bool {
+				t := test.MustTFromContext(ctx)
+				a := assertions.New(t)
+
+				var popRespCh chan<- error
+				popFuncRespCh := make(chan error)
+				select {
+				case <-ctx.Done():
+					t.Error("Timed out while waiting for DownlinkTasks.Pop to be called")
+					return false
+
+				case req := <-env.DownlinkTasks.Pop:
+					popRespCh = req.Response
+					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
+					go func() {
+						popFuncRespCh <- req.Func(req.Context, ttnpb.EndDeviceIdentifiers{
+							ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+							DeviceID:               "test-dev-id",
+						}, time.Now())
+					}()
+				}
+
+				lastUp := &ttnpb.UplinkMessage{
+					CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
+					DeviceChannelIndex: 3,
+					Payload: &ttnpb.Message{
+						MHDR: ttnpb.MHDR{
+							MType: ttnpb.MType_UNCONFIRMED_UP,
+						},
+						Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
+					},
+					ReceivedAt: time.Now().Add(-time.Second),
+					RxMetadata: deepcopy.Copy(rxMetadata).([]*ttnpb.RxMetadata),
+					Settings: ttnpb.TxSettings{
+						DataRateIndex: ttnpb.DATA_RATE_0,
+						Frequency:     430000000,
+					},
+				}
+
+				absTime := time.Now().Add(42 * time.Hour).UTC()
+
+				var setRespCh chan<- DeviceRegistrySetByIDResponse
+				setFuncRespCh := make(chan DeviceRegistrySetByIDRequestFuncResponse)
+				select {
+				case <-ctx.Done():
+					t.Error("Timed out while waiting for DeviceRegistry.SetByID to be called")
+					return false
+
+				case req := <-env.DeviceRegistry.SetByID:
+					setRespCh = req.Response
+					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
+					a.So(req.ApplicationIdentifiers, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
+					a.So(req.DeviceID, should.Resemble, "test-dev-id")
+					a.So(req.Paths, should.Resemble, getPaths)
+
+					go func() {
+						dev, sets, err := req.Func(&ttnpb.EndDevice{
+							EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+								ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+								DeviceID:               "test-dev-id",
+								DevAddr:                &types.DevAddr{0x42, 0xff, 0xff, 0xff},
+							},
+							FrequencyPlanID:   test.EUFrequencyPlanID,
+							LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+							MACSettings: &ttnpb.MACSettings{
+								ClassCTimeout: DurationPtr(42 * time.Second),
+							},
+							MACState: &ttnpb.MACState{
+								CurrentParameters: *CopyMACParameters(eu868macParameters),
+								DesiredParameters: *CopyMACParameters(eu868macParameters),
+								DeviceClass:       ttnpb.CLASS_C,
+								LoRaWANVersion:    ttnpb.MAC_V1_1,
+								QueuedResponses: []*ttnpb.MACCommand{
+									(&ttnpb.MACCommand_ResetConf{
+										MinorVersion: 1,
+									}).MACCommand(),
+									(&ttnpb.MACCommand_LinkCheckAns{
+										Margin:       2,
+										GatewayCount: 5,
+									}).MACCommand(),
+								},
+								RxWindowsAvailable: true,
+							},
+							QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+								{
+									CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+									FCnt:           0x42,
+									FPort:          0x1,
+									FRMPayload:     []byte("testPayload"),
+									Priority:       ttnpb.TxSchedulePriority_HIGHEST,
+									SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+									ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
+										AbsoluteTime: deepcopy.Copy(&absTime).(*time.Time),
+									},
+								},
+							},
+							RecentUplinks: []*ttnpb.UplinkMessage{
+								CopyUplinkMessage(lastUp),
+							},
+							Session: &ttnpb.Session{
+								DevAddr:       types.DevAddr{0x42, 0xff, 0xff, 0xff},
+								LastNFCntDown: 0x24,
+								SessionKeys:   *CopySessionKeys(sessionKeys),
+							},
+						})
+						setFuncRespCh <- DeviceRegistrySetByIDRequestFuncResponse{
+							Device: dev,
+							Paths:  sets,
+							Error:  err,
+						}
+					}()
+				}
+
+				var setErr error
+				select {
+				case <-ctx.Done():
+					t.Error("Timed out while waiting for DeviceRegistry.SetByID callback to return")
+
+				case resp := <-setFuncRespCh:
+					setErr = resp.Error
+					a.So(resp.Error, should.BeError)
+					a.So(resp.Paths, should.BeNil)
+					a.So(resp.Device, should.BeNil)
+				}
+				close(setFuncRespCh)
+
+				select {
+				case <-ctx.Done():
+					t.Error("Timed out while waiting for DeviceRegistry.SetByID response to be processed")
+
+				case setRespCh <- DeviceRegistrySetByIDResponse{
+					Error: setErr,
+				}:
+				}
+
+				if !AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(reqCtx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time, replace bool) bool {
+					return a.So(reqCtx, should.HaveParentContextOrEqual, ctx) &&
+						a.So(devID, should.Resemble, ttnpb.EndDeviceIdentifiers{
+							ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+							DeviceID:               "test-dev-id",
+						}) &&
+						a.So(replace, should.BeTrue) &&
+						a.So(t, should.Resemble, absTime.Add(-gsScheduleWindow))
 				},
 					nil,
 				) {
