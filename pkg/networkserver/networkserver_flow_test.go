@@ -32,7 +32,6 @@ import (
 	. "go.thethings.network/lorawan-stack/pkg/networkserver"
 	"go.thethings.network/lorawan-stack/pkg/networkserver/redis"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
-	"go.thethings.network/lorawan-stack/pkg/rpcserver"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
@@ -171,13 +170,7 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 		component.MustNew(
 			test.GetLogger(t),
 			&component.Config{},
-			component.WithClusterNew(func(_ context.Context, conf *config.ServiceBase, registerers ...rpcserver.Registerer) (cluster.Cluster, error) {
-				a.So(conf, should.Resemble, &config.ServiceBase{})
-				if a.So(registerers, should.HaveLength, 1) {
-					a.So(registerers[0].Roles(), should.Resemble, []ttnpb.PeerInfo_Role{
-						ttnpb.PeerInfo_NETWORK_SERVER,
-					})
-				}
+			component.WithClusterNew(func(_ context.Context, conf *config.Cluster, options ...cluster.Option) (cluster.Cluster, error) {
 				return &test.MockCluster{
 					AuthFunc:    test.MakeClusterAuthChFunc(authCh),
 					GetPeerFunc: test.MakeClusterGetPeerChFunc(getPeerCh),

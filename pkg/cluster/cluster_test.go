@@ -26,7 +26,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/rpclog"
-	"go.thethings.network/lorawan-stack/pkg/rpcserver"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
@@ -56,7 +55,7 @@ func TestCluster(t *testing.T) {
 
 	go grpc.NewServer().Serve(lis)
 
-	config := &config.ServiceBase{Cluster: config.Cluster{
+	config := config.Cluster{
 		Address:           lis.Addr().String(),
 		IdentityServer:    lis.Addr().String(),
 		GatewayServer:     lis.Addr().String(),
@@ -64,11 +63,11 @@ func TestCluster(t *testing.T) {
 		ApplicationServer: lis.Addr().String(),
 		JoinServer:        lis.Addr().String(),
 		Join:              []string{lis.Addr().String()},
-	}}
+	}
 
 	ctx := test.Context()
 
-	c, err := New(ctx, config, []rpcserver.Registerer{}...)
+	c, err := New(ctx, &config)
 	a.So(err, should.BeNil)
 
 	a.So(c.Join(), should.BeNil)

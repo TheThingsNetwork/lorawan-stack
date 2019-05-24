@@ -37,11 +37,9 @@ func TestVerifySource(t *testing.T) {
 
 	key := []byte{0x2A, 0x9C, 0x2C, 0x3C, 0x2A, 0x9C, 0x2A, 0x9C, 0x2A, 0x9C, 0x2A, 0x9C, 0x2A, 0x9C, 0x2A, 0x9C}
 
-	c, err := New(ctx, &config.ServiceBase{
-		Cluster: config.Cluster{
-			Keys: []string{
-				hex.EncodeToString(key),
-			},
+	c, err := New(ctx, &config.Cluster{
+		Keys: []string{
+			hex.EncodeToString(key),
 		},
 	})
 	a.So(err, should.BeNil)

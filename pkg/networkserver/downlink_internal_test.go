@@ -34,7 +34,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/log"
-	"go.thethings.network/lorawan-stack/pkg/rpcserver"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
@@ -1531,7 +1530,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 			c := component.MustNew(
 				log.Noop,
 				&component.Config{},
-				component.WithClusterNew(func(context.Context, *config.ServiceBase, ...rpcserver.Registerer) (cluster.Cluster, error) {
+				component.WithClusterNew(func(context.Context, *config.Cluster, ...cluster.Option) (cluster.Cluster, error) {
 					return &test.MockCluster{
 						AuthFunc:    test.MakeClusterAuthChFunc(authCh),
 						GetPeerFunc: test.MakeClusterGetPeerChFunc(getPeerCh),
@@ -2564,7 +2563,7 @@ func TestGenerateDownlink(t *testing.T) {
 			c := component.MustNew(
 				log.Noop,
 				&component.Config{},
-				component.WithClusterNew(func(context.Context, *config.ServiceBase, ...rpcserver.Registerer) (cluster.Cluster, error) {
+				component.WithClusterNew(func(context.Context, *config.Cluster, ...cluster.Option) (cluster.Cluster, error) {
 					return &test.MockCluster{
 						JoinFunc: test.ClusterJoinNilFunc,
 					}, nil

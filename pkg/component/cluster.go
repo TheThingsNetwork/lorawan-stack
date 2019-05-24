@@ -22,7 +22,10 @@ import (
 )
 
 func (c *Component) initCluster() (err error) {
-	c.cluster, err = c.clusterNew(c.ctx, &c.config.ServiceBase, c.grpcSubsystems...)
+	clusterOpts := []cluster.Option{
+		cluster.WithServices(c.grpcSubsystems...),
+	}
+	c.cluster, err = c.clusterNew(c.ctx, &c.config.ServiceBase.Cluster, clusterOpts...)
 	if err != nil {
 		return err
 	}

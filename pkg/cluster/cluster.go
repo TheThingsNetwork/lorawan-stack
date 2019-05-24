@@ -67,25 +67,44 @@ type Cluster interface {
 	WithVerifiedSource(context.Context) context.Context
 }
 
+// Option to apply at cluster initialization.
+type Option interface {
+	apply(*cluster)
+}
+
+type optionFunc func(*cluster)
+
+func (f optionFunc) apply(c *cluster) { f(c) }
+// WithServices registers the given services on the "self" peer.
+func WithServices(services ...rpcserver.Registerer) Option {
+	return optionFunc(func(c *cluster) {
+		for _, service := range services {
+			if roles := service.Roles(); len(roles) > 0 {
+				c.self.roles = append(c.self.roles, roles...)
+			}
+		}
+	})
+}
+
 // CustomNew allows you to replace the clustering implementation. New will call CustomNew if not nil.
-var CustomNew func(ctx context.Context, config *config.ServiceBase, services ...rpcserver.Registerer) (Cluster, error)
+var CustomNew func(ctx context.Context, config *config.Cluster, options ...Option) (Cluster, error)
 
 // New instantiates a new clustering implementation.
 // The basic clustering implementation allows for a cluster setup with a single-instance deployment of each component
 // (GS/NS/AS/JS).
 // Network operators can use their own clustering logic, which can be activated by setting the CustomNew variable.
-func New(ctx context.Context, config *config.ServiceBase, services ...rpcserver.Registerer) (Cluster, error) {
+func New(ctx context.Context, config *config.Cluster, options ...Option) (Cluster, error) {
 	if CustomNew != nil {
-		return CustomNew(ctx, config, services...)
+		return CustomNew(ctx, config, options...)
 	}
 
 	c := &cluster{
 		ctx:   ctx,
-		tls:   config.Cluster.TLS,
+		tls:   config.TLS,
 		peers: make(map[string]*peer),
 	}
 
-	for i, key := range config.Cluster.Keys {
+	for i, key := range config.Keys {
 		decodedKey, err := hex.DecodeString(key)
 		if err != nil {
 			return nil, fmt.Errorf("Could not decode cluster key: %s", err)
@@ -103,25 +122,12 @@ func New(ctx context.Context, config *config.ServiceBase, services ...rpcserver.
 	}
 
 	c.self = &peer{
-		name:   config.Cluster.Name,
-		target: config.Cluster.Address,
+		name:   config.Name,
+		target: config.Address,
 	}
 	if c.self.name == "" {
 		c.self.name, _ = os.Hostname()
 	}
-	if c.self.target == "" {
-		if c.tls {
-			c.self.target = config.GRPC.ListenTLS
-		} else {
-			c.self.target = config.GRPC.Listen
-		}
-	}
-	for _, service := range services {
-		if roles := service.Roles(); len(roles) > 0 {
-			c.self.roles = append(c.self.roles, roles...)
-		}
-	}
-
 	c.peers[c.self.name] = c.self
 
 	tryAddPeer := func(name string, target string, roles ...ttnpb.PeerInfo_Role) {
@@ -144,17 +150,21 @@ func New(ctx context.Context, config *config.ServiceBase, services ...rpcserver.
 		}
 	}
 
-	tryAddPeer("is", config.Cluster.IdentityServer, ttnpb.PeerInfo_ACCESS, ttnpb.PeerInfo_ENTITY_REGISTRY)
-	tryAddPeer("gs", config.Cluster.GatewayServer, ttnpb.PeerInfo_GATEWAY_SERVER)
-	tryAddPeer("ns", config.Cluster.NetworkServer, ttnpb.PeerInfo_NETWORK_SERVER)
-	tryAddPeer("as", config.Cluster.ApplicationServer, ttnpb.PeerInfo_APPLICATION_SERVER)
-	tryAddPeer("js", config.Cluster.JoinServer, ttnpb.PeerInfo_JOIN_SERVER)
+	tryAddPeer("is", config.IdentityServer, ttnpb.PeerInfo_ACCESS, ttnpb.PeerInfo_ENTITY_REGISTRY)
+	tryAddPeer("gs", config.GatewayServer, ttnpb.PeerInfo_GATEWAY_SERVER)
+	tryAddPeer("ns", config.NetworkServer, ttnpb.PeerInfo_NETWORK_SERVER)
+	tryAddPeer("as", config.ApplicationServer, ttnpb.PeerInfo_APPLICATION_SERVER)
+	tryAddPeer("js", config.JoinServer, ttnpb.PeerInfo_JOIN_SERVER)
 
-	for _, join := range config.Cluster.Join {
+	for _, join := range config.Join {
 		c.peers[join] = &peer{
 			name:   join,
 			target: join,
 		}
+	}
+
+	for _, option := range options {
+		option.apply(c)
 	}
 
 	return c, nil
