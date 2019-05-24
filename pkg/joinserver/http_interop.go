@@ -53,9 +53,9 @@ func (srv interopServer) JoinRequest(ctx context.Context, req *interop.JoinReq) 
 
 	res, err := srv.JS.HandleJoin(ctx, &ttnpb.JoinRequest{
 		RawPayload:         req.PHYPayload,
-		DevAddr:            req.DevAddr,
+		DevAddr:            types.DevAddr(req.DevAddr),
 		SelectedMACVersion: ttnpb.MACVersion(req.MACVersion),
-		NetID:              req.SenderID,
+		NetID:              types.NetID(req.SenderID),
 		DownlinkSettings:   dlSettings,
 		RxDelay:            req.RxDelay,
 		CFList:             cfList,
@@ -104,7 +104,7 @@ func (srv interopServer) JoinRequest(ctx context.Context, req *interop.JoinReq) 
 func (srv interopServer) HomeNSRequest(ctx context.Context, req *interop.HomeNSReq) (*interop.HomeNSAns, error) {
 	ctx = log.NewContextWithField(ctx, "namespace", "joinserver/interop")
 
-	netID, err := srv.JS.GetHomeNetID(ctx, req.ReceiverID, req.DevEUI)
+	netID, err := srv.JS.GetHomeNetID(ctx, types.EUI64(req.ReceiverID), types.EUI64(req.DevEUI))
 	if err != nil {
 		return nil, err
 	}
@@ -118,8 +118,8 @@ func (srv interopServer) HomeNSRequest(ctx context.Context, req *interop.HomeNSR
 	}
 	return &interop.HomeNSAns{
 		JsNsMessageHeader: header,
-		HNSID:             *netID,
-		HNetID:            *netID,
+		HNSID:             interop.NetID(*netID),
+		HNetID:            interop.NetID(*netID),
 	}, nil
 }
 
@@ -127,8 +127,8 @@ func (srv interopServer) AppSKeyRequest(ctx context.Context, req *interop.AppSKe
 	ctx = log.NewContextWithField(ctx, "namespace", "joinserver/interop")
 
 	res, err := srv.JS.GetAppSKey(ctx, &ttnpb.SessionKeyRequest{
-		JoinEUI:      req.ReceiverID,
-		DevEUI:       req.DevEUI,
+		JoinEUI:      types.EUI64(req.ReceiverID),
+		DevEUI:       types.EUI64(req.DevEUI),
 		SessionKeyID: req.SessionKeyID,
 	})
 	if err != nil {
