@@ -211,7 +211,6 @@
   "lib.shared-messages.macVersion": "MAC Version",
   "lib.shared-messages.model": "Model",
   "lib.shared-messages.name": "Name",
-  "lib.shared-messages.networkKey": "Network Key",
   "lib.shared-messages.noDesc": "This device has no description",
   "lib.shared-messages.noEvents": "{entityId} has not sent any events recently",
   "lib.shared-messages.noMatch": "No items matched your criteria",

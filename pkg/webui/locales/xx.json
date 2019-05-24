@@ -211,7 +211,6 @@
   "lib.shared-messages.macVersion": "XXX Xxxxxxx",
   "lib.shared-messages.model": "Xxxxx",
   "lib.shared-messages.name": "Xxxx",
-  "lib.shared-messages.networkKey": "Xxxxxxx Xxx",
   "lib.shared-messages.noDesc": "Xxxx xxxxxx xxx xx xxxxxxxxxxx",
   "lib.shared-messages.noEvents": "{entityId} xxx xxx xxxx xxx xxxxxx xxxxxxxx",
   "lib.shared-messages.noMatch": "Xx xxxxx xxxxxxx xxxx xxxxxxxx",
