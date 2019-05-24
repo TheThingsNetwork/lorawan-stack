@@ -17,6 +17,7 @@ package cluster
 
 import (
 	"context"
+	"crypto/tls"
 	"encoding/hex"
 	"fmt"
 	"os"
@@ -186,10 +187,11 @@ func New(ctx context.Context, config *config.Cluster, options ...Option) (Cluste
 }
 
 type cluster struct {
-	ctx   context.Context
-	tls   bool
-	peers map[string]*peer
-	self  *peer
+	ctx       context.Context
+	tls       bool
+	tlsConfig *tls.Config
+	peers     map[string]*peer
+	self      *peer
 
 	keys [][]byte
 }
@@ -203,7 +205,7 @@ func (c *cluster) Join() (err error) {
 	options := rpcclient.DefaultDialOptions(c.ctx)
 	// TODO: Use custom WithBalancer DialOption?
 	if c.tls {
-		options = append(options, grpc.WithTransportCredentials(credentials.NewTLS(nil))) // TODO: Get *tls.Config from context
+		options = append(options, grpc.WithTransportCredentials(credentials.NewTLS(c.tlsConfig)))
 	} else {
 		options = append(options, grpc.WithInsecure())
 	}

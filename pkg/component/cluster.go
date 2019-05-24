@@ -26,6 +26,9 @@ func (c *Component) initCluster() (err error) {
 		cluster.WithServices(c.grpcSubsystems...),
 		cluster.WithConn(c.LoopbackConn()),
 	}
+	if tlsConfig, err := c.config.TLS.Config(c.Context()); err == nil {
+		clusterOpts = append(clusterOpts, cluster.WithTLSConfig(tlsConfig))
+	}
 	c.cluster, err = c.clusterNew(c.ctx, &c.config.ServiceBase.Cluster, clusterOpts...)
 	if err != nil {
 		return err
