@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/interop"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -541,6 +542,120 @@ func TestInteropHomeNSRequest(t *testing.T) {
 			}
 
 			a.So(ans, should.Resemble, tc.ExpectedHomeNSAns)
+		})
+	}
+}
+
+func TestInteropAppSKeyRequest(t *testing.T) {
+	errNotFound := errors.DefineNotFound("not_found", "not found")
+
+	for _, tc := range []struct {
+		Name                      string
+		AppSKeyReq                *interop.AppSKeyReq
+		ExpectedSessionKeyRequest *ttnpb.SessionKeyRequest
+		ErrorAssertion            func(*testing.T, error) bool
+		GetAppSKeyFunc            func() (*ttnpb.AppSKeyResponse, error)
+		ExpectedAppSKeyAns        *interop.AppSKeyAns
+	}{
+		{
+			Name: "Normal",
+			AppSKeyReq: &interop.AppSKeyReq{
+				AsJsMessageHeader: interop.AsJsMessageHeader{
+					MessageHeader: interop.MessageHeader{
+						ProtocolVersion: "1.0",
+						MessageType:     interop.MessageTypeJoinReq,
+					},
+					SenderID:   interop.Buffer("test.local"),
+					ReceiverID: types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				},
+				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				SessionKeyID: interop.Buffer{0x1, 0x2, 0x3, 0x4},
+			},
+			ExpectedSessionKeyRequest: &ttnpb.SessionKeyRequest{
+				JoinEUI:      types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				SessionKeyID: []byte{0x1, 0x2, 0x3, 0x4},
+			},
+			GetAppSKeyFunc: func() (*ttnpb.AppSKeyResponse, error) {
+				return &ttnpb.AppSKeyResponse{
+					AppSKey: ttnpb.KeyEnvelope{
+						KEKLabel:     "test",
+						EncryptedKey: []byte{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
+					},
+				}, nil
+			},
+			ExpectedAppSKeyAns: &interop.AppSKeyAns{
+				JsAsMessageHeader: interop.JsAsMessageHeader{
+					MessageHeader: interop.MessageHeader{
+						ProtocolVersion: "1.0",
+						MessageType:     interop.MessageTypeJoinAns,
+					},
+					SenderID:   types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					ReceiverID: interop.Buffer("test.local"),
+				},
+				Result: interop.ResultSuccess,
+				DevEUI: types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				AppSKey: interop.KeyEnvelope{
+					KEKLabel:     "test",
+					EncryptedKey: []byte{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
+				},
+				SessionKeyID: interop.Buffer{0x1, 0x2, 0x3, 0x4},
+			},
+		},
+		{
+			Name: "UnknownDevEUI",
+			AppSKeyReq: &interop.AppSKeyReq{
+				AsJsMessageHeader: interop.AsJsMessageHeader{
+					MessageHeader: interop.MessageHeader{
+						ProtocolVersion: "1.0",
+						MessageType:     interop.MessageTypeJoinReq,
+					},
+					SenderID:   interop.Buffer("test.local"),
+					ReceiverID: types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				},
+				DevEUI:       types.EUI64{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42},
+				SessionKeyID: interop.Buffer{0x1, 0x2, 0x3, 0x4},
+			},
+			ExpectedSessionKeyRequest: &ttnpb.SessionKeyRequest{
+				JoinEUI:      types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				DevEUI:       types.EUI64{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42},
+				SessionKeyID: []byte{0x1, 0x2, 0x3, 0x4},
+			},
+			GetAppSKeyFunc: func() (*ttnpb.AppSKeyResponse, error) {
+				return nil, errRegistryOperation.WithCause(errNotFound)
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				a := assertions.New(t)
+				return a.So(err, should.HaveSameErrorDefinitionAs, interop.ErrUnknownDevEUI)
+			},
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			ctx := log.NewContext(test.Context(), test.GetLogger(t))
+			a := assertions.New(t)
+
+			srv := interopServer{
+				JS: &mockInteropHandler{
+					GetAppSKeyFunc: func(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.AppSKeyResponse, error) {
+						if !a.So(req, should.Resemble, tc.ExpectedSessionKeyRequest) {
+							t.FailNow()
+						}
+						return tc.GetAppSKeyFunc()
+					},
+				},
+			}
+
+			ans, err := srv.AppSKeyRequest(ctx, tc.AppSKeyReq)
+			if err != nil {
+				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
+					t.Fatalf("Unexpected error: %v", err)
+				}
+				return
+			} else if tc.ErrorAssertion != nil {
+				t.Fatal("Expected error")
+			}
+
+			a.So(ans, should.Resemble, tc.ExpectedAppSKeyAns)
 		})
 	}
 }

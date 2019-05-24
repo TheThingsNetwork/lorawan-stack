@@ -123,6 +123,35 @@ func (srv interopServer) HomeNSRequest(ctx context.Context, req *interop.HomeNSR
 	}, nil
 }
 
-func (interopServer) AppSKeyRequest(context.Context, *interop.AppSKeyReq) (*interop.AppSKeyAns, error) {
-	return nil, nil
+func (srv interopServer) AppSKeyRequest(ctx context.Context, req *interop.AppSKeyReq) (*interop.AppSKeyAns, error) {
+	ctx = log.NewContextWithField(ctx, "namespace", "joinserver/interop")
+
+	res, err := srv.JS.GetAppSKey(ctx, &ttnpb.SessionKeyRequest{
+		JoinEUI:      req.ReceiverID,
+		DevEUI:       req.DevEUI,
+		SessionKeyID: req.SessionKeyID,
+	})
+	if err != nil {
+		switch {
+		case errors.Resemble(err, errAddressNotAuthorized):
+			return nil, interop.ErrActivation.WithCause(err)
+		case errors.Resemble(err, errRegistryOperation):
+			if errors.IsNotFound(errors.Cause(err)) {
+				return nil, interop.ErrUnknownDevEUI.WithCause(err)
+			}
+		}
+		return nil, err
+	}
+
+	header, err := req.AnswerHeader()
+	if err != nil {
+		return nil, interop.ErrMalformedMessage.WithCause(err)
+	}
+	return &interop.AppSKeyAns{
+		JsAsMessageHeader: header,
+		Result:            interop.ResultSuccess,
+		DevEUI:            req.DevEUI,
+		AppSKey:           interop.KeyEnvelope(res.AppSKey),
+		SessionKeyID:      req.SessionKeyID,
+	}, nil
 }
