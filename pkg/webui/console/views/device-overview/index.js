@@ -105,7 +105,7 @@ class DeviceOverview extends React.Component {
         sensitive: false,
         subItems: [
           { key: sharedMessages.appKey, value: root_keys.app_key.key, type: 'byte', sensitive: true },
-          { key: sharedMessages.networkKey, value: root_keys.nwk_key.key, type: 'byte', sensitive: true },
+          { key: sharedMessages.nwkKey, value: root_keys.nwk_key.key, type: 'byte', sensitive: true },
         ],
       })
     }

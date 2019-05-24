@@ -94,7 +94,6 @@ export default defineMessages({
   macVersion: 'MAC Version',
   model: 'Model',
   name: 'Name',
-  networkKey: 'Network Key',
   noDesc: 'This device has no description',
   noEvents: '{entityId} has not sent any events recently',
   noMatch: 'No items matched your criteria',
