@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
+import { connect } from 'react-redux'
 import { defineMessages } from 'react-intl'
 import { Container, Col, Row } from 'react-grid-system'
 
@@ -23,12 +24,21 @@ import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Message from '../../../lib/components/message'
 import ApplicationEvents from '../../containers/application-events'
 
+import { getApplicationId } from '../../../lib/selectors/id'
+
 import style from './application-data.styl'
 
 const m = defineMessages({
   appData: 'Application Data',
 })
 
+@connect(function (state) {
+  const application = state.application.application
+
+  return {
+    appId: getApplicationId(application),
+  }
+})
 @withBreadcrumb('apps.single.data', function (props) {
   return (
     <Breadcrumb
@@ -41,7 +51,7 @@ const m = defineMessages({
 export default class Data extends React.Component {
 
   render () {
-    const { appId } = this.props.match.params
+    const { appId } = this.props
 
     return (
       <Container>
