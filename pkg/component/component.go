@@ -63,7 +63,7 @@ type Component struct {
 	sentry *raven.Client
 
 	cluster    cluster.Cluster
-	clusterNew func(ctx context.Context, config *config.ServiceBase, services ...rpcserver.Registerer) (cluster.Cluster, error)
+	clusterNew func(ctx context.Context, config *config.Cluster, options ...cluster.Option) (cluster.Cluster, error)
 
 	grpc           *rpcserver.Server
 	grpcSubsystems []rpcserver.Registerer
@@ -97,7 +97,7 @@ type Option func(*Component)
 // setting up the cluster.
 // This allows extending the cluster configuration with custom logic based on
 // information in the context.
-func WithClusterNew(f func(ctx context.Context, config *config.ServiceBase, services ...rpcserver.Registerer) (cluster.Cluster, error)) Option {
+func WithClusterNew(f func(ctx context.Context, config *config.Cluster, options ...cluster.Option) (cluster.Cluster, error)) Option {
 	return func(c *Component) {
 		c.clusterNew = f
 	}
