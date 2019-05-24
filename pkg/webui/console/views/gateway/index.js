@@ -26,6 +26,7 @@ import Message from '../../../lib/components/message'
 import GatewayOverview from '../gateway-overview'
 import GatewayApiKeys from '../gateway-api-keys'
 import GatewayLocation from '../gateway-location'
+import GatewayData from '../gateway-data'
 
 import {
   getGateway,
@@ -75,6 +76,11 @@ dispatch => ({
         path: `${matchedUrl}/api-keys`,
         icon: 'api_keys',
         exact: false,
+      },
+      {
+        title: sharedMessages.data,
+        path: `${matchedUrl}/data`,
+        icon: 'data',
       },
     ],
   }
@@ -137,6 +143,7 @@ export default class Gateway extends React.Component {
         <Route exact path={`${match.path}`} component={GatewayOverview} />
         <Route path={`${match.path}/api-keys`} component={GatewayApiKeys} />
         <Route path={`${match.path}/location`} component={GatewayLocation} />
+        <Route path={`${match.path}/data`} component={GatewayData} />
       </Switch>
     )
   }
