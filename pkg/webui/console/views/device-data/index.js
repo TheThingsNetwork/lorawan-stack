@@ -44,7 +44,7 @@ import { getDeviceId } from '../../../lib/selectors/id'
   )
 })
 @bind
-export default class DeviceGeneralSettings extends React.Component {
+export default class Data extends React.Component {
   render () {
     const { devIds } = this.props
 
