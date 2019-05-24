@@ -22,7 +22,6 @@ import (
 
 	echo "github.com/labstack/echo/v4"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
 // MessageHeader contains the message header.
@@ -100,10 +99,10 @@ type ErrorMessage struct {
 // NsJsMessageHeader contains the message header for NS to JS messages.
 type NsJsMessageHeader struct {
 	MessageHeader
-	SenderID types.NetID
+	SenderID NetID
 	// ReceiverID is a JoinEUI.
-	ReceiverID types.EUI64
-	SenderNSID types.NetID
+	ReceiverID EUI64
+	SenderNSID NetID
 }
 
 // AnswerHeader returns the header of the answer message.
@@ -124,9 +123,9 @@ func (h NsJsMessageHeader) AnswerHeader() (JsNsMessageHeader, error) {
 type JsNsMessageHeader struct {
 	MessageHeader
 	// SenderID is a JoinEUI.
-	SenderID     types.EUI64
-	ReceiverID   types.NetID
-	ReceiverNSID types.NetID
+	SenderID     EUI64
+	ReceiverID   NetID
+	ReceiverNSID NetID
 }
 
 // AsJsMessageHeader contains the message header for AS to JS messages.
@@ -134,7 +133,7 @@ type AsJsMessageHeader struct {
 	MessageHeader
 	SenderID Buffer
 	// ReceiverID is a JoinEUI.
-	ReceiverID types.EUI64
+	ReceiverID EUI64
 }
 
 // AnswerHeader returns the header of the answer message.
@@ -154,7 +153,7 @@ func (h AsJsMessageHeader) AnswerHeader() (JsAsMessageHeader, error) {
 type JsAsMessageHeader struct {
 	MessageHeader
 	// SenderID is a JoinEUI.
-	SenderID   types.EUI64
+	SenderID   EUI64
 	ReceiverID Buffer
 }
 
@@ -163,8 +162,8 @@ type JoinReq struct {
 	NsJsMessageHeader
 	MACVersion MACVersion
 	PHYPayload Buffer
-	DevEUI     types.EUI64
-	DevAddr    types.DevAddr
+	DevEUI     EUI64
+	DevAddr    DevAddr
 	DLSettings Buffer
 	RxDelay    ttnpb.RxDelay
 	CFList     Buffer
@@ -187,7 +186,7 @@ type JoinAns struct {
 // AppSKeyReq is a AppSKey request message.
 type AppSKeyReq struct {
 	AsJsMessageHeader
-	DevEUI       types.EUI64
+	DevEUI       EUI64
 	SessionKeyID Buffer
 }
 
@@ -195,7 +194,7 @@ type AppSKeyReq struct {
 type AppSKeyAns struct {
 	JsAsMessageHeader
 	Result       Result
-	DevEUI       types.EUI64
+	DevEUI       EUI64
 	AppSKey      KeyEnvelope
 	SessionKeyID Buffer
 }
@@ -203,15 +202,15 @@ type AppSKeyAns struct {
 // HomeNSReq is a NetID request message.
 type HomeNSReq struct {
 	NsJsMessageHeader
-	DevEUI types.EUI64
+	DevEUI EUI64
 }
 
 // HomeNSAns is an answer to a HomeNSReq message.
 type HomeNSAns struct {
 	JsNsMessageHeader
 	Result Result
-	HNSID  types.NetID
-	HNetID types.NetID
+	HNSID  NetID
+	HNetID NetID
 }
 
 // parseMessage parses the header and the message type of the request body.

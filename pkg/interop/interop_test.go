@@ -27,7 +27,6 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
@@ -58,8 +57,8 @@ func TestServeHTTP(t *testing.T) {
 						MessageType:     MessageTypeJoinReq,
 						ProtocolVersion: "1.1",
 					},
-					SenderID:   types.NetID{0x0, 0x0, 0x02},
-					ReceiverID: types.EUI64{0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
+					SenderID:   NetID{0x0, 0x0, 0x02},
+					ReceiverID: EUI64{0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
 				},
 				MACVersion: MACVersion(ttnpb.MAC_V1_0_3),
 			},
@@ -81,8 +80,8 @@ func TestServeHTTP(t *testing.T) {
 						MessageType:     MessageTypeJoinReq,
 						ProtocolVersion: "1.1",
 					},
-					SenderID:   types.NetID{0x0, 0x0, 0x01},
-					ReceiverID: types.EUI64{0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
+					SenderID:   NetID{0x0, 0x0, 0x01},
+					ReceiverID: EUI64{0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
 				},
 				MACVersion: MACVersion(ttnpb.MAC_V1_0_3),
 			},
