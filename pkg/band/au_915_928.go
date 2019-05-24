@@ -189,10 +189,15 @@ func init() {
 			PingSlotChannels: usAuBeaconFrequencies[:],
 		},
 
+		TxParamSetupReqSupport: true,
+
 		// No LoRaWAN Regional Parameters 1.0
 		regionalParameters1_0_1:     bandIdentity,
 		regionalParameters1_0_2RevA: auDataRates1_0_2,
-		regionalParameters1_0_2RevB: disableChMaskCntl51_0_2,
+		regionalParameters1_0_2RevB: composeSwaps(
+			disableChMaskCntl51_0_2,
+			disableTxParamSetupReq,
+		),
 		regionalParameters1_0_3RevA: bandIdentity,
 		regionalParameters1_1RevA:   bandIdentity,
 	}

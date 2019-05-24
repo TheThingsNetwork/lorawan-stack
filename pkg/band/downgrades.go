@@ -28,6 +28,11 @@ func disableChMaskCntl51_0_2(b Band) Band {
 	return b
 }
 
+func disableTxParamSetupReq(b Band) Band {
+	b.TxParamSetupReqSupport = false
+	return b
+}
+
 // LoRaWAN 1.0.2rB -> 1.0.2rA downgrades
 
 func auDataRates1_0_2(b Band) Band {
