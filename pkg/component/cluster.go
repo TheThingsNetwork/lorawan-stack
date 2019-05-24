@@ -24,6 +24,7 @@ import (
 func (c *Component) initCluster() (err error) {
 	clusterOpts := []cluster.Option{
 		cluster.WithServices(c.grpcSubsystems...),
+		cluster.WithConn(c.LoopbackConn()),
 	}
 	c.cluster, err = c.clusterNew(c.ctx, &c.config.ServiceBase.Cluster, clusterOpts...)
 	if err != nil {

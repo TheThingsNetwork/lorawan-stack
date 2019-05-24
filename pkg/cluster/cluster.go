@@ -75,6 +75,14 @@ type Option interface {
 type optionFunc func(*cluster)
 
 func (f optionFunc) apply(c *cluster) { f(c) }
+
+// WithConn bypasses the standard mechanism for connecting to the "self" peer.
+func WithConn(conn *grpc.ClientConn) Option {
+	return optionFunc(func(c *cluster) {
+		c.self.conn = conn
+	})
+}
+
 // WithServices registers the given services on the "self" peer.
 func WithServices(services ...rpcserver.Registerer) Option {
 	return optionFunc(func(c *cluster) {
@@ -83,6 +91,13 @@ func WithServices(services ...rpcserver.Registerer) Option {
 				c.self.roles = append(c.self.roles, roles...)
 			}
 		}
+	})
+}
+
+// WithTLSConfig sets the TLS config to use in cluster connections.
+func WithTLSConfig(tlsConfig *tls.Config) Option {
+	return optionFunc(func(c *cluster) {
+		c.tlsConfig = tlsConfig
 	})
 }
 
@@ -193,6 +208,9 @@ func (c *cluster) Join() (err error) {
 		options = append(options, grpc.WithInsecure())
 	}
 	for _, peer := range c.peers {
+		if peer.conn != nil {
+			continue
+		}
 		peer.ctx, peer.cancel = context.WithCancel(c.ctx)
 		logger := log.FromContext(c.ctx).WithFields(log.Fields(
 			"target", peer.target,
