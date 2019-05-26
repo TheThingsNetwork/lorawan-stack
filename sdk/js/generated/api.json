@@ -16279,11 +16279,33 @@
       "package": "ttn.lorawan.v3",
       "hasEnums": false,
       "hasExtensions": false,
-      "hasMessages": false,
+      "hasMessages": true,
       "hasServices": true,
       "enums": [],
       "extensions": [],
-      "messages": [],
+      "messages": [
+        {
+          "name": "GenerateDevAddrResponse",
+          "longName": "GenerateDevAddrResponse",
+          "fullName": "ttn.lorawan.v3.GenerateDevAddrResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "dev_addr",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
       "services": [
         {
           "name": "AsNs",
@@ -16358,6 +16380,36 @@
               "responseLongType": ".google.protobuf.Empty",
               "responseFullType": "google.protobuf.Empty",
               "responseStreaming": false
+            }
+          ]
+        },
+        {
+          "name": "Ns",
+          "longName": "Ns",
+          "fullName": "ttn.lorawan.v3.Ns",
+          "description": "",
+          "methods": [
+            {
+              "name": "GenerateDevAddr",
+              "description": "GenerateDevAddr requests a device address assignment from the Network Server.",
+              "requestType": "Empty",
+              "requestLongType": ".google.protobuf.Empty",
+              "requestFullType": "google.protobuf.Empty",
+              "requestStreaming": false,
+              "responseType": "GenerateDevAddrResponse",
+              "responseLongType": "GenerateDevAddrResponse",
+              "responseFullType": "ttn.lorawan.v3.GenerateDevAddrResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ns/dev_addr"
+                    }
+                  ]
+                }
+              }
             }
           ]
         },
