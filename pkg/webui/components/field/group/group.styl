@@ -14,16 +14,14 @@
 
 .container
   display: flex
-  margin-bottom: $cs.l
   flex-direction: column
+  margin-bottom: $cs.l
   &.horizontal
     flex-direction: row
     .header-title
       width: 30%
     .fields
       width: 70%
-      margin-top: $cs.xs
-      margin-bottom: $cs.l * -1
   &.disabled
     .header-title
       opacity: .4
@@ -41,12 +39,17 @@
   display: flex
   flex-wrap: wrap
 
-  .field
-    margin-bottom: $cs.m
-
 .columns
   width: auto
   margin-right: $cs.l
+
+  &.field
+    margin-bottom: 0
+
+.field:not(.columns)
+  margin-bottom: $cs.m
+  &:first-child
+    margin-top: $cs.xxs
 
 .error
   margin-bottom: $cs.m
