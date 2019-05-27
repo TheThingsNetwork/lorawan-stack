@@ -7700,16 +7700,6 @@
           "format": "float",
           "description": "Maximum EIRP (dBm)."
         },
-        "uplink_dwell_time": {
-          "type": "boolean",
-          "format": "boolean",
-          "description": "Uplink dwell time is set (400ms)."
-        },
-        "downlink_dwell_time": {
-          "type": "boolean",
-          "format": "boolean",
-          "description": "Downlink dwell time is set (400ms)."
-        },
         "adr_data_rate_index": {
           "$ref": "#/definitions/v3DataRateIndex",
           "description": "ADR: data rate index to use."
@@ -7784,6 +7774,16 @@
             "$ref": "#/definitions/v3MACParametersChannel"
           },
           "description": "Configured uplink channels and optionally Rx1 frequency."
+        },
+        "uplink_dwell_time": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Whether uplink dwell time is set (400ms).\nIf this field is not set, then the value is either unknown or irrelevant(Network Server cannot modify it)."
+        },
+        "downlink_dwell_time": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Whether downlink dwell time is set (400ms).\nIf this field is not set, then the value is either unknown or irrelevant(Network Server cannot modify it)."
         }
       },
       "description": "MACParameters represent the parameters of the device's MAC layer (active or desired).\nThis is used internally by the Network Server and is read only."

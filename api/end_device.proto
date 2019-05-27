@@ -59,10 +59,8 @@ message MACParameters {
 
   // Maximum EIRP (dBm).
   float max_eirp = 1 [(gogoproto.customname) = "MaxEIRP"];
-  // Uplink dwell time is set (400ms).
-  bool uplink_dwell_time = 2;
-  // Downlink dwell time is set (400ms).
-  bool downlink_dwell_time = 3;
+  reserved 2; // Deprecated: uplink_dwell_time
+  reserved 3; // Deprecated: downlink_dwell_time
   // ADR: data rate index to use.
   DataRateIndex adr_data_rate_index = 4 [(gogoproto.customname) = "ADRDataRateIndex", (validate.rules).enum.defined_only = true];
   // ADR: transmission power index to use.
@@ -110,6 +108,13 @@ message MACParameters {
   }
   // Configured uplink channels and optionally Rx1 frequency.
   repeated Channel channels = 19 [(validate.rules).repeated.min_items = 1];
+
+  // Whether uplink dwell time is set (400ms).
+  // If this field is not set, then the value is either unknown or irrelevant(Network Server cannot modify it).
+  google.protobuf.BoolValue uplink_dwell_time = 20;
+  // Whether downlink dwell time is set (400ms).
+  // If this field is not set, then the value is either unknown or irrelevant(Network Server cannot modify it).
+  google.protobuf.BoolValue downlink_dwell_time = 21;
 }
 
 message EndDeviceBrand {

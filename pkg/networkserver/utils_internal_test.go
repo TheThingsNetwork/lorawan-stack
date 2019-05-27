@@ -60,7 +60,6 @@ func TestNewMACState(t *testing.T) {
 						ADRNbTrans:             1,
 						ADRTxPowerIndex:        0,
 						BeaconFrequency:        0,
-						DownlinkDwellTime:      false,
 						MaxDutyCycle:           ttnpb.DUTY_CYCLE_1,
 						MaxEIRP:                phy.DefaultMaxEIRP,
 						PingSlotDataRateIndex:  ttnpb.DATA_RATE_0,
@@ -71,7 +70,6 @@ func TestNewMACState(t *testing.T) {
 						Rx1Delay:               ttnpb.RxDelay(phy.ReceiveDelay1.Seconds()),
 						Rx2DataRateIndex:       phy.DefaultRx2Parameters.DataRateIndex,
 						Rx2Frequency:           phy.DefaultRx2Parameters.Frequency,
-						UplinkDwellTime:        false,
 						Channels: []*ttnpb.MACParameters_Channel{
 							{
 								UplinkFrequency:   868100000,
@@ -103,7 +101,6 @@ func TestNewMACState(t *testing.T) {
 						ADRNbTrans:             1,
 						ADRTxPowerIndex:        0,
 						BeaconFrequency:        0,
-						DownlinkDwellTime:      false,
 						MaxDutyCycle:           ttnpb.DUTY_CYCLE_1,
 						MaxEIRP:                phy.DefaultMaxEIRP,
 						PingSlotDataRateIndex:  ttnpb.DATA_RATE_0,
@@ -114,7 +111,6 @@ func TestNewMACState(t *testing.T) {
 						Rx1Delay:               ttnpb.RX_DELAY_13,
 						Rx2DataRateIndex:       phy.DefaultRx2Parameters.DataRateIndex,
 						Rx2Frequency:           phy.DefaultRx2Parameters.Frequency,
-						UplinkDwellTime:        false,
 						Channels: []*ttnpb.MACParameters_Channel{
 							{
 								UplinkFrequency:   868100000,
@@ -225,7 +221,6 @@ func TestNewMACState(t *testing.T) {
 						ADRNbTrans:             1,
 						ADRTxPowerIndex:        0,
 						BeaconFrequency:        0,
-						DownlinkDwellTime:      false,
 						MaxDutyCycle:           ttnpb.DUTY_CYCLE_1,
 						MaxEIRP:                phy.DefaultMaxEIRP,
 						PingSlotDataRateIndex:  ttnpb.DATA_RATE_0,
@@ -236,7 +231,6 @@ func TestNewMACState(t *testing.T) {
 						Rx1Delay:               ttnpb.RxDelay(phy.ReceiveDelay1.Seconds()),
 						Rx2DataRateIndex:       phy.DefaultRx2Parameters.DataRateIndex,
 						Rx2Frequency:           phy.DefaultRx2Parameters.Frequency,
-						UplinkDwellTime:        false,
 						Channels:               deepcopy.Copy(bandChannels).([]*ttnpb.MACParameters_Channel),
 					},
 					DesiredParameters: ttnpb.MACParameters{
@@ -246,7 +240,6 @@ func TestNewMACState(t *testing.T) {
 						ADRNbTrans:             1,
 						ADRTxPowerIndex:        0,
 						BeaconFrequency:        0,
-						DownlinkDwellTime:      false,
 						MaxDutyCycle:           ttnpb.DUTY_CYCLE_1,
 						MaxEIRP:                phy.DefaultMaxEIRP,
 						PingSlotDataRateIndex:  ttnpb.DATA_RATE_0,
@@ -257,7 +250,6 @@ func TestNewMACState(t *testing.T) {
 						Rx1Delay:               ttnpb.RX_DELAY_13,
 						Rx2DataRateIndex:       phy.DefaultRx2Parameters.DataRateIndex,
 						Rx2Frequency:           phy.DefaultRx2Parameters.Frequency,
-						UplinkDwellTime:        false,
 						Channels: func() []*ttnpb.MACParameters_Channel {
 							ret := deepcopy.Copy(bandChannels).([]*ttnpb.MACParameters_Channel)
 							for _, ch := range ret {

@@ -17,6 +17,7 @@ package networkserver
 import (
 	"testing"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/events"
@@ -24,6 +25,185 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
+
+func TestHandleTxParamSetupReq(t *testing.T) {
+	for _, tc := range []struct {
+		Name                                              string
+		Device, Expected                                  *ttnpb.EndDevice
+		AssertEvents                                      func(*testing.T, ...events.Event) bool
+		InputMaxDownlinkLength, ExpectedMaxDownlinkLength uint16
+		InputMaxUplinkLength, ExpectedMaxUplinkLength     uint16
+		Ok                                                bool
+	}{
+		{
+			Name: "payload fits/EIRP 26/dwell time both",
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					CurrentParameters: ttnpb.MACParameters{
+						MaxEIRP: 26,
+					},
+					DesiredParameters: ttnpb.MACParameters{
+						MaxEIRP:           26,
+						DownlinkDwellTime: &pbtypes.BoolValue{Value: true},
+						UplinkDwellTime:   &pbtypes.BoolValue{Value: true},
+					},
+				},
+			},
+			Expected: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					CurrentParameters: ttnpb.MACParameters{
+						MaxEIRP: 26,
+					},
+					DesiredParameters: ttnpb.MACParameters{
+						MaxEIRP:           26,
+						DownlinkDwellTime: &pbtypes.BoolValue{Value: true},
+						UplinkDwellTime:   &pbtypes.BoolValue{Value: true},
+					},
+					PendingRequests: []*ttnpb.MACCommand{
+						(&ttnpb.MACCommand_TxParamSetupReq{
+							MaxEIRPIndex:      ttnpb.DEVICE_EIRP_26,
+							DownlinkDwellTime: true,
+							UplinkDwellTime:   true,
+						}).MACCommand(),
+					},
+				},
+			},
+			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
+				a := assertions.New(t)
+				return a.So(evs, should.HaveLength, 1) &&
+					a.So(evs[0].Name(), should.Equal, "ns.mac.tx_param_setup.request") &&
+					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_TxParamSetupReq{
+						MaxEIRPIndex:      ttnpb.DEVICE_EIRP_26,
+						DownlinkDwellTime: true,
+						UplinkDwellTime:   true,
+					})
+			},
+			InputMaxDownlinkLength:    42,
+			InputMaxUplinkLength:      24,
+			ExpectedMaxDownlinkLength: 40,
+			ExpectedMaxUplinkLength:   23,
+			Ok:                        true,
+		},
+		{
+			Name: "payload fits/EIRP 26/no dwell time limitations",
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					CurrentParameters: ttnpb.MACParameters{
+						MaxEIRP: 26,
+					},
+					DesiredParameters: ttnpb.MACParameters{
+						MaxEIRP: 26,
+					},
+				},
+			},
+			Expected: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					CurrentParameters: ttnpb.MACParameters{
+						MaxEIRP: 26,
+					},
+					DesiredParameters: ttnpb.MACParameters{
+						MaxEIRP: 26,
+					},
+				},
+			},
+			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
+				return assertions.New(t).So(evs, should.BeEmpty)
+			},
+			InputMaxDownlinkLength:    42,
+			InputMaxUplinkLength:      24,
+			ExpectedMaxDownlinkLength: 42,
+			ExpectedMaxUplinkLength:   24,
+			Ok:                        true,
+		},
+		{
+			Name: "downlink does not fit/EIRP 26/dwell time both",
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					CurrentParameters: ttnpb.MACParameters{
+						MaxEIRP: 26,
+					},
+					DesiredParameters: ttnpb.MACParameters{
+						MaxEIRP:           26,
+						DownlinkDwellTime: &pbtypes.BoolValue{Value: true},
+						UplinkDwellTime:   &pbtypes.BoolValue{Value: true},
+					},
+				},
+			},
+			Expected: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					CurrentParameters: ttnpb.MACParameters{
+						MaxEIRP: 26,
+					},
+					DesiredParameters: ttnpb.MACParameters{
+						MaxEIRP:           26,
+						DownlinkDwellTime: &pbtypes.BoolValue{Value: true},
+						UplinkDwellTime:   &pbtypes.BoolValue{Value: true},
+					},
+				},
+			},
+			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
+				return assertions.New(t).So(evs, should.BeEmpty)
+			},
+			InputMaxDownlinkLength:    1,
+			InputMaxUplinkLength:      24,
+			ExpectedMaxDownlinkLength: 1,
+			ExpectedMaxUplinkLength:   24,
+			Ok:                        false,
+		},
+		{
+			Name: "uplink does not fit/EIRP 26/dwell time both",
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					CurrentParameters: ttnpb.MACParameters{
+						MaxEIRP: 26,
+					},
+					DesiredParameters: ttnpb.MACParameters{
+						MaxEIRP:           26,
+						DownlinkDwellTime: &pbtypes.BoolValue{Value: true},
+						UplinkDwellTime:   &pbtypes.BoolValue{Value: true},
+					},
+				},
+			},
+			Expected: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					CurrentParameters: ttnpb.MACParameters{
+						MaxEIRP: 26,
+					},
+					DesiredParameters: ttnpb.MACParameters{
+						MaxEIRP:           26,
+						DownlinkDwellTime: &pbtypes.BoolValue{Value: true},
+						UplinkDwellTime:   &pbtypes.BoolValue{Value: true},
+					},
+				},
+			},
+			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
+				return assertions.New(t).So(evs, should.BeEmpty)
+			},
+			InputMaxDownlinkLength:    42,
+			InputMaxUplinkLength:      0,
+			ExpectedMaxDownlinkLength: 42,
+			ExpectedMaxUplinkLength:   0,
+			Ok:                        false,
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
+
+			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
+
+			var maxDownLen, maxUpLen uint16
+			var ok bool
+			evs := collectEvents(func() {
+				maxDownLen, maxUpLen, ok = enqueueTxParamSetupReq(test.Context(), dev, tc.InputMaxDownlinkLength, tc.InputMaxUplinkLength)
+			})
+			a.So(dev, should.Resemble, tc.Expected)
+			a.So(maxDownLen, should.Equal, tc.ExpectedMaxDownlinkLength)
+			a.So(maxUpLen, should.Equal, tc.ExpectedMaxUplinkLength)
+			a.So(ok, should.Resemble, tc.Ok)
+			a.So(tc.AssertEvents(t, evs...), should.BeTrue)
+		})
+	}
+}
 
 func TestHandleTxParamSetupAns(t *testing.T) {
 	for _, tc := range []struct {
@@ -65,8 +245,8 @@ func TestHandleTxParamSetupAns(t *testing.T) {
 				MACState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						MaxEIRP:           26,
-						DownlinkDwellTime: true,
-						UplinkDwellTime:   true,
+						DownlinkDwellTime: &pbtypes.BoolValue{Value: true},
+						UplinkDwellTime:   &pbtypes.BoolValue{Value: true},
 					},
 					PendingRequests: []*ttnpb.MACCommand{},
 				},
