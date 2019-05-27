@@ -800,7 +800,7 @@ func TestFlow(t *testing.T) {
 					}
 
 					ctx := test.ContextWithT(test.Context(), t)
-					ctx, cancel := context.WithTimeout(ctx, (1<<8)*test.Delay)
+					ctx, cancel := context.WithTimeout(ctx, (1<<11)*test.Delay)
 					defer cancel()
 					handleFlowTest(ctx, reg, tq)
 				})
