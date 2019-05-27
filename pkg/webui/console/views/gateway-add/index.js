@@ -13,25 +13,21 @@
 // limitations under the License.
 
 import React from 'react'
+import { defineMessages } from 'react-intl'
 import { connect } from 'react-redux'
 import { Container, Col, Row } from 'react-grid-system'
-import * as Yup from 'yup'
 import bind from 'autobind-decorator'
-import { defineMessages } from 'react-intl'
 import { push } from 'connected-react-router'
 
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import sharedMessages from '../../../lib/shared-messages'
-import Message from '../../../lib/components/message'
-import Form from '../../../components/form'
-import Field from '../../../components/field'
-import SubmitBar from '../../../components/submit-bar'
 import Button from '../../../components/button'
-import { id as gatewayIdRegexp, address as addressRegexp } from '../../lib/regexp'
+import Message from '../../../lib/components/message'
+import PropTypes from '../../../lib/prop-types'
 import IntlHelmet from '../../../lib/components/intl-helmet'
-import FrequencyPlansSelect from '../../containers/freq-plans-select'
 import { withEnv } from '../../../lib/components/env'
+import GatewayDataForm from '../../components/gateway-data-form'
 
 import api from '../../api'
 
@@ -40,31 +36,7 @@ import { userIdSelector } from '../../store/selectors/user'
 import style from './gateway-add.styl'
 
 const m = defineMessages({
-  dutyCycle: 'Enforce Duty Cycle',
-  gatewayIdPlaceholder: 'my-new-gateway',
   createGateway: 'Create Gateway',
-  gsServerAddressDescription: 'The address of the Gateway Server to connect to',
-})
-
-const validationSchema = Yup.object().shape({
-  ids: Yup.object().shape({
-    gateway_id: Yup.string()
-      .matches(gatewayIdRegexp, sharedMessages.validateAlphanum)
-      .min(2, sharedMessages.validateTooShort)
-      .max(36, sharedMessages.validateTooLong)
-      .required(sharedMessages.validateRequired),
-    eui: Yup.string()
-      .length(8 * 2, sharedMessages.validateTooShort),
-  }),
-  name: Yup.string()
-    .min(2, sharedMessages.validateTooShort)
-    .max(50, sharedMessages.validateTooLong),
-  description: Yup.string()
-    .max(2000, sharedMessages.validateTooLong),
-  frequency_plan_id: Yup.string()
-    .required(sharedMessages.validateRequired),
-  gateway_server_address: Yup.string()
-    .matches(addressRegexp, sharedMessages.validateAddressFormat),
 })
 
 @withEnv
@@ -87,6 +59,11 @@ dispatch => ({
 }))
 @bind
 export default class GatewayAdd extends React.Component {
+
+  static propTypes = {
+    userId: PropTypes.string.isRequired,
+    createSuccess: PropTypes.func.isRequired,
+  }
 
   state = {
     error: '',
@@ -139,70 +116,17 @@ export default class GatewayAdd extends React.Component {
             <Message component="h2" content={sharedMessages.addGateway} />
           </Col>
           <Col sm={12} md={8}>
-            <Form
-              submitEnabledWhenInvalid
+            <GatewayDataForm
               error={error}
               onSubmit={this.handleSubmit}
               initialValues={initialValues}
-              validationSchema={validationSchema}
-              horizontal
+              update={false}
             >
-              <Message
-                component="h4"
-                content={sharedMessages.generalSettings}
+              <Button
+                type="submit"
+                message={m.createGateway}
               />
-              <Field
-                title={sharedMessages.gatewayID}
-                name="ids.gateway_id"
-                type="text"
-                placeholder={m.gatewayIdPlaceholder}
-                required
-                autoFocus
-              />
-              <Field
-                title={sharedMessages.gatewayEUI}
-                name="ids.eui"
-                type="byte"
-                min={8}
-                max={8}
-                placeholder={sharedMessages.gatewayEUI}
-              />
-              <Field
-                title={sharedMessages.gatewayName}
-                name="name"
-              />
-              <Field
-                title={sharedMessages.gatewayDescription}
-                name="description"
-                type="textarea"
-              />
-              <Field
-                title={sharedMessages.gatewayServerAddress}
-                description={m.gsServerAddressDescription}
-                placeholder={sharedMessages.addressPlaceholder}
-                name="gateway_server_address"
-                type="text"
-              />
-              <Message
-                component="h4"
-                content={sharedMessages.lorawanOptions}
-              />
-              <FrequencyPlansSelect
-                horizontal
-                source="gs"
-                name="frequency_plan_id"
-                menuPlacement="top"
-                required
-              />
-              <Field
-                title={m.dutyCycle}
-                name="enforce_duty_cycle"
-                type="checkbox"
-              />
-              <SubmitBar>
-                <Button type="submit" message={m.createGateway} />
-              </SubmitBar>
-            </Form>
+            </GatewayDataForm>
           </Col>
         </Row>
       </Container>
