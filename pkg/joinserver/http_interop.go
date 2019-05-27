@@ -36,30 +36,43 @@ type interopServer struct {
 	JS interopHandler
 }
 
-func (srv interopServer) JoinRequest(ctx context.Context, req *interop.JoinReq) (*interop.JoinAns, error) {
+func (srv interopServer) JoinRequest(ctx context.Context, in *interop.JoinReq) (*interop.JoinAns, error) {
 	ctx = log.NewContextWithField(ctx, "namespace", "joinserver/interop")
 
 	var cfList *ttnpb.CFList
-	if len(req.CFList) > 0 {
+	if len(in.CFList) > 0 {
 		cfList = new(ttnpb.CFList)
-		if err := lorawan.UnmarshalCFList(req.CFList, cfList); err != nil {
+		if err := lorawan.UnmarshalCFList(in.CFList, cfList); err != nil {
 			return nil, interop.ErrMalformedMessage.WithCause(err)
 		}
 	}
 	var dlSettings ttnpb.DLSettings
-	if err := lorawan.UnmarshalDLSettings(req.DLSettings, &dlSettings); err != nil {
+	if err := lorawan.UnmarshalDLSettings(in.DLSettings, &dlSettings); err != nil {
 		return nil, interop.ErrMalformedMessage.WithCause(err)
 	}
 
-	res, err := srv.JS.HandleJoin(ctx, &ttnpb.JoinRequest{
-		RawPayload:         req.PHYPayload,
-		DevAddr:            types.DevAddr(req.DevAddr),
-		SelectedMACVersion: ttnpb.MACVersion(req.MACVersion),
-		NetID:              types.NetID(req.SenderID),
+	req := &ttnpb.JoinRequest{
+		RawPayload:         in.PHYPayload,
+		DevAddr:            types.DevAddr(in.DevAddr),
+		SelectedMACVersion: ttnpb.MACVersion(in.MACVersion),
+		NetID:              types.NetID(in.SenderID),
 		DownlinkSettings:   dlSettings,
-		RxDelay:            req.RxDelay,
+		RxDelay:            in.RxDelay,
 		CFList:             cfList,
-	})
+	}
+	if err := req.ValidateFields(
+		"raw_payload",
+		"dev_addr",
+		"selected_mac_version",
+		"net_id",
+		"downlink_settings",
+		"rx_delay",
+		"cf_list",
+	); err != nil {
+		return nil, interop.ErrMalformedMessage.WithCause(err)
+	}
+
+	res, err := srv.JS.HandleJoin(ctx, req)
 	if err != nil {
 		switch {
 		case errors.Resemble(err, errDecodePayload),
@@ -79,7 +92,7 @@ func (srv interopServer) JoinRequest(ctx context.Context, req *interop.JoinReq) 
 		return nil, interop.ErrJoinReq.WithCause(err)
 	}
 
-	header, err := req.AnswerHeader()
+	header, err := in.AnswerHeader()
 	if err != nil {
 		return nil, interop.ErrMalformedMessage.WithCause(err)
 	}
@@ -91,7 +104,7 @@ func (srv interopServer) JoinRequest(ctx context.Context, req *interop.JoinReq) 
 		AppSKey:           (*interop.KeyEnvelope)(res.AppSKey),
 		SessionKeyID:      interop.Buffer(res.SessionKeyID),
 	}
-	if ttnpb.MACVersion(req.MACVersion).Compare(ttnpb.MAC_V1_1) < 0 {
+	if ttnpb.MACVersion(in.MACVersion).Compare(ttnpb.MAC_V1_1) < 0 {
 		ans.NwkSKey = (*interop.KeyEnvelope)(res.FNwkSIntKey)
 	} else {
 		ans.FNwkSIntKey = (*interop.KeyEnvelope)(res.FNwkSIntKey)
@@ -101,10 +114,10 @@ func (srv interopServer) JoinRequest(ctx context.Context, req *interop.JoinReq) 
 	return ans, nil
 }
 
-func (srv interopServer) HomeNSRequest(ctx context.Context, req *interop.HomeNSReq) (*interop.HomeNSAns, error) {
+func (srv interopServer) HomeNSRequest(ctx context.Context, in *interop.HomeNSReq) (*interop.HomeNSAns, error) {
 	ctx = log.NewContextWithField(ctx, "namespace", "joinserver/interop")
 
-	netID, err := srv.JS.GetHomeNetID(ctx, types.EUI64(req.ReceiverID), types.EUI64(req.DevEUI))
+	netID, err := srv.JS.GetHomeNetID(ctx, types.EUI64(in.ReceiverID), types.EUI64(in.DevEUI))
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +125,7 @@ func (srv interopServer) HomeNSRequest(ctx context.Context, req *interop.HomeNSR
 		return nil, interop.ErrActivation
 	}
 
-	header, err := req.AnswerHeader()
+	header, err := in.AnswerHeader()
 	if err != nil {
 		return nil, interop.ErrMalformedMessage.WithCause(err)
 	}
@@ -123,14 +136,23 @@ func (srv interopServer) HomeNSRequest(ctx context.Context, req *interop.HomeNSR
 	}, nil
 }
 
-func (srv interopServer) AppSKeyRequest(ctx context.Context, req *interop.AppSKeyReq) (*interop.AppSKeyAns, error) {
+func (srv interopServer) AppSKeyRequest(ctx context.Context, in *interop.AppSKeyReq) (*interop.AppSKeyAns, error) {
 	ctx = log.NewContextWithField(ctx, "namespace", "joinserver/interop")
 
-	res, err := srv.JS.GetAppSKey(ctx, &ttnpb.SessionKeyRequest{
-		JoinEUI:      types.EUI64(req.ReceiverID),
-		DevEUI:       types.EUI64(req.DevEUI),
-		SessionKeyID: req.SessionKeyID,
-	})
+	req := &ttnpb.SessionKeyRequest{
+		JoinEUI:      types.EUI64(in.ReceiverID),
+		DevEUI:       types.EUI64(in.DevEUI),
+		SessionKeyID: in.SessionKeyID,
+	}
+	if err := req.ValidateFields(
+		"join_eui",
+		"dev_eui",
+		"session_key_id",
+	); err != nil {
+		return nil, interop.ErrMalformedMessage.WithCause(err)
+	}
+
+	res, err := srv.JS.GetAppSKey(ctx, req)
 	if err != nil {
 		switch {
 		case errors.Resemble(err, errAddressNotAuthorized):
@@ -143,15 +165,15 @@ func (srv interopServer) AppSKeyRequest(ctx context.Context, req *interop.AppSKe
 		return nil, err
 	}
 
-	header, err := req.AnswerHeader()
+	header, err := in.AnswerHeader()
 	if err != nil {
 		return nil, interop.ErrMalformedMessage.WithCause(err)
 	}
 	return &interop.AppSKeyAns{
 		JsAsMessageHeader: header,
 		Result:            interop.ResultSuccess,
-		DevEUI:            req.DevEUI,
+		DevEUI:            in.DevEUI,
 		AppSKey:           interop.KeyEnvelope(res.AppSKey),
-		SessionKeyID:      req.SessionKeyID,
+		SessionKeyID:      in.SessionKeyID,
 	}, nil
 }
