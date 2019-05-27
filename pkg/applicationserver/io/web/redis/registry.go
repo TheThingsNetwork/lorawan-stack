@@ -63,6 +63,8 @@ func (r WebhookRegistry) Get(ctx context.Context, ids ttnpb.ApplicationWebhookId
 		return nil, err
 	}
 	return applyWebhookFieldMask(nil, pb, append(paths,
+		"base_url",
+		"format",
 		"ids",
 	)...)
 }
@@ -75,6 +77,8 @@ func (r WebhookRegistry) List(ctx context.Context, ids ttnpb.ApplicationIdentifi
 		pb := &ttnpb.ApplicationWebhook{}
 		return pb, func() (bool, error) {
 			pb, err := applyWebhookFieldMask(nil, pb, append(paths,
+				"base_url",
+				"format",
 				"ids",
 			)...)
 			if err != nil {
