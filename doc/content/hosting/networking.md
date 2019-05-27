@@ -1,10 +1,8 @@
 ---
-title: "Network"
+title: "Networking"
 description: "List of network protocols and ports"
 weight: 3
 --- 
-
-# The Things Network Stack Networking
 
 The Things Network Stack uses a port per protocol, with a TLS counterpart when applicable. Ports can be shared by multiple services using the same protocol, i.e. gRPC services sharing management, data and events services.
 

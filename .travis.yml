@@ -96,6 +96,7 @@ before_script:
     set -e
     make dev.databases.start
   fi
+- if [[ "$RUNTYPE" == "doc" ]]; then $MAGE docs:config; fi
 script:
 - if [[ "$RUNTYPE" == "js" ]]; then $MAGE proto:swaggerClean proto:swagger; fi
 - if [[ "$RUNTYPE" == "js" ]]; then $MAGE proto:markdownClean proto:markdown; fi
