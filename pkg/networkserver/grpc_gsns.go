@@ -49,6 +49,9 @@ const (
 
 	// maxTransmissionDelay is the maximum delay between uplink retransmissions.
 	maxTransmissionDelay = 10 * time.Second
+
+	// maxConfirmedRetransmissions is the maximum number of confirmed uplink retransmissions for pre-1.0.3 devices.
+	maxConfirmedRetransmissions = 5
 )
 
 var (
@@ -105,6 +108,16 @@ func transmissionNumber(macPayload []byte, ups ...*ttnpb.UplinkMessage) (uint32,
 		}
 	}
 	return nb, lastTrans
+}
+
+func maxTransmissionNumber(ver ttnpb.MACVersion, confirmed bool, nbTrans uint32) uint32 {
+	if !confirmed {
+		return nbTrans
+	}
+	if ver.Compare(ttnpb.MAC_V1_0_3) < 0 {
+		return maxConfirmedRetransmissions
+	}
+	return nbTrans
 }
 
 type matchedDevice struct {
@@ -203,11 +216,13 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 			fCnt |= (match.Session.LastFCntUp + 0x10000) &^ 0xffff
 		}
 
+		maxTrans := maxTransmissionNumber(match.MACState.LoRaWANVersion, up.Payload.MType == ttnpb.MType_CONFIRMED_UP, match.MACState.CurrentParameters.ADRNbTrans)
 		logger := logger.WithFields(log.Fields(
 			"device_uid", unique.ID(ctx, match.Device.EndDeviceIdentifiers),
 			"last_f_cnt_up", match.Session.LastFCntUp,
 			"mac_version", match.MACState.LoRaWANVersion,
 			"nb_trans", match.MACState.CurrentParameters.ADRNbTrans,
+			"max_transmissions", maxTrans,
 			"pending_session", match.Pending,
 		))
 
@@ -224,7 +239,7 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 				"transmission", trans,
 			))
 
-			if trans > match.MACState.CurrentParameters.ADRNbTrans ||
+			if trans > maxTrans ||
 				!lastAt.IsZero() && up.ReceivedAt.Sub(lastAt) > match.MACState.CurrentParameters.Rx1Delay.Duration()+time.Second+maxTransmissionDelay {
 				logger.Debug("Possible replay attack or malfunctioning device, skip")
 				continue
