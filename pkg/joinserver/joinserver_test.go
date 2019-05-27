@@ -1672,16 +1672,17 @@ func TestGetAppSKey(t *testing.T) {
 		Name        string
 		ContextFunc func(context.Context) context.Context
 
-		GetByID     func(context.Context, types.EUI64, []byte, []string) (*ttnpb.SessionKeys, error)
-		KeyRequest  *ttnpb.SessionKeyRequest
-		KeyResponse *ttnpb.AppSKeyResponse
+		GetKeyByID     func(context.Context, types.EUI64, []byte, []string) (*ttnpb.SessionKeys, error)
+		GetDeviceByEUI func(context.Context, types.EUI64, types.EUI64, []string) (*ttnpb.EndDevice, error)
+		KeyRequest     *ttnpb.SessionKeyRequest
+		KeyResponse    *ttnpb.AppSKeyResponse
 
 		ErrorAssertion func(*testing.T, error) bool
 	}{
 		{
 			Name:        "Registry error",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
-			GetByID: func(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
+			GetKeyByID: func(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
 				a.So(id, should.Resemble, []byte{0x11, 0x22, 0x33, 0x44})
@@ -1706,7 +1707,7 @@ func TestGetAppSKey(t *testing.T) {
 		{
 			Name:        "Missing AppSKey",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
-			GetByID: func(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
+			GetKeyByID: func(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
 				a.So(id, should.Resemble, []byte{0x11, 0x22, 0x33, 0x44})
@@ -1725,9 +1726,57 @@ func TestGetAppSKey(t *testing.T) {
 			},
 		},
 		{
-			Name:        "Matching request",
+			Name: "Address not authorized",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return auth.NewContextWithX509DN(ctx, pkix.Name{
+					CommonName: "other.hostname.local",
+				})
+			},
+			GetKeyByID: func(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
+				a.So(id, should.Resemble, []byte{0x11, 0x22, 0x33, 0x44})
+				a.So(paths, should.HaveSameElementsDeep, []string{
+					"app_s_key",
+				})
+				return &ttnpb.SessionKeys{
+					SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
+					AppSKey: &ttnpb.KeyEnvelope{
+						EncryptedKey: KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
+						KEKLabel:     "test-kek",
+					},
+				}, nil
+			},
+			GetDeviceByEUI: func(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(joinEUI, should.Resemble, types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
+				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
+				a.So(paths, should.HaveSameElementsDeep, []string{
+					"application_server_address",
+				})
+				return &ttnpb.EndDevice{
+					ApplicationServerAddress: asAddr,
+				}, nil
+			},
+			KeyRequest: &ttnpb.SessionKeyRequest{
+				JoinEUI:      types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
+			},
+			KeyResponse: &ttnpb.AppSKeyResponse{
+				AppSKey: ttnpb.KeyEnvelope{
+					EncryptedKey: KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
+					KEKLabel:     "test-kek",
+				},
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.HaveSameErrorDefinitionAs, ErrAddressNotAuthorized)
+			},
+		},
+		{
+			Name:        "Matching request/cluster auth",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
-			GetByID: func(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
+			GetKeyByID: func(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
 				a.So(id, should.Resemble, []byte{0x11, 0x22, 0x33, 0x44})
@@ -1753,6 +1802,51 @@ func TestGetAppSKey(t *testing.T) {
 				},
 			},
 		},
+		{
+			Name: "Matching request/tls client auth",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return auth.NewContextWithX509DN(ctx, pkix.Name{
+					CommonName: asAddr,
+				})
+			},
+			GetKeyByID: func(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
+				a.So(id, should.Resemble, []byte{0x11, 0x22, 0x33, 0x44})
+				a.So(paths, should.HaveSameElementsDeep, []string{
+					"app_s_key",
+				})
+				return &ttnpb.SessionKeys{
+					SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
+					AppSKey: &ttnpb.KeyEnvelope{
+						EncryptedKey: KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
+						KEKLabel:     "test-kek",
+					},
+				}, nil
+			},
+			GetDeviceByEUI: func(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(joinEUI, should.Resemble, types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
+				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
+				a.So(paths, should.HaveSameElementsDeep, []string{
+					"application_server_address",
+				})
+				return &ttnpb.EndDevice{
+					ApplicationServerAddress: asAddr,
+				}, nil
+			},
+			KeyRequest: &ttnpb.SessionKeyRequest{
+				JoinEUI:      types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
+			},
+			KeyResponse: &ttnpb.AppSKeyResponse{
+				AppSKey: ttnpb.KeyEnvelope{
+					EncryptedKey: KeyToBytes(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
+					KEKLabel:     "test-kek",
+				},
+			},
+		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
@@ -1761,8 +1855,8 @@ func TestGetAppSKey(t *testing.T) {
 			js := test.Must(New(
 				component.MustNew(test.GetLogger(t), &component.Config{}),
 				&Config{
-					Keys:    &MockKeyRegistry{GetByIDFunc: tc.GetByID},
-					Devices: &MockDeviceRegistry{},
+					Keys:    &MockKeyRegistry{GetByIDFunc: tc.GetKeyByID},
+					Devices: &MockDeviceRegistry{GetByEUIFunc: tc.GetDeviceByEUI},
 				},
 			)).(*JoinServer)
 			res, err := js.GetAppSKey(ctx, tc.KeyRequest)
