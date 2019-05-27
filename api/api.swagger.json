@@ -839,71 +839,6 @@
         ]
       }
     },
-    "/as/applications/{application_ids.application_id}/webhooks": {
-      "get": {
-        "operationId": "List",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v3ApplicationWebhooks"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "application_ids.application_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "field_mask.paths",
-            "description": "The set of field mask paths.",
-            "in": "query",
-            "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
-          }
-        ],
-        "tags": [
-          "ApplicationWebhookRegistry"
-        ]
-      }
-    },
-    "/as/applications/{application_ids.application_id}/webhooks/{webhook_id}": {
-      "delete": {
-        "operationId": "Delete",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "properties": {}
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "application_ids.application_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "webhook_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "ApplicationWebhookRegistry"
-        ]
-      }
-    },
     "/as/applications/{application_id}/link": {
       "delete": {
         "summary": "Delete deletes the device that matches the given identifiers.\nIf there are multiple matches, an error will be returned.",
@@ -1164,7 +1099,88 @@
         ]
       }
     },
-    "/as/applications/{ids.application_ids.application_id}/webhooks/{ids.webhook_id}": {
+    "/as/webhook-formats": {
+      "get": {
+        "operationId": "GetFormats",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ApplicationWebhookFormats"
+            }
+          }
+        },
+        "tags": [
+          "ApplicationWebhookRegistry"
+        ]
+      }
+    },
+    "/as/webhooks/{application_ids.application_id}": {
+      "get": {
+        "operationId": "List",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ApplicationWebhooks"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "field_mask.paths",
+            "description": "The set of field mask paths.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "ApplicationWebhookRegistry"
+        ]
+      }
+    },
+    "/as/webhooks/{application_ids.application_id}/{webhook_id}": {
+      "delete": {
+        "operationId": "Delete",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "webhook_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ApplicationWebhookRegistry"
+        ]
+      }
+    },
+    "/as/webhooks/{ids.application_ids.application_id}/{ids.webhook_id}": {
       "get": {
         "operationId": "Get",
         "responses": {
@@ -1205,8 +1221,40 @@
         ]
       }
     },
-    "/as/applications/{webhook.ids.application_ids.application_id}/webhooks/{webhook.ids.webhook_id}": {
+    "/as/webhooks/{webhook.ids.application_ids.application_id}": {
       "post": {
+        "operationId": "Set2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ApplicationWebhook"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "webhook.ids.application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3SetApplicationWebhookRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ApplicationWebhookRegistry"
+        ]
+      }
+    },
+    "/as/webhooks/{webhook.ids.application_ids.application_id}/{webhook.ids.webhook_id}": {
+      "put": {
         "operationId": "Set",
         "responses": {
           "200": {
@@ -1238,22 +1286,6 @@
             }
           }
         ],
-        "tags": [
-          "ApplicationWebhookRegistry"
-        ]
-      }
-    },
-    "/as/webhook-formats": {
-      "get": {
-        "operationId": "GetFormats",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v3ApplicationWebhookFormats"
-            }
-          }
-        },
         "tags": [
           "ApplicationWebhookRegistry"
         ]

@@ -2043,7 +2043,7 @@
                   "rules": [
                     {
                       "method": "GET",
-                      "pattern": "/as/applications/{ids.application_ids.application_id}/webhooks/{ids.webhook_id}"
+                      "pattern": "/as/webhooks/{ids.application_ids.application_id}/{ids.webhook_id}"
                     }
                   ]
                 }
@@ -2065,7 +2065,7 @@
                   "rules": [
                     {
                       "method": "GET",
-                      "pattern": "/as/applications/{application_ids.application_id}/webhooks"
+                      "pattern": "/as/webhooks/{application_ids.application_id}"
                     }
                   ]
                 }
@@ -2086,8 +2086,13 @@
                 "google.api.http": {
                   "rules": [
                     {
+                      "method": "PUT",
+                      "pattern": "/as/webhooks/{webhook.ids.application_ids.application_id}/{webhook.ids.webhook_id}",
+                      "body": "*"
+                    },
+                    {
                       "method": "POST",
-                      "pattern": "/as/applications/{webhook.ids.application_ids.application_id}/webhooks/{webhook.ids.webhook_id}",
+                      "pattern": "/as/webhooks/{webhook.ids.application_ids.application_id}",
                       "body": "*"
                     }
                   ]
@@ -2110,7 +2115,7 @@
                   "rules": [
                     {
                       "method": "DELETE",
-                      "pattern": "/as/applications/{application_ids.application_id}/webhooks/{webhook_id}"
+                      "pattern": "/as/webhooks/{application_ids.application_id}/{webhook_id}"
                     }
                   ]
                 }

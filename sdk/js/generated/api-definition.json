@@ -338,7 +338,7 @@
       "http": [
         {
           "method": "get",
-          "pattern": "/as/applications/{ids.application_ids.application_id}/webhooks/{ids.webhook_id}",
+          "pattern": "/as/webhooks/{ids.application_ids.application_id}/{ids.webhook_id}",
           "parameters": [
             "ids.application_ids.application_id",
             "ids.webhook_id"
@@ -351,7 +351,7 @@
       "http": [
         {
           "method": "get",
-          "pattern": "/as/applications/{application_ids.application_id}/webhooks",
+          "pattern": "/as/webhooks/{application_ids.application_id}",
           "parameters": [
             "application_ids.application_id"
           ]
@@ -362,12 +362,20 @@
       "file": "lorawan-stack/api/applicationserver_web.proto",
       "http": [
         {
-          "method": "post",
-          "pattern": "/as/applications/{webhook.ids.application_ids.application_id}/webhooks/{webhook.ids.webhook_id}",
+          "method": "put",
+          "pattern": "/as/webhooks/{webhook.ids.application_ids.application_id}/{webhook.ids.webhook_id}",
           "body": "*",
           "parameters": [
             "webhook.ids.application_ids.application_id",
             "webhook.ids.webhook_id"
+          ]
+        },
+        {
+          "method": "post",
+          "pattern": "/as/webhooks/{webhook.ids.application_ids.application_id}",
+          "body": "*",
+          "parameters": [
+            "webhook.ids.application_ids.application_id"
           ]
         }
       ]
@@ -377,7 +385,7 @@
       "http": [
         {
           "method": "delete",
-          "pattern": "/as/applications/{application_ids.application_id}/webhooks/{webhook_id}",
+          "pattern": "/as/webhooks/{application_ids.application_id}/{webhook_id}",
           "parameters": [
             "application_ids.application_id",
             "webhook_id"

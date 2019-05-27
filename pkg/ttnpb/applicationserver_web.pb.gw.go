@@ -165,6 +165,41 @@ func request_ApplicationWebhookRegistry_Set_0(ctx context.Context, marshaler run
 
 }
 
+func request_ApplicationWebhookRegistry_Set_1(ctx context.Context, marshaler runtime.Marshaler, client ApplicationWebhookRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq SetApplicationWebhookRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["webhook.ids.application_ids.application_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "webhook.ids.application_ids.application_id")
+	}
+
+	err = runtime.PopulateFieldFromPath(&protoReq, "webhook.ids.application_ids.application_id", val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "webhook.ids.application_ids.application_id", err)
+	}
+
+	msg, err := client.Set(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
 var (
 	filter_ApplicationWebhookRegistry_Delete_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "webhook_id": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
 )
@@ -309,7 +344,7 @@ func RegisterApplicationWebhookRegistryHandlerClient(ctx context.Context, mux *r
 
 	})
 
-	mux.Handle("POST", pattern_ApplicationWebhookRegistry_Set_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("PUT", pattern_ApplicationWebhookRegistry_Set_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -326,6 +361,26 @@ func RegisterApplicationWebhookRegistryHandlerClient(ctx context.Context, mux *r
 		}
 
 		forward_ApplicationWebhookRegistry_Set_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("POST", pattern_ApplicationWebhookRegistry_Set_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_ApplicationWebhookRegistry_Set_1(rctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_ApplicationWebhookRegistry_Set_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -355,13 +410,15 @@ func RegisterApplicationWebhookRegistryHandlerClient(ctx context.Context, mux *r
 var (
 	pattern_ApplicationWebhookRegistry_GetFormats_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"as", "webhook-formats"}, ""))
 
-	pattern_ApplicationWebhookRegistry_Get_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"as", "applications", "ids.application_ids.application_id", "webhooks", "ids.webhook_id"}, ""))
+	pattern_ApplicationWebhookRegistry_Get_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 3}, []string{"as", "webhooks", "ids.application_ids.application_id", "ids.webhook_id"}, ""))
 
-	pattern_ApplicationWebhookRegistry_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"as", "applications", "application_ids.application_id", "webhooks"}, ""))
+	pattern_ApplicationWebhookRegistry_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"as", "webhooks", "application_ids.application_id"}, ""))
 
-	pattern_ApplicationWebhookRegistry_Set_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"as", "applications", "webhook.ids.application_ids.application_id", "webhooks", "webhook.ids.webhook_id"}, ""))
+	pattern_ApplicationWebhookRegistry_Set_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 3}, []string{"as", "webhooks", "webhook.ids.application_ids.application_id", "webhook.ids.webhook_id"}, ""))
 
-	pattern_ApplicationWebhookRegistry_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"as", "applications", "application_ids.application_id", "webhooks", "webhook_id"}, ""))
+	pattern_ApplicationWebhookRegistry_Set_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"as", "webhooks", "webhook.ids.application_ids.application_id"}, ""))
+
+	pattern_ApplicationWebhookRegistry_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 3}, []string{"as", "webhooks", "application_ids.application_id", "webhook_id"}, ""))
 )
 
 var (
@@ -372,6 +429,8 @@ var (
 	forward_ApplicationWebhookRegistry_List_0 = runtime.ForwardResponseMessage
 
 	forward_ApplicationWebhookRegistry_Set_0 = runtime.ForwardResponseMessage
+
+	forward_ApplicationWebhookRegistry_Set_1 = runtime.ForwardResponseMessage
 
 	forward_ApplicationWebhookRegistry_Delete_0 = runtime.ForwardResponseMessage
 )

@@ -91,26 +91,30 @@ service ApplicationWebhookRegistry {
 
   rpc Get(GetApplicationWebhookRequest) returns (ApplicationWebhook) {
     option (google.api.http) = {
-      get: "/as/applications/{ids.application_ids.application_id}/webhooks/{ids.webhook_id}"
+      get: "/as/webhooks/{ids.application_ids.application_id}/{ids.webhook_id}"
     };
   };
 
   rpc List(ListApplicationWebhooksRequest) returns (ApplicationWebhooks) {
     option (google.api.http) = {
-      get: "/as/applications/{application_ids.application_id}/webhooks"
+      get: "/as/webhooks/{application_ids.application_id}"
     };
   };
 
   rpc Set(SetApplicationWebhookRequest) returns (ApplicationWebhook) {
     option (google.api.http) = {
-      post: "/as/applications/{webhook.ids.application_ids.application_id}/webhooks/{webhook.ids.webhook_id}",
+      put: "/as/webhooks/{webhook.ids.application_ids.application_id}/{webhook.ids.webhook_id}"
       body: "*"
+      additional_bindings {
+        post: "/as/webhooks/{webhook.ids.application_ids.application_id}"
+        body: "*"
+      }
     };
   };
 
   rpc Delete(ApplicationWebhookIdentifiers) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      delete: "/as/applications/{application_ids.application_id}/webhooks/{webhook_id}",
+      delete: "/as/webhooks/{application_ids.application_id}/{webhook_id}",
     };
   };
 }
