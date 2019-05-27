@@ -26,6 +26,15 @@ import getByPath from '../../lib/get-by-path'
 @bind
 class InnerForm extends React.Component {
 
+  componentDidMount () {
+    const { error, setStatus } = this.props
+
+    // check for errors on initial form mount
+    if (error) {
+      setStatus({ formError: error })
+    }
+  }
+
   componentDidUpdate (prev) {
     const {
       loading,
