@@ -321,8 +321,12 @@ func TestWebhooks(t *testing.T) {
 
 	t.Run("Downstream", func(t *testing.T) {
 		httpAddress := "0.0.0.0:8098"
-		testSink := &mockSink{}
-		w := web.NewWebhooks(newContextWithRightsFetcher(ctx), testSink, registry, testSink)
+		testSink := &mockSink{
+			FillContextFunc: func(ctx context.Context) context.Context {
+				return newContextWithRightsFetcher(ctx)
+			},
+		}
+		w := web.NewWebhooks(ctx, testSink, registry, testSink)
 		conf := &component.Config{
 			ServiceBase: config.ServiceBase{
 				HTTP: config.HTTP{
@@ -386,7 +390,15 @@ func TestWebhooks(t *testing.T) {
 
 type mockSink struct {
 	io.Server
-	ch chan *http.Request
+	ch              chan *http.Request
+	FillContextFunc func(context.Context) context.Context
+}
+
+func (s *mockSink) FillContext(ctx context.Context) context.Context {
+	if s.FillContextFunc == nil {
+		panic("FillContext should not be called")
+	}
+	return s.FillContextFunc(ctx)
 }
 
 func (s *mockSink) Process(req *http.Request) error {
