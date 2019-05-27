@@ -22,6 +22,7 @@ import ErrorView from '../../../lib/components/error-view'
 import SubViewError from '../error/sub-view'
 
 import ApplicationIntegrationsList from '../application-integrations-list'
+import ApplicationIntegrationAdd from '../application-integration-add'
 
 @withBreadcrumb('apps.single.api-keys', function (props) {
   const { match } = props
@@ -44,6 +45,7 @@ export default class ApplicationCollaborators extends React.Component {
       <ErrorView ErrorComponent={SubViewError}>
         <Switch>
           <Route exact path={`${match.path}`} component={ApplicationIntegrationsList} />
+          <Route path={`${match.path}/add`} component={ApplicationIntegrationAdd} />
         </Switch>
       </ErrorView>
     )
