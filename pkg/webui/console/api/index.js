@@ -103,6 +103,8 @@ export default {
       create: ttnClient.Applications.Webhooks.create.bind(ttnClient.Applications.Webhooks),
       update: ttnClient.Applications.Webhooks.updateById.bind(ttnClient.Applications.Webhooks),
       'delete': ttnClient.Applications.Webhooks.deleteById.bind(ttnClient.Applications.Webhooks),
+      getFormats: ttnClient.Applications.Webhooks.getFormats.bind(ttnClient.Applications.Webhooks),
+
     },
   },
   devices: {
