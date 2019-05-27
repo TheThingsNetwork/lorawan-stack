@@ -23,6 +23,7 @@ import SubViewError from '../error/sub-view'
 
 import ApplicationIntegrationsList from '../application-integrations-list'
 import ApplicationIntegrationAdd from '../application-integration-add'
+import ApplicationIntegrationEdit from '../application-integration-edit'
 
 @withBreadcrumb('apps.single.api-keys', function (props) {
   const { match } = props
@@ -46,6 +47,7 @@ export default class ApplicationCollaborators extends React.Component {
         <Switch>
           <Route exact path={`${match.path}`} component={ApplicationIntegrationsList} />
           <Route path={`${match.path}/add`} component={ApplicationIntegrationAdd} />
+          <Route path={`${match.path}/:webhookId`} component={ApplicationIntegrationEdit} />
         </Switch>
       </ErrorView>
     )
