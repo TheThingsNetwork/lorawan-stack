@@ -45,6 +45,11 @@ func NewServer() Server {
 	}
 }
 
+// FillContext implements io.Server.
+func (s *server) FillContext(ctx context.Context) context.Context {
+	return ctx
+}
+
 // FillApplicationContext implements io.Server.
 func (s *server) FillApplicationContext(ctx context.Context, ids ttnpb.ApplicationIdentifiers) (context.Context, ttnpb.ApplicationIdentifiers, error) {
 	return ctx, ids, nil
