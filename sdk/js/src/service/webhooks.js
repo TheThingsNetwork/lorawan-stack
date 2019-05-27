@@ -78,6 +78,12 @@ class Webhooks {
 
     return Marshaler.payloadSingleResponse(result)
   }
+
+  async getFormats () {
+    const result = await this._api.GetFormats()
+
+    return Marshaler.payloadSingleResponse(result)
+  }
 }
 
 export default Webhooks
