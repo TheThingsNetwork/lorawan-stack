@@ -20,6 +20,7 @@ import * as application from '../actions/application'
 import * as link from '../actions/link'
 import * as webhooks from '../actions/webhooks'
 import * as webhook from '../actions/webhook'
+import * as webhookFormats from '../actions/webhook-formats'
 import createEventsConnectLogics from './events'
 
 const getApplicationLogic = createLogic({
@@ -168,6 +169,20 @@ const getWebhooksLogic = createLogic({
   },
 })
 
+const getWebhookFormatsLogic = createLogic({
+  type: webhookFormats.GET_WEBHOOK_FORMATS,
+  async process ({ action }, dispatch, done) {
+    try {
+      const { formats } = await api.application.webhooks.getFormats()
+      dispatch(webhookFormats.getWebhookFormatsSuccess(formats))
+    } catch (e) {
+      dispatch(webhookFormats.getWebhookFormatsFailure(e))
+    }
+
+    done()
+  },
+})
+
 export default [
   getApplicationLogic,
   getApplicationApiKeysLogic,
@@ -175,6 +190,7 @@ export default [
   getApplicationCollaboratorsLogic,
   getWebhooksLogic,
   getWebhookLogic,
+  getWebhookFormatsLogic,
   ...createEventsConnectLogics(application.SHARED_NAME, 'application'),
   getApplicationLinkLogic,
 ]

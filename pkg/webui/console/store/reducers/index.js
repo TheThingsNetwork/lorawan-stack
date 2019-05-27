@@ -38,6 +38,7 @@ import fetching from './ui/fetching'
 import error from './ui/error'
 import webhook from './webhook'
 import webhooks from './webhooks'
+import webhookFormats from './webhook-formats'
 
 export default combineReducers({
   user,
@@ -52,6 +53,7 @@ export default combineReducers({
   gateway,
   webhook,
   webhooks,
+  webhookFormats,
   configuration,
   apiKeys: combineReducers({
     application: createNamedApiKeyReducer(APPLICATION_SHARED_NAME),
