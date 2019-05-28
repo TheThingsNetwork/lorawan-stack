@@ -42,10 +42,8 @@ const hardcoded = {
   event_create: 'add_circle',
   event_delete: 'delete',
   event_update: 'edit',
-  event_uplink: 'arrow_drop_up',
-  event_downlink: 'arrow_drop_down',
-  uplink: 'trending_up',
-  downlink: 'trending_down',
+  uplink: 'arrow_drop_up',
+  downlink: 'arrow_drop_down',
 }
 
 const Icon = function ({
