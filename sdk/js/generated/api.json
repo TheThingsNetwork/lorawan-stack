@@ -14714,6 +14714,24 @@
       "hasServices": false,
       "enums": [
         {
+          "name": "Operation",
+          "longName": "DownlinkQueueOperation.Operation",
+          "fullName": "ttn.lorawan.v3.DownlinkQueueOperation.Operation",
+          "description": "",
+          "values": [
+            {
+              "name": "PUSH",
+              "number": "0",
+              "description": ""
+            },
+            {
+              "name": "REPLACE",
+              "number": "1",
+              "description": ""
+            }
+          ]
+        },
+        {
           "name": "PayloadFormatter",
           "longName": "PayloadFormatter",
           "fullName": "ttn.lorawan.v3.PayloadFormatter",
@@ -15568,6 +15586,63 @@
                   }
                 ]
               }
+            }
+          ]
+        },
+        {
+          "name": "DownlinkQueueOperation",
+          "longName": "DownlinkQueueOperation",
+          "fullName": "ttn.lorawan.v3.DownlinkQueueOperation",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "end_device_ids",
+              "description": "",
+              "label": "",
+              "type": "EndDeviceIdentifiers",
+              "longType": "EndDeviceIdentifiers",
+              "fullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "operation",
+              "description": "",
+              "label": "",
+              "type": "Operation",
+              "longType": "DownlinkQueueOperation.Operation",
+              "fullType": "ttn.lorawan.v3.DownlinkQueueOperation.Operation",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "downlinks",
+              "description": "",
+              "label": "repeated",
+              "type": "ApplicationDownlink",
+              "longType": "ApplicationDownlink",
+              "fullType": "ttn.lorawan.v3.ApplicationDownlink",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },
