@@ -238,7 +238,9 @@ func (w *webhooks) validateAndFillIDs() echo.MiddlewareFunc {
 func (w *webhooks) requireApplicationRights(required ...ttnpb.Right) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			ctx := w.ctx
+			ctx := w.server.FillContext(c.Request().Context())
+			ctx = log.NewContextWithField(ctx, "namespace", "applicationserver/io/web")
+
 			appID := c.Get(applicationIDKey).(ttnpb.ApplicationIdentifiers)
 			md := metadata.New(map[string]string{
 				"id":            appID.ApplicationID,
@@ -248,9 +250,11 @@ func (w *webhooks) requireApplicationRights(required ...ttnpb.Right) echo.Middle
 				md = metadata.Join(ctxMd, md)
 			}
 			ctx = metadata.NewIncomingContext(ctx, md)
+
 			if err := rights.RequireApplication(ctx, appID, required...); err != nil {
 				return err
 			}
+
 			return next(c)
 		}
 	}

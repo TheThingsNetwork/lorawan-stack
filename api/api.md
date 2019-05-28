@@ -856,10 +856,11 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 | Method Name | Method | Pattern | Body |
 | ----------- | ------ | ------- | ---- |
 | `GetFormats` | `GET` | `/api/v3/as/webhook-formats` |  |
-| `Get` | `GET` | `/api/v3/as/applications/{ids.application_ids.application_id}/webhooks/{ids.webhook_id}` |  |
-| `List` | `GET` | `/api/v3/as/applications/{application_ids.application_id}/webhooks` |  |
-| `Set` | `POST` | `/api/v3/as/applications/{webhook.ids.application_ids.application_id}/webhooks/{webhook.ids.webhook_id}` | `*` |
-| `Delete` | `DELETE` | `/api/v3/as/applications/{application_ids.application_id}/webhooks/{webhook_id}` |  |
+| `Get` | `GET` | `/api/v3/as/webhooks/{ids.application_ids.application_id}/{ids.webhook_id}` |  |
+| `List` | `GET` | `/api/v3/as/webhooks/{application_ids.application_id}` |  |
+| `Set` | `PUT` | `/api/v3/as/webhooks/{webhook.ids.application_ids.application_id}/{webhook.ids.webhook_id}` | `*` |
+| `Set` | `POST` | `/api/v3/as/webhooks/{webhook.ids.application_ids.application_id}` | `*` |
+| `Delete` | `DELETE` | `/api/v3/as/webhooks/{application_ids.application_id}/{webhook_id}` |  |
 
 ## <a name="lorawan-stack/api/client.proto">File `lorawan-stack/api/client.proto`</a>
 
