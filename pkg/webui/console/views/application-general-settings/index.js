@@ -140,7 +140,6 @@ export default class ApplicationGeneralSettings extends React.Component {
               />
               <Field
                 title={sharedMessages.name}
-                required
                 name="name"
                 type="text"
               />
