@@ -22,6 +22,7 @@ const defaultState = {
   fetching: false,
   error: undefined,
   application: undefined,
+  link: {},
 }
 
 const application = function (state = defaultState, action) {

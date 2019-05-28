@@ -14,8 +14,10 @@
 
 import { createLogic } from 'redux-logic'
 
+import { isNotFoundError } from '../../../lib/errors/utils'
 import api from '../../api'
 import * as application from '../actions/application'
+import * as link from '../actions/link'
 import createEventsConnectLogics from './events'
 
 const getApplicationLogic = createLogic({
@@ -107,10 +109,38 @@ const getApplicationCollaboratorsLogic = createLogic({
   },
 })
 
+const getApplicationLinkLogic = createLogic({
+  type: link.GET_APP_LINK,
+  async process ({ action }, dispatch, done) {
+    const { id, meta = {}} = action
+    const { selectors = []} = meta
+
+    let linkResult
+    let statsResult
+    try {
+      linkResult = await api.application.link.get(id, selectors)
+      statsResult = await api.application.link.stats(id)
+
+      dispatch(link.getApplicationLinkSuccess(linkResult, statsResult, true))
+    } catch (error) {
+      // consider errors that are not 404, since not found means that the
+      // application is not linked.
+      if (isNotFoundError(error)) {
+        dispatch(link.getApplicationLinkSuccess(linkResult, statsResult, false))
+      } else {
+        dispatch(link.getApplicationLinkFailure(error))
+      }
+    }
+
+    done()
+  },
+})
+
 export default [
   getApplicationLogic,
   getApplicationApiKeysLogic,
   getApplicationApiKeyLogic,
   getApplicationCollaboratorsLogic,
   ...createEventsConnectLogics(application.SHARED_NAME, 'application'),
+  getApplicationLinkLogic,
 ]

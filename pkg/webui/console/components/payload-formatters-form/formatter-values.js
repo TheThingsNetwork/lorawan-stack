@@ -12,29 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.wrapper
-  border-input()
-  border-radius: $br.s
-  transition: border-color .2s
-  position: relative
-  overflow: hidden
-  z-index: 0
-  box-sizing: border-box
+const DEFAULT_UPLINK_JS_FORMATTER = `function Decoder(bytes, f_port) {
+  return {
+    raw: bytes,
+    f_port: f_port
+  };
+}`
+const DEFAULT_DOWNLINK_JS_FORMATTER = `function Encoder(payload, f_port) {
+  return [];
+}`
 
-  &.focus
-    :global .ace-ttn
-      .ace_marker-layer .ace_active-line
-        background-color: lighter($c-active-blue, 9)
+export const getDefaultJavascriptFormatter = uplink => uplink
+  ? DEFAULT_UPLINK_JS_FORMATTER
+  : DEFAULT_DOWNLINK_JS_FORMATTER
 
-      .ace_gutter-active-line
-        background-color: darker($c-backdrop, 3)
-
-  &.read-only
-    :global .ace-ttn
-      .ace_marker-layer .ace_active-line,
-      .ace_gutter-active-line,
-      .ace_cursor
-        display: none
-
-      .ace_bracket
-        border: 0
+export const getDefaultGrpcServiceFormatter = () => undefined

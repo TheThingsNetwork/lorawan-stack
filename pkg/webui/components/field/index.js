@@ -25,6 +25,7 @@ import Input from '../input'
 import Checkbox from '../checkbox'
 import Select from '../select'
 import RadioButton from '../radio-button'
+import CodeEditor from '../code-editor'
 import Message from '../../lib/components/message'
 
 import style from './field.styl'
@@ -84,6 +85,18 @@ const selectAllowedProps = [
   'menuPlacement',
 ]
 
+const codeAllowedProps = [
+  'name',
+  'height',
+  'value',
+  'onChange',
+  'onBlur',
+  'onFocus',
+  'minLines',
+  'maxLines',
+  'disabled',
+]
+
 const getAllowedPropsByType = function (type) {
   switch (type) {
   case 'checkbox':
@@ -91,6 +104,8 @@ const getAllowedPropsByType = function (type) {
     return checkboxAllowedProps
   case 'select':
     return selectAllowedProps
+  case 'code':
+    return codeAllowedProps
   default:
     return inputAllowedProps
   }
@@ -124,6 +139,9 @@ const component = function (type) {
 
   case 'select':
     return Select
+
+  case 'code':
+    return CodeEditor
 
   default:
     warn('No type matches', type)

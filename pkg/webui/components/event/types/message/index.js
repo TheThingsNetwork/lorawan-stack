@@ -38,7 +38,7 @@ class MessageEvent extends React.PureComponent {
     } = this.props
 
     const entityId = getEntityId(event.identifiers[0])
-    const icon = type === 'downlink' ? 'event_downlink' : 'event_uplink'
+    const icon = type === 'downlink' ? 'downlink' : 'uplink'
     const data = formatMessageData(event.data)
 
     const eventContent = (

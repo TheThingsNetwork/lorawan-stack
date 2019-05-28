@@ -12,29 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.wrapper
-  border-input()
-  border-radius: $br.s
-  transition: border-color .2s
-  position: relative
-  overflow: hidden
-  z-index: 0
-  box-sizing: border-box
-
-  &.focus
-    :global .ace-ttn
-      .ace_marker-layer .ace_active-line
-        background-color: lighter($c-active-blue, 9)
-
-      .ace_gutter-active-line
-        background-color: darker($c-backdrop, 3)
-
-  &.read-only
-    :global .ace-ttn
-      .ace_marker-layer .ace_active-line,
-      .ace_gutter-active-line,
-      .ace_cursor
-        display: none
-
-      .ace_bracket
-        border: 0
+export default Object.freeze({
+  NONE: 'FORMATTER_NONE',
+  JAVASCRIPT: 'FORMATTER_JAVASCRIPT',
+  GRPC: 'FORMATTER_GRPC_SERVICE',
+  CAYENNELPP: 'FORMATTER_CAYENNELPP',
+  REPOSITORY: 'FORMATTER_REPOSITORY',
+})

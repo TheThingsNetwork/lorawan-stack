@@ -31,6 +31,7 @@ const Notification = function ({
   small,
   message,
   success,
+  messageValues = {},
 }) {
 
   const classname = classnames(style.notification, className, {
@@ -62,7 +63,7 @@ const Notification = function ({
             component="h4"
           />
         )}
-        <Component content={content} />
+        <Component content={content} values={messageValues} />
       </div>
     </div>
   )
@@ -70,6 +71,7 @@ const Notification = function ({
 
 Notification.propTypes = {
   message: PropTypes.message,
+  messageValues: PropTypes.object,
   error: PropTypes.error,
   warning: PropTypes.message,
   info: PropTypes.message,

@@ -33,6 +33,7 @@ import createNamedRightsReducer from './rights'
 import createNamedCollaboratorsReducer from './collaborators'
 import createNamedEventsReducer from './events'
 import createNamedApiKeyReducer from './api-key'
+import link from './link'
 
 export default combineReducers({
   user,
@@ -40,6 +41,7 @@ export default combineReducers({
   init,
   applications,
   application,
+  link,
   devices,
   device,
   gateways,
