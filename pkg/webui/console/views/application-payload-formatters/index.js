@@ -33,8 +33,8 @@ import {
   selectApplicationIsLinked,
   selectApplicationLink,
   selectApplicationLinkFetching,
+  selectSelectedApplicationId,
 } from '../../store/selectors/application'
-import { getApplicationId } from '../../../lib/selectors/id'
 
 import style from './application-payload-formatters.styl'
 
@@ -45,12 +45,11 @@ const m = defineMessages({
 })
 
 @connect(function (state) {
-  const application = state.application.application
   const link = selectApplicationLink(state)
   const fetching = selectApplicationLinkFetching(state)
 
   return {
-    appId: getApplicationId(application),
+    appId: selectSelectedApplicationId(state),
     fetching: fetching || !link,
     linked: selectApplicationIsLinked(state),
   }

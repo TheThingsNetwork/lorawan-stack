@@ -12,19 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {
-  GET_APP_SUCCESS,
-} from '../actions/application'
+const fetching = function (state = {}, action) {
+  const { type } = action
+  const matches = /(.*)_(REQUEST|SUCCESS|FAILURE)/.exec(type)
 
-const defaultState = null
-
-const application = function (state = defaultState, action) {
-  switch (action.type) {
-  case GET_APP_SUCCESS:
-    return action.application
-  default:
+  if (!matches) {
     return state
+  }
+
+  const [ , key, status ] = matches
+  return {
+    ...state,
+    [key]: status === 'REQUEST',
   }
 }
 
-export default application
+export default fetching

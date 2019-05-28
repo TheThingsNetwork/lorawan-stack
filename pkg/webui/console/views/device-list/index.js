@@ -20,11 +20,13 @@ import IntlHelmet from '../../../lib/components/intl-helmet'
 import sharedMessages from '../../../lib/shared-messages'
 import DevicesTable from '../../containers/devices-table'
 
+import { selectSelectedApplication } from '../../store/selectors/application'
+
 const DEVICES_TABLE_SIZE = 25
 
-@connect(function ({ application }, props) {
+@connect(function (state, props) {
   return {
-    application: application.application,
+    application: selectSelectedApplication(state),
   }
 })
 class ApplicationDeviceList extends React.Component {

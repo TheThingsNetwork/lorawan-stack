@@ -32,6 +32,8 @@ import diff from '../../../lib/diff'
 import toast from '../../../components/toast'
 import SubmitBar from '../../../components/submit-bar'
 
+import { selectSelectedApplication } from '../../store/selectors/application'
+
 import api from '../../api'
 
 const m = defineMessages({
@@ -50,10 +52,9 @@ const validationSchema = Yup.object().shape({
     .max(150, sharedMessages.validateTooLong),
 })
 
-
-@connect(function ({ application }) {
+@connect(function (state) {
   return {
-    application: application.application,
+    application: selectSelectedApplication(state),
   }
 })
 @withBreadcrumb('apps.single.general-settings', function (props) {

@@ -19,7 +19,6 @@ import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 
 import sharedMessages from '../../../lib/shared-messages'
-import { getApplicationId } from '../../../lib/selectors/id'
 import diff from '../../../lib/diff'
 import api from '../../api'
 
@@ -27,14 +26,16 @@ import DeviceDataForm from '../../containers/device-data-form'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import toast from '../../../components/toast'
 
+import { selectSelectedApplicationId } from '../../store/selectors/application'
+
 const m = defineMessages({
   updateSuccess: 'Successfully updated end device',
 })
 
-@connect(function ({ device, application }, props) {
+@connect(function (state) {
   return {
-    device: device.device,
-    application: application.application,
+    device: state.device.device,
+    appId: selectSelectedApplicationId(state),
   }
 })
 @bind
@@ -45,8 +46,7 @@ export default class DeviceGeneralSettings extends React.Component {
   }
 
   async handleSubmit (values, { setSubmitting, resetForm }) {
-    const { device, application } = this.props
-    const appId = getApplicationId(application)
+    const { device, appId } = this.props
     const { activation_mode, ...updatedDevice } = values
 
     // Clean values based on activation mode
