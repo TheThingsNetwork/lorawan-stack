@@ -24,7 +24,7 @@ matrix:
   - env: RUNTYPE=go.lint
   - env: RUNTYPE=release
     if: tag IS present OR (type != pull_request AND branch = master)
-  - env: RUNTYPE=doc
+  - env: RUNTYPE=doc HUGO_BASE_URL=https://thethingsnetwork.github.io/lorawan-stack/
     if: branch = master
 services:
 - docker
@@ -138,7 +138,7 @@ after_success:
       GO111MODULE=on go run github.com/goreleaser/goreleaser --snapshot --release-notes <(go run github.com/TheThingsIndustries/release-notes -owner TheThingsNetwork -repo lorawan-stack -id "release-notes" -head $(git rev-parse HEAD))
     fi
   fi
-- if [[ "$RUNTYPE" == "doc" ]]; then $MAGE docs:genVersion fi
+- if [[ "$RUNTYPE" == "doc" ]]; then $MAGE docs:genVersion; fi
 deploy:
 - provider: pages
   local_dir: doc/public

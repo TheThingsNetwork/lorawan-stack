@@ -31,22 +31,23 @@ type Docs mg.Namespace
 
 // Gen Generates static website from the doc in doc/public
 func (Docs) Gen() error {
-	mg.Deps(Version.getCurrent)
-	return sh.RunV(
-		"cp",
-		"-s", "./doc",
-		"--baseUrl", "https://thethingsnetwork.github.io/lorawan-stack/",
-		"-d", "public/")
+	baseUrl := getDocURL()
+	args := []string{"-s", "./doc", "-d", "public/"}
+	if baseUrl != "" {
+		args = append(args, "--baseUrl", baseUrl)
+	}
+	return sh.RunV("hugo", args...)
 }
 
 // Gen Generates static website from the doc in doc/public/$version
 func (Docs) GenVersion() error {
 	mg.Deps(Version.getCurrent)
-	return sh.RunV(
-		"hugo",
-		"-s", "./doc",
-		"--baseUrl", "https://thethingsnetwork.github.io/lorawan-stack/"+currentVersion+"/",
-		"-d", "public/"+currentVersion)
+	baseUrl := getDocURL()
+	args := []string{"-s", "./doc", "-d", "public/" + currentVersion}
+	if baseUrl != "" {
+		args = append(args, "--baseUrl", baseUrl+currentVersion)
+	}
+	return sh.RunV("hugo", args...)
 }
 
 // Docs Install documentation dependencies
@@ -76,4 +77,8 @@ func (d Docs) Config() error {
 	}
 	err = t.Execute(file, cfg)
 	return err
+}
+
+func getDocURL() string {
+	return os.Getenv("HUGO_DOC_URL")
 }
