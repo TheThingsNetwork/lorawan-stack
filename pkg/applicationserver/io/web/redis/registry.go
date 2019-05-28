@@ -30,6 +30,15 @@ var (
 	errInvalidIdentifiers = errors.DefineInvalidArgument("invalid_identifiers", "invalid identifiers")
 )
 
+// appendImplicitWebhookGetPaths appends implicit ttnpb.ApplicationWebhook get paths to paths.
+func appendImplicitWebhookGetPaths(paths ...string) []string {
+	return append(paths,
+		"created_at",
+		"ids",
+		"updated_at",
+	)
+}
+
 func applyWebhookFieldMask(dst, src *ttnpb.ApplicationWebhook, paths ...string) (*ttnpb.ApplicationWebhook, error) {
 	if dst == nil {
 		dst = &ttnpb.ApplicationWebhook{}
@@ -62,11 +71,7 @@ func (r WebhookRegistry) Get(ctx context.Context, ids ttnpb.ApplicationWebhookId
 	if err := ttnredis.GetProto(r.Redis, r.idKey(unique.ID(ctx, ids.ApplicationIdentifiers), ids.WebhookID)).ScanProto(pb); err != nil {
 		return nil, err
 	}
-	return applyWebhookFieldMask(nil, pb, append(paths,
-		"base_url",
-		"format",
-		"ids",
-	)...)
+	return applyWebhookFieldMask(nil, pb, appendImplicitWebhookGetPaths(paths...)...)
 }
 
 // List implements WebhookRegistry.
@@ -76,11 +81,7 @@ func (r WebhookRegistry) List(ctx context.Context, ids ttnpb.ApplicationIdentifi
 	err := ttnredis.FindProtos(r.Redis, r.appKey(appUID), r.makeIDKeyFunc(appUID)).Range(func() (proto.Message, func() (bool, error)) {
 		pb := &ttnpb.ApplicationWebhook{}
 		return pb, func() (bool, error) {
-			pb, err := applyWebhookFieldMask(nil, pb, append(paths,
-				"base_url",
-				"format",
-				"ids",
-			)...)
+			pb, err := applyWebhookFieldMask(nil, pb, appendImplicitWebhookGetPaths(paths...)...)
 			if err != nil {
 				return false, err
 			}
@@ -109,11 +110,7 @@ func (r WebhookRegistry) Set(ctx context.Context, ids ttnpb.ApplicationWebhookId
 			return err
 		}
 
-		gets = append(gets,
-			"created_at",
-			"ids",
-			"updated_at",
-		)
+		gets = appendImplicitWebhookGetPaths(gets...)
 
 		var err error
 		if stored != nil {

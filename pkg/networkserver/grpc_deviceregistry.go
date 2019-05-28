@@ -138,13 +138,16 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.desired_rx2_frequency")
 		}
 
-		sets := append(req.FieldMask.Paths[:0:0], req.FieldMask.Paths...)
+		sets := req.FieldMask.Paths
 		if ttnpb.HasAnyField(sets, "version_ids") {
 			// TODO: Apply version IDs (https://github.com/TheThingsIndustries/lorawan-stack/issues/1544)
 		}
 
 		if dev != nil {
-			if ttnpb.HasAnyField(req.FieldMask.Paths, "session.dev_addr") && !ttnpb.HasAnyField(req.FieldMask.Paths, "ids.dev_addr") {
+			if err := ttnpb.ProhibitFields(req.FieldMask.Paths, "ids.dev_addr"); err != nil {
+				return nil, nil, errInvalidFieldMask.WithCause(err)
+			}
+			if ttnpb.HasAnyField(req.FieldMask.Paths, "session.dev_addr") {
 				req.EndDevice.DevAddr = &req.EndDevice.Session.DevAddr
 				sets = append(sets, "ids.dev_addr")
 			}
@@ -182,11 +185,31 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			}
 		}
 
+		sets = append(sets,
+			"ids.application_ids",
+			"ids.device_id",
+		)
+		if req.EndDevice.JoinEUI != nil {
+			sets = append(sets,
+				"ids.join_eui",
+			)
+		}
+		if req.EndDevice.DevEUI != nil {
+			sets = append(sets,
+				"ids.dev_eui",
+			)
+		}
+		if req.EndDevice.DevAddr != nil {
+			if !ttnpb.HasAnyField(req.FieldMask.Paths, "session.dev_addr") || !req.EndDevice.DevAddr.Equal(req.EndDevice.Session.DevAddr) {
+				return nil, nil, errInvalidFieldValue.WithAttributes("field", "ids.dev_addr")
+			}
+		}
+
 		if req.EndDevice.SupportsJoin {
-			if req.EndDevice.EndDeviceIdentifiers.JoinEUI == nil {
+			if req.EndDevice.JoinEUI == nil {
 				return nil, nil, errNoJoinEUI
 			}
-			if req.EndDevice.EndDeviceIdentifiers.DevEUI == nil {
+			if req.EndDevice.DevEUI == nil {
 				return nil, nil, errNoDevEUI
 			}
 			if !ttnpb.HasAnyField([]string{"session"}, sets...) {
@@ -201,6 +224,9 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			return nil, nil, errInvalidFieldMask.WithCause(err)
 		}
 		req.EndDevice.EndDeviceIdentifiers.DevAddr = &req.EndDevice.Session.DevAddr
+		sets = append(sets,
+			"ids.dev_addr",
+		)
 
 		if !validABPSessionKey(req.EndDevice.Session.FNwkSIntKey) {
 			return nil, nil, errInvalidFNwkSIntKey

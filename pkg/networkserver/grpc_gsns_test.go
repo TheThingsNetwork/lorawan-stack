@@ -222,8 +222,10 @@ func handleUplinkTest() func(t *testing.T) {
 			ret, err := devReg.SetByID(authorizedCtx, pb.ApplicationIdentifiers, pb.DeviceID,
 				[]string{
 					"frequency_plan_id",
+					"ids.application_ids",
 					"ids.dev_addr",
 					"ids.dev_eui",
+					"ids.device_id",
 					"ids.join_eui",
 					"lorawan_phy_version",
 					"lorawan_version",
@@ -235,8 +237,10 @@ func handleUplinkTest() func(t *testing.T) {
 					}
 					return CopyEndDevice(pb), []string{
 						"frequency_plan_id",
+						"ids.application_ids",
 						"ids.dev_addr",
 						"ids.dev_eui",
+						"ids.device_id",
 						"ids.join_eui",
 						"lorawan_phy_version",
 						"lorawan_version",
@@ -311,8 +315,10 @@ func handleUplinkTest() func(t *testing.T) {
 				[]string{
 					"created_at",
 					"frequency_plan_id",
+					"ids.application_ids",
 					"ids.dev_addr",
 					"ids.dev_eui",
+					"ids.device_id",
 					"ids.join_eui",
 					"lorawan_phy_version",
 					"lorawan_version",
@@ -325,8 +331,10 @@ func handleUplinkTest() func(t *testing.T) {
 					}
 					return CopyEndDevice(pb), []string{
 						"frequency_plan_id",
+						"ids.application_ids",
 						"ids.dev_addr",
 						"ids.dev_eui",
+						"ids.device_id",
 						"ids.join_eui",
 						"lorawan_phy_version",
 						"lorawan_version",
@@ -1387,8 +1395,10 @@ func handleUplinkTest() func(t *testing.T) {
 						[]string{
 							"created_at",
 							"frequency_plan_id",
+							"ids.application_ids",
 							"ids.dev_addr",
 							"ids.dev_eui",
+							"ids.device_id",
 							"ids.join_eui",
 							"lorawan_phy_version",
 							"lorawan_version",
@@ -1403,8 +1413,10 @@ func handleUplinkTest() func(t *testing.T) {
 							}
 							return CopyEndDevice(pb), []string{
 								"frequency_plan_id",
+								"ids.application_ids",
 								"ids.dev_addr",
 								"ids.dev_eui",
+								"ids.device_id",
 								"ids.join_eui",
 								"lorawan_phy_version",
 								"lorawan_version",
@@ -1490,8 +1502,10 @@ func handleUplinkTest() func(t *testing.T) {
 					[]string{
 						"created_at",
 						"frequency_plan_id",
+						"ids.application_ids",
 						"ids.dev_addr",
 						"ids.dev_eui",
+						"ids.device_id",
 						"ids.join_eui",
 						"lorawan_phy_version",
 						"lorawan_version",
@@ -1508,8 +1522,10 @@ func handleUplinkTest() func(t *testing.T) {
 						}
 						return CopyEndDevice(tc.Device), []string{
 							"frequency_plan_id",
+							"ids.application_ids",
 							"ids.dev_addr",
 							"ids.dev_eui",
+							"ids.device_id",
 							"ids.join_eui",
 							"lorawan_phy_version",
 							"lorawan_version",
@@ -1876,8 +1892,10 @@ func handleJoinTest() func(t *testing.T) {
 						[]string{
 							"created_at",
 							"frequency_plan_id",
+							"ids.application_ids",
 							"ids.dev_addr",
 							"ids.dev_eui",
+							"ids.device_id",
 							"ids.join_eui",
 							"lorawan_phy_version",
 							"lorawan_version",
@@ -1892,8 +1910,10 @@ func handleJoinTest() func(t *testing.T) {
 							}
 							return CopyEndDevice(pb), []string{
 								"frequency_plan_id",
+								"ids.application_ids",
 								"ids.dev_addr",
 								"ids.dev_eui",
+								"ids.device_id",
 								"ids.join_eui",
 								"lorawan_phy_version",
 								"lorawan_version",
@@ -2004,6 +2024,11 @@ func handleJoinTest() func(t *testing.T) {
 					[]string{
 						"created_at",
 						"frequency_plan_id",
+						"ids.application_ids",
+						"ids.dev_addr",
+						"ids.dev_eui",
+						"ids.device_id",
+						"ids.join_eui",
 						"lorawan_phy_version",
 						"lorawan_version",
 						"mac_settings",
@@ -2020,6 +2045,11 @@ func handleJoinTest() func(t *testing.T) {
 						}
 						return CopyEndDevice(tc.Device), []string{
 							"frequency_plan_id",
+							"ids.application_ids",
+							"ids.dev_addr",
+							"ids.dev_eui",
+							"ids.device_id",
+							"ids.join_eui",
 							"lorawan_phy_version",
 							"lorawan_version",
 							"mac_settings",

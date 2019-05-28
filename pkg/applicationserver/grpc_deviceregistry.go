@@ -39,8 +39,33 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 	if err := rights.RequireApplication(ctx, req.EndDevice.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
-	return r.registry.Set(ctx, req.EndDevice.EndDeviceIdentifiers, req.FieldMask.Paths, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
-		return &req.EndDevice, req.FieldMask.Paths, nil
+
+	gets := append(req.FieldMask.Paths[:0:0], req.FieldMask.Paths...)
+	return r.registry.Set(ctx, req.EndDevice.EndDeviceIdentifiers, gets, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+		if dev != nil {
+			return &req.EndDevice, req.FieldMask.Paths, nil
+		}
+
+		sets := append(req.FieldMask.Paths,
+			"ids.application_ids",
+			"ids.device_id",
+		)
+		if req.EndDevice.JoinEUI != nil {
+			sets = append(sets,
+				"ids.join_eui",
+			)
+		}
+		if req.EndDevice.DevEUI != nil {
+			sets = append(sets,
+				"ids.dev_eui",
+			)
+		}
+		if req.EndDevice.DevAddr != nil {
+			sets = append(sets,
+				"ids.dev_addr",
+			)
+		}
+		return &req.EndDevice, sets, nil
 	})
 }
 

@@ -101,7 +101,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
-				a.So(gets, should.HaveSameElementsDeep, []string{
+				a.So(gets, should.Resemble, []string{
 					"frequency_plan_id",
 				})
 				return &ttnpb.EndDevice{
@@ -270,6 +270,10 @@ func TestDeviceRegistrySet(t *testing.T) {
 				}
 				a.So(sets, should.HaveSameElementsDeep, []string{
 					"frequency_plan_id",
+					"ids.application_ids",
+					"ids.dev_eui",
+					"ids.device_id",
+					"ids.join_eui",
 					"lorawan_phy_version",
 					"lorawan_version",
 					"mac_settings.adr_margin",
@@ -378,6 +382,11 @@ func TestDeviceRegistrySet(t *testing.T) {
 				}
 				a.So(sets, should.HaveSameElementsDeep, []string{
 					"frequency_plan_id",
+					"ids.application_ids",
+					"ids.dev_addr",
+					"ids.dev_eui",
+					"ids.device_id",
+					"ids.join_eui",
 					"lorawan_phy_version",
 					"lorawan_version",
 					"mac_settings.supports_32_bit_f_cnt",
@@ -562,6 +571,9 @@ func TestDeviceRegistrySet(t *testing.T) {
 				}
 				a.So(sets, should.HaveSameElementsDeep, []string{
 					"frequency_plan_id",
+					"ids.application_ids",
+					"ids.dev_addr",
+					"ids.device_id",
 					"lorawan_phy_version",
 					"lorawan_version",
 					"mac_settings.supports_32_bit_f_cnt",
@@ -738,6 +750,11 @@ func TestDeviceRegistrySet(t *testing.T) {
 				}
 				a.So(sets, should.HaveSameElementsDeep, []string{
 					"frequency_plan_id",
+					"ids.application_ids",
+					"ids.dev_addr",
+					"ids.dev_eui",
+					"ids.device_id",
+					"ids.join_eui",
 					"lorawan_phy_version",
 					"lorawan_version",
 					"mac_settings.supports_32_bit_f_cnt",

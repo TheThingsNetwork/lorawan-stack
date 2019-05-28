@@ -29,9 +29,19 @@ import (
 )
 
 var (
+	errInvalidFieldmask     = errors.DefineInvalidArgument("invalid_fieldmask", "invalid fieldmask")
 	errInvalidIdentifiers   = errors.DefineInvalidArgument("invalid_identifiers", "invalid identifiers")
 	errDuplicateIdentifiers = errors.DefineAlreadyExists("duplicate_identifiers", "duplicate identifiers")
 )
+
+// appendImplicitDeviceGetPaths appends implicit ttnpb.EndDevice get paths to paths.
+func appendImplicitDeviceGetPaths(paths ...string) []string {
+	return append(paths,
+		"created_at",
+		"ids",
+		"updated_at",
+	)
+}
 
 func applyDeviceFieldMask(dst, src *ttnpb.EndDevice, paths ...string) (*ttnpb.EndDevice, error) {
 	if dst == nil {
@@ -73,13 +83,7 @@ func (r *DeviceRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIde
 	if err := ttnredis.GetProto(r.Redis, r.uidKey(unique.ID(ctx, ids))).ScanProto(pb); err != nil {
 		return nil, err
 	}
-	return applyDeviceFieldMask(nil, pb, append(paths,
-		"ids.application_ids",
-		"ids.dev_addr",
-		"ids.dev_eui",
-		"ids.device_id",
-		"ids.join_eui",
-	)...)
+	return applyDeviceFieldMask(nil, pb, appendImplicitDeviceGetPaths(paths...)...)
 }
 
 // GetByEUI gets device by joinEUI, devEUI.
@@ -90,29 +94,18 @@ func (r *DeviceRegistry) GetByEUI(ctx context.Context, joinEUI, devEUI types.EUI
 	if err := ttnredis.FindProto(r.Redis, r.euiKey(joinEUI, devEUI), r.uidKey).ScanProto(pb); err != nil {
 		return nil, err
 	}
-	return applyDeviceFieldMask(nil, pb, append(paths,
-		"ids.application_ids",
-		"ids.dev_addr",
-		"ids.dev_eui",
-		"ids.device_id",
-		"ids.join_eui",
-	)...)
+	return applyDeviceFieldMask(nil, pb, appendImplicitDeviceGetPaths(paths...)...)
 }
 
 // RangeByAddr ranges over devices by addr.
 func (r *DeviceRegistry) RangeByAddr(ctx context.Context, addr types.DevAddr, paths []string, f func(*ttnpb.EndDevice) bool) error {
 	defer trace.StartRegion(ctx, "range end devices by dev_addr").End()
 
+	paths = appendImplicitDeviceGetPaths(paths...)
 	return ttnredis.FindProtos(r.Redis, r.addrKey(addr), r.uidKey).Range(func() (proto.Message, func() (bool, error)) {
 		pb := &ttnpb.EndDevice{}
 		return pb, func() (bool, error) {
-			pb, err := applyDeviceFieldMask(nil, pb, append(paths,
-				"ids.application_ids",
-				"ids.dev_addr",
-				"ids.dev_eui",
-				"ids.device_id",
-				"ids.join_eui",
-			)...)
+			pb, err := applyDeviceFieldMask(nil, pb, paths...)
 			if err != nil {
 				return false, err
 			}
@@ -146,13 +139,6 @@ func equalAddr(x, y *types.DevAddr) bool {
 	return x.Equal(*y)
 }
 
-func equalEUI(x, y *types.EUI64) bool {
-	if x == nil || y == nil {
-		return x == y
-	}
-	return x.Equal(*y)
-}
-
 // SetByID sets device by appID, devID.
 func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(pb *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 	ids := ttnpb.EndDeviceIdentifiers{
@@ -177,17 +163,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 			return err
 		}
 
-		storedAddrs := getDevAddrs(stored)
-
-		gets = append(gets,
-			"created_at",
-			"ids.application_ids",
-			"ids.dev_addr",
-			"ids.dev_eui",
-			"ids.device_id",
-			"ids.join_eui",
-			"updated_at",
-		)
+		gets = appendImplicitDeviceGetPaths(gets...)
 
 		var err error
 		if stored != nil {
@@ -206,6 +182,13 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 		if err != nil {
 			return err
 		}
+		if err := ttnpb.ProhibitFields(sets,
+			"created_at",
+			"updated_at",
+		); err != nil {
+			return errInvalidFieldmask.WithCause(err)
+		}
+
 		if stored == nil && pb == nil {
 			return nil
 		}
@@ -221,31 +204,26 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 				if stored.JoinEUI != nil && stored.DevEUI != nil {
 					p.Del(r.euiKey(*stored.JoinEUI, *stored.DevEUI))
 				}
-				if storedAddrs.pending != nil {
-					p.SRem(r.addrKey(*storedAddrs.pending), uid)
+				if stored.PendingSession != nil {
+					p.SRem(r.addrKey(stored.PendingSession.DevAddr), uid)
 				}
-				if storedAddrs.current != nil {
-					p.SRem(r.addrKey(*storedAddrs.current), uid)
+				if stored.Session != nil {
+					p.SRem(r.addrKey(stored.Session.DevAddr), uid)
 				}
 				return nil
 			}
 		} else {
-			if pb.ApplicationIdentifiers != appID || pb.DeviceID != devID {
-				return errInvalidIdentifiers
-			}
-
 			pb.UpdatedAt = time.Now().UTC()
 			sets = append(sets, "updated_at")
 
 			updated := &ttnpb.EndDevice{}
 			if stored == nil {
-				sets = append(sets,
+				if err := ttnpb.RequireFields(sets,
 					"ids.application_ids",
-					"ids.dev_addr",
-					"ids.dev_eui",
 					"ids.device_id",
-					"ids.join_eui",
-				)
+				); err != nil {
+					return errInvalidFieldmask.WithCause(err)
+				}
 
 				pb.CreatedAt = pb.UpdatedAt
 				sets = append(sets, "created_at")
@@ -254,7 +232,18 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 				if err != nil {
 					return err
 				}
+				if updated.ApplicationIdentifiers != appID || updated.DeviceID != devID {
+					return errInvalidIdentifiers
+				}
 			} else {
+				if err := ttnpb.ProhibitFields(sets,
+					"ids.application_ids",
+					"ids.dev_eui",
+					"ids.device_id",
+					"ids.join_eui",
+				); err != nil {
+					return errInvalidFieldmask.WithCause(err)
+				}
 				if err := cmd.ScanProto(updated); err != nil {
 					return err
 				}
@@ -262,16 +251,10 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 				if err != nil {
 					return err
 				}
-				if !equalEUI(stored.JoinEUI, updated.JoinEUI) || !equalEUI(stored.DevEUI, updated.DevEUI) ||
-					stored.ApplicationIdentifiers != updated.ApplicationIdentifiers || stored.DeviceID != updated.DeviceID {
-					return errInvalidIdentifiers
-				}
 			}
 			if err := updated.ValidateFields(sets...); err != nil {
 				return err
 			}
-			updatedAddrs := getDevAddrs(updated)
-
 			pipelined = func(p redis.Pipeliner) error {
 				if stored == nil && updated.JoinEUI != nil && updated.DevEUI != nil {
 					ek := r.euiKey(*updated.JoinEUI, *updated.DevEUI)
@@ -292,6 +275,9 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 				if err != nil {
 					return err
 				}
+
+				storedAddrs := getDevAddrs(stored)
+				updatedAddrs := getDevAddrs(updated)
 
 				if storedAddrs.pending != nil && !equalAddr(storedAddrs.pending, updatedAddrs.pending) && !equalAddr(storedAddrs.pending, updatedAddrs.current) {
 					p.SRem(r.addrKey(*storedAddrs.pending), uid)

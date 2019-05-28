@@ -102,7 +102,9 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 
 	ret, err = reg.SetByID(ctx, pb.ApplicationIdentifiers, pb.DeviceID,
 		[]string{
+			"ids.application_ids",
 			"ids.dev_eui",
+			"ids.device_id",
 			"ids.join_eui",
 			"pending_session",
 			"session",
@@ -112,7 +114,9 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 				t.Fatal("Registry is not empty")
 			}
 			return pb, []string{
+				"ids.application_ids",
 				"ids.dev_eui",
+				"ids.device_id",
 				"ids.join_eui",
 				"pending_session",
 				"session",
@@ -131,7 +135,9 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 
 	ret, err = reg.SetByID(ctx, pb.ApplicationIdentifiers, pb.DeviceID,
 		[]string{
+			"ids.application_ids",
 			"ids.dev_eui",
+			"ids.device_id",
 			"ids.join_eui",
 			"pending_session",
 			"session",
@@ -187,7 +193,9 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 
 	ret, err = reg.SetByID(ctx, pbOther.ApplicationIdentifiers, pbOther.DeviceID,
 		[]string{
+			"ids.application_ids",
 			"ids.dev_eui",
+			"ids.device_id",
 			"ids.join_eui",
 			"pending_session",
 			"session",
@@ -197,7 +205,9 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 				t.Fatal("Registry is not empty")
 			}
 			return pbOther, []string{
+				"ids.application_ids",
 				"ids.dev_eui",
+				"ids.device_id",
 				"ids.join_eui",
 				"pending_session",
 				"session",
