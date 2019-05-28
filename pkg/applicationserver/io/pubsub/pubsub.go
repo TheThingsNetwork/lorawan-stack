@@ -45,15 +45,15 @@ func Start(ctx context.Context, server io.Server, formatter formatters.Formatter
 	}
 
 	subs := []*io.Subscription{}
-	for i, pubURL := range pubURLs {
+	for _, pubURL := range pubURLs {
 		topic, err := pubsub.OpenTopic(ctx, pubURL)
 		if err != nil {
 			return nil, err
 		}
-		sub := io.NewSubscription(s.ctx, fmt.Sprintf("pubsub-%d", i), nil)
+		sub := io.NewSubscription(s.ctx, "pubsub", nil)
 		// Publish upstream
 		go func() {
-			logger := log.FromContext(s.ctx)
+			logger := log.FromContext(s.ctx).WithField("publish-url", pubURL)
 			for {
 				select {
 				case <-sub.Context().Done():
@@ -65,10 +65,14 @@ func Start(ctx context.Context, server io.Server, formatter formatters.Formatter
 						log.WithError(err).Warn("Failed to marshal upstream message")
 						continue
 					}
-					logger.Infof("Publish upstream message")
-					topic.Send(ctx, &pubsub.Message{
+					err = topic.Send(ctx, &pubsub.Message{
 						Body: buf,
 					})
+					if err != nil {
+						log.WithError(err).Warn("Failed to publish upstream message")
+						continue
+					}
+					logger.Debug("Publish upstream message")
 				}
 			}
 		}()
@@ -82,7 +86,7 @@ func Start(ctx context.Context, server io.Server, formatter formatters.Formatter
 		}
 		// Subscribe downstream
 		go func() {
-			logger := log.FromContext(s.ctx)
+			logger := log.FromContext(s.ctx).WithField("subscribe-url", subURL)
 			for ctx.Err() == nil {
 				msg, err := subscription.Receive(ctx)
 				if err != nil {

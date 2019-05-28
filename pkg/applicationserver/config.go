@@ -42,7 +42,7 @@ type Config struct {
 	Links    LinkRegistry   `name:"-"`
 	MQTT     MQTTConfig     `name:"mqtt" description:"MQTT configuration"`
 	Webhooks WebhooksConfig `name:"webhooks" description:"Webhooks configuration"`
-	PubSub   PubSubConfig   `name:"pubsub" description:"PubSub messaging configuration"`
+	PubSub   PubSubConfig   `name:"pubsub" description:"Pub/sub messaging configuration"`
 }
 
 var errLinkMode = errors.DefineInvalidArgument("link_mode", "invalid link mode `{value}`")
@@ -82,7 +82,7 @@ type WebhooksConfig struct {
 // PubSubConfig contains go-cloud PubSub configuration of the Application Server.
 type PubSubConfig struct {
 	PublishURLs   []string `name:"publish-url" description:"URLs for the topics to send uplinks"`
-	SubscribeURLs []string `name:"subscribe-url" description:"URLs for the subscriptions to receiving downlink operations"`
+	SubscribeURLs []string `name:"subscribe-url" description:"URLs for the subscriptions for receiving downlink operations"`
 }
 
 // NewWebhooks returns a new web.Webhooks based on the configuration.
