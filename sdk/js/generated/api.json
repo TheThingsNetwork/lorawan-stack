@@ -8803,7 +8803,7 @@
             },
             {
               "name": "join_eui",
-              "description": "The LoRaWAN JoinEUI (or AppEUI for LoRaWAN 1.0 end devices).",
+              "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices).",
               "label": "",
               "type": "bytes",
               "longType": "bytes",
@@ -10049,6 +10049,16 @@
             {
               "name": "dev_eui",
               "description": "LoRaWAN DevEUI.",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "join_eui",
+              "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices).",
               "label": "",
               "type": "bytes",
               "longType": "bytes",

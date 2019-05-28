@@ -124,7 +124,7 @@ type EndDeviceIdentifiers struct {
 	ApplicationIdentifiers `protobuf:"bytes,2,opt,name=application_ids,json=applicationIds,proto3,embedded=application_ids" json:"application_ids"`
 	// The LoRaWAN DevEUI.
 	DevEUI *go_thethings_network_lorawan_stack_pkg_types.EUI64 `protobuf:"bytes,4,opt,name=dev_eui,json=devEui,proto3,customtype=go.thethings.network/lorawan-stack/pkg/types.EUI64" json:"dev_eui,omitempty"`
-	// The LoRaWAN JoinEUI (or AppEUI for LoRaWAN 1.0 end devices).
+	// The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices).
 	JoinEUI *go_thethings_network_lorawan_stack_pkg_types.EUI64 `protobuf:"bytes,5,opt,name=join_eui,json=joinEui,proto3,customtype=go.thethings.network/lorawan-stack/pkg/types.EUI64" json:"join_eui,omitempty"`
 	// The LoRaWAN DevAddr.
 	DevAddr              *go_thethings_network_lorawan_stack_pkg_types.DevAddr `protobuf:"bytes,6,opt,name=dev_addr,json=devAddr,proto3,customtype=go.thethings.network/lorawan-stack/pkg/types.DevAddr" json:"dev_addr,omitempty"`

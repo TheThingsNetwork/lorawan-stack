@@ -30,6 +30,16 @@ func (dst *SessionKeyRequest) SetFields(src *SessionKeyRequest, paths ...string)
 				var zero go_thethings_network_lorawan_stack_pkg_types.EUI64
 				dst.DevEUI = zero
 			}
+		case "join_eui":
+			if len(subs) > 0 {
+				return fmt.Errorf("'join_eui' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.JoinEUI = src.JoinEUI
+			} else {
+				var zero go_thethings_network_lorawan_stack_pkg_types.EUI64
+				dst.JoinEUI = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

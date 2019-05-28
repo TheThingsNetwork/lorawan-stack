@@ -25,7 +25,6 @@ import (
 	echo "github.com/labstack/echo/v4"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
@@ -153,6 +152,7 @@ func TestParseMessage(t *testing.T) {
 				"MessageType": "JoinReq",
 				"SenderID": "010203",
 				"ReceiverID": "0102030405060708",
+				"SenderNSID": "010203",
 				"SenderToken": "01",
 				"MACVersion": "1.0.2",
 				"PHYPayload": "010203040506",
@@ -176,13 +176,14 @@ func TestParseMessage(t *testing.T) {
 							SenderToken:     []byte{0x1},
 							TransactionID:   0,
 						},
-						SenderID:   types.NetID{0x1, 0x2, 0x3},
-						ReceiverID: types.EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
+						SenderID:   NetID{0x1, 0x2, 0x3},
+						ReceiverID: EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
+						SenderNSID: NetID{0x1, 0x2, 0x3},
 					},
 					MACVersion: MACVersion(ttnpb.MAC_V1_0_2),
 					PHYPayload: Buffer{0x1, 0x2, 0x3, 0x4, 0x5, 0x6},
-					DevEUI:     types.EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
-					DevAddr:    types.DevAddr{0x1, 0x2, 0x3, 0x4},
+					DevEUI:     EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
+					DevAddr:    DevAddr{0x1, 0x2, 0x3, 0x4},
 					DLSettings: Buffer{0xff},
 					RxDelay:    ttnpb.RX_DELAY_5,
 					CFList:     Buffer{0x1, 0x2, 0x3, 0x4, 0x5, 0x6},
@@ -200,6 +201,7 @@ func TestParseMessage(t *testing.T) {
 				"MessageType": "JoinAns",
 				"SenderID": "0102030405060708",
 				"ReceiverID": "010203",
+				"ReceiverNSID": "010203",
 				"SenderToken": "01",
 				"PHYPayload": "010203040506",
 				"Result": "Success",
@@ -228,8 +230,9 @@ func TestParseMessage(t *testing.T) {
 							SenderToken:     []byte{0x1},
 							TransactionID:   0,
 						},
-						SenderID:   types.EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
-						ReceiverID: types.NetID{0x1, 0x2, 0x3},
+						SenderID:     EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
+						ReceiverID:   NetID{0x1, 0x2, 0x3},
+						ReceiverNSID: NetID{0x1, 0x2, 0x3},
 					},
 					PHYPayload: Buffer{0x1, 0x2, 0x3, 0x4, 0x5, 0x6},
 					Result:     ResultSuccess,
@@ -241,6 +244,167 @@ func TestParseMessage(t *testing.T) {
 						EncryptedKey: []byte{0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf},
 					}),
 					SessionKeyID: []byte{0x1, 0x2, 0x3, 0x4},
+				})
+			},
+			ResponseAssertion: func(t *testing.T, statusCode int, data []byte) bool {
+				a := assertions.New(t)
+				return a.So(statusCode, should.Equal, http.StatusOK)
+			},
+		},
+		{
+			Name: "ValidAppSKeyReq",
+			Request: []byte(`{
+				"ProtocolVersion": "1.0",
+				"MessageType": "AppSKeyReq",
+				"SenderID": "01020304",
+				"ReceiverID": "0102030405060708",
+				"SenderToken": "01",
+				"DevEUI": "0102030405060708",
+				"SessionKeyID": "01020304"
+			}`),
+			RequestHeaderAssertion: func(t *testing.T, header RawMessageHeader) bool {
+				a := assertions.New(t)
+				return a.So(header.MessageType, should.Equal, "AppSKeyReq")
+			},
+			RequestMessageAssertion: func(t *testing.T, msg interface{}) bool {
+				a := assertions.New(t)
+				return a.So(msg, should.Resemble, &AppSKeyReq{
+					AsJsMessageHeader: AsJsMessageHeader{
+						MessageHeader: MessageHeader{
+							ProtocolVersion: "1.0",
+							MessageType:     MessageTypeAppSKeyReq,
+							SenderToken:     []byte{0x1},
+							TransactionID:   0,
+						},
+						SenderID:   Buffer{0x1, 0x2, 0x3, 0x4},
+						ReceiverID: EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
+					},
+					DevEUI:       EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
+					SessionKeyID: []byte{0x1, 0x2, 0x3, 0x4},
+				})
+			},
+			ResponseAssertion: func(t *testing.T, statusCode int, data []byte) bool {
+				a := assertions.New(t)
+				return a.So(statusCode, should.Equal, http.StatusOK)
+			},
+		},
+		{
+			Name: "ValidAppSKeyAns",
+			Request: []byte(`{
+				"ProtocolVersion": "1.0",
+				"MessageType": "AppSKeyAns",
+				"SenderID": "0102030405060708",
+				"ReceiverID": "01020304",
+				"SenderToken": "01",
+				"Result": "Success",
+				"DevEUI": "0102030405060708",
+				"AppSKey": {
+					"KEKLabel": "",
+					"AESKey": "000102030405060708090A0B0C0D0E0F"
+				},
+				"SessionKeyID": "01020304"
+			}`),
+			RequestHeaderAssertion: func(t *testing.T, header RawMessageHeader) bool {
+				a := assertions.New(t)
+				return a.So(header.MessageType, should.Equal, "AppSKeyAns")
+			},
+			RequestMessageAssertion: func(t *testing.T, msg interface{}) bool {
+				a := assertions.New(t)
+				return a.So(msg, should.Resemble, &AppSKeyAns{
+					JsAsMessageHeader: JsAsMessageHeader{
+						MessageHeader: MessageHeader{
+							ProtocolVersion: "1.0",
+							MessageType:     MessageTypeAppSKeyAns,
+							SenderToken:     []byte{0x1},
+							TransactionID:   0,
+						},
+						SenderID:   EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
+						ReceiverID: Buffer{0x1, 0x2, 0x3, 0x4},
+					},
+					Result: ResultSuccess,
+					DevEUI: EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
+					AppSKey: KeyEnvelope{
+						EncryptedKey: []byte{0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf},
+					},
+					SessionKeyID: []byte{0x1, 0x2, 0x3, 0x4},
+				})
+			},
+			ResponseAssertion: func(t *testing.T, statusCode int, data []byte) bool {
+				a := assertions.New(t)
+				return a.So(statusCode, should.Equal, http.StatusOK)
+			},
+		},
+		{
+			Name: "ValidHomeNSReq",
+			Request: []byte(`{
+				"ProtocolVersion": "1.0",
+				"MessageType": "HomeNSReq",
+				"SenderID": "010203",
+				"ReceiverID": "0102030405060708",
+				"SenderNSID": "010203",
+				"SenderToken": "01",
+				"DevEUI": "0102030405060708"
+			}`),
+			RequestHeaderAssertion: func(t *testing.T, header RawMessageHeader) bool {
+				a := assertions.New(t)
+				return a.So(header.MessageType, should.Equal, "HomeNSReq")
+			},
+			RequestMessageAssertion: func(t *testing.T, msg interface{}) bool {
+				a := assertions.New(t)
+				return a.So(msg, should.Resemble, &HomeNSReq{
+					NsJsMessageHeader: NsJsMessageHeader{
+						MessageHeader: MessageHeader{
+							ProtocolVersion: "1.0",
+							MessageType:     MessageTypeHomeNSReq,
+							SenderToken:     []byte{0x1},
+							TransactionID:   0,
+						},
+						SenderID:   NetID{0x1, 0x2, 0x3},
+						ReceiverID: EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
+						SenderNSID: NetID{0x1, 0x2, 0x3},
+					},
+					DevEUI: EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
+				})
+			},
+			ResponseAssertion: func(t *testing.T, statusCode int, data []byte) bool {
+				a := assertions.New(t)
+				return a.So(statusCode, should.Equal, http.StatusOK)
+			},
+		},
+		{
+			Name: "ValidHomeNSAns",
+			Request: []byte(`{
+				"ProtocolVersion": "1.0",
+				"MessageType": "HomeNSAns",
+				"SenderID": "0102030405060708",
+				"ReceiverID": "010203",
+				"ReceiverNSID": "010203",
+				"SenderToken": "01",
+				"Result": "Success",
+				"HNSID": "42FFFF",
+				"HNetID": "42FFFF"
+			}`),
+			RequestHeaderAssertion: func(t *testing.T, header RawMessageHeader) bool {
+				a := assertions.New(t)
+				return a.So(header.MessageType, should.Equal, "HomeNSAns")
+			},
+			RequestMessageAssertion: func(t *testing.T, msg interface{}) bool {
+				a := assertions.New(t)
+				return a.So(msg, should.Resemble, &HomeNSAns{
+					JsNsMessageHeader: JsNsMessageHeader{
+						MessageHeader: MessageHeader{
+							ProtocolVersion: "1.0",
+							MessageType:     MessageTypeHomeNSAns,
+							SenderToken:     []byte{0x1},
+							TransactionID:   0,
+						},
+						SenderID:     EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
+						ReceiverID:   NetID{0x1, 0x2, 0x3},
+						ReceiverNSID: NetID{0x1, 0x2, 0x3},
+					},
+					Result: ResultSuccess,
+					HNSID:  NetID{0x42, 0xff, 0xff},
+					HNetID: NetID{0x42, 0xff, 0xff},
 				})
 			},
 			ResponseAssertion: func(t *testing.T, statusCode int, data []byte) bool {

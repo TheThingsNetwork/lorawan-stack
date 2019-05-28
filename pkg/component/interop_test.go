@@ -29,7 +29,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/interop"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
@@ -47,6 +46,28 @@ func (m mockInterop) JoinRequest(ctx context.Context, req *interop.JoinReq) (*in
 		return nil, err
 	}
 	return &interop.JoinAns{
+		JsNsMessageHeader: ansHeader,
+		Result:            interop.ResultSuccess,
+	}, nil
+}
+
+func (m mockInterop) AppSKeyRequest(ctx context.Context, req *interop.AppSKeyReq) (*interop.AppSKeyAns, error) {
+	ansHeader, err := req.AnswerHeader()
+	if err != nil {
+		return nil, err
+	}
+	return &interop.AppSKeyAns{
+		JsAsMessageHeader: ansHeader,
+		Result:            interop.ResultSuccess,
+	}, nil
+}
+
+func (m mockInterop) HomeNSRequest(ctx context.Context, req *interop.HomeNSReq) (*interop.HomeNSAns, error) {
+	ansHeader, err := req.AnswerHeader()
+	if err != nil {
+		return nil, err
+	}
+	return &interop.HomeNSAns{
 		JsNsMessageHeader: ansHeader,
 		Result:            interop.ResultSuccess,
 	}, nil
@@ -103,8 +124,8 @@ func TestInteropTLS(t *testing.T) {
 					MessageType:     interop.MessageTypeJoinReq,
 					ProtocolVersion: "1.1",
 				},
-				SenderID:   types.NetID{0x0, 0x0, 0x1},
-				ReceiverID: types.EUI64{0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
+				SenderID:   interop.NetID{0x0, 0x0, 0x1},
+				ReceiverID: interop.EUI64{0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
 			},
 			MACVersion: interop.MACVersion(ttnpb.MAC_V1_0_3),
 		}
@@ -123,8 +144,8 @@ func TestInteropTLS(t *testing.T) {
 					MessageType:     interop.MessageTypeJoinReq,
 					ProtocolVersion: "1.1",
 				},
-				SenderID:   types.NetID{0x0, 0x0, 0x2},
-				ReceiverID: types.EUI64{0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
+				SenderID:   interop.NetID{0x0, 0x0, 0x2},
+				ReceiverID: interop.EUI64{0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
 			},
 			MACVersion: interop.MACVersion(ttnpb.MAC_V1_0_3),
 		}

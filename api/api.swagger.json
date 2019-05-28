@@ -461,7 +461,7 @@
           },
           {
             "name": "join_eui",
-            "description": "The LoRaWAN JoinEUI (or AppEUI for LoRaWAN 1.0 end devices).",
+            "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices).",
             "in": "query",
             "required": false,
             "type": "string",
@@ -633,7 +633,7 @@
           },
           {
             "name": "end_device_ids.join_eui",
-            "description": "The LoRaWAN JoinEUI (or AppEUI for LoRaWAN 1.0 end devices).",
+            "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices).",
             "in": "query",
             "required": false,
             "type": "string",
@@ -698,7 +698,7 @@
           },
           {
             "name": "join_eui",
-            "description": "The LoRaWAN JoinEUI (or AppEUI for LoRaWAN 1.0 end devices).",
+            "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices).",
             "in": "query",
             "required": false,
             "type": "string",
@@ -752,7 +752,7 @@
           },
           {
             "name": "join_eui",
-            "description": "The LoRaWAN JoinEUI (or AppEUI for LoRaWAN 1.0 end devices).",
+            "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices).",
             "in": "query",
             "required": false,
             "type": "string",
@@ -992,7 +992,7 @@
           },
           {
             "name": "end_device_ids.join_eui",
-            "description": "The LoRaWAN JoinEUI (or AppEUI for LoRaWAN 1.0 end devices).",
+            "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices).",
             "in": "query",
             "required": false,
             "type": "string",
@@ -2239,7 +2239,7 @@
           },
           {
             "name": "join_eui",
-            "description": "The LoRaWAN JoinEUI (or AppEUI for LoRaWAN 1.0 end devices).",
+            "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices).",
             "in": "query",
             "required": false,
             "type": "string",
@@ -2395,7 +2395,7 @@
           },
           {
             "name": "end_device_ids.join_eui",
-            "description": "The LoRaWAN JoinEUI (or AppEUI for LoRaWAN 1.0 end devices).",
+            "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices).",
             "in": "query",
             "required": false,
             "type": "string",
@@ -2460,7 +2460,7 @@
           },
           {
             "name": "join_eui",
-            "description": "The LoRaWAN JoinEUI (or AppEUI for LoRaWAN 1.0 end devices).",
+            "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices).",
             "in": "query",
             "required": false,
             "type": "string",
@@ -2584,7 +2584,7 @@
           },
           {
             "name": "end_device_ids.join_eui",
-            "description": "The LoRaWAN JoinEUI (or AppEUI for LoRaWAN 1.0 end devices).",
+            "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices).",
             "in": "query",
             "required": false,
             "type": "string",
@@ -6898,7 +6898,7 @@
         "join_eui": {
           "type": "string",
           "format": "byte",
-          "description": "The LoRaWAN JoinEUI (or AppEUI for LoRaWAN 1.0 end devices)."
+          "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices)."
         },
         "dev_addr": {
           "type": "string",

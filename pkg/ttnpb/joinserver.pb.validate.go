@@ -58,6 +58,8 @@ func (m *SessionKeyRequest) ValidateFields(paths ...string) error {
 
 		case "dev_eui":
 			// no validation rules for DevEUI
+		case "join_eui":
+			// no validation rules for JoinEUI
 		default:
 			return SessionKeyRequestValidationError{
 				field:  name,

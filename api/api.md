@@ -2283,7 +2283,7 @@ The main purpose of this message is its use in events.
 | `device_id` | [`string`](#string) |  |  |
 | `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
 | `dev_eui` | [`bytes`](#bytes) |  | The LoRaWAN DevEUI. |
-| `join_eui` | [`bytes`](#bytes) |  | The LoRaWAN JoinEUI (or AppEUI for LoRaWAN 1.0 end devices). |
+| `join_eui` | [`bytes`](#bytes) |  | The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices). |
 | `dev_addr` | [`bytes`](#bytes) |  | The LoRaWAN DevAddr. |
 
 #### Field Rules
@@ -2579,6 +2579,7 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | ----- | ---- | ----- | ----------- |
 | `session_key_id` | [`bytes`](#bytes) |  | Join Server issued identifier for the session keys. |
 | `dev_eui` | [`bytes`](#bytes) |  | LoRaWAN DevEUI. |
+| `join_eui` | [`bytes`](#bytes) |  | The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices). |
 
 #### Field Rules
 

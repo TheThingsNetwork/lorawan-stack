@@ -22,7 +22,6 @@ import (
 
 	echo "github.com/labstack/echo/v4"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
 // MessageHeader contains the message header.
@@ -100,9 +99,10 @@ type ErrorMessage struct {
 // NsJsMessageHeader contains the message header for NS to JS messages.
 type NsJsMessageHeader struct {
 	MessageHeader
-	SenderID types.NetID
+	SenderID NetID
 	// ReceiverID is a JoinEUI.
-	ReceiverID types.EUI64
+	ReceiverID EUI64
+	SenderNSID NetID
 }
 
 // AnswerHeader returns the header of the answer message.
@@ -115,6 +115,7 @@ func (h NsJsMessageHeader) AnswerHeader() (JsNsMessageHeader, error) {
 		MessageHeader: header,
 		SenderID:      h.ReceiverID,
 		ReceiverID:    h.SenderID,
+		ReceiverNSID:  h.SenderNSID,
 	}, nil
 }
 
@@ -122,8 +123,38 @@ func (h NsJsMessageHeader) AnswerHeader() (JsNsMessageHeader, error) {
 type JsNsMessageHeader struct {
 	MessageHeader
 	// SenderID is a JoinEUI.
-	SenderID   types.EUI64
-	ReceiverID types.NetID
+	SenderID     EUI64
+	ReceiverID   NetID
+	ReceiverNSID NetID
+}
+
+// AsJsMessageHeader contains the message header for AS to JS messages.
+type AsJsMessageHeader struct {
+	MessageHeader
+	SenderID Buffer
+	// ReceiverID is a JoinEUI.
+	ReceiverID EUI64
+}
+
+// AnswerHeader returns the header of the answer message.
+func (h AsJsMessageHeader) AnswerHeader() (JsAsMessageHeader, error) {
+	header, err := h.MessageHeader.AnswerHeader()
+	if err != nil {
+		return JsAsMessageHeader{}, err
+	}
+	return JsAsMessageHeader{
+		MessageHeader: header,
+		SenderID:      h.ReceiverID,
+		ReceiverID:    h.SenderID,
+	}, nil
+}
+
+// JsAsMessageHeader contains the message header for JS to AS messages.
+type JsAsMessageHeader struct {
+	MessageHeader
+	// SenderID is a JoinEUI.
+	SenderID   EUI64
+	ReceiverID Buffer
 }
 
 // JoinReq is a join-request message.
@@ -131,8 +162,8 @@ type JoinReq struct {
 	NsJsMessageHeader
 	MACVersion MACVersion
 	PHYPayload Buffer
-	DevEUI     types.EUI64
-	DevAddr    types.DevAddr
+	DevEUI     EUI64
+	DevAddr    DevAddr
 	DLSettings Buffer
 	RxDelay    ttnpb.RxDelay
 	CFList     Buffer
@@ -150,6 +181,36 @@ type JoinAns struct {
 	NwkSKey      *KeyEnvelope `json:",omitempty"`
 	AppSKey      *KeyEnvelope `json:",omitempty"`
 	SessionKeyID Buffer       `json:",omitempty"`
+}
+
+// AppSKeyReq is a AppSKey request message.
+type AppSKeyReq struct {
+	AsJsMessageHeader
+	DevEUI       EUI64
+	SessionKeyID Buffer
+}
+
+// AppSKeyAns is an answer to an AppSKeyReq message.
+type AppSKeyAns struct {
+	JsAsMessageHeader
+	Result       Result
+	DevEUI       EUI64
+	AppSKey      KeyEnvelope
+	SessionKeyID Buffer
+}
+
+// HomeNSReq is a NetID request message.
+type HomeNSReq struct {
+	NsJsMessageHeader
+	DevEUI EUI64
+}
+
+// HomeNSAns is an answer to a HomeNSReq message.
+type HomeNSAns struct {
+	JsNsMessageHeader
+	Result Result
+	HNSID  NetID
+	HNetID NetID
 }
 
 // parseMessage parses the header and the message type of the request body.
@@ -183,6 +244,14 @@ func parseMessage() echo.MiddlewareFunc {
 				msg = &JoinReq{}
 			case MessageTypeJoinAns:
 				msg = &JoinAns{}
+			case MessageTypeAppSKeyReq:
+				msg = &AppSKeyReq{}
+			case MessageTypeAppSKeyAns:
+				msg = &AppSKeyAns{}
+			case MessageTypeHomeNSReq:
+				msg = &HomeNSReq{}
+			case MessageTypeHomeNSAns:
+				msg = &HomeNSAns{}
 			default:
 				return ErrMalformedMessage
 			}

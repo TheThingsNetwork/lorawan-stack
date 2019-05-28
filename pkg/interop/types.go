@@ -21,6 +21,7 @@ import (
 	"strings"
 
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
 // MessageType is the message type.
@@ -172,5 +173,71 @@ func (k *KeyEnvelope) UnmarshalJSON(data []byte) error {
 		KEKLabel:     aux.KEKLabel,
 		EncryptedKey: aux.AESKey,
 	}
+	return nil
+}
+
+// NetID is a LoRaWAN NetID.
+type NetID types.NetID
+
+// MarshalJSON marshals the NetID to JSON.
+func (n NetID) MarshalJSON() ([]byte, error) {
+	buf := Buffer(n[:])
+	return buf.MarshalJSON()
+}
+
+// UnmarshalJSON unmarshals the NetID from JSON.
+func (n *NetID) UnmarshalJSON(data []byte) error {
+	var buf Buffer
+	if err := buf.UnmarshalJSON(data); err != nil {
+		return err
+	}
+	if len(buf) != 3 {
+		return errInvalidLength
+	}
+	copy(n[:], buf)
+	return nil
+}
+
+// EUI64 is an 64-bit EUI, e.g. a DevEUI or JoinEUI.
+type EUI64 types.EUI64
+
+// MarshalJSON marshals the EUI64 to JSON.
+func (n EUI64) MarshalJSON() ([]byte, error) {
+	buf := Buffer(n[:])
+	return buf.MarshalJSON()
+}
+
+// UnmarshalJSON unmarshals the EUI64 from JSON.
+func (n *EUI64) UnmarshalJSON(data []byte) error {
+	var buf Buffer
+	if err := buf.UnmarshalJSON(data); err != nil {
+		return err
+	}
+	if len(buf) != 8 {
+		return errInvalidLength
+	}
+	copy(n[:], buf)
+	return nil
+}
+
+// DevAddr is a LoRaWAN DevAddr.
+type DevAddr types.DevAddr
+
+// MarshalJSON marshals the DevAddr to JSON.
+func (n DevAddr) MarshalJSON() ([]byte, error) {
+	buf := Buffer(n[:])
+	return buf.MarshalJSON()
+}
+
+// UnmarshalJSON unmarshals the DevAddr from JSON.
+func (n *DevAddr) UnmarshalJSON(data []byte) error {
+	var buf Buffer
+	if err := buf.UnmarshalJSON(data); err != nil {
+		return err
+	}
+	if len(buf) != 4 {
+		return errInvalidLength
+	}
+	copy(n[:], buf)
 	return nil
 }

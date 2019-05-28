@@ -22,13 +22,14 @@ import (
 )
 
 var (
-	ErrDevNonceTooSmall  = errDevNonceTooSmall
-	ErrNoAppSKey         = errNoAppSKey
-	ErrNoFNwkSIntKey     = errNoFNwkSIntKey
-	ErrNoNwkSEncKey      = errNoNwkSEncKey
-	ErrNoSNwkSIntKey     = errNoSNwkSIntKey
-	ErrRegistryOperation = errRegistryOperation
-	ErrReuseDevNonce     = errReuseDevNonce
+	ErrAddressNotAuthorized = errAddressNotAuthorized
+	ErrDevNonceTooSmall     = errDevNonceTooSmall
+	ErrNoAppSKey            = errNoAppSKey
+	ErrNoFNwkSIntKey        = errNoFNwkSIntKey
+	ErrNoNwkSEncKey         = errNoNwkSEncKey
+	ErrNoSNwkSIntKey        = errNoSNwkSIntKey
+	ErrRegistryOperation    = errRegistryOperation
+	ErrReuseDevNonce        = errReuseDevNonce
 )
 
 func KeyToBytes(key types.AES128Key) []byte { return key[:] }
