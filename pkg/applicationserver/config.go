@@ -81,8 +81,8 @@ type WebhooksConfig struct {
 
 // PubSubConfig contains go-cloud PubSub configuration of the Application Server.
 type PubSubConfig struct {
-	PublishURLs   []string `name:"publish-url" description:"URLs for the topics to send uplinks"`
-	SubscribeURLs []string `name:"subscribe-url" description:"URLs for the subscriptions for receiving downlink operations"`
+	PublishURLs   []string `name:"publish-urls" description:"URLs for the topics to send uplinks"`
+	SubscribeURLs []string `name:"subscribe-urls" description:"URLs for the subscriptions for receiving downlink operations"`
 }
 
 // NewWebhooks returns a new web.Webhooks based on the configuration.
