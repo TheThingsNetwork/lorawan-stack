@@ -19,7 +19,6 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/component"
-
 	. "go.thethings.network/lorawan-stack/pkg/networkserver"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
@@ -27,7 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-func TestGenerateDevAddrAssignment(t *testing.T) {
+func TestGenerateDevAddr(t *testing.T) {
 	for _, tc := range []struct {
 		Name          string
 		NetID         types.NetID
