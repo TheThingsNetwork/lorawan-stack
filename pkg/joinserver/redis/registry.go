@@ -160,6 +160,9 @@ func (r *DeviceRegistry) set(tx *redis.Tx, uid string, gets []string, f func(pb 
 	if stored == nil && pb == nil {
 		return nil, nil
 	}
+	if pb != nil && len(sets) == 0 {
+		return applyDeviceFieldMask(nil, stored, gets...)
+	}
 
 	var pipelined func(redis.Pipeliner) error
 	if pb == nil {
@@ -419,6 +422,10 @@ func (r *KeyRegistry) SetByID(ctx context.Context, devEUI types.EUI64, id []byte
 		}
 		if stored == nil && pb == nil {
 			return nil
+		}
+		if pb != nil && len(sets) == 0 {
+			pb, err = applyKeyFieldMask(nil, stored, gets...)
+			return err
 		}
 
 		var pipelined func(redis.Pipeliner) error

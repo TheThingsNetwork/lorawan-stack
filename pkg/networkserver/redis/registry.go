@@ -209,6 +209,10 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 		if stored == nil && pb == nil {
 			return nil
 		}
+		if pb != nil && len(sets) == 0 {
+			pb, err = applyDeviceFieldMask(nil, stored, gets...)
+			return err
+		}
 
 		var pipelined func(redis.Pipeliner) error
 		if pb == nil {

@@ -135,6 +135,10 @@ func (r WebhookRegistry) Set(ctx context.Context, ids ttnpb.ApplicationWebhookId
 		if stored == nil && pb == nil {
 			return nil
 		}
+		if pb != nil && len(sets) == 0 {
+			pb, err = applyWebhookFieldMask(nil, stored, gets...)
+			return err
+		}
 
 		var pipelined func(redis.Pipeliner) error
 		if pb == nil {
