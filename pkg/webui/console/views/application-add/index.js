@@ -148,17 +148,6 @@ export default class Add extends React.Component {
               </SubmitBar>
             </Form>
           </Col>
-          <Col className={style.description} sm={12} md={4} xl={3}>
-            <aside>
-              <p>
-                Here is a text that sort of explains the process of adding an application.
-                This is to help users making sense of what is actually happening.
-                <br />
-                We could also provide links and resources from our documentation.
-                Lorem Ipsum dolor sit amet.
-              </p>
-            </aside>
-          </Col>
         </Row>
       </Container>
     )
