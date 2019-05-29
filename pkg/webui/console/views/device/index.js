@@ -123,7 +123,7 @@ export default class Device extends React.Component {
       { title: sharedMessages.overview, name: 'overview', link: basePath },
       { title: sharedMessages.data, name: 'data', link: `${basePath}/data` },
       { title: sharedMessages.location, name: 'location', link: `${basePath}/location` },
-      { title: sharedMessages.payloadFormats, name: 'develop' },
+      { title: sharedMessages.payloadFormatters, name: 'develop' },
       { title: sharedMessages.generalSettings, name: 'general-settings', link: `${basePath}/general-settings` },
     ]
 
