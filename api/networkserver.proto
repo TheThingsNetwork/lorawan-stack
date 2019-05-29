@@ -69,3 +69,16 @@ service NsEndDeviceRegistry {
   };
 }
 
+message GenerateDevAddrResponse {
+  bytes dev_addr = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.DevAddr"];
+}
+
+service Ns {
+  // GenerateDevAddr requests a device address assignment from the Network Server.
+  rpc GenerateDevAddr(google.protobuf.Empty) returns (GenerateDevAddrResponse) {
+    option (google.api.http) = {
+      get: "/ns/dev_addr"
+    };
+  };
+}
+

@@ -2615,6 +2615,22 @@
         ]
       }
     },
+    "/ns/dev_addr": {
+      "get": {
+        "operationId": "GenerateDevAddr",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3GenerateDevAddrResponse"
+            }
+          }
+        },
+        "tags": [
+          "Ns"
+        ]
+      }
+    },
     "/organizations": {
       "get": {
         "operationId": "List",
@@ -7375,6 +7391,15 @@
           "items": {
             "$ref": "#/definitions/v3Gateway"
           }
+        }
+      }
+    },
+    "v3GenerateDevAddrResponse": {
+      "type": "object",
+      "properties": {
+        "dev_addr": {
+          "type": "string",
+          "format": "byte"
         }
       }
     },

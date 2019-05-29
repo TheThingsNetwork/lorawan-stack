@@ -1009,6 +1009,18 @@
       "http": []
     }
   },
+  "Ns": {
+    "GenerateDevAddr": {
+      "file": "lorawan-stack/api/networkserver.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/ns/dev_addr",
+          "parameters": []
+        }
+      ]
+    }
+  },
   "NsEndDeviceRegistry": {
     "Get": {
       "file": "lorawan-stack/api/networkserver.proto",

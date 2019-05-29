@@ -299,9 +299,11 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.GsNs", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("networkserver"))
 	hooks.RegisterStreamHook("/ttn.lorawan.v3.AsNs", rpclog.NamespaceHook, rpclog.StreamNamespaceHook("networkserver"))
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.AsNs", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("networkserver"))
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.Ns", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("networkserver"))
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.GsNs", cluster.HookName, c.ClusterAuthUnaryHook())
 	hooks.RegisterStreamHook("/ttn.lorawan.v3.AsNs", cluster.HookName, c.ClusterAuthStreamHook())
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.AsNs", cluster.HookName, c.ClusterAuthUnaryHook())
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.Ns", cluster.HookName, c.ClusterAuthUnaryHook())
 
 	ns.RegisterTask(ns.Context(), "process_downlink", func(ctx context.Context) error {
 		for {
@@ -331,11 +333,13 @@ func (ns *NetworkServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterGsNsServer(s, ns)
 	ttnpb.RegisterAsNsServer(s, ns)
 	ttnpb.RegisterNsEndDeviceRegistryServer(s, ns)
+	ttnpb.RegisterNsServer(s, ns)
 }
 
 // RegisterHandlers registers gRPC handlers.
 func (ns *NetworkServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
 	ttnpb.RegisterNsEndDeviceRegistryHandler(ns.Context(), s, conn)
+	ttnpb.RegisterNsHandler(ns.Context(), s, conn)
 }
 
 // Roles returns the roles that the Network Server fulfills.
