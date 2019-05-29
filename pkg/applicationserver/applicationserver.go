@@ -532,7 +532,8 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 						},
 						StartedAt: time.Now().UTC(),
 					}
-					mask = append(mask, "session")
+					dev.DevAddr = ids.DevAddr
+					mask = append(mask, "session", "ids.dev_addr")
 					logger.Debug("Restored session")
 				}
 				dev.PendingSession = nil

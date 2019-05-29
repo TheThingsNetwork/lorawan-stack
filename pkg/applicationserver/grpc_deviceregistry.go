@@ -19,6 +19,7 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -34,10 +35,16 @@ func (r asEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDev
 	return r.registry.Get(ctx, req.EndDeviceIdentifiers, req.FieldMask.Paths)
 }
 
+var errInvalidFieldValue = errors.DefineInvalidArgument("field_value", "invalid value of field `{field}`")
+
 // Set implements ttnpb.AsEndDeviceRegistryServer.
 func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest) (*ttnpb.EndDevice, error) {
 	if err := rights.RequireApplication(ctx, req.EndDevice.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
+	}
+
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "ids.dev_addr") && req.EndDevice.DevAddr != nil && !req.EndDevice.DevAddr.IsZero() {
+		return nil, errInvalidFieldValue.WithAttributes("field", "ids.dev_addr")
 	}
 
 	gets := append(req.FieldMask.Paths[:0:0], req.FieldMask.Paths...)
@@ -50,19 +57,14 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 			"ids.application_ids",
 			"ids.device_id",
 		)
-		if req.EndDevice.JoinEUI != nil {
+		if req.EndDevice.JoinEUI != nil && !req.EndDevice.JoinEUI.IsZero() {
 			sets = append(sets,
 				"ids.join_eui",
 			)
 		}
-		if req.EndDevice.DevEUI != nil {
+		if req.EndDevice.DevEUI != nil && !req.EndDevice.DevEUI.IsZero() {
 			sets = append(sets,
 				"ids.dev_eui",
-			)
-		}
-		if req.EndDevice.DevAddr != nil {
-			sets = append(sets,
-				"ids.dev_addr",
 			)
 		}
 		return &req.EndDevice, sets, nil

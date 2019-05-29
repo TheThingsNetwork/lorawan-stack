@@ -1457,6 +1457,7 @@ func TestHandleJoin(t *testing.T) {
 				SessionKeys: res.SessionKeys,
 				StartedAt:   ret.GetSession().GetStartedAt(),
 			}
+			pb.DevAddr = &tc.JoinRequest.DevAddr
 			a.So(ret, should.HaveEmptyDiff, pb)
 
 			res, err = js.HandleJoin(ctx, deepcopy.Copy(tc.JoinRequest).(*ttnpb.JoinRequest))
