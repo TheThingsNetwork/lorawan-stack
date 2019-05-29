@@ -292,7 +292,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		ErrorAssertion     func(*testing.T, error) bool
 	}{
 		{
-			Name: "application downlink/Class A/windows open/FOpts present/EU868/1.1",
+			Name: "Class A/windows open/Rx1,2/application downlink/FOpts present/EU868/1.1",
 			DownlinkPriorities: DownlinkPriorities{
 				JoinAccept:             ttnpb.TxSchedulePriority_HIGHEST,
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
@@ -339,6 +339,50 @@ func TestProcessDownlinkTask(t *testing.T) {
 					},
 				}
 
+				getDevice := &ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+						DeviceID:               "test-dev-id",
+						DevAddr:                &types.DevAddr{0x42, 0xff, 0xff, 0xff},
+					},
+					FrequencyPlanID:   test.EUFrequencyPlanID,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+					MACState: &ttnpb.MACState{
+						CurrentParameters: *CopyMACParameters(eu868macParameters),
+						DesiredParameters: *CopyMACParameters(eu868macParameters),
+						DeviceClass:       ttnpb.CLASS_A,
+						LoRaWANVersion:    ttnpb.MAC_V1_1,
+						QueuedResponses: []*ttnpb.MACCommand{
+							(&ttnpb.MACCommand_ResetConf{
+								MinorVersion: 1,
+							}).MACCommand(),
+							(&ttnpb.MACCommand_LinkCheckAns{
+								Margin:       2,
+								GatewayCount: 5,
+							}).MACCommand(),
+						},
+						RxWindowsAvailable: true,
+					},
+					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+						{
+							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+							FCnt:           0x42,
+							FPort:          0x1,
+							FRMPayload:     []byte("testPayload"),
+							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
+							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+						},
+					},
+					RecentUplinks: []*ttnpb.UplinkMessage{
+						CopyUplinkMessage(lastUp),
+					},
+					Session: &ttnpb.Session{
+						DevAddr:       types.DevAddr{0x42, 0xff, 0xff, 0xff},
+						LastNFCntDown: 0x24,
+						SessionKeys:   *CopySessionKeys(sessionKeys),
+					},
+				}
+
 				var setRespCh chan<- DeviceRegistrySetByIDResponse
 				setFuncRespCh := make(chan DeviceRegistrySetByIDRequestFuncResponse)
 				select {
@@ -354,49 +398,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(req.Paths, should.Resemble, getPaths)
 
 					go func() {
-						dev, sets, err := req.Func(&ttnpb.EndDevice{
-							EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-								ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-								DeviceID:               "test-dev-id",
-								DevAddr:                &types.DevAddr{0x42, 0xff, 0xff, 0xff},
-							},
-							FrequencyPlanID:   test.EUFrequencyPlanID,
-							LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
-							MACState: &ttnpb.MACState{
-								CurrentParameters: *CopyMACParameters(eu868macParameters),
-								DesiredParameters: *CopyMACParameters(eu868macParameters),
-								DeviceClass:       ttnpb.CLASS_A,
-								LoRaWANVersion:    ttnpb.MAC_V1_1,
-								QueuedResponses: []*ttnpb.MACCommand{
-									(&ttnpb.MACCommand_ResetConf{
-										MinorVersion: 1,
-									}).MACCommand(),
-									(&ttnpb.MACCommand_LinkCheckAns{
-										Margin:       2,
-										GatewayCount: 5,
-									}).MACCommand(),
-								},
-								RxWindowsAvailable: true,
-							},
-							QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-								{
-									CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
-									FCnt:           0x42,
-									FPort:          0x1,
-									FRMPayload:     []byte("testPayload"),
-									Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-									SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
-								},
-							},
-							RecentUplinks: []*ttnpb.UplinkMessage{
-								CopyUplinkMessage(lastUp),
-							},
-							Session: &ttnpb.Session{
-								DevAddr:       types.DevAddr{0x42, 0xff, 0xff, 0xff},
-								LastNFCntDown: 0x24,
-								SessionKeys:   *CopySessionKeys(sessionKeys),
-							},
-						})
+						dev, sets, err := req.Func(CopyEndDevice(getDevice))
 						setFuncRespCh <- DeviceRegistrySetByIDRequestFuncResponse{
 							Device: dev,
 							Paths:  sets,
@@ -547,7 +549,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					if a.So(resp.Device, should.NotBeNil) &&
 						a.So(resp.Device.MACState, should.NotBeNil) &&
 						a.So(resp.Device.MACState.LastConfirmedDownlinkAt, should.NotBeNil) {
-						a.So([]time.Time{start, *resp.Device.MACState.LastConfirmedDownlinkAt, time.Now()}, should.BeChronological)
+						a.So([]time.Time{start, *resp.Device.MACState.LastConfirmedDownlinkAt, time.Now().Add(time.Second)}, should.BeChronological)
 						setDevice.MACState.LastConfirmedDownlinkAt = resp.Device.MACState.LastConfirmedDownlinkAt
 					}
 					a.So(resp.Device, should.Resemble, setDevice)
@@ -584,7 +586,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		},
 
 		{
-			Name: "application downlink/Class C/no absolute time/no forced gateways/windows open/FOpts present/EU868/1.1",
+			Name: "Class C/windows open/Rx1/application downlink/FOpts present/EU868/1.1",
 			DownlinkPriorities: DownlinkPriorities{
 				JoinAccept:             ttnpb.TxSchedulePriority_HIGHEST,
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
@@ -631,6 +633,53 @@ func TestProcessDownlinkTask(t *testing.T) {
 					},
 				}
 
+				getDevice := &ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+						DeviceID:               "test-dev-id",
+						DevAddr:                &types.DevAddr{0x42, 0xff, 0xff, 0xff},
+					},
+					FrequencyPlanID:   test.EUFrequencyPlanID,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+					MACSettings: &ttnpb.MACSettings{
+						ClassCTimeout: DurationPtr(42 * time.Second),
+					},
+					MACState: &ttnpb.MACState{
+						CurrentParameters: *CopyMACParameters(eu868macParameters),
+						DesiredParameters: *CopyMACParameters(eu868macParameters),
+						DeviceClass:       ttnpb.CLASS_C,
+						LoRaWANVersion:    ttnpb.MAC_V1_1,
+						QueuedResponses: []*ttnpb.MACCommand{
+							(&ttnpb.MACCommand_ResetConf{
+								MinorVersion: 1,
+							}).MACCommand(),
+							(&ttnpb.MACCommand_LinkCheckAns{
+								Margin:       2,
+								GatewayCount: 5,
+							}).MACCommand(),
+						},
+						RxWindowsAvailable: true,
+					},
+					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+						{
+							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+							FCnt:           0x42,
+							FPort:          0x1,
+							FRMPayload:     []byte("testPayload"),
+							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
+							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+						},
+					},
+					RecentUplinks: []*ttnpb.UplinkMessage{
+						CopyUplinkMessage(lastUp),
+					},
+					Session: &ttnpb.Session{
+						DevAddr:       types.DevAddr{0x42, 0xff, 0xff, 0xff},
+						LastNFCntDown: 0x24,
+						SessionKeys:   *CopySessionKeys(sessionKeys),
+					},
+				}
+
 				var setRespCh chan<- DeviceRegistrySetByIDResponse
 				setFuncRespCh := make(chan DeviceRegistrySetByIDRequestFuncResponse)
 				select {
@@ -646,52 +695,320 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(req.Paths, should.Resemble, getPaths)
 
 					go func() {
-						dev, sets, err := req.Func(&ttnpb.EndDevice{
-							EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-								ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-								DeviceID:               "test-dev-id",
-								DevAddr:                &types.DevAddr{0x42, 0xff, 0xff, 0xff},
+						dev, sets, err := req.Func(CopyEndDevice(getDevice))
+						setFuncRespCh <- DeviceRegistrySetByIDRequestFuncResponse{
+							Device: dev,
+							Paths:  sets,
+							Error:  err,
+						}
+					}()
+				}
+
+				scheduleDownlink124Ch := make(chan NsGsScheduleDownlinkRequest)
+				peer124 := NewGSPeer(ctx, &MockNsGsServer{
+					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink124Ch),
+				})
+
+				scheduleDownlink3Ch := make(chan NsGsScheduleDownlinkRequest)
+				peer3 := NewGSPeer(ctx, &MockNsGsServer{
+					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink3Ch),
+				})
+
+				if !a.So(assertGetRxMetadataGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
+					return false
+				}
+
+				lastDown, ok := assertScheduleRxMetadataGateways(
+					ctx,
+					env.Cluster.Auth,
+					scheduleDownlink124Ch,
+					scheduleDownlink3Ch,
+					func() []byte {
+						b := []byte{
+							/* MHDR */
+							0x60,
+							/* MACPayload */
+							/** FHDR **/
+							/*** DevAddr ***/
+							0xff, 0xff, 0xff, 0x42,
+							/*** FCtrl ***/
+							0x86,
+							/*** FCnt ***/
+							0x42, 0x00,
+						}
+
+						/** FOpts **/
+						b = append(b, test.Must(crypto.EncryptDownlink(
+							nwkSEncKey,
+							types.DevAddr{0x42, 0xff, 0xff, 0xff},
+							0x24,
+							[]byte{
+								/* ResetConf */
+								0x01, 0x01,
+								/* LinkCheckAns */
+								0x02, 0x02, 0x05,
+								/* DevStatusReq */
+								0x06,
 							},
-							FrequencyPlanID:   test.EUFrequencyPlanID,
-							LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
-							MACSettings: &ttnpb.MACSettings{
-								ClassCTimeout: DurationPtr(42 * time.Second),
+						)).([]byte)...)
+
+						/** FPort **/
+						b = append(b, 0x1)
+
+						/** FRMPayload **/
+						b = append(b, []byte("testPayload")...)
+
+						/* MIC */
+						mic := test.Must(crypto.ComputeDownlinkMIC(
+							sNwkSIntKey,
+							types.DevAddr{0x42, 0xff, 0xff, 0xff},
+							0,
+							0x42,
+							b,
+						)).([4]byte)
+						return append(b, mic[:]...)
+					}(),
+					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
+						return &ttnpb.TxRequest{
+							Class:            ttnpb.CLASS_A,
+							DownlinkPaths:    paths,
+							Priority:         ttnpb.TxSchedulePriority_HIGH,
+							Rx1Delay:         ttnpb.RX_DELAY_3,
+							Rx1DataRateIndex: ttnpb.DATA_RATE_0,
+							Rx1Frequency:     431000000,
+						}
+					},
+					NsGsScheduleDownlinkResponse{
+						Response: &ttnpb.ScheduleDownlinkResponse{
+							Delay: time.Second,
+						},
+					},
+				)
+				if !a.So(ok, should.BeTrue) {
+					t.Error("Scheduling assertion failed")
+					return false
+				}
+
+				if a.So(lastDown.CorrelationIDs, should.HaveLength, 5) {
+					a.So(lastDown.CorrelationIDs, should.Contain, "correlation-up-1")
+					a.So(lastDown.CorrelationIDs, should.Contain, "correlation-up-2")
+					a.So(lastDown.CorrelationIDs, should.Contain, "correlation-app-down-1")
+					a.So(lastDown.CorrelationIDs, should.Contain, "correlation-app-down-2")
+				}
+
+				setDevice := &ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+						DeviceID:               "test-dev-id",
+						DevAddr:                &types.DevAddr{0x42, 0xff, 0xff, 0xff},
+					},
+					FrequencyPlanID:   test.EUFrequencyPlanID,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+					MACSettings: &ttnpb.MACSettings{
+						ClassCTimeout: DurationPtr(42 * time.Second),
+					},
+					MACState: &ttnpb.MACState{
+						CurrentParameters: *CopyMACParameters(eu868macParameters),
+						DesiredParameters: *CopyMACParameters(eu868macParameters),
+						DeviceClass:       ttnpb.CLASS_C,
+						LoRaWANVersion:    ttnpb.MAC_V1_1,
+						PendingRequests: []*ttnpb.MACCommand{
+							{
+								CID: ttnpb.CID_DEV_STATUS,
 							},
-							MACState: &ttnpb.MACState{
-								CurrentParameters: *CopyMACParameters(eu868macParameters),
-								DesiredParameters: *CopyMACParameters(eu868macParameters),
-								DeviceClass:       ttnpb.CLASS_C,
-								LoRaWANVersion:    ttnpb.MAC_V1_1,
-								QueuedResponses: []*ttnpb.MACCommand{
-									(&ttnpb.MACCommand_ResetConf{
-										MinorVersion: 1,
-									}).MACCommand(),
-									(&ttnpb.MACCommand_LinkCheckAns{
-										Margin:       2,
-										GatewayCount: 5,
-									}).MACCommand(),
-								},
-								RxWindowsAvailable: true,
-							},
-							QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-								{
-									CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
-									FCnt:           0x42,
-									FPort:          0x1,
-									FRMPayload:     []byte("testPayload"),
-									Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-									SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
-								},
-							},
-							RecentUplinks: []*ttnpb.UplinkMessage{
-								CopyUplinkMessage(lastUp),
-							},
-							Session: &ttnpb.Session{
-								DevAddr:       types.DevAddr{0x42, 0xff, 0xff, 0xff},
-								LastNFCntDown: 0x24,
-								SessionKeys:   *CopySessionKeys(sessionKeys),
-							},
-						})
+						},
+					},
+					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{},
+					RecentUplinks: []*ttnpb.UplinkMessage{
+						CopyUplinkMessage(lastUp),
+					},
+					RecentDownlinks: []*ttnpb.DownlinkMessage{
+						lastDown,
+					},
+					Session: &ttnpb.Session{
+						DevAddr:       types.DevAddr{0x42, 0xff, 0xff, 0xff},
+						LastNFCntDown: 0x24,
+						SessionKeys:   *CopySessionKeys(sessionKeys),
+					},
+				}
+
+				select {
+				case <-ctx.Done():
+					t.Error("Timed out while waiting for DeviceRegistry.SetByID callback to return")
+
+				case resp := <-setFuncRespCh:
+					a.So(resp.Error, should.BeNil)
+					a.So(resp.Paths, should.Resemble, []string{
+						"mac_state",
+						"queued_application_downlinks",
+						"recent_downlinks",
+						"session",
+					})
+					if a.So(resp.Device, should.NotBeNil) &&
+						a.So(resp.Device.MACState, should.NotBeNil) &&
+						a.So(resp.Device.MACState.LastConfirmedDownlinkAt, should.NotBeNil) {
+						a.So([]time.Time{start, *resp.Device.MACState.LastConfirmedDownlinkAt, time.Now().Add(time.Second)}, should.BeChronological)
+						setDevice.MACState.LastConfirmedDownlinkAt = resp.Device.MACState.LastConfirmedDownlinkAt
+					}
+					a.So(resp.Device, should.Resemble, setDevice)
+				}
+				close(setFuncRespCh)
+
+				select {
+				case <-ctx.Done():
+					t.Error("Timed out while waiting for DeviceRegistry.SetByID response to be processed")
+
+				case setRespCh <- DeviceRegistrySetByIDResponse{
+					Device: setDevice,
+				}:
+				}
+
+				if !AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(reqCtx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time, replace bool) bool {
+					return a.So(reqCtx, should.HaveParentContextOrEqual, ctx) &&
+						a.So(devID, should.Resemble, ttnpb.EndDeviceIdentifiers{
+							ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+							DeviceID:               "test-dev-id",
+						}) &&
+						a.So(replace, should.BeTrue) &&
+						a.So(t, should.Resemble, setDevice.MACState.LastConfirmedDownlinkAt.Add(42*time.Second))
+				},
+					nil,
+				) {
+					t.Error("Downlink task add assertion failed")
+					return false
+				}
+
+				select {
+				case <-ctx.Done():
+					t.Error("Timed out while waiting for DownlinkTasks.Pop callback to return")
+
+				case resp := <-popFuncRespCh:
+					a.So(resp, should.BeNil)
+				}
+				close(popFuncRespCh)
+
+				select {
+				case <-ctx.Done():
+					t.Error("Timed out while waiting for DownlinkTasks.Pop response to be processed")
+
+				case popRespCh <- nil:
+				}
+
+				return true
+			},
+		},
+
+		{
+			Name: "Class C/windows open/Rx2/application downlink/no absolute time/no forced gateways/windows open/FOpts present/EU868/1.1",
+			DownlinkPriorities: DownlinkPriorities{
+				JoinAccept:             ttnpb.TxSchedulePriority_HIGHEST,
+				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
+				MaxApplicationDownlink: ttnpb.TxSchedulePriority_NORMAL,
+			},
+			Handler: func(ctx context.Context, env Environment) bool {
+				t := test.MustTFromContext(ctx)
+				a := assertions.New(t)
+
+				start := time.Now()
+
+				var popRespCh chan<- error
+				popFuncRespCh := make(chan error)
+				select {
+				case <-ctx.Done():
+					t.Error("Timed out while waiting for DownlinkTasks.Pop to be called")
+					return false
+
+				case req := <-env.DownlinkTasks.Pop:
+					popRespCh = req.Response
+					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
+					go func() {
+						popFuncRespCh <- req.Func(req.Context, ttnpb.EndDeviceIdentifiers{
+							ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+							DeviceID:               "test-dev-id",
+						}, time.Now())
+					}()
+				}
+
+				lastUp := &ttnpb.UplinkMessage{
+					CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
+					DeviceChannelIndex: 3,
+					Payload: &ttnpb.Message{
+						MHDR: ttnpb.MHDR{
+							MType: ttnpb.MType_UNCONFIRMED_UP,
+						},
+						Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
+					},
+					ReceivedAt: time.Now().Add(-time.Second),
+					RxMetadata: deepcopy.Copy(rxMetadata).([]*ttnpb.RxMetadata),
+					Settings: ttnpb.TxSettings{
+						DataRateIndex: ttnpb.DATA_RATE_0,
+						Frequency:     430000000,
+					},
+				}
+
+				getDevice := &ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+						DeviceID:               "test-dev-id",
+						DevAddr:                &types.DevAddr{0x42, 0xff, 0xff, 0xff},
+					},
+					FrequencyPlanID:   test.EUFrequencyPlanID,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+					MACSettings: &ttnpb.MACSettings{
+						ClassCTimeout: DurationPtr(42 * time.Second),
+					},
+					MACState: &ttnpb.MACState{
+						CurrentParameters: *CopyMACParameters(eu868macParameters),
+						DesiredParameters: *CopyMACParameters(eu868macParameters),
+						DeviceClass:       ttnpb.CLASS_C,
+						LoRaWANVersion:    ttnpb.MAC_V1_1,
+						QueuedResponses: []*ttnpb.MACCommand{
+							(&ttnpb.MACCommand_ResetConf{
+								MinorVersion: 1,
+							}).MACCommand(),
+							(&ttnpb.MACCommand_LinkCheckAns{
+								Margin:       2,
+								GatewayCount: 5,
+							}).MACCommand(),
+						},
+						RxWindowsAvailable: true,
+					},
+					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+						{
+							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+							FCnt:           0x42,
+							FPort:          0x1,
+							FRMPayload:     []byte("testPayload"),
+							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
+							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+						},
+					},
+					RecentUplinks: []*ttnpb.UplinkMessage{
+						CopyUplinkMessage(lastUp),
+					},
+					Session: &ttnpb.Session{
+						DevAddr:       types.DevAddr{0x42, 0xff, 0xff, 0xff},
+						LastNFCntDown: 0x24,
+						SessionKeys:   *CopySessionKeys(sessionKeys),
+					},
+				}
+
+				var setRespCh chan<- DeviceRegistrySetByIDResponse
+				setFuncRespCh := make(chan DeviceRegistrySetByIDRequestFuncResponse)
+				select {
+				case <-ctx.Done():
+					t.Error("Timed out while waiting for DeviceRegistry.SetByID to be called")
+					return false
+
+				case req := <-env.DeviceRegistry.SetByID:
+					setRespCh = req.Response
+					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
+					a.So(req.ApplicationIdentifiers, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
+					a.So(req.DeviceID, should.Resemble, "test-dev-id")
+					a.So(req.Paths, should.Resemble, getPaths)
+
+					go func() {
+						dev, sets, err := req.Func(CopyEndDevice(getDevice))
 						setFuncRespCh <- DeviceRegistrySetByIDRequestFuncResponse{
 							Device: dev,
 							Paths:  sets,
@@ -915,7 +1232,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					if a.So(resp.Device, should.NotBeNil) &&
 						a.So(resp.Device.MACState, should.NotBeNil) &&
 						a.So(resp.Device.MACState.LastConfirmedDownlinkAt, should.NotBeNil) {
-						a.So([]time.Time{start, *resp.Device.MACState.LastConfirmedDownlinkAt, time.Now()}, should.BeChronological)
+						a.So([]time.Time{start, *resp.Device.MACState.LastConfirmedDownlinkAt, time.Now().Add(time.Second)}, should.BeChronological)
 						setDevice.MACState.LastConfirmedDownlinkAt = resp.Device.MACState.LastConfirmedDownlinkAt
 					}
 					a.So(resp.Device, should.Resemble, setDevice)
@@ -967,7 +1284,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		},
 
 		{
-			Name: "application downlink/Class C/absolute time within window/no forced gateways/windows open/FOpts present/EU868/1.1",
+			Name: "Class C/windows open/Rx2/application downlink/absolute time within window/no forced gateways/windows open/FOpts present/EU868/1.1",
 			DownlinkPriorities: DownlinkPriorities{
 				JoinAccept:             ttnpb.TxSchedulePriority_HIGHEST,
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
@@ -1016,6 +1333,56 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				absTime := time.Now().Add(10 * time.Second).UTC()
 
+				getDevice := &ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+						DeviceID:               "test-dev-id",
+						DevAddr:                &types.DevAddr{0x42, 0xff, 0xff, 0xff},
+					},
+					FrequencyPlanID:   test.EUFrequencyPlanID,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+					MACSettings: &ttnpb.MACSettings{
+						ClassCTimeout: DurationPtr(42 * time.Second),
+					},
+					MACState: &ttnpb.MACState{
+						CurrentParameters: *CopyMACParameters(eu868macParameters),
+						DesiredParameters: *CopyMACParameters(eu868macParameters),
+						DeviceClass:       ttnpb.CLASS_C,
+						LoRaWANVersion:    ttnpb.MAC_V1_1,
+						QueuedResponses: []*ttnpb.MACCommand{
+							(&ttnpb.MACCommand_ResetConf{
+								MinorVersion: 1,
+							}).MACCommand(),
+							(&ttnpb.MACCommand_LinkCheckAns{
+								Margin:       2,
+								GatewayCount: 5,
+							}).MACCommand(),
+						},
+						RxWindowsAvailable: true,
+					},
+					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+						{
+							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+							FCnt:           0x42,
+							FPort:          0x1,
+							FRMPayload:     []byte("testPayload"),
+							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
+							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
+								AbsoluteTime: deepcopy.Copy(&absTime).(*time.Time),
+							},
+						},
+					},
+					RecentUplinks: []*ttnpb.UplinkMessage{
+						CopyUplinkMessage(lastUp),
+					},
+					Session: &ttnpb.Session{
+						DevAddr:       types.DevAddr{0x42, 0xff, 0xff, 0xff},
+						LastNFCntDown: 0x24,
+						SessionKeys:   *CopySessionKeys(sessionKeys),
+					},
+				}
+
 				var setRespCh chan<- DeviceRegistrySetByIDResponse
 				setFuncRespCh := make(chan DeviceRegistrySetByIDRequestFuncResponse)
 				select {
@@ -1031,55 +1398,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(req.Paths, should.Resemble, getPaths)
 
 					go func() {
-						dev, sets, err := req.Func(&ttnpb.EndDevice{
-							EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-								ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-								DeviceID:               "test-dev-id",
-								DevAddr:                &types.DevAddr{0x42, 0xff, 0xff, 0xff},
-							},
-							FrequencyPlanID:   test.EUFrequencyPlanID,
-							LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
-							MACSettings: &ttnpb.MACSettings{
-								ClassCTimeout: DurationPtr(42 * time.Second),
-							},
-							MACState: &ttnpb.MACState{
-								CurrentParameters: *CopyMACParameters(eu868macParameters),
-								DesiredParameters: *CopyMACParameters(eu868macParameters),
-								DeviceClass:       ttnpb.CLASS_C,
-								LoRaWANVersion:    ttnpb.MAC_V1_1,
-								QueuedResponses: []*ttnpb.MACCommand{
-									(&ttnpb.MACCommand_ResetConf{
-										MinorVersion: 1,
-									}).MACCommand(),
-									(&ttnpb.MACCommand_LinkCheckAns{
-										Margin:       2,
-										GatewayCount: 5,
-									}).MACCommand(),
-								},
-								RxWindowsAvailable: true,
-							},
-							QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-								{
-									CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
-									FCnt:           0x42,
-									FPort:          0x1,
-									FRMPayload:     []byte("testPayload"),
-									Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-									SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
-									ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
-										AbsoluteTime: deepcopy.Copy(&absTime).(*time.Time),
-									},
-								},
-							},
-							RecentUplinks: []*ttnpb.UplinkMessage{
-								CopyUplinkMessage(lastUp),
-							},
-							Session: &ttnpb.Session{
-								DevAddr:       types.DevAddr{0x42, 0xff, 0xff, 0xff},
-								LastNFCntDown: 0x24,
-								SessionKeys:   *CopySessionKeys(sessionKeys),
-							},
-						})
+						dev, sets, err := req.Func(CopyEndDevice(getDevice))
 						setFuncRespCh <- DeviceRegistrySetByIDRequestFuncResponse{
 							Device: dev,
 							Paths:  sets,
@@ -1231,7 +1550,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					if a.So(resp.Device, should.NotBeNil) &&
 						a.So(resp.Device.MACState, should.NotBeNil) &&
 						a.So(resp.Device.MACState.LastConfirmedDownlinkAt, should.NotBeNil) {
-						a.So([]time.Time{start, *resp.Device.MACState.LastConfirmedDownlinkAt, time.Now()}, should.BeChronological)
+						a.So([]time.Time{start, *resp.Device.MACState.LastConfirmedDownlinkAt, time.Now().Add(time.Second)}, should.BeChronological)
 						setDevice.MACState.LastConfirmedDownlinkAt = resp.Device.MACState.LastConfirmedDownlinkAt
 					}
 					a.So(resp.Device, should.Resemble, setDevice)
@@ -1283,7 +1602,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		},
 
 		{
-			Name: "application downlink/Class C/absolute time outside window",
+			Name: "Class C/windows open/Rx2/application downlink/absolute time outside window",
 			DownlinkPriorities: DownlinkPriorities{
 				JoinAccept:             ttnpb.TxSchedulePriority_HIGHEST,
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
@@ -1330,6 +1649,56 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				absTime := time.Now().Add(42 * time.Hour).UTC()
 
+				getDevice := &ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+						DeviceID:               "test-dev-id",
+						DevAddr:                &types.DevAddr{0x42, 0xff, 0xff, 0xff},
+					},
+					FrequencyPlanID:   test.EUFrequencyPlanID,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+					MACSettings: &ttnpb.MACSettings{
+						ClassCTimeout: DurationPtr(42 * time.Second),
+					},
+					MACState: &ttnpb.MACState{
+						CurrentParameters: *CopyMACParameters(eu868macParameters),
+						DesiredParameters: *CopyMACParameters(eu868macParameters),
+						DeviceClass:       ttnpb.CLASS_C,
+						LoRaWANVersion:    ttnpb.MAC_V1_1,
+						QueuedResponses: []*ttnpb.MACCommand{
+							(&ttnpb.MACCommand_ResetConf{
+								MinorVersion: 1,
+							}).MACCommand(),
+							(&ttnpb.MACCommand_LinkCheckAns{
+								Margin:       2,
+								GatewayCount: 5,
+							}).MACCommand(),
+						},
+						RxWindowsAvailable: true,
+					},
+					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+						{
+							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+							FCnt:           0x42,
+							FPort:          0x1,
+							FRMPayload:     []byte("testPayload"),
+							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
+							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
+								AbsoluteTime: deepcopy.Copy(&absTime).(*time.Time),
+							},
+						},
+					},
+					RecentUplinks: []*ttnpb.UplinkMessage{
+						CopyUplinkMessage(lastUp),
+					},
+					Session: &ttnpb.Session{
+						DevAddr:       types.DevAddr{0x42, 0xff, 0xff, 0xff},
+						LastNFCntDown: 0x24,
+						SessionKeys:   *CopySessionKeys(sessionKeys),
+					},
+				}
+
 				var setRespCh chan<- DeviceRegistrySetByIDResponse
 				setFuncRespCh := make(chan DeviceRegistrySetByIDRequestFuncResponse)
 				select {
@@ -1345,55 +1714,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(req.Paths, should.Resemble, getPaths)
 
 					go func() {
-						dev, sets, err := req.Func(&ttnpb.EndDevice{
-							EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-								ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-								DeviceID:               "test-dev-id",
-								DevAddr:                &types.DevAddr{0x42, 0xff, 0xff, 0xff},
-							},
-							FrequencyPlanID:   test.EUFrequencyPlanID,
-							LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
-							MACSettings: &ttnpb.MACSettings{
-								ClassCTimeout: DurationPtr(42 * time.Second),
-							},
-							MACState: &ttnpb.MACState{
-								CurrentParameters: *CopyMACParameters(eu868macParameters),
-								DesiredParameters: *CopyMACParameters(eu868macParameters),
-								DeviceClass:       ttnpb.CLASS_C,
-								LoRaWANVersion:    ttnpb.MAC_V1_1,
-								QueuedResponses: []*ttnpb.MACCommand{
-									(&ttnpb.MACCommand_ResetConf{
-										MinorVersion: 1,
-									}).MACCommand(),
-									(&ttnpb.MACCommand_LinkCheckAns{
-										Margin:       2,
-										GatewayCount: 5,
-									}).MACCommand(),
-								},
-								RxWindowsAvailable: true,
-							},
-							QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-								{
-									CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
-									FCnt:           0x42,
-									FPort:          0x1,
-									FRMPayload:     []byte("testPayload"),
-									Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-									SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
-									ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
-										AbsoluteTime: deepcopy.Copy(&absTime).(*time.Time),
-									},
-								},
-							},
-							RecentUplinks: []*ttnpb.UplinkMessage{
-								CopyUplinkMessage(lastUp),
-							},
-							Session: &ttnpb.Session{
-								DevAddr:       types.DevAddr{0x42, 0xff, 0xff, 0xff},
-								LastNFCntDown: 0x24,
-								SessionKeys:   *CopySessionKeys(sessionKeys),
-							},
-						})
+						dev, sets, err := req.Func(CopyEndDevice(getDevice))
 						setFuncRespCh <- DeviceRegistrySetByIDRequestFuncResponse{
 							Device: dev,
 							Paths:  sets,
@@ -1409,7 +1730,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				case resp := <-setFuncRespCh:
 					setErr = resp.Error
-					a.So(resp.Error, should.BeError)
+					a.So(resp.Error, should.NotBeNil)
 					a.So(resp.Paths, should.BeNil)
 					a.So(resp.Device, should.BeNil)
 				}
@@ -1460,7 +1781,173 @@ func TestProcessDownlinkTask(t *testing.T) {
 		},
 
 		{
-			Name: "join-accept/no active MAC state/window open/EU868/1.1",
+			Name: "Class C/windows open/Rx2/expired application downlinks",
+			DownlinkPriorities: DownlinkPriorities{
+				JoinAccept:             ttnpb.TxSchedulePriority_HIGHEST,
+				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
+				MaxApplicationDownlink: ttnpb.TxSchedulePriority_NORMAL,
+			},
+			Handler: func(ctx context.Context, env Environment) bool {
+				t := test.MustTFromContext(ctx)
+				a := assertions.New(t)
+
+				var popRespCh chan<- error
+				popFuncRespCh := make(chan error)
+				select {
+				case <-ctx.Done():
+					t.Error("Timed out while waiting for DownlinkTasks.Pop to be called")
+					return false
+
+				case req := <-env.DownlinkTasks.Pop:
+					popRespCh = req.Response
+					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
+					go func() {
+						popFuncRespCh <- req.Func(req.Context, ttnpb.EndDeviceIdentifiers{
+							ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+							DeviceID:               "test-dev-id",
+						}, time.Now())
+					}()
+				}
+
+				lastUp := &ttnpb.UplinkMessage{
+					CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
+					DeviceChannelIndex: 3,
+					Payload: &ttnpb.Message{
+						MHDR: ttnpb.MHDR{
+							MType: ttnpb.MType_UNCONFIRMED_UP,
+						},
+						Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
+					},
+					ReceivedAt: time.Now().Add(-time.Second),
+					RxMetadata: deepcopy.Copy(rxMetadata).([]*ttnpb.RxMetadata),
+					Settings: ttnpb.TxSettings{
+						DataRateIndex: ttnpb.DATA_RATE_0,
+						Frequency:     430000000,
+					},
+				}
+
+				getDevice := &ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+						DeviceID:               "test-dev-id",
+						DevAddr:                &types.DevAddr{0x42, 0xff, 0xff, 0xff},
+					},
+					FrequencyPlanID:   test.EUFrequencyPlanID,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+					MACSettings: &ttnpb.MACSettings{
+						ClassCTimeout:          DurationPtr(42 * time.Second),
+						StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
+						StatusTimePeriodicity:  DurationPtr(0),
+					},
+					MACState: &ttnpb.MACState{
+						CurrentParameters:  *CopyMACParameters(eu868macParameters),
+						DesiredParameters:  *CopyMACParameters(eu868macParameters),
+						DeviceClass:        ttnpb.CLASS_C,
+						LoRaWANVersion:     ttnpb.MAC_V1_1,
+						RxWindowsAvailable: true,
+					},
+					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+						{
+							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+							FCnt:           0x42,
+							FPort:          0x1,
+							FRMPayload:     []byte("testPayload"),
+							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
+							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
+								AbsoluteTime: TimePtr(time.Now().Add(-2).UTC()),
+							},
+						},
+						{
+							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+							FCnt:           0x42,
+							FPort:          0x1,
+							FRMPayload:     []byte("testPayload"),
+							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
+							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
+								AbsoluteTime: TimePtr(time.Now().Add(-1).UTC()),
+							},
+						},
+					},
+					RecentUplinks: []*ttnpb.UplinkMessage{
+						CopyUplinkMessage(lastUp),
+					},
+					Session: &ttnpb.Session{
+						DevAddr:       types.DevAddr{0x42, 0xff, 0xff, 0xff},
+						LastNFCntDown: 0x24,
+						SessionKeys:   *CopySessionKeys(sessionKeys),
+					},
+				}
+
+				var setRespCh chan<- DeviceRegistrySetByIDResponse
+				setFuncRespCh := make(chan DeviceRegistrySetByIDRequestFuncResponse)
+				select {
+				case <-ctx.Done():
+					t.Error("Timed out while waiting for DeviceRegistry.SetByID to be called")
+					return false
+
+				case req := <-env.DeviceRegistry.SetByID:
+					setRespCh = req.Response
+					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
+					a.So(req.ApplicationIdentifiers, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
+					a.So(req.DeviceID, should.Resemble, "test-dev-id")
+					a.So(req.Paths, should.Resemble, getPaths)
+
+					go func() {
+						dev, sets, err := req.Func(CopyEndDevice(getDevice))
+						setFuncRespCh <- DeviceRegistrySetByIDRequestFuncResponse{
+							Device: dev,
+							Paths:  sets,
+							Error:  err,
+						}
+					}()
+				}
+
+				var setErr error
+				select {
+				case <-ctx.Done():
+					t.Error("Timed out while waiting for DeviceRegistry.SetByID callback to return")
+
+				case resp := <-setFuncRespCh:
+					setErr = resp.Error
+					a.So(resp.Error, should.NotBeNil)
+					a.So(resp.Paths, should.BeNil)
+					a.So(resp.Device, should.BeNil)
+				}
+				close(setFuncRespCh)
+
+				select {
+				case <-ctx.Done():
+					t.Error("Timed out while waiting for DeviceRegistry.SetByID response to be processed")
+
+				case setRespCh <- DeviceRegistrySetByIDResponse{
+					Error: setErr,
+				}:
+				}
+
+				select {
+				case <-ctx.Done():
+					t.Error("Timed out while waiting for DownlinkTasks.Pop callback to return")
+
+				case resp := <-popFuncRespCh:
+					a.So(resp, should.BeNil)
+				}
+				close(popFuncRespCh)
+
+				select {
+				case <-ctx.Done():
+					t.Error("Timed out while waiting for DownlinkTasks.Pop response to be processed")
+
+				case popRespCh <- nil:
+				}
+
+				return true
+			},
+		},
+
+		{
+			Name: "join-accept/windows open/Rx2/no active MAC state/window open/EU868/1.1",
 			DownlinkPriorities: DownlinkPriorities{
 				JoinAccept:             ttnpb.TxSchedulePriority_HIGHEST,
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
@@ -1509,6 +1996,45 @@ func TestProcessDownlinkTask(t *testing.T) {
 					},
 				}
 
+				getDevice := &ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+						DeviceID:               "test-dev-id",
+						JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+						DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+					},
+					FrequencyPlanID:   test.EUFrequencyPlanID,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+					PendingMACState: &ttnpb.MACState{
+						CurrentParameters: *CopyMACParameters(eu868macParameters),
+						DesiredParameters: *CopyMACParameters(eu868macParameters),
+						DeviceClass:       ttnpb.CLASS_A,
+						LoRaWANVersion:    ttnpb.MAC_V1_1,
+						QueuedJoinAccept: &ttnpb.MACState_JoinAccept{
+							Keys:    *CopySessionKeys(sessionKeys),
+							Payload: bytes.Repeat([]byte{0x42}, 33),
+							Request: ttnpb.JoinRequest{
+								DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+							},
+						},
+						RxWindowsAvailable: true,
+					},
+					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+						{
+							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+							FCnt:           0x42,
+							FPort:          0x1,
+							FRMPayload:     []byte("testPayload"),
+							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
+							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+						},
+					},
+					RecentUplinks: []*ttnpb.UplinkMessage{
+						CopyUplinkMessage(lastUp),
+					},
+					SupportsJoin: true,
+				}
+
 				var setRespCh chan<- DeviceRegistrySetByIDResponse
 				setFuncRespCh := make(chan DeviceRegistrySetByIDRequestFuncResponse)
 				select {
@@ -1524,44 +2050,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(req.Paths, should.Resemble, getPaths)
 
 					go func() {
-						dev, sets, err := req.Func(&ttnpb.EndDevice{
-							EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-								ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-								DeviceID:               "test-dev-id",
-								JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-								DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-							},
-							FrequencyPlanID:   test.EUFrequencyPlanID,
-							LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
-							PendingMACState: &ttnpb.MACState{
-								CurrentParameters: *CopyMACParameters(eu868macParameters),
-								DesiredParameters: *CopyMACParameters(eu868macParameters),
-								DeviceClass:       ttnpb.CLASS_A,
-								LoRaWANVersion:    ttnpb.MAC_V1_1,
-								QueuedJoinAccept: &ttnpb.MACState_JoinAccept{
-									Keys:    *CopySessionKeys(sessionKeys),
-									Payload: bytes.Repeat([]byte{0x42}, 33),
-									Request: ttnpb.JoinRequest{
-										DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
-									},
-								},
-								RxWindowsAvailable: true,
-							},
-							QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-								{
-									CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
-									FCnt:           0x42,
-									FPort:          0x1,
-									FRMPayload:     []byte("testPayload"),
-									Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-									SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
-								},
-							},
-							RecentUplinks: []*ttnpb.UplinkMessage{
-								CopyUplinkMessage(lastUp),
-							},
-							SupportsJoin: true,
-						})
+						dev, sets, err := req.Func(CopyEndDevice(getDevice))
 						setFuncRespCh <- DeviceRegistrySetByIDRequestFuncResponse{
 							Device: dev,
 							Paths:  sets,
@@ -1750,6 +2239,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 					PopFunc: MakeDownlinkTaskPopChFunc(popCh),
 				},
 				downlinkPriorities: tc.DownlinkPriorities,
+				handleASUplink: func(reqCtx context.Context, ids ttnpb.ApplicationIdentifiers, up *ttnpb.ApplicationUp) (bool, error) {
+					// TODO: Assert AS uplinks sent(https://github.com/TheThingsNetwork/lorawan-stack/issues/631).
+					a.So(reqCtx, should.HaveParentContextOrEqual, ctx)
+					t.Logf("Send uplink to AS %v: %+v", ids, up)
+					return false, nil
+				},
 			}
 
 			processDownlinkTaskErrCh := make(chan error)
@@ -2342,11 +2837,9 @@ func TestGenerateDownlink(t *testing.T) {
 			},
 			DeviceAssertion: func(t *testing.T, dev *ttnpb.EndDevice) bool {
 				a := assertions.New(t)
-				if !a.So(dev.MACState, should.NotBeNil) || !a.So(dev.MACState.LastConfirmedDownlinkAt, should.NotBeNil) {
+				if !a.So(dev.MACState, should.NotBeNil) {
 					t.FailNow()
 				}
-				now := time.Now()
-				a.So([]time.Time{now.Add(-time.Minute), *dev.MACState.LastConfirmedDownlinkAt, now}, should.BeChronological)
 				return a.So(dev, should.Resemble, &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
@@ -2354,8 +2847,7 @@ func TestGenerateDownlink(t *testing.T) {
 						DevAddr:                &DevAddr,
 					},
 					MACState: &ttnpb.MACState{
-						LoRaWANVersion:          ttnpb.MAC_V1_1,
-						LastConfirmedDownlinkAt: dev.MACState.LastConfirmedDownlinkAt,
+						LoRaWANVersion: ttnpb.MAC_V1_1,
 						PendingApplicationDownlink: &ttnpb.ApplicationDownlink{
 							Confirmed:  true,
 							FCnt:       42,
@@ -2467,11 +2959,9 @@ func TestGenerateDownlink(t *testing.T) {
 			},
 			DeviceAssertion: func(t *testing.T, dev *ttnpb.EndDevice) bool {
 				a := assertions.New(t)
-				if !a.So(dev.MACState, should.NotBeNil) || !a.So(dev.MACState.LastConfirmedDownlinkAt, should.NotBeNil) {
+				if !a.So(dev.MACState, should.NotBeNil) {
 					t.FailNow()
 				}
-				now := time.Now()
-				a.So([]time.Time{now.Add(-time.Minute), *dev.MACState.LastConfirmedDownlinkAt, now}, should.BeChronological)
 				return a.So(dev, should.Resemble, &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
@@ -2479,9 +2969,8 @@ func TestGenerateDownlink(t *testing.T) {
 						DevAddr:                &DevAddr,
 					},
 					MACState: &ttnpb.MACState{
-						LoRaWANVersion:          ttnpb.MAC_V1_1,
-						RxWindowsAvailable:      true,
-						LastConfirmedDownlinkAt: dev.MACState.LastConfirmedDownlinkAt,
+						LoRaWANVersion:     ttnpb.MAC_V1_1,
+						RxWindowsAvailable: true,
 						PendingApplicationDownlink: &ttnpb.ApplicationDownlink{
 							Confirmed:  true,
 							FCnt:       42,
@@ -2585,11 +3074,9 @@ func TestGenerateDownlink(t *testing.T) {
 			}, ttnpb.MAC_V1_1, 0),
 			DeviceAssertion: func(t *testing.T, dev *ttnpb.EndDevice) bool {
 				a := assertions.New(t)
-				if !a.So(dev.MACState, should.NotBeNil) || !a.So(dev.MACState.LastConfirmedDownlinkAt, should.NotBeNil) {
+				if !a.So(dev.MACState, should.NotBeNil) {
 					t.FailNow()
 				}
-				now := time.Now()
-				a.So([]time.Time{now.Add(-time.Minute), *dev.MACState.LastConfirmedDownlinkAt, now}, should.BeChronological)
 				return a.So(dev, should.Resemble, &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
@@ -2600,9 +3087,8 @@ func TestGenerateDownlink(t *testing.T) {
 						StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 3},
 					},
 					MACState: &ttnpb.MACState{
-						LoRaWANVersion:          ttnpb.MAC_V1_1,
-						LastConfirmedDownlinkAt: dev.MACState.LastConfirmedDownlinkAt,
-						LastDevStatusFCntUp:     4,
+						LoRaWANVersion:      ttnpb.MAC_V1_1,
+						LastDevStatusFCntUp: 4,
 						PendingRequests: []*ttnpb.MACCommand{
 							ttnpb.CID_DEV_STATUS.MACCommand(),
 						},
@@ -2695,11 +3181,9 @@ func TestGenerateDownlink(t *testing.T) {
 			}, ttnpb.MAC_V1_1, 0),
 			DeviceAssertion: func(t *testing.T, dev *ttnpb.EndDevice) bool {
 				a := assertions.New(t)
-				if !a.So(dev.MACState, should.NotBeNil) || !a.So(dev.MACState.LastConfirmedDownlinkAt, should.NotBeNil) {
+				if !a.So(dev.MACState, should.NotBeNil) {
 					t.FailNow()
 				}
-				now := time.Now()
-				a.So([]time.Time{now.Add(-time.Minute), *dev.MACState.LastConfirmedDownlinkAt, now}, should.BeChronological)
 				return a.So(dev, should.Resemble, &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
@@ -2710,8 +3194,7 @@ func TestGenerateDownlink(t *testing.T) {
 						StatusTimePeriodicity: DurationPtr(time.Nanosecond),
 					},
 					MACState: &ttnpb.MACState{
-						LoRaWANVersion:          ttnpb.MAC_V1_1,
-						LastConfirmedDownlinkAt: dev.MACState.LastConfirmedDownlinkAt,
+						LoRaWANVersion: ttnpb.MAC_V1_1,
 						PendingRequests: []*ttnpb.MACCommand{
 							ttnpb.CID_DEV_STATUS.MACCommand(),
 						},
@@ -2781,12 +3264,14 @@ func TestGenerateDownlink(t *testing.T) {
 				return
 			}
 
-			genDown, err := ns.generateDownlink(ctx, dev, phy, math.MaxUint16, math.MaxUint16)
+			genDown, appUpFunc, err := ns.generateDownlink(ctx, dev, phy, math.MaxUint16, math.MaxUint16)
 			if tc.Error != nil {
 				a.So(err, should.EqualErrorOrDefinition, tc.Error)
 				a.So(genDown, should.BeNil)
 				return
 			}
+			// TODO: Assert AS uplinks generated(https://github.com/TheThingsNetwork/lorawan-stack/issues/631).
+			a.So(appUpFunc, should.NotBeNil)
 
 			if !a.So(err, should.BeNil) || !a.So(genDown, should.NotBeNil) {
 				t.Fail()
