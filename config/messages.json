@@ -1448,6 +1448,15 @@
       "file": "mqtt.go"
     }
   },
+  "error:pkg/applicationserver/io/web/redis:invalid_fieldmask": {
+    "translations": {
+      "en": "invalid fieldmask"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/web/redis",
+      "file": "registry.go"
+    }
+  },
   "error:pkg/applicationserver/io/web/redis:invalid_identifiers": {
     "translations": {
       "en": "invalid identifiers"
@@ -1529,6 +1538,15 @@
       "file": "registry.go"
     }
   },
+  "error:pkg/applicationserver/redis:invalid_fieldmask": {
+    "translations": {
+      "en": "invalid fieldmask"
+    },
+    "description": {
+      "package": "pkg/applicationserver/redis",
+      "file": "registry.go"
+    }
+  },
   "error:pkg/applicationserver/redis:invalid_identifiers": {
     "translations": {
       "en": "invalid identifiers"
@@ -1572,6 +1590,24 @@
     "description": {
       "package": "pkg/applicationserver",
       "file": "registry.go"
+    }
+  },
+  "error:pkg/applicationserver:field_mask": {
+    "translations": {
+      "en": "invalid field mask"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "grpc_deviceregistry.go"
+    }
+  },
+  "error:pkg/applicationserver:field_value": {
+    "translations": {
+      "en": "invalid value of field `{field}`"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "grpc_deviceregistry.go"
     }
   },
   "error:pkg/applicationserver:formatter_not_configured": {
@@ -3680,6 +3716,15 @@
       "file": "registry.go"
     }
   },
+  "error:pkg/joinserver/redis:invalid_fieldmask": {
+    "translations": {
+      "en": "invalid fieldmask"
+    },
+    "description": {
+      "package": "pkg/joinserver/redis",
+      "file": "registry.go"
+    }
+  },
   "error:pkg/joinserver/redis:invalid_identifiers": {
     "translations": {
       "en": "invalid identifiers"
@@ -3813,6 +3858,24 @@
     "description": {
       "package": "pkg/joinserver",
       "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:field_mask": {
+    "translations": {
+      "en": "invalid field mask"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "grpc_deviceregistry.go"
+    }
+  },
+  "error:pkg/joinserver:field_value": {
+    "translations": {
+      "en": "invalid value of field `{field}`"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "grpc_deviceregistry.go"
     }
   },
   "error:pkg/joinserver:forward_join_request": {
@@ -4160,6 +4223,15 @@
   "error:pkg/networkserver/redis:duplicate_identifiers": {
     "translations": {
       "en": "duplicate identifiers"
+    },
+    "description": {
+      "package": "pkg/networkserver/redis",
+      "file": "registry.go"
+    }
+  },
+  "error:pkg/networkserver/redis:invalid_fieldmask": {
+    "translations": {
+      "en": "invalid fieldmask"
     },
     "description": {
       "package": "pkg/networkserver/redis",
