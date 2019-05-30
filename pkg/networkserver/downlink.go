@@ -1036,7 +1036,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 							if nextConfirmedAt.After(downAt) {
 								nextDownlinkAt = nextConfirmedAt
 							} else {
-								nextDownlinkAt = downAt
+								nextDownlinkAt = downAt.Add(dev.MACState.CurrentParameters.Rx1Delay.Duration())
 							}
 						}
 						dev.MACState.RxWindowsAvailable = false
@@ -1126,7 +1126,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					if nextConfirmedAt.After(downAt) {
 						nextDownlinkAt = nextConfirmedAt
 					} else {
-						nextDownlinkAt = downAt
+						nextDownlinkAt = downAt.Add(dev.MACState.CurrentParameters.Rx1Delay.Duration())
 					}
 				}
 				dev.MACState.RxWindowsAvailable = false
