@@ -147,9 +147,9 @@ func (r WebhookRegistry) Set(ctx context.Context, ids ttnpb.ApplicationWebhookId
 			}
 		} else {
 			pb.UpdatedAt = time.Now().UTC()
-			sets = append(append(make([]string, 0, 2+len(sets)),
+			sets = append(append(sets[:0:0], sets...),
 				"updated_at",
-			), sets...)
+			)
 
 			updated := &ttnpb.ApplicationWebhook{}
 			if stored == nil {

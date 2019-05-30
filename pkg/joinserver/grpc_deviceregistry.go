@@ -106,7 +106,10 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 	return dev, nil
 }
 
-var errInvalidFieldValue = errors.DefineInvalidArgument("field_value", "invalid value of field `{field}`")
+var (
+	errInvalidFieldMask  = errors.DefineInvalidArgument("field_mask", "invalid field mask")
+	errInvalidFieldValue = errors.DefineInvalidArgument("field_value", "invalid value of field `{field}`")
+)
 
 // Set implements ttnpb.JsEndDeviceRegistryServer.
 func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest) (*ttnpb.EndDevice, error) {
@@ -116,6 +119,7 @@ func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndD
 	if req.EndDevice.DevEUI == nil || req.EndDevice.DevEUI.IsZero() {
 		return nil, errNoDevEUI
 	}
+
 	if err := rights.RequireApplication(ctx, req.EndDevice.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
@@ -124,13 +128,17 @@ func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndD
 			return nil, err
 		}
 	}
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "ids.dev_addr") && req.EndDevice.DevAddr != nil && !req.EndDevice.DevAddr.IsZero() {
-		return nil, errInvalidFieldValue.WithAttributes("field", "ids.dev_addr")
-	}
-
 	return srv.JS.devices.SetByID(ctx, req.EndDevice.ApplicationIdentifiers, req.EndDevice.DeviceID, req.FieldMask.Paths, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+		sets := req.FieldMask.Paths
 		if dev != nil {
-			return &req.EndDevice, req.FieldMask.Paths, nil
+			if err := ttnpb.ProhibitFields(req.FieldMask.Paths, "ids.dev_addr"); err != nil {
+				return nil, nil, errInvalidFieldMask.WithCause(err)
+			}
+			return &req.EndDevice, sets, nil
+		}
+
+		if req.EndDevice.DevAddr != nil && !req.EndDevice.DevAddr.IsZero() {
+			return nil, nil, errInvalidFieldValue.WithAttributes("field", "ids.dev_addr")
 		}
 		return &req.EndDevice, append(req.FieldMask.Paths,
 			"ids.application_ids",

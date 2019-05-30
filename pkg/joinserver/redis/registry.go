@@ -179,9 +179,9 @@ func (r *DeviceRegistry) set(tx *redis.Tx, uid string, gets []string, f func(pb 
 		}
 	} else {
 		pb.UpdatedAt = time.Now().UTC()
-		sets = append(append(make([]string, 0, 2+len(sets)),
+		sets = append(append(sets[:0:0], sets...),
 			"updated_at",
-		), sets...)
+		)
 
 		updated := &ttnpb.EndDevice{}
 		var updatedPID string

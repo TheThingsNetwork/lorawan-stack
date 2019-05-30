@@ -35,24 +35,37 @@ func (r asEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDev
 	return r.registry.Get(ctx, req.EndDeviceIdentifiers, req.FieldMask.Paths)
 }
 
-var errInvalidFieldValue = errors.DefineInvalidArgument("field_value", "invalid value of field `{field}`")
+var (
+	errInvalidFieldMask  = errors.DefineInvalidArgument("field_mask", "invalid field mask")
+	errInvalidFieldValue = errors.DefineInvalidArgument("field_value", "invalid value of field `{field}`")
+)
 
 // Set implements ttnpb.AsEndDeviceRegistryServer.
 func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest) (*ttnpb.EndDevice, error) {
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "session.dev_addr") && (req.EndDevice.Session == nil || req.EndDevice.Session.DevAddr.IsZero()) {
+		return nil, errInvalidFieldValue.WithAttributes("field", "session.dev_addr")
+	}
+
 	if err := rights.RequireApplication(ctx, req.EndDevice.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
-
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "ids.dev_addr") && req.EndDevice.DevAddr != nil && !req.EndDevice.DevAddr.IsZero() {
-		return nil, errInvalidFieldValue.WithAttributes("field", "ids.dev_addr")
-	}
-
 	return r.registry.Set(ctx, req.EndDevice.EndDeviceIdentifiers, req.FieldMask.Paths, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+		sets := req.FieldMask.Paths
 		if dev != nil {
-			return &req.EndDevice, req.FieldMask.Paths, nil
+			if err := ttnpb.ProhibitFields(req.FieldMask.Paths, "ids.dev_addr"); err != nil {
+				return nil, nil, errInvalidFieldMask.WithCause(err)
+			}
+			if ttnpb.HasAnyField(req.FieldMask.Paths, "session.dev_addr") {
+				req.EndDevice.DevAddr = &req.EndDevice.Session.DevAddr
+				sets = append(sets, "ids.dev_addr")
+			}
+			return &req.EndDevice, sets, nil
 		}
 
-		sets := append(req.FieldMask.Paths,
+		if req.EndDevice.DevAddr != nil && !req.EndDevice.DevAddr.IsZero() {
+			return nil, nil, errInvalidFieldValue.WithAttributes("field", "ids.dev_addr")
+		}
+		sets = append(sets,
 			"ids.application_ids",
 			"ids.device_id",
 		)

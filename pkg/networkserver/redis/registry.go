@@ -214,9 +214,9 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 			}
 		} else {
 			pb.UpdatedAt = time.Now().UTC()
-			sets = append(append(make([]string, 0, 2+len(sets)),
+			sets = append(append(sets[:0:0], sets...),
 				"updated_at",
-			), sets...)
+			)
 
 			updated := &ttnpb.EndDevice{}
 			if stored == nil {
