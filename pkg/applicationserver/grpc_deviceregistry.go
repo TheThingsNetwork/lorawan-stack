@@ -47,8 +47,7 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 		return nil, errInvalidFieldValue.WithAttributes("field", "ids.dev_addr")
 	}
 
-	gets := append(req.FieldMask.Paths[:0:0], req.FieldMask.Paths...)
-	return r.registry.Set(ctx, req.EndDevice.EndDeviceIdentifiers, gets, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+	return r.registry.Set(ctx, req.EndDevice.EndDeviceIdentifiers, req.FieldMask.Paths, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		if dev != nil {
 			return &req.EndDevice, req.FieldMask.Paths, nil
 		}

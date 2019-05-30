@@ -27,16 +27,17 @@ import (
 )
 
 var (
+	errInvalidFieldmask   = errors.DefineInvalidArgument("invalid_fieldmask", "invalid fieldmask")
 	errInvalidIdentifiers = errors.DefineInvalidArgument("invalid_identifiers", "invalid identifiers")
 )
 
 // appendImplicitWebhookGetPaths appends implicit ttnpb.ApplicationWebhook get paths to paths.
 func appendImplicitWebhookGetPaths(paths ...string) []string {
-	return append(paths,
+	return append(append(make([]string, 0, 3+len(paths)),
 		"created_at",
 		"ids",
 		"updated_at",
-	)
+	), paths...)
 }
 
 func applyWebhookFieldMask(dst, src *ttnpb.ApplicationWebhook, paths ...string) (*ttnpb.ApplicationWebhook, error) {
@@ -145,16 +146,19 @@ func (r WebhookRegistry) Set(ctx context.Context, ids ttnpb.ApplicationWebhookId
 				return nil
 			}
 		} else {
-			if pb.ApplicationWebhookIdentifiers != ids {
-				return errInvalidIdentifiers
-			}
-
 			pb.UpdatedAt = time.Now().UTC()
-			sets = append(sets, "updated_at")
+			sets = append(append(make([]string, 0, 2+len(sets)),
+				"updated_at",
+			), sets...)
 
 			updated := &ttnpb.ApplicationWebhook{}
 			if stored == nil {
-				sets = append(sets, "ids")
+				if err := ttnpb.RequireFields(sets,
+					"ids.application_ids",
+					"ids.webhook_id",
+				); err != nil {
+					return errInvalidFieldmask.WithCause(err)
+				}
 
 				pb.CreatedAt = pb.UpdatedAt
 				sets = append(sets, "created_at")
@@ -163,16 +167,22 @@ func (r WebhookRegistry) Set(ctx context.Context, ids ttnpb.ApplicationWebhookId
 				if err != nil {
 					return err
 				}
+				if updated.ApplicationID != ids.ApplicationID || updated.WebhookID != ids.WebhookID {
+					return errInvalidIdentifiers
+				}
 			} else {
+				if err := ttnpb.ProhibitFields(sets,
+					"ids.application_ids",
+					"ids.webhook_id",
+				); err != nil {
+					return errInvalidFieldmask.WithCause(err)
+				}
 				if err := cmd.ScanProto(updated); err != nil {
 					return err
 				}
 				updated, err = applyWebhookFieldMask(updated, pb, sets...)
 				if err != nil {
 					return err
-				}
-				if stored.ApplicationWebhookIdentifiers != updated.ApplicationWebhookIdentifiers {
-					return errInvalidIdentifiers
 				}
 			}
 			if err := updated.ValidateFields(sets...); err != nil {

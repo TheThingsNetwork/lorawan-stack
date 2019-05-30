@@ -24,10 +24,10 @@ import (
 
 // appendImplicitWebhookGetPaths appends implicit ttnpb.ApplicationWebhook get paths to paths.
 func appendImplicitWebhookGetPaths(paths ...string) []string {
-	return append(paths,
+	return append(append(make([]string, 0, 2+len(paths)),
 		"base_url",
 		"format",
-	)
+	), paths...)
 }
 
 type webhookRegistryRPC struct {
@@ -75,18 +75,15 @@ func (s webhookRegistryRPC) Set(ctx context.Context, req *ttnpb.SetApplicationWe
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
 		return nil, err
 	}
-	gets := appendImplicitWebhookGetPaths(append(req.FieldMask.Paths[:0:0], req.FieldMask.Paths...)...)
-	return s.webhooks.Set(ctx, req.ApplicationWebhookIdentifiers, gets,
+	return s.webhooks.Set(ctx, req.ApplicationWebhookIdentifiers, appendImplicitWebhookGetPaths(req.FieldMask.Paths...),
 		func(webhook *ttnpb.ApplicationWebhook) (*ttnpb.ApplicationWebhook, []string, error) {
 			if webhook != nil {
 				return &req.ApplicationWebhook, req.FieldMask.Paths, nil
 			}
-
-			sets := append(req.FieldMask.Paths,
+			return &req.ApplicationWebhook, append(req.FieldMask.Paths,
 				"ids.application_ids",
 				"ids.webhook_id",
-			)
-			return &req.ApplicationWebhook, sets, nil
+			), nil
 		},
 	)
 }

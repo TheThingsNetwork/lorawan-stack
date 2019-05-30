@@ -141,7 +141,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		return nil, err
 	}
 
-	gets := append(req.FieldMask.Paths[:0:0], req.FieldMask.Paths...)
+	gets := req.FieldMask.Paths
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.device_class") {
 		gets = append(gets,
 			"mac_state.current_parameters",

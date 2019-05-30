@@ -36,11 +36,11 @@ var (
 
 // appendImplicitDeviceGetPaths appends implicit ttnpb.EndDevice get paths to paths.
 func appendImplicitDeviceGetPaths(paths ...string) []string {
-	return append(paths,
+	return append(append(make([]string, 0, 3+len(paths)),
 		"created_at",
 		"ids",
 		"updated_at",
-	)
+	), paths...)
 }
 
 func applyDeviceFieldMask(dst, src *ttnpb.EndDevice, paths ...string) (*ttnpb.EndDevice, error) {
@@ -214,7 +214,9 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 			}
 		} else {
 			pb.UpdatedAt = time.Now().UTC()
-			sets = append(sets, "updated_at")
+			sets = append(append(make([]string, 0, 2+len(sets)),
+				"updated_at",
+			), sets...)
 
 			updated := &ttnpb.EndDevice{}
 			if stored == nil {

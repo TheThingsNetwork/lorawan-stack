@@ -128,18 +128,16 @@ func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndD
 		return nil, errInvalidFieldValue.WithAttributes("field", "ids.dev_addr")
 	}
 
-	gets := append(req.FieldMask.Paths[:0:0], req.FieldMask.Paths...)
-	return srv.JS.devices.SetByID(ctx, req.EndDevice.ApplicationIdentifiers, req.EndDevice.DeviceID, gets, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+	return srv.JS.devices.SetByID(ctx, req.EndDevice.ApplicationIdentifiers, req.EndDevice.DeviceID, req.FieldMask.Paths, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		if dev != nil {
 			return &req.EndDevice, req.FieldMask.Paths, nil
 		}
-		sets := append(req.FieldMask.Paths,
+		return &req.EndDevice, append(req.FieldMask.Paths,
 			"ids.application_ids",
 			"ids.dev_eui",
 			"ids.device_id",
 			"ids.join_eui",
-		)
-		return &req.EndDevice, sets, nil
+		), nil
 	})
 }
 
