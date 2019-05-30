@@ -325,9 +325,9 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 					"full_f_cnt_up", pld.FCnt,
 				))
 				matched = append(matched, device{
+					matchedDevice: match,
 					fCntReset:     true,
 					gap:           gap,
-					matchedDevice: match,
 				})
 			}
 
@@ -344,8 +344,8 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 			match.NbTrans = 1
 			match.logger = logger
 			matched = append(matched, device{
-				gap:           gap,
 				matchedDevice: match,
+				gap:           gap,
 			})
 		}
 	}
