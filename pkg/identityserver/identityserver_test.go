@@ -298,6 +298,7 @@ func getIdentityServer(t *testing.T) (*IdentityServer, *grpc.ClientConn) {
 		DatabaseURI: dbConnString,
 	}
 	conf.UserRegistration.PasswordRequirements.MinLength = 10
+	conf.UserRegistration.PasswordRequirements.MaxLength = 1000
 	is, err := New(c, conf)
 	if err != nil {
 		panic(err)
