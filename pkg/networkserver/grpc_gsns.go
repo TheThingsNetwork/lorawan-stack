@@ -47,8 +47,11 @@ const (
 	// accumulationCapacity is the initial capacity of the accumulator.
 	accumulationCapacity = 20
 
-	// maxTransmissionDelay is the maximum delay between uplink retransmissions.
-	maxTransmissionDelay = 10 * time.Second
+	// retransmissionWindow is the maximum delay between Rx2 end and an uplink retransmission.
+	retransmissionWindow = 10 * time.Second
+
+	// maxConfNbTrans is the maximum number of confirmed uplink retransmissions for pre-1.0.3 devices.
+	maxConfNbTrans = 5
 )
 
 var (
@@ -107,12 +110,28 @@ func transmissionNumber(macPayload []byte, ups ...*ttnpb.UplinkMessage) (uint32,
 	return nb, lastTrans
 }
 
+func maxTransmissionNumber(ver ttnpb.MACVersion, confirmed bool, nbTrans uint32) uint32 {
+	if !confirmed {
+		return nbTrans
+	}
+	if ver.Compare(ttnpb.MAC_V1_0_3) < 0 {
+		return maxConfNbTrans
+	}
+	return nbTrans
+}
+
+func maxRetransmissionDelay(rxDelay ttnpb.RxDelay) time.Duration {
+	return rxDelay.Duration() + time.Second + retransmissionWindow
+}
+
 type matchedDevice struct {
 	Device   *ttnpb.EndDevice
+	FCnt     uint32
+	MACState *ttnpb.MACState
+	NbTrans  uint32
 	Pending  bool
 	Session  *ttnpb.Session
-	MACState *ttnpb.MACState
-	FCnt     uint32
+	logger   log.Interface
 }
 
 // matchDevice tries to match the uplink message with a device and returns the matched device.
@@ -182,7 +201,6 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 		matchedDevice
 		gap       uint32
 		fCntReset bool
-		logger    log.Interface
 	}
 	matched := make([]device, 0, len(addrMatches))
 
@@ -203,36 +221,47 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 			fCnt |= (match.Session.LastFCntUp + 0x10000) &^ 0xffff
 		}
 
+		maxNbTrans := maxTransmissionNumber(match.MACState.LoRaWANVersion, up.Payload.MType == ttnpb.MType_CONFIRMED_UP, match.MACState.CurrentParameters.ADRNbTrans)
 		logger := logger.WithFields(log.Fields(
 			"device_uid", unique.ID(ctx, match.Device.EndDeviceIdentifiers),
 			"last_f_cnt_up", match.Session.LastFCntUp,
 			"mac_version", match.MACState.LoRaWANVersion,
-			"nb_trans", match.MACState.CurrentParameters.ADRNbTrans,
+			"max_transmissions", maxNbTrans,
 			"pending_session", match.Pending,
 		))
 
 		switch {
 		case fCnt == match.Session.LastFCntUp:
-			trans, lastAt := transmissionNumber(macPayloadBytes, match.Device.RecentUplinks...)
-			if !lastAt.IsZero() {
-				logger = logger.WithField("last_transmission_at", lastAt)
-			}
-
+			nbTrans, lastAt := transmissionNumber(macPayloadBytes, match.Device.RecentUplinks...)
 			logger = logger.WithFields(log.Fields(
 				"f_cnt_gap", 0,
 				"full_f_cnt_up", match.Session.LastFCntUp,
-				"transmission", trans,
+				"transmission", nbTrans,
 			))
+			if !lastAt.IsZero() {
+				maxDelay := maxRetransmissionDelay(match.MACState.CurrentParameters.Rx1Delay)
+				delay := up.ReceivedAt.Sub(lastAt)
 
-			if trans > match.MACState.CurrentParameters.ADRNbTrans ||
-				!lastAt.IsZero() && up.ReceivedAt.Sub(lastAt) > match.MACState.CurrentParameters.Rx1Delay.Duration()+time.Second+maxTransmissionDelay {
-				logger.Debug("Possible replay attack or malfunctioning device, skip")
+				logger = logger.WithFields(log.Fields(
+					"last_transmission_at", lastAt,
+					"max_retransmission_delay", maxDelay,
+					"retransmission_delay", delay,
+				))
+
+				if delay > maxDelay {
+					logger.Error("Retransmission delay exceeds maximum, skip")
+					continue
+				}
+			}
+			if nbTrans > maxNbTrans {
+				logger.Error("Transmission number exceeds maximum, skip")
 				continue
 			}
 			match.FCnt = match.Session.LastFCntUp
+			match.NbTrans = nbTrans
+			match.logger = logger
 			matched = append(matched, device{
 				matchedDevice: match,
-				logger:        logger,
 			})
 
 		case fCnt < match.Session.LastFCntUp:
@@ -262,11 +291,12 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 				gap = math.MaxUint32
 			}
 			match.FCnt = pld.FCnt
+			match.NbTrans = 1
+			match.logger = logger.WithField("f_cnt_gap", gap)
 			matched = append(matched, device{
+				matchedDevice: match,
 				fCntReset:     true,
 				gap:           gap,
-				matchedDevice: match,
-				logger:        logger.WithField("f_cnt_gap", gap),
 			})
 
 		default:
@@ -289,14 +319,15 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 					gap = math.MaxUint32
 				}
 				match.FCnt = pld.FCnt
+				match.NbTrans = 1
+				match.logger = logger.WithFields(log.Fields(
+					"f_cnt_gap", gap,
+					"full_f_cnt_up", pld.FCnt,
+				))
 				matched = append(matched, device{
+					matchedDevice: match,
 					fCntReset:     true,
 					gap:           gap,
-					matchedDevice: match,
-					logger: logger.WithFields(log.Fields(
-						"f_cnt_gap", gap,
-						"full_f_cnt_up", pld.FCnt,
-					)),
 				})
 			}
 
@@ -310,10 +341,11 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 				continue
 			}
 			match.FCnt = fCnt
+			match.NbTrans = 1
+			match.logger = logger
 			matched = append(matched, device{
-				gap:           gap,
 				matchedDevice: match,
-				logger:        logger,
+				gap:           gap,
 			})
 		}
 	}
@@ -328,8 +360,8 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 	})
 
 	logger.WithField("device_count", len(matched)).Debug("Perform MIC checks on devices with matching frame counters")
-	for _, match := range matched {
-		logger := match.logger
+	for i, match := range matched {
+		logger := match.logger.WithField("match_attempt", i)
 
 		if pld.Ack {
 			if len(match.Device.RecentDownlinks) == 0 {
@@ -454,8 +486,8 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 		return errDeviceNotFound.WithCause(err)
 	}
 
-	logger = logger.WithField("device_uid", unique.ID(ctx, matched.Device.EndDeviceIdentifiers))
-	ctx = log.NewContext(ctx, logger)
+	logger = matched.logger
+	ctx = log.NewContext(ctx, matched.logger)
 
 	logger.Debug("Matched device")
 
@@ -498,46 +530,51 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 		}
 	}
 
-	macBuf := pld.FOpts
-	if len(macBuf) == 0 && pld.FPort == 0 {
-		macBuf = pld.FRMPayload
-	}
-
-	if len(macBuf) > 0 && (len(pld.FOpts) == 0 || matched.MACState != nil && matched.MACState.LoRaWANVersion.EncryptFOpts()) {
-		if matched.Session.NwkSEncKey == nil || len(matched.Session.NwkSEncKey.Key) == 0 {
-			return errUnknownNwkSEncKey
-		}
-		key, err := cryptoutil.UnwrapAES128Key(*matched.Session.NwkSEncKey, ns.KeyVault)
-		if err != nil {
-			logger.WithField("kek_label", matched.Session.NwkSEncKey.KEKLabel).WithError(err).Warn("Failed to unwrap NwkSEncKey")
-			return err
-		}
-
-		macBuf, err = crypto.DecryptUplink(key, pld.DevAddr, pld.FCnt, macBuf)
-		if err != nil {
-			return errDecrypt.WithCause(err)
-		}
-	}
-
-	_, phy, err := getDeviceBandVersion(matched.Device, ns.FrequencyPlans)
-	if err != nil {
-		return errUnknownBand.WithCause(err)
-	}
 	var cmds []*ttnpb.MACCommand
-	for r := bytes.NewReader(macBuf); r.Len() > 0; {
-		cmd := &ttnpb.MACCommand{}
-		if err := lorawan.DefaultMACCommands.ReadUplink(phy, r, cmd); err != nil {
-			logger.WithFields(log.Fields(
-				"bytes_left", r.Len(),
-				"mac_count", len(cmds),
-			)).WithError(err).Warn("Failed to unmarshal MAC command")
-			break
+	if matched.NbTrans != 1 {
+		logger.Debug("Skip decoding MAC command buffer for uplink retransmission")
+	} else {
+		macBuf := pld.FOpts
+		if len(macBuf) == 0 && pld.FPort == 0 {
+			macBuf = pld.FRMPayload
 		}
-		logger.WithField("cid", cmd.CID).Debug("Read MAC command")
-		cmds = append(cmds, cmd)
+
+		if len(macBuf) > 0 && (len(pld.FOpts) == 0 || matched.MACState != nil && matched.MACState.LoRaWANVersion.EncryptFOpts()) {
+			if matched.Session.NwkSEncKey == nil || len(matched.Session.NwkSEncKey.Key) == 0 {
+				return errUnknownNwkSEncKey
+			}
+			key, err := cryptoutil.UnwrapAES128Key(*matched.Session.NwkSEncKey, ns.KeyVault)
+			if err != nil {
+				logger.WithField("kek_label", matched.Session.NwkSEncKey.KEKLabel).WithError(err).Warn("Failed to unwrap NwkSEncKey")
+				return err
+			}
+
+			macBuf, err = crypto.DecryptUplink(key, pld.DevAddr, pld.FCnt, macBuf)
+			if err != nil {
+				return errDecrypt.WithCause(err)
+			}
+		}
+
+		_, phy, err := getDeviceBandVersion(matched.Device, ns.FrequencyPlans)
+		if err != nil {
+			return errUnknownBand.WithCause(err)
+		}
+
+		for r := bytes.NewReader(macBuf); r.Len() > 0; {
+			cmd := &ttnpb.MACCommand{}
+			if err := lorawan.DefaultMACCommands.ReadUplink(phy, r, cmd); err != nil {
+				logger.WithFields(log.Fields(
+					"bytes_left", r.Len(),
+					"mac_count", len(cmds),
+				)).WithError(err).Warn("Failed to unmarshal MAC command")
+				break
+			}
+			logger.WithField("cid", cmd.CID).Debug("Read MAC command")
+			cmds = append(cmds, cmd)
+		}
+		logger = logger.WithField("mac_count", len(cmds))
+		ctx = log.NewContext(ctx, logger)
 	}
-	logger = logger.WithField("mac_count", len(cmds))
-	ctx = log.NewContext(ctx, logger)
 
 	select {
 	case <-ctx.Done():
@@ -633,16 +670,35 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 
 			var lastAt time.Time
 			nbTrans, lastAt = transmissionNumber(up.RawPayload[:len(up.RawPayload)-4], stored.RecentUplinks...)
-			if nbTrans > stored.MACState.CurrentParameters.ADRNbTrans ||
-				!lastAt.IsZero() && up.ReceivedAt.Sub(lastAt) > stored.MACState.CurrentParameters.Rx1Delay.Duration()+time.Second+maxTransmissionDelay {
-				logger.Warn("A more recent uplink retransmission was received during uplink handling, drop")
+			if !lastAt.IsZero() {
+				maxDelay := maxRetransmissionDelay(stored.MACState.CurrentParameters.Rx1Delay)
+				delay := up.ReceivedAt.Sub(lastAt)
+
+				if delay > maxDelay {
+					logger.WithFields(log.Fields(
+						"last_transmission_at", lastAt,
+						"max_retransmission_delay", maxDelay,
+						"retransmission_delay", delay,
+					)).Error("A more recent uplink retransmission made current retransmission delay exceed maximum, drop")
+					return nil, nil, errOutdatedData
+				}
+			}
+			maxNbTrans := maxTransmissionNumber(stored.MACState.LoRaWANVersion, up.Payload.MType == ttnpb.MType_CONFIRMED_UP, stored.MACState.CurrentParameters.ADRNbTrans)
+			if nbTrans > maxNbTrans {
+				logger.WithFields(log.Fields(
+					"last_transmission_at", lastAt,
+					"transmission", nbTrans,
+					"max_transmissions", maxNbTrans,
+				)).Warn("A more recent uplink retransmission made current transmission number exceed maximum, drop")
 				return nil, nil, errOutdatedData
 			}
 
 			stored.RecentUplinks = appendRecentUplink(stored.RecentUplinks, up, recentUplinkCount)
 			paths = append(paths, "recent_uplinks")
 
-			if nbTrans == 1 {
+			if nbTrans != 1 {
+				logger.Debug("Skip handling MAC commands for uplink retransmission")
+			} else {
 				stored.MACState.QueuedResponses = stored.MACState.QueuedResponses[:0]
 			outer:
 				for len(cmds) > 0 {
@@ -659,7 +715,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 						pld := cmd.GetLinkADRAns()
 						dupCount := 0
 						if stored.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_2) >= 0 && stored.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
-							logger.Debug("Count duplicates")
+							logger.Debug("Count LinkADR duplicates")
 							for _, dup := range cmds {
 								if dup.CID != ttnpb.CID_LINK_ADR {
 									break
@@ -670,7 +726,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 								}
 								dupCount++
 							}
-							logger.WithField("duplicate_count", dupCount).Debug("Counted duplicates")
+							logger.WithField("duplicate_count", dupCount).Debug("Counted LinkADR duplicates")
 						}
 						if err != nil {
 							break
