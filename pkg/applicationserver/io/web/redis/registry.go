@@ -139,13 +139,17 @@ func (r WebhookRegistry) Set(ctx context.Context, ids ttnpb.ApplicationWebhookId
 		}
 
 		var pipelined func(redis.Pipeliner) error
-		if pb == nil {
+		if pb == nil && len(sets) == 0 {
 			pipelined = func(p redis.Pipeliner) error {
 				p.Del(ik)
 				p.SRem(r.appKey(appUID), stored.WebhookID)
 				return nil
 			}
 		} else {
+			if pb == nil {
+				pb = &ttnpb.ApplicationWebhook{}
+			}
+
 			pb.UpdatedAt = time.Now().UTC()
 			sets = append(append(sets[:0:0], sets...),
 				"updated_at",

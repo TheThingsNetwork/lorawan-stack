@@ -132,7 +132,7 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 		}
 
 		var pipelined func(redis.Pipeliner) error
-		if pb == nil {
+		if pb == nil && len(sets) == 0 {
 			pipelined = func(p redis.Pipeliner) error {
 				p.Del(uk)
 				if stored.JoinEUI != nil && stored.DevEUI != nil {
@@ -141,6 +141,10 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 				return nil
 			}
 		} else {
+			if pb == nil {
+				pb = &ttnpb.EndDevice{}
+			}
+
 			if pb.ApplicationIdentifiers != ids.ApplicationIdentifiers || pb.DeviceID != ids.DeviceID {
 				return errInvalidIdentifiers
 			}
@@ -337,13 +341,17 @@ func (r *LinkRegistry) Set(ctx context.Context, ids ttnpb.ApplicationIdentifiers
 		}
 
 		var pipelined func(redis.Pipeliner) error
-		if pb == nil {
+		if pb == nil && len(sets) == 0 {
 			pipelined = func(p redis.Pipeliner) error {
 				p.Del(uk)
 				p.SRem(r.allKey(), uid)
 				return nil
 			}
 		} else {
+			if pb == nil {
+				pb = &ttnpb.ApplicationLink{}
+			}
+
 			updated := &ttnpb.ApplicationLink{}
 			if stored != nil {
 				if err := cmd.ScanProto(updated); err != nil {
