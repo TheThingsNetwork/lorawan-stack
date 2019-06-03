@@ -1723,16 +1723,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}()
 				}
 
-				var setErr error
 				select {
 				case <-ctx.Done():
 					t.Error("Timed out while waiting for DeviceRegistry.SetByID callback to return")
 
 				case resp := <-setFuncRespCh:
-					setErr = resp.Error
-					a.So(resp.Error, should.NotBeNil)
+					a.So(resp.Error, should.BeNil)
 					a.So(resp.Paths, should.BeNil)
-					a.So(resp.Device, should.BeNil)
+					a.So(resp.Device, should.NotBeNil)
 				}
 				close(setFuncRespCh)
 
@@ -1740,9 +1738,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				case <-ctx.Done():
 					t.Error("Timed out while waiting for DeviceRegistry.SetByID response to be processed")
 
-				case setRespCh <- DeviceRegistrySetByIDResponse{
-					Error: setErr,
-				}:
+				case setRespCh <- DeviceRegistrySetByIDResponse{}:
 				}
 
 				if !AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(reqCtx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time, replace bool) bool {
@@ -1904,16 +1900,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}()
 				}
 
-				var setErr error
 				select {
 				case <-ctx.Done():
 					t.Error("Timed out while waiting for DeviceRegistry.SetByID callback to return")
 
 				case resp := <-setFuncRespCh:
-					setErr = resp.Error
-					a.So(resp.Error, should.NotBeNil)
+					a.So(resp.Error, should.BeNil)
 					a.So(resp.Paths, should.BeNil)
-					a.So(resp.Device, should.BeNil)
+					a.So(resp.Device, should.NotBeNil)
 				}
 				close(setFuncRespCh)
 
@@ -1921,9 +1915,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				case <-ctx.Done():
 					t.Error("Timed out while waiting for DeviceRegistry.SetByID response to be processed")
 
-				case setRespCh <- DeviceRegistrySetByIDResponse{
-					Error: setErr,
-				}:
+				case setRespCh <- DeviceRegistrySetByIDResponse{}:
 				}
 
 				select {

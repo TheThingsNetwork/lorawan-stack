@@ -395,9 +395,6 @@ func TestDeviceRegistrySet(t *testing.T) {
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
 				EndDevice: deepcopy.Copy(*registeredDevice).(ttnpb.EndDevice),
-				FieldMask: pbtypes.FieldMask{
-					Paths: []string{"ids"},
-				},
 			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 				test.MustTFromContext(ctx).Errorf("SetByIDFunc must not be called")
@@ -430,9 +427,6 @@ func TestDeviceRegistrySet(t *testing.T) {
 						DevEUI:   registeredDevEUI,
 					},
 				},
-				FieldMask: pbtypes.FieldMask{
-					Paths: []string{"ids"},
-				},
 			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 				test.MustTFromContext(ctx).Errorf("SetByIDFunc must not be called")
@@ -464,9 +458,6 @@ func TestDeviceRegistrySet(t *testing.T) {
 						DeviceID: registeredDeviceID,
 						JoinEUI:  registeredJoinEUI,
 					},
-				},
-				FieldMask: pbtypes.FieldMask{
-					Paths: []string{"ids"},
 				},
 			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
@@ -501,18 +492,21 @@ func TestDeviceRegistrySet(t *testing.T) {
 						DevEUI:   unregisteredDevEUI,
 					},
 				},
-				FieldMask: pbtypes.FieldMask{
-					Paths: []string{"ids"},
-				},
 			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{
 					ApplicationID: registeredApplicationID,
 				})
 				a.So(devID, should.Equal, "new-device")
-				a.So(paths, should.HaveSameElementsDeep, []string{"ids"})
-				dev, _, err := cb(nil)
+				a.So(gets, should.BeEmpty)
+				dev, sets, err := cb(nil)
+				a.So(sets, should.HaveSameElementsDeep, []string{
+					"ids.application_ids",
+					"ids.dev_eui",
+					"ids.device_id",
+					"ids.join_eui",
+				})
 				return dev, err
 			},
 			DeviceAssertion: func(t *testing.T, dev *ttnpb.EndDevice) bool {
@@ -545,17 +539,22 @@ func TestDeviceRegistrySet(t *testing.T) {
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
 				EndDevice: deepcopy.Copy(*registeredDevice).(ttnpb.EndDevice),
 				FieldMask: pbtypes.FieldMask{
-					Paths: []string{"ids"},
+					Paths: []string{"net_id"},
 				},
 			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{
 					ApplicationID: registeredApplicationID,
 				})
 				a.So(devID, should.Equal, registeredDeviceID)
-				a.So(paths, should.HaveSameElementsDeep, []string{"ids"})
-				dev, _, err := cb(deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice))
+				a.So(gets, should.HaveSameElementsDeep, []string{
+					"net_id",
+				})
+				dev, sets, err := cb(deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice))
+				a.So(sets, should.HaveSameElementsDeep, []string{
+					"net_id",
+				})
 				return dev, err
 			},
 			SetByIDCalls: 1,
@@ -575,7 +574,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
 				EndDevice: deepcopy.Copy(*registeredDevice).(ttnpb.EndDevice),
 				FieldMask: pbtypes.FieldMask{
-					Paths: []string{"ids", "root_keys"},
+					Paths: []string{"root_keys"},
 				},
 			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
@@ -603,17 +602,22 @@ func TestDeviceRegistrySet(t *testing.T) {
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
 				EndDevice: deepcopy.Copy(*registeredDevice).(ttnpb.EndDevice),
 				FieldMask: pbtypes.FieldMask{
-					Paths: []string{"ids", "root_keys"},
+					Paths: []string{"root_keys"},
 				},
 			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{
 					ApplicationID: registeredApplicationID,
 				})
 				a.So(devID, should.Equal, registeredDeviceID)
-				a.So(paths, should.HaveSameElementsDeep, []string{"ids", "root_keys"})
-				dev, _, err := cb(deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice))
+				a.So(gets, should.HaveSameElementsDeep, []string{
+					"root_keys",
+				})
+				dev, sets, err := cb(deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice))
+				a.So(sets, should.HaveSameElementsDeep, []string{
+					"root_keys",
+				})
 				return dev, err
 			},
 			SetByIDCalls: 1,

@@ -706,7 +706,6 @@ const downlinkRetryInterval = time.Second
 func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 	var setErr bool
 	var addErr bool
-	var handleErr bool
 	err := ns.downlinkTasks.Pop(ctx, func(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time) error {
 		logger := log.FromContext(ctx).WithFields(log.Fields(
 			"device_uid", unique.ID(ctx, devID),
@@ -750,54 +749,74 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					case errors.Resemble(err, errUplinkNotFound):
 						logger.Warn("Uplink preceding downlink not found, skip downlink slot")
 						nextDownlinkAt = time.Time{}
-						handleErr = true
+						setDev = dev
+						sets = nil
+						err = nil
 
 					case errors.Resemble(err, errInvalidChannelIndex):
 						logger.Warn("Invalid channel index in preceding uplink, skip downlink slot")
 						nextDownlinkAt = time.Time{}
-						handleErr = true
+						setDev = dev
+						sets = nil
+						err = nil
 
 					case errors.Resemble(err, errNoPath):
 						logger.Warn("No downlink path available, skip downlink slot")
 						nextDownlinkAt = time.Time{}
-						handleErr = true
+						setDev = dev
+						sets = nil
+						err = nil
 
 					case errors.Resemble(err, errCorruptedMACState):
 						logger.Warn("Corrupted MAC state, skip downlink slot")
 						nextDownlinkAt = time.Time{}
-						handleErr = true
+						setDev = dev
+						sets = nil
+						err = nil
 
 					case errors.Resemble(err, errUnknownMACState):
 						logger.Warn("Unknown MAC state, skip downlink slot")
 						nextDownlinkAt = time.Time{}
-						handleErr = true
+						setDev = dev
+						sets = nil
+						err = nil
 
 					case errors.Resemble(err, errNoDownlink):
 						logger.Debug("No downlink to send, skip downlink slot")
 						nextDownlinkAt = time.Time{}
-						handleErr = true
+						setDev = dev
+						sets = nil
+						err = nil
 
 					case errors.Resemble(err, errScheduleTooSoon):
 						logger.Debug("Downlink scheduled too soon, skip downlink slot")
 						if nextDownlinkAt.IsZero() {
 							nextDownlinkAt = time.Now().Add(gsScheduleWindow)
 						}
-						handleErr = true
+						setDev = dev
+						sets = nil
+						err = nil
 
 					case errors.Resemble(err, errScheduleTooLate):
 						logger.Debug("Downlink scheduled too late, retry downlink slot")
 						nextDownlinkAt = time.Now()
-						handleErr = true
+						setDev = dev
+						sets = nil
+						err = nil
 
 					case errors.Resemble(err, errConfirmedDownlinkTooSoon):
 						logger.Debug("Confirmed downlink scheduled too soon, skip downlink slot")
 						nextDownlinkAt = dev.MACState.LastConfirmedDownlinkAt.Add(deviceClassCTimeout(dev, ns.defaultMACSettings))
-						handleErr = true
+						setDev = dev
+						sets = nil
+						err = nil
 
 					case errors.Resemble(err, errSchedule):
 						// NOTE: The error is already logged.
 						nextDownlinkAt = time.Now().Add(downlinkRetryInterval)
-						handleErr = true
+						setDev = dev
+						sets = nil
+						err = nil
 					}
 				}()
 
@@ -1153,7 +1172,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 				}
 			}
 		}()
-		if err != nil && !handleErr {
+		if err != nil {
 			setErr = true
 			logger.WithError(err).Warn("Failed to update device in registry")
 			return err

@@ -250,9 +250,9 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 	}
 	_, err = as.deviceRegistry.Set(ctx, ids,
 		[]string{
-			"session",
-			"pending_session",
 			"formatters",
+			"pending_session",
+			"session",
 			"version_ids",
 		},
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
@@ -446,8 +446,8 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 	))
 	_, err := as.deviceRegistry.Set(ctx, ids,
 		[]string{
-			"session",
 			"pending_session",
+			"session",
 		},
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			var mask []string
@@ -503,9 +503,9 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 	logger := log.FromContext(ctx)
 	dev, err := as.deviceRegistry.Set(ctx, ids,
 		[]string{
-			"session",
-			"pending_session",
 			"formatters",
+			"pending_session",
+			"session",
 			"version_ids",
 		},
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
@@ -532,7 +532,8 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 						},
 						StartedAt: time.Now().UTC(),
 					}
-					mask = append(mask, "session")
+					dev.DevAddr = ids.DevAddr
+					mask = append(mask, "session", "ids.dev_addr")
 					logger.Debug("Restored session")
 				}
 				dev.PendingSession = nil

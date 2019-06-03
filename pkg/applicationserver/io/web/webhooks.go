@@ -281,16 +281,16 @@ func (w *webhooks) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error
 	hooks, err := w.registry.List(ctx, msg.ApplicationIdentifiers,
 		[]string{
 			"base_url",
-			"headers",
-			"format",
-			"uplink_message",
-			"join_accept",
 			"downlink_ack",
-			"downlink_nack",
-			"downlink_sent",
 			"downlink_failed",
+			"downlink_nack",
 			"downlink_queued",
+			"downlink_sent",
+			"format",
+			"headers",
+			"join_accept",
 			"location_solved",
+			"uplink_message",
 		},
 	)
 	if err != nil {

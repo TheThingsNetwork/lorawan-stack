@@ -427,7 +427,8 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 				DevAddr:     req.DevAddr,
 				SessionKeys: res.SessionKeys,
 			}
-			paths = append(paths, "session")
+			dev.EndDeviceIdentifiers.DevAddr = &req.DevAddr
+			paths = append(paths, "session", "ids.dev_addr")
 
 			return dev, paths, nil
 		})

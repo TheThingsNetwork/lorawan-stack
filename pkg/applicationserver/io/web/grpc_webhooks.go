@@ -22,6 +22,14 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
+// appendImplicitWebhookGetPaths appends implicit ttnpb.ApplicationWebhook get paths to paths.
+func appendImplicitWebhookGetPaths(paths ...string) []string {
+	return append(append(make([]string, 0, 2+len(paths)),
+		"base_url",
+		"format",
+	), paths...)
+}
+
 type webhookRegistryRPC struct {
 	webhooks WebhookRegistry
 }
@@ -47,14 +55,14 @@ func (s webhookRegistryRPC) Get(ctx context.Context, req *ttnpb.GetApplicationWe
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
 		return nil, err
 	}
-	return s.webhooks.Get(ctx, req.ApplicationWebhookIdentifiers, req.FieldMask.Paths)
+	return s.webhooks.Get(ctx, req.ApplicationWebhookIdentifiers, appendImplicitWebhookGetPaths(req.FieldMask.Paths...))
 }
 
 func (s webhookRegistryRPC) List(ctx context.Context, req *ttnpb.ListApplicationWebhooksRequest) (*ttnpb.ApplicationWebhooks, error) {
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
 		return nil, err
 	}
-	webhooks, err := s.webhooks.List(ctx, req.ApplicationIdentifiers, req.FieldMask.Paths)
+	webhooks, err := s.webhooks.List(ctx, req.ApplicationIdentifiers, appendImplicitWebhookGetPaths(req.FieldMask.Paths...))
 	if err != nil {
 		return nil, err
 	}
@@ -67,9 +75,15 @@ func (s webhookRegistryRPC) Set(ctx context.Context, req *ttnpb.SetApplicationWe
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
 		return nil, err
 	}
-	return s.webhooks.Set(ctx, req.ApplicationWebhookIdentifiers, req.FieldMask.Paths,
+	return s.webhooks.Set(ctx, req.ApplicationWebhookIdentifiers, appendImplicitWebhookGetPaths(req.FieldMask.Paths...),
 		func(webhook *ttnpb.ApplicationWebhook) (*ttnpb.ApplicationWebhook, []string, error) {
-			return &req.ApplicationWebhook, req.FieldMask.Paths, nil
+			if webhook != nil {
+				return &req.ApplicationWebhook, req.FieldMask.Paths, nil
+			}
+			return &req.ApplicationWebhook, append(req.FieldMask.Paths,
+				"ids.application_ids",
+				"ids.webhook_id",
+			), nil
 		},
 	)
 }

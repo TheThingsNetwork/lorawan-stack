@@ -28,9 +28,19 @@ import (
 )
 
 var (
+	errInvalidFieldmask     = errors.DefineInvalidArgument("invalid_fieldmask", "invalid fieldmask")
 	errInvalidIdentifiers   = errors.DefineInvalidArgument("invalid_identifiers", "invalid identifiers")
 	errDuplicateIdentifiers = errors.DefineAlreadyExists("duplicate_identifiers", "duplicate identifiers")
 )
+
+// appendImplicitDeviceGetPaths appends implicit ttnpb.EndDevice get paths to paths.
+func appendImplicitDeviceGetPaths(paths ...string) []string {
+	return append(append(make([]string, 0, 3+len(paths)),
+		"created_at",
+		"ids",
+		"updated_at",
+	), paths...)
+}
 
 func applyDeviceFieldMask(dst, src *ttnpb.EndDevice, paths ...string) (*ttnpb.EndDevice, error) {
 	if dst == nil {
@@ -64,17 +74,7 @@ func (r *DeviceRegistry) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 	if err := ttnredis.GetProto(r.Redis, r.uidKey(unique.ID(ctx, ids))).ScanProto(pb); err != nil {
 		return nil, err
 	}
-	return applyDeviceFieldMask(nil, pb, append(paths,
-		"ids.application_ids",
-		"ids.device_id",
-	)...)
-}
-
-func equalEUI(x, y *types.EUI64) bool {
-	if x == nil || y == nil {
-		return x == y
-	}
-	return x.Equal(*y)
+	return applyDeviceFieldMask(nil, pb, appendImplicitDeviceGetPaths(paths...)...)
 }
 
 // Set creates, updates or deletes the end device by its identifiers.
@@ -97,12 +97,7 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 			return err
 		}
 
-		gets = append(gets,
-			"created_at",
-			"ids.application_ids",
-			"ids.device_id",
-			"updated_at",
-		)
+		gets = appendImplicitDeviceGetPaths(gets...)
 
 		var err error
 		if stored != nil {
@@ -121,8 +116,19 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 		if err != nil {
 			return err
 		}
+		if err := ttnpb.ProhibitFields(sets,
+			"created_at",
+			"updated_at",
+		); err != nil {
+			return errInvalidFieldmask.WithCause(err)
+		}
+
 		if stored == nil && pb == nil {
 			return nil
+		}
+		if pb != nil && len(sets) == 0 {
+			pb, err = applyDeviceFieldMask(nil, stored, gets...)
+			return err
 		}
 
 		var pipelined func(redis.Pipeliner) error
@@ -140,14 +146,18 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 			}
 
 			pb.UpdatedAt = time.Now().UTC()
-			sets = append(sets, "updated_at")
+			sets = append(append(sets[:0:0], sets...),
+				"updated_at",
+			)
 
 			updated := &ttnpb.EndDevice{}
 			if stored == nil {
-				sets = append(sets,
+				if err := ttnpb.RequireFields(sets,
 					"ids.application_ids",
 					"ids.device_id",
-				)
+				); err != nil {
+					return errInvalidFieldmask.WithCause(err)
+				}
 
 				pb.CreatedAt = pb.UpdatedAt
 				sets = append(sets, "created_at")
@@ -156,17 +166,25 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 				if err != nil {
 					return err
 				}
+				if updated.ApplicationIdentifiers != ids.ApplicationIdentifiers || updated.DeviceID != ids.DeviceID {
+					return errInvalidIdentifiers
+				}
 			} else {
+				if err := ttnpb.ProhibitFields(sets,
+					"ids.application_ids",
+					"ids.dev_eui",
+					"ids.device_id",
+					"ids.join_eui",
+				); err != nil {
+					return errInvalidFieldmask.WithCause(err)
+				}
+
 				if err := cmd.ScanProto(updated); err != nil {
 					return err
 				}
 				updated, err = applyDeviceFieldMask(updated, pb, sets...)
 				if err != nil {
 					return err
-				}
-				if !equalEUI(stored.JoinEUI, updated.JoinEUI) || !equalEUI(stored.DevEUI, updated.DevEUI) ||
-					stored.ApplicationIdentifiers != updated.ApplicationIdentifiers || stored.DeviceID != updated.DeviceID {
-					return errInvalidIdentifiers
 				}
 			}
 			if err := updated.ValidateFields(sets...); err != nil {
@@ -312,6 +330,10 @@ func (r *LinkRegistry) Set(ctx context.Context, ids ttnpb.ApplicationIdentifiers
 		}
 		if stored == nil && pb == nil {
 			return nil
+		}
+		if pb != nil && len(sets) == 0 {
+			pb, err = applyLinkFieldMask(nil, stored, gets...)
+			return err
 		}
 
 		var pipelined func(redis.Pipeliner) error
