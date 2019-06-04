@@ -41,6 +41,12 @@ type Server interface {
 	DownlinkQueueList(context.Context, ttnpb.EndDeviceIdentifiers) ([]*ttnpb.ApplicationDownlink, error)
 }
 
+// ContextApplicationUp represents an ttnpb.ApplicationUp with an attached context.
+type ContextApplicationUp struct {
+	context.Context
+	*ttnpb.ApplicationUp
+}
+
 // Subscription is a subscription to an application or integration managed by a frontend.
 type Subscription struct {
 	ctx       context.Context
@@ -49,7 +55,7 @@ type Subscription struct {
 	protocol string
 	ids      *ttnpb.ApplicationIdentifiers
 
-	upCh chan *ttnpb.ApplicationUp
+	upCh chan ContextApplicationUp
 }
 
 // NewSubscription instantiates a new application or integration subscription.
@@ -60,7 +66,7 @@ func NewSubscription(ctx context.Context, protocol string, ids *ttnpb.Applicatio
 		cancelCtx: cancelCtx,
 		protocol:  protocol,
 		ids:       ids,
-		upCh:      make(chan *ttnpb.ApplicationUp, bufferSize),
+		upCh:      make(chan ContextApplicationUp, bufferSize),
 	}
 }
 
@@ -82,11 +88,14 @@ var errBufferFull = errors.DefineResourceExhausted("buffer_full", "buffer is ful
 
 // SendUp sends an upstream message.
 // This method returns immediately, returning nil if the message is buffered, or with an error when the buffer is full.
-func (s *Subscription) SendUp(up *ttnpb.ApplicationUp) error {
+func (s *Subscription) SendUp(ctx context.Context, up *ttnpb.ApplicationUp) error {
 	select {
 	case <-s.ctx.Done():
 		return s.ctx.Err()
-	case s.upCh <- up:
+	case s.upCh <- ContextApplicationUp{
+		Context:       ctx,
+		ApplicationUp: up,
+	}:
 	default:
 		return errBufferFull
 	}
@@ -94,7 +103,7 @@ func (s *Subscription) SendUp(up *ttnpb.ApplicationUp) error {
 }
 
 // Up returns the upstream channel.
-func (s *Subscription) Up() <-chan *ttnpb.ApplicationUp {
+func (s *Subscription) Up() <-chan ContextApplicationUp {
 	return s.upCh
 }
 
