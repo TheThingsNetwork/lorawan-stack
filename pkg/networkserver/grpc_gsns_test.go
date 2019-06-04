@@ -1739,6 +1739,7 @@ func handleJoinTest() func(t *testing.T) {
 						DeviceID:               DeviceID,
 					},
 					FrequencyPlanID: test.EUFrequencyPlanID,
+					SupportsJoin:    true,
 				},
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
@@ -1768,6 +1769,7 @@ func handleJoinTest() func(t *testing.T) {
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					PendingSession:  ttnpb.NewPopulatedSession(test.Randy, false),
 					PendingMACState: ttnpb.NewPopulatedMACState(test.Randy, false),
+					SupportsJoin:    true,
 				},
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
@@ -1797,6 +1799,7 @@ func handleJoinTest() func(t *testing.T) {
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					PendingSession:  ttnpb.NewPopulatedSession(test.Randy, false),
 					PendingMACState: ttnpb.NewPopulatedMACState(test.Randy, false),
+					SupportsJoin:    true,
 				},
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
@@ -1826,6 +1829,7 @@ func handleJoinTest() func(t *testing.T) {
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					PendingSession:  ttnpb.NewPopulatedSession(test.Randy, false),
 					PendingMACState: ttnpb.NewPopulatedMACState(test.Randy, false),
+					SupportsJoin:    true,
 				},
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
@@ -1855,6 +1859,7 @@ func handleJoinTest() func(t *testing.T) {
 					FrequencyPlanID: test.EUFrequencyPlanID,
 					PendingSession:  ttnpb.NewPopulatedSession(test.Randy, false),
 					PendingMACState: ttnpb.NewPopulatedMACState(test.Randy, false),
+					SupportsJoin:    true,
 				},
 				func() *ttnpb.UplinkMessage {
 					msg := ttnpb.NewPopulatedUplinkMessageJoinRequest(test.Randy)
@@ -1892,6 +1897,7 @@ func handleJoinTest() func(t *testing.T) {
 						"mac_state",
 						"pending_session",
 						"session",
+						"supports_join",
 					}...); err != nil {
 						t.Fatalf("Failed to set fields: %s", err)
 					}
@@ -1910,6 +1916,7 @@ func handleJoinTest() func(t *testing.T) {
 							"mac_state",
 							"pending_session",
 							"session",
+							"supports_join",
 							"updated_at",
 						},
 						func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
@@ -1928,6 +1935,7 @@ func handleJoinTest() func(t *testing.T) {
 								"mac_state",
 								"pending_session",
 								"session",
+								"supports_join",
 							}, nil
 						})
 					if !a.So(err, should.BeNil) || !a.So(ret, should.NotBeNil) {
@@ -2046,6 +2054,7 @@ func handleJoinTest() func(t *testing.T) {
 						"recent_downlinks",
 						"session",
 						"updated_at",
+						"supports_join",
 					},
 					func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 						if !a.So(stored, should.BeNil) {
@@ -2066,6 +2075,7 @@ func handleJoinTest() func(t *testing.T) {
 							"pending_session",
 							"recent_downlinks",
 							"session",
+							"supports_join",
 						}, nil
 					})
 				if !a.So(err, should.BeNil) || !a.So(ret, should.NotBeNil) {

@@ -892,6 +892,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 			"lorawan_version",
 			"mac_settings",
 			"session",
+			"supports_join",
 		},
 	)
 	if err != nil {
@@ -907,6 +908,12 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 	}(dev)
 
 	logger = logger.WithField("device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers))
+
+	if !dev.SupportsJoin {
+		logger.Warn("ABP device sent a join-request, drop")
+		return errABPJoinRequest
+	}
+
 	ctx = log.NewContext(ctx, logger)
 
 	devAddr := ns.newDevAddr(ctx, dev)
