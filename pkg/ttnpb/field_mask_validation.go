@@ -471,8 +471,6 @@ var AllowedFieldMaskPathsForRPC = map[string][]string{
 		"version_ids.model_id",
 	},
 	"/ttn.lorawan.v3.NsEndDeviceRegistry/Set": {
-		"battery_percentage",
-		"downlink_margin",
 		"frequency_plan_id",
 		"ids",
 		"ids.application_ids",
@@ -517,7 +515,6 @@ var AllowedFieldMaskPathsForRPC = map[string][]string{
 		"mac_state.ping_slot_periodicity",
 		"max_frequency",
 		"min_frequency",
-		"power_state",
 		"session.dev_addr",
 		"session.keys.f_nwk_s_int_key",
 		"session.keys.f_nwk_s_int_key.key",
