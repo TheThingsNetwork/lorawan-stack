@@ -10211,15 +10211,15 @@ reduce-function-call@^1.0.1:
   dependencies:
     balanced-match "^0.4.2"
 
-redux-logic@^0.15.0:
-  version "0.15.5"
-  resolved "https://registry.yarnpkg.com/redux-logic/-/redux-logic-0.15.5.tgz#29b5e4869885452dc624f2ab19b60733f5b18ace"
-  integrity sha512-npPm4bRlKh9UssE1zzgelRjGzOscFc4a/bdx7i55w9ORDJ36Xh7XTcJFSx9bwB8Odfs7g3mGiCWgteiH29Nr+w==
+redux-logic@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/redux-logic/-/redux-logic-2.1.1.tgz#a6094941584d252bc90a19815329677fb4710c0b"
+  integrity sha512-A9vgtXbfY4QC+ycJV8F1DzYTamXqODt68wM0LBZXANzvVUZ+8DXDBsTgWk9+dMs14hL5bwCplGRFDxvPOJZP+Q==
   dependencies:
+    core-js "^2.5.7"
     is-promise "^2.1.0"
-    loose-envify "^1.2.0"
-    rxjs "^5.5.11"
-    symbol-observable "^1.2.0"
+    loose-envify "^1.4.0"
+    rxjs "^6.3.1"
 
 redux-seamless-immutable@^0.4.0:
   version "0.4.0"
@@ -10616,7 +10616,7 @@ rx-lite@*, rx-lite@^4.0.8:
   resolved "https://registry.yarnpkg.com/rx-lite/-/rx-lite-4.0.8.tgz#0b1e11af8bc44836f04a6407e92da42467b79444"
   integrity sha1-Cx4Rr4vESDbwSmQH6S2kJGe3lEQ=
 
-rxjs@^5.5.11, rxjs@^5.5.2:
+rxjs@^5.5.2:
   version "5.5.12"
   resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-5.5.12.tgz#6fa61b8a77c3d793dbaf270bee2f43f652d741cc"
   integrity sha512-xx2itnL5sBbqeeiVgNPVuQQ1nC8Jp2WfNJhXWHmElW9YmrpS9UVnNzhP3EH3HFqexO5Tlp8GhYY+WEcqcVMvGw==
@@ -10627,6 +10627,13 @@ rxjs@^6.1.0:
   version "6.3.3"
   resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-6.3.3.tgz#3c6a7fa420e844a81390fb1158a9ec614f4bad55"
   integrity sha512-JTWmoY9tWCs7zvIk/CvRjhjGaOd+OVBM987mxFo+OW66cGpdKjZcpmc74ES1sB//7Kl/PAe8+wEakuhG4pcgOw==
+  dependencies:
+    tslib "^1.9.0"
+
+rxjs@^6.3.1:
+  version "6.5.2"
+  resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-6.5.2.tgz#2e35ce815cd46d84d02a209fb4e5921e051dbec7"
+  integrity sha512-HUb7j3kvb7p7eCUHE3FqjoDsC1xfZQ4AHFWfTKSpZ+sAhhz5X1WX0ZuUqWbzB2QhSLp3DoLUG+hMdEDKqWo2Zg==
   dependencies:
     tslib "^1.9.0"
 
