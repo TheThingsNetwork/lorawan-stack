@@ -40,7 +40,6 @@ func (testData) GetCorrelationIDs() []string {
 
 func TestNew(t *testing.T) {
 	a := assertions.New(t)
-	events.IncludeCaller = true
 	ctx := events.ContextWithCorrelationID(test.Context(), t.Name())
 	evt := events.New(ctx, "as.up.receive", nil, testData{})
 	a.So(evt.CorrelationIDs(), should.Resemble, []string{"TestNew"})
