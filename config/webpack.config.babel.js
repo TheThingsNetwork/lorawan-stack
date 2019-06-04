@@ -64,22 +64,12 @@ export default {
     inline: true,
     hot: true,
     stats: 'minimal',
-    proxy: {
-      // proxy /console and /oauth requests to the actual backend for both
-      // api calls and fetching the generated html
-      '/console': {
-        target: 'http://localhost:1885',
-        bypass: () => false,
-      },
-      '/oauth': {
-        target: 'http://localhost:1885',
-        bypass: () => false,
-      },
-      '/api': {
-        target: 'http://localhost:1885',
-        bypass: () => false,
-      },
-    },
+    publicPath: `${ASSETS_ROOT}/`,
+    proxy: [{
+      context: [ '/console', '/oauth', '/api' ],
+      target: 'http://localhost:1885',
+      changeOrigin: true,
+    }],
     historyApiFallback: true,
   },
   entry: {
@@ -172,7 +162,6 @@ export default {
             loader: 'css-loader',
             options: {
               modules: false,
-              minimize: production,
             },
           },
         ],
