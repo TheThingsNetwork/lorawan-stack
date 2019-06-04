@@ -119,8 +119,8 @@ class GatewayStatistic extends React.PureComponent {
       return null
     }
 
-    const uplinkCount = statistics.uplink_count
-    const downlinkCount = statistics.downlink_count
+    const uplinkCount = statistics.uplink_count || 0
+    const downlinkCount = statistics.downlink_count || 0
 
     return (
       <React.Fragment>
