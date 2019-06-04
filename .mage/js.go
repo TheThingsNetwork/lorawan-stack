@@ -212,6 +212,7 @@ func (js Js) ServeMain() error {
 	if err != nil {
 		return err
 	}
+	os.Setenv("DEV_SERVER_BUILD", "true")
 	return webpackServe("--config", "config/webpack.config.babel.js", "-w")
 }
 
