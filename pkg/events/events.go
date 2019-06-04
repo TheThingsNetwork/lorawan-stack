@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"sort"
 	"strings"
 	"time"
 
@@ -145,7 +146,11 @@ func New(ctx context.Context, name string, identifiers CombinedIdentifiers, data
 		data: data,
 	}
 	if data, ok := data.(interface{ GetCorrelationIDs() []string }); ok {
-		evt.innerEvent.CorrelationIDs = append(evt.innerEvent.CorrelationIDs, data.GetCorrelationIDs()...)
+		if cids := data.GetCorrelationIDs(); len(cids) > 0 {
+			cids = append(cids[:0:0], cids...)
+			sort.Strings(cids)
+			evt.innerEvent.CorrelationIDs = mergeStrings(evt.innerEvent.CorrelationIDs, cids)
+		}
 	}
 	if identifiers != nil {
 		evt.innerEvent.Identifiers = identifiers.CombinedIdentifiers().GetEntityIdentifiers()
