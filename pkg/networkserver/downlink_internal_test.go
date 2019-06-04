@@ -68,6 +68,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		"lorawan_phy_version",
 		"mac_settings",
 		"mac_state",
+		"multicast",
 		"pending_mac_state",
 		"queued_application_downlinks",
 		"recent_downlinks",

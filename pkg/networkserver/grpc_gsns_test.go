@@ -322,6 +322,7 @@ func handleUplinkTest() func(t *testing.T) {
 					"ids.join_eui",
 					"lorawan_phy_version",
 					"lorawan_version",
+					"multicast",
 					"session",
 					"updated_at",
 				},
@@ -338,6 +339,7 @@ func handleUplinkTest() func(t *testing.T) {
 						"ids.join_eui",
 						"lorawan_phy_version",
 						"lorawan_version",
+						"multicast",
 						"session",
 					}, nil
 				})
@@ -1354,6 +1356,7 @@ func handleUplinkTest() func(t *testing.T) {
 						"lorawan_phy_version",
 						"lorawan_version",
 						"mac_state",
+						"multicast",
 						"pending_session",
 						"session",
 					}...); err != nil {
@@ -1366,6 +1369,7 @@ func handleUplinkTest() func(t *testing.T) {
 							"lorawan_phy_version",
 							"lorawan_version",
 							"mac_state",
+							"multicast",
 							"pending_session",
 							"session",
 						}...); err != nil {
@@ -1403,6 +1407,7 @@ func handleUplinkTest() func(t *testing.T) {
 							"lorawan_phy_version",
 							"lorawan_version",
 							"mac_state",
+							"multicast",
 							"pending_session",
 							"session",
 							"updated_at",
@@ -1421,6 +1426,7 @@ func handleUplinkTest() func(t *testing.T) {
 								"lorawan_phy_version",
 								"lorawan_version",
 								"mac_state",
+								"multicast",
 								"pending_session",
 								"session",
 							}, nil
@@ -1511,6 +1517,7 @@ func handleUplinkTest() func(t *testing.T) {
 						"lorawan_version",
 						"mac_settings",
 						"mac_state",
+						"multicast",
 						"pending_session",
 						"recent_downlinks",
 						"session",
@@ -1531,6 +1538,7 @@ func handleUplinkTest() func(t *testing.T) {
 							"lorawan_version",
 							"mac_settings",
 							"mac_state",
+							"multicast",
 							"pending_session",
 							"recent_downlinks",
 							"session",

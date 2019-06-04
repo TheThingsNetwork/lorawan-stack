@@ -125,7 +125,7 @@ func validateApplicationDownlinks(macState ttnpb.MACState, session ttnpb.Session
 // - The LoRaWAN version is 1.0.x and an item's FCnt is not higher than the session's NFCntDown.
 func validateQueuedApplicationDownlinks(dev *ttnpb.EndDevice) error {
 	for _, down := range dev.QueuedApplicationDownlinks {
-		if !dev.SupportsUplink {
+		if dev.Multicast {
 			if down.Confirmed {
 				return errConfirmedMulticastDownlink
 			}
@@ -168,11 +168,11 @@ func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.Do
 	dev, err := ns.devices.SetByID(ctx, req.EndDeviceIdentifiers.ApplicationIdentifiers, req.EndDeviceIdentifiers.DeviceID,
 		[]string{
 			"mac_state",
+			"multicast",
 			"pending_mac_state",
 			"pending_session",
 			"queued_application_downlinks",
 			"session",
-			"supports_uplink",
 		},
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if dev == nil {
@@ -214,11 +214,11 @@ func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.Downl
 	dev, err := ns.devices.SetByID(ctx, req.EndDeviceIdentifiers.ApplicationIdentifiers, req.EndDeviceIdentifiers.DeviceID,
 		[]string{
 			"mac_state",
+			"multicast",
 			"pending_mac_state",
 			"pending_session",
 			"queued_application_downlinks",
 			"session",
-			"supports_uplink",
 		},
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if dev == nil {

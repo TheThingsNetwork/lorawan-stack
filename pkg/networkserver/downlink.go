@@ -154,80 +154,81 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 		cmds = append(cmds, cmd)
 		maxDownLen -= desc.DownlinkLength
 	}
-
 	dev.MACState.QueuedResponses = nil
 	dev.MACState.PendingRequests = dev.MACState.PendingRequests[:0]
 
-	enqueuers := make([]func(context.Context, *ttnpb.EndDevice, uint16, uint16) (uint16, uint16, bool), 0, 13)
-	if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0) >= 0 {
-		enqueuers = append(enqueuers,
-			enqueueDutyCycleReq,
-			enqueueRxParamSetupReq,
-			func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) (uint16, uint16, bool) {
-				return enqueueDevStatusReq(ctx, dev, maxDownLen, maxUpLen, ns.defaultMACSettings)
-			},
-			enqueueNewChannelReq,
-			func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) (uint16, uint16, bool) {
-				// NOTE: LinkADRReq must be enqueued after NewChannelReq.
-				newMaxDownLen, newMaxUpLen, ok, err := enqueueLinkADRReq(ctx, dev, maxDownLen, maxUpLen, ns.FrequencyPlans)
-				if err != nil {
-					logger.WithError(err).Error("Failed to enqueue LinkADRReq")
-					return maxDownLen, maxUpLen, false
-				}
-				return newMaxDownLen, newMaxUpLen, ok
-			},
-			enqueueRxTimingSetupReq,
-		)
-		if dev.MACState.DeviceClass == ttnpb.CLASS_B {
-			enqueuers = append(enqueuers,
-				enqueuePingSlotChannelReq,
-				enqueueBeaconFreqReq,
-			)
-		}
-	}
-	if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_2) >= 0 {
-		if phy.TxParamSetupReqSupport {
-			enqueuers = append(enqueuers,
-				enqueueTxParamSetupReq,
-			)
-		}
-		enqueuers = append(enqueuers,
-			enqueueDLChannelReq,
-		)
-	}
-	if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
-		enqueuers = append(enqueuers,
-			enqueueADRParamSetupReq,
-			enqueueForceRejoinReq,
-			enqueueRejoinParamSetupReq,
-		)
-	}
-
-	var fPending bool
-	for _, f := range enqueuers {
-		var ok bool
-		maxDownLen, maxUpLen, ok = f(ctx, dev, maxDownLen, maxUpLen)
-		fPending = fPending || !ok
-	}
-
-	cmds = append(cmds, dev.MACState.PendingRequests...)
-
 	mType := ttnpb.MType_UNCONFIRMED_DOWN
 	cmdBuf := make([]byte, 0, maxDownLen)
-	for _, cmd := range cmds {
-		logger := logger.WithField("cid", cmd.CID)
-		logger.Debug("Add MAC command to buffer")
-		var err error
-		cmdBuf, err = spec.AppendDownlink(phy, cmdBuf, *cmd)
-		if err != nil {
-			return nil, appUpFunc, errEncodeMAC.WithCause(err)
+	var fPending bool
+	if !dev.Multicast {
+		enqueuers := make([]func(context.Context, *ttnpb.EndDevice, uint16, uint16) (uint16, uint16, bool), 0, 13)
+		if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0) >= 0 {
+			enqueuers = append(enqueuers,
+				enqueueDutyCycleReq,
+				enqueueRxParamSetupReq,
+				func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) (uint16, uint16, bool) {
+					return enqueueDevStatusReq(ctx, dev, maxDownLen, maxUpLen, ns.defaultMACSettings)
+				},
+				enqueueNewChannelReq,
+				func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) (uint16, uint16, bool) {
+					// NOTE: LinkADRReq must be enqueued after NewChannelReq.
+					newMaxDownLen, newMaxUpLen, ok, err := enqueueLinkADRReq(ctx, dev, maxDownLen, maxUpLen, ns.FrequencyPlans)
+					if err != nil {
+						logger.WithError(err).Error("Failed to enqueue LinkADRReq")
+						return maxDownLen, maxUpLen, false
+					}
+					return newMaxDownLen, newMaxUpLen, ok
+				},
+				enqueueRxTimingSetupReq,
+			)
+			if dev.MACState.DeviceClass == ttnpb.CLASS_B {
+				enqueuers = append(enqueuers,
+					enqueuePingSlotChannelReq,
+					enqueueBeaconFreqReq,
+				)
+			}
 		}
-		if mType == ttnpb.MType_UNCONFIRMED_DOWN &&
-			spec[cmd.CID].ExpectAnswer &&
-			dev.MACState.DeviceClass == ttnpb.CLASS_C &&
-			dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
-			logger.Debug("Use confirmed downlink to get immediate answer")
-			mType = ttnpb.MType_CONFIRMED_DOWN
+		if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_2) >= 0 {
+			if phy.TxParamSetupReqSupport {
+				enqueuers = append(enqueuers,
+					enqueueTxParamSetupReq,
+				)
+			}
+			enqueuers = append(enqueuers,
+				enqueueDLChannelReq,
+			)
+		}
+		if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
+			enqueuers = append(enqueuers,
+				enqueueADRParamSetupReq,
+				enqueueForceRejoinReq,
+				enqueueRejoinParamSetupReq,
+			)
+		}
+
+		for _, f := range enqueuers {
+			var ok bool
+			maxDownLen, maxUpLen, ok = f(ctx, dev, maxDownLen, maxUpLen)
+			fPending = fPending || !ok
+		}
+
+		cmds = append(cmds, dev.MACState.PendingRequests...)
+
+		for _, cmd := range cmds {
+			logger := logger.WithField("cid", cmd.CID)
+			logger.Debug("Add MAC command to buffer")
+			var err error
+			cmdBuf, err = spec.AppendDownlink(phy, cmdBuf, *cmd)
+			if err != nil {
+				return nil, generateDownlinkState{}, errEncodeMAC.WithCause(err)
+			}
+			if mType == ttnpb.MType_UNCONFIRMED_DOWN &&
+				spec[cmd.CID].ExpectAnswer &&
+				dev.MACState.DeviceClass == ttnpb.CLASS_C &&
+				dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+				logger.Debug("Use confirmed downlink to get immediate answer")
+				mType = ttnpb.MType_CONFIRMED_DOWN
+			}
 		}
 	}
 	logger = logger.WithField("mac_count", len(cmds))
@@ -280,6 +281,22 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 					},
 				},
 			})
+			skipAppDown = true
+			break
+		}
+		if down.Confirmed && dev.Multicast {
+			logger.Debug("Skip confirmed application downlink for multicast device")
+			st.baseApplicationUps = append(st.baseApplicationUps, &ttnpb.ApplicationUp{
+				EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
+				CorrelationIDs:       events.CorrelationIDsFromContext(ctx),
+				Up: &ttnpb.ApplicationUp_DownlinkFailed{
+					DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
+						ApplicationDownlink: *down,
+						Error:               *ttnpb.ErrorDetailsToProto(errConfirmedMulticastDownlink),
+					},
+				},
+			})
+			startIdx++
 			skipAppDown = true
 			break
 		}
@@ -723,6 +740,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 				"lorawan_phy_version",
 				"mac_settings",
 				"mac_state",
+				"multicast",
 				"pending_mac_state",
 				"queued_application_downlinks",
 				"recent_downlinks",

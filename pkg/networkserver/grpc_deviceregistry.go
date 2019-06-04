@@ -98,8 +98,8 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				"ids.dev_addr",
 				"lorawan_phy_version",
 				"lorawan_version",
+				"multicast",
 				"supports_join",
-				"supports_uplink",
 			); err != nil {
 				return nil, nil, errInvalidFieldMask.WithCause(err)
 			}
@@ -199,6 +199,10 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			); err != nil {
 				return nil, nil, errInvalidFieldMask.WithCause(err)
 			}
+		}
+
+		if req.EndDevice.Multicast && req.EndDevice.SupportsJoin {
+			return nil, nil, errInvalidFieldValue.WithAttributes("field", "supports_join")
 		}
 
 		sets = append(sets,
