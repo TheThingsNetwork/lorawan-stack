@@ -12,9 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Radio from './radio'
-import RadioGroup from './group'
+.group
+  display: flex
+  flex-direction: row
 
-Radio.Group = RadioGroup
+  .group-radio:not(:last-child)
+    margin-right: $cs.m
 
-export default Radio
+  &.horizontal
+    flex-direction: column
+
+    .group-radio:not(:last-child)
+      margin-bottom: $cs.s
