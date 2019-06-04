@@ -33,8 +33,7 @@ func ContextWithCorrelationID(ctx context.Context, cids ...string) context.Conte
 	if !ok {
 		return context.WithValue(ctx, correlationKey{}, cids)
 	}
-	merged := mergeCorrelationIDs(existing, cids)
-	return context.WithValue(ctx, correlationKey{}, merged)
+	return context.WithValue(ctx, correlationKey{}, mergeStrings(existing, cids))
 }
 
 // CorrelationIDsFromContext returns the correlation IDs that are attached to the context.
@@ -51,12 +50,10 @@ func NewCorrelationID() string {
 	return ulid.MustNew(ulid.Now(), rand.Reader).String()
 }
 
-// mergeCorrelationIDs returns sorted array of correlation ids from context and payload
-// Since existing and cids are sorted, merging them will result in a sorted slice.
+// mergeStrings merges 2 sorted string slices and returns the resulting slice
 // See https://en.wikipedia.org/wiki/Merge_sort
-func mergeCorrelationIDs(existing, cids []string) []string {
-	merged := make([]string, 0, len(existing)+len(cids))
-	a, b := existing, cids
+func mergeStrings(a, b []string) []string {
+	merged := make([]string, 0, len(a)+len(b))
 	var i, j int
 	for i < len(a) && j < len(b) {
 		if a[i] < b[j] {
