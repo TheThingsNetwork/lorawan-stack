@@ -149,7 +149,7 @@ func New(ctx context.Context, name string, identifiers CombinedIdentifiers, data
 		if cids := data.GetCorrelationIDs(); len(cids) > 0 {
 			cids = append(cids[:0:0], cids...)
 			sort.Strings(cids)
-			evt.innerEvent.CorrelationIDs = mergeCorrelationIDs(evt.innerEvent.CorrelationIDs, cids)
+			evt.innerEvent.CorrelationIDs = mergeStrings(evt.innerEvent.CorrelationIDs, cids)
 		}
 	}
 	if identifiers != nil {
