@@ -44,7 +44,6 @@ const Tabs = function ({
         return (
           <Tab
             key={index}
-            tabIndex={index + 1}
             active={name === active}
             name={name}
             disabled={disabled}
