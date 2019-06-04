@@ -94,36 +94,67 @@ func (ns *NetworkServer) LinkApplication(link ttnpb.AsNs_LinkApplicationServer) 
 	}
 }
 
-// validateDownlinks validates the given end device's application downlink queue.
+func validateApplicationDownlinks(macState ttnpb.MACState, session ttnpb.Session, downs ...*ttnpb.ApplicationDownlink) error {
+	var lastFCnt *uint32
+	if macState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+		lastFCnt = &session.LastNFCntDown
+	}
+	for _, down := range downs {
+		if down.ClassBC != nil && macState.DeviceClass == ttnpb.CLASS_A {
+			return errClassBCForClassA
+		}
+		if !bytes.Equal(down.SessionKeyID, session.SessionKeyID) {
+			return errUnknownSession
+		}
+		if lastFCnt != nil && down.FCnt <= *lastFCnt {
+			return errFCntTooLow
+		}
+		lastFCnt = &down.FCnt
+	}
+	return nil
+}
+
+// validateQueuedApplicationDownlinks validates the given end device's application downlink queue.
 // This function returns an error if any of the following checks fail:
-// - The MACState is unknown;
+// - The device has neither MACState and Session, nor PendingMACState and PendingSession set.
+// - Items belong to different sessions;
+// - An item has ClassBC set, but device is in Class A mode.
+// - An item's FRMPayload is longer than 250.
 // - An item's session is neither the device's session or pending session;
 // - An item's FCnt is not higher than the previous for the corresponding session;
 // - The LoRaWAN version is 1.0.x and an item's FCnt is not higher than the session's NFCntDown.
-func validateDownlinks(dev *ttnpb.EndDevice) error {
-	if dev.MACState == nil {
-		return errUnknownMACState
-	}
-	var prevSession, prevPendingSession *uint32
-	for _, item := range dev.QueuedApplicationDownlinks {
-		var prev **uint32
-		if dev.Session != nil && bytes.Equal(dev.Session.SessionKeyID, item.SessionKeyID) {
-			// In 1.0.x, NS and AS share FCntDown.
-			if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 && item.FCnt <= dev.Session.LastNFCntDown {
-				return errFCntTooLow
+func validateQueuedApplicationDownlinks(dev *ttnpb.EndDevice) error {
+	for _, down := range dev.QueuedApplicationDownlinks {
+		if !dev.SupportsUplink {
+			if down.Confirmed {
+				return errConfirmedMulticastDownlink
 			}
-			prev = &prevSession
-		} else if dev.PendingSession != nil && bytes.Equal(dev.PendingSession.SessionKeyID, item.SessionKeyID) {
-			prev = &prevPendingSession
-		} else {
-			return errUnknownSession
+			if len(down.GetClassBC().GetGateways()) == 0 {
+				return errNoPath
+			}
 		}
-		if *prev != nil && item.FCnt <= **prev {
-			return errFCntTooLow
+		if absTime := down.GetClassBC().GetAbsoluteTime(); absTime != nil && absTime.Before(time.Now()) {
+			return errExpiredDownlink
 		}
-		*prev = &item.FCnt
+		if len(down.FRMPayload) > 250 {
+			return errInvalidPayload
+		}
 	}
-	return nil
+	hasActiveSession := dev.MACState != nil && dev.Session != nil
+	hasPendingSession := dev.PendingMACState != nil && dev.PendingSession != nil
+	switch {
+	case !hasActiveSession && !hasPendingSession:
+		return errUnknownMACState
+	case !hasPendingSession:
+		return validateApplicationDownlinks(*dev.MACState, *dev.Session, dev.QueuedApplicationDownlinks...)
+	case !hasActiveSession:
+		return validateApplicationDownlinks(*dev.PendingMACState, *dev.PendingSession, dev.QueuedApplicationDownlinks...)
+	default:
+		if validateApplicationDownlinks(*dev.PendingMACState, *dev.PendingSession, dev.QueuedApplicationDownlinks...) == nil {
+			return nil
+		}
+		return validateApplicationDownlinks(*dev.MACState, *dev.Session, dev.QueuedApplicationDownlinks...)
+	}
 }
 
 // DownlinkQueueReplace is called by the Application Server to completely replace the downlink queue for a device.
@@ -136,19 +167,19 @@ func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.Do
 
 	dev, err := ns.devices.SetByID(ctx, req.EndDeviceIdentifiers.ApplicationIdentifiers, req.EndDeviceIdentifiers.DeviceID,
 		[]string{
+			"mac_state",
+			"pending_mac_state",
+			"pending_session",
 			"queued_application_downlinks",
-			"mac_state.device_class",
-			"mac_state.lorawan_version",
-			"pending_session.keys.session_key_id",
-			"session.last_n_f_cnt_down",
-			"session.keys.session_key_id",
+			"session",
+			"supports_uplink",
 		},
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if dev == nil {
 				return nil, nil, errDeviceNotFound
 			}
 			dev.QueuedApplicationDownlinks = req.Downlinks
-			if err := validateDownlinks(dev); err != nil {
+			if err := validateQueuedApplicationDownlinks(dev); err != nil {
 				return nil, nil, err
 			}
 			return dev, []string{"queued_application_downlinks"}, nil
@@ -182,19 +213,19 @@ func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.Downl
 
 	dev, err := ns.devices.SetByID(ctx, req.EndDeviceIdentifiers.ApplicationIdentifiers, req.EndDeviceIdentifiers.DeviceID,
 		[]string{
+			"mac_state",
+			"pending_mac_state",
+			"pending_session",
 			"queued_application_downlinks",
-			"mac_state.device_class",
-			"mac_state.lorawan_version",
-			"pending_session.keys.session_key_id",
-			"session.last_n_f_cnt_down",
-			"session.keys.session_key_id",
+			"session",
+			"supports_uplink",
 		},
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if dev == nil {
 				return nil, nil, errDeviceNotFound
 			}
 			dev.QueuedApplicationDownlinks = append(dev.QueuedApplicationDownlinks, req.Downlinks...)
-			if err := validateDownlinks(dev); err != nil {
+			if err := validateQueuedApplicationDownlinks(dev); err != nil {
 				return nil, nil, err
 			}
 			return dev, []string{"queued_application_downlinks"}, nil
