@@ -64,7 +64,7 @@ func (s *impl) Subscribe(ids *ttnpb.ApplicationIdentifiers, stream ttnpb.AppAs_S
 		case <-ctx.Done():
 			return ctx.Err()
 		case up := <-sub.Up():
-			if err := stream.Send(up); err != nil {
+			if err := stream.Send(up.ApplicationUp); err != nil {
 				logger.WithError(err).Warn("Failed to send message")
 				sub.Disconnect(err)
 				return err
