@@ -32,6 +32,20 @@ type wrappedEvent struct {
 	events.Event
 }
 
+type testData struct{}
+
+func (testData) GetCorrelationIDs() []string {
+	return []string{"TestNew"}
+}
+
+func TestNew(t *testing.T) {
+	a := assertions.New(t)
+	events.IncludeCaller = true
+	ctx := events.ContextWithCorrelationID(test.Context(), t.Name())
+	evt := events.New(ctx, "as.up.receive", nil, testData{})
+	a.So(evt.CorrelationIDs(), should.Resemble, []string{"TestNew"})
+}
+
 func TestEvents(t *testing.T) {
 	a := assertions.New(t)
 
