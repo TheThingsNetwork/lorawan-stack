@@ -29,7 +29,7 @@ type HugoConfig struct {
 // Docs namespace
 type Docs mg.Namespace
 
-// Gen Generates static website from the doc in doc/public
+// Gen generates static website from the doc in doc/public.
 func (Docs) Gen() error {
 	baseUrl := getDocURL()
 	args := []string{"-s", "./doc", "-d", "public/"}
@@ -39,7 +39,7 @@ func (Docs) Gen() error {
 	return sh.RunV("hugo", args...)
 }
 
-// Gen Generates static website from the doc in doc/public/$version
+// Gen generates static website from the doc in doc/public/$version.
 func (Docs) GenVersion() error {
 	mg.Deps(Version.getCurrent)
 	baseUrl := getDocURL()
@@ -50,7 +50,7 @@ func (Docs) GenVersion() error {
 	return sh.RunV("hugo", args...)
 }
 
-// Docs Install documentation dependencies
+// Docs install documentation dependencies.
 func (Docs) Deps() error {
 	return sh.RunV("git", "submodule", "update", "--init", "doc/themes/hugo-theme-techdoc")
 }
@@ -60,7 +60,8 @@ func (Docs) Server() error {
 	return sh.RunV("hugo", "server", "-s", "doc")
 }
 
-func (d Docs) Config() error {
+// Config generate hugo documentation with git metadata.
+func (Docs) Config() error {
 
 	mg.Deps(Version.getCurrent)
 	tmpl, err := ioutil.ReadFile("./doc/config.tmpl")

@@ -10,6 +10,13 @@ All the content is written in Markdown.
 
 ## HUGO
 
+### Install
+
+Hugo is available on most platform via packet managers. See HUGO install instruction
+for more details.
+
+https://github.com/gohugoio/hugo#choose-how-to-install
+
 ### Front Matter
 
 The Front Matter refer to the top part of each content page.
