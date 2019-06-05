@@ -199,11 +199,11 @@ const Field = function (props) {
     rest.onBlur = handleBlur
     _error = touched && rest.error
     rest.value = rest.value || ''
-  }
 
-  // Dismiss non boolean values for checkboxes
-  if (type === 'checkbox') {
-    rest.value = typeof rest.value === 'boolean' ? rest.value : false
+    // Dismiss non boolean values for checkboxes
+    if (type === 'checkbox') {
+      rest.value = typeof rest.value === 'boolean' ? rest.value : false
+    }
   }
 
   // restore the rest object for future per component filtering
