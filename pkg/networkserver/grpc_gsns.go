@@ -125,13 +125,15 @@ func maxRetransmissionDelay(rxDelay ttnpb.RxDelay) time.Duration {
 }
 
 type matchedDevice struct {
-	Device   *ttnpb.EndDevice
-	FCnt     uint32
-	MACState *ttnpb.MACState
-	NbTrans  uint32
-	Pending  bool
-	Session  *ttnpb.Session
-	logger   log.Interface
+	logger log.Interface
+
+	Device    *ttnpb.EndDevice
+	FCnt      uint32
+	FCntReset bool
+	MACState  *ttnpb.MACState
+	NbTrans   uint32
+	Pending   bool
+	Session   *ttnpb.Session
 }
 
 // matchDevice tries to match the uplink message with a device and returns the matched device.
@@ -200,8 +202,7 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 
 	type device struct {
 		matchedDevice
-		gap       uint32
-		fCntReset bool
+		gap uint32
 	}
 	matched := make([]device, 0, len(addrMatches))
 
@@ -236,6 +237,7 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 			nbTrans, lastAt := transmissionNumber(macPayloadBytes, match.Device.RecentUplinks...)
 			logger = logger.WithFields(log.Fields(
 				"f_cnt_gap", 0,
+				"f_cnt_reset", false,
 				"full_f_cnt_up", match.Session.LastFCntUp,
 				"transmission", nbTrans,
 			))
@@ -258,9 +260,9 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 				logger.Error("Transmission number exceeds maximum, skip")
 				continue
 			}
+			match.logger = logger
 			match.FCnt = match.Session.LastFCntUp
 			match.NbTrans = nbTrans
-			match.logger = logger
 			matched = append(matched, device{
 				matchedDevice: match,
 			})
@@ -291,12 +293,15 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 			} else {
 				gap = math.MaxUint32
 			}
+			match.logger = logger.WithFields(log.Fields(
+				"f_cnt_gap", gap,
+				"f_cnt_reset", true,
+			))
 			match.FCnt = pld.FCnt
+			match.FCntReset = true
 			match.NbTrans = 1
-			match.logger = logger.WithField("f_cnt_gap", gap)
 			matched = append(matched, device{
 				matchedDevice: match,
-				fCntReset:     true,
 				gap:           gap,
 			})
 
@@ -319,15 +324,16 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 				} else {
 					gap = math.MaxUint32
 				}
-				match.FCnt = pld.FCnt
-				match.NbTrans = 1
 				match.logger = logger.WithFields(log.Fields(
 					"f_cnt_gap", gap,
+					"f_cnt_reset", true,
 					"full_f_cnt_up", pld.FCnt,
 				))
+				match.FCnt = pld.FCnt
+				match.FCntReset = true
+				match.NbTrans = 1
 				matched = append(matched, device{
 					matchedDevice: match,
-					fCntReset:     true,
 					gap:           gap,
 				})
 			}
@@ -335,6 +341,7 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 			gap := fCnt - match.Session.LastFCntUp
 			logger = logger.WithFields(log.Fields(
 				"f_cnt_gap", gap,
+				"f_cnt_reset", false,
 				"full_f_cnt_up", fCnt,
 			))
 			if match.MACState.LoRaWANVersion.HasMaxFCntGap() && uint(gap) > phy.MaxFCntGap {
@@ -354,8 +361,8 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 		if matched[i].gap != matched[j].gap {
 			return matched[i].gap < matched[j].gap
 		}
-		if matched[i].fCntReset != matched[j].fCntReset {
-			return matched[j].fCntReset
+		if matched[i].FCntReset != matched[j].FCntReset {
+			return matched[j].FCntReset
 		}
 		return matched[i].Session.LastFCntUp < matched[j].Session.LastFCntUp
 	})
@@ -384,8 +391,13 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 			continue
 		}
 
-		if match.fCntReset {
-			// TODO: Handle MAC state reset(https://github.com/TheThingsNetwork/lorawan-stack/issues/505)
+		if match.FCntReset {
+			macState, err := newMACState(match.Device, ns.FrequencyPlans, ns.defaultMACSettings)
+			if err != nil {
+				logger.WithError(err).Warn("Failed to generate new MAC state")
+				continue
+			}
+			match.MACState = macState
 		}
 
 		var computedMIC [4]byte
@@ -492,45 +504,6 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 
 	logger.Debug("Matched device")
 
-	if matched.MACState.PendingApplicationDownlink != nil {
-		asUp := &ttnpb.ApplicationUp{
-			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-				DevAddr:                &pld.DevAddr,
-				JoinEUI:                matched.Device.JoinEUI,
-				DevEUI:                 matched.Device.DevEUI,
-				ApplicationIdentifiers: matched.Device.ApplicationIdentifiers,
-				DeviceID:               matched.Device.DeviceID,
-			},
-			CorrelationIDs: matched.MACState.PendingApplicationDownlink.CorrelationIDs,
-			ReceivedAt:     &up.ReceivedAt,
-		}
-
-		if pld.Ack {
-			asUp.Up = &ttnpb.ApplicationUp_DownlinkAck{
-				DownlinkAck: matched.MACState.PendingApplicationDownlink,
-			}
-		} else {
-			asUp.Up = &ttnpb.ApplicationUp_DownlinkNack{
-				DownlinkNack: matched.MACState.PendingApplicationDownlink,
-			}
-		}
-		asUp.CorrelationIDs = append(asUp.CorrelationIDs, up.CorrelationIDs...)
-
-		matched.MACState.PendingApplicationDownlink = nil
-
-		asCtx, cancel := context.WithTimeout(ctx, appQueueUpdateTimeout)
-		defer cancel()
-
-		logger.Debug("Send downlink (n)ack to Application Server")
-		ok, err := ns.handleASUplink(asCtx, matched.Device.EndDeviceIdentifiers.ApplicationIdentifiers, asUp)
-		if err != nil {
-			return err
-		}
-		if !ok {
-			logger.Warn("Application Server not found, downlink (n)ack not sent")
-		}
-	}
-
 	var cmds []*ttnpb.MACCommand
 	if matched.NbTrans != 1 {
 		logger.Debug("Skip decoding MAC command buffer for uplink retransmission")
@@ -589,6 +562,8 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	ctx = log.NewContext(ctx, logger)
 	registerMergeMetadata(ctx, &matched.Device.EndDeviceIdentifiers, up)
 
+	var queuedApplicationUplinks []*ttnpb.ApplicationUp
+	var queuedEvents []events.Event
 	var nbTrans uint32
 	var handleErr bool
 	stored, err := ns.devices.SetByID(ctx, matched.Device.ApplicationIdentifiers, matched.Device.DeviceID,
@@ -630,31 +605,75 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 				handleErr = true
 				return nil, nil, errOutdatedData
 			}
-			if storedSession.GetLastFCntUp() != matched.Session.LastFCntUp && !resetsFCnt(stored, ns.defaultMACSettings) {
+			if storedSession.GetLastFCntUp() != matched.Session.LastFCntUp {
 				logger.WithFields(log.Fields(
 					"stored_f_cnt", storedSession.GetLastFCntUp(),
-					"got_f_cnt", matched.Session.LastFCntUp,
+					"matched_f_cnt", matched.Session.LastFCntUp,
 				)).Warn("A more recent uplink was received by device during uplink handling, drop")
 				handleErr = true
 				return nil, nil, errOutdatedData
 			}
 
+			if stored.GetMACState().GetPendingApplicationDownlink() != nil {
+				asUp := &ttnpb.ApplicationUp{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						DevAddr:                &pld.DevAddr,
+						JoinEUI:                stored.JoinEUI,
+						DevEUI:                 stored.DevEUI,
+						ApplicationIdentifiers: stored.ApplicationIdentifiers,
+						DeviceID:               stored.DeviceID,
+					},
+					CorrelationIDs: append(stored.MACState.PendingApplicationDownlink.CorrelationIDs, up.CorrelationIDs...),
+					ReceivedAt:     &up.ReceivedAt,
+				}
+				if pld.Ack {
+					asUp.Up = &ttnpb.ApplicationUp_DownlinkAck{
+						DownlinkAck: stored.MACState.PendingApplicationDownlink,
+					}
+				} else {
+					asUp.Up = &ttnpb.ApplicationUp_DownlinkNack{
+						DownlinkNack: stored.MACState.PendingApplicationDownlink,
+					}
+				}
+				queuedApplicationUplinks = append(queuedApplicationUplinks, asUp)
+				stored.MACState.PendingApplicationDownlink = nil
+			}
+
 			var paths []string
 
-			if matched.Pending {
-				stored.MACState = stored.PendingMACState
-				stored.PendingSession.LastFCntUp = matched.FCnt
-				stored.PendingSession.StartedAt = up.ReceivedAt
+			switch {
+			case matched.FCntReset && matched.Pending:
+				return nil, nil, errCorruptedMACState
 
+			case matched.FCntReset:
+				macState, err := newMACState(stored, ns.FrequencyPlans, ns.defaultMACSettings)
+				if err != nil {
+					return nil, nil, err
+				}
+				if stored.SupportsClassC {
+					macState.DeviceClass = ttnpb.CLASS_C
+				} else if stored.SupportsClassB {
+					macState.DeviceClass = ttnpb.CLASS_B
+				}
+				stored.MACState = macState
+				stored.Session.LastFCntUp = matched.FCnt
+				stored.Session.StartedAt = up.ReceivedAt
+
+			case matched.Pending:
+				stored.MACState = stored.PendingMACState
 				if stored.SupportsClassC {
 					stored.MACState.DeviceClass = ttnpb.CLASS_C
 				} else if stored.SupportsClassB {
 					stored.MACState.DeviceClass = ttnpb.CLASS_B
 				}
-			} else {
+				stored.PendingSession.LastFCntUp = matched.FCnt
+				stored.PendingSession.StartedAt = up.ReceivedAt
+
+			default:
 				stored.Session.LastFCntUp = matched.FCnt
 			}
 			stored.PendingMACState = nil
+
 			paths = append(paths,
 				"mac_state",
 				"pending_mac_state",
@@ -835,6 +854,18 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	if err != nil {
 		registerDropDataUplink(ctx, &matched.Device.EndDeviceIdentifiers, up, err)
 		return err
+	}
+
+	asCtx, cancel := context.WithTimeout(ctx, appQueueUpdateTimeout)
+	defer cancel()
+
+	logger.Debug("Send downlink (n)ack to Application Server")
+	ok, err := ns.handleASUplink(asCtx, matched.Device.EndDeviceIdentifiers.ApplicationIdentifiers, asUp)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		logger.Warn("Application Server not found, downlink (n)ack not sent")
 	}
 
 	asCtx, cancel := context.WithTimeout(ctx, appQueueUpdateTimeout)
