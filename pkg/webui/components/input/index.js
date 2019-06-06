@@ -13,16 +13,19 @@
 // limitations under the License.
 
 import React from 'react'
-import PropTypes from 'prop-types'
+import { injectIntl } from 'react-intl'
 import classnames from 'classnames'
 import bind from 'autobind-decorator'
+
 import Icon from '../icon'
 import Spinner from '../spinner'
+import PropTypes from '../../lib/prop-types'
 import ByteInput from './byte'
 import Toggled from './toggled'
 
 import style from './input.styl'
 
+@injectIntl
 @bind
 class Input extends React.Component {
   static propTypes = {
@@ -35,7 +38,7 @@ class Input extends React.Component {
     onBlur: PropTypes.func,
     onChange: PropTypes.func,
     onEnter: PropTypes.func,
-    placeholder: PropTypes.string,
+    placeholder: PropTypes.message,
     error: PropTypes.bool,
     warning: PropTypes.bool,
     valid: PropTypes.bool,
@@ -44,6 +47,7 @@ class Input extends React.Component {
     type: PropTypes.string.isRequired,
     label: PropTypes.string,
     loading: PropTypes.bool,
+    title: PropTypes.message,
   }
 
   static defaultProps = {
@@ -58,10 +62,28 @@ class Input extends React.Component {
     focus: false,
   }
 
+  input = React.createRef()
+
+  focus () {
+    if (this.input.current) {
+      this.input.current.focus()
+    }
+
+    this.setState({ focus: true })
+  }
+
+  blur () {
+    if (this.input.current) {
+      this.input.current.blur()
+    }
+
+    this.setState({ focus: false })
+  }
+
   render () {
     const {
       icon,
-      value,
+      value = '',
       error,
       warning,
       valid,
@@ -77,6 +99,9 @@ class Input extends React.Component {
       label,
       component = 'input',
       loading,
+      title,
+      intl,
+      horizontal,
       ...rest
     } = this.props
 
@@ -89,6 +114,16 @@ class Input extends React.Component {
       Component = ByteInput
     } else if (type === 'textarea') {
       Component = 'textarea'
+    }
+
+    let inputPlaceholder = placeholder
+    if (typeof placeholder === 'object') {
+      inputPlaceholder = intl.formatMessage(placeholder)
+    }
+
+    let inputTitle = title
+    if (typeof title === 'object') {
+      inputTitle = intl.formatMessage(title)
     }
 
     const v = valid && (Component.validate ? Component.validate(value, this.props) : true)
@@ -105,6 +140,7 @@ class Input extends React.Component {
       <div className={classname}>
         {icon && <Icon className={style.icon} icon={icon} />}
         <Component
+          ref={this.input}
           key="i"
           className={style.input}
           type={type}
@@ -113,9 +149,10 @@ class Input extends React.Component {
           onBlur={this.onBlur}
           onChange={this.onChange}
           onKeyDown={this.onKeyDown}
-          placeholder={placeholder}
+          placeholder={inputPlaceholder}
           disabled={disabled}
           readOnly={readOnly}
+          title={inputTitle}
           {...rest}
         />
         { v && <Valid show={v} /> }
@@ -125,18 +162,24 @@ class Input extends React.Component {
   }
 
   onFocus (evt) {
+    const { onFocus } = this.props
+
     this.setState({ focus: true })
-    this.props.onFocus(evt)
+    onFocus(evt)
   }
 
   onBlur (evt) {
+    const { onBlur } = this.props
+
     this.setState({ focus: false })
-    this.props.onBlur(evt)
+    onBlur(evt)
   }
 
   onChange (evt) {
+    const { onChange } = this.props
     const { value } = evt.target
-    this.props.onChange(value !== '' ? value : undefined)
+
+    onChange(value)
   }
 
   onKeyDown (evt) {
