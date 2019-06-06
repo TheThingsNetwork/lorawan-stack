@@ -27,9 +27,10 @@ const Tabs = function ({
   active,
   tabs,
   onTabChange,
+  divider,
 }) {
   return (
-    <ul className={classnames(className, style.tabs)}>
+    <ul className={classnames(className, style.tabs, { [style.divider]: divider })}>
       {tabs.map(function (tab, index) {
         const {
           disabled,
@@ -76,6 +77,8 @@ Tabs.propTypes = {
    * the name of the new active tab as an argument.
    */
   onTabChange: PropTypes.func,
+  /** Flag specifying whether the tab should render a bottom divider */
+  divider: PropTypes.bool,
 }
 
 export default Tabs
