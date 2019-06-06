@@ -155,14 +155,14 @@ export default class Device extends React.Component {
             <Col lg={12}>
               <h2 className={style.title}>{deviceName || devId}</h2>
               <Tabs
+                className={style.tabs}
                 narrow
                 tabs={tabs}
-                className={style.tabs}
-                divider
               />
             </Col>
           </Row>
         </Container>
+        <hr className={style.rule} />
         <Switch>
           <Route exact path={basePath} component={DeviceOverview} />
           <Route exact path={`${basePath}/data`} component={DeviceData} />
