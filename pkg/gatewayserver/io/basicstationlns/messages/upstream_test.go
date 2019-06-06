@@ -56,7 +56,7 @@ func TestMarshalJSON(t *testing.T) {
 					},
 				},
 			},
-			Expected: []byte(`{"msgtype":"jreq","MHdr":0,"JoinEui":"2222:2222:2222:2222","DevEui":"1111:1111:1111:1111","DevNonce":18000,"MIC":12345678,"RefTime":0,"RadioMetaData":{"DR":1,"Freq":868300000,"upinfo":{"rxtime":1548059982,"rtcx":0,"xtime":12666373963464220,"gpstime":0,"rssi":89,"snr":9.25}}}`),
+			Expected: []byte(`{"msgtype":"jreq","MHdr":0,"JoinEui":"2222:2222:2222:2222","DevEui":"1111:1111:1111:1111","DevNonce":18000,"MIC":12345678,"RefTime":0,"DR":1,"Freq":868300000,"upinfo":{"rxtime":1548059982,"rtcx":0,"xtime":12666373963464220,"gpstime":0,"rssi":89,"snr":9.25}}`),
 		},
 		{
 			Name: "UplinkDataFrame",
@@ -80,7 +80,7 @@ func TestMarshalJSON(t *testing.T) {
 					},
 				},
 			},
-			Expected: []byte(`{"msgtype":"updf","MHdr":64,"DevAddr":287454020,"FCtrl":48,"Fcnt":25,"FOpts":"FD","FPort":0,"FRMPayload":"Ymxhamthc25kJ3M=","MIC":12345678,"RefTime":0,"RadioMetaData":{"DR":1,"Freq":868300000,"upinfo":{"rxtime":1548059982,"rtcx":0,"xtime":12666373963464220,"gpstime":0,"rssi":89,"snr":9.25}}}`),
+			Expected: []byte(`{"msgtype":"updf","MHdr":64,"DevAddr":287454020,"FCtrl":48,"Fcnt":25,"FOpts":"FD","FPort":0,"FRMPayload":"Ymxhamthc25kJ3M=","MIC":12345678,"RefTime":0,"DR":1,"Freq":868300000,"upinfo":{"rxtime":1548059982,"rtcx":0,"xtime":12666373963464220,"gpstime":0,"rssi":89,"snr":9.25}}`),
 		},
 		{
 			Name: "TxConfirmation",
@@ -101,7 +101,7 @@ func TestMarshalJSON(t *testing.T) {
 				t.Fatalf("Unexpected error: %v", err)
 			}
 			if !a.So(msg, should.Resemble, tc.Expected) {
-				t.Fatalf("Unexpected message: %v", msg)
+				t.Fatalf("Unexpected message: %v\n, Expected: %s", string(msg), string(tc.Expected))
 			}
 		})
 	}
@@ -218,7 +218,7 @@ func TestJoinRequest(t *testing.T) {
 					Payload: &ttnpb.Message_JoinRequestPayload{JoinRequestPayload: &ttnpb.JoinRequestPayload{
 						JoinEUI:  types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22},
 						DevEUI:   types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11},
-						DevNonce: [2]byte{0x50, 0x46},
+						DevNonce: [2]byte{0x46, 0x50},
 					}}},
 				RxMetadata: []*ttnpb.RxMetadata{{
 					GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "eui-1122334455667788",

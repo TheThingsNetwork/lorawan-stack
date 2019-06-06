@@ -248,12 +248,12 @@ func (s *srv) handleTraffic(c echo.Context) error {
 				"firmware", version.Firmware,
 				"model", version.Model,
 			))
-			cfg, err := messages.GetRouterConfig(*fp, version.IsProduction())
+			cfg, err := messages.GetRouterConfig(*fp, version.IsProduction(), time.Now())
 			if err != nil {
 				logger.WithError(err).Warn("Failed to generate router configuration")
 				return err
 			}
-			data, err = json.Marshal(cfg)
+			data, err = cfg.MarshalJSON()
 			if err != nil {
 				logger.WithError(err).Warn("Failed to marshal response message")
 				return err
