@@ -17,10 +17,12 @@ package messages
 import (
 	"encoding/json"
 	"testing"
+	"time"
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
+	pfconfig "go.thethings.network/lorawan-stack/pkg/pfconfig/shared"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
@@ -56,21 +58,21 @@ func TestIsProduction(t *testing.T) {
 		{
 			Name: "EmptyMessage1",
 			Message: Version{
-				Features: []string{""},
+				Features: "",
 			},
 			ExpectedResponse: false,
 		},
 		{
 			Name: "NonProduction",
 			Message: Version{
-				Features: []string{"gps", "rmtsh"},
+				Features: "gps rmtsh",
 			},
 			ExpectedResponse: false,
 		},
 		{
 			Name: "Production",
 			Message: Version{
-				Features: []string{"prod"},
+				Features: "prod",
 			},
 			ExpectedResponse: true,
 		},
@@ -150,6 +152,56 @@ func TestGetRouterConfig(t *testing.T) {
 				NoCCA:       true,
 				NoDutyCycle: true,
 				NoDwellTime: true,
+				SX1301Config: []pfconfig.SX1301Config{
+					pfconfig.SX1301Config{
+						LoRaWANPublic: true,
+						ClockSource:   0,
+						AntennaGain:   0,
+						Radios: []pfconfig.RFConfig{
+							{
+								Enable:    true,
+								Type:      "SX1257",
+								Frequency: 922300000,
+								TxEnable:  true,
+							},
+							{
+								Enable: false, Type: "SX1257",
+								Frequency: 923000000,
+								TxEnable:  false,
+							},
+						},
+						Channels: []pfconfig.IFConfig{
+							{Enable: false, Radio: 0, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+							{Enable: false, Radio: 0, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+							{Enable: false, Radio: 0, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+							{Enable: false, Radio: 0, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+							{Enable: false, Radio: 0, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+							{Enable: false, Radio: 0, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+							{Enable: false, Radio: 0, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+							{Enable: false, Radio: 0, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+						},
+						LoRaStandardChannel: &pfconfig.IFConfig{Enable: false, Radio: 0, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+						FSKChannel:          &pfconfig.IFConfig{Enable: false, Radio: 0, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+						TxLUTConfigs: []pfconfig.TxLUTConfig{
+							{PAGain: 0, MixGain: 8, RFPower: -6, DigGain: 0},
+							{PAGain: 0, MixGain: 10, RFPower: -3, DigGain: 0},
+							{PAGain: 0, MixGain: 12, RFPower: 0, DigGain: 0},
+							{PAGain: 1, MixGain: 8, RFPower: 3, DigGain: 0},
+							{PAGain: 1, MixGain: 10, RFPower: 6, DigGain: 0},
+							{PAGain: 1, MixGain: 12, RFPower: 10, DigGain: 0},
+							{PAGain: 1, MixGain: 13, RFPower: 11, DigGain: 0},
+							{PAGain: 2, MixGain: 9, RFPower: 12, DigGain: 0},
+							{PAGain: 1, MixGain: 15, RFPower: 13, DigGain: 0},
+							{PAGain: 2, MixGain: 10, RFPower: 14, DigGain: 0},
+							{PAGain: 2, MixGain: 11, RFPower: 16, DigGain: 0},
+							{PAGain: 3, MixGain: 9, RFPower: 20, DigGain: 0},
+							{PAGain: 3, MixGain: 10, RFPower: 23, DigGain: 0},
+							{PAGain: 3, MixGain: 11, RFPower: 25, DigGain: 0},
+							{PAGain: 3, MixGain: 12, RFPower: 26, DigGain: 0},
+							{PAGain: 3, MixGain: 14, RFPower: 27, DigGain: 0},
+						},
+					},
+				},
 			},
 		},
 		{
@@ -190,13 +242,63 @@ func TestGetRouterConfig(t *testing.T) {
 					[3]int{8, 500, 0},
 					[3]int{7, 500, 0},
 				},
+				SX1301Config: []pfconfig.SX1301Config{
+					pfconfig.SX1301Config{
+						LoRaWANPublic: true,
+						ClockSource:   0,
+						AntennaGain:   0,
+						Radios: []pfconfig.RFConfig{
+							{
+								Enable:    true,
+								Type:      "SX1257",
+								Frequency: 922300000,
+								TxEnable:  true,
+							},
+							{
+								Enable: false, Type: "SX1257",
+								Frequency: 923000000,
+								TxEnable:  false,
+							},
+						},
+						Channels: []pfconfig.IFConfig{
+							{Enable: false, Radio: 0, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+							{Enable: false, Radio: 0, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+							{Enable: false, Radio: 0, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+							{Enable: false, Radio: 0, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+							{Enable: false, Radio: 0, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+							{Enable: false, Radio: 0, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+							{Enable: false, Radio: 0, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+							{Enable: false, Radio: 0, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+						},
+						LoRaStandardChannel: &pfconfig.IFConfig{Enable: false, Radio: 0, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+						FSKChannel:          &pfconfig.IFConfig{Enable: false, Radio: 0, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+						TxLUTConfigs: []pfconfig.TxLUTConfig{
+							{PAGain: 0, MixGain: 8, RFPower: -6, DigGain: 0},
+							{PAGain: 0, MixGain: 10, RFPower: -3, DigGain: 0},
+							{PAGain: 0, MixGain: 12, RFPower: 0, DigGain: 0},
+							{PAGain: 1, MixGain: 8, RFPower: 3, DigGain: 0},
+							{PAGain: 1, MixGain: 10, RFPower: 6, DigGain: 0},
+							{PAGain: 1, MixGain: 12, RFPower: 10, DigGain: 0},
+							{PAGain: 1, MixGain: 13, RFPower: 11, DigGain: 0},
+							{PAGain: 2, MixGain: 9, RFPower: 12, DigGain: 0},
+							{PAGain: 1, MixGain: 15, RFPower: 13, DigGain: 0},
+							{PAGain: 2, MixGain: 10, RFPower: 14, DigGain: 0},
+							{PAGain: 2, MixGain: 11, RFPower: 16, DigGain: 0},
+							{PAGain: 3, MixGain: 9, RFPower: 20, DigGain: 0},
+							{PAGain: 3, MixGain: 10, RFPower: 23, DigGain: 0},
+							{PAGain: 3, MixGain: 11, RFPower: 25, DigGain: 0},
+							{PAGain: 3, MixGain: 12, RFPower: 26, DigGain: 0},
+							{PAGain: 3, MixGain: 14, RFPower: 27, DigGain: 0},
+						},
+					},
+				},
 			},
 			IsProd: true,
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			cfg, err := GetRouterConfig(tc.FrequencyPlan, tc.IsProd)
+			cfg, err := GetRouterConfig(tc.FrequencyPlan, tc.IsProd, time.Now())
 			if err != nil {
 				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 					t.Fatalf("Unexpected error: %v", err)
@@ -204,8 +306,9 @@ func TestGetRouterConfig(t *testing.T) {
 			} else if tc.ErrorAssertion != nil {
 				t.Fatalf("Expected error")
 			} else {
+				cfg.MuxTime = 0
 				if !a.So(cfg, should.Resemble, tc.Cfg) {
-					t.Fatalf("Invalid config: %v", cfg)
+					t.Fatalf("Invalid config: %v\n", cfg)
 				}
 			}
 		})
