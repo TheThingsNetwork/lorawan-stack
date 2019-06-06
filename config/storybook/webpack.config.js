@@ -18,27 +18,45 @@
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 require('@babel/register')
 
-const config = require('../webpack.config.babel.js').default
-const development = process.env.NODE_ENV !== 'production'
+const { 'default': bundleConfig, styleConfig } = require('../webpack.config.babel.js')
 
 // list of allowed plugins
 const allow = [
   MiniCssExtractPlugin,
 ]
 
-if (development) {
-  // TODO: reenable this when the bug has been fixed in https://github.com/webpack/webpack/issues/5478
-  // const webpack = require("webpack")
-  // allow.push(webpack.DllReferencePlugin)
+
+module.exports = async function ({ config, mode }) {
+
+  if (mode === 'PRODUCTION') {
+    const webpack = require('webpack')
+    allow.push(webpack.DllReferencePlugin)
+  }
+
+  // Filter plugins on allowed type
+  const filteredPlugins = bundleConfig.plugins.filter(function (plugin) {
+    return allow.reduce((ok, klass) => ok || plugin instanceof klass, false)
+  })
+
+
+  // Compose storybook config, making use of stack webpack config
+  const cfg = {
+    ...config,
+    output: {
+      ...config.output,
+      publicPath: '',
+    },
+    module: {
+      rules: [
+        ...config.module.rules,
+        styleConfig,
+      ],
+    },
+    plugins: [
+      ...config.plugins,
+      ...filteredPlugins,
+    ],
+  }
+
+  return cfg
 }
-
-// filter plugins on allowed type
-config.plugins = config.plugins.filter(function (plugin) {
-  return allow.reduce((ok, klass) => ok || plugin instanceof klass, false)
-})
-
-config.module.rules = config.module.rules.filter(function (rule) {
-  return rule.loader !== 'babel-loader'
-})
-
-module.exports = config

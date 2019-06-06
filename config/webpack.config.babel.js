@@ -48,6 +48,41 @@ const modules = [ path.resolve(context, 'node_modules') ]
 
 const r = SUPPORT_LOCALES.split(',').map(l => new RegExp(l.trim()))
 
+// Export the style config for usage in the storybook config
+export const styleConfig = {
+  test: /\.(styl|css)$/,
+  include,
+  use: [
+    'css-hot-loader',
+    {
+      loader: MiniCssExtractPlugin.loader,
+      options: {
+        publicPath: './',
+      },
+    },
+    {
+      loader: 'css-loader',
+      options: {
+        camelCase: true,
+        localIdentName: env({
+          production: '[hash:base64:10]',
+          development: '[path][local]-[hash:base64:10]',
+        }),
+        modules: true,
+      },
+    },
+    {
+      loader: 'stylus-loader',
+      options: {
+        'import': [
+          path.resolve(context, 'pkg/webui/styles/include.styl'),
+        ],
+        use: [ nib() ],
+      },
+    },
+  ],
+}
+
 export default {
   context,
   mode: production ? 'production' : 'development',
@@ -64,22 +99,12 @@ export default {
     inline: true,
     hot: true,
     stats: 'minimal',
-    proxy: {
-      // proxy /console and /oauth requests to the actual backend for both
-      // api calls and fetching the generated html
-      '/console': {
-        target: 'http://localhost:1885',
-        bypass: () => false,
-      },
-      '/oauth': {
-        target: 'http://localhost:1885',
-        bypass: () => false,
-      },
-      '/api': {
-        target: 'http://localhost:1885',
-        bypass: () => false,
-      },
-    },
+    publicPath: `${ASSETS_ROOT}/`,
+    proxy: [{
+      context: [ '/console', '/oauth', '/api' ],
+      target: 'http://localhost:1885',
+      changeOrigin: true,
+    }],
     historyApiFallback: true,
   },
   entry: {
@@ -130,40 +155,7 @@ export default {
           name: '[name].[hash].[ext]',
         },
       },
-      {
-        test: /\.(styl|css)$/,
-        include,
-        use: [
-          'css-hot-loader',
-          {
-            loader: MiniCssExtractPlugin.loader,
-            options: {
-              publicPath: './',
-            },
-          },
-          {
-            loader: 'css-loader',
-            options: {
-              modules: true,
-              minimize: production,
-              camelCase: true,
-              localIdentName: env({
-                production: '[hash:base64:10]',
-                development: '[path][local]-[hash:base64:10]',
-              }),
-            },
-          },
-          {
-            loader: 'stylus-loader',
-            options: {
-              'import': [
-                path.resolve(context, 'pkg/webui/styles/include.styl'),
-              ],
-              use: [ nib() ],
-            },
-          },
-        ],
-      },
+      styleConfig,
       {
         test: /\.css$/,
         use: [
@@ -172,7 +164,6 @@ export default {
             loader: 'css-loader',
             options: {
               modules: false,
-              minimize: production,
             },
           },
         ],
