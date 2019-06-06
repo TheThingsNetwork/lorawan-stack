@@ -54,6 +54,7 @@ export const [{
   failure: updateDeviceFailure,
 }] = createRequestActions(UPDATE_DEV_BASE,
   (appId, deviceId, patch) => ({ appId, deviceId, patch }),
+  (appId, deviceId, patch, selector) => ({ selector })
 )
 
 export const START_DEVICE_EVENT_STREAM = createStartEventsStreamActionType(SHARED_NAME)

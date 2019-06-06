@@ -13,28 +13,28 @@
 // limitations under the License.
 
 import {
-  UPDATE_DEV,
   GET_DEV_SUCCESS,
+  UPDATE_DEV_SUCCESS,
 } from '../actions/device'
 
 const defaultState = {
   device: undefined,
 }
 
-const device = function (state = defaultState, action) {
-  switch (action.type) {
-  case UPDATE_DEV:
+const device = function (state = defaultState, { type, payload }) {
+  switch (type) {
+  case UPDATE_DEV_SUCCESS:
     return {
       ...state,
       device: {
         ...state.device,
-        ...action.patch,
+        ...payload,
       },
     }
   case GET_DEV_SUCCESS:
     return {
       ...state,
-      device: action.payload,
+      device: payload,
     }
   default:
     return state
