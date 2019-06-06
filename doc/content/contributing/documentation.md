@@ -12,10 +12,14 @@ All the content is written in Markdown.
 
 ### Install
 
-Hugo is available on most platform via packet managers. See HUGO install instruction
-for more details.
+Since HUGO is written essentially in `go` you don't have to install anything, our build
+system will task itself to `run` the right commands
 
-https://github.com/gohugoio/hugo#choose-how-to-install
+### Commands
+
+There are two important command when working on the documentation
+* `mage docs:deps` pull the dependencies necessary to generate the doc.
+* `mage docs:server` to start HUGO live server and visualize the doc.
 
 ### Front Matter
 
@@ -44,3 +48,9 @@ aliases:
     - /2010/01/01/even-earlier-url.html
 ```
 [Source](https://gohugo.io/content-management/urls/#example-aliases)
+
+## Configuration
+
+For developement you can make change to the `config.toml`.
+If you want to make permanent changes you need to edit `config.tmpl` and run `mage docs:config`
+then commit your changes.
