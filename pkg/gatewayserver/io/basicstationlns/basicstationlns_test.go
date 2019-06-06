@@ -377,7 +377,7 @@ func TestVersion(t *testing.T) {
 				Package:  "test-package",
 				Model:    "test-model",
 				Protocol: 2,
-				Features: []string{"prod", "gps"},
+				Features: "prod gps",
 			},
 			ExpectedRouterConfig: messages.RouterConfig{
 				Region:         "EU863",
@@ -403,7 +403,7 @@ func TestVersion(t *testing.T) {
 				Package:  "test-package",
 				Model:    "test-model",
 				Protocol: 2,
-				Features: []string{"rmtsh", "gps"},
+				Features: "rmtsh gps",
 			},
 			ExpectedRouterConfig: messages.RouterConfig{
 				Region:         "EU863",

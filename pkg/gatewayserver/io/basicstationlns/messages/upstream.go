@@ -55,13 +55,13 @@ type RadioMetaData struct {
 
 // JoinRequest is the LoRaWAN Join Request message from the BasicStation.
 type JoinRequest struct {
-	MHdr          uint             `json:"MHdr"`
-	JoinEUI       basicstation.EUI `json:"JoinEui"`
-	DevEUI        basicstation.EUI `json:"DevEui"`
-	DevNonce      uint             `json:"DevNonce"`
-	MIC           int32            `json:"MIC"`
-	RefTime       float64          `json:"RefTime"`
-	RadioMetaData RadioMetaData
+	MHdr     uint             `json:"MHdr"`
+	JoinEUI  basicstation.EUI `json:"JoinEui"`
+	DevEUI   basicstation.EUI `json:"DevEui"`
+	DevNonce uint             `json:"DevNonce"`
+	MIC      int32            `json:"MIC"`
+	RefTime  float64          `json:"RefTime"`
+	RadioMetaData
 }
 
 // MarshalJSON implements json.Marshaler.
@@ -78,16 +78,16 @@ func (req JoinRequest) MarshalJSON() ([]byte, error) {
 
 // UplinkDataFrame is the LoRaWAN Uplink message from the BasicStation.
 type UplinkDataFrame struct {
-	MHdr          uint    `json:"MHdr"`
-	DevAddr       int32   `json:"DevAddr"`
-	FCtrl         uint    `json:"FCtrl"`
-	FCnt          uint    `json:"Fcnt"`
-	FOpts         string  `json:"FOpts"`
-	FPort         int     `json:"FPort"`
-	FRMPayload    string  `json:"FRMPayload"`
-	MIC           int32   `json:"MIC"`
-	RefTime       float64 `json:"RefTime"`
-	RadioMetaData RadioMetaData
+	MHdr       uint    `json:"MHdr"`
+	DevAddr    int32   `json:"DevAddr"`
+	FCtrl      uint    `json:"FCtrl"`
+	FCnt       uint    `json:"Fcnt"`
+	FOpts      string  `json:"FOpts"`
+	FPort      int     `json:"FPort"`
+	FRMPayload string  `json:"FRMPayload"`
+	MIC        int32   `json:"MIC"`
+	RefTime    float64 `json:"RefTime"`
+	RadioMetaData
 }
 
 // MarshalJSON implements json.Marshaler.
@@ -145,7 +145,7 @@ func (req *JoinRequest) ToUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID str
 		Payload: &ttnpb.Message_JoinRequestPayload{JoinRequestPayload: &ttnpb.JoinRequestPayload{
 			JoinEUI:  req.JoinEUI.EUI64,
 			DevEUI:   req.DevEUI.EUI64,
-			DevNonce: [2]byte{byte(req.DevNonce), byte(req.DevNonce >> 8)},
+			DevNonce: [2]byte{byte(req.DevNonce >> 8), byte(req.DevNonce)},
 		}},
 	}
 
