@@ -15,7 +15,6 @@
 import React from 'react'
 import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
-import { defineMessages } from 'react-intl'
 
 import toast from '../../../components/toast'
 import PropTypes from '../../../lib/prop-types'
@@ -25,6 +24,7 @@ import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import PayloadFormattersForm from '../../components/payload-formatters-form'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import PAYLOAD_FORMATTER_TYPES from '../../constants/formatter-types'
+import Message from '../../../lib/components/message'
 import { updateApplicationLinkSuccess } from '../../store/actions/link'
 import {
   selectApplicationIsLinked,
@@ -33,11 +33,6 @@ import {
 } from '../../store/selectors/application'
 
 import api from '../../api'
-
-const m = defineMessages({
-  title: 'Uplink Payload Formatters',
-  updateSuccess: 'Successfully set uplink payload formatter',
-})
 
 @connect(function (state) {
   const formatters = selectApplicationLinkFormatters(state) || {}
@@ -87,7 +82,7 @@ class ApplicationPayloadFormatters extends React.PureComponent {
     const { appId, updateLinkSuccess } = this.props
     toast({
       title: appId,
-      message: m.updateSuccess,
+      message: sharedMessages.payloadFormattersUpdateSuccess,
       type: toast.types.SUCCESS,
     })
     updateLinkSuccess(link)
@@ -98,13 +93,13 @@ class ApplicationPayloadFormatters extends React.PureComponent {
 
     return (
       <React.Fragment>
-        <IntlHelmet title={m.title} />
+        <IntlHelmet title={sharedMessages.payloadFormattersUplink} />
+        <Message component="h2" content={sharedMessages.payloadFormattersUplink} />
         <PayloadFormattersForm
           uplink
           linked={linked}
           onSubmit={this.onSubmit}
           onSubmitSuccess={this.onSubmitSuccess}
-          title={m.title}
           initialType={formatters.up_formatter || PAYLOAD_FORMATTER_TYPES.NONE}
           initialParameter={formatters.up_formatter_parameter || ''}
         />
