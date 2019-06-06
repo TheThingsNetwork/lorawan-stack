@@ -59,3 +59,7 @@ export const getEntityId = function (entity) {
 
   return id
 }
+
+export const getWebhookId = function (webhook = {}) {
+  return getByPath(webhook, 'ids.webhook_id')
+}

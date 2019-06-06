@@ -12,44 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.container
-  display: flex
-  flex-direction: column
-  margin-bottom: $cs.l
-  &.horizontal
-    flex-direction: row
-    .header-title
-      width: 30%
-    .fields
-      width: 70%
-  &.disabled
-    .header-title
-      opacity: .4
+const storeSelector = state => state.webhookFormats
 
-.container:not(.horizontal)
-  span.header-title
-    font-weight: 600
+export const formatsSelector = function (state) {
+  const store = storeSelector(state)
 
-.header-title
-  line-height: 2.2
-  margin-bottom: 0
-  flex-shrink: 0
+  return store.formats || {}
+}
 
-.fields
-  display: flex
-  flex-wrap: wrap
+export const errorSelector = function (state) {
+  const store = storeSelector(state)
 
-.columns
-  width: auto
-  margin-right: $cs.l
+  return store.error
+}
 
-  &.field
-    margin-bottom: 0
+export const fetchingSelector = function (state) {
+  const store = storeSelector(state)
 
-.field:not(.columns)
-  margin-bottom: $cs.m
-  &:first-child
-    margin-top: $cs.xxs
-
-.error
-  margin-bottom: $cs.m
+  return store.fetching
+}

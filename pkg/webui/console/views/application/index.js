@@ -30,6 +30,7 @@ import ApplicationLink from '../application-link'
 import ApplicationCollaborators from '../application-collaborators'
 import ApplicationData from '../application-data'
 import ApplicationPayloadFormatters from '../application-payload-formatters'
+import ApplicationIntegrations from '../application-integrations'
 
 import {
   getApplication,
@@ -105,6 +106,7 @@ dispatch => ({
         title: sharedMessages.integrations,
         path: `${matchedUrl}/integrations`,
         icon: 'integration',
+        exact: false,
       },
       {
         title: sharedMessages.collaborators,
@@ -176,6 +178,7 @@ export default class Application extends React.Component {
         <Route path={`${match.path}/collaborators`} component={ApplicationCollaborators} />
         <Route path={`${match.path}/data`} component={ApplicationData} />
         <Route path={`${match.path}/payload-formatters`} component={ApplicationPayloadFormatters} />
+        <Route path={`${match.path}/integrations`} component={ApplicationIntegrations} />
       </Switch>
     )
   }

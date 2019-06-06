@@ -19,11 +19,12 @@ import bind from 'autobind-decorator'
 import Icon from '../icon'
 import Spinner from '../spinner'
 import ByteInput from './byte'
+import Toggled from './toggled'
 
 import style from './input.styl'
 
 @bind
-export default class Input extends React.Component {
+class Input extends React.Component {
   static propTypes = {
     icon: PropTypes.string,
     value: PropTypes.oneOfType([
@@ -156,3 +157,7 @@ const Valid = function (props) {
     </svg>
   )
 }
+
+Input.Toggled = Toggled
+
+export default Input

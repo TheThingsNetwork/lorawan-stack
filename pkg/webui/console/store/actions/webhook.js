@@ -12,44 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.container
-  display: flex
-  flex-direction: column
-  margin-bottom: $cs.l
-  &.horizontal
-    flex-direction: row
-    .header-title
-      width: 30%
-    .fields
-      width: 70%
-  &.disabled
-    .header-title
-      opacity: .4
+export const GET_WEBHOOK = 'GET_WEBHOOK_REQUEST'
+export const GET_WEBHOOK_SUCCESS = 'GET_WEBHOOK_SUCCESS'
+export const GET_WEBHOOK_FAILURE = 'GET_WEBHOOK_FAILURE'
 
-.container:not(.horizontal)
-  span.header-title
-    font-weight: 600
+export const getWebhook = (appId, webhookId, meta) => (
+  { type: GET_WEBHOOK, appId, webhookId, meta }
+)
 
-.header-title
-  line-height: 2.2
-  margin-bottom: 0
-  flex-shrink: 0
+export const getWebhookSuccess = webhook => (
+  { type: GET_WEBHOOK_SUCCESS, webhook }
+)
 
-.fields
-  display: flex
-  flex-wrap: wrap
-
-.columns
-  width: auto
-  margin-right: $cs.l
-
-  &.field
-    margin-bottom: 0
-
-.field:not(.columns)
-  margin-bottom: $cs.m
-  &:first-child
-    margin-top: $cs.xxs
-
-.error
-  margin-bottom: $cs.m
+export const getWebhookFailure = error => (
+  { type: GET_WEBHOOK_FAILURE, error }
+)

@@ -136,7 +136,8 @@ const component = function (type) {
   case 'byte':
   case 'textarea':
     return Input
-
+  case 'toggled-input':
+    return Input.Toggled
   case 'select':
     return Select
 
@@ -160,7 +161,6 @@ const Field = function (props) {
     placeholder = props.title,
     description = null,
     warning,
-    touched = false,
     horizontal = false,
     disabled = false,
     readOnly = false,
@@ -173,9 +173,9 @@ const Field = function (props) {
     ...rest
   } = props
 
-  const handleChange = function (value) {
+  const handleChange = function (value, forceTouch) {
     setFieldValue(name, value)
-    if (validateOnChange) {
+    if (validateOnChange || forceTouch) {
       setFieldTouched(touches, true)
     }
     if (props.onChange) {
@@ -193,17 +193,24 @@ const Field = function (props) {
   // Underscored assignment due to naming conflict
   let _error = rest.error
   const id = props.id || name
+
+  let touched = rest.touched || false
+  if (typeof touched === 'object') {
+    // Reduce touch value in case of object
+    touched = Object.values(touched).every(e => Boolean(e))
+  }
+
   const formatMessage = content => typeof content === 'object' ? props.intl.formatMessage(content) : content
   if (form) {
     rest.onChange = handleChange
     rest.onBlur = handleBlur
     _error = touched && rest.error
     rest.value = rest.value || ''
-  }
 
-  // Dismiss non boolean values for checkboxes
-  if (type === 'checkbox') {
-    rest.value = typeof rest.value === 'boolean' ? rest.value : false
+    // Dismiss non boolean values for checkboxes
+    if (type === 'checkbox') {
+      rest.value = typeof rest.value === 'boolean' ? rest.value : false
+    }
   }
 
   // restore the rest object for future per component filtering
@@ -289,7 +296,10 @@ Field.propTypes = {
    */
   form: PropTypes.bool,
   /** A flag indicating whether the field has already received any input so far */
-  touched: PropTypes.bool,
+  touched: PropTypes.oneOfType([
+    PropTypes.bool,
+    PropTypes.object,
+  ]),
   /** The value name that the field will set to touched (defaults to 'name' prop)
    */
   touches: PropTypes.string,

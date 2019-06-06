@@ -45,7 +45,57 @@ const checkboxFields = [
   />,
 ]
 
-storiesOf('Fields', module)
+storiesOf('Fields/Select', module)
+  .addDecorator((story, context) => withInfo(info)(story)(context))
+  .add('Default', () => (
+    <Field
+      type="select"
+      name="foo"
+      title="Foo"
+      description="A Select field."
+      options={[
+        { value: 'amsterdam', label: 'Amsterdam' },
+        { value: 'berlin', label: 'Berlin' },
+        { value: 'dusseldorf', label: 'Düsseldorf' },
+      ]}
+      form={false}
+    />
+  ))
+
+storiesOf('Fields/Boolean', module)
+  .addDecorator((story, context) => withInfo(info)(story)(context))
+  .add('Default', () => (
+    <Field
+      type="checkbox"
+      name="foo"
+      title="Foo"
+      description="Foo field."
+      form={false}
+    />
+  ))
+  .add('Disabled', () => (
+    <Field
+      type="checkbox"
+      name="foo"
+      title="Foo"
+      description="Foo field."
+      form={false}
+      disabled
+    />
+  ))
+  .add('Error', () => (
+    <Field
+      type="checkbox"
+      name="foo"
+      title="Foo"
+      description="Foo field."
+      error="Are you sure?"
+      touched
+      form={false}
+    />
+  ))
+
+storiesOf('Fields/Inputs', module)
   .addDecorator((story, context) => withInfo(info)(story)(context))
   .add('Default', () => (
     <Field
@@ -73,7 +123,6 @@ storiesOf('Fields', module)
         form={false}
       />
     </div>
-
   ))
   .add('Number', () => (
     <Field
@@ -84,26 +133,15 @@ storiesOf('Fields', module)
       form={false}
     />
   ))
-  .add('Boolean', () => (
+  .add('Warning', () => (
     <Field
-      type="checkbox"
-      name="foo"
-      title="Foo"
-      description="Foo field."
-      form={false}
-    />
-  ))
-  .add('Select', () => (
-    <Field
-      type="select"
-      name="foo"
-      title="Foo"
-      description="A Select field."
-      options={[
-        { value: 'amsterdam', label: 'Amsterdam' },
-        { value: 'berlin', label: 'Berlin' },
-        { value: 'dusseldorf', label: 'Düsseldorf' },
-      ]}
+      name="password"
+      title="Password"
+      description="Create a new password."
+      value="123456"
+      type="password"
+      warning="Insecure password"
+      touched
       form={false}
     />
   ))
@@ -119,37 +157,15 @@ storiesOf('Fields', module)
       form={false}
     />
   ))
-  .add('Boolean Disabled', () => (
+  .add('Toggled', () => (
     <Field
-      type="checkbox"
-      name="foo"
-      title="Foo"
-      description="Foo field."
+      name="uplink_message"
+      title="Uplink Message"
+      type="toggled-input"
+      value={{ enabled: true, value: '/path/to/webhook' }}
       form={false}
-      disabled
-    />
-  ))
-  .add('Boolean Error', () => (
-    <Field
-      type="checkbox"
-      name="foo"
-      title="Foo"
-      description="Foo field."
-      error="Are you sure?"
       touched
-      form={false}
-    />
-  ))
-  .add('Warning', () => (
-    <Field
-      name="password"
-      title="Password"
-      description="Create a new password."
-      value="123456"
-      type="password"
-      warning="Insecure password"
-      touched
-      form={false}
+      horizontal
     />
   ))
 
