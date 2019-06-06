@@ -38,7 +38,7 @@ func (Docs) Gen() error {
 	if baseUrl != "" {
 		args = append(args, "--baseUrl", baseUrl)
 	}
-	return sh.RunV("go", args...)
+	return sh.RunWith(map[string]string{"GO111MODULE": "on"}, "go", args...)
 }
 
 // Gen generates static website from the doc in doc/public/$version.
@@ -49,7 +49,7 @@ func (Docs) GenVersion() error {
 	if baseUrl != "" {
 		args = append(args, "--baseUrl", baseUrl+currentVersion)
 	}
-	return sh.RunV("go", args...)
+	return sh.RunWith(map[string]string{"GO111MODULE": "on"}, "go", args...)
 }
 
 // Docs install documentation dependencies.
@@ -59,7 +59,7 @@ func (Docs) Deps() error {
 
 // Server starts live documentation server.
 func (Docs) Server() error {
-	return sh.RunV("go", append(hugoArgs, "server")...)
+	return sh.RunWith(map[string]string{"GO111MODULE": "on"}, "go", append(hugoArgs, "server")...)
 }
 
 // Config generate hugo documentation with git metadata.

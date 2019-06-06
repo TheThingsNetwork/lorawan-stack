@@ -84,10 +84,6 @@ install:
   fi
 - |
   if [[ "$RUNTYPE" == "doc" ]]; then
-    set -e
-    sudo apt-get -y update
-    sudo apt-get install -y snapd
-    sudo snap install hugo
     $MAGE docs:deps
   fi
 before_script:
