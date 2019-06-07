@@ -14,9 +14,9 @@
 
 import { createLogic } from 'redux-logic'
 
-import api from '../../api'
-import * as applications from '../actions/applications'
-import * as application from '../actions/application'
+import api from '../../../api'
+import * as applications from '../../actions/applications'
+import * as application from '../../actions/application'
 
 const getApplicationsLogic = createLogic({
   type: [

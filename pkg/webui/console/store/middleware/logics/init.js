@@ -14,10 +14,10 @@
 
 import { createLogic } from 'redux-logic'
 
-import * as user from '../actions/user'
-import * as init from '../actions/init'
-import api from '../../api'
-import * as accessToken from '../../lib/access-token'
+import * as user from '../../actions/user'
+import * as init from '../../actions/init'
+import api from '../../../api'
+import * as accessToken from '../../../lib/access-token'
 
 const consoleAppLogic = createLogic({
   type: init.INITIALIZE,
@@ -50,4 +50,4 @@ const consoleAppLogic = createLogic({
   },
 })
 
-export default consoleAppLogic
+export default [ consoleAppLogic ]

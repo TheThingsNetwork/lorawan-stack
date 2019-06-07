@@ -14,8 +14,8 @@
 
 import { createLogic } from 'redux-logic'
 
-import api from '../../api'
-import * as gateways from '../actions/gateways'
+import api from '../../../api'
+import * as gateways from '../../actions/gateways'
 
 const getGatewaysLogic = createLogic({
   type: [

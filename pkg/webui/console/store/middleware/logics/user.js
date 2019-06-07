@@ -14,30 +14,24 @@
 
 import { createLogic } from 'redux-logic'
 
-import api from '../../api'
-import * as devices from '../actions/devices'
-
-const getDevicesListLogic = createLogic({
-  type: [
-    devices.GET_DEVICES_LIST,
-    devices.SEARCH_DEVICES_LIST,
-  ],
-  async process ({ getState, action }, dispatch, done) {
-    const { appId } = action
-    const { page, pageSize: limit } = action.filters
-
-    try {
-      const data = await api.devices.list(appId, { page, limit })
-      dispatch(devices.getDevicesListSuccess(data.end_devices, data.totalCount))
-    } catch (error) {
-      dispatch(devices.getDevicesListFailure(error))
-    }
-
-    done()
-
-  },
-})
+import * as user from '../../actions/user'
+import api from '../../../api'
+import * as accessToken from '../../../lib/access-token'
 
 export default [
-  getDevicesListLogic,
+  createLogic({
+    type: user.LOGOUT,
+    async process ({ getState, action }, dispatch, done) {
+      try {
+        await api.console.logout()
+
+        accessToken.clear()
+        dispatch(user.logoutSuccess())
+      } catch (error) {
+        dispatch(user.logoutFailure())
+      }
+
+      done()
+    },
+  }),
 ]

@@ -14,14 +14,14 @@
 
 import { createLogic } from 'redux-logic'
 
-import * as configuration from '../actions/configuration'
-import { get as cacheGet, set as cacheSet } from '../../lib/cache'
-import api from '../../api'
+import * as configuration from '../../actions/configuration'
+import { get as cacheGet, set as cacheSet } from '../../../lib/cache'
+import api from '../../../api'
 
 import {
   nsFrequencyPlansSelector,
   gsFrequencyPlansSelector,
-} from '../selectors/configuration'
+} from '../../selectors/configuration'
 
 const getNsFrequencyPlansLogic = createLogic({
   type: configuration.GET_NS_FREQUENCY_PLANS,

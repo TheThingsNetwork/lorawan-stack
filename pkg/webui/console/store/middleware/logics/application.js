@@ -14,13 +14,13 @@
 
 import { createLogic } from 'redux-logic'
 
-import { isNotFoundError } from '../../../lib/errors/utils'
-import api from '../../api'
-import * as application from '../actions/application'
-import * as link from '../actions/link'
-import * as webhooks from '../actions/webhooks'
-import * as webhook from '../actions/webhook'
-import * as webhookFormats from '../actions/webhook-formats'
+import { isNotFoundError } from '../../../../lib/errors/utils'
+import api from '../../../api'
+import * as application from '../../actions/application'
+import * as link from '../../actions/link'
+import * as webhooks from '../../actions/webhooks'
+import * as webhook from '../../actions/webhook'
+import * as webhookFormats from '../../actions/webhook-formats'
 import createEventsConnectLogics from './events'
 
 const getApplicationLogic = createLogic({

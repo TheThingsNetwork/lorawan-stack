@@ -14,11 +14,11 @@
 
 import { createLogic } from 'redux-logic'
 
-import sharedMessages from '../../../lib/shared-messages'
-import api from '../../api'
-import * as gateway from '../actions/gateway'
-import { gsConfigSelector } from '../../../lib/selectors/env'
-import { gatewaySelector } from '../selectors/gateway'
+import sharedMessages from '../../../../lib/shared-messages'
+import api from '../../../api'
+import * as gateway from '../../actions/gateway'
+import { gsConfigSelector } from '../../../../lib/selectors/env'
+import { gatewaySelector } from '../../selectors/gateway'
 import createEventsConnectLogics from './events'
 
 const getGatewayLogic = createLogic({

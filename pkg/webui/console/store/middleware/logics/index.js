@@ -12,26 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { createLogic } from 'redux-logic'
-
-import * as user from '../actions/user'
-import api from '../../api'
-import * as accessToken from '../../lib/access-token'
+import client from './client'
+import user from './user'
+import init from './init'
+import applications from './applications'
+import application from './application'
+import devices from './devices'
+import device from './device'
+import gateways from './gateways'
+import gateway from './gateway'
+import configuration from './configuration'
 
 export default [
-  createLogic({
-    type: user.LOGOUT,
-    async process ({ getState, action }, dispatch, done) {
-      try {
-        await api.console.logout()
-
-        accessToken.clear()
-        dispatch(user.logoutSuccess())
-      } catch (error) {
-        dispatch(user.logoutFailure())
-      }
-
-      done()
-    },
-  }),
+  client,
+  ...user,
+  ...init,
+  ...applications,
+  ...application,
+  ...devices,
+  ...device,
+  ...gateways,
+  ...gateway,
+  ...configuration,
 ]

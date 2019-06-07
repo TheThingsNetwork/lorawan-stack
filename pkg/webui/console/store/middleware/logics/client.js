@@ -14,27 +14,20 @@
 
 import { createLogic } from 'redux-logic'
 
-import api from '../../api'
-import * as device from '../actions/device'
-import createEventsConnectLogics from './events'
+import api from '../../../api'
+import * as client from '../../actions/client'
 
-const getDeviceLogic = createLogic({
-  type: [ device.GET_DEV ],
+const clientLogic = createLogic({
+  type: client.GET_CLIENT,
   async process ({ getState, action }, dispatch, done) {
-    const { appId, deviceId, selector, options } = action
     try {
-      const dev = await api.device.get(appId, deviceId, selector, options)
-      dispatch(device.startDeviceEventsStream(dev.ids))
-      dispatch(device.getDeviceSuccess(dev))
-    } catch (e) {
-      dispatch(device.getDeviceFailure(e))
+      const result = await api.clients.get(action.clientId)
+      dispatch(client.getClientSuccess(result.data))
+    } catch (error) {
+      dispatch(client.getClientFailure(action.clientId))
     }
-
     done()
   },
 })
 
-export default [
-  getDeviceLogic,
-  ...createEventsConnectLogics(device.SHARED_NAME, 'device'),
-]
+export default clientLogic
