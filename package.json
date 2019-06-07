@@ -94,6 +94,7 @@
     "react-text-mask": "^5.0.2",
     "react-toastify": "^4.5.2",
     "redux": "^4.0.1",
+    "redux-actions": "^2.6.5",
     "redux-logic": "^2.1.1",
     "ttn-lw": "file:sdk/js",
     "url-polyfill": "^1.1.5",
