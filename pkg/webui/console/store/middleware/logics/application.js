@@ -42,18 +42,11 @@ const getApplicationApiKeysLogic = createRequestLogic({
   },
 })
 
-const getApplicationApiKeyLogic = createLogic({
+const getApplicationApiKeyLogic = createRequestLogic({
   type: application.GET_APP_API_KEY,
-  async process ({ action }, dispatch, done) {
-    const { entityId, keyId } = action
-    try {
-      const key = await api.application.apiKeys.get(entityId, keyId)
-      dispatch(application.getApplicationApiKeySuccess(key))
-    } catch (error) {
-      dispatch(application.getApplicationApiKeyFailure(error))
-    }
-
-    done()
+  async process ({ action }) {
+    const { entityId, keyId } = action.payload
+    return api.application.apiKeys.get(entityId, keyId)
   },
 })
 

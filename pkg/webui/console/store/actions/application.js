@@ -39,12 +39,7 @@ import {
 } from '../actions/events'
 
 import {
-  getApiKey,
   createGetApiKeyActionType,
-  getApiKeySuccess,
-  createGetApiKeySuccessActionType,
-  getApiKeyFailure,
-  createGetApiKeyFailureActionType,
 } from './api-key'
 
 import { createRequestActions } from './lib'
@@ -85,11 +80,8 @@ export const [{
   request: getApplicationApiKey,
   success: getApplicationApiKeySuccess,
   failure: getApplicationApiKeyFailure,
-}] = createRequestActions(GET_APP_API_KEY_BASE)
+}] = createRequestActions(GET_APP_API_KEY_BASE, (appId, keyId) => ({ entityId: appId, keyId }))
 
-export const GET_APP_API_KEY = createGetApiKeyActionType(SHARED_NAME)
-export const GET_APP_API_KEY_SUCCESS = createGetApiKeySuccessActionType(SHARED_NAME)
-export const GET_APP_API_KEY_FAILURE = createGetApiKeyFailureActionType(SHARED_NAME)
 export const GET_APP_COLLABORATOR_PAGE_DATA = createGetCollaboratorActionType(SHARED_NAME)
 export const GET_APP_COLLABORATORS_LIST = createGetCollaboratorsListActionType(SHARED_NAME)
 export const GET_APP_COLLABORATORS_LIST_SUCCESS = createGetCollaboratorsListSuccessActionType(SHARED_NAME)
@@ -99,12 +91,6 @@ export const START_APP_EVENT_STREAM_SUCCESS = createStartEventsStreamSuccessActi
 export const START_APP_EVENT_STREAM_FAILURE = createStartEventsStreamFailureActionType(SHARED_NAME)
 export const STOP_APP_EVENT_STREAM = createStopEventsStreamActionType(SHARED_NAME)
 export const CLEAR_APP_EVENTS = createClearEventsActionType(SHARED_NAME)
-
-export const getApplicationApiKey = getApiKey(SHARED_NAME)
-
-export const getApplicationApiKeySuccess = getApiKeySuccess(SHARED_NAME)
-
-export const getApplicationApiKeyFailure = getApiKeyFailure(SHARED_NAME)
 
 export const getApplicationCollaboratorsList = getCollaboratorsList(SHARED_NAME)
 

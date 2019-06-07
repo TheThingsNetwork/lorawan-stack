@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import { getApplicationId } from '../../../lib/selectors/id'
-import { GET_APP_BASE } from '../actions/application'
+import { GET_APP_BASE, GET_APP_API_KEY_BASE } from '../actions/application'
 import {
   eventsSelector,
   errorSelector as eventsErrorSelector,
@@ -29,11 +29,7 @@ import {
   errorSelector as apiKeysErrorSelector,
   fetchingSelector as apiKeysFetchingSelector,
 } from './api-keys'
-import {
-  apiKeySelector,
-  fetchingSelector as apiKeyFetchingSelector,
-  errorSelector as apiKeyErrorSelector,
-} from './api-key'
+import { apiKeySelector } from './api-key'
 import { createFetchingSelector } from './fetching'
 import { createErrorSelector } from './error'
 
@@ -78,9 +74,9 @@ export const applicationKeysFetchingSelector = apiKeysFetchingSelector(ENTITY)
 
 export const applicationKeySelector = apiKeySelector(ENTITY_SINGLE)
 
-export const applicationKeyFetchingSelector = apiKeyFetchingSelector(ENTITY_SINGLE)
+export const applicationKeyFetchingSelector = createFetchingSelector(GET_APP_API_KEY_BASE)
 
-export const applicationKeyErrorSelector = apiKeyErrorSelector(ENTITY_SINGLE)
+export const applicationKeyErrorSelector = createErrorSelector(GET_APP_API_KEY_BASE)
 
 const selectLinkStore = state => state.link
 

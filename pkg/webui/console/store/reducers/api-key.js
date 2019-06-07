@@ -14,38 +14,24 @@
 
 import {
   createGetApiKeyActionType,
-  createGetApiKeySuccessActionType,
-  createGetApiKeyFailureActionType,
 } from '../actions/api-key'
 
+import { createRequestActions } from '../actions/lib'
+
 const defaultState = {
-  fetching: false,
-  error: undefined,
   key: undefined,
 }
 
 const createNamedApiKeyReducer = function (reducerName = '') {
-  const GET_KEY = createGetApiKeyActionType(reducerName)
-  const GET_KEY_SUCCESS = createGetApiKeySuccessActionType(reducerName)
-  const GET_KEY_FAILURE = createGetApiKeyFailureActionType(reducerName)
+  const GET_KEY_BASE = createGetApiKeyActionType(reducerName)
+  const [{ success: GET_KEY_SUCCESS }] = createRequestActions(GET_KEY_BASE)
 
-  return function (state = defaultState, action) {
-    switch (action.type) {
-    case GET_KEY:
-      return {
-        fetching: true,
-      }
+  return function (state = defaultState, { type, payload }) {
+    switch (type) {
     case GET_KEY_SUCCESS:
       return {
         ...state,
-        key: action.key,
-        fetching: false,
-        error: undefined,
-      }
-    case GET_KEY_FAILURE:
-      return {
-        error: action.error,
-        fetching: false,
+        key: payload,
       }
     default:
       return state
