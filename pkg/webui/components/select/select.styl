@@ -16,23 +16,42 @@
   // Overwriting react-select styling in global scope
 
   // @stylint off
-  :global(.select__control)
-    min-height: 2.2rem
-    border-radius: $br.s
-  :global(.select__menu)
-    z-index: $zi.dropdown
   :global(.select__option)
     padding: $cs.xs $cs.s
   :global(.select__option--is-selected)
     background-color: $c-active-blue
   :global(.select__option--is-focused:not(.select__option--is-selected))
     background-color: $c-backdrop
-  :global(.select__dropdown-indicator)
-    padding: 4px
   :global(.select__control--is-focused)
     box-shadow: none
     border-color: $c-active-blue
     color: black
+
+  :global(.select__control)
+    min-height: 2.2rem
+    border-radius: $br.s
+  :global(.select__menu)
+    z-index: $zi.dropdown
+  :global(.select__dropdown-indicator)
+    padding: 4px
   :global(.select__value-container)
     padding: 0 8px
+
+  &.error
+    :global(.select__control)
+      color: $c-error
+      border-color: $c-error
+      background-color: lighten($c-error, 49)
+
+    :global(.select__control--is-focused)
+      box-shadow: 0 0 0 3px alpha($c-error, .2)
+
+  &.warning
+    :global(.select__control)
+      color: $c-warning
+      border-color: $c-warning
+      background-color: lighten($c-warning, 42)
+
+    :global(.select__control--is-focused)
+      box-shadow: 0 0 0 3px alpha($c-warning, .3)
   // @stylint on

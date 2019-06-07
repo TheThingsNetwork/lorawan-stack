@@ -16,6 +16,9 @@ import React from 'react'
 import ReactSelect from 'react-select'
 import { injectIntl } from 'react-intl'
 import bind from 'autobind-decorator'
+import classnames from 'classnames'
+
+import PropTypes from '../../lib/prop-types'
 
 import style from './select.styl'
 
@@ -26,12 +29,71 @@ const getValue = (opts, val) => opts.find(o => o.value === val)
 @bind
 class Select extends React.PureComponent {
 
-  onChange ({ value }) {
+  static propTypes = {
+    onChange: PropTypes.func,
+    onBlur: PropTypes.func,
+    onFocus: PropTypes.func,
+    value: PropTypes.string,
+    disabled: PropTypes.bool,
+    options: PropTypes.arrayOf(PropTypes.shape({
+      value: PropTypes.string,
+      label: PropTypes.message,
+    })),
+    error: PropTypes.bool,
+    warning: PropTypes.bool,
+  }
+
+  static defaultProps = {
+    onChange: () => null,
+    onBlur: () => null,
+    onFocus: () => null,
+    options: [],
+    disabled: false,
+    error: false,
+    warning: false,
+  }
+
+  constructor (props) {
+    super(props)
+
+    let value
+    if ('value' in props && this.context) {
+      value = props.value
+    }
+
+    this.state = {
+      checked: value,
+    }
+  }
+
+  static getDerivedStateFromProps (props, state) {
+    const { value } = props
+
+    if ('value' in props && value !== state.value) {
+      return { value }
+    }
+
+    return null
+  }
+
+  async onChange ({ value }) {
     const { onChange } = this.props
 
-    if (onChange) {
-      onChange(value)
+    if (!('value' in this.props)) {
+      await this.setState({ value })
     }
+
+    onChange(value)
+  }
+
+  onBlur (event) {
+    const { value } = this.state
+    const { onBlur } = this.props
+
+    // https://github.com/JedWatson/react-select/issues/3175
+    event.target.value = value
+
+    onBlur(event)
   }
 
   render () {
@@ -41,11 +103,19 @@ class Select extends React.PureComponent {
       intl,
       value,
       onChange,
+      onBlur,
+      onFocus,
+      disabled,
+      error,
+      warning,
       ...rest
     } = this.props
 
     const formatMessage = (label, values) => intl ? intl.formatMessage(label, values) : label
-    const classNames = className ? [ className, style.container ].join(' ') : style.container
+    const cls = classnames(className, style.container, {
+      [style.error]: error,
+      [style.warning]: warning,
+    })
     const translatedOptions = options.map(function (option) {
       const { label, labelValues = {}} = option
       if (typeof label === 'object' && label.id && label.defaultMessage) {
@@ -57,11 +127,14 @@ class Select extends React.PureComponent {
 
     return (
       <ReactSelect
-        className={classNames}
+        className={cls}
         classNamePrefix="select"
         value={getValue(translatedOptions, value)}
         options={translatedOptions}
         onChange={this.onChange}
+        onBlur={this.onBlur}
+        onFocus={onFocus}
+        isDisabled={disabled}
         {...rest}
       />
     )
