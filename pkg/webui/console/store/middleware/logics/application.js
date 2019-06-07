@@ -33,24 +33,12 @@ const getApplicationLogic = createRequestLogic({
   },
 })
 
-const getApplicationApiKeysLogic = createLogic({
+const getApplicationApiKeysLogic = createRequestLogic({
   type: application.GET_APP_API_KEYS_LIST,
-  async process ({ getState, action }, dispatch, done) {
-    const { id, params } = action
-    try {
-      const res = await api.application.apiKeys.list(id, params)
-      dispatch(
-        application.getApplicationApiKeysListSuccess(
-          id,
-          res.api_keys,
-          res.totalCount
-        )
-      )
-    } catch (e) {
-      dispatch(application.getApplicationApiKeysListFailure(id, e))
-    }
-
-    done()
+  async process ({ getState, action }) {
+    const { appId, params } = action.payload
+    const res = await api.application.apiKeys.list(appId, params)
+    return { ...res, id: appId }
   },
 })
 

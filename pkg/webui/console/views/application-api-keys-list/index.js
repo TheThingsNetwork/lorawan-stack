@@ -30,7 +30,7 @@ export default class ApplicationApiKeys extends React.Component {
     super(props)
 
     const { appId } = props.match.params
-    this.getApplicationsApiKeysList = filters => getApplicationApiKeysList(appId, filters)
+    this.getApplicationsApiKeysList = filters => getApplicationApiKeysList({ appId, filters })
   }
 
   baseDataSelector ({ apiKeys }) {
