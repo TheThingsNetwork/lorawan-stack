@@ -24,12 +24,12 @@ import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import sharedMessages from '../../../lib/shared-messages'
 import Form from '../../../components/form'
-import Field from '../../../components/field'
-import Button from '../../../components/button'
+import SubmitButton from '../../../components/submit-button'
+import Input from '../../../components/input'
+import Checkbox from '../../../components/checkbox'
 import Spinner from '../../../components/spinner'
 import ModalButton from '../../../components/button/modal-button'
 import Message from '../../../lib/components/message'
-import FieldGroup from '../../../components/field/group'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import toast from '../../../components/toast'
 import SubmitBar from '../../../components/submit-bar'
@@ -175,13 +175,11 @@ export default class ApplicationCollaboratorEdit extends React.Component {
     const { rightsItems, rightsValues } = rights.reduce(
       function (acc, right) {
         acc.rightsItems.push(
-          <Field
+          <Checkbox
             className={style.rightLabel}
             key={right}
             name={right}
-            type="checkbox"
-            title={{ id: `enum:${right}` }}
-            form
+            label={{ id: `enum:${right}` }}
           />
         )
         acc.rightsValues[right] = hasUniversalRights || collaborator.rights.includes(right)
@@ -227,22 +225,26 @@ export default class ApplicationCollaboratorEdit extends React.Component {
                 component="h4"
                 content={sharedMessages.generalInformation}
               />
-              <Field
+              <Form.Field
                 title={sharedMessages.collaboratorId}
                 required
                 valid
                 disabled
                 name="collaborator_id"
-                type="text"
+                component={Input}
               />
-              <FieldGroup
+              <Form.Field
                 name="rights"
                 title={sharedMessages.rights}
+                required
+                component={Checkbox.Group}
               >
                 {rightsItems}
-              </FieldGroup>
+              </Form.Field>
               <SubmitBar>
-                <Button type="submit" message={sharedMessages.saveChanges} />
+                <Form.Submit
+                  component={SubmitButton} message={sharedMessages.saveChanges}
+                />
                 <ModalButton
                   type="button"
                   icon="delete"

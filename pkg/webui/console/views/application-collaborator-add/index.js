@@ -24,10 +24,11 @@ import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import sharedMessages from '../../../lib/shared-messages'
 import Form from '../../../components/form'
-import Field from '../../../components/field'
-import Button from '../../../components/button'
+import SubmitButton from '../../../components/submit-button'
+import Input from '../../../components/input'
+import Checkbox from '../../../components/checkbox'
+import Select from '../../../components/select'
 import Message from '../../../lib/components/message'
-import FieldGroup from '../../../components/field/group'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import { id as collaboratorIdRegexp } from '../../lib/regexp'
 import SubmitBar from '../../../components/submit-bar'
@@ -98,6 +99,8 @@ export default class ApplicationCollaboratorAdd extends React.Component {
       rights: Object.keys(rights).filter(r => rights[r]),
     }
 
+    await this.setState({ error: '' })
+
     try {
       await api.application.collaborators.add(appId, collaborator)
       dispatch(push(`/console/applications/${appId}/collaborators`))
@@ -121,13 +124,11 @@ export default class ApplicationCollaboratorAdd extends React.Component {
     const { rightsItems, rightsValues } = rights.reduce(
       function (acc, right) {
         acc.rightsItems.push(
-          <Field
+          <Checkbox
             className={style.rightLabel}
             key={right}
             name={right}
-            type="checkbox"
-            title={{ id: `enum:${right}` }}
-            form
+            label={{ id: `enum:${right}` }}
           />
         )
         acc.rightsValues[right] = false
@@ -162,25 +163,21 @@ export default class ApplicationCollaboratorAdd extends React.Component {
               onSubmit={this.handleSubmit}
               initialValues={initialFormValues}
               validationSchema={validationSchema}
-              mapErrorsToFields={{
-                user_not_found: 'collaborator_id',
-                organization_not_found: 'collaborator_id',
-              }}
             >
               <Message
                 component="h4"
                 content={sharedMessages.generalInformation}
               />
-              <Field
+              <Form.Field
                 name="collaborator_id"
-                type="text"
+                component={Input}
                 title={sharedMessages.collaboratorId}
                 required
                 autoFocus
               />
-              <Field
-                type="select"
+              <Form.Field
                 name="collaborator_type"
+                component={Select}
                 title={sharedMessages.type}
                 required
                 options={[
@@ -188,14 +185,19 @@ export default class ApplicationCollaboratorAdd extends React.Component {
                   { value: 'organization', label: sharedMessages.organization },
                 ]}
               />
-              <FieldGroup
+              <Form.Field
                 name="rights"
                 title={sharedMessages.rights}
+                required
+                component={Checkbox.Group}
               >
                 {rightsItems}
-              </FieldGroup>
+              </Form.Field>
               <SubmitBar>
-                <Button type="submit" message={sharedMessages.addCollaborator} />
+                <Form.Submit
+                  component={SubmitButton}
+                  message={sharedMessages.addCollaborator}
+                />
               </SubmitBar>
             </Form>
           </Col>
