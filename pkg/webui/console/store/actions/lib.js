@@ -14,7 +14,13 @@
 
 /* eslint-disable import/prefer-default-export */
 
-const createRequestActions = function (baseType) {
+import { createAction } from 'redux-actions'
+
+const createRequestActions = function (
+  baseType,
+  requestPayloadCreator,
+  requestMetaCreator,
+) {
   const requestType = `${baseType}_REQUEST`
   const successType = `${baseType}_SUCCESS`
   const failureType = `${baseType}_FAILURE`
@@ -23,11 +29,10 @@ const createRequestActions = function (baseType) {
     request: requestType,
     success: successType,
     failure: failureType,
-  },
-  {
-    request: payload => ({ type: requestType, payload }),
-    success: payload => ({ type: successType, payload }),
-    failure: error => ({ type: failureType, error: true, payload: error }),
+  }, {
+    request: createAction(requestType, requestPayloadCreator, requestMetaCreator),
+    success: createAction(successType),
+    failure: createAction(failureType),
   }]
 }
 
