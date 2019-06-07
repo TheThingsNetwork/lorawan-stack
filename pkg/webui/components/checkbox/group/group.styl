@@ -12,9 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import CheckboxGroup from './group'
-import Checkbox from './checkbox'
+.group
+  display: flex
+  flex-direction: row
 
-Checkbox.Group = CheckboxGroup
+  .group-checkbox:not(:last-child)
+    margin-right: $cs.m
 
-export default Checkbox
+  &.horizontal
+    flex-direction: column
+
+    .group-checkbox:not(:last-child)
+      margin-bottom: $cs.s
