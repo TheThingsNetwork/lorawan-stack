@@ -54,12 +54,25 @@ import {
   createGetApiKeyFailureActionType,
 } from './api-key'
 
+import { createRequestActions } from './lib'
+
 export const SHARED_NAME = 'APPLICATION'
 
 export const GET_APP_BASE = 'GET_APPLICATION'
-export const GET_APP = `${GET_APP_BASE}_REQUEST`
-export const GET_APP_SUCCESS = `${GET_APP_BASE}_SUCCESS`
-export const GET_APP_FAILURE = `${GET_APP_BASE}_FAILURE`
+
+export const [{
+  request: GET_APP,
+  success: GET_APP_SUCCESS,
+  failure: GET_APP_FAILURE,
+}, {
+  request: getApplication,
+  success: getApplicationSuccess,
+  failure: getApplicationFailure,
+}] = createRequestActions(GET_APP_BASE,
+  id => ({ id }),
+  (id, selector) => ({ selector })
+)
+
 export const GET_APP_API_KEYS_LIST = createGetApiKeysListActionType(SHARED_NAME)
 export const GET_APP_API_KEYS_LIST_SUCCESS = createGetApiKeysListSuccessActionType(SHARED_NAME)
 export const GET_APP_API_KEYS_LIST_FAILURE = createGetApiKeysListFailureActionType(SHARED_NAME)
@@ -75,18 +88,6 @@ export const START_APP_EVENT_STREAM_SUCCESS = createStartEventsStreamSuccessActi
 export const START_APP_EVENT_STREAM_FAILURE = createStartEventsStreamFailureActionType(SHARED_NAME)
 export const STOP_APP_EVENT_STREAM = createStopEventsStreamActionType(SHARED_NAME)
 export const CLEAR_APP_EVENTS = createClearEventsActionType(SHARED_NAME)
-
-export const getApplication = id => (
-  { type: GET_APP, id }
-)
-
-export const getApplicationSuccess = application => (
-  { type: GET_APP_SUCCESS, application }
-)
-
-export const getApplicationFailure = error => (
-  { type: GET_APP_FAILURE, error }
-)
 
 export const getApplicationApiKeysList = getApiKeysList(SHARED_NAME)
 

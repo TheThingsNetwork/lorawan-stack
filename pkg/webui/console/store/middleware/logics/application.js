@@ -22,19 +22,14 @@ import * as webhooks from '../../actions/webhooks'
 import * as webhook from '../../actions/webhook'
 import * as webhookFormats from '../../actions/webhook-formats'
 import createEventsConnectLogics from './events'
+import createRequestLogic from './lib'
 
-const getApplicationLogic = createLogic({
-  type: [ application.GET_APP ],
-  async process ({ getState, action }, dispatch, done) {
-    const { id } = action
-    try {
-      const app = await api.application.get(id, 'name,description')
-      dispatch(application.getApplicationSuccess(app))
-    } catch (e) {
-      dispatch(application.getApplicationFailure(e))
-    }
 
-    done()
+const getApplicationLogic = createRequestLogic({
+  type: application.GET_APP,
+  async process ({ action }) {
+    const { payload: { id }, meta: { selector }} = action
+    return api.application.get(id, selector)
   },
 })
 

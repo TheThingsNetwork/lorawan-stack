@@ -12,19 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {
-  GET_APP_SUCCESS,
-} from '../actions/application'
+/* eslint-disable import/prefer-default-export */
 
-const defaultState = null
+const createRequestActions = function (baseType) {
+  const requestType = `${baseType}_REQUEST`
+  const successType = `${baseType}_SUCCESS`
+  const failureType = `${baseType}_FAILURE`
 
-const application = function (state = defaultState, action) {
-  switch (action.type) {
-  case GET_APP_SUCCESS:
-    return action.payload
-  default:
-    return state
-  }
+  return [{
+    request: requestType,
+    success: successType,
+    failure: failureType,
+  },
+  {
+    request: payload => ({ type: requestType, payload }),
+    success: payload => ({ type: successType, payload }),
+    failure: error => ({ type: failureType, error: true, payload: error }),
+  }]
 }
 
-export default application
+export { createRequestActions }
