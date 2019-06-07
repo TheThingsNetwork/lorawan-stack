@@ -1078,6 +1078,185 @@ var _ interface {
 
 var _ProvisionEndDevicesRequest_ProvisionerID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
+// ValidateFields checks the field values on JoinEUIPrefix with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *JoinEUIPrefix) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = JoinEUIPrefixFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "join_eui":
+			// no validation rules for JoinEUI
+		case "length":
+			// no validation rules for Length
+		default:
+			return JoinEUIPrefixValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// JoinEUIPrefixValidationError is the validation error returned by
+// JoinEUIPrefix.ValidateFields if the designated constraints aren't met.
+type JoinEUIPrefixValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e JoinEUIPrefixValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e JoinEUIPrefixValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e JoinEUIPrefixValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e JoinEUIPrefixValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e JoinEUIPrefixValidationError) ErrorName() string { return "JoinEUIPrefixValidationError" }
+
+// Error satisfies the builtin error interface
+func (e JoinEUIPrefixValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sJoinEUIPrefix.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = JoinEUIPrefixValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = JoinEUIPrefixValidationError{}
+
+// ValidateFields checks the field values on JoinEUIPrefixes with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *JoinEUIPrefixes) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = JoinEUIPrefixesFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "prefixes":
+
+			for idx, item := range m.Prefixes {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return JoinEUIPrefixesValidationError{
+							field:  fmt.Sprintf("prefixes[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
+		default:
+			return JoinEUIPrefixesValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// JoinEUIPrefixesValidationError is the validation error returned by
+// JoinEUIPrefixes.ValidateFields if the designated constraints aren't met.
+type JoinEUIPrefixesValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e JoinEUIPrefixesValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e JoinEUIPrefixesValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e JoinEUIPrefixesValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e JoinEUIPrefixesValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e JoinEUIPrefixesValidationError) ErrorName() string { return "JoinEUIPrefixesValidationError" }
+
+// Error satisfies the builtin error interface
+func (e JoinEUIPrefixesValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sJoinEUIPrefixes.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = JoinEUIPrefixesValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = JoinEUIPrefixesValidationError{}
+
 // ValidateFields checks the field values on
 // ProvisionEndDevicesRequest_IdentifiersList with the rules defined in the
 // proto definition for this message. If any rules are violated, an error is returned.

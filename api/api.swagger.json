@@ -2426,6 +2426,22 @@
         ]
       }
     },
+    "/js/join_eui_prefixes": {
+      "get": {
+        "operationId": "GetJoinEUIPrefixes",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3JoinEUIPrefixes"
+            }
+          }
+        },
+        "tags": [
+          "Js"
+        ]
+      }
+    },
     "/ns/applications/{application_ids.application_id}/devices/{device_id}": {
       "delete": {
         "operationId": "Delete",
@@ -7481,6 +7497,30 @@
         },
         "cf_list": {
           "$ref": "#/definitions/v3CFList"
+        }
+      }
+    },
+    "v3JoinEUIPrefix": {
+      "type": "object",
+      "properties": {
+        "join_eui": {
+          "type": "string",
+          "format": "byte"
+        },
+        "length": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "v3JoinEUIPrefixes": {
+      "type": "object",
+      "properties": {
+        "prefixes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3JoinEUIPrefix"
+          }
         }
       }
     },

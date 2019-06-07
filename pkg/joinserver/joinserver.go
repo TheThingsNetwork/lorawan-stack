@@ -72,6 +72,7 @@ type JoinServer struct {
 		nsJs      nsJsServer
 		asJs      asJsServer
 		jsDevices jsEndDeviceRegistryServer
+		js        jsServer
 	}
 	interop interopServer
 }
@@ -99,13 +100,16 @@ func New(c *component.Component, conf *Config) (*JoinServer, error) {
 	js.grpc.jsDevices = jsEndDeviceRegistryServer{JS: js}
 	js.grpc.asJs = asJsServer{JS: js}
 	js.grpc.nsJs = nsJsServer{JS: js}
+	js.grpc.js = jsServer{JS: js}
 	js.interop = interopServer{JS: js}
 
 	// TODO: Support authentication from non-cluster-local NS and AS (https://github.com/TheThingsNetwork/lorawan-stack/issues/4).
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.NsJs", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("joinserver"))
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.AsJs", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("joinserver"))
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.Js", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("joinserver"))
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.NsJs", cluster.HookName, c.ClusterAuthUnaryHook())
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.AsJs", cluster.HookName, c.ClusterAuthUnaryHook())
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.Js", cluster.HookName, c.ClusterAuthUnaryHook())
 
 	c.RegisterGRPC(js)
 	c.RegisterInterop(js)
@@ -122,10 +126,12 @@ func (js *JoinServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterAsJsServer(s, js.grpc.asJs)
 	ttnpb.RegisterNsJsServer(s, js.grpc.nsJs)
 	ttnpb.RegisterJsEndDeviceRegistryServer(s, js.grpc.jsDevices)
+	ttnpb.RegisterJsServer(s, js.grpc.js)
 }
 
 // RegisterHandlers registers gRPC handlers.
 func (js *JoinServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
+	ttnpb.RegisterJsHandler(js.Context(), s, conn)
 	ttnpb.RegisterJsEndDeviceRegistryHandler(js.Context(), s, conn)
 }
 

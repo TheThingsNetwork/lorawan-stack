@@ -172,6 +172,8 @@
   - [Message `DeriveSessionKeysRequest`](#ttn.lorawan.v3.DeriveSessionKeysRequest)
   - [Message `GetRootKeysRequest`](#ttn.lorawan.v3.GetRootKeysRequest)
   - [Message `JoinAcceptMICRequest`](#ttn.lorawan.v3.JoinAcceptMICRequest)
+  - [Message `JoinEUIPrefix`](#ttn.lorawan.v3.JoinEUIPrefix)
+  - [Message `JoinEUIPrefixes`](#ttn.lorawan.v3.JoinEUIPrefixes)
   - [Message `NwkSKeysResponse`](#ttn.lorawan.v3.NwkSKeysResponse)
   - [Message `ProvisionEndDevicesRequest`](#ttn.lorawan.v3.ProvisionEndDevicesRequest)
   - [Message `ProvisionEndDevicesRequest.IdentifiersFromData`](#ttn.lorawan.v3.ProvisionEndDevicesRequest.IdentifiersFromData)
@@ -180,6 +182,7 @@
   - [Message `SessionKeyRequest`](#ttn.lorawan.v3.SessionKeyRequest)
   - [Service `ApplicationCryptoService`](#ttn.lorawan.v3.ApplicationCryptoService)
   - [Service `AsJs`](#ttn.lorawan.v3.AsJs)
+  - [Service `Js`](#ttn.lorawan.v3.Js)
   - [Service `JsEndDeviceRegistry`](#ttn.lorawan.v3.JsEndDeviceRegistry)
   - [Service `NetworkCryptoService`](#ttn.lorawan.v3.NetworkCryptoService)
   - [Service `NsJs`](#ttn.lorawan.v3.NsJs)
@@ -2524,6 +2527,19 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | `payload_request` | <p>`message.required`: `true`</p> |
 | `join_request_type` | <p>`enum.defined_only`: `true`</p> |
 
+### <a name="ttn.lorawan.v3.JoinEUIPrefix">Message `JoinEUIPrefix`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `join_eui` | [`bytes`](#bytes) |  |  |
+| `length` | [`uint32`](#uint32) |  |  |
+
+### <a name="ttn.lorawan.v3.JoinEUIPrefixes">Message `JoinEUIPrefixes`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `prefixes` | [`JoinEUIPrefix`](#ttn.lorawan.v3.JoinEUIPrefix) | repeated |  |
+
 ### <a name="ttn.lorawan.v3.NwkSKeysResponse">Message `NwkSKeysResponse`</a>
 
 | Field | Type | Label | Description |
@@ -2607,6 +2623,18 @@ The AsJs service connects an Application Server to a Join Server.
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `GetAppSKey` | [`SessionKeyRequest`](#ttn.lorawan.v3.SessionKeyRequest) | [`AppSKeyResponse`](#ttn.lorawan.v3.AppSKeyResponse) |  |
+
+### <a name="ttn.lorawan.v3.Js">Service `Js`</a>
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| `GetJoinEUIPrefixes` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`JoinEUIPrefixes`](#ttn.lorawan.v3.JoinEUIPrefixes) |  |
+
+#### HTTP bindings
+
+| Method Name | Method | Pattern | Body |
+| ----------- | ------ | ------- | ---- |
+| `GetJoinEUIPrefixes` | `GET` | `/api/v3/js/join_eui_prefixes` |  |
 
 ### <a name="ttn.lorawan.v3.JsEndDeviceRegistry">Service `JsEndDeviceRegistry`</a>
 
