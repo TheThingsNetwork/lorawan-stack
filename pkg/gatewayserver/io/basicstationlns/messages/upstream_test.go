@@ -101,7 +101,7 @@ func TestMarshalJSON(t *testing.T) {
 				t.Fatalf("Unexpected error: %v", err)
 			}
 			if !a.So(msg, should.Resemble, tc.Expected) {
-				t.Fatalf("Unexpected message: %v\n, Expected: %s", string(msg), string(tc.Expected))
+				t.Fatalf("Unexpected message: %v", msg)
 			}
 		})
 	}
@@ -586,7 +586,7 @@ func TestJreqFromUplinkDataFrame(t *testing.T) {
 				MHdr:     0,
 				DevEUI:   basicstation.EUI{EUI64: types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}},
 				JoinEUI:  basicstation.EUI{EUI64: types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}},
-				DevNonce: 65346,
+				DevNonce: 0x42ff,
 				MIC:      268435266,
 				RadioMetaData: RadioMetaData{
 					DataRate:  1,
