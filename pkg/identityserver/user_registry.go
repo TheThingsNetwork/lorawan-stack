@@ -48,7 +48,8 @@ var (
 var (
 	errInvitationTokenRequired   = errors.DefineUnauthenticated("invitation_token_required", "invitation token required")
 	errInvitationTokenExpired    = errors.DefineUnauthenticated("invitation_token_expired", "invitation token expired")
-	errPasswordStrengthLength    = errors.DefineInvalidArgument("password_strength_length", "need at least `{n}` characters")
+	errPasswordStrengthMinLength = errors.DefineInvalidArgument("password_strength_min_length", "need at least `{n}` characters")
+	errPasswordStrengthMaxLength = errors.DefineInvalidArgument("password_strength_max_length", "need at most `{n}` characters")
 	errPasswordStrengthUppercase = errors.DefineInvalidArgument("password_strength_uppercase", "need at least `{n}` uppercase letter(s)")
 	errPasswordStrengthDigits    = errors.DefineInvalidArgument("password_strength_digits", "need at least `{n}` digit(s)")
 	errPasswordStrengthSpecial   = errors.DefineInvalidArgument("password_strength_special", "need at least `{n}` special character(s)")
@@ -57,7 +58,10 @@ var (
 func (is *IdentityServer) validatePasswordStrength(ctx context.Context, password string) error {
 	requirements := is.configFromContext(ctx).UserRegistration.PasswordRequirements
 	if len(password) < requirements.MinLength {
-		return errPasswordStrengthLength.WithAttributes("n", requirements.MinLength)
+		return errPasswordStrengthMinLength.WithAttributes("n", requirements.MinLength)
+	}
+	if len(password) > requirements.MaxLength {
+		return errPasswordStrengthMaxLength.WithAttributes("n", requirements.MaxLength)
 	}
 	var uppercase, digits, special int
 	for _, r := range password {

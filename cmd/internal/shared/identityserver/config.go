@@ -46,6 +46,7 @@ func init() {
 	DefaultIdentityServerConfig.AuthCache.MembershipTTL = 10 * time.Minute
 	DefaultIdentityServerConfig.UserRegistration.Invitation.TokenTTL = 7 * 24 * time.Hour
 	DefaultIdentityServerConfig.UserRegistration.PasswordRequirements.MinLength = 8
+	DefaultIdentityServerConfig.UserRegistration.PasswordRequirements.MaxLength = 1000
 	DefaultIdentityServerConfig.UserRegistration.PasswordRequirements.MinUppercase = 1
 	DefaultIdentityServerConfig.UserRegistration.PasswordRequirements.MinDigits = 1
 	DefaultIdentityServerConfig.Email.Network.Name = DefaultIdentityServerConfig.OAuth.UI.SiteName

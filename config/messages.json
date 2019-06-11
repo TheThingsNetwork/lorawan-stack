@@ -3374,7 +3374,16 @@
       "file": "user_registry.go"
     }
   },
-  "error:pkg/identityserver:password_strength_length": {
+  "error:pkg/identityserver:password_strength_max_length": {
+    "translations": {
+      "en": "need at most `{n}` characters"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "user_registry.go"
+    }
+  },
+  "error:pkg/identityserver:password_strength_min_length": {
     "translations": {
       "en": "need at least `{n}` characters"
     },

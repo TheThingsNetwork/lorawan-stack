@@ -53,6 +53,7 @@ type Config struct {
 		} `name:"admin-approval"`
 		PasswordRequirements struct {
 			MinLength    int `name:"min-length" description:"Minimum password length"`
+			MaxLength    int `name:"max-length" description:"Maximum password length"`
 			MinUppercase int `name:"min-uppercase" description:"Minimum number of uppercase letters"`
 			MinDigits    int `name:"min-digits" description:"Minimum number of digits"`
 			MinSpecial   int `name:"min-special" description:"Minimum number of special characters"`

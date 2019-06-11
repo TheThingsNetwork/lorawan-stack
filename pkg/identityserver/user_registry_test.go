@@ -16,6 +16,7 @@ package identityserver
 
 import (
 	"context"
+	"strings"
 	"testing"
 	"time"
 
@@ -34,13 +35,15 @@ func TestValidatePasswordStrength(t *testing.T) {
 	testWithIdentityServer(t, func(is *IdentityServer, _ *grpc.ClientConn) {
 		conf := *is.config
 		conf.UserRegistration.PasswordRequirements.MinLength = 8
+		conf.UserRegistration.PasswordRequirements.MaxLength = 1000
 		conf.UserRegistration.PasswordRequirements.MinUppercase = 1
 		conf.UserRegistration.PasswordRequirements.MinDigits = 1
 		conf.UserRegistration.PasswordRequirements.MinSpecial = 1
 		ctx := context.WithValue(is.Context(), ctxKey, &conf)
 
 		for p, ok := range map[string]bool{
-			"aA0$":         false, // Fails length check.
+			"aA0$": false, // Fails minimum length check.
+			strings.Repeat("aaaAAA123!@#aaaAAA12aaaAAA123!@#aaaAAA12aaaAAA123!@#aaaAAA12aaaAAA123!@#aaaAAA12aaaAAA123!@#aaaAAA12aaa", 10): false, // Fails maximum length check.
 			"aaa123!@#":    false, // Fails uppercase check.
 			"aaaAAA!@#":    false, // Fails digits check.
 			"aaaAAA123":    false, // Fails special check.
