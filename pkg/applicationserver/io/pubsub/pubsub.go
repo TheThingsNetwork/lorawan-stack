@@ -60,7 +60,7 @@ func Start(ctx context.Context, server io.Server, formatter formatters.Formatter
 					logger.WithError(sub.Context().Err()).Debug("Done sending upstream messages")
 					return
 				case up := <-sub.Up():
-					buf, err := s.formatter.FromUp(up)
+					buf, err := s.formatter.FromUp(up.ApplicationUp)
 					if err != nil {
 						log.WithError(err).Warn("Failed to marshal upstream message")
 						continue
