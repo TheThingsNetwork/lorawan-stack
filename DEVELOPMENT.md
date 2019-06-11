@@ -238,8 +238,8 @@ In order to set up the stack to support running the frontend via `webpack-dev-se
 ```
 NODE_ENV=development
 TTN_LW_LOG_LEVEL=debug
-TTN_LW_IS_OAUTH_UI_JS_FILE=libs.bundle.js,oauth.js
-TTN_LW_CONSOLE_UI_JS_FILE=libs.bundle.js,console.js
+TTN_LW_IS_OAUTH_UI_JS_FILE="libs.bundle.js oauth.js"
+TTN_LW_CONSOLE_UI_JS_FILE="libs.bundle.js console.js"
 TTN_LW_CONSOLE_UI_CANONICAL_URL=http://localhost:8080/console
 TTN_LW_CONSOLE_OAUTH_AUTHORIZE_URL=http://localhost:8080/oauth/authorize
 TTN_LW_CONSOLE_OAUTH_TOKEN_URL=http://localhost:8080/oauth/token
