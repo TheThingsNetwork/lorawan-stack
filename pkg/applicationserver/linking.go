@@ -96,7 +96,7 @@ type link struct {
 
 	subscribeCh   chan *io.Subscription
 	unsubscribeCh chan *io.Subscription
-	upCh          chan io.ContextApplicationUp
+	upCh          chan *io.ContextualApplicationUp
 }
 
 const linkBufferSize = 10
@@ -160,7 +160,7 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 		connReady:              make(chan struct{}),
 		subscribeCh:            make(chan *io.Subscription, 1),
 		unsubscribeCh:          make(chan *io.Subscription, 1),
-		upCh:                   make(chan io.ContextApplicationUp, linkBufferSize),
+		upCh:                   make(chan *io.ContextualApplicationUp, linkBufferSize),
 	}
 	if _, loaded := as.links.LoadOrStore(uid, l); loaded {
 		return errAlreadyLinked.WithAttributes("application_uid", uid)
@@ -241,7 +241,7 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 			continue
 		}
 
-		l.upCh <- io.ContextApplicationUp{
+		l.upCh <- &io.ContextualApplicationUp{
 			Context:       ctx,
 			ApplicationUp: up,
 		}

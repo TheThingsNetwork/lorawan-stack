@@ -126,6 +126,7 @@ func (c *connection) setup(ctx context.Context) error {
 				logger.WithError(c.io.Context().Err()).Debug("Done sending upstream messages")
 				return
 			case up := <-c.io.Up():
+				logger := logger.WithField("device_uid", unique.ID(up.Context, up.EndDeviceIdentifiers))
 				var topicParts []string
 				switch up.Up.(type) {
 				case *ttnpb.ApplicationUp_UplinkMessage:
@@ -153,7 +154,7 @@ func (c *connection) setup(ctx context.Context) error {
 					logger.WithError(err).Warn("Failed to marshal upstream message")
 					continue
 				}
-				logger.WithField("device_uid", unique.ID(up.Context, up.EndDeviceIdentifiers)).Debug("Publish upstream message")
+				logger.Debug("Publish upstream message")
 				c.session.Publish(&packet.PublishPacket{
 					TopicName:  topic.Join(topicParts),
 					TopicParts: topicParts,

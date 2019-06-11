@@ -41,8 +41,8 @@ type Server interface {
 	DownlinkQueueList(context.Context, ttnpb.EndDeviceIdentifiers) ([]*ttnpb.ApplicationDownlink, error)
 }
 
-// ContextApplicationUp represents an ttnpb.ApplicationUp with an attached context.
-type ContextApplicationUp struct {
+// ContextualApplicationUp represents an ttnpb.ApplicationUp with its context.
+type ContextualApplicationUp struct {
 	context.Context
 	*ttnpb.ApplicationUp
 }
@@ -55,7 +55,7 @@ type Subscription struct {
 	protocol string
 	ids      *ttnpb.ApplicationIdentifiers
 
-	upCh chan ContextApplicationUp
+	upCh chan *ContextualApplicationUp
 }
 
 // NewSubscription instantiates a new application or integration subscription.
@@ -66,7 +66,7 @@ func NewSubscription(ctx context.Context, protocol string, ids *ttnpb.Applicatio
 		cancelCtx: cancelCtx,
 		protocol:  protocol,
 		ids:       ids,
-		upCh:      make(chan ContextApplicationUp, bufferSize),
+		upCh:      make(chan *ContextualApplicationUp, bufferSize),
 	}
 }
 
@@ -92,7 +92,7 @@ func (s *Subscription) SendUp(ctx context.Context, up *ttnpb.ApplicationUp) erro
 	select {
 	case <-s.ctx.Done():
 		return s.ctx.Err()
-	case s.upCh <- ContextApplicationUp{
+	case s.upCh <- &ContextualApplicationUp{
 		Context:       ctx,
 		ApplicationUp: up,
 	}:
@@ -103,7 +103,7 @@ func (s *Subscription) SendUp(ctx context.Context, up *ttnpb.ApplicationUp) erro
 }
 
 // Up returns the upstream channel.
-func (s *Subscription) Up() <-chan ContextApplicationUp {
+func (s *Subscription) Up() <-chan *ContextualApplicationUp {
 	return s.upCh
 }
 

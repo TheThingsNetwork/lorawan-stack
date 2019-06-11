@@ -304,7 +304,7 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 			errorDetails = *ttnpb.ErrorDetailsToProto(ttnErr)
 		}
 		for _, item := range items {
-			link.upCh <- io.ContextApplicationUp{
+			link.upCh <- &io.ContextualApplicationUp{
 				Context: ctx,
 				ApplicationUp: &ttnpb.ApplicationUp{
 					EndDeviceIdentifiers: ids,
@@ -324,7 +324,7 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 	atomic.AddUint64(&link.downlinks, uint64(len(items)))
 	atomic.StoreInt64(&link.lastDownlinkTime, time.Now().UnixNano())
 	for _, item := range items {
-		link.upCh <- io.ContextApplicationUp{
+		link.upCh <- &io.ContextualApplicationUp{
 			Context: ctx,
 			ApplicationUp: &ttnpb.ApplicationUp{
 				EndDeviceIdentifiers: ids,
