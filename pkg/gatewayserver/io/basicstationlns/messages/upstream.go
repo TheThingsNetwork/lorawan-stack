@@ -237,7 +237,7 @@ func (req *JoinRequest) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID string
 	if err != nil {
 		return err
 	}
-	req.DevNonce = uint(binary.LittleEndian.Uint16(devNonce[:]))
+	req.DevNonce = uint(binary.BigEndian.Uint16(devNonce[:]))
 
 	dr, err := getDataRateIndexFromDataRate(bandID, up.Settings.GetDataRate())
 	if err != nil {

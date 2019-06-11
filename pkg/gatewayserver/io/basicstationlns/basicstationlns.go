@@ -203,7 +203,12 @@ func (s *srv) handleTraffic(c echo.Context) error {
 				return
 			case down := <-conn.Down():
 				dlTime := time.Now()
-				dnmsg := messages.FromDownlinkMessage(ids, *down, int64(s.tokens.Next(down.CorrelationIDs, dlTime)), dlTime)
+				xTimeUpper, ok := conn.RetrieveCustomValue().(int64)
+				if !ok {
+					logger.WithError(err).Error("Failed to retrieve XTime")
+					continue
+				}
+				dnmsg := messages.FromDownlinkMessage(ids, *down, int64(s.tokens.Next(down.CorrelationIDs, dlTime)), dlTime, xTimeUpper)
 				msg, err := dnmsg.MarshalJSON()
 				if err != nil {
 					logger.WithError(err).Error("Failed to marshal downlink message")
@@ -218,6 +223,7 @@ func (s *srv) handleTraffic(c echo.Context) error {
 			}
 		}
 	}()
+
 	for {
 		_, data, err := ws.ReadMessage()
 		if err != nil {
@@ -269,6 +275,7 @@ func (s *srv) handleTraffic(c echo.Context) error {
 				logger.WithError(err).Warn("Failed to unmarshal join-request message")
 				return nil
 			}
+			conn.StoreCustomValue(jreq.UpInfo.XTime)
 			up, err := jreq.ToUplinkMessage(ids, fp.BandID, receivedAt)
 			if err != nil {
 				logger.WithError(err).Debug("Failed to parse join-request message")
@@ -286,6 +293,7 @@ func (s *srv) handleTraffic(c echo.Context) error {
 				return nil
 			}
 			up, err := updf.ToUplinkMessage(ids, fp.BandID, receivedAt)
+			conn.StoreCustomValue(updf.UpInfo.XTime)
 			if err != nil {
 				logger.WithError(err).Debug("Failed to parse uplink data frame")
 				return nil

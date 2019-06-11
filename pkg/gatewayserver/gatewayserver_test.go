@@ -408,11 +408,9 @@ func TestGatewayServer(t *testing.T) {
 			Protocol:       "basicstation",
 			SupportsStatus: false,
 			ValidAuth: func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool {
-				// TODO: Add basic Auth header check (https://github.com/TheThingsNetwork/lorawan-stack/issues/74#issue-404431141)
 				return ids.EUI != nil
 			},
 			Link: func(ctx context.Context, t *testing.T, ids ttnpb.GatewayIdentifiers, key string, upCh <-chan *ttnpb.GatewayUp, downCh chan<- *ttnpb.GatewayDown) error {
-				// TODO: Add basic Auth header check (https://github.com/TheThingsNetwork/lorawan-stack/issues/74#issue-404431141)
 				if ids.EUI == nil {
 					t.SkipNow()
 				}
@@ -472,7 +470,6 @@ func TestGatewayServer(t *testing.T) {
 								}
 							}
 							if msg.TxAcknowledgment != nil {
-								//TODO: Add Token check after rebasing https://github.com/TheThingsNetwork/lorawan-stack/pull/589
 								txConf := messages.TxConfirmation{
 									Diid:  0,
 									XTime: time.Now().Unix(),
