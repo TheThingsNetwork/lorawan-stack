@@ -268,7 +268,7 @@ func (w *webhooks) NewSubscription() *io.Subscription {
 			case <-w.ctx.Done():
 				return
 			case msg := <-sub.Up():
-				if err := w.handleUp(w.ctx, msg); err != nil {
+				if err := w.handleUp(msg.Context, msg.ApplicationUp); err != nil {
 					log.FromContext(w.ctx).WithError(err).Warn("Failed to handle message")
 				}
 			}
