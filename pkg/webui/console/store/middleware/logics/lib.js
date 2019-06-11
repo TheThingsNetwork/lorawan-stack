@@ -12,7 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 import { createLogic } from 'redux-logic'
+
+const getResultActionFromType = function (typeString, status) {
+  if (typeString instanceof Array) {
+    if (typeString.length === 1) {
+      return typeString[0].replace('REQUEST', status)
+    }
+    return undefined
+  }
+  return typeString.replace('REQUEST', status)
+}
 
 /**
  * Logic creator for request logics, it will handle promise resolution, as well
@@ -24,9 +35,14 @@ import { createLogic } from 'redux-logic'
  */
 const createRequestLogic = function (
   options,
-  successType = options.type.replace('REQUEST', 'SUCCESS'),
-  failType = options.type.replace('REQUEST', 'FAILURE'),
+  successType = getResultActionFromType(options.type, 'SUCCESS'),
+  failType = getResultActionFromType(options.type, 'FAILURE'),
 ) {
+
+  if (!successType || !failType) {
+    throw new Error('Could not derive result actions from provided options')
+  }
+
   let successAction = successType
   let failAction = failType
 
