@@ -34,7 +34,8 @@ import IntlHelmet from '../../../lib/components/intl-helmet'
 import toast from '../../../components/toast'
 import SubmitBar from '../../../components/submit-bar'
 
-import { getApplicationCollaboratorPageData } from '../../store/actions/application'
+import { getApplicationCollaboratorsList } from '../../store/actions/application'
+import { getApplicationsRightsList } from '../../store/actions/applications'
 import api from '../../api'
 
 import style from './application-collaborator-edit.styl'
@@ -79,7 +80,15 @@ const m = defineMessages({
     fetching: collaboratorsFetching || rightsFetching,
     error: collaboratorsError || rightsError,
   }
-})
+}, dispatch => ({
+  loadData (appId) {
+    dispatch(getApplicationsRightsList(appId))
+    dispatch(getApplicationCollaboratorsList(appId))
+  },
+  redirectToList (appId) {
+    dispatch(replace(`/console/applications/${appId}/collaborators`))
+  },
+}))
 @withBreadcrumb('apps.single.collaborators.edit', function (props) {
   const { appId, collaboratorId } = props
 
@@ -99,9 +108,9 @@ export default class ApplicationCollaboratorEdit extends React.Component {
   }
 
   componentDidMount () {
-    const { dispatch, appId } = this.props
+    const { loadData, appId } = this.props
 
-    dispatch(getApplicationCollaboratorPageData(appId))
+    loadData(appId)
   }
 
   async handleSubmit (values, { resetForm }) {
@@ -135,7 +144,7 @@ export default class ApplicationCollaboratorEdit extends React.Component {
   }
 
   async handleDelete () {
-    const { collaborator, appId, dispatch } = this.props
+    const { collaborator, redirectToList, appId } = this.props
     const collaborator_type = collaborator.isUser ? 'user' : 'organization'
 
     const collaborator_ids = {
@@ -153,7 +162,7 @@ export default class ApplicationCollaboratorEdit extends React.Component {
         message: m.deleteSuccess,
         type: toast.types.SUCCESS,
       })
-      dispatch(replace(`/console/applications/${appId}/collaborators`))
+      redirectToList(appId)
     } catch (error) {
       await this.setState({ error })
     }
