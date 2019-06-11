@@ -15,10 +15,10 @@
 package messages
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"time"
 
-	"go.thethings.network/lorawan-stack/pkg/basicstation"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
@@ -27,20 +27,18 @@ var errDownlinkMessage = errors.Define("downlink_message", "could not translate 
 
 // DownlinkMessage is the LoRaWAN downlink message sent to the basic station.
 type DownlinkMessage struct {
-	DevEUI      basicstation.EUI `json:"DevEui"`
-	DeviceClass uint             `json:"dC"`
-	Diid        int64            `json:"diid"`
-	Pdu         string           `json:"pdu"`
-	RxDelay     int              `json:"RxDelay"`
-	Rx1DR       int              `json:"Rx1DR"`
-	Rx1Freq     int              `json:"Rx1Freq"`
-	Rx2DR       int              `json:"Rx2DR"`
-	Rx2Freq     int              `json:"Rx2Freq"`
-	Priority    int              `json:"priority"`
-	XTime       int64            `json:"xtime"`
-	GpsTime     int64            `json:"gpstime"`
-	RCtx        int64            `json:"rctx"`
-	MuxTime     float64          `json:"MuxTime"`
+	DevEUI      string  `json:"DevEui"`
+	DeviceClass uint    `json:"dC"`
+	Diid        int64   `json:"diid"`
+	Pdu         string  `json:"pdu"`
+	RxDelay     int     `json:"RxDelay"`
+	Rx1DR       int     `json:"RX1DR"`
+	Rx1Freq     int     `json:"RX1Freq"`
+	Priority    int     `json:"priority"`
+	XTime       int64   `json:"xtime"`
+	GpsTime     int64   `json:"gpstime"`
+	RCtx        int64   `json:"rctx"`
+	MuxTime     float64 `json:"MuxTime"`
 }
 
 // MarshalJSON implements json.Marshaler.
@@ -56,20 +54,23 @@ func (dnmsg DownlinkMessage) MarshalJSON() ([]byte, error) {
 }
 
 // FromDownlinkMessage translates the ttnpb.DownlinkMessage to LNS DownlinkMessage "dnmsg".
-func FromDownlinkMessage(ids ttnpb.GatewayIdentifiers, down ttnpb.DownlinkMessage, dlToken int64, dlTime time.Time) DownlinkMessage {
+func FromDownlinkMessage(ids ttnpb.GatewayIdentifiers, down ttnpb.DownlinkMessage, dlToken int64, dlTime time.Time, latestXTime int64) DownlinkMessage {
 	var dnmsg DownlinkMessage
 	scheduledMsg := down.GetScheduled()
-	dnmsg.Pdu = string(down.GetRawPayload())
+	dnmsg.Pdu = hex.EncodeToString(down.GetRawPayload())
 	dnmsg.RCtx = int64(scheduledMsg.Downlink.AntennaIndex)
 	dnmsg.Diid = dlToken
+
+	// This field is not used but needs to be defined for the station to parse the json.
+	dnmsg.DevEUI = "00-00-00-00-00-00-00-00"
 
 	// Chosen fixed values.
 	dnmsg.Priority = 25
 	dnmsg.RxDelay = 1
 
 	// Fix the Tx Parameters since we don't use the gateway scheduler.
-	dnmsg.Rx2DR = int(scheduledMsg.DataRateIndex)
-	dnmsg.Rx2Freq = int(scheduledMsg.Frequency)
+	dnmsg.Rx1DR = int(scheduledMsg.DataRateIndex)
+	dnmsg.Rx1Freq = int(scheduledMsg.Frequency)
 
 	//Add the MuxTime for RTT measurement
 	dnmsg.MuxTime = float64(dlTime.Unix()) + float64(dlTime.Nanosecond())/(1e9)
@@ -83,9 +84,10 @@ func FromDownlinkMessage(ids ttnpb.GatewayIdentifiers, down ttnpb.DownlinkMessag
 
 	dnmsg.DeviceClass = uint(ttnpb.CLASS_A)
 	// Estimate the xtime based on the timestamp; xtime = timestamp - (rxdelay+1).
+
 	t := time.Unix(int64(scheduledMsg.Timestamp), 0)
-	offset := time.Duration((dnmsg.RxDelay + 1)) * time.Second
-	dnmsg.XTime = t.Add(-offset).Unix()
+	offset := time.Duration((dnmsg.RxDelay)) * time.Second * (1e6)
+	dnmsg.XTime = latestXTime&0x7FFFFFFF00000000 | (t.Add(-offset).Unix())
 
 	return dnmsg
 }
@@ -102,8 +104,8 @@ func (dnmsg *DownlinkMessage) ToDownlinkMessage() ttnpb.DownlinkMessage {
 		RawPayload: []byte(dnmsg.Pdu),
 		Settings: &ttnpb.DownlinkMessage_Scheduled{
 			Scheduled: &ttnpb.TxSettings{
-				DataRateIndex: ttnpb.DataRateIndex(dnmsg.Rx2DR),
-				Frequency:     uint64(dnmsg.Rx2Freq),
+				DataRateIndex: ttnpb.DataRateIndex(dnmsg.Rx1DR),
+				Frequency:     uint64(dnmsg.Rx1Freq),
 				Downlink: &ttnpb.TxSettings_Downlink{
 					AntennaIndex: uint32(dnmsg.RCtx),
 				},

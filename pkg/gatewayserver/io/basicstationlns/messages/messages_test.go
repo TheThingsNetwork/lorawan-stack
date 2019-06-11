@@ -153,7 +153,7 @@ func TestGetRouterConfig(t *testing.T) {
 				NoDutyCycle: true,
 				NoDwellTime: true,
 				SX1301Config: []pfconfig.SX1301Config{
-					pfconfig.SX1301Config{
+					{
 						LoRaWANPublic: true,
 						ClockSource:   0,
 						AntennaGain:   0,
@@ -243,7 +243,7 @@ func TestGetRouterConfig(t *testing.T) {
 					[3]int{7, 500, 0},
 				},
 				SX1301Config: []pfconfig.SX1301Config{
-					pfconfig.SX1301Config{
+					{
 						LoRaWANPublic: true,
 						ClockSource:   0,
 						AntennaGain:   0,
@@ -308,7 +308,7 @@ func TestGetRouterConfig(t *testing.T) {
 			} else {
 				cfg.MuxTime = 0
 				if !a.So(cfg, should.Resemble, tc.Cfg) {
-					t.Fatalf("Invalid config: %v\n", cfg)
+					t.Fatalf("Invalid config: %v", cfg)
 				}
 			}
 		})
