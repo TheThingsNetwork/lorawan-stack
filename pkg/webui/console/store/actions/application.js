@@ -14,16 +14,7 @@
 
 import { createGetApiKeysListActionType } from '../actions/api-keys'
 
-import {
-  getCollaboratorsList,
-  createGetCollaboratorsListActionType,
-  getCollaboratorsListFailure,
-  createGetCollaboratorsListFailureActionType,
-  getCollaboratorsListSuccess,
-  createGetCollaboratorsListSuccessActionType,
-  createGetCollaboratorActionType,
-  getCollaborator,
-} from '../actions/collaborators'
+import { createGetCollaboratorsListActionType } from '../actions/collaborators'
 
 import {
   startEventsStream,
@@ -82,23 +73,22 @@ export const [{
   failure: getApplicationApiKeyFailure,
 }] = createRequestActions(GET_APP_API_KEY_BASE, (appId, keyId) => ({ entityId: appId, keyId }))
 
-export const GET_APP_COLLABORATOR_PAGE_DATA = createGetCollaboratorActionType(SHARED_NAME)
-export const GET_APP_COLLABORATORS_LIST = createGetCollaboratorsListActionType(SHARED_NAME)
-export const GET_APP_COLLABORATORS_LIST_SUCCESS = createGetCollaboratorsListSuccessActionType(SHARED_NAME)
-export const GET_APP_COLLABORATORS_LIST_FAILURE = createGetCollaboratorsListFailureActionType(SHARED_NAME)
+export const GET_APP_COLLABORATORS_LIST_BASE = createGetCollaboratorsListActionType(SHARED_NAME)
+export const [{
+  request: GET_APP_COLLABORATORS_LIST,
+  success: GET_APP_COLLABORATORS_LIST_SUCCESS,
+  failure: GET_APP_COLLABORATORS_LIST_FAILURE,
+}, {
+  request: getApplicationCollaboratorsList,
+  success: getApplicationCollaboratorsListSuccess,
+  failure: getApplicationCollaboratorsListFailure,
+}] = createRequestActions(GET_APP_COLLABORATORS_LIST_BASE, (appId, params) => ({ appId, params }))
+
 export const START_APP_EVENT_STREAM = createStartEventsStreamActionType(SHARED_NAME)
 export const START_APP_EVENT_STREAM_SUCCESS = createStartEventsStreamSuccessActionType(SHARED_NAME)
 export const START_APP_EVENT_STREAM_FAILURE = createStartEventsStreamFailureActionType(SHARED_NAME)
 export const STOP_APP_EVENT_STREAM = createStopEventsStreamActionType(SHARED_NAME)
 export const CLEAR_APP_EVENTS = createClearEventsActionType(SHARED_NAME)
-
-export const getApplicationCollaboratorsList = getCollaboratorsList(SHARED_NAME)
-
-export const getApplicationCollaboratorsListSuccess = getCollaboratorsListSuccess(SHARED_NAME)
-
-export const getApplicationCollaboratorsListFailure = getCollaboratorsListFailure(SHARED_NAME)
-
-export const getApplicationCollaboratorPageData = getCollaborator(SHARED_NAME)
 
 export const startApplicationEventsStream = startEventsStream(SHARED_NAME)
 

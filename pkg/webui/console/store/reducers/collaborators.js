@@ -12,45 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {
-  createGetCollaboratorsListActionType,
-  createGetCollaboratorsListFailureActionType,
-  createGetCollaboratorsListSuccessActionType,
-} from '../actions/collaborators'
+import { createGetCollaboratorsListActionType } from '../actions/collaborators'
+import { createRequestActions } from '../actions/lib'
 
 const defaultState = {
-  fetching: false,
   collaborators: [],
   totalCount: 0,
-  error: false,
 }
 
 const createNamedCollaboratorReducer = function (reducerName = '') {
-  const GET_LIST = createGetCollaboratorsListActionType(reducerName)
-  const GET_LIST_SUCCESS = createGetCollaboratorsListSuccessActionType(reducerName)
-  const GET_LIST_FAILURE = createGetCollaboratorsListFailureActionType(reducerName)
+  const GET_LIST_BASE = createGetCollaboratorsListActionType(reducerName)
+  const [{ success: GET_LIST_SUCCESS }] = createRequestActions(GET_LIST_BASE)
 
-  return function (state = defaultState, action) {
-    switch (action.type) {
-    case GET_LIST:
-      return {
-        ...state,
-        fetching: true,
-        error: false,
-      }
-    case GET_LIST_FAILURE:
-      return {
-        ...state,
-        error: action.error,
-        fetching: false,
-      }
+  return function (state = defaultState, { type, payload }) {
+    switch (type) {
     case GET_LIST_SUCCESS:
       return {
         ...state,
-        error: false,
-        fetching: false,
-        collaborators: action.collaborators,
-        totalCount: action.totalCount,
+        collaborators: payload.collaborators,
+        totalCount: payload.totalCount,
       }
     default:
       return state
@@ -59,23 +39,21 @@ const createNamedCollaboratorReducer = function (reducerName = '') {
 }
 
 const createNamedCollaboratorsReducer = function (reducerName = '') {
-  const GET_LIST = createGetCollaboratorsListActionType(reducerName)
-  const GET_LIST_SUCCESS = createGetCollaboratorsListSuccessActionType(reducerName)
-  const GET_LIST_FAILURE = createGetCollaboratorsListFailureActionType(reducerName)
+  const GET_LIST_BASE = createGetCollaboratorsListActionType(reducerName)
+  const [{ success: GET_LIST_SUCCESS }] = createRequestActions(GET_LIST_BASE)
   const collaborators = createNamedCollaboratorReducer(reducerName)
 
   return function (state = {}, action) {
-    if (!action.id) {
+    const { payload, type } = action
+    if (!payload || !payload.id) {
       return state
     }
 
-    switch (action.type) {
-    case GET_LIST:
-    case GET_LIST_FAILURE:
+    switch (type) {
     case GET_LIST_SUCCESS:
       return {
         ...state,
-        [action.id]: collaborators(state[action.id], action),
+        [payload.id]: collaborators(state[payload.id], action),
       }
     default:
       return state
