@@ -13,27 +13,16 @@
 // limitations under the License.
 
 import {
-  GET_DEV,
   UPDATE_DEV,
   GET_DEV_SUCCESS,
-  GET_DEV_FAILURE,
 } from '../actions/device'
 
 const defaultState = {
-  fetching: true,
-  error: undefined,
   device: undefined,
 }
 
 const device = function (state = defaultState, action) {
   switch (action.type) {
-  case GET_DEV:
-    return {
-      ...state,
-      fetching: true,
-      device: undefined,
-      error: false,
-    }
   case UPDATE_DEV:
     return {
       ...state,
@@ -45,16 +34,7 @@ const device = function (state = defaultState, action) {
   case GET_DEV_SUCCESS:
     return {
       ...state,
-      fetching: false,
-      error: false,
-      device: action.device,
-    }
-  case GET_DEV_FAILURE:
-    return {
-      ...state,
-      fetching: false,
-      error: action.error,
-      device: undefined,
+      device: action.payload,
     }
   default:
     return state

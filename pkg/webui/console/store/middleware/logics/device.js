@@ -12,25 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { createLogic } from 'redux-logic'
-
 import api from '../../../api'
 import * as device from '../../actions/device'
 import createEventsConnectLogics from './events'
+import createRequestLogic from './lib'
 
-const getDeviceLogic = createLogic({
-  type: [ device.GET_DEV ],
-  async process ({ getState, action }, dispatch, done) {
-    const { appId, deviceId, selector, options } = action
-    try {
-      const dev = await api.device.get(appId, deviceId, selector, options)
-      dispatch(device.startDeviceEventsStream(dev.ids))
-      dispatch(device.getDeviceSuccess(dev))
-    } catch (e) {
-      dispatch(device.getDeviceFailure(e))
-    }
-
-    done()
+const getDeviceLogic = createRequestLogic({
+  type: device.GET_DEV,
+  async process ({ action }, dispatch) {
+    const { payload: { appId, deviceId }, meta: { selector, options }} = action
+    const dev = await api.device.get(appId, deviceId, selector, options)
+    dispatch(device.startDeviceEventsStream(dev.ids))
+    return dev
   },
 })
 

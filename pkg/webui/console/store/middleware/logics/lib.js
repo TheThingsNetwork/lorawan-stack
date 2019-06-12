@@ -20,6 +20,7 @@ const getResultActionFromType = function (typeString, status) {
     if (typeString.length === 1) {
       return typeString[0].replace('REQUEST', status)
     }
+
     return undefined
   }
   return typeString.replace('REQUEST', status)
