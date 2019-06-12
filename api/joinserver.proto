@@ -189,3 +189,20 @@ service JsEndDeviceRegistry {
     };
   };
 }
+
+message JoinEUIPrefix {
+  bytes join_eui = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "JoinEUI"];
+  uint32 length = 2;
+}
+
+message JoinEUIPrefixes {
+  repeated JoinEUIPrefix prefixes = 1 [(gogoproto.nullable) = false];
+}
+
+service Js {
+  rpc GetJoinEUIPrefixes(google.protobuf.Empty) returns (JoinEUIPrefixes) {
+    option (google.api.http) = {
+      get: "/js/join_eui_prefixes"
+    };
+  };
+}

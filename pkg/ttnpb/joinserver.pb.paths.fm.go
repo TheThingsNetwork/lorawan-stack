@@ -157,6 +157,22 @@ var ProvisionEndDevicesRequestFieldPathsTopLevel = []string{
 	"provisioner_id",
 	"provisioning_data",
 }
+var JoinEUIPrefixFieldPathsNested = []string{
+	"join_eui",
+	"length",
+}
+
+var JoinEUIPrefixFieldPathsTopLevel = []string{
+	"join_eui",
+	"length",
+}
+var JoinEUIPrefixesFieldPathsNested = []string{
+	"prefixes",
+}
+
+var JoinEUIPrefixesFieldPathsTopLevel = []string{
+	"prefixes",
+}
 var ProvisionEndDevicesRequest_IdentifiersListFieldPathsNested = []string{
 	"end_device_ids",
 	"join_eui",

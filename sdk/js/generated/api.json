@@ -9789,6 +9789,58 @@
           ]
         },
         {
+          "name": "JoinEUIPrefix",
+          "longName": "JoinEUIPrefix",
+          "fullName": "ttn.lorawan.v3.JoinEUIPrefix",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "join_eui",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "length",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "JoinEUIPrefixes",
+          "longName": "JoinEUIPrefixes",
+          "fullName": "ttn.lorawan.v3.JoinEUIPrefixes",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "prefixes",
+              "description": "",
+              "label": "repeated",
+              "type": "JoinEUIPrefix",
+              "longType": "JoinEUIPrefix",
+              "fullType": "ttn.lorawan.v3.JoinEUIPrefix",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "NwkSKeysResponse",
           "longName": "NwkSKeysResponse",
           "fullName": "ttn.lorawan.v3.NwkSKeysResponse",
@@ -10119,6 +10171,36 @@
               "responseLongType": "AppSKeyResponse",
               "responseFullType": "ttn.lorawan.v3.AppSKeyResponse",
               "responseStreaming": false
+            }
+          ]
+        },
+        {
+          "name": "Js",
+          "longName": "Js",
+          "fullName": "ttn.lorawan.v3.Js",
+          "description": "",
+          "methods": [
+            {
+              "name": "GetJoinEUIPrefixes",
+              "description": "",
+              "requestType": "Empty",
+              "requestLongType": ".google.protobuf.Empty",
+              "requestFullType": "google.protobuf.Empty",
+              "requestStreaming": false,
+              "responseType": "JoinEUIPrefixes",
+              "responseLongType": "JoinEUIPrefixes",
+              "responseFullType": "ttn.lorawan.v3.JoinEUIPrefixes",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/js/join_eui_prefixes"
+                    }
+                  ]
+                }
+              }
             }
           ]
         },

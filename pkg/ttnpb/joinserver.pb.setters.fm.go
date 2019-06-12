@@ -555,6 +555,56 @@ func (dst *ProvisionEndDevicesRequest) SetFields(src *ProvisionEndDevicesRequest
 	return nil
 }
 
+func (dst *JoinEUIPrefix) SetFields(src *JoinEUIPrefix, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "join_eui":
+			if len(subs) > 0 {
+				return fmt.Errorf("'join_eui' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.JoinEUI = src.JoinEUI
+			} else {
+				dst.JoinEUI = nil
+			}
+		case "length":
+			if len(subs) > 0 {
+				return fmt.Errorf("'length' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Length = src.Length
+			} else {
+				var zero uint32
+				dst.Length = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *JoinEUIPrefixes) SetFields(src *JoinEUIPrefixes, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "prefixes":
+			if len(subs) > 0 {
+				return fmt.Errorf("'prefixes' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Prefixes = src.Prefixes
+			} else {
+				dst.Prefixes = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *ProvisionEndDevicesRequest_IdentifiersList) SetFields(src *ProvisionEndDevicesRequest_IdentifiersList, paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {

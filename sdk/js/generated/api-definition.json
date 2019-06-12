@@ -874,6 +874,18 @@
       "http": []
     }
   },
+  "Js": {
+    "GetJoinEUIPrefixes": {
+      "file": "lorawan-stack/api/joinserver.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/js/join_eui_prefixes",
+          "parameters": []
+        }
+      ]
+    }
+  },
   "JsEndDeviceRegistry": {
     "Get": {
       "file": "lorawan-stack/api/joinserver.proto",
