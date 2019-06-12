@@ -12,15 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {
-  getRightsList,
-  createGetRightsListActionType,
-  getRightsListFailure,
-  createGetRightsListFailureActionType,
-  getRightsListSuccess,
-  createGetRightsListSuccessActionType,
-} from '../actions/rights'
-
+import { createGetRightsListActionType } from '../actions/rights'
 import { createRequestActions } from './lib'
 
 export const SHARED_NAME = 'GATEWAYS'
@@ -36,12 +28,13 @@ export const [{
   failure: getGatetaysFailure,
 }] = createRequestActions(GET_GTWS_LIST_BASE, filters => ({ filters }))
 
-export const GET_GTWS_RIGHTS_LIST = createGetRightsListActionType(SHARED_NAME)
-export const GET_GTWS_RIGHTS_LIST_SUCCESS = createGetRightsListSuccessActionType(SHARED_NAME)
-export const GET_GTWS_RIGHTS_LIST_FAILURE = createGetRightsListFailureActionType(SHARED_NAME)
-
-export const getGatewaysRightsList = getRightsList(SHARED_NAME)
-
-export const getGatewaysRightsListSuccess = getRightsListSuccess(SHARED_NAME)
-
-export const getGatewaysRightsListFailure = getRightsListFailure(SHARED_NAME)
+export const GET_GTWS_RIGHTS_LIST_BASE = createGetRightsListActionType(SHARED_NAME)
+export const [{
+  request: GET_GTWS_RIGHTS_LIST,
+  success: GET_GTWS_RIGHTS_LIST_SUCCESS,
+  failure: GET_GTWS_RIGHTS_LIST_FAILURE,
+}, {
+  request: getGatewaysRightsList,
+  success: getGatewaysRightsListSuccess,
+  failure: getGatewaysRightsListFailure,
+}] = createRequestActions(GET_GTWS_RIGHTS_LIST_BASE, id => ({ id }))

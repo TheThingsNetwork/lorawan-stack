@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { createLogic } from 'redux-logic'
-
 import api from '../../../api'
 import * as gateways from '../../actions/gateways'
 import createRequestLogic from './lib'
@@ -38,19 +36,12 @@ const getGatewaysLogic = createRequestLogic({
   },
 })
 
-const getGatewaysRightsLogic = createLogic({
+const getGatewaysRightsLogic = createRequestLogic({
   type: gateways.GET_GTWS_RIGHTS_LIST,
   async process ({ action }, dispatch, done) {
-    const { id } = action
-    try {
-      const result = await api.rights.gateways(id)
-
-      dispatch(gateways.getGatewaysRightsListSuccess(result.rights.sort()))
-    } catch (error) {
-      dispatch(gateways.getGatewaysRightsListFailure(error))
-    }
-
-    done()
+    const { id } = action.payload
+    const result = await api.rights.gateways(id)
+    return result.rights.sort()
   },
 })
 

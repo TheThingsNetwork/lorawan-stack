@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import { createGetApiKeysListActionType } from './api-keys'
+import { createGetApiKeyActionType } from './api-key'
 
 import {
   startEventsStream,
@@ -26,8 +27,6 @@ import {
   clearEvents,
   createClearEventsActionType,
 } from './events'
-
-import { createGetApiKeyActionType } from './api-key'
 
 import { createRequestActions } from './lib'
 
