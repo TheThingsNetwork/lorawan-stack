@@ -97,24 +97,12 @@ const updateGatewayStatisticsLogic = createRequestLogic({
   },
 })
 
-const getGatewayApiKeysLogic = createLogic({
+const getGatewayApiKeysLogic = createRequestLogic({
   type: gateway.GET_GTW_API_KEYS_LIST,
-  async process ({ action }, dispatch, done) {
-    const { id, params } = action
-    try {
-      const res = await api.gateway.apiKeys.list(id, params)
-      dispatch(
-        gateway.getGatewayApiKeysListSuccess(
-          id,
-          res.api_keys,
-          res.totalCount
-        )
-      )
-    } catch (e) {
-      dispatch(gateway.getGatewayApiKeysListFailure(id, e))
-    }
-
-    done()
+  async process ({ action }) {
+    const { id: gtwId, params } = action.payload
+    const res = await api.gateway.apiKeys.list(gtwId, params)
+    return { ...res, id: gtwId }
   },
 })
 
