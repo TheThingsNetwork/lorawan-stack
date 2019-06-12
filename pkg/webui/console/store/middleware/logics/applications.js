@@ -16,30 +16,24 @@ import { createLogic } from 'redux-logic'
 
 import api from '../../../api'
 import * as applications from '../../actions/applications'
+import createRequestLogic from './lib'
 
-const getApplicationsLogic = createLogic({
-  type: [
-    applications.GET_APPS_LIST,
-    applications.SEARCH_APPS_LIST,
-  ],
+const getApplicationsLogic = createRequestLogic({
+  type: applications.GET_APPS_LIST,
   latest: true,
-  async process ({ getState, action }, dispatch, done) {
-    const { page, pageSize: limit, query } = action.filters
-    try {
-      const data = query
-        ? await api.applications.search({
-          page,
-          limit,
-          id_contains: query,
-          name_contains: query,
-        })
-        : await api.applications.list({ page, limit })
-      dispatch(applications.getApplicationsSuccess(data.applications, data.totalCount))
-    } catch (error) {
-      dispatch(applications.getApplicationsFailure(error))
-    }
+  async process ({ action }) {
+    const { payload } = action
+    const { filters: { page, pageSize: limit, query }} = payload
 
-    done()
+    const data = query
+      ? await api.applications.search({
+        page,
+        limit,
+        id_contains: query,
+        name_contains: query,
+      })
+      : await api.applications.list({ page, limit })
+    return { applications: data.applications, totalCount: data.totalCount }
   },
 })
 

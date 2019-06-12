@@ -12,48 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {
-  GET_APPS_LIST,
-  SEARCH_APPS_LIST,
-  GET_APPS_LIST_SUCCESS,
-  GET_APPS_LIST_FAILURE,
-} from '../actions/applications'
+import { GET_APPS_LIST_SUCCESS } from '../actions/applications'
 
 const defaultState = {
-  fetching: false,
-  fetchingSearch: false,
-  error: undefined,
   applications: [],
   totalCount: 0,
 }
 
-const applications = function (state = defaultState, action) {
-  switch (action.type) {
-  case GET_APPS_LIST:
-    return {
-      ...state,
-      fetching: true,
-    }
-  case SEARCH_APPS_LIST:
-    return {
-      ...state,
-      fetching: true,
-      fetchingSearch: true,
-    }
+const applications = function (state = defaultState, { type, payload }) {
+  switch (type) {
   case GET_APPS_LIST_SUCCESS:
     return {
       ...state,
-      totalCount: action.totalCount,
-      applications: action.applications,
-      fetching: false,
-      fetchingSearch: false,
-    }
-  case GET_APPS_LIST_FAILURE:
-    return {
-      ...state,
-      fetching: false,
-      fetchingSearch: false,
-      error: action.error,
+      applications: payload.applications,
+      totalCount: payload.totalCount,
     }
   default:
     return state

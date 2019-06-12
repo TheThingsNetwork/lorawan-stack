@@ -24,7 +24,6 @@ import * as webhookFormats from '../../actions/webhook-formats'
 import createEventsConnectLogics from './events'
 import createRequestLogic from './lib'
 
-
 const getApplicationLogic = createRequestLogic({
   type: application.GET_APP,
   async process ({ action }) {
