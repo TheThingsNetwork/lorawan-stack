@@ -19,7 +19,7 @@ import { withInfo } from '@storybook/addon-info'
 import Breadcrumb from './breadcrumb'
 import Breadcrumbs from './breadcrumbs'
 
-storiesOf('Breacrumbs', module)
+storiesOf('Breadcrumbs', module)
   .addDecorator((story, context) => withInfo({
     inline: true,
     header: false,

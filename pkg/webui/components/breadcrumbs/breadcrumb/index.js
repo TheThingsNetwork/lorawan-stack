@@ -27,17 +27,24 @@ const Breadcrumb = function ({
   path,
   content,
   icon = null,
+  isLast = false,
 }) {
   const isRawText = typeof content === 'string' || typeof content === 'number'
+  let Component
+  let componentProps
+  if (!isLast) {
+    Component = Link
+    componentProps = { className: classnames(className, style.link), to: path }
+  } else {
+    Component = 'span'
+    componentProps = { className: classnames(className, style.last) }
+  }
 
   return (
-    <Link
-      to={path}
-      className={classnames(className, style.link)}
-    >
+    <Component {...componentProps}>
       {icon && <Icon className={style.icon} icon={icon} />}
-      {isRawText ? <span>{content}</span> : <Message content={content} /> }
-    </Link>
+      {isRawText ? <span>{content}</span> : <Message content={content} />}
+    </Component>
   )
 }
 
@@ -48,6 +55,8 @@ Breadcrumb.propTypes = {
   icon: PropTypes.string,
   /** The content of the breadcrumb */
   content: PropTypes.message.isRequired,
+  /** The flag for rendering last breadcrumb as plain text */
+  isLast: PropTypes.bool,
 }
 
 export default Breadcrumb

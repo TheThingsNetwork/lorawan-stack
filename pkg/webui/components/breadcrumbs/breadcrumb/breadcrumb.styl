@@ -16,6 +16,7 @@
   one-liner()
   text-decoration: none
   color: $tc-subtle-gray
+  min-height: 18px
 
   &:not(:last-child):after
     material-icon()
@@ -30,6 +31,11 @@
   +focus-visible()
     text-decoration: underline
     color: $tc-deep-gray
+
+.last
+  one-liner()
+  color: $tc-deep-gray
+  min-height: 18px
 
 .icon
   nudge('up')
