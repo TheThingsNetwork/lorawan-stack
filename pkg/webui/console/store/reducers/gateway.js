@@ -13,9 +13,7 @@
 // limitations under the License.
 
 import {
-  GET_GTW,
   GET_GTW_SUCCESS,
-  GET_GTW_FAILURE,
   UPDATE_GTW,
   START_GTW_STATS,
   UPDATE_GTW_STATS,
@@ -33,8 +31,6 @@ const statsDefaultState = {
 }
 
 const defaultState = {
-  fetching: false,
-  error: undefined,
   gateway: undefined,
   statistics: statsDefaultState,
 }
@@ -74,24 +70,10 @@ const statistics = function (state = statsDefaultState, action) {
 
 const gateway = function (state = defaultState, action) {
   switch (action.type) {
-  case GET_GTW:
-    return {
-      ...state,
-      fetching: true,
-      gateway: undefined,
-      error: undefined,
-    }
   case GET_GTW_SUCCESS:
     return {
       ...state,
-      fetching: false,
-      gateway: action.gateway,
-    }
-  case GET_GTW_FAILURE:
-    return {
-      ...state,
-      fetching: false,
-      error: action.error,
+      gateway: action.payload,
     }
   case UPDATE_GTW:
     return {

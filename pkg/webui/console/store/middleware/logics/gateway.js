@@ -20,20 +20,15 @@ import * as gateway from '../../actions/gateway'
 import { gsConfigSelector } from '../../../../lib/selectors/env'
 import { gatewaySelector } from '../../selectors/gateway'
 import createEventsConnectLogics from './events'
+import createRequestLogic from './lib'
 
-const getGatewayLogic = createLogic({
+const getGatewayLogic = createRequestLogic({
   type: gateway.GET_GTW,
-  async process ({ action }, dispatch, done) {
-    const { id, meta = {}} = action
-    try {
-      const selectors = meta.selectors || ''
-      const gtw = await api.gateway.get(id, selectors)
-      dispatch(gateway.getGatewaySuccess(gtw))
-    } catch (error) {
-      dispatch(gateway.getGatewayFailure(error))
-    }
-
-    done()
+  async process ({ action }) {
+    const { payload, meta } = action
+    const { id = {}} = payload
+    const selector = meta.selector || ''
+    return api.gateway.get(id, selector)
   },
 })
 

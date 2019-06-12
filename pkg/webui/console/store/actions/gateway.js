@@ -19,7 +19,7 @@ import {
   createGetApiKeysListFailureActionType,
   getApiKeysListSuccess,
   createGetApiKeysListSuccessActionType,
-} from '../actions/api-keys'
+} from './api-keys'
 
 import {
   startEventsStream,
@@ -32,7 +32,7 @@ import {
   createStopEventsStreamActionType,
   clearEvents,
   createClearEventsActionType,
-} from '../actions/events'
+} from './events'
 
 import {
   getApiKey,
@@ -43,11 +43,24 @@ import {
   createGetApiKeyFailureActionType,
 } from './api-key'
 
+import { createRequestActions } from './lib'
+
 export const SHARED_NAME = 'GATEWAY'
 
-export const GET_GTW = 'GET_GATEWAY'
-export const GET_GTW_SUCCESS = 'GET_GATEWAY_SUCCESS'
-export const GET_GTW_FAILURE = 'GET_GATEWAY_FAILURE'
+export const GET_GTW_BASE = 'GET_GATEWAY'
+export const [{
+  request: GET_GTW,
+  success: GET_GTW_SUCCESS,
+  failure: GET_GTW_FAILURE,
+}, {
+  request: getGateway,
+  success: getGatewaySuccess,
+  failure: getGatewayFailure,
+}] = createRequestActions(GET_GTW_BASE,
+  id => ({ id }),
+  (id, selector) => ({ selector })
+)
+
 export const UPDATE_GTW = 'UPDATE_GATEWAY'
 export const START_GTW_STATS = 'START_GATEWAY_STATISTICS'
 export const STOP_GTW_STATS = 'STOP_GATEWAY_STATISTICS'
@@ -67,17 +80,6 @@ export const GET_GTW_API_KEY = createGetApiKeyActionType(SHARED_NAME)
 export const GET_GTW_API_KEY_SUCCESS = createGetApiKeySuccessActionType(SHARED_NAME)
 export const GET_GTW_API_KEY_FAILURE = createGetApiKeyFailureActionType(SHARED_NAME)
 
-export const getGateway = (id, meta) => (
-  { type: GET_GTW, id, meta }
-)
-
-export const getGatewaySuccess = gateway => (
-  { type: GET_GTW_SUCCESS, gateway }
-)
-
-export const getGatewayFailure = error => (
-  { type: GET_GTW_FAILURE, error }
-)
 
 export const updateGateway = (id, patch) => (
   { type: UPDATE_GTW, id, patch }

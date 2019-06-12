@@ -109,17 +109,15 @@ export default class Gateway extends React.Component {
     const { gtwId } = match.params
 
     startStream(gtwId)
-    getGateway(gtwId, {
-      selectors: [
-        'name',
-        'description',
-        'enforce_duty_cycle',
-        'frequency_plan_id',
-        'gateway_server_address',
-        'enforce_duty_cycle',
-        'antennas',
-      ],
-    })
+    getGateway(gtwId, [
+      'name',
+      'description',
+      'enforce_duty_cycle',
+      'frequency_plan_id',
+      'gateway_server_address',
+      'enforce_duty_cycle',
+      'antennas',
+    ])
   }
 
   componentWillUnmount () {
