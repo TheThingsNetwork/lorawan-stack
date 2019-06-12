@@ -17,12 +17,12 @@ import { defineMessages } from 'react-intl'
 import bind from 'autobind-decorator'
 
 import Form from '../form'
+import Input from '../input'
 import Message from '../../lib/components/message'
-import Field from '../field'
 import SubmitBar from '../submit-bar'
+import SubmitButton from '../submit-button'
 import Notification from '../notification'
 import ModalButton from '../button/modal-button'
-import Button from '../button'
 import toast from '../toast'
 
 import sharedMessages from '../../lib/shared-messages'
@@ -117,29 +117,35 @@ class LocationForm extends Component {
             component="h4"
             content={formTitle}
           />
-          <Field
+          <Form.Field
             type="number"
             title={sharedMessages.latitude}
             description={sharedMessages.latitudeDesc}
             name="latitude"
+            component={Input}
             required
           />
-          <Field
+          <Form.Field
             type="number"
             title={sharedMessages.longitude}
             description={sharedMessages.longitudeDesc}
             name="longitude"
+            component={Input}
             required
           />
-          <Field
+          <Form.Field
             type="number"
             title={sharedMessages.altitude}
             description={sharedMessages.altitudeDesc}
             name="altitude"
+            component={Input}
             required
           />
           <SubmitBar>
-            <Button type="submit" message={sharedMessages.saveChanges} />
+            <Form.Submit
+              component={SubmitButton}
+              message={sharedMessages.saveChanges}
+            />
             <ModalButton
               type="button"
               icon="delete"
