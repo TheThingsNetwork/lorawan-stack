@@ -90,7 +90,7 @@ const validationSchema = Yup.object().shape({
   }
 },
 dispatch => ({
-  getLink: (id, meta) => dispatch(getApplicationLink(id, meta)),
+  getLink: (id, selector) => dispatch(getApplicationLink(id, selector)),
   updateLinkSuccess: (link, stats) => dispatch(updateApplicationLinkSuccess(link, stats)),
   deleteLinkSuccess: () => dispatch(deleteApplicationLinkSuccess()),
 }))
@@ -116,9 +116,7 @@ class ApplicationLink extends React.Component {
   componentDidMount () {
     const { getLink, appId } = this.props
 
-    getLink(appId, {
-      selectors: [ 'api_key', 'network_server_address' ],
-    })
+    getLink(appId, [ 'api_key', 'network_server_address' ])
   }
 
   async handleLink (values, { setSubmitting, resetForm }) {

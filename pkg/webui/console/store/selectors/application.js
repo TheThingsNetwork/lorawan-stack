@@ -14,6 +14,7 @@
 
 import { getApplicationId } from '../../../lib/selectors/id'
 import { GET_APP_BASE, GET_APP_API_KEY_BASE } from '../actions/application'
+import { GET_APP_LINK_BASE } from '../actions/link'
 import {
   eventsSelector,
   errorSelector as eventsErrorSelector,
@@ -84,9 +85,9 @@ export const selectApplicationLink = state => selectLinkStore(state).link
 
 export const selectApplicationLinkStats = state => selectLinkStore(state).stats
 
-export const selectApplicationLinkFetching = state => selectLinkStore(state).fetching || false
+export const selectApplicationLinkFetching = createFetchingSelector(GET_APP_LINK_BASE)
 
-export const selectApplicationLinkError = state => selectLinkStore(state).error
+export const selectApplicationLinkError = createErrorSelector(GET_APP_LINK_BASE)
 
 export const selectApplicationLinkFormatters = function (state) {
   const link = selectApplicationLink(state) || {}

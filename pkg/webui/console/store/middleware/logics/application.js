@@ -71,30 +71,27 @@ const getApplicationCollaboratorsLogic = createRequestLogic({
   },
 })
 
-const getApplicationLinkLogic = createLogic({
+const getApplicationLinkLogic = createRequestLogic({
   type: link.GET_APP_LINK,
   async process ({ action }, dispatch, done) {
-    const { id, meta = {}} = action
-    const { selectors = []} = meta
+    const { payload: { id }, meta: { selector = []} = {}} = action
 
     let linkResult
     let statsResult
     try {
-      linkResult = await api.application.link.get(id, selectors)
+      linkResult = await api.application.link.get(id, selector)
       statsResult = await api.application.link.stats(id)
 
-      dispatch(link.getApplicationLinkSuccess(linkResult, statsResult, true))
+      return { link: linkResult, stats: statsResult, linked: true }
     } catch (error) {
-      // consider errors that are not 404, since not found means that the
+      // Consider errors that are not 404, since not found means that the
       // application is not linked.
       if (isNotFoundError(error)) {
-        dispatch(link.getApplicationLinkSuccess(linkResult, statsResult, false))
-      } else {
-        dispatch(link.getApplicationLinkFailure(error))
+        return { link: linkResult, stats: statsResult, linked: false }
       }
-    }
 
-    done()
+      throw error
+    }
   },
 })
 
