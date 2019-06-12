@@ -18,15 +18,13 @@ import * as Yup from 'yup'
 import bind from 'autobind-decorator'
 
 import Form from '../../../components/form'
-import Field from '../../../components/field'
+import Input from '../../../components/input'
 import SubmitBar from '../../../components/submit-bar'
-import Button from '../../../components/button'
+import SubmitButton from '../../../components/submit-button'
 import Notification from '../../../components/notification'
 import Message from '../../../lib/components/message'
 import ModalButton from '../../../components/button/modal-button'
-
 import WebhookFormatSelector from '../../containers/webhook-formats-select'
-
 import sharedMessages from '../../../lib/shared-messages'
 import { id as webhookIdRegexp } from '../../lib/regexp'
 import PropTypes from '../../../lib/prop-types'
@@ -122,16 +120,16 @@ export default class WebhookForm extends Component {
         initialValues={initialValues}
         error={error}
         formikRef={this.form}
-        horizontal
       >
         <Message
           component="h4"
           content={sharedMessages.generalInformation}
         />
-        <Field
+        <Form.Field
           name="webhook_id"
           title={sharedMessages.webhookId}
           placeholder={m.idPlaceholder}
+          component={Input}
           required
           autoFocus
           disabled={update}
@@ -141,10 +139,11 @@ export default class WebhookForm extends Component {
           name="format"
           required
         />
-        <Field
+        <Form.Field
           name="base_url"
           title={sharedMessages.webhookBaseUrl}
           placeholder="http://example.com/webhooks"
+          component={Input}
           required
         />
         <Message
@@ -155,56 +154,65 @@ export default class WebhookForm extends Component {
           info={m.messageInfo}
           small
         />
-        <Field
+        <Form.Field
           name="uplink_message"
           type="toggled-input"
           title={m.uplinkMessage}
           placeholder={pathPlaceholder}
+          component={Input.Toggled}
         />
-        <Field
+        <Form.Field
           name="join_accept"
           type="toggled-input"
           title={m.joinAccept}
           placeholder={pathPlaceholder}
+          component={Input.Toggled}
         />
-        <Field
+        <Form.Field
           name="downlink_ack"
           type="toggled-input"
           title={m.downlinkAck}
           placeholder={pathPlaceholder}
+          component={Input.Toggled}
         />
-        <Field
+        <Form.Field
           name="downlink_nack"
           type="toggled-input"
           title={m.downlinkNack}
           placeholder={pathPlaceholder}
+          component={Input.Toggled}
         />
-        <Field
+        <Form.Field
           name="downlink_sent"
           type="toggled-input"
           title={m.downlinkSent}
           placeholder={pathPlaceholder}
+          component={Input.Toggled}
         />
-        <Field
+        <Form.Field
           name="downlink_failed"
           type="toggled-input"
           title={m.downlinkFailed}
           placeholder={pathPlaceholder}
+          component={Input.Toggled}
         />
-        <Field
+        <Form.Field
           name="downlink_queued"
           type="toggled-input"
           title={m.downlinkQueued}
           placeholder={pathPlaceholder}
+          component={Input.Toggled}
         />
-        <Field
+        <Form.Field
           name="location_solved"
           type="toggled-input"
           title={m.locationSolved}
           placeholder={pathPlaceholder}
+          component={Input.Toggled}
         />
         <SubmitBar>
-          <Button type="submit"
+          <Form.Submit
+            component={SubmitButton}
             message={update
               ? sharedMessages.saveChanges
               : sharedMessages.addWebhook
