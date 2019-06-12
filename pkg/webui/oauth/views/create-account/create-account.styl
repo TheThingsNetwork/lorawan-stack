@@ -12,36 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.full-height-center
+.full-height
   height: 100%
-  display: flex
-  justify-content: center
-  align-items: center
 
-  & > div
-    display: flex
-    justify-content: center
-    nudge('up', 4%)
-    nudge('left', 2%)
-
-
-.wrapper
-  display: flex
-  flex-direction: column
-  align-items: center
-  padding: $cs.s
-
-  & > form
-    width: 100%
-
-  & > h1
-    margin-bottom: $ls.m
-    line-height: 1
-
-  & > div
-    width: 100%
-    min-width: 16rem
-    max-width: 30rem
-
-  .field
-    display: block
+.title
+  h1()
+  margin-bottom: $ls.m
+  line-height: 1
