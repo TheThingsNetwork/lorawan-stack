@@ -61,12 +61,21 @@ export const [{
   (id, selector) => ({ selector })
 )
 
+export const UPDATE_GTW_STATS_BASE = 'UPDATE_GATEWAY_STATISTICS'
+export const [{
+  request: UPDATE_GTW_STATS,
+  success: UPDATE_GTW_STATS_SUCCESS,
+  failure: UPDATE_GTW_STATS_FAILURE,
+}, {
+  request: updateGatewayStatistics,
+  success: updateGatewayStatisticsSuccess,
+  failure: updateGatewayStatisticsFailure,
+}] = createRequestActions(UPDATE_GTW_STATS_BASE, id => ({ id }))
+
+
 export const UPDATE_GTW = 'UPDATE_GATEWAY'
 export const START_GTW_STATS = 'START_GATEWAY_STATISTICS'
 export const STOP_GTW_STATS = 'STOP_GATEWAY_STATISTICS'
-export const UPDATE_GTW_STATS = 'UPDATE_GATEWAY_STATISTICS'
-export const UPDATE_GTW_STATS_SUCCESS = 'UPDATE_GATEWAY_STATISTICS_SUCCESS'
-export const UPDATE_GTW_STATS_FAILURE = 'UPDATE_GATEWAY_STATISTICS_FAILURE'
 export const UPDATE_GTW_STATS_UNAVAILABLE = 'UPDATE_GATEWAY_STATISTICS_UNAVAILABLE'
 export const START_GTW_EVENT_STREAM = createStartEventsStreamActionType(SHARED_NAME)
 export const START_GTW_EVENT_STREAM_SUCCESS = createStartEventsStreamSuccessActionType(SHARED_NAME)
@@ -87,18 +96,6 @@ export const updateGateway = (id, patch) => (
 
 export const startGatewayStatistics = (id, meta) => (
   { type: START_GTW_STATS, id, meta }
-)
-
-export const updateGatewayStatistics = id => (
-  { type: UPDATE_GTW_STATS, id }
-)
-
-export const updateGatewayStatisticsSuccess = statistics => (
-  { type: UPDATE_GTW_STATS_SUCCESS, statistics }
-)
-
-export const updateGatewayStatisticsFailure = error => (
-  { type: UPDATE_GTW_STATS_FAILURE, error }
 )
 
 export const updateGatewayStatisticsUnavailable = () => (

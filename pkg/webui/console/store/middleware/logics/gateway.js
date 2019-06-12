@@ -89,19 +89,11 @@ const startGatewayStatisticsLogic = createLogic({
   },
 })
 
-const updateGatewayStatisticsLogic = createLogic({
+const updateGatewayStatisticsLogic = createRequestLogic({
   type: gateway.UPDATE_GTW_STATS,
-  async process ({ action }, dispatch, done) {
-    const { id } = action
-
-    try {
-      const stats = await api.gateway.stats(id)
-      dispatch(gateway.updateGatewayStatisticsSuccess(stats))
-    } catch (error) {
-      dispatch(gateway.updateGatewayStatisticsFailure(error))
-    }
-
-    done()
+  async process ({ action }) {
+    const { id } = action.payload
+    return api.gateway.stats(id)
   },
 })
 

@@ -24,9 +24,7 @@ import {
 } from '../actions/gateway'
 
 const statsDefaultState = {
-  fetching: false,
   available: true,
-  error: undefined,
   stats: undefined,
 }
 
@@ -35,32 +33,21 @@ const defaultState = {
   statistics: statsDefaultState,
 }
 
-const statistics = function (state = statsDefaultState, action) {
-  switch (action.type) {
+const statistics = function (state = statsDefaultState, { type, payload }) {
+  switch (type) {
   case START_GTW_STATS:
     return {
       ...state,
-      fetching: true,
-      error: undefined,
     }
   case UPDATE_GTW_STATS_SUCCESS:
     return {
       ...state,
-      fetching: false,
       available: true,
-      error: undefined,
-      stats: action.statistics,
-    }
-  case UPDATE_GTW_STATS_FAILURE:
-    return {
-      ...state,
-      fetching: false,
-      error: action.error,
+      stats: payload,
     }
   case UPDATE_GTW_STATS_UNAVAILABLE:
     return {
       ...state,
-      fetching: false,
       available: false,
     }
   default:
