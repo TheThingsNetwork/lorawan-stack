@@ -19,10 +19,7 @@ import bind from 'autobind-decorator'
 import sharedMessages from '../../../lib/shared-messages'
 import FetchTable from '../fetch-table'
 
-import {
-  getGatewaysList,
-  searchGatewaysList,
-} from '../../../console/store/actions/gateways'
+import { getGatewaysList } from '../../../console/store/actions/gateways'
 
 const m = defineMessages({
   add: 'Add Gateway',
@@ -74,7 +71,7 @@ export default class GatewaysTable extends React.Component {
         addMessage={m.add}
         headers={headers}
         getItemsAction={getGatewaysList}
-        searchItemsAction={searchGatewaysList}
+        searchItemsAction={getGatewaysList}
         baseDataSelector={this.baseDataSelector}
         {...this.props}
       />

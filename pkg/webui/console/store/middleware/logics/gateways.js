@@ -16,31 +16,25 @@ import { createLogic } from 'redux-logic'
 
 import api from '../../../api'
 import * as gateways from '../../actions/gateways'
+import createRequestLogic from './lib'
 
-const getGatewaysLogic = createLogic({
-  type: [
-    gateways.GET_GTWS_LIST,
-    gateways.SEARCH_GTWS_LIST,
-  ],
+const getGatewaysLogic = createRequestLogic({
+  type: gateways.GET_GTWS_LIST,
   latest: true,
-  async process ({ getState, action }, dispatch, done) {
-    const { page, pageSize: limit, query } = action.filters
-
-    try {
-      const data = query
-        ? await api.gateways.search({
-          page,
-          limit,
-          id_contains: query,
-          name_contains: query,
-        })
-        : await api.gateways.list({ page, limit }, [ 'name,description,frequency_plan_id' ])
-      dispatch(gateways.getGatewaysSuccess(data.gateways, data.totalCount))
-    } catch (error) {
-      dispatch(gateways.getGatewaysFailure(error))
+  async process ({ action }) {
+    const { page, pageSize: limit, query } = action.payload.filters
+    const data = query
+      ? await api.gateways.search({
+        page,
+        limit,
+        id_contains: query,
+        name_contains: query,
+      })
+      : await api.gateways.list({ page, limit }, [ 'name,description,frequency_plan_id' ])
+    return {
+      gateways: data.gateways,
+      totalCount: data.totalCount,
     }
-
-    done()
   },
 })
 
