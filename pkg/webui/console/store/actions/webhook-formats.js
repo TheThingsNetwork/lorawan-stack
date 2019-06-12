@@ -12,18 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const GET_WEBHOOK_FORMATS = 'GET_WEBHOOK_FORMATS'
-export const GET_WEBHOOK_FORMATS_SUCCESS = 'GET_WEBHOOK_FORMATS_SUCCESS'
-export const GET_WEBHOOK_FORMATS_FAILURE = 'GET_WEBHOOK_FORMATS_FAILURE'
+import { createRequestActions } from './lib'
 
-export const getWebhookFormats = () => (
-  { type: GET_WEBHOOK_FORMATS }
-)
-
-export const getWebhookFormatsSuccess = formats => (
-  { type: GET_WEBHOOK_FORMATS_SUCCESS, formats }
-)
-
-export const getWebhookFormatsFailure = error => (
-  { type: GET_WEBHOOK_FORMATS_FAILURE, error }
-)
+export const GET_WEBHOOK_FORMATS_BASE = 'GET_WEBHOOK_FORMATS'
+export const [{
+  request: GET_WEBHOOK_FORMATS,
+  success: GET_WEBHOOK_FORMATS_SUCCESS,
+  failure: GET_WEBHOOK_FORMATS_FAILURE,
+}, {
+  request: getWebhookFormats,
+  success: getWebhookFormatsSuccess,
+  failure: getWebhookFormatsFailure,
+}] = createRequestActions(GET_WEBHOOK_FORMATS_BASE)

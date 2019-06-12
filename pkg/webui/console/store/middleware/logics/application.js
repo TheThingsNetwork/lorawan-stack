@@ -125,17 +125,11 @@ const getWebhooksLogic = createLogic({
   },
 })
 
-const getWebhookFormatsLogic = createLogic({
+const getWebhookFormatsLogic = createRequestLogic({
   type: webhookFormats.GET_WEBHOOK_FORMATS,
-  async process ({ action }, dispatch, done) {
-    try {
-      const { formats } = await api.application.webhooks.getFormats()
-      dispatch(webhookFormats.getWebhookFormatsSuccess(formats))
-    } catch (e) {
-      dispatch(webhookFormats.getWebhookFormatsFailure(e))
-    }
-
-    done()
+  async process () {
+    const { formats } = await api.application.webhooks.getFormats()
+    return formats
   },
 })
 

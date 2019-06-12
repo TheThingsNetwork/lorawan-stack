@@ -12,37 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {
-  GET_WEBHOOK_FORMATS,
-  GET_WEBHOOK_FORMATS_FAILURE,
-  GET_WEBHOOK_FORMATS_SUCCESS,
-} from '../actions/webhook-formats'
+import { GET_WEBHOOK_FORMATS_SUCCESS } from '../actions/webhook-formats'
 
 const defaultState = {
-  fetching: false,
-  error: undefined,
   formats: undefined,
 }
 
-const webhooks = function (state = defaultState, action) {
-  switch (action.type) {
-  case GET_WEBHOOK_FORMATS:
-    return {
-      ...state,
-      fetching: true,
-      formats: undefined,
-    }
+const webhooks = function (state = defaultState, { type, payload }) {
+  switch (type) {
   case GET_WEBHOOK_FORMATS_SUCCESS:
     return {
       ...state,
-      fetching: false,
-      formats: action.formats,
-    }
-  case GET_WEBHOOK_FORMATS_FAILURE:
-    return {
-      ...state,
-      fetching: false,
-      error: action.error,
+      formats: payload,
     }
   default:
     return state
