@@ -12,11 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {
-  GET_WEBHOOKS_LIST,
-  GET_WEBHOOKS_LIST_FAILURE,
-  GET_WEBHOOKS_LIST_SUCCESS,
-} from '../actions/webhooks'
+import { GET_WEBHOOKS_LIST_SUCCESS } from '../actions/webhooks'
 
 const defaultState = {
   fetching: false,
@@ -24,25 +20,12 @@ const defaultState = {
   webhooks: undefined,
 }
 
-const webhooks = function (state = defaultState, action) {
-  switch (action.type) {
-  case GET_WEBHOOKS_LIST:
-    return {
-      ...state,
-      fetching: true,
-      webhooks: undefined,
-    }
+const webhooks = function (state = defaultState, { type, payload }) {
+  switch (type) {
   case GET_WEBHOOKS_LIST_SUCCESS:
     return {
       ...state,
-      fetching: false,
-      webhooks: action.webhooks,
-    }
-  case GET_WEBHOOKS_LIST_FAILURE:
-    return {
-      ...state,
-      fetching: false,
-      error: action.error,
+      webhooks: payload.webhooks,
     }
   default:
     return state

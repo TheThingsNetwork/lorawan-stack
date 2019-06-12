@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { createLogic } from 'redux-logic'
-
 import { isNotFoundError } from '../../../../lib/errors/utils'
 import api from '../../../api'
 import * as application from '../../actions/application'
@@ -103,18 +101,12 @@ const getWebhookLogic = createRequestLogic({
   },
 })
 
-const getWebhooksLogic = createLogic({
+const getWebhooksLogic = createRequestLogic({
   type: webhooks.GET_WEBHOOKS_LIST,
-  async process ({ action }, dispatch, done) {
-    const { appId } = action
-    try {
-      const res = await api.application.webhooks.list(appId)
-      dispatch(webhooks.getWebhooksListSuccess(res.webhooks, res.totalCount))
-    } catch (e) {
-      dispatch(webhooks.getWebhooksListFailure(e))
-    }
-
-    done()
+  async process ({ action }) {
+    const { appId } = action.payload
+    const res = await api.application.webhooks.list(appId)
+    return { webhooks: res.webhooks, totalCount: res.totalCount }
   },
 })
 

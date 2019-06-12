@@ -12,18 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const GET_WEBHOOKS_LIST = 'GET_WEBHOOKS_LIST_REQUEST'
-export const GET_WEBHOOKS_LIST_SUCCESS = 'GET_WEBHOOKS_LIST_SUCCESS'
-export const GET_WEBHOOKS_LIST_FAILURE = 'GET_WEBHOOKS_LIST_FAILURE'
+import { createRequestActions } from './lib'
 
-export const getWebhooksList = appId => (
-  { type: GET_WEBHOOKS_LIST, appId }
-)
-
-export const getWebhooksListSuccess = (webhooks, totalCount) => (
-  { type: GET_WEBHOOKS_LIST_SUCCESS, webhooks, totalCount }
-)
-
-export const getWebhooksListFailure = error => (
-  { type: GET_WEBHOOKS_LIST_FAILURE, error }
+export const GET_WEBHOOKS_LIST_BASE = 'GET_WEBHOOKS_LIST'
+export const [{
+  request: GET_WEBHOOKS_LIST,
+  success: GET_WEBHOOKS_LIST_SUCCESS,
+  failure: GET_WEBHOOKS_LIST_FAILURE,
+}, {
+  request: getWebhooksList,
+  success: getWebhooksListSuccess,
+  failure: getWebhooksListFailure,
+}] = createRequestActions(GET_WEBHOOKS_LIST_BASE,
+  appId => ({ appId })
 )
