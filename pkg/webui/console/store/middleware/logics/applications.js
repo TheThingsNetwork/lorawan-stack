@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { createLogic } from 'redux-logic'
-
 import api from '../../../api'
 import * as applications from '../../actions/applications'
 import createRequestLogic from './lib'
@@ -37,19 +35,12 @@ const getApplicationsLogic = createRequestLogic({
   },
 })
 
-const getApplicationsRightsLogic = createLogic({
+const getApplicationsRightsLogic = createRequestLogic({
   type: applications.GET_APPS_RIGHTS_LIST,
-  async process ({ getState, action }, dispatch, done) {
-    const { id } = action
-    try {
-      const result = await api.rights.applications(id)
-
-      dispatch(applications.getApplicationsRightsListSuccess(result.rights.sort()))
-    } catch (error) {
-      dispatch(applications.getApplicationsRightsListFailure(error))
-    }
-
-    done()
+  async process ({ action }) {
+    const { id } = action.payload
+    const result = await api.rights.applications(id)
+    return result.rights.sort()
   },
 })
 

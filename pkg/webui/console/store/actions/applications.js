@@ -40,5 +40,5 @@ export const [{
   request: getApplicationsRightsList,
   success: getApplicationsRightsListSuccess,
   failure: getApplicationsRightsListFailure,
-}] = createRequestActions(GET_APPS_RIGHTS_LIST_BASE, rights => ({ rights }))
+}] = createRequestActions(GET_APPS_RIGHTS_LIST_BASE, id => ({ id }))
 

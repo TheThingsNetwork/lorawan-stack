@@ -12,43 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {
-  createGetRightsListActionType,
-  createGetRightsListFailureActionType,
-  createGetRightsListSuccessActionType,
-} from '../actions/rights'
+import { createGetRightsListActionType } from '../actions/rights'
+import { createRequestActions } from '../actions/lib'
 
 const defaultState = {
-  fetching: false,
   rights: [],
-  error: false,
 }
 
 const createNamedRightsReducer = function (reducerName = '') {
-  const GET_LIST = createGetRightsListActionType(reducerName)
-  const GET_LIST_SUCCESS = createGetRightsListSuccessActionType(reducerName)
-  const GET_LIST_FAILURE = createGetRightsListFailureActionType(reducerName)
+  const GET_LIST_BASE = createGetRightsListActionType(reducerName)
+  const [{ success: GET_LIST_SUCCESS }] = createRequestActions(GET_LIST_BASE)
 
-  return function (state = defaultState, action) {
-    switch (action.type) {
-    case GET_LIST:
-      return {
-        ...state,
-        fetching: true,
-      }
-    case GET_LIST_FAILURE:
-      return {
-        ...state,
-        fetching: false,
-        rights: [],
-        error: action.error,
-      }
+
+  return function (state = defaultState, { type, payload }) {
+    switch (type) {
     case GET_LIST_SUCCESS:
       return {
         ...state,
-        rights: action.rights,
-        fetching: false,
-        error: false,
+        rights: payload,
       }
     default:
       return state
