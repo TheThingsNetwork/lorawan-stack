@@ -18,14 +18,15 @@ import { defineMessages } from 'react-intl'
 import * as Yup from 'yup'
 
 import Form from '../../../components/form'
-import Field from '../../../components/field'
-import FieldGroup from '../../../components/field/group'
+import Radio from '../../../components/radio-button'
 import Button from '../../../components/button'
 import SubmitBar from '../../../components/submit-bar'
 import sharedMessages from '../../../lib/shared-messages'
 import Message from '../../../lib/components/message'
 import PropTypes from '../../../lib/prop-types'
 import { address as addressRegexp } from '../../lib/regexp'
+import Input from '../../../components/input'
+import CodeEditor from '../../../components/code-editor'
 import TYPES from '../../constants/formatter-types'
 import {
   getDefaultGrpcServiceFormatter,
@@ -132,9 +133,9 @@ class PayloadFormattersForm extends React.Component {
     switch (type) {
     case TYPES.JAVASCRIPT:
       return (
-        <Field
+        <Form.Field
           required
-          type="code"
+          component={CodeEditor}
           horizontal
           name={FIELD_NAMES.JAVASCRIPT}
           title={m.formatterParameter}
@@ -145,9 +146,10 @@ class PayloadFormattersForm extends React.Component {
       )
     case TYPES.GRPC:
       return (
-        <Field
+        <Form.Field
           horizontal
           required
+          component={Input}
           title={m.formatterParameter}
           name={FIELD_NAMES.GRPC}
           type="text"
@@ -190,43 +192,34 @@ class PayloadFormattersForm extends React.Component {
           initialValues={initialValues}
           validationSchema={validationSchema}
         >
-          <FieldGroup
+          <Form.Field
             name={FIELD_NAMES.RADIO}
             title={m.formatterType}
-            horizontal
-            columns
+            horizontal={false}
+            component={Radio.Group}
+            onChange={this.onTypeChange}
           >
-            <Field
-              title={sharedMessages.none}
-              type="radio"
+            <Radio
+              label={sharedMessages.none}
               value={TYPES.NONE}
-              onChange={this.onTypeChange}
             />
-            <Field
-              title="Javascript"
-              type="radio"
+            <Radio
+              label="Javascript"
               value={TYPES.JAVASCRIPT}
-              onChange={this.onTypeChange}
             />
-            <Field
-              title={m.grpc}
-              type="radio"
+            <Radio
+              label={m.grpc}
               value={TYPES.GRPC}
-              onChange={this.onTypeChange}
             />
-            <Field
-              title="CayenneLPP"
-              type="radio"
+            <Radio
+              label="CayenneLPP"
               value={TYPES.CAYENNELPP}
-              onChange={this.onTypeChange}
             />
-            <Field
-              title={m.repository}
-              type="radio"
+            <Radio
+              label={m.repository}
               value={TYPES.REPOSITORY}
-              onChange={this.onTypeChange}
             />
-          </FieldGroup>
+          </Form.Field>
           {this.formatter}
           <SubmitBar>
             <Button
