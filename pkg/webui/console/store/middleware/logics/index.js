@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import client from './client'
 import user from './user'
 import init from './init'
 import applications from './applications'
@@ -24,7 +23,6 @@ import gateway from './gateway'
 import configuration from './configuration'
 
 export default [
-  client,
   ...user,
   ...init,
   ...applications,
