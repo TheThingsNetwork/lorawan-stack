@@ -118,18 +118,11 @@ const getGatewayApiKeysLogic = createLogic({
   },
 })
 
-const getGatewayApiKeyLogic = createLogic({
+const getGatewayApiKeyLogic = createRequestLogic({
   type: gateway.GET_GTW_API_KEY,
-  async process ({ action }, dispatch, done) {
-    const { entityId, keyId } = action
-    try {
-      const key = await api.gateway.apiKeys.get(entityId, keyId)
-      dispatch(gateway.getGatewayApiKeySuccess(key))
-    } catch (error) {
-      dispatch(gateway.getGatewayApiKeyFailure(error))
-    }
-
-    done()
+  async process ({ action }) {
+    const { entityId, keyId } = action.payload
+    return api.gateway.apiKeys.get(entityId, keyId)
   },
 })
 

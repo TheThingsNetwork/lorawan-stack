@@ -34,14 +34,7 @@ import {
   createClearEventsActionType,
 } from './events'
 
-import {
-  getApiKey,
-  createGetApiKeyActionType,
-  getApiKeySuccess,
-  createGetApiKeySuccessActionType,
-  getApiKeyFailure,
-  createGetApiKeyFailureActionType,
-} from './api-key'
+import { createGetApiKeyActionType } from './api-key'
 
 import { createRequestActions } from './lib'
 
@@ -72,6 +65,16 @@ export const [{
   failure: updateGatewayStatisticsFailure,
 }] = createRequestActions(UPDATE_GTW_STATS_BASE, id => ({ id }))
 
+export const GET_GTW_API_KEY_BASE = createGetApiKeyActionType(SHARED_NAME)
+export const [{
+  request: GET_GTW_API_KEY,
+  success: GET_GTW_API_KEY_SUCCESS,
+  failure: GET_GTW_API_KEY_FAILURE,
+}, {
+  request: getGatewayApiKey,
+  success: getGatewayApiKeySuccess,
+  failure: getGatewayApiKeyFailure,
+}] = createRequestActions(GET_GTW_API_KEY_BASE, (gtwId, keyId) => ({ entityId: gtwId, keyId }))
 
 export const UPDATE_GTW = 'UPDATE_GATEWAY'
 export const START_GTW_STATS = 'START_GATEWAY_STATISTICS'
@@ -85,10 +88,6 @@ export const CLEAR_GTW_EVENTS = createClearEventsActionType(SHARED_NAME)
 export const GET_GTW_API_KEYS_LIST = createGetApiKeysListActionType(SHARED_NAME)
 export const GET_GTW_API_KEYS_LIST_SUCCESS = createGetApiKeysListSuccessActionType(SHARED_NAME)
 export const GET_GTW_API_KEYS_LIST_FAILURE = createGetApiKeysListFailureActionType(SHARED_NAME)
-export const GET_GTW_API_KEY = createGetApiKeyActionType(SHARED_NAME)
-export const GET_GTW_API_KEY_SUCCESS = createGetApiKeySuccessActionType(SHARED_NAME)
-export const GET_GTW_API_KEY_FAILURE = createGetApiKeyFailureActionType(SHARED_NAME)
-
 
 export const updateGateway = (id, patch) => (
   { type: UPDATE_GTW, id, patch }
@@ -121,9 +120,3 @@ export const getGatewayApiKeysList = getApiKeysList(SHARED_NAME)
 export const getGatewayApiKeysListSuccess = getApiKeysListSuccess(SHARED_NAME)
 
 export const getGatewayApiKeysListFailure = getApiKeysListFailure(SHARED_NAME)
-
-export const getGatewayApiKey = getApiKey(SHARED_NAME)
-
-export const getGatewayApiKeySuccess = getApiKeySuccess(SHARED_NAME)
-
-export const getGatewayApiKeyFailure = getApiKeyFailure(SHARED_NAME)
