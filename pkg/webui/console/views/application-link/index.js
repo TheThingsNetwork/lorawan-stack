@@ -93,10 +93,6 @@ dispatch => ({
   updateLinkSuccess: (link, stats) => dispatch(updateApplicationLinkSuccess(link, stats)),
   deleteLinkSuccess: () => dispatch(deleteApplicationLinkSuccess()),
 }))
-@connect(function (state, props) {
-  return {
-  }
-})
 @withBreadcrumb('apps.single.link', function (props) {
   return (
     <Breadcrumb
