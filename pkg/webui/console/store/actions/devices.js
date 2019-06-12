@@ -12,23 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const GET_DEVICES_LIST = 'GET_DEVICES_LIST'
-export const SEARCH_DEVICES_LIST = 'SEARCH_DEVICES_LIST'
-export const GET_DEVICES_LIST_SUCCESS = 'GET_DEVICES_LIST_SUCCESS'
-export const GET_DEVICES_LIST_FAILURE = 'GET_DEVICES_LIST_FAILURE'
+import { createRequestActions } from './lib'
 
-export const getDevicesList = (appId, filters) => (
-  { type: GET_DEVICES_LIST, appId, filters }
-)
-
-export const searchDevicesList = (appId, filters) => (
-  { type: SEARCH_DEVICES_LIST, appId, filters }
-)
-
-export const getDevicesListSuccess = (devices, totalCount) => (
-  { type: GET_DEVICES_LIST_SUCCESS, devices, totalCount }
-)
-
-export const getDevicesListFailure = error => (
-  { type: GET_DEVICES_LIST_FAILURE, error }
+export const GET_DEVICES_LIST_BASE = 'GET_DEVICES_LIST'
+export const [{
+  request: GET_DEVICES_LIST,
+  success: GET_DEVICES_LIST_SUCCESS,
+  failure: GET_DEVICES_LIST_FAILURE,
+}, {
+  request: getDevicesList,
+  success: getDevicesListSuccess,
+  failure: getDevicesListFailure,
+}] = createRequestActions(GET_DEVICES_LIST_BASE,
+  (appId, filters) => ({ appId, filters })
 )
