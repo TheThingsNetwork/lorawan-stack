@@ -23,8 +23,9 @@ import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import sharedMessages from '../../../lib/shared-messages'
 import Form from '../../../components/form'
-import Field from '../../../components/field'
+import Input from '../../../components/input'
 import Button from '../../../components/button'
+import SubmitButton from '../../../components/submit-button'
 import Message from '../../../lib/components/message'
 import DataSheet from '../../../components/data-sheet'
 import { apiKey, address } from '../../lib/regexp'
@@ -270,22 +271,23 @@ class ApplicationLink extends React.Component {
               initialValues={initialValues}
               validationSchema={validationSchema}
             >
-              <Field
-                type="text"
+              <Form.Field
+                component={Input}
                 description={m.nsDescription}
                 name="network_server_address"
                 title={m.nsAddress}
                 autoFocus
               />
-              <Field
+              <Form.Field
                 type="password"
+                component={Input}
                 required
                 name="api_key"
                 title={sharedMessages.apiKey}
               />
               <SubmitBar>
-                <Button
-                  type="submit"
+                <Form.Submit
+                  component={SubmitButton}
                   message={sharedMessages.saveChanges}
                 />
               </SubmitBar>
