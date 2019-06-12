@@ -95,18 +95,11 @@ const getApplicationLinkLogic = createRequestLogic({
   },
 })
 
-const getWebhookLogic = createLogic({
+const getWebhookLogic = createRequestLogic({
   type: webhook.GET_WEBHOOK,
-  async process ({ action }, dispatch, done) {
-    const { appId, webhookId, meta: { selector }} = action
-    try {
-      const res = await api.application.webhooks.get(appId, webhookId, selector)
-      dispatch(webhook.getWebhookSuccess(res))
-    } catch (e) {
-      dispatch(webhook.getWebhookFailure(e))
-    }
-
-    done()
+  async process ({ action }) {
+    const { payload: { appId, webhookId }, meta: { selector }} = action
+    return api.application.webhooks.get(appId, webhookId, selector)
   },
 })
 
