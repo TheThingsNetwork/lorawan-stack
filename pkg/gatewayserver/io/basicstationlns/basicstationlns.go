@@ -129,6 +129,7 @@ func (s *srv) handleDiscover(c echo.Context) error {
 }
 
 func (s *srv) handleTraffic(c echo.Context) error {
+	var latestUpstreamXTime int64
 	id := c.Param("id")
 	auth := c.Request().Header.Get(echo.HeaderAuthorization)
 	ctx := s.ctx
@@ -195,7 +196,6 @@ func (s *srv) handleTraffic(c echo.Context) error {
 	}
 	defer ws.Close()
 
-	// Process downlinks in a separate go routine
 	go func() {
 		for {
 			select {
@@ -203,12 +203,7 @@ func (s *srv) handleTraffic(c echo.Context) error {
 				return
 			case down := <-conn.Down():
 				dlTime := time.Now()
-				xTimeUpper, ok := conn.RetrieveCustomValue().(int64)
-				if !ok {
-					logger.WithError(err).Error("Failed to retrieve XTime")
-					continue
-				}
-				dnmsg := messages.FromDownlinkMessage(ids, *down, int64(s.tokens.Next(down.CorrelationIDs, dlTime)), dlTime, xTimeUpper)
+				dnmsg := messages.FromDownlinkMessage(ids, *down, int64(s.tokens.Next(down.CorrelationIDs, dlTime)), dlTime, latestUpstreamXTime)
 				msg, err := dnmsg.MarshalJSON()
 				if err != nil {
 					logger.WithError(err).Error("Failed to marshal downlink message")
@@ -275,7 +270,6 @@ func (s *srv) handleTraffic(c echo.Context) error {
 				logger.WithError(err).Warn("Failed to unmarshal join-request message")
 				return nil
 			}
-			conn.StoreCustomValue(jreq.UpInfo.XTime)
 			up, err := jreq.ToUplinkMessage(ids, fp.BandID, receivedAt)
 			if err != nil {
 				logger.WithError(err).Debug("Failed to parse join-request message")
@@ -285,6 +279,7 @@ func (s *srv) handleTraffic(c echo.Context) error {
 				logger.WithError(err).Warn("Failed to handle uplink message")
 			}
 			recordRTT(conn, receivedAt, jreq.RefTime)
+			latestUpstreamXTime = jreq.UpInfo.XTime
 
 		case messages.TypeUpstreamUplinkDataFrame:
 			var updf messages.UplinkDataFrame
@@ -293,7 +288,6 @@ func (s *srv) handleTraffic(c echo.Context) error {
 				return nil
 			}
 			up, err := updf.ToUplinkMessage(ids, fp.BandID, receivedAt)
-			conn.StoreCustomValue(updf.UpInfo.XTime)
 			if err != nil {
 				logger.WithError(err).Debug("Failed to parse uplink data frame")
 				return nil
@@ -302,6 +296,7 @@ func (s *srv) handleTraffic(c echo.Context) error {
 				logger.WithError(err).Warn("Failed to handle uplink message")
 			}
 			recordRTT(conn, receivedAt, updf.RefTime)
+			latestUpstreamXTime = updf.UpInfo.XTime
 
 		case messages.TypeUpstreamTxConfirmation:
 			var txConf messages.TxConfirmation
@@ -327,7 +322,6 @@ func (s *srv) handleTraffic(c echo.Context) error {
 			return errMessageTypeNotImplemented.WithAttributes("type", typ)
 
 		default:
-			// Unknown message types are ignored by the server
 			logger.WithField("message_type", typ).Debug("Unknown message type")
 		}
 	}
