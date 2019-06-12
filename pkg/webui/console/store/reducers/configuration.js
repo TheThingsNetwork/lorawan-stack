@@ -13,58 +13,26 @@
 // limitations under the License.
 
 import {
-  GET_NS_FREQUENCY_PLANS,
-  GET_NS_FREQUENCY_PLANS_FAILURE,
   GET_NS_FREQUENCY_PLANS_SUCCESS,
-  GET_GS_FREQUENCY_PLANS,
-  GET_GS_FREQUENCY_PLANS_FAILURE,
   GET_GS_FREQUENCY_PLANS_SUCCESS,
 } from '../actions/configuration'
 
 const defaultState = {
-  fetching: false,
-  error: undefined,
   nsFrequencyPlans: undefined,
   gsFrequencyPlans: undefined,
 }
 
-const configuration = function (state = defaultState, action) {
-  switch (action.type) {
-  case GET_NS_FREQUENCY_PLANS:
-    return {
-      ...state,
-      fetching: true,
-      nsFrequencyPlans: undefined,
-    }
+const configuration = function (state = defaultState, { type, payload }) {
+  switch (type) {
   case GET_NS_FREQUENCY_PLANS_SUCCESS:
     return {
       ...state,
-      fetching: false,
-      nsFrequencyPlans: action.frequencyPlans,
-    }
-  case GET_NS_FREQUENCY_PLANS_FAILURE:
-    return {
-      ...state,
-      fetching: false,
-      error: action.error,
-    }
-  case GET_GS_FREQUENCY_PLANS:
-    return {
-      ...state,
-      fetching: true,
-      gsFrequencyPlans: undefined,
+      nsFrequencyPlans: payload,
     }
   case GET_GS_FREQUENCY_PLANS_SUCCESS:
     return {
       ...state,
-      fetching: false,
-      gsFrequencyPlans: action.frequencyPlans,
-    }
-  case GET_GS_FREQUENCY_PLANS_FAILURE:
-    return {
-      ...state,
-      fetching: false,
-      error: action.error,
+      gsFrequencyPlans: payload,
     }
   default:
     return state
