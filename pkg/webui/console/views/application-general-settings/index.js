@@ -25,8 +25,8 @@ import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import sharedMessages from '../../../lib/shared-messages'
 import Message from '../../../lib/components/message'
 import Form from '../../../components/form'
-import Field from '../../../components/field'
-import Button from '../../../components/button'
+import Input from '../../../components/input'
+import SubmitButton from '../../../components/submit-button'
 import ModalButton from '../../../components/button/modal-button'
 import diff from '../../../lib/diff'
 import toast from '../../../components/toast'
@@ -85,15 +85,15 @@ export default class ApplicationGeneralSettings extends React.Component {
     try {
       const { ids: { application_id }} = application
       await api.application.update(application_id, changed)
-      resetForm({ ...values })
+      resetForm(values)
       toast({
         title: application_id,
         message: m.updateSuccess,
         type: toast.types.SUCCESS,
       })
     } catch (error) {
-      resetForm({ ...values })
-      await this.setState(error)
+      resetForm(values)
+      await this.setState({ error })
     }
   }
 
@@ -107,7 +107,7 @@ export default class ApplicationGeneralSettings extends React.Component {
       await api.application.delete(appId)
       dispatch(replace('/console/applications'))
     } catch (error) {
-      this.setState(error)
+      await this.setState({ error })
     }
   }
 
@@ -138,18 +138,18 @@ export default class ApplicationGeneralSettings extends React.Component {
                 component="h4"
                 content={m.basics}
               />
-              <Field
+              <Form.Field
                 title={sharedMessages.name}
                 name="name"
-                type="text"
+                component={Input}
               />
-              <Field
+              <Form.Field
                 title={sharedMessages.description}
                 name="description"
-                type="text"
+                component={Input}
               />
               <SubmitBar>
-                <Button type="submit" message={sharedMessages.saveChanges} />
+                <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
                 <ModalButton
                   type="button"
                   icon="delete"
