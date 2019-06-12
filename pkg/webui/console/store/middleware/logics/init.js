@@ -12,41 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { createLogic } from 'redux-logic'
-
 import * as user from '../../actions/user'
 import * as init from '../../actions/init'
 import api from '../../../api'
 import * as accessToken from '../../../lib/access-token'
+import createRequestLogic from './lib'
 
-const consoleAppLogic = createLogic({
+const consoleAppLogic = createRequestLogic({
   type: init.INITIALIZE,
-  async process ({ getState, action }, dispatch, done) {
+  async process (_, dispatch) {
     dispatch(user.getUserMe())
 
     try {
-      try {
-        // there is no way to retrieve the current user directly
-        // within the console app, so first get the authentication info
-        // and only afterwards fetch the user
-        const info = await api.users.authInfo()
-        const userId = info.data.oauth_access_token.user_ids.user_id
-        const result = await api.users.get(userId)
-        dispatch(user.getUserMeSuccess(result.data))
-      } catch (error) {
-        dispatch(user.getUserMeFailure())
-        accessToken.clear()
-      }
-
-      dispatch(init.initializeSuccess())
-
-      // eslint-disable-next-line no-console
-      console.log('Console initialization successful!')
+      // there is no way to retrieve the current user directly
+      // within the console app, so first get the authentication info
+      // and only afterwards fetch the user
+      const info = await api.users.authInfo()
+      const userId = info.data.oauth_access_token.user_ids.user_id
+      const result = await api.users.get(userId)
+      dispatch(user.getUserMeSuccess(result.data))
     } catch (error) {
-      dispatch(init.initializeFailure())
+      dispatch(user.getUserMeFailure())
+      accessToken.clear()
     }
 
-    done()
+    // eslint-disable-next-line no-console
+    console.log('Console initialization successful!')
+
+    return
   },
 })
 
