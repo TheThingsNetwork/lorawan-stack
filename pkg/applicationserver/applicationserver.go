@@ -304,13 +304,16 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 			errorDetails = *ttnpb.ErrorDetailsToProto(ttnErr)
 		}
 		for _, item := range items {
-			link.upCh <- &ttnpb.ApplicationUp{
-				EndDeviceIdentifiers: ids,
-				CorrelationIDs:       item.CorrelationIDs,
-				Up: &ttnpb.ApplicationUp_DownlinkFailed{
-					DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
-						ApplicationDownlink: *item,
-						Error:               errorDetails,
+			link.upCh <- &io.ContextualApplicationUp{
+				Context: ctx,
+				ApplicationUp: &ttnpb.ApplicationUp{
+					EndDeviceIdentifiers: ids,
+					CorrelationIDs:       item.CorrelationIDs,
+					Up: &ttnpb.ApplicationUp_DownlinkFailed{
+						DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
+							ApplicationDownlink: *item,
+							Error:               errorDetails,
+						},
 					},
 				},
 			}
@@ -321,11 +324,14 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 	atomic.AddUint64(&link.downlinks, uint64(len(items)))
 	atomic.StoreInt64(&link.lastDownlinkTime, time.Now().UnixNano())
 	for _, item := range items {
-		link.upCh <- &ttnpb.ApplicationUp{
-			EndDeviceIdentifiers: ids,
-			CorrelationIDs:       item.CorrelationIDs,
-			Up: &ttnpb.ApplicationUp_DownlinkQueued{
-				DownlinkQueued: item,
+		link.upCh <- &io.ContextualApplicationUp{
+			Context: ctx,
+			ApplicationUp: &ttnpb.ApplicationUp{
+				EndDeviceIdentifiers: ids,
+				CorrelationIDs:       item.CorrelationIDs,
+				Up: &ttnpb.ApplicationUp_DownlinkQueued{
+					DownlinkQueued: item,
+				},
 			},
 		}
 		registerForwardDownlink(ctx, ids, item, link.connName)

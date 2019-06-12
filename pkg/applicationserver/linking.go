@@ -96,7 +96,7 @@ type link struct {
 
 	subscribeCh   chan *io.Subscription
 	unsubscribeCh chan *io.Subscription
-	upCh          chan *ttnpb.ApplicationUp
+	upCh          chan *io.ContextualApplicationUp
 }
 
 const linkBufferSize = 10
@@ -160,7 +160,7 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 		connReady:              make(chan struct{}),
 		subscribeCh:            make(chan *io.Subscription, 1),
 		unsubscribeCh:          make(chan *io.Subscription, 1),
-		upCh:                   make(chan *ttnpb.ApplicationUp, linkBufferSize),
+		upCh:                   make(chan *io.ContextualApplicationUp, linkBufferSize),
 	}
 	if _, loaded := as.links.LoadOrStore(uid, l); loaded {
 		return errAlreadyLinked.WithAttributes("application_uid", uid)
@@ -236,12 +236,15 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 		}
 
 		if handleUpErr != nil {
-			logger.WithError(err).Warn("Failed to process upstream message")
-			registerDropUp(ctx, up, err)
+			logger.WithError(handleUpErr).Warn("Failed to process upstream message")
+			registerDropUp(ctx, up, handleUpErr)
 			continue
 		}
 
-		l.upCh <- up
+		l.upCh <- &io.ContextualApplicationUp{
+			Context:       ctx,
+			ApplicationUp: up,
+		}
 		registerForwardUp(ctx, up)
 	}
 }
@@ -296,7 +299,7 @@ func (l *link) run() {
 			}
 		case up := <-l.upCh:
 			for sub := range subscribers {
-				if err := sub.SendUp(up); err != nil {
+				if err := sub.SendUp(up.Context, up.ApplicationUp); err != nil {
 					log.FromContext(sub.Context()).WithError(err).Warn("Send upstream message failed")
 				}
 			}

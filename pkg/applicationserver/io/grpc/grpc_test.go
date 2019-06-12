@@ -152,7 +152,7 @@ func TestTraffic(t *testing.T) {
 				},
 			},
 		}
-		if err := sub.SendUp(up); !a.So(err, should.BeNil) {
+		if err := sub.SendUp(ctx, up); !a.So(err, should.BeNil) {
 			t.FailNow()
 		}
 

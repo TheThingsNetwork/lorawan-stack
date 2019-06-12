@@ -109,7 +109,7 @@ func TestTraffic(t *testing.T) {
 					upCh <- up
 				}()
 
-				err = subs[0].SendUp(tc.Message)
+				err = subs[0].SendUp(ctx, tc.Message)
 				a.So(err, should.BeNil)
 
 				select {

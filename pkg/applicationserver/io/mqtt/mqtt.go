@@ -126,34 +126,35 @@ func (c *connection) setup(ctx context.Context) error {
 				logger.WithError(c.io.Context().Err()).Debug("Done sending upstream messages")
 				return
 			case up := <-c.io.Up():
+				logger := logger.WithField("device_uid", unique.ID(up.Context, up.EndDeviceIdentifiers))
 				var topicParts []string
 				switch up.Up.(type) {
 				case *ttnpb.ApplicationUp_UplinkMessage:
-					topicParts = c.format.UplinkTopic(unique.ID(c.io.Context(), c.io.ApplicationIDs()), up.DeviceID)
+					topicParts = c.format.UplinkTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceID)
 				case *ttnpb.ApplicationUp_JoinAccept:
-					topicParts = c.format.JoinAcceptTopic(unique.ID(c.io.Context(), c.io.ApplicationIDs()), up.DeviceID)
+					topicParts = c.format.JoinAcceptTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceID)
 				case *ttnpb.ApplicationUp_DownlinkAck:
-					topicParts = c.format.DownlinkAckTopic(unique.ID(c.io.Context(), c.io.ApplicationIDs()), up.DeviceID)
+					topicParts = c.format.DownlinkAckTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceID)
 				case *ttnpb.ApplicationUp_DownlinkNack:
-					topicParts = c.format.DownlinkNackTopic(unique.ID(c.io.Context(), c.io.ApplicationIDs()), up.DeviceID)
+					topicParts = c.format.DownlinkNackTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceID)
 				case *ttnpb.ApplicationUp_DownlinkSent:
-					topicParts = c.format.DownlinkSentTopic(unique.ID(c.io.Context(), c.io.ApplicationIDs()), up.DeviceID)
+					topicParts = c.format.DownlinkSentTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceID)
 				case *ttnpb.ApplicationUp_DownlinkFailed:
-					topicParts = c.format.DownlinkFailedTopic(unique.ID(c.io.Context(), c.io.ApplicationIDs()), up.DeviceID)
+					topicParts = c.format.DownlinkFailedTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceID)
 				case *ttnpb.ApplicationUp_DownlinkQueued:
-					topicParts = c.format.DownlinkQueuedTopic(unique.ID(c.io.Context(), c.io.ApplicationIDs()), up.DeviceID)
+					topicParts = c.format.DownlinkQueuedTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceID)
 				case *ttnpb.ApplicationUp_LocationSolved:
-					topicParts = c.format.LocationSolvedTopic(unique.ID(c.io.Context(), c.io.ApplicationIDs()), up.DeviceID)
+					topicParts = c.format.LocationSolvedTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceID)
 				}
 				if topicParts == nil {
 					continue
 				}
-				buf, err := c.format.FromUp(up)
+				buf, err := c.format.FromUp(up.ApplicationUp)
 				if err != nil {
 					logger.WithError(err).Warn("Failed to marshal upstream message")
 					continue
 				}
-				logger.Info("Publish upstream message")
+				logger.Debug("Publish upstream message")
 				c.session.Publish(&packet.PublishPacket{
 					TopicName:  topic.Join(topicParts),
 					TopicParts: topicParts,
