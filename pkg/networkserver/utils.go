@@ -81,9 +81,18 @@ func newMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb
 		return nil, err
 	}
 
+	class := ttnpb.CLASS_A
+	if dev.Multicast || dev.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+		if dev.SupportsClassC {
+			class = ttnpb.CLASS_C
+		} else if dev.SupportsClassB {
+			class = ttnpb.CLASS_B
+		}
+	}
+
 	macState := &ttnpb.MACState{
 		LoRaWANVersion: dev.LoRaWANVersion,
-		DeviceClass:    ttnpb.CLASS_A,
+		DeviceClass:    class,
 	}
 
 	macState.CurrentParameters.MaxEIRP = phy.DefaultMaxEIRP
