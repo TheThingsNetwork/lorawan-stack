@@ -21,10 +21,11 @@ import (
 var (
 	errABPJoinRequest             = errors.DefineInvalidArgument("abp_join_request", "received a join-request from ABP device")
 	errCIDOutOfRange              = errors.DefineInvalidArgument("cid_out_of_range", "CID must be in range from {min} to {max}")
+	errClassAMulticast            = errors.DefineInvalidArgument("class_a_multicast", "multicast device in class A mode")
+	errClassBCForClassA           = errors.DefineInvalidArgument("class_b_c_for_class_a", "class B/C downlink queued for device in class A mode")
 	errComputeMIC                 = errors.DefineInvalidArgument("compute_mic", "failed to compute MIC")
 	errConfirmedDownlinkTooSoon   = errors.DefineUnavailable("confirmed_too_soon", "confirmed downlink is scheduled too soon")
 	errConfirmedMulticastDownlink = errors.DefineInvalidArgument("confirmed_multicast_downlink", "confirmed downlink queued for multicast device")
-	errClassBCForClassA           = errors.DefineInvalidArgument("class_b_c_for_class_a", "class B/C downlink queued for device in class A mode")
 	errCorruptedMACState          = errors.DefineCorruption("corrupted_mac_state", "MAC state is corrupted")
 	errDataRateNotFound           = errors.DefineNotFound("data_rate_not_found", "data rate not found")
 	errDecodePayload              = errors.DefineInvalidArgument("decode_payload", "failed to decode payload")
