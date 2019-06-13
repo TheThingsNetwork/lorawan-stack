@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const INITIALIZE = 'INITIALIZE'
+export const INITIALIZE = 'INITIALIZE_REQUEST'
 export const INITIALIZE_SUCCESS = 'INITIALIZE_SUCCESS'
 export const INITIALIZE_FAILURE = 'INITIALIZE_FAILURE'
 
