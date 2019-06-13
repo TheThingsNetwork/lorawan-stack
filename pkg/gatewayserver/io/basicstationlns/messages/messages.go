@@ -137,7 +137,6 @@ type RouterConfig struct {
 	NoDutyCycle bool `json:"nodc"`
 	NoDwellTime bool `json:"nodwell"`
 
-	// TODO: Roundtrip time monitoring
 	MuxTime float64 `json:"MuxTime"`
 }
 
@@ -176,13 +175,13 @@ func GetRouterConfig(fp frequencyplans.FrequencyPlan, isProd bool, dlTime time.T
 	if len(fp.Radios) == 0 {
 		return RouterConfig{}, errFrequencyPlan
 	}
-	// TODO: Handle FP with multiple radios if necessary
+	// TODO: Handle FP with multiple radios if necessary (https://github.com/TheThingsNetwork/lorawan-stack/issues/761)
 	cfg.FrequencyRange = []int{
 		int(fp.Radios[0].TxConfiguration.MinFrequency),
 		int(fp.Radios[0].TxConfiguration.MaxFrequency),
 	}
 
-	// TODO: https://github.com/TheThingsNetwork/lorawan-stack/issues/761
+	// TODO: Dynamically fill this field based on https://github.com/TheThingsNetwork/lorawan-stack/issues/761
 	cfg.HardwareSpec = fmt.Sprintf("%s/%s", configHardwareSpecPrefix, configHardwareSpecNoOfConcentrators)
 
 	drs, err := getDataRatesFromBandID(fp.BandID)
@@ -204,10 +203,10 @@ func GetRouterConfig(fp frequencyplans.FrequencyPlan, isProd bool, dlTime time.T
 	sx1301Conf.Radios[0].TxFreqMin = 0
 	sx1301Conf.Radios[0].TxFreqMax = 0
 
-	// TODO: Extend this for > 8ch gateways https://github.com/TheThingsNetwork/lorawan-stack/issues/761
+	// TODO: Extend this for > 8ch gateways (https://github.com/TheThingsNetwork/lorawan-stack/issues/761)
 	cfg.SX1301Config = append(cfg.SX1301Config, *sx1301Conf)
 
-	//Add the MuxTime for RTT measurement
+	// Add the MuxTime for RTT measurement
 	cfg.MuxTime = float64(dlTime.Unix()) + float64(dlTime.Nanosecond())/(1e9)
 
 	return cfg, nil
