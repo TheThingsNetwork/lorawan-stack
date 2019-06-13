@@ -72,8 +72,8 @@ func FromDownlinkMessage(ids ttnpb.GatewayIdentifiers, down ttnpb.DownlinkMessag
 	dnmsg.Rx1DR = int(scheduledMsg.DataRateIndex)
 	dnmsg.Rx1Freq = int(scheduledMsg.Frequency)
 
-	//Add the MuxTime for RTT measurement
-	dnmsg.MuxTime = float64(dlTime.Unix()) + float64(dlTime.Nanosecond())/(1e9)
+	// Add the MuxTime for RTT measurement
+	dnmsg.MuxTime = float64(dlTime.UnixNano()) / float64(time.Second)
 
 	// Always use the Basic Station ClassB mode for absolute time scheduling.
 	if scheduledMsg.Time != nil {
@@ -83,11 +83,12 @@ func FromDownlinkMessage(ids ttnpb.GatewayIdentifiers, down ttnpb.DownlinkMessag
 	}
 
 	dnmsg.DeviceClass = uint(ttnpb.CLASS_A)
-	// Estimate the xtime based on the timestamp; xtime = timestamp - (rxdelay+1).
 
+	// Estimate the xtime based on the timestamp; xtime = timestamp - (rxdelay+1).
+	// The calculated offset is in microseconds.
 	t := time.Unix(int64(scheduledMsg.Timestamp), 0)
-	offset := time.Duration((dnmsg.RxDelay)) * time.Second * (1e6)
-	dnmsg.XTime = latestXTime&0x7FFFFFFF00000000 | (t.Add(-offset).Unix())
+	offset := time.Duration((dnmsg.RxDelay)) * time.Second * 1e6
+	dnmsg.XTime = int64(uint64(latestXTime)&0xFFFFFFFF00000000 | uint64(t.Add(-offset).Unix()))
 
 	return dnmsg
 }

@@ -2807,15 +2807,6 @@
       "file": "basicstationlns.go"
     }
   },
-  "error:pkg/gatewayserver/io/basicstationlns:message_type_not_implemented": {
-    "translations": {
-      "en": "message of type `{type}` is not implemented"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/basicstationlns",
-      "file": "basicstationlns.go"
-    }
-  },
   "error:pkg/gatewayserver/io/grpc:connect": {
     "translations": {
       "en": "failed to connect gateway `{gateway_uid}`"

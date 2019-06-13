@@ -42,7 +42,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	encoding "go.thethings.network/lorawan-stack/pkg/ttnpb/udp"
 	"go.thethings.network/lorawan-stack/pkg/types"
-
 	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
@@ -415,8 +414,8 @@ func TestGatewayServer(t *testing.T) {
 					t.SkipNow()
 				}
 				wsConn, _, err := websocket.DefaultDialer.Dial("ws://0.0.0.0:1885/api/v3/gs/io/basicstation/traffic/"+registeredGatewayID, nil)
-				if !a.So(err, should.BeNil) {
-					return fmt.Errorf("Connection failed: %v", err)
+				if err != nil {
+					return err
 				}
 				defer wsConn.Close()
 
@@ -861,10 +860,10 @@ func TestGatewayServer(t *testing.T) {
 							case <-time.After(timeout):
 								t.Fatal("Expected gateway status event timeout")
 							}
-						}
 
-						// Wait for gateway status to be processed; no event available here.
-						time.Sleep(timeout)
+							// Wait for gateway status to be processed; no event available here.
+							time.Sleep(timeout)
+						}
 
 						stats, err := statsClient.GetGatewayConnectionStats(statsCtx, &ids)
 						if !a.So(err, should.BeNil) {

@@ -422,3 +422,6 @@ func (c *Connection) DownStats() (total uint64, t time.Time, ok bool) {
 func (c *Connection) RTTStats() (min, max, median time.Duration, count int) {
 	return c.rtts.Stats()
 }
+
+// FrequencyPlan returns the frequency plan for the gateway.
+func (c *Connection) FrequencyPlan() *frequencyplans.FrequencyPlan { return c.fp }

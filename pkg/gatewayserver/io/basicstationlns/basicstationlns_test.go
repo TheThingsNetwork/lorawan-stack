@@ -76,12 +76,20 @@ func TestClientTokenAuth(t *testing.T) {
 		Name           string
 		GatewayID      string
 		AuthToken      string
+		TokenPrefix    string
 		ErrorAssertion func(err error) bool
 	}{
 		{
 			Name:           "RegisteredGatewayAndValidKey",
 			GatewayID:      registeredGatewayID.GatewayID,
 			AuthToken:      registeredGatewayToken,
+			ErrorAssertion: nil,
+		},
+		{
+			Name:           "RegisteredGatewayAndValidKey",
+			GatewayID:      registeredGatewayID.GatewayID,
+			AuthToken:      registeredGatewayToken,
+			TokenPrefix:    "Bearer ",
 			ErrorAssertion: nil,
 		},
 		{
@@ -109,7 +117,7 @@ func TestClientTokenAuth(t *testing.T) {
 		t.Run(fmt.Sprintf("%s", tc.Name), func(t *testing.T) {
 			a := assertions.New(t)
 			h := http.Header{}
-			h.Set("Authorization", tc.AuthToken)
+			h.Set("Authorization", fmt.Sprintf("%s%s", tc.TokenPrefix, tc.AuthToken))
 			conn, _, err := websocket.DefaultDialer.Dial("ws://localhost:8100/api/v3/gs/io/basicstation/traffic/"+tc.GatewayID, h)
 			if err != nil {
 				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
@@ -172,26 +180,30 @@ func TestDiscover(t *testing.T) {
 	}
 
 	// Test Queries
-	for i, tc := range []struct {
+	for _, tc := range []struct {
+		Name     string
 		Query    interface{}
 		Response messages.DiscoverResponse
 	}{
 		{
+			Name:     "EmptyEUI",
 			Query:    messages.DiscoverQuery{},
-			Response: messages.DiscoverResponse{Error: "Invalid request"},
+			Response: messages.DiscoverResponse{Error: "Empty router EUI provided"},
 		},
 		{
+			Name:     "EmptyStruct",
 			Query:    struct{}{},
-			Response: messages.DiscoverResponse{Error: "Invalid request"},
+			Response: messages.DiscoverResponse{Error: "Empty router EUI provided"},
 		},
 		{
+			Name: "InvalidJSONKey",
 			Query: struct {
 				EUI string `json:"route"`
 			}{EUI: `"01-02-03-04-05-06-07-08"`},
-			Response: messages.DiscoverResponse{Error: "Invalid request"},
+			Response: messages.DiscoverResponse{Error: "Empty router EUI provided"},
 		},
 	} {
-		t.Run(fmt.Sprintf("InvalidQuery/%d", i), func(t *testing.T) {
+		t.Run(fmt.Sprintf("InvalidQuery/%s", tc.Name), func(t *testing.T) {
 			a := assertions.New(t)
 			conn, _, err := websocket.DefaultDialer.Dial(discoveryEndPoint, nil)
 			if !a.So(err, should.BeNil) {
@@ -231,26 +243,30 @@ func TestDiscover(t *testing.T) {
 		})
 	}
 
-	for i, tc := range []struct {
+	for _, tc := range []struct {
+		Name  string
 		Query interface{}
 	}{
 		{
+			Name: "InvalidLength",
 			Query: struct {
 				EUI string `json:"router"`
 			}{EUI: `"01-02-03-04-05-06-07-08-09"`},
 		},
 		{
+			Name: "InvalidLength",
 			Query: struct {
 				EUI string `json:"router"`
 			}{EUI: `"01:02:03:04:05:06:07:08:09"`},
 		},
 		{
+			Name: "InvalidEUIFormat",
 			Query: struct {
 				EUI string `json:"router"`
 			}{EUI: `"01:02:03:04:05:06:07-08"`},
 		},
 	} {
-		t.Run(fmt.Sprintf("InvalidQuery/%d", i), func(t *testing.T) {
+		t.Run(fmt.Sprintf("InvalidQuery/%s", tc.Name), func(t *testing.T) {
 			a := assertions.New(t)
 			conn, _, err := websocket.DefaultDialer.Dial(discoveryEndPoint, nil)
 			if !a.So(err, should.BeNil) {
@@ -457,6 +473,7 @@ func TestVersion(t *testing.T) {
 		})
 	}
 }
+
 func TestTraffic(t *testing.T) {
 	a := assertions.New(t)
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))

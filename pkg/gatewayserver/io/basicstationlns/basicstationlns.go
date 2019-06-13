@@ -19,6 +19,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
+	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -36,8 +38,7 @@ import (
 )
 
 var (
-	errEmptyGatewayEUI           = errors.Define("empty_gateway_eui", "empty gateway EUI")
-	errMessageTypeNotImplemented = errors.DefineUnimplemented("message_type_not_implemented", "message of type `{type}` is not implemented")
+	errEmptyGatewayEUI = errors.Define("empty_gateway_eui", "empty gateway EUI")
 )
 
 type srv struct {
@@ -66,7 +67,8 @@ func (s *srv) RegisterRoutes(server *web.Server) {
 }
 
 func (s *srv) handleDiscover(c echo.Context) error {
-	logger := log.FromContext(s.ctx).WithFields(log.Fields(
+	ctx := c.Request().Context()
+	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"endpoint", "discover",
 		"remote_addr", c.Request().RemoteAddr,
 	))
@@ -79,27 +81,27 @@ func (s *srv) handleDiscover(c echo.Context) error {
 
 	_, data, err := ws.ReadMessage()
 	if err != nil {
-		logger.WithError(err).Debug("Failed to read message")
+		logger.WithError(err).Warn("Failed to read message")
 		return err
 	}
 	var req messages.DiscoverQuery
 	if err := json.Unmarshal(data, &req); err != nil {
-		logger.WithError(err).Debug("Failed to parse discover query message")
+		logger.WithError(err).Warn("Failed to parse discover query message")
 		return err
 	}
 
 	if req.EUI.IsZero() {
-		writeDiscoverError(s.ctx, ws, "Invalid request")
+		writeDiscoverError(s.ctx, ws, "Empty router EUI provided")
 		return errEmptyGatewayEUI
 	}
 
 	ids := ttnpb.GatewayIdentifiers{
 		EUI: &req.EUI.EUI64,
 	}
-	ctx, ids, err := s.server.FillGatewayContext(s.ctx, ids)
+	ctx, ids, err = s.server.FillGatewayContext(ctx, ids)
 	if err != nil {
-		logger.WithError(err).Debug("Failed to fill gateway context")
-		writeDiscoverError(ctx, ws, "Router not provisioned")
+		logger.WithError(err).Warn("Failed to fetch gateway")
+		writeDiscoverError(ctx, ws, fmt.Sprintf("Failed to fetch gateway: %s", err.Error()))
 		return err
 	}
 
@@ -131,12 +133,16 @@ func (s *srv) handleDiscover(c echo.Context) error {
 func (s *srv) handleTraffic(c echo.Context) error {
 	var latestUpstreamXTime int64
 	id := c.Param("id")
-	auth := c.Request().Header.Get(echo.HeaderAuthorization)
-	ctx := s.ctx
+	var auth string
+	auth = c.Request().Header.Get(echo.HeaderAuthorization)
+	ctx := c.Request().Context()
 	if auth != "" {
+		if !strings.Contains(auth, "Bearer") {
+			auth = fmt.Sprintf("Bearer %s", auth)
+		}
 		md := metadata.New(map[string]string{
 			"id":            id,
-			"authorization": fmt.Sprintf("Bearer %s", auth),
+			"authorization": auth,
 		})
 		if ctxMd, ok := metadata.FromIncomingContext(s.ctx); ok {
 			md = metadata.Join(ctxMd, md)
@@ -151,10 +157,10 @@ func (s *srv) handleTraffic(c echo.Context) error {
 
 	ctx, ids, err := s.server.FillGatewayContext(ctx, ttnpb.GatewayIdentifiers{GatewayID: id})
 	if err != nil {
-		logger.WithError(err).Debug("Failed to fill gateway context")
 		return err
 	}
 
+	// For gateways with valid EUIs and no auth, we provide the link rights ourselves as in the udp frontend.
 	if auth == "" {
 		ctx = rights.NewContext(ctx, rights.Rights{
 			GatewayRights: map[string]*ttnpb.Rights{
@@ -167,12 +173,6 @@ func (s *srv) handleTraffic(c echo.Context) error {
 
 	uid := unique.ID(ctx, ids)
 	ctx = log.NewContextWithField(ctx, "gateway_uid", uid)
-
-	fp, err := s.server.GetFrequencyPlan(ctx, ids)
-	if err != nil {
-		logger.WithError(err).Warn("Failed to get frequency plan")
-		return err
-	}
 
 	conn, err := s.server.Connect(ctx, s, ids)
 	if err != nil {
@@ -196,6 +196,8 @@ func (s *srv) handleTraffic(c echo.Context) error {
 	}
 	defer ws.Close()
 
+	fp := conn.FrequencyPlan()
+
 	go func() {
 		for {
 			select {
@@ -203,10 +205,10 @@ func (s *srv) handleTraffic(c echo.Context) error {
 				return
 			case down := <-conn.Down():
 				dlTime := time.Now()
-				dnmsg := messages.FromDownlinkMessage(ids, *down, int64(s.tokens.Next(down.CorrelationIDs, dlTime)), dlTime, latestUpstreamXTime)
+				dnmsg := messages.FromDownlinkMessage(ids, *down, int64(s.tokens.Next(down.CorrelationIDs, dlTime)), dlTime, atomic.LoadInt64(&latestUpstreamXTime))
 				msg, err := dnmsg.MarshalJSON()
 				if err != nil {
-					logger.WithError(err).Error("Failed to marshal downlink message")
+					logger.WithError(err).Warn("Failed to marshal downlink message")
 					continue
 				}
 
@@ -214,115 +216,118 @@ func (s *srv) handleTraffic(c echo.Context) error {
 				if err := ws.WriteMessage(websocket.TextMessage, msg); err != nil {
 					logger.WithError(err).Error("Failed to send downlink message")
 					conn.Disconnect(err)
+					return
 				}
 			}
 		}
 	}()
 
 	for {
-		_, data, err := ws.ReadMessage()
-		if err != nil {
-			logger.WithError(err).Debug("Failed to read message")
-			conn.Disconnect(err)
-			return nil
-		}
+		select {
+		case <-conn.Context().Done():
+			return conn.Context().Err()
+		default:
+			_, data, err := ws.ReadMessage()
+			if err != nil {
+				logger.WithError(err).Error("Failed to read message")
+				conn.Disconnect(err)
+				return nil
+			}
 
-		typ, err := messages.Type(data)
-		if err != nil {
-			logger.WithError(err).Debug("Failed to parse message type")
-			continue
-		}
-		logger = logger.WithFields(log.Fields(
-			"upstream_type", typ,
-		))
-		receivedAt := time.Now()
-
-		switch typ {
-		case messages.TypeUpstreamVersion:
-			var version messages.Version
-			if err := json.Unmarshal(data, &version); err != nil {
-				logger.WithError(err).Debug("Failed to unmarshal version message")
-				return err
+			typ, err := messages.Type(data)
+			if err != nil {
+				logger.WithError(err).Warn("Failed to parse message type")
+				continue
 			}
 			logger = logger.WithFields(log.Fields(
-				"station", version.Station,
-				"firmware", version.Firmware,
-				"model", version.Model,
+				"upstream_type", typ,
 			))
-			cfg, err := messages.GetRouterConfig(*fp, version.IsProduction(), time.Now())
-			if err != nil {
-				logger.WithError(err).Warn("Failed to generate router configuration")
-				return err
-			}
-			data, err = cfg.MarshalJSON()
-			if err != nil {
-				logger.WithError(err).Warn("Failed to marshal response message")
-				return err
-			}
-			if err := ws.WriteMessage(websocket.TextMessage, data); err != nil {
-				logger.WithError(err).Warn("Failed to send router configuration")
-				return err
-			}
+			receivedAt := time.Now()
 
-		case messages.TypeUpstreamJoinRequest:
-			var jreq messages.JoinRequest
-			if err := json.Unmarshal(data, &jreq); err != nil {
-				logger.WithError(err).Warn("Failed to unmarshal join-request message")
-				return nil
-			}
-			up, err := jreq.ToUplinkMessage(ids, fp.BandID, receivedAt)
-			if err != nil {
-				logger.WithError(err).Debug("Failed to parse join-request message")
-				return nil
-			}
-			if err := conn.HandleUp(up); err != nil {
-				logger.WithError(err).Warn("Failed to handle uplink message")
-			}
-			recordRTT(conn, receivedAt, jreq.RefTime)
-			latestUpstreamXTime = jreq.UpInfo.XTime
-
-		case messages.TypeUpstreamUplinkDataFrame:
-			var updf messages.UplinkDataFrame
-			if err := json.Unmarshal(data, &updf); err != nil {
-				logger.WithError(err).Warn("Failed to unmarshal uplink data frame")
-				return nil
-			}
-			up, err := updf.ToUplinkMessage(ids, fp.BandID, receivedAt)
-			if err != nil {
-				logger.WithError(err).Debug("Failed to parse uplink data frame")
-				return nil
-			}
-			if err := conn.HandleUp(up); err != nil {
-				logger.WithError(err).Warn("Failed to handle uplink message")
-			}
-			recordRTT(conn, receivedAt, updf.RefTime)
-			latestUpstreamXTime = updf.UpInfo.XTime
-
-		case messages.TypeUpstreamTxConfirmation:
-			var txConf messages.TxConfirmation
-			if err := json.Unmarshal(data, &txConf); err != nil {
-				logger.WithError(err).Warn("Failed to unmarshal Tx acknowledgement frame")
-				return nil
-			}
-			if cids, _, ok := s.tokens.Get(uint16(txConf.Diid), receivedAt); ok {
-				txAck := messages.ToTxAcknowledgment(cids)
-				if err := conn.HandleTxAck(&txAck); err != nil {
-					logger.WithField("diid", txConf.Diid).Debug("Failed to handle Tx acknowledgement")
+			switch typ {
+			case messages.TypeUpstreamVersion:
+				var version messages.Version
+				if err := json.Unmarshal(data, &version); err != nil {
+					logger.WithError(err).Warn("Failed to unmarshal version message")
+					return err
 				}
-			} else {
-				logger.WithField("diid", txConf.Diid).Debug("Tx acknowledgement either does not correspond to a downlink message or arrived too late")
+				logger = logger.WithFields(log.Fields(
+					"station", version.Station,
+					"firmware", version.Firmware,
+					"model", version.Model,
+				))
+				cfg, err := messages.GetRouterConfig(*fp, version.IsProduction(), time.Now())
+				if err != nil {
+					logger.WithError(err).Warn("Failed to generate router configuration")
+					return err
+				}
+				data, err = cfg.MarshalJSON()
+				if err != nil {
+					logger.WithError(err).Warn("Failed to marshal response message")
+					return err
+				}
+				if err := ws.WriteMessage(websocket.TextMessage, data); err != nil {
+					logger.WithError(err).Warn("Failed to send router configuration")
+					return err
+				}
+
+			case messages.TypeUpstreamJoinRequest:
+				var jreq messages.JoinRequest
+				if err := json.Unmarshal(data, &jreq); err != nil {
+					logger.WithError(err).Warn("Failed to unmarshal join-request message")
+					return nil
+				}
+				up, err := jreq.ToUplinkMessage(ids, fp.BandID, receivedAt)
+				if err != nil {
+					logger.WithError(err).Warn("Failed to parse join-request message")
+					return nil
+				}
+				if err := conn.HandleUp(up); err != nil {
+					logger.WithError(err).Warn("Failed to handle uplink message")
+				}
+				recordRTT(conn, receivedAt, jreq.RefTime)
+				atomic.StoreInt64(&latestUpstreamXTime, jreq.UpInfo.XTime)
+
+			case messages.TypeUpstreamUplinkDataFrame:
+				var updf messages.UplinkDataFrame
+				if err := json.Unmarshal(data, &updf); err != nil {
+					logger.WithError(err).Warn("Failed to unmarshal uplink data frame")
+					return nil
+				}
+				up, err := updf.ToUplinkMessage(ids, fp.BandID, receivedAt)
+				if err != nil {
+					logger.WithError(err).Warn("Failed to parse uplink data frame")
+					return nil
+				}
+				if err := conn.HandleUp(up); err != nil {
+					logger.WithError(err).Warn("Failed to handle uplink message")
+				}
+				recordRTT(conn, receivedAt, updf.RefTime)
+				atomic.StoreInt64(&latestUpstreamXTime, updf.UpInfo.XTime)
+
+			case messages.TypeUpstreamTxConfirmation:
+				var txConf messages.TxConfirmation
+				if err := json.Unmarshal(data, &txConf); err != nil {
+					logger.WithError(err).Warn("Failed to unmarshal Tx acknowledgement frame")
+					return nil
+				}
+				if cids, _, ok := s.tokens.Get(uint16(txConf.Diid), receivedAt); ok {
+					txAck := messages.ToTxAcknowledgment(cids)
+					if err := conn.HandleTxAck(&txAck); err != nil {
+						logger.WithField("diid", txConf.Diid).Warn("Failed to handle Tx acknowledgement")
+					}
+				} else {
+					logger.WithField("diid", txConf.Diid).Debug("Tx acknowledgement either does not correspond to a downlink message or arrived too late")
+				}
+				recordRTT(conn, receivedAt, txConf.RefTime)
+
+			case messages.TypeUpstreamProprietaryDataFrame, messages.TypeUpstreamRemoteShell, messages.TypeUpstreamTimeSync:
+				logger.WithField("message_type", typ).Warn("Message type not implemented")
+
+			default:
+				logger.WithField("message_type", typ).Debug("Unknown message type")
 			}
-			recordRTT(conn, receivedAt, txConf.RefTime)
 
-		case messages.TypeUpstreamProprietaryDataFrame:
-			return errMessageTypeNotImplemented.WithAttributes("type", typ)
-		case messages.TypeUpstreamRemoteShell:
-			return errMessageTypeNotImplemented.WithAttributes("type", typ)
-		case messages.TypeUpstreamTimeSync:
-			return errMessageTypeNotImplemented.WithAttributes("type", typ)
-
-		default:
-			logger.WithField("message_type", typ).Debug("Unknown message type")
 		}
 	}
 }
@@ -332,11 +337,11 @@ func writeDiscoverError(ctx context.Context, ws *websocket.Conn, msg string) {
 	logger := log.FromContext(ctx)
 	errMsg, err := json.Marshal(messages.DiscoverResponse{Error: msg})
 	if err != nil {
-		logger.WithError(err).Debug("Failed to marshal error message")
+		logger.WithError(err).Warn("Failed to marshal error message")
 		return
 	}
 	if err := ws.WriteMessage(websocket.TextMessage, errMsg); err != nil {
-		logger.WithError(err).Debug("Failed to write error response message")
+		logger.WithError(err).Warn("Failed to write error response message")
 	}
 }
 

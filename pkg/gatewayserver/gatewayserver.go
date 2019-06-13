@@ -172,11 +172,10 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 	}
 
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.NsGs", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("gatewayserver"))
-	bsCtx := gs.FillContext(ctx)
 	if conf.BasicStation.FallbackFrequencyPlanID != "" {
-		bsCtx = frequencyplans.WithFallbackID(bsCtx, conf.BasicStation.FallbackFrequencyPlanID)
+		ctx = frequencyplans.WithFallbackID(ctx, conf.BasicStation.FallbackFrequencyPlanID)
 	}
-	c.RegisterWeb(basicstationlns.New(bsCtx, gs))
+	c.RegisterWeb(basicstationlns.New(ctx, gs))
 
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.NsGs", cluster.HookName, c.ClusterAuthUnaryHook())
 
@@ -257,7 +256,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 		"protocol", frontend.Protocol(),
 		"gateway_uid", uid,
 	))
-	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gateway_conn:%s", events.NewCorrelationID()))
+	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:conn:%s", events.NewCorrelationID()))
 
 	var err error
 	var callOpt grpc.CallOption
