@@ -24,7 +24,17 @@ import (
 const i18nPrefix = "event"
 
 // Definition of a registered event.
-type Definition func(ctx context.Context, identifiers CombinedIdentifiers, data interface{}) Event
+type Definition func(ctx context.Context, ids CombinedIdentifiers, data interface{}) Event
+
+// BindData partially-applies Definition by binding data argument.
+func (d Definition) BindData(data interface{}) DefinitionDataClosure {
+	return func(ctx context.Context, ids CombinedIdentifiers) Event {
+		return d(ctx, ids, data)
+	}
+}
+
+// DefinitionDataClosure is partially-applied Definition with data argument bound.
+type DefinitionDataClosure func(ctx context.Context, ids CombinedIdentifiers) Event
 
 // Definitions of registered events.
 // Events that are defined in init() funcs will be collected for translation.
