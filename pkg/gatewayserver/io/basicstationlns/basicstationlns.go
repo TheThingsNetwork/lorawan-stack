@@ -66,7 +66,8 @@ func (s *srv) RegisterRoutes(server *web.Server) {
 }
 
 func (s *srv) handleDiscover(c echo.Context) error {
-	logger := log.FromContext(s.ctx).WithFields(log.Fields(
+	ctx := c.Request().Context()
+	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"endpoint", "discover",
 		"remote_addr", c.Request().RemoteAddr,
 	))
@@ -96,7 +97,7 @@ func (s *srv) handleDiscover(c echo.Context) error {
 	ids := ttnpb.GatewayIdentifiers{
 		EUI: &req.EUI.EUI64,
 	}
-	ctx, ids, err := s.server.FillGatewayContext(s.ctx, ids)
+	ctx, ids, err = s.server.FillGatewayContext(ctx, ids)
 	if err != nil {
 		logger.WithError(err).Debug("Failed to fill gateway context")
 		writeDiscoverError(ctx, ws, "Router not provisioned")
@@ -132,7 +133,7 @@ func (s *srv) handleTraffic(c echo.Context) error {
 	var latestUpstreamXTime int64
 	id := c.Param("id")
 	auth := c.Request().Header.Get(echo.HeaderAuthorization)
-	ctx := s.ctx
+	ctx := c.Request().Context()
 	if auth != "" {
 		md := metadata.New(map[string]string{
 			"id":            id,
