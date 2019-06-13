@@ -17,7 +17,6 @@ package networkserver
 
 import (
 	"context"
-	"fmt"
 	"hash/fnv"
 	"sync"
 	"time"
@@ -122,7 +121,6 @@ type NetworkServer struct {
 	metadataAccumulatorPool *sync.Pool
 	hashPool                *sync.Pool
 
-	macHandlers        *sync.Map // ttnpb.MACCommandIdentifier -> MACHandler
 	downlinkTasks      DownlinkTaskQueue
 	downlinkPriorities DownlinkPriorities
 
@@ -170,27 +168,6 @@ func WithASUplinkHandler(f func(context.Context, ttnpb.ApplicationIdentifiers, *
 	}
 }
 
-// WithMACHandler registers a MACHandler for specified CID in 0x80-0xFF range.
-// WithMACHandler panics if a MACHandler for the CID is already registered, or if
-// the CID is out of range.
-func WithMACHandler(cid ttnpb.MACCommandIdentifier, fn MACHandler) Option {
-	if cid < 0x80 || cid > 0xFF {
-		panic(errCIDOutOfRange.WithAttributes(
-			"min", fmt.Sprintf("0x%X", 0x80),
-			"max", fmt.Sprintf("0x%X", 0xFF),
-		))
-	}
-
-	return func(ns *NetworkServer) {
-		_, ok := ns.macHandlers.LoadOrStore(cid, fn)
-		if ok {
-			panic(errDuplicateCIDHandler.WithAttributes(
-				"cid", fmt.Sprintf("0x%X", int32(cid)),
-			))
-		}
-	}
-}
-
 // New returns new NetworkServer.
 func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, error) {
 	devAddrPrefixes := conf.DevAddrPrefixes
@@ -221,7 +198,6 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		metadataAccumulators:    &sync.Map{},
 		metadataAccumulatorPool: &sync.Pool{},
 		hashPool:                &sync.Pool{},
-		macHandlers:             &sync.Map{},
 		downlinkTasks:           conf.DownlinkTasks,
 		downlinkPriorities:      downlinkPriorities,
 		defaultMACSettings: ttnpb.MACSettings{
