@@ -52,7 +52,7 @@
     &:disabled
       cursor: not-allowed
 
-  & input:checked ~ .checkmark
+  input:checked ~ .checkmark
     border-color: $c-active-blue
     background-color: $c-active-blue
 
@@ -85,7 +85,20 @@
     border: solid white
     border-width: 0 2px 2px 0
     transform: rotate(45deg) scale(0) translate(-50%, -50%)
-    transition: all $ad.s ease-out $ad.xs
+    transition: transform $ad.s ease-out $ad.xs
+    content: ''
+
+.indeterminate
+  .checkmark:after
+    border: 0
+    top: 50%
+    left: 50%
+    width: 50%
+    height: 50%
+    background-color: $c-active-blue
+    transform: translate(-50%, -50%) scale(1)
+    opacity: 1
+    transition: none
     content: ''
 
 .label
