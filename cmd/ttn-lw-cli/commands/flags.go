@@ -71,6 +71,9 @@ func mergeAttributes(attributes map[string]string, flagSet *pflag.FlagSet) map[s
 	}
 	for _, kv := range kv {
 		kv := strings.SplitN(kv, "=", 2)
+		if len(kv) != 2 {
+			continue
+		}
 		if kv[1] == "" {
 			delete(out, kv[0])
 		} else {
