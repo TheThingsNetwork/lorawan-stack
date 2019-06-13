@@ -28,6 +28,8 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
+var emptyClientCert = []byte{0x00, 0x00, 0x00, 0x00}
+
 // UpdateInfoRequest is the contents of the update-info request.
 type UpdateInfoRequest struct {
 	Router             basicstation.EUI `json:"router"`
@@ -80,7 +82,9 @@ func TLSCredentials(trust *x509.Certificate, client *tls.Certificate) ([]byte, e
 func TokenCredentials(trust *x509.Certificate, authorization string) ([]byte, error) {
 	var out []byte
 	out = append(out, trust.Raw...)
-	out = append(out, []byte(authorization)...)
+	// TODO: Refactor when client side TLS is supported https://github.com/TheThingsNetwork/lorawan-stack/issues/137
+	out = append(out, emptyClientCert...)
+	out = append(out, []byte(fmt.Sprintf("%s%s%s", "Authorization: ", authorization, "\r\n"))...)
 	return out, nil
 }
 
