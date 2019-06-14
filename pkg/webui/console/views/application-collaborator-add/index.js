@@ -26,17 +26,23 @@ import sharedMessages from '../../../lib/shared-messages'
 import Form from '../../../components/form'
 import SubmitButton from '../../../components/submit-button'
 import Input from '../../../components/input'
-import Checkbox from '../../../components/checkbox'
 import Select from '../../../components/select'
 import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import { id as collaboratorIdRegexp } from '../../lib/regexp'
 import SubmitBar from '../../../components/submit-bar'
+import RightsGroup from '../../components/rights-group'
 
 import { getApplicationsRightsList } from '../../store/actions/applications'
-import api from '../../api'
+import {
+  selectSelectedApplicationId,
+  applicationRightsSelector,
+  applicationUniversalRightsSelector,
+  applicationRightsFetchingSelector,
+  applicationRightsErrorSelector,
+} from '../../store/selectors/application'
 
-import style from './application-collaborator-add.styl'
+import api from '../../api'
 
 const validationSchema = Yup.object().shape({
   collaborator_id: Yup.string()
@@ -51,15 +57,14 @@ const validationSchema = Yup.object().shape({
   ),
 })
 
-@connect(function ({ rights, collaborators }, props) {
-  const appId = props.match.params.appId
-
+@connect(function (state, props) {
   return {
-    appId,
-    collaborators: collaborators.applications.collaborators,
-    fetching: rights.applications.fetching,
-    error: rights.applications.error,
-    rights: rights.applications.rights,
+    appId: selectSelectedApplicationId(state, props),
+    collaborators: state.collaborators.applications.collaborators,
+    rights: applicationRightsSelector(state, props),
+    universalRights: applicationUniversalRightsSelector(state, props),
+    fetching: applicationRightsFetchingSelector(state, props),
+    error: applicationRightsErrorSelector(state, props),
   }
 })
 @withBreadcrumb('apps.single.collaborators.add', function (props) {
@@ -111,7 +116,7 @@ export default class ApplicationCollaboratorAdd extends React.Component {
   }
 
   render () {
-    const { rights, fetching, error } = this.props
+    const { rights, fetching, error, universalRights } = this.props
 
     if (error) {
       throw error
@@ -121,25 +126,11 @@ export default class ApplicationCollaboratorAdd extends React.Component {
       return <Spinner center />
     }
 
-    const { rightsItems, rightsValues } = rights.reduce(
-      function (acc, right) {
-        acc.rightsItems.push(
-          <Checkbox
-            className={style.rightLabel}
-            key={right}
-            name={right}
-            label={{ id: `enum:${right}` }}
-          />
-        )
-        acc.rightsValues[right] = false
+    const rightsValues = rights.reduce(function (acc, right) {
+      acc[right] = false
 
-        return acc
-      },
-      {
-        rightsItems: [],
-        rightsValues: {},
-      }
-    )
+      return acc
+    }, {})
 
     const initialFormValues = {
       collaborator_id: '',
@@ -189,10 +180,10 @@ export default class ApplicationCollaboratorAdd extends React.Component {
                 name="rights"
                 title={sharedMessages.rights}
                 required
-                component={Checkbox.Group}
-              >
-                {rightsItems}
-              </Form.Field>
+                component={RightsGroup}
+                rights={rights}
+                universalRight={universalRights[0]}
+              />
               <SubmitBar>
                 <Form.Submit
                   component={SubmitButton}
