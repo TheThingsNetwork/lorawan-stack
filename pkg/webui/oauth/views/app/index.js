@@ -46,11 +46,18 @@ const GenericNotFound = () => <FullViewError error={{ statusCode: 404 }} />
 
 export default class OAuthApp extends React.PureComponent {
   render () {
-
     const pageData = pageDataSelector(env)
 
     if (pageData && pageData.error) {
-      return <FullViewError error={pageData.error} />
+      return (
+        <EnvProvider env={env}>
+          <Provider store={store}>
+            <WithLocale>
+              <FullViewError error={pageData.error} />
+            </WithLocale>
+          </Provider>
+        </EnvProvider>
+      )
     }
 
     return (
