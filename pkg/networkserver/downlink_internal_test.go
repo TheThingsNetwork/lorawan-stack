@@ -68,6 +68,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		"lorawan_phy_version",
 		"mac_settings",
 		"mac_state",
+		"multicast",
 		"pending_mac_state",
 		"queued_application_downlinks",
 		"recent_downlinks",
@@ -1729,7 +1730,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				case resp := <-setFuncRespCh:
 					a.So(resp.Error, should.BeNil)
-					a.So(resp.Paths, should.BeNil)
+					a.So(resp.Paths, should.BeEmpty)
 					a.So(resp.Device, should.NotBeNil)
 				}
 				close(setFuncRespCh)
@@ -1906,8 +1907,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				case resp := <-setFuncRespCh:
 					a.So(resp.Error, should.BeNil)
-					a.So(resp.Paths, should.BeNil)
-					a.So(resp.Device, should.NotBeNil)
+					a.So(resp.Paths, should.Resemble, []string{
+						"queued_application_downlinks",
+					})
+					if resp.Device != nil {
+						a.So(resp.Device.QueuedApplicationDownlinks, should.BeEmpty)
+					} else {
+						a.So(resp.Device, should.BeNil)
+					}
 				}
 				close(setFuncRespCh)
 
@@ -3256,14 +3263,14 @@ func TestGenerateDownlink(t *testing.T) {
 				return
 			}
 
-			genDown, appUpFunc, err := ns.generateDownlink(ctx, dev, phy, math.MaxUint16, math.MaxUint16)
+			genDown, genState, err := ns.generateDownlink(ctx, dev, phy, math.MaxUint16, math.MaxUint16)
 			if tc.Error != nil {
 				a.So(err, should.EqualErrorOrDefinition, tc.Error)
 				a.So(genDown, should.BeNil)
 				return
 			}
 			// TODO: Assert AS uplinks generated(https://github.com/TheThingsNetwork/lorawan-stack/issues/631).
-			a.So(appUpFunc, should.NotBeNil)
+			_ = genState
 
 			if !a.So(err, should.BeNil) || !a.So(genDown, should.NotBeNil) {
 				t.Fail()

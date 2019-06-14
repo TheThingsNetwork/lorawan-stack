@@ -1869,6 +1869,8 @@ func (m *EndDevice) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "multicast":
+			// no validation rules for Multicast
 		default:
 			return EndDeviceValidationError{
 				field:  name,

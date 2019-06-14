@@ -4128,6 +4128,16 @@
               "fullType": "google.protobuf.Struct",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "multicast",
+              "description": "Indicates whether this device represents a multicast group.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },

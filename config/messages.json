@@ -4256,6 +4256,15 @@
       "file": "registry.go"
     }
   },
+  "error:pkg/networkserver:abp_join_request": {
+    "translations": {
+      "en": "received a join-request from ABP device"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/networkserver:application_downlink_too_long": {
     "translations": {
       "en": "application downlink payload is too long"
@@ -4283,6 +4292,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/networkserver:class_b_c_for_class_a": {
+    "translations": {
+      "en": "class B/C downlink queued for device in class A mode"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/networkserver:compute_mic": {
     "translations": {
       "en": "failed to compute MIC"
@@ -4295,6 +4313,15 @@
   "error:pkg/networkserver:configuration": {
     "translations": {
       "en": "invalid configuration"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:confirmed_multicast_downlink": {
+    "translations": {
+      "en": "confirmed downlink queued for multicast device"
     },
     "description": {
       "package": "pkg/networkserver",

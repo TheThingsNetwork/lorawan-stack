@@ -1245,6 +1245,7 @@ SDKs are responsible for combining (if desired) the three.
 | `formatters` | [`MessagePayloadFormatters`](#ttn.lorawan.v3.MessagePayloadFormatters) |  | The payload formatters for this end device. Stored in Application Server. Copied on creation from template identified by version_ids. |
 | `provisioner_id` | [`string`](#string) |  | ID of the provisioner. Stored in Join Server. |
 | `provisioning_data` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  | Vendor-specific provisioning data. Stored in Join Server. |
+| `multicast` | [`bool`](#bool) |  | Indicates whether this device represents a multicast group. |
 
 #### Field Rules
 

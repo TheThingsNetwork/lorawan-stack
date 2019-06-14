@@ -162,7 +162,7 @@ func (r *DeviceRegistry) set(tx *redis.Tx, uid string, gets []string, f func(pb 
 	}
 
 	var pipelined func(redis.Pipeliner) error
-	if pb == nil {
+	if pb == nil && len(sets) == 0 {
 		pipelined = func(p redis.Pipeliner) error {
 			p.Del(uk)
 			if stored.JoinEUI != nil && stored.DevEUI != nil {
@@ -178,6 +178,10 @@ func (r *DeviceRegistry) set(tx *redis.Tx, uid string, gets []string, f func(pb 
 			return nil
 		}
 	} else {
+		if pb == nil {
+			pb = &ttnpb.EndDevice{}
+		}
+
 		pb.UpdatedAt = time.Now().UTC()
 		sets = append(append(sets[:0:0], sets...),
 			"updated_at",
@@ -431,12 +435,16 @@ func (r *KeyRegistry) SetByID(ctx context.Context, devEUI types.EUI64, id []byte
 		}
 
 		var pipelined func(redis.Pipeliner) error
-		if pb == nil {
+		if pb == nil && len(sets) == 0 {
 			pipelined = func(p redis.Pipeliner) error {
 				p.Del(ik)
 				return nil
 			}
 		} else {
+			if pb == nil {
+				pb = &ttnpb.SessionKeys{}
+			}
+
 			updated := &ttnpb.SessionKeys{}
 			if stored == nil {
 				if err := ttnpb.RequireFields(sets,

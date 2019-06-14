@@ -198,7 +198,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 		}
 
 		var pipelined func(redis.Pipeliner) error
-		if pb == nil {
+		if pb == nil && len(sets) == 0 {
 			pipelined = func(p redis.Pipeliner) error {
 				p.Del(uk)
 				if stored.JoinEUI != nil && stored.DevEUI != nil {
@@ -213,6 +213,10 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 				return nil
 			}
 		} else {
+			if pb == nil {
+				pb = &ttnpb.EndDevice{}
+			}
+
 			pb.UpdatedAt = time.Now().UTC()
 			sets = append(append(sets[:0:0], sets...),
 				"updated_at",

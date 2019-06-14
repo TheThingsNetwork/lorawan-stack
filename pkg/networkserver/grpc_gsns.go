@@ -157,6 +157,7 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 			"mac_settings.resets_f_cnt",
 			"mac_settings.supports_32_bit_f_cnt",
 			"mac_state",
+			"multicast",
 			"pending_mac_state",
 			"pending_session",
 			"recent_downlinks",
@@ -164,19 +165,19 @@ func (ns *NetworkServer) matchDevice(ctx context.Context, up *ttnpb.UplinkMessag
 			"session",
 		},
 		func(dev *ttnpb.EndDevice) bool {
-			if dev.MACState == nil && dev.PendingMACState == nil {
+			if dev.Multicast {
 				return true
 			}
 
-			if dev.Session != nil && dev.Session.DevAddr == pld.DevAddr {
+			if dev.Session != nil && dev.MACState != nil && dev.Session.DevAddr == pld.DevAddr {
 				addrMatches = append(addrMatches, matchedDevice{
 					Device:   dev,
 					Session:  dev.Session,
 					MACState: dev.MACState,
 				})
 			}
-			if dev.PendingSession != nil && dev.PendingSession.DevAddr == pld.DevAddr {
-				if dev.Session != nil && dev.Session.DevAddr == pld.DevAddr {
+			if dev.PendingSession != nil && dev.PendingMACState != nil && dev.PendingSession.DevAddr == pld.DevAddr {
+				if dev.Session != nil && dev.MACState != nil && dev.Session.DevAddr == pld.DevAddr {
 					logger.Warn("Same DevAddr was assigned to a device in two consecutive sessions")
 				}
 				addrMatches = append(addrMatches, matchedDevice{
@@ -599,6 +600,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 			"lorawan_version",
 			"mac_settings",
 			"mac_state",
+			"multicast",
 			"pending_mac_state",
 			"pending_session",
 			"recent_uplinks",
@@ -611,6 +613,10 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 			if stored == nil {
 				logger.Warn("Device deleted during uplink handling, drop")
 				handleErr = true
+				return nil, nil, errOutdatedData
+			}
+
+			if stored.Multicast {
 				return nil, nil, errOutdatedData
 			}
 
@@ -886,6 +892,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 			"lorawan_version",
 			"mac_settings",
 			"session",
+			"supports_join",
 		},
 	)
 	if err != nil {
@@ -901,6 +908,12 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 	}(dev)
 
 	logger = logger.WithField("device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers))
+
+	if !dev.SupportsJoin {
+		logger.Warn("ABP device sent a join-request, drop")
+		return errABPJoinRequest
+	}
+
 	ctx = log.NewContext(ctx, logger)
 
 	devAddr := ns.newDevAddr(ctx, dev)

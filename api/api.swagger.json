@@ -6909,6 +6909,11 @@
         "provisioning_data": {
           "$ref": "#/definitions/protobufStruct",
           "description": "Vendor-specific provisioning data. Stored in Join Server."
+        },
+        "multicast": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Indicates whether this device represents a multicast group."
         }
       },
       "description": "Defines an End Device registration and its state on the network.\nThe persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.\nSDKs are responsible for combining (if desired) the three."

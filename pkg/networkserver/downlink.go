@@ -96,6 +96,22 @@ type generatedDownlink struct {
 	Priority            ttnpb.TxSchedulePriority
 }
 
+type generateDownlinkState struct {
+	baseApplicationUps        []*ttnpb.ApplicationUp
+	ifScheduledApplicationUps []*ttnpb.ApplicationUp
+
+	NeedsDownlinkQueueUpdate bool
+	Events                   []events.Event
+}
+
+func (s generateDownlinkState) appendApplicationUplinks(ups []*ttnpb.ApplicationUp, scheduled bool) []*ttnpb.ApplicationUp {
+	if !scheduled {
+		return append(ups, s.baseApplicationUps...)
+	} else {
+		return append(append(ups, s.baseApplicationUps...), s.ifScheduledApplicationUps...)
+	}
+}
+
 // generateDownlink attempts to generate a downlink.
 // generateDownlink returns the generated downlink, application uplinks associated with the generation and error, if any.
 // generateDownlink may mutate the device in order to record the downlink generated.
@@ -107,24 +123,12 @@ type generatedDownlink struct {
 // For example, a sequence of 'NewChannel' MAC commands could be generated for a
 // device operating in a region where a fixed channel plan is defined in case
 // dev.MACState.CurrentParameters.Channels is not equal to dev.MACState.DesiredParameters.Channels.
-func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, phy band.Band, maxDownLen, maxUpLen uint16) (*generatedDownlink, func(ups []*ttnpb.ApplicationUp, scheduled bool) []*ttnpb.ApplicationUp, error) {
-	var appUps struct {
-		base        []*ttnpb.ApplicationUp
-		ifScheduled []*ttnpb.ApplicationUp
-	}
-	appUpFunc := func(ups []*ttnpb.ApplicationUp, scheduled bool) []*ttnpb.ApplicationUp {
-		if !scheduled {
-			return append(ups, appUps.base...)
-		} else {
-			return append(append(ups, appUps.base...), appUps.ifScheduled...)
-		}
-	}
-
+func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, phy band.Band, maxDownLen, maxUpLen uint16) (*generatedDownlink, generateDownlinkState, error) {
 	if dev.MACState == nil {
-		return nil, appUpFunc, errUnknownMACState
+		return nil, generateDownlinkState{}, errUnknownMACState
 	}
 	if dev.Session == nil {
-		return nil, appUpFunc, errEmptySession
+		return nil, generateDownlinkState{}, errEmptySession
 	}
 
 	ctx = log.NewContextWithFields(ctx, log.Fields(
@@ -154,80 +158,82 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 		cmds = append(cmds, cmd)
 		maxDownLen -= desc.DownlinkLength
 	}
-
 	dev.MACState.QueuedResponses = nil
 	dev.MACState.PendingRequests = dev.MACState.PendingRequests[:0]
 
-	enqueuers := make([]func(context.Context, *ttnpb.EndDevice, uint16, uint16) (uint16, uint16, bool), 0, 13)
-	if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0) >= 0 {
-		enqueuers = append(enqueuers,
-			enqueueDutyCycleReq,
-			enqueueRxParamSetupReq,
-			func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) (uint16, uint16, bool) {
-				return enqueueDevStatusReq(ctx, dev, maxDownLen, maxUpLen, ns.defaultMACSettings)
-			},
-			enqueueNewChannelReq,
-			func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) (uint16, uint16, bool) {
-				// NOTE: LinkADRReq must be enqueued after NewChannelReq.
-				newMaxDownLen, newMaxUpLen, ok, err := enqueueLinkADRReq(ctx, dev, maxDownLen, maxUpLen, ns.FrequencyPlans)
-				if err != nil {
-					logger.WithError(err).Error("Failed to enqueue LinkADRReq")
-					return maxDownLen, maxUpLen, false
-				}
-				return newMaxDownLen, newMaxUpLen, ok
-			},
-			enqueueRxTimingSetupReq,
-		)
-		if dev.MACState.DeviceClass == ttnpb.CLASS_B {
-			enqueuers = append(enqueuers,
-				enqueuePingSlotChannelReq,
-				enqueueBeaconFreqReq,
-			)
-		}
-	}
-	if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_2) >= 0 {
-		if phy.TxParamSetupReqSupport {
-			enqueuers = append(enqueuers,
-				enqueueTxParamSetupReq,
-			)
-		}
-		enqueuers = append(enqueuers,
-			enqueueDLChannelReq,
-		)
-	}
-	if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
-		enqueuers = append(enqueuers,
-			enqueueADRParamSetupReq,
-			enqueueForceRejoinReq,
-			enqueueRejoinParamSetupReq,
-		)
-	}
-
-	var fPending bool
-	for _, f := range enqueuers {
-		var ok bool
-		maxDownLen, maxUpLen, ok = f(ctx, dev, maxDownLen, maxUpLen)
-		fPending = fPending || !ok
-	}
-
-	cmds = append(cmds, dev.MACState.PendingRequests...)
-
 	mType := ttnpb.MType_UNCONFIRMED_DOWN
 	cmdBuf := make([]byte, 0, maxDownLen)
-	for _, cmd := range cmds {
-		logger := logger.WithField("cid", cmd.CID)
-		logger.Debug("Add MAC command to buffer")
-		var err error
-		cmdBuf, err = spec.AppendDownlink(phy, cmdBuf, *cmd)
-		if err != nil {
-			return nil, appUpFunc, errEncodeMAC.WithCause(err)
+	var fPending bool
+	if !dev.Multicast {
+		enqueuers := make([]func(context.Context, *ttnpb.EndDevice, uint16, uint16) (uint16, uint16, bool), 0, 13)
+		if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0) >= 0 {
+			enqueuers = append(enqueuers,
+				enqueueDutyCycleReq,
+				enqueueRxParamSetupReq,
+				func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) (uint16, uint16, bool) {
+					return enqueueDevStatusReq(ctx, dev, maxDownLen, maxUpLen, ns.defaultMACSettings)
+				},
+				enqueueNewChannelReq,
+				func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) (uint16, uint16, bool) {
+					// NOTE: LinkADRReq must be enqueued after NewChannelReq.
+					newMaxDownLen, newMaxUpLen, ok, err := enqueueLinkADRReq(ctx, dev, maxDownLen, maxUpLen, ns.FrequencyPlans)
+					if err != nil {
+						logger.WithError(err).Error("Failed to enqueue LinkADRReq")
+						return maxDownLen, maxUpLen, false
+					}
+					return newMaxDownLen, newMaxUpLen, ok
+				},
+				enqueueRxTimingSetupReq,
+			)
+			if dev.MACState.DeviceClass == ttnpb.CLASS_B {
+				enqueuers = append(enqueuers,
+					enqueuePingSlotChannelReq,
+					enqueueBeaconFreqReq,
+				)
+			}
 		}
-		if mType == ttnpb.MType_UNCONFIRMED_DOWN &&
-			spec[cmd.CID].ExpectAnswer &&
-			dev.MACState.DeviceClass == ttnpb.CLASS_C &&
-			dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
-			logger.Debug("Use confirmed downlink to get immediate answer")
-			mType = ttnpb.MType_CONFIRMED_DOWN
+		if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_2) >= 0 {
+			if phy.TxParamSetupReqSupport {
+				enqueuers = append(enqueuers,
+					enqueueTxParamSetupReq,
+				)
+			}
+			enqueuers = append(enqueuers,
+				enqueueDLChannelReq,
+			)
+		}
+		if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
+			enqueuers = append(enqueuers,
+				enqueueADRParamSetupReq,
+				enqueueForceRejoinReq,
+				enqueueRejoinParamSetupReq,
+			)
+		}
+
+		for _, f := range enqueuers {
+			var ok bool
+			maxDownLen, maxUpLen, ok = f(ctx, dev, maxDownLen, maxUpLen)
+			fPending = fPending || !ok
+			// TODO: Buffer events https://github.com/TheThingsNetwork/lorawan-stack/issues/789
+		}
+
+		cmds = append(cmds, dev.MACState.PendingRequests...)
+
+		for _, cmd := range cmds {
+			logger := logger.WithField("cid", cmd.CID)
+			logger.Debug("Add MAC command to buffer")
+			var err error
+			cmdBuf, err = spec.AppendDownlink(phy, cmdBuf, *cmd)
+			if err != nil {
+				return nil, generateDownlinkState{}, errEncodeMAC.WithCause(err)
+			}
+			if mType == ttnpb.MType_UNCONFIRMED_DOWN &&
+				spec[cmd.CID].ExpectAnswer &&
+				dev.MACState.DeviceClass == ttnpb.CLASS_C &&
+				dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+				logger.Debug("Use confirmed downlink to get immediate answer")
+				mType = ttnpb.MType_CONFIRMED_DOWN
+			}
 		}
 	}
 	logger = logger.WithField("mac_count", len(cmds))
@@ -247,6 +253,7 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 		}
 	}
 
+	var st generateDownlinkState
 	var skipAppDown bool
 	var startIdx int
 	for _, down := range dev.QueuedApplicationDownlinks {
@@ -254,7 +261,7 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 
 		if len(down.FRMPayload) > int(maxDownLen) {
 			logger.WithField("max_down_len", maxDownLen).Debug("Skip application downlink with payload length exceeding band regulations")
-			appUps.base = append(appUps.base, &ttnpb.ApplicationUp{
+			st.baseApplicationUps = append(st.baseApplicationUps, &ttnpb.ApplicationUp{
 				EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 				CorrelationIDs:       append(events.CorrelationIDsFromContext(ctx), down.CorrelationIDs...),
 				Up: &ttnpb.ApplicationUp_DownlinkFailed{
@@ -270,7 +277,7 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 		}
 		if down.FCnt <= dev.Session.LastNFCntDown && dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 			logger.WithField("last_f_cnt_down", dev.Session.LastNFCntDown).Debug("Skip application downlink with too low FCnt")
-			appUps.base = append(appUps.base, &ttnpb.ApplicationUp{
+			st.baseApplicationUps = append(st.baseApplicationUps, &ttnpb.ApplicationUp{
 				EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 				CorrelationIDs:       events.CorrelationIDsFromContext(ctx),
 				Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
@@ -280,6 +287,22 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 					},
 				},
 			})
+			skipAppDown = true
+			break
+		}
+		if down.Confirmed && dev.Multicast {
+			logger.Debug("Skip confirmed application downlink for multicast device")
+			st.baseApplicationUps = append(st.baseApplicationUps, &ttnpb.ApplicationUp{
+				EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
+				CorrelationIDs:       events.CorrelationIDsFromContext(ctx),
+				Up: &ttnpb.ApplicationUp_DownlinkFailed{
+					DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
+						ApplicationDownlink: *down,
+						Error:               *ttnpb.ErrorDetailsToProto(errConfirmedMulticastDownlink),
+					},
+				},
+			})
+			startIdx++
 			skipAppDown = true
 			break
 		}
@@ -294,7 +317,7 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 		case ttnpb.CLASS_B, ttnpb.CLASS_C:
 			if absTime := down.GetClassBC().GetAbsoluteTime(); absTime != nil && absTime.Before(time.Now()) {
 				logger.Debug("Drop expired downlink")
-				appUps.base = append(appUps.base, &ttnpb.ApplicationUp{
+				st.baseApplicationUps = append(st.baseApplicationUps, &ttnpb.ApplicationUp{
 					EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 					CorrelationIDs:       append(events.CorrelationIDsFromContext(ctx), down.CorrelationIDs...),
 					Up: &ttnpb.ApplicationUp_DownlinkFailed{
@@ -311,6 +334,7 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 		break
 	}
 	dev.QueuedApplicationDownlinks = dev.QueuedApplicationDownlinks[startIdx:]
+	st.NeedsDownlinkQueueUpdate = startIdx > 0
 
 	pld := &ttnpb.MACPayload{
 		FHDR: ttnpb.FHDR{
@@ -346,7 +370,7 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 		pld.FHDR.FCnt = dev.Session.LastNFCntDown + 1
 
 	default:
-		return nil, appUpFunc, errNoDownlink
+		return nil, st, errNoDownlink
 	}
 	logger = logger.WithFields(log.Fields(
 		"f_cnt", pld.FHDR.FCnt,
@@ -356,12 +380,12 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 
 	if len(cmdBuf) > 0 && (pld.FPort == 0 || dev.MACState.LoRaWANVersion.EncryptFOpts()) {
 		if dev.Session.NwkSEncKey == nil || len(dev.Session.NwkSEncKey.Key) == 0 {
-			return nil, appUpFunc, errUnknownNwkSEncKey
+			return nil, st, errUnknownNwkSEncKey
 		}
 		key, err := cryptoutil.UnwrapAES128Key(*dev.Session.NwkSEncKey, ns.KeyVault)
 		if err != nil {
 			logger.WithField("kek_label", dev.Session.NwkSEncKey.KEKLabel).WithError(err).Warn("Failed to unwrap NwkSEncKey")
-			return nil, appUpFunc, err
+			return nil, st, err
 		}
 
 		fCnt := pld.FHDR.FCnt
@@ -370,7 +394,7 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 		}
 		cmdBuf, err = crypto.EncryptDownlink(key, dev.Session.DevAddr, fCnt, cmdBuf)
 		if err != nil {
-			return nil, appUpFunc, errEncryptMAC.WithCause(err)
+			return nil, st, errEncryptMAC.WithCause(err)
 		}
 	}
 	if pld.FPort == 0 {
@@ -380,7 +404,7 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 	}
 
 	if pld.FPort == 0 && dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
-		appUps.ifScheduled = append(appUps.ifScheduled, &ttnpb.ApplicationUp{
+		st.ifScheduledApplicationUps = append(st.ifScheduledApplicationUps, &ttnpb.ApplicationUp{
 			EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 			CorrelationIDs:       events.CorrelationIDsFromContext(ctx),
 			Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
@@ -402,7 +426,7 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 	if needsAck &&
 		dev.MACState.LastConfirmedDownlinkAt != nil &&
 		dev.MACState.LastConfirmedDownlinkAt.Add(deviceClassCTimeout(dev, ns.defaultMACSettings)).After(time.Now()) {
-		return nil, appUpFunc, errConfirmedDownlinkTooSoon
+		return nil, st, errConfirmedDownlinkTooSoon
 	}
 
 	b, err := lorawan.MarshalMessage(ttnpb.Message{
@@ -415,17 +439,17 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 		},
 	})
 	if err != nil {
-		return nil, appUpFunc, errEncodePayload.WithCause(err)
+		return nil, st, errEncodePayload.WithCause(err)
 	}
 	// NOTE: It is assumed, that b does not contain MIC.
 
 	if dev.Session.SNwkSIntKey == nil || len(dev.Session.SNwkSIntKey.Key) == 0 {
-		return nil, appUpFunc, errUnknownSNwkSIntKey
+		return nil, st, errUnknownSNwkSIntKey
 	}
 	key, err := cryptoutil.UnwrapAES128Key(*dev.Session.SNwkSIntKey, ns.KeyVault)
 	if err != nil {
 		logger.WithField("kek_label", dev.Session.SNwkSIntKey.KEKLabel).WithError(err).Warn("Failed to unwrap SNwkSIntKey")
-		return nil, appUpFunc, err
+		return nil, st, err
 	}
 
 	var mic [4]byte
@@ -450,7 +474,7 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 		)
 	}
 	if err != nil {
-		return nil, appUpFunc, errComputeMIC
+		return nil, st, errComputeMIC
 	}
 	b = append(b, mic[:]...)
 
@@ -475,7 +499,7 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 		NeedsAck:            needsAck,
 		ApplicationDownlink: appDown,
 		Priority:            priority,
-	}, appUpFunc, nil
+	}, st, nil
 }
 
 type downlinkPath struct {
@@ -715,6 +739,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 		logger.WithField("start_at", t).Debug("Process downlink task")
 
 		var queuedApplicationUplinks []*ttnpb.ApplicationUp
+		var queuedEvents []events.Event
 		var nextDownlinkAt time.Time
 		_, err := ns.devices.SetByID(ctx, devID.ApplicationIdentifiers, devID.DeviceID,
 			[]string{
@@ -723,6 +748,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 				"lorawan_phy_version",
 				"mac_settings",
 				"mac_state",
+				"multicast",
 				"pending_mac_state",
 				"queued_application_downlinks",
 				"recent_downlinks",
@@ -745,47 +771,38 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						return
 					}
 
+					if len(sets) == 0 {
+						setDev = dev
+					}
 					switch {
 					case errors.Resemble(err, errUplinkNotFound):
 						logger.Warn("Uplink preceding downlink not found, skip downlink slot")
 						nextDownlinkAt = time.Time{}
-						setDev = dev
-						sets = nil
 						err = nil
 
 					case errors.Resemble(err, errInvalidChannelIndex):
 						logger.Warn("Invalid channel index in preceding uplink, skip downlink slot")
 						nextDownlinkAt = time.Time{}
-						setDev = dev
-						sets = nil
 						err = nil
 
 					case errors.Resemble(err, errNoPath):
 						logger.Warn("No downlink path available, skip downlink slot")
 						nextDownlinkAt = time.Time{}
-						setDev = dev
-						sets = nil
 						err = nil
 
 					case errors.Resemble(err, errCorruptedMACState):
 						logger.Warn("Corrupted MAC state, skip downlink slot")
 						nextDownlinkAt = time.Time{}
-						setDev = dev
-						sets = nil
 						err = nil
 
 					case errors.Resemble(err, errUnknownMACState):
 						logger.Warn("Unknown MAC state, skip downlink slot")
 						nextDownlinkAt = time.Time{}
-						setDev = dev
-						sets = nil
 						err = nil
 
 					case errors.Resemble(err, errNoDownlink):
 						logger.Debug("No downlink to send, skip downlink slot")
 						nextDownlinkAt = time.Time{}
-						setDev = dev
-						sets = nil
 						err = nil
 
 					case errors.Resemble(err, errScheduleTooSoon):
@@ -793,29 +810,21 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						if nextDownlinkAt.IsZero() {
 							nextDownlinkAt = time.Now().Add(gsScheduleWindow)
 						}
-						setDev = dev
-						sets = nil
 						err = nil
 
 					case errors.Resemble(err, errScheduleTooLate):
 						logger.Debug("Downlink scheduled too late, retry downlink slot")
 						nextDownlinkAt = time.Now()
-						setDev = dev
-						sets = nil
 						err = nil
 
 					case errors.Resemble(err, errConfirmedDownlinkTooSoon):
 						logger.Debug("Confirmed downlink scheduled too soon, skip downlink slot")
 						nextDownlinkAt = dev.MACState.LastConfirmedDownlinkAt.Add(deviceClassCTimeout(dev, ns.defaultMACSettings))
-						setDev = dev
-						sets = nil
 						err = nil
 
 					case errors.Resemble(err, errSchedule):
 						// NOTE: The error is already logged.
 						nextDownlinkAt = time.Now().Add(downlinkRetryInterval)
-						setDev = dev
-						sets = nil
 						err = nil
 					}
 				}()
@@ -947,15 +956,20 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 							minDR = req.Rx2DataRateIndex
 						}
 
-						genDown, appUpFunc, err := ns.generateDownlink(ctx, dev, phy,
+						genDown, genState, err := ns.generateDownlink(ctx, dev, phy,
 							phy.DataRates[minDR].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 							maxUpLength,
 						)
 						defer func() {
-							queuedApplicationUplinks = appUpFunc(queuedApplicationUplinks, err == nil)
+							queuedApplicationUplinks = genState.appendApplicationUplinks(queuedApplicationUplinks, err == nil)
 						}()
+						if genState.NeedsDownlinkQueueUpdate {
+							sets = []string{
+								"queued_application_downlinks",
+							}
+						}
 						if err != nil {
-							return nil, nil, err
+							return dev, sets, err
 						}
 
 						if genDown.ApplicationDownlink != nil {
@@ -973,14 +987,14 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 							paths...,
 						)
 						if err != nil {
-							return nil, nil, err
+							return dev, sets, err
 						}
-
 						if genDown.NeedsAck {
 							dev.MACState.LastConfirmedDownlinkAt = timePtr(downAt)
 						}
 						dev.MACState.RxWindowsAvailable = false
 						dev.RecentDownlinks = appendRecentDownlink(dev.RecentDownlinks, down, recentDownlinkCount)
+						queuedEvents = append(queuedEvents, genState.Events...)
 						return dev, []string{
 							"mac_state",
 							"queued_application_downlinks",
@@ -1005,7 +1019,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						// we need to create a deep copy for the first call.
 						devCopy := deepcopy.Copy(dev).(*ttnpb.EndDevice)
 
-						genDown, appUpFunc, err := ns.generateDownlink(ctx, dev, phy,
+						genDown, genState, err := ns.generateDownlink(ctx, dev, phy,
 							phy.DataRates[req.Rx1DataRateIndex].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 							maxUpLength,
 						)
@@ -1060,7 +1074,8 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						}
 						dev.MACState.RxWindowsAvailable = false
 						dev.RecentDownlinks = appendRecentDownlink(dev.RecentDownlinks, down, recentDownlinkCount)
-						queuedApplicationUplinks = appUpFunc(queuedApplicationUplinks, true)
+						queuedApplicationUplinks = genState.appendApplicationUplinks(queuedApplicationUplinks, true)
+						queuedEvents = append(queuedEvents, genState.Events...)
 						return dev, []string{
 							"mac_state",
 							"queued_application_downlinks",
@@ -1077,15 +1092,20 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					Rx2Frequency:     dev.MACState.CurrentParameters.Rx2Frequency,
 				}
 
-				genDown, appUpFunc, err := ns.generateDownlink(ctx, dev, phy,
+				genDown, genState, err := ns.generateDownlink(ctx, dev, phy,
 					phy.DataRates[req.Rx2DataRateIndex].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 					maxUpLength,
 				)
 				defer func() {
-					queuedApplicationUplinks = appUpFunc(queuedApplicationUplinks, err == nil)
+					queuedApplicationUplinks = genState.appendApplicationUplinks(queuedApplicationUplinks, err == nil)
 				}()
+				if genState.NeedsDownlinkQueueUpdate {
+					sets = []string{
+						"queued_application_downlinks",
+					}
+				}
 				if err != nil {
-					return nil, nil, err
+					return dev, sets, err
 				}
 
 				if genDown.ApplicationDownlink != nil {
@@ -1109,15 +1129,15 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 				} else {
 					paths = downlinkPathsFromRecentUplinks(dev.RecentUplinks...)
 					if len(paths) == 0 {
-						return nil, nil, errNoPath
+						return dev, sets, errNoPath
 					}
 				}
 				if absTime := genDown.ApplicationDownlink.GetClassBC().GetAbsoluteTime(); absTime != nil {
 					if absTime.After(time.Now().Add(gsScheduleWindow)) {
 						nextDownlinkAt = absTime.Add(-gsScheduleWindow)
-						return nil, nil, errScheduleTooSoon
+						return dev, sets, errScheduleTooSoon
 					} else if absTime.Before(time.Now()) {
-						return nil, nil, errScheduleTooLate
+						return dev, sets, errScheduleTooLate
 					}
 					req.AbsoluteTime = absTime
 				}
@@ -1131,7 +1151,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					paths...,
 				)
 				if err != nil {
-					return nil, nil, err
+					return dev, sets, err
 				}
 
 				if genDown.NeedsAck {
@@ -1150,6 +1170,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 				}
 				dev.MACState.RxWindowsAvailable = false
 				dev.RecentDownlinks = appendRecentDownlink(dev.RecentDownlinks, down, recentDownlinkCount)
+				queuedEvents = append(queuedEvents, genState.Events...)
 				return dev, []string{
 					"mac_state",
 					"queued_application_downlinks",
@@ -1158,20 +1179,29 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 				}, nil
 			},
 		)
-		go func() {
-			// TODO: Enqueue the uplinks and let a task processor take care of them.
-			// (https://github.com/TheThingsNetwork/lorawan-stack/issues/560)
-			for _, up := range queuedApplicationUplinks {
-				ok, err := ns.handleASUplink(ctx, devID.ApplicationIdentifiers, up)
-				if !ok {
-					logger.Warn("Application Server not found, drop uplinks associated with downlink task processing")
-					return
+		if len(queuedApplicationUplinks) > 0 {
+			go func() {
+				// TODO: Enqueue the uplinks and let a task processor take care of them.
+				// (https://github.com/TheThingsNetwork/lorawan-stack/issues/560)
+				for _, up := range queuedApplicationUplinks {
+					ok, err := ns.handleASUplink(ctx, devID.ApplicationIdentifiers, up)
+					if !ok {
+						logger.Warn("Application Server not found, drop uplinks associated with downlink task processing")
+						return
+					}
+					if err != nil {
+						logger.WithError(err).Warn("Failed to send uplink to Application Server")
+					}
 				}
-				if err != nil {
-					logger.WithError(err).Warn("Failed to send uplink to Application Server")
+			}()
+		}
+		if len(queuedEvents) > 0 {
+			go func() {
+				for _, ev := range queuedEvents {
+					events.Publish(ev)
 				}
-			}
-		}()
+			}()
+		}
 		if err != nil {
 			setErr = true
 			logger.WithError(err).Warn("Failed to update device in registry")
