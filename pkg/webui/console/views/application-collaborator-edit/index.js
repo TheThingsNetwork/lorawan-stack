@@ -17,7 +17,6 @@ import { connect } from 'react-redux'
 import bind from 'autobind-decorator'
 import { Container, Col, Row } from 'react-grid-system'
 import * as Yup from 'yup'
-import { defineMessages } from 'react-intl'
 import { replace } from 'connected-react-router'
 
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
@@ -54,13 +53,6 @@ const validationSchema = Yup.object().shape({
     sharedMessages.validateRights,
     values => Object.values(values).reduce((acc, curr) => acc || curr, false)
   ),
-})
-
-const m = defineMessages({
-  deleteSuccess: 'Successfully removed collaborator',
-  updateSuccess: 'Successfully updated collaborator rights',
-  modalWarning:
-    'Are you sure you want to remove {collaboratorId} as a collaborator?',
 })
 
 @connect(function (state, props) {
@@ -139,7 +131,7 @@ export default class ApplicationCollaboratorEdit extends React.Component {
       await api.application.collaborators.update(appId, updatedCollaborator)
       resetForm(values)
       toast({
-        message: m.updateSuccess,
+        message: sharedMessages.collaboratorUpdateSuccess,
         type: toast.types.SUCCESS,
       })
     } catch (error) {
@@ -164,7 +156,7 @@ export default class ApplicationCollaboratorEdit extends React.Component {
     try {
       await api.application.collaborators.remove(appId, updatedCollaborator)
       toast({
-        message: m.deleteSuccess,
+        message: sharedMessages.collaboratorDeleteSuccess,
         type: toast.types.SUCCESS,
       })
       redirectToList(appId)
@@ -255,7 +247,7 @@ export default class ApplicationCollaboratorEdit extends React.Component {
                   modalData={{
                     message: {
                       values: { collaboratorId: collaborator.id },
-                      ...m.modalWarning,
+                      ...sharedMessages.collaboratorModalWarning,
                     },
                   }}
                   onApprove={this.handleDelete}
