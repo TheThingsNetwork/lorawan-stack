@@ -31,6 +31,7 @@ import { getGatewayId } from '../../../lib/selectors/id'
 import {
   gatewaySelector,
   gatewayRightsSelector,
+  gatewayUniversalRightsSelector,
   gatewayRightsErrorSelector,
   gatewayRightsFetchingSelector,
 } from '../../store/selectors/gateway'
@@ -46,6 +47,7 @@ import api from '../../api'
     fetching: gatewayRightsFetchingSelector(state, props),
     error: gatewayRightsErrorSelector(state, props),
     rights: gatewayRightsSelector(state, props),
+    universalRights: gatewayUniversalRightsSelector(state, props),
   }
 })
 @withBreadcrumb('gtws.single.api-keys.add', function (props) {
@@ -81,7 +83,7 @@ export default class GatewayApiKeyAdd extends React.Component {
   }
 
   render () {
-    const { rights, fetching, error } = this.props
+    const { rights, fetching, error, universalRights } = this.props
 
     if (error) {
       throw error
@@ -103,6 +105,7 @@ export default class GatewayApiKeyAdd extends React.Component {
           <Col lg={8} md={12}>
             <ApiKeyCreateForm
               rights={rights}
+              universalRights={universalRights}
               onCreate={this.createGatewayKey}
               onCreateSuccess={this.handleApprove}
             />
