@@ -12,6 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.right-label
-  span::first-letter
-    text-transform: uppercase
+.group
+  display: flex
+  flex-direction: row
+
+  .group-radio:not(:last-child)
+    margin-right: $cs.m
+
+  &.horizontal
+    flex-direction: column
+
+    .group-radio:not(:last-child)
+      margin-bottom: $cs.s

@@ -15,12 +15,12 @@
 import React from 'react'
 import { connect as storeConnect } from 'react-redux'
 import { defineMessages } from 'react-intl'
-import { connect as formConnect, getIn } from 'formik'
 import bind from 'autobind-decorator'
 
 import sharedMessages from '../../../lib/shared-messages'
 import PropTypes from '../../../lib/prop-types'
-import Field from '../../../components/field'
+import Field from '../../../components/form/field'
+import Select from '../../../components/select'
 
 import {
   gsFrequencyPlansSelector,
@@ -40,7 +40,6 @@ const m = defineMessages({
 
 const formatOptions = plans => plans.map(plan => ({ value: plan.id, label: plan.name }))
 
-@formConnect
 @storeConnect(function (state, props) {
   return {
     plansGs: gsFrequencyPlansSelector(state, props),
@@ -56,14 +55,6 @@ dispatch => ({
 @bind
 class FrequencyPlansSelect extends React.PureComponent {
 
-  constructor (props) {
-    super(props)
-
-    const { name, formik } = props
-
-    formik.registerField(name, this)
-  }
-
   componentDidMount () {
     const {
       source,
@@ -76,12 +67,6 @@ class FrequencyPlansSelect extends React.PureComponent {
     } else {
       getGsFrequencyPlans()
     }
-  }
-
-  componentWillUnmount () {
-    const { formik, name } = this.props
-
-    formik.unregisterField(name)
   }
 
   getOptions () {
@@ -98,39 +83,24 @@ class FrequencyPlansSelect extends React.PureComponent {
       required,
       title,
       autoFocus,
-      horizontal,
       error,
       fetching,
       menuPlacement,
     } = this.props
 
-    const {
-      setFieldValue,
-      setFieldTouched,
-    } = this.props.formik
-
     const fieldOptions = this.getOptions()
-    const fieldError = getIn(this.props.formik.errors, name)
-    const fieldTouched = getIn(this.props.formik.touched, name)
-    const fieldValue = getIn(this.props.formik.values, name)
 
     return (
       <Field
-        horizontal={horizontal}
-        type="select"
+        component={Select}
         options={fieldOptions}
         name={name}
-        value={fieldValue}
         required={required}
         title={title}
         autoFocus={autoFocus}
         isLoading={fetching}
         warning={Boolean(error) ? m.freqPlansFetchingFailure : undefined}
-        error={fieldError}
-        touched={fieldTouched}
         menuPlacement={menuPlacement}
-        setFieldTouched={setFieldTouched}
-        setFieldValue={setFieldValue}
       />
     )
   }
@@ -139,7 +109,7 @@ class FrequencyPlansSelect extends React.PureComponent {
 FrequencyPlansSelect.propTypes = {
   source: PropTypes.oneOf([ 'ns', 'gs' ]).isRequired,
   name: PropTypes.string.isRequired,
-  required: PropTypes.bool.isRequired,
+  required: PropTypes.bool,
   title: PropTypes.message,
   autoFocus: PropTypes.bool,
   horizontal: PropTypes.bool,
@@ -151,6 +121,7 @@ FrequencyPlansSelect.defaultProps = {
   autoFocus: false,
   horizontal: false,
   menuPlacement: 'auto',
+  required: false,
 }
 
 export default FrequencyPlansSelect

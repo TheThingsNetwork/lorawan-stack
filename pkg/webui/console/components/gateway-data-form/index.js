@@ -18,7 +18,8 @@ import { defineMessages } from 'react-intl'
 import * as Yup from 'yup'
 
 import Form from '../../../components/form'
-import Field from '../../../components/field'
+import Input from '../../../components/input'
+import Checkbox from '../../../components/checkbox'
 import SubmitBar from '../../../components/submit-bar'
 import Message from '../../../lib/components/message'
 import PropTypes from '../../../lib/prop-types'
@@ -27,7 +28,8 @@ import sharedMessages from '../../../lib/shared-messages'
 import { id as gatewayIdRegexp, address as addressRegexp } from '../../lib/regexp'
 
 const m = defineMessages({
-  dutyCycle: 'Enforce Duty Cycle',
+  enforced: 'Enforced',
+  dutyCycle: 'Duty Cycle',
   gatewayIdPlaceholder: 'my-new-gateway',
   gsServerAddressDescription: 'The address of the Gateway Server to connect to',
 })
@@ -61,59 +63,57 @@ class GatewayDataForm extends React.Component {
       update,
       error,
       initialValues,
-      mapErrorsToFields,
       formRef,
       children,
     } = this.props
 
     return (
       <Form
-        submitEnabledWhenInvalid
         error={error}
         onSubmit={onSubmit}
         initialValues={initialValues}
         validationSchema={validationSchema}
-        mapErrorsToFields={mapErrorsToFields}
-        horizontal
         formikRef={formRef}
       >
         <Message
           component="h4"
           content={sharedMessages.generalSettings}
         />
-        <Field
+        <Form.Field
           title={sharedMessages.gatewayID}
           name="ids.gateway_id"
-          type="text"
           placeholder={m.gatewayIdPlaceholder}
           required
           disabled={update}
           autoFocus={!update}
+          component={Input}
         />
-        <Field
+        <Form.Field
           title={sharedMessages.gatewayEUI}
           name="ids.eui"
           type="byte"
           min={8}
           max={8}
           placeholder={sharedMessages.gatewayEUI}
-          autoFocus={update}
+          component={Input}
         />
-        <Field
+        <Form.Field
           title={sharedMessages.gatewayName}
           name="name"
+          component={Input}
         />
-        <Field
+        <Form.Field
           title={sharedMessages.gatewayDescription}
           name="description"
           type="textarea"
+          component={Input}
         />
-        <Field
+        <Form.Field
           title={sharedMessages.gatewayServerAddress}
           description={m.gsServerAddressDescription}
           placeholder={sharedMessages.addressPlaceholder}
           name="gateway_server_address"
-          type="text"
+          component={Input}
         />
         <Message
           component="h4"
@@ -126,10 +126,11 @@ class GatewayDataForm extends React.Component {
           menuPlacement="top"
           required
         />
-        <Field
+        <Form.Field
           title={m.dutyCycle}
           name="enforce_duty_cycle"
-          type="checkbox"
+          component={Checkbox}
+          label={m.enforced}
         />
         <SubmitBar>
           {children}

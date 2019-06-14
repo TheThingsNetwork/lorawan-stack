@@ -16,25 +16,28 @@ import React from 'react'
 import { storiesOf } from '@storybook/react'
 import { action } from '@storybook/addon-actions'
 import { withInfo } from '@storybook/addon-info'
+import * as Yup from 'yup'
 
-import Field from '../field'
-import FieldGroup from '../field/group'
 import Button from '../button'
-import Form from '.'
+import SubmitBar from '../submit-bar'
+import SubmitButton from '../submit-button'
+import Input from '../input'
+import Form from '../form'
+import Checkbox from '../checkbox'
+import Radio from '../radio-button'
 
-const handleSubmit = function (data, { setSubmitting }) {
+const handleSubmit = function (data, { resetForm }) {
   action('Submit')(data)
-  setTimeout(() => setSubmitting(false), 1000)
+  setTimeout(() => resetForm(data), 1000)
 }
 
 const containerStyles = {
-  maxWidth: '300px',
+  maxWidth: '400px',
 }
 
 const containerHorizontalStyles = {
   maxWidth: '600px',
 }
-
 
 storiesOf('Form', module)
   .addDecorator((story, context) => withInfo({
@@ -51,19 +54,22 @@ storiesOf('Form', module)
           user_id: '',
           password: '',
         }}
-        submitEnabledWhenInvalid
       >
-        <Field
+        <Form.Field
           title="Username or Email"
           name="user_id"
           type="text"
+          component={Input}
         />
-        <Field
+        <Form.Field
           title="Password"
           name="password"
           type="password"
+          component={Input}
         />
-        <Button type="submit" message="Login" />
+        <SubmitBar>
+          <Form.Submit message="Login" component={SubmitButton} />
+        </SubmitBar>
         <Button naked message="Create an account" />
       </Form>
     </div>
@@ -79,55 +85,119 @@ storiesOf('Form', module)
         submitEnabledWhenInvalid
         horizontal
       >
-        <FieldGroup
+        <Form.Field
           name="radio-story"
           title="Radio Buttons"
-          columns
+          component={Radio.Group}
         >
-          <Field
-            type="radio"
-            title="Foo"
+          <Radio
+            label="Foo"
             value="foo"
             name="foo"
           />
-          <Field
-            type="radio"
-            title="Bar"
+          <Radio
+            label="Bar"
             value="bar"
-            name="foo"
+            name="bar"
           />
-          <Field
-            type="radio"
-            title="Baz"
+          <Radio
+            label="Baz"
             value="baz"
-            name="foo"
+            name="baz"
           />
-        </FieldGroup>
-        <FieldGroup
+        </Form.Field>
+        <Form.Field
           name="checkbox-story"
           title="Checkboxes"
-          columns
+          component={Checkbox.Group}
         >
-          <Field
-            type="checkbox"
-            title="Foo"
+          <Checkbox
+            label="Foo"
             name="foo"
-            form
           />
-          <Field
-            type="checkbox"
-            title="Bar"
+          <Checkbox
+            label="Bar"
             name="bar"
-            form
           />
-          <Field
-            type="checkbox"
-            title="Baz"
+          <Checkbox
+            label="Baz"
             name="baz"
-            form
           />
-        </FieldGroup>
-        <Button type="submit" message="Save" />
+        </Form.Field>
+        <SubmitBar>
+          <Form.Submit message="Save" component={SubmitButton} />
+        </SubmitBar>
+      </Form>
+    </div>
+  ))
+  .add('Mixed', () => (
+    <div style={containerHorizontalStyles}>
+      <Form
+        validateOnBlur
+        validateOnChange
+        validate
+        horizontal
+        onSubmit={handleSubmit}
+        validationSchema={Yup.object().shape({
+          name: Yup.string()
+            .min(5, 'Too Short')
+            .max(25, 'Too Long')
+            .required('Required'),
+          description: Yup.string()
+            .min(5, 'Too Short')
+            .max(50, 'Too Long'),
+          checkboxes: Yup.object().test(
+            'checkboxes',
+            'Cannot be empty',
+            values => Object.values(values).reduce((acc, curr) => acc || curr, false)
+          ),
+        })}
+        initialValues={{
+          name: '',
+          description: '',
+          radio: 'radio1',
+          checkboxes: {},
+        }}
+      >
+        <Form.Field
+          component={Input}
+          type="text"
+          name="name"
+          placeholder="Name"
+          title="Name"
+          required
+        />
+        <Form.Field
+          component={Input}
+          type="text"
+          name="description"
+          placeholder="Description"
+          title="Description"
+        />
+        <Form.Field
+          component={Checkbox.Group}
+          name="checkboxes"
+          title="Checkboxes"
+          description="Choose at least one"
+          required
+        >
+          <Checkbox name="cb1" label="Checkbox 1" />
+          <Checkbox name="cb2" label="Checkbox 2" />
+          <Checkbox name="cb3" label="Checkbox 3" />
+        </Form.Field>
+        <Form.Field
+          component={Radio.Group}
+          name="radio"
+          title="Radio"
+          required
+        >
+          <Radio label="Radio 1" value="radio1" />
+          <Radio label="Radio 2" value="radio2" />
+          <Radio label="Radio 3" value="radio3" />
+        </Form.Field>
+        <SubmitBar>
+          <Form.Submit message="Submit" component={SubmitButton} />
+        </SubmitBar>
       </Form>
     </div>
   ))

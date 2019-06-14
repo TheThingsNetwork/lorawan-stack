@@ -19,13 +19,15 @@ import Query from 'query-string'
 import { defineMessages } from 'react-intl'
 import { replace } from 'connected-react-router'
 import { connect } from 'react-redux'
+import * as Yup from 'yup'
 
 import api from '../../api'
 import sharedMessages from '../../../lib/shared-messages'
 
 import Button from '../../../components/button'
-import Field from '../../../components/field'
 import Form from '../../../components/form'
+import Input from '../../../components/input'
+import SubmitButton from '../../../components/submit-button'
 import Logo from '../../../components/logo'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import Message from '../../../lib/components/message'
@@ -37,6 +39,14 @@ const m = defineMessages({
   loginToContinue: 'Please login to continue',
   stackAccount: 'TTN Stack Account',
 })
+
+const validationSchema = Yup.object().shape({
+  user_id: Yup.string()
+    .required(sharedMessages.validateRequired),
+  password: Yup.string()
+    .required(sharedMessages.validateRequired),
+})
+
 @withRouter
 @connect()
 @bind
@@ -92,20 +102,27 @@ export default class OAuth extends React.PureComponent {
               onSubmit={this.handleSubmit}
               initialValues={initialValues}
               error={this.state.error}
-              submitEnabledWhenInvalid
+              validationSchema={validationSchema}
+              horizontal={false}
             >
-              <Field
+              <Form.Field
                 title={sharedMessages.userId}
                 name="user_id"
-                type="text"
+                component={Input}
                 autoFocus
+                required
               />
-              <Field
+              <Form.Field
                 title={sharedMessages.password}
+                component={Input}
                 name="password"
                 type="password"
+                required
               />
-              <Button type="submit" message={sharedMessages.login} />
+              <Form.Submit
+                component={SubmitButton}
+                message={sharedMessages.login}
+              />
               <Button naked message={m.createAccount} onClick={this.navigateToRegister} />
             </Form>
           </div>

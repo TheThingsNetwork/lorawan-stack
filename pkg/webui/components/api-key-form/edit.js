@@ -19,13 +19,15 @@ import { defineMessages } from 'react-intl'
 import diff from '../../lib/diff'
 import PropTypes from '../../lib/prop-types'
 import sharedMessages from '../../lib/shared-messages'
-import FieldGroup from '../field/group'
-import Field from '../field'
 import SubmitBar from '../submit-bar'
 import ModalButton from '../button/modal-button'
 import toast from '../toast'
 import Message from '../../lib/components/message'
-import Button from '../button'
+import FormField from '../form/field'
+import FormSubmit from '../form/submit'
+import SubmitButton from '../submit-button'
+import Checkbox from '../checkbox'
+import Input from '../input'
 import ApiKeyForm from './form'
 import validationSchema from './validation-schema'
 
@@ -110,13 +112,11 @@ class EditForm extends React.Component {
     const { rightsItems, rightsValues } = rights.reduce(
       function (acc, right) {
         acc.rightsItems.push(
-          <Field
+          <Checkbox
             className={style.rightLabel}
             key={right}
             name={right}
-            type="checkbox"
-            title={{ id: `enum:${right}` }}
-            form
+            label={{ id: `enum:${right}` }}
           />
         )
         acc.rightsValues[right] = apiKey.rights.includes(right)
@@ -147,28 +147,32 @@ class EditForm extends React.Component {
           component="h4"
           content={sharedMessages.generalInformation}
         />
-        <Field
+        <FormField
           title={sharedMessages.keyId}
+          name="id"
           required
           valid
           disabled
-          name="id"
-          type="text"
+          component={Input}
         />
-        <Field
+        <FormField
           title={sharedMessages.name}
           name="name"
-          type="text"
-          autoFocus
+          component={Input}
         />
-        <FieldGroup
+        <FormField
           name="rights"
           title={sharedMessages.rights}
+          required
+          component={Checkbox.Group}
         >
           {rightsItems}
-        </FieldGroup>
+        </FormField>
         <SubmitBar>
-          <Button type="submit" message={sharedMessages.saveChanges} />
+          <FormSubmit
+            component={SubmitButton}
+            message={sharedMessages.saveChanges}
+          />
           <ModalButton
             type="button"
             icon="delete"

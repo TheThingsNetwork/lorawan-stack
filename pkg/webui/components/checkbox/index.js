@@ -12,53 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import PropTypes from 'prop-types'
-import bind from 'autobind-decorator'
-import classnames from 'classnames'
+import CheckboxGroup from './group'
+import Checkbox from './checkbox'
 
-import style from './checkbox.styl'
-
-@bind
-class Checkbox extends React.PureComponent {
-
-  onChange (evt) {
-    this.props.onChange(evt.target.checked)
-  }
-
-  render () {
-    const { value, onChange, ...rest } = this.props
-
-    const classNames = classnames(style.container, {
-      [style.disabled]: rest.disabled,
-    })
-
-    return (
-      <label className={classNames}>
-        <input
-          className={style.input}
-          type="checkbox"
-          onChange={this.onChange}
-          checked={value}
-          {...rest}
-        />
-        <span className={style.checkmark} />
-      </label>
-    )
-  }
-}
-
-
-Checkbox.propTypes = {
-  value: PropTypes.bool,
-  onFocus: PropTypes.func,
-  onBlur: PropTypes.func,
-  onChange: PropTypes.func,
-  disabled: PropTypes.bool,
-}
-
-Checkbox.defaultProps = {
-  onChange: () => null,
-}
+Checkbox.Group = CheckboxGroup
 
 export default Checkbox

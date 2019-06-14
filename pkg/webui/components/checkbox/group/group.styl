@@ -12,44 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.container
+.group
   display: flex
-  flex-direction: column
-  margin-bottom: $cs.l
+  flex-direction: row
+
+  .group-checkbox:not(:last-child)
+    margin-right: $cs.m
+
   &.horizontal
-    flex-direction: row
-    .header-title
-      width: 30%
-    .fields
-      width: 70%
-  &.disabled
-    .header-title
-      opacity: .4
+    flex-direction: column
 
-.container:not(.horizontal)
-  span.header-title
-    font-weight: 600
-
-.header-title
-  line-height: 2.2
-  margin-bottom: 0
-  flex-shrink: 0
-
-.fields
-  display: flex
-  flex-wrap: wrap
-
-.columns
-  width: auto
-  margin-right: $cs.l
-
-  &.field
-    margin-bottom: 0
-
-.field:not(.columns)
-  margin-bottom: $cs.m
-  &:first-child
-    margin-top: $cs.xxs
-
-.error
-  margin-bottom: $cs.m
+    .group-checkbox:not(:last-child)
+      margin-bottom: $cs.s

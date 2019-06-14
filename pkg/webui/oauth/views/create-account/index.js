@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
+import { Container, Col, Row } from 'react-grid-system'
 import { withRouter } from 'react-router-dom'
 import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
@@ -24,8 +25,9 @@ import api from '../../api'
 import sharedMessages from '../../../lib/shared-messages'
 
 import Button from '../../../components/button'
-import Field from '../../../components/field'
+import Input from '../../../components/input'
 import Form from '../../../components/form'
+import SubmitButton from '../../../components/submit-button'
 import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 
@@ -55,8 +57,7 @@ const validationSchema = Yup.object().shape({
     .required(sharedMessages.validateRequired),
   name: Yup.string()
     .min(3, sharedMessages.validateTooShort)
-    .max(50, sharedMessages.validateTooLong)
-    .required(sharedMessages.validateRequired),
+    .max(50, sharedMessages.validateTooLong),
   password: Yup.string()
     .min(8)
     .matches(digit, m.validatePasswordDigit)
@@ -71,6 +72,14 @@ const validationSchema = Yup.object().shape({
     .min(8)
     .required(sharedMessages.validateRequired),
 })
+
+const initialValues = {
+  user_id: '',
+  name: '',
+  primary_email_address: '',
+  password: '',
+  password_confirm: '',
+}
 
 const getSuccessMessage = function (state) {
   switch (state) {
@@ -133,61 +142,65 @@ export default class CreateAccount extends React.PureComponent {
     const cancelButtonText = registered ? m.goToLogin : sharedMessages.cancel
 
     return (
-      <div className={style.fullHeightCenter}>
-        <IntlHelmet title={m.register} />
-        <div className={style.wrapper}>
-          <h1><Message content={m.createAccount} /></h1>
-          <Form
-            onSubmit={this.handleSubmit}
-            error={error}
-            info={info}
-            validationSchema={validationSchema}
-          >
-            <Field
-              className={style.field}
-              required
-              title={sharedMessages.userId}
-              name="user_id"
-              type="text"
-              autoComplete="username"
-              autoFocus
-            />
-            <Field
-              className={style.field}
-              title={sharedMessages.name}
-              name="name"
-              type="text"
-              autoComplete="name"
-            />
-            <Field
-              className={style.field}
-              required
-              title={sharedMessages.email}
-              type="text"
-              name="primary_email_address"
-              autoComplete="email"
-            />
-            <Field
-              className={style.field}
-              required
-              title={sharedMessages.password}
-              name="password"
-              type="password"
-              autoComplete="new-password"
-            />
-            <Field
-              className={style.field}
-              required
-              title={m.confirmPassword}
-              name="password_confirm"
-              type="password"
-              autoComplete="new-password"
-            />
-            <Button type="submit" message={m.register} />
-            <Button naked secondary message={cancelButtonText} onClick={this.handleCancel} />
-          </Form>
-        </div>
-      </div>
+      <Container className={style.fullHeight}>
+        <Row justify="center" align="center" className={style.fullHeight}>
+          <Col sm={12} md={8} lg={5}>
+            <IntlHelmet title={m.register} />
+            <Message content={m.createAccount} component="h1" className={style.title} />
+            <Form
+              onSubmit={this.handleSubmit}
+              initialValues={initialValues}
+              error={error}
+              info={info}
+              validationSchema={validationSchema}
+              horizontal={false}
+            >
+              <Form.Field
+                component={Input}
+                required
+                title={sharedMessages.userId}
+                name="user_id"
+                autoComplete="username"
+                autoFocus
+              />
+              <Form.Field
+                title={sharedMessages.name}
+                name="name"
+                component={Input}
+                autoComplete="name"
+              />
+              <Form.Field
+                required
+                title={sharedMessages.email}
+                component={Input}
+                name="primary_email_address"
+                autoComplete="email"
+              />
+              <Form.Field
+                required
+                title={sharedMessages.password}
+                name="password"
+                type="password"
+                component={Input}
+                autoComplete="new-password"
+              />
+              <Form.Field
+                required
+                title={m.confirmPassword}
+                name="password_confirm"
+                type="password"
+                autoComplete="new-password"
+                component={Input}
+              />
+              <Form.Submit
+                component={SubmitButton}
+                message={m.register}
+              />
+              <Button naked secondary message={cancelButtonText} onClick={this.handleCancel} />
+            </Form>
+          </Col>
+        </Row>
+      </Container>
     )
   }
 }

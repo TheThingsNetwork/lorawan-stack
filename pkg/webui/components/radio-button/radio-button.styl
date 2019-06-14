@@ -12,58 +12,81 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.container
-  display: flex
-  position: relative
-  padding-left: 1rem + $cs.xs
-  margin-bottom: 12px
-  user-select: none
+.wrapper
+  cursor: pointer
+  display flex
+  flex-wrap: nowrap
+  justify-content: flex-start
+  align-items: center
 
-  // Hide default radio button
-  input
-    position: absolute
-    opacity: 0
-    cursor: pointer
-
-  &:hover input ~ span
+  &:not(.disabled):hover input ~ .dot
     background-color: $c-backdrop
 
-  & input:checked ~ span
+  &:not(.disabled):hover input:checked ~ .dot, input:checked:focus ~ .dot
+    border-color: lighter($c-active-blue)
+
+.disabled
+  cursor: not-allowed
+  opacity: .4
+
+.radio
+  nudge('up')
+  position: relative
+  display: inline-block
+  white-space: nowrap
+  vertical-align: middle
+  outline: none
+
+  input
+    position: absolute
+    top: 0
+    right: 0
+    bottom: 0
+    left: 0
+    z-index: 1
+    width: 100%
+    height: 100%
+    cursor: pointer
+    opacity: 0
+
+    &:disabled
+      cursor: not-allowed
+
+  & input:checked ~ .dot
     border-color: $c-input-border
 
-  &:hover input:checked ~ span, input:checked:focus ~ span
-      border-color: lighter($c-active-blue)
+  input:checked ~ .dot:after
+    opacity: 1
+    transform: scale(1)
+    transition: all $ad.s cubic-bezier(.12, .4, .29, 1.40) $ad.xs
 
-  // Show the dot when checked
-  input:checked ~ span:after
-    display: block
-
-  input:focus ~ span
+  input:focus ~ .dot
     border-color: $c-active-blue
 
-// Custom radio button
 .dot
   border-input()
   border-radius: 1.08rem
-  position: absolute
-  top: -1px
+  position: relative
+  top: 0
   left: 0
+  display: block
   width: 1.08rem
   height: 1.08rem
+  transition: all $ad.s
 
-  // Style the select-dot
   &:after
-    content: ''
-    box-sizing: content-box
+    opacity: 0
     position: absolute
-    background-color: lighter($c-active-blue)
-    border-radius: 100%
-    display: none
     left: 4px
     top: 4px
     width: 7px
     height: 7px
+    background-color: lighter($c-active-blue)
+    border-radius: 100%
+    transform: scale(0)
+    transition: all $ad.s ease-out $ad.xs
+    content: ''
 
-.disabled
-  opacity: .4
-  cursor: not-allowed
+.label
+  padding-right: $cs.xs
+  padding-left: $cs.xs

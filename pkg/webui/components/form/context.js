@@ -12,6 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.right-label
-  span::first-letter
-    text-transform: uppercase
+import React from 'react'
+
+export default React.createContext()

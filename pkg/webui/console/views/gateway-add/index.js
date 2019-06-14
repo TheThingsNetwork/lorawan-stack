@@ -22,7 +22,8 @@ import { push } from 'connected-react-router'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import sharedMessages from '../../../lib/shared-messages'
-import Button from '../../../components/button'
+import FormSubmit from '../../../components/form/submit'
+import SubmitButton from '../../../components/submit-button'
 import Message from '../../../lib/components/message'
 import PropTypes from '../../../lib/prop-types'
 import IntlHelmet from '../../../lib/components/intl-helmet'
@@ -122,10 +123,7 @@ export default class GatewayAdd extends React.Component {
               initialValues={initialValues}
               update={false}
             >
-              <Button
-                type="submit"
-                message={m.createGateway}
-              />
+              <FormSubmit component={SubmitButton} message={m.createGateway} />
             </GatewayDataForm>
           </Col>
         </Row>

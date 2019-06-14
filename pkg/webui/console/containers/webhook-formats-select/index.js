@@ -15,12 +15,11 @@
 import React from 'react'
 import { connect as storeConnect } from 'react-redux'
 import { defineMessages } from 'react-intl'
-import { connect as formConnect, getIn } from 'formik'
 import bind from 'autobind-decorator'
 
 import sharedMessages from '../../../lib/shared-messages'
 import PropTypes from '../../../lib/prop-types'
-import Field from '../../../components/field'
+import Field from '../../../components/form/field'
 
 import {
   formatsSelector,
@@ -36,7 +35,6 @@ const m = defineMessages({
 
 const formatOptions = formats => Object.keys(formats).map(key => ({ value: key, label: formats[key]}))
 
-@formConnect
 @storeConnect(function (state, props) {
   return {
     formats: formatsSelector(state, props),
@@ -86,15 +84,7 @@ class WebhookFormatsSelector extends React.PureComponent {
       menuPlacement,
     } = this.props
 
-    const {
-      setFieldValue,
-      setFieldTouched,
-    } = this.props.formik
-
     const fieldOptions = this.getOptions()
-    const fieldError = getIn(this.props.formik.errors, name)
-    const fieldTouched = getIn(this.props.formik.touched, name)
-    const fieldValue = getIn(this.props.formik.values, name)
 
     return (
       <Field
@@ -102,17 +92,12 @@ class WebhookFormatsSelector extends React.PureComponent {
         type="select"
         options={fieldOptions}
         name={name}
-        value={fieldValue}
         required={required}
         title={title}
         autoFocus={autoFocus}
         isLoading={fetching}
         warning={Boolean(error) ? m.formatFetchingFailure : undefined}
-        error={fieldError}
-        touched={fieldTouched}
         menuPlacement={menuPlacement}
-        setFieldTouched={setFieldTouched}
-        setFieldValue={setFieldValue}
       />
     )
   }

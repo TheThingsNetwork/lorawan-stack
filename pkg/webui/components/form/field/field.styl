@@ -33,7 +33,6 @@
   display: flex
   flex-wrap: wrap
   width: 100%
-  align-items: center
 
   &.disabled
     .label
@@ -43,35 +42,6 @@
   &:not(.horizontal)
     .label
       font-weight: 600
-
-  &.checkbox:not(.disabled), &.radio:not(.disabled)
-    .label
-      cursor: pointer
-
-  &.checkbox, &.radio
-    .component
-      order: 1
-      width: .8rem
-      flex-grow: 0
-
-    .label
-      nudge('down')
-      flex: 1 1
-      display: flex
-      font-weight: normal
-      order: 2
-      padding-left: $cs.xxs
-      width: auto
-      vertical-align: middle
-
-    .description
-      order: 3
-      display: block
-      width: 100%
-
-    .err, .warn
-      margin-top: $cs.xxs
-      margin-left: 0
 
 .reqicon
   display: none

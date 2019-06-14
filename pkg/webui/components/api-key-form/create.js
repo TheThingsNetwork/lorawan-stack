@@ -19,9 +19,11 @@ import ApiKeyModal from '../api-key-modal'
 import PropTypes from '../../lib/prop-types'
 import sharedMessages from '../../lib/shared-messages'
 import SubmitBar from '../submit-bar'
-import Field from '../field'
-import FieldGroup from '../field/group'
-import Button from '../button'
+import FormField from '../form/field'
+import FormSubmit from '../form/submit'
+import SubmitButton from '../submit-button'
+import Checkbox from '../checkbox'
+import Input from '../input'
 import Message from '../../lib/components/message'
 import ApiKeyForm from './form'
 import validationSchema from './validation-schema'
@@ -79,13 +81,11 @@ class CreateForm extends React.Component {
     const { rightsItems, rightsValues } = rights.reduce(
       function (acc, right) {
         acc.rightsItems.push(
-          <Field
+          <Checkbox
             className={style.rightLabel}
             key={right}
             name={right}
-            type="checkbox"
-            title={{ id: `enum:${right}` }}
-            form
+            label={{ id: `enum:${right}` }}
           />
         )
         acc.rightsValues[right] = false
@@ -121,21 +121,23 @@ class CreateForm extends React.Component {
             component="h4"
             content={sharedMessages.generalInformation}
           />
-          <Field
+          <FormField
             title={sharedMessages.name}
             name="name"
-            type="text"
             autoFocus
+            component={Input}
           />
-          <FieldGroup
+          <FormField
             name="rights"
             title={sharedMessages.rights}
+            required
+            component={Checkbox.Group}
           >
             {rightsItems}
-          </FieldGroup>
+          </FormField>
           <SubmitBar>
-            <Button
-              type="submit"
+            <FormSubmit
+              component={SubmitButton}
               message={sharedMessages.createApiKey}
             />
           </SubmitBar>

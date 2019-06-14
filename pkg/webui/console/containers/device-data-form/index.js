@@ -17,9 +17,11 @@ import { connect } from 'react-redux'
 import bind from 'autobind-decorator'
 
 import Form from '../../../components/form'
-import Field from '../../../components/field'
-import Button from '../../../components/button'
-import FieldGroup from '../../../components/field/group'
+import SubmitButton from '../../../components/submit-button'
+import Input from '../../../components/input'
+import Checkbox from '../../../components/checkbox'
+import Radio from '../../../components/radio-button'
+import Select from '../../../components/select'
 import Message from '../../../lib/components/message'
 import SubmitBar from '../../../components/submit-bar'
 import FrequencyPlansSelect from '../../containers/freq-plans-select'
@@ -61,19 +63,19 @@ class DeviceDataForm extends Component {
     this.setState({ otaa: false })
   }
 
-  handleResetsJoinNoncesChange (value) {
-    this.setState({ resets_join_nonces: value })
+  handleResetsJoinNoncesChange (evt) {
+    this.setState({ resets_join_nonces: evt.target.checked })
   }
 
-  handleResetsFrameCountersChange (value) {
-    this.setState({ resets_f_cnt: value })
+  handleResetsFrameCountersChange (evt) {
+    this.setState({ resets_f_cnt: evt.target.checked })
   }
 
   get ABPSection () {
     const { resets_f_cnt } = this.state
     return (
       <React.Fragment>
-        <Field
+        <Form.Field
           title={sharedMessages.devAddr}
           name="session.dev_addr"
           type="byte"
@@ -81,8 +83,9 @@ class DeviceDataForm extends Component {
           max={4}
           placeholder={m.leaveBlankPlaceholder}
           description={m.deviceAddrDescription}
+          component={Input}
         />
-        <Field
+        <Form.Field
           title={sharedMessages.fwdNtwkKey}
           name="session.keys.f_nwk_s_int_key.key"
           type="byte"
@@ -90,8 +93,9 @@ class DeviceDataForm extends Component {
           max={16}
           placeholder={m.leaveBlankPlaceholder}
           description={m.fwdNtwkKeyDescription}
+          component={Input}
         />
-        <Field
+        <Form.Field
           title={sharedMessages.sNtwkSIKey}
           name="session.keys.s_nwk_s_int_key.key"
           type="byte"
@@ -99,8 +103,9 @@ class DeviceDataForm extends Component {
           max={16}
           placeholder={m.leaveBlankPlaceholder}
           description={m.sNtwkSIKeyDescription}
+          component={Input}
         />
-        <Field
+        <Form.Field
           title={sharedMessages.ntwkSEncKey}
           name="session.keys.nwk_s_enc_key.key"
           type="byte"
@@ -108,8 +113,9 @@ class DeviceDataForm extends Component {
           max={16}
           placeholder={m.leaveBlankPlaceholder}
           description={m.ntwkSEncKeyDescription}
+          component={Input}
         />
-        <Field
+        <Form.Field
           title={sharedMessages.appSKey}
           name="session.keys.app_s_key.key"
           type="byte"
@@ -117,13 +123,14 @@ class DeviceDataForm extends Component {
           max={16}
           placeholder={m.leaveBlankPlaceholder}
           description={m.appSKeyDescription}
+          component={Input}
         />
-        <Field
+        <Form.Field
           title={m.resetsFCnt}
           onChange={this.handleResetsFrameCountersChange}
           warning={resets_f_cnt ? m.resetWarning : undefined}
           name="mac_settings.resets_f_cnt"
-          type="checkbox"
+          component={Checkbox}
         />
       </React.Fragment>
     )
@@ -134,7 +141,7 @@ class DeviceDataForm extends Component {
     const { update } = this.props
     return (
       <React.Fragment>
-        <Field
+        <Form.Field
           title={sharedMessages.joinEUI}
           name="ids.join_eui"
           type="byte"
@@ -143,8 +150,9 @@ class DeviceDataForm extends Component {
           placeholder={m.joinEUIPlaceholder}
           required
           disabled={update}
+          component={Input}
         />
-        <Field
+        <Form.Field
           title={sharedMessages.devEUI}
           name="ids.dev_eui"
           type="byte"
@@ -154,8 +162,9 @@ class DeviceDataForm extends Component {
           description={m.deviceEUIDescription}
           required
           disabled={update}
+          component={Input}
         />
-        <Field
+        <Form.Field
           title={sharedMessages.nwkKey}
           name="root_keys.nwk_key.key"
           type="byte"
@@ -163,8 +172,9 @@ class DeviceDataForm extends Component {
           max={16}
           placeholder={m.leaveBlankPlaceholder}
           description={m.nwkKeyDescription}
+          component={Input}
         />
-        <Field
+        <Form.Field
           title={sharedMessages.appKey}
           name="root_keys.app_key.key"
           type="byte"
@@ -172,13 +182,14 @@ class DeviceDataForm extends Component {
           max={16}
           placeholder={m.leaveBlankPlaceholder}
           description={m.appKeyDescription}
+          component={Input}
         />
-        <Field
+        <Form.Field
           title={m.resetsJoinNonces}
           onChange={this.handleResetsJoinNoncesChange}
           warning={resets_join_nonces ? m.resetWarning : undefined}
           name="resets_join_nonces"
-          type="checkbox"
+          component={Checkbox}
         />
       </React.Fragment>
     )
@@ -198,6 +209,7 @@ class DeviceDataForm extends Component {
       lorawan_version: undefined,
       lorawan_phy_version: undefined,
       frequency_plan_id: undefined,
+      supports_class_c: false,
       resets_join_nonces: false,
       root_keys: {},
       session: {},
@@ -218,19 +230,13 @@ class DeviceDataForm extends Component {
         onSubmit={onSubmit}
         validationSchema={validationSchema}
         submitEnabledWhenInvalid
-        isInitialValid={false}
         initialValues={formValues}
-        mapErrorsToFields={{
-          id_taken: 'application_id',
-          identifiers: 'application_id',
-        }}
-        horizontal
       >
         <Message
           component="h4"
           content={sharedMessages.generalSettings}
         />
-        <Field
+        <Form.Field
           title={sharedMessages.devID}
           name="ids.device_id"
           placeholder={m.deviceIdPlaceholder}
@@ -238,27 +244,30 @@ class DeviceDataForm extends Component {
           autoFocus
           required
           disabled={update}
+          component={Input}
         />
-        <Field
+        <Form.Field
           title={sharedMessages.devName}
           name="name"
           placeholder={m.deviceNamePlaceholder}
           description={m.deviceNameDescription}
+          component={Input}
         />
-        <Field
+        <Form.Field
           title={sharedMessages.devDesc}
           name="description"
           type="textarea"
           description={m.deviceDescDescription}
+          component={Input}
         />
         <Message
           component="h4"
           content={m.lorawanOptions}
         />
-        <Field
+        <Form.Field
           title={sharedMessages.macVersion}
           name="lorawan_version"
-          type="select"
+          component={Select}
           required
           options={[
             { value: '1.0.0', label: 'MAC V1.0' },
@@ -268,10 +277,10 @@ class DeviceDataForm extends Component {
             { value: '1.1.0', label: 'MAC V1.1' },
           ]}
         />
-        <Field
+        <Form.Field
           title={sharedMessages.phyVersion}
           name="lorawan_phy_version"
-          type="select"
+          component={Select}
           required
           options={[
             { value: '1.0.0', label: 'PHY V1.0' },
@@ -287,41 +296,38 @@ class DeviceDataForm extends Component {
           title={sharedMessages.frequencyPlan}
           source="ns"
           name="frequency_plan_id"
-          horizontal
           required
         />
-        <Field
+        <Form.Field
           title={m.supportsClassC}
           name="supports_class_c"
-          type="checkbox"
+          component={Checkbox}
         />
         <Message
           component="h4"
           content={m.activationSettings}
         />
-        <FieldGroup
+        <Form.Field
           title={m.activationMode}
-          name="activation_mode"
           disabled={update}
-          columns
+          name="activation_mode"
+          component={Radio.Group}
         >
-          <Field
-            title={m.otaa}
+          <Radio
+            label={m.otaa}
             value="otaa"
-            type="radio"
             onChange={this.handleOTAASelect}
           />
-          <Field
-            title={m.abp}
+          <Radio
+            label={m.abp}
             value="abp"
-            type="radio"
             onChange={this.handleABPSelect}
           />
-        </FieldGroup>
+        </Form.Field>
         {otaa ? this.OTAASection : this.ABPSection}
         <SubmitBar>
-          <Button
-            type="submit"
+          <Form.Submit
+            component={SubmitButton}
             message={update ? sharedMessages.saveChanges : m.createDevice}
           />
         </SubmitBar>

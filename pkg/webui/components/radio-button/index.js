@@ -12,52 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import PropTypes from 'prop-types'
-import bind from 'autobind-decorator'
-import classnames from 'classnames'
+import Radio from './radio'
+import RadioGroup from './group'
 
-import style from './radio-button.styl'
+Radio.Group = RadioGroup
 
-@bind
-class RadioButton extends React.PureComponent {
-
-  onChange (evt) {
-    this.props.onChange(evt.target.value)
-  }
-
-  render () {
-    const { onChange, ...rest } = this.props
-
-    const classNames = classnames(style.container, {
-      [style.disabled]: rest.disabled,
-    })
-
-    return (
-      <label className={classNames}>
-        <input
-          className={style.input}
-          type="radio"
-          onChange={this.onChange}
-          {...rest}
-        />
-        <span className={style.dot} />
-      </label>
-    )
-  }
-}
-
-RadioButton.propTypes = {
-  value: PropTypes.string,
-  name: PropTypes.string,
-  onFocus: PropTypes.func,
-  onBlur: PropTypes.func,
-  onChange: PropTypes.func,
-  disabled: PropTypes.bool,
-}
-
-RadioButton.defaultProps = {
-  onChange: () => null,
-}
-
-export default RadioButton
+export default Radio

@@ -19,20 +19,22 @@ import classnames from 'classnames'
 import sharedMessages from '../../lib/shared-messages'
 import PropTypes from '../../lib/prop-types'
 
-import Message from '../../lib/components/message'
 import Checkbox from '../checkbox'
 import style from './toggled.styl'
 import Input from './'
 
 @bind
 class Toggled extends Component {
-  handleCheckboxChange (enabled) {
+  handleCheckboxChange (event) {
+    const enabled = event.target.checked
     const { value } = this.props.value
+
     this.props.onChange({ value, enabled }, true)
   }
 
   handleInputChange (value) {
     const { enabled } = this.props.value
+
     this.props.onChange({ value, enabled })
   }
 
@@ -51,8 +53,12 @@ class Toggled extends Component {
     return (
       <div className={classnames(className, style.container)}>
         <label className={style.checkbox} htmlFor={checkboxId}>
-          <Checkbox onChange={this.handleCheckboxChange} value={isEnabled} id={checkboxId} />
-          <Message className={style.label} content={enabledMessage} />
+          <Checkbox
+            name={`${rest.name}.enable`}
+            onChange={this.handleCheckboxChange}
+            value={isEnabled}
+            id={checkboxId}
+          />
         </label>
         { isEnabled && (
           <Input

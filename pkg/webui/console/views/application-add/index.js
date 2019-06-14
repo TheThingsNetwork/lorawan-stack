@@ -21,8 +21,8 @@ import { defineMessages } from 'react-intl'
 import { push } from 'connected-react-router'
 
 import Form from '../../../components/form'
-import Field from '../../../components/field'
-import Button from '../../../components/button'
+import Input from '../../../components/input'
+import SubmitButton from '../../../components/submit-button'
 import Message from '../../../lib/components/message'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
@@ -79,7 +79,7 @@ export default class Add extends React.Component {
     error: '',
   }
 
-  async handleSubmit (values, { setSubmitting, resetForm }) {
+  async handleSubmit (values, { resetForm }) {
     const { userId, dispatch } = this.props
 
     await this.setState({ error: '' })
@@ -116,35 +116,32 @@ export default class Add extends React.Component {
               onSubmit={this.handleSubmit}
               initialValues={initialValues}
               validationSchema={validationSchema}
-              mapErrorsToFields={{
-                id_taken: 'application_id',
-                identifiers: 'application_id',
-                blacklisted_id: 'application_id',
-              }}
-              horizontal
             >
-              <Field
+              <Form.Field
                 title={sharedMessages.appId}
                 name="application_id"
-                type="text"
                 placeholder={m.appIdPlaceholder}
                 autoFocus
                 required
+                component={Input}
               />
-              <Field
+              <Form.Field
                 title={m.applicationName}
                 name="name"
-                type="text"
                 placeholder={m.appNamePlaceholder}
+                component={Input}
               />
-              <Field
+              <Form.Field
                 title={sharedMessages.description}
                 name="description"
                 placeholder={m.appDescPlaceholder}
-                type="text"
+                component={Input}
               />
               <SubmitBar>
-                <Button type="submit" message={m.createApplication} />
+                <Form.Submit
+                  message={m.createApplication}
+                  component={SubmitButton}
+                />
               </SubmitBar>
             </Form>
           </Col>

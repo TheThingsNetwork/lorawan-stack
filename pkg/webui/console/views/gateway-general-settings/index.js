@@ -27,7 +27,8 @@ import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import GatewayDataForm from '../../components/gateway-data-form'
 import ModalButton from '../../../components/button/modal-button'
-import Button from '../../../components/button'
+import FormSubmit from '../../../components/form/submit'
+import SubmitButton from '../../../components/submit-button'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import diff from '../../../lib/diff'
 
@@ -179,7 +180,7 @@ export default class GatewayGeneralSettings extends React.Component {
               formRef={this.formRef}
               update
             >
-              <Button type="submit" message={sharedMessages.saveChanges} />
+              <FormSubmit component={SubmitButton} message={sharedMessages.saveChanges} />
               <ModalButton
                 type="button"
                 icon="delete"
