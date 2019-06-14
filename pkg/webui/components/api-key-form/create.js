@@ -22,13 +22,11 @@ import SubmitBar from '../submit-bar'
 import FormField from '../form/field'
 import FormSubmit from '../form/submit'
 import SubmitButton from '../submit-button'
-import Checkbox from '../checkbox'
 import Input from '../input'
 import Message from '../../lib/components/message'
+import RightsGroup from '../../console/components/rights-group'
 import ApiKeyForm from './form'
 import validationSchema from './validation-schema'
-
-import style from './api-key-form.styl'
 
 @bind
 class CreateForm extends React.Component {
@@ -73,30 +71,17 @@ class CreateForm extends React.Component {
     const {
       rights,
       onCreateFailure,
+      universalRights,
     } = this.props
     const { modal } = this.state
 
     const modalProps = modal ? modal : {}
     const modalVisible = Boolean(modal)
-    const { rightsItems, rightsValues } = rights.reduce(
-      function (acc, right) {
-        acc.rightsItems.push(
-          <Checkbox
-            className={style.rightLabel}
-            key={right}
-            name={right}
-            label={{ id: `enum:${right}` }}
-          />
-        )
-        acc.rightsValues[right] = false
+    const rightsValues = rights.reduce(function (acc, right) {
+      acc[right] = false
 
-        return acc
-      },
-      {
-        rightsItems: [],
-        rightsValues: {},
-      }
-    )
+      return acc
+    }, {})
     const initialValues = {
       name: '',
       rights: rightsValues,
@@ -131,10 +116,10 @@ class CreateForm extends React.Component {
             name="rights"
             title={sharedMessages.rights}
             required
-            component={Checkbox.Group}
-          >
-            {rightsItems}
-          </FormField>
+            component={RightsGroup}
+            rights={rights}
+            universalRight={universalRights[0]}
+          />
           <SubmitBar>
             <FormSubmit
               component={SubmitButton}
@@ -150,6 +135,10 @@ class CreateForm extends React.Component {
 CreateForm.propTypes = {
   /** The list of rights */
   rights: PropTypes.arrayOf(PropTypes.string),
+  /**
+   * The rights that imply all other rights, e.g. 'RIGHT_APPLICATION_ALL', 'RIGHT_ALL'
+   */
+  universalRights: PropTypes.arrayOf(PropTypes.string),
   /**
    * Called after successful creation of the API key.
    * Receives the key object as an argument.
@@ -171,6 +160,7 @@ CreateForm.defaultProps = {
   rights: [],
   onCreateSuccess: () => null,
   onCreateFailure: () => null,
+  universalRights: [],
 }
 
 export default CreateForm
