@@ -26,12 +26,10 @@ import Message from '../../lib/components/message'
 import FormField from '../form/field'
 import FormSubmit from '../form/submit'
 import SubmitButton from '../submit-button'
-import Checkbox from '../checkbox'
 import Input from '../input'
+import RightsGroup from '../../console/components/rights-group'
 import ApiKeyForm from './form'
 import validationSchema from './validation-schema'
-
-import style from './api-key-form.styl'
 
 const m = defineMessages({
   deleteKey: 'Delete Key',
@@ -106,28 +104,19 @@ class EditForm extends React.Component {
       rights,
       apiKey,
       onEditFailure,
+      universalRights,
     } = this.props
     const { error } = this.state
 
-    const { rightsItems, rightsValues } = rights.reduce(
-      function (acc, right) {
-        acc.rightsItems.push(
-          <Checkbox
-            className={style.rightLabel}
-            key={right}
-            name={right}
-            label={{ id: `enum:${right}` }}
-          />
-        )
-        acc.rightsValues[right] = apiKey.rights.includes(right)
+    const hasUniversalRight = universalRights.length
+      ? universalRights.some(universalRight => apiKey.rights.includes(universalRight))
+      : false
 
-        return acc
-      },
-      {
-        rightsItems: [],
-        rightsValues: {},
-      }
-    )
+    const rightsValues = rights.reduce(function (acc, right) {
+      acc[right] = hasUniversalRight || apiKey.rights.includes(right)
+
+      return acc
+    }, {})
     const initialValues = {
       id: apiKey.id,
       name: apiKey.name,
@@ -164,10 +153,10 @@ class EditForm extends React.Component {
           name="rights"
           title={sharedMessages.rights}
           required
-          component={Checkbox.Group}
-        >
-          {rightsItems}
-        </FormField>
+          component={RightsGroup}
+          rights={rights}
+          universalRight={universalRights[0]}
+        />
         <SubmitBar>
           <FormSubmit
             component={SubmitButton}
@@ -202,6 +191,10 @@ EditForm.propTypes = {
   }),
   /** The list of rights */
   rights: PropTypes.arrayOf(PropTypes.string),
+  /**
+   * The rights that imply all other rights, e.g. 'RIGHT_APPLICATION_ALL', 'RIGHT_ALL'
+   */
+  universalRights: PropTypes.arrayOf(PropTypes.string),
   /**
    * Called on form submission.
    * Receives the updated key object as an argument.
@@ -240,6 +233,7 @@ EditForm.defaultProps = {
   onEditFailure: () => null,
   onDeleteSuccess: () => null,
   onDeleteFailure: () => null,
+  universalRights: [],
 }
 
 export default EditForm
