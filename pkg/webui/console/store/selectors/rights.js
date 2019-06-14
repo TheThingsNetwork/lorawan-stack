@@ -17,7 +17,13 @@ const storeSelector = (state, entity) => state.rights[entity]
 export const rightsSelector = entity => function (state) {
   const store = storeSelector(state, entity)
 
-  return store.rights
+  return store.rights.filter(right => !right.endsWith('_ALL'))
+}
+
+export const universalRightsSelector = entity => function (state) {
+  const store = storeSelector(state, entity)
+
+  return store.rights.filter(right => right.endsWith('_ALL'))
 }
 
 export const fetchingSelector = entity => function (state) {
