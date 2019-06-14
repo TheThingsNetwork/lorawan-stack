@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { GET_DEV_BASE } from '../actions/device'
+import { GET_DEV_BASE, UPDATE_DEV_BASE } from '../actions/device'
 import { getDeviceId } from '../../../lib/selectors/id'
 
 import {
@@ -31,7 +31,9 @@ const storeSelector = store => store.device
 export const deviceSelector = state => storeSelector(state).device
 
 export const selectDeviceFetching = createFetchingSelector(GET_DEV_BASE)
-export const selectDeviceError = createErrorSelector(GET_DEV_BASE)
+export const selectGetDeviceError = createErrorSelector(GET_DEV_BASE)
+export const selectUpdateDeviceError = createErrorSelector(UPDATE_DEV_BASE)
+export const selectDeviceError = createErrorSelector([ GET_DEV_BASE, UPDATE_DEV_BASE ])
 export const selectSelectedDevice = state => deviceSelector(state)
 
 export const selectSelectedDeviceId = state => getDeviceId(selectSelectedDevice(state))

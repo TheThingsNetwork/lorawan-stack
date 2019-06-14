@@ -37,7 +37,7 @@ import {
   stopDeviceEventsStream,
 } from '../../store/actions/device'
 
-import { selectDeviceFetching, selectDeviceError } from '../../store/selectors/device'
+import { selectDeviceFetching, selectGetDeviceError } from '../../store/selectors/device'
 
 import style from './device.styl'
 
@@ -53,7 +53,7 @@ const m = defineMessages({
     devIds: device.device && device.device.ids,
     devId: props.match.params.devId,
     fetching: selectDeviceFetching(state),
-    error: selectDeviceError(state),
+    error: selectGetDeviceError(state),
   }
 }, dispatch => ({
   getDevice: (appId, devId, selectors, config) =>
