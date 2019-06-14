@@ -14,6 +14,7 @@
 
 import createApiKeysRequestActions, { createGetApiKeysListActionType } from './api-keys'
 import createApiKeyRequestActions, { createGetApiKeyActionType } from './api-key'
+import { createGetCollaboratorsListActionType } from './collaborators'
 
 import {
   startEventsStream,
@@ -78,6 +79,17 @@ export const [{
   success: getGatewayApiKeysListSuccess,
   failure: getGatewayApiKeysListFailure,
 }] = createApiKeysRequestActions(SHARED_NAME)
+
+export const GET_GTW_COLLABORATORS_LIST_BASE = createGetCollaboratorsListActionType(SHARED_NAME)
+export const [{
+  request: GET_GTW_COLLABORATORS_LIST,
+  success: GET_GTW_COLLABORATORS_LIST_SUCCESS,
+  failure: GET_GTW_COLLABORATORS_LIST_FAILURE,
+}, {
+  request: getGatewayCollaboratorsList,
+  success: getGatewayCollaboratorsListSuccess,
+  failure: getGatewayCollaboratorsListFailure,
+}] = createRequestActions(GET_GTW_COLLABORATORS_LIST_BASE, (gtwId, { page, limit } = {}) => ({ gtwId, params: { page, limit }}))
 
 export const UPDATE_GTW = 'UPDATE_GATEWAY'
 export const START_GTW_STATS = 'START_GATEWAY_STATISTICS'
