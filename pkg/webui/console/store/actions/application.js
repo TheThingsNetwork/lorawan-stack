@@ -60,7 +60,7 @@ export const [{
   request: getApplicationApiKeysList,
   success: getApplicationApiKeysListSuccess,
   failure: getApplicationApiKeysListFailure,
-}] = createRequestActions(GET_APP_API_KEYS_LIST_BASE, (appId, params) => ({ appId, params }))
+}] = createRequestActions(GET_APP_API_KEYS_LIST_BASE, (appId, { page, limit } = {}) => ({ appId, params: { page, limit }}))
 
 export const GET_APP_API_KEY_BASE = createGetApiKeyActionType(SHARED_NAME)
 export const [{
@@ -82,7 +82,7 @@ export const [{
   request: getApplicationCollaboratorsList,
   success: getApplicationCollaboratorsListSuccess,
   failure: getApplicationCollaboratorsListFailure,
-}] = createRequestActions(GET_APP_COLLABORATORS_LIST_BASE, (appId, params) => ({ appId, params }))
+}] = createRequestActions(GET_APP_COLLABORATORS_LIST_BASE, (appId, { page, limit } = {}) => ({ appId, params: { page, limit }}))
 
 export const START_APP_EVENT_STREAM = createStartEventsStreamActionType(SHARED_NAME)
 export const START_APP_EVENT_STREAM_SUCCESS = createStartEventsStreamSuccessActionType(SHARED_NAME)

@@ -20,7 +20,7 @@ const getGatewaysLogic = createRequestLogic({
   type: gateways.GET_GTWS_LIST,
   latest: true,
   async process ({ action }) {
-    const { page, pageSize: limit, query } = action.payload.filters
+    const { payload: { page, limit, query }} = action
     const data = query
       ? await api.gateways.search({
         page,

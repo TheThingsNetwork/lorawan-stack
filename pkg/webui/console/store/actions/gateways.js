@@ -26,7 +26,9 @@ export const [{
   request: getGatewaysList,
   success: getGatewaysSuccess,
   failure: getGatetaysFailure,
-}] = createRequestActions(GET_GTWS_LIST_BASE, filters => ({ filters }))
+}] = createRequestActions(GET_GTWS_LIST_BASE,
+  ({ page, limit, query } = {}) => ({ page, limit, query })
+)
 
 export const GET_GTWS_RIGHTS_LIST_BASE = createGetRightsListActionType(SHARED_NAME)
 export const [{

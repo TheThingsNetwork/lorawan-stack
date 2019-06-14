@@ -29,7 +29,9 @@ export const [{
   request: getApplicationsList,
   success: getApplicationsSuccess,
   failure: getApplicationsFailure,
-}] = createRequestActions(GET_APPS_LIST_BASE, filters => ({ filters }))
+}] = createRequestActions(GET_APPS_LIST_BASE,
+  ({ page, limit, query } = {}) => ({ page, limit, query })
+)
 
 export const GET_APPS_RIGHTS_LIST_BASE = createGetRightsListActionType(SHARED_NAME)
 export const [{

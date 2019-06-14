@@ -105,7 +105,7 @@ class FetchTable extends Component {
       getItemsAction,
     } = this.props
 
-    const filters = { ...this.state, pageSize }
+    const filters = { ...this.state, limit: pageSize }
 
     if (filters.query) {
       dispatch(searchItemsAction(filters))
