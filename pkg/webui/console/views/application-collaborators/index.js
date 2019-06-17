@@ -25,7 +25,7 @@ import ApplicationCollaboratorsList from '../application-collaborators-list'
 import ApplicationCollaboratorAdd from '../application-collaborator-add'
 import ApplicationCollaboratorEdit from '../application-collaborator-edit'
 
-@withBreadcrumb('apps.single.api-keys', function (props) {
+@withBreadcrumb('apps.single.collaborators', function (props) {
   const { match } = props
   const appId = match.params.appId
 
