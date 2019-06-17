@@ -159,6 +159,7 @@
     },
     "/applications/{application_ids.application_id}/api-keys": {
       "get": {
+        "summary": "List applications. See request message for details.",
         "operationId": "ListAPIKeys",
         "responses": {
           "200": {
@@ -197,6 +198,7 @@
         ]
       },
       "post": {
+        "summary": "Get the application with the given identifiers, selecting the fields given\nby the field mask. The method may return more or less fields, depending on\nthe rights of the caller.",
         "operationId": "CreateAPIKey",
         "responses": {
           "200": {
@@ -229,7 +231,6 @@
     },
     "/applications/{application_ids.application_id}/api-keys/{api_key.id}": {
       "put": {
-        "summary": "Update the rights of an existing application API key. To generate an API key,\nthe CreateAPIKey should be used. To delete an API key, update it\nwith zero rights.",
         "operationId": "UpdateAPIKey",
         "responses": {
           "200": {
@@ -371,6 +372,7 @@
     },
     "/applications/{application_ids.application_id}/devices": {
       "get": {
+        "summary": "List applications. See request message for details.",
         "operationId": "List",
         "responses": {
           "200": {
@@ -507,6 +509,7 @@
     },
     "/applications/{application_id}/rights": {
       "get": {
+        "summary": "Create a new application. This also sets the given organization or user as\nfirst collaborator with all possible rights.",
         "operationId": "ListRights",
         "responses": {
           "200": {
@@ -531,6 +534,7 @@
     },
     "/applications/{end_device.ids.application_ids.application_id}/devices": {
       "post": {
+        "summary": "Create a new end device within an application.",
         "operationId": "Create",
         "responses": {
           "200": {
@@ -601,6 +605,7 @@
     },
     "/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}": {
       "get": {
+        "summary": "Get the end device with the given identifiers, selecting the fields given\nby the field mask.",
         "operationId": "Get",
         "responses": {
           "200": {
@@ -720,6 +725,7 @@
     },
     "/as/applications/{application_ids.application_id}/devices/{device_id}/down": {
       "get": {
+        "summary": "GetLinkStats returns the link statistics.\nThis call returns a NotFound error code if there is no link for the given application identifiers.\nThis call returns the error code of the link error if linking to a Network Server failed.",
         "operationId": "DownlinkQueueList",
         "responses": {
           "200": {
@@ -774,7 +780,6 @@
     },
     "/as/applications/{application_ids.application_id}/link": {
       "get": {
-        "summary": "Get returns the device that matches the given identifiers.\nIf there are multiple matches, an error will be returned.",
         "operationId": "GetLink",
         "responses": {
           "200": {
@@ -808,7 +813,7 @@
         ]
       },
       "put": {
-        "summary": "Set creates or updates the device.",
+        "summary": "Set a link configuration from the Application Server a Network Server.\nThis call returns immediately after setting the link configuration; it does not wait for a link to establish.\nTo get link statistics or errors, use the `GetLinkStats` call.",
         "operationId": "SetLink",
         "responses": {
           "200": {
@@ -841,7 +846,6 @@
     },
     "/as/applications/{application_id}/link": {
       "delete": {
-        "summary": "Delete deletes the device that matches the given identifiers.\nIf there are multiple matches, an error will be returned.",
         "operationId": "DeleteLink",
         "responses": {
           "200": {
@@ -866,6 +870,7 @@
     },
     "/as/applications/{application_id}/link/stats": {
       "get": {
+        "summary": "GetLinkStats returns the link statistics.\nThis call returns a NotFound error code if there is no link for the given application identifiers.\nThis call returns the error code of the link error if linking to a Network Server failed.",
         "operationId": "GetLinkStats",
         "responses": {
           "200": {
@@ -890,6 +895,7 @@
     },
     "/as/applications/{end_device.ids.application_ids.application_id}/devices": {
       "post": {
+        "summary": "Set a link configuration from the Application Server a Network Server.\nThis call returns immediately after setting the link configuration; it does not wait for a link to establish.\nTo get link statistics or errors, use the `GetLinkStats` call.",
         "operationId": "Set2",
         "responses": {
           "200": {
@@ -922,6 +928,7 @@
     },
     "/as/applications/{end_device.ids.application_ids.application_id}/devices/{end_device.ids.device_id}": {
       "put": {
+        "summary": "Set a link configuration from the Application Server a Network Server.\nThis call returns immediately after setting the link configuration; it does not wait for a link to establish.\nTo get link statistics or errors, use the `GetLinkStats` call.",
         "operationId": "Set",
         "responses": {
           "200": {
@@ -1025,6 +1032,7 @@
     },
     "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/down/push": {
       "post": {
+        "summary": "Set a link configuration from the Application Server a Network Server.\nThis call returns immediately after setting the link configuration; it does not wait for a link to establish.\nTo get link statistics or errors, use the `GetLinkStats` call.",
         "operationId": "DownlinkQueuePush",
         "responses": {
           "200": {
@@ -1293,6 +1301,7 @@
     },
     "/auth_info": {
       "get": {
+        "summary": "AuthInfo returns information about the authentication that is used on the request.",
         "operationId": "AuthInfo",
         "responses": {
           "200": {
@@ -1309,6 +1318,7 @@
     },
     "/clients": {
       "get": {
+        "summary": "List OAuth clients. See request message for details.",
         "operationId": "List",
         "responses": {
           "200": {
@@ -1414,6 +1424,7 @@
     },
     "/clients/{client_ids.client_id}": {
       "get": {
+        "summary": "Get the OAuth client with the given identifiers, selecting the fields given\nby the field mask. The method may return more or less fields, depending on\nthe rights of the caller.",
         "operationId": "Get",
         "responses": {
           "200": {
@@ -1449,6 +1460,7 @@
     },
     "/clients/{client_ids.client_id}/collaborators": {
       "get": {
+        "summary": "List OAuth clients. See request message for details.",
         "operationId": "ListCollaborators",
         "responses": {
           "200": {
@@ -1487,6 +1499,7 @@
         ]
       },
       "put": {
+        "summary": "Get the OAuth client with the given identifiers, selecting the fields given\nby the field mask. The method may return more or less fields, depending on\nthe rights of the caller.",
         "operationId": "SetCollaborator",
         "responses": {
           "200": {
@@ -1543,6 +1556,7 @@
     },
     "/clients/{client_id}/rights": {
       "get": {
+        "summary": "Create a new OAuth client. This also sets the given organization or user as\nfirst collaborator with all possible rights.",
         "operationId": "ListRights",
         "responses": {
           "200": {
@@ -1593,6 +1607,7 @@
     },
     "/contact_info/validation": {
       "post": {
+        "summary": "Request validation for the non-validated contact info for the given entity.",
         "operationId": "RequestValidation",
         "responses": {
           "200": {
@@ -1607,6 +1622,7 @@
         ]
       },
       "patch": {
+        "summary": "Validate confirms a contact info validation.",
         "operationId": "Validate",
         "responses": {
           "200": {
@@ -1623,6 +1639,7 @@
     },
     "/events": {
       "post": {
+        "summary": "Stream live events, optionally with a tail of historical events (depending on server support and retention policy).\nEvents may arrive out-of-order.",
         "operationId": "Stream",
         "responses": {
           "200": {
@@ -1649,6 +1666,7 @@
     },
     "/gateways": {
       "get": {
+        "summary": "List gateways. See request message for details.",
         "operationId": "List",
         "responses": {
           "200": {
@@ -1754,6 +1772,7 @@
     },
     "/gateways/{gateway_ids.gateway_id}": {
       "get": {
+        "summary": "Get the gateway with the given identifiers, selecting the fields given\nby the field mask. The method may return more or less fields, depending on\nthe rights of the caller.",
         "operationId": "Get",
         "responses": {
           "200": {
@@ -1843,6 +1862,7 @@
         ]
       },
       "post": {
+        "summary": "Get the gateway with the given identifiers, selecting the fields given\nby the field mask. The method may return more or less fields, depending on\nthe rights of the caller.",
         "operationId": "CreateAPIKey",
         "responses": {
           "200": {
@@ -1914,6 +1934,7 @@
     },
     "/gateways/{gateway_ids.gateway_id}/api-keys/{key_id}": {
       "get": {
+        "summary": "List gateways. See request message for details.",
         "operationId": "GetAPIKey",
         "responses": {
           "200": {
@@ -2063,6 +2084,7 @@
     },
     "/gateways/{gateway_id}/rights": {
       "get": {
+        "summary": "Create a new gateway. This also sets the given organization or user as\nfirst collaborator with all possible rights.",
         "operationId": "ListRights",
         "responses": {
           "200": {
@@ -2095,6 +2117,7 @@
     },
     "/gs/gateways/{gateway_id}/connection/stats": {
       "get": {
+        "summary": "Link the gateway to the Gateway Server.",
         "operationId": "GetGatewayConnectionStats",
         "responses": {
           "200": {
@@ -2127,6 +2150,7 @@
     },
     "/invitations": {
       "get": {
+        "summary": "Get the user with the given identifiers, selecting the fields given by the\nfield mask. The method may return more or less fields, depending on the rights\nof the caller.",
         "operationId": "List",
         "responses": {
           "200": {
@@ -2181,6 +2205,7 @@
         ]
       },
       "post": {
+        "summary": "Register a new user. This method may be restricted by network settings.",
         "operationId": "Send",
         "responses": {
           "200": {
@@ -2649,6 +2674,7 @@
     },
     "/organizations": {
       "get": {
+        "summary": "List organizations. See request message for details.",
         "operationId": "List",
         "responses": {
           "200": {
@@ -2828,6 +2854,7 @@
     },
     "/organizations/{collaborator.organization_ids.organization_id}/clients": {
       "get": {
+        "summary": "List OAuth clients. See request message for details.",
         "operationId": "List3",
         "responses": {
           "200": {
@@ -2899,6 +2926,7 @@
         ]
       },
       "post": {
+        "summary": "Create a new OAuth client. This also sets the given organization or user as\nfirst collaborator with all possible rights.",
         "operationId": "Create2",
         "responses": {
           "200": {
@@ -2932,6 +2960,7 @@
     },
     "/organizations/{collaborator.organization_ids.organization_id}/gateways": {
       "get": {
+        "summary": "List gateways. See request message for details.",
         "operationId": "List3",
         "responses": {
           "200": {
@@ -3003,6 +3032,7 @@
         ]
       },
       "post": {
+        "summary": "Create a new gateway. This also sets the given organization or user as\nfirst collaborator with all possible rights.",
         "operationId": "Create2",
         "responses": {
           "200": {
@@ -3069,6 +3099,7 @@
     },
     "/organizations/{organization_ids.organization_id}": {
       "get": {
+        "summary": "Get the organization with the given identifiers, selecting the fields given\nby the field mask. The method may return more or less fields, depending on\nthe rights of the caller.",
         "operationId": "Get",
         "responses": {
           "200": {
@@ -3105,6 +3136,7 @@
     },
     "/organizations/{organization_ids.organization_id}/api-keys": {
       "get": {
+        "summary": "List organizations. See request message for details.",
         "operationId": "ListAPIKeys",
         "responses": {
           "200": {
@@ -3144,6 +3176,7 @@
         ]
       },
       "post": {
+        "summary": "Get the organization with the given identifiers, selecting the fields given\nby the field mask. The method may return more or less fields, depending on\nthe rights of the caller.",
         "operationId": "CreateAPIKey",
         "responses": {
           "200": {
@@ -3288,6 +3321,7 @@
         ]
       },
       "put": {
+        "summary": "Set the rights of a collaborator (member) on the organization. Users\nare considered to be a collaborator if they have at least one right on the\norganization.\nNote that only users can collaborate (be member of) an organization.",
         "operationId": "SetCollaborator",
         "responses": {
           "200": {
@@ -3346,6 +3380,7 @@
     },
     "/organizations/{organization_id}/rights": {
       "get": {
+        "summary": "Create a new organization. This also sets the given user as\nfirst collaborator with all possible rights.",
         "operationId": "ListRights",
         "responses": {
           "200": {
@@ -3698,6 +3733,7 @@
     },
     "/users": {
       "post": {
+        "summary": "Register a new user. This method may be restricted by network settings.",
         "operationId": "Create",
         "responses": {
           "200": {
@@ -3830,6 +3866,7 @@
     },
     "/users/{collaborator.user_ids.user_id}/clients": {
       "get": {
+        "summary": "List OAuth clients. See request message for details.",
         "operationId": "List2",
         "responses": {
           "200": {
@@ -3901,6 +3938,7 @@
         ]
       },
       "post": {
+        "summary": "Create a new OAuth client. This also sets the given organization or user as\nfirst collaborator with all possible rights.",
         "operationId": "Create",
         "responses": {
           "200": {
@@ -3934,6 +3972,7 @@
     },
     "/users/{collaborator.user_ids.user_id}/gateways": {
       "get": {
+        "summary": "List gateways. See request message for details.",
         "operationId": "List2",
         "responses": {
           "200": {
@@ -4005,6 +4044,7 @@
         ]
       },
       "post": {
+        "summary": "Create a new gateway. This also sets the given organization or user as\nfirst collaborator with all possible rights.",
         "operationId": "Create",
         "responses": {
           "200": {
@@ -4038,6 +4078,7 @@
     },
     "/users/{collaborator.user_ids.user_id}/organizations": {
       "get": {
+        "summary": "List organizations. See request message for details.",
         "operationId": "List2",
         "responses": {
           "200": {
@@ -4109,6 +4150,7 @@
         ]
       },
       "post": {
+        "summary": "Create a new organization. This also sets the given user as\nfirst collaborator with all possible rights.",
         "operationId": "Create",
         "responses": {
           "200": {
@@ -4175,6 +4217,7 @@
     },
     "/users/{user_ids.user_id}": {
       "get": {
+        "summary": "Get the user with the given identifiers, selecting the fields given by the\nfield mask. The method may return more or less fields, depending on the rights\nof the caller.",
         "operationId": "Get",
         "responses": {
           "200": {
@@ -4264,6 +4307,7 @@
         ]
       },
       "post": {
+        "summary": "Get the user with the given identifiers, selecting the fields given by the\nfield mask. The method may return more or less fields, depending on the rights\nof the caller.",
         "operationId": "CreateAPIKey",
         "responses": {
           "200": {
@@ -4337,6 +4381,7 @@
     },
     "/users/{user_ids.user_id}/api-keys/{key_id}": {
       "get": {
+        "summary": "Create a temporary password that can be used for updating a forgotten password.\nThe generated password is sent to the user's email address.",
         "operationId": "GetAPIKey",
         "responses": {
           "200": {
@@ -4607,6 +4652,7 @@
     },
     "/users/{user_ids.user_id}/sessions": {
       "get": {
+        "summary": "Register a new user. This method may be restricted by network settings.",
         "operationId": "List",
         "responses": {
           "200": {
@@ -4662,6 +4708,7 @@
     },
     "/users/{user_ids.user_id}/sessions/{session_id}": {
       "delete": {
+        "summary": "Get the user with the given identifiers, selecting the fields given by the\nfield mask. The method may return more or less fields, depending on the rights\nof the caller.",
         "operationId": "Delete",
         "responses": {
           "200": {
@@ -4700,6 +4747,7 @@
     },
     "/users/{user_ids.user_id}/temporary_password": {
       "post": {
+        "summary": "Create a temporary password that can be used for updating a forgotten password.\nThe generated password is sent to the user's email address.",
         "operationId": "CreateTemporaryPassword",
         "responses": {
           "200": {
@@ -4757,6 +4805,7 @@
     },
     "/users/{user_id}/rights": {
       "get": {
+        "summary": "Register a new user. This method may be restricted by network settings.",
         "operationId": "ListRights",
         "responses": {
           "200": {
@@ -5475,7 +5524,7 @@
       "properties": {
         "type_url": {
           "type": "string",
-          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
         },
         "value": {
           "type": "string",
@@ -5496,7 +5545,7 @@
           "description": "The set of field mask paths."
         }
       },
-      "description": "paths: \"f.a\"\n    paths: \"f.b.d\"\n\nHere `f` represents a field in some root message, `a` and `b`\nfields in the message found in `f`, and `d` a field found in the\nmessage in `f.b`.\n\nField masks are used to specify a subset of fields that should be\nreturned by a get operation or modified by an update operation.\nField masks also have a custom JSON encoding (see below).\n\n# Field Masks in Projections\n\nWhen used in the context of a projection, a response message or\nsub-message is filtered by the API to only contain those fields as\nspecified in the mask. For example, if the mask in the previous\nexample is applied to a response message as follows:\n\n    f {\n      a : 22\n      b {\n        d : 1\n        x : 2\n      }\n      y : 13\n    }\n    z: 8\n\nThe result will not contain specific values for fields x,y and z\n(their value will be set to the default, and omitted in proto text\noutput):\n\n\n    f {\n      a : 22\n      b {\n        d : 1\n      }\n    }\n\nA repeated field is not allowed except at the last position of a\npaths string.\n\nIf a FieldMask object is not present in a get operation, the\noperation applies to all fields (as if a FieldMask of all fields\nhad been specified).\n\nNote that a field mask does not necessarily apply to the\ntop-level response message. In case of a REST get operation, the\nfield mask applies directly to the response, but in case of a REST\nlist operation, the mask instead applies to each individual message\nin the returned resource list. In case of a REST custom method,\nother definitions may be used. Where the mask applies will be\nclearly documented together with its declaration in the API.  In\nany case, the effect on the returned resource/resources is required\nbehavior for APIs.\n\n# Field Masks in Update Operations\n\nA field mask in update operations specifies which fields of the\ntargeted resource are going to be updated. The API is required\nto only change the values of the fields as specified in the mask\nand leave the others untouched. If a resource is passed in to\ndescribe the updated values, the API ignores the values of all\nfields not covered by the mask.\n\nIf a repeated field is specified for an update operation, the existing\nrepeated values in the target resource will be overwritten by the new values.\nNote that a repeated field is only allowed in the last position of a `paths`\nstring.\n\nIf a sub-message is specified in the last position of the field mask for an\nupdate operation, then the existing sub-message in the target resource is\noverwritten. Given the target message:\n\n    f {\n      b {\n        d : 1\n        x : 2\n      }\n      c : 1\n    }\n\nAnd an update message:\n\n    f {\n      b {\n        d : 10\n      }\n    }\n\nthen if the field mask is:\n\n paths: \"f.b\"\n\nthen the result will be:\n\n    f {\n      b {\n        d : 10\n      }\n      c : 1\n    }\n\nHowever, if the update mask was:\n\n paths: \"f.b.d\"\n\nthen the result would be:\n\n    f {\n      b {\n        d : 10\n        x : 2\n      }\n      c : 1\n    }\n\nIn order to reset a field's value to the default, the field must\nbe in the mask and set to the default value in the provided resource.\nHence, in order to reset all fields of a resource, provide a default\ninstance of the resource and set all fields in the mask, or do\nnot provide a mask as described below.\n\nIf a field mask is not present on update, the operation applies to\nall fields (as if a field mask of all fields has been specified).\nNote that in the presence of schema evolution, this may mean that\nfields the client does not know and has therefore not filled into\nthe request will be reset to their default. If this is unwanted\nbehavior, a specific service may require a client to always specify\na field mask, producing an error if not.\n\nAs with get operations, the location of the resource which\ndescribes the updated values in the request message depends on the\noperation kind. In any case, the effect of the field mask is\nrequired to be honored by the API.\n\n## Considerations for HTTP REST\n\nThe HTTP kind of an update operation which uses a field mask must\nbe set to PATCH instead of PUT in order to satisfy HTTP semantics\n(PUT must only be used for full updates).\n\n# JSON Encoding of Field Masks\n\nIn JSON, a field mask is encoded as a single string where paths are\nseparated by a comma. Fields name in each path are converted\nto/from lower-camel naming conventions.\n\nAs an example, consider the following message declarations:\n\n    message Profile {\n      User user = 1;\n      Photo photo = 2;\n    }\n    message User {\n      string display_name = 1;\n      string address = 2;\n    }\n\nIn proto a field mask for `Profile` may look as such:\n\n    mask {\n      paths: \"user.display_name\"\n      paths: \"photo\"\n    }\n\nIn JSON, the same mask is represented as below:\n\n    {\n      mask: \"user.displayName,photo\"\n    }\n\n# Field Masks and Oneof Fields\n\nField masks treat fields in oneofs just as regular fields. Consider the\nfollowing message:\n\n    message SampleMessage {\n      oneof test_oneof {\n        string name = 4;\n        SubMessage sub_message = 9;\n      }\n    }\n\nThe field mask can be:\n\n    mask {\n      paths: \"name\"\n    }\n\nOr:\n\n    mask {\n      paths: \"sub_message\"\n    }\n\nNote that oneof type names (\"test_oneof\" in this case) cannot be used in\npaths.\n\n## Field Mask Verification\n\nThe implementation of any API method which has a FieldMask type field in the\nrequest should verify the included field paths, and return an\n`INVALID_ARGUMENT` error if any path is duplicated or unmappable.",
+      "description": "paths: \"f.a\"\n    paths: \"f.b.d\"\n\nHere `f` represents a field in some root message, `a` and `b`\nfields in the message found in `f`, and `d` a field found in the\nmessage in `f.b`.\n\nField masks are used to specify a subset of fields that should be\nreturned by a get operation or modified by an update operation.\nField masks also have a custom JSON encoding (see below).\n\n# Field Masks in Projections\n\nWhen used in the context of a projection, a response message or\nsub-message is filtered by the API to only contain those fields as\nspecified in the mask. For example, if the mask in the previous\nexample is applied to a response message as follows:\n\n    f {\n      a : 22\n      b {\n        d : 1\n        x : 2\n      }\n      y : 13\n    }\n    z: 8\n\nThe result will not contain specific values for fields x,y and z\n(their value will be set to the default, and omitted in proto text\noutput):\n\n\n    f {\n      a : 22\n      b {\n        d : 1\n      }\n    }\n\nA repeated field is not allowed except at the last position of a\npaths string.\n\nIf a FieldMask object is not present in a get operation, the\noperation applies to all fields (as if a FieldMask of all fields\nhad been specified).\n\nNote that a field mask does not necessarily apply to the\ntop-level response message. In case of a REST get operation, the\nfield mask applies directly to the response, but in case of a REST\nlist operation, the mask instead applies to each individual message\nin the returned resource list. In case of a REST custom method,\nother definitions may be used. Where the mask applies will be\nclearly documented together with its declaration in the API.  In\nany case, the effect on the returned resource/resources is required\nbehavior for APIs.\n\n# Field Masks in Update Operations\n\nA field mask in update operations specifies which fields of the\ntargeted resource are going to be updated. The API is required\nto only change the values of the fields as specified in the mask\nand leave the others untouched. If a resource is passed in to\ndescribe the updated values, the API ignores the values of all\nfields not covered by the mask.\n\nIf a repeated field is specified for an update operation, new values will\nbe appended to the existing repeated field in the target resource. Note that\na repeated field is only allowed in the last position of a `paths` string.\n\nIf a sub-message is specified in the last position of the field mask for an\nupdate operation, then new value will be merged into the existing sub-message\nin the target resource.\n\nFor example, given the target message:\n\n    f {\n      b {\n        d: 1\n        x: 2\n      }\n      c: [1]\n    }\n\nAnd an update message:\n\n    f {\n      b {\n        d: 10\n      }\n      c: [2]\n    }\n\nthen if the field mask is:\n\n paths: [\"f.b\", \"f.c\"]\n\nthen the result will be:\n\n    f {\n      b {\n        d: 10\n        x: 2\n      }\n      c: [1, 2]\n    }\n\nAn implementation may provide options to override this default behavior for\nrepeated and message fields.\n\nIn order to reset a field's value to the default, the field must\nbe in the mask and set to the default value in the provided resource.\nHence, in order to reset all fields of a resource, provide a default\ninstance of the resource and set all fields in the mask, or do\nnot provide a mask as described below.\n\nIf a field mask is not present on update, the operation applies to\nall fields (as if a field mask of all fields has been specified).\nNote that in the presence of schema evolution, this may mean that\nfields the client does not know and has therefore not filled into\nthe request will be reset to their default. If this is unwanted\nbehavior, a specific service may require a client to always specify\na field mask, producing an error if not.\n\nAs with get operations, the location of the resource which\ndescribes the updated values in the request message depends on the\noperation kind. In any case, the effect of the field mask is\nrequired to be honored by the API.\n\n## Considerations for HTTP REST\n\nThe HTTP kind of an update operation which uses a field mask must\nbe set to PATCH instead of PUT in order to satisfy HTTP semantics\n(PUT must only be used for full updates).\n\n# JSON Encoding of Field Masks\n\nIn JSON, a field mask is encoded as a single string where paths are\nseparated by a comma. Fields name in each path are converted\nto/from lower-camel naming conventions.\n\nAs an example, consider the following message declarations:\n\n    message Profile {\n      User user = 1;\n      Photo photo = 2;\n    }\n    message User {\n      string display_name = 1;\n      string address = 2;\n    }\n\nIn proto a field mask for `Profile` may look as such:\n\n    mask {\n      paths: \"user.display_name\"\n      paths: \"photo\"\n    }\n\nIn JSON, the same mask is represented as below:\n\n    {\n      mask: \"user.displayName,photo\"\n    }\n\n# Field Masks and Oneof Fields\n\nField masks treat fields in oneofs just as regular fields. Consider the\nfollowing message:\n\n    message SampleMessage {\n      oneof test_oneof {\n        string name = 4;\n        SubMessage sub_message = 9;\n      }\n    }\n\nThe field mask can be:\n\n    mask {\n      paths: \"name\"\n    }\n\nOr:\n\n    mask {\n      paths: \"sub_message\"\n    }\n\nNote that oneof type names (\"test_oneof\" in this case) cannot be used in\npaths.\n\n## Field Mask Verification\n\nThe implementation of any API method which has a FieldMask type field in the\nrequest should verify the included field paths, and return an\n`INVALID_ARGUMENT` error if any path is duplicated or unmappable.",
       "title": "`FieldMask` represents a set of symbolic field paths, for example:"
     },
     "protobufListValue": {
