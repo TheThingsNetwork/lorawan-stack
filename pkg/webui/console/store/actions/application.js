@@ -15,7 +15,10 @@
 import createApiKeysRequestActions, { createGetApiKeysListActionType } from './api-keys'
 import createApiKeyRequestActions, { createGetApiKeyActionType } from './api-key'
 
-import { createGetCollaboratorsListActionType } from './collaborators'
+import {
+  createGetCollaboratorsListRequestActions,
+  createGetCollaboratorsListActionType,
+} from './collaborators'
 
 import {
   startEventsStream,
@@ -80,7 +83,7 @@ export const [{
   request: getApplicationCollaboratorsList,
   success: getApplicationCollaboratorsListSuccess,
   failure: getApplicationCollaboratorsListFailure,
-}] = createRequestActions(GET_APP_COLLABORATORS_LIST_BASE, (appId, { page, limit } = {}) => ({ appId, params: { page, limit }}))
+}] = createGetCollaboratorsListRequestActions(SHARED_NAME)
 
 export const START_APP_EVENT_STREAM = createStartEventsStreamActionType(SHARED_NAME)
 export const START_APP_EVENT_STREAM_SUCCESS = createStartEventsStreamSuccessActionType(SHARED_NAME)

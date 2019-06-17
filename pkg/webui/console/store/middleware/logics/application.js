@@ -50,7 +50,7 @@ const getApplicationApiKeyLogic = createRequestLogic({
 const getApplicationCollaboratorsLogic = createRequestLogic({
   type: application.GET_APP_COLLABORATORS_LIST,
   async process ({ action }) {
-    const { appId } = action.payload
+    const { id: appId } = action.payload
     const res = await api.application.collaborators.list(appId)
     const collaborators = res.collaborators.map(function (collaborator) {
       const { ids, ...rest } = collaborator
