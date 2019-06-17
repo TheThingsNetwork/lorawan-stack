@@ -51,7 +51,7 @@ const createRequestLogic = function (
     successAction = payload => ({ type: successType, payload })
   }
   if (typeof failType === 'string') {
-    failAction = error => ({ type: failType, error })
+    failAction = error => ({ type: failType, error: true, payload: error })
   }
 
   return createLogic({
