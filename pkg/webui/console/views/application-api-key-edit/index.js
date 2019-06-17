@@ -59,9 +59,9 @@ import api from '../../api'
   }
 },
 dispatch => ({
-  loadPageData (appId, apiKeyId) {
+  async loadPageData (appId, apiKeyId) {
+    await dispatch(getApplicationsRightsList(appId))
     dispatch(getApplicationApiKey(appId, apiKeyId))
-    dispatch(getApplicationsRightsList(appId))
   },
   deleteSuccess: appId => dispatch(replace(`/console/applications/${appId}/api-keys`)),
 }))

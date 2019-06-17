@@ -81,8 +81,8 @@ const m = defineMessages({
     error: collaboratorsError || rightsError,
   }
 }, dispatch => ({
-  loadData (appId) {
-    dispatch(getApplicationsRightsList(appId))
+  async loadData (appId) {
+    await dispatch(getApplicationsRightsList(appId))
     dispatch(getApplicationCollaboratorsList(appId))
   },
   redirectToList (appId) {
