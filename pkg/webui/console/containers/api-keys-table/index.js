@@ -85,7 +85,6 @@ export default class ApiKeysTable extends Component {
         entity="keys"
         headers={headers}
         addMessage={sharedMessages.addApiKey}
-        handlesPagination
         pageSize={pageSize}
         baseDataSelector={baseDataSelector}
         getItemsAction={getItemsAction}
