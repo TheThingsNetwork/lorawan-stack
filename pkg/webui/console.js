@@ -34,6 +34,8 @@ const env = {
   assets_root: window.ASSETS_ROOT,
   config: window.APP_CONFIG,
   page_data: window.PAGE_DATA,
+  site_name: window.SITE_NAME,
+  site_title: window.SITE_TITLE,
 }
 
 const Console = () => (
