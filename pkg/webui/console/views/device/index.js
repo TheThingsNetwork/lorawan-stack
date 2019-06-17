@@ -16,7 +16,6 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Switch, Route } from 'react-router'
 import { Col, Row, Container } from 'react-grid-system'
-import { defineMessages } from 'react-intl'
 
 import sharedMessages from '../../../lib/shared-messages'
 import Message from '../../../lib/components/message'
@@ -37,13 +36,11 @@ import {
   stopDeviceEventsStream,
 } from '../../store/actions/device'
 
+import withEnv, { EnvProvider } from '../../../lib/components/env'
 import { selectDeviceFetching, selectGetDeviceError } from '../../store/selectors/device'
 
 import style from './device.styl'
 
-const m = defineMessages({
-  title: '%s - {deviceName} - The Things Network Console',
-})
 
 @connect(function (state, props) {
   const { device } = state
@@ -71,6 +68,8 @@ const m = defineMessages({
     />
   )
 })
+
+@withEnv
 export default class Device extends React.Component {
 
   componentDidMount () {
@@ -115,6 +114,7 @@ export default class Device extends React.Component {
       devId,
       deviceName,
       device,
+      env,
     } = this.props
 
     if (fetching || !device) {
@@ -146,9 +146,9 @@ export default class Device extends React.Component {
     ]
 
     return (
-      <React.Fragment>
+      <EnvProvider env={env}>
         <IntlHelmet
-          titleTemplate={m.title} values={{ deviceName: deviceName || devId }}
+          titleTemplate={`%s - ${deviceName || devId} - ${env.site_name}`}
         />
         <Container>
           <Row>
@@ -170,7 +170,7 @@ export default class Device extends React.Component {
           <Route exact path={`${basePath}/general-settings`} component={DeviceGeneralSettings} />
           <Route path={`${basePath}/payload-formatters`} component={DevicePayloadFormatters} />
         </Switch>
-      </React.Fragment>
+      </EnvProvider>
     )
   }
 }
