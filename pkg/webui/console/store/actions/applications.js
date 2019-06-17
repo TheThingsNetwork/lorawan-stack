@@ -12,10 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {
-  createGetRightsListActionType,
-} from './rights'
-
+import createGetRightsListRequestActions, { createGetRightsListActionType } from './rights'
 import { createRequestActions } from './lib'
 
 export const SHARED_NAME = 'APPLICATIONS'
@@ -42,5 +39,5 @@ export const [{
   request: getApplicationsRightsList,
   success: getApplicationsRightsListSuccess,
   failure: getApplicationsRightsListFailure,
-}] = createRequestActions(GET_APPS_RIGHTS_LIST_BASE, id => ({ id }))
+}] = createGetRightsListRequestActions(SHARED_NAME)
 

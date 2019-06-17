@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { createGetRightsListActionType } from '../actions/rights'
+import createGetRightsListRequestActions, { createGetRightsListActionType } from './rights'
 import { createRequestActions } from './lib'
 
 export const SHARED_NAME = 'GATEWAYS'
@@ -39,4 +39,4 @@ export const [{
   request: getGatewaysRightsList,
   success: getGatewaysRightsListSuccess,
   failure: getGatewaysRightsListFailure,
-}] = createRequestActions(GET_GTWS_RIGHTS_LIST_BASE, id => ({ id }))
+}] = createGetRightsListRequestActions(SHARED_NAME)
