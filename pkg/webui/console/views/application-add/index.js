@@ -25,6 +25,7 @@ import Input from '../../../components/input'
 import SubmitButton from '../../../components/submit-button'
 import Message from '../../../lib/components/message'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
+import IntlHelmet from '../../../lib/components/intl-helmet'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import sharedMessages from '../../../lib/shared-messages'
 import { id as applicationIdRegexp } from '../../lib/regexp'
@@ -108,6 +109,7 @@ export default class Add extends React.Component {
       <Container>
         <Row className={style.wrapper}>
           <Col sm={12}>
+            <IntlHelmet title={sharedMessages.addApplication} />
             <Message component="h2" content={sharedMessages.addApplication} />
           </Col>
           <Col className={style.form} sm={12} md={8} lg={8} xl={8}>

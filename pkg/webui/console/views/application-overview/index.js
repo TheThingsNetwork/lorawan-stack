@@ -17,6 +17,8 @@ import { connect } from 'react-redux'
 import { Col, Row, Container } from 'react-grid-system'
 
 import sharedMessages from '../../../lib/shared-messages'
+
+import IntlHelmet from '../../../lib/components/intl-helmet'
 import DateTime from '../../../lib/components/date-time'
 import DevicesTable from '../../containers/devices-table'
 import DataSheet from '../../../components/data-sheet'
@@ -33,6 +35,7 @@ const DEVICES_TABLE_SIZE = 5
     application: selectSelectedApplication(state),
   }
 })
+
 class ApplicationOverview extends React.Component {
 
   get applicationInfo () {
@@ -71,6 +74,7 @@ class ApplicationOverview extends React.Component {
 
     return (
       <Container>
+        <IntlHelmet title={sharedMessages.overview} />
         <Row>
           <Col sm={12} lg={6}>
             {this.applicationInfo}
