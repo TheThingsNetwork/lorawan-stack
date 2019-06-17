@@ -109,8 +109,8 @@ const getGatewayApiKeysLogic = createRequestLogic({
 const getGatewayApiKeyLogic = createRequestLogic({
   type: gateway.GET_GTW_API_KEY,
   async process ({ action }) {
-    const { entityId, keyId } = action.payload
-    return api.gateway.apiKeys.get(entityId, keyId)
+    const { id: gtwId, keyId } = action.payload
+    return api.gateway.apiKeys.get(gtwId, keyId)
   },
 })
 

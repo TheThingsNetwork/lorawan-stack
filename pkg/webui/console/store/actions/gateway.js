@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import createApiKeysRequestAction, { createGetApiKeysListActionType } from './api-keys'
-import { createGetApiKeyActionType } from './api-key'
+import createApiKeysRequestActions, { createGetApiKeysListActionType } from './api-keys'
+import createApiKeyRequestActions, { createGetApiKeyActionType } from './api-key'
 
 import {
   startEventsStream,
@@ -66,7 +66,7 @@ export const [{
   request: getGatewayApiKey,
   success: getGatewayApiKeySuccess,
   failure: getGatewayApiKeyFailure,
-}] = createRequestActions(GET_GTW_API_KEY_BASE, (gtwId, keyId) => ({ entityId: gtwId, keyId }))
+}] = createApiKeyRequestActions(SHARED_NAME)
 
 export const GET_GTW_API_KEYS_LIST_BASE = createGetApiKeysListActionType(SHARED_NAME)
 export const [{
@@ -77,7 +77,7 @@ export const [{
   request: getGatewayApiKeysList,
   success: getGatewayApiKeysListSuccess,
   failure: getGatewayApiKeysListFailure,
-}] = createApiKeysRequestAction(SHARED_NAME)
+}] = createApiKeysRequestActions(SHARED_NAME)
 
 export const UPDATE_GTW = 'UPDATE_GATEWAY'
 export const START_GTW_STATS = 'START_GATEWAY_STATISTICS'

@@ -42,8 +42,8 @@ const getApplicationApiKeysLogic = createRequestLogic({
 const getApplicationApiKeyLogic = createRequestLogic({
   type: application.GET_APP_API_KEY,
   async process ({ action }) {
-    const { entityId, keyId } = action.payload
-    return api.application.apiKeys.get(entityId, keyId)
+    const { id: appId, keyId } = action.payload
+    return api.application.apiKeys.get(appId, keyId)
   },
 })
 

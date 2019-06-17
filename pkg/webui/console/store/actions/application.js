@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import createApiKeysRequestActions, { createGetApiKeysListActionType } from '../actions/api-keys'
+import createApiKeysRequestActions, { createGetApiKeysListActionType } from './api-keys'
+import createApiKeyRequestActions, { createGetApiKeyActionType } from './api-key'
 
-import { createGetCollaboratorsListActionType } from '../actions/collaborators'
+import { createGetCollaboratorsListActionType } from './collaborators'
 
 import {
   startEventsStream,
@@ -27,11 +28,8 @@ import {
   createStopEventsStreamActionType,
   clearEvents,
   createClearEventsActionType,
-} from '../actions/events'
+} from './events'
 
-import {
-  createGetApiKeyActionType,
-} from './api-key'
 
 import { createRequestActions } from './lib'
 
@@ -71,7 +69,7 @@ export const [{
   request: getApplicationApiKey,
   success: getApplicationApiKeySuccess,
   failure: getApplicationApiKeyFailure,
-}] = createRequestActions(GET_APP_API_KEY_BASE, (appId, keyId) => ({ entityId: appId, keyId }))
+}] = createApiKeyRequestActions(SHARED_NAME)
 
 export const GET_APP_COLLABORATORS_LIST_BASE = createGetCollaboratorsListActionType(SHARED_NAME)
 export const [{
