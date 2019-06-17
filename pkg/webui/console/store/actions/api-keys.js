@@ -12,34 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const GET_API_KEYS_LIST = 'GET_API_KEYS_LIST'
-export const GET_API_KEYS_LIST_SUCCESS = 'GET_API_KEYS_LIST_SUCCESS'
-export const GET_API_KEYS_LIST_FAILURE = 'GET_API_KEYS_LIST_FAILURE'
+import { createRequestActions } from './lib'
 
 export const createGetApiKeysListActionType = name => (
   `GET_${name}_API_KEYS_LIST`
 )
 
-export const createGetApiKeysListSuccessActionType = name => (
-  `GET_${name}_API_KEYS_LIST_SUCCESS`
-)
-
-export const createGetApiKeysListFailureActionType = name => (
-  `GET_${name}_API_KEYS_LIST_FAILURE`
-)
-
-export const createGetApiKeyActionType = name => (
-  `GET_${name}_API_KEY`
-)
-
-export const getApiKeysList = name => (id, params) => (
-  { type: createGetApiKeysListActionType(name), id, params }
-)
-
-export const getApiKeysListSuccess = name => (id, keys, totalCount) => (
-  { type: createGetApiKeysListSuccessActionType(name), id, keys, totalCount }
-)
-
-export const getApiKeysListFailure = name => (id, error) => (
-  { type: createGetApiKeysListFailureActionType(name), id, error }
+export default name => createRequestActions(
+  createGetApiKeysListActionType(name),
+  (id, { page, limit }) => ({ id, params: { page, limit }})
 )

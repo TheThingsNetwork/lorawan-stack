@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { createGetApiKeysListActionType } from './api-keys'
+import createApiKeysRequestAction, { createGetApiKeysListActionType } from './api-keys'
 import { createGetApiKeyActionType } from './api-key'
 
 import {
@@ -77,7 +77,7 @@ export const [{
   request: getGatewayApiKeysList,
   success: getGatewayApiKeysListSuccess,
   failure: getGatewayApiKeysListFailure,
-}] = createRequestActions(GET_GTW_API_KEYS_LIST_BASE, (id, params) => ({ id, params }))
+}] = createApiKeysRequestAction(SHARED_NAME)
 
 export const UPDATE_GTW = 'UPDATE_GATEWAY'
 export const START_GTW_STATS = 'START_GATEWAY_STATISTICS'

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { createGetApiKeysListActionType } from '../actions/api-keys'
+import createApiKeysRequestActions, { createGetApiKeysListActionType } from '../actions/api-keys'
 
 import { createGetCollaboratorsListActionType } from '../actions/collaborators'
 
@@ -60,7 +60,7 @@ export const [{
   request: getApplicationApiKeysList,
   success: getApplicationApiKeysListSuccess,
   failure: getApplicationApiKeysListFailure,
-}] = createRequestActions(GET_APP_API_KEYS_LIST_BASE, (appId, { page, limit } = {}) => ({ appId, params: { page, limit }}))
+}] = createApiKeysRequestActions(SHARED_NAME)
 
 export const GET_APP_API_KEY_BASE = createGetApiKeyActionType(SHARED_NAME)
 export const [{

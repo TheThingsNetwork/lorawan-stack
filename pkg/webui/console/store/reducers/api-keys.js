@@ -38,7 +38,7 @@ const createNamedApiKeyReducer = function (reducerName = '') {
   }
 }
 
-const createNamedAPIKeysReducer = function (reducerName = '') {
+const createNamedApiKeysReducer = function (reducerName = '') {
   const GET_LIST_BASE = createGetApiKeysListActionType(reducerName)
   const [{ success: GET_LIST_SUCCESS }] = createRequestActions(GET_LIST_BASE)
   const apiKey = createNamedApiKeyReducer(reducerName)
@@ -61,4 +61,4 @@ const createNamedAPIKeysReducer = function (reducerName = '') {
   }
 }
 
-export default createNamedAPIKeysReducer
+export default createNamedApiKeysReducer

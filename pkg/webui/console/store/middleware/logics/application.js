@@ -33,7 +33,7 @@ const getApplicationLogic = createRequestLogic({
 const getApplicationApiKeysLogic = createRequestLogic({
   type: application.GET_APP_API_KEYS_LIST,
   async process ({ getState, action }) {
-    const { appId, params: { page, limit }} = action.payload
+    const { id: appId, params: { page, limit }} = action.payload
     const res = await api.application.apiKeys.list(appId, { limit, page })
     return { ...res, id: appId }
   },
