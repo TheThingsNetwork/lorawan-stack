@@ -12,23 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const GET_APP_LINK = 'GET_APPLICATION_LINK_REQUEST'
-export const GET_APP_LINK_SUCCESS = 'GET_APPLICATION_LINK_SUCCESS'
-export const GET_APP_LINK_FAILURE = 'GET_APPLICATION_LINK_FAILURE'
+import { createRequestActions } from './lib'
+
+export const GET_APP_LINK_BASE = 'GET_APPLICATION_LINK'
+export const [{
+  request: GET_APP_LINK,
+  success: GET_APP_LINK_SUCCESS,
+  failure: GET_APP_LINK_FAILURE,
+}, {
+  request: getApplicationLink,
+  success: getApplicationLinkSuccess,
+  failure: getApplicationLinkFailure,
+}] = createRequestActions(GET_APP_LINK_BASE,
+  id => ({ id }),
+  (id, selector) => ({ selector })
+)
+
 export const UPDATE_APP_LINK_SUCCESS = 'UPDATE_APPLICATION_LINK_SUCCESS'
 export const DELETE_APP_LINK_SUCCESS = 'DELETE_APPLICATION_LINK_SUCCESS'
-
-export const getApplicationLink = (id, meta) => (
-  { type: GET_APP_LINK, id, meta }
-)
-
-export const getApplicationLinkSuccess = (link, stats, linked) => (
-  { type: GET_APP_LINK_SUCCESS, link, stats, linked }
-)
-
-export const getApplicationLinkFailure = error => (
-  { type: GET_APP_LINK_FAILURE, error }
-)
 
 export const updateApplicationLinkSuccess = (link, stats) => (
   { type: UPDATE_APP_LINK_SUCCESS, link, stats }

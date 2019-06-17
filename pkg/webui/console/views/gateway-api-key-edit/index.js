@@ -63,9 +63,9 @@ import api from '../../api'
   }
 },
 dispatch => ({
-  loadPageData (gtwId, apiKeyId) {
+  async loadPageData (gtwId, apiKeyId) {
+    await dispatch(getGatewaysRightsList(gtwId))
     dispatch(getGatewayApiKey(gtwId, apiKeyId))
-    dispatch(getGatewaysRightsList(gtwId))
   },
   deleteSuccess: gtwId => dispatch(replace(`/console/gateways/${gtwId}/api-keys`)),
 }))

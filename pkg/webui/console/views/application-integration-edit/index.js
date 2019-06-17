@@ -66,7 +66,7 @@ const webhookEntitySelector = [
 }, function (dispatch, { match }) {
   const { appId, webhookId } = match.params
   return {
-    getWebhook: () => dispatch(getWebhook(appId, webhookId, { selector: webhookEntitySelector })),
+    getWebhook: () => dispatch(getWebhook(appId, webhookId, webhookEntitySelector)),
     navigateToList: () => dispatch(replace(`/console/applications/${appId}/integrations`)),
   }
 })

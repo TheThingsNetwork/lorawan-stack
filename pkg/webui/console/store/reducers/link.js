@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import {
-  GET_APP_LINK,
   GET_APP_LINK_SUCCESS,
   GET_APP_LINK_FAILURE,
   UPDATE_APP_LINK_SUCCESS,
@@ -21,32 +20,28 @@ import {
 } from '../actions/link'
 
 const defaultProps = {
-  fetching: false,
   linked: false,
-  error: undefined,
   link: undefined,
   stats: undefined,
 }
 
-const getLinkSuccess = function (state, { linked, stats, link = {}}) {
+const getLinkSuccess = function (state, { payload }) {
+  const { linked, stats, link = {}} = payload
+
   return {
     ...state,
-    fetching: false,
-    error: undefined,
     linked,
     link,
     stats,
   }
 }
 
-const getLinkFailure = function (state, { error }) {
+const getLinkFailure = function (state) {
   return {
     ...state,
-    fetching: false,
     link: {},
     stats: undefined,
     linked: false,
-    error,
   }
 }
 
@@ -57,8 +52,6 @@ const updateLinkSuccess = function (state, { link, stats }) {
   return {
     ...state,
     linked: true,
-    fetching: false,
-    error: undefined,
     link: newLink,
     stats: newStats,
   }
@@ -67,7 +60,6 @@ const updateLinkSuccess = function (state, { link, stats }) {
 const deleteLinkSuccess = function (state) {
   return {
     ...state,
-    fetching: false,
     linked: false,
     link: {},
     stats: undefined,
@@ -76,11 +68,6 @@ const deleteLinkSuccess = function (state) {
 
 const link = function (state = defaultProps, action) {
   switch (action.type) {
-  case GET_APP_LINK:
-    return {
-      ...state,
-      fetching: true,
-    }
   case GET_APP_LINK_SUCCESS:
     return getLinkSuccess(state, action)
   case UPDATE_APP_LINK_SUCCESS:

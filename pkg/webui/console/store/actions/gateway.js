@@ -12,14 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {
-  getApiKeysList,
-  createGetApiKeysListActionType,
-  getApiKeysListFailure,
-  createGetApiKeysListFailureActionType,
-  getApiKeysListSuccess,
-  createGetApiKeysListSuccessActionType,
-} from '../actions/api-keys'
+import createApiKeysRequestActions, { createGetApiKeysListActionType } from './api-keys'
+import createApiKeyRequestActions, { createGetApiKeyActionType } from './api-key'
 
 import {
   startEventsStream,
@@ -32,52 +26,68 @@ import {
   createStopEventsStreamActionType,
   clearEvents,
   createClearEventsActionType,
-} from '../actions/events'
+} from './events'
 
-import {
-  getApiKey,
-  createGetApiKeyActionType,
-  getApiKeySuccess,
-  createGetApiKeySuccessActionType,
-  getApiKeyFailure,
-  createGetApiKeyFailureActionType,
-} from './api-key'
+import { createRequestActions } from './lib'
 
 export const SHARED_NAME = 'GATEWAY'
 
-export const GET_GTW = 'GET_GATEWAY'
-export const GET_GTW_SUCCESS = 'GET_GATEWAY_SUCCESS'
-export const GET_GTW_FAILURE = 'GET_GATEWAY_FAILURE'
+export const GET_GTW_BASE = 'GET_GATEWAY'
+export const [{
+  request: GET_GTW,
+  success: GET_GTW_SUCCESS,
+  failure: GET_GTW_FAILURE,
+}, {
+  request: getGateway,
+  success: getGatewaySuccess,
+  failure: getGatewayFailure,
+}] = createRequestActions(GET_GTW_BASE,
+  id => ({ id }),
+  (id, selector) => ({ selector })
+)
+
+export const UPDATE_GTW_STATS_BASE = 'UPDATE_GATEWAY_STATISTICS'
+export const [{
+  request: UPDATE_GTW_STATS,
+  success: UPDATE_GTW_STATS_SUCCESS,
+  failure: UPDATE_GTW_STATS_FAILURE,
+}, {
+  request: updateGatewayStatistics,
+  success: updateGatewayStatisticsSuccess,
+  failure: updateGatewayStatisticsFailure,
+}] = createRequestActions(UPDATE_GTW_STATS_BASE, id => ({ id }))
+
+export const GET_GTW_API_KEY_BASE = createGetApiKeyActionType(SHARED_NAME)
+export const [{
+  request: GET_GTW_API_KEY,
+  success: GET_GTW_API_KEY_SUCCESS,
+  failure: GET_GTW_API_KEY_FAILURE,
+}, {
+  request: getGatewayApiKey,
+  success: getGatewayApiKeySuccess,
+  failure: getGatewayApiKeyFailure,
+}] = createApiKeyRequestActions(SHARED_NAME)
+
+export const GET_GTW_API_KEYS_LIST_BASE = createGetApiKeysListActionType(SHARED_NAME)
+export const [{
+  request: GET_GTW_API_KEYS_LIST,
+  success: GET_GTW_API_KEYS_LIST_SUCCESS,
+  failure: GET_GTW_API_KEYS_LIST_FAILURE,
+}, {
+  request: getGatewayApiKeysList,
+  success: getGatewayApiKeysListSuccess,
+  failure: getGatewayApiKeysListFailure,
+}] = createApiKeysRequestActions(SHARED_NAME)
+
 export const UPDATE_GTW = 'UPDATE_GATEWAY'
 export const START_GTW_STATS = 'START_GATEWAY_STATISTICS'
 export const STOP_GTW_STATS = 'STOP_GATEWAY_STATISTICS'
-export const UPDATE_GTW_STATS = 'UPDATE_GATEWAY_STATISTICS'
-export const UPDATE_GTW_STATS_SUCCESS = 'UPDATE_GATEWAY_STATISTICS_SUCCESS'
-export const UPDATE_GTW_STATS_FAILURE = 'UPDATE_GATEWAY_STATISTICS_FAILURE'
 export const UPDATE_GTW_STATS_UNAVAILABLE = 'UPDATE_GATEWAY_STATISTICS_UNAVAILABLE'
 export const START_GTW_EVENT_STREAM = createStartEventsStreamActionType(SHARED_NAME)
 export const START_GTW_EVENT_STREAM_SUCCESS = createStartEventsStreamSuccessActionType(SHARED_NAME)
 export const START_GTW_EVENT_STREAM_FAILURE = createStartEventsStreamFailureActionType(SHARED_NAME)
 export const STOP_GTW_EVENT_STREAM = createStopEventsStreamActionType(SHARED_NAME)
 export const CLEAR_GTW_EVENTS = createClearEventsActionType(SHARED_NAME)
-export const GET_GTW_API_KEYS_LIST = createGetApiKeysListActionType(SHARED_NAME)
-export const GET_GTW_API_KEYS_LIST_SUCCESS = createGetApiKeysListSuccessActionType(SHARED_NAME)
-export const GET_GTW_API_KEYS_LIST_FAILURE = createGetApiKeysListFailureActionType(SHARED_NAME)
-export const GET_GTW_API_KEY = createGetApiKeyActionType(SHARED_NAME)
-export const GET_GTW_API_KEY_SUCCESS = createGetApiKeySuccessActionType(SHARED_NAME)
-export const GET_GTW_API_KEY_FAILURE = createGetApiKeyFailureActionType(SHARED_NAME)
-
-export const getGateway = (id, meta) => (
-  { type: GET_GTW, id, meta }
-)
-
-export const getGatewaySuccess = gateway => (
-  { type: GET_GTW_SUCCESS, gateway }
-)
-
-export const getGatewayFailure = error => (
-  { type: GET_GTW_FAILURE, error }
-)
 
 export const updateGateway = (id, patch) => (
   { type: UPDATE_GTW, id, patch }
@@ -85,18 +95,6 @@ export const updateGateway = (id, patch) => (
 
 export const startGatewayStatistics = (id, meta) => (
   { type: START_GTW_STATS, id, meta }
-)
-
-export const updateGatewayStatistics = id => (
-  { type: UPDATE_GTW_STATS, id }
-)
-
-export const updateGatewayStatisticsSuccess = statistics => (
-  { type: UPDATE_GTW_STATS_SUCCESS, statistics }
-)
-
-export const updateGatewayStatisticsFailure = error => (
-  { type: UPDATE_GTW_STATS_FAILURE, error }
 )
 
 export const updateGatewayStatisticsUnavailable = () => (
@@ -116,15 +114,3 @@ export const startGatewayEventsStreamFailure = startEventsStreamFailure(SHARED_N
 export const stopGatewayEventsStream = stopEventsStream(SHARED_NAME)
 
 export const clearGatewayEventsStream = clearEvents(SHARED_NAME)
-
-export const getGatewayApiKeysList = getApiKeysList(SHARED_NAME)
-
-export const getGatewayApiKeysListSuccess = getApiKeysListSuccess(SHARED_NAME)
-
-export const getGatewayApiKeysListFailure = getApiKeysListFailure(SHARED_NAME)
-
-export const getGatewayApiKey = getApiKey(SHARED_NAME)
-
-export const getGatewayApiKeySuccess = getApiKeySuccess(SHARED_NAME)
-
-export const getGatewayApiKeyFailure = getApiKeyFailure(SHARED_NAME)

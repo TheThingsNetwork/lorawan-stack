@@ -12,18 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { createLogic } from 'redux-logic'
-
-import * as configuration from '../actions/configuration'
-import { get as cacheGet, set as cacheSet } from '../../lib/cache'
-import api from '../../api'
+import * as configuration from '../../actions/configuration'
+import { get as cacheGet, set as cacheSet } from '../../../lib/cache'
+import api from '../../../api'
 
 import {
   nsFrequencyPlansSelector,
   gsFrequencyPlansSelector,
-} from '../selectors/configuration'
+} from '../../selectors/configuration'
 
-const getNsFrequencyPlansLogic = createLogic({
+import createRequestLogic from './lib'
+
+const getNsFrequencyPlansLogic = createRequestLogic({
   type: configuration.GET_NS_FREQUENCY_PLANS,
   validate ({ getState, action }, allow, reject) {
     const plansNs = nsFrequencyPlansSelector(getState())
@@ -33,23 +33,17 @@ const getNsFrequencyPlansLogic = createLogic({
       allow(action)
     }
   },
-  async process ({ getState, action }, dispatch, done) {
+  async process () {
     let frequencyPlans = cacheGet('ns_frequency_plans')
-    try {
-      if (!frequencyPlans) {
-        frequencyPlans = (await api.configuration.listNsFrequencyPlans()).frequency_plans
-        cacheSet('ns_frequency_plans', frequencyPlans)
-      }
-      dispatch(configuration.getNsFrequencyPlansSuccess(frequencyPlans))
-    } catch (error) {
-      dispatch(configuration.getNsFrequencyPlansFailure(error))
+    if (!frequencyPlans) {
+      frequencyPlans = (await api.configuration.listNsFrequencyPlans()).frequency_plans
+      cacheSet('ns_frequency_plans', frequencyPlans)
     }
-
-    done()
+    return frequencyPlans
   },
 })
 
-const getGsFrequencyPlansLogic = createLogic({
+const getGsFrequencyPlansLogic = createRequestLogic({
   type: configuration.GET_GS_FREQUENCY_PLANS,
   validate ({ getState, action }, allow, reject) {
     const plansGs = gsFrequencyPlansSelector(getState())
@@ -59,19 +53,14 @@ const getGsFrequencyPlansLogic = createLogic({
       allow(action)
     }
   },
-  async process ({ getState, action }, dispatch, done) {
+  async process () {
     let frequencyPlans = cacheGet('gs_frequency_plans')
-    try {
-      if (!frequencyPlans) {
-        frequencyPlans = (await api.configuration.listGsFrequencyPlans()).frequency_plans
-        cacheSet('gs_frequency_plans', frequencyPlans)
-      }
-      dispatch(configuration.getGsFrequencyPlansSuccess(frequencyPlans))
-    } catch (error) {
-      dispatch(configuration.getGsFrequencyPlansFailure(error))
+    if (!frequencyPlans) {
+      frequencyPlans = (await api.configuration.listGsFrequencyPlans()).frequency_plans
+      cacheSet('gs_frequency_plans', frequencyPlans)
     }
 
-    done()
+    return frequencyPlans
   },
 })
 

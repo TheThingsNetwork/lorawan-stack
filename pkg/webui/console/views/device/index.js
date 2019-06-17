@@ -36,19 +36,23 @@ import {
   stopDeviceEventsStream,
 } from '../../store/actions/device'
 
+import { selectDeviceFetching, selectDeviceError } from '../../store/selectors/device'
+
 import style from './device.styl'
 
 const m = defineMessages({
   title: '%s - {deviceName} - The Things Network Console',
 })
 
-@connect(function ({ device }, props) {
+@connect(function (state, props) {
+  const { device } = state
   return {
+    device: device.device,
     deviceName: device.device && device.device.name,
     devIds: device.device && device.device.ids,
     devId: props.match.params.devId,
-    fetching: device.fetching,
-    error: device.error,
+    fetching: selectDeviceFetching(state),
+    error: selectDeviceError(state),
   }
 }, dispatch => ({
   getDevice: (appId, devId, selectors, config) =>
@@ -101,10 +105,10 @@ export default class Device extends React.Component {
 
 
   render () {
-    const { fetching, error, match, devId, deviceName } = this.props
+    const { device, fetching, error, match, devId, deviceName } = this.props
     const { appId } = match.params
 
-    if (fetching) {
+    if (fetching || !device) {
       return (
         <Spinner center>
           <Message content={sharedMessages.loading} />

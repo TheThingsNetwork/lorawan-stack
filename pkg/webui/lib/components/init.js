@@ -39,7 +39,7 @@ setConfiguration({
 export default class Init extends React.PureComponent {
 
   componentDidMount () {
-    this.props.dispatch({ type: 'INITIALIZE' })
+    this.props.dispatch({ type: 'INITIALIZE_REQUEST' })
   }
 
   render () {

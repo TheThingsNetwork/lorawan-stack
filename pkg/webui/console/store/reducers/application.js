@@ -21,7 +21,7 @@ const defaultState = null
 const application = function (state = defaultState, action) {
   switch (action.type) {
   case GET_APP_SUCCESS:
-    return action.application
+    return action.payload
   default:
     return state
   }

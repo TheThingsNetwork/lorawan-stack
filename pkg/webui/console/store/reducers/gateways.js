@@ -12,48 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {
-  GET_GTWS_LIST,
-  SEARCH_GTWS_LIST,
-  GET_GTWS_LIST_SUCCESS,
-  GET_GTWS_LIST_FAILURE,
-} from '../actions/gateways'
+import { GET_GTWS_LIST_SUCCESS } from '../actions/gateways'
 
 const defaultState = {
-  fetching: false,
-  fetchingSearch: false,
-  error: undefined,
   gateways: [],
   totalCount: 0,
 }
 
-const gateways = function (state = defaultState, action) {
-  switch (action.type) {
-  case GET_GTWS_LIST:
-    return {
-      ...state,
-      fetching: true,
-    }
-  case SEARCH_GTWS_LIST:
-    return {
-      ...state,
-      fetching: true,
-      fetchingSearch: true,
-    }
+const gateways = function (state = defaultState, { type, payload }) {
+  switch (type) {
   case GET_GTWS_LIST_SUCCESS:
     return {
       ...state,
-      totalCount: action.totalCount,
-      gateways: action.gateways,
-      fetching: false,
-      fetchingSearch: false,
-    }
-  case GET_GTWS_LIST_FAILURE:
-    return {
-      ...state,
-      fetching: false,
-      fetchingSearch: false,
-      error: action.error,
+      totalCount: payload.totalCount,
+      gateways: payload.gateways,
     }
   default:
     return state

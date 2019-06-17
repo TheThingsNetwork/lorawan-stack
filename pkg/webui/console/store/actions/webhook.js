@@ -12,18 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const GET_WEBHOOK = 'GET_WEBHOOK_REQUEST'
-export const GET_WEBHOOK_SUCCESS = 'GET_WEBHOOK_SUCCESS'
-export const GET_WEBHOOK_FAILURE = 'GET_WEBHOOK_FAILURE'
+import { createRequestActions } from './lib'
 
-export const getWebhook = (appId, webhookId, meta) => (
-  { type: GET_WEBHOOK, appId, webhookId, meta }
-)
-
-export const getWebhookSuccess = webhook => (
-  { type: GET_WEBHOOK_SUCCESS, webhook }
-)
-
-export const getWebhookFailure = error => (
-  { type: GET_WEBHOOK_FAILURE, error }
+export const GET_WEBHOOK_BASE = 'GET_WEBHOOK'
+export const [{
+  request: GET_WEBHOOK,
+  success: GET_WEBHOOK_SUCCESS,
+  failure: GET_WEBHOOK_FAILURE,
+}, {
+  request: getWebhook,
+  success: getWebhookSuccess,
+  failure: getWebhookFailure,
+}] = createRequestActions(GET_WEBHOOK_BASE,
+  (appId, webhookId) => ({ appId, webhookId }),
+  (appId, webhookId, selector) => ({ selector })
 )

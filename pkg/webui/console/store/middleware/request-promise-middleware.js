@@ -12,26 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { createLogic } from 'redux-logic'
-
-import * as user from '../actions/user'
-import api from '../../api'
-import * as accessToken from '../../lib/access-token'
-
-export default [
-  createLogic({
-    type: user.LOGOUT,
-    async process ({ getState, action }, dispatch, done) {
-      try {
-        await api.console.logout()
-
-        accessToken.clear()
-        dispatch(user.logoutSuccess())
-      } catch (error) {
-        dispatch(user.logoutFailure())
+/**
+ * This middleware will check for request actions and attach a promise to the
+ * action.
+ * @param {Object} store - The store to apply the middleware to
+ * @returns {Object} The middleware
+ */
+const requestPromiseMiddleware = store => next => function (action) {
+  if (action.type.endsWith('_REQUEST')) {
+    return new Promise(function (resolve, reject) {
+      action.meta = {
+        ...action.meta,
+        _resolve: resolve,
+        _reject: reject,
       }
+      next(action)
+    })
+  }
 
-      done()
-    },
-  }),
-]
+  return next(action)
+}
+
+export default requestPromiseMiddleware

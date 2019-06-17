@@ -12,33 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const GET_NS_FREQUENCY_PLANS = 'GET_NS_FREQUENCY_PLANS'
-export const GET_NS_FREQUENCY_PLANS_SUCCESS = 'GET_NS_FREQUENCY_PLANS_SUCCESS'
-export const GET_NS_FREQUENCY_PLANS_FAILURE = 'GET_NS_FREQUENCY_PLANS_FAILURE'
-export const GET_GS_FREQUENCY_PLANS = 'GET_GS_FREQUENCY_PLANS'
-export const GET_GS_FREQUENCY_PLANS_SUCCESS = 'GET_GS_FREQUENCY_PLANS_SUCCESS'
-export const GET_GS_FREQUENCY_PLANS_FAILURE = 'GET_GS_FREQUENCY_PLANS_FAILURE'
+import { createRequestActions } from './lib'
 
-export const getNsFrequencyPlans = () => (
-  { type: GET_NS_FREQUENCY_PLANS }
-)
+export const GET_NS_FREQUENCY_PLANS_BASE = 'GET_NS_FREQUENCY_PLANS'
+export const [{
+  request: GET_NS_FREQUENCY_PLANS,
+  success: GET_NS_FREQUENCY_PLANS_SUCCESS,
+  failure: GET_NS_FREQUENCY_PLANS_FAILURE,
+}, {
+  request: getNsFrequencyPlans,
+  success: getNsFrequencyPlansSuccess,
+  failure: getNsFrequencyPlansFailure,
+}] = createRequestActions(GET_NS_FREQUENCY_PLANS_BASE)
 
-export const getNsFrequencyPlansSuccess = frequencyPlans => (
-  { type: GET_NS_FREQUENCY_PLANS_SUCCESS, frequencyPlans }
-)
-
-export const getNsFrequencyPlansFailure = error => (
-  { type: GET_NS_FREQUENCY_PLANS_FAILURE, error }
-)
-
-export const getGsFrequencyPlans = () => (
-  { type: GET_GS_FREQUENCY_PLANS }
-)
-
-export const getGsFrequencyPlansSuccess = frequencyPlans => (
-  { type: GET_GS_FREQUENCY_PLANS_SUCCESS, frequencyPlans }
-)
-
-export const getGsFrequencyPlansFailure = error => (
-  { type: GET_GS_FREQUENCY_PLANS_FAILURE, error }
-)
+export const GET_GS_FREQUENCY_PLANS_BASE = 'GET_GS_FREQUENCY_PLANS'
+export const [{
+  request: GET_GS_FREQUENCY_PLANS,
+  success: GET_GS_FREQUENCY_PLANS_SUCCESS,
+  failure: GET_GS_FREQUENCY_PLANS_FAILURE,
+}, {
+  request: getGsFrequencyPlans,
+  success: getGsFrequencyPlansSuccess,
+  failure: getGsFrequencyPlansFailure,
+}] = createRequestActions(GET_GS_FREQUENCY_PLANS_BASE)

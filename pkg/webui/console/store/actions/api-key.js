@@ -12,26 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { createRequestActions } from './lib'
+
 export const createGetApiKeyActionType = name => (
   `GET_${name}_API_KEY`
 )
 
-export const createGetApiKeySuccessActionType = name => (
-  `GET_${name}_API_KEY_SUCCESS`
-)
-
-export const createGetApiKeyFailureActionType = name => (
-  `GET_${name}_API_KEY_FAILURE`
-)
-
-export const getApiKey = name => (entityId, keyId) => (
-  { type: createGetApiKeyActionType(name), entityId, keyId }
-)
-
-export const getApiKeySuccess = name => key => (
-  { type: createGetApiKeySuccessActionType(name), key }
-)
-
-export const getApiKeyFailure = name => error => (
-  { type: createGetApiKeyFailureActionType(name), error }
+export default name => createRequestActions(
+  createGetApiKeyActionType(name),
+  (parentId, keyId) => ({ id: parentId, keyId })
 )

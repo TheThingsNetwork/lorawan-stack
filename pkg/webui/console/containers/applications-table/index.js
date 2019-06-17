@@ -19,10 +19,7 @@ import bind from 'autobind-decorator'
 import sharedMessages from '../../../lib/shared-messages'
 import FetchTable from '../fetch-table'
 
-import {
-  getApplicationsList,
-  searchApplicationsList,
-} from '../../../console/store/actions/applications'
+import { getApplicationsList } from '../../../console/store/actions/applications'
 
 const m = defineMessages({
   all: 'All',
@@ -65,7 +62,7 @@ export default class ApplicationsTable extends Component {
         addMessage={sharedMessages.addApplication}
         tableTitle={this.tableTitle}
         getItemsAction={getApplicationsList}
-        searchItemsAction={searchApplicationsList}
+        searchItemsAction={getApplicationsList}
         tabs={tabs}
         baseDataSelector={this.baseDataSelector}
         {...this.props}

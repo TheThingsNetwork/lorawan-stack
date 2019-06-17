@@ -14,8 +14,8 @@
 
 import { createLogic } from 'redux-logic'
 
-import CONNECTION_STATUS from '../../constants/connection-status'
-import api from '../../api'
+import CONNECTION_STATUS from '../../../constants/connection-status'
+import api from '../../../api'
 import {
   createStartEventsStreamActionType,
   createStopEventsStreamActionType,
@@ -25,10 +25,10 @@ import {
   startEventsStreamFailure,
   startEventsStreamSuccess,
   stopEventsStream,
-} from '../actions/events'
+} from '../../actions/events'
 import {
   applicationEventsStatusSelector,
-} from '../selectors/application'
+} from '../../selectors/application'
 
 const createEventsConnectLogics = function (name, entity) {
   const START_EVENTS = createStartEventsStreamActionType(name)

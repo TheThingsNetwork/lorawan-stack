@@ -12,18 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const INITIALIZE = 'INITIALIZE'
-export const INITIALIZE_FAILURE = 'INITIALIZE_FAILURE'
-export const INITIALIZE_SUCCESS = 'INITIALIZE_SUCCESS'
+/* eslint-disable import/prefer-default-export */
 
-export const initialize = () => (
-  { type: INITIALIZE }
-)
+import { createRequestActions } from './lib'
 
-export const initializeFailure = () => (
-  { type: INITIALIZE_FAILURE }
-)
-
-export const initializeSuccess = error => (
-  { type: INITIALIZE_SUCCESS, error }
-)
+export const [{
+  request: INITIALIZE,
+  success: INITIALIZE_SUCCESS,
+  failure: INITIALIZE_FAILURE,
+}, {
+  request: initialize,
+  success: initializeSuccess,
+  failure: initializeFailure,
+}] = createRequestActions('INITIALIZE')

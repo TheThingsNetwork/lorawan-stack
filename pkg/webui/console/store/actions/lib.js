@@ -12,26 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import client from './client'
-import user from './user'
-import init from './init'
-import applications from './applications'
-import application from './application'
-import devices from './devices'
-import device from './device'
-import gateways from './gateways'
-import gateway from './gateway'
-import configuration from './configuration'
+/* eslint-disable import/prefer-default-export */
 
-export default [
-  client,
-  ...user,
-  init,
-  ...applications,
-  ...application,
-  ...devices,
-  ...device,
-  ...gateways,
-  ...gateway,
-  ...configuration,
-]
+import { createAction } from 'redux-actions'
+
+const createRequestActions = function (
+  baseType,
+  requestPayloadCreator,
+  requestMetaCreator,
+) {
+  const requestType = `${baseType}_REQUEST`
+  const successType = `${baseType}_SUCCESS`
+  const failureType = `${baseType}_FAILURE`
+
+  return [{
+    request: requestType,
+    success: successType,
+    failure: failureType,
+  }, {
+    request: createAction(requestType, requestPayloadCreator, requestMetaCreator),
+    success: createAction(successType),
+    failure: createAction(failureType),
+  }]
+}
+
+export { createRequestActions }

@@ -56,7 +56,7 @@ import Devices from '../devices'
 dispatch => ({
   startStream: id => dispatch(startApplicationEventsStream(id)),
   stopStream: id => dispatch(stopApplicationEventsStream(id)),
-  getApplication: id => dispatch(getApplication(id)),
+  getApplication: id => dispatch(getApplication(id, 'name,description')),
 }))
 @withSideNavigation(function (props) {
   const matchedUrl = props.match.url

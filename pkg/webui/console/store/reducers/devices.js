@@ -12,50 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {
-  GET_DEVICES_LIST,
-  SEARCH_DEVICES_LIST,
-  GET_DEVICES_LIST_SUCCESS,
-  GET_DEVICES_LIST_FAILURE,
-} from '../actions/devices'
+import { GET_DEVICES_LIST_SUCCESS } from '../actions/devices'
 
 const defaultState = {
-  fetching: true,
-  fetchingSearch: false,
-  error: undefined,
   devices: [],
   totalCount: 0,
 }
 
-const devices = function (state = defaultState, action) {
-  switch (action.type) {
-  case GET_DEVICES_LIST:
-    return {
-      ...state,
-      fetching: true,
-    }
-  case SEARCH_DEVICES_LIST:
-    return {
-      ...state,
-      fetching: true,
-      fetchingSearch: true,
-    }
+const devices = function (state = defaultState, { type, payload }) {
+  switch (type) {
   case GET_DEVICES_LIST_SUCCESS:
     return {
       ...state,
-      fetching: false,
-      fetchingSearch: false,
-      devices: action.devices,
-      totalCount: action.totalCount,
-    }
-  case GET_DEVICES_LIST_FAILURE:
-    return {
-      ...state,
-      fetching: false,
-      fetchingSearch: false,
-      error: action.error,
-      devices: [],
-      totalCount: 0,
+      devices: payload.devices,
+      totalCount: payload.totalCount,
     }
   default:
     return state

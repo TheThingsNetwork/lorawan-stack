@@ -12,11 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { GET_DEV_BASE } from '../actions/device'
+
 import {
   eventsSelector,
   errorSelector as eventsErrorSelector,
   statusSelector as eventsStatusSelector,
 } from './events'
+
+import { createFetchingSelector } from './fetching'
+import { createErrorSelector } from './error'
 
 const ENTITY = 'devices'
 
@@ -24,11 +29,8 @@ const storeSelector = store => store.device
 
 export const deviceSelector = state => storeSelector(state).device
 
-export const fetchingSelector = function (state) {
-  const store = storeSelector(state)
-
-  return store.fetching || false
-}
+export const selectDeviceFetching = createFetchingSelector(GET_DEV_BASE)
+export const selectDeviceError = createErrorSelector(GET_DEV_BASE)
 
 export const errorSelector = function (state) {
   const store = storeSelector(state)

@@ -12,45 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {
-  createGetApiKeysListActionType,
-  createGetApiKeysListFailureActionType,
-  createGetApiKeysListSuccessActionType,
-} from '../actions/api-keys'
+import { createGetApiKeysListActionType } from '../actions/api-keys'
+import { createRequestActions } from '../actions/lib'
 
-const defualtState = {
-  fetching: false,
+const defaultState = {
   keys: [],
   totalCount: 0,
-  error: false,
 }
 
 const createNamedApiKeyReducer = function (reducerName = '') {
-  const GET_LIST = createGetApiKeysListActionType(reducerName)
-  const GET_LIST_SUCCESS = createGetApiKeysListSuccessActionType(reducerName)
-  const GET_LIST_FAILURE = createGetApiKeysListFailureActionType(reducerName)
+  const GET_LIST_BASE = createGetApiKeysListActionType(reducerName)
+  const [{ success: GET_LIST_SUCCESS }] = createRequestActions(GET_LIST_BASE)
 
-  return function (state = defualtState, action) {
-    switch (action.type) {
-    case GET_LIST:
-      return {
-        ...state,
-        fetching: true,
-      }
-    case GET_LIST_FAILURE:
-      return {
-        ...state,
-        fetching: false,
-        keys: [],
-        totalCount: 0,
-        error: action.error,
-      }
+  return function (state = defaultState, { type, payload }) {
+    switch (type) {
     case GET_LIST_SUCCESS:
       return {
         ...state,
-        keys: action.keys,
-        totalCount: action.totalCount,
-        fetching: false,
+        keys: payload.api_keys,
+        totalCount: payload.totalCount,
       }
     default:
       return state
@@ -58,24 +38,22 @@ const createNamedApiKeyReducer = function (reducerName = '') {
   }
 }
 
-const createNamedAPIKeysReducer = function (reducerName = '') {
-  const GET_LIST = createGetApiKeysListActionType(reducerName)
-  const GET_LIST_SUCCESS = createGetApiKeysListSuccessActionType(reducerName)
-  const GET_LIST_FAILURE = createGetApiKeysListFailureActionType(reducerName)
+const createNamedApiKeysReducer = function (reducerName = '') {
+  const GET_LIST_BASE = createGetApiKeysListActionType(reducerName)
+  const [{ success: GET_LIST_SUCCESS }] = createRequestActions(GET_LIST_BASE)
   const apiKey = createNamedApiKeyReducer(reducerName)
 
   return function (state = {}, action) {
-    if (!action.id) {
+    const { payload } = action
+    if (!payload || !payload.id) {
       return state
     }
 
     switch (action.type) {
-    case GET_LIST:
-    case GET_LIST_FAILURE:
     case GET_LIST_SUCCESS:
       return {
         ...state,
-        [action.id]: apiKey(state[action.id], action),
+        [payload.id]: apiKey(state[payload.id], action),
       }
     default:
       return state
@@ -83,4 +61,4 @@ const createNamedAPIKeysReducer = function (reducerName = '') {
   }
 }
 
-export default createNamedAPIKeysReducer
+export default createNamedApiKeysReducer

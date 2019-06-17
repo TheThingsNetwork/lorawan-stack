@@ -23,7 +23,7 @@ import PropTypes from '../../../lib/prop-types'
 import FetchTable from '../fetch-table'
 import DateTime from '../../../lib/components/date-time'
 
-import { getDevicesList, searchDevicesList } from '../../../console/store/actions/devices'
+import { getDevicesList } from '../../../console/store/actions/devices'
 import { selectSelectedApplicationId } from '../../store/selectors/application'
 
 const m = defineMessages({
@@ -61,7 +61,6 @@ class DevicesTable extends React.Component {
   constructor (props) {
     super(props)
 
-    this.searchDevicesList = filters => searchDevicesList(props.appId, filters)
     this.getDevicesList = filters => getDevicesList(props.appId, filters)
   }
 
@@ -78,7 +77,7 @@ class DevicesTable extends React.Component {
         addMessage={m.add}
         tableTitle={<Message content={m.connectedDevices} values={{ deviceCount: totalCount }} />}
         getItemsAction={this.getDevicesList}
-        searchItemsAction={this.searchDevicesList}
+        searchItemsAction={this.getDevicesList}
         itemPathPrefix={devicePathPrefix}
         baseDataSelector={this.baseDataSelector}
         {...this.props}

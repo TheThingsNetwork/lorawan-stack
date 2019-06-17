@@ -12,26 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { createRequestActions } from './lib'
+
 export const createGetRightsListActionType = name => (
   `GET_${name}_RIGHTS_LIST`
 )
 
-export const createGetRightsListSuccessActionType = name => (
-  `GET_${name}_RIGHTS_LIST_SUCCESS`
-)
-
-export const createGetRightsListFailureActionType = name => (
-  `GET_${name}_RIGHTS_LIST_FAILURE`
-)
-
-export const getRightsList = name => id => (
-  { type: createGetRightsListActionType(name), id }
-)
-
-export const getRightsListSuccess = name => rights => (
-  { type: createGetRightsListSuccessActionType(name), rights }
-)
-
-export const getRightsListFailure = name => error => (
-  { type: createGetRightsListFailureActionType(name), error }
-)
+export default name =>
+  createRequestActions(
+    createGetRightsListActionType(name),
+    id => ({ id })
+  )

@@ -12,33 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const GET_USER_ME = 'GET_USER_ME'
-export const GET_USER_ME_FAILURE = 'GET_USER_ME_FAILURE'
-export const GET_USER_ME_SUCCESS = 'GET_USER_ME_SUCCESS'
-export const LOGOUT = 'LOGOUT'
-export const LOGOUT_SUCCESS = 'LOGOUT_SUCCESS'
-export const LOGOUT_FAILURE = 'LOGOUT_FAILURE'
+import { createRequestActions } from './lib'
 
-export const getUserMe = () => (
-  { type: GET_USER_ME }
-)
+export const GET_USER_ME_BASE = 'GET_USER_ME'
+export const [{
+  request: GET_USER_ME,
+  success: GET_USER_ME_SUCCESS,
+  failure: GET_USER_ME_FAILURE,
+}, {
+  request: getUserMe,
+  success: getUserMeSuccess,
+  failure: getUserMeFailure,
+}] = createRequestActions(GET_USER_ME_BASE)
 
-export const getUserMeFailure = () => (
-  { type: GET_USER_ME_FAILURE }
-)
-
-export const getUserMeSuccess = userData => (
-  { type: GET_USER_ME_SUCCESS, userData }
-)
-
-export const logout = () => (
-  { type: LOGOUT }
-)
-
-export const logoutSuccess = () => (
-  { type: LOGOUT_SUCCESS }
-)
-
-export const logoutFailure = () => (
-  { type: LOGOUT_FAILURE }
-)
+export const LOGOUT_BASE = 'LOGOUT'
+export const [{
+  request: LOGOUT,
+  success: LOGOUT_SUCCESS,
+  failure: LOGOUT_FAILURE,
+}, {
+  request: logout,
+  success: logoutSuccess,
+  failure: logoutFailure,
+}] = createRequestActions(LOGOUT_BASE)

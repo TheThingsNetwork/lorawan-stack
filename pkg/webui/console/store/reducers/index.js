@@ -19,7 +19,6 @@ import { SHARED_NAME as GATEWAY_SHARED_NAME } from '../actions/gateway'
 import { SHARED_NAME as GATEWAYS_SHARED_NAME } from '../actions/gateways'
 import { SHARED_NAME as DEVICE_SHARED_NAME } from '../actions/device'
 import user from './user'
-import client from './client'
 import init from './init'
 import applications from './applications'
 import application from './application'
@@ -42,7 +41,6 @@ import webhookFormats from './webhook-formats'
 
 export default combineReducers({
   user,
-  client,
   init,
   applications,
   application,

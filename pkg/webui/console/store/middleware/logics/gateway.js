@@ -14,26 +14,21 @@
 
 import { createLogic } from 'redux-logic'
 
-import sharedMessages from '../../../lib/shared-messages'
-import api from '../../api'
-import * as gateway from '../actions/gateway'
-import { gsConfigSelector } from '../../../lib/selectors/env'
-import { gatewaySelector } from '../selectors/gateway'
+import sharedMessages from '../../../../lib/shared-messages'
+import api from '../../../api'
+import * as gateway from '../../actions/gateway'
+import { gsConfigSelector } from '../../../../lib/selectors/env'
+import { gatewaySelector } from '../../selectors/gateway'
 import createEventsConnectLogics from './events'
+import createRequestLogic from './lib'
 
-const getGatewayLogic = createLogic({
+const getGatewayLogic = createRequestLogic({
   type: gateway.GET_GTW,
-  async process ({ action }, dispatch, done) {
-    const { id, meta = {}} = action
-    try {
-      const selectors = meta.selectors || ''
-      const gtw = await api.gateway.get(id, selectors)
-      dispatch(gateway.getGatewaySuccess(gtw))
-    } catch (error) {
-      dispatch(gateway.getGatewayFailure(error))
-    }
-
-    done()
+  async process ({ action }) {
+    const { payload, meta } = action
+    const { id = {}} = payload
+    const selector = meta.selector || ''
+    return api.gateway.get(id, selector)
   },
 })
 
@@ -94,55 +89,28 @@ const startGatewayStatisticsLogic = createLogic({
   },
 })
 
-const updateGatewayStatisticsLogic = createLogic({
+const updateGatewayStatisticsLogic = createRequestLogic({
   type: gateway.UPDATE_GTW_STATS,
-  async process ({ action }, dispatch, done) {
-    const { id } = action
-
-    try {
-      const stats = await api.gateway.stats(id)
-      dispatch(gateway.updateGatewayStatisticsSuccess(stats))
-    } catch (error) {
-      dispatch(gateway.updateGatewayStatisticsFailure(error))
-    }
-
-    done()
+  async process ({ action }) {
+    const { id } = action.payload
+    return api.gateway.stats(id)
   },
 })
 
-const getGatewayApiKeysLogic = createLogic({
+const getGatewayApiKeysLogic = createRequestLogic({
   type: gateway.GET_GTW_API_KEYS_LIST,
-  async process ({ action }, dispatch, done) {
-    const { id, params } = action
-    try {
-      const res = await api.gateway.apiKeys.list(id, params)
-      dispatch(
-        gateway.getGatewayApiKeysListSuccess(
-          id,
-          res.api_keys,
-          res.totalCount
-        )
-      )
-    } catch (e) {
-      dispatch(gateway.getGatewayApiKeysListFailure(id, e))
-    }
-
-    done()
+  async process ({ action }) {
+    const { id: gtwId, params } = action.payload
+    const res = await api.gateway.apiKeys.list(gtwId, params)
+    return { ...res, id: gtwId }
   },
 })
 
-const getGatewayApiKeyLogic = createLogic({
+const getGatewayApiKeyLogic = createRequestLogic({
   type: gateway.GET_GTW_API_KEY,
-  async process ({ action }, dispatch, done) {
-    const { entityId, keyId } = action
-    try {
-      const key = await api.gateway.apiKeys.get(entityId, keyId)
-      dispatch(gateway.getGatewayApiKeySuccess(key))
-    } catch (error) {
-      dispatch(gateway.getGatewayApiKeyFailure(error))
-    }
-
-    done()
+  async process ({ action }) {
+    const { id: gtwId, keyId } = action.payload
+    return api.gateway.apiKeys.get(gtwId, keyId)
   },
 })
 

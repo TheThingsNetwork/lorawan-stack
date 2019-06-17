@@ -23,34 +23,34 @@ import {
   createStopEventsStreamActionType,
   clearEvents,
   createClearEventsActionType,
-} from '../actions/events'
+} from './events'
+
+import { createRequestActions } from './lib'
 
 export const SHARED_NAME = 'DEVICE'
 
-export const GET_DEV = 'GET_DEVICE'
+export const GET_DEV_BASE = 'GET_DEVICE'
+export const [{
+  request: GET_DEV,
+  success: GET_DEV_SUCCESS,
+  failure: GET_DEV_FAILURE,
+}, {
+  request: getDevice,
+  success: getDeviceSuccess,
+  failure: getDeviceFailure,
+}] = createRequestActions(GET_DEV_BASE,
+  (appId, deviceId) => ({ appId, deviceId }),
+  (appId, deviceId, selector, options) => ({ selector, options })
+)
 export const UPDATE_DEV = 'UPDATE_DEVICE'
-export const GET_DEV_SUCCESS = 'GET_DEVICE_SUCCESS'
-export const GET_DEV_FAILURE = 'GET_DEVICE_FAILURE'
 export const START_DEVICE_EVENT_STREAM = createStartEventsStreamActionType(SHARED_NAME)
 export const START_DEVICE_EVENT_STREAM_SUCCESS = createStartEventsStreamSuccessActionType(SHARED_NAME)
 export const START_DEVICE_EVENT_STREAM_FAILURE = createStartEventsStreamFailureActionType(SHARED_NAME)
 export const STOP_DEVICE_EVENT_STREAM = createStopEventsStreamActionType(SHARED_NAME)
 export const CLEAR_DEVICE_EVENTS = createClearEventsActionType(SHARED_NAME)
 
-export const getDevice = (appId, deviceId, selector, options) => (
-  { type: GET_DEV, appId, deviceId, selector, options }
-)
-
 export const updateDevice = (appId, deviceId, patch) => (
   { type: UPDATE_DEV, appId, deviceId, patch }
-)
-
-export const getDeviceSuccess = device => (
-  { type: GET_DEV_SUCCESS, device }
-)
-
-export const getDeviceFailure = error => (
-  { type: GET_DEV_FAILURE, error }
 )
 
 export const startDeviceEventsStream = startEventsStream(SHARED_NAME)

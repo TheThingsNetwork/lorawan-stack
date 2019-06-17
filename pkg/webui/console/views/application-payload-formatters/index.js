@@ -55,7 +55,7 @@ const m = defineMessages({
   }
 },
 dispatch => ({
-  getLink: (id, meta) => dispatch(getApplicationLink(id, meta)),
+  getLink: (id, selector) => dispatch(getApplicationLink(id, selector)),
 }))
 @withBreadcrumb('apps.single.payload-formatters', function (props) {
   const { appId } = props
@@ -79,13 +79,11 @@ export default class ApplicationPayloadFormatters extends React.Component {
   componentDidMount () {
     const { appId, getLink } = this.props
 
-    getLink(appId, {
-      selectors: [
-        'default_formatters',
-        'api_key',
-        'network_server_address',
-      ],
-    })
+    getLink(appId, [
+      'default_formatters',
+      'api_key',
+      'network_server_address',
+    ])
   }
 
   render () {

@@ -33,7 +33,7 @@ describe('error reducers', function () {
   describe('dispatches the `failure` action', function () {
     it('should set error', function () {
       const error = { status: 404 }
-      expect(reducer({}, { type: FAILURE, error })).toEqual({
+      expect(reducer({}, { type: FAILURE, payload: error, error: true })).toEqual({
         [BASE]: error,
       })
     })

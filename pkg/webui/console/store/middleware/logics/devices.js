@@ -12,29 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { createLogic } from 'redux-logic'
+import api from '../../../api'
+import * as devices from '../../actions/devices'
+import createRequestLogic from './lib'
 
-import api from '../../api'
-import * as devices from '../actions/devices'
-
-const getDevicesListLogic = createLogic({
-  type: [
-    devices.GET_DEVICES_LIST,
-    devices.SEARCH_DEVICES_LIST,
-  ],
-  async process ({ getState, action }, dispatch, done) {
-    const { appId } = action
-    const { page, pageSize: limit } = action.filters
-
-    try {
-      const data = await api.devices.list(appId, { page, limit })
-      dispatch(devices.getDevicesListSuccess(data.end_devices, data.totalCount))
-    } catch (error) {
-      dispatch(devices.getDevicesListFailure(error))
-    }
-
-    done()
-
+const getDevicesListLogic = createRequestLogic({
+  type: devices.GET_DEVICES_LIST,
+  async process ({ action }) {
+    const { payload: { appId, params: { page, limit }}} = action
+    const data = await api.devices.list(appId, { page, limit })
+    return { devices: data.end_devices, totalCount: data.totalCount }
   },
 })
 
