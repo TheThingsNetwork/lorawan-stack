@@ -14,16 +14,16 @@
 
 syntax = "proto3";
 
+import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
-import "github.com/lyft/protoc-gen-validate/validate/validate.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/struct.proto";
 import "lorawan-stack/api/end_device.proto";
 import "lorawan-stack/api/identifiers.proto";
 import "lorawan-stack/api/join.proto";
-import "lorawan-stack/api/lorawan.proto";
 import "lorawan-stack/api/keys.proto";
+import "lorawan-stack/api/lorawan.proto";
 
 package ttn.lorawan.v3;
 

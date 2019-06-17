@@ -24,6 +24,7 @@ require (
 	github.com/cpuguy83/go-md2man v1.0.10 // indirect
 	github.com/disintegration/imaging v1.6.0
 	github.com/eclipse/paho.mqtt.golang v1.1.1
+	github.com/envoyproxy/protoc-gen-validate v0.1.0
 	github.com/erikstmartin/go-testdb v0.0.0-20160219214506-8d10e4a1bae5 // indirect
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/getsentry/raven-go v0.2.0
@@ -56,7 +57,6 @@ require (
 	github.com/labstack/echo/v4 v4.0.0-00010101000000-000000000000
 	github.com/labstack/gommon v0.2.8
 	github.com/lib/pq v1.1.0
-	github.com/lyft/protoc-gen-validate v0.0.14
 	github.com/magefile/mage v1.8.1-0.20190314142316-8dce728c572d
 	github.com/mattn/go-isatty v0.0.7
 	github.com/mattn/goveralls v0.0.2

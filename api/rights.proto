@@ -16,8 +16,8 @@ syntax = "proto3";
 
 package ttn.lorawan.v3;
 
+import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
-import "github.com/lyft/protoc-gen-validate/validate/validate.proto";
 import "lorawan-stack/api/identifiers.proto";
 
 option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
