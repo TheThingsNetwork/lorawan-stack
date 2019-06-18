@@ -32,6 +32,7 @@ import { getGatewayId } from '../../../lib/selectors/id'
 import {
   gatewaySelector,
   gatewayRightsSelector,
+  gatewayUniversalRightsSelector,
   gatewayRightsErrorSelector,
   gatewayRightsFetchingSelector,
   gatewayKeySelector,
@@ -52,12 +53,14 @@ import api from '../../api'
   const apiKey = gatewayKeySelector(state)
   const rightsError = gatewayRightsErrorSelector(state, props)
   const rights = gatewayRightsSelector(state, props)
+  const universalRights = gatewayUniversalRightsSelector(state, props)
 
   return {
     keyId: apiKeyId,
     gtwId,
     apiKey,
     rights,
+    universalRights,
     fetching: keyFetching || rightsFetching,
     error: keyError || rightsError,
   }
@@ -107,7 +110,7 @@ export default class GatewayApiKeyEdit extends React.Component {
   }
 
   render () {
-    const { apiKey, rights, fetching, error } = this.props
+    const { apiKey, rights, fetching, error, universalRights } = this.props
 
     if (error) {
       throw error
@@ -129,6 +132,7 @@ export default class GatewayApiKeyEdit extends React.Component {
           <Col lg={8} md={12}>
             <ApiKeyEditForm
               rights={rights}
+              universalRights={universalRights}
               apiKey={apiKey}
               onEdit={this.editGatewayKey}
               onDelete={this.deleteGatewayKey}

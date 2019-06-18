@@ -27,6 +27,7 @@ import {
 
 import {
   rightsSelector,
+  universalRightsSelector,
   errorSelector as rightsErrorSelector,
   fetchingSelector as rightsFetchingSelector,
 } from './rights'
@@ -101,6 +102,8 @@ export const gatewayKeysErrorSelector = apiKeysErrorSelector(ENTITY)
 export const gatewayKeysFetchingSelector = apiKeysFetchingSelector(ENTITY)
 
 export const gatewayRightsSelector = rightsSelector(ENTITY)
+
+export const gatewayUniversalRightsSelector = universalRightsSelector(ENTITY)
 
 export const gatewayRightsErrorSelector = rightsErrorSelector(ENTITY)
 

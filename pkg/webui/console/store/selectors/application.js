@@ -22,6 +22,7 @@ import {
 } from './events'
 import {
   rightsSelector,
+  universalRightsSelector,
   errorSelector as rightsErrorSelector,
   fetchingSelector as rightsFetchingSelector,
 } from './rights'
@@ -62,6 +63,8 @@ export const applicationEventsErrorSelector = eventsErrorSelector(ENTITY)
 export const applicationEventsStatusSelector = eventsStatusSelector(ENTITY)
 
 export const applicationRightsSelector = rightsSelector(ENTITY)
+
+export const applicationUniversalRightsSelector = universalRightsSelector(ENTITY)
 
 export const applicationRightsErrorSelector = rightsErrorSelector(ENTITY)
 

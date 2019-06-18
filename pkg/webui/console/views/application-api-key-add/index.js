@@ -29,6 +29,7 @@ import { ApiKeyCreateForm } from '../../../components/api-key-form'
 import { getApplicationsRightsList } from '../../store/actions/applications'
 import {
   applicationRightsSelector,
+  applicationUniversalRightsSelector,
   applicationRightsErrorSelector,
   applicationRightsFetchingSelector,
 } from '../../store/selectors/application'
@@ -42,6 +43,7 @@ import api from '../../api'
     fetching: applicationRightsFetchingSelector(state, props),
     error: applicationRightsErrorSelector(state, props),
     rights: applicationRightsSelector(state, props),
+    universalRights: applicationUniversalRightsSelector(state, props),
   }
 })
 @withBreadcrumb('apps.single.api-keys.add', function (props) {
@@ -76,7 +78,7 @@ export default class ApplicationApiKeyAdd extends React.Component {
   }
 
   render () {
-    const { rights, fetching, error } = this.props
+    const { rights, fetching, error, universalRights } = this.props
 
     if (error) {
       throw error
@@ -98,6 +100,7 @@ export default class ApplicationApiKeyAdd extends React.Component {
           <Col lg={8} md={12}>
             <ApiKeyCreateForm
               rights={rights}
+              universalRights={universalRights}
               onCreate={this.createApplicationKey}
               onCreateSuccess={this.handleApprove}
             />

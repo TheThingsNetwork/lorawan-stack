@@ -94,6 +94,7 @@ class Checkbox extends React.PureComponent {
       autoFocus,
       onBlur,
       onFocus,
+      indeterminate,
     } = this.props
     const { checked } = this.state
 
@@ -114,6 +115,7 @@ class Checkbox extends React.PureComponent {
 
     const cls = classnames(className, style.wrapper, groupCls, {
       [style.disabled]: checkboxProps.disabled,
+      [style.indeterminate]: indeterminate,
     })
 
     return (
@@ -149,6 +151,7 @@ Checkbox.propTypes = {
   onChange: PropTypes.func,
   onBlur: PropTypes.func,
   onFocus: PropTypes.func,
+  indeterminate: PropTypes.bool,
 }
 
 Checkbox.defaultProps = {
@@ -159,6 +162,7 @@ Checkbox.defaultProps = {
   onChange: () => null,
   onBlur: () => null,
   onFocus: () => null,
+  indeterminate: false,
 }
 
 export default Checkbox

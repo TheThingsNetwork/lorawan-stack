@@ -26,22 +26,25 @@ import sharedMessages from '../../../lib/shared-messages'
 import Form from '../../../components/form'
 import SubmitButton from '../../../components/submit-button'
 import Input from '../../../components/input'
-import Checkbox from '../../../components/checkbox'
 import Spinner from '../../../components/spinner'
 import ModalButton from '../../../components/button/modal-button'
 import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import toast from '../../../components/toast'
 import SubmitBar from '../../../components/submit-bar'
+import RightsGroup from '../../components/rights-group'
 
 import { getApplicationCollaboratorsList } from '../../store/actions/application'
 import { getApplicationsRightsList } from '../../store/actions/applications'
 import api from '../../api'
 
-import style from './application-collaborator-edit.styl'
-
-// TODO: Move this to checkbox group later, see https://github.com/TheThingsNetwork/lorawan-stack/issues/189
-const UNIVERSAL_APPLICATION_RIGHTS = [ 'RIGHT_APPLICATION_ALL', 'RIGHT_ALL' ]
+import {
+  selectSelectedApplicationId,
+  applicationRightsSelector,
+  applicationUniversalRightsSelector,
+  applicationRightsFetchingSelector,
+  applicationRightsErrorSelector,
+} from '../../store/selectors/application'
 
 const validationSchema = Yup.object().shape({
   rights: Yup.object().test(
@@ -58,27 +61,27 @@ const m = defineMessages({
     'Are you sure you want to remove {collaboratorId} as a collaborator?',
 })
 
-@connect(function ({ collaborators, rights }, props) {
-  const { appId, collaboratorId } = props.match.params
-  const collaboratorsFetching = collaborators.applications.fetching
-  const rightsFetching = rights.applications.fetching
-  const collaboratorsError = collaborators.applications.error
-  const rightsError = rights.applications.error
+@connect(function (state, props) {
+  const appId = selectSelectedApplicationId(state, props)
+  const { collaboratorId } = props.match.params
+  const collaboratorsFetching = state.collaborators.applications.fetching
+  const collaboratorsError = state.collaborators.applications.error
 
-  const appRights = rights.applications
-  const rs = appRights ? appRights.rights : []
-
-  const appCollaborators = collaborators.applications[appId]
+  const appCollaborators = state.collaborators.applications[appId]
   const collaborator = appCollaborators ? appCollaborators.collaborators
     .find(c => c.id === collaboratorId) : undefined
+
+  const fetching = applicationRightsFetchingSelector(state, props) || collaboratorsFetching
+  const error = applicationRightsErrorSelector(state, props) || collaboratorsError
 
   return {
     collaboratorId,
     collaborator,
     appId,
-    rights: rs,
-    fetching: collaboratorsFetching || rightsFetching,
-    error: collaboratorsError || rightsError,
+    rights: applicationRightsSelector(state, props),
+    universalRights: applicationUniversalRightsSelector(state, props),
+    fetching,
+    error,
   }
 }, dispatch => ({
   async loadData (appId) {
@@ -169,7 +172,7 @@ export default class ApplicationCollaboratorEdit extends React.Component {
   }
 
   render () {
-    const { collaborator, rights, fetching, error } = this.props
+    const { collaborator, rights, fetching, error, universalRights } = this.props
 
     if (error) {
       throw error
@@ -179,27 +182,14 @@ export default class ApplicationCollaboratorEdit extends React.Component {
       return <Spinner center />
     }
 
-    const hasUniversalRights = UNIVERSAL_APPLICATION_RIGHTS.reduce(
+    const hasUniversalRights = universalRights.reduce(
       (acc, curr) => acc || collaborator.rights.includes(curr), false)
-    const { rightsItems, rightsValues } = rights.reduce(
+    const rightsValues = rights.reduce(
       function (acc, right) {
-        acc.rightsItems.push(
-          <Checkbox
-            className={style.rightLabel}
-            key={right}
-            name={right}
-            label={{ id: `enum:${right}` }}
-          />
-        )
-        acc.rightsValues[right] = hasUniversalRights || collaborator.rights.includes(right)
+        acc[right] = hasUniversalRights || collaborator.rights.includes(right)
 
         return acc
-      },
-      {
-        rightsItems: [],
-        rightsValues: {},
-      }
-    )
+      }, {})
 
     const initialFormValues = {
       collaborator_id: collaborator.id,
@@ -246,10 +236,10 @@ export default class ApplicationCollaboratorEdit extends React.Component {
                 name="rights"
                 title={sharedMessages.rights}
                 required
-                component={Checkbox.Group}
-              >
-                {rightsItems}
-              </Form.Field>
+                component={RightsGroup}
+                rights={rights}
+                universalRight={universalRights[0]}
+              />
               <SubmitBar>
                 <Form.Submit
                   component={SubmitButton} message={sharedMessages.saveChanges}
