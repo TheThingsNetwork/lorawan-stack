@@ -51,7 +51,7 @@ class InnerForm extends React.PureComponent {
 }
 
 const formRenderer = ({ children, ...rest }) => function (props) {
-  const { className, horizontal, error, info } = rest
+  const { className, horizontal, error, info, disabled } = rest
   const { handleSubmit, ...restFormikProps } = props
 
   return (
@@ -61,6 +61,7 @@ const formRenderer = ({ children, ...rest }) => function (props) {
       formError={error}
       formInfo={info}
       handleSubmit={handleSubmit}
+      disabled={disabled}
       {...restFormikProps}
     >
       {children}
@@ -112,6 +113,7 @@ Form.propTypes = {
   horizontal: PropTypes.bool,
   className: PropTypes.string,
   error: PropTypes.error,
+  disabled: PropTypes.bool,
 }
 
 Form.defaultProps = {
@@ -124,6 +126,7 @@ Form.defaultProps = {
   onReset: () => null,
   error: '',
   horizontal: true,
+  disabled: false,
 }
 
 Form.Field = FormField
