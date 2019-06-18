@@ -90,7 +90,7 @@ class Devices {
         const path = this.path
 
         // Only consider adding, if a common parent has not been already added
-        if (acc.every(e => !path.join().startsWith(e.join()))) {
+        if (acc.every(e => !path.slice(-1).join().startsWith(e.join()))) {
           // Add only the deepest possible field mask of the patch
           const commonPath = path.filter(commonPathFilter)
           acc.push(commonPath)

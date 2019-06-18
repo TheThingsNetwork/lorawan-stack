@@ -22,7 +22,6 @@ import Radio from '../../../components/radio-button'
 import Button from '../../../components/button'
 import SubmitBar from '../../../components/submit-bar'
 import sharedMessages from '../../../lib/shared-messages'
-import Message from '../../../lib/components/message'
 import PropTypes from '../../../lib/prop-types'
 import { address as addressRegexp } from '../../lib/regexp'
 import Input from '../../../components/input'
@@ -166,7 +165,6 @@ class PayloadFormattersForm extends React.Component {
     const {
       initialType,
       initialParameter,
-      title,
       linked,
       uplink,
     } = this.props
@@ -183,7 +181,6 @@ class PayloadFormattersForm extends React.Component {
 
     return (
       <div>
-        <Message component="h2" content={title} />
         <Form
           disabled={!linked}
           submitEnabledWhenInvalid
@@ -239,7 +236,6 @@ PayloadFormattersForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   onSubmitSuccess: PropTypes.func,
   onSubmitFailure: PropTypes.func,
-  title: PropTypes.message.isRequired,
   linked: PropTypes.bool.isRequired,
   uplink: PropTypes.bool.isRequired,
 }

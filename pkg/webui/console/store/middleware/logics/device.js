@@ -27,7 +27,16 @@ const getDeviceLogic = createRequestLogic({
   },
 })
 
+const updateDeviceLogic = createRequestLogic({
+  type: device.UPDATE_DEV,
+  async process ({ action }) {
+    const { payload: { appId, deviceId, patch }} = action
+    return api.device.update(appId, deviceId, patch)
+  },
+}, device.updateDeviceSuccess)
+
 export default [
   getDeviceLogic,
+  updateDeviceLogic,
   ...createEventsConnectLogics(device.SHARED_NAME, 'device'),
 ]

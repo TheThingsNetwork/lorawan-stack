@@ -50,7 +50,7 @@ storiesOf('Tabs', module)
   .addDecorator((story, context) => withInfo({
     inline: true,
     header: false,
-    source: false,
+    source: true,
     propTables: [ Tabs ],
     propTablesExclude: [ Example ],
   })(story)(context))

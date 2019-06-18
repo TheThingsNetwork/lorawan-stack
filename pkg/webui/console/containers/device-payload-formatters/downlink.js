@@ -16,90 +16,82 @@ import React from 'react'
 import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
 
-import toast from '../../../components/toast'
 import PropTypes from '../../../lib/prop-types'
 import sharedMessages from '../../../lib/shared-messages'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import IntlHelmet from '../../../lib/components/intl-helmet'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import PayloadFormattersForm from '../../components/payload-formatters-form'
-import Message from '../../../lib/components/message'
+import IntlHelmet from '../../../lib/components/intl-helmet'
 import PAYLOAD_FORMATTER_TYPES from '../../constants/formatter-types'
-import { updateApplicationLinkSuccess } from '../../store/actions/link'
-import {
-  selectApplicationIsLinked,
-  selectApplicationLinkFormatters,
-  selectSelectedApplicationId,
-} from '../../store/selectors/application'
+import toast from '../../../components/toast'
 
-import api from '../../api'
+import { updateDevice } from '../../store/actions/device'
+import { selectSelectedApplicationId } from '../../store/selectors/application'
+import {
+  selectSelectedDeviceId,
+  selectSelectedDeviceFormatters,
+} from '../../store/selectors/device'
 
 @connect(function (state) {
-  const formatters = selectApplicationLinkFormatters(state) || {}
+  const formatters = selectSelectedDeviceFormatters(state) || {}
 
   return {
     appId: selectSelectedApplicationId(state),
-    linked: selectApplicationIsLinked(state) || false,
+    devId: selectSelectedDeviceId(state),
     formatters,
   }
 },
-{ updateLinkSuccess: updateApplicationLinkSuccess })
-@withBreadcrumb('apps.single.payload-formatters.downlink', function (props) {
-  const { appId } = props
+{ updateDevice })
+@withBreadcrumb('device.single.payload-formatters.downlink', function (props) {
+  const { appId, devId } = props
 
   return (
     <Breadcrumb
-      path={`/console/applications/${appId}/payload-formatters/downlink`}
+      path={`/console/applications/${appId}/devices/${devId}/payload-formatters/downlink`}
       icon="downlink"
       content={sharedMessages.downlink}
     />
   )
 })
 @bind
-class ApplicationPayloadFormatters extends React.PureComponent {
+class DevicePayloadFormatters extends React.PureComponent {
 
   static propTypes = {
     appId: PropTypes.string.isRequired,
+    devId: PropTypes.string.isRequired,
     formatters: PropTypes.object.isRequired,
-    updateLinkSuccess: PropTypes.func.isRequired,
-    linked: PropTypes.bool.isRequired,
+    updateDevice: PropTypes.func.isRequired,
   }
 
   async onSubmit (values) {
-    const { appId, formatters } = this.props
+    const { appId, devId, formatters, updateDevice } = this.props
 
-    return await api.application.link.set(appId, {
-      default_formatters: {
-        up_formatter: formatters.up_formatter || PAYLOAD_FORMATTER_TYPES.NONE,
-        up_formatter_parameter: formatters.up_formatter_parameter || '',
+    await updateDevice(appId, devId, {
+      formatters: {
         down_formatter: values.type,
         down_formatter_parameter: values.parameter,
+        up_formatter: formatters.up_formatter || PAYLOAD_FORMATTER_TYPES.NONE,
+        up_formatter_parameter: formatters.up_formatter_parameter || '',
       },
     })
-  }
 
-  onSubmitSuccess (link) {
-    const { appId, updateLinkSuccess } = this.props
     toast({
-      title: appId,
+      title: devId,
       message: sharedMessages.payloadFormattersUpdateSuccess,
       type: toast.types.SUCCESS,
     })
-    updateLinkSuccess(link)
   }
 
   render () {
-    const { formatters, linked } = this.props
+    const { formatters } = this.props
 
     return (
       <React.Fragment>
         <IntlHelmet title={sharedMessages.payloadFormattersDownlink} />
-        <Message component="h2" content={sharedMessages.payloadFormattersDownlink} />
         <PayloadFormattersForm
           uplink={false}
-          linked={linked}
+          linked
           onSubmit={this.onSubmit}
-          onSubmitSuccess={this.onSubmitSuccess}
           title={sharedMessages.payloadFormattersDownlink}
           initialType={formatters.down_formatter || PAYLOAD_FORMATTER_TYPES.NONE}
           initialParameter={formatters.down_formatter_parameter || ''}
@@ -109,4 +101,4 @@ class ApplicationPayloadFormatters extends React.PureComponent {
   }
 }
 
-export default ApplicationPayloadFormatters
+export default DevicePayloadFormatters

@@ -42,16 +42,26 @@ export const [{
   (appId, deviceId) => ({ appId, deviceId }),
   (appId, deviceId, selector, options) => ({ selector, options })
 )
-export const UPDATE_DEV = 'UPDATE_DEVICE'
+
+export const UPDATE_DEV_BASE = 'UPDATE_DEVICE'
+export const [{
+  request: UPDATE_DEV,
+  success: UPDATE_DEV_SUCCESS,
+  failure: UPDATE_DEV_FAILURE,
+}, {
+  request: updateDevice,
+  success: updateDeviceSuccess,
+  failure: updateDeviceFailure,
+}] = createRequestActions(UPDATE_DEV_BASE,
+  (appId, deviceId, patch) => ({ appId, deviceId, patch }),
+  (appId, deviceId, patch, selector) => ({ selector })
+)
+
 export const START_DEVICE_EVENT_STREAM = createStartEventsStreamActionType(SHARED_NAME)
 export const START_DEVICE_EVENT_STREAM_SUCCESS = createStartEventsStreamSuccessActionType(SHARED_NAME)
 export const START_DEVICE_EVENT_STREAM_FAILURE = createStartEventsStreamFailureActionType(SHARED_NAME)
 export const STOP_DEVICE_EVENT_STREAM = createStopEventsStreamActionType(SHARED_NAME)
 export const CLEAR_DEVICE_EVENTS = createClearEventsActionType(SHARED_NAME)
-
-export const updateDevice = (appId, deviceId, patch) => (
-  { type: UPDATE_DEV, appId, deviceId, patch }
-)
 
 export const startDeviceEventsStream = startEventsStream(SHARED_NAME)
 

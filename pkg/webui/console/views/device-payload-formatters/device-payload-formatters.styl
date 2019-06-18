@@ -12,35 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.tab
-  display: inline-block
-
-.tab-item
-  display: inline-block
-  padding: $cs.s $cs.l
-  text-align: center
-  position: relative
-  cursor: pointer
-  user-select: none
-  color: $tc-subtle-gray
-  transition: color $ad.xs
-
-  &:not(.tab-item-active):hover
-    color: $tc-deep-gray
-
-  &:not(:last-child)
-    margin-bottom: 0
-
-  &-narrow
-    padding: $cs.l $cs.m
-
-  &-disabled
-    cursor: not-allowed
-    opacity: .4
-
-  &-default:not(.tab-item-active)
-    pseudo-border-animated(3px, $c-divider)
-
-  &-active
-    pseudo-border(3px, $c-active-blue)
-    color: $c-active-blue
+.tabs
+  margin-top: 0
+  margin-bottom: $ls.s
