@@ -20,6 +20,7 @@ import { connect } from 'react-redux'
 import * as Yup from 'yup'
 import { replace } from 'connected-react-router'
 
+import IntlHelmet from '../../../lib/components/intl-helmet'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import sharedMessages from '../../../lib/shared-messages'
@@ -40,7 +41,6 @@ const m = defineMessages({
   basics: 'Basics',
   deleteApp: 'Delete application',
   modalWarning: 'Are you sure you want to delete "{appName}"? Deleting an application cannot be undone!',
-  generalSettings: 'General Settings',
   updateSuccess: 'Successfully updated application',
 })
 
@@ -65,7 +65,7 @@ const validationSchema = Yup.object().shape({
     <Breadcrumb
       path={`/console/applications/${appId}/general-settings`}
       icon="general_settings"
-      content={m.generalSettings}
+      content={sharedMessages.generalSettings}
     />
   )
 })
@@ -117,6 +117,9 @@ export default class ApplicationGeneralSettings extends React.Component {
 
     return (
       <Container>
+        <IntlHelmet
+          title={sharedMessages.generalSettings}
+        />
         <Row>
           <Col lg={8} md={12}>
             <Message

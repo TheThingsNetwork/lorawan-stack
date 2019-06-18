@@ -91,6 +91,9 @@ const appHTML = `{{- $assetsBaseURL := .AssetsBaseURL -}}
       window.APP_ROOT={{.MountPath}};
       window.ASSETS_ROOT={{$assetsBaseURL}};
       window.APP_CONFIG={{.AppConfig}};
+      window.SITE_NAME={{.SiteName}};
+      window.SITE_TITLE={{.Title}};
+      window.SITE_SUB_TITLE={{.SubTitle}};
       {{with .PageData}}window.PAGE_DATA={{.}};{{end}}
     </script>
     {{range .JSFiles}}<script type="text/javascript" src="{{$assetsBaseURL}}/{{.}}"></script>{{end}}

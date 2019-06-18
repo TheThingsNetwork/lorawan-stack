@@ -22,6 +22,7 @@ import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import { withSideNavigation } from '../../../components/navigation/side/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import Spinner from '../../../components/spinner'
+import IntlHelmet from '../../../lib/components/intl-helmet'
 
 import ApplicationOverview from '../application-overview'
 import ApplicationGeneralSettings from '../application-general-settings'
@@ -44,6 +45,7 @@ import {
 } from '../../store/selectors/application'
 
 import Devices from '../devices'
+import withEnv, { EnvProvider } from '../../../lib/components/env'
 
 @connect(function (state, props) {
   return {
@@ -138,6 +140,8 @@ dispatch => ({
     />
   )
 })
+
+@withEnv
 export default class Application extends React.Component {
 
   componentDidMount () {
@@ -154,8 +158,7 @@ export default class Application extends React.Component {
   }
 
   render () {
-    const { fetching, match, error, application } = this.props
-
+    const { fetching, match, error, application, appId, env } = this.props
     if (error) {
       throw error
     }
@@ -169,17 +172,22 @@ export default class Application extends React.Component {
     }
 
     return (
-      <Switch>
-        <Route exact path={`${match.path}`} component={ApplicationOverview} />
-        <Route path={`${match.path}/general-settings`} component={ApplicationGeneralSettings} />
-        <Route path={`${match.path}/api-keys`} component={ApplicationApiKeys} />
-        <Route path={`${match.path}/link`} component={ApplicationLink} />
-        <Route path={`${match.path}/devices`} component={Devices} />
-        <Route path={`${match.path}/collaborators`} component={ApplicationCollaborators} />
-        <Route path={`${match.path}/data`} component={ApplicationData} />
-        <Route path={`${match.path}/payload-formatters`} component={ApplicationPayloadFormatters} />
-        <Route path={`${match.path}/integrations`} component={ApplicationIntegrations} />
-      </Switch>
+      <EnvProvider env={env}>
+        <IntlHelmet
+          titleTemplate={`%s - ${application.name || appId} - ${env.site_name}`}
+        />
+        <Switch>
+          <Route exact path={`${match.path}`} component={ApplicationOverview} />
+          <Route path={`${match.path}/general-settings`} component={ApplicationGeneralSettings} />
+          <Route path={`${match.path}/api-keys`} component={ApplicationApiKeys} />
+          <Route path={`${match.path}/link`} component={ApplicationLink} />
+          <Route path={`${match.path}/devices`} component={Devices} />
+          <Route path={`${match.path}/collaborators`} component={ApplicationCollaborators} />
+          <Route path={`${match.path}/data`} component={ApplicationData} />
+          <Route path={`${match.path}/payload-formatters`} component={ApplicationPayloadFormatters} />
+          <Route path={`${match.path}/integrations`} component={ApplicationIntegrations} />
+        </Switch>
+      </EnvProvider>
     )
   }
 }

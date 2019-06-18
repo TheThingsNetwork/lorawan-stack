@@ -16,6 +16,7 @@ import React from 'react'
 import { Switch, Route } from 'react-router'
 import { connect } from 'react-redux'
 
+import IntlHelmet from '../../../lib/components/intl-helmet'
 import sharedMessages from '../../../lib/shared-messages'
 import { withSideNavigation } from '../../../components/navigation/side/context'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
@@ -39,6 +40,7 @@ import {
   errorSelector,
   gatewaySelector,
 } from '../../store/selectors/gateway'
+import withEnv, { EnvProvider } from '../../../lib/components/env'
 
 @connect(function (state, props) {
   const gtwId = props.match.params.gtwId
@@ -102,6 +104,7 @@ dispatch => ({
     />
   )
 })
+@withEnv
 export default class Gateway extends React.Component {
 
   componentDidMount () {
@@ -127,7 +130,7 @@ export default class Gateway extends React.Component {
   }
 
   render () {
-    const { fetching, error, match, gateway } = this.props
+    const { fetching, error, match, gateway, gtwId, env } = this.props
 
     // show any gateway fetching error, e.g. not found, no rights, etc
     if (error) {
@@ -143,13 +146,18 @@ export default class Gateway extends React.Component {
     }
 
     return (
-      <Switch>
-        <Route exact path={`${match.path}`} component={GatewayOverview} />
-        <Route path={`${match.path}/api-keys`} component={GatewayApiKeys} />
-        <Route path={`${match.path}/location`} component={GatewayLocation} />
-        <Route path={`${match.path}/data`} component={GatewayData} />
-        <Route path={`${match.path}/general-settings`} component={GatewayGeneralSettings} />
-      </Switch>
+      <EnvProvider env={env}>
+        <IntlHelmet
+          titleTemplate={`%s - ${gateway.name || gtwId} - ${env.site_name}`}
+        />
+        <Switch>
+          <Route exact path={`${match.path}`} component={GatewayOverview} />
+          <Route path={`${match.path}/api-keys`} component={GatewayApiKeys} />
+          <Route path={`${match.path}/location`} component={GatewayLocation} />
+          <Route path={`${match.path}/data`} component={GatewayData} />
+          <Route path={`${match.path}/general-settings`} component={GatewayGeneralSettings} />
+        </Switch>
+      </EnvProvider>
     )
   }
 }
