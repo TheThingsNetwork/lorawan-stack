@@ -28,7 +28,6 @@ class FormSubmit extends React.Component {
   }
 
   static defaultProps = {
-    submitEnabledWhenInvalid: false,
     component: 'button',
   }
 
@@ -43,6 +42,7 @@ class FormSubmit extends React.Component {
       dirty: this.context.dirty,
       validateForm: this.context.validateForm,
       validateField: this.context.validateField,
+      disabled: this.context.disabled,
     }
 
     return (
