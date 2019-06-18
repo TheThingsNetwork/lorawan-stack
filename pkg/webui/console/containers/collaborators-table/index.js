@@ -68,7 +68,7 @@ export default class CollaboratorsTable extends Component {
       <FetchTable
         entity="collaborators"
         headers={headers}
-        addMessage={sharedMessages.addCollaborator}
+        addMessage={sharedMessages.collaboratorAdd}
         {...this.props}
       />
     )
