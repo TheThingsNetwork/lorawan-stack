@@ -12,20 +12,53 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { getApplicationId } from '../../../lib/selectors/id'
+import {
+  GET_APP,
+  GET_APP_SUCCESS,
+} from '../actions/application'
 import { GET_APPS_LIST_SUCCESS } from '../actions/applications'
 
+const application = function (state = {}, application) {
+  return {
+    ...state,
+    ...application,
+  }
+}
+
 const defaultState = {
-  applications: [],
-  totalCount: 0,
+  entities: {},
+  selectedApplication: null,
 }
 
 const applications = function (state = defaultState, { type, payload }) {
   switch (type) {
-  case GET_APPS_LIST_SUCCESS:
+  case GET_APP:
     return {
       ...state,
-      applications: payload.applications,
-      totalCount: payload.totalCount,
+      selectedApplication: payload.id,
+    }
+  case GET_APPS_LIST_SUCCESS:
+    const entities = payload.entities.reduce(function (acc, app) {
+      const id = getApplicationId(app)
+
+      acc[id] = application(acc[id], app)
+      return acc
+    }, { ...state.entities })
+
+    return {
+      ...state,
+      entities,
+    }
+  case GET_APP_SUCCESS:
+    const id = getApplicationId(payload)
+
+    return {
+      ...state,
+      entities: {
+        ...state.entities,
+        [id]: application(state[id], payload),
+      },
     }
   default:
     return state

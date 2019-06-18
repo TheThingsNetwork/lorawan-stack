@@ -26,7 +26,7 @@ import Message from '../../../lib/components/message'
 import WebhookForm from '../../components/webhook-form'
 import toast from '../../../components/toast'
 import Spinner from '../../../components/spinner'
-
+import diff from '../../../lib/diff'
 import sharedMessages from '../../../lib/shared-messages'
 
 import {
@@ -34,9 +34,8 @@ import {
   selectWebhookFetching,
   selectWebhookError,
 } from '../../store/selectors/webhook'
-import { selectSelectedApplicationId } from '../../store/selectors/application'
+import { selectSelectedApplicationId } from '../../store/selectors/applications'
 import { getWebhook } from '../../store/actions/webhook'
-import diff from '../../../lib/diff'
 
 import api from '../../api'
 
@@ -59,15 +58,12 @@ const webhookEntitySelector = [
   'location_solved',
 ]
 
-@connect(function (state) {
-  const webhook = selectSelectedWebhook(state)
-  return {
-    appId: selectSelectedApplicationId(state),
-    webhook,
-    fetching: selectWebhookFetching(state),
-    error: selectWebhookError(state),
-  }
-}, function (dispatch, { match }) {
+@connect(state => ({
+  appId: selectSelectedApplicationId(state),
+  webhook: selectSelectedWebhook(state),
+  fetching: selectWebhookFetching(state),
+  error: selectWebhookError(state),
+}), function (dispatch, { match }) {
   const { appId, webhookId } = match.params
   return {
     getWebhook: () => dispatch(getWebhook(appId, webhookId, webhookEntitySelector)),

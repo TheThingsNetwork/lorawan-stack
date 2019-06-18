@@ -34,8 +34,8 @@ import SubmitBar from '../../../components/submit-bar'
 import RightsGroup from '../../components/rights-group'
 
 import { getApplicationsRightsList } from '../../store/actions/applications'
+import { selectSelectedApplicationId } from '../../store/selectors/applications'
 import {
-  selectSelectedApplicationId,
   selectApplicationRights,
   selectApplicationUniversalRights,
   selectApplicationRightsFetching,

@@ -33,7 +33,7 @@ import diff from '../../../lib/diff'
 import toast from '../../../components/toast'
 import SubmitBar from '../../../components/submit-bar'
 
-import { selectSelectedApplication } from '../../store/selectors/application'
+import { selectSelectedApplication } from '../../store/selectors/applications'
 
 import api from '../../api'
 

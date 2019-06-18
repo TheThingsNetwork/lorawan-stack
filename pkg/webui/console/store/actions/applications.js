@@ -13,11 +13,11 @@
 // limitations under the License.
 
 import createGetRightsListRequestActions, { createGetRightsListActionType } from './rights'
-import { createRequestActions } from './lib'
+import { createPaginationRequestActions, createPaginationBaseActionType } from './pagination'
 
 export const SHARED_NAME = 'APPLICATIONS'
 
-export const GET_APPS_LIST_BASE = 'GET_APPLICATIONS_LIST'
+export const GET_APPS_LIST_BASE = createPaginationBaseActionType(SHARED_NAME)
 export const [{
   request: GET_APPS_LIST,
   success: GET_APPS_LIST_SUCCESS,
@@ -26,9 +26,7 @@ export const [{
   request: getApplicationsList,
   success: getApplicationsSuccess,
   failure: getApplicationsFailure,
-}] = createRequestActions(GET_APPS_LIST_BASE,
-  ({ page, limit, query } = {}) => ({ page, limit, query })
-)
+}] = createPaginationRequestActions(SHARED_NAME)
 
 export const GET_APPS_RIGHTS_LIST_BASE = createGetRightsListActionType(SHARED_NAME)
 export const [{

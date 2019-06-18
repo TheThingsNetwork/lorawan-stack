@@ -28,8 +28,8 @@ import { ApiKeyEditForm } from '../../../components/api-key-form'
 
 import { getApplicationApiKey } from '../../store/actions/application'
 import { getApplicationsRightsList } from '../../store/actions/applications'
+import { selectSelectedApplicationId } from '../../store/selectors/applications'
 import {
-  selectSelectedApplicationId,
   selectApplicationRights,
   selectApplicationUniversalRights,
   selectApplicationRightsError,

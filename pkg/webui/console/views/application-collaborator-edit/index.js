@@ -36,15 +36,15 @@ import RightsGroup from '../../components/rights-group'
 
 import { getApplicationCollaboratorsList } from '../../store/actions/application'
 import { getApplicationsRightsList } from '../../store/actions/applications'
-import api from '../../api'
-
+import { selectSelectedApplicationId } from '../../store/selectors/applications'
 import {
-  selectSelectedApplicationId,
   selectApplicationRights,
   selectApplicationUniversalRights,
   selectApplicationRightsFetching,
   selectApplicationRightsError,
 } from '../../store/selectors/application'
+
+import api from '../../api'
 
 const validationSchema = Yup.object().shape({
   rights: Yup.object().test(

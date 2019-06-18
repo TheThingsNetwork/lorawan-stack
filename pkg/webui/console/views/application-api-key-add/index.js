@@ -27,16 +27,17 @@ import IntlHelmet from '../../../lib/components/intl-helmet'
 import { ApiKeyCreateForm } from '../../../components/api-key-form'
 
 import { getApplicationsRightsList } from '../../store/actions/applications'
+import { selectSelectedApplicationId } from '../../store/selectors/applications'
 import {
-  selectSelectedApplicationId,
   selectApplicationRights,
   selectApplicationUniversalRights,
   selectApplicationRightsError,
   selectApplicationRightsFetching,
 } from '../../store/selectors/application'
+
 import api from '../../api'
 
-@connect((state, props) => ({
+@connect(state => ({
   appId: selectSelectedApplicationId(state),
   fetching: selectApplicationRightsFetching(state),
   error: selectApplicationRightsError(state),

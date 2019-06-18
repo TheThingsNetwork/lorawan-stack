@@ -40,9 +40,9 @@ import {
 } from '../../store/actions/application'
 import {
   selectSelectedApplication,
-  selectApplicationError,
   selectApplicationFetching,
-} from '../../store/selectors/application'
+  selectApplicationError,
+} from '../../store/selectors/applications'
 
 import Devices from '../devices'
 import withEnv, { EnvProvider } from '../../../lib/components/env'
