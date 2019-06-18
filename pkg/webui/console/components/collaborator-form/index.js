@@ -22,15 +22,13 @@ import { id as collaboratorIdRegexp } from '../../lib/regexp'
 
 import Form from '../../../components/form'
 import Input from '../../../components/input'
-import Checkbox from '../../../components/checkbox'
 import Select from '../../../components/select'
 import SubmitBar from '../../../components/submit-bar'
 import SubmitButton from '../../../components/submit-button'
 import Message from '../../../lib/components/message'
 import toast from '../../../components/toast'
 import ModalButton from '../../../components/button/modal-button'
-
-import style from './collaborator-form.styl'
+import RightsGroup from '../../components/rights-group'
 
 const validationSchema = Yup.object().shape({
   collaborator_id: Yup.string()
@@ -55,6 +53,7 @@ export default class CollaboratorForm extends Component {
     onDeleteSuccess: () => null,
     oneleteFailure: () => null,
     rights: [],
+    universalRights: [],
   }
 
   static propTypes = {
@@ -67,6 +66,7 @@ export default class CollaboratorForm extends Component {
     rights: PropTypes.array,
     initialFormValues: PropTypes.object,
     error: PropTypes.error,
+    universalRights: PropTypes.array,
   }
 
   state = {
@@ -121,12 +121,12 @@ export default class CollaboratorForm extends Component {
       })
       onDeleteSuccess()
     } catch (error) {
-      await this.setState({ error })
+      this.setState({ error })
     }
   }
 
   computeInitialValues () {
-    const { collaborator, rights, universalRightLiterals } = this.props
+    const { collaborator, rights } = this.props
 
     if (!collaborator) {
       return {
@@ -136,11 +136,9 @@ export default class CollaboratorForm extends Component {
       }
     }
 
-    const hasUniversalRights = universalRightLiterals.reduce(
-      (acc, curr) => acc || collaborator.rights.includes(curr), false)
     const rightsValues = rights.reduce(
       function (acc, right) {
-        acc[right] = hasUniversalRights || collaborator.rights.includes(right)
+        acc[right] = collaborator.rights.includes(right)
 
         return acc
       },
@@ -160,21 +158,12 @@ export default class CollaboratorForm extends Component {
       rights,
       error: passedError,
       update,
+      universalRights,
     } = this.props
+
     const { error: submitError } = this.state
 
     const error = passedError || submitError
-
-    const rightsItems = rights.map(
-      right => (
-        <Checkbox
-          className={style.rightLabel}
-          key={right}
-          name={right}
-          label={{ id: `enum:${right}` }}
-        />
-      )
-    )
 
     return (
       <Form
@@ -210,10 +199,13 @@ export default class CollaboratorForm extends Component {
           name="rights"
           title={sharedMessages.rights}
           required
-          component={Checkbox.Group}
-        >
-          {rightsItems}
-        </Form.Field>
+          strict
+          component={RightsGroup}
+          rights={rights}
+          universalRight={universalRights[0]}
+          disabled={hasRightAll}
+
+        />
         <SubmitBar>
           <Form.Submit
             component={SubmitButton}
@@ -243,4 +235,3 @@ export default class CollaboratorForm extends Component {
     )
   }
 }
-
