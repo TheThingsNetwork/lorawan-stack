@@ -16,49 +16,43 @@ import React from 'react'
 import { Container, Col, Row } from 'react-grid-system'
 import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
-import * as Yup from 'yup'
 import { push } from 'connected-react-router'
 
 import Spinner from '../../../components/spinner'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import sharedMessages from '../../../lib/shared-messages'
-import Form from '../../../components/form'
-import Field from '../../../components/field'
-import Button from '../../../components/button'
 import Message from '../../../lib/components/message'
-import FieldGroup from '../../../components/field/group'
 import IntlHelmet from '../../../lib/components/intl-helmet'
-import { id as collaboratorIdRegexp } from '../../lib/regexp'
-import SubmitBar from '../../../components/submit-bar'
+import CollaboratorForm from '../../components/collaborator-form'
+
+import {
+  gatewayRightsSelector,
+  gatewayUniversalRightsSelector,
+  gatewayRightsFetchingSelector,
+  gatewayRightsErrorSelector,
+} from '../../store/selectors/gateway'
 
 import { getGatewaysRightsList } from '../../store/actions/gateways'
 import api from '../../api'
 
-import style from './gateway-collaborator-add.styl'
-
-const validationSchema = Yup.object().shape({
-  collaborator_id: Yup.string()
-    .matches(collaboratorIdRegexp, sharedMessages.validateAlphanum)
-    .required(sharedMessages.validateRequired),
-  collaborator_type: Yup.string()
-    .required(sharedMessages.validateRequired),
-  rights: Yup.object().test(
-    'rights',
-    sharedMessages.validateRights,
-    values => Object.values(values).reduce((acc, curr) => acc || curr, false)
-  ),
-})
-
-@connect(function ({ rights, collaborators }, props) {
+@connect(function (state, props) {
   const gtwId = props.match.params.gtwId
+  const { collaborators } = state
 
   return {
     gtwId,
     collaborators: collaborators.gateways.collaborators,
-    fetching: rights.gateways.fetching,
-    error: rights.gateways.error,
-    rights: rights.gateways.rights,
+    fetching: gatewayRightsFetchingSelector(state),
+    error: gatewayRightsErrorSelector(state),
+    rights: gatewayRightsSelector(state),
+    universalRights: gatewayUniversalRightsSelector(state),
+  }
+}, function (dispatch, ownProps) {
+  const gtwId = ownProps.match.params.gtwId
+  return {
+    redirectToList: () => dispatch(push(`/console/gateways/${gtwId}/collaborators`)),
+    getGatewaysRightsList: () => dispatch(getGatewaysRightsList(gtwId)),
   }
 })
 @withBreadcrumb('gtws.single.collaborators.add', function (props) {
@@ -79,36 +73,19 @@ export default class GatewayCollaboratorAdd extends React.Component {
   }
 
   componentDidMount () {
-    const { dispatch, gtwId } = this.props
+    const { getGatewaysRightsList } = this.props
 
-    dispatch(getGatewaysRightsList(gtwId))
+    getGatewaysRightsList()
   }
 
-  async handleSubmit (values, { resetForm }) {
-    const { collaborator_id, collaborator_type, rights } = values
-    const { gtwId, dispatch } = this.props
+  handleSubmit (collaborator) {
+    const { gtwId } = this.props
 
-    const collaborator_ids = {
-      [`${collaborator_type}_ids`]: {
-        [`${collaborator_type}_id`]: collaborator_id,
-      },
-    }
-    const collaborator = {
-      ids: collaborator_ids,
-      rights: Object.keys(rights).filter(r => rights[r]),
-    }
-
-    try {
-      await api.gateway.collaborators.add(gtwId, collaborator)
-      dispatch(push(`/console/gateways/${gtwId}/collaborators`))
-    } catch (error) {
-      resetForm(values)
-      this.setState({ error })
-    }
+    return api.gateway.collaborators.add(gtwId, collaborator)
   }
 
   render () {
-    const { rights, fetching, error } = this.props
+    const { rights, fetching, error, redirectToList, universalRights } = this.props
 
     if (error) {
       throw error
@@ -116,34 +93,6 @@ export default class GatewayCollaboratorAdd extends React.Component {
 
     if (fetching && !rights.length) {
       return <Spinner center />
-    }
-
-    const { rightsItems, rightsValues } = rights.reduce(
-      function (acc, right) {
-        acc.rightsItems.push(
-          <Field
-            className={style.rightLabel}
-            key={right}
-            name={right}
-            type="checkbox"
-            title={{ id: `enum:${right}` }}
-            form
-          />
-        )
-        acc.rightsValues[right] = false
-
-        return acc
-      },
-      {
-        rightsItems: [],
-        rightsValues: {},
-      }
-    )
-
-    const initialFormValues = {
-      collaborator_id: '',
-      collaborator_type: 'user',
-      rights: rightsValues,
     }
 
     return (
@@ -156,48 +105,13 @@ export default class GatewayCollaboratorAdd extends React.Component {
         </Row>
         <Row>
           <Col lg={8} md={12}>
-            <Form
-              horizontal
+            <CollaboratorForm
               error={this.state.error}
               onSubmit={this.handleSubmit}
-              initialValues={initialFormValues}
-              validationSchema={validationSchema}
-              mapErrorsToFields={{
-                user_not_found: 'collaborator_id',
-                organization_not_found: 'collaborator_id',
-              }}
-            >
-              <Message
-                component="h4"
-                content={sharedMessages.generalInformation}
-              />
-              <Field
-                name="collaborator_id"
-                type="text"
-                title={sharedMessages.collaboratorId}
-                required
-                autoFocus
-              />
-              <Field
-                type="select"
-                name="collaborator_type"
-                title={sharedMessages.type}
-                required
-                options={[
-                  { value: 'user', label: sharedMessages.user },
-                  { value: 'organization', label: sharedMessages.organization },
-                ]}
-              />
-              <FieldGroup
-                name="rights"
-                title={sharedMessages.rights}
-              >
-                {rightsItems}
-              </FieldGroup>
-              <SubmitBar>
-                <Button type="submit" message={sharedMessages.addCollaborator} />
-              </SubmitBar>
-            </Form>
+              onSubmitSuccess={redirectToList}
+              universalRightLiterals={universalRights}
+              rights={rights}
+            />
           </Col>
         </Row>
       </Container>
