@@ -16,22 +16,16 @@ import React from 'react'
 import { connect } from 'react-redux'
 import bind from 'autobind-decorator'
 import { Container, Col, Row } from 'react-grid-system'
-import * as Yup from 'yup'
 import { replace } from 'connected-react-router'
 
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import sharedMessages from '../../../lib/shared-messages'
-import Form from '../../../components/form'
-import SubmitButton from '../../../components/submit-button'
-import Input from '../../../components/input'
+import CollaboratorForm from '../../components/collaborator-form'
 import Spinner from '../../../components/spinner'
-import ModalButton from '../../../components/button/modal-button'
 import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import toast from '../../../components/toast'
-import SubmitBar from '../../../components/submit-bar'
-import RightsGroup from '../../components/rights-group'
 
 import {
   getApplicationCollaboratorsList,
@@ -46,14 +40,6 @@ import {
 } from '../../store/selectors/applications'
 
 import api from '../../api'
-
-const validationSchema = Yup.object().shape({
-  rights: Yup.object().test(
-    'rights',
-    sharedMessages.validateRights,
-    values => Object.values(values).reduce((acc, curr) => acc || curr, false)
-  ),
-})
 
 @connect(function (state, props) {
   const appId = selectSelectedApplicationId(state)
@@ -110,34 +96,17 @@ export default class ApplicationCollaboratorEdit extends React.Component {
     loadData(appId)
   }
 
-  async handleSubmit (values, { resetForm }) {
-    const { collaborator_id, rights } = values
-    const { appId, collaborator } = this.props
-    const collaborator_type = collaborator.isUser ? 'user' : 'organization'
+  async handleSubmit (updatedCollaborator) {
+    const { appId } = this.props
 
-    const collaborator_ids = {
-      [`${collaborator_type}_ids`]: {
-        [`${collaborator_type}_id`]: collaborator_id,
-      },
-    }
-    const updatedCollaborator = {
-      ids: collaborator_ids,
-      rights: Object.keys(rights).filter(r => rights[r]),
-    }
+    await api.application.collaborators.update(appId, updatedCollaborator)
+  }
 
-    await this.setState({ error: '' })
-
-    try {
-      await api.application.collaborators.update(appId, updatedCollaborator)
-      resetForm(values)
-      toast({
-        message: sharedMessages.collaboratorUpdateSuccess,
-        type: toast.types.SUCCESS,
-      })
-    } catch (error) {
-      resetForm(values)
-      await this.setState({ error })
-    }
+  handleSubmitSuccess () {
+    toast({
+      message: sharedMessages.collaboratorUpdateSuccess,
+      type: toast.types.SUCCESS,
+    })
   }
 
   async handleDelete () {
@@ -166,7 +135,14 @@ export default class ApplicationCollaboratorEdit extends React.Component {
   }
 
   render () {
-    const { collaborator, rights, fetching, error, universalRights } = this.props
+    const {
+      collaborator,
+      rights,
+      fetching,
+      error,
+      universalRights,
+      redirectToList,
+    } = this.props
 
     if (error) {
       throw error
@@ -174,20 +150,6 @@ export default class ApplicationCollaboratorEdit extends React.Component {
 
     if (fetching || !collaborator) {
       return <Spinner center />
-    }
-
-    const hasUniversalRights = universalRights.reduce(
-      (acc, curr) => acc || collaborator.rights.includes(curr), false)
-    const rightsValues = rights.reduce(
-      function (acc, right) {
-        acc[right] = hasUniversalRights || collaborator.rights.includes(right)
-
-        return acc
-      }, {})
-
-    const initialFormValues = {
-      collaborator_id: collaborator.id,
-      rights: { ...rightsValues },
     }
 
     return (
@@ -207,53 +169,17 @@ export default class ApplicationCollaboratorEdit extends React.Component {
         </Row>
         <Row>
           <Col lg={8} md={12}>
-            <Form
-              horizontal
+            <CollaboratorForm
               error={this.state.error}
               onSubmit={this.handleSubmit}
-              initialValues={initialFormValues}
-              validationSchema={validationSchema}
-            >
-              <Message
-                component="h4"
-                content={sharedMessages.generalInformation}
-              />
-              <Form.Field
-                title={sharedMessages.collaboratorId}
-                required
-                valid
-                disabled
-                name="collaborator_id"
-                component={Input}
-              />
-              <Form.Field
-                name="rights"
-                title={sharedMessages.rights}
-                required
-                component={RightsGroup}
-                rights={rights}
-                universalRight={universalRights[0]}
-              />
-              <SubmitBar>
-                <Form.Submit
-                  component={SubmitButton} message={sharedMessages.saveChanges}
-                />
-                <ModalButton
-                  type="button"
-                  icon="delete"
-                  danger
-                  naked
-                  message={sharedMessages.removeCollaborator}
-                  modalData={{
-                    message: {
-                      values: { collaboratorId: collaborator.id },
-                      ...sharedMessages.collaboratorModalWarning,
-                    },
-                  }}
-                  onApprove={this.handleDelete}
-                />
-              </SubmitBar>
-            </Form>
+              onSubmitSuccess={this.handleSubmitSuccess}
+              onDelete={this.handleDelete}
+              onDeleteSuccess={redirectToList}
+              collaborator={collaborator}
+              universalRightLiterals={universalRights}
+              rights={rights}
+              update
+            />
           </Col>
         </Row>
       </Container>
