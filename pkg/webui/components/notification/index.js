@@ -22,17 +22,19 @@ import Icon from '../icon'
 import PropTypes from '../../lib/prop-types'
 import style from './notification.styl'
 
-const Notification = function ({
-  className,
-  title,
-  error,
-  warning,
-  info,
-  small,
-  message,
-  success,
-  messageValues = {},
-}) {
+const Notification = React.forwardRef(function (props, ref) {
+
+  const {
+    className,
+    title,
+    error,
+    warning,
+    info,
+    small,
+    message,
+    success,
+    messageValues = {},
+  } = props
 
   const classname = classnames(style.notification, className, {
     [style.error]: error,
@@ -53,7 +55,7 @@ const Notification = function ({
   const Component = error ? ErrorMessage : Message
 
   return (
-    <div className={classname}>
+    <div className={classname} ref={ref}>
       <Icon className={style.icon} icon={icon} large={!small} />
       <div className={style.content}>
         { title && (
@@ -67,7 +69,7 @@ const Notification = function ({
       </div>
     </div>
   )
-}
+})
 
 Notification.propTypes = {
   message: PropTypes.message,
