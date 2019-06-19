@@ -16,22 +16,15 @@ import React from 'react'
 import { Container, Col, Row } from 'react-grid-system'
 import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
-import * as Yup from 'yup'
 import { push } from 'connected-react-router'
 
 import Spinner from '../../../components/spinner'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import sharedMessages from '../../../lib/shared-messages'
-import Form from '../../../components/form'
-import SubmitButton from '../../../components/submit-button'
-import Input from '../../../components/input'
-import Select from '../../../components/select'
+import CollaboratorForm from '../../components/collaborator-form'
 import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
-import { id as collaboratorIdRegexp } from '../../lib/regexp'
-import SubmitBar from '../../../components/submit-bar'
-import RightsGroup from '../../components/rights-group'
 
 import { getApplicationsRightsList } from '../../store/actions/applications'
 import {
@@ -44,19 +37,6 @@ import {
 
 import api from '../../api'
 
-const validationSchema = Yup.object().shape({
-  collaborator_id: Yup.string()
-    .matches(collaboratorIdRegexp, sharedMessages.validateAlphanum)
-    .required(sharedMessages.validateRequired),
-  collaborator_type: Yup.string()
-    .required(sharedMessages.validateRequired),
-  rights: Yup.object().test(
-    'rights',
-    sharedMessages.validateRights,
-    values => Object.values(values).reduce((acc, curr) => acc || curr, false)
-  ),
-})
-
 @connect(function (state) {
   return {
     appId: selectSelectedApplicationId(state),
@@ -65,6 +45,12 @@ const validationSchema = Yup.object().shape({
     universalRights: selectApplicationUniversalRights(state),
     fetching: selectApplicationRightsFetching(state),
     error: selectApplicationRightsError(state),
+  }
+}, function (dispatch, ownProps) {
+  const appId = ownProps.match.params.appId
+  return {
+    redirectToList: () => dispatch(push(`/console/applications/${appId}/collaborators`)),
+    getApplicationsRightsList: () => dispatch(getApplicationsRightsList(appId)),
   }
 })
 @withBreadcrumb('apps.single.collaborators.add', function (props) {
@@ -85,38 +71,20 @@ export default class ApplicationCollaboratorAdd extends React.Component {
   }
 
   componentDidMount () {
-    const { dispatch, appId } = this.props
+    const { getApplicationsRightsList } = this.props
 
-    dispatch(getApplicationsRightsList(appId))
+    getApplicationsRightsList()
   }
 
-  async handleSubmit (values, { resetForm }) {
-    const { collaborator_id, collaborator_type, rights } = values
-    const { appId, dispatch } = this.props
+  async handleSubmit (collaborator) {
+    const { appId } = this.props
 
-    const collaborator_ids = {
-      [`${collaborator_type}_ids`]: {
-        [`${collaborator_type}_id`]: collaborator_id,
-      },
-    }
-    const collaborator = {
-      ids: collaborator_ids,
-      rights: Object.keys(rights).filter(r => rights[r]),
-    }
+    await api.application.collaborators.add(appId, collaborator)
 
-    await this.setState({ error: '' })
-
-    try {
-      await api.application.collaborators.add(appId, collaborator)
-      dispatch(push(`/console/applications/${appId}/collaborators`))
-    } catch (error) {
-      resetForm(values)
-      this.setState({ error })
-    }
   }
 
   render () {
-    const { rights, fetching, error, universalRights } = this.props
+    const { rights, fetching, error, universalRights, redirectToList } = this.props
 
     if (error) {
       throw error
@@ -124,18 +92,6 @@ export default class ApplicationCollaboratorAdd extends React.Component {
 
     if (fetching && !rights.length) {
       return <Spinner center />
-    }
-
-    const rightsValues = rights.reduce(function (acc, right) {
-      acc[right] = false
-
-      return acc
-    }, {})
-
-    const initialFormValues = {
-      collaborator_id: '',
-      collaborator_type: 'user',
-      rights: rightsValues,
     }
 
     return (
@@ -148,49 +104,13 @@ export default class ApplicationCollaboratorAdd extends React.Component {
         </Row>
         <Row>
           <Col lg={8} md={12}>
-            <Form
-              horizontal
+            <CollaboratorForm
               error={this.state.error}
               onSubmit={this.handleSubmit}
-              initialValues={initialFormValues}
-              validationSchema={validationSchema}
-            >
-              <Message
-                component="h4"
-                content={sharedMessages.generalInformation}
-              />
-              <Form.Field
-                name="collaborator_id"
-                component={Input}
-                title={sharedMessages.collaboratorId}
-                required
-                autoFocus
-              />
-              <Form.Field
-                name="collaborator_type"
-                component={Select}
-                title={sharedMessages.type}
-                required
-                options={[
-                  { value: 'user', label: sharedMessages.user },
-                  { value: 'organization', label: sharedMessages.organization },
-                ]}
-              />
-              <Form.Field
-                name="rights"
-                title={sharedMessages.rights}
-                required
-                component={RightsGroup}
-                rights={rights}
-                universalRight={universalRights[0]}
-              />
-              <SubmitBar>
-                <Form.Submit
-                  component={SubmitButton}
-                  message={sharedMessages.addCollaborator}
-                />
-              </SubmitBar>
-            </Form>
+              onSubmitSuccess={redirectToList}
+              universalRightLiterals={universalRights}
+              rights={rights}
+            />
           </Col>
         </Row>
       </Container>
