@@ -102,6 +102,7 @@ class RightsGroup extends React.Component {
       name,
       onBlur,
       universalRight,
+      disabled,
     } = this.props
 
     const {
@@ -130,6 +131,7 @@ class RightsGroup extends React.Component {
           onChange={this.handleChangeAll}
           indeterminate={indeterminate}
           value={allSelected}
+          disabled={disabled}
         />
         <Checkbox.Group
           className={style.group}
@@ -138,6 +140,7 @@ class RightsGroup extends React.Component {
           value={value}
           onChange={this.handleChange}
           onBlur={onBlur}
+          disabled={disabled}
         >
           {cbs}
         </Checkbox.Group>
