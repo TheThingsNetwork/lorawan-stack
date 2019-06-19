@@ -149,5 +149,5 @@ class Select extends React.PureComponent {
   }
 }
 
-export default injectIntl(Select)
+export default injectIntl(Select, { withRef: true })
 export { Select }
