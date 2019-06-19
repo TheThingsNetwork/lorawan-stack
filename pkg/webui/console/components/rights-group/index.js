@@ -59,7 +59,7 @@ class RightsGroup extends React.Component {
   }
 
   async handleChangeAll (event) {
-    const { onChange, rights } = this.props
+    const { onChange, rights, universalRight } = this.props
     const { checked } = event.target
 
     const value = rights.reduce((values, right) => ({
@@ -75,11 +75,15 @@ class RightsGroup extends React.Component {
       ...newValues,
     })
 
+    if (universalRight) {
+      value[universalRight] = checked
+    }
+
     onChange(value)
   }
 
   async handleChange (value) {
-    const { onChange, rights } = this.props
+    const { onChange, rights, universalRight } = this.props
     const { allSelected, indeterminate } = computeState(value, rights)
 
     let newValues = {}
@@ -93,7 +97,11 @@ class RightsGroup extends React.Component {
       ...newValues,
     })
 
-    onChange(value)
+    const result = universalRight
+      ? { ...value, [universalRight]: allSelected }
+      : value
+
+    onChange(result)
   }
 
   render () {

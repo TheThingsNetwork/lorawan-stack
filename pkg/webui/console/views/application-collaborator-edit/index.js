@@ -63,15 +63,18 @@ import api from '../../api'
     fetching,
     error,
   }
-}, dispatch => ({
-  async loadData (appId) {
-    await dispatch(getApplicationsRightsList(appId))
-    dispatch(getApplicationCollaboratorsList(appId))
-  },
-  redirectToList (appId) {
-    dispatch(replace(`/console/applications/${appId}/collaborators`))
-  },
-}))
+}, function (dispatch, ownProps) {
+  const appId = ownProps.match.params.appId
+  return {
+    async loadData () {
+      await dispatch(getApplicationsRightsList(appId))
+      dispatch(getApplicationCollaboratorsList(appId))
+    },
+    redirectToList () {
+      dispatch(replace(`/console/applications/${appId}/collaborators`))
+    },
+  }
+})
 @withBreadcrumb('apps.single.collaborators.edit', function (props) {
   const { appId, collaboratorId } = props
 
