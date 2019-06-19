@@ -816,6 +816,7 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 				queuedApplicationUplinks = matched.QueuedApplicationUplinks
 			}
 			up.DeviceChannelIndex = uint32(matched.ChannelIndex)
+			up.Settings.DataRateIndex = matched.DataRateIndex
 
 			stored = matched.Device
 			paths := matched.SetPaths
