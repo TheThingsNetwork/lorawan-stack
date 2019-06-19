@@ -16,71 +16,62 @@ import React from 'react'
 import { connect } from 'react-redux'
 import bind from 'autobind-decorator'
 import { Container, Col, Row } from 'react-grid-system'
-import * as Yup from 'yup'
 import { replace } from 'connected-react-router'
 
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import sharedMessages from '../../../lib/shared-messages'
-import Form from '../../../components/form'
-import Field from '../../../components/field'
-import Button from '../../../components/button'
+import CollaboratorForm from '../../components/collaborator-form'
 import Spinner from '../../../components/spinner'
-import ModalButton from '../../../components/button/modal-button'
 import Message from '../../../lib/components/message'
-import FieldGroup from '../../../components/field/group'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import toast from '../../../components/toast'
-import SubmitBar from '../../../components/submit-bar'
 
 import { getGatewayCollaboratorsList } from '../../store/actions/gateway'
 import { getGatewaysRightsList } from '../../store/actions/gateways'
+import {
+  selectSelectedGatewayId,
+  gatewayRightsSelector,
+  gatewayUniversalRightsSelector,
+  gatewayRightsFetchingSelector,
+  gatewayRightsErrorSelector,
+} from '../../store/selectors/gateway'
 import api from '../../api'
 
-import style from './gateway-collaborator-edit.styl'
+@connect(function (state, props) {
+  const gtwId = selectSelectedGatewayId(state, props)
+  const { collaboratorId } = props.match.params
+  const collaboratorsFetching = state.collaborators.gateways.fetching
+  const collaboratorsError = state.collaborators.gateways.error
 
-// TODO: Move this to checkbox group later, see https://github.com/TheThingsNetwork/lorawan-stack/issues/189
-const UNIVERSAL_APPLICATION_RIGHTS = [ 'RIGHT_APPLICATION_ALL', 'RIGHT_ALL' ]
-
-const validationSchema = Yup.object().shape({
-  rights: Yup.object().test(
-    'rights',
-    sharedMessages.validateRights,
-    values => Object.values(values).reduce((acc, curr) => acc || curr, false)
-  ),
-})
-
-@connect(function ({ collaborators, rights }, props) {
-  const { gtwId, collaboratorId } = props.match.params
-  const collaboratorsFetching = collaborators.gateways.fetching
-  const rightsFetching = rights.gateways.fetching
-  const collaboratorsError = collaborators.gateways.error
-  const rightsError = rights.gateways.error
-
-  const gtwRights = rights.gateways
-  const rs = gtwRights ? gtwRights.rights : []
-
-  const gtwCollaborators = collaborators.gateways[gtwId]
+  const gtwCollaborators = state.collaborators.gateways[gtwId]
   const collaborator = gtwCollaborators ? gtwCollaborators.collaborators
     .find(c => c.id === collaboratorId) : undefined
+
+  const fetching = gatewayRightsFetchingSelector(state, props) || collaboratorsFetching
+  const error = gatewayRightsErrorSelector(state, props) || collaboratorsError
 
   return {
     collaboratorId,
     collaborator,
     gtwId,
-    rights: rs,
-    fetching: collaboratorsFetching || rightsFetching,
-    error: collaboratorsError || rightsError,
+    rights: gatewayRightsSelector(state, props),
+    universalRights: gatewayUniversalRightsSelector(state, props),
+    fetching,
+    error,
   }
-}, dispatch => ({
-  loadData (gtwId) {
-    dispatch(getGatewaysRightsList(gtwId))
-    dispatch(getGatewayCollaboratorsList(gtwId))
-  },
-  redirectToList (gtwId) {
-    dispatch(replace(`/console/gateways/${gtwId}/collaborators`))
-  },
-}))
+}, function (dispatch, ownProps) {
+  const { gtwId } = ownProps.match.params
+  return {
+    async loadData () {
+      await dispatch(getGatewaysRightsList(gtwId))
+      dispatch(getGatewayCollaboratorsList(gtwId))
+    },
+    redirectToList () {
+      dispatch(replace(`/console/gateways/${gtwId}/collaborators`))
+    },
+  }
+})
 @withBreadcrumb('gtws.single.collaborators.edit', function (props) {
   const { gtwId, collaboratorId } = props
 
@@ -100,68 +91,32 @@ export default class GatewayCollaboratorEdit extends React.Component {
   }
 
   componentDidMount () {
-    const { loadData, gtwId } = this.props
+    const { loadData } = this.props
 
-    loadData(gtwId)
+    loadData()
   }
 
-  async handleSubmit (values, { resetForm }) {
-    const { collaborator_id, rights } = values
-    const { gtwId, collaborator } = this.props
-    const collaborator_type = collaborator.isUser ? 'user' : 'organization'
+  handleSubmit (updatedCollaborator) {
+    const { gtwId } = this.props
 
-    const collaborator_ids = {
-      [`${collaborator_type}_ids`]: {
-        [`${collaborator_type}_id`]: collaborator_id,
-      },
-    }
-    const updatedCollaborator = {
-      ids: collaborator_ids,
-      rights: Object.keys(rights).filter(r => rights[r]),
-    }
-
-    await this.setState({ error: '' })
-
-    try {
-      await api.gateway.collaborators.update(gtwId, updatedCollaborator)
-      resetForm(values)
-      toast({
-        message: sharedMessages.collaboratorUpdateSuccess,
-        type: toast.types.SUCCESS,
-      })
-    } catch (error) {
-      resetForm(values)
-      await this.setState({ error })
-    }
+    return api.gateway.collaborators.update(gtwId, updatedCollaborator)
   }
 
-  async handleDelete () {
-    const { collaborator, redirectToList, gtwId } = this.props
-    const collaborator_type = collaborator.isUser ? 'user' : 'organization'
+  handleSubmitSuccess () {
+    toast({
+      message: sharedMessages.collaboratorUpdateSuccess,
+      type: toast.types.SUCCESS,
+    })
+  }
 
-    const collaborator_ids = {
-      [`${collaborator_type}_ids`]: {
-        [`${collaborator_type}_id`]: collaborator.id,
-      },
-    }
-    const updatedCollaborator = {
-      ids: collaborator_ids,
-    }
+  async handleDelete (updatedCollaborator) {
+    const { gtwId } = this.props
 
-    try {
-      await api.gateway.collaborators.remove(gtwId, updatedCollaborator)
-      toast({
-        message: sharedMessages.collaboratorDeleteSuccess,
-        type: toast.types.SUCCESS,
-      })
-      redirectToList(gtwId)
-    } catch (error) {
-      await this.setState({ error })
-    }
+    return api.gateway.collaborators.remove(gtwId, updatedCollaborator)
   }
 
   render () {
-    const { collaborator, rights, fetching, error } = this.props
+    const { collaborator, rights, fetching, error, redirectToList, universalRights } = this.props
 
     if (error) {
       throw error
@@ -169,35 +124,6 @@ export default class GatewayCollaboratorEdit extends React.Component {
 
     if (fetching || !collaborator) {
       return <Spinner center />
-    }
-
-    const hasUniversalRights = UNIVERSAL_APPLICATION_RIGHTS.reduce(
-      (acc, curr) => acc || collaborator.rights.includes(curr), false)
-    const { rightsItems, rightsValues } = rights.reduce(
-      function (acc, right) {
-        acc.rightsItems.push(
-          <Field
-            className={style.rightLabel}
-            key={right}
-            name={right}
-            type="checkbox"
-            title={{ id: `enum:${right}` }}
-            form
-          />
-        )
-        acc.rightsValues[right] = hasUniversalRights || collaborator.rights.includes(right)
-
-        return acc
-      },
-      {
-        rightsItems: [],
-        rightsValues: {},
-      }
-    )
-
-    const initialFormValues = {
-      collaborator_id: collaborator.id,
-      rights: { ...rightsValues },
     }
 
     return (
@@ -217,49 +143,17 @@ export default class GatewayCollaboratorEdit extends React.Component {
         </Row>
         <Row>
           <Col lg={8} md={12}>
-            <Form
-              horizontal
+            <CollaboratorForm
               error={this.state.error}
               onSubmit={this.handleSubmit}
-              initialValues={initialFormValues}
-              validationSchema={validationSchema}
-            >
-              <Message
-                component="h4"
-                content={sharedMessages.generalInformation}
-              />
-              <Field
-                title={sharedMessages.collaboratorId}
-                required
-                valid
-                disabled
-                name="collaborator_id"
-                type="text"
-              />
-              <FieldGroup
-                name="rights"
-                title={sharedMessages.rights}
-              >
-                {rightsItems}
-              </FieldGroup>
-              <SubmitBar>
-                <Button type="submit" message={sharedMessages.saveChanges} />
-                <ModalButton
-                  type="button"
-                  icon="delete"
-                  danger
-                  naked
-                  message={sharedMessages.removeCollaborator}
-                  modalData={{
-                    message: {
-                      values: { collaboratorId: collaborator.id },
-                      ...sharedMessages.collaboratorModalWarning,
-                    },
-                  }}
-                  onApprove={this.handleDelete}
-                />
-              </SubmitBar>
-            </Form>
+              onSubmitSuccess={this.handleSubmitSuccess}
+              onDelete={this.handleDelete}
+              onDeleteSuccess={redirectToList}
+              collaborator={collaborator}
+              universalRightLiterals={universalRights}
+              rights={rights}
+              update
+            />
           </Col>
         </Row>
       </Container>
