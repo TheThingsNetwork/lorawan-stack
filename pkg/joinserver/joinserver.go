@@ -226,11 +226,11 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			"last_join_nonce",
 			"net_id",
 			"network_server_address",
+			"provisioner_id",
+			"provisioning_data",
 			"resets_join_nonces",
 			"root_keys",
 			"used_dev_nonces",
-			"provisioner_id",
-			"provisioning_data",
 		},
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if dn, ok := auth.X509DNFromContext(ctx); ok {

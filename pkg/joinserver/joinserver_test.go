@@ -138,7 +138,7 @@ func TestHandleJoin(t *testing.T) {
 		JoinRequest  *ttnpb.JoinRequest
 		JoinResponse *ttnpb.JoinResponse
 
-		ValidError func(error) bool
+		ErrorAssertion func(error) bool
 	}{
 		{
 			Name:        "1.1.0/cluster auth/new device",
@@ -152,18 +152,15 @@ func TestHandleJoin(t *testing.T) {
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
-						Key:      &appKey,
-						KEKLabel: "",
+						Key: &appKey,
 					},
 					NwkKey: &ttnpb.KeyEnvelope{
-						Key:      &nwkKey,
-						KEKLabel: "",
+						Key: &nwkKey,
 					},
 				},
 				LoRaWANVersion:       ttnpb.MAC_V1_1,
 				NetworkServerAddress: nsAddr,
 			},
-			NextLastDevNonce:  0,
 			NextLastJoinNonce: 1,
 			JoinRequest: &ttnpb.JoinRequest{
 				SelectedMACVersion: ttnpb.MAC_V1_1,
@@ -190,7 +187,6 @@ func TestHandleJoin(t *testing.T) {
 					Rx2DR:       0xf,
 				},
 				RxDelay: 0x42,
-				CFList:  nil,
 			},
 			JoinResponse: &ttnpb.JoinResponse{
 				RawPayload: append([]byte{
@@ -218,7 +214,6 @@ func TestHandleJoin(t *testing.T) {
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 							types.DevNonce{0x00, 0x00})),
-						KEKLabel: "",
 					},
 					SNwkSIntKey: &ttnpb.KeyEnvelope{
 						Key: KeyPtr(crypto.DeriveSNwkSIntKey(
@@ -226,7 +221,6 @@ func TestHandleJoin(t *testing.T) {
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 							types.DevNonce{0x00, 0x00})),
-						KEKLabel: "",
 					},
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
 						Key: KeyPtr(crypto.DeriveFNwkSIntKey(
@@ -234,7 +228,6 @@ func TestHandleJoin(t *testing.T) {
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 							types.DevNonce{0x00, 0x00})),
-						KEKLabel: "",
 					},
 					NwkSEncKey: &ttnpb.KeyEnvelope{
 						Key: KeyPtr(crypto.DeriveNwkSEncKey(
@@ -242,10 +235,109 @@ func TestHandleJoin(t *testing.T) {
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 							types.DevNonce{0x00, 0x00})),
-						KEKLabel: "",
 					},
 				},
-				Lifetime: 0,
+			},
+		},
+		{
+			Name:        "1.1.0/existing device/dev nonce reset",
+			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
+			Device: &ttnpb.EndDevice{
+				LastDevNonce: 0x2441,
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"},
+					DeviceID:               "test-dev",
+				},
+				RootKeys: &ttnpb.RootKeys{
+					AppKey: &ttnpb.KeyEnvelope{
+						Key: &appKey,
+					},
+					NwkKey: &ttnpb.KeyEnvelope{
+						Key: &nwkKey,
+					},
+				},
+				LoRaWANVersion:       ttnpb.MAC_V1_1,
+				NetworkServerAddress: nsAddr,
+				ResetsJoinNonces:     true,
+			},
+			NextLastJoinNonce: 1,
+			JoinRequest: &ttnpb.JoinRequest{
+				SelectedMACVersion: ttnpb.MAC_V1_1,
+				RawPayload: []byte{
+					/* MHDR */
+					0x00,
+
+					/* MACPayload */
+					/** JoinEUI **/
+					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42,
+					/** DevEUI **/
+					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
+					/** DevNonce **/
+					0x00, 0x00,
+
+					/* MIC */
+					0x55, 0x17, 0x54, 0x8e,
+				},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				NetID:   types.NetID{0x42, 0xff, 0xff},
+				DownlinkSettings: ttnpb.DLSettings{
+					OptNeg:      true,
+					Rx1DROffset: 0x7,
+					Rx2DR:       0xf,
+				},
+				RxDelay: 0x42,
+			},
+			JoinResponse: &ttnpb.JoinResponse{
+				RawPayload: append([]byte{
+					/* MHDR */
+					0x20},
+					mustEncryptJoinAccept(nwkKey, []byte{
+						/* JoinNonce */
+						0x01, 0x00, 0x00,
+						/* NetID */
+						0xff, 0xff, 0x42,
+						/* DevAddr */
+						0xff, 0xff, 0xff, 0x42,
+						/* DLSettings */
+						0xff,
+						/* RxDelay */
+						0x42,
+
+						/* MIC */
+						0xeb, 0xcd, 0x74, 0x59,
+					})...),
+				SessionKeys: ttnpb.SessionKeys{
+					AppSKey: &ttnpb.KeyEnvelope{
+						Key: KeyPtr(crypto.DeriveAppSKey(
+							appKey,
+							types.JoinNonce{0x00, 0x00, 0x01},
+							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+							types.DevNonce{0x00, 0x00})),
+					},
+					SNwkSIntKey: &ttnpb.KeyEnvelope{
+						Key: KeyPtr(crypto.DeriveSNwkSIntKey(
+							nwkKey,
+							types.JoinNonce{0x00, 0x00, 0x01},
+							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+							types.DevNonce{0x00, 0x00})),
+					},
+					FNwkSIntKey: &ttnpb.KeyEnvelope{
+						Key: KeyPtr(crypto.DeriveFNwkSIntKey(
+							nwkKey,
+							types.JoinNonce{0x00, 0x00, 0x01},
+							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+							types.DevNonce{0x00, 0x00})),
+					},
+					NwkSEncKey: &ttnpb.KeyEnvelope{
+						Key: KeyPtr(crypto.DeriveNwkSEncKey(
+							nwkKey,
+							types.JoinNonce{0x00, 0x00, 0x01},
+							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+							types.DevNonce{0x00, 0x00})),
+					},
+				},
 			},
 		},
 		{
@@ -262,12 +354,10 @@ func TestHandleJoin(t *testing.T) {
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
-						Key:      &appKey,
-						KEKLabel: "",
+						Key: &appKey,
 					},
 					NwkKey: &ttnpb.KeyEnvelope{
-						Key:      &nwkKey,
-						KEKLabel: "",
+						Key: &nwkKey,
 					},
 				},
 				LoRaWANVersion:       ttnpb.MAC_V1_1,
@@ -300,7 +390,6 @@ func TestHandleJoin(t *testing.T) {
 					Rx2DR:       0xf,
 				},
 				RxDelay: 0x42,
-				CFList:  nil,
 			},
 			JoinResponse: &ttnpb.JoinResponse{
 				RawPayload: append([]byte{
@@ -328,7 +417,6 @@ func TestHandleJoin(t *testing.T) {
 							types.JoinNonce{0x42, 0xff, 0xfe},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 							types.DevNonce{0x24, 0x42})),
-						KEKLabel: "",
 					},
 					SNwkSIntKey: &ttnpb.KeyEnvelope{
 						Key: KeyPtr(crypto.DeriveSNwkSIntKey(
@@ -336,7 +424,6 @@ func TestHandleJoin(t *testing.T) {
 							types.JoinNonce{0x42, 0xff, 0xfe},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 							types.DevNonce{0x24, 0x42})),
-						KEKLabel: "",
 					},
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
 						Key: KeyPtr(crypto.DeriveFNwkSIntKey(
@@ -344,7 +431,6 @@ func TestHandleJoin(t *testing.T) {
 							types.JoinNonce{0x42, 0xff, 0xfe},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 							types.DevNonce{0x24, 0x42})),
-						KEKLabel: "",
 					},
 					NwkSEncKey: &ttnpb.KeyEnvelope{
 						Key: KeyPtr(crypto.DeriveNwkSEncKey(
@@ -352,12 +438,9 @@ func TestHandleJoin(t *testing.T) {
 							types.JoinNonce{0x42, 0xff, 0xfe},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 							types.DevNonce{0x24, 0x42})),
-						KEKLabel: "",
 					},
 				},
-				Lifetime: 0,
 			},
-			ValidError: nil,
 		},
 		{
 			Name:        "1.1.0/DevNonce too small",
@@ -373,12 +456,10 @@ func TestHandleJoin(t *testing.T) {
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
-						Key:      &appKey,
-						KEKLabel: "",
+						Key: &appKey,
 					},
 					NwkKey: &ttnpb.KeyEnvelope{
-						Key:      &nwkKey,
-						KEKLabel: "",
+						Key: &nwkKey,
 					},
 				},
 				LoRaWANVersion:       ttnpb.MAC_V1_1,
@@ -411,10 +492,8 @@ func TestHandleJoin(t *testing.T) {
 					Rx2DR:       0xf,
 				},
 				RxDelay: 0x42,
-				CFList:  nil,
 			},
-			JoinResponse: nil,
-			ValidError:   errors.IsInvalidArgument,
+			ErrorAssertion: errors.IsInvalidArgument,
 		},
 		{
 			Name:        "1.0.2/cluster auth/new device",
@@ -428,8 +507,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
-						Key:      &appKey,
-						KEKLabel: "",
+						Key: &appKey,
 					},
 				},
 				LoRaWANVersion:       ttnpb.MAC_V1_0_2,
@@ -462,7 +540,6 @@ func TestHandleJoin(t *testing.T) {
 					Rx2DR:       0xf,
 				},
 				RxDelay: 0x42,
-				CFList:  nil,
 			},
 			JoinResponse: &ttnpb.JoinResponse{
 				RawPayload: append([]byte{
@@ -490,7 +567,6 @@ func TestHandleJoin(t *testing.T) {
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.NetID{0x42, 0xff, 0xff},
 							types.DevNonce{0x00, 0x01})),
-						KEKLabel: "",
 					},
 					AppSKey: &ttnpb.KeyEnvelope{
 						Key: KeyPtr(crypto.DeriveLegacyAppSKey(
@@ -498,12 +574,9 @@ func TestHandleJoin(t *testing.T) {
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.NetID{0x42, 0xff, 0xff},
 							types.DevNonce{0x00, 0x01})),
-						KEKLabel: "",
 					},
 				},
-				Lifetime: 0,
 			},
-			ValidError: nil,
 		},
 		{
 			Name:        "1.0.1/cluster auth/new device",
@@ -517,8 +590,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
-						Key:      &appKey,
-						KEKLabel: "",
+						Key: &appKey,
 					},
 				},
 				LoRaWANVersion:       ttnpb.MAC_V1_0_1,
@@ -551,7 +623,6 @@ func TestHandleJoin(t *testing.T) {
 					Rx2DR:       0xf,
 				},
 				RxDelay: 0x42,
-				CFList:  nil,
 			},
 			JoinResponse: &ttnpb.JoinResponse{
 				RawPayload: append([]byte{
@@ -579,7 +650,6 @@ func TestHandleJoin(t *testing.T) {
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.NetID{0x42, 0xff, 0xff},
 							types.DevNonce{0x00, 0x01})),
-						KEKLabel: "",
 					},
 					AppSKey: &ttnpb.KeyEnvelope{
 						Key: KeyPtr(crypto.DeriveLegacyAppSKey(
@@ -587,12 +657,9 @@ func TestHandleJoin(t *testing.T) {
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.NetID{0x42, 0xff, 0xff},
 							types.DevNonce{0x00, 0x01})),
-						KEKLabel: "",
 					},
 				},
-				Lifetime: 0,
 			},
-			ValidError: nil,
 		},
 		{
 			Name:        "1.0.0/cluster auth/new device",
@@ -606,8 +673,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
-						Key:      &appKey,
-						KEKLabel: "",
+						Key: &appKey,
 					},
 				},
 				LoRaWANVersion:       ttnpb.MAC_V1_0,
@@ -640,7 +706,6 @@ func TestHandleJoin(t *testing.T) {
 					Rx2DR:       0xf,
 				},
 				RxDelay: 0x42,
-				CFList:  nil,
 			},
 			JoinResponse: &ttnpb.JoinResponse{
 				RawPayload: append([]byte{
@@ -668,7 +733,6 @@ func TestHandleJoin(t *testing.T) {
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.NetID{0x42, 0xff, 0xff},
 							types.DevNonce{0x00, 0x01})),
-						KEKLabel: "",
 					},
 					AppSKey: &ttnpb.KeyEnvelope{
 						Key: KeyPtr(crypto.DeriveLegacyAppSKey(
@@ -676,12 +740,9 @@ func TestHandleJoin(t *testing.T) {
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.NetID{0x42, 0xff, 0xff},
 							types.DevNonce{0x00, 0x01})),
-						KEKLabel: "",
 					},
 				},
-				Lifetime: 0,
 			},
-			ValidError: nil,
 		},
 		{
 			Name:        "1.0.0/cluster auth/existing device",
@@ -697,8 +758,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
-						Key:      &appKey,
-						KEKLabel: "",
+						Key: &appKey,
 					},
 				},
 				LoRaWANVersion:       ttnpb.MAC_V1_0,
@@ -731,7 +791,6 @@ func TestHandleJoin(t *testing.T) {
 					Rx2DR:       0xf,
 				},
 				RxDelay: 0x42,
-				CFList:  nil,
 			},
 			JoinResponse: &ttnpb.JoinResponse{
 				RawPayload: append([]byte{
@@ -759,7 +818,6 @@ func TestHandleJoin(t *testing.T) {
 							types.JoinNonce{0x42, 0xff, 0xfe},
 							types.NetID{0x42, 0xff, 0xff},
 							types.DevNonce{0x24, 0x42})),
-						KEKLabel: "",
 					},
 					AppSKey: &ttnpb.KeyEnvelope{
 						Key: KeyPtr(crypto.DeriveLegacyAppSKey(
@@ -767,12 +825,9 @@ func TestHandleJoin(t *testing.T) {
 							types.JoinNonce{0x42, 0xff, 0xfe},
 							types.NetID{0x42, 0xff, 0xff},
 							types.DevNonce{0x24, 0x42})),
-						KEKLabel: "",
 					},
 				},
-				Lifetime: 0,
 			},
-			ValidError: nil,
 		},
 		{
 			Name: "1.0.0/tls client auth/new device",
@@ -790,8 +845,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
-						Key:      &appKey,
-						KEKLabel: "",
+						Key: &appKey,
 					},
 				},
 				LoRaWANVersion:       ttnpb.MAC_V1_0,
@@ -825,7 +879,6 @@ func TestHandleJoin(t *testing.T) {
 					Rx2DR:       0xf,
 				},
 				RxDelay: 0x42,
-				CFList:  nil,
 			},
 			JoinResponse: &ttnpb.JoinResponse{
 				RawPayload: append([]byte{
@@ -853,7 +906,6 @@ func TestHandleJoin(t *testing.T) {
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.NetID{0x42, 0xff, 0xff},
 							types.DevNonce{0x00, 0x01})),
-						KEKLabel: "",
 					},
 					AppSKey: &ttnpb.KeyEnvelope{
 						Key: KeyPtr(crypto.DeriveLegacyAppSKey(
@@ -861,12 +913,9 @@ func TestHandleJoin(t *testing.T) {
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.NetID{0x42, 0xff, 0xff},
 							types.DevNonce{0x00, 0x01})),
-						KEKLabel: "",
 					},
 				},
-				Lifetime: 0,
 			},
-			ValidError: nil,
 		},
 		{
 			Name: "1.0.0/NetID mismatch",
@@ -884,8 +933,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
-						Key:      &appKey,
-						KEKLabel: "",
+						Key: &appKey,
 					},
 				},
 				LoRaWANVersion:       ttnpb.MAC_V1_0,
@@ -919,10 +967,8 @@ func TestHandleJoin(t *testing.T) {
 					Rx2DR:       0xf,
 				},
 				RxDelay: 0x42,
-				CFList:  nil,
 			},
-			JoinResponse: nil,
-			ValidError:   errors.IsInvalidArgument,
+			ErrorAssertion: errors.IsInvalidArgument,
 		},
 		{
 			Name: "1.0.0/no NetID",
@@ -940,8 +986,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
-						Key:      &appKey,
-						KEKLabel: "",
+						Key: &appKey,
 					},
 				},
 				LoRaWANVersion:       ttnpb.MAC_V1_0,
@@ -974,10 +1019,8 @@ func TestHandleJoin(t *testing.T) {
 					Rx2DR:       0xf,
 				},
 				RxDelay: 0x42,
-				CFList:  nil,
 			},
-			JoinResponse: nil,
-			ValidError:   errors.IsFailedPrecondition,
+			ErrorAssertion: errors.IsFailedPrecondition,
 		},
 		{
 			Name: "1.0.0/address not authorized",
@@ -995,8 +1038,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
-						Key:      &appKey,
-						KEKLabel: "",
+						Key: &appKey,
 					},
 				},
 				LoRaWANVersion:       ttnpb.MAC_V1_0,
@@ -1030,10 +1072,8 @@ func TestHandleJoin(t *testing.T) {
 					Rx2DR:       0xf,
 				},
 				RxDelay: 0x42,
-				CFList:  nil,
 			},
-			JoinResponse: nil,
-			ValidError:   errors.IsPermissionDenied,
+			ErrorAssertion: errors.IsPermissionDenied,
 		},
 		{
 			Name:        "1.0.0/repeated DevNonce",
@@ -1049,8 +1089,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
-						Key:      &appKey,
-						KEKLabel: "",
+						Key: &appKey,
 					},
 				},
 				LoRaWANVersion:       ttnpb.MAC_V1_0,
@@ -1082,10 +1121,8 @@ func TestHandleJoin(t *testing.T) {
 					Rx2DR:       0xf,
 				},
 				RxDelay: 0x42,
-				CFList:  nil,
 			},
-			JoinResponse: nil,
-			ValidError:   errors.IsInvalidArgument,
+			ErrorAssertion: errors.IsInvalidArgument,
 		},
 		{
 			Name:        "1.0.0/no payload",
@@ -1101,8 +1138,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
-						Key:      &appKey,
-						KEKLabel: "",
+						Key: &appKey,
 					},
 				},
 				LoRaWANVersion:       ttnpb.MAC_V1_0,
@@ -1119,10 +1155,8 @@ func TestHandleJoin(t *testing.T) {
 					Rx2DR:       0xf,
 				},
 				RxDelay: 0x42,
-				CFList:  nil,
 			},
-			JoinResponse: nil,
-			ValidError:   errors.IsInvalidArgument,
+			ErrorAssertion: errors.IsInvalidArgument,
 		},
 		{
 			Name:        "1.0.0/not a join request payload",
@@ -1138,8 +1172,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
-						Key:      &appKey,
-						KEKLabel: "",
+						Key: &appKey,
 					},
 				},
 				LoRaWANVersion:       ttnpb.MAC_V1_0,
@@ -1162,10 +1195,8 @@ func TestHandleJoin(t *testing.T) {
 					Rx2DR:       0xf,
 				},
 				RxDelay: 0x42,
-				CFList:  nil,
 			},
-			JoinResponse: nil,
-			ValidError:   errors.IsInvalidArgument,
+			ErrorAssertion: errors.IsInvalidArgument,
 		},
 		{
 			Name:        "1.0.0/unsupported LoRaWAN version",
@@ -1181,8 +1212,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
-						Key:      &appKey,
-						KEKLabel: "",
+						Key: &appKey,
 					},
 				},
 				LoRaWANVersion:       ttnpb.MAC_V1_0,
@@ -1206,10 +1236,8 @@ func TestHandleJoin(t *testing.T) {
 					Rx2DR:       0xf,
 				},
 				RxDelay: 0x42,
-				CFList:  nil,
 			},
-			JoinResponse: nil,
-			ValidError:   errors.IsInvalidArgument,
+			ErrorAssertion: errors.IsInvalidArgument,
 		},
 		{
 			Name:        "1.0.0/no JoinEUI",
@@ -1225,8 +1253,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
-						Key:      &appKey,
-						KEKLabel: "",
+						Key: &appKey,
 					},
 				},
 				LoRaWANVersion:       ttnpb.MAC_V1_0,
@@ -1254,10 +1281,8 @@ func TestHandleJoin(t *testing.T) {
 					Rx2DR:       0xf,
 				},
 				RxDelay: 0x42,
-				CFList:  nil,
 			},
-			JoinResponse: nil,
-			ValidError:   errors.IsInvalidArgument,
+			ErrorAssertion: errors.IsInvalidArgument,
 		},
 		{
 			Name:        "1.0.0/raw payload that can't be unmarshalled",
@@ -1273,8 +1298,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
-						Key:      &appKey,
-						KEKLabel: "",
+						Key: &appKey,
 					},
 				},
 				LoRaWANVersion:       ttnpb.MAC_V1_0,
@@ -1294,10 +1318,8 @@ func TestHandleJoin(t *testing.T) {
 					Rx2DR:       0xf,
 				},
 				RxDelay: 0x42,
-				CFList:  nil,
 			},
-			JoinResponse: nil,
-			ValidError:   errors.IsInvalidArgument,
+			ErrorAssertion: errors.IsInvalidArgument,
 		},
 		{
 			Name:        "1.0.0/invalid MType",
@@ -1313,8 +1335,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				RootKeys: &ttnpb.RootKeys{
 					AppKey: &ttnpb.KeyEnvelope{
-						Key:      &appKey,
-						KEKLabel: "",
+						Key: &appKey,
 					},
 				},
 				LoRaWANVersion:       ttnpb.MAC_V1_0,
@@ -1342,10 +1363,8 @@ func TestHandleJoin(t *testing.T) {
 					Rx2DR:       0xf,
 				},
 				RxDelay: 0x42,
-				CFList:  nil,
 			},
-			JoinResponse: nil,
-			ValidError:   errors.IsInvalidArgument,
+			ErrorAssertion: errors.IsInvalidArgument,
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -1384,6 +1403,7 @@ func TestHandleJoin(t *testing.T) {
 					"provisioner_id",
 					"provisioning_data",
 					"root_keys",
+					"resets_join_nonces",
 					"updated_at",
 					"used_dev_nonces",
 				},
@@ -1404,6 +1424,7 @@ func TestHandleJoin(t *testing.T) {
 						"provisioner_id",
 						"provisioning_data",
 						"root_keys",
+						"resets_join_nonces",
 						"used_dev_nonces",
 					}, nil
 				},
@@ -1419,8 +1440,8 @@ func TestHandleJoin(t *testing.T) {
 			a.So(ret, should.HaveEmptyDiff, pb)
 
 			res, err := js.HandleJoin(ctx, deepcopy.Copy(tc.JoinRequest).(*ttnpb.JoinRequest))
-			if tc.ValidError != nil {
-				if !a.So(err, should.BeError) || !a.So(tc.ValidError(err), should.BeTrue) {
+			if tc.ErrorAssertion != nil {
+				if !a.So(err, should.BeError) || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 					t.Fatalf("Received an unexpected error: %s", err)
 				}
 				a.So(res, should.BeNil)
@@ -1461,8 +1482,13 @@ func TestHandleJoin(t *testing.T) {
 			a.So(ret, should.HaveEmptyDiff, pb)
 
 			res, err = js.HandleJoin(ctx, deepcopy.Copy(tc.JoinRequest).(*ttnpb.JoinRequest))
-			a.So(err, should.BeError)
-			a.So(res, should.BeNil)
+			if !tc.Device.ResetsJoinNonces {
+				a.So(err, should.BeError)
+				a.So(res, should.BeNil)
+			} else {
+				a.So(err, should.BeNil)
+				a.So(res, should.NotBeNil)
+			}
 		})
 	}
 }
@@ -1602,8 +1628,7 @@ func TestGetNwkSKeys(t *testing.T) {
 				return &ttnpb.SessionKeys{
 					SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
-						Key:      KeyPtr(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
-						KEKLabel: "",
+						Key: KeyPtr(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
 					},
 					NwkSEncKey: &ttnpb.KeyEnvelope{
 						Key:      KeyPtr(types.AES128Key{0x43, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
@@ -1621,8 +1646,7 @@ func TestGetNwkSKeys(t *testing.T) {
 			},
 			KeyResponse: &ttnpb.NwkSKeysResponse{
 				FNwkSIntKey: ttnpb.KeyEnvelope{
-					Key:      KeyPtr(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
-					KEKLabel: "",
+					Key: KeyPtr(types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
 				},
 				NwkSEncKey: ttnpb.KeyEnvelope{
 					Key:      KeyPtr(types.AES128Key{0x43, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0xff}),
