@@ -13,16 +13,92 @@
 // limitations under the License.
 
 import React from 'react'
-import { Formik } from 'formik'
+import { Formik, getIn } from 'formik'
 import bind from 'autobind-decorator'
 
+import scrollIntoView from 'scroll-into-view-if-needed'
 import Notification from '../notification'
 import PropTypes from '../../lib/prop-types'
 import FormContext from './context'
 import FormField from './field'
 import FormSubmit from './submit'
 
+@bind
 class InnerForm extends React.PureComponent {
+
+  formError = React.createRef()
+  fields = {}
+  firstField = undefined
+
+  _getInvalidField () {
+    const { errors } = this.props
+
+    let field
+    for (const fieldName of Object.keys(this.fields)) {
+      const err = getIn(errors, fieldName)
+      if (err) {
+        field = this.fields[fieldName]
+        break
+      }
+    }
+
+    return field
+  }
+
+  _scroll (node, delay = 200) {
+    if (node) {
+      scrollIntoView(node, {
+        scrollMode: 'if-needed',
+        behavior: 'smooth',
+        duration: delay,
+      })
+    }
+  }
+
+  _focus (node, delay = 200) {
+    setTimeout(() => node.focus(), delay)
+  }
+
+  componentDidUpdate (prevProps) {
+    const { formError, isSubmitting, isValid } = this.props
+
+    if (formError && formError !== prevProps.formError) {
+      this._scroll(this.formError.current)
+      this._focus(this.firstField)
+    } else if (prevProps.isSubmitting && !isSubmitting && !isValid) {
+      const invalidField = this._getInvalidField()
+      if (invalidField && invalidField.focus) {
+        this._focus(invalidField, 100)
+      } else if (this.firstField && this.firstField.focus) {
+        this._focus(this.firstField, 100)
+      }
+    }
+  }
+
+  registerField (name, field) {
+    const { registerField } = this.props
+
+    this.fields[name] = field
+    registerField(name, field)
+
+    if (!this.firstField && !field.props.disabled) {
+      this.firstField = field
+    }
+  }
+
+  unregisterField (name) {
+    const { unregisterField } = this.props
+
+    const field = this.fields[name]
+
+    if (field === this.firstField) {
+      this.firstField = undefined
+    }
+
+    delete this.fields[name]
+    unregisterField(name)
+  }
+
   render () {
     const {
       className,
@@ -36,11 +112,13 @@ class InnerForm extends React.PureComponent {
 
     return (
       <form className={className} onSubmit={handleSubmit}>
-        {formError && <Notification error={formError} small />}
+        {formError && <Notification error={formError} small ref={this.formError} />}
         {formInfo && <Notification info={formInfo} small /> }
         <FormContext.Provider value={{
           ...rest,
           horizontal,
+          registerField: this.registerField,
+          unregisterField: this.unregisterField,
         }}
         >
           {children}
