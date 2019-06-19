@@ -1,6 +1,6 @@
 module go.thethings.network/lorawan-stack
 
-replace github.com/grpc-ecosystem/grpc-gateway => github.com/ThethingsIndustries/grpc-gateway v1.7.0-gogo
+replace github.com/grpc-ecosystem/grpc-gateway => github.com/ThethingsIndustries/grpc-gateway v1.9.1-gogo
 
 replace github.com/robertkrimen/otto => github.com/ThethingsIndustries/otto v0.0.0-20181129100957-6ddbbb60554a
 
@@ -24,6 +24,7 @@ require (
 	github.com/cpuguy83/go-md2man v1.0.10 // indirect
 	github.com/disintegration/imaging v1.6.0
 	github.com/eclipse/paho.mqtt.golang v1.1.1
+	github.com/envoyproxy/protoc-gen-validate v0.1.0
 	github.com/erikstmartin/go-testdb v0.0.0-20160219214506-8d10e4a1bae5 // indirect
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/getsentry/raven-go v0.2.0
@@ -56,7 +57,6 @@ require (
 	github.com/labstack/echo/v4 v4.0.0-00010101000000-000000000000
 	github.com/labstack/gommon v0.2.8
 	github.com/lib/pq v1.1.0
-	github.com/lyft/protoc-gen-validate v0.0.14
 	github.com/magefile/mage v1.8.1-0.20190314142316-8dce728c572d
 	github.com/mattn/go-isatty v0.0.7
 	github.com/mattn/goveralls v0.0.2
@@ -91,7 +91,7 @@ require (
 	golang.org/x/tools v0.0.0-20190417005754-4ca4b55e2050
 	golang.org/x/xerrors v0.0.0-20190410155217-1f06c39b4373
 	google.golang.org/genproto v0.0.0-20190415143225-d1146b9035b9
-	google.golang.org/grpc v1.20.0
+	google.golang.org/grpc v1.21.1
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/mail.v2 v2.3.1 // indirect
 	gopkg.in/sourcemap.v1 v1.0.5 // indirect
