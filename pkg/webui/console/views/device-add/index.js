@@ -43,6 +43,11 @@ import style from './device-add.styl'
 @connect()
 @bind
 export default class DeviceAdd extends Component {
+
+  state = {
+    error: '',
+  }
+
   async handleSubmit (values, { setSubmitting, resetForm }) {
     const { match, dispatch } = this.props
     const { appId } = match.params
@@ -81,6 +86,8 @@ export default class DeviceAdd extends Component {
   }
 
   render () {
+    const { error } = this.state
+
     return (
       <Container>
         <Row className={style.wrapper}>
@@ -90,6 +97,7 @@ export default class DeviceAdd extends Component {
           </Col>
           <Col className={style.form} sm={12} md={12} lg={8} xl={8}>
             <DeviceDataForm
+              error={error}
               onSubmit={this.handleSubmit}
             />
           </Col>
