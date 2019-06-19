@@ -54,6 +54,7 @@ const isValueEmpty = function (value) {
 @bind
 class FormField extends React.Component {
 
+  field = React.createRef()
   static contextType = FormContext
   static propTypes = {
     className: PropTypes.string,
@@ -79,12 +80,14 @@ class FormField extends React.Component {
     const { name } = this.props
 
     this.context.registerField(name, this)
+    this._isMounted = true
   }
 
   componentWillUnmount () {
     const { name } = this.props
 
     this.context.unregisterField(name)
+    this._isMounted = false
   }
 
   extractValue (value) {
@@ -119,6 +122,28 @@ class FormField extends React.Component {
     if (validateOnBlur) {
       const value = this.extractValue(event)
       setFieldTouched(name, !isValueEmpty(value))
+    }
+  }
+
+  focus () {
+    if (!this.field.current) {
+      return
+    }
+
+    // `focus()` can be called with timeout,
+    //  so check if the component is still mounted
+    if (!this._isMounted) {
+      return
+    }
+
+    let component = this.field.current
+    // account for fields wrapped with `injectIntl`
+    if (this.field.current.getWrappedInstance) {
+      component = this.field.current.getWrappedInstance()
+    }
+
+    if (typeof component.focus === 'function') {
+      component.focus()
     }
   }
 
@@ -191,6 +216,7 @@ class FormField extends React.Component {
           className={style.component}
           {...fieldComponentProps}
           {...getPassThroughProps(this.props, FormField.propTypes)}
+          ref={this.field}
         />
         {fieldMessage}
       </div>
