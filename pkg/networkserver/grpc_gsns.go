@@ -1116,7 +1116,6 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 				DevAddr:                &devAddr,
 			},
 			CorrelationIDs: events.CorrelationIDsFromContext(ctx),
-			ReceivedAt:     &up.ReceivedAt,
 			Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
 				AppSKey:              resp.SessionKeys.AppSKey,
 				InvalidatedDownlinks: invalidatedQueue,

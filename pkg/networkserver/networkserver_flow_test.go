@@ -403,9 +403,6 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 		a.So(asUp.CorrelationIDs, should.Contain, "NsJs-1")
 		a.So(asUp.CorrelationIDs, should.Contain, "NsJs-2")
 		a.So(asUp.CorrelationIDs, should.HaveLength, 6)
-		if !a.So(asUp.ReceivedAt, should.NotBeNil) {
-			a.So([]time.Time{start, *asUp.ReceivedAt, time.Now()}, should.BeChronological)
-		}
 		a.So(asUp, should.Resemble, &ttnpb.ApplicationUp{
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 				DeviceID:               "test-dev-id",
@@ -415,7 +412,6 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 				DevAddr:                &devAddr,
 			},
 			CorrelationIDs: asUp.CorrelationIDs,
-			ReceivedAt:     asUp.ReceivedAt,
 			Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
 				AppSKey: &ttnpb.KeyEnvelope{
 					Key: &appSKey,
@@ -457,7 +453,7 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 			return
 		}
 
-		a.So(test.AssertClusterGetPeerRequest(ctx, getPeerCh,
+		if !a.So(test.AssertClusterGetPeerRequest(ctx, getPeerCh,
 			func(ctx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) bool {
 				return a.So(role, should.Equal, ttnpb.PeerInfo_GATEWAY_SERVER) &&
 					a.So(ids, should.Resemble, ttnpb.GatewayIdentifiers{
@@ -465,7 +461,9 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 					})
 			},
 			gsPeer,
-		), should.BeTrue)
+		), should.BeTrue) {
+			return
+		}
 
 		a.So(AssertAuthNsGsScheduleDownlinkRequest(ctx, authCh, scheduleDownlinkCh,
 			func(ctx context.Context, msg *ttnpb.DownlinkMessage) bool {
@@ -589,9 +587,6 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 		a.So(asUp.CorrelationIDs, should.Contain, "GsNs-1")
 		a.So(asUp.CorrelationIDs, should.Contain, "GsNs-2")
 		a.So(asUp.CorrelationIDs, should.HaveLength, 4)
-		if !a.So(asUp.ReceivedAt, should.NotBeNil) {
-			a.So([]time.Time{start, *asUp.ReceivedAt, time.Now()}, should.BeChronological)
-		}
 		a.So(asUp, should.Resemble, &ttnpb.ApplicationUp{
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 				DeviceID:               "test-dev-id",
@@ -601,11 +596,9 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 				DevAddr:                &devAddr,
 			},
 			CorrelationIDs: asUp.CorrelationIDs,
-			ReceivedAt:     asUp.ReceivedAt,
 			Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
 				SessionKeyID: []byte("session-key-id"),
 				FPort:        0x42,
-				FCnt:         0,
 				FRMPayload:   uplinkFRMPayload,
 				RxMetadata:   uplink.RxMetadata,
 				Settings: ttnpb.TxSettings{
