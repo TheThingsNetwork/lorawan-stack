@@ -19,7 +19,7 @@ import * as Yup from 'yup'
 
 import Form from '../../../components/form'
 import Radio from '../../../components/radio-button'
-import Button from '../../../components/button'
+import SubmitButton from '../../../components/submit-button'
 import SubmitBar from '../../../components/submit-bar'
 import sharedMessages from '../../../lib/shared-messages'
 import PropTypes from '../../../lib/prop-types'
@@ -219,8 +219,8 @@ class PayloadFormattersForm extends React.Component {
           </Form.Field>
           {this.formatter}
           <SubmitBar>
-            <Button
-              type="submit"
+            <Form.Submit
+              component={SubmitButton}
               message={sharedMessages.saveChanges}
             />
           </SubmitBar>
