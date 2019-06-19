@@ -29,6 +29,7 @@ const getValue = (opts, val) => opts.find(o => o.value === val)
 @bind
 class Select extends React.PureComponent {
 
+  select = React.createRef()
   static propTypes = {
     onChange: PropTypes.func,
     onBlur: PropTypes.func,
@@ -96,6 +97,12 @@ class Select extends React.PureComponent {
     onBlur(event)
   }
 
+  focus () {
+    if (this.select.current) {
+      this.select.current.focus()
+    }
+  }
+
   render () {
     const {
       className,
@@ -135,6 +142,7 @@ class Select extends React.PureComponent {
         onBlur={this.onBlur}
         onFocus={onFocus}
         isDisabled={disabled}
+        ref={this.select}
         {...rest}
       />
     )
