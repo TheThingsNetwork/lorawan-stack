@@ -25,7 +25,6 @@ import Toggled from './toggled'
 
 import style from './input.styl'
 
-@injectIntl
 @bind
 class Input extends React.Component {
   static propTypes = {
@@ -65,15 +64,14 @@ class Input extends React.Component {
   input = React.createRef()
 
   focus () {
-    if (this.input.current) {
+    if (this.input.current && this.input.current.focus) {
       this.input.current.focus()
+      this.setState({ focus: true })
     }
-
-    this.setState({ focus: true })
   }
 
   blur () {
-    if (this.input.current) {
+    if (this.input.current && this.input.current.blur) {
       this.input.current.blur()
     }
 
@@ -203,4 +201,5 @@ const Valid = function (props) {
 
 Input.Toggled = Toggled
 
-export default Input
+export default injectIntl(Input, { withRef: true })
+export { Input }
