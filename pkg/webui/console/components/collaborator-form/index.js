@@ -82,7 +82,7 @@ export default class CollaboratorForm extends Component {
   }
 
   async handleSubmit (values, { resetForm, setSubmitting }) {
-    const { collaborator_id, collaborator_type, rights } = values
+    const { collaborator_id, collaborator_type, rights: rightMap } = values
     const { onSubmit, onSubmitSuccess, onSubmitFailure } = this.props
 
     const collaborator_ids = {
@@ -90,9 +90,17 @@ export default class CollaboratorForm extends Component {
         [`${collaborator_type}_id`]: collaborator_id,
       },
     }
+
+    // Prefer universal wildcard rights over individual rights, if set
+    const rights = Object.keys(rightMap).filter(r => rightMap[r])
+    const universalRights = rights.filter(r => r.endsWith('_ALL'))
+    const computedRights = universalRights.length
+      ? universalRights
+      : rights
+
     const collaborator = {
       ids: collaborator_ids,
-      rights: Object.keys(rights).filter(r => rights[r]),
+      rights: computedRights,
     }
 
     await this.setState({ error: '' })
@@ -144,10 +152,13 @@ export default class CollaboratorForm extends Component {
       }
     }
 
-    const hasRightAll = (collaborator.rights.includes(RIGHT_ALL))
+    // Translate universal rights back to individual values
+    const hasRightAll = collaborator.rights.includes(RIGHT_ALL)
+    const hasUniversalRight = collaborator.rights.some(r => r.endsWith('_ALL'))
+
     const rightsValues = rights.reduce(
       function (acc, right) {
-        acc[right] = hasRightAll || collaborator.rights.includes(right)
+        acc[right] = hasUniversalRight || collaborator.rights.includes(right)
 
         return acc
       },
