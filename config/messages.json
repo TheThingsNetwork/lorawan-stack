@@ -3923,9 +3923,18 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/joinserver:lorawan_version": {
+  "error:pkg/joinserver:lorawan_major_version": {
     "translations": {
-      "en": "unsupported LoRaWAN version: {version}"
+      "en": "unsupported LoRaWAN major version: `{major}`"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:mac_version": {
+    "translations": {
+      "en": "unsupported MAC version: `{version}`"
     },
     "description": {
       "package": "pkg/joinserver",

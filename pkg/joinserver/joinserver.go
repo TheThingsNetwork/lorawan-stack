@@ -178,7 +178,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		}
 	}
 	if !supported {
-		return nil, errUnsupportedLoRaWANVersion.WithAttributes("version", req.SelectedMACVersion)
+		return nil, errUnsupportedMACVersion.WithAttributes("version", req.SelectedMACVersion)
 	}
 
 	req.Payload = &ttnpb.Message{}
@@ -187,7 +187,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 	}
 
 	if req.Payload.Major != ttnpb.Major_LORAWAN_R1 {
-		return nil, errUnsupportedLoRaWANVersion.WithAttributes("version", req.Payload.Major)
+		return nil, errUnsupportedLoRaWANMajorVersion.WithAttributes("major", req.Payload.Major)
 	}
 	if req.Payload.MType != ttnpb.MType_JOIN_REQUEST {
 		return nil, errWrongPayloadType.WithAttributes("type", req.Payload.MType)
