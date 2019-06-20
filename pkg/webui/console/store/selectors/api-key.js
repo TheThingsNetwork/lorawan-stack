@@ -12,22 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const storeSelector = (state, entity) => state.apiKeys[entity]
+/* eslint-disable import/prefer-default-export */
 
-export const apiKeySelector = entity => function (state) {
-  const store = storeSelector(state, entity)
+const selectApiKeysStore = (state, entity) => state.apiKeys[entity]
+
+export const createApiKeySelector = entity => function (state) {
+  const store = selectApiKeysStore(state, entity)
 
   return store.key
-}
-
-export const fetchingSelector = entity => function (state) {
-  const store = storeSelector(state, entity)
-
-  return store.fetching
-}
-
-export const errorSelector = entity => function (state) {
-  const store = storeSelector(state, entity)
-
-  return store.error
 }

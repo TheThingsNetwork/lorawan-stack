@@ -12,22 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const storeSelector = state => state.webhookFormats
+import { GET_WEBHOOK_FORMATS_BASE } from '../actions/webhook-formats'
+import { createFetchingSelector } from './fetching'
+import { createErrorSelector } from './error'
 
-export const formatsSelector = function (state) {
-  const store = storeSelector(state)
+const selectWebhookFormatsStore = state => state.webhookFormats
+
+export const selectWebhookFormats = function (state) {
+  const store = selectWebhookFormatsStore(state)
 
   return store.formats || {}
 }
 
-export const errorSelector = function (state) {
-  const store = storeSelector(state)
-
-  return store.error
-}
-
-export const fetchingSelector = function (state) {
-  const store = storeSelector(state)
-
-  return store.fetching
-}
+export const selectWebhookFormatsError = createErrorSelector(GET_WEBHOOK_FORMATS_BASE)
+export const selectWebhookFormatsFetching = createFetchingSelector(GET_WEBHOOK_FORMATS_BASE)

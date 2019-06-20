@@ -14,10 +14,10 @@
 
 /* eslint-disable import/prefer-default-export */
 
-const getErrorStoreSelector = state => state.ui.error
+const selectErrorStore = state => state.ui.error
 
 const getErrorStoreEntrySelector = (state, baseActionType) =>
-  getErrorStoreSelector(state)[baseActionType]
+  selectErrorStore(state)[baseActionType]
 
 /**
  * @example

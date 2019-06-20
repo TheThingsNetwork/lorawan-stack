@@ -13,104 +13,74 @@
 // limitations under the License.
 
 import {
-  eventsSelector,
-  errorSelector as eventsErrorSelector,
-  statusSelector as eventsStatusSelector,
+  GET_GTW_BASE,
+  GET_GTW_API_KEY_BASE,
+  GET_GTW_API_KEYS_LIST_BASE,
+  UPDATE_GTW_STATS_BASE,
+} from '../actions/gateway'
+import { GET_GTWS_RIGHTS_LIST_BASE } from '../actions/gateways'
+import { getGatewayId } from '../../../lib/selectors/id'
+import {
+  createEventsSelector,
+  createEventsErrorSelector,
+  createEventsStatusSelector,
 } from './events'
-
 import {
-  apiKeysStoreSelector,
-  fetchingSelector as apiKeysFetchingSelector,
-  errorSelector as apiKeysErrorSelector,
-  totalCountSelector as apiKeysTotalCountSelector,
-} from './api-keys'
-
-import {
-  rightsSelector,
-  universalRightsSelector,
-  errorSelector as rightsErrorSelector,
-  fetchingSelector as rightsFetchingSelector,
+  createRightsSelector,
+  createUniversalRightsSelector,
 } from './rights'
-
-import {
-  apiKeySelector,
-  fetchingSelector as apiKeyFetchingSelector,
-  errorSelector as apiKeyErrorSelector,
-} from './api-key'
+import { createApiKeysSelector, createApiKeysStoreSelector } from './api-keys'
+import { createApiKeySelector } from './api-key'
+import { createFetchingSelector } from './fetching'
+import { createErrorSelector } from './error'
 
 const ENTITY = 'gateways'
 const ENTITY_SINGLE = 'gateway'
 
-const storeSelector = state => state.gateway
+const selectGatewayStore = state => state.gateway
 
-export const gatewaySelector = state => storeSelector(state).gateway
+// Gateway Entity
+export const selectSelectedGateway = state => selectGatewayStore(state).gateway
+export const selectSelectedGatewayId = state => getGatewayId(selectSelectedGateway(state))
+export const selectGatewayFetching = createFetchingSelector(GET_GTW_BASE)
+export const selectGatewayError = createErrorSelector(GET_GTW_BASE)
 
-export const fetchingSelector = function (state) {
-  const store = storeSelector(state)
+// Events
+export const selectGatewayEvents = createEventsSelector(ENTITY)
+export const selectGatewayEventsError = createEventsErrorSelector(ENTITY)
+export const selectGatewayEventsStatus = createEventsStatusSelector(ENTITY)
+export const selectGatewayTotalCount = 100 || selectGatewayStore(ENTITY).totalCount
 
-  return store.fetching || false
-}
+// Api Keys
+export const selectGatewayApiKeysStore = createApiKeysStoreSelector(ENTITY)
+export const selectGatewayApiKeys = createApiKeysSelector(ENTITY)
+export const selectGatewayKeysError = createErrorSelector(GET_GTW_API_KEYS_LIST_BASE)
+export const selectGatewayKeysFetching = createFetchingSelector(GET_GTW_API_KEYS_LIST_BASE)
+export const selectGatewayApiKey = createApiKeySelector(ENTITY_SINGLE)
+export const selectGatewayApiKeyFetching = createFetchingSelector(GET_GTW_API_KEY_BASE)
+export const selectGatewayApiKeyError = createErrorSelector(GET_GTW_API_KEY_BASE)
 
-export const errorSelector = function (state) {
-  const store = storeSelector(state)
+// Rights
+export const selectGatewayRights = createRightsSelector(ENTITY)
+export const selectGatewayUniversalRights = createUniversalRightsSelector(ENTITY)
+export const selectGatewayRightsError = createErrorSelector(ENTITY)
+export const selectGatewayRightsFetching = createFetchingSelector(GET_GTWS_RIGHTS_LIST_BASE)
 
-  return store.error
-}
-
-const statisticsStoreSelector = function (state) {
-  const store = storeSelector(state)
+// Statistics
+export const selectGatewayStatisticsError = createErrorSelector(UPDATE_GTW_STATS_BASE)
+export const selectGatewayStatisticsIsFetching = createFetchingSelector(UPDATE_GTW_STATS_BASE)
+const selectGatewayStatisticStore = function (state) {
+  const store = selectGatewayStore(state)
 
   return store.statistics
 }
-
-export const statisticsSelector = function (state) {
-  const store = statisticsStoreSelector(state)
+export const selectGatewayStatistics = function (state) {
+  const store = selectGatewayStatisticStore(state)
 
   return store.stats
 }
-
-export const statisticsErrorSelector = function (state) {
-  const store = statisticsStoreSelector(state)
-
-  return store.error
-}
-
-export const statisticsIsAvailableSelector = function (state) {
-  const store = statisticsStoreSelector(state)
+export const selectGatewayStatisticsIsAvailable = function (state) {
+  const store = selectGatewayStatisticStore(state)
 
   return store.available
 }
-
-export const statisticsIsFetchingSelector = function (state) {
-  const store = statisticsStoreSelector(state)
-
-  return store.fetching
-}
-
-export const gatewayEventsSelector = eventsSelector(ENTITY)
-
-export const gatewayEventsErrorSelector = eventsErrorSelector(ENTITY)
-
-export const gatewayEventsStatusSelector = eventsStatusSelector(ENTITY)
-
-export const gatewayApiKeysStoreSelector = apiKeysStoreSelector(ENTITY)
-
-export const gatewayTotalCountSelector = apiKeysTotalCountSelector(ENTITY)
-
-export const gatewayKeysErrorSelector = apiKeysErrorSelector(ENTITY)
-
-export const gatewayKeysFetchingSelector = apiKeysFetchingSelector(ENTITY)
-
-export const gatewayRightsSelector = rightsSelector(ENTITY)
-
-export const gatewayUniversalRightsSelector = universalRightsSelector(ENTITY)
-
-export const gatewayRightsErrorSelector = rightsErrorSelector(ENTITY)
-
-export const gatewayRightsFetchingSelector = rightsFetchingSelector(ENTITY)
-
-export const gatewayKeySelector = apiKeySelector(ENTITY_SINGLE)
-
-export const gatewayKeyFetchingSelector = apiKeyFetchingSelector(ENTITY_SINGLE)
-
-export const gatewayKeyErrorSelector = apiKeyErrorSelector(ENTITY_SINGLE)

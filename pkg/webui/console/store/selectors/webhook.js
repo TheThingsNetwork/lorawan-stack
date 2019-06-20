@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const storeSelector = state => state.webhook
+import { GET_WEBHOOK_BASE } from '../actions/webhook'
+import { createFetchingSelector } from './fetching'
+import { createErrorSelector } from './error'
 
-export const webhookSelector = state => storeSelector(state).webhook
+const selectWebhookStore = state => state.webhook
 
-export const errorSelector = state => storeSelector(state).error
-
-export const fetchingSelector = state => storeSelector(state).fetching || false
+export const selectSelectedWebhook = state => selectWebhookStore(state).webhook
+export const selectWebhookError = createErrorSelector(GET_WEBHOOK_BASE)
+export const selectWebhookFetching = createFetchingSelector(GET_WEBHOOK_BASE)

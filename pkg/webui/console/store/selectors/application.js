@@ -13,40 +13,33 @@
 // limitations under the License.
 
 import { getApplicationId } from '../../../lib/selectors/id'
-import { GET_APP_BASE, GET_APP_API_KEY_BASE } from '../actions/application'
+import {
+  GET_APP_BASE,
+  GET_APP_API_KEY_BASE,
+  GET_APP_API_KEYS_LIST_BASE,
+} from '../actions/application'
+import { GET_APPS_RIGHTS_LIST_BASE } from '../actions/applications'
 import { GET_APP_LINK_BASE } from '../actions/link'
 import {
-  eventsSelector,
-  errorSelector as eventsErrorSelector,
-  statusSelector as eventsStatusSelector,
+  createEventsSelector,
+  createEventsErrorSelector,
+  createEventsStatusSelector,
 } from './events'
 import {
-  rightsSelector,
-  universalRightsSelector,
-  errorSelector as rightsErrorSelector,
-  fetchingSelector as rightsFetchingSelector,
+  createRightsSelector,
+  createUniversalRightsSelector,
 } from './rights'
-import {
-  apiKeysSelector,
-  errorSelector as apiKeysErrorSelector,
-  fetchingSelector as apiKeysFetchingSelector,
-} from './api-keys'
-import { apiKeySelector } from './api-key'
+import { createApiKeysSelector } from './api-keys'
+import { createApiKeySelector } from './api-key'
 import { createFetchingSelector } from './fetching'
 import { createErrorSelector } from './error'
 
 const ENTITY = 'applications'
 const ENTITY_SINGLE = 'application'
-const storeSelector = state => state.application
-
-export const applicationSelector = state => storeSelector(state).application
-
-export const fetchingSelector = state => storeSelector(state).fetching || false
-
-export const errorSelector = state => storeSelector(state).error
 
 const selectApplicationStore = state => state.application
 
+// Application Entity
 export const selectSelectedApplicationId = function (state) {
   const application = selectApplicationStore(state)
 
@@ -56,48 +49,36 @@ export const selectSelectedApplication = state => selectApplicationStore(state)
 export const selectApplicationFetching = createFetchingSelector(GET_APP_BASE)
 export const selectApplicationError = createErrorSelector(GET_APP_BASE)
 
-export const applicationEventsSelector = eventsSelector(ENTITY)
+// Events
+export const selectApplicationEvents = createEventsSelector(ENTITY)
+export const selectApplicationEventsError = createEventsErrorSelector(ENTITY)
+export const selectApplicationEventsStatus = createEventsStatusSelector(ENTITY)
 
-export const applicationEventsErrorSelector = eventsErrorSelector(ENTITY)
+// Rights
+export const selectApplicationRights = createRightsSelector(ENTITY)
+export const selectApplicationUniversalRights = createUniversalRightsSelector(ENTITY)
+export const selectApplicationRightsError = createErrorSelector(GET_APPS_RIGHTS_LIST_BASE)
+export const selectApplicationRightsFetching = createFetchingSelector(GET_APPS_RIGHTS_LIST_BASE)
 
-export const applicationEventsStatusSelector = eventsStatusSelector(ENTITY)
+// Api Keys
+export const selectApplicationApiKeys = createApiKeysSelector(ENTITY)
+export const selectApplicationApiKeysError = createErrorSelector(GET_APP_API_KEYS_LIST_BASE)
+export const selectApplicationApiKeysFetching = createFetchingSelector(GET_APP_API_KEYS_LIST_BASE)
+export const selectApplicationApiKey = createApiKeySelector(ENTITY_SINGLE)
+export const selectApplicationApiKeyFetching = createFetchingSelector(GET_APP_API_KEY_BASE)
+export const selectApplicationApiKeyError = createErrorSelector(GET_APP_API_KEY_BASE)
 
-export const applicationRightsSelector = rightsSelector(ENTITY)
-
-export const applicationUniversalRightsSelector = universalRightsSelector(ENTITY)
-
-export const applicationRightsErrorSelector = rightsErrorSelector(ENTITY)
-
-export const applicationRightsFetchingSelector = rightsFetchingSelector(ENTITY)
-
-export const applicationKeysSelector = apiKeysSelector(ENTITY)
-
-export const applicationKeysErrorSelector = apiKeysErrorSelector(ENTITY)
-
-export const applicationKeysFetchingSelector = apiKeysFetchingSelector(ENTITY)
-
-export const applicationKeySelector = apiKeySelector(ENTITY_SINGLE)
-
-export const applicationKeyFetchingSelector = createFetchingSelector(GET_APP_API_KEY_BASE)
-
-export const applicationKeyErrorSelector = createErrorSelector(GET_APP_API_KEY_BASE)
-
+// Link
 const selectLinkStore = state => state.link
-
 export const selectApplicationLink = state => selectLinkStore(state).link
-
 export const selectApplicationLinkStats = state => selectLinkStore(state).stats
-
 export const selectApplicationLinkFetching = createFetchingSelector(GET_APP_LINK_BASE)
-
 export const selectApplicationLinkError = createErrorSelector(GET_APP_LINK_BASE)
-
 export const selectApplicationLinkFormatters = function (state) {
   const link = selectApplicationLink(state) || {}
 
   return link.default_formatters
 }
-
 export const selectApplicationIsLinked = function (state) {
   const linkStore = selectLinkStore(state)
   const link = selectApplicationLink(state) || {}
