@@ -235,6 +235,11 @@ func (c *Component) Start() (err error) {
 		)).Debug("Exposed services")
 	}
 
+	c.logger.Debug("Initializing cluster...")
+	if err := c.initCluster(); err != nil {
+		return err
+	}
+
 	c.logger.Debug("Initializing web server...")
 	for _, sub := range c.webSubsystems {
 		sub.RegisterRoutes(c.web)
@@ -266,11 +271,6 @@ func (c *Component) Start() (err error) {
 		c.logger.WithError(err).Error("Could not start interop server")
 	}
 	c.logger.Debug("Started interop server")
-
-	c.logger.Debug("Initializing cluster...")
-	if err := c.initCluster(); err != nil {
-		return err
-	}
 
 	c.logger.Debug("Joining cluster...")
 	if err := c.cluster.Join(); err != nil {
