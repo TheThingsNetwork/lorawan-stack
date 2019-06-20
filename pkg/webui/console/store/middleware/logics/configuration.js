@@ -17,8 +17,8 @@ import { get as cacheGet, set as cacheSet } from '../../../lib/cache'
 import api from '../../../api'
 
 import {
-  nsFrequencyPlansSelector,
-  gsFrequencyPlansSelector,
+  selectNsFrequencyPlans,
+  selectGsFrequencyPlans,
 } from '../../selectors/configuration'
 
 import createRequestLogic from './lib'
@@ -26,7 +26,7 @@ import createRequestLogic from './lib'
 const getNsFrequencyPlansLogic = createRequestLogic({
   type: configuration.GET_NS_FREQUENCY_PLANS,
   validate ({ getState, action }, allow, reject) {
-    const plansNs = nsFrequencyPlansSelector(getState())
+    const plansNs = selectNsFrequencyPlans(getState())
     if (plansNs && plansNs.length) {
       reject()
     } else {
@@ -46,7 +46,7 @@ const getNsFrequencyPlansLogic = createRequestLogic({
 const getGsFrequencyPlansLogic = createRequestLogic({
   type: configuration.GET_GS_FREQUENCY_PLANS,
   validate ({ getState, action }, allow, reject) {
-    const plansGs = gsFrequencyPlansSelector(getState())
+    const plansGs = selectGsFrequencyPlans(getState())
     if (plansGs && plansGs.length) {
       reject()
     } else {

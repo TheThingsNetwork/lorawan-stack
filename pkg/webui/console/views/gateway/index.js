@@ -36,9 +36,9 @@ import {
   stopGatewayEventsStream,
 } from '../../store/actions/gateway'
 import {
-  fetchingSelector,
-  errorSelector,
-  gatewaySelector,
+  selectGatewayFetching,
+  selectGatewayError,
+  selectSelectedGateway,
 } from '../../store/selectors/gateway'
 import withEnv, { EnvProvider } from '../../../lib/components/env'
 
@@ -47,9 +47,9 @@ import withEnv, { EnvProvider } from '../../../lib/components/env'
 
   return {
     gtwId,
-    gateway: gatewaySelector(state, props),
-    error: errorSelector(state, props),
-    fetching: fetchingSelector(state, props),
+    gateway: selectSelectedGateway(state),
+    error: selectGatewayError(state),
+    fetching: selectGatewayFetching(state),
   }
 },
 dispatch => ({

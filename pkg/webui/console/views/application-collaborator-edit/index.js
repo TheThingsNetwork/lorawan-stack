@@ -40,10 +40,10 @@ import api from '../../api'
 
 import {
   selectSelectedApplicationId,
-  applicationRightsSelector,
-  applicationUniversalRightsSelector,
-  applicationRightsFetchingSelector,
-  applicationRightsErrorSelector,
+  selectApplicationRights,
+  selectApplicationUniversalRights,
+  selectApplicationRightsFetching,
+  selectApplicationRightsError,
 } from '../../store/selectors/application'
 
 const validationSchema = Yup.object().shape({
@@ -62,7 +62,7 @@ const m = defineMessages({
 })
 
 @connect(function (state, props) {
-  const appId = selectSelectedApplicationId(state, props)
+  const appId = selectSelectedApplicationId(state)
   const { collaboratorId } = props.match.params
   const collaboratorsFetching = state.collaborators.applications.fetching
   const collaboratorsError = state.collaborators.applications.error
@@ -71,15 +71,15 @@ const m = defineMessages({
   const collaborator = appCollaborators ? appCollaborators.collaborators
     .find(c => c.id === collaboratorId) : undefined
 
-  const fetching = applicationRightsFetchingSelector(state, props) || collaboratorsFetching
-  const error = applicationRightsErrorSelector(state, props) || collaboratorsError
+  const fetching = selectApplicationRightsFetching(state) || collaboratorsFetching
+  const error = selectApplicationRightsError(state) || collaboratorsError
 
   return {
     collaboratorId,
     collaborator,
     appId,
-    rights: applicationRightsSelector(state, props),
-    universalRights: applicationUniversalRightsSelector(state, props),
+    rights: selectApplicationRights(state),
+    universalRights: selectApplicationUniversalRights(state),
     fetching,
     error,
   }

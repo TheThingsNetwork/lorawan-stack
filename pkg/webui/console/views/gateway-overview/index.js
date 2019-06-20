@@ -27,7 +27,7 @@ import Tag from '../../../components/tag'
 import Message from '../../../lib/components/message'
 
 import {
-  gatewaySelector,
+  selectSelectedGateway as gatewaySelector,
 } from '../../store/selectors/gateway'
 import {
   getGatewayId as idSelector,

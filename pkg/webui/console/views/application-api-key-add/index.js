@@ -28,24 +28,21 @@ import { ApiKeyCreateForm } from '../../../components/api-key-form'
 
 import { getApplicationsRightsList } from '../../store/actions/applications'
 import {
-  applicationRightsSelector,
-  applicationUniversalRightsSelector,
-  applicationRightsErrorSelector,
-  applicationRightsFetchingSelector,
+  selectSelectedApplicationId,
+  selectApplicationRights,
+  selectApplicationUniversalRights,
+  selectApplicationRightsError,
+  selectApplicationRightsFetching,
 } from '../../store/selectors/application'
 import api from '../../api'
 
-@connect(function (state, props) {
-  const appId = props.match.params.appId
-
-  return {
-    appId,
-    fetching: applicationRightsFetchingSelector(state, props),
-    error: applicationRightsErrorSelector(state, props),
-    rights: applicationRightsSelector(state, props),
-    universalRights: applicationUniversalRightsSelector(state, props),
-  }
-})
+@connect((state, props) => ({
+  appId: selectSelectedApplicationId(state),
+  fetching: selectApplicationRightsFetching(state),
+  error: selectApplicationRightsError(state),
+  rights: selectApplicationRights(state),
+  universalRights: selectApplicationUniversalRights(state),
+}))
 @withBreadcrumb('apps.single.api-keys.add', function (props) {
   const appId = props.appId
   return (

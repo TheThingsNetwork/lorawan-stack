@@ -18,7 +18,7 @@ import sharedMessages from '../../../../lib/shared-messages'
 import api from '../../../api'
 import * as gateway from '../../actions/gateway'
 import { gsConfigSelector } from '../../../../lib/selectors/env'
-import { gatewaySelector } from '../../selectors/gateway'
+import { selectSelectedGateway } from '../../selectors/gateway'
 import createEventsConnectLogics from './events'
 import createRequestLogic from './lib'
 
@@ -42,7 +42,7 @@ const startGatewayStatisticsLogic = createLogic({
   warnTimeout: 0,
   validate ({ getState, action }, allow, reject) {
     const gsConfig = gsConfigSelector()
-    const gtw = gatewaySelector(getState())
+    const gtw = selectSelectedGateway(getState())
 
     if (!gsConfig.enabled) {
       reject(gateway.updateGatewayStatisticsUnavailable())

@@ -26,9 +26,7 @@ import {
   startEventsStreamSuccess,
   stopEventsStream,
 } from '../../actions/events'
-import {
-  applicationEventsStatusSelector,
-} from '../../selectors/application'
+import { selectApplicationEventsStatus } from '../../selectors/application'
 
 const createEventsConnectLogics = function (name, entity) {
   const START_EVENTS = createStartEventsStreamActionType(name)
@@ -53,7 +51,7 @@ const createEventsConnectLogics = function (name, entity) {
         }
 
         // only proceed if not already connected
-        const status = applicationEventsStatusSelector(getState(), { id })
+        const status = selectApplicationEventsStatus(getState(), { id })
         const connected = status === CONNECTION_STATUS.CONNECTED
         const connecting = status === CONNECTION_STATUS.CONNECTING
         if (connected || connecting) {
@@ -87,7 +85,7 @@ const createEventsConnectLogics = function (name, entity) {
         }
 
         // only proceed if connected
-        const status = applicationEventsStatusSelector(getState(), { id })
+        const status = selectApplicationEventsStatus(getState(), { id })
         const disconnected = status === CONNECTION_STATUS.DISCONNECTED
         const unknown = status === CONNECTION_STATUS.UNKNOWN
         if (disconnected || unknown) {

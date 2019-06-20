@@ -24,8 +24,8 @@ import {
 } from '../../store/actions/application'
 
 import {
-  applicationEventsSelector,
-  applicationEventsStatusSelector,
+  selectApplicationEvents,
+  selectApplicationEventsStatus,
 } from '../../store/selectors/application'
 
 @connect(
@@ -46,8 +46,8 @@ class ApplicationEvents extends React.Component {
       <EventsSubscription
         id={appId}
         widget={widget}
-        eventsSelector={applicationEventsSelector}
-        statusSelector={applicationEventsStatusSelector}
+        eventsSelector={selectApplicationEvents}
+        statusSelector={selectApplicationEventsStatus}
         onClear={onClear}
         toAllUrl={`/console/applications/${appId}/data`}
       />

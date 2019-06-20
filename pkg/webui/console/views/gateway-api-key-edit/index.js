@@ -28,39 +28,32 @@ import { ApiKeyEditForm } from '../../../components/api-key-form'
 
 import { getGatewayApiKey } from '../../store/actions/gateway'
 import { getGatewaysRightsList } from '../../store/actions/gateways'
-import { getGatewayId } from '../../../lib/selectors/id'
 import {
-  gatewaySelector,
-  gatewayRightsSelector,
-  gatewayUniversalRightsSelector,
-  gatewayRightsErrorSelector,
-  gatewayRightsFetchingSelector,
-  gatewayKeySelector,
-  gatewayKeyErrorSelector,
-  gatewayKeyFetchingSelector,
+  selectSelectedGatewayId,
+  selectGatewayRights,
+  selectGatewayUniversalRights,
+  selectGatewayRightsError,
+  selectGatewayRightsFetching,
+  selectGatewayApiKey,
+  selectGatewayApiKeyError,
+  selectGatewayApiKeyFetching,
 } from '../../store/selectors/gateway'
 
 import api from '../../api'
 
 @connect(function (state, props) {
-  const gateway = gatewaySelector(state, props)
-  const gtwId = getGatewayId(gateway)
   const apiKeyId = props.match.params.apiKeyId
-
-  const keyFetching = gatewayKeyFetchingSelector(state)
-  const rightsFetching = gatewayRightsFetchingSelector(state, props)
-  const keyError = gatewayKeyErrorSelector(state)
-  const apiKey = gatewayKeySelector(state)
-  const rightsError = gatewayRightsErrorSelector(state, props)
-  const rights = gatewayRightsSelector(state, props)
-  const universalRights = gatewayUniversalRightsSelector(state, props)
+  const keyFetching = selectGatewayApiKeyFetching(state)
+  const rightsFetching = selectGatewayRightsFetching(state)
+  const keyError = selectGatewayApiKeyError(state)
+  const rightsError = selectGatewayRightsError(state)
 
   return {
     keyId: apiKeyId,
-    gtwId,
-    apiKey,
-    rights,
-    universalRights,
+    gtwId: selectSelectedGatewayId(state),
+    apiKey: selectGatewayApiKey(state),
+    rights: selectGatewayRights(state),
+    universalRights: selectGatewayUniversalRights(state),
     fetching: keyFetching || rightsFetching,
     error: keyError || rightsError,
   }

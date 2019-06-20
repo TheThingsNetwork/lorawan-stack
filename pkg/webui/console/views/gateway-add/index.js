@@ -32,7 +32,7 @@ import GatewayDataForm from '../../components/gateway-data-form'
 
 import api from '../../api'
 
-import { userIdSelector } from '../../store/selectors/user'
+import { selectUserId } from '../../store/selectors/user'
 
 import style from './gateway-add.styl'
 
@@ -50,8 +50,8 @@ const m = defineMessages({
     />
   )
 })
-@connect(function (state, props) {
-  const userId = userIdSelector(state, props)
+@connect(function (state) {
+  const userId = selectUserId(state)
 
   return { userId }
 },
