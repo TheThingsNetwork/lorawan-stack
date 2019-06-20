@@ -30,6 +30,19 @@
   - [Service `AppAs`](#ttn.lorawan.v3.AppAs)
   - [Service `As`](#ttn.lorawan.v3.As)
   - [Service `AsEndDeviceRegistry`](#ttn.lorawan.v3.AsEndDeviceRegistry)
+- [File `lorawan-stack/api/applicationserver_pubsub.proto`](#lorawan-stack/api/applicationserver_pubsub.proto)
+  - [Message `ApplicationPubSub`](#ttn.lorawan.v3.ApplicationPubSub)
+  - [Message `ApplicationPubSub.AttributesEntry`](#ttn.lorawan.v3.ApplicationPubSub.AttributesEntry)
+  - [Message `ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message)
+  - [Message `ApplicationPubSubFormats`](#ttn.lorawan.v3.ApplicationPubSubFormats)
+  - [Message `ApplicationPubSubFormats.FormatsEntry`](#ttn.lorawan.v3.ApplicationPubSubFormats.FormatsEntry)
+  - [Message `ApplicationPubSubIdentifiers`](#ttn.lorawan.v3.ApplicationPubSubIdentifiers)
+  - [Message `ApplicationPubSubs`](#ttn.lorawan.v3.ApplicationPubSubs)
+  - [Message `GetApplicationPubSubRequest`](#ttn.lorawan.v3.GetApplicationPubSubRequest)
+  - [Message `ListApplicationPubSubsRequest`](#ttn.lorawan.v3.ListApplicationPubSubsRequest)
+  - [Message `SetApplicationPubSubRequest`](#ttn.lorawan.v3.SetApplicationPubSubRequest)
+  - [Enum `ApplicationPubSub.Service`](#ttn.lorawan.v3.ApplicationPubSub.Service)
+  - [Service `ApplicationPubSubRegistry`](#ttn.lorawan.v3.ApplicationPubSubRegistry)
 - [File `lorawan-stack/api/applicationserver_web.proto`](#lorawan-stack/api/applicationserver_web.proto)
   - [Message `ApplicationWebhook`](#ttn.lorawan.v3.ApplicationWebhook)
   - [Message `ApplicationWebhook.HeadersEntry`](#ttn.lorawan.v3.ApplicationWebhook.HeadersEntry)
@@ -734,6 +747,155 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 | `Set` | `PUT` | `/api/v3/as/applications/{end_device.ids.application_ids.application_id}/devices/{end_device.ids.device_id}` | `*` |
 | `Set` | `POST` | `/api/v3/as/applications/{end_device.ids.application_ids.application_id}/devices` | `*` |
 | `Delete` | `DELETE` | `/api/v3/as/applications/{application_ids.application_id}/devices/{device_id}` |  |
+
+## <a name="lorawan-stack/api/applicationserver_pubsub.proto">File `lorawan-stack/api/applicationserver_pubsub.proto`</a>
+
+### <a name="ttn.lorawan.v3.ApplicationPubSub">Message `ApplicationPubSub`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `ids` | [`ApplicationPubSubIdentifiers`](#ttn.lorawan.v3.ApplicationPubSubIdentifiers) |  |  |
+| `created_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+| `updated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+| `attributes` | [`ApplicationPubSub.AttributesEntry`](#ttn.lorawan.v3.ApplicationPubSub.AttributesEntry) | repeated | Service specific strings used for authentication and settings. |
+| `format` | [`string`](#string) |  | The format to use for the body. Supported values depend on the Application Server configuration. |
+| `service` | [`ApplicationPubSub.Service`](#ttn.lorawan.v3.ApplicationPubSub.Service) |  |  |
+| `downlink_push_topic` | [`string`](#string) |  | The topic to which the Application Server subscribes for downlink queue push operations. |
+| `downlink_replace_topic` | [`string`](#string) |  | The topic to which the Application Server subscribes for downlink queue replace operations. |
+| `uplink_message` | [`ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message) |  |  |
+| `join_accept` | [`ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message) |  |  |
+| `downlink_ack` | [`ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message) |  |  |
+| `downlink_nack` | [`ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message) |  |  |
+| `downlink_sent` | [`ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message) |  |  |
+| `downlink_failed` | [`ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message) |  |  |
+| `downlink_queued` | [`ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message) |  |  |
+| `location_solved` | [`ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `ids` | <p>`message.required`: `true`</p> |
+| `service` | <p>`enum.defined_only`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.ApplicationPubSub.AttributesEntry">Message `ApplicationPubSub.AttributesEntry`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `key` | [`string`](#string) |  |  |
+| `value` | [`string`](#string) |  |  |
+
+### <a name="ttn.lorawan.v3.ApplicationPubSub.Message">Message `ApplicationPubSub.Message`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `topic` | [`string`](#string) |  | The topic on which the Application Server publishes the messages. |
+
+### <a name="ttn.lorawan.v3.ApplicationPubSubFormats">Message `ApplicationPubSubFormats`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `formats` | [`ApplicationPubSubFormats.FormatsEntry`](#ttn.lorawan.v3.ApplicationPubSubFormats.FormatsEntry) | repeated | Format and description. |
+
+### <a name="ttn.lorawan.v3.ApplicationPubSubFormats.FormatsEntry">Message `ApplicationPubSubFormats.FormatsEntry`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `key` | [`string`](#string) |  |  |
+| `value` | [`string`](#string) |  |  |
+
+### <a name="ttn.lorawan.v3.ApplicationPubSubIdentifiers">Message `ApplicationPubSubIdentifiers`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
+| `pubsub_id` | [`string`](#string) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `application_ids` | <p>`message.required`: `true`</p> |
+| `pubsub_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+
+### <a name="ttn.lorawan.v3.ApplicationPubSubs">Message `ApplicationPubSubs`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `pubsubs` | [`ApplicationPubSub`](#ttn.lorawan.v3.ApplicationPubSub) | repeated |  |
+
+### <a name="ttn.lorawan.v3.GetApplicationPubSubRequest">Message `GetApplicationPubSubRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `ids` | [`ApplicationPubSubIdentifiers`](#ttn.lorawan.v3.ApplicationPubSubIdentifiers) |  |  |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `ids` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.ListApplicationPubSubsRequest">Message `ListApplicationPubSubsRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `application_ids` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.SetApplicationPubSubRequest">Message `SetApplicationPubSubRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `pubsub` | [`ApplicationPubSub`](#ttn.lorawan.v3.ApplicationPubSub) |  |  |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `pubsub` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.ApplicationPubSub.Service">Enum `ApplicationPubSub.Service`</a>
+
+The service type for the PubSub.
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| `AWSSNSSQS` | 0 | AWS SQS / SNS |
+| `AZURESB` | 1 | Azure Service Bus |
+| `GCPPUBSUB` | 2 | GCP PubSub |
+| `KAFKA` | 3 | Apache Kafka |
+| `NATS` | 4 | NATS |
+| `RABBIT` | 5 | RabbitMQ |
+
+### <a name="ttn.lorawan.v3.ApplicationPubSubRegistry">Service `ApplicationPubSubRegistry`</a>
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| `GetFormats` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`ApplicationPubSubFormats`](#ttn.lorawan.v3.ApplicationPubSubFormats) |  |
+| `Get` | [`GetApplicationPubSubRequest`](#ttn.lorawan.v3.GetApplicationPubSubRequest) | [`ApplicationPubSub`](#ttn.lorawan.v3.ApplicationPubSub) |  |
+| `List` | [`ListApplicationPubSubsRequest`](#ttn.lorawan.v3.ListApplicationPubSubsRequest) | [`ApplicationPubSubs`](#ttn.lorawan.v3.ApplicationPubSubs) |  |
+| `Set` | [`SetApplicationPubSubRequest`](#ttn.lorawan.v3.SetApplicationPubSubRequest) | [`ApplicationPubSub`](#ttn.lorawan.v3.ApplicationPubSub) |  |
+| `Delete` | [`ApplicationPubSubIdentifiers`](#ttn.lorawan.v3.ApplicationPubSubIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) |  |
+
+#### HTTP bindings
+
+| Method Name | Method | Pattern | Body |
+| ----------- | ------ | ------- | ---- |
+| `GetFormats` | `GET` | `/api/v3/as/pubsub-formats` |  |
+| `Get` | `GET` | `/api/v3/as/pubsub/{ids.application_ids.application_id}/{ids.pubsub_id}` |  |
+| `List` | `GET` | `/api/v3/as/pubsub/{application_ids.application_id}` |  |
+| `Set` | `PUT` | `/api/v3/as/pubsub/{pubsub.ids.application_ids.application_id}/{pubsub.ids.pubsub_id}` | `*` |
+| `Set` | `POST` | `/api/v3/as/pubsub/{pubsub.ids.application_ids.application_id}` | `*` |
+| `Delete` | `DELETE` | `/api/v3/as/pubsub/{application_ids.application_id}/{pubsub_id}` |  |
 
 ## <a name="lorawan-stack/api/applicationserver_web.proto">File `lorawan-stack/api/applicationserver_web.proto`</a>
 

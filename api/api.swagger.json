@@ -1107,6 +1107,198 @@
         ]
       }
     },
+    "/as/pubsub-formats": {
+      "get": {
+        "operationId": "GetFormats",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ApplicationPubSubFormats"
+            }
+          }
+        },
+        "tags": [
+          "ApplicationPubSubRegistry"
+        ]
+      }
+    },
+    "/as/pubsub/{application_ids.application_id}": {
+      "get": {
+        "operationId": "List",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ApplicationPubSubs"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "field_mask.paths",
+            "description": "The set of field mask paths.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "ApplicationPubSubRegistry"
+        ]
+      }
+    },
+    "/as/pubsub/{application_ids.application_id}/{pubsub_id}": {
+      "delete": {
+        "operationId": "Delete",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "pubsub_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ApplicationPubSubRegistry"
+        ]
+      }
+    },
+    "/as/pubsub/{ids.application_ids.application_id}/{ids.pubsub_id}": {
+      "get": {
+        "operationId": "Get",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ApplicationPubSub"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "ids.application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "ids.pubsub_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "field_mask.paths",
+            "description": "The set of field mask paths.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "ApplicationPubSubRegistry"
+        ]
+      }
+    },
+    "/as/pubsub/{pubsub.ids.application_ids.application_id}": {
+      "post": {
+        "operationId": "Set2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ApplicationPubSub"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pubsub.ids.application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3SetApplicationPubSubRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ApplicationPubSubRegistry"
+        ]
+      }
+    },
+    "/as/pubsub/{pubsub.ids.application_ids.application_id}/{pubsub.ids.pubsub_id}": {
+      "put": {
+        "operationId": "Set",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ApplicationPubSub"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pubsub.ids.application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "pubsub.ids.pubsub_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3SetApplicationPubSubRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ApplicationPubSubRegistry"
+        ]
+      }
+    },
     "/as/webhook-formats": {
       "get": {
         "operationId": "GetFormats",
@@ -4855,6 +5047,19 @@
         }
       }
     },
+    "ApplicationPubSubService": {
+      "type": "string",
+      "enum": [
+        "AWSSNSSQS",
+        "AZURESB",
+        "GCPPUBSUB",
+        "KAFKA",
+        "NATS",
+        "RABBIT"
+      ],
+      "default": "AWSSNSSQS",
+      "description": "The service type for the PubSub."
+    },
     "AuthInfoResponseAPIKeyAccess": {
       "type": "object",
       "properties": {
@@ -5959,6 +6164,111 @@
           "type": "object",
           "additionalProperties": {
             "type": "string"
+          }
+        }
+      }
+    },
+    "v3ApplicationPubSub": {
+      "type": "object",
+      "properties": {
+        "ids": {
+          "$ref": "#/definitions/v3ApplicationPubSubIdentifiers"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "attributes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Service specific strings used for authentication and settings."
+        },
+        "format": {
+          "type": "string",
+          "description": "The format to use for the body.\nSupported values depend on the Application Server configuration."
+        },
+        "service": {
+          "$ref": "#/definitions/ApplicationPubSubService"
+        },
+        "downlink_push_topic": {
+          "type": "string",
+          "description": "The topic to which the Application Server subscribes for downlink queue push operations."
+        },
+        "downlink_replace_topic": {
+          "type": "string",
+          "description": "The topic to which the Application Server subscribes for downlink queue replace operations."
+        },
+        "uplink_message": {
+          "$ref": "#/definitions/v3ApplicationPubSubMessage"
+        },
+        "join_accept": {
+          "$ref": "#/definitions/v3ApplicationPubSubMessage"
+        },
+        "downlink_ack": {
+          "$ref": "#/definitions/v3ApplicationPubSubMessage"
+        },
+        "downlink_nack": {
+          "$ref": "#/definitions/v3ApplicationPubSubMessage"
+        },
+        "downlink_sent": {
+          "$ref": "#/definitions/v3ApplicationPubSubMessage"
+        },
+        "downlink_failed": {
+          "$ref": "#/definitions/v3ApplicationPubSubMessage"
+        },
+        "downlink_queued": {
+          "$ref": "#/definitions/v3ApplicationPubSubMessage"
+        },
+        "location_solved": {
+          "$ref": "#/definitions/v3ApplicationPubSubMessage"
+        }
+      }
+    },
+    "v3ApplicationPubSubFormats": {
+      "type": "object",
+      "properties": {
+        "formats": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Format and description."
+        }
+      }
+    },
+    "v3ApplicationPubSubIdentifiers": {
+      "type": "object",
+      "properties": {
+        "application_ids": {
+          "$ref": "#/definitions/v3ApplicationIdentifiers"
+        },
+        "pubsub_id": {
+          "type": "string"
+        }
+      }
+    },
+    "v3ApplicationPubSubMessage": {
+      "type": "object",
+      "properties": {
+        "topic": {
+          "type": "string",
+          "description": "The topic on which the Application Server publishes the messages."
+        }
+      }
+    },
+    "v3ApplicationPubSubs": {
+      "type": "object",
+      "properties": {
+        "pubsubs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3ApplicationPubSub"
           }
         }
       }
@@ -8884,6 +9194,17 @@
         },
         "link": {
           "$ref": "#/definitions/v3ApplicationLink"
+        },
+        "field_mask": {
+          "$ref": "#/definitions/protobufFieldMask"
+        }
+      }
+    },
+    "v3SetApplicationPubSubRequest": {
+      "type": "object",
+      "properties": {
+        "pubsub": {
+          "$ref": "#/definitions/v3ApplicationPubSub"
         },
         "field_mask": {
           "$ref": "#/definitions/protobufFieldMask"
