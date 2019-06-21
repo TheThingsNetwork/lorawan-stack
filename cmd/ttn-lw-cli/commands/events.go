@@ -34,10 +34,18 @@ var eventsCommand = &cobra.Command{
 
 		addresses := make(map[string]bool)
 		addresses[config.IdentityServerGRPCAddress] = true
-		addresses[config.GatewayServerGRPCAddress] = true
-		addresses[config.NetworkServerGRPCAddress] = true
-		addresses[config.ApplicationServerGRPCAddress] = true
-		addresses[config.JoinServerGRPCAddress] = true
+		if config.GatewayServerEnabled {
+			addresses[config.GatewayServerGRPCAddress] = true
+		}
+		if config.NetworkServerEnabled {
+			addresses[config.NetworkServerGRPCAddress] = true
+		}
+		if config.ApplicationServerEnabled {
+			addresses[config.ApplicationServerGRPCAddress] = true
+		}
+		if config.JoinServerEnabled {
+			addresses[config.JoinServerGRPCAddress] = true
+		}
 
 		ids := getCombinedIdentifiers(cmd.Flags()).GetEntityIdentifiers()
 		if len(ids) == 0 {

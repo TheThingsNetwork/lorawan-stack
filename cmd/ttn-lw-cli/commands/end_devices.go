@@ -141,6 +141,8 @@ func generateDevAddr(netID types.NetID) (types.DevAddr, error) {
 	return devAddr, nil
 }
 
+var errGatewayServerDisabled = errors.DefineFailedPrecondition("gateway_server_disabled", "Gateway Server is disabled")
+
 var (
 	endDevicesCommand = &cobra.Command{
 		Use:     "end-devices",
@@ -152,6 +154,10 @@ var (
 		Short:             "List available frequency plans for end devices",
 		PersistentPreRunE: preRun(),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if !config.GatewayServerEnabled {
+				return errGatewayServerDisabled
+			}
+
 			baseFrequency, _ := cmd.Flags().GetUint32("base-frequency")
 			ns, err := api.Dial(ctx, config.NetworkServerGRPCAddress)
 			if err != nil {
@@ -309,17 +315,21 @@ var (
 
 			setDefaults, _ := cmd.Flags().GetBool("defaults")
 			if setDefaults {
-				device.NetworkServerAddress = getHost(config.NetworkServerGRPCAddress)
-				device.ApplicationServerAddress = getHost(config.ApplicationServerGRPCAddress)
-				paths = append(paths,
-					"application_server_address",
-					"network_server_address",
-				)
+				if config.NetworkServerEnabled {
+					device.NetworkServerAddress = getHost(config.NetworkServerGRPCAddress)
+					paths = append(paths, "network_server_address")
+				}
+				if config.ApplicationServerEnabled {
+					device.ApplicationServerAddress = getHost(config.ApplicationServerGRPCAddress)
+					paths = append(paths, "application_server_address")
+				}
 			}
 
 			if abp, _ := cmd.Flags().GetBool("abp"); abp {
 				device.SupportsJoin = false
-				paths = append(paths, "supports_join")
+				if config.NetworkServerEnabled {
+					paths = append(paths, "supports_join")
+				}
 				if withSession, _ := cmd.Flags().GetBool("with-session"); withSession {
 					if device.ProvisionerID != "" {
 						return errEndDeviceKeysWithProvisioner
@@ -355,12 +365,16 @@ var (
 				}
 			} else {
 				device.SupportsJoin = true
-				paths = append(paths, "supports_join")
+				if config.NetworkServerEnabled {
+					paths = append(paths, "supports_join")
+				}
 				if setDefaults {
-					device.JoinServerAddress = getHost(config.JoinServerGRPCAddress)
-					paths = append(paths,
-						"join_server_address",
-					)
+					if config.JoinServerEnabled {
+						device.JoinServerAddress = getHost(config.JoinServerGRPCAddress)
+						paths = append(paths,
+							"join_server_address",
+						)
+					}
 				}
 				if withKeys, _ := cmd.Flags().GetBool("with-root-keys"); withKeys {
 					if device.ProvisionerID != "" {
@@ -478,13 +492,13 @@ var (
 
 			isPaths, nsPaths, asPaths, jsPaths := splitEndDeviceSetPaths(device.SupportsJoin, paths...)
 
-			if len(nsPaths) > 0 {
+			if len(nsPaths) > 0 && config.NetworkServerEnabled {
 				isPaths = append(isPaths, "network_server_address")
 			}
-			if len(asPaths) > 0 {
+			if len(asPaths) > 0 && config.ApplicationServerEnabled {
 				isPaths = append(isPaths, "application_server_address")
 			}
-			if len(jsPaths) > 0 {
+			if len(jsPaths) > 0 && config.JoinServerEnabled {
 				isPaths = append(isPaths, "join_server_address")
 			}
 
@@ -744,21 +758,21 @@ var errAddressMismatchEndDevice = errors.DefineAborted("end_device_server_addres
 
 func compareServerAddressesEndDevice(device *ttnpb.EndDevice, config *Config) (nsMismatch, asMismatch, jsMismatch bool) {
 	nsHost, asHost, jsHost := getHost(config.NetworkServerGRPCAddress), getHost(config.ApplicationServerGRPCAddress), getHost(config.JoinServerGRPCAddress)
-	if host := getHost(device.NetworkServerAddress); host != "" && host != nsHost {
+	if host := getHost(device.NetworkServerAddress); config.NetworkServerEnabled && host != "" && host != nsHost {
 		nsMismatch = true
 		logger.WithFields(log.Fields(
 			"configured", nsHost,
 			"registered", host,
 		)).Warn("Registered Network Server address does not match CLI configuration")
 	}
-	if host := getHost(device.ApplicationServerAddress); host != "" && host != asHost {
+	if host := getHost(device.ApplicationServerAddress); config.ApplicationServerEnabled && host != "" && host != asHost {
 		asMismatch = true
 		logger.WithFields(log.Fields(
 			"configured", asHost,
 			"registered", host,
 		)).Warn("Registered Application Server address does not match CLI configuration")
 	}
-	if host := getHost(device.JoinServerAddress); host != "" && host != jsHost {
+	if host := getHost(device.JoinServerAddress); config.JoinServerEnabled && host != "" && host != jsHost {
 		jsMismatch = true
 		logger.WithFields(log.Fields(
 			"configured", jsHost,
