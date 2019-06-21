@@ -33,16 +33,17 @@ func InitializeEvents(ctx context.Context, config config.ServiceBase) (err error
 		return nil // this is the default.
 	case "redis":
 		if !config.Events.Redis.IsZero() {
-			events.DefaultPubSub = redis.NewPubSub(config.Events.Redis)
+			events.SetDefaultPubSub(redis.NewPubSub(config.Events.Redis))
 		} else {
-			events.DefaultPubSub = redis.NewPubSub(config.Redis)
+			events.SetDefaultPubSub(redis.NewPubSub(config.Redis))
 		}
 		return nil
 	case "cloud":
-		events.DefaultPubSub, err = cloud.NewPubSub(ctx, config.Events.Cloud.PublishURL, config.Events.Cloud.SubscribeURL)
+		ps, err := cloud.NewPubSub(ctx, config.Events.Cloud.PublishURL, config.Events.Cloud.SubscribeURL)
 		if err != nil {
 			return err
 		}
+		events.SetDefaultPubSub(ps)
 		return nil
 	default:
 		return fmt.Errorf("unknown events backend: %s", config.Events.Backend)
