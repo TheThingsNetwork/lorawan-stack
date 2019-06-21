@@ -14,24 +14,54 @@
 
 package events
 
-import "context"
+import (
+	"context"
+	"sync"
+)
 
-// DefaultPubSub is the default event pubsub.
-var DefaultPubSub = NewPubSub(DefaultBufferSize)
+var (
+	defaultPubSubMu = &sync.Mutex{}
+	// defaultPubSub is the default event pubsub.
+	defaultPubSub = NewPubSub(DefaultBufferSize)
+	// defaultPubSubSet records whether SetDefaultPubSub has been called or not.
+	defaultPubSubSet bool
+)
+
+// SetDefaultPubSub sets pubsub used by the package to ps.
+// SetDefaultPubSub panics if called multiple times.
+func SetDefaultPubSub(ps PubSub) {
+	defaultPubSubMu.Lock()
+	defer defaultPubSubMu.Unlock()
+
+	if defaultPubSubSet {
+		panic("SetDefaultPubSub called multiple times")
+	}
+	defaultPubSub = ps
+	defaultPubSubSet = true
+}
+
+// DefaultPubSub returns the default PubSub.
+func DefaultPubSub() PubSub {
+	return defaultPubSub
+}
 
 // Subscribe adds an event handler to the default event pubsub.
 // The name can be a glob in order to catch multiple event types.
 // The handler must be non-blocking.
-func Subscribe(name string, hdl Handler) error { return DefaultPubSub.Subscribe(name, hdl) }
+func Subscribe(name string, hdl Handler) error {
+	return defaultPubSub.Subscribe(name, hdl)
+}
 
 // Unsubscribe removes an event handler from the default event pubsub.
-func Unsubscribe(name string, hdl Handler) { DefaultPubSub.Unsubscribe(name, hdl) }
+func Unsubscribe(name string, hdl Handler) {
+	defaultPubSub.Unsubscribe(name, hdl)
+}
 
-// Publish emits an event on the default event pubsub.
-func Publish(evt Event) {
-	localEvent := local(evt)
-	localEvent = localEvent.withCaller()
-	DefaultPubSub.Publish(localEvent)
+// Publish emits events on the default event pubsub.
+func Publish(evts ...Event) {
+	for _, evt := range evts {
+		defaultPubSub.Publish(local(evt).withCaller())
+	}
 }
 
 // PublishEvent creates an event and emits it on the default event pubsub.
@@ -40,7 +70,5 @@ func Publish(evt Event) {
 // System events have nil identifiers.
 // Event data will in most cases be marshaled to JSON, but ideally is a proto message.
 func PublishEvent(ctx context.Context, name string, identifiers CombinedIdentifiers, data interface{}) {
-	localEvent := local(New(ctx, name, identifiers, data))
-	localEvent = localEvent.withCaller()
-	Publish(localEvent)
+	defaultPubSub.Publish(local(New(ctx, name, identifiers, data)).withCaller())
 }
