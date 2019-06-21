@@ -32,22 +32,6 @@ import (
 	_ "gocloud.dev/pubsub/mempubsub"
 )
 
-var (
-	registeredApplicationID   = ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}
-	unregisteredApplicationID = ttnpb.ApplicationIdentifiers{ApplicationID: "no-app"}
-	registeredDeviceID        = ttnpb.EndDeviceIdentifiers{
-		ApplicationIdentifiers: registeredApplicationID,
-		DeviceID:               "test-device",
-	}
-	unregisteredDeviceID = ttnpb.EndDeviceIdentifiers{
-		ApplicationIdentifiers: unregisteredApplicationID,
-		DeviceID:               "no-device",
-	}
-	keys = ttnpb.NewPopulatedSessionKeys(test.Randy, false)
-
-	timeout = (1 << 8) * test.Delay
-)
-
 func TestTraffic(t *testing.T) {
 	a := assertions.New(t)
 
