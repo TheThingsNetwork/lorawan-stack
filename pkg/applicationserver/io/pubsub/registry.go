@@ -24,6 +24,8 @@ import (
 type Registry interface {
 	// Get returns the PubSub integration by its identifiers.
 	Get(ctx context.Context, ids ttnpb.ApplicationPubSubIdentifiers, paths []string) (*ttnpb.ApplicationPubSub, error)
+	// Range ranges the PubSub integrations and calls the callback function, until false is returned.
+	Range(ctx context.Context, paths []string, f func(context.Context, *ttnpb.ApplicationPubSub) bool) error
 	// List returns all PubSub integrations of the application.
 	List(ctx context.Context, ids ttnpb.ApplicationIdentifiers, paths []string) ([]*ttnpb.ApplicationPubSub, error)
 	// Set creates, updates or deletes the PubSub integration by its identifiers.

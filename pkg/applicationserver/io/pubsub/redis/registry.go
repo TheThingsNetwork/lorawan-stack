@@ -52,6 +52,10 @@ type PubSubRegistry struct {
 	Redis *ttnredis.Client
 }
 
+func (r *PubSubRegistry) allKey(ctx context.Context) string {
+	return r.Redis.Key("all")
+}
+
 func (r *PubSubRegistry) appKey(uid string) string {
 	return r.Redis.Key("uid", uid)
 }
@@ -73,6 +77,43 @@ func (r PubSubRegistry) Get(ctx context.Context, ids ttnpb.ApplicationPubSubIden
 		return nil, err
 	}
 	return applyPubSubFieldMask(nil, pb, appendImplicitPubSubGetPaths(paths...)...)
+}
+
+var errApplicationUID = errors.DefineCorruption("application_uid", "invalid application UID `{application_uid}`")
+
+// Range implements pubsub.Registry.
+func (r PubSubRegistry) Range(ctx context.Context, paths []string, f func(context.Context, *ttnpb.ApplicationPubSub) bool) error {
+	uids, err := r.Redis.SMembers(r.allKey(ctx)).Result()
+	if err != nil {
+		return err
+	}
+	for _, uid := range uids {
+		ctx, err := unique.WithContext(ctx, uid)
+		if err != nil {
+			return errApplicationUID.WithCause(err).WithAttributes("application_uid", uid)
+		}
+		var pbs []*ttnpb.ApplicationPubSub
+		err = ttnredis.FindProtos(r.Redis, r.appKey(uid), r.makeIDKeyFunc(uid)).Range(func() (proto.Message, func() (bool, error)) {
+			pb := &ttnpb.ApplicationPubSub{}
+			return pb, func() (bool, error) {
+				pb, err := applyPubSubFieldMask(nil, pb, appendImplicitPubSubGetPaths(paths...)...)
+				if err != nil {
+					return false, err
+				}
+				pbs = append(pbs, pb)
+				return true, nil
+			}
+		})
+		if err != nil {
+			return errApplicationUID.WithCause(err).WithAttributes("application_uid", uid)
+		}
+		for _, pb := range pbs {
+			if !f(ctx, pb) {
+				return nil
+			}
+		}
+	}
+	return nil
 }
 
 // List implements pubsub.Registry.
@@ -143,6 +184,7 @@ func (r PubSubRegistry) Set(ctx context.Context, ids ttnpb.ApplicationPubSubIden
 			pipelined = func(p redis.Pipeliner) error {
 				p.Del(ik)
 				p.SRem(r.appKey(appUID), stored.PubSubID)
+				p.SRem(r.allKey(ctx), appUID)
 				return nil
 			}
 		} else {
@@ -198,6 +240,7 @@ func (r PubSubRegistry) Set(ctx context.Context, ids ttnpb.ApplicationPubSubIden
 					return err
 				}
 				p.SAdd(r.appKey(appUID), updated.PubSubID)
+				p.SAdd(r.allKey(ctx), appUID)
 				return nil
 			}
 
