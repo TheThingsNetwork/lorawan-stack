@@ -388,7 +388,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 					Key: &appSKey,
 				},
 			}
-			if req.SelectedMACVersion == ttnpb.MAC_V1_1 {
+			if req.SelectedMACVersion >= ttnpb.MAC_V1_1 {
 				sessionKeys.SNwkSIntKey = &ttnpb.KeyEnvelope{
 					// TODO: Encrypt key with NS KEK https://github.com/TheThingsNetwork/lorawan-stack/issues/5
 					Key: &nwkSKeys.SNwkSIntKey,
