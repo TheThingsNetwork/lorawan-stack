@@ -70,25 +70,6 @@ func NewWindowEndAfterFunc(d time.Duration) WindowEndFunc {
 	}
 }
 
-// NsJsClientFunc is the function used to get Join Server.
-type NsJsClientFunc func(ctx context.Context, id ttnpb.EndDeviceIdentifiers) (ttnpb.NsJsClient, error)
-
-// PeerGetter is the interface, which wraps GetPeer method.
-type PeerGetter interface {
-	GetPeer(ctx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) cluster.Peer
-}
-
-// NewJoinServerPeerGetterFunc returns a NsJsClientFunc, which uses g to retrieve Join Server clients.
-func NewJoinServerPeerGetterFunc(g PeerGetter) NsJsClientFunc {
-	return func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) (ttnpb.NsJsClient, error) {
-		p := g.GetPeer(ctx, ttnpb.PeerInfo_JOIN_SERVER, ids)
-		if p == nil {
-			return nil, errJoinServerNotFound
-		}
-		return ttnpb.NewNsJsClient(p.Conn()), nil
-	}
-}
-
 // DownlinkPriorities define the schedule priorities for the different types of downlink.
 type DownlinkPriorities struct {
 	// JoinAccept is the downlink priority for join-accept messages.
@@ -127,8 +108,6 @@ type NetworkServer struct {
 	deduplicationDone WindowEndFunc
 	collectionDone    WindowEndFunc
 
-	jsClient NsJsClientFunc
-
 	handleASUplink func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, up *ttnpb.ApplicationUp) (bool, error)
 
 	defaultMACSettings ttnpb.MACSettings
@@ -150,14 +129,6 @@ func WithDeduplicationDoneFunc(f WindowEndFunc) Option {
 func WithCollectionDoneFunc(f WindowEndFunc) Option {
 	return func(ns *NetworkServer) {
 		ns.collectionDone = f
-	}
-}
-
-// WithNsJsClientFunc overrides the default NsJsClientFunc, which
-// is used to get the Join Server by end device identifiers.
-func WithNsJsClientFunc(f NsJsClientFunc) Option {
-	return func(ns *NetworkServer) {
-		ns.jsClient = f
 	}
 }
 
@@ -245,10 +216,6 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 	}
 	if ns.collectionDone == nil {
 		ns.collectionDone = NewWindowEndAfterFunc(conf.DeduplicationWindow + conf.CooldownWindow)
-	}
-
-	if ns.jsClient == nil {
-		ns.jsClient = NewJoinServerPeerGetterFunc(ns.Component)
 	}
 
 	if ns.handleASUplink == nil {
