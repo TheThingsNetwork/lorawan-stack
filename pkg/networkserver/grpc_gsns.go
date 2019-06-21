@@ -1027,14 +1027,14 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		}
 	}
 
-	js, err := ns.jsClient(ctx, dev.EndDeviceIdentifiers)
-	if err != nil {
-		logger.WithError(err).Debug("Could not get Join Server")
-		return err
+	js := ns.GetPeer(ctx, ttnpb.PeerInfo_JOIN_SERVER, dev.EndDeviceIdentifiers)
+	if js == nil {
+		logger.Debug("Join Server peer not found")
+		return errJoinServerNotFound
 	}
 
 	logger.Debug("Send join-request to Join Server")
-	resp, err := js.HandleJoin(ctx, req, ns.WithClusterAuth())
+	resp, err := ttnpb.NewNsJsClient(js.Conn()).HandleJoin(ctx, req, ns.WithClusterAuth())
 	if err != nil {
 		logger.WithError(err).Warn("Join Server failed to handle join-request")
 		return err
