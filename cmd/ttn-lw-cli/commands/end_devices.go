@@ -153,11 +153,11 @@ var (
 		PersistentPreRunE: preRun(),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			baseFrequency, _ := cmd.Flags().GetUint32("base-frequency")
-			gs, err := api.Dial(ctx, config.NetworkServerGRPCAddress)
+			ns, err := api.Dial(ctx, config.NetworkServerGRPCAddress)
 			if err != nil {
 				return err
 			}
-			res, err := ttnpb.NewConfigurationClient(gs).ListFrequencyPlans(ctx, &ttnpb.ListFrequencyPlansRequest{
+			res, err := ttnpb.NewConfigurationClient(ns).ListFrequencyPlans(ctx, &ttnpb.ListFrequencyPlansRequest{
 				BaseFrequency: baseFrequency,
 			})
 			if err != nil {
