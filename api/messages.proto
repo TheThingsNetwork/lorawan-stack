@@ -237,12 +237,7 @@ message ApplicationInvalidatedDownlinks {
 
 message DownlinkQueueOperation {
   EndDeviceIdentifiers end_device_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
-  enum Operation {
-    PUSH = 0;
-    REPLACE = 1;
-  }
-  Operation operation = 2 [(validate.rules).message.required = true, (validate.rules).enum.defined_only = true];
-  repeated ApplicationDownlink downlinks = 3;
+  repeated ApplicationDownlink downlinks = 2;
 }
 
 message ApplicationUp {

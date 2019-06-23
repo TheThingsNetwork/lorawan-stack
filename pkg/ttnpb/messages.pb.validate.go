@@ -1370,15 +1370,6 @@ func (m *DownlinkQueueOperation) ValidateFields(paths ...string) error {
 				}
 			}
 
-		case "operation":
-
-			if _, ok := DownlinkQueueOperation_Operation_name[int32(m.GetOperation())]; !ok {
-				return DownlinkQueueOperationValidationError{
-					field:  "operation",
-					reason: "value must be one of the defined enum values",
-				}
-			}
-
 		case "downlinks":
 
 			for idx, item := range m.GetDownlinks() {

@@ -334,13 +334,11 @@ var DownlinkQueueOperationFieldPathsNested = []string{
 	"end_device_ids.dev_eui",
 	"end_device_ids.device_id",
 	"end_device_ids.join_eui",
-	"operation",
 }
 
 var DownlinkQueueOperationFieldPathsTopLevel = []string{
 	"downlinks",
 	"end_device_ids",
-	"operation",
 }
 var ApplicationUpFieldPathsNested = []string{
 	"correlation_ids",

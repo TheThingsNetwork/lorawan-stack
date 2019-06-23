@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package service
+package provider
 
 import (
 	"context"
 
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"gocloud.dev/pubsub"
 )
@@ -75,10 +76,34 @@ func (ut *UplinkTopics) Shutdown(ctx context.Context) error {
 	return nil
 }
 
-// Service represents a PubSub service provided by go-cloud pubsub.
-type Service interface {
+// Provider represents a PubSub service provider.
+type Provider interface {
 	// OpenSubscriptions opens the subscriptions for the downlink queue operations of a given ttnpb.ApplicationPubSub.
-	OpenSubscriptions(ctx context.Context, pubsub *ttnpb.ApplicationPubSub) (*DownlinkSubscriptions, error)
+	OpenSubscriptions(ctx context.Context, pb *ttnpb.ApplicationPubSub) (*DownlinkSubscriptions, error)
 	// OpenTopics opens the subscriptions for the uplink messages of a given ttnpb.ApplicationPubSub.
-	OpenTopics(ctx context.Context, pubsub *ttnpb.ApplicationPubSub) (*UplinkTopics, error)
+	OpenTopics(ctx context.Context, pb *ttnpb.ApplicationPubSub) (*UplinkTopics, error)
+}
+
+var (
+	errNotImplemented    = errors.DefineUnimplemented("provider_not_implemented", "provider `{provider_id}` is not implemented")
+	errAlreadyRegistered = errors.DefineAlreadyExists("already_registered", "provider `{provider_id}` already registered")
+
+	providers = map[ttnpb.ApplicationPubSub_Provider]Provider{}
+)
+
+// RegisterProvider registers an implementation for a given PubSub provider.
+func RegisterProvider(p ttnpb.ApplicationPubSub_Provider, implementation Provider) error {
+	if _, ok := providers[p]; ok {
+		return errAlreadyRegistered.WithAttributes("provider_id", p)
+	}
+	providers[p] = implementation
+	return nil
+}
+
+// GetProvider returns an implementation for a given provider.
+func GetProvider(p ttnpb.ApplicationPubSub_Provider) (Provider, error) {
+	if implementation, ok := providers[p]; ok {
+		return implementation, nil
+	}
+	return nil, errNotImplemented.WithAttributes("provider_id", p)
 }

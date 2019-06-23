@@ -703,16 +703,6 @@ func (dst *DownlinkQueueOperation) SetFields(src *DownlinkQueueOperation, paths 
 					dst.EndDeviceIdentifiers = zero
 				}
 			}
-		case "operation":
-			if len(subs) > 0 {
-				return fmt.Errorf("'operation' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.Operation = src.Operation
-			} else {
-				var zero DownlinkQueueOperation_Operation
-				dst.Operation = zero
-			}
 		case "downlinks":
 			if len(subs) > 0 {
 				return fmt.Errorf("'downlinks' has no subfields, but %s were specified", subs)

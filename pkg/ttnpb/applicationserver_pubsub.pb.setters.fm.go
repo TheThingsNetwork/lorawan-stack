@@ -108,15 +108,15 @@ func (dst *ApplicationPubSub) SetFields(src *ApplicationPubSub, paths ...string)
 				var zero string
 				dst.Format = zero
 			}
-		case "service":
+		case "provider":
 			if len(subs) > 0 {
-				return fmt.Errorf("'service' has no subfields, but %s were specified", subs)
+				return fmt.Errorf("'provider' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.Service = src.Service
+				dst.Provider = src.Provider
 			} else {
-				var zero ApplicationPubSub_Service
-				dst.Service = zero
+				var zero ApplicationPubSub_Provider
+				dst.Provider = zero
 			}
 		case "downlink_push_topic":
 			if len(subs) > 0 {

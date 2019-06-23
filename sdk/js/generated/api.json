@@ -1536,10 +1536,10 @@
       "hasServices": true,
       "enums": [
         {
-          "name": "Service",
-          "longName": "ApplicationPubSub.Service",
-          "fullName": "ttn.lorawan.v3.ApplicationPubSub.Service",
-          "description": "The service type for the PubSub.",
+          "name": "Provider",
+          "longName": "ApplicationPubSub.Provider",
+          "fullName": "ttn.lorawan.v3.ApplicationPubSub.Provider",
+          "description": "The provider for the PubSub.",
           "values": [
             {
               "name": "AWSSNSSQS",
@@ -1625,7 +1625,7 @@
             },
             {
               "name": "attributes",
-              "description": "Service specific strings used for authentication and settings.",
+              "description": "Provider specific attributes used for authentication and settings.",
               "label": "repeated",
               "type": "AttributesEntry",
               "longType": "ApplicationPubSub.AttributesEntry",
@@ -1644,12 +1644,12 @@
               "defaultValue": ""
             },
             {
-              "name": "service",
+              "name": "provider",
               "description": "",
               "label": "",
-              "type": "Service",
-              "longType": "ApplicationPubSub.Service",
-              "fullType": "ttn.lorawan.v3.ApplicationPubSub.Service",
+              "type": "Provider",
+              "longType": "ApplicationPubSub.Provider",
+              "fullType": "ttn.lorawan.v3.ApplicationPubSub.Provider",
               "ismap": false,
               "defaultValue": "",
               "options": {
@@ -15464,24 +15464,6 @@
       "hasServices": false,
       "enums": [
         {
-          "name": "Operation",
-          "longName": "DownlinkQueueOperation.Operation",
-          "fullName": "ttn.lorawan.v3.DownlinkQueueOperation.Operation",
-          "description": "",
-          "values": [
-            {
-              "name": "PUSH",
-              "number": "0",
-              "description": ""
-            },
-            {
-              "name": "REPLACE",
-              "number": "1",
-              "description": ""
-            }
-          ]
-        },
-        {
           "name": "PayloadFormatter",
           "longName": "PayloadFormatter",
           "fullName": "ttn.lorawan.v3.PayloadFormatter",
@@ -16361,24 +16343,6 @@
                 "validate.rules": [
                   {
                     "name": "message.required",
-                    "value": true
-                  }
-                ]
-              }
-            },
-            {
-              "name": "operation",
-              "description": "",
-              "label": "",
-              "type": "Operation",
-              "longType": "DownlinkQueueOperation.Operation",
-              "fullType": "ttn.lorawan.v3.DownlinkQueueOperation.Operation",
-              "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "enum.defined_only",
                     "value": true
                   }
                 ]

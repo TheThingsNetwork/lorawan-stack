@@ -41,7 +41,7 @@
   - [Message `GetApplicationPubSubRequest`](#ttn.lorawan.v3.GetApplicationPubSubRequest)
   - [Message `ListApplicationPubSubsRequest`](#ttn.lorawan.v3.ListApplicationPubSubsRequest)
   - [Message `SetApplicationPubSubRequest`](#ttn.lorawan.v3.SetApplicationPubSubRequest)
-  - [Enum `ApplicationPubSub.Service`](#ttn.lorawan.v3.ApplicationPubSub.Service)
+  - [Enum `ApplicationPubSub.Provider`](#ttn.lorawan.v3.ApplicationPubSub.Provider)
   - [Service `ApplicationPubSubRegistry`](#ttn.lorawan.v3.ApplicationPubSubRegistry)
 - [File `lorawan-stack/api/applicationserver_web.proto`](#lorawan-stack/api/applicationserver_web.proto)
   - [Message `ApplicationWebhook`](#ttn.lorawan.v3.ApplicationWebhook)
@@ -296,7 +296,6 @@
   - [Message `MessagePayloadFormatters`](#ttn.lorawan.v3.MessagePayloadFormatters)
   - [Message `TxAcknowledgment`](#ttn.lorawan.v3.TxAcknowledgment)
   - [Message `UplinkMessage`](#ttn.lorawan.v3.UplinkMessage)
-  - [Enum `DownlinkQueueOperation.Operation`](#ttn.lorawan.v3.DownlinkQueueOperation.Operation)
   - [Enum `PayloadFormatter`](#ttn.lorawan.v3.PayloadFormatter)
   - [Enum `TxAcknowledgment.Result`](#ttn.lorawan.v3.TxAcknowledgment.Result)
 - [File `lorawan-stack/api/metadata.proto`](#lorawan-stack/api/metadata.proto)
@@ -757,9 +756,9 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 | `ids` | [`ApplicationPubSubIdentifiers`](#ttn.lorawan.v3.ApplicationPubSubIdentifiers) |  |  |
 | `created_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 | `updated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
-| `attributes` | [`ApplicationPubSub.AttributesEntry`](#ttn.lorawan.v3.ApplicationPubSub.AttributesEntry) | repeated | Service specific strings used for authentication and settings. |
+| `attributes` | [`ApplicationPubSub.AttributesEntry`](#ttn.lorawan.v3.ApplicationPubSub.AttributesEntry) | repeated | Provider specific attributes used for authentication and settings. |
 | `format` | [`string`](#string) |  | The format to use for the body. Supported values depend on the Application Server configuration. |
-| `service` | [`ApplicationPubSub.Service`](#ttn.lorawan.v3.ApplicationPubSub.Service) |  |  |
+| `provider` | [`ApplicationPubSub.Provider`](#ttn.lorawan.v3.ApplicationPubSub.Provider) |  |  |
 | `downlink_push_topic` | [`string`](#string) |  | The topic to which the Application Server subscribes for downlink queue push operations. |
 | `downlink_replace_topic` | [`string`](#string) |  | The topic to which the Application Server subscribes for downlink queue replace operations. |
 | `uplink_message` | [`ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message) |  |  |
@@ -776,7 +775,7 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 | Field | Validations |
 | ----- | ----------- |
 | `ids` | <p>`message.required`: `true`</p> |
-| `service` | <p>`enum.defined_only`: `true`</p> |
+| `provider` | <p>`enum.defined_only`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.ApplicationPubSub.AttributesEntry">Message `ApplicationPubSub.AttributesEntry`</a>
 
@@ -863,9 +862,9 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 | ----- | ----------- |
 | `pubsub` | <p>`message.required`: `true`</p> |
 
-### <a name="ttn.lorawan.v3.ApplicationPubSub.Service">Enum `ApplicationPubSub.Service`</a>
+### <a name="ttn.lorawan.v3.ApplicationPubSub.Provider">Enum `ApplicationPubSub.Provider`</a>
 
-The service type for the PubSub.
+The provider for the PubSub.
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
@@ -4103,7 +4102,6 @@ Downlink message from the network to the end device
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `end_device_ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |  |
-| `operation` | [`DownlinkQueueOperation.Operation`](#ttn.lorawan.v3.DownlinkQueueOperation.Operation) |  |  |
 | `downlinks` | [`ApplicationDownlink`](#ttn.lorawan.v3.ApplicationDownlink) | repeated |  |
 
 #### Field Rules
@@ -4111,7 +4109,6 @@ Downlink message from the network to the end device
 | Field | Validations |
 | ----- | ----------- |
 | `end_device_ids` | <p>`message.required`: `true`</p> |
-| `operation` | <p>`enum.defined_only`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.DownlinkQueueRequest">Message `DownlinkQueueRequest`</a>
 
@@ -4174,13 +4171,6 @@ Uplink message from the end device to the network
 | `correlation_ids` | <p>`repeated.items.string.max_len`: `100`</p> |
 | `gateway_channel_index` | <p>`uint32.lte`: `255`</p> |
 | `device_channel_index` | <p>`uint32.lte`: `255`</p> |
-
-### <a name="ttn.lorawan.v3.DownlinkQueueOperation.Operation">Enum `DownlinkQueueOperation.Operation`</a>
-
-| Name | Number | Description |
-| ---- | ------ | ----------- |
-| `PUSH` | 0 |  |
-| `REPLACE` | 1 |  |
 
 ### <a name="ttn.lorawan.v3.PayloadFormatter">Enum `PayloadFormatter`</a>
 

@@ -5047,7 +5047,7 @@
         }
       }
     },
-    "ApplicationPubSubService": {
+    "ApplicationPubSubProvider": {
       "type": "string",
       "enum": [
         "AWSSNSSQS",
@@ -5058,7 +5058,7 @@
         "RABBIT"
       ],
       "default": "AWSSNSSQS",
-      "description": "The service type for the PubSub."
+      "description": "The provider for the PubSub."
     },
     "AuthInfoResponseAPIKeyAccess": {
       "type": "object",
@@ -6187,14 +6187,14 @@
           "additionalProperties": {
             "type": "string"
           },
-          "description": "Service specific strings used for authentication and settings."
+          "description": "Provider specific attributes used for authentication and settings."
         },
         "format": {
           "type": "string",
           "description": "The format to use for the body.\nSupported values depend on the Application Server configuration."
         },
-        "service": {
-          "$ref": "#/definitions/ApplicationPubSubService"
+        "provider": {
+          "$ref": "#/definitions/ApplicationPubSubProvider"
         },
         "downlink_push_topic": {
           "type": "string",

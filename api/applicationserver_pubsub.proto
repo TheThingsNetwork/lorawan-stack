@@ -36,14 +36,14 @@ message ApplicationPubSub {
   google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
-  // Service specific strings used for authentication and settings.
+  // Provider specific attributes used for authentication and settings.
   map<string,string> attributes = 4;
   // The format to use for the body.
   // Supported values depend on the Application Server configuration.
   string format = 5;
 
-  // The service type for the PubSub.
-  enum Service {
+  // The provider for the PubSub.
+  enum Provider {
       AWSSNSSQS = 0; // AWS SQS / SNS
       AZURESB = 1;   // Azure Service Bus
       GCPPUBSUB = 2; // GCP PubSub
@@ -51,7 +51,7 @@ message ApplicationPubSub {
       NATS = 4;      // NATS
       RABBIT = 5;    // RabbitMQ
   }
-  Service service = 6 [(validate.rules).message.required = true, (validate.rules).enum.defined_only = true];
+  Provider provider = 6 [(validate.rules).message.required = true, (validate.rules).enum.defined_only = true];
 
   // The topic to which the Application Server subscribes for downlink queue push operations.
   string downlink_push_topic = 7;

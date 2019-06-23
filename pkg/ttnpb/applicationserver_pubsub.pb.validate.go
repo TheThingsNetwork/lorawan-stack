@@ -199,11 +199,11 @@ func (m *ApplicationPubSub) ValidateFields(paths ...string) error {
 			// no validation rules for Attributes
 		case "format":
 			// no validation rules for Format
-		case "service":
+		case "provider":
 
-			if _, ok := ApplicationPubSub_Service_name[int32(m.GetService())]; !ok {
+			if _, ok := ApplicationPubSub_Provider_name[int32(m.GetProvider())]; !ok {
 				return ApplicationPubSubValidationError{
-					field:  "service",
+					field:  "provider",
 					reason: "value must be one of the defined enum values",
 				}
 			}
