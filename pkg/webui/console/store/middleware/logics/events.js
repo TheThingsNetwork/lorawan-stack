@@ -28,15 +28,18 @@ import {
 } from '../../actions/events'
 import { selectApplicationEventsStatus } from '../../selectors/applications'
 
-const createEventsConnectLogics = function (name, entity) {
-  const START_EVENTS = createStartEventsStreamActionType(name)
-  const START_EVENTS_FAILURE = createStartEventsStreamFailureActionType(name)
-  const STOP_EVENTS = createStopEventsStreamActionType(name)
-  const startEventsSuccess = startEventsStreamSuccess(name)
-  const startEventsFailure = startEventsStreamFailure(name)
-  const stopEvents = stopEventsStream(name)
-  const getEventSuccess = getEventMessageSuccess(name)
-  const getEventFailure = getEventMessageFailure(name)
+const createEventsConnectLogics = function (
+  reducerName,
+  entity
+) {
+  const START_EVENTS = createStartEventsStreamActionType(reducerName)
+  const START_EVENTS_FAILURE = createStartEventsStreamFailureActionType(reducerName)
+  const STOP_EVENTS = createStopEventsStreamActionType(reducerName)
+  const startEventsSuccess = startEventsStreamSuccess(reducerName)
+  const startEventsFailure = startEventsStreamFailure(reducerName)
+  const stopEvents = stopEventsStream(reducerName)
+  const getEventSuccess = getEventMessageSuccess(reducerName)
+  const getEventFailure = getEventMessageFailure(reducerName)
 
   let channel = null
 
