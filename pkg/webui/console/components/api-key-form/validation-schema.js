@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import * as Yup from 'yup'
-import sharedMessages from '../../lib/shared-messages'
+import sharedMessages from '../../../lib/shared-messages'
 
 const validationSchema = Yup.object().shape({
   name: Yup.string()

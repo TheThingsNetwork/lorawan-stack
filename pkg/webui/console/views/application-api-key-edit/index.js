@@ -24,7 +24,7 @@ import sharedMessages from '../../../lib/shared-messages'
 import Spinner from '../../../components/spinner'
 import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
-import { ApiKeyEditForm } from '../../../components/api-key-form'
+import { ApiKeyEditForm } from '../../components/api-key-form'
 
 import {
   getApplicationApiKey,
@@ -107,6 +107,8 @@ export default class ApplicationApiKeyEdit extends React.Component {
 
   render () {
     const { apiKey, rights, fetching, error, universalRights } = this.props
+
+    console.log(universalRights)
 
     if (error) {
       throw error
