@@ -16,6 +16,8 @@ package redis
 
 import (
 	"context"
+	"fmt"
+	"regexp"
 	"time"
 
 	"github.com/go-redis/redis"
@@ -64,6 +66,20 @@ func (r *PubSubRegistry) idKey(appUID, id string) string {
 	return r.Redis.Key("uid", appUID, id)
 }
 
+var uniqueIDPattern = regexp.MustCompile("(.*)\\.(.*)")
+
+func (r *PubSubRegistry) toUniqueID(appUID, id string) string {
+	return fmt.Sprintf("%s.%s", appUID, id)
+}
+
+func (r *PubSubRegistry) fromUniqueID(uid string) (string, string) {
+	matches := uniqueIDPattern.FindStringSubmatch(uid)
+	if len(matches) != 3 {
+		panic(fmt.Sprintf("invalid uniqueID `%s` with matches %v", uid, matches))
+	}
+	return matches[1], matches[2]
+}
+
 func (r *PubSubRegistry) makeIDKeyFunc(appUID string) func(id string) string {
 	return func(id string) string {
 		return r.idKey(appUID, id)
@@ -82,35 +98,34 @@ func (r PubSubRegistry) Get(ctx context.Context, ids ttnpb.ApplicationPubSubIden
 var errApplicationUID = errors.DefineCorruption("application_uid", "invalid application UID `{application_uid}`")
 
 // Range implements pubsub.Registry.
-func (r PubSubRegistry) Range(ctx context.Context, paths []string, f func(context.Context, *ttnpb.ApplicationPubSub) bool) error {
+func (r PubSubRegistry) Range(ctx context.Context, paths []string, f func(context.Context, ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationPubSub) bool) error {
 	uids, err := r.Redis.SMembers(r.allKey(ctx)).Result()
 	if err != nil {
 		return err
 	}
 	for _, uid := range uids {
-		ctx, err := unique.WithContext(ctx, uid)
+		appUID, pubsubID := r.fromUniqueID(uid)
+		ctx, err := unique.WithContext(ctx, appUID)
 		if err != nil {
-			return errApplicationUID.WithCause(err).WithAttributes("application_uid", uid)
+			return errApplicationUID.WithCause(err).WithAttributes("application_uid", appUID)
 		}
-		var pbs []*ttnpb.ApplicationPubSub
-		err = ttnredis.FindProtos(r.Redis, r.appKey(uid), r.makeIDKeyFunc(uid)).Range(func() (proto.Message, func() (bool, error)) {
-			pb := &ttnpb.ApplicationPubSub{}
-			return pb, func() (bool, error) {
-				pb, err := applyPubSubFieldMask(nil, pb, appendImplicitPubSubGetPaths(paths...)...)
-				if err != nil {
-					return false, err
-				}
-				pbs = append(pbs, pb)
-				return true, nil
-			}
-		})
+		ids, err := unique.ToApplicationID(appUID)
 		if err != nil {
-			return errApplicationUID.WithCause(err).WithAttributes("application_uid", uid)
+			return errApplicationUID.WithCause(err).WithAttributes("application_uid", appUID)
 		}
-		for _, pb := range pbs {
-			if !f(ctx, pb) {
-				return nil
-			}
+		pb := &ttnpb.ApplicationPubSub{}
+		if err := ttnredis.GetProto(r.Redis, r.idKey(appUID, pubsubID)).ScanProto(pb); err != nil {
+			return err
+		}
+		if err != nil {
+			return errApplicationUID.WithCause(err).WithAttributes("application_uid", appUID)
+		}
+		pb, err = applyPubSubFieldMask(nil, pb, paths...)
+		if err != nil {
+			return err
+		}
+		if !f(ctx, ids, pb) {
+			return nil
 		}
 	}
 	return nil
@@ -184,7 +199,7 @@ func (r PubSubRegistry) Set(ctx context.Context, ids ttnpb.ApplicationPubSubIden
 			pipelined = func(p redis.Pipeliner) error {
 				p.Del(ik)
 				p.SRem(r.appKey(appUID), stored.PubSubID)
-				p.SRem(r.allKey(ctx), appUID)
+				p.SRem(r.allKey(ctx), r.toUniqueID(appUID, stored.PubSubID))
 				return nil
 			}
 		} else {
@@ -240,7 +255,7 @@ func (r PubSubRegistry) Set(ctx context.Context, ids ttnpb.ApplicationPubSubIden
 					return err
 				}
 				p.SAdd(r.appKey(appUID), updated.PubSubID)
-				p.SAdd(r.allKey(ctx), appUID)
+				p.SAdd(r.allKey(ctx), r.toUniqueID(appUID, updated.PubSubID))
 				return nil
 			}
 

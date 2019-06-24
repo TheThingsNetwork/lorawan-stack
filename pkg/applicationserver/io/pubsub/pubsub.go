@@ -56,7 +56,7 @@ func Start(c *component.Component, server io.Server, registry Registry) error {
 
 func (s *srv) integrateAll(ctx context.Context) error {
 	return s.registry.Range(ctx, nil,
-		func(ctx context.Context, pb *ttnpb.ApplicationPubSub) bool {
+		func(ctx context.Context, _ ttnpb.ApplicationIdentifiers, pb *ttnpb.ApplicationPubSub) bool {
 			s.startIntegrationTask(ctx, pb.ApplicationPubSubIdentifiers)
 			return true
 		},
