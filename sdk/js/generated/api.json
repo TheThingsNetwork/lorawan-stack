@@ -16322,45 +16322,6 @@
           ]
         },
         {
-          "name": "DownlinkQueueOperation",
-          "longName": "DownlinkQueueOperation",
-          "fullName": "ttn.lorawan.v3.DownlinkQueueOperation",
-          "description": "",
-          "hasExtensions": false,
-          "hasFields": true,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "end_device_ids",
-              "description": "",
-              "label": "",
-              "type": "EndDeviceIdentifiers",
-              "longType": "EndDeviceIdentifiers",
-              "fullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
-              "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "message.required",
-                    "value": true
-                  }
-                ]
-              }
-            },
-            {
-              "name": "downlinks",
-              "description": "",
-              "label": "repeated",
-              "type": "ApplicationDownlink",
-              "longType": "ApplicationDownlink",
-              "fullType": "ttn.lorawan.v3.ApplicationDownlink",
-              "ismap": false,
-              "defaultValue": ""
-            }
-          ]
-        },
-        {
           "name": "DownlinkQueueRequest",
           "longName": "DownlinkQueueRequest",
           "fullName": "ttn.lorawan.v3.DownlinkQueueRequest",

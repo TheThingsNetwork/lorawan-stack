@@ -181,7 +181,7 @@ func (i *integration) handleDown(ctx context.Context, op func(io.Server, context
 			continue
 		}
 		msg.Ack()
-		operation, err := i.format.ToDownlinkQueueOperation(msg.Body)
+		operation, err := i.format.ToDownlinkQueueRequest(msg.Body)
 		if err != nil {
 			logger.WithError(err).Warn("Failed to decode downlink queue operation")
 			continue

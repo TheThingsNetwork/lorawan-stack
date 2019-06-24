@@ -291,7 +291,6 @@
   - [Message `ApplicationUp`](#ttn.lorawan.v3.ApplicationUp)
   - [Message `ApplicationUplink`](#ttn.lorawan.v3.ApplicationUplink)
   - [Message `DownlinkMessage`](#ttn.lorawan.v3.DownlinkMessage)
-  - [Message `DownlinkQueueOperation`](#ttn.lorawan.v3.DownlinkQueueOperation)
   - [Message `DownlinkQueueRequest`](#ttn.lorawan.v3.DownlinkQueueRequest)
   - [Message `MessagePayloadFormatters`](#ttn.lorawan.v3.MessagePayloadFormatters)
   - [Message `TxAcknowledgment`](#ttn.lorawan.v3.TxAcknowledgment)
@@ -4096,19 +4095,6 @@ Downlink message from the network to the end device
 | Field | Validations |
 | ----- | ----------- |
 | `correlation_ids` | <p>`repeated.items.string.max_len`: `100`</p> |
-
-### <a name="ttn.lorawan.v3.DownlinkQueueOperation">Message `DownlinkQueueOperation`</a>
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `end_device_ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |  |
-| `downlinks` | [`ApplicationDownlink`](#ttn.lorawan.v3.ApplicationDownlink) | repeated |  |
-
-#### Field Rules
-
-| Field | Validations |
-| ----- | ----------- |
-| `end_device_ids` | <p>`message.required`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.DownlinkQueueRequest">Message `DownlinkQueueRequest`</a>
 
