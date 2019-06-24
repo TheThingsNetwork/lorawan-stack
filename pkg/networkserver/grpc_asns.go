@@ -34,7 +34,10 @@ type applicationUpStream struct {
 }
 
 func (s applicationUpStream) Close() error {
-	close(s.closeCh)
+	// First read succeeds when either closeCh is closed by LinkApplication or LinkApplication initializes closing sequence.
+	// Second read succeeds when closeCh is closed by LinkApplication.
+	<-s.closeCh
+	<-s.closeCh
 	return nil
 }
 
@@ -57,6 +60,9 @@ func (ns *NetworkServer) LinkApplication(link ttnpb.AsNs_LinkApplicationServer) 
 		AsNs_LinkApplicationServer: link,
 		closeCh:                    make(chan struct{}),
 	}
+	defer func() {
+		close(ws.closeCh)
+	}()
 
 	uid := unique.ID(ctx, ids)
 
@@ -65,32 +71,36 @@ func (ns *NetworkServer) LinkApplication(link ttnpb.AsNs_LinkApplicationServer) 
 	ns.applicationServersMu.Lock()
 	cl, ok := ns.applicationServers[uid]
 	ns.applicationServers[uid] = ws
+	ns.applicationServersMu.Unlock()
 	if ok {
+		logger.Debug("Close existing link")
 		if err := cl.Close(); err != nil {
-			ns.applicationServersMu.Unlock()
-			logger.WithError(err).Warn("Failed to link application")
-			return err
+			logger.WithError(err).Warn("Failed to close existing link")
 		}
 	}
-	ns.applicationServersMu.Unlock()
 
 	logger.Debug("Linked application")
 
 	events.Publish(evtBeginApplicationLink(ctx, ids, nil))
 	defer events.Publish(evtEndApplicationLink(ctx, ids, err))
 
-	select {
-	case <-ctx.Done():
-		err := ctx.Err()
+	defer func() {
 		ns.applicationServersMu.Lock()
-		cl, ok := ns.applicationServers[uid]
+		cl, ok = ns.applicationServers[uid]
 		if ok && cl == ws {
 			delete(ns.applicationServers, uid)
 		}
 		ns.applicationServersMu.Unlock()
+	}()
+
+	select {
+	case <-ctx.Done():
+		err = ctx.Err()
+		logger.WithError(err).Debug("Context done - close stream")
 		return err
-	case <-ws.closeCh:
-		return errDuplicateSubscription
+	case ws.closeCh <- struct{}{}:
+		logger.Debug("Link closed - close stream")
+		return nil
 	}
 }
 
