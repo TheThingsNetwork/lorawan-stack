@@ -31,7 +31,10 @@ import (
 	"gocloud.dev/pubsub"
 )
 
-type srv struct {
+// PubSub is an PubSub frontend that exposes ttnpb.ApplicationPubSubRegistryServer.
+type PubSub struct {
+	ttnpb.ApplicationPubSubRegistryServer
+
 	*component.Component
 	ctx      context.Context
 	server   io.Server
@@ -42,22 +45,22 @@ type srv struct {
 }
 
 // Start starts the pusub frontend.
-func Start(c *component.Component, server io.Server, registry Registry) error {
+func Start(c *component.Component, server io.Server, registry Registry) (*PubSub, error) {
 	ctx := log.NewContextWithField(c.Context(), "namespace", "applicationserver/io/pubsub")
-	s := &srv{
+	ps := &PubSub{
 		Component: c,
 		ctx:       ctx,
 		server:    server,
 		registry:  registry,
 	}
-	c.RegisterTask(ctx, "link_all", s.integrateAll, component.TaskRestartOnFailure)
-	return nil
+	ps.RegisterTask(ctx, "integrate_all", ps.integrateAll, component.TaskRestartOnFailure)
+	return ps, nil
 }
 
-func (s *srv) integrateAll(ctx context.Context) error {
-	return s.registry.Range(ctx, nil,
+func (ps *PubSub) integrateAll(ctx context.Context) error {
+	return ps.registry.Range(ctx, nil,
 		func(ctx context.Context, _ ttnpb.ApplicationIdentifiers, pb *ttnpb.ApplicationPubSub) bool {
-			s.startIntegrationTask(ctx, pb.ApplicationPubSubIdentifiers)
+			ps.startIntegrationTask(ctx, pb.ApplicationPubSubIdentifiers)
 			return true
 		},
 	)
@@ -65,13 +68,13 @@ func (s *srv) integrateAll(ctx context.Context) error {
 
 var integrationBackoff = []time.Duration{100 * time.Millisecond, 1 * time.Second, 10 * time.Second}
 
-func (s *srv) startIntegrationTask(ctx context.Context, ids ttnpb.ApplicationPubSubIdentifiers) {
+func (ps *PubSub) startIntegrationTask(ctx context.Context, ids ttnpb.ApplicationPubSubIdentifiers) {
 	ctx = log.NewContextWithFields(ctx, log.Fields(
 		"application_uid", unique.ID(ctx, ids.ApplicationIdentifiers),
 		"pubsub_id", ids.PubSubID,
 	))
-	s.StartTask(ctx, "integrate", func(ctx context.Context) error {
-		target, err := s.registry.Get(ctx, ids, []string{
+	ps.StartTask(ctx, "integrate", func(ctx context.Context) error {
+		target, err := ps.registry.Get(ctx, ids, []string{
 			"attributes",
 			"format",
 			"provider",
@@ -95,7 +98,7 @@ func (s *srv) startIntegrationTask(ctx context.Context, ids ttnpb.ApplicationPub
 			return nil
 		}
 
-		err = s.integrate(ctx, target)
+		err = ps.integrate(ctx, target)
 		switch {
 		case errors.IsFailedPrecondition(err),
 			errors.IsUnauthenticated(err),
@@ -227,7 +230,7 @@ func (i *integration) shutdown(ctx context.Context) {
 
 var errAlreadyIntegrated = errors.DefineAlreadyExists("already_integrated", "already integrated to `{application_uid} {pubsub_id}`")
 
-func (s *srv) integrate(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err error) {
+func (ps *PubSub) integrate(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err error) {
 	uid := unique.ID(ctx, pb.ApplicationIdentifiers)
 	ctx = log.NewContextWithFields(ctx, log.Fields(
 		"application_uid", uid,
@@ -238,15 +241,15 @@ func (s *srv) integrate(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err e
 		ApplicationPubSub: *pb,
 		ctx:               ctx,
 		cancel:            cancel,
-		server:            s.server,
+		server:            ps.server,
 	}
-	if _, loaded := s.integrations.LoadOrStore(pb.ApplicationPubSubIdentifiers, i); loaded {
+	if _, loaded := ps.integrations.LoadOrStore(pb.ApplicationPubSubIdentifiers, i); loaded {
 		return errAlreadyIntegrated.WithAttributes("application_uid", uid, "pubsub_id", pb.PubSubID)
 	}
 	go func() {
 		<-ctx.Done()
-		s.integrationErrors.Store(pb.ApplicationPubSubIdentifiers, ctx.Err())
-		s.integrations.Delete(pb.ApplicationPubSubIdentifiers)
+		ps.integrationErrors.Store(pb.ApplicationPubSubIdentifiers, ctx.Err())
+		ps.integrations.Delete(pb.ApplicationPubSubIdentifiers)
 		if err := ctx.Err(); err != nil && !errors.IsCanceled(err) {
 			log.FromContext(ctx).WithError(err).Warn("Integration failed")
 		}
@@ -265,7 +268,7 @@ func (s *srv) integrate(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err e
 	}
 	ctx = log.NewContextWithField(ctx, "provider", pb.Provider)
 	logger := log.FromContext(ctx)
-	i.sub = io.NewSubscription(s.ctx, "pubsub", &pb.ApplicationIdentifiers)
+	i.sub = io.NewSubscription(ctx, "pubsub", &pb.ApplicationIdentifiers)
 	format, ok := formats[pb.Format]
 	if !ok {
 		return errFormatNotFound.WithAttributes("format", pb.Format)
@@ -282,8 +285,8 @@ func (s *srv) integrate(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err e
 	return
 }
 
-func (s *srv) cancelIntegration(ctx context.Context, ids ttnpb.ApplicationPubSubIdentifiers) error {
-	if val, ok := s.integrations.Load(ids); ok {
+func (ps *PubSub) cancelIntegration(ctx context.Context, ids ttnpb.ApplicationPubSubIdentifiers) error {
+	if val, ok := ps.integrations.Load(ids); ok {
 		i := val.(*integration)
 		log.FromContext(ctx).WithFields(log.Fields(
 			"application_uid", ids.ApplicationIdentifiers,
@@ -291,7 +294,7 @@ func (s *srv) cancelIntegration(ctx context.Context, ids ttnpb.ApplicationPubSub
 		)).Debug("Integration cancelled")
 		i.cancel(context.Canceled)
 	} else {
-		s.integrationErrors.Delete(ids)
+		ps.integrationErrors.Delete(ids)
 	}
 	return nil
 }

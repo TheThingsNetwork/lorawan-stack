@@ -58,6 +58,7 @@ type ApplicationServer struct {
 	deviceRegistry DeviceRegistry
 	formatter      payloadFormatter
 	webhooks       web.Webhooks
+	pubsub         *pubsub.PubSub
 
 	links              sync.Map
 	linkErrors         sync.Map
@@ -155,8 +156,10 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		c.RegisterWeb(webhooks)
 	}
 
-	if err = pubsub.Start(c, as, conf.PubSub.Registry); err != nil {
+	if pubsub, err := pubsub.Start(c, as, conf.PubSub.Registry); err != nil {
 		return nil, err
+	} else if pubsub != nil {
+		as.pubsub = pubsub
 	}
 
 	c.RegisterGRPC(as)
@@ -174,6 +177,9 @@ func (as *ApplicationServer) RegisterServices(s *grpc.Server) {
 	if as.webhooks != nil {
 		ttnpb.RegisterApplicationWebhookRegistryServer(s, web.NewWebhookRegistryRPC(as.webhooks.Registry()))
 	}
+	if as.pubsub != nil {
+		ttnpb.RegisterApplicationPubSubRegistryServer(s, as.pubsub)
+	}
 }
 
 // RegisterHandlers registers gRPC handlers.
@@ -183,6 +189,9 @@ func (as *ApplicationServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.Cl
 	ttnpb.RegisterAppAsHandler(as.Context(), s, conn)
 	if as.webhooks != nil {
 		ttnpb.RegisterApplicationWebhookRegistryHandler(as.Context(), s, conn)
+	}
+	if as.pubsub != nil {
+		ttnpb.RegisterApplicationPubSubRegistryHandler(as.Context(), s, conn)
 	}
 }
 
