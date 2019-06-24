@@ -112,6 +112,12 @@ func (id NetID) IDBits() uint {
 	panic(unmatchedNetID)
 }
 
+// Copy stores a copy of id in x and returns it.
+func (id NetID) Copy(x *NetID) *NetID {
+	copy(x[:], id[:])
+	return x
+}
+
 var (
 	errNetIDType = errors.DefineInvalidArgument("net_id_type", "NetID type must be lower or equal to 7")
 	errNetIDBits = errors.DefineInvalidArgument("net_id_bits", "too many bits set in NetID")
