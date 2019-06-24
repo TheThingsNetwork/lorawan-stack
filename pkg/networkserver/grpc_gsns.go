@@ -903,7 +903,6 @@ func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	logger.WithField("start_at", startAt).Debug("Add downlink task for class A downlink")
 	if err := ns.downlinkTasks.Add(ctx, stored.EndDeviceIdentifiers, startAt, true); err != nil {
 		logger.WithError(err).Error("Failed to add downlink task for class A downlink")
-		return err
 	}
 	return nil
 }
@@ -1138,7 +1137,6 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 	logger.WithField("start_at", startAt).Debug("Add downlink task for join-accept")
 	if err := ns.downlinkTasks.Add(ctx, dev.EndDeviceIdentifiers, startAt, true); err != nil {
 		logger.WithError(err).Error("Failed to add downlink task for join-accept")
-		return err
 	}
 	return nil
 }
