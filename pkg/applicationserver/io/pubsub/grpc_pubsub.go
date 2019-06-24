@@ -26,7 +26,7 @@ import (
 func appendImplicitPubSubGetPaths(paths ...string) []string {
 	return append(append(make([]string, 0, 2+len(paths)),
 		"format",
-		"service",
+		"provider",
 	), paths...)
 }
 

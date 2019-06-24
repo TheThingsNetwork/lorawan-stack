@@ -51,7 +51,7 @@ func TestPubSubRegistryRPC(t *testing.T) {
 		res, err := srv.List(authorizedCtx, &ttnpb.ListApplicationPubSubsRequest{
 			ApplicationIdentifiers: registeredApplicationID,
 			FieldMask: pbtypes.FieldMask{
-				Paths: []string{"service"},
+				Paths: []string{"provider"},
 			},
 		})
 		a.So(err, should.BeNil)
@@ -66,10 +66,10 @@ func TestPubSubRegistryRPC(t *testing.T) {
 					ApplicationIdentifiers: registeredApplicationID,
 					PubSubID:               registeredPubSubID,
 				},
-				Service: ttnpb.ApplicationPubSub_AWSSNSSQS,
+				Provider: ttnpb.ApplicationPubSub_AWSSNSSQS,
 			},
 			FieldMask: pbtypes.FieldMask{
-				Paths: []string{"service"},
+				Paths: []string{"provider"},
 			},
 		})
 		a.So(err, should.BeNil)
@@ -80,12 +80,12 @@ func TestPubSubRegistryRPC(t *testing.T) {
 		res, err := srv.List(authorizedCtx, &ttnpb.ListApplicationPubSubsRequest{
 			ApplicationIdentifiers: registeredApplicationID,
 			FieldMask: pbtypes.FieldMask{
-				Paths: []string{"service"},
+				Paths: []string{"provider"},
 			},
 		})
 		a.So(err, should.BeNil)
 		a.So(res.Pubsubs, should.HaveLength, 1)
-		a.So(res.Pubsubs[0].Service, should.Equal, ttnpb.ApplicationPubSub_AWSSNSSQS)
+		a.So(res.Pubsubs[0].Provider, should.Equal, ttnpb.ApplicationPubSub_AWSSNSSQS)
 	}
 
 	// Get.
@@ -96,11 +96,11 @@ func TestPubSubRegistryRPC(t *testing.T) {
 				PubSubID:               registeredPubSubID,
 			},
 			FieldMask: pbtypes.FieldMask{
-				Paths: []string{"service"},
+				Paths: []string{"provider"},
 			},
 		})
 		a.So(err, should.BeNil)
-		a.So(res.Service, should.Equal, ttnpb.ApplicationPubSub_AWSSNSSQS)
+		a.So(res.Provider, should.Equal, ttnpb.ApplicationPubSub_AWSSNSSQS)
 	}
 
 	// Delete.
@@ -117,7 +117,7 @@ func TestPubSubRegistryRPC(t *testing.T) {
 		res, err := srv.List(authorizedCtx, &ttnpb.ListApplicationPubSubsRequest{
 			ApplicationIdentifiers: registeredApplicationID,
 			FieldMask: pbtypes.FieldMask{
-				Paths: []string{"service"},
+				Paths: []string{"provider"},
 			},
 		})
 		a.So(err, should.BeNil)

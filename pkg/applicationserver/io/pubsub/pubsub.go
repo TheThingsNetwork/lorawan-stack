@@ -74,7 +74,7 @@ func (s *srv) startIntegrationTask(ctx context.Context, ids ttnpb.ApplicationPub
 		target, err := s.registry.Get(ctx, ids, []string{
 			"attributes",
 			"format",
-			"service",
+			"provider",
 
 			"downlink_push_topic",
 			"downlink_replace_topic",
@@ -263,7 +263,7 @@ func (s *srv) integrate(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err e
 	if err != nil {
 		return err
 	}
-	ctx = log.NewContextWithField(ctx, "service", pb.Provider)
+	ctx = log.NewContextWithField(ctx, "provider", pb.Provider)
 	logger := log.FromContext(ctx)
 	i.sub = io.NewSubscription(s.ctx, "pubsub", &pb.ApplicationIdentifiers)
 	format, ok := formats[pb.Format]
