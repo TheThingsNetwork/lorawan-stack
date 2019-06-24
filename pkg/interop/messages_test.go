@@ -207,11 +207,11 @@ func TestParseMessage(t *testing.T) {
 				"Result": "Success",
 				"Lifetime": 3600,
 				"NwkSKey": {
-					"KEKLabel": "",
+					"KEKLabel": "test",
 					"AESKey": "000102030405060708090A0B0C0D0E0F"
 				},
 				"AppSKey": {
-					"KEKLabel": "",
+					"KEKLabel": "test",
 					"AESKey": "000102030405060708090A0B0C0D0E0F"
 				},
 				"SessionKeyID": "01020304"
@@ -238,9 +238,11 @@ func TestParseMessage(t *testing.T) {
 					Result:     ResultSuccess,
 					Lifetime:   3600,
 					NwkSKey: (*KeyEnvelope)(&ttnpb.KeyEnvelope{
+						KEKLabel:     "test",
 						EncryptedKey: []byte{0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf},
 					}),
 					AppSKey: (*KeyEnvelope)(&ttnpb.KeyEnvelope{
+						KEKLabel:     "test",
 						EncryptedKey: []byte{0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf},
 					}),
 					SessionKeyID: []byte{0x1, 0x2, 0x3, 0x4},
@@ -299,7 +301,7 @@ func TestParseMessage(t *testing.T) {
 				"Result": "Success",
 				"DevEUI": "0102030405060708",
 				"AppSKey": {
-					"KEKLabel": "",
+					"KEKLabel": "test",
 					"AESKey": "000102030405060708090A0B0C0D0E0F"
 				},
 				"SessionKeyID": "01020304"
@@ -324,6 +326,7 @@ func TestParseMessage(t *testing.T) {
 					Result: ResultSuccess,
 					DevEUI: EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
 					AppSKey: KeyEnvelope{
+						KEKLabel:     "test",
 						EncryptedKey: []byte{0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf},
 					},
 					SessionKeyID: []byte{0x1, 0x2, 0x3, 0x4},
