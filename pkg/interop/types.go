@@ -130,7 +130,7 @@ type Buffer []byte
 
 // MarshalJSON marshals the binary data to a hexadecimal string.
 func (b Buffer) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf(`"%s"`, hex.EncodeToString(b))), nil
+	return []byte(fmt.Sprintf(`"%s"`, strings.ToUpper(hex.EncodeToString(b)))), nil
 }
 
 // UnmarshalJSON unmarshals a hexadecimal string to binary data.
