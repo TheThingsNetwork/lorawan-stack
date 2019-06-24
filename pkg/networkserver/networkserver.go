@@ -219,16 +219,16 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 	}
 
 	if ns.handleASUplink == nil {
-		ns.handleASUplink = func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, up *ttnpb.ApplicationUp) (ok bool, err error) {
+		ns.handleASUplink = func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, up *ttnpb.ApplicationUp) (bool, error) {
 			ns.applicationServersMu.RLock()
-
 			as, ok := ns.applicationServers[unique.ID(ctx, ids)]
 			if !ok {
 				ns.applicationServersMu.RUnlock()
 				return false, nil
 			}
-
 			defer ns.applicationServersMu.RUnlock()
+
+			var err error
 			if err = as.Send(up); err != nil {
 				return true, err
 			}
@@ -288,4 +288,17 @@ func (ns *NetworkServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.Client
 // Roles returns the roles that the Network Server fulfills.
 func (ns *NetworkServer) Roles() []ttnpb.PeerInfo_Role {
 	return []ttnpb.PeerInfo_Role{ttnpb.PeerInfo_NETWORK_SERVER}
+}
+
+func (ns *NetworkServer) Close() {
+	ns.Component.Close()
+
+	logger := ns.Logger()
+	for _, cl := range ns.applicationServers {
+		logger.Debug("Close Application Server link")
+		if err := cl.Close(); err != nil {
+			logger.WithError(err).Warn("Failed to close AS link")
+		}
+		logger.Debug("Application Server link closed")
+	}
 }
