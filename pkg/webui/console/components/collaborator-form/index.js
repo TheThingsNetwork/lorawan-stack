@@ -181,6 +181,7 @@ export default class CollaboratorForm extends Component {
           title={sharedMessages.collaboratorId}
           required
           autoFocus={!update}
+          disabled={update}
         />
         <Form.Field
           name="collaborator_type"
