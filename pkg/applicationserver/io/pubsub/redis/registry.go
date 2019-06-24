@@ -16,12 +16,11 @@ package redis
 
 import (
 	"context"
-	"fmt"
-	"regexp"
 	"time"
 
 	"github.com/go-redis/redis"
 	"github.com/gogo/protobuf/proto"
+	pubsubunique "go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/unique"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	ttnredis "go.thethings.network/lorawan-stack/pkg/redis"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -66,20 +65,6 @@ func (r *PubSubRegistry) idKey(appUID, id string) string {
 	return r.Redis.Key("uid", appUID, id)
 }
 
-var uniqueIDPattern = regexp.MustCompile("(.*)\\.(.*)")
-
-func (r *PubSubRegistry) toUniqueID(appUID, id string) string {
-	return fmt.Sprintf("%s.%s", appUID, id)
-}
-
-func (r *PubSubRegistry) fromUniqueID(uid string) (string, string) {
-	matches := uniqueIDPattern.FindStringSubmatch(uid)
-	if len(matches) != 3 {
-		panic(fmt.Sprintf("invalid uniqueID `%s` with matches %v", uid, matches))
-	}
-	return matches[1], matches[2]
-}
-
 func (r *PubSubRegistry) makeIDKeyFunc(appUID string) func(id string) string {
 	return func(id string) string {
 		return r.idKey(appUID, id)
@@ -104,21 +89,21 @@ func (r PubSubRegistry) Range(ctx context.Context, paths []string, f func(contex
 		return err
 	}
 	for _, uid := range uids {
-		appUID, pubsubID := r.fromUniqueID(uid)
+		appUID, psID := pubsubunique.ToUIDs(uid)
 		ctx, err := unique.WithContext(ctx, appUID)
 		if err != nil {
-			return errApplicationUID.WithCause(err).WithAttributes("application_uid", appUID)
+			return errApplicationUID.WithCause(err).WithAttributes("application_uid", appUID, "pubsub_id", psID)
 		}
 		ids, err := unique.ToApplicationID(appUID)
 		if err != nil {
-			return errApplicationUID.WithCause(err).WithAttributes("application_uid", appUID)
+			return errApplicationUID.WithCause(err).WithAttributes("application_uid", appUID, "pubsub_id", psID)
 		}
 		pb := &ttnpb.ApplicationPubSub{}
-		if err := ttnredis.GetProto(r.Redis, r.idKey(appUID, pubsubID)).ScanProto(pb); err != nil {
+		if err := ttnredis.GetProto(r.Redis, r.idKey(appUID, psID)).ScanProto(pb); err != nil {
 			return err
 		}
 		if err != nil {
-			return errApplicationUID.WithCause(err).WithAttributes("application_uid", appUID)
+			return errApplicationUID.WithCause(err).WithAttributes("application_uid", appUID, "pubsub_id", psID)
 		}
 		pb, err = applyPubSubFieldMask(nil, pb, paths...)
 		if err != nil {
@@ -199,7 +184,7 @@ func (r PubSubRegistry) Set(ctx context.Context, ids ttnpb.ApplicationPubSubIden
 			pipelined = func(p redis.Pipeliner) error {
 				p.Del(ik)
 				p.SRem(r.appKey(appUID), stored.PubSubID)
-				p.SRem(r.allKey(ctx), r.toUniqueID(appUID, stored.PubSubID))
+				p.SRem(r.allKey(ctx), pubsubunique.ID(appUID, stored.PubSubID))
 				return nil
 			}
 		} else {
@@ -255,7 +240,7 @@ func (r PubSubRegistry) Set(ctx context.Context, ids ttnpb.ApplicationPubSubIden
 					return err
 				}
 				p.SAdd(r.appKey(appUID), updated.PubSubID)
-				p.SAdd(r.allKey(ctx), r.toUniqueID(appUID, updated.PubSubID))
+				p.SAdd(r.allKey(ctx), pubsubunique.ID(appUID, updated.PubSubID))
 				return nil
 			}
 

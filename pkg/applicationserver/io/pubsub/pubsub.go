@@ -22,6 +22,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/provider"
+	pubsubunique "go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/unique"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errorcontext"
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -231,9 +232,10 @@ func (i *integration) shutdown(ctx context.Context) {
 var errAlreadyIntegrated = errors.DefineAlreadyExists("already_integrated", "already integrated to `{application_uid} {pubsub_id}`")
 
 func (ps *PubSub) integrate(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err error) {
-	uid := unique.ID(ctx, pb.ApplicationIdentifiers)
+	appUID := unique.ID(ctx, pb.ApplicationIdentifiers)
+	psUID := pubsubunique.ID(appUID, pb.PubSubID)
 	ctx = log.NewContextWithFields(ctx, log.Fields(
-		"application_uid", uid,
+		"application_uid", appUID,
 		"pubsub_id", pb.PubSubID,
 	))
 	ctx, cancel := errorcontext.New(ctx)
@@ -243,13 +245,13 @@ func (ps *PubSub) integrate(ctx context.Context, pb *ttnpb.ApplicationPubSub) (e
 		cancel:            cancel,
 		server:            ps.server,
 	}
-	if _, loaded := ps.integrations.LoadOrStore(pb.ApplicationPubSubIdentifiers, i); loaded {
-		return errAlreadyIntegrated.WithAttributes("application_uid", uid, "pubsub_id", pb.PubSubID)
+	if _, loaded := ps.integrations.LoadOrStore(psUID, i); loaded {
+		return errAlreadyIntegrated.WithAttributes("application_uid", appUID, "pubsub_id", pb.PubSubID)
 	}
 	go func() {
 		<-ctx.Done()
-		ps.integrationErrors.Store(pb.ApplicationPubSubIdentifiers, ctx.Err())
-		ps.integrations.Delete(pb.ApplicationPubSubIdentifiers)
+		ps.integrationErrors.Store(psUID, ctx.Err())
+		ps.integrations.Delete(psUID)
 		if err := ctx.Err(); err != nil && !errors.IsCanceled(err) {
 			log.FromContext(ctx).WithError(err).Warn("Integration failed")
 		}
@@ -286,15 +288,17 @@ func (ps *PubSub) integrate(ctx context.Context, pb *ttnpb.ApplicationPubSub) (e
 }
 
 func (ps *PubSub) cancelIntegration(ctx context.Context, ids ttnpb.ApplicationPubSubIdentifiers) error {
-	if val, ok := ps.integrations.Load(ids); ok {
+	appUID := unique.ID(ctx, ids.ApplicationIdentifiers)
+	psUID := pubsubunique.ID(appUID, ids.PubSubID)
+	if val, ok := ps.integrations.Load(psUID); ok {
 		i := val.(*integration)
 		log.FromContext(ctx).WithFields(log.Fields(
-			"application_uid", ids.ApplicationIdentifiers,
+			"application_uid", appUID,
 			"pubsub_id", ids.PubSubID,
 		)).Debug("Integration cancelled")
 		i.cancel(context.Canceled)
 	} else {
-		ps.integrationErrors.Delete(ids)
+		ps.integrationErrors.Delete(psUID)
 	}
 	return nil
 }
