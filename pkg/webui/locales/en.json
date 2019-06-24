@@ -38,6 +38,7 @@
   "console.components.payload-formatters-form.index.formatterParameter": "Formatter Parameter",
   "console.components.payload-formatters-form.index.grpcDescription": "The address of the service to connect to",
   "console.components.rights-group.index.selectAll": "Select All",
+  "console.components.rights-group.index.outOfOwnScopeRights": "This entity possesses rights that are out of your scope of granted rights. These rights cannot be altered.",
   "console.components.webhook-form.index.idPlaceholder": "my-new-webhook",
   "console.components.webhook-form.index.messageTypes": "Message types",
   "console.components.webhook-form.index.messageInfo": "For each enabled message type, you can set an optional path that will be appended to the base URL.",

@@ -109,7 +109,7 @@ export default class GatewayCollaboratorAdd extends React.Component {
               error={this.state.error}
               onSubmit={this.handleSubmit}
               onSubmitSuccess={redirectToList}
-              universalRightLiterals={universalRights}
+              universalRights={universalRights}
               rights={rights}
             />
           </Col>

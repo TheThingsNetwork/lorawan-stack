@@ -150,7 +150,7 @@ export default class GatewayCollaboratorEdit extends React.Component {
               onDelete={this.handleDelete}
               onDeleteSuccess={redirectToList}
               collaborator={collaborator}
-              universalRightLiterals={universalRights}
+              universalRights={universalRights}
               rights={rights}
               update
             />

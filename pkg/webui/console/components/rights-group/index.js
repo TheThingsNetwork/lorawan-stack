@@ -18,22 +18,28 @@ import { defineMessages } from 'react-intl'
 import classnames from 'classnames'
 
 import PropTypes from '../../../lib/prop-types'
+import { RIGHT_ALL } from '../../lib/rights'
+
 import Checkbox from '../../../components/checkbox'
+import Notification from '../../../components/notification'
 
 import style from './rights-group.styl'
 
 const m = defineMessages({
   selectAll: 'Select All',
+  outOfOwnScopeRights: 'This entity possesses rights that are out of your scope of granted rights. These rights cannot be altered.',
+  outOfOwnScopeRightsStrict: 'This entity possesses rights that are out of your scope of granted rights. Modifying is hence prohibited.',
 })
 
-const computeState = function (values, rights) {
-  const selectedCheckboxesCount = rights
-    .reduce((count, val) => values[val] ? count + 1 : count, 0)
+const computeState = function (values, rights, universalRight) {
+  const selectedCheckboxesCount = values.length
   const totalCheckboxesCount = rights.length
 
+  const universalRightIsChecked = values.includes(RIGHT_ALL) || values.includes(universalRight)
+
   return {
-    allSelected: selectedCheckboxesCount === totalCheckboxesCount,
-    indeterminate: selectedCheckboxesCount !== 0 && selectedCheckboxesCount !== totalCheckboxesCount,
+    allSelected: universalRightIsChecked || selectedCheckboxesCount === totalCheckboxesCount,
+    indeterminate: !universalRightIsChecked && selectedCheckboxesCount !== 0 && selectedCheckboxesCount !== totalCheckboxesCount,
   }
 }
 
@@ -44,13 +50,36 @@ class RightsGroup extends React.Component {
 
   static getDerivedStateFromProps (props) {
     if ('value' in props) {
-      const { value, rights } = props
-      const { allSelected, indeterminate } = computeState(value, rights)
+      const {
+        value,
+        rights: grantableRights,
+        universalRight: grantableUniversalRight,
+      } = props
+      let universalRight = grantableUniversalRight
+      const allGrantableRights = [ ...grantableRights, ...grantableUniversalRight ]
+
+      // Identify given rights that are out of the scope of the current user
+      const outOfOwnScopeRights = value.filter(function (right) {
+        if (!(allGrantableRights.includes(right)) && right !== RIGHT_ALL) {
+          if (right.endsWith('_ALL')) {
+            universalRight = right
+          }
+          return true
+        }
+        return false
+      })
+
+      // Compose rights list
+      const rights = [ ...outOfOwnScopeRights, ...grantableRights ]
+
+      const { allSelected, indeterminate } = computeState(value, rights, universalRight)
 
       return {
         allSelected,
         indeterminate,
+        outOfOwnScopeRights,
         rights,
+        universalRight,
         value,
       }
     }
@@ -59,47 +88,37 @@ class RightsGroup extends React.Component {
   }
 
   async handleChangeAll (event) {
-    const { onChange, rights, universalRight } = this.props
+    const { onChange } = this.props
+    const { rights, outOfOwnScopeRights, universalRight } = this.state
     const { checked } = event.target
 
-    const value = rights.reduce((values, right) => ({
-      ...values,
-      [right]: checked,
-    }), {})
+    let value
 
-    const newValues = !('value' in this.props) ? { value } : {}
-
-    await this.setState({
-      allSelected: checked,
-      indeterminate: false,
-      ...newValues,
-    })
-
-    if (universalRight) {
-      value[universalRight] = checked
+    // Determine new value based on universal rights and out of scope rights
+    if (checked) {
+      if (universalRight) {
+        // Prefer universal right value, if present
+        value = [ universalRight ]
+      } else {
+        // Else add rights individually
+        value = [ ...rights ]
+      }
+    } else {
+      // On uncheck, leave out of scope rights checked, if present
+      value = [ ...outOfOwnScopeRights ]
     }
 
     onChange(value)
   }
 
-  async handleChange (value) {
-    const { onChange, rights, universalRight } = this.props
-    const { allSelected, indeterminate } = computeState(value, rights)
+  async handleChange (val) {
+    const value = Object.keys(val).filter(right => val[right])
+    const { onChange, rights } = this.props
+    const { universalRight } = this.state
+    const { allSelected } = computeState(value, rights, universalRight)
 
-    let newValues = {}
-    if (!('value' in this.props)) {
-      newValues = { value }
-    }
-
-    await this.setState({
-      allSelected,
-      indeterminate,
-      ...newValues,
-    })
-
-    const result = universalRight
-      ? { ...value, [universalRight]: allSelected }
-      : value
+    // Set new right value and prefer universal right if applicable
+    const result = universalRight && allSelected ? [ universalRight ] : [ ...value ]
 
     onChange(result)
   }
@@ -109,15 +128,17 @@ class RightsGroup extends React.Component {
       className,
       name,
       onBlur,
-      universalRight,
       disabled,
+      strict,
     } = this.props
 
     const {
       indeterminate,
+      outOfOwnScopeRights,
       value,
       allSelected,
       rights,
+      universalRight,
     } = this.state
 
     const cbs = rights
@@ -127,11 +148,35 @@ class RightsGroup extends React.Component {
           key={right}
           name={right}
           label={{ id: `enum:${right}` }}
+          disabled={outOfOwnScopeRights.includes(right)}
         />
       ))
 
+    const hasRightAll = Boolean(value.includes(RIGHT_ALL))
+    const hasOutOfOwnScopeRights = Boolean(outOfOwnScopeRights.length)
+    const allDisabled =
+    disabled
+    || outOfOwnScopeRights.includes(universalRight)
+    || (strict && hasOutOfOwnScopeRights)
+
+    // Marshal rights to key/value for checkbox group
+    const rightsValues = rights.reduce(
+      function (acc, right) {
+        acc[right] = allSelected || value.includes(right)
+
+        return acc
+      },
+      { [RIGHT_ALL]: hasRightAll }
+    )
+
     return (
       <div className={className}>
+        { hasOutOfOwnScopeRights && (
+          <Notification
+            small
+            info={strict ? m.outOfOwnScopeRightsStrict : m.outOfOwnScopeRights}
+          />
+        )}
         <Checkbox
           className={classnames(style.selectAll, style.rightLabel)}
           name={universalRight || 'select-all'}
@@ -139,16 +184,16 @@ class RightsGroup extends React.Component {
           onChange={this.handleChangeAll}
           indeterminate={indeterminate}
           value={allSelected}
-          disabled={disabled}
+          disabled={allDisabled}
         />
         <Checkbox.Group
           className={style.group}
           horizontal
           name={name}
-          value={value}
+          value={rightsValues}
           onChange={this.handleChange}
           onBlur={onBlur}
-          disabled={disabled}
+          disabled={allDisabled}
         >
           {cbs}
         </Checkbox.Group>
@@ -158,19 +203,32 @@ class RightsGroup extends React.Component {
 }
 
 RightsGroup.propTypes = {
+  /** The class to be added to the container */
   className: PropTypes.string,
+  /** The name prop, used to connect to formik */
   name: PropTypes.string.isRequired,
-  value: PropTypes.object,
+  /** The rights value */
+  value: PropTypes.array,
+  /** Change event hook */
   onChange: PropTypes.func,
+  /** Blur event hook */
   onBlur: PropTypes.func,
+  /** The universal right literal comprising all other rights */
   universalRight: PropTypes.string,
+  /** The list of rights options */
   rights: PropTypes.arrayOf(PropTypes.string),
+  /** A flag identifying whether modifying rights is allowed when out of scope
+  * rights are present. Can be used to prevent user error.
+  */
+  strict: PropTypes.bool,
 }
 
 RightsGroup.defaultProps = {
   onChange: () => null,
   onBlur: () => null,
   rights: [],
+  value: [],
+  strict: false,
 }
 
 export default RightsGroup

@@ -44,15 +44,9 @@ class CreateForm extends React.Component {
   }
 
   async handleCreate (values) {
-    const { rights, name } = values
     const { onCreate } = this.props
 
-    const key = {
-      name,
-      rights: Object.keys(rights).filter(r => rights[r]),
-    }
-
-    return await onCreate(key)
+    return await onCreate(values)
   }
 
   async handleCreateSuccess (key) {
@@ -77,14 +71,9 @@ class CreateForm extends React.Component {
 
     const modalProps = modal ? modal : {}
     const modalVisible = Boolean(modal)
-    const rightsValues = rights.reduce(function (acc, right) {
-      acc[right] = false
-
-      return acc
-    }, {})
     const initialValues = {
       name: '',
-      rights: rightsValues,
+      rights: [],
     }
 
     return (

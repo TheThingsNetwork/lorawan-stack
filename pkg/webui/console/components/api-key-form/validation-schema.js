@@ -19,11 +19,7 @@ const validationSchema = Yup.object().shape({
   name: Yup.string()
     .min(2, sharedMessages.validateTooShort)
     .max(50, sharedMessages.validateTooLong),
-  rights: Yup.object().test(
-    'rights',
-    sharedMessages.validateRights,
-    values => Object.values(values).reduce((acc, curr) => acc || curr, false)
-  ),
+  rights: Yup.array().min(1, sharedMessages.validateRights),
 })
 
 export default validationSchema

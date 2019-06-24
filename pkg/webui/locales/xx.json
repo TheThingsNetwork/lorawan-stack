@@ -38,6 +38,7 @@
   "console.components.payload-formatters-form.index.formatterParameter": "Xxxxxxxxx Xxxxxxxxx",
   "console.components.payload-formatters-form.index.grpcDescription": "Xxx xxxxxxx xx xxx xxxxxxx xx xxxxxxx xx",
   "console.components.rights-group.index.selectAll": "Xxxxxx Xxx",
+  "console.components.rights-group.index.outOfOwnScopeRights": "Xxxx xxxxxx xxxxxxxxx xxxxxx xxxx xxx xxx xx xxxx xxxxx xx xxxxxxx xxxxxx. Xxxxx xxxxxx xxxxxx xx xxxxxxx.",
   "console.components.webhook-form.index.idPlaceholder": "xx-xxx-xxxxxxx",
   "console.components.webhook-form.index.messageTypes": "Xxxxxxx xxxxx",
   "console.components.webhook-form.index.messageInfo": "Xxx xxxx xxxxxxx xxxxxxx xxxx, xxx xxx xxx xx xxxxxxxx xxxx xxxx xxxx xx xxxxxxxx xx xxx xxxx XXX.",

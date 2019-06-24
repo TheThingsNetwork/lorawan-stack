@@ -39,11 +39,7 @@ const validationSchema = Yup.object().shape({
     .required(sharedMessages.validateRequired),
   collaborator_type: Yup.string()
     .required(sharedMessages.validateRequired),
-  rights: Yup.object().test(
-    'rights',
-    sharedMessages.validateRights,
-    values => Object.values(values).reduce((acc, curr) => acc || curr, false)
-  ),
+  rights: Yup.array().min(1, sharedMessages.validateRights),
 })
 
 const m = defineMessages({
@@ -82,7 +78,7 @@ export default class CollaboratorForm extends Component {
   }
 
   async handleSubmit (values, { resetForm, setSubmitting }) {
-    const { collaborator_id, collaborator_type, rights: rightMap } = values
+    const { collaborator_id, collaborator_type, rights } = values
     const { onSubmit, onSubmitSuccess, onSubmitFailure } = this.props
 
     const collaborator_ids = {
@@ -91,16 +87,9 @@ export default class CollaboratorForm extends Component {
       },
     }
 
-    // Prefer universal wildcard rights over individual rights, if set
-    const rights = Object.keys(rightMap).filter(r => rightMap[r])
-    const universalRights = rights.filter(r => r.endsWith('_ALL'))
-    const computedRights = universalRights.length
-      ? universalRights
-      : rights
-
     const collaborator = {
       ids: collaborator_ids,
-      rights: computedRights,
+      rights,
     }
 
     await this.setState({ error: '' })
@@ -142,33 +131,20 @@ export default class CollaboratorForm extends Component {
   }
 
   computeInitialValues () {
-    const { collaborator, rights } = this.props
+    const { collaborator } = this.props
 
     if (!collaborator) {
       return {
         collaborator_id: '',
         collaborator_type: 'user',
-        rights: {},
+        rights: [],
       }
     }
-
-    // Translate universal rights back to individual values
-    const hasRightAll = collaborator.rights.includes(RIGHT_ALL)
-    const hasUniversalRight = collaborator.rights.some(r => r.endsWith('_ALL'))
-
-    const rightsValues = rights.reduce(
-      function (acc, right) {
-        acc[right] = hasUniversalRight || collaborator.rights.includes(right)
-
-        return acc
-      },
-      { [RIGHT_ALL]: hasRightAll }
-    )
 
     return {
       collaborator_id: collaborator.id,
       collaborator_type: collaborator.isUser ? 'user' : 'organization',
-      rights: { ...rightsValues },
+      rights: [ ...collaborator.rights ],
     }
   }
 
@@ -176,9 +152,9 @@ export default class CollaboratorForm extends Component {
     const {
       collaborator,
       rights,
+      universalRights,
       error: passedError,
       update,
-      universalRights,
     } = this.props
 
     const { error: submitError } = this.state

@@ -108,8 +108,6 @@ export default class ApplicationApiKeyEdit extends React.Component {
   render () {
     const { apiKey, rights, fetching, error, universalRights } = this.props
 
-    console.log(universalRights)
-
     if (error) {
       throw error
     }
