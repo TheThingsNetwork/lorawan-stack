@@ -227,7 +227,7 @@ var (
 			if err != nil {
 				return err
 			}
-			logger.WithField("paths", isPaths).Debug("Get EndDevice from Identity Server")
+			logger.WithField("paths", isPaths).Debug("Get end device from Identity Server")
 			device, err := ttnpb.NewEndDeviceRegistryClient(is).Get(ctx, &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: *devID,
 				FieldMask:            pbtypes.FieldMask{Paths: isPaths},
@@ -492,7 +492,7 @@ var (
 			if err != nil {
 				return err
 			}
-			logger.WithField("paths", isPaths).Debug("Get EndDevice from Identity Server")
+			logger.WithField("paths", isPaths).Debug("Get end device from Identity Server")
 			existingDevice, err := ttnpb.NewEndDeviceRegistryClient(is).Get(ctx, &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: *devID,
 				FieldMask:            pbtypes.FieldMask{Paths: isPaths},
