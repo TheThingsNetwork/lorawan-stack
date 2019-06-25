@@ -15,13 +15,13 @@
 package assertions
 
 import (
+	"context"
 	"fmt"
 	"time"
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
 const (
@@ -66,7 +66,7 @@ func ShouldResembleEventDefinitionDataClosure(actual interface{}, expected ...in
 	if !ok {
 		return fmt.Sprintf(needEventDefinitionDataClosureCompatible, actual)
 	}
-	ctx := test.Context()
+	ctx := context.Background()
 	ids := &ttnpb.EndDeviceIdentifiers{
 		DeviceID: "test-dev",
 		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
@@ -88,7 +88,7 @@ func ShouldResembleEventDefinitionDataClosures(actual interface{}, expected ...i
 	if !ok {
 		return fmt.Sprintf(needEventDefinitionDataClosureCompatible, actual)
 	}
-	ctx := test.Context()
+	ctx := context.Background()
 	ids := &ttnpb.EndDeviceIdentifiers{
 		DeviceID: "test-dev",
 		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{

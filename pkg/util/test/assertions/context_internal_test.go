@@ -26,7 +26,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/errorcontext"
 	"go.thethings.network/lorawan-stack/pkg/log"
-	"go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
 func TestContextParent(t *testing.T) {
@@ -61,7 +60,7 @@ func TestContextParent(t *testing.T) {
 		{
 			Name: "context.WithDeadline",
 			NewContext: func(ctx context.Context) context.Context {
-				ctx, cancel := context.WithDeadline(ctx, time.Now().Add(200*test.Delay))
+				ctx, cancel := context.WithDeadline(ctx, time.Now().Add(200*time.Hour))
 				cancels = append(cancels, cancel)
 				return ctx
 			},
@@ -70,7 +69,7 @@ func TestContextParent(t *testing.T) {
 		{
 			Name: "context.WithTimeout",
 			NewContext: func(ctx context.Context) context.Context {
-				ctx, cancel := context.WithTimeout(ctx, 200*test.Delay)
+				ctx, cancel := context.WithTimeout(ctx, 200*time.Hour)
 				cancels = append(cancels, cancel)
 				return ctx
 			},
@@ -207,7 +206,7 @@ func TestContextRoot(t *testing.T) {
 }
 
 func TestContextHasParent(t *testing.T) {
-	sharedCtx, cancel := context.WithCancel(context.WithValue(test.Context(), struct{}{}, struct{}{}))
+	sharedCtx, cancel := context.WithCancel(context.WithValue(context.Background(), struct{}{}, struct{}{}))
 	defer cancel()
 
 	for _, tc := range []struct {
@@ -241,7 +240,7 @@ func TestContextHasParent(t *testing.T) {
 				context.WithValue(
 					context.WithValue(
 						context.WithValue(
-							test.Context(), "A", nil),
+							context.Background(), "A", nil),
 						"B", nil),
 					struct{}{}, nil),
 				struct{}{}, nil),
