@@ -32,13 +32,10 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/networkserver/redis"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
-
-func eui64Ptr(eui types.EUI64) *types.EUI64 { return &eui }
 
 func TestLinkApplication(t *testing.T) {
 	a := assertions.New(t)
