@@ -24,7 +24,7 @@ import { RIGHT_ALL } from '../../lib/rights'
 
 import Form from '../../../components/form'
 import Input from '../../../components/input'
-import Select from '../../../components/select'
+import Radio from '../../../components/radio-button'
 import SubmitBar from '../../../components/submit-bar'
 import SubmitButton from '../../../components/submit-button'
 import Message from '../../../lib/components/message'
@@ -208,15 +208,21 @@ export default class CollaboratorForm extends Component {
         />
         <Form.Field
           name="collaborator_type"
-          component={Select}
           title={sharedMessages.type}
-          required
+          component={Radio.Group}
+          horizontal={false}
           disabled={update}
-          options={[
-            { value: 'user', label: sharedMessages.user },
-            { value: 'organization', label: sharedMessages.organization },
-          ]}
-        />
+          required
+        >
+          <Radio
+            label={sharedMessages.user}
+            value="user"
+          />
+          <Radio
+            label={sharedMessages.organization}
+            value="organization"
+          />
+        </Form.Field>
         { hasRightAll && <Notification small info={m.cannotModifyRightAll} />}
         <Form.Field
           name="rights"
