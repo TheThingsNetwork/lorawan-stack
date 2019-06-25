@@ -80,8 +80,10 @@ func (ps *PubSub) startIntegrationTask(ctx context.Context, ids ttnpb.Applicatio
 			"format",
 			"provider",
 
-			"downlink_push_topic",
-			"downlink_replace_topic",
+			"base_topic",
+
+			"downlink_push",
+			"downlink_replace",
 
 			"uplink_message",
 			"join_accept",
@@ -121,8 +123,7 @@ type integration struct {
 	ctx    context.Context
 	cancel errorcontext.CancelFunc
 
-	subscriptions *provider.DownlinkSubscriptions
-	topics        *provider.UplinkTopics
+	conn *provider.Connection
 
 	server io.Server
 	sub    *io.Subscription
@@ -140,21 +141,21 @@ func (i *integration) handleUp(ctx context.Context) {
 			var topic *pubsub.Topic
 			switch up.ApplicationUp.Up.(type) {
 			case *ttnpb.ApplicationUp_UplinkMessage:
-				topic = i.topics.UplinkMessage
+				topic = i.conn.Topics.UplinkMessage
 			case *ttnpb.ApplicationUp_JoinAccept:
-				topic = i.topics.JoinAccept
+				topic = i.conn.Topics.JoinAccept
 			case *ttnpb.ApplicationUp_DownlinkAck:
-				topic = i.topics.DownlinkAck
+				topic = i.conn.Topics.DownlinkAck
 			case *ttnpb.ApplicationUp_DownlinkNack:
-				topic = i.topics.DownlinkNack
+				topic = i.conn.Topics.DownlinkNack
 			case *ttnpb.ApplicationUp_DownlinkSent:
-				topic = i.topics.DownlinkSent
+				topic = i.conn.Topics.DownlinkSent
 			case *ttnpb.ApplicationUp_DownlinkFailed:
-				topic = i.topics.DownlinkFailed
+				topic = i.conn.Topics.DownlinkFailed
 			case *ttnpb.ApplicationUp_DownlinkQueued:
-				topic = i.topics.DownlinkQueued
+				topic = i.conn.Topics.DownlinkQueued
 			case *ttnpb.ApplicationUp_LocationSolved:
-				topic = i.topics.LocationSolved
+				topic = i.conn.Topics.LocationSolved
 			}
 			if topic == nil {
 				continue
@@ -209,12 +210,12 @@ func (i *integration) startHandleDown(ctx context.Context) {
 		{
 			name:         "push",
 			op:           io.Server.DownlinkQueuePush,
-			subscription: i.subscriptions.Push,
+			subscription: i.conn.Subscriptions.Push,
 		},
 		{
 			name:         "replace",
 			op:           io.Server.DownlinkQueueReplace,
-			subscription: i.subscriptions.Replace,
+			subscription: i.conn.Subscriptions.Replace,
 		},
 	} {
 		if downlink.subscription == nil {
@@ -222,11 +223,6 @@ func (i *integration) startHandleDown(ctx context.Context) {
 		}
 		go i.handleDown(log.NewContextWithField(ctx, "operation", downlink.name), downlink.op, downlink.subscription)
 	}
-}
-
-func (i *integration) shutdown(ctx context.Context) {
-	i.subscriptions.Shutdown(ctx)
-	i.topics.Shutdown(ctx)
 }
 
 var errAlreadyIntegrated = errors.DefineAlreadyExists("already_integrated", "already integrated to `{application_uid} {pubsub_id}`")
@@ -260,11 +256,7 @@ func (ps *PubSub) integrate(ctx context.Context, pb *ttnpb.ApplicationPubSub) (e
 	if err != nil {
 		return err
 	}
-	i.subscriptions, err = provider.OpenSubscriptions(ctx, pb)
-	if err != nil {
-		return err
-	}
-	i.topics, err = provider.OpenTopics(ctx, pb)
+	i.conn, err = provider.OpenConnection(ctx, pb)
 	if err != nil {
 		return err
 	}
@@ -282,7 +274,7 @@ func (ps *PubSub) integrate(ctx context.Context, pb *ttnpb.ApplicationPubSub) (e
 	<-ctx.Done()
 	if err := ctx.Err(); errors.IsCanceled(err) {
 		logger.Info("Integration cancelled")
-		i.shutdown(ctx)
+		i.conn.Shutdown(ctx)
 	}
 	return
 }

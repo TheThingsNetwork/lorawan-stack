@@ -19,69 +19,12 @@ import (
 
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"gocloud.dev/pubsub"
 )
-
-// DownlinkSubscriptions contains the subscriptions for the push and replace queue operations.
-type DownlinkSubscriptions struct {
-	Push    *pubsub.Subscription
-	Replace *pubsub.Subscription
-}
-
-// Shutdown shutdowns the active subscriptions.
-func (ds *DownlinkSubscriptions) Shutdown(ctx context.Context) error {
-	for _, sub := range []*pubsub.Subscription{
-		ds.Push,
-		ds.Replace,
-	} {
-		if sub != nil {
-			if err := sub.Shutdown(ctx); err != nil {
-				return err
-			}
-		}
-	}
-	return nil
-}
-
-// UplinkTopics contains the topics for the uplink messages.
-type UplinkTopics struct {
-	UplinkMessage  *pubsub.Topic
-	JoinAccept     *pubsub.Topic
-	DownlinkAck    *pubsub.Topic
-	DownlinkNack   *pubsub.Topic
-	DownlinkSent   *pubsub.Topic
-	DownlinkFailed *pubsub.Topic
-	DownlinkQueued *pubsub.Topic
-	LocationSolved *pubsub.Topic
-}
-
-// Shutdown shutdowns the active topics.
-func (ut *UplinkTopics) Shutdown(ctx context.Context) error {
-	for _, topic := range []*pubsub.Topic{
-		ut.UplinkMessage,
-		ut.JoinAccept,
-		ut.DownlinkAck,
-		ut.DownlinkNack,
-		ut.DownlinkSent,
-		ut.DownlinkFailed,
-		ut.DownlinkQueued,
-		ut.LocationSolved,
-	} {
-		if topic != nil {
-			if err := topic.Shutdown(ctx); err != nil {
-				return err
-			}
-		}
-	}
-	return nil
-}
 
 // Provider represents a PubSub service provider.
 type Provider interface {
-	// OpenSubscriptions opens the subscriptions for the downlink queue operations of a given ttnpb.ApplicationPubSub.
-	OpenSubscriptions(ctx context.Context, pb *ttnpb.ApplicationPubSub) (*DownlinkSubscriptions, error)
-	// OpenTopics opens the subscriptions for the uplink messages of a given ttnpb.ApplicationPubSub.
-	OpenTopics(ctx context.Context, pb *ttnpb.ApplicationPubSub) (*UplinkTopics, error)
+	// OpenConnection opens the Connection of a given ttnpb.ApplicationPubSub.
+	OpenConnection(ctx context.Context, pb *ttnpb.ApplicationPubSub) (*Connection, error)
 }
 
 var (
