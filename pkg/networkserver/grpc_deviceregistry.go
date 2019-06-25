@@ -20,6 +20,7 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
@@ -34,7 +35,49 @@ func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest
 			return nil, err
 		}
 	}
-	return ns.devices.GetByID(ctx, req.ApplicationIdentifiers, req.DeviceID, req.FieldMask.Paths)
+	dev, err := ns.devices.GetByID(ctx, req.ApplicationIdentifiers, req.DeviceID, req.FieldMask.Paths)
+	if err != nil {
+		return nil, err
+	}
+	for _, s := range []struct {
+		val  *ttnpb.Session
+		path string
+	}{
+		{
+			val:  dev.Session,
+			path: "session",
+		},
+		{
+			val:  dev.PendingSession,
+			path: "pending_session",
+		},
+	} {
+		if s.val == nil {
+			continue
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths, s.path+".keys.f_nwk_s_int_key") && s.val.FNwkSIntKey != nil {
+			key, err := cryptoutil.UnwrapAES128Key(*s.val.FNwkSIntKey, ns.KeyVault)
+			if err != nil {
+				return nil, err
+			}
+			s.val.FNwkSIntKey = &ttnpb.KeyEnvelope{Key: &key}
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths, s.path+".keys.s_nwk_s_int_key") && s.val.SNwkSIntKey != nil {
+			key, err := cryptoutil.UnwrapAES128Key(*s.val.SNwkSIntKey, ns.KeyVault)
+			if err != nil {
+				return nil, err
+			}
+			s.val.SNwkSIntKey = &ttnpb.KeyEnvelope{Key: &key}
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths, s.path+".keys.nwk_s_enc_key") && s.val.NwkSEncKey != nil {
+			key, err := cryptoutil.UnwrapAES128Key(*s.val.NwkSEncKey, ns.KeyVault)
+			if err != nil {
+				return nil, err
+			}
+			s.val.NwkSEncKey = &ttnpb.KeyEnvelope{Key: &key}
+		}
+	}
+	return dev, nil
 }
 
 func validABPSessionKey(key *ttnpb.KeyEnvelope) bool {

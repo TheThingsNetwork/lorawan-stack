@@ -26,6 +26,7 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	. "go.thethings.network/lorawan-stack/pkg/networkserver"
@@ -41,6 +42,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 		Name           string
 		ContextFunc    func(context.Context) context.Context
 		GetByIDFunc    func(context.Context, ttnpb.ApplicationIdentifiers, string, []string) (*ttnpb.EndDevice, error)
+		KeyVault       map[string][]byte
 		Request        *ttnpb.GetEndDeviceRequest
 		Device         *ttnpb.EndDevice
 		ErrorAssertion func(*testing.T, error) bool
@@ -103,13 +105,25 @@ func TestDeviceRegistryGet(t *testing.T) {
 				a.So(devID, should.Equal, "test-dev-id")
 				a.So(gets, should.Resemble, []string{
 					"frequency_plan_id",
+					"session",
 				})
 				return &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceID:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
 					},
+					Session: &ttnpb.Session{
+						SessionKeys: ttnpb.SessionKeys{
+							FNwkSIntKey: &ttnpb.KeyEnvelope{
+								KEKLabel:     "test",
+								EncryptedKey: []byte{0x96, 0x77, 0x8b, 0x25, 0xae, 0x6c, 0xa4, 0x35, 0xf9, 0x2b, 0x5b, 0x97, 0xc0, 0x50, 0xae, 0xd2, 0x46, 0x8a, 0xb8, 0xa1, 0x7a, 0xd8, 0x4e, 0x5d},
+							},
+						},
+					},
 				}, nil
+			},
+			KeyVault: map[string][]byte{
+				"test": {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17},
 			},
 			Request: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -119,6 +133,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 				FieldMask: pbtypes.FieldMask{
 					Paths: []string{
 						"frequency_plan_id",
+						"session",
 					},
 				},
 			},
@@ -126,6 +141,13 @@ func TestDeviceRegistryGet(t *testing.T) {
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DeviceID:               "test-dev-id",
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+				},
+				Session: &ttnpb.Session{
+					SessionKeys: ttnpb.SessionKeys{
+						FNwkSIntKey: &ttnpb.KeyEnvelope{
+							Key: AES128KeyPtr(types.AES128Key{0x0, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff}),
+						},
+					},
 				},
 			},
 			GetByIDCalls: 1,
@@ -137,7 +159,13 @@ func TestDeviceRegistryGet(t *testing.T) {
 			var getByIDCalls uint64
 
 			ns := test.Must(New(
-				component.MustNew(test.GetLogger(t), &component.Config{}),
+				component.MustNew(test.GetLogger(t), &component.Config{
+					ServiceBase: config.ServiceBase{
+						KeyVault: config.KeyVault{
+							Static: tc.KeyVault,
+						},
+					},
+				}),
 				&Config{
 					Devices: &MockDeviceRegistry{
 						GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string) (*ttnpb.EndDevice, error) {

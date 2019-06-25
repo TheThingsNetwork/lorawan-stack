@@ -77,6 +77,10 @@ func DurationPtr(v time.Duration) *time.Duration {
 	return &v
 }
 
+func AES128KeyPtr(key types.AES128Key) *types.AES128Key {
+	return &key
+}
+
 func MakeEU868Channels(chs ...*ttnpb.MACParameters_Channel) []*ttnpb.MACParameters_Channel {
 	return append([]*ttnpb.MACParameters_Channel{
 		{
