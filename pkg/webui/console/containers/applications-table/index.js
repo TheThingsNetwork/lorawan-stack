@@ -20,6 +20,12 @@ import sharedMessages from '../../../lib/shared-messages'
 import FetchTable from '../fetch-table'
 
 import { getApplicationsList } from '../../../console/store/actions/applications'
+import {
+  selectApplications,
+  selectApplicationsTotalCount,
+  selectApplicationsFetching,
+  selectApplicationsError,
+} from '../../store/selectors/applications'
 
 const m = defineMessages({
   all: 'All',
@@ -50,8 +56,13 @@ const headers = [
 @bind
 export default class ApplicationsTable extends Component {
 
-  baseDataSelector ({ applications }) {
-    return applications
+  baseDataSelector (state) {
+    return {
+      applications: selectApplications(state),
+      totalCount: selectApplicationsTotalCount(state),
+      fetching: selectApplicationsFetching(state),
+      error: selectApplicationsError(state),
+    }
   }
 
   render () {

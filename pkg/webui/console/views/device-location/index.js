@@ -20,7 +20,7 @@ import { defineMessages } from 'react-intl'
 import * as Yup from 'yup'
 
 import sharedMessages from '../../../lib/shared-messages'
-import { getDeviceId, getApplicationId } from '../../../lib/selectors/id'
+import { getDeviceId } from '../../../lib/selectors/id'
 import api from '../../api'
 
 import LocationForm from '../../../components/location-form'
@@ -29,6 +29,7 @@ import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 
 import { updateDevice } from '../../store/actions/device'
+import { selectSelectedApplicationId } from '../../store/selectors/applications'
 
 import {
   latitude as latitudeRegexp,
@@ -62,17 +63,15 @@ const getRegistryLocation = function (locations) {
 }
 
 @connect(
-  ({ device, application }, props) => ({
-    device: device.device,
-    application: application.application,
-    appId: getApplicationId(application.application),
-    devId: getDeviceId(device.device),
+  state => ({
+    device: state.device.device,
+    appId: selectSelectedApplicationId(state),
+    devId: getDeviceId(state.device.device),
   }),
   { updateDevice }
 )
 @withBreadcrumb('device.single.data', function (props) {
-  const { devId } = props
-  const { appId } = props.match.params
+  const { devId, appId } = props
   return (
     <Breadcrumb
       path={`/console/applications/${appId}/devices/${devId}/location`}

@@ -24,7 +24,7 @@ import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Message from '../../../lib/components/message'
 import ApplicationEvents from '../../containers/application-events'
 
-import { selectSelectedApplicationId } from '../../store/selectors/application'
+import { selectSelectedApplicationId } from '../../store/selectors/applications'
 
 import style from './application-data.styl'
 

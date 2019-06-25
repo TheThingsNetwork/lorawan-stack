@@ -20,7 +20,7 @@ import IntlHelmet from '../../../lib/components/intl-helmet'
 import sharedMessages from '../../../lib/shared-messages'
 import DevicesTable from '../../containers/devices-table'
 
-import { selectSelectedApplication } from '../../store/selectors/application'
+import { selectSelectedApplication } from '../../store/selectors/applications'
 
 const DEVICES_TABLE_SIZE = 25
 

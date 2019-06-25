@@ -12,19 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {
-  GET_APP_SUCCESS,
-} from '../actions/application'
+import { createRequestActions } from './lib'
 
-const defaultState = null
+export const createPaginationBaseActionType = name => (
+  `GET_${name}_LIST`
+)
 
-const application = function (state = defaultState, action) {
-  switch (action.type) {
-  case GET_APP_SUCCESS:
-    return action.payload
-  default:
-    return state
-  }
-}
+export const createPaginationByIdRequestActions = name => createRequestActions(
+  createPaginationBaseActionType(name),
+  (id, { page, limit, query } = {}) => ({ id, params: { page, limit, query }}),
+  (id, params, selectors) => ({ selectors })
+)
 
-export default application
+export const createPaginationRequestActions = name => createRequestActions(
+  createPaginationBaseActionType(name),
+  ({ page, limit, query } = {}) => ({ params: { page, limit, query }}),
+  (params, selectors) => ({ selectors })
+)

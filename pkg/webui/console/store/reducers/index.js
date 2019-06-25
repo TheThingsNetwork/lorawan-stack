@@ -18,10 +18,10 @@ import { SHARED_NAME as APPLICATIONS_SHARED_NAME } from '../actions/applications
 import { SHARED_NAME as GATEWAY_SHARED_NAME } from '../actions/gateway'
 import { SHARED_NAME as GATEWAYS_SHARED_NAME } from '../actions/gateways'
 import { SHARED_NAME as DEVICE_SHARED_NAME } from '../actions/device'
+import { getApplicationId } from '../../../lib/selectors/id'
 import user from './user'
 import init from './init'
 import applications from './applications'
-import application from './application'
 import devices from './devices'
 import device from './device'
 import gateways from './gateways'
@@ -38,12 +38,12 @@ import error from './ui/error'
 import webhook from './webhook'
 import webhooks from './webhooks'
 import webhookFormats from './webhook-formats'
+import { createNamedPaginationReducer } from './pagination'
 
 export default combineReducers({
   user,
   init,
   applications,
-  application,
   link,
   devices,
   device,
@@ -74,5 +74,11 @@ export default combineReducers({
   ui: combineReducers({
     fetching,
     error,
+  }),
+  pagination: combineReducers({
+    applications: createNamedPaginationReducer(
+      APPLICATIONS_SHARED_NAME,
+      getApplicationId
+    ),
   }),
 })

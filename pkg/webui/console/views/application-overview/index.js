@@ -24,7 +24,8 @@ import DevicesTable from '../../containers/devices-table'
 import DataSheet from '../../../components/data-sheet'
 import ApplicationEvents from '../../containers/application-events'
 
-import { selectSelectedApplication } from '../../store/selectors/application'
+import { getApplicationId } from '../../../lib/selectors/id'
+import { selectSelectedApplication } from '../../store/selectors/applications'
 
 import style from './application-overview.styl'
 
@@ -70,7 +71,8 @@ class ApplicationOverview extends React.Component {
   }
 
   render () {
-    const { appId } = this.props.match.params
+    const { application } = this.props
+    const appId = getApplicationId(application)
 
     return (
       <Container>

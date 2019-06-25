@@ -26,7 +26,7 @@ import DeviceDataForm from '../../containers/device-data-form'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import toast from '../../../components/toast'
 
-import { selectSelectedApplicationId } from '../../store/selectors/application'
+import { selectSelectedApplicationId } from '../../store/selectors/applications'
 
 const m = defineMessages({
   updateSuccess: 'Successfully updated end device',

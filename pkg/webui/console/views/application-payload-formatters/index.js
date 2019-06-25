@@ -33,8 +33,8 @@ import {
   selectApplicationIsLinked,
   selectApplicationLink,
   selectApplicationLinkFetching,
-  selectSelectedApplicationId,
 } from '../../store/selectors/application'
+import { selectSelectedApplicationId } from '../../store/selectors/applications'
 
 import style from './application-payload-formatters.styl'
 

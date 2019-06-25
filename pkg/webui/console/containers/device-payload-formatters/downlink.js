@@ -26,7 +26,7 @@ import PAYLOAD_FORMATTER_TYPES from '../../constants/formatter-types'
 import toast from '../../../components/toast'
 
 import { updateDevice } from '../../store/actions/device'
-import { selectSelectedApplicationId } from '../../store/selectors/application'
+import { selectSelectedApplicationId } from '../../store/selectors/applications'
 import {
   selectSelectedDeviceId,
   selectSelectedDeviceFormatters,

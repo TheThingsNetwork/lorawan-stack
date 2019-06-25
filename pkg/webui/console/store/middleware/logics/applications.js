@@ -20,7 +20,7 @@ const getApplicationsLogic = createRequestLogic({
   type: applications.GET_APPS_LIST,
   latest: true,
   async process ({ action }) {
-    const { payload: { page, limit, query }} = action
+    const { params: { page, limit, query }} = action.payload
 
     const data = query
       ? await api.applications.search({
@@ -30,7 +30,8 @@ const getApplicationsLogic = createRequestLogic({
         name_contains: query,
       })
       : await api.applications.list({ page, limit })
-    return { applications: data.applications, totalCount: data.totalCount }
+
+    return { entities: data.applications, totalCount: data.totalCount }
   },
 })
 

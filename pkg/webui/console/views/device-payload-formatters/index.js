@@ -28,8 +28,8 @@ import {
   selectApplicationIsLinked,
   selectApplicationLink,
   selectApplicationLinkFetching,
-  selectSelectedApplicationId,
 } from '../../store/selectors/application'
+import { selectSelectedApplicationId } from '../../store/selectors/applications'
 import { selectSelectedDeviceId } from '../../store/selectors/device'
 
 import style from './device-payload-formatters.styl'

@@ -12,9 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { getApplicationId } from '../../../lib/selectors/id'
 import {
-  GET_APP_BASE,
   GET_APP_API_KEY_BASE,
   GET_APP_API_KEYS_LIST_BASE,
 } from '../actions/application'
@@ -36,18 +34,6 @@ import { createErrorSelector } from './error'
 
 const ENTITY = 'applications'
 const ENTITY_SINGLE = 'application'
-
-const selectApplicationStore = state => state.application
-
-// Application Entity
-export const selectSelectedApplicationId = function (state) {
-  const application = selectApplicationStore(state)
-
-  return getApplicationId(application)
-}
-export const selectSelectedApplication = state => selectApplicationStore(state)
-export const selectApplicationFetching = createFetchingSelector(GET_APP_BASE)
-export const selectApplicationError = createErrorSelector(GET_APP_BASE)
 
 // Events
 export const selectApplicationEvents = createEventsSelector(ENTITY)

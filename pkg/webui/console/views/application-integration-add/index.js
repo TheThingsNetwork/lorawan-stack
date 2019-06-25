@@ -26,7 +26,7 @@ import WebhookForm from '../../components/webhook-form'
 
 import sharedMessages from '../../../lib/shared-messages'
 
-import { selectSelectedApplicationId } from '../../store/selectors/application'
+import { selectSelectedApplicationId } from '../../store/selectors/applications'
 
 import api from '../../api'
 

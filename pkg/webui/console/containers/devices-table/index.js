@@ -24,7 +24,7 @@ import FetchTable from '../fetch-table'
 import DateTime from '../../../lib/components/date-time'
 
 import { getDevicesList } from '../../../console/store/actions/devices'
-import { selectSelectedApplicationId } from '../../store/selectors/application'
+import { selectSelectedApplicationId } from '../../store/selectors/applications'
 
 const m = defineMessages({
   deviceId: 'Device ID',
