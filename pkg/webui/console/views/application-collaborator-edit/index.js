@@ -36,13 +36,13 @@ import RightsGroup from '../../components/rights-group'
 
 import { getApplicationCollaboratorsList } from '../../store/actions/application'
 import { getApplicationsRightsList } from '../../store/actions/applications'
-import { selectSelectedApplicationId } from '../../store/selectors/applications'
 import {
+  selectSelectedApplicationId,
   selectApplicationRights,
   selectApplicationUniversalRights,
   selectApplicationRightsFetching,
   selectApplicationRightsError,
-} from '../../store/selectors/application'
+} from '../../store/selectors/applications'
 
 import api from '../../api'
 

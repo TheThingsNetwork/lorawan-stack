@@ -26,7 +26,7 @@ import {
 import {
   selectApplicationEvents,
   selectApplicationEventsStatus,
-} from '../../store/selectors/application'
+} from '../../store/selectors/applications'
 
 @connect(
   null,

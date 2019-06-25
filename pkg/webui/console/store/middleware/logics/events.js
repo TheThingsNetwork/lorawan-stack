@@ -26,7 +26,7 @@ import {
   startEventsStreamSuccess,
   stopEventsStream,
 } from '../../actions/events'
-import { selectApplicationEventsStatus } from '../../selectors/application'
+import { selectApplicationEventsStatus } from '../../selectors/applications'
 
 const createEventsConnectLogics = function (name, entity) {
   const START_EVENTS = createStartEventsStreamActionType(name)

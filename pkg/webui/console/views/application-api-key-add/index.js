@@ -27,13 +27,13 @@ import IntlHelmet from '../../../lib/components/intl-helmet'
 import { ApiKeyCreateForm } from '../../../components/api-key-form'
 
 import { getApplicationsRightsList } from '../../store/actions/applications'
-import { selectSelectedApplicationId } from '../../store/selectors/applications'
 import {
+  selectSelectedApplicationId,
   selectApplicationRights,
   selectApplicationUniversalRights,
   selectApplicationRightsError,
   selectApplicationRightsFetching,
-} from '../../store/selectors/application'
+} from '../../store/selectors/applications'
 
 import api from '../../api'
 
