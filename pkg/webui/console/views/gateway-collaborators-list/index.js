@@ -15,26 +15,31 @@
 import React from 'react'
 import { Container, Row, Col } from 'react-grid-system'
 import bind from 'autobind-decorator'
+import { connect } from 'react-redux'
 
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import CollaboratorsTable from '../../containers/collaborators-table'
 import { getGatewayCollaboratorsList } from '../../store/actions/gateway'
 import sharedMessages from '../../../lib/shared-messages'
 
+import { selectSelectedGatewayId } from '../../store/selectors/gateway'
+
 const COLLABORATORS_TABLE_SIZE = 10
 
+@connect(state => ({
+  gtwId: selectSelectedGatewayId(state),
+}))
 @bind
 export default class GatewayCollaborators extends React.Component {
-
   constructor (props) {
     super(props)
 
-    const { gtwId } = props.match.params
+    const { gtwId } = this.props
     this.getGatewayCollaboratorsList = filters => getGatewayCollaboratorsList(gtwId, filters)
   }
 
   baseDataSelector ({ collaborators }) {
-    const { gtwId } = this.props.match.params
+    const { gtwId } = this.props
     return collaborators.gateways[gtwId] || {}
   }
 
@@ -55,5 +60,3 @@ export default class GatewayCollaborators extends React.Component {
     )
   }
 }
-
-

@@ -27,34 +27,35 @@ import IntlHelmet from '../../../lib/components/intl-helmet'
 import CollaboratorForm from '../../components/collaborator-form'
 
 import {
-  gatewayRightsSelector,
-  gatewayUniversalRightsSelector,
-  gatewayRightsFetchingSelector,
-  gatewayRightsErrorSelector,
+  selectSelectedGatewayId,
+  selectGatewayRights,
+  selectGatewayUniversalRights,
+  selectGatewayRightsFetching,
+  selectGatewayRightsError,
 } from '../../store/selectors/gateway'
 
 import { getGatewaysRightsList } from '../../store/actions/gateways'
 import api from '../../api'
 
 @connect(function (state, props) {
-  const gtwId = props.match.params.gtwId
   const { collaborators } = state
 
   return {
-    gtwId,
+    gtwId: selectSelectedGatewayId(state),
     collaborators: collaborators.gateways.collaborators,
-    fetching: gatewayRightsFetchingSelector(state),
-    error: gatewayRightsErrorSelector(state),
-    rights: gatewayRightsSelector(state),
-    universalRights: gatewayUniversalRightsSelector(state),
+    fetching: selectGatewayRightsFetching(state),
+    error: selectGatewayRightsError(state),
+    rights: selectGatewayRights(state),
+    universalRights: selectGatewayUniversalRights(state),
   }
-}, function (dispatch, ownProps) {
-  const gtwId = ownProps.match.params.gtwId
-  return {
-    redirectToList: () => dispatch(push(`/console/gateways/${gtwId}/collaborators`)),
-    getGatewaysRightsList: () => dispatch(getGatewaysRightsList(gtwId)),
-  }
-})
+}, (dispatch, ownProps) => ({
+  getGatewaysRightsList: gtwId => dispatch(getGatewaysRightsList(gtwId)),
+  redirectToList: gtwId => dispatch(push(`/console/gateways/${gtwId}/collaborators`)),
+}), (stateProps, dispatchProps, ownProps) => ({
+  ...stateProps, ...dispatchProps, ...ownProps,
+  getGatewaysRightsList: () => dispatchProps.getGatewaysRightsList(stateProps.gtwId),
+  redirectToList: () => dispatchProps.redirectToList(stateProps.gtwId),
+}))
 @withBreadcrumb('gtws.single.collaborators.add', function (props) {
   const gtwId = props.gtwId
   return (

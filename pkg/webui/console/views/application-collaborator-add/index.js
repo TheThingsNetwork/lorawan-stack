@@ -46,13 +46,14 @@ import api from '../../api'
     fetching: selectApplicationRightsFetching(state),
     error: selectApplicationRightsError(state),
   }
-}, function (dispatch, ownProps) {
-  const appId = ownProps.match.params.appId
-  return {
-    redirectToList: () => dispatch(push(`/console/applications/${appId}/collaborators`)),
-    getApplicationsRightsList: () => dispatch(getApplicationsRightsList(appId)),
-  }
-})
+}, (dispatch, ownProps) => ({
+  redirectToList: appId => dispatch(push(`/console/applications/${appId}/collaborators`)),
+  getApplicationsRightsList: appId => dispatch(getApplicationsRightsList(appId)),
+}), (stateProps, dispatchProps, ownProps) => ({
+  ...stateProps, ...dispatchProps, ...ownProps,
+  redirectToList: () => dispatchProps.redirectToList(stateProps.appId),
+  getApplicationsRightsList: () => dispatchProps.getApplicationsRightsList(stateProps.appId),
+}))
 @withBreadcrumb('apps.single.collaborators.add', function (props) {
   const appId = props.appId
   return (

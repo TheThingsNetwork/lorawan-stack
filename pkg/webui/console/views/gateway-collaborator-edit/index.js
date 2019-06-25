@@ -31,10 +31,10 @@ import { getGatewayCollaboratorsList } from '../../store/actions/gateway'
 import { getGatewaysRightsList } from '../../store/actions/gateways'
 import {
   selectSelectedGatewayId,
-  gatewayRightsSelector,
-  gatewayUniversalRightsSelector,
-  gatewayRightsFetchingSelector,
-  gatewayRightsErrorSelector,
+  selectGatewayRights,
+  selectGatewayUniversalRights,
+  selectGatewayRightsFetching,
+  selectGatewayRightsError,
 } from '../../store/selectors/gateway'
 import api from '../../api'
 
@@ -48,30 +48,32 @@ import api from '../../api'
   const collaborator = gtwCollaborators ? gtwCollaborators.collaborators
     .find(c => c.id === collaboratorId) : undefined
 
-  const fetching = gatewayRightsFetchingSelector(state, props) || collaboratorsFetching
-  const error = gatewayRightsErrorSelector(state, props) || collaboratorsError
+  const fetching = selectGatewayRightsFetching(state) || collaboratorsFetching
+  const error = selectGatewayRightsError(state) || collaboratorsError
 
   return {
     collaboratorId,
     collaborator,
     gtwId,
-    rights: gatewayRightsSelector(state, props),
-    universalRights: gatewayUniversalRightsSelector(state, props),
+    rights: selectGatewayRights(state),
+    universalRights: selectGatewayUniversalRights(state),
     fetching,
     error,
   }
-}, function (dispatch, ownProps) {
-  const { gtwId } = ownProps.match.params
-  return {
-    async loadData () {
-      await dispatch(getGatewaysRightsList(gtwId))
-      dispatch(getGatewayCollaboratorsList(gtwId))
-    },
-    redirectToList () {
-      dispatch(replace(`/console/gateways/${gtwId}/collaborators`))
-    },
-  }
-})
+
+}, (dispatch, ownProps) => ({
+  async loadData (gtwId) {
+    await dispatch(getGatewaysRightsList(gtwId))
+    dispatch(getGatewayCollaboratorsList(gtwId))
+  },
+  redirectToList (gtwId) {
+    dispatch(replace(`/console/gateways/${gtwId}/collaborators`))
+  },
+}), (stateProps, dispatchProps, ownProps) => ({
+  ...stateProps, ...dispatchProps, ...ownProps,
+  loadData: () => dispatchProps.loadData(stateProps.gtwId),
+  redirectToList: () => dispatchProps.redirectToList(stateProps.gtwId),
+}))
 @withBreadcrumb('gtws.single.collaborators.edit', function (props) {
   const { gtwId, collaboratorId } = props
 
