@@ -208,10 +208,32 @@ func (m *ApplicationPubSub) ValidateFields(paths ...string) error {
 				}
 			}
 
-		case "downlink_push_topic":
-			// no validation rules for DownlinkPushTopic
-		case "downlink_replace_topic":
-			// no validation rules for DownlinkReplaceTopic
+		case "base_topic":
+			// no validation rules for BaseTopic
+		case "downlink_push":
+
+			if v, ok := interface{}(m.GetDownlinkPush()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationPubSubValidationError{
+						field:  "downlink_push",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "downlink_replace":
+
+			if v, ok := interface{}(m.GetDownlinkReplace()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationPubSubValidationError{
+						field:  "downlink_replace",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		case "uplink_message":
 
 			if v, ok := interface{}(m.GetUplinkMessage()).(interface{ ValidateFields(...string) error }); ok {

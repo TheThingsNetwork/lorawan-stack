@@ -6196,12 +6196,16 @@
         "provider": {
           "$ref": "#/definitions/ApplicationPubSubProvider"
         },
-        "downlink_push_topic": {
+        "base_topic": {
           "type": "string",
+          "description": "Base topic name to which the messages topic is appended."
+        },
+        "downlink_push": {
+          "$ref": "#/definitions/v3ApplicationPubSubMessage",
           "description": "The topic to which the Application Server subscribes for downlink queue push operations."
         },
-        "downlink_replace_topic": {
-          "type": "string",
+        "downlink_replace": {
+          "$ref": "#/definitions/v3ApplicationPubSubMessage",
           "description": "The topic to which the Application Server subscribes for downlink queue replace operations."
         },
         "uplink_message": {
@@ -6258,7 +6262,7 @@
       "properties": {
         "topic": {
           "type": "string",
-          "description": "The topic on which the Application Server publishes the messages."
+          "description": "The topic on which the Application Server publishes or receives the messages."
         }
       }
     },

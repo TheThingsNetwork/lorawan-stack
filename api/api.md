@@ -758,8 +758,9 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 | `attributes` | [`ApplicationPubSub.AttributesEntry`](#ttn.lorawan.v3.ApplicationPubSub.AttributesEntry) | repeated | Provider specific attributes used for authentication and settings. |
 | `format` | [`string`](#string) |  | The format to use for the body. Supported values depend on the Application Server configuration. |
 | `provider` | [`ApplicationPubSub.Provider`](#ttn.lorawan.v3.ApplicationPubSub.Provider) |  |  |
-| `downlink_push_topic` | [`string`](#string) |  | The topic to which the Application Server subscribes for downlink queue push operations. |
-| `downlink_replace_topic` | [`string`](#string) |  | The topic to which the Application Server subscribes for downlink queue replace operations. |
+| `base_topic` | [`string`](#string) |  | Base topic name to which the messages topic is appended. |
+| `downlink_push` | [`ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message) |  | The topic to which the Application Server subscribes for downlink queue push operations. |
+| `downlink_replace` | [`ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message) |  | The topic to which the Application Server subscribes for downlink queue replace operations. |
 | `uplink_message` | [`ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message) |  |  |
 | `join_accept` | [`ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message) |  |  |
 | `downlink_ack` | [`ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message) |  |  |
@@ -787,7 +788,7 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `topic` | [`string`](#string) |  | The topic on which the Application Server publishes the messages. |
+| `topic` | [`string`](#string) |  | The topic on which the Application Server publishes or receives the messages. |
 
 ### <a name="ttn.lorawan.v3.ApplicationPubSubFormats">Message `ApplicationPubSubFormats`</a>
 

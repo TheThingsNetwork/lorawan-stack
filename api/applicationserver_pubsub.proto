@@ -53,23 +53,27 @@ message ApplicationPubSub {
   }
   Provider provider = 6 [(validate.rules).message.required = true, (validate.rules).enum.defined_only = true];
 
-  // The topic to which the Application Server subscribes for downlink queue push operations.
-  string downlink_push_topic = 7;
-  // The topic to which the Application Server subscribes for downlink queue replace operations.
-  string downlink_replace_topic = 8;
+  // Base topic name to which the messages topic is appended.
+  string base_topic = 7;
 
   message Message {
-    // The topic on which the Application Server publishes the messages.
+    // The topic on which the Application Server publishes or receives the messages.
     string topic = 1;
   }
-  Message uplink_message = 9;
-  Message join_accept = 10;
-  Message downlink_ack = 11;
-  Message downlink_nack = 12;
-  Message downlink_sent = 13;
-  Message downlink_failed = 14;
-  Message downlink_queued = 15;
-  Message location_solved = 16;
+
+  // The topic to which the Application Server subscribes for downlink queue push operations.
+  Message downlink_push = 8;
+  // The topic to which the Application Server subscribes for downlink queue replace operations.
+  Message downlink_replace = 9;
+
+  Message uplink_message = 10;
+  Message join_accept = 11;
+  Message downlink_ack = 12;
+  Message downlink_nack = 13;
+  Message downlink_sent = 14;
+  Message downlink_failed = 15;
+  Message downlink_queued = 16;
+  Message location_solved = 17;
 }
 
 message ApplicationPubSubs {

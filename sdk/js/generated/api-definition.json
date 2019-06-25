@@ -322,6 +322,78 @@
       ]
     }
   },
+  "ApplicationPubSubRegistry": {
+    "GetFormats": {
+      "file": "lorawan-stack/api/applicationserver_pubsub.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/as/pubsub-formats",
+          "parameters": []
+        }
+      ]
+    },
+    "Get": {
+      "file": "lorawan-stack/api/applicationserver_pubsub.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/as/pubsub/{ids.application_ids.application_id}/{ids.pubsub_id}",
+          "parameters": [
+            "ids.application_ids.application_id",
+            "ids.pubsub_id"
+          ]
+        }
+      ]
+    },
+    "List": {
+      "file": "lorawan-stack/api/applicationserver_pubsub.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/as/pubsub/{application_ids.application_id}",
+          "parameters": [
+            "application_ids.application_id"
+          ]
+        }
+      ]
+    },
+    "Set": {
+      "file": "lorawan-stack/api/applicationserver_pubsub.proto",
+      "http": [
+        {
+          "method": "put",
+          "pattern": "/as/pubsub/{pubsub.ids.application_ids.application_id}/{pubsub.ids.pubsub_id}",
+          "body": "*",
+          "parameters": [
+            "pubsub.ids.application_ids.application_id",
+            "pubsub.ids.pubsub_id"
+          ]
+        },
+        {
+          "method": "post",
+          "pattern": "/as/pubsub/{pubsub.ids.application_ids.application_id}",
+          "body": "*",
+          "parameters": [
+            "pubsub.ids.application_ids.application_id"
+          ]
+        }
+      ]
+    },
+    "Delete": {
+      "file": "lorawan-stack/api/applicationserver_pubsub.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/as/pubsub/{application_ids.application_id}/{pubsub_id}",
+          "parameters": [
+            "application_ids.application_id",
+            "pubsub_id"
+          ]
+        }
+      ]
+    }
+  },
   "ApplicationWebhookRegistry": {
     "GetFormats": {
       "file": "lorawan-stack/api/applicationserver_web.proto",

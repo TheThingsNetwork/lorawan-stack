@@ -118,25 +118,57 @@ func (dst *ApplicationPubSub) SetFields(src *ApplicationPubSub, paths ...string)
 				var zero ApplicationPubSub_Provider
 				dst.Provider = zero
 			}
-		case "downlink_push_topic":
+		case "base_topic":
 			if len(subs) > 0 {
-				return fmt.Errorf("'downlink_push_topic' has no subfields, but %s were specified", subs)
+				return fmt.Errorf("'base_topic' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.DownlinkPushTopic = src.DownlinkPushTopic
+				dst.BaseTopic = src.BaseTopic
 			} else {
 				var zero string
-				dst.DownlinkPushTopic = zero
+				dst.BaseTopic = zero
 			}
-		case "downlink_replace_topic":
+		case "downlink_push":
 			if len(subs) > 0 {
-				return fmt.Errorf("'downlink_replace_topic' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.DownlinkReplaceTopic = src.DownlinkReplaceTopic
+				newDst := dst.DownlinkPush
+				if newDst == nil {
+					newDst = &ApplicationPubSub_Message{}
+					dst.DownlinkPush = newDst
+				}
+				var newSrc *ApplicationPubSub_Message
+				if src != nil {
+					newSrc = src.DownlinkPush
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
 			} else {
-				var zero string
-				dst.DownlinkReplaceTopic = zero
+				if src != nil {
+					dst.DownlinkPush = src.DownlinkPush
+				} else {
+					dst.DownlinkPush = nil
+				}
+			}
+		case "downlink_replace":
+			if len(subs) > 0 {
+				newDst := dst.DownlinkReplace
+				if newDst == nil {
+					newDst = &ApplicationPubSub_Message{}
+					dst.DownlinkReplace = newDst
+				}
+				var newSrc *ApplicationPubSub_Message
+				if src != nil {
+					newSrc = src.DownlinkReplace
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DownlinkReplace = src.DownlinkReplace
+				} else {
+					dst.DownlinkReplace = nil
+				}
 			}
 		case "uplink_message":
 			if len(subs) > 0 {

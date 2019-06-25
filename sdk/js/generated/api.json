@@ -1662,8 +1662,8 @@
               }
             },
             {
-              "name": "downlink_push_topic",
-              "description": "The topic to which the Application Server subscribes for downlink queue push operations.",
+              "name": "base_topic",
+              "description": "Base topic name to which the messages topic is appended.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -1672,12 +1672,22 @@
               "defaultValue": ""
             },
             {
-              "name": "downlink_replace_topic",
+              "name": "downlink_push",
+              "description": "The topic to which the Application Server subscribes for downlink queue push operations.",
+              "label": "",
+              "type": "Message",
+              "longType": "ApplicationPubSub.Message",
+              "fullType": "ttn.lorawan.v3.ApplicationPubSub.Message",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "downlink_replace",
               "description": "The topic to which the Application Server subscribes for downlink queue replace operations.",
               "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
+              "type": "Message",
+              "longType": "ApplicationPubSub.Message",
+              "fullType": "ttn.lorawan.v3.ApplicationPubSub.Message",
               "ismap": false,
               "defaultValue": ""
             },
@@ -1805,7 +1815,7 @@
           "fields": [
             {
               "name": "topic",
-              "description": "The topic on which the Application Server publishes the messages.",
+              "description": "The topic on which the Application Server publishes or receives the messages.",
               "label": "",
               "type": "string",
               "longType": "string",
