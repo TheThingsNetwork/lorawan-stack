@@ -156,7 +156,7 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		c.RegisterWeb(webhooks)
 	}
 
-	if pubsub, err := pubsub.Start(as.Component, as, conf.PubSub.Registry); err != nil {
+	if pubsub, err := pubsub.Start(c, as, conf.PubSub.Registry); err != nil {
 		return nil, err
 	} else if pubsub != nil {
 		as.pubsub = pubsub

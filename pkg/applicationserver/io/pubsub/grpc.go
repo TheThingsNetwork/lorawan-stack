@@ -89,7 +89,7 @@ func (ps *PubSub) Set(ctx context.Context, req *ttnpb.SetApplicationPubSubReques
 	if err := ps.cancelIntegration(ctx, req.ApplicationPubSubIdentifiers); err != nil && !errors.IsNotFound(err) {
 		log.FromContext(ctx).WithError(err).Warn("Failed to cancel integration")
 	}
-	ps.startIntegrationTask(ps.FillContext(ps.Context()), req.ApplicationPubSubIdentifiers)
+	ps.startIntegrationTask(ps.ctx, req.ApplicationPubSubIdentifiers)
 
 	res := &ttnpb.ApplicationPubSub{}
 	if err := res.SetFields(pubsub, req.FieldMask.Paths...); err != nil {
