@@ -16,8 +16,8 @@ import { getApplicationId } from '../../../lib/selectors/id'
 import {
   GET_APP,
   GET_APP_SUCCESS,
-} from '../actions/application'
-import { GET_APPS_LIST_SUCCESS } from '../actions/applications'
+  GET_APPS_LIST_SUCCESS,
+} from '../actions/applications'
 
 const application = function (state = {}, application) {
   return {

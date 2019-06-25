@@ -14,7 +14,7 @@
 
 import { isNotFoundError } from '../../../../lib/errors/utils'
 import api from '../../../api'
-import * as application from '../../actions/application'
+import * as application from '../../actions/applications'
 import * as link from '../../actions/link'
 import * as webhooks from '../../actions/webhooks'
 import * as webhook from '../../actions/webhook'
@@ -126,6 +126,6 @@ export default [
   getWebhooksLogic,
   getWebhookLogic,
   getWebhookFormatsLogic,
-  ...createEventsConnectLogics(application.SHARED_NAME, 'application'),
+  ...createEventsConnectLogics(application.SHARED_NAME_SINGLE, 'application'),
   getApplicationLinkLogic,
 ]

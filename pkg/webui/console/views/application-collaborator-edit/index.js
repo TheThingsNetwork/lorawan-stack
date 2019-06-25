@@ -34,8 +34,10 @@ import toast from '../../../components/toast'
 import SubmitBar from '../../../components/submit-bar'
 import RightsGroup from '../../components/rights-group'
 
-import { getApplicationCollaboratorsList } from '../../store/actions/application'
-import { getApplicationsRightsList } from '../../store/actions/applications'
+import {
+  getApplicationCollaboratorsList,
+  getApplicationsRightsList,
+} from '../../store/actions/applications'
 import {
   selectSelectedApplicationId,
   selectApplicationRights,

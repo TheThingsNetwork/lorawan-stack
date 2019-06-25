@@ -15,12 +15,10 @@
 import {
   GET_APPS_LIST_BASE,
   GET_APPS_RIGHTS_LIST_BASE,
-} from '../actions/applications'
-import {
   GET_APP_BASE,
   GET_APP_API_KEY_BASE,
   GET_APP_API_KEYS_LIST_BASE,
-} from '../actions/application'
+} from '../actions/applications'
 import { GET_APP_LINK_BASE } from '../actions/link'
 
 import {
