@@ -29,27 +29,29 @@ type HugoConfig struct {
 // Docs namespace
 type Docs mg.Namespace
 
-var hugoArgs = []string{"run", "github.com/gohugoio/hugo", "-s", "doc"}
+func execHugo(args ...string) error {
+	return execGo("run", append([]string{"github.com/gohugoio/hugo", "-s", "doc"}, args...)...)
+}
 
 // Gen generates static website from the doc in doc/public.
 func (Docs) Gen() error {
 	baseUrl := getDocURL()
-	args := append(hugoArgs, "-d", "public/")
+	var args []string
 	if baseUrl != "" {
-		args = append(args, "--baseUrl", baseUrl)
+		args = []string{"--baseUrl", baseUrl + currentVersion}
 	}
-	return sh.RunWith(map[string]string{"GO111MODULE": "on"}, "go", args...)
+	return execHugo(args...)
 }
 
 // Gen generates static website from the doc in doc/public/$version.
 func (Docs) GenVersion() error {
 	mg.Deps(Version.getCurrent)
 	baseUrl := getDocURL()
-	args := append(hugoArgs, "-d", "public/"+currentVersion)
+	var args []string
 	if baseUrl != "" {
-		args = append(args, "--baseUrl", baseUrl+currentVersion)
+		args = []string{"--baseUrl", baseUrl + currentVersion}
 	}
-	return sh.RunWith(map[string]string{"GO111MODULE": "on"}, "go", args...)
+	return execHugo(args...)
 }
 
 // Docs install documentation dependencies.
@@ -59,12 +61,11 @@ func (Docs) Deps() error {
 
 // Server starts live documentation server.
 func (Docs) Server() error {
-	return sh.RunWith(map[string]string{"GO111MODULE": "on"}, "go", append(hugoArgs, "server")...)
+	return execHugo("server")
 }
 
 // Config generate hugo documentation with git metadata.
 func (Docs) Config() error {
-
 	mg.Deps(Version.getCurrent)
 	tmpl, err := ioutil.ReadFile("./doc/config.tmpl")
 	if err != nil {
@@ -78,8 +79,7 @@ func (Docs) Config() error {
 	if err != nil {
 		return nil
 	}
-	err = t.Execute(file, cfg)
-	return err
+	return t.Execute(file, cfg)
 }
 
 func getDocURL() string {
