@@ -15,7 +15,6 @@
 import { createLogic } from 'redux-logic'
 
 import CONNECTION_STATUS from '../../../constants/connection-status'
-import api from '../../../api'
 import {
   createStartEventsStreamActionType,
   createStopEventsStreamActionType,
@@ -26,11 +25,20 @@ import {
   startEventsStreamSuccess,
   stopEventsStream,
 } from '../../actions/events'
-import { selectApplicationEventsStatus } from '../../selectors/applications'
+import { createEventsStatusSelector } from '../../selectors/events'
 
+/**
+ * Creates `redux-logic` logic from processing entity events.
+ * @param {string} reducerName - The name of an entity used to create the events reducer.
+ * @param {string} entityName - The name of an entity.
+ * @param {Function} onEventsStart - A function to be called to start the events stream.
+ * Should accept a list of entity ids.
+ * @returns {Object} - The `redux-logic` (decorated) logic.
+ */
 const createEventsConnectLogics = function (
   reducerName,
-  entity
+  entityName,
+  onEventsStart,
 ) {
   const START_EVENTS = createStartEventsStreamActionType(reducerName)
   const START_EVENTS_FAILURE = createStartEventsStreamFailureActionType(reducerName)
@@ -40,6 +48,7 @@ const createEventsConnectLogics = function (
   const stopEvents = stopEventsStream(reducerName)
   const getEventSuccess = getEventMessageSuccess(reducerName)
   const getEventFailure = getEventMessageFailure(reducerName)
+  const selectEntityEventsStatus = createEventsStatusSelector(entityName)
 
   let channel = null
 
@@ -54,7 +63,7 @@ const createEventsConnectLogics = function (
         }
 
         // only proceed if not already connected
-        const status = selectApplicationEventsStatus(getState(), { id })
+        const status = selectEntityEventsStatus(getState(), id)
         const connected = status === CONNECTION_STATUS.CONNECTED
         const connecting = status === CONNECTION_STATUS.CONNECTING
         if (connected || connecting) {
@@ -64,11 +73,10 @@ const createEventsConnectLogics = function (
         allow(action)
       },
       async process ({ action }, dispatch, done) {
-        const { eventsSubscribe } = api[entity]
         const { id } = action
 
         try {
-          channel = await eventsSubscribe([ id ])
+          channel = await onEventsStart([ id ])
           channel.on('start', () => dispatch(startEventsSuccess(id)))
           channel.on('event', message => dispatch(getEventSuccess(id, message)))
           channel.on('error', error => dispatch(getEventFailure(id, error)))
@@ -88,7 +96,7 @@ const createEventsConnectLogics = function (
         }
 
         // only proceed if connected
-        const status = selectApplicationEventsStatus(getState(), { id })
+        const status = selectEntityEventsStatus(getState(), id)
         const disconnected = status === CONNECTION_STATUS.DISCONNECTED
         const unknown = status === CONNECTION_STATUS.UNKNOWN
         if (disconnected || unknown) {
@@ -97,7 +105,7 @@ const createEventsConnectLogics = function (
 
         allow(action)
       },
-      process (helpers, dispatch, done) {
+      process (_, __, done) {
         channel.close()
         done()
       },

@@ -158,5 +158,9 @@ export default [
   getWebhookLogic,
   getWebhookFormatsLogic,
   getApplicationLinkLogic,
-  ...createEventsConnectLogics(applications.SHARED_NAME_SINGLE, 'application'),
+  ...createEventsConnectLogics(
+    applications.SHARED_NAME_SINGLE,
+    'applications',
+    api.application.eventsSubscribe,
+  ),
 ]

@@ -118,7 +118,11 @@ export default [
   getGatewayLogic,
   startGatewayStatisticsLogic,
   updateGatewayStatisticsLogic,
-  ...createEventsConnectLogics(gateway.SHARED_NAME, 'gateway'),
+  ...createEventsConnectLogics(
+    gateway.SHARED_NAME,
+    'gateways',
+    api.gateway.eventsSubscribe,
+  ),
   getGatewayApiKeysLogic,
   getGatewayApiKeyLogic,
 ]
