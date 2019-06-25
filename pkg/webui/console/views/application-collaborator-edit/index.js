@@ -64,8 +64,8 @@ import api from '../../api'
     error,
   }
 }, (dispatch, ownProps) => ({
-  async loadData (appId) {
-    await dispatch(getApplicationsRightsList(appId))
+  loadData (appId) {
+    dispatch(getApplicationsRightsList(appId))
     dispatch(getApplicationCollaboratorsList(appId))
   },
   redirectToList (appId) {

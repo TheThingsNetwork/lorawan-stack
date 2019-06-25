@@ -63,7 +63,7 @@ import api from '../../api'
 
 }, (dispatch, ownProps) => ({
   async loadData (gtwId) {
-    await dispatch(getGatewaysRightsList(gtwId))
+    dispatch(getGatewaysRightsList(gtwId))
     dispatch(getGatewayCollaboratorsList(gtwId))
   },
   redirectToList (gtwId) {
