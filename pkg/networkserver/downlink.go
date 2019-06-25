@@ -548,7 +548,7 @@ func downlinkPathsForClassA(rxDelay ttnpb.RxDelay, ups ...*ttnpb.UplinkMessage) 
 	maxDelta := time.Duration(rxDelay) * time.Second
 	for i := len(ups) - 1; i >= 0; i-- {
 		up := ups[i]
-		delta := time.Now().Sub(up.ReceivedAt)
+		delta := time.Since(up.ReceivedAt)
 		rx1, rx2 := delta < maxDelta, delta < maxDelta+time.Second
 		if paths := downlinkPathsFromMetadata(up.RxMetadata...); len(paths) > 0 {
 			return rx1, rx2, paths

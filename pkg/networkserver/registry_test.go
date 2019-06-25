@@ -63,7 +63,6 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 	a.So(ret, should.BeNil)
 
 	var rets []*ttnpb.EndDevice
-	rets = nil
 	err = reg.RangeByAddr(ctx, pb.Session.DevAddr, ttnpb.EndDeviceFieldPathsTopLevel, func(dev *ttnpb.EndDevice) bool {
 		rets = append(rets, dev)
 		return true
