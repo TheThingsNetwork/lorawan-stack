@@ -107,9 +107,7 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		},
 	}
 
-	as.grpc.asDevices = asEndDeviceRegistryServer{
-		registry: as.deviceRegistry,
-	}
+	as.grpc.asDevices = asEndDeviceRegistryServer{AS: as}
 	as.grpc.appAs = iogrpc.New(as)
 
 	ctx, cancel := context.WithCancel(as.Context())
