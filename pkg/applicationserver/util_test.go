@@ -52,6 +52,9 @@ func withDevAddr(ids ttnpb.EndDeviceIdentifiers, devAddr types.DevAddr) ttnpb.En
 	ids.DevAddr = &devAddr
 	return ids
 }
+func aes128KeyPtr(key types.AES128Key) *types.AES128Key {
+	return &key
+}
 
 type mockNS struct {
 	linkCh          chan ttnpb.ApplicationIdentifiers

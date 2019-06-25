@@ -19,12 +19,13 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 type asEndDeviceRegistryServer struct {
-	registry DeviceRegistry
+	AS *ApplicationServer
 }
 
 // Get implements ttnpb.AsEndDeviceRegistryServer.
@@ -32,7 +33,25 @@ func (r asEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDev
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
 		return nil, err
 	}
-	return r.registry.Get(ctx, req.EndDeviceIdentifiers, req.FieldMask.Paths)
+	dev, err := r.AS.deviceRegistry.Get(ctx, req.EndDeviceIdentifiers, req.FieldMask.Paths)
+	if err != nil {
+		return nil, err
+	}
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.app_s_key") && dev.GetSession().GetAppSKey() != nil {
+		key, err := cryptoutil.UnwrapAES128Key(*dev.Session.AppSKey, r.AS.KeyVault)
+		if err != nil {
+			return nil, err
+		}
+		dev.Session.AppSKey = &ttnpb.KeyEnvelope{Key: &key}
+	}
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "pending_session.keys.app_s_key") && dev.GetPendingSession().GetAppSKey() != nil {
+		key, err := cryptoutil.UnwrapAES128Key(*dev.PendingSession.AppSKey, r.AS.KeyVault)
+		if err != nil {
+			return nil, err
+		}
+		dev.PendingSession.AppSKey = &ttnpb.KeyEnvelope{Key: &key}
+	}
+	return dev, nil
 }
 
 var (
@@ -49,7 +68,7 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 	if err := rights.RequireApplication(ctx, req.EndDevice.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
-	return r.registry.Set(ctx, req.EndDevice.EndDeviceIdentifiers, req.FieldMask.Paths, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+	return r.AS.deviceRegistry.Set(ctx, req.EndDevice.EndDeviceIdentifiers, req.FieldMask.Paths, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		sets := req.FieldMask.Paths
 		if dev != nil {
 			if err := ttnpb.ProhibitFields(req.FieldMask.Paths, "ids.dev_addr"); err != nil {
@@ -88,7 +107,7 @@ func (r asEndDeviceRegistryServer) Delete(ctx context.Context, ids *ttnpb.EndDev
 	if err := rights.RequireApplication(ctx, ids.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
-	_, err := r.registry.Set(ctx, *ids, nil, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+	_, err := r.AS.deviceRegistry.Set(ctx, *ids, nil, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		return nil, nil, nil
 	})
 	if err != nil {

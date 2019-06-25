@@ -22,12 +22,15 @@ import (
 // MemKeyVault is a KeyVault that uses KEKs from memory.
 // This implementation does not provide any security as KEKs are stored in the clear.
 type MemKeyVault struct {
+	ComponentPrefixKEKLabeler
 	m map[string][]byte
 }
 
 // NewMemKeyVault returns a MemKeyVault.
 func NewMemKeyVault(m map[string][]byte) *MemKeyVault {
-	return &MemKeyVault{m}
+	return &MemKeyVault{
+		m: m,
+	}
 }
 
 var errKEKNotFound = errors.DefineNotFound("kek_not_found", "KEK with label `{label}` not found")

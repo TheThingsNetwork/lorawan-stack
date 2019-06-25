@@ -60,5 +60,6 @@ var (
 	errUnknownAppEUI                  = errors.Define("unknown_app_eui", "AppEUI specified is not known")
 	errUnsupportedLoRaWANMajorVersion = errors.DefineInvalidArgument("lorawan_major_version", "unsupported LoRaWAN major version: `{major}`")
 	errUnsupportedMACVersion          = errors.DefineInvalidArgument("mac_version", "unsupported MAC version: `{version}`")
+	errWrapKey                        = errors.Define("wrap_key", "failed to wrap key")
 	errWrongPayloadType               = errors.DefineInvalidArgument("payload_type", "wrong payload type: {type}")
 )

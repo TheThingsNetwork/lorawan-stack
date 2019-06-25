@@ -130,7 +130,7 @@ type Buffer []byte
 
 // MarshalJSON marshals the binary data to a hexadecimal string.
 func (b Buffer) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf(`"%s"`, hex.EncodeToString(b))), nil
+	return []byte(fmt.Sprintf(`"%s"`, strings.ToUpper(hex.EncodeToString(b)))), nil
 }
 
 // UnmarshalJSON unmarshals a hexadecimal string to binary data.
@@ -151,12 +151,18 @@ type KeyEnvelope ttnpb.KeyEnvelope
 
 // MarshalJSON marshals the key envelope to JSON.
 func (k KeyEnvelope) MarshalJSON() ([]byte, error) {
+	var key []byte
+	if k.KEKLabel != "" {
+		key = k.EncryptedKey
+	} else if k.Key != nil {
+		key = k.Key[:]
+	}
 	return json.Marshal(struct {
 		KEKLabel string
 		AESKey   Buffer
 	}{
 		KEKLabel: k.KEKLabel,
-		AESKey:   Buffer(k.EncryptedKey),
+		AESKey:   Buffer(key),
 	})
 }
 
@@ -169,9 +175,18 @@ func (k *KeyEnvelope) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &aux); err != nil {
 		return err
 	}
+	var key *types.AES128Key
+	var encryptedKey []byte
+	if aux.KEKLabel != "" {
+		encryptedKey = aux.AESKey
+	} else {
+		key = new(types.AES128Key)
+		copy(key[:], aux.AESKey)
+	}
 	*k = KeyEnvelope{
 		KEKLabel:     aux.KEKLabel,
-		EncryptedKey: aux.AESKey,
+		Key:          key,
+		EncryptedKey: encryptedKey,
 	}
 	return nil
 }

@@ -18,15 +18,16 @@ import (
 	"context"
 	"crypto/x509/pkix"
 	"fmt"
-	"go.thethings.network/lorawan-stack/pkg/auth"
 	"net"
 	"testing"
 	"time"
 
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/auth"
 	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	. "go.thethings.network/lorawan-stack/pkg/joinserver"
@@ -129,7 +130,8 @@ func TestHandleJoin(t *testing.T) {
 		Name        string
 		ContextFunc func(context.Context) context.Context
 
-		Device *ttnpb.EndDevice
+		KeyVault map[string][]byte
+		Device   *ttnpb.EndDevice
 
 		NextLastDevNonce  uint32
 		NextLastJoinNonce uint32
@@ -141,7 +143,7 @@ func TestHandleJoin(t *testing.T) {
 		ErrorAssertion func(error) bool
 	}{
 		{
-			Name:        "1.1.0/cluster auth/new device",
+			Name:        "1.1.0/cluster auth/new device/unwrapped keys",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -235,6 +237,130 @@ func TestHandleJoin(t *testing.T) {
 							types.JoinNonce{0x00, 0x00, 0x01},
 							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 							types.DevNonce{0x00, 0x00})),
+					},
+				},
+			},
+		},
+		{
+			Name:        "1.1.0/cluster auth/new device/wrapped keys",
+			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
+			KeyVault: map[string][]byte{
+				"ns:" + nsAddr: {0x3f, 0x36, 0x7b, 0xa1, 0x16, 0x67, 0xd9, 0x8b, 0x89, 0x00, 0x47, 0x77, 0x84, 0xf6, 0xfe, 0x50, 0x56, 0x67, 0x12, 0xab, 0x71, 0x96, 0x04, 0x6b, 0x9f, 0x2b, 0xc2, 0x50, 0xdf, 0xc8, 0xc1, 0xa2},
+				"as:" + asAddr: {0xed, 0x8a, 0x2e, 0x97, 0xf6, 0x8e, 0xbb, 0x79, 0x4d, 0x96, 0x4b, 0xd6, 0x14, 0xbb, 0xbc, 0xf2, 0x25, 0xc3, 0x7d, 0x61, 0xa9, 0xfe, 0xd0, 0x83, 0x7b, 0x07, 0xc0, 0x5f, 0x02, 0x52, 0x3c, 0x8b},
+			},
+			Device: &ttnpb.EndDevice{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"},
+					DeviceID:               "test-dev",
+				},
+				RootKeys: &ttnpb.RootKeys{
+					AppKey: &ttnpb.KeyEnvelope{
+						Key: &appKey,
+					},
+					NwkKey: &ttnpb.KeyEnvelope{
+						Key: &nwkKey,
+					},
+				},
+				LoRaWANVersion:           ttnpb.MAC_V1_1,
+				ApplicationServerAddress: asAddr,
+				NetworkServerAddress:     nsAddr,
+			},
+			NextLastJoinNonce: 1,
+			JoinRequest: &ttnpb.JoinRequest{
+				SelectedMACVersion: ttnpb.MAC_V1_1,
+				RawPayload: []byte{
+					/* MHDR */
+					0x00,
+
+					/* MACPayload */
+					/** JoinEUI **/
+					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42,
+					/** DevEUI **/
+					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
+					/** DevNonce **/
+					0x00, 0x00,
+
+					/* MIC */
+					0x55, 0x17, 0x54, 0x8e,
+				},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				NetID:   types.NetID{0x42, 0xff, 0xff},
+				DownlinkSettings: ttnpb.DLSettings{
+					OptNeg:      true,
+					Rx1DROffset: 0x7,
+					Rx2DR:       0xf,
+				},
+				RxDelay: 0x42,
+			},
+			JoinResponse: &ttnpb.JoinResponse{
+				RawPayload: append([]byte{
+					/* MHDR */
+					0x20},
+					mustEncryptJoinAccept(nwkKey, []byte{
+						/* JoinNonce */
+						0x01, 0x00, 0x00,
+						/* NetID */
+						0xff, 0xff, 0x42,
+						/* DevAddr */
+						0xff, 0xff, 0xff, 0x42,
+						/* DLSettings */
+						0xff,
+						/* RxDelay */
+						0x42,
+
+						/* MIC */
+						0xeb, 0xcd, 0x74, 0x59,
+					})...),
+				SessionKeys: ttnpb.SessionKeys{
+					AppSKey: &ttnpb.KeyEnvelope{
+						KEKLabel: "as:66.66.66.255",
+						EncryptedKey: MustWrapAES128Key(
+							crypto.DeriveAppSKey(
+								appKey,
+								types.JoinNonce{0x00, 0x00, 0x01},
+								types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+								types.DevNonce{0x00, 0x00},
+							),
+							[]byte{0xed, 0x8a, 0x2e, 0x97, 0xf6, 0x8e, 0xbb, 0x79, 0x4d, 0x96, 0x4b, 0xd6, 0x14, 0xbb, 0xbc, 0xf2, 0x25, 0xc3, 0x7d, 0x61, 0xa9, 0xfe, 0xd0, 0x83, 0x7b, 0x07, 0xc0, 0x5f, 0x02, 0x52, 0x3c, 0x8b},
+						),
+					},
+					SNwkSIntKey: &ttnpb.KeyEnvelope{
+						KEKLabel: "ns:66.66.66.66",
+						EncryptedKey: MustWrapAES128Key(
+							crypto.DeriveSNwkSIntKey(
+								nwkKey,
+								types.JoinNonce{0x00, 0x00, 0x01},
+								types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+								types.DevNonce{0x00, 0x00},
+							),
+							[]byte{0x3f, 0x36, 0x7b, 0xa1, 0x16, 0x67, 0xd9, 0x8b, 0x89, 0x00, 0x47, 0x77, 0x84, 0xf6, 0xfe, 0x50, 0x56, 0x67, 0x12, 0xab, 0x71, 0x96, 0x04, 0x6b, 0x9f, 0x2b, 0xc2, 0x50, 0xdf, 0xc8, 0xc1, 0xa2},
+						),
+					},
+					FNwkSIntKey: &ttnpb.KeyEnvelope{
+						KEKLabel: "ns:66.66.66.66",
+						EncryptedKey: MustWrapAES128Key(
+							crypto.DeriveFNwkSIntKey(
+								nwkKey,
+								types.JoinNonce{0x00, 0x00, 0x01},
+								types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+								types.DevNonce{0x00, 0x00},
+							),
+							[]byte{0x3f, 0x36, 0x7b, 0xa1, 0x16, 0x67, 0xd9, 0x8b, 0x89, 0x00, 0x47, 0x77, 0x84, 0xf6, 0xfe, 0x50, 0x56, 0x67, 0x12, 0xab, 0x71, 0x96, 0x04, 0x6b, 0x9f, 0x2b, 0xc2, 0x50, 0xdf, 0xc8, 0xc1, 0xa2},
+						),
+					},
+					NwkSEncKey: &ttnpb.KeyEnvelope{
+						KEKLabel: "ns:66.66.66.66",
+						EncryptedKey: MustWrapAES128Key(
+							crypto.DeriveNwkSEncKey(
+								nwkKey,
+								types.JoinNonce{0x00, 0x00, 0x01},
+								types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+								types.DevNonce{0x00, 0x00},
+							),
+							[]byte{0x3f, 0x36, 0x7b, 0xa1, 0x16, 0x67, 0xd9, 0x8b, 0x89, 0x00, 0x47, 0x77, 0x84, 0xf6, 0xfe, 0x50, 0x56, 0x67, 0x12, 0xab, 0x71, 0x96, 0x04, 0x6b, 0x9f, 0x2b, 0xc2, 0x50, 0xdf, 0xc8, 0xc1, 0xa2},
+						),
 					},
 				},
 			},
@@ -1377,7 +1503,13 @@ func TestHandleJoin(t *testing.T) {
 			devReg := &redis.DeviceRegistry{Redis: redisClient}
 			keyReg := &redis.KeyRegistry{Redis: redisClient}
 
-			c := component.MustNew(test.GetLogger(t), &component.Config{})
+			c := component.MustNew(test.GetLogger(t), &component.Config{
+				ServiceBase: config.ServiceBase{
+					KeyVault: config.KeyVault{
+						Static: tc.KeyVault,
+					},
+				},
+			})
 			js := test.Must(New(
 				c,
 				&Config{
@@ -1394,6 +1526,7 @@ func TestHandleJoin(t *testing.T) {
 
 			ret, err := devReg.SetByID(ctx, pb.ApplicationIdentifiers, pb.DeviceID,
 				[]string{
+					"application_server_address",
 					"created_at",
 					"last_dev_nonce",
 					"last_join_nonce",
@@ -1412,6 +1545,7 @@ func TestHandleJoin(t *testing.T) {
 						t.Fatal("Registry is not empty")
 					}
 					return CopyEndDevice(pb), []string{
+						"application_server_address",
 						"ids.application_ids",
 						"ids.dev_eui",
 						"ids.device_id",

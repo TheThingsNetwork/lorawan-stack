@@ -4166,6 +4166,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/joinserver:wrap_key": {
+    "translations": {
+      "en": "failed to wrap key"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/messageprocessors/cayennelpp:channel": {
     "translations": {
       "en": "invalid channel `{channel}`"

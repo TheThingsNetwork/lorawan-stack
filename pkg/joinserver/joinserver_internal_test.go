@@ -17,8 +17,10 @@ package joinserver
 import (
 	"context"
 
+	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
 var (
@@ -35,6 +37,10 @@ var (
 func KeyToBytes(key types.AES128Key) []byte { return key[:] }
 
 func KeyPtr(key types.AES128Key) *types.AES128Key { return &key }
+
+func MustWrapAES128Key(key types.AES128Key, kek []byte) []byte {
+	return test.Must(crypto.WrapKey(key[:], kek)).([]byte)
+}
 
 type AsJsServer = asJsServer
 type NsJsServer = nsJsServer

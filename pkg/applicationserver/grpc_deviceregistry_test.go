@@ -26,8 +26,10 @@ import (
 	. "go.thethings.network/lorawan-stack/pkg/applicationserver"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
@@ -46,6 +48,36 @@ func TestDeviceRegistryGet(t *testing.T) {
 		Formatters: &ttnpb.MessagePayloadFormatters{
 			UpFormatter:   ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,
 			DownFormatter: ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,
+		},
+		Session: &ttnpb.Session{
+			SessionKeys: ttnpb.SessionKeys{
+				AppSKey: &ttnpb.KeyEnvelope{
+					KEKLabel:     "test",
+					EncryptedKey: []byte{0x96, 0x77, 0x8b, 0x25, 0xae, 0x6c, 0xa4, 0x35, 0xf9, 0x2b, 0x5b, 0x97, 0xc0, 0x50, 0xae, 0xd2, 0x46, 0x8a, 0xb8, 0xa1, 0x7a, 0xd8, 0x4e, 0x5d},
+				},
+			},
+		},
+	}
+	registeredKEKs := map[string][]byte{
+		"test": {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17},
+	}
+	expectedDevice := &ttnpb.EndDevice{
+		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+				ApplicationID: registeredApplicationID,
+			},
+			DeviceID: registeredDeviceID,
+		},
+		Formatters: &ttnpb.MessagePayloadFormatters{
+			UpFormatter:   ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,
+			DownFormatter: ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,
+		},
+		Session: &ttnpb.Session{
+			SessionKeys: ttnpb.SessionKeys{
+				AppSKey: &ttnpb.KeyEnvelope{
+					Key: aes128KeyPtr(types.AES128Key{0x0, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff}),
+				},
+			},
 		},
 	}
 	for _, tc := range []struct {
@@ -161,13 +193,14 @@ func TestDeviceRegistryGet(t *testing.T) {
 				})
 				a.So(paths, should.HaveSameElementsDeep, []string{
 					"formatters",
+					"session",
 				})
 				return deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice), nil
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
 				FieldMask: pbtypes.FieldMask{
-					Paths: []string{"formatters"},
+					Paths: []string{"formatters", "session"},
 				},
 			},
 			GetCalls: 1,
@@ -178,7 +211,14 @@ func TestDeviceRegistryGet(t *testing.T) {
 
 			var getCalls uint64
 
-			as := test.Must(New(component.MustNew(test.GetLogger(t), &component.Config{}),
+			as := test.Must(New(
+				component.MustNew(test.GetLogger(t), &component.Config{
+					ServiceBase: config.ServiceBase{
+						KeyVault: config.KeyVault{
+							Static: registeredKEKs,
+						},
+					},
+				}),
 				&Config{
 					LinkMode: "explicit",
 					Devices: &MockDeviceRegistry{
@@ -209,7 +249,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			if tc.ErrorAssertion != nil && a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
 				a.So(dev, should.BeNil)
 			} else if a.So(err, should.BeNil) {
-				a.So(dev, should.Resemble, registeredDevice)
+				a.So(dev, should.Resemble, expectedDevice)
 			}
 			a.So(req, should.Resemble, tc.DeviceRequest)
 		})
