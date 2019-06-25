@@ -12,20 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const storeSelector = (state, props) => state[props.id] || {}
+const selectApiKeysStore = (state, props) => state[props.id] || {}
 
-export const apiKeysStoreSelector = entity => (state, props) => (
-  storeSelector(state.apiKeys[entity], props) || {}
+export const createApiKeysStoreSelector = entity => (state, props) => (
+  selectApiKeysStore(state.apiKeys[entity], props) || {}
 )
 
-export const apiKeysSelector = entity => function (state, props) {
-  const store = storeSelector(state.apiKeys[entity], props)
+export const createApiKeysSelector = entity => function (state, props) {
+  const store = selectApiKeysStore(state.apiKeys[entity], props)
 
   return store.keys ? store.keys : []
 }
 
-export const apiKeySelector = function (entity) {
-  const keysSelector = apiKeysSelector(entity)
+export const createApiKeySelector = function (entity) {
+  const keysSelector = createApiKeysSelector(entity)
 
   return function (state, props) {
     const keys = keysSelector(state, props)
@@ -34,20 +34,8 @@ export const apiKeySelector = function (entity) {
   }
 }
 
-export const totalCountSelector = entity => function (state, props) {
-  const store = storeSelector(state.totalCount[entity], props)
+export const createTotalCountSelector = entity => function (state, props) {
+  const store = selectApiKeysStore(state.totalCount[entity], props)
 
   return store.totalCount
-}
-
-export const fetchingSelector = entity => function (state, props) {
-  const store = storeSelector(state.apiKeys[entity], props)
-
-  return store.fetching
-}
-
-export const errorSelector = entity => function (state, props) {
-  const store = storeSelector(state.apiKeys[entity], props)
-
-  return store.error
 }

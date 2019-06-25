@@ -27,10 +27,10 @@ import Button from '../../../components/button'
 import { isNotFoundError, isTranslated } from '../../../lib/errors/utils'
 
 import {
-  statisticsSelector,
-  statisticsErrorSelector,
-  statisticsIsAvailableSelector,
-  statisticsIsFetchingSelector,
+  selectGatewayStatistics,
+  selectGatewayStatisticsError,
+  selectGatewayStatisticsIsAvailable,
+  selectGatewayStatisticsIsFetching,
 } from '../../store/selectors/gateway'
 import {
   startGatewayStatistics,
@@ -171,10 +171,10 @@ GatewayStatistic.defaultProps = {
 
 export default connect(function (state, props) {
   return {
-    statistics: statisticsSelector(state, props),
-    error: statisticsErrorSelector(state, props),
-    available: statisticsIsAvailableSelector(state, props),
-    fetching: statisticsIsFetchingSelector(state, props),
+    statistics: selectGatewayStatistics(state, props),
+    error: selectGatewayStatisticsError(state, props),
+    available: selectGatewayStatisticsIsAvailable(state, props),
+    fetching: selectGatewayStatisticsIsFetching(state, props),
   }
 },
 (dispatch, ownProps) => ({

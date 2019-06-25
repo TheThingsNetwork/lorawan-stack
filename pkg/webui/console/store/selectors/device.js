@@ -16,9 +16,9 @@ import { GET_DEV_BASE, UPDATE_DEV_BASE } from '../actions/device'
 import { getDeviceId } from '../../../lib/selectors/id'
 
 import {
-  eventsSelector,
-  errorSelector as eventsErrorSelector,
-  statusSelector as eventsStatusSelector,
+  createEventsSelector,
+  createEventsErrorSelector,
+  createEventsStatusSelector,
 } from './events'
 
 import { createFetchingSelector } from './fetching'
@@ -26,34 +26,18 @@ import { createErrorSelector } from './error'
 
 const ENTITY = 'devices'
 
-const storeSelector = store => store.device
+const selectDeviceStore = store => store.device
 
-export const deviceSelector = state => storeSelector(state).device
-
+// Device Entity
+export const selectSelectedDevice = state => selectDeviceStore(state).device
+export const selectSelectedDeviceId = state => getDeviceId(selectSelectedDevice(state))
 export const selectDeviceFetching = createFetchingSelector(GET_DEV_BASE)
 export const selectGetDeviceError = createErrorSelector(GET_DEV_BASE)
 export const selectUpdateDeviceError = createErrorSelector(UPDATE_DEV_BASE)
 export const selectDeviceError = createErrorSelector([ GET_DEV_BASE, UPDATE_DEV_BASE ])
-export const selectSelectedDevice = state => deviceSelector(state)
-
-export const selectSelectedDeviceId = state => getDeviceId(selectSelectedDevice(state))
-
 export const selectSelectedDeviceFormatters = state => selectSelectedDevice(state).formatters
 
-export const fetchingSelector = function (state) {
-  const store = storeSelector(state)
-
-  return store.fetching || false
-}
-
-export const errorSelector = function (state) {
-  const store = storeSelector(state)
-
-  return store.error
-}
-
-export const deviceEventsSelector = eventsSelector(ENTITY)
-
-export const deviceEventsErrorSelector = eventsErrorSelector(ENTITY)
-
-export const deviceEventsStatusSelector = eventsStatusSelector(ENTITY)
+// Events
+export const selectDeviceEvents = createEventsSelector(ENTITY)
+export const selectDeviceEventsError = createEventsErrorSelector(ENTITY)
+export const selectDeviceEventsStatus = createEventsStatusSelector(ENTITY)

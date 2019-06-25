@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const storeSelector = state => state.user
+const selectUserStore = state => state.user
 
-export const userSelector = state => storeSelector(state).user
+export const selectUser = state => selectUserStore(state).user
 
-export const userIdSelector = function (state) {
-  const user = userSelector(state)
+export const selectUserId = function (state) {
+  const user = selectUser(state)
   const { ids = {}} = user
 
   return ids.user_id

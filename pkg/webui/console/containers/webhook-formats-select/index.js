@@ -20,11 +20,12 @@ import bind from 'autobind-decorator'
 import sharedMessages from '../../../lib/shared-messages'
 import PropTypes from '../../../lib/prop-types'
 import Field from '../../../components/form/field'
+import Select from '../../../components/select'
 
 import {
-  formatsSelector,
-  errorSelector,
-  fetchingSelector,
+  selectWebhookFormats,
+  selectWebhookFormatsError,
+  selectWebhookFormatsFetching,
 } from '../../store/selectors/webhook-formats'
 
 import { getWebhookFormats } from '../../store/actions/webhook-formats'
@@ -35,11 +36,11 @@ const m = defineMessages({
 
 const formatOptions = formats => Object.keys(formats).map(key => ({ value: key, label: formats[key]}))
 
-@storeConnect(function (state, props) {
+@storeConnect(function (state) {
   return {
-    formats: formatsSelector(state, props),
-    error: errorSelector(state, props),
-    fetching: fetchingSelector(state, props),
+    formats: selectWebhookFormats(state),
+    error: selectWebhookFormatsError(state),
+    fetching: selectWebhookFormatsFetching(state),
   }
 },
 { getWebhookFormats }
@@ -47,23 +48,9 @@ const formatOptions = formats => Object.keys(formats).map(key => ({ value: key, 
 @bind
 class WebhookFormatsSelector extends React.PureComponent {
 
-  constructor (props) {
-    super(props)
-
-    const { name, formik } = props
-
-    formik.registerField(name, this)
-  }
-
   componentDidMount () {
     const { getWebhookFormats } = this.props
     getWebhookFormats()
-  }
-
-  componentWillUnmount () {
-    const { formik, name } = this.props
-
-    formik.unregisterField(name)
   }
 
   getOptions () {
@@ -88,6 +75,7 @@ class WebhookFormatsSelector extends React.PureComponent {
 
     return (
       <Field
+        component={Select}
         horizontal={horizontal}
         type="select"
         options={fieldOptions}

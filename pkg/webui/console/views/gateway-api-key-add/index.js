@@ -27,29 +27,23 @@ import IntlHelmet from '../../../lib/components/intl-helmet'
 import { ApiKeyCreateForm } from '../../../components/api-key-form'
 
 import { getGatewaysRightsList } from '../../store/actions/gateways'
-import { getGatewayId } from '../../../lib/selectors/id'
 import {
-  gatewaySelector,
-  gatewayRightsSelector,
-  gatewayUniversalRightsSelector,
-  gatewayRightsErrorSelector,
-  gatewayRightsFetchingSelector,
+  selectSelectedGatewayId,
+  selectGatewayRights,
+  selectGatewayRightsError,
+  selectGatewayRightsFetching,
+  selectGatewayUniversalRights,
 } from '../../store/selectors/gateway'
 
 import api from '../../api'
 
-@connect(function (state, props) {
-  const gateway = gatewaySelector(state, props)
-  const gtwId = getGatewayId(gateway)
-
-  return {
-    gtwId,
-    fetching: gatewayRightsFetchingSelector(state, props),
-    error: gatewayRightsErrorSelector(state, props),
-    rights: gatewayRightsSelector(state, props),
-    universalRights: gatewayUniversalRightsSelector(state, props),
-  }
-})
+@connect((state, props) => ({
+  gtwId: selectSelectedGatewayId(state),
+  fetching: selectGatewayRightsFetching(state),
+  error: selectGatewayRightsError(state),
+  rights: selectGatewayRights(state),
+  universalRights: selectGatewayUniversalRights(state),
+}))
 @withBreadcrumb('gtws.single.api-keys.add', function (props) {
   const gtwId = props.gtwId
 

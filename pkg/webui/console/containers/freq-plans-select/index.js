@@ -23,10 +23,10 @@ import Field from '../../../components/form/field'
 import Select from '../../../components/select'
 
 import {
-  gsFrequencyPlansSelector,
-  nsFrequencyPlansSelector,
-  errorSelector,
-  fetchingSelector,
+  selectGsFrequencyPlans,
+  selectNsFrequencyPlans,
+  selectFrequencyPlansError,
+  selectFrequencyPlansFetching,
 } from '../../store/selectors/configuration'
 
 import {
@@ -42,10 +42,10 @@ const formatOptions = plans => plans.map(plan => ({ value: plan.id, label: plan.
 
 @storeConnect(function (state, props) {
   return {
-    plansGs: gsFrequencyPlansSelector(state, props),
-    plansNs: nsFrequencyPlansSelector(state, props),
-    error: errorSelector(state, props),
-    fetching: fetchingSelector(state, props),
+    plansGs: selectGsFrequencyPlans(state, props),
+    plansNs: selectNsFrequencyPlans(state, props),
+    error: selectFrequencyPlansError(state, props),
+    fetching: selectFrequencyPlansFetching(state, props),
   }
 },
 dispatch => ({

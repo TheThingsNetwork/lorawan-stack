@@ -12,28 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const storeSelector = (state, entity) => state.rights[entity]
+/* eslint-disable import/prefer-default-export */
 
-export const rightsSelector = entity => function (state) {
-  const store = storeSelector(state, entity)
+const selectRightsStore = (state, entity) => state.rights[entity]
+
+export const createRightsSelector = entity => function (state) {
+  const store = selectRightsStore(state, entity)
 
   return store.rights.filter(right => !right.endsWith('_ALL'))
 }
 
-export const universalRightsSelector = entity => function (state) {
-  const store = storeSelector(state, entity)
+export const createUniversalRightsSelector = entity => function (state) {
+  const store = selectRightsStore(state, entity)
 
   return store.rights.filter(right => right.endsWith('_ALL'))
-}
-
-export const fetchingSelector = entity => function (state) {
-  const store = storeSelector(state, entity)
-
-  return store.fetching
-}
-
-export const errorSelector = entity => function (state) {
-  const store = storeSelector(state, entity)
-
-  return store.error
 }

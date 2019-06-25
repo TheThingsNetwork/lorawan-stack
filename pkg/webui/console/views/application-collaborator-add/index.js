@@ -36,10 +36,10 @@ import RightsGroup from '../../components/rights-group'
 import { getApplicationsRightsList } from '../../store/actions/applications'
 import {
   selectSelectedApplicationId,
-  applicationRightsSelector,
-  applicationUniversalRightsSelector,
-  applicationRightsFetchingSelector,
-  applicationRightsErrorSelector,
+  selectApplicationRights,
+  selectApplicationUniversalRights,
+  selectApplicationRightsFetching,
+  selectApplicationRightsError,
 } from '../../store/selectors/application'
 
 import api from '../../api'
@@ -57,14 +57,14 @@ const validationSchema = Yup.object().shape({
   ),
 })
 
-@connect(function (state, props) {
+@connect(function (state) {
   return {
-    appId: selectSelectedApplicationId(state, props),
+    appId: selectSelectedApplicationId(state),
     collaborators: state.collaborators.applications.collaborators,
-    rights: applicationRightsSelector(state, props),
-    universalRights: applicationUniversalRightsSelector(state, props),
-    fetching: applicationRightsFetchingSelector(state, props),
-    error: applicationRightsErrorSelector(state, props),
+    rights: selectApplicationRights(state),
+    universalRights: selectApplicationUniversalRights(state),
+    fetching: selectApplicationRightsFetching(state),
+    error: selectApplicationRightsError(state),
   }
 })
 @withBreadcrumb('apps.single.collaborators.add', function (props) {

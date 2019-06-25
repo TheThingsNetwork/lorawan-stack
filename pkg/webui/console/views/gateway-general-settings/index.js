@@ -34,9 +34,7 @@ import diff from '../../../lib/diff'
 
 import { updateGateway } from '../../store/actions/gateway'
 import { getGatewayId } from '../../../lib/selectors/id'
-import {
-  gatewaySelector,
-} from '../../store/selectors/gateway'
+import { selectSelectedGateway } from '../../store/selectors/gateway'
 
 import api from '../../api'
 
@@ -47,7 +45,7 @@ const m = defineMessages({
 })
 
 @connect(function (state) {
-  const gateway = gatewaySelector(state)
+  const gateway = selectSelectedGateway(state)
 
   return {
     gtwId: getGatewayId(gateway),

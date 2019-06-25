@@ -25,8 +25,8 @@ import {
 } from '../../store/actions/device'
 
 import {
-  deviceEventsSelector,
-  deviceEventsStatusSelector,
+  selectDeviceEvents,
+  selectDeviceEventsStatus,
 } from '../../store/selectors/device'
 
 @connect(
@@ -50,8 +50,8 @@ class DeviceEvents extends React.Component {
       <EventsSubscription
         id={devId}
         widget={widget}
-        eventsSelector={deviceEventsSelector}
-        statusSelector={deviceEventsStatusSelector}
+        eventsSelector={selectDeviceEvents}
+        statusSelector={selectDeviceEventsStatus}
         onClear={onClear}
         toAllUrl={`/console/applications/${appId}/devices/${devId}/data`}
       />

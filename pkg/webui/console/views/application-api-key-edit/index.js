@@ -29,34 +29,32 @@ import { ApiKeyEditForm } from '../../../components/api-key-form'
 import { getApplicationApiKey } from '../../store/actions/application'
 import { getApplicationsRightsList } from '../../store/actions/applications'
 import {
-  applicationRightsSelector,
-  applicationUniversalRightsSelector,
-  applicationRightsErrorSelector,
-  applicationRightsFetchingSelector,
-  applicationKeySelector,
-  applicationKeyErrorSelector,
-  applicationKeyFetchingSelector,
+  selectSelectedApplicationId,
+  selectApplicationRights,
+  selectApplicationUniversalRights,
+  selectApplicationRightsError,
+  selectApplicationRightsFetching,
+  selectApplicationApiKey,
+  selectApplicationApiKeyError,
+  selectApplicationApiKeyFetching,
 } from '../../store/selectors/application'
 
 import api from '../../api'
 
 @connect(function (state, props) {
-  const { appId, apiKeyId } = props.match.params
+  const { apiKeyId } = props.match.params
 
-  const keyFetching = applicationKeyFetchingSelector(state)
-  const rightsFetching = applicationRightsFetchingSelector(state, props)
-  const keyError = applicationKeyErrorSelector(state)
-  const rightsError = applicationRightsErrorSelector(state, props)
-  const apiKey = applicationKeySelector(state)
-  const rights = applicationRightsSelector(state, props)
-  const universalRights = applicationUniversalRightsSelector(state, props)
+  const keyFetching = selectApplicationApiKeyFetching(state)
+  const rightsFetching = selectApplicationRightsFetching(state)
+  const keyError = selectApplicationApiKeyError(state)
+  const rightsError = selectApplicationRightsError(state)
 
   return {
     keyId: apiKeyId,
-    appId,
-    apiKey,
-    rights,
-    universalRights,
+    appId: selectSelectedApplicationId(state),
+    apiKey: selectApplicationApiKey(state),
+    rights: selectApplicationRights(state),
+    universalRights: selectApplicationUniversalRights(state),
     fetching: keyFetching || rightsFetching,
     error: keyError || rightsError,
   }

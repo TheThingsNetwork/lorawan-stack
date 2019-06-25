@@ -29,7 +29,11 @@ import Spinner from '../../../components/spinner'
 
 import sharedMessages from '../../../lib/shared-messages'
 
-import { webhookSelector, fetchingSelector, errorSelector } from '../../store/selectors/webhook'
+import {
+  selectSelectedWebhook,
+  selectWebhookFetching,
+  selectWebhookError,
+} from '../../store/selectors/webhook'
 import { selectSelectedApplicationId } from '../../store/selectors/application'
 import { getWebhook } from '../../store/actions/webhook'
 import diff from '../../../lib/diff'
@@ -56,12 +60,12 @@ const webhookEntitySelector = [
 ]
 
 @connect(function (state) {
-  const webhook = webhookSelector(state)
+  const webhook = selectSelectedWebhook(state)
   return {
     appId: selectSelectedApplicationId(state),
     webhook,
-    fetching: fetchingSelector(state),
-    error: errorSelector(state),
+    fetching: selectWebhookFetching(state),
+    error: selectWebhookError(state),
   }
 }, function (dispatch, { match }) {
   const { appId, webhookId } = match.params
