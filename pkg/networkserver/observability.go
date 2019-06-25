@@ -173,11 +173,7 @@ func registerReceiveUplinkDuplicate(ctx context.Context, msg *ttnpb.UplinkMessag
 	nsMetrics.uplinkReceived.WithLabelValues(ctx, uplinkMTypeLabel(msg)).Inc()
 }
 
-func registerMergeMetadata(ctx context.Context, devIDs *ttnpb.EndDeviceIdentifiers, msg *ttnpb.UplinkMessage) {
-	if devIDs != nil && devIDs.ApplicationID != "" && devIDs.DeviceID != "" {
-		events.Publish(evtMergeMetadata(ctx, devIDs, len(msg.RxMetadata)))
-	}
-
+func registerMergeMetadata(ctx context.Context, msg *ttnpb.UplinkMessage) {
 	gtws := make(map[string]struct{}, len(msg.RxMetadata))
 	for _, md := range msg.RxMetadata {
 		gtws[unique.ID(ctx, md.GatewayIdentifiers)] = struct{}{}
@@ -185,32 +181,19 @@ func registerMergeMetadata(ctx context.Context, devIDs *ttnpb.EndDeviceIdentifie
 	nsMetrics.uplinkGateways.WithLabelValues(ctx).Observe(float64(len(gtws)))
 }
 
-func registerForwardDataUplink(ctx context.Context, devIDs *ttnpb.EndDeviceIdentifiers, msg *ttnpb.UplinkMessage) {
-	if devIDs != nil && devIDs.ApplicationID != "" && devIDs.DeviceID != "" {
-		events.Publish(evtForwardDataUplink(ctx, devIDs, nil))
-	}
+func registerForwardDataUplink(ctx context.Context, msg *ttnpb.UplinkMessage) {
 	nsMetrics.uplinkForwarded.WithLabelValues(ctx, uplinkMTypeLabel(msg)).Inc()
 }
 
-func registerForwardJoinRequest(ctx context.Context, devIDs *ttnpb.EndDeviceIdentifiers, msg *ttnpb.UplinkMessage) {
-	if devIDs != nil && devIDs.ApplicationID != "" && devIDs.DeviceID != "" {
-		events.Publish(evtForwardJoinRequest(ctx, devIDs, nil))
-	}
+func registerForwardJoinRequest(ctx context.Context, msg *ttnpb.UplinkMessage) {
 	nsMetrics.uplinkForwarded.WithLabelValues(ctx, uplinkMTypeLabel(msg)).Inc()
 }
 
-func registerForwardRejoinRequest(ctx context.Context, devIDs *ttnpb.EndDeviceIdentifiers, msg *ttnpb.UplinkMessage) {
-	if devIDs != nil && devIDs.ApplicationID != "" && devIDs.DeviceID != "" {
-		events.Publish(evtForwardRejoinRequest(ctx, devIDs, nil))
-	}
+func registerForwardRejoinRequest(ctx context.Context, msg *ttnpb.UplinkMessage) {
 	nsMetrics.uplinkForwarded.WithLabelValues(ctx, uplinkMTypeLabel(msg)).Inc()
 }
 
-func registerDropDataUplink(ctx context.Context, devIDs *ttnpb.EndDeviceIdentifiers, msg *ttnpb.UplinkMessage, err error) {
-	if devIDs != nil && devIDs.ApplicationID != "" && devIDs.DeviceID != "" {
-		events.Publish(evtDropDataUplink(ctx, devIDs, err))
-	}
-
+func registerDropDataUplink(ctx context.Context, msg *ttnpb.UplinkMessage, err error) {
 	if ttnErr, ok := errors.From(err); ok {
 		nsMetrics.uplinkDropped.WithLabelValues(ctx, uplinkMTypeLabel(msg), ttnErr.FullName()).Inc()
 	} else {
@@ -218,11 +201,7 @@ func registerDropDataUplink(ctx context.Context, devIDs *ttnpb.EndDeviceIdentifi
 	}
 }
 
-func registerDropJoinRequest(ctx context.Context, devIDs *ttnpb.EndDeviceIdentifiers, msg *ttnpb.UplinkMessage, err error) {
-	if devIDs != nil && devIDs.ApplicationID != "" && devIDs.DeviceID != "" {
-		events.Publish(evtDropJoinRequest(ctx, devIDs, err))
-	}
-
+func registerDropJoinRequest(ctx context.Context, msg *ttnpb.UplinkMessage, err error) {
 	if ttnErr, ok := errors.From(err); ok {
 		nsMetrics.uplinkDropped.WithLabelValues(ctx, uplinkMTypeLabel(msg), ttnErr.FullName()).Inc()
 	} else {
@@ -230,11 +209,7 @@ func registerDropJoinRequest(ctx context.Context, devIDs *ttnpb.EndDeviceIdentif
 	}
 }
 
-func registerDropRejoinRequest(ctx context.Context, devIDs *ttnpb.EndDeviceIdentifiers, msg *ttnpb.UplinkMessage, err error) {
-	if devIDs != nil && devIDs.ApplicationID != "" && devIDs.DeviceID != "" {
-		events.Publish(evtDropRejoinRequest(ctx, devIDs, err))
-	}
-
+func registerDropRejoinRequest(ctx context.Context, msg *ttnpb.UplinkMessage, err error) {
 	if ttnErr, ok := errors.From(err); ok {
 		nsMetrics.uplinkDropped.WithLabelValues(ctx, uplinkMTypeLabel(msg), ttnErr.FullName()).Inc()
 	} else {
