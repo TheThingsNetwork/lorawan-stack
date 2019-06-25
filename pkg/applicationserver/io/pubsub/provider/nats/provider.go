@@ -98,7 +98,7 @@ func (impl) OpenConnection(ctx context.Context, pb *ttnpb.ApplicationPubSub) (pc
 		},
 		{
 			topic:   &pc.Topics.LocationSolved,
-			subject: pb.GetDownlinkQueued().GetTopic(),
+			subject: pb.GetLocationSolved().GetTopic(),
 		},
 	} {
 		if *t.topic, err = natspubsub.OpenTopic(

@@ -24,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/provider"
 	_ "go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/provider/nats" // The NATS integration provider
 	pubsubunique "go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/unique"
+	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errorcontext"
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -217,7 +218,17 @@ func (ps *PubSub) integrate(ctx context.Context, pb *ttnpb.ApplicationPubSub) (e
 		"application_uid", appUID,
 		"pubsub_id", pb.PubSubID,
 	))
+	ctx = rights.NewContext(ctx, rights.Rights{
+		ApplicationRights: map[string]*ttnpb.Rights{
+			appUID: {
+				Rights: []ttnpb.Right{ttnpb.RIGHT_APPLICATION_TRAFFIC_READ}, // Required by io.Subscribe.
+			},
+		},
+	})
 	ctx, cancel := errorcontext.New(ctx)
+	defer func() {
+		cancel(err)
+	}()
 	i := &integration{
 		ApplicationPubSub: *pb,
 		ctx:               ctx,
