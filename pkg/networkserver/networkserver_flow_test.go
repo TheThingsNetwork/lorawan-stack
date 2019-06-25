@@ -510,7 +510,7 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 	t.Run("uplink", func(t *testing.T) {
 		a := assertions.New(t)
 
-		uplinkFRMPayload := test.Must(crypto.EncryptUplink(fNwkSIntKey, devAddr, 0, []byte("test"))).([]byte)
+		uplinkFRMPayload := test.Must(crypto.EncryptUplink(appSKey, devAddr, 0, []byte("test"))).([]byte)
 		uplink := &ttnpb.UplinkMessage{
 			RawPayload: func() []byte {
 				b := append([]byte{
