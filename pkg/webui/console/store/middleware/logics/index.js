@@ -15,7 +15,6 @@
 import user from './user'
 import init from './init'
 import applications from './applications'
-import application from './application'
 import devices from './devices'
 import device from './device'
 import gateways from './gateways'
@@ -26,7 +25,6 @@ export default [
   ...user,
   ...init,
   ...applications,
-  ...application,
   ...devices,
   ...device,
   ...gateways,
