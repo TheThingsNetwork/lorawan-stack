@@ -26,9 +26,10 @@ import (
 
 // appendImplicitPubSubGetPaths appends implicit ttnpb.ApplicationPubSub get paths to paths.
 func appendImplicitPubSubGetPaths(paths ...string) []string {
-	return append(append(make([]string, 0, 2+len(paths)),
+	return append(append(make([]string, 0, 3+len(paths)),
 		"format",
 		"provider",
+		"base_topic",
 	), paths...)
 }
 
@@ -71,9 +72,15 @@ func (ps *PubSub) Set(ctx context.Context, req *ttnpb.SetApplicationPubSubReques
 		return nil, err
 	}
 	// Get all the fields here for starting the integration task.
-	pubsub, err := ps.registry.Set(ctx, req.ApplicationPubSubIdentifiers, ttnpb.ApplicationPubSubFieldPathsTopLevel,
+	pubsub, err := ps.registry.Set(ctx, req.ApplicationPubSubIdentifiers, req.FieldMask.Paths,
 		func(pubsub *ttnpb.ApplicationPubSub) (*ttnpb.ApplicationPubSub, []string, error) {
-			return &req.ApplicationPubSub, req.FieldMask.Paths, nil
+			if pubsub != nil {
+				return &req.ApplicationPubSub, req.FieldMask.Paths, nil
+			}
+			return &req.ApplicationPubSub, append(req.FieldMask.Paths,
+				"ids.application_ids",
+				"ids.pubsub_id",
+			), nil
 		},
 	)
 	if err != nil {

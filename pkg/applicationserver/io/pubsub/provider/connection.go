@@ -17,6 +17,7 @@ package provider
 import (
 	"context"
 
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"gocloud.dev/pubsub"
 )
 
@@ -33,7 +34,7 @@ func (ds *DownlinkSubscriptions) Shutdown(ctx context.Context) error {
 		ds.Replace,
 	} {
 		if sub != nil {
-			if err := sub.Shutdown(ctx); err != nil {
+			if err := sub.Shutdown(ctx); err != nil && !errors.IsCanceled(err) {
 				return err
 			}
 		}
@@ -66,7 +67,7 @@ func (ut *UplinkTopics) Shutdown(ctx context.Context) error {
 		ut.LocationSolved,
 	} {
 		if topic != nil {
-			if err := topic.Shutdown(ctx); err != nil {
+			if err := topic.Shutdown(ctx); err != nil && !errors.IsCanceled(err) {
 				return err
 			}
 		}

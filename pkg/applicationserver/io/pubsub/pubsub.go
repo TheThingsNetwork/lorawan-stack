@@ -22,6 +22,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/provider"
+	_ "go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/provider/nats" // The NATS integration provider
 	pubsubunique "go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/unique"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errorcontext"
@@ -47,7 +48,7 @@ type PubSub struct {
 
 // Start starts the pusub frontend.
 func Start(c *component.Component, server io.Server, registry Registry) (*PubSub, error) {
-	ctx := log.NewContextWithField(c.Context(), "namespace", "applicationserver/io/pubsub")
+	ctx := log.NewContextWithField(c.FillContext(c.Context()), "namespace", "applicationserver/io/pubsub")
 	ps := &PubSub{
 		Component: c,
 		ctx:       ctx,
@@ -59,7 +60,7 @@ func Start(c *component.Component, server io.Server, registry Registry) (*PubSub
 }
 
 func (ps *PubSub) integrateAll(ctx context.Context) error {
-	return ps.registry.Range(ctx, nil,
+	return ps.registry.Range(ctx, []string{"ids"},
 		func(ctx context.Context, _ ttnpb.ApplicationIdentifiers, pb *ttnpb.ApplicationPubSub) bool {
 			ps.startIntegrationTask(ctx, pb.ApplicationPubSubIdentifiers)
 			return true
@@ -75,25 +76,7 @@ func (ps *PubSub) startIntegrationTask(ctx context.Context, ids ttnpb.Applicatio
 		"pubsub_id", ids.PubSubID,
 	))
 	ps.StartTask(ctx, "integrate", func(ctx context.Context) error {
-		target, err := ps.registry.Get(ctx, ids, []string{
-			"attributes",
-			"format",
-			"provider",
-
-			"base_topic",
-
-			"downlink_push",
-			"downlink_replace",
-
-			"uplink_message",
-			"join_accept",
-			"downlink_ack",
-			"downlink_nack",
-			"downlink_queued",
-			"downlink_sent",
-			"downlink_failed",
-			"location_solved",
-		})
+		target, err := ps.registry.Get(ctx, ids, ttnpb.ApplicationPubSubFieldPathsNested)
 		if err != nil {
 			if !errors.IsNotFound(err) {
 				log.FromContext(ctx).WithError(err).Error("Failed to get link")
@@ -262,7 +245,10 @@ func (ps *PubSub) integrate(ctx context.Context, pb *ttnpb.ApplicationPubSub) (e
 	}
 	ctx = log.NewContextWithField(ctx, "provider", pb.Provider)
 	logger := log.FromContext(ctx)
-	i.sub = io.NewSubscription(ctx, "pubsub", &pb.ApplicationIdentifiers)
+	i.sub, err = ps.server.Subscribe(ctx, "pubsub", pb.ApplicationIdentifiers)
+	if err != nil {
+		return err
+	}
 	format, ok := formats[pb.Format]
 	if !ok {
 		return errFormatNotFound.WithAttributes("format", pb.Format)
