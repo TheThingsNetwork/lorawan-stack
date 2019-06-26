@@ -49,6 +49,19 @@ export const [{
   (id, selector) => ({ selector })
 )
 
+export const UPDATE_APP_BASE = 'UPDATE_APPLICATION'
+export const [{
+  request: UPDATE_APP,
+  success: UPDATE_APP_SUCCESS,
+  failure: UPDATE_APP_FAILURE,
+}, {
+  request: updateApplication,
+  success: updateApplicationSuccess,
+  failure: updateApplicationFailure,
+}] = createRequestActions(UPDATE_APP_BASE,
+  (id, patch) => ({ id, patch }),
+)
+
 export const GET_APPS_LIST_BASE = createPaginationBaseActionType(SHARED_NAME)
 export const [{
   request: GET_APPS_LIST,
