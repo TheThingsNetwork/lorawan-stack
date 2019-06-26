@@ -166,8 +166,8 @@ func (d *matchedDevice) deferMACHandler(f macHandler) {
 	d.DeferredMACHandlers = append(d.DeferredMACHandlers, makeDeferredMACHandler(d.Device, f))
 }
 
-// matchAndHandleUplink tries to match the uplink message with a device and returns the matched device.
-func (ns *NetworkServer) matchAndHandleUplink(ctx context.Context, up *ttnpb.UplinkMessage, deduplicated bool, devs ...*ttnpb.EndDevice) (*matchedDevice, error) {
+// matchAndHandleDataUplink tries to match the data uplink message with a device and returns the matched device.
+func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, up *ttnpb.UplinkMessage, deduplicated bool, devs ...*ttnpb.EndDevice) (*matchedDevice, error) {
 	if len(up.RawPayload) < 4 {
 		return nil, errRawPayloadTooShort
 	}
@@ -415,7 +415,6 @@ func (ns *NetworkServer) matchAndHandleUplink(ctx context.Context, up *ttnpb.Upl
 				DataRateIndex: drIdx,
 				Device:        dev,
 				FCnt:          fCnt,
-				FCntReset:     true,
 				NbTrans:       1,
 			},
 			band:                       phy,
@@ -686,6 +685,9 @@ matchLoop:
 		if !match.Pending && match.Device.PendingSession != nil {
 			// TODO: Notify AS of session recovery(https://github.com/TheThingsNetwork/lorawan-stack/issues/594)
 		}
+		if match.Pending || match.FCntReset {
+			match.Device.Session.StartedAt = up.ReceivedAt
+		}
 		match.Device.MACState.PendingApplicationDownlink = nil
 		match.Device.MACState.PendingJoinRequest = nil
 		match.Device.MACState.RxWindowsAvailable = true
@@ -760,7 +762,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 		return err
 	}
 
-	matched, err := ns.matchAndHandleUplink(ctx, up, false, addrMatches...)
+	matched, err := ns.matchAndHandleDataUplink(ctx, up, false, addrMatches...)
 	if err != nil {
 		registerDropDataUplink(ctx, up, err)
 		logger.WithError(err).Debug("Failed to match device")
@@ -807,7 +809,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 			}
 
 			if !stored.CreatedAt.Equal(matched.Device.CreatedAt) || !stored.UpdatedAt.Equal(matched.Device.UpdatedAt) {
-				matched, err = ns.matchAndHandleUplink(ctx, up, true, stored)
+				matched, err = ns.matchAndHandleDataUplink(ctx, up, true, stored)
 				if err != nil {
 					handleErr = true
 					return nil, nil, errOutdatedData.WithCause(err)
