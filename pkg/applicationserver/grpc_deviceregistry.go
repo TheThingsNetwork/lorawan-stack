@@ -37,14 +37,14 @@ func (r asEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDev
 	if err != nil {
 		return nil, err
 	}
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.app_s_key") && dev.GetSession().GetAppSKey() != nil {
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.app_s_key") && dev.Session != nil && dev.Session.AppSKey != nil {
 		key, err := cryptoutil.UnwrapAES128Key(*dev.Session.AppSKey, r.AS.KeyVault)
 		if err != nil {
 			return nil, err
 		}
 		dev.Session.AppSKey = &ttnpb.KeyEnvelope{Key: &key}
 	}
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "pending_session.keys.app_s_key") && dev.GetPendingSession().GetAppSKey() != nil {
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "pending_session.keys.app_s_key") && dev.PendingSession != nil && dev.PendingSession.AppSKey != nil {
 		key, err := cryptoutil.UnwrapAES128Key(*dev.PendingSession.AppSKey, r.AS.KeyVault)
 		if err != nil {
 			return nil, err
