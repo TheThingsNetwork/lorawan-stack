@@ -18,7 +18,7 @@ import bind from 'autobind-decorator'
 
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import CollaboratorsTable from '../../containers/collaborators-table'
-import { getApplicationCollaboratorsList } from '../../store/actions/application'
+import { getApplicationCollaboratorsList } from '../../store/actions/applications'
 import sharedMessages from '../../../lib/shared-messages'
 
 const COLLABORATORS_TABLE_SIZE = 10

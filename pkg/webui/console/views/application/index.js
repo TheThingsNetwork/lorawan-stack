@@ -37,7 +37,7 @@ import {
   getApplication,
   startApplicationEventsStream,
   stopApplicationEventsStream,
-} from '../../store/actions/application'
+} from '../../store/actions/applications'
 import {
   selectSelectedApplication,
   selectApplicationFetching,

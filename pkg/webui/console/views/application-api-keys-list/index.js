@@ -18,7 +18,7 @@ import bind from 'autobind-decorator'
 
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import ApiKeysTable from '../../containers/api-keys-table'
-import { getApplicationApiKeysList } from '../../store/actions/application'
+import { getApplicationApiKeysList } from '../../store/actions/applications'
 import sharedMessages from '../../../lib/shared-messages'
 
 const API_KEYS_TABLE_SIZE = 10

@@ -21,12 +21,12 @@ import EventsSubscription from '../../containers/events-subscription'
 
 import {
   clearApplicationEventsStream,
-} from '../../store/actions/application'
+} from '../../store/actions/applications'
 
 import {
   selectApplicationEvents,
   selectApplicationEventsStatus,
-} from '../../store/selectors/application'
+} from '../../store/selectors/applications'
 
 @connect(
   null,

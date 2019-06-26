@@ -26,10 +26,12 @@ import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import { ApiKeyEditForm } from '../../../components/api-key-form'
 
-import { getApplicationApiKey } from '../../store/actions/application'
-import { getApplicationsRightsList } from '../../store/actions/applications'
-import { selectSelectedApplicationId } from '../../store/selectors/applications'
 import {
+  getApplicationApiKey,
+  getApplicationsRightsList,
+} from '../../store/actions/applications'
+import {
+  selectSelectedApplicationId,
   selectApplicationRights,
   selectApplicationUniversalRights,
   selectApplicationRightsError,
@@ -37,7 +39,7 @@ import {
   selectApplicationApiKey,
   selectApplicationApiKeyError,
   selectApplicationApiKeyFetching,
-} from '../../store/selectors/application'
+} from '../../store/selectors/applications'
 
 import api from '../../api'
 

@@ -47,8 +47,8 @@ import {
   selectApplicationLinkStats,
   selectApplicationLinkFetching,
   selectApplicationLinkError,
-} from '../../store/selectors/application'
-import { selectSelectedApplicationId } from '../../store/selectors/applications'
+  selectSelectedApplicationId,
+} from '../../store/selectors/applications'
 
 import api from '../../api'
 
