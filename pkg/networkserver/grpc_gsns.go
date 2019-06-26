@@ -732,7 +732,7 @@ var handleUplinkGetPaths = [...]string{
 	"supports_join",
 }
 
-func (ns *NetworkServer) handleUplink(ctx context.Context, up *ttnpb.UplinkMessage, acc *metadataAccumulator) (err error) {
+func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkMessage, acc *metadataAccumulator) (err error) {
 	pld := up.Payload.GetMACPayload()
 
 	logger := log.FromContext(ctx).WithFields(log.Fields(
@@ -918,7 +918,7 @@ func (ns *NetworkServer) newDevAddr(context.Context, *ttnpb.EndDevice) types.Dev
 	return devAddr.WithPrefix(prefix)
 }
 
-func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage, acc *metadataAccumulator) (err error) {
+func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.UplinkMessage, acc *metadataAccumulator) (err error) {
 	pld := up.Payload.GetJoinRequestPayload()
 
 	logger := log.FromContext(ctx).WithFields(log.Fields(
@@ -940,10 +940,6 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 		},
 	)
 	if err != nil {
-		events.Publish(evtDropJoinRequest(ctx, ttnpb.EndDeviceIdentifiers{
-			JoinEUI: &pld.JoinEUI,
-			DevEUI:  &pld.DevEUI,
-		}, err))
 		registerDropJoinRequest(ctx, up, err)
 		logger.WithError(err).Debug("Failed to load device from registry")
 		return err
@@ -1153,7 +1149,7 @@ func (ns *NetworkServer) handleJoin(ctx context.Context, up *ttnpb.UplinkMessage
 	return nil
 }
 
-func (ns *NetworkServer) handleRejoin(ctx context.Context, up *ttnpb.UplinkMessage, acc *metadataAccumulator) (err error) {
+func (ns *NetworkServer) handleRejoinRequest(ctx context.Context, up *ttnpb.UplinkMessage, acc *metadataAccumulator) (err error) {
 	defer func() {
 		if err != nil {
 			registerDropRejoinRequest(ctx, up, err)
@@ -1182,7 +1178,7 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 
 	if up.Payload.Major != ttnpb.Major_LORAWAN_R1 {
 		return nil, errUnsupportedLoRaWANVersion.WithAttributes(
-			"major", up.Payload.Major,
+			"version", up.Payload.Major,
 		)
 	}
 
@@ -1192,6 +1188,19 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 		"received_at", up.ReceivedAt,
 	))
 	ctx = log.NewContext(ctx, logger)
+
+	var handle func(context.Context, *ttnpb.UplinkMessage, *metadataAccumulator) error
+	switch up.Payload.MType {
+	case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:
+		handle = ns.handleDataUplink
+	case ttnpb.MType_JOIN_REQUEST:
+		handle = ns.handleJoinRequest
+	case ttnpb.MType_REJOIN_REQUEST:
+		handle = ns.handleRejoinRequest
+	default:
+		logger.Debug("Unmatched MType")
+		return ttnpb.Empty, nil
+	}
 
 	logger.Debug("Deduplicate uplink")
 	acc, stopDedup, ok := ns.deduplicateUplink(ctx, up)
@@ -1208,18 +1217,6 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 		logger.Debug("Done deduplicating uplink")
 	}()
 
-	switch up.Payload.MType {
-	case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:
-		logger.Debug("Handle data uplink")
-		return ttnpb.Empty, ns.handleUplink(ctx, up, acc)
-	case ttnpb.MType_JOIN_REQUEST:
-		logger.Debug("Handle join-request")
-		return ttnpb.Empty, ns.handleJoin(ctx, up, acc)
-	case ttnpb.MType_REJOIN_REQUEST:
-		logger.Debug("Handle rejoin-request")
-		return ttnpb.Empty, ns.handleRejoin(ctx, up, acc)
-	default:
-		logger.Warn("Unmatched MType")
-		return ttnpb.Empty, nil
-	}
+	logger.Debug("Handle uplink")
+	return ttnpb.Empty, handle(ctx, up, acc)
 }
