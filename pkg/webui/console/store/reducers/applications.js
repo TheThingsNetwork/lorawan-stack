@@ -59,7 +59,7 @@ const applications = function (state = defaultState, { type, payload }) {
       ...state,
       entities: {
         ...state.entities,
-        [id]: application(state[id], payload),
+        [id]: application(state.entities[id], payload),
       },
     }
   default:
