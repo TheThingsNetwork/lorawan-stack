@@ -38,5 +38,9 @@ const updateDeviceLogic = createRequestLogic({
 export default [
   getDeviceLogic,
   updateDeviceLogic,
-  ...createEventsConnectLogics(device.SHARED_NAME, 'device'),
+  ...createEventsConnectLogics(
+    device.SHARED_NAME,
+    'devices',
+    api.device.eventsSubscribe,
+  ),
 ]

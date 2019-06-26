@@ -37,13 +37,14 @@ const mapConnectionStatusToWidget = function (status) {
 
 @connect(function (state, props) {
   const {
+    id,
     eventsSelector,
     statusSelector,
   } = props
 
   return {
-    events: eventsSelector(state, props),
-    connectionStatus: statusSelector(state, props),
+    events: eventsSelector(state, id),
+    connectionStatus: statusSelector(state, id),
   }
 })
 class EventsSubscription extends React.Component {

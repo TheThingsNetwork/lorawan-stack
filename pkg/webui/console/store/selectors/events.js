@@ -12,22 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const selectEventsStore = (state, props) => state[props.id]
+const selectEventsStore = (state, entityId) => state[entityId]
 
-export const createEventsSelector = entity => function (state, props) {
-  const store = selectEventsStore(state.events[entity], props)
+export const createEventsSelector = entity => function (state, entityId) {
+  const store = selectEventsStore(state.events[entity], entityId)
 
   return store ? store.events : []
 }
 
-export const createEventsStatusSelector = entity => function (state, props) {
-  const store = selectEventsStore(state.events[entity], props)
+export const createEventsStatusSelector = entity => function (state, entityId) {
+  const store = selectEventsStore(state.events[entity], entityId)
 
   return store ? store.status : 'unknown'
 }
 
-export const createEventsErrorSelector = entity => function (state, props) {
-  const store = selectEventsStore(state.events[entity], props)
+export const createEventsErrorSelector = entity => function (state, entityId) {
+  const store = selectEventsStore(state.events[entity], entityId)
 
   return store ? store.error : false
 }
