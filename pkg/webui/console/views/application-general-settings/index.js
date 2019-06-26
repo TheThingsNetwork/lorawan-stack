@@ -34,6 +34,7 @@ import toast from '../../../components/toast'
 import SubmitBar from '../../../components/submit-bar'
 
 import { selectSelectedApplication } from '../../store/selectors/applications'
+import { updateApplication } from '../../store/actions/applications'
 
 import api from '../../api'
 
@@ -52,14 +53,15 @@ const validationSchema = Yup.object().shape({
     .max(150, sharedMessages.validateTooLong),
 })
 
-@connect(function (state) {
-  return {
-    application: selectSelectedApplication(state),
-  }
-})
+@connect(state => ({
+  application: selectSelectedApplication(state),
+}),
+dispatch => ({
+  updateApplication: (id, patch) => dispatch(updateApplication(id, patch)),
+  redirectToList: () => dispatch(replace('/console/applications')),
+}))
 @withBreadcrumb('apps.single.general-settings', function (props) {
-  const { match } = props
-  const appId = match.params.appId
+  const { appId } = props
 
   return (
     <Breadcrumb
@@ -77,14 +79,15 @@ export default class ApplicationGeneralSettings extends React.Component {
   }
 
   async handleSubmit (values, { resetForm }) {
-    const { application } = this.props
+    const { application, updateApplication } = this.props
 
     await this.setState({ error: '' })
 
     const changed = diff(application, values)
+    const { ids: { application_id }} = application
+
     try {
-      const { ids: { application_id }} = application
-      await api.application.update(application_id, changed)
+      await updateApplication(application_id, changed)
       resetForm(values)
       toast({
         title: application_id,
@@ -98,14 +101,14 @@ export default class ApplicationGeneralSettings extends React.Component {
   }
 
   async handleDelete () {
-    const { dispatch } = this.props
+    const { redirectToList } = this.props
     const { appId } = this.props.match.params
 
     await this.setState({ error: '' })
 
     try {
       await api.application.delete(appId)
-      dispatch(replace('/console/applications'))
+      redirectToList()
     } catch (error) {
       await this.setState({ error })
     }
