@@ -17,6 +17,7 @@ import {
   GET_APP,
   GET_APP_SUCCESS,
   GET_APPS_LIST_SUCCESS,
+  UPDATE_APP_SUCCESS,
 } from '../actions/applications'
 
 const application = function (state = {}, application) {
@@ -51,6 +52,7 @@ const applications = function (state = defaultState, { type, payload }) {
       entities,
     }
   case GET_APP_SUCCESS:
+  case UPDATE_APP_SUCCESS:
     const id = getApplicationId(payload)
 
     return {
