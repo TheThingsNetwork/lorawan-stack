@@ -71,93 +71,104 @@ func splitEndDeviceSetPaths(supportsJoin bool, paths ...string) (is, ns, as, js 
 
 func getEndDevice(ids ttnpb.EndDeviceIdentifiers, nsPaths, asPaths, jsPaths []string, continueOnError bool) (*ttnpb.EndDevice, error) {
 	var res ttnpb.EndDevice
-
 	if len(jsPaths) > 0 {
-		js, err := api.Dial(ctx, config.JoinServerGRPCAddress)
-		if err != nil {
-			if !continueOnError {
-				return nil, err
-			}
-			logger.WithError(err).Error("Could not connect to Join Server")
+		if !config.JoinServerEnabled {
+			logger.WithField("paths", jsPaths).Warn("Join Server disabled but fields specified to get")
 		} else {
-			logger.WithField("paths", jsPaths).Debug("Get EndDevice from Join Server")
-			jsRes, err := ttnpb.NewJsEndDeviceRegistryClient(js).Get(ctx, &ttnpb.GetEndDeviceRequest{
-				EndDeviceIdentifiers: ids,
-				FieldMask:            types.FieldMask{Paths: jsPaths},
-			})
+			js, err := api.Dial(ctx, config.JoinServerGRPCAddress)
 			if err != nil {
 				if !continueOnError {
 					return nil, err
 				}
-				logger.WithError(err).Error("Could not get end device from Join Server")
+				logger.WithError(err).Error("Could not connect to Join Server")
 			} else {
-				res.SetFields(jsRes, ttnpb.AllowedBottomLevelFields(jsPaths, getEndDeviceFromJS)...)
-				if res.CreatedAt.IsZero() || (!jsRes.CreatedAt.IsZero() && jsRes.CreatedAt.Before(res.CreatedAt)) {
-					res.CreatedAt = jsRes.CreatedAt
-				}
-				if jsRes.UpdatedAt.After(res.UpdatedAt) {
-					res.UpdatedAt = jsRes.UpdatedAt
+				logger.WithField("paths", jsPaths).Debug("Get end device from Join Server")
+				jsRes, err := ttnpb.NewJsEndDeviceRegistryClient(js).Get(ctx, &ttnpb.GetEndDeviceRequest{
+					EndDeviceIdentifiers: ids,
+					FieldMask:            types.FieldMask{Paths: jsPaths},
+				})
+				if err != nil {
+					if !continueOnError {
+						return nil, err
+					}
+					logger.WithError(err).Error("Could not get end device from Join Server")
+				} else {
+					res.SetFields(jsRes, ttnpb.AllowedBottomLevelFields(jsPaths, getEndDeviceFromJS)...)
+					if res.CreatedAt.IsZero() || (!jsRes.CreatedAt.IsZero() && jsRes.CreatedAt.Before(res.CreatedAt)) {
+						res.CreatedAt = jsRes.CreatedAt
+					}
+					if jsRes.UpdatedAt.After(res.UpdatedAt) {
+						res.UpdatedAt = jsRes.UpdatedAt
+					}
 				}
 			}
 		}
 	}
 
 	if len(asPaths) > 0 {
-		as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
-		if err != nil {
-			if !continueOnError {
-				return nil, err
-			}
-			logger.WithError(err).Error("Could not connect to Application Server")
+		if !config.ApplicationServerEnabled {
+			logger.WithField("paths", asPaths).Warn("Application Server disabled but fields specified to get")
 		} else {
-			logger.WithField("paths", asPaths).Debug("Get EndDevice from Application Server")
-			asRes, err := ttnpb.NewAsEndDeviceRegistryClient(as).Get(ctx, &ttnpb.GetEndDeviceRequest{
-				EndDeviceIdentifiers: ids,
-				FieldMask:            types.FieldMask{Paths: asPaths},
-			})
+			as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
 			if err != nil {
 				if !continueOnError {
 					return nil, err
 				}
-				logger.WithError(err).Error("Could not get end device from Application Server")
+				logger.WithError(err).Error("Could not connect to Application Server")
 			} else {
-				res.SetFields(asRes, ttnpb.AllowedBottomLevelFields(asPaths, getEndDeviceFromAS)...)
-				if res.CreatedAt.IsZero() || (!asRes.CreatedAt.IsZero() && asRes.CreatedAt.Before(res.CreatedAt)) {
-					res.CreatedAt = asRes.CreatedAt
-				}
-				if asRes.UpdatedAt.After(res.UpdatedAt) {
-					res.UpdatedAt = asRes.UpdatedAt
+				logger.WithField("paths", asPaths).Debug("Get end device from Application Server")
+				asRes, err := ttnpb.NewAsEndDeviceRegistryClient(as).Get(ctx, &ttnpb.GetEndDeviceRequest{
+					EndDeviceIdentifiers: ids,
+					FieldMask:            types.FieldMask{Paths: asPaths},
+				})
+				if err != nil {
+					if !continueOnError {
+						return nil, err
+					}
+					logger.WithError(err).Error("Could not get end device from Application Server")
+				} else {
+					res.SetFields(asRes, ttnpb.AllowedBottomLevelFields(asPaths, getEndDeviceFromAS)...)
+					if res.CreatedAt.IsZero() || (!asRes.CreatedAt.IsZero() && asRes.CreatedAt.Before(res.CreatedAt)) {
+						res.CreatedAt = asRes.CreatedAt
+					}
+					if asRes.UpdatedAt.After(res.UpdatedAt) {
+						res.UpdatedAt = asRes.UpdatedAt
+					}
 				}
 			}
 		}
 	}
 
 	if len(nsPaths) > 0 {
-		ns, err := api.Dial(ctx, config.NetworkServerGRPCAddress)
-		if err != nil {
-			if !continueOnError {
-				return nil, err
-			}
-			logger.WithError(err).Error("Could not connect to Network Server")
+		if !config.NetworkServerEnabled {
+			logger.WithField("paths", nsPaths).Warn("Network Server disabled but fields specified to get")
 		} else {
-			logger.WithField("paths", nsPaths).Debug("Get EndDevice from Network Server")
-			nsRes, err := ttnpb.NewNsEndDeviceRegistryClient(ns).Get(ctx, &ttnpb.GetEndDeviceRequest{
-				EndDeviceIdentifiers: ids,
-				FieldMask:            types.FieldMask{Paths: nsPaths},
-			})
+			ns, err := api.Dial(ctx, config.NetworkServerGRPCAddress)
 			if err != nil {
 				if !continueOnError {
 					return nil, err
 				}
-				logger.WithError(err).Error("Could not get end device from Network Server")
+				logger.WithError(err).Error("Could not connect to Network Server")
 			} else {
-				res.SetFields(nsRes, "ids.dev_addr")
-				res.SetFields(nsRes, ttnpb.AllowedBottomLevelFields(nsPaths, getEndDeviceFromNS)...)
-				if res.CreatedAt.IsZero() || (!nsRes.CreatedAt.IsZero() && nsRes.CreatedAt.Before(res.CreatedAt)) {
-					res.CreatedAt = nsRes.CreatedAt
-				}
-				if nsRes.UpdatedAt.After(res.UpdatedAt) {
-					res.UpdatedAt = nsRes.UpdatedAt
+				logger.WithField("paths", nsPaths).Debug("Get end device from Network Server")
+				nsRes, err := ttnpb.NewNsEndDeviceRegistryClient(ns).Get(ctx, &ttnpb.GetEndDeviceRequest{
+					EndDeviceIdentifiers: ids,
+					FieldMask:            types.FieldMask{Paths: nsPaths},
+				})
+				if err != nil {
+					if !continueOnError {
+						return nil, err
+					}
+					logger.WithError(err).Error("Could not get end device from Network Server")
+				} else {
+					res.SetFields(nsRes, "ids.dev_addr")
+					res.SetFields(nsRes, ttnpb.AllowedBottomLevelFields(nsPaths, getEndDeviceFromNS)...)
+					if res.CreatedAt.IsZero() || (!nsRes.CreatedAt.IsZero() && nsRes.CreatedAt.Before(res.CreatedAt)) {
+						res.CreatedAt = nsRes.CreatedAt
+					}
+					if nsRes.UpdatedAt.After(res.UpdatedAt) {
+						res.UpdatedAt = nsRes.UpdatedAt
+					}
 				}
 			}
 		}
@@ -176,7 +187,7 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths []
 			return nil, err
 		}
 		var isDevice ttnpb.EndDevice
-		logger.WithField("paths", isPaths).Debug("Set EndDevice on Identity Server")
+		logger.WithField("paths", isPaths).Debug("Set end device on Identity Server")
 		isDevice.SetFields(device, append(isPaths, "ids")...)
 		isRes, err := ttnpb.NewEndDeviceRegistryClient(is).Update(ctx, &ttnpb.UpdateEndDeviceRequest{
 			EndDevice: isDevice,
@@ -194,13 +205,15 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths []
 		}
 	}
 
-	if len(jsPaths) > 0 {
+	if len(jsPaths) > 0 && !config.JoinServerEnabled {
+		logger.WithField("paths", jsPaths).Warn("Join Server disabled but fields specified to set")
+	} else if len(jsPaths) > 0 {
 		js, err := api.Dial(ctx, config.JoinServerGRPCAddress)
 		if err != nil {
 			return nil, err
 		}
 		var jsDevice ttnpb.EndDevice
-		logger.WithField("paths", jsPaths).Debug("Set EndDevice on Join Server")
+		logger.WithField("paths", jsPaths).Debug("Set end device on Join Server")
 		jsDevice.SetFields(device, append(jsPaths, "ids")...)
 		jsRes, err := ttnpb.NewJsEndDeviceRegistryClient(js).Set(ctx, &ttnpb.SetEndDeviceRequest{
 			EndDevice: jsDevice,
@@ -218,13 +231,15 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths []
 		}
 	}
 
-	if len(nsPaths) > 0 || isCreate {
+	if len(nsPaths) > 0 && !config.NetworkServerEnabled {
+		logger.WithField("paths", nsPaths).Warn("Network Server disabled but fields specified to set")
+	} else if (len(nsPaths) > 0 || isCreate) && config.NetworkServerEnabled {
 		ns, err := api.Dial(ctx, config.NetworkServerGRPCAddress)
 		if err != nil {
 			return nil, err
 		}
 		var nsDevice ttnpb.EndDevice
-		logger.WithField("paths", nsPaths).Debug("Set EndDevice on Network Server")
+		logger.WithField("paths", nsPaths).Debug("Set end device on Network Server")
 		nsDevice.SetFields(device, append(nsPaths, "ids")...)
 		nsRes, err := ttnpb.NewNsEndDeviceRegistryClient(ns).Set(ctx, &ttnpb.SetEndDeviceRequest{
 			EndDevice: nsDevice,
@@ -242,13 +257,15 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths []
 		}
 	}
 
-	if len(asPaths) > 0 || isCreate {
+	if len(asPaths) > 0 && !config.ApplicationServerEnabled {
+		logger.WithField("paths", asPaths).Warn("Application Server disabled but fields specified to set")
+	} else if (len(asPaths) > 0 || isCreate) && config.ApplicationServerEnabled {
 		as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
 		if err != nil {
 			return nil, err
 		}
 		var asDevice ttnpb.EndDevice
-		logger.WithField("paths", asPaths).Debug("Set EndDevice on Application Server")
+		logger.WithField("paths", asPaths).Debug("Set end device on Application Server")
 		asDevice.SetFields(device, append(asPaths, "ids")...)
 		asRes, err := ttnpb.NewAsEndDeviceRegistryClient(as).Set(ctx, &ttnpb.SetEndDeviceRequest{
 			EndDevice: asDevice,
@@ -270,38 +287,44 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths []
 }
 
 func deleteEndDevice(ctx context.Context, devID *ttnpb.EndDeviceIdentifiers) error {
-	as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
-	if err != nil {
-		return err
-	}
-	_, err = ttnpb.NewAsEndDeviceRegistryClient(as).Delete(ctx, devID)
-	if errors.IsNotFound(err) {
-		logger.WithError(err).Error("Could not delete end device from Application Server")
-	} else if err != nil {
-		return err
-	}
-
-	ns, err := api.Dial(ctx, config.NetworkServerGRPCAddress)
-	if err != nil {
-		return err
-	}
-	_, err = ttnpb.NewNsEndDeviceRegistryClient(ns).Delete(ctx, devID)
-	if errors.IsNotFound(err) {
-		logger.WithError(err).Error("Could not delete end device from Network Server")
-	} else if err != nil {
-		return err
-	}
-
-	if devID.JoinEUI != nil && devID.DevEUI != nil {
-		js, err := api.Dial(ctx, config.JoinServerGRPCAddress)
+	if config.ApplicationServerEnabled {
+		as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
 		if err != nil {
 			return err
 		}
-		_, err = ttnpb.NewJsEndDeviceRegistryClient(js).Delete(ctx, devID)
+		_, err = ttnpb.NewAsEndDeviceRegistryClient(as).Delete(ctx, devID)
 		if errors.IsNotFound(err) {
-			logger.WithError(err).Error("Could not delete end device from Join Server")
+			logger.WithError(err).Error("Could not delete end device from Application Server")
 		} else if err != nil {
 			return err
+		}
+	}
+
+	if config.NetworkServerEnabled {
+		ns, err := api.Dial(ctx, config.NetworkServerGRPCAddress)
+		if err != nil {
+			return err
+		}
+		_, err = ttnpb.NewNsEndDeviceRegistryClient(ns).Delete(ctx, devID)
+		if errors.IsNotFound(err) {
+			logger.WithError(err).Error("Could not delete end device from Network Server")
+		} else if err != nil {
+			return err
+		}
+	}
+
+	if config.JoinServerEnabled {
+		if devID.JoinEUI != nil && devID.DevEUI != nil {
+			js, err := api.Dial(ctx, config.JoinServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			_, err = ttnpb.NewJsEndDeviceRegistryClient(js).Delete(ctx, devID)
+			if errors.IsNotFound(err) {
+				logger.WithError(err).Error("Could not delete end device from Join Server")
+			} else if err != nil {
+				return err
+			}
 		}
 	}
 

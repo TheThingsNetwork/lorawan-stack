@@ -33,25 +33,37 @@ type Config struct {
 	InputFormat                  string `name:"input-format" description:"Input format"`
 	OutputFormat                 string `name:"output-format" description:"Output format"`
 	AllowUnknownHosts            bool   `name:"allow-unknown-hosts" description:"Allow sending credentials to unknown hosts"`
-	OAuthServerAddress           string `name:"oauth-server-address" description:"OAuth Server Address"`
-	IdentityServerGRPCAddress    string `name:"identity-server-grpc-address" description:"Identity Server Address"`
-	GatewayServerGRPCAddress     string `name:"gateway-server-grpc-address" description:"Gateway Server Address"`
-	NetworkServerGRPCAddress     string `name:"network-server-grpc-address" description:"Network Server Address"`
-	ApplicationServerGRPCAddress string `name:"application-server-grpc-address" description:"Application Server Address"`
-	JoinServerGRPCAddress        string `name:"join-server-grpc-address" description:"Join Server Address"`
+	OAuthServerAddress           string `name:"oauth-server-address" description:"OAuth Server address"`
+	IdentityServerGRPCAddress    string `name:"identity-server-grpc-address" description:"Identity Server address"`
+	GatewayServerEnabled         bool   `name:"gateway-server-enabled" description:"Gateway Server enabled"`
+	GatewayServerGRPCAddress     string `name:"gateway-server-grpc-address" description:"Gateway Server address"`
+	NetworkServerEnabled         bool   `name:"network-server-enabled" description:"Network Server enabled"`
+	NetworkServerGRPCAddress     string `name:"network-server-grpc-address" description:"Network Server address"`
+	ApplicationServerEnabled     bool   `name:"application-server-enabled" description:"Application Server enabled"`
+	ApplicationServerGRPCAddress string `name:"application-server-grpc-address" description:"Application Server address"`
+	JoinServerEnabled            bool   `name:"join-server-enabled" description:"Join Server enabled"`
+	JoinServerGRPCAddress        string `name:"join-server-grpc-address" description:"Join Server address"`
 	Insecure                     bool   `name:"insecure" description:"Connect without TLS"`
 	CA                           string `name:"ca" description:"CA certificate file"`
 }
 
 func (c Config) getHosts() []string {
-	return getHosts(
-		c.OAuthServerAddress,
-		c.IdentityServerGRPCAddress,
-		c.GatewayServerGRPCAddress,
-		c.NetworkServerGRPCAddress,
-		c.ApplicationServerGRPCAddress,
-		c.JoinServerGRPCAddress,
-	)
+	hosts := make([]string, 0, 6)
+	hosts = append(hosts, c.OAuthServerAddress)
+	hosts = append(hosts, c.IdentityServerGRPCAddress)
+	if c.GatewayServerEnabled {
+		hosts = append(hosts, c.GatewayServerGRPCAddress)
+	}
+	if c.NetworkServerEnabled {
+		hosts = append(hosts, c.NetworkServerGRPCAddress)
+	}
+	if c.ApplicationServerEnabled {
+		hosts = append(hosts, c.ApplicationServerGRPCAddress)
+	}
+	if c.JoinServerEnabled {
+		hosts = append(hosts, c.JoinServerGRPCAddress)
+	}
+	return getHosts(hosts...)
 }
 
 // DefaultConfig contains the default config for the ttn-lw-cli binary.
@@ -65,9 +77,13 @@ var DefaultConfig = Config{
 	OutputFormat:                 "json",
 	OAuthServerAddress:           clusterHTTPAddress + "/oauth",
 	IdentityServerGRPCAddress:    clusterGRPCAddress,
+	GatewayServerEnabled:         true,
 	GatewayServerGRPCAddress:     clusterGRPCAddress,
+	NetworkServerEnabled:         true,
 	NetworkServerGRPCAddress:     clusterGRPCAddress,
+	ApplicationServerEnabled:     true,
 	ApplicationServerGRPCAddress: clusterGRPCAddress,
+	JoinServerEnabled:            true,
 	JoinServerGRPCAddress:        clusterGRPCAddress,
 }
 
