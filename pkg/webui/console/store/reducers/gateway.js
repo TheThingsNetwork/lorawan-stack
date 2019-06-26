@@ -14,7 +14,7 @@
 
 import {
   GET_GTW_SUCCESS,
-  UPDATE_GTW,
+  UPDATE_GTW_SUCCESS,
   START_GTW_STATS,
   UPDATE_GTW_STATS,
   UPDATE_GTW_STATS_SUCCESS,
@@ -56,18 +56,19 @@ const statistics = function (state = statsDefaultState, { type, payload }) {
 }
 
 const gateway = function (state = defaultState, action) {
-  switch (action.type) {
+  const { type, payload } = action
+  switch (type) {
   case GET_GTW_SUCCESS:
     return {
       ...state,
-      gateway: action.payload,
+      gateway: payload,
     }
-  case UPDATE_GTW:
+  case UPDATE_GTW_SUCCESS:
     return {
       ...state,
       gateway: {
         ...state.gateway,
-        ...action.patch,
+        ...payload,
       },
     }
   case START_GTW_STATS:
