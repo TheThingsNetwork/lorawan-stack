@@ -54,7 +54,7 @@ const m = defineMessages({
 },
 dispatch => ({
   onDeleteSuccess: () => dispatch(replace('/console/gateways')),
-  updateGateway,
+  updateGateway: (gatewayId, patch) => dispatch(updateGateway(gatewayId, patch)),
 }))
 @withBreadcrumb('gateways.single.general-settings', function (props) {
   const { gtwId } = props
@@ -109,14 +109,13 @@ export default class GatewayGeneralSettings extends React.Component {
     }
 
     try {
-      const updatedGateway = await api.gateway.update(gtwId, changed)
-      this.formRef.current.resetForm(values)
+      await updateGateway(gtwId, changed)
+      this.formRef.current.resetForm()
       toast({
         title: gtwId,
         message: m.updateSuccess,
         type: toast.types.SUCCESS,
       })
-      updateGateway(gtwId, updatedGateway)
     } catch (error) {
       this.formRef.current.resetForm(values)
       await this.setState({ error })
