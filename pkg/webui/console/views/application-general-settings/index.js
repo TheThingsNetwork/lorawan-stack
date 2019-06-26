@@ -18,7 +18,6 @@ import { Col, Row, Container } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 import { connect } from 'react-redux'
 import * as Yup from 'yup'
-import { replace } from 'connected-react-router'
 
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
@@ -34,9 +33,7 @@ import toast from '../../../components/toast'
 import SubmitBar from '../../../components/submit-bar'
 
 import { selectSelectedApplication } from '../../store/selectors/applications'
-import { updateApplication } from '../../store/actions/applications'
-
-import api from '../../api'
+import { updateApplication, deleteApplication } from '../../store/actions/applications'
 
 const m = defineMessages({
   basics: 'Basics',
@@ -56,10 +53,10 @@ const validationSchema = Yup.object().shape({
 @connect(state => ({
   application: selectSelectedApplication(state),
 }),
-dispatch => ({
-  updateApplication: (id, patch) => dispatch(updateApplication(id, patch)),
-  redirectToList: () => dispatch(replace('/console/applications')),
-}))
+{
+  updateApplication,
+  deleteApplication,
+})
 @withBreadcrumb('apps.single.general-settings', function (props) {
   const { appId } = props
 
@@ -101,14 +98,13 @@ export default class ApplicationGeneralSettings extends React.Component {
   }
 
   async handleDelete () {
-    const { redirectToList } = this.props
+    const { deleteApplication } = this.props
     const { appId } = this.props.match.params
 
     await this.setState({ error: '' })
 
     try {
-      await api.application.delete(appId)
-      redirectToList()
+      await deleteApplication(appId)
     } catch (error) {
       await this.setState({ error })
     }
