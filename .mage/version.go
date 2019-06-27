@@ -70,6 +70,10 @@ func (Version) Files() error {
 		return err
 	}
 	version := strings.TrimPrefix(currentVersion, "v")
+	if version == "" {
+		fmt.Println("No version rewrite necessary")
+		return nil
+	}
 	for _, packageJSONFile := range packageJSONFilePaths {
 		err = sh.Run(
 			nodeBin("json"),
