@@ -20,11 +20,12 @@ import { defineMessages } from 'react-intl'
 
 import sharedMessages from '../../../lib/shared-messages'
 import diff from '../../../lib/diff'
-import api from '../../api'
 
 import DeviceDataForm from '../../containers/device-data-form'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import toast from '../../../components/toast'
+
+import { updateDevice } from '../../store/actions/device'
 
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
 
@@ -37,7 +38,7 @@ const m = defineMessages({
     device: state.device.device,
     appId: selectSelectedApplicationId(state),
   }
-})
+}, { updateDevice })
 @bind
 export default class DeviceGeneralSettings extends React.Component {
 
@@ -46,7 +47,7 @@ export default class DeviceGeneralSettings extends React.Component {
   }
 
   async handleSubmit (values, { setSubmitting, resetForm }) {
-    const { device, appId } = this.props
+    const { device, appId, updateDevice } = this.props
     const { activation_mode, ...updatedDevice } = values
 
     // Clean values based on activation mode
@@ -65,18 +66,18 @@ export default class DeviceGeneralSettings extends React.Component {
 
     await this.setState({ error: '' })
     try {
-      const { ids: { device_id }} = this.props.device
+      const { ids: { device_id: deviceId }} = this.props.device
       const changed = diff(device, updatedDevice)
-      await api.device.update(appId, device_id, changed)
 
-      resetForm(values)
+      await updateDevice(appId, deviceId, changed)
+      resetForm()
       toast({
-        title: device_id,
+        title: deviceId,
         message: m.updateSuccess,
         type: toast.types.SUCCESS,
       })
     } catch (error) {
-      resetForm(values)
+      resetForm()
       const err = error instanceof Error ? sharedMessages.genericError : error
       await this.setState({ error: err })
     }

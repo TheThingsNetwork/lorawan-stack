@@ -31,7 +31,9 @@ const updateDeviceLogic = createRequestLogic({
   type: device.UPDATE_DEV,
   async process ({ action }) {
     const { payload: { appId, deviceId, patch }} = action
-    return api.device.update(appId, deviceId, patch)
+    const result = await api.device.update(appId, deviceId, patch)
+
+    return { ...patch, ...result }
   },
 }, device.updateDeviceSuccess)
 

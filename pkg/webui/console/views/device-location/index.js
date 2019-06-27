@@ -21,7 +21,6 @@ import * as Yup from 'yup'
 
 import sharedMessages from '../../../lib/shared-messages'
 import { getDeviceId } from '../../../lib/selectors/id'
-import api from '../../api'
 
 import LocationForm from '../../../components/location-form'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
@@ -107,8 +106,7 @@ export default class DeviceGeneralSettings extends React.Component {
       }
     }
 
-    const updatedDevice = await api.device.update(appId, devId, patch)
-    updateDevice(appId, devId, updatedDevice)
+    await updateDevice(appId, devId, patch)
   }
 
   async handleDelete () {
@@ -119,13 +117,8 @@ export default class DeviceGeneralSettings extends React.Component {
       locations: { ...device.location },
     }
     delete patch.locations[registryLocation.key]
-    const updatedDevice = await api.device.update(appId, devId, patch)
 
-    if (!updatedDevice.locations) {
-      updatedDevice.locations = undefined
-    }
-
-    updateDevice(appId, devId, updatedDevice)
+    await updateDevice(appId, devId, patch)
   }
 
   render () {

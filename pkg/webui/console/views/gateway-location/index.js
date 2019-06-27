@@ -21,7 +21,6 @@ import * as Yup from 'yup'
 
 import sharedMessages from '../../../lib/shared-messages'
 import { getGatewayId } from '../../../lib/selectors/id'
-import api from '../../api'
 
 import LocationForm from '../../../components/location-form'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
@@ -106,8 +105,7 @@ export default class GatewayLocation extends React.Component {
       }]
     }
 
-    const updatedGateway = await api.gateway.update(gtwId, patch)
-    updateGateway(gtwId, updatedGateway)
+    await updateGateway(gtwId, patch)
   }
 
   async handleDelete () {
@@ -118,13 +116,8 @@ export default class GatewayLocation extends React.Component {
       antennas: [ ...gateway.antennas ],
     }
     patch.antennas.splice(registryLocation.key, 1)
-    const updatedGateway = await api.gateway.update(gtwId, patch)
 
-    if (!updatedGateway.antennas) {
-      updatedGateway.antennas = undefined
-    }
-
-    updateGateway(gtwId, updatedGateway)
+    await updateGateway(gtwId, patch)
   }
 
   render () {
