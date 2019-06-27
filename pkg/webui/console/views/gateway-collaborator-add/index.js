@@ -22,70 +22,71 @@ import Spinner from '../../../components/spinner'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import sharedMessages from '../../../lib/shared-messages'
-import CollaboratorForm from '../../components/collaborator-form'
 import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
+import CollaboratorForm from '../../components/collaborator-form'
 
-import { getApplicationsRightsList } from '../../store/actions/applications'
 import {
-  selectSelectedApplicationId,
-  selectApplicationRights,
-  selectApplicationUniversalRights,
-  selectApplicationRightsFetching,
-  selectApplicationRightsError,
-} from '../../store/selectors/applications'
+  selectSelectedGatewayId,
+  selectGatewayRights,
+  selectGatewayUniversalRights,
+  selectGatewayRightsFetching,
+  selectGatewayRightsError,
+} from '../../store/selectors/gateway'
 
+import { getGatewaysRightsList } from '../../store/actions/gateways'
 import api from '../../api'
 
-@connect(function (state) {
+@connect(function (state, props) {
+  const { collaborators } = state
+
   return {
-    appId: selectSelectedApplicationId(state),
-    collaborators: state.collaborators.applications.collaborators,
-    rights: selectApplicationRights(state),
-    universalRights: selectApplicationUniversalRights(state),
-    fetching: selectApplicationRightsFetching(state),
-    error: selectApplicationRightsError(state),
+    gtwId: selectSelectedGatewayId(state),
+    collaborators: collaborators.gateways.collaborators,
+    fetching: selectGatewayRightsFetching(state),
+    error: selectGatewayRightsError(state),
+    rights: selectGatewayRights(state),
+    universalRights: selectGatewayUniversalRights(state),
   }
 }, (dispatch, ownProps) => ({
-  redirectToList: appId => dispatch(push(`/console/applications/${appId}/collaborators`)),
-  getApplicationsRightsList: appId => dispatch(getApplicationsRightsList(appId)),
+  getGatewaysRightsList: gtwId => dispatch(getGatewaysRightsList(gtwId)),
+  redirectToList: gtwId => dispatch(push(`/console/gateways/${gtwId}/collaborators`)),
 }), (stateProps, dispatchProps, ownProps) => ({
   ...stateProps, ...dispatchProps, ...ownProps,
-  redirectToList: () => dispatchProps.redirectToList(stateProps.appId),
-  getApplicationsRightsList: () => dispatchProps.getApplicationsRightsList(stateProps.appId),
+  getGatewaysRightsList: () => dispatchProps.getGatewaysRightsList(stateProps.gtwId),
+  redirectToList: () => dispatchProps.redirectToList(stateProps.gtwId),
 }))
-@withBreadcrumb('apps.single.collaborators.add', function (props) {
-  const appId = props.appId
+@withBreadcrumb('gtws.single.collaborators.add', function (props) {
+  const gtwId = props.gtwId
   return (
     <Breadcrumb
-      path={`/console/applications/${appId}/collaborators/add`}
+      path={`/console/gateways/${gtwId}/collaborators/add`}
       icon="add"
       content={sharedMessages.add}
     />
   )
 })
 @bind
-export default class ApplicationCollaboratorAdd extends React.Component {
+export default class GatewayCollaboratorAdd extends React.Component {
 
   state = {
     error: '',
   }
 
   componentDidMount () {
-    const { getApplicationsRightsList } = this.props
+    const { getGatewaysRightsList } = this.props
 
-    getApplicationsRightsList()
+    getGatewaysRightsList()
   }
 
-  async handleSubmit (collaborator) {
-    const { appId } = this.props
+  handleSubmit (collaborator) {
+    const { gtwId } = this.props
 
-    await api.application.collaborators.add(appId, collaborator)
-
+    return api.gateway.collaborators.add(gtwId, collaborator)
   }
 
   render () {
-    const { rights, fetching, error, universalRights, redirectToList } = this.props
+    const { rights, fetching, error, redirectToList, universalRights } = this.props
 
     if (error) {
       throw error

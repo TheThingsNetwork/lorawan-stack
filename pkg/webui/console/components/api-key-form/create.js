@@ -16,15 +16,15 @@ import React from 'react'
 import bind from 'autobind-decorator'
 
 import ApiKeyModal from '../api-key-modal'
-import PropTypes from '../../lib/prop-types'
-import sharedMessages from '../../lib/shared-messages'
-import SubmitBar from '../submit-bar'
-import FormField from '../form/field'
-import FormSubmit from '../form/submit'
-import SubmitButton from '../submit-button'
-import Input from '../input'
-import Message from '../../lib/components/message'
-import RightsGroup from '../../console/components/rights-group'
+import PropTypes from '../../../lib/prop-types'
+import sharedMessages from '../../../lib/shared-messages'
+import SubmitBar from '../../../components/submit-bar'
+import FormField from '../../../components/form/field'
+import FormSubmit from '../../../components/form/submit'
+import SubmitButton from '../../../components/submit-button'
+import Input from '../../../components/input'
+import Message from '../../../lib/components/message'
+import RightsGroup from '../../../console/components/rights-group'
 import ApiKeyForm from './form'
 import validationSchema from './validation-schema'
 
@@ -44,15 +44,9 @@ class CreateForm extends React.Component {
   }
 
   async handleCreate (values) {
-    const { rights, name } = values
     const { onCreate } = this.props
 
-    const key = {
-      name,
-      rights: Object.keys(rights).filter(r => rights[r]),
-    }
-
-    return await onCreate(key)
+    return await onCreate(values)
   }
 
   async handleCreateSuccess (key) {
@@ -77,14 +71,9 @@ class CreateForm extends React.Component {
 
     const modalProps = modal ? modal : {}
     const modalVisible = Boolean(modal)
-    const rightsValues = rights.reduce(function (acc, right) {
-      acc[right] = false
-
-      return acc
-    }, {})
     const initialValues = {
       name: '',
-      rights: rightsValues,
+      rights: [],
     }
 
     return (

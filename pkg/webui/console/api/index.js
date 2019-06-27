@@ -126,6 +126,12 @@ export default {
     update: ttnClient.Gateways.updateById.bind(ttnClient.Gateways),
     stats: ttnClient.Gateways.getStatisticsById.bind(ttnClient.Gateways),
     eventsSubscribe: ttnClient.Gateways.openStream.bind(ttnClient.Gateways),
+    collaborators: {
+      list: ttnClient.Gateways.Collaborators.getAll.bind(ttnClient.Gateways.Collaborators),
+      add: ttnClient.Gateways.Collaborators.add.bind(ttnClient.Gateways.Collaborators),
+      update: ttnClient.Gateways.Collaborators.update.bind(ttnClient.Gateways.Collaborators),
+      remove: ttnClient.Gateways.Collaborators.remove.bind(ttnClient.Gateways.Collaborators),
+    },
     apiKeys: {
       get: ttnClient.Gateways.ApiKeys.getById.bind(ttnClient.Gateways.ApiKeys),
       list: ttnClient.Gateways.ApiKeys.getAll.bind(ttnClient.Gateways.ApiKeys),

@@ -16,18 +16,17 @@ import React from 'react'
 import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 
-import diff from '../../lib/diff'
-import PropTypes from '../../lib/prop-types'
-import sharedMessages from '../../lib/shared-messages'
-import SubmitBar from '../submit-bar'
-import ModalButton from '../button/modal-button'
-import toast from '../toast'
-import Message from '../../lib/components/message'
-import FormField from '../form/field'
-import FormSubmit from '../form/submit'
-import SubmitButton from '../submit-button'
-import Input from '../input'
-import RightsGroup from '../../console/components/rights-group'
+import PropTypes from '../../../lib/prop-types'
+import sharedMessages from '../../../lib/shared-messages'
+import SubmitBar from '../../../components/submit-bar'
+import ModalButton from '../../../components/button/modal-button'
+import toast from '../../../components/toast'
+import Message from '../../../lib/components/message'
+import FormField from '../../../components/form/field'
+import FormSubmit from '../../../components/form/submit'
+import SubmitButton from '../../../components/submit-button'
+import Input from '../../../components/input'
+import RightsGroup from '../../../console/components/rights-group'
 import ApiKeyForm from './form'
 import validationSchema from './validation-schema'
 
@@ -48,12 +47,9 @@ class EditForm extends React.Component {
 
   async handleEdit (values) {
     const { name, rights } = values
-    const { apiKey, onEdit } = this.props
+    const { onEdit } = this.props
 
-    const changed = diff({ name: apiKey.name }, { name })
-    changed.rights = Object.keys(rights).filter(r => rights[r])
-
-    return await onEdit(changed)
+    return await onEdit({ name, rights })
   }
 
   async handleEditSuccess (key) {
@@ -108,19 +104,10 @@ class EditForm extends React.Component {
     } = this.props
     const { error } = this.state
 
-    const hasUniversalRight = universalRights.length
-      ? universalRights.some(universalRight => apiKey.rights.includes(universalRight))
-      : false
-
-    const rightsValues = rights.reduce(function (acc, right) {
-      acc[right] = hasUniversalRight || apiKey.rights.includes(right)
-
-      return acc
-    }, {})
     const initialValues = {
       id: apiKey.id,
       name: apiKey.name,
-      rights: rightsValues,
+      rights: apiKey.rights,
     }
 
     return (

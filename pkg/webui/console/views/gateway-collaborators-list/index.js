@@ -1,0 +1,62 @@
+// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+import React from 'react'
+import { Container, Row, Col } from 'react-grid-system'
+import bind from 'autobind-decorator'
+import { connect } from 'react-redux'
+
+import IntlHelmet from '../../../lib/components/intl-helmet'
+import CollaboratorsTable from '../../containers/collaborators-table'
+import { getGatewayCollaboratorsList } from '../../store/actions/gateway'
+import sharedMessages from '../../../lib/shared-messages'
+
+import { selectSelectedGatewayId } from '../../store/selectors/gateway'
+
+const COLLABORATORS_TABLE_SIZE = 10
+
+@connect(state => ({
+  gtwId: selectSelectedGatewayId(state),
+}))
+@bind
+export default class GatewayCollaborators extends React.Component {
+  constructor (props) {
+    super(props)
+
+    const { gtwId } = this.props
+    this.getGatewayCollaboratorsList = filters => getGatewayCollaboratorsList(gtwId, filters)
+  }
+
+  baseDataSelector ({ collaborators }) {
+    const { gtwId } = this.props
+    return collaborators.gateways[gtwId] || {}
+  }
+
+  render () {
+    return (
+      <Container>
+        <Row>
+          <IntlHelmet title={sharedMessages.collaborators} />
+          <Col sm={12}>
+            <CollaboratorsTable
+              pageSize={COLLABORATORS_TABLE_SIZE}
+              baseDataSelector={this.baseDataSelector}
+              getItemsAction={this.getGatewayCollaboratorsList}
+            />
+          </Col>
+        </Row>
+      </Container>
+    )
+  }
+}

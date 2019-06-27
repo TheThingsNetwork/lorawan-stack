@@ -12,18 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as Yup from 'yup'
-import sharedMessages from '../../lib/shared-messages'
+/* eslint-disable import/prefer-default-export */
 
-const validationSchema = Yup.object().shape({
-  name: Yup.string()
-    .min(2, sharedMessages.validateTooShort)
-    .max(50, sharedMessages.validateTooLong),
-  rights: Yup.object().test(
-    'rights',
-    sharedMessages.validateRights,
-    values => Object.values(values).reduce((acc, curr) => acc || curr, false)
-  ),
-})
-
-export default validationSchema
+export const RIGHT_ALL = 'RIGHT_ALL'

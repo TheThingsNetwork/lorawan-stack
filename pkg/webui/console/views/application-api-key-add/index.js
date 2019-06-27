@@ -24,7 +24,7 @@ import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import sharedMessages from '../../../lib/shared-messages'
 import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
-import { ApiKeyCreateForm } from '../../../components/api-key-form'
+import { ApiKeyCreateForm } from '../../components/api-key-form'
 
 import { getApplicationsRightsList } from '../../store/actions/applications'
 import {

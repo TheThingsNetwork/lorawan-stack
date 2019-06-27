@@ -27,84 +27,81 @@ import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import toast from '../../../components/toast'
 
+import { getGatewayCollaboratorsList } from '../../store/actions/gateway'
+import { getGatewaysRightsList } from '../../store/actions/gateways'
 import {
-  getApplicationCollaboratorsList,
-  getApplicationsRightsList,
-} from '../../store/actions/applications'
-import {
-  selectSelectedApplicationId,
-  selectApplicationRights,
-  selectApplicationUniversalRights,
-  selectApplicationRightsFetching,
-  selectApplicationRightsError,
-} from '../../store/selectors/applications'
-
+  selectSelectedGatewayId,
+  selectGatewayRights,
+  selectGatewayUniversalRights,
+  selectGatewayRightsFetching,
+  selectGatewayRightsError,
+} from '../../store/selectors/gateway'
 import api from '../../api'
 
 @connect(function (state, props) {
-  const appId = selectSelectedApplicationId(state)
+  const gtwId = selectSelectedGatewayId(state, props)
   const { collaboratorId } = props.match.params
-  const collaboratorsFetching = state.collaborators.applications.fetching
-  const collaboratorsError = state.collaborators.applications.error
+  const collaboratorsFetching = state.collaborators.gateways.fetching
+  const collaboratorsError = state.collaborators.gateways.error
 
-  const appCollaborators = state.collaborators.applications[appId]
-  const collaborator = appCollaborators ? appCollaborators.collaborators
+  const gtwCollaborators = state.collaborators.gateways[gtwId]
+  const collaborator = gtwCollaborators ? gtwCollaborators.collaborators
     .find(c => c.id === collaboratorId) : undefined
 
-  const fetching = selectApplicationRightsFetching(state) || collaboratorsFetching
-  const error = selectApplicationRightsError(state) || collaboratorsError
+  const fetching = selectGatewayRightsFetching(state) || collaboratorsFetching
+  const error = selectGatewayRightsError(state) || collaboratorsError
 
   return {
     collaboratorId,
     collaborator,
-    appId,
-    rights: selectApplicationRights(state),
-    universalRights: selectApplicationUniversalRights(state),
+    gtwId,
+    rights: selectGatewayRights(state),
+    universalRights: selectGatewayUniversalRights(state),
     fetching,
     error,
   }
+
 }, (dispatch, ownProps) => ({
-  loadData (appId) {
-    dispatch(getApplicationsRightsList(appId))
-    dispatch(getApplicationCollaboratorsList(appId))
+  async loadData (gtwId) {
+    dispatch(getGatewaysRightsList(gtwId))
+    dispatch(getGatewayCollaboratorsList(gtwId))
   },
-  redirectToList (appId) {
-    dispatch(replace(`/console/applications/${appId}/collaborators`))
+  redirectToList (gtwId) {
+    dispatch(replace(`/console/gateways/${gtwId}/collaborators`))
   },
 }), (stateProps, dispatchProps, ownProps) => ({
   ...stateProps, ...dispatchProps, ...ownProps,
-  loadData: () => dispatchProps.loadData(stateProps.appId),
-  redirectToList: () => dispatchProps.redirectToList(stateProps.appId),
-})
-)
-@withBreadcrumb('apps.single.collaborators.edit', function (props) {
-  const { appId, collaboratorId } = props
+  loadData: () => dispatchProps.loadData(stateProps.gtwId),
+  redirectToList: () => dispatchProps.redirectToList(stateProps.gtwId),
+}))
+@withBreadcrumb('gtws.single.collaborators.edit', function (props) {
+  const { gtwId, collaboratorId } = props
 
   return (
     <Breadcrumb
-      path={`/console/applications/${appId}/collaborators/${collaboratorId}/edit`}
+      path={`/console/gateways/${gtwId}/collaborators/${collaboratorId}/edit`}
       icon="general_settings"
       content={sharedMessages.edit}
     />
   )
 })
 @bind
-export default class ApplicationCollaboratorEdit extends React.Component {
+export default class GatewayCollaboratorEdit extends React.Component {
 
   state = {
     error: '',
   }
 
   componentDidMount () {
-    const { loadData, appId } = this.props
+    const { loadData } = this.props
 
-    loadData(appId)
+    loadData()
   }
 
-  async handleSubmit (updatedCollaborator) {
-    const { appId } = this.props
+  handleSubmit (updatedCollaborator) {
+    const { gtwId } = this.props
 
-    await api.application.collaborators.update(appId, updatedCollaborator)
+    return api.gateway.collaborators.update(gtwId, updatedCollaborator)
   }
 
   handleSubmitSuccess () {
@@ -114,40 +111,14 @@ export default class ApplicationCollaboratorEdit extends React.Component {
     })
   }
 
-  async handleDelete () {
-    const { collaborator, redirectToList, appId } = this.props
-    const collaborator_type = collaborator.isUser ? 'user' : 'organization'
+  async handleDelete (updatedCollaborator) {
+    const { gtwId } = this.props
 
-    const collaborator_ids = {
-      [`${collaborator_type}_ids`]: {
-        [`${collaborator_type}_id`]: collaborator.id,
-      },
-    }
-    const updatedCollaborator = {
-      ids: collaborator_ids,
-    }
-
-    try {
-      await api.application.collaborators.remove(appId, updatedCollaborator)
-      toast({
-        message: sharedMessages.collaboratorDeleteSuccess,
-        type: toast.types.SUCCESS,
-      })
-      redirectToList(appId)
-    } catch (error) {
-      await this.setState({ error })
-    }
+    return api.gateway.collaborators.remove(gtwId, updatedCollaborator)
   }
 
   render () {
-    const {
-      collaborator,
-      rights,
-      fetching,
-      error,
-      universalRights,
-      redirectToList,
-    } = this.props
+    const { collaborator, rights, fetching, error, redirectToList, universalRights } = this.props
 
     if (error) {
       throw error

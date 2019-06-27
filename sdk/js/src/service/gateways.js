@@ -15,6 +15,7 @@
 import Marshaler from '../util/marshaler'
 import stream from '../api/stream/stream-node'
 import ApiKeys from './api-keys'
+import Collaborators from './collaborators'
 
 class Gateways {
   constructor (api, { defaultUserId, stackConfig, proxy = true }) {
@@ -27,6 +28,12 @@ class Gateways {
         list: 'gateway_ids.gateway_id',
         create: 'gateway_ids.gateway_id',
         update: 'gateway_ids.gateway_id',
+      },
+    })
+    this.Collaborators = new Collaborators(api.GatewayAccess, {
+      parentRoutes: {
+        list: 'gateway_ids.gateway_id',
+        set: 'gateway_ids.gateway_id',
       },
     })
   }
