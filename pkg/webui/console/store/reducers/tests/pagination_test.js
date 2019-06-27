@@ -19,6 +19,8 @@ import {
 import {
   createPaginationRequestActions,
   createPaginationByIdRequestActions,
+  createPaginationDeleteActions,
+  createPaginationByIdDeleteActions,
 } from '../../actions/pagination'
 
 describe('pagination reducers', function () {
@@ -34,17 +36,30 @@ describe('pagination reducers', function () {
       success,
       failure,
     } = createPaginationRequestActions(NAME)[1]
+    const {
+      request: requestDelete,
+      success: successDelete,
+      failure: failureDelete,
+    } = createPaginationDeleteActions(NAME)[1]
 
     it('should return the initial state', function () {
       expect(reducer(undefined, { payload: {}})).toEqual(defaultState)
     })
 
-    it('should ignore the `request` action', function () {
+    it('should ignore the get `request` action', function () {
       expect(reducer(defaultState, request())).toEqual(defaultState)
     })
 
-    it('should ignore the `failure` action', function () {
+    it('should ignore the get `failure` action', function () {
       expect(reducer(defaultState, failure())).toEqual(defaultState)
+    })
+
+    it('should ignore the delete `request` action', function () {
+      expect(reducer(defaultState, requestDelete('test-id'))).toEqual(defaultState)
+    })
+
+    it('should ignore the delete `failure` action', function () {
+      expect(reducer(defaultState, failureDelete())).toEqual(defaultState)
     })
 
     describe('receives the `success` action', function () {
@@ -76,6 +91,23 @@ describe('pagination reducers', function () {
 
         expect(newTotalCount).toEqual(totalCount)
       })
+
+      describe('deletes an entity', function () {
+        beforeAll(function () {
+          newState = reducer(newState, successDelete({ id: entities[0].id }))
+        })
+
+        it('should decrease `totalCount`', function () {
+          expect(newState.totalCount).toEqual(entities.length - 1)
+        })
+
+        it('should remove deleted id from `ids`', function () {
+          expect(newState.ids).toHaveLength(entities.length - 1)
+          expect(newState.ids).toEqual(
+            expect.not.arrayContaining(entities)
+          )
+        })
+      })
     })
   })
 
@@ -89,6 +121,11 @@ describe('pagination reducers', function () {
       success,
       failure,
     } = createPaginationByIdRequestActions(NAME)[1]
+    const {
+      request: requestDelete,
+      success: successDelete,
+      failure: failureDelete,
+    } = createPaginationByIdDeleteActions(NAME)[1]
 
     it('should return the initial state', function () {
       expect(reducer(undefined, { payload: {}})).toEqual(defaultState)
@@ -99,8 +136,15 @@ describe('pagination reducers', function () {
     })
 
     it('should ignore the `failure` action', function () {
-      const res = reducer(defaultState, failure({}))
-      expect(res).toEqual(defaultState)
+      expect(reducer(defaultState, failure({}))).toEqual(defaultState)
+    })
+
+    it('should ignore the delete `request` action', function () {
+      expect(reducer(defaultState, requestDelete('test-id', 'target-test-id'))).toEqual(defaultState)
+    })
+
+    it('should ignore the delete `failure` action', function () {
+      expect(reducer(defaultState, failureDelete('test-id'))).toEqual(defaultState)
     })
 
     describe('receives the `success` action', function () {
@@ -143,6 +187,27 @@ describe('pagination reducers', function () {
         const { [entityId]: results } = newState
 
         expect(results.totalCount).toEqual(totalCount)
+      })
+
+      describe('deletes entity', function () {
+        let updatedState
+
+        beforeAll(function () {
+          updatedState = reducer(newState, successDelete({ id: entityId, targetId: entities[0].id }))
+        })
+
+        it('should decrease `totalCount`', function () {
+          const { [entityId]: results } = updatedState
+          expect(results.totalCount).toEqual(entities.length - 1)
+        })
+
+        it('should remove deleted id from `ids`', function () {
+          const { [entityId]: results } = updatedState
+          expect(results.ids).toHaveLength(entities.length - 1)
+          expect(results.ids).toEqual(
+            expect.not.arrayContaining(entities)
+          )
+        })
       })
 
       describe('receives the `success` action for another entity', function () {
@@ -193,6 +258,27 @@ describe('pagination reducers', function () {
           const { [otherEntityId]: results } = otherNewState
 
           expect(results.totalCount).toEqual(otherTotalCount)
+        })
+
+        describe('deletes entity', function () {
+          let updatedState
+
+          beforeAll(function () {
+            updatedState = reducer(otherNewState, successDelete({ id: otherEntityId, targetId: otherEntities[0].id }))
+          })
+
+          it('should decrease `totalCount`', function () {
+            const { [entityId]: results } = updatedState
+            expect(results.totalCount).toEqual(otherEntities.length - 1)
+          })
+
+          it('should remove deleted id from `ids`', function () {
+            const { [entityId]: results } = updatedState
+            expect(results.ids).toHaveLength(otherEntities.length - 1)
+            expect(results.ids).toEqual(
+              expect.not.arrayContaining(otherEntities)
+            )
+          })
         })
       })
     })
