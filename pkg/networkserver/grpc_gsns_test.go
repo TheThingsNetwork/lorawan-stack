@@ -1440,23 +1440,14 @@ func handleUplinkTest() func(t *testing.T) {
 				}
 
 				deduplicationDoneCh := make(chan WindowEndRequest, 1)
-				defer func() {
-					close(deduplicationDoneCh)
-				}()
 
 				collectionDoneCh := make(chan WindowEndRequest, 1)
-				defer func() {
-					close(collectionDoneCh)
-				}()
 
 				type asSendReq struct {
 					up    *ttnpb.ApplicationUp
 					errch chan error
 				}
 				asSendCh := make(chan asSendReq)
-				defer func() {
-					close(asSendCh)
-				}()
 
 				type downlinkTasksAddRequest struct {
 					ctx     context.Context
@@ -1558,6 +1549,9 @@ func handleUplinkTest() func(t *testing.T) {
 					errch <- err
 				}()
 
+				md := sendUplinkDuplicates(t, ns, deduplicationDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
+				close(deduplicationDoneCh)
+
 				if pb.MACState != nil && pb.MACState.PendingApplicationDownlink != nil {
 					select {
 					case req := <-asSendCh:
@@ -1579,14 +1573,11 @@ func handleUplinkTest() func(t *testing.T) {
 					}
 				}
 
-				md := sendUplinkDuplicates(t, ns, deduplicationDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
-
 				var asUpReq asSendReq
 				select {
 				case asUpReq = <-asSendCh:
 					a.So(md, should.HaveSameElementsDeep, asUpReq.up.GetUplinkMessage().RxMetadata)
 					a.So(asUpReq.up.CorrelationIDs, should.NotBeEmpty)
-
 					a.So(asUpReq.up, should.Resemble, &ttnpb.ApplicationUp{
 						EndDeviceIdentifiers: pb.EndDeviceIdentifiers,
 						CorrelationIDs:       asUpReq.up.CorrelationIDs,
@@ -1600,15 +1591,12 @@ func handleUplinkTest() func(t *testing.T) {
 							Settings:     asUpReq.up.GetUplinkMessage().Settings,
 						}},
 					})
-
-				case weReq := <-collectionDoneCh:
-					close(weReq.Response)
-					a.So(<-errch, should.BeNil)
-					t.Fatal("Uplink not sent to AS")
+					close(asUpReq.errch)
 
 				case <-time.After(Timeout):
 					t.Fatal("Timed out while waiting for uplink to be sent to AS")
 				}
+				close(asSendCh)
 
 				if !t.Run("device update", func(t *testing.T) {
 					a := assertions.New(t)
@@ -1664,8 +1652,6 @@ func handleUplinkTest() func(t *testing.T) {
 					t.FailNow()
 				}
 
-				close(asUpReq.errch)
-
 				select {
 				case req := <-downlinkAddCh:
 					a.So(req.ctx, should.HaveParentContext, ctx)
@@ -1678,6 +1664,7 @@ func handleUplinkTest() func(t *testing.T) {
 				}
 
 				_ = sendUplinkDuplicates(t, ns, collectionDoneCh, ctx, tc.UplinkMessage, DuplicateCount)
+				close(collectionDoneCh)
 
 				select {
 				case err := <-errch:

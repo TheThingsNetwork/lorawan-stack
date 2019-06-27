@@ -39,65 +39,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-func AssertLinkApplication(ctx context.Context, conn *grpc.ClientConn, getPeerCh <-chan test.ClusterGetPeerRequest, appID string) (ttnpb.AsNs_LinkApplicationClient, bool) {
-	t := test.MustTFromContext(ctx)
-	t.Helper()
-
-	a := assertions.New(t)
-
-	listRightsCh := make(chan test.ApplicationAccessListRightsRequest)
-	defer func() {
-		close(listRightsCh)
-	}()
-
-	var link ttnpb.AsNs_LinkApplicationClient
-	var err error
-	wg := &sync.WaitGroup{}
-	wg.Add(1)
-	go func() {
-		link, err = ttnpb.NewAsNsClient(conn).LinkApplication(
-			(rpcmetadata.MD{
-				ID: appID,
-			}).ToOutgoingContext(ctx),
-			grpc.PerRPCCredentials(rpcmetadata.MD{
-				AuthType:      "Bearer",
-				AuthValue:     "link-application-key",
-				AllowInsecure: true,
-			}),
-		)
-		wg.Done()
-	}()
-
-	if !a.So(test.AssertClusterGetPeerRequest(ctx, getPeerCh,
-		func(ctx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) bool {
-			return a.So(role, should.Equal, ttnpb.PeerInfo_ACCESS) && a.So(ids, should.BeNil)
-		},
-		NewISPeer(ctx, &test.MockApplicationAccessServer{
-			ListRightsFunc: test.MakeApplicationAccessListRightsChFunc(listRightsCh),
-		}),
-	), should.BeTrue) {
-		return nil, false
-	}
-
-	if !a.So(test.AssertListRightsRequest(ctx, listRightsCh,
-		func(ctx context.Context, ids ttnpb.Identifiers) bool {
-			md := rpcmetadata.FromIncomingContext(ctx)
-			return a.So(md.AuthType, should.Equal, "Bearer") &&
-				a.So(md.AuthValue, should.Equal, "link-application-key") &&
-				a.So(ids, should.Resemble, &ttnpb.ApplicationIdentifiers{ApplicationID: appID})
-		}, ttnpb.RIGHT_APPLICATION_LINK,
-	), should.BeTrue) {
-		return nil, false
-	}
-
-	if !a.So(test.WaitContext(ctx, wg.Wait), should.BeTrue) {
-		t.Error("Timed out while waiting for AS link to open")
-		return nil, false
-	}
-	return link, a.So(err, should.BeNil)
-}
-
-func AssertSetDevice(ctx context.Context, conn *grpc.ClientConn, getPeerCh <-chan test.ClusterGetPeerRequest, appID string, req *ttnpb.SetEndDeviceRequest) (*ttnpb.EndDevice, bool) {
+func AssertSetDevice(ctx context.Context, conn *grpc.ClientConn, getPeerCh <-chan test.ClusterGetPeerRequest, appID ttnpb.ApplicationIdentifiers, req *ttnpb.SetEndDeviceRequest) (*ttnpb.EndDevice, bool) {
 	t := test.MustTFromContext(ctx)
 	t.Helper()
 
@@ -141,7 +83,7 @@ func AssertSetDevice(ctx context.Context, conn *grpc.ClientConn, getPeerCh <-cha
 			md := rpcmetadata.FromIncomingContext(ctx)
 			return a.So(md.AuthType, should.Equal, "Bearer") &&
 				a.So(md.AuthValue, should.Equal, "set-key") &&
-				a.So(ids, should.Resemble, &ttnpb.ApplicationIdentifiers{ApplicationID: appID})
+				a.So(ids, should.Resemble, &appID)
 		}, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
 	), should.BeTrue) {
 		return nil, false
@@ -165,6 +107,9 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 	deduplicationDoneCh := make(chan WindowEndRequest)
 
 	netID := test.Must(types.NewNetID(2, []byte{1, 2, 3})).(types.NetID)
+
+	appID := ttnpb.ApplicationIdentifiers{ApplicationID: "flow-test-app-id"}
+	devID := "flow-test-dev-id"
 
 	ns := test.Must(New(
 		component.MustNew(
@@ -205,17 +150,17 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 
 	start := time.Now()
 
-	link, ok := AssertLinkApplication(ctx, conn, getPeerCh, "test-app-id")
+	link, ok := AssertLinkApplication(ctx, conn, getPeerCh, appID)
 	if !a.So(ok, should.BeTrue) || !a.So(link, should.NotBeNil) {
 		t.Error("Failed to link application")
 		return
 	}
 
-	dev, ok := AssertSetDevice(ctx, conn, getPeerCh, "test-app-id", &ttnpb.SetEndDeviceRequest{
+	dev, ok := AssertSetDevice(ctx, conn, getPeerCh, appID, &ttnpb.SetEndDeviceRequest{
 		EndDevice: ttnpb.EndDevice{
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-				DeviceID:               "test-dev-id",
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+				DeviceID:               devID,
+				ApplicationIdentifiers: appID,
 				JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 				DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 			},
@@ -243,8 +188,8 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 	a.So([]time.Time{start, dev.CreatedAt, time.Now()}, should.BeChronological)
 	a.So(dev, should.Resemble, &ttnpb.EndDevice{
 		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-			DeviceID:               "test-dev-id",
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+			DeviceID:               devID,
+			ApplicationIdentifiers: appID,
 			JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 			DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 		},
@@ -323,8 +268,8 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 			func(ctx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) bool {
 				return a.So(role, should.Equal, ttnpb.PeerInfo_JOIN_SERVER) &&
 					a.So(ids, should.Resemble, ttnpb.EndDeviceIdentifiers{
-						DeviceID:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+						DeviceID:               devID,
+						ApplicationIdentifiers: appID,
 						JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 						DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 					})
@@ -408,8 +353,8 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 		}
 		a.So(asUp, should.Resemble, &ttnpb.ApplicationUp{
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-				DeviceID:               "test-dev-id",
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+				DeviceID:               devID,
+				ApplicationIdentifiers: appID,
 				JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 				DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 				DevAddr:                &devAddr,
@@ -512,8 +457,11 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 
 		uplinkFRMPayload := test.Must(crypto.EncryptUplink(appSKey, devAddr, 0, []byte("test"))).([]byte)
 		uplink := &ttnpb.UplinkMessage{
-			RawPayload: func() []byte {
-				b := append([]byte{
+			RawPayload: MustAppendLegacyUplinkMIC(
+				fNwkSIntKey,
+				devAddr,
+				0,
+				append([]byte{
 					/* MHDR */
 					0x40,
 					/* MACPayload */
@@ -528,10 +476,8 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 					0x42,
 				},
 					uplinkFRMPayload...,
-				)
-				mic := test.Must(crypto.ComputeLegacyUplinkMIC(fNwkSIntKey, devAddr, 0, b)).([4]byte)
-				return append(b, mic[:]...)
-			}(),
+				)...,
+			),
 			Settings: ttnpb.TxSettings{
 				DataRate: ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
@@ -594,8 +540,8 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 		}
 		a.So(asUp, should.Resemble, &ttnpb.ApplicationUp{
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-				DeviceID:               "test-dev-id",
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+				DeviceID:               devID,
+				ApplicationIdentifiers: appID,
 				JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 				DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 				DevAddr:                &devAddr,
@@ -672,8 +618,11 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 					a.So(msg.CorrelationIDs, should.Contain, "GsNs-2") &&
 					a.So(msg.CorrelationIDs, should.HaveLength, 5) &&
 					a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
-						RawPayload: func() []byte {
-							b := append([]byte{
+						RawPayload: MustAppendLegacyDownlinkMIC(
+							fNwkSIntKey,
+							devAddr,
+							1,
+							append([]byte{
 								/* MHDR */
 								0x60,
 								/* MACPayload */
@@ -691,10 +640,8 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 									/* DevStatusReq */
 									0x06,
 								})).([]byte)...,
-							)
-							mic := test.Must(crypto.ComputeLegacyDownlinkMIC(fNwkSIntKey, devAddr, 1, b)).([4]byte)
-							return append(b, mic[:]...)
-						}(),
+							)...,
+						),
 						Settings: &ttnpb.DownlinkMessage_Request{
 							Request: &ttnpb.TxRequest{
 								Class: ttnpb.CLASS_A,
