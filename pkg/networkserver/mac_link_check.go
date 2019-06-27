@@ -27,14 +27,16 @@ var (
 	evtEnqueueLinkCheckAnswer  = defineEnqueueMACAnswerEvent("link_check", "link check")()
 )
 
-func handleLinkCheckReq(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.UplinkMessage) error {
-	events.Publish(evtReceiveLinkCheckRequest(ctx, dev.EndDeviceIdentifiers, nil))
+func handleLinkCheckReq(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.UplinkMessage) ([]events.DefinitionDataClosure, error) {
+	evs := []events.DefinitionDataClosure{
+		evtReceiveLinkCheckRequest.BindData(nil),
+	}
 
 	var floor float32
 	if dr, ok := msg.Settings.DataRate.Modulation.(*ttnpb.DataRate_LoRa); ok {
 		floor, ok = demodulationFloor[dr.LoRa.SpreadingFactor][dr.LoRa.Bandwidth]
 		if !ok {
-			return errInvalidDataRate
+			return evs, errInvalidDataRate
 		}
 	}
 	gtws := make(map[string]struct{}, len(msg.RxMetadata))
@@ -54,7 +56,7 @@ func handleLinkCheckReq(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.Up
 		GatewayCount: uint32(len(gtws)),
 	}
 	dev.MACState.QueuedResponses = append(dev.MACState.QueuedResponses, ans.MACCommand())
-
-	events.Publish(evtEnqueueLinkCheckAnswer(ctx, dev.EndDeviceIdentifiers, ans))
-	return nil
+	return append(evs,
+		evtEnqueueLinkCheckAnswer.BindData(ans),
+	), nil
 }

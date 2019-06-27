@@ -17,11 +17,12 @@ package networkserver
 import (
 	"context"
 
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-func handleBeaconTimingReq(ctx context.Context, dev *ttnpb.EndDevice) error {
+func handleBeaconTimingReq(ctx context.Context, dev *ttnpb.EndDevice) ([]events.DefinitionDataClosure, error) {
 	// TODO: Support Class B (https://github.com/TheThingsNetwork/lorawan-stack/issues/19)
 	// NOTE: This command is deprecated in LoRaWAN 1.1
-	return nil
+	return nil, nil
 }

@@ -31,7 +31,7 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Message          *ttnpb.UplinkMessage
-		AssertEvents     func(*testing.T, ...events.Event) bool
+		Events           []events.DefinitionDataClosure
 		Error            error
 	}{
 		{
@@ -55,15 +55,11 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 					},
 				},
 			},
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				a := assertions.New(t)
-				return a.So(evs, should.HaveLength, 2) &&
-					a.So(evs[0].Name(), should.Equal, "ns.mac.device_time.request") &&
-					a.So(evs[0].Data(), should.BeNil) &&
-					a.So(evs[1].Name(), should.Equal, "ns.mac.device_time.answer") &&
-					a.So(evs[1].Data(), should.Resemble, &ttnpb.MACCommand_DeviceTimeAns{
-						Time: time.Unix(42, 42),
-					})
+			Events: []events.DefinitionDataClosure{
+				evtReceiveDeviceTimeRequest.BindData(nil),
+				evtEnqueueDeviceTimeAnswer.BindData(&ttnpb.MACCommand_DeviceTimeAns{
+					Time: time.Unix(42, 42),
+				}),
 			},
 		},
 		{
@@ -102,15 +98,11 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 					},
 				},
 			},
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				a := assertions.New(t)
-				return a.So(evs, should.HaveLength, 2) &&
-					a.So(evs[0].Name(), should.Equal, "ns.mac.device_time.request") &&
-					a.So(evs[0].Data(), should.BeNil) &&
-					a.So(evs[1].Name(), should.Equal, "ns.mac.device_time.answer") &&
-					a.So(evs[1].Data(), should.Resemble, &ttnpb.MACCommand_DeviceTimeAns{
-						Time: time.Unix(42, 42),
-					})
+			Events: []events.DefinitionDataClosure{
+				evtReceiveDeviceTimeRequest.BindData(nil),
+				evtEnqueueDeviceTimeAnswer.BindData(&ttnpb.MACCommand_DeviceTimeAns{
+					Time: time.Unix(42, 42),
+				}),
 			},
 		},
 		{
@@ -152,15 +144,11 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 					},
 				},
 			},
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				a := assertions.New(t)
-				return a.So(evs, should.HaveLength, 2) &&
-					a.So(evs[0].Name(), should.Equal, "ns.mac.device_time.request") &&
-					a.So(evs[0].Data(), should.BeNil) &&
-					a.So(evs[1].Name(), should.Equal, "ns.mac.device_time.answer") &&
-					a.So(evs[1].Data(), should.Resemble, &ttnpb.MACCommand_DeviceTimeAns{
-						Time: time.Unix(42, 45),
-					})
+			Events: []events.DefinitionDataClosure{
+				evtReceiveDeviceTimeRequest.BindData(nil),
+				evtEnqueueDeviceTimeAnswer.BindData(&ttnpb.MACCommand_DeviceTimeAns{
+					Time: time.Unix(42, 45),
+				}),
 			},
 		},
 	} {
@@ -169,16 +157,13 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 
 			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			var err error
-			evs := collectEvents(func() {
-				err = handleDeviceTimeReq(test.Context(), dev, tc.Message)
-			})
+			evs, err := handleDeviceTimeReq(test.Context(), dev, tc.Message)
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 				tc.Error == nil && !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
 			a.So(dev, should.Resemble, tc.Expected)
-			a.So(tc.AssertEvents(t, evs...), should.BeTrue)
+			a.So(evs, should.ResembleEventDefinitionDataClosures, tc.Events)
 		})
 	}
 }

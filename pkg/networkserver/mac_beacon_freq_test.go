@@ -30,7 +30,7 @@ func TestHandleBeaconFreqAns(t *testing.T) {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Payload          *ttnpb.MACCommand_BeaconFreqAns
-		AssertEvents     func(*testing.T, ...events.Event) bool
+		Events           []events.DefinitionDataClosure
 		Error            error
 	}{
 		{
@@ -41,14 +41,10 @@ func TestHandleBeaconFreqAns(t *testing.T) {
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{},
 			},
-			Payload: nil,
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				return assertions.New(t).So(evs, should.BeEmpty)
-			},
 			Error: errNoPayload,
 		},
 		{
-			Name: "no request",
+			Name: "ack/no request",
 			Device: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{},
 			},
@@ -58,18 +54,29 @@ func TestHandleBeaconFreqAns(t *testing.T) {
 			Payload: &ttnpb.MACCommand_BeaconFreqAns{
 				FrequencyAck: true,
 			},
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				a := assertions.New(t)
-				return a.So(evs, should.HaveLength, 1) &&
-					a.So(evs[0].Name(), should.Equal, "ns.mac.beacon_freq.answer.accept") &&
-					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_BeaconFreqAns{
-						FrequencyAck: true,
-					})
+			Events: []events.DefinitionDataClosure{
+				evtReceiveBeaconFreqAccept.BindData(&ttnpb.MACCommand_BeaconFreqAns{
+					FrequencyAck: true,
+				}),
 			},
 			Error: errMACRequestNotFound,
 		},
 		{
-			Name: "ack",
+			Name: "nack/no request",
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
+			Expected: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
+			Payload: &ttnpb.MACCommand_BeaconFreqAns{},
+			Events: []events.DefinitionDataClosure{
+				evtReceiveBeaconFreqReject.BindData(&ttnpb.MACCommand_BeaconFreqAns{}),
+			},
+			Error: errMACRequestNotFound,
+		},
+		{
+			Name: "ack/valid request",
 			Device: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{
@@ -90,13 +97,31 @@ func TestHandleBeaconFreqAns(t *testing.T) {
 			Payload: &ttnpb.MACCommand_BeaconFreqAns{
 				FrequencyAck: true,
 			},
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				a := assertions.New(t)
-				return a.So(evs, should.HaveLength, 1) &&
-					a.So(evs[0].Name(), should.Equal, "ns.mac.beacon_freq.answer.accept") &&
-					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_BeaconFreqAns{
-						FrequencyAck: true,
-					})
+			Events: []events.DefinitionDataClosure{
+				evtReceiveBeaconFreqAccept.BindData(&ttnpb.MACCommand_BeaconFreqAns{
+					FrequencyAck: true,
+				}),
+			},
+		},
+		{
+			Name: "nack/valid request",
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					PendingRequests: []*ttnpb.MACCommand{
+						(&ttnpb.MACCommand_BeaconFreqReq{
+							Frequency: 42,
+						}).MACCommand(),
+					},
+				},
+			},
+			Expected: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					PendingRequests: []*ttnpb.MACCommand{},
+				},
+			},
+			Payload: &ttnpb.MACCommand_BeaconFreqAns{},
+			Events: []events.DefinitionDataClosure{
+				evtReceiveBeaconFreqReject.BindData(&ttnpb.MACCommand_BeaconFreqAns{}),
 			},
 		},
 	} {
@@ -106,15 +131,13 @@ func TestHandleBeaconFreqAns(t *testing.T) {
 			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
 			var err error
-			evs := collectEvents(func() {
-				err = handleBeaconFreqAns(test.Context(), dev, tc.Payload)
-			})
+			evs, err := handleBeaconFreqAns(test.Context(), dev, tc.Payload)
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 				tc.Error == nil && !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
 			a.So(dev, should.Resemble, tc.Expected)
-			a.So(tc.AssertEvents(t, evs...), should.BeTrue)
+			a.So(evs, should.ResembleEventDefinitionDataClosures, tc.Events)
 		})
 	}
 }

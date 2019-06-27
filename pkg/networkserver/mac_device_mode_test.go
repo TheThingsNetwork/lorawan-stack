@@ -30,7 +30,7 @@ func TestHandleDeviceModeInd(t *testing.T) {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Payload          *ttnpb.MACCommand_DeviceModeInd
-		AssertEvents     func(*testing.T, ...events.Event) bool
+		Events           []events.DefinitionDataClosure
 		Error            error
 	}{
 		{
@@ -40,10 +40,6 @@ func TestHandleDeviceModeInd(t *testing.T) {
 			},
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{},
-			},
-			Payload: nil,
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				return assertions.New(t).So(evs, should.BeEmpty)
 			},
 			Error: errNoPayload,
 		},
@@ -68,17 +64,13 @@ func TestHandleDeviceModeInd(t *testing.T) {
 			Payload: &ttnpb.MACCommand_DeviceModeInd{
 				Class: ttnpb.CLASS_C,
 			},
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				a := assertions.New(t)
-				return a.So(evs, should.HaveLength, 2) &&
-					a.So(evs[0].Name(), should.Equal, "ns.mac.device_mode.indication") &&
-					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_DeviceModeInd{
-						Class: ttnpb.CLASS_C,
-					}) &&
-					a.So(evs[1].Name(), should.Equal, "ns.mac.device_mode.confirmation") &&
-					a.So(evs[1].Data(), should.Resemble, &ttnpb.MACCommand_DeviceModeConf{
-						Class: ttnpb.CLASS_C,
-					})
+			Events: []events.DefinitionDataClosure{
+				evtReceiveDeviceModeIndication.BindData(&ttnpb.MACCommand_DeviceModeInd{
+					Class: ttnpb.CLASS_C,
+				}),
+				evtEnqueueDeviceModeConfirmation.BindData(&ttnpb.MACCommand_DeviceModeConf{
+					Class: ttnpb.CLASS_C,
+				}),
 			},
 		},
 		{
@@ -109,17 +101,13 @@ func TestHandleDeviceModeInd(t *testing.T) {
 			Payload: &ttnpb.MACCommand_DeviceModeInd{
 				Class: ttnpb.CLASS_A,
 			},
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				a := assertions.New(t)
-				return a.So(evs, should.HaveLength, 2) &&
-					a.So(evs[0].Name(), should.Equal, "ns.mac.device_mode.indication") &&
-					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_DeviceModeInd{
-						Class: ttnpb.CLASS_A,
-					}) &&
-					a.So(evs[1].Name(), should.Equal, "ns.mac.device_mode.confirmation") &&
-					a.So(evs[1].Data(), should.Resemble, &ttnpb.MACCommand_DeviceModeConf{
-						Class: ttnpb.CLASS_A,
-					})
+			Events: []events.DefinitionDataClosure{
+				evtReceiveDeviceModeIndication.BindData(&ttnpb.MACCommand_DeviceModeInd{
+					Class: ttnpb.CLASS_A,
+				}),
+				evtEnqueueDeviceModeConfirmation.BindData(&ttnpb.MACCommand_DeviceModeConf{
+					Class: ttnpb.CLASS_A,
+				}),
 			},
 		},
 	} {
@@ -128,16 +116,13 @@ func TestHandleDeviceModeInd(t *testing.T) {
 
 			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			var err error
-			evs := collectEvents(func() {
-				err = handleDeviceModeInd(test.Context(), dev, tc.Payload)
-			})
+			evs, err := handleDeviceModeInd(test.Context(), dev, tc.Payload)
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 				tc.Error == nil && !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
 			a.So(dev, should.Resemble, tc.Expected)
-			a.So(tc.AssertEvents(t, evs...), should.BeTrue)
+			a.So(evs, should.ResembleEventDefinitionDataClosures, tc.Events)
 		})
 	}
 }

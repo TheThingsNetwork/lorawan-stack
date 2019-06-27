@@ -19,6 +19,7 @@ import (
 
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
@@ -28,6 +29,7 @@ func TestHandleBeaconTimingReq(t *testing.T) {
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
+		Events           []events.DefinitionDataClosure
 		Error            error
 	}{
 		{
@@ -73,12 +75,13 @@ func TestHandleBeaconTimingReq(t *testing.T) {
 
 			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			err := handleBeaconTimingReq(test.Context(), dev)
+			evs, err := handleBeaconTimingReq(test.Context(), dev)
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 				tc.Error == nil && !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
 			a.So(dev, should.Resemble, tc.Expected)
+			a.So(evs, should.ResembleEventDefinitionDataClosures, tc.Events)
 		})
 	}
 }

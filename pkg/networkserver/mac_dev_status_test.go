@@ -34,7 +34,7 @@ func TestHandleDevStatusAns(t *testing.T) {
 		Payload          *ttnpb.MACCommand_DevStatusAns
 		FCntUp           uint32
 		ReceivedAt       time.Time
-		AssertEvents     func(*testing.T, ...events.Event) bool
+		Events           []events.DefinitionDataClosure
 		Error            error
 	}{
 		{
@@ -46,10 +46,7 @@ func TestHandleDevStatusAns(t *testing.T) {
 				MACState: &ttnpb.MACState{},
 			},
 			ReceivedAt: time.Unix(42, 0),
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				return assertions.New(t).So(evs, should.BeEmpty)
-			},
-			Error: errNoPayload,
+			Error:      errNoPayload,
 		},
 		{
 			Name: "no request",
@@ -64,14 +61,11 @@ func TestHandleDevStatusAns(t *testing.T) {
 				Margin:  4,
 			},
 			ReceivedAt: time.Unix(42, 0),
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				a := assertions.New(t)
-				return a.So(evs, should.HaveLength, 1) &&
-					a.So(evs[0].Name(), should.Equal, "ns.mac.dev_status.answer") &&
-					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_DevStatusAns{
-						Battery: 42,
-						Margin:  4,
-					})
+			Events: []events.DefinitionDataClosure{
+				evtReceiveDevStatusAnswer.BindData(&ttnpb.MACCommand_DevStatusAns{
+					Battery: 42,
+					Margin:  4,
+				}),
 			},
 			Error: errMACRequestNotFound,
 		},
@@ -103,14 +97,11 @@ func TestHandleDevStatusAns(t *testing.T) {
 			},
 			FCntUp:     43,
 			ReceivedAt: time.Unix(42, 0),
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				a := assertions.New(t)
-				return a.So(evs, should.HaveLength, 1) &&
-					a.So(evs[0].Name(), should.Equal, "ns.mac.dev_status.answer") &&
-					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_DevStatusAns{
-						Battery: 42,
-						Margin:  4,
-					})
+			Events: []events.DefinitionDataClosure{
+				evtReceiveDevStatusAnswer.BindData(&ttnpb.MACCommand_DevStatusAns{
+					Battery: 42,
+					Margin:  4,
+				}),
 			},
 		},
 		{
@@ -140,14 +131,10 @@ func TestHandleDevStatusAns(t *testing.T) {
 			},
 			FCntUp:     43,
 			ReceivedAt: time.Unix(42, 0),
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				a := assertions.New(t)
-				return a.So(evs, should.HaveLength, 1) &&
-					a.So(evs[0].Name(), should.Equal, "ns.mac.dev_status.answer") &&
-					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_DevStatusAns{
-						Battery: 0,
-						Margin:  20,
-					})
+			Events: []events.DefinitionDataClosure{
+				evtReceiveDevStatusAnswer.BindData(&ttnpb.MACCommand_DevStatusAns{
+					Margin: 20,
+				}),
 			},
 		},
 		{
@@ -177,14 +164,11 @@ func TestHandleDevStatusAns(t *testing.T) {
 			},
 			FCntUp:     43,
 			ReceivedAt: time.Unix(42, 0),
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				a := assertions.New(t)
-				return a.So(evs, should.HaveLength, 1) &&
-					a.So(evs[0].Name(), should.Equal, "ns.mac.dev_status.answer") &&
-					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_DevStatusAns{
-						Battery: 255,
-						Margin:  -5,
-					})
+			Events: []events.DefinitionDataClosure{
+				evtReceiveDevStatusAnswer.BindData(&ttnpb.MACCommand_DevStatusAns{
+					Battery: 255,
+					Margin:  -5,
+				}),
 			},
 		},
 	} {
@@ -193,16 +177,13 @@ func TestHandleDevStatusAns(t *testing.T) {
 
 			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			var err error
-			evs := collectEvents(func() {
-				err = handleDevStatusAns(test.Context(), dev, tc.Payload, tc.FCntUp, tc.ReceivedAt)
-			})
+			evs, err := handleDevStatusAns(test.Context(), dev, tc.Payload, tc.FCntUp, tc.ReceivedAt)
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 				tc.Error == nil && !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
 			a.So(dev, should.Resemble, tc.Expected)
-			a.So(tc.AssertEvents(t, evs...), should.BeTrue)
+			a.So(evs, should.ResembleEventDefinitionDataClosures, tc.Events)
 		})
 	}
 }

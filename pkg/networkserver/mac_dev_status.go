@@ -78,13 +78,12 @@ func enqueueDevStatusReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, 
 	return maxDownLen, maxUpLen, ok
 }
 
-func handleDevStatusAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_DevStatusAns, fCntUp uint32, recvAt time.Time) (err error) {
+func handleDevStatusAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_DevStatusAns, fCntUp uint32, recvAt time.Time) ([]events.DefinitionDataClosure, error) {
 	if pld == nil {
-		return errNoPayload
+		return nil, errNoPayload
 	}
 
-	events.Publish(evtReceiveDevStatusAnswer(ctx, dev.EndDeviceIdentifiers, pld))
-
+	var err error
 	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_DEV_STATUS, func(*ttnpb.MACCommand) error {
 		switch pld.Battery {
 		case 0:
@@ -102,5 +101,7 @@ func handleDevStatusAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MA
 		dev.MACState.LastDevStatusFCntUp = fCntUp
 		return nil
 	}, dev.MACState.PendingRequests...)
-	return
+	return []events.DefinitionDataClosure{
+		evtReceiveDevStatusAnswer.BindData(pld),
+	}, err
 }

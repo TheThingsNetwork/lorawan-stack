@@ -28,8 +28,10 @@ var (
 	evtEnqueueDeviceTimeAnswer  = defineEnqueueMACAnswerEvent("device_time", "device time")()
 )
 
-func handleDeviceTimeReq(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.UplinkMessage) error {
-	events.Publish(evtReceiveDeviceTimeRequest(ctx, dev.EndDeviceIdentifiers, nil))
+func handleDeviceTimeReq(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.UplinkMessage) ([]events.DefinitionDataClosure, error) {
+	evs := []events.DefinitionDataClosure{
+		evtReceiveDeviceTimeRequest.BindData(nil),
+	}
 
 	ts := make([]time.Time, 0, len(msg.RxMetadata))
 	for _, md := range msg.RxMetadata {
@@ -39,7 +41,7 @@ func handleDeviceTimeReq(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.U
 		ts = append(ts, *md.Time)
 	}
 	if len(ts) == 0 {
-		return nil
+		return evs, nil
 	}
 
 	sort.Slice(ts, func(i, j int) bool {
@@ -58,7 +60,7 @@ func handleDeviceTimeReq(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.U
 		Time: t,
 	}
 	dev.MACState.QueuedResponses = append(dev.MACState.QueuedResponses, ans.MACCommand())
-
-	events.Publish(evtEnqueueDeviceTimeAnswer(ctx, dev.EndDeviceIdentifiers, ans))
-	return nil
+	return append(evs,
+		evtEnqueueDeviceTimeAnswer.BindData(ans),
+	), nil
 }

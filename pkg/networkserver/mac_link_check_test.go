@@ -30,7 +30,7 @@ func TestHandleLinkCheckReq(t *testing.T) {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Message          *ttnpb.UplinkMessage
-		AssertEvents     func(*testing.T, ...events.Event) bool
+		Events           []events.DefinitionDataClosure
 		Error            error
 	}{
 		{
@@ -53,11 +53,8 @@ func TestHandleLinkCheckReq(t *testing.T) {
 					},
 				},
 			},
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				a := assertions.New(t)
-				return a.So(evs, should.HaveLength, 1) &&
-					a.So(evs[0].Name(), should.Equal, "ns.mac.link_check.request") &&
-					a.So(evs[0].Data(), should.BeNil)
+			Events: []events.DefinitionDataClosure{
+				evtReceiveLinkCheckRequest.BindData(nil),
 			},
 			Error: errInvalidDataRate,
 		},
@@ -96,16 +93,12 @@ func TestHandleLinkCheckReq(t *testing.T) {
 					},
 				},
 			},
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				a := assertions.New(t)
-				return a.So(evs, should.HaveLength, 2) &&
-					a.So(evs[0].Name(), should.Equal, "ns.mac.link_check.request") &&
-					a.So(evs[0].Data(), should.BeNil) &&
-					a.So(evs[1].Name(), should.Equal, "ns.mac.link_check.answer") &&
-					a.So(evs[1].Data(), should.Resemble, &ttnpb.MACCommand_LinkCheckAns{
-						Margin:       42,
-						GatewayCount: 1,
-					})
+			Events: []events.DefinitionDataClosure{
+				evtReceiveLinkCheckRequest.BindData(nil),
+				evtEnqueueLinkCheckAnswer.BindData(&ttnpb.MACCommand_LinkCheckAns{
+					Margin:       42,
+					GatewayCount: 1,
+				}),
 			},
 		},
 		{
@@ -152,16 +145,12 @@ func TestHandleLinkCheckReq(t *testing.T) {
 					},
 				},
 			},
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				a := assertions.New(t)
-				return a.So(evs, should.HaveLength, 2) &&
-					a.So(evs[0].Name(), should.Equal, "ns.mac.link_check.request") &&
-					a.So(evs[0].Data(), should.BeNil) &&
-					a.So(evs[1].Name(), should.Equal, "ns.mac.link_check.answer") &&
-					a.So(evs[1].Data(), should.Resemble, &ttnpb.MACCommand_LinkCheckAns{
-						Margin:       42,
-						GatewayCount: 1,
-					})
+			Events: []events.DefinitionDataClosure{
+				evtReceiveLinkCheckRequest.BindData(nil),
+				evtEnqueueLinkCheckAnswer.BindData(&ttnpb.MACCommand_LinkCheckAns{
+					Margin:       42,
+					GatewayCount: 1,
+				}),
 			},
 		},
 		{
@@ -220,16 +209,12 @@ func TestHandleLinkCheckReq(t *testing.T) {
 					},
 				},
 			},
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				a := assertions.New(t)
-				return a.So(evs, should.HaveLength, 2) &&
-					a.So(evs[0].Name(), should.Equal, "ns.mac.link_check.request") &&
-					a.So(evs[0].Data(), should.BeNil) &&
-					a.So(evs[1].Name(), should.Equal, "ns.mac.link_check.answer") &&
-					a.So(evs[1].Data(), should.Resemble, &ttnpb.MACCommand_LinkCheckAns{
-						Margin:       42,
-						GatewayCount: 3,
-					})
+			Events: []events.DefinitionDataClosure{
+				evtReceiveLinkCheckRequest.BindData(nil),
+				evtEnqueueLinkCheckAnswer.BindData(&ttnpb.MACCommand_LinkCheckAns{
+					Margin:       42,
+					GatewayCount: 3,
+				}),
 			},
 		},
 	} {
@@ -238,16 +223,13 @@ func TestHandleLinkCheckReq(t *testing.T) {
 
 			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			var err error
-			evs := collectEvents(func() {
-				err = handleLinkCheckReq(test.Context(), dev, tc.Message)
-			})
+			evs, err := handleLinkCheckReq(test.Context(), dev, tc.Message)
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 				tc.Error == nil && !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
 			a.So(dev, should.Resemble, tc.Expected)
-			a.So(tc.AssertEvents(t, evs...), should.BeTrue)
+			a.So(evs, should.ResembleEventDefinitionDataClosures, tc.Events)
 		})
 	}
 }

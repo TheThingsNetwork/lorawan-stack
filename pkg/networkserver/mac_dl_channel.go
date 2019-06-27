@@ -54,28 +54,29 @@ func enqueueDLChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, 
 	return maxDownLen, maxUpLen, ok
 }
 
-func handleDLChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_DLChannelAns) (err error) {
+func handleDLChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_DLChannelAns) ([]events.DefinitionDataClosure, error) {
 	if pld == nil {
-		return errNoPayload
+		return nil, errNoPayload
 	}
 
-	if !pld.ChannelIndexAck || !pld.FrequencyAck {
-		events.Publish(evtReceiveDLChannelReject(ctx, dev.EndDeviceIdentifiers, pld))
-	} else {
-		events.Publish(evtReceiveDLChannelAccept(ctx, dev.EndDeviceIdentifiers, pld))
-	}
-
+	var err error
 	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_DL_CHANNEL, func(cmd *ttnpb.MACCommand) error {
 		if !pld.ChannelIndexAck || !pld.FrequencyAck {
 			return nil
 		}
-
 		req := cmd.GetDLChannelReq()
+
 		if uint(req.ChannelIndex) >= uint(len(dev.MACState.CurrentParameters.Channels)) || dev.MACState.CurrentParameters.Channels[req.ChannelIndex] == nil {
 			return errCorruptedMACState.WithCause(errUnknownChannel)
 		}
 		dev.MACState.CurrentParameters.Channels[req.ChannelIndex].DownlinkFrequency = req.Frequency
 		return nil
 	}, dev.MACState.PendingRequests...)
-	return
+	evt := evtReceiveDLChannelAccept
+	if !pld.ChannelIndexAck || !pld.FrequencyAck {
+		evt = evtReceiveDLChannelReject
+	}
+	return []events.DefinitionDataClosure{
+		evt.BindData(pld),
+	}, err
 }
