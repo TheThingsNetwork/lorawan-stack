@@ -26,16 +26,15 @@ var (
 	evtReceivePingSlotInfoRequest = defineReceiveMACRequestEvent("ping_slot_info", "ping slot info")()
 )
 
-func handlePingSlotInfoReq(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_PingSlotInfoReq) error {
+func handlePingSlotInfoReq(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_PingSlotInfoReq) ([]events.DefinitionDataClosure, error) {
 	if pld == nil {
-		return errNoPayload
+		return nil, errNoPayload
 	}
-
-	events.Publish(evtReceivePingSlotInfoRequest(ctx, dev.EndDeviceIdentifiers, pld))
 
 	dev.MACState.PingSlotPeriodicity = pld.Period
 	dev.MACState.QueuedResponses = append(dev.MACState.QueuedResponses, ttnpb.CID_PING_SLOT_INFO.MACCommand())
-
-	events.Publish(evtEnqueuePingSlotInfoAnswer(ctx, dev.EndDeviceIdentifiers, nil))
-	return nil
+	return []events.DefinitionDataClosure{
+		evtReceivePingSlotInfoRequest.BindData(pld),
+		evtEnqueuePingSlotInfoAnswer.BindData(nil),
+	}, nil
 }

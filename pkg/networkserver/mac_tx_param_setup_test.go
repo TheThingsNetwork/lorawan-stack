@@ -26,7 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-func TestHandleTxParamSetupReq(t *testing.T) {
+func TestEnqueueTxParamSetupReq(t *testing.T) {
 	for _, tc := range []struct {
 		Name                                              string
 		Device, Expected                                  *ttnpb.EndDevice
@@ -193,7 +193,7 @@ func TestHandleTxParamSetupReq(t *testing.T) {
 
 			var maxDownLen, maxUpLen uint16
 			var ok bool
-			evs := collectEvents(func() {
+			evs := test.CollectEvents(func() {
 				maxDownLen, maxUpLen, ok = enqueueTxParamSetupReq(test.Context(), dev, tc.InputMaxDownlinkLength, tc.InputMaxUplinkLength)
 			})
 			a.So(dev, should.Resemble, tc.Expected)
@@ -209,7 +209,7 @@ func TestHandleTxParamSetupAns(t *testing.T) {
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
-		AssertEvents     func(*testing.T, ...events.Event) bool
+		Events           []events.DefinitionDataClosure
 		Error            error
 	}{
 		{
@@ -220,11 +220,8 @@ func TestHandleTxParamSetupAns(t *testing.T) {
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{},
 			},
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				a := assertions.New(t)
-				return a.So(evs, should.HaveLength, 1) &&
-					a.So(evs[0].Name(), should.Equal, "ns.mac.tx_param_setup.answer") &&
-					a.So(evs[0].Data(), should.BeNil)
+			Events: []events.DefinitionDataClosure{
+				evtReceiveTxParamSetupAnswer.BindData(nil),
 			},
 			Error: errMACRequestNotFound,
 		},
@@ -251,11 +248,8 @@ func TestHandleTxParamSetupAns(t *testing.T) {
 					PendingRequests: []*ttnpb.MACCommand{},
 				},
 			},
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				a := assertions.New(t)
-				return a.So(evs, should.HaveLength, 1) &&
-					a.So(evs[0].Name(), should.Equal, "ns.mac.tx_param_setup.answer") &&
-					a.So(evs[0].Data(), should.BeNil)
+			Events: []events.DefinitionDataClosure{
+				evtReceiveTxParamSetupAnswer.BindData(nil),
 			},
 		},
 	} {
@@ -264,16 +258,13 @@ func TestHandleTxParamSetupAns(t *testing.T) {
 
 			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			var err error
-			evs := collectEvents(func() {
-				err = handleTxParamSetupAns(test.Context(), dev)
-			})
+			evs, err := handleTxParamSetupAns(test.Context(), dev)
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 				tc.Error == nil && !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
 			a.So(dev, should.Resemble, tc.Expected)
-			a.So(tc.AssertEvents(t, evs...), should.BeTrue)
+			a.So(evs, should.ResembleEventDefinitionDataClosures, tc.Events)
 		})
 	}
 }

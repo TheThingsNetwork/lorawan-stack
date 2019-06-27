@@ -47,13 +47,12 @@ func enqueuePingSlotChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDow
 	return maxDownLen, maxUpLen, ok
 }
 
-func handlePingSlotChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_PingSlotChannelAns) (err error) {
+func handlePingSlotChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_PingSlotChannelAns) ([]events.DefinitionDataClosure, error) {
 	if pld == nil {
-		return errNoPayload
+		return nil, errNoPayload
 	}
 
-	events.Publish(evtReceivePingSlotChannelAnswer(ctx, dev.EndDeviceIdentifiers, pld))
-
+	var err error
 	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_PING_SLOT_CHANNEL, func(cmd *ttnpb.MACCommand) error {
 		req := cmd.GetPingSlotChannelReq()
 
@@ -61,5 +60,7 @@ func handlePingSlotChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *tt
 		dev.MACState.CurrentParameters.PingSlotFrequency = req.Frequency
 		return nil
 	}, dev.MACState.PendingRequests...)
-	return
+	return []events.DefinitionDataClosure{
+		evtReceivePingSlotChannelAnswer.BindData(pld),
+	}, err
 }

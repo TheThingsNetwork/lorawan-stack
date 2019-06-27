@@ -93,20 +93,9 @@ func enqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, ma
 	return maxDownLen, maxUpLen, ok, nil
 }
 
-func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_LinkADRAns, dupCount uint, fps *frequencyplans.Store) (err error) {
+func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_LinkADRAns, dupCount uint, fps *frequencyplans.Store) ([]events.DefinitionDataClosure, error) {
 	if pld == nil {
-		return errNoPayload
-	}
-
-	if !pld.ChannelMaskAck || !pld.DataRateIndexAck || !pld.TxPowerIndexAck {
-		events.Publish(evtReceiveLinkADRReject(ctx, dev.EndDeviceIdentifiers, pld))
-	} else {
-		events.Publish(evtReceiveLinkADRAccept(ctx, dev.EndDeviceIdentifiers, pld))
-	}
-
-	_, phy, err := getDeviceBandVersion(dev, fps)
-	if err != nil {
-		return err
+		return nil, errNoPayload
 	}
 
 	handler := handleMACResponseBlock
@@ -115,7 +104,18 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 	}
 
 	if (dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_2) < 0 || dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0) && dupCount != 0 {
-		return errInvalidPayload
+		return nil, errInvalidPayload
+	}
+
+	evt := evtReceiveLinkADRAccept
+	if !pld.ChannelMaskAck || !pld.DataRateIndexAck || !pld.TxPowerIndexAck {
+		evt = evtReceiveLinkADRReject
+	}
+	evs := []events.DefinitionDataClosure{evt.BindData(pld)}
+
+	_, phy, err := getDeviceBandVersion(dev, fps)
+	if err != nil {
+		return evs, err
 	}
 
 	var n uint
@@ -162,11 +162,8 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 		}
 		return nil
 	}, dev.MACState.PendingRequests...)
-	if err != nil {
-		return err
-	}
-	if req == nil {
-		return nil
+	if err != nil || req == nil {
+		return evs, err
 	}
 
 	if dev.MACState.CurrentParameters.ADRDataRateIndex != req.DataRateIndex || dev.MACState.CurrentParameters.ADRTxPowerIndex != req.TxPowerIndex {
@@ -174,5 +171,5 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 		dev.MACState.CurrentParameters.ADRTxPowerIndex = req.TxPowerIndex
 		dev.RecentADRUplinks = nil
 	}
-	return nil
+	return evs, nil
 }

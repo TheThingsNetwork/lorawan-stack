@@ -29,7 +29,7 @@ func TestHandleRxTimingSetupAns(t *testing.T) {
 	for _, tc := range []struct {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
-		AssertEvents     func(*testing.T, ...events.Event) bool
+		Events           []events.DefinitionDataClosure
 		Error            error
 	}{
 		{
@@ -40,11 +40,8 @@ func TestHandleRxTimingSetupAns(t *testing.T) {
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{},
 			},
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				a := assertions.New(t)
-				return a.So(evs, should.HaveLength, 1) &&
-					a.So(evs[0].Name(), should.Equal, "ns.mac.rx_timing_setup.answer") &&
-					a.So(evs[0].Data(), should.BeNil)
+			Events: []events.DefinitionDataClosure{
+				evtReceiveRxTimingSetupAnswer.BindData(nil),
 			},
 			Error: errMACRequestNotFound,
 		},
@@ -67,11 +64,8 @@ func TestHandleRxTimingSetupAns(t *testing.T) {
 					PendingRequests: []*ttnpb.MACCommand{},
 				},
 			},
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				a := assertions.New(t)
-				return a.So(evs, should.HaveLength, 1) &&
-					a.So(evs[0].Name(), should.Equal, "ns.mac.rx_timing_setup.answer") &&
-					a.So(evs[0].Data(), should.BeNil)
+			Events: []events.DefinitionDataClosure{
+				evtReceiveRxTimingSetupAnswer.BindData(nil),
 			},
 		},
 	} {
@@ -80,16 +74,13 @@ func TestHandleRxTimingSetupAns(t *testing.T) {
 
 			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			var err error
-			evs := collectEvents(func() {
-				err = handleRxTimingSetupAns(test.Context(), dev)
-			})
+			evs, err := handleRxTimingSetupAns(test.Context(), dev)
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 				tc.Error == nil && !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
 			a.So(dev, should.Resemble, tc.Expected)
-			a.So(tc.AssertEvents(t, evs...), should.BeTrue)
+			a.So(evs, should.ResembleEventDefinitionDataClosures, tc.Events)
 		})
 	}
 }

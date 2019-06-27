@@ -55,9 +55,8 @@ func enqueueTxParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLe
 	return maxDownLen, maxUpLen, ok
 }
 
-func handleTxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (err error) {
-	events.Publish(evtReceiveTxParamSetupAnswer(ctx, dev.EndDeviceIdentifiers, nil))
-
+func handleTxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) ([]events.DefinitionDataClosure, error) {
+	var err error
 	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_TX_PARAM_SETUP, func(cmd *ttnpb.MACCommand) error {
 		req := cmd.GetTxParamSetupReq()
 
@@ -70,5 +69,7 @@ func handleTxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (err error
 		}
 		return nil
 	}, dev.MACState.PendingRequests...)
-	return
+	return []events.DefinitionDataClosure{
+		evtReceiveTxParamSetupAnswer.BindData(nil),
+	}, err
 }

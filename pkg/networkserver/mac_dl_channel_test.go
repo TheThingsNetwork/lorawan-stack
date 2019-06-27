@@ -31,7 +31,7 @@ func TestHandleDLChannelAns(t *testing.T) {
 		Device, Expected *ttnpb.EndDevice
 		Payload          *ttnpb.MACCommand_DLChannelAns
 		Error            error
-		AssertEvents     func(*testing.T, ...events.Event) bool
+		Events           []events.DefinitionDataClosure
 	}{
 		{
 			Name: "nil payload",
@@ -41,14 +41,10 @@ func TestHandleDLChannelAns(t *testing.T) {
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{},
 			},
-			Payload: nil,
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				return assertions.New(t).So(evs, should.BeEmpty)
-			},
 			Error: errNoPayload,
 		},
 		{
-			Name: "no request",
+			Name: "frequency ack/chanel index ack/no request",
 			Device: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{},
 			},
@@ -56,22 +52,37 @@ func TestHandleDLChannelAns(t *testing.T) {
 				MACState: &ttnpb.MACState{},
 			},
 			Payload: &ttnpb.MACCommand_DLChannelAns{
-				FrequencyAck:    false,
+				FrequencyAck:    true,
 				ChannelIndexAck: true,
 			},
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				a := assertions.New(t)
-				return a.So(evs, should.HaveLength, 1) &&
-					a.So(evs[0].Name(), should.Equal, "ns.mac.dl_channel.answer.reject") &&
-					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_DLChannelAns{
-						FrequencyAck:    false,
-						ChannelIndexAck: true,
-					})
+			Events: []events.DefinitionDataClosure{
+				evtReceiveDLChannelAccept.BindData(&ttnpb.MACCommand_DLChannelAns{
+					FrequencyAck:    true,
+					ChannelIndexAck: true,
+				}),
 			},
 			Error: errMACRequestNotFound,
 		},
 		{
-			Name: "frequency nack",
+			Name: "frequency nack/channel index ack/no request",
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
+			Expected: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
+			Payload: &ttnpb.MACCommand_DLChannelAns{
+				ChannelIndexAck: true,
+			},
+			Events: []events.DefinitionDataClosure{
+				evtReceiveDLChannelReject.BindData(&ttnpb.MACCommand_DLChannelAns{
+					ChannelIndexAck: true,
+				}),
+			},
+			Error: errMACRequestNotFound,
+		},
+		{
+			Name: "frequency nack/channel index ack/valid request",
 			Device: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{
@@ -112,21 +123,16 @@ func TestHandleDLChannelAns(t *testing.T) {
 				},
 			},
 			Payload: &ttnpb.MACCommand_DLChannelAns{
-				FrequencyAck:    false,
 				ChannelIndexAck: true,
 			},
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				a := assertions.New(t)
-				return a.So(evs, should.HaveLength, 1) &&
-					a.So(evs[0].Name(), should.Equal, "ns.mac.dl_channel.answer.reject") &&
-					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_DLChannelAns{
-						FrequencyAck:    false,
-						ChannelIndexAck: true,
-					})
+			Events: []events.DefinitionDataClosure{
+				evtReceiveDLChannelReject.BindData(&ttnpb.MACCommand_DLChannelAns{
+					ChannelIndexAck: true,
+				}),
 			},
 		},
 		{
-			Name: "both ack/no channel",
+			Name: "frequency ack/channel index ack/no channel",
 			Device: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{
@@ -151,19 +157,16 @@ func TestHandleDLChannelAns(t *testing.T) {
 				FrequencyAck:    true,
 				ChannelIndexAck: true,
 			},
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				a := assertions.New(t)
-				return a.So(evs, should.HaveLength, 1) &&
-					a.So(evs[0].Name(), should.Equal, "ns.mac.dl_channel.answer.accept") &&
-					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_DLChannelAns{
-						FrequencyAck:    true,
-						ChannelIndexAck: true,
-					})
+			Events: []events.DefinitionDataClosure{
+				evtReceiveDLChannelAccept.BindData(&ttnpb.MACCommand_DLChannelAns{
+					FrequencyAck:    true,
+					ChannelIndexAck: true,
+				}),
 			},
 			Error: errCorruptedMACState.WithCause(errUnknownChannel),
 		},
 		{
-			Name: "both ack/channel exists",
+			Name: "frequency ack/channel index ack/channel exists",
 			Device: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{
@@ -207,14 +210,11 @@ func TestHandleDLChannelAns(t *testing.T) {
 				FrequencyAck:    true,
 				ChannelIndexAck: true,
 			},
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				a := assertions.New(t)
-				return a.So(evs, should.HaveLength, 1) &&
-					a.So(evs[0].Name(), should.Equal, "ns.mac.dl_channel.answer.accept") &&
-					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_DLChannelAns{
-						FrequencyAck:    true,
-						ChannelIndexAck: true,
-					})
+			Events: []events.DefinitionDataClosure{
+				evtReceiveDLChannelAccept.BindData(&ttnpb.MACCommand_DLChannelAns{
+					FrequencyAck:    true,
+					ChannelIndexAck: true,
+				}),
 			},
 		},
 	} {
@@ -223,16 +223,13 @@ func TestHandleDLChannelAns(t *testing.T) {
 
 			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			var err error
-			evs := collectEvents(func() {
-				err = handleDLChannelAns(test.Context(), dev, tc.Payload)
-			})
+			evs, err := handleDLChannelAns(test.Context(), dev, tc.Payload)
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 				tc.Error == nil && !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
 			a.So(dev, should.Resemble, tc.Expected)
-			a.So(tc.AssertEvents(t, evs...), should.BeTrue)
+			a.So(evs, should.ResembleEventDefinitionDataClosures, tc.Events)
 		})
 	}
 }

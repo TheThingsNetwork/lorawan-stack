@@ -26,19 +26,18 @@ var (
 	evtEnqueueDeviceModeConfirmation = defineEnqueueMACConfirmationEvent("device_mode", "device mode")()
 )
 
-func handleDeviceModeInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_DeviceModeInd) error {
+func handleDeviceModeInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_DeviceModeInd) ([]events.DefinitionDataClosure, error) {
 	if pld == nil {
-		return errNoPayload
+		return nil, errNoPayload
 	}
-
-	events.Publish(evtReceiveDeviceModeIndication(ctx, dev.EndDeviceIdentifiers, pld))
 
 	dev.MACState.DeviceClass = pld.Class
 	conf := &ttnpb.MACCommand_DeviceModeConf{
 		Class: pld.Class,
 	}
 	dev.MACState.QueuedResponses = append(dev.MACState.QueuedResponses, conf.MACCommand())
-
-	events.Publish(evtEnqueueDeviceModeConfirmation(ctx, dev.EndDeviceIdentifiers, conf))
-	return nil
+	return []events.DefinitionDataClosure{
+		evtReceiveDeviceModeIndication.BindData(pld),
+		evtEnqueueDeviceModeConfirmation.BindData(conf),
+	}, nil
 }
