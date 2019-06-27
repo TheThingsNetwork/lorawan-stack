@@ -20,7 +20,6 @@ import (
 	"errors"
 	"fmt"
 	"math"
-	"sync"
 	"testing"
 	"time"
 
@@ -43,20 +42,6 @@ import (
 )
 
 func TestProcessDownlinkTask(t *testing.T) {
-	type Environment struct {
-		Cluster struct {
-			Auth    <-chan test.ClusterAuthRequest
-			GetPeer <-chan test.ClusterGetPeerRequest
-		}
-		DeviceRegistry struct {
-			SetByID <-chan DeviceRegistrySetByIDRequest
-		}
-		DownlinkTasks struct {
-			Add <-chan DownlinkTaskAddRequest
-			Pop <-chan DownlinkTaskPopRequest
-		}
-	}
-
 	getPaths := []string{
 		"frequency_plan_id",
 		"last_dev_status_received_at",
@@ -252,7 +237,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 	for _, tc := range []struct {
 		Name               string
 		DownlinkPriorities DownlinkPriorities
-		Handler            func(context.Context, Environment) bool
+		Handler            func(context.Context, TestEnvironment) bool
 		ErrorAssertion     func(*testing.T, error) bool
 	}{
 		{
@@ -262,7 +247,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
 				MaxApplicationDownlink: ttnpb.TxSchedulePriority_NORMAL,
 			},
-			Handler: func(ctx context.Context, env Environment) bool {
+			Handler: func(ctx context.Context, env TestEnvironment) bool {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 
@@ -556,7 +541,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
 				MaxApplicationDownlink: ttnpb.TxSchedulePriority_NORMAL,
 			},
-			Handler: func(ctx context.Context, env Environment) bool {
+			Handler: func(ctx context.Context, env TestEnvironment) bool {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 
@@ -869,7 +854,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
 				MaxApplicationDownlink: ttnpb.TxSchedulePriority_NORMAL,
 			},
-			Handler: func(ctx context.Context, env Environment) bool {
+			Handler: func(ctx context.Context, env TestEnvironment) bool {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 
@@ -1254,7 +1239,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
 				MaxApplicationDownlink: ttnpb.TxSchedulePriority_NORMAL,
 			},
-			Handler: func(ctx context.Context, env Environment) bool {
+			Handler: func(ctx context.Context, env TestEnvironment) bool {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 
@@ -1572,7 +1557,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
 				MaxApplicationDownlink: ttnpb.TxSchedulePriority_NORMAL,
 			},
-			Handler: func(ctx context.Context, env Environment) bool {
+			Handler: func(ctx context.Context, env TestEnvironment) bool {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 
@@ -1747,7 +1732,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
 				MaxApplicationDownlink: ttnpb.TxSchedulePriority_NORMAL,
 			},
-			Handler: func(ctx context.Context, env Environment) bool {
+			Handler: func(ctx context.Context, env TestEnvironment) bool {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 
@@ -1915,7 +1900,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
 				MaxApplicationDownlink: ttnpb.TxSchedulePriority_NORMAL,
 			},
-			Handler: func(ctx context.Context, env Environment) bool {
+			Handler: func(ctx context.Context, env TestEnvironment) bool {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 
@@ -2160,55 +2145,19 @@ func TestProcessDownlinkTask(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
-			logger := test.GetLogger(t)
+			ns, ctx, env, stop := StartTest(t, Config{}, (1<<10)*test.Delay)
+			defer stop()
 
-			ctx := test.ContextWithT(test.Context(), t)
-			ctx = log.NewContext(ctx, logger)
-			ctx, cancel := context.WithTimeout(ctx, (1<<8)*test.Delay)
-			defer cancel()
+			ns.downlinkPriorities = tc.DownlinkPriorities
 
-			authCh := make(chan test.ClusterAuthRequest)
-			getPeerCh := make(chan test.ClusterGetPeerRequest)
+			go func() {
+				for ev := range env.Events {
+					t.Logf("Event %s published with data %v", ev.Event.Name(), ev.Event.Data())
+					ev.Response <- struct{}{}
+				}
+			}()
 
-			c := component.MustNew(
-				log.Noop,
-				&component.Config{},
-				component.WithClusterNew(func(context.Context, *config.Cluster, ...cluster.Option) (cluster.Cluster, error) {
-					return &test.MockCluster{
-						AuthFunc:    test.MakeClusterAuthChFunc(authCh),
-						GetPeerFunc: test.MakeClusterGetPeerChFunc(getPeerCh),
-						JoinFunc:    test.ClusterJoinNilFunc,
-					}, nil
-				}),
-			)
-			c.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
-			err := c.Start()
-			a.So(err, should.BeNil)
-
-			setByIDCh := make(chan DeviceRegistrySetByIDRequest)
-
-			addCh := make(chan DownlinkTaskAddRequest)
-			popCh := make(chan DownlinkTaskPopRequest)
-
-			ns := &NetworkServer{
-				Component:          c,
-				ctx:                ctx,
-				applicationServers: &sync.Map{},
-				devices: &MockDeviceRegistry{
-					SetByIDFunc: MakeDeviceRegistrySetByIDChFunc(setByIDCh),
-				},
-				downlinkTasks: &MockDownlinkTaskQueue{
-					AddFunc: MakeDownlinkTaskAddChFunc(addCh),
-					PopFunc: MakeDownlinkTaskPopChFunc(popCh),
-				},
-				downlinkPriorities: tc.DownlinkPriorities,
-				handleASUplink: func(reqCtx context.Context, ids ttnpb.ApplicationIdentifiers, up *ttnpb.ApplicationUp) (bool, error) {
-					// TODO: Assert AS uplinks sent(https://github.com/TheThingsNetwork/lorawan-stack/issues/631).
-					a.So(reqCtx, should.HaveParentContextOrEqual, ctx)
-					t.Logf("Send uplink to AS %v: %+v", ids, up)
-					return false, nil
-				},
-			}
+			<-env.DownlinkTasks.Pop
 
 			processDownlinkTaskErrCh := make(chan error)
 			go func() {
@@ -2223,12 +2172,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 			}()
 
-			var env Environment
-			env.Cluster.Auth = authCh
-			env.Cluster.GetPeer = getPeerCh
-			env.DeviceRegistry.SetByID = setByIDCh
-			env.DownlinkTasks.Add = addCh
-			env.DownlinkTasks.Pop = popCh
 			res := tc.Handler(ctx, env)
 			if !a.So(res, should.BeTrue) {
 				t.Error("Test handler failed")
@@ -2246,13 +2189,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(err, should.BeNil)
 				}
 			}
-			close(authCh)
-			close(addCh)
-			close(getPeerCh)
-			close(popCh)
-			close(setByIDCh)
 			close(processDownlinkTaskErrCh)
-			ns.Close()
 		})
 	}
 }

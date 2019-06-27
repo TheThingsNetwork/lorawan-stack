@@ -975,7 +975,7 @@ type TestEnvironment struct {
 	Events            <-chan test.EventPubSubPublishRequest
 }
 
-func StartTest(t *testing.T, conf Config, timeout time.Duration) (*NetworkServer, context.Context, TestEnvironment, func()) {
+func StartTest(t *testing.T, conf Config, timeout time.Duration, opts ...Option) (*NetworkServer, context.Context, TestEnvironment, func()) {
 	t.Helper()
 
 	logger := test.GetLogger(t)
