@@ -30,8 +30,8 @@ func TestHandleRejoinParamSetupAns(t *testing.T) {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Payload          *ttnpb.MACCommand_RejoinParamSetupAns
+		Events           []events.DefinitionDataClosure
 		Error            error
-		AssertEvents     func(*testing.T, ...events.Event) bool
 	}{
 		{
 			Name: "nil payload",
@@ -40,9 +40,6 @@ func TestHandleRejoinParamSetupAns(t *testing.T) {
 			},
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{},
-			},
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				return assertions.New(t).So(evs, should.BeEmpty)
 			},
 			Error: errNoPayload,
 		},
@@ -57,13 +54,10 @@ func TestHandleRejoinParamSetupAns(t *testing.T) {
 			Payload: &ttnpb.MACCommand_RejoinParamSetupAns{
 				MaxTimeExponentAck: true,
 			},
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				a := assertions.New(t)
-				return a.So(evs, should.HaveLength, 1) &&
-					a.So(evs[0].Name(), should.Equal, "ns.mac.rejoin_param_setup.answer") &&
-					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_RejoinParamSetupAns{
-						MaxTimeExponentAck: true,
-					})
+			Events: []events.DefinitionDataClosure{
+				evtReceiveRejoinParamSetupAnswer.BindData(&ttnpb.MACCommand_RejoinParamSetupAns{
+					MaxTimeExponentAck: true,
+				}),
 			},
 			Error: errMACRequestNotFound,
 		},
@@ -91,13 +85,10 @@ func TestHandleRejoinParamSetupAns(t *testing.T) {
 			Payload: &ttnpb.MACCommand_RejoinParamSetupAns{
 				MaxTimeExponentAck: true,
 			},
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				a := assertions.New(t)
-				return a.So(evs, should.HaveLength, 1) &&
-					a.So(evs[0].Name(), should.Equal, "ns.mac.rejoin_param_setup.answer") &&
-					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_RejoinParamSetupAns{
-						MaxTimeExponentAck: true,
-					})
+			Events: []events.DefinitionDataClosure{
+				evtReceiveRejoinParamSetupAnswer.BindData(&ttnpb.MACCommand_RejoinParamSetupAns{
+					MaxTimeExponentAck: true,
+				}),
 			},
 		},
 		{
@@ -127,13 +118,8 @@ func TestHandleRejoinParamSetupAns(t *testing.T) {
 			Payload: &ttnpb.MACCommand_RejoinParamSetupAns{
 				MaxTimeExponentAck: false,
 			},
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				a := assertions.New(t)
-				return a.So(evs, should.HaveLength, 1) &&
-					a.So(evs[0].Name(), should.Equal, "ns.mac.rejoin_param_setup.answer") &&
-					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_RejoinParamSetupAns{
-						MaxTimeExponentAck: false,
-					})
+			Events: []events.DefinitionDataClosure{
+				evtReceiveRejoinParamSetupAnswer.BindData(&ttnpb.MACCommand_RejoinParamSetupAns{}),
 			},
 		},
 	} {
@@ -142,16 +128,13 @@ func TestHandleRejoinParamSetupAns(t *testing.T) {
 
 			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			var err error
-			evs := collectEvents(func() {
-				err = handleRejoinParamSetupAns(test.Context(), dev, tc.Payload)
-			})
+			evs, err := handleRejoinParamSetupAns(test.Context(), dev, tc.Payload)
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 				tc.Error == nil && !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
 			a.So(dev, should.Resemble, tc.Expected)
-			a.So(tc.AssertEvents(t, evs...), should.BeTrue)
+			a.So(evs, should.ResembleEventDefinitionDataClosures, tc.Events)
 		})
 	}
 }

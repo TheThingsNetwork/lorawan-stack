@@ -31,7 +31,7 @@ func TestHandleRekeyInd(t *testing.T) {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Payload          *ttnpb.MACCommand_RekeyInd
-		AssertEvents     func(*testing.T, ...events.Event) bool
+		Events           []events.DefinitionDataClosure
 		Error            error
 	}{
 		{
@@ -41,9 +41,6 @@ func TestHandleRekeyInd(t *testing.T) {
 			},
 			Expected: &ttnpb.EndDevice{
 				SupportsJoin: true,
-			},
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				return assertions.New(t).So(evs, should.BeEmpty)
 			},
 			Error: errNoPayload,
 		},
@@ -82,17 +79,13 @@ func TestHandleRekeyInd(t *testing.T) {
 			Payload: &ttnpb.MACCommand_RekeyInd{
 				MinorVersion: 1,
 			},
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				a := assertions.New(t)
-				return a.So(evs, should.HaveLength, 2) &&
-					a.So(evs[0].Name(), should.Equal, "ns.mac.rekey.indication") &&
-					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_RekeyInd{
-						MinorVersion: 1,
-					}) &&
-					a.So(evs[1].Name(), should.Equal, "ns.mac.rekey.confirmation") &&
-					a.So(evs[1].Data(), should.Resemble, &ttnpb.MACCommand_RekeyConf{
-						MinorVersion: 1,
-					})
+			Events: []events.DefinitionDataClosure{
+				evtReceiveRekeyIndication.BindData(&ttnpb.MACCommand_RekeyInd{
+					MinorVersion: 1,
+				}),
+				evtEnqueueRekeyConfirmation.BindData(&ttnpb.MACCommand_RekeyConf{
+					MinorVersion: 1,
+				}),
 			},
 		},
 		{
@@ -137,17 +130,13 @@ func TestHandleRekeyInd(t *testing.T) {
 			Payload: &ttnpb.MACCommand_RekeyInd{
 				MinorVersion: 1,
 			},
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				a := assertions.New(t)
-				return a.So(evs, should.HaveLength, 2) &&
-					a.So(evs[0].Name(), should.Equal, "ns.mac.rekey.indication") &&
-					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_RekeyInd{
-						MinorVersion: 1,
-					}) &&
-					a.So(evs[1].Name(), should.Equal, "ns.mac.rekey.confirmation") &&
-					a.So(evs[1].Data(), should.Resemble, &ttnpb.MACCommand_RekeyConf{
-						MinorVersion: 1,
-					})
+			Events: []events.DefinitionDataClosure{
+				evtReceiveRekeyIndication.BindData(&ttnpb.MACCommand_RekeyInd{
+					MinorVersion: 1,
+				}),
+				evtEnqueueRekeyConfirmation.BindData(&ttnpb.MACCommand_RekeyConf{
+					MinorVersion: 1,
+				}),
 			},
 		},
 	} {
@@ -156,16 +145,13 @@ func TestHandleRekeyInd(t *testing.T) {
 
 			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			var err error
-			evs := collectEvents(func() {
-				err = handleRekeyInd(test.Context(), dev, tc.Payload)
-			})
+			evs, err := handleRekeyInd(test.Context(), dev, tc.Payload)
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 				tc.Error == nil && !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
 			a.So(dev, should.Resemble, tc.Expected)
-			a.So(tc.AssertEvents(t, evs...), should.BeTrue)
+			a.So(evs, should.ResembleEventDefinitionDataClosures, tc.Events)
 		})
 	}
 }

@@ -26,15 +26,16 @@ var (
 	evtEnqueueRekeyConfirmation = defineEnqueueMACConfirmationEvent("rekey", "device rekey")()
 )
 
-func handleRekeyInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_RekeyInd) error {
+func handleRekeyInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_RekeyInd) ([]events.DefinitionDataClosure, error) {
 	if pld == nil {
-		return errNoPayload
+		return nil, errNoPayload
 	}
 
-	events.Publish(evtReceiveRekeyIndication(ctx, dev.EndDeviceIdentifiers, pld))
-
+	evs := []events.DefinitionDataClosure{
+		evtReceiveRekeyIndication.BindData(pld),
+	}
 	if !dev.SupportsJoin {
-		return nil
+		return evs, nil
 	}
 
 	dev.MACState.LoRaWANVersion = ttnpb.MAC_V1_1
@@ -46,7 +47,7 @@ func handleRekeyInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCom
 		MinorVersion: pld.MinorVersion,
 	}
 	dev.MACState.QueuedResponses = append(dev.MACState.QueuedResponses, conf.MACCommand())
-
-	events.Publish(evtEnqueueRekeyConfirmation(ctx, dev.EndDeviceIdentifiers, conf))
-	return nil
+	return append(evs,
+		evtEnqueueRekeyConfirmation.BindData(conf),
+	), nil
 }

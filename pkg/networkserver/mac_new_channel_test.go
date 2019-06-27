@@ -30,7 +30,7 @@ func TestHandleNewChannelAns(t *testing.T) {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Payload          *ttnpb.MACCommand_NewChannelAns
-		AssertEvents     func(*testing.T, ...events.Event) bool
+		Events           []events.DefinitionDataClosure
 		Error            error
 	}{
 		{
@@ -42,10 +42,7 @@ func TestHandleNewChannelAns(t *testing.T) {
 				MACState: &ttnpb.MACState{},
 			},
 			Payload: nil,
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				return assertions.New(t).So(evs, should.BeEmpty)
-			},
-			Error: errNoPayload,
+			Error:   errNoPayload,
 		},
 		{
 			Name: "no request",
@@ -59,14 +56,11 @@ func TestHandleNewChannelAns(t *testing.T) {
 				FrequencyAck: true,
 				DataRateAck:  true,
 			},
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				a := assertions.New(t)
-				return a.So(evs, should.HaveLength, 1) &&
-					a.So(evs[0].Name(), should.Equal, "ns.mac.new_channel.answer.accept") &&
-					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_NewChannelAns{
-						FrequencyAck: true,
-						DataRateAck:  true,
-					})
+			Events: []events.DefinitionDataClosure{
+				evtReceiveNewChannelAccept.BindData(&ttnpb.MACCommand_NewChannelAns{
+					FrequencyAck: true,
+					DataRateAck:  true,
+				}),
 			},
 			Error: errMACRequestNotFound,
 		},
@@ -108,14 +102,11 @@ func TestHandleNewChannelAns(t *testing.T) {
 				FrequencyAck: true,
 				DataRateAck:  true,
 			},
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				a := assertions.New(t)
-				return a.So(evs, should.HaveLength, 1) &&
-					a.So(evs[0].Name(), should.Equal, "ns.mac.new_channel.answer.accept") &&
-					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_NewChannelAns{
-						FrequencyAck: true,
-						DataRateAck:  true,
-					})
+			Events: []events.DefinitionDataClosure{
+				evtReceiveNewChannelAccept.BindData(&ttnpb.MACCommand_NewChannelAns{
+					FrequencyAck: true,
+					DataRateAck:  true,
+				}),
 			},
 		},
 	} {
@@ -124,16 +115,13 @@ func TestHandleNewChannelAns(t *testing.T) {
 
 			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			var err error
-			evs := collectEvents(func() {
-				err = handleNewChannelAns(test.Context(), dev, tc.Payload)
-			})
+			evs, err := handleNewChannelAns(test.Context(), dev, tc.Payload)
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 				tc.Error == nil && !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
 			a.So(dev, should.Resemble, tc.Expected)
-			a.So(tc.AssertEvents(t, evs...), should.BeTrue)
+			a.So(evs, should.ResembleEventDefinitionDataClosures, tc.Events)
 		})
 	}
 }

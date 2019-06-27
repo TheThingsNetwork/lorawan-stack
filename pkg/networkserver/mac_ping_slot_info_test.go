@@ -30,7 +30,7 @@ func TestHandlePingSlotInfoReq(t *testing.T) {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Payload          *ttnpb.MACCommand_PingSlotInfoReq
-		AssertEvents     func(*testing.T, ...events.Event) bool
+		Events           []events.DefinitionDataClosure
 		Error            error
 	}{
 		{
@@ -40,9 +40,6 @@ func TestHandlePingSlotInfoReq(t *testing.T) {
 			},
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{},
-			},
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				return assertions.New(t).So(evs, should.BeEmpty)
 			},
 			Error: errNoPayload,
 		},
@@ -64,15 +61,11 @@ func TestHandlePingSlotInfoReq(t *testing.T) {
 			Payload: &ttnpb.MACCommand_PingSlotInfoReq{
 				Period: 42,
 			},
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				a := assertions.New(t)
-				return a.So(evs, should.HaveLength, 2) &&
-					a.So(evs[0].Name(), should.Equal, "ns.mac.ping_slot_info.request") &&
-					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_PingSlotInfoReq{
-						Period: 42,
-					}) &&
-					a.So(evs[1].Name(), should.Equal, "ns.mac.ping_slot_info.answer") &&
-					a.So(evs[1].Data(), should.BeNil)
+			Events: []events.DefinitionDataClosure{
+				evtReceivePingSlotInfoRequest.BindData(&ttnpb.MACCommand_PingSlotInfoReq{
+					Period: 42,
+				}),
+				evtEnqueuePingSlotInfoAnswer.BindData(nil),
 			},
 		},
 		{
@@ -100,15 +93,11 @@ func TestHandlePingSlotInfoReq(t *testing.T) {
 			Payload: &ttnpb.MACCommand_PingSlotInfoReq{
 				Period: 42,
 			},
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				a := assertions.New(t)
-				return a.So(evs, should.HaveLength, 2) &&
-					a.So(evs[0].Name(), should.Equal, "ns.mac.ping_slot_info.request") &&
-					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_PingSlotInfoReq{
-						Period: 42,
-					}) &&
-					a.So(evs[1].Name(), should.Equal, "ns.mac.ping_slot_info.answer") &&
-					a.So(evs[1].Data(), should.BeNil)
+			Events: []events.DefinitionDataClosure{
+				evtReceivePingSlotInfoRequest.BindData(&ttnpb.MACCommand_PingSlotInfoReq{
+					Period: 42,
+				}),
+				evtEnqueuePingSlotInfoAnswer.BindData(nil),
 			},
 		},
 	} {
@@ -117,16 +106,13 @@ func TestHandlePingSlotInfoReq(t *testing.T) {
 
 			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			var err error
-			evs := collectEvents(func() {
-				err = handlePingSlotInfoReq(test.Context(), dev, tc.Payload)
-			})
+			evs, err := handlePingSlotInfoReq(test.Context(), dev, tc.Payload)
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 				tc.Error == nil && !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
 			a.So(dev, should.Resemble, tc.Expected)
-			a.So(tc.AssertEvents(t, evs...), should.BeTrue)
+			a.So(evs, should.ResembleEventDefinitionDataClosures, tc.Events)
 		})
 	}
 }

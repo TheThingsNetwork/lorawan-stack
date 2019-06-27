@@ -66,22 +66,16 @@ func enqueueNewChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen,
 	return maxDownLen, maxUpLen, ok
 }
 
-func handleNewChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_NewChannelAns) (err error) {
+func handleNewChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_NewChannelAns) ([]events.DefinitionDataClosure, error) {
 	if pld == nil {
-		return errNoPayload
+		return nil, errNoPayload
 	}
 
-	if !pld.DataRateAck || !pld.FrequencyAck {
-		events.Publish(evtReceiveNewChannelReject(ctx, dev.EndDeviceIdentifiers, pld))
-	} else {
-		events.Publish(evtReceiveNewChannelAccept(ctx, dev.EndDeviceIdentifiers, pld))
-	}
-
+	var err error
 	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_NEW_CHANNEL, func(cmd *ttnpb.MACCommand) error {
 		if !pld.DataRateAck || !pld.FrequencyAck {
 			return nil
 		}
-
 		req := cmd.GetNewChannelReq()
 
 		if uint(req.ChannelIndex) >= uint(len(dev.MACState.CurrentParameters.Channels)) {
@@ -95,12 +89,17 @@ func handleNewChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.M
 			}
 			dev.MACState.CurrentParameters.Channels[req.ChannelIndex] = ch
 		}
-
 		ch.UplinkFrequency = req.Frequency
 		ch.MinDataRateIndex = req.MinDataRateIndex
 		ch.MaxDataRateIndex = req.MaxDataRateIndex
 		ch.EnableUplink = true
 		return nil
 	}, dev.MACState.PendingRequests...)
-	return
+	evt := evtReceiveNewChannelAccept
+	if !pld.DataRateAck || !pld.FrequencyAck {
+		evt = evtReceiveNewChannelReject
+	}
+	return []events.DefinitionDataClosure{
+		evt.BindData(pld),
+	}, err
 }

@@ -30,7 +30,7 @@ func TestHandleRxParamSetupAns(t *testing.T) {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Payload          *ttnpb.MACCommand_RxParamSetupAns
-		AssertEvents     func(*testing.T, ...events.Event) bool
+		Events           []events.DefinitionDataClosure
 		Error            error
 	}{
 		{
@@ -40,9 +40,6 @@ func TestHandleRxParamSetupAns(t *testing.T) {
 			},
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{},
-			},
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				return assertions.New(t).So(evs, should.BeEmpty)
 			},
 			Error: errNoPayload,
 		},
@@ -59,15 +56,12 @@ func TestHandleRxParamSetupAns(t *testing.T) {
 				Rx2DataRateIndexAck:  true,
 				Rx2FrequencyAck:      true,
 			},
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				a := assertions.New(t)
-				return a.So(evs, should.HaveLength, 1) &&
-					a.So(evs[0].Name(), should.Equal, "ns.mac.rx_param_setup.answer.accept") &&
-					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_RxParamSetupAns{
-						Rx1DataRateOffsetAck: true,
-						Rx2DataRateIndexAck:  true,
-						Rx2FrequencyAck:      true,
-					})
+			Events: []events.DefinitionDataClosure{
+				evtReceiveRxParamSetupAccept.BindData(&ttnpb.MACCommand_RxParamSetupAns{
+					Rx1DataRateOffsetAck: true,
+					Rx2DataRateIndexAck:  true,
+					Rx2FrequencyAck:      true,
+				}),
 			},
 			Error: errMACRequestNotFound,
 		},
@@ -103,15 +97,12 @@ func TestHandleRxParamSetupAns(t *testing.T) {
 				Rx2DataRateIndexAck:  true,
 				Rx2FrequencyAck:      true,
 			},
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				a := assertions.New(t)
-				return a.So(evs, should.HaveLength, 1) &&
-					a.So(evs[0].Name(), should.Equal, "ns.mac.rx_param_setup.answer.accept") &&
-					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_RxParamSetupAns{
-						Rx1DataRateOffsetAck: true,
-						Rx2DataRateIndexAck:  true,
-						Rx2FrequencyAck:      true,
-					})
+			Events: []events.DefinitionDataClosure{
+				evtReceiveRxParamSetupAccept.BindData(&ttnpb.MACCommand_RxParamSetupAns{
+					Rx1DataRateOffsetAck: true,
+					Rx2DataRateIndexAck:  true,
+					Rx2FrequencyAck:      true,
+				}),
 			},
 		},
 		{
@@ -143,17 +134,12 @@ func TestHandleRxParamSetupAns(t *testing.T) {
 			Payload: &ttnpb.MACCommand_RxParamSetupAns{
 				Rx1DataRateOffsetAck: true,
 				Rx2DataRateIndexAck:  true,
-				Rx2FrequencyAck:      false,
 			},
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				a := assertions.New(t)
-				return a.So(evs, should.HaveLength, 1) &&
-					a.So(evs[0].Name(), should.Equal, "ns.mac.rx_param_setup.answer.reject") &&
-					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_RxParamSetupAns{
-						Rx1DataRateOffsetAck: true,
-						Rx2DataRateIndexAck:  true,
-						Rx2FrequencyAck:      false,
-					})
+			Events: []events.DefinitionDataClosure{
+				evtReceiveRxParamSetupReject.BindData(&ttnpb.MACCommand_RxParamSetupAns{
+					Rx1DataRateOffsetAck: true,
+					Rx2DataRateIndexAck:  true,
+				}),
 			},
 		},
 	} {
@@ -162,16 +148,13 @@ func TestHandleRxParamSetupAns(t *testing.T) {
 
 			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			var err error
-			evs := collectEvents(func() {
-				err = handleRxParamSetupAns(test.Context(), dev, tc.Payload)
-			})
+			evs, err := handleRxParamSetupAns(test.Context(), dev, tc.Payload)
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 				tc.Error == nil && !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
 			a.So(dev, should.Resemble, tc.Expected)
-			a.So(tc.AssertEvents(t, evs...), should.BeTrue)
+			a.So(evs, should.ResembleEventDefinitionDataClosures, tc.Events)
 		})
 	}
 }

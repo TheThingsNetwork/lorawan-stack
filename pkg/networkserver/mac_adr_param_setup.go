@@ -49,9 +49,8 @@ func enqueueADRParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownL
 	return maxDownLen, maxUpLen, ok
 }
 
-func handleADRParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (err error) {
-	events.Publish(evtReceiveADRParamSetupAnswer(ctx, dev.EndDeviceIdentifiers, nil))
-
+func handleADRParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) ([]events.DefinitionDataClosure, error) {
+	var err error
 	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_ADR_PARAM_SETUP, func(cmd *ttnpb.MACCommand) error {
 		req := cmd.GetADRParamSetupReq()
 
@@ -67,5 +66,7 @@ func handleADRParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (err erro
 		}
 		return nil
 	}, dev.MACState.PendingRequests...)
-	return
+	return []events.DefinitionDataClosure{
+		evtReceiveADRParamSetupAnswer.BindData(nil),
+	}, err
 }
