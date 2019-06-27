@@ -56,12 +56,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 		}
 	}
 
-	type DeviceRegistrySetByIDRequestFuncResponse struct {
-		Device *ttnpb.EndDevice
-		Paths  []string
-		Error  error
-	}
-
 	getPaths := []string{
 		"frequency_plan_id",
 		"last_dev_status_received_at",
@@ -75,6 +69,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 		"recent_uplinks",
 		"session",
 	}
+
+	const appIDString = "process-downlink-test-app-id"
+	appID := ttnpb.ApplicationIdentifiers{ApplicationID: appIDString}
+	const devID = "process-downlink-test-dev-id"
+
+	devAddr := types.DevAddr{0x42, 0xff, 0xff, 0xff}
 
 	fNwkSIntKey := types.AES128Key{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
 	nwkSEncKey := types.AES128Key{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
@@ -92,45 +92,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		},
 	}
 
-	rxMetadata := []*ttnpb.RxMetadata{
-		{
-			GatewayIdentifiers:     ttnpb.GatewayIdentifiers{GatewayID: "gateway-test-1"},
-			SNR:                    -9,
-			UplinkToken:            []byte("token-gtw-1"),
-			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_NONE,
-		},
-		{
-			GatewayIdentifiers:     ttnpb.GatewayIdentifiers{GatewayID: "gateway-test-3"},
-			SNR:                    -5.3,
-			UplinkToken:            []byte("token-gtw-3"),
-			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER,
-		},
-		{
-			GatewayIdentifiers:     ttnpb.GatewayIdentifiers{GatewayID: "gateway-test-5"},
-			SNR:                    12,
-			UplinkToken:            []byte("token-gtw-5"),
-			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_NEVER,
-		},
-		{
-			GatewayIdentifiers:     ttnpb.GatewayIdentifiers{GatewayID: "gateway-test-0"},
-			SNR:                    5.2,
-			UplinkToken:            []byte("token-gtw-0"),
-			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_NONE,
-		},
-		{
-			GatewayIdentifiers:     ttnpb.GatewayIdentifiers{GatewayID: "gateway-test-2"},
-			SNR:                    6.3,
-			UplinkToken:            []byte("token-gtw-2"),
-			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER,
-		},
-		{
-			GatewayIdentifiers:     ttnpb.GatewayIdentifiers{GatewayID: "gateway-test-4"},
-			SNR:                    -7,
-			UplinkToken:            []byte("token-gtw-4"),
-			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER,
-		},
-	}
-
+	rxMetadata := MakeRxMetadataSlice()
 	eu868macParameters := &ttnpb.MACParameters{
 		Channels: MakeEU868Channels(&ttnpb.MACParameters_Channel{
 			UplinkFrequency:   430000000,
@@ -317,8 +279,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					go func() {
 						popFuncRespCh <- req.Func(req.Context, ttnpb.EndDeviceIdentifiers{
-							ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-							DeviceID:               "test-dev-id",
+							ApplicationIdentifiers: appID,
+							DeviceID:               devID,
 						}, time.Now())
 					}()
 				}
@@ -342,9 +304,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				getDevice := &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-						DeviceID:               "test-dev-id",
-						DevAddr:                &types.DevAddr{0x42, 0xff, 0xff, 0xff},
+						ApplicationIdentifiers: appID,
+						DeviceID:               devID,
+						DevAddr:                &devAddr,
 					},
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
@@ -378,7 +340,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						CopyUplinkMessage(lastUp),
 					},
 					Session: &ttnpb.Session{
-						DevAddr:       types.DevAddr{0x42, 0xff, 0xff, 0xff},
+						DevAddr:       devAddr,
 						LastNFCntDown: 0x24,
 						SessionKeys:   *CopySessionKeys(sessionKeys),
 					},
@@ -394,8 +356,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 				case req := <-env.DeviceRegistry.SetByID:
 					setRespCh = req.Response
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
-					a.So(req.ApplicationIdentifiers, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
-					a.So(req.DeviceID, should.Resemble, "test-dev-id")
+					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
+					a.So(req.DeviceID, should.Resemble, devID)
 					a.So(req.Paths, should.Resemble, getPaths)
 
 					go func() {
@@ -434,7 +396,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							/* MACPayload */
 							/** FHDR **/
 							/*** DevAddr ***/
-							0xff, 0xff, 0xff, 0x42,
+							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
 							/*** FCtrl ***/
 							0x86,
 							/*** FCnt ***/
@@ -444,7 +406,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						/** FOpts **/
 						b = append(b, test.Must(crypto.EncryptDownlink(
 							nwkSEncKey,
-							types.DevAddr{0x42, 0xff, 0xff, 0xff},
+							devAddr,
 							0x24,
 							[]byte{
 								/* ResetConf */
@@ -465,7 +427,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						/* MIC */
 						mic := test.Must(crypto.ComputeDownlinkMIC(
 							sNwkSIntKey,
-							types.DevAddr{0x42, 0xff, 0xff, 0xff},
+							devAddr,
 							0,
 							0x42,
 							b,
@@ -504,9 +466,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				setDevice := &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-						DeviceID:               "test-dev-id",
-						DevAddr:                &types.DevAddr{0x42, 0xff, 0xff, 0xff},
+						ApplicationIdentifiers: appID,
+						DeviceID:               devID,
+						DevAddr:                &devAddr,
 					},
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
@@ -529,7 +491,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						lastDown,
 					},
 					Session: &ttnpb.Session{
-						DevAddr:       types.DevAddr{0x42, 0xff, 0xff, 0xff},
+						DevAddr:       devAddr,
 						LastNFCntDown: 0x24,
 						SessionKeys:   *CopySessionKeys(sessionKeys),
 					},
@@ -611,8 +573,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					go func() {
 						popFuncRespCh <- req.Func(req.Context, ttnpb.EndDeviceIdentifiers{
-							ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-							DeviceID:               "test-dev-id",
+							ApplicationIdentifiers: appID,
+							DeviceID:               devID,
 						}, time.Now())
 					}()
 				}
@@ -636,9 +598,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				getDevice := &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-						DeviceID:               "test-dev-id",
-						DevAddr:                &types.DevAddr{0x42, 0xff, 0xff, 0xff},
+						ApplicationIdentifiers: appID,
+						DeviceID:               devID,
+						DevAddr:                &devAddr,
 					},
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
@@ -675,7 +637,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						CopyUplinkMessage(lastUp),
 					},
 					Session: &ttnpb.Session{
-						DevAddr:       types.DevAddr{0x42, 0xff, 0xff, 0xff},
+						DevAddr:       devAddr,
 						LastNFCntDown: 0x24,
 						SessionKeys:   *CopySessionKeys(sessionKeys),
 					},
@@ -691,8 +653,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 				case req := <-env.DeviceRegistry.SetByID:
 					setRespCh = req.Response
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
-					a.So(req.ApplicationIdentifiers, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
-					a.So(req.DeviceID, should.Resemble, "test-dev-id")
+					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
+					a.So(req.DeviceID, should.Resemble, devID)
 					a.So(req.Paths, should.Resemble, getPaths)
 
 					go func() {
@@ -731,7 +693,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							/* MACPayload */
 							/** FHDR **/
 							/*** DevAddr ***/
-							0xff, 0xff, 0xff, 0x42,
+							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
 							/*** FCtrl ***/
 							0x86,
 							/*** FCnt ***/
@@ -741,7 +703,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						/** FOpts **/
 						b = append(b, test.Must(crypto.EncryptDownlink(
 							nwkSEncKey,
-							types.DevAddr{0x42, 0xff, 0xff, 0xff},
+							devAddr,
 							0x24,
 							[]byte{
 								/* ResetConf */
@@ -762,7 +724,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						/* MIC */
 						mic := test.Must(crypto.ComputeDownlinkMIC(
 							sNwkSIntKey,
-							types.DevAddr{0x42, 0xff, 0xff, 0xff},
+							devAddr,
 							0,
 							0x42,
 							b,
@@ -799,9 +761,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				setDevice := &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-						DeviceID:               "test-dev-id",
-						DevAddr:                &types.DevAddr{0x42, 0xff, 0xff, 0xff},
+						ApplicationIdentifiers: appID,
+						DeviceID:               devID,
+						DevAddr:                &devAddr,
 					},
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
@@ -827,7 +789,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						lastDown,
 					},
 					Session: &ttnpb.Session{
-						DevAddr:       types.DevAddr{0x42, 0xff, 0xff, 0xff},
+						DevAddr:       devAddr,
 						LastNFCntDown: 0x24,
 						SessionKeys:   *CopySessionKeys(sessionKeys),
 					},
@@ -864,11 +826,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}:
 				}
 
-				if !AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(reqCtx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time, replace bool) bool {
+				if !AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(reqCtx context.Context, ids ttnpb.EndDeviceIdentifiers, t time.Time, replace bool) bool {
 					return a.So(reqCtx, should.HaveParentContextOrEqual, ctx) &&
-						a.So(devID, should.Resemble, ttnpb.EndDeviceIdentifiers{
-							ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-							DeviceID:               "test-dev-id",
+						a.So(ids, should.Resemble, ttnpb.EndDeviceIdentifiers{
+							ApplicationIdentifiers: appID,
+							DeviceID:               devID,
 						}) &&
 						a.So(replace, should.BeTrue) &&
 						a.So(t, should.Resemble, setDevice.MACState.LastConfirmedDownlinkAt.Add(42*time.Second))
@@ -924,8 +886,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					go func() {
 						popFuncRespCh <- req.Func(req.Context, ttnpb.EndDeviceIdentifiers{
-							ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-							DeviceID:               "test-dev-id",
+							ApplicationIdentifiers: appID,
+							DeviceID:               devID,
 						}, time.Now())
 					}()
 				}
@@ -949,9 +911,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				getDevice := &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-						DeviceID:               "test-dev-id",
-						DevAddr:                &types.DevAddr{0x42, 0xff, 0xff, 0xff},
+						ApplicationIdentifiers: appID,
+						DeviceID:               devID,
+						DevAddr:                &devAddr,
 					},
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
@@ -988,7 +950,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						CopyUplinkMessage(lastUp),
 					},
 					Session: &ttnpb.Session{
-						DevAddr:       types.DevAddr{0x42, 0xff, 0xff, 0xff},
+						DevAddr:       devAddr,
 						LastNFCntDown: 0x24,
 						SessionKeys:   *CopySessionKeys(sessionKeys),
 					},
@@ -1004,8 +966,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 				case req := <-env.DeviceRegistry.SetByID:
 					setRespCh = req.Response
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
-					a.So(req.ApplicationIdentifiers, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
-					a.So(req.DeviceID, should.Resemble, "test-dev-id")
+					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
+					a.So(req.DeviceID, should.Resemble, devID)
 					a.So(req.Paths, should.Resemble, getPaths)
 
 					go func() {
@@ -1044,7 +1006,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							/* MACPayload */
 							/** FHDR **/
 							/*** DevAddr ***/
-							0xff, 0xff, 0xff, 0x42,
+							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
 							/*** FCtrl ***/
 							0x86,
 							/*** FCnt ***/
@@ -1054,7 +1016,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						/** FOpts **/
 						b = append(b, test.Must(crypto.EncryptDownlink(
 							nwkSEncKey,
-							types.DevAddr{0x42, 0xff, 0xff, 0xff},
+							devAddr,
 							0x24,
 							[]byte{
 								/* ResetConf */
@@ -1075,7 +1037,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						/* MIC */
 						mic := test.Must(crypto.ComputeDownlinkMIC(
 							sNwkSIntKey,
-							types.DevAddr{0x42, 0xff, 0xff, 0xff},
+							devAddr,
 							0,
 							0x42,
 							b,
@@ -1117,7 +1079,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							/* MACPayload */
 							/** FHDR **/
 							/*** DevAddr ***/
-							0xff, 0xff, 0xff, 0x42,
+							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
 							/*** FCtrl ***/
 							0x86,
 							/*** FCnt ***/
@@ -1127,7 +1089,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						/** FOpts **/
 						b = append(b, test.Must(crypto.EncryptDownlink(
 							nwkSEncKey,
-							types.DevAddr{0x42, 0xff, 0xff, 0xff},
+							devAddr,
 							0x24,
 							[]byte{
 								/* ResetConf */
@@ -1148,7 +1110,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						/* MIC */
 						mic := test.Must(crypto.ComputeDownlinkMIC(
 							sNwkSIntKey,
-							types.DevAddr{0x42, 0xff, 0xff, 0xff},
+							devAddr,
 							0,
 							0x42,
 							b,
@@ -1184,9 +1146,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				setDevice := &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-						DeviceID:               "test-dev-id",
-						DevAddr:                &types.DevAddr{0x42, 0xff, 0xff, 0xff},
+						ApplicationIdentifiers: appID,
+						DeviceID:               devID,
+						DevAddr:                &devAddr,
 					},
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
@@ -1212,7 +1174,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						lastDown,
 					},
 					Session: &ttnpb.Session{
-						DevAddr:       types.DevAddr{0x42, 0xff, 0xff, 0xff},
+						DevAddr:       devAddr,
 						LastNFCntDown: 0x24,
 						SessionKeys:   *CopySessionKeys(sessionKeys),
 					},
@@ -1249,11 +1211,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}:
 				}
 
-				if !AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(reqCtx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time, replace bool) bool {
+				if !AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(reqCtx context.Context, ids ttnpb.EndDeviceIdentifiers, t time.Time, replace bool) bool {
 					return a.So(reqCtx, should.HaveParentContextOrEqual, ctx) &&
-						a.So(devID, should.Resemble, ttnpb.EndDeviceIdentifiers{
-							ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-							DeviceID:               "test-dev-id",
+						a.So(ids, should.Resemble, ttnpb.EndDeviceIdentifiers{
+							ApplicationIdentifiers: appID,
+							DeviceID:               devID,
 						}) &&
 						a.So(replace, should.BeTrue) &&
 						a.So(t, should.Resemble, setDevice.MACState.LastConfirmedDownlinkAt.Add(42*time.Second))
@@ -1309,8 +1271,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					go func() {
 						popFuncRespCh <- req.Func(req.Context, ttnpb.EndDeviceIdentifiers{
-							ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-							DeviceID:               "test-dev-id",
+							ApplicationIdentifiers: appID,
+							DeviceID:               devID,
 						}, time.Now())
 					}()
 				}
@@ -1336,9 +1298,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				getDevice := &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-						DeviceID:               "test-dev-id",
-						DevAddr:                &types.DevAddr{0x42, 0xff, 0xff, 0xff},
+						ApplicationIdentifiers: appID,
+						DeviceID:               devID,
+						DevAddr:                &devAddr,
 					},
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
@@ -1378,7 +1340,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						CopyUplinkMessage(lastUp),
 					},
 					Session: &ttnpb.Session{
-						DevAddr:       types.DevAddr{0x42, 0xff, 0xff, 0xff},
+						DevAddr:       devAddr,
 						LastNFCntDown: 0x24,
 						SessionKeys:   *CopySessionKeys(sessionKeys),
 					},
@@ -1394,8 +1356,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 				case req := <-env.DeviceRegistry.SetByID:
 					setRespCh = req.Response
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
-					a.So(req.ApplicationIdentifiers, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
-					a.So(req.DeviceID, should.Resemble, "test-dev-id")
+					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
+					a.So(req.DeviceID, should.Resemble, devID)
 					a.So(req.Paths, should.Resemble, getPaths)
 
 					go func() {
@@ -1434,7 +1396,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							/* MACPayload */
 							/** FHDR **/
 							/*** DevAddr ***/
-							0xff, 0xff, 0xff, 0x42,
+							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
 							/*** FCtrl ***/
 							0x86,
 							/*** FCnt ***/
@@ -1444,7 +1406,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						/** FOpts **/
 						b = append(b, test.Must(crypto.EncryptDownlink(
 							nwkSEncKey,
-							types.DevAddr{0x42, 0xff, 0xff, 0xff},
+							devAddr,
 							0x24,
 							[]byte{
 								/* ResetConf */
@@ -1465,7 +1427,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						/* MIC */
 						mic := test.Must(crypto.ComputeDownlinkMIC(
 							sNwkSIntKey,
-							types.DevAddr{0x42, 0xff, 0xff, 0xff},
+							devAddr,
 							0,
 							0x42,
 							b,
@@ -1502,9 +1464,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				setDevice := &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-						DeviceID:               "test-dev-id",
-						DevAddr:                &types.DevAddr{0x42, 0xff, 0xff, 0xff},
+						ApplicationIdentifiers: appID,
+						DeviceID:               devID,
+						DevAddr:                &devAddr,
 					},
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
@@ -1530,7 +1492,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						lastDown,
 					},
 					Session: &ttnpb.Session{
-						DevAddr:       types.DevAddr{0x42, 0xff, 0xff, 0xff},
+						DevAddr:       devAddr,
 						LastNFCntDown: 0x24,
 						SessionKeys:   *CopySessionKeys(sessionKeys),
 					},
@@ -1567,11 +1529,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}:
 				}
 
-				if !AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(reqCtx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time, replace bool) bool {
+				if !AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(reqCtx context.Context, ids ttnpb.EndDeviceIdentifiers, t time.Time, replace bool) bool {
 					return a.So(reqCtx, should.HaveParentContextOrEqual, ctx) &&
-						a.So(devID, should.Resemble, ttnpb.EndDeviceIdentifiers{
-							ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-							DeviceID:               "test-dev-id",
+						a.So(ids, should.Resemble, ttnpb.EndDeviceIdentifiers{
+							ApplicationIdentifiers: appID,
+							DeviceID:               devID,
 						}) &&
 						a.So(replace, should.BeTrue) &&
 						a.So(t, should.Resemble, setDevice.MACState.LastConfirmedDownlinkAt.Add(42*time.Second))
@@ -1625,8 +1587,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					go func() {
 						popFuncRespCh <- req.Func(req.Context, ttnpb.EndDeviceIdentifiers{
-							ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-							DeviceID:               "test-dev-id",
+							ApplicationIdentifiers: appID,
+							DeviceID:               devID,
 						}, time.Now())
 					}()
 				}
@@ -1652,9 +1614,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				getDevice := &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-						DeviceID:               "test-dev-id",
-						DevAddr:                &types.DevAddr{0x42, 0xff, 0xff, 0xff},
+						ApplicationIdentifiers: appID,
+						DeviceID:               devID,
+						DevAddr:                &devAddr,
 					},
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
@@ -1694,7 +1656,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						CopyUplinkMessage(lastUp),
 					},
 					Session: &ttnpb.Session{
-						DevAddr:       types.DevAddr{0x42, 0xff, 0xff, 0xff},
+						DevAddr:       devAddr,
 						LastNFCntDown: 0x24,
 						SessionKeys:   *CopySessionKeys(sessionKeys),
 					},
@@ -1710,8 +1672,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 				case req := <-env.DeviceRegistry.SetByID:
 					setRespCh = req.Response
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
-					a.So(req.ApplicationIdentifiers, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
-					a.So(req.DeviceID, should.Resemble, "test-dev-id")
+					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
+					a.So(req.DeviceID, should.Resemble, devID)
 					a.So(req.Paths, should.Resemble, getPaths)
 
 					go func() {
@@ -1742,11 +1704,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 				case setRespCh <- DeviceRegistrySetByIDResponse{}:
 				}
 
-				if !AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(reqCtx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time, replace bool) bool {
+				if !AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(reqCtx context.Context, ids ttnpb.EndDeviceIdentifiers, t time.Time, replace bool) bool {
 					return a.So(reqCtx, should.HaveParentContextOrEqual, ctx) &&
-						a.So(devID, should.Resemble, ttnpb.EndDeviceIdentifiers{
-							ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-							DeviceID:               "test-dev-id",
+						a.So(ids, should.Resemble, ttnpb.EndDeviceIdentifiers{
+							ApplicationIdentifiers: appID,
+							DeviceID:               devID,
 						}) &&
 						a.So(replace, should.BeTrue) &&
 						a.So(t, should.Resemble, absTime.Add(-gsScheduleWindow))
@@ -1800,8 +1762,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					go func() {
 						popFuncRespCh <- req.Func(req.Context, ttnpb.EndDeviceIdentifiers{
-							ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-							DeviceID:               "test-dev-id",
+							ApplicationIdentifiers: appID,
+							DeviceID:               devID,
 						}, time.Now())
 					}()
 				}
@@ -1825,9 +1787,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				getDevice := &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-						DeviceID:               "test-dev-id",
-						DevAddr:                &types.DevAddr{0x42, 0xff, 0xff, 0xff},
+						ApplicationIdentifiers: appID,
+						DeviceID:               devID,
+						DevAddr:                &devAddr,
 					},
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
@@ -1871,7 +1833,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						CopyUplinkMessage(lastUp),
 					},
 					Session: &ttnpb.Session{
-						DevAddr:       types.DevAddr{0x42, 0xff, 0xff, 0xff},
+						DevAddr:       devAddr,
 						LastNFCntDown: 0x24,
 						SessionKeys:   *CopySessionKeys(sessionKeys),
 					},
@@ -1887,8 +1849,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 				case req := <-env.DeviceRegistry.SetByID:
 					setRespCh = req.Response
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
-					a.So(req.ApplicationIdentifiers, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
-					a.So(req.DeviceID, should.Resemble, "test-dev-id")
+					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
+					a.So(req.DeviceID, should.Resemble, devID)
 					a.So(req.Paths, should.Resemble, getPaths)
 
 					go func() {
@@ -1968,8 +1930,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					go func() {
 						popFuncRespCh <- req.Func(req.Context, ttnpb.EndDeviceIdentifiers{
-							ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-							DeviceID:               "test-dev-id",
+							ApplicationIdentifiers: appID,
+							DeviceID:               devID,
 						}, time.Now())
 					}()
 				}
@@ -1997,8 +1959,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				getDevice := &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-						DeviceID:               "test-dev-id",
+						ApplicationIdentifiers: appID,
+						DeviceID:               devID,
 						JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 						DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 					},
@@ -2013,7 +1975,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Keys:    *CopySessionKeys(sessionKeys),
 							Payload: bytes.Repeat([]byte{0x42}, 33),
 							Request: ttnpb.JoinRequest{
-								DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+								DevAddr: devAddr,
 							},
 						},
 						RxWindowsAvailable: true,
@@ -2044,8 +2006,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 				case req := <-env.DeviceRegistry.SetByID:
 					setRespCh = req.Response
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
-					a.So(req.ApplicationIdentifiers, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
-					a.So(req.DeviceID, should.Resemble, "test-dev-id")
+					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
+					a.So(req.DeviceID, should.Resemble, devID)
 					a.So(req.Paths, should.Resemble, getPaths)
 
 					go func() {
@@ -2108,8 +2070,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				setDevice := &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
-						DeviceID:               "test-dev-id",
+						ApplicationIdentifiers: appID,
+						DeviceID:               devID,
 						JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 						DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 					},
@@ -2121,11 +2083,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 						DeviceClass:       ttnpb.CLASS_A,
 						LoRaWANVersion:    ttnpb.MAC_V1_1,
 						PendingJoinRequest: &ttnpb.JoinRequest{
-							DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+							DevAddr: devAddr,
 						},
 					},
 					PendingSession: &ttnpb.Session{
-						DevAddr:     types.DevAddr{0x42, 0xff, 0xff, 0xff},
+						DevAddr:     devAddr,
 						SessionKeys: *CopySessionKeys(sessionKeys),
 					},
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -2201,7 +2163,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 			ctx := test.ContextWithT(test.Context(), t)
 			ctx = log.NewContext(ctx, logger)
-			ctx, cancel := context.WithTimeout(ctx, (1<<7)*test.Delay)
+			ctx, cancel := context.WithTimeout(ctx, (1<<8)*test.Delay)
 			defer cancel()
 
 			authCh := make(chan test.ClusterAuthRequest)
@@ -2282,6 +2244,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(err, should.BeNil)
 				}
 			}
+			close(authCh)
 			close(addCh)
 			close(getPeerCh)
 			close(popCh)
@@ -2295,6 +2258,16 @@ func TestProcessDownlinkTask(t *testing.T) {
 func TestGenerateDownlink(t *testing.T) {
 	phy := test.Must(test.Must(band.GetByID(band.EU_863_870)).(band.Band).Version(ttnpb.PHY_V1_1_REV_B)).(band.Band)
 
+	const appIDString = "process-downlink-test-app-id"
+	appID := ttnpb.ApplicationIdentifiers{ApplicationID: appIDString}
+	const devID = "process-downlink-test-dev-id"
+
+	devAddr := types.DevAddr{0x42, 0xff, 0xff, 0xff}
+
+	fNwkSIntKey := types.AES128Key{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+	nwkSEncKey := types.AES128Key{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+	sNwkSIntKey := types.AES128Key{0x42, 0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+
 	encodeMessage := func(msg *ttnpb.Message, ver ttnpb.MACVersion, confFCnt uint32) []byte {
 		msg = deepcopy.Copy(msg).(*ttnpb.Message)
 		mac := msg.GetMACPayload()
@@ -2303,9 +2276,9 @@ func TestGenerateDownlink(t *testing.T) {
 			var key types.AES128Key
 			switch ver {
 			case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
-				key = FNwkSIntKey
+				key = fNwkSIntKey
 			case ttnpb.MAC_V1_1:
-				key = NwkSEncKey
+				key = nwkSEncKey
 			default:
 				panic(fmt.Errorf("unknown version %s", ver))
 			}
@@ -2325,9 +2298,9 @@ func TestGenerateDownlink(t *testing.T) {
 		var key types.AES128Key
 		switch ver {
 		case ttnpb.MAC_V1_0, ttnpb.MAC_V1_0_1, ttnpb.MAC_V1_0_2:
-			key = FNwkSIntKey
+			key = fNwkSIntKey
 		case ttnpb.MAC_V1_1:
-			key = SNwkSIntKey
+			key = sNwkSIntKey
 		default:
 			panic(fmt.Errorf("unknown version %s", ver))
 		}
@@ -2358,9 +2331,9 @@ func TestGenerateDownlink(t *testing.T) {
 			Name: "1.1/no app downlink/no MAC/no ack",
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-					DeviceID:               DeviceID,
-					DevAddr:                &DevAddr,
+					ApplicationIdentifiers: appID,
+					DeviceID:               devID,
+					DevAddr:                &devAddr,
 				},
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
@@ -2383,9 +2356,9 @@ func TestGenerateDownlink(t *testing.T) {
 			Name: "1.1/no app downlink/status after 1 downlink/no ack",
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-					DeviceID:               DeviceID,
-					DevAddr:                &DevAddr,
+					ApplicationIdentifiers: appID,
+					DeviceID:               devID,
+					DevAddr:                &devAddr,
 				},
 				MACSettings: &ttnpb.MACSettings{
 					StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 3},
@@ -2415,9 +2388,9 @@ func TestGenerateDownlink(t *testing.T) {
 			Name: "1.1/no app downlink/status after an hour/no ack",
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-					DeviceID:               DeviceID,
-					DevAddr:                &DevAddr,
+					ApplicationIdentifiers: appID,
+					DeviceID:               devID,
+					DevAddr:                &devAddr,
 				},
 				MACSettings: &ttnpb.MACSettings{
 					StatusTimePeriodicity: DurationPtr(24 * time.Hour),
@@ -2444,23 +2417,23 @@ func TestGenerateDownlink(t *testing.T) {
 			Name: "1.1/no app downlink/no MAC/ack",
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-					DeviceID:               DeviceID,
-					DevAddr:                &DevAddr,
+					ApplicationIdentifiers: appID,
+					DeviceID:               devID,
+					DevAddr:                &devAddr,
 				},
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion:     ttnpb.MAC_V1_1,
 					RxWindowsAvailable: true,
 				},
 				Session: &ttnpb.Session{
-					DevAddr:       DevAddr,
+					DevAddr:       devAddr,
 					LastNFCntDown: 41,
 					SessionKeys: ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
-							Key: &NwkSEncKey,
+							Key: &nwkSEncKey,
 						},
 						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: &SNwkSIntKey,
+							Key: &sNwkSIntKey,
 						},
 					},
 				},
@@ -2489,7 +2462,7 @@ func TestGenerateDownlink(t *testing.T) {
 				Payload: &ttnpb.Message_MACPayload{
 					MACPayload: &ttnpb.MACPayload{
 						FHDR: ttnpb.FHDR{
-							DevAddr: DevAddr,
+							DevAddr: devAddr,
 							FCtrl: ttnpb.FCtrl{
 								Ack: true,
 								ADR: true,
@@ -2502,23 +2475,23 @@ func TestGenerateDownlink(t *testing.T) {
 			DeviceAssertion: func(t *testing.T, dev *ttnpb.EndDevice) bool {
 				return assertions.New(t).So(dev, should.Resemble, &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-						DeviceID:               DeviceID,
-						DevAddr:                &DevAddr,
+						ApplicationIdentifiers: appID,
+						DeviceID:               devID,
+						DevAddr:                &devAddr,
 					},
 					MACState: &ttnpb.MACState{
 						LoRaWANVersion:     ttnpb.MAC_V1_1,
 						RxWindowsAvailable: true,
 					},
 					Session: &ttnpb.Session{
-						DevAddr:       DevAddr,
+						DevAddr:       devAddr,
 						LastNFCntDown: 42,
 						SessionKeys: ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: &NwkSEncKey,
+								Key: &nwkSEncKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: &SNwkSIntKey,
+								Key: &sNwkSIntKey,
 							},
 						},
 					},
@@ -2545,22 +2518,22 @@ func TestGenerateDownlink(t *testing.T) {
 			Name: "1.1/unconfirmed app downlink/no MAC/no ack",
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-					DeviceID:               DeviceID,
-					DevAddr:                &DevAddr,
+					ApplicationIdentifiers: appID,
+					DeviceID:               devID,
+					DevAddr:                &devAddr,
 				},
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion:     ttnpb.MAC_V1_1,
 					RxWindowsAvailable: true,
 				},
 				Session: &ttnpb.Session{
-					DevAddr: DevAddr,
+					DevAddr: devAddr,
 					SessionKeys: ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
-							Key: &NwkSEncKey,
+							Key: &nwkSEncKey,
 						},
 						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: &SNwkSIntKey,
+							Key: &sNwkSIntKey,
 						},
 					},
 				},
@@ -2591,7 +2564,7 @@ func TestGenerateDownlink(t *testing.T) {
 				Payload: &ttnpb.Message_MACPayload{
 					MACPayload: &ttnpb.MACPayload{
 						FHDR: ttnpb.FHDR{
-							DevAddr: DevAddr,
+							DevAddr: devAddr,
 							FCtrl: ttnpb.FCtrl{
 								Ack: false,
 								ADR: true,
@@ -2614,22 +2587,22 @@ func TestGenerateDownlink(t *testing.T) {
 			DeviceAssertion: func(t *testing.T, dev *ttnpb.EndDevice) bool {
 				return assertions.New(t).So(dev, should.Resemble, &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-						DeviceID:               DeviceID,
-						DevAddr:                &DevAddr,
+						ApplicationIdentifiers: appID,
+						DeviceID:               devID,
+						DevAddr:                &devAddr,
 					},
 					MACState: &ttnpb.MACState{
 						LoRaWANVersion:     ttnpb.MAC_V1_1,
 						RxWindowsAvailable: true,
 					},
 					Session: &ttnpb.Session{
-						DevAddr: DevAddr,
+						DevAddr: devAddr,
 						SessionKeys: ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: &NwkSEncKey,
+								Key: &nwkSEncKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: &SNwkSIntKey,
+								Key: &sNwkSIntKey,
 							},
 						},
 					},
@@ -2651,22 +2624,22 @@ func TestGenerateDownlink(t *testing.T) {
 			Name: "1.1/unconfirmed app downlink/no MAC/ack",
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-					DeviceID:               DeviceID,
-					DevAddr:                &DevAddr,
+					ApplicationIdentifiers: appID,
+					DeviceID:               devID,
+					DevAddr:                &devAddr,
 				},
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion:     ttnpb.MAC_V1_1,
 					RxWindowsAvailable: true,
 				},
 				Session: &ttnpb.Session{
-					DevAddr: DevAddr,
+					DevAddr: devAddr,
 					SessionKeys: ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
-							Key: &NwkSEncKey,
+							Key: &nwkSEncKey,
 						},
 						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: &SNwkSIntKey,
+							Key: &sNwkSIntKey,
 						},
 					},
 				},
@@ -2703,7 +2676,7 @@ func TestGenerateDownlink(t *testing.T) {
 				Payload: &ttnpb.Message_MACPayload{
 					MACPayload: &ttnpb.MACPayload{
 						FHDR: ttnpb.FHDR{
-							DevAddr: DevAddr,
+							DevAddr: devAddr,
 							FCtrl: ttnpb.FCtrl{
 								Ack: true,
 								ADR: true,
@@ -2726,22 +2699,22 @@ func TestGenerateDownlink(t *testing.T) {
 			DeviceAssertion: func(t *testing.T, dev *ttnpb.EndDevice) bool {
 				return assertions.New(t).So(dev, should.Resemble, &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-						DeviceID:               DeviceID,
-						DevAddr:                &DevAddr,
+						ApplicationIdentifiers: appID,
+						DeviceID:               devID,
+						DevAddr:                &devAddr,
 					},
 					MACState: &ttnpb.MACState{
 						LoRaWANVersion:     ttnpb.MAC_V1_1,
 						RxWindowsAvailable: true,
 					},
 					Session: &ttnpb.Session{
-						DevAddr: DevAddr,
+						DevAddr: devAddr,
 						SessionKeys: ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: &NwkSEncKey,
+								Key: &nwkSEncKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: &SNwkSIntKey,
+								Key: &sNwkSIntKey,
 							},
 						},
 					},
@@ -2769,21 +2742,21 @@ func TestGenerateDownlink(t *testing.T) {
 			Name: "1.1/confirmed app downlink/no MAC/no ack",
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-					DeviceID:               DeviceID,
-					DevAddr:                &DevAddr,
+					ApplicationIdentifiers: appID,
+					DeviceID:               devID,
+					DevAddr:                &devAddr,
 				},
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
 				Session: &ttnpb.Session{
-					DevAddr: DevAddr,
+					DevAddr: devAddr,
 					SessionKeys: ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
-							Key: &NwkSEncKey,
+							Key: &nwkSEncKey,
 						},
 						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: &SNwkSIntKey,
+							Key: &sNwkSIntKey,
 						},
 					},
 				},
@@ -2814,7 +2787,7 @@ func TestGenerateDownlink(t *testing.T) {
 				Payload: &ttnpb.Message_MACPayload{
 					MACPayload: &ttnpb.MACPayload{
 						FHDR: ttnpb.FHDR{
-							DevAddr: DevAddr,
+							DevAddr: devAddr,
 							FCtrl: ttnpb.FCtrl{
 								Ack: false,
 								ADR: true,
@@ -2841,9 +2814,9 @@ func TestGenerateDownlink(t *testing.T) {
 				}
 				return a.So(dev, should.Resemble, &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-						DeviceID:               DeviceID,
-						DevAddr:                &DevAddr,
+						ApplicationIdentifiers: appID,
+						DeviceID:               devID,
+						DevAddr:                &devAddr,
 					},
 					MACState: &ttnpb.MACState{
 						LoRaWANVersion: ttnpb.MAC_V1_1,
@@ -2855,14 +2828,14 @@ func TestGenerateDownlink(t *testing.T) {
 						},
 					},
 					Session: &ttnpb.Session{
-						DevAddr:          DevAddr,
+						DevAddr:          devAddr,
 						LastConfFCntDown: 42,
 						SessionKeys: ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: &NwkSEncKey,
+								Key: &nwkSEncKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: &SNwkSIntKey,
+								Key: &sNwkSIntKey,
 							},
 						},
 					},
@@ -2884,22 +2857,22 @@ func TestGenerateDownlink(t *testing.T) {
 			Name: "1.1/confirmed app downlink/no MAC/ack",
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-					DeviceID:               DeviceID,
-					DevAddr:                &DevAddr,
+					ApplicationIdentifiers: appID,
+					DeviceID:               devID,
+					DevAddr:                &devAddr,
 				},
 				MACState: &ttnpb.MACState{
 					LoRaWANVersion:     ttnpb.MAC_V1_1,
 					RxWindowsAvailable: true,
 				},
 				Session: &ttnpb.Session{
-					DevAddr: DevAddr,
+					DevAddr: devAddr,
 					SessionKeys: ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
-							Key: &NwkSEncKey,
+							Key: &nwkSEncKey,
 						},
 						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: &SNwkSIntKey,
+							Key: &sNwkSIntKey,
 						},
 					},
 				},
@@ -2936,7 +2909,7 @@ func TestGenerateDownlink(t *testing.T) {
 				Payload: &ttnpb.Message_MACPayload{
 					MACPayload: &ttnpb.MACPayload{
 						FHDR: ttnpb.FHDR{
-							DevAddr: DevAddr,
+							DevAddr: devAddr,
 							FCtrl: ttnpb.FCtrl{
 								Ack: true,
 								ADR: true,
@@ -2963,9 +2936,9 @@ func TestGenerateDownlink(t *testing.T) {
 				}
 				return a.So(dev, should.Resemble, &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-						DeviceID:               DeviceID,
-						DevAddr:                &DevAddr,
+						ApplicationIdentifiers: appID,
+						DeviceID:               devID,
+						DevAddr:                &devAddr,
 					},
 					MACState: &ttnpb.MACState{
 						LoRaWANVersion:     ttnpb.MAC_V1_1,
@@ -2978,14 +2951,14 @@ func TestGenerateDownlink(t *testing.T) {
 						},
 					},
 					Session: &ttnpb.Session{
-						DevAddr:          DevAddr,
+						DevAddr:          devAddr,
 						LastConfFCntDown: 42,
 						SessionKeys: ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: &NwkSEncKey,
+								Key: &nwkSEncKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: &SNwkSIntKey,
+								Key: &sNwkSIntKey,
 							},
 						},
 					},
@@ -3013,9 +2986,9 @@ func TestGenerateDownlink(t *testing.T) {
 			Name: "1.1/no app downlink/status(count)/no ack",
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-					DeviceID:               DeviceID,
-					DevAddr:                &DevAddr,
+					ApplicationIdentifiers: appID,
+					DeviceID:               devID,
+					DevAddr:                &devAddr,
 				},
 				MACSettings: &ttnpb.MACSettings{
 					StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 3},
@@ -3025,15 +2998,15 @@ func TestGenerateDownlink(t *testing.T) {
 					LastDevStatusFCntUp: 4,
 				},
 				Session: &ttnpb.Session{
-					DevAddr:       DevAddr,
+					DevAddr:       devAddr,
 					LastFCntUp:    99,
 					LastNFCntDown: 41,
 					SessionKeys: ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
-							Key: &NwkSEncKey,
+							Key: &nwkSEncKey,
 						},
 						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: &SNwkSIntKey,
+							Key: &sNwkSIntKey,
 						},
 					},
 				},
@@ -3056,7 +3029,7 @@ func TestGenerateDownlink(t *testing.T) {
 				Payload: &ttnpb.Message_MACPayload{
 					MACPayload: &ttnpb.MACPayload{
 						FHDR: ttnpb.FHDR{
-							DevAddr: DevAddr,
+							DevAddr: devAddr,
 							FCtrl: ttnpb.FCtrl{
 								Ack: false,
 								ADR: true,
@@ -3078,9 +3051,9 @@ func TestGenerateDownlink(t *testing.T) {
 				}
 				return a.So(dev, should.Resemble, &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-						DeviceID:               DeviceID,
-						DevAddr:                &DevAddr,
+						ApplicationIdentifiers: appID,
+						DeviceID:               devID,
+						DevAddr:                &devAddr,
 					},
 					MACSettings: &ttnpb.MACSettings{
 						StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 3},
@@ -3093,15 +3066,15 @@ func TestGenerateDownlink(t *testing.T) {
 						},
 					},
 					Session: &ttnpb.Session{
-						DevAddr:       DevAddr,
+						DevAddr:       devAddr,
 						LastFCntUp:    99,
 						LastNFCntDown: 42,
 						SessionKeys: ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: &NwkSEncKey,
+								Key: &nwkSEncKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: &SNwkSIntKey,
+								Key: &sNwkSIntKey,
 							},
 						},
 					},
@@ -3122,9 +3095,9 @@ func TestGenerateDownlink(t *testing.T) {
 			Name: "1.1/no app downlink/status(time/zero time)/no ack",
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-					DeviceID:               DeviceID,
-					DevAddr:                &DevAddr,
+					ApplicationIdentifiers: appID,
+					DeviceID:               devID,
+					DevAddr:                &devAddr,
 				},
 				MACSettings: &ttnpb.MACSettings{
 					StatusTimePeriodicity: DurationPtr(time.Nanosecond),
@@ -3133,14 +3106,14 @@ func TestGenerateDownlink(t *testing.T) {
 					LoRaWANVersion: ttnpb.MAC_V1_1,
 				},
 				Session: &ttnpb.Session{
-					DevAddr:       DevAddr,
+					DevAddr:       devAddr,
 					LastNFCntDown: 41,
 					SessionKeys: ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
-							Key: &NwkSEncKey,
+							Key: &nwkSEncKey,
 						},
 						SNwkSIntKey: &ttnpb.KeyEnvelope{
-							Key: &SNwkSIntKey,
+							Key: &sNwkSIntKey,
 						},
 					},
 				},
@@ -3163,7 +3136,7 @@ func TestGenerateDownlink(t *testing.T) {
 				Payload: &ttnpb.Message_MACPayload{
 					MACPayload: &ttnpb.MACPayload{
 						FHDR: ttnpb.FHDR{
-							DevAddr: DevAddr,
+							DevAddr: devAddr,
 							FCtrl: ttnpb.FCtrl{
 								Ack: false,
 								ADR: true,
@@ -3185,9 +3158,9 @@ func TestGenerateDownlink(t *testing.T) {
 				}
 				return a.So(dev, should.Resemble, &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: ApplicationID},
-						DeviceID:               DeviceID,
-						DevAddr:                &DevAddr,
+						ApplicationIdentifiers: appID,
+						DeviceID:               devID,
+						DevAddr:                &devAddr,
 					},
 					MACSettings: &ttnpb.MACSettings{
 						StatusTimePeriodicity: DurationPtr(time.Nanosecond),
@@ -3199,14 +3172,14 @@ func TestGenerateDownlink(t *testing.T) {
 						},
 					},
 					Session: &ttnpb.Session{
-						DevAddr:       DevAddr,
+						DevAddr:       devAddr,
 						LastNFCntDown: 42,
 						SessionKeys: ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
-								Key: &NwkSEncKey,
+								Key: &nwkSEncKey,
 							},
 							SNwkSIntKey: &ttnpb.KeyEnvelope{
-								Key: &SNwkSIntKey,
+								Key: &sNwkSIntKey,
 							},
 						},
 					},
