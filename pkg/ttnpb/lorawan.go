@@ -612,7 +612,7 @@ func (v RxDelay) Duration() time.Duration {
 // Validate reports whether v represents a valid RxDelay.
 func (v RxDelay) Validate() error {
 	if v < 0 || v >= RxDelay(len(RxDelay_name)) {
-		return errExpectedBetween("RxDelay", 1, len(RxDelay_name)-1)(v)
+		return errExpectedBetween("RxDelay", 0, len(RxDelay_name)-1)(v)
 	}
 	return nil
 }
