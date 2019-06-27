@@ -41,9 +41,9 @@ func (console *Console) freshToken(c echo.Context) (*oauth2.Token, error) {
 
 	if freshToken.AccessToken != token.AccessToken {
 		err = console.setAuthCookie(c, authCookie{
-			AccessToken:  token.AccessToken,
-			RefreshToken: token.RefreshToken,
-			Expiry:       token.Expiry,
+			AccessToken:  freshToken.AccessToken,
+			RefreshToken: freshToken.RefreshToken,
+			Expiry:       freshToken.Expiry,
 		})
 		if err != nil {
 			return nil, err
