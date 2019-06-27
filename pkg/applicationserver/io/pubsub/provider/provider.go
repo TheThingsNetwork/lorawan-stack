@@ -35,12 +35,11 @@ var (
 )
 
 // RegisterProvider registers an implementation for a given PubSub provider.
-func RegisterProvider(p ttnpb.ApplicationPubSub_Provider, implementation Provider) error {
+func RegisterProvider(p ttnpb.ApplicationPubSub_Provider, implementation Provider) {
 	if _, ok := providers[p]; ok {
-		return errAlreadyRegistered.WithAttributes("provider_id", p)
+		panic(errAlreadyRegistered.WithAttributes("provider_id", p))
 	}
 	providers[p] = implementation
-	return nil
 }
 
 // GetProvider returns an implementation for a given provider.
