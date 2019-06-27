@@ -31,6 +31,28 @@ const getApplicationLogic = createRequestLogic({
   },
 })
 
+const updateApplicationLogic = createRequestLogic({
+  type: applications.UPDATE_APP,
+  async process ({ action }) {
+    const { id, patch } = action.payload
+
+    const result = await api.application.update(id, patch)
+
+    return { ...patch, ...result }
+  },
+})
+
+const deleteApplicationLogic = createRequestLogic({
+  type: applications.DELETE_APP,
+  async process ({ action }) {
+    const { id } = action.payload
+
+    await api.application.delete(id)
+
+    return { id }
+  },
+})
+
 const getApplicationsLogic = createRequestLogic({
   type: applications.GET_APPS_LIST,
   latest: true,
@@ -149,6 +171,8 @@ const getWebhookFormatsLogic = createRequestLogic({
 
 export default [
   getApplicationLogic,
+  updateApplicationLogic,
+  deleteApplicationLogic,
   getApplicationsLogic,
   getApplicationsRightsLogic,
   getApplicationApiKeysLogic,

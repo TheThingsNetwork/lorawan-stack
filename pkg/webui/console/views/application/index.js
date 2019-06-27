@@ -15,6 +15,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Switch, Route } from 'react-router'
+import { replace } from 'connected-react-router'
 
 import sharedMessages from '../../../lib/shared-messages'
 import Message from '../../../lib/components/message'
@@ -59,6 +60,7 @@ dispatch => ({
   startStream: id => dispatch(startApplicationEventsStream(id)),
   stopStream: id => dispatch(stopApplicationEventsStream(id)),
   getApplication: id => dispatch(getApplication(id, 'name,description')),
+  redirectToList: () => dispatch(replace('/console/applications')),
 }))
 @withSideNavigation(function (props) {
   const matchedUrl = props.match.url
@@ -140,7 +142,6 @@ dispatch => ({
     />
   )
 })
-
 @withEnv
 export default class Application extends React.Component {
 
@@ -149,6 +150,14 @@ export default class Application extends React.Component {
 
     getApplication(appId)
     startStream(appId)
+  }
+
+  componentDidUpdate (prevProps) {
+    const { application, redirectToList } = this.props
+
+    if (Boolean(prevProps.application) && !Boolean(application)) {
+      redirectToList()
+    }
   }
 
   componentWillUnmount () {

@@ -13,7 +13,12 @@
 // limitations under the License.
 
 import createGetRightsListRequestActions, { createGetRightsListActionType } from './rights'
-import { createPaginationRequestActions, createPaginationBaseActionType } from './pagination'
+import {
+  createPaginationRequestActions,
+  createPaginationBaseActionType,
+  createPaginationDeleteBaseActionType,
+  createPaginationDeleteActions,
+} from './pagination'
 import createApiKeysRequestActions, { createGetApiKeysListActionType } from './api-keys'
 import createApiKeyRequestActions, { createGetApiKeyActionType } from './api-key'
 import { createGetCollaboratorsListRequestActions, createGetCollaboratorsListActionType } from './collaborators'
@@ -49,7 +54,33 @@ export const [{
   (id, selector) => ({ selector })
 )
 
-export const GET_APPS_LIST_BASE = createPaginationBaseActionType(SHARED_NAME)
+export const UPDATE_APP_BASE = 'UPDATE_APPLICATION'
+export const [{
+  request: UPDATE_APP,
+  success: UPDATE_APP_SUCCESS,
+  failure: UPDATE_APP_FAILURE,
+}, {
+  request: updateApplication,
+  success: updateApplicationSuccess,
+  failure: updateApplicationFailure,
+}] = createRequestActions(UPDATE_APP_BASE,
+  (id, patch) => ({ id, patch }),
+)
+
+export const DELETE_APP_BASE = createPaginationDeleteBaseActionType(SHARED_NAME_SINGLE)
+export const [{
+  request: DELETE_APP,
+  success: DELETE_APP_SUCCESS,
+  failure: DELETE_APP_FAILURE,
+}, {
+  request: deleteApplication,
+  success: deleteApplicationSuccess,
+  failure: deleteApplicationFailure,
+}] = createPaginationDeleteActions(SHARED_NAME_SINGLE,
+  id => ({ id }),
+)
+
+export const GET_APPS_LIST_BASE = createPaginationBaseActionType(SHARED_NAME_SINGLE)
 export const [{
   request: GET_APPS_LIST,
   success: GET_APPS_LIST_SUCCESS,
@@ -58,7 +89,7 @@ export const [{
   request: getApplicationsList,
   success: getApplicationsSuccess,
   failure: getApplicationsFailure,
-}] = createPaginationRequestActions(SHARED_NAME)
+}] = createPaginationRequestActions(SHARED_NAME_SINGLE)
 
 export const GET_APPS_RIGHTS_LIST_BASE = createGetRightsListActionType(SHARED_NAME)
 export const [{

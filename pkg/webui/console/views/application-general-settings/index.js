@@ -18,7 +18,6 @@ import { Col, Row, Container } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 import { connect } from 'react-redux'
 import * as Yup from 'yup'
-import { replace } from 'connected-react-router'
 
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
@@ -34,8 +33,7 @@ import toast from '../../../components/toast'
 import SubmitBar from '../../../components/submit-bar'
 
 import { selectSelectedApplication } from '../../store/selectors/applications'
-
-import api from '../../api'
+import { updateApplication, deleteApplication } from '../../store/actions/applications'
 
 const m = defineMessages({
   basics: 'Basics',
@@ -52,14 +50,15 @@ const validationSchema = Yup.object().shape({
     .max(150, sharedMessages.validateTooLong),
 })
 
-@connect(function (state) {
-  return {
-    application: selectSelectedApplication(state),
-  }
+@connect(state => ({
+  application: selectSelectedApplication(state),
+}),
+{
+  updateApplication,
+  deleteApplication,
 })
 @withBreadcrumb('apps.single.general-settings', function (props) {
-  const { match } = props
-  const appId = match.params.appId
+  const { appId } = props
 
   return (
     <Breadcrumb
@@ -77,14 +76,15 @@ export default class ApplicationGeneralSettings extends React.Component {
   }
 
   async handleSubmit (values, { resetForm }) {
-    const { application } = this.props
+    const { application, updateApplication } = this.props
 
     await this.setState({ error: '' })
 
     const changed = diff(application, values)
+    const { ids: { application_id }} = application
+
     try {
-      const { ids: { application_id }} = application
-      await api.application.update(application_id, changed)
+      await updateApplication(application_id, changed)
       resetForm(values)
       toast({
         title: application_id,
@@ -98,14 +98,13 @@ export default class ApplicationGeneralSettings extends React.Component {
   }
 
   async handleDelete () {
-    const { dispatch } = this.props
+    const { deleteApplication } = this.props
     const { appId } = this.props.match.params
 
     await this.setState({ error: '' })
 
     try {
-      await api.application.delete(appId)
-      dispatch(replace('/console/applications'))
+      await deleteApplication(appId)
     } catch (error) {
       await this.setState({ error })
     }

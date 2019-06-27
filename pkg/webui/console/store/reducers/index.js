@@ -80,7 +80,7 @@ export default combineReducers({
   }),
   pagination: combineReducers({
     applications: createNamedPaginationReducer(
-      APPLICATIONS_SHARED_NAME,
+      APPLICATION_SHARED_NAME,
       getApplicationId
     ),
   }),
