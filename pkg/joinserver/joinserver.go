@@ -341,7 +341,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 					return nil, nil, err
 				}
 				networkCryptoService = cryptoservices.NewMemory(&nwkKey, nil)
-			} else if cs != nil {
+			} else if cs != nil && dev.ProvisionerID != "" {
 				networkCryptoService = cryptoservices.NewNetworkRPCClient(cs.Conn(), js.KeyVault, js.WithClusterAuth())
 			}
 
@@ -356,7 +356,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 					// LoRaWAN 1.0.x use the AppKey for network security operations.
 					networkCryptoService = cryptoservices.NewMemory(nil, &appKey)
 				}
-			} else if cs != nil {
+			} else if cs != nil && dev.ProvisionerID != "" {
 				applicationCryptoService = cryptoservices.NewApplicationRPCClient(cs.Conn(), js.KeyVault, js.WithClusterAuth())
 			}
 			if networkCryptoService == nil {

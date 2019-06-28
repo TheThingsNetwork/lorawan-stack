@@ -68,7 +68,7 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 					return nil, err
 				}
 				networkCryptoService = cryptoservices.NewMemory(&nwkKey, nil)
-			} else if cs != nil {
+			} else if cs != nil && dev.ProvisionerID != "" {
 				networkCryptoService = cryptoservices.NewNetworkRPCClient(cs.Conn(), srv.JS.KeyVault, srv.JS.WithClusterAuth())
 			}
 			if networkCryptoService != nil {
@@ -89,7 +89,7 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 					return nil, err
 				}
 				applicationCryptoService = cryptoservices.NewMemory(nil, &appKey)
-			} else if cs != nil {
+			} else if cs != nil && dev.ProvisionerID != "" {
 				applicationCryptoService = cryptoservices.NewApplicationRPCClient(cs.Conn(), srv.JS.KeyVault, srv.JS.WithClusterAuth())
 			}
 			if applicationCryptoService != nil {
