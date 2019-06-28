@@ -121,10 +121,11 @@ func TestGatewayServer(t *testing.T) {
 	}, registeredGatewayKey)
 
 	for _, ptc := range []struct {
-		Protocol       string
-		SupportsStatus bool
-		ValidAuth      func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool
-		Link           func(ctx context.Context, t *testing.T, ids ttnpb.GatewayIdentifiers, key string, upCh <-chan *ttnpb.GatewayUp, downCh chan<- *ttnpb.GatewayDown) error
+		Protocol               string
+		SupportsStatus         bool
+		DetectsInvalidMessages bool
+		ValidAuth              func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool
+		Link                   func(ctx context.Context, t *testing.T, ids ttnpb.GatewayIdentifiers, key string, upCh <-chan *ttnpb.GatewayUp, downCh chan<- *ttnpb.GatewayDown) error
 	}{
 		{
 			Protocol:       "grpc",
@@ -404,8 +405,9 @@ func TestGatewayServer(t *testing.T) {
 			},
 		},
 		{
-			Protocol:       "basicstation",
-			SupportsStatus: false,
+			Protocol:               "basicstation",
+			SupportsStatus:         false,
+			DetectsInvalidMessages: true,
 			ValidAuth: func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool {
 				return ids.EUI != nil
 			},
@@ -812,11 +814,10 @@ func TestGatewayServer(t *testing.T) {
 						case <-time.After(timeout):
 							t.Fatalf("Failed to send message to upstream channel")
 						}
-						if ptc.SupportsStatus {
-							uplinkCount += len(tc.Up.UplinkMessages)
-						} else {
-							// If the protocol does not support Status Messages, then count only the uplinks.
+						if ptc.DetectsInvalidMessages {
 							uplinkCount += len(tc.Forwards)
+						} else {
+							uplinkCount += len(tc.Up.UplinkMessages)
 						}
 
 						for _, msgIdx := range tc.Forwards {
