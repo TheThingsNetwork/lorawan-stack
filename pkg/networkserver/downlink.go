@@ -571,6 +571,21 @@ type scheduledDownlink struct {
 	TransmitAt time.Time
 }
 
+type downlinkSchedulingError []error
+
+func (errs downlinkSchedulingError) IsRetryable() bool {
+	for _, err := range errs {
+		if !errors.IsResourceExhausted(err) && !errors.IsFailedPrecondition(err) && !errors.IsAborted(err) {
+			return true
+		}
+	}
+	return false
+}
+
+func (errs downlinkSchedulingError) Error() string {
+	return errSchedule.Error()
+}
+
 // scheduleDownlinkByPaths attempts to schedule payload b using parameters in req using paths.
 // scheduleDownlinkByPaths discards req.DownlinkPaths and mutates it arbitrarily.
 // scheduleDownlinkByPaths returns the scheduled downlink or error.
@@ -634,14 +649,7 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *ttnpb
 			TransmitAt: time.Now().Add(res.Delay),
 		}, nil
 	}
-
-	for i, err := range errs {
-		logger = logger.WithField(
-			fmt.Sprintf("error_%d", i), err,
-		)
-	}
-	logger.Warn("All Gateway Servers failed to schedule downlink")
-	return nil, errSchedule
+	return nil, downlinkSchedulingError(errs)
 }
 
 func loggerWithTxRequestFields(logger log.Interface, req *ttnpb.TxRequest, rx1, rx2 bool) log.Interface {
@@ -782,7 +790,21 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					if len(sets) == 0 {
 						setDev = dev
 					}
+					schedulingErr, isSchedulingError := err.(downlinkSchedulingError)
 					switch {
+					case isSchedulingError:
+						retryable := schedulingErr.IsRetryable()
+						logger.WithFields(log.Fields(
+							"attempts", len(schedulingErr),
+							"retryable", retryable,
+						)).Warn("All Gateway Servers failed to schedule downlink")
+						if retryable {
+							nextDownlinkAt = time.Now().Add(downlinkRetryInterval)
+						} else {
+							nextDownlinkAt = time.Time{}
+						}
+						err = nil
+
 					case errors.Resemble(err, errUplinkNotFound):
 						logger.Warn("Uplink preceding downlink not found, skip downlink slot")
 						nextDownlinkAt = time.Time{}
@@ -828,11 +850,6 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					case errors.Resemble(err, errConfirmedDownlinkTooSoon):
 						logger.Debug("Confirmed downlink scheduled too soon, skip downlink slot")
 						nextDownlinkAt = dev.MACState.LastConfirmedDownlinkAt.Add(deviceClassCTimeout(dev, ns.defaultMACSettings))
-						err = nil
-
-					case errors.Resemble(err, errSchedule):
-						// NOTE: The error is already logged.
-						nextDownlinkAt = time.Now().Add(downlinkRetryInterval)
 						err = nil
 					}
 				}()
