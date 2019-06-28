@@ -18,10 +18,16 @@ import (
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
+	"github.com/mohae/deepcopy"
 	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
+
+// copyEndDevice returns a deep copy of ttnpb.EndDevice pb.
+func copyEndDevice(pb *ttnpb.EndDevice) *ttnpb.EndDevice {
+	return deepcopy.Copy(pb).(*ttnpb.EndDevice)
+}
 
 func timePtr(t time.Time) *time.Time {
 	return &t

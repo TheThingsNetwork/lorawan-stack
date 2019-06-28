@@ -722,8 +722,14 @@ loop:
 	return phy.DataRates[maxUpDRIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks())
 }
 
-const gsScheduleWindow = 30 * time.Second
+// downlinkRetryInterval is the time interval, which defines the interval between downlink task retries.
 const downlinkRetryInterval = time.Second
+
+// gsScheduleWindow is the time interval, which is sufficient for GS to ensure downlink is scheduled.
+const gsScheduleWindow = 30 * time.Second
+
+// nsScheduleWindow is the time interval, which is sufficient for NS to ensure downlink is scheduled.
+var nsScheduleWindow = time.Second
 
 // processDownlinkTask processes the most recent downlink task ready for execution, if such is available or wait until it is before processing it.
 // NOTE: ctx.Done() is not guaranteed to be respected by processDownlinkTask.
