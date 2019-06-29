@@ -22,7 +22,6 @@ import (
 
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/provider"
-	_ "go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/provider/nats" // The NATS integration provider
 	pubsubunique "go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/unique"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
@@ -80,7 +79,7 @@ func (ps *PubSub) startIntegrationTask(ctx context.Context, ids ttnpb.Applicatio
 		target, err := ps.registry.Get(ctx, ids, ttnpb.ApplicationPubSubFieldPathsNested)
 		if err != nil {
 			if !errors.IsNotFound(err) {
-				log.FromContext(ctx).WithError(err).Error("Failed to get link")
+				log.FromContext(ctx).WithError(err).Error("Failed to get integration")
 			}
 			return nil
 		}
@@ -173,6 +172,10 @@ func (i *integration) handleDown(ctx context.Context, op func(io.Server, context
 		operation, err := i.format.ToDownlinkQueueRequest(msg.Body)
 		if err != nil {
 			logger.WithError(err).Warn("Failed to decode downlink queue operation")
+			continue
+		}
+		if err := operation.EndDeviceIdentifiers.ValidateContext(ctx); err != nil {
+			logger.WithError(err).Warn("Failed to validate downlink queue operation")
 			continue
 		}
 		logger.WithFields(log.Fields(

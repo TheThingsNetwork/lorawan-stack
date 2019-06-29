@@ -72,7 +72,7 @@ func (ps *PubSub) Set(ctx context.Context, req *ttnpb.SetApplicationPubSubReques
 		return nil, err
 	}
 	// Get all the fields here for starting the integration task.
-	pubsub, err := ps.registry.Set(ctx, req.ApplicationPubSubIdentifiers, req.FieldMask.Paths,
+	pubsub, err := ps.registry.Set(ctx, req.ApplicationPubSubIdentifiers, appendImplicitPubSubGetPaths(req.FieldMask.Paths...),
 		func(pubsub *ttnpb.ApplicationPubSub) (*ttnpb.ApplicationPubSub, []string, error) {
 			if pubsub != nil {
 				return &req.ApplicationPubSub, req.FieldMask.Paths, nil

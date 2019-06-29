@@ -64,6 +64,7 @@ require (
 	github.com/mgechev/revive v0.0.0-20190416071613-796760d728e1
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
+	github.com/nats-io/gnatsd v1.4.1
 	github.com/nats-io/go-nats v1.7.2
 	github.com/nats-io/nats-server v1.4.1
 	github.com/nats-io/nats.go v1.7.2

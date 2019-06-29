@@ -19,7 +19,8 @@ import (
 	"testing"
 	"time"
 
-	nats_server "github.com/nats-io/nats-server/test"
+	nats_server "github.com/nats-io/gnatsd/server"
+	nats_test_server "github.com/nats-io/nats-server/test"
 	nats_client "github.com/nats-io/nats.go"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/provider"
@@ -36,10 +37,15 @@ func TestOpenConnection(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()
 
-	natsServer := nats_server.RunDefaultServer()
+	natsServer := nats_test_server.RunServer(&nats_server.Options{
+		Host:           "127.0.0.1",
+		Port:           4123,
+		NoLog:          true,
+		NoSigs:         true,
+		MaxControlLine: 256,
+	})
 	a.So(natsServer, should.NotBeNil)
 	defer natsServer.Shutdown()
-	time.Sleep(timeout)
 
 	pb := &ttnpb.ApplicationPubSub{
 		ApplicationPubSubIdentifiers: ttnpb.ApplicationPubSubIdentifiers{
@@ -93,7 +99,7 @@ func TestOpenConnection(t *testing.T) {
 		a.So(err, should.NotBeNil)
 	}
 
-	pb.Attributes[nats.NATSServerAttribute] = "localhost"
+	pb.Attributes[nats.NATSServerAttribute] = "nats://localhost:4123"
 
 	// Valid attributes - connection established.
 	{
@@ -139,7 +145,7 @@ func TestOpenConnection(t *testing.T) {
 					ctx, cancel := context.WithTimeout(ctx, timeout)
 					defer cancel()
 
-					natsClient, err := nats_client.Connect("localhost")
+					natsClient, err := nats_client.Connect("nats://localhost:4123")
 					a.So(err, should.BeNil)
 					defer natsClient.Close()
 
@@ -154,6 +160,9 @@ func TestOpenConnection(t *testing.T) {
 						a.So(msg.Body, should.Resemble, []byte("foobar"))
 					} else if err == nil {
 						t.Fatal("Unexpected message received")
+					}
+					if msg != nil {
+						msg.Ack()
 					}
 				})
 			}
@@ -201,19 +210,22 @@ func TestOpenConnection(t *testing.T) {
 				},
 			} {
 				t.Run(tc.name, func(t *testing.T) {
-					ctx, cancel := context.WithTimeout(ctx, timeout)
-					defer cancel()
-
-					natsClient, err := nats_client.Connect("localhost")
+					natsClient, err := nats_client.Connect("nats://localhost:4123")
 					a.So(err, should.BeNil)
 					defer natsClient.Close()
 
-					upCh := make(chan *nats_client.Msg)
+					upCh := make(chan *nats_client.Msg, 10)
 					defer close(upCh)
 
 					sub, err := natsClient.ChanSubscribe(tc.subject, upCh)
 					a.So(sub, should.NotBeNil)
 					a.So(err, should.BeNil)
+					defer sub.Unsubscribe()
+
+					// We have to sleep here since ChanSubscribe is not actually synced,
+					// so it could be the case that we to topic.Send before the subscription,
+					// was actually opened.
+					time.Sleep(timeout)
 
 					err = tc.topic.Send(ctx, &pubsub.Message{
 						Body: []byte("foobar"),

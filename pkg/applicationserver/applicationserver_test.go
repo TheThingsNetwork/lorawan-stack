@@ -21,17 +21,19 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"sync"
 	"testing"
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	pbtypes "github.com/gogo/protobuf/types"
-	nats_server "github.com/nats-io/nats-server/test"
+	nats_server "github.com/nats-io/gnatsd/server"
+	nats_test_server "github.com/nats-io/nats-server/test"
 	nats_client "github.com/nats-io/nats.go"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver"
+	nats_provider "go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/provider/nats"
+	iopubsubredis "go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/redis"
 	iowebredis "go.thethings.network/lorawan-stack/pkg/applicationserver/io/web/redis"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/redis"
 	"go.thethings.network/lorawan-stack/pkg/component"
@@ -65,6 +67,10 @@ func TestApplicationServer(t *testing.T) {
 	registeredApplicationWebhookID := ttnpb.ApplicationWebhookIdentifiers{
 		ApplicationIdentifiers: registeredApplicationID,
 		WebhookID:              "test",
+	}
+	registeredApplicationPubSubID := ttnpb.ApplicationPubSubIdentifiers{
+		ApplicationIdentifiers: registeredApplicationID,
+		PubSubID:               "test",
 	}
 
 	// This device gets registered in the device registry of the Application Server.
@@ -200,13 +206,20 @@ hardware_versions:
 	defer webhooksRedisClient.Close()
 	webhookRegistry := iowebredis.WebhookRegistry{Redis: webhooksRedisClient}
 
-	natsServer := nats_server.RunDefaultServer()
+	pubsubRedisClient, pubsubFlush := test.NewRedis(t, "applicationserver_test", "pubsub")
+	defer pubsubFlush()
+	defer pubsubRedisClient.Close()
+	pubsubRegistry := iopubsubredis.PubSubRegistry{Redis: pubsubRedisClient}
+
+	natsServer := nats_test_server.RunServer(&nats_server.Options{
+		Host:           "127.0.0.1",
+		Port:           4124,
+		NoLog:          true,
+		NoSigs:         true,
+		MaxControlLine: 256,
+	})
 	defer natsServer.Shutdown()
 	time.Sleep(Timeout)
-	err = os.Setenv("NATS_SERVER_URL", "127.0.0.1")
-	if err != nil {
-		t.Fatalf("Failed to set the NATS_SERVER_URL: %s", err)
-	}
 
 	c := component.MustNew(test.GetLogger(t), &component.Config{
 		ServiceBase: config.ServiceBase{
@@ -246,8 +259,7 @@ hardware_versions:
 			QueueSize: 1,
 		},
 		PubSub: applicationserver.PubSubConfig{
-			PublishURLs:   []string{"nats://publish"},
-			SubscribeURLs: []string{"nats://subscribe?ackfunc=noop"},
+			Registry: pubsubRegistry,
 		},
 	}
 	as, err := applicationserver.New(c, config)
@@ -391,43 +403,115 @@ hardware_versions:
 			SkipCheckDownErr: true, // There is no direct error response in MQTT.
 		},
 		{
-			Protocol: "pubsub",
+			Protocol: "pubsub/nats",
 			ValidAuth: func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, key string) bool {
-				return true // There is no authentication in PubSub.
+				return ids == registeredApplicationID && key == registeredApplicationKey
 			},
 			Connect: func(ctx context.Context, t *testing.T, ids ttnpb.ApplicationIdentifiers, key string, chs *connChannels) error {
-				client, err := nats_client.Connect("127.0.0.1")
+				// Configure pubsub.
+				conn, err := grpc.Dial(":9184", append(rpcclient.DefaultDialOptions(ctx), grpc.WithInsecure(), grpc.WithBlock())...)
 				if err != nil {
 					return err
 				}
-				defer client.Close()
+				defer conn.Close()
+				creds := grpc.PerRPCCredentials(rpcmetadata.MD{
+					AuthType:      "Bearer",
+					AuthValue:     key,
+					AllowInsecure: true,
+				})
+				client := ttnpb.NewApplicationPubSubRegistryClient(conn)
+				req := &ttnpb.SetApplicationPubSubRequest{
+					ApplicationPubSub: ttnpb.ApplicationPubSub{
+						ApplicationPubSubIdentifiers: registeredApplicationPubSubID,
+						Provider:                     ttnpb.ApplicationPubSub_NATS,
+						Attributes: map[string]string{
+							nats_provider.NATSServerAttribute: "nats://localhost:4124",
+						},
+						Format:    "json",
+						BaseTopic: "foo.bar",
+						DownlinkPush: &ttnpb.ApplicationPubSub_Message{
+							Topic: "down.downlink.push",
+						},
+						DownlinkReplace: &ttnpb.ApplicationPubSub_Message{
+							Topic: "down.downlink.replace",
+						},
+						UplinkMessage: &ttnpb.ApplicationPubSub_Message{
+							Topic: "up.uplink.message",
+						},
+						JoinAccept: &ttnpb.ApplicationPubSub_Message{
+							Topic: "up.join.accept",
+						},
+						DownlinkAck: &ttnpb.ApplicationPubSub_Message{
+							Topic: "up.downlink.ack",
+						},
+						DownlinkNack: &ttnpb.ApplicationPubSub_Message{
+							Topic: "up.downlink.nack",
+						},
+						DownlinkSent: &ttnpb.ApplicationPubSub_Message{
+							Topic: "up.downlink.sent",
+						},
+						DownlinkFailed: &ttnpb.ApplicationPubSub_Message{
+							Topic: "up.downlnk.failed",
+						},
+						DownlinkQueued: &ttnpb.ApplicationPubSub_Message{
+							Topic: "up.downlink.queued",
+						},
+						LocationSolved: &ttnpb.ApplicationPubSub_Message{
+							Topic: "up.location.solved",
+						},
+					},
+					FieldMask: pbtypes.FieldMask{
+						Paths: []string{
+							"base_topic",
+							"downlink_ack",
+							"downlink_failed",
+							"downlink_nack",
+							"downlink_queued",
+							"downlink_sent",
+							"downlink_push",
+							"downlink_replace",
+							"format",
+							"attributes",
+							"provider",
+							"join_accept",
+							"location_solved",
+							"uplink_message",
+						},
+					},
+				}
+				if _, err := client.Set(ctx, req, creds); err != nil {
+					return err
+				}
+				nc, err := nats_client.Connect("nats://localhost:4124")
+				if err != nil {
+					return err
+				}
+				defer nc.Close()
 				// Write downstream.
 				go func() {
 					for {
 						var req *ttnpb.DownlinkQueueRequest
-						op := &ttnpb.DownlinkQueueOperation{}
+						var subject string
 						select {
 						case <-ctx.Done():
 							return
 						case req = <-chs.downPush:
-							op.Operation = ttnpb.DownlinkQueueOperation_PUSH
+							subject = "foo.bar.down.downlink.push"
 						case req = <-chs.downReplace:
-							op.Operation = ttnpb.DownlinkQueueOperation_REPLACE
+							subject = "foo.bar.down.downlink.replace"
 						}
-						op.EndDeviceIdentifiers = req.EndDeviceIdentifiers
-						op.Downlinks = req.Downlinks
-						buf, err := jsonpb.TTN().Marshal(op)
+						buf, err := jsonpb.TTN().Marshal(req)
 						if err != nil {
 							chs.downErr <- err
 							continue
 						}
-						err = client.Publish("subscribe", buf)
+						err = nc.Publish(subject, buf)
 						chs.downErr <- err
 					}
 				}()
 				errCh := make(chan error, 1)
 				// Read upstream.
-				subscription, err := client.Subscribe("publish", func(raw *nats_client.Msg) {
+				subscription, err := nc.Subscribe("foo.bar.up.>", func(raw *nats_client.Msg) {
 					msg := &ttnpb.ApplicationUp{}
 					err = jsonpb.TTN().Unmarshal(raw.Data, msg)
 					if err != nil {
