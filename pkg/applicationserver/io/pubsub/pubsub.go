@@ -46,8 +46,8 @@ type PubSub struct {
 	integrationErrors sync.Map
 }
 
-// Start starts the pusub frontend.
-func Start(c *component.Component, server io.Server, registry Registry) (*PubSub, error) {
+// New creates a new pusub frontend.
+func New(c *component.Component, server io.Server, registry Registry) (*PubSub, error) {
 	ctx := log.NewContextWithField(c.FillContext(c.Context()), "namespace", "applicationserver/io/pubsub")
 	ps := &PubSub{
 		Component: c,

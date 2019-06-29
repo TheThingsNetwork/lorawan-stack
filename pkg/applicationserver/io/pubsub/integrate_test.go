@@ -91,7 +91,7 @@ func TestIntegrate(t *testing.T) {
 			},
 		},
 	})
-	srv, err := pubsub.Start(c, io, pubsubRegistry)
+	srv, err := pubsub.New(c, io, pubsubRegistry)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
