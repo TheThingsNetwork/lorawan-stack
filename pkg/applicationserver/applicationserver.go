@@ -29,6 +29,7 @@ import (
 	iogrpc "go.thethings.network/lorawan-stack/pkg/applicationserver/io/grpc"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/mqtt"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub"
+	_ "go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/provider/nats" // The NATS integration provider
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/web"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
@@ -42,7 +43,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/messageprocessors/javascript"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
-	_ "gocloud.dev/pubsub/natspubsub" // NATS backend for PubSub.
 	"google.golang.org/grpc"
 )
 
