@@ -1466,15 +1466,6 @@
       "file": "mqtt.go"
     }
   },
-  "error:pkg/applicationserver/io/pubsub/provider/nats:attribute_not_found": {
-    "translations": {
-      "en": "attribute `{attribute}` not found"
-    },
-    "description": {
-      "package": "pkg/applicationserver/io/pubsub/provider/nats",
-      "file": "provider.go"
-    }
-  },
   "error:pkg/applicationserver/io/pubsub/provider:already_registered": {
     "translations": {
       "en": "provider `{provider_id}` already registered"

@@ -165,13 +165,12 @@ var (
 			if err != nil {
 				return err
 			}
-			paths := util.UpdateFieldMask(cmd.Flags(), setApplicationPubSubFlags, attributesFlags())
+			paths := util.UpdateFieldMask(cmd.Flags(), setApplicationPubSubFlags)
 
 			var pubsub ttnpb.ApplicationPubSub
 			if err = util.SetFields(&pubsub, setApplicationPubSubFlags); err != nil {
 				return err
 			}
-			pubsub.Attributes = mergeAttributes(pubsub.Attributes, cmd.Flags())
 			pubsub.ApplicationPubSubIdentifiers = *pubsubID
 
 			as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
@@ -222,7 +221,6 @@ func init() {
 	applicationsPubSubsCommand.AddCommand(applicationsPubSubsListCommand)
 	applicationsPubSubsSetCommand.Flags().AddFlagSet(applicationPubSubIDFlags())
 	applicationsPubSubsSetCommand.Flags().AddFlagSet(setApplicationPubSubFlags)
-	applicationsPubSubsSetCommand.Flags().AddFlagSet(attributesFlags())
 	applicationsPubSubsCommand.AddCommand(applicationsPubSubsSetCommand)
 	applicationsPubSubsDeleteCommand.Flags().AddFlagSet(applicationPubSubIDFlags())
 	applicationsPubSubsCommand.AddCommand(applicationsPubSubsDeleteCommand)
