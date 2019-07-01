@@ -221,6 +221,22 @@ $ ttn-lw-cli end-devices create app1 dev2 \
 
 >Hint: You can also pass `--with-session` to have a session generated.
 
+It is also possible to create a multicast device (an ABP device which can not send uplinks and shares the security session with other devices) using the `--multicast` flag as follows:
+
+```bash
+$ ttn-lw-cli end-devices create app1 dev3 \
+  --frequency-plan-id EU_863_870 \
+  --lorawan-version 1.0.2 \
+  --lorawan-phy-version 1.0.2-b \
+  --abp \
+  --session.dev-addr 00E4304D \
+  --session.keys.app-s-key.key A0CAD5A30036DBE03096EB67CA975BAA \
+  --session.keys.nwk-s-key.key B7F3E161BC9D4388E6C788A0C547F255 \
+  --multicast
+```
+
+>Note: The `--multicast` flag can be set only during device creation, and as such can not be turned on or off later.
+
 ## <a name="linkappserver">Linking the application</a>
 
 In order to send uplinks and receive downlinks from your device, you must link the Application Server to the Network Server. In order to do this, create an API key for the Application Server:
@@ -448,7 +464,7 @@ To disable class C scheduling, set reset with `--supports-class-c=false`.
 
 #### Class C multicast
 
-Multicast messages are downlinks messages which are sent to multiple devices that share the same security context. In the Network Server, this is an ABP session. See [creating a device](#createdev) for learning how to create an ABP device.
+Multicast messages are downlinks messages which are sent to multiple devices that share the same security context. In the Network Server, this is an ABP session. See [creating a device](#createdev) for learning how to create a multicast device.
 
 Multicast sessions do not allow uplink. Therefore, you need to explicitly specify the gateway(s) to send messages from, using the `class_b_c` field:
 
@@ -509,8 +525,16 @@ This will create a webhook `wh1` for the application `app1` with JSON formatting
 
 >Note: You can also specify URL paths for downlink events, just like MQTT. See `ttn-lw-cli applications webhooks set --help` for more information.
 
-You can also send downlink messages using webhooks. The path is `/v3/api/as/applications/{application_id}/webhooks/{webhook_id}/devices/{device_id}/down/push` (or `/replace`). Pass the API key as
-bearer token on the `Authorization` header. For example:
+You can also send downlink messages using webhooks. The path is `/v3/api/as/applications/{application_id}/webhooks/{webhook_id}/devices/{device_id}/down/push` (or `/replace`). This requires an API key with traffic writing rights, which can be created as follows:
+
+```bash
+$ ttn-lw-cli applications api-keys create \
+  --name wh-client \
+  --application-id app1 \
+  --right-application-traffic-down-write
+```
+
+Pass the API key as bearer token on the `Authorization` header. For example:
 
 ```
 $ curl http://localhost:1885/api/v3/as/applications/app1/webhooks/wh1/devices/dev1/down/push \
