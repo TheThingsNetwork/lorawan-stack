@@ -16,14 +16,14 @@ import { createLogic } from 'redux-logic'
 
 import sharedMessages from '../../../../lib/shared-messages'
 import api from '../../../api'
-import * as gateway from '../../actions/gateway'
+import * as gateways from '../../actions/gateways'
 import { gsConfigSelector } from '../../../../lib/selectors/env'
 import { selectSelectedGateway } from '../../selectors/gateway'
 import createEventsConnectLogics from './events'
 import createRequestLogic from './lib'
 
 const getGatewayLogic = createRequestLogic({
-  type: gateway.GET_GTW,
+  type: gateways.GET_GTW,
   async process ({ action }) {
     const { payload, meta } = action
     const { id = {}} = payload
@@ -33,17 +33,17 @@ const getGatewayLogic = createRequestLogic({
 })
 
 const updateGatewayLogic = createRequestLogic({
-  type: gateway.UPDATE_GTW,
+  type: gateways.UPDATE_GTW,
   async process ({ action }) {
     const { payload: { gatewayId, patch }} = action
     const result = await api.gateway.update(gatewayId, patch)
 
     return { ...patch, ...result }
   },
-}, gateway.updateGatewaySuccess)
+}, gateways.updateGatewaySuccess)
 
 const getGatewayCollaboratorsLogic = createRequestLogic({
-  type: gateway.GET_GTW_COLLABORATORS_LIST,
+  type: gateways.GET_GTW_COLLABORATORS_LIST,
   async process ({ action }) {
     const { gtwId } = action.payload
     const res = await api.gateway.collaborators.list(gtwId)
@@ -65,11 +65,11 @@ const getGatewayCollaboratorsLogic = createRequestLogic({
 })
 
 const startGatewayStatisticsLogic = createLogic({
-  type: gateway.START_GTW_STATS,
+  type: gateways.START_GTW_STATS,
   cancelType: [
-    gateway.STOP_GTW_STATS,
-    gateway.UPDATE_GTW_STATS_FAILURE,
-    gateway.UPDATE_GTW_STATS_UNAVAILABLE,
+    gateways.STOP_GTW_STATS,
+    gateways.UPDATE_GTW_STATS_FAILURE,
+    gateways.UPDATE_GTW_STATS_UNAVAILABLE,
   ],
   warnTimeout: 0,
   validate ({ getState, action }, allow, reject) {
@@ -77,7 +77,7 @@ const startGatewayStatisticsLogic = createLogic({
     const gtw = selectSelectedGateway(getState())
 
     if (!gsConfig.enabled) {
-      reject(gateway.updateGatewayStatisticsUnavailable())
+      reject(gateways.updateGatewayStatisticsUnavailable())
       return
     }
 
@@ -93,14 +93,14 @@ const startGatewayStatisticsLogic = createLogic({
       gtwGsAddress = gtwAddress.split(':')[0]
       consoleGsAddress = new URL(gsConfig.base_url).hostname
     } catch (error) {
-      reject(gateway.updateGatewayStatisticsFailure({
+      reject(gateways.updateGatewayStatisticsFailure({
         message: sharedMessages.unknown,
       }))
       return
     }
 
     if (gtwGsAddress !== consoleGsAddress) {
-      reject(gateway.updateGatewayStatisticsFailure({
+      reject(gateways.updateGatewayStatisticsFailure({
         message: sharedMessages.otherCluster,
       }))
       return
@@ -118,10 +118,10 @@ const startGatewayStatisticsLogic = createLogic({
   async process ({ cancelled$, action }, dispatch, done) {
     const { id, meta } = action
 
-    dispatch(gateway.updateGatewayStatistics(id))
+    dispatch(gateways.updateGatewayStatistics(id))
 
     const interval = setInterval(
-      () => dispatch(gateway.updateGatewayStatistics(id)),
+      () => dispatch(gateways.updateGatewayStatistics(id)),
       meta.timeout
     )
 
@@ -130,7 +130,7 @@ const startGatewayStatisticsLogic = createLogic({
 })
 
 const updateGatewayStatisticsLogic = createRequestLogic({
-  type: gateway.UPDATE_GTW_STATS,
+  type: gateways.UPDATE_GTW_STATS,
   async process ({ action }) {
     const { id } = action.payload
     return api.gateway.stats(id)
@@ -138,7 +138,7 @@ const updateGatewayStatisticsLogic = createRequestLogic({
 })
 
 const getGatewayApiKeysLogic = createRequestLogic({
-  type: gateway.GET_GTW_API_KEYS_LIST,
+  type: gateways.GET_GTW_API_KEYS_LIST,
   async process ({ action }) {
     const { id: gtwId, params } = action.payload
     const res = await api.gateway.apiKeys.list(gtwId, params)
@@ -147,7 +147,7 @@ const getGatewayApiKeysLogic = createRequestLogic({
 })
 
 const getGatewayApiKeyLogic = createRequestLogic({
-  type: gateway.GET_GTW_API_KEY,
+  type: gateways.GET_GTW_API_KEY,
   async process ({ action }) {
     const { id: gtwId, keyId } = action.payload
     return api.gateway.apiKeys.get(gtwId, keyId)
@@ -161,7 +161,7 @@ export default [
   startGatewayStatisticsLogic,
   updateGatewayStatisticsLogic,
   ...createEventsConnectLogics(
-    gateway.SHARED_NAME,
+    gateways.SHARED_NAME,
     'gateways',
     api.gateway.eventsSubscribe,
   ),

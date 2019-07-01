@@ -35,7 +35,7 @@ import {
   getGateway,
   startGatewayEventsStream,
   stopGatewayEventsStream,
-} from '../../store/actions/gateway'
+} from '../../store/actions/gateways'
 import {
   selectGatewayFetching,
   selectGatewayError,

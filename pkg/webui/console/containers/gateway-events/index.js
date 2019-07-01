@@ -21,7 +21,7 @@ import EventsSubscription from '../../containers/events-subscription'
 
 import {
   clearGatewayEventsStream,
-} from '../../store/actions/gateway'
+} from '../../store/actions/gateways'
 
 import {
   selectGatewayEvents,

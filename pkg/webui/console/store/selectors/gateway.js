@@ -17,8 +17,9 @@ import {
   GET_GTW_API_KEY_BASE,
   GET_GTW_API_KEYS_LIST_BASE,
   UPDATE_GTW_STATS_BASE,
-} from '../actions/gateway'
-import { GET_GTWS_RIGHTS_LIST_BASE } from '../actions/gateways'
+  GET_GTWS_RIGHTS_LIST_BASE,
+} from '../actions/gateways'
+
 import { getGatewayId } from '../../../lib/selectors/id'
 import {
   createEventsSelector,

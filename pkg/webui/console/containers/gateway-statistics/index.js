@@ -35,7 +35,7 @@ import {
 import {
   startGatewayStatistics,
   stopGatewayStatistics,
-} from '../../store/actions/gateway'
+} from '../../store/actions/gateways'
 
 import style from './gateway-statistics.styl'
 

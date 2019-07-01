@@ -32,7 +32,7 @@ import SubmitButton from '../../../components/submit-button'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import diff from '../../../lib/diff'
 
-import { updateGateway } from '../../store/actions/gateway'
+import { updateGateway } from '../../store/actions/gateways'
 import { getGatewayId } from '../../../lib/selectors/id'
 import { selectSelectedGateway } from '../../store/selectors/gateway'
 

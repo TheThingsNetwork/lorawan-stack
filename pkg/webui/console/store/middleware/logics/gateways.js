@@ -20,15 +20,17 @@ const getGatewaysLogic = createRequestLogic({
   type: gateways.GET_GTWS_LIST,
   latest: true,
   async process ({ action }) {
-    const { payload: { page, limit, query }} = action
+    const { params: { page, limit, query }} = action.payload
+    const { selectors } = action.meta
+
     const data = query
       ? await api.gateways.search({
         page,
         limit,
         id_contains: query,
         name_contains: query,
-      })
-      : await api.gateways.list({ page, limit }, [ 'name,description,frequency_plan_id' ])
+      }, selectors)
+      : await api.gateways.list({ page, limit }, selectors)
     return {
       gateways: data.gateways,
       totalCount: data.totalCount,
