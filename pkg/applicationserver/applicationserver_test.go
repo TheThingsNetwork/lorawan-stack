@@ -38,7 +38,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/jsonpb"
-	"go.thethings.network/lorawan-stack/pkg/rpcclient"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
@@ -281,17 +280,12 @@ hardware_versions:
 				return ids == registeredApplicationID && key == registeredApplicationKey
 			},
 			Connect: func(ctx context.Context, t *testing.T, ids ttnpb.ApplicationIdentifiers, key string, chs *connChannels) error {
-				conn, err := grpc.Dial(":9184", grpc.WithInsecure(), grpc.WithBlock())
-				if err != nil {
-					return err
-				}
-				defer conn.Close()
 				creds := grpc.PerRPCCredentials(rpcmetadata.MD{
 					AuthType:      "Bearer",
 					AuthValue:     key,
 					AllowInsecure: true,
 				})
-				client := ttnpb.NewAppAsClient(conn)
+				client := ttnpb.NewAppAsClient(as.LoopbackConn())
 				stream, err := client.Subscribe(ctx, &ids, creds)
 				if err != nil {
 					return err
@@ -476,17 +470,12 @@ hardware_versions:
 				}))
 				defer webhookTarget.Close()
 				// Configure webhook.
-				conn, err := grpc.Dial(":9184", append(rpcclient.DefaultDialOptions(ctx), grpc.WithInsecure(), grpc.WithBlock())...)
-				if err != nil {
-					return err
-				}
-				defer conn.Close()
 				creds := grpc.PerRPCCredentials(rpcmetadata.MD{
 					AuthType:      "Bearer",
 					AuthValue:     key,
 					AllowInsecure: true,
 				})
-				client := ttnpb.NewApplicationWebhookRegistryClient(conn)
+				client := ttnpb.NewApplicationWebhookRegistryClient(as.LoopbackConn())
 				req := &ttnpb.SetApplicationWebhookRequest{
 					ApplicationWebhook: ttnpb.ApplicationWebhook{
 						ApplicationWebhookIdentifiers: registeredApplicationWebhookID,
