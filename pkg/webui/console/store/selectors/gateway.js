@@ -50,7 +50,6 @@ export const selectGatewayError = createErrorSelector(GET_GTW_BASE)
 export const selectGatewayEvents = createEventsSelector(ENTITY)
 export const selectGatewayEventsError = createEventsErrorSelector(ENTITY)
 export const selectGatewayEventsStatus = createEventsStatusSelector(ENTITY)
-export const selectGatewayTotalCount = 100 || selectGatewayStore(ENTITY).totalCount
 
 // Api Keys
 export const selectGatewayApiKeysStore = createApiKeysStoreSelector(ENTITY)
