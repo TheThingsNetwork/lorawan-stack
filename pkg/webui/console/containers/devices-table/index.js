@@ -61,7 +61,7 @@ class DevicesTable extends React.Component {
   constructor (props) {
     super(props)
 
-    this.getDevicesList = filters => getDevicesList(props.appId, filters)
+    this.getDevicesList = filters => getDevicesList(props.appId, filters, [ 'name' ])
   }
 
   baseDataSelector ({ devices }) {
