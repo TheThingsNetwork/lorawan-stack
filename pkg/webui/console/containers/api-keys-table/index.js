@@ -44,6 +44,11 @@ const headers = [
     width: 35,
   },
   {
+    name: 'name',
+    displayName: sharedMessages.name,
+    width: 20,
+  },
+  {
     name: 'rights',
     displayName: m.grantedRights,
     width: 45,
@@ -58,16 +63,12 @@ const headers = [
 
       return (
         <TagGroup
+          className={style.rightTagGroup}
           tagMaxWidth={RIGHT_TAG_MAX_WIDTH}
           tags={tags}
         />
       )
     },
-  },
-  {
-    name: 'name',
-    displayName: sharedMessages.name,
-    width: 20,
   },
 ]
 
