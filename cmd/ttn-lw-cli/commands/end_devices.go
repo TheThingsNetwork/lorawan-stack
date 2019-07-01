@@ -492,12 +492,21 @@ var (
 			isPaths, nsPaths, asPaths, jsPaths := splitEndDeviceSetPaths(device.SupportsJoin, paths...)
 
 			if len(nsPaths) > 0 && config.NetworkServerEnabled {
+				if device.NetworkServerAddress == "" {
+					device.NetworkServerAddress = getHost(config.NetworkServerGRPCAddress)
+				}
 				isPaths = append(isPaths, "network_server_address")
 			}
 			if len(asPaths) > 0 && config.ApplicationServerEnabled {
+				if device.ApplicationServerAddress == "" {
+					device.ApplicationServerAddress = getHost(config.ApplicationServerGRPCAddress)
+				}
 				isPaths = append(isPaths, "application_server_address")
 			}
 			if len(jsPaths) > 0 && config.JoinServerEnabled {
+				if device.JoinServerAddress == "" {
+					device.JoinServerAddress = getHost(config.JoinServerGRPCAddress)
+				}
 				isPaths = append(isPaths, "join_server_address")
 			}
 
