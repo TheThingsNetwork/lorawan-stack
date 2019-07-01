@@ -69,8 +69,11 @@ class Applications {
 
   // Retrieval
 
-  async getAll (params) {
-    const response = await this._api.ApplicationRegistry.List(undefined, params)
+  async getAll (params, selector) {
+    const response = await this._api.ApplicationRegistry.List(undefined, {
+      ...params,
+      ...Marshaler.selectorToFieldMask(selector),
+    })
 
     return this._responseTransform(response, false)
   }
