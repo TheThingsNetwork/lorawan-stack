@@ -126,7 +126,6 @@ func (impl) OpenConnection(ctx context.Context, pb *ttnpb.ApplicationPubSub) (pc
 		if *s.subscription, err = natspubsub.OpenSubscription(
 			conn,
 			combineSubjects(pb.BaseTopic, s.subject),
-			func() {},
 			&natspubsub.SubscriptionOptions{},
 		); err != nil {
 			conn.Close()

@@ -1520,9 +1520,9 @@
       "file": "registry.go"
     }
   },
-  "error:pkg/applicationserver/io/pubsub:already_integrated": {
+  "error:pkg/applicationserver/io/pubsub:already_configured": {
     "translations": {
-      "en": "already integrated to `{application_uid} {pubsub_id}`"
+      "en": "already configured to `{application_uid}` `{pubsub_id}`"
     },
     "description": {
       "package": "pkg/applicationserver/io/pubsub",

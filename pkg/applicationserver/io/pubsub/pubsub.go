@@ -84,13 +84,13 @@ func (ps *PubSub) startIntegrationTask(ctx context.Context, ids ttnpb.Applicatio
 			return nil
 		}
 
-		err = ps.integrate(ctx, target)
+		err = ps.start(ctx, target)
 		switch {
 		case errors.IsFailedPrecondition(err),
 			errors.IsUnauthenticated(err),
 			errors.IsPermissionDenied(err),
 			errors.IsInvalidArgument(err):
-			log.FromContext(ctx).WithError(err).Warn("Failed to integrate")
+			log.FromContext(ctx).WithError(err).Warn("Failed to start")
 			return nil
 		case errors.IsCanceled(err),
 			errors.IsAlreadyExists(err):
@@ -212,9 +212,9 @@ func (i *integration) startHandleDown(ctx context.Context) {
 	}
 }
 
-var errAlreadyIntegrated = errors.DefineAlreadyExists("already_integrated", "already integrated to `{application_uid} {pubsub_id}`")
+var errAlreadyConfigured = errors.DefineAlreadyExists("already_configured", "already configured to `{application_uid}` `{pubsub_id}`")
 
-func (ps *PubSub) integrate(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err error) {
+func (ps *PubSub) start(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err error) {
 	appUID := unique.ID(ctx, pb.ApplicationIdentifiers)
 	psUID := pubsubunique.ID(appUID, pb.PubSubID)
 	ctx = log.NewContextWithFields(ctx, log.Fields(
@@ -239,7 +239,7 @@ func (ps *PubSub) integrate(ctx context.Context, pb *ttnpb.ApplicationPubSub) (e
 		server:            ps.server,
 	}
 	if _, loaded := ps.integrations.LoadOrStore(psUID, i); loaded {
-		return errAlreadyIntegrated.WithAttributes("application_uid", appUID, "pubsub_id", pb.PubSubID)
+		return errAlreadyConfigured.WithAttributes("application_uid", appUID, "pubsub_id", pb.PubSubID)
 	}
 	go func() {
 		<-ctx.Done()
@@ -270,16 +270,16 @@ func (ps *PubSub) integrate(ctx context.Context, pb *ttnpb.ApplicationPubSub) (e
 	i.format = format
 	go i.handleUp(ctx)
 	i.startHandleDown(ctx)
-	logger.Info("Integrated")
+	logger.Info("Started")
 	<-ctx.Done()
 	if err := ctx.Err(); errors.IsCanceled(err) {
-		logger.Info("Integration cancelled")
+		logger.Info("Integration canceled")
 		i.conn.Shutdown(ctx)
 	}
 	return
 }
 
-func (ps *PubSub) cancelIntegration(ctx context.Context, ids ttnpb.ApplicationPubSubIdentifiers) error {
+func (ps *PubSub) stop(ctx context.Context, ids ttnpb.ApplicationPubSubIdentifiers) error {
 	appUID := unique.ID(ctx, ids.ApplicationIdentifiers)
 	psUID := pubsubunique.ID(appUID, ids.PubSubID)
 	if val, ok := ps.integrations.Load(psUID); ok {
@@ -287,7 +287,7 @@ func (ps *PubSub) cancelIntegration(ctx context.Context, ids ttnpb.ApplicationPu
 		log.FromContext(ctx).WithFields(log.Fields(
 			"application_uid", appUID,
 			"pubsub_id", ids.PubSubID,
-		)).Debug("Integration cancelled")
+		)).Debug("Integration canceled")
 		i.cancel(context.Canceled)
 	} else {
 		ps.integrationErrors.Delete(psUID)

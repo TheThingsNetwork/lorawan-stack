@@ -86,7 +86,7 @@ func (ps *PubSub) Set(ctx context.Context, req *ttnpb.SetApplicationPubSubReques
 	if err != nil {
 		return nil, err
 	}
-	if err := ps.cancelIntegration(ctx, req.ApplicationPubSubIdentifiers); err != nil && !errors.IsNotFound(err) {
+	if err := ps.stop(ctx, req.ApplicationPubSubIdentifiers); err != nil && !errors.IsNotFound(err) {
 		log.FromContext(ctx).WithError(err).Warn("Failed to cancel integration")
 	}
 	ps.startIntegrationTask(ps.ctx, req.ApplicationPubSubIdentifiers)
@@ -103,7 +103,7 @@ func (ps *PubSub) Delete(ctx context.Context, ids *ttnpb.ApplicationPubSubIdenti
 	if err := rights.RequireApplication(ctx, ids.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
 		return nil, err
 	}
-	if err := ps.cancelIntegration(ctx, *ids); err != nil {
+	if err := ps.stop(ctx, *ids); err != nil {
 		log.FromContext(ctx).WithError(err).Warn("Failed to cancel integration")
 	}
 	_, err := ps.registry.Set(ctx, *ids, nil,
