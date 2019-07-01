@@ -18,7 +18,7 @@ import sharedMessages from '../../../../lib/shared-messages'
 import api from '../../../api'
 import * as gateways from '../../actions/gateways'
 import { gsConfigSelector } from '../../../../lib/selectors/env'
-import { selectSelectedGateway } from '../../selectors/gateway'
+import { selectSelectedGateway } from '../../selectors/gateways'
 import createEventsConnectLogics from './events'
 import createRequestLogic from './lib'
 

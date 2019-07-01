@@ -32,7 +32,7 @@ import {
   selectGatewayUniversalRights,
   selectGatewayRightsFetching,
   selectGatewayRightsError,
-} from '../../store/selectors/gateway'
+} from '../../store/selectors/gateways'
 
 import { getGatewaysRightsList } from '../../store/actions/gateways'
 import api from '../../api'

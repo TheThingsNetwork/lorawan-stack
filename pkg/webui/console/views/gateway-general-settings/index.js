@@ -34,7 +34,7 @@ import diff from '../../../lib/diff'
 
 import { updateGateway } from '../../store/actions/gateways'
 import { getGatewayId } from '../../../lib/selectors/id'
-import { selectSelectedGateway } from '../../store/selectors/gateway'
+import { selectSelectedGateway } from '../../store/selectors/gateways'
 
 import api from '../../api'
 

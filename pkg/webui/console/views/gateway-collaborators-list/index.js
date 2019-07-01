@@ -22,7 +22,7 @@ import CollaboratorsTable from '../../containers/collaborators-table'
 import sharedMessages from '../../../lib/shared-messages'
 
 import { getGatewayCollaboratorsList } from '../../store/actions/gateways'
-import { selectSelectedGatewayId } from '../../store/selectors/gateway'
+import { selectSelectedGatewayId } from '../../store/selectors/gateways'
 
 const COLLABORATORS_TABLE_SIZE = 10
 

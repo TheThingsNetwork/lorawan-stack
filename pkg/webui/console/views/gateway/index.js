@@ -40,7 +40,7 @@ import {
   selectGatewayFetching,
   selectGatewayError,
   selectSelectedGateway,
-} from '../../store/selectors/gateway'
+} from '../../store/selectors/gateways'
 import withEnv, { EnvProvider } from '../../../lib/components/env'
 
 @connect(function (state, props) {

@@ -26,7 +26,7 @@ import {
 import {
   selectGatewayEvents,
   selectGatewayEventsStatus,
-} from '../../store/selectors/gateway'
+} from '../../store/selectors/gateways'
 
 @bind
 class GatewayEvents extends React.Component {

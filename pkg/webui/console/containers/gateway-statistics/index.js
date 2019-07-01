@@ -31,7 +31,7 @@ import {
   selectGatewayStatisticsError,
   selectGatewayStatisticsIsAvailable,
   selectGatewayStatisticsIsFetching,
-} from '../../store/selectors/gateway'
+} from '../../store/selectors/gateways'
 import {
   startGatewayStatistics,
   stopGatewayStatistics,

@@ -21,7 +21,7 @@ import ApiKeysTable from '../../containers/api-keys-table'
 import sharedMessages from '../../../lib/shared-messages'
 
 import { getGatewayApiKeysList } from '../../store/actions/gateways'
-import { selectGatewayApiKeysStore } from '../../store/selectors/gateway'
+import { selectGatewayApiKeysStore } from '../../store/selectors/gateways'
 
 const API_KEYS_TABLE_SIZE = 10
 
