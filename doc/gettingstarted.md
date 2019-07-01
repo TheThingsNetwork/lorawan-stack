@@ -525,8 +525,16 @@ This will create a webhook `wh1` for the application `app1` with JSON formatting
 
 >Note: You can also specify URL paths for downlink events, just like MQTT. See `ttn-lw-cli applications webhooks set --help` for more information.
 
-You can also send downlink messages using webhooks. The path is `/v3/api/as/applications/{application_id}/webhooks/{webhook_id}/devices/{device_id}/down/push` (or `/replace`). Pass the API key as
-bearer token on the `Authorization` header. For example:
+You can also send downlink messages using webhooks. The path is `/v3/api/as/applications/{application_id}/webhooks/{webhook_id}/devices/{device_id}/down/push` (or `/replace`). This requires an API key with traffic writing rights, which can be created as follows:
+
+```bash
+$ ttn-lw-cli applications api-keys create \
+  --name wh-client \
+  --application-id app1 \
+  --right-application-traffic-down-write
+```
+
+Pass the API key as bearer token on the `Authorization` header. For example:
 
 ```
 $ curl http://localhost:1885/api/v3/as/applications/app1/webhooks/wh1/devices/dev1/down/push \
