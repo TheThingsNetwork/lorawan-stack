@@ -1017,7 +1017,7 @@ func StartTest(t *testing.T, conf Config, timeout time.Duration) (*NetworkServer
 	env.Events = eventsCh
 
 	var closeFuncs []func()
-	closeFuncs = append(closeFuncs, events.SetDefaultPubSub(&test.MockEventPubSub{
+	closeFuncs = append(closeFuncs, test.SetDefaultEventsPubSub(&test.MockEventPubSub{
 		PublishFunc: test.MakeEventPubSubPublishChFunc(eventsCh),
 	}))
 	if conf.Devices == nil {
