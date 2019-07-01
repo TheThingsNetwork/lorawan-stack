@@ -25,12 +25,16 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io"
 	. "go.thethings.network/lorawan-stack/pkg/applicationserver/io/grpc"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/mock"
+	"go.thethings.network/lorawan-stack/pkg/component"
+	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/log"
+	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
+	"google.golang.org/grpc"
 )
 
 var (
@@ -38,15 +42,35 @@ var (
 	registeredApplicationUID = unique.ID(test.Context(), registeredApplicationID)
 	registeredApplicationKey = "test-key"
 
-	timeout = 10 * test.Delay
+	timeout = (1 << 6) * test.Delay
 )
 
 func TestAuthentication(t *testing.T) {
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
-	ctx = newContextWithRightsFetcher(ctx)
+
+	is, isAddr := startMockIS(ctx)
+	is.add(ctx, registeredApplicationID, registeredApplicationKey)
 
 	as := mock.NewServer()
+	c := component.MustNew(test.GetLogger(t), &component.Config{
+		ServiceBase: config.ServiceBase{
+			GRPC: config.GRPC{
+				Listen:                      ":0",
+				AllowInsecureForCredentials: true,
+			},
+			Cluster: config.Cluster{
+				IdentityServer: isAddr,
+			},
+		},
+	})
 	srv := New(as)
+	c.RegisterGRPC(&mockRegisterer{ctx, srv})
+	test.Must(nil, c.Start())
+	defer c.Close()
+
+	mustHavePeer(ctx, c, ttnpb.PeerInfo_ENTITY_REGISTRY)
+
+	client := ttnpb.NewAppAsClient(c.LoopbackConn())
 
 	for _, tc := range []struct {
 		ID  ttnpb.ApplicationIdentifiers
@@ -72,21 +96,21 @@ func TestAuthentication(t *testing.T) {
 		t.Run(fmt.Sprintf("%v:%v", tc.ID.ApplicationID, tc.Key), func(t *testing.T) {
 			a := assertions.New(t)
 
-			ctx, cancelCtx := context.WithCancel(ctx)
-			stream := &mockAppAsLinkServerStream{
-				MockServerStream: &test.MockServerStream{
-					MockStream: &test.MockStream{
-						ContextFunc: contextWithKey(ctx, tc.Key),
-					},
-				},
-			}
+			ctx, cancel := context.WithTimeout(ctx, timeout)
+			defer cancel()
+
+			creds := grpc.PerRPCCredentials(rpcmetadata.MD{
+				AuthType:      "Bearer",
+				AuthValue:     tc.Key,
+				AllowInsecure: true,
+			})
 
 			wg := sync.WaitGroup{}
 			wg.Add(1)
 			go func() {
 				defer wg.Done()
-				err := srv.Subscribe(&tc.ID, stream)
-				if tc.OK && !a.So(errors.IsCanceled(err), should.BeTrue) {
+				_, err := client.Subscribe(ctx, &tc.ID, creds)
+				if tc.OK && err != nil && !a.So(errors.IsCanceled(err), should.BeTrue) {
 					t.Fatalf("Unexpected link error: %v", err)
 				}
 				if !tc.OK && !a.So(errors.IsCanceled(err), should.BeFalse) {
@@ -94,42 +118,74 @@ func TestAuthentication(t *testing.T) {
 				}
 			}()
 
-			cancelCtx()
 			wg.Wait()
 		})
 	}
+}
+
+type erroredApplicationUp struct {
+	*ttnpb.ApplicationUp
+	error
 }
 
 func TestTraffic(t *testing.T) {
 	a := assertions.New(t)
 
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
-	ctx = newContextWithRightsFetcher(ctx)
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	is, isAddr := startMockIS(ctx)
+	is.add(ctx, registeredApplicationID, registeredApplicationKey)
 
 	as := mock.NewServer()
-	srv := New(as)
-
-	upCh := make(chan *ttnpb.ApplicationUp)
-
-	stream := &mockAppAsLinkServerStream{
-		MockServerStream: &test.MockServerStream{
-			MockStream: &test.MockStream{
-				ContextFunc: contextWithKey(ctx, registeredApplicationKey),
+	c := component.MustNew(test.GetLogger(t), &component.Config{
+		ServiceBase: config.ServiceBase{
+			GRPC: config.GRPC{
+				Listen:                      ":0",
+				AllowInsecureForCredentials: true,
+			},
+			Cluster: config.Cluster{
+				IdentityServer: isAddr,
 			},
 		},
-		SendFunc: func(up *ttnpb.ApplicationUp) error {
-			upCh <- up
-			return nil
-		},
-	}
+	})
+	srv := New(as)
+	c.RegisterGRPC(&mockRegisterer{ctx, srv})
+	test.Must(nil, c.Start())
+	defer c.Close()
 
-	go func() {
-		if err := srv.Subscribe(&registeredApplicationID, stream); err != nil {
+	mustHavePeer(ctx, c, ttnpb.PeerInfo_ENTITY_REGISTRY)
+
+	client := ttnpb.NewAppAsClient(c.LoopbackConn())
+
+	creds := grpc.PerRPCCredentials(rpcmetadata.MD{
+		AuthType:      "Bearer",
+		AuthValue:     registeredApplicationKey,
+		AllowInsecure: true,
+	})
+	badCreds := grpc.PerRPCCredentials(rpcmetadata.MD{
+		AuthType:      "Bearer",
+		AuthValue:     "barfoo",
+		AllowInsecure: true,
+	})
+
+	upCh := make(chan erroredApplicationUp, 10)
+	{
+		var sub ttnpb.AppAs_SubscribeClient
+		var err error
+		if sub, err = client.Subscribe(ctx, &registeredApplicationID, creds); err != nil {
 			if !a.So(errors.IsCanceled(err), should.BeTrue) {
 				t.FailNow()
 			}
 		}
-	}()
+		go func() {
+			for ctx.Err() == nil {
+				up, err := sub.Recv()
+				upCh <- erroredApplicationUp{up, err}
+			}
+		}()
+	}
 
 	var sub *io.Subscription
 	select {
@@ -158,7 +214,8 @@ func TestTraffic(t *testing.T) {
 
 		select {
 		case actual := <-upCh:
-			a.So(actual, should.Resemble, up)
+			a.So(actual.ApplicationUp, should.Resemble, up)
+			a.So(actual.error, should.BeNil)
 		case <-time.After(timeout):
 			t.Fatal("Receive expected upstream message timeout")
 		}
@@ -173,20 +230,20 @@ func TestTraffic(t *testing.T) {
 
 		// List: unauthorized.
 		{
-			_, err := srv.DownlinkQueueList(ctx, &ids)
+			_, err := client.DownlinkQueueList(ctx, &ids, badCreds)
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
 
 		// List: happy flow; no items.
 		{
-			res, err := srv.DownlinkQueueList(contextWithKey(ctx, registeredApplicationKey)(), &ids)
+			res, err := client.DownlinkQueueList(ctx, &ids, creds)
 			a.So(err, should.BeNil)
 			a.So(res.Downlinks, should.HaveLength, 0)
 		}
 
 		// Push: unauthorized.
 		{
-			_, err := srv.DownlinkQueuePush(ctx, &ttnpb.DownlinkQueueRequest{
+			_, err := client.DownlinkQueuePush(ctx, &ttnpb.DownlinkQueueRequest{
 				EndDeviceIdentifiers: ids,
 				Downlinks: []*ttnpb.ApplicationDownlink{
 					{
@@ -194,13 +251,13 @@ func TestTraffic(t *testing.T) {
 						FRMPayload: []byte{0x01, 0x01, 0x01},
 					},
 				},
-			})
+			}, badCreds)
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
 
 		// Push and assert content: happy flow.
 		{
-			_, err := srv.DownlinkQueuePush(contextWithKey(ctx, registeredApplicationKey)(), &ttnpb.DownlinkQueueRequest{
+			_, err := client.DownlinkQueuePush(ctx, &ttnpb.DownlinkQueueRequest{
 				EndDeviceIdentifiers: ids,
 				Downlinks: []*ttnpb.ApplicationDownlink{
 					{
@@ -216,11 +273,11 @@ func TestTraffic(t *testing.T) {
 						FRMPayload: []byte{0x02, 0x02, 0x02},
 					},
 				},
-			})
+			}, creds)
 			a.So(err, should.BeNil)
 		}
 		{
-			_, err := srv.DownlinkQueuePush(contextWithKey(ctx, registeredApplicationKey)(), &ttnpb.DownlinkQueueRequest{
+			_, err := client.DownlinkQueuePush(ctx, &ttnpb.DownlinkQueueRequest{
 				EndDeviceIdentifiers: ids,
 				Downlinks: []*ttnpb.ApplicationDownlink{
 					{
@@ -228,11 +285,11 @@ func TestTraffic(t *testing.T) {
 						FRMPayload: []byte{0x03, 0x03, 0x03},
 					},
 				},
-			})
+			}, creds)
 			a.So(err, should.BeNil)
 		}
 		{
-			res, err := srv.DownlinkQueueList(contextWithKey(ctx, registeredApplicationKey)(), &ids)
+			res, err := client.DownlinkQueueList(ctx, &ids, creds)
 			a.So(err, should.BeNil)
 			a.So(res.Downlinks, should.HaveLength, 3)
 			a.So(res.Downlinks, should.Resemble, []*ttnpb.ApplicationDownlink{
@@ -255,7 +312,7 @@ func TestTraffic(t *testing.T) {
 
 		// Replace: unauthorized.
 		{
-			_, err := srv.DownlinkQueueReplace(ctx, &ttnpb.DownlinkQueueRequest{
+			_, err := client.DownlinkQueueReplace(ctx, &ttnpb.DownlinkQueueRequest{
 				EndDeviceIdentifiers: ids,
 				Downlinks: []*ttnpb.ApplicationDownlink{
 					{
@@ -263,13 +320,13 @@ func TestTraffic(t *testing.T) {
 						FRMPayload: []byte{0x04, 0x04, 0x04},
 					},
 				},
-			})
+			}, badCreds)
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
 
 		// Replace and assert content: happy flow.
 		{
-			_, err := srv.DownlinkQueueReplace(contextWithKey(ctx, registeredApplicationKey)(), &ttnpb.DownlinkQueueRequest{
+			_, err := client.DownlinkQueueReplace(ctx, &ttnpb.DownlinkQueueRequest{
 				EndDeviceIdentifiers: ids,
 				Downlinks: []*ttnpb.ApplicationDownlink{
 					{
@@ -279,11 +336,11 @@ func TestTraffic(t *testing.T) {
 						Confirmed:  true,
 					},
 				},
-			})
+			}, creds)
 			a.So(err, should.BeNil)
 		}
 		{
-			res, err := srv.DownlinkQueueList(contextWithKey(ctx, registeredApplicationKey)(), &ids)
+			res, err := client.DownlinkQueueList(ctx, &ids, creds)
 			a.So(err, should.BeNil)
 			a.So(res.Downlinks, should.HaveLength, 1)
 			a.So(res.Downlinks, should.Resemble, []*ttnpb.ApplicationDownlink{
