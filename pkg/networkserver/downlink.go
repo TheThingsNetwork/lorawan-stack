@@ -566,12 +566,32 @@ func downlinkPathsFromRecentUplinks(ups ...*ttnpb.UplinkMessage) []downlinkPath 
 	return nil
 }
 
+type scheduledDownlink struct {
+	Message    *ttnpb.DownlinkMessage
+	TransmitAt time.Time
+}
+
+type downlinkSchedulingError []error
+
+func (errs downlinkSchedulingError) IsRetryable() bool {
+	for _, err := range errs {
+		if !errors.IsResourceExhausted(err) && !errors.IsFailedPrecondition(err) && !errors.IsAborted(err) {
+			return true
+		}
+	}
+	return false
+}
+
+func (errs downlinkSchedulingError) Error() string {
+	return errSchedule.Error()
+}
+
 // scheduleDownlinkByPaths attempts to schedule payload b using parameters in req using paths.
 // scheduleDownlinkByPaths discards req.DownlinkPaths and mutates it arbitrarily.
 // scheduleDownlinkByPaths returns the scheduled downlink or error.
-func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *ttnpb.TxRequest, b []byte, paths ...downlinkPath) (*ttnpb.DownlinkMessage, time.Time, error) {
+func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *ttnpb.TxRequest, b []byte, paths ...downlinkPath) (*scheduledDownlink, error) {
 	if len(paths) == 0 {
-		return nil, time.Time{}, errNoPath
+		return nil, errNoPath
 	}
 
 	logger := log.FromContext(ctx)
@@ -624,16 +644,12 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *ttnpb
 			continue
 		}
 		logger.WithField("delay", res.Delay).Debug("Scheduled downlink")
-		return down, time.Now().Add(res.Delay), nil
+		return &scheduledDownlink{
+			Message:    down,
+			TransmitAt: time.Now().Add(res.Delay),
+		}, nil
 	}
-
-	for i, err := range errs {
-		logger = logger.WithField(
-			fmt.Sprintf("error_%d", i), err,
-		)
-	}
-	logger.Warn("All Gateway Servers failed to schedule downlink")
-	return nil, time.Time{}, errSchedule
+	return nil, downlinkSchedulingError(errs)
 }
 
 func loggerWithTxRequestFields(logger log.Interface, req *ttnpb.TxRequest, rx1, rx2 bool) log.Interface {
@@ -774,7 +790,21 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					if len(sets) == 0 {
 						setDev = dev
 					}
+					schedulingErr, isSchedulingError := err.(downlinkSchedulingError)
 					switch {
+					case isSchedulingError:
+						retryable := schedulingErr.IsRetryable()
+						logger.WithFields(log.Fields(
+							"attempts", len(schedulingErr),
+							"retryable", retryable,
+						)).Warn("All Gateway Servers failed to schedule downlink")
+						if retryable {
+							nextDownlinkAt = time.Now().Add(downlinkRetryInterval)
+						} else {
+							nextDownlinkAt = time.Time{}
+						}
+						err = nil
+
 					case errors.Resemble(err, errUplinkNotFound):
 						logger.Warn("Uplink preceding downlink not found, skip downlink slot")
 						nextDownlinkAt = time.Time{}
@@ -821,11 +851,6 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						logger.Debug("Confirmed downlink scheduled too soon, skip downlink slot")
 						nextDownlinkAt = dev.MACState.LastConfirmedDownlinkAt.Add(deviceClassCTimeout(dev, ns.defaultMACSettings))
 						err = nil
-
-					case errors.Resemble(err, errSchedule):
-						// NOTE: The error is already logged.
-						nextDownlinkAt = time.Now().Add(downlinkRetryInterval)
-						err = nil
 					}
 				}()
 
@@ -860,7 +885,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					}
 					req.Priority = ns.downlinkPriorities.JoinAccept
 
-					down, _, err := ns.scheduleDownlinkByPaths(
+					down, err := ns.scheduleDownlinkByPaths(
 						log.NewContext(ctx, loggerWithTxRequestFields(logger, req, rx1, rx2).WithFields(log.Fields(
 							"downlink_type", "join-accept",
 							"rx1_delay", req.Rx1Delay,
@@ -880,7 +905,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					dev.PendingMACState.PendingJoinRequest = &dev.PendingMACState.QueuedJoinAccept.Request
 					dev.PendingMACState.QueuedJoinAccept = nil
 					dev.PendingMACState.RxWindowsAvailable = false
-					dev.RecentDownlinks = appendRecentDownlink(dev.RecentDownlinks, down, recentDownlinkCount)
+					dev.RecentDownlinks = appendRecentDownlink(dev.RecentDownlinks, down.Message, recentDownlinkCount)
 					return dev, []string{
 						"pending_mac_state.pending_join_request",
 						"pending_mac_state.queued_join_accept",
@@ -977,7 +1002,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						}
 						req.Priority = genDown.Priority
 
-						down, downAt, err := ns.scheduleDownlinkByPaths(
+						down, err := ns.scheduleDownlinkByPaths(
 							log.NewContext(ctx, loggerWithTxRequestFields(logger, req, rx1, rx2).WithFields(log.Fields(
 								"downlink_type", "data",
 								"rx1_delay", req.Rx1Delay,
@@ -990,10 +1015,10 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 							return dev, sets, err
 						}
 						if genDown.NeedsAck {
-							dev.MACState.LastConfirmedDownlinkAt = timePtr(downAt)
+							dev.MACState.LastConfirmedDownlinkAt = timePtr(down.TransmitAt)
 						}
 						dev.MACState.RxWindowsAvailable = false
-						dev.RecentDownlinks = appendRecentDownlink(dev.RecentDownlinks, down, recentDownlinkCount)
+						dev.RecentDownlinks = appendRecentDownlink(dev.RecentDownlinks, down.Message, recentDownlinkCount)
 						queuedEvents = append(queuedEvents, genState.Events...)
 						return dev, []string{
 							"mac_state",
@@ -1043,7 +1068,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						}
 						req.Priority = genDown.Priority
 
-						down, downAt, err := ns.scheduleDownlinkByPaths(
+						down, err := ns.scheduleDownlinkByPaths(
 							log.NewContext(ctx, loggerWithTxRequestFields(logger, req, true, false).WithFields(log.Fields(
 								"downlink_type", "data",
 								"rx1_delay", req.Rx1Delay,
@@ -1059,21 +1084,21 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						}
 
 						if genDown.NeedsAck {
-							dev.MACState.LastConfirmedDownlinkAt = timePtr(downAt)
+							dev.MACState.LastConfirmedDownlinkAt = timePtr(down.TransmitAt)
 						}
 						if dev.MACState.DeviceClass == ttnpb.CLASS_C {
 							var nextConfirmedAt time.Time
 							if dev.MACState.LastConfirmedDownlinkAt != nil {
 								nextConfirmedAt = dev.MACState.LastConfirmedDownlinkAt.Add(deviceClassCTimeout(dev, ns.defaultMACSettings))
 							}
-							if nextConfirmedAt.After(downAt) {
+							if nextConfirmedAt.After(down.TransmitAt) {
 								nextDownlinkAt = nextConfirmedAt
 							} else {
-								nextDownlinkAt = downAt.Add(dev.MACState.CurrentParameters.Rx1Delay.Duration())
+								nextDownlinkAt = down.TransmitAt.Add(dev.MACState.CurrentParameters.Rx1Delay.Duration())
 							}
 						}
 						dev.MACState.RxWindowsAvailable = false
-						dev.RecentDownlinks = appendRecentDownlink(dev.RecentDownlinks, down, recentDownlinkCount)
+						dev.RecentDownlinks = appendRecentDownlink(dev.RecentDownlinks, down.Message, recentDownlinkCount)
 						queuedApplicationUplinks = genState.appendApplicationUplinks(queuedApplicationUplinks, true)
 						queuedEvents = append(queuedEvents, genState.Events...)
 						return dev, []string{
@@ -1142,7 +1167,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					req.AbsoluteTime = absTime
 				}
 
-				down, downAt, err := ns.scheduleDownlinkByPaths(
+				down, err := ns.scheduleDownlinkByPaths(
 					log.NewContext(ctx, loggerWithTxRequestFields(logger, req, false, true).WithFields(log.Fields(
 						"downlink_type", "data",
 					))),
@@ -1155,21 +1180,21 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 				}
 
 				if genDown.NeedsAck {
-					dev.MACState.LastConfirmedDownlinkAt = timePtr(downAt)
+					dev.MACState.LastConfirmedDownlinkAt = timePtr(down.TransmitAt)
 				}
 				if dev.MACState.DeviceClass == ttnpb.CLASS_C {
 					var nextConfirmedAt time.Time
 					if dev.MACState.LastConfirmedDownlinkAt != nil {
 						nextConfirmedAt = dev.MACState.LastConfirmedDownlinkAt.Add(deviceClassCTimeout(dev, ns.defaultMACSettings))
 					}
-					if nextConfirmedAt.After(downAt) {
+					if nextConfirmedAt.After(down.TransmitAt) {
 						nextDownlinkAt = nextConfirmedAt
 					} else {
-						nextDownlinkAt = downAt.Add(dev.MACState.CurrentParameters.Rx1Delay.Duration())
+						nextDownlinkAt = down.TransmitAt.Add(dev.MACState.CurrentParameters.Rx1Delay.Duration())
 					}
 				}
 				dev.MACState.RxWindowsAvailable = false
-				dev.RecentDownlinks = appendRecentDownlink(dev.RecentDownlinks, down, recentDownlinkCount)
+				dev.RecentDownlinks = appendRecentDownlink(dev.RecentDownlinks, down.Message, recentDownlinkCount)
 				queuedEvents = append(queuedEvents, genState.Events...)
 				return dev, []string{
 					"mac_state",
