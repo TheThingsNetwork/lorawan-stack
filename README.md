@@ -51,7 +51,7 @@ LoRaWAN is a protocol for low-power wide area networks. It allows for large scal
 
 You want to **install the stack**? Fantastic! Here's the [Getting Started guide](./doc/gettingstarted.md).
 
-Do you want to **set op a local development environment**? See the [DEVELOPMENT.md](DEVELOPMENT.md) for instructions.
+Do you want to **set up a local development environment**? See the [DEVELOPMENT.md](DEVELOPMENT.md) for instructions.
 
 Do you want to **contribute to the stack**? Your contributions are welcome! See the guidelines in [CONTRIBUTING.md](CONTRIBUTING.md).
 
@@ -72,6 +72,6 @@ You can find the releases and their notes on the [Releases page](https://github.
 
 ## Support
 
-- The [forums](https://www.thethingsnetwork.org/forum) contain a massive amount of information and has great search
+- The [forum](https://www.thethingsnetwork.org/forum) contains a large amount of information and has great search support.
 - You can chat in the [#lorawan-stack channel on Slack](https://thethingsnetwork.slack.com/messages/CFVF7R4AH/). If you don't have a Slack account yet, you can create one by going to [ttn.fyi/slack-invite](https://ttn.fyi/slack-invite).
-- Hosted solutions, as well as commercial support and consultancy are offered by [The Things Industries](https://www.thethingsindustries.com)
+- Hosted solutions, as well as commercial support and consultancy are offered by [The Things Industries](https://www.thethingsindustries.com).
