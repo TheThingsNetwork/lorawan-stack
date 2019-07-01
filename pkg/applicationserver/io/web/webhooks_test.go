@@ -26,6 +26,7 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/formatters"
+	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/mock"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/web"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/web/redis"
 	"go.thethings.network/lorawan-stack/pkg/component"
@@ -321,24 +322,35 @@ func TestWebhooks(t *testing.T) {
 	})
 
 	t.Run("Downstream", func(t *testing.T) {
+		is, isAddr := startMockIS(ctx)
+		is.add(ctx, registeredApplicationID, registeredApplicationKey)
 		httpAddress := "0.0.0.0:8098"
-		testSink := &mockSink{
-			FillContextFunc: func(ctx context.Context) context.Context {
-				return newContextWithRightsFetcher(ctx)
-			},
-		}
-		w := web.NewWebhooks(ctx, testSink, registry, testSink)
 		conf := &component.Config{
 			ServiceBase: config.ServiceBase{
+				GRPC: config.GRPC{
+					Listen:                      ":0",
+					AllowInsecureForCredentials: true,
+				},
+				Cluster: config.Cluster{
+					IdentityServer: isAddr,
+				},
 				HTTP: config.HTTP{
 					Listen: httpAddress,
 				},
 			},
 		}
 		c := component.MustNew(test.GetLogger(t), conf)
+		io := mock.NewServer()
+		testSink := &mockSink{
+			Component: c,
+			Server:    io,
+		}
+		w := web.NewWebhooks(ctx, testSink, registry, testSink)
 		c.RegisterWeb(w)
 		test.Must(nil, c.Start())
 		defer c.Close()
+
+		mustHavePeer(ctx, c, ttnpb.PeerInfo_ENTITY_REGISTRY)
 
 		t.Run("Authorization", func(t *testing.T) {
 			for _, tc := range []struct {
@@ -383,6 +395,11 @@ func TestWebhooks(t *testing.T) {
 						t.FailNow()
 					}
 					a.So(res.StatusCode, should.Equal, tc.ExpectCode)
+					downlinks, err := io.DownlinkQueueList(ctx, registeredDeviceID)
+					if !a.So(err, should.BeNil) {
+						t.FailNow()
+					}
+					a.So(downlinks, should.Resemble, []*ttnpb.ApplicationDownlink{})
 				})
 			}
 		})
@@ -390,27 +407,16 @@ func TestWebhooks(t *testing.T) {
 }
 
 type mockSink struct {
+	*component.Component
 	io.Server
-	ch              chan *http.Request
-	FillContextFunc func(context.Context) context.Context
+	ch chan *http.Request
 }
 
 func (s *mockSink) FillContext(ctx context.Context) context.Context {
-	if s.FillContextFunc == nil {
-		panic("FillContext should not be called")
-	}
-	return s.FillContextFunc(ctx)
+	return s.Component.FillContext(ctx)
 }
 
 func (s *mockSink) Process(req *http.Request) error {
 	s.ch <- req
-	return nil
-}
-
-func (s *mockSink) DownlinkQueuePush(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, items []*ttnpb.ApplicationDownlink) error {
-	return nil
-}
-
-func (s *mockSink) DownlinkQueueReplace(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, items []*ttnpb.ApplicationDownlink) error {
 	return nil
 }

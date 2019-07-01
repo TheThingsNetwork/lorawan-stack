@@ -21,25 +21,54 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/web"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/web/redis"
+	"go.thethings.network/lorawan-stack/pkg/component"
+	"go.thethings.network/lorawan-stack/pkg/config"
+	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
+	"google.golang.org/grpc"
 )
 
 func TestWebhookRegistryRPC(t *testing.T) {
 	a := assertions.New(t)
-	ctx := newContextWithRightsFetcher(test.Context())
+	ctx := test.Context()
 
+	is, isAddr := startMockIS(ctx)
+	is.add(ctx, registeredApplicationID, registeredApplicationKey)
+
+	c := component.MustNew(test.GetLogger(t), &component.Config{
+		ServiceBase: config.ServiceBase{
+			GRPC: config.GRPC{
+				Listen:                      ":0",
+				AllowInsecureForCredentials: true,
+			},
+			Cluster: config.Cluster{
+				IdentityServer: isAddr,
+			},
+		},
+	})
 	redisClient, flush := test.NewRedis(t, "applicationserver_test")
 	defer flush()
 	defer redisClient.Close()
 	webhookReg := &redis.WebhookRegistry{Redis: redisClient}
 	srv := web.NewWebhookRegistryRPC(webhookReg)
-	authorizedCtx := contextWithKey(ctx, registeredApplicationKey)
+	c.RegisterGRPC(&mockRegisterer{ctx, srv})
+	test.Must(nil, c.Start())
+	defer c.Close()
+
+	mustHavePeer(ctx, c, ttnpb.PeerInfo_ENTITY_REGISTRY)
+
+	client := ttnpb.NewApplicationWebhookRegistryClient(c.LoopbackConn())
+	creds := grpc.PerRPCCredentials(rpcmetadata.MD{
+		AuthType:      "Bearer",
+		AuthValue:     registeredApplicationKey,
+		AllowInsecure: true,
+	})
 
 	// Formats.
 	{
-		res, err := srv.GetFormats(authorizedCtx, ttnpb.Empty)
+		res, err := client.GetFormats(ctx, ttnpb.Empty, creds)
 		a.So(err, should.BeNil)
 		a.So(res.Formats, should.HaveSameElementsDeep, map[string]string{
 			"json":     "JSON",
@@ -49,19 +78,19 @@ func TestWebhookRegistryRPC(t *testing.T) {
 
 	// Check empty.
 	{
-		res, err := srv.List(authorizedCtx, &ttnpb.ListApplicationWebhooksRequest{
+		res, err := client.List(ctx, &ttnpb.ListApplicationWebhooksRequest{
 			ApplicationIdentifiers: registeredApplicationID,
 			FieldMask: pbtypes.FieldMask{
 				Paths: []string{"base_url"},
 			},
-		})
+		}, creds)
 		a.So(err, should.BeNil)
 		a.So(res.Webhooks, should.BeEmpty)
 	}
 
 	// Add.
 	{
-		_, err := srv.Set(authorizedCtx, &ttnpb.SetApplicationWebhookRequest{
+		_, err := client.Set(ctx, &ttnpb.SetApplicationWebhookRequest{
 			ApplicationWebhook: ttnpb.ApplicationWebhook{
 				ApplicationWebhookIdentifiers: ttnpb.ApplicationWebhookIdentifiers{
 					ApplicationIdentifiers: registeredApplicationID,
@@ -72,18 +101,18 @@ func TestWebhookRegistryRPC(t *testing.T) {
 			FieldMask: pbtypes.FieldMask{
 				Paths: []string{"base_url"},
 			},
-		})
+		}, creds)
 		a.So(err, should.BeNil)
 	}
 
 	// List; assert one.
 	{
-		res, err := srv.List(authorizedCtx, &ttnpb.ListApplicationWebhooksRequest{
+		res, err := client.List(ctx, &ttnpb.ListApplicationWebhooksRequest{
 			ApplicationIdentifiers: registeredApplicationID,
 			FieldMask: pbtypes.FieldMask{
 				Paths: []string{"base_url"},
 			},
-		})
+		}, creds)
 		a.So(err, should.BeNil)
 		a.So(res.Webhooks, should.HaveLength, 1)
 		a.So(res.Webhooks[0].BaseURL, should.Equal, "http://localhost/test")
@@ -91,7 +120,7 @@ func TestWebhookRegistryRPC(t *testing.T) {
 
 	// Get.
 	{
-		res, err := srv.Get(authorizedCtx, &ttnpb.GetApplicationWebhookRequest{
+		res, err := client.Get(ctx, &ttnpb.GetApplicationWebhookRequest{
 			ApplicationWebhookIdentifiers: ttnpb.ApplicationWebhookIdentifiers{
 				ApplicationIdentifiers: registeredApplicationID,
 				WebhookID:              registeredWebhookID,
@@ -99,28 +128,28 @@ func TestWebhookRegistryRPC(t *testing.T) {
 			FieldMask: pbtypes.FieldMask{
 				Paths: []string{"base_url"},
 			},
-		})
+		}, creds)
 		a.So(err, should.BeNil)
 		a.So(res.BaseURL, should.Equal, "http://localhost/test")
 	}
 
 	// Delete.
 	{
-		_, err := srv.Delete(authorizedCtx, &ttnpb.ApplicationWebhookIdentifiers{
+		_, err := client.Delete(ctx, &ttnpb.ApplicationWebhookIdentifiers{
 			ApplicationIdentifiers: registeredApplicationID,
 			WebhookID:              registeredWebhookID,
-		})
+		}, creds)
 		a.So(err, should.BeNil)
 	}
 
 	// Check empty.
 	{
-		res, err := srv.List(authorizedCtx, &ttnpb.ListApplicationWebhooksRequest{
+		res, err := client.List(ctx, &ttnpb.ListApplicationWebhooksRequest{
 			ApplicationIdentifiers: registeredApplicationID,
 			FieldMask: pbtypes.FieldMask{
 				Paths: []string{"base_url"},
 			},
-		})
+		}, creds)
 		a.So(err, should.BeNil)
 		a.So(res.Webhooks, should.BeEmpty)
 	}
