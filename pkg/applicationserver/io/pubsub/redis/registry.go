@@ -20,7 +20,7 @@ import (
 
 	"github.com/go-redis/redis"
 	"github.com/gogo/protobuf/proto"
-	pubsubunique "go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/unique"
+	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	ttnredis "go.thethings.network/lorawan-stack/pkg/redis"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -89,7 +89,7 @@ func (r PubSubRegistry) Range(ctx context.Context, paths []string, f func(contex
 		return err
 	}
 	for _, uid := range uids {
-		appUID, psID := pubsubunique.ToUIDs(uid)
+		appUID, psID := pubsub.SplitPubSubUID(uid)
 		ctx, err := unique.WithContext(ctx, appUID)
 		if err != nil {
 			return errApplicationUID.WithCause(err).WithAttributes("application_uid", appUID, "pubsub_id", psID)
@@ -184,7 +184,7 @@ func (r PubSubRegistry) Set(ctx context.Context, ids ttnpb.ApplicationPubSubIden
 			pipelined = func(p redis.Pipeliner) error {
 				p.Del(ik)
 				p.SRem(r.appKey(appUID), stored.PubSubID)
-				p.SRem(r.allKey(ctx), pubsubunique.ID(appUID, stored.PubSubID))
+				p.SRem(r.allKey(ctx), pubsub.PubSubUID(appUID, stored.PubSubID))
 				return nil
 			}
 		} else {
@@ -240,7 +240,7 @@ func (r PubSubRegistry) Set(ctx context.Context, ids ttnpb.ApplicationPubSubIden
 					return err
 				}
 				p.SAdd(r.appKey(appUID), updated.PubSubID)
-				p.SAdd(r.allKey(ctx), pubsubunique.ID(appUID, updated.PubSubID))
+				p.SAdd(r.allKey(ctx), pubsub.PubSubUID(appUID, updated.PubSubID))
 				return nil
 			}
 

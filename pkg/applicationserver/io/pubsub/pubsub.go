@@ -22,7 +22,6 @@ import (
 
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/provider"
-	pubsubunique "go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/unique"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errorcontext"
@@ -216,7 +215,7 @@ var errAlreadyConfigured = errors.DefineAlreadyExists("already_configured", "alr
 
 func (ps *PubSub) start(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err error) {
 	appUID := unique.ID(ctx, pb.ApplicationIdentifiers)
-	psUID := pubsubunique.ID(appUID, pb.PubSubID)
+	psUID := PubSubUID(appUID, pb.PubSubID)
 	ctx = log.NewContextWithFields(ctx, log.Fields(
 		"application_uid", appUID,
 		"pubsub_id", pb.PubSubID,
@@ -281,7 +280,7 @@ func (ps *PubSub) start(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err e
 
 func (ps *PubSub) stop(ctx context.Context, ids ttnpb.ApplicationPubSubIdentifiers) error {
 	appUID := unique.ID(ctx, ids.ApplicationIdentifiers)
-	psUID := pubsubunique.ID(appUID, ids.PubSubID)
+	psUID := PubSubUID(appUID, ids.PubSubID)
 	if val, ok := ps.integrations.Load(psUID); ok {
 		i := val.(*integration)
 		log.FromContext(ctx).WithFields(log.Fields(
