@@ -56,6 +56,12 @@ const headers = [
 @bind
 export default class ApplicationsTable extends Component {
 
+  constructor (props) {
+    super(props)
+
+    this.getApplicationsList = params => getApplicationsList(params, [ 'description' ])
+  }
+
   baseDataSelector (state) {
     return {
       applications: selectApplications(state),
@@ -72,8 +78,8 @@ export default class ApplicationsTable extends Component {
         headers={headers}
         addMessage={sharedMessages.addApplication}
         tableTitle={this.tableTitle}
-        getItemsAction={getApplicationsList}
-        searchItemsAction={getApplicationsList}
+        getItemsAction={this.getApplicationsList}
+        searchItemsAction={this.getApplicationsList}
         tabs={tabs}
         baseDataSelector={this.baseDataSelector}
         {...this.props}
