@@ -20,19 +20,9 @@ import (
 
 	"github.com/nats-io/go-nats"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/provider"
-	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"gocloud.dev/pubsub"
 	"gocloud.dev/pubsub/natspubsub"
-)
-
-const (
-	// NATSServerAttribute is the server URL for the NATS server.
-	NATSServerAttribute = "nats-server"
-)
-
-var (
-	errAttributeNotFound = errors.DefineNotFound("attribute_not_found", "attribute `{attribute}` not found")
 )
 
 type impl struct {
@@ -50,13 +40,11 @@ func (c *connection) Shutdown(_ context.Context) error {
 
 // OpenConnection implements provider.Provider using the natspubsub package.
 func (impl) OpenConnection(ctx context.Context, pb *ttnpb.ApplicationPubSub) (pc *provider.Connection, err error) {
-	var serverURL string
-	var ok bool
-	if serverURL, ok = pb.Attributes[NATSServerAttribute]; !ok {
-		return nil, errAttributeNotFound.WithAttributes("attribute", NATSServerAttribute)
+	if _, ok := pb.Provider.(*ttnpb.ApplicationPubSub_NATS); !ok {
+		panic("wrong provider type provided to OpenConnection")
 	}
 	var conn *nats.Conn
-	if conn, err = nats.Connect(serverURL); err != nil {
+	if conn, err = nats.Connect(pb.GetNATS().GetServerURL()); err != nil {
 		return nil, err
 	}
 	pc = &provider.Connection{
@@ -136,5 +124,5 @@ func (impl) OpenConnection(ctx context.Context, pb *ttnpb.ApplicationPubSub) (pc
 }
 
 func init() {
-	provider.RegisterProvider(ttnpb.ApplicationPubSub_NATS, impl{})
+	provider.RegisterProvider(&ttnpb.ApplicationPubSub_NATS{}, impl{})
 }

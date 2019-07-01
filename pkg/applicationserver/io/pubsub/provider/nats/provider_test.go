@@ -24,7 +24,6 @@ import (
 	nats_client "github.com/nats-io/nats.go"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/provider"
-	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/provider/nats"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
@@ -54,8 +53,10 @@ func TestOpenConnection(t *testing.T) {
 			},
 			PubSubID: "ps1",
 		},
-		Attributes: map[string]string{},
-		BaseTopic:  "app1.ps1",
+		Provider: &ttnpb.ApplicationPubSub_NATS{
+			NATS: nil,
+		},
+		BaseTopic: "app1.ps1",
 		DownlinkPush: &ttnpb.ApplicationPubSub_Message{
 			Topic: "downlink.push",
 		},
@@ -88,7 +89,7 @@ func TestOpenConnection(t *testing.T) {
 		},
 	}
 
-	impl, err := provider.GetProvider(ttnpb.ApplicationPubSub_NATS)
+	impl, err := provider.GetProvider(&ttnpb.ApplicationPubSub_NATS{})
 	a.So(impl, should.NotBeNil)
 	a.So(err, should.BeNil)
 
@@ -99,7 +100,11 @@ func TestOpenConnection(t *testing.T) {
 		a.So(err, should.NotBeNil)
 	}
 
-	pb.Attributes[nats.NATSServerAttribute] = "nats://localhost:4123"
+	pb.Provider = &ttnpb.ApplicationPubSub_NATS{
+		NATS: &ttnpb.ApplicationPubSub_NATSProvider{
+			ServerURL: "nats://localhost:4123",
+		},
+	}
 
 	// Valid attributes - connection established.
 	{

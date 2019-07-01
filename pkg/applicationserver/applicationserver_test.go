@@ -32,7 +32,6 @@ import (
 	nats_client "github.com/nats-io/nats.go"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver"
-	nats_provider "go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/provider/nats"
 	iopubsubredis "go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/redis"
 	iowebredis "go.thethings.network/lorawan-stack/pkg/applicationserver/io/web/redis"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/redis"
@@ -409,23 +408,19 @@ hardware_versions:
 			},
 			Connect: func(ctx context.Context, t *testing.T, ids ttnpb.ApplicationIdentifiers, key string, chs *connChannels) error {
 				// Configure pubsub.
-				conn, err := grpc.Dial(":9184", append(rpcclient.DefaultDialOptions(ctx), grpc.WithInsecure(), grpc.WithBlock())...)
-				if err != nil {
-					return err
-				}
-				defer conn.Close()
 				creds := grpc.PerRPCCredentials(rpcmetadata.MD{
 					AuthType:      "Bearer",
 					AuthValue:     key,
 					AllowInsecure: true,
 				})
-				client := ttnpb.NewApplicationPubSubRegistryClient(conn)
+				client := ttnpb.NewApplicationPubSubRegistryClient(as.LoopbackConn())
 				req := &ttnpb.SetApplicationPubSubRequest{
 					ApplicationPubSub: ttnpb.ApplicationPubSub{
 						ApplicationPubSubIdentifiers: registeredApplicationPubSubID,
-						Provider:                     ttnpb.ApplicationPubSub_NATS,
-						Attributes: map[string]string{
-							nats_provider.NATSServerAttribute: "nats://localhost:4124",
+						Provider: &ttnpb.ApplicationPubSub_NATS{
+							NATS: &ttnpb.ApplicationPubSub_NATSProvider{
+								ServerURL: "nats://localhost:4124",
+							},
 						},
 						Format:    "json",
 						BaseTopic: "foo.bar",
@@ -471,7 +466,6 @@ hardware_versions:
 							"downlink_push",
 							"downlink_replace",
 							"format",
-							"attributes",
 							"provider",
 							"join_accept",
 							"location_solved",

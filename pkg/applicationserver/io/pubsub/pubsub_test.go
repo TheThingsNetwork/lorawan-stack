@@ -60,8 +60,10 @@ func TestPubSub(t *testing.T) {
 					ApplicationIdentifiers: registeredApplicationID,
 					PubSubID:               registeredPubSubID,
 				},
-				Attributes: map[string]string{
-					mock_provider.MockAckDeadline: timeout.String(),
+				Provider: &ttnpb.ApplicationPubSub_NATS{
+					NATS: &ttnpb.ApplicationPubSub_NATSProvider{
+						ServerURL: "nats://localhost",
+					},
 				},
 				Format:    "json",
 				BaseTopic: "app1.ps1",
@@ -106,8 +108,8 @@ func TestPubSub(t *testing.T) {
 				"downlink_push",
 				"downlink_replace",
 				"format",
-				"attributes",
 				"ids",
+				"provider",
 				"join_accept",
 				"location_solved",
 				"uplink_message",
@@ -117,7 +119,7 @@ func TestPubSub(t *testing.T) {
 		t.Fatalf("Failed to set pubsub in registry: %s", err)
 	}
 
-	mockProvider, err := provider.GetProvider(ttnpb.ApplicationPubSub_AWSSNSSQS)
+	mockProvider, err := provider.GetProvider(&ttnpb.ApplicationPubSub_NATS{})
 	a.So(mockProvider, should.NotBeNil)
 	a.So(err, should.BeNil)
 	mockImpl := mockProvider.(*mock_provider.Impl)

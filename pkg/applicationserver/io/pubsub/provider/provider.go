@@ -16,6 +16,7 @@ package provider
 
 import (
 	"context"
+	"reflect"
 
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -31,21 +32,23 @@ var (
 	errNotImplemented    = errors.DefineUnimplemented("provider_not_implemented", "provider `{provider_id}` is not implemented")
 	errAlreadyRegistered = errors.DefineAlreadyExists("already_registered", "provider `{provider_id}` already registered")
 
-	providers = map[ttnpb.ApplicationPubSub_Provider]Provider{}
+	providers = map[reflect.Type]Provider{}
 )
 
 // RegisterProvider registers an implementation for a given PubSub provider.
 func RegisterProvider(p ttnpb.ApplicationPubSub_Provider, implementation Provider) {
-	if _, ok := providers[p]; ok {
+	t := reflect.TypeOf(p)
+	if _, ok := providers[t]; ok {
 		panic(errAlreadyRegistered.WithAttributes("provider_id", p))
 	}
-	providers[p] = implementation
+	providers[t] = implementation
 }
 
 // GetProvider returns an implementation for a given provider.
 func GetProvider(p ttnpb.ApplicationPubSub_Provider) (Provider, error) {
-	if implementation, ok := providers[p]; ok {
+	t := reflect.TypeOf(p)
+	if implementation, ok := providers[t]; ok {
 		return implementation, nil
 	}
-	return nil, errNotImplemented.WithAttributes("provider_id", p)
+	return nil, errNotImplemented.WithAttributes("provider_id", t)
 }

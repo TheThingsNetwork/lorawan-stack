@@ -34,10 +34,11 @@ var (
 
 // appendImplicitPubSubGetPaths appends implicit ttnpb.ApplicationPubSub get paths to paths.
 func appendImplicitPubSubGetPaths(paths ...string) []string {
-	return append(append(make([]string, 0, 3+len(paths)),
+	return append(append(make([]string, 0, 4+len(paths)),
 		"created_at",
 		"ids",
 		"updated_at",
+		"provider",
 	), paths...)
 }
 

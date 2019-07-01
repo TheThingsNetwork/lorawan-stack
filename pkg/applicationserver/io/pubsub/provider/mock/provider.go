@@ -26,15 +26,6 @@ import (
 	"gocloud.dev/pubsub/mempubsub"
 )
 
-const (
-	// MockAckDeadline is the deadline for message ack before a resend occurs.
-	MockAckDeadline = "mock-ack-deadline"
-)
-
-var (
-	errAttributeNotFound = errors.DefineNotFound("attribute_not_found", "attribute `{attribute}` not found")
-)
-
 // ConnectionWithError is an connection wrapped with an error.
 type ConnectionWithError struct {
 	*Connection
@@ -110,15 +101,6 @@ func (i *Impl) OpenConnection(ctx context.Context, pb *ttnpb.ApplicationPubSub) 
 			error:      err,
 		}
 	}()
-	var deadline time.Duration
-	var deadlineStr string
-	var ok bool
-	if deadlineStr, ok = pb.Attributes[MockAckDeadline]; !ok {
-		return nil, errAttributeNotFound.WithAttributes("attribute", MockAckDeadline)
-	}
-	if deadline, err = time.ParseDuration(deadlineStr); err != nil {
-		return nil, err
-	}
 	for _, t := range []struct {
 		topic        **pubsub.Topic
 		subscription **pubsub.Subscription
@@ -166,7 +148,7 @@ func (i *Impl) OpenConnection(ctx context.Context, pb *ttnpb.ApplicationPubSub) 
 		},
 	} {
 		*t.topic = mempubsub.NewTopic()
-		*t.subscription = mempubsub.NewSubscription(*t.topic, deadline)
+		*t.subscription = mempubsub.NewSubscription(*t.topic, 5*time.Minute)
 	}
 	return pc, nil
 }
@@ -177,12 +159,7 @@ func init() {
 		ShutdownCh:       make(chan *ConnectionWithError, 10),
 	}
 	for _, p := range []ttnpb.ApplicationPubSub_Provider{
-		ttnpb.ApplicationPubSub_AWSSNSSQS,
-		ttnpb.ApplicationPubSub_AZURESB,
-		ttnpb.ApplicationPubSub_GCPPUBSUB,
-		ttnpb.ApplicationPubSub_KAFKA,
-		ttnpb.ApplicationPubSub_NATS,
-		ttnpb.ApplicationPubSub_RABBIT,
+		&ttnpb.ApplicationPubSub_NATS{},
 	} {
 		provider.RegisterProvider(p, impl)
 	}

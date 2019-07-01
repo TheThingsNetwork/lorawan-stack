@@ -25,14 +25,11 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/provider"
 	mock_provider "go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/provider/mock"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/redis"
-	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/rpcclient"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
@@ -45,14 +42,14 @@ func TestIntegrate(t *testing.T) {
 	is, isAddr := startMockIS(ctx)
 	is.add(ctx, registeredApplicationID, registeredApplicationKey)
 
-	mockProvider, err := provider.GetProvider(ttnpb.ApplicationPubSub_AWSSNSSQS)
+	mockProvider, err := provider.GetProvider(&ttnpb.ApplicationPubSub_NATS{})
 	a.So(mockProvider, should.NotBeNil)
 	a.So(err, should.BeNil)
 	mockImpl := mockProvider.(*mock_provider.Impl)
 
 	paths := []string{
 		"format",
-		"attributes",
+		"provider",
 	}
 
 	// ps1 is added to the pubsub registry, app2 will be integrated at runtime.
@@ -71,10 +68,12 @@ func TestIntegrate(t *testing.T) {
 	_, err = pubsubRegistry.Set(ctx, ps1, paths, func(_ *ttnpb.ApplicationPubSub) (*ttnpb.ApplicationPubSub, []string, error) {
 		return &ttnpb.ApplicationPubSub{
 			ApplicationPubSubIdentifiers: ps1,
-			Attributes: map[string]string{
-				mock_provider.MockAckDeadline: timeout.String(),
+			Format:                       "json",
+			Provider: &ttnpb.ApplicationPubSub_NATS{
+				NATS: &ttnpb.ApplicationPubSub_NATSProvider{
+					ServerURL: "nats://localhost",
+				},
 			},
-			Format: "json",
 		}, append(paths, "ids.application_ids", "ids.pubsub_id"), nil
 	})
 	a.So(err, should.BeNil)
@@ -101,17 +100,12 @@ func TestIntegrate(t *testing.T) {
 
 	mustHavePeer(ctx, c, ttnpb.PeerInfo_ENTITY_REGISTRY)
 
-	conn, err := grpc.Dial(":9185", append(rpcclient.DefaultDialOptions(ctx), grpc.WithInsecure(), grpc.WithBlock())...)
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
-	defer conn.Close()
 	creds := grpc.PerRPCCredentials(rpcmetadata.MD{
 		AuthType:      "Bearer",
 		AuthValue:     registeredApplicationKey,
 		AllowInsecure: true,
 	})
-	ps := ttnpb.NewApplicationPubSubRegistryClient(conn)
+	ps := ttnpb.NewApplicationPubSubRegistryClient(c.LoopbackConn())
 
 	// Expect ps1 to be integrated through the registry.
 	t.Run("AlreadyExisting", func(t *testing.T) {
@@ -131,20 +125,14 @@ func TestIntegrate(t *testing.T) {
 
 	// ps2: expect no integration, set integration, expect integration, delete integration and expect integration to be gone.
 	t.Run("RuntimeCreation", func(t *testing.T) {
-		ctx := rights.NewContext(ctx, rights.Rights{
-			ApplicationRights: map[string]*ttnpb.Rights{
-				unique.ID(ctx, registeredApplicationID): {
-					Rights: []ttnpb.Right{ttnpb.RIGHT_APPLICATION_TRAFFIC_READ},
-				},
-			},
-		})
-
 		integration := ttnpb.ApplicationPubSub{
 			ApplicationPubSubIdentifiers: ps2,
-			Attributes: map[string]string{
-				mock_provider.MockAckDeadline: timeout.String(),
+			Format:                       "json",
+			Provider: &ttnpb.ApplicationPubSub_NATS{
+				NATS: &ttnpb.ApplicationPubSub_NATSProvider{
+					ServerURL: "nats://localhost",
+				},
 			},
-			Format: "json",
 		}
 
 		// Expect no integration.
