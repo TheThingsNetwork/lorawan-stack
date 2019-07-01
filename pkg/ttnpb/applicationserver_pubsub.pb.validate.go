@@ -195,19 +195,8 @@ func (m *ApplicationPubSub) ValidateFields(paths ...string) error {
 				}
 			}
 
-		case "attributes":
-			// no validation rules for Attributes
 		case "format":
 			// no validation rules for Format
-		case "provider":
-
-			if _, ok := ApplicationPubSub_Provider_name[int32(m.GetProvider())]; !ok {
-				return ApplicationPubSubValidationError{
-					field:  "provider",
-					reason: "value must be one of the defined enum values",
-				}
-			}
-
 		case "base_topic":
 			// no validation rules for BaseTopic
 		case "downlink_push":
@@ -330,6 +319,34 @@ func (m *ApplicationPubSub) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "provider":
+			if len(subs) == 0 {
+				subs = []string{
+					"nats",
+				}
+			}
+			for name, subs := range _processPaths(subs) {
+				_ = subs
+				switch name {
+				case "nats":
+
+					if v, ok := interface{}(m.GetNATS()).(interface{ ValidateFields(...string) error }); ok {
+						if err := v.ValidateFields(subs...); err != nil {
+							return ApplicationPubSubValidationError{
+								field:  "nats",
+								reason: "embedded message failed validation",
+								cause:  err,
+							}
+						}
+					}
+
+				default:
+					return ApplicationPubSubValidationError{
+						field:  "provider",
+						reason: "value is required",
+					}
+				}
+			}
 		default:
 			return ApplicationPubSubValidationError{
 				field:  name,
@@ -895,6 +912,103 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = SetApplicationPubSubRequestValidationError{}
+
+// ValidateFields checks the field values on ApplicationPubSub_NATSProvider
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *ApplicationPubSub_NATSProvider) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ApplicationPubSub_NATSProviderFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "server_url":
+
+			if uri, err := url.Parse(m.GetServerURL()); err != nil {
+				return ApplicationPubSub_NATSProviderValidationError{
+					field:  "server_url",
+					reason: "value must be a valid URI",
+					cause:  err,
+				}
+			} else if !uri.IsAbs() {
+				return ApplicationPubSub_NATSProviderValidationError{
+					field:  "server_url",
+					reason: "value must be absolute",
+				}
+			}
+
+		default:
+			return ApplicationPubSub_NATSProviderValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ApplicationPubSub_NATSProviderValidationError is the validation error
+// returned by ApplicationPubSub_NATSProvider.ValidateFields if the designated
+// constraints aren't met.
+type ApplicationPubSub_NATSProviderValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ApplicationPubSub_NATSProviderValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ApplicationPubSub_NATSProviderValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ApplicationPubSub_NATSProviderValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ApplicationPubSub_NATSProviderValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ApplicationPubSub_NATSProviderValidationError) ErrorName() string {
+	return "ApplicationPubSub_NATSProviderValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ApplicationPubSub_NATSProviderValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sApplicationPubSub_NATSProvider.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ApplicationPubSub_NATSProviderValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ApplicationPubSub_NATSProviderValidationError{}
 
 // ValidateFields checks the field values on ApplicationPubSub_Message with the
 // rules defined in the proto definition for this message. If any rules are

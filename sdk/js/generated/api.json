@@ -1534,46 +1534,7 @@
       "hasExtensions": false,
       "hasMessages": true,
       "hasServices": true,
-      "enums": [
-        {
-          "name": "Provider",
-          "longName": "ApplicationPubSub.Provider",
-          "fullName": "ttn.lorawan.v3.ApplicationPubSub.Provider",
-          "description": "The provider for the PubSub.",
-          "values": [
-            {
-              "name": "AWSSNSSQS",
-              "number": "0",
-              "description": "AWS SQS / SNS"
-            },
-            {
-              "name": "AZURESB",
-              "number": "1",
-              "description": "Azure Service Bus"
-            },
-            {
-              "name": "GCPPUBSUB",
-              "number": "2",
-              "description": "GCP PubSub"
-            },
-            {
-              "name": "KAFKA",
-              "number": "3",
-              "description": "Apache Kafka"
-            },
-            {
-              "name": "NATS",
-              "number": "4",
-              "description": "NATS"
-            },
-            {
-              "name": "RABBIT",
-              "number": "5",
-              "description": "RabbitMQ"
-            }
-          ]
-        }
-      ],
+      "enums": [],
       "extensions": [],
       "messages": [
         {
@@ -1624,16 +1585,6 @@
               "defaultValue": ""
             },
             {
-              "name": "attributes",
-              "description": "Provider specific attributes used for authentication and settings.",
-              "label": "repeated",
-              "type": "AttributesEntry",
-              "longType": "ApplicationPubSub.AttributesEntry",
-              "fullType": "ttn.lorawan.v3.ApplicationPubSub.AttributesEntry",
-              "ismap": true,
-              "defaultValue": ""
-            },
-            {
               "name": "format",
               "description": "The format to use for the body.\nSupported values depend on the Application Server configuration.",
               "label": "",
@@ -1644,22 +1595,14 @@
               "defaultValue": ""
             },
             {
-              "name": "provider",
+              "name": "nats",
               "description": "",
               "label": "",
-              "type": "Provider",
-              "longType": "ApplicationPubSub.Provider",
-              "fullType": "ttn.lorawan.v3.ApplicationPubSub.Provider",
+              "type": "NATSProvider",
+              "longType": "ApplicationPubSub.NATSProvider",
+              "fullType": "ttn.lorawan.v3.ApplicationPubSub.NATSProvider",
               "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "enum.defined_only",
-                    "value": true
-                  }
-                ]
-              }
+              "defaultValue": ""
             },
             {
               "name": "base_topic",
@@ -1774,37 +1717,6 @@
           ]
         },
         {
-          "name": "AttributesEntry",
-          "longName": "ApplicationPubSub.AttributesEntry",
-          "fullName": "ttn.lorawan.v3.ApplicationPubSub.AttributesEntry",
-          "description": "",
-          "hasExtensions": false,
-          "hasFields": true,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "key",
-              "description": "",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "defaultValue": ""
-            },
-            {
-              "name": "value",
-              "description": "",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "defaultValue": ""
-            }
-          ]
-        },
-        {
           "name": "Message",
           "longName": "ApplicationPubSub.Message",
           "fullName": "ttn.lorawan.v3.ApplicationPubSub.Message",
@@ -1822,6 +1734,35 @@
               "fullType": "string",
               "ismap": false,
               "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "NATSProvider",
+          "longName": "ApplicationPubSub.NATSProvider",
+          "fullName": "ttn.lorawan.v3.ApplicationPubSub.NATSProvider",
+          "description": "The NATS provider settings.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "server_url",
+              "description": "The server connection URL.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.uri",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },

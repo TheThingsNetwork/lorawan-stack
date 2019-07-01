@@ -13,7 +13,6 @@ var ApplicationPubSubIdentifiersFieldPathsTopLevel = []string{
 	"pubsub_id",
 }
 var ApplicationPubSubFieldPathsNested = []string{
-	"attributes",
 	"base_topic",
 	"created_at",
 	"downlink_ack",
@@ -40,13 +39,14 @@ var ApplicationPubSubFieldPathsNested = []string{
 	"location_solved",
 	"location_solved.topic",
 	"provider",
+	"provider.nats",
+	"provider.nats.server_url",
 	"updated_at",
 	"uplink_message",
 	"uplink_message.topic",
 }
 
 var ApplicationPubSubFieldPathsTopLevel = []string{
-	"attributes",
 	"base_topic",
 	"created_at",
 	"downlink_ack",
@@ -103,7 +103,6 @@ var ListApplicationPubSubsRequestFieldPathsTopLevel = []string{
 var SetApplicationPubSubRequestFieldPathsNested = []string{
 	"field_mask",
 	"pubsub",
-	"pubsub.attributes",
 	"pubsub.base_topic",
 	"pubsub.created_at",
 	"pubsub.downlink_ack",
@@ -130,6 +129,8 @@ var SetApplicationPubSubRequestFieldPathsNested = []string{
 	"pubsub.location_solved",
 	"pubsub.location_solved.topic",
 	"pubsub.provider",
+	"pubsub.provider.nats",
+	"pubsub.provider.nats.server_url",
 	"pubsub.updated_at",
 	"pubsub.uplink_message",
 	"pubsub.uplink_message.topic",
@@ -138,6 +139,13 @@ var SetApplicationPubSubRequestFieldPathsNested = []string{
 var SetApplicationPubSubRequestFieldPathsTopLevel = []string{
 	"field_mask",
 	"pubsub",
+}
+var ApplicationPubSub_NATSProviderFieldPathsNested = []string{
+	"server_url",
+}
+
+var ApplicationPubSub_NATSProviderFieldPathsTopLevel = []string{
+	"server_url",
 }
 var ApplicationPubSub_MessageFieldPathsNested = []string{
 	"topic",

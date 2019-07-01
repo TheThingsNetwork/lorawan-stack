@@ -9,7 +9,6 @@ import (
 	io "io"
 	math "math"
 	reflect "reflect"
-	strconv "strconv"
 	strings "strings"
 	time "time"
 
@@ -36,40 +35,6 @@ var _ = time.Kitchen
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
-
-// The provider for the PubSub.
-type ApplicationPubSub_Provider int32
-
-const (
-	ApplicationPubSub_AWSSNSSQS ApplicationPubSub_Provider = 0
-	ApplicationPubSub_AZURESB   ApplicationPubSub_Provider = 1
-	ApplicationPubSub_GCPPUBSUB ApplicationPubSub_Provider = 2
-	ApplicationPubSub_KAFKA     ApplicationPubSub_Provider = 3
-	ApplicationPubSub_NATS      ApplicationPubSub_Provider = 4
-	ApplicationPubSub_RABBIT    ApplicationPubSub_Provider = 5
-)
-
-var ApplicationPubSub_Provider_name = map[int32]string{
-	0: "AWSSNSSQS",
-	1: "AZURESB",
-	2: "GCPPUBSUB",
-	3: "KAFKA",
-	4: "NATS",
-	5: "RABBIT",
-}
-
-var ApplicationPubSub_Provider_value = map[string]int32{
-	"AWSSNSSQS": 0,
-	"AZURESB":   1,
-	"GCPPUBSUB": 2,
-	"KAFKA":     3,
-	"NATS":      4,
-	"RABBIT":    5,
-}
-
-func (ApplicationPubSub_Provider) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_1dce56ec18597200, []int{1, 0}
-}
 
 type ApplicationPubSubIdentifiers struct {
 	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application_ids,json=applicationIds,proto3,embedded=application_ids" json:"application_ids"`
@@ -121,26 +86,28 @@ type ApplicationPubSub struct {
 	ApplicationPubSubIdentifiers `protobuf:"bytes,1,opt,name=ids,proto3,embedded=ids" json:"ids"`
 	CreatedAt                    time.Time `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3,stdtime" json:"created_at"`
 	UpdatedAt                    time.Time `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,proto3,stdtime" json:"updated_at"`
-	// Provider specific attributes used for authentication and settings.
-	Attributes map[string]string `protobuf:"bytes,4,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// The format to use for the body.
 	// Supported values depend on the Application Server configuration.
-	Format   string                     `protobuf:"bytes,5,opt,name=format,proto3" json:"format,omitempty"`
-	Provider ApplicationPubSub_Provider `protobuf:"varint,6,opt,name=provider,proto3,enum=ttn.lorawan.v3.ApplicationPubSub_Provider" json:"provider,omitempty"`
+	Format string `protobuf:"bytes,4,opt,name=format,proto3" json:"format,omitempty"`
+	// The provider for the PubSub.
+	//
+	// Types that are valid to be assigned to Provider:
+	//	*ApplicationPubSub_NATS
+	Provider isApplicationPubSub_Provider `protobuf_oneof:"provider"`
 	// Base topic name to which the messages topic is appended.
-	BaseTopic string `protobuf:"bytes,7,opt,name=base_topic,json=baseTopic,proto3" json:"base_topic,omitempty"`
+	BaseTopic string `protobuf:"bytes,6,opt,name=base_topic,json=baseTopic,proto3" json:"base_topic,omitempty"`
 	// The topic to which the Application Server subscribes for downlink queue push operations.
-	DownlinkPush *ApplicationPubSub_Message `protobuf:"bytes,8,opt,name=downlink_push,json=downlinkPush,proto3" json:"downlink_push,omitempty"`
+	DownlinkPush *ApplicationPubSub_Message `protobuf:"bytes,7,opt,name=downlink_push,json=downlinkPush,proto3" json:"downlink_push,omitempty"`
 	// The topic to which the Application Server subscribes for downlink queue replace operations.
-	DownlinkReplace      *ApplicationPubSub_Message `protobuf:"bytes,9,opt,name=downlink_replace,json=downlinkReplace,proto3" json:"downlink_replace,omitempty"`
-	UplinkMessage        *ApplicationPubSub_Message `protobuf:"bytes,10,opt,name=uplink_message,json=uplinkMessage,proto3" json:"uplink_message,omitempty"`
-	JoinAccept           *ApplicationPubSub_Message `protobuf:"bytes,11,opt,name=join_accept,json=joinAccept,proto3" json:"join_accept,omitempty"`
-	DownlinkAck          *ApplicationPubSub_Message `protobuf:"bytes,12,opt,name=downlink_ack,json=downlinkAck,proto3" json:"downlink_ack,omitempty"`
-	DownlinkNack         *ApplicationPubSub_Message `protobuf:"bytes,13,opt,name=downlink_nack,json=downlinkNack,proto3" json:"downlink_nack,omitempty"`
-	DownlinkSent         *ApplicationPubSub_Message `protobuf:"bytes,14,opt,name=downlink_sent,json=downlinkSent,proto3" json:"downlink_sent,omitempty"`
-	DownlinkFailed       *ApplicationPubSub_Message `protobuf:"bytes,15,opt,name=downlink_failed,json=downlinkFailed,proto3" json:"downlink_failed,omitempty"`
-	DownlinkQueued       *ApplicationPubSub_Message `protobuf:"bytes,16,opt,name=downlink_queued,json=downlinkQueued,proto3" json:"downlink_queued,omitempty"`
-	LocationSolved       *ApplicationPubSub_Message `protobuf:"bytes,17,opt,name=location_solved,json=locationSolved,proto3" json:"location_solved,omitempty"`
+	DownlinkReplace      *ApplicationPubSub_Message `protobuf:"bytes,8,opt,name=downlink_replace,json=downlinkReplace,proto3" json:"downlink_replace,omitempty"`
+	UplinkMessage        *ApplicationPubSub_Message `protobuf:"bytes,9,opt,name=uplink_message,json=uplinkMessage,proto3" json:"uplink_message,omitempty"`
+	JoinAccept           *ApplicationPubSub_Message `protobuf:"bytes,10,opt,name=join_accept,json=joinAccept,proto3" json:"join_accept,omitempty"`
+	DownlinkAck          *ApplicationPubSub_Message `protobuf:"bytes,11,opt,name=downlink_ack,json=downlinkAck,proto3" json:"downlink_ack,omitempty"`
+	DownlinkNack         *ApplicationPubSub_Message `protobuf:"bytes,12,opt,name=downlink_nack,json=downlinkNack,proto3" json:"downlink_nack,omitempty"`
+	DownlinkSent         *ApplicationPubSub_Message `protobuf:"bytes,13,opt,name=downlink_sent,json=downlinkSent,proto3" json:"downlink_sent,omitempty"`
+	DownlinkFailed       *ApplicationPubSub_Message `protobuf:"bytes,14,opt,name=downlink_failed,json=downlinkFailed,proto3" json:"downlink_failed,omitempty"`
+	DownlinkQueued       *ApplicationPubSub_Message `protobuf:"bytes,15,opt,name=downlink_queued,json=downlinkQueued,proto3" json:"downlink_queued,omitempty"`
+	LocationSolved       *ApplicationPubSub_Message `protobuf:"bytes,16,opt,name=location_solved,json=locationSolved,proto3" json:"location_solved,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                   `json:"-"`
 	XXX_sizecache        int32                      `json:"-"`
 }
@@ -177,6 +144,26 @@ func (m *ApplicationPubSub) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ApplicationPubSub proto.InternalMessageInfo
 
+type isApplicationPubSub_Provider interface {
+	isApplicationPubSub_Provider()
+	Equal(interface{}) bool
+	MarshalTo([]byte) (int, error)
+	Size() int
+}
+
+type ApplicationPubSub_NATS struct {
+	NATS *ApplicationPubSub_NATSProvider `protobuf:"bytes,17,opt,name=nats,proto3,oneof"`
+}
+
+func (*ApplicationPubSub_NATS) isApplicationPubSub_Provider() {}
+
+func (m *ApplicationPubSub) GetProvider() isApplicationPubSub_Provider {
+	if m != nil {
+		return m.Provider
+	}
+	return nil
+}
+
 func (m *ApplicationPubSub) GetCreatedAt() time.Time {
 	if m != nil {
 		return m.CreatedAt
@@ -191,13 +178,6 @@ func (m *ApplicationPubSub) GetUpdatedAt() time.Time {
 	return time.Time{}
 }
 
-func (m *ApplicationPubSub) GetAttributes() map[string]string {
-	if m != nil {
-		return m.Attributes
-	}
-	return nil
-}
-
 func (m *ApplicationPubSub) GetFormat() string {
 	if m != nil {
 		return m.Format
@@ -205,11 +185,11 @@ func (m *ApplicationPubSub) GetFormat() string {
 	return ""
 }
 
-func (m *ApplicationPubSub) GetProvider() ApplicationPubSub_Provider {
-	if m != nil {
-		return m.Provider
+func (m *ApplicationPubSub) GetNATS() *ApplicationPubSub_NATSProvider {
+	if x, ok := m.GetProvider().(*ApplicationPubSub_NATS); ok {
+		return x.NATS
 	}
-	return ApplicationPubSub_AWSSNSSQS
+	return nil
 }
 
 func (m *ApplicationPubSub) GetBaseTopic() string {
@@ -287,6 +267,108 @@ func (m *ApplicationPubSub) GetLocationSolved() *ApplicationPubSub_Message {
 		return m.LocationSolved
 	}
 	return nil
+}
+
+// XXX_OneofFuncs is for the internal use of the proto package.
+func (*ApplicationPubSub) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
+	return _ApplicationPubSub_OneofMarshaler, _ApplicationPubSub_OneofUnmarshaler, _ApplicationPubSub_OneofSizer, []interface{}{
+		(*ApplicationPubSub_NATS)(nil),
+	}
+}
+
+func _ApplicationPubSub_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
+	m := msg.(*ApplicationPubSub)
+	// provider
+	switch x := m.Provider.(type) {
+	case *ApplicationPubSub_NATS:
+		_ = b.EncodeVarint(17<<3 | proto.WireBytes)
+		if err := b.EncodeMessage(x.NATS); err != nil {
+			return err
+		}
+	case nil:
+	default:
+		return fmt.Errorf("ApplicationPubSub.Provider has unexpected type %T", x)
+	}
+	return nil
+}
+
+func _ApplicationPubSub_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
+	m := msg.(*ApplicationPubSub)
+	switch tag {
+	case 17: // provider.nats
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		msg := new(ApplicationPubSub_NATSProvider)
+		err := b.DecodeMessage(msg)
+		m.Provider = &ApplicationPubSub_NATS{msg}
+		return true, err
+	default:
+		return false, nil
+	}
+}
+
+func _ApplicationPubSub_OneofSizer(msg proto.Message) (n int) {
+	m := msg.(*ApplicationPubSub)
+	// provider
+	switch x := m.Provider.(type) {
+	case *ApplicationPubSub_NATS:
+		s := proto.Size(x.NATS)
+		n += 2 // tag and wire
+		n += proto.SizeVarint(uint64(s))
+		n += s
+	case nil:
+	default:
+		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
+	}
+	return n
+}
+
+// The NATS provider settings.
+type ApplicationPubSub_NATSProvider struct {
+	// The server connection URL.
+	ServerURL            string   `protobuf:"bytes,1,opt,name=server_url,json=serverUrl,proto3" json:"server_url,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ApplicationPubSub_NATSProvider) Reset()      { *m = ApplicationPubSub_NATSProvider{} }
+func (*ApplicationPubSub_NATSProvider) ProtoMessage() {}
+func (*ApplicationPubSub_NATSProvider) Descriptor() ([]byte, []int) {
+	return fileDescriptor_1dce56ec18597200, []int{1, 0}
+}
+func (m *ApplicationPubSub_NATSProvider) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ApplicationPubSub_NATSProvider) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ApplicationPubSub_NATSProvider.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *ApplicationPubSub_NATSProvider) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ApplicationPubSub_NATSProvider.Merge(m, src)
+}
+func (m *ApplicationPubSub_NATSProvider) XXX_Size() int {
+	return m.Size()
+}
+func (m *ApplicationPubSub_NATSProvider) XXX_DiscardUnknown() {
+	xxx_messageInfo_ApplicationPubSub_NATSProvider.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ApplicationPubSub_NATSProvider proto.InternalMessageInfo
+
+func (m *ApplicationPubSub_NATSProvider) GetServerURL() string {
+	if m != nil {
+		return m.ServerURL
+	}
+	return ""
 }
 
 type ApplicationPubSub_Message struct {
@@ -565,14 +647,12 @@ func (m *SetApplicationPubSubRequest) GetFieldMask() types.FieldMask {
 }
 
 func init() {
-	proto.RegisterEnum("ttn.lorawan.v3.ApplicationPubSub_Provider", ApplicationPubSub_Provider_name, ApplicationPubSub_Provider_value)
-	golang_proto.RegisterEnum("ttn.lorawan.v3.ApplicationPubSub_Provider", ApplicationPubSub_Provider_name, ApplicationPubSub_Provider_value)
 	proto.RegisterType((*ApplicationPubSubIdentifiers)(nil), "ttn.lorawan.v3.ApplicationPubSubIdentifiers")
 	golang_proto.RegisterType((*ApplicationPubSubIdentifiers)(nil), "ttn.lorawan.v3.ApplicationPubSubIdentifiers")
 	proto.RegisterType((*ApplicationPubSub)(nil), "ttn.lorawan.v3.ApplicationPubSub")
 	golang_proto.RegisterType((*ApplicationPubSub)(nil), "ttn.lorawan.v3.ApplicationPubSub")
-	proto.RegisterMapType((map[string]string)(nil), "ttn.lorawan.v3.ApplicationPubSub.AttributesEntry")
-	golang_proto.RegisterMapType((map[string]string)(nil), "ttn.lorawan.v3.ApplicationPubSub.AttributesEntry")
+	proto.RegisterType((*ApplicationPubSub_NATSProvider)(nil), "ttn.lorawan.v3.ApplicationPubSub.NATSProvider")
+	golang_proto.RegisterType((*ApplicationPubSub_NATSProvider)(nil), "ttn.lorawan.v3.ApplicationPubSub.NATSProvider")
 	proto.RegisterType((*ApplicationPubSub_Message)(nil), "ttn.lorawan.v3.ApplicationPubSub.Message")
 	golang_proto.RegisterType((*ApplicationPubSub_Message)(nil), "ttn.lorawan.v3.ApplicationPubSub.Message")
 	proto.RegisterType((*ApplicationPubSubs)(nil), "ttn.lorawan.v3.ApplicationPubSubs")
@@ -597,101 +677,90 @@ func init() {
 }
 
 var fileDescriptor_1dce56ec18597200 = []byte{
-	// 1345 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x97, 0x4f, 0x6c, 0x13, 0xc7,
-	0x17, 0xc7, 0x77, 0xe2, 0xc4, 0xb1, 0xc7, 0x24, 0x31, 0xa3, 0x08, 0xed, 0xcf, 0xc0, 0x24, 0xbf,
-	0x2d, 0xaa, 0x42, 0xc0, 0x6b, 0x6a, 0x44, 0x5b, 0x82, 0xaa, 0x68, 0x0d, 0x24, 0xa2, 0x90, 0x34,
-	0xd9, 0x0d, 0xad, 0x04, 0xa5, 0xd6, 0xda, 0x3b, 0x76, 0x16, 0xdb, 0xbb, 0xcb, 0xee, 0xac, 0x69,
-	0x8a, 0x90, 0x10, 0x27, 0xd4, 0x43, 0x41, 0xaa, 0x54, 0xf5, 0x54, 0x55, 0xbd, 0x94, 0x4b, 0x25,
-	0xd4, 0x13, 0xaa, 0x2a, 0x95, 0x4b, 0x25, 0x8e, 0x48, 0x3d, 0x94, 0x13, 0xc5, 0xeb, 0x1e, 0xe8,
-	0xa5, 0xe2, 0xc8, 0xb1, 0xda, 0x7f, 0xb6, 0x63, 0x87, 0x18, 0x07, 0xb5, 0x27, 0xcf, 0xec, 0xbc,
-	0xf7, 0x99, 0xef, 0x7b, 0xf3, 0xf6, 0x79, 0x16, 0x1e, 0xa9, 0xea, 0xa6, 0x7c, 0x55, 0xd6, 0xd2,
-	0x16, 0x95, 0x8b, 0x95, 0x8c, 0x6c, 0xa8, 0x19, 0xd9, 0x30, 0xaa, 0x6a, 0x51, 0xa6, 0xaa, 0xae,
-	0x59, 0xc4, 0xac, 0x13, 0x33, 0x6f, 0xd8, 0x05, 0xcb, 0x2e, 0xf0, 0x86, 0xa9, 0x53, 0x1d, 0x8d,
-	0x53, 0xaa, 0xf1, 0x81, 0x17, 0x5f, 0x3f, 0x9a, 0x12, 0xca, 0x2a, 0x5d, 0xb7, 0x0b, 0x7c, 0x51,
-	0xaf, 0x65, 0x88, 0x56, 0xd7, 0x37, 0x0c, 0x53, 0xff, 0x74, 0x23, 0xe3, 0x19, 0x17, 0xd3, 0x65,
-	0xa2, 0xa5, 0xeb, 0x72, 0x55, 0x55, 0x64, 0x4a, 0x32, 0x3d, 0x03, 0x1f, 0x99, 0x4a, 0x77, 0x20,
-	0xca, 0x7a, 0x59, 0xf7, 0x9d, 0x0b, 0x76, 0xc9, 0x9b, 0x79, 0x13, 0x6f, 0x14, 0x98, 0xef, 0x2b,
-	0xeb, 0x7a, 0xb9, 0x4a, 0x7c, 0xb1, 0x9a, 0xa6, 0x53, 0x5f, 0x6b, 0xb0, 0xba, 0x37, 0x58, 0x6d,
-	0x31, 0x48, 0xcd, 0xa0, 0x1b, 0xc1, 0xe2, 0x74, 0xf7, 0x62, 0x49, 0x25, 0x55, 0x25, 0x5f, 0x93,
-	0xad, 0x4a, 0x60, 0x31, 0xd5, 0x6d, 0x41, 0xd5, 0x1a, 0xb1, 0xa8, 0x5c, 0x33, 0x02, 0x83, 0x37,
-	0x7a, 0x33, 0xa6, 0x2a, 0x44, 0xa3, 0x6a, 0x49, 0x25, 0x66, 0x20, 0x82, 0xfb, 0x1d, 0xc0, 0x7d,
-	0x42, 0x3b, 0x8f, 0x2b, 0x76, 0x41, 0xb2, 0x0b, 0x67, 0xda, 0x66, 0xa8, 0x08, 0x27, 0x3a, 0xf2,
-	0x9c, 0x57, 0x15, 0x8b, 0x05, 0xd3, 0x60, 0x26, 0x91, 0x7d, 0x93, 0xdf, 0x9c, 0x5f, 0xbe, 0x03,
-	0xd3, 0x01, 0xc8, 0xa1, 0x87, 0x4f, 0xa6, 0x98, 0x47, 0x4f, 0xa6, 0xc0, 0x4f, 0x7f, 0x3d, 0x88,
-	0x8c, 0x7c, 0x0e, 0x86, 0x92, 0x40, 0x1c, 0x97, 0x3b, 0x6d, 0x2d, 0x24, 0xc2, 0xb8, 0x7f, 0x74,
-	0x79, 0x55, 0x61, 0x87, 0xa6, 0xc1, 0x4c, 0x3c, 0x77, 0xcc, 0x79, 0x32, 0x15, 0x0b, 0xe4, 0x9c,
-	0x72, 0x5d, 0x0f, 0x98, 0x1c, 0x7b, 0x20, 0x8b, 0x3f, 0xb9, 0x28, 0xa7, 0x3f, 0x3b, 0x92, 0x3e,
-	0x7e, 0x69, 0x66, 0x7e, 0xee, 0x62, 0xfa, 0xd2, 0x7c, 0x38, 0x3d, 0x78, 0x2d, 0x7b, 0xf8, 0xfa,
-	0x01, 0x31, 0xe6, 0x73, 0xce, 0x28, 0xdc, 0x2f, 0x09, 0xb8, 0xbb, 0x27, 0x32, 0x24, 0xc2, 0x48,
-	0x3b, 0x84, 0xc3, 0xdb, 0x84, 0xd0, 0x93, 0x89, 0x2d, 0x03, 0x71, 0x61, 0xe8, 0x24, 0x84, 0x45,
-	0x93, 0xc8, 0x94, 0x28, 0x79, 0x99, 0x7a, 0xf2, 0x13, 0xd9, 0x14, 0xef, 0x1f, 0x0f, 0x1f, 0x1e,
-	0x0f, 0xbf, 0x16, 0x1e, 0x4f, 0x2e, 0xe6, 0x82, 0xee, 0xfc, 0x31, 0x05, 0xc4, 0x78, 0xe0, 0x27,
-	0x50, 0x17, 0x62, 0x1b, 0x4a, 0x08, 0x89, 0x0c, 0x02, 0x09, 0xfc, 0x04, 0x8a, 0x56, 0x21, 0x94,
-	0x29, 0x35, 0xd5, 0x82, 0x4d, 0x89, 0xc5, 0x0e, 0x4f, 0x47, 0x66, 0x12, 0xd9, 0xb7, 0xfa, 0x06,
-	0xc9, 0x0b, 0x2d, 0x9f, 0xd3, 0x1a, 0x35, 0x37, 0xc4, 0x0e, 0x08, 0xda, 0x03, 0xa3, 0x25, 0xdd,
-	0xac, 0xc9, 0x94, 0x1d, 0x71, 0xcf, 0x45, 0x0c, 0x66, 0xe8, 0x63, 0x18, 0x33, 0x4c, 0xbd, 0xae,
-	0x2a, 0xc4, 0x64, 0xa3, 0xd3, 0x60, 0x66, 0x3c, 0x3b, 0xdb, 0x7f, 0xa3, 0x95, 0xc0, 0x23, 0x37,
-	0xd9, 0xce, 0xa1, 0x37, 0xba, 0xe9, 0x65, 0xb3, 0x45, 0x44, 0xfb, 0x21, 0x2c, 0xc8, 0x16, 0xc9,
-	0x53, 0xdd, 0x50, 0x8b, 0xec, 0xa8, 0xb7, 0x73, 0xdc, 0x7d, 0xb2, 0xe6, 0x3e, 0x40, 0xcb, 0x70,
-	0x4c, 0xd1, 0xaf, 0x6a, 0x55, 0x55, 0xab, 0xe4, 0x0d, 0xdb, 0x5a, 0x67, 0x63, 0x5e, 0xbe, 0x0e,
-	0xf6, 0x57, 0xb0, 0x44, 0x2c, 0x4b, 0x2e, 0x13, 0x71, 0x57, 0xe8, 0xbf, 0x62, 0x5b, 0xeb, 0x68,
-	0x0d, 0x26, 0x5b, 0x3c, 0x93, 0x18, 0x55, 0xb9, 0x48, 0xd8, 0xf8, 0xa0, 0xc8, 0x89, 0x10, 0x21,
-	0xfa, 0x04, 0xb4, 0x02, 0xc7, 0x6d, 0xc3, 0x63, 0xd6, 0x7c, 0x13, 0x16, 0x0e, 0xca, 0x1c, 0xf3,
-	0x01, 0xc1, 0x14, 0xbd, 0x0f, 0x13, 0x97, 0x75, 0x55, 0xcb, 0xcb, 0xc5, 0x22, 0x31, 0x28, 0x9b,
-	0x18, 0x14, 0x07, 0x5d, 0x6f, 0xc1, 0x73, 0x46, 0xe7, 0x60, 0x2b, 0x07, 0x79, 0xb9, 0x58, 0x61,
-	0x77, 0x0d, 0x0a, 0x4b, 0x84, 0xee, 0x42, 0xb1, 0xb2, 0xe9, 0x44, 0x34, 0x17, 0x37, 0xb6, 0xe3,
-	0x13, 0x59, 0x96, 0xbb, 0x78, 0x16, 0xd1, 0x28, 0x3b, 0xbe, 0x63, 0x9e, 0x44, 0x34, 0x8a, 0x44,
-	0xd8, 0x3a, 0x9e, 0x7c, 0x49, 0x56, 0xab, 0x44, 0x61, 0x27, 0x06, 0x25, 0x8e, 0x87, 0x84, 0x05,
-	0x0f, 0xb0, 0x89, 0x79, 0xc5, 0x26, 0x36, 0x51, 0xd8, 0xe4, 0x8e, 0x99, 0xab, 0x1e, 0xc0, 0x65,
-	0x56, 0xf5, 0xa0, 0xd7, 0x5a, 0x7a, 0xb5, 0x4e, 0x14, 0x76, 0xf7, 0xc0, 0xcc, 0x90, 0x20, 0x79,
-	0x80, 0xd4, 0x7b, 0x70, 0xa2, 0xeb, 0x0d, 0x47, 0x49, 0x18, 0xa9, 0x90, 0x0d, 0xaf, 0x0d, 0xc6,
-	0x45, 0x77, 0x88, 0x26, 0xe1, 0x48, 0x5d, 0xae, 0xda, 0xc4, 0x6f, 0xbf, 0xa2, 0x3f, 0x99, 0x1b,
-	0x7a, 0x17, 0xa4, 0xa6, 0xe0, 0x68, 0x58, 0x7f, 0x93, 0x70, 0xc4, 0x7f, 0x23, 0x7d, 0x47, 0x7f,
-	0xc2, 0x7d, 0x08, 0x63, 0xe1, 0x8b, 0x8d, 0xc6, 0x60, 0x5c, 0xf8, 0x48, 0x92, 0x96, 0x25, 0x69,
-	0x55, 0x4a, 0x32, 0x28, 0x01, 0x47, 0x85, 0x0b, 0xe7, 0xc5, 0xd3, 0x52, 0x2e, 0x09, 0xdc, 0xb5,
-	0xc5, 0x93, 0x2b, 0x2b, 0xe7, 0x73, 0xd2, 0xf9, 0x5c, 0x72, 0x08, 0xc5, 0xe1, 0xc8, 0x59, 0x61,
-	0xe1, 0xac, 0x90, 0x8c, 0xa0, 0x18, 0x1c, 0x5e, 0x16, 0xd6, 0xa4, 0xe4, 0x30, 0x82, 0x30, 0x2a,
-	0x0a, 0xb9, 0xdc, 0x99, 0xb5, 0xe4, 0x08, 0xb7, 0x0a, 0x51, 0x4f, 0x90, 0x16, 0x3a, 0x01, 0x47,
-	0xfd, 0x1e, 0xef, 0x76, 0x71, 0xb7, 0xc1, 0xfd, 0xbf, 0x6f, 0x66, 0xc4, 0xd0, 0x83, 0xfb, 0x1e,
-	0x40, 0xb6, 0x67, 0x79, 0xc1, 0xeb, 0x68, 0x16, 0xfa, 0x00, 0x8e, 0xfa, 0xcd, 0x2d, 0x24, 0x1f,
-	0xeb, 0x4b, 0x0e, 0x5c, 0xf9, 0xe0, 0xd7, 0x6f, 0x9f, 0x21, 0x25, 0x35, 0x07, 0x77, 0x75, 0x2e,
-	0x0c, 0x92, 0x75, 0xee, 0x47, 0x00, 0xf7, 0x2e, 0x12, 0xda, 0x1b, 0x0b, 0xb9, 0x62, 0x13, 0x8b,
-	0xfe, 0x2b, 0x7f, 0x64, 0xf3, 0x10, 0xb6, 0xaf, 0x19, 0x2f, 0xfd, 0x23, 0x5b, 0x70, 0x4d, 0x96,
-	0x64, 0xab, 0x92, 0x1b, 0x76, 0x41, 0x62, 0xbc, 0x14, 0x3e, 0xe0, 0x7e, 0x05, 0x70, 0xff, 0x39,
-	0xd5, 0xea, 0x55, 0x6d, 0x85, 0xb2, 0xff, 0x93, 0xeb, 0xc4, 0x6b, 0xc7, 0xf1, 0x03, 0x80, 0x7b,
-	0xa5, 0x6d, 0x92, 0xbf, 0x04, 0xa3, 0x7e, 0x45, 0x05, 0xe2, 0xfb, 0x97, 0xe0, 0x96, 0xba, 0x03,
-	0xc8, 0x6b, 0xeb, 0xcd, 0xfe, 0x1c, 0x85, 0xff, 0xdb, 0x42, 0x6c, 0x59, 0xb5, 0xdc, 0xb2, 0xbb,
-	0x0c, 0xe1, 0x22, 0xa1, 0x61, 0x95, 0xef, 0xe9, 0x01, 0x9f, 0x76, 0xef, 0x9d, 0xa9, 0x99, 0x57,
-	0x2d, 0x76, 0x2e, 0x75, 0xf3, 0xb7, 0x3f, 0xbf, 0x1c, 0x9a, 0x44, 0x28, 0x23, 0x5b, 0x19, 0x3f,
-	0x84, 0x74, 0x50, 0xf2, 0xe8, 0x1b, 0x00, 0x23, 0x8b, 0x84, 0xa2, 0x43, 0xdd, 0xb4, 0x6d, 0x6a,
-	0x39, 0xd5, 0x3f, 0x7d, 0xdc, 0xa2, 0xb7, 0xa7, 0x80, 0xe6, 0xdb, 0x7b, 0x66, 0xae, 0xa9, 0x8a,
-	0xc5, 0x77, 0x55, 0x53, 0xd7, 0xfc, 0xba, 0x6f, 0xd4, 0xba, 0x5c, 0x5e, 0x47, 0x5f, 0x00, 0x38,
-	0xec, 0x96, 0x28, 0x4a, 0x77, 0x6f, 0xba, 0x6d, 0xe1, 0xa6, 0xb8, 0xbe, 0x1a, 0x2d, 0xee, 0xa8,
-	0x27, 0x32, 0x8d, 0x0e, 0x75, 0x8a, 0xec, 0x23, 0x10, 0xfd, 0x0d, 0x60, 0x44, 0xda, 0x2a, 0x63,
-	0xd2, 0xeb, 0x65, 0xec, 0x2b, 0xe0, 0xa9, 0xb9, 0x0d, 0x52, 0x4b, 0x9d, 0x72, 0x82, 0x4f, 0xa4,
-	0x57, 0x4a, 0x5d, 0x87, 0x6d, 0x3b, 0x83, 0x73, 0x60, 0xf6, 0xc2, 0x09, 0xee, 0xed, 0x9d, 0x31,
-	0xe7, 0xc0, 0x2c, 0xba, 0x0d, 0x60, 0xf4, 0x14, 0xa9, 0x12, 0x4a, 0xd0, 0x40, 0x7d, 0x2b, 0xf5,
-	0x92, 0xca, 0xe5, 0xe6, 0xbd, 0x40, 0x8f, 0xcf, 0xbe, 0x33, 0x40, 0xda, 0x43, 0xd1, 0xee, 0x38,
-	0xf7, 0x1d, 0x78, 0xd8, 0xc0, 0xe0, 0x51, 0x03, 0x83, 0xc7, 0x0d, 0xcc, 0x3c, 0x6d, 0x60, 0xe6,
-	0x59, 0x03, 0x33, 0xcf, 0x1b, 0x98, 0x79, 0xd1, 0xc0, 0xe0, 0x86, 0x83, 0xc1, 0x2d, 0x07, 0x33,
-	0x77, 0x1d, 0x0c, 0xee, 0x39, 0x98, 0xb9, 0xef, 0x60, 0xe6, 0x81, 0x83, 0x99, 0x87, 0x0e, 0x06,
-	0x8f, 0x1c, 0x0c, 0x1e, 0x3b, 0x98, 0x79, 0xea, 0x60, 0xf0, 0xcc, 0xc1, 0xcc, 0x73, 0x07, 0x83,
-	0x17, 0x0e, 0x66, 0x6e, 0x34, 0x31, 0x73, 0xab, 0x89, 0xc1, 0x9d, 0x26, 0x66, 0xbe, 0x6e, 0x62,
-	0xf0, 0x6d, 0x13, 0x33, 0x77, 0x9b, 0x98, 0xb9, 0xd7, 0xc4, 0xe0, 0x7e, 0x13, 0x83, 0x07, 0x4d,
-	0x0c, 0x2e, 0x1c, 0x2e, 0xeb, 0x3c, 0x5d, 0x27, 0x74, 0x5d, 0xd5, 0xca, 0x16, 0xaf, 0x11, 0x7a,
-	0x55, 0x37, 0x2b, 0x99, 0xcd, 0x5f, 0x6d, 0x46, 0xa5, 0x9c, 0xa1, 0x54, 0x33, 0x0a, 0x85, 0xa8,
-	0x17, 0xf5, 0xd1, 0x7f, 0x02, 0x00, 0x00, 0xff, 0xff, 0x2f, 0x3f, 0x2c, 0xd8, 0x09, 0x0f, 0x00,
-	0x00,
+	// 1285 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x97, 0x4d, 0x6c, 0x13, 0x47,
+	0x14, 0xc7, 0x77, 0xe2, 0x90, 0xc4, 0x93, 0x10, 0xc2, 0x08, 0xd1, 0xad, 0x81, 0x31, 0xdd, 0xa2,
+	0x2a, 0x7c, 0x78, 0x8d, 0x82, 0xa0, 0x25, 0x1c, 0x22, 0xbb, 0x90, 0x94, 0x8a, 0xa4, 0x61, 0x1d,
+	0x2e, 0x20, 0x6a, 0x8d, 0xbd, 0x13, 0x67, 0xf1, 0x7a, 0x77, 0xd9, 0x99, 0x35, 0x4d, 0x11, 0x12,
+	0xea, 0x09, 0xf5, 0x50, 0x90, 0x2a, 0x55, 0x3d, 0x55, 0x15, 0x97, 0x72, 0xa9, 0x84, 0x7a, 0x42,
+	0x55, 0x0f, 0xb9, 0x54, 0xe2, 0x88, 0xd4, 0x43, 0x39, 0xa5, 0x78, 0xdd, 0x03, 0x5c, 0x2a, 0x8e,
+	0x1c, 0xab, 0x9d, 0xdd, 0x4d, 0x1c, 0x3b, 0xc4, 0x38, 0xa8, 0x3d, 0x79, 0x3e, 0xde, 0xfb, 0xcd,
+	0xff, 0xbd, 0x79, 0x7e, 0x63, 0xc3, 0xe3, 0xa6, 0xed, 0x92, 0x1b, 0xc4, 0xca, 0x30, 0x4e, 0xca,
+	0xd5, 0x2c, 0x71, 0x8c, 0x2c, 0x71, 0x1c, 0xd3, 0x28, 0x13, 0x6e, 0xd8, 0x16, 0xa3, 0x6e, 0x9d,
+	0xba, 0x45, 0xc7, 0x2b, 0x31, 0xaf, 0xa4, 0x3a, 0xae, 0xcd, 0x6d, 0x34, 0xca, 0xb9, 0xa5, 0x46,
+	0x5e, 0x6a, 0xfd, 0x44, 0x2a, 0x57, 0x31, 0xf8, 0x92, 0x57, 0x52, 0xcb, 0x76, 0x2d, 0x4b, 0xad,
+	0xba, 0xbd, 0xec, 0xb8, 0xf6, 0x17, 0xcb, 0x59, 0x61, 0x5c, 0xce, 0x54, 0xa8, 0x95, 0xa9, 0x13,
+	0xd3, 0xd0, 0x09, 0xa7, 0xd9, 0x8e, 0x41, 0x88, 0x4c, 0x65, 0x5a, 0x10, 0x15, 0xbb, 0x62, 0x87,
+	0xce, 0x25, 0x6f, 0x51, 0xcc, 0xc4, 0x44, 0x8c, 0x22, 0xf3, 0xfd, 0x15, 0xdb, 0xae, 0x98, 0x34,
+	0x14, 0x6b, 0x59, 0x36, 0x0f, 0xb5, 0x46, 0xbb, 0xfb, 0xa2, 0xdd, 0x35, 0x06, 0xad, 0x39, 0x7c,
+	0x39, 0xda, 0x3c, 0xd8, 0xbe, 0xb9, 0x68, 0x50, 0x53, 0x2f, 0xd6, 0x08, 0xab, 0x46, 0x16, 0xe9,
+	0x76, 0x0b, 0x6e, 0xd4, 0x28, 0xe3, 0xa4, 0xe6, 0x44, 0x06, 0xef, 0x77, 0x66, 0xcc, 0xd0, 0xa9,
+	0xc5, 0x8d, 0x45, 0x83, 0xba, 0x91, 0x08, 0xe5, 0x4f, 0x00, 0xf7, 0xe7, 0xd6, 0xf3, 0x38, 0xef,
+	0x95, 0x0a, 0x5e, 0xe9, 0xfc, 0xba, 0x19, 0x2a, 0xc3, 0x5d, 0x2d, 0x79, 0x2e, 0x1a, 0x3a, 0x93,
+	0xc1, 0x41, 0x30, 0x3e, 0x3c, 0xf1, 0x81, 0xba, 0x31, 0xbf, 0x6a, 0x0b, 0xa6, 0x05, 0x90, 0x47,
+	0x8f, 0x57, 0xd3, 0xd2, 0x93, 0xd5, 0x34, 0xf8, 0xf5, 0xc5, 0x4a, 0x62, 0xc7, 0xd7, 0xa0, 0x6f,
+	0x0c, 0x68, 0xa3, 0xa4, 0xd5, 0x96, 0x21, 0x0d, 0x26, 0xc3, 0xab, 0x2b, 0x1a, 0xba, 0xdc, 0x77,
+	0x10, 0x8c, 0x27, 0xf3, 0x27, 0xfd, 0xd5, 0xf4, 0x50, 0x24, 0xe7, 0x6c, 0xe0, 0x7a, 0xc8, 0x55,
+	0xe4, 0x43, 0x13, 0xf8, 0xf3, 0x2b, 0x24, 0xf3, 0xe5, 0xf1, 0xcc, 0xe9, 0xab, 0xe3, 0x53, 0x93,
+	0x57, 0x32, 0x57, 0xa7, 0xe2, 0xe9, 0xe1, 0x9b, 0x13, 0xc7, 0x6e, 0x1d, 0xd2, 0x86, 0x42, 0xce,
+	0x79, 0x5d, 0xb9, 0x0f, 0xe1, 0xee, 0x8e, 0xc8, 0x90, 0x06, 0x13, 0xeb, 0x21, 0x1c, 0xdb, 0x22,
+	0x84, 0x8e, 0x4c, 0x6c, 0x1a, 0x48, 0x00, 0x43, 0x1f, 0x43, 0x58, 0x76, 0x29, 0xe1, 0x54, 0x2f,
+	0x12, 0x2e, 0xe4, 0x0f, 0x4f, 0xa4, 0xd4, 0xf0, 0x7a, 0xd4, 0xf8, 0x7a, 0xd4, 0x85, 0xf8, 0x7a,
+	0xf2, 0x43, 0x01, 0xe8, 0xde, 0x5f, 0x69, 0xa0, 0x25, 0x23, 0xbf, 0x1c, 0x0f, 0x20, 0x9e, 0xa3,
+	0xc7, 0x90, 0x44, 0x2f, 0x90, 0xc8, 0x2f, 0xc7, 0xd1, 0x5e, 0x38, 0xb0, 0x68, 0xbb, 0x35, 0xc2,
+	0xe5, 0xfe, 0x20, 0x89, 0x5a, 0x34, 0x43, 0x73, 0xb0, 0xdf, 0x22, 0x9c, 0xc9, 0xbb, 0x05, 0x56,
+	0xed, 0x1a, 0xb6, 0x3a, 0x97, 0x5b, 0x28, 0xcc, 0xbb, 0x76, 0xdd, 0xd0, 0xa9, 0x9b, 0x1f, 0xf2,
+	0x57, 0xd3, 0xfd, 0xc1, 0xca, 0x27, 0x92, 0x26, 0x38, 0xe8, 0x00, 0x84, 0x25, 0xc2, 0x68, 0x91,
+	0xdb, 0x8e, 0x51, 0x96, 0x07, 0xc4, 0x59, 0xc9, 0x60, 0x65, 0x21, 0x58, 0x40, 0x73, 0x70, 0xa7,
+	0x6e, 0xdf, 0xb0, 0x4c, 0xc3, 0xaa, 0x16, 0x1d, 0x8f, 0x2d, 0xc9, 0x83, 0xe2, 0xdc, 0xc3, 0xdd,
+	0xcf, 0x9d, 0xa5, 0x8c, 0x91, 0x0a, 0xd5, 0x46, 0x62, 0xff, 0x79, 0x8f, 0x2d, 0xa1, 0x05, 0x38,
+	0xb6, 0xc6, 0x73, 0xa9, 0x63, 0x92, 0x32, 0x95, 0x87, 0x7a, 0x45, 0xee, 0x8a, 0x11, 0x5a, 0x48,
+	0x40, 0xf3, 0x70, 0xd4, 0x73, 0x04, 0xb3, 0x16, 0x9a, 0xc8, 0xc9, 0x5e, 0x99, 0x3b, 0x43, 0x40,
+	0x34, 0x45, 0x9f, 0xc2, 0xe1, 0x6b, 0xb6, 0x61, 0x15, 0x49, 0xb9, 0x4c, 0x1d, 0x2e, 0xc3, 0x5e,
+	0x71, 0x30, 0xf0, 0xce, 0x09, 0x67, 0x74, 0x01, 0xae, 0xe5, 0xa0, 0x48, 0xca, 0x55, 0x79, 0xb8,
+	0x57, 0xd8, 0x70, 0xec, 0x9e, 0x2b, 0x57, 0x37, 0xdc, 0x88, 0x15, 0xe0, 0x46, 0xb6, 0x7d, 0x23,
+	0x73, 0xa4, 0x8d, 0xc7, 0xa8, 0xc5, 0xe5, 0x9d, 0xdb, 0xe6, 0x15, 0xa8, 0xc5, 0x91, 0x06, 0xd7,
+	0xae, 0xa7, 0xb8, 0x48, 0x0c, 0x93, 0xea, 0xf2, 0x68, 0xaf, 0xc4, 0xd1, 0x98, 0x30, 0x2d, 0x00,
+	0x1b, 0x98, 0xd7, 0x3d, 0xea, 0x51, 0x5d, 0xde, 0xb5, 0x6d, 0xe6, 0x45, 0x01, 0x08, 0x98, 0xa6,
+	0x1d, 0xb5, 0x42, 0x66, 0x9b, 0x75, 0xaa, 0xcb, 0x63, 0x3d, 0x33, 0x63, 0x42, 0x41, 0x00, 0x52,
+	0xd3, 0x70, 0xa4, 0xf5, 0xeb, 0x86, 0x4e, 0x41, 0x18, 0x3d, 0x67, 0x9e, 0x6b, 0x8a, 0x4e, 0x95,
+	0xcc, 0xbf, 0xe3, 0xaf, 0xa6, 0x93, 0x05, 0xb1, 0x7a, 0x49, 0xbb, 0x20, 0x1a, 0x90, 0x9b, 0xb8,
+	0x03, 0x80, 0x96, 0x0c, 0x4d, 0x2f, 0xb9, 0x66, 0x2a, 0x0d, 0x07, 0xe3, 0x42, 0xdc, 0x03, 0x77,
+	0x84, 0x5f, 0x4d, 0xe1, 0xad, 0x85, 0x93, 0xfc, 0x6e, 0x38, 0xe4, 0xc4, 0x87, 0xec, 0x78, 0xf4,
+	0x62, 0x25, 0x01, 0x94, 0x8b, 0x10, 0x75, 0x08, 0x65, 0xe8, 0x0c, 0x1c, 0x0c, 0xdb, 0x68, 0xd0,
+	0x28, 0x13, 0xe3, 0xc3, 0x13, 0xef, 0x75, 0x8d, 0x4e, 0x8b, 0x3d, 0x94, 0x9f, 0x00, 0x94, 0x3b,
+	0xb6, 0xa7, 0x45, 0x1f, 0x62, 0xe8, 0x33, 0x38, 0x18, 0xb6, 0xa4, 0x98, 0x7c, 0xb2, 0x2b, 0x39,
+	0x72, 0x55, 0xa3, 0xcf, 0x73, 0x16, 0x77, 0x97, 0xb5, 0x98, 0x92, 0x9a, 0x84, 0x23, 0xad, 0x1b,
+	0x68, 0x0c, 0x26, 0xaa, 0x74, 0x39, 0x8a, 0x3b, 0x18, 0x06, 0xb9, 0xa8, 0x13, 0xd3, 0xa3, 0xe1,
+	0xbb, 0xa2, 0x85, 0x93, 0xc9, 0xbe, 0x8f, 0x80, 0xf2, 0x0b, 0x80, 0xfb, 0x66, 0x28, 0xef, 0x8c,
+	0x85, 0x5e, 0xf7, 0x28, 0xe3, 0xff, 0xc9, 0x5b, 0x31, 0x05, 0xe1, 0xfa, 0x4b, 0xfe, 0xda, 0xb7,
+	0x62, 0x3a, 0x30, 0x99, 0x25, 0xac, 0x9a, 0xef, 0x0f, 0x40, 0x5a, 0x72, 0x31, 0x5e, 0x50, 0x7e,
+	0x07, 0xf0, 0xc0, 0x05, 0x83, 0x75, 0xaa, 0x66, 0xb1, 0xec, 0xff, 0xe5, 0xc5, 0x7e, 0xeb, 0x38,
+	0x7e, 0x06, 0x70, 0x5f, 0x61, 0x8b, 0xe4, 0xcf, 0xc2, 0x81, 0xb0, 0xa2, 0x22, 0xf1, 0xdd, 0x4b,
+	0x70, 0x53, 0xdd, 0x11, 0xe4, 0xad, 0xf5, 0x4e, 0xfc, 0x36, 0x00, 0xdf, 0xdd, 0x44, 0x6c, 0xc5,
+	0x60, 0x41, 0xd9, 0x5d, 0x83, 0x70, 0x86, 0xf2, 0xb8, 0xca, 0xf7, 0x76, 0x80, 0xcf, 0x05, 0x3f,
+	0xed, 0x52, 0xe3, 0x6f, 0x5a, 0xec, 0x4a, 0xea, 0xab, 0x3f, 0xfe, 0xfe, 0xb6, 0x6f, 0x0f, 0x42,
+	0x59, 0xc2, 0xb2, 0x61, 0x08, 0x99, 0xa8, 0xe4, 0xd1, 0x0f, 0x00, 0x26, 0x66, 0x28, 0x47, 0x47,
+	0xdb, 0x69, 0x5b, 0xd4, 0x72, 0xaa, 0x7b, 0xfa, 0x94, 0x19, 0x71, 0x66, 0x0e, 0x4d, 0xad, 0x9f,
+	0x99, 0xbd, 0x69, 0xe8, 0x4c, 0x6d, 0xab, 0xa6, 0xb6, 0xf9, 0xad, 0xd0, 0x68, 0xed, 0xf7, 0xdb,
+	0x2d, 0xf4, 0x0d, 0x80, 0xfd, 0x41, 0x89, 0xa2, 0x4c, 0xfb, 0xa1, 0x5b, 0x16, 0x6e, 0x4a, 0xe9,
+	0xaa, 0x91, 0x29, 0x27, 0x84, 0xc8, 0x0c, 0x3a, 0xda, 0x2a, 0xb2, 0x8b, 0x40, 0xf4, 0x0f, 0x80,
+	0x89, 0xc2, 0x66, 0x19, 0x2b, 0xbc, 0x5d, 0xc6, 0xbe, 0x03, 0x42, 0xcd, 0x5d, 0x90, 0x9a, 0x6d,
+	0x95, 0x13, 0xfd, 0x0b, 0x79, 0xa3, 0xd4, 0xb5, 0xd8, 0xae, 0x67, 0x70, 0x12, 0x1c, 0xb9, 0x7c,
+	0x46, 0x39, 0xb5, 0x3d, 0xe6, 0x24, 0x38, 0x82, 0xee, 0x02, 0x38, 0x70, 0x96, 0x9a, 0x94, 0x53,
+	0xd4, 0x53, 0xdf, 0x4a, 0xbd, 0xa6, 0x72, 0x95, 0x29, 0x11, 0xe8, 0xe9, 0x23, 0x1f, 0xf6, 0x90,
+	0xf6, 0x58, 0x74, 0x30, 0xce, 0xdf, 0x07, 0x8f, 0x1b, 0x18, 0x3c, 0x69, 0x60, 0xf0, 0xb4, 0x81,
+	0xa5, 0x67, 0x0d, 0x2c, 0x3d, 0x6f, 0x60, 0xe9, 0x65, 0x03, 0x4b, 0xaf, 0x1a, 0x18, 0xdc, 0xf6,
+	0x31, 0xb8, 0xe3, 0x63, 0xe9, 0x81, 0x8f, 0xc1, 0x43, 0x1f, 0x4b, 0x8f, 0x7c, 0x2c, 0xad, 0xf8,
+	0x58, 0x7a, 0xec, 0x63, 0xf0, 0xc4, 0xc7, 0xe0, 0xa9, 0x8f, 0xa5, 0x67, 0x3e, 0x06, 0xcf, 0x7d,
+	0x2c, 0xbd, 0xf4, 0x31, 0x78, 0xe5, 0x63, 0xe9, 0x76, 0x13, 0x4b, 0x77, 0x9a, 0x18, 0xdc, 0x6b,
+	0x62, 0xe9, 0xfb, 0x26, 0x06, 0x3f, 0x36, 0xb1, 0xf4, 0xa0, 0x89, 0xa5, 0x87, 0x4d, 0x0c, 0x1e,
+	0x35, 0x31, 0x58, 0x69, 0x62, 0x70, 0xf9, 0x58, 0xc5, 0x56, 0xf9, 0x12, 0xe5, 0x4b, 0x86, 0x55,
+	0x61, 0xaa, 0x45, 0xf9, 0x0d, 0xdb, 0xad, 0x66, 0x37, 0xfe, 0x31, 0x72, 0xaa, 0x95, 0x2c, 0xe7,
+	0x96, 0x53, 0x2a, 0x0d, 0x88, 0xa8, 0x4f, 0xfc, 0x1b, 0x00, 0x00, 0xff, 0xff, 0x90, 0x39, 0x87,
+	0xdb, 0x6c, 0x0e, 0x00, 0x00,
 }
 
-func (x ApplicationPubSub_Provider) String() string {
-	s, ok := ApplicationPubSub_Provider_name[int32(x)]
-	if ok {
-		return s
-	}
-	return strconv.Itoa(int(x))
-}
 func (this *ApplicationPubSubIdentifiers) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -747,18 +816,16 @@ func (this *ApplicationPubSub) Equal(that interface{}) bool {
 	if !this.UpdatedAt.Equal(that1.UpdatedAt) {
 		return false
 	}
-	if len(this.Attributes) != len(that1.Attributes) {
-		return false
-	}
-	for i := range this.Attributes {
-		if this.Attributes[i] != that1.Attributes[i] {
-			return false
-		}
-	}
 	if this.Format != that1.Format {
 		return false
 	}
-	if this.Provider != that1.Provider {
+	if that1.Provider == nil {
+		if this.Provider != nil {
+			return false
+		}
+	} else if this.Provider == nil {
+		return false
+	} else if !this.Provider.Equal(that1.Provider) {
 		return false
 	}
 	if this.BaseTopic != that1.BaseTopic {
@@ -792,6 +859,54 @@ func (this *ApplicationPubSub) Equal(that interface{}) bool {
 		return false
 	}
 	if !this.LocationSolved.Equal(that1.LocationSolved) {
+		return false
+	}
+	return true
+}
+func (this *ApplicationPubSub_NATS) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*ApplicationPubSub_NATS)
+	if !ok {
+		that2, ok := that.(ApplicationPubSub_NATS)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.NATS.Equal(that1.NATS) {
+		return false
+	}
+	return true
+}
+func (this *ApplicationPubSub_NATSProvider) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*ApplicationPubSub_NATSProvider)
+	if !ok {
+		that2, ok := that.(ApplicationPubSub_NATSProvider)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.ServerURL != that1.ServerURL {
 		return false
 	}
 	return true
@@ -1235,42 +1350,20 @@ func (m *ApplicationPubSub) MarshalTo(dAtA []byte) (int, error) {
 		return 0, err
 	}
 	i += n4
-	if len(m.Attributes) > 0 {
-		for k := range m.Attributes {
-			dAtA[i] = 0x22
-			i++
-			v := m.Attributes[k]
-			mapSize := 1 + len(k) + sovApplicationserverPubsub(uint64(len(k))) + 1 + len(v) + sovApplicationserverPubsub(uint64(len(v)))
-			i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(mapSize))
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(len(k)))
-			i += copy(dAtA[i:], k)
-			dAtA[i] = 0x12
-			i++
-			i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(len(v)))
-			i += copy(dAtA[i:], v)
-		}
-	}
 	if len(m.Format) > 0 {
-		dAtA[i] = 0x2a
+		dAtA[i] = 0x22
 		i++
 		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(len(m.Format)))
 		i += copy(dAtA[i:], m.Format)
 	}
-	if m.Provider != 0 {
-		dAtA[i] = 0x30
-		i++
-		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(m.Provider))
-	}
 	if len(m.BaseTopic) > 0 {
-		dAtA[i] = 0x3a
+		dAtA[i] = 0x32
 		i++
 		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(len(m.BaseTopic)))
 		i += copy(dAtA[i:], m.BaseTopic)
 	}
 	if m.DownlinkPush != nil {
-		dAtA[i] = 0x42
+		dAtA[i] = 0x3a
 		i++
 		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(m.DownlinkPush.Size()))
 		n5, err := m.DownlinkPush.MarshalTo(dAtA[i:])
@@ -1280,7 +1373,7 @@ func (m *ApplicationPubSub) MarshalTo(dAtA []byte) (int, error) {
 		i += n5
 	}
 	if m.DownlinkReplace != nil {
-		dAtA[i] = 0x4a
+		dAtA[i] = 0x42
 		i++
 		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(m.DownlinkReplace.Size()))
 		n6, err := m.DownlinkReplace.MarshalTo(dAtA[i:])
@@ -1290,7 +1383,7 @@ func (m *ApplicationPubSub) MarshalTo(dAtA []byte) (int, error) {
 		i += n6
 	}
 	if m.UplinkMessage != nil {
-		dAtA[i] = 0x52
+		dAtA[i] = 0x4a
 		i++
 		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(m.UplinkMessage.Size()))
 		n7, err := m.UplinkMessage.MarshalTo(dAtA[i:])
@@ -1300,7 +1393,7 @@ func (m *ApplicationPubSub) MarshalTo(dAtA []byte) (int, error) {
 		i += n7
 	}
 	if m.JoinAccept != nil {
-		dAtA[i] = 0x5a
+		dAtA[i] = 0x52
 		i++
 		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(m.JoinAccept.Size()))
 		n8, err := m.JoinAccept.MarshalTo(dAtA[i:])
@@ -1310,7 +1403,7 @@ func (m *ApplicationPubSub) MarshalTo(dAtA []byte) (int, error) {
 		i += n8
 	}
 	if m.DownlinkAck != nil {
-		dAtA[i] = 0x62
+		dAtA[i] = 0x5a
 		i++
 		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(m.DownlinkAck.Size()))
 		n9, err := m.DownlinkAck.MarshalTo(dAtA[i:])
@@ -1320,7 +1413,7 @@ func (m *ApplicationPubSub) MarshalTo(dAtA []byte) (int, error) {
 		i += n9
 	}
 	if m.DownlinkNack != nil {
-		dAtA[i] = 0x6a
+		dAtA[i] = 0x62
 		i++
 		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(m.DownlinkNack.Size()))
 		n10, err := m.DownlinkNack.MarshalTo(dAtA[i:])
@@ -1330,7 +1423,7 @@ func (m *ApplicationPubSub) MarshalTo(dAtA []byte) (int, error) {
 		i += n10
 	}
 	if m.DownlinkSent != nil {
-		dAtA[i] = 0x72
+		dAtA[i] = 0x6a
 		i++
 		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(m.DownlinkSent.Size()))
 		n11, err := m.DownlinkSent.MarshalTo(dAtA[i:])
@@ -1340,7 +1433,7 @@ func (m *ApplicationPubSub) MarshalTo(dAtA []byte) (int, error) {
 		i += n11
 	}
 	if m.DownlinkFailed != nil {
-		dAtA[i] = 0x7a
+		dAtA[i] = 0x72
 		i++
 		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(m.DownlinkFailed.Size()))
 		n12, err := m.DownlinkFailed.MarshalTo(dAtA[i:])
@@ -1350,9 +1443,7 @@ func (m *ApplicationPubSub) MarshalTo(dAtA []byte) (int, error) {
 		i += n12
 	}
 	if m.DownlinkQueued != nil {
-		dAtA[i] = 0x82
-		i++
-		dAtA[i] = 0x1
+		dAtA[i] = 0x7a
 		i++
 		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(m.DownlinkQueued.Size()))
 		n13, err := m.DownlinkQueued.MarshalTo(dAtA[i:])
@@ -1362,7 +1453,7 @@ func (m *ApplicationPubSub) MarshalTo(dAtA []byte) (int, error) {
 		i += n13
 	}
 	if m.LocationSolved != nil {
-		dAtA[i] = 0x8a
+		dAtA[i] = 0x82
 		i++
 		dAtA[i] = 0x1
 		i++
@@ -1372,6 +1463,53 @@ func (m *ApplicationPubSub) MarshalTo(dAtA []byte) (int, error) {
 			return 0, err
 		}
 		i += n14
+	}
+	if m.Provider != nil {
+		nn15, err := m.Provider.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += nn15
+	}
+	return i, nil
+}
+
+func (m *ApplicationPubSub_NATS) MarshalTo(dAtA []byte) (int, error) {
+	i := 0
+	if m.NATS != nil {
+		dAtA[i] = 0x8a
+		i++
+		dAtA[i] = 0x1
+		i++
+		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(m.NATS.Size()))
+		n16, err := m.NATS.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n16
+	}
+	return i, nil
+}
+func (m *ApplicationPubSub_NATSProvider) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ApplicationPubSub_NATSProvider) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.ServerURL) > 0 {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(len(m.ServerURL)))
+		i += copy(dAtA[i:], m.ServerURL)
 	}
 	return i, nil
 }
@@ -1483,19 +1621,19 @@ func (m *GetApplicationPubSubRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(m.ApplicationPubSubIdentifiers.Size()))
-	n15, err := m.ApplicationPubSubIdentifiers.MarshalTo(dAtA[i:])
+	n17, err := m.ApplicationPubSubIdentifiers.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n15
+	i += n17
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(m.FieldMask.Size()))
-	n16, err := m.FieldMask.MarshalTo(dAtA[i:])
+	n18, err := m.FieldMask.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n16
+	i += n18
 	return i, nil
 }
 
@@ -1517,19 +1655,19 @@ func (m *ListApplicationPubSubsRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(m.ApplicationIdentifiers.Size()))
-	n17, err := m.ApplicationIdentifiers.MarshalTo(dAtA[i:])
+	n19, err := m.ApplicationIdentifiers.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n17
+	i += n19
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(m.FieldMask.Size()))
-	n18, err := m.FieldMask.MarshalTo(dAtA[i:])
+	n20, err := m.FieldMask.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n18
+	i += n20
 	return i, nil
 }
 
@@ -1551,19 +1689,19 @@ func (m *SetApplicationPubSubRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(m.ApplicationPubSub.Size()))
-	n19, err := m.ApplicationPubSub.MarshalTo(dAtA[i:])
+	n21, err := m.ApplicationPubSub.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n19
+	i += n21
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(m.FieldMask.Size()))
-	n20, err := m.FieldMask.MarshalTo(dAtA[i:])
+	n22, err := m.FieldMask.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n20
+	i += n22
 	return i, nil
 }
 
@@ -1594,15 +1732,7 @@ func NewPopulatedApplicationPubSub(r randyApplicationserverPubsub, easy bool) *A
 	this.CreatedAt = *v3
 	v4 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	this.UpdatedAt = *v4
-	if r.Intn(10) != 0 {
-		v5 := r.Intn(10)
-		this.Attributes = make(map[string]string)
-		for i := 0; i < v5; i++ {
-			this.Attributes[randStringApplicationserverPubsub(r)] = randStringApplicationserverPubsub(r)
-		}
-	}
 	this.Format = randStringApplicationserverPubsub(r)
-	this.Provider = ApplicationPubSub_Provider([]int32{0, 1, 2, 3, 4, 5}[r.Intn(6)])
 	this.BaseTopic = randStringApplicationserverPubsub(r)
 	if r.Intn(10) != 0 {
 		this.DownlinkPush = NewPopulatedApplicationPubSub_Message(r, easy)
@@ -1634,6 +1764,24 @@ func NewPopulatedApplicationPubSub(r randyApplicationserverPubsub, easy bool) *A
 	if r.Intn(10) != 0 {
 		this.LocationSolved = NewPopulatedApplicationPubSub_Message(r, easy)
 	}
+	oneofNumber_Provider := []int32{17}[r.Intn(1)]
+	switch oneofNumber_Provider {
+	case 17:
+		this.Provider = NewPopulatedApplicationPubSub_NATS(r, easy)
+	}
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedApplicationPubSub_NATS(r randyApplicationserverPubsub, easy bool) *ApplicationPubSub_NATS {
+	this := &ApplicationPubSub_NATS{}
+	this.NATS = NewPopulatedApplicationPubSub_NATSProvider(r, easy)
+	return this
+}
+func NewPopulatedApplicationPubSub_NATSProvider(r randyApplicationserverPubsub, easy bool) *ApplicationPubSub_NATSProvider {
+	this := &ApplicationPubSub_NATSProvider{}
+	this.ServerURL = randStringApplicationserverPubsub(r)
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1650,9 +1798,9 @@ func NewPopulatedApplicationPubSub_Message(r randyApplicationserverPubsub, easy 
 func NewPopulatedApplicationPubSubs(r randyApplicationserverPubsub, easy bool) *ApplicationPubSubs {
 	this := &ApplicationPubSubs{}
 	if r.Intn(10) != 0 {
-		v6 := r.Intn(5)
-		this.Pubsubs = make([]*ApplicationPubSub, v6)
-		for i := 0; i < v6; i++ {
+		v5 := r.Intn(5)
+		this.Pubsubs = make([]*ApplicationPubSub, v5)
+		for i := 0; i < v5; i++ {
 			this.Pubsubs[i] = NewPopulatedApplicationPubSub(r, easy)
 		}
 	}
@@ -1664,9 +1812,9 @@ func NewPopulatedApplicationPubSubs(r randyApplicationserverPubsub, easy bool) *
 func NewPopulatedApplicationPubSubFormats(r randyApplicationserverPubsub, easy bool) *ApplicationPubSubFormats {
 	this := &ApplicationPubSubFormats{}
 	if r.Intn(10) != 0 {
-		v7 := r.Intn(10)
+		v6 := r.Intn(10)
 		this.Formats = make(map[string]string)
-		for i := 0; i < v7; i++ {
+		for i := 0; i < v6; i++ {
 			this.Formats[randStringApplicationserverPubsub(r)] = randStringApplicationserverPubsub(r)
 		}
 	}
@@ -1677,10 +1825,10 @@ func NewPopulatedApplicationPubSubFormats(r randyApplicationserverPubsub, easy b
 
 func NewPopulatedGetApplicationPubSubRequest(r randyApplicationserverPubsub, easy bool) *GetApplicationPubSubRequest {
 	this := &GetApplicationPubSubRequest{}
-	v8 := NewPopulatedApplicationPubSubIdentifiers(r, easy)
-	this.ApplicationPubSubIdentifiers = *v8
-	v9 := types.NewPopulatedFieldMask(r, easy)
-	this.FieldMask = *v9
+	v7 := NewPopulatedApplicationPubSubIdentifiers(r, easy)
+	this.ApplicationPubSubIdentifiers = *v7
+	v8 := types.NewPopulatedFieldMask(r, easy)
+	this.FieldMask = *v8
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1688,10 +1836,10 @@ func NewPopulatedGetApplicationPubSubRequest(r randyApplicationserverPubsub, eas
 
 func NewPopulatedListApplicationPubSubsRequest(r randyApplicationserverPubsub, easy bool) *ListApplicationPubSubsRequest {
 	this := &ListApplicationPubSubsRequest{}
-	v10 := NewPopulatedApplicationIdentifiers(r, easy)
-	this.ApplicationIdentifiers = *v10
-	v11 := types.NewPopulatedFieldMask(r, easy)
-	this.FieldMask = *v11
+	v9 := NewPopulatedApplicationIdentifiers(r, easy)
+	this.ApplicationIdentifiers = *v9
+	v10 := types.NewPopulatedFieldMask(r, easy)
+	this.FieldMask = *v10
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1699,10 +1847,10 @@ func NewPopulatedListApplicationPubSubsRequest(r randyApplicationserverPubsub, e
 
 func NewPopulatedSetApplicationPubSubRequest(r randyApplicationserverPubsub, easy bool) *SetApplicationPubSubRequest {
 	this := &SetApplicationPubSubRequest{}
-	v12 := NewPopulatedApplicationPubSub(r, easy)
-	this.ApplicationPubSub = *v12
-	v13 := types.NewPopulatedFieldMask(r, easy)
-	this.FieldMask = *v13
+	v11 := NewPopulatedApplicationPubSub(r, easy)
+	this.ApplicationPubSub = *v11
+	v12 := types.NewPopulatedFieldMask(r, easy)
+	this.FieldMask = *v12
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1727,9 +1875,9 @@ func randUTF8RuneApplicationserverPubsub(r randyApplicationserverPubsub) rune {
 	return rune(ru + 61)
 }
 func randStringApplicationserverPubsub(r randyApplicationserverPubsub) string {
-	v14 := r.Intn(100)
-	tmps := make([]rune, v14)
-	for i := 0; i < v14; i++ {
+	v13 := r.Intn(100)
+	tmps := make([]rune, v13)
+	for i := 0; i < v13; i++ {
 		tmps[i] = randUTF8RuneApplicationserverPubsub(r)
 	}
 	return string(tmps)
@@ -1751,11 +1899,11 @@ func randFieldApplicationserverPubsub(dAtA []byte, r randyApplicationserverPubsu
 	switch wire {
 	case 0:
 		dAtA = encodeVarintPopulateApplicationserverPubsub(dAtA, uint64(key))
-		v15 := r.Int63()
+		v14 := r.Int63()
 		if r.Intn(2) == 0 {
-			v15 *= -1
+			v14 *= -1
 		}
-		dAtA = encodeVarintPopulateApplicationserverPubsub(dAtA, uint64(v15))
+		dAtA = encodeVarintPopulateApplicationserverPubsub(dAtA, uint64(v14))
 	case 1:
 		dAtA = encodeVarintPopulateApplicationserverPubsub(dAtA, uint64(key))
 		dAtA = append(dAtA, byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)))
@@ -1807,20 +1955,9 @@ func (m *ApplicationPubSub) Size() (n int) {
 	n += 1 + l + sovApplicationserverPubsub(uint64(l))
 	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt)
 	n += 1 + l + sovApplicationserverPubsub(uint64(l))
-	if len(m.Attributes) > 0 {
-		for k, v := range m.Attributes {
-			_ = k
-			_ = v
-			mapEntrySize := 1 + len(k) + sovApplicationserverPubsub(uint64(len(k))) + 1 + len(v) + sovApplicationserverPubsub(uint64(len(v)))
-			n += mapEntrySize + 1 + sovApplicationserverPubsub(uint64(mapEntrySize))
-		}
-	}
 	l = len(m.Format)
 	if l > 0 {
 		n += 1 + l + sovApplicationserverPubsub(uint64(l))
-	}
-	if m.Provider != 0 {
-		n += 1 + sovApplicationserverPubsub(uint64(m.Provider))
 	}
 	l = len(m.BaseTopic)
 	if l > 0 {
@@ -1860,11 +1997,39 @@ func (m *ApplicationPubSub) Size() (n int) {
 	}
 	if m.DownlinkQueued != nil {
 		l = m.DownlinkQueued.Size()
-		n += 2 + l + sovApplicationserverPubsub(uint64(l))
+		n += 1 + l + sovApplicationserverPubsub(uint64(l))
 	}
 	if m.LocationSolved != nil {
 		l = m.LocationSolved.Size()
 		n += 2 + l + sovApplicationserverPubsub(uint64(l))
+	}
+	if m.Provider != nil {
+		n += m.Provider.Size()
+	}
+	return n
+}
+
+func (m *ApplicationPubSub_NATS) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.NATS != nil {
+		l = m.NATS.Size()
+		n += 2 + l + sovApplicationserverPubsub(uint64(l))
+	}
+	return n
+}
+func (m *ApplicationPubSub_NATSProvider) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.ServerURL)
+	if l > 0 {
+		n += 1 + l + sovApplicationserverPubsub(uint64(l))
 	}
 	return n
 }
@@ -1981,23 +2146,11 @@ func (this *ApplicationPubSub) String() string {
 	if this == nil {
 		return "nil"
 	}
-	keysForAttributes := make([]string, 0, len(this.Attributes))
-	for k := range this.Attributes {
-		keysForAttributes = append(keysForAttributes, k)
-	}
-	github_com_gogo_protobuf_sortkeys.Strings(keysForAttributes)
-	mapStringForAttributes := "map[string]string{"
-	for _, k := range keysForAttributes {
-		mapStringForAttributes += fmt.Sprintf("%v: %v,", k, this.Attributes[k])
-	}
-	mapStringForAttributes += "}"
 	s := strings.Join([]string{`&ApplicationPubSub{`,
 		`ApplicationPubSubIdentifiers:` + strings.Replace(strings.Replace(this.ApplicationPubSubIdentifiers.String(), "ApplicationPubSubIdentifiers", "ApplicationPubSubIdentifiers", 1), `&`, ``, 1) + `,`,
 		`CreatedAt:` + strings.Replace(strings.Replace(this.CreatedAt.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
 		`UpdatedAt:` + strings.Replace(strings.Replace(this.UpdatedAt.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
-		`Attributes:` + mapStringForAttributes + `,`,
 		`Format:` + fmt.Sprintf("%v", this.Format) + `,`,
-		`Provider:` + fmt.Sprintf("%v", this.Provider) + `,`,
 		`BaseTopic:` + fmt.Sprintf("%v", this.BaseTopic) + `,`,
 		`DownlinkPush:` + strings.Replace(fmt.Sprintf("%v", this.DownlinkPush), "ApplicationPubSub_Message", "ApplicationPubSub_Message", 1) + `,`,
 		`DownlinkReplace:` + strings.Replace(fmt.Sprintf("%v", this.DownlinkReplace), "ApplicationPubSub_Message", "ApplicationPubSub_Message", 1) + `,`,
@@ -2009,6 +2162,27 @@ func (this *ApplicationPubSub) String() string {
 		`DownlinkFailed:` + strings.Replace(fmt.Sprintf("%v", this.DownlinkFailed), "ApplicationPubSub_Message", "ApplicationPubSub_Message", 1) + `,`,
 		`DownlinkQueued:` + strings.Replace(fmt.Sprintf("%v", this.DownlinkQueued), "ApplicationPubSub_Message", "ApplicationPubSub_Message", 1) + `,`,
 		`LocationSolved:` + strings.Replace(fmt.Sprintf("%v", this.LocationSolved), "ApplicationPubSub_Message", "ApplicationPubSub_Message", 1) + `,`,
+		`Provider:` + fmt.Sprintf("%v", this.Provider) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *ApplicationPubSub_NATS) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&ApplicationPubSub_NATS{`,
+		`NATS:` + strings.Replace(fmt.Sprintf("%v", this.NATS), "ApplicationPubSub_NATSProvider", "ApplicationPubSub_NATSProvider", 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *ApplicationPubSub_NATSProvider) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&ApplicationPubSub_NATSProvider{`,
+		`ServerURL:` + fmt.Sprintf("%v", this.ServerURL) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2342,133 +2516,6 @@ func (m *ApplicationPubSub) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Attributes", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApplicationserverPubsub
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthApplicationserverPubsub
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthApplicationserverPubsub
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Attributes == nil {
-				m.Attributes = make(map[string]string)
-			}
-			var mapkey string
-			var mapvalue string
-			for iNdEx < postIndex {
-				entryPreIndex := iNdEx
-				var wire uint64
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowApplicationserverPubsub
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					wire |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				fieldNum := int32(wire >> 3)
-				if fieldNum == 1 {
-					var stringLenmapkey uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowApplicationserverPubsub
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						stringLenmapkey |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					intStringLenmapkey := int(stringLenmapkey)
-					if intStringLenmapkey < 0 {
-						return ErrInvalidLengthApplicationserverPubsub
-					}
-					postStringIndexmapkey := iNdEx + intStringLenmapkey
-					if postStringIndexmapkey < 0 {
-						return ErrInvalidLengthApplicationserverPubsub
-					}
-					if postStringIndexmapkey > l {
-						return io.ErrUnexpectedEOF
-					}
-					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
-					iNdEx = postStringIndexmapkey
-				} else if fieldNum == 2 {
-					var stringLenmapvalue uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowApplicationserverPubsub
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						stringLenmapvalue |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					intStringLenmapvalue := int(stringLenmapvalue)
-					if intStringLenmapvalue < 0 {
-						return ErrInvalidLengthApplicationserverPubsub
-					}
-					postStringIndexmapvalue := iNdEx + intStringLenmapvalue
-					if postStringIndexmapvalue < 0 {
-						return ErrInvalidLengthApplicationserverPubsub
-					}
-					if postStringIndexmapvalue > l {
-						return io.ErrUnexpectedEOF
-					}
-					mapvalue = string(dAtA[iNdEx:postStringIndexmapvalue])
-					iNdEx = postStringIndexmapvalue
-				} else {
-					iNdEx = entryPreIndex
-					skippy, err := skipApplicationserverPubsub(dAtA[iNdEx:])
-					if err != nil {
-						return err
-					}
-					if skippy < 0 {
-						return ErrInvalidLengthApplicationserverPubsub
-					}
-					if (iNdEx + skippy) > postIndex {
-						return io.ErrUnexpectedEOF
-					}
-					iNdEx += skippy
-				}
-			}
-			m.Attributes[mapkey] = mapvalue
-			iNdEx = postIndex
-		case 5:
-			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Format", wireType)
 			}
 			var stringLen uint64
@@ -2500,25 +2547,6 @@ func (m *ApplicationPubSub) Unmarshal(dAtA []byte) error {
 			m.Format = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 6:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Provider", wireType)
-			}
-			m.Provider = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApplicationserverPubsub
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Provider |= ApplicationPubSub_Provider(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 7:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field BaseTopic", wireType)
 			}
@@ -2550,7 +2578,7 @@ func (m *ApplicationPubSub) Unmarshal(dAtA []byte) error {
 			}
 			m.BaseTopic = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 8:
+		case 7:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field DownlinkPush", wireType)
 			}
@@ -2586,7 +2614,7 @@ func (m *ApplicationPubSub) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 9:
+		case 8:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field DownlinkReplace", wireType)
 			}
@@ -2622,7 +2650,7 @@ func (m *ApplicationPubSub) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 10:
+		case 9:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field UplinkMessage", wireType)
 			}
@@ -2658,7 +2686,7 @@ func (m *ApplicationPubSub) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 11:
+		case 10:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field JoinAccept", wireType)
 			}
@@ -2694,7 +2722,7 @@ func (m *ApplicationPubSub) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 12:
+		case 11:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field DownlinkAck", wireType)
 			}
@@ -2730,7 +2758,7 @@ func (m *ApplicationPubSub) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 13:
+		case 12:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field DownlinkNack", wireType)
 			}
@@ -2766,7 +2794,7 @@ func (m *ApplicationPubSub) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 14:
+		case 13:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field DownlinkSent", wireType)
 			}
@@ -2802,7 +2830,7 @@ func (m *ApplicationPubSub) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 15:
+		case 14:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field DownlinkFailed", wireType)
 			}
@@ -2838,7 +2866,7 @@ func (m *ApplicationPubSub) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 16:
+		case 15:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field DownlinkQueued", wireType)
 			}
@@ -2874,7 +2902,7 @@ func (m *ApplicationPubSub) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 17:
+		case 16:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field LocationSolved", wireType)
 			}
@@ -2909,6 +2937,126 @@ func (m *ApplicationPubSub) Unmarshal(dAtA []byte) error {
 			if err := m.LocationSolved.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
+			iNdEx = postIndex
+		case 17:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NATS", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplicationserverPubsub
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthApplicationserverPubsub
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthApplicationserverPubsub
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &ApplicationPubSub_NATSProvider{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.Provider = &ApplicationPubSub_NATS{v}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipApplicationserverPubsub(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthApplicationserverPubsub
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthApplicationserverPubsub
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ApplicationPubSub_NATSProvider) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowApplicationserverPubsub
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: NATSProvider: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: NATSProvider: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ServerURL", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplicationserverPubsub
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthApplicationserverPubsub
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthApplicationserverPubsub
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ServerURL = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

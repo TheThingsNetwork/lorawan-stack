@@ -32,8 +32,8 @@
   - [Service `AsEndDeviceRegistry`](#ttn.lorawan.v3.AsEndDeviceRegistry)
 - [File `lorawan-stack/api/applicationserver_pubsub.proto`](#lorawan-stack/api/applicationserver_pubsub.proto)
   - [Message `ApplicationPubSub`](#ttn.lorawan.v3.ApplicationPubSub)
-  - [Message `ApplicationPubSub.AttributesEntry`](#ttn.lorawan.v3.ApplicationPubSub.AttributesEntry)
   - [Message `ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message)
+  - [Message `ApplicationPubSub.NATSProvider`](#ttn.lorawan.v3.ApplicationPubSub.NATSProvider)
   - [Message `ApplicationPubSubFormats`](#ttn.lorawan.v3.ApplicationPubSubFormats)
   - [Message `ApplicationPubSubFormats.FormatsEntry`](#ttn.lorawan.v3.ApplicationPubSubFormats.FormatsEntry)
   - [Message `ApplicationPubSubIdentifiers`](#ttn.lorawan.v3.ApplicationPubSubIdentifiers)
@@ -41,7 +41,6 @@
   - [Message `GetApplicationPubSubRequest`](#ttn.lorawan.v3.GetApplicationPubSubRequest)
   - [Message `ListApplicationPubSubsRequest`](#ttn.lorawan.v3.ListApplicationPubSubsRequest)
   - [Message `SetApplicationPubSubRequest`](#ttn.lorawan.v3.SetApplicationPubSubRequest)
-  - [Enum `ApplicationPubSub.Provider`](#ttn.lorawan.v3.ApplicationPubSub.Provider)
   - [Service `ApplicationPubSubRegistry`](#ttn.lorawan.v3.ApplicationPubSubRegistry)
 - [File `lorawan-stack/api/applicationserver_web.proto`](#lorawan-stack/api/applicationserver_web.proto)
   - [Message `ApplicationWebhook`](#ttn.lorawan.v3.ApplicationWebhook)
@@ -755,9 +754,8 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 | `ids` | [`ApplicationPubSubIdentifiers`](#ttn.lorawan.v3.ApplicationPubSubIdentifiers) |  |  |
 | `created_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 | `updated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
-| `attributes` | [`ApplicationPubSub.AttributesEntry`](#ttn.lorawan.v3.ApplicationPubSub.AttributesEntry) | repeated | Provider specific attributes used for authentication and settings. |
 | `format` | [`string`](#string) |  | The format to use for the body. Supported values depend on the Application Server configuration. |
-| `provider` | [`ApplicationPubSub.Provider`](#ttn.lorawan.v3.ApplicationPubSub.Provider) |  |  |
+| `nats` | [`ApplicationPubSub.NATSProvider`](#ttn.lorawan.v3.ApplicationPubSub.NATSProvider) |  |  |
 | `base_topic` | [`string`](#string) |  | Base topic name to which the messages topic is appended. |
 | `downlink_push` | [`ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message) |  | The topic to which the Application Server subscribes for downlink queue push operations. |
 | `downlink_replace` | [`ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message) |  | The topic to which the Application Server subscribes for downlink queue replace operations. |
@@ -775,20 +773,26 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 | Field | Validations |
 | ----- | ----------- |
 | `ids` | <p>`message.required`: `true`</p> |
-| `provider` | <p>`enum.defined_only`: `true`</p> |
-
-### <a name="ttn.lorawan.v3.ApplicationPubSub.AttributesEntry">Message `ApplicationPubSub.AttributesEntry`</a>
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `key` | [`string`](#string) |  |  |
-| `value` | [`string`](#string) |  |  |
 
 ### <a name="ttn.lorawan.v3.ApplicationPubSub.Message">Message `ApplicationPubSub.Message`</a>
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `topic` | [`string`](#string) |  | The topic on which the Application Server publishes or receives the messages. |
+
+### <a name="ttn.lorawan.v3.ApplicationPubSub.NATSProvider">Message `ApplicationPubSub.NATSProvider`</a>
+
+The NATS provider settings.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `server_url` | [`string`](#string) |  | The server connection URL. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `server_url` | <p>`string.uri`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.ApplicationPubSubFormats">Message `ApplicationPubSubFormats`</a>
 
@@ -861,19 +865,6 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 | Field | Validations |
 | ----- | ----------- |
 | `pubsub` | <p>`message.required`: `true`</p> |
-
-### <a name="ttn.lorawan.v3.ApplicationPubSub.Provider">Enum `ApplicationPubSub.Provider`</a>
-
-The provider for the PubSub.
-
-| Name | Number | Description |
-| ---- | ------ | ----------- |
-| `AWSSNSSQS` | 0 | AWS SQS / SNS |
-| `AZURESB` | 1 | Azure Service Bus |
-| `GCPPUBSUB` | 2 | GCP PubSub |
-| `KAFKA` | 3 | Apache Kafka |
-| `NATS` | 4 | NATS |
-| `RABBIT` | 5 | RabbitMQ |
 
 ### <a name="ttn.lorawan.v3.ApplicationPubSubRegistry">Service `ApplicationPubSubRegistry`</a>
 

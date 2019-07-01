@@ -36,25 +36,24 @@ message ApplicationPubSub {
   google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
-  // Provider specific attributes used for authentication and settings.
-  map<string,string> attributes = 4;
   // The format to use for the body.
   // Supported values depend on the Application Server configuration.
-  string format = 5;
+  string format = 4;
 
-  // The provider for the PubSub.
-  enum Provider {
-      AWSSNSSQS = 0; // AWS SQS / SNS
-      AZURESB = 1;   // Azure Service Bus
-      GCPPUBSUB = 2; // GCP PubSub
-      KAFKA = 3;     // Apache Kafka
-      NATS = 4;      // NATS
-      RABBIT = 5;    // RabbitMQ
+  // The NATS provider settings.
+  message NATSProvider {
+    // The server connection URL.
+    string server_url = 1 [(gogoproto.customname) = "ServerURL", (validate.rules).string.uri = true];
   }
-  Provider provider = 6 [(validate.rules).message.required = true, (validate.rules).enum.defined_only = true];
+  // The provider for the PubSub.
+  oneof provider {
+      option (validate.required) = true;
+
+      NATSProvider nats = 17 [(gogoproto.customname) = "NATS"];
+  };
 
   // Base topic name to which the messages topic is appended.
-  string base_topic = 7;
+  string base_topic = 6;
 
   message Message {
     // The topic on which the Application Server publishes or receives the messages.
@@ -62,18 +61,18 @@ message ApplicationPubSub {
   }
 
   // The topic to which the Application Server subscribes for downlink queue push operations.
-  Message downlink_push = 8;
+  Message downlink_push = 7;
   // The topic to which the Application Server subscribes for downlink queue replace operations.
-  Message downlink_replace = 9;
+  Message downlink_replace = 8;
 
-  Message uplink_message = 10;
-  Message join_accept = 11;
-  Message downlink_ack = 12;
-  Message downlink_nack = 13;
-  Message downlink_sent = 14;
-  Message downlink_failed = 15;
-  Message downlink_queued = 16;
-  Message location_solved = 17;
+  Message uplink_message = 9;
+  Message join_accept = 10;
+  Message downlink_ack = 11;
+  Message downlink_nack = 12;
+  Message downlink_sent = 13;
+  Message downlink_failed = 14;
+  Message downlink_queued = 15;
+  Message location_solved = 16;
 }
 
 message ApplicationPubSubs {

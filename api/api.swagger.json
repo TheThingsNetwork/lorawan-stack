@@ -5047,18 +5047,15 @@
         }
       }
     },
-    "ApplicationPubSubProvider": {
-      "type": "string",
-      "enum": [
-        "AWSSNSSQS",
-        "AZURESB",
-        "GCPPUBSUB",
-        "KAFKA",
-        "NATS",
-        "RABBIT"
-      ],
-      "default": "AWSSNSSQS",
-      "description": "The provider for the PubSub."
+    "ApplicationPubSubNATSProvider": {
+      "type": "object",
+      "properties": {
+        "server_url": {
+          "type": "string",
+          "description": "The server connection URL."
+        }
+      },
+      "description": "The NATS provider settings."
     },
     "AuthInfoResponseAPIKeyAccess": {
       "type": "object",
@@ -6182,19 +6179,12 @@
           "type": "string",
           "format": "date-time"
         },
-        "attributes": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          },
-          "description": "Provider specific attributes used for authentication and settings."
-        },
         "format": {
           "type": "string",
           "description": "The format to use for the body.\nSupported values depend on the Application Server configuration."
         },
-        "provider": {
-          "$ref": "#/definitions/ApplicationPubSubProvider"
+        "nats": {
+          "$ref": "#/definitions/ApplicationPubSubNATSProvider"
         },
         "base_topic": {
           "type": "string",

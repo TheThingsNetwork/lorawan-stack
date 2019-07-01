@@ -89,15 +89,6 @@ func (dst *ApplicationPubSub) SetFields(src *ApplicationPubSub, paths ...string)
 				var zero time.Time
 				dst.UpdatedAt = zero
 			}
-		case "attributes":
-			if len(subs) > 0 {
-				return fmt.Errorf("'attributes' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.Attributes = src.Attributes
-			} else {
-				dst.Attributes = nil
-			}
 		case "format":
 			if len(subs) > 0 {
 				return fmt.Errorf("'format' has no subfields, but %s were specified", subs)
@@ -107,16 +98,6 @@ func (dst *ApplicationPubSub) SetFields(src *ApplicationPubSub, paths ...string)
 			} else {
 				var zero string
 				dst.Format = zero
-			}
-		case "provider":
-			if len(subs) > 0 {
-				return fmt.Errorf("'provider' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.Provider = src.Provider
-			} else {
-				var zero ApplicationPubSub_Provider
-				dst.Provider = zero
 			}
 		case "base_topic":
 			if len(subs) > 0 {
@@ -339,6 +320,51 @@ func (dst *ApplicationPubSub) SetFields(src *ApplicationPubSub, paths ...string)
 				}
 			}
 
+		case "provider":
+			if len(subs) == 0 && src == nil {
+				dst.Provider = nil
+				continue
+			} else if len(subs) == 0 {
+				dst.Provider = src.Provider
+				continue
+			}
+
+			subPathMap := _processPaths(subs)
+			if len(subPathMap) > 1 {
+				return fmt.Errorf("more than one field specified for oneof field '%s'", name)
+			}
+			for oneofName, oneofSubs := range subPathMap {
+				switch oneofName {
+				case "nats":
+					if _, ok := dst.Provider.(*ApplicationPubSub_NATS); !ok {
+						dst.Provider = &ApplicationPubSub_NATS{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Provider.(*ApplicationPubSub_NATS).NATS
+						if newDst == nil {
+							newDst = &ApplicationPubSub_NATSProvider{}
+							dst.Provider.(*ApplicationPubSub_NATS).NATS = newDst
+						}
+						var newSrc *ApplicationPubSub_NATSProvider
+						if src != nil {
+							newSrc = src.GetNATS()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Provider.(*ApplicationPubSub_NATS).NATS = src.GetNATS()
+						} else {
+							dst.Provider.(*ApplicationPubSub_NATS).NATS = nil
+						}
+					}
+
+				default:
+					return fmt.Errorf("invalid oneof field: '%s.%s'", name, oneofName)
+				}
+			}
+
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
 		}
@@ -494,6 +520,27 @@ func (dst *SetApplicationPubSubRequest) SetFields(src *SetApplicationPubSubReque
 			} else {
 				var zero types.FieldMask
 				dst.FieldMask = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ApplicationPubSub_NATSProvider) SetFields(src *ApplicationPubSub_NATSProvider, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "server_url":
+			if len(subs) > 0 {
+				return fmt.Errorf("'server_url' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ServerURL = src.ServerURL
+			} else {
+				var zero string
+				dst.ServerURL = zero
 			}
 
 		default:
