@@ -26,6 +26,8 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/mock"
 	. "go.thethings.network/lorawan-stack/pkg/applicationserver/io/mqtt"
+	"go.thethings.network/lorawan-stack/pkg/component"
+	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -50,16 +52,33 @@ func TestAuthentication(t *testing.T) {
 	a := assertions.New(t)
 
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
-	ctx = newContextWithRightsFetcher(ctx)
 	ctx, cancelCtx := context.WithCancel(ctx)
 	defer cancelCtx()
+
+	is, isAddr := startMockIS(ctx)
+	is.add(ctx, registeredApplicationID, registeredApplicationKey)
+
+	c := component.MustNew(test.GetLogger(t), &component.Config{
+		ServiceBase: config.ServiceBase{
+			GRPC: config.GRPC{
+				Listen:                      ":0",
+				AllowInsecureForCredentials: true,
+			},
+			Cluster: config.Cluster{
+				IdentityServer: isAddr,
+			},
+		},
+	})
+	test.Must(nil, c.Start())
+	defer c.Close()
+	mustHavePeer(ctx, c, ttnpb.PeerInfo_ENTITY_REGISTRY)
 
 	as := mock.NewServer()
 	lis, err := net.Listen("tcp", ":0")
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	Start(ctx, as, lis, JSON, "tcp")
+	Start(c.FillContext(ctx), as, lis, JSON, "tcp")
 
 	for _, tc := range []struct {
 		UID string
@@ -107,16 +126,34 @@ func TestTraffic(t *testing.T) {
 	a := assertions.New(t)
 
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
-	ctx = newContextWithRightsFetcher(ctx)
 	ctx, cancelCtx := context.WithCancel(ctx)
 	defer cancelCtx()
+
+	is, isAddr := startMockIS(ctx)
+	is.add(ctx, registeredApplicationID, registeredApplicationKey)
+
+	c := component.MustNew(test.GetLogger(t), &component.Config{
+		ServiceBase: config.ServiceBase{
+			GRPC: config.GRPC{
+				Listen:                      ":0",
+				AllowInsecureForCredentials: true,
+			},
+			Cluster: config.Cluster{
+				IdentityServer: isAddr,
+			},
+		},
+	})
+	test.Must(nil, c.Start())
+	defer c.Close()
+
+	mustHavePeer(ctx, c, ttnpb.PeerInfo_ENTITY_REGISTRY)
 
 	as := mock.NewServer()
 	lis, err := net.Listen("tcp", ":0")
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	Start(ctx, as, lis, JSON, "tcp")
+	Start(c.FillContext(ctx), as, lis, JSON, "tcp")
 
 	clientOpts := mqtt.NewClientOptions()
 	clientOpts.AddBroker(fmt.Sprintf("tcp://%v", lis.Addr()))
