@@ -2,6 +2,8 @@ sudo: required
 conditions: v1
 if: type = pull_request OR branch = master OR tag IS present
 os: linux
+git:
+  depth: false
 language: go
 go: 1.12.x
 go_import_path: go.thethings.network/lorawan-stack
