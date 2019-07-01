@@ -214,7 +214,7 @@ func (s *srv) handleTraffic(c echo.Context) error {
 
 				logger.Info("Send downlink message")
 				if err := ws.WriteMessage(websocket.TextMessage, msg); err != nil {
-					logger.WithError(err).Error("Failed to send downlink message")
+					logger.WithError(err).Warn("Failed to send downlink message")
 					conn.Disconnect(err)
 					return
 				}
@@ -229,7 +229,7 @@ func (s *srv) handleTraffic(c echo.Context) error {
 		default:
 			_, data, err := ws.ReadMessage()
 			if err != nil {
-				logger.WithError(err).Error("Failed to read message")
+				logger.WithError(err).Warn("Failed to read message")
 				conn.Disconnect(err)
 				return nil
 			}

@@ -86,10 +86,8 @@ func FromDownlinkMessage(ids ttnpb.GatewayIdentifiers, down ttnpb.DownlinkMessag
 
 	// Estimate the xtime based on the timestamp; xtime = timestamp - (rxdelay+1).
 	// The calculated offset is in microseconds.
-	t := time.Unix(int64(scheduledMsg.Timestamp), 0)
-	offset := time.Duration((dnmsg.RxDelay)) * time.Second * 1e6
-	dnmsg.XTime = int64(uint64(latestXTime)&0xFFFFFFFF00000000 | uint64(t.Add(-offset).Unix()))
-
+	offset := uint64(scheduledMsg.Timestamp - uint32(dnmsg.RxDelay*(1e6)))
+	dnmsg.XTime = int64(uint64(latestXTime)&0xFFFFFFFF00000000 | offset)
 	return dnmsg
 }
 
