@@ -81,6 +81,23 @@ $ ttn-lw-cli end-devices create app1 dev2 \
   --session.keys.nwk-s-key.key B7F3E161BC9D4388E6C788A0C547F255
 ```
 
+It is also possible to create a multicast device (an ABP device which can not send uplinks and shares the security session with other devices) using the `--multicast` flag as follows:
+
+```bash
+$ ttn-lw-cli end-devices create app1 dev3 \
+  --frequency-plan-id EU_863_870 \
+  --lorawan-version 1.0.2 \
+  --lorawan-phy-version 1.0.2-b \
+  --abp \
+  --session.dev-addr 00E4304D \
+  --session.keys.app-s-key.key A0CAD5A30036DBE03096EB67CA975BAA \
+  --session.keys.nwk-s-key.key B7F3E161BC9D4388E6C788A0C547F255 \
+  --multicast
+```
+
+>Note: The `--multicast` flag can be set only during device creation, and as such can not be turned on or off later.
+
 >Note: The `NwkSKey` is returned as `f_nwk_s_int_key` (V3 uses LoRaWAN 1.1 terminology).
 
 >Hint: You can also pass `--with-session` to have a session generated.
+
