@@ -302,3 +302,13 @@ The message definitions in `pkg/webui/locales` can be used to provide translatio
 ├── manifest.go       generated manifest of the frontend, containing file hashes
 ├── template.go       go template module used to render the frontend HTML
 ```
+
+## Documentation
+
+The documentation is available through the mage command `mage docs:server`. All content is
+stored in `doc/content/`.
+
+It will create the documentation server at http://localhost:1313/. 
+
+For more information about the documentation build and contribution please check
+[documentation guidelines](doc/content/contributing/documentation.md).

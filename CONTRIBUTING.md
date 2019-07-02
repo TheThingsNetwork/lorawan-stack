@@ -265,6 +265,10 @@ We do our utmost best to build secure systems, but we're human too, so we someti
 
 Our email addresses follow the pattern `<firstname>@thethingsnetwork.org`.
 
+## Documentation
+
+See [doc guidelines](doc/content/contributing/documentation.md)
+
 ## Legal
 
 The Things Network Stack for LoRaWAN is Apache 2.0 licensed.
