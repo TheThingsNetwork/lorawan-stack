@@ -99,10 +99,12 @@ func (srv interopServer) JoinRequest(ctx context.Context, in *interop.JoinReq) (
 	ans := &interop.JoinAns{
 		JsNsMessageHeader: header,
 		PHYPayload:        interop.Buffer(res.RawPayload),
-		Result:            interop.ResultSuccess,
-		Lifetime:          uint32(res.Lifetime / time.Second),
-		AppSKey:           (*interop.KeyEnvelope)(res.AppSKey),
-		SessionKeyID:      interop.Buffer(res.SessionKeyID),
+		Result: interop.Result{
+			ResultCode: interop.ResultSuccess,
+		},
+		Lifetime:     uint32(res.Lifetime / time.Second),
+		AppSKey:      (*interop.KeyEnvelope)(res.AppSKey),
+		SessionKeyID: interop.Buffer(res.SessionKeyID),
 	}
 	if ttnpb.MACVersion(in.MACVersion).Compare(ttnpb.MAC_V1_1) < 0 {
 		ans.NwkSKey = (*interop.KeyEnvelope)(res.FNwkSIntKey)
@@ -131,8 +133,11 @@ func (srv interopServer) HomeNSRequest(ctx context.Context, in *interop.HomeNSRe
 	}
 	return &interop.HomeNSAns{
 		JsNsMessageHeader: header,
-		HNSID:             interop.NetID(*netID),
-		HNetID:            interop.NetID(*netID),
+		Result: interop.Result{
+			ResultCode: interop.ResultSuccess,
+		},
+		HNSID:  interop.NetID(*netID),
+		HNetID: interop.NetID(*netID),
 	}, nil
 }
 
@@ -171,9 +176,11 @@ func (srv interopServer) AppSKeyRequest(ctx context.Context, in *interop.AppSKey
 	}
 	return &interop.AppSKeyAns{
 		JsAsMessageHeader: header,
-		Result:            interop.ResultSuccess,
-		DevEUI:            in.DevEUI,
-		AppSKey:           interop.KeyEnvelope(res.AppSKey),
-		SessionKeyID:      in.SessionKeyID,
+		Result: interop.Result{
+			ResultCode: interop.ResultSuccess,
+		},
+		DevEUI:       in.DevEUI,
+		AppSKey:      interop.KeyEnvelope(res.AppSKey),
+		SessionKeyID: in.SessionKeyID,
 	}, nil
 }
