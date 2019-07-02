@@ -196,9 +196,23 @@ func (m *ApplicationPubSub) ValidateFields(paths ...string) error {
 			}
 
 		case "format":
-			// no validation rules for Format
+
+			if utf8.RuneCountInString(m.GetFormat()) > 10 {
+				return ApplicationPubSubValidationError{
+					field:  "format",
+					reason: "value length must be at most 10 runes",
+				}
+			}
+
 		case "base_topic":
-			// no validation rules for BaseTopic
+
+			if utf8.RuneCountInString(m.GetBaseTopic()) > 100 {
+				return ApplicationPubSubValidationError{
+					field:  "base_topic",
+					reason: "value length must be at most 100 runes",
+				}
+			}
+
 		case "downlink_push":
 
 			if v, ok := interface{}(m.GetDownlinkPush()).(interface{ ValidateFields(...string) error }); ok {
@@ -1026,7 +1040,14 @@ func (m *ApplicationPubSub_Message) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "topic":
-			// no validation rules for Topic
+
+			if utf8.RuneCountInString(m.GetTopic()) > 100 {
+				return ApplicationPubSub_MessageValidationError{
+					field:  "topic",
+					reason: "value length must be at most 100 runes",
+				}
+			}
+
 		default:
 			return ApplicationPubSub_MessageValidationError{
 				field:  name,

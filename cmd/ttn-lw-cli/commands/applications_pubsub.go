@@ -79,7 +79,7 @@ func getApplicationPubSubID(flagSet *pflag.FlagSet, args []string) (*ttnpb.Appli
 var (
 	applicationsPubSubsCommand = &cobra.Command{
 		Use:     "pubsubs",
-		Aliases: []string{"pubsub"},
+		Aliases: []string{"pubsub", "ps"},
 		Short:   "Application pubsub commands",
 	}
 	applicationsPubSubsGetFormatsCommand = &cobra.Command{

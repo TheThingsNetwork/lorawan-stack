@@ -38,7 +38,7 @@ message ApplicationPubSub {
 
   // The format to use for the body.
   // Supported values depend on the Application Server configuration.
-  string format = 4;
+  string format = 4 [(validate.rules).string.max_len = 10];
 
   // The NATS provider settings.
   message NATSProvider {
@@ -53,11 +53,11 @@ message ApplicationPubSub {
   };
 
   // Base topic name to which the messages topic is appended.
-  string base_topic = 6;
+  string base_topic = 6 [(validate.rules).string.max_len = 100];
 
   message Message {
     // The topic on which the Application Server publishes or receives the messages.
-    string topic = 1;
+    string topic = 1 [(validate.rules).string.max_len = 100];
   }
 
   // The topic to which the Application Server subscribes for downlink queue push operations.

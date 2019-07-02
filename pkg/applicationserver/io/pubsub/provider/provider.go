@@ -30,7 +30,7 @@ type Provider interface {
 
 var (
 	errNotImplemented    = errors.DefineUnimplemented("provider_not_implemented", "provider `{provider_id}` is not implemented")
-	errAlreadyRegistered = errors.DefineAlreadyExists("already_registered", "provider `{provider_id}` already registered")
+	errAlreadyRegistered = errors.DefineAlreadyExists("provider_already_registered", "provider `{provider_id}` already registered")
 
 	providers = map[reflect.Type]Provider{}
 )

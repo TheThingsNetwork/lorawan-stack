@@ -1466,7 +1466,7 @@
       "file": "mqtt.go"
     }
   },
-  "error:pkg/applicationserver/io/pubsub/provider:already_registered": {
+  "error:pkg/applicationserver/io/pubsub/provider:provider_already_registered": {
     "translations": {
       "en": "provider `{provider_id}` already registered"
     },

@@ -14,4 +14,7 @@
 
 package ttnpb
 
+// ApplicationPubSub_Provider is an alias to the interface identifying the PubSub provider types.
+// This enables provider.RegisterProvider and provider.GetProvider to offer type safety guarantees.
+// The underscore is maintained for consistency with the generated code.
 type ApplicationPubSub_Provider = isApplicationPubSub_Provider

@@ -773,12 +773,20 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 | Field | Validations |
 | ----- | ----------- |
 | `ids` | <p>`message.required`: `true`</p> |
+| `format` | <p>`string.max_len`: `10`</p> |
+| `base_topic` | <p>`string.max_len`: `100`</p> |
 
 ### <a name="ttn.lorawan.v3.ApplicationPubSub.Message">Message `ApplicationPubSub.Message`</a>
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `topic` | [`string`](#string) |  | The topic on which the Application Server publishes or receives the messages. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `topic` | <p>`string.max_len`: `100`</p> |
 
 ### <a name="ttn.lorawan.v3.ApplicationPubSub.NATSProvider">Message `ApplicationPubSub.NATSProvider`</a>
 
