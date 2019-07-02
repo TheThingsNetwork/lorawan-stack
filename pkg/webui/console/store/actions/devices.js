@@ -24,5 +24,6 @@ export const [{
   success: getDevicesListSuccess,
   failure: getDevicesListFailure,
 }] = createRequestActions(GET_DEVICES_LIST_BASE,
-  (appId, { page, limit } = {}) => ({ appId, params: { page, limit }})
+  (appId, { page, limit } = {}) => ({ appId, params: { page, limit }}),
+  (appId, { page, limit } = {}, selectors = []) => ({ selectors })
 )

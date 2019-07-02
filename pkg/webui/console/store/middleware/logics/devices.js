@@ -19,8 +19,10 @@ import createRequestLogic from './lib'
 const getDevicesListLogic = createRequestLogic({
   type: devices.GET_DEVICES_LIST,
   async process ({ action }) {
-    const { payload: { appId, params: { page, limit }}} = action
-    const data = await api.devices.list(appId, { page, limit })
+    const { appId, params: { page, limit }} = action.payload
+    const { selectors } = action.meta
+
+    const data = await api.devices.list(appId, { page, limit }, selectors)
     return { devices: data.end_devices, totalCount: data.totalCount }
   },
 })
