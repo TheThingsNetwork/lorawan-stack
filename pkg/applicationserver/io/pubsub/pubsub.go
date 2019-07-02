@@ -73,7 +73,7 @@ var integrationBackoff = []time.Duration{100 * time.Millisecond, 1 * time.Second
 func (ps *PubSub) startIntegrationTask(ctx context.Context, ids ttnpb.ApplicationPubSubIdentifiers) {
 	ctx = log.NewContextWithFields(ctx, log.Fields(
 		"application_uid", unique.ID(ctx, ids.ApplicationIdentifiers),
-		"pubsub_id", ids.PubSubID,
+		"pub_sub_id", ids.PubSubID,
 	))
 	ps.StartTask(ctx, "integrate", func(ctx context.Context) error {
 		target, err := ps.registry.Get(ctx, ids, ttnpb.ApplicationPubSubFieldPathsNested)
@@ -212,14 +212,14 @@ func (i *integration) startHandleDown(ctx context.Context) {
 	}
 }
 
-var errAlreadyConfigured = errors.DefineAlreadyExists("already_configured", "already configured to `{application_uid}` `{pubsub_id}`")
+var errAlreadyConfigured = errors.DefineAlreadyExists("already_configured", "already configured to `{application_uid}` `{pub_sub_id}`")
 
 func (ps *PubSub) start(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err error) {
 	appUID := unique.ID(ctx, pb.ApplicationIdentifiers)
 	psUID := PubSubUID(appUID, pb.PubSubID)
 	ctx = log.NewContextWithFields(ctx, log.Fields(
 		"application_uid", appUID,
-		"pubsub_id", pb.PubSubID,
+		"pub_sub_id", pb.PubSubID,
 	))
 	ctx = rights.NewContext(ctx, rights.Rights{
 		ApplicationRights: map[string]*ttnpb.Rights{
@@ -239,7 +239,7 @@ func (ps *PubSub) start(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err e
 		server:            ps.server,
 	}
 	if _, loaded := ps.integrations.LoadOrStore(psUID, i); loaded {
-		return errAlreadyConfigured.WithAttributes("application_uid", appUID, "pubsub_id", pb.PubSubID)
+		return errAlreadyConfigured.WithAttributes("application_uid", appUID, "pub_sub_id", pb.PubSubID)
 	}
 	go func() {
 		<-ctx.Done()
@@ -286,7 +286,7 @@ func (ps *PubSub) stop(ctx context.Context, ids ttnpb.ApplicationPubSubIdentifie
 		i := val.(*integration)
 		log.FromContext(ctx).WithFields(log.Fields(
 			"application_uid", appUID,
-			"pubsub_id", ids.PubSubID,
+			"pub_sub_id", ids.PubSubID,
 		)).Debug("Integration canceled")
 		i.cancel(context.Canceled)
 	} else {

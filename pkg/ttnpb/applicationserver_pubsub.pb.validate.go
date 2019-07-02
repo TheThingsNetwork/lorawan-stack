@@ -59,18 +59,18 @@ func (m *ApplicationPubSubIdentifiers) ValidateFields(paths ...string) error {
 				}
 			}
 
-		case "pubsub_id":
+		case "pub_sub_id":
 
 			if utf8.RuneCountInString(m.GetPubSubID()) > 36 {
 				return ApplicationPubSubIdentifiersValidationError{
-					field:  "pubsub_id",
+					field:  "pub_sub_id",
 					reason: "value length must be at most 36 runes",
 				}
 			}
 
 			if !_ApplicationPubSubIdentifiers_PubSubID_Pattern.MatchString(m.GetPubSubID()) {
 				return ApplicationPubSubIdentifiersValidationError{
-					field:  "pubsub_id",
+					field:  "pub_sub_id",
 					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
 				}
 			}

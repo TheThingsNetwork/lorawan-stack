@@ -1870,7 +1870,7 @@
               }
             },
             {
-              "name": "pubsub_id",
+              "name": "pub_sub_id",
               "description": "",
               "label": "",
               "type": "string",
@@ -2077,7 +2077,7 @@
                   "rules": [
                     {
                       "method": "GET",
-                      "pattern": "/as/pubsub/{ids.application_ids.application_id}/{ids.pubsub_id}"
+                      "pattern": "/as/pubsub/{ids.application_ids.application_id}/{ids.pub_sub_id}"
                     }
                   ]
                 }
@@ -2121,7 +2121,7 @@
                   "rules": [
                     {
                       "method": "PUT",
-                      "pattern": "/as/pubsub/{pubsub.ids.application_ids.application_id}/{pubsub.ids.pubsub_id}",
+                      "pattern": "/as/pubsub/{pubsub.ids.application_ids.application_id}/{pubsub.ids.pub_sub_id}",
                       "body": "*"
                     },
                     {
@@ -2149,7 +2149,7 @@
                   "rules": [
                     {
                       "method": "DELETE",
-                      "pattern": "/as/pubsub/{application_ids.application_id}/{pubsub_id}"
+                      "pattern": "/as/pubsub/{application_ids.application_id}/{pub_sub_id}"
                     }
                   ]
                 }

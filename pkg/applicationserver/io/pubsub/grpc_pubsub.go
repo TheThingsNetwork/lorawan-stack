@@ -79,7 +79,7 @@ func (ps *PubSub) Set(ctx context.Context, req *ttnpb.SetApplicationPubSubReques
 			}
 			return &req.ApplicationPubSub, append(req.FieldMask.Paths,
 				"ids.application_ids",
-				"ids.pubsub_id",
+				"ids.pub_sub_id",
 			), nil
 		},
 	)

@@ -820,14 +820,14 @@ The NATS provider settings.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
-| `pubsub_id` | [`string`](#string) |  |  |
+| `pub_sub_id` | [`string`](#string) |  |  |
 
 #### Field Rules
 
 | Field | Validations |
 | ----- | ----------- |
 | `application_ids` | <p>`message.required`: `true`</p> |
-| `pubsub_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+| `pub_sub_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
 
 ### <a name="ttn.lorawan.v3.ApplicationPubSubs">Message `ApplicationPubSubs`</a>
 
@@ -889,11 +889,11 @@ The NATS provider settings.
 | Method Name | Method | Pattern | Body |
 | ----------- | ------ | ------- | ---- |
 | `GetFormats` | `GET` | `/api/v3/as/pubsub-formats` |  |
-| `Get` | `GET` | `/api/v3/as/pubsub/{ids.application_ids.application_id}/{ids.pubsub_id}` |  |
+| `Get` | `GET` | `/api/v3/as/pubsub/{ids.application_ids.application_id}/{ids.pub_sub_id}` |  |
 | `List` | `GET` | `/api/v3/as/pubsub/{application_ids.application_id}` |  |
-| `Set` | `PUT` | `/api/v3/as/pubsub/{pubsub.ids.application_ids.application_id}/{pubsub.ids.pubsub_id}` | `*` |
+| `Set` | `PUT` | `/api/v3/as/pubsub/{pubsub.ids.application_ids.application_id}/{pubsub.ids.pub_sub_id}` | `*` |
 | `Set` | `POST` | `/api/v3/as/pubsub/{pubsub.ids.application_ids.application_id}` | `*` |
-| `Delete` | `DELETE` | `/api/v3/as/pubsub/{application_ids.application_id}/{pubsub_id}` |  |
+| `Delete` | `DELETE` | `/api/v3/as/pubsub/{application_ids.application_id}/{pub_sub_id}` |  |
 
 ## <a name="lorawan-stack/api/applicationserver_web.proto">File `lorawan-stack/api/applicationserver_web.proto`</a>
 

@@ -338,10 +338,10 @@
       "http": [
         {
           "method": "get",
-          "pattern": "/as/pubsub/{ids.application_ids.application_id}/{ids.pubsub_id}",
+          "pattern": "/as/pubsub/{ids.application_ids.application_id}/{ids.pub_sub_id}",
           "parameters": [
             "ids.application_ids.application_id",
-            "ids.pubsub_id"
+            "ids.pub_sub_id"
           ]
         }
       ]
@@ -363,11 +363,11 @@
       "http": [
         {
           "method": "put",
-          "pattern": "/as/pubsub/{pubsub.ids.application_ids.application_id}/{pubsub.ids.pubsub_id}",
+          "pattern": "/as/pubsub/{pubsub.ids.application_ids.application_id}/{pubsub.ids.pub_sub_id}",
           "body": "*",
           "parameters": [
             "pubsub.ids.application_ids.application_id",
-            "pubsub.ids.pubsub_id"
+            "pubsub.ids.pub_sub_id"
           ]
         },
         {
@@ -385,10 +385,10 @@
       "http": [
         {
           "method": "delete",
-          "pattern": "/as/pubsub/{application_ids.application_id}/{pubsub_id}",
+          "pattern": "/as/pubsub/{application_ids.application_id}/{pub_sub_id}",
           "parameters": [
             "application_ids.application_id",
-            "pubsub_id"
+            "pub_sub_id"
           ]
         }
       ]

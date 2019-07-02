@@ -1340,7 +1340,7 @@
       "file": "organizations.go"
     }
   },
-  "error:cmd/ttn-lw-cli/commands:no_pubsub_id": {
+  "error:cmd/ttn-lw-cli/commands:no_pub_sub_id": {
     "translations": {
       "en": "no pubsub ID set"
     },
@@ -1513,7 +1513,7 @@
   },
   "error:pkg/applicationserver/io/pubsub:already_configured": {
     "translations": {
-      "en": "already configured to `{application_uid}` `{pubsub_id}`"
+      "en": "already configured to `{application_uid}` `{pub_sub_id}`"
     },
     "description": {
       "package": "pkg/applicationserver/io/pubsub",

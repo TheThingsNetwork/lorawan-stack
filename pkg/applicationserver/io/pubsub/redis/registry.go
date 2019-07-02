@@ -93,18 +93,18 @@ func (r PubSubRegistry) Range(ctx context.Context, paths []string, f func(contex
 		appUID, psID := pubsub.SplitPubSubUID(uid)
 		ctx, err := unique.WithContext(ctx, appUID)
 		if err != nil {
-			return errApplicationUID.WithCause(err).WithAttributes("application_uid", appUID, "pubsub_id", psID)
+			return errApplicationUID.WithCause(err).WithAttributes("application_uid", appUID, "pub_sub_id", psID)
 		}
 		ids, err := unique.ToApplicationID(appUID)
 		if err != nil {
-			return errApplicationUID.WithCause(err).WithAttributes("application_uid", appUID, "pubsub_id", psID)
+			return errApplicationUID.WithCause(err).WithAttributes("application_uid", appUID, "pub_sub_id", psID)
 		}
 		pb := &ttnpb.ApplicationPubSub{}
 		if err := ttnredis.GetProto(r.Redis, r.idKey(appUID, psID)).ScanProto(pb); err != nil {
 			return err
 		}
 		if err != nil {
-			return errApplicationUID.WithCause(err).WithAttributes("application_uid", appUID, "pubsub_id", psID)
+			return errApplicationUID.WithCause(err).WithAttributes("application_uid", appUID, "pub_sub_id", psID)
 		}
 		pb, err = applyPubSubFieldMask(nil, pb, paths...)
 		if err != nil {
@@ -202,7 +202,7 @@ func (r PubSubRegistry) Set(ctx context.Context, ids ttnpb.ApplicationPubSubIden
 			if stored == nil {
 				if err := ttnpb.RequireFields(sets,
 					"ids.application_ids",
-					"ids.pubsub_id",
+					"ids.pub_sub_id",
 				); err != nil {
 					return errInvalidFieldmask.WithCause(err)
 				}
@@ -220,7 +220,7 @@ func (r PubSubRegistry) Set(ctx context.Context, ids ttnpb.ApplicationPubSubIden
 			} else {
 				if err := ttnpb.ProhibitFields(sets,
 					"ids.application_ids",
-					"ids.pubsub_id",
+					"ids.pub_sub_id",
 				); err != nil {
 					return errInvalidFieldmask.WithCause(err)
 				}

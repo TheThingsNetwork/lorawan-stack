@@ -47,7 +47,7 @@ func natsFlags() *pflag.FlagSet {
 	return flagSet
 }
 
-var errNoPubSubID = errors.DefineInvalidArgument("no_pubsub_id", "no pubsub ID set")
+var errNoPubSubID = errors.DefineInvalidArgument("no_pub_sub_id", "no pubsub ID set")
 
 func getApplicationPubSubID(flagSet *pflag.FlagSet, args []string) (*ttnpb.ApplicationPubSubIdentifiers, error) {
 	applicationID, _ := flagSet.GetString("application-id")

@@ -39,7 +39,7 @@ func request_ApplicationPubSubRegistry_GetFormats_0(ctx context.Context, marshal
 }
 
 var (
-	filter_ApplicationPubSubRegistry_Get_0 = &utilities.DoubleArray{Encoding: map[string]int{"ids": 0, "application_ids": 1, "application_id": 2, "pubsub_id": 3}, Base: []int{1, 1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 3, 2, 4, 5}}
+	filter_ApplicationPubSubRegistry_Get_0 = &utilities.DoubleArray{Encoding: map[string]int{"ids": 0, "application_ids": 1, "application_id": 2, "pub_sub_id": 3}, Base: []int{1, 1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 3, 2, 4, 5}}
 )
 
 func request_ApplicationPubSubRegistry_Get_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationPubSubRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -64,15 +64,15 @@ func request_ApplicationPubSubRegistry_Get_0(ctx context.Context, marshaler runt
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "ids.application_ids.application_id", err)
 	}
 
-	val, ok = pathParams["ids.pubsub_id"]
+	val, ok = pathParams["ids.pub_sub_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "ids.pubsub_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "ids.pub_sub_id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "ids.pubsub_id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "ids.pub_sub_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "ids.pubsub_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "ids.pub_sub_id", err)
 	}
 
 	if err := req.ParseForm(); err != nil {
@@ -155,15 +155,15 @@ func request_ApplicationPubSubRegistry_Set_0(ctx context.Context, marshaler runt
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pubsub.ids.application_ids.application_id", err)
 	}
 
-	val, ok = pathParams["pubsub.ids.pubsub_id"]
+	val, ok = pathParams["pubsub.ids.pub_sub_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pubsub.ids.pubsub_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pubsub.ids.pub_sub_id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "pubsub.ids.pubsub_id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "pubsub.ids.pub_sub_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pubsub.ids.pubsub_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pubsub.ids.pub_sub_id", err)
 	}
 
 	msg, err := client.Set(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -207,7 +207,7 @@ func request_ApplicationPubSubRegistry_Set_1(ctx context.Context, marshaler runt
 }
 
 var (
-	filter_ApplicationPubSubRegistry_Delete_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "pubsub_id": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
+	filter_ApplicationPubSubRegistry_Delete_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "pub_sub_id": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 1, 3, 4}}
 )
 
 func request_ApplicationPubSubRegistry_Delete_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationPubSubRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -232,15 +232,15 @@ func request_ApplicationPubSubRegistry_Delete_0(ctx context.Context, marshaler r
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
 	}
 
-	val, ok = pathParams["pubsub_id"]
+	val, ok = pathParams["pub_sub_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pubsub_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pub_sub_id")
 	}
 
 	protoReq.PubSubID, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pubsub_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pub_sub_id", err)
 	}
 
 	if err := req.ParseForm(); err != nil {
@@ -419,15 +419,15 @@ func RegisterApplicationPubSubRegistryHandlerClient(ctx context.Context, mux *ru
 var (
 	pattern_ApplicationPubSubRegistry_GetFormats_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"as", "pubsub-formats"}, ""))
 
-	pattern_ApplicationPubSubRegistry_Get_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 3}, []string{"as", "pubsub", "ids.application_ids.application_id", "ids.pubsub_id"}, ""))
+	pattern_ApplicationPubSubRegistry_Get_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 3}, []string{"as", "pubsub", "ids.application_ids.application_id", "ids.pub_sub_id"}, ""))
 
 	pattern_ApplicationPubSubRegistry_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"as", "pubsub", "application_ids.application_id"}, ""))
 
-	pattern_ApplicationPubSubRegistry_Set_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 3}, []string{"as", "pubsub", "pubsub.ids.application_ids.application_id", "pubsub.ids.pubsub_id"}, ""))
+	pattern_ApplicationPubSubRegistry_Set_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 3}, []string{"as", "pubsub", "pubsub.ids.application_ids.application_id", "pubsub.ids.pub_sub_id"}, ""))
 
 	pattern_ApplicationPubSubRegistry_Set_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"as", "pubsub", "pubsub.ids.application_ids.application_id"}, ""))
 
-	pattern_ApplicationPubSubRegistry_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 3}, []string{"as", "pubsub", "application_ids.application_id", "pubsub_id"}, ""))
+	pattern_ApplicationPubSubRegistry_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 3}, []string{"as", "pubsub", "application_ids.application_id", "pub_sub_id"}, ""))
 )
 
 var (

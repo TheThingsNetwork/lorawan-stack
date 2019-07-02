@@ -30,9 +30,9 @@ func (dst *ApplicationPubSubIdentifiers) SetFields(src *ApplicationPubSubIdentif
 					dst.ApplicationIdentifiers = zero
 				}
 			}
-		case "pubsub_id":
+		case "pub_sub_id":
 			if len(subs) > 0 {
-				return fmt.Errorf("'pubsub_id' has no subfields, but %s were specified", subs)
+				return fmt.Errorf("'pub_sub_id' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
 				dst.PubSubID = src.PubSubID

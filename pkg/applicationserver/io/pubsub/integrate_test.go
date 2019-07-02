@@ -74,7 +74,7 @@ func TestIntegrate(t *testing.T) {
 					ServerURL: "nats://localhost",
 				},
 			},
-		}, append(paths, "ids.application_ids", "ids.pubsub_id"), nil
+		}, append(paths, "ids.application_ids", "ids.pub_sub_id"), nil
 	})
 	a.So(err, should.BeNil)
 

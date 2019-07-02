@@ -5,12 +5,12 @@ package ttnpb
 var ApplicationPubSubIdentifiersFieldPathsNested = []string{
 	"application_ids",
 	"application_ids.application_id",
-	"pubsub_id",
+	"pub_sub_id",
 }
 
 var ApplicationPubSubIdentifiersFieldPathsTopLevel = []string{
 	"application_ids",
-	"pubsub_id",
+	"pub_sub_id",
 }
 var ApplicationPubSubFieldPathsNested = []string{
 	"base_topic",
@@ -33,7 +33,7 @@ var ApplicationPubSubFieldPathsNested = []string{
 	"ids",
 	"ids.application_ids",
 	"ids.application_ids.application_id",
-	"ids.pubsub_id",
+	"ids.pub_sub_id",
 	"join_accept",
 	"join_accept.topic",
 	"location_solved",
@@ -83,7 +83,7 @@ var GetApplicationPubSubRequestFieldPathsNested = []string{
 	"ids",
 	"ids.application_ids",
 	"ids.application_ids.application_id",
-	"ids.pubsub_id",
+	"ids.pub_sub_id",
 }
 
 var GetApplicationPubSubRequestFieldPathsTopLevel = []string{
@@ -123,7 +123,7 @@ var SetApplicationPubSubRequestFieldPathsNested = []string{
 	"pubsub.ids",
 	"pubsub.ids.application_ids",
 	"pubsub.ids.application_ids.application_id",
-	"pubsub.ids.pubsub_id",
+	"pubsub.ids.pub_sub_id",
 	"pubsub.join_accept",
 	"pubsub.join_accept.topic",
 	"pubsub.location_solved",

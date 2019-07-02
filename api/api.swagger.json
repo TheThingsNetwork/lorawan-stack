@@ -1158,7 +1158,7 @@
         ]
       }
     },
-    "/as/pubsub/{application_ids.application_id}/{pubsub_id}": {
+    "/as/pubsub/{application_ids.application_id}/{pub_sub_id}": {
       "delete": {
         "operationId": "Delete",
         "responses": {
@@ -1177,7 +1177,7 @@
             "type": "string"
           },
           {
-            "name": "pubsub_id",
+            "name": "pub_sub_id",
             "in": "path",
             "required": true,
             "type": "string"
@@ -1188,7 +1188,7 @@
         ]
       }
     },
-    "/as/pubsub/{ids.application_ids.application_id}/{ids.pubsub_id}": {
+    "/as/pubsub/{ids.application_ids.application_id}/{ids.pub_sub_id}": {
       "get": {
         "operationId": "Get",
         "responses": {
@@ -1207,7 +1207,7 @@
             "type": "string"
           },
           {
-            "name": "ids.pubsub_id",
+            "name": "ids.pub_sub_id",
             "in": "path",
             "required": true,
             "type": "string"
@@ -1261,7 +1261,7 @@
         ]
       }
     },
-    "/as/pubsub/{pubsub.ids.application_ids.application_id}/{pubsub.ids.pubsub_id}": {
+    "/as/pubsub/{pubsub.ids.application_ids.application_id}/{pubsub.ids.pub_sub_id}": {
       "put": {
         "operationId": "Set",
         "responses": {
@@ -1280,7 +1280,7 @@
             "type": "string"
           },
           {
-            "name": "pubsub.ids.pubsub_id",
+            "name": "pubsub.ids.pub_sub_id",
             "in": "path",
             "required": true,
             "type": "string"
@@ -6242,7 +6242,7 @@
         "application_ids": {
           "$ref": "#/definitions/v3ApplicationIdentifiers"
         },
-        "pubsub_id": {
+        "pub_sub_id": {
           "type": "string"
         }
       }
