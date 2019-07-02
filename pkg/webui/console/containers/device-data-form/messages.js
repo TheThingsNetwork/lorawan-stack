@@ -26,7 +26,7 @@ export default defineMessages({
   leaveBlankPlaceholder: 'Leave blank to generate automatically',
   resetsJoinNonces: 'Resets Join Nonces',
   resetsFCnt: 'Resets Frame Counters',
-  deviceEUIDescription: 'The device EUI is the unique identifier for this device on the network. Can be changed later.',
+  deviceEUIDescription: 'The device EUI is the unique identifier for this device on the network.',
   nwkKeyDescription: 'The encrypted Network Key',
   appKeyDescription: 'The App Key is used to secure the communication between your device and the network.',
   appSKeyDescription: 'App Session Key',
