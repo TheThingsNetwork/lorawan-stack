@@ -25,7 +25,7 @@ export const createPaginationDeleteBaseActionType = name => (
 export const createPaginationByIdRequestActions = name => createRequestActions(
   createPaginationBaseActionType(name),
   (id, { page, limit, query } = {}) => ({ id, params: { page, limit, query }}),
-  (id, params, selectors) => ({ selectors })
+  (id, params, selectors = []) => ({ selectors })
 )
 
 export const createPaginationRequestActions = name => createRequestActions(
