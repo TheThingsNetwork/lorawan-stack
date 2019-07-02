@@ -253,23 +253,23 @@ func AssertClusterGetPeerRequest(ctx context.Context, reqCh <-chan ClusterGetPee
 	t := MustTFromContext(ctx)
 	t.Helper()
 	select {
+	case <-ctx.Done():
+		t.Error("Timed out while waiting for Cluster.GetPeer to be called")
+		return false
+
 	case req := <-reqCh:
 		t.Log("Cluster.GetPeer called")
 		if !assert(req.Context, req.Role, req.Identifiers) {
 			return false
 		}
 		select {
-		case req.Response <- resp:
-			return true
-
 		case <-ctx.Done():
 			t.Error("Timed out while waiting for Cluster.GetPeer response to be processed")
 			return false
-		}
 
-	case <-ctx.Done():
-		t.Error("Timed out while waiting for Cluster.GetPeer to be called")
-		return false
+		case req.Response <- resp:
+			return true
+		}
 	}
 }
 

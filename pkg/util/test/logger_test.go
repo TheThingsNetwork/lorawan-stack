@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package test
+package test_test
 
 import (
 	"errors"
 	"testing"
 
 	"go.thethings.network/lorawan-stack/pkg/log"
+	. "go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
 func TestGetLogger(t *testing.T) {
