@@ -81,10 +81,18 @@ const startGatewayStatisticsLogic = createLogic({
       return
     }
 
-    const gtwGsAddress = gtw.gateway_server_address
-    const consoleGsAddress = new URL(gsConfig.base_url).host
+    let gtwGsAddress
+    let consoleGsAddress
+    try {
+      const gtwAddress = gtw.gateway_server_address
 
-    if (!Boolean(gtwGsAddress)) {
+      if (!Boolean(gtwAddress)) {
+        throw new Error()
+      }
+
+      gtwGsAddress = gtwAddress.split(':')[0]
+      consoleGsAddress = new URL(gsConfig.base_url).hostname
+    } catch (error) {
       reject(gateway.updateGatewayStatisticsFailure({
         message: sharedMessages.unknown,
       }))
