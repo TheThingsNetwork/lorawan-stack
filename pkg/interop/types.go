@@ -54,31 +54,31 @@ const (
 	MessageTypeErrorNotif   MessageType = "ErrorNotif"
 )
 
-// Result is the result of an answer message.
-type Result string
+// ResultCode is the result of an answer message.
+type ResultCode string
 
 const (
-	ResultSuccess                Result = "Success"
-	ResultNoAction               Result = "NoAction"
-	ResultMICFailed              Result = "MICFailed"
-	ResultFrameReplayed          Result = "FrameReplayed"
-	ResultJoinReqFailed          Result = "JoinReqFailed"
-	ResultNoRoamingAgreement     Result = "NoRoamingAgreement"
-	ResultDevRoamingDisallowed   Result = "DevRoamingDisallowed"
-	ResultRoamingActDisallowed   Result = "RoamingActDisallowed"
-	ResultActivationDisallowed   Result = "ActivationDisallowed"
-	ResultUnknownDevEUI          Result = "UnknownDevEUI"
-	ResultUnknownDevAddr         Result = "UnknownDevAddr"
-	ResultUnknownSender          Result = "UnknownSender"
-	ResultUnknownReceiver        Result = "UnknownReceiver"
-	ResultDeferred               Result = "Deferred"
-	ResultXmitFailed             Result = "XmitFailed"
-	ResultInvalidFPort           Result = "InvalidFPort"
-	ResultInvalidProtocolVersion Result = "InvalidProtocolVersion"
-	ResultStaleDeviceProfile     Result = "StaleDeviceProfile"
-	ResultMalformedMessage       Result = "MalformedMessage"
-	ResultFrameSizeError         Result = "FrameSizeError"
-	ResultOther                  Result = "Other"
+	ResultSuccess                ResultCode = "Success"
+	ResultNoAction               ResultCode = "NoAction"
+	ResultMICFailed              ResultCode = "MICFailed"
+	ResultFrameReplayed          ResultCode = "FrameReplayed"
+	ResultJoinReqFailed          ResultCode = "JoinReqFailed"
+	ResultNoRoamingAgreement     ResultCode = "NoRoamingAgreement"
+	ResultDevRoamingDisallowed   ResultCode = "DevRoamingDisallowed"
+	ResultRoamingActDisallowed   ResultCode = "RoamingActDisallowed"
+	ResultActivationDisallowed   ResultCode = "ActivationDisallowed"
+	ResultUnknownDevEUI          ResultCode = "UnknownDevEUI"
+	ResultUnknownDevAddr         ResultCode = "UnknownDevAddr"
+	ResultUnknownSender          ResultCode = "UnknownSender"
+	ResultUnknownReceiver        ResultCode = "UnknownReceiver"
+	ResultDeferred               ResultCode = "Deferred"
+	ResultXmitFailed             ResultCode = "XmitFailed"
+	ResultInvalidFPort           ResultCode = "InvalidFPort"
+	ResultInvalidProtocolVersion ResultCode = "InvalidProtocolVersion"
+	ResultStaleDeviceProfile     ResultCode = "StaleDeviceProfile"
+	ResultMalformedMessage       ResultCode = "MalformedMessage"
+	ResultFrameSizeError         ResultCode = "FrameSizeError"
+	ResultOther                  ResultCode = "Other"
 )
 
 // MACVersion is the MAC version.

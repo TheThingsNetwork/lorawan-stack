@@ -93,7 +93,7 @@ func (h RawMessageHeader) AnswerHeader() (RawMessageHeader, error) {
 // ErrorMessage is a message with raw header and a result field.
 type ErrorMessage struct {
 	RawMessageHeader
-	Result Result
+	Result ResultCode
 }
 
 // NsJsMessageHeader contains the message header for NS to JS messages.
@@ -173,7 +173,7 @@ type JoinReq struct {
 type JoinAns struct {
 	JsNsMessageHeader
 	PHYPayload   Buffer
-	Result       Result
+	Result       ResultCode
 	Lifetime     uint32
 	SNwkSIntKey  *KeyEnvelope `json:",omitempty"`
 	FNwkSIntKey  *KeyEnvelope `json:",omitempty"`
@@ -193,7 +193,7 @@ type AppSKeyReq struct {
 // AppSKeyAns is an answer to an AppSKeyReq message.
 type AppSKeyAns struct {
 	JsAsMessageHeader
-	Result       Result
+	Result       ResultCode
 	DevEUI       EUI64
 	AppSKey      KeyEnvelope
 	SessionKeyID Buffer
@@ -208,7 +208,7 @@ type HomeNSReq struct {
 // HomeNSAns is an answer to a HomeNSReq message.
 type HomeNSAns struct {
 	JsNsMessageHeader
-	Result Result
+	Result ResultCode
 	HNSID  NetID
 	HNetID NetID
 }
