@@ -32,6 +32,14 @@
     text-decoration: underline
     color: $tc-deep-gray
 
+  +media-query($bp.s)
+   &:not(:last-child):not(:first-child):not(:nth-child(2))
+     display: none
+
+   &:nth-child(2):after
+     nudge('down')
+     content: 'more_horiz'
+
 .last
   one-liner()
   color: $tc-deep-gray
@@ -40,3 +48,5 @@
 .icon
   nudge('up')
   margin-right: $cs.xxs
+  +media-query($bp.m)
+    display: none
