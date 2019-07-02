@@ -124,6 +124,9 @@ func TestUnmarshalJSON(t *testing.T) {
 }
 
 func Example() {
+	// This is required for unit test to pass.
+	defer test.SetDefaultEventsPubSub(events.NewPubSub(10))()
+
 	// The WaitGroup is only for synchronizing the unit test
 	var wg sync.WaitGroup
 	wg.Add(1)
