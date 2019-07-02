@@ -28,7 +28,7 @@ import { selectSelectedApplicationId } from '../../store/selectors/applications'
 
 const m = defineMessages({
   deviceId: 'Device ID',
-  connectedDevices: 'Connected Devices ({deviceCount})',
+  devices: 'Devices ({deviceCount})',
   add: 'Add Device',
 })
 
@@ -75,7 +75,7 @@ class DevicesTable extends React.Component {
         entity="devices"
         headers={headers}
         addMessage={m.add}
-        tableTitle={<Message content={m.connectedDevices} values={{ deviceCount: totalCount }} />}
+        tableTitle={<Message content={m.devices} values={{ deviceCount: totalCount }} />}
         getItemsAction={this.getDevicesList}
         searchItemsAction={this.getDevicesList}
         itemPathPrefix={devicePathPrefix}

@@ -87,7 +87,7 @@
   "console.containers.device-data-form.messages.abp": "Xxxxxxxxxx Xx Xxxxxxxxxxxxxxx (XXX)",
   "console.containers.device-data-form.messages.resetWarning": "Xxxxxxxx xx xxxxxxxx xxx xxxxx xxxx xxxxxx xxxxxxxxxxx xxx xxxxxx xxxxxxx",
   "console.containers.devices-table.index.deviceId": "Xxxxxx XX",
-  "console.containers.devices-table.index.connectedDevices": "Xxxxxxxxx Xxxxxxx ({deviceCount})",
+  "console.containers.devices-table.index.devices": "Xxxxxxx ({deviceCount})",
   "console.containers.devices-table.index.add": "Xxx Xxxxxx",
   "console.containers.freq-plans-select.index.freqPlansFetchingFailure": "Xxxxx xxx xxxxxxxx xxx xxxx xx xxxxxxxxx xxxxxxxxx xxxxx",
   "console.containers.gateways-table.index.add": "Xxx Xxxxxxx",

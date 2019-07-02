@@ -87,7 +87,7 @@
   "console.containers.device-data-form.messages.abp": "Activation By Personalization (ABP)",
   "console.containers.device-data-form.messages.resetWarning": "Reseting is insecure and makes your device susceptible for replay attacks",
   "console.containers.devices-table.index.deviceId": "Device ID",
-  "console.containers.devices-table.index.connectedDevices": "Connected Devices ({deviceCount})",
+  "console.containers.devices-table.index.devices": "Devices ({deviceCount})",
   "console.containers.devices-table.index.add": "Add Device",
   "console.containers.freq-plans-select.index.freqPlansFetchingFailure": "Could not retrieve the list of available frequency plans",
   "console.containers.gateways-table.index.add": "Add Gateway",
