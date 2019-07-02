@@ -14,13 +14,16 @@
 
 .group
   display: flex
-  flex-direction: row
+  flex-direction: column
+  margin-bottom: $cs.s * -1
+  flex-wrap: wrap
 
-  .group-radio:not(:last-child)
-    margin-right: $cs.m
+  .group-radio
+    margin-bottom: $cs.s
+
+    &:not(:last-child)
+      margin-right: $cs.m
 
   &.horizontal
-    flex-direction: column
-
-    .group-radio:not(:last-child)
-      margin-bottom: $cs.s
+    flex-direction: row
+    margin-bottom: 0
