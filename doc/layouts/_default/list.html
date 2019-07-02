@@ -1,4 +1,5 @@
 {{ define "main" }}
+  {{- .Content -}}
   <main>
     <h1>{{ .Title }}</h1>
     <ul>
@@ -8,4 +9,6 @@
       {{ end }}
     </ul>
   </main>
+  {{- partial "edit-meta.html" . -}}
+  {{- partial "pagination.html" . -}}
 {{ end }}
