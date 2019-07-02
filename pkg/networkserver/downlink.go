@@ -972,23 +972,23 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 							return nil, nil, err
 						}
 
-						var minDR ttnpb.DataRateIndex
+						var maxDR ttnpb.DataRateIndex
 						switch {
 						case rx1 && rx2:
-							minDR = req.Rx1DataRateIndex
-							if req.Rx2DataRateIndex < minDR {
-								minDR = req.Rx2DataRateIndex
+							maxDR = req.Rx1DataRateIndex
+							if req.Rx2DataRateIndex > maxDR {
+								maxDR = req.Rx2DataRateIndex
 							}
 
 						case rx1:
-							minDR = req.Rx1DataRateIndex
+							maxDR = req.Rx1DataRateIndex
 
 						case rx2:
-							minDR = req.Rx2DataRateIndex
+							maxDR = req.Rx2DataRateIndex
 						}
 
 						genDown, genState, err := ns.generateDownlink(ctx, dev, phy,
-							phy.DataRates[minDR].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
+							phy.DataRates[maxDR].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 							maxUpLength,
 						)
 						defer func() {
@@ -1001,6 +1001,18 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						}
 						if err != nil {
 							return dev, sets, err
+						}
+
+						if rx1 && rx2 {
+							rx1 = len(genDown.Payload) <= int(phy.DataRates[req.Rx1DataRateIndex].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()))
+							rx2 = len(genDown.Payload) <= int(phy.DataRates[req.Rx2DataRateIndex].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()))
+							if !rx1 && !rx2 {
+								logger.Error("Generated downlink payload size does not fit neither Rx1, nor Rx2")
+							}
+							req, err = txRequestFromUplink(phy, dev.MACState, rx1, rx2, rxDelay, up)
+							if err != nil {
+								return nil, nil, err
+							}
 						}
 
 						if genDown.ApplicationDownlink != nil {
