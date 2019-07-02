@@ -22,7 +22,7 @@ export default defineMessages({
   deviceIdDescription: 'Unique Identifier of your device; this cannot be changed afterwards',
   deviceNameDescription: 'Human friendly name of your device for display purposes',
   deviceDescDescription: 'Optional device description; can also be used to save notes about the device',
-  joinEUIPlaceholder: 'The connected Join EUI',
+  joinEUIDescription: 'The connected Join EUI',
   leaveBlankPlaceholder: 'Leave blank to generate automatically',
   resetsJoinNonces: 'Resets Join Nonces',
   resetsFCnt: 'Resets Frame Counters',

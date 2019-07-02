@@ -147,7 +147,7 @@ class DeviceDataForm extends Component {
           type="byte"
           min={8}
           max={8}
-          placeholder={m.joinEUIPlaceholder}
+          description={m.joinEUIDescription}
           required
           disabled={update}
           component={Input}
@@ -158,7 +158,6 @@ class DeviceDataForm extends Component {
           type="byte"
           min={8}
           max={8}
-          placeholder={m.deviceEUIPlaceholder}
           description={m.deviceEUIDescription}
           required
           disabled={update}
