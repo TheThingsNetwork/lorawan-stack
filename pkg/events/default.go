@@ -14,30 +14,13 @@
 
 package events
 
-import (
-	"context"
-	"sync"
-)
+import "context"
 
-var (
-	defaultPubSubMu = &sync.Mutex{}
-	// defaultPubSub is the default event pubsub.
-	defaultPubSub = NewPubSub(DefaultBufferSize)
-	// defaultPubSubSet records whether SetDefaultPubSub has been called or not.
-	defaultPubSubSet bool
-)
+var defaultPubSub = NewPubSub(DefaultBufferSize)
 
 // SetDefaultPubSub sets pubsub used by the package to ps.
-// SetDefaultPubSub panics if called multiple times.
 func SetDefaultPubSub(ps PubSub) {
-	defaultPubSubMu.Lock()
-	defer defaultPubSubMu.Unlock()
-
-	if defaultPubSubSet {
-		panic("SetDefaultPubSub called multiple times")
-	}
 	defaultPubSub = ps
-	defaultPubSubSet = true
 }
 
 // DefaultPubSub returns the default PubSub.
