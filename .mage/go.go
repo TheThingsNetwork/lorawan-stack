@@ -183,12 +183,16 @@ func init() {
 	preCommitChecks = append(preCommitChecks, Go.Quality)
 }
 
+func execGoTest(args ...string) error {
+	return execGo("test", append([]string{"-timeout=5m", "-failfast"}, args...)...)
+}
+
 // Test tests all Go packages.
 func (Go) Test() error {
 	if mg.Verbose() {
 		fmt.Println("Testing all Go packages")
 	}
-	return execGo("test", "./...")
+	return execGoTest("./...")
 }
 
 const goCoverageFile = "coverage.out"
@@ -198,7 +202,7 @@ func (Go) Cover() error {
 	if mg.Verbose() {
 		fmt.Println("Testing all Go packages with coverage")
 	}
-	return execGo("test", "-cover", "-covermode=atomic", "-coverprofile="+goCoverageFile, "-timeout=5m", "./...")
+	return execGoTest("-cover", "-covermode=atomic", "-coverprofile="+goCoverageFile, "./...")
 }
 
 var coverallsIgnored = []string{
