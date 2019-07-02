@@ -57,7 +57,7 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "root_keys") {
 		rootKeysEnc := dev.RootKeys
 		dev.RootKeys = &ttnpb.RootKeys{
-			RootKeyID: rootKeysEnc.RootKeyID,
+			RootKeyID: rootKeysEnc.GetRootKeyID(),
 		}
 		cs := srv.JS.GetPeer(ctx, ttnpb.PeerInfo_CRYPTO_SERVER, dev.EndDeviceIdentifiers)
 		if ttnpb.HasAnyField(req.FieldMask.Paths, "root_keys.nwk_key") {
