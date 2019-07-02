@@ -28,7 +28,7 @@ import Message from '../../../lib/components/message'
 
 import {
   selectSelectedGateway as gatewaySelector,
-} from '../../store/selectors/gateway'
+} from '../../store/selectors/gateways'
 import {
   getGatewayId as idSelector,
 } from '../../../lib/selectors/id'

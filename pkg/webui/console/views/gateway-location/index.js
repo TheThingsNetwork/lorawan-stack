@@ -27,7 +27,7 @@ import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 
-import { updateGateway } from '../../store/actions/gateway'
+import { updateGateway } from '../../store/actions/gateways'
 
 import {
   latitude as latitudeRegexp,

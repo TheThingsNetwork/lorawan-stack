@@ -18,9 +18,10 @@ import bind from 'autobind-decorator'
 
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import ApiKeysTable from '../../containers/api-keys-table'
-import { getGatewayApiKeysList } from '../../store/actions/gateway'
-import { selectGatewayApiKeysStore } from '../../store/selectors/gateway'
 import sharedMessages from '../../../lib/shared-messages'
+
+import { getGatewayApiKeysList } from '../../store/actions/gateways'
+import { selectGatewayApiKeysStore } from '../../store/selectors/gateways'
 
 const API_KEYS_TABLE_SIZE = 10
 

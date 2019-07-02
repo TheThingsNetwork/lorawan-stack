@@ -21,12 +21,12 @@ import EventsSubscription from '../../containers/events-subscription'
 
 import {
   clearGatewayEventsStream,
-} from '../../store/actions/gateway'
+} from '../../store/actions/gateways'
 
 import {
   selectGatewayEvents,
   selectGatewayEventsStatus,
-} from '../../store/selectors/gateway'
+} from '../../store/selectors/gateways'
 
 @bind
 class GatewayEvents extends React.Component {

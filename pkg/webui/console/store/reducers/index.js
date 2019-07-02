@@ -17,8 +17,8 @@ import {
   SHARED_NAME_SINGLE as APPLICATION_SHARED_NAME,
   SHARED_NAME as APPLICATIONS_SHARED_NAME,
 } from '../actions/applications'
-import { SHARED_NAME as GATEWAY_SHARED_NAME } from '../actions/gateway'
-import { SHARED_NAME as GATEWAYS_SHARED_NAME } from '../actions/gateways'
+import { SHARED_NAME as GATEWAY_SHARED_NAME } from '../actions/gateways'
+
 import { SHARED_NAME as DEVICE_SHARED_NAME } from '../actions/device'
 import { getApplicationId } from '../../../lib/selectors/id'
 import user from './user'
@@ -63,7 +63,7 @@ export default combineReducers({
   }),
   rights: combineReducers({
     applications: createNamedRightsReducer(APPLICATIONS_SHARED_NAME),
-    gateways: createNamedRightsReducer(GATEWAYS_SHARED_NAME),
+    gateways: createNamedRightsReducer(GATEWAY_SHARED_NAME),
   }),
   collaborators: combineReducers({
     applications: createNamedCollaboratorsReducer(APPLICATION_SHARED_NAME),

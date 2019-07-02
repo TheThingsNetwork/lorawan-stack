@@ -17,8 +17,9 @@ import {
   GET_GTW_API_KEY_BASE,
   GET_GTW_API_KEYS_LIST_BASE,
   UPDATE_GTW_STATS_BASE,
-} from '../actions/gateway'
-import { GET_GTWS_RIGHTS_LIST_BASE } from '../actions/gateways'
+  GET_GTWS_RIGHTS_LIST_BASE,
+} from '../actions/gateways'
+
 import { getGatewayId } from '../../../lib/selectors/id'
 import {
   createEventsSelector,
@@ -49,7 +50,6 @@ export const selectGatewayError = createErrorSelector(GET_GTW_BASE)
 export const selectGatewayEvents = createEventsSelector(ENTITY)
 export const selectGatewayEventsError = createEventsErrorSelector(ENTITY)
 export const selectGatewayEventsStatus = createEventsStatusSelector(ENTITY)
-export const selectGatewayTotalCount = 100 || selectGatewayStore(ENTITY).totalCount
 
 // Api Keys
 export const selectGatewayApiKeysStore = createApiKeysStoreSelector(ENTITY)

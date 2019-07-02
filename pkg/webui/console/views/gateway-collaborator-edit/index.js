@@ -27,15 +27,18 @@ import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import toast from '../../../components/toast'
 
-import { getGatewayCollaboratorsList } from '../../store/actions/gateway'
-import { getGatewaysRightsList } from '../../store/actions/gateways'
+import {
+  getGatewayCollaboratorsList,
+  getGatewaysRightsList,
+} from '../../store/actions/gateways'
 import {
   selectSelectedGatewayId,
   selectGatewayRights,
   selectGatewayUniversalRights,
   selectGatewayRightsFetching,
   selectGatewayRightsError,
-} from '../../store/selectors/gateway'
+} from '../../store/selectors/gateways'
+
 import api from '../../api'
 
 @connect(function (state, props) {

@@ -26,8 +26,10 @@ import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import { ApiKeyEditForm } from '../../components/api-key-form'
 
-import { getGatewayApiKey } from '../../store/actions/gateway'
-import { getGatewaysRightsList } from '../../store/actions/gateways'
+import {
+  getGatewayApiKey,
+  getGatewaysRightsList,
+} from '../../store/actions/gateways'
 import {
   selectSelectedGatewayId,
   selectGatewayRights,
@@ -37,7 +39,7 @@ import {
   selectGatewayApiKey,
   selectGatewayApiKeyError,
   selectGatewayApiKeyFetching,
-} from '../../store/selectors/gateway'
+} from '../../store/selectors/gateways'
 
 import api from '../../api'
 

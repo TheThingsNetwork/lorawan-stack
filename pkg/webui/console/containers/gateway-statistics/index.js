@@ -31,11 +31,11 @@ import {
   selectGatewayStatisticsError,
   selectGatewayStatisticsIsAvailable,
   selectGatewayStatisticsIsFetching,
-} from '../../store/selectors/gateway'
+} from '../../store/selectors/gateways'
 import {
   startGatewayStatistics,
   stopGatewayStatistics,
-} from '../../store/actions/gateway'
+} from '../../store/actions/gateways'
 
 import style from './gateway-statistics.styl'
 

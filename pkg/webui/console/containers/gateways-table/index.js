@@ -60,6 +60,16 @@ const headers = [
 @bind
 export default class GatewaysTable extends React.Component {
 
+  constructor (props) {
+    super(props)
+
+    this.getGatewaysList = params => getGatewaysList(params, [
+      'name',
+      'description',
+      'frequency_plan_id',
+    ])
+  }
+
   baseDataSelector ({ gateways }) {
     return gateways
   }
@@ -70,8 +80,8 @@ export default class GatewaysTable extends React.Component {
         entity="gateways"
         addMessage={m.add}
         headers={headers}
-        getItemsAction={getGatewaysList}
-        searchItemsAction={getGatewaysList}
+        getItemsAction={this.getGatewaysList}
+        searchItemsAction={this.getGatewaysList}
         baseDataSelector={this.baseDataSelector}
         {...this.props}
       />

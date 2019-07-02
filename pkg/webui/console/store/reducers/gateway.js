@@ -21,7 +21,7 @@ import {
   UPDATE_GTW_STATS_FAILURE,
   UPDATE_GTW_STATS_UNAVAILABLE,
   STOP_GTW_STATS,
-} from '../actions/gateway'
+} from '../actions/gateways'
 
 const statsDefaultState = {
   available: true,

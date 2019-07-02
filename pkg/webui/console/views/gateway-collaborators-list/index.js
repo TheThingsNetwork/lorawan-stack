@@ -19,10 +19,10 @@ import { connect } from 'react-redux'
 
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import CollaboratorsTable from '../../containers/collaborators-table'
-import { getGatewayCollaboratorsList } from '../../store/actions/gateway'
 import sharedMessages from '../../../lib/shared-messages'
 
-import { selectSelectedGatewayId } from '../../store/selectors/gateway'
+import { getGatewayCollaboratorsList } from '../../store/actions/gateways'
+import { selectSelectedGatewayId } from '../../store/selectors/gateways'
 
 const COLLABORATORS_TABLE_SIZE = 10
 

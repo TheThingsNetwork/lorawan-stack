@@ -33,7 +33,7 @@ import {
   selectGatewayRightsError,
   selectGatewayRightsFetching,
   selectGatewayUniversalRights,
-} from '../../store/selectors/gateway'
+} from '../../store/selectors/gateways'
 
 import api from '../../api'
 
