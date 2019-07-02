@@ -148,7 +148,7 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		}
 	}
 
-	if webhooks, err := conf.Webhooks.NewWebhooks(as.FillContext(as.Context()), as); err != nil {
+	if webhooks, err := conf.Webhooks.NewWebhooks(ctx, as); err != nil {
 		return nil, err
 	} else if webhooks != nil {
 		as.webhooks = webhooks
