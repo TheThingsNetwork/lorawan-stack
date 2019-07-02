@@ -56,6 +56,10 @@ func defineError(name string, result ResultCode, message string) errors.Definiti
 	return definition
 }
 
+type errorMessage struct {
+	Message string `json:"message"`
+}
+
 // ErrorHandler is an echo.HTTPErrorHandler.
 func ErrorHandler(err error, c echo.Context) {
 	if httpErr, ok := err.(*echo.HTTPError); ok {
@@ -63,11 +67,13 @@ func ErrorHandler(err error, c echo.Context) {
 		return
 	}
 
-	result := ResultOther
-	statusCode := http.StatusInternalServerError
+	result, statusCode, description := ResultOther, http.StatusInternalServerError, ""
 	if ttnErr, ok := errors.From(err); ok {
 		if val, ok := errorResults[ttnErr.FullName()]; ok {
 			result = val
+			if cause := errors.Cause(ttnErr); cause != nil && !errors.IsInternal(cause) {
+				description = cause.Error()
+			}
 		}
 		statusCode = errors.ToHTTPStatusCode(err)
 	}
@@ -79,9 +85,14 @@ func ErrorHandler(err error, c echo.Context) {
 		} else {
 			c.JSON(statusCode, ErrorMessage{
 				RawMessageHeader: answerHeader,
-				Result:           result,
+				Result: Result{
+					ResultCode:  result,
+					Description: description,
+				},
 			})
 		}
+	} else if description != "" {
+		c.JSON(statusCode, errorMessage{description})
 	} else {
 		c.NoContent(statusCode)
 	}

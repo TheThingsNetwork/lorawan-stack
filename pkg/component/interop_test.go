@@ -47,7 +47,9 @@ func (m mockInterop) JoinRequest(ctx context.Context, req *interop.JoinReq) (*in
 	}
 	return &interop.JoinAns{
 		JsNsMessageHeader: ansHeader,
-		Result:            interop.ResultSuccess,
+		Result: interop.Result{
+			ResultCode: interop.ResultSuccess,
+		},
 	}, nil
 }
 
@@ -58,7 +60,9 @@ func (m mockInterop) AppSKeyRequest(ctx context.Context, req *interop.AppSKeyReq
 	}
 	return &interop.AppSKeyAns{
 		JsAsMessageHeader: ansHeader,
-		Result:            interop.ResultSuccess,
+		Result: interop.Result{
+			ResultCode: interop.ResultSuccess,
+		},
 	}, nil
 }
 
@@ -69,7 +73,9 @@ func (m mockInterop) HomeNSRequest(ctx context.Context, req *interop.HomeNSReq) 
 	}
 	return &interop.HomeNSAns{
 		JsNsMessageHeader: ansHeader,
-		Result:            interop.ResultSuccess,
+		Result: interop.Result{
+			ResultCode: interop.ResultSuccess,
+		},
 	}, nil
 }
 
@@ -158,6 +164,6 @@ func TestInteropTLS(t *testing.T) {
 		if !a.So(json.NewDecoder(res.Body).Decode(&msg), should.BeNil) {
 			t.FailNow()
 		}
-		a.So(msg.Result, should.Equal, interop.ResultUnknownSender)
+		a.So(msg.Result, should.Resemble, interop.Result{ResultCode: interop.ResultUnknownSender})
 	}
 }
