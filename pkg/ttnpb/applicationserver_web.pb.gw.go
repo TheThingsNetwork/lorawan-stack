@@ -417,17 +417,17 @@ func RegisterApplicationWebhookRegistryHandlerClient(ctx context.Context, mux *r
 }
 
 var (
-	pattern_ApplicationWebhookRegistry_GetFormats_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"as", "webhook-formats"}, ""))
+	pattern_ApplicationWebhookRegistry_GetFormats_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"as", "webhook-formats"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationWebhookRegistry_Get_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 3}, []string{"as", "webhooks", "ids.application_ids.application_id", "ids.webhook_id"}, ""))
+	pattern_ApplicationWebhookRegistry_Get_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 3}, []string{"as", "webhooks", "ids.application_ids.application_id", "ids.webhook_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationWebhookRegistry_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"as", "webhooks", "application_ids.application_id"}, ""))
+	pattern_ApplicationWebhookRegistry_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"as", "webhooks", "application_ids.application_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationWebhookRegistry_Set_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 3}, []string{"as", "webhooks", "webhook.ids.application_ids.application_id", "webhook.ids.webhook_id"}, ""))
+	pattern_ApplicationWebhookRegistry_Set_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 3}, []string{"as", "webhooks", "webhook.ids.application_ids.application_id", "webhook.ids.webhook_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationWebhookRegistry_Set_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"as", "webhooks", "webhook.ids.application_ids.application_id"}, ""))
+	pattern_ApplicationWebhookRegistry_Set_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"as", "webhooks", "webhook.ids.application_ids.application_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationWebhookRegistry_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 3}, []string{"as", "webhooks", "application_ids.application_id", "webhook_id"}, ""))
+	pattern_ApplicationWebhookRegistry_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 3}, []string{"as", "webhooks", "application_ids.application_id", "webhook_id"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

@@ -346,13 +346,13 @@ func RegisterOAuthAuthorizationRegistryHandlerClient(ctx context.Context, mux *r
 }
 
 var (
-	pattern_OAuthAuthorizationRegistry_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "user_ids.user_id", "authorizations"}, ""))
+	pattern_OAuthAuthorizationRegistry_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "user_ids.user_id", "authorizations"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_OAuthAuthorizationRegistry_ListTokens_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"users", "user_ids.user_id", "authorizations", "client_ids.client_id", "tokens"}, ""))
+	pattern_OAuthAuthorizationRegistry_ListTokens_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"users", "user_ids.user_id", "authorizations", "client_ids.client_id", "tokens"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_OAuthAuthorizationRegistry_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"users", "user_ids.user_id", "authorizations", "client_ids.client_id"}, ""))
+	pattern_OAuthAuthorizationRegistry_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"users", "user_ids.user_id", "authorizations", "client_ids.client_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_OAuthAuthorizationRegistry_DeleteToken_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"users", "user_ids.user_id", "authorizations", "client_ids.client_id", "tokens", "id"}, ""))
+	pattern_OAuthAuthorizationRegistry_DeleteToken_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"users", "user_ids.user_id", "authorizations", "client_ids.client_id", "tokens", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

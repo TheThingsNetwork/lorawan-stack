@@ -100,7 +100,7 @@ func RegisterEntityAccessHandlerClient(ctx context.Context, mux *runtime.ServeMu
 }
 
 var (
-	pattern_EntityAccess_AuthInfo_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"auth_info"}, ""))
+	pattern_EntityAccess_AuthInfo_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"auth_info"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

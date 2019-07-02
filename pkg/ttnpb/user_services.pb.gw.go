@@ -741,17 +741,17 @@ func RegisterUserRegistryHandlerClient(ctx context.Context, mux *runtime.ServeMu
 }
 
 var (
-	pattern_UserRegistry_Create_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"users"}, ""))
+	pattern_UserRegistry_Create_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"users"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_UserRegistry_Get_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"users", "user_ids.user_id"}, ""))
+	pattern_UserRegistry_Get_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"users", "user_ids.user_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_UserRegistry_Update_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"users", "user.ids.user_id"}, ""))
+	pattern_UserRegistry_Update_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"users", "user.ids.user_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_UserRegistry_CreateTemporaryPassword_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "user_ids.user_id", "temporary_password"}, ""))
+	pattern_UserRegistry_CreateTemporaryPassword_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "user_ids.user_id", "temporary_password"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_UserRegistry_UpdatePassword_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "user_ids.user_id", "password"}, ""))
+	pattern_UserRegistry_UpdatePassword_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "user_ids.user_id", "password"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_UserRegistry_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"users", "user_id"}, ""))
+	pattern_UserRegistry_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"users", "user_id"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
@@ -910,15 +910,15 @@ func RegisterUserAccessHandlerClient(ctx context.Context, mux *runtime.ServeMux,
 }
 
 var (
-	pattern_UserAccess_ListRights_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "user_id", "rights"}, ""))
+	pattern_UserAccess_ListRights_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "user_id", "rights"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_UserAccess_CreateAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "user_ids.user_id", "api-keys"}, ""))
+	pattern_UserAccess_CreateAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "user_ids.user_id", "api-keys"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_UserAccess_ListAPIKeys_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "user_ids.user_id", "api-keys"}, ""))
+	pattern_UserAccess_ListAPIKeys_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "user_ids.user_id", "api-keys"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_UserAccess_GetAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"users", "user_ids.user_id", "api-keys", "key_id"}, ""))
+	pattern_UserAccess_GetAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"users", "user_ids.user_id", "api-keys", "key_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_UserAccess_UpdateAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"users", "user_ids.user_id", "api-keys", "api_key.id"}, ""))
+	pattern_UserAccess_UpdateAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"users", "user_ids.user_id", "api-keys", "api_key.id"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
@@ -1035,11 +1035,11 @@ func RegisterUserInvitationRegistryHandlerClient(ctx context.Context, mux *runti
 }
 
 var (
-	pattern_UserInvitationRegistry_Send_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"invitations"}, ""))
+	pattern_UserInvitationRegistry_Send_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"invitations"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_UserInvitationRegistry_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"invitations"}, ""))
+	pattern_UserInvitationRegistry_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"invitations"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_UserInvitationRegistry_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"invitations"}, ""))
+	pattern_UserInvitationRegistry_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"invitations"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
@@ -1132,9 +1132,9 @@ func RegisterUserSessionRegistryHandlerClient(ctx context.Context, mux *runtime.
 }
 
 var (
-	pattern_UserSessionRegistry_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "user_ids.user_id", "sessions"}, ""))
+	pattern_UserSessionRegistry_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "user_ids.user_id", "sessions"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_UserSessionRegistry_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"users", "user_ids.user_id", "sessions", "session_id"}, ""))
+	pattern_UserSessionRegistry_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"users", "user_ids.user_id", "sessions", "session_id"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

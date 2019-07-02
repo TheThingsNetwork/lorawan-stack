@@ -128,7 +128,7 @@ func RegisterGsHandlerClient(ctx context.Context, mux *runtime.ServeMux, client 
 }
 
 var (
-	pattern_Gs_GetGatewayConnectionStats_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4}, []string{"gs", "gateways", "gateway_id", "connection", "stats"}, ""))
+	pattern_Gs_GetGatewayConnectionStats_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4}, []string{"gs", "gateways", "gateway_id", "connection", "stats"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

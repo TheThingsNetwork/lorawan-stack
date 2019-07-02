@@ -596,21 +596,21 @@ func RegisterClientRegistryHandlerClient(ctx context.Context, mux *runtime.Serve
 }
 
 var (
-	pattern_ClientRegistry_Create_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "collaborator.user_ids.user_id", "clients"}, ""))
+	pattern_ClientRegistry_Create_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "collaborator.user_ids.user_id", "clients"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ClientRegistry_Create_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "collaborator.organization_ids.organization_id", "clients"}, ""))
+	pattern_ClientRegistry_Create_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "collaborator.organization_ids.organization_id", "clients"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ClientRegistry_Get_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"clients", "client_ids.client_id"}, ""))
+	pattern_ClientRegistry_Get_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"clients", "client_ids.client_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ClientRegistry_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"clients"}, ""))
+	pattern_ClientRegistry_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"clients"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ClientRegistry_List_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "collaborator.user_ids.user_id", "clients"}, ""))
+	pattern_ClientRegistry_List_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "collaborator.user_ids.user_id", "clients"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ClientRegistry_List_2 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "collaborator.organization_ids.organization_id", "clients"}, ""))
+	pattern_ClientRegistry_List_2 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "collaborator.organization_ids.organization_id", "clients"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ClientRegistry_Update_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"clients", "client.ids.client_id"}, ""))
+	pattern_ClientRegistry_Update_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"clients", "client.ids.client_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ClientRegistry_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"clients", "client_id"}, ""))
+	pattern_ClientRegistry_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"clients", "client_id"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
@@ -733,11 +733,11 @@ func RegisterClientAccessHandlerClient(ctx context.Context, mux *runtime.ServeMu
 }
 
 var (
-	pattern_ClientAccess_ListRights_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"clients", "client_id", "rights"}, ""))
+	pattern_ClientAccess_ListRights_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"clients", "client_id", "rights"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ClientAccess_SetCollaborator_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"clients", "client_ids.client_id", "collaborators"}, ""))
+	pattern_ClientAccess_SetCollaborator_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"clients", "client_ids.client_id", "collaborators"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ClientAccess_ListCollaborators_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"clients", "client_ids.client_id", "collaborators"}, ""))
+	pattern_ClientAccess_ListCollaborators_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"clients", "client_ids.client_id", "collaborators"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

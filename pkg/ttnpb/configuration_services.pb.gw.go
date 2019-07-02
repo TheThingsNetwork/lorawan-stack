@@ -110,7 +110,7 @@ func RegisterConfigurationHandlerClient(ctx context.Context, mux *runtime.ServeM
 }
 
 var (
-	pattern_Configuration_ListFrequencyPlans_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"configuration", "frequency-plans"}, ""))
+	pattern_Configuration_ListFrequencyPlans_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"configuration", "frequency-plans"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
