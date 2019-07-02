@@ -15,6 +15,7 @@
 import React from 'react'
 import { Switch, Route } from 'react-router'
 import { connect } from 'react-redux'
+import { replace } from 'connected-react-router'
 
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import sharedMessages from '../../../lib/shared-messages'
@@ -57,6 +58,7 @@ dispatch => ({
   getGateway: (id, meta) => dispatch(getGateway(id, meta)),
   startStream: id => dispatch(startGatewayEventsStream(id)),
   stopStream: id => dispatch(stopGatewayEventsStream(id)),
+  redirectToList: () => dispatch(replace('/console/gateways')),
 }))
 @withSideNavigation(function (props) {
   const { match, gtwId } = props
@@ -128,6 +130,14 @@ export default class Gateway extends React.Component {
       'enforce_duty_cycle',
       'antennas',
     ])
+  }
+
+  componentDidUpdate (prevProps) {
+    const { gateway, redirectToList } = this.props
+
+    if (Boolean(prevProps.gateway) && !Boolean(gateway)) {
+      redirectToList()
+    }
   }
 
   componentWillUnmount () {

@@ -42,6 +42,17 @@ const updateGatewayLogic = createRequestLogic({
   },
 })
 
+const deleteGatewayLogic = createRequestLogic({
+  type: gateways.DELETE_GTW,
+  async process ({ action }) {
+    const { id } = action.payload
+
+    await api.gateway.delete(id)
+
+    return { id }
+  },
+})
+
 const getGatewaysLogic = createRequestLogic({
   type: gateways.GET_GTWS_LIST,
   latest: true,
@@ -189,6 +200,7 @@ const getGatewayApiKeyLogic = createRequestLogic({
 export default [
   getGatewayLogic,
   updateGatewayLogic,
+  deleteGatewayLogic,
   getGatewaysLogic,
   getGatewaysRightsLogic,
   getGatewayCollaboratorsLogic,
