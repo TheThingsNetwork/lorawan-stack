@@ -245,7 +245,7 @@ type LinkRegistry struct {
 	Redis *ttnredis.Client
 }
 
-func (r *LinkRegistry) allKey() string {
+func (r *LinkRegistry) allKey(ctx context.Context) string {
 	return r.Redis.Key("all")
 }
 
@@ -270,7 +270,7 @@ var errApplicationUID = errors.DefineCorruption("application_uid", "invalid appl
 func (r *LinkRegistry) Range(ctx context.Context, paths []string, f func(context.Context, ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationLink) bool) error {
 	defer trace.StartRegion(ctx, "range links").End()
 
-	uids, err := r.Redis.SMembers(r.allKey()).Result()
+	uids, err := r.Redis.SMembers(r.allKey(ctx)).Result()
 	if err != nil {
 		return err
 	}
@@ -344,7 +344,7 @@ func (r *LinkRegistry) Set(ctx context.Context, ids ttnpb.ApplicationIdentifiers
 		if pb == nil && len(sets) == 0 {
 			pipelined = func(p redis.Pipeliner) error {
 				p.Del(uk)
-				p.SRem(r.allKey(), uid)
+				p.SRem(r.allKey(ctx), uid)
 				return nil
 			}
 		} else {
@@ -372,7 +372,7 @@ func (r *LinkRegistry) Set(ctx context.Context, ids ttnpb.ApplicationIdentifiers
 				if err != nil {
 					return err
 				}
-				p.SAdd(r.allKey(), uid)
+				p.SAdd(r.allKey(ctx), uid)
 				return nil
 			}
 			pb, err = applyLinkFieldMask(nil, updated, gets...)

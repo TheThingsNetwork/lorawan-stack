@@ -372,7 +372,7 @@ func (w *webhooks) newRequest(ctx context.Context, msg *ttnpb.ApplicationUp, hoo
 var errWebhookNotFound = errors.DefineNotFound("webhook_not_found", "webhook not found")
 
 func (w *webhooks) handleDown(c echo.Context, op func(io.Server, context.Context, ttnpb.EndDeviceIdentifiers, []*ttnpb.ApplicationDownlink) error) error {
-	ctx := w.ctx
+	ctx := w.server.FillContext(c.Request().Context())
 	devID := c.Get(deviceIDKey).(ttnpb.EndDeviceIdentifiers)
 	hookID := c.Get(webhookIDKey).(ttnpb.ApplicationWebhookIdentifiers)
 	logger := log.FromContext(ctx).WithFields(log.Fields(
