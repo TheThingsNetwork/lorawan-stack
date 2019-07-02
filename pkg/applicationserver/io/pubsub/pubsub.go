@@ -17,6 +17,7 @@ package pubsub
 
 import (
 	"context"
+	"fmt"
 	"sync"
 	"time"
 
@@ -256,7 +257,7 @@ func (ps *PubSub) start(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err e
 	if err != nil {
 		return err
 	}
-	ctx = log.NewContextWithField(ctx, "provider", pb.Provider)
+	ctx = log.NewContextWithField(ctx, "provider", fmt.Sprintf("%T", pb.Provider))
 	logger := log.FromContext(ctx)
 	i.sub, err = ps.server.Subscribe(ctx, "pubsub", pb.ApplicationIdentifiers)
 	if err != nil {

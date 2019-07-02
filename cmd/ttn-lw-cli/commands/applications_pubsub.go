@@ -40,6 +40,13 @@ func applicationPubSubIDFlags() *pflag.FlagSet {
 	return flagSet
 }
 
+func natsFlags() *pflag.FlagSet {
+	flagSet := &pflag.FlagSet{}
+	flagSet.Bool("nats", false, "use the NATS provider")
+	flagSet.String("nats-server-url", "", "")
+	return flagSet
+}
+
 var errNoPubSubID = errors.DefineInvalidArgument("no_pubsub_id", "no pubsub ID set")
 
 func getApplicationPubSubID(flagSet *pflag.FlagSet, args []string) (*ttnpb.ApplicationPubSubIdentifiers, error) {
@@ -173,6 +180,16 @@ var (
 			}
 			pubsub.ApplicationPubSubIdentifiers = *pubsubID
 
+			if nats, _ := cmd.Flags().GetBool("nats"); nats {
+				serverURL, _ := cmd.Flags().GetString("nats-server-url")
+				pubsub.Provider = &ttnpb.ApplicationPubSub_NATS{
+					NATS: &ttnpb.ApplicationPubSub_NATSProvider{
+						ServerURL: serverURL,
+					},
+				}
+				paths = append(paths, "provider")
+			}
+
 			as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
 			if err != nil {
 				return err
@@ -221,6 +238,7 @@ func init() {
 	applicationsPubSubsCommand.AddCommand(applicationsPubSubsListCommand)
 	applicationsPubSubsSetCommand.Flags().AddFlagSet(applicationPubSubIDFlags())
 	applicationsPubSubsSetCommand.Flags().AddFlagSet(setApplicationPubSubFlags)
+	applicationsPubSubsSetCommand.Flags().AddFlagSet(natsFlags())
 	applicationsPubSubsCommand.AddCommand(applicationsPubSubsSetCommand)
 	applicationsPubSubsDeleteCommand.Flags().AddFlagSet(applicationPubSubIDFlags())
 	applicationsPubSubsCommand.AddCommand(applicationsPubSubsDeleteCommand)
