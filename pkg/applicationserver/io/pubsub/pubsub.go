@@ -55,31 +55,31 @@ func New(c *component.Component, server io.Server, registry Registry) (*PubSub, 
 		server:    server,
 		registry:  registry,
 	}
-	ps.RegisterTask(ctx, "integrate_all", ps.integrateAll, component.TaskRestartOnFailure)
+	ps.RegisterTask(ctx, "pubsubs_start_all", ps.startAll, component.TaskRestartOnFailure)
 	return ps, nil
 }
 
-func (ps *PubSub) integrateAll(ctx context.Context) error {
+func (ps *PubSub) startAll(ctx context.Context) error {
 	return ps.registry.Range(ctx, []string{"ids"},
 		func(ctx context.Context, _ ttnpb.ApplicationIdentifiers, pb *ttnpb.ApplicationPubSub) bool {
-			ps.startIntegrationTask(ctx, pb.ApplicationPubSubIdentifiers)
+			ps.startTask(ctx, pb.ApplicationPubSubIdentifiers)
 			return true
 		},
 	)
 }
 
-var integrationBackoff = []time.Duration{100 * time.Millisecond, 1 * time.Second, 10 * time.Second}
+var startBackoff = []time.Duration{100 * time.Millisecond, 1 * time.Second, 10 * time.Second}
 
-func (ps *PubSub) startIntegrationTask(ctx context.Context, ids ttnpb.ApplicationPubSubIdentifiers) {
+func (ps *PubSub) startTask(ctx context.Context, ids ttnpb.ApplicationPubSubIdentifiers) {
 	ctx = log.NewContextWithFields(ctx, log.Fields(
 		"application_uid", unique.ID(ctx, ids.ApplicationIdentifiers),
 		"pub_sub_id", ids.PubSubID,
 	))
-	ps.StartTask(ctx, "integrate", func(ctx context.Context) error {
+	ps.StartTask(ctx, "pubsub", func(ctx context.Context) error {
 		target, err := ps.registry.Get(ctx, ids, ttnpb.ApplicationPubSubFieldPathsNested)
 		if err != nil {
 			if !errors.IsNotFound(err) {
-				log.FromContext(ctx).WithError(err).Error("Failed to get integration")
+				log.FromContext(ctx).WithError(err).Error("Failed to stop pubsub")
 			}
 			return nil
 		}
@@ -98,7 +98,7 @@ func (ps *PubSub) startIntegrationTask(ctx context.Context, ids ttnpb.Applicatio
 		default:
 			return err
 		}
-	}, component.TaskRestartOnFailure, 0.1, integrationBackoff...)
+	}, component.TaskRestartOnFailure, 0.1, startBackoff...)
 }
 
 type integration struct {

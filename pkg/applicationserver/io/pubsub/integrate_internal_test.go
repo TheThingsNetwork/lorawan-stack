@@ -21,5 +21,5 @@ import (
 )
 
 func init() {
-	integrationBackoff = []time.Duration{(1 << 5) * test.Delay}
+	startBackoff = []time.Duration{(1 << 5) * test.Delay}
 }

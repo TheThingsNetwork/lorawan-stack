@@ -47,9 +47,9 @@ message ApplicationPubSub {
   }
   // The provider for the PubSub.
   oneof provider {
-      option (validate.required) = true;
+    option (validate.required) = true;
 
-      NATSProvider nats = 17 [(gogoproto.customname) = "NATS"];
+    NATSProvider nats = 17 [(gogoproto.customname) = "NATS"];
   };
 
   // Base topic name to which the messages topic is appended.
