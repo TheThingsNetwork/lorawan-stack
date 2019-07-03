@@ -35,8 +35,8 @@ const getGatewayLogic = createRequestLogic({
 const updateGatewayLogic = createRequestLogic({
   type: gateways.UPDATE_GTW,
   async process ({ action }) {
-    const { payload: { gatewayId, patch }} = action
-    const result = await api.gateway.update(gatewayId, patch)
+    const { payload: { id, patch }} = action
+    const result = await api.gateway.update(id, patch)
 
     return { ...patch, ...result }
   },
@@ -57,8 +57,9 @@ const getGatewaysLogic = createRequestLogic({
         name_contains: query,
       }, selectors)
       : await api.gateways.list({ page, limit }, selectors)
+
     return {
-      gateways: data.gateways,
+      entities: data.gateways,
       totalCount: data.totalCount,
     }
   },

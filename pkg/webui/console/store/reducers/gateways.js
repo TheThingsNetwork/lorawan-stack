@@ -12,20 +12,109 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { GET_GTWS_LIST_SUCCESS } from '../actions/gateways'
+import { getGatewayId } from '../../../lib/selectors/id'
+import {
+  GET_GTW,
+  GET_GTW_SUCCESS,
+  UPDATE_GTW_SUCCESS,
+  DELETE_GTW_SUCCESS,
+  GET_GTWS_LIST_SUCCESS,
+  START_GTW_STATS,
+  UPDATE_GTW_STATS,
+  UPDATE_GTW_STATS_SUCCESS,
+  UPDATE_GTW_STATS_FAILURE,
+  UPDATE_GTW_STATS_UNAVAILABLE,
+  STOP_GTW_STATS,
+} from '../actions/gateways'
 
 const defaultState = {
-  gateways: [],
-  totalCount: 0,
+  entities: {},
+  selectedGateway: null,
+  statistics: {},
 }
 
-const gateways = function (state = defaultState, { type, payload }) {
+const gateway = function (state = {}, gateway) {
+  return {
+    ...state,
+    ...gateway,
+  }
+}
+
+const statistics = function (state = defaultState.statistics, { type, payload }) {
+  const { id } = payload
+  const stats = state[id] || {}
+
   switch (type) {
-  case GET_GTWS_LIST_SUCCESS:
+  case UPDATE_GTW_STATS_SUCCESS:
     return {
       ...state,
-      totalCount: payload.totalCount,
-      gateways: payload.gateways,
+      [id]: {
+        ...stats,
+        available: true,
+        stats: payload.stats,
+      },
+    }
+  case UPDATE_GTW_STATS_UNAVAILABLE:
+    return {
+      ...state,
+      [id]: {
+        ...stats,
+        available: false,
+      },
+    }
+  default:
+    return state
+  }
+}
+
+const gateways = function (state = defaultState, action) {
+  const { type, payload } = action
+
+  switch (type) {
+  case GET_GTW:
+    return {
+      ...state,
+      selectedGateway: payload.id,
+    }
+  case GET_GTW_SUCCESS:
+  case UPDATE_GTW_SUCCESS:
+    const id = getGatewayId(payload)
+
+    return {
+      ...state,
+      entities: {
+        ...state.entities,
+        [id]: gateway(state.entities[id], payload),
+      },
+    }
+  case DELETE_GTW_SUCCESS:
+    const { [payload.id]: deleted, ...rest } = state.entities
+
+    return {
+      selectedGateway: null,
+      entities: rest,
+    }
+  case GET_GTWS_LIST_SUCCESS:
+    const entities = payload.entities.reduce(function (acc, gtw) {
+      const id = getGatewayId(gtw)
+
+      acc[id] = gateway(acc[id], gtw)
+      return acc
+    }, { ...state.entities })
+
+    return {
+      ...state,
+      entities,
+    }
+  case START_GTW_STATS:
+  case UPDATE_GTW_STATS:
+  case UPDATE_GTW_STATS_SUCCESS:
+  case UPDATE_GTW_STATS_FAILURE:
+  case UPDATE_GTW_STATS_UNAVAILABLE:
+  case STOP_GTW_STATS:
+    return {
+      ...state,
+      statistics: statistics(state.statistics, action),
     }
   default:
     return state

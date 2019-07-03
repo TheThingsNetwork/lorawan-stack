@@ -29,6 +29,12 @@ import {
   clearEvents,
   createClearEventsActionType,
 } from './events'
+import {
+  createPaginationRequestActions,
+  createPaginationBaseActionType,
+  createPaginationDeleteBaseActionType,
+  createPaginationDeleteActions,
+} from './pagination'
 
 export const SHARED_NAME = 'GATEWAY'
 
@@ -56,23 +62,32 @@ export const [{
   success: updateGatewaySuccess,
   failure: updateGatewayFailure,
 }] = createRequestActions(UPDATE_GTW_BASE,
-  (gatewayId, patch) => ({ gatewayId, patch }),
-  (gatewayId, patch, selector) => ({ selector })
+  (id, patch) => ({ id, patch }),
+  (id, patch, selector) => ({ selector })
 )
 
-export const GET_GTWS_LIST_BASE = 'GET_GATEWAYS_LIST'
+export const DELETE_GTW_BASE = createPaginationDeleteBaseActionType(SHARED_NAME)
+export const [{
+  request: DELETE_GTW,
+  success: DELETE_GTW_SUCCESS,
+  failure: DELETE_GTW_FAILURE,
+}, {
+  request: deleteGateway,
+  success: deleteGatewaySuccess,
+  failure: deleteGatewayFailure,
+}] = createPaginationDeleteActions(SHARED_NAME)
+
+
+export const GET_GTWS_LIST_BASE = createPaginationBaseActionType(SHARED_NAME)
 export const [{
   request: GET_GTWS_LIST,
   success: GET_GTWS_LIST_SUCCESS,
   failure: GET_GTWS_LIST_FAILURE,
 }, {
   request: getGatewaysList,
-  success: getGatewaysSuccess,
-  failure: getGatetaysFailure,
-}] = createRequestActions(GET_GTWS_LIST_BASE,
-  ({ page, limit, query } = {}) => ({ params: { page, limit, query }}),
-  ({ page, limit, query } = {}, selectors = []) => ({ selectors })
-)
+  success: getGatewaysListSuccess,
+  failure: getGatewaysListFailure,
+}] = createPaginationRequestActions(SHARED_NAME)
 
 export const GET_GTWS_RIGHTS_LIST_BASE = createGetRightsListActionType(SHARED_NAME)
 export const [{
