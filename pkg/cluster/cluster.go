@@ -171,6 +171,7 @@ func New(ctx context.Context, config *config.Cluster, options ...Option) (Cluste
 	tryAddPeer("ns", config.NetworkServer, ttnpb.PeerInfo_NETWORK_SERVER)
 	tryAddPeer("as", config.ApplicationServer, ttnpb.PeerInfo_APPLICATION_SERVER)
 	tryAddPeer("js", config.JoinServer, ttnpb.PeerInfo_JOIN_SERVER)
+	tryAddPeer("cs", config.CryptoServer, ttnpb.PeerInfo_CRYPTO_SERVER)
 
 	for _, join := range config.Join {
 		c.peers[join] = &peer{
