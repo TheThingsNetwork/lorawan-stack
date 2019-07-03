@@ -13,10 +13,10 @@
 // limitations under the License.
 
 import React, { Component } from 'react'
-import { defineMessages } from 'react-intl'
 import bind from 'autobind-decorator'
 
 import sharedMessages from '../../../lib/shared-messages'
+import Message from '../../../lib/components/message'
 import FetchTable from '../fetch-table'
 
 import { getApplicationsList } from '../../../console/store/actions/applications'
@@ -27,29 +27,21 @@ import {
   selectApplicationsError,
 } from '../../store/selectors/applications'
 
-const m = defineMessages({
-  all: 'All',
-  appId: 'Application ID',
-  desc: 'Description',
-  empty: 'No items matched your criteria',
-})
-
-const tabs = [
-  {
-    title: m.all,
-    name: 'all',
-    disabled: true,
-  },
-]
-
 const headers = [
   {
     name: 'ids.application_id',
-    displayName: m.appId,
+    displayName: sharedMessages.id,
+    width: 25,
+  },
+  {
+    name: 'name',
+    displayName: sharedMessages.name,
+    width: 25,
   },
   {
     name: 'description',
-    displayName: m.desc,
+    displayName: sharedMessages.description,
+    width: 50,
   },
 ]
 
@@ -59,7 +51,7 @@ export default class ApplicationsTable extends Component {
   constructor (props) {
     super(props)
 
-    this.getApplicationsList = params => getApplicationsList(params, [ 'description' ])
+    this.getApplicationsList = params => getApplicationsList(params, [ 'name', 'description' ])
   }
 
   baseDataSelector (state) {
@@ -77,10 +69,9 @@ export default class ApplicationsTable extends Component {
         entity="applications"
         headers={headers}
         addMessage={sharedMessages.addApplication}
-        tableTitle={this.tableTitle}
+        tableTitle={<Message content={sharedMessages.applications} />}
         getItemsAction={this.getApplicationsList}
         searchItemsAction={this.getApplicationsList}
-        tabs={tabs}
         baseDataSelector={this.baseDataSelector}
         {...this.props}
       />

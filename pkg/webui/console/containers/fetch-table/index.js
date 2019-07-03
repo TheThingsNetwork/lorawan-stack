@@ -207,7 +207,7 @@ class FetchTable extends Component {
     const { page, query, tab } = this.state
 
     const buttonClassNames = classnames(style.filters, {
-      [style.tabbed]: Boolean(tabs),
+      [style.topRule]: Boolean(tabs || tableTitle),
     })
 
     return (
@@ -224,7 +224,7 @@ class FetchTable extends Component {
                 />
               )
             }
-            <div className={style.tableTitle}>{tableTitle}</div>
+            { tableTitle && <div className={style.tableTitle}>{tableTitle} ({totalCount})</div> }
           </div>
           <div className={style.filtersRight}>
             { searchable && (

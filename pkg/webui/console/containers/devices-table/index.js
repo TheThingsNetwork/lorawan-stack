@@ -14,7 +14,6 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { defineMessages } from 'react-intl'
 import bind from 'autobind-decorator'
 
 import sharedMessages from '../../../lib/shared-messages'
@@ -26,16 +25,10 @@ import DateTime from '../../../lib/components/date-time'
 import { getDevicesList } from '../../../console/store/actions/devices'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
 
-const m = defineMessages({
-  deviceId: 'Device ID',
-  devices: 'Devices ({deviceCount})',
-  add: 'Add Device',
-})
-
 const headers = [
   {
     name: 'ids.device_id',
-    displayName: m.deviceId,
+    displayName: sharedMessages.id,
   },
   {
     name: 'name',
@@ -53,7 +46,6 @@ const headers = [
 @connect(function (state) {
   return {
     appId: selectSelectedApplicationId(state),
-    totalCount: state.devices.totalCount,
   }
 })
 @bind
@@ -69,13 +61,13 @@ class DevicesTable extends React.Component {
   }
 
   render () {
-    const { totalCount, devicePathPrefix } = this.props
+    const { devicePathPrefix } = this.props
     return (
       <FetchTable
         entity="devices"
         headers={headers}
-        addMessage={m.add}
-        tableTitle={<Message content={m.devices} values={{ deviceCount: totalCount }} />}
+        addMessage={sharedMessages.addDevice}
+        tableTitle={<Message content={sharedMessages.devices} />}
         getItemsAction={this.getDevicesList}
         searchItemsAction={this.getDevicesList}
         itemPathPrefix={devicePathPrefix}

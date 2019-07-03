@@ -82,6 +82,7 @@ export default defineMessages({
   generalSettings: 'General Settings',
   hardware: 'Hardware',
   hardwareVersion: 'Hardware version',
+  id: 'ID',
   integrations: 'Integrations',
   joinEUI: 'Join EUI',
   keyEdit: 'Edit API Key',

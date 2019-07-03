@@ -13,25 +13,19 @@
 // limitations under the License.
 
 import React from 'react'
-import { defineMessages } from 'react-intl'
 import bind from 'autobind-decorator'
 
 import sharedMessages from '../../../lib/shared-messages'
+import Message from '../../../lib/components/message'
 import FetchTable from '../fetch-table'
 
 import { getGatewaysList } from '../../../console/store/actions/gateways'
 
-const m = defineMessages({
-  add: 'Add Gateway',
-  gtwId: 'Gateway ID',
-  gtwEUI: 'Gateway EUI',
-  freqPlan: 'Frequency Plan',
-})
 
 const headers = [
   {
     name: 'ids.gateway_id',
-    displayName: m.gtwId,
+    displayName: sharedMessages.id,
     width: 25,
   },
   {
@@ -41,12 +35,12 @@ const headers = [
   },
   {
     name: 'ids.eui',
-    displayName: m.gtwEUI,
+    displayName: sharedMessages.gatewayEUI,
     width: 25,
   },
   {
     name: 'frequency_plan_id',
-    displayName: m.freqPlan,
+    displayName: sharedMessages.frequencyPlan,
     width: 15,
   },
   {
@@ -78,11 +72,12 @@ export default class GatewaysTable extends React.Component {
     return (
       <FetchTable
         entity="gateways"
-        addMessage={m.add}
+        addMessage={sharedMessages.addGateway}
         headers={headers}
         getItemsAction={this.getGatewaysList}
         searchItemsAction={this.getGatewaysList}
         baseDataSelector={this.baseDataSelector}
+        tableTitle={<Message content={sharedMessages.gateways} />}
         {...this.props}
       />
     )

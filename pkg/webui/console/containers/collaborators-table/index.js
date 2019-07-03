@@ -69,6 +69,7 @@ export default class CollaboratorsTable extends Component {
         entity="collaborators"
         headers={headers}
         addMessage={sharedMessages.collaboratorAdd}
+        tableTitle={<Message content={sharedMessages.collaborators} />}
         {...this.props}
       />
     )
