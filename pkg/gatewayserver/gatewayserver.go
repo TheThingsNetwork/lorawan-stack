@@ -173,9 +173,6 @@ func (gs *GatewayServer) Roles() []ttnpb.PeerInfo_Role {
 	return []ttnpb.PeerInfo_Role{ttnpb.PeerInfo_GATEWAY_SERVER}
 }
 
-// CustomContextFromIdentifier returns a derived context based on the given identifiers to use for the connection.
-var CustomContextFromIdentifier func(context.Context, ttnpb.GatewayIdentifiers) (context.Context, error)
-
 var (
 	errEntityRegistryNotFound = errors.DefineNotFound(
 		"entity_registry_not_found",
@@ -210,12 +207,6 @@ func (gs *GatewayServer) FillGatewayContext(ctx context.Context, ids ttnpb.Gatew
 			}
 			ids.GatewayID = fmt.Sprintf("eui-%v", strings.ToLower(ids.EUI.String()))
 		} else {
-			return nil, ttnpb.GatewayIdentifiers{}, err
-		}
-	}
-	if filler := CustomContextFromIdentifier; filler != nil {
-		var err error
-		if ctx, err = filler(ctx, ids); err != nil {
 			return nil, ttnpb.GatewayIdentifiers{}, err
 		}
 	}
