@@ -45,7 +45,11 @@
     box-shadow: 0 0 0 3px alpha($c-warning, .3)
 
   &.disabled
-    opacity: .4
+    background-color: $c-backdrop
+    opacity .6
+
+    .input
+      cursor: not-allowed
 
   &.readOnly
     background-color: $c-backdrop
