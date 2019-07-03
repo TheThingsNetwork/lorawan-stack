@@ -81,13 +81,13 @@ hoverize($color)
   if ($color == $c-active-blue)
     $c-active-blue-hover
   else
-    darker($color)
+    darker($color, 2)
 
 activize($color)
   if ($color == $c-active-blue)
     $c-active-blue-active
   else
-    darker($color, 2)
+    darker($color, 3)
 
 // For text colors and lines
 tc-hoverize($color)
