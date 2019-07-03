@@ -62,6 +62,9 @@ type GatewayServer struct {
 	connections sync.Map
 }
 
+// Option configures GatewayServer.
+type Option func(*GatewayServer)
+
 // Context returns the context of the Gateway Server.
 func (gs *GatewayServer) Context() context.Context {
 	return gs.ctx
@@ -76,7 +79,7 @@ var (
 )
 
 // New returns new *GatewayServer.
-func New(c *component.Component, conf *Config) (gs *GatewayServer, err error) {
+func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServer, err error) {
 	forward, err := conf.ForwardDevAddrPrefixes()
 	if err != nil {
 		return nil, err
@@ -89,6 +92,9 @@ func New(c *component.Component, conf *Config) (gs *GatewayServer, err error) {
 		ctx:                       log.NewContextWithField(c.Context(), "namespace", "gatewayserver"),
 		requireRegisteredGateways: conf.RequireRegisteredGateways,
 		forward:                   forward,
+	}
+	for _, opt := range opts {
+		opt(gs)
 	}
 
 	ctx, cancel := context.WithCancel(gs.Context())
