@@ -18,10 +18,16 @@ import (
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
+	"github.com/mohae/deepcopy"
 	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
+
+// copyEndDevice returns a deep copy of ttnpb.EndDevice pb.
+func copyEndDevice(pb *ttnpb.EndDevice) *ttnpb.EndDevice {
+	return deepcopy.Copy(pb).(*ttnpb.EndDevice)
+}
 
 func timePtr(t time.Time) *time.Time {
 	return &t
@@ -81,9 +87,21 @@ func newMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb
 		return nil, err
 	}
 
+	class := ttnpb.CLASS_A
+	if dev.Multicast {
+		if dev.SupportsClassC {
+			class = ttnpb.CLASS_C
+		} else if dev.SupportsClassB {
+			class = ttnpb.CLASS_B
+		}
+		return nil, errClassAMulticast
+	} else if dev.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 && dev.SupportsClassC {
+		class = ttnpb.CLASS_C
+	}
+
 	macState := &ttnpb.MACState{
 		LoRaWANVersion: dev.LoRaWANVersion,
-		DeviceClass:    ttnpb.CLASS_A,
+		DeviceClass:    class,
 	}
 
 	macState.CurrentParameters.MaxEIRP = phy.DefaultMaxEIRP

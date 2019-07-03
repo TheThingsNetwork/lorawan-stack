@@ -32,29 +32,29 @@ func TestHandleResetInd(t *testing.T) {
 		Name             string
 		Device, Expected *ttnpb.EndDevice
 		Payload          *ttnpb.MACCommand_ResetInd
-		AssertEvents     func(*testing.T, ...events.Event) bool
+		Events           []events.DefinitionDataClosure
 		Error            error
 	}{
 		{
 			Name: "nil payload",
 			Device: &ttnpb.EndDevice{
+				LoRaWANVersion:    ttnpb.MAC_V1_1,
 				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 				SupportsJoin:      false,
 				MACState:          &ttnpb.MACState{},
 			},
 			Expected: &ttnpb.EndDevice{
+				LoRaWANVersion:    ttnpb.MAC_V1_1,
 				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 				SupportsJoin:      false,
 				MACState:          &ttnpb.MACState{},
-			},
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				return assertions.New(t).So(evs, should.BeEmpty)
 			},
 			Error: errNoPayload,
 		},
 		{
 			Name: "empty queue",
 			Device: &ttnpb.EndDevice{
+				LoRaWANVersion:    ttnpb.MAC_V1_1,
 				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 				SupportsJoin:      false,
 				FrequencyPlanID:   test.EUFrequencyPlanID,
@@ -66,6 +66,7 @@ func TestHandleResetInd(t *testing.T) {
 			},
 			Expected: func() *ttnpb.EndDevice {
 				dev := &ttnpb.EndDevice{
+					LoRaWANVersion:    ttnpb.MAC_V1_1,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					SupportsJoin:      false,
 					FrequencyPlanID:   test.EUFrequencyPlanID,
@@ -86,22 +87,19 @@ func TestHandleResetInd(t *testing.T) {
 			Payload: &ttnpb.MACCommand_ResetInd{
 				MinorVersion: 1,
 			},
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				a := assertions.New(t)
-				return a.So(evs, should.HaveLength, 2) &&
-					a.So(evs[0].Name(), should.Equal, "ns.mac.reset.indication") &&
-					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_ResetInd{
-						MinorVersion: 1,
-					}) &&
-					a.So(evs[1].Name(), should.Equal, "ns.mac.reset.confirmation") &&
-					a.So(evs[1].Data(), should.Resemble, &ttnpb.MACCommand_ResetConf{
-						MinorVersion: 1,
-					})
+			Events: []events.DefinitionDataClosure{
+				evtReceiveResetIndication.BindData(&ttnpb.MACCommand_ResetInd{
+					MinorVersion: 1,
+				}),
+				evtEnqueueResetConfirmation.BindData(&ttnpb.MACCommand_ResetConf{
+					MinorVersion: 1,
+				}),
 			},
 		},
 		{
 			Name: "non-empty queue",
 			Device: &ttnpb.EndDevice{
+				LoRaWANVersion:    ttnpb.MAC_V1_1,
 				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 				SupportsJoin:      false,
 				FrequencyPlanID:   test.EUFrequencyPlanID,
@@ -117,6 +115,7 @@ func TestHandleResetInd(t *testing.T) {
 			},
 			Expected: func() *ttnpb.EndDevice {
 				dev := &ttnpb.EndDevice{
+					LoRaWANVersion:    ttnpb.MAC_V1_1,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					SupportsJoin:      false,
 					FrequencyPlanID:   test.EUFrequencyPlanID,
@@ -137,17 +136,13 @@ func TestHandleResetInd(t *testing.T) {
 			Payload: &ttnpb.MACCommand_ResetInd{
 				MinorVersion: 1,
 			},
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				a := assertions.New(t)
-				return a.So(evs, should.HaveLength, 2) &&
-					a.So(evs[0].Name(), should.Equal, "ns.mac.reset.indication") &&
-					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_ResetInd{
-						MinorVersion: 1,
-					}) &&
-					a.So(evs[1].Name(), should.Equal, "ns.mac.reset.confirmation") &&
-					a.So(evs[1].Data(), should.Resemble, &ttnpb.MACCommand_ResetConf{
-						MinorVersion: 1,
-					})
+			Events: []events.DefinitionDataClosure{
+				evtReceiveResetIndication.BindData(&ttnpb.MACCommand_ResetInd{
+					MinorVersion: 1,
+				}),
+				evtEnqueueResetConfirmation.BindData(&ttnpb.MACCommand_ResetConf{
+					MinorVersion: 1,
+				}),
 			},
 		},
 	} {
@@ -156,16 +151,13 @@ func TestHandleResetInd(t *testing.T) {
 
 			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			var err error
-			evs := collectEvents(func() {
-				err = handleResetInd(test.Context(), dev, tc.Payload, frequencyplans.NewStore(test.FrequencyPlansFetcher), ttnpb.MACSettings{})
-			})
+			evs, err := handleResetInd(test.Context(), dev, tc.Payload, frequencyplans.NewStore(test.FrequencyPlansFetcher), ttnpb.MACSettings{})
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 				tc.Error == nil && !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
 			a.So(dev, should.Resemble, tc.Expected)
-			a.So(tc.AssertEvents(t, evs...), should.BeTrue)
+			a.So(evs, should.ResembleEventDefinitionDataClosures, tc.Events)
 		})
 	}
 }

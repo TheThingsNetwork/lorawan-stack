@@ -17,8 +17,8 @@ package networkserver
 
 import (
 	"context"
-	"fmt"
 	"hash/fnv"
+	"io"
 	"sync"
 	"time"
 
@@ -71,25 +71,6 @@ func NewWindowEndAfterFunc(d time.Duration) WindowEndFunc {
 	}
 }
 
-// NsJsClientFunc is the function used to get Join Server.
-type NsJsClientFunc func(ctx context.Context, id ttnpb.EndDeviceIdentifiers) (ttnpb.NsJsClient, error)
-
-// PeerGetter is the interface, which wraps GetPeer method.
-type PeerGetter interface {
-	GetPeer(ctx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) cluster.Peer
-}
-
-// NewJoinServerPeerGetterFunc returns a NsJsClientFunc, which uses g to retrieve Join Server clients.
-func NewJoinServerPeerGetterFunc(g PeerGetter) NsJsClientFunc {
-	return func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) (ttnpb.NsJsClient, error) {
-		p := g.GetPeer(ctx, ttnpb.PeerInfo_JOIN_SERVER, ids)
-		if p == nil {
-			return nil, errJoinServerNotFound
-		}
-		return ttnpb.NewNsJsClient(p.Conn()), nil
-	}
-}
-
 // DownlinkPriorities define the schedule priorities for the different types of downlink.
 type DownlinkPriorities struct {
 	// JoinAccept is the downlink priority for join-accept messages.
@@ -114,22 +95,18 @@ type NetworkServer struct {
 	netID           types.NetID
 	devAddrPrefixes []types.DevAddrPrefix
 
-	applicationServersMu *sync.RWMutex
-	applicationServers   map[string]*applicationUpStream
+	applicationServers *sync.Map // string -> *applicationUpStream
 
 	metadataAccumulators *sync.Map // uint64 -> *metadataAccumulator
 
 	metadataAccumulatorPool *sync.Pool
 	hashPool                *sync.Pool
 
-	macHandlers        *sync.Map // ttnpb.MACCommandIdentifier -> MACHandler
 	downlinkTasks      DownlinkTaskQueue
 	downlinkPriorities DownlinkPriorities
 
 	deduplicationDone WindowEndFunc
 	collectionDone    WindowEndFunc
-
-	jsClient NsJsClientFunc
 
 	handleASUplink func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, up *ttnpb.ApplicationUp) (bool, error)
 
@@ -155,39 +132,10 @@ func WithCollectionDoneFunc(f WindowEndFunc) Option {
 	}
 }
 
-// WithNsJsClientFunc overrides the default NsJsClientFunc, which
-// is used to get the Join Server by end device identifiers.
-func WithNsJsClientFunc(f NsJsClientFunc) Option {
-	return func(ns *NetworkServer) {
-		ns.jsClient = f
-	}
-}
-
 // WithASUplinkHandler overrides the default function called, which is used for sending the uplink to AS.
 func WithASUplinkHandler(f func(context.Context, ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationUp) (bool, error)) Option {
 	return func(ns *NetworkServer) {
 		ns.handleASUplink = f
-	}
-}
-
-// WithMACHandler registers a MACHandler for specified CID in 0x80-0xFF range.
-// WithMACHandler panics if a MACHandler for the CID is already registered, or if
-// the CID is out of range.
-func WithMACHandler(cid ttnpb.MACCommandIdentifier, fn MACHandler) Option {
-	if cid < 0x80 || cid > 0xFF {
-		panic(errCIDOutOfRange.WithAttributes(
-			"min", fmt.Sprintf("0x%X", 0x80),
-			"max", fmt.Sprintf("0x%X", 0xFF),
-		))
-	}
-
-	return func(ns *NetworkServer) {
-		_, ok := ns.macHandlers.LoadOrStore(cid, fn)
-		if ok {
-			panic(errDuplicateCIDHandler.WithAttributes(
-				"cid", fmt.Sprintf("0x%X", int32(cid)),
-			))
-		}
 	}
 }
 
@@ -216,12 +164,10 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		devices:                 conf.Devices,
 		netID:                   conf.NetID,
 		devAddrPrefixes:         devAddrPrefixes,
-		applicationServersMu:    &sync.RWMutex{},
-		applicationServers:      make(map[string]*applicationUpStream),
+		applicationServers:      &sync.Map{},
 		metadataAccumulators:    &sync.Map{},
 		metadataAccumulatorPool: &sync.Pool{},
 		hashPool:                &sync.Pool{},
-		macHandlers:             &sync.Map{},
 		downlinkTasks:           conf.DownlinkTasks,
 		downlinkPriorities:      downlinkPriorities,
 		defaultMACSettings: ttnpb.MACSettings{
@@ -271,21 +217,15 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		ns.collectionDone = NewWindowEndAfterFunc(conf.DeduplicationWindow + conf.CooldownWindow)
 	}
 
-	if ns.jsClient == nil {
-		ns.jsClient = NewJoinServerPeerGetterFunc(ns.Component)
-	}
-
 	if ns.handleASUplink == nil {
-		ns.handleASUplink = func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, up *ttnpb.ApplicationUp) (ok bool, err error) {
-			ns.applicationServersMu.RLock()
-
-			as, ok := ns.applicationServers[unique.ID(ctx, ids)]
+		ns.handleASUplink = func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, up *ttnpb.ApplicationUp) (bool, error) {
+			v, ok := ns.applicationServers.Load(unique.ID(ctx, ids))
 			if !ok {
-				ns.applicationServersMu.RUnlock()
 				return false, nil
 			}
+			as := v.(ttnpb.AsNs_LinkApplicationServer)
 
-			defer ns.applicationServersMu.RUnlock()
+			var err error
 			if err = as.Send(up); err != nil {
 				return true, err
 			}
@@ -345,4 +285,19 @@ func (ns *NetworkServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.Client
 // Roles returns the roles that the Network Server fulfills.
 func (ns *NetworkServer) Roles() []ttnpb.PeerInfo_Role {
 	return []ttnpb.PeerInfo_Role{ttnpb.PeerInfo_NETWORK_SERVER}
+}
+
+func (ns *NetworkServer) Close() {
+	ns.Component.Close()
+
+	logger := ns.Logger()
+	ns.applicationServers.Range(func(k interface{}, v interface{}) bool {
+		logger := logger.WithField("application_uid", k.(string))
+		logger.Debug("Close Application Server link")
+		if err := v.(io.Closer).Close(); err != nil {
+			logger.WithError(err).Warn("Failed to close AS link")
+		}
+		logger.Debug("Application Server link closed")
+		return true
+	})
 }

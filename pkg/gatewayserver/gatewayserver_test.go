@@ -484,13 +484,6 @@ func TestGatewayServer(t *testing.T) {
 
 			t.Run("Upstream", func(t *testing.T) {
 				uplinkCount := 0
-				upEvents := map[string]events.Channel{}
-				for _, event := range []string{"gs.up.receive", "gs.down.tx.success", "gs.down.tx.fail", "gs.status.receive"} {
-					ch := make(events.Channel, 5)
-					events.Subscribe(event, ch)
-					defer events.Unsubscribe(event, ch)
-					upEvents[event] = ch
-				}
 				for _, tc := range []struct {
 					Name     string
 					Up       *ttnpb.GatewayUp
@@ -663,6 +656,23 @@ func TestGatewayServer(t *testing.T) {
 				} {
 					t.Run(tc.Name, func(t *testing.T) {
 						a := assertions.New(t)
+
+						upEvents := map[string]events.Channel{}
+						for _, event := range []string{"gs.up.receive", "gs.down.tx.success", "gs.down.tx.fail", "gs.status.receive"} {
+							upEvents[event] = make(events.Channel, 5)
+						}
+						defer test.SetDefaultEventsPubSub(&test.MockEventPubSub{
+							PublishFunc: func(ev events.Event) {
+								switch name := ev.Name(); name {
+								case "gs.up.receive", "gs.down.tx.success", "gs.down.tx.fail", "gs.status.receive":
+									go func() {
+										upEvents[name] <- ev
+									}()
+								default:
+									t.Logf("%s event published", name)
+								}
+							},
+						})()
 
 						select {
 						case upCh <- tc.Up:

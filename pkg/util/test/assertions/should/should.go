@@ -169,4 +169,11 @@ var (
 	HaveRoute = testassertions.ShouldHaveRoute
 	// NotHaveRoute asserts that the given *echo.Echo server does not have a route with the given method and path.
 	NotHaveRoute = testassertions.ShouldNotHaveRoute
+
+	// ResembleEvent receives exactly two events.Event and does a resemblance check.
+	ResembleEvent = testassertions.ShouldResembleEvent
+	// ResembleEventDefinitionDataClosure receives exactly two events.DefinitionDataClosure and does a resemblance check.
+	ResembleEventDefinitionDataClosure = testassertions.ShouldResembleEventDefinitionDataClosure
+	// ResembleEventDefinitionDataClosures receives exactly two []events.DefinitionDataClosure and does a resemblance check.
+	ResembleEventDefinitionDataClosures = testassertions.ShouldResembleEventDefinitionDataClosures
 )

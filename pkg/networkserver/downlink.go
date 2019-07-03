@@ -548,7 +548,7 @@ func downlinkPathsForClassA(rxDelay ttnpb.RxDelay, ups ...*ttnpb.UplinkMessage) 
 	maxDelta := time.Duration(rxDelay) * time.Second
 	for i := len(ups) - 1; i >= 0; i-- {
 		up := ups[i]
-		delta := time.Now().Sub(up.ReceivedAt)
+		delta := time.Since(up.ReceivedAt)
 		rx1, rx2 := delta < maxDelta, delta < maxDelta+time.Second
 		if paths := downlinkPathsFromMetadata(up.RxMetadata...); len(paths) > 0 {
 			return rx1, rx2, paths
@@ -738,8 +738,14 @@ loop:
 	return phy.DataRates[maxUpDRIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks())
 }
 
-const gsScheduleWindow = 30 * time.Second
+// downlinkRetryInterval is the time interval, which defines the interval between downlink task retries.
 const downlinkRetryInterval = time.Second
+
+// gsScheduleWindow is the time interval, which is sufficient for GS to ensure downlink is scheduled.
+const gsScheduleWindow = 30 * time.Second
+
+// nsScheduleWindow is the time interval, which is sufficient for NS to ensure downlink is scheduled.
+var nsScheduleWindow = time.Second
 
 // processDownlinkTask processes the most recent downlink task ready for execution, if such is available or wait until it is before processing it.
 // NOTE: ctx.Done() is not guaranteed to be respected by processDownlinkTask.

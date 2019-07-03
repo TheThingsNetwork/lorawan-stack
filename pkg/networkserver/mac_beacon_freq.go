@@ -47,25 +47,27 @@ func enqueueBeaconFreqReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen,
 	return maxDownLen, maxUpLen, ok
 }
 
-func handleBeaconFreqAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_BeaconFreqAns) (err error) {
+func handleBeaconFreqAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_BeaconFreqAns) ([]events.DefinitionDataClosure, error) {
 	if pld == nil {
-		return errNoPayload
+		return nil, errNoPayload
 	}
 
+	evt := evtReceiveBeaconFreqAccept
 	if !pld.FrequencyAck {
-		events.Publish(evtReceiveBeaconFreqReject(ctx, dev.EndDeviceIdentifiers, pld))
-	} else {
-		events.Publish(evtReceiveBeaconFreqAccept(ctx, dev.EndDeviceIdentifiers, pld))
+		evt = evtReceiveBeaconFreqReject
 	}
 
+	var err error
 	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_BEACON_FREQ, func(cmd *ttnpb.MACCommand) error {
-		req := cmd.GetBeaconFreqReq()
-
 		if !pld.FrequencyAck {
 			return nil
 		}
+		req := cmd.GetBeaconFreqReq()
+
 		dev.MACState.CurrentParameters.BeaconFrequency = req.Frequency
 		return nil
 	}, dev.MACState.PendingRequests...)
-	return
+	return []events.DefinitionDataClosure{
+		evt.BindData(pld),
+	}, err
 }

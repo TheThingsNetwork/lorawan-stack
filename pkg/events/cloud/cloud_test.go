@@ -34,13 +34,13 @@ func Example() {
 	// In this example we use "gocloud.dev/pubsub/mempubsub".
 
 	// This sends all events received from a Go Cloud pub sub to the default pubsub.
-	cloudPubSub, err := cloud.WrapPubSub(context.TODO(), events.DefaultPubSub, "mem://events", "mem://events")
+	cloudPubSub, err := cloud.WrapPubSub(context.TODO(), events.DefaultPubSub(), "mem://events", "mem://events")
 	if err != nil {
 		// Handle error.
 	}
 
 	// Replace the default pubsub so that we will now publish to a Go Cloud pub sub.
-	events.DefaultPubSub = cloudPubSub
+	events.SetDefaultPubSub(cloudPubSub)
 }
 
 func TestCloudPubSub(t *testing.T) {

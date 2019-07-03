@@ -16,6 +16,7 @@ package networkserver_test
 
 import (
 	"context"
+	"io"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -23,98 +24,109 @@ import (
 
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
-	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	. "go.thethings.network/lorawan-stack/pkg/networkserver"
-	"go.thethings.network/lorawan-stack/pkg/networkserver/redis"
-	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-func eui64Ptr(eui types.EUI64) *types.EUI64 { return &eui }
-
 func TestLinkApplication(t *testing.T) {
 	a := assertions.New(t)
 
-	redisClient, flush := test.NewRedis(t, "networkserver_test")
-	defer flush()
-	defer redisClient.Close()
-	devReg := &redis.DeviceRegistry{Redis: redisClient}
+	ns, ctx, env, stop := StartTest(t, Config{}, (1<<12)*test.Delay)
+	defer stop()
 
-	ns := test.Must(New(
-		component.MustNew(test.GetLogger(t), &component.Config{
-			ServiceBase: config.ServiceBase{Cluster: config.Cluster{Keys: []string{"AEAEAEAEAEAEAEAEAEAEAEAEAEAEAEAE"}}},
-		}),
-		&Config{
-			Devices:             devReg,
-			DeduplicationWindow: 42,
-			CooldownWindow:      42,
-			DownlinkTasks: &MockDownlinkTaskQueue{
-				PopFunc: DownlinkTaskPopBlockFunc,
-			},
-		})).(*NetworkServer)
-	test.Must(nil, ns.Start())
-	defer ns.Close()
+	<-env.DownlinkTasks.Pop
 
-	ids := ttnpb.ApplicationIdentifiers{
-		ApplicationID: "foo-app",
+	appID1 := ttnpb.ApplicationIdentifiers{
+		ApplicationID: "link-application-app-1",
 	}
-	ctx := test.ContextWithT(test.Context(), t)
-	authorizedCtx := rights.NewContext(ctx, rights.Rights{
-		ApplicationRights: map[string]*ttnpb.Rights{
-			unique.ID(ctx, ids): ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_LINK),
-		},
-	})
-	authorizedCtx = cluster.NewContext(authorizedCtx, nil)
 
+	appID2 := ttnpb.ApplicationIdentifiers{
+		ApplicationID: "link-application-app-2",
+	}
+
+	link1, ok := AssertLinkApplication(ctx, ns.LoopbackConn(), env.Cluster.GetPeer, appID1)
+	if !a.So(ok, should.BeTrue) {
+		t.Fatal("Failed to link application 1")
+	}
+	var link1CorrelationIDs []string
+	a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
+		link1CorrelationIDs = ev.CorrelationIDs()
+		a.So(link1CorrelationIDs, should.HaveLength, 1)
+		return a.So(ev, should.ResembleEvent, EvtBeginApplicationLink(events.ContextWithCorrelationID(ctx, link1CorrelationIDs...), appID1, nil))
+	}), should.BeTrue)
+
+	link2, ok := AssertLinkApplication(ctx, ns.LoopbackConn(), env.Cluster.GetPeer, appID2)
+	if !a.So(ok, should.BeTrue) {
+		t.Fatal("Failed to link application 2")
+	}
+	var link2CorrelationIDs []string
+	a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
+		link2CorrelationIDs = ev.CorrelationIDs()
+		a.So(link2CorrelationIDs, should.HaveLength, 1)
+		return a.So(ev, should.ResembleEvent, EvtBeginApplicationLink(events.ContextWithCorrelationID(ctx, link2CorrelationIDs...), appID2, nil))
+	}), should.BeTrue)
+
+	newLink1, ok := AssertLinkApplication(ctx, ns.LoopbackConn(), env.Cluster.GetPeer, appID1)
+	if !a.So(ok, should.BeTrue) {
+		t.Fatal("Failed to relink application 1")
+	}
+	a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
+		return a.So(ev, should.ResembleEvent, EvtEndApplicationLink(events.ContextWithCorrelationID(ctx, link1CorrelationIDs...), appID1, nil))
+	}), should.BeTrue)
+	var newLink1CorrelationIDs []string
+	a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
+		newLink1CorrelationIDs = ev.CorrelationIDs()
+		a.So(newLink1CorrelationIDs, should.HaveLength, 1)
+		return a.So(ev, should.ResembleEvent, EvtBeginApplicationLink(events.ContextWithCorrelationID(ctx, newLink1CorrelationIDs...), appID1, nil))
+	}), should.BeTrue)
+
+	up, err := link1.Recv()
+	if !a.So(up, should.BeNil) {
+		t.Fatalf("Received uplink on link 1: %v", up)
+	}
+	a.So(err, should.Resemble, io.EOF)
+
+	var evs []events.Event
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
-
-	sendFunc := func(*ttnpb.ApplicationUp) error {
-		t.Error("Send should not be called")
-		return nil
-	}
-
-	time.AfterFunc(test.Delay, func() {
+	go func() {
 		defer wg.Done()
-		err := ns.LinkApplication(&MockAsNsLinkApplicationStream{
-			MockServerStream: &test.MockServerStream{
-				MockStream: &test.MockStream{
-					ContextFunc: func() context.Context {
-						ctx := (rpcmetadata.MD{ID: ids.ApplicationID}).ToIncomingContext(authorizedCtx)
-						ctx, cancel := context.WithCancel(ctx)
-						time.AfterFunc(test.Delay, cancel)
-						return ctx
-					},
-				},
-			},
-			SendFunc: sendFunc,
-		})
-		if !a.So(errors.IsCanceled(err), should.BeTrue) {
-			t.Fatalf("Unexpected error: %v", err)
-		}
-	})
+		a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
+			evs = append(evs, ev)
+			return true
+		}), should.BeTrue)
+		a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
+			evs = append(evs, ev)
+			return true
+		}), should.BeTrue)
+	}()
 
-	err := ns.LinkApplication(&MockAsNsLinkApplicationStream{
-		MockServerStream: &test.MockServerStream{
-			MockStream: &test.MockStream{
-				ContextFunc: func() context.Context {
-					return (rpcmetadata.MD{ID: ids.ApplicationID}).ToIncomingContext(authorizedCtx)
-				},
-			},
-		},
-		SendFunc: sendFunc,
-	})
-	a.So(err, should.NotBeNil)
+	a.So(AssertNetworkServerClose(ctx, ns), should.BeTrue)
 
 	wg.Wait()
+	a.So(evs, should.HaveSameElements, []events.Event{
+		EvtEndApplicationLink(events.ContextWithCorrelationID(ctx, newLink1CorrelationIDs...), appID1, nil),
+		EvtEndApplicationLink(events.ContextWithCorrelationID(ctx, link2CorrelationIDs...), appID2, nil),
+	}, test.EventEqual)
+
+	up, err = newLink1.Recv()
+	if !a.So(up, should.BeNil) {
+		t.Fatalf("Received uplink on new link 1: %v", up)
+	}
+	a.So(err, should.BeError)
+
+	up, err = link2.Recv()
+	if !a.So(up, should.BeNil) {
+		t.Fatalf("Received uplink on link 2: %v", up)
+	}
+	a.So(err, should.BeError)
 }
 
 func TestDownlinkQueueReplace(t *testing.T) {

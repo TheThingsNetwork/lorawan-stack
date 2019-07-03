@@ -27,20 +27,21 @@ var (
 	evtEnqueueResetConfirmation = defineEnqueueMACConfirmationEvent("reset", "device reset")()
 )
 
-func handleResetInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_ResetInd, fps *frequencyplans.Store, defaults ttnpb.MACSettings) error {
+func handleResetInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_ResetInd, fps *frequencyplans.Store, defaults ttnpb.MACSettings) ([]events.DefinitionDataClosure, error) {
 	if pld == nil {
-		return errNoPayload
+		return nil, errNoPayload
 	}
 
-	events.Publish(evtReceiveResetIndication(ctx, dev.EndDeviceIdentifiers, pld))
-
+	evs := []events.DefinitionDataClosure{
+		evtReceiveResetIndication.BindData(pld),
+	}
 	if dev.SupportsJoin {
-		return nil
+		return evs, nil
 	}
 
 	macState, err := newMACState(dev, fps, defaults)
 	if err != nil {
-		return err
+		return evs, err
 	}
 	dev.MACState = macState
 	dev.MACState.LoRaWANVersion = ttnpb.MAC_V1_1
@@ -49,7 +50,7 @@ func handleResetInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCom
 		MinorVersion: pld.MinorVersion,
 	}
 	dev.MACState.QueuedResponses = append(dev.MACState.QueuedResponses, conf.MACCommand())
-
-	events.Publish(evtEnqueueResetConfirmation(ctx, dev.EndDeviceIdentifiers, conf))
-	return nil
+	return append(evs,
+		evtEnqueueResetConfirmation.BindData(conf),
+	), nil
 }

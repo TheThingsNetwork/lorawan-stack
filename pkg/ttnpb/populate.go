@@ -14,6 +14,8 @@
 
 package ttnpb
 
+import "go.thethings.network/lorawan-stack/pkg/types"
+
 var PopulatorConfig struct {
 	LoRaWAN struct {
 		AppendMHDR       func(b []byte, mhdr MHDR) ([]byte, error)
@@ -21,5 +23,8 @@ var PopulatorConfig struct {
 		AppendMessage    func(dst []byte, msg Message) ([]byte, error)
 		MarshalMessage   func(msg Message) ([]byte, error)
 		UnmarshalMessage func(b []byte, msg *Message) error
+
+		ComputeUplinkMIC   func(sNwkSIntKey, fNwkSIntKey types.AES128Key, confFCnt uint32, txDRIdx uint8, txChIdx uint8, addr types.DevAddr, fCnt uint32, payload []byte) ([4]byte, error)
+		ComputeDownlinkMIC func(key types.AES128Key, addr types.DevAddr, confFCnt uint32, fCnt uint32, payload []byte) ([4]byte, error)
 	}
 }

@@ -96,7 +96,7 @@ var (
 				return shared.ErrInitializeBaseComponent.WithCause(err)
 			}
 
-			c.RegisterGRPC(events_grpc.NewEventsServer(c.Context(), events.DefaultPubSub))
+			c.RegisterGRPC(events_grpc.NewEventsServer(c.Context(), events.DefaultPubSub()))
 			c.RegisterGRPC(component.NewConfigurationServer(c))
 
 			host, err := os.Hostname()

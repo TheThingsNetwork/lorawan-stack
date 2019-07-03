@@ -12,17 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package networkserver
+package crypto
 
-import (
-	"context"
+import "go.thethings.network/lorawan-stack/pkg/ttnpb"
 
-	"go.thethings.network/lorawan-stack/pkg/events"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-)
-
-func handleBeaconTimingReq(ctx context.Context, dev *ttnpb.EndDevice) ([]events.DefinitionDataClosure, error) {
-	// TODO: Support Class B (https://github.com/TheThingsNetwork/lorawan-stack/issues/19)
-	// NOTE: This command is deprecated in LoRaWAN 1.1
-	return nil, nil
+func init() {
+	ttnpb.PopulatorConfig.LoRaWAN.ComputeUplinkMIC = ComputeUplinkMIC
+	ttnpb.PopulatorConfig.LoRaWAN.ComputeDownlinkMIC = ComputeDownlinkMIC
 }
