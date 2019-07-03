@@ -71,6 +71,11 @@ dispatch => ({
         icon: 'overview',
       },
       {
+        title: sharedMessages.data,
+        path: `${matchedUrl}/data`,
+        icon: 'data',
+      },
+      {
         title: sharedMessages.location,
         path: `${matchedUrl}/location`,
         icon: 'location',
@@ -86,11 +91,6 @@ dispatch => ({
         path: `${matchedUrl}/api-keys`,
         icon: 'api_keys',
         exact: false,
-      },
-      {
-        title: sharedMessages.data,
-        path: `${matchedUrl}/data`,
-        icon: 'data',
       },
       {
         title: sharedMessages.generalSettings,
