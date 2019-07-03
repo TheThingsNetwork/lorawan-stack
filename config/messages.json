@@ -2924,15 +2924,6 @@
       "file": "gatewayserver.go"
     }
   },
-  "error:pkg/gatewayserver:entity_registry_not_found": {
-    "translations": {
-      "en": "Entity Registry not found"
-    },
-    "description": {
-      "package": "pkg/gatewayserver",
-      "file": "gatewayserver.go"
-    }
-  },
   "error:pkg/gatewayserver:gateway_eui_not_registered": {
     "translations": {
       "en": "gateway EUI `{eui}` is not registered"
