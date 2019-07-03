@@ -1,8 +1,8 @@
 module go.thethings.network/lorawan-stack
 
-replace github.com/grpc-ecosystem/grpc-gateway => github.com/ThethingsIndustries/grpc-gateway v1.9.1-gogo
+replace github.com/grpc-ecosystem/grpc-gateway => github.com/TheThingsIndustries/grpc-gateway v1.9.3-gogo
 
-replace github.com/robertkrimen/otto => github.com/ThethingsIndustries/otto v0.0.0-20181129100957-6ddbbb60554a
+replace github.com/robertkrimen/otto => github.com/TheThingsIndustries/otto v0.0.0-20181129100957-6ddbbb60554a
 
 replace github.com/labstack/echo/v4 => github.com/TheThingsIndustries/echo/v4 v4.0.1-0.20190409124425-ee570f243713
 
@@ -41,7 +41,7 @@ require (
 	github.com/gregjones/httpcache v0.0.0-20190212212710-3befbb6ad0cc
 	github.com/grpc-ecosystem/go-grpc-middleware v1.0.0
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
-	github.com/grpc-ecosystem/grpc-gateway v1.8.5
+	github.com/grpc-ecosystem/grpc-gateway v1.9.3
 	github.com/heptiolabs/healthcheck v0.0.0-20180807145615-6ff867650f40
 	github.com/howeyc/gopass v0.0.0-20170109162249-bf9dde6d0d2c
 	github.com/jacobsa/crypto v0.0.0-20190317225127-9f44e2d11115

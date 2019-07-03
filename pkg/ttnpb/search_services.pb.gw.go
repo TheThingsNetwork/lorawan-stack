@@ -308,15 +308,15 @@ func RegisterEntityRegistrySearchHandlerClient(ctx context.Context, mux *runtime
 }
 
 var (
-	pattern_EntityRegistrySearch_SearchApplications_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"search", "applications"}, ""))
+	pattern_EntityRegistrySearch_SearchApplications_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"search", "applications"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_EntityRegistrySearch_SearchClients_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"search", "clients"}, ""))
+	pattern_EntityRegistrySearch_SearchClients_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"search", "clients"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_EntityRegistrySearch_SearchGateways_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"search", "gateways"}, ""))
+	pattern_EntityRegistrySearch_SearchGateways_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"search", "gateways"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_EntityRegistrySearch_SearchOrganizations_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"search", "organizations"}, ""))
+	pattern_EntityRegistrySearch_SearchOrganizations_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"search", "organizations"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_EntityRegistrySearch_SearchUsers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"search", "users"}, ""))
+	pattern_EntityRegistrySearch_SearchUsers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"search", "users"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
@@ -393,7 +393,7 @@ func RegisterEndDeviceRegistrySearchHandlerClient(ctx context.Context, mux *runt
 }
 
 var (
-	pattern_EndDeviceRegistrySearch_SearchEndDevices_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"search", "applications", "application_ids.application_id", "devices"}, ""))
+	pattern_EndDeviceRegistrySearch_SearchEndDevices_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"search", "applications", "application_ids.application_id", "devices"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

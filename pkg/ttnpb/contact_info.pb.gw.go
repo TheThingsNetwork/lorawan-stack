@@ -150,9 +150,9 @@ func RegisterContactInfoRegistryHandlerClient(ctx context.Context, mux *runtime.
 }
 
 var (
-	pattern_ContactInfoRegistry_RequestValidation_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"contact_info", "validation"}, ""))
+	pattern_ContactInfoRegistry_RequestValidation_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"contact_info", "validation"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ContactInfoRegistry_Validate_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"contact_info", "validation"}, ""))
+	pattern_ContactInfoRegistry_Validate_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"contact_info", "validation"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

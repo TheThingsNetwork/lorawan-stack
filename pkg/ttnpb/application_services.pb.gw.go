@@ -764,21 +764,21 @@ func RegisterApplicationRegistryHandlerClient(ctx context.Context, mux *runtime.
 }
 
 var (
-	pattern_ApplicationRegistry_Create_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "collaborator.user_ids.user_id", "applications"}, ""))
+	pattern_ApplicationRegistry_Create_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "collaborator.user_ids.user_id", "applications"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationRegistry_Create_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "collaborator.organization_ids.organization_id", "applications"}, ""))
+	pattern_ApplicationRegistry_Create_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "collaborator.organization_ids.organization_id", "applications"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationRegistry_Get_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"applications", "application_ids.application_id"}, ""))
+	pattern_ApplicationRegistry_Get_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"applications", "application_ids.application_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationRegistry_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"applications"}, ""))
+	pattern_ApplicationRegistry_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"applications"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationRegistry_List_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "collaborator.user_ids.user_id", "applications"}, ""))
+	pattern_ApplicationRegistry_List_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "collaborator.user_ids.user_id", "applications"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationRegistry_List_2 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "collaborator.organization_ids.organization_id", "applications"}, ""))
+	pattern_ApplicationRegistry_List_2 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "collaborator.organization_ids.organization_id", "applications"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationRegistry_Update_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"applications", "application.ids.application_id"}, ""))
+	pattern_ApplicationRegistry_Update_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"applications", "application.ids.application_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationRegistry_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"applications", "application_id"}, ""))
+	pattern_ApplicationRegistry_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"applications", "application_id"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
@@ -981,19 +981,19 @@ func RegisterApplicationAccessHandlerClient(ctx context.Context, mux *runtime.Se
 }
 
 var (
-	pattern_ApplicationAccess_ListRights_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"applications", "application_id", "rights"}, ""))
+	pattern_ApplicationAccess_ListRights_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"applications", "application_id", "rights"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationAccess_CreateAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"applications", "application_ids.application_id", "api-keys"}, ""))
+	pattern_ApplicationAccess_CreateAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"applications", "application_ids.application_id", "api-keys"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationAccess_ListAPIKeys_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"applications", "application_ids.application_id", "api-keys"}, ""))
+	pattern_ApplicationAccess_ListAPIKeys_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"applications", "application_ids.application_id", "api-keys"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationAccess_GetAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"applications", "application_ids.application_id", "api-keys", "key_id"}, ""))
+	pattern_ApplicationAccess_GetAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"applications", "application_ids.application_id", "api-keys", "key_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationAccess_UpdateAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"applications", "application_ids.application_id", "api-keys", "api_key.id"}, ""))
+	pattern_ApplicationAccess_UpdateAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"applications", "application_ids.application_id", "api-keys", "api_key.id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationAccess_SetCollaborator_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"applications", "application_ids.application_id", "collaborators"}, ""))
+	pattern_ApplicationAccess_SetCollaborator_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"applications", "application_ids.application_id", "collaborators"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationAccess_ListCollaborators_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"applications", "application_ids.application_id", "collaborators"}, ""))
+	pattern_ApplicationAccess_ListCollaborators_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"applications", "application_ids.application_id", "collaborators"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

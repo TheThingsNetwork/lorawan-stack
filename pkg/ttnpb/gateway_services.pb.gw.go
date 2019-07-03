@@ -786,21 +786,21 @@ func RegisterGatewayRegistryHandlerClient(ctx context.Context, mux *runtime.Serv
 }
 
 var (
-	pattern_GatewayRegistry_Create_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "collaborator.user_ids.user_id", "gateways"}, ""))
+	pattern_GatewayRegistry_Create_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "collaborator.user_ids.user_id", "gateways"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_GatewayRegistry_Create_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "collaborator.organization_ids.organization_id", "gateways"}, ""))
+	pattern_GatewayRegistry_Create_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "collaborator.organization_ids.organization_id", "gateways"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_GatewayRegistry_Get_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"gateways", "gateway_ids.gateway_id"}, ""))
+	pattern_GatewayRegistry_Get_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"gateways", "gateway_ids.gateway_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_GatewayRegistry_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"gateways"}, ""))
+	pattern_GatewayRegistry_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"gateways"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_GatewayRegistry_List_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "collaborator.user_ids.user_id", "gateways"}, ""))
+	pattern_GatewayRegistry_List_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "collaborator.user_ids.user_id", "gateways"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_GatewayRegistry_List_2 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "collaborator.organization_ids.organization_id", "gateways"}, ""))
+	pattern_GatewayRegistry_List_2 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "collaborator.organization_ids.organization_id", "gateways"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_GatewayRegistry_Update_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"gateways", "gateway.ids.gateway_id"}, ""))
+	pattern_GatewayRegistry_Update_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"gateways", "gateway.ids.gateway_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_GatewayRegistry_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"gateways", "gateway_id"}, ""))
+	pattern_GatewayRegistry_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"gateways", "gateway_id"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
@@ -1003,19 +1003,19 @@ func RegisterGatewayAccessHandlerClient(ctx context.Context, mux *runtime.ServeM
 }
 
 var (
-	pattern_GatewayAccess_ListRights_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"gateways", "gateway_id", "rights"}, ""))
+	pattern_GatewayAccess_ListRights_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"gateways", "gateway_id", "rights"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_GatewayAccess_CreateAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"gateways", "gateway_ids.gateway_id", "api-keys"}, ""))
+	pattern_GatewayAccess_CreateAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"gateways", "gateway_ids.gateway_id", "api-keys"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_GatewayAccess_ListAPIKeys_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"gateways", "gateway_ids.gateway_id", "api-keys"}, ""))
+	pattern_GatewayAccess_ListAPIKeys_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"gateways", "gateway_ids.gateway_id", "api-keys"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_GatewayAccess_GetAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"gateways", "gateway_ids.gateway_id", "api-keys", "key_id"}, ""))
+	pattern_GatewayAccess_GetAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"gateways", "gateway_ids.gateway_id", "api-keys", "key_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_GatewayAccess_UpdateAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"gateways", "gateway_ids.gateway_id", "api-keys", "api_key.id"}, ""))
+	pattern_GatewayAccess_UpdateAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"gateways", "gateway_ids.gateway_id", "api-keys", "api_key.id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_GatewayAccess_SetCollaborator_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"gateways", "gateway_ids.gateway_id", "collaborators"}, ""))
+	pattern_GatewayAccess_SetCollaborator_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"gateways", "gateway_ids.gateway_id", "collaborators"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_GatewayAccess_ListCollaborators_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"gateways", "gateway_ids.gateway_id", "collaborators"}, ""))
+	pattern_GatewayAccess_ListCollaborators_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"gateways", "gateway_ids.gateway_id", "collaborators"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

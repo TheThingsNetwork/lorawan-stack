@@ -387,15 +387,15 @@ func RegisterEndDeviceRegistryHandlerClient(ctx context.Context, mux *runtime.Se
 }
 
 var (
-	pattern_EndDeviceRegistry_Create_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"applications", "end_device.ids.application_ids.application_id", "devices"}, ""))
+	pattern_EndDeviceRegistry_Create_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"applications", "end_device.ids.application_ids.application_id", "devices"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_EndDeviceRegistry_Get_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"applications", "end_device_ids.application_ids.application_id", "devices", "end_device_ids.device_id"}, ""))
+	pattern_EndDeviceRegistry_Get_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"applications", "end_device_ids.application_ids.application_id", "devices", "end_device_ids.device_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_EndDeviceRegistry_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"applications", "application_ids.application_id", "devices"}, ""))
+	pattern_EndDeviceRegistry_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"applications", "application_ids.application_id", "devices"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_EndDeviceRegistry_Update_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"applications", "end_device.ids.application_ids.application_id", "devices", "end_device.ids.device_id"}, ""))
+	pattern_EndDeviceRegistry_Update_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"applications", "end_device.ids.application_ids.application_id", "devices", "end_device.ids.device_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_EndDeviceRegistry_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"applications", "application_ids.application_id", "devices", "device_id"}, ""))
+	pattern_EndDeviceRegistry_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"applications", "application_ids.application_id", "devices", "device_id"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

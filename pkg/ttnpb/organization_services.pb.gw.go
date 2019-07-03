@@ -651,17 +651,17 @@ func RegisterOrganizationRegistryHandlerClient(ctx context.Context, mux *runtime
 }
 
 var (
-	pattern_OrganizationRegistry_Create_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "collaborator.user_ids.user_id", "organizations"}, ""))
+	pattern_OrganizationRegistry_Create_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "collaborator.user_ids.user_id", "organizations"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_OrganizationRegistry_Get_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"organizations", "organization_ids.organization_id"}, ""))
+	pattern_OrganizationRegistry_Get_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"organizations", "organization_ids.organization_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_OrganizationRegistry_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"organizations"}, ""))
+	pattern_OrganizationRegistry_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"organizations"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_OrganizationRegistry_List_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "collaborator.user_ids.user_id", "organizations"}, ""))
+	pattern_OrganizationRegistry_List_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "collaborator.user_ids.user_id", "organizations"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_OrganizationRegistry_Update_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"organizations", "organization.ids.organization_id"}, ""))
+	pattern_OrganizationRegistry_Update_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"organizations", "organization.ids.organization_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_OrganizationRegistry_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"organizations", "organization_id"}, ""))
+	pattern_OrganizationRegistry_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"organizations", "organization_id"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
@@ -860,19 +860,19 @@ func RegisterOrganizationAccessHandlerClient(ctx context.Context, mux *runtime.S
 }
 
 var (
-	pattern_OrganizationAccess_ListRights_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_id", "rights"}, ""))
+	pattern_OrganizationAccess_ListRights_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_id", "rights"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_OrganizationAccess_CreateAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_ids.organization_id", "api-keys"}, ""))
+	pattern_OrganizationAccess_CreateAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_ids.organization_id", "api-keys"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_OrganizationAccess_ListAPIKeys_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_ids.organization_id", "api-keys"}, ""))
+	pattern_OrganizationAccess_ListAPIKeys_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_ids.organization_id", "api-keys"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_OrganizationAccess_GetAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"organizations", "organization_ids.organization_id", "api-keys", "key_id"}, ""))
+	pattern_OrganizationAccess_GetAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"organizations", "organization_ids.organization_id", "api-keys", "key_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_OrganizationAccess_UpdateAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"organizations", "organization_ids.organization_id", "api-keys", "api_key.id"}, ""))
+	pattern_OrganizationAccess_UpdateAPIKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"organizations", "organization_ids.organization_id", "api-keys", "api_key.id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_OrganizationAccess_SetCollaborator_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_ids.organization_id", "collaborators"}, ""))
+	pattern_OrganizationAccess_SetCollaborator_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_ids.organization_id", "collaborators"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_OrganizationAccess_ListCollaborators_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_ids.organization_id", "collaborators"}, ""))
+	pattern_OrganizationAccess_ListCollaborators_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"organizations", "organization_ids.organization_id", "collaborators"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

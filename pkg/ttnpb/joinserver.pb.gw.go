@@ -402,15 +402,15 @@ func RegisterJsEndDeviceRegistryHandlerClient(ctx context.Context, mux *runtime.
 }
 
 var (
-	pattern_JsEndDeviceRegistry_Get_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"js", "applications", "end_device_ids.application_ids.application_id", "devices", "end_device_ids.device_id"}, ""))
+	pattern_JsEndDeviceRegistry_Get_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"js", "applications", "end_device_ids.application_ids.application_id", "devices", "end_device_ids.device_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_JsEndDeviceRegistry_Set_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"js", "applications", "end_device.ids.application_ids.application_id", "devices", "end_device.ids.device_id"}, ""))
+	pattern_JsEndDeviceRegistry_Set_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"js", "applications", "end_device.ids.application_ids.application_id", "devices", "end_device.ids.device_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_JsEndDeviceRegistry_Set_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"js", "applications", "end_device.ids.application_ids.application_id", "devices"}, ""))
+	pattern_JsEndDeviceRegistry_Set_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"js", "applications", "end_device.ids.application_ids.application_id", "devices"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_JsEndDeviceRegistry_Provision_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"js", "applications", "application_ids.application_id", "provision-devices"}, ""))
+	pattern_JsEndDeviceRegistry_Provision_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"js", "applications", "application_ids.application_id", "provision-devices"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_JsEndDeviceRegistry_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"js", "applications", "application_ids.application_id", "devices", "device_id"}, ""))
+	pattern_JsEndDeviceRegistry_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"js", "applications", "application_ids.application_id", "devices", "device_id"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
@@ -487,7 +487,7 @@ func RegisterJsHandlerClient(ctx context.Context, mux *runtime.ServeMux, client 
 }
 
 var (
-	pattern_Js_GetJoinEUIPrefixes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"js", "join_eui_prefixes"}, ""))
+	pattern_Js_GetJoinEUIPrefixes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"js", "join_eui_prefixes"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
