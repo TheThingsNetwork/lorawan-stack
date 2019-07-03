@@ -300,19 +300,6 @@ var (
 				paths = append(paths, ttnpb.FlattenPaths(decodedPaths, endDeviceFlattenPaths)...)
 			}
 
-			var macVersion ttnpb.MACVersion
-			s, err := setEndDeviceFlags.GetString("lorawan_version")
-			if err != nil {
-				return err
-			}
-
-			if err := macVersion.UnmarshalText([]byte(s)); err != nil {
-				return err
-			}
-			if err := macVersion.Validate(); err != nil {
-				return errInvalidMACVerson
-			}
-
 			setDefaults, _ := cmd.Flags().GetBool("defaults")
 			if setDefaults {
 				if config.NetworkServerEnabled {
@@ -354,6 +341,17 @@ var (
 						"session.keys.app_s_key.key",
 						"session.dev_addr",
 					)
+					var macVersion ttnpb.MACVersion
+					s, err := setEndDeviceFlags.GetString("lorawan_version")
+					if err != nil {
+						return err
+					}
+					if err := macVersion.UnmarshalText([]byte(s)); err != nil {
+						return err
+					}
+					if err := macVersion.Validate(); err != nil {
+						return errInvalidMACVerson
+					}
 					if macVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
 						device.Session.SessionKeys.SNwkSIntKey = &ttnpb.KeyEnvelope{Key: generateKey()}
 						device.Session.SessionKeys.NwkSEncKey = &ttnpb.KeyEnvelope{Key: generateKey()}
@@ -492,12 +490,21 @@ var (
 			isPaths, nsPaths, asPaths, jsPaths := splitEndDeviceSetPaths(device.SupportsJoin, paths...)
 
 			if len(nsPaths) > 0 && config.NetworkServerEnabled {
+				if device.NetworkServerAddress == "" {
+					device.NetworkServerAddress = getHost(config.NetworkServerGRPCAddress)
+				}
 				isPaths = append(isPaths, "network_server_address")
 			}
 			if len(asPaths) > 0 && config.ApplicationServerEnabled {
+				if device.ApplicationServerAddress == "" {
+					device.ApplicationServerAddress = getHost(config.ApplicationServerGRPCAddress)
+				}
 				isPaths = append(isPaths, "application_server_address")
 			}
 			if len(jsPaths) > 0 && config.JoinServerEnabled {
+				if device.JoinServerAddress == "" {
+					device.JoinServerAddress = getHost(config.JoinServerGRPCAddress)
+				}
 				isPaths = append(isPaths, "join_server_address")
 			}
 
