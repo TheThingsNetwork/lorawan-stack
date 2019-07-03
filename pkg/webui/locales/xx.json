@@ -251,7 +251,7 @@
   "lib.shared-messages.name": "Xxxx",
   "lib.shared-messages.noDesc": "Xxxx xxxxxx xxx xx xxxxxxxxxxx",
   "lib.shared-messages.noEvents": "{entityId} xxx xxx xxxx xxx xxxxxx xxxxxxxx",
-  "lib.shared-messages.noMatch": "Xx xxxxx xxxxxxx xxxx xxxxxxxx",
+  "lib.shared-messages.noMatch": "Xx xxxxx xxxxx",
   "lib.shared-messages.none": "Xxxx",
   "lib.shared-messages.notAvailable": "x/x",
   "lib.shared-messages.ntwkSEncKey": "XxxXXxxXxx",

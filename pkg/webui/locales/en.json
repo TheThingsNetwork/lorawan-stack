@@ -251,7 +251,7 @@
   "lib.shared-messages.name": "Name",
   "lib.shared-messages.noDesc": "This device has no description",
   "lib.shared-messages.noEvents": "{entityId} has not sent any events recently",
-  "lib.shared-messages.noMatch": "No items matched your criteria",
+  "lib.shared-messages.noMatch": "No items found",
   "lib.shared-messages.none": "None",
   "lib.shared-messages.notAvailable": "n/a",
   "lib.shared-messages.ntwkSEncKey": "NwkSEncKey",

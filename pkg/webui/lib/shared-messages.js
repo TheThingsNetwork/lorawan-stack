@@ -104,7 +104,7 @@ export default defineMessages({
   name: 'Name',
   noDesc: 'This device has no description',
   noEvents: '{entityId} has not sent any events recently',
-  noMatch: 'No items matched your criteria',
+  noMatch: 'No items found',
   none: 'None',
   notAvailable: 'n/a',
   ntwkSEncKey: 'NwkSEncKey',
