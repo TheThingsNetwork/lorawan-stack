@@ -129,8 +129,10 @@ func TestInteropJoinRequest(t *testing.T) {
 					ReceiverNSID: interop.NetID{0x0, 0x0, 0x13},
 				},
 				PHYPayload: interop.Buffer{0x1, 0x2, 0x3, 0x4},
-				Result:     interop.ResultSuccess,
-				Lifetime:   3600,
+				Result: interop.Result{
+					ResultCode: interop.ResultSuccess,
+				},
+				Lifetime: 3600,
 				NwkSKey: &interop.KeyEnvelope{
 					KEKLabel:     "test",
 					EncryptedKey: []byte{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
@@ -214,8 +216,10 @@ func TestInteropJoinRequest(t *testing.T) {
 					ReceiverNSID: interop.NetID{0x0, 0x0, 0x13},
 				},
 				PHYPayload: []byte{0x1, 0x2, 0x3, 0x4},
-				Result:     interop.ResultSuccess,
-				Lifetime:   3600,
+				Result: interop.Result{
+					ResultCode: interop.ResultSuccess,
+				},
+				Lifetime: 3600,
 				FNwkSIntKey: &interop.KeyEnvelope{
 					KEKLabel:     "test",
 					EncryptedKey: []byte{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
@@ -487,6 +491,9 @@ func TestInteropHomeNSRequest(t *testing.T) {
 					ReceiverID:   interop.NetID{0x0, 0x0, 0x13},
 					ReceiverNSID: interop.NetID{0x0, 0x0, 0x13},
 				},
+				Result: interop.Result{
+					ResultCode: interop.ResultSuccess,
+				},
 				HNSID:  interop.NetID{0x42, 0xff, 0xff},
 				HNetID: interop.NetID{0x42, 0xff, 0xff},
 			},
@@ -593,7 +600,9 @@ func TestInteropAppSKeyRequest(t *testing.T) {
 					SenderID:   interop.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ReceiverID: interop.Buffer("test.local"),
 				},
-				Result: interop.ResultSuccess,
+				Result: interop.Result{
+					ResultCode: interop.ResultSuccess,
+				},
 				DevEUI: interop.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				AppSKey: interop.KeyEnvelope{
 					KEKLabel:     "test",

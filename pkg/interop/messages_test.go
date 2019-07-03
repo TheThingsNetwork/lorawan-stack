@@ -104,7 +104,9 @@ func TestParseMessage(t *testing.T) {
 						},
 						ReceiverID: "01",
 					},
-					Result: ResultInvalidProtocolVersion,
+					Result: Result{
+						ResultCode: ResultInvalidProtocolVersion,
+					},
 				})
 			},
 		},
@@ -141,7 +143,9 @@ func TestParseMessage(t *testing.T) {
 						},
 						ReceiverID: "01",
 					},
-					Result: ResultMalformedMessage,
+					Result: Result{
+						ResultCode: ResultMalformedMessage,
+					},
 				})
 			},
 		},
@@ -204,7 +208,9 @@ func TestParseMessage(t *testing.T) {
 				"ReceiverNSID": "010203",
 				"SenderToken": "01",
 				"PHYPayload": "010203040506",
-				"Result": "Success",
+				"Result": {
+					"ResultCode": "Success"
+				},
 				"Lifetime": 3600,
 				"NwkSKey": {
 					"KEKLabel": "test",
@@ -235,8 +241,10 @@ func TestParseMessage(t *testing.T) {
 						ReceiverNSID: NetID{0x1, 0x2, 0x3},
 					},
 					PHYPayload: Buffer{0x1, 0x2, 0x3, 0x4, 0x5, 0x6},
-					Result:     ResultSuccess,
-					Lifetime:   3600,
+					Result: Result{
+						ResultCode: ResultSuccess,
+					},
+					Lifetime: 3600,
 					NwkSKey: (*KeyEnvelope)(&ttnpb.KeyEnvelope{
 						KEKLabel:     "test",
 						EncryptedKey: []byte{0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf},
@@ -298,7 +306,9 @@ func TestParseMessage(t *testing.T) {
 				"SenderID": "0102030405060708",
 				"ReceiverID": "01020304",
 				"SenderToken": "01",
-				"Result": "Success",
+				"Result": {
+					"ResultCode": "Success"
+				},
 				"DevEUI": "0102030405060708",
 				"AppSKey": {
 					"KEKLabel": "test",
@@ -323,7 +333,9 @@ func TestParseMessage(t *testing.T) {
 						SenderID:   EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
 						ReceiverID: Buffer{0x1, 0x2, 0x3, 0x4},
 					},
-					Result: ResultSuccess,
+					Result: Result{
+						ResultCode: ResultSuccess,
+					},
 					DevEUI: EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
 					AppSKey: KeyEnvelope{
 						KEKLabel:     "test",
@@ -383,7 +395,9 @@ func TestParseMessage(t *testing.T) {
 				"ReceiverID": "010203",
 				"ReceiverNSID": "010203",
 				"SenderToken": "01",
-				"Result": "Success",
+				"Result": {
+					"ResultCode": "Success"
+				},
 				"HNSID": "42FFFF",
 				"HNetID": "42FFFF"
 			}`),
@@ -405,7 +419,9 @@ func TestParseMessage(t *testing.T) {
 						ReceiverID:   NetID{0x1, 0x2, 0x3},
 						ReceiverNSID: NetID{0x1, 0x2, 0x3},
 					},
-					Result: ResultSuccess,
+					Result: Result{
+						ResultCode: ResultSuccess,
+					},
 					HNSID:  NetID{0x42, 0xff, 0xff},
 					HNetID: NetID{0x42, 0xff, 0xff},
 				})

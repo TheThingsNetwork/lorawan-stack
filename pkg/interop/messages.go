@@ -90,6 +90,12 @@ func (h RawMessageHeader) AnswerHeader() (RawMessageHeader, error) {
 	}, nil
 }
 
+// Result contains the result of an operation.
+type Result struct {
+	ResultCode  ResultCode
+	Description string `json:",omitempty"`
+}
+
 // ErrorMessage is a message with raw header and a result field.
 type ErrorMessage struct {
 	RawMessageHeader

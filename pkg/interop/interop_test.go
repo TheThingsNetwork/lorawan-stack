@@ -69,7 +69,7 @@ func TestServeHTTP(t *testing.T) {
 				}
 				var msg ErrorMessage
 				err := json.NewDecoder(res.Body).Decode(&msg)
-				return a.So(err, should.BeNil) && a.So(msg.Result, should.Equal, ResultUnknownSender)
+				return a.So(err, should.BeNil) && a.So(msg.Result, should.Resemble, Result{ResultCode: ResultUnknownSender})
 			},
 		},
 		{
