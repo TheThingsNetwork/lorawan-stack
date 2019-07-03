@@ -59,7 +59,26 @@ type GatewayServer struct {
 	requireRegisteredGateways bool
 	forward                   map[string][]types.DevAddrPrefix
 
+	registry ttnpb.GatewayRegistryClient
+
 	connections sync.Map
+}
+
+func (gs *GatewayServer) getRegistry(ctx context.Context, ids *ttnpb.GatewayIdentifiers) ttnpb.GatewayRegistryClient {
+	if gs.registry != nil {
+		return gs.registry
+	}
+	return ttnpb.NewGatewayRegistryClient(gs.GetPeer(ctx, ttnpb.PeerInfo_ENTITY_REGISTRY, ids).Conn())
+}
+
+// Option configures GatewayServer.
+type Option func(*GatewayServer)
+
+// WithRegistry overrides the registry.
+func WithRegistry(registry ttnpb.GatewayRegistryClient) Option {
+	return func(gs *GatewayServer) {
+		gs.registry = registry
+	}
 }
 
 // Context returns the context of the Gateway Server.
@@ -76,7 +95,7 @@ var (
 )
 
 // New returns new *GatewayServer.
-func New(c *component.Component, conf *Config) (gs *GatewayServer, err error) {
+func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServer, err error) {
 	forward, err := conf.ForwardDevAddrPrefixes()
 	if err != nil {
 		return nil, err
@@ -89,6 +108,9 @@ func New(c *component.Component, conf *Config) (gs *GatewayServer, err error) {
 		ctx:                       log.NewContextWithField(c.Context(), "namespace", "gatewayserver"),
 		requireRegisteredGateways: conf.RequireRegisteredGateways,
 		forward:                   forward,
+	}
+	for _, opt := range opts {
+		opt(gs)
 	}
 
 	ctx, cancel := context.WithCancel(gs.Context())
@@ -173,14 +195,7 @@ func (gs *GatewayServer) Roles() []ttnpb.PeerInfo_Role {
 	return []ttnpb.PeerInfo_Role{ttnpb.PeerInfo_GATEWAY_SERVER}
 }
 
-// CustomContextFromIdentifier returns a derived context based on the given identifiers to use for the connection.
-var CustomContextFromIdentifier func(context.Context, ttnpb.GatewayIdentifiers) (context.Context, error)
-
 var (
-	errEntityRegistryNotFound = errors.DefineNotFound(
-		"entity_registry_not_found",
-		"Entity Registry not found",
-	)
 	errGatewayEUINotRegistered = errors.DefineNotFound(
 		"gateway_eui_not_registered",
 		"gateway EUI `{eui}` is not registered",
@@ -195,11 +210,7 @@ func (gs *GatewayServer) FillGatewayContext(ctx context.Context, ids ttnpb.Gatew
 		return nil, ttnpb.GatewayIdentifiers{}, errEmptyIdentifiers
 	}
 	if ids.GatewayID == "" {
-		er := gs.GetPeer(ctx, ttnpb.PeerInfo_ENTITY_REGISTRY, nil)
-		if er == nil {
-			return nil, ttnpb.GatewayIdentifiers{}, errEntityRegistryNotFound
-		}
-		extIDs, err := ttnpb.NewGatewayRegistryClient(er.Conn()).GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
+		extIDs, err := gs.getRegistry(ctx, nil).GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
 			EUI: *ids.EUI,
 		}, gs.WithClusterAuth())
 		if err == nil {
@@ -210,12 +221,6 @@ func (gs *GatewayServer) FillGatewayContext(ctx context.Context, ids ttnpb.Gatew
 			}
 			ids.GatewayID = fmt.Sprintf("eui-%v", strings.ToLower(ids.EUI.String()))
 		} else {
-			return nil, ttnpb.GatewayIdentifiers{}, err
-		}
-	}
-	if filler := CustomContextFromIdentifier; filler != nil {
-		var err error
-		if ctx, err = filler(ctx, ids); err != nil {
 			return nil, ttnpb.GatewayIdentifiers{}, err
 		}
 	}
@@ -244,10 +249,6 @@ func (gs *GatewayServer) Connect(ctx context.Context, protocol string, ids ttnpb
 	logger := log.FromContext(ctx).WithField("gateway_uid", uid)
 	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:conn:%s", events.NewCorrelationID()))
 
-	er := gs.GetPeer(ctx, ttnpb.PeerInfo_ENTITY_REGISTRY, nil)
-	if er == nil {
-		return nil, errEntityRegistryNotFound
-	}
 	var err error
 	var callOpt grpc.CallOption
 	callOpt, err = rpcmetadata.WithForwardedAuth(ctx, gs.AllowInsecureForCredentials())
@@ -256,7 +257,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, protocol string, ids ttnpb
 	} else if err != nil {
 		return nil, err
 	}
-	gtw, err := ttnpb.NewGatewayRegistryClient(er.Conn()).Get(ctx, &ttnpb.GetGatewayRequest{
+	gtw, err := gs.getRegistry(ctx, &ids).Get(ctx, &ttnpb.GetGatewayRequest{
 		GatewayIdentifiers: ids,
 		FieldMask: pbtypes.FieldMask{
 			Paths: []string{
@@ -495,10 +496,6 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 
 // GetFrequencyPlan gets the specified frequency plan by the gateway identifiers.
 func (gs *GatewayServer) GetFrequencyPlan(ctx context.Context, ids ttnpb.GatewayIdentifiers) (*frequencyplans.FrequencyPlan, error) {
-	er := gs.GetPeer(ctx, ttnpb.PeerInfo_ENTITY_REGISTRY, nil)
-	if er == nil {
-		return nil, errEntityRegistryNotFound
-	}
 	var err error
 	var callOpt grpc.CallOption
 	callOpt, err = rpcmetadata.WithForwardedAuth(ctx, gs.AllowInsecureForCredentials())
@@ -507,7 +504,7 @@ func (gs *GatewayServer) GetFrequencyPlan(ctx context.Context, ids ttnpb.Gateway
 	} else if err != nil {
 		return nil, err
 	}
-	gtw, err := ttnpb.NewGatewayRegistryClient(er.Conn()).Get(ctx, &ttnpb.GetGatewayRequest{
+	gtw, err := gs.getRegistry(ctx, &ids).Get(ctx, &ttnpb.GetGatewayRequest{
 		GatewayIdentifiers: ids,
 		FieldMask:          pbtypes.FieldMask{Paths: []string{"frequency_plan_id"}},
 	}, callOpt)
