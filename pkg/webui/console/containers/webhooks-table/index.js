@@ -17,12 +17,11 @@ import { defineMessages } from 'react-intl'
 import bind from 'autobind-decorator'
 
 import FetchTable from '../fetch-table'
+import Message from '../../../lib/components/message'
 
 import sharedMessages from '../../../lib/shared-messages'
 
-import {
-  getWebhooksList,
-} from '../../../console/store/actions/webhooks'
+import { getWebhooksList } from '../../../console/store/actions/webhooks'
 
 const m = defineMessages({
   format: 'Format',
@@ -32,7 +31,7 @@ const m = defineMessages({
 const headers = [
   {
     name: 'ids.webhook_id',
-    displayName: sharedMessages.webhookId,
+    displayName: sharedMessages.id,
     width: 35,
   },
   {
@@ -69,6 +68,7 @@ export default class WebhooksTable extends React.Component {
         headers={headers}
         getItemsAction={this.getWebhooksList}
         baseDataSelector={this.baseDataSelector}
+        tableTitle={<Message content={sharedMessages.webhooks} />}
         {...this.props}
       />
     )

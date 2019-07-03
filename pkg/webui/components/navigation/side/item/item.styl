@@ -46,7 +46,7 @@
 .link
   one-liner()
   color: $tc-deep-gray
-  padding: $cs.s $cs.xxl $cs.s $cs.l
+  padding: $cs.m $cs.xxl $cs.m $cs.l
   display: block
   position: relative
 
@@ -58,7 +58,7 @@
     left: 0
     width: 0
     height: 100%
-    background-color: $c-backdrop
+    background-color: $c-backdrop-lighter
     transition: width $ad.s ease-out 0s, background-color $ad.s linear
 
   &:hover:not(&-active)::before // @stylint ignore
@@ -81,7 +81,7 @@
     transform: scaleY(1)
 
   &-active
-    background-color: $c-backdrop
+    background-color: $c-backdrop-lighter
     color: $c-active-blue
 
     &::before
@@ -94,9 +94,13 @@
       width: 3px
       background: $c-active-blue
 
+    .icon
+      color: $c-active-blue
+
 .icon
   margin-right: $cs.xs
   vertical-align: middle
+  color: $c-icon-fill
 
 .message
   vertical-align: middle

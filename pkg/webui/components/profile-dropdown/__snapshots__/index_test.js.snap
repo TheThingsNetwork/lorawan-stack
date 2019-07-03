@@ -8,9 +8,6 @@ exports[`Profile Dropdown is in initial state has dropdown open should match sna
   role="button"
   tabIndex="0"
 >
-  <div
-    className="profilePicture"
-  />
   <span
     className="id"
   >
@@ -46,9 +43,6 @@ exports[`Profile Dropdown is in initial state should match snapshot 1`] = `
   role="button"
   tabIndex="0"
 >
-  <div
-    className="profilePicture"
-  />
   <span
     className="id"
   >

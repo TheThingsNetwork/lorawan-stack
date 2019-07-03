@@ -192,7 +192,6 @@ class PayloadFormattersForm extends React.Component {
           <Form.Field
             name={FIELD_NAMES.RADIO}
             title={m.formatterType}
-            horizontal={false}
             component={Radio.Group}
             onChange={this.onTypeChange}
           >

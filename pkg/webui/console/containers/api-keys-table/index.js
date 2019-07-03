@@ -19,6 +19,7 @@ import Tag from '../../../components/tag'
 import TagGroup from '../../../components/tag/group'
 import FetchTable from '../fetch-table'
 import PropTypes from '../../../lib/prop-types'
+import Message from '../../../lib/components/message'
 
 import sharedMessages from '../../../lib/shared-messages'
 import style from './api-keys-table.styl'
@@ -90,6 +91,7 @@ export default class ApiKeysTable extends Component {
         baseDataSelector={baseDataSelector}
         getItemsAction={getItemsAction}
         id={entityId}
+        tableTitle={<Message content={sharedMessages.apiKeys} />}
       />
     )
   }

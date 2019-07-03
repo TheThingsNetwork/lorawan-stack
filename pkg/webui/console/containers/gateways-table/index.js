@@ -13,47 +13,41 @@
 // limitations under the License.
 
 import React from 'react'
-import { defineMessages } from 'react-intl'
 import bind from 'autobind-decorator'
 
 import sharedMessages from '../../../lib/shared-messages'
+import Message from '../../../lib/components/message'
 import FetchTable from '../fetch-table'
 
 import { getGatewaysList } from '../../../console/store/actions/gateways'
 
-const m = defineMessages({
-  add: 'Add Gateway',
-  gtwId: 'Gateway ID',
-  gtwEUI: 'Gateway EUI',
-  freqPlan: 'Frequency Plan',
-})
 
 const headers = [
   {
     name: 'ids.gateway_id',
-    displayName: m.gtwId,
-    width: 45,
-  },
-  {
-    name: 'ids.eui',
-    displayName: m.gtwEUI,
+    displayName: sharedMessages.id,
     width: 25,
   },
   {
     name: 'name',
     displayName: sharedMessages.name,
-    width: 10,
+    width: 25,
+  },
+  {
+    name: 'ids.eui',
+    displayName: sharedMessages.gatewayEUI,
+    width: 25,
+  },
+  {
+    name: 'frequency_plan_id',
+    displayName: sharedMessages.frequencyPlan,
+    width: 15,
   },
   {
     name: 'antennasCount',
     displayName: sharedMessages.antennas,
     centered: true,
-    width: 5,
-  },
-  {
-    name: 'frequency_plan_id',
-    displayName: m.freqPlan,
-    width: 15,
+    width: 10,
   },
 ]
 
@@ -78,11 +72,12 @@ export default class GatewaysTable extends React.Component {
     return (
       <FetchTable
         entity="gateways"
-        addMessage={m.add}
+        addMessage={sharedMessages.addGateway}
         headers={headers}
         getItemsAction={this.getGatewaysList}
         searchItemsAction={this.getGatewaysList}
         baseDataSelector={this.baseDataSelector}
+        tableTitle={<Message content={sharedMessages.gateways} />}
         {...this.props}
       />
     )

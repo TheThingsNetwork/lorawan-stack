@@ -14,8 +14,8 @@
 
 .bar
   border-normal('bottom')
-  background: white
-  height: 7rem
+  background: linear-gradient(bottom left, 0% #F8F8F8, 60% white) // @stylint ignore
+  height: $header-height
   position: relative
   display: flex
   padding: 0 $ls.s
@@ -31,19 +31,19 @@
   flex-grow: 1
 
   svg
-    height: 2.5rem
     nudge('up', 3px)
+    height: 2.2rem
 
 .nav-list
   display: flex
   align-items: stretch
   justify-content: space-between
-  padding: 0 $cs.l
-  flex-grow: 3
+  padding: 0 $cs.xl
+  flex-grow: 2
 
 .left
   display: flex
-  max-width: 60rem
+  max-width: 52rem
   flex-grow: 1
 
 .right
@@ -52,10 +52,8 @@
   align-items: center
   justify-content: flex-end
   max-width: 25rem
-  flex-grow: 1
+  flex-grow: 2
 
   & > div:first-child
     max-width: 15rem
-    margin-right: $ls.s
-    border-radius: 60px
     border-color: $c-divider-dark

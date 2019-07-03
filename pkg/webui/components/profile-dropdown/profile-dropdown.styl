@@ -17,21 +17,27 @@
   align-items: center
   position: relative
   cursor: pointer
+  transition: background-color $ad.s
+  height: 100%
+  padding: 0 $cs.l
 
-.profile-picture
-  width: 50px
-  height: 50px
-  border-radius: 100%
-  background: $c-backdrop
-  margin-right: $cs.m
+  &:hover
+    background-color: hoverize(white)
+
+  +focus-visible()
+    background-color: hoverize(white)
+
+  &:active, &:focus
+    background-color: activize(white)
 
 .id
+  one-liner()
   margin-right: $cs.s
 
 ul.dropdown
   border-normal()
   z-index: 1
-  top: 3.5rem
+  top: 6rem
   right: 0
   position: absolute
   background: white
@@ -56,7 +62,6 @@ ul.dropdown
         nudge('down')
 
     .icon
-      margin-right: $cs.xs
       margin-left: $cs.m
 
     &:not(:last-child)

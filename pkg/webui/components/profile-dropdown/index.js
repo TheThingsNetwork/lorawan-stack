@@ -92,7 +92,6 @@ export default class ProfileDropdown extends React.PureComponent {
         role="button"
         {...rest}
       >
-        <div className={styles.profilePicture} />
         <span className={styles.id}>{userId}</span>
         <Icon icon="arrow_drop_down" />
         { this.state.expanded && <Dropdown items={dropdownItems} anchored={anchored} />}

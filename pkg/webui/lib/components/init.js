@@ -26,8 +26,8 @@ import '../../styles/main.styl'
 // Keep these in line with styles/variables.less
 setConfiguration({
   breakpoints: [ 480, 768, 1000, 1280 ],
-  containerWidths: [ 465, 750, 980, 1240 ],
-  gutterWidth: 26,
+  containerWidths: [ 365, 650, 880, 1140 ],
+  gutterWidth: 28,
 })
 
 @connect(state => (
