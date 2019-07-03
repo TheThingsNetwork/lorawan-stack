@@ -20,6 +20,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"sync"
 	"testing"
 	"time"
 
@@ -2190,8 +2191,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 			popCh := make(chan DownlinkTaskPopRequest)
 
 			ns := &NetworkServer{
-				Component: c,
-				ctx:       ctx,
+				Component:          c,
+				ctx:                ctx,
+				applicationServers: &sync.Map{},
 				devices: &MockDeviceRegistry{
 					SetByIDFunc: MakeDeviceRegistrySetByIDChFunc(setByIDCh),
 				},

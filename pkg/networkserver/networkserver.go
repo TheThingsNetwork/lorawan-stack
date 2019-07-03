@@ -18,6 +18,7 @@ package networkserver
 import (
 	"context"
 	"hash/fnv"
+	"io"
 	"sync"
 	"time"
 
@@ -94,8 +95,7 @@ type NetworkServer struct {
 	netID           types.NetID
 	devAddrPrefixes []types.DevAddrPrefix
 
-	applicationServersMu *sync.RWMutex
-	applicationServers   map[string]*applicationUpStream
+	applicationServers *sync.Map // string -> *applicationUpStream
 
 	metadataAccumulators *sync.Map // uint64 -> *metadataAccumulator
 
@@ -164,8 +164,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		devices:                 conf.Devices,
 		netID:                   conf.NetID,
 		devAddrPrefixes:         devAddrPrefixes,
-		applicationServersMu:    &sync.RWMutex{},
-		applicationServers:      make(map[string]*applicationUpStream),
+		applicationServers:      &sync.Map{},
 		metadataAccumulators:    &sync.Map{},
 		metadataAccumulatorPool: &sync.Pool{},
 		hashPool:                &sync.Pool{},
@@ -220,13 +219,11 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 
 	if ns.handleASUplink == nil {
 		ns.handleASUplink = func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, up *ttnpb.ApplicationUp) (bool, error) {
-			ns.applicationServersMu.RLock()
-			as, ok := ns.applicationServers[unique.ID(ctx, ids)]
+			v, ok := ns.applicationServers.Load(unique.ID(ctx, ids))
 			if !ok {
-				ns.applicationServersMu.RUnlock()
 				return false, nil
 			}
-			defer ns.applicationServersMu.RUnlock()
+			as := v.(ttnpb.AsNs_LinkApplicationServer)
 
 			var err error
 			if err = as.Send(up); err != nil {
@@ -294,11 +291,13 @@ func (ns *NetworkServer) Close() {
 	ns.Component.Close()
 
 	logger := ns.Logger()
-	for _, cl := range ns.applicationServers {
+	ns.applicationServers.Range(func(k interface{}, v interface{}) bool {
+		logger := logger.WithField("application_uid", k.(string))
 		logger.Debug("Close Application Server link")
-		if err := cl.Close(); err != nil {
+		if err := v.(io.Closer).Close(); err != nil {
 			logger.WithError(err).Warn("Failed to close AS link")
 		}
 		logger.Debug("Application Server link closed")
-	}
+		return true
+	})
 }

@@ -17,6 +17,7 @@ package networkserver
 import (
 	"bytes"
 	"context"
+	"io"
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
@@ -68,30 +69,20 @@ func (ns *NetworkServer) LinkApplication(link ttnpb.AsNs_LinkApplicationServer) 
 
 	logger := log.FromContext(ctx).WithField("application_uid", uid)
 
-	ns.applicationServersMu.Lock()
-	cl, ok := ns.applicationServers[uid]
-	ns.applicationServers[uid] = ws
-	ns.applicationServersMu.Unlock()
-	if ok {
+	v, ok := ns.applicationServers.LoadOrStore(uid, ws)
+	for ok {
 		logger.Debug("Close existing link")
-		if err := cl.Close(); err != nil {
+		if err := v.(io.Closer).Close(); err != nil {
 			logger.WithError(err).Warn("Failed to close existing link")
 		}
+		v, ok = ns.applicationServers.LoadOrStore(uid, ws)
 	}
+	defer ns.applicationServers.Delete(uid)
 
 	logger.Debug("Linked application")
 
 	events.Publish(evtBeginApplicationLink(ctx, ids, nil))
 	defer events.Publish(evtEndApplicationLink(ctx, ids, err))
-
-	defer func() {
-		ns.applicationServersMu.Lock()
-		cl, ok = ns.applicationServers[uid]
-		if ok && cl == ws {
-			delete(ns.applicationServers, uid)
-		}
-		ns.applicationServersMu.Unlock()
-	}()
 
 	select {
 	case <-ctx.Done():
