@@ -37,7 +37,7 @@ require (
 	github.com/certifi/gocertifi v0.0.0-20190506164543-d2eda7129713 // indirect
 	github.com/client9/misspell v0.3.4
 	github.com/disintegration/imaging v1.6.0
-	github.com/eclipse/paho.mqtt.golang v1.1.1
+	github.com/eclipse/paho.mqtt.golang v1.2.0
 	github.com/envoyproxy/protoc-gen-validate v0.1.0
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/getsentry/raven-go v0.2.0
