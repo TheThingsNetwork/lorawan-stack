@@ -62,9 +62,6 @@ export default class DeviceAdd extends Component {
       delete device.ids.dev_eui
       delete device.root_keys
       delete device.resets_join_nonces
-      if (device.session.dev_addr) {
-        device.ids.dev_addr = device.session.dev_addr
-      }
     }
     delete device.activation_mode
 

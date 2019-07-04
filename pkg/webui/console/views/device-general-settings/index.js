@@ -59,9 +59,6 @@ export default class DeviceGeneralSettings extends React.Component {
       delete updatedDevice.ids.dev_eui
       delete updatedDevice.root_keys
       delete updatedDevice.resets_join_nonces
-      if (updatedDevice.session.dev_addr) {
-        updatedDevice.ids.dev_addr = updatedDevice.session.dev_addr
-      }
     }
 
     await this.setState({ error: '' })
