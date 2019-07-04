@@ -427,7 +427,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					DeviceID:               "test-dev-id",
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
 				})
-				a.So(replace, should.BeFalse)
+				a.So(replace, should.BeTrue)
 				a.So([]time.Time{start, at, time.Now()}, should.BeChronological)
 				return nil
 			},
@@ -1202,7 +1202,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 					DeviceID:               "test-dev-id",
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
 				})
-				a.So(replace, should.BeFalse)
+				a.So(replace, should.BeTrue)
 				a.So([]time.Time{start, at, time.Now()}, should.BeChronological)
 				return nil
 			},
@@ -1286,7 +1286,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 					DeviceID:               "test-dev-id",
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
 				})
-				a.So(replace, should.BeFalse)
+				a.So(replace, should.BeTrue)
 				a.So([]time.Time{start, at, time.Now()}, should.BeChronological)
 				return nil
 			},
@@ -1366,7 +1366,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 					DeviceID:               "test-dev-id",
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
 				})
-				a.So(replace, should.BeFalse)
+				a.So(replace, should.BeTrue)
 				a.So([]time.Time{start, at, time.Now()}, should.BeChronological)
 				return nil
 			},

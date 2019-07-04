@@ -199,7 +199,7 @@ func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.Do
 	if dev.MACState != nil && dev.MACState.DeviceClass != ttnpb.CLASS_A && len(dev.QueuedApplicationDownlinks) > 0 {
 		startAt := time.Now().UTC()
 		logger.WithField("start_at", startAt).Debug("Add downlink task with application downlink pending")
-		return ttnpb.Empty, ns.downlinkTasks.Add(ctx, req.EndDeviceIdentifiers, startAt, false)
+		return ttnpb.Empty, ns.downlinkTasks.Add(ctx, req.EndDeviceIdentifiers, startAt, true)
 	}
 	return ttnpb.Empty, nil
 }
@@ -245,7 +245,7 @@ func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.Downl
 	if dev.MACState != nil && dev.MACState.DeviceClass != ttnpb.CLASS_A {
 		startAt := time.Now().UTC()
 		logger.WithField("start_at", startAt).Debug("Add downlink task with application downlink pending")
-		return ttnpb.Empty, ns.downlinkTasks.Add(ctx, req.EndDeviceIdentifiers, startAt, false)
+		return ttnpb.Empty, ns.downlinkTasks.Add(ctx, req.EndDeviceIdentifiers, startAt, true)
 	}
 	return ttnpb.Empty, nil
 }
