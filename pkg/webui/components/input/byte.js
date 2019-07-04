@@ -57,7 +57,7 @@ const Placeholder = function (props) {
     placeholder,
   } = props
 
-  if (placeholder) {
+  if (placeholder || Boolean(value)) {
     return null
   }
 
