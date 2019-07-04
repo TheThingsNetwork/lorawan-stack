@@ -19,6 +19,7 @@ import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 
 import sharedMessages from '../../../lib/shared-messages'
+import errorMessages from '../../../lib/errors/error-messages'
 import diff from '../../../lib/diff'
 
 import DeviceDataForm from '../../containers/device-data-form'
@@ -78,7 +79,7 @@ export default class DeviceGeneralSettings extends React.Component {
       })
     } catch (error) {
       resetForm()
-      const err = error instanceof Error ? sharedMessages.genericError : error
+      const err = error instanceof Error ? errorMessages.genericError : error
       await this.setState({ error: err })
     }
   }

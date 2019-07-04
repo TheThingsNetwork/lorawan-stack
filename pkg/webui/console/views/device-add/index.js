@@ -27,6 +27,7 @@ import DeviceDataForm from '../../containers/device-data-form'
 import api from '../../api'
 
 import sharedMessages from '../../../lib/shared-messages'
+import errorMessages from '../../../lib/errors/error-messages'
 
 import style from './device-add.styl'
 
@@ -79,7 +80,7 @@ export default class DeviceAdd extends Component {
       dispatch(push(`/console/applications/${appId}/devices/${device_id}`))
     } catch (error) {
       resetForm(values)
-      const err = error instanceof Error ? sharedMessages.genericError : error
+      const err = error instanceof Error ? errorMessages.genericError : error
 
       await this.setState({ error: err })
     }
