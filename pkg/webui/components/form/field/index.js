@@ -182,7 +182,7 @@ class FormField extends React.Component {
     }))
 
     return (
-      <div className={cls}>
+      <div className={cls} data-needs-focus={showError}>
         <label className={style.label}>
           <Message content={title} className={style.title} />
           <span className={style.reqicon}>&middot;</span>
