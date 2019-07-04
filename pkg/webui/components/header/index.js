@@ -41,11 +41,6 @@ const defaultNavigationEntries = [
     icon: 'gateway',
     path: '/console/gateways',
   },
-  {
-    title: sharedMessages.organizations,
-    icon: 'organization',
-    path: '/console/organizations',
-  },
 ]
 
 const defaultDropdownItems = handleLogout => [
