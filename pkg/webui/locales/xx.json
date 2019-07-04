@@ -122,6 +122,7 @@
   "console.views.device-overview.index.rootKeyId": "Xxxx Xxx XX",
   "console.views.device-overview.index.sessionInfo": "Xxxxxxx Xxxxxxxxxxx",
   "console.views.device-overview.index.latestData": "Xxxxxx Xxxx",
+  "console.views.device-overview.index.noSessionInfo": "Xx xxxxxxx xxxxxxxxxxx xxxxxxxxx",
   "console.views.gateway-add.index.createGateway": "Xxxxxx Xxxxxxx",
   "console.views.gateway-data.index.gtwData": "Xxxxxxx Xxxx",
   "console.views.gateway-general-settings.index.updateSuccess": "Xxxxxxxxxxxx xxxxxxx xxxxxxx",

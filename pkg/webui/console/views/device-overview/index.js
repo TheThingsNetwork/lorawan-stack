@@ -33,6 +33,7 @@ const m = defineMessages({
   rootKeyId: 'Root Key ID',
   sessionInfo: 'Session Information',
   latestData: 'Latest Data',
+  noSessionInfo: 'No session information available',
 })
 
 @connect(function ({ device }, props) {
@@ -113,17 +114,27 @@ class DeviceOverview extends React.Component {
     }
     sheetData.push(activationInfoData)
 
-    // Add session info
-    sheetData.push({
-      header: m.sessionInfo,
-      items: [
-        { key: sharedMessages.devAddr, value: ids.dev_addr, type: 'byte', sensitive: false },
-        { key: sharedMessages.fwdNtwkKey, value: f_nwk_s_int_key.key, type: 'code', sensitive: true },
-        { key: sharedMessages.sNtwkSIKey, value: s_nwk_s_int_key.key, type: 'code', sensitive: true },
-        { key: sharedMessages.ntwkSEncKey, value: nwk_s_enc_key.key, type: 'code', sensitive: true },
-        { key: sharedMessages.appSKey, value: app_s_key.key, type: 'code', sensitive: true },
-      ],
-    })
+    // Add session info, if available
+
+    if (Object.keys(sessionKeys).length > 0) {
+      sheetData.push({
+        header: m.sessionInfo,
+        items: [
+          { key: sharedMessages.devAddr, value: ids.dev_addr, type: 'byte', sensitive: false },
+          { key: sharedMessages.fwdNtwkKey, value: f_nwk_s_int_key.key, type: 'code', sensitive: true },
+          { key: sharedMessages.sNtwkSIKey, value: s_nwk_s_int_key.key, type: 'code', sensitive: true },
+          { key: sharedMessages.ntwkSEncKey, value: nwk_s_enc_key.key, type: 'code', sensitive: true },
+          { key: sharedMessages.appSKey, value: app_s_key.key, type: 'code', sensitive: true },
+        ],
+      })
+    } else {
+      sheetData.push({
+        header: m.sessionInfo,
+        items: [
+          { info: m.noSessionInfo },
+        ],
+      })
+    }
 
     return (
       <div className={style.overviewInfo}>

@@ -122,6 +122,7 @@
   "console.views.device-overview.index.rootKeyId": "Root Key ID",
   "console.views.device-overview.index.sessionInfo": "Session Information",
   "console.views.device-overview.index.latestData": "Latest Data",
+  "console.views.device-overview.index.noSessionInfo": "No session information available",
   "console.views.gateway-add.index.createGateway": "Create Gateway",
   "console.views.gateway-data.index.gtwData": "Gateway Data",
   "console.views.gateway-general-settings.index.updateSuccess": "Successfully updated gateway",
