@@ -19,6 +19,7 @@ describe('error reducers', function () {
   const REQUEST = `${BASE}_REQUEST`
   const SUCCESS = `${BASE}_SUCCESS`
   const FAILURE = `${BASE}_FAILURE`
+  const defaultState = {}
 
   it('should return the initial state', function () {
     expect(reducer(undefined, {})).toEqual({})
@@ -26,21 +27,25 @@ describe('error reducers', function () {
 
   describe('dispatches invalid action type', function () {
     it('should ignore base type', function () {
-      expect(reducer({}, { type: BASE })).toEqual({})
+      expect(reducer(defaultState, { type: BASE })).toEqual(defaultState)
     })
   })
 
   describe('dispatches the `failure` action', function () {
+    const error = { status: 404 }
+    let newState
+
+    beforeAll(function () {
+      newState = reducer(defaultState, { type: FAILURE, payload: error, error: true })
+    })
+
     it('should set error', function () {
-      const error = { status: 404 }
-      expect(reducer({}, { type: FAILURE, payload: error, error: true })).toEqual({
-        [BASE]: error,
-      })
+      expect(newState).toEqual({ [BASE]: error })
     })
 
     describe('dispatches the `success` action', function () {
       it('should reset the error', function () {
-        expect(reducer({}, { type: SUCCESS })).toEqual({
+        expect(reducer(newState, { type: SUCCESS })).toEqual({
           [BASE]: undefined,
         })
       })
@@ -48,7 +53,7 @@ describe('error reducers', function () {
 
     describe('dispatches the `request` action', function () {
       it('should reset the error', function () {
-        expect(reducer({}, { type: REQUEST })).toEqual({
+        expect(reducer(newState, { type: REQUEST })).toEqual({
           [BASE]: undefined,
         })
       })
