@@ -222,6 +222,7 @@ func (is *mockIS) ListRights(ctx context.Context, ids *ttnpb.ApplicationIdentifi
 		if auth == authorization[0] {
 			res.Rights = append(res.Rights,
 				ttnpb.RIGHT_APPLICATION_LINK,
+				ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC,
 				ttnpb.RIGHT_APPLICATION_DEVICES_READ,
 				ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
 				ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,

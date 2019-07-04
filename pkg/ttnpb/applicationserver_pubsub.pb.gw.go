@@ -417,17 +417,17 @@ func RegisterApplicationPubSubRegistryHandlerClient(ctx context.Context, mux *ru
 }
 
 var (
-	pattern_ApplicationPubSubRegistry_GetFormats_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"as", "pubsub-formats"}, ""))
+	pattern_ApplicationPubSubRegistry_GetFormats_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"as", "pubsub-formats"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationPubSubRegistry_Get_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 3}, []string{"as", "pubsub", "ids.application_ids.application_id", "ids.pub_sub_id"}, ""))
+	pattern_ApplicationPubSubRegistry_Get_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 3}, []string{"as", "pubsub", "ids.application_ids.application_id", "ids.pub_sub_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationPubSubRegistry_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"as", "pubsub", "application_ids.application_id"}, ""))
+	pattern_ApplicationPubSubRegistry_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"as", "pubsub", "application_ids.application_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationPubSubRegistry_Set_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 3}, []string{"as", "pubsub", "pubsub.ids.application_ids.application_id", "pubsub.ids.pub_sub_id"}, ""))
+	pattern_ApplicationPubSubRegistry_Set_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 3}, []string{"as", "pubsub", "pubsub.ids.application_ids.application_id", "pubsub.ids.pub_sub_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationPubSubRegistry_Set_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"as", "pubsub", "pubsub.ids.application_ids.application_id"}, ""))
+	pattern_ApplicationPubSubRegistry_Set_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"as", "pubsub", "pubsub.ids.application_ids.application_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationPubSubRegistry_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 3}, []string{"as", "pubsub", "application_ids.application_id", "pub_sub_id"}, ""))
+	pattern_ApplicationPubSubRegistry_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 3}, []string{"as", "pubsub", "application_ids.application_id", "pub_sub_id"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
