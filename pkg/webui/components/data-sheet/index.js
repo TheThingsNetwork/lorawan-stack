@@ -30,7 +30,7 @@ const DataSheet = function ({ className, data }) {
         { data.map(function (group, index) {
           return (
             <React.Fragment key={`${group.header}_${index}`}>
-              <tr className={style.groupHeading}><th colSpan={2}><Message content={group.header} /></th></tr>
+              <tr className={style.groupHeading}><th><Message content={group.header} /></th></tr>
               { group.items.map( function (item) {
                 if (!item) {
                   return null
