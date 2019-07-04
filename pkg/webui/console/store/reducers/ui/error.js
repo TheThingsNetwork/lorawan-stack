@@ -16,14 +16,14 @@ const error = function (state = {}, action) {
   const { type, error, payload: errorValue } = action
 
   const matches = /(.*)_(REQUEST|SUCCESS|FAILURE)/.exec(type)
-  if (!matches || !error) {
+  if (!matches) {
     return state
   }
 
   const [ , key, status ] = matches
   return {
     ...state,
-    [key]: status === 'FAILURE' ? errorValue : undefined,
+    [key]: status === 'FAILURE' && error ? errorValue : undefined,
   }
 }
 
