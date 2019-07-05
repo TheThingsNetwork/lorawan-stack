@@ -14,6 +14,7 @@
 
 import React from 'react'
 import classnames from 'classnames'
+import { defineMessages } from 'react-intl'
 
 import SafeInspector from '../safe-inspector'
 import Message from '../../lib/components/message'
@@ -23,6 +24,10 @@ import sharedMessages from '../../lib/shared-messages'
 
 import style from './data-sheet.styl'
 
+const m = defineMessages({
+  noData: 'No data available',
+})
+
 const DataSheet = function ({ className, data }) {
   return (
     <table className={classnames(className, style.table)}>
@@ -30,8 +35,8 @@ const DataSheet = function ({ className, data }) {
         { data.map(function (group, index) {
           return (
             <React.Fragment key={`${group.header}_${index}`}>
-              <tr className={style.groupHeading}><th colSpan={2}><Message content={group.header} /></th></tr>
-              { group.items.map( function (item) {
+              <tr className={style.groupHeading}><th><Message content={group.header} /></th></tr>
+              { group.items.length > 0 ? group.items.map( function (item) {
                 if (!item) {
                   return null
                 }
@@ -47,6 +52,10 @@ const DataSheet = function ({ className, data }) {
                   </React.Fragment>
                 )
               }
+              ) : (
+                <tr>
+                  <th colSpan={2}><Message content={m.noData} /></th>
+                </tr>
               )}
             </React.Fragment>
           )

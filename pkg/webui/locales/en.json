@@ -1,4 +1,5 @@
 {
+  "components.data-sheet.index.noData": "No data available",
   "components.event.index.eventData": "Event Data",
   "components.events.index.truncated": "Events have been truncated",
   "components.events.index.showing": "Showing all available events",

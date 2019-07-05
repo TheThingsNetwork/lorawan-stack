@@ -87,43 +87,55 @@ class DeviceOverview extends React.Component {
       })
     }
 
-    // Add activation info
+    // Add activation info, if available
     const activationInfoData = {
       header: m.activationInfo,
-      items: [
-        { key: sharedMessages.devEUI, value: ids.dev_eui, type: 'byte', sensitive: false },
-        { key: sharedMessages.joinEUI, value: ids.join_eui, type: 'byte', sensitive: false },
-      ],
+      items: [],
     }
 
-    // Add root keys, if available
-    if (Object.keys(root_keys).length > 0) {
-      activationInfoData.items.push({
-        key: m.rootKeyId,
-        value: root_keys.root_key_id,
-        type: 'code',
-        sensitive: false,
-        subItems: [
-          { key: sharedMessages.appKey, value: root_keys.app_key.key, type: 'byte', sensitive: true },
-          ...root_keys.nwk_key
-            ? { key: sharedMessages.nwkKey, value: root_keys.nwk_key.key, type: 'byte', sensitive: true }
-            : { key: sharedMessages.nwkKey, value: undefined },
-        ],
-      })
+    if (ids.join_eui || ids.dev_eui) {
+      activationInfoData.items.push(
+        { key: sharedMessages.joinEUI, value: ids.join_eui, type: 'byte', sensitive: false },
+        { key: sharedMessages.devEUI, value: ids.dev_eui, type: 'byte', sensitive: false },
+      )
+
+      // Add root keys, if available
+      if (Object.keys(root_keys).length > 0) {
+        activationInfoData.items.push({
+          key: m.rootKeyId,
+          value: root_keys.root_key_id,
+          type: 'code',
+          sensitive: false,
+          subItems: [
+            { key: sharedMessages.appKey, value: root_keys.app_key.key, type: 'byte', sensitive: true },
+            ...root_keys.nwk_key
+              ? { key: sharedMessages.nwkKey, value: root_keys.nwk_key.key, type: 'byte', sensitive: true }
+              : { key: sharedMessages.nwkKey, value: undefined },
+          ],
+        })
+      }
     }
+
     sheetData.push(activationInfoData)
 
-    // Add session info
-    sheetData.push({
+    // Add session info, if available
+
+    const sessionInfoData = {
       header: m.sessionInfo,
-      items: [
+      items: [],
+    }
+
+    if (Object.keys(sessionKeys).length > 0) {
+      sessionInfoData.items.push(
         { key: sharedMessages.devAddr, value: ids.dev_addr, type: 'byte', sensitive: false },
         { key: sharedMessages.fwdNtwkKey, value: f_nwk_s_int_key.key, type: 'code', sensitive: true },
         { key: sharedMessages.sNtwkSIKey, value: s_nwk_s_int_key.key, type: 'code', sensitive: true },
         { key: sharedMessages.ntwkSEncKey, value: nwk_s_enc_key.key, type: 'code', sensitive: true },
         { key: sharedMessages.appSKey, value: app_s_key.key, type: 'code', sensitive: true },
-      ],
-    })
+      )
+    }
+
+    sheetData.push(sessionInfoData)
 
     return (
       <div className={style.overviewInfo}>
@@ -147,7 +159,7 @@ class DeviceOverview extends React.Component {
           <Col md={12} lg={6}>
             {this.deviceInfo}
           </Col>
-          <Col md={12} lg={6}>
+          <Col md={12} lg={6} className={style.latestEvents}>
             <DeviceEvents devIds={devIds} widget />
           </Col>
         </Row>

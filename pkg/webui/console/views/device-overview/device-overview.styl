@@ -22,12 +22,8 @@
   margin-top: $ls.xl
 
 .latest-events
-  border-normal()
-  padding: $ls.xl
-  margin-top: $ls.s
-  text-align: center
-  font-style: italic
-  color: $tc-subtle-gray
+  +media-query($bp.m)
+    margin-top: $ls.s
 
 .attributes
   list-style: none
