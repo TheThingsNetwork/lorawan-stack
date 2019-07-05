@@ -21,11 +21,14 @@ import Input from '../../../components/input'
 import Checkbox from '../../../components/checkbox'
 import Radio from '../../../components/radio-button'
 import Select from '../../../components/select'
+import toast from '../../../components/toast'
 import Message from '../../../lib/components/message'
 import SubmitBar from '../../../components/submit-bar'
+import ModalButton from '../../../components/button/modal-button'
 import FrequencyPlansSelect from '../../containers/freq-plans-select'
 
 import sharedMessages from '../../../lib/shared-messages'
+import { getDeviceId } from '../../../lib/selectors/id'
 import PropTypes from '../../../lib/prop-types'
 import m from './messages'
 import validationSchema from './validation-schema'
@@ -62,6 +65,24 @@ class DeviceDataForm extends Component {
 
   handleResetsFrameCountersChange (evt) {
     this.setState({ resets_f_cnt: evt.target.checked })
+  }
+
+  async handleDelete () {
+    const { onDelete, onDeleteSuccess, initialValues } = this.props
+    const deviceId = getDeviceId(initialValues)
+
+    try {
+      await onDelete()
+      toast({
+        title: deviceId,
+        message: m.deleteSuccess,
+        type: toast.types.SUCCESS,
+      })
+      onDeleteSuccess()
+    } catch (error) {
+      const err = error instanceof Error ? sharedMessages.genericError : error
+      this.setState({ error: err })
+    }
   }
 
   get ABPSection () {
@@ -188,8 +209,16 @@ class DeviceDataForm extends Component {
   }
 
   render () {
-    const { otaa } = this.state
-    const { onSubmit, initialValues, update, error } = this.props
+    const { otaa, error } = this.state
+    const { onSubmit, initialValues, update } = this.props
+
+    let deviceId
+    let deviceName
+
+    if (initialValues) {
+      deviceId = getDeviceId(initialValues)
+      deviceName = initialValues.name
+    }
 
     const emptyValues = {
       ids: {
@@ -322,6 +351,17 @@ class DeviceDataForm extends Component {
             component={SubmitButton}
             message={update ? sharedMessages.saveChanges : m.createDevice}
           />
+          {update && (
+            <ModalButton
+              type="button"
+              icon="delete"
+              message={m.deleteDevice}
+              modalData={{ message: { values: { deviceId: deviceName || deviceId }, ...m.deleteWarning }}}
+              onApprove={this.handleDelete}
+              danger
+              naked
+            />
+          )}
         </SubmitBar>
       </Form>
     )
@@ -330,12 +370,18 @@ class DeviceDataForm extends Component {
 
 DeviceDataForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
+  onDelete: PropTypes.func,
+  onDeleteSuccess: PropTypes.func,
+  onSubmitSuccess: PropTypes.func,
   error: PropTypes.error,
   update: PropTypes.bool,
   initialValues: PropTypes.object,
 }
 
 DeviceDataForm.defaultProps = {
+  onDelete: () => null,
+  onDeleteSuccess: () => null,
+  onSubmitSuccess: () => null,
   initialValues: {},
   update: false,
   error: '',

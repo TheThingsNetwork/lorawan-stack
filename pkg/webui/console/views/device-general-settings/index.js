@@ -13,33 +13,34 @@
 // limitations under the License.
 
 import React from 'react'
+import { replace } from 'connected-react-router'
 import { connect } from 'react-redux'
 import { Col, Row, Container } from 'react-grid-system'
 import bind from 'autobind-decorator'
-import { defineMessages } from 'react-intl'
 
 import sharedMessages from '../../../lib/shared-messages'
-import errorMessages from '../../../lib/errors/error-messages'
 import diff from '../../../lib/diff'
-
 import DeviceDataForm from '../../components/device-data-form'
 import IntlHelmet from '../../../lib/components/intl-helmet'
-import toast from '../../../components/toast'
+import api from '../../api'
 
 import { updateDevice } from '../../store/actions/device'
-
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
-
-const m = defineMessages({
-  updateSuccess: 'Successfully updated end device',
-})
 
 @connect(function (state) {
   return {
     device: state.device.device,
     appId: selectSelectedApplicationId(state),
   }
-}, { updateDevice })
+}, dispatch => ({
+  onDeleteSuccess: appId => dispatch(replace(`/console/applications/${appId}/devices`)),
+  updateDevice: (appId, deviceId, patch) => dispatch(updateDevice(appId, deviceId, patch)),
+}),
+(stateProps, dispatchProps, ownProps) => ({
+  ...stateProps, ...dispatchProps, ...ownProps,
+  onDeleteSuccess: () => dispatchProps.onDeleteSuccess(stateProps.appId),
+})
+)
 @bind
 export default class DeviceGeneralSettings extends React.Component {
 
@@ -47,7 +48,7 @@ export default class DeviceGeneralSettings extends React.Component {
     error: '',
   }
 
-  async handleSubmit (values, { setSubmitting, resetForm }) {
+  async handleSubmit (values) {
     const { device, appId, updateDevice } = this.props
     const { activation_mode, ...updatedDevice } = values
 
@@ -62,27 +63,21 @@ export default class DeviceGeneralSettings extends React.Component {
       delete updatedDevice.resets_join_nonces
     }
 
-    await this.setState({ error: '' })
-    try {
-      const { ids: { device_id: deviceId }} = this.props.device
-      const changed = diff(device, updatedDevice)
+    const { ids: { device_id: deviceId }} = this.props.device
+    const changed = diff(device, updatedDevice)
 
-      await updateDevice(appId, deviceId, changed)
-      resetForm()
-      toast({
-        title: deviceId,
-        message: m.updateSuccess,
-        type: toast.types.SUCCESS,
-      })
-    } catch (error) {
-      resetForm()
-      const err = error instanceof Error ? errorMessages.genericError : error
-      await this.setState({ error: err })
-    }
+    return updateDevice(appId, deviceId, changed)
+  }
+
+  async handleDelete () {
+    const { appId, device } = this.props
+    const { ids: { device_id: deviceId }} = device
+
+    return api.device.delete(appId, deviceId)
   }
 
   render () {
-    const { device } = this.props
+    const { device, onDeleteSuccess } = this.props
     const { error } = this.state
 
     return (
@@ -95,6 +90,8 @@ export default class DeviceGeneralSettings extends React.Component {
             <DeviceDataForm
               error={error}
               onSubmit={this.handleSubmit}
+              onDelete={this.handleDelete}
+              onDeleteSuccess={onDeleteSuccess}
               initialValues={device}
               update
             />
