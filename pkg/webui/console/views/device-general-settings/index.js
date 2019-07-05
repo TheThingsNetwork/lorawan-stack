@@ -22,7 +22,7 @@ import sharedMessages from '../../../lib/shared-messages'
 import errorMessages from '../../../lib/errors/error-messages'
 import diff from '../../../lib/diff'
 
-import DeviceDataForm from '../../containers/device-data-form'
+import DeviceDataForm from '../../components/device-data-form'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import toast from '../../../components/toast'
 

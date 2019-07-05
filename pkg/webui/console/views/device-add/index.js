@@ -22,7 +22,7 @@ import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
-import DeviceDataForm from '../../containers/device-data-form'
+import DeviceDataForm from '../../components/device-data-form'
 
 import api from '../../api'
 
