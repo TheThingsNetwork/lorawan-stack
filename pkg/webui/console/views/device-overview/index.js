@@ -93,10 +93,10 @@ class DeviceOverview extends React.Component {
       items: [],
     }
 
-    if (ids.dev_eui || ids.join_eui) {
+    if (ids.join_eui || ids.dev_eui) {
       activationInfoData.items.push(
-        { key: sharedMessages.devEUI, value: ids.dev_eui, type: 'byte', sensitive: false },
         { key: sharedMessages.joinEUI, value: ids.join_eui, type: 'byte', sensitive: false },
+        { key: sharedMessages.devEUI, value: ids.dev_eui, type: 'byte', sensitive: false },
       )
 
       // Add root keys, if available
