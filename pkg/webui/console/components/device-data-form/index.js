@@ -28,6 +28,7 @@ import ModalButton from '../../../components/button/modal-button'
 import FrequencyPlansSelect from '../../containers/freq-plans-select'
 
 import sharedMessages from '../../../lib/shared-messages'
+import errorMessages from '../../../lib/errors/error-messages'
 import { getDeviceId } from '../../../lib/selectors/id'
 import PropTypes from '../../../lib/prop-types'
 import m from './messages'
@@ -67,6 +68,29 @@ class DeviceDataForm extends Component {
     this.setState({ resets_f_cnt: evt.target.checked })
   }
 
+  async handleSubmit (values, { setSubmitting, resetForm }) {
+    const { onSubmit, onSubmitSuccess, initialValues, update } = this.props
+    const deviceId = getDeviceId(initialValues)
+    await this.setState({ error: '' })
+
+    try {
+      await onSubmit
+      resetForm(values)
+      if (update) {
+        toast({
+          title: deviceId,
+          message: m.updateSuccess,
+          type: toast.types.SUCCESS,
+        })
+      }
+      await onSubmitSuccess()
+    } catch (error) {
+      resetForm()
+      const err = error instanceof Error ? errorMessages.genericError : error
+      await this.setState({ error: err })
+    }
+  }
+
   async handleDelete () {
     const { onDelete, onDeleteSuccess, initialValues } = this.props
     const deviceId = getDeviceId(initialValues)
@@ -80,7 +104,7 @@ class DeviceDataForm extends Component {
       })
       onDeleteSuccess()
     } catch (error) {
-      const err = error instanceof Error ? sharedMessages.genericError : error
+      const err = error instanceof Error ? errorMessages.genericError : error
       this.setState({ error: err })
     }
   }
@@ -210,7 +234,7 @@ class DeviceDataForm extends Component {
 
   render () {
     const { otaa, error } = this.state
-    const { onSubmit, initialValues, update } = this.props
+    const { initialValues, update } = this.props
 
     let deviceId
     let deviceName
@@ -248,7 +272,7 @@ class DeviceDataForm extends Component {
     return (
       <Form
         error={error}
-        onSubmit={onSubmit}
+        onSubmit={this.handleSubmit}
         validationSchema={validationSchema}
         submitEnabledWhenInvalid
         initialValues={formValues}
