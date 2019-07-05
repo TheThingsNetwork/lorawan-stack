@@ -18,6 +18,7 @@ import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
 import "lorawan-stack/api/enums.proto";
 import "lorawan-stack/api/identifiers.proto";
 
@@ -38,11 +39,14 @@ message RxMetadata {
   // Encrypted gateway's internal fine timestamp when the Rx finished (nanoseconds).
   bytes encrypted_fine_timestamp = 6;
   string encrypted_fine_timestamp_key_id = 7 [(gogoproto.customname) = "EncryptedFineTimestampKeyID"];
-  // Received signal strength (dBm).
+  // Received signal strength indicator (dBm).
+  // This value equals `channel_rssi`.
   float rssi = 8 [(gogoproto.customname) = "RSSI"];
-  // Received channel power (dBm).
+  // Received signal strength indicator of the signal (dBm).
+  google.protobuf.FloatValue signal_rssi = 16 [(gogoproto.customname) = "SignalRSSI"];
+  // Received signal strength indicator of the channel (dBm).
   float channel_rssi = 9 [(gogoproto.customname) = "ChannelRSSI"];
-  // Standard deviation of the RSSI.
+  // Standard deviation of the RSSI during preamble.
   float rssi_standard_deviation = 10 [(gogoproto.customname) = "RSSIStandardDeviation"];
   // Signal-to-noise ratio (dB).
   float snr = 11 [(gogoproto.customname) = "SNR"];

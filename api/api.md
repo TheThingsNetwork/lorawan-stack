@@ -4218,9 +4218,10 @@ a message corresponds to one RxMetadata.
 | `fine_timestamp` | [`uint64`](#uint64) |  | Gateway's internal fine timestamp when the Rx finished (nanoseconds). |
 | `encrypted_fine_timestamp` | [`bytes`](#bytes) |  | Encrypted gateway's internal fine timestamp when the Rx finished (nanoseconds). |
 | `encrypted_fine_timestamp_key_id` | [`string`](#string) |  |  |
-| `rssi` | [`float`](#float) |  | Received signal strength (dBm). |
-| `channel_rssi` | [`float`](#float) |  | Received channel power (dBm). |
-| `rssi_standard_deviation` | [`float`](#float) |  | Standard deviation of the RSSI. |
+| `rssi` | [`float`](#float) |  | Received signal strength indicator (dBm). This value equals `channel_rssi`. |
+| `signal_rssi` | [`google.protobuf.FloatValue`](#google.protobuf.FloatValue) |  | Received signal strength indicator of the signal (dBm). |
+| `channel_rssi` | [`float`](#float) |  | Received signal strength indicator of the channel (dBm). |
+| `rssi_standard_deviation` | [`float`](#float) |  | Standard deviation of the RSSI during preamble. |
 | `snr` | [`float`](#float) |  | Signal-to-noise ratio (dB). |
 | `frequency_offset` | [`int64`](#int64) |  | Frequency offset (Hz). |
 | `location` | [`Location`](#ttn.lorawan.v3.Location) |  | Antenna location; injected by the Gateway Server. |

@@ -16822,7 +16822,7 @@
             },
             {
               "name": "rssi",
-              "description": "Received signal strength (dBm).",
+              "description": "Received signal strength indicator (dBm).\nThis value equals `channel_rssi`.",
               "label": "",
               "type": "float",
               "longType": "float",
@@ -16831,8 +16831,18 @@
               "defaultValue": ""
             },
             {
+              "name": "signal_rssi",
+              "description": "Received signal strength indicator of the signal (dBm).",
+              "label": "",
+              "type": "FloatValue",
+              "longType": "google.protobuf.FloatValue",
+              "fullType": "google.protobuf.FloatValue",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
               "name": "channel_rssi",
-              "description": "Received channel power (dBm).",
+              "description": "Received signal strength indicator of the channel (dBm).",
               "label": "",
               "type": "float",
               "longType": "float",
@@ -16842,7 +16852,7 @@
             },
             {
               "name": "rssi_standard_deviation",
-              "description": "Standard deviation of the RSSI.",
+              "description": "Standard deviation of the RSSI during preamble.",
               "label": "",
               "type": "float",
               "longType": "float",

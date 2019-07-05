@@ -93,6 +93,15 @@ func (dst *RxMetadata) SetFields(src *RxMetadata, paths ...string) error {
 				var zero float32
 				dst.RSSI = zero
 			}
+		case "signal_rssi":
+			if len(subs) > 0 {
+				return fmt.Errorf("'signal_rssi' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SignalRSSI = src.SignalRSSI
+			} else {
+				dst.SignalRSSI = nil
+			}
 		case "channel_rssi":
 			if len(subs) > 0 {
 				return fmt.Errorf("'channel_rssi' has no subfields, but %s were specified", subs)
