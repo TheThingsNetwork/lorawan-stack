@@ -252,9 +252,8 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 					UplinkToken: []byte("join-request-token"),
 				},
 			},
-			ReceivedAt:          time.Now(),
-			CorrelationIDs:      []string{"GsNs-1", "GsNs-2"},
-			GatewayChannelIndex: 2,
+			ReceivedAt:     time.Now(),
+			CorrelationIDs: []string{"GsNs-1", "GsNs-2"},
 		}
 		handleUplinkErrCh := make(chan error)
 		go func() {
@@ -495,9 +494,8 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 					UplinkToken: []byte("test-uplink-token"),
 				},
 			},
-			ReceivedAt:          time.Now(),
-			CorrelationIDs:      []string{"GsNs-1", "GsNs-2"},
-			GatewayChannelIndex: 2,
+			ReceivedAt:     time.Now(),
+			CorrelationIDs: []string{"GsNs-1", "GsNs-2"},
 		}
 
 		handleUplinkErrCh := make(chan error)

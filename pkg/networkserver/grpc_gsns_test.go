@@ -231,8 +231,7 @@ func TestHandleUplink(t *testing.T) {
 
 	makeJoinRequest := func(decodePayload bool) *ttnpb.UplinkMessage {
 		msg := &ttnpb.UplinkMessage{
-			CorrelationIDs:      correlationIDs[:],
-			GatewayChannelIndex: 2,
+			CorrelationIDs: correlationIDs[:],
 			RawPayload: []byte{
 				/* MHDR */
 				0x00,
@@ -280,8 +279,7 @@ func TestHandleUplink(t *testing.T) {
 
 	makeRejoinRequest := func(decodePayload bool) *ttnpb.UplinkMessage {
 		msg := &ttnpb.UplinkMessage{
-			CorrelationIDs:      correlationIDs[:],
-			GatewayChannelIndex: 2,
+			CorrelationIDs: correlationIDs[:],
 			RawPayload: []byte{
 				/* MHDR */
 				0xc0,
@@ -371,8 +369,7 @@ func TestHandleUplink(t *testing.T) {
 
 	makeLegacyDataUplink := func(fCnt uint8, decodePayload bool) *ttnpb.UplinkMessage {
 		msg := &ttnpb.UplinkMessage{
-			CorrelationIDs:      correlationIDs[:],
-			GatewayChannelIndex: 1,
+			CorrelationIDs: correlationIDs[:],
 			RawPayload: MustAppendLegacyUplinkMIC(
 				fNwkSIntKey,
 				devAddr,
@@ -418,8 +415,7 @@ func TestHandleUplink(t *testing.T) {
 		mds := MakeRxMetadataSlice()
 		fOpts := MustEncryptUplink(nwkSEncKey, devAddr, uint32(fCnt), 0x02)
 		msg := &ttnpb.UplinkMessage{
-			CorrelationIDs:      correlationIDs[:],
-			GatewayChannelIndex: 1,
+			CorrelationIDs: correlationIDs[:],
 			RawPayload: MustAppendUplinkMIC(
 				sNwkSIntKey,
 				fNwkSIntKey,
