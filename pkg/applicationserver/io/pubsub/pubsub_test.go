@@ -21,61 +21,144 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/formatters"
-	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/mock"
-	. "go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub"
+	mock_server "go.thethings.network/lorawan-stack/pkg/applicationserver/io/mock"
+	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub"
+	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/provider"
+	mock_provider "go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/provider/mock"
+	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/redis"
+	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
-	"gocloud.dev/pubsub"
-	_ "gocloud.dev/pubsub/mempubsub"
+	cloudpubsub "gocloud.dev/pubsub"
 )
 
-var (
-	registeredApplicationID   = ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}
-	unregisteredApplicationID = ttnpb.ApplicationIdentifiers{ApplicationID: "no-app"}
-	registeredDeviceID        = ttnpb.EndDeviceIdentifiers{
-		ApplicationIdentifiers: registeredApplicationID,
-		DeviceID:               "test-device",
-	}
-	unregisteredDeviceID = ttnpb.EndDeviceIdentifiers{
-		ApplicationIdentifiers: unregisteredApplicationID,
-		DeviceID:               "no-device",
-	}
-	keys = ttnpb.NewPopulatedSessionKeys(test.Randy, false)
+type messageWithError struct {
+	*cloudpubsub.Message
+	error
+}
 
-	timeout = (1 << 8) * test.Delay
-)
-
-func TestTraffic(t *testing.T) {
+func TestPubSub(t *testing.T) {
 	a := assertions.New(t)
-
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
-	ctx, cancelCtx := context.WithCancel(ctx)
-	defer cancelCtx()
+	redisClient, flush := test.NewRedis(t, "pubsub_test")
+	defer flush()
+	defer redisClient.Close()
+	registry := &redis.PubSubRegistry{
+		Redis: redisClient,
+	}
+	ids := ttnpb.ApplicationPubSubIdentifiers{
+		ApplicationIdentifiers: registeredApplicationID,
+		PubSubID:               registeredPubSubID,
+	}
 
-	as := mock.NewServer()
-	subs, err := Start(ctx, as, formatters.JSON, []string{"mem://cloud_test"}, []string{"mem://cloud_test"})
-	a.So(err, should.BeNil)
+	_, err := registry.Set(ctx, ids, nil, func(_ *ttnpb.ApplicationPubSub) (*ttnpb.ApplicationPubSub, []string, error) {
+		return &ttnpb.ApplicationPubSub{
+				ApplicationPubSubIdentifiers: ttnpb.ApplicationPubSubIdentifiers{
+					ApplicationIdentifiers: registeredApplicationID,
+					PubSubID:               registeredPubSubID,
+				},
+				Provider: &ttnpb.ApplicationPubSub_NATS{
+					NATS: &ttnpb.ApplicationPubSub_NATSProvider{
+						ServerURL: "nats://localhost",
+					},
+				},
+				Format:    "json",
+				BaseTopic: "app1.ps1",
+				DownlinkPush: &ttnpb.ApplicationPubSub_Message{
+					Topic: "downlink.push",
+				},
+				DownlinkReplace: &ttnpb.ApplicationPubSub_Message{
+					Topic: "downlink.replace",
+				},
+				UplinkMessage: &ttnpb.ApplicationPubSub_Message{
+					Topic: "uplink.message",
+				},
+				JoinAccept: &ttnpb.ApplicationPubSub_Message{
+					Topic: "join.accept",
+				},
+				DownlinkAck: &ttnpb.ApplicationPubSub_Message{
+					Topic: "downlink.ack",
+				},
+				DownlinkNack: &ttnpb.ApplicationPubSub_Message{
+					Topic: "downlink.nack",
+				},
+				DownlinkSent: &ttnpb.ApplicationPubSub_Message{
+					Topic: "downlink.sent",
+				},
+				DownlinkFailed: &ttnpb.ApplicationPubSub_Message{
+					Topic: "downlnk.failed",
+				},
+				DownlinkQueued: &ttnpb.ApplicationPubSub_Message{
+					Topic: "downlink.queued",
+				},
+				LocationSolved: &ttnpb.ApplicationPubSub_Message{
+					Topic: "location.solved",
+				},
+			},
+			[]string{
+				"base_topic",
+				"downlink_ack",
+				"downlink_failed",
+				"downlink_nack",
+				"downlink_queued",
+				"downlink_sent",
+				"downlink_push",
+				"downlink_replace",
+				"format",
+				"ids",
+				"provider",
+				"join_accept",
+				"location_solved",
+				"uplink_message",
+			}, nil
+	})
+	if err != nil {
+		t.Fatalf("Failed to set pubsub in registry: %s", err)
+	}
 
-	topic, err := pubsub.OpenTopic(ctx, "mem://cloud_test")
+	mockProvider, err := provider.GetProvider(&ttnpb.ApplicationPubSub_NATS{})
+	a.So(mockProvider, should.NotBeNil)
 	a.So(err, should.BeNil)
-	defer topic.Shutdown(ctx)
+	mockImpl := mockProvider.(*mock_provider.Impl)
+
+	io := mock_server.NewServer()
+	c := component.MustNew(test.GetLogger(t), &component.Config{})
+	_, err = pubsub.New(c, io, registry)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	test.Must(nil, c.Start())
+	defer c.Close()
+
+	sub := <-io.Subscriptions()
+	conn := <-mockImpl.OpenConnectionCh
 
 	t.Run("Upstream", func(t *testing.T) {
+		ctx, cancel := context.WithCancel(ctx)
+		defer cancel()
+
 		for _, tc := range []struct {
-			Name    string
-			Message *ttnpb.ApplicationUp
+			Name         string
+			Message      *ttnpb.ApplicationUp
+			Subscription *cloudpubsub.Subscription
 		}{
 			{
-				Name: "Uplink",
+				Name: "UplinkMessage",
 				Message: &ttnpb.ApplicationUp{
 					EndDeviceIdentifiers: registeredDeviceID,
 					Up: &ttnpb.ApplicationUp_UplinkMessage{
-						UplinkMessage: &ttnpb.ApplicationUplink{FRMPayload: []byte{0x2, 0x2, 0x2}},
+						UplinkMessage: &ttnpb.ApplicationUplink{
+							SessionKeyID: []byte{0x11},
+							FPort:        42,
+							FCnt:         42,
+							FRMPayload:   []byte{0x1, 0x2, 0x3},
+						},
 					},
 				},
+				Subscription: conn.UplinkMessage,
 			},
 			{
 				Name: "JoinAccept",
@@ -83,58 +166,157 @@ func TestTraffic(t *testing.T) {
 					EndDeviceIdentifiers: registeredDeviceID,
 					Up: &ttnpb.ApplicationUp_JoinAccept{
 						JoinAccept: &ttnpb.ApplicationJoinAccept{
-							AppSKey:      keys.AppSKey,
-							SessionKeyID: keys.SessionKeyID,
+							SessionKeyID: []byte{0x22},
 						},
 					},
 				},
+				Subscription: conn.JoinAccept,
+			},
+			{
+				Name: "DownlinkMessage/Ack",
+				Message: &ttnpb.ApplicationUp{
+					EndDeviceIdentifiers: registeredDeviceID,
+					Up: &ttnpb.ApplicationUp_DownlinkAck{
+						DownlinkAck: &ttnpb.ApplicationDownlink{
+							SessionKeyID: []byte{0x22},
+							FCnt:         42,
+							FPort:        42,
+							FRMPayload:   []byte{0x1, 0x2, 0x3},
+						},
+					},
+				},
+				Subscription: conn.DownlinkAck,
+			},
+			{
+				Name: "DownlinkMessage/Nack",
+				Message: &ttnpb.ApplicationUp{
+					EndDeviceIdentifiers: registeredDeviceID,
+					Up: &ttnpb.ApplicationUp_DownlinkNack{
+						DownlinkNack: &ttnpb.ApplicationDownlink{
+							SessionKeyID: []byte{0x22},
+							FCnt:         42,
+							FPort:        42,
+							FRMPayload:   []byte{0x1, 0x2, 0x3},
+						},
+					},
+				},
+				Subscription: conn.DownlinkNack,
+			},
+			{
+				Name: "DownlinkMessage/Sent",
+				Message: &ttnpb.ApplicationUp{
+					EndDeviceIdentifiers: registeredDeviceID,
+					Up: &ttnpb.ApplicationUp_DownlinkSent{
+						DownlinkSent: &ttnpb.ApplicationDownlink{
+							SessionKeyID: []byte{0x22},
+							FCnt:         42,
+							FPort:        42,
+							FRMPayload:   []byte{0x1, 0x2, 0x3},
+						},
+					},
+				},
+				Subscription: conn.DownlinkSent,
+			},
+			{
+				Name: "DownlinkMessage/Queued",
+				Message: &ttnpb.ApplicationUp{
+					EndDeviceIdentifiers: registeredDeviceID,
+					Up: &ttnpb.ApplicationUp_DownlinkQueued{
+						DownlinkQueued: &ttnpb.ApplicationDownlink{
+							SessionKeyID: []byte{0x22},
+							FCnt:         42,
+							FPort:        42,
+							FRMPayload:   []byte{0x1, 0x2, 0x3},
+						},
+					},
+				},
+				Subscription: conn.DownlinkQueued,
+			},
+			{
+				Name: "DownlinkMessage/Failed",
+				Message: &ttnpb.ApplicationUp{
+					EndDeviceIdentifiers: registeredDeviceID,
+					Up: &ttnpb.ApplicationUp_DownlinkFailed{
+						DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
+							ApplicationDownlink: ttnpb.ApplicationDownlink{
+								SessionKeyID: []byte{0x22},
+								FCnt:         42,
+								FPort:        42,
+								FRMPayload:   []byte{0x1, 0x2, 0x3},
+							},
+							Error: ttnpb.ErrorDetails{
+								Name: "test",
+							},
+						},
+					},
+				},
+				Subscription: conn.DownlinkFailed,
+			},
+			{
+				Name: "LocationSolved",
+				Message: &ttnpb.ApplicationUp{
+					EndDeviceIdentifiers: registeredDeviceID,
+					Up: &ttnpb.ApplicationUp_LocationSolved{
+						LocationSolved: &ttnpb.ApplicationLocation{
+							Location: ttnpb.Location{
+								Latitude:  10,
+								Longitude: 20,
+								Altitude:  30,
+							},
+							Service: "test",
+						},
+					},
+				},
+				Subscription: conn.LocationSolved,
 			},
 		} {
-			t.Run(tc.Name, func(t *testing.T) {
-				a := assertions.New(t)
+			tcok := t.Run(tc.Name, func(t *testing.T) {
+				ctx, cancel := context.WithCancel(ctx)
+				defer cancel()
 
-				upCh := make(chan *ttnpb.ApplicationUp)
+				err := sub.SendUp(ctx, tc.Message)
+				if !a.So(err, should.BeNil) {
+					t.FailNow()
+				}
 
-				subscription, err := pubsub.OpenSubscription(ctx, "mem://cloud_test")
-				a.So(err, should.BeNil)
-				defer subscription.Shutdown(ctx)
-
+				ch := make(chan messageWithError, 10)
 				go func() {
-					msg, err := subscription.Receive(ctx)
-					a.So(err, should.BeNil)
-
-					up := &ttnpb.ApplicationUp{}
-					err = jsonpb.TTN().Unmarshal(msg.Body, up)
-					a.So(err, should.BeNil)
-					upCh <- up
+					msg, err := tc.Subscription.Receive(ctx)
+					ch <- messageWithError{msg, err}
 				}()
 
-				err = subs[0].SendUp(ctx, tc.Message)
-				a.So(err, should.BeNil)
-
+				var msg messageWithError
 				select {
-				case up := <-upCh:
-					a.So(up, should.Resemble, tc.Message)
-
+				case msg = <-ch:
+					a.So(msg.Message, should.NotBeNil)
+					a.So(err, should.BeNil)
+					msg.Ack()
 				case <-time.After(timeout):
-					t.Fatal("Receive expected upstream timeout")
+					t.Fatal("Expected message but nothing received")
 				}
+				expectedBody, err := formatters.JSON.FromUp(tc.Message)
+				if !a.So(err, should.BeNil) {
+					t.FailNow()
+				}
+				a.So(msg.Message.Body, should.Resemble, expectedBody)
 			})
+			if !tcok {
+				t.FailNow()
+			}
 		}
 	})
 
 	t.Run("Downstream", func(t *testing.T) {
 		for _, tc := range []struct {
 			Name     string
-			IDs      ttnpb.EndDeviceIdentifiers
-			Message  *ttnpb.DownlinkQueueOperation
+			Topic    *cloudpubsub.Topic
+			Message  *ttnpb.DownlinkQueueRequest
 			Expected []*ttnpb.ApplicationDownlink
 		}{
 			{
-				Name: "PushEmptyQueue",
-				IDs:  registeredDeviceID,
-				Message: &ttnpb.DownlinkQueueOperation{
-					Operation:            ttnpb.DownlinkQueueOperation_PUSH,
+				Name:  "ValidPush",
+				Topic: conn.Push,
+				Message: &ttnpb.DownlinkQueueRequest{
 					EndDeviceIdentifiers: registeredDeviceID,
 					Downlinks: []*ttnpb.ApplicationDownlink{
 						{
@@ -151,10 +333,9 @@ func TestTraffic(t *testing.T) {
 				},
 			},
 			{
-				Name: "ReplaceEmptyQueue",
-				IDs:  registeredDeviceID,
-				Message: &ttnpb.DownlinkQueueOperation{
-					Operation:            ttnpb.DownlinkQueueOperation_REPLACE,
+				Name:  "ValidReplace",
+				Topic: conn.Replace,
+				Message: &ttnpb.DownlinkQueueRequest{
 					EndDeviceIdentifiers: registeredDeviceID,
 					Downlinks: []*ttnpb.ApplicationDownlink{
 						{
@@ -171,10 +352,9 @@ func TestTraffic(t *testing.T) {
 				},
 			},
 			{
-				Name: "PushInvalidDevice",
-				IDs:  registeredDeviceID,
-				Message: &ttnpb.DownlinkQueueOperation{
-					Operation:            ttnpb.DownlinkQueueOperation_PUSH,
+				Name:  "InvalidPush",
+				Topic: conn.Push,
+				Message: &ttnpb.DownlinkQueueRequest{
 					EndDeviceIdentifiers: unregisteredDeviceID,
 					Downlinks: []*ttnpb.ApplicationDownlink{
 						{
@@ -190,16 +370,39 @@ func TestTraffic(t *testing.T) {
 					},
 				},
 			},
+			{
+				Name:  "InvalidReplace",
+				Topic: conn.Replace,
+				Message: &ttnpb.DownlinkQueueRequest{
+					EndDeviceIdentifiers: unregisteredDeviceID,
+					Downlinks: []*ttnpb.ApplicationDownlink{
+						{
+							FPort:      42,
+							FRMPayload: []byte{0x4, 0x4, 0x4},
+						},
+					},
+				},
+				Expected: []*ttnpb.ApplicationDownlink{
+					{
+						FPort:      42,
+						FRMPayload: []byte{0x2, 0x2, 0x2}, // Do not expect a change.
+					},
+				},
+			},
 		} {
 			tcok := t.Run(tc.Name, func(t *testing.T) {
-				a := assertions.New(t)
 				buf, err := jsonpb.TTN().Marshal(tc.Message)
 				a.So(err, should.BeNil)
-				if err := topic.Send(ctx, &pubsub.Message{Body: buf}); !a.So(err, should.BeNil) {
+
+				if err := tc.Topic.Send(ctx, &cloudpubsub.Message{
+					Body: buf,
+				}); !a.So(err, should.BeNil) {
 					t.FailNow()
 				}
-				<-time.After(timeout)
-				res, err := as.DownlinkQueueList(ctx, tc.IDs)
+
+				time.Sleep(timeout)
+
+				res, err := io.DownlinkQueueList(ctx, registeredDeviceID)
 				a.So(err, should.BeNil)
 				a.So(res, should.Resemble, tc.Expected)
 			})

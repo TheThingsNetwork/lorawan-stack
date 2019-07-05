@@ -12,15 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package formatters
+package pubsub
 
-import (
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-)
+import "go.thethings.network/lorawan-stack/pkg/applicationserver/io/formatters"
 
-// Formatter formats upstream and downstream messages.
-type Formatter interface {
-	FromUp(*ttnpb.ApplicationUp) ([]byte, error)
-	ToDownlinks([]byte) (*ttnpb.ApplicationDownlinks, error)
-	ToDownlinkQueueRequest([]byte) (*ttnpb.DownlinkQueueRequest, error)
+func init() {
+	formats["json"] = Format{
+		Formatter: formatters.JSON,
+		Name:      "JSON",
+	}
 }

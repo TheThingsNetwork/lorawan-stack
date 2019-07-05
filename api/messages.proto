@@ -235,16 +235,6 @@ message ApplicationInvalidatedDownlinks {
   uint32 last_f_cnt_down = 2;
 }
 
-message DownlinkQueueOperation {
-  EndDeviceIdentifiers end_device_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
-  enum Operation {
-    PUSH = 0;
-    REPLACE = 1;
-  }
-  Operation operation = 2 [(validate.rules).message.required = true, (validate.rules).enum.defined_only = true];
-  repeated ApplicationDownlink downlinks = 3;
-}
-
 message ApplicationUp {
   EndDeviceIdentifiers end_device_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   repeated string correlation_ids = 2 [(gogoproto.customname) = "CorrelationIDs", (validate.rules).repeated.items.string.max_len = 100];

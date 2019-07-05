@@ -34,8 +34,8 @@ func (json) ToDownlinks(data []byte) (*ttnpb.ApplicationDownlinks, error) {
 	return res, nil
 }
 
-func (json) ToDownlinkQueueOperation(data []byte) (*ttnpb.DownlinkQueueOperation, error) {
-	res := &ttnpb.DownlinkQueueOperation{}
+func (json) ToDownlinkQueueRequest(data []byte) (*ttnpb.DownlinkQueueRequest, error) {
+	res := &ttnpb.DownlinkQueueRequest{}
 	if err := jsonpb.TTN().Unmarshal(data, &res); err != nil {
 		return nil, err
 	}

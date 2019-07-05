@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package web_test
+package pubsub_test
 
 import (
 	"context"
@@ -21,6 +21,7 @@ import (
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/rpcserver"
@@ -33,10 +34,11 @@ import (
 )
 
 var (
-	registeredApplicationID  = ttnpb.ApplicationIdentifiers{ApplicationID: "foo-app"}
-	registeredApplicationUID = unique.ID(test.Context(), registeredApplicationID)
-	registeredApplicationKey = "secret"
-	registeredDeviceID       = ttnpb.EndDeviceIdentifiers{
+	registeredApplicationID   = ttnpb.ApplicationIdentifiers{ApplicationID: "foo-app"}
+	unregisteredApplicationID = ttnpb.ApplicationIdentifiers{ApplicationID: "no-app"}
+	registeredApplicationUID  = unique.ID(test.Context(), registeredApplicationID)
+	registeredApplicationKey  = "secret"
+	registeredDeviceID        = ttnpb.EndDeviceIdentifiers{
 		ApplicationIdentifiers: registeredApplicationID,
 		DeviceID:               "foo-device",
 		DevAddr:                devAddrPtr(types.DevAddr{0x42, 0xff, 0xff, 0xff}),
@@ -48,9 +50,11 @@ var (
 		DeviceID: "bar-device",
 		DevAddr:  devAddrPtr(types.DevAddr{0x42, 0x42, 0x42, 0x42}),
 	}
-	registeredWebhookID = "foo-hook"
+	registeredPubSubID = "foo-integration"
 
-	timeout = (1 << 5) * test.Delay
+	keys = ttnpb.NewPopulatedSessionKeys(test.Randy, false)
+
+	timeout = (1 << 8) * test.Delay
 )
 
 func devAddrPtr(addr types.DevAddr) *types.DevAddr {
@@ -58,8 +62,7 @@ func devAddrPtr(addr types.DevAddr) *types.DevAddr {
 }
 
 type mockRegisterer struct {
-	context.Context
-	ttnpb.ApplicationWebhookRegistryServer
+	*pubsub.PubSub
 }
 
 func (m *mockRegisterer) Roles() []ttnpb.PeerInfo_Role {
@@ -67,11 +70,11 @@ func (m *mockRegisterer) Roles() []ttnpb.PeerInfo_Role {
 }
 
 func (m *mockRegisterer) RegisterServices(s *grpc.Server) {
-	ttnpb.RegisterApplicationWebhookRegistryServer(s, m.ApplicationWebhookRegistryServer)
+	ttnpb.RegisterApplicationPubSubRegistryServer(s, m.PubSub)
 }
 
 func (m *mockRegisterer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
-	ttnpb.RegisterApplicationWebhookRegistryHandler(m.Context, s, conn)
+	ttnpb.RegisterApplicationPubSubRegistryHandler(m.PubSub.Context(), s, conn)
 }
 
 func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.PeerInfo_Role) {

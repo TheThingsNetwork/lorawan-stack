@@ -12,15 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package formatters
+package nats
 
 import (
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"fmt"
+	"strings"
 )
 
-// Formatter formats upstream and downstream messages.
-type Formatter interface {
-	FromUp(*ttnpb.ApplicationUp) ([]byte, error)
-	ToDownlinks([]byte) (*ttnpb.ApplicationDownlinks, error)
-	ToDownlinkQueueRequest([]byte) (*ttnpb.DownlinkQueueRequest, error)
+func combineSubjects(s1, s2 string) string {
+	s1 = strings.Trim(s1, ".")
+	s2 = strings.Trim(s2, ".")
+	if s1 == "" {
+		return s2
+	}
+	if s2 == "" {
+		return s1
+	}
+	return fmt.Sprintf("%s.%s", s1, s2)
 }

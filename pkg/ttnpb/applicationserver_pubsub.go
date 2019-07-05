@@ -12,15 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package formatters
+package ttnpb
 
-import (
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-)
-
-// Formatter formats upstream and downstream messages.
-type Formatter interface {
-	FromUp(*ttnpb.ApplicationUp) ([]byte, error)
-	ToDownlinks([]byte) (*ttnpb.ApplicationDownlinks, error)
-	ToDownlinkQueueRequest([]byte) (*ttnpb.DownlinkQueueRequest, error)
-}
+// ApplicationPubSub_Provider is an alias to the interface identifying the PubSub provider types.
+// This enables provider.RegisterProvider and provider.GetProvider to offer type safety guarantees.
+// The underscore is maintained for consistency with the generated code.
+type ApplicationPubSub_Provider = isApplicationPubSub_Provider

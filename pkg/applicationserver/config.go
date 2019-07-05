@@ -20,7 +20,9 @@ import (
 	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io"
+	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/web"
+	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/log"
 )
@@ -81,8 +83,7 @@ type WebhooksConfig struct {
 
 // PubSubConfig contains go-cloud PubSub configuration of the Application Server.
 type PubSubConfig struct {
-	PublishURLs   []string `name:"publish-urls" description:"URLs for the topics to send uplinks"`
-	SubscribeURLs []string `name:"subscribe-urls" description:"URLs for the subscriptions for receiving downlink operations"`
+	Registry pubsub.Registry `name:"-"`
 }
 
 // NewWebhooks returns a new web.Webhooks based on the configuration.
@@ -119,4 +120,13 @@ func (c WebhooksConfig) NewWebhooks(ctx context.Context, server io.Server) (web.
 		}()
 	}
 	return web.NewWebhooks(ctx, server, c.Registry, target), nil
+}
+
+// NewPubSub returns a new pubsub.PubSub based on the configuration.
+// If the registry is nil, it returns nil.
+func (c PubSubConfig) NewPubSub(comp *component.Component, server io.Server, registry pubsub.Registry) (*pubsub.PubSub, error) {
+	if registry == nil {
+		return nil, nil
+	}
+	return pubsub.New(comp, server, registry)
 }

@@ -1527,6 +1527,639 @@
       ]
     },
     {
+      "name": "lorawan-stack/api/applicationserver_pubsub.proto",
+      "description": "",
+      "package": "ttn.lorawan.v3",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": true,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "ApplicationPubSub",
+          "longName": "ApplicationPubSub",
+          "fullName": "ttn.lorawan.v3.ApplicationPubSub",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "ids",
+              "description": "",
+              "label": "",
+              "type": "ApplicationPubSubIdentifiers",
+              "longType": "ApplicationPubSubIdentifiers",
+              "fullType": "ttn.lorawan.v3.ApplicationPubSubIdentifiers",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "created_at",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "updated_at",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "format",
+              "description": "The format to use for the body.\nSupported values depend on the Application Server configuration.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 10
+                  }
+                ]
+              }
+            },
+            {
+              "name": "nats",
+              "description": "",
+              "label": "",
+              "type": "NATSProvider",
+              "longType": "ApplicationPubSub.NATSProvider",
+              "fullType": "ttn.lorawan.v3.ApplicationPubSub.NATSProvider",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "base_topic",
+              "description": "Base topic name to which the messages topic is appended.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 100
+                  }
+                ]
+              }
+            },
+            {
+              "name": "downlink_push",
+              "description": "The topic to which the Application Server subscribes for downlink queue push operations.",
+              "label": "",
+              "type": "Message",
+              "longType": "ApplicationPubSub.Message",
+              "fullType": "ttn.lorawan.v3.ApplicationPubSub.Message",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "downlink_replace",
+              "description": "The topic to which the Application Server subscribes for downlink queue replace operations.",
+              "label": "",
+              "type": "Message",
+              "longType": "ApplicationPubSub.Message",
+              "fullType": "ttn.lorawan.v3.ApplicationPubSub.Message",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "uplink_message",
+              "description": "",
+              "label": "",
+              "type": "Message",
+              "longType": "ApplicationPubSub.Message",
+              "fullType": "ttn.lorawan.v3.ApplicationPubSub.Message",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "join_accept",
+              "description": "",
+              "label": "",
+              "type": "Message",
+              "longType": "ApplicationPubSub.Message",
+              "fullType": "ttn.lorawan.v3.ApplicationPubSub.Message",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "downlink_ack",
+              "description": "",
+              "label": "",
+              "type": "Message",
+              "longType": "ApplicationPubSub.Message",
+              "fullType": "ttn.lorawan.v3.ApplicationPubSub.Message",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "downlink_nack",
+              "description": "",
+              "label": "",
+              "type": "Message",
+              "longType": "ApplicationPubSub.Message",
+              "fullType": "ttn.lorawan.v3.ApplicationPubSub.Message",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "downlink_sent",
+              "description": "",
+              "label": "",
+              "type": "Message",
+              "longType": "ApplicationPubSub.Message",
+              "fullType": "ttn.lorawan.v3.ApplicationPubSub.Message",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "downlink_failed",
+              "description": "",
+              "label": "",
+              "type": "Message",
+              "longType": "ApplicationPubSub.Message",
+              "fullType": "ttn.lorawan.v3.ApplicationPubSub.Message",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "downlink_queued",
+              "description": "",
+              "label": "",
+              "type": "Message",
+              "longType": "ApplicationPubSub.Message",
+              "fullType": "ttn.lorawan.v3.ApplicationPubSub.Message",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "location_solved",
+              "description": "",
+              "label": "",
+              "type": "Message",
+              "longType": "ApplicationPubSub.Message",
+              "fullType": "ttn.lorawan.v3.ApplicationPubSub.Message",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "Message",
+          "longName": "ApplicationPubSub.Message",
+          "fullName": "ttn.lorawan.v3.ApplicationPubSub.Message",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "topic",
+              "description": "The topic on which the Application Server publishes or receives the messages.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 100
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "NATSProvider",
+          "longName": "ApplicationPubSub.NATSProvider",
+          "fullName": "ttn.lorawan.v3.ApplicationPubSub.NATSProvider",
+          "description": "The NATS provider settings.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "server_url",
+              "description": "The server connection URL.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.uri",
+                    "value": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ApplicationPubSubFormats",
+          "longName": "ApplicationPubSubFormats",
+          "fullName": "ttn.lorawan.v3.ApplicationPubSubFormats",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "formats",
+              "description": "Format and description.",
+              "label": "repeated",
+              "type": "FormatsEntry",
+              "longType": "ApplicationPubSubFormats.FormatsEntry",
+              "fullType": "ttn.lorawan.v3.ApplicationPubSubFormats.FormatsEntry",
+              "ismap": true,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "FormatsEntry",
+          "longName": "ApplicationPubSubFormats.FormatsEntry",
+          "fullName": "ttn.lorawan.v3.ApplicationPubSubFormats.FormatsEntry",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "key",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "value",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ApplicationPubSubIdentifiers",
+          "longName": "ApplicationPubSubIdentifiers",
+          "fullName": "ttn.lorawan.v3.ApplicationPubSubIdentifiers",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "application_ids",
+              "description": "",
+              "label": "",
+              "type": "ApplicationIdentifiers",
+              "longType": "ApplicationIdentifiers",
+              "fullType": "ttn.lorawan.v3.ApplicationIdentifiers",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "pub_sub_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ApplicationPubSubs",
+          "longName": "ApplicationPubSubs",
+          "fullName": "ttn.lorawan.v3.ApplicationPubSubs",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "pubsubs",
+              "description": "",
+              "label": "repeated",
+              "type": "ApplicationPubSub",
+              "longType": "ApplicationPubSub",
+              "fullType": "ttn.lorawan.v3.ApplicationPubSub",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "GetApplicationPubSubRequest",
+          "longName": "GetApplicationPubSubRequest",
+          "fullName": "ttn.lorawan.v3.GetApplicationPubSubRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "ids",
+              "description": "",
+              "label": "",
+              "type": "ApplicationPubSubIdentifiers",
+              "longType": "ApplicationPubSubIdentifiers",
+              "fullType": "ttn.lorawan.v3.ApplicationPubSubIdentifiers",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "field_mask",
+              "description": "",
+              "label": "",
+              "type": "FieldMask",
+              "longType": "google.protobuf.FieldMask",
+              "fullType": "google.protobuf.FieldMask",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ListApplicationPubSubsRequest",
+          "longName": "ListApplicationPubSubsRequest",
+          "fullName": "ttn.lorawan.v3.ListApplicationPubSubsRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "application_ids",
+              "description": "",
+              "label": "",
+              "type": "ApplicationIdentifiers",
+              "longType": "ApplicationIdentifiers",
+              "fullType": "ttn.lorawan.v3.ApplicationIdentifiers",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "field_mask",
+              "description": "",
+              "label": "",
+              "type": "FieldMask",
+              "longType": "google.protobuf.FieldMask",
+              "fullType": "google.protobuf.FieldMask",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "SetApplicationPubSubRequest",
+          "longName": "SetApplicationPubSubRequest",
+          "fullName": "ttn.lorawan.v3.SetApplicationPubSubRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "pubsub",
+              "description": "",
+              "label": "",
+              "type": "ApplicationPubSub",
+              "longType": "ApplicationPubSub",
+              "fullType": "ttn.lorawan.v3.ApplicationPubSub",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "field_mask",
+              "description": "",
+              "label": "",
+              "type": "FieldMask",
+              "longType": "google.protobuf.FieldMask",
+              "fullType": "google.protobuf.FieldMask",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": [
+        {
+          "name": "ApplicationPubSubRegistry",
+          "longName": "ApplicationPubSubRegistry",
+          "fullName": "ttn.lorawan.v3.ApplicationPubSubRegistry",
+          "description": "",
+          "methods": [
+            {
+              "name": "GetFormats",
+              "description": "",
+              "requestType": "Empty",
+              "requestLongType": ".google.protobuf.Empty",
+              "requestFullType": "google.protobuf.Empty",
+              "requestStreaming": false,
+              "responseType": "ApplicationPubSubFormats",
+              "responseLongType": "ApplicationPubSubFormats",
+              "responseFullType": "ttn.lorawan.v3.ApplicationPubSubFormats",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/as/pubsub-formats"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get",
+              "description": "",
+              "requestType": "GetApplicationPubSubRequest",
+              "requestLongType": "GetApplicationPubSubRequest",
+              "requestFullType": "ttn.lorawan.v3.GetApplicationPubSubRequest",
+              "requestStreaming": false,
+              "responseType": "ApplicationPubSub",
+              "responseLongType": "ApplicationPubSub",
+              "responseFullType": "ttn.lorawan.v3.ApplicationPubSub",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/as/pubsub/{ids.application_ids.application_id}/{ids.pub_sub_id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "List",
+              "description": "",
+              "requestType": "ListApplicationPubSubsRequest",
+              "requestLongType": "ListApplicationPubSubsRequest",
+              "requestFullType": "ttn.lorawan.v3.ListApplicationPubSubsRequest",
+              "requestStreaming": false,
+              "responseType": "ApplicationPubSubs",
+              "responseLongType": "ApplicationPubSubs",
+              "responseFullType": "ttn.lorawan.v3.ApplicationPubSubs",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/as/pubsub/{application_ids.application_id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Set",
+              "description": "",
+              "requestType": "SetApplicationPubSubRequest",
+              "requestLongType": "SetApplicationPubSubRequest",
+              "requestFullType": "ttn.lorawan.v3.SetApplicationPubSubRequest",
+              "requestStreaming": false,
+              "responseType": "ApplicationPubSub",
+              "responseLongType": "ApplicationPubSub",
+              "responseFullType": "ttn.lorawan.v3.ApplicationPubSub",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "PUT",
+                      "pattern": "/as/pubsub/{pubsub.ids.application_ids.application_id}/{pubsub.ids.pub_sub_id}",
+                      "body": "*"
+                    },
+                    {
+                      "method": "POST",
+                      "pattern": "/as/pubsub/{pubsub.ids.application_ids.application_id}",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Delete",
+              "description": "",
+              "requestType": "ApplicationPubSubIdentifiers",
+              "requestLongType": "ApplicationPubSubIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.ApplicationPubSubIdentifiers",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/as/pubsub/{application_ids.application_id}/{pub_sub_id}"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "lorawan-stack/api/applicationserver_web.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
@@ -14806,24 +15439,6 @@
       "hasServices": false,
       "enums": [
         {
-          "name": "Operation",
-          "longName": "DownlinkQueueOperation.Operation",
-          "fullName": "ttn.lorawan.v3.DownlinkQueueOperation.Operation",
-          "description": "",
-          "values": [
-            {
-              "name": "PUSH",
-              "number": "0",
-              "description": ""
-            },
-            {
-              "name": "REPLACE",
-              "number": "1",
-              "description": ""
-            }
-          ]
-        },
-        {
           "name": "PayloadFormatter",
           "longName": "PayloadFormatter",
           "fullName": "ttn.lorawan.v3.PayloadFormatter",
@@ -15678,63 +16293,6 @@
                   }
                 ]
               }
-            }
-          ]
-        },
-        {
-          "name": "DownlinkQueueOperation",
-          "longName": "DownlinkQueueOperation",
-          "fullName": "ttn.lorawan.v3.DownlinkQueueOperation",
-          "description": "",
-          "hasExtensions": false,
-          "hasFields": true,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "end_device_ids",
-              "description": "",
-              "label": "",
-              "type": "EndDeviceIdentifiers",
-              "longType": "EndDeviceIdentifiers",
-              "fullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
-              "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "message.required",
-                    "value": true
-                  }
-                ]
-              }
-            },
-            {
-              "name": "operation",
-              "description": "",
-              "label": "",
-              "type": "Operation",
-              "longType": "DownlinkQueueOperation.Operation",
-              "fullType": "ttn.lorawan.v3.DownlinkQueueOperation.Operation",
-              "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "enum.defined_only",
-                    "value": true
-                  }
-                ]
-              }
-            },
-            {
-              "name": "downlinks",
-              "description": "",
-              "label": "repeated",
-              "type": "ApplicationDownlink",
-              "longType": "ApplicationDownlink",
-              "fullType": "ttn.lorawan.v3.ApplicationDownlink",
-              "ismap": false,
-              "defaultValue": ""
             }
           ]
         },

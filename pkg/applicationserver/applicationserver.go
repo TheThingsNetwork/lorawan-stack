@@ -26,10 +26,10 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io"
-	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/formatters"
 	iogrpc "go.thethings.network/lorawan-stack/pkg/applicationserver/io/grpc"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/mqtt"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub"
+	_ "go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/provider/nats" // The NATS integration provider
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/web"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
@@ -43,7 +43,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/messageprocessors/javascript"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
-	_ "gocloud.dev/pubsub/natspubsub" // NATS backend for PubSub.
 	"google.golang.org/grpc"
 )
 
@@ -59,6 +58,7 @@ type ApplicationServer struct {
 	deviceRegistry DeviceRegistry
 	formatter      payloadFormatter
 	webhooks       web.Webhooks
+	pubsub         *pubsub.PubSub
 
 	links              sync.Map
 	linkErrors         sync.Map
@@ -156,12 +156,8 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		c.RegisterWeb(webhooks)
 	}
 
-	if len(conf.PubSub.PublishURLs) > 0 {
-		pubsub, err := pubsub.Start(as.Context(), as, formatters.JSON, conf.PubSub.PublishURLs, conf.PubSub.SubscribeURLs)
-		if err != nil {
-			return nil, err
-		}
-		as.defaultSubscribers = append(as.defaultSubscribers, pubsub...)
+	if as.pubsub, err = conf.PubSub.NewPubSub(c, as, conf.PubSub.Registry); err != nil {
+		return nil, err
 	}
 
 	c.RegisterGRPC(as)
@@ -179,6 +175,9 @@ func (as *ApplicationServer) RegisterServices(s *grpc.Server) {
 	if as.webhooks != nil {
 		ttnpb.RegisterApplicationWebhookRegistryServer(s, web.NewWebhookRegistryRPC(as.webhooks.Registry()))
 	}
+	if as.pubsub != nil {
+		ttnpb.RegisterApplicationPubSubRegistryServer(s, as.pubsub)
+	}
 }
 
 // RegisterHandlers registers gRPC handlers.
@@ -188,6 +187,9 @@ func (as *ApplicationServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.Cl
 	ttnpb.RegisterAppAsHandler(as.Context(), s, conn)
 	if as.webhooks != nil {
 		ttnpb.RegisterApplicationWebhookRegistryHandler(as.Context(), s, conn)
+	}
+	if as.pubsub != nil {
+		ttnpb.RegisterApplicationPubSubRegistryHandler(as.Context(), s, conn)
 	}
 }
 

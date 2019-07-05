@@ -11,13 +11,14 @@ replace github.com/golang/lint => golang.org/x/lint v0.0.0-20190313153728-d0100b
 replace github.com/testcontainers/testcontainer-go => github.com/testcontainers/testcontainers-go v0.0.2
 
 require (
+	contrib.go.opencensus.io/exporter/prometheus v0.1.0
 	github.com/PuerkitoBio/purell v1.1.1
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/TheThingsIndustries/magepkg v0.0.0-20190214092847-6c0299b7c3ed
 	github.com/TheThingsIndustries/mystique v0.0.0-20181023142449-f12a32cee6d6
 	github.com/TheThingsIndustries/release-notes v0.0.1
 	github.com/TheThingsNetwork/go-cayenne-lib v1.0.0
-	github.com/aws/aws-sdk-go v1.19.12
+	github.com/aws/aws-sdk-go v1.19.16
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/certifi/gocertifi v0.0.0-20190415143156-92f724a62f3e // indirect
 	github.com/client9/misspell v0.3.4
@@ -44,6 +45,7 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway v1.9.3
 	github.com/heptiolabs/healthcheck v0.0.0-20180807145615-6ff867650f40
 	github.com/howeyc/gopass v0.0.0-20170109162249-bf9dde6d0d2c
+	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/jacobsa/crypto v0.0.0-20190317225127-9f44e2d11115
 	github.com/jacobsa/oglematchers v0.0.0-20150720000706-141901ea67cd // indirect
 	github.com/jacobsa/oglemock v0.0.0-20150831005832-e94d794d06ff // indirect
@@ -64,10 +66,15 @@ require (
 	github.com/mgechev/revive v0.0.0-20190416071613-796760d728e1
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
+	github.com/nats-io/gnatsd v1.4.1
+	github.com/nats-io/go-nats v1.7.2
 	github.com/nats-io/nats-server v1.4.1
 	github.com/nats-io/nats.go v1.7.2
 	github.com/oklog/ulid v1.3.1
+	github.com/onsi/ginkgo v1.8.0 // indirect
+	github.com/onsi/gomega v1.5.0 // indirect
 	github.com/openshift/osin v1.0.1
+	github.com/pborman/uuid v1.2.0 // indirect
 	github.com/pkg/browser v0.0.0-20180916011732-0a3d74bf9ce4
 	github.com/pkg/errors v0.8.1
 	github.com/prometheus/client_golang v0.9.3-0.20190127221311-3c4408c8b829
@@ -82,15 +89,16 @@ require (
 	github.com/spf13/pflag v1.0.3
 	github.com/spf13/viper v1.3.2
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
-	go.opencensus.io v0.20.2
+	go.opencensus.io v0.22.0
 	go.thethings.network/lorawan-stack-legacy v0.0.0-20190118141410-68812c833a78
-	gocloud.dev v0.13.0
-	golang.org/x/crypto v0.0.0-20190411191339-88737f569e3a
-	golang.org/x/net v0.0.0-20190424112056-4829fb13d2c6
+	gocloud.dev v0.15.0
+	gocloud.dev/pubsub/natspubsub v0.15.0
+	golang.org/x/crypto v0.0.0-20190422183909-d864b10871cd
+	golang.org/x/net v0.0.0-20190501004415-9ce7a6920f09
 	golang.org/x/oauth2 v0.0.0-20190402181905-9f3314589c9a
-	golang.org/x/tools v0.0.0-20190417005754-4ca4b55e2050
+	golang.org/x/tools v0.0.0-20190422233926-fe54fb35175b
 	golang.org/x/xerrors v0.0.0-20190410155217-1f06c39b4373
-	google.golang.org/genproto v0.0.0-20190415143225-d1146b9035b9
+	google.golang.org/genproto v0.0.0-20190508193815-b515fa19cec8
 	google.golang.org/grpc v1.21.1
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/mail.v2 v2.3.1 // indirect

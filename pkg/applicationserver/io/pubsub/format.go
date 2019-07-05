@@ -12,15 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package formatters
+package pubsub
 
 import (
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/formatters"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
-// Formatter formats upstream and downstream messages.
-type Formatter interface {
-	FromUp(*ttnpb.ApplicationUp) ([]byte, error)
-	ToDownlinks([]byte) (*ttnpb.ApplicationDownlinks, error)
-	ToDownlinkQueueRequest([]byte) (*ttnpb.DownlinkQueueRequest, error)
+// Format is a format to use for PubSub integrations.
+type Format struct {
+	formatters.Formatter
+	Name string
 }
+
+var (
+	formats = map[string]Format{}
+
+	errFormatNotFound = errors.DefineNotFound("format_not_found", "format `{format}` not found")
+)

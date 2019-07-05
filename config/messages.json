@@ -1340,6 +1340,15 @@
       "file": "organizations.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:no_pub_sub_id": {
+    "translations": {
+      "en": "no pubsub ID set"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "applications_pubsub.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/commands:no_token_id": {
     "translations": {
       "en": "no token ID set"
@@ -1455,6 +1464,69 @@
     "description": {
       "package": "pkg/applicationserver/io/mqtt",
       "file": "mqtt.go"
+    }
+  },
+  "error:pkg/applicationserver/io/pubsub/provider:provider_already_registered": {
+    "translations": {
+      "en": "provider `{provider_id}` already registered"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/pubsub/provider",
+      "file": "provider.go"
+    }
+  },
+  "error:pkg/applicationserver/io/pubsub/provider:provider_not_implemented": {
+    "translations": {
+      "en": "provider `{provider_id}` is not implemented"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/pubsub/provider",
+      "file": "provider.go"
+    }
+  },
+  "error:pkg/applicationserver/io/pubsub/redis:application_uid": {
+    "translations": {
+      "en": "invalid application UID `{application_uid}`"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/pubsub/redis",
+      "file": "registry.go"
+    }
+  },
+  "error:pkg/applicationserver/io/pubsub/redis:invalid_fieldmask": {
+    "translations": {
+      "en": "invalid fieldmask"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/pubsub/redis",
+      "file": "registry.go"
+    }
+  },
+  "error:pkg/applicationserver/io/pubsub/redis:invalid_identifiers": {
+    "translations": {
+      "en": "invalid identifiers"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/pubsub/redis",
+      "file": "registry.go"
+    }
+  },
+  "error:pkg/applicationserver/io/pubsub:already_configured": {
+    "translations": {
+      "en": "already configured to `{application_uid}` `{pub_sub_id}`"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/pubsub",
+      "file": "pubsub.go"
+    }
+  },
+  "error:pkg/applicationserver/io/pubsub:format_not_found": {
+    "translations": {
+      "en": "format `{format}` not found"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/pubsub",
+      "file": "format.go"
     }
   },
   "error:pkg/applicationserver/io/web/redis:invalid_fieldmask": {

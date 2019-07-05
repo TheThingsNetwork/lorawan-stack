@@ -12,15 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package formatters
+package pubsub
 
 import (
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"time"
+
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
-// Formatter formats upstream and downstream messages.
-type Formatter interface {
-	FromUp(*ttnpb.ApplicationUp) ([]byte, error)
-	ToDownlinks([]byte) (*ttnpb.ApplicationDownlinks, error)
-	ToDownlinkQueueRequest([]byte) (*ttnpb.DownlinkQueueRequest, error)
+func init() {
+	startBackoff = []time.Duration{(1 << 5) * test.Delay}
 }
