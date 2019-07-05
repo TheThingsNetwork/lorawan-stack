@@ -29,6 +29,8 @@ option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 // Contains metadata for a received message. Each antenna that receives
 // a message corresponds to one RxMetadata.
 message RxMetadata {
+  option (gogoproto.populate) = false;
+
   GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   uint32 antenna_index = 2;
   google.protobuf.Timestamp time = 3 [(gogoproto.stdtime) = true];
@@ -58,6 +60,8 @@ message RxMetadata {
   DownlinkPathConstraint downlink_path_constraint = 14 [(validate.rules).enum.defined_only = true];
   // Uplink token to be included in the Tx request in class A downlink; injected by gateway, Gateway Server or fNS.
   bytes uplink_token = 15;
+  // Index of the gateway channel that received the message.
+  uint32 channel_index = 17 [(validate.rules).uint32 = {lte: 255}];
   // Advanced metadata fields
   // - can be used for advanced information or experimental features that are not yet formally defined in the API
   // - field names are written in snake_case

@@ -5,6 +5,7 @@ package ttnpb
 var RxMetadataFieldPathsNested = []string{
 	"advanced",
 	"antenna_index",
+	"channel_index",
 	"channel_rssi",
 	"downlink_path_constraint",
 	"encrypted_fine_timestamp",
@@ -32,6 +33,7 @@ var RxMetadataFieldPathsNested = []string{
 var RxMetadataFieldPathsTopLevel = []string{
 	"advanced",
 	"antenna_index",
+	"channel_index",
 	"channel_rssi",
 	"downlink_path_constraint",
 	"encrypted_fine_timestamp",

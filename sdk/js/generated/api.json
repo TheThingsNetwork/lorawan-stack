@@ -16535,24 +16535,6 @@
               }
             },
             {
-              "name": "gateway_channel_index",
-              "description": "Index of the gateway channel that received the message.\nSet by Gateway Server.",
-              "label": "",
-              "type": "uint32",
-              "longType": "uint32",
-              "fullType": "uint32",
-              "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "uint32.lte",
-                    "value": 255
-                  }
-                ]
-              }
-            },
-            {
               "name": "device_channel_index",
               "description": "Index of the device channel that received the message.\nSet by Network Server.",
               "label": "",
@@ -16917,6 +16899,24 @@
               "fullType": "bytes",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "channel_index",
+              "description": "Index of the gateway channel that received the message.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 255
+                  }
+                ]
+              }
             },
             {
               "name": "advanced",

@@ -126,6 +126,15 @@ func (m *RxMetadata) ValidateFields(paths ...string) error {
 
 		case "uplink_token":
 			// no validation rules for UplinkToken
+		case "channel_index":
+
+			if m.GetChannelIndex() > 255 {
+				return RxMetadataValidationError{
+					field:  "channel_index",
+					reason: "value must be less than or equal to 255",
+				}
+			}
+
 		case "advanced":
 
 			if v, ok := interface{}(m.GetAdvanced()).(interface{ ValidateFields(...string) error }); ok {

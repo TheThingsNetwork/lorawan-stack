@@ -119,6 +119,7 @@ func metadata(rx RxPacket, gatewayID ttnpb.GatewayIdentifiers) []*ttnpb.RxMetada
 		{
 			GatewayIdentifiers: gatewayID,
 			AntennaIndex:       0,
+			ChannelIndex:       uint32(rx.Chan),
 			Timestamp:          rx.Tmst,
 			RSSI:               float32(rx.RSSI),
 			ChannelRSSI:        float32(rx.RSSI),
@@ -133,6 +134,7 @@ func fineTimestampMetadata(rx RxPacket, gatewayID ttnpb.GatewayIdentifiers) []*t
 		signalMetadata := &ttnpb.RxMetadata{
 			GatewayIdentifiers: gatewayID,
 			AntennaIndex:       uint32(signal.Ant),
+			ChannelIndex:       uint32(signal.Chan),
 			Timestamp:          rx.Tmst,
 			RSSI:               float32(signal.RSSIC),
 			ChannelRSSI:        float32(signal.RSSIC),
@@ -163,7 +165,6 @@ func fineTimestampMetadata(rx RxPacket, gatewayID ttnpb.GatewayIdentifiers) []*t
 
 func convertUplink(rx RxPacket, md UpstreamMetadata) (ttnpb.UplinkMessage, error) {
 	up := ttnpb.UplinkMessage{
-		GatewayChannelIndex: uint32(rx.Chan),
 		Settings: ttnpb.TxSettings{
 			Frequency: uint64(rx.Freq * 1000000),
 		},
@@ -175,7 +176,7 @@ func convertUplink(rx RxPacket, md UpstreamMetadata) (ttnpb.UplinkMessage, error
 	}
 	up.RawPayload = rawPayload
 
-	if rx.RSig != nil && len(rx.RSig) > 0 {
+	if len(rx.RSig) > 0 {
 		up.RxMetadata = fineTimestampMetadata(rx, md.ID)
 	} else {
 		up.RxMetadata = metadata(rx, md.ID)
@@ -283,7 +284,7 @@ func FromGatewayUp(up *ttnpb.GatewayUp) (rxs []*RxPacket, stat *Stat, ack *TxPac
 		}
 		rxs = append(rxs, &RxPacket{
 			Freq: float64(msg.Settings.Frequency) / 1000000,
-			Chan: uint8(msg.GatewayChannelIndex),
+			Chan: uint8(msg.RxMetadata[0].ChannelIndex),
 			Modu: modulation,
 			DatR: DataRate{msg.Settings.DataRate},
 			CodR: codr,

@@ -79,9 +79,7 @@ message UplinkMessage {
   // The Gateway Server and Network Server set this value to their local server time of reception.
   google.protobuf.Timestamp received_at = 6 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
   repeated string correlation_ids = 7 [(gogoproto.customname) = "CorrelationIDs", (validate.rules).repeated.items.string.max_len = 100];
-  // Index of the gateway channel that received the message.
-  // Set by Gateway Server.
-  uint32 gateway_channel_index = 8 [(validate.rules).uint32 = {lte: 255}];
+  reserved 8; // gateway_channel_index (obsolete).
   // Index of the device channel that received the message.
   // Set by Network Server.
   uint32 device_channel_index = 9 [(validate.rules).uint32 = {lte: 255}];

@@ -182,6 +182,16 @@ func (dst *RxMetadata) SetFields(src *RxMetadata, paths ...string) error {
 			} else {
 				dst.UplinkToken = nil
 			}
+		case "channel_index":
+			if len(subs) > 0 {
+				return fmt.Errorf("'channel_index' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ChannelIndex = src.ChannelIndex
+			} else {
+				var zero uint32
+				dst.ChannelIndex = zero
+			}
 		case "advanced":
 			if len(subs) > 0 {
 				return fmt.Errorf("'advanced' has no subfields, but %s were specified", subs)
