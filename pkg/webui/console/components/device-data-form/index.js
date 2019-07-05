@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React, { Component } from 'react'
-import { connect } from 'react-redux'
 import bind from 'autobind-decorator'
 
 import Form from '../../../components/form'
@@ -31,12 +30,6 @@ import PropTypes from '../../../lib/prop-types'
 import m from './messages'
 import validationSchema from './validation-schema'
 
-@connect(function ({ configuration }, props) {
-  return {
-    nsFrequencyPlans: configuration.nsFrequencyPlans,
-    frequencyPlanError: configuration.error,
-  }
-})
 @bind
 class DeviceDataForm extends Component {
   constructor (props) {
