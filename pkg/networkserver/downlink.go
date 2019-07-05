@@ -860,11 +860,10 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					}
 				}()
 
-				if dev.PendingMACState != nil {
-					if !dev.PendingMACState.RxWindowsAvailable || dev.PendingMACState.QueuedJoinAccept == nil {
-						logger.Debug("Pending MAC state is present, but Rx windows already answered, skip downlink slot")
-						return dev, nil, nil
-					}
+				if dev.PendingMACState != nil &&
+					dev.PendingMACState.PendingJoinRequest == nil &&
+					dev.PendingMACState.RxWindowsAvailable &&
+					dev.PendingMACState.QueuedJoinAccept != nil {
 
 					if len(dev.RecentUplinks) == 0 {
 						return nil, nil, errUplinkNotFound
