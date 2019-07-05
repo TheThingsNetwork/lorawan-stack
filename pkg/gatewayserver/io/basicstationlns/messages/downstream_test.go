@@ -60,7 +60,6 @@ func TestFromDownlinkMessage(t *testing.T) {
 				Rx1Freq:     868500000,
 				RCtx:        2,
 				Priority:    25,
-				XTime:       1552300787,
 				MuxTime:     1554300787.123456,
 			},
 		},
@@ -85,22 +84,21 @@ func TestFromDownlinkMessage(t *testing.T) {
 			GatewayIDs: ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"},
 			ExpectedDownlinkMessage: DownlinkMessage{
 				DevEUI:      "00-00-00-00-00-00-00-00",
-				DeviceClass: 1,
+				DeviceClass: 0,
 				Pdu:         "596d7868616d74686332356b4a334d3d3d",
 				RxDelay:     1,
 				Rx1DR:       2,
 				Rx1Freq:     869525000,
 				RCtx:        2,
 				Priority:    25,
-				GpsTime:     1554300787,
 				MuxTime:     1554300787.123456,
 			},
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			dnmsg := FromDownlinkMessage(tc.GatewayIDs, tc.DownlinkMessage, 0, time.Unix(1554300787, 123456000), 0x00)
-
+			dnmsg := FromDownlinkMessage(tc.GatewayIDs, tc.DownlinkMessage.GetRawPayload(), tc.DownlinkMessage.GetScheduled(), 0, time.Unix(1554300787, 123456000), 0x00)
+			dnmsg.XTime = 0
 			if !a.So(dnmsg, should.Resemble, tc.ExpectedDownlinkMessage) {
 				t.Fatalf("Invalid DownlinkMessage: %v", dnmsg)
 			}

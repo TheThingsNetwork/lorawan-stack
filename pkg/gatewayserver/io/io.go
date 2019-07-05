@@ -421,3 +421,8 @@ func (c *Connection) RTTStats() (min, max, median time.Duration, count int) {
 
 // FrequencyPlan returns the frequency plan for the gateway.
 func (c *Connection) FrequencyPlan() *frequencyplans.FrequencyPlan { return c.fp }
+
+// GetConcentratorTime wraps the connection clock's FromTimestampTime().
+func (c *Connection) GetConcentratorTime(timestamp uint32) scheduling.ConcentratorTime {
+	return c.scheduler.GetClock().FromTimestampTime(timestamp)
+}
