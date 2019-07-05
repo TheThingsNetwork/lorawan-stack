@@ -115,6 +115,7 @@ export default {
     create: ttnClient.Applications.Devices.create.bind(ttnClient.Applications.Devices),
     update: ttnClient.Applications.Devices.updateById.bind(ttnClient.Applications.Devices),
     eventsSubscribe: ttnClient.Applications.Devices.openStream.bind(ttnClient.Applications.Devices),
+    'delete': ttnClient.Applications.Devices.deleteById.bind(ttnClient.Applications.Devices),
   },
   gateways: {
     list: ttnClient.Gateways.getAll.bind(ttnClient.Gateways),
