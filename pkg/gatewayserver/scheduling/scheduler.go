@@ -311,3 +311,8 @@ func (s *Scheduler) Now() (ConcentratorTime, bool) {
 	}
 	return s.clock.FromServerTime(s.timeSource.Now()), true
 }
+
+// GetClock returns this scheduler's clock instance.
+func (s *Scheduler) GetClock() *RolloverClock {
+	return s.clock
+}

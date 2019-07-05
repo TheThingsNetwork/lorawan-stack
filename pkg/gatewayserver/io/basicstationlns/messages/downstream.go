@@ -54,10 +54,9 @@ func (dnmsg DownlinkMessage) MarshalJSON() ([]byte, error) {
 }
 
 // FromDownlinkMessage translates the ttnpb.DownlinkMessage to LNS DownlinkMessage "dnmsg".
-func FromDownlinkMessage(ids ttnpb.GatewayIdentifiers, down ttnpb.DownlinkMessage, dlToken int64, dlTime time.Time, latestXTime int64) DownlinkMessage {
+func FromDownlinkMessage(ids ttnpb.GatewayIdentifiers, rawPayload []byte, scheduledMsg *ttnpb.TxSettings, dlToken int64, dlTime time.Time, xTime int64) DownlinkMessage {
 	var dnmsg DownlinkMessage
-	scheduledMsg := down.GetScheduled()
-	dnmsg.Pdu = hex.EncodeToString(down.GetRawPayload())
+	dnmsg.Pdu = hex.EncodeToString(rawPayload)
 	dnmsg.RCtx = int64(scheduledMsg.Downlink.AntennaIndex)
 	dnmsg.Diid = dlToken
 
@@ -75,19 +74,11 @@ func FromDownlinkMessage(ids ttnpb.GatewayIdentifiers, down ttnpb.DownlinkMessag
 	// Add the MuxTime for RTT measurement
 	dnmsg.MuxTime = float64(dlTime.UnixNano()) / float64(time.Second)
 
-	// Always use the Basic Station ClassB mode for absolute time scheduling.
-	if scheduledMsg.Time != nil {
-		dnmsg.DeviceClass = uint(ttnpb.CLASS_B)
-		dnmsg.GpsTime = scheduledMsg.Time.Unix()
-		return dnmsg
-	}
-
+	// The GS controls the scheduling and hence for the gateway, its always Class A.
 	dnmsg.DeviceClass = uint(ttnpb.CLASS_A)
 
-	// Estimate the xtime based on the timestamp; xtime = timestamp - (rxdelay+1).
-	// The calculated offset is in microseconds.
-	offset := uint64(scheduledMsg.Timestamp - uint32(dnmsg.RxDelay*(1e6)))
-	dnmsg.XTime = int64(uint64(latestXTime)&0xFFFFFFFF00000000 | offset)
+	// Estimate the xtime based on the timestamp; xtime = timestamp - (rxdelay+1). The calculated offset is in microseconds.
+	dnmsg.XTime = xTime - int64(dnmsg.RxDelay*(1e6))
 	return dnmsg
 }
 
