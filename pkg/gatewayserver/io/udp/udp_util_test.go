@@ -63,7 +63,7 @@ func generatePushData(eui types.EUI64, status bool, timestamps ...time.Duration)
 		abs := encoding.CompactTime(time.Unix(0, 0).Add(t))
 		packet.Data.RxPacket[i] = &encoding.RxPacket{
 			Freq: float64(up.Settings.Frequency) / 1000000,
-			Chan: uint8(up.GatewayChannelIndex),
+			Chan: uint8(up.RxMetadata[0].ChannelIndex),
 			Modu: modulation,
 			CodR: codr,
 			DatR: encoding.DataRate{
