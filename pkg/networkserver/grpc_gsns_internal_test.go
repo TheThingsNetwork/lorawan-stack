@@ -158,7 +158,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 		}
 	}
 
-	makeUplink := func(pld *ttnpb.MACPayload, confirmed bool, fCnt, confFCnt uint32, txDRIdx ttnpb.DataRateIndex, txChIdx uint8, gtwChIdx uint32, sets ttnpb.TxSettings) *ttnpb.UplinkMessage {
+	makeUplink := func(pld *ttnpb.MACPayload, confirmed bool, fCnt, confFCnt uint32, txDRIdx ttnpb.DataRateIndex, txChIdx uint8, sets ttnpb.TxSettings) *ttnpb.UplinkMessage {
 		mType := ttnpb.MType_UNCONFIRMED_UP
 		if confirmed {
 			mType = ttnpb.MType_CONFIRMED_UP
@@ -176,13 +176,12 @@ func TestMatchAndHandleUplink(t *testing.T) {
 		rawPayload := MustAppendUplinkMIC(sNwkSIntKey, fNwkSIntKey, confFCnt, uint8(txDRIdx), txChIdx, pld.DevAddr, fCnt, test.Must(lorawan.MarshalMessage(msg)).([]byte)...)
 		msg.MIC = rawPayload[len(rawPayload)-4:]
 		return &ttnpb.UplinkMessage{
-			CorrelationIDs:      correlationIDs[:],
-			GatewayChannelIndex: gtwChIdx,
-			Payload:             &msg,
-			RawPayload:          rawPayload,
-			ReceivedAt:          start,
-			RxMetadata:          MakeRxMetadataSlice(),
-			Settings:            sets,
+			CorrelationIDs: correlationIDs[:],
+			Payload:        &msg,
+			RawPayload:     rawPayload,
+			ReceivedAt:     start,
+			RxMetadata:     MakeRxMetadataSlice(),
+			Settings:       sets,
 		}
 	}
 
@@ -252,7 +251,6 @@ func TestMatchAndHandleUplink(t *testing.T) {
 				12,
 				0,
 				ttnpb.DATA_RATE_2,
-				1,
 				1,
 				ttnpb.TxSettings{
 					DataRate: ttnpb.DataRate{
@@ -360,7 +358,6 @@ func TestMatchAndHandleUplink(t *testing.T) {
 				12,
 				0,
 				ttnpb.DATA_RATE_2,
-				1,
 				1,
 				ttnpb.TxSettings{
 					DataRate: ttnpb.DataRate{
@@ -476,7 +473,6 @@ func TestMatchAndHandleUplink(t *testing.T) {
 				0,
 				ttnpb.DATA_RATE_2,
 				1,
-				1,
 				ttnpb.TxSettings{
 					DataRate: ttnpb.DataRate{
 						Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
@@ -584,7 +580,6 @@ func TestMatchAndHandleUplink(t *testing.T) {
 				12,
 				0,
 				ttnpb.DATA_RATE_2,
-				1,
 				1,
 				ttnpb.TxSettings{
 					DataRate: ttnpb.DataRate{

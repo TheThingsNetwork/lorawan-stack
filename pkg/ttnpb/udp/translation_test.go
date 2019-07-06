@@ -20,6 +20,7 @@ import (
 	"testing"
 	"time"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/kr/pretty"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -30,6 +31,8 @@ import (
 )
 
 var ids = ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"}
+
+func timePtr(t time.Time) *time.Time { return &t }
 
 func TestStatusRaw(t *testing.T) {
 	a := assertions.New(t)
@@ -222,13 +225,14 @@ func TestToGatewayUpRawMultiAntenna(t *testing.T) {
 			"codr": "4/5",
 			"size": 24,
 			"data": "gM+AMQcAvgQBlohnlJqUGOJKTDuTscQD",
+			"aesk": 42,
 			"rsig": [{
 				"ant": 0,
 				"chan": 7,
-				"rssic": -95,
 				"lsnr": 14.0,
 				"etime": "42QMzOlYSSPMMeqVPrY0fQ==",
-				"rssis": -95,
+				"rssis": -92,
+				"rssic": -95,
 				"rssisd": 0,
 				"ftime": 1255738435,
 				"foff": -8898,
@@ -238,12 +242,12 @@ func TestToGatewayUpRawMultiAntenna(t *testing.T) {
 			}, {
 				"ant": 1,
 				"chan": 23,
-				"rssic": -88,
 				"lsnr": 14.0,
 				"etime": "djGiSzOC+gCT7vRPv7+Asw==",
 				"rssis": -88,
+				"rssic": -93,
 				"rssisd": 0,
-				"ftime": -1252538435,
+				"ftime": 1252538436,
 				"foff": -8898,
 				"ft2d": -187,
 				"rfbsb": 100,
@@ -255,8 +259,66 @@ func TestToGatewayUpRawMultiAntenna(t *testing.T) {
 	err := json.Unmarshal(rx, &rxData)
 	a.So(err, should.BeNil)
 
-	_, err = udp.ToGatewayUp(rxData, udp.UpstreamMetadata{ID: ids})
+	up, err := udp.ToGatewayUp(rxData, udp.UpstreamMetadata{ID: ids})
 	a.So(err, should.BeNil)
+	a.So(up, should.Resemble, &ttnpb.GatewayUp{
+		UplinkMessages: []*ttnpb.UplinkMessage{
+			{
+				RawPayload: []byte{0x80, 0xcf, 0x80, 0x31, 0x07, 0x00, 0xbe, 0x04, 0x01, 0x96, 0x88, 0x67, 0x94, 0x9a, 0x94, 0x18, 0xe2, 0x4a, 0x4c, 0x3b, 0x93, 0xb1, 0xc4, 0x03},
+				Settings: ttnpb.TxSettings{
+					DataRate: ttnpb.DataRate{
+						Modulation: &ttnpb.DataRate_LoRa{
+							LoRa: &ttnpb.LoRaDataRate{
+								SpreadingFactor: 7,
+								Bandwidth:       125000,
+							},
+						},
+					},
+					CodingRate: "4/5",
+					Frequency:  868500000,
+					Timestamp:  879148780,
+				},
+				RxMetadata: []*ttnpb.RxMetadata{
+					{
+						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+							GatewayID: "test-gateway",
+						},
+						AntennaIndex:                0,
+						ChannelIndex:                7,
+						Time:                        timePtr(time.Date(2017, 7, 4, 13, 51, 17, 997099000, time.UTC)),
+						Timestamp:                   879148780,
+						FineTimestamp:               1255738435,
+						EncryptedFineTimestamp:      []byte{0xe3, 0x64, 0x0c, 0xcc, 0xe9, 0x58, 0x49, 0x23, 0xcc, 0x31, 0xea, 0x95, 0x3e, 0xb6, 0x34, 0x7d},
+						EncryptedFineTimestampKeyID: "42",
+						RSSI:                        -95,
+						SignalRSSI:                  &pbtypes.FloatValue{Value: -92},
+						ChannelRSSI:                 -95,
+						RSSIStandardDeviation:       0,
+						SNR:                         14.0,
+						FrequencyOffset:             -8898,
+					},
+					{
+						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+							GatewayID: "test-gateway",
+						},
+						AntennaIndex:                1,
+						ChannelIndex:                23,
+						Time:                        timePtr(time.Date(2017, 7, 4, 13, 51, 17, 997099000, time.UTC)),
+						Timestamp:                   879148780,
+						FineTimestamp:               1252538436,
+						EncryptedFineTimestamp:      []byte{0x76, 0x31, 0xa2, 0x4b, 0x33, 0x82, 0xfa, 0x00, 0x93, 0xee, 0xf4, 0x4f, 0xbf, 0xbf, 0x80, 0xb3},
+						EncryptedFineTimestampKeyID: "42",
+						RSSI:                        -93,
+						SignalRSSI:                  &pbtypes.FloatValue{Value: -88},
+						ChannelRSSI:                 -93,
+						RSSIStandardDeviation:       0,
+						SNR:                         14.0,
+						FrequencyOffset:             -8898,
+					},
+				},
+			},
+		},
+	})
 }
 
 func TestFromDownlinkMessage(t *testing.T) {

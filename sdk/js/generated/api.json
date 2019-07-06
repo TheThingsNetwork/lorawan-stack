@@ -16535,24 +16535,6 @@
               }
             },
             {
-              "name": "gateway_channel_index",
-              "description": "Index of the gateway channel that received the message.\nSet by Gateway Server.",
-              "label": "",
-              "type": "uint32",
-              "longType": "uint32",
-              "fullType": "uint32",
-              "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "uint32.lte",
-                    "value": 255
-                  }
-                ]
-              }
-            },
-            {
               "name": "device_channel_index",
               "description": "Index of the device channel that received the message.\nSet by Network Server.",
               "label": "",
@@ -16822,7 +16804,7 @@
             },
             {
               "name": "rssi",
-              "description": "Received signal strength (dBm).",
+              "description": "Received signal strength indicator (dBm).\nThis value equals `channel_rssi`.",
               "label": "",
               "type": "float",
               "longType": "float",
@@ -16831,8 +16813,18 @@
               "defaultValue": ""
             },
             {
+              "name": "signal_rssi",
+              "description": "Received signal strength indicator of the signal (dBm).",
+              "label": "",
+              "type": "FloatValue",
+              "longType": "google.protobuf.FloatValue",
+              "fullType": "google.protobuf.FloatValue",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
               "name": "channel_rssi",
-              "description": "Received channel power (dBm).",
+              "description": "Received signal strength indicator of the channel (dBm).",
               "label": "",
               "type": "float",
               "longType": "float",
@@ -16842,7 +16834,7 @@
             },
             {
               "name": "rssi_standard_deviation",
-              "description": "Standard deviation of the RSSI.",
+              "description": "Standard deviation of the RSSI during preamble.",
               "label": "",
               "type": "float",
               "longType": "float",
@@ -16907,6 +16899,24 @@
               "fullType": "bytes",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "channel_index",
+              "description": "Index of the gateway channel that received the message.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 255
+                  }
+                ]
+              }
             },
             {
               "name": "advanced",

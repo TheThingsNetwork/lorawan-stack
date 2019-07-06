@@ -83,6 +83,18 @@ func (m *RxMetadata) ValidateFields(paths ...string) error {
 			// no validation rules for EncryptedFineTimestampKeyID
 		case "rssi":
 			// no validation rules for RSSI
+		case "signal_rssi":
+
+			if v, ok := interface{}(m.GetSignalRSSI()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return RxMetadataValidationError{
+						field:  "signal_rssi",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		case "channel_rssi":
 			// no validation rules for ChannelRSSI
 		case "rssi_standard_deviation":
@@ -114,6 +126,15 @@ func (m *RxMetadata) ValidateFields(paths ...string) error {
 
 		case "uplink_token":
 			// no validation rules for UplinkToken
+		case "channel_index":
+
+			if m.GetChannelIndex() > 255 {
+				return RxMetadataValidationError{
+					field:  "channel_index",
+					reason: "value must be less than or equal to 255",
+				}
+			}
+
 		case "advanced":
 
 			if v, ok := interface{}(m.GetAdvanced()).(interface{ ValidateFields(...string) error }); ok {

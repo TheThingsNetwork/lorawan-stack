@@ -123,15 +123,6 @@ func (m *UplinkMessage) ValidateFields(paths ...string) error {
 
 			}
 
-		case "gateway_channel_index":
-
-			if m.GetGatewayChannelIndex() > 255 {
-				return UplinkMessageValidationError{
-					field:  "gateway_channel_index",
-					reason: "value must be less than or equal to 255",
-				}
-			}
-
 		case "device_channel_index":
 
 			if m.GetDeviceChannelIndex() > 255 {

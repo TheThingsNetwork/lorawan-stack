@@ -9046,17 +9046,22 @@
         "rssi": {
           "type": "number",
           "format": "float",
-          "description": "Received signal strength (dBm)."
+          "description": "Received signal strength indicator (dBm).\nThis value equals `channel_rssi`."
+        },
+        "signal_rssi": {
+          "type": "number",
+          "format": "float",
+          "description": "Received signal strength indicator of the signal (dBm)."
         },
         "channel_rssi": {
           "type": "number",
           "format": "float",
-          "description": "Received channel power (dBm)."
+          "description": "Received signal strength indicator of the channel (dBm)."
         },
         "rssi_standard_deviation": {
           "type": "number",
           "format": "float",
-          "description": "Standard deviation of the RSSI."
+          "description": "Standard deviation of the RSSI during preamble."
         },
         "snr": {
           "type": "number",
@@ -9080,6 +9085,11 @@
           "type": "string",
           "format": "byte",
           "description": "Uplink token to be included in the Tx request in class A downlink; injected by gateway, Gateway Server or fNS."
+        },
+        "channel_index": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Index of the gateway channel that received the message."
         },
         "advanced": {
           "$ref": "#/definitions/protobufStruct",
@@ -9566,11 +9576,6 @@
           "items": {
             "type": "string"
           }
-        },
-        "gateway_channel_index": {
-          "type": "integer",
-          "format": "int64",
-          "description": "Index of the gateway channel that received the message.\nSet by Gateway Server."
         },
         "device_channel_index": {
           "type": "integer",

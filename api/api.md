@@ -4145,7 +4145,6 @@ Uplink message from the end device to the network
 | `rx_metadata` | [`RxMetadata`](#ttn.lorawan.v3.RxMetadata) | repeated |  |
 | `received_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Server time when a component received the message. The Gateway Server and Network Server set this value to their local server time of reception. |
 | `correlation_ids` | [`string`](#string) | repeated |  |
-| `gateway_channel_index` | [`uint32`](#uint32) |  | Index of the gateway channel that received the message. Set by Gateway Server. |
 | `device_channel_index` | [`uint32`](#uint32) |  | Index of the device channel that received the message. Set by Network Server. |
 
 #### Field Rules
@@ -4155,7 +4154,6 @@ Uplink message from the end device to the network
 | `settings` | <p>`message.required`: `true`</p> |
 | `rx_metadata` | <p>`repeated.min_items`: `1`</p> |
 | `correlation_ids` | <p>`repeated.items.string.max_len`: `100`</p> |
-| `gateway_channel_index` | <p>`uint32.lte`: `255`</p> |
 | `device_channel_index` | <p>`uint32.lte`: `255`</p> |
 
 ### <a name="ttn.lorawan.v3.PayloadFormatter">Enum `PayloadFormatter`</a>
@@ -4218,14 +4216,16 @@ a message corresponds to one RxMetadata.
 | `fine_timestamp` | [`uint64`](#uint64) |  | Gateway's internal fine timestamp when the Rx finished (nanoseconds). |
 | `encrypted_fine_timestamp` | [`bytes`](#bytes) |  | Encrypted gateway's internal fine timestamp when the Rx finished (nanoseconds). |
 | `encrypted_fine_timestamp_key_id` | [`string`](#string) |  |  |
-| `rssi` | [`float`](#float) |  | Received signal strength (dBm). |
-| `channel_rssi` | [`float`](#float) |  | Received channel power (dBm). |
-| `rssi_standard_deviation` | [`float`](#float) |  | Standard deviation of the RSSI. |
+| `rssi` | [`float`](#float) |  | Received signal strength indicator (dBm). This value equals `channel_rssi`. |
+| `signal_rssi` | [`google.protobuf.FloatValue`](#google.protobuf.FloatValue) |  | Received signal strength indicator of the signal (dBm). |
+| `channel_rssi` | [`float`](#float) |  | Received signal strength indicator of the channel (dBm). |
+| `rssi_standard_deviation` | [`float`](#float) |  | Standard deviation of the RSSI during preamble. |
 | `snr` | [`float`](#float) |  | Signal-to-noise ratio (dB). |
 | `frequency_offset` | [`int64`](#int64) |  | Frequency offset (Hz). |
 | `location` | [`Location`](#ttn.lorawan.v3.Location) |  | Antenna location; injected by the Gateway Server. |
 | `downlink_path_constraint` | [`DownlinkPathConstraint`](#ttn.lorawan.v3.DownlinkPathConstraint) |  | Gateway downlink path constraint; injected by the Gateway Server. |
 | `uplink_token` | [`bytes`](#bytes) |  | Uplink token to be included in the Tx request in class A downlink; injected by gateway, Gateway Server or fNS. |
+| `channel_index` | [`uint32`](#uint32) |  | Index of the gateway channel that received the message. |
 | `advanced` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  | Advanced metadata fields - can be used for advanced information or experimental features that are not yet formally defined in the API - field names are written in snake_case |
 
 #### Field Rules
@@ -4234,6 +4234,7 @@ a message corresponds to one RxMetadata.
 | ----- | ----------- |
 | `gateway_ids` | <p>`message.required`: `true`</p> |
 | `downlink_path_constraint` | <p>`enum.defined_only`: `true`</p> |
+| `channel_index` | <p>`uint32.lte`: `255`</p> |
 
 ### <a name="ttn.lorawan.v3.LocationSource">Enum `LocationSource`</a>
 

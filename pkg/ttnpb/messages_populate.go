@@ -46,7 +46,7 @@ func NewPopulatedUplinkMessageUplink(r randyLorawan, sNwkSIntKey, fNwkSIntKey ty
 		out.RxMetadata[i] = NewPopulatedRxMetadata(r, false)
 	}
 
-	msg := NewPopulatedMessageUplink(r, sNwkSIntKey, fNwkSIntKey, uint8(out.Settings.DataRateIndex), uint8(out.GatewayChannelIndex), confirmed)
+	msg := NewPopulatedMessageUplink(r, sNwkSIntKey, fNwkSIntKey, uint8(out.Settings.DataRateIndex), uint8(out.DeviceChannelIndex), confirmed)
 	out.Payload = msg
 	var err error
 	out.RawPayload, err = PopulatorConfig.LoRaWAN.AppendMessage(out.RawPayload, *msg)

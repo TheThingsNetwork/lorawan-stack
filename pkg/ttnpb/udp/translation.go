@@ -20,6 +20,7 @@ import (
 	"strings"
 	"time"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/gpstime"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/version"
@@ -118,8 +119,10 @@ func metadata(rx RxPacket, gatewayID ttnpb.GatewayIdentifiers) []*ttnpb.RxMetada
 		{
 			GatewayIdentifiers: gatewayID,
 			AntennaIndex:       0,
+			ChannelIndex:       uint32(rx.Chan),
 			Timestamp:          rx.Tmst,
 			RSSI:               float32(rx.RSSI),
+			ChannelRSSI:        float32(rx.RSSI),
 			SNR:                float32(rx.LSNR),
 		},
 	}
@@ -129,20 +132,31 @@ func fineTimestampMetadata(rx RxPacket, gatewayID ttnpb.GatewayIdentifiers) []*t
 	md := make([]*ttnpb.RxMetadata, 0)
 	for _, signal := range rx.RSig {
 		signalMetadata := &ttnpb.RxMetadata{
-			GatewayIdentifiers:    gatewayID,
-			AntennaIndex:          uint32(signal.Ant),
-			Timestamp:             rx.Tmst,
-			RSSI:                  float32(signal.RSSIS),
-			ChannelRSSI:           float32(signal.RSSIC),
-			RSSIStandardDeviation: float32(signal.RSSISD),
-			SNR:                   float32(signal.LSNR),
-			FrequencyOffset:       int64(signal.FOff),
+			GatewayIdentifiers: gatewayID,
+			AntennaIndex:       uint32(signal.Ant),
+			ChannelIndex:       uint32(signal.Chan),
+			Timestamp:          rx.Tmst,
+			RSSI:               float32(signal.RSSIC),
+			ChannelRSSI:        float32(signal.RSSIC),
+			SNR:                float32(signal.LSNR),
+			FrequencyOffset:    int64(signal.FOff),
+		}
+		if signal.RSSIS != nil {
+			signalMetadata.SignalRSSI = &pbtypes.FloatValue{
+				Value: float32(*signal.RSSIS),
+			}
+		}
+		if signal.RSSISD != nil {
+			signalMetadata.RSSIStandardDeviation = float32(*signal.RSSISD)
 		}
 		if signal.ETime != "" {
 			if etime, err := base64.RawStdEncoding.DecodeString(strings.TrimRight(signal.ETime, "=")); err == nil {
 				signalMetadata.EncryptedFineTimestampKeyID = strconv.Itoa(int(rx.Aesk))
 				signalMetadata.EncryptedFineTimestamp = etime
 			}
+		}
+		if signal.FTime != nil {
+			signalMetadata.FineTimestamp = uint64(*signal.FTime)
 		}
 		md = append(md, signalMetadata)
 	}
@@ -151,13 +165,9 @@ func fineTimestampMetadata(rx RxPacket, gatewayID ttnpb.GatewayIdentifiers) []*t
 
 func convertUplink(rx RxPacket, md UpstreamMetadata) (ttnpb.UplinkMessage, error) {
 	up := ttnpb.UplinkMessage{
-		GatewayChannelIndex: uint32(rx.Chan),
 		Settings: ttnpb.TxSettings{
 			Frequency: uint64(rx.Freq * 1000000),
 		},
-	}
-	up.Settings = ttnpb.TxSettings{
-		Frequency: uint64(rx.Freq * 1000000),
 	}
 
 	rawPayload, err := base64.RawStdEncoding.DecodeString(strings.TrimRight(rx.Data, "="))
@@ -166,7 +176,7 @@ func convertUplink(rx RxPacket, md UpstreamMetadata) (ttnpb.UplinkMessage, error
 	}
 	up.RawPayload = rawPayload
 
-	if rx.RSig != nil && len(rx.RSig) > 0 {
+	if len(rx.RSig) > 0 {
 		up.RxMetadata = fineTimestampMetadata(rx, md.ID)
 	} else {
 		up.RxMetadata = metadata(rx, md.ID)
@@ -179,10 +189,9 @@ func convertUplink(rx RxPacket, md UpstreamMetadata) (ttnpb.UplinkMessage, error
 
 	if rx.Time != nil {
 		goTime := time.Time(*rx.Time)
-		for mdIndex := range up.RxMetadata {
-			up.RxMetadata[mdIndex].Time = &goTime
+		for _, md := range up.RxMetadata {
+			md.Time = &goTime
 		}
-		up.RxMetadata[0].Time = &goTime
 	}
 
 	up.Settings.DataRate = rx.DatR.DataRate
@@ -275,7 +284,7 @@ func FromGatewayUp(up *ttnpb.GatewayUp) (rxs []*RxPacket, stat *Stat, ack *TxPac
 		}
 		rxs = append(rxs, &RxPacket{
 			Freq: float64(msg.Settings.Frequency) / 1000000,
-			Chan: uint8(msg.GatewayChannelIndex),
+			Chan: uint8(msg.RxMetadata[0].ChannelIndex),
 			Modu: modulation,
 			DatR: DataRate{msg.Settings.DataRate},
 			CodR: codr,

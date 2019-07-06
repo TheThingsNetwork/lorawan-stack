@@ -86,16 +86,6 @@ func (dst *UplinkMessage) SetFields(src *UplinkMessage, paths ...string) error {
 			} else {
 				dst.CorrelationIDs = nil
 			}
-		case "gateway_channel_index":
-			if len(subs) > 0 {
-				return fmt.Errorf("'gateway_channel_index' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.GatewayChannelIndex = src.GatewayChannelIndex
-			} else {
-				var zero uint32
-				dst.GatewayChannelIndex = zero
-			}
 		case "device_channel_index":
 			if len(subs) > 0 {
 				return fmt.Errorf("'device_channel_index' has no subfields, but %s were specified", subs)

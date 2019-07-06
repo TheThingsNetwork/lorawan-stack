@@ -5,7 +5,6 @@ package ttnpb
 var UplinkMessageFieldPathsNested = []string{
 	"correlation_ids",
 	"device_channel_index",
-	"gateway_channel_index",
 	"payload",
 	"payload.Payload",
 	"payload.Payload.join_accept_payload",
@@ -76,7 +75,6 @@ var UplinkMessageFieldPathsNested = []string{
 var UplinkMessageFieldPathsTopLevel = []string{
 	"correlation_ids",
 	"device_channel_index",
-	"gateway_channel_index",
 	"payload",
 	"raw_payload",
 	"received_at",
