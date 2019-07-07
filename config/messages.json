@@ -4562,6 +4562,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/networkserver:absolute_time": {
+    "translations": {
+      "en": "invalid absolute time set in application downlink"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/networkserver:application_downlink_too_long": {
     "translations": {
       "en": "application downlink payload is too long"
@@ -4760,6 +4769,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/networkserver:fixed_paths": {
+    "translations": {
+      "en": "invalid fixed paths set in application downlink"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/networkserver:invalid_f_nwk_s_int_key": {
     "translations": {
       "en": "invalid FNwkSIntKey"
@@ -4886,24 +4904,6 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/networkserver:schedule_too_late": {
-    "translations": {
-      "en": "downlink is scheduled too late"
-    },
-    "description": {
-      "package": "pkg/networkserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/networkserver:schedule_too_soon": {
-    "translations": {
-      "en": "downlink is scheduled too soon"
-    },
-    "description": {
-      "package": "pkg/networkserver",
-      "file": "errors.go"
-    }
-  },
   "error:pkg/networkserver:unknown_chanel": {
     "translations": {
       "en": "channel is unknown"
@@ -4961,15 +4961,6 @@
   "error:pkg/networkserver:uplink_channel_not_found": {
     "translations": {
       "en": "uplink channel not found"
-    },
-    "description": {
-      "package": "pkg/networkserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/networkserver:uplink_not_found": {
-    "translations": {
-      "en": "uplink not found"
     },
     "description": {
       "package": "pkg/networkserver",
