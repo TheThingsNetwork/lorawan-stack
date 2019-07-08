@@ -23,11 +23,10 @@ import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import DeviceDataForm from '../../components/device-data-form'
-
-import api from '../../api'
-
 import sharedMessages from '../../../lib/shared-messages'
-import errorMessages from '../../../lib/errors/error-messages'
+import { selectSelectedApplicationId } from '../../store/selectors/applications'
+import { getDeviceId } from '../../../lib/selectors/id'
+import api from '../../api'
 
 import style from './device-add.styl'
 
@@ -41,7 +40,15 @@ import style from './device-add.styl'
     />
   )
 })
-@connect()
+@connect(function (state) {
+  return {
+    device: state.device.device,
+    appId: selectSelectedApplicationId(state),
+  }
+}, dispatch => ({
+  redirectToList: (appId, deviceId) => dispatch(push(`/console/applications/${appId}/devices/${deviceId}`)),
+}),
+)
 @bind
 export default class DeviceAdd extends Component {
 
@@ -49,10 +56,9 @@ export default class DeviceAdd extends Component {
     error: '',
   }
 
-  async handleSubmit (values, { setSubmitting, resetForm }) {
-    const { match, dispatch } = this.props
-    const { appId } = match.params
-    const device = Object.assign({}, values)
+  async handleSubmit (values) {
+    const { appId } = this.props
+    const device = { ...values }
 
     // Clean values based on activation mode
     if (device.activation_mode === 'otaa') {
@@ -66,21 +72,17 @@ export default class DeviceAdd extends Component {
     }
     delete device.activation_mode
 
-    await this.setState({ error: '' })
-    try {
-      const result = await api.device.create(appId, device, {
-        abp: values.activation_mode === 'abp',
-        withRootKeys: true,
-      })
+    return api.device.create(appId, device, {
+      abp: values.activation_mode === 'abp',
+      withRootKeys: true,
+    })
+  }
 
-      const { ids: { device_id }} = result
-      dispatch(push(`/console/applications/${appId}/devices/${device_id}`))
-    } catch (error) {
-      resetForm(values)
-      const err = error instanceof Error ? errorMessages.genericError : error
+  handleSubmitSuccess (device) {
+    const { appId, redirectToList } = this.props
+    const deviceId = getDeviceId(device)
 
-      await this.setState({ error: err })
-    }
+    redirectToList(appId, deviceId)
   }
 
   render () {
@@ -97,6 +99,7 @@ export default class DeviceAdd extends Component {
             <DeviceDataForm
               error={error}
               onSubmit={this.handleSubmit}
+              onSubmitSuccess={this.handleSubmitSuccess}
             />
           </Col>
         </Row>
