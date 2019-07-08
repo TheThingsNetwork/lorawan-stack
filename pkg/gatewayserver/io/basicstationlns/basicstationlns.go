@@ -131,10 +131,9 @@ func (s *srv) handleDiscover(c echo.Context) error {
 }
 
 func (s *srv) handleTraffic(c echo.Context) error {
-	var latestUpstreamXTime int64
+	var sessionID int32
 	id := c.Param("id")
-	var auth string
-	auth = c.Request().Header.Get(echo.HeaderAuthorization)
+	auth := c.Request().Header.Get(echo.HeaderAuthorization)
 	ctx := c.Request().Context()
 	if auth != "" {
 		if !strings.Contains(auth, "Bearer") {
@@ -206,13 +205,10 @@ func (s *srv) handleTraffic(c echo.Context) error {
 			case down := <-conn.Down():
 				dlTime := time.Now()
 				scheduledMsg := down.GetScheduled()
-				latestXTime := atomic.LoadInt64(&latestUpstreamXTime)
-
-				// Convert to microseconds
-				concentratorTimeMs := conn.GetConcentratorTime(scheduledMsg.Timestamp) / 1000
 
 				// The first 16 bits of XTime gets the session ID from the upstream latestXTime and the other 48 bits are concentrator timestamp accounted for rollover.
-				xTime := int64(uint64(latestXTime)&0xFFFF000000000000 | uint64(concentratorTimeMs)&0x0000FFFFFFFFFFFF)
+				sID := atomic.LoadInt32(&sessionID)
+				xTime := int64(sID)<<48 | int64(conn.GetConcentratorTime(scheduledMsg.Timestamp))/int64(time.Microsecond)
 				dnmsg := messages.FromDownlinkMessage(ids, down.GetRawPayload(), scheduledMsg, int64(s.tokens.Next(down.CorrelationIDs, dlTime)), dlTime, xTime)
 				msg, err := dnmsg.MarshalJSON()
 				if err != nil {
@@ -294,7 +290,7 @@ func (s *srv) handleTraffic(c echo.Context) error {
 					logger.WithError(err).Warn("Failed to handle uplink message")
 				}
 				recordRTT(conn, receivedAt, jreq.RefTime)
-				atomic.StoreInt64(&latestUpstreamXTime, jreq.UpInfo.XTime)
+				atomic.StoreInt32(&sessionID, int32(jreq.UpInfo.XTime>>48))
 
 			case messages.TypeUpstreamUplinkDataFrame:
 				var updf messages.UplinkDataFrame
@@ -311,7 +307,7 @@ func (s *srv) handleTraffic(c echo.Context) error {
 					logger.WithError(err).Warn("Failed to handle uplink message")
 				}
 				recordRTT(conn, receivedAt, updf.RefTime)
-				atomic.StoreInt64(&latestUpstreamXTime, updf.UpInfo.XTime)
+				atomic.StoreInt32(&sessionID, int32(updf.UpInfo.XTime>>48))
 
 			case messages.TypeUpstreamTxConfirmation:
 				var txConf messages.TxConfirmation

@@ -27,9 +27,11 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
-var errDataRateIndex = errors.Define("data_rate_index", "data rate index is out of range")
-var errDataRate = errors.DefineNotFound("data_rate", "data rate not found")
-var errUID = errors.DefineInvalidArgument("uid", "invalid uid `{uid}`")
+var (
+	errDataRateIndex = errors.DefineInvalidArgument("data_rate_index", "data rate index is out of range")
+	errDataRate      = errors.DefineNotFound("data_rate", "data rate not found")
+	errUID           = errors.DefineInvalidArgument("uid", "invalid uid `{uid}`")
+)
 
 func getInt32AsByteSlice(value int32) ([]byte, error) {
 	b := new(bytes.Buffer)

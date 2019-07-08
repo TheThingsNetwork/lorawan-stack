@@ -77,7 +77,6 @@ func TestFromDownlinkMessage(t *testing.T) {
 						Downlink: &ttnpb.TxSettings_Downlink{
 							AntennaIndex: 2,
 						},
-						Time: timePtr(time.Unix(1554300787, 0)),
 					},
 				},
 			},
@@ -148,7 +147,6 @@ func TestToDownlinkMessage(t *testing.T) {
 				Rx1Freq:     869525000,
 				RCtx:        2,
 				Priority:    25,
-				GpsTime:     1554300787,
 			},
 			ExpectedDownlinkMessage: ttnpb.DownlinkMessage{
 				RawPayload: []byte("Ymxhamthc25kJ3M=="),
@@ -159,7 +157,6 @@ func TestToDownlinkMessage(t *testing.T) {
 						Downlink: &ttnpb.TxSettings_Downlink{
 							AntennaIndex: 2,
 						},
-						Time: timePtr(time.Unix(1554300787, 0)),
 					},
 				},
 			},

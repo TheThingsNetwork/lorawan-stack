@@ -36,7 +36,6 @@ type DownlinkMessage struct {
 	Rx1Freq     int     `json:"RX1Freq"`
 	Priority    int     `json:"priority"`
 	XTime       int64   `json:"xtime"`
-	GpsTime     int64   `json:"gpstime"`
 	RCtx        int64   `json:"rctx"`
 	MuxTime     float64 `json:"MuxTime"`
 }
@@ -77,19 +76,14 @@ func FromDownlinkMessage(ids ttnpb.GatewayIdentifiers, rawPayload []byte, schedu
 	// The GS controls the scheduling and hence for the gateway, its always Class A.
 	dnmsg.DeviceClass = uint(ttnpb.CLASS_A)
 
-	// Estimate the xtime based on the timestamp; xtime = timestamp - (rxdelay+1). The calculated offset is in microseconds.
-	dnmsg.XTime = xTime - int64(dnmsg.RxDelay*(1e6))
+	// Estimate the xtime based on the timestamp; xtime = timestamp - (rxdelay). The calculated offset is in microseconds.
+	dnmsg.XTime = xTime - int64(dnmsg.RxDelay*int(time.Second/time.Microsecond))
+
 	return dnmsg
 }
 
 // ToDownlinkMessage translates the LNS DownlinkMessage "dnmsg" to ttnpb.DownlinkMessage.
 func (dnmsg *DownlinkMessage) ToDownlinkMessage() ttnpb.DownlinkMessage {
-	// var dlMesg ttnpb.DownlinkMessage
-	var absTime *time.Time
-	if dnmsg.GpsTime != 0 {
-		val := time.Unix(dnmsg.GpsTime, 0)
-		absTime = &val
-	}
 	return ttnpb.DownlinkMessage{
 		RawPayload: []byte(dnmsg.Pdu),
 		Settings: &ttnpb.DownlinkMessage_Scheduled{
@@ -100,7 +94,6 @@ func (dnmsg *DownlinkMessage) ToDownlinkMessage() ttnpb.DownlinkMessage {
 					AntennaIndex: uint32(dnmsg.RCtx),
 				},
 				Timestamp: uint32(dnmsg.XTime),
-				Time:      absTime,
 			},
 		},
 	}
