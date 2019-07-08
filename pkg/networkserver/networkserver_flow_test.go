@@ -216,6 +216,10 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 	if !t.Run("join-request", func(t *testing.T) {
 		a := assertions.New(t)
 
+		ctx := test.ContextWithT(ctx, t)
+		ctx, cancel := context.WithCancel(ctx)
+		defer cancel()
+
 		uplink := &ttnpb.UplinkMessage{
 			RawPayload: []byte{
 				/* MHDR */
@@ -428,6 +432,10 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 
 	t.Run("uplink", func(t *testing.T) {
 		a := assertions.New(t)
+
+		ctx := test.ContextWithT(ctx, t)
+		ctx, cancel := context.WithCancel(ctx)
+		defer cancel()
 
 		uplinkFRMPayload := test.Must(crypto.EncryptUplink(appSKey, devAddr, 0, []byte("test"))).([]byte)
 		uplink := &ttnpb.UplinkMessage{
