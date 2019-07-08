@@ -103,9 +103,6 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 	authCh := make(chan test.ClusterAuthRequest)
 	getPeerCh := make(chan test.ClusterGetPeerRequest)
 
-	collectionDoneCh := make(chan WindowEndRequest)
-	deduplicationDoneCh := make(chan WindowEndRequest)
-
 	netID := test.Must(types.NewNetID(2, []byte{1, 2, 3})).(types.NetID)
 
 	appID := ttnpb.ApplicationIdentifiers{ApplicationID: "flow-test-app-id"}
@@ -138,9 +135,9 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 			DefaultMACSettings: MACSettingConfig{
 				DesiredRx1Delay: func(v ttnpb.RxDelay) *ttnpb.RxDelay { return &v }(ttnpb.RX_DELAY_6),
 			},
+			DeduplicationWindow: (1 << 2) * test.Delay,
+			CooldownWindow:      (1 << 3) * test.Delay,
 		},
-		WithCollectionDoneFunc(MakeWindowEndChFunc(collectionDoneCh)),
-		WithDeduplicationDoneFunc(MakeWindowEndChFunc(deduplicationDoneCh)),
 	)).(*NetworkServer)
 	ns.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 	test.Must(nil, ns.Start())
@@ -320,16 +317,6 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 			return
 		}
 
-		select {
-		case <-ctx.Done():
-			t.Error("Timed out while waiting for deduplication window to close")
-			return
-
-		case req := <-deduplicationDoneCh:
-			req.Response <- time.Now()
-			close(req.Response)
-		}
-
 		var asUp *ttnpb.ApplicationUp
 		var err error
 		if !a.So(test.WaitContext(ctx, func() {
@@ -372,16 +359,6 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 		}
 		if !a.So(err, should.BeNil) {
 			t.Errorf("Failed to send AS uplink response: %s", err)
-			return
-		}
-
-		select {
-		case req := <-collectionDoneCh:
-			req.Response <- time.Now()
-			close(req.Response)
-
-		case <-ctx.Done():
-			t.Error("Timed out while waiting for collection window to close")
 			return
 		}
 
@@ -506,16 +483,6 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 			close(handleUplinkErrCh)
 		}()
 
-		select {
-		case req := <-deduplicationDoneCh:
-			req.Response <- time.Now()
-			close(req.Response)
-
-		case <-ctx.Done():
-			t.Error("Timed out while waiting for deduplication window to close")
-			return
-		}
-
 		var asUp *ttnpb.ApplicationUp
 		var err error
 		if !a.So(test.WaitContext(ctx, func() {
@@ -568,16 +535,6 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 		}
 		if !a.So(err, should.BeNil) {
 			t.Errorf("Failed to send AS uplink response: %s", err)
-			return
-		}
-
-		select {
-		case req := <-collectionDoneCh:
-			req.Response <- time.Now()
-			close(req.Response)
-
-		case <-ctx.Done():
-			t.Error("Timed out while waiting for collection window to close")
 			return
 		}
 
