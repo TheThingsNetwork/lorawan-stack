@@ -21,7 +21,7 @@
     "babel": "^6.23.0",
     "babel-cli": "^6.26.0",
     "babel-preset-ttn": "^1.2.3",
-    "jest": "^23.5.0",
+    "jest": "^24.8.0",
     "jest-preset-ttn": "^0.0.3"
   },
   "babel": {
