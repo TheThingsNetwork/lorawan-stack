@@ -33,7 +33,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
-	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
@@ -861,7 +860,7 @@ func AssertLinkApplication(ctx context.Context, conn *grpc.ClientConn, getPeerCh
 	go func() {
 		link, err = ttnpb.NewAsNsClient(conn).LinkApplication(
 			(rpcmetadata.MD{
-				ID: unique.ID(ctx, appID),
+				ID: appID.ApplicationID,
 			}).ToOutgoingContext(ctx),
 			grpc.PerRPCCredentials(rpcmetadata.MD{
 				AuthType:      "Bearer",
