@@ -34,7 +34,7 @@ func (console *Console) freshToken(c echo.Context) (*oauth2.Token, error) {
 		Expiry:       value.Expiry,
 	}
 
-	freshToken, err := console.oauth.TokenSource(c.Request().Context(), token).Token()
+	freshToken, err := console.oauth(c).TokenSource(c.Request().Context(), token).Token()
 	if err != nil {
 		return nil, err
 	}

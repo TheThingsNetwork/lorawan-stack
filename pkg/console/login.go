@@ -36,5 +36,5 @@ func (console *Console) Login(c echo.Context) error {
 		return err
 	}
 
-	return c.Redirect(http.StatusFound, console.oauth.AuthCodeURL(state.Secret))
+	return c.Redirect(http.StatusFound, console.oauth(c).AuthCodeURL(state.Secret))
 }

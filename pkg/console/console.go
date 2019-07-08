@@ -15,6 +15,7 @@
 package console
 
 import (
+	"context"
 	"fmt"
 	"net/url"
 	"strings"
@@ -77,7 +78,6 @@ func (o OAuth) isZero() bool {
 type Console struct {
 	*component.Component
 	config Config
-	oauth  *oauth2.Config
 }
 
 // New returns a new Console.
@@ -95,20 +95,34 @@ func New(c *component.Component, config Config) (*Console, error) {
 		console.config.Mount = console.config.UI.MountPath()
 	}
 
-	console.oauth = &oauth2.Config{
-		ClientID:     console.config.OAuth.ClientID,
-		ClientSecret: console.config.OAuth.ClientSecret,
-		RedirectURL:  fmt.Sprintf("%s/oauth/callback", strings.TrimSuffix(console.config.UI.CanonicalURL, "/")),
-		Endpoint: oauth2.Endpoint{
-			TokenURL:  console.config.OAuth.TokenURL,
-			AuthURL:   console.config.OAuth.AuthorizeURL,
-			AuthStyle: oauth2.AuthStyleInParams,
-		},
-	}
-
 	c.RegisterWeb(console)
 
 	return console, nil
+}
+
+type ctxKeyType struct{}
+
+var ctxKey ctxKeyType
+
+func (console *Console) configFromContext(ctx context.Context) *Config {
+	if config, ok := ctx.Value(ctxKey).(*Config); ok {
+		return config
+	}
+	return &console.config
+}
+
+func (console *Console) oauth(c echo.Context) *oauth2.Config {
+	config := console.configFromContext(c.Request().Context())
+	return &oauth2.Config{
+		ClientID:     config.OAuth.ClientID,
+		ClientSecret: config.OAuth.ClientSecret,
+		RedirectURL:  fmt.Sprintf("%s/oauth/callback", strings.TrimSuffix(config.UI.CanonicalURL, "/")),
+		Endpoint: oauth2.Endpoint{
+			TokenURL:  config.OAuth.TokenURL,
+			AuthURL:   config.OAuth.AuthorizeURL,
+			AuthStyle: oauth2.AuthStyleInParams,
+		},
+	}
 }
 
 // path extracts the mounted location from the public Console URL.

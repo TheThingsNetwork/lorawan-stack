@@ -48,7 +48,7 @@ func (console *Console) Callback(c echo.Context) error {
 	}
 
 	// Exchange token.
-	token, err := console.oauth.Exchange(c.Request().Context(), code)
+	token, err := console.oauth(c).Exchange(c.Request().Context(), code)
 	if err != nil {
 		return err
 	}
@@ -65,5 +65,5 @@ func (console *Console) Callback(c echo.Context) error {
 		return err
 	}
 
-	return c.Redirect(http.StatusFound, console.config.UI.CanonicalURL+stateCookie.Next)
+	return c.Redirect(http.StatusFound, console.configFromContext(c.Request().Context()).UI.CanonicalURL+stateCookie.Next)
 }
