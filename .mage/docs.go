@@ -15,11 +15,12 @@
 package ttnmage
 
 import (
-	"github.com/magefile/mage/mg"
-	"github.com/magefile/mage/sh"
 	"io/ioutil"
 	"os"
 	"text/template"
+
+	"github.com/magefile/mage/mg"
+	"github.com/magefile/mage/sh"
 )
 
 type HugoConfig struct {

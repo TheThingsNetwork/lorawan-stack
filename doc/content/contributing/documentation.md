@@ -54,3 +54,7 @@ aliases:
 For developement you can make change to the `config.toml`.
 If you want to make permanent changes you need to edit `config.tmpl` and run `mage docs:config`
 then commit your changes.
+
+## Resources
+
+Leave images and others sources you are using in the same folder as your written file.
