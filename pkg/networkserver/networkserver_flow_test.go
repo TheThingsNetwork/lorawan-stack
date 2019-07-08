@@ -135,8 +135,8 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 			DefaultMACSettings: MACSettingConfig{
 				DesiredRx1Delay: func(v ttnpb.RxDelay) *ttnpb.RxDelay { return &v }(ttnpb.RX_DELAY_6),
 			},
-			DeduplicationWindow: (1 << 2) * test.Delay,
-			CooldownWindow:      (1 << 3) * test.Delay,
+			DeduplicationWindow: (1 << 3) * test.Delay,
+			CooldownWindow:      (1 << 4) * test.Delay,
 		},
 	)).(*NetworkServer)
 	ns.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
@@ -220,49 +220,73 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 		ctx, cancel := context.WithCancel(ctx)
 		defer cancel()
 
-		uplink := &ttnpb.UplinkMessage{
-			RawPayload: []byte{
-				/* MHDR */
-				0x00,
-				/* Join-request */
-				/** JoinEUI **/
-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x42,
-				/** DevEUI **/
-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x42, 0x42,
-				/** DevNonce **/
-				0x01, 0x00,
-				/* MIC */
-				0x03, 0x02, 0x01, 0x00,
-			},
-			Settings: ttnpb.TxSettings{
-				DataRate: ttnpb.DataRate{
-					Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
-						Bandwidth:       125000,
-						SpreadingFactor: 12,
-					}},
+		payload := []byte{
+			/* MHDR */
+			0x00,
+			/* Join-request */
+			/** JoinEUI **/
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x42,
+			/** DevEUI **/
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x42, 0x42,
+			/** DevNonce **/
+			0x01, 0x00,
+			/* MIC */
+			0x03, 0x02, 0x01, 0x00,
+		}
+
+		makeUplink := func(rxMetadata *ttnpb.RxMetadata, correlationIDs ...string) *ttnpb.UplinkMessage {
+			return &ttnpb.UplinkMessage{
+				RawPayload: payload,
+				Settings: ttnpb.TxSettings{
+					DataRate: ttnpb.DataRate{
+						Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+							Bandwidth:       125000,
+							SpreadingFactor: 12,
+						}},
+					},
+					Frequency: 868100000,
+					EnableCRC: true,
+					Timestamp: 42,
 				},
-				Frequency: 868100000,
-				EnableCRC: true,
-				Timestamp: 42,
-			},
-			RxMetadata: []*ttnpb.RxMetadata{
-				{
+				RxMetadata: []*ttnpb.RxMetadata{
+					rxMetadata,
+				},
+				ReceivedAt:     time.Now(),
+				CorrelationIDs: correlationIDs,
+			}
+		}
+
+		handleUplinkErrCh := make(chan error)
+		go func() {
+			_, err := gsns.HandleUplink(ctx, makeUplink(
+				&ttnpb.RxMetadata{
 					GatewayIdentifiers: ttnpb.GatewayIdentifiers{
 						GatewayID: "test-gtw-1",
 					},
-					UplinkToken: []byte("join-request-token"),
+					SNR:         -1,
+					UplinkToken: []byte("join-request-token-1"),
 				},
-			},
-			ReceivedAt:     time.Now(),
-			CorrelationIDs: []string{"GsNs-1", "GsNs-2"},
-		}
-		handleUplinkErrCh := make(chan error)
-		go func() {
-			_, err := gsns.HandleUplink(ctx, uplink)
+				"GsNs-1", "GsNs-2",
+			))
 			t.Logf("HandleUplink returned %v", err)
 			handleUplinkErrCh <- err
 			close(handleUplinkErrCh)
 		}()
+
+		defer time.AfterFunc((1<<2)*test.Delay, func() {
+			_, err := gsns.HandleUplink(ctx, makeUplink(
+				&ttnpb.RxMetadata{
+					GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+						GatewayID: "test-gtw-2",
+					},
+					SNR:         -2,
+					UplinkToken: []byte("join-request-token-2"),
+				},
+				"GsNs-1", "GsNs-3",
+			))
+			t.Logf("Duplicate HandleUplink returned %v", err)
+			handleUplinkErrCh <- err
+		}).Stop()
 
 		if !a.So(test.AssertClusterGetPeerRequest(ctx, getPeerCh,
 			func(ctx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) bool {
@@ -288,7 +312,7 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 				a.So(req.DevAddr.NwkID(), should.Resemble, netID.ID()) &&
 				a.So(req.DevAddr.NetIDType(), should.Equal, netID.Type()) &&
 				a.So(req, should.Resemble, &ttnpb.JoinRequest{
-					RawPayload:         uplink.RawPayload,
+					RawPayload:         payload,
 					DevAddr:            req.DevAddr,
 					SelectedMACVersion: ttnpb.MAC_V1_0_2,
 					NetID:              netID,
@@ -319,6 +343,18 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 		), should.BeTrue) {
 			t.Error("Join-request send assertion failed")
 			return
+		}
+
+		select {
+		case <-ctx.Done():
+			t.Error("Timed out while waiting for duplicate HandleUplink to return")
+			return
+
+		case err := <-handleUplinkErrCh:
+			if !a.So(err, should.BeNil) {
+				t.Errorf("Failed to handle duplicate uplink: %s", err)
+				return
+			}
 		}
 
 		var asUp *ttnpb.ApplicationUp
@@ -390,6 +426,18 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 			return
 		}
 
+		if !a.So(test.AssertClusterGetPeerRequest(ctx, getPeerCh,
+			func(ctx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) bool {
+				return a.So(role, should.Equal, ttnpb.PeerInfo_GATEWAY_SERVER) &&
+					a.So(ids, should.Resemble, ttnpb.GatewayIdentifiers{
+						GatewayID: "test-gtw-2",
+					})
+			},
+			gsPeer,
+		), should.BeTrue) {
+			return
+		}
+
 		a.So(AssertAuthNsGsScheduleDownlinkRequest(ctx, authCh, scheduleDownlinkCh,
 			func(ctx context.Context, msg *ttnpb.DownlinkMessage) bool {
 				return a.So(msg.CorrelationIDs, should.Contain, "GsNs-1") &&
@@ -403,7 +451,12 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 								DownlinkPaths: []*ttnpb.DownlinkPath{
 									{
 										Path: &ttnpb.DownlinkPath_UplinkToken{
-											UplinkToken: []byte("join-request-token"),
+											UplinkToken: []byte("join-request-token-1"),
+										},
+									},
+									{
+										Path: &ttnpb.DownlinkPath_UplinkToken{
+											UplinkToken: []byte("join-request-token-2"),
 										},
 									},
 								},
@@ -438,58 +491,85 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 		defer cancel()
 
 		uplinkFRMPayload := test.Must(crypto.EncryptUplink(appSKey, devAddr, 0, []byte("test"))).([]byte)
-		uplink := &ttnpb.UplinkMessage{
-			RawPayload: MustAppendLegacyUplinkMIC(
-				fNwkSIntKey,
-				devAddr,
-				0,
-				append([]byte{
-					/* MHDR */
-					0x40,
-					/* MACPayload */
-					/** FHDR **/
-					/*** DevAddr ***/
-					devAddr[3], devAddr[2], devAddr[1], devAddr[0],
-					/*** FCtrl ***/
-					0x80,
-					/*** FCnt ***/
-					0x00, 0x00,
-					/** FPort **/
-					0x42,
-				},
-					uplinkFRMPayload...,
-				)...,
-			),
-			Settings: ttnpb.TxSettings{
-				DataRate: ttnpb.DataRate{
-					Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
-						Bandwidth:       125000,
-						SpreadingFactor: 11,
-					}},
-				},
-				EnableCRC: true,
-				Frequency: 867100000,
-				Timestamp: 42,
-			},
-			RxMetadata: []*ttnpb.RxMetadata{
-				{
-					GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-						GatewayID: "test-gtw-2",
+
+		makeUplink := func(rxMetadata *ttnpb.RxMetadata, correlationIDs ...string) *ttnpb.UplinkMessage {
+			return &ttnpb.UplinkMessage{
+				RawPayload: MustAppendLegacyUplinkMIC(
+					fNwkSIntKey,
+					devAddr,
+					0,
+					append([]byte{
+						/* MHDR */
+						0x40,
+						/* MACPayload */
+						/** FHDR **/
+						/*** DevAddr ***/
+						devAddr[3], devAddr[2], devAddr[1], devAddr[0],
+						/*** FCtrl ***/
+						0x80,
+						/*** FCnt ***/
+						0x00, 0x00,
+						/** FPort **/
+						0x42,
 					},
-					UplinkToken: []byte("test-uplink-token"),
+						uplinkFRMPayload...,
+					)...,
+				),
+				Settings: ttnpb.TxSettings{
+					DataRate: ttnpb.DataRate{
+						Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+							Bandwidth:       125000,
+							SpreadingFactor: 11,
+						}},
+					},
+					EnableCRC: true,
+					Frequency: 867100000,
+					Timestamp: 42,
 				},
+				RxMetadata: []*ttnpb.RxMetadata{
+					rxMetadata,
+				},
+				ReceivedAt:     time.Now(),
+				CorrelationIDs: correlationIDs,
+			}
+		}
+
+		mds := [...]*ttnpb.RxMetadata{
+			{
+				GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+					GatewayID: "test-gtw-2",
+				},
+				SNR:         -3.42,
+				UplinkToken: []byte("test-uplink-token-2"),
 			},
-			ReceivedAt:     time.Now(),
-			CorrelationIDs: []string{"GsNs-1", "GsNs-2"},
+			{
+				GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+					GatewayID: "test-gtw-3",
+				},
+				SNR:         -2.3,
+				UplinkToken: []byte("test-uplink-token-3"),
+			},
 		}
 
 		handleUplinkErrCh := make(chan error)
 		go func() {
-			_, err := gsns.HandleUplink(ctx, uplink)
+			_, err := gsns.HandleUplink(ctx, makeUplink(
+				mds[0],
+				"GsNs-1", "GsNs-2",
+			))
 			t.Logf("HandleUplink returned %v", err)
 			handleUplinkErrCh <- err
 			close(handleUplinkErrCh)
 		}()
+
+		defer time.AfterFunc((1<<2)*test.Delay, func() {
+			_, err := gsns.HandleUplink(ctx, makeUplink(
+				mds[1],
+				"GsNs-1", "GsNs-3",
+			))
+			t.Logf("Duplicate HandleUplink returned %v", err)
+			handleUplinkErrCh <- err
+		}).Stop()
 
 		var asUp *ttnpb.ApplicationUp
 		var err error
@@ -503,6 +583,8 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 			t.Errorf("Failed to receive AS uplink: %s", err)
 			return
 		}
+
+		a.So(asUp.GetUplinkMessage().GetRxMetadata(), should.HaveSameElementsDeep, mds)
 		a.So(asUp.CorrelationIDs, should.Contain, "GsNs-1")
 		a.So(asUp.CorrelationIDs, should.Contain, "GsNs-2")
 		a.So(asUp.CorrelationIDs, should.HaveLength, 4)
@@ -519,7 +601,7 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 				SessionKeyID: []byte("session-key-id"),
 				FPort:        0x42,
 				FRMPayload:   uplinkFRMPayload,
-				RxMetadata:   uplink.RxMetadata,
+				RxMetadata:   mds[:],
 				Settings: ttnpb.TxSettings{
 					DataRate: ttnpb.DataRate{
 						Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
@@ -557,6 +639,16 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 			t.Error("Timed out while waiting for HandleUplink to return")
 			return
 		}
+
+		a.So(test.AssertClusterGetPeerRequest(ctx, getPeerCh,
+			func(ctx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) bool {
+				return a.So(role, should.Equal, ttnpb.PeerInfo_GATEWAY_SERVER) &&
+					a.So(ids, should.Resemble, ttnpb.GatewayIdentifiers{
+						GatewayID: "test-gtw-3",
+					})
+			},
+			gsPeer,
+		), should.BeTrue)
 
 		a.So(test.AssertClusterGetPeerRequest(ctx, getPeerCh,
 			func(ctx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) bool {
@@ -604,7 +696,12 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 								DownlinkPaths: []*ttnpb.DownlinkPath{
 									{
 										Path: &ttnpb.DownlinkPath_UplinkToken{
-											UplinkToken: []byte("test-uplink-token"),
+											UplinkToken: []byte("test-uplink-token-3"),
+										},
+									},
+									{
+										Path: &ttnpb.DownlinkPath_UplinkToken{
+											UplinkToken: []byte("test-uplink-token-2"),
 										},
 									},
 								},
