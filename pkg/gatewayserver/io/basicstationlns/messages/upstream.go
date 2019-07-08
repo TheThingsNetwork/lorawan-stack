@@ -185,6 +185,7 @@ func (req *JoinRequest) ToUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID str
 		Time:               rxTime,
 		Timestamp:          timestamp,
 		RSSI:               req.RadioMetaData.UpInfo.RSSI,
+		ChannelRSSI:        req.RadioMetaData.UpInfo.RSSI,
 		SNR:                req.RadioMetaData.UpInfo.SNR,
 		UplinkToken:        ulTokenBytes,
 	}
@@ -361,6 +362,7 @@ func (updf *UplinkDataFrame) ToUplinkMessage(ids ttnpb.GatewayIdentifiers, bandI
 		Time:               rxTime,
 		Timestamp:          timestamp,
 		RSSI:               updf.RadioMetaData.UpInfo.RSSI,
+		ChannelRSSI:        updf.RadioMetaData.UpInfo.RSSI,
 		SNR:                updf.RadioMetaData.UpInfo.SNR,
 		UplinkToken:        ulTokenBytes,
 	}
