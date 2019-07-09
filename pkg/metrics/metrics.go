@@ -23,7 +23,7 @@ import (
 )
 
 // Namespace for metrics.
-const Namespace = "ttn"
+const Namespace = "ttn_lw"
 
 // ContextLabelNames are the label names that can be retrieved from a context for XXXVec metrics.
 var ContextLabelNames []string
