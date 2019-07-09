@@ -89,6 +89,11 @@ var errAccountType = errors.DefineInvalidArgument(
 	"account of type `{account_type}` can not collaborate on `{entity_type}`",
 )
 
+var errMembershipNotFound = errors.DefineNotFound(
+	"membership_not_found",
+	"account `{account_id}` is not a member of `{entity_type}` `{entity_id}`",
+)
+
 func (s *membershipStore) SetMember(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityID ttnpb.Identifiers, rights *ttnpb.Rights) (err error) {
 	defer trace.StartRegion(ctx, "update membership").End()
 	account, err := s.findAccount(ctx, id)
@@ -128,6 +133,12 @@ func (s *membershipStore) SetMember(ctx context.Context, id *ttnpb.OrganizationO
 			EntityType: entityTypeForID(entityID),
 		}
 		membership.SetContext(ctx)
+	} else if gorm.IsRecordNotFoundError(err) {
+		return errMembershipNotFound.WithAttributes(
+			"account_id", id.IDString(),
+			"entity_type", entityID.EntityType(),
+			"entity_id", entityID.IDString(),
+		)
 	} else {
 		return err
 	}
