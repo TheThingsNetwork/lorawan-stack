@@ -93,8 +93,7 @@ func TestAuthentication(t *testing.T) {
 					client.Disconnect(uint(timeout / time.Millisecond))
 				}
 			} else {
-				a.So(ok, should.BeTrue)
-				a.So(token.Error(), should.NotBeNil)
+				a.So(ok, should.BeFalse)
 			}
 		})
 	}
@@ -120,7 +119,11 @@ func TestTraffic(t *testing.T) {
 	clientOpts.SetUsername(registeredGatewayUID)
 	clientOpts.SetPassword(registeredGatewayKey)
 	client := mqtt.NewClient(clientOpts)
-	client.Connect()
+	if token := client.Connect(); !a.So(token.WaitTimeout(timeout), should.BeTrue) {
+		t.FailNow()
+	} else if !a.So(token.Error(), should.BeNil) {
+		t.FailNow()
+	}
 
 	var conn *io.Connection
 	select {

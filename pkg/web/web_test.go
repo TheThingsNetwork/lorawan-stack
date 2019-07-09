@@ -108,10 +108,11 @@ func TestRootGroup(t *testing.T) {
 		t.Fatal("Could not create a web instance")
 	}
 
-	s.RootGroup("/sub")
+	s.RootGroup("/sub").GET("/some", handler)
 	a.So(s.server, should.NotHaveRoute, "GET", "/")
+	a.So(s.server, should.NotHaveRoute, "GET", "/sub")
+	a.So(s.server, should.HaveRoute, "GET", "/sub/some")
 	a.So(s.server, should.NotHaveRoute, "GET", "/sub/another")
-	a.So(s.server, should.HaveRoute, "GET", "/sub")
 }
 
 func TestStatic(t *testing.T) {

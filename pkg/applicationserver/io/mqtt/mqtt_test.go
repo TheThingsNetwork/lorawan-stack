@@ -115,8 +115,7 @@ func TestAuthentication(t *testing.T) {
 					client.Disconnect(uint(timeout / time.Millisecond))
 				}
 			} else {
-				a.So(ok, should.BeTrue)
-				a.So(token.Error(), should.NotBeNil)
+				a.So(ok, should.BeFalse)
 			}
 		})
 	}
@@ -160,7 +159,11 @@ func TestTraffic(t *testing.T) {
 	clientOpts.SetUsername(registeredApplicationUID)
 	clientOpts.SetPassword(registeredApplicationKey)
 	client := mqtt.NewClient(clientOpts)
-	client.Connect()
+	if token := client.Connect(); !a.So(token.WaitTimeout(timeout), should.BeTrue) {
+		t.FailNow()
+	} else if !a.So(token.Error(), should.BeNil) {
+		t.FailNow()
+	}
 
 	var sub *io.Subscription
 	select {
@@ -229,10 +232,14 @@ func TestTraffic(t *testing.T) {
 				}
 				if token := client.Subscribe(tc.Topic, 1, handler); !a.So(token.WaitTimeout(timeout), should.BeTrue) {
 					t.FailNow()
+				} else if !a.So(token.Error(), should.BeNil) {
+					t.FailNow()
 				}
 				defer func() {
 					token := client.Unsubscribe(tc.Topic)
 					if !a.So(token.WaitTimeout(timeout), should.BeTrue) {
+						t.FailNow()
+					} else if !a.So(token.Error(), should.BeNil) {
 						t.FailNow()
 					}
 				}()
