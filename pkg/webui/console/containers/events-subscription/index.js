@@ -40,11 +40,13 @@ const mapConnectionStatusToWidget = function (status) {
     id,
     eventsSelector,
     statusSelector,
+    errorSelector,
   } = props
 
   return {
     events: eventsSelector(state, id),
     connectionStatus: statusSelector(state, id),
+    error: errorSelector(state, id),
   }
 })
 class EventsSubscription extends React.Component {
@@ -56,6 +58,7 @@ class EventsSubscription extends React.Component {
       connectionStatus,
       onClear,
       toAllUrl,
+      error,
     } = this.props
 
     if (widget) {
@@ -65,6 +68,7 @@ class EventsSubscription extends React.Component {
           events={events}
           connectionStatus={mapConnectionStatusToWidget(connectionStatus)}
           toAllUrl={toAllUrl}
+          error={error}
         />
       )
     }
@@ -74,6 +78,7 @@ class EventsSubscription extends React.Component {
         emitterId={id}
         events={events}
         onClear={onClear}
+        error={error}
       />
     )
   }
@@ -83,6 +88,7 @@ EventsSubscription.propTypes = {
   id: PropTypes.string.isRequired,
   eventsSelector: PropTypes.func.isRequired,
   statusSelector: PropTypes.func,
+  errorSelector: PropTypes.func,
   onClear: PropTypes.func,
   widget: PropTypes.bool,
   toAllUrl: PropTypes.string,
@@ -92,6 +98,7 @@ EventsSubscription.defaultProps = {
   widget: false,
   onClear: () => null,
   statusSelector: () => 'unknown',
+  errorSelector: () => undefined,
   toAllUrl: null,
 }
 

@@ -26,6 +26,7 @@ import {
 import {
   selectGatewayEvents,
   selectGatewayEventsStatus,
+  selectGatewayEventsError,
 } from '../../store/selectors/gateways'
 
 @bind
@@ -43,6 +44,7 @@ class GatewayEvents extends React.Component {
         widget={widget}
         eventsSelector={selectGatewayEvents}
         statusSelector={selectGatewayEventsStatus}
+        errorSelector={selectGatewayEventsError}
         onClear={onClear}
         toAllUrl={`/console/gateways/${gtwId}/data`}
       />
