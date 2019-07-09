@@ -19,7 +19,7 @@ import (
 	"net"
 	"runtime/pprof"
 
-	"github.com/grpc-ecosystem/go-grpc-prometheus"
+	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/stats"
@@ -61,7 +61,7 @@ var gRPCStats = statsHandler{
 			Name:      "client_conns_opened_total",
 			Help:      "Opened client connections",
 		},
-		[]string{"server_address"},
+		[]string{"remote_address"},
 	),
 	closedClientConns: NewContextualCounterVec(
 		prometheus.CounterOpts{
@@ -69,7 +69,7 @@ var gRPCStats = statsHandler{
 			Name:      "client_conns_closed_total",
 			Help:      "Closed client connections",
 		},
-		[]string{"server_address"},
+		[]string{"remote_address"},
 	),
 	openedServerConns: NewContextualCounterVec(
 		prometheus.CounterOpts{
@@ -77,7 +77,7 @@ var gRPCStats = statsHandler{
 			Name:      "server_conns_opened_total",
 			Help:      "Opened server connections",
 		},
-		[]string{"server_address"},
+		[]string{"remote_address"},
 	),
 	closedServerConns: NewContextualCounterVec(
 		prometheus.CounterOpts{
@@ -85,7 +85,7 @@ var gRPCStats = statsHandler{
 			Name:      "server_conns_closed_total",
 			Help:      "Closed server connections",
 		},
-		[]string{"server_address"},
+		[]string{"remote_address"},
 	),
 }
 
