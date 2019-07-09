@@ -57,6 +57,7 @@ func Write(w io.Writer, format string, data interface{}) (err error) {
 		if err != nil {
 			return err
 		}
+		sep = []byte("\n")
 		writeItem = func(v interface{}) error {
 			return tmpl.Execute(w, v)
 		}
