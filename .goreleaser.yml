@@ -7,7 +7,8 @@ release:
   prerelease: auto
 
 builds:
-  - main: ./cmd/ttn-lw-stack
+  - id: stack
+    main: ./cmd/ttn-lw-stack
     binary: ttn-lw-stack
     ldflags:
     - -s
@@ -30,7 +31,8 @@ builds:
       - 6
       - 7
 
-  - main: ./cmd/ttn-lw-cli
+  - id: cli
+    main: ./cmd/ttn-lw-cli
     binary: ttn-lw-cli
     ldflags:
     - -s
