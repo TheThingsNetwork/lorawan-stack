@@ -375,7 +375,7 @@ hardware_versions:
 							chs.downErr <- err
 							continue
 						}
-						token := client.Publish(fmt.Sprintf(topicFmt, req.ApplicationID, req.DeviceID), 1, false, buf)
+						token := client.Publish(fmt.Sprintf(topicFmt, unique.ID(ctx, req.ApplicationIdentifiers), req.DeviceID), 1, false, buf)
 						token.Wait()
 						chs.downErr <- token.Error()
 					}
