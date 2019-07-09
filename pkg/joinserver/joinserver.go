@@ -242,20 +242,15 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		"dev_eui", pld.DevEUI,
 	))
 
-	match := false
+	var match bool
 	for _, p := range js.euiPrefixes {
 		if p.Matches(pld.JoinEUI) {
 			match = true
 			break
 		}
 	}
-	switch {
-	case !match && req.SelectedMACVersion.Compare(ttnpb.MAC_V1_1) < 0:
-		return nil, errUnknownAppEUI
-	case !match:
-		// TODO: Determine the cluster containing the device.
-		// https://github.com/TheThingsNetwork/lorawan-stack/issues/4
-		return nil, errForwardJoinRequest
+	if !match {
+		return nil, errUnknownJoinEUI
 	}
 
 	var handled bool
