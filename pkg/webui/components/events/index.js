@@ -18,6 +18,7 @@ import classnames from 'classnames'
 import { defineMessages } from 'react-intl'
 
 import Button from '../button'
+import Notification from '../notification'
 import Message from '../../lib/components/message'
 import List from '../list'
 import Icon from '../icon'
@@ -110,8 +111,13 @@ class Events extends React.Component {
       onClear,
       emitterId,
       limit,
+      error,
     } = this.props
     const { paused } = this.state
+
+    if (error) {
+      return <Notification title={sharedMessages.eventsCannotShow} error={error} />
+    }
 
     let limitedEvents = events
     const truncated = events.length > limit
