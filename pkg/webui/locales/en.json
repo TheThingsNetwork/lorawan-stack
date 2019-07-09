@@ -209,6 +209,7 @@
   "lib.shared-messages.email": "Email",
   "lib.shared-messages.enabled": "Enabled",
   "lib.shared-messages.entityId": "Entity ID",
+  "lib.shared-messages.eventsCannotShow": "Cannot show events",
   "lib.shared-messages.firmwareVersion": "Firmware Version",
   "lib.shared-messages.frequencyPlan": "Frequency Plan",
   "lib.shared-messages.fwdNtwkKey": "FNwkSIntKey",
