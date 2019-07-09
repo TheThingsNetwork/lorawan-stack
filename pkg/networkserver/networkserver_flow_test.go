@@ -135,8 +135,8 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 			DefaultMACSettings: MACSettingConfig{
 				DesiredRx1Delay: func(v ttnpb.RxDelay) *ttnpb.RxDelay { return &v }(ttnpb.RX_DELAY_6),
 			},
-			DeduplicationWindow: (1 << 3) * test.Delay,
-			CooldownWindow:      (1 << 4) * test.Delay,
+			DeduplicationWindow: (1 << 5) * test.Delay,
+			CooldownWindow:      (1 << 6) * test.Delay,
 		},
 	)).(*NetworkServer)
 	ns.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
@@ -273,7 +273,7 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 			close(handleUplinkErrCh)
 		}()
 
-		defer time.AfterFunc((1<<2)*test.Delay, func() {
+		defer time.AfterFunc((1<<3)*test.Delay, func() {
 			_, err := gsns.HandleUplink(ctx, makeUplink(
 				&ttnpb.RxMetadata{
 					GatewayIdentifiers: ttnpb.GatewayIdentifiers{
@@ -562,7 +562,7 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 			close(handleUplinkErrCh)
 		}()
 
-		defer time.AfterFunc((1<<2)*test.Delay, func() {
+		defer time.AfterFunc((1<<3)*test.Delay, func() {
 			_, err := gsns.HandleUplink(ctx, makeUplink(
 				mds[1],
 				"GsNs-1", "GsNs-3",
