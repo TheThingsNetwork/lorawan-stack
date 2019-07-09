@@ -57,15 +57,22 @@ const createRequestLogic = function (
   return createLogic({
     ...options,
     async process (deps, dispatch, done) {
-      const { meta: { _reject, _resolve }} = deps.action
+      const { meta: { _resolve }} = deps.action
+      let res, resultAction
+
       try {
-        const res = await options.process(deps, dispatch)
-        dispatch(successAction(res))
-        _resolve(res)
-      } catch (e) {
-        dispatch(failAction(e))
-        _reject(e)
+        res = await options.process(deps, dispatch)
+        resultAction = successAction(res)
+      } catch (error) {
+        resultAction = failAction(error)
       }
+
+      dispatch(resultAction)
+
+      // Resolve the promise also on failure actions, as the dispatch and logic
+      // operated correctly. We never want to reject the promise, as doing so
+      // could lead to unwanted unresolved promise rejections when dispatching.
+      _resolve(resultAction)
 
       done()
     },
