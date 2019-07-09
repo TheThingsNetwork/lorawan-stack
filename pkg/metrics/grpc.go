@@ -55,7 +55,7 @@ var (
 )
 
 var gRPCStats = statsHandler{
-	openedClientConns: NewContextualCounterVec(
+	openedClientConns: prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: "grpc",
 			Name:      "client_conns_opened_total",
@@ -63,7 +63,7 @@ var gRPCStats = statsHandler{
 		},
 		[]string{"remote_address"},
 	),
-	closedClientConns: NewContextualCounterVec(
+	closedClientConns: prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: "grpc",
 			Name:      "client_conns_closed_total",
@@ -71,21 +71,19 @@ var gRPCStats = statsHandler{
 		},
 		[]string{"remote_address"},
 	),
-	openedServerConns: NewContextualCounterVec(
+	openedServerConns: prometheus.NewCounter(
 		prometheus.CounterOpts{
 			Subsystem: "grpc",
 			Name:      "server_conns_opened_total",
 			Help:      "Opened server connections",
 		},
-		[]string{"remote_address"},
 	),
-	closedServerConns: NewContextualCounterVec(
+	closedServerConns: prometheus.NewCounter(
 		prometheus.CounterOpts{
 			Subsystem: "grpc",
 			Name:      "server_conns_closed_total",
 			Help:      "Closed server connections",
 		},
-		[]string{"remote_address"},
 	),
 }
 
@@ -97,10 +95,10 @@ func init() {
 }
 
 type statsHandler struct {
-	openedClientConns *ContextualCounterVec
-	openedServerConns *ContextualCounterVec
-	closedClientConns *ContextualCounterVec
-	closedServerConns *ContextualCounterVec
+	openedClientConns *prometheus.CounterVec
+	openedServerConns prometheus.Counter
+	closedClientConns *prometheus.CounterVec
+	closedServerConns prometheus.Counter
 }
 
 func (hdl statsHandler) Describe(ch chan<- *prometheus.Desc) {
@@ -139,15 +137,15 @@ func (hdl statsHandler) HandleConn(ctx context.Context, s stats.ConnStats) {
 	switch s.(type) {
 	case *stats.ConnBegin:
 		if s.IsClient() {
-			hdl.openedClientConns.WithLabelValues(ctx, peer).Inc()
+			hdl.openedClientConns.WithLabelValues(peer).Inc()
 		} else {
-			hdl.openedServerConns.WithLabelValues(ctx, peer).Inc()
+			hdl.openedServerConns.Inc()
 		}
 	case *stats.ConnEnd:
 		if s.IsClient() {
-			hdl.closedClientConns.WithLabelValues(ctx, peer).Inc()
+			hdl.closedClientConns.WithLabelValues(peer).Inc()
 		} else {
-			hdl.closedServerConns.WithLabelValues(ctx, peer).Inc()
+			hdl.closedServerConns.Inc()
 		}
 	}
 }
