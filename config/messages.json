@@ -3266,6 +3266,15 @@
       "file": "invitation_store.go"
     }
   },
+  "error:pkg/identityserver/store:membership_not_found": {
+    "translations": {
+      "en": "account `{account_id}` is not a member of `{entity_type}` `{entity_id}`"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "membership_store.go"
+    }
+  },
   "error:pkg/identityserver/store:multiple_application_ids": {
     "translations": {
       "en": "can not list devices for multiple application IDs"
