@@ -23,16 +23,20 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/component"
+	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
 	. "go.thethings.network/lorawan-stack/pkg/gatewayserver/io/grpc"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/mock"
 	"go.thethings.network/lorawan-stack/pkg/log"
+	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
+	"google.golang.org/grpc"
 )
 
 var (
@@ -40,17 +44,39 @@ var (
 	registeredGatewayUID = unique.ID(test.Context(), registeredGatewayID)
 	registeredGatewayKey = "test-key"
 
-	timeout = 10 * test.Delay
+	timeout = (1 << 4) * test.Delay
 )
 
 func TestAuthentication(t *testing.T) {
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
-	ctx = newContextWithRightsFetcher(ctx)
+	ctx, cancelCtx := context.WithCancel(ctx)
+	defer cancelCtx()
 
-	gs := mock.NewServer()
+	is, isAddr := startMockIS(ctx)
+	is.add(ctx, registeredGatewayID, registeredGatewayKey)
+
+	c := component.MustNew(test.GetLogger(t), &component.Config{
+		ServiceBase: config.ServiceBase{
+			GRPC: config.GRPC{
+				Listen:                      ":0",
+				AllowInsecureForCredentials: true,
+			},
+			Cluster: config.Cluster{
+				IdentityServer: isAddr,
+			},
+		},
+	})
+	gs := mock.NewServer(c)
 	srv := New(gs)
+	c.RegisterGRPC(&mockRegisterer{ctx, srv})
+	test.Must(nil, c.Start())
+	defer c.Close()
 
 	eui := types.EUI64{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01}
+
+	mustHavePeer(ctx, c, ttnpb.PeerInfo_ENTITY_REGISTRY)
+
+	client := ttnpb.NewGtwGsClient(c.LoopbackConn())
 
 	for _, tc := range []struct {
 		ID  ttnpb.GatewayIdentifiers
@@ -81,76 +107,97 @@ func TestAuthentication(t *testing.T) {
 		t.Run(fmt.Sprintf("%v:%v", tc.ID.GatewayID, tc.Key), func(t *testing.T) {
 			a := assertions.New(t)
 
-			ctx, cancelCtx := context.WithCancel(ctx)
-			stream := &mockGtwGsLinkServerStream{
-				MockServerStream: &test.MockServerStream{
-					MockStream: &test.MockStream{
-						ContextFunc: contextWithKey(ctx, tc.ID, tc.Key),
-					},
-				},
-				RecvFunc: func() (*ttnpb.GatewayUp, error) {
-					<-ctx.Done()
-					return nil, ctx.Err()
-				},
-			}
+			ctx, cancel := context.WithTimeout(ctx, timeout)
+			defer cancel()
+
+			ctx = rpcmetadata.MD{
+				ID: tc.ID.GatewayID,
+			}.ToOutgoingContext(ctx)
+			creds := grpc.PerRPCCredentials(rpcmetadata.MD{
+				AuthType:      "Bearer",
+				AuthValue:     tc.Key,
+				AllowInsecure: true,
+			})
 
 			wg := sync.WaitGroup{}
 			wg.Add(1)
 			go func() {
-				err := srv.LinkGateway(stream)
-				if tc.OK && !a.So(errors.IsCanceled(err), should.BeTrue) {
+				defer wg.Done()
+				_, err := client.LinkGateway(ctx, creds)
+				if tc.OK && err != nil && !a.So(errors.IsCanceled(err), should.BeTrue) {
 					t.Fatalf("Unexpected link error: %v", err)
 				}
 				if !tc.OK && !a.So(errors.IsCanceled(err), should.BeFalse) {
 					t.FailNow()
 				}
-				wg.Done()
 			}()
 
-			cancelCtx()
 			wg.Wait()
 		})
 	}
 }
 
+type erroredGatewayDown struct {
+	*ttnpb.GatewayDown
+	error
+}
+
 func TestTraffic(t *testing.T) {
-	a := assertions.New(t)
-
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
-	ctx = newContextWithRightsFetcher(ctx)
 	ctx, cancelCtx := context.WithCancel(ctx)
+	defer cancelCtx()
 
-	gs := mock.NewServer()
-	srv := New(gs)
+	is, isAddr := startMockIS(ctx)
+	is.add(ctx, registeredGatewayID, registeredGatewayKey)
 
-	upCh := make(chan *ttnpb.GatewayUp)
-	downCh := make(chan *ttnpb.DownlinkMessage)
-
-	stream := &mockGtwGsLinkServerStream{
-		MockServerStream: &test.MockServerStream{
-			MockStream: &test.MockStream{
-				ContextFunc: contextWithKey(ctx, registeredGatewayID, registeredGatewayKey),
+	c := component.MustNew(test.GetLogger(t), &component.Config{
+		ServiceBase: config.ServiceBase{
+			GRPC: config.GRPC{
+				Listen:                      ":0",
+				AllowInsecureForCredentials: true,
+			},
+			Cluster: config.Cluster{
+				IdentityServer: isAddr,
 			},
 		},
-		RecvFunc: func() (*ttnpb.GatewayUp, error) {
-			select {
-			case <-ctx.Done():
-				return nil, ctx.Err()
-			case msg := <-upCh:
-				return msg, nil
-			}
-		},
-		SendFunc: func(msg *ttnpb.GatewayDown) error {
-			downCh <- msg.DownlinkMessage
-			return nil
-		},
-	}
+	})
+	gs := mock.NewServer(c)
+	srv := New(gs)
+	c.RegisterGRPC(&mockRegisterer{ctx, srv})
+	test.Must(nil, c.Start())
+	defer c.Close()
 
+	mustHavePeer(ctx, c, ttnpb.PeerInfo_ENTITY_REGISTRY)
+
+	client := ttnpb.NewGtwGsClient(c.LoopbackConn())
+
+	ctx = rpcmetadata.MD{
+		ID: registeredGatewayID.GatewayID,
+	}.ToOutgoingContext(ctx)
+	creds := grpc.PerRPCCredentials(rpcmetadata.MD{
+		AuthType:      "Bearer",
+		AuthValue:     registeredGatewayKey,
+		AllowInsecure: true,
+	})
+
+	upCh := make(chan *ttnpb.GatewayUp, 10)
+	downCh := make(chan erroredGatewayDown, 10)
+
+	stream, err := client.LinkGateway(ctx, creds)
+	if err != nil {
+		t.Fatalf("Failed to link gateway: %v", err)
+	}
 	go func() {
-		if err := srv.LinkGateway(stream); err != nil {
-			if !a.So(errors.IsCanceled(err), should.BeTrue) {
-				t.Fatalf("Expected context cancellation but got: %v", err)
+		for up := range upCh {
+			if err := stream.Send(up); err != nil {
+				t.Fatalf("Send failed: %v", err)
 			}
+		}
+	}()
+	go func() {
+		for ctx.Err() == nil {
+			down, err := stream.Recv()
+			downCh <- erroredGatewayDown{down, err}
 		}
 	}()
 
@@ -173,6 +220,11 @@ func TestTraffic(t *testing.T) {
 				UplinkMessages: []*ttnpb.UplinkMessage{
 					{
 						RawPayload: []byte{0x01},
+						RxMetadata: []*ttnpb.RxMetadata{
+							{
+								GatewayIdentifiers: registeredGatewayID,
+							},
+						},
 					},
 				},
 			},
@@ -180,6 +232,11 @@ func TestTraffic(t *testing.T) {
 				UplinkMessages: []*ttnpb.UplinkMessage{
 					{
 						RawPayload: []byte{0x02},
+						RxMetadata: []*ttnpb.RxMetadata{
+							{
+								GatewayIdentifiers: registeredGatewayID,
+							},
+						},
 					},
 				},
 				GatewayStatus: &ttnpb.GatewayStatus{
@@ -190,12 +247,27 @@ func TestTraffic(t *testing.T) {
 				UplinkMessages: []*ttnpb.UplinkMessage{
 					{
 						RawPayload: []byte{0x03},
+						RxMetadata: []*ttnpb.RxMetadata{
+							{
+								GatewayIdentifiers: registeredGatewayID,
+							},
+						},
 					},
 					{
 						RawPayload: []byte{0x04},
+						RxMetadata: []*ttnpb.RxMetadata{
+							{
+								GatewayIdentifiers: registeredGatewayID,
+							},
+						},
 					},
 					{
 						RawPayload: []byte{0x05},
+						RxMetadata: []*ttnpb.RxMetadata{
+							{
+								GatewayIdentifiers: registeredGatewayID,
+							},
+						},
 					},
 				},
 				GatewayStatus: &ttnpb.GatewayStatus{
@@ -219,7 +291,10 @@ func TestTraffic(t *testing.T) {
 				for ups != len(tc.UplinkMessages) || needStatus || needTxAck {
 					select {
 					case up := <-conn.Up():
-						a.So(up, should.Resemble, tc.UplinkMessages[ups])
+						expected := tc.UplinkMessages[ups]
+						up.ReceivedAt = expected.ReceivedAt
+						up.RxMetadata[0].UplinkToken = expected.RxMetadata[0].UplinkToken
+						a.So(up, should.Resemble, expected)
 						ups++
 					case status := <-conn.Status():
 						a.So(needStatus, should.BeTrue)
@@ -311,9 +386,9 @@ func TestTraffic(t *testing.T) {
 				select {
 				case down := <-downCh:
 					if tc.ErrorAssertion == nil {
-						a.So(down, should.Resemble, tc.Message)
+						a.So(down.DownlinkMessage, should.Resemble, tc.Message)
 					} else {
-						t.Fatalf("Unexpected message: %v", down)
+						t.Fatalf("Unexpected message: %v", down.DownlinkMessage)
 					}
 				case <-time.After(timeout):
 					if tc.ErrorAssertion == nil {
@@ -331,13 +406,42 @@ func TestConcentratorConfig(t *testing.T) {
 	a := assertions.New(t)
 
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
-	ctx = newContextWithRightsFetcher(ctx)
+	ctx, cancelCtx := context.WithCancel(ctx)
+	defer cancelCtx()
 
-	gs := mock.NewServer()
+	is, isAddr := startMockIS(ctx)
+	is.add(ctx, registeredGatewayID, registeredGatewayKey)
+
+	c := component.MustNew(test.GetLogger(t), &component.Config{
+		ServiceBase: config.ServiceBase{
+			GRPC: config.GRPC{
+				Listen:                      ":0",
+				AllowInsecureForCredentials: true,
+			},
+			Cluster: config.Cluster{
+				IdentityServer: isAddr,
+			},
+		},
+	})
+	gs := mock.NewServer(c)
 	srv := New(gs)
+	c.RegisterGRPC(&mockRegisterer{ctx, srv})
+	test.Must(nil, c.Start())
+	defer c.Close()
 
-	ctx = contextWithKey(ctx, registeredGatewayID, registeredGatewayKey)()
+	mustHavePeer(ctx, c, ttnpb.PeerInfo_ENTITY_REGISTRY)
 
-	_, err := srv.GetConcentratorConfig(ctx, ttnpb.Empty)
+	client := ttnpb.NewGtwGsClient(c.LoopbackConn())
+
+	ctx = rpcmetadata.MD{
+		ID: registeredGatewayID.GatewayID,
+	}.ToOutgoingContext(ctx)
+	creds := grpc.PerRPCCredentials(rpcmetadata.MD{
+		AuthType:      "Bearer",
+		AuthValue:     registeredGatewayKey,
+		AllowInsecure: true,
+	})
+
+	_, err := client.GetConcentratorConfig(ctx, ttnpb.Empty, creds)
 	a.So(err, should.BeNil)
 }

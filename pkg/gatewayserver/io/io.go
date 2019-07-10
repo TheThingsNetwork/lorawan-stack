@@ -37,6 +37,7 @@ const (
 // Server represents the Gateway Server to gateway frontends.
 type Server interface {
 	// FillGatewayContext fills the given context and identifiers.
+	// This method should only be used for request contexts.
 	FillGatewayContext(ctx context.Context, ids ttnpb.GatewayIdentifiers) (context.Context, ttnpb.GatewayIdentifiers, error)
 	// Connect connects a gateway by its identifiers to the Gateway Server, and returns a Connection for traffic and
 	// control.

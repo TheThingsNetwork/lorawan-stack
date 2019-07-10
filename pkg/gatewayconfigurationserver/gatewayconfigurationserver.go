@@ -101,8 +101,7 @@ func (gcs *GatewayConfigurationServer) handleGetGlobalConfig(c echo.Context) err
 }
 
 func (gcs *GatewayConfigurationServer) getContext(c echo.Context) context.Context {
-	ctx := c.Request().Context()
-	ctx = gcs.FillContext(ctx)
+	ctx := gcs.FillContext(c.Request().Context())
 	md := metadata.New(map[string]string{
 		"authorization": c.Request().Header.Get(echo.HeaderAuthorization),
 	})

@@ -17,62 +17,109 @@ package grpc_test
 import (
 	"context"
 	"fmt"
+	"net"
+	"time"
 
-	"go.thethings.network/lorawan-stack/pkg/auth/rights"
-	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"go.thethings.network/lorawan-stack/pkg/component"
+	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/rpcserver"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
-	"go.thethings.network/lorawan-stack/pkg/util/test"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
 
-type mockGtwGsLinkServerStream struct {
-	*test.MockServerStream
-	SendFunc func(*ttnpb.GatewayDown) error
-	RecvFunc func() (*ttnpb.GatewayUp, error)
+type mockRegisterer struct {
+	context.Context
+	ttnpb.GtwGsServer
 }
 
-func (s *mockGtwGsLinkServerStream) Send(down *ttnpb.GatewayDown) error {
-	if s.SendFunc == nil {
-		panic("Send called, but not set")
-	}
-	return s.SendFunc(down)
+func (m *mockRegisterer) Roles() []ttnpb.PeerInfo_Role {
+	return nil
 }
 
-func (s *mockGtwGsLinkServerStream) Recv() (*ttnpb.GatewayUp, error) {
-	if s.RecvFunc == nil {
-		panic("Recv called, but not set")
-	}
-	return s.RecvFunc()
+func (m *mockRegisterer) RegisterServices(s *grpc.Server) {
+	ttnpb.RegisterGtwGsServer(s, m.GtwGsServer)
 }
 
-func newContextWithRightsFetcher(ctx context.Context) context.Context {
-	return rights.NewContextWithFetcher(
-		ctx,
-		rights.FetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) (set *ttnpb.Rights, err error) {
-			uid := unique.ID(ctx, ids)
-			if uid != registeredGatewayUID {
-				return
-			}
-			md := rpcmetadata.FromIncomingContext(ctx)
-			if md.AuthType != "Bearer" || md.AuthValue != registeredGatewayKey {
-				return
-			}
-			set = ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_LINK)
+func (m *mockRegisterer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
+}
+
+func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.PeerInfo_Role) {
+	for i := 0; i < 20; i++ {
+		time.Sleep(20 * time.Millisecond)
+		if peer := c.GetPeer(ctx, role, nil); peer != nil {
 			return
-		}),
-	)
+		}
+	}
+	panic("could not connect to peer")
 }
 
-func contextWithKey(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) func() context.Context {
-	return func() context.Context {
-		md := metadata.New(map[string]string{
-			"id":            ids.GatewayID,
-			"authorization": fmt.Sprintf("Bearer %v", key),
-		})
-		if ctxMd, ok := metadata.FromIncomingContext(ctx); ok {
-			md = metadata.Join(ctxMd, md)
-		}
-		return metadata.NewIncomingContext(ctx, md)
+type mockIS struct {
+	ttnpb.GatewayRegistryServer
+	ttnpb.GatewayAccessServer
+	gateways     map[string]*ttnpb.Gateway
+	gatewayAuths map[string][]string
+}
+
+func startMockIS(ctx context.Context) (*mockIS, string) {
+	is := &mockIS{
+		gateways:     make(map[string]*ttnpb.Gateway),
+		gatewayAuths: make(map[string][]string),
 	}
+	srv := rpcserver.New(ctx)
+	ttnpb.RegisterGatewayRegistryServer(srv.Server, is)
+	ttnpb.RegisterGatewayAccessServer(srv.Server, is)
+	lis, err := net.Listen("tcp", ":0")
+	if err != nil {
+		panic(err)
+	}
+	go srv.Serve(lis)
+	return is, lis.Addr().String()
+}
+
+func (is *mockIS) add(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) {
+	uid := unique.ID(ctx, ids)
+	is.gateways[uid] = &ttnpb.Gateway{
+		GatewayIdentifiers: ids,
+	}
+	if key != "" {
+		is.gatewayAuths[uid] = []string{fmt.Sprintf("Bearer %v", key)}
+	}
+}
+
+var errNotFound = errors.DefineNotFound("not_found", "not found")
+
+func (is *mockIS) Get(ctx context.Context, req *ttnpb.GetGatewayRequest) (*ttnpb.Gateway, error) {
+	uid := unique.ID(ctx, req.GatewayIdentifiers)
+	app, ok := is.gateways[uid]
+	if !ok {
+		return nil, errNotFound
+	}
+	return app, nil
+}
+
+func (is *mockIS) ListRights(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (res *ttnpb.Rights, err error) {
+	res = &ttnpb.Rights{}
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return
+	}
+	authorization, ok := md["authorization"]
+	if !ok || len(authorization) == 0 {
+		return
+	}
+	auths, ok := is.gatewayAuths[unique.ID(ctx, *ids)]
+	if !ok {
+		return
+	}
+	for _, auth := range auths {
+		if auth == authorization[0] {
+			res.Rights = append(res.Rights,
+				ttnpb.RIGHT_GATEWAY_LINK,
+			)
+		}
+	}
+	return
 }

@@ -204,6 +204,7 @@ func (c *Component) GetBaseConfig(ctx context.Context) config.ServiceBase {
 }
 
 // FillContext fills the context.
+// This method should only be used for request contexts.
 func (c *Component) FillContext(ctx context.Context) context.Context {
 	for _, filler := range c.fillers {
 		ctx = filler(ctx)

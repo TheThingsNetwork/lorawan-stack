@@ -47,14 +47,14 @@ func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) (err error) {
 	ids := ttnpb.GatewayIdentifiers{
 		GatewayID: rpcmetadata.FromIncomingContext(ctx).ID,
 	}
+	ctx, ids, err = s.server.FillGatewayContext(ctx, ids)
+	if err != nil {
+		return
+	}
 	if err = ids.ValidateContext(ctx); err != nil {
 		return
 	}
 	if err = rights.RequireGateway(ctx, ids, ttnpb.RIGHT_GATEWAY_LINK); err != nil {
-		return
-	}
-	ctx, ids, err = s.server.FillGatewayContext(ctx, ids)
-	if err != nil {
 		return
 	}
 

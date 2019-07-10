@@ -198,11 +198,6 @@ func (as *ApplicationServer) Roles() []ttnpb.PeerInfo_Role {
 	return []ttnpb.PeerInfo_Role{ttnpb.PeerInfo_APPLICATION_SERVER}
 }
 
-// FillApplicationContext fills the given context and identifiers.
-func (as *ApplicationServer) FillApplicationContext(ctx context.Context, ids ttnpb.ApplicationIdentifiers) (context.Context, ttnpb.ApplicationIdentifiers, error) {
-	return as.FillContext(ctx), ids, nil
-}
-
 // Subscribe subscribes an application or integration by its identifiers to the Application Server, and returns a
 // io.Subscription for traffic and control.
 func (as *ApplicationServer) Subscribe(ctx context.Context, protocol string, ids ttnpb.ApplicationIdentifiers) (*io.Subscription, error) {

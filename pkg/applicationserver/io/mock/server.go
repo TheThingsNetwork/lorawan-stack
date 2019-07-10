@@ -20,11 +20,13 @@ import (
 
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 )
 
 type server struct {
+	*component.Component
 	subscriptionsCh chan *io.Subscription
 	downlinkQueueMu sync.RWMutex
 	downlinkQueue   map[string][]*ttnpb.ApplicationDownlink
@@ -38,8 +40,9 @@ type Server interface {
 }
 
 // NewServer instantiates a new Server.
-func NewServer() Server {
+func NewServer(c *component.Component) Server {
 	return &server{
+		Component:       c,
 		subscriptionsCh: make(chan *io.Subscription, 10),
 		downlinkQueue:   make(map[string][]*ttnpb.ApplicationDownlink),
 	}
@@ -47,12 +50,7 @@ func NewServer() Server {
 
 // FillContext implements io.Server.
 func (s *server) FillContext(ctx context.Context) context.Context {
-	return ctx
-}
-
-// FillApplicationContext implements io.Server.
-func (s *server) FillApplicationContext(ctx context.Context, ids ttnpb.ApplicationIdentifiers) (context.Context, ttnpb.ApplicationIdentifiers, error) {
-	return ctx, ids, nil
+	return s.Component.FillContext(ctx)
 }
 
 // Subscribe implements io.Server.

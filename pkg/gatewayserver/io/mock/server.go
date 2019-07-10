@@ -21,6 +21,7 @@ import (
 	"sync"
 
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
@@ -31,6 +32,7 @@ import (
 )
 
 type server struct {
+	*component.Component
 	store          *frequencyplans.Store
 	gateways       map[string]*ttnpb.Gateway
 	connections    map[string]*io.Connection
@@ -49,8 +51,9 @@ type Server interface {
 }
 
 // NewServer instantiates a new Server.
-func NewServer() Server {
+func NewServer(c *component.Component) Server {
 	return &server{
+		Component:     c,
 		store:         frequencyplans.NewStore(test.FrequencyPlansFetcher),
 		gateways:      make(map[string]*ttnpb.Gateway),
 		connections:   make(map[string]*io.Connection),
@@ -60,6 +63,7 @@ func NewServer() Server {
 
 // FillContext implements io.Server.
 func (s *server) FillGatewayContext(ctx context.Context, ids ttnpb.GatewayIdentifiers) (context.Context, ttnpb.GatewayIdentifiers, error) {
+	ctx = s.FillContext(ctx)
 	if ids.IsZero() {
 		return nil, ttnpb.GatewayIdentifiers{}, errors.New("the identifiers are zero")
 	}

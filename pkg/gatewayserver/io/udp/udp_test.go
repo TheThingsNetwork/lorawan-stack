@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/mock"
 	. "go.thethings.network/lorawan-stack/pkg/gatewayserver/io/udp"
@@ -57,8 +58,13 @@ func TestConnection(t *testing.T) {
 
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 	ctx, cancelCtx := context.WithCancel(ctx)
+	defer cancelCtx()
 
-	gs := mock.NewServer()
+	c := component.MustNew(test.GetLogger(t), &component.Config{})
+	test.Must(nil, c.Start())
+	defer c.Close()
+
+	gs := mock.NewServer(c)
 	addr, _ := net.ResolveUDPAddr("udp", ":0")
 	lis, err := net.ListenUDP("udp", addr)
 	if !a.So(err, should.BeNil) {
@@ -191,8 +197,13 @@ func TestTraffic(t *testing.T) {
 
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 	ctx, cancelCtx := context.WithCancel(ctx)
+	defer cancelCtx()
 
-	gs := mock.NewServer()
+	c := component.MustNew(test.GetLogger(t), &component.Config{})
+	test.Must(nil, c.Start())
+	defer c.Close()
+
+	gs := mock.NewServer(c)
 	addr, _ := net.ResolveUDPAddr("udp", ":0")
 	lis, err := net.ListenUDP("udp", addr)
 	if !a.So(err, should.BeNil) {
