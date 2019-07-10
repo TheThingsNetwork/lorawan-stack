@@ -81,7 +81,7 @@ const getRegistryLocation = function (locations) {
 })
 @bind
 export default class DeviceGeneralSettings extends React.Component {
-  async handleSubmit (values) {
+  handleSubmit (values) {
     const { device, appId, devId, updateDevice } = this.props
 
     const patch = {
@@ -106,10 +106,10 @@ export default class DeviceGeneralSettings extends React.Component {
       }
     }
 
-    await updateDevice(appId, devId, patch)
+    return updateDevice(appId, devId, patch)
   }
 
-  async handleDelete () {
+  handleDelete () {
     const { device, devId, appId, updateDevice } = this.props
     const registryLocation = getRegistryLocation(device.locations)
 
@@ -118,7 +118,7 @@ export default class DeviceGeneralSettings extends React.Component {
     }
     delete patch.locations[registryLocation.key]
 
-    await updateDevice(appId, devId, patch)
+    return updateDevice(appId, devId, patch)
   }
 
   render () {

@@ -84,7 +84,7 @@ const getRegistryLocation = function (antennas) {
 })
 @bind
 export default class GatewayLocation extends React.Component {
-  async handleSubmit (values) {
+  handleSubmit (values) {
     const { gateway, gtwId, updateGateway } = this.props
 
     const patch = {}
@@ -108,10 +108,10 @@ export default class GatewayLocation extends React.Component {
       }]
     }
 
-    await updateGateway(gtwId, patch)
+    return updateGateway(gtwId, patch)
   }
 
-  async handleDelete () {
+  handleDelete () {
     const { gateway, gtwId, updateGateway } = this.props
     const registryLocation = getRegistryLocation(gateway.antennas)
 
@@ -120,7 +120,7 @@ export default class GatewayLocation extends React.Component {
     }
     patch.antennas.splice(registryLocation.key, 1)
 
-    await updateGateway(gtwId, patch)
+    return updateGateway(gtwId, patch)
   }
 
   render () {
