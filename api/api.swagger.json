@@ -7376,6 +7376,11 @@
         "cause": {
           "$ref": "#/definitions/v3ErrorDetails",
           "description": "The error that caused this error."
+        },
+        "code": {
+          "type": "integer",
+          "format": "int64",
+          "description": "The status code of the error."
         }
       },
       "description": "Error details that are communicated over gRPC (and HTTP) APIs.\nThe messages (for translation) are stored as \"error:\u003cnamespace\u003e:\u003cname\u003e\"."

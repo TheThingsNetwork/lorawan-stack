@@ -77,6 +77,16 @@ func (dst *ErrorDetails) SetFields(src *ErrorDetails, paths ...string) error {
 					dst.Cause = nil
 				}
 			}
+		case "code":
+			if len(subs) > 0 {
+				return fmt.Errorf("'code' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Code = src.Code
+			} else {
+				var zero uint32
+				dst.Code = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

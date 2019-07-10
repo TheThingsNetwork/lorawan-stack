@@ -79,6 +79,8 @@ func (m *ErrorDetails) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "code":
+			// no validation rules for Code
 		default:
 			return ErrorDetailsValidationError{
 				field:  name,

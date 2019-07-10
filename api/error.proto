@@ -39,5 +39,7 @@ message ErrorDetails {
   string correlation_id = 5 [(gogoproto.customname) = "CorrelationID"];
   // The error that caused this error.
   ErrorDetails cause = 6;
+  // The status code of the error.
+  uint32 code = 7;
 }
 
