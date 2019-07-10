@@ -302,3 +302,19 @@ The message definitions in `pkg/webui/locales` can be used to provide translatio
 ├── manifest.go       generated manifest of the frontend, containing file hashes
 ├── template.go       go template module used to render the frontend HTML
 ```
+
+## Documentation
+
+The documentation site for The Things Network Stack is built from the `doc` folder. 
+All content is stored as Markdown files in `doc/content`.
+
+In order to build the documentation site with the right theme, you need to run
+`./mage docs:deps` from time to time. 
+
+You can start a development server with live reloading by running
+`./mage docs:server`. This command will print the address of the server.
+
+The documentation site can be built by running `./mage docs:build`. This will 
+output the site to `docs/public`.
+
+For more details on how our documentation site is written, see the [Hugo docs](https://gohugo.io/documentation/).
