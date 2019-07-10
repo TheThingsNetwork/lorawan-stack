@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"sync/atomic"
 
+	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc/codes"
 )
 
@@ -39,7 +40,7 @@ type Error struct {
 	*stack
 	correlationID string
 	cause         error
-	details       []interface{}
+	details       []proto.Message
 	attributes    map[string]interface{}
 	grpcStatus    *atomic.Value
 }
@@ -67,7 +68,7 @@ type Interface interface {
 	DefinitionInterface
 	Attributes() map[string]interface{}
 	Cause() error
-	Details() (details []interface{})
+	Details() (details []proto.Message)
 }
 
 // build an error from the definition, skipping the first frames of the call stack.

@@ -43,11 +43,7 @@ func FromGRPCStatus(status *status.Status) Error {
 	}
 	details, rest := ErrorDetailsFromProto(detailProtos...)
 	if len(rest) != 0 {
-		detailIfaces := make([]interface{}, len(rest))
-		for i, iface := range rest { // convert to []interface{}
-			detailIfaces[i] = iface
-		}
-		err.details = detailIfaces
+		err.details = rest
 	}
 	if details != nil {
 		setErrorDetails(&err, details)
