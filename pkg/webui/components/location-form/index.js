@@ -60,16 +60,16 @@ class LocationForm extends Component {
 
     this.setState({ error: '' })
 
-    try {
-      await onSubmit(values)
+    const res = await onSubmit(values)
+    if (!res.error) {
       resetForm()
       toast({
         title: entityId,
         message: m.updateSuccess,
         type: toast.types.SUCCESS,
       })
-    } catch (error) {
-      await this.setState({ error })
+    } else {
+      await this.setState({ error: res.payload })
       setSubmitting(false)
     }
   }
@@ -77,16 +77,16 @@ class LocationForm extends Component {
   async onDelete () {
     const { onDelete, entityId } = this.props
 
-    try {
-      await onDelete()
+    const res = await onDelete()
+    if (!res.error) {
       this.form.current.resetForm()
       toast({
         title: entityId,
         message: m.deleteSuccess,
         type: toast.types.SUCCESS,
       })
-    } catch (error) {
-      await this.setState({ error })
+    } else {
+      await this.setState({ error: res.payload })
     }
   }
 
