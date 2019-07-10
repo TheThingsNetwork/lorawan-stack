@@ -129,8 +129,6 @@ type erroredApplicationUp struct {
 }
 
 func TestTraffic(t *testing.T) {
-	a := assertions.New(t)
-
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -171,21 +169,16 @@ func TestTraffic(t *testing.T) {
 	})
 
 	upCh := make(chan erroredApplicationUp, 10)
-	{
-		var sub ttnpb.AppAs_SubscribeClient
-		var err error
-		if sub, err = client.Subscribe(ctx, &registeredApplicationID, creds); err != nil {
-			if !a.So(errors.IsCanceled(err), should.BeTrue) {
-				t.FailNow()
-			}
-		}
-		go func() {
-			for ctx.Err() == nil {
-				up, err := sub.Recv()
-				upCh <- erroredApplicationUp{up, err}
-			}
-		}()
+	stream, err := client.Subscribe(ctx, &registeredApplicationID, creds)
+	if err != nil {
+		t.Fatalf("Failed to subscribe: %v", err)
 	}
+	go func() {
+		for ctx.Err() == nil {
+			up, err := stream.Recv()
+			upCh <- erroredApplicationUp{up, err}
+		}
+	}()
 
 	var sub *io.Subscription
 	select {
