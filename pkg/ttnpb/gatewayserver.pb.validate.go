@@ -336,3 +336,102 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ScheduleDownlinkResponseValidationError{}
+
+// ValidateFields checks the field values on ScheduleDownlinkErrorDetails with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *ScheduleDownlinkErrorDetails) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ScheduleDownlinkErrorDetailsFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "path_errors":
+
+			for idx, item := range m.GetPathErrors() {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return ScheduleDownlinkErrorDetailsValidationError{
+							field:  fmt.Sprintf("path_errors[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
+		default:
+			return ScheduleDownlinkErrorDetailsValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ScheduleDownlinkErrorDetailsValidationError is the validation error returned
+// by ScheduleDownlinkErrorDetails.ValidateFields if the designated
+// constraints aren't met.
+type ScheduleDownlinkErrorDetailsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ScheduleDownlinkErrorDetailsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ScheduleDownlinkErrorDetailsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ScheduleDownlinkErrorDetailsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ScheduleDownlinkErrorDetailsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ScheduleDownlinkErrorDetailsValidationError) ErrorName() string {
+	return "ScheduleDownlinkErrorDetailsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ScheduleDownlinkErrorDetailsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sScheduleDownlinkErrorDetails.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ScheduleDownlinkErrorDetailsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ScheduleDownlinkErrorDetailsValidationError{}

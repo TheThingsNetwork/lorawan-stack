@@ -19,6 +19,7 @@ import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
+import "lorawan-stack/api/error.proto";
 import "lorawan-stack/api/gateway.proto";
 import "lorawan-stack/api/identifiers.proto";
 import "lorawan-stack/api/messages.proto";
@@ -52,6 +53,10 @@ service GtwGs {
 
 message ScheduleDownlinkResponse {
   google.protobuf.Duration delay = 1 [(gogoproto.stdduration) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+}
+
+message ScheduleDownlinkErrorDetails {
+  repeated ErrorDetails path_errors = 1;
 }
 
 // The NsGs service connects a Network Server to a Gateway Server.

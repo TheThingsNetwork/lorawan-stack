@@ -159,6 +159,7 @@
 - [File `lorawan-stack/api/gatewayserver.proto`](#lorawan-stack/api/gatewayserver.proto)
   - [Message `GatewayDown`](#ttn.lorawan.v3.GatewayDown)
   - [Message `GatewayUp`](#ttn.lorawan.v3.GatewayUp)
+  - [Message `ScheduleDownlinkErrorDetails`](#ttn.lorawan.v3.ScheduleDownlinkErrorDetails)
   - [Message `ScheduleDownlinkResponse`](#ttn.lorawan.v3.ScheduleDownlinkResponse)
   - [Service `Gs`](#ttn.lorawan.v3.Gs)
   - [Service `GtwGs`](#ttn.lorawan.v3.GtwGs)
@@ -2427,6 +2428,12 @@ GatewayUp may contain zero or more uplink messages and/or a status message for t
 | `uplink_messages` | [`UplinkMessage`](#ttn.lorawan.v3.UplinkMessage) | repeated | UplinkMessages received by the gateway. |
 | `gateway_status` | [`GatewayStatus`](#ttn.lorawan.v3.GatewayStatus) |  |  |
 | `tx_acknowledgment` | [`TxAcknowledgment`](#ttn.lorawan.v3.TxAcknowledgment) |  |  |
+
+### <a name="ttn.lorawan.v3.ScheduleDownlinkErrorDetails">Message `ScheduleDownlinkErrorDetails`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `path_errors` | [`ErrorDetails`](#ttn.lorawan.v3.ErrorDetails) | repeated |  |
 
 ### <a name="ttn.lorawan.v3.ScheduleDownlinkResponse">Message `ScheduleDownlinkResponse`</a>
 

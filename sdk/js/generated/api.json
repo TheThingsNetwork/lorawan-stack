@@ -9414,6 +9414,27 @@
           ]
         },
         {
+          "name": "ScheduleDownlinkErrorDetails",
+          "longName": "ScheduleDownlinkErrorDetails",
+          "fullName": "ttn.lorawan.v3.ScheduleDownlinkErrorDetails",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "path_errors",
+              "description": "",
+              "label": "repeated",
+              "type": "ErrorDetails",
+              "longType": "ErrorDetails",
+              "fullType": "ttn.lorawan.v3.ErrorDetails",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "ScheduleDownlinkResponse",
           "longName": "ScheduleDownlinkResponse",
           "fullName": "ttn.lorawan.v3.ScheduleDownlinkResponse",
