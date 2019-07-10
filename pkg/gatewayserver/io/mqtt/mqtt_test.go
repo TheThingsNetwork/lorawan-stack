@@ -24,6 +24,8 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/gogo/protobuf/proto"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/component"
+	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/mock"
@@ -47,11 +49,28 @@ func TestAuthentication(t *testing.T) {
 	a := assertions.New(t)
 
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
-	ctx = newContextWithRightsFetcher(ctx)
 	ctx, cancelCtx := context.WithCancel(ctx)
 	defer cancelCtx()
 
-	gs := mock.NewServer()
+	is, isAddr := startMockIS(ctx)
+	is.add(ctx, registeredGatewayID, registeredGatewayKey)
+
+	c := component.MustNew(test.GetLogger(t), &component.Config{
+		ServiceBase: config.ServiceBase{
+			GRPC: config.GRPC{
+				Listen:                      ":0",
+				AllowInsecureForCredentials: true,
+			},
+			Cluster: config.Cluster{
+				IdentityServer: isAddr,
+			},
+		},
+	})
+	test.Must(nil, c.Start())
+	defer c.Close()
+	mustHavePeer(ctx, c, ttnpb.PeerInfo_ENTITY_REGISTRY)
+
+	gs := mock.NewServer(c)
 	lis, err := net.Listen("tcp", ":0")
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
@@ -103,11 +122,28 @@ func TestTraffic(t *testing.T) {
 	a := assertions.New(t)
 
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
-	ctx = newContextWithRightsFetcher(ctx)
 	ctx, cancelCtx := context.WithCancel(ctx)
 	defer cancelCtx()
 
-	gs := mock.NewServer()
+	is, isAddr := startMockIS(ctx)
+	is.add(ctx, registeredGatewayID, registeredGatewayKey)
+
+	c := component.MustNew(test.GetLogger(t), &component.Config{
+		ServiceBase: config.ServiceBase{
+			GRPC: config.GRPC{
+				Listen:                      ":0",
+				AllowInsecureForCredentials: true,
+			},
+			Cluster: config.Cluster{
+				IdentityServer: isAddr,
+			},
+		},
+	})
+	test.Must(nil, c.Start())
+	defer c.Close()
+	mustHavePeer(ctx, c, ttnpb.PeerInfo_ENTITY_REGISTRY)
+
+	gs := mock.NewServer(c)
 	lis, err := net.Listen("tcp", ":0")
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
