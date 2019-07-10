@@ -78,7 +78,6 @@ func TestIntegrate(t *testing.T) {
 	})
 	a.So(err, should.BeNil)
 
-	io := mock_server.NewServer()
 	c := component.MustNew(test.GetLogger(t), &component.Config{
 		ServiceBase: config.ServiceBase{
 			GRPC: config.GRPC{
@@ -90,6 +89,7 @@ func TestIntegrate(t *testing.T) {
 			},
 		},
 	})
+	io := mock_server.NewServer(c)
 	srv, err := pubsub.New(c, io, pubsubRegistry)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()

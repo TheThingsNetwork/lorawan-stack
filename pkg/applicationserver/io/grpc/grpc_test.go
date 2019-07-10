@@ -51,7 +51,6 @@ func TestAuthentication(t *testing.T) {
 	is, isAddr := startMockIS(ctx)
 	is.add(ctx, registeredApplicationID, registeredApplicationKey)
 
-	as := mock.NewServer()
 	c := component.MustNew(test.GetLogger(t), &component.Config{
 		ServiceBase: config.ServiceBase{
 			GRPC: config.GRPC{
@@ -63,6 +62,7 @@ func TestAuthentication(t *testing.T) {
 			},
 		},
 	})
+	as := mock.NewServer(c)
 	srv := New(as)
 	c.RegisterGRPC(&mockRegisterer{ctx, srv})
 	test.Must(nil, c.Start())
@@ -138,7 +138,6 @@ func TestTraffic(t *testing.T) {
 	is, isAddr := startMockIS(ctx)
 	is.add(ctx, registeredApplicationID, registeredApplicationKey)
 
-	as := mock.NewServer()
 	c := component.MustNew(test.GetLogger(t), &component.Config{
 		ServiceBase: config.ServiceBase{
 			GRPC: config.GRPC{
@@ -150,6 +149,7 @@ func TestTraffic(t *testing.T) {
 			},
 		},
 	})
+	as := mock.NewServer(c)
 	srv := New(as)
 	c.RegisterGRPC(&mockRegisterer{ctx, srv})
 	test.Must(nil, c.Start())

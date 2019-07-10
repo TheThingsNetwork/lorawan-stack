@@ -73,12 +73,12 @@ func TestAuthentication(t *testing.T) {
 	defer c.Close()
 	mustHavePeer(ctx, c, ttnpb.PeerInfo_ENTITY_REGISTRY)
 
-	as := mock.NewServer()
+	as := mock.NewServer(c)
 	lis, err := net.Listen("tcp", ":0")
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	Start(c.FillContext(ctx), as, lis, JSON, "tcp")
+	Start(c.Context(), as, lis, JSON, "tcp")
 
 	for _, tc := range []struct {
 		UID string
@@ -147,12 +147,12 @@ func TestTraffic(t *testing.T) {
 
 	mustHavePeer(ctx, c, ttnpb.PeerInfo_ENTITY_REGISTRY)
 
-	as := mock.NewServer()
+	as := mock.NewServer(c)
 	lis, err := net.Listen("tcp", ":0")
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	Start(c.FillContext(ctx), as, lis, JSON, "tcp")
+	Start(c.Context(), as, lis, JSON, "tcp")
 
 	clientOpts := mqtt.NewClientOptions()
 	clientOpts.AddBroker(fmt.Sprintf("tcp://%v", lis.Addr()))

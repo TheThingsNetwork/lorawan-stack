@@ -340,7 +340,7 @@ func TestWebhooks(t *testing.T) {
 			},
 		}
 		c := component.MustNew(test.GetLogger(t), conf)
-		io := mock.NewServer()
+		io := mock.NewServer(c)
 		testSink := &mockSink{
 			Component: c,
 			Server:    io,

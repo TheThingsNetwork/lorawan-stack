@@ -124,8 +124,8 @@ func TestPubSub(t *testing.T) {
 	a.So(err, should.BeNil)
 	mockImpl := mockProvider.(*mock_provider.Impl)
 
-	io := mock_server.NewServer()
 	c := component.MustNew(test.GetLogger(t), &component.Config{})
+	io := mock_server.NewServer(c)
 	_, err = pubsub.New(c, io, registry)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
