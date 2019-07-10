@@ -1,6 +1,6 @@
 {
   "name": "ttn-stack",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "description": "The Thing Network Stack",
   "main": "index.js",
   "repository": "https://github.com/TheThingsNetwork/ttn.git",
