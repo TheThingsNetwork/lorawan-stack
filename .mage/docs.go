@@ -18,6 +18,8 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"path/filepath"
+	"text/template"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
@@ -35,8 +37,13 @@ func (Docs) Deps() error {
 	return sh.RunV("git", "submodule", "update", "--init", "doc/themes/hugo-theme-techdoc")
 }
 
+const (
+	docRedirectTemplateFilePath = "doc/redirect.html.tmpl"
+	docRedirectFilePath         = "doc/public/index.html"
+)
+
 // Build builds a static website from the documentation into doc/public.
-func (Docs) Build() error {
+func (d Docs) Build() (err error) {
 	mg.Deps(Version.getCurrent)
 	var args []string
 	if baseURL := os.Getenv("HUGO_BASE_URL"); baseURL != "" {
@@ -47,8 +54,31 @@ func (Docs) Build() error {
 		url.Path = path.Join(url.Path, currentVersion)
 		destination := path.Join("public", currentVersion)
 		args = append(args, "-b", url.String(), "-d", destination)
+		defer func() {
+			genErr := d.generateRedirect()
+			if err == nil {
+				err = genErr
+			}
+		}()
 	}
 	return execHugo(args...)
+}
+
+func (Docs) generateRedirect() error {
+	docTmpl, err := template.New(filepath.Base(docRedirectTemplateFilePath)).ParseFiles(docRedirectTemplateFilePath)
+	if err != nil {
+		return err
+	}
+	target, err := os.OpenFile(docRedirectFilePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+	if err != nil {
+		return nil
+	}
+	defer target.Close()
+	return docTmpl.Execute(target, struct {
+		CurrentVersion string
+	}{
+		CurrentVersion: currentVersion,
+	})
 }
 
 // Server starts a documentation server.
