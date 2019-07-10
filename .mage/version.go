@@ -17,8 +17,11 @@ package ttnmage
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
+	"text/template"
 
 	"github.com/TheThingsIndustries/magepkg/git"
 	"github.com/blang/semver"
@@ -55,9 +58,13 @@ func (Version) Current() error {
 	return nil
 }
 
-const goVersionFilePath = "pkg/version/ttn.go"
+const (
+	goVersionFilePath          = "./pkg/version/ttn.go"
+	docVersionFilePath         = "./doc/config.toml"
+	docVersionTemplateFilePath = docVersionFilePath + ".tmpl"
+)
 
-var packageJSONFilePaths = []string{"package.json", "sdk/js/package.json"}
+var packageJSONFilePaths = []string{"./package.json", "./sdk/js/package.json"}
 
 // Files writes the current version to files that contain version info and adds them to the Git index.
 func (Version) Files() error {
@@ -80,6 +87,23 @@ func (Version) Files() error {
 		if err != nil {
 			return err
 		}
+	}
+	docTmpl, err := template.New(filepath.Base(docVersionTemplateFilePath)).ParseFiles(docVersionTemplateFilePath)
+	if err != nil {
+		return err
+	}
+	target, err := os.OpenFile(docVersionFilePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+	if err != nil {
+		return nil
+	}
+	defer target.Close()
+	err = docTmpl.Execute(target, struct {
+		CurrentVersion string
+	}{
+		CurrentVersion: currentVersion,
+	})
+	if err != nil {
+		return err
 	}
 	return git.Add(append(packageJSONFilePaths, goVersionFilePath)...)
 }

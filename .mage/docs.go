@@ -15,17 +15,11 @@
 package ttnmage
 
 import (
-	"io/ioutil"
 	"os"
-	"text/template"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 )
-
-type HugoConfig struct {
-	CurrentVersion string
-}
 
 // Docs namespace
 type Docs mg.Namespace
@@ -63,26 +57,4 @@ func (Docs) Deps() error {
 // Server starts live documentation server.
 func (Docs) Server() error {
 	return execHugo("server")
-}
-
-// Config generate hugo documentation with git metadata.
-func (Docs) Config() error {
-	mg.Deps(Version.getCurrent)
-	tmpl, err := ioutil.ReadFile("./doc/config.tmpl")
-	if err != nil {
-		return err
-	}
-	cfg := HugoConfig{
-		CurrentVersion: currentVersion,
-	}
-	t := template.Must(template.New("config").Parse(string(tmpl)))
-	file, err := os.OpenFile("doc/config.toml", os.O_CREATE|os.O_RDWR, 0)
-	if err != nil {
-		return nil
-	}
-	return t.Execute(file, cfg)
-}
-
-func getDocURL() string {
-	return os.Getenv("HUGO_DOC_URL")
 }
