@@ -1068,7 +1068,6 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	registerMergeMetadata(ctx, up)
 
 	var invalidatedQueue []*ttnpb.ApplicationDownlink
-	var resetErr bool
 	dev, err = ns.devices.SetByID(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, dev.EndDeviceIdentifiers.DeviceID,
 		[]string{
 			"frequency_plan_id",
@@ -1077,6 +1076,11 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 			"recent_uplinks",
 		},
 		func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+			if stored == nil {
+				logger.Warn("Device deleted during join-request handling, drop")
+				return nil, nil, errOutdatedData
+			}
+
 			var paths []string
 
 			stored.PendingMACState = macState
@@ -1103,7 +1107,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 
 			return stored, paths, nil
 		})
-	if err != nil && !resetErr {
+	if err != nil {
 		logger.WithError(err).Warn("Failed to update device in registry")
 		// TODO: Retry transaction. (https://github.com/TheThingsNetwork/lorawan-stack/issues/33)
 	}
