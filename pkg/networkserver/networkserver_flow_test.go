@@ -601,7 +601,7 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 				SessionKeyID: []byte("session-key-id"),
 				FPort:        0x42,
 				FRMPayload:   uplinkFRMPayload,
-				RxMetadata:   mds[:],
+				RxMetadata:   asUp.GetUplinkMessage().GetRxMetadata(),
 				Settings: ttnpb.TxSettings{
 					DataRate: ttnpb.DataRate{
 						Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
