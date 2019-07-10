@@ -204,6 +204,7 @@ var (
 )
 
 // FillGatewayContext fills the given context and identifiers.
+// This method should only be used for request contexts.
 func (gs *GatewayServer) FillGatewayContext(ctx context.Context, ids ttnpb.GatewayIdentifiers) (context.Context, ttnpb.GatewayIdentifiers, error) {
 	ctx = gs.FillContext(ctx)
 	if ids.IsZero() {
