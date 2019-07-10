@@ -20,7 +20,10 @@ import { defineMessages } from 'react-intl'
 import * as Yup from 'yup'
 
 import sharedMessages from '../../../lib/shared-messages'
-import { getGatewayId } from '../../../lib/selectors/id'
+import {
+  selectSelectedGatewayId,
+  selectSelectedGateway,
+} from '../../store/selectors/gateways'
 
 import LocationForm from '../../../components/location-form'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
@@ -63,9 +66,9 @@ const getRegistryLocation = function (antennas) {
 }
 
 @connect(
-  ({ gateway }, props) => ({
-    gateway: gateway.gateway,
-    gtwId: getGatewayId(gateway.gateway),
+  (state, props) => ({
+    gateway: selectSelectedGateway(state),
+    gtwId: selectSelectedGatewayId(state),
   }),
   { updateGateway }
 )
