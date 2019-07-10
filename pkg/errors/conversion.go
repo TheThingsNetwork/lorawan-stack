@@ -77,6 +77,7 @@ type ErrorDetails interface {
 	PublicAttributes() map[string]interface{}
 	CorrelationID() string
 	Cause() error
+	Code() uint32
 }
 
 func setErrorDetails(err *Error, details ErrorDetails) {
@@ -102,5 +103,8 @@ func setErrorDetails(err *Error, details ErrorDetails) {
 	}
 	if cause := details.Cause(); cause != nil {
 		err.cause, _ = From(cause)
+	}
+	if code := details.Code(); code != 0 {
+		err.code = code
 	}
 }
