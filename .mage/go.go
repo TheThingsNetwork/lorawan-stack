@@ -195,6 +195,22 @@ func (Go) Test() error {
 	return execGoTest("./...")
 }
 
+var goBinaries = []string{"./cmd/ttn-lw-cli", "./cmd/ttn-lw-stack"}
+
+// TestBinaries tests the Go binaries by executing them with the --help flag.
+func (Go) TestBinaries() error {
+	if mg.Verbose() {
+		fmt.Println("Testing Go binaries")
+	}
+	for _, binary := range goBinaries {
+		_, err := outputGo("run", binary, "--help")
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 const goCoverageFile = "coverage.out"
 
 // Cover tests all Go packages and writes test coverage into the coverage file.

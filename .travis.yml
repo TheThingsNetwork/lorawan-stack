@@ -109,8 +109,7 @@ script:
       GOARCH=$RUN_GOARCH $MAGE go:test
     fi
   fi
-- if [[ "$RUNTYPE" == "go.test" ]]; then GO111MODULE=on go run ./cmd/ttn-lw-stack version; fi
-- if [[ "$RUNTYPE" == "go.test" ]]; then GO111MODULE=on go run ./cmd/ttn-lw-cli version; fi
+- if [[ "$RUNTYPE" == "go.test" ]]; then $MAGE go:testBinaries; fi
 - if [[ "$RUNTYPE" == "release" ]]; then $MAGE version:files; fi
 - make git.diff
 after_success:
