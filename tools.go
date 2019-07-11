@@ -19,6 +19,7 @@ package tools
 import (
 	_ "github.com/TheThingsIndustries/release-notes"
 	_ "github.com/client9/misspell/cmd/misspell"
+	_ "github.com/gohugoio/hugo"
 	_ "github.com/goreleaser/goreleaser"
 	_ "github.com/magefile/mage"
 	_ "github.com/mattn/goveralls"

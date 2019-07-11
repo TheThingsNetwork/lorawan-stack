@@ -16,6 +16,7 @@ env:
   - TEST_SLOWDOWN=8
   - TEST_REDIS=1
   - PATH=/snap/bin:$PATH
+  - HUGO_BASE_URL=https://thethingsnetwork.github.io/lorawan-stack/
 matrix:
   include:
   - env: RUNTYPE=js
@@ -79,6 +80,7 @@ install:
     sudo apt-get install -y rpm snapd
     sudo snap install snapcraft --classic
     $MAGE jsSDK:deps js:deps
+    $MAGE docs:deps
   fi
 before_script:
 - |
@@ -86,6 +88,7 @@ before_script:
     set -e
     make dev.databases.start
   fi
+- if [[ "$RUNTYPE" == "release" ]]; then $MAGE docs:config; fi
 script:
 - if [[ "$RUNTYPE" == "js" ]]; then $MAGE proto:swaggerClean proto:swagger; fi
 - if [[ "$RUNTYPE" == "js" ]]; then $MAGE proto:markdownClean proto:markdown; fi
@@ -111,6 +114,7 @@ script:
   fi
 - if [[ "$RUNTYPE" == "go.test" ]]; then $MAGE go:testBinaries; fi
 - if [[ "$RUNTYPE" == "release" ]]; then $MAGE version:files; fi
+- if [[ "$RUNTYPE" == "release" ]]; then $MAGE docs:gen; fi
 - make git.diff
 after_success:
 - |
@@ -125,3 +129,12 @@ after_success:
       GO111MODULE=on go run github.com/goreleaser/goreleaser --snapshot --release-notes <(go run github.com/TheThingsIndustries/release-notes -owner TheThingsNetwork -repo lorawan-stack -id "release-notes" -head $(git rev-parse HEAD))
     fi
   fi
+- if [[ "$RUNTYPE" == "release" ]]; then $MAGE docs:gen; fi
+deploy:
+- provider: pages
+  local_dir: doc/public
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN
+  keep_history: true
+  on:
+    branch: master
