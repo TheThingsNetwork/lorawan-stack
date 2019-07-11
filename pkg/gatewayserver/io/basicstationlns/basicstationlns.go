@@ -25,6 +25,7 @@ import (
 
 	"github.com/gorilla/websocket"
 	echo "github.com/labstack/echo/v4"
+	echomiddleware "github.com/labstack/echo/v4/middleware"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/basicstation"
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -34,36 +35,56 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/web"
+	"go.thethings.network/lorawan-stack/pkg/web/middleware"
 	"google.golang.org/grpc/metadata"
 )
 
 var (
 	errEmptyGatewayEUI = errors.Define("empty_gateway_eui", "empty gateway EUI")
+	errListener        = errors.DefineFailedPrecondition(
+		"listener",
+		"failed to serve Basic Station frontend listener",
+	)
 )
 
 type srv struct {
-	ctx      context.Context
-	server   io.Server
-	upgrader *websocket.Upgrader
-	tokens   io.DownlinkTokens
+	ctx       context.Context
+	server    io.Server
+	webServer *echo.Echo
+	upgrader  *websocket.Upgrader
+	tokens    io.DownlinkTokens
 }
 
 func (*srv) Protocol() string { return "basicstation" }
 
-// New returns a new Basic Station frontend that can be registered in the web server.
-func New(ctx context.Context, server io.Server) web.Registerer {
-	ctx = log.NewContextWithField(ctx, "namespace", "gatewayserver/io/basicstation")
-	return &srv{
-		ctx:      ctx,
-		server:   server,
-		upgrader: &websocket.Upgrader{},
-	}
-}
+// New creates the Basic Station front end.
+func New(ctx context.Context, server io.Server) *echo.Echo {
+	webServer := echo.New()
+	webServer.Logger = web.NewNoopLogger()
+	webServer.HTTPErrorHandler = errorHandler
+	webServer.Use(
+		middleware.ID(""),
+		echomiddleware.BodyLimit("16M"),
+		middleware.Recover(),
+	)
 
-func (s *srv) RegisterRoutes(server *web.Server) {
-	group := server.Group(ttnpb.HTTPAPIPrefix + "/gs/io/basicstation")
-	group.GET("/discover", s.handleDiscover)
-	group.GET("/traffic/:id", s.handleTraffic)
+	ctx = log.NewContextWithField(ctx, "namespace", "gatewayserver/io/basicstation")
+	s := &srv{
+		ctx:       ctx,
+		server:    server,
+		upgrader:  &websocket.Upgrader{},
+		webServer: webServer,
+	}
+
+	webServer.GET("/router-info", s.handleDiscover)
+	webServer.GET("/traffic/:id", s.handleTraffic)
+
+	go func() {
+		<-ctx.Done()
+		webServer.Close()
+	}()
+
+	return webServer
 }
 
 func (s *srv) handleDiscover(c echo.Context) error {
@@ -354,5 +375,13 @@ func recordRTT(conn *io.Connection, receivedAt time.Time, refTime float64) {
 	if sec != 0 {
 		ref := time.Unix(int64(sec), int64(nsec*1e9))
 		conn.RecordRTT(receivedAt.Sub(ref))
+	}
+}
+
+// errorHandler is an echo.HTTPErrorHandler.
+func errorHandler(err error, c echo.Context) {
+	if httpErr, ok := err.(*echo.HTTPError); ok {
+		c.JSON(httpErr.Code, httpErr.Message)
+		return
 	}
 }

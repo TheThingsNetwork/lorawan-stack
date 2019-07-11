@@ -19,6 +19,7 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"net/http"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -176,7 +177,32 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 	if conf.BasicStation.FallbackFrequencyPlanID != "" {
 		ctx = frequencyplans.WithFallbackID(ctx, conf.BasicStation.FallbackFrequencyPlanID)
 	}
-	c.RegisterWeb(basicstationlns.New(ctx, gs))
+
+	bsWebServer := basicstationlns.New(ctx, gs)
+	for _, endpoint := range []component.Endpoint{
+		component.NewTCPEndpoint(conf.BasicStation.Listen, "Basic Station"),
+		component.NewTLSEndpoint(conf.BasicStation.ListenTLS, "Basic Station"),
+	} {
+		if endpoint.Address() == "" {
+			continue
+		}
+		l, err := gs.ListenTCP(endpoint.Address())
+		var lis net.Listener
+		if err == nil {
+			lis, err = endpoint.Listen(l)
+		}
+		if err != nil {
+			return nil, errListenFrontend.WithCause(err).WithAttributes(
+				"address", endpoint.Address(),
+				"protocol", endpoint.Protocol(),
+			)
+		}
+		go func() error {
+			return http.Serve(lis, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				bsWebServer.ServeHTTP(w, r)
+			}))
+		}()
+	}
 
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.NsGs", cluster.HookName, c.ClusterAuthUnaryHook())
 
