@@ -208,12 +208,10 @@ type topicAccess struct {
 }
 
 func (c *connection) Connect(ctx context.Context, info *auth.Info) (context.Context, error) {
-	ids, err := unique.ToApplicationID(info.Username)
-	if err != nil {
-		return nil, err
+	ids := ttnpb.ApplicationIdentifiers{
+		ApplicationID: info.Username,
 	}
-	ctx, err = unique.WithContext(ctx, info.Username)
-	if err != nil {
+	if err := ids.ValidateContext(ctx); err != nil {
 		return nil, err
 	}
 
@@ -227,12 +225,10 @@ func (c *connection) Connect(ctx context.Context, info *auth.Info) (context.Cont
 	ctx = metadata.NewIncomingContext(ctx, md)
 
 	ctx = c.server.FillContext(ctx)
-	if err != nil {
-		return nil, err
-	}
 	uid := unique.ID(ctx, ids)
 	ctx = log.NewContextWithField(ctx, "application_uid", uid)
 
+	var err error
 	c.io, err = c.server.Subscribe(ctx, "mqtt", ids)
 	if err != nil {
 		return nil, err
