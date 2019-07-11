@@ -390,7 +390,8 @@ For example, to send an unconfirmed downlink message to the device `dev1` in app
 }
 ```
 
->Hint: Use [this handy tool](https://v2.cryptii.com/hexadecimal/base64) to convert hexadecimal to base64.
+> Hint: You can use `ttn-lw-cli utilities hex-to-base64 "BE EF"` to convert hexadecimal to base64.
+> You can use `ttn-lw-cli utilities base64-to-hex "vu8="` to convert base64 back to hexadecimal.
 
 >If you use `mosquitto_pub`, use the following command:
 >
