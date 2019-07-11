@@ -113,7 +113,7 @@ script:
   fi
 - if [[ "$RUNTYPE" == "go.test" ]]; then $MAGE go:testBinaries; fi
 - if [[ "$RUNTYPE" == "release" ]]; then $MAGE version:files; fi
-- if [[ "$RUNTYPE" == "release" ]]; then $MAGE docs:gen; fi
+- if [[ "$RUNTYPE" == "release" ]]; then $MAGE docs:build; fi
 - make git.diff
 after_success:
 - |
