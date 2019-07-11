@@ -24,6 +24,7 @@ import (
 	echo "github.com/labstack/echo/v4"
 	echomiddleware "github.com/labstack/echo/v4/middleware"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/fillcontext"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/random"
 	"go.thethings.network/lorawan-stack/pkg/web/cookie"
@@ -51,10 +52,19 @@ type options struct {
 
 	staticMount       string
 	staticSearchPaths []string
+
+	contextFillers []fillcontext.Filler
 }
 
 // Option for the web server
 type Option func(*options)
+
+// WithContextFiller sets context fillers that are executed on every request context.
+func WithContextFiller(contextFillers ...fillcontext.Filler) Option {
+	return func(o *options) {
+		o.contextFillers = append(o.contextFillers, contextFillers...)
+	}
+}
 
 // WithCookieKeys sets the cookie hash key and block key.
 func WithCookieKeys(hashKey, blockKey []byte) Option {
@@ -111,6 +121,7 @@ func New(ctx context.Context, opts ...Option) (*Server, error) {
 		echomiddleware.Gzip(),
 		middleware.Recover(),
 		cookie.Cookies(blockKey, hashKey),
+		middleware.FillContext(options.contextFillers...),
 	)
 
 	s := &Server{
