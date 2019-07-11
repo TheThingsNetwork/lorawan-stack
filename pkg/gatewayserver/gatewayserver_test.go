@@ -1032,14 +1032,27 @@ func TestGatewayServer(t *testing.T) {
 							}
 							if tc.RxWindowDetailsAssertion != nil {
 								a.So(err, should.HaveSameErrorDefinitionAs, gatewayserver.ErrSchedule)
-								a.So(errors.Details(err), should.HaveLength, 1)
-								errSchedulePathCause := errors.Cause(errors.Details(err)[0].(error))
+								if !a.So(errors.Details(err), should.HaveLength, 1) {
+									t.FailNow()
+								}
+								details := errors.Details(err)[0].(*ttnpb.ScheduleDownlinkErrorDetails)
+								if !a.So(details, should.NotBeNil) || !a.So(details.PathErrors, should.HaveLength, 1) {
+									t.FailNow()
+								}
+								errSchedulePathCause := errors.Cause(ttnpb.ErrorDetailsFromProto(details.PathErrors[0]))
 								a.So(errors.IsAborted(errSchedulePathCause), should.BeTrue)
 								for i, assert := range tc.RxWindowDetailsAssertion {
-									if i >= len(errors.Details(errSchedulePathCause)) {
+									if !a.So(errors.Details(errSchedulePathCause), should.HaveLength, 1) {
+										t.FailNow()
+									}
+									errSchedulePathCauseDetails := errors.Details(errSchedulePathCause)[0].(*ttnpb.ScheduleDownlinkErrorDetails)
+									if !a.So(errSchedulePathCauseDetails, should.NotBeNil) {
+										t.FailNow()
+									}
+									if i >= len(errSchedulePathCauseDetails.PathErrors) {
 										t.Fatalf("Expected error in Rx window %d", i+1)
 									}
-									errRxWindow := errors.Details(errSchedulePathCause)[i].(error)
+									errRxWindow := ttnpb.ErrorDetailsFromProto(errSchedulePathCauseDetails.PathErrors[i])
 									if !a.So(assert(errRxWindow), should.BeTrue) {
 										t.Fatalf("Unexpected Rx window %d error: %v", i+1, errRxWindow)
 									}
