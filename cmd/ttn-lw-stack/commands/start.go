@@ -50,13 +50,13 @@ var (
 		Short: "Start the Network Stack",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var start struct {
-				IdentityServer    bool
-				GatewayServer     bool
-				NetworkServer     bool
-				ApplicationServer bool
-				JoinServer        bool
-				Console           bool
-				GCS               bool
+				IdentityServer             bool
+				GatewayServer              bool
+				NetworkServer              bool
+				ApplicationServer          bool
+				JoinServer                 bool
+				Console                    bool
+				GatewayConfigurationServer bool
 			}
 			startDefault := len(args) == 0
 			for _, arg := range args {
@@ -74,7 +74,7 @@ var (
 				case "console":
 					start.Console = true
 				case "gcs":
-					start.GCS = true
+					start.GatewayConfigurationServer = true
 				case "all":
 					start.IdentityServer = true
 					start.GatewayServer = true
@@ -82,7 +82,7 @@ var (
 					start.ApplicationServer = true
 					start.JoinServer = true
 					start.Console = true
-					start.GCS = true
+					start.GatewayConfigurationServer = true
 				default:
 					return errUnknownComponent.WithAttributes("component", arg)
 				}
@@ -202,7 +202,7 @@ var (
 				rootRedirect = web.Redirect("/", http.StatusFound, config.Console.UI.CanonicalURL)
 			}
 
-			if start.GCS {
+			if start.GatewayConfigurationServer {
 				logger.Info("Setting up Gateway Configuration Server")
 				gcs, err := gatewayconfigurationserver.New(c, &config.GCS)
 				if err != nil {
