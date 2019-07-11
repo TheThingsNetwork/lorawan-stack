@@ -23,8 +23,8 @@ import (
 
 	echo "github.com/labstack/echo/v4"
 	echomiddleware "github.com/labstack/echo/v4/middleware"
-	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/fillcontext"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/random"
 	"go.thethings.network/lorawan-stack/pkg/web/cookie"
@@ -39,7 +39,6 @@ type Registerer interface {
 // Server is the server.
 type Server struct {
 	*rootGroup
-	config config.HTTP
 	server *echo.Echo
 }
 
@@ -47,11 +46,50 @@ type rootGroup struct {
 	*echo.Group
 }
 
+type options struct {
+	cookieHashKey  []byte
+	cookieBlockKey []byte
+
+	staticMount       string
+	staticSearchPaths []string
+
+	contextFillers []fillcontext.Filler
+}
+
+// Option for the web server
+type Option func(*options)
+
+// WithContextFiller sets context fillers that are executed on every request context.
+func WithContextFiller(contextFillers ...fillcontext.Filler) Option {
+	return func(o *options) {
+		o.contextFillers = append(o.contextFillers, contextFillers...)
+	}
+}
+
+// WithCookieKeys sets the cookie hash key and block key.
+func WithCookieKeys(hashKey, blockKey []byte) Option {
+	return func(o *options) {
+		o.cookieHashKey, o.cookieBlockKey = hashKey, blockKey
+	}
+}
+
+// WithStatic sets the mount and search paths for static assets.
+func WithStatic(mount string, searchPaths ...string) Option {
+	return func(o *options) {
+		o.staticMount, o.staticSearchPaths = mount, searchPaths
+	}
+}
+
 // New builds a new server.
-func New(ctx context.Context, config config.HTTP) (*Server, error) {
+func New(ctx context.Context, opts ...Option) (*Server, error) {
 	logger := log.FromContext(ctx).WithField("namespace", "web")
 
-	hashKey, blockKey := config.Cookie.HashKey, config.Cookie.BlockKey
+	options := new(options)
+	for _, opt := range opts {
+		opt(options)
+	}
+
+	hashKey, blockKey := options.cookieHashKey, options.cookieBlockKey
 
 	if len(hashKey) == 0 || isZeros(hashKey) {
 		hashKey = random.Bytes(64)
@@ -83,6 +121,7 @@ func New(ctx context.Context, config config.HTTP) (*Server, error) {
 		echomiddleware.Gzip(),
 		middleware.Recover(),
 		cookie.Cookies(blockKey, hashKey),
+		middleware.FillContext(options.contextFillers...),
 	)
 
 	s := &Server{
@@ -93,22 +132,21 @@ func New(ctx context.Context, config config.HTTP) (*Server, error) {
 				middleware.Normalize(middleware.RedirectPermanent),
 			),
 		},
-		config: config,
 		server: server,
 	}
 
 	var staticDir http.Dir
-	for _, path := range config.Static.SearchPath {
+	for _, path := range options.staticSearchPaths {
 		if s, err := os.Stat(path); err == nil && s.IsDir() {
 			staticDir = http.Dir(path)
 			break
 		}
 	}
 	if staticDir != "" {
-		logger.WithFields(log.Fields("path", staticDir, "mount", config.Static.Mount)).Debug("Serving static assets")
-		s.Static(config.Static.Mount, staticDir, middleware.Immutable)
+		logger.WithFields(log.Fields("path", staticDir, "mount", options.staticMount)).Debug("Serving static assets")
+		s.Static(options.staticMount, staticDir, middleware.Immutable)
 	} else {
-		logger.WithField("search_path", config.Static.SearchPath).Warn("No static assets found in any search path")
+		logger.WithField("search_paths", options.staticSearchPaths).Warn("No static assets found in any search path")
 	}
 
 	return s, nil

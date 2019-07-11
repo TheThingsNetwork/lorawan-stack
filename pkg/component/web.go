@@ -35,6 +35,20 @@ const (
 	healthUsername  = "health"
 )
 
+func (c *Component) initWeb() error {
+	web, err := web.New(
+		c.ctx,
+		web.WithContextFiller(c.FillContext),
+		web.WithCookieKeys(c.config.HTTP.Cookie.HashKey, c.config.HTTP.Cookie.BlockKey),
+		web.WithStatic(c.config.HTTP.Static.Mount, c.config.HTTP.Static.SearchPath...),
+	)
+	if err != nil {
+		return err
+	}
+	c.web = web
+	return nil
+}
+
 // RegisterWeb registers a web subsystem to the component.
 func (c *Component) RegisterWeb(s web.Registerer) {
 	c.webSubsystems = append(c.webSubsystems, s)

@@ -149,8 +149,7 @@ func New(logger log.Stack, config *Config, opts ...Option) (*Component, error) {
 		c.clusterNew = cluster.New
 	}
 
-	c.web, err = web.New(c.ctx, config.HTTP)
-	if err != nil {
+	if err = c.initWeb(); err != nil {
 		return nil, err
 	}
 
