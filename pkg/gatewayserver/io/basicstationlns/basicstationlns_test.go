@@ -15,8 +15,10 @@
 package basicstationlns_test
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
+	"net"
 	"net/http"
 	"testing"
 	"time"
@@ -24,8 +26,6 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/basicstation"
-	"go.thethings.network/lorawan-stack/pkg/component"
-	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
 	. "go.thethings.network/lorawan-stack/pkg/gatewayserver/io/basicstationlns"
@@ -39,15 +39,16 @@ import (
 )
 
 var (
+	serverAddress          = "127.0.0.1:0"
 	registeredGatewayUID   = "eui-0101010101010101"
 	registeredGatewayID    = ttnpb.GatewayIdentifiers{GatewayID: registeredGatewayUID}
 	registeredGateway      = ttnpb.Gateway{GatewayIdentifiers: registeredGatewayID, FrequencyPlanID: "EU_863_870"}
 	registeredGatewayToken = "secrettoken"
 
-	discoveryEndPoint      = "ws://localhost:8100/api/v3/gs/io/basicstation/discover"
-	connectionRootEndPoint = "ws://localhost:8100/api/v3/gs/io/basicstation/traffic/"
+	discoveryEndPoint      = "/router-info"
+	connectionRootEndPoint = "/traffic/"
 
-	testTrafficEndPoint = "ws://localhost:8100/api/v3/gs/io/basicstation/traffic/eui-0101010101010101"
+	testTrafficEndPoint = "/traffic/eui-0101010101010101"
 
 	timeout = 10 * test.Delay
 )
@@ -55,20 +56,25 @@ var (
 func eui64Ptr(eui types.EUI64) *types.EUI64 { return &eui }
 
 func TestClientTokenAuth(t *testing.T) {
+	a := assertions.New(t)
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 	ctx = newContextWithRightsFetcher(ctx)
-	c := component.MustNew(test.GetLogger(t), &component.Config{
-		ServiceBase: config.ServiceBase{
-			HTTP: config.HTTP{
-				Listen: ":8100",
-			},
-		},
-	})
+	ctx, cancelCtx := context.WithCancel(ctx)
+	defer cancelCtx()
 	gs := mock.NewServer()
-	srv := New(ctx, gs)
-	c.RegisterWeb(srv)
-	test.Must(nil, c.Start())
-	defer c.Close()
+
+	bsWebServer := New(ctx, gs)
+	lis, err := net.Listen("tcp", serverAddress)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	defer lis.Close()
+	go func() error {
+		return http.Serve(lis, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			bsWebServer.ServeHTTP(w, r)
+		}))
+	}()
+	servAddr := fmt.Sprintf("ws://%s", lis.Addr().String())
 
 	gs.RegisterGateway(ctx, registeredGatewayID, &registeredGateway)
 
@@ -118,7 +124,7 @@ func TestClientTokenAuth(t *testing.T) {
 			a := assertions.New(t)
 			h := http.Header{}
 			h.Set("Authorization", fmt.Sprintf("%s%s", tc.TokenPrefix, tc.AuthToken))
-			conn, _, err := websocket.DefaultDialer.Dial("ws://localhost:8100/api/v3/gs/io/basicstation/traffic/"+tc.GatewayID, h)
+			conn, _, err := websocket.DefaultDialer.Dial(servAddr+connectionRootEndPoint+tc.GatewayID, h)
 			if err != nil {
 				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 					t.Fatalf("Unexpected error: %v", err)
@@ -131,40 +137,44 @@ func TestClientTokenAuth(t *testing.T) {
 			}
 		})
 	}
-
 }
 
 func TestClientSideTLS(t *testing.T) {
 	// TODO: https://github.com/TheThingsNetwork/lorawan-stack/issues/558
 }
-func TestDiscover(t *testing.T) {
-	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 
-	c := component.MustNew(test.GetLogger(t), &component.Config{
-		ServiceBase: config.ServiceBase{
-			HTTP: config.HTTP{
-				Listen: ":8100",
-			},
-		},
-	})
+func TestDiscover(t *testing.T) {
+	a := assertions.New(t)
+	ctx := log.NewContext(test.Context(), test.GetLogger(t))
+	ctx = newContextWithRightsFetcher(ctx)
+	ctx, cancelCtx := context.WithCancel(ctx)
+	defer cancelCtx()
 	gs := mock.NewServer()
-	srv := New(ctx, gs)
-	c.RegisterWeb(srv)
-	test.Must(nil, c.Start())
-	defer c.Close()
+
+	bsWebServer := New(ctx, gs)
+	lis, err := net.Listen("tcp", serverAddress)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	defer lis.Close()
+	go func() error {
+		return http.Serve(lis, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			bsWebServer.ServeHTTP(w, r)
+		}))
+	}()
+	servAddr := fmt.Sprintf("ws://%s", lis.Addr().String())
+
+	gs.RegisterGateway(ctx, registeredGatewayID, &registeredGateway)
 
 	// Invalid Endpoints
 	for i, tc := range []struct {
 		URL string
 	}{
 		{
-			URL: "ws://localhost:8100/router-info",
+			URL: servAddr + "/api/v3/gs/io/basicstation/discover",
 		},
 		{
-			URL: discoveryEndPoint + "/router-58a0:cbff:fe80:f8",
-		},
-		{
-			URL: discoveryEndPoint + "/eui-0101010101010101",
+			URL: servAddr + discoveryEndPoint + "/eui-0101010101010101",
 		},
 	} {
 		t.Run(fmt.Sprintf("InvalidDiscoveryEndPoint/%d", i), func(t *testing.T) {
@@ -205,7 +215,7 @@ func TestDiscover(t *testing.T) {
 	} {
 		t.Run(fmt.Sprintf("InvalidQuery/%s", tc.Name), func(t *testing.T) {
 			a := assertions.New(t)
-			conn, _, err := websocket.DefaultDialer.Dial(discoveryEndPoint, nil)
+			conn, _, err := websocket.DefaultDialer.Dial(servAddr+discoveryEndPoint, nil)
 			if !a.So(err, should.BeNil) {
 				t.Fatalf("Connection failed: %v", err)
 			}
@@ -268,7 +278,7 @@ func TestDiscover(t *testing.T) {
 	} {
 		t.Run(fmt.Sprintf("InvalidQuery/%s", tc.Name), func(t *testing.T) {
 			a := assertions.New(t)
-			conn, _, err := websocket.DefaultDialer.Dial(discoveryEndPoint, nil)
+			conn, _, err := websocket.DefaultDialer.Dial(servAddr+discoveryEndPoint, nil)
 			if !a.So(err, should.BeNil) {
 				t.Fatalf("Connection failed: %v", err)
 			}
@@ -309,7 +319,7 @@ func TestDiscover(t *testing.T) {
 	} {
 		t.Run(fmt.Sprintf("ValidQuery/%d", i), func(t *testing.T) {
 			a := assertions.New(t)
-			conn, _, err := websocket.DefaultDialer.Dial(discoveryEndPoint, nil)
+			conn, _, err := websocket.DefaultDialer.Dial(servAddr+discoveryEndPoint, nil)
 			if !a.So(err, should.BeNil) {
 				t.Fatalf("Connection failed: %v", err)
 			}
@@ -346,7 +356,7 @@ func TestDiscover(t *testing.T) {
 					Muxs: basicstation.EUI{
 						Prefix: "muxs",
 					},
-					URI: connectionRootEndPoint + "eui-" + tc.EndPointEUI,
+					URI: servAddr + connectionRootEndPoint + "eui-" + tc.EndPointEUI,
 				})
 			case <-time.After(timeout):
 				t.Fatalf("Read message timeout")
@@ -359,22 +369,27 @@ func TestDiscover(t *testing.T) {
 func TestVersion(t *testing.T) {
 	a := assertions.New(t)
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
-
-	c := component.MustNew(test.GetLogger(t), &component.Config{
-		ServiceBase: config.ServiceBase{
-			HTTP: config.HTTP{
-				Listen: ":8100",
-			},
-		},
-	})
+	ctx = newContextWithRightsFetcher(ctx)
+	ctx, cancelCtx := context.WithCancel(ctx)
+	defer cancelCtx()
 	gs := mock.NewServer()
-	srv := New(ctx, gs)
-	c.RegisterWeb(srv)
-	test.Must(nil, c.Start())
-	defer c.Close()
+
+	bsWebServer := New(ctx, gs)
+	lis, err := net.Listen("tcp", serverAddress)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	defer lis.Close()
+	go func() error {
+		return http.Serve(lis, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			bsWebServer.ServeHTTP(w, r)
+		}))
+	}()
+	servAddr := fmt.Sprintf("ws://%s", lis.Addr().String())
+
 	gs.RegisterGateway(ctx, registeredGatewayID, &registeredGateway)
 
-	conn, _, err := websocket.DefaultDialer.Dial(testTrafficEndPoint, nil)
+	conn, _, err := websocket.DefaultDialer.Dial(servAddr+testTrafficEndPoint, nil)
 	if !a.So(err, should.BeNil) {
 		t.Fatalf("Connection failed: %v", err)
 	}
@@ -477,23 +492,27 @@ func TestVersion(t *testing.T) {
 func TestTraffic(t *testing.T) {
 	a := assertions.New(t)
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
-
-	c := component.MustNew(test.GetLogger(t), &component.Config{
-		ServiceBase: config.ServiceBase{
-			HTTP: config.HTTP{
-				Listen: ":8100",
-			},
-		},
-	})
+	ctx = newContextWithRightsFetcher(ctx)
+	ctx, cancelCtx := context.WithCancel(ctx)
+	defer cancelCtx()
 	gs := mock.NewServer()
-	srv := New(ctx, gs)
-	c.RegisterWeb(srv)
-	test.Must(nil, c.Start())
-	defer c.Close()
+
+	bsWebServer := New(ctx, gs)
+	lis, err := net.Listen("tcp", serverAddress)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	defer lis.Close()
+	go func() error {
+		return http.Serve(lis, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			bsWebServer.ServeHTTP(w, r)
+		}))
+	}()
+	servAddr := fmt.Sprintf("ws://%s", lis.Addr().String())
 
 	gs.RegisterGateway(ctx, registeredGatewayID, &registeredGateway)
 
-	wsConn, _, err := websocket.DefaultDialer.Dial(testTrafficEndPoint, nil)
+	wsConn, _, err := websocket.DefaultDialer.Dial(servAddr+testTrafficEndPoint, nil)
 	if !a.So(err, should.BeNil) {
 		t.Fatalf("Connection failed: %v", err)
 	}
@@ -783,23 +802,27 @@ func TestTraffic(t *testing.T) {
 func TestRTT(t *testing.T) {
 	a := assertions.New(t)
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
-
-	c := component.MustNew(test.GetLogger(t), &component.Config{
-		ServiceBase: config.ServiceBase{
-			HTTP: config.HTTP{
-				Listen: ":8100",
-			},
-		},
-	})
+	ctx = newContextWithRightsFetcher(ctx)
+	ctx, cancelCtx := context.WithCancel(ctx)
+	defer cancelCtx()
 	gs := mock.NewServer()
-	srv := New(ctx, gs)
-	c.RegisterWeb(srv)
-	test.Must(nil, c.Start())
-	defer c.Close()
+
+	bsWebServer := New(ctx, gs)
+	lis, err := net.Listen("tcp", serverAddress)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	defer lis.Close()
+	go func() error {
+		return http.Serve(lis, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			bsWebServer.ServeHTTP(w, r)
+		}))
+	}()
+	servAddr := fmt.Sprintf("ws://%s", lis.Addr().String())
 
 	gs.RegisterGateway(ctx, registeredGatewayID, &registeredGateway)
 
-	wsConn, _, err := websocket.DefaultDialer.Dial(testTrafficEndPoint, nil)
+	wsConn, _, err := websocket.DefaultDialer.Dial(servAddr+testTrafficEndPoint, nil)
 	if !a.So(err, should.BeNil) {
 		t.Fatalf("Connection failed: %v", err)
 	}

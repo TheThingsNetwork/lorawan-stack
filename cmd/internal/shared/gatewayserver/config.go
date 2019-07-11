@@ -35,4 +35,8 @@ var DefaultGatewayServerConfig = gatewayserver.Config{
 		Listen:    ":1882",
 		ListenTLS: ":8882",
 	},
+	BasicStation: gatewayserver.BasicStationConfig{
+		Listen:    ":1887",
+		ListenTLS: ":8887",
+	},
 }

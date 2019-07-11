@@ -73,9 +73,6 @@ func TestGatewayServer(t *testing.T) {
 				Listen:                      ":9187",
 				AllowInsecureForCredentials: true,
 			},
-			HTTP: config.HTTP{
-				Listen: ":1885",
-			},
 			Cluster: config.Cluster{
 				IdentityServer: isAddr,
 				NetworkServer:  nsAddr,
@@ -100,6 +97,9 @@ func TestGatewayServer(t *testing.T) {
 			Listeners: map[string]string{
 				":1700": test.EUFrequencyPlanID,
 			},
+		},
+		BasicStation: gatewayserver.BasicStationConfig{
+			Listen: ":1887",
 		},
 	}
 	gs, err := gatewayserver.New(c, config)
@@ -415,7 +415,7 @@ func TestGatewayServer(t *testing.T) {
 				if ids.EUI == nil {
 					t.SkipNow()
 				}
-				wsConn, _, err := websocket.DefaultDialer.Dial("ws://0.0.0.0:1885/api/v3/gs/io/basicstation/traffic/"+registeredGatewayID, nil)
+				wsConn, _, err := websocket.DefaultDialer.Dial("ws://0.0.0.0:1887/traffic/"+registeredGatewayID, nil)
 				if err != nil {
 					return err
 				}
