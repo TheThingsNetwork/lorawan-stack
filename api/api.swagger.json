@@ -7896,6 +7896,13 @@
           "type": "integer",
           "format": "int64",
           "description": "The status code of the error."
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          },
+          "description": "The details of the error."
         }
       },
       "description": "Error details that are communicated over gRPC (and HTTP) APIs.\nThe messages (for translation) are stored as \"error:\u003cnamespace\u003e:\u003cname\u003e\"."

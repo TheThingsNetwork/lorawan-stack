@@ -15,6 +15,7 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "google/protobuf/any.proto";
 import "google/protobuf/struct.proto";
 
 package ttn.lorawan.v3;
@@ -41,5 +42,7 @@ message ErrorDetails {
   ErrorDetails cause = 6;
   // The status code of the error.
   uint32 code = 7;
+  // The details of the error.
+  repeated google.protobuf.Any details = 8;
 }
 

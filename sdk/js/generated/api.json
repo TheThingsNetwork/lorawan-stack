@@ -7019,6 +7019,16 @@
               "fullType": "uint32",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "details",
+              "description": "The details of the error.",
+              "label": "repeated",
+              "type": "Any",
+              "longType": "google.protobuf.Any",
+              "fullType": "google.protobuf.Any",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         }
