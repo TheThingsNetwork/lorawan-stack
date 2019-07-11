@@ -17,6 +17,7 @@ package io
 import (
 	"context"
 
+	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errorcontext"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -26,6 +27,8 @@ const bufferSize = 32
 
 // Server represents the Application Server to gateway frontends.
 type Server interface {
+	// GetBaseConfig returns the component configuration.
+	GetBaseConfig(ctx context.Context) config.ServiceBase
 	// FillContext fills the given context.
 	// This method should only be used for request contexts.
 	FillContext(ctx context.Context) context.Context

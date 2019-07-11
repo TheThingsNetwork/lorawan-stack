@@ -54,7 +54,6 @@ import (
 type GatewayServer struct {
 	*component.Component
 	ctx context.Context
-	io.Server
 
 	requireRegisteredGateways bool
 	forward                   map[string][]types.DevAddrPrefix

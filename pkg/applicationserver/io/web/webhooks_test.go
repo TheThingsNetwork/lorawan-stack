@@ -345,7 +345,7 @@ func TestWebhooks(t *testing.T) {
 			Component: c,
 			Server:    io,
 		}
-		w := web.NewWebhooks(ctx, testSink, registry, testSink)
+		w := web.NewWebhooks(ctx, testSink.Server, registry, testSink)
 		c.RegisterWeb(w)
 		test.Must(nil, c.Start())
 		defer c.Close()
@@ -407,9 +407,9 @@ func TestWebhooks(t *testing.T) {
 }
 
 type mockSink struct {
-	*component.Component
-	io.Server
-	ch chan *http.Request
+	Component *component.Component
+	Server    io.Server
+	ch        chan *http.Request
 }
 
 func (s *mockSink) FillContext(ctx context.Context) context.Context {
