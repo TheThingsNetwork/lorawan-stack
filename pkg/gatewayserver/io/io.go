@@ -21,6 +21,7 @@ import (
 	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/band"
+	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errorcontext"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
@@ -36,6 +37,8 @@ const (
 
 // Server represents the Gateway Server to gateway frontends.
 type Server interface {
+	// GetBaseConfig returns the component configuration.
+	GetBaseConfig(ctx context.Context) config.ServiceBase
 	// FillGatewayContext fills the given context and identifiers.
 	// This method should only be used for request contexts.
 	FillGatewayContext(ctx context.Context, ids ttnpb.GatewayIdentifiers) (context.Context, ttnpb.GatewayIdentifiers, error)

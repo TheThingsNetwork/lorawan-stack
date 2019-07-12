@@ -30,6 +30,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/mqtt"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 	"google.golang.org/grpc/metadata"
 )
@@ -183,12 +184,10 @@ type topicAccess struct {
 }
 
 func (c *connection) Connect(ctx context.Context, info *auth.Info) (context.Context, error) {
-	ids, err := unique.ToGatewayID(info.Username)
-	if err != nil {
-		return nil, err
+	ids := ttnpb.GatewayIdentifiers{
+		GatewayID: info.Username,
 	}
-	ctx, err = unique.WithContext(ctx, info.Username)
-	if err != nil {
+	if err := ids.ValidateContext(ctx); err != nil {
 		return nil, err
 	}
 
@@ -201,7 +200,7 @@ func (c *connection) Connect(ctx context.Context, info *auth.Info) (context.Cont
 	}
 	ctx = metadata.NewIncomingContext(ctx, md)
 
-	ctx, ids, err = c.server.FillGatewayContext(ctx, ids)
+	ctx, ids, err := c.server.FillGatewayContext(ctx, ids)
 	if err != nil {
 		return nil, err
 	}
