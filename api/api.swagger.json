@@ -2104,6 +2104,50 @@
         ]
       }
     },
+    "/edtc/convert": {
+      "post": {
+        "summary": "Get the end device with the given identifiers, selecting the fields given\nby the field mask.",
+        "operationId": "Convert",
+        "responses": {
+          "200": {
+            "description": "A successful response.(streaming responses)",
+            "schema": {
+              "$ref": "#/x-stream-definitions/v3EndDeviceTemplate"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3ConvertEndDeviceTemplateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "EndDeviceTemplateConverter"
+        ]
+      }
+    },
+    "/edtc/formats": {
+      "get": {
+        "summary": "Create a new end device within an application.",
+        "operationId": "ListFormats",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3EndDeviceTemplateFormats"
+            }
+          }
+        },
+        "tags": [
+          "EndDeviceTemplateConverter"
+        ]
+      }
+    },
     "/events": {
       "post": {
         "summary": "Stream live events, optionally with a tail of historical events (depending on server support and retention policy).\nEvents may arrive out-of-order.",
@@ -7263,6 +7307,20 @@
       ],
       "default": "CONTACT_TYPE_OTHER"
     },
+    "v3ConvertEndDeviceTemplateRequest": {
+      "type": "object",
+      "properties": {
+        "format_id": {
+          "type": "string",
+          "description": "ID of the format."
+        },
+        "data": {
+          "type": "string",
+          "format": "byte",
+          "description": "Data to convert."
+        }
+      }
+    },
     "v3CreateApplicationAPIKeyRequest": {
       "type": "object",
       "properties": {
@@ -7809,6 +7867,42 @@
           "type": "string",
           "format": "byte",
           "description": "The LoRaWAN DevAddr."
+        }
+      }
+    },
+    "v3EndDeviceTemplate": {
+      "type": "object",
+      "properties": {
+        "end_device": {
+          "$ref": "#/definitions/v3EndDevice"
+        },
+        "field_mask": {
+          "$ref": "#/definitions/protobufFieldMask"
+        },
+        "mapping_key": {
+          "type": "string"
+        }
+      }
+    },
+    "v3EndDeviceTemplateFormat": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "v3EndDeviceTemplateFormats": {
+      "type": "object",
+      "properties": {
+        "formats": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/v3EndDeviceTemplateFormat"
+          }
         }
       }
     },
@@ -10288,6 +10382,18 @@
         }
       },
       "title": "Stream result of v3EndDevice"
+    },
+    "v3EndDeviceTemplate": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/definitions/v3EndDeviceTemplate"
+        },
+        "error": {
+          "$ref": "#/definitions/runtimeStreamError"
+        }
+      },
+      "title": "Stream result of v3EndDeviceTemplate"
     },
     "v3Event": {
       "type": "object",

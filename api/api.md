@@ -86,12 +86,17 @@
   - [Enum `ContactType`](#ttn.lorawan.v3.ContactType)
   - [Service `ContactInfoRegistry`](#ttn.lorawan.v3.ContactInfoRegistry)
 - [File `lorawan-stack/api/end_device.proto`](#lorawan-stack/api/end_device.proto)
+  - [Message `ConvertEndDeviceTemplateRequest`](#ttn.lorawan.v3.ConvertEndDeviceTemplateRequest)
   - [Message `CreateEndDeviceRequest`](#ttn.lorawan.v3.CreateEndDeviceRequest)
   - [Message `EndDevice`](#ttn.lorawan.v3.EndDevice)
   - [Message `EndDevice.AttributesEntry`](#ttn.lorawan.v3.EndDevice.AttributesEntry)
   - [Message `EndDevice.LocationsEntry`](#ttn.lorawan.v3.EndDevice.LocationsEntry)
   - [Message `EndDeviceBrand`](#ttn.lorawan.v3.EndDeviceBrand)
   - [Message `EndDeviceModel`](#ttn.lorawan.v3.EndDeviceModel)
+  - [Message `EndDeviceTemplate`](#ttn.lorawan.v3.EndDeviceTemplate)
+  - [Message `EndDeviceTemplateFormat`](#ttn.lorawan.v3.EndDeviceTemplateFormat)
+  - [Message `EndDeviceTemplateFormats`](#ttn.lorawan.v3.EndDeviceTemplateFormats)
+  - [Message `EndDeviceTemplateFormats.FormatsEntry`](#ttn.lorawan.v3.EndDeviceTemplateFormats.FormatsEntry)
   - [Message `EndDeviceVersion`](#ttn.lorawan.v3.EndDeviceVersion)
   - [Message `EndDeviceVersionIdentifiers`](#ttn.lorawan.v3.EndDeviceVersionIdentifiers)
   - [Message `EndDevices`](#ttn.lorawan.v3.EndDevices)
@@ -112,6 +117,7 @@
   - [Enum `PowerState`](#ttn.lorawan.v3.PowerState)
 - [File `lorawan-stack/api/end_device_services.proto`](#lorawan-stack/api/end_device_services.proto)
   - [Service `EndDeviceRegistry`](#ttn.lorawan.v3.EndDeviceRegistry)
+  - [Service `EndDeviceTemplateConverter`](#ttn.lorawan.v3.EndDeviceTemplateConverter)
 - [File `lorawan-stack/api/enums.proto`](#lorawan-stack/api/enums.proto)
   - [Enum `DownlinkPathConstraint`](#ttn.lorawan.v3.DownlinkPathConstraint)
   - [Enum `State`](#ttn.lorawan.v3.State)
@@ -1291,6 +1297,7 @@ PeerInfo
 | `APPLICATION_SERVER` | 5 |  |
 | `JOIN_SERVER` | 6 |  |
 | `CRYPTO_SERVER` | 7 |  |
+| `DEVICE_TEMPLATE_CONVERTER` | 8 |  |
 
 ## <a name="lorawan-stack/api/configuration_services.proto">File `lorawan-stack/api/configuration_services.proto`</a>
 
@@ -1382,6 +1389,19 @@ PeerInfo
 | `Validate` | `PATCH` | `/api/v3/contact_info/validation` |  |
 
 ## <a name="lorawan-stack/api/end_device.proto">File `lorawan-stack/api/end_device.proto`</a>
+
+### <a name="ttn.lorawan.v3.ConvertEndDeviceTemplateRequest">Message `ConvertEndDeviceTemplateRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `format_id` | [`string`](#string) |  | ID of the format. |
+| `data` | [`bytes`](#bytes) |  | Data to convert. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `format_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
 
 ### <a name="ttn.lorawan.v3.CreateEndDeviceRequest">Message `CreateEndDeviceRequest`</a>
 
@@ -1506,6 +1526,54 @@ SDKs are responsible for combining (if desired) the three.
 | ----- | ----------- |
 | `brand_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
 | `id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+
+### <a name="ttn.lorawan.v3.EndDeviceTemplate">Message `EndDeviceTemplate`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `end_device` | [`EndDevice`](#ttn.lorawan.v3.EndDevice) |  |  |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  |  |
+| `mapping_key` | [`string`](#string) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `end_device` | <p>`message.required`: `true`</p> |
+| `mapping_key` | <p>`string.max_len`: `100`</p> |
+
+### <a name="ttn.lorawan.v3.EndDeviceTemplateFormat">Message `EndDeviceTemplateFormat`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `name` | [`string`](#string) |  |  |
+| `description` | [`string`](#string) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `name` | <p>`string.max_len`: `100`</p> |
+| `description` | <p>`string.max_len`: `200`</p> |
+
+### <a name="ttn.lorawan.v3.EndDeviceTemplateFormats">Message `EndDeviceTemplateFormats`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `formats` | [`EndDeviceTemplateFormats.FormatsEntry`](#ttn.lorawan.v3.EndDeviceTemplateFormats.FormatsEntry) | repeated |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `formats` | <p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+
+### <a name="ttn.lorawan.v3.EndDeviceTemplateFormats.FormatsEntry">Message `EndDeviceTemplateFormats.FormatsEntry`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `key` | [`string`](#string) |  |  |
+| `value` | [`EndDeviceTemplateFormat`](#ttn.lorawan.v3.EndDeviceTemplateFormat) |  |  |
 
 ### <a name="ttn.lorawan.v3.EndDeviceVersion">Message `EndDeviceVersion`</a>
 
@@ -1864,6 +1932,20 @@ Power state of the device.
 | `List` | `GET` | `/api/v3/applications/{application_ids.application_id}/devices` |  |
 | `Update` | `PUT` | `/api/v3/applications/{end_device.ids.application_ids.application_id}/devices/{end_device.ids.device_id}` | `*` |
 | `Delete` | `DELETE` | `/api/v3/applications/{application_ids.application_id}/devices/{device_id}` |  |
+
+### <a name="ttn.lorawan.v3.EndDeviceTemplateConverter">Service `EndDeviceTemplateConverter`</a>
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| `ListFormats` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`EndDeviceTemplateFormats`](#ttn.lorawan.v3.EndDeviceTemplateFormats) | Returns the configured formats to convert from. |
+| `Convert` | [`ConvertEndDeviceTemplateRequest`](#ttn.lorawan.v3.ConvertEndDeviceTemplateRequest) | [`EndDeviceTemplate`](#ttn.lorawan.v3.EndDeviceTemplate) _stream_ | Converts the binary data to a stream of end device templates. |
+
+#### HTTP bindings
+
+| Method Name | Method | Pattern | Body |
+| ----------- | ------ | ------- | ---- |
+| `ListFormats` | `GET` | `/api/v3/edtc/formats` |  |
+| `Convert` | `POST` | `/api/v3/edtc/convert` | `*` |
 
 ## <a name="lorawan-stack/api/enums.proto">File `lorawan-stack/api/enums.proto`</a>
 

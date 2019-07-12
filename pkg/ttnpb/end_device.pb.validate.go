@@ -2569,6 +2569,436 @@ var _ interface {
 	ErrorName() string
 } = SetEndDeviceRequestValidationError{}
 
+// ValidateFields checks the field values on EndDeviceTemplate with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *EndDeviceTemplate) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = EndDeviceTemplateFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "end_device":
+
+			if v, ok := interface{}(&m.EndDevice).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return EndDeviceTemplateValidationError{
+						field:  "end_device",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "field_mask":
+
+			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return EndDeviceTemplateValidationError{
+						field:  "field_mask",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "mapping_key":
+
+			if utf8.RuneCountInString(m.GetMappingKey()) > 100 {
+				return EndDeviceTemplateValidationError{
+					field:  "mapping_key",
+					reason: "value length must be at most 100 runes",
+				}
+			}
+
+		default:
+			return EndDeviceTemplateValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// EndDeviceTemplateValidationError is the validation error returned by
+// EndDeviceTemplate.ValidateFields if the designated constraints aren't met.
+type EndDeviceTemplateValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e EndDeviceTemplateValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e EndDeviceTemplateValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e EndDeviceTemplateValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e EndDeviceTemplateValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e EndDeviceTemplateValidationError) ErrorName() string {
+	return "EndDeviceTemplateValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e EndDeviceTemplateValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sEndDeviceTemplate.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = EndDeviceTemplateValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = EndDeviceTemplateValidationError{}
+
+// ValidateFields checks the field values on EndDeviceTemplateFormat with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *EndDeviceTemplateFormat) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = EndDeviceTemplateFormatFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "name":
+
+			if utf8.RuneCountInString(m.GetName()) > 100 {
+				return EndDeviceTemplateFormatValidationError{
+					field:  "name",
+					reason: "value length must be at most 100 runes",
+				}
+			}
+
+		case "description":
+
+			if utf8.RuneCountInString(m.GetDescription()) > 200 {
+				return EndDeviceTemplateFormatValidationError{
+					field:  "description",
+					reason: "value length must be at most 200 runes",
+				}
+			}
+
+		default:
+			return EndDeviceTemplateFormatValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// EndDeviceTemplateFormatValidationError is the validation error returned by
+// EndDeviceTemplateFormat.ValidateFields if the designated constraints aren't met.
+type EndDeviceTemplateFormatValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e EndDeviceTemplateFormatValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e EndDeviceTemplateFormatValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e EndDeviceTemplateFormatValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e EndDeviceTemplateFormatValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e EndDeviceTemplateFormatValidationError) ErrorName() string {
+	return "EndDeviceTemplateFormatValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e EndDeviceTemplateFormatValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sEndDeviceTemplateFormat.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = EndDeviceTemplateFormatValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = EndDeviceTemplateFormatValidationError{}
+
+// ValidateFields checks the field values on EndDeviceTemplateFormats with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *EndDeviceTemplateFormats) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = EndDeviceTemplateFormatsFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "formats":
+
+			for key, val := range m.GetFormats() {
+				_ = val
+
+				if utf8.RuneCountInString(key) > 36 {
+					return EndDeviceTemplateFormatsValidationError{
+						field:  fmt.Sprintf("formats[%v]", key),
+						reason: "value length must be at most 36 runes",
+					}
+				}
+
+				if !_EndDeviceTemplateFormats_Formats_Pattern.MatchString(key) {
+					return EndDeviceTemplateFormatsValidationError{
+						field:  fmt.Sprintf("formats[%v]", key),
+						reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+					}
+				}
+
+				if v, ok := interface{}(val).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return EndDeviceTemplateFormatsValidationError{
+							field:  fmt.Sprintf("formats[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
+		default:
+			return EndDeviceTemplateFormatsValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// EndDeviceTemplateFormatsValidationError is the validation error returned by
+// EndDeviceTemplateFormats.ValidateFields if the designated constraints
+// aren't met.
+type EndDeviceTemplateFormatsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e EndDeviceTemplateFormatsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e EndDeviceTemplateFormatsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e EndDeviceTemplateFormatsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e EndDeviceTemplateFormatsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e EndDeviceTemplateFormatsValidationError) ErrorName() string {
+	return "EndDeviceTemplateFormatsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e EndDeviceTemplateFormatsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sEndDeviceTemplateFormats.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = EndDeviceTemplateFormatsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = EndDeviceTemplateFormatsValidationError{}
+
+var _EndDeviceTemplateFormats_Formats_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+
+// ValidateFields checks the field values on ConvertEndDeviceTemplateRequest
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *ConvertEndDeviceTemplateRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ConvertEndDeviceTemplateRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "format_id":
+
+			if utf8.RuneCountInString(m.GetFormatID()) > 36 {
+				return ConvertEndDeviceTemplateRequestValidationError{
+					field:  "format_id",
+					reason: "value length must be at most 36 runes",
+				}
+			}
+
+			if !_ConvertEndDeviceTemplateRequest_FormatID_Pattern.MatchString(m.GetFormatID()) {
+				return ConvertEndDeviceTemplateRequestValidationError{
+					field:  "format_id",
+					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+				}
+			}
+
+		case "data":
+			// no validation rules for Data
+		default:
+			return ConvertEndDeviceTemplateRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ConvertEndDeviceTemplateRequestValidationError is the validation error
+// returned by ConvertEndDeviceTemplateRequest.ValidateFields if the
+// designated constraints aren't met.
+type ConvertEndDeviceTemplateRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ConvertEndDeviceTemplateRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ConvertEndDeviceTemplateRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ConvertEndDeviceTemplateRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ConvertEndDeviceTemplateRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ConvertEndDeviceTemplateRequestValidationError) ErrorName() string {
+	return "ConvertEndDeviceTemplateRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ConvertEndDeviceTemplateRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sConvertEndDeviceTemplateRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ConvertEndDeviceTemplateRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ConvertEndDeviceTemplateRequestValidationError{}
+
+var _ConvertEndDeviceTemplateRequest_FormatID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+
 // ValidateFields checks the field values on MACParameters_Channel with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.

@@ -18,6 +18,7 @@ import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/duration.proto";
+import "google/protobuf/empty.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
@@ -506,4 +507,26 @@ message ListEndDevicesRequest {
 message SetEndDeviceRequest {
   EndDevice end_device = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+}
+
+message EndDeviceTemplate {
+  EndDevice end_device = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+  string mapping_key = 3 [(validate.rules).string.max_len = 100];
+}
+
+message EndDeviceTemplateFormat {
+  string name = 1 [(validate.rules).string.max_len = 100];
+  string description = 2 [(validate.rules).string.max_len = 200];
+}
+
+message EndDeviceTemplateFormats {
+  map<string, EndDeviceTemplateFormat> formats = 1 [(validate.rules).map.keys.string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36}];
+}
+
+message ConvertEndDeviceTemplateRequest {
+  // ID of the format.
+  string format_id = 1 [(gogoproto.customname) = "FormatID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36}];
+  // Data to convert.
+  bytes data = 2;
 }
