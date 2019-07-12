@@ -29,14 +29,17 @@ class Http {
 
     const stackComponents = Object.keys(stackConfig)
     const instances = stackComponents.reduce(function (acc, curr) {
-      acc[curr] = axios.create({
-        baseURL: stackConfig[curr],
-        headers: {
-          Authorization,
-          ...headers,
-        },
-        ...axiosConfig,
-      })
+      const componentUrl = stackConfig[curr]
+      if (componentUrl) {
+        acc[curr] = axios.create({
+          baseURL: componentUrl,
+          headers: {
+            Authorization,
+            ...headers,
+          },
+          ...axiosConfig,
+        })
+      }
 
       return acc
     }, {})
