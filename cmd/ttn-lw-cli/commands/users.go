@@ -40,22 +40,26 @@ func userIDFlags() *pflag.FlagSet {
 	return flagSet
 }
 
-var errNoUserID = errors.DefineInvalidArgument("no_user_id", "no user ID set")
+var errNoUserID = errors.DefineInvalidArgument("no_user_id", "no user ID set, please specify one")
 
-func getUserID(flagSet *pflag.FlagSet, args []string) *ttnpb.UserIdentifiers {
+func getUserID(flagSet *pflag.FlagSet, args []string) (*ttnpb.UserIdentifiers, error) {
 	var userID string
+	var err error
 	if len(args) > 0 {
 		if len(args) > 1 {
 			logger.Warn("multiple IDs found in arguments, considering only the first")
 		}
 		userID = args[0]
 	} else {
-		userID, _ = flagSet.GetString("user-id")
+		userID, err = flagSet.GetString("user-id")
+		if err != nil {
+			return nil, err
+		}
 	}
 	if userID == "" {
-		return nil
+		return nil, errNoUserID
 	}
-	return &ttnpb.UserIdentifiers{UserID: userID}
+	return &ttnpb.UserIdentifiers{UserID: userID}, nil
 }
 
 var errPasswordMismatch = errors.DefineInvalidArgument("password_mismatch", "password did not match")
@@ -92,9 +96,9 @@ var (
 		Aliases: []string{"info"},
 		Short:   "Get a user",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			usrID := getUserID(cmd.Flags(), args)
-			if usrID == nil {
-				return errNoUserID
+			usrID, err := getUserID(cmd.Flags(), args)
+			if err != nil {
+				return err
 			}
 			paths := util.SelectFieldMask(cmd.Flags(), selectUserFlags)
 
@@ -119,7 +123,10 @@ var (
 		Short:             "Create a user",
 		PersistentPreRunE: preRun(optionalAuth),
 		RunE: asBulk(func(cmd *cobra.Command, args []string) (err error) {
-			usrID := getUserID(cmd.Flags(), args)
+			usrID, err := getUserID(cmd.Flags(), args)
+			if err != nil {
+				return err
+			}
 			var user ttnpb.User
 			if inputDecoder != nil {
 				_, err := inputDecoder.Decode(&user)
@@ -179,9 +186,9 @@ var (
 		Aliases: []string{"set"},
 		Short:   "Update a user",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			usrID := getUserID(cmd.Flags(), args)
-			if usrID == nil {
-				return errNoUserID
+			usrID, err := getUserID(cmd.Flags(), args)
+			if err != nil {
+				return err
 			}
 			paths := util.UpdateFieldMask(cmd.Flags(), setUserFlags, attributesFlags(), profilePictureFlags)
 			if len(paths) == 0 {
@@ -222,11 +229,10 @@ var (
 		Use:   "forgot-password [user-id]",
 		Short: "Request a temporary user password",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			usrID := getUserID(cmd.Flags(), args)
-			if usrID == nil {
-				return errNoUserID
+			usrID, err := getUserID(cmd.Flags(), args)
+			if err != nil {
+				return err
 			}
-
 			usrID.Email, _ = cmd.Flags().GetString("email")
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -245,11 +251,10 @@ var (
 		Aliases: []string{"change-password"},
 		Short:   "Update a user password",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			usrID := getUserID(cmd.Flags(), args)
-			if usrID == nil {
-				return errNoUserID
+			usrID, err := getUserID(cmd.Flags(), args)
+			if err != nil {
+				return err
 			}
-
 			old, _ := cmd.Flags().GetString("old")
 			if old == "" {
 				pw, err := gopass.GetPasswdPrompt("Please enter old password:", true, os.Stdin, os.Stderr)
@@ -288,9 +293,9 @@ var (
 		Use:   "delete [user-id]",
 		Short: "Delete a user",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			usrID := getUserID(cmd.Flags(), args)
-			if usrID == nil {
-				return errNoUserID
+			usrID, err := getUserID(cmd.Flags(), args)
+			if err != nil {
+				return err
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -306,9 +311,9 @@ var (
 		},
 	}
 	usersContactInfoCommand = contactInfoCommands("user", func(cmd *cobra.Command, args []string) (*ttnpb.EntityIdentifiers, error) {
-		usrID := getUserID(cmd.Flags(), args)
-		if usrID == nil {
-			return nil, errNoUserID
+		usrID, err := getUserID(cmd.Flags(), args)
+		if err != nil {
+			return nil, err
 		}
 		return usrID.EntityIdentifiers(), nil
 	})

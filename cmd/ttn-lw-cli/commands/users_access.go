@@ -29,9 +29,9 @@ var (
 		Use:   "rights [user-id]",
 		Short: "List the rights to a user",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			usrID := getUserID(cmd.Flags(), args)
-			if usrID == nil {
-				return errNoUserID
+			usrID, err := getUserID(cmd.Flags(), args)
+			if err != nil {
+				return err
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -56,9 +56,9 @@ var (
 		Aliases: []string{"ls"},
 		Short:   "List user API keys",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			usrID := getUserID(cmd.Flags(), args)
-			if usrID == nil {
-				return errNoUserID
+			usrID, err := getUserID(cmd.Flags(), args)
+			if err != nil {
+				return err
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -82,9 +82,9 @@ var (
 		Aliases: []string{"add", "generate"},
 		Short:   "Create a user API key",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			usrID := getUserID(cmd.Flags(), args)
-			if usrID == nil {
-				return errNoUserID
+			usrID, err := getUserID(cmd.Flags(), args)
+			if err != nil {
+				return err
 			}
 			name, _ := cmd.Flags().GetString("name")
 
@@ -119,9 +119,9 @@ var (
 		Aliases: []string{"set"},
 		Short:   "Update a user API key",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			usrID := getUserID(cmd.Flags(), firstArgs(1, args...))
-			if usrID == nil {
-				return errNoUserID
+			usrID, err := getUserID(cmd.Flags(), args)
+			if err != nil {
+				return err
 			}
 			id := getAPIKeyID(cmd.Flags(), args, 1)
 			if id == "" {
@@ -158,9 +158,9 @@ var (
 		Aliases: []string{"remove"},
 		Short:   "Delete a user API key",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			usrID := getUserID(cmd.Flags(), firstArgs(1, args...))
-			if usrID == nil {
-				return errNoUserID
+			usrID, err := getUserID(cmd.Flags(), args)
+			if err != nil {
+				return err
 			}
 			id := getAPIKeyID(cmd.Flags(), args, 1)
 			if id == "" {

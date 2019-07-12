@@ -1360,7 +1360,7 @@
   },
   "error:cmd/ttn-lw-cli/commands:no_user_id": {
     "translations": {
-      "en": "no user ID set"
+      "en": "no user ID set, please specify one"
     },
     "description": {
       "package": "cmd/ttn-lw-cli/commands",

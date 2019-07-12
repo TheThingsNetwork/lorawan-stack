@@ -62,9 +62,9 @@ var (
 		Aliases: []string{"ls"},
 		Short:   "List OAuth authorizations",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			usrID := getUserID(cmd.Flags(), args)
-			if usrID == nil {
-				return errNoUserID
+			usrID, err := getUserID(cmd.Flags(), args)
+			if err != nil {
+				return err
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)

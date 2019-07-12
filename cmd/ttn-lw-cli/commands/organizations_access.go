@@ -85,7 +85,11 @@ var (
 			if orgID == nil {
 				return errNoOrganizationID
 			}
-			collaborator := getUserID(cmd.Flags(), nil).OrganizationOrUserIdentifiers()
+			usrID, err := getUserID(cmd.Flags(), nil)
+			if err != nil {
+				return err
+			}
+			collaborator := usrID.OrganizationOrUserIdentifiers()
 			if collaborator == nil {
 				return errNoCollaborator
 			}
@@ -121,7 +125,11 @@ var (
 			if orgID == nil {
 				return errNoOrganizationID
 			}
-			collaborator := getUserID(cmd.Flags(), nil).OrganizationOrUserIdentifiers()
+			usrID, err := getUserID(cmd.Flags(), nil)
+			if err != nil {
+				return err
+			}
+			collaborator := usrID.OrganizationOrUserIdentifiers()
 			if collaborator == nil {
 				return errNoCollaborator
 			}
