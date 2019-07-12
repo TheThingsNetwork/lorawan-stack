@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import Marshaler from '../util/marshaler'
-import stream from '../api/stream/stream-node'
 import ApiKeys from './api-keys'
 import Collaborators from './collaborators'
 
@@ -112,7 +111,6 @@ class Gateways {
   // Events Stream
 
   async openStream (identifiers, tail, after) {
-    const eventsUrl = `${this._stackConfig.as}/events`
     const payload = {
       identifiers: identifiers.map(id => ({
         gateway_ids: { gateway_id: id },
@@ -121,7 +119,7 @@ class Gateways {
       after,
     }
 
-    return stream(payload, eventsUrl)
+    return this._api.Events.Stream(undefined, payload)
   }
 }
 

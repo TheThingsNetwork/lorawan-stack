@@ -18,7 +18,6 @@ import { URL } from 'url'
 import traverse from 'traverse'
 import Marshaler from '../../util/marshaler'
 import Device from '../../entity/device'
-import stream from '../../api/stream/stream-node'
 import randomByteString from '../../util/random-bytes'
 import deviceEntityMap from '../../../generated/device-entity-map.json'
 import { splitSetPaths, splitGetPaths, makeRequests } from './split'
@@ -317,7 +316,6 @@ class Devices {
   // Events Stream
 
   async openStream (identifiers, tail, after) {
-    const eventsUrl = `${this._stackConfig.as}/events`
     const payload = {
       identifiers: identifiers.map(ids => ({
         device_ids: ids,
@@ -326,7 +324,7 @@ class Devices {
       after,
     }
 
-    return stream(payload, eventsUrl)
+    return this._api.Events.Stream(undefined, payload)
   }
 }
 
