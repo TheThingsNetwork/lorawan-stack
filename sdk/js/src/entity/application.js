@@ -31,7 +31,7 @@ class Application extends Entity {
 
     this._parent = parent
     this._id = data.ids.application_id
-    this.Devices = new Devices(parent._api, this._id)
+    this.Devices = new Devices(parent._api, { stackConfig: parent._stackConfig })
   }
 
   // API Keys
