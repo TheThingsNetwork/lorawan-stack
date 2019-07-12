@@ -70,9 +70,9 @@ var ErrorDetailsFromProto func(msg ...proto.Message) (details ErrorDetails, rest
 func (d *Definition) setGRPCStatus() {
 	s := status.New(codes.Code(d.Code()), d.String())
 	if ErrorDetailsToProto != nil {
-		if proto := ErrorDetailsToProto(d); proto != nil {
+		if pb := ErrorDetailsToProto(d); pb != nil {
 			var err error
-			s, err = s.WithDetails(proto)
+			s, err = s.WithDetails(pb)
 			if err != nil {
 				panic(err) // ErrorDetailsToProto generated an invalid proto.
 			}
@@ -96,22 +96,13 @@ func (e *Error) GRPCStatus() *status.Status {
 		return s
 	}
 	s := status.New(codes.Code(e.Code()), e.String())
-	protoDetails := make([]proto.Message, 0, len(e.Details())+1)
-	for _, details := range e.Details() {
-		if details, ok := details.(proto.Message); ok {
-			protoDetails = append(protoDetails, details)
-		}
-	}
 	if ErrorDetailsToProto != nil {
-		if proto := ErrorDetailsToProto(e); proto != nil {
-			protoDetails = append(protoDetails, proto)
-		}
-	}
-	if len(protoDetails) != 0 {
-		var err error
-		s, err = s.WithDetails(protoDetails...)
-		if err != nil {
-			panic(err) // invalid details in the error or ErrorDetailsToProto generated an invalid proto.
+		if pb := ErrorDetailsToProto(e); pb != nil {
+			var err error
+			s, err = s.WithDetails(pb)
+			if err != nil {
+				panic(err) // ErrorDetailsToProto generated an invalid proto.
+			}
 		}
 	}
 	e.grpcStatus.Store(s)
