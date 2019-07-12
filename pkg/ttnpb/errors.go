@@ -52,7 +52,7 @@ func (e errorDetails) Cause() error {
 func (e errorDetails) Code() uint32 { return e.GetCode() }
 
 func ErrorDetailsToProto(e errors.ErrorDetails) *ErrorDetails {
-	proto := &ErrorDetails{
+	pb := &ErrorDetails{
 		Namespace:     e.Namespace(),
 		Name:          e.Name(),
 		MessageFormat: e.MessageFormat(),
@@ -64,14 +64,14 @@ func ErrorDetailsToProto(e errors.ErrorDetails) *ErrorDetails {
 		if err != nil {
 			panic(fmt.Sprintf("Failed to encode error attributes: %s", err)) // Likely a bug in ttn (invalid attribute type).
 		}
-		proto.Attributes = attributesStruct
+		pb.Attributes = attributesStruct
 	}
 	if cause := e.Cause(); cause != nil {
 		if ttnErr, ok := errors.From(cause); ok {
-			proto.Cause = ErrorDetailsToProto(ttnErr)
+			pb.Cause = ErrorDetailsToProto(ttnErr)
 		}
 	}
-	return proto
+	return pb
 }
 
 func ErrorDetailsFromProto(e *ErrorDetails) errors.ErrorDetails {
