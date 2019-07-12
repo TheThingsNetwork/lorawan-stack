@@ -245,9 +245,6 @@ func (ps *PubSub) start(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err e
 		<-ctx.Done()
 		ps.integrationErrors.Store(psUID, ctx.Err())
 		ps.integrations.Delete(psUID)
-		if err := ctx.Err(); err != nil && !errors.IsCanceled(err) {
-			log.FromContext(ctx).WithError(err).Warn("Integration failed")
-		}
 	}()
 	provider, err := provider.GetProvider(pb.Provider)
 	if err != nil {
