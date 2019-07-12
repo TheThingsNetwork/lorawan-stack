@@ -64,6 +64,12 @@ class Http {
 
   async handleRequest (method, endpoint, component, payload = {}, config) {
     const parsedComponent = component || this._parseStackComponent(endpoint)
+    if (!this._stackConfig[parsedComponent]) {
+      // If the component has not been defined in the stack config, make no
+      // request and throw an error instead
+      throw new Error(`Cannot run "${method.toUpperCase()} ${endpoint}" API call on disabled component: "${parsedComponent}"`)
+    }
+
     try {
       return await this[parsedComponent]({
         method,
