@@ -192,7 +192,7 @@ var (
 				_ = js
 			}
 
-			if start.Console {
+			if start.Console || startDefault {
 				logger.Info("Setting up Console")
 				console, err := console.New(c, config.Console)
 				if err != nil {
