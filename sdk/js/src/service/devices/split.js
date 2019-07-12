@@ -76,6 +76,9 @@ export function splitGetPaths (paths, base) {
 
 /** A wrapper function to obtain a request tree for reading values to a device
 * @param {Object} api - The Api object as passed to the service
+* @param {Object} stackConfig - The stack config object
+* @param {boolean} ignoreDisabledComponents - A flag indicating wheter queries
+* against disabled components should be ignored insread of throwing
 * @param {string} operation - The operation, an enum of 'set', 'get' and 'delete'
 * @param {string} requestTree - The request tree, as returned by the splitPaths
 * function
@@ -88,6 +91,8 @@ export function splitGetPaths (paths, base) {
 */
 export async function makeRequests (
   api,
+  stackConfig,
+  ignoreDisabledComponents,
   operation,
   requestTree,
   params,
@@ -114,8 +119,17 @@ export async function makeRequests (
   const requests = new Array(3)
   let isResult
 
+  // Check whether the request would query against disabled components
+  if (!ignoreDisabledComponents) {
+    for (const component of Object.keys(requestTree)) {
+      if (!stackConfig[component]) {
+        throw new Error(`Cannot run ${operation.toUpperCase()} end device request which (partially) depends on disabled component: "${component}".`)
+      }
+    }
+  }
+
   // Do a possible IS request first
-  if ('is' in requestTree) {
+  if (stackConfig.is && 'is' in requestTree) {
     let func = isSet ? 'Update' : 'Get'
     if (isDelete) {
       func = 'Delete'
@@ -132,7 +146,7 @@ export async function makeRequests (
   }
 
   // Compose an array of possible api calls to NS, AS, JS
-  if ('ns' in requestTree) {
+  if (stackConfig.ns && 'ns' in requestTree) {
     requests[0] = requestWrapper(api.NsEndDeviceRegistry[rpcFunction],
       params, {
         ...payload,
@@ -140,7 +154,7 @@ export async function makeRequests (
       }
     )
   }
-  if ('as' in requestTree) {
+  if (stackConfig.as && 'as' in requestTree) {
     requests[1] = requestWrapper(api.AsEndDeviceRegistry[rpcFunction],
       params, {
         ...payload,
@@ -148,7 +162,7 @@ export async function makeRequests (
       }
     )
   }
-  if ('js' in requestTree) {
+  if (stackConfig.js && 'js' in requestTree) {
     requests[2] = requestWrapper(api.JsEndDeviceRegistry[rpcFunction],
       params, {
         ...payload,

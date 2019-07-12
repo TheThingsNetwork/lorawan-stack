@@ -23,20 +23,20 @@ import deviceEntityMap from '../../../generated/device-entity-map.json'
 import { splitSetPaths, splitGetPaths, makeRequests } from './split'
 import mergeDevice from './merge'
 
-
 /**
  * Devices Class provides an abstraction on all devices and manages data
  * handling from different sources. It exposes an API to easily work with
  * device data.
  */
 class Devices {
-  constructor (api, { proxy = true, stackConfig }) {
+  constructor (api, { proxy = true, ignoreDisabledComponents = true, stackConfig }) {
     if (!api) {
       throw new Error('Cannot initialize device service without api object.')
     }
     this._api = api
     this._stackConfig = stackConfig
     this._proxy = proxy
+    this._ignoreDisabledComponents = ignoreDisabledComponents
   }
 
   _responseTransform (response, single = true) {
@@ -144,7 +144,15 @@ class Devices {
     params.routeParams['end_device.ids.device_id'] = 'data' in isResult ? isResult.ids.device_id : devId
 
     try {
-      const setParts = await makeRequests(this._api, 'set', requestTree, params, devicePayload)
+      const setParts = await makeRequests(
+        this._api,
+        this._stackConfig,
+        this._ignoreDisabledComponents,
+        'set',
+        requestTree,
+        params,
+        devicePayload
+      )
       const result = mergeDevice(setParts, isResult)
       return result
     } catch (err) {
@@ -175,7 +183,16 @@ class Devices {
       },
     }
 
-    const deviceParts = await makeRequests(this._api, 'get', requestTree, params, undefined, ignoreNotFound)
+    const deviceParts = await makeRequests(
+      this._api,
+      this._stackConfig,
+      this._ignoreDisabledComponents,
+      'get',
+      requestTree,
+      params,
+      undefined,
+      ignoreNotFound
+    )
     const result = mergeDevice(deviceParts)
 
     return result
@@ -195,7 +212,14 @@ class Devices {
       return acc
     }, {})
 
-    const deleteParts = await makeRequests(this._api, 'delete', requestTree, params)
+    const deleteParts = await makeRequests(
+      this._api,
+      this._stackConfig,
+      this._ignoreDisabledComponents,
+      'delete',
+      requestTree,
+      params
+    )
     return deleteParts.every(e => Object.keys(e.device).length === 0) ? {} : deleteParts
   }
 
