@@ -28,6 +28,7 @@ import (
 	asredis "go.thethings.network/lorawan-stack/pkg/applicationserver/redis"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/console"
+	"go.thethings.network/lorawan-stack/pkg/devicetemplateconverter"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	events_grpc "go.thethings.network/lorawan-stack/pkg/events/grpc"
@@ -46,7 +47,7 @@ var errUnknownComponent = errors.DefineInvalidArgument("unknown_component", "unk
 
 var (
 	startCommand = &cobra.Command{
-		Use:   "start [is|gs|ns|as|js|console|gcs|all]... [flags]",
+		Use:   "start [is|gs|ns|as|js|console|gcs|dtc|all]... [flags]",
 		Short: "Start the Network Stack",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var start struct {
@@ -57,24 +58,31 @@ var (
 				JoinServer                 bool
 				Console                    bool
 				GatewayConfigurationServer bool
+				DeviceTemplateConverter    bool
 			}
 			startDefault := len(args) == 0
 			for _, arg := range args {
 				switch strings.ToLower(arg) {
 				case "is", "identityserver":
 					start.IdentityServer = true
+					start.DeviceTemplateConverter = true
 				case "gs", "gatewayserver":
 					start.GatewayServer = true
 				case "ns", "networkserver":
 					start.NetworkServer = true
+					start.DeviceTemplateConverter = true
 				case "as", "applicationserver":
 					start.ApplicationServer = true
+					start.DeviceTemplateConverter = true
 				case "js", "joinserver":
 					start.JoinServer = true
+					start.DeviceTemplateConverter = true
 				case "console":
 					start.Console = true
 				case "gcs":
 					start.GatewayConfigurationServer = true
+				case "dtc":
+					start.DeviceTemplateConverter = true
 				case "all":
 					start.IdentityServer = true
 					start.GatewayServer = true
@@ -83,6 +91,7 @@ var (
 					start.JoinServer = true
 					start.Console = true
 					start.GatewayConfigurationServer = true
+					start.DeviceTemplateConverter = true
 				default:
 					return errUnknownComponent.WithAttributes("component", arg)
 				}
@@ -209,6 +218,15 @@ var (
 					return shared.ErrInitializeGatewayConfigurationServer.WithCause(err)
 				}
 				_ = gcs
+			}
+
+			if start.DeviceTemplateConverter || startDefault {
+				logger.Info("Setting up Device Template Converter")
+				dtc, err := devicetemplateconverter.New(c, &config.DTC)
+				if err != nil {
+					return shared.ErrInitializeDeviceTemplateConverter.WithCause(err)
+				}
+				_ = dtc
 			}
 
 			if rootRedirect != nil {
