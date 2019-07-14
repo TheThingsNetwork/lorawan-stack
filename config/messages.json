@@ -1088,6 +1088,15 @@
       "file": "errors.go"
     }
   },
+  "error:cmd/internal/shared:initialize_device_template_converter": {
+    "translations": {
+      "en": "could not initialize Device Template Converter"
+    },
+    "description": {
+      "package": "cmd/internal/shared",
+      "file": "errors.go"
+    }
+  },
   "error:cmd/internal/shared:initialize_gateway_configuration_server": {
     "translations": {
       "en": "could not initialize Gateway Configuration Server"
