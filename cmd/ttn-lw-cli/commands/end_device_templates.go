@@ -26,13 +26,20 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
+var (
+	endDeviceTemplateFlattenPaths = []string{"end_device.provisioning_data"}
+)
+
 func templateFormatIDFlags() *pflag.FlagSet {
 	flagSet := &pflag.FlagSet{}
 	flagSet.String("format-id", "", "")
 	return flagSet
 }
 
-var errNoTemplateFormatID = errors.DefineInvalidArgument("no_template_format_id", "no template format ID set")
+var (
+	errNoTemplateFormatID       = errors.DefineInvalidArgument("no_template_format_id", "no template format ID set")
+	errEndDeviceMappingNotFound = errors.DefineNotFound("mapped_end_device_not_found", "end device mapping not found")
+)
 
 func getTemplateFormatID(flagSet *pflag.FlagSet, args []string) string {
 	var formatID string
@@ -81,7 +88,7 @@ var (
 			if formatID == "" {
 				return errNoTemplateFormatID
 			}
-			data, err := getData(cmd.Flags())
+			data, err := getDataBytes("", cmd.Flags())
 			if err != nil {
 				return err
 			}
@@ -112,6 +119,109 @@ var (
 			}
 		},
 	}
+	endDeviceTemplatesMapCommand = &cobra.Command{
+		Use:   "map [flags]",
+		Short: "Map end device templates",
+		Long: `Map end device templates
+
+This command matches the input templates with the mapping file to create new
+templates. The mapping file contains end device templates in the same format
+as input.
+
+The matching from input to a mapping template is, in order, by mapping key, end
+device identifiers and DevEUI. If you don't specify a mapping key, end device
+identifiers nor DevEUI, the mapping entry always matches. This is useful for
+mapping many end device templates with a generic template.
+
+Typical use cases are:
+
+1. Assigning identifiers from a mapping file to device templates matching on
+   mapping key.
+2. Mapping a device profile (i.e. MAC and PHY versions, frequency plan and class
+   B/C support) from a mapping file to many end device templates.
+
+Use the create command to create a mapping file and (optionally) the assign-euis
+command to assign EUIs to map to end device templates.`,
+		PersistentPreRunE: preRun(),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			inputDecoder := inputDecoder
+			if inputDecoder == nil {
+				reader, err := getDataReader("input", cmd.Flags())
+				if err != nil {
+					return err
+				}
+				inputDecoder, err = getInputDecoder(reader)
+				if err != nil {
+					return err
+				}
+			}
+			var input []ttnpb.EndDeviceTemplate
+			for {
+				var entry ttnpb.EndDeviceTemplate
+				_, err := inputDecoder.Decode(&entry)
+				if err != nil {
+					if err == stdio.EOF {
+						break
+					}
+					return err
+				}
+				input = append(input, entry)
+			}
+
+			var mapping []ttnpb.EndDeviceTemplate
+			data, err := getData("mapping", cmd.Flags())
+			if err != nil {
+				return err
+			}
+			mappingDecoder, err := getInputDecoder(reader)
+			if err != nil {
+				return err
+			}
+			for {
+				var entry ttnpb.EndDeviceTemplate
+				if _, err := mappingDecoder.Decode(&entry); err != nil {
+					if err == stdio.EOF {
+						break
+					}
+					return err
+				}
+				mapping = append(mapping, entry)
+			}
+
+			for _, inputEntry := range input {
+				var mappedEntry *ttnpb.EndDeviceTemplate
+				for _, e := range mapping {
+					switch {
+					case e.MappingKey != "" && e.MappingKey == inputEntry.MappingKey:
+					case e.EndDevice.ApplicationID != "" && e.EndDevice.ApplicationID == inputEntry.EndDevice.ApplicationID &&
+						e.EndDevice.DeviceID != "" && e.EndDevice.DeviceID == inputEntry.EndDevice.DeviceID:
+					case e.EndDevice.DevEUI != nil && inputEntry.EndDevice.DevEUI != nil && e.EndDevice.DevEUI.Equal(*inputEntry.EndDevice.DevEUI):
+					case e.EndDevice.EndDeviceIdentifiers.IsZero():
+					default:
+						continue
+					}
+					mappedEntry = &e
+					break
+				}
+				if mappedEntry == nil {
+					if fail, _ := cmd.Flags().GetBool("fail-not-found"); fail {
+						return errEndDeviceMappingNotFound
+					}
+					continue
+				}
+
+				var res ttnpb.EndDeviceTemplate
+				res.EndDevice.SetFields(&inputEntry.EndDevice, inputEntry.FieldMask.Paths...)
+				res.EndDevice.SetFields(&mappedEntry.EndDevice, mappedEntry.FieldMask.Paths...)
+				res.FieldMask.Paths = ttnpb.BottomLevelFields(append(inputEntry.FieldMask.Paths, mappedEntry.FieldMask.Paths...))
+
+				if err := io.Write(os.Stdout, config.OutputFormat, &res); err != nil {
+					return err
+				}
+			}
+			return nil
+		},
+	}
 )
 
 func init() {
@@ -119,6 +229,10 @@ func init() {
 	endDeviceTemplatesFromDataCommand.Flags().AddFlagSet(templateFormatIDFlags())
 	endDeviceTemplatesFromDataCommand.Flags().AddFlagSet(dataFlags("", ""))
 	endDeviceTemplatesCommand.AddCommand(endDeviceTemplatesFromDataCommand)
+	endDeviceTemplatesMapCommand.Flags().AddFlagSet(dataFlags("input", "input file"))
+	endDeviceTemplatesMapCommand.Flags().AddFlagSet(dataFlags("mapping", "mapping file"))
+	endDeviceTemplatesMapCommand.Flags().Bool("fail-not-found", false, "fail if no matching mapping is found")
+	endDeviceTemplatesCommand.AddCommand(endDeviceTemplatesMapCommand)
 	endDevicesCommand.AddCommand(endDeviceTemplatesCommand)
 
 	Root.AddCommand(endDeviceTemplatesCommand)
