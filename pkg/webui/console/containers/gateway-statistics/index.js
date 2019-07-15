@@ -29,7 +29,6 @@ import { isNotFoundError, isTranslated } from '../../../lib/errors/utils'
 import {
   selectGatewayStatistics,
   selectGatewayStatisticsError,
-  selectGatewayStatisticsIsAvailable,
   selectGatewayStatisticsIsFetching,
 } from '../../store/selectors/gateways'
 import {
@@ -57,19 +56,24 @@ class GatewayStatistic extends React.PureComponent {
   get status () {
     const { statistics, error, fetching } = this.props
 
+    const isNotConnected = Boolean(error) && isNotFoundError(error)
+    const isFetching = !Boolean(statistics) && fetching
+    const isUnavailable = Boolean(error) && Boolean(error.message) && isTranslated(error.message)
+    const hasStatistics = Boolean(statistics)
+
     let statusIndicator = null
     let message = null
 
-    if (isNotFoundError(error)) {
+    if (isNotConnected) {
       statusIndicator = 'bad'
       message = sharedMessages.disconnected
-    } else if (fetching) {
+    } else if (isFetching) {
       statusIndicator = 'mediocre'
       message = sharedMessages.connecting
-    } else if (error && error.message && isTranslated(error.message)) {
+    } else if (isUnavailable) {
       statusIndicator = 'unknown'
       message = error.message
-    } else if (statistics) {
+    } else if (hasStatistics) {
       message = sharedMessages.lastSeen
       statusIndicator = 'good'
     } else {
@@ -137,11 +141,7 @@ class GatewayStatistic extends React.PureComponent {
   }
 
   render () {
-    const { className, available } = this.props
-
-    if (!available) {
-      return null
-    }
+    const { className } = this.props
 
     return (
       <div className={classnames(className, style.container)}>
@@ -157,14 +157,12 @@ GatewayStatistic.propTypes = {
   startStatistics: PropTypes.func.isRequired,
   stopStatistics: PropTypes.func.isRequired,
   fetching: PropTypes.bool,
-  available: PropTypes.bool,
   error: PropTypes.object,
   statistics: PropTypes.object,
 }
 
 GatewayStatistic.defaultProps = {
   fetching: false,
-  available: false,
   error: null,
   statistics: null,
 }
@@ -173,7 +171,6 @@ export default connect(function (state, props) {
   return {
     statistics: selectGatewayStatistics(state, props),
     error: selectGatewayStatisticsError(state, props),
-    available: selectGatewayStatisticsIsAvailable(state, props),
     fetching: selectGatewayStatisticsIsFetching(state, props),
   }
 },
