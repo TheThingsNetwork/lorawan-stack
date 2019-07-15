@@ -12,20 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package provisioning
+package devicetemplates
 
 import (
+	"context"
 	"crypto/x509"
-	"encoding/hex"
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
-	"strings"
+	"io"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/gogoproto"
-	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/pkg/provisioning"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	jose "gopkg.in/square/go-jose.v2"
 )
 
@@ -56,8 +57,8 @@ pno8+2vVTkQDhcinNrgoPLQORzV5/l/b4z4=
 -----END CERTIFICATE-----`),
 }
 
-// microchip is a Microchip device provisioner.
-type microchip struct {
+// microchipATECC608AMAHTNT is a Microchip ATECC608A-MAHTN-T device provisioner.
+type microchipATECC608AMAHTNT struct {
 	keys map[string]interface{}
 }
 
@@ -74,70 +75,66 @@ func (m *microchipEntry) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-var errMicrochipPublicKey = errors.DefineInvalidArgument("microchip_public_key", "unknown Microchip public key ID `{id}`")
-
-// Decode decodes the given data and returns a struct.
-func (p *microchip) Decode(data []byte) ([]*pbtypes.Struct, error) {
-	entries := make([]microchipEntry, 0)
-	if err := json.Unmarshal(data, &entries); err != nil {
-		return nil, err
+func (m *microchipATECC608AMAHTNT) Format() *ttnpb.EndDeviceTemplateFormat {
+	return &ttnpb.EndDeviceTemplateFormat{
+		Name:        "Microchip ATECC608A-MAHTN-T Manifest File",
+		Description: "JSON manifest file received through Microchip Purchasing & Client Services.",
 	}
-	res := make([]*pbtypes.Struct, 0, len(entries))
-	for _, jws := range entries {
+}
+
+var (
+	errMicrochipData      = errors.DefineInvalidArgument("microchip_data", "invalid Microchip data")
+	errMicrochipPublicKey = errors.DefineInvalidArgument("microchip_public_key", "unknown Microchip public key ID `{id}`")
+)
+
+// Convert decodes the given manifest data.
+// The input data is an array of JWS (JSON Web Signatures).
+func (m *microchipATECC608AMAHTNT) Convert(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndDeviceTemplate) error {
+	defer close(ch)
+
+	dec := json.NewDecoder(r)
+	delim, err := dec.Token()
+	if err != nil {
+		return errMicrochipData.WithCause(err)
+	}
+	if _, ok := delim.(json.Delim); !ok {
+		return errMicrochipData
+	}
+
+	for dec.More() {
+		var jws microchipEntry
+		if err := dec.Decode(&jws); err != nil {
+			return errMicrochipData.WithCause(err)
+		}
 		kid := jws.Signatures[0].Header.KeyID
-		key, ok := p.keys[kid]
+		key, ok := m.keys[kid]
 		if !ok {
-			return nil, errMicrochipPublicKey.WithAttributes("id", kid)
+			return errMicrochipPublicKey.WithAttributes("id", kid)
 		}
 		buf, err := jws.Verify(key)
 		if err != nil {
-			return nil, err
+			return err
 		}
 		m := make(map[string]interface{})
 		if err := json.Unmarshal(buf, &m); err != nil {
-			return nil, err
+			return err
 		}
 		s, err := gogoproto.Struct(m)
 		if err != nil {
-			return nil, err
+			return err
 		}
-		res = append(res, s)
+		ch <- &ttnpb.EndDeviceTemplate{
+			EndDevice: ttnpb.EndDevice{
+				ProvisionerID:    provisioning.Microchip,
+				ProvisioningData: s,
+			},
+			FieldMask: pbtypes.FieldMask{
+				Paths: []string{"provisioner_id", "provisioning_data"},
+			},
+			MappingKey: s.Fields["uniqueId"].GetStringValue(),
+		}
 	}
-	return res, nil
-}
-
-// DefaultJoinEUI returns the default JoinEUI 70B3D57ED0000000.
-func (p *microchip) DefaultJoinEUI(entry *pbtypes.Struct) (types.EUI64, error) {
-	return types.EUI64{0x70, 0xB3, 0xD5, 0x7E, 0xD0, 0x00, 0x00, 0x00}, nil
-}
-
-// DefaultDevEUI returns the first 8 bytes of the serial number as DevEUI.
-func (p *microchip) DefaultDevEUI(entry *pbtypes.Struct) (types.EUI64, error) {
-	sn, err := hex.DecodeString(entry.Fields["uniqueId"].GetStringValue())
-	if err != nil {
-		return types.EUI64{}, errEntry.WithCause(err)
-	}
-	var eui types.EUI64
-	copy(eui[:], sn[:8])
-	return eui, nil
-}
-
-// DeviceID returns the default device ID formatted as sn-{uniqueId}.
-func (p *microchip) DefaultDeviceID(joinEUI, devEUI types.EUI64, entry *pbtypes.Struct) (string, error) {
-	sn, err := p.UniqueID(entry)
-	if err != nil {
-		return "", err
-	}
-	return fmt.Sprintf("sn-%s", strings.ToLower(sn)), nil
-}
-
-// UniqueID returns the serial number.
-func (p *microchip) UniqueID(entry *pbtypes.Struct) (string, error) {
-	sn := entry.Fields["uniqueId"].GetStringValue()
-	if sn == "" {
-		return "", errEntry
-	}
-	return strings.ToUpper(sn), nil
+	return nil
 }
 
 func init() {
@@ -154,7 +151,7 @@ func init() {
 		keys[kid] = cert.PublicKey
 	}
 
-	Register("microchip", &microchip{
+	RegisterConverter("microchip-atecc608a-mahtn-t", &microchipATECC608AMAHTNT{
 		keys: keys,
 	})
 }
