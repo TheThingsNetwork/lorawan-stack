@@ -698,7 +698,8 @@
           "method": "post",
           "pattern": "/events",
           "body": "*",
-          "parameters": []
+          "parameters": [],
+          "stream": true
         }
       ]
     }
@@ -1003,7 +1004,8 @@
           "body": "*",
           "parameters": [
             "application_ids.application_id"
-          ]
+          ],
+          "stream": true
         }
       ]
     },

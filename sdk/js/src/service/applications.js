@@ -15,7 +15,6 @@
 import Marshaler from '../util/marshaler'
 import Devices from '../service/devices'
 import Application from '../entity/application'
-import stream from '../api/stream/stream-node'
 import ApiKeys from './api-keys'
 import Link from './link'
 import Collaborators from './collaborators'
@@ -160,7 +159,6 @@ class Applications {
   // Events Stream
 
   async openStream (identifiers, tail, after) {
-    const eventsUrl = `${this._stackConfig.as}/events`
     const payload = {
       identifiers: identifiers.map(id => ({
         application_ids: { application_id: id },
@@ -169,7 +167,7 @@ class Applications {
       after,
     }
 
-    return stream(payload, eventsUrl)
+    return this._api.Events.Stream(undefined, payload)
   }
 }
 

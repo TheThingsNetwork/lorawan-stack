@@ -48,6 +48,17 @@ jest.mock('../../generated/api-definition.json', () => (
           },
         ],
       },
+      Events: {
+        file: 'lorawan-stack/api/application_services.proto',
+        http: [
+          {
+            method: 'get',
+            pattern: '/events',
+            parameters: [],
+            stream: true,
+          },
+        ],
+      },
     },
   }
 ))
@@ -56,8 +67,7 @@ describe('API', function () {
   let api
   beforeEach(function () {
     api = new Api('http', { baseURL: 'http://localhost:1885' })
-    api._connector.post = jest.fn()
-    api._connector.get = jest.fn()
+    api._connector.handleRequest = jest.fn()
   })
 
   test('it applies api definitions correctly', function () {
@@ -68,8 +78,8 @@ describe('API', function () {
   test('it applies parameters correctly', function () {
     api.ApplicationRegistry.Create({ routeParams: { 'collaborator.user_ids.user_id': 'test' }}, { name: 'test-name' })
 
-    expect(api._connector.post).toHaveBeenCalledTimes(1)
-    expect(api._connector.post).toHaveBeenCalledWith('/users/test/applications', undefined, { name: 'test-name' })
+    expect(api._connector.handleRequest).toHaveBeenCalledTimes(1)
+    expect(api._connector.handleRequest).toHaveBeenCalledWith('post', '/users/test/applications', undefined, { name: 'test-name' }, false)
   })
 
   test('it throws when parameters mismatch', function () {
@@ -81,7 +91,14 @@ describe('API', function () {
   test('it respects the search query', function () {
     api.ApplicationRegistry.List(undefined, { limit: 2, page: 1 })
 
-    expect(api._connector.get).toHaveBeenCalledTimes(1)
-    expect(api._connector.get).toHaveBeenCalledWith('/applications', undefined, { limit: 2, page: 1 })
+    expect(api._connector.handleRequest).toHaveBeenCalledTimes(1)
+    expect(api._connector.handleRequest).toHaveBeenCalledWith('get', '/applications', undefined, { limit: 2, page: 1 }, false)
+  })
+
+  test('it sets stream value to true for streaming endpoints', function () {
+    api.ApplicationRegistry.Events()
+
+    expect(api._connector.handleRequest).toHaveBeenCalledTimes(1)
+    expect(api._connector.handleRequest).toHaveBeenCalledWith('get', '/events', undefined, undefined, true)
   })
 })

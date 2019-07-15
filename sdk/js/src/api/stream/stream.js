@@ -44,7 +44,7 @@ import 'web-streams-polyfill/dist/polyfill.js'
  * @returns {Object} The stream subscription object with the `on` function for
  * attaching listeners and the `close` function to close the stream.
  */
-export default async function (payload, url = '/api/v3/events') {
+export default async function (payload, url) {
   let listeners = Object.values(EVENTS)
     .reduce((acc, curr) => ({ ...acc, [curr]: null }), {})
   const token = new Token().get()

@@ -40,6 +40,9 @@ function map (files) {
             }
 
             rule.method = rule.method.toLowerCase()
+            if (method.responseStreaming) {
+              rule.stream = method.responseStreaming
+            }
             result[service.name][method.name].http.push(rule)
           }
         }

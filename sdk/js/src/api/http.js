@@ -13,13 +13,16 @@
 // limitations under the License.
 
 import axios from 'axios'
+
 import { STACK_COMPONENTS } from '../util/constants'
+import stream from './stream/stream-node'
 
 /**
  * Http Class is a connector for the API that uses the HTTP bridge to connect.
  */
 class Http {
   constructor (token, stackConfig, axiosConfig = {}) {
+    this._stackConfig = stackConfig
     const headers = axiosConfig.headers || {}
 
     let Authorization = null
@@ -29,14 +32,17 @@ class Http {
 
     const stackComponents = Object.keys(stackConfig)
     const instances = stackComponents.reduce(function (acc, curr) {
-      acc[curr] = axios.create({
-        baseURL: stackConfig[curr],
-        headers: {
-          Authorization,
-          ...headers,
-        },
-        ...axiosConfig,
-      })
+      const componentUrl = stackConfig[curr]
+      if (componentUrl) {
+        acc[curr] = axios.create({
+          baseURL: componentUrl,
+          headers: {
+            Authorization,
+            ...headers,
+          },
+          ...axiosConfig,
+        })
+      }
 
       return acc
     }, {})
@@ -59,15 +65,35 @@ class Http {
     }
   }
 
-  async handleRequest (method, endpoint, component, payload = {}, config) {
+  async handleRequest (method, endpoint, component, payload = {}, isStream) {
     const parsedComponent = component || this._parseStackComponent(endpoint)
+    if (!this._stackConfig[parsedComponent]) {
+      // If the component has not been defined in the stack config, make no
+      // request and throw an error instead
+      throw new Error(`Cannot run "${method.toUpperCase()} ${endpoint}" API call on disabled component: "${parsedComponent}"`)
+    }
+
     try {
-      return await this[parsedComponent]({
+      if (isStream) {
+        const url = this._stackConfig[parsedComponent] + endpoint
+        return stream(payload, url)
+      }
+
+      const config = {
         method,
         url: endpoint,
-        data: payload,
-        ...config,
-      })
+      }
+
+      if (method === 'get' || method === 'delete') {
+        // For GETs and DELETEs, convert payload to query params (should usually
+        // be field_mask only)
+        config.params = this._payloadToQueryParams(payload)
+      } else {
+        // Otherwise pass data as request body
+        config.data = payload
+      }
+
+      return await this[parsedComponent](config)
     } catch (err) {
       if ('response' in err && err.response && 'data' in err.response) {
         throw err.response.data
@@ -77,38 +103,25 @@ class Http {
     }
   }
 
-  async get (endpoint, component, params) {
-    // Convert payload to query params (should usually be field_mask only)
-    const config = {}
-    if (params && Object.keys(params).length > 0) {
-      if ('field_mask' in params) {
+  /**
+   * Converts a payload object to a query parameter object, making sure that the
+   * field mask parameter is converted correctly.
+   * @param {Object} payload - The payload object.
+   * @returns {Object} The params object, to be passed to axios config.
+   */
+  _payloadToQueryParams (payload) {
+    const res = { ...payload }
+    if (payload && Object.keys(payload).length > 0) {
+      if ('field_mask' in payload) {
         // Convert field mask prop to a query param friendly format
-        params.field_mask = params.field_mask.paths.join(',')
+        res.field_mask = payload.field_mask.paths.join(',')
       }
-      config.params = params
+      return res
     }
-
-    return this.handleRequest('get', endpoint, component, undefined, config)
-  }
-
-  async post (endpoint, component, payload) {
-    return this.handleRequest('post', endpoint, component, payload)
-  }
-
-  async patch (endpoint, component, payload) {
-    return this.handleRequest('patch', endpoint, component, payload)
-  }
-
-  async put (endpoint, component, payload) {
-    return this.handleRequest('put', endpoint, component, payload)
-  }
-
-  async delete (endpoint, component) {
-    return this.handleRequest('delete', endpoint, component)
   }
 
   /**
-   *  Extracts the stack component abbreviation from the endpoint.
+   * Extracts the stack component abbreviation from the endpoint.
    * @param {string} endpoint - The endpoint got for a request method.
    * @returns {string} One of {is|as|gs|js|ns}.
    */
