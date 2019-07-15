@@ -28,27 +28,28 @@ var (
 
 // Config for the ttn-lw-cli binary.
 type Config struct {
-	conf.Base                    `name:",squash"`
-	CredentialsID                string `name:"credentials-id" description:"Credentials ID (if using multiple configurations)"`
-	InputFormat                  string `name:"input-format" description:"Input format"`
-	OutputFormat                 string `name:"output-format" description:"Output format"`
-	AllowUnknownHosts            bool   `name:"allow-unknown-hosts" description:"Allow sending credentials to unknown hosts"`
-	OAuthServerAddress           string `name:"oauth-server-address" description:"OAuth Server address"`
-	IdentityServerGRPCAddress    string `name:"identity-server-grpc-address" description:"Identity Server address"`
-	GatewayServerEnabled         bool   `name:"gateway-server-enabled" description:"Gateway Server enabled"`
-	GatewayServerGRPCAddress     string `name:"gateway-server-grpc-address" description:"Gateway Server address"`
-	NetworkServerEnabled         bool   `name:"network-server-enabled" description:"Network Server enabled"`
-	NetworkServerGRPCAddress     string `name:"network-server-grpc-address" description:"Network Server address"`
-	ApplicationServerEnabled     bool   `name:"application-server-enabled" description:"Application Server enabled"`
-	ApplicationServerGRPCAddress string `name:"application-server-grpc-address" description:"Application Server address"`
-	JoinServerEnabled            bool   `name:"join-server-enabled" description:"Join Server enabled"`
-	JoinServerGRPCAddress        string `name:"join-server-grpc-address" description:"Join Server address"`
-	Insecure                     bool   `name:"insecure" description:"Connect without TLS"`
-	CA                           string `name:"ca" description:"CA certificate file"`
+	conf.Base                          `name:",squash"`
+	CredentialsID                      string `name:"credentials-id" description:"Credentials ID (if using multiple configurations)"`
+	InputFormat                        string `name:"input-format" description:"Input format"`
+	OutputFormat                       string `name:"output-format" description:"Output format"`
+	AllowUnknownHosts                  bool   `name:"allow-unknown-hosts" description:"Allow sending credentials to unknown hosts"`
+	OAuthServerAddress                 string `name:"oauth-server-address" description:"OAuth Server address"`
+	IdentityServerGRPCAddress          string `name:"identity-server-grpc-address" description:"Identity Server address"`
+	GatewayServerEnabled               bool   `name:"gateway-server-enabled" description:"Gateway Server enabled"`
+	GatewayServerGRPCAddress           string `name:"gateway-server-grpc-address" description:"Gateway Server address"`
+	NetworkServerEnabled               bool   `name:"network-server-enabled" description:"Network Server enabled"`
+	NetworkServerGRPCAddress           string `name:"network-server-grpc-address" description:"Network Server address"`
+	ApplicationServerEnabled           bool   `name:"application-server-enabled" description:"Application Server enabled"`
+	ApplicationServerGRPCAddress       string `name:"application-server-grpc-address" description:"Application Server address"`
+	JoinServerEnabled                  bool   `name:"join-server-enabled" description:"Join Server enabled"`
+	JoinServerGRPCAddress              string `name:"join-server-grpc-address" description:"Join Server address"`
+	DeviceTemplateConverterGRPCAddress string `name:"device-template-converter-grpc-address" description:"Device Template Converter address"`
+	Insecure                           bool   `name:"insecure" description:"Connect without TLS"`
+	CA                                 string `name:"ca" description:"CA certificate file"`
 }
 
 func (c Config) getHosts() []string {
-	hosts := make([]string, 0, 6)
+	hosts := make([]string, 0, 7)
 	hosts = append(hosts, c.OAuthServerAddress)
 	hosts = append(hosts, c.IdentityServerGRPCAddress)
 	if c.GatewayServerEnabled {
@@ -63,6 +64,7 @@ func (c Config) getHosts() []string {
 	if c.JoinServerEnabled {
 		hosts = append(hosts, c.JoinServerGRPCAddress)
 	}
+	hosts = append(hosts, c.DeviceTemplateConverterGRPCAddress)
 	return getHosts(hosts...)
 }
 
@@ -73,18 +75,19 @@ var DefaultConfig = Config{
 			Level: log.InfoLevel,
 		},
 	},
-	InputFormat:                  "json",
-	OutputFormat:                 "json",
-	OAuthServerAddress:           clusterHTTPAddress + "/oauth",
-	IdentityServerGRPCAddress:    clusterGRPCAddress,
-	GatewayServerEnabled:         true,
-	GatewayServerGRPCAddress:     clusterGRPCAddress,
-	NetworkServerEnabled:         true,
-	NetworkServerGRPCAddress:     clusterGRPCAddress,
-	ApplicationServerEnabled:     true,
-	ApplicationServerGRPCAddress: clusterGRPCAddress,
-	JoinServerEnabled:            true,
-	JoinServerGRPCAddress:        clusterGRPCAddress,
+	InputFormat:                        "json",
+	OutputFormat:                       "json",
+	OAuthServerAddress:                 clusterHTTPAddress + "/oauth",
+	IdentityServerGRPCAddress:          clusterGRPCAddress,
+	GatewayServerEnabled:               true,
+	GatewayServerGRPCAddress:           clusterGRPCAddress,
+	NetworkServerEnabled:               true,
+	NetworkServerGRPCAddress:           clusterGRPCAddress,
+	ApplicationServerEnabled:           true,
+	ApplicationServerGRPCAddress:       clusterGRPCAddress,
+	JoinServerEnabled:                  true,
+	JoinServerGRPCAddress:              clusterGRPCAddress,
+	DeviceTemplateConverterGRPCAddress: clusterGRPCAddress,
 }
 
 var configCommand = commands.Config(mgr)
