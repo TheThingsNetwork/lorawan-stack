@@ -23,7 +23,7 @@ import (
 
 	"github.com/go-redis/redis"
 	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/joinserver/provisioning"
+	"go.thethings.network/lorawan-stack/pkg/provisioning"
 	ttnredis "go.thethings.network/lorawan-stack/pkg/redis"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"

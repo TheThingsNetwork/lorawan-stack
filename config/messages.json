@@ -2411,6 +2411,24 @@
       "file": "devicetemplateconverter.go"
     }
   },
+  "error:pkg/devicetemplates:microchip_data": {
+    "translations": {
+      "en": "invalid Microchip data"
+    },
+    "description": {
+      "package": "pkg/devicetemplates",
+      "file": "microchip.go"
+    }
+  },
+  "error:pkg/devicetemplates:microchip_public_key": {
+    "translations": {
+      "en": "unknown Microchip public key ID `{id}`"
+    },
+    "description": {
+      "package": "pkg/devicetemplates",
+      "file": "microchip.go"
+    }
+  },
   "error:pkg/email/sendgrid:email_not_sent": {
     "translations": {
       "en": "email was not sent"
@@ -3878,24 +3896,6 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/joinserver/provisioning:entry": {
-    "translations": {
-      "en": "invalid entry"
-    },
-    "description": {
-      "package": "pkg/joinserver/provisioning",
-      "file": "provisioning.go"
-    }
-  },
-  "error:pkg/joinserver/provisioning:microchip_public_key": {
-    "translations": {
-      "en": "unknown Microchip public key ID `{id}`"
-    },
-    "description": {
-      "package": "pkg/joinserver/provisioning",
-      "file": "microchip.go"
-    }
-  },
   "error:pkg/joinserver/redis:already_provisioned": {
     "translations": {
       "en": "device already provisioned"
@@ -4965,6 +4965,15 @@
     "description": {
       "package": "pkg/pfconfig/shared",
       "file": "shared.go"
+    }
+  },
+  "error:pkg/provisioning:entry": {
+    "translations": {
+      "en": "invalid entry"
+    },
+    "description": {
+      "package": "pkg/provisioning",
+      "file": "provisioning.go"
     }
   },
   "error:pkg/redis:not_found": {
