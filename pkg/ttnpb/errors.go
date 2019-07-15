@@ -96,7 +96,10 @@ func init() {
 				rest = append(rest, msg)
 			}
 		}
-		return ErrorDetailsFromProto(detailsMsg), rest
+		if detailsMsg != nil {
+			return ErrorDetailsFromProto(detailsMsg), rest
+		}
+		return nil, rest
 	}
 }
 
