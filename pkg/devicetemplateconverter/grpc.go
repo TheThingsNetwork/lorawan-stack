@@ -15,6 +15,7 @@
 package devicetemplateconverter
 
 import (
+	"bytes"
 	"context"
 
 	pbtypes "github.com/gogo/protobuf/types"
@@ -39,5 +40,28 @@ func (s *endDeviceTemplateConverterServer) ListFormats(ctx context.Context, _ *p
 
 // Convert implements ttnpb.DeviceTemplateServiceServer.
 func (s *endDeviceTemplateConverterServer) Convert(req *ttnpb.ConvertEndDeviceTemplateRequest, res ttnpb.EndDeviceTemplateConverter_ConvertServer) error {
-	panic("not implemented")
+	converter, ok := s.DTC.converters[req.FormatID]
+	if !ok {
+		return errNotFound.WithAttributes("id", req.FormatID)
+	}
+	ctx, cancel := errorcontext.New(res.Context())
+	ch := make(chan *ttnpb.EndDeviceTemplate)
+	go func() {
+		if err := converter.Convert(ctx, bytes.NewReader(req.Data), ch); err != nil {
+			cancel(err)
+		}
+	}()
+	for {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case tmpl, ok := <-ch:
+			if !ok {
+				return nil
+			}
+			if err := res.Send(tmpl); err != nil {
+				return err
+			}
+		}
+	}
 }

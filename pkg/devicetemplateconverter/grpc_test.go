@@ -15,8 +15,13 @@
 package devicetemplateconverter_test
 
 import (
+	"bufio"
+	"context"
+	"fmt"
+	"io"
 	"testing"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	. "go.thethings.network/lorawan-stack/pkg/devicetemplateconverter"
@@ -35,6 +40,29 @@ func TestConvertEndDeviceTemplate(t *testing.T) {
 		EndDeviceTemplateFormat: ttnpb.EndDeviceTemplateFormat{
 			Name:        "Test",
 			Description: "Test",
+		},
+		ConvertFunc: func(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndDeviceTemplate) error {
+			reader := bufio.NewReader(r)
+			for {
+				b, err := reader.ReadByte()
+				if err != nil {
+					if err == io.EOF {
+						close(ch)
+						return nil
+					}
+					return err
+				}
+				ch <- &ttnpb.EndDeviceTemplate{
+					EndDevice: ttnpb.EndDevice{
+						EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+							DeviceID: fmt.Sprintf("sn-%d", b),
+						},
+					},
+					FieldMask: pbtypes.FieldMask{
+						Paths: []string{"ids.device_id"},
+					},
+				}
+			}
 		},
 	})
 
@@ -55,6 +83,42 @@ func TestConvertEndDeviceTemplate(t *testing.T) {
 		"test": {
 			Name:        "Test",
 			Description: "Test",
+		},
+	})
+
+	stream, err := client.Convert(ctx, &ttnpb.ConvertEndDeviceTemplateRequest{
+		FormatID: "test",
+		Data:     []byte{0x1, 0x2},
+	})
+	a.So(err, should.BeNil)
+	tmpls := make([]*ttnpb.EndDeviceTemplate, 0, 2)
+	for {
+		tmpl, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		tmpls = append(tmpls, tmpl)
+	}
+	a.So(tmpls, should.Resemble, []*ttnpb.EndDeviceTemplate{
+		{
+			EndDevice: ttnpb.EndDevice{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DeviceID: "sn-1",
+				},
+			},
+			FieldMask: pbtypes.FieldMask{
+				Paths: []string{"ids.device_id"},
+			},
+		},
+		{
+			EndDevice: ttnpb.EndDevice{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DeviceID: "sn-2",
+				},
+			},
+			FieldMask: pbtypes.FieldMask{
+				Paths: []string{"ids.device_id"},
+			},
 		},
 	})
 }
