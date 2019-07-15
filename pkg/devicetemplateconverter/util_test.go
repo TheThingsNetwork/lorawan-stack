@@ -16,6 +16,7 @@ package devicetemplateconverter_test
 
 import (
 	"context"
+	"io"
 	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/component"
@@ -30,4 +31,20 @@ func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.PeerIn
 		}
 	}
 	panic("could not connect to peer")
+}
+
+type mockConverter struct {
+	ttnpb.EndDeviceTemplateFormat
+}
+
+func (c *mockConverter) Format() *ttnpb.EndDeviceTemplateFormat {
+	return &c.EndDeviceTemplateFormat
+}
+
+func (c *mockConverter) Convert(context.Context, io.Reader, chan<- *ttnpb.EndDeviceTemplate) error {
+	return nil
+}
+
+func (c *mockConverter) UniqueID(*ttnpb.EndDevice) (string, error) {
+	return "", nil
 }

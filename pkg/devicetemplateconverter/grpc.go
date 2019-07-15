@@ -26,9 +26,15 @@ type endDeviceTemplateConverterServer struct {
 	DTC *DeviceTemplateConverter
 }
 
-// GetFormats implements ttnpb.DeviceTemplateServiceServer.
-func (s *endDeviceTemplateConverterServer) GetFormats(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.EndDeviceTemplateFormats, error) {
-	panic("not implemented")
+// ListFormats implements ttnpb.DeviceTemplateServiceServer.
+func (s *endDeviceTemplateConverterServer) ListFormats(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.EndDeviceTemplateFormats, error) {
+	formats := make(map[string]*ttnpb.EndDeviceTemplateFormat, len(s.DTC.converters))
+	for id, converter := range s.DTC.converters {
+		formats[id] = converter.Format()
+	}
+	return &ttnpb.EndDeviceTemplateFormats{
+		Formats: formats,
+	}, nil
 }
 
 // Convert implements ttnpb.DeviceTemplateServiceServer.
