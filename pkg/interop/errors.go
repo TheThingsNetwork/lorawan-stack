@@ -26,6 +26,7 @@ var (
 	errInvalidLength      = errors.DefineInvalidArgument("invalid_length", "invalid length")
 	errInvalidRequestType = errors.DefineInvalidArgument("invalid_request_type", "invalid request type `{type}`")
 	errNotRegistered      = errors.DefineNotFound("not_registered", "not registered")
+	errUnexpectedResult   = errors.Define("unexpected_result", "unexpected result code {code}", "code")
 
 	ErrNoAction           = defineError("no_action", ResultNoAction, "no action")
 	ErrMIC                = defineError("mic", ResultMICFailed, "MIC failed")
@@ -49,10 +50,12 @@ var (
 )
 
 var errorResults = make(map[string]ResultCode)
+var resultErrors = make(map[ResultCode]errors.Definition)
 
 func defineError(name string, result ResultCode, message string) errors.Definition {
 	definition := errors.DefineInvalidArgument(name, message)
 	errorResults[definition.FullName()] = result
+	resultErrors[result] = definition
 	return definition
 }
 
