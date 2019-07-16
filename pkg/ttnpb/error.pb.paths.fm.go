@@ -10,6 +10,7 @@ var ErrorDetailsFieldPathsNested = []string{
 	"cause.message_format",
 	"cause.name",
 	"cause.namespace",
+	"code",
 	"correlation_id",
 	"message_format",
 	"name",
@@ -19,6 +20,7 @@ var ErrorDetailsFieldPathsNested = []string{
 var ErrorDetailsFieldPathsTopLevel = []string{
 	"attributes",
 	"cause",
+	"code",
 	"correlation_id",
 	"message_format",
 	"name",

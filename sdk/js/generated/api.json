@@ -6855,6 +6855,16 @@
               "fullType": "ttn.lorawan.v3.ErrorDetails",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "code",
+              "description": "The status code of the error.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         }

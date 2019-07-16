@@ -49,6 +49,7 @@ func (e errorDetails) Cause() error {
 	}
 	return errorDetails{cause}
 }
+func (e errorDetails) Code() uint32 { return e.GetCode() }
 
 func ErrorDetailsToProto(e errors.ErrorDetails) *ErrorDetails {
 	proto := &ErrorDetails{
@@ -56,6 +57,7 @@ func ErrorDetailsToProto(e errors.ErrorDetails) *ErrorDetails {
 		Name:          e.Name(),
 		MessageFormat: e.MessageFormat(),
 		CorrelationID: e.CorrelationID(),
+		Code:          e.Code(),
 	}
 	if attributes := e.PublicAttributes(); len(attributes) > 0 {
 		attributesStruct, err := gogoproto.Struct(attributes)
@@ -94,7 +96,10 @@ func init() {
 				rest = append(rest, msg)
 			}
 		}
-		return ErrorDetailsFromProto(detailsMsg), rest
+		if detailsMsg != nil {
+			return ErrorDetailsFromProto(detailsMsg), rest
+		}
+		return nil, rest
 	}
 }
 

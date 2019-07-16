@@ -1860,6 +1860,7 @@ The messages (for translation) are stored as "error:<namespace>:<name>".
 | `attributes` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  | Attributes that should be filled into the message format. Any extra attributes can be displayed as error details. |
 | `correlation_id` | [`string`](#string) |  | The correlation ID of the error can be used to correlate the error to stack traces the network may (or may not) store about recent errors. |
 | `cause` | [`ErrorDetails`](#ttn.lorawan.v3.ErrorDetails) |  | The error that caused this error. |
+| `code` | [`uint32`](#uint32) |  | The status code of the error. |
 
 ## <a name="lorawan-stack/api/events.proto">File `lorawan-stack/api/events.proto`</a>
 
