@@ -39,6 +39,16 @@ var (
 	endDeviceFlattenPaths    = []string{"provisioning_data"}
 )
 
+func selectEndDeviceIDFlags() *pflag.FlagSet {
+	flagSet := &pflag.FlagSet{}
+	flagSet.Bool("application-id", false, "")
+	flagSet.Bool("device-id", false, "")
+	flagSet.Bool("join-eui", false, "")
+	flagSet.Bool("dev-eui", false, "")
+	addDeprecatedDeviceFlags(flagSet)
+	return flagSet
+}
+
 func endDeviceIDFlags() *pflag.FlagSet {
 	flagSet := &pflag.FlagSet{}
 	flagSet.String("application-id", "", "")
