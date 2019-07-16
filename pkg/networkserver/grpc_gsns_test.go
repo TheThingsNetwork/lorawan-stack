@@ -1020,6 +1020,38 @@ func TestHandleUplink(t *testing.T) {
 					return false
 				}
 
+				if !a.So(AssertInteropClientHandleJoinRequestRequest(ctx, env.InteropClient.HandleJoinRequest,
+					func(ctx context.Context, netID types.NetID, req *ttnpb.JoinRequest) bool {
+						return a.So(ctx, should.HaveParentContextOrEqual, reqCtx) &&
+							a.So(netID, should.Equal, netID) &&
+							a.So(req, should.NotBeNil) &&
+							a.So(req.CorrelationIDs, should.HaveSameElementsDeep, reqCorrelationIDs) &&
+							a.So(req.DevAddr, should.NotBeEmpty) &&
+							a.So(req.DevAddr.NwkID(), should.Resemble, netID.ID()) &&
+							a.So(req.DevAddr.NetIDType(), should.Equal, netID.Type()) &&
+							a.So(req, should.Resemble, &ttnpb.JoinRequest{
+								CFList: &ttnpb.CFList{
+									Type: ttnpb.CFListType_FREQUENCIES,
+									Freq: []uint32{8671000, 8673000, 8675000, 8677000, 8679000},
+								},
+								CorrelationIDs: req.CorrelationIDs,
+								DevAddr:        req.DevAddr,
+								DownlinkSettings: ttnpb.DLSettings{
+									OptNeg: true,
+								},
+								NetID:              netID,
+								RawPayload:         msg.RawPayload,
+								RxDelay:            ttnpb.RX_DELAY_3,
+								SelectedMACVersion: ttnpb.MAC_V1_1,
+							})
+					},
+					InteropClientHandleJoinRequestResponse{
+						Error: errors.New("test"),
+					},
+				), should.BeTrue) {
+					return false
+				}
+
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
 					if !a.So(ev.Data(), should.BeError) {
 						return false

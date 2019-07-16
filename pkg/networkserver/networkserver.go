@@ -83,6 +83,11 @@ type DownlinkPriorities struct {
 	MaxApplicationDownlink ttnpb.TxSchedulePriority
 }
 
+// InteropClient is a client, which Network Server can use for interoperability.
+type InteropClient interface {
+	HandleJoinRequest(context.Context, types.NetID, *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error)
+}
+
 // NetworkServer implements the Network Server component.
 //
 // The Network Server exposes the GsNs, AsNs, DeviceRegistry and ApplicationDownlinkQueue services.
@@ -111,6 +116,8 @@ type NetworkServer struct {
 	handleASUplink func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, up *ttnpb.ApplicationUp) (bool, error)
 
 	defaultMACSettings ttnpb.MACSettings
+
+	interopClient InteropClient
 }
 
 // Option configures the NetworkServer.
@@ -175,6 +182,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 			ClassCTimeout:         conf.DefaultMACSettings.ClassCTimeout,
 			StatusTimePeriodicity: conf.DefaultMACSettings.StatusTimePeriodicity,
 		},
+		interopClient: conf.InteropClient,
 	}
 	ns.hashPool.New = func() interface{} {
 		return fnv.New64a()

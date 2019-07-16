@@ -592,6 +592,47 @@ type DeviceRegistrySetByIDRequestFuncResponse struct {
 	Error  error
 }
 
+var _ InteropClient = MockInteropClient{}
+
+// MockInteropClient is a mock InteropClient used for testing.
+type MockInteropClient struct {
+	HandleJoinRequestFunc func(context.Context, types.NetID, *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error)
+}
+
+// HandleJoinRequest calls HandleJoinRequestFunc if set and panics otherwise.
+func (m MockInteropClient) HandleJoinRequest(ctx context.Context, netID types.NetID, req *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error) {
+	if m.HandleJoinRequestFunc == nil {
+		panic("HandleJoinRequest called, but not set")
+	}
+	return m.HandleJoinRequestFunc(ctx, netID, req)
+}
+
+type InteropClientHandleJoinRequestResponse struct {
+	Response *ttnpb.JoinResponse
+	Error    error
+}
+
+type InteropClientHandleJoinRequestRequest struct {
+	Context  context.Context
+	NetID    types.NetID
+	Request  *ttnpb.JoinRequest
+	Response chan<- InteropClientHandleJoinRequestResponse
+}
+
+func MakeInteropClientHandleJoinRequestChFunc(reqCh chan<- InteropClientHandleJoinRequestRequest) func(context.Context, types.NetID, *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error) {
+	return func(ctx context.Context, netID types.NetID, msg *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error) {
+		respCh := make(chan InteropClientHandleJoinRequestResponse)
+		reqCh <- InteropClientHandleJoinRequestRequest{
+			Context:  ctx,
+			NetID:    netID,
+			Request:  msg,
+			Response: respCh,
+		}
+		resp := <-respCh
+		return resp.Response, resp.Error
+	}
+}
+
 var _ ttnpb.NsJsServer = &MockNsJsServer{}
 
 type MockNsJsServer struct {
@@ -756,6 +797,29 @@ func AssertDownlinkTaskAddRequest(ctx context.Context, reqCh <-chan DownlinkTask
 		select {
 		case <-ctx.Done():
 			t.Error("Timed out while waiting for DownlinkTasks.Add response to be processed")
+			return false
+
+		case req.Response <- resp:
+			return true
+		}
+	}
+}
+
+func AssertInteropClientHandleJoinRequestRequest(ctx context.Context, reqCh <-chan InteropClientHandleJoinRequestRequest, assert func(context.Context, types.NetID, *ttnpb.JoinRequest) bool, resp InteropClientHandleJoinRequestResponse) bool {
+	t := test.MustTFromContext(ctx)
+	t.Helper()
+	select {
+	case <-ctx.Done():
+		t.Error("Timed out while waiting for InteropClient.HandleJoinRequest to be called")
+		return false
+
+	case req := <-reqCh:
+		if !assert(req.Context, req.NetID, req.Request) {
+			return false
+		}
+		select {
+		case <-ctx.Done():
+			t.Error("Timed out while waiting for InteropClient.HandleJoinRequest response to be processed")
 			return false
 
 		case req.Response <- resp:
@@ -961,6 +1025,22 @@ func newMockDownlinkTaskQueue() (DownlinkTaskQueue, DownlinkTaskQueueEnvironment
 		}
 }
 
+type InteropClientEnvironment struct {
+	HandleJoinRequest <-chan InteropClientHandleJoinRequestRequest
+}
+
+func newMockInteropClient() (InteropClient, InteropClientEnvironment, func()) {
+	handleJoinCh := make(chan InteropClientHandleJoinRequestRequest)
+	return &MockInteropClient{
+			HandleJoinRequestFunc: MakeInteropClientHandleJoinRequestChFunc(handleJoinCh),
+		}, InteropClientEnvironment{
+			HandleJoinRequest: handleJoinCh,
+		},
+		func() {
+			close(handleJoinCh)
+		}
+}
+
 type TestEnvironment struct {
 	Cluster struct {
 		Auth    <-chan test.ClusterAuthRequest
@@ -971,6 +1051,7 @@ type TestEnvironment struct {
 	DeviceRegistry    *DeviceRegistryEnvironment
 	DownlinkTasks     *DownlinkTaskQueueEnvironment
 	Events            <-chan test.EventPubSubPublishRequest
+	InteropClient     *InteropClientEnvironment
 }
 
 func StartTest(t *testing.T, conf Config, timeout time.Duration, opts ...Option) (*NetworkServer, context.Context, TestEnvironment, func()) {
@@ -1027,6 +1108,12 @@ func StartTest(t *testing.T, conf Config, timeout time.Duration, opts ...Option)
 		m, mEnv, closeM := newMockDownlinkTaskQueue()
 		conf.DownlinkTasks = m
 		env.DownlinkTasks = &mEnv
+		closeFuncs = append(closeFuncs, closeM)
+	}
+	if conf.InteropClient == nil {
+		m, mEnv, closeM := newMockInteropClient()
+		conf.InteropClient = m
+		env.InteropClient = &mEnv
 		closeFuncs = append(closeFuncs, closeM)
 	}
 
