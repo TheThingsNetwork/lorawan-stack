@@ -66,6 +66,7 @@ const createEventsConnectLogics = function (
         const { id } = action
         if (!id) {
           reject()
+          return
         }
 
         // only proceed if not already connected
@@ -74,6 +75,7 @@ const createEventsConnectLogics = function (
         const connecting = status === CONNECTION_STATUS.CONNECTING
         if (connected || connecting) {
           reject()
+          return
         }
 
         allow(action)
@@ -99,6 +101,7 @@ const createEventsConnectLogics = function (
         const { id } = action
         if (!id) {
           reject()
+          return
         }
 
         // only proceed if connected
@@ -107,6 +110,7 @@ const createEventsConnectLogics = function (
         const unknown = status === CONNECTION_STATUS.UNKNOWN
         if (disconnected || unknown) {
           reject()
+          return
         }
 
         allow(action)
