@@ -140,6 +140,22 @@ var ListClientCollaboratorsRequestFieldPathsTopLevel = []string{
 	"limit",
 	"page",
 }
+var GetClientCollaboratorRequestFieldPathsNested = []string{
+	"client_ids",
+	"client_ids.client_id",
+	"collaborator",
+	"collaborator.ids",
+	"collaborator.ids.organization_ids",
+	"collaborator.ids.organization_ids.organization_id",
+	"collaborator.ids.user_ids",
+	"collaborator.ids.user_ids.email",
+	"collaborator.ids.user_ids.user_id",
+}
+
+var GetClientCollaboratorRequestFieldPathsTopLevel = []string{
+	"client_ids",
+	"collaborator",
+}
 var SetClientCollaboratorRequestFieldPathsNested = []string{
 	"client_ids",
 	"client_ids.client_id",

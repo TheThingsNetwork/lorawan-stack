@@ -104,9 +104,19 @@ service OrganizationAccess {
     };
   };
 
-  // Set the rights of a collaborator (member) on the organization. Users
-  // are considered to be a collaborator if they have at least one right on the
-  // organization.
+  // Get the rights of a collaborator (member) of the organization.
+  // Pseudo-rights in the response (such as the "_ALL" right) are not expanded.
+  rpc GetCollaborator(GetOrganizationCollaboratorRequest) returns (GetCollaboratorResponse) {
+    option (google.api.http) = {
+      get: "/organizations/{organization_ids.organization_id}/collaborator"
+      additional_bindings {
+        get: "/organizations/{organization_ids.organization_id}/collaborator/user/{collaborator.user_ids.user_id}"
+      }
+    };
+  }
+
+  // Set the rights of a collaborator (member) on the organization.
+  // Setting a collaborator without rights, removes them.
   // Note that only users can collaborate (be member of) an organization.
   rpc SetCollaborator(SetOrganizationCollaboratorRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {

@@ -132,6 +132,26 @@ func (dst *Collaborator) SetFields(src *Collaborator, paths ...string) error {
 	return nil
 }
 
+func (dst *GetCollaboratorResponse) SetFields(src *GetCollaboratorResponse, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "rights":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rights' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Rights = src.Rights
+			} else {
+				dst.Rights = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *Collaborators) SetFields(src *Collaborators, paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {

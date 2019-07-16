@@ -304,6 +304,23 @@ var ListGatewayCollaboratorsRequestFieldPathsTopLevel = []string{
 	"limit",
 	"page",
 }
+var GetGatewayCollaboratorRequestFieldPathsNested = []string{
+	"collaborator",
+	"collaborator.ids",
+	"collaborator.ids.organization_ids",
+	"collaborator.ids.organization_ids.organization_id",
+	"collaborator.ids.user_ids",
+	"collaborator.ids.user_ids.email",
+	"collaborator.ids.user_ids.user_id",
+	"gateway_ids",
+	"gateway_ids.eui",
+	"gateway_ids.gateway_id",
+}
+
+var GetGatewayCollaboratorRequestFieldPathsTopLevel = []string{
+	"collaborator",
+	"gateway_ids",
+}
 var SetGatewayCollaboratorRequestFieldPathsNested = []string{
 	"collaborator",
 	"collaborator.ids",

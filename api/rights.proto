@@ -183,6 +183,10 @@ message Collaborator {
   repeated Right rights = 2 [(validate.rules).repeated.items.enum.defined_only = true];
 }
 
+message GetCollaboratorResponse {
+  repeated Right rights = 2;
+}
+
 message Collaborators {
   repeated Collaborator collaborators = 1;
 }

@@ -108,6 +108,11 @@ message ListApplicationCollaboratorsRequest {
   uint32 page = 3;
 }
 
+message GetApplicationCollaboratorRequest {
+  ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  OrganizationOrUserIdentifiers collaborator = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+}
+
 message SetApplicationCollaboratorRequest {
   ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   Collaborator collaborator = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];

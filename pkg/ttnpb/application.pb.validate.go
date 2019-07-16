@@ -1266,6 +1266,112 @@ var _ interface {
 	ErrorName() string
 } = ListApplicationCollaboratorsRequestValidationError{}
 
+// ValidateFields checks the field values on GetApplicationCollaboratorRequest
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *GetApplicationCollaboratorRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = GetApplicationCollaboratorRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "application_ids":
+
+			if v, ok := interface{}(&m.ApplicationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return GetApplicationCollaboratorRequestValidationError{
+						field:  "application_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "collaborator":
+
+			if v, ok := interface{}(&m.OrganizationOrUserIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return GetApplicationCollaboratorRequestValidationError{
+						field:  "collaborator",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return GetApplicationCollaboratorRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// GetApplicationCollaboratorRequestValidationError is the validation error
+// returned by GetApplicationCollaboratorRequest.ValidateFields if the
+// designated constraints aren't met.
+type GetApplicationCollaboratorRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetApplicationCollaboratorRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetApplicationCollaboratorRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetApplicationCollaboratorRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetApplicationCollaboratorRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetApplicationCollaboratorRequestValidationError) ErrorName() string {
+	return "GetApplicationCollaboratorRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetApplicationCollaboratorRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetApplicationCollaboratorRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetApplicationCollaboratorRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetApplicationCollaboratorRequestValidationError{}
+
 // ValidateFields checks the field values on SetApplicationCollaboratorRequest
 // with the rules defined in the proto definition for this message. If any
 // rules are violated, an error is returned.

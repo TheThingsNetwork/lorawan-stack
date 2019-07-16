@@ -160,6 +160,22 @@ var ListOrganizationCollaboratorsRequestFieldPathsTopLevel = []string{
 	"organization_ids",
 	"page",
 }
+var GetOrganizationCollaboratorRequestFieldPathsNested = []string{
+	"collaborator",
+	"collaborator.ids",
+	"collaborator.ids.organization_ids",
+	"collaborator.ids.organization_ids.organization_id",
+	"collaborator.ids.user_ids",
+	"collaborator.ids.user_ids.email",
+	"collaborator.ids.user_ids.user_id",
+	"organization_ids",
+	"organization_ids.organization_id",
+}
+
+var GetOrganizationCollaboratorRequestFieldPathsTopLevel = []string{
+	"collaborator",
+	"organization_ids",
+}
 var SetOrganizationCollaboratorRequestFieldPathsNested = []string{
 	"collaborator",
 	"collaborator.ids",

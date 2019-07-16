@@ -1954,6 +1954,112 @@ var _ interface {
 	ErrorName() string
 } = ListGatewayCollaboratorsRequestValidationError{}
 
+// ValidateFields checks the field values on GetGatewayCollaboratorRequest with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *GetGatewayCollaboratorRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = GetGatewayCollaboratorRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "gateway_ids":
+
+			if v, ok := interface{}(&m.GatewayIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return GetGatewayCollaboratorRequestValidationError{
+						field:  "gateway_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "collaborator":
+
+			if v, ok := interface{}(&m.OrganizationOrUserIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return GetGatewayCollaboratorRequestValidationError{
+						field:  "collaborator",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return GetGatewayCollaboratorRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// GetGatewayCollaboratorRequestValidationError is the validation error
+// returned by GetGatewayCollaboratorRequest.ValidateFields if the designated
+// constraints aren't met.
+type GetGatewayCollaboratorRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetGatewayCollaboratorRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetGatewayCollaboratorRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetGatewayCollaboratorRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetGatewayCollaboratorRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetGatewayCollaboratorRequestValidationError) ErrorName() string {
+	return "GetGatewayCollaboratorRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetGatewayCollaboratorRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetGatewayCollaboratorRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetGatewayCollaboratorRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetGatewayCollaboratorRequestValidationError{}
+
 // ValidateFields checks the field values on SetGatewayCollaboratorRequest with
 // the rules defined in the proto definition for this message. If any rules
 // are violated, an error is returned.
