@@ -160,6 +160,29 @@ func (is *IdentityServer) updateApplicationAPIKey(ctx context.Context, req *ttnp
 	return key, nil
 }
 
+func (is *IdentityServer) getApplicationCollaborator(ctx context.Context, req *ttnpb.GetApplicationCollaboratorRequest) (*ttnpb.GetCollaboratorResponse, error) {
+	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS); err != nil {
+		return nil, err
+	}
+	res := &ttnpb.GetCollaboratorResponse{}
+	err := is.withDatabase(ctx, func(db *gorm.DB) error {
+		rights, err := store.GetMembershipStore(db).GetMember(
+			ctx,
+			&req.OrganizationOrUserIdentifiers,
+			req.ApplicationIdentifiers,
+		)
+		if err != nil {
+			return err
+		}
+		res.Rights = rights.GetRights()
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
 func (is *IdentityServer) setApplicationCollaborator(ctx context.Context, req *ttnpb.SetApplicationCollaboratorRequest) (*types.Empty, error) {
 	// Require that caller has rights to manage collaborators.
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS); err != nil {
@@ -249,6 +272,10 @@ func (aa *applicationAccess) GetAPIKey(ctx context.Context, req *ttnpb.GetApplic
 
 func (aa *applicationAccess) UpdateAPIKey(ctx context.Context, req *ttnpb.UpdateApplicationAPIKeyRequest) (*ttnpb.APIKey, error) {
 	return aa.updateApplicationAPIKey(ctx, req)
+}
+
+func (aa *applicationAccess) GetCollaborator(ctx context.Context, req *ttnpb.GetApplicationCollaboratorRequest) (*ttnpb.GetCollaboratorResponse, error) {
+	return aa.getApplicationCollaborator(ctx, req)
 }
 
 func (aa *applicationAccess) SetCollaborator(ctx context.Context, req *ttnpb.SetApplicationCollaboratorRequest) (*types.Empty, error) {

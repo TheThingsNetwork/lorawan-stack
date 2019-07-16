@@ -218,13 +218,13 @@ func TestGatewayAccessCRUD(t *testing.T) {
 	ctx := test.Context()
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID, userCreds := defaultUser.UserIdentifiers, userCreds(defaultUserIdx)
+		userID, creds := defaultUser.UserIdentifiers, userCreds(defaultUserIdx)
 		gatewayID := userGateways(&userID).Gateways[0].GatewayIdentifiers
 		collaboratorID := collaboratorUser.UserIdentifiers.OrganizationOrUserIdentifiers()
 
 		reg := ttnpb.NewGatewayAccessClient(cc)
 
-		rights, err := reg.ListRights(ctx, &gatewayID, userCreds)
+		rights, err := reg.ListRights(ctx, &gatewayID, creds)
 
 		a.So(rights, should.NotBeNil)
 		a.So(rights.Rights, should.Contain, ttnpb.RIGHT_GATEWAY_ALL)
@@ -233,7 +233,7 @@ func TestGatewayAccessCRUD(t *testing.T) {
 		modifiedGatewayID := gatewayID
 		modifiedGatewayID.GatewayID += "mod"
 
-		rights, err = reg.ListRights(ctx, &modifiedGatewayID, userCreds)
+		rights, err = reg.ListRights(ctx, &modifiedGatewayID, creds)
 		a.So(rights, should.NotBeNil)
 		a.So(rights.Rights, should.BeEmpty)
 		a.So(err, should.BeNil)
@@ -244,7 +244,7 @@ func TestGatewayAccessCRUD(t *testing.T) {
 		APIKey, err := reg.GetAPIKey(ctx, &ttnpb.GetGatewayAPIKeyRequest{
 			GatewayIdentifiers: gatewayID,
 			KeyID:              gatewayKey.ID,
-		}, userCreds)
+		}, creds)
 
 		a.So(APIKey, should.NotBeNil)
 		a.So(err, should.BeNil)
@@ -253,7 +253,7 @@ func TestGatewayAccessCRUD(t *testing.T) {
 
 		APIKeys, err := reg.ListAPIKeys(ctx, &ttnpb.ListGatewayAPIKeysRequest{
 			GatewayIdentifiers: gatewayID,
-		}, userCreds)
+		}, creds)
 
 		a.So(APIKeys, should.NotBeNil)
 		a.So(len(APIKeys.APIKeys), should.Equal, len(gatewayAPIKeys.APIKeys))
@@ -265,7 +265,7 @@ func TestGatewayAccessCRUD(t *testing.T) {
 
 		collaborators, err := reg.ListCollaborators(ctx, &ttnpb.ListGatewayCollaboratorsRequest{
 			GatewayIdentifiers: gatewayID,
-		}, userCreds)
+		}, creds)
 
 		a.So(collaborators, should.NotBeNil)
 		a.So(collaborators.Collaborators, should.NotBeEmpty)
@@ -276,7 +276,7 @@ func TestGatewayAccessCRUD(t *testing.T) {
 			GatewayIdentifiers: gatewayID,
 			Name:               APIKeyName,
 			Rights:             []ttnpb.Right{ttnpb.RIGHT_GATEWAY_ALL},
-		}, userCreds)
+		}, creds)
 
 		a.So(APIKey, should.NotBeNil)
 		a.So(APIKey.Name, should.Equal, APIKeyName)
@@ -287,7 +287,7 @@ func TestGatewayAccessCRUD(t *testing.T) {
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
 			GatewayIdentifiers: gatewayID,
 			APIKey:             *APIKey,
-		}, userCreds)
+		}, creds)
 
 		a.So(updated, should.NotBeNil)
 		a.So(updated.Name, should.Equal, newAPIKeyName)
@@ -299,8 +299,16 @@ func TestGatewayAccessCRUD(t *testing.T) {
 				OrganizationOrUserIdentifiers: *collaboratorID,
 				Rights:                        []ttnpb.Right{ttnpb.RIGHT_GATEWAY_ALL},
 			},
-		}, userCreds)
+		}, creds)
 
 		a.So(err, should.BeNil)
+
+		res, err := reg.GetCollaborator(ctx, &ttnpb.GetGatewayCollaboratorRequest{
+			GatewayIdentifiers:            gatewayID,
+			OrganizationOrUserIdentifiers: *collaboratorID,
+		}, creds)
+
+		a.So(err, should.BeNil)
+		a.So(res.Rights, should.Resemble, []ttnpb.Right{ttnpb.RIGHT_GATEWAY_ALL})
 	})
 }

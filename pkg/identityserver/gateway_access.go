@@ -160,6 +160,29 @@ func (is *IdentityServer) updateGatewayAPIKey(ctx context.Context, req *ttnpb.Up
 	return key, nil
 }
 
+func (is *IdentityServer) getGatewayCollaborator(ctx context.Context, req *ttnpb.GetGatewayCollaboratorRequest) (*ttnpb.GetCollaboratorResponse, error) {
+	if err := rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS); err != nil {
+		return nil, err
+	}
+	res := &ttnpb.GetCollaboratorResponse{}
+	err := is.withDatabase(ctx, func(db *gorm.DB) error {
+		rights, err := store.GetMembershipStore(db).GetMember(
+			ctx,
+			&req.OrganizationOrUserIdentifiers,
+			req.GatewayIdentifiers,
+		)
+		if err != nil {
+			return err
+		}
+		res.Rights = rights.GetRights()
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
 func (is *IdentityServer) setGatewayCollaborator(ctx context.Context, req *ttnpb.SetGatewayCollaboratorRequest) (*types.Empty, error) {
 	// Require that caller has rights to manage collaborators.
 	if err := rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS); err != nil {
@@ -249,6 +272,10 @@ func (ga *gatewayAccess) GetAPIKey(ctx context.Context, req *ttnpb.GetGatewayAPI
 
 func (ga *gatewayAccess) UpdateAPIKey(ctx context.Context, req *ttnpb.UpdateGatewayAPIKeyRequest) (*ttnpb.APIKey, error) {
 	return ga.updateGatewayAPIKey(ctx, req)
+}
+
+func (ga *gatewayAccess) GetCollaborator(ctx context.Context, req *ttnpb.GetGatewayCollaboratorRequest) (*ttnpb.GetCollaboratorResponse, error) {
+	return ga.getGatewayCollaborator(ctx, req)
 }
 
 func (ga *gatewayAccess) SetCollaborator(ctx context.Context, req *ttnpb.SetGatewayCollaboratorRequest) (*types.Empty, error) {
