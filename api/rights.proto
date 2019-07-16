@@ -181,10 +181,21 @@ message APIKeys {
 message Collaborator {
   OrganizationOrUserIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   repeated Right rights = 2 [(validate.rules).repeated.items.enum.defined_only = true];
+  reserved 3; // reserved for future EntityIdentifiers entity = 3;
+  reserved 4; // reserved for future State state = 4;
+  reserved 5; // reserved for future google.protobuf.Timestamp created_at = 5;
+  reserved 6; // reserved for future google.protobuf.Timestamp updated_at = 6;
+  // NOTE: Keep compatible with GetCollaboratorResponse.
 }
 
 message GetCollaboratorResponse {
+  reserved 1; // reserved for future OrganizationOrUserIdentifiers ids = 1;
   repeated Right rights = 2;
+  reserved 3; // reserved for future EntityIdentifiers entity = 3;
+  reserved 4; // reserved for future State state = 4;
+  reserved 5; // reserved for future google.protobuf.Timestamp created_at = 5;
+  reserved 6; // reserved for future google.protobuf.Timestamp updated_at = 6;
+  // NOTE: Keep compatible with Collaborator.
 }
 
 message Collaborators {
