@@ -122,6 +122,8 @@ type MembershipStore interface {
 	FindMembers(ctx context.Context, entityID ttnpb.Identifiers) (map[*ttnpb.OrganizationOrUserIdentifiers]*ttnpb.Rights, error)
 	// Find direct member rights of the given organization or user. The entityType may be omitted.
 	FindMemberRights(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityType string) (map[ttnpb.Identifiers]*ttnpb.Rights, error)
+	// Get member rights on an entity.
+	GetMember(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityID ttnpb.Identifiers) (*ttnpb.Rights, error)
 	// Set member rights on an entity. Rights can be deleted by not passing any rights.
 	SetMember(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityID ttnpb.Identifiers, rights *ttnpb.Rights) error
 }

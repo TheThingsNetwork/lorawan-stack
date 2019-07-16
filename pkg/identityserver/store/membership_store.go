@@ -84,14 +84,48 @@ func (s *membershipStore) FindMemberRights(ctx context.Context, id *ttnpb.Organi
 	return s.identifierRights(entityRightsForMemberships(memberships))
 }
 
-var errAccountType = errors.DefineInvalidArgument(
-	"account_type",
-	"account of type `{account_type}` can not collaborate on `{entity_type}`",
-)
-
 var errMembershipNotFound = errors.DefineNotFound(
 	"membership_not_found",
 	"account `{account_id}` is not a member of `{entity_type}` `{entity_id}`",
+)
+
+func (s *membershipStore) GetMember(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityID ttnpb.Identifiers) (*ttnpb.Rights, error) {
+	defer trace.StartRegion(ctx, "get membership").End()
+	account, err := s.findAccount(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	entity, err := s.findEntity(ctx, entityID, "id")
+	if err != nil {
+		return nil, err
+	}
+	if err := ctx.Err(); err != nil { // Early exit if context canceled
+		return nil, err
+	}
+	query := s.query(ctx, Membership{})
+	var membership Membership
+	err = query.Where(&Membership{
+		AccountID:  account.PrimaryKey(),
+		EntityID:   entity.PrimaryKey(),
+		EntityType: entityTypeForID(entityID),
+	}).First(&membership).Error
+	if err != nil {
+		if gorm.IsRecordNotFoundError(err) {
+			return nil, errMembershipNotFound.WithAttributes(
+				"account_id", id.IDString(),
+				"entity_type", entityID.EntityType(),
+				"entity_id", entityID.IDString(),
+			)
+		}
+		return nil, err
+	}
+	rights := ttnpb.Rights(membership.Rights)
+	return &rights, nil
+}
+
+var errAccountType = errors.DefineInvalidArgument(
+	"account_type",
+	"account of type `{account_type}` can not collaborate on `{entity_type}`",
 )
 
 func (s *membershipStore) SetMember(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityID ttnpb.Identifiers, rights *ttnpb.Rights) (err error) {

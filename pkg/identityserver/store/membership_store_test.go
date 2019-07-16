@@ -151,17 +151,24 @@ func TestMembershipStore(t *testing.T) {
 			t.Run(tt.Name, func(t *testing.T) {
 				a := assertions.New(t)
 
+				memberEntityRights, err := store.GetMember(ctx, tt.Identifiers, tt.MemberIdentifiers)
+				if a.So(err, should.NotBeNil) {
+					a.So(errors.IsNotFound(err), should.BeTrue)
+				}
+
 				// set membership
-				err := store.SetMember(ctx,
+				err = store.SetMember(ctx,
 					tt.Identifiers,
 					tt.MemberIdentifiers,
 					ttnpb.RightsFrom(tt.Rights...),
 				)
-
 				a.So(err, should.BeNil)
 
-				members, err := store.FindMembers(ctx, tt.MemberIdentifiers)
+				memberEntityRights, err = store.GetMember(ctx, tt.Identifiers, tt.MemberIdentifiers)
+				a.So(err, should.BeNil)
+				a.So(memberEntityRights.GetRights(), should.Resemble, tt.Rights)
 
+				members, err := store.FindMembers(ctx, tt.MemberIdentifiers)
 				a.So(err, should.BeNil)
 				if a.So(members, should.HaveLength, 1) {
 					for ouid, rights := range members {
@@ -171,7 +178,6 @@ func TestMembershipStore(t *testing.T) {
 				}
 
 				memberRights, err := store.FindMemberRights(ctx, tt.Identifiers, tt.EntityType)
-
 				a.So(err, should.BeNil)
 				if a.So(memberRights, should.HaveLength, 1) {
 					for eid, rights := range memberRights {
@@ -186,11 +192,13 @@ func TestMembershipStore(t *testing.T) {
 					tt.MemberIdentifiers,
 					ttnpb.RightsFrom(tt.RightsUpdated...),
 				)
-
 				a.So(err, should.BeNil)
 
-				memberRights, err = store.FindMemberRights(ctx, tt.Identifiers, tt.EntityType)
+				memberEntityRights, err = store.GetMember(ctx, tt.Identifiers, tt.MemberIdentifiers)
+				a.So(err, should.BeNil)
+				a.So(memberEntityRights.GetRights(), should.Resemble, tt.RightsUpdated)
 
+				memberRights, err = store.FindMemberRights(ctx, tt.Identifiers, tt.EntityType)
 				a.So(err, should.BeNil)
 				if a.So(memberRights, should.HaveLength, 1) {
 					for eid, rights := range memberRights {
@@ -207,9 +215,12 @@ func TestMembershipStore(t *testing.T) {
 				)
 
 				a.So(err, should.BeNil)
+				memberEntityRights, err = store.GetMember(ctx, tt.Identifiers, tt.MemberIdentifiers)
+				if a.So(err, should.NotBeNil) {
+					a.So(errors.IsNotFound(err), should.BeTrue)
+				}
 
 				memberRights, err = store.FindMemberRights(ctx, tt.Identifiers, tt.EntityType)
-
 				a.So(err, should.BeNil)
 				a.So(memberRights, should.HaveLength, 0)
 			})
@@ -223,7 +234,6 @@ func TestMembershipStore(t *testing.T) {
 				ttnpb.OrganizationIdentifiers{OrganizationID: "other-org"},
 				ttnpb.RightsFrom([]ttnpb.Right{ttnpb.RIGHT_ORGANIZATION_ALL}...),
 			)
-
 			a.So(err, should.NotBeNil)
 			a.So(errors.IsInvalidArgument(err), should.BeTrue)
 		})
@@ -288,12 +298,10 @@ func TestMembershipStore(t *testing.T) {
 					tt.MemberIdentifiers,
 					ttnpb.RightsFrom([]ttnpb.Right{}...),
 				)
-
 				a.So(err, should.NotBeNil)
 				a.So(errors.IsNotFound(err), should.BeTrue)
 
 				_, err = store.FindMemberRights(ctx, tt.Identifiers, tt.EntityType)
-
 				a.So(err, should.NotBeNil)
 				a.So(errors.IsNotFound(err), should.BeTrue)
 			})
@@ -356,12 +364,10 @@ func TestMembershipStore(t *testing.T) {
 					tt.MemberIdentifiers,
 					ttnpb.RightsFrom([]ttnpb.Right{}...),
 				)
-
 				a.So(err, should.NotBeNil)
 				a.So(errors.IsNotFound(err), should.BeTrue)
 
 				_, err = store.FindMembers(ctx, tt.MemberIdentifiers)
-
 				a.So(err, should.NotBeNil)
 				a.So(errors.IsNotFound(err), should.BeTrue)
 			})
