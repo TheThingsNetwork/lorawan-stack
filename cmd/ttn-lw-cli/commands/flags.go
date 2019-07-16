@@ -63,8 +63,7 @@ func attributesFlags() *pflag.FlagSet {
 	return flagSet
 }
 
-func mergeAttributes(attributes map[string]string, flagSet *pflag.FlagSet) map[string]string {
-	kv, _ := flagSet.GetStringSlice("attributes")
+func mergeKV(attributes map[string]string, kv []string) map[string]string {
 	out := make(map[string]string, len(attributes)+len(kv))
 	for k, v := range attributes {
 		out[k] = v
@@ -81,6 +80,11 @@ func mergeAttributes(attributes map[string]string, flagSet *pflag.FlagSet) map[s
 		}
 	}
 	return out
+}
+
+func mergeAttributes(attributes map[string]string, flagSet *pflag.FlagSet) map[string]string {
+	kv, _ := flagSet.GetStringSlice("attributes")
+	return mergeKV(attributes, kv)
 }
 
 func rightsFlags(filter func(string) bool) *pflag.FlagSet {

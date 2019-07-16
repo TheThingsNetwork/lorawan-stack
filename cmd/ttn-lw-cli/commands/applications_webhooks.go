@@ -69,6 +69,12 @@ func getApplicationWebhookID(flagSet *pflag.FlagSet, args []string) (*ttnpb.Appl
 	}, nil
 }
 
+func headersFlags() *pflag.FlagSet {
+	flagSet := &pflag.FlagSet{}
+	flagSet.StringSlice("headers", nil, "key=value")
+	return flagSet
+}
+
 var (
 	applicationsWebhooksCommand = &cobra.Command{
 		Use:     "webhooks",
@@ -165,12 +171,14 @@ var (
 			if err != nil {
 				return err
 			}
-			paths := util.UpdateFieldMask(cmd.Flags(), setApplicationWebhookFlags)
+			paths := util.UpdateFieldMask(cmd.Flags(), setApplicationWebhookFlags, headersFlags())
 
 			var webhook ttnpb.ApplicationWebhook
 			if err = util.SetFields(&webhook, setApplicationWebhookFlags); err != nil {
 				return err
 			}
+			headers, _ := cmd.Flags().GetStringSlice("headers")
+			webhook.Headers = mergeKV(webhook.Headers, headers)
 			webhook.ApplicationWebhookIdentifiers = *webhookID
 
 			as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
@@ -221,6 +229,7 @@ func init() {
 	applicationsWebhooksCommand.AddCommand(applicationsWebhooksListCommand)
 	applicationsWebhooksSetCommand.Flags().AddFlagSet(applicationWebhookIDFlags())
 	applicationsWebhooksSetCommand.Flags().AddFlagSet(setApplicationWebhookFlags)
+	applicationsWebhooksSetCommand.Flags().AddFlagSet(headersFlags())
 	applicationsWebhooksCommand.AddCommand(applicationsWebhooksSetCommand)
 	applicationsWebhooksDeleteCommand.Flags().AddFlagSet(applicationWebhookIDFlags())
 	applicationsWebhooksCommand.AddCommand(applicationsWebhooksDeleteCommand)
