@@ -164,7 +164,9 @@ func (is *IdentityServer) getGatewayCollaborator(ctx context.Context, req *ttnpb
 	if err := rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS); err != nil {
 		return nil, err
 	}
-	res := &ttnpb.GetCollaboratorResponse{}
+	res := &ttnpb.GetCollaboratorResponse{
+		OrganizationOrUserIdentifiers: req.OrganizationOrUserIdentifiers,
+	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
 		rights, err := store.GetMembershipStore(db).GetMember(
 			ctx,

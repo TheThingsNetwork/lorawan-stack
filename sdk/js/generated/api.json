@@ -19897,6 +19897,16 @@
           "extensions": [],
           "fields": [
             {
+              "name": "ids",
+              "description": "",
+              "label": "",
+              "type": "OrganizationOrUserIdentifiers",
+              "longType": "OrganizationOrUserIdentifiers",
+              "fullType": "ttn.lorawan.v3.OrganizationOrUserIdentifiers",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
               "name": "rights",
               "description": "",
               "label": "repeated",

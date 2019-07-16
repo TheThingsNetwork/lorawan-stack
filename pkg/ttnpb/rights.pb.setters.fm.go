@@ -135,6 +135,24 @@ func (dst *Collaborator) SetFields(src *Collaborator, paths ...string) error {
 func (dst *GetCollaboratorResponse) SetFields(src *GetCollaboratorResponse, paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
+		case "ids":
+			if len(subs) > 0 {
+				newDst := &dst.OrganizationOrUserIdentifiers
+				var newSrc *OrganizationOrUserIdentifiers
+				if src != nil {
+					newSrc = &src.OrganizationOrUserIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.OrganizationOrUserIdentifiers = src.OrganizationOrUserIdentifiers
+				} else {
+					var zero OrganizationOrUserIdentifiers
+					dst.OrganizationOrUserIdentifiers = zero
+				}
+			}
 		case "rights":
 			if len(subs) > 0 {
 				return fmt.Errorf("'rights' has no subfields, but %s were specified", subs)

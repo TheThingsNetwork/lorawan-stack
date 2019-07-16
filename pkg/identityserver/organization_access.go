@@ -164,7 +164,9 @@ func (is *IdentityServer) getOrganizationCollaborator(ctx context.Context, req *
 	if err := rights.RequireOrganization(ctx, req.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS); err != nil {
 		return nil, err
 	}
-	res := &ttnpb.GetCollaboratorResponse{}
+	res := &ttnpb.GetCollaboratorResponse{
+		OrganizationOrUserIdentifiers: req.OrganizationOrUserIdentifiers,
+	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
 		rights, err := store.GetMembershipStore(db).GetMember(
 			ctx,

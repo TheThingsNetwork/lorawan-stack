@@ -189,7 +189,7 @@ message Collaborator {
 }
 
 message GetCollaboratorResponse {
-  reserved 1; // reserved for future OrganizationOrUserIdentifiers ids = 1;
+  OrganizationOrUserIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
   repeated Right rights = 2;
   reserved 3; // reserved for future EntityIdentifiers entity = 3;
   reserved 4; // reserved for future State state = 4;

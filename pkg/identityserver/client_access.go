@@ -50,7 +50,9 @@ func (is *IdentityServer) getClientCollaborator(ctx context.Context, req *ttnpb.
 	if err := rights.RequireClient(ctx, req.ClientIdentifiers, ttnpb.RIGHT_CLIENT_ALL); err != nil {
 		return nil, err
 	}
-	res := &ttnpb.GetCollaboratorResponse{}
+	res := &ttnpb.GetCollaboratorResponse{
+		OrganizationOrUserIdentifiers: req.OrganizationOrUserIdentifiers,
+	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
 		rights, err := store.GetMembershipStore(db).GetMember(
 			ctx,

@@ -8300,6 +8300,9 @@
     "v3GetCollaboratorResponse": {
       "type": "object",
       "properties": {
+        "ids": {
+          "$ref": "#/definitions/v3OrganizationOrUserIdentifiers"
+        },
         "rights": {
           "type": "array",
           "items": {

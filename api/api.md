@@ -4865,6 +4865,7 @@ where the user or organization is collaborator on.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
+| `ids` | [`OrganizationOrUserIdentifiers`](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) |  |  |
 | `rights` | [`Right`](#ttn.lorawan.v3.Right) | repeated |  |
 
 ### <a name="ttn.lorawan.v3.Rights">Message `Rights`</a>
