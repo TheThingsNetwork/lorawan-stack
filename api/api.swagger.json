@@ -6934,6 +6934,17 @@
           "type": "string",
           "description": "The format to use for the body.\nSupported values depend on the Application Server configuration."
         },
+        "template_ids": {
+          "$ref": "#/definitions/v3ApplicationWebhookTemplateIdentifiers",
+          "description": "The ID of the template that was used to create the Webhook."
+        },
+        "template_fields": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "The value of the fields used by the template. Maps field.id to the value."
+        },
         "uplink_message": {
           "$ref": "#/definitions/v3ApplicationWebhookMessage"
         },
@@ -6989,6 +7000,14 @@
         "path": {
           "type": "string",
           "description": "Path to append to the base URL."
+        }
+      }
+    },
+    "v3ApplicationWebhookTemplateIdentifiers": {
+      "type": "object",
+      "properties": {
+        "template_id": {
+          "type": "string"
         }
       }
     },

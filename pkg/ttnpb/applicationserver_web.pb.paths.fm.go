@@ -12,6 +12,78 @@ var ApplicationWebhookIdentifiersFieldPathsTopLevel = []string{
 	"application_ids",
 	"webhook_id",
 }
+var ApplicationWebhookTemplateIdentifiersFieldPathsNested = []string{
+	"template_id",
+}
+
+var ApplicationWebhookTemplateIdentifiersFieldPathsTopLevel = []string{
+	"template_id",
+}
+var ApplicationWebhookTemplateFieldFieldPathsNested = []string{
+	"default_value",
+	"description",
+	"id",
+	"name",
+	"secret",
+}
+
+var ApplicationWebhookTemplateFieldFieldPathsTopLevel = []string{
+	"default_value",
+	"description",
+	"id",
+	"name",
+	"secret",
+}
+var ApplicationWebhookTemplateFieldPathsNested = []string{
+	"base_url",
+	"description",
+	"documentation_url",
+	"downlink_ack",
+	"downlink_ack.path",
+	"downlink_failed",
+	"downlink_failed.path",
+	"downlink_nack",
+	"downlink_nack.path",
+	"downlink_queued",
+	"downlink_queued.path",
+	"downlink_sent",
+	"downlink_sent.path",
+	"fields",
+	"format",
+	"headers",
+	"ids",
+	"ids.template_id",
+	"info_url",
+	"join_accept",
+	"join_accept.path",
+	"location_solved",
+	"location_solved.path",
+	"logo_url",
+	"name",
+	"uplink_message",
+	"uplink_message.path",
+}
+
+var ApplicationWebhookTemplateFieldPathsTopLevel = []string{
+	"base_url",
+	"description",
+	"documentation_url",
+	"downlink_ack",
+	"downlink_failed",
+	"downlink_nack",
+	"downlink_queued",
+	"downlink_sent",
+	"fields",
+	"format",
+	"headers",
+	"ids",
+	"info_url",
+	"join_accept",
+	"location_solved",
+	"logo_url",
+	"name",
+	"uplink_message",
+}
 var ApplicationWebhookFieldPathsNested = []string{
 	"base_url",
 	"created_at",
@@ -35,6 +107,9 @@ var ApplicationWebhookFieldPathsNested = []string{
 	"join_accept.path",
 	"location_solved",
 	"location_solved.path",
+	"template_fields",
+	"template_ids",
+	"template_ids.template_id",
 	"updated_at",
 	"uplink_message",
 	"uplink_message.path",
@@ -53,6 +128,8 @@ var ApplicationWebhookFieldPathsTopLevel = []string{
 	"ids",
 	"join_accept",
 	"location_solved",
+	"template_fields",
+	"template_ids",
 	"updated_at",
 	"uplink_message",
 }
@@ -117,6 +194,9 @@ var SetApplicationWebhookRequestFieldPathsNested = []string{
 	"webhook.join_accept.path",
 	"webhook.location_solved",
 	"webhook.location_solved.path",
+	"webhook.template_fields",
+	"webhook.template_ids",
+	"webhook.template_ids.template_id",
 	"webhook.updated_at",
 	"webhook.uplink_message",
 	"webhook.uplink_message.path",
@@ -125,6 +205,13 @@ var SetApplicationWebhookRequestFieldPathsNested = []string{
 var SetApplicationWebhookRequestFieldPathsTopLevel = []string{
 	"field_mask",
 	"webhook",
+}
+var ApplicationWebhookTemplate_MessageFieldPathsNested = []string{
+	"path",
+}
+
+var ApplicationWebhookTemplate_MessageFieldPathsTopLevel = []string{
+	"path",
 }
 var ApplicationWebhook_MessageFieldPathsNested = []string{
 	"path",

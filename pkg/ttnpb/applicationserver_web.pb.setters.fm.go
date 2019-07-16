@@ -48,6 +48,373 @@ func (dst *ApplicationWebhookIdentifiers) SetFields(src *ApplicationWebhookIdent
 	return nil
 }
 
+func (dst *ApplicationWebhookTemplateIdentifiers) SetFields(src *ApplicationWebhookTemplateIdentifiers, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "template_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'template_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.TemplateID = src.TemplateID
+			} else {
+				var zero string
+				dst.TemplateID = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ApplicationWebhookTemplateField) SetFields(src *ApplicationWebhookTemplateField, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Id = src.Id
+			} else {
+				var zero string
+				dst.Id = zero
+			}
+		case "name":
+			if len(subs) > 0 {
+				return fmt.Errorf("'name' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Name = src.Name
+			} else {
+				var zero string
+				dst.Name = zero
+			}
+		case "description":
+			if len(subs) > 0 {
+				return fmt.Errorf("'description' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Description = src.Description
+			} else {
+				var zero string
+				dst.Description = zero
+			}
+		case "secret":
+			if len(subs) > 0 {
+				return fmt.Errorf("'secret' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Secret = src.Secret
+			} else {
+				var zero bool
+				dst.Secret = zero
+			}
+		case "default_value":
+			if len(subs) > 0 {
+				return fmt.Errorf("'default_value' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DefaultValue = src.DefaultValue
+			} else {
+				var zero string
+				dst.DefaultValue = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ApplicationWebhookTemplate) SetFields(src *ApplicationWebhookTemplate, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "ids":
+			if len(subs) > 0 {
+				newDst := &dst.ApplicationWebhookTemplateIdentifiers
+				var newSrc *ApplicationWebhookTemplateIdentifiers
+				if src != nil {
+					newSrc = &src.ApplicationWebhookTemplateIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ApplicationWebhookTemplateIdentifiers = src.ApplicationWebhookTemplateIdentifiers
+				} else {
+					var zero ApplicationWebhookTemplateIdentifiers
+					dst.ApplicationWebhookTemplateIdentifiers = zero
+				}
+			}
+		case "name":
+			if len(subs) > 0 {
+				return fmt.Errorf("'name' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Name = src.Name
+			} else {
+				var zero string
+				dst.Name = zero
+			}
+		case "description":
+			if len(subs) > 0 {
+				return fmt.Errorf("'description' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Description = src.Description
+			} else {
+				var zero string
+				dst.Description = zero
+			}
+		case "logo_url":
+			if len(subs) > 0 {
+				return fmt.Errorf("'logo_url' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.LogoURL = src.LogoURL
+			} else {
+				var zero string
+				dst.LogoURL = zero
+			}
+		case "info_url":
+			if len(subs) > 0 {
+				return fmt.Errorf("'info_url' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.InfoURL = src.InfoURL
+			} else {
+				var zero string
+				dst.InfoURL = zero
+			}
+		case "documentation_url":
+			if len(subs) > 0 {
+				return fmt.Errorf("'documentation_url' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DocumentationURL = src.DocumentationURL
+			} else {
+				var zero string
+				dst.DocumentationURL = zero
+			}
+		case "format":
+			if len(subs) > 0 {
+				return fmt.Errorf("'format' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Format = src.Format
+			} else {
+				var zero string
+				dst.Format = zero
+			}
+		case "fields":
+			if len(subs) > 0 {
+				return fmt.Errorf("'fields' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Fields = src.Fields
+			} else {
+				dst.Fields = nil
+			}
+		case "headers":
+			if len(subs) > 0 {
+				return fmt.Errorf("'headers' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Headers = src.Headers
+			} else {
+				dst.Headers = nil
+			}
+		case "base_url":
+			if len(subs) > 0 {
+				return fmt.Errorf("'base_url' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.BaseURL = src.BaseURL
+			} else {
+				var zero string
+				dst.BaseURL = zero
+			}
+		case "uplink_message":
+			if len(subs) > 0 {
+				newDst := dst.UplinkMessage
+				if newDst == nil {
+					newDst = &ApplicationWebhookTemplate_Message{}
+					dst.UplinkMessage = newDst
+				}
+				var newSrc *ApplicationWebhookTemplate_Message
+				if src != nil {
+					newSrc = src.UplinkMessage
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.UplinkMessage = src.UplinkMessage
+				} else {
+					dst.UplinkMessage = nil
+				}
+			}
+		case "join_accept":
+			if len(subs) > 0 {
+				newDst := dst.JoinAccept
+				if newDst == nil {
+					newDst = &ApplicationWebhookTemplate_Message{}
+					dst.JoinAccept = newDst
+				}
+				var newSrc *ApplicationWebhookTemplate_Message
+				if src != nil {
+					newSrc = src.JoinAccept
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.JoinAccept = src.JoinAccept
+				} else {
+					dst.JoinAccept = nil
+				}
+			}
+		case "downlink_ack":
+			if len(subs) > 0 {
+				newDst := dst.DownlinkAck
+				if newDst == nil {
+					newDst = &ApplicationWebhookTemplate_Message{}
+					dst.DownlinkAck = newDst
+				}
+				var newSrc *ApplicationWebhookTemplate_Message
+				if src != nil {
+					newSrc = src.DownlinkAck
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DownlinkAck = src.DownlinkAck
+				} else {
+					dst.DownlinkAck = nil
+				}
+			}
+		case "downlink_nack":
+			if len(subs) > 0 {
+				newDst := dst.DownlinkNack
+				if newDst == nil {
+					newDst = &ApplicationWebhookTemplate_Message{}
+					dst.DownlinkNack = newDst
+				}
+				var newSrc *ApplicationWebhookTemplate_Message
+				if src != nil {
+					newSrc = src.DownlinkNack
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DownlinkNack = src.DownlinkNack
+				} else {
+					dst.DownlinkNack = nil
+				}
+			}
+		case "downlink_sent":
+			if len(subs) > 0 {
+				newDst := dst.DownlinkSent
+				if newDst == nil {
+					newDst = &ApplicationWebhookTemplate_Message{}
+					dst.DownlinkSent = newDst
+				}
+				var newSrc *ApplicationWebhookTemplate_Message
+				if src != nil {
+					newSrc = src.DownlinkSent
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DownlinkSent = src.DownlinkSent
+				} else {
+					dst.DownlinkSent = nil
+				}
+			}
+		case "downlink_failed":
+			if len(subs) > 0 {
+				newDst := dst.DownlinkFailed
+				if newDst == nil {
+					newDst = &ApplicationWebhookTemplate_Message{}
+					dst.DownlinkFailed = newDst
+				}
+				var newSrc *ApplicationWebhookTemplate_Message
+				if src != nil {
+					newSrc = src.DownlinkFailed
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DownlinkFailed = src.DownlinkFailed
+				} else {
+					dst.DownlinkFailed = nil
+				}
+			}
+		case "downlink_queued":
+			if len(subs) > 0 {
+				newDst := dst.DownlinkQueued
+				if newDst == nil {
+					newDst = &ApplicationWebhookTemplate_Message{}
+					dst.DownlinkQueued = newDst
+				}
+				var newSrc *ApplicationWebhookTemplate_Message
+				if src != nil {
+					newSrc = src.DownlinkQueued
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DownlinkQueued = src.DownlinkQueued
+				} else {
+					dst.DownlinkQueued = nil
+				}
+			}
+		case "location_solved":
+			if len(subs) > 0 {
+				newDst := dst.LocationSolved
+				if newDst == nil {
+					newDst = &ApplicationWebhookTemplate_Message{}
+					dst.LocationSolved = newDst
+				}
+				var newSrc *ApplicationWebhookTemplate_Message
+				if src != nil {
+					newSrc = src.LocationSolved
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.LocationSolved = src.LocationSolved
+				} else {
+					dst.LocationSolved = nil
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *ApplicationWebhook) SetFields(src *ApplicationWebhook, paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
@@ -117,6 +484,36 @@ func (dst *ApplicationWebhook) SetFields(src *ApplicationWebhook, paths ...strin
 			} else {
 				var zero string
 				dst.Format = zero
+			}
+		case "template_ids":
+			if len(subs) > 0 {
+				newDst := dst.ApplicationWebhookTemplateIdentifiers
+				if newDst == nil {
+					newDst = &ApplicationWebhookTemplateIdentifiers{}
+					dst.ApplicationWebhookTemplateIdentifiers = newDst
+				}
+				var newSrc *ApplicationWebhookTemplateIdentifiers
+				if src != nil {
+					newSrc = src.ApplicationWebhookTemplateIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ApplicationWebhookTemplateIdentifiers = src.ApplicationWebhookTemplateIdentifiers
+				} else {
+					dst.ApplicationWebhookTemplateIdentifiers = nil
+				}
+			}
+		case "template_fields":
+			if len(subs) > 0 {
+				return fmt.Errorf("'template_fields' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.TemplateFields = src.TemplateFields
+			} else {
+				dst.TemplateFields = nil
 			}
 		case "uplink_message":
 			if len(subs) > 0 {
@@ -442,6 +839,27 @@ func (dst *SetApplicationWebhookRequest) SetFields(src *SetApplicationWebhookReq
 			} else {
 				var zero types.FieldMask
 				dst.FieldMask = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ApplicationWebhookTemplate_Message) SetFields(src *ApplicationWebhookTemplate_Message, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "path":
+			if len(subs) > 0 {
+				return fmt.Errorf("'path' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Path = src.Path
+			} else {
+				var zero string
+				dst.Path = zero
 			}
 
 		default:
