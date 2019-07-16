@@ -56,11 +56,6 @@ type Model struct {
 // PrimaryKey returns the primary key of the model.
 func (m Model) PrimaryKey() string { return m.ID }
 
-// SetContext needs to be called before creating models.
-func (m *Model) SetContext(ctx context.Context) {
-	m.ctx = ctx
-}
-
 var modelColumns = []string{"id", "created_at", "updated_at"}
 
 // SoftDelete makes a Delete operation set a DeletedAt instead of actually deleting the model.
