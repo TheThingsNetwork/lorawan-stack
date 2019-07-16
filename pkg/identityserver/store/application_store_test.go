@@ -111,6 +111,5 @@ func TestApplicationStore(t *testing.T) {
 		list, err = store.FindApplications(ctx, nil, nil)
 		a.So(err, should.BeNil)
 		a.So(list, should.BeEmpty)
-
 	})
 }

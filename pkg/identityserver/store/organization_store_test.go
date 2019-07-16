@@ -111,6 +111,5 @@ func TestOrganizationStore(t *testing.T) {
 		list, err = store.FindOrganizations(ctx, nil, nil)
 		a.So(err, should.BeNil)
 		a.So(list, should.BeEmpty)
-
 	})
 }

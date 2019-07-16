@@ -228,7 +228,8 @@ func TestEndDeviceStore(t *testing.T) {
 				{
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-another"},
 					DeviceID:               "baz",
-				}},
+				},
+			},
 			nil)
 		a.So(devices, should.BeNil)
 		if a.So(err, should.NotBeNil) {
