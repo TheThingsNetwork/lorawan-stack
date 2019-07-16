@@ -84,6 +84,30 @@ var ApplicationWebhookTemplateFieldPathsTopLevel = []string{
 	"name",
 	"uplink_message",
 }
+var ApplicationWebhookTemplatesFieldPathsNested = []string{
+	"templates",
+}
+
+var ApplicationWebhookTemplatesFieldPathsTopLevel = []string{
+	"templates",
+}
+var GetApplicationWebhookTemplateRequestFieldPathsNested = []string{
+	"field_mask",
+	"ids",
+	"ids.template_id",
+}
+
+var GetApplicationWebhookTemplateRequestFieldPathsTopLevel = []string{
+	"field_mask",
+	"ids",
+}
+var ListApplicationWebhookTemplatesRequestFieldPathsNested = []string{
+	"field_mask",
+}
+
+var ListApplicationWebhookTemplatesRequestFieldPathsTopLevel = []string{
+	"field_mask",
+}
 var ApplicationWebhookFieldPathsNested = []string{
 	"base_url",
 	"created_at",

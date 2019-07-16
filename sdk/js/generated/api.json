@@ -3054,6 +3054,27 @@
           ]
         },
         {
+          "name": "ApplicationWebhookTemplates",
+          "longName": "ApplicationWebhookTemplates",
+          "fullName": "ttn.lorawan.v3.ApplicationWebhookTemplates",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "templates",
+              "description": "",
+              "label": "repeated",
+              "type": "ApplicationWebhookTemplate",
+              "longType": "ApplicationWebhookTemplate",
+              "fullType": "ttn.lorawan.v3.ApplicationWebhookTemplate",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "ApplicationWebhooks",
           "longName": "ApplicationWebhooks",
           "fullName": "ttn.lorawan.v3.ApplicationWebhooks",
@@ -3101,6 +3122,66 @@
                 ]
               }
             },
+            {
+              "name": "field_mask",
+              "description": "",
+              "label": "",
+              "type": "FieldMask",
+              "longType": "google.protobuf.FieldMask",
+              "fullType": "google.protobuf.FieldMask",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "GetApplicationWebhookTemplateRequest",
+          "longName": "GetApplicationWebhookTemplateRequest",
+          "fullName": "ttn.lorawan.v3.GetApplicationWebhookTemplateRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "ids",
+              "description": "",
+              "label": "",
+              "type": "ApplicationWebhookTemplateIdentifiers",
+              "longType": "ApplicationWebhookTemplateIdentifiers",
+              "fullType": "ttn.lorawan.v3.ApplicationWebhookTemplateIdentifiers",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "field_mask",
+              "description": "",
+              "label": "",
+              "type": "FieldMask",
+              "longType": "google.protobuf.FieldMask",
+              "fullType": "google.protobuf.FieldMask",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ListApplicationWebhookTemplatesRequest",
+          "longName": "ListApplicationWebhookTemplatesRequest",
+          "fullName": "ttn.lorawan.v3.ListApplicationWebhookTemplatesRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
             {
               "name": "field_mask",
               "description": "",
@@ -3310,6 +3391,58 @@
                     {
                       "method": "DELETE",
                       "pattern": "/as/webhooks/{application_ids.application_id}/{webhook_id}"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "ApplicationWebhookTemplateRegistry",
+          "longName": "ApplicationWebhookTemplateRegistry",
+          "fullName": "ttn.lorawan.v3.ApplicationWebhookTemplateRegistry",
+          "description": "",
+          "methods": [
+            {
+              "name": "Get",
+              "description": "",
+              "requestType": "GetApplicationWebhookTemplateRequest",
+              "requestLongType": "GetApplicationWebhookTemplateRequest",
+              "requestFullType": "ttn.lorawan.v3.GetApplicationWebhookTemplateRequest",
+              "requestStreaming": false,
+              "responseType": "ApplicationWebhookTemplate",
+              "responseLongType": "ApplicationWebhookTemplate",
+              "responseFullType": "ttn.lorawan.v3.ApplicationWebhookTemplate",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/as/webhook-templates/{ids.template_id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "List",
+              "description": "",
+              "requestType": "ListApplicationWebhookTemplatesRequest",
+              "requestLongType": "ListApplicationWebhookTemplatesRequest",
+              "requestFullType": "ttn.lorawan.v3.ListApplicationWebhookTemplatesRequest",
+              "requestStreaming": false,
+              "responseType": "ApplicationWebhookTemplates",
+              "responseLongType": "ApplicationWebhookTemplates",
+              "responseFullType": "ttn.lorawan.v3.ApplicationWebhookTemplates",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/as/webhook-templates"
                     }
                   ]
                 }
