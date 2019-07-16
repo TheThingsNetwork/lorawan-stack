@@ -45,6 +45,7 @@ func unmarshalContext(ctx context.Context, data map[string][]byte) (context.Cont
 		if err != nil {
 			return nil, err
 		}
+		delete(data, name)
 	}
 	return ctx, nil
 }
