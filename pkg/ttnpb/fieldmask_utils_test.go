@@ -150,3 +150,19 @@ func TestAllowedBottomLevelFields(t *testing.T) {
 	}
 	a.So(ttnpb.AllowedBottomLevelFields(paths, allowedPaths), should.HaveSameElementsDeep, []string{"c.d", "c.e"})
 }
+
+func TestExcludeFields(t *testing.T) {
+	a := assertions.New(t)
+	paths := []string{
+		"a.b.c",
+		"c",
+		"c.d",
+		"e",
+		"e.f",
+	}
+	excludePaths := []string{
+		"a",
+		"c.d",
+	}
+	a.So(ttnpb.ExcludeFields(paths, excludePaths...), should.HaveSameElementsDeep, []string{"c", "e", "e.f"})
+}

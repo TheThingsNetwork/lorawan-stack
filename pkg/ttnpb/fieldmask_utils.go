@@ -167,6 +167,21 @@ outer:
 	return selectedPaths
 }
 
+// ExcludeFields returns the given paths without the given search paths to exclude.
+func ExcludeFields(paths []string, excludePaths ...string) []string {
+	excluded := make([]string, 0, len(paths))
+outer:
+	for _, path := range paths {
+		for _, excludePath := range excludePaths {
+			if path == excludePath || strings.HasPrefix(path, excludePath+".") {
+				continue outer
+			}
+		}
+		excluded = append(excluded, path)
+	}
+	return excluded
+}
+
 func fieldsWithPrefix(prefix string, paths ...string) []string {
 	ret := make([]string, 0, len(paths))
 	for _, p := range paths {
