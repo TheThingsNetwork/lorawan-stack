@@ -106,9 +106,11 @@ type invitationRegistry struct {
 func (ir *invitationRegistry) Send(ctx context.Context, req *ttnpb.SendInvitationRequest) (*ttnpb.Invitation, error) {
 	return ir.sendInvitation(ctx, req)
 }
+
 func (ir *invitationRegistry) List(ctx context.Context, req *ttnpb.ListInvitationsRequest) (*ttnpb.Invitations, error) {
 	return ir.listInvitations(ctx, req)
 }
+
 func (ir *invitationRegistry) Delete(ctx context.Context, req *ttnpb.DeleteInvitationRequest) (*types.Empty, error) {
 	return ir.deleteInvitation(ctx, req)
 }

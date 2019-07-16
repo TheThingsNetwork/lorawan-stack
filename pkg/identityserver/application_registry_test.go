@@ -190,7 +190,6 @@ func TestApplicationsCRUD(t *testing.T) {
 
 		_, err = reg.Delete(ctx, &created.ApplicationIdentifiers, creds)
 		a.So(err, should.BeNil)
-
 	})
 }
 

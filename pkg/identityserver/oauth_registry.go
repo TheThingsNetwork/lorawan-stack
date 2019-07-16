@@ -131,12 +131,15 @@ type oauthRegistry struct {
 func (or *oauthRegistry) List(ctx context.Context, req *ttnpb.ListOAuthClientAuthorizationsRequest) (*ttnpb.OAuthClientAuthorizations, error) {
 	return or.listOAuthClientAuthorizations(ctx, req)
 }
+
 func (or *oauthRegistry) ListTokens(ctx context.Context, req *ttnpb.ListOAuthAccessTokensRequest) (*ttnpb.OAuthAccessTokens, error) {
 	return or.listOAuthAccessTokens(ctx, req)
 }
+
 func (or *oauthRegistry) Delete(ctx context.Context, req *ttnpb.OAuthClientAuthorizationIdentifiers) (*types.Empty, error) {
 	return or.deleteOAuthAuthorization(ctx, req)
 }
+
 func (or *oauthRegistry) DeleteToken(ctx context.Context, req *ttnpb.OAuthAccessTokenIdentifiers) (*types.Empty, error) {
 	return or.deleteOAuthAccessToken(ctx, req)
 }

@@ -249,15 +249,19 @@ type applicationRegistry struct {
 func (ar *applicationRegistry) Create(ctx context.Context, req *ttnpb.CreateApplicationRequest) (*ttnpb.Application, error) {
 	return ar.createApplication(ctx, req)
 }
+
 func (ar *applicationRegistry) Get(ctx context.Context, req *ttnpb.GetApplicationRequest) (*ttnpb.Application, error) {
 	return ar.getApplication(ctx, req)
 }
+
 func (ar *applicationRegistry) List(ctx context.Context, req *ttnpb.ListApplicationsRequest) (*ttnpb.Applications, error) {
 	return ar.listApplications(ctx, req)
 }
+
 func (ar *applicationRegistry) Update(ctx context.Context, req *ttnpb.UpdateApplicationRequest) (*ttnpb.Application, error) {
 	return ar.updateApplication(ctx, req)
 }
+
 func (ar *applicationRegistry) Delete(ctx context.Context, req *ttnpb.ApplicationIdentifiers) (*types.Empty, error) {
 	return ar.deleteApplication(ctx, req)
 }

@@ -164,15 +164,19 @@ type userAccess struct {
 func (ua *userAccess) ListRights(ctx context.Context, req *ttnpb.UserIdentifiers) (*ttnpb.Rights, error) {
 	return ua.listUserRights(ctx, req)
 }
+
 func (ua *userAccess) GetAPIKey(ctx context.Context, req *ttnpb.GetUserAPIKeyRequest) (*ttnpb.APIKey, error) {
 	return ua.getUserAPIKey(ctx, req)
 }
+
 func (ua *userAccess) CreateAPIKey(ctx context.Context, req *ttnpb.CreateUserAPIKeyRequest) (*ttnpb.APIKey, error) {
 	return ua.createUserAPIKey(ctx, req)
 }
+
 func (ua *userAccess) ListAPIKeys(ctx context.Context, req *ttnpb.ListUserAPIKeysRequest) (*ttnpb.APIKeys, error) {
 	return ua.listUserAPIKeys(ctx, req)
 }
+
 func (ua *userAccess) UpdateAPIKey(ctx context.Context, req *ttnpb.UpdateUserAPIKeyRequest) (*ttnpb.APIKey, error) {
 	return ua.updateUserAPIKey(ctx, req)
 }

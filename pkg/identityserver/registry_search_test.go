@@ -68,6 +68,5 @@ func TestRegistrySearch(t *testing.T) {
 		}, creds)
 		a.So(err, should.BeNil)
 		a.So(usrs.Users, should.NotBeEmpty)
-
 	})
 }

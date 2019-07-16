@@ -190,7 +190,6 @@ func TestClientsCRUD(t *testing.T) {
 
 		_, err = reg.Delete(ctx, &created.ClientIdentifiers, creds)
 		a.So(err, should.BeNil)
-
 	})
 }
 

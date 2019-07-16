@@ -234,21 +234,27 @@ type applicationAccess struct {
 func (aa *applicationAccess) ListRights(ctx context.Context, req *ttnpb.ApplicationIdentifiers) (*ttnpb.Rights, error) {
 	return aa.listApplicationRights(ctx, req)
 }
+
 func (aa *applicationAccess) CreateAPIKey(ctx context.Context, req *ttnpb.CreateApplicationAPIKeyRequest) (*ttnpb.APIKey, error) {
 	return aa.createApplicationAPIKey(ctx, req)
 }
+
 func (aa *applicationAccess) ListAPIKeys(ctx context.Context, req *ttnpb.ListApplicationAPIKeysRequest) (*ttnpb.APIKeys, error) {
 	return aa.listApplicationAPIKeys(ctx, req)
 }
+
 func (aa *applicationAccess) GetAPIKey(ctx context.Context, req *ttnpb.GetApplicationAPIKeyRequest) (*ttnpb.APIKey, error) {
 	return aa.getApplicationAPIKey(ctx, req)
 }
+
 func (aa *applicationAccess) UpdateAPIKey(ctx context.Context, req *ttnpb.UpdateApplicationAPIKeyRequest) (*ttnpb.APIKey, error) {
 	return aa.updateApplicationAPIKey(ctx, req)
 }
+
 func (aa *applicationAccess) SetCollaborator(ctx context.Context, req *ttnpb.SetApplicationCollaboratorRequest) (*types.Empty, error) {
 	return aa.setApplicationCollaborator(ctx, req)
 }
+
 func (aa *applicationAccess) ListCollaborators(ctx context.Context, req *ttnpb.ListApplicationCollaboratorsRequest) (*ttnpb.Collaborators, error) {
 	return aa.listApplicationCollaborators(ctx, req)
 }
