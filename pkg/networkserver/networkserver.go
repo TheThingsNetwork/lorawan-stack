@@ -27,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/interop"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/rpclog"
@@ -83,6 +84,11 @@ type DownlinkPriorities struct {
 	MaxApplicationDownlink ttnpb.TxSchedulePriority
 }
 
+// InteropClient is a client, which Network Server can use for interoperability.
+type InteropClient interface {
+	HandleJoinRequest(context.Context, types.NetID, *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error)
+}
+
 // NetworkServer implements the Network Server component.
 //
 // The Network Server exposes the GsNs, AsNs, DeviceRegistry and ApplicationDownlinkQueue services.
@@ -111,6 +117,8 @@ type NetworkServer struct {
 	handleASUplink func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, up *ttnpb.ApplicationUp) (bool, error)
 
 	defaultMACSettings ttnpb.MACSettings
+
+	interopClient InteropClient
 }
 
 // Option configures the NetworkServer.
@@ -158,9 +166,20 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 	if err != nil {
 		return nil, err
 	}
+
+	ctx := log.NewContextWithField(c.Context(), "namespace", "networkserver")
+
+	var interopCl InteropClient
+	if conf.Interop.ConfigURI != "" {
+		interopCl, err = interop.NewClient(ctx, conf.Interop, nil)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	ns := &NetworkServer{
 		Component:               c,
-		ctx:                     log.NewContextWithField(c.Context(), "namespace", "networkserver"),
+		ctx:                     ctx,
 		devices:                 conf.Devices,
 		netID:                   conf.NetID,
 		devAddrPrefixes:         devAddrPrefixes,
@@ -175,6 +194,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 			ClassCTimeout:         conf.DefaultMACSettings.ClassCTimeout,
 			StatusTimePeriodicity: conf.DefaultMACSettings.StatusTimePeriodicity,
 		},
+		interopClient: interopCl,
 	}
 	ns.hashPool.New = func() interface{} {
 		return fnv.New64a()

@@ -29,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -920,6 +921,33 @@ func (ns *NetworkServer) newDevAddr(context.Context, *ttnpb.EndDevice) types.Dev
 	return devAddr.WithPrefix(prefix)
 }
 
+func (ns *NetworkServer) sendJoinRequest(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, req *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error) {
+	logger := log.FromContext(ctx)
+	if js := ns.GetPeer(ctx, ttnpb.PeerInfo_JOIN_SERVER, ids); js != nil {
+		resp, err := ttnpb.NewNsJsClient(js.Conn()).HandleJoin(ctx, req, ns.WithClusterAuth())
+		if err == nil {
+			logger.Debug("Join-request accepted by cluster-local Join Server")
+			return resp, nil
+		}
+		if !errors.IsNotFound(err) {
+			logger.WithError(err).Warn("Cluster-local Join Server did not accept join-request")
+			return nil, err
+		}
+	}
+	if ns.interopClient != nil {
+		resp, err := ns.interopClient.HandleJoinRequest(ctx, ns.netID, req)
+		if err == nil {
+			logger.Debug("Join-request accepted by interop Join Server")
+			return resp, nil
+		}
+		if !errors.IsNotFound(err) {
+			logger.WithError(err).Warn("Interop Join Server did not accept join-request")
+			return nil, err
+		}
+	}
+	return nil, errJoinServerNotFound
+}
+
 func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.UplinkMessage, acc *metadataAccumulator) (err error) {
 	pld := up.Payload.GetJoinRequestPayload()
 
@@ -995,6 +1023,27 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 			OptNeg:      dev.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0,
 		},
 	}
+
+	resp, err := ns.sendJoinRequest(ctx, dev.EndDeviceIdentifiers, req)
+	if err != nil {
+		return err
+	}
+
+	ctx = events.ContextWithCorrelationID(ctx, resp.CorrelationIDs...)
+
+	keys := resp.SessionKeys
+	if !req.DownlinkSettings.OptNeg {
+		keys.NwkSEncKey = keys.FNwkSIntKey
+		keys.SNwkSIntKey = keys.FNwkSIntKey
+	}
+
+	macState.QueuedJoinAccept = &ttnpb.MACState_JoinAccept{
+		Keys:    keys,
+		Payload: resp.RawPayload,
+		Request: *req,
+	}
+	macState.RxWindowsAvailable = true
+
 	macState.CurrentParameters.Rx1Delay = req.RxDelay
 	macState.CurrentParameters.Rx1DataRateOffset = req.DownlinkSettings.Rx1DROffset
 	macState.CurrentParameters.Rx2DataRateIndex = req.DownlinkSettings.Rx2DR
@@ -1026,33 +1075,6 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 			}
 		}
 	}
-
-	js := ns.GetPeer(ctx, ttnpb.PeerInfo_JOIN_SERVER, dev.EndDeviceIdentifiers)
-	if js == nil {
-		logger.Debug("Join Server peer not found")
-		return errJoinServerNotFound
-	}
-
-	logger.Debug("Send join-request to Join Server")
-	resp, err := ttnpb.NewNsJsClient(js.Conn()).HandleJoin(ctx, req, ns.WithClusterAuth())
-	if err != nil {
-		logger.WithError(err).Warn("Join Server failed to handle join-request")
-		return err
-	}
-	logger.Debug("Join-accept received from Join Server")
-
-	ctx = events.ContextWithCorrelationID(ctx, resp.CorrelationIDs...)
-	keys := resp.SessionKeys
-	if !req.DownlinkSettings.OptNeg {
-		keys.NwkSEncKey = keys.FNwkSIntKey
-		keys.SNwkSIntKey = keys.FNwkSIntKey
-	}
-	macState.QueuedJoinAccept = &ttnpb.MACState_JoinAccept{
-		Keys:    keys,
-		Payload: resp.RawPayload,
-		Request: *req,
-	}
-	macState.RxWindowsAvailable = true
 
 	events.Publish(evtForwardJoinRequest(ctx, dev.EndDeviceIdentifiers, nil))
 	registerForwardJoinRequest(ctx, up)
