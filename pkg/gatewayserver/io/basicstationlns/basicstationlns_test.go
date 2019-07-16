@@ -26,6 +26,8 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/basicstation"
+	"go.thethings.network/lorawan-stack/pkg/component"
+	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
 	. "go.thethings.network/lorawan-stack/pkg/gatewayserver/io/basicstationlns"
@@ -61,7 +63,24 @@ func TestClientTokenAuth(t *testing.T) {
 	ctx = newContextWithRightsFetcher(ctx)
 	ctx, cancelCtx := context.WithCancel(ctx)
 	defer cancelCtx()
-	gs := mock.NewServer()
+
+	is, isAddr := mock.NewIS(ctx)
+	is.Add(ctx, registeredGatewayID, registeredGatewayToken)
+	c := component.MustNew(test.GetLogger(t), &component.Config{
+		ServiceBase: config.ServiceBase{
+			GRPC: config.GRPC{
+				Listen:                      ":0",
+				AllowInsecureForCredentials: true,
+			},
+			Cluster: config.Cluster{
+				IdentityServer: isAddr,
+			},
+		},
+	})
+	test.Must(nil, c.Start())
+	defer c.Close()
+	mustHavePeer(ctx, c, ttnpb.PeerInfo_ENTITY_REGISTRY)
+	gs := mock.NewServer(c)
 
 	bsWebServer := New(ctx, gs)
 	lis, err := net.Listen("tcp", serverAddress)
@@ -75,8 +94,6 @@ func TestClientTokenAuth(t *testing.T) {
 		}))
 	}()
 	servAddr := fmt.Sprintf("ws://%s", lis.Addr().String())
-
-	gs.RegisterGateway(ctx, registeredGatewayID, &registeredGateway)
 
 	for _, tc := range []struct {
 		Name           string
@@ -149,7 +166,24 @@ func TestDiscover(t *testing.T) {
 	ctx = newContextWithRightsFetcher(ctx)
 	ctx, cancelCtx := context.WithCancel(ctx)
 	defer cancelCtx()
-	gs := mock.NewServer()
+
+	is, isAddr := mock.NewIS(ctx)
+	is.Add(ctx, registeredGatewayID, registeredGatewayToken)
+	c := component.MustNew(test.GetLogger(t), &component.Config{
+		ServiceBase: config.ServiceBase{
+			GRPC: config.GRPC{
+				Listen:                      ":0",
+				AllowInsecureForCredentials: true,
+			},
+			Cluster: config.Cluster{
+				IdentityServer: isAddr,
+			},
+		},
+	})
+	test.Must(nil, c.Start())
+	defer c.Close()
+	mustHavePeer(ctx, c, ttnpb.PeerInfo_ENTITY_REGISTRY)
+	gs := mock.NewServer(c)
 
 	bsWebServer := New(ctx, gs)
 	lis, err := net.Listen("tcp", serverAddress)
@@ -163,8 +197,6 @@ func TestDiscover(t *testing.T) {
 		}))
 	}()
 	servAddr := fmt.Sprintf("ws://%s", lis.Addr().String())
-
-	gs.RegisterGateway(ctx, registeredGatewayID, &registeredGateway)
 
 	// Invalid Endpoints
 	for i, tc := range []struct {
@@ -372,7 +404,24 @@ func TestVersion(t *testing.T) {
 	ctx = newContextWithRightsFetcher(ctx)
 	ctx, cancelCtx := context.WithCancel(ctx)
 	defer cancelCtx()
-	gs := mock.NewServer()
+
+	is, isAddr := mock.NewIS(ctx)
+	is.Add(ctx, registeredGatewayID, registeredGatewayToken)
+	c := component.MustNew(test.GetLogger(t), &component.Config{
+		ServiceBase: config.ServiceBase{
+			GRPC: config.GRPC{
+				Listen:                      ":0",
+				AllowInsecureForCredentials: true,
+			},
+			Cluster: config.Cluster{
+				IdentityServer: isAddr,
+			},
+		},
+	})
+	test.Must(nil, c.Start())
+	defer c.Close()
+	mustHavePeer(ctx, c, ttnpb.PeerInfo_ENTITY_REGISTRY)
+	gs := mock.NewServer(c)
 
 	bsWebServer := New(ctx, gs)
 	lis, err := net.Listen("tcp", serverAddress)
@@ -386,8 +435,6 @@ func TestVersion(t *testing.T) {
 		}))
 	}()
 	servAddr := fmt.Sprintf("ws://%s", lis.Addr().String())
-
-	gs.RegisterGateway(ctx, registeredGatewayID, &registeredGateway)
 
 	conn, _, err := websocket.DefaultDialer.Dial(servAddr+testTrafficEndPoint, nil)
 	if !a.So(err, should.BeNil) {
@@ -495,7 +542,24 @@ func TestTraffic(t *testing.T) {
 	ctx = newContextWithRightsFetcher(ctx)
 	ctx, cancelCtx := context.WithCancel(ctx)
 	defer cancelCtx()
-	gs := mock.NewServer()
+
+	is, isAddr := mock.NewIS(ctx)
+	is.Add(ctx, registeredGatewayID, registeredGatewayToken)
+	c := component.MustNew(test.GetLogger(t), &component.Config{
+		ServiceBase: config.ServiceBase{
+			GRPC: config.GRPC{
+				Listen:                      ":0",
+				AllowInsecureForCredentials: true,
+			},
+			Cluster: config.Cluster{
+				IdentityServer: isAddr,
+			},
+		},
+	})
+	test.Must(nil, c.Start())
+	defer c.Close()
+	mustHavePeer(ctx, c, ttnpb.PeerInfo_ENTITY_REGISTRY)
+	gs := mock.NewServer(c)
 
 	bsWebServer := New(ctx, gs)
 	lis, err := net.Listen("tcp", serverAddress)
@@ -509,8 +573,6 @@ func TestTraffic(t *testing.T) {
 		}))
 	}()
 	servAddr := fmt.Sprintf("ws://%s", lis.Addr().String())
-
-	gs.RegisterGateway(ctx, registeredGatewayID, &registeredGateway)
 
 	wsConn, _, err := websocket.DefaultDialer.Dial(servAddr+testTrafficEndPoint, nil)
 	if !a.So(err, should.BeNil) {
@@ -805,7 +867,24 @@ func TestRTT(t *testing.T) {
 	ctx = newContextWithRightsFetcher(ctx)
 	ctx, cancelCtx := context.WithCancel(ctx)
 	defer cancelCtx()
-	gs := mock.NewServer()
+
+	is, isAddr := mock.NewIS(ctx)
+	is.Add(ctx, registeredGatewayID, registeredGatewayToken)
+	c := component.MustNew(test.GetLogger(t), &component.Config{
+		ServiceBase: config.ServiceBase{
+			GRPC: config.GRPC{
+				Listen:                      ":0",
+				AllowInsecureForCredentials: true,
+			},
+			Cluster: config.Cluster{
+				IdentityServer: isAddr,
+			},
+		},
+	})
+	test.Must(nil, c.Start())
+	defer c.Close()
+	mustHavePeer(ctx, c, ttnpb.PeerInfo_ENTITY_REGISTRY)
+	gs := mock.NewServer(c)
 
 	bsWebServer := New(ctx, gs)
 	lis, err := net.Listen("tcp", serverAddress)
@@ -819,8 +898,6 @@ func TestRTT(t *testing.T) {
 		}))
 	}()
 	servAddr := fmt.Sprintf("ws://%s", lis.Addr().String())
-
-	gs.RegisterGateway(ctx, registeredGatewayID, &registeredGateway)
 
 	wsConn, _, err := websocket.DefaultDialer.Dial(servAddr+testTrafficEndPoint, nil)
 	if !a.So(err, should.BeNil) {
