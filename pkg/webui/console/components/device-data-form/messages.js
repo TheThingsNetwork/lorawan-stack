@@ -41,4 +41,8 @@ export default defineMessages({
   otaa: 'Over The Air Activation (OTAA)',
   abp: 'Activation By Personalization (ABP)',
   resetWarning: 'Reseting is insecure and makes your device susceptible for replay attacks',
+  deleteDevice: 'Delete End Device',
+  deleteWarning: 'Are you sure you want to delete "{deviceId}"? Deleting an end device cannot be undone!',
+  deleteSuccess: 'The end device has been deleted successfully',
+  updateSuccess: 'Successfully updated end device',
 })

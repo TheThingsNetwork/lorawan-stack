@@ -218,7 +218,9 @@ class Devices {
       this._ignoreDisabledComponents,
       'delete',
       requestTree,
-      params
+      params,
+      undefined,
+      true,
     )
     return deleteParts.every(e => Object.keys(e.device).length === 0) ? {} : deleteParts
   }
