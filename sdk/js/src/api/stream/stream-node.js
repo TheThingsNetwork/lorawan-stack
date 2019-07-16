@@ -19,6 +19,7 @@ import { notify, EVENTS } from './shared'
 /**
  * Opens a new stream.
  *
+ * @async
  * @param {Object} payload  - The body of the initial request.
  * @param {string} url - The stream endpoint.
  *

@@ -20,6 +20,7 @@ import 'web-streams-polyfill/dist/polyfill.js'
 /**
  * Opens a new stream.
  *
+ * @async
  * @param {Object} payload  - The body of the initial request.
  * @param {string} url - The stream endpoint, defaults to `/api/v3/events`.
  *
@@ -57,45 +58,43 @@ export default async function (payload, url) {
   }
 
   let reader = null
-  fetch(url, {
+  const response = await fetch(url, {
     body: JSON.stringify(payload),
     method: 'POST',
     headers: {
       Authorization,
     },
   })
-    .then(async function (response) {
-      if (response.status !== 200) {
-        const err = await response.json()
 
-        throw err
-      }
+  if (response.status !== 200) {
+    const err = await response.json()
 
-      return response.body
-    })
-    .then(function (body) {
+    throw 'error' in err ? err.error : err
+  }
+
+  reader = response.body.getReader()
+  reader.read()
+    .then(function (data) {
       notify(listeners[EVENTS.START])
 
-      reader = body.getReader()
-      reader.read()
-        .then(function onChunk ({ done, value }) {
+      return data
+    })
+    .then(function onChunk ({ done, value }) {
+      if (done) {
+        notify(listeners[EVENTS.CLOSE])
+        listeners = null
+        return
+      }
 
-          if (done) {
-            notify(listeners[EVENTS.CLOSE])
-            listeners = null
-            return
-          }
+      const parsed = ArrayBufferToString(value)
+      const result = JSON.parse(parsed).result
+      notify(listeners[EVENTS.EVENT], result)
 
-          const parsed = ArrayBufferToString(value)
-          const result = JSON.parse(parsed).result
-          notify(listeners[EVENTS.EVENT], result)
-
-          return reader.read().then(onChunk)
-        })
-        .catch(function (error) {
-          notify(listeners[EVENTS.ERROR], error)
-          listeners = null
-        })
+      return reader.read().then(onChunk)
+    })
+    .catch(function (error) {
+      notify(listeners[EVENTS.ERROR], error)
+      listeners = null
     })
 
   return {
