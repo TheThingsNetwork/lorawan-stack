@@ -758,6 +758,8 @@ func init() {
 	endDevicesCommand.AddCommand(applicationsDownlinkCommand)
 
 	Root.AddCommand(endDevicesCommand)
+
+	endDeviceTemplatesFromDeviceCommand.Flags().AddFlagSet(selectEndDeviceFlags)
 }
 
 var errAddressMismatchEndDevice = errors.DefineAborted("end_device_server_address_mismatch", "network/application/join server address mismatch")

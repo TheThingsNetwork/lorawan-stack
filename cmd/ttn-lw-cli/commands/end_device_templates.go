@@ -18,10 +18,12 @@ import (
 	stdio "io"
 	"os"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/api"
 	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/io"
+	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/util"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
@@ -62,6 +64,63 @@ var (
 		Use:     "templates",
 		Aliases: []string{"template", "tmpl"},
 		Short:   "End Device template commands",
+	}
+	endDeviceTemplatesFromDeviceCommand = &cobra.Command{
+		Use:   "from-device [flags]",
+		Short: "Create an end device template from an existing device",
+		Long: `Create an end device template from an existing device
+
+	This command takes an end device from stdin.`,
+		PersistentPreRunE: preRun(),
+		RunE: asBulk(func(cmd *cobra.Command, args []string) error {
+			if inputDecoder == nil {
+				return nil
+			}
+
+			forwardDeprecatedDeviceFlags(cmd.Flags())
+			paths := util.UpdateFieldMask(cmd.Flags(), selectEndDeviceFlags)
+
+			excludePaths := []string{
+				"ids.dev_addr",
+				"created_at",
+				"updated_at",
+				"network_server_address",
+				"application_server_address",
+				"join_server_address",
+			}
+			if appID, _ := cmd.Flags().GetBool("application-id"); !appID {
+				excludePaths = append(excludePaths, "ids.application_ids.application_id")
+			}
+			if devID, _ := cmd.Flags().GetBool("device-id"); !devID {
+				excludePaths = append(excludePaths, "ids.device_id")
+			}
+			if joinEUI, _ := cmd.Flags().GetBool("join-eui"); !joinEUI {
+				excludePaths = append(excludePaths, "ids.join_eui")
+			}
+			if devEUI, _ := cmd.Flags().GetBool("dev-eui"); !devEUI {
+				excludePaths = append(excludePaths, "ids.dev_eui")
+			}
+
+			var input ttnpb.EndDevice
+			decodedPaths, err := inputDecoder.Decode(&input)
+			if err != nil {
+				return err
+			}
+			decodedPaths = ttnpb.FlattenPaths(decodedPaths, endDeviceFlattenPaths)
+			decodedPaths = ttnpb.ExcludeFields(decodedPaths, excludePaths...)
+			paths = append(paths, decodedPaths...)
+
+			mappingKey, _ := cmd.Flags().GetString("mapping-key")
+			res := &ttnpb.EndDeviceTemplate{
+				FieldMask: pbtypes.FieldMask{
+					Paths: paths,
+				},
+				MappingKey: mappingKey,
+			}
+			res.EndDevice.SetFields(&input, paths...)
+
+			return io.Write(os.Stdout, config.OutputFormat, res)
+		}),
 	}
 	endDeviceTemplatesListFormats = &cobra.Command{
 		Use:               "list-formats",
@@ -225,6 +284,9 @@ command to assign EUIs to map to end device templates.`,
 )
 
 func init() {
+	endDeviceTemplatesFromDeviceCommand.Flags().AddFlagSet(selectEndDeviceIDFlags())
+	endDeviceTemplatesFromDeviceCommand.Flags().String("mapping-key", "", "mapping key")
+	endDeviceTemplatesCommand.AddCommand(endDeviceTemplatesFromDeviceCommand)
 	endDeviceTemplatesCommand.AddCommand(endDeviceTemplatesListFormats)
 	endDeviceTemplatesFromDataCommand.Flags().AddFlagSet(templateFormatIDFlags())
 	endDeviceTemplatesFromDataCommand.Flags().AddFlagSet(dataFlags("", ""))
