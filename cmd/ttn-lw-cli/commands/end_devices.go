@@ -769,6 +769,7 @@ func init() {
 
 	Root.AddCommand(endDevicesCommand)
 
+	endDeviceTemplatesCreateCommand.Flags().AddFlagSet(setEndDeviceFlags)
 	endDeviceTemplatesFromDeviceCommand.Flags().AddFlagSet(selectEndDeviceFlags)
 }
 

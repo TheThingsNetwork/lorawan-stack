@@ -65,12 +65,41 @@ var (
 		Aliases: []string{"template", "tmpl"},
 		Short:   "End Device template commands",
 	}
+	endDeviceTemplatesCreateCommand = &cobra.Command{
+		Use:               "create [flags]",
+		Short:             "Create an end device template with mapping key",
+		PersistentPreRunE: preRun(),
+		RunE: asBulk(func(cmd *cobra.Command, args []string) error {
+			forwardDeprecatedDeviceFlags(cmd.Flags())
+			paths := util.UpdateFieldMask(cmd.Flags(), setEndDeviceFlags, attributesFlags())
+
+			var res ttnpb.EndDeviceTemplate
+			if inputDecoder != nil {
+				_, err := inputDecoder.Decode(&res)
+				if err != nil {
+					return err
+				}
+				paths = append(paths, res.FieldMask.Paths...)
+			}
+
+			if mappingKey, _ := cmd.Flags().GetString("mapping-key"); mappingKey != "" {
+				res.MappingKey = mappingKey
+			}
+			if err := util.SetFields(&res.EndDevice, setEndDeviceFlags); err != nil {
+				return err
+			}
+			res.EndDevice.Attributes = mergeAttributes(res.EndDevice.Attributes, cmd.Flags())
+			res.FieldMask.Paths = ttnpb.BottomLevelFields(paths)
+
+			return io.Write(os.Stdout, config.OutputFormat, &res)
+		}),
+	}
 	endDeviceTemplatesFromDeviceCommand = &cobra.Command{
 		Use:   "from-device [flags]",
 		Short: "Create an end device template from an existing device",
 		Long: `Create an end device template from an existing device
 
-	This command takes an end device from stdin.`,
+	This command takes end devices from stdin.`,
 		PersistentPreRunE: preRun(),
 		RunE: asBulk(func(cmd *cobra.Command, args []string) error {
 			if inputDecoder == nil {
@@ -284,8 +313,11 @@ command to assign EUIs to map to end device templates.`,
 )
 
 func init() {
+	endDeviceTemplatesCreateCommand.Flags().AddFlagSet(attributesFlags())
+	endDeviceTemplatesCreateCommand.Flags().String("mapping-key", "", "")
+	endDeviceTemplatesCommand.AddCommand(endDeviceTemplatesCreateCommand)
 	endDeviceTemplatesFromDeviceCommand.Flags().AddFlagSet(selectEndDeviceIDFlags())
-	endDeviceTemplatesFromDeviceCommand.Flags().String("mapping-key", "", "mapping key")
+	endDeviceTemplatesFromDeviceCommand.Flags().String("mapping-key", "", "")
 	endDeviceTemplatesCommand.AddCommand(endDeviceTemplatesFromDeviceCommand)
 	endDeviceTemplatesCommand.AddCommand(endDeviceTemplatesListFormats)
 	endDeviceTemplatesFromDataCommand.Flags().AddFlagSet(templateFormatIDFlags())
