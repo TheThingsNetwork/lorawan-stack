@@ -22,13 +22,19 @@ import {
   UPDATE_GTW_STATS,
   UPDATE_GTW_STATS_SUCCESS,
   UPDATE_GTW_STATS_FAILURE,
+  START_GTW_STATS_SUCCESS,
   START_GTW_STATS_FAILURE,
 } from '../actions/gateways'
+
+const defaultStatisticsState = {
+  error: undefined,
+  stats: undefined,
+}
 
 const defaultState = {
   entities: {},
   selectedGateway: null,
-  statistics: {},
+  statistics: defaultStatisticsState,
 }
 
 const gateway = function (state = {}, gateway) {
@@ -38,35 +44,27 @@ const gateway = function (state = {}, gateway) {
   }
 }
 
-const statistics = function (state = defaultState.statistics, { type, payload }) {
-  const { id } = payload
-  const stats = state[id] || {}
-
+const statistics = function (state = defaultStatisticsState, { type, payload }) {
   switch (type) {
   case UPDATE_GTW_STATS_SUCCESS:
     return {
       ...state,
-      [id]: {
-        ...stats,
-        error: undefined,
-        stats: payload.stats,
-      },
+      error: undefined,
+      stats: payload.stats,
     }
   case UPDATE_GTW_STATS_FAILURE:
+  case START_GTW_STATS_FAILURE:
     return {
       ...state,
-      [id]: {
-        ...stats,
-        error: payload.error,
-      },
+      stats: undefined,
+      error: payload,
     }
   case UPDATE_GTW_STATS:
+  case START_GTW_STATS_SUCCESS:
     return {
       ...state,
-      [id]: {
-        ...stats,
-        error: undefined,
-      },
+      stats: undefined,
+      error: undefined,
     }
   default:
     return state
@@ -113,6 +111,7 @@ const gateways = function (state = defaultState, action) {
       ...state,
       entities,
     }
+  case START_GTW_STATS_SUCCESS:
   case START_GTW_STATS_FAILURE:
   case UPDATE_GTW_STATS:
   case UPDATE_GTW_STATS_SUCCESS:

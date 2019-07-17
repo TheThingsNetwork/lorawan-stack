@@ -161,12 +161,6 @@ export const [{
 )
 
 export const STOP_GTW_STATS = 'STOP_GATEWAY_STATISTICS'
-export const UPDATE_GTW_STATS_UNAVAILABLE = 'UPDATE_GATEWAY_STATISTICS_UNAVAILABLE'
-
-export const updateGatewayStatisticsUnavailable = () => (
-  { type: UPDATE_GTW_STATS_UNAVAILABLE }
-)
-
 export const stopGatewayStatistics = () => (
   { type: STOP_GTW_STATS }
 )

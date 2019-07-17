@@ -156,7 +156,7 @@ const startGatewayStatisticsLogic = createLogic({
       done()
     }
 
-    dispatch(gateways.startGatewayStatisticsSuccess(id))
+    dispatch(gateways.startGatewayStatisticsSuccess())
     dispatch(gateways.updateGatewayStatistics(id))
 
     const interval = setInterval(
@@ -168,19 +168,14 @@ const startGatewayStatisticsLogic = createLogic({
   },
 })
 
-const updateGatewayStatisticsLogic = createLogic({
+const updateGatewayStatisticsLogic = createRequestLogic({
   type: gateways.UPDATE_GTW_STATS,
-  async process ({ action }, dispatch, done) {
+  async process ({ action }) {
     const { id } = action.payload
 
-    try {
-      const stats = await api.gateway.stats(id)
-      dispatch(gateways.updateGatewayStatisticsSuccess({ id, stats }))
-    } catch (error) {
-      dispatch(gateways.updateGatewayStatisticsFailure({ id, error }))
-    }
+    const stats = await api.gateway.stats(id)
 
-    done()
+    return { stats }
   },
 })
 

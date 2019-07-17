@@ -90,11 +90,9 @@ export const selectGatewayRightsError = createErrorSelector(ENTITY)
 export const selectGatewayRightsFetching = createFetchingSelector(GET_GTWS_RIGHTS_LIST_BASE)
 
 // Statistics
-export const selectGatewayStatisticsById = (state, id) => selectGatewayStatisticsStore(state)[id]
-
 export const selectGatewayStatisticsConnectError = createErrorSelector(START_GTW_STATS_BASE)
 export const selectGatewayStatisticsUpdateError = function (state) {
-  const statistics = selectGatewayStatisticsById(state, selectSelectedGatewayId(state)) || {}
+  const statistics = selectGatewayStatisticsStore(state) || {}
 
   return statistics.error
 }
@@ -102,12 +100,7 @@ export const selectGatewayStatisticsError = state =>
   selectGatewayStatisticsConnectError(state) || selectGatewayStatisticsUpdateError(state)
 export const selectGatewayStatisticsIsFetching = createFetchingSelector([ START_GTW_STATS_BASE, UPDATE_GTW_STATS_BASE ])
 export const selectGatewayStatistics = function (state) {
-  const statistics = selectGatewayStatisticsById(state, selectSelectedGatewayId(state)) || {}
+  const statistics = selectGatewayStatisticsStore(state) || {}
 
   return statistics.stats
-}
-export const selectGatewayStatisticsIsAvailable = function (state) {
-  const statistics = selectGatewayStatisticsById(state, selectSelectedGatewayId(state)) || {}
-
-  return statistics.available || false
 }
