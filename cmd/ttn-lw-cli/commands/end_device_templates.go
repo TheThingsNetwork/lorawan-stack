@@ -15,8 +15,11 @@
 package commands
 
 import (
+	"encoding/binary"
+	"fmt"
 	stdio "io"
 	"os"
+	"strings"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
@@ -26,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/util"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
 var (
@@ -39,8 +43,10 @@ func templateFormatIDFlags() *pflag.FlagSet {
 }
 
 var (
-	errNoTemplateFormatID       = errors.DefineInvalidArgument("no_template_format_id", "no template format ID set")
-	errEndDeviceMappingNotFound = errors.DefineNotFound("mapped_end_device_not_found", "end device mapping not found")
+	errNoTemplateFormatID             = errors.DefineInvalidArgument("no_template_format_id", "no template format ID set")
+	errEndDeviceMappingNotFound       = errors.DefineNotFound("mapped_end_device_not_found", "end device mapping not found")
+	errNoEndDeviceTemplateJoinEUI     = errors.DefineInvalidArgument("no_end_device_template_join_eui", "no end device template JoinEUI set")
+	errNoEndDeviceTemplateStartDevEUI = errors.DefineInvalidArgument("no_end_device_template_start_dev_eui", "no end device template start DevEUI set")
 )
 
 func getTemplateFormatID(flagSet *pflag.FlagSet, args []string) string {
@@ -151,6 +157,84 @@ var (
 			return io.Write(os.Stdout, config.OutputFormat, res)
 		}),
 	}
+	endDeviceTemplatesAssignEUIsCommand = &cobra.Command{
+		Use:     "assign-euis [join-eui] [start-dev-eui] [flags]",
+		Aliases: []string{"euis"},
+		Short:   "Assign JoinEUI and DevEUIs to end device templates",
+		Long: `Assign JoinEUI and DevEUIs to end device templates
+
+This command takes an end device template from stdin.`,
+		PersistentPreRunE: preRun(),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if inputDecoder == nil {
+				return nil
+			}
+
+			forwardDeprecatedDeviceFlags(cmd.Flags())
+			joinEUIHex, _ := cmd.Flags().GetString("join-eui")
+			startDevEUIHex, _ := cmd.Flags().GetString("start-dev-eui")
+			switch len(args) {
+			case 0:
+			case 1:
+				logger.Warn("only single EUI found in arguments, not considering arguments")
+			case 2:
+				joinEUIHex = args[0]
+				startDevEUIHex = args[1]
+			default:
+				logger.Warn("multiple EUIs found in arguments, considering the first")
+				joinEUIHex = args[0]
+				startDevEUIHex = args[1]
+			}
+			if joinEUIHex == "" {
+				return errNoEndDeviceTemplateJoinEUI
+			}
+			if startDevEUIHex == "" {
+				return errNoEndDeviceTemplateStartDevEUI
+			}
+
+			var joinEUI types.EUI64
+			if err := joinEUI.UnmarshalText([]byte(joinEUIHex)); err != nil {
+				return err
+			}
+			var startDevEUI types.EUI64
+			if err := startDevEUI.UnmarshalText([]byte(startDevEUIHex)); err != nil {
+				return err
+			}
+			devEUIInt := binary.BigEndian.Uint64(startDevEUI[:])
+
+			count, _ := cmd.Flags().GetInt("count")
+			for {
+				var template ttnpb.EndDeviceTemplate
+				if _, err := inputDecoder.Decode(&template); err != nil {
+					if err == stdio.EOF {
+						return nil
+					}
+					return err
+				}
+
+				for i := 0; i < count; i++ {
+					res := template
+
+					var devEUI types.EUI64
+					binary.BigEndian.PutUint64(devEUI[:], devEUIInt)
+					devEUIInt++
+
+					res.EndDevice.DeviceID = fmt.Sprintf("eui-%s", strings.ToLower(devEUI.String()))
+					res.EndDevice.JoinEUI = &joinEUI
+					res.EndDevice.DevEUI = &devEUI
+					res.FieldMask.Paths = ttnpb.BottomLevelFields(append(res.FieldMask.Paths,
+						"ids.device_id",
+						"ids.join_eui",
+						"ids.dev_eui",
+					))
+
+					if err := io.Write(os.Stdout, config.OutputFormat, &res); err != nil {
+						return err
+					}
+				}
+			}
+		},
+	}
 	endDeviceTemplatesListFormats = &cobra.Command{
 		Use:               "list-formats",
 		Short:             "List available end device template formats",
@@ -257,7 +341,7 @@ command to assign EUIs to map to end device templates.`,
 			}
 
 			var mapping []ttnpb.EndDeviceTemplate
-			data, err := getData("mapping", cmd.Flags())
+			reader, err := getDataReader("mapping", cmd.Flags())
 			if err != nil {
 				return err
 			}
@@ -319,6 +403,10 @@ func init() {
 	endDeviceTemplatesFromDeviceCommand.Flags().AddFlagSet(selectEndDeviceIDFlags())
 	endDeviceTemplatesFromDeviceCommand.Flags().String("mapping-key", "", "")
 	endDeviceTemplatesCommand.AddCommand(endDeviceTemplatesFromDeviceCommand)
+	endDeviceTemplatesAssignEUIsCommand.Flags().String("join-eui", "", "(hex)")
+	endDeviceTemplatesAssignEUIsCommand.Flags().String("start-dev-eui", "", "(hex)")
+	endDeviceTemplatesAssignEUIsCommand.Flags().Int("count", 1, "")
+	endDeviceTemplatesCommand.AddCommand(endDeviceTemplatesAssignEUIsCommand)
 	endDeviceTemplatesCommand.AddCommand(endDeviceTemplatesListFormats)
 	endDeviceTemplatesFromDataCommand.Flags().AddFlagSet(templateFormatIDFlags())
 	endDeviceTemplatesFromDataCommand.Flags().AddFlagSet(dataFlags("", ""))
