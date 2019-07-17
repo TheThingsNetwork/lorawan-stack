@@ -1,21 +1,23 @@
-<a name="top"></a>
+---
+title: "Reference"
+description: ""
+weight: 99
+---
 
-# API Documentation
-
-## <a name="toc">Table of Contents</a>
-
-{{ range .Files }}{{ $file_name := .Name -}}
-- [File `{{ .Name }}`](#{{ .Name }})
-  {{- range .Messages }}
-  - [Message `{{ .LongName }}`](#{{ .FullName }})
-  {{- end -}}
-  {{- range .Enums }}
-  - [Enum `{{ .LongName }}`](#{{ .FullName }})
-  {{- end -}}
+{{ range .Files }}
   {{- range .Services }}
-  - [Service `{{ .Name }}`](#{{ .FullName }})
+## [{{ .Name }}](#{{ .FullName }})
+
+  {{ .Description }}
+
+  Method | Request | Response
+  ---|---|---|
+  {{- range .Methods }}
+  [{{ .Name }}](#{{.Name}}) | [{{ .RequestLongType }}](#{{ .RequestFullType }}){{ if .RequestStreaming }} _stream_{{ end }} | [{{ .ResponseLongType }}](#{{ .ResponseFullType }}){{ if .ResponseStreaming }} _stream_{{ end }}
   {{- end }}
-{{ end -}}
+  {{ end }}
+{{- end -}}
+
 - [Scalar Value Types](#scalar-value-types)
 
 {{- range .Files }}{{ $file_name := .Name }}
