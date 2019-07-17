@@ -15,6 +15,7 @@
 import React from 'react'
 import { Formik } from 'formik'
 import bind from 'autobind-decorator'
+import scrollIntoView from 'scroll-into-view-if-needed'
 
 import Notification from '../notification'
 import PropTypes from '../../lib/prop-types'
@@ -23,6 +24,31 @@ import FormField from './field'
 import FormSubmit from './submit'
 
 class InnerForm extends React.PureComponent {
+  constructor (props) {
+    super(props)
+    this.notificationRef = React.createRef()
+  }
+
+  componentDidUpdate (prevProps) {
+    const { formError, isSubmitting, isValid } = this.props
+    const { isSubmitting: prevIsSubmitting, formError: prevFormError } = prevProps
+
+    // Scroll form notification into view if needed
+    if (formError && !prevFormError) {
+      scrollIntoView(this.notificationRef.current, { behavior: 'smooth' })
+      this.notificationRef.current.focus({ preventScroll: true })
+    }
+
+    // Scroll invalid fields into view if needed and focus them
+    if (!prevIsSubmitting && isSubmitting && !isValid) {
+      const firstErrorNode = document.querySelectorAll('[data-needs-focus="true"]')[0]
+      if (firstErrorNode) {
+        scrollIntoView(firstErrorNode, { behavior: 'smooth' })
+        firstErrorNode.querySelector('input,textarea').focus({ preventScroll: true })
+      }
+    }
+  }
+
   render () {
     const {
       className,
@@ -36,8 +62,12 @@ class InnerForm extends React.PureComponent {
 
     return (
       <form className={className} onSubmit={handleSubmit}>
-        {formError && <Notification error={formError} small />}
-        {formInfo && <Notification info={formInfo} small /> }
+        {(formError || formInfo) && (
+          <div style={{ outline: 'none' }} ref={this.notificationRef} tabIndex="-1">
+            {formError && <Notification error={formError} small />}
+            {formInfo && <Notification info={formInfo} small /> }
+          </div>
+        )}
         <FormContext.Provider value={{
           ...rest,
           horizontal,

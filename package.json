@@ -96,6 +96,7 @@
     "redux": "^4.0.1",
     "redux-actions": "^2.6.5",
     "redux-logic": "^2.1.1",
+    "scroll-into-view-if-needed": "^2.2.20",
     "ttn-lw": "file:sdk/js",
     "url-polyfill": "^1.1.5",
     "yup": "^0.26.6"
