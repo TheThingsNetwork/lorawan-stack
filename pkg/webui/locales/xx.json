@@ -309,7 +309,6 @@
   "oauth.views.code.index.code": "Xxxx Xxxxxxxxxxxxx Xxxx",
   "oauth.views.create-account.index.createAccount": "Xxxxxx XXX Xxxxx Xxxxxxx",
   "oauth.views.create-account.index.register": "Xxxxxxxx",
-  "oauth.views.create-account.index.goToLogin": "Xx xx xxxxx",
   "oauth.views.create-account.index.confirmPassword": "Xxxxxxx Xxxxxxxx",
   "oauth.views.create-account.index.validatePasswordMatch": "Xxxxxxxxx xxxxxx xxxxx",
   "oauth.views.create-account.index.validatePasswordDigit": "Xxxxxx xxxxxxx xx xxxxx xxx xxxxx",

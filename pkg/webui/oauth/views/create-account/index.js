@@ -18,7 +18,7 @@ import { withRouter } from 'react-router-dom'
 import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 import { connect } from 'react-redux'
-import { replace } from 'connected-react-router'
+import { replace, push } from 'connected-react-router'
 import * as Yup from 'yup'
 
 import api from '../../api'
@@ -36,7 +36,6 @@ import style from './create-account.styl'
 const m = defineMessages({
   createAccount: 'Create TTN Stack Account',
   register: 'Register',
-  goToLogin: 'Go to login',
   confirmPassword: 'Confirm Password',
   validatePasswordMatch: 'Passwords should match',
   validatePasswordDigit: 'Should contain at least one digit',
@@ -84,7 +83,7 @@ const initialValues = {
 const getSuccessMessage = function (state) {
   switch (state) {
   case 'STATE_REQUESTED':
-    return m.registrationApproved
+    return m.registrationPending
   case 'STATE_APPROVED':
     return m.registrationApproved
   default:
@@ -92,7 +91,10 @@ const getSuccessMessage = function (state) {
   }
 }
 
-@connect()
+@connect(null, {
+  push,
+  replace,
+})
 @withRouter
 @bind
 export default class CreateAccount extends React.PureComponent {
@@ -101,27 +103,24 @@ export default class CreateAccount extends React.PureComponent {
 
     this.state = {
       error: '',
-      info: '',
-      registered: false,
     }
   }
 
   async handleSubmit (values, { setSubmitting, setErrors }) {
     try {
       const { user_id, ...rest } = values
+      const { push } = this.props
       const result = await api.users.register({
         user: { ids: { user_id }, ...rest },
       })
 
-      this.setState({
-        error: '',
+      push('/oauth/login', {
         info: getSuccessMessage(result.data.state),
-        registered: true,
       })
+
     } catch (error) {
       this.setState({
         error: error.response.data,
-        info: '',
       })
     } finally {
       setSubmitting(false)
@@ -129,17 +128,16 @@ export default class CreateAccount extends React.PureComponent {
   }
 
   handleCancel () {
-    const { dispatch, location } = this.props
+    const { replace, location } = this.props
     const state = location.state || {}
 
     const back = state.back || '/oauth/login'
 
-    dispatch(replace(back))
+    replace(back)
   }
 
   render () {
-    const { error, info, registered } = this.state
-    const cancelButtonText = registered ? m.goToLogin : sharedMessages.cancel
+    const { error } = this.state
 
     return (
       <Container className={style.fullHeight}>
@@ -151,7 +149,6 @@ export default class CreateAccount extends React.PureComponent {
               onSubmit={this.handleSubmit}
               initialValues={initialValues}
               error={error}
-              info={info}
               validationSchema={validationSchema}
               horizontal={false}
             >
@@ -196,7 +193,7 @@ export default class CreateAccount extends React.PureComponent {
                 component={SubmitButton}
                 message={m.register}
               />
-              <Button naked secondary message={cancelButtonText} onClick={this.handleCancel} />
+              <Button naked secondary message={sharedMessages.cancel} onClick={this.handleCancel} />
             </Form>
           </Col>
         </Row>
