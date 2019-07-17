@@ -126,6 +126,5 @@ func TestUserStore(t *testing.T) {
 		list, err = store.FindUsers(ctx, nil, nil)
 		a.So(err, should.BeNil)
 		a.So(list, should.BeEmpty)
-
 	})
 }

@@ -120,9 +120,11 @@ type clientAccess struct {
 func (ca *clientAccess) ListRights(ctx context.Context, req *ttnpb.ClientIdentifiers) (*ttnpb.Rights, error) {
 	return ca.listClientRights(ctx, req)
 }
+
 func (ca *clientAccess) SetCollaborator(ctx context.Context, req *ttnpb.SetClientCollaboratorRequest) (*types.Empty, error) {
 	return ca.setClientCollaborator(ctx, req)
 }
+
 func (ca *clientAccess) ListCollaborators(ctx context.Context, req *ttnpb.ListClientCollaboratorsRequest) (*ttnpb.Collaborators, error) {
 	return ca.listClientCollaborators(ctx, req)
 }

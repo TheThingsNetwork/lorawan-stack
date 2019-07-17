@@ -234,21 +234,27 @@ type gatewayAccess struct {
 func (ga *gatewayAccess) ListRights(ctx context.Context, req *ttnpb.GatewayIdentifiers) (*ttnpb.Rights, error) {
 	return ga.listGatewayRights(ctx, req)
 }
+
 func (ga *gatewayAccess) CreateAPIKey(ctx context.Context, req *ttnpb.CreateGatewayAPIKeyRequest) (*ttnpb.APIKey, error) {
 	return ga.createGatewayAPIKey(ctx, req)
 }
+
 func (ga *gatewayAccess) ListAPIKeys(ctx context.Context, req *ttnpb.ListGatewayAPIKeysRequest) (*ttnpb.APIKeys, error) {
 	return ga.listGatewayAPIKeys(ctx, req)
 }
+
 func (ga *gatewayAccess) GetAPIKey(ctx context.Context, req *ttnpb.GetGatewayAPIKeyRequest) (*ttnpb.APIKey, error) {
 	return ga.getGatewayAPIKey(ctx, req)
 }
+
 func (ga *gatewayAccess) UpdateAPIKey(ctx context.Context, req *ttnpb.UpdateGatewayAPIKeyRequest) (*ttnpb.APIKey, error) {
 	return ga.updateGatewayAPIKey(ctx, req)
 }
+
 func (ga *gatewayAccess) SetCollaborator(ctx context.Context, req *ttnpb.SetGatewayCollaboratorRequest) (*types.Empty, error) {
 	return ga.setGatewayCollaborator(ctx, req)
 }
+
 func (ga *gatewayAccess) ListCollaborators(ctx context.Context, req *ttnpb.ListGatewayCollaboratorsRequest) (*ttnpb.Collaborators, error) {
 	return ga.listGatewayCollaborators(ctx, req)
 }

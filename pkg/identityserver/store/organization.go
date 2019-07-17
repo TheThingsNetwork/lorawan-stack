@@ -15,8 +15,6 @@
 package store
 
 import (
-	"context"
-
 	"github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
@@ -39,12 +37,6 @@ type Organization struct {
 
 func init() {
 	registerModel(&Organization{})
-}
-
-// SetContext sets the context on the organization model and the embedded account model.
-func (org *Organization) SetContext(ctx context.Context) {
-	org.Model.SetContext(ctx)
-	org.Account.SetContext(ctx)
 }
 
 // functions to set fields from the organization model into the organization proto.

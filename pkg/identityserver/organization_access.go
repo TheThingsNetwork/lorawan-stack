@@ -233,21 +233,27 @@ type organizationAccess struct {
 func (oa *organizationAccess) ListRights(ctx context.Context, req *ttnpb.OrganizationIdentifiers) (*ttnpb.Rights, error) {
 	return oa.listOrganizationRights(ctx, req)
 }
+
 func (oa *organizationAccess) CreateAPIKey(ctx context.Context, req *ttnpb.CreateOrganizationAPIKeyRequest) (*ttnpb.APIKey, error) {
 	return oa.createOrganizationAPIKey(ctx, req)
 }
+
 func (oa *organizationAccess) ListAPIKeys(ctx context.Context, req *ttnpb.ListOrganizationAPIKeysRequest) (*ttnpb.APIKeys, error) {
 	return oa.listOrganizationAPIKeys(ctx, req)
 }
+
 func (oa *organizationAccess) GetAPIKey(ctx context.Context, req *ttnpb.GetOrganizationAPIKeyRequest) (*ttnpb.APIKey, error) {
 	return oa.getOrganizationAPIKey(ctx, req)
 }
+
 func (oa *organizationAccess) UpdateAPIKey(ctx context.Context, req *ttnpb.UpdateOrganizationAPIKeyRequest) (*ttnpb.APIKey, error) {
 	return oa.updateOrganizationAPIKey(ctx, req)
 }
+
 func (oa *organizationAccess) SetCollaborator(ctx context.Context, req *ttnpb.SetOrganizationCollaboratorRequest) (*types.Empty, error) {
 	return oa.setOrganizationCollaborator(ctx, req)
 }
+
 func (oa *organizationAccess) ListCollaborators(ctx context.Context, req *ttnpb.ListOrganizationCollaboratorsRequest) (*ttnpb.Collaborators, error) {
 	return oa.listOrganizationCollaborators(ctx, req)
 }

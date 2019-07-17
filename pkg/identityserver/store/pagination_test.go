@@ -93,5 +93,4 @@ func TestPagination(t *testing.T) {
 		setTotal(ctx, total)
 		a.So(totalCount, should.Equal, total)
 	})
-
 }

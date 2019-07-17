@@ -148,7 +148,7 @@ func Store(ctx context.Context, bucket *blob.Bucket, prefix string, pic *ttnpb.P
 	applicableSizes = append(applicableSizes, 0)
 	sort.Sort(sort.Reverse(sort.IntSlice(applicableSizes)))
 	imagesBySize := make(map[uint32]string, len(applicableSizes))
-	var img = original
+	img := original
 	encodedFormat, mimeType, extension := settings(format)
 	for _, size := range applicableSizes {
 		if err = ctx.Err(); err != nil {

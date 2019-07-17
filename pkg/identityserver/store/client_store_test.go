@@ -111,6 +111,5 @@ func TestClientStore(t *testing.T) {
 		list, err = store.FindClients(ctx, nil, nil)
 		a.So(err, should.BeNil)
 		a.So(list, should.BeEmpty)
-
 	})
 }

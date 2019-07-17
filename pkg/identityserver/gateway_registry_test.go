@@ -206,7 +206,6 @@ func TestGatewaysCRUD(t *testing.T) {
 
 		_, err = reg.Delete(ctx, &created.GatewayIdentifiers, creds)
 		a.So(err, should.BeNil)
-
 	})
 }
 

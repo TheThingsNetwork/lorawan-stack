@@ -259,18 +259,23 @@ type gatewayRegistry struct {
 func (gr *gatewayRegistry) Create(ctx context.Context, req *ttnpb.CreateGatewayRequest) (*ttnpb.Gateway, error) {
 	return gr.createGateway(ctx, req)
 }
+
 func (gr *gatewayRegistry) Get(ctx context.Context, req *ttnpb.GetGatewayRequest) (*ttnpb.Gateway, error) {
 	return gr.getGateway(ctx, req)
 }
+
 func (gr *gatewayRegistry) GetIdentifiersForEUI(ctx context.Context, req *ttnpb.GetGatewayIdentifiersForEUIRequest) (*ttnpb.GatewayIdentifiers, error) {
 	return gr.getGatewayIdentifiersForEUI(ctx, req)
 }
+
 func (gr *gatewayRegistry) List(ctx context.Context, req *ttnpb.ListGatewaysRequest) (*ttnpb.Gateways, error) {
 	return gr.listGateways(ctx, req)
 }
+
 func (gr *gatewayRegistry) Update(ctx context.Context, req *ttnpb.UpdateGatewayRequest) (*ttnpb.Gateway, error) {
 	return gr.updateGateway(ctx, req)
 }
+
 func (gr *gatewayRegistry) Delete(ctx context.Context, req *ttnpb.GatewayIdentifiers) (*types.Empty, error) {
 	return gr.deleteGateway(ctx, req)
 }

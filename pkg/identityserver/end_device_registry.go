@@ -134,15 +134,19 @@ type endDeviceRegistry struct {
 func (dr *endDeviceRegistry) Create(ctx context.Context, req *ttnpb.CreateEndDeviceRequest) (*ttnpb.EndDevice, error) {
 	return dr.createEndDevice(ctx, req)
 }
+
 func (dr *endDeviceRegistry) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest) (*ttnpb.EndDevice, error) {
 	return dr.getEndDevice(ctx, req)
 }
+
 func (dr *endDeviceRegistry) List(ctx context.Context, req *ttnpb.ListEndDevicesRequest) (*ttnpb.EndDevices, error) {
 	return dr.listEndDevices(ctx, req)
 }
+
 func (dr *endDeviceRegistry) Update(ctx context.Context, req *ttnpb.UpdateEndDeviceRequest) (*ttnpb.EndDevice, error) {
 	return dr.updateEndDevice(ctx, req)
 }
+
 func (dr *endDeviceRegistry) Delete(ctx context.Context, req *ttnpb.EndDeviceIdentifiers) (*types.Empty, error) {
 	return dr.deleteEndDevice(ctx, req)
 }

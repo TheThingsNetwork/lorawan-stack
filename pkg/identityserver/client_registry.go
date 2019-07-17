@@ -211,9 +211,7 @@ func (is *IdentityServer) listClients(ctx context.Context, req *ttnpb.ListClient
 	return clis, nil
 }
 
-var (
-	errUpdateClientAdminField = errors.DefinePermissionDenied("client_update_admin_field", "only admins can update the `{field}` field")
-)
+var errUpdateClientAdminField = errors.DefinePermissionDenied("client_update_admin_field", "only admins can update the `{field}` field")
 
 func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateClientRequest) (cli *ttnpb.Client, err error) {
 	if err = rights.RequireClient(ctx, req.ClientIdentifiers, ttnpb.RIGHT_CLIENT_ALL); err != nil {
@@ -278,15 +276,19 @@ type clientRegistry struct {
 func (cr *clientRegistry) Create(ctx context.Context, req *ttnpb.CreateClientRequest) (*ttnpb.Client, error) {
 	return cr.createClient(ctx, req)
 }
+
 func (cr *clientRegistry) Get(ctx context.Context, req *ttnpb.GetClientRequest) (*ttnpb.Client, error) {
 	return cr.getClient(ctx, req)
 }
+
 func (cr *clientRegistry) List(ctx context.Context, req *ttnpb.ListClientsRequest) (*ttnpb.Clients, error) {
 	return cr.listClients(ctx, req)
 }
+
 func (cr *clientRegistry) Update(ctx context.Context, req *ttnpb.UpdateClientRequest) (*ttnpb.Client, error) {
 	return cr.updateClient(ctx, req)
 }
+
 func (cr *clientRegistry) Delete(ctx context.Context, req *ttnpb.ClientIdentifiers) (*types.Empty, error) {
 	return cr.deleteClient(ctx, req)
 }

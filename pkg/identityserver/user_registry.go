@@ -510,18 +510,23 @@ type userRegistry struct {
 func (ur *userRegistry) Create(ctx context.Context, req *ttnpb.CreateUserRequest) (*ttnpb.User, error) {
 	return ur.createUser(ctx, req)
 }
+
 func (ur *userRegistry) Get(ctx context.Context, req *ttnpb.GetUserRequest) (*ttnpb.User, error) {
 	return ur.getUser(ctx, req)
 }
+
 func (ur *userRegistry) Update(ctx context.Context, req *ttnpb.UpdateUserRequest) (*ttnpb.User, error) {
 	return ur.updateUser(ctx, req)
 }
+
 func (ur *userRegistry) UpdatePassword(ctx context.Context, req *ttnpb.UpdateUserPasswordRequest) (*types.Empty, error) {
 	return ur.updateUserPassword(ctx, req)
 }
+
 func (ur *userRegistry) CreateTemporaryPassword(ctx context.Context, req *ttnpb.CreateTemporaryPasswordRequest) (*types.Empty, error) {
 	return ur.createTemporaryPassword(ctx, req)
 }
+
 func (ur *userRegistry) Delete(ctx context.Context, req *ttnpb.UserIdentifiers) (*types.Empty, error) {
 	return ur.deleteUser(ctx, req)
 }

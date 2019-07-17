@@ -238,15 +238,19 @@ type organizationRegistry struct {
 func (or *organizationRegistry) Create(ctx context.Context, req *ttnpb.CreateOrganizationRequest) (*ttnpb.Organization, error) {
 	return or.createOrganization(ctx, req)
 }
+
 func (or *organizationRegistry) Get(ctx context.Context, req *ttnpb.GetOrganizationRequest) (*ttnpb.Organization, error) {
 	return or.getOrganization(ctx, req)
 }
+
 func (or *organizationRegistry) List(ctx context.Context, req *ttnpb.ListOrganizationsRequest) (*ttnpb.Organizations, error) {
 	return or.listOrganizations(ctx, req)
 }
+
 func (or *organizationRegistry) Update(ctx context.Context, req *ttnpb.UpdateOrganizationRequest) (*ttnpb.Organization, error) {
 	return or.updateOrganization(ctx, req)
 }
+
 func (or *organizationRegistry) Delete(ctx context.Context, req *ttnpb.OrganizationIdentifiers) (*types.Empty, error) {
 	return or.deleteOrganization(ctx, req)
 }

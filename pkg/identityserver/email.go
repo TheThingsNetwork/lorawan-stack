@@ -16,6 +16,7 @@ package identityserver
 
 import (
 	"context"
+
 	"github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/pkg/email"

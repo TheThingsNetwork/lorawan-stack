@@ -121,6 +121,5 @@ func TestContactInfoValidation(t *testing.T) {
 		if a.So(info, should.HaveLength, 1) {
 			a.So(info[0].ValidatedAt, should.NotBeNil)
 		}
-
 	})
 }
