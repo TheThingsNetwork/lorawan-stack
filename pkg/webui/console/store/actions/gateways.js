@@ -146,13 +146,22 @@ export const [{
 }] = createRequestActions(GET_GTW_COLLABORATORS_LIST_BASE,
   (gtwId, { page, limit } = {}) => ({ gtwId, params: { page, limit }}))
 
-export const START_GTW_STATS = 'START_GATEWAY_STATISTICS'
+export const START_GTW_STATS_BASE = 'START_GATEWAY_STATISTICS'
+export const [{
+  request: START_GTW_STATS,
+  success: START_GTW_STATS_SUCCESS,
+  failure: START_GTW_STATS_FAILURE,
+}, {
+  request: startGatewayStatistics,
+  success: startGatewayStatisticsSuccess,
+  failure: startGatewayStatisticsFailure,
+}] = createRequestActions(START_GTW_STATS_BASE,
+  id => ({ id }),
+  (id, timeout) => ({ timeout })
+)
+
 export const STOP_GTW_STATS = 'STOP_GATEWAY_STATISTICS'
 export const UPDATE_GTW_STATS_UNAVAILABLE = 'UPDATE_GATEWAY_STATISTICS_UNAVAILABLE'
-
-export const startGatewayStatistics = (id, meta) => (
-  { type: START_GTW_STATS, id, meta }
-)
 
 export const updateGatewayStatisticsUnavailable = () => (
   { type: UPDATE_GTW_STATS_UNAVAILABLE }

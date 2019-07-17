@@ -19,9 +19,9 @@ import {
   GET_GTW_API_KEYS_LIST_BASE,
   UPDATE_GTW_STATS_BASE,
   GET_GTWS_RIGHTS_LIST_BASE,
+  START_GTW_STATS_BASE,
 } from '../actions/gateways'
 
-import { getGatewayId } from '../../../lib/selectors/id'
 import {
   createEventsSelector,
   createEventsErrorSelector,
@@ -54,6 +54,7 @@ export const selectGatewayStatisticsStore = state => selectGatewayStore(state).s
 export const selectGatewayById = (state, id) => selectGatewayEntitiesStore(state)[id]
 export const selectSelectedGatewayId = state => selectGatewayStore(state).selectedGateway
 export const selectSelectedGateway = state => selectGatewayById(state, selectSelectedGatewayId(state))
+
 export const selectGatewayFetching = createFetchingSelector(GET_GTW_BASE)
 export const selectGatewayError = createErrorSelector(GET_GTW_BASE)
 
@@ -89,17 +90,24 @@ export const selectGatewayRightsError = createErrorSelector(ENTITY)
 export const selectGatewayRightsFetching = createFetchingSelector(GET_GTWS_RIGHTS_LIST_BASE)
 
 // Statistics
-export const selectGatewayStatisticsById = (state, id) => selectGatewayStatisticsStore(state)[id] || {}
+export const selectGatewayStatisticsById = (state, id) => selectGatewayStatisticsStore(state)[id]
 
-export const selectGatewayStatisticsError = createErrorSelector(UPDATE_GTW_STATS_BASE)
-export const selectGatewayStatisticsIsFetching = createFetchingSelector(UPDATE_GTW_STATS_BASE)
+export const selectGatewayStatisticsConnectError = createErrorSelector(START_GTW_STATS_BASE)
+export const selectGatewayStatisticsUpdateError = function (state) {
+  const statistics = selectGatewayStatisticsById(state, selectSelectedGatewayId(state)) || {}
+
+  return statistics.error
+}
+export const selectGatewayStatisticsError = state =>
+  selectGatewayStatisticsConnectError(state) || selectGatewayStatisticsUpdateError(state)
+export const selectGatewayStatisticsIsFetching = createFetchingSelector([ START_GTW_STATS_BASE, UPDATE_GTW_STATS_BASE ])
 export const selectGatewayStatistics = function (state) {
-  const statistics = selectGatewayStatisticsById(state, selectSelectedGatewayId(state))
+  const statistics = selectGatewayStatisticsById(state, selectSelectedGatewayId(state)) || {}
 
   return statistics.stats
 }
 export const selectGatewayStatisticsIsAvailable = function (state) {
-  const statistics = selectGatewayStatisticsById(state, selectSelectedGatewayId(state))
+  const statistics = selectGatewayStatisticsById(state, selectSelectedGatewayId(state)) || {}
 
   return statistics.available || false
 }

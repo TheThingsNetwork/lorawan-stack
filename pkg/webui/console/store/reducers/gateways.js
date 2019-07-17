@@ -97,6 +97,7 @@ const gateways = function (state = defaultState, action) {
     const { [payload.id]: deleted, ...rest } = state.entities
 
     return {
+      ...state,
       selectedGateway: null,
       entities: rest,
     }
