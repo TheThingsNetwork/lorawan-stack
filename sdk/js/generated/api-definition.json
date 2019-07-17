@@ -494,6 +494,30 @@
       ]
     }
   },
+  "ApplicationWebhookTemplateRegistry": {
+    "Get": {
+      "file": "lorawan-stack/api/applicationserver_web.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/as/webhook-templates/{ids.template_id}",
+          "parameters": [
+            "ids.template_id"
+          ]
+        }
+      ]
+    },
+    "List": {
+      "file": "lorawan-stack/api/applicationserver_web.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/as/webhook-templates",
+          "parameters": []
+        }
+      ]
+    }
+  },
   "ClientAccess": {
     "ListRights": {
       "file": "lorawan-stack/api/client_services.proto",

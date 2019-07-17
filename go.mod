@@ -68,6 +68,7 @@ require (
 	github.com/jarcoal/httpmock v1.0.4
 	github.com/jaytaylor/html2text v0.0.0-20190408195923-01ec452cbe43
 	github.com/jinzhu/gorm v1.9.10
+	github.com/jtacoma/uritemplates v1.0.0
 	github.com/kr/pretty v0.1.0
 	// Do not upgrade Echo beyond v4.1.2 - see https://github.com/TheThingsNetwork/lorawan-stack/issues/977 .
 	github.com/labstack/echo/v4 v4.1.2
@@ -111,6 +112,7 @@ require (
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
 	golang.org/x/tools v0.0.0-20190702201734-44aeb8b7c377
 	golang.org/x/xerrors v0.0.0-20190513163551-3ee3066db522
+	google.golang.org/api v0.7.0
 	google.golang.org/genproto v0.0.0-20190701230453-710ae3a149df
 	google.golang.org/grpc v1.22.0
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
