@@ -34,6 +34,7 @@ import ApplicationData from '../application-data'
 import ApplicationPayloadFormatters from '../application-payload-formatters'
 import ApplicationIntegrations from '../application-integrations'
 
+import { getApplicationId } from '../../../lib/selectors/id'
 import {
   getApplication,
   startApplicationEventsStream,
@@ -153,9 +154,12 @@ export default class Application extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    const { application, redirectToList } = this.props
+    const { appId, application, redirectToList } = this.props
 
-    if (Boolean(prevProps.application) && !Boolean(application)) {
+    const isSame = appId === getApplicationId(prevProps.application)
+    const isDeleted = Boolean(prevProps.application) && !Boolean(application)
+
+    if (isSame && isDeleted) {
       redirectToList()
     }
   }
