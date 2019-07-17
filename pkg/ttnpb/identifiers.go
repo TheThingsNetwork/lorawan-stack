@@ -55,11 +55,27 @@ func (ids UserIdentifiers) IsZero() bool {
 	return ids.UserID == "" && ids.Email == ""
 }
 
+// GetOrganizationOrUserIdentifiers returns the OrganizationIdentifiers as *OrganizationOrUserIdentifiers.
+func (ids *OrganizationIdentifiers) GetOrganizationOrUserIdentifiers() *OrganizationOrUserIdentifiers {
+	if ids == nil {
+		return nil
+	}
+	return ids.OrganizationOrUserIdentifiers()
+}
+
 // OrganizationOrUserIdentifiers returns the OrganizationIdentifiers as *OrganizationOrUserIdentifiers.
 func (ids OrganizationIdentifiers) OrganizationOrUserIdentifiers() *OrganizationOrUserIdentifiers {
 	return &OrganizationOrUserIdentifiers{Ids: &OrganizationOrUserIdentifiers_OrganizationIDs{
 		OrganizationIDs: &ids,
 	}}
+}
+
+// GetOrganizationOrUserIdentifiers returns the UserIdentifiers as *OrganizationOrUserIdentifiers.
+func (ids *UserIdentifiers) GetOrganizationOrUserIdentifiers() *OrganizationOrUserIdentifiers {
+	if ids == nil {
+		return nil
+	}
+	return ids.OrganizationOrUserIdentifiers()
 }
 
 // OrganizationOrUserIdentifiers returns the UserIdentifiers as *OrganizationOrUserIdentifiers.
