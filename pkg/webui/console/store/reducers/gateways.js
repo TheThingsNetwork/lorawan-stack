@@ -19,12 +19,10 @@ import {
   UPDATE_GTW_SUCCESS,
   DELETE_GTW_SUCCESS,
   GET_GTWS_LIST_SUCCESS,
-  START_GTW_STATS,
   UPDATE_GTW_STATS,
   UPDATE_GTW_STATS_SUCCESS,
   UPDATE_GTW_STATS_FAILURE,
-  UPDATE_GTW_STATS_UNAVAILABLE,
-  STOP_GTW_STATS,
+  START_GTW_STATS_FAILURE,
 } from '../actions/gateways'
 
 const defaultState = {
@@ -50,16 +48,24 @@ const statistics = function (state = defaultState.statistics, { type, payload })
       ...state,
       [id]: {
         ...stats,
-        available: true,
+        error: undefined,
         stats: payload.stats,
       },
     }
-  case UPDATE_GTW_STATS_UNAVAILABLE:
+  case UPDATE_GTW_STATS_FAILURE:
     return {
       ...state,
       [id]: {
         ...stats,
-        available: false,
+        error: payload.error,
+      },
+    }
+  case UPDATE_GTW_STATS:
+    return {
+      ...state,
+      [id]: {
+        ...stats,
+        error: undefined,
       },
     }
   default:
@@ -106,12 +112,10 @@ const gateways = function (state = defaultState, action) {
       ...state,
       entities,
     }
-  case START_GTW_STATS:
+  case START_GTW_STATS_FAILURE:
   case UPDATE_GTW_STATS:
   case UPDATE_GTW_STATS_SUCCESS:
   case UPDATE_GTW_STATS_FAILURE:
-  case UPDATE_GTW_STATS_UNAVAILABLE:
-  case STOP_GTW_STATS:
     return {
       ...state,
       statistics: statistics(state.statistics, action),
