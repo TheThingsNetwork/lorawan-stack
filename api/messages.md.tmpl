@@ -1,0 +1,31 @@
+---
+title: "Messages"
+description: "All messages type available use by the API."
+weight: 2
+---
+
+Name | Description
+---|---
+{{ range .Files -}}
+  {{ range .Messages -}}
+[{{ .Name }}](#{{ .FullName }}) | {{ nobr .Description }}
+  {{ end -}}
+{{- end }}
+
+
+{{ range .Files }}
+ {{ range .Messages }}
+
+## <a name="{{ .FullName }}">{{ .Name }}</a>
+
+  {{ .Description }}
+
+Field | Type | Label | Description | Validation
+---|---|---|---|---
+  {{- range .Fields }}
+{{ .Name }} | [{{ .LongType }}](#{{ .FullType }}) | {{ .Label }} | {{ nobr .Description }}{{ if .DefaultValue }} Default: {{ .DefaultValue }}{{ end }} | {{range (.Option "validate.rules").Rules}}<p>`{{.Name}}`: `{{.Value}}`</p>{{end}}
+  {{- end -}}
+
+  {{- end }}
+
+{{- end }}

@@ -1,0 +1,54 @@
+---
+title: "Services"
+description: "List of services and methods available through the API"
+weight: 1
+tags: [ http, grpc ]
+---
+
+{{ $messages_path := "messages.md" }}
+{{ $files := .Files }}
+Name | Description
+---|---
+{{ range .Files -}}
+{{ range .Services -}}
+[{{ .Name }}](#{{ .Name }}) | {{ nobr .Description }}
+{{ end -}}
+{{- end -}}
+
+
+[Scalar Value Types](#scalar-value-types)
+
+{{- range .Files }}
+  {{- $filename := .Name }}
+  {{- $messages := .Messages }}
+  {{ range .Services }}
+
+## <a name="{{ .Name }}">{{ .Name }}</a>
+  `{{ $filename }}`
+
+  {{ .Description }}
+
+  {{ range .Methods }}
+### <a name="{{ .Name }}">{{ .Name }}</a>
+  {{ .Description }}
+
+  {{ print "{{% reftab " .Name " " "gRPC" .Name " " "HTTP" .Name " %}}" }}
+
+  **Request**: [{{ .RequestLongType }}]({{ printf "{{< ref \"%s#%s\" >}}" $messages_path .RequestFullType }}){{ if .RequestStreaming }} _stream_{{ end }}
+
+  **Response**: [{{ .ResponseLongType }}]({{ printf "{{< ref \"%s#%s\" >}}" $messages_path .ResponseFullType }}){{ if .ResponseStreaming }} _stream_{{ end }}
+
+  $$$$$$
+
+Method | Pattern | Body
+------|-------|----
+{{- range (.Option "google.api.http").Rules }}
+ `{{ .Method }}` | `/api/v3{{ .Pattern }}` | {{ .Body }} |
+{{- end -}}
+
+  {{ print "{{% /reftab %}}" }}
+
+  {{ end }}
+  {{ end }}
+{{print "{{% refswitcher %}}" }}
+{{ end }}

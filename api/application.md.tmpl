@@ -1,0 +1,83 @@
+---
+title: "Application"
+description: "API core type Application reference."
+weight: 2
+category: [reference]
+tags: [application, api]
+---
+
+* Services
+{{- range .Files -}}
+  {{- with $file := . }}{{- if eq .Name "lorawan-stack/api/application_services.proto"}}
+  {{- range $file.Services }}
+ * [{{ .Name }}](#{{ .Name }})
+  {{- end -}}
+  {{- end }}{{ end }}
+{{- end }}
+* Messages
+{{- range .Files -}}
+  {{- with $file := . }}{{- if eq .Name "lorawan-stack/api/application.proto"}}
+  {{- range $file.Messages }}
+ * [{{ .Name }}](#{{ .FullName }})
+  {{- end -}}
+  {{- end }}{{ end }}
+{{- end }}
+
+## Services
+
+
+{{- range .Files }}
+  {{- $messages := .Messages }}
+  {{- if eq .Name "lorawan-stack/api/application_services.proto"}}
+    {{ range .Services }}
+
+### <a name="{{ .Name }}">{{ .Name }}</a>
+
+    {{ .Description }}
+
+    {{ range .Methods }}
+#### <a name="{{ .Name }}">{{ .Name }}</a>
+
+{{ .Description }}
+
+{{ print "{{% reftab " .Name " " "gRPC" .Name " " "HTTP" .Name " %}}" }}
+
+**Request**: [{{ .RequestLongType }}](#{{ .RequestFullType }}){{ if .RequestStreaming }} _stream_{{ end }}
+
+**Response**: [{{ .ResponseLongType }}](#{{ .ResponseFullType }}){{ if .ResponseStreaming }} _stream_{{ end }}
+
+    $$$$$$
+
+Method | Pattern | Body
+------|-------|----
+{{- range (.Option "google.api.http").Rules }}
+`{{ .Method }}` | `/api/v3{{ .Pattern }}` | {{ .Body }} |
+{{- end }}
+
+{{ print "{{% /reftab %}}" }}
+
+    {{ end }}
+  {{ end }}
+{{ end }}
+{{ end }}
+
+{{print "{{% refswitcher %}}" }}
+
+## Messages
+
+{{- range .Files -}}
+  {{ with $file := . }}{{- if eq .Name "lorawan-stack/api/application.proto"}}
+ {{ range $file.Messages }}
+### <a name="{{ .FullName }}">{{ .Name }}</a>
+
+  {{ .Description }}
+
+Field | Type | Label | Description | Validation
+---|---|---|---|---
+  {{- range .Fields }}
+{{ .Name }} | [{{ .LongType }}](#{{ .FullType }}) | {{ .Label }} | {{ nobr .Description }}{{ if .DefaultValue }} Default: {{ .DefaultValue }}{{ end }} | {{range (.Option "validate.rules").Rules}}<p>`{{.Name}}`: `{{.Value}}`</p>{{end}}
+  {{- end -}}
+  {{- end }}
+  {{- end }}{{ end }}
+{{- end }}
+

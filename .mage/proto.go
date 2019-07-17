@@ -17,10 +17,13 @@ package ttnmage
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/user"
 	"path/filepath"
 	"strings"
+
+	"gopkg.in/yaml.v2"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
@@ -70,6 +73,7 @@ func makeProtoc() (func(...string) error, *protocContext, error) {
 			"--rm",
 			"--user", fmt.Sprintf("%s:%s", usr.Uid, usr.Gid),
 			"--mount", fmt.Sprintf("type=bind,src=%s,dst=%s/api", filepath.Join(wd, "api"), wd),
+			"--mount", fmt.Sprintf("type=bind,src=%s,dst=%s/doc", filepath.Join(wd, "doc"), wd),
 			"--mount", fmt.Sprintf("type=bind,src=%s,dst=%s/go.thethings.network/lorawan-stack/pkg/ttnpb", filepath.Join(wd, "pkg", "ttnpb"), protocOut),
 			"--mount", fmt.Sprintf("type=bind,src=%s,dst=%s/sdk/js", filepath.Join(wd, "sdk", "js"), wd),
 			"-w", wd,
@@ -172,6 +176,15 @@ func (p Proto) SwaggerClean(context.Context) error {
 	return sh.Rm(filepath.Join("api", "api.swagger.json"))
 }
 
+type HugoPage struct {
+	Title       string     `yaml:title`
+	Description string     `yaml:description`
+	Tags        []string   `yaml:tags`
+	SubPage     []HugoPage `yaml:subpage`
+	Files       []string   `yaml:files`
+	Template    string     `yaml:template`
+}
+
 // Markdown generates Markdown protos.
 func (p Proto) Markdown(context.Context) error {
 	changed, err := target.Glob(filepath.Join("api", "api.md"), filepath.Join("api", "*.proto"))
@@ -179,22 +192,84 @@ func (p Proto) Markdown(context.Context) error {
 		return xerrors.Errorf("failed checking modtime: %w", err)
 	}
 	if !changed {
+		fmt.Println("nothing changed")
 		return nil
 	}
-	return withProtoc(func(pCtx *protocContext, protoc func(...string) error) error {
-		if err := protoc(
-			fmt.Sprintf("--doc_opt=%s/api/api.md.tmpl,api.md --doc_out=%s/api", pCtx.WorkingDirectory, pCtx.WorkingDirectory),
+	buff, err := ioutil.ReadFile("./.mage/proto_ref_tree.yaml")
+	if err != nil {
+		return err
+	}
+	var root HugoPage
+	err = yaml.Unmarshal(buff, &root)
+	if err != nil {
+		return err
+	}
+	return markdownGenerateTree(strings.ReplaceAll(strings.ToLower(root.Title), " ", "-"), &root)
+}
+
+func markdownGenerateTree(path string, root *HugoPage) error {
+	for _, page := range root.SubPage {
+		if page.Template == "" || page.Files == nil {
+			path = filepath.Join(path, strings.ReplaceAll(strings.ToLower(page.Title), " ", "-"))
+			if err := markdownGenerateTree(path, &page); err != nil {
+				return err
+			}
+			continue
+		}
+		if err := withProtoc(markdownProtoc(path, &page)); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func markdownProtoc(path string, page *HugoPage) func(pCtx *protocContext, protoc func(...string) error) error {
+	return func(pCtx *protocContext, protoc func(...string) error) error {
+		err := protoc(
+			fmt.Sprintf("--doc_opt=%s/api/%s,%s.md --doc_out=%s/doc/content/reference/%s",
+				pCtx.WorkingDirectory,
+				page.Template,
+				strings.ToLower(page.Title),
+				pCtx.WorkingDirectory,
+				path),
 			fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),
-		); err != nil {
-			return xerrors.Errorf("failed to generate protos: %w", err)
+		)
+		if err != nil {
+			return xerrors.Errorf("failed to generate protos for %v : %w", page, err)
 		}
 		return nil
-	})
+	}
 }
 
 // MarkdownClean removes generated Markdown protos.
 func (p Proto) MarkdownClean(context.Context) error {
-	return sh.Rm(filepath.Join("api", "api.md"))
+	var root HugoPage
+	buff, err := ioutil.ReadFile("./.mage/proto_ref_tree.yaml")
+	if err != nil {
+		return err
+	}
+	err = yaml.Unmarshal(buff, &root)
+	if err != nil {
+		return err
+	}
+	return markdownCleanTree(strings.ReplaceAll(strings.ToLower(root.Title), " ", "-"), &root)
+}
+
+func markdownCleanTree(rootPath string, root *HugoPage) error {
+	for _, page := range root.SubPage {
+		path := filepath.Join(rootPath, strings.ReplaceAll(strings.ToLower(page.Title), " ", "-"))
+		if page.Template == "" || page.Files == nil {
+			if err := markdownCleanTree(path, &page); err != nil {
+				return err
+			}
+			continue
+		}
+		err := sh.Rm(filepath.Join("doc/content/references/api", path))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // JsSDK generates javascript SDK protos.

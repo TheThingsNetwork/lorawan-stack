@@ -1,0 +1,15 @@
+title: "API"
+tags:
+  - index
+  - api
+subpage:
+  - title: "Core Entities"
+    subpage:
+      - title: "Application"
+        template: application.md.tmpl
+        files:
+          - application.proto
+          - application_services.proto
+        tags:
+          - applications
+          - registery
