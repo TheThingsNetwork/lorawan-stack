@@ -14,6 +14,8 @@
 
 
 import { createLogic } from 'redux-logic'
+import * as user from '../../actions/user'
+import { isUnauthenticatedError } from '../../../../lib/errors/utils'
 
 const getResultActionFromType = function (typeString, status) {
   if (typeString instanceof Array) {
@@ -63,7 +65,11 @@ const createRequestLogic = function (
         dispatch(successAction(res))
         _resolve(res)
       } catch (e) {
-        dispatch(failAction(e))
+        if (isUnauthenticatedError(e)) {
+          dispatch(user.logoutSuccess())
+        } else {
+          dispatch(failAction(e))
+        }
         _reject(e)
       }
 
