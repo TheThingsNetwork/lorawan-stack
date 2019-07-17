@@ -2767,7 +2767,7 @@
             },
             {
               "name": "headers",
-              "description": "The HTTP headers used by the template. Both the key and the value can contain Fields.",
+              "description": "The HTTP headers used by the template. Both the key and the value can contain TemplateFields.",
               "label": "repeated",
               "type": "HeadersEntry",
               "longType": "ApplicationWebhookTemplate.HeadersEntry",
@@ -2777,7 +2777,7 @@
             },
             {
               "name": "base_url",
-              "description": "The base URL of the template. Can contain Fields.",
+              "description": "The base URL of the template. Can contain TemplateFields, in RFC 6570 format.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -2917,7 +2917,7 @@
           "fields": [
             {
               "name": "path",
-              "description": "Path to append to the base URL. Can contain Fields.",
+              "description": "Path to append to the base URL. Can contain TemplateFields, in RFC 6570 format.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -2938,7 +2938,7 @@
           "fields": [
             {
               "name": "id",
-              "description": "The ID of the field. It is meant to be used in the replacement process as `{{.ID}}`.",
+              "description": "The ID of the field.",
               "label": "",
               "type": "string",
               "longType": "string",

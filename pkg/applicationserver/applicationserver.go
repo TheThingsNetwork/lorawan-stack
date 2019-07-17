@@ -53,12 +53,13 @@ type ApplicationServer struct {
 	*component.Component
 	ctx context.Context
 
-	linkMode       LinkMode
-	linkRegistry   LinkRegistry
-	deviceRegistry DeviceRegistry
-	formatter      payloadFormatter
-	webhooks       web.Webhooks
-	pubsub         *pubsub.PubSub
+	linkMode         LinkMode
+	linkRegistry     LinkRegistry
+	deviceRegistry   DeviceRegistry
+	formatter        payloadFormatter
+	webhooks         web.Webhooks
+	webhookTemplates *web.TemplateStore
+	pubsub           *pubsub.PubSub
 
 	links              sync.Map
 	linkErrors         sync.Map
@@ -156,6 +157,10 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		c.RegisterWeb(webhooks)
 	}
 
+	if as.webhookTemplates, err = conf.Webhooks.NewTemplateStore(); err != nil {
+		return nil, err
+	}
+
 	if as.pubsub, err = conf.PubSub.NewPubSub(c, as, conf.PubSub.Registry); err != nil {
 		return nil, err
 	}
@@ -175,6 +180,9 @@ func (as *ApplicationServer) RegisterServices(s *grpc.Server) {
 	if as.webhooks != nil {
 		ttnpb.RegisterApplicationWebhookRegistryServer(s, web.NewWebhookRegistryRPC(as.webhooks.Registry()))
 	}
+	if as.webhookTemplates != nil {
+		ttnpb.RegisterApplicationWebhookTemplateRegistryServer(s, as.webhookTemplates)
+	}
 	if as.pubsub != nil {
 		ttnpb.RegisterApplicationPubSubRegistryServer(s, as.pubsub)
 	}
@@ -187,6 +195,9 @@ func (as *ApplicationServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.Cl
 	ttnpb.RegisterAppAsHandler(as.Context(), s, conn)
 	if as.webhooks != nil {
 		ttnpb.RegisterApplicationWebhookRegistryHandler(as.Context(), s, conn)
+	}
+	if as.webhookTemplates != nil {
+		ttnpb.RegisterApplicationWebhookTemplateRegistryHandler(as.Context(), s, conn)
 	}
 	if as.pubsub != nil {
 		ttnpb.RegisterApplicationPubSubRegistryHandler(as.Context(), s, conn)

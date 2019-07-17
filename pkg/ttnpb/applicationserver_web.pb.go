@@ -131,7 +131,7 @@ func (m *ApplicationWebhookTemplateIdentifiers) GetTemplateID() string {
 // A field can be an API key, an username or password, or any custom platform specific field (such as region).
 // The fields are meant to be replaced inside the URLs and headers when the webhook is created.
 type ApplicationWebhookTemplateField struct {
-	// The ID of the field. It is meant to be used in the replacement process as `{{.ID}}`.
+	// The ID of the field.
 	ID string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// The name of the field.
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
@@ -221,9 +221,9 @@ type ApplicationWebhookTemplate struct {
 	DocumentationURL                      string                             `protobuf:"bytes,6,opt,name=documentation_url,json=documentationUrl,proto3" json:"documentation_url,omitempty"`
 	Format                                string                             `protobuf:"bytes,7,opt,name=format,proto3" json:"format,omitempty"`
 	Fields                                []*ApplicationWebhookTemplateField `protobuf:"bytes,8,rep,name=fields,proto3" json:"fields,omitempty"`
-	// The HTTP headers used by the template. Both the key and the value can contain Fields.
+	// The HTTP headers used by the template. Both the key and the value can contain TemplateFields.
 	Headers map[string]string `protobuf:"bytes,9,rep,name=headers,proto3" json:"headers,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	// The base URL of the template. Can contain Fields.
+	// The base URL of the template. Can contain TemplateFields, in RFC 6570 format.
 	BaseURL              string                              `protobuf:"bytes,10,opt,name=base_url,json=baseUrl,proto3" json:"base_url,omitempty"`
 	UplinkMessage        *ApplicationWebhookTemplate_Message `protobuf:"bytes,11,opt,name=uplink_message,json=uplinkMessage,proto3" json:"uplink_message,omitempty"`
 	JoinAccept           *ApplicationWebhookTemplate_Message `protobuf:"bytes,12,opt,name=join_accept,json=joinAccept,proto3" json:"join_accept,omitempty"`
@@ -389,7 +389,7 @@ func (m *ApplicationWebhookTemplate) GetLocationSolved() *ApplicationWebhookTemp
 }
 
 type ApplicationWebhookTemplate_Message struct {
-	// Path to append to the base URL. Can contain Fields.
+	// Path to append to the base URL. Can contain TemplateFields, in RFC 6570 format.
 	Path                 string   `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_sizecache        int32    `json:"-"`

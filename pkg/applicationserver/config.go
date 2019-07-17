@@ -24,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/web"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/fetch"
 	"go.thethings.network/lorawan-stack/pkg/log"
 )
 
@@ -72,13 +73,21 @@ var (
 	errWebhooksTarget   = errors.DefineInvalidArgument("webhooks_target", "invalid webhooks target `{target}`")
 )
 
+// WebhookTemplatesConfig defines the configuration for the webhook templates registry.
+type WebhookTemplatesConfig struct {
+	Static    map[string][]byte `name:"-"`
+	Directory string            `name:"directory" description:"Retrieve the webhook templates from the filesystem"`
+	URL       string            `name:"url" description:"Retrieve the webhook templates from a web server"`
+}
+
 // WebhooksConfig defines the configuration of the webhooks integration.
 type WebhooksConfig struct {
-	Registry  web.WebhookRegistry `name:"-"`
-	Target    string              `name:"target" description:"Target of the integration (direct)"`
-	Timeout   time.Duration       `name:"timeout" description:"Wait timeout of the target to process the request"`
-	QueueSize int                 `name:"queue-size" description:"Number of requests to queue"`
-	Workers   int                 `name:"workers" description:"Number of workers to process requests"`
+	Registry  web.WebhookRegistry    `name:"-"`
+	Target    string                 `name:"target" description:"Target of the integration (direct)"`
+	Timeout   time.Duration          `name:"timeout" description:"Wait timeout of the target to process the request"`
+	QueueSize int                    `name:"queue-size" description:"Number of requests to queue"`
+	Workers   int                    `name:"workers" description:"Number of workers to process requests"`
+	Templates WebhookTemplatesConfig `name:"templates" description:"The store of the webhook templates"`
 }
 
 // PubSubConfig contains go-cloud PubSub configuration of the Application Server.
@@ -120,6 +129,23 @@ func (c WebhooksConfig) NewWebhooks(ctx context.Context, server io.Server) (web.
 		}()
 	}
 	return web.NewWebhooks(ctx, server, c.Registry, target), nil
+}
+
+// NewTemplateStore returns a new *web.TemplatStore based on the configuration.
+// If no stores are provided, this method returns nil.
+func (c WebhooksConfig) NewTemplateStore() (*web.TemplateStore, error) {
+	var fetcher fetch.Interface
+	switch {
+	case c.Templates.Static != nil:
+		fetcher = fetch.NewMemFetcher(c.Templates.Static)
+	case c.Templates.Directory != "":
+		fetcher = fetch.FromFilesystem(c.Templates.Directory)
+	case c.Templates.URL != "":
+		fetcher = fetch.FromHTTP(c.Templates.URL, true)
+	default:
+		return nil, nil
+	}
+	return web.NewTemplateStore(fetcher)
 }
 
 // NewPubSub returns a new pubsub.PubSub based on the configuration.

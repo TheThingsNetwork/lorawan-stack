@@ -7102,11 +7102,11 @@
           "additionalProperties": {
             "type": "string"
           },
-          "description": "The HTTP headers used by the template. Both the key and the value can contain Fields."
+          "description": "The HTTP headers used by the template. Both the key and the value can contain TemplateFields."
         },
         "base_url": {
           "type": "string",
-          "description": "The base URL of the template. Can contain Fields."
+          "description": "The base URL of the template. Can contain TemplateFields, in RFC 6570 format."
         },
         "uplink_message": {
           "$ref": "#/definitions/v3ApplicationWebhookTemplateMessage"
@@ -7139,7 +7139,7 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "The ID of the field. It is meant to be used in the replacement process as `{{.ID}}`."
+          "description": "The ID of the field."
         },
         "name": {
           "type": "string",
@@ -7174,7 +7174,7 @@
       "properties": {
         "path": {
           "type": "string",
-          "description": "Path to append to the base URL. Can contain Fields."
+          "description": "Path to append to the base URL. Can contain TemplateFields, in RFC 6570 format."
         }
       }
     },

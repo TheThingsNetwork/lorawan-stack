@@ -1025,8 +1025,8 @@ The NATS provider settings.
 | `documentation_url` | [`string`](#string) |  |  |
 | `format` | [`string`](#string) |  |  |
 | `fields` | [`ApplicationWebhookTemplateField`](#ttn.lorawan.v3.ApplicationWebhookTemplateField) | repeated |  |
-| `headers` | [`ApplicationWebhookTemplate.HeadersEntry`](#ttn.lorawan.v3.ApplicationWebhookTemplate.HeadersEntry) | repeated | The HTTP headers used by the template. Both the key and the value can contain Fields. |
-| `base_url` | [`string`](#string) |  | The base URL of the template. Can contain Fields. |
+| `headers` | [`ApplicationWebhookTemplate.HeadersEntry`](#ttn.lorawan.v3.ApplicationWebhookTemplate.HeadersEntry) | repeated | The HTTP headers used by the template. Both the key and the value can contain TemplateFields. |
+| `base_url` | [`string`](#string) |  | The base URL of the template. Can contain TemplateFields, in RFC 6570 format. |
 | `uplink_message` | [`ApplicationWebhookTemplate.Message`](#ttn.lorawan.v3.ApplicationWebhookTemplate.Message) |  |  |
 | `join_accept` | [`ApplicationWebhookTemplate.Message`](#ttn.lorawan.v3.ApplicationWebhookTemplate.Message) |  |  |
 | `downlink_ack` | [`ApplicationWebhookTemplate.Message`](#ttn.lorawan.v3.ApplicationWebhookTemplate.Message) |  |  |
@@ -1060,7 +1060,7 @@ The NATS provider settings.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `path` | [`string`](#string) |  | Path to append to the base URL. Can contain Fields. |
+| `path` | [`string`](#string) |  | Path to append to the base URL. Can contain TemplateFields, in RFC 6570 format. |
 
 ### <a name="ttn.lorawan.v3.ApplicationWebhookTemplateField">Message `ApplicationWebhookTemplateField`</a>
 
@@ -1070,7 +1070,7 @@ The fields are meant to be replaced inside the URLs and headers when the webhook
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `id` | [`string`](#string) |  | The ID of the field. It is meant to be used in the replacement process as `{{.ID}}`. |
+| `id` | [`string`](#string) |  | The ID of the field. |
 | `name` | [`string`](#string) |  | The name of the field. |
 | `description` | [`string`](#string) |  | The description of the field. |
 | `secret` | [`bool`](#bool) |  | Secret decides if the field should be shown in plain-text or should stay hidden. |
