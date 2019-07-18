@@ -13,7 +13,7 @@
 // limitations under the License.
 
 const error = function (state = {}, action) {
-  const { type, error, payload: errorValue } = action
+  const { type, payload: errorValue } = action
 
   const matches = /(.*)_(REQUEST|SUCCESS|FAILURE)/.exec(type)
   if (!matches) {
@@ -23,7 +23,7 @@ const error = function (state = {}, action) {
   const [ , key, status ] = matches
   return {
     ...state,
-    [key]: status === 'FAILURE' && error ? errorValue : undefined,
+    [key]: status === 'FAILURE' ? errorValue : undefined,
   }
 }
 

@@ -18,7 +18,7 @@ import sharedMessages from '../../../../lib/shared-messages'
 import api from '../../../api'
 import * as gateways from '../../actions/gateways'
 import { gsConfigSelector } from '../../../../lib/selectors/env'
-import { selectSelectedGateway } from '../../selectors/gateways'
+import { selectGatewayById } from '../../selectors/gateways'
 import createEventsConnectLogics from './events'
 import createRequestLogic from './lib'
 
@@ -35,10 +35,21 @@ const getGatewayLogic = createRequestLogic({
 const updateGatewayLogic = createRequestLogic({
   type: gateways.UPDATE_GTW,
   async process ({ action }) {
-    const { payload: { gatewayId, patch }} = action
-    const result = await api.gateway.update(gatewayId, patch)
+    const { payload: { id, patch }} = action
+    const result = await api.gateway.update(id, patch)
 
     return { ...patch, ...result }
+  },
+})
+
+const deleteGatewayLogic = createRequestLogic({
+  type: gateways.DELETE_GTW,
+  async process ({ action }) {
+    const { id } = action.payload
+
+    await api.gateway.delete(id)
+
+    return { id }
   },
 })
 
@@ -57,8 +68,9 @@ const getGatewaysLogic = createRequestLogic({
         name_contains: query,
       }, selectors)
       : await api.gateways.list({ page, limit }, selectors)
+
     return {
-      gateways: data.gateways,
+      entities: data.gateways,
       totalCount: data.totalCount,
     }
   },
@@ -100,16 +112,23 @@ const startGatewayStatisticsLogic = createLogic({
   cancelType: [
     gateways.STOP_GTW_STATS,
     gateways.UPDATE_GTW_STATS_FAILURE,
-    gateways.UPDATE_GTW_STATS_UNAVAILABLE,
   ],
   warnTimeout: 0,
-  validate ({ getState, action }, allow, reject) {
+  processOptions: {
+    dispatchMultiple: true,
+  },
+  async process ({ cancelled$, action, getState }, dispatch, done) {
+    const { id } = action.payload
+    const { timeout = 5000 } = action.meta
+
     const gsConfig = gsConfigSelector()
-    const gtw = selectSelectedGateway(getState())
+    const gtw = selectGatewayById(getState(), id)
 
     if (!gsConfig.enabled) {
-      reject(gateways.updateGatewayStatisticsUnavailable())
-      return
+      dispatch(gateways.startGatewayStatisticsFailure({
+        message: 'Unavailable',
+      }))
+      done()
     }
 
     let gtwGsAddress
@@ -124,36 +143,25 @@ const startGatewayStatisticsLogic = createLogic({
       gtwGsAddress = gtwAddress.split(':')[0]
       consoleGsAddress = new URL(gsConfig.base_url).hostname
     } catch (error) {
-      reject(gateways.updateGatewayStatisticsFailure({
+      dispatch(gateways.startGatewayStatisticsFailure({
         message: sharedMessages.unknown,
       }))
-      return
+      done()
     }
 
     if (gtwGsAddress !== consoleGsAddress) {
-      reject(gateways.updateGatewayStatisticsFailure({
+      dispatch(gateways.startGatewayStatisticsFailure({
         message: sharedMessages.otherCluster,
       }))
-      return
+      done()
     }
 
-    const { meta = {}} = action
-
-    let transformed = action
-    if (!meta.timeout) {
-      transformed = { ...action, meta: { ...meta, timeout: 5000 }}
-    }
-
-    allow(transformed)
-  },
-  async process ({ cancelled$, action }, dispatch, done) {
-    const { id, meta } = action
-
+    dispatch(gateways.startGatewayStatisticsSuccess())
     dispatch(gateways.updateGatewayStatistics(id))
 
     const interval = setInterval(
       () => dispatch(gateways.updateGatewayStatistics(id)),
-      meta.timeout
+      timeout
     )
 
     cancelled$.subscribe(() => clearInterval(interval))
@@ -164,7 +172,10 @@ const updateGatewayStatisticsLogic = createRequestLogic({
   type: gateways.UPDATE_GTW_STATS,
   async process ({ action }) {
     const { id } = action.payload
-    return api.gateway.stats(id)
+
+    const stats = await api.gateway.stats(id)
+
+    return { stats }
   },
 })
 
@@ -188,6 +199,7 @@ const getGatewayApiKeyLogic = createRequestLogic({
 export default [
   getGatewayLogic,
   updateGatewayLogic,
+  deleteGatewayLogic,
   getGatewaysLogic,
   getGatewaysRightsLogic,
   getGatewayCollaboratorsLogic,

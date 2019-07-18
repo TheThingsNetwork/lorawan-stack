@@ -28,6 +28,7 @@ import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 
 import { updateGateway } from '../../store/actions/gateways'
+import { selectSelectedGateway } from '../../store/selectors/gateways'
 
 import {
   latitude as latitudeRegexp,
@@ -62,13 +63,15 @@ const getRegistryLocation = function (antennas) {
   return registryLocation
 }
 
-@connect(
-  ({ gateway }, props) => ({
-    gateway: gateway.gateway,
-    gtwId: getGatewayId(gateway.gateway),
-  }),
-  { updateGateway }
-)
+@connect(function (state) {
+  const gateway = selectSelectedGateway(state)
+
+  return {
+    gateway,
+    gtwId: getGatewayId(gateway),
+  }
+},
+{ updateGateway })
 @withBreadcrumb('gateway.single.data', function (props) {
   const { gtwId } = props
   return (

@@ -20,14 +20,13 @@ import {
 import { SHARED_NAME as GATEWAY_SHARED_NAME } from '../actions/gateways'
 
 import { SHARED_NAME as DEVICE_SHARED_NAME } from '../actions/device'
-import { getApplicationId } from '../../../lib/selectors/id'
+import { getApplicationId, getGatewayId } from '../../../lib/selectors/id'
 import user from './user'
 import init from './init'
 import applications from './applications'
 import devices from './devices'
 import device from './device'
 import gateways from './gateways'
-import gateway from './gateway'
 import configuration from './configuration'
 import createNamedApiKeysReducer from './api-keys'
 import createNamedRightsReducer from './rights'
@@ -50,7 +49,6 @@ export default combineReducers({
   devices,
   device,
   gateways,
-  gateway,
   webhook,
   webhooks,
   webhookFormats,
@@ -82,6 +80,10 @@ export default combineReducers({
     applications: createNamedPaginationReducer(
       APPLICATION_SHARED_NAME,
       getApplicationId
+    ),
+    gateways: createNamedPaginationReducer(
+      GATEWAY_SHARED_NAME,
+      getGatewayId
     ),
   }),
 })

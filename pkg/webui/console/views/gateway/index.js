@@ -15,6 +15,7 @@
 import React from 'react'
 import { Switch, Route } from 'react-router'
 import { connect } from 'react-redux'
+import { replace } from 'connected-react-router'
 
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import sharedMessages from '../../../lib/shared-messages'
@@ -23,6 +24,7 @@ import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import Spinner from '../../../components/spinner'
 import Message from '../../../lib/components/message'
+import withEnv, { EnvProvider } from '../../../lib/components/env'
 
 import GatewayOverview from '../gateway-overview'
 import GatewayApiKeys from '../gateway-api-keys'
@@ -31,6 +33,7 @@ import GatewayLocation from '../gateway-location'
 import GatewayData from '../gateway-data'
 import GatewayGeneralSettings from '../gateway-general-settings'
 
+import { getGatewayId } from '../../../lib/selectors/id'
 import {
   getGateway,
   startGatewayEventsStream,
@@ -41,14 +44,18 @@ import {
   selectGatewayError,
   selectSelectedGateway,
 } from '../../store/selectors/gateways'
-import withEnv, { EnvProvider } from '../../../lib/components/env'
 
 @connect(function (state, props) {
   const gtwId = props.match.params.gtwId
+  const selectedGateway = selectSelectedGateway(state)
+
+  const gateway = gtwId === getGatewayId(selectedGateway)
+    ? selectedGateway
+    : undefined
 
   return {
     gtwId,
-    gateway: selectSelectedGateway(state),
+    gateway,
     error: selectGatewayError(state),
     fetching: selectGatewayFetching(state),
   }
@@ -57,6 +64,7 @@ dispatch => ({
   getGateway: (id, meta) => dispatch(getGateway(id, meta)),
   startStream: id => dispatch(startGatewayEventsStream(id)),
   stopStream: id => dispatch(stopGatewayEventsStream(id)),
+  redirectToList: () => dispatch(replace('/console/gateways')),
 }))
 @withSideNavigation(function (props) {
   const { match, gtwId } = props
@@ -115,8 +123,7 @@ dispatch => ({
 export default class Gateway extends React.Component {
 
   componentDidMount () {
-    const { getGateway, startStream, match } = this.props
-    const { gtwId } = match.params
+    const { getGateway, startStream, gtwId } = this.props
 
     startStream(gtwId)
     getGateway(gtwId, [
@@ -128,6 +135,17 @@ export default class Gateway extends React.Component {
       'enforce_duty_cycle',
       'antennas',
     ])
+  }
+
+  componentDidUpdate (prevProps) {
+    const { gtwId, gateway, redirectToList } = this.props
+
+    const isSame = gtwId === getGatewayId(prevProps.gateway)
+    const isDeleted = Boolean(prevProps.gateway) && !Boolean(gateway)
+
+    if (isSame && isDeleted) {
+      redirectToList()
+    }
   }
 
   componentWillUnmount () {
@@ -144,7 +162,7 @@ export default class Gateway extends React.Component {
       throw error
     }
 
-    if (fetching || !gateway) {
+    if (!Boolean(gateway) || fetching) {
       return (
         <Spinner center>
           <Message content={sharedMessages.loading} />

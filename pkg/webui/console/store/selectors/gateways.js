@@ -14,13 +14,14 @@
 
 import {
   GET_GTW_BASE,
+  GET_GTWS_LIST_BASE,
   GET_GTW_API_KEY_BASE,
   GET_GTW_API_KEYS_LIST_BASE,
   UPDATE_GTW_STATS_BASE,
   GET_GTWS_RIGHTS_LIST_BASE,
+  START_GTW_STATS_BASE,
 } from '../actions/gateways'
 
-import { getGatewayId } from '../../../lib/selectors/id'
 import {
   createEventsSelector,
   createEventsErrorSelector,
@@ -30,7 +31,14 @@ import {
   createRightsSelector,
   createUniversalRightsSelector,
 } from './rights'
-import { createApiKeysSelector, createApiKeysStoreSelector } from './api-keys'
+import {
+  createApiKeysSelector,
+  createApiKeysStoreSelector,
+} from './api-keys'
+import {
+  createPaginationIdsSelectorByEntity,
+  createPaginationTotalCountSelectorByEntity,
+} from './pagination'
 import { createApiKeySelector } from './api-key'
 import { createFetchingSelector } from './fetching'
 import { createErrorSelector } from './error'
@@ -38,13 +46,28 @@ import { createErrorSelector } from './error'
 const ENTITY = 'gateways'
 const ENTITY_SINGLE = 'gateway'
 
-const selectGatewayStore = state => state.gateway
 
 // Gateway Entity
-export const selectSelectedGateway = state => selectGatewayStore(state).gateway
-export const selectSelectedGatewayId = state => getGatewayId(selectSelectedGateway(state))
+export const selectGatewayStore = state => state.gateways
+export const selectGatewayEntitiesStore = state => selectGatewayStore(state).entities
+export const selectGatewayStatisticsStore = state => selectGatewayStore(state).statistics
+export const selectGatewayById = (state, id) => selectGatewayEntitiesStore(state)[id]
+export const selectSelectedGatewayId = state => selectGatewayStore(state).selectedGateway
+export const selectSelectedGateway = state => selectGatewayById(state, selectSelectedGatewayId(state))
+
 export const selectGatewayFetching = createFetchingSelector(GET_GTW_BASE)
 export const selectGatewayError = createErrorSelector(GET_GTW_BASE)
+
+// Gateways
+const selectGtwsIds = createPaginationIdsSelectorByEntity(ENTITY)
+const selectGtwsTotalCount = createPaginationTotalCountSelectorByEntity(ENTITY)
+const selectGtwsFetching = createFetchingSelector(GET_GTWS_LIST_BASE)
+const selectGtwsError = createErrorSelector(GET_GTWS_LIST_BASE)
+
+export const selectGateways = state => selectGtwsIds(state).map(id => selectGatewayById(state, id))
+export const selectGatewaysTotalCount = state => selectGtwsTotalCount(state)
+export const selectGatewaysFetching = state => selectGtwsFetching(state)
+export const selectGatewaysError = state => selectGtwsError(state)
 
 // Events
 export const selectGatewayEvents = createEventsSelector(ENTITY)
@@ -67,20 +90,17 @@ export const selectGatewayRightsError = createErrorSelector(ENTITY)
 export const selectGatewayRightsFetching = createFetchingSelector(GET_GTWS_RIGHTS_LIST_BASE)
 
 // Statistics
-export const selectGatewayStatisticsError = createErrorSelector(UPDATE_GTW_STATS_BASE)
-export const selectGatewayStatisticsIsFetching = createFetchingSelector(UPDATE_GTW_STATS_BASE)
-const selectGatewayStatisticStore = function (state) {
-  const store = selectGatewayStore(state)
+export const selectGatewayStatisticsConnectError = createErrorSelector(START_GTW_STATS_BASE)
+export const selectGatewayStatisticsUpdateError = function (state) {
+  const statistics = selectGatewayStatisticsStore(state) || {}
 
-  return store.statistics
+  return statistics.error
 }
+export const selectGatewayStatisticsError = state =>
+  selectGatewayStatisticsConnectError(state) || selectGatewayStatisticsUpdateError(state)
+export const selectGatewayStatisticsIsFetching = createFetchingSelector([ START_GTW_STATS_BASE, UPDATE_GTW_STATS_BASE ])
 export const selectGatewayStatistics = function (state) {
-  const store = selectGatewayStatisticStore(state)
+  const statistics = selectGatewayStatisticsStore(state) || {}
 
-  return store.stats
-}
-export const selectGatewayStatisticsIsAvailable = function (state) {
-  const store = selectGatewayStatisticStore(state)
-
-  return store.available
+  return statistics.stats
 }
