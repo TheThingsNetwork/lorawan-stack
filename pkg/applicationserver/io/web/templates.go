@@ -18,26 +18,34 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"time"
 
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/fetch"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"gopkg.in/yaml.v2"
 )
 
+const yamlFetchErrorCache = 1 * time.Minute
+
 // TemplateStore contains the webhook templates.
 type TemplateStore struct {
 	Fetcher fetch.Interface
 
-	templates      sync.Map
-	templateIDs    *[]string
-	templateIDsMu  sync.Mutex
-	templateIDsErr error
+	templateIDs          []string
+	templateIDsMu        sync.Mutex
+	templateIDsError     error
+	templateIDsErrorTime time.Time
+
+	templates   map[string]queryResult
+	templatesMu sync.Mutex
 }
 
 // NewTemplateStore creates a new template store that is backed by the provided fetcher.
 func NewTemplateStore(fetcher fetch.Interface) (*TemplateStore, error) {
 	return &TemplateStore{
-		Fetcher: fetcher,
+		Fetcher:   fetcher,
+		templates: make(map[string]queryResult),
 	}, nil
 }
 
@@ -76,56 +84,72 @@ func (ts *TemplateStore) ListTemplates(ctx context.Context, req *ttnpb.ListAppli
 	return &templates, nil
 }
 
-type registeredTemplate struct {
-	t     *ttnpb.ApplicationWebhookTemplate
-	err   error
-	ready chan struct{}
+type queryResult struct {
+	t    *ttnpb.ApplicationWebhookTemplate
+	err  error
+	time time.Time
 }
 
-func (ts *TemplateStore) getAllTemplateIDs() (ids []string, err error) {
-	ts.templateIDsMu.Lock()
-	defer ts.templateIDsMu.Unlock()
-	if ts.templateIDs != nil {
-		return *ts.templateIDs, ts.templateIDsErr
-	}
-	defer func() {
-		ts.templateIDs, ts.templateIDsErr = &ids, err
-	}()
+var (
+	errFetchFailed = errors.Define("fetch", "fetching failed")
+	errParseFile   = errors.DefineCorruption("parse_file", "could not parse file")
+)
 
+func (ts *TemplateStore) allTemplateIDs() (ids []string, err error) {
 	data, err := ts.Fetcher.File("templates.yml")
 	if err != nil {
-		return nil, err
+		return nil, errFetchFailed.WithCause(err)
 	}
 	err = yaml.Unmarshal(data, &ids)
 	if err != nil {
+		return nil, errParseFile.WithCause(err)
+	}
+	return ids, nil
+}
+
+func (ts *TemplateStore) getAllTemplateIDs() ([]string, error) {
+	ts.templateIDsMu.Lock()
+	defer ts.templateIDsMu.Unlock()
+	if ts.templateIDs != nil {
+		return ts.templateIDs, nil
+	}
+	if time.Since(ts.templateIDsErrorTime) < yamlFetchErrorCache {
+		return nil, ts.templateIDsError
+	}
+	ids, err := ts.allTemplateIDs()
+	if err != nil {
+		ts.templateIDsError, ts.templateIDsErrorTime = err, time.Now()
 		return nil, err
 	}
+	ts.templateIDs, ts.templateIDsError, ts.templateIDsErrorTime = ids, nil, time.Time{}
 	return ids, err
 }
 
-func (ts *TemplateStore) getTemplate(ids ttnpb.ApplicationWebhookTemplateIdentifiers) (t *ttnpb.ApplicationWebhookTemplate, err error) {
-	registeredI, ok := ts.templates.LoadOrStore(ids.TemplateID, &registeredTemplate{ready: make(chan struct{})})
-	registered := registeredI.(*registeredTemplate)
-	if ok {
-		<-registered.ready
-		return registered.t, registered.err
-	}
-	defer func() {
-		registered.t, registered.err = t, err
-		close(registered.ready)
-	}()
-
+func (ts *TemplateStore) template(ids ttnpb.ApplicationWebhookTemplateIdentifiers) (*ttnpb.ApplicationWebhookTemplate, error) {
 	data, err := ts.Fetcher.File(fmt.Sprintf("%s.yml", ids.TemplateID))
 	if err != nil {
-		return nil, err
+		return nil, errFetchFailed.WithCause(err)
 	}
-
 	template := &ttnpb.ApplicationWebhookTemplate{}
 	err = yaml.Unmarshal(data, template)
 	if err != nil {
-		return nil, err
+		return nil, errParseFile.WithCause(err)
 	}
+	return template, nil
+}
 
+func (ts *TemplateStore) getTemplate(ids ttnpb.ApplicationWebhookTemplateIdentifiers) (t *ttnpb.ApplicationWebhookTemplate, err error) {
+	ts.templatesMu.Lock()
+	defer ts.templatesMu.Unlock()
+	if cached, ok := ts.templates[ids.TemplateID]; ok && cached.err == nil && time.Since(cached.time) < yamlFetchErrorCache {
+		return cached.t, cached.err
+	}
+	template, err := ts.template(ids)
+	ts.templates[ids.TemplateID] = queryResult{
+		t:    template,
+		err:  err,
+		time: time.Now(),
+	}
 	return template, err
 }
 
