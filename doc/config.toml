@@ -5,7 +5,6 @@ title = "TTN Stack Documentation"
 
 baseURL = "http://localhost/"
 
-enableEmoji = true
 enableGitInfo = true
 
 languageCode = "en-us"
