@@ -106,9 +106,9 @@ const createEventsConnectLogics = function (
 
         // only proceed if connected
         const status = selectEntityEventsStatus(getState(), id)
-        const disconnected = status === CONNECTION_STATUS.DISCONNECTED
-        const unknown = status === CONNECTION_STATUS.UNKNOWN
-        if (disconnected || unknown) {
+        const connected = status === CONNECTION_STATUS.CONNECTED
+        const connecting = status === CONNECTION_STATUS.CONNECTING
+        if (!connected && !connecting) {
           reject()
           return
         }

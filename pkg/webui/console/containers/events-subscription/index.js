@@ -28,6 +28,7 @@ const mapConnectionStatusToWidget = function (status) {
   case CONNECTION_STATUS.CONNECTING:
     return Widget.CONNECTION_STATUS.MEDIOCRE
   case CONNECTION_STATUS.DISCONNECTED:
+  case CONNECTION_STATUS.ERROR:
     return Widget.CONNECTION_STATUS.BAD
   case CONNECTION_STATUS.UNKNOWN:
   default:

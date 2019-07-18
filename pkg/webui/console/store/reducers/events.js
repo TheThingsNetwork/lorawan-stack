@@ -62,7 +62,7 @@ const createNamedEventReducer = function (reducerName = '') {
       return {
         ...state,
         error: action.error,
-        status: CONNECTION_STATUS.UNKNOWN,
+        status: CONNECTION_STATUS.ERROR,
       }
     case STOP_EVENTS:
       return {
