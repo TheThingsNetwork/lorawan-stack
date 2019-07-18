@@ -26,10 +26,27 @@ import {
 import {
   selectGatewayEvents,
   selectGatewayEventsStatus,
+  selectGatewayEventsError,
 } from '../../store/selectors/gateways'
 
+@connect(
+  null,
+  (dispatch, ownProps) => ({
+    onClear: () => dispatch(clearGatewayEventsStream(ownProps.gtwId)),
+  }))
 @bind
-class GatewayEvents extends React.Component {
+export default class GatewayEvents extends React.Component {
+
+  static propTypes = {
+    gtwId: PropTypes.string.isRequired,
+    onClear: PropTypes.func.isRequired,
+    widget: PropTypes.bool,
+  }
+
+  static defaultProps = {
+    widget: false,
+  }
+
   render () {
     const {
       gtwId,
@@ -43,25 +60,10 @@ class GatewayEvents extends React.Component {
         widget={widget}
         eventsSelector={selectGatewayEvents}
         statusSelector={selectGatewayEventsStatus}
+        errorSelector={selectGatewayEventsError}
         onClear={onClear}
         toAllUrl={`/console/gateways/${gtwId}/data`}
       />
     )
   }
 }
-
-GatewayEvents.propTypes = {
-  gtwId: PropTypes.string.isRequired,
-  onClear: PropTypes.func.isRequired,
-  widget: PropTypes.bool,
-}
-
-GatewayEvents.defaultProps = {
-  widget: false,
-}
-
-export default connect(
-  null,
-  (dispatch, ownProps) => ({
-    onClear: () => dispatch(clearGatewayEventsStream(ownProps.gtwId)),
-  }))(GatewayEvents)

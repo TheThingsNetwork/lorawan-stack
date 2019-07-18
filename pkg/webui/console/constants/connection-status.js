@@ -17,4 +17,5 @@ export default Object.freeze({
   DISCONNECTED: 'disconnected',
   CONNECTING: 'connecting',
   UNKNOWN: 'unknown',
+  ERROR: 'error',
 })

@@ -19,6 +19,7 @@ import {
   createStartEventsStreamActionType,
   createStopEventsStreamActionType,
   createStartEventsStreamFailureActionType,
+  createGetEventMessageFailureActionType,
   getEventMessageSuccess,
   getEventMessageFailure,
   startEventsStreamFailure,
@@ -43,6 +44,7 @@ const createEventsConnectLogics = function (
   const START_EVENTS = createStartEventsStreamActionType(reducerName)
   const START_EVENTS_FAILURE = createStartEventsStreamFailureActionType(reducerName)
   const STOP_EVENTS = createStopEventsStreamActionType(reducerName)
+  const GET_EVENT_MESSAGE_FAILURE = createGetEventMessageFailureActionType(reducerName)
   const startEventsSuccess = startEventsStreamSuccess(reducerName)
   const startEventsFailure = startEventsStreamFailure(reducerName)
   const stopEvents = stopEventsStream(reducerName)
@@ -55,11 +57,16 @@ const createEventsConnectLogics = function (
   return [
     createLogic({
       type: START_EVENTS,
+      cancelType: [ STOP_EVENTS, START_EVENTS_FAILURE, GET_EVENT_MESSAGE_FAILURE ],
       warnTimeout: 0,
+      processOptions: {
+        dispatchMultiple: true,
+      },
       validate ({ getState, action }, allow, reject) {
         const { id } = action
         if (!id) {
           reject()
+          return
         }
 
         // only proceed if not already connected
@@ -68,45 +75,50 @@ const createEventsConnectLogics = function (
         const connecting = status === CONNECTION_STATUS.CONNECTING
         if (connected || connecting) {
           reject()
+          return
         }
 
         allow(action)
       },
-      async process ({ action }, dispatch, done) {
+      async process ({ getState, action }, dispatch) {
         const { id } = action
 
         try {
           channel = await onEventsStart([ id ])
+
           channel.on('start', () => dispatch(startEventsSuccess(id)))
           channel.on('event', message => dispatch(getEventSuccess(id, message)))
           channel.on('error', error => dispatch(getEventFailure(id, error)))
           channel.on('close', () => dispatch(stopEvents(id)))
         } catch (error) {
-          dispatch(startEventsFailure(error))
-          done()
+          dispatch(startEventsFailure(id, error))
         }
       },
     }),
     createLogic({
-      type: [ STOP_EVENTS, START_EVENTS_FAILURE ],
+      type: [ STOP_EVENTS, START_EVENTS_FAILURE, GET_EVENT_MESSAGE_FAILURE ],
       validate ({ getState, action }, allow, reject) {
         const { id } = action
-        if (!id || !channel) {
+        if (!id) {
           reject()
+          return
         }
 
         // only proceed if connected
         const status = selectEntityEventsStatus(getState(), id)
-        const disconnected = status === CONNECTION_STATUS.DISCONNECTED
-        const unknown = status === CONNECTION_STATUS.UNKNOWN
-        if (disconnected || unknown) {
+        const connected = status === CONNECTION_STATUS.CONNECTED
+        const connecting = status === CONNECTION_STATUS.CONNECTING
+        if (!connected && !connecting) {
           reject()
+          return
         }
 
         allow(action)
       },
       process (_, __, done) {
-        channel.close()
+        if (channel) {
+          channel.close()
+        }
         done()
       },
     }),

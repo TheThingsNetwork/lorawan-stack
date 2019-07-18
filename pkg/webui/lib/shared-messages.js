@@ -68,6 +68,7 @@ export default defineMessages({
   email: 'Email',
   enabled: 'Enabled',
   entityId: 'Entity ID',
+  eventsCannotShow: 'Cannot show events',
   firmwareVersion: 'Firmware Version',
   frequencyPlan: 'Frequency Plan',
   fwdNtwkKey: 'FNwkSIntKey',

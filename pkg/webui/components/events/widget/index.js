@@ -20,6 +20,7 @@ import Link from '../../link'
 import Message from '../../../lib/components/message'
 import Status from '../../status'
 import List from '../../list'
+import Notification from '../../notification'
 import PropTypes from '../../../lib/prop-types'
 import getEventComponentByName from '../../event/types'
 
@@ -58,6 +59,7 @@ class EventsWidget extends React.PureComponent {
       emitterId,
       connectionStatus,
       limit,
+      error,
     } = this.props
 
     let latestActivityTime = null
@@ -90,23 +92,30 @@ class EventsWidget extends React.PureComponent {
             label={statusMessage}
             status={connectionStatus}
           />
-          <Link to={toAllUrl}>
-            <Message
-              className={style.seeAllMessage}
-              content={m.seeAllActivity}
-            />
-            →
-          </Link>
+          {!error && (
+            <Link to={toAllUrl}>
+              <Message
+                className={style.seeAllMessage}
+                content={m.seeAllActivity}
+              />
+              →
+            </Link>
+          )}
         </div>
-        <List
-          bordered
-          listClassName={style.list}
-          size="small"
-          items={truncatedEvents}
-          renderItem={this.renderEvent}
-          emptyMessage={sharedMessages.noEvents}
-          emptyMessageValues={{ entityId: emitterId }}
-        />
+        {error
+          ? <Notification small title={sharedMessages.eventsCannotShow} error={error} />
+          : (
+            <List
+              bordered
+              listClassName={style.list}
+              size="small"
+              items={truncatedEvents}
+              renderItem={this.renderEvent}
+              emptyMessage={sharedMessages.noEvents}
+              emptyMessageValues={{ entityId: emitterId }}
+            />
+          )
+        }
       </aside>
     )
   }

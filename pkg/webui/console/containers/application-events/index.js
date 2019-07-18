@@ -26,6 +26,7 @@ import {
 import {
   selectApplicationEvents,
   selectApplicationEventsStatus,
+  selectApplicationEventsError,
 } from '../../store/selectors/applications'
 
 @connect(
@@ -34,7 +35,18 @@ import {
     onClear: () => dispatch(clearApplicationEventsStream(ownProps.appId)),
   }))
 @bind
-class ApplicationEvents extends React.Component {
+export default class ApplicationEvents extends React.Component {
+
+  static propTypes = {
+    appId: PropTypes.string.isRequired,
+    onClear: PropTypes.func.isRequired,
+    widget: PropTypes.bool,
+  }
+
+  static defaultProps = {
+    widget: false,
+  }
+
   render () {
     const {
       appId,
@@ -48,20 +60,10 @@ class ApplicationEvents extends React.Component {
         widget={widget}
         eventsSelector={selectApplicationEvents}
         statusSelector={selectApplicationEventsStatus}
+        errorSelector={selectApplicationEventsError}
         onClear={onClear}
         toAllUrl={`/console/applications/${appId}/data`}
       />
     )
   }
 }
-
-ApplicationEvents.propTypes = {
-  appId: PropTypes.string.isRequired,
-  widget: PropTypes.bool,
-}
-
-ApplicationEvents.defaultProps = {
-  widget: false,
-}
-
-export default ApplicationEvents
