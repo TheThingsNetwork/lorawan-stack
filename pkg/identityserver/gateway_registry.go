@@ -192,7 +192,7 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 			return err
 		}
 		for i, gtw := range gtws.Gateways {
-			if !gtwRights[unique.ID(ctx, gtw.GatewayIdentifiers)].IncludesAll(ttnpb.RIGHT_GATEWAY_INFO) {
+			if rights.RequireGateway(ctx, gtw.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_INFO) != nil {
 				gtws.Gateways[i] = gtw.PublicSafe()
 			}
 		}

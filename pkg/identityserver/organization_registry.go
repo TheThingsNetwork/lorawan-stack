@@ -171,7 +171,7 @@ func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.List
 			return err
 		}
 		for i, org := range orgs.Organizations {
-			if !orgRights[unique.ID(ctx, org.OrganizationIdentifiers)].IncludesAll(ttnpb.RIGHT_ORGANIZATION_INFO) {
+			if rights.RequireOrganization(ctx, org.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_INFO) != nil {
 				orgs.Organizations[i] = org.PublicSafe()
 			}
 		}
