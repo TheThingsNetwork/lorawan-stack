@@ -771,6 +771,7 @@ func init() {
 
 	endDeviceTemplatesCreateCommand.Flags().AddFlagSet(setEndDeviceFlags)
 	endDeviceTemplatesFromDeviceCommand.Flags().AddFlagSet(selectEndDeviceFlags)
+	endDeviceTemplatesExecuteCommand.Flags().AddFlagSet(setEndDeviceFlags)
 }
 
 var errAddressMismatchEndDevice = errors.DefineAborted("end_device_server_address_mismatch", "network/application/join server address mismatch")

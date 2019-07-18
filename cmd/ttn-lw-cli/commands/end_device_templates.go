@@ -157,6 +157,35 @@ var (
 			return io.Write(os.Stdout, config.OutputFormat, res)
 		}),
 	}
+	endDeviceTemplatesExecuteCommand = &cobra.Command{
+		Use:   "execute [flags]",
+		Short: "Execute the template to an end device",
+		Long: `Execute the template to an end device
+
+This command takes device templates from stdin.`,
+		PersistentPreRunE: preRun(),
+		RunE: asBulk(func(cmd *cobra.Command, args []string) error {
+			if inputDecoder == nil {
+				return nil
+			}
+
+			forwardDeprecatedDeviceFlags(cmd.Flags())
+
+			var input ttnpb.EndDeviceTemplate
+			_, err := inputDecoder.Decode(&input)
+			if err != nil {
+				return err
+			}
+
+			var device ttnpb.EndDevice
+			device.SetFields(&input.EndDevice, input.FieldMask.Paths...)
+			if err := util.SetFields(&device, setEndDeviceFlags); err != nil {
+				return err
+			}
+
+			return io.Write(os.Stdout, config.OutputFormat, &device)
+		}),
+	}
 	endDeviceTemplatesAssignEUIsCommand = &cobra.Command{
 		Use:     "assign-euis [join-eui] [start-dev-eui] [flags]",
 		Aliases: []string{"euis"},
@@ -403,6 +432,7 @@ func init() {
 	endDeviceTemplatesFromDeviceCommand.Flags().AddFlagSet(selectEndDeviceIDFlags())
 	endDeviceTemplatesFromDeviceCommand.Flags().String("mapping-key", "", "")
 	endDeviceTemplatesCommand.AddCommand(endDeviceTemplatesFromDeviceCommand)
+	endDeviceTemplatesCommand.AddCommand(endDeviceTemplatesExecuteCommand)
 	endDeviceTemplatesAssignEUIsCommand.Flags().String("join-eui", "", "(hex)")
 	endDeviceTemplatesAssignEUIsCommand.Flags().String("start-dev-eui", "", "(hex)")
 	endDeviceTemplatesAssignEUIsCommand.Flags().Int("count", 1, "")
