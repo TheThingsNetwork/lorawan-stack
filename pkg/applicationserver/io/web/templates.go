@@ -16,12 +16,12 @@ package web
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"sync"
 
 	"go.thethings.network/lorawan-stack/pkg/fetch"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"gopkg.in/yaml.v2"
 )
 
 // TemplateStore contains the webhook templates.
@@ -92,11 +92,11 @@ func (ts *TemplateStore) getAllTemplateIDs() (ids []string, err error) {
 		ts.templateIDs, ts.templateIDsErr = &ids, err
 	}()
 
-	data, err := ts.Fetcher.File("templates.json")
+	data, err := ts.Fetcher.File("templates.yml")
 	if err != nil {
 		return nil, err
 	}
-	err = json.Unmarshal(data, &ids)
+	err = yaml.Unmarshal(data, &ids)
 	if err != nil {
 		return nil, err
 	}
@@ -115,13 +115,13 @@ func (ts *TemplateStore) getTemplate(ids ttnpb.ApplicationWebhookTemplateIdentif
 		close(registered.ready)
 	}()
 
-	data, err := ts.Fetcher.File(fmt.Sprintf("%s.json", ids.TemplateID))
+	data, err := ts.Fetcher.File(fmt.Sprintf("%s.yml", ids.TemplateID))
 	if err != nil {
 		return nil, err
 	}
 
 	template := &ttnpb.ApplicationWebhookTemplate{}
-	err = json.Unmarshal(data, template)
+	err = yaml.Unmarshal(data, template)
 	if err != nil {
 		return nil, err
 	}

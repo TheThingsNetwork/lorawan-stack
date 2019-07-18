@@ -59,7 +59,7 @@ func TestTemplateStore(t *testing.T) {
 		{
 			name: "InvalidStore",
 			fetcher: fetch.NewMemFetcher(map[string][]byte{
-				"templates.json": []byte(`invalid-json`),
+				"templates.yml": []byte(`invalid-yaml`),
 			}),
 			assertGet: func(a *assertions.Assertion, res *ttnpb.ApplicationWebhookTemplate, err error) {
 				a.So(err, should.NotBeNil)
@@ -73,7 +73,7 @@ func TestTemplateStore(t *testing.T) {
 		{
 			name: "EmptyStore",
 			fetcher: fetch.NewMemFetcher(map[string][]byte{
-				"templates.json": []byte(`[]`),
+				"templates.yml": []byte(`--- []`),
 			}),
 			assertGet: func(a *assertions.Assertion, res *ttnpb.ApplicationWebhookTemplate, err error) {
 				a.So(err, should.NotBeNil)
@@ -88,8 +88,14 @@ func TestTemplateStore(t *testing.T) {
 		{
 			name: "NormalStore",
 			fetcher: fetch.NewMemFetcher(map[string][]byte{
-				"templates.json": []byte(`["foo"]`),
-				"foo.json":       []byte(`{"ids":{"template_id":"foo"},"name":"Foo","description":"Bar "}`),
+				"templates.yml": []byte(`---
+- foo`),
+				"foo.yml": []byte(
+					`---
+ids:
+  template_id: foo
+name: Foo
+description: Bar`),
 			}),
 			assertGet: func(a *assertions.Assertion, res *ttnpb.ApplicationWebhookTemplate, err error) {
 				a.So(err, should.BeNil)

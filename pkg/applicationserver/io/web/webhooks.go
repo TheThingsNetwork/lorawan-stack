@@ -423,11 +423,13 @@ func expandVariables(url *url.URL, up *ttnpb.ApplicationUp) {
 		devAddr = up.DevAddr.String()
 	}
 	googleapi.Expand(url, map[string]string{
-		"appID":   up.ApplicationID,
-		"appEUI":  joinEUI,
-		"joinEUI": joinEUI,
-		"devID":   up.DeviceID,
-		"devEUI":  devEUI,
-		"devAddr": devAddr,
+		"appID":         up.ApplicationID,
+		"applicationID": up.ApplicationID,
+		"appEUI":        joinEUI,
+		"joinEUI":       joinEUI,
+		"devID":         up.DeviceID,
+		"deviceID":      up.DeviceID,
+		"devEUI":        devEUI,
+		"devAddr":       devAddr,
 	})
 }
