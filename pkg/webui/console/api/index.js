@@ -130,6 +130,8 @@ export default {
     stats: ttnClient.Gateways.getStatisticsById.bind(ttnClient.Gateways),
     eventsSubscribe: ttnClient.Gateways.openStream.bind(ttnClient.Gateways),
     collaborators: {
+      getOrganization: ttnClient.Gateways.Collaborators.getByOrganizationId.bind(ttnClient.Gateways.Collaborators),
+      getUser: ttnClient.Gateways.Collaborators.getByUserId.bind(ttnClient.Gateways.Collaborators),
       list: ttnClient.Gateways.Collaborators.getAll.bind(ttnClient.Gateways.Collaborators),
       add: ttnClient.Gateways.Collaborators.add.bind(ttnClient.Gateways.Collaborators),
       update: ttnClient.Gateways.Collaborators.update.bind(ttnClient.Gateways.Collaborators),
