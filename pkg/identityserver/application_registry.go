@@ -172,9 +172,9 @@ func (is *IdentityServer) listApplications(ctx context.Context, req *ttnpb.ListA
 		if err != nil {
 			return err
 		}
-		for _, app := range apps.Applications {
+		for i, app := range apps.Applications {
 			if !appRights[unique.ID(ctx, app.ApplicationIdentifiers)].IncludesAll(ttnpb.RIGHT_APPLICATION_INFO) {
-				app = app.PublicSafe()
+				apps.Applications[i] = app.PublicSafe()
 			}
 		}
 		return nil
