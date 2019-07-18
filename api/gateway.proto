@@ -190,6 +190,11 @@ message ListGatewayCollaboratorsRequest {
   uint32 page = 3;
 }
 
+message GetGatewayCollaboratorRequest {
+  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  OrganizationOrUserIdentifiers collaborator = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+}
+
 message SetGatewayCollaboratorRequest {
   GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   Collaborator collaborator = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];

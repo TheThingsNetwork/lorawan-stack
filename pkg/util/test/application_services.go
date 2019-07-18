@@ -28,6 +28,7 @@ type MockApplicationAccessServer struct {
 	ListAPIKeysFunc       func(context.Context, *ttnpb.ListApplicationAPIKeysRequest) (*ttnpb.APIKeys, error)
 	ListCollaboratorsFunc func(context.Context, *ttnpb.ListApplicationCollaboratorsRequest) (*ttnpb.Collaborators, error)
 	ListRightsFunc        func(context.Context, *ttnpb.ApplicationIdentifiers) (*ttnpb.Rights, error)
+	GetCollaboratorFunc   func(context.Context, *ttnpb.GetApplicationCollaboratorRequest) (*ttnpb.GetCollaboratorResponse, error)
 	SetCollaboratorFunc   func(context.Context, *ttnpb.SetApplicationCollaboratorRequest) (*pbtypes.Empty, error)
 	UpdateAPIKeyFunc      func(context.Context, *ttnpb.UpdateApplicationAPIKeyRequest) (*ttnpb.APIKey, error)
 }
@@ -70,6 +71,14 @@ func (m MockApplicationAccessServer) UpdateAPIKey(ctx context.Context, req *ttnp
 		panic("UpdateAPIKey called, but not set")
 	}
 	return m.UpdateAPIKeyFunc(ctx, req)
+}
+
+// GetCollaborator calls GetCollaboratorFunc if set and panics otherwise.
+func (m MockApplicationAccessServer) GetCollaborator(ctx context.Context, req *ttnpb.GetApplicationCollaboratorRequest) (*ttnpb.GetCollaboratorResponse, error) {
+	if m.GetCollaboratorFunc == nil {
+		panic("GetCollaborator called, but not set")
+	}
+	return m.GetCollaboratorFunc(ctx, req)
 }
 
 // SetCollaborator calls SetCollaboratorFunc if set and panics otherwise.

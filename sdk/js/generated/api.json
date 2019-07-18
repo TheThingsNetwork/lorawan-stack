@@ -345,6 +345,53 @@
           ]
         },
         {
+          "name": "GetApplicationCollaboratorRequest",
+          "longName": "GetApplicationCollaboratorRequest",
+          "fullName": "ttn.lorawan.v3.GetApplicationCollaboratorRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "application_ids",
+              "description": "",
+              "label": "",
+              "type": "ApplicationIdentifiers",
+              "longType": "ApplicationIdentifiers",
+              "fullType": "ttn.lorawan.v3.ApplicationIdentifiers",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "collaborator",
+              "description": "",
+              "label": "",
+              "type": "OrganizationOrUserIdentifiers",
+              "longType": "OrganizationOrUserIdentifiers",
+              "fullType": "ttn.lorawan.v3.OrganizationOrUserIdentifiers",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "GetApplicationRequest",
           "longName": "GetApplicationRequest",
           "fullName": "ttn.lorawan.v3.GetApplicationRequest",
@@ -833,8 +880,38 @@
               }
             },
             {
+              "name": "GetCollaborator",
+              "description": "Get the rights of a collaborator (member) of the application.\nPseudo-rights in the response (such as the \"_ALL\" right) are not expanded.",
+              "requestType": "GetApplicationCollaboratorRequest",
+              "requestLongType": "GetApplicationCollaboratorRequest",
+              "requestFullType": "ttn.lorawan.v3.GetApplicationCollaboratorRequest",
+              "requestStreaming": false,
+              "responseType": "GetCollaboratorResponse",
+              "responseLongType": "GetCollaboratorResponse",
+              "responseFullType": "ttn.lorawan.v3.GetCollaboratorResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/applications/{application_ids.application_id}/collaborator"
+                    },
+                    {
+                      "method": "GET",
+                      "pattern": "/applications/{application_ids.application_id}/collaborator/user/{collaborator.user_ids.user_id}"
+                    },
+                    {
+                      "method": "GET",
+                      "pattern": "/applications/{application_ids.application_id}/collaborator/organization/{collaborator.organization_ids.organization_id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
               "name": "SetCollaborator",
-              "description": "Setting a collaborator without rights, removes them.",
+              "description": "Set the rights of a collaborator (member) on the application.\nSetting a collaborator without rights, removes them.",
               "requestType": "SetApplicationCollaboratorRequest",
               "requestLongType": "SetApplicationCollaboratorRequest",
               "requestFullType": "ttn.lorawan.v3.SetApplicationCollaboratorRequest",
@@ -3104,6 +3181,53 @@
           ]
         },
         {
+          "name": "GetClientCollaboratorRequest",
+          "longName": "GetClientCollaboratorRequest",
+          "fullName": "ttn.lorawan.v3.GetClientCollaboratorRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "client_ids",
+              "description": "",
+              "label": "",
+              "type": "ClientIdentifiers",
+              "longType": "ClientIdentifiers",
+              "fullType": "ttn.lorawan.v3.ClientIdentifiers",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "collaborator",
+              "description": "",
+              "label": "",
+              "type": "OrganizationOrUserIdentifiers",
+              "longType": "OrganizationOrUserIdentifiers",
+              "fullType": "ttn.lorawan.v3.OrganizationOrUserIdentifiers",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "GetClientRequest",
           "longName": "GetClientRequest",
           "fullName": "ttn.lorawan.v3.GetClientRequest",
@@ -3398,8 +3522,38 @@
               }
             },
             {
+              "name": "GetCollaborator",
+              "description": "Get the rights of a collaborator (member) of the client.\nPseudo-rights in the response (such as the \"_ALL\" right) are not expanded.",
+              "requestType": "GetClientCollaboratorRequest",
+              "requestLongType": "GetClientCollaboratorRequest",
+              "requestFullType": "ttn.lorawan.v3.GetClientCollaboratorRequest",
+              "requestStreaming": false,
+              "responseType": "GetCollaboratorResponse",
+              "responseLongType": "GetCollaboratorResponse",
+              "responseFullType": "ttn.lorawan.v3.GetCollaboratorResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/clients/{client_ids.client_id}/collaborator"
+                    },
+                    {
+                      "method": "GET",
+                      "pattern": "/clients/{client_ids.client_id}/collaborator/user/{collaborator.user_ids.user_id}"
+                    },
+                    {
+                      "method": "GET",
+                      "pattern": "/clients/{client_ids.client_id}/collaborator/organization/{collaborator.organization_ids.organization_id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
               "name": "SetCollaborator",
-              "description": "Set the rights of a collaborator on the OAuth client. Users or organizations\nare considered to be a collaborator if they have at least one right on the\nOAuth client.",
+              "description": "Set the rights of a collaborator (member) on the client.\nSetting a collaborator without rights, removes them.",
               "requestType": "SetClientCollaboratorRequest",
               "requestLongType": "SetClientCollaboratorRequest",
               "requestFullType": "ttn.lorawan.v3.SetClientCollaboratorRequest",
@@ -8355,6 +8509,53 @@
           ]
         },
         {
+          "name": "GetGatewayCollaboratorRequest",
+          "longName": "GetGatewayCollaboratorRequest",
+          "fullName": "ttn.lorawan.v3.GetGatewayCollaboratorRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "gateway_ids",
+              "description": "",
+              "label": "",
+              "type": "GatewayIdentifiers",
+              "longType": "GatewayIdentifiers",
+              "fullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "collaborator",
+              "description": "",
+              "label": "",
+              "type": "OrganizationOrUserIdentifiers",
+              "longType": "OrganizationOrUserIdentifiers",
+              "fullType": "ttn.lorawan.v3.OrganizationOrUserIdentifiers",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "GetGatewayIdentifiersForEUIRequest",
           "longName": "GetGatewayIdentifiersForEUIRequest",
           "fullName": "ttn.lorawan.v3.GetGatewayIdentifiersForEUIRequest",
@@ -8896,8 +9097,38 @@
               }
             },
             {
+              "name": "GetCollaborator",
+              "description": "Get the rights of a collaborator (member) of the gateway.\nPseudo-rights in the response (such as the \"_ALL\" right) are not expanded.",
+              "requestType": "GetGatewayCollaboratorRequest",
+              "requestLongType": "GetGatewayCollaboratorRequest",
+              "requestFullType": "ttn.lorawan.v3.GetGatewayCollaboratorRequest",
+              "requestStreaming": false,
+              "responseType": "GetCollaboratorResponse",
+              "responseLongType": "GetCollaboratorResponse",
+              "responseFullType": "ttn.lorawan.v3.GetCollaboratorResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/gateways/{gateway_ids.gateway_id}/collaborator"
+                    },
+                    {
+                      "method": "GET",
+                      "pattern": "/gateways/{gateway_ids.gateway_id}/collaborator/user/{collaborator.user_ids.user_id}"
+                    },
+                    {
+                      "method": "GET",
+                      "pattern": "/gateways/{gateway_ids.gateway_id}/collaborator/organization/{collaborator.organization_ids.organization_id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
               "name": "SetCollaborator",
-              "description": "Set the rights of a collaborator on the gateway. Users or organizations\nare considered to be a collaborator if they have at least one right on the\ngateway.",
+              "description": "Set the rights of a collaborator (member) on the gateway.\nSetting a collaborator without rights, removes them.",
               "requestType": "SetGatewayCollaboratorRequest",
               "requestLongType": "SetGatewayCollaboratorRequest",
               "requestFullType": "ttn.lorawan.v3.SetGatewayCollaboratorRequest",
@@ -18049,6 +18280,53 @@
           ]
         },
         {
+          "name": "GetOrganizationCollaboratorRequest",
+          "longName": "GetOrganizationCollaboratorRequest",
+          "fullName": "ttn.lorawan.v3.GetOrganizationCollaboratorRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "organization_ids",
+              "description": "",
+              "label": "",
+              "type": "OrganizationIdentifiers",
+              "longType": "OrganizationIdentifiers",
+              "fullType": "ttn.lorawan.v3.OrganizationIdentifiers",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "collaborator",
+              "description": "NOTE: It is currently not possible to have organizations collaborating on\nother organizations.",
+              "label": "",
+              "type": "OrganizationOrUserIdentifiers",
+              "longType": "OrganizationOrUserIdentifiers",
+              "fullType": "ttn.lorawan.v3.OrganizationOrUserIdentifiers",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "GetOrganizationRequest",
           "longName": "GetOrganizationRequest",
           "fullName": "ttn.lorawan.v3.GetOrganizationRequest",
@@ -18706,8 +18984,34 @@
               }
             },
             {
+              "name": "GetCollaborator",
+              "description": "Get the rights of a collaborator (member) of the organization.\nPseudo-rights in the response (such as the \"_ALL\" right) are not expanded.",
+              "requestType": "GetOrganizationCollaboratorRequest",
+              "requestLongType": "GetOrganizationCollaboratorRequest",
+              "requestFullType": "ttn.lorawan.v3.GetOrganizationCollaboratorRequest",
+              "requestStreaming": false,
+              "responseType": "GetCollaboratorResponse",
+              "responseLongType": "GetCollaboratorResponse",
+              "responseFullType": "ttn.lorawan.v3.GetCollaboratorResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/organizations/{organization_ids.organization_id}/collaborator"
+                    },
+                    {
+                      "method": "GET",
+                      "pattern": "/organizations/{organization_ids.organization_id}/collaborator/user/{collaborator.user_ids.user_id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
               "name": "SetCollaborator",
-              "description": "Set the rights of a collaborator (member) on the organization. Users\nare considered to be a collaborator if they have at least one right on the\norganization.\nNote that only users can collaborate (be member of) an organization.",
+              "description": "Set the rights of a collaborator (member) on the organization.\nSetting a collaborator without rights, removes them.\nNote that only users can collaborate (be member of) an organization.",
               "requestType": "SetOrganizationCollaboratorRequest",
               "requestLongType": "SetOrganizationCollaboratorRequest",
               "requestFullType": "ttn.lorawan.v3.SetOrganizationCollaboratorRequest",
@@ -19578,6 +19882,37 @@
               "type": "Collaborator",
               "longType": "Collaborator",
               "fullType": "ttn.lorawan.v3.Collaborator",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "GetCollaboratorResponse",
+          "longName": "GetCollaboratorResponse",
+          "fullName": "ttn.lorawan.v3.GetCollaboratorResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "ids",
+              "description": "",
+              "label": "",
+              "type": "OrganizationOrUserIdentifiers",
+              "longType": "OrganizationOrUserIdentifiers",
+              "fullType": "ttn.lorawan.v3.OrganizationOrUserIdentifiers",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "rights",
+              "description": "",
+              "label": "repeated",
+              "type": "Right",
+              "longType": "Right",
+              "fullType": "ttn.lorawan.v3.Right",
               "ismap": false,
               "defaultValue": ""
             }

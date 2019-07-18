@@ -45,7 +45,8 @@ func (s *store) findAccount(ctx context.Context, id *ttnpb.OrganizationOrUserIde
 func findAccount(ctx context.Context, db *gorm.DB, id *ttnpb.OrganizationOrUserIdentifiers) (*Account, error) {
 	var account Account
 	err := db.Scopes(withContext(ctx)).Where(Account{
-		UID: id.IDString(),
+		UID:         id.IDString(),
+		AccountType: id.EntityType(),
 	}).Find(&account).Error
 	if err != nil {
 		if gorm.IsRecordNotFoundError(err) {

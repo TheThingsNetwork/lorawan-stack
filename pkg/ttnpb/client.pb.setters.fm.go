@@ -429,6 +429,53 @@ func (dst *ListClientCollaboratorsRequest) SetFields(src *ListClientCollaborator
 	return nil
 }
 
+func (dst *GetClientCollaboratorRequest) SetFields(src *GetClientCollaboratorRequest, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "client_ids":
+			if len(subs) > 0 {
+				newDst := &dst.ClientIdentifiers
+				var newSrc *ClientIdentifiers
+				if src != nil {
+					newSrc = &src.ClientIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ClientIdentifiers = src.ClientIdentifiers
+				} else {
+					var zero ClientIdentifiers
+					dst.ClientIdentifiers = zero
+				}
+			}
+		case "collaborator":
+			if len(subs) > 0 {
+				newDst := &dst.OrganizationOrUserIdentifiers
+				var newSrc *OrganizationOrUserIdentifiers
+				if src != nil {
+					newSrc = &src.OrganizationOrUserIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.OrganizationOrUserIdentifiers = src.OrganizationOrUserIdentifiers
+				} else {
+					var zero OrganizationOrUserIdentifiers
+					dst.OrganizationOrUserIdentifiers = zero
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *SetClientCollaboratorRequest) SetFields(src *SetClientCollaboratorRequest, paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {

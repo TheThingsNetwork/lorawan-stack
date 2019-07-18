@@ -545,6 +545,53 @@ func (dst *ListOrganizationCollaboratorsRequest) SetFields(src *ListOrganization
 	return nil
 }
 
+func (dst *GetOrganizationCollaboratorRequest) SetFields(src *GetOrganizationCollaboratorRequest, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "organization_ids":
+			if len(subs) > 0 {
+				newDst := &dst.OrganizationIdentifiers
+				var newSrc *OrganizationIdentifiers
+				if src != nil {
+					newSrc = &src.OrganizationIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.OrganizationIdentifiers = src.OrganizationIdentifiers
+				} else {
+					var zero OrganizationIdentifiers
+					dst.OrganizationIdentifiers = zero
+				}
+			}
+		case "collaborator":
+			if len(subs) > 0 {
+				newDst := &dst.OrganizationOrUserIdentifiers
+				var newSrc *OrganizationOrUserIdentifiers
+				if src != nil {
+					newSrc = &src.OrganizationOrUserIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.OrganizationOrUserIdentifiers = src.OrganizationOrUserIdentifiers
+				} else {
+					var zero OrganizationOrUserIdentifiers
+					dst.OrganizationOrUserIdentifiers = zero
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *SetOrganizationCollaboratorRequest) SetFields(src *SetOrganizationCollaboratorRequest, paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {

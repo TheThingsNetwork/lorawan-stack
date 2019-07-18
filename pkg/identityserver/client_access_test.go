@@ -157,5 +157,13 @@ func TestClientAccessCRUD(t *testing.T) {
 		}, creds)
 
 		a.So(err, should.BeNil)
+
+		res, err := reg.GetCollaborator(ctx, &ttnpb.GetClientCollaboratorRequest{
+			ClientIdentifiers:             clientID,
+			OrganizationOrUserIdentifiers: *collaboratorID,
+		}, creds)
+
+		a.So(err, should.BeNil)
+		a.So(res.Rights, should.Resemble, []ttnpb.Right{ttnpb.RIGHT_CLIENT_ALL})
 	})
 }

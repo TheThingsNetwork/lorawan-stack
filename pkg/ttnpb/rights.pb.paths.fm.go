@@ -44,6 +44,21 @@ var CollaboratorFieldPathsTopLevel = []string{
 	"ids",
 	"rights",
 }
+var GetCollaboratorResponseFieldPathsNested = []string{
+	"ids",
+	"ids.ids",
+	"ids.ids.organization_ids",
+	"ids.ids.organization_ids.organization_id",
+	"ids.ids.user_ids",
+	"ids.ids.user_ids.email",
+	"ids.ids.user_ids.user_id",
+	"rights",
+}
+
+var GetCollaboratorResponseFieldPathsTopLevel = []string{
+	"ids",
+	"rights",
+}
 var CollaboratorsFieldPathsNested = []string{
 	"collaborators",
 }

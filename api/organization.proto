@@ -110,6 +110,13 @@ message ListOrganizationCollaboratorsRequest {
   uint32 page = 3;
 }
 
+message GetOrganizationCollaboratorRequest {
+  OrganizationIdentifiers organization_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  // NOTE: It is currently not possible to have organizations collaborating on
+  // other organizations.
+  OrganizationOrUserIdentifiers collaborator = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+}
+
 message SetOrganizationCollaboratorRequest {
   OrganizationIdentifiers organization_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   Collaborator collaborator = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];

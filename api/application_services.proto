@@ -111,6 +111,21 @@ service ApplicationAccess {
     };
   };
 
+  // Get the rights of a collaborator (member) of the application.
+  // Pseudo-rights in the response (such as the "_ALL" right) are not expanded.
+  rpc GetCollaborator(GetApplicationCollaboratorRequest) returns (GetCollaboratorResponse) {
+    option (google.api.http) = {
+      get: "/applications/{application_ids.application_id}/collaborator"
+      additional_bindings {
+        get: "/applications/{application_ids.application_id}/collaborator/user/{collaborator.user_ids.user_id}"
+      }
+      additional_bindings {
+        get: "/applications/{application_ids.application_id}/collaborator/organization/{collaborator.organization_ids.organization_id}"
+      }
+    };
+  }
+
+  // Set the rights of a collaborator (member) on the application.
   // Setting a collaborator without rights, removes them.
   rpc SetCollaborator(SetApplicationCollaboratorRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {

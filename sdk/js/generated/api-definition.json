@@ -64,6 +64,34 @@
         }
       ]
     },
+    "GetCollaborator": {
+      "file": "lorawan-stack/api/application_services.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/applications/{application_ids.application_id}/collaborator",
+          "parameters": [
+            "application_ids.application_id"
+          ]
+        },
+        {
+          "method": "get",
+          "pattern": "/applications/{application_ids.application_id}/collaborator/user/{collaborator.user_ids.user_id}",
+          "parameters": [
+            "application_ids.application_id",
+            "collaborator.user_ids.user_id"
+          ]
+        },
+        {
+          "method": "get",
+          "pattern": "/applications/{application_ids.application_id}/collaborator/organization/{collaborator.organization_ids.organization_id}",
+          "parameters": [
+            "application_ids.application_id",
+            "collaborator.organization_ids.organization_id"
+          ]
+        }
+      ]
+    },
     "SetCollaborator": {
       "file": "lorawan-stack/api/application_services.proto",
       "http": [
@@ -479,6 +507,34 @@
         }
       ]
     },
+    "GetCollaborator": {
+      "file": "lorawan-stack/api/client_services.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/clients/{client_ids.client_id}/collaborator",
+          "parameters": [
+            "client_ids.client_id"
+          ]
+        },
+        {
+          "method": "get",
+          "pattern": "/clients/{client_ids.client_id}/collaborator/user/{collaborator.user_ids.user_id}",
+          "parameters": [
+            "client_ids.client_id",
+            "collaborator.user_ids.user_id"
+          ]
+        },
+        {
+          "method": "get",
+          "pattern": "/clients/{client_ids.client_id}/collaborator/organization/{collaborator.organization_ids.organization_id}",
+          "parameters": [
+            "client_ids.client_id",
+            "collaborator.organization_ids.organization_id"
+          ]
+        }
+      ]
+    },
     "SetCollaborator": {
       "file": "lorawan-stack/api/client_services.proto",
       "http": [
@@ -765,6 +821,34 @@
           "parameters": [
             "gateway_ids.gateway_id",
             "api_key.id"
+          ]
+        }
+      ]
+    },
+    "GetCollaborator": {
+      "file": "lorawan-stack/api/gateway_services.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/gateways/{gateway_ids.gateway_id}/collaborator",
+          "parameters": [
+            "gateway_ids.gateway_id"
+          ]
+        },
+        {
+          "method": "get",
+          "pattern": "/gateways/{gateway_ids.gateway_id}/collaborator/user/{collaborator.user_ids.user_id}",
+          "parameters": [
+            "gateway_ids.gateway_id",
+            "collaborator.user_ids.user_id"
+          ]
+        },
+        {
+          "method": "get",
+          "pattern": "/gateways/{gateway_ids.gateway_id}/collaborator/organization/{collaborator.organization_ids.organization_id}",
+          "parameters": [
+            "gateway_ids.gateway_id",
+            "collaborator.organization_ids.organization_id"
           ]
         }
       ]
@@ -1272,6 +1356,26 @@
           "parameters": [
             "organization_ids.organization_id",
             "api_key.id"
+          ]
+        }
+      ]
+    },
+    "GetCollaborator": {
+      "file": "lorawan-stack/api/organization_services.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/organizations/{organization_ids.organization_id}/collaborator",
+          "parameters": [
+            "organization_ids.organization_id"
+          ]
+        },
+        {
+          "method": "get",
+          "pattern": "/organizations/{organization_ids.organization_id}/collaborator/user/{collaborator.user_ids.user_id}",
+          "parameters": [
+            "organization_ids.organization_id",
+            "collaborator.user_ids.user_id"
           ]
         }
       ]

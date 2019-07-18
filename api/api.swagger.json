@@ -299,6 +299,144 @@
         ]
       }
     },
+    "/applications/{application_ids.application_id}/collaborator": {
+      "get": {
+        "summary": "Get the rights of a collaborator (member) of the application.\nPseudo-rights in the response (such as the \"_ALL\" right) are not expanded.",
+        "operationId": "GetCollaborator",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3GetCollaboratorResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ApplicationAccess"
+        ]
+      }
+    },
+    "/applications/{application_ids.application_id}/collaborator/organization/{collaborator.organization_ids.organization_id}": {
+      "get": {
+        "summary": "Get the rights of a collaborator (member) of the application.\nPseudo-rights in the response (such as the \"_ALL\" right) are not expanded.",
+        "operationId": "GetCollaborator3",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3GetCollaboratorResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ApplicationAccess"
+        ]
+      }
+    },
+    "/applications/{application_ids.application_id}/collaborator/user/{collaborator.user_ids.user_id}": {
+      "get": {
+        "summary": "Get the rights of a collaborator (member) of the application.\nPseudo-rights in the response (such as the \"_ALL\" right) are not expanded.",
+        "operationId": "GetCollaborator2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3GetCollaboratorResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ApplicationAccess"
+        ]
+      }
+    },
     "/applications/{application_ids.application_id}/collaborators": {
       "get": {
         "operationId": "ListCollaborators",
@@ -339,7 +477,7 @@
         ]
       },
       "put": {
-        "summary": "Setting a collaborator without rights, removes them.",
+        "summary": "Set the rights of a collaborator (member) on the application.\nSetting a collaborator without rights, removes them.",
         "operationId": "SetCollaborator",
         "responses": {
           "200": {
@@ -1650,9 +1788,146 @@
         ]
       }
     },
+    "/clients/{client_ids.client_id}/collaborator": {
+      "get": {
+        "summary": "Get the OAuth client with the given identifiers, selecting the fields given\nby the field mask. The method may return more or less fields, depending on\nthe rights of the caller.",
+        "operationId": "GetCollaborator",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3GetCollaboratorResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "client_ids.client_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ClientAccess"
+        ]
+      }
+    },
+    "/clients/{client_ids.client_id}/collaborator/organization/{collaborator.organization_ids.organization_id}": {
+      "get": {
+        "summary": "Get the OAuth client with the given identifiers, selecting the fields given\nby the field mask. The method may return more or less fields, depending on\nthe rights of the caller.",
+        "operationId": "GetCollaborator3",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3GetCollaboratorResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "client_ids.client_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ClientAccess"
+        ]
+      }
+    },
+    "/clients/{client_ids.client_id}/collaborator/user/{collaborator.user_ids.user_id}": {
+      "get": {
+        "summary": "Get the OAuth client with the given identifiers, selecting the fields given\nby the field mask. The method may return more or less fields, depending on\nthe rights of the caller.",
+        "operationId": "GetCollaborator2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3GetCollaboratorResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "client_ids.client_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ClientAccess"
+        ]
+      }
+    },
     "/clients/{client_ids.client_id}/collaborators": {
       "get": {
-        "summary": "List OAuth clients. See request message for details.",
         "operationId": "ListCollaborators",
         "responses": {
           "200": {
@@ -1691,7 +1966,7 @@
         ]
       },
       "put": {
-        "summary": "Get the OAuth client with the given identifiers, selecting the fields given\nby the field mask. The method may return more or less fields, depending on\nthe rights of the caller.",
+        "summary": "List OAuth clients. See request message for details.",
         "operationId": "SetCollaborator",
         "responses": {
           "200": {
@@ -2164,6 +2439,165 @@
         ]
       }
     },
+    "/gateways/{gateway_ids.gateway_id}/collaborator": {
+      "get": {
+        "operationId": "GetCollaborator",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3GetCollaboratorResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "gateway_ids.gateway_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "gateway_ids.eui",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "collaborator.organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "GatewayAccess"
+        ]
+      }
+    },
+    "/gateways/{gateway_ids.gateway_id}/collaborator/organization/{collaborator.organization_ids.organization_id}": {
+      "get": {
+        "operationId": "GetCollaborator3",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3GetCollaboratorResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "gateway_ids.gateway_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "gateway_ids.eui",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "collaborator.user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "GatewayAccess"
+        ]
+      }
+    },
+    "/gateways/{gateway_ids.gateway_id}/collaborator/user/{collaborator.user_ids.user_id}": {
+      "get": {
+        "operationId": "GetCollaborator2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3GetCollaboratorResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "gateway_ids.gateway_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "gateway_ids.eui",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "collaborator.organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "GatewayAccess"
+        ]
+      }
+    },
     "/gateways/{gateway_ids.gateway_id}/collaborators": {
       "get": {
         "operationId": "ListCollaborators",
@@ -2212,6 +2646,7 @@
         ]
       },
       "put": {
+        "summary": "Set the rights of a collaborator (member) on the gateway.\nSetting a collaborator without rights, removes them.",
         "operationId": "SetCollaborator",
         "responses": {
           "200": {
@@ -3472,6 +3907,86 @@
         ]
       }
     },
+    "/organizations/{organization_ids.organization_id}/collaborator": {
+      "get": {
+        "summary": "Get the rights of a collaborator (member) of the organization.\nPseudo-rights in the response (such as the \"_ALL\" right) are not expanded.",
+        "operationId": "GetCollaborator",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3GetCollaboratorResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "OrganizationAccess"
+        ]
+      }
+    },
+    "/organizations/{organization_ids.organization_id}/collaborator/user/{collaborator.user_ids.user_id}": {
+      "get": {
+        "summary": "Get the rights of a collaborator (member) of the organization.\nPseudo-rights in the response (such as the \"_ALL\" right) are not expanded.",
+        "operationId": "GetCollaborator2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3GetCollaboratorResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "organization_ids.organization_id",
+            "description": "This ID shares namespace with user IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.user_ids.user_id",
+            "description": "This ID shares namespace with organization IDs.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collaborator.user_ids.email",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "OrganizationAccess"
+        ]
+      }
+    },
     "/organizations/{organization_ids.organization_id}/collaborators": {
       "get": {
         "operationId": "ListCollaborators",
@@ -3513,7 +4028,7 @@
         ]
       },
       "put": {
-        "summary": "Set the rights of a collaborator (member) on the organization. Users\nare considered to be a collaborator if they have at least one right on the\norganization.\nNote that only users can collaborate (be member of) an organization.",
+        "summary": "Set the rights of a collaborator (member) on the organization.\nSetting a collaborator without rights, removes them.\nNote that only users can collaborate (be member of) an organization.",
         "operationId": "SetCollaborator",
         "responses": {
           "200": {
@@ -7779,6 +8294,20 @@
         "dev_addr": {
           "type": "string",
           "format": "byte"
+        }
+      }
+    },
+    "v3GetCollaboratorResponse": {
+      "type": "object",
+      "properties": {
+        "ids": {
+          "$ref": "#/definitions/v3OrganizationOrUserIdentifiers"
+        },
+        "rights": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3Right"
+          }
         }
       }
     },

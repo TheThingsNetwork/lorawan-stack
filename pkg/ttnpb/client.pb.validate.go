@@ -883,6 +883,112 @@ var _ interface {
 	ErrorName() string
 } = ListClientCollaboratorsRequestValidationError{}
 
+// ValidateFields checks the field values on GetClientCollaboratorRequest with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *GetClientCollaboratorRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = GetClientCollaboratorRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "client_ids":
+
+			if v, ok := interface{}(&m.ClientIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return GetClientCollaboratorRequestValidationError{
+						field:  "client_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "collaborator":
+
+			if v, ok := interface{}(&m.OrganizationOrUserIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return GetClientCollaboratorRequestValidationError{
+						field:  "collaborator",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return GetClientCollaboratorRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// GetClientCollaboratorRequestValidationError is the validation error returned
+// by GetClientCollaboratorRequest.ValidateFields if the designated
+// constraints aren't met.
+type GetClientCollaboratorRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetClientCollaboratorRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetClientCollaboratorRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetClientCollaboratorRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetClientCollaboratorRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetClientCollaboratorRequestValidationError) ErrorName() string {
+	return "GetClientCollaboratorRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetClientCollaboratorRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetClientCollaboratorRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetClientCollaboratorRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetClientCollaboratorRequestValidationError{}
+
 // ValidateFields checks the field values on SetClientCollaboratorRequest with
 // the rules defined in the proto definition for this message. If any rules
 // are violated, an error is returned.
