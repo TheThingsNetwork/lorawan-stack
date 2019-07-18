@@ -92,6 +92,8 @@ export default {
       stats: ttnClient.Applications.Link.getStats.bind(ttnClient.Applications.Link),
     },
     collaborators: {
+      getOrganization: ttnClient.Applications.Collaborators.getByOrganizationId.bind(ttnClient.Applications.Collaborators),
+      getUser: ttnClient.Applications.Collaborators.getByUserId.bind(ttnClient.Applications.Collaborators),
       list: ttnClient.Applications.Collaborators.getAll.bind(ttnClient.Applications.Collaborators),
       add: ttnClient.Applications.Collaborators.add.bind(ttnClient.Applications.Collaborators),
       update: ttnClient.Applications.Collaborators.update.bind(ttnClient.Applications.Collaborators),
