@@ -31,6 +31,7 @@ class Gateways {
     })
     this.Collaborators = new Collaborators(api.GatewayAccess, {
       parentRoutes: {
+        get: 'gateway_ids.gateway_id',
         list: 'gateway_ids.gateway_id',
         set: 'gateway_ids.gateway_id',
       },
