@@ -30,6 +30,46 @@ type Rights struct {
 	UserRights         map[string]*ttnpb.Rights
 }
 
+// SetApplicationRights sets the rights for the given application.
+func (r *Rights) setApplicationRights(appUID string, rights *ttnpb.Rights) {
+	if r.ApplicationRights == nil {
+		r.ApplicationRights = make(map[string]*ttnpb.Rights)
+	}
+	r.ApplicationRights[appUID] = rights
+}
+
+// SetClientRights sets the rights for the given client.
+func (r *Rights) setClientRights(cliUID string, rights *ttnpb.Rights) {
+	if r.ClientRights == nil {
+		r.ClientRights = make(map[string]*ttnpb.Rights)
+	}
+	r.ClientRights[cliUID] = rights
+}
+
+// SetGatewayRights sets the rights for the given gateway.
+func (r *Rights) setGatewayRights(gtwUID string, rights *ttnpb.Rights) {
+	if r.GatewayRights == nil {
+		r.GatewayRights = make(map[string]*ttnpb.Rights)
+	}
+	r.GatewayRights[gtwUID] = rights
+}
+
+// SetOrganizationRights sets the rights for the given organization.
+func (r *Rights) setOrganizationRights(orgUID string, rights *ttnpb.Rights) {
+	if r.OrganizationRights == nil {
+		r.OrganizationRights = make(map[string]*ttnpb.Rights)
+	}
+	r.OrganizationRights[orgUID] = rights
+}
+
+// SetUserRights sets the rights for the given user.
+func (r *Rights) setUserRights(usrUID string, rights *ttnpb.Rights) {
+	if r.UserRights == nil {
+		r.UserRights = make(map[string]*ttnpb.Rights)
+	}
+	r.UserRights[usrUID] = rights
+}
+
 // MissingApplicationRights returns the rights that are missing for the given application.
 func (r Rights) MissingApplicationRights(appUID string, rights ...ttnpb.Right) []ttnpb.Right {
 	return ttnpb.RightsFrom(rights...).Sub(r.ApplicationRights[appUID]).GetRights()
@@ -94,4 +134,27 @@ func fromContext(ctx context.Context) (Rights, bool) {
 // NewContext returns a derived context with the given rights.
 func NewContext(ctx context.Context, rights Rights) context.Context {
 	return context.WithValue(ctx, rightsKey, rights)
+}
+
+type rightsCacheKeyType struct{}
+
+var rightsCacheKey rightsCacheKeyType
+
+// NewContextWithCache returns a derived context with a rights cache.
+// This should only be used for request contexts.
+func NewContextWithCache(ctx context.Context) context.Context {
+	return context.WithValue(ctx, rightsCacheKey, &Rights{})
+}
+
+func cacheInContext(ctx context.Context, f func(*Rights)) {
+	if rights, ok := ctx.Value(rightsCacheKey).(*Rights); ok {
+		f(rights)
+	}
+}
+
+func cacheFromContext(ctx context.Context) (Rights, bool) {
+	if rights, ok := ctx.Value(rightsCacheKey).(*Rights); ok {
+		return *rights, true
+	}
+	return Rights{}, false
 }

@@ -23,16 +23,26 @@ import (
 )
 
 // ListApplication lists the rights for the given application ID in the context.
-func ListApplication(ctx context.Context, id ttnpb.ApplicationIdentifiers) (*ttnpb.Rights, error) {
+func ListApplication(ctx context.Context, id ttnpb.ApplicationIdentifiers) (rights *ttnpb.Rights, err error) {
 	uid := unique.ID(ctx, id)
 	if inCtx, ok := fromContext(ctx); ok {
 		return inCtx.ApplicationRights[uid], nil
 	}
+	if inCtx, ok := cacheFromContext(ctx); ok {
+		if rights, ok := inCtx.ApplicationRights[uid]; ok {
+			return rights, nil
+		}
+	}
+	defer func() {
+		if err == nil {
+			cacheInContext(ctx, func(r *Rights) { r.setApplicationRights(uid, rights) })
+		}
+	}()
 	fetcher, ok := fetcherFromContext(ctx)
 	if !ok {
 		panic(errNoFetcher)
 	}
-	rights, err := fetcher.ApplicationRights(ctx, id)
+	rights, err = fetcher.ApplicationRights(ctx, id)
 	if err != nil {
 		if errors.IsPermissionDenied(err) {
 			return &ttnpb.Rights{}, nil
@@ -43,16 +53,26 @@ func ListApplication(ctx context.Context, id ttnpb.ApplicationIdentifiers) (*ttn
 }
 
 // ListClient lists the rights for the given client ID in the context.
-func ListClient(ctx context.Context, id ttnpb.ClientIdentifiers) (*ttnpb.Rights, error) {
+func ListClient(ctx context.Context, id ttnpb.ClientIdentifiers) (rights *ttnpb.Rights, err error) {
 	uid := unique.ID(ctx, id)
 	if inCtx, ok := fromContext(ctx); ok {
 		return inCtx.ClientRights[uid], nil
 	}
+	if inCtx, ok := cacheFromContext(ctx); ok {
+		if rights, ok := inCtx.ClientRights[uid]; ok {
+			return rights, nil
+		}
+	}
+	defer func() {
+		if err == nil {
+			cacheInContext(ctx, func(r *Rights) { r.setClientRights(uid, rights) })
+		}
+	}()
 	fetcher, ok := fetcherFromContext(ctx)
 	if !ok {
 		panic(errNoFetcher)
 	}
-	rights, err := fetcher.ClientRights(ctx, id)
+	rights, err = fetcher.ClientRights(ctx, id)
 	if err != nil {
 		if errors.IsPermissionDenied(err) {
 			return &ttnpb.Rights{}, nil
@@ -63,16 +83,26 @@ func ListClient(ctx context.Context, id ttnpb.ClientIdentifiers) (*ttnpb.Rights,
 }
 
 // ListGateway lists the rights for the given gateway ID in the context.
-func ListGateway(ctx context.Context, id ttnpb.GatewayIdentifiers) (*ttnpb.Rights, error) {
+func ListGateway(ctx context.Context, id ttnpb.GatewayIdentifiers) (rights *ttnpb.Rights, err error) {
 	uid := unique.ID(ctx, id)
 	if inCtx, ok := fromContext(ctx); ok {
 		return inCtx.GatewayRights[uid], nil
 	}
+	if inCtx, ok := cacheFromContext(ctx); ok {
+		if rights, ok := inCtx.GatewayRights[uid]; ok {
+			return rights, nil
+		}
+	}
+	defer func() {
+		if err == nil {
+			cacheInContext(ctx, func(r *Rights) { r.setGatewayRights(uid, rights) })
+		}
+	}()
 	fetcher, ok := fetcherFromContext(ctx)
 	if !ok {
 		panic(errNoFetcher)
 	}
-	rights, err := fetcher.GatewayRights(ctx, id)
+	rights, err = fetcher.GatewayRights(ctx, id)
 	if err != nil {
 		if errors.IsPermissionDenied(err) {
 			return &ttnpb.Rights{}, nil
@@ -83,16 +113,26 @@ func ListGateway(ctx context.Context, id ttnpb.GatewayIdentifiers) (*ttnpb.Right
 }
 
 // ListOrganization lists the rights for the given organization ID in the context.
-func ListOrganization(ctx context.Context, id ttnpb.OrganizationIdentifiers) (*ttnpb.Rights, error) {
+func ListOrganization(ctx context.Context, id ttnpb.OrganizationIdentifiers) (rights *ttnpb.Rights, err error) {
 	uid := unique.ID(ctx, id)
 	if inCtx, ok := fromContext(ctx); ok {
 		return inCtx.OrganizationRights[uid], nil
 	}
+	if inCtx, ok := cacheFromContext(ctx); ok {
+		if rights, ok := inCtx.OrganizationRights[uid]; ok {
+			return rights, nil
+		}
+	}
+	defer func() {
+		if err == nil {
+			cacheInContext(ctx, func(r *Rights) { r.setOrganizationRights(uid, rights) })
+		}
+	}()
 	fetcher, ok := fetcherFromContext(ctx)
 	if !ok {
 		panic(errNoFetcher)
 	}
-	rights, err := fetcher.OrganizationRights(ctx, id)
+	rights, err = fetcher.OrganizationRights(ctx, id)
 	if err != nil {
 		if errors.IsPermissionDenied(err) {
 			return &ttnpb.Rights{}, nil
@@ -103,16 +143,26 @@ func ListOrganization(ctx context.Context, id ttnpb.OrganizationIdentifiers) (*t
 }
 
 // ListUser lists the rights for the given user ID in the context.
-func ListUser(ctx context.Context, id ttnpb.UserIdentifiers) (*ttnpb.Rights, error) {
+func ListUser(ctx context.Context, id ttnpb.UserIdentifiers) (rights *ttnpb.Rights, err error) {
 	uid := unique.ID(ctx, id)
 	if inCtx, ok := fromContext(ctx); ok {
 		return inCtx.UserRights[uid], nil
 	}
+	if inCtx, ok := cacheFromContext(ctx); ok {
+		if rights, ok := inCtx.UserRights[uid]; ok {
+			return rights, nil
+		}
+	}
+	defer func() {
+		if err == nil {
+			cacheInContext(ctx, func(r *Rights) { r.setUserRights(uid, rights) })
+		}
+	}()
 	fetcher, ok := fetcherFromContext(ctx)
 	if !ok {
 		panic(errNoFetcher)
 	}
-	rights, err := fetcher.UserRights(ctx, id)
+	rights, err = fetcher.UserRights(ctx, id)
 	if err != nil {
 		if errors.IsPermissionDenied(err) {
 			return &ttnpb.Rights{}, nil
