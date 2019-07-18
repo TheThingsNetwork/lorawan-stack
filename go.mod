@@ -68,7 +68,6 @@ require (
 	github.com/jarcoal/httpmock v1.0.4
 	github.com/jaytaylor/html2text v0.0.0-20190408195923-01ec452cbe43
 	github.com/jinzhu/gorm v1.9.10
-	github.com/jtacoma/uritemplates v1.0.0
 	github.com/kr/pretty v0.1.0
 	// Do not upgrade Echo beyond v4.1.2 - see https://github.com/TheThingsNetwork/lorawan-stack/issues/977 .
 	github.com/labstack/echo/v4 v4.1.2

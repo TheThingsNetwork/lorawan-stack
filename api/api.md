@@ -814,7 +814,7 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 | Field | Validations |
 | ----- | ----------- |
 | `ids` | <p>`message.required`: `true`</p> |
-| `format` | <p>`string.max_len`: `10`</p> |
+| `format` | <p>`string.max_len`: `20`</p> |
 | `base_topic` | <p>`string.max_len`: `100`</p> |
 
 ### <a name="ttn.lorawan.v3.ApplicationPubSub.Message">Message `ApplicationPubSub.Message`</a>
@@ -965,6 +965,7 @@ The NATS provider settings.
 | ----- | ----------- |
 | `ids` | <p>`message.required`: `true`</p> |
 | `base_url` | <p>`string.uri`: `true`</p> |
+| `format` | <p>`string.max_len`: `20`</p> |
 
 ### <a name="ttn.lorawan.v3.ApplicationWebhook.HeadersEntry">Message `ApplicationWebhook.HeadersEntry`</a>
 
@@ -1023,10 +1024,10 @@ The NATS provider settings.
 | `logo_url` | [`string`](#string) |  |  |
 | `info_url` | [`string`](#string) |  |  |
 | `documentation_url` | [`string`](#string) |  |  |
+| `base_url` | [`string`](#string) |  | The base URL of the template. Can contain template fields, in RFC 6570 format. |
+| `headers` | [`ApplicationWebhookTemplate.HeadersEntry`](#ttn.lorawan.v3.ApplicationWebhookTemplate.HeadersEntry) | repeated | The HTTP headers used by the template. Both the key and the value can contain template fields. |
 | `format` | [`string`](#string) |  |  |
 | `fields` | [`ApplicationWebhookTemplateField`](#ttn.lorawan.v3.ApplicationWebhookTemplateField) | repeated |  |
-| `headers` | [`ApplicationWebhookTemplate.HeadersEntry`](#ttn.lorawan.v3.ApplicationWebhookTemplate.HeadersEntry) | repeated | The HTTP headers used by the template. Both the key and the value can contain TemplateFields. |
-| `base_url` | [`string`](#string) |  | The base URL of the template. Can contain TemplateFields, in RFC 6570 format. |
 | `uplink_message` | [`ApplicationWebhookTemplate.Message`](#ttn.lorawan.v3.ApplicationWebhookTemplate.Message) |  |  |
 | `join_accept` | [`ApplicationWebhookTemplate.Message`](#ttn.lorawan.v3.ApplicationWebhookTemplate.Message) |  |  |
 | `downlink_ack` | [`ApplicationWebhookTemplate.Message`](#ttn.lorawan.v3.ApplicationWebhookTemplate.Message) |  |  |
@@ -1046,8 +1047,8 @@ The NATS provider settings.
 | `logo_url` | <p>`string.uri`: `true`</p> |
 | `info_url` | <p>`string.uri`: `true`</p> |
 | `documentation_url` | <p>`string.uri`: `true`</p> |
-| `format` | <p>`string.max_len`: `10`</p> |
 | `base_url` | <p>`string.uri`: `true`</p> |
+| `format` | <p>`string.max_len`: `20`</p> |
 
 ### <a name="ttn.lorawan.v3.ApplicationWebhookTemplate.HeadersEntry">Message `ApplicationWebhookTemplate.HeadersEntry`</a>
 
@@ -1060,7 +1061,7 @@ The NATS provider settings.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `path` | [`string`](#string) |  | Path to append to the base URL. Can contain TemplateFields, in RFC 6570 format. |
+| `path` | [`string`](#string) |  | Path to append to the base URL. Can contain template fields, in RFC 6570 format. |
 
 ### <a name="ttn.lorawan.v3.ApplicationWebhookTemplateField">Message `ApplicationWebhookTemplateField`</a>
 
@@ -1070,11 +1071,11 @@ The fields are meant to be replaced inside the URLs and headers when the webhook
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `id` | [`string`](#string) |  | The ID of the field. |
-| `name` | [`string`](#string) |  | The name of the field. |
-| `description` | [`string`](#string) |  | The description of the field. |
+| `id` | [`string`](#string) |  |  |
+| `name` | [`string`](#string) |  |  |
+| `description` | [`string`](#string) |  |  |
 | `secret` | [`bool`](#bool) |  | Secret decides if the field should be shown in plain-text or should stay hidden. |
-| `default_value` | [`string`](#string) |  | The default value of the field, if applicable. |
+| `default_value` | [`string`](#string) |  |  |
 
 #### Field Rules
 

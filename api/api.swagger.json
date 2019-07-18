@@ -7088,6 +7088,17 @@
         "documentation_url": {
           "type": "string"
         },
+        "base_url": {
+          "type": "string",
+          "description": "The base URL of the template. Can contain template fields, in RFC 6570 format."
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "The HTTP headers used by the template. Both the key and the value can contain template fields."
+        },
         "format": {
           "type": "string"
         },
@@ -7096,17 +7107,6 @@
           "items": {
             "$ref": "#/definitions/v3ApplicationWebhookTemplateField"
           }
-        },
-        "headers": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          },
-          "description": "The HTTP headers used by the template. Both the key and the value can contain TemplateFields."
-        },
-        "base_url": {
-          "type": "string",
-          "description": "The base URL of the template. Can contain TemplateFields, in RFC 6570 format."
         },
         "uplink_message": {
           "$ref": "#/definitions/v3ApplicationWebhookTemplateMessage"
@@ -7138,16 +7138,13 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string",
-          "description": "The ID of the field."
+          "type": "string"
         },
         "name": {
-          "type": "string",
-          "description": "The name of the field."
+          "type": "string"
         },
         "description": {
-          "type": "string",
-          "description": "The description of the field."
+          "type": "string"
         },
         "secret": {
           "type": "boolean",
@@ -7155,8 +7152,7 @@
           "description": "Secret decides if the field should be shown in plain-text or should stay hidden."
         },
         "default_value": {
-          "type": "string",
-          "description": "The default value of the field, if applicable."
+          "type": "string"
         }
       },
       "description": "ApplicationWebhookTemplateField represents a custom field that needs to be filled by the user in order to use the template.\nA field can be an API key, an username or password, or any custom platform specific field (such as region).\nThe fields are meant to be replaced inside the URLs and headers when the webhook is created."
@@ -7174,7 +7170,7 @@
       "properties": {
         "path": {
           "type": "string",
-          "description": "Path to append to the base URL. Can contain TemplateFields, in RFC 6570 format."
+          "description": "Path to append to the base URL. Can contain template fields, in RFC 6570 format."
         }
       }
     },

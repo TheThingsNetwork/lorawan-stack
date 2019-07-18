@@ -201,6 +201,25 @@ func (dst *ApplicationWebhookTemplate) SetFields(src *ApplicationWebhookTemplate
 				var zero string
 				dst.DocumentationURL = zero
 			}
+		case "base_url":
+			if len(subs) > 0 {
+				return fmt.Errorf("'base_url' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.BaseURL = src.BaseURL
+			} else {
+				var zero string
+				dst.BaseURL = zero
+			}
+		case "headers":
+			if len(subs) > 0 {
+				return fmt.Errorf("'headers' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Headers = src.Headers
+			} else {
+				dst.Headers = nil
+			}
 		case "format":
 			if len(subs) > 0 {
 				return fmt.Errorf("'format' has no subfields, but %s were specified", subs)
@@ -219,25 +238,6 @@ func (dst *ApplicationWebhookTemplate) SetFields(src *ApplicationWebhookTemplate
 				dst.Fields = src.Fields
 			} else {
 				dst.Fields = nil
-			}
-		case "headers":
-			if len(subs) > 0 {
-				return fmt.Errorf("'headers' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.Headers = src.Headers
-			} else {
-				dst.Headers = nil
-			}
-		case "base_url":
-			if len(subs) > 0 {
-				return fmt.Errorf("'base_url' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.BaseURL = src.BaseURL
-			} else {
-				var zero string
-				dst.BaseURL = zero
 			}
 		case "uplink_message":
 			if len(subs) > 0 {

@@ -454,12 +454,29 @@ func (m *ApplicationWebhookTemplate) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "base_url":
+
+			if uri, err := url.Parse(m.GetBaseURL()); err != nil {
+				return ApplicationWebhookTemplateValidationError{
+					field:  "base_url",
+					reason: "value must be a valid URI",
+					cause:  err,
+				}
+			} else if !uri.IsAbs() {
+				return ApplicationWebhookTemplateValidationError{
+					field:  "base_url",
+					reason: "value must be absolute",
+				}
+			}
+
+		case "headers":
+			// no validation rules for Headers
 		case "format":
 
-			if utf8.RuneCountInString(m.GetFormat()) > 10 {
+			if utf8.RuneCountInString(m.GetFormat()) > 20 {
 				return ApplicationWebhookTemplateValidationError{
 					field:  "format",
-					reason: "value length must be at most 10 runes",
+					reason: "value length must be at most 20 runes",
 				}
 			}
 
@@ -478,23 +495,6 @@ func (m *ApplicationWebhookTemplate) ValidateFields(paths ...string) error {
 					}
 				}
 
-			}
-
-		case "headers":
-			// no validation rules for Headers
-		case "base_url":
-
-			if uri, err := url.Parse(m.GetBaseURL()); err != nil {
-				return ApplicationWebhookTemplateValidationError{
-					field:  "base_url",
-					reason: "value must be a valid URI",
-					cause:  err,
-				}
-			} else if !uri.IsAbs() {
-				return ApplicationWebhookTemplateValidationError{
-					field:  "base_url",
-					reason: "value must be absolute",
-				}
 			}
 
 		case "uplink_message":
@@ -1028,7 +1028,14 @@ func (m *ApplicationWebhook) ValidateFields(paths ...string) error {
 		case "headers":
 			// no validation rules for Headers
 		case "format":
-			// no validation rules for Format
+
+			if utf8.RuneCountInString(m.GetFormat()) > 20 {
+				return ApplicationWebhookValidationError{
+					field:  "format",
+					reason: "value length must be at most 20 runes",
+				}
+			}
+
 		case "template_ids":
 
 			if v, ok := interface{}(m.ApplicationWebhookTemplateIdentifiers).(interface{ ValidateFields(...string) error }); ok {

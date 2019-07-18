@@ -131,7 +131,7 @@ func (c WebhooksConfig) NewWebhooks(ctx context.Context, server io.Server) (web.
 	return web.NewWebhooks(ctx, server, c.Registry, target), nil
 }
 
-// NewTemplateStore returns a new *web.TemplatStore based on the configuration.
+// NewTemplateStore returns a new *web.TemplateStore based on the configuration.
 // If no stores are provided, this method returns nil.
 func (c WebhooksConfig) NewTemplateStore() (*web.TemplateStore, error) {
 	var fetcher fetch.Interface

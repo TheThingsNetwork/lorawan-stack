@@ -1674,7 +1674,7 @@
                 "validate.rules": [
                   {
                     "name": "string.max_len",
-                    "value": 10
+                    "value": 20
                   }
                 ]
               }
@@ -2330,7 +2330,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 20
+                  }
+                ]
+              }
             },
             {
               "name": "template_ids",
@@ -2738,46 +2746,8 @@
               }
             },
             {
-              "name": "format",
-              "description": "",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "string.max_len",
-                    "value": 10
-                  }
-                ]
-              }
-            },
-            {
-              "name": "fields",
-              "description": "",
-              "label": "repeated",
-              "type": "ApplicationWebhookTemplateField",
-              "longType": "ApplicationWebhookTemplateField",
-              "fullType": "ttn.lorawan.v3.ApplicationWebhookTemplateField",
-              "ismap": false,
-              "defaultValue": ""
-            },
-            {
-              "name": "headers",
-              "description": "The HTTP headers used by the template. Both the key and the value can contain TemplateFields.",
-              "label": "repeated",
-              "type": "HeadersEntry",
-              "longType": "ApplicationWebhookTemplate.HeadersEntry",
-              "fullType": "ttn.lorawan.v3.ApplicationWebhookTemplate.HeadersEntry",
-              "ismap": true,
-              "defaultValue": ""
-            },
-            {
               "name": "base_url",
-              "description": "The base URL of the template. Can contain TemplateFields, in RFC 6570 format.",
+              "description": "The base URL of the template. Can contain template fields, in RFC 6570 format.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -2792,6 +2762,44 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "headers",
+              "description": "The HTTP headers used by the template. Both the key and the value can contain template fields.",
+              "label": "repeated",
+              "type": "HeadersEntry",
+              "longType": "ApplicationWebhookTemplate.HeadersEntry",
+              "fullType": "ttn.lorawan.v3.ApplicationWebhookTemplate.HeadersEntry",
+              "ismap": true,
+              "defaultValue": ""
+            },
+            {
+              "name": "format",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 20
+                  }
+                ]
+              }
+            },
+            {
+              "name": "fields",
+              "description": "",
+              "label": "repeated",
+              "type": "ApplicationWebhookTemplateField",
+              "longType": "ApplicationWebhookTemplateField",
+              "fullType": "ttn.lorawan.v3.ApplicationWebhookTemplateField",
+              "ismap": false,
+              "defaultValue": ""
             },
             {
               "name": "uplink_message",
@@ -2917,7 +2925,7 @@
           "fields": [
             {
               "name": "path",
-              "description": "Path to append to the base URL. Can contain TemplateFields, in RFC 6570 format.",
+              "description": "Path to append to the base URL. Can contain template fields, in RFC 6570 format.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -2938,7 +2946,7 @@
           "fields": [
             {
               "name": "id",
-              "description": "The ID of the field.",
+              "description": "",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -2956,7 +2964,7 @@
             },
             {
               "name": "name",
-              "description": "The name of the field.",
+              "description": "",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -2974,7 +2982,7 @@
             },
             {
               "name": "description",
-              "description": "The description of the field.",
+              "description": "",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -3002,7 +3010,7 @@
             },
             {
               "name": "default_value",
-              "description": "The default value of the field, if applicable.",
+              "description": "",
               "label": "",
               "type": "string",
               "longType": "string",

@@ -197,10 +197,10 @@ func (m *ApplicationPubSub) ValidateFields(paths ...string) error {
 
 		case "format":
 
-			if utf8.RuneCountInString(m.GetFormat()) > 10 {
+			if utf8.RuneCountInString(m.GetFormat()) > 20 {
 				return ApplicationPubSubValidationError{
 					field:  "format",
-					reason: "value length must be at most 10 runes",
+					reason: "value length must be at most 20 runes",
 				}
 			}
 
