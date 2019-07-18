@@ -20,6 +20,30 @@ class Collaborators {
     this._parentRoutes = parentRoutes
   }
 
+  async _getById (entityId, collaboratorId, isUser) {
+    const entityIdRoute = this._parentRoutes.get
+    const collaboratorIdRoute = isUser
+      ? 'collaborator.user_ids.user_id'
+      : 'collaborator.organization_ids.organization_id'
+
+    const result = await this._api.GetCollaborator({
+      routeParams: {
+        [entityIdRoute]: entityId,
+        [collaboratorIdRoute]: collaboratorId,
+      },
+    })
+
+    return Marshaler.payloadSingleResponse(result)
+  }
+
+  async getByUserId (entityId, userId) {
+    return this._getById(entityId, userId, true)
+  }
+
+  async getByOrganizationId (entityId, organizationId) {
+    return this._getById(entityId, organizationId, false)
+  }
+
   async getAll (entityId) {
     const entityIdRoute = this._parentRoutes.list
     const result = await this._api.ListCollaborators({

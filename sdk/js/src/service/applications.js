@@ -50,6 +50,7 @@ class Applications {
     this.Devices = new Devices(api, { proxy, stackConfig })
     this.Collaborators = new Collaborators(api.ApplicationAccess, {
       parentRoutes: {
+        get: 'application_ids.application_id',
         list: 'application_ids.application_id',
         set: 'application_ids.application_id',
       },
