@@ -28,7 +28,7 @@ func TestContext(t *testing.T) {
 	a := assertions.New(t)
 
 	ctx := test.Context()
-	rights, ok := FromContext(ctx)
+	rights, ok := fromContext(ctx)
 	a.So(ok, should.BeFalse)
 	a.So(rights, should.Resemble, Rights{})
 
@@ -52,7 +52,7 @@ func TestContext(t *testing.T) {
 
 	ctx = NewContext(ctx, fooRights)
 
-	rights, ok = FromContext(ctx)
+	rights, ok = fromContext(ctx)
 	a.So(ok, should.BeTrue)
 	a.So(rights, should.Resemble, fooRights)
 	a.So(rights.IncludesApplicationRights(unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "foo-app"}), ttnpb.RIGHT_APPLICATION_INFO), should.BeTrue)

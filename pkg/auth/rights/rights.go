@@ -84,8 +84,7 @@ type rightsKeyType struct{}
 
 var rightsKey rightsKeyType
 
-// FromContext returns the request rights from the context.
-func FromContext(ctx context.Context) (Rights, bool) {
+func fromContext(ctx context.Context) (Rights, bool) {
 	if rights, ok := ctx.Value(rightsKey).(Rights); ok {
 		return rights, true
 	}
