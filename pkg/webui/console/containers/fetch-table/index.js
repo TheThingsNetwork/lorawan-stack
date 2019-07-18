@@ -173,6 +173,7 @@ class FetchTable extends Component {
       items,
       entity,
       itemPathPrefix,
+      getItemPathPrefix,
       handlesPagination,
       pageSize,
     } = this.props
@@ -185,9 +186,15 @@ class FetchTable extends Component {
     }
 
     const entitySingle = entity.substr(0, entity.length - 1)
-    const item_id = items[itemIndex].id || items[itemIndex].ids[`${entitySingle}_id`]
+    let entityPath
+    if (Boolean(getItemPathPrefix)) {
+      entityPath = getItemPathPrefix(items[itemIndex])
+    } else {
+      const item_id = items[itemIndex].id || items[itemIndex].ids[`${entitySingle}_id`]
+      entityPath = `${itemPathPrefix}/${item_id}`
+    }
 
-    dispatch(push(`${pathname}${itemPathPrefix}/${item_id}`))
+    dispatch(push(`${pathname}${entityPath}`))
   }
 
   render () {
