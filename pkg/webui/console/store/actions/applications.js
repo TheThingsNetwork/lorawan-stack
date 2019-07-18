@@ -21,7 +21,12 @@ import {
 } from './pagination'
 import createApiKeysRequestActions, { createGetApiKeysListActionType } from './api-keys'
 import createApiKeyRequestActions, { createGetApiKeyActionType } from './api-key'
-import { createGetCollaboratorsListRequestActions, createGetCollaboratorsListActionType } from './collaborators'
+import {
+  createGetCollaboratorsListRequestActions,
+  createGetCollaboratorsListActionType,
+  createGetCollaboratorRequestActions,
+  createGetCollaboratorActionType,
+} from './collaborators'
 import { createRequestActions } from './lib'
 
 import {
@@ -123,6 +128,17 @@ export const [{
   success: getApplicationApiKeysListSuccess,
   failure: getApplicationApiKeysListFailure,
 }] = createApiKeysRequestActions(SHARED_NAME_SINGLE)
+
+export const GET_APP_COLLABORATOR_BASE = createGetCollaboratorActionType(SHARED_NAME_SINGLE)
+export const [{
+  request: GET_APP_COLLABORATOR,
+  success: GET_APP_COLLABORATOR_SUCCESS,
+  failure: GET_APP_COLLABORATOR_FAILURE,
+}, {
+  request: getApplicationCollaborator,
+  success: getApplicationCollaboratorSuccess,
+  failure: getApplicationCollaboratorFailure,
+}] = createGetCollaboratorRequestActions(SHARED_NAME_SINGLE)
 
 export const GET_APP_COLLABORATORS_LIST_BASE = createGetCollaboratorsListActionType(SHARED_NAME_SINGLE)
 export const [{
