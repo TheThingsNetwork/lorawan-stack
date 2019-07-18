@@ -178,10 +178,7 @@ func (as *ApplicationServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterAsEndDeviceRegistryServer(s, as.grpc.asDevices)
 	ttnpb.RegisterAppAsServer(s, as.grpc.appAs)
 	if as.webhooks != nil {
-		ttnpb.RegisterApplicationWebhookRegistryServer(s, web.NewWebhookRegistryRPC(as.webhooks.Registry()))
-	}
-	if as.webhookTemplates != nil {
-		ttnpb.RegisterApplicationWebhookTemplateRegistryServer(s, as.webhookTemplates)
+		ttnpb.RegisterApplicationWebhookRegistryServer(s, web.NewWebhookRegistryRPC(as.webhooks.Registry(), as.webhookTemplates))
 	}
 	if as.pubsub != nil {
 		ttnpb.RegisterApplicationPubSubRegistryServer(s, as.pubsub)
@@ -195,9 +192,6 @@ func (as *ApplicationServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.Cl
 	ttnpb.RegisterAppAsHandler(as.Context(), s, conn)
 	if as.webhooks != nil {
 		ttnpb.RegisterApplicationWebhookRegistryHandler(as.Context(), s, conn)
-	}
-	if as.webhookTemplates != nil {
-		ttnpb.RegisterApplicationWebhookTemplateRegistryHandler(as.Context(), s, conn)
 	}
 	if as.pubsub != nil {
 		ttnpb.RegisterApplicationPubSubRegistryHandler(as.Context(), s, conn)

@@ -475,99 +475,6 @@ func (m *ApplicationWebhookTemplates) GetTemplates() []*ApplicationWebhookTempla
 	return nil
 }
 
-type GetApplicationWebhookTemplateRequest struct {
-	ApplicationWebhookTemplateIdentifiers `protobuf:"bytes,1,opt,name=ids,proto3,embedded=ids" json:"ids"`
-	FieldMask                             types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
-	XXX_NoUnkeyedLiteral                  struct{}        `json:"-"`
-	XXX_sizecache                         int32           `json:"-"`
-}
-
-func (m *GetApplicationWebhookTemplateRequest) Reset()      { *m = GetApplicationWebhookTemplateRequest{} }
-func (*GetApplicationWebhookTemplateRequest) ProtoMessage() {}
-func (*GetApplicationWebhookTemplateRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_2652f2d8eaceda0e, []int{5}
-}
-func (m *GetApplicationWebhookTemplateRequest) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *GetApplicationWebhookTemplateRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_GetApplicationWebhookTemplateRequest.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *GetApplicationWebhookTemplateRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetApplicationWebhookTemplateRequest.Merge(m, src)
-}
-func (m *GetApplicationWebhookTemplateRequest) XXX_Size() int {
-	return m.Size()
-}
-func (m *GetApplicationWebhookTemplateRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetApplicationWebhookTemplateRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_GetApplicationWebhookTemplateRequest proto.InternalMessageInfo
-
-func (m *GetApplicationWebhookTemplateRequest) GetFieldMask() types.FieldMask {
-	if m != nil {
-		return m.FieldMask
-	}
-	return types.FieldMask{}
-}
-
-type ListApplicationWebhookTemplatesRequest struct {
-	FieldMask            types.FieldMask `protobuf:"bytes,1,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
-	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
-	XXX_sizecache        int32           `json:"-"`
-}
-
-func (m *ListApplicationWebhookTemplatesRequest) Reset() {
-	*m = ListApplicationWebhookTemplatesRequest{}
-}
-func (*ListApplicationWebhookTemplatesRequest) ProtoMessage() {}
-func (*ListApplicationWebhookTemplatesRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_2652f2d8eaceda0e, []int{6}
-}
-func (m *ListApplicationWebhookTemplatesRequest) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *ListApplicationWebhookTemplatesRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_ListApplicationWebhookTemplatesRequest.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *ListApplicationWebhookTemplatesRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ListApplicationWebhookTemplatesRequest.Merge(m, src)
-}
-func (m *ListApplicationWebhookTemplatesRequest) XXX_Size() int {
-	return m.Size()
-}
-func (m *ListApplicationWebhookTemplatesRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_ListApplicationWebhookTemplatesRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ListApplicationWebhookTemplatesRequest proto.InternalMessageInfo
-
-func (m *ListApplicationWebhookTemplatesRequest) GetFieldMask() types.FieldMask {
-	if m != nil {
-		return m.FieldMask
-	}
-	return types.FieldMask{}
-}
-
 type ApplicationWebhook struct {
 	ApplicationWebhookIdentifiers `protobuf:"bytes,1,opt,name=ids,proto3,embedded=ids" json:"ids"`
 	CreatedAt                     time.Time `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3,stdtime" json:"created_at"`
@@ -598,7 +505,7 @@ type ApplicationWebhook struct {
 func (m *ApplicationWebhook) Reset()      { *m = ApplicationWebhook{} }
 func (*ApplicationWebhook) ProtoMessage() {}
 func (*ApplicationWebhook) Descriptor() ([]byte, []int) {
-	return fileDescriptor_2652f2d8eaceda0e, []int{7}
+	return fileDescriptor_2652f2d8eaceda0e, []int{5}
 }
 func (m *ApplicationWebhook) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -735,7 +642,7 @@ type ApplicationWebhook_Message struct {
 func (m *ApplicationWebhook_Message) Reset()      { *m = ApplicationWebhook_Message{} }
 func (*ApplicationWebhook_Message) ProtoMessage() {}
 func (*ApplicationWebhook_Message) Descriptor() ([]byte, []int) {
-	return fileDescriptor_2652f2d8eaceda0e, []int{7, 2}
+	return fileDescriptor_2652f2d8eaceda0e, []int{5, 2}
 }
 func (m *ApplicationWebhook_Message) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -780,7 +687,7 @@ type ApplicationWebhooks struct {
 func (m *ApplicationWebhooks) Reset()      { *m = ApplicationWebhooks{} }
 func (*ApplicationWebhooks) ProtoMessage() {}
 func (*ApplicationWebhooks) Descriptor() ([]byte, []int) {
-	return fileDescriptor_2652f2d8eaceda0e, []int{8}
+	return fileDescriptor_2652f2d8eaceda0e, []int{6}
 }
 func (m *ApplicationWebhooks) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -826,7 +733,7 @@ type ApplicationWebhookFormats struct {
 func (m *ApplicationWebhookFormats) Reset()      { *m = ApplicationWebhookFormats{} }
 func (*ApplicationWebhookFormats) ProtoMessage() {}
 func (*ApplicationWebhookFormats) Descriptor() ([]byte, []int) {
-	return fileDescriptor_2652f2d8eaceda0e, []int{9}
+	return fileDescriptor_2652f2d8eaceda0e, []int{7}
 }
 func (m *ApplicationWebhookFormats) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -872,7 +779,7 @@ type GetApplicationWebhookRequest struct {
 func (m *GetApplicationWebhookRequest) Reset()      { *m = GetApplicationWebhookRequest{} }
 func (*GetApplicationWebhookRequest) ProtoMessage() {}
 func (*GetApplicationWebhookRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_2652f2d8eaceda0e, []int{10}
+	return fileDescriptor_2652f2d8eaceda0e, []int{8}
 }
 func (m *GetApplicationWebhookRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -918,7 +825,7 @@ type ListApplicationWebhooksRequest struct {
 func (m *ListApplicationWebhooksRequest) Reset()      { *m = ListApplicationWebhooksRequest{} }
 func (*ListApplicationWebhooksRequest) ProtoMessage() {}
 func (*ListApplicationWebhooksRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_2652f2d8eaceda0e, []int{11}
+	return fileDescriptor_2652f2d8eaceda0e, []int{9}
 }
 func (m *ListApplicationWebhooksRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -964,7 +871,7 @@ type SetApplicationWebhookRequest struct {
 func (m *SetApplicationWebhookRequest) Reset()      { *m = SetApplicationWebhookRequest{} }
 func (*SetApplicationWebhookRequest) ProtoMessage() {}
 func (*SetApplicationWebhookRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_2652f2d8eaceda0e, []int{12}
+	return fileDescriptor_2652f2d8eaceda0e, []int{10}
 }
 func (m *SetApplicationWebhookRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1000,6 +907,99 @@ func (m *SetApplicationWebhookRequest) GetFieldMask() types.FieldMask {
 	return types.FieldMask{}
 }
 
+type GetApplicationWebhookTemplateRequest struct {
+	ApplicationWebhookTemplateIdentifiers `protobuf:"bytes,1,opt,name=ids,proto3,embedded=ids" json:"ids"`
+	FieldMask                             types.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
+	XXX_NoUnkeyedLiteral                  struct{}        `json:"-"`
+	XXX_sizecache                         int32           `json:"-"`
+}
+
+func (m *GetApplicationWebhookTemplateRequest) Reset()      { *m = GetApplicationWebhookTemplateRequest{} }
+func (*GetApplicationWebhookTemplateRequest) ProtoMessage() {}
+func (*GetApplicationWebhookTemplateRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_2652f2d8eaceda0e, []int{11}
+}
+func (m *GetApplicationWebhookTemplateRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *GetApplicationWebhookTemplateRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_GetApplicationWebhookTemplateRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *GetApplicationWebhookTemplateRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetApplicationWebhookTemplateRequest.Merge(m, src)
+}
+func (m *GetApplicationWebhookTemplateRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *GetApplicationWebhookTemplateRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetApplicationWebhookTemplateRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetApplicationWebhookTemplateRequest proto.InternalMessageInfo
+
+func (m *GetApplicationWebhookTemplateRequest) GetFieldMask() types.FieldMask {
+	if m != nil {
+		return m.FieldMask
+	}
+	return types.FieldMask{}
+}
+
+type ListApplicationWebhookTemplatesRequest struct {
+	FieldMask            types.FieldMask `protobuf:"bytes,1,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask"`
+	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
+	XXX_sizecache        int32           `json:"-"`
+}
+
+func (m *ListApplicationWebhookTemplatesRequest) Reset() {
+	*m = ListApplicationWebhookTemplatesRequest{}
+}
+func (*ListApplicationWebhookTemplatesRequest) ProtoMessage() {}
+func (*ListApplicationWebhookTemplatesRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_2652f2d8eaceda0e, []int{12}
+}
+func (m *ListApplicationWebhookTemplatesRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ListApplicationWebhookTemplatesRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ListApplicationWebhookTemplatesRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *ListApplicationWebhookTemplatesRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListApplicationWebhookTemplatesRequest.Merge(m, src)
+}
+func (m *ListApplicationWebhookTemplatesRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *ListApplicationWebhookTemplatesRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListApplicationWebhookTemplatesRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListApplicationWebhookTemplatesRequest proto.InternalMessageInfo
+
+func (m *ListApplicationWebhookTemplatesRequest) GetFieldMask() types.FieldMask {
+	if m != nil {
+		return m.FieldMask
+	}
+	return types.FieldMask{}
+}
+
 func init() {
 	proto.RegisterType((*ApplicationWebhookIdentifiers)(nil), "ttn.lorawan.v3.ApplicationWebhookIdentifiers")
 	golang_proto.RegisterType((*ApplicationWebhookIdentifiers)(nil), "ttn.lorawan.v3.ApplicationWebhookIdentifiers")
@@ -1015,10 +1015,6 @@ func init() {
 	golang_proto.RegisterType((*ApplicationWebhookTemplate_Message)(nil), "ttn.lorawan.v3.ApplicationWebhookTemplate.Message")
 	proto.RegisterType((*ApplicationWebhookTemplates)(nil), "ttn.lorawan.v3.ApplicationWebhookTemplates")
 	golang_proto.RegisterType((*ApplicationWebhookTemplates)(nil), "ttn.lorawan.v3.ApplicationWebhookTemplates")
-	proto.RegisterType((*GetApplicationWebhookTemplateRequest)(nil), "ttn.lorawan.v3.GetApplicationWebhookTemplateRequest")
-	golang_proto.RegisterType((*GetApplicationWebhookTemplateRequest)(nil), "ttn.lorawan.v3.GetApplicationWebhookTemplateRequest")
-	proto.RegisterType((*ListApplicationWebhookTemplatesRequest)(nil), "ttn.lorawan.v3.ListApplicationWebhookTemplatesRequest")
-	golang_proto.RegisterType((*ListApplicationWebhookTemplatesRequest)(nil), "ttn.lorawan.v3.ListApplicationWebhookTemplatesRequest")
 	proto.RegisterType((*ApplicationWebhook)(nil), "ttn.lorawan.v3.ApplicationWebhook")
 	golang_proto.RegisterType((*ApplicationWebhook)(nil), "ttn.lorawan.v3.ApplicationWebhook")
 	proto.RegisterMapType((map[string]string)(nil), "ttn.lorawan.v3.ApplicationWebhook.HeadersEntry")
@@ -1039,6 +1035,10 @@ func init() {
 	golang_proto.RegisterType((*ListApplicationWebhooksRequest)(nil), "ttn.lorawan.v3.ListApplicationWebhooksRequest")
 	proto.RegisterType((*SetApplicationWebhookRequest)(nil), "ttn.lorawan.v3.SetApplicationWebhookRequest")
 	golang_proto.RegisterType((*SetApplicationWebhookRequest)(nil), "ttn.lorawan.v3.SetApplicationWebhookRequest")
+	proto.RegisterType((*GetApplicationWebhookTemplateRequest)(nil), "ttn.lorawan.v3.GetApplicationWebhookTemplateRequest")
+	golang_proto.RegisterType((*GetApplicationWebhookTemplateRequest)(nil), "ttn.lorawan.v3.GetApplicationWebhookTemplateRequest")
+	proto.RegisterType((*ListApplicationWebhookTemplatesRequest)(nil), "ttn.lorawan.v3.ListApplicationWebhookTemplatesRequest")
+	golang_proto.RegisterType((*ListApplicationWebhookTemplatesRequest)(nil), "ttn.lorawan.v3.ListApplicationWebhookTemplatesRequest")
 }
 
 func init() {
@@ -1049,115 +1049,115 @@ func init() {
 }
 
 var fileDescriptor_2652f2d8eaceda0e = []byte{
-	// 1723 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x58, 0x4d, 0x8c, 0xdb, 0xc6,
-	0x15, 0xe6, 0x48, 0x5a, 0x69, 0x35, 0xda, 0xbf, 0x8c, 0xe3, 0x94, 0x95, 0xed, 0xd1, 0x96, 0x71,
-	0xd3, 0xb5, 0x63, 0x51, 0x81, 0xd2, 0x24, 0xcd, 0xa2, 0x88, 0xb1, 0xaa, 0x63, 0xc7, 0x8d, 0xdd,
-	0xc4, 0x54, 0xb6, 0x69, 0x63, 0x24, 0x02, 0x57, 0x1c, 0x69, 0x59, 0x51, 0x24, 0x43, 0x8e, 0x76,
-	0xbb, 0x0d, 0x16, 0x48, 0x73, 0x32, 0x72, 0x0a, 0x92, 0x43, 0x73, 0x2a, 0x8a, 0xf6, 0x92, 0xde,
-	0x52, 0xa0, 0x87, 0xa0, 0x27, 0x1f, 0x8a, 0xc2, 0x87, 0x1e, 0x0c, 0x14, 0x08, 0x02, 0x14, 0xd8,
-	0x66, 0xa9, 0x1e, 0xd2, 0x5b, 0x8e, 0x3e, 0x16, 0x1c, 0x0e, 0x25, 0xea, 0x6f, 0x97, 0xd2, 0x3a,
-	0x39, 0x2d, 0x47, 0xf3, 0xde, 0xf7, 0xbe, 0xf7, 0xe6, 0xf1, 0x7d, 0xb3, 0x84, 0x45, 0xc3, 0x72,
-	0xd4, 0x5d, 0xd5, 0x2c, 0xba, 0x54, 0xad, 0xb7, 0x4a, 0xaa, 0xad, 0x97, 0x54, 0xdb, 0x36, 0xf4,
-	0xba, 0x4a, 0x75, 0xcb, 0x74, 0x89, 0xb3, 0x43, 0x9c, 0xda, 0x2e, 0xd9, 0x92, 0x6d, 0xc7, 0xa2,
-	0x16, 0x5a, 0xa2, 0xd4, 0x94, 0xb9, 0x8b, 0xbc, 0xf3, 0x74, 0x7e, 0xa3, 0xa9, 0xd3, 0xed, 0xce,
-	0x96, 0x5c, 0xb7, 0xda, 0x25, 0x62, 0xee, 0x58, 0x7b, 0xb6, 0x63, 0xfd, 0x7a, 0xaf, 0xc4, 0x8c,
-	0xeb, 0xc5, 0x26, 0x31, 0x8b, 0x3b, 0xaa, 0xa1, 0x6b, 0x2a, 0x25, 0xa5, 0x91, 0x87, 0x00, 0x32,
-	0x5f, 0x8c, 0x40, 0x34, 0xad, 0xa6, 0x15, 0x38, 0x6f, 0x75, 0x1a, 0x6c, 0xc5, 0x16, 0xec, 0x89,
-	0x9b, 0x9f, 0x6d, 0x5a, 0x56, 0xd3, 0x20, 0x01, 0x53, 0xd3, 0xb4, 0x68, 0x40, 0x94, 0xef, 0x9e,
-	0xe1, 0xbb, 0x3d, 0x0c, 0xd2, 0xb6, 0xe9, 0x1e, 0xdf, 0x5c, 0x1d, 0xde, 0x6c, 0xe8, 0xc4, 0xd0,
-	0x6a, 0x6d, 0xd5, 0x6d, 0x71, 0x8b, 0xc2, 0xb0, 0x05, 0xd5, 0xdb, 0xc4, 0xa5, 0x6a, 0xdb, 0xe6,
-	0x06, 0x8f, 0x8f, 0x96, 0x4b, 0xd7, 0x88, 0x49, 0xf5, 0x86, 0x4e, 0x1c, 0x4e, 0x42, 0xfa, 0x37,
-	0x80, 0xe7, 0x36, 0xfa, 0x45, 0x7c, 0x9d, 0x6c, 0x6d, 0x5b, 0x56, 0xeb, 0x7a, 0xdf, 0x0e, 0xd5,
-	0xe1, 0x72, 0xa4, 0xca, 0x35, 0x5d, 0x73, 0x45, 0xb0, 0x0a, 0xd6, 0x72, 0xe5, 0x27, 0xe4, 0xc1,
-	0x02, 0xcb, 0x11, 0x9c, 0x08, 0x40, 0x05, 0xdd, 0x3b, 0x28, 0x08, 0xf7, 0x0f, 0x0a, 0xe0, 0x6f,
-	0xff, 0xbb, 0x9b, 0x9c, 0x7b, 0x1f, 0x24, 0x56, 0x80, 0xb2, 0xa4, 0x46, 0x6d, 0x5d, 0xb4, 0x09,
-	0xe1, 0x6e, 0x10, 0xba, 0xa6, 0x6b, 0x62, 0x62, 0x15, 0xac, 0x65, 0x2b, 0xcf, 0x7a, 0x07, 0x85,
-	0x6c, 0x48, 0xe8, 0x8a, 0xef, 0x7c, 0xde, 0x91, 0xc4, 0xf3, 0x65, 0xfc, 0xd6, 0x6d, 0xb5, 0xf8,
-	0x9b, 0xa7, 0x8a, 0xcf, 0xbf, 0xb9, 0x76, 0x79, 0xfd, 0x76, 0xf1, 0xcd, 0xcb, 0xe1, 0xf2, 0xc2,
-	0x3b, 0xe5, 0x4b, 0xfb, 0xe7, 0x95, 0xec, 0x6e, 0x98, 0x84, 0xf4, 0x5b, 0x00, 0xbf, 0x3f, 0x9a,
-	0xdd, 0x6b, 0xa4, 0x6d, 0x1b, 0x2a, 0x25, 0xd1, 0x2c, 0x7f, 0x01, 0x73, 0x94, 0xff, 0xec, 0x33,
-	0x00, 0x8c, 0xc1, 0x73, 0xde, 0x41, 0x01, 0xf6, 0xac, 0xa7, 0xa0, 0x00, 0x69, 0x2f, 0x84, 0xf4,
-	0x39, 0x80, 0x85, 0xc9, 0x1c, 0xae, 0xfa, 0xc7, 0x8a, 0x0a, 0x30, 0xd1, 0x0b, 0xba, 0xec, 0x1d,
-	0x14, 0x12, 0x41, 0xb0, 0x94, 0x93, 0x10, 0x1f, 0x55, 0x12, 0xba, 0x86, 0xce, 0xc1, 0x94, 0xa9,
-	0xb6, 0x09, 0xaf, 0x4c, 0xb6, 0xbf, 0xc9, 0x7e, 0x46, 0x4f, 0xc2, 0x9c, 0x46, 0xdc, 0xba, 0xa3,
-	0xdb, 0x7e, 0x08, 0x31, 0x39, 0x68, 0xa5, 0x29, 0xd1, 0x5d, 0xf4, 0x18, 0x4c, 0xbb, 0xa4, 0xee,
-	0x10, 0x2a, 0xa6, 0x56, 0xc1, 0xda, 0xbc, 0xc2, 0x57, 0x48, 0x86, 0x8b, 0x1a, 0x69, 0xa8, 0x1d,
-	0x83, 0xd6, 0x76, 0x54, 0xa3, 0x43, 0xc4, 0xb9, 0x61, 0x98, 0x05, 0xbe, 0xff, 0x73, 0x7f, 0x5b,
-	0xfa, 0x30, 0x07, 0xf3, 0x93, 0x13, 0x43, 0xb7, 0x61, 0xb2, 0xdf, 0x2b, 0xcf, 0x1c, 0xd1, 0x2b,
-	0x93, 0x4f, 0x65, 0x6c, 0xeb, 0xf8, 0xa8, 0x0f, 0xb5, 0x1e, 0x4f, 0xc1, 0x79, 0xc3, 0x6a, 0x5a,
-	0xb5, 0x8e, 0x63, 0xb0, 0x8a, 0x64, 0x2b, 0xa7, 0xbd, 0x83, 0x42, 0xe6, 0x86, 0xd5, 0xb4, 0x36,
-	0x95, 0x1b, 0x2c, 0xb2, 0x93, 0xbc, 0x03, 0x80, 0x92, 0xf1, 0xcd, 0x36, 0x1d, 0xc3, 0xf7, 0xd0,
-	0xcd, 0x46, 0xe0, 0x31, 0xd7, 0xf7, 0xb8, 0x6e, 0x36, 0x86, 0x3d, 0x7c, 0x33, 0xdf, 0xe3, 0x65,
-	0xf8, 0x88, 0x66, 0xd5, 0x3b, 0x6d, 0x62, 0x06, 0x33, 0x80, 0xb9, 0xa6, 0x99, 0x2b, 0xf6, 0x0e,
-	0x0a, 0x2b, 0x57, 0xa2, 0x9b, 0x83, 0x18, 0x2b, 0x03, 0x8e, 0x3c, 0xfc, 0x96, 0xea, 0x12, 0x86,
-	0x91, 0xe9, 0x87, 0xaf, 0xa8, 0x2e, 0x19, 0x0a, 0xef, 0x9b, 0xf9, 0x1e, 0xb7, 0x60, 0x66, 0x9b,
-	0xa8, 0x1a, 0x71, 0x5c, 0x71, 0x7e, 0x35, 0xb9, 0x96, 0x2b, 0x3f, 0x17, 0xff, 0x3c, 0xe4, 0x97,
-	0x02, 0xcf, 0x17, 0x4d, 0xea, 0xec, 0x29, 0x21, 0x0e, 0xfa, 0x1e, 0x4c, 0x37, 0x2c, 0xa7, 0xad,
-	0x52, 0x31, 0x3b, 0x7c, 0x06, 0x7c, 0x03, 0x5d, 0x83, 0x69, 0x36, 0xb5, 0x5c, 0x11, 0xb2, 0xa0,
-	0xa5, 0xf8, 0x41, 0xd9, 0x6b, 0xa1, 0x70, 0x77, 0xf4, 0x4b, 0xb8, 0xd4, 0xb1, 0x0d, 0xdd, 0x6c,
-	0xd5, 0xda, 0xc4, 0x75, 0xd5, 0x26, 0x11, 0x73, 0xac, 0xab, 0xca, 0x53, 0x64, 0x71, 0x33, 0xf0,
-	0x54, 0x16, 0x03, 0x24, 0xbe, 0x44, 0x55, 0x98, 0xfb, 0x95, 0xa5, 0x9b, 0x35, 0xb5, 0x5e, 0x27,
-	0x36, 0x15, 0x17, 0x66, 0xc6, 0x85, 0x3e, 0xcc, 0x06, 0x43, 0x41, 0x9b, 0x70, 0x41, 0xb3, 0x76,
-	0x4d, 0xc6, 0x58, 0xad, 0xb7, 0xc4, 0xc5, 0x99, 0x51, 0x73, 0x21, 0xce, 0x46, 0xbd, 0x85, 0x5e,
-	0x87, 0x8b, 0x3d, 0x58, 0xd3, 0xc7, 0x5d, 0x9a, 0x19, 0xb7, 0xc7, 0xef, 0x67, 0xea, 0x10, 0xb0,
-	0x4b, 0x4c, 0x2a, 0x2e, 0x9f, 0x1c, 0xb8, 0x4a, 0x4c, 0x8a, 0x6e, 0xc3, 0xe5, 0x1e, 0x70, 0x43,
-	0xd5, 0x0d, 0xa2, 0x89, 0x2b, 0x33, 0x43, 0x2f, 0x85, 0x50, 0x57, 0x19, 0xd2, 0x00, 0xf8, 0xdb,
-	0x1d, 0xd2, 0x21, 0x9a, 0xf8, 0xc8, 0xc9, 0xc1, 0x6f, 0x31, 0x24, 0x1f, 0xdc, 0xb0, 0xb8, 0xe4,
-	0xb9, 0x96, 0xb1, 0x43, 0x34, 0x11, 0xcd, 0x0e, 0x1e, 0x42, 0x55, 0x19, 0x52, 0x7e, 0x1d, 0x2e,
-	0x44, 0x5f, 0x2a, 0xb4, 0x02, 0x93, 0x2d, 0xb2, 0x17, 0xcc, 0x7f, 0xc5, 0x7f, 0x44, 0x8f, 0xc2,
-	0xb9, 0x60, 0x06, 0xb3, 0x01, 0xa7, 0x04, 0x8b, 0xf5, 0xc4, 0x8f, 0x40, 0xfe, 0x1c, 0xcc, 0x84,
-	0xbd, 0x8b, 0x60, 0xca, 0x56, 0xe9, 0x36, 0xf7, 0x63, 0xcf, 0x52, 0x13, 0x9e, 0x99, 0x4c, 0xc8,
-	0x45, 0x2f, 0xc1, 0x6c, 0x28, 0x4d, 0xfe, 0x68, 0xf6, 0xdf, 0xca, 0x8b, 0xf1, 0x13, 0x52, 0xfa,
-	0xce, 0xd2, 0xdf, 0x01, 0x3c, 0x7f, 0x8d, 0xd0, 0x23, 0x8c, 0xc9, 0xdb, 0x1d, 0xe2, 0xd2, 0x6f,
-	0x56, 0x07, 0x2e, 0x43, 0xd8, 0xbf, 0x18, 0xb1, 0x62, 0xe5, 0xca, 0x79, 0x39, 0xb8, 0x19, 0xc9,
-	0xe1, 0xcd, 0x48, 0x66, 0xd3, 0xe4, 0xa6, 0xea, 0xb6, 0x2a, 0x29, 0x1f, 0x48, 0xc9, 0x36, 0xc2,
-	0x1f, 0x24, 0x1d, 0x3e, 0x71, 0x43, 0x77, 0x8f, 0x48, 0xc3, 0x0d, 0xf3, 0x18, 0x0c, 0x05, 0xa6,
-	0x0f, 0xf5, 0x5e, 0x0e, 0xa2, 0xd1, 0x38, 0xa8, 0x1a, 0xad, 0x4f, 0xf1, 0xf8, 0xfa, 0xc4, 0xaa,
-	0xcb, 0x4f, 0x20, 0xac, 0x3b, 0x44, 0xa5, 0x44, 0xab, 0xa9, 0x74, 0x62, 0x5d, 0x5e, 0x0b, 0x6f,
-	0x8c, 0x95, 0x79, 0x1f, 0xe8, 0x83, 0xff, 0x14, 0x80, 0x92, 0xe5, 0x7e, 0x1b, 0xd4, 0x07, 0xe9,
-	0xd8, 0x5a, 0x08, 0x92, 0x9c, 0x06, 0x84, 0xfb, 0x6d, 0xd0, 0x01, 0xb1, 0x4a, 0xc5, 0x12, 0xab,
-	0xeb, 0x7d, 0xb1, 0x9a, 0x8b, 0xab, 0x1b, 0xc7, 0x8a, 0x54, 0x7a, 0x92, 0x48, 0xbd, 0x05, 0x17,
-	0x22, 0x17, 0x3f, 0x97, 0x8f, 0xbe, 0x19, 0xfb, 0x34, 0xe5, 0x9f, 0x85, 0x92, 0xeb, 0xdf, 0xfe,
-	0x5c, 0x54, 0x83, 0xcb, 0x3d, 0x7c, 0xae, 0x86, 0x2b, 0x2c, 0xab, 0x67, 0x63, 0x64, 0x35, 0x20,
-	0x87, 0x3c, 0xb9, 0x25, 0x3a, 0xf0, 0x23, 0xba, 0x35, 0x22, 0x8e, 0x19, 0x96, 0x42, 0x8c, 0xf7,
-	0x7a, 0x92, 0x28, 0xbe, 0x3c, 0x28, 0x8a, 0xf3, 0x53, 0xe3, 0x45, 0xc5, 0xf0, 0xe6, 0x90, 0x18,
-	0x66, 0xa7, 0x46, 0x1b, 0x10, 0xc1, 0x57, 0x86, 0x45, 0x10, 0x4e, 0x8d, 0x37, 0x28, 0x7e, 0xaf,
-	0x0c, 0x8b, 0x5f, 0x6e, 0x76, 0x40, 0x26, 0x7a, 0xd5, 0x51, 0xd1, 0x5b, 0x98, 0x1a, 0x72, 0x58,
-	0xec, 0xaa, 0xa3, 0x62, 0xb7, 0x38, 0x3b, 0x28, 0x17, 0xb9, 0xea, 0xa8, 0xc8, 0x2d, 0x4d, 0x0f,
-	0xfa, 0x10, 0xc5, 0x6d, 0x03, 0x9e, 0x1a, 0xd3, 0xf2, 0x0f, 0x53, 0x1f, 0x37, 0xe1, 0xa9, 0xd1,
-	0x5c, 0x5c, 0xf4, 0x02, 0x9c, 0xe7, 0xff, 0x35, 0x86, 0xb2, 0x28, 0x1d, 0x5f, 0x02, 0xa5, 0xe7,
-	0x23, 0xfd, 0x19, 0xc0, 0xef, 0x8e, 0x1a, 0x5c, 0x65, 0x23, 0xc6, 0x45, 0xaf, 0xc2, 0x4c, 0x30,
-	0x6d, 0x42, 0xf0, 0x18, 0xef, 0x3e, 0xf7, 0x95, 0xf9, 0x5f, 0x3e, 0xd8, 0x38, 0x8c, 0x5f, 0xe4,
-	0xe8, 0xc6, 0x34, 0x15, 0x92, 0xfe, 0x0a, 0xe0, 0xd9, 0xb1, 0xca, 0x1d, 0x2a, 0xdd, 0x37, 0xa2,
-	0x48, 0x27, 0x56, 0xea, 0x7f, 0x00, 0x88, 0xc7, 0x4b, 0x75, 0x4f, 0xa2, 0xbf, 0x95, 0x4f, 0x15,
-	0x27, 0x4e, 0xe4, 0x2f, 0x00, 0x9e, 0xad, 0x1e, 0x55, 0xff, 0x57, 0x61, 0x86, 0x37, 0x16, 0xa7,
-	0x1f, 0xa3, 0x17, 0xc7, 0x52, 0x0f, 0x61, 0x4e, 0xcc, 0xb9, 0xfc, 0xcf, 0x04, 0x94, 0x8e, 0xba,
-	0xea, 0x35, 0x75, 0xd7, 0x6f, 0xc3, 0x8f, 0x01, 0x4c, 0x5e, 0x23, 0x14, 0xfd, 0x70, 0x98, 0x70,
-	0x9c, 0x9b, 0x62, 0x7e, 0x8a, 0x9b, 0xa8, 0x54, 0x7a, 0xef, 0x5f, 0xff, 0xfd, 0x28, 0x71, 0x01,
-	0xfd, 0xa0, 0xa4, 0xba, 0x25, 0x9e, 0x66, 0xb1, 0x77, 0x3b, 0x2d, 0xbd, 0xa3, 0x6b, 0xae, 0x1c,
-	0xd1, 0xf5, 0x7d, 0xf4, 0x3e, 0x80, 0x29, 0xbf, 0x7d, 0xd0, 0xc8, 0xbb, 0x17, 0xef, 0xfe, 0x97,
-	0x7f, 0x32, 0x3e, 0x3b, 0x57, 0x3a, 0xc7, 0xe8, 0x7d, 0x07, 0x9d, 0x1e, 0x4b, 0xaf, 0xfc, 0x79,
-	0x7a, 0xdc, 0xa7, 0x93, 0x5e, 0x19, 0x0d, 0x08, 0xaf, 0x11, 0x1a, 0x4e, 0x8f, 0xc7, 0x46, 0x0e,
-	0xea, 0xc5, 0xb6, 0x4d, 0xf7, 0xf2, 0x17, 0x62, 0x0f, 0x11, 0xe9, 0x0c, 0xa3, 0x73, 0x1a, 0x9d,
-	0x8a, 0xd2, 0xe1, 0xb3, 0x04, 0xfd, 0x89, 0x1f, 0xda, 0xa5, 0x58, 0x87, 0x16, 0x96, 0x23, 0x46,
-	0x4f, 0x4a, 0x3f, 0x65, 0x61, 0xaf, 0xa0, 0x4a, 0x24, 0x2c, 0x3f, 0x9b, 0xa1, 0xf7, 0x74, 0x68,
-	0xbd, 0x1f, 0x18, 0xf5, 0x3f, 0x09, 0xee, 0xa3, 0x0f, 0xc3, 0xf3, 0x93, 0xe3, 0x9d, 0x5f, 0xef,
-	0xdc, 0x1e, 0x3f, 0x9e, 0xa8, 0x2b, 0x3d, 0xc3, 0x98, 0x96, 0x50, 0x71, 0x90, 0xe9, 0x31, 0x2c,
-	0xd1, 0x03, 0x00, 0x93, 0xd5, 0x71, 0xa5, 0xab, 0x9e, 0xb4, 0x74, 0xbf, 0x07, 0x8c, 0xd1, 0xef,
-	0x40, 0x5e, 0x19, 0xa4, 0xc4, 0x9f, 0xe4, 0x58, 0x45, 0x8c, 0x1a, 0x47, 0x8a, 0xb9, 0x0e, 0x2e,
-	0xbe, 0xf1, 0x82, 0xf4, 0xfc, 0xcc, 0xc0, 0xeb, 0xe0, 0x22, 0xfa, 0x08, 0xc0, 0xf4, 0x15, 0x62,
-	0x10, 0x4a, 0xd0, 0x74, 0x12, 0x91, 0x9f, 0xd0, 0xcf, 0x52, 0x85, 0x65, 0xfc, 0xe3, 0x8b, 0xeb,
-	0x53, 0x9d, 0x41, 0x8f, 0xb8, 0xbf, 0xa8, 0xfc, 0x11, 0xdc, 0x3b, 0xc4, 0xe0, 0xfe, 0x21, 0x06,
-	0x5f, 0x1c, 0x62, 0xe1, 0xcb, 0x43, 0x2c, 0x7c, 0x75, 0x88, 0x85, 0xaf, 0x0f, 0xb1, 0xf0, 0xe0,
-	0x10, 0x83, 0x77, 0x3d, 0x0c, 0xee, 0x78, 0x58, 0xf8, 0xc4, 0xc3, 0xe0, 0x53, 0x0f, 0x0b, 0x9f,
-	0x79, 0x58, 0xb8, 0xeb, 0x61, 0xe1, 0x9e, 0x87, 0xc1, 0x7d, 0x0f, 0x83, 0x2f, 0x3c, 0x2c, 0x7c,
-	0xe9, 0x61, 0xf0, 0x95, 0x87, 0x85, 0xaf, 0x3d, 0x0c, 0x1e, 0x78, 0x58, 0x78, 0xb7, 0x8b, 0x85,
-	0x3b, 0x5d, 0x0c, 0x3e, 0xe8, 0x62, 0xe1, 0xe3, 0x2e, 0x06, 0x7f, 0xe8, 0x62, 0xe1, 0x93, 0x2e,
-	0x16, 0x3e, 0xed, 0x62, 0xf0, 0x59, 0x17, 0x83, 0xbb, 0x5d, 0x0c, 0xde, 0xb8, 0xd4, 0xb4, 0x64,
-	0xba, 0x4d, 0xe8, 0xb6, 0x6e, 0x36, 0x5d, 0xd9, 0x24, 0x74, 0xd7, 0x72, 0x5a, 0xa5, 0xc1, 0xef,
-	0xef, 0x76, 0xab, 0x59, 0xa2, 0xd4, 0xb4, 0xb7, 0xb6, 0xd2, 0x2c, 0xf1, 0xa7, 0xff, 0x1f, 0x00,
-	0x00, 0xff, 0xff, 0xe1, 0x6f, 0xbc, 0x35, 0xd0, 0x18, 0x00, 0x00,
+	// 1724 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x58, 0x4d, 0x6c, 0xe3, 0xc6,
+	0x15, 0xe6, 0x48, 0xb2, 0x65, 0x8d, 0xfc, 0x97, 0xd9, 0x6c, 0xca, 0x6a, 0xd7, 0x23, 0x97, 0x71,
+	0x53, 0xaf, 0xb3, 0xa2, 0x02, 0xa7, 0x49, 0x1a, 0xa3, 0xc8, 0xc2, 0xaa, 0xb3, 0xce, 0x36, 0xbb,
+	0x4d, 0x96, 0x8a, 0x9b, 0x36, 0x46, 0x22, 0xd0, 0xe2, 0x48, 0x66, 0x45, 0x91, 0x0c, 0x39, 0xb2,
+	0xeb, 0x06, 0x06, 0xd2, 0x9c, 0x16, 0xbd, 0x34, 0x48, 0x0e, 0xed, 0xa9, 0x08, 0xda, 0x4b, 0x7a,
+	0x4b, 0x81, 0x1e, 0x82, 0x9e, 0xf6, 0x50, 0x14, 0x7b, 0x5c, 0xa0, 0x40, 0x11, 0xa0, 0x80, 0x1b,
+	0x53, 0x3d, 0xa4, 0xb7, 0x1c, 0xf7, 0x58, 0x70, 0x38, 0x94, 0xa8, 0xbf, 0x98, 0x92, 0x37, 0x39,
+	0x89, 0xc3, 0x79, 0xef, 0x7b, 0xdf, 0x7b, 0xf3, 0xe6, 0x9b, 0xa1, 0x60, 0xc1, 0xb0, 0x1c, 0xf5,
+	0x50, 0x35, 0x0b, 0x2e, 0x55, 0xab, 0x8d, 0xa2, 0x6a, 0xeb, 0x45, 0xd5, 0xb6, 0x0d, 0xbd, 0xaa,
+	0x52, 0xdd, 0x32, 0x5d, 0xe2, 0x1c, 0x10, 0xa7, 0x72, 0x48, 0xf6, 0x64, 0xdb, 0xb1, 0xa8, 0x85,
+	0xe6, 0x29, 0x35, 0x65, 0xee, 0x22, 0x1f, 0x3c, 0x9d, 0xdb, 0xac, 0xeb, 0x74, 0xbf, 0xb5, 0x27,
+	0x57, 0xad, 0x66, 0x91, 0x98, 0x07, 0xd6, 0x91, 0xed, 0x58, 0xbf, 0x3c, 0x2a, 0x32, 0xe3, 0x6a,
+	0xa1, 0x4e, 0xcc, 0xc2, 0x81, 0x6a, 0xe8, 0x9a, 0x4a, 0x49, 0x71, 0xe0, 0x21, 0x80, 0xcc, 0x15,
+	0x22, 0x10, 0x75, 0xab, 0x6e, 0x05, 0xce, 0x7b, 0xad, 0x1a, 0x1b, 0xb1, 0x01, 0x7b, 0xe2, 0xe6,
+	0x97, 0xeb, 0x96, 0x55, 0x37, 0x48, 0xc0, 0xd4, 0x34, 0x2d, 0x1a, 0x10, 0xe5, 0xb3, 0x97, 0xf8,
+	0x6c, 0x07, 0x83, 0x34, 0x6d, 0x7a, 0xc4, 0x27, 0x97, 0xfb, 0x27, 0x6b, 0x3a, 0x31, 0xb4, 0x4a,
+	0x53, 0x75, 0x1b, 0xdc, 0x22, 0xdf, 0x6f, 0x41, 0xf5, 0x26, 0x71, 0xa9, 0xda, 0xb4, 0xb9, 0xc1,
+	0xe3, 0x83, 0xe5, 0xd2, 0x35, 0x62, 0x52, 0xbd, 0xa6, 0x13, 0x87, 0x93, 0x90, 0xfe, 0x0d, 0xe0,
+	0xd2, 0x66, 0xb7, 0x88, 0xaf, 0x93, 0xbd, 0x7d, 0xcb, 0x6a, 0xdc, 0xe8, 0xda, 0xa1, 0x2a, 0x5c,
+	0x88, 0x54, 0xb9, 0xa2, 0x6b, 0xae, 0x08, 0x96, 0xc1, 0x6a, 0x76, 0xfd, 0x09, 0xb9, 0xb7, 0xc0,
+	0x72, 0x04, 0x27, 0x02, 0x50, 0x42, 0xf7, 0x4e, 0xf2, 0xc2, 0xfd, 0x93, 0x3c, 0xf8, 0xdb, 0xff,
+	0xee, 0x26, 0xa7, 0x7e, 0x03, 0x12, 0x8b, 0x40, 0x99, 0x57, 0xa3, 0xb6, 0x2e, 0xda, 0x81, 0xf0,
+	0x30, 0x08, 0x5d, 0xd1, 0x35, 0x31, 0xb1, 0x0c, 0x56, 0x33, 0xa5, 0x67, 0xbd, 0x93, 0x7c, 0x26,
+	0x24, 0xb4, 0xe5, 0x3b, 0xaf, 0x38, 0x92, 0xb8, 0xb2, 0x8e, 0xdf, 0xda, 0x55, 0x0b, 0xbf, 0x7a,
+	0xaa, 0xf0, 0xfc, 0x9b, 0xab, 0xd7, 0x36, 0x76, 0x0b, 0x6f, 0x5e, 0x0b, 0x87, 0x57, 0xde, 0x59,
+	0xbf, 0x7a, 0xbc, 0xa2, 0x64, 0x0e, 0xc3, 0x24, 0xa4, 0x5f, 0x03, 0xf8, 0xdd, 0xc1, 0xec, 0x5e,
+	0x23, 0x4d, 0xdb, 0x50, 0x29, 0x89, 0x66, 0xf9, 0x33, 0x98, 0xa5, 0xfc, 0xb5, 0xcf, 0x00, 0x30,
+	0x06, 0xcf, 0x79, 0x27, 0x79, 0xd8, 0xb1, 0x1e, 0x83, 0x02, 0xa4, 0x9d, 0x10, 0xd2, 0xbf, 0x00,
+	0xcc, 0x8f, 0xe6, 0x70, 0xdd, 0x5f, 0x56, 0x94, 0x87, 0x89, 0x4e, 0xd0, 0x05, 0xef, 0x24, 0x9f,
+	0x08, 0x82, 0xa5, 0x9c, 0x84, 0xf8, 0xa8, 0x92, 0xd0, 0x35, 0xb4, 0x04, 0x53, 0xa6, 0xda, 0x24,
+	0xbc, 0x32, 0x99, 0xee, 0x24, 0x7b, 0x8d, 0x9e, 0x84, 0x59, 0x8d, 0xb8, 0x55, 0x47, 0xb7, 0xfd,
+	0x10, 0x62, 0xb2, 0xd7, 0x4a, 0x53, 0xa2, 0xb3, 0xe8, 0x31, 0x38, 0xed, 0x92, 0xaa, 0x43, 0xa8,
+	0x98, 0x5a, 0x06, 0xab, 0x33, 0x0a, 0x1f, 0x21, 0x19, 0xce, 0x69, 0xa4, 0xa6, 0xb6, 0x0c, 0x5a,
+	0x39, 0x50, 0x8d, 0x16, 0x11, 0xa7, 0xfa, 0x61, 0x66, 0xf9, 0xfc, 0x4f, 0xfd, 0x69, 0xe9, 0x83,
+	0x2c, 0xcc, 0x8d, 0x4e, 0x0c, 0xed, 0xc2, 0x64, 0xb7, 0x57, 0x9e, 0xf9, 0x8a, 0x5e, 0x19, 0xbd,
+	0x2a, 0x43, 0x5b, 0xc7, 0x47, 0x7d, 0xa8, 0xf5, 0x78, 0x0a, 0xce, 0x18, 0x56, 0xdd, 0xaa, 0xb4,
+	0x1c, 0x83, 0x55, 0x24, 0x53, 0xba, 0xe8, 0x9d, 0xe4, 0xd3, 0x37, 0xad, 0xba, 0xb5, 0xa3, 0xdc,
+	0x64, 0x91, 0x9d, 0xe4, 0x1d, 0x00, 0x94, 0xb4, 0x6f, 0xb6, 0xe3, 0x18, 0xbe, 0x87, 0x6e, 0xd6,
+	0x02, 0x8f, 0xa9, 0xae, 0xc7, 0x0d, 0xb3, 0xd6, 0xef, 0xe1, 0x9b, 0xf9, 0x1e, 0x2f, 0xc3, 0x47,
+	0x34, 0xab, 0xda, 0x6a, 0x12, 0x33, 0xd0, 0x00, 0xe6, 0x3a, 0xcd, 0x5c, 0xb1, 0x77, 0x92, 0x5f,
+	0xdc, 0x8a, 0x4e, 0xf6, 0x62, 0x2c, 0xf6, 0x38, 0xf2, 0xf0, 0x7b, 0xaa, 0x4b, 0x18, 0x46, 0xba,
+	0x1b, 0xbe, 0xa4, 0xba, 0xa4, 0x2f, 0xbc, 0x6f, 0xe6, 0x7b, 0xdc, 0x86, 0xe9, 0x7d, 0xa2, 0x6a,
+	0xc4, 0x71, 0xc5, 0x99, 0xe5, 0xe4, 0x6a, 0x76, 0xfd, 0xb9, 0xf8, 0xeb, 0x21, 0xbf, 0x14, 0x78,
+	0xbe, 0x68, 0x52, 0xe7, 0x48, 0x09, 0x71, 0xd0, 0x77, 0xe0, 0x74, 0xcd, 0x72, 0x9a, 0x2a, 0x15,
+	0x33, 0xfd, 0x6b, 0xc0, 0x27, 0xd0, 0x36, 0x9c, 0x66, 0xaa, 0xe5, 0x8a, 0x90, 0x05, 0x2d, 0xc6,
+	0x0f, 0xca, 0xb6, 0x85, 0xc2, 0xdd, 0xd1, 0xcf, 0xe1, 0x7c, 0xcb, 0x36, 0x74, 0xb3, 0x51, 0x69,
+	0x12, 0xd7, 0x55, 0xeb, 0x44, 0xcc, 0xb2, 0xae, 0x5a, 0x1f, 0x23, 0x8b, 0x5b, 0x81, 0xa7, 0x32,
+	0x17, 0x20, 0xf1, 0x21, 0x2a, 0xc3, 0xec, 0x2f, 0x2c, 0xdd, 0xac, 0xa8, 0xd5, 0x2a, 0xb1, 0xa9,
+	0x38, 0x3b, 0x31, 0x2e, 0xf4, 0x61, 0x36, 0x19, 0x0a, 0xda, 0x81, 0xb3, 0x9a, 0x75, 0x68, 0x32,
+	0xc6, 0x6a, 0xb5, 0x21, 0xce, 0x4d, 0x8c, 0x9a, 0x0d, 0x71, 0x36, 0xab, 0x0d, 0xf4, 0x3a, 0x9c,
+	0xeb, 0xc0, 0x9a, 0x3e, 0xee, 0xfc, 0xc4, 0xb8, 0x1d, 0x7e, 0x3f, 0x51, 0xfb, 0x80, 0x5d, 0x62,
+	0x52, 0x71, 0xe1, 0xfc, 0xc0, 0x65, 0x62, 0x52, 0xb4, 0x0b, 0x17, 0x3a, 0xc0, 0x35, 0x55, 0x37,
+	0x88, 0x26, 0x2e, 0x4e, 0x0c, 0x3d, 0x1f, 0x42, 0x5d, 0x67, 0x48, 0x3d, 0xe0, 0x6f, 0xb7, 0x48,
+	0x8b, 0x68, 0xe2, 0x23, 0xe7, 0x07, 0xbf, 0xcd, 0x90, 0x7c, 0x70, 0xc3, 0xe2, 0x47, 0x9e, 0x6b,
+	0x19, 0x07, 0x44, 0x13, 0xd1, 0xe4, 0xe0, 0x21, 0x54, 0x99, 0x21, 0xe5, 0x36, 0xe0, 0x6c, 0x74,
+	0x53, 0xa1, 0x45, 0x98, 0x6c, 0x90, 0xa3, 0x40, 0xff, 0x15, 0xff, 0x11, 0x3d, 0x0a, 0xa7, 0x02,
+	0x0d, 0x66, 0x02, 0xa7, 0x04, 0x83, 0x8d, 0xc4, 0x0f, 0x40, 0x6e, 0x09, 0xa6, 0xc3, 0xde, 0x45,
+	0x30, 0x65, 0xab, 0x74, 0x9f, 0xfb, 0xb1, 0x67, 0xa9, 0x0e, 0x2f, 0x8d, 0x26, 0xe4, 0xa2, 0x97,
+	0x60, 0x26, 0x3c, 0x9a, 0x7c, 0x69, 0xf6, 0x77, 0xe5, 0x5a, 0xfc, 0x84, 0x94, 0xae, 0xb3, 0xf4,
+	0x5e, 0x16, 0xa2, 0x41, 0x4b, 0x54, 0x8e, 0xaa, 0x7e, 0xe1, 0x6c, 0xe8, 0x58, 0x6a, 0xff, 0x23,
+	0x08, 0xab, 0x0e, 0x51, 0x29, 0xd1, 0x2a, 0x2a, 0x65, 0x25, 0xc9, 0xae, 0xe7, 0xe4, 0xe0, 0xfe,
+	0x23, 0x87, 0xf7, 0x1f, 0xf9, 0xb5, 0xf0, 0xfe, 0x53, 0x9a, 0xf1, 0x81, 0xde, 0xff, 0x4f, 0x1e,
+	0x28, 0x19, 0xee, 0xb7, 0x49, 0x7d, 0x90, 0x96, 0xad, 0x85, 0x20, 0xc9, 0x71, 0x40, 0xb8, 0xdf,
+	0x26, 0xed, 0x91, 0xde, 0x54, 0x2c, 0xe9, 0xbd, 0xd1, 0x95, 0xde, 0xa9, 0xb8, 0x2a, 0x78, 0xa6,
+	0xe4, 0x4e, 0x8f, 0x92, 0xdc, 0xb7, 0xe0, 0x6c, 0xe4, 0x1a, 0xe3, 0xf2, 0x8d, 0x3c, 0xe1, 0xe9,
+	0x9b, 0xf2, 0xd7, 0x42, 0xc9, 0x76, 0xef, 0x32, 0x2e, 0xaa, 0xc0, 0x85, 0x0e, 0x3e, 0xd7, 0xf6,
+	0x45, 0x96, 0xd5, 0xb3, 0x31, 0xb2, 0xea, 0x11, 0x77, 0x9e, 0xdc, 0x3c, 0xed, 0x79, 0x89, 0x6e,
+	0x0f, 0x48, 0x7d, 0x9a, 0xa5, 0x10, 0xa3, 0x4b, 0x47, 0x49, 0xfc, 0xcb, 0xbd, 0x12, 0x3f, 0x33,
+	0x36, 0x5e, 0x54, 0xda, 0x6f, 0xf5, 0x49, 0x7b, 0x66, 0x6c, 0xb4, 0x1e, 0x49, 0x7f, 0xa5, 0x5f,
+	0xd2, 0xe1, 0xd8, 0x78, 0xbd, 0x52, 0xfe, 0x4a, 0xbf, 0x94, 0x67, 0x27, 0x07, 0x64, 0x12, 0x5e,
+	0x1e, 0x94, 0xf0, 0xd9, 0xb1, 0x21, 0xfb, 0xa5, 0xbb, 0x3c, 0x28, 0xdd, 0x73, 0x93, 0x83, 0x72,
+	0xc9, 0x2e, 0x0f, 0x4a, 0xf6, 0xfc, 0xf8, 0xa0, 0x0f, 0x51, 0xaa, 0x37, 0xe1, 0x85, 0x21, 0x2d,
+	0xff, 0x30, 0xd5, 0x7e, 0x07, 0x5e, 0x18, 0xcc, 0xc5, 0x45, 0x2f, 0xc0, 0x19, 0xfe, 0x0d, 0x14,
+	0x8a, 0xbc, 0x74, 0x76, 0x09, 0x94, 0x8e, 0x8f, 0xf4, 0x67, 0x00, 0xbf, 0x3d, 0x68, 0x70, 0x9d,
+	0x49, 0x8c, 0x8b, 0x5e, 0x85, 0xe9, 0x40, 0x6d, 0x42, 0xf0, 0x18, 0x7b, 0x9f, 0xfb, 0xca, 0xfc,
+	0x97, 0x0b, 0x1b, 0x87, 0xf1, 0x8b, 0x1c, 0x9d, 0x18, 0xa7, 0x42, 0xd2, 0x5f, 0x01, 0xbc, 0xbc,
+	0x4d, 0xe8, 0x90, 0x7c, 0xc8, 0xdb, 0x2d, 0xe2, 0xd2, 0xaf, 0xe7, 0x44, 0xba, 0x06, 0x61, 0xf7,
+	0x83, 0x7c, 0xe4, 0x89, 0xc4, 0x56, 0xfd, 0x96, 0xea, 0x36, 0x4a, 0x29, 0x1f, 0x48, 0xc9, 0xd4,
+	0xc2, 0x17, 0xd2, 0x3f, 0x00, 0xc4, 0x37, 0x75, 0x77, 0x08, 0x6f, 0x37, 0x24, 0xfe, 0x8d, 0x7c,
+	0x78, 0x9f, 0x3b, 0x91, 0xbf, 0x00, 0x78, 0xb9, 0xfc, 0x55, 0xf5, 0x7f, 0x15, 0xa6, 0x79, 0x63,
+	0x71, 0xfa, 0x31, 0x7a, 0x71, 0x28, 0xf5, 0x10, 0xe6, 0xfc, 0x9c, 0xff, 0x0e, 0xe0, 0xca, 0xd0,
+	0x9e, 0xe9, 0x5c, 0x74, 0x38, 0xf7, 0xaf, 0xf5, 0x1b, 0xf6, 0xdc, 0x69, 0xe8, 0xf0, 0x89, 0xe1,
+	0x2d, 0xd4, 0xb9, 0xef, 0x85, 0x79, 0xf4, 0x86, 0x02, 0x63, 0x87, 0x5a, 0xff, 0x6d, 0x66, 0xd8,
+	0xb7, 0xbe, 0x42, 0xea, 0xba, 0xeb, 0x6f, 0x58, 0x03, 0xc2, 0x6d, 0x42, 0x43, 0x81, 0x78, 0x6c,
+	0x00, 0xf9, 0xc5, 0xa6, 0x4d, 0x8f, 0x72, 0x57, 0x62, 0xeb, 0x84, 0x74, 0xe9, 0xbd, 0x7f, 0xfe,
+	0xf7, 0xc3, 0xc4, 0x45, 0x74, 0xa1, 0xa8, 0xba, 0x45, 0xbe, 0xee, 0x05, 0x2e, 0x17, 0xe8, 0x23,
+	0x00, 0xb3, 0xdb, 0x84, 0x76, 0xfe, 0x69, 0xf8, 0x7e, 0x3f, 0x6e, 0x9c, 0xb5, 0xcd, 0x8d, 0x71,
+	0xef, 0x95, 0x8a, 0x8c, 0xce, 0x15, 0xf4, 0xbd, 0x28, 0x9d, 0xce, 0x5d, 0xb8, 0xf8, 0x8e, 0xae,
+	0xb9, 0x72, 0xe4, 0xde, 0x75, 0x8c, 0x3e, 0x04, 0x70, 0xce, 0x5f, 0x9b, 0xee, 0xcd, 0x7b, 0x40,
+	0x24, 0xe3, 0x2d, 0x5d, 0xee, 0xc9, 0xf8, 0x34, 0x5d, 0x69, 0x89, 0xf1, 0xfc, 0x16, 0xba, 0x38,
+	0x94, 0x27, 0xfa, 0x13, 0x80, 0xc9, 0x6d, 0x42, 0xd1, 0xd5, 0x58, 0x05, 0x0b, 0x19, 0xc4, 0xd8,
+	0xaf, 0xd2, 0x8f, 0x59, 0xe0, 0x2d, 0x54, 0x8a, 0x04, 0xe6, 0x75, 0xe9, 0xd3, 0xb0, 0xbe, 0xf1,
+	0x71, 0x60, 0xd4, 0xfd, 0xf3, 0xef, 0x18, 0x7d, 0x00, 0x60, 0xca, 0x2f, 0x0e, 0x92, 0xe3, 0x95,
+	0xac, 0x53, 0xaa, 0xc7, 0xcf, 0x26, 0xea, 0x4a, 0xcf, 0x30, 0xa6, 0x45, 0x54, 0xe8, 0x65, 0x7a,
+	0x06, 0x4b, 0xf4, 0x00, 0xc0, 0x64, 0x79, 0x58, 0xe9, 0xca, 0xe7, 0x2d, 0xdd, 0x1f, 0x00, 0x63,
+	0xf4, 0x3b, 0x90, 0x53, 0x7a, 0x29, 0xf1, 0x27, 0x39, 0x56, 0x11, 0xa3, 0xc6, 0x91, 0x62, 0x6e,
+	0x80, 0xb5, 0x37, 0x5e, 0x90, 0x9e, 0x9f, 0x18, 0x78, 0x03, 0xac, 0xf9, 0xbd, 0x3c, 0xbd, 0x45,
+	0x0c, 0x42, 0x09, 0x1a, 0xef, 0xf8, 0xcc, 0x8d, 0x10, 0x02, 0xa9, 0xc4, 0x32, 0xfe, 0xe1, 0xda,
+	0xc6, 0x58, 0x6b, 0xd0, 0x21, 0xee, 0x0f, 0x4a, 0x7f, 0x04, 0xf7, 0x4e, 0x31, 0xb8, 0x7f, 0x8a,
+	0xc1, 0x67, 0xa7, 0x58, 0xf8, 0xfc, 0x14, 0x0b, 0x5f, 0x9c, 0x62, 0xe1, 0xcb, 0x53, 0x2c, 0x3c,
+	0x38, 0xc5, 0xe0, 0x5d, 0x0f, 0x83, 0x3b, 0x1e, 0x16, 0x3e, 0xf6, 0x30, 0xf8, 0xc4, 0xc3, 0xc2,
+	0xa7, 0x1e, 0x16, 0xee, 0x7a, 0x58, 0xb8, 0xe7, 0x61, 0x70, 0xdf, 0xc3, 0xe0, 0x33, 0x0f, 0x0b,
+	0x9f, 0x7b, 0x18, 0x7c, 0xe1, 0x61, 0xe1, 0x4b, 0x0f, 0x83, 0x07, 0x1e, 0x16, 0xde, 0x6d, 0x63,
+	0xe1, 0x4e, 0x1b, 0x83, 0xf7, 0xdb, 0x58, 0xf8, 0x7d, 0x1b, 0x83, 0x8f, 0xda, 0x58, 0xf8, 0xb8,
+	0x8d, 0x85, 0x4f, 0xda, 0x18, 0x7c, 0xda, 0xc6, 0xe0, 0x6e, 0x1b, 0x83, 0x37, 0xae, 0xd6, 0x2d,
+	0x99, 0xee, 0x13, 0xba, 0xaf, 0x9b, 0x75, 0x57, 0x36, 0x09, 0x3d, 0xb4, 0x9c, 0x46, 0xb1, 0xf7,
+	0x9f, 0x76, 0xbb, 0x51, 0x2f, 0x52, 0x6a, 0xda, 0x7b, 0x7b, 0xd3, 0x2c, 0xf1, 0xa7, 0xff, 0x1f,
+	0x00, 0x00, 0xff, 0xff, 0xf4, 0xae, 0x64, 0x93, 0xba, 0x18, 0x00, 0x00,
 }
 
 func (this *ApplicationWebhookIdentifiers) Equal(that interface{}) bool {
@@ -1382,57 +1382,6 @@ func (this *ApplicationWebhookTemplates) Equal(that interface{}) bool {
 		if !this.Templates[i].Equal(that1.Templates[i]) {
 			return false
 		}
-	}
-	return true
-}
-func (this *GetApplicationWebhookTemplateRequest) Equal(that interface{}) bool {
-	if that == nil {
-		return this == nil
-	}
-
-	that1, ok := that.(*GetApplicationWebhookTemplateRequest)
-	if !ok {
-		that2, ok := that.(GetApplicationWebhookTemplateRequest)
-		if ok {
-			that1 = &that2
-		} else {
-			return false
-		}
-	}
-	if that1 == nil {
-		return this == nil
-	} else if this == nil {
-		return false
-	}
-	if !this.ApplicationWebhookTemplateIdentifiers.Equal(&that1.ApplicationWebhookTemplateIdentifiers) {
-		return false
-	}
-	if !this.FieldMask.Equal(&that1.FieldMask) {
-		return false
-	}
-	return true
-}
-func (this *ListApplicationWebhookTemplatesRequest) Equal(that interface{}) bool {
-	if that == nil {
-		return this == nil
-	}
-
-	that1, ok := that.(*ListApplicationWebhookTemplatesRequest)
-	if !ok {
-		that2, ok := that.(ListApplicationWebhookTemplatesRequest)
-		if ok {
-			that1 = &that2
-		} else {
-			return false
-		}
-	}
-	if that1 == nil {
-		return this == nil
-	} else if this == nil {
-		return false
-	}
-	if !this.FieldMask.Equal(&that1.FieldMask) {
-		return false
 	}
 	return true
 }
@@ -1678,6 +1627,57 @@ func (this *SetApplicationWebhookRequest) Equal(that interface{}) bool {
 	}
 	return true
 }
+func (this *GetApplicationWebhookTemplateRequest) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*GetApplicationWebhookTemplateRequest)
+	if !ok {
+		that2, ok := that.(GetApplicationWebhookTemplateRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.ApplicationWebhookTemplateIdentifiers.Equal(&that1.ApplicationWebhookTemplateIdentifiers) {
+		return false
+	}
+	if !this.FieldMask.Equal(&that1.FieldMask) {
+		return false
+	}
+	return true
+}
+func (this *ListApplicationWebhookTemplatesRequest) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*ListApplicationWebhookTemplatesRequest)
+	if !ok {
+		that2, ok := that.(ListApplicationWebhookTemplatesRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.FieldMask.Equal(&that1.FieldMask) {
+		return false
+	}
+	return true
+}
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
@@ -1687,108 +1687,13 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// ApplicationWebhookTemplateRegistryClient is the client API for ApplicationWebhookTemplateRegistry service.
-//
-// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
-type ApplicationWebhookTemplateRegistryClient interface {
-	Get(ctx context.Context, in *GetApplicationWebhookTemplateRequest, opts ...grpc.CallOption) (*ApplicationWebhookTemplate, error)
-	List(ctx context.Context, in *ListApplicationWebhookTemplatesRequest, opts ...grpc.CallOption) (*ApplicationWebhookTemplates, error)
-}
-
-type applicationWebhookTemplateRegistryClient struct {
-	cc *grpc.ClientConn
-}
-
-func NewApplicationWebhookTemplateRegistryClient(cc *grpc.ClientConn) ApplicationWebhookTemplateRegistryClient {
-	return &applicationWebhookTemplateRegistryClient{cc}
-}
-
-func (c *applicationWebhookTemplateRegistryClient) Get(ctx context.Context, in *GetApplicationWebhookTemplateRequest, opts ...grpc.CallOption) (*ApplicationWebhookTemplate, error) {
-	out := new(ApplicationWebhookTemplate)
-	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.ApplicationWebhookTemplateRegistry/Get", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *applicationWebhookTemplateRegistryClient) List(ctx context.Context, in *ListApplicationWebhookTemplatesRequest, opts ...grpc.CallOption) (*ApplicationWebhookTemplates, error) {
-	out := new(ApplicationWebhookTemplates)
-	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.ApplicationWebhookTemplateRegistry/List", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-// ApplicationWebhookTemplateRegistryServer is the server API for ApplicationWebhookTemplateRegistry service.
-type ApplicationWebhookTemplateRegistryServer interface {
-	Get(context.Context, *GetApplicationWebhookTemplateRequest) (*ApplicationWebhookTemplate, error)
-	List(context.Context, *ListApplicationWebhookTemplatesRequest) (*ApplicationWebhookTemplates, error)
-}
-
-func RegisterApplicationWebhookTemplateRegistryServer(s *grpc.Server, srv ApplicationWebhookTemplateRegistryServer) {
-	s.RegisterService(&_ApplicationWebhookTemplateRegistry_serviceDesc, srv)
-}
-
-func _ApplicationWebhookTemplateRegistry_Get_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetApplicationWebhookTemplateRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ApplicationWebhookTemplateRegistryServer).Get(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/ttn.lorawan.v3.ApplicationWebhookTemplateRegistry/Get",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ApplicationWebhookTemplateRegistryServer).Get(ctx, req.(*GetApplicationWebhookTemplateRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ApplicationWebhookTemplateRegistry_List_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListApplicationWebhookTemplatesRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ApplicationWebhookTemplateRegistryServer).List(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/ttn.lorawan.v3.ApplicationWebhookTemplateRegistry/List",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ApplicationWebhookTemplateRegistryServer).List(ctx, req.(*ListApplicationWebhookTemplatesRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-var _ApplicationWebhookTemplateRegistry_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "ttn.lorawan.v3.ApplicationWebhookTemplateRegistry",
-	HandlerType: (*ApplicationWebhookTemplateRegistryServer)(nil),
-	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "Get",
-			Handler:    _ApplicationWebhookTemplateRegistry_Get_Handler,
-		},
-		{
-			MethodName: "List",
-			Handler:    _ApplicationWebhookTemplateRegistry_List_Handler,
-		},
-	},
-	Streams:  []grpc.StreamDesc{},
-	Metadata: "lorawan-stack/api/applicationserver_web.proto",
-}
-
 // ApplicationWebhookRegistryClient is the client API for ApplicationWebhookRegistry service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type ApplicationWebhookRegistryClient interface {
 	GetFormats(ctx context.Context, in *types.Empty, opts ...grpc.CallOption) (*ApplicationWebhookFormats, error)
+	GetTemplate(ctx context.Context, in *GetApplicationWebhookTemplateRequest, opts ...grpc.CallOption) (*ApplicationWebhookTemplate, error)
+	ListTemplates(ctx context.Context, in *ListApplicationWebhookTemplatesRequest, opts ...grpc.CallOption) (*ApplicationWebhookTemplates, error)
 	Get(ctx context.Context, in *GetApplicationWebhookRequest, opts ...grpc.CallOption) (*ApplicationWebhook, error)
 	List(ctx context.Context, in *ListApplicationWebhooksRequest, opts ...grpc.CallOption) (*ApplicationWebhooks, error)
 	Set(ctx context.Context, in *SetApplicationWebhookRequest, opts ...grpc.CallOption) (*ApplicationWebhook, error)
@@ -1806,6 +1711,24 @@ func NewApplicationWebhookRegistryClient(cc *grpc.ClientConn) ApplicationWebhook
 func (c *applicationWebhookRegistryClient) GetFormats(ctx context.Context, in *types.Empty, opts ...grpc.CallOption) (*ApplicationWebhookFormats, error) {
 	out := new(ApplicationWebhookFormats)
 	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.ApplicationWebhookRegistry/GetFormats", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *applicationWebhookRegistryClient) GetTemplate(ctx context.Context, in *GetApplicationWebhookTemplateRequest, opts ...grpc.CallOption) (*ApplicationWebhookTemplate, error) {
+	out := new(ApplicationWebhookTemplate)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.ApplicationWebhookRegistry/GetTemplate", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *applicationWebhookRegistryClient) ListTemplates(ctx context.Context, in *ListApplicationWebhookTemplatesRequest, opts ...grpc.CallOption) (*ApplicationWebhookTemplates, error) {
+	out := new(ApplicationWebhookTemplates)
+	err := c.cc.Invoke(ctx, "/ttn.lorawan.v3.ApplicationWebhookRegistry/ListTemplates", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1851,6 +1774,8 @@ func (c *applicationWebhookRegistryClient) Delete(ctx context.Context, in *Appli
 // ApplicationWebhookRegistryServer is the server API for ApplicationWebhookRegistry service.
 type ApplicationWebhookRegistryServer interface {
 	GetFormats(context.Context, *types.Empty) (*ApplicationWebhookFormats, error)
+	GetTemplate(context.Context, *GetApplicationWebhookTemplateRequest) (*ApplicationWebhookTemplate, error)
+	ListTemplates(context.Context, *ListApplicationWebhookTemplatesRequest) (*ApplicationWebhookTemplates, error)
 	Get(context.Context, *GetApplicationWebhookRequest) (*ApplicationWebhook, error)
 	List(context.Context, *ListApplicationWebhooksRequest) (*ApplicationWebhooks, error)
 	Set(context.Context, *SetApplicationWebhookRequest) (*ApplicationWebhook, error)
@@ -1875,6 +1800,42 @@ func _ApplicationWebhookRegistry_GetFormats_Handler(srv interface{}, ctx context
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ApplicationWebhookRegistryServer).GetFormats(ctx, req.(*types.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ApplicationWebhookRegistry_GetTemplate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetApplicationWebhookTemplateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ApplicationWebhookRegistryServer).GetTemplate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.lorawan.v3.ApplicationWebhookRegistry/GetTemplate",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ApplicationWebhookRegistryServer).GetTemplate(ctx, req.(*GetApplicationWebhookTemplateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ApplicationWebhookRegistry_ListTemplates_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListApplicationWebhookTemplatesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ApplicationWebhookRegistryServer).ListTemplates(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ttn.lorawan.v3.ApplicationWebhookRegistry/ListTemplates",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ApplicationWebhookRegistryServer).ListTemplates(ctx, req.(*ListApplicationWebhookTemplatesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1958,6 +1919,14 @@ var _ApplicationWebhookRegistry_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetFormats",
 			Handler:    _ApplicationWebhookRegistry_GetFormats_Handler,
+		},
+		{
+			MethodName: "GetTemplate",
+			Handler:    _ApplicationWebhookRegistry_GetTemplate_Handler,
+		},
+		{
+			MethodName: "ListTemplates",
+			Handler:    _ApplicationWebhookRegistry_ListTemplates_Handler,
 		},
 		{
 			MethodName: "Get",
@@ -2325,66 +2294,6 @@ func (m *ApplicationWebhookTemplates) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
-func (m *GetApplicationWebhookTemplateRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *GetApplicationWebhookTemplateRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.ApplicationWebhookTemplateIdentifiers.Size()))
-	n11, err := m.ApplicationWebhookTemplateIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n11
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.FieldMask.Size()))
-	n12, err := m.FieldMask.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n12
-	return i, nil
-}
-
-func (m *ListApplicationWebhookTemplatesRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ListApplicationWebhookTemplatesRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.FieldMask.Size()))
-	n13, err := m.FieldMask.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n13
-	return i, nil
-}
-
 func (m *ApplicationWebhook) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -2403,27 +2312,27 @@ func (m *ApplicationWebhook) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.ApplicationWebhookIdentifiers.Size()))
-	n14, err := m.ApplicationWebhookIdentifiers.MarshalTo(dAtA[i:])
+	n11, err := m.ApplicationWebhookIdentifiers.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n14
+	i += n11
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintApplicationserverWeb(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)))
-	n15, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
+	n12, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n15
+	i += n12
 	dAtA[i] = 0x1a
 	i++
 	i = encodeVarintApplicationserverWeb(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt)))
-	n16, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i:])
+	n13, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n16
+	i += n13
 	if len(m.BaseURL) > 0 {
 		dAtA[i] = 0x22
 		i++
@@ -2457,91 +2366,91 @@ func (m *ApplicationWebhook) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0x3a
 		i++
 		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.UplinkMessage.Size()))
-		n17, err := m.UplinkMessage.MarshalTo(dAtA[i:])
+		n14, err := m.UplinkMessage.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n17
+		i += n14
 	}
 	if m.JoinAccept != nil {
 		dAtA[i] = 0x42
 		i++
 		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.JoinAccept.Size()))
-		n18, err := m.JoinAccept.MarshalTo(dAtA[i:])
+		n15, err := m.JoinAccept.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n18
+		i += n15
 	}
 	if m.DownlinkAck != nil {
 		dAtA[i] = 0x4a
 		i++
 		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.DownlinkAck.Size()))
-		n19, err := m.DownlinkAck.MarshalTo(dAtA[i:])
+		n16, err := m.DownlinkAck.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n19
+		i += n16
 	}
 	if m.DownlinkNack != nil {
 		dAtA[i] = 0x52
 		i++
 		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.DownlinkNack.Size()))
-		n20, err := m.DownlinkNack.MarshalTo(dAtA[i:])
+		n17, err := m.DownlinkNack.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n20
+		i += n17
 	}
 	if m.DownlinkSent != nil {
 		dAtA[i] = 0x5a
 		i++
 		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.DownlinkSent.Size()))
-		n21, err := m.DownlinkSent.MarshalTo(dAtA[i:])
+		n18, err := m.DownlinkSent.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n21
+		i += n18
 	}
 	if m.DownlinkFailed != nil {
 		dAtA[i] = 0x62
 		i++
 		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.DownlinkFailed.Size()))
-		n22, err := m.DownlinkFailed.MarshalTo(dAtA[i:])
+		n19, err := m.DownlinkFailed.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n22
+		i += n19
 	}
 	if m.DownlinkQueued != nil {
 		dAtA[i] = 0x6a
 		i++
 		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.DownlinkQueued.Size()))
-		n23, err := m.DownlinkQueued.MarshalTo(dAtA[i:])
+		n20, err := m.DownlinkQueued.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n23
+		i += n20
 	}
 	if m.LocationSolved != nil {
 		dAtA[i] = 0x72
 		i++
 		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.LocationSolved.Size()))
-		n24, err := m.LocationSolved.MarshalTo(dAtA[i:])
+		n21, err := m.LocationSolved.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n24
+		i += n21
 	}
 	if m.ApplicationWebhookTemplateIdentifiers != nil {
 		dAtA[i] = 0x7a
 		i++
 		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.ApplicationWebhookTemplateIdentifiers.Size()))
-		n25, err := m.ApplicationWebhookTemplateIdentifiers.MarshalTo(dAtA[i:])
+		n22, err := m.ApplicationWebhookTemplateIdentifiers.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n25
+		i += n22
 	}
 	if len(m.TemplateFields) > 0 {
 		for k := range m.TemplateFields {
@@ -2672,19 +2581,19 @@ func (m *GetApplicationWebhookRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.ApplicationWebhookIdentifiers.Size()))
-	n26, err := m.ApplicationWebhookIdentifiers.MarshalTo(dAtA[i:])
+	n23, err := m.ApplicationWebhookIdentifiers.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n26
+	i += n23
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.FieldMask.Size()))
-	n27, err := m.FieldMask.MarshalTo(dAtA[i:])
+	n24, err := m.FieldMask.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n27
+	i += n24
 	return i, nil
 }
 
@@ -2706,19 +2615,19 @@ func (m *ListApplicationWebhooksRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.ApplicationIdentifiers.Size()))
-	n28, err := m.ApplicationIdentifiers.MarshalTo(dAtA[i:])
+	n25, err := m.ApplicationIdentifiers.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n28
+	i += n25
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.FieldMask.Size()))
-	n29, err := m.FieldMask.MarshalTo(dAtA[i:])
+	n26, err := m.FieldMask.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n29
+	i += n26
 	return i, nil
 }
 
@@ -2740,12 +2649,72 @@ func (m *SetApplicationWebhookRequest) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.ApplicationWebhook.Size()))
-	n30, err := m.ApplicationWebhook.MarshalTo(dAtA[i:])
+	n27, err := m.ApplicationWebhook.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n27
+	dAtA[i] = 0x12
+	i++
+	i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.FieldMask.Size()))
+	n28, err := m.FieldMask.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n28
+	return i, nil
+}
+
+func (m *GetApplicationWebhookTemplateRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *GetApplicationWebhookTemplateRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.ApplicationWebhookTemplateIdentifiers.Size()))
+	n29, err := m.ApplicationWebhookTemplateIdentifiers.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n29
+	dAtA[i] = 0x12
+	i++
+	i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.FieldMask.Size()))
+	n30, err := m.FieldMask.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
 	i += n30
-	dAtA[i] = 0x12
+	return i, nil
+}
+
+func (m *ListApplicationWebhookTemplatesRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ListApplicationWebhookTemplatesRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
 	i++
 	i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.FieldMask.Size()))
 	n31, err := m.FieldMask.MarshalTo(dAtA[i:])
@@ -2871,39 +2840,19 @@ func NewPopulatedApplicationWebhookTemplates(r randyApplicationserverWeb, easy b
 	return this
 }
 
-func NewPopulatedGetApplicationWebhookTemplateRequest(r randyApplicationserverWeb, easy bool) *GetApplicationWebhookTemplateRequest {
-	this := &GetApplicationWebhookTemplateRequest{}
-	v6 := NewPopulatedApplicationWebhookTemplateIdentifiers(r, easy)
-	this.ApplicationWebhookTemplateIdentifiers = *v6
-	v7 := types.NewPopulatedFieldMask(r, easy)
-	this.FieldMask = *v7
-	if !easy && r.Intn(10) != 0 {
-	}
-	return this
-}
-
-func NewPopulatedListApplicationWebhookTemplatesRequest(r randyApplicationserverWeb, easy bool) *ListApplicationWebhookTemplatesRequest {
-	this := &ListApplicationWebhookTemplatesRequest{}
-	v8 := types.NewPopulatedFieldMask(r, easy)
-	this.FieldMask = *v8
-	if !easy && r.Intn(10) != 0 {
-	}
-	return this
-}
-
 func NewPopulatedApplicationWebhook(r randyApplicationserverWeb, easy bool) *ApplicationWebhook {
 	this := &ApplicationWebhook{}
-	v9 := NewPopulatedApplicationWebhookIdentifiers(r, easy)
-	this.ApplicationWebhookIdentifiers = *v9
-	v10 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
-	this.CreatedAt = *v10
-	v11 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
-	this.UpdatedAt = *v11
+	v6 := NewPopulatedApplicationWebhookIdentifiers(r, easy)
+	this.ApplicationWebhookIdentifiers = *v6
+	v7 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	this.CreatedAt = *v7
+	v8 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
+	this.UpdatedAt = *v8
 	this.BaseURL = randStringApplicationserverWeb(r)
 	if r.Intn(10) != 0 {
-		v12 := r.Intn(10)
+		v9 := r.Intn(10)
 		this.Headers = make(map[string]string)
-		for i := 0; i < v12; i++ {
+		for i := 0; i < v9; i++ {
 			this.Headers[randStringApplicationserverWeb(r)] = randStringApplicationserverWeb(r)
 		}
 	}
@@ -2936,9 +2885,9 @@ func NewPopulatedApplicationWebhook(r randyApplicationserverWeb, easy bool) *App
 		this.ApplicationWebhookTemplateIdentifiers = NewPopulatedApplicationWebhookTemplateIdentifiers(r, easy)
 	}
 	if r.Intn(10) != 0 {
-		v13 := r.Intn(10)
+		v10 := r.Intn(10)
 		this.TemplateFields = make(map[string]string)
-		for i := 0; i < v13; i++ {
+		for i := 0; i < v10; i++ {
 			this.TemplateFields[randStringApplicationserverWeb(r)] = randStringApplicationserverWeb(r)
 		}
 	}
@@ -2958,9 +2907,9 @@ func NewPopulatedApplicationWebhook_Message(r randyApplicationserverWeb, easy bo
 func NewPopulatedApplicationWebhooks(r randyApplicationserverWeb, easy bool) *ApplicationWebhooks {
 	this := &ApplicationWebhooks{}
 	if r.Intn(10) != 0 {
-		v14 := r.Intn(5)
-		this.Webhooks = make([]*ApplicationWebhook, v14)
-		for i := 0; i < v14; i++ {
+		v11 := r.Intn(5)
+		this.Webhooks = make([]*ApplicationWebhook, v11)
+		for i := 0; i < v11; i++ {
 			this.Webhooks[i] = NewPopulatedApplicationWebhook(r, easy)
 		}
 	}
@@ -2972,9 +2921,9 @@ func NewPopulatedApplicationWebhooks(r randyApplicationserverWeb, easy bool) *Ap
 func NewPopulatedApplicationWebhookFormats(r randyApplicationserverWeb, easy bool) *ApplicationWebhookFormats {
 	this := &ApplicationWebhookFormats{}
 	if r.Intn(10) != 0 {
-		v15 := r.Intn(10)
+		v12 := r.Intn(10)
 		this.Formats = make(map[string]string)
-		for i := 0; i < v15; i++ {
+		for i := 0; i < v12; i++ {
 			this.Formats[randStringApplicationserverWeb(r)] = randStringApplicationserverWeb(r)
 		}
 	}
@@ -2985,10 +2934,10 @@ func NewPopulatedApplicationWebhookFormats(r randyApplicationserverWeb, easy boo
 
 func NewPopulatedGetApplicationWebhookRequest(r randyApplicationserverWeb, easy bool) *GetApplicationWebhookRequest {
 	this := &GetApplicationWebhookRequest{}
-	v16 := NewPopulatedApplicationWebhookIdentifiers(r, easy)
-	this.ApplicationWebhookIdentifiers = *v16
-	v17 := types.NewPopulatedFieldMask(r, easy)
-	this.FieldMask = *v17
+	v13 := NewPopulatedApplicationWebhookIdentifiers(r, easy)
+	this.ApplicationWebhookIdentifiers = *v13
+	v14 := types.NewPopulatedFieldMask(r, easy)
+	this.FieldMask = *v14
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -2996,10 +2945,10 @@ func NewPopulatedGetApplicationWebhookRequest(r randyApplicationserverWeb, easy 
 
 func NewPopulatedListApplicationWebhooksRequest(r randyApplicationserverWeb, easy bool) *ListApplicationWebhooksRequest {
 	this := &ListApplicationWebhooksRequest{}
-	v18 := NewPopulatedApplicationIdentifiers(r, easy)
-	this.ApplicationIdentifiers = *v18
-	v19 := types.NewPopulatedFieldMask(r, easy)
-	this.FieldMask = *v19
+	v15 := NewPopulatedApplicationIdentifiers(r, easy)
+	this.ApplicationIdentifiers = *v15
+	v16 := types.NewPopulatedFieldMask(r, easy)
+	this.FieldMask = *v16
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -3007,8 +2956,28 @@ func NewPopulatedListApplicationWebhooksRequest(r randyApplicationserverWeb, eas
 
 func NewPopulatedSetApplicationWebhookRequest(r randyApplicationserverWeb, easy bool) *SetApplicationWebhookRequest {
 	this := &SetApplicationWebhookRequest{}
-	v20 := NewPopulatedApplicationWebhook(r, easy)
-	this.ApplicationWebhook = *v20
+	v17 := NewPopulatedApplicationWebhook(r, easy)
+	this.ApplicationWebhook = *v17
+	v18 := types.NewPopulatedFieldMask(r, easy)
+	this.FieldMask = *v18
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedGetApplicationWebhookTemplateRequest(r randyApplicationserverWeb, easy bool) *GetApplicationWebhookTemplateRequest {
+	this := &GetApplicationWebhookTemplateRequest{}
+	v19 := NewPopulatedApplicationWebhookTemplateIdentifiers(r, easy)
+	this.ApplicationWebhookTemplateIdentifiers = *v19
+	v20 := types.NewPopulatedFieldMask(r, easy)
+	this.FieldMask = *v20
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedListApplicationWebhookTemplatesRequest(r randyApplicationserverWeb, easy bool) *ListApplicationWebhookTemplatesRequest {
+	this := &ListApplicationWebhookTemplatesRequest{}
 	v21 := types.NewPopulatedFieldMask(r, easy)
 	this.FieldMask = *v21
 	if !easy && r.Intn(10) != 0 {
@@ -3257,30 +3226,6 @@ func (m *ApplicationWebhookTemplates) Size() (n int) {
 	return n
 }
 
-func (m *GetApplicationWebhookTemplateRequest) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = m.ApplicationWebhookTemplateIdentifiers.Size()
-	n += 1 + l + sovApplicationserverWeb(uint64(l))
-	l = m.FieldMask.Size()
-	n += 1 + l + sovApplicationserverWeb(uint64(l))
-	return n
-}
-
-func (m *ListApplicationWebhookTemplatesRequest) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = m.FieldMask.Size()
-	n += 1 + l + sovApplicationserverWeb(uint64(l))
-	return n
-}
-
 func (m *ApplicationWebhook) Size() (n int) {
 	if m == nil {
 		return 0
@@ -3440,6 +3385,30 @@ func (m *SetApplicationWebhookRequest) Size() (n int) {
 	return n
 }
 
+func (m *GetApplicationWebhookTemplateRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.ApplicationWebhookTemplateIdentifiers.Size()
+	n += 1 + l + sovApplicationserverWeb(uint64(l))
+	l = m.FieldMask.Size()
+	n += 1 + l + sovApplicationserverWeb(uint64(l))
+	return n
+}
+
+func (m *ListApplicationWebhookTemplatesRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.FieldMask.Size()
+	n += 1 + l + sovApplicationserverWeb(uint64(l))
+	return n
+}
+
 func sovApplicationserverWeb(x uint64) (n int) {
 	for {
 		n++
@@ -3541,27 +3510,6 @@ func (this *ApplicationWebhookTemplates) String() string {
 	}
 	s := strings.Join([]string{`&ApplicationWebhookTemplates{`,
 		`Templates:` + strings.Replace(fmt.Sprintf("%v", this.Templates), "ApplicationWebhookTemplate", "ApplicationWebhookTemplate", 1) + `,`,
-		`}`,
-	}, "")
-	return s
-}
-func (this *GetApplicationWebhookTemplateRequest) String() string {
-	if this == nil {
-		return "nil"
-	}
-	s := strings.Join([]string{`&GetApplicationWebhookTemplateRequest{`,
-		`ApplicationWebhookTemplateIdentifiers:` + strings.Replace(strings.Replace(this.ApplicationWebhookTemplateIdentifiers.String(), "ApplicationWebhookTemplateIdentifiers", "ApplicationWebhookTemplateIdentifiers", 1), `&`, ``, 1) + `,`,
-		`FieldMask:` + strings.Replace(strings.Replace(this.FieldMask.String(), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
-		`}`,
-	}, "")
-	return s
-}
-func (this *ListApplicationWebhookTemplatesRequest) String() string {
-	if this == nil {
-		return "nil"
-	}
-	s := strings.Join([]string{`&ListApplicationWebhookTemplatesRequest{`,
-		`FieldMask:` + strings.Replace(strings.Replace(this.FieldMask.String(), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -3679,6 +3627,27 @@ func (this *SetApplicationWebhookRequest) String() string {
 	}
 	s := strings.Join([]string{`&SetApplicationWebhookRequest{`,
 		`ApplicationWebhook:` + strings.Replace(strings.Replace(this.ApplicationWebhook.String(), "ApplicationWebhook", "ApplicationWebhook", 1), `&`, ``, 1) + `,`,
+		`FieldMask:` + strings.Replace(strings.Replace(this.FieldMask.String(), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *GetApplicationWebhookTemplateRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&GetApplicationWebhookTemplateRequest{`,
+		`ApplicationWebhookTemplateIdentifiers:` + strings.Replace(strings.Replace(this.ApplicationWebhookTemplateIdentifiers.String(), "ApplicationWebhookTemplateIdentifiers", "ApplicationWebhookTemplateIdentifiers", 1), `&`, ``, 1) + `,`,
+		`FieldMask:` + strings.Replace(strings.Replace(this.FieldMask.String(), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *ListApplicationWebhookTemplatesRequest) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&ListApplicationWebhookTemplatesRequest{`,
 		`FieldMask:` + strings.Replace(strings.Replace(this.FieldMask.String(), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
@@ -5000,211 +4969,6 @@ func (m *ApplicationWebhookTemplates) Unmarshal(dAtA []byte) error {
 			}
 			m.Templates = append(m.Templates, &ApplicationWebhookTemplate{})
 			if err := m.Templates[len(m.Templates)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipApplicationserverWeb(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthApplicationserverWeb
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthApplicationserverWeb
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *GetApplicationWebhookTemplateRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowApplicationserverWeb
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: GetApplicationWebhookTemplateRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: GetApplicationWebhookTemplateRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationWebhookTemplateIdentifiers", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApplicationserverWeb
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthApplicationserverWeb
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthApplicationserverWeb
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.ApplicationWebhookTemplateIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field FieldMask", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApplicationserverWeb
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthApplicationserverWeb
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthApplicationserverWeb
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.FieldMask.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipApplicationserverWeb(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthApplicationserverWeb
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthApplicationserverWeb
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *ListApplicationWebhookTemplatesRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowApplicationserverWeb
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: ListApplicationWebhookTemplatesRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ListApplicationWebhookTemplatesRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field FieldMask", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowApplicationserverWeb
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthApplicationserverWeb
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthApplicationserverWeb
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.FieldMask.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -6679,6 +6443,211 @@ func (m *SetApplicationWebhookRequest) Unmarshal(dAtA []byte) error {
 			}
 			iNdEx = postIndex
 		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FieldMask", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplicationserverWeb
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthApplicationserverWeb
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthApplicationserverWeb
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.FieldMask.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipApplicationserverWeb(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthApplicationserverWeb
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthApplicationserverWeb
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *GetApplicationWebhookTemplateRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowApplicationserverWeb
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: GetApplicationWebhookTemplateRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: GetApplicationWebhookTemplateRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationWebhookTemplateIdentifiers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplicationserverWeb
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthApplicationserverWeb
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthApplicationserverWeb
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.ApplicationWebhookTemplateIdentifiers.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FieldMask", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowApplicationserverWeb
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthApplicationserverWeb
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthApplicationserverWeb
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.FieldMask.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipApplicationserverWeb(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthApplicationserverWeb
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthApplicationserverWeb
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ListApplicationWebhookTemplatesRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowApplicationserverWeb
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ListApplicationWebhookTemplatesRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ListApplicationWebhookTemplatesRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field FieldMask", wireType)
 			}

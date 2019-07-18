@@ -84,29 +84,6 @@ message ApplicationWebhookTemplates {
   repeated ApplicationWebhookTemplate templates = 1;
 }
 
-message GetApplicationWebhookTemplateRequest {
-  ApplicationWebhookTemplateIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
-  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
-}
-
-message ListApplicationWebhookTemplatesRequest {
-  google.protobuf.FieldMask field_mask = 1 [(gogoproto.nullable) = false];
-}
-
-service ApplicationWebhookTemplateRegistry {
-  rpc Get(GetApplicationWebhookTemplateRequest) returns (ApplicationWebhookTemplate) {
-    option (google.api.http) = {
-      get: "/as/webhook-templates/{ids.template_id}"
-    };
-  };
-
-  rpc List(ListApplicationWebhookTemplatesRequest) returns (ApplicationWebhookTemplates) {
-    option (google.api.http) = {
-      get: "/as/webhook-templates"
-    };
-  };
-}
-
 message ApplicationWebhook {
   ApplicationWebhookIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
@@ -163,10 +140,31 @@ message SetApplicationWebhookRequest {
   google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
 }
 
+message GetApplicationWebhookTemplateRequest {
+  ApplicationWebhookTemplateIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+}
+
+message ListApplicationWebhookTemplatesRequest {
+  google.protobuf.FieldMask field_mask = 1 [(gogoproto.nullable) = false];
+}
+
 service ApplicationWebhookRegistry {
   rpc GetFormats(google.protobuf.Empty) returns (ApplicationWebhookFormats) {
     option (google.api.http) = {
       get: "/as/webhook-formats"
+    };
+  };
+
+  rpc GetTemplate(GetApplicationWebhookTemplateRequest) returns (ApplicationWebhookTemplate) {
+    option (google.api.http) = {
+      get: "/as/webhook-templates/{ids.template_id}"
+    };
+  };
+
+  rpc ListTemplates(ListApplicationWebhookTemplatesRequest) returns (ApplicationWebhookTemplates) {
+    option (google.api.http) = {
+      get: "/as/webhook-templates"
     };
   };
 

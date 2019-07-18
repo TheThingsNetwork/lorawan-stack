@@ -3311,6 +3311,50 @@
               }
             },
             {
+              "name": "GetTemplate",
+              "description": "",
+              "requestType": "GetApplicationWebhookTemplateRequest",
+              "requestLongType": "GetApplicationWebhookTemplateRequest",
+              "requestFullType": "ttn.lorawan.v3.GetApplicationWebhookTemplateRequest",
+              "requestStreaming": false,
+              "responseType": "ApplicationWebhookTemplate",
+              "responseLongType": "ApplicationWebhookTemplate",
+              "responseFullType": "ttn.lorawan.v3.ApplicationWebhookTemplate",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/as/webhook-templates/{ids.template_id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "ListTemplates",
+              "description": "",
+              "requestType": "ListApplicationWebhookTemplatesRequest",
+              "requestLongType": "ListApplicationWebhookTemplatesRequest",
+              "requestFullType": "ttn.lorawan.v3.ListApplicationWebhookTemplatesRequest",
+              "requestStreaming": false,
+              "responseType": "ApplicationWebhookTemplates",
+              "responseLongType": "ApplicationWebhookTemplates",
+              "responseFullType": "ttn.lorawan.v3.ApplicationWebhookTemplates",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/as/webhook-templates"
+                    }
+                  ]
+                }
+              }
+            },
+            {
               "name": "Get",
               "description": "",
               "requestType": "GetApplicationWebhookRequest",
@@ -3399,58 +3443,6 @@
                     {
                       "method": "DELETE",
                       "pattern": "/as/webhooks/{application_ids.application_id}/{webhook_id}"
-                    }
-                  ]
-                }
-              }
-            }
-          ]
-        },
-        {
-          "name": "ApplicationWebhookTemplateRegistry",
-          "longName": "ApplicationWebhookTemplateRegistry",
-          "fullName": "ttn.lorawan.v3.ApplicationWebhookTemplateRegistry",
-          "description": "",
-          "methods": [
-            {
-              "name": "Get",
-              "description": "",
-              "requestType": "GetApplicationWebhookTemplateRequest",
-              "requestLongType": "GetApplicationWebhookTemplateRequest",
-              "requestFullType": "ttn.lorawan.v3.GetApplicationWebhookTemplateRequest",
-              "requestStreaming": false,
-              "responseType": "ApplicationWebhookTemplate",
-              "responseLongType": "ApplicationWebhookTemplate",
-              "responseFullType": "ttn.lorawan.v3.ApplicationWebhookTemplate",
-              "responseStreaming": false,
-              "options": {
-                "google.api.http": {
-                  "rules": [
-                    {
-                      "method": "GET",
-                      "pattern": "/as/webhook-templates/{ids.template_id}"
-                    }
-                  ]
-                }
-              }
-            },
-            {
-              "name": "List",
-              "description": "",
-              "requestType": "ListApplicationWebhookTemplatesRequest",
-              "requestLongType": "ListApplicationWebhookTemplatesRequest",
-              "requestFullType": "ttn.lorawan.v3.ListApplicationWebhookTemplatesRequest",
-              "requestStreaming": false,
-              "responseType": "ApplicationWebhookTemplates",
-              "responseLongType": "ApplicationWebhookTemplates",
-              "responseFullType": "ttn.lorawan.v3.ApplicationWebhookTemplates",
-              "responseStreaming": false,
-              "options": {
-                "google.api.http": {
-                  "rules": [
-                    {
-                      "method": "GET",
-                      "pattern": "/as/webhook-templates"
                     }
                   ]
                 }

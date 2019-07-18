@@ -1455,7 +1455,7 @@
     },
     "/as/webhook-templates": {
       "get": {
-        "operationId": "List",
+        "operationId": "ListTemplates",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -1478,13 +1478,13 @@
           }
         ],
         "tags": [
-          "ApplicationWebhookTemplateRegistry"
+          "ApplicationWebhookRegistry"
         ]
       }
     },
     "/as/webhook-templates/{ids.template_id}": {
       "get": {
-        "operationId": "Get",
+        "operationId": "GetTemplate",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -1513,7 +1513,7 @@
           }
         ],
         "tags": [
-          "ApplicationWebhookTemplateRegistry"
+          "ApplicationWebhookRegistry"
         ]
       }
     },

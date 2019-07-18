@@ -64,7 +64,6 @@
   - [Message `ListApplicationWebhooksRequest`](#ttn.lorawan.v3.ListApplicationWebhooksRequest)
   - [Message `SetApplicationWebhookRequest`](#ttn.lorawan.v3.SetApplicationWebhookRequest)
   - [Service `ApplicationWebhookRegistry`](#ttn.lorawan.v3.ApplicationWebhookRegistry)
-  - [Service `ApplicationWebhookTemplateRegistry`](#ttn.lorawan.v3.ApplicationWebhookTemplateRegistry)
 - [File `lorawan-stack/api/client.proto`](#lorawan-stack/api/client.proto)
   - [Message `Client`](#ttn.lorawan.v3.Client)
   - [Message `Client.AttributesEntry`](#ttn.lorawan.v3.Client.AttributesEntry)
@@ -1173,6 +1172,8 @@ The fields are meant to be replaced inside the URLs and headers when the webhook
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `GetFormats` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`ApplicationWebhookFormats`](#ttn.lorawan.v3.ApplicationWebhookFormats) |  |
+| `GetTemplate` | [`GetApplicationWebhookTemplateRequest`](#ttn.lorawan.v3.GetApplicationWebhookTemplateRequest) | [`ApplicationWebhookTemplate`](#ttn.lorawan.v3.ApplicationWebhookTemplate) |  |
+| `ListTemplates` | [`ListApplicationWebhookTemplatesRequest`](#ttn.lorawan.v3.ListApplicationWebhookTemplatesRequest) | [`ApplicationWebhookTemplates`](#ttn.lorawan.v3.ApplicationWebhookTemplates) |  |
 | `Get` | [`GetApplicationWebhookRequest`](#ttn.lorawan.v3.GetApplicationWebhookRequest) | [`ApplicationWebhook`](#ttn.lorawan.v3.ApplicationWebhook) |  |
 | `List` | [`ListApplicationWebhooksRequest`](#ttn.lorawan.v3.ListApplicationWebhooksRequest) | [`ApplicationWebhooks`](#ttn.lorawan.v3.ApplicationWebhooks) |  |
 | `Set` | [`SetApplicationWebhookRequest`](#ttn.lorawan.v3.SetApplicationWebhookRequest) | [`ApplicationWebhook`](#ttn.lorawan.v3.ApplicationWebhook) |  |
@@ -1183,25 +1184,13 @@ The fields are meant to be replaced inside the URLs and headers when the webhook
 | Method Name | Method | Pattern | Body |
 | ----------- | ------ | ------- | ---- |
 | `GetFormats` | `GET` | `/api/v3/as/webhook-formats` |  |
+| `GetTemplate` | `GET` | `/api/v3/as/webhook-templates/{ids.template_id}` |  |
+| `ListTemplates` | `GET` | `/api/v3/as/webhook-templates` |  |
 | `Get` | `GET` | `/api/v3/as/webhooks/{ids.application_ids.application_id}/{ids.webhook_id}` |  |
 | `List` | `GET` | `/api/v3/as/webhooks/{application_ids.application_id}` |  |
 | `Set` | `PUT` | `/api/v3/as/webhooks/{webhook.ids.application_ids.application_id}/{webhook.ids.webhook_id}` | `*` |
 | `Set` | `POST` | `/api/v3/as/webhooks/{webhook.ids.application_ids.application_id}` | `*` |
 | `Delete` | `DELETE` | `/api/v3/as/webhooks/{application_ids.application_id}/{webhook_id}` |  |
-
-### <a name="ttn.lorawan.v3.ApplicationWebhookTemplateRegistry">Service `ApplicationWebhookTemplateRegistry`</a>
-
-| Method Name | Request Type | Response Type | Description |
-| ----------- | ------------ | ------------- | ------------|
-| `Get` | [`GetApplicationWebhookTemplateRequest`](#ttn.lorawan.v3.GetApplicationWebhookTemplateRequest) | [`ApplicationWebhookTemplate`](#ttn.lorawan.v3.ApplicationWebhookTemplate) |  |
-| `List` | [`ListApplicationWebhookTemplatesRequest`](#ttn.lorawan.v3.ListApplicationWebhookTemplatesRequest) | [`ApplicationWebhookTemplates`](#ttn.lorawan.v3.ApplicationWebhookTemplates) |  |
-
-#### HTTP bindings
-
-| Method Name | Method | Pattern | Body |
-| ----------- | ------ | ------- | ---- |
-| `Get` | `GET` | `/api/v3/as/webhook-templates/{ids.template_id}` |  |
-| `List` | `GET` | `/api/v3/as/webhook-templates` |  |
 
 ## <a name="lorawan-stack/api/client.proto">File `lorawan-stack/api/client.proto`</a>
 

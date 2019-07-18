@@ -435,66 +435,6 @@ func (dst *ApplicationWebhookTemplates) SetFields(src *ApplicationWebhookTemplat
 	return nil
 }
 
-func (dst *GetApplicationWebhookTemplateRequest) SetFields(src *GetApplicationWebhookTemplateRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
-		switch name {
-		case "ids":
-			if len(subs) > 0 {
-				newDst := &dst.ApplicationWebhookTemplateIdentifiers
-				var newSrc *ApplicationWebhookTemplateIdentifiers
-				if src != nil {
-					newSrc = &src.ApplicationWebhookTemplateIdentifiers
-				}
-				if err := newDst.SetFields(newSrc, subs...); err != nil {
-					return err
-				}
-			} else {
-				if src != nil {
-					dst.ApplicationWebhookTemplateIdentifiers = src.ApplicationWebhookTemplateIdentifiers
-				} else {
-					var zero ApplicationWebhookTemplateIdentifiers
-					dst.ApplicationWebhookTemplateIdentifiers = zero
-				}
-			}
-		case "field_mask":
-			if len(subs) > 0 {
-				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.FieldMask = src.FieldMask
-			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
-			}
-
-		default:
-			return fmt.Errorf("invalid field: '%s'", name)
-		}
-	}
-	return nil
-}
-
-func (dst *ListApplicationWebhookTemplatesRequest) SetFields(src *ListApplicationWebhookTemplatesRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
-		switch name {
-		case "field_mask":
-			if len(subs) > 0 {
-				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.FieldMask = src.FieldMask
-			} else {
-				var zero types.FieldMask
-				dst.FieldMask = zero
-			}
-
-		default:
-			return fmt.Errorf("invalid field: '%s'", name)
-		}
-	}
-	return nil
-}
-
 func (dst *ApplicationWebhook) SetFields(src *ApplicationWebhook, paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
@@ -910,6 +850,66 @@ func (dst *SetApplicationWebhookRequest) SetFields(src *SetApplicationWebhookReq
 					dst.ApplicationWebhook = zero
 				}
 			}
+		case "field_mask":
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				var zero types.FieldMask
+				dst.FieldMask = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *GetApplicationWebhookTemplateRequest) SetFields(src *GetApplicationWebhookTemplateRequest, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "ids":
+			if len(subs) > 0 {
+				newDst := &dst.ApplicationWebhookTemplateIdentifiers
+				var newSrc *ApplicationWebhookTemplateIdentifiers
+				if src != nil {
+					newSrc = &src.ApplicationWebhookTemplateIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ApplicationWebhookTemplateIdentifiers = src.ApplicationWebhookTemplateIdentifiers
+				} else {
+					var zero ApplicationWebhookTemplateIdentifiers
+					dst.ApplicationWebhookTemplateIdentifiers = zero
+				}
+			}
+		case "field_mask":
+			if len(subs) > 0 {
+				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FieldMask = src.FieldMask
+			} else {
+				var zero types.FieldMask
+				dst.FieldMask = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ListApplicationWebhookTemplatesRequest) SetFields(src *ListApplicationWebhookTemplatesRequest, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
 		case "field_mask":
 			if len(subs) > 0 {
 				return fmt.Errorf("'field_mask' has no subfields, but %s were specified", subs)

@@ -91,23 +91,6 @@ var ApplicationWebhookTemplatesFieldPathsNested = []string{
 var ApplicationWebhookTemplatesFieldPathsTopLevel = []string{
 	"templates",
 }
-var GetApplicationWebhookTemplateRequestFieldPathsNested = []string{
-	"field_mask",
-	"ids",
-	"ids.template_id",
-}
-
-var GetApplicationWebhookTemplateRequestFieldPathsTopLevel = []string{
-	"field_mask",
-	"ids",
-}
-var ListApplicationWebhookTemplatesRequestFieldPathsNested = []string{
-	"field_mask",
-}
-
-var ListApplicationWebhookTemplatesRequestFieldPathsTopLevel = []string{
-	"field_mask",
-}
 var ApplicationWebhookFieldPathsNested = []string{
 	"base_url",
 	"created_at",
@@ -229,6 +212,23 @@ var SetApplicationWebhookRequestFieldPathsNested = []string{
 var SetApplicationWebhookRequestFieldPathsTopLevel = []string{
 	"field_mask",
 	"webhook",
+}
+var GetApplicationWebhookTemplateRequestFieldPathsNested = []string{
+	"field_mask",
+	"ids",
+	"ids.template_id",
+}
+
+var GetApplicationWebhookTemplateRequestFieldPathsTopLevel = []string{
+	"field_mask",
+	"ids",
+}
+var ListApplicationWebhookTemplatesRequestFieldPathsNested = []string{
+	"field_mask",
+}
+
+var ListApplicationWebhookTemplatesRequestFieldPathsTopLevel = []string{
+	"field_mask",
 }
 var ApplicationWebhookTemplate_MessageFieldPathsNested = []string{
 	"path",

@@ -41,8 +41,8 @@ func NewTemplateStore(fetcher fetch.Interface) (*TemplateStore, error) {
 	}, nil
 }
 
-// Get returns the template with the given identifiers.
-func (ts *TemplateStore) Get(ctx context.Context, req *ttnpb.GetApplicationWebhookTemplateRequest) (*ttnpb.ApplicationWebhookTemplate, error) {
+// GetTemplate returns the template with the given identifiers.
+func (ts *TemplateStore) GetTemplate(ctx context.Context, req *ttnpb.GetApplicationWebhookTemplateRequest) (*ttnpb.ApplicationWebhookTemplate, error) {
 	template, err := ts.getTemplate(req.ApplicationWebhookTemplateIdentifiers)
 	if err != nil {
 		return nil, err
@@ -50,8 +50,8 @@ func (ts *TemplateStore) Get(ctx context.Context, req *ttnpb.GetApplicationWebho
 	return applyWebhookTemplateFieldMask(nil, template, appendImplicitWebhookTemplatePaths(req.FieldMask.Paths...)...)
 }
 
-// List returns the available templates.
-func (ts *TemplateStore) List(ctx context.Context, req *ttnpb.ListApplicationWebhookTemplatesRequest) (*ttnpb.ApplicationWebhookTemplates, error) {
+// ListTemplates returns the available templates.
+func (ts *TemplateStore) ListTemplates(ctx context.Context, req *ttnpb.ListApplicationWebhookTemplatesRequest) (*ttnpb.ApplicationWebhookTemplates, error) {
 	ids, err := ts.getAllTemplateIDs()
 	if err != nil {
 		return nil, err

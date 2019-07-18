@@ -15,14 +15,17 @@
 package web_test
 
 import (
+	"context"
 	"testing"
 
+	"github.com/gogo/protobuf/types"
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/web"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/web/redis"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/config"
+	"go.thethings.network/lorawan-stack/pkg/fetch"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
@@ -52,7 +55,7 @@ func TestWebhookRegistryRPC(t *testing.T) {
 	defer flush()
 	defer redisClient.Close()
 	webhookReg := &redis.WebhookRegistry{Redis: redisClient}
-	srv := web.NewWebhookRegistryRPC(webhookReg)
+	srv := web.NewWebhookRegistryRPC(webhookReg, nil)
 	c.RegisterGRPC(&mockRegisterer{ctx, srv})
 	test.Must(nil, c.Start())
 	defer c.Close()
@@ -152,5 +155,104 @@ func TestWebhookRegistryRPC(t *testing.T) {
 		}, creds)
 		a.So(err, should.BeNil)
 		a.So(res.Webhooks, should.BeEmpty)
+	}
+}
+
+func TestTemplateStoreRPC(t *testing.T) {
+	ctx := test.Context()
+
+	for _, tc := range []struct {
+		name       string
+		fetcher    fetch.Interface
+		assertGet  func(*assertions.Assertion, *ttnpb.ApplicationWebhookTemplate, error)
+		assertList func(*assertions.Assertion, *ttnpb.ApplicationWebhookTemplates, error)
+	}{
+		{
+			name: "InvalidStore",
+			fetcher: fetch.NewMemFetcher(map[string][]byte{
+				"templates.yml": []byte(`invalid-yaml`),
+			}),
+			assertGet: func(a *assertions.Assertion, res *ttnpb.ApplicationWebhookTemplate, err error) {
+				a.So(err, should.NotBeNil)
+				a.So(res, should.BeNil)
+			},
+			assertList: func(a *assertions.Assertion, res *ttnpb.ApplicationWebhookTemplates, err error) {
+				a.So(err, should.NotBeNil)
+				a.So(res, should.BeNil)
+			},
+		},
+		{
+			name: "EmptyStore",
+			fetcher: fetch.NewMemFetcher(map[string][]byte{
+				"templates.yml": []byte(`--- []`),
+			}),
+			assertGet: func(a *assertions.Assertion, res *ttnpb.ApplicationWebhookTemplate, err error) {
+				a.So(err, should.NotBeNil)
+				a.So(res, should.BeNil)
+			},
+			assertList: func(a *assertions.Assertion, res *ttnpb.ApplicationWebhookTemplates, err error) {
+				a.So(err, should.BeNil)
+				a.So(res, should.NotBeNil)
+				a.So(res.Templates, should.BeEmpty)
+			},
+		},
+		{
+			name: "NormalStore",
+			fetcher: fetch.NewMemFetcher(map[string][]byte{
+				"templates.yml": []byte(`---
+- foo`),
+				"foo.yml": []byte(
+					`---
+ids:
+  template_id: foo
+name: Foo
+description: Bar`),
+			}),
+			assertGet: func(a *assertions.Assertion, res *ttnpb.ApplicationWebhookTemplate, err error) {
+				a.So(err, should.BeNil)
+				a.So(res, should.NotBeNil)
+				a.So(res.Name, should.NotBeEmpty)
+				a.So(res.Description, should.BeEmpty)
+			},
+			assertList: func(a *assertions.Assertion, res *ttnpb.ApplicationWebhookTemplates, err error) {
+				a.So(err, should.BeNil)
+				a.So(res, should.NotBeNil)
+				a.So(res.Templates, should.HaveLength, 1)
+			},
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			ctx, cancel := context.WithCancel(ctx)
+			defer cancel()
+
+			a := assertions.New(t)
+
+			store, err := web.NewTemplateStore(tc.fetcher)
+			a.So(err, should.BeNil)
+
+			c := component.MustNew(test.GetLogger(t), &component.Config{})
+			c.RegisterGRPC(&mockRegisterer{ctx, web.NewWebhookRegistryRPC(nil, store)})
+			test.Must(nil, c.Start())
+			defer c.Close()
+
+			client := ttnpb.NewApplicationWebhookRegistryClient(c.LoopbackConn())
+
+			getRes, err := client.GetTemplate(ctx, &ttnpb.GetApplicationWebhookTemplateRequest{
+				ApplicationWebhookTemplateIdentifiers: ttnpb.ApplicationWebhookTemplateIdentifiers{
+					TemplateID: "foo",
+				},
+			})
+			tc.assertGet(a, getRes, err)
+
+			listRes, err := client.ListTemplates(ctx, &ttnpb.ListApplicationWebhookTemplatesRequest{
+				FieldMask: types.FieldMask{
+					Paths: []string{
+						"name",
+						"description",
+					},
+				},
+			})
+			tc.assertList(a, listRes, err)
+		})
 	}
 }
