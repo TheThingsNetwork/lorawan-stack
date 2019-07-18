@@ -18,6 +18,7 @@ import {
   GET_APP_BASE,
   GET_APP_API_KEY_BASE,
   GET_APP_API_KEYS_LIST_BASE,
+  GET_APP_COLLABORATOR_BASE,
 } from '../actions/applications'
 import { GET_APP_LINK_BASE } from '../actions/link'
 
@@ -34,6 +35,10 @@ import {
   createRightsSelector,
   createUniversalRightsSelector,
 } from './rights'
+import {
+  createUserCollaboratorSelector,
+  createOrganizationCollaboratorSelector,
+} from './collaborators'
 import { createApiKeysSelector } from './api-keys'
 import { createApiKeySelector } from './api-key'
 import { createFetchingSelector } from './fetching'
@@ -105,3 +110,9 @@ export const selectApplicationIsLinked = function (state) {
 
   return hasBase && !hasError && isLinked && hasStats
 }
+
+// Collaborators
+export const selectApplicationUserCollaborator = createUserCollaboratorSelector(ENTITY_SINGLE)
+export const selectApplicationOrganizationCollaborator = createOrganizationCollaboratorSelector(ENTITY_SINGLE)
+export const selectApplicationCollaboratorFetching = createFetchingSelector(GET_APP_COLLABORATOR_BASE)
+export const selectApplicationCollaboratorError = createErrorSelector(GET_APP_COLLABORATOR_BASE)

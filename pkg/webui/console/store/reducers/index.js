@@ -31,6 +31,7 @@ import configuration from './configuration'
 import createNamedApiKeysReducer from './api-keys'
 import createNamedRightsReducer from './rights'
 import createNamedCollaboratorsReducer from './collaborators'
+import createNamedCollaboratorReducer from './collaborator'
 import createNamedEventsReducer from './events'
 import createNamedApiKeyReducer from './api-key'
 import link from './link'
@@ -64,6 +65,7 @@ export default combineReducers({
     gateways: createNamedRightsReducer(GATEWAY_SHARED_NAME),
   }),
   collaborators: combineReducers({
+    application: createNamedCollaboratorReducer(APPLICATION_SHARED_NAME),
     applications: createNamedCollaboratorsReducer(APPLICATION_SHARED_NAME),
     gateways: createNamedCollaboratorsReducer(GATEWAY_SHARED_NAME),
   }),
