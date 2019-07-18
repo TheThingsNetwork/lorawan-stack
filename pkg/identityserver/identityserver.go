@@ -147,6 +147,7 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 	c.AddContextFiller(func(ctx context.Context) context.Context {
 		ctx = is.withRequestAccessCache(ctx)
 		ctx = rights.NewContextWithFetcher(ctx, is)
+		ctx = rights.NewContextWithCache(ctx)
 		return ctx
 	})
 
