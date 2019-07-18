@@ -67,6 +67,7 @@ export default combineReducers({
   collaborators: combineReducers({
     application: createNamedCollaboratorReducer(APPLICATION_SHARED_NAME),
     applications: createNamedCollaboratorsReducer(APPLICATION_SHARED_NAME),
+    gateway: createNamedCollaboratorReducer(GATEWAY_SHARED_NAME),
     gateways: createNamedCollaboratorsReducer(GATEWAY_SHARED_NAME),
   }),
   events: combineReducers({
