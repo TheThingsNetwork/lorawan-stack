@@ -26,7 +26,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/unique"
 )
 
 var (
@@ -38,13 +37,9 @@ var (
 )
 
 func (is *IdentityServer) listOrganizationRights(ctx context.Context, ids *ttnpb.OrganizationIdentifiers) (*ttnpb.Rights, error) {
-	rights, ok := rights.FromContext(ctx)
-	if !ok {
-		return &ttnpb.Rights{}, nil
-	}
-	orgRights, ok := rights.OrganizationRights[unique.ID(ctx, ids)]
-	if !ok || orgRights == nil {
-		return &ttnpb.Rights{}, nil
+	orgRights, err := rights.ListOrganization(ctx, *ids)
+	if err != nil {
+		return nil, err
 	}
 	return orgRights.Intersect(ttnpb.AllEntityRights.Union(ttnpb.AllOrganizationRights)), nil
 }

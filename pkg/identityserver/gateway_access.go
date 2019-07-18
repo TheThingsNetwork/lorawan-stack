@@ -26,7 +26,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/unique"
 )
 
 var (
@@ -38,13 +37,9 @@ var (
 )
 
 func (is *IdentityServer) listGatewayRights(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*ttnpb.Rights, error) {
-	rights, ok := rights.FromContext(ctx)
-	if !ok {
-		return &ttnpb.Rights{}, nil
-	}
-	gtwRights, ok := rights.GatewayRights[unique.ID(ctx, ids)]
-	if !ok || gtwRights == nil {
-		return &ttnpb.Rights{}, nil
+	gtwRights, err := rights.ListGateway(ctx, *ids)
+	if err != nil {
+		return nil, err
 	}
 	return gtwRights.Intersect(ttnpb.AllGatewayRights), nil
 }
