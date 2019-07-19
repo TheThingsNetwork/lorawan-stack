@@ -55,6 +55,7 @@ export default class ResetPassword extends React.PureComponent {
         this.state = {
             error: '',
             info: '',
+            requested: false,
         }
     }
 
@@ -64,6 +65,7 @@ export default class ResetPassword extends React.PureComponent {
             this.setState({
                 error: '',
                 info: m.passwordRequested,
+                requested: true,
             })
         } catch (error) {
             this.setState({
@@ -84,10 +86,10 @@ export default class ResetPassword extends React.PureComponent {
       }
 
     render() {
-        const initialUserId = {
-            user_id: '',
-        }
-
+        const { error, info, requested } = this.state
+        const initialUserId = { user_id: '' }
+        const cancelButtonText = requested ? m.loginPage : sharedMessages.cancel
+        
         return(
             <div className={style.fullHeightCenter}>
               <IntlHelmet title={m.resetPassword} />
@@ -103,8 +105,8 @@ export default class ResetPassword extends React.PureComponent {
                       <Form
                         onSubmit={this.handleSubmit}
                         initialValues={initialUserId}
-                        error={this.state.error}
-                        info={this.state.info}
+                        error={error}
+                        info={info}
                         validationSchema={validationSchema}
                         horizontal={false}
                       >
@@ -119,7 +121,7 @@ export default class ResetPassword extends React.PureComponent {
                             component={SubmitButton}
                             message={m.resetPassword}
                           />
-                          <Button naked secondary message={sharedMessages.cancel} onClick={this.navigateToLogin} />
+                          <Button naked secondary message={cancelButtonText} onClick={this.navigateToLogin} />
                       </Form>
                   </div>
               </div>
