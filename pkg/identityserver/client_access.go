@@ -26,7 +26,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/unique"
 )
 
 var (
@@ -35,13 +34,9 @@ var (
 )
 
 func (is *IdentityServer) listClientRights(ctx context.Context, ids *ttnpb.ClientIdentifiers) (*ttnpb.Rights, error) {
-	rights, ok := rights.FromContext(ctx)
-	if !ok {
-		return &ttnpb.Rights{}, nil
-	}
-	cliRights, ok := rights.ClientRights[unique.ID(ctx, ids)]
-	if !ok || cliRights == nil {
-		return &ttnpb.Rights{}, nil
+	cliRights, err := rights.ListClient(ctx, *ids)
+	if err != nil {
+		return nil, err
 	}
 	return cliRights.Intersect(ttnpb.AllClientRights), nil
 }

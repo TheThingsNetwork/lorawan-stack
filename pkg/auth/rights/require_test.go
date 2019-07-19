@@ -107,13 +107,6 @@ func TestRequire(t *testing.T) {
 	a.So(fooRes.OrgErr, should.BeNil)
 	a.So(fooRes.UsrErr, should.BeNil)
 
-	barRes := requireRights(fooCtx, "bar")
-	a.So(errors.IsPermissionDenied(barRes.AppErr), should.BeTrue)
-	a.So(errors.IsPermissionDenied(barRes.CliErr), should.BeTrue)
-	a.So(errors.IsPermissionDenied(barRes.GtwErr), should.BeTrue)
-	a.So(errors.IsPermissionDenied(barRes.OrgErr), should.BeTrue)
-	a.So(errors.IsPermissionDenied(barRes.UsrErr), should.BeTrue)
-
 	mockErr := errors.New("mock")
 	errFetchCtx := NewContextWithFetcher(test.Context(), &mockFetcher{
 		applicationError:  mockErr,

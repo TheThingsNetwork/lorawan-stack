@@ -1958,7 +1958,7 @@
     },
     "description": {
       "package": "pkg/auth/rights",
-      "file": "hook.go"
+      "file": "fetcher.go"
     }
   },
   "error:pkg/auth/rights:no_gateway_rights": {

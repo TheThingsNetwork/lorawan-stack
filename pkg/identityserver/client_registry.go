@@ -198,9 +198,9 @@ func (is *IdentityServer) listClients(ctx context.Context, req *ttnpb.ListClient
 		if err != nil {
 			return err
 		}
-		for _, cli := range clis.Clients {
-			if !cliRights[unique.ID(ctx, cli.ClientIdentifiers)].IncludesAll(ttnpb.RIGHT_CLIENT_ALL) {
-				cli = cli.PublicSafe()
+		for i, cli := range clis.Clients {
+			if rights.RequireClient(ctx, cli.ClientIdentifiers, ttnpb.RIGHT_CLIENT_ALL) != nil {
+				clis.Clients[i] = cli.PublicSafe()
 			}
 		}
 		return nil

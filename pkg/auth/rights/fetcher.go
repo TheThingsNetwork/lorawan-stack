@@ -95,6 +95,8 @@ func fetcherFromContext(ctx context.Context) (Fetcher, bool) {
 	return nil, false
 }
 
+var errNoFetcher = errors.DefineInternal("no_fetcher", "no fetcher found in context")
+
 // NewAccessFetcher returns a new rights fetcher that fetches from the Access role returned by getConn.
 // The allowInsecure argument indicates whether it's allowed to send credentials over connections without TLS.
 func NewAccessFetcher(getConn func(ctx context.Context) *grpc.ClientConn, allowInsecure bool) Fetcher {

@@ -76,18 +76,9 @@ var errInsufficientUserRights = errors.DefinePermissionDenied(
 // given application ID.
 func RequireApplication(ctx context.Context, id ttnpb.ApplicationIdentifiers, required ...ttnpb.Right) (err error) {
 	uid := unique.ID(ctx, id)
-	var rights *ttnpb.Rights
-	if inCtx, ok := FromContext(ctx); ok {
-		rights = inCtx.ApplicationRights[uid]
-	} else {
-		fetcher, ok := fetcherFromContext(ctx)
-		if !ok {
-			panic(errNoFetcher)
-		}
-		rights, err = fetcher.ApplicationRights(ctx, id)
-		if err != nil && !errors.IsPermissionDenied(err) {
-			return err
-		}
+	rights, err := ListApplication(ctx, id)
+	if err != nil {
+		return err
 	}
 	if len(rights.GetRights()) == 0 {
 		return errNoApplicationRights.WithAttributes("uid", uid)
@@ -103,18 +94,9 @@ func RequireApplication(ctx context.Context, id ttnpb.ApplicationIdentifiers, re
 // given client ID.
 func RequireClient(ctx context.Context, id ttnpb.ClientIdentifiers, required ...ttnpb.Right) (err error) {
 	uid := unique.ID(ctx, id)
-	var rights *ttnpb.Rights
-	if inCtx, ok := FromContext(ctx); ok {
-		rights = inCtx.ClientRights[uid]
-	} else {
-		fetcher, ok := fetcherFromContext(ctx)
-		if !ok {
-			panic(errNoFetcher)
-		}
-		rights, err = fetcher.ClientRights(ctx, id)
-		if err != nil && !errors.IsPermissionDenied(err) {
-			return err
-		}
+	rights, err := ListClient(ctx, id)
+	if err != nil {
+		return err
 	}
 	if len(rights.GetRights()) == 0 {
 		return errNoClientRights.WithAttributes("uid", uid)
@@ -130,18 +112,9 @@ func RequireClient(ctx context.Context, id ttnpb.ClientIdentifiers, required ...
 // given gateway ID.
 func RequireGateway(ctx context.Context, id ttnpb.GatewayIdentifiers, required ...ttnpb.Right) (err error) {
 	uid := unique.ID(ctx, id)
-	var rights *ttnpb.Rights
-	if inCtx, ok := FromContext(ctx); ok {
-		rights = inCtx.GatewayRights[uid]
-	} else {
-		fetcher, ok := fetcherFromContext(ctx)
-		if !ok {
-			panic(errNoFetcher)
-		}
-		rights, err = fetcher.GatewayRights(ctx, id)
-		if err != nil && !errors.IsPermissionDenied(err) {
-			return err
-		}
+	rights, err := ListGateway(ctx, id)
+	if err != nil {
+		return err
 	}
 	if len(rights.GetRights()) == 0 {
 		return errNoGatewayRights.WithAttributes("uid", uid)
@@ -157,18 +130,9 @@ func RequireGateway(ctx context.Context, id ttnpb.GatewayIdentifiers, required .
 // given organization ID.
 func RequireOrganization(ctx context.Context, id ttnpb.OrganizationIdentifiers, required ...ttnpb.Right) (err error) {
 	uid := unique.ID(ctx, id)
-	var rights *ttnpb.Rights
-	if inCtx, ok := FromContext(ctx); ok {
-		rights = inCtx.OrganizationRights[uid]
-	} else {
-		fetcher, ok := fetcherFromContext(ctx)
-		if !ok {
-			panic(errNoFetcher)
-		}
-		rights, err = fetcher.OrganizationRights(ctx, id)
-		if err != nil && !errors.IsPermissionDenied(err) {
-			return err
-		}
+	rights, err := ListOrganization(ctx, id)
+	if err != nil {
+		return err
 	}
 	if len(rights.GetRights()) == 0 {
 		return errNoOrganizationRights.WithAttributes("uid", uid)
@@ -184,18 +148,9 @@ func RequireOrganization(ctx context.Context, id ttnpb.OrganizationIdentifiers, 
 // given user ID.
 func RequireUser(ctx context.Context, id ttnpb.UserIdentifiers, required ...ttnpb.Right) (err error) {
 	uid := unique.ID(ctx, id)
-	var rights *ttnpb.Rights
-	if inCtx, ok := FromContext(ctx); ok {
-		rights = inCtx.UserRights[uid]
-	} else {
-		fetcher, ok := fetcherFromContext(ctx)
-		if !ok {
-			panic(errNoFetcher)
-		}
-		rights, err = fetcher.UserRights(ctx, id)
-		if err != nil && !errors.IsPermissionDenied(err) {
-			return err
-		}
+	rights, err := ListUser(ctx, id)
+	if err != nil {
+		return err
 	}
 	if len(rights.GetRights()) == 0 {
 		return errNoUserRights.WithAttributes("uid", uid)
