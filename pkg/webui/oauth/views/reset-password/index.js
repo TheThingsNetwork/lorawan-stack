@@ -60,11 +60,10 @@ export default class ResetPassword extends React.PureComponent {
 
     async handleSubmit (values, {setSubmitting, setErrors }) {
         try {
-            console.log(values)
-            response = await api.users.reset(values.user_id)
+            const response = await api.users.reset(values.user_id)
             this.setState({
                 error: '',
-                info: response.data,
+                info: m.passwordRequested,
             })
         } catch (error) {
             this.setState({
