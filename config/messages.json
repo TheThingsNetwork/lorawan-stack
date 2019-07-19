@@ -2717,6 +2717,105 @@
       "file": "frequencyplans.go"
     }
   },
+  "error:pkg/gatewayserver/io/basicstationlns/messages:data_rate": {
+    "translations": {
+      "en": "data rate not found"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/basicstationlns/messages",
+      "file": "util.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/basicstationlns/messages:data_rate_index": {
+    "translations": {
+      "en": "data rate index is out of range"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/basicstationlns/messages",
+      "file": "util.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/basicstationlns/messages:downlink_message": {
+    "translations": {
+      "en": "could not translate downlink message"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/basicstationlns/messages",
+      "file": "downstream.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/basicstationlns/messages:frequency_plan": {
+    "translations": {
+      "en": "invalid frequency plan"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/basicstationlns/messages",
+      "file": "messages.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/basicstationlns/messages:gateway_id": {
+    "translations": {
+      "en": "invalid gateway ID `{id}`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/basicstationlns/messages",
+      "file": "upstream.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/basicstationlns/messages:join_request_message": {
+    "translations": {
+      "en": "invalid join-request message received"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/basicstationlns/messages",
+      "file": "upstream.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/basicstationlns/messages:uid": {
+    "translations": {
+      "en": "invalid uid `{uid}`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/basicstationlns/messages",
+      "file": "util.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/basicstationlns/messages:uplink_data_Frame": {
+    "translations": {
+      "en": "invalid uplink data frame received"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/basicstationlns/messages",
+      "file": "upstream.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/basicstationlns/messages:uplink_message": {
+    "translations": {
+      "en": "invalid uplink message received"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/basicstationlns/messages",
+      "file": "upstream.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/basicstationlns:empty_gateway_eui": {
+    "translations": {
+      "en": "empty gateway EUI"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/basicstationlns",
+      "file": "basicstationlns.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/basicstationlns:listener": {
+    "translations": {
+      "en": "failed to serve Basic Station frontend listener"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/basicstationlns",
+      "file": "basicstationlns.go"
+    }
+  },
   "error:pkg/gatewayserver/io/grpc:connect": {
     "translations": {
       "en": "failed to connect gateway `{gateway_uid}`"
@@ -2819,15 +2918,6 @@
   "error:pkg/gatewayserver/io/udp:downlink_path_expired": {
     "translations": {
       "en": "downlink path expired"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/udp",
-      "file": "udp.go"
-    }
-  },
-  "error:pkg/gatewayserver/io/udp:no_clock_sync": {
-    "translations": {
-      "en": "no clock sync"
     },
     "description": {
       "package": "pkg/gatewayserver/io/udp",

@@ -19,6 +19,7 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"net/http"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -34,6 +35,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
+	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/basicstationlns"
 	iogrpc "go.thethings.network/lorawan-stack/pkg/gatewayserver/io/grpc"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/mqtt"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/udp"
@@ -171,6 +173,37 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 	}
 
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.NsGs", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("gatewayserver"))
+	bsCtx := ctx
+	if conf.BasicStation.FallbackFrequencyPlanID != "" {
+		bsCtx = frequencyplans.WithFallbackID(ctx, conf.BasicStation.FallbackFrequencyPlanID)
+	}
+
+	bsWebServer := basicstationlns.New(bsCtx, gs)
+	for _, endpoint := range []component.Endpoint{
+		component.NewTCPEndpoint(conf.BasicStation.Listen, "Basic Station"),
+		component.NewTLSEndpoint(conf.BasicStation.ListenTLS, "Basic Station"),
+	} {
+		if endpoint.Address() == "" {
+			continue
+		}
+		l, err := gs.ListenTCP(endpoint.Address())
+		var lis net.Listener
+		if err == nil {
+			lis, err = endpoint.Listen(l)
+		}
+		if err != nil {
+			return nil, errListenFrontend.WithCause(err).WithAttributes(
+				"address", endpoint.Address(),
+				"protocol", endpoint.Protocol(),
+			)
+		}
+		go func() error {
+			return http.Serve(lis, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				bsWebServer.ServeHTTP(w, r)
+			}))
+		}()
+	}
+
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.NsGs", cluster.HookName, c.ClusterAuthUnaryHook())
 
 	c.RegisterGRPC(gs)
@@ -240,13 +273,16 @@ var (
 
 // Connect connects a gateway by its identifiers to the Gateway Server, and returns a io.Connection for traffic and
 // control.
-func (gs *GatewayServer) Connect(ctx context.Context, protocol string, ids ttnpb.GatewayIdentifiers) (*io.Connection, error) {
+func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids ttnpb.GatewayIdentifiers) (*io.Connection, error) {
 	if err := rights.RequireGateway(ctx, ids, ttnpb.RIGHT_GATEWAY_LINK); err != nil {
 		return nil, err
 	}
 
 	uid := unique.ID(ctx, ids)
-	logger := log.FromContext(ctx).WithField("gateway_uid", uid)
+	logger := log.FromContext(ctx).WithFields(log.Fields(
+		"protocol", frontend.Protocol(),
+		"gateway_uid", uid,
+	))
 	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:conn:%s", events.NewCorrelationID()))
 
 	var err error
@@ -295,7 +331,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, protocol string, ids ttnpb
 		return nil, err
 	}
 
-	conn := io.NewConnection(ctx, protocol, gtw, fp, scheduler)
+	conn := io.NewConnection(ctx, frontend.Protocol(), gtw, fp, scheduler)
 	gs.connections.Store(uid, conn)
 	registerGatewayConnect(ctx, ids)
 	logger.Info("Connected")

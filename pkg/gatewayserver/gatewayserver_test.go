@@ -16,6 +16,7 @@ package gatewayserver_test
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net"
 	"sync"
@@ -23,15 +24,18 @@ import (
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/gorilla/websocket"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/config"
+	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
+	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/basicstationlns/messages"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/udp"
 	"go.thethings.network/lorawan-stack/pkg/rpcclient"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
@@ -46,7 +50,7 @@ import (
 )
 
 var (
-	registeredGatewayID  = "test-gateway"
+	registeredGatewayID  = "eui-aaee000000000000"
 	registeredGatewayKey = "secret"
 	registeredGatewayEUI = types.EUI64{0xAA, 0xEE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
 
@@ -94,6 +98,9 @@ func TestGatewayServer(t *testing.T) {
 				":1700": test.EUFrequencyPlanID,
 			},
 		},
+		BasicStation: gatewayserver.BasicStationConfig{
+			Listen: ":1887",
+		},
 	}
 	gs, err := gatewayserver.New(c, config)
 	if !a.So(err, should.BeNil) {
@@ -114,12 +121,15 @@ func TestGatewayServer(t *testing.T) {
 	}, registeredGatewayKey)
 
 	for _, ptc := range []struct {
-		Protocol  string
-		ValidAuth func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool
-		Link      func(ctx context.Context, t *testing.T, ids ttnpb.GatewayIdentifiers, key string, upCh <-chan *ttnpb.GatewayUp, downCh chan<- *ttnpb.GatewayDown) error
+		Protocol               string
+		SupportsStatus         bool
+		DetectsInvalidMessages bool
+		ValidAuth              func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool
+		Link                   func(ctx context.Context, t *testing.T, ids ttnpb.GatewayIdentifiers, key string, upCh <-chan *ttnpb.GatewayUp, downCh chan<- *ttnpb.GatewayDown) error
 	}{
 		{
-			Protocol: "grpc",
+			Protocol:       "grpc",
+			SupportsStatus: true,
 			ValidAuth: func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool {
 				return ids.GatewayID == registeredGatewayID && key == registeredGatewayKey
 			},
@@ -179,7 +189,8 @@ func TestGatewayServer(t *testing.T) {
 			},
 		},
 		{
-			Protocol: "mqtt",
+			Protocol:       "mqtt",
+			SupportsStatus: true,
 			ValidAuth: func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool {
 				return ids.GatewayID == registeredGatewayID && key == registeredGatewayKey
 			},
@@ -263,7 +274,8 @@ func TestGatewayServer(t *testing.T) {
 			},
 		},
 		{
-			Protocol: "udp",
+			Protocol:       "udp",
+			SupportsStatus: true,
 			ValidAuth: func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool {
 				return ids.EUI != nil
 			},
@@ -392,6 +404,125 @@ func TestGatewayServer(t *testing.T) {
 				}
 			},
 		},
+		{
+			Protocol:               "basicstation",
+			SupportsStatus:         false,
+			DetectsInvalidMessages: true,
+			ValidAuth: func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool {
+				return ids.EUI != nil
+			},
+			Link: func(ctx context.Context, t *testing.T, ids ttnpb.GatewayIdentifiers, key string, upCh <-chan *ttnpb.GatewayUp, downCh chan<- *ttnpb.GatewayDown) error {
+				if ids.EUI == nil {
+					t.SkipNow()
+				}
+				wsConn, _, err := websocket.DefaultDialer.Dial("ws://0.0.0.0:1887/traffic/"+registeredGatewayID, nil)
+				if err != nil {
+					return err
+				}
+				defer wsConn.Close()
+
+				errCh := make(chan error, 2)
+				// Write upstream.
+				go func() {
+					for {
+						select {
+						case <-ctx.Done():
+							return
+						case msg := <-upCh:
+							for _, uplink := range msg.UplinkMessages {
+								var payload ttnpb.Message
+								if err := lorawan.UnmarshalMessage(uplink.RawPayload, &payload); err != nil {
+									// Ignore invalid uplinks
+									continue
+								}
+								var bsUpstream []byte
+								if payload.GetMType() == ttnpb.MType_JOIN_REQUEST {
+									var jreq messages.JoinRequest
+									err := jreq.FromUplinkMessage(uplink, test.EUFrequencyPlanID)
+									if err != nil {
+										errCh <- err
+										return
+									}
+									bsUpstream, err = jreq.MarshalJSON()
+									if err != nil {
+										errCh <- err
+										return
+									}
+								}
+								if payload.GetMType() == ttnpb.MType_UNCONFIRMED_UP || payload.GetMType() == ttnpb.MType_CONFIRMED_UP {
+									var updf messages.UplinkDataFrame
+									err := updf.FromUplinkMessage(uplink, test.EUFrequencyPlanID)
+									if err != nil {
+										errCh <- err
+										return
+									}
+									bsUpstream, err = updf.MarshalJSON()
+									if err != nil {
+										errCh <- err
+										return
+									}
+								}
+
+								if err := wsConn.WriteMessage(websocket.TextMessage, bsUpstream); err != nil {
+									if err != nil {
+										errCh <- err
+										return
+									}
+								}
+							}
+							if msg.TxAcknowledgment != nil {
+								txConf := messages.TxConfirmation{
+									Diid:  0,
+									XTime: time.Now().Unix(),
+								}
+
+								bsUpstream, err := txConf.MarshalJSON()
+								if err != nil {
+									errCh <- err
+									return
+								}
+
+								if err := wsConn.WriteMessage(websocket.TextMessage, bsUpstream); err != nil {
+									if err != nil {
+										errCh <- err
+										return
+									}
+								}
+							}
+						}
+					}
+				}()
+
+				// Read downstream.
+				go func() {
+					for {
+						_, data, err := wsConn.ReadMessage()
+						if err != nil {
+							if !websocket.IsUnexpectedCloseError(err) {
+								errCh <- err
+							}
+							return
+						}
+						var msg messages.DownlinkMessage
+						if err := json.Unmarshal(data, &msg); err != nil {
+							errCh <- err
+							return
+						}
+						dlmesg := msg.ToDownlinkMessage()
+						downCh <- &ttnpb.GatewayDown{
+							DownlinkMessage: &dlmesg,
+						}
+					}
+				}()
+
+				select {
+				case err := <-errCh:
+					return err
+				case <-ctx.Done():
+					return ctx.Err()
+				}
+			},
+		},
 	} {
 		t.Run(fmt.Sprintf("Authenticate/%v", ptc.Protocol), func(t *testing.T) {
 			for _, ctc := range []struct {
@@ -450,7 +581,6 @@ func TestGatewayServer(t *testing.T) {
 				GatewayID: registeredGatewayID,
 				EUI:       &registeredGatewayEUI,
 			}
-
 			// Setup a stats client with independent context to query whether the gateway is connected and statistics on
 			// upstream and downstream.
 			statsConn, err := grpc.Dial(":9187", append(rpcclient.DefaultDialOptions(test.Context()), grpc.WithInsecure(), grpc.WithBlock())...)
@@ -684,7 +814,11 @@ func TestGatewayServer(t *testing.T) {
 						case <-time.After(timeout):
 							t.Fatalf("Failed to send message to upstream channel")
 						}
-						uplinkCount += len(tc.Up.UplinkMessages)
+						if ptc.DetectsInvalidMessages {
+							uplinkCount += len(tc.Forwards)
+						} else {
+							uplinkCount += len(tc.Up.UplinkMessages)
+						}
 
 						for _, msgIdx := range tc.Forwards {
 							select {
@@ -721,23 +855,24 @@ func TestGatewayServer(t *testing.T) {
 								t.Fatal("Expected Tx acknowledgment event timeout")
 							}
 						}
-						if tc.Up.GatewayStatus != nil {
+						if tc.Up.GatewayStatus != nil && ptc.SupportsStatus {
 							select {
 							case <-upEvents["gs.status.receive"]:
 							case <-time.After(timeout):
 								t.Fatal("Expected gateway status event timeout")
 							}
-						}
 
-						// Wait for gateway status to be processed; no event available here.
-						time.Sleep(timeout)
+							// Wait for gateway status to be processed; no event available here.
+							time.Sleep(timeout)
+						}
 
 						stats, err := statsClient.GetGatewayConnectionStats(statsCtx, &ids)
 						if !a.So(err, should.BeNil) {
 							t.FailNow()
 						}
 						a.So(stats.UplinkCount, should.Equal, uplinkCount)
-						if tc.Up.GatewayStatus != nil {
+
+						if tc.Up.GatewayStatus != nil && ptc.SupportsStatus {
 							if !a.So(stats.LastStatus, should.NotBeNil) {
 								t.FailNow()
 							}
@@ -918,15 +1053,8 @@ func TestGatewayServer(t *testing.T) {
 
 						select {
 						case msg := <-downCh:
-							conn, ok := gs.GetConnection(ctx, ids)
-							a.So(ok, should.BeTrue)
-							if conn.HasScheduler() {
-								settings := msg.DownlinkMessage.GetScheduled()
-								a.So(settings, should.NotBeNil)
-							} else {
-								request := msg.DownlinkMessage.GetRequest()
-								a.So(request, should.NotBeNil)
-							}
+							settings := msg.DownlinkMessage.GetScheduled()
+							a.So(settings, should.NotBeNil)
 						case <-time.After(timeout):
 							t.Fatal("Expected downlink timeout")
 						}

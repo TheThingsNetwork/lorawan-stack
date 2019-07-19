@@ -32,8 +32,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/unique"
 )
 
-const tokenExpiration = 3 * time.Minute
-
 // Config contains configuration settings for the UDP gateway frontend.
 // Use DefaultConfig for recommended settings.
 type Config struct {
@@ -75,6 +73,8 @@ type srv struct {
 	connections sync.Map
 	firewall    Firewall
 }
+
+func (*srv) Protocol() string { return "udp" }
 
 // Start starts the UDP frontend.
 func Start(ctx context.Context, server io.Server, conn *net.UDPConn, config Config) {
@@ -212,7 +212,7 @@ func (s *srv) connect(ctx context.Context, eui types.EUI64) (*state, error) {
 				},
 			},
 		})
-		io, err = s.server.Connect(ctx, "udp", ids)
+		io, err = s.server.Connect(ctx, s, ids)
 		if err != nil {
 			return nil, err
 		}
@@ -470,5 +470,3 @@ type state struct {
 
 	tokens io.DownlinkTokens
 }
-
-var errNoClock = errors.DefineUnavailable("no_clock_sync", "no clock sync")

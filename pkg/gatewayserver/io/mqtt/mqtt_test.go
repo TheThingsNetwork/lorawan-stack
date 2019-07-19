@@ -52,8 +52,8 @@ func TestAuthentication(t *testing.T) {
 	ctx, cancelCtx := context.WithCancel(ctx)
 	defer cancelCtx()
 
-	is, isAddr := startMockIS(ctx)
-	is.add(ctx, registeredGatewayID, registeredGatewayKey)
+	is, isAddr := mock.NewIS(ctx)
+	is.Add(ctx, registeredGatewayID, registeredGatewayKey)
 
 	c := component.MustNew(test.GetLogger(t), &component.Config{
 		ServiceBase: config.ServiceBase{
@@ -125,8 +125,8 @@ func TestTraffic(t *testing.T) {
 	ctx, cancelCtx := context.WithCancel(ctx)
 	defer cancelCtx()
 
-	is, isAddr := startMockIS(ctx)
-	is.add(ctx, registeredGatewayID, registeredGatewayKey)
+	is, isAddr := mock.NewIS(ctx)
+	is.Add(ctx, registeredGatewayID, registeredGatewayKey)
 
 	c := component.MustNew(test.GetLogger(t), &component.Config{
 		ServiceBase: config.ServiceBase{
