@@ -118,7 +118,9 @@ export const isPermissionDeniedError = error => (
  */
 export const isUnauthenticatedError = error => (
   grpcStatusCode(error) === 16
-  || (isBackend(error) && error.details[0].attributes.message === 'code=401, message=You are not logged in') // TODO: Remove this once #1014 is resolved
+  || (isBackend(error)
+    && error.details[0].attributes
+    && error.details[0].attributes.message === 'code=401, message=You are not logged in') // TODO: Remove this once #1014 is resolved
 )
 
 /**
