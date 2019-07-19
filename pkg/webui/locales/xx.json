@@ -318,5 +318,10 @@
   "oauth.views.create-account.index.registrationPending": "Xxx xxxx xxxxxxxxxxxx xxxx xxx xxxxxxxxxxxx xxxxxxx. Xxxxxx xxxx xxxxx xx xxxxx xxxxxxxx xx.",
   "oauth.views.login.index.createAccount": "Xxxxxx xx xxxxxxx",
   "oauth.views.login.index.loginToContinue": "Xxxxxx xxxxx xx xxxxxxxx",
-  "oauth.views.login.index.stackAccount": "XXX Xxxxx Xxxxxxx"
+  "oauth.views.login.index.stackAccount": "XXX Xxxxx Xxxxxxx",
+  "oauth.views.reset-password.index.loginPage": "Xxxxx Xxxx",
+  "oauth.views.reset-password.index.passwordRequested": "Xxx xxxxxxxxx xxxxxxxx xxx xxxx xxxx xx xxxx xxxxx",
+  "oauth.views.reset-password.index.resetPassword": "Xxxxx Xxxxxxxx",
+  "oauth.views.reset-password.index.requestTempPassword": "Xxxxxxx x xxx xxxxxxxxx xxxxxxxx",
+  "oauth.views.reset-password.index.stackAccount": "XXX Xxxxx Xxxxxxx"
 }

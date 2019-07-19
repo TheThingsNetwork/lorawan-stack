@@ -37,5 +37,8 @@ export default {
     me () {
       return instance.get('/oauth/api/me')
     },
+    reset (user_id) {
+      return instance.post('/oauth/api/auth/password-reset', user_id)
+    },
   },
 }
