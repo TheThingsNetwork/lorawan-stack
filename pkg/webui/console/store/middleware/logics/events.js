@@ -27,6 +27,8 @@ import {
   stopEventsStream,
 } from '../../actions/events'
 import { createEventsStatusSelector } from '../../selectors/events'
+import { isUnauthenticatedError } from '../../../../lib/errors/utils'
+import user from './user'
 
 /**
  * Creates `redux-logic` logic from processing entity events.
@@ -91,7 +93,11 @@ const createEventsConnectLogics = function (
           channel.on('error', error => dispatch(getEventFailure(id, error)))
           channel.on('close', () => dispatch(stopEvents(id)))
         } catch (error) {
-          dispatch(startEventsFailure(id, error))
+          if (isUnauthenticatedError(error)) {
+            dispatch(user.logoutSuccess())
+          } else {
+            dispatch(startEventsFailure(id, error))
+          }
         }
       },
     }),
