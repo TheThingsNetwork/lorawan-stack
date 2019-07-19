@@ -107,7 +107,7 @@ type Scheduler struct {
 	timeOffAir        frequencyplans.TimeOffAir
 	timeSource        TimeSource
 	subBands          []*SubBand
-	mu                sync.Mutex
+	mu                sync.RWMutex
 	emissions         Emissions
 }
 
@@ -149,8 +149,8 @@ var (
 func (s *Scheduler) ScheduleAt(ctx context.Context, payloadSize int, settings ttnpb.TxSettings, rtts RTTs, priority ttnpb.TxSchedulePriority) (Emission, error) {
 	defer trace.StartRegion(ctx, "schedule transmission").End()
 
-	s.mu.Lock()
-	defer s.mu.Unlock()
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 	if !s.clock.IsSynced() {
 		return Emission{}, errNoClockSync
 	}
@@ -217,8 +217,8 @@ func (s *Scheduler) ScheduleAt(ctx context.Context, payloadSize int, settings tt
 func (s *Scheduler) ScheduleAnytime(ctx context.Context, payloadSize int, settings ttnpb.TxSettings, rtts RTTs, priority ttnpb.TxSchedulePriority) (Emission, error) {
 	defer trace.StartRegion(ctx, "schedule transmission at any time").End()
 
-	s.mu.Lock()
-	defer s.mu.Unlock()
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 	if !s.clock.IsSynced() {
 		return Emission{}, errNoClockSync
 	}
@@ -304,15 +304,21 @@ func (s *Scheduler) SyncWithGateway(v uint32, server, gateway time.Time) {
 // Now returns an indication of the current concentrator time.
 // This method returns false if the clock is not synced with the server.
 func (s *Scheduler) Now() (ConcentratorTime, bool) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 	if !s.clock.IsSynced() {
 		return 0, false
 	}
 	return s.clock.FromServerTime(s.timeSource.Now()), true
 }
 
-// GetClock returns this scheduler's clock instance.
-func (s *Scheduler) GetClock() *RolloverClock {
-	return s.clock
+// TimeFromTimestampTime returns the concentrator time by the given timestamp.
+// This method returns false if the clock is not synced with the server.
+func (s *Scheduler) TimeFromTimestampTime(t uint32) (ConcentratorTime, bool) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	if !s.clock.IsSynced() {
+		return 0, false
+	}
+	return s.clock.FromTimestampTime(t), true
 }
