@@ -26,6 +26,9 @@ export default {
     async register (userData) {
       return axios.post(`/api/v3/users`, userData)
     },
+    reset(user_id) {
+      return instance.post(`/api/v3/users/${user_id}/temporary_password`)
+    },
   },
   oauth: {
     login (credentials) {
@@ -36,9 +39,6 @@ export default {
     },
     me () {
       return instance.get('/oauth/api/me')
-    },
-    reset (user_id) {
-      return instance.post('/oauth/api/auth/password-reset', user_id)
     },
   },
 }
