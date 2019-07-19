@@ -107,8 +107,8 @@ const getGatewayCollaboratorLogic = createRequestLogic({
 const getGatewayCollaboratorsLogic = createRequestLogic({
   type: gateways.GET_GTW_COLLABORATORS_LIST,
   async process ({ action }) {
-    const { id } = action.payload
-    const res = await api.gateway.collaborators.list(id)
+    const { id, params } = action.payload
+    const res = await api.gateway.collaborators.list(id, params)
     const collaborators = res.collaborators.map(function (collaborator) {
       const { ids, ...rest } = collaborator
       const isUser = !!ids.user_ids
