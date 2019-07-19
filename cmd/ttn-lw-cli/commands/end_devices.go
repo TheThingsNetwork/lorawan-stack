@@ -564,17 +564,20 @@ var (
 			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
+	// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/999)
 	endDevicesProvisionCommand = &cobra.Command{
 		Use:   "provision",
 		Short: "Provision end devices using vendor-specific data",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			logger.Warn("This command is deprecated. Please use `device template from-data` instead")
+
 			appID := getApplicationID(cmd.Flags(), nil)
 			if appID == nil {
 				return errNoApplicationID
 			}
 
 			provisionerID, _ := cmd.Flags().GetString("provisioner-id")
-			data, err := getData(cmd.Flags())
+			data, err := getDataBytes("", cmd.Flags())
 			if err != nil {
 				return err
 			}
@@ -757,7 +760,7 @@ func init() {
 	endDevicesUpdateCommand.Flags().AddFlagSet(attributesFlags())
 	endDevicesCommand.AddCommand(endDevicesUpdateCommand)
 	endDevicesProvisionCommand.Flags().AddFlagSet(applicationIDFlags())
-	endDevicesProvisionCommand.Flags().AddFlagSet(dataFlags())
+	endDevicesProvisionCommand.Flags().AddFlagSet(dataFlags("", ""))
 	endDevicesProvisionCommand.Flags().String("provisioner-id", "", "provisioner service")
 	endDevicesProvisionCommand.Flags().String("join-eui", "", "(hex)")
 	endDevicesProvisionCommand.Flags().String("start-dev-eui", "", "starting DevEUI to provision (hex)")
