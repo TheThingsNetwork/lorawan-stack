@@ -85,13 +85,15 @@ export default class Spinner extends React.PureComponent {
               <stop offset="100%" className={style.stop} stopColor="white" stopOpacity="0" />
             </linearGradient>
           </defs>
-          <circle
-            cx="50"
-            cy="50"
-            r="40"
-            className={style.bar}
-            stroke={`url(#${this.id})`}
-          />
+          <g transform="translate(50, 50)">
+            <circle
+              cx="0"
+              cy="0"
+              r="40"
+              className={style.bar}
+              stroke={`url(#${this.id})`}
+            />
+          </g>
           <circle
             cx="50"
             cy="50"
