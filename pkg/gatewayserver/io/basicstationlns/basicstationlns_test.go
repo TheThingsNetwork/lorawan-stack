@@ -622,10 +622,12 @@ func TestTraffic(t *testing.T) {
 						JoinEUI:  types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22},
 						DevEUI:   types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11},
 						DevNonce: [2]byte{0x46, 0x50},
-					}}},
+					}},
+				},
 				RxMetadata: []*ttnpb.RxMetadata{{
-					GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "eui-0101010101010101",
-						EUI: &types.EUI64{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01},
+					GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+						GatewayID: "eui-0101010101010101",
+						EUI:       &types.EUI64{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01},
 					},
 					Time:        &[]time.Time{time.Unix(1548059982, 0)}[0],
 					Timestamp:   (uint32)(12666373963464220 & 0xFFFFFFFF),
@@ -683,16 +685,20 @@ func TestTraffic(t *testing.T) {
 							FCnt:  25,
 							FOpts: []byte{0xFD},
 						},
-					}}},
-				RxMetadata: []*ttnpb.RxMetadata{{
-					GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "eui-0101010101010101",
-						EUI: &types.EUI64{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01},
+					}},
+				},
+				RxMetadata: []*ttnpb.RxMetadata{
+					{
+						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+							GatewayID: "eui-0101010101010101",
+							EUI:       &types.EUI64{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01},
+						},
+						Time:        &[]time.Time{time.Unix(1548059982, 0)}[0],
+						Timestamp:   (uint32)(12666373963464220 & 0xFFFFFFFF),
+						RSSI:        89,
+						ChannelRSSI: 89,
+						SNR:         9.25,
 					},
-					Time:        &[]time.Time{time.Unix(1548059982, 0)}[0],
-					Timestamp:   (uint32)(12666373963464220 & 0xFFFFFFFF),
-					RSSI:        89,
-					ChannelRSSI: 89,
-					SNR:         9.25},
 				},
 				Settings: ttnpb.TxSettings{
 					Frequency:  868300000,
@@ -858,7 +864,6 @@ func TestTraffic(t *testing.T) {
 			}
 		})
 	}
-
 }
 
 func TestRTT(t *testing.T) {
@@ -1134,5 +1139,4 @@ func TestRTT(t *testing.T) {
 			}
 		})
 	}
-
 }

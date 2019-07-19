@@ -27,9 +27,7 @@ import (
 	pfconfig "go.thethings.network/lorawan-stack/pkg/pfconfig/shared"
 )
 
-var (
-	errFrequencyPlan = errors.DefineInvalidArgument("frequency_plan", "invalid frequency plan")
-)
+var errFrequencyPlan = errors.DefineInvalidArgument("frequency_plan", "invalid frequency plan")
 
 // Definition of message types.
 const (

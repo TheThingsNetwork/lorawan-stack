@@ -82,7 +82,6 @@ func TestIsProduction(t *testing.T) {
 			a.So(tc.Message.IsProduction(), should.Equal, tc.ExpectedResponse)
 		})
 	}
-
 }
 
 func TestGetRouterConfig(t *testing.T) {

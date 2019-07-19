@@ -108,7 +108,7 @@ func getDataRatesFromBandID(id string) (DataRates, error) {
 		dr[2] = 0
 	}
 
-	var i = 0
+	i := 0
 	for _, dr := range band.DataRates {
 		if loraDR := dr.Rate.GetLoRa(); loraDR != nil {
 			loraDR.GetSpreadingFactor()

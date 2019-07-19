@@ -470,5 +470,3 @@ type state struct {
 
 	tokens io.DownlinkTokens
 }
-
-var errNoClock = errors.DefineUnavailable("no_clock_sync", "no clock sync")

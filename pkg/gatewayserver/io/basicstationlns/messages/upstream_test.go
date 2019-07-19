@@ -175,10 +175,12 @@ func TestJoinRequest(t *testing.T) {
 						JoinEUI:  types.EUI64{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 						DevEUI:   types.EUI64{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 						DevNonce: [2]byte{0x00, 0x00},
-					}}},
+					}},
+				},
 				RxMetadata: []*ttnpb.RxMetadata{{
-					GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "eui-1122334455667788",
-						EUI: &types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88},
+					GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+						GatewayID: "eui-1122334455667788",
+						EUI:       &types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88},
 					},
 					UplinkToken: []byte{10, 24, 10, 22, 10, 20, 101, 117, 105, 45, 49, 49, 50, 50, 51, 51, 52, 52, 53, 53, 54, 54, 55, 55, 56, 56},
 				}},
@@ -187,7 +189,8 @@ func TestJoinRequest(t *testing.T) {
 					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 12,
 						Bandwidth:       125000,
-					}}}},
+					}}},
+				},
 			},
 		},
 		{
@@ -219,18 +222,21 @@ func TestJoinRequest(t *testing.T) {
 						JoinEUI:  types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22},
 						DevEUI:   types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11},
 						DevNonce: [2]byte{0x46, 0x50},
-					}}},
-				RxMetadata: []*ttnpb.RxMetadata{{
-					GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "eui-1122334455667788",
-						EUI: &types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88},
-					},
-					Time:        &[]time.Time{time.Unix(1548059982, 0)}[0],
-					Timestamp:   (uint32)(12666373963464220 & 0xFFFFFFFF),
-					RSSI:        89,
-					ChannelRSSI: 89,
-					SNR:         9.25,
-					UplinkToken: []byte{10, 24, 10, 22, 10, 20, 101, 117, 105, 45, 49, 49, 50, 50, 51, 51, 52, 52, 53, 53, 54, 54, 55, 55, 56, 56, 16, 156, 252, 188, 5},
+					}},
 				},
+				RxMetadata: []*ttnpb.RxMetadata{
+					{
+						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+							GatewayID: "eui-1122334455667788",
+							EUI:       &types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88},
+						},
+						Time:        &[]time.Time{time.Unix(1548059982, 0)}[0],
+						Timestamp:   (uint32)(12666373963464220 & 0xFFFFFFFF),
+						RSSI:        89,
+						ChannelRSSI: 89,
+						SNR:         9.25,
+						UplinkToken: []byte{10, 24, 10, 22, 10, 20, 101, 117, 105, 45, 49, 49, 50, 50, 51, 51, 52, 52, 53, 53, 54, 54, 55, 55, 56, 56, 16, 156, 252, 188, 5},
+					},
 				},
 				Settings: ttnpb.TxSettings{
 					Frequency:  868300000,
@@ -328,18 +334,21 @@ func TestUplinkDataFrame(t *testing.T) {
 							FCnt:  25,
 							FOpts: []byte{0xFD},
 						},
-					}}},
-				RxMetadata: []*ttnpb.RxMetadata{{
-					GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "eui-1122334455667788",
-						EUI: &types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88},
-					},
-					Time:        &[]time.Time{time.Unix(1548059982, 0)}[0],
-					Timestamp:   (uint32)(12666373963464220 & 0xFFFFFFFF),
-					RSSI:        89,
-					ChannelRSSI: 89,
-					SNR:         9.25,
-					UplinkToken: []byte{10, 34, 10, 32, 10, 20, 101, 117, 105, 45, 49, 49, 50, 50, 51, 51, 52, 52, 53, 53, 54, 54, 55, 55, 56, 56, 18, 8, 17, 34, 51, 68, 85, 102, 119, 136, 16, 156, 252, 188, 5},
+					}},
 				},
+				RxMetadata: []*ttnpb.RxMetadata{
+					{
+						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+							GatewayID: "eui-1122334455667788",
+							EUI:       &types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88},
+						},
+						Time:        &[]time.Time{time.Unix(1548059982, 0)}[0],
+						Timestamp:   (uint32)(12666373963464220 & 0xFFFFFFFF),
+						RSSI:        89,
+						ChannelRSSI: 89,
+						SNR:         9.25,
+						UplinkToken: []byte{10, 34, 10, 32, 10, 20, 101, 117, 105, 45, 49, 49, 50, 50, 51, 51, 52, 52, 53, 53, 54, 54, 55, 55, 56, 56, 18, 8, 17, 34, 51, 68, 85, 102, 119, 136, 16, 156, 252, 188, 5},
+					},
 				},
 				Settings: ttnpb.TxSettings{
 					Timestamp:  (uint32)(12666373963464220 & 0xFFFFFFFF),
@@ -393,18 +402,21 @@ func TestUplinkDataFrame(t *testing.T) {
 							FCnt:  25,
 							FOpts: []byte{0xFD},
 						},
-					}}},
-				RxMetadata: []*ttnpb.RxMetadata{{
-					GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "eui-1122334455667788",
-						EUI: &types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88},
-					},
-					Time:        &[]time.Time{time.Unix(1548059982, 0)}[0],
-					Timestamp:   (uint32)(12666373963464220 & 0xFFFFFFFF),
-					RSSI:        89,
-					ChannelRSSI: 89,
-					SNR:         9.25,
-					UplinkToken: []byte{10, 34, 10, 32, 10, 20, 101, 117, 105, 45, 49, 49, 50, 50, 51, 51, 52, 52, 53, 53, 54, 54, 55, 55, 56, 56, 18, 8, 17, 34, 51, 68, 85, 102, 119, 136, 16, 156, 252, 188, 5},
+					}},
 				},
+				RxMetadata: []*ttnpb.RxMetadata{
+					{
+						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+							GatewayID: "eui-1122334455667788",
+							EUI:       &types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88},
+						},
+						Time:        &[]time.Time{time.Unix(1548059982, 0)}[0],
+						Timestamp:   (uint32)(12666373963464220 & 0xFFFFFFFF),
+						RSSI:        89,
+						ChannelRSSI: 89,
+						SNR:         9.25,
+						UplinkToken: []byte{10, 34, 10, 32, 10, 20, 101, 117, 105, 45, 49, 49, 50, 50, 51, 51, 52, 52, 53, 53, 54, 54, 55, 55, 56, 56, 18, 8, 17, 34, 51, 68, 85, 102, 119, 136, 16, 156, 252, 188, 5},
+					},
 				},
 				Settings: ttnpb.TxSettings{
 					Frequency:  868300000,
@@ -478,15 +490,17 @@ func TestFromUplinkDataFrame(t *testing.T) {
 						FPort:      0x42,
 						FRMPayload: []byte{0xfe, 0xff},
 					}},
-					MIC: []byte{0x42, 0xff, 0xff, 0x0f}},
-				RxMetadata: []*ttnpb.RxMetadata{{
-					GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "eui-1122334455667788"},
-					Time:               &[]time.Time{time.Unix(1548059982, 0)}[0],
-					Timestamp:          (uint32)(12666373963464220 & 0xFFFFFFFF),
-					RSSI:               89,
-					SNR:                9.25,
-					UplinkToken:        []byte{10, 16, 10, 14, 10, 12, 116, 101, 115, 116, 45, 103, 97, 116, 101, 119, 97, 121, 16, 156, 252, 188, 5},
+					MIC: []byte{0x42, 0xff, 0xff, 0x0f},
 				},
+				RxMetadata: []*ttnpb.RxMetadata{
+					{
+						GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "eui-1122334455667788"},
+						Time:               &[]time.Time{time.Unix(1548059982, 0)}[0],
+						Timestamp:          (uint32)(12666373963464220 & 0xFFFFFFFF),
+						RSSI:               89,
+						SNR:                9.25,
+						UplinkToken:        []byte{10, 16, 10, 14, 10, 12, 116, 101, 115, 116, 45, 103, 97, 116, 101, 119, 97, 121, 16, 156, 252, 188, 5},
+					},
 				},
 				Settings: ttnpb.TxSettings{
 					Frequency: 868300000,
@@ -566,15 +580,17 @@ func TestJreqFromUplinkDataFrame(t *testing.T) {
 						DevEUI:   types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 						DevNonce: types.DevNonce{0x42, 0xff},
 					}},
-					MIC: []byte{0x42, 0xff, 0xff, 0x0f}},
-				RxMetadata: []*ttnpb.RxMetadata{{
-					GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "eui-1122334455667788"},
-					Time:               &[]time.Time{time.Unix(1548059982, 0)}[0],
-					Timestamp:          (uint32)(12666373963464220 & 0xFFFFFFFF),
-					RSSI:               89,
-					SNR:                9.25,
-					UplinkToken:        []byte{10, 16, 10, 14, 10, 12, 116, 101, 115, 116, 45, 103, 97, 116, 101, 119, 97, 121, 16, 156, 252, 188, 5},
+					MIC: []byte{0x42, 0xff, 0xff, 0x0f},
 				},
+				RxMetadata: []*ttnpb.RxMetadata{
+					{
+						GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "eui-1122334455667788"},
+						Time:               &[]time.Time{time.Unix(1548059982, 0)}[0],
+						Timestamp:          (uint32)(12666373963464220 & 0xFFFFFFFF),
+						RSSI:               89,
+						SNR:                9.25,
+						UplinkToken:        []byte{10, 16, 10, 14, 10, 12, 116, 101, 115, 116, 45, 103, 97, 116, 101, 119, 97, 121, 16, 156, 252, 188, 5},
+					},
 				},
 				Settings: ttnpb.TxSettings{
 					Frequency: 868300000,
@@ -634,5 +650,4 @@ func TestTxAck(t *testing.T) {
 	}) {
 		t.Fatalf("Unexpected TxAck: %v", res)
 	}
-
 }

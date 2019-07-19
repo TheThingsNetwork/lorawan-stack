@@ -64,6 +64,7 @@ func TestGetDataRatesFromFrequencyPlan(t *testing.T) {
 		})
 	}
 }
+
 func TestGetUint32IntegerAsByteSlice(t *testing.T) {
 	a := assertions.New(t)
 
@@ -198,7 +199,6 @@ func TestGetDataRateFromDataRateIndex(t *testing.T) {
 				}
 			}
 		})
-
 	}
 }
 
@@ -262,7 +262,6 @@ func TestGetDataRateIndexFromDataRate(t *testing.T) {
 				}
 			}
 		})
-
 	}
 }
 
@@ -327,5 +326,4 @@ func TestGetFCtrlAsUint(t *testing.T) {
 			}
 		})
 	}
-
 }

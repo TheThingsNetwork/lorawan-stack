@@ -229,7 +229,12 @@ func (s *srv) handleTraffic(c echo.Context) error {
 
 				// The first 16 bits of XTime gets the session ID from the upstream latestXTime and the other 48 bits are concentrator timestamp accounted for rollover.
 				sID := atomic.LoadInt32(&sessionID)
-				xTime := int64(sID)<<48 | int64(conn.GetConcentratorTime(scheduledMsg.Timestamp))/int64(time.Microsecond)
+				concentratorTime, ok := conn.TimeFromTimestampTime(scheduledMsg.Timestamp)
+				if !ok {
+					logger.Warn("No clock synchronization")
+					continue
+				}
+				xTime := int64(sID)<<48 | int64(concentratorTime)/int64(time.Microsecond)
 				dnmsg := messages.FromDownlinkMessage(ids, down.GetRawPayload(), scheduledMsg, int64(s.tokens.Next(down.CorrelationIDs, dlTime)), dlTime, xTime)
 				msg, err := dnmsg.MarshalJSON()
 				if err != nil {
