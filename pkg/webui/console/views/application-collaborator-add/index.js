@@ -77,6 +77,14 @@ export default class ApplicationCollaboratorAdd extends React.Component {
     getApplicationsRightsList()
   }
 
+  componentDidUpdate (prevProps) {
+    const { error } = this.props
+
+    if (Boolean(error) && prevProps.error !== error) {
+      throw error
+    }
+  }
+
   async handleSubmit (collaborator) {
     const { appId } = this.props
 
@@ -85,11 +93,12 @@ export default class ApplicationCollaboratorAdd extends React.Component {
   }
 
   render () {
-    const { rights, fetching, error, universalRights, redirectToList } = this.props
-
-    if (error) {
-      throw error
-    }
+    const {
+      rights,
+      fetching,
+      universalRights,
+      redirectToList,
+    } = this.props
 
     if (fetching && !rights.length) {
       return <Spinner center />

@@ -103,9 +103,17 @@ export default class ApplicationCollaboratorEdit extends React.Component {
   }
 
   componentDidMount () {
-    const { loadData, appId } = this.props
+    const { loadData } = this.props
 
-    loadData(appId)
+    loadData()
+  }
+
+  componentDidUpdate (prevProps) {
+    const { error } = this.props
+
+    if (Boolean(error) && prevProps.error !== error) {
+      throw error
+    }
   }
 
   async handleSubmit (updatedCollaborator) {
@@ -151,14 +159,9 @@ export default class ApplicationCollaboratorEdit extends React.Component {
       collaborator,
       rights,
       fetching,
-      error,
       universalRights,
       redirectToList,
     } = this.props
-
-    if (error) {
-      throw error
-    }
 
     if (fetching || !collaborator) {
       return <Spinner center />
