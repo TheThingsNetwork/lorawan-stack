@@ -81,6 +81,11 @@ var (
 
 			cache.Set("hosts", config.getHosts())
 
+			if apiKey, _ := cmd.Flags().GetString("api-key"); apiKey != "" {
+				cache.Set("api_key", apiKey)
+				return nil
+			}
+
 			ctx, done := context.WithCancel(ctx)
 			defer done()
 
@@ -183,6 +188,7 @@ var (
 
 func init() {
 	loginCommand.Flags().Bool("callback", true, "use local OAuth callback endpoint")
+	loginCommand.Flags().String("api-key", "", "API key to login with (instead of using OAuth)")
 	Root.AddCommand(loginCommand)
 	Root.AddCommand(logoutCommand)
 }
