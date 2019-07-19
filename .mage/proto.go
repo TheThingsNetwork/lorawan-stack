@@ -70,6 +70,7 @@ func makeProtoc() (func(...string) error, *protocContext, error) {
 			"--rm",
 			"--user", fmt.Sprintf("%s:%s", usr.Uid, usr.Gid),
 			"--mount", fmt.Sprintf("type=bind,src=%s,dst=%s/api", filepath.Join(wd, "api"), wd),
+			"--mount", fmt.Sprintf("type=bind,src=%s,dst=%s/doc", filepath.Join(wd, "doc"), wd),
 			"--mount", fmt.Sprintf("type=bind,src=%s,dst=%s/go.thethings.network/lorawan-stack/pkg/ttnpb", filepath.Join(wd, "pkg", "ttnpb"), protocOut),
 			"--mount", fmt.Sprintf("type=bind,src=%s,dst=%s/sdk/js", filepath.Join(wd, "sdk", "js"), wd),
 			"-w", wd,
@@ -183,7 +184,7 @@ func (p Proto) Markdown(context.Context) error {
 	}
 	return withProtoc(func(pCtx *protocContext, protoc func(...string) error) error {
 		if err := protoc(
-			fmt.Sprintf("--doc_opt=%s/api/api.md.tmpl,api.md --doc_out=%s/api", pCtx.WorkingDirectory, pCtx.WorkingDirectory),
+			fmt.Sprintf("--doc_opt=%s/api/api.md.tmpl,api2.md --doc_out=%s/doc/content/references/", pCtx.WorkingDirectory, pCtx.WorkingDirectory),
 			fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),
 		); err != nil {
 			return xerrors.Errorf("failed to generate protos: %w", err)
@@ -194,7 +195,7 @@ func (p Proto) Markdown(context.Context) error {
 
 // MarkdownClean removes generated Markdown protos.
 func (p Proto) MarkdownClean(context.Context) error {
-	return sh.Rm(filepath.Join("api", "api.md"))
+	return sh.Rm(filepath.Join("doc/content/references/", "api2.md"))
 }
 
 // JsSDK generates javascript SDK protos.

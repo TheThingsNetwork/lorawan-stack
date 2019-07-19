@@ -4,114 +4,80 @@ description: ""
 weight: 99
 ---
 
-{{ range .Files }}
-  {{- range .Services }}
-## [{{ .Name }}](#{{ .FullName }})
+{{ $files := .Files }}
+Name | Description
+---|---
+{{ range .Files -}}
+{{ range .Services -}}
+[{{ .Name }}](#{{ .Name }}) | {{ nobr .Description }}
+{{ end -}}
+{{- end -}}
+
+
+[Scalar Value Types](#scalar-value-types)
+
+{{- range .Files }}
+  {{- $filename := .Name }}
+  {{- $messages := .Messages }}
+  {{ range .Services }}
+
+## <a name="{{ .Name }}">{{ .Name }}</a>
+  `{{ $filename }}`
 
   {{ .Description }}
 
-  Method | Request | Response
-  ---|---|---|
-  {{- range .Methods }}
-  [{{ .Name }}](#{{.Name}}) | [{{ .RequestLongType }}](#{{ .RequestFullType }}){{ if .RequestStreaming }} _stream_{{ end }} | [{{ .ResponseLongType }}](#{{ .ResponseFullType }}){{ if .ResponseStreaming }} _stream_{{ end }}
-  {{- end }}
+  {{ range .Methods }}
+### <a name="{{ .Name }}">{{ .Name }}</a>
+  {{ .Description }}
+
+  {{ print "{{% reftab " "gRPC" .Name " " "HTTP" .Name " %}}" }}
+
+  **Request**: [{{ .RequestLongType }}](#{{ .RequestFullType }}){{ if .RequestStreaming }}_stream_{{ end }}
+  {{ with $msg := .RequestLongType }}{{- range $files -}}
+    {{- range .Messages -}}
+      {{- if eq .Name $msg -}}
+      {{ .Description }}
+
+        {{- if .HasFields }}
+
+Field | Type | Label | Description | Validation
+---|---|---|---|---
+          {{- range .Fields }}
+{{ .Name }} | [{{ .LongType }}](#{{ .FullType }}) | {{ .Label }} | {{ nobr .Description }}{{ if .DefaultValue }} Default: {{ .DefaultValue }}{{ end }} | {{range (.Option "validate.rules").Rules}}<p>`{{.Name}}`: `{{.Value}}`</p>{{end}}
+          {{- end -}}
+        {{- end -}}
+
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+
   {{ end }}
-{{- end -}}
 
-- [Scalar Value Types](#scalar-value-types)
+  **Response**: [{{ .ResponseLongType }}](#{{ .ResponseFullType }}){{ if .ResponseStreaming }} _stream_{{ end }}
+  {{ with $msg := .ResponseLongType }}{{ range $files }}
+    {{- range .Messages -}}
+      {{- if eq .Name $msg -}}
+      {{ .Description }}
 
-{{- range .Files }}{{ $file_name := .Name }}
+        {{- if .HasFields }}
 
-## <a name="{{ .Name }}">File `{{ .Name }}`</a>
+Field | Type | Label | Description
+---|---|---|---
+          {{- range .Fields }}
+{{ .Name }} | [{{ .LongType }}](#{{ .FullType }}) | {{ .Label }} | {{ nobr .Description }}{{ if .DefaultValue }} Default: {{ .DefaultValue }}{{ end }}
+          {{- end -}}
+        {{- end -}}
+      {{- end -}}
+    {{- end -}}
+  {{ end }}
+  $$$$$$
+  #### HTTP bindings
+  Method Name | Method | Pattern | Body
+  |-----------|------|-------|----
 
-{{- with .Description }}
+  {{ print "{{% /reftab %}}" }}
 
-{{ . }}
-{{- end }}
-
-{{- range .Messages }}{{ $message := . }}
-
-### <a name="{{ .FullName }}">Message `{{ .LongName }}`</a>
-
-{{- with .Description }}
-
-{{ . }}
-{{- end }}
-
-{{- if .HasFields }}
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-{{- range .Fields }}
-| `{{ .Name }}` | [`{{ .LongType }}`](#{{ .FullType }}) | {{ .Label }} | {{ nobr .Description }}{{ if .DefaultValue }} Default: {{ .DefaultValue }}{{ end }} |
-{{- end -}}
-
-{{- if $message.FieldsWithOption "validate.rules" }}
-
-#### Field Rules
-
-| Field | Validations |
-| ----- | ----------- |
-{{- range $message.FieldsWithOption "validate.rules" }}
-| `{{ .Name }}` | {{range (.Option "validate.rules").Rules}}<p>`{{.Name}}`: `{{.Value}}`</p>{{end}} |
-{{- end -}}
-{{ end -}}
-
-{{ end -}}
-{{ end }}
-
-{{- range .Enums }}{{ $enum := . }}
-
-### <a name="{{ .FullName }}">Enum `{{ .LongName }}`</a>
-
-{{- with .Description }}
-
-{{ . }}
-{{- end }}
-
-| Name | Number | Description |
-| ---- | ------ | ----------- |
-{{- range .Values }}
-| `{{ .Name }}` | {{ .Number }} | {{ nobr .Description }} |
-{{- end -}}
-{{ end -}}
-
-{{- range .Services }}{{ $service := . }}
-
-### <a name="{{ .FullName }}">Service `{{ .LongName }}`</a>
-
-{{- with .Description }}
-
-{{ . }}
-{{- end }}
-
-| Method Name | Request Type | Response Type | Description |
-| ----------- | ------------ | ------------- | ------------|
-{{- range .Methods }}
-| `{{ .Name }}` | [`{{ .RequestLongType }}`](#{{ .RequestFullType }}){{ if .RequestStreaming }} _stream_{{ end }} | [`{{ .ResponseLongType }}`](#{{ .ResponseFullType }}){{ if .ResponseStreaming }} _stream_{{ end }} | {{ nobr .Description }} |
-{{- end -}}
-
-{{- if $service.MethodsWithOption "google.api.http" }}
-
-#### HTTP bindings
-
-| Method Name | Method | Pattern | Body |
-| ----------- | ------ | ------- | ---- |
-{{- range $service.MethodsWithOption "google.api.http" }}{{ $method := . }}
-{{- range (.Option "google.api.http").Rules }}
-| `{{ $method.Name }}` | `{{ .Method }}` | `/api/v3{{ .Pattern }}` | {{ with .Body }}`{{ . }}`{{ end }} |
-{{- end -}}
-{{- end -}}
-{{ end -}}
-
-
-{{ end -}}
-{{ end }}
-
-## Scalar Value Types
-
-| .proto Type | Notes | C++ Type | Java Type | Python Type |
-| ----------- | ----- | -------- | --------- | ----------- |
-{{- range .Scalars }}
-| <a name="{{ .ProtoType }}" /> {{ .ProtoType }} | {{ .Notes }} | {{ .CppType }} | {{ .JavaType }} | {{ .PythonType }} |
-{{- end }}
+  {{ end }}
+  {{ end }}
+  {{ end }}
+{{end}}

@@ -1,0 +1,13 @@
+<div class={{ .Get 0 }}>
+  <button class="tablinks" onclick="openCity(event, {{ .Get 0}})">gRPC</button>
+  <button class="tablinks" onclick="openCity(event, {{ .Get 0}})">HTTP</button>
+</div>
+
+{{ $s := split .Inner "$$$$$$"}}
+<div id={{ .Get 0}} class="tabcontent">
+  {{ index $s 0 | markdownify }}
+</div>
+
+<div id={{ .Get 1 }} class="tabcontent">
+  {{ index $s 1 | markdownify }}
+</div>

@@ -25,6 +25,7 @@ package ttn.lorawan.v3;
 
 option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
+// ApplicationRegistry is used to managed application
 service ApplicationRegistry {
   // Create a new application. This also sets the given organization or user as
   // first collaborator with all possible rights.
