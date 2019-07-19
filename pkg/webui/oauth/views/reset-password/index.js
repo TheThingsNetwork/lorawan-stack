@@ -35,9 +35,9 @@ import style from '../login/login.styl'
 
 const m = defineMessages({
     loginPage: 'Login Page',
-    passwordRequested: 'New temporary password has been sent to user email',
+    passwordRequested: 'New password reset token has been sent to user email',
     resetPassword: 'Reset Password',
-    requestTempPassword: 'Request a new temporary password',
+    requestTempPassword: 'Request a new password reset token',
     stackAccount: 'TTN Stack Account',
   })
 
@@ -58,9 +58,9 @@ export default class ResetPassword extends React.PureComponent {
         }
     }
 
-    async handleSubmit (values, {setSubmitting, setErrors }) {
+    async handleSubmit (values, { setSubmitting }) {
         try {
-            const response = await api.users.reset(values.user_id)
+            await api.users.reset(values.user_id)
             this.setState({
                 error: '',
                 info: m.passwordRequested,
@@ -77,11 +77,13 @@ export default class ResetPassword extends React.PureComponent {
 
     navigateToLogin () {
         const { dispatch, location } = this.props
-        dispatch(replace('/oauth/login'))
+        const state = location.state || {}
+        const back = state.back || '/oauth/login'
+
+        dispatch(replace(back))
       }
 
     render() {
-        const { error , info } = this.state
         const initialUserId = {
             user_id: '',
         }
@@ -102,6 +104,7 @@ export default class ResetPassword extends React.PureComponent {
                         onSubmit={this.handleSubmit}
                         initialValues={initialUserId}
                         error={this.state.error}
+                        info={this.state.info}
                         validationSchema={validationSchema}
                         horizontal={false}
                       >
@@ -116,7 +119,7 @@ export default class ResetPassword extends React.PureComponent {
                             component={SubmitButton}
                             message={m.resetPassword}
                           />
-                          <Button naked secondary message={m.loginPage} onClick={this.navigateToLogin} />
+                          <Button naked secondary message={sharedMessages.cancel} onClick={this.navigateToLogin} />
                       </Form>
                   </div>
               </div>

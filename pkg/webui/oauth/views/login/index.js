@@ -36,6 +36,7 @@ import style from './login.styl'
 
 const m = defineMessages({
   createAccount: 'Create an account',
+  forgotPassword: 'Forgot password?',
   loginToContinue: 'Please login to continue',
   stackAccount: 'TTN Stack Account',
 })
@@ -75,6 +76,13 @@ export default class OAuth extends React.PureComponent {
   navigateToRegister () {
     const { dispatch, location } = this.props
     dispatch(replace('/oauth/register', {
+      back: `${location.pathname}${location.search}`,
+    }))
+  }
+
+  navigateToResetPassword () {
+    const { dispatch, location } = this.props
+    dispatch(replace('/oauth/reset-password', {
       back: `${location.pathname}${location.search}`,
     }))
   }
@@ -124,6 +132,7 @@ export default class OAuth extends React.PureComponent {
                 message={sharedMessages.login}
               />
               <Button naked message={m.createAccount} onClick={this.navigateToRegister} />
+              <Button naked message={m.forgotPassword} onClick={this.navigateToResetPassword} />
             </Form>
           </div>
         </div>

@@ -317,11 +317,12 @@
   "oauth.views.create-account.index.registrationApproved": "You have successfully registered and can login now",
   "oauth.views.create-account.index.registrationPending": "You have successfully sent the registration request. Please wait until an admin approves it.",
   "oauth.views.login.index.createAccount": "Create an account",
+  "oauth.views.login.index.forgotPassword": "Forgot password?",
   "oauth.views.login.index.loginToContinue": "Please login to continue",
   "oauth.views.login.index.stackAccount": "TTN Stack Account",
   "oauth.views.reset-password.index.loginPage": "Login Page",
-  "oauth.views.reset-password.index.passwordRequested": "New temporary password has been sent to user email",
+  "oauth.views.reset-password.index.passwordRequested": "New password reset token has been sent to user email",
   "oauth.views.reset-password.index.resetPassword": "Reset Password",
-  "oauth.views.reset-password.index.requestTempPassword": "Request a new temporary password",
+  "oauth.views.reset-password.index.requestTempPassword": "Request a new password reset token",
   "oauth.views.reset-password.index.stackAccount": "TTN Stack Account"
 }
