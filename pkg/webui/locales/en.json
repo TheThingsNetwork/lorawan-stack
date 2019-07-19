@@ -309,7 +309,6 @@
   "oauth.views.code.index.code": "Your Authorization Code",
   "oauth.views.create-account.index.createAccount": "Create TTN Stack Account",
   "oauth.views.create-account.index.register": "Register",
-  "oauth.views.create-account.index.goToLogin": "Go to login",
   "oauth.views.create-account.index.confirmPassword": "Confirm Password",
   "oauth.views.create-account.index.validatePasswordMatch": "Passwords should match",
   "oauth.views.create-account.index.validatePasswordDigit": "Should contain at least one digit",

@@ -86,6 +86,8 @@ export default class OAuth extends React.PureComponent {
       password: '',
     }
 
+    const { info } = this.props.location.state || ''
+
     return (
       <div className={style.fullHeightCenter}>
         <IntlHelmet title={sharedMessages.login} />
@@ -102,6 +104,7 @@ export default class OAuth extends React.PureComponent {
               onSubmit={this.handleSubmit}
               initialValues={initialValues}
               error={this.state.error}
+              info={info}
               validationSchema={validationSchema}
               horizontal={false}
             >
