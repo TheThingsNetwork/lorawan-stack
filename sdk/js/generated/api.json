@@ -11170,7 +11170,10 @@
               "ismap": false,
               "defaultValue": ""
             }
-          ]
+          ],
+          "options": {
+            "deprecated": true
+          }
         },
         {
           "name": "IdentifiersFromData",
@@ -11446,7 +11449,7 @@
             },
             {
               "name": "Provision",
-              "description": "Provision returns end devices that are provisioned using the given vendor-specific data.\nThe devices are not set in the registry.",
+              "description": "This rpc is deprecated; use EndDeviceTemplateConverter service instead.\nTODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/999)",
               "requestType": "ProvisionEndDevicesRequest",
               "requestLongType": "ProvisionEndDevicesRequest",
               "requestFullType": "ttn.lorawan.v3.ProvisionEndDevicesRequest",
@@ -11456,6 +11459,7 @@
               "responseFullType": "ttn.lorawan.v3.EndDevice",
               "responseStreaming": true,
               "options": {
+                "deprecated": true,
                 "google.api.http": {
                   "rules": [
                     {

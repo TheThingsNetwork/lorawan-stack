@@ -2955,7 +2955,7 @@ The JsEndDeviceRegistry service allows clients to manage their end devices on th
 | ----------- | ------------ | ------------- | ------------|
 | `Get` | [`GetEndDeviceRequest`](#ttn.lorawan.v3.GetEndDeviceRequest) | [`EndDevice`](#ttn.lorawan.v3.EndDevice) | Get returns the device that matches the given identifiers. If there are multiple matches, an error will be returned. |
 | `Set` | [`SetEndDeviceRequest`](#ttn.lorawan.v3.SetEndDeviceRequest) | [`EndDevice`](#ttn.lorawan.v3.EndDevice) | Set creates or updates the device. |
-| `Provision` | [`ProvisionEndDevicesRequest`](#ttn.lorawan.v3.ProvisionEndDevicesRequest) | [`EndDevice`](#ttn.lorawan.v3.EndDevice) _stream_ | Provision returns end devices that are provisioned using the given vendor-specific data. The devices are not set in the registry. |
+| `Provision` | [`ProvisionEndDevicesRequest`](#ttn.lorawan.v3.ProvisionEndDevicesRequest) | [`EndDevice`](#ttn.lorawan.v3.EndDevice) _stream_ | This rpc is deprecated; use EndDeviceTemplateConverter service instead. TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/999) |
 | `Delete` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete deletes the device that matches the given identifiers. If there are multiple matches, an error will be returned. |
 
 #### HTTP bindings
