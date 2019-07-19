@@ -109,6 +109,14 @@ export default class GatewayCollaboratorEdit extends React.Component {
     loadData()
   }
 
+  componentDidUpdate (prevProps) {
+    const { error } = this.props
+
+    if (Boolean(error) && prevProps.error !== error) {
+      throw error
+    }
+  }
+
   handleSubmit (updatedCollaborator) {
     const { gtwId } = this.props
 
@@ -129,11 +137,13 @@ export default class GatewayCollaboratorEdit extends React.Component {
   }
 
   render () {
-    const { collaborator, rights, fetching, error, redirectToList, universalRights } = this.props
-
-    if (error) {
-      throw error
-    }
+    const {
+      collaborator,
+      rights,
+      fetching,
+      redirectToList,
+      universalRights,
+    } = this.props
 
     if (fetching || !collaborator) {
       return <Spinner center />

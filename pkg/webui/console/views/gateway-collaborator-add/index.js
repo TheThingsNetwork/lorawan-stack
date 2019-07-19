@@ -79,6 +79,14 @@ export default class GatewayCollaboratorAdd extends React.Component {
     getGatewaysRightsList()
   }
 
+  componentDidUpdate (prevProps) {
+    const { error } = this.props
+
+    if (Boolean(error) && prevProps.error !== error) {
+      throw error
+    }
+  }
+
   handleSubmit (collaborator) {
     const { gtwId } = this.props
 
@@ -86,11 +94,12 @@ export default class GatewayCollaboratorAdd extends React.Component {
   }
 
   render () {
-    const { rights, fetching, error, redirectToList, universalRights } = this.props
-
-    if (error) {
-      throw error
-    }
+    const {
+      rights,
+      fetching,
+      redirectToList,
+      universalRights,
+    } = this.props
 
     if (fetching && !rights.length) {
       return <Spinner center />
