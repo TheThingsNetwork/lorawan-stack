@@ -31,9 +31,9 @@ var (
 	errFrequencyPlan = errors.DefineInvalidArgument("frequency_plan", "invalid frequency plan")
 )
 
-// Definition of message types
+// Definition of message types.
 const (
-	// Upstream types for messages from the Gateway
+	// Upstream types for messages from the Gateway.
 	TypeUpstreamVersion              = "version"
 	TypeUpstreamJoinRequest          = "jreq"
 	TypeUpstreamUplinkDataFrame      = "updf"
@@ -54,7 +54,7 @@ const (
 	configHardwareSpecNoOfConcentrators = "1"
 )
 
-// DataRates encodes the available datarates of the channel plan for the Station in the format below
+// DataRates encodes the available datarates of the channel plan for the Station in the format below:
 // [0] -> SF (Spreading Factor; Range: 7...12 for LoRa, 0 for FSK)
 // [1] -> BW (Bandwidth; 125/250/500 for LoRa, ignored for FSK)
 // [2] -> DNONLY (Downlink Only; 1 = true, 0 = false)
@@ -110,7 +110,7 @@ func (v Version) MarshalJSON() ([]byte, error) {
 }
 
 // IsProduction checks the features field for "prod" and returns true if found.
-// This is then used to set debug options in the router config
+// This is then used to set debug options in the router config.
 func (v Version) IsProduction() bool {
 	if v.Features == "" {
 		return false
@@ -132,7 +132,7 @@ type RouterConfig struct {
 	DataRates      DataRates               `json:"DRs"`
 	SX1301Config   []pfconfig.SX1301Config `json:"sx1301_conf"`
 
-	// These are debug options to be unset in production gateways
+	// These are debug options to be unset in production gateways.
 	NoCCA       bool `json:"nocca"`
 	NoDutyCycle bool `json:"nodc"`
 	NoDwellTime bool `json:"nodwell"`
@@ -152,7 +152,7 @@ func (cfg RouterConfig) MarshalJSON() ([]byte, error) {
 	})
 }
 
-// GetRouterConfig returns the routerconfig message to be sent to the gateway
+// GetRouterConfig returns the routerconfig message to be sent to the gateway.
 func GetRouterConfig(fp frequencyplans.FrequencyPlan, isProd bool, dlTime time.Time) (RouterConfig, error) {
 	if err := fp.Validate(); err != nil {
 		return RouterConfig{}, errFrequencyPlan
@@ -175,13 +175,13 @@ func GetRouterConfig(fp frequencyplans.FrequencyPlan, isProd bool, dlTime time.T
 	if len(fp.Radios) == 0 {
 		return RouterConfig{}, errFrequencyPlan
 	}
-	// TODO: Handle FP with multiple radios if necessary (https://github.com/TheThingsNetwork/lorawan-stack/issues/761)
+	// TODO: Handle FP with multiple radios if necessary (https://github.com/TheThingsNetwork/lorawan-stack/issues/761).
 	cfg.FrequencyRange = []int{
 		int(fp.Radios[0].TxConfiguration.MinFrequency),
 		int(fp.Radios[0].TxConfiguration.MaxFrequency),
 	}
 
-	// TODO: Dynamically fill this field based on https://github.com/TheThingsNetwork/lorawan-stack/issues/761
+	// TODO: Dynamically fill this field based on no of SX1301_conf objects (https://github.com/TheThingsNetwork/lorawan-stack/issues/761).
 	cfg.HardwareSpec = fmt.Sprintf("%s/%s", configHardwareSpecPrefix, configHardwareSpecNoOfConcentrators)
 
 	drs, err := getDataRatesFromBandID(fp.BandID)
@@ -203,10 +203,10 @@ func GetRouterConfig(fp frequencyplans.FrequencyPlan, isProd bool, dlTime time.T
 	sx1301Conf.Radios[0].TxFreqMin = 0
 	sx1301Conf.Radios[0].TxFreqMax = 0
 
-	// TODO: Extend this for > 8ch gateways (https://github.com/TheThingsNetwork/lorawan-stack/issues/761)
+	// TODO: Extend this for > 8ch gateways (https://github.com/TheThingsNetwork/lorawan-stack/issues/761).
 	cfg.SX1301Config = append(cfg.SX1301Config, *sx1301Conf)
 
-	// Add the MuxTime for RTT measurement
+	// Add the MuxTime for RTT measurement.
 	cfg.MuxTime = float64(dlTime.Unix()) + float64(dlTime.Nanosecond())/(1e9)
 
 	return cfg, nil

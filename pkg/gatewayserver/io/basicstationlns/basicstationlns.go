@@ -102,12 +102,12 @@ func (s *srv) handleDiscover(c echo.Context) error {
 
 	_, data, err := ws.ReadMessage()
 	if err != nil {
-		logger.WithError(err).Warn("Failed to read message")
+		logger.WithError(err).Debug("Failed to read message")
 		return err
 	}
 	var req messages.DiscoverQuery
 	if err := json.Unmarshal(data, &req); err != nil {
-		logger.WithError(err).Warn("Failed to parse discover query message")
+		logger.WithError(err).Debug("Failed to parse discover query message")
 		return err
 	}
 
@@ -254,14 +254,14 @@ func (s *srv) handleTraffic(c echo.Context) error {
 		default:
 			_, data, err := ws.ReadMessage()
 			if err != nil {
-				logger.WithError(err).Warn("Failed to read message")
+				logger.WithError(err).Debug("Failed to read message")
 				conn.Disconnect(err)
 				return nil
 			}
 
 			typ, err := messages.Type(data)
 			if err != nil {
-				logger.WithError(err).Warn("Failed to parse message type")
+				logger.WithError(err).Debug("Failed to parse message type")
 				continue
 			}
 			logger = logger.WithFields(log.Fields(
@@ -273,7 +273,7 @@ func (s *srv) handleTraffic(c echo.Context) error {
 			case messages.TypeUpstreamVersion:
 				var version messages.Version
 				if err := json.Unmarshal(data, &version); err != nil {
-					logger.WithError(err).Warn("Failed to unmarshal version message")
+					logger.WithError(err).Debug("Failed to unmarshal version message")
 					return err
 				}
 				logger = logger.WithFields(log.Fields(
@@ -299,12 +299,12 @@ func (s *srv) handleTraffic(c echo.Context) error {
 			case messages.TypeUpstreamJoinRequest:
 				var jreq messages.JoinRequest
 				if err := json.Unmarshal(data, &jreq); err != nil {
-					logger.WithError(err).Warn("Failed to unmarshal join-request message")
+					logger.WithError(err).Debug("Failed to unmarshal join-request message")
 					return nil
 				}
 				up, err := jreq.ToUplinkMessage(ids, fp.BandID, receivedAt)
 				if err != nil {
-					logger.WithError(err).Warn("Failed to parse join-request message")
+					logger.WithError(err).Debug("Failed to parse join-request message")
 					return nil
 				}
 				if err := conn.HandleUp(up); err != nil {
@@ -316,12 +316,12 @@ func (s *srv) handleTraffic(c echo.Context) error {
 			case messages.TypeUpstreamUplinkDataFrame:
 				var updf messages.UplinkDataFrame
 				if err := json.Unmarshal(data, &updf); err != nil {
-					logger.WithError(err).Warn("Failed to unmarshal uplink data frame")
+					logger.WithError(err).Debug("Failed to unmarshal uplink data frame")
 					return nil
 				}
 				up, err := updf.ToUplinkMessage(ids, fp.BandID, receivedAt)
 				if err != nil {
-					logger.WithError(err).Warn("Failed to parse uplink data frame")
+					logger.WithError(err).Debug("Failed to parse uplink data frame")
 					return nil
 				}
 				if err := conn.HandleUp(up); err != nil {
@@ -333,7 +333,7 @@ func (s *srv) handleTraffic(c echo.Context) error {
 			case messages.TypeUpstreamTxConfirmation:
 				var txConf messages.TxConfirmation
 				if err := json.Unmarshal(data, &txConf); err != nil {
-					logger.WithError(err).Warn("Failed to unmarshal Tx acknowledgement frame")
+					logger.WithError(err).Debug("Failed to unmarshal Tx acknowledgement frame")
 					return nil
 				}
 				if cids, _, ok := s.tokens.Get(uint16(txConf.Diid), receivedAt); ok {
@@ -347,7 +347,7 @@ func (s *srv) handleTraffic(c echo.Context) error {
 				recordRTT(conn, receivedAt, txConf.RefTime)
 
 			case messages.TypeUpstreamProprietaryDataFrame, messages.TypeUpstreamRemoteShell, messages.TypeUpstreamTimeSync:
-				logger.WithField("message_type", typ).Warn("Message type not implemented")
+				logger.WithField("message_type", typ).Debug("Message type not implemented")
 
 			default:
 				logger.WithField("message_type", typ).Debug("Unknown message type")

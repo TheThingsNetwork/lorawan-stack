@@ -1088,7 +1088,7 @@ func TestRTT(t *testing.T) {
 				}
 
 				if MuxTime > 0 {
-					// Atleast one downlink is needed for the first muxtime
+					// Atleast one downlink is needed for the first muxtime.
 					min, max, median, count := gsConn.RTTStats()
 					if !a.So(count, should.Equal, tc.ExpectedRTTStatsCount) {
 						t.Fatalf("Incorrect Stats entries recorded: %d", count)

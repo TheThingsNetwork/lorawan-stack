@@ -173,11 +173,12 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 	}
 
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.NsGs", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("gatewayserver"))
+	bsCtx := ctx
 	if conf.BasicStation.FallbackFrequencyPlanID != "" {
-		ctx = frequencyplans.WithFallbackID(ctx, conf.BasicStation.FallbackFrequencyPlanID)
+		bsCtx = frequencyplans.WithFallbackID(ctx, conf.BasicStation.FallbackFrequencyPlanID)
 	}
 
-	bsWebServer := basicstationlns.New(ctx, gs)
+	bsWebServer := basicstationlns.New(bsCtx, gs)
 	for _, endpoint := range []component.Endpoint{
 		component.NewTCPEndpoint(conf.BasicStation.Listen, "Basic Station"),
 		component.NewTLSEndpoint(conf.BasicStation.ListenTLS, "Basic Station"),
