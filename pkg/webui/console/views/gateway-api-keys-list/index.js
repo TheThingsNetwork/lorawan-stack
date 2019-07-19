@@ -23,7 +23,7 @@ import sharedMessages from '../../../lib/shared-messages'
 import { getGatewayApiKeysList } from '../../store/actions/gateways'
 import { selectGatewayApiKeysStore } from '../../store/selectors/gateways'
 
-const API_KEYS_TABLE_SIZE = 10
+import PAGE_SIZES from '../../constants/page-sizes'
 
 @bind
 export default class GatewayApiKeys extends React.Component {
@@ -45,7 +45,7 @@ export default class GatewayApiKeys extends React.Component {
           <Col sm={12}>
             <ApiKeysTable
               entityId={gtwId}
-              pageSize={API_KEYS_TABLE_SIZE}
+              pageSize={PAGE_SIZES.REGULAR}
               baseDataSelector={selectGatewayApiKeysStore}
               getItemsAction={this.getGatewayApiKeysList}
             />

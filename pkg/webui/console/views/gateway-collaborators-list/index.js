@@ -24,7 +24,7 @@ import sharedMessages from '../../../lib/shared-messages'
 import { getGatewayCollaboratorsList } from '../../store/actions/gateways'
 import { selectSelectedGatewayId } from '../../store/selectors/gateways'
 
-const COLLABORATORS_TABLE_SIZE = 10
+import PAGE_SIZES from '../../constants/page-sizes'
 
 @connect(state => ({
   gtwId: selectSelectedGatewayId(state),
@@ -50,7 +50,7 @@ export default class GatewayCollaborators extends React.Component {
           <IntlHelmet title={sharedMessages.collaborators} />
           <Col sm={12}>
             <CollaboratorsTable
-              pageSize={COLLABORATORS_TABLE_SIZE}
+              pageSize={PAGE_SIZES.REGULAR}
               baseDataSelector={this.baseDataSelector}
               getItemsAction={this.getGatewayCollaboratorsList}
             />

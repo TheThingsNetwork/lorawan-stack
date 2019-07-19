@@ -20,7 +20,7 @@ import IntlHelmet from '../../../lib/components/intl-helmet'
 
 import ApplicationsTable from '../../containers/applications-table'
 
-const APPLICATIONS_TABLE_SIZE = 5
+import PAGE_SIZES from '../../constants/page-sizes'
 
 export default class List extends React.Component {
   render () {
@@ -29,7 +29,7 @@ export default class List extends React.Component {
         <Row>
           <IntlHelmet title={sharedMessages.applications} />
           <Col sm={12}>
-            <ApplicationsTable pageSize={APPLICATIONS_TABLE_SIZE} />
+            <ApplicationsTable pageSize={PAGE_SIZES.REGULAR} />
           </Col>
         </Row>
       </Container>

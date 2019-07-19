@@ -22,7 +22,7 @@ import DevicesTable from '../../containers/devices-table'
 
 import { selectSelectedApplication } from '../../store/selectors/applications'
 
-const DEVICES_TABLE_SIZE = 25
+import PAGE_SIZES from '../../constants/page-sizes'
 
 @connect(function (state, props) {
   return {
@@ -36,7 +36,7 @@ class ApplicationDeviceList extends React.Component {
         <Row>
           <IntlHelmet title={sharedMessages.devices} />
           <Col sm={12}>
-            <DevicesTable pageSize={DEVICES_TABLE_SIZE} />
+            <DevicesTable pageSize={PAGE_SIZES.REGULAR} />
           </Col>
         </Row>
       </Container>

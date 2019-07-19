@@ -29,7 +29,7 @@ import { selectSelectedApplication } from '../../store/selectors/applications'
 
 import style from './application-overview.styl'
 
-const DEVICES_TABLE_SIZE = 5
+import PAGE_SIZES from '../../constants/page-sizes'
 
 @connect(function (state) {
   return {
@@ -92,7 +92,7 @@ class ApplicationOverview extends React.Component {
         </Row>
         <Row>
           <Col sm={12} className={style.table}>
-            <DevicesTable pageSize={DEVICES_TABLE_SIZE} devicePathPrefix="/devices" />
+            <DevicesTable pageSize={PAGE_SIZES.SMALL} devicePathPrefix="/devices" />
           </Col>
         </Row>
       </Container>
