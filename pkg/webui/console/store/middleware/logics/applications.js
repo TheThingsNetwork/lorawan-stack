@@ -121,8 +121,8 @@ const getApplicationCollaboratorLogic = createRequestLogic({
 const getApplicationCollaboratorsLogic = createRequestLogic({
   type: applications.GET_APP_COLLABORATORS_LIST,
   async process ({ action }) {
-    const { id: appId } = action.payload
-    const res = await api.application.collaborators.list(appId)
+    const { id: appId, params } = action.payload
+    const res = await api.application.collaborators.list(appId, params)
     const collaborators = res.collaborators.map(function (collaborator) {
       const { ids, ...rest } = collaborator
       const isUser = !!ids.user_ids
