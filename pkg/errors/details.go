@@ -51,7 +51,10 @@ func (e Error) Details() (details []proto.Message) {
 	if e.cause != nil {
 		details = append(details, Details(e.cause)...)
 	}
-	return append(details, e.details...)
+	if len(e.details) > 0 {
+		return append(details, e.details...)
+	}
+	return nil
 }
 
 // Details are not present in the error definition, so this just returns nil.
