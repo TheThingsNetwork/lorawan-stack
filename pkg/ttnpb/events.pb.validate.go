@@ -108,6 +108,18 @@ func (m *Event) ValidateFields(paths ...string) error {
 			// no validation rules for Origin
 		case "context":
 			// no validation rules for Context
+		case "visibility":
+
+			if v, ok := interface{}(m.GetVisibility()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return EventValidationError{
+						field:  "visibility",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return EventValidationError{
 				field:  name,

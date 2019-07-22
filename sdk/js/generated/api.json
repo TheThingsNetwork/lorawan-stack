@@ -7409,6 +7409,16 @@
               "fullType": "ttn.lorawan.v3.Event.ContextEntry",
               "ismap": true,
               "defaultValue": ""
+            },
+            {
+              "name": "visibility",
+              "description": "The event will be visible to a caller that has any of these rights.",
+              "label": "",
+              "type": "Rights",
+              "longType": "Rights",
+              "fullType": "ttn.lorawan.v3.Rights",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },

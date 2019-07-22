@@ -76,6 +76,27 @@ func (dst *Event) SetFields(src *Event, paths ...string) error {
 			} else {
 				dst.Context = nil
 			}
+		case "visibility":
+			if len(subs) > 0 {
+				newDst := dst.Visibility
+				if newDst == nil {
+					newDst = &Rights{}
+					dst.Visibility = newDst
+				}
+				var newSrc *Rights
+				if src != nil {
+					newSrc = src.Visibility
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Visibility = src.Visibility
+				} else {
+					dst.Visibility = nil
+				}
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

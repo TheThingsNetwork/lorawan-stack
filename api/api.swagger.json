@@ -8035,6 +8035,10 @@
             "type": "string",
             "format": "byte"
           }
+        },
+        "visibility": {
+          "$ref": "#/definitions/v3Rights",
+          "description": "The event will be visible to a caller that has any of these rights."
         }
       }
     },
