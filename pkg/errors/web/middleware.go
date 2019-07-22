@@ -16,6 +16,7 @@
 package web
 
 import (
+	"fmt"
 	"net/http"
 	"sort"
 
@@ -45,21 +46,17 @@ func RegisterRenderer(contentType string, renderer ErrorRenderer) {
 	globalRenderers[contentType] = renderer
 }
 
-var errHTTP = errors.Define("http", "HTTP error: {message}")
-
 // ProcessError processes an HTTP error by converting it if appropriate, and
 // determining the HTTP status code to return.
 func ProcessError(in error) (statusCode int, err error) {
 	statusCode, err = http.StatusInternalServerError, in
-	if errors.Resemble(in, errHTTP) {
-		err = errors.Cause(err)
-	}
 	if echoErr, ok := err.(*echo.HTTPError); ok {
 		if echoErr.Code != 0 {
 			statusCode = echoErr.Code
 		}
 		if echoErr.Internal == nil {
-			return statusCode, errHTTP.WithCause(echoErr).WithAttributes("message", err.Error())
+			ttnErr := errors.FromHTTPStatusCode(statusCode, "message")
+			return statusCode, ttnErr.WithAttributes("message", fmt.Sprint(echoErr.Message))
 		}
 		err = echoErr.Internal
 	}
@@ -67,7 +64,8 @@ func ProcessError(in error) (statusCode int, err error) {
 		statusCode = errors.ToHTTPStatusCode(ttnErr)
 		return statusCode, ttnErr
 	}
-	return statusCode, errHTTP.WithCause(err).WithAttributes("message", err.Error())
+	ttnErr := errors.FromHTTPStatusCode(statusCode, "message")
+	return statusCode, ttnErr.WithCause(err).WithAttributes("message", err.Error())
 }
 
 // ErrorMiddleware returns an Echo middleware that catches errors in the chain,

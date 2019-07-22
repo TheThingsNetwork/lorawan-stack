@@ -2654,15 +2654,6 @@
       "file": "mac.go"
     }
   },
-  "error:pkg/errors/web:http": {
-    "translations": {
-      "en": "HTTP error: {message}"
-    },
-    "description": {
-      "package": "pkg/errors/web",
-      "file": "middleware.go"
-    }
-  },
   "error:pkg/errors:odd_kv": {
     "translations": {
       "en": "Odd number of key-value elements"
