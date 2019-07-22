@@ -47,7 +47,10 @@ export default class GatewayCollaborators extends React.Component {
         <Switch>
           <Route exact path={`${match.path}`} component={GatewayCollaboratorsList} />
           <Route path={`${match.path}/add`} component={GatewayCollaboratorAdd} />
-          <Route path={`${match.path}/:collaboratorId`} component={GatewayCollaboratorEdit} />
+          <Route
+            path={`${match.path}/:collaboratorType(user|organization)/:collaboratorId`}
+            component={GatewayCollaboratorEdit}
+          />
         </Switch>
       </ErrorView>
     )

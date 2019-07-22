@@ -92,6 +92,8 @@ export default {
       stats: ttnClient.Applications.Link.getStats.bind(ttnClient.Applications.Link),
     },
     collaborators: {
+      getOrganization: ttnClient.Applications.Collaborators.getByOrganizationId.bind(ttnClient.Applications.Collaborators),
+      getUser: ttnClient.Applications.Collaborators.getByUserId.bind(ttnClient.Applications.Collaborators),
       list: ttnClient.Applications.Collaborators.getAll.bind(ttnClient.Applications.Collaborators),
       add: ttnClient.Applications.Collaborators.add.bind(ttnClient.Applications.Collaborators),
       update: ttnClient.Applications.Collaborators.update.bind(ttnClient.Applications.Collaborators),
@@ -128,6 +130,8 @@ export default {
     stats: ttnClient.Gateways.getStatisticsById.bind(ttnClient.Gateways),
     eventsSubscribe: ttnClient.Gateways.openStream.bind(ttnClient.Gateways),
     collaborators: {
+      getOrganization: ttnClient.Gateways.Collaborators.getByOrganizationId.bind(ttnClient.Gateways.Collaborators),
+      getUser: ttnClient.Gateways.Collaborators.getByUserId.bind(ttnClient.Gateways.Collaborators),
       list: ttnClient.Gateways.Collaborators.getAll.bind(ttnClient.Gateways.Collaborators),
       add: ttnClient.Gateways.Collaborators.add.bind(ttnClient.Gateways.Collaborators),
       update: ttnClient.Gateways.Collaborators.update.bind(ttnClient.Gateways.Collaborators),

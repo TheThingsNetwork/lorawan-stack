@@ -26,7 +26,8 @@ export const createGetCollaboratorsListRequestActions = name =>
 export const createGetCollaboratorActionType = name => (
   `GET_${name}_COLLABORATOR`
 )
-
-export const getCollaborator = name => id => (
-  { type: createGetCollaboratorActionType(name), id }
-)
+export const createGetCollaboratorRequestActions = name =>
+  createRequestActions(
+    createGetCollaboratorActionType(name),
+    (parentId, collaboratorId, isUser) => ({ id: parentId, collaboratorId, isUser })
+  )

@@ -28,7 +28,7 @@ import IntlHelmet from '../../../lib/components/intl-helmet'
 import toast from '../../../components/toast'
 
 import {
-  getGatewayCollaboratorsList,
+  getGatewayCollaborator,
   getGatewaysRightsList,
 } from '../../store/actions/gateways'
 import {
@@ -37,25 +37,29 @@ import {
   selectGatewayUniversalRights,
   selectGatewayRightsFetching,
   selectGatewayRightsError,
+  selectGatewayUserCollaborator,
+  selectGatewayOrganizationCollaborator,
+  selectGatewayCollaboratorFetching,
+  selectGatewayCollaboratorError,
 } from '../../store/selectors/gateways'
 
 import api from '../../api'
 
 @connect(function (state, props) {
   const gtwId = selectSelectedGatewayId(state, props)
-  const { collaboratorId } = props.match.params
-  const collaboratorsFetching = state.collaborators.gateways.fetching
-  const collaboratorsError = state.collaborators.gateways.error
 
-  const gtwCollaborators = state.collaborators.gateways[gtwId]
-  const collaborator = gtwCollaborators ? gtwCollaborators.collaborators
-    .find(c => c.id === collaboratorId) : undefined
+  const { collaboratorId, collaboratorType } = props.match.params
 
-  const fetching = selectGatewayRightsFetching(state) || collaboratorsFetching
-  const error = selectGatewayRightsError(state) || collaboratorsError
+  const collaborator = collaboratorType === 'user'
+    ? selectGatewayUserCollaborator(state)
+    : selectGatewayOrganizationCollaborator(state)
+
+  const fetching = selectGatewayRightsFetching(state) || selectGatewayCollaboratorFetching(state)
+  const error = selectGatewayRightsError(state) || selectGatewayCollaboratorError(state)
 
   return {
     collaboratorId,
+    collaboratorType,
     collaborator,
     gtwId,
     rights: selectGatewayRights(state),
@@ -65,16 +69,20 @@ import api from '../../api'
   }
 
 }, (dispatch, ownProps) => ({
-  async loadData (gtwId) {
+  loadData (gtwId, collaboratorId, isUser) {
     dispatch(getGatewaysRightsList(gtwId))
-    dispatch(getGatewayCollaboratorsList(gtwId))
+    dispatch(getGatewayCollaborator(gtwId, collaboratorId, isUser))
   },
   redirectToList (gtwId) {
     dispatch(replace(`/console/gateways/${gtwId}/collaborators`))
   },
 }), (stateProps, dispatchProps, ownProps) => ({
   ...stateProps, ...dispatchProps, ...ownProps,
-  loadData: () => dispatchProps.loadData(stateProps.gtwId),
+  loadData: () => dispatchProps.loadData(
+    stateProps.gtwId,
+    stateProps.collaboratorId,
+    stateProps.collaboratorType === 'user'
+  ),
   redirectToList: () => dispatchProps.redirectToList(stateProps.gtwId),
 }))
 @withBreadcrumb('gtws.single.collaborators.edit', function (props) {
@@ -101,6 +109,14 @@ export default class GatewayCollaboratorEdit extends React.Component {
     loadData()
   }
 
+  componentDidUpdate (prevProps) {
+    const { error } = this.props
+
+    if (Boolean(error) && prevProps.error !== error) {
+      throw error
+    }
+  }
+
   handleSubmit (updatedCollaborator) {
     const { gtwId } = this.props
 
@@ -121,11 +137,13 @@ export default class GatewayCollaboratorEdit extends React.Component {
   }
 
   render () {
-    const { collaborator, rights, fetching, error, redirectToList, universalRights } = this.props
-
-    if (error) {
-      throw error
-    }
+    const {
+      collaborator,
+      rights,
+      fetching,
+      redirectToList,
+      universalRights,
+    } = this.props
 
     if (fetching || !collaborator) {
       return <Spinner center />

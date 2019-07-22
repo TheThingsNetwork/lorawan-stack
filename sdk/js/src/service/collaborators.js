@@ -44,11 +44,11 @@ class Collaborators {
     return this._getById(entityId, organizationId, false)
   }
 
-  async getAll (entityId) {
+  async getAll (entityId, params) {
     const entityIdRoute = this._parentRoutes.list
     const result = await this._api.ListCollaborators({
       routeParams: { [entityIdRoute]: entityId },
-    })
+    }, params)
 
     return Marshaler.payloadListResponse('collaborators', result)
   }

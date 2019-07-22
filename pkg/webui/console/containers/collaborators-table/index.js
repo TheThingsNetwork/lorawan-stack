@@ -63,11 +63,17 @@ const headers = [
 ]
 
 export default class CollaboratorsTable extends Component {
+
+  getCollaboratorPathPrefix (collaborator) {
+    return `/${collaborator.isUser ? 'user' : 'organization'}/${collaborator.id}`
+  }
+
   render () {
     return (
       <FetchTable
         entity="collaborators"
         headers={headers}
+        getItemPathPrefix={this.getCollaboratorPathPrefix}
         addMessage={sharedMessages.collaboratorAdd}
         tableTitle={<Message content={sharedMessages.collaborators} />}
         {...this.props}

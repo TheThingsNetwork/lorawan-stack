@@ -28,7 +28,7 @@ import IntlHelmet from '../../../lib/components/intl-helmet'
 import toast from '../../../components/toast'
 
 import {
-  getApplicationCollaboratorsList,
+  getApplicationCollaborator,
   getApplicationsRightsList,
 } from '../../store/actions/applications'
 import {
@@ -37,25 +37,28 @@ import {
   selectApplicationUniversalRights,
   selectApplicationRightsFetching,
   selectApplicationRightsError,
+  selectApplicationUserCollaborator,
+  selectApplicationOrganizationCollaborator,
+  selectApplicationCollaboratorFetching,
+  selectApplicationCollaboratorError,
 } from '../../store/selectors/applications'
 
 import api from '../../api'
 
 @connect(function (state, props) {
   const appId = selectSelectedApplicationId(state)
-  const { collaboratorId } = props.match.params
-  const collaboratorsFetching = state.collaborators.applications.fetching
-  const collaboratorsError = state.collaborators.applications.error
 
-  const appCollaborators = state.collaborators.applications[appId]
-  const collaborator = appCollaborators ? appCollaborators.collaborators
-    .find(c => c.id === collaboratorId) : undefined
+  const { collaboratorId, collaboratorType } = props.match.params
 
-  const fetching = selectApplicationRightsFetching(state) || collaboratorsFetching
-  const error = selectApplicationRightsError(state) || collaboratorsError
+  const collaborator = collaboratorType === 'user'
+    ? selectApplicationUserCollaborator(state)
+    : selectApplicationOrganizationCollaborator(state)
+  const fetching = selectApplicationRightsFetching(state) || selectApplicationCollaboratorFetching(state)
+  const error = selectApplicationRightsError(state) || selectApplicationCollaboratorError(state)
 
   return {
     collaboratorId,
+    collaboratorType,
     collaborator,
     appId,
     rights: selectApplicationRights(state),
@@ -64,25 +67,29 @@ import api from '../../api'
     error,
   }
 }, (dispatch, ownProps) => ({
-  loadData (appId) {
+  loadData (appId, collaboratorId, isUser) {
     dispatch(getApplicationsRightsList(appId))
-    dispatch(getApplicationCollaboratorsList(appId))
+    dispatch(getApplicationCollaborator(appId, collaboratorId, isUser))
   },
   redirectToList (appId) {
     dispatch(replace(`/console/applications/${appId}/collaborators`))
   },
 }), (stateProps, dispatchProps, ownProps) => ({
   ...stateProps, ...dispatchProps, ...ownProps,
-  loadData: () => dispatchProps.loadData(stateProps.appId),
+  loadData: () => dispatchProps.loadData(
+    stateProps.appId,
+    stateProps.collaboratorId,
+    stateProps.collaboratorType === 'user'
+  ),
   redirectToList: () => dispatchProps.redirectToList(stateProps.appId),
 })
 )
 @withBreadcrumb('apps.single.collaborators.edit', function (props) {
-  const { appId, collaboratorId } = props
+  const { appId, collaboratorId, collaboratorType } = props
 
   return (
     <Breadcrumb
-      path={`/console/applications/${appId}/collaborators/${collaboratorId}/edit`}
+      path={`/console/applications/${appId}/collaborators/${collaboratorType}/${collaboratorId}`}
       icon="general_settings"
       content={sharedMessages.edit}
     />
@@ -96,9 +103,17 @@ export default class ApplicationCollaboratorEdit extends React.Component {
   }
 
   componentDidMount () {
-    const { loadData, appId } = this.props
+    const { loadData } = this.props
 
-    loadData(appId)
+    loadData()
+  }
+
+  componentDidUpdate (prevProps) {
+    const { error } = this.props
+
+    if (Boolean(error) && prevProps.error !== error) {
+      throw error
+    }
   }
 
   async handleSubmit (updatedCollaborator) {
@@ -144,14 +159,9 @@ export default class ApplicationCollaboratorEdit extends React.Component {
       collaborator,
       rights,
       fetching,
-      error,
       universalRights,
       redirectToList,
     } = this.props
-
-    if (error) {
-      throw error
-    }
 
     if (fetching || !collaborator) {
       return <Spinner center />

@@ -85,11 +85,30 @@ const getGatewaysRightsLogic = createRequestLogic({
   },
 })
 
+const getGatewayCollaboratorLogic = createRequestLogic({
+  type: gateways.GET_GTW_COLLABORATOR,
+  async process ({ action }) {
+    const { id: gtwId, collaboratorId, isUser } = action.payload
+
+    const collaborator = isUser
+      ? await api.gateway.collaborators.getUser(gtwId, collaboratorId)
+      : await api.gateway.collaborators.getOrganization(gtwId, collaboratorId)
+
+    const { ids, ...rest } = collaborator
+
+    return {
+      id: collaboratorId,
+      isUser,
+      ...rest,
+    }
+  },
+})
+
 const getGatewayCollaboratorsLogic = createRequestLogic({
   type: gateways.GET_GTW_COLLABORATORS_LIST,
   async process ({ action }) {
-    const { gtwId } = action.payload
-    const res = await api.gateway.collaborators.list(gtwId)
+    const { id, params } = action.payload
+    const res = await api.gateway.collaborators.list(id, params)
     const collaborators = res.collaborators.map(function (collaborator) {
       const { ids, ...rest } = collaborator
       const isUser = !!ids.user_ids
@@ -103,7 +122,7 @@ const getGatewayCollaboratorsLogic = createRequestLogic({
         ...rest,
       }
     })
-    return { id: gtwId, collaborators, totalCount: res.totalCount }
+    return { id, collaborators, totalCount: res.totalCount }
   },
 })
 
@@ -202,6 +221,7 @@ export default [
   deleteGatewayLogic,
   getGatewaysLogic,
   getGatewaysRightsLogic,
+  getGatewayCollaboratorLogic,
   getGatewayCollaboratorsLogic,
   startGatewayStatisticsLogic,
   updateGatewayStatisticsLogic,
