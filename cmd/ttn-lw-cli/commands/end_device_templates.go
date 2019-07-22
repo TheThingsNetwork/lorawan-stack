@@ -73,7 +73,7 @@ var (
 	}
 	endDeviceTemplatesCreateCommand = &cobra.Command{
 		Use:               "create [flags]",
-		Short:             "Create an end device template with mapping key",
+		Short:             "Create an end device template with mapping key (EXPERIMENTAL)",
 		PersistentPreRunE: preRun(),
 		RunE: asBulk(func(cmd *cobra.Command, args []string) error {
 			forwardDeprecatedDeviceFlags(cmd.Flags())
@@ -101,9 +101,10 @@ var (
 		}),
 	}
 	endDeviceTemplatesFromDeviceCommand = &cobra.Command{
-		Use:   "from-device [flags]",
-		Short: "Create an end device template from an existing device",
-		Long: `Create an end device template from an existing device
+		Use:     "from-device [flags]",
+		Aliases: []string{"from-dev", "fromdevice", "fromdev"},
+		Short:   "Create an end device template from an existing device (EXPERIMENTAL)",
+		Long: `Create an end device template from an existing device (EXPERIMENTAL)
 
 	This command takes end devices from stdin.`,
 		PersistentPreRunE: preRun(),
@@ -158,9 +159,10 @@ var (
 		}),
 	}
 	endDeviceTemplatesExecuteCommand = &cobra.Command{
-		Use:   "execute [flags]",
-		Short: "Execute the template to an end device",
-		Long: `Execute the template to an end device
+		Use:     "execute [flags]",
+		Aliases: []string{"exec"},
+		Short:   "Execute the template to an end device (EXPERIMENTAL)",
+		Long: `Execute the template to an end device (EXPERIMENTAL)
 
 This command takes device templates from stdin.`,
 		PersistentPreRunE: preRun(),
@@ -188,9 +190,9 @@ This command takes device templates from stdin.`,
 	}
 	endDeviceTemplatesAssignEUIsCommand = &cobra.Command{
 		Use:     "assign-euis [join-eui] [start-dev-eui] [flags]",
-		Aliases: []string{"euis"},
-		Short:   "Assign JoinEUI and DevEUIs to end device templates",
-		Long: `Assign JoinEUI and DevEUIs to end device templates
+		Aliases: []string{"euis", "eui"},
+		Short:   "Assign JoinEUI and DevEUIs to end device templates (EXPERIMENTAL)",
+		Long: `Assign JoinEUI and DevEUIs to end device templates (EXPERIMENTAL)
 
 This command takes an end device template from stdin.`,
 		PersistentPreRunE: preRun(),
@@ -266,7 +268,8 @@ This command takes an end device template from stdin.`,
 	}
 	endDeviceTemplatesListFormats = &cobra.Command{
 		Use:               "list-formats",
-		Short:             "List available end device template formats",
+		Aliases:           []string{"ls-formats", "listformats", "lsformats"},
+		Short:             "List available end device template formats (EXPERIMENTAL)",
 		PersistentPreRunE: preRun(),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			dtc, err := api.Dial(ctx, config.DeviceTemplateConverterGRPCAddress)
@@ -282,7 +285,8 @@ This command takes an end device template from stdin.`,
 	}
 	endDeviceTemplatesFromDataCommand = &cobra.Command{
 		Use:               "from-data [format-id]",
-		Short:             "Convert data to an end device template",
+		Aliases:           []string{"fromdata"},
+		Short:             "Convert data to an end device template (EXPERIMENTAL)",
 		PersistentPreRunE: preRun(),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			formatID := getTemplateFormatID(cmd.Flags(), args)
@@ -322,8 +326,8 @@ This command takes an end device template from stdin.`,
 	}
 	endDeviceTemplatesMapCommand = &cobra.Command{
 		Use:   "map [flags]",
-		Short: "Map end device templates",
-		Long: `Map end device templates
+		Short: "Map end device templates (EXPERIMENTAL)",
+		Long: `Map end device templates (EXPERIMENTAL)
 
 This command matches the input templates with the mapping file to create new
 templates. The mapping file contains end device templates in the same format
