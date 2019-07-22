@@ -75,15 +75,16 @@ func ToHTTPStatusCode(err error) int {
 }
 
 // FromHTTPStatusCode maps an HTTP response code to an error.
-func FromHTTPStatusCode(status int) error {
+func FromHTTPStatusCode(status int, publicAttributes ...string) Error {
 	code := uint32(codes.Unknown)
 	if c, ok := httpErrorCodes[status]; ok {
 		code = c
 	}
 	return build(Definition{
-		namespace:     namespace(2),
-		messageFormat: http.StatusText(status),
-		code:          code,
+		namespace:        namespace(2),
+		messageFormat:    http.StatusText(status),
+		publicAttributes: publicAttributes,
+		code:             code,
 	}, 4)
 }
 
