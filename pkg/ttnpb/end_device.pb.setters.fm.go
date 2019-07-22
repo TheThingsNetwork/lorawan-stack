@@ -1077,6 +1077,44 @@ func (dst *MACState) SetFields(src *MACState, paths ...string) error {
 	return nil
 }
 
+func (dst *EndDeviceAuthenticationCode) SetFields(src *EndDeviceAuthenticationCode, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "value":
+			if len(subs) > 0 {
+				return fmt.Errorf("'value' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Value = src.Value
+			} else {
+				dst.Value = nil
+			}
+		case "valid_from":
+			if len(subs) > 0 {
+				return fmt.Errorf("'valid_from' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ValidFrom = src.ValidFrom
+			} else {
+				dst.ValidFrom = nil
+			}
+		case "valid_to":
+			if len(subs) > 0 {
+				return fmt.Errorf("'valid_to' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ValidTo = src.ValidTo
+			} else {
+				dst.ValidTo = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
@@ -1614,6 +1652,27 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 			} else {
 				var zero bool
 				dst.Multicast = zero
+			}
+		case "claim_authentication_code":
+			if len(subs) > 0 {
+				newDst := dst.ClaimAuthenticationCode
+				if newDst == nil {
+					newDst = &EndDeviceAuthenticationCode{}
+					dst.ClaimAuthenticationCode = newDst
+				}
+				var newSrc *EndDeviceAuthenticationCode
+				if src != nil {
+					newSrc = src.ClaimAuthenticationCode
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ClaimAuthenticationCode = src.ClaimAuthenticationCode
+				} else {
+					dst.ClaimAuthenticationCode = nil
+				}
 			}
 
 		default:

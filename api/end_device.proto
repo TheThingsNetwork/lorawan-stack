@@ -321,6 +321,15 @@ enum PowerState {
   POWER_EXTERNAL = 2;
 }
 
+// Authentication code for end devices.
+message EndDeviceAuthenticationCode {
+  option (gogoproto.populate) = false;
+
+  bytes value = 1 [(validate.rules).bytes = {min_len: 1, max_len: 8}];
+  google.protobuf.Timestamp valid_from = 2 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp valid_to = 3 [(gogoproto.stdtime) = true];
+}
+
 // Defines an End Device registration and its state on the network.
 // The persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.
 // SDKs are responsible for combining (if desired) the three.
@@ -472,6 +481,9 @@ message EndDevice {
 
   // Indicates whether this device represents a multicast group.
   bool multicast = 45;
+
+  // Authentication code to claim ownership of the end device. Stored in Join Server.
+  EndDeviceAuthenticationCode claim_authentication_code = 46;
 }
 
 message EndDevices {

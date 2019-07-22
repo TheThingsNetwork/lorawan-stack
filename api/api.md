@@ -91,6 +91,7 @@
   - [Message `EndDevice`](#ttn.lorawan.v3.EndDevice)
   - [Message `EndDevice.AttributesEntry`](#ttn.lorawan.v3.EndDevice.AttributesEntry)
   - [Message `EndDevice.LocationsEntry`](#ttn.lorawan.v3.EndDevice.LocationsEntry)
+  - [Message `EndDeviceAuthenticationCode`](#ttn.lorawan.v3.EndDeviceAuthenticationCode)
   - [Message `EndDeviceBrand`](#ttn.lorawan.v3.EndDeviceBrand)
   - [Message `EndDeviceModel`](#ttn.lorawan.v3.EndDeviceModel)
   - [Message `EndDeviceTemplate`](#ttn.lorawan.v3.EndDeviceTemplate)
@@ -1468,6 +1469,7 @@ SDKs are responsible for combining (if desired) the three.
 | `provisioner_id` | [`string`](#string) |  | ID of the provisioner. Stored in Join Server. |
 | `provisioning_data` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  | Vendor-specific provisioning data. Stored in Join Server. |
 | `multicast` | [`bool`](#bool) |  | Indicates whether this device represents a multicast group. |
+| `claim_authentication_code` | [`EndDeviceAuthenticationCode`](#ttn.lorawan.v3.EndDeviceAuthenticationCode) |  | Authentication code to claim ownership of the end device. Stored in Join Server. |
 
 #### Field Rules
 
@@ -1502,6 +1504,22 @@ SDKs are responsible for combining (if desired) the three.
 | ----- | ---- | ----- | ----------- |
 | `key` | [`string`](#string) |  |  |
 | `value` | [`Location`](#ttn.lorawan.v3.Location) |  |  |
+
+### <a name="ttn.lorawan.v3.EndDeviceAuthenticationCode">Message `EndDeviceAuthenticationCode`</a>
+
+Authentication code for end devices.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `value` | [`bytes`](#bytes) |  |  |
+| `valid_from` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+| `valid_to` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `value` | <p>`bytes.min_len`: `1`</p><p>`bytes.max_len`: `8`</p> |
 
 ### <a name="ttn.lorawan.v3.EndDeviceBrand">Message `EndDeviceBrand`</a>
 
