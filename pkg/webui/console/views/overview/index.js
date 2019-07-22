@@ -16,6 +16,7 @@ import React from 'react'
 import { Container, Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 import bind from 'autobind-decorator'
+import { connect } from 'react-redux'
 
 import sharedMessages from '../../../lib/shared-messages'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
@@ -24,7 +25,15 @@ import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import Message from '../../../lib/components/message'
 import Status from '../../../components/status'
+import Spinner from '../../../components/spinner'
+import Link from '../../../components/link'
 import Animation from '../../../lib/components/animation'
+import { selectApplicationsTotalCount } from '../../store/selectors/applications'
+import { getApplicationsList, GET_APPS_LIST } from '../../store/actions/applications'
+import { selectGatewaysTotalCount } from '../../store/selectors/gateways'
+import { getGatewaysList, GET_GTWS_LIST } from '../../store/actions/gateways'
+import { createFetchingSelector } from '../../store/selectors/fetching'
+import { selectUserId } from '../../store/selectors/user'
 
 import ServerIcon from '../../../assets/auxiliary-icons/server.svg'
 import AppAnimation from '../../../assets/animations/illustrations/app.json'
@@ -34,9 +43,13 @@ import style from './overview.styl'
 
 const m = defineMessages({
   createApplication: 'Create an application',
-  createGateway: 'Create a gateway',
+  createGateway: 'Register a gateway',
+  gotoApplications: 'Go to applications',
+  gotoGateways: 'Go to gateways',
   welcome: 'Welcome to the Console!',
+  welcomeBack: 'Welcome back, {userId} 👋!',
   getStarted: 'Get started right away by creating an application or registering a gateway.',
+  continueWorking: 'Walk right through to your applications and/or gateways.',
   componentStatus: 'Component Status',
   versionInfo: 'Version Info',
 })
@@ -49,6 +62,17 @@ const componentMap = {
   js: sharedMessages.componentJoinServer,
 }
 
+@connect(state => ({
+  applicationCount: selectApplicationsTotalCount(state),
+  gatewayCount: selectGatewaysTotalCount(state),
+  fetching: createFetchingSelector([ GET_APPS_LIST, GET_GTWS_LIST ])(state),
+  userId: selectUserId(state),
+}), dispatch => ({
+  loadData () {
+    dispatch(getApplicationsList())
+    dispatch(getGatewaysList())
+  },
+}))
 @withBreadcrumb('overview', function (props) {
   return (
     <Breadcrumb
@@ -66,6 +90,11 @@ export default class Overview extends React.Component {
 
     this.appAnimationRef = React.createRef()
     this.gatewayAnimationRef = React.createRef()
+  }
+
+  componentDidMount () {
+    const { loadData } = this.props
+    loadData()
   }
 
   handleAppChooserMouseEnter () {
@@ -88,34 +117,52 @@ export default class Overview extends React.Component {
 
   render () {
     const { config } = this.props.env
+    const { fetching, applicationCount, gatewayCount, userId } = this.props
+    const { path } = this.props.match
+
+    if (fetching || applicationCount === undefined || gatewayCount === undefined) {
+      return (
+        <Spinner center>
+          <Message content={sharedMessages.loading} />
+        </Spinner>
+      )
+    }
+
+    const hasEntities = applicationCount + gatewayCount !== 0
+    const appPath = path + (hasEntities ? '/applications' : '/applications/add')
+    const gatewayPath = path + (hasEntities ? '/gateways' : '/gateways/add')
 
     return (
       <Container>
         <Row className={style.welcomeSection}>
           <IntlHelmet title={sharedMessages.overview} />
           <Col sm={12} className={style.welcomeTitleSection}>
-            <Message className={style.welcome} content={m.welcome} component="h1" />
-            <Message className={style.getStarted} content={m.getStarted} component="h2" />
+            <Message className={style.welcome} content={hasEntities ? m.welcomeBack : m.welcome} values={{ userId }} component="h1" />
+            <Message className={style.getStarted} content={hasEntities ? m.continueWorking : m.getStarted} component="h2" />
           </Col>
           <Col lg={6}>
-            <div
-              onMouseEnter={this.handleAppChooserMouseEnter}
-              onMouseLeave={this.handleAppChooserMouseLeave}
-              className={style.chooser}
-            >
-              <Animation ref={this.appAnimationRef} animationData={AppAnimation} />
-              <span>Create an application</span>
-            </div>
+            <Link to={appPath} className={style.chooserNav}>
+              <div
+                onMouseEnter={this.handleAppChooserMouseEnter}
+                onMouseLeave={this.handleAppChooserMouseLeave}
+                className={style.chooser}
+              >
+                <Animation ref={this.appAnimationRef} animationData={AppAnimation} />
+                <Message content={hasEntities ? m.gotoApplications : m.createApplication} />
+              </div>
+            </Link>
           </Col>
           <Col lg={6}>
-            <div
-              onMouseEnter={this.handleGatewayChooserMouseEnter}
-              onMouseLeave={this.handleGatewayChooserMouseLeave}
-              className={style.chooser}
-            >
-              <Animation ref={this.gatewayAnimationRef} animationData={GatewayAnimation} />
-              <span>Register a gateway</span>
-            </div>
+            <Link to={gatewayPath} className={style.chooserNav}>
+              <div
+                onMouseEnter={this.handleGatewayChooserMouseEnter}
+                onMouseLeave={this.handleGatewayChooserMouseLeave}
+                className={style.chooser}
+              >
+                <Animation ref={this.gatewayAnimationRef} animationData={GatewayAnimation} />
+                <Message content={hasEntities ? m.gotoGateways : m.createGateway} />
+              </div>
+            </Link>
           </Col>
         </Row>
         <hr />
