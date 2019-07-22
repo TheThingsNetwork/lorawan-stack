@@ -21,7 +21,7 @@ import ApiKeysTable from '../../containers/api-keys-table'
 import { getApplicationApiKeysList } from '../../store/actions/applications'
 import sharedMessages from '../../../lib/shared-messages'
 
-const API_KEYS_TABLE_SIZE = 10
+import PAGE_SIZES from '../../constants/page-sizes'
 
 @bind
 export default class ApplicationApiKeys extends React.Component {
@@ -45,7 +45,7 @@ export default class ApplicationApiKeys extends React.Component {
           <IntlHelmet title={sharedMessages.apiKeys} />
           <Col sm={12}>
             <ApiKeysTable
-              pageSize={API_KEYS_TABLE_SIZE}
+              pageSize={PAGE_SIZES.REGULAR}
               baseDataSelector={this.baseDataSelector}
               getItemsAction={this.getApplicationsApiKeysList}
             />

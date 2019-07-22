@@ -21,7 +21,7 @@ import CollaboratorsTable from '../../containers/collaborators-table'
 import { getApplicationCollaboratorsList } from '../../store/actions/applications'
 import sharedMessages from '../../../lib/shared-messages'
 
-const COLLABORATORS_TABLE_SIZE = 10
+import PAGE_SIZES from '../../constants/page-sizes'
 
 @bind
 export default class ApplicationCollaborators extends React.Component {
@@ -45,7 +45,7 @@ export default class ApplicationCollaborators extends React.Component {
           <IntlHelmet title={sharedMessages.collaborators} />
           <Col sm={12}>
             <CollaboratorsTable
-              pageSize={COLLABORATORS_TABLE_SIZE}
+              pageSize={PAGE_SIZES.REGULAR}
               baseDataSelector={this.baseDataSelector}
               getItemsAction={this.getApplicationCollaboratorsList}
             />

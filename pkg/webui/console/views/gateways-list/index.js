@@ -19,7 +19,7 @@ import GatewaysTable from '../../containers/gateways-table'
 import sharedMessages from '../../../lib/shared-messages'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 
-const GATEWAYS_TABLE_SIZE = 5
+import PAGE_SIZES from '../../constants/page-sizes'
 
 export default class GatewaysList extends React.Component {
   render () {
@@ -28,7 +28,7 @@ export default class GatewaysList extends React.Component {
         <Row>
           <IntlHelmet title={sharedMessages.gateways} />
           <Col sm={12}>
-            <GatewaysTable pageSize={GATEWAYS_TABLE_SIZE} />
+            <GatewaysTable pageSize={PAGE_SIZES.REGULAR} />
           </Col>
         </Row>
       </Container>
