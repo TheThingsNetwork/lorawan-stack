@@ -27,6 +27,10 @@ import HashOutput from 'webpack-plugin-hash-output'
 
 import nib from 'nib'
 
+import pjson from '../package.json'
+
+const { version } = pjson
+
 const {
   CONTEXT = '.',
   CACHE_DIR = '.cache',
@@ -178,6 +182,7 @@ export default {
       new webpack.NamedChunksPlugin(),
       new webpack.EnvironmentPlugin({
         NODE_ENV,
+        VERSION: version,
       }),
       new webpack.DefinePlugin({
         'process.predefined.DEFAULT_MESSAGES':
