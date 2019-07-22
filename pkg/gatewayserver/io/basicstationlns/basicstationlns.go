@@ -29,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/basicstation"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/basicstationlns/messages"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -168,6 +169,11 @@ func (s *srv) handleTraffic(c echo.Context) error {
 			md = metadata.Join(ctxMd, md)
 		}
 		ctx = metadata.NewIncomingContext(s.ctx, md)
+	}
+
+	// If a fallback frequency is defined in the server context, inject it into local the context.
+	if fallback, ok := frequencyplans.FallbackIDFromContext(s.ctx); ok {
+		ctx = frequencyplans.WithFallbackID(ctx, fallback)
 	}
 
 	logger := log.FromContext(ctx).WithFields(log.Fields(
