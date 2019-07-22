@@ -100,10 +100,9 @@ var (
 			return io.Write(os.Stdout, config.OutputFormat, &res)
 		}),
 	}
-	endDeviceTemplatesFromDeviceCommand = &cobra.Command{
-		Use:     "from-device [flags]",
-		Aliases: []string{"from-dev", "fromdevice", "fromdev"},
-		Short:   "Create an end device template from an existing device (EXPERIMENTAL)",
+	endDeviceTemplatesCreateCommand = &cobra.Command{
+		Use:   "create [flags]",
+		Short: "Create an end device template from an existing device (EXPERIMENTAL)",
 		Long: `Create an end device template from an existing device (EXPERIMENTAL)
 
 	This command takes end devices from stdin.`,
@@ -433,9 +432,9 @@ func init() {
 	endDeviceTemplatesExtendCommand.Flags().AddFlagSet(attributesFlags())
 	endDeviceTemplatesExtendCommand.Flags().String("mapping-key", "", "")
 	endDeviceTemplatesCommand.AddCommand(endDeviceTemplatesExtendCommand)
-	endDeviceTemplatesFromDeviceCommand.Flags().AddFlagSet(selectEndDeviceIDFlags())
-	endDeviceTemplatesFromDeviceCommand.Flags().String("mapping-key", "", "")
-	endDeviceTemplatesCommand.AddCommand(endDeviceTemplatesFromDeviceCommand)
+	endDeviceTemplatesCreateCommand.Flags().AddFlagSet(selectEndDeviceIDFlags())
+	endDeviceTemplatesCreateCommand.Flags().String("mapping-key", "", "")
+	endDeviceTemplatesCommand.AddCommand(endDeviceTemplatesCreateCommand)
 	endDeviceTemplatesCommand.AddCommand(endDeviceTemplatesExecuteCommand)
 	endDeviceTemplatesAssignEUIsCommand.Flags().String("join-eui", "", "(hex)")
 	endDeviceTemplatesAssignEUIsCommand.Flags().String("start-dev-eui", "", "(hex)")
