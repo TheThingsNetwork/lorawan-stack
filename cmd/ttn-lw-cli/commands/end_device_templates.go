@@ -105,7 +105,12 @@ var (
 		Short: "Create an end device template from an existing device (EXPERIMENTAL)",
 		Long: `Create an end device template from an existing device (EXPERIMENTAL)
 
-	This command takes end devices from stdin.`,
+By default, this command strips the device's application ID, device ID, JoinEUI,
+DevEUI and server addresses to create a generic template. You can include the
+end device identifiers by passing the concerning flags: --application-id,
+--device-id, --join-eui and --dev-eui.
+
+This command takes end devices from stdin.`,
 		PersistentPreRunE: preRun(),
 		RunE: asBulk(func(cmd *cobra.Command, args []string) error {
 			if inputDecoder == nil {
@@ -163,7 +168,7 @@ var (
 		Short:   "Execute the template to an end device (EXPERIMENTAL)",
 		Long: `Execute the template to an end device (EXPERIMENTAL)
 
-This command takes device templates from stdin.`,
+This command takes end device templates from stdin.`,
 		PersistentPreRunE: preRun(),
 		RunE: asBulk(func(cmd *cobra.Command, args []string) error {
 			if inputDecoder == nil {
@@ -193,7 +198,9 @@ This command takes device templates from stdin.`,
 		Short:   "Assign JoinEUI and DevEUIs to end device templates (EXPERIMENTAL)",
 		Long: `Assign JoinEUI and DevEUIs to end device templates (EXPERIMENTAL)
 
-This command takes an end device template from stdin.`,
+Pass --count=N to assign N number of DevEUIs to each input end device template.
+
+This command takes end device templates from stdin.`,
 		PersistentPreRunE: preRun(),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if inputDecoder == nil {
