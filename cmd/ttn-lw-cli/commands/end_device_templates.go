@@ -71,9 +71,9 @@ var (
 		Aliases: []string{"template", "tmpl"},
 		Short:   "End Device template commands",
 	}
-	endDeviceTemplatesCreateCommand = &cobra.Command{
-		Use:               "create [flags]",
-		Short:             "Create an end device template with mapping key (EXPERIMENTAL)",
+	endDeviceTemplatesExtendCommand = &cobra.Command{
+		Use:               "extend [flags]",
+		Short:             "Extend an end device template (EXPERIMENTAL)",
 		PersistentPreRunE: preRun(),
 		RunE: asBulk(func(cmd *cobra.Command, args []string) error {
 			forwardDeprecatedDeviceFlags(cmd.Flags())
@@ -430,9 +430,9 @@ command to assign EUIs to map to end device templates.`,
 )
 
 func init() {
-	endDeviceTemplatesCreateCommand.Flags().AddFlagSet(attributesFlags())
-	endDeviceTemplatesCreateCommand.Flags().String("mapping-key", "", "")
-	endDeviceTemplatesCommand.AddCommand(endDeviceTemplatesCreateCommand)
+	endDeviceTemplatesExtendCommand.Flags().AddFlagSet(attributesFlags())
+	endDeviceTemplatesExtendCommand.Flags().String("mapping-key", "", "")
+	endDeviceTemplatesCommand.AddCommand(endDeviceTemplatesExtendCommand)
 	endDeviceTemplatesFromDeviceCommand.Flags().AddFlagSet(selectEndDeviceIDFlags())
 	endDeviceTemplatesFromDeviceCommand.Flags().String("mapping-key", "", "")
 	endDeviceTemplatesCommand.AddCommand(endDeviceTemplatesFromDeviceCommand)
