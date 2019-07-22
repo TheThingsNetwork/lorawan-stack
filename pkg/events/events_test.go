@@ -41,8 +41,9 @@ func (testData) GetCorrelationIDs() []string {
 func TestNew(t *testing.T) {
 	a := assertions.New(t)
 	ctx := events.ContextWithCorrelationID(test.Context(), t.Name())
-	evt := events.New(ctx, "as.up.receive", nil, testData{})
+	evt := events.New(ctx, "as.up.receive", nil, testData{}, ttnpb.RIGHT_ALL)
 	a.So(evt.CorrelationIDs(), should.Resemble, []string{"TestNew"})
+	a.So(evt.Visibility().GetRights(), should.Contain, ttnpb.RIGHT_ALL)
 }
 
 func TestEvents(t *testing.T) {
@@ -78,7 +79,7 @@ func TestEvents(t *testing.T) {
 	pubsub.Subscribe("test.*", handler)
 	pubsub.Subscribe("test.*", handler) // second time should not matter
 
-	evt := events.New(ctx, "test.evt1", nil, "hello")
+	evt := events.New(ctx, "test.evt1", nil, "hello", ttnpb.RIGHT_ALL)
 	a.So(evt.CorrelationIDs(), should.Contain, t.Name())
 
 	wrapped := wrappedEvent{Event: evt}
@@ -93,6 +94,7 @@ func TestEvents(t *testing.T) {
 	a.So(received.Data(), should.Equal, evt.Data())
 	a.So(received.CorrelationIDs(), should.Resemble, evt.CorrelationIDs())
 	a.So(received.Origin(), should.Equal, evt.Origin())
+	a.So(received.Visibility(), should.Resemble, evt.Visibility())
 
 	pubsub.Unsubscribe("test.*", handler)
 
@@ -104,7 +106,7 @@ func TestEvents(t *testing.T) {
 func TestUnmarshalJSON(t *testing.T) {
 	a := assertions.New(t)
 	{
-		evt := events.New(context.Background(), "name", ttnpb.CombineIdentifiers(&ttnpb.ApplicationIdentifiers{ApplicationID: "application_id"}), "data")
+		evt := events.New(context.Background(), "name", ttnpb.CombineIdentifiers(&ttnpb.ApplicationIdentifiers{ApplicationID: "application_id"}), "data", ttnpb.RIGHT_ALL)
 		json, err := json.Marshal(evt)
 		a.So(err, should.BeNil)
 		evt2, err := events.UnmarshalJSON(json)
@@ -114,7 +116,7 @@ func TestUnmarshalJSON(t *testing.T) {
 
 	{
 		var fieldmask []string
-		evt := events.New(context.Background(), "name", ttnpb.CombineIdentifiers(&ttnpb.ApplicationIdentifiers{ApplicationID: "application_id"}), fieldmask)
+		evt := events.New(context.Background(), "name", ttnpb.CombineIdentifiers(&ttnpb.ApplicationIdentifiers{ApplicationID: "application_id"}), fieldmask, ttnpb.RIGHT_ALL)
 		json, err := json.Marshal(evt)
 		a.So(err, should.BeNil)
 		evt2, err := events.UnmarshalJSON(json)
@@ -143,7 +145,8 @@ func Example() {
 	// Defining the event is not mandatory, but will be needed in order to translate the descriptions.
 	// Event names are lowercase snake_case and can be dot-separated as component.subsystem.subsystem.event
 	// Event descriptions are short descriptions of what the event means.
-	var adrSendEvent = events.Define("ns.mac.adr.send_req", "send ADR request")
+	// Visibility rights are optional. If no rights are supplied, then the _ALL right is assumed.
+	var adrSendEvent = events.Define("ns.mac.adr.send_req", "send ADR request", ttnpb.RIGHT_APPLICATION_TRAFFIC_READ)
 
 	// These variables come from the request or you got them from the db or something.
 	var (

@@ -43,6 +43,7 @@ type Event interface {
 	CorrelationIDs() []string
 	Origin() string
 	Caller() string
+	Visibility() *ttnpb.Rights
 }
 
 func local(evt Event) *event {
@@ -56,6 +57,7 @@ func local(evt Event) *event {
 				Identifiers:    evt.Identifiers(),
 				CorrelationIDs: evt.CorrelationIDs(),
 				Origin:         evt.Origin(),
+				Visibility:     evt.Visibility(),
 			},
 			data:   evt.Data(),
 			caller: evt.Caller(),
@@ -122,6 +124,7 @@ func (e event) Data() interface{}                       { return e.data }
 func (e event) CorrelationIDs() []string                { return e.innerEvent.CorrelationIDs }
 func (e event) Origin() string                          { return e.innerEvent.Origin }
 func (e event) Caller() string                          { return e.caller }
+func (e event) Visibility() *ttnpb.Rights               { return e.innerEvent.Visibility }
 
 var hostname string
 
@@ -134,7 +137,7 @@ func init() {
 // Event identifiers identify the TTN entities that are related to the event.
 // System events have nil identifiers.
 // Event data will in most cases be marshaled to JSON, but ideally is a proto message.
-func New(ctx context.Context, name string, identifiers CombinedIdentifiers, data interface{}) Event {
+func New(ctx context.Context, name string, identifiers CombinedIdentifiers, data interface{}, requiredRights ...ttnpb.Right) Event {
 	evt := &event{
 		ctx: ctx,
 		innerEvent: ttnpb.Event{
@@ -142,6 +145,7 @@ func New(ctx context.Context, name string, identifiers CombinedIdentifiers, data
 			Time:           time.Now().UTC(),
 			Origin:         hostname,
 			CorrelationIDs: CorrelationIDsFromContext(ctx),
+			Visibility:     ttnpb.RightsFrom(requiredRights...),
 		},
 		data: data,
 	}
