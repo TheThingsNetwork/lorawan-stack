@@ -10,4 +10,4 @@ stack lives.
 This section will document the purpose and exploitation of those components. The aim is to provide
 a clear understanding of the stack workflow so developers and maintainers can build upon it and contribute.
 
-Advanced users should also go though those documents to know the full scope of possibilities.
+Advanced users should also go through those documents to know the full the extend of the possibilities and limitations.

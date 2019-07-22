@@ -1,7 +1,7 @@
 ---
 title: "References"
 description: "List of all the API, types and commands."
-weight: 5
+weight: 99
 ---
 
 The References section list all the external resources, API and commands a user
