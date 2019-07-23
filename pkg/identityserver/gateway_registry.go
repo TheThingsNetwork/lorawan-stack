@@ -28,9 +28,18 @@ import (
 )
 
 var (
-	evtCreateGateway = events.Define("gateway.create", "create gateway")
-	evtUpdateGateway = events.Define("gateway.update", "update gateway")
-	evtDeleteGateway = events.Define("gateway.delete", "delete gateway")
+	evtCreateGateway = events.Define(
+		"gateway.create", "create gateway",
+		ttnpb.RIGHT_GATEWAY_INFO,
+	)
+	evtUpdateGateway = events.Define(
+		"gateway.update", "update gateway",
+		ttnpb.RIGHT_GATEWAY_INFO,
+	)
+	evtDeleteGateway = events.Define(
+		"gateway.delete", "delete gateway",
+		ttnpb.RIGHT_GATEWAY_INFO,
+	)
 )
 
 func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGatewayRequest) (gtw *ttnpb.Gateway, err error) {

@@ -29,11 +29,28 @@ import (
 )
 
 var (
-	evtCreateOrganizationAPIKey       = events.Define("organization.api-key.create", "create organization API key")
-	evtUpdateOrganizationAPIKey       = events.Define("organization.api-key.update", "update organization API key")
-	evtDeleteOrganizationAPIKey       = events.Define("organization.api-key.delete", "delete organization API key")
-	evtUpdateOrganizationCollaborator = events.Define("organization.collaborator.update", "update organization collaborator")
-	evtDeleteOrganizationCollaborator = events.Define("organization.collaborator.delete", "delete organization collaborator")
+	evtCreateOrganizationAPIKey = events.Define(
+		"organization.api-key.create", "create organization API key",
+		ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS,
+	)
+	evtUpdateOrganizationAPIKey = events.Define(
+		"organization.api-key.update", "update organization API key",
+		ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS,
+	)
+	evtDeleteOrganizationAPIKey = events.Define(
+		"organization.api-key.delete", "delete organization API key",
+		ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS,
+	)
+	evtUpdateOrganizationCollaborator = events.Define(
+		"organization.collaborator.update", "update organization collaborator",
+		ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS,
+		ttnpb.RIGHT_USER_ORGANIZATIONS_LIST,
+	)
+	evtDeleteOrganizationCollaborator = events.Define(
+		"organization.collaborator.delete", "delete organization collaborator",
+		ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS,
+		ttnpb.RIGHT_USER_ORGANIZATIONS_LIST,
+	)
 )
 
 func (is *IdentityServer) listOrganizationRights(ctx context.Context, ids *ttnpb.OrganizationIdentifiers) (*ttnpb.Rights, error) {
@@ -201,6 +218,7 @@ func (is *IdentityServer) setOrganizationCollaborator(ctx context.Context, req *
 		return nil, err
 	}
 	if len(req.Collaborator.Rights) > 0 {
+		events.Publish(evtUpdateOrganizationCollaborator(ctx, ttnpb.CombineIdentifiers(req.OrganizationIdentifiers, req.Collaborator), nil))
 		err = is.SendContactsEmail(ctx, req.EntityIdentifiers(), func(data emails.Data) email.MessageData {
 			data.SetEntity(req.EntityIdentifiers())
 			return &emails.CollaboratorChanged{Data: data, Collaborator: req.Collaborator}
@@ -209,7 +227,7 @@ func (is *IdentityServer) setOrganizationCollaborator(ctx context.Context, req *
 			log.FromContext(ctx).WithError(err).Error("Could not send collaborator updated notification email")
 		}
 	} else {
-		events.Publish(evtDeleteOrganizationCollaborator(ctx, req.OrganizationIdentifiers, nil))
+		events.Publish(evtDeleteOrganizationCollaborator(ctx, ttnpb.CombineIdentifiers(req.OrganizationIdentifiers, req.Collaborator), nil))
 	}
 	is.invalidateCachedMembershipsForAccount(ctx, &req.Collaborator.OrganizationOrUserIdentifiers)
 	return ttnpb.Empty, nil

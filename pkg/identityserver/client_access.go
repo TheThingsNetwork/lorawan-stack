@@ -29,8 +29,16 @@ import (
 )
 
 var (
-	evtUpdateClientCollaborator = events.Define("client.collaborator.update", "update client collaborator")
-	evtDeleteClientCollaborator = events.Define("client.collaborator.delete", "delete client collaborator")
+	evtUpdateClientCollaborator = events.Define(
+		"client.collaborator.update", "update client collaborator",
+		ttnpb.RIGHT_CLIENT_ALL,
+		ttnpb.RIGHT_USER_CLIENTS_LIST,
+	)
+	evtDeleteClientCollaborator = events.Define(
+		"client.collaborator.delete", "delete client collaborator",
+		ttnpb.RIGHT_CLIENT_ALL,
+		ttnpb.RIGHT_USER_CLIENTS_LIST,
+	)
 )
 
 func (is *IdentityServer) listClientRights(ctx context.Context, ids *ttnpb.ClientIdentifiers) (*ttnpb.Rights, error) {
@@ -87,7 +95,7 @@ func (is *IdentityServer) setClientCollaborator(ctx context.Context, req *ttnpb.
 		return nil, err
 	}
 	if len(req.Collaborator.Rights) > 0 {
-		events.Publish(evtUpdateClientCollaborator(ctx, req.ClientIdentifiers, nil))
+		events.Publish(evtUpdateClientCollaborator(ctx, ttnpb.CombineIdentifiers(req.ClientIdentifiers, req.Collaborator), nil))
 		err = is.SendContactsEmail(ctx, req.EntityIdentifiers(), func(data emails.Data) email.MessageData {
 			data.SetEntity(req.EntityIdentifiers())
 			return &emails.CollaboratorChanged{Data: data, Collaborator: req.Collaborator}
@@ -96,7 +104,7 @@ func (is *IdentityServer) setClientCollaborator(ctx context.Context, req *ttnpb.
 			log.FromContext(ctx).WithError(err).Error("Could not send collaborator updated notification email")
 		}
 	} else {
-		events.Publish(evtDeleteClientCollaborator(ctx, req.ClientIdentifiers, nil))
+		events.Publish(evtDeleteClientCollaborator(ctx, ttnpb.CombineIdentifiers(req.ClientIdentifiers, req.Collaborator), nil))
 	}
 	is.invalidateCachedMembershipsForAccount(ctx, &req.Collaborator.OrganizationOrUserIdentifiers)
 	return ttnpb.Empty, nil

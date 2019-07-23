@@ -29,9 +29,18 @@ import (
 )
 
 var (
-	evtCreateOrganization = events.Define("organization.create", "create organization")
-	evtUpdateOrganization = events.Define("organization.update", "update organization")
-	evtDeleteOrganization = events.Define("organization.delete", "delete organization")
+	evtCreateOrganization = events.Define(
+		"organization.create", "create organization",
+		ttnpb.RIGHT_ORGANIZATION_INFO,
+	)
+	evtUpdateOrganization = events.Define(
+		"organization.update", "update organization",
+		ttnpb.RIGHT_ORGANIZATION_INFO,
+	)
+	evtDeleteOrganization = events.Define(
+		"organization.delete", "delete organization",
+		ttnpb.RIGHT_ORGANIZATION_INFO,
+	)
 )
 
 var errNestedOrganizations = errors.DefineInvalidArgument("nested_organizations", "organizations can not be nested")

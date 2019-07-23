@@ -30,9 +30,18 @@ import (
 )
 
 var (
-	evtCreateClient = events.Define("client.create", "create OAuth client")
-	evtUpdateClient = events.Define("client.update", "update OAuth client")
-	evtDeleteClient = events.Define("client.delete", "delete OAuth client")
+	evtCreateClient = events.Define(
+		"client.create", "create OAuth client",
+		ttnpb.RIGHT_CLIENT_ALL,
+	)
+	evtUpdateClient = events.Define(
+		"client.update", "update OAuth client",
+		ttnpb.RIGHT_CLIENT_ALL,
+	)
+	evtDeleteClient = events.Define(
+		"client.delete", "delete OAuth client",
+		ttnpb.RIGHT_CLIENT_ALL,
+	)
 )
 
 func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateClientRequest) (cli *ttnpb.Client, err error) {
