@@ -2285,6 +2285,33 @@
       "file": "tls.go"
     }
   },
+  "error:pkg/console:invalid_state": {
+    "translations": {
+      "en": "invalid state parameter in request"
+    },
+    "description": {
+      "package": "pkg/console",
+      "file": "callback.go"
+    }
+  },
+  "error:pkg/console:missing_code": {
+    "translations": {
+      "en": "missing code parameter in request"
+    },
+    "description": {
+      "package": "pkg/console",
+      "file": "callback.go"
+    }
+  },
+  "error:pkg/console:missing_state": {
+    "translations": {
+      "en": "missing state parameter in request"
+    },
+    "description": {
+      "package": "pkg/console",
+      "file": "callback.go"
+    }
+  },
   "error:pkg/console:no_oauth_config": {
     "translations": {
       "en": "no OAuth configuration found for the Console"
@@ -2292,6 +2319,15 @@
     "description": {
       "package": "pkg/console",
       "file": "console.go"
+    }
+  },
+  "error:pkg/console:oauth_authorization": {
+    "translations": {
+      "en": "OAuth authorization failed with `{error}`"
+    },
+    "description": {
+      "package": "pkg/console",
+      "file": "callback.go"
     }
   },
   "error:pkg/crypto/cryptoservices:no_app_key": {
