@@ -27,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 )
 
 const workersPerCPU = 2
@@ -204,7 +205,7 @@ func (srv *EventsServer) isVisible(ctx context.Context, evt events.Event) (bool,
 }
 
 // Stream implements the EventsServer interface.
-func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Events_StreamServer) (err error) {
+func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Events_StreamServer) error {
 	ctx := stream.Context()
 
 	if len(req.Identifiers) == 0 {
@@ -222,6 +223,10 @@ func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Eve
 
 	if req.Tail > 0 || req.After != nil {
 		warning.Add(ctx, "Historical events not implemented")
+	}
+
+	if err := stream.SendHeader(metadata.MD{}); err != nil {
+		return err
 	}
 
 	srv.pubsub.Publish(evtStreamStart(ctx, req, req))
