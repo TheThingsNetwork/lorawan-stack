@@ -121,12 +121,12 @@ func Test(t *testing.T) {
 
 	received := 0
 	for _, tc := range []struct {
-		Name            string
-		Path            *ttnpb.DownlinkPath
-		Message         *ttnpb.DownlinkMessage
-		ErrorAssertion  func(error) bool
-		DetailAssertion []func(error) bool
-		ExpectedEIRP    float32
+		Name             string
+		Path             *ttnpb.DownlinkPath
+		Message          *ttnpb.DownlinkMessage
+		ErrorAssertion   func(error) bool
+		RxErrorAssertion []func(error) bool
+		ExpectedEIRP     float32
 	}{
 		{
 			Name: "NoRequest",
@@ -184,7 +184,7 @@ func Test(t *testing.T) {
 				},
 			},
 			ErrorAssertion: errors.IsAborted,
-			DetailAssertion: []func(error) bool{
+			RxErrorAssertion: []func(error) bool{
 				errors.IsResourceExhausted,  // Rx1 conflicts with previous.
 				errors.IsFailedPrecondition, // Rx2 not provided.
 			},
@@ -347,8 +347,12 @@ func Test(t *testing.T) {
 				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 					t.Fatalf("Unexpected error: %v", err)
 				}
-				for i, assert := range tc.DetailAssertion {
-					errDetail := errors.Details(err)[i].(error)
+				for i, assert := range tc.RxErrorAssertion {
+					details := errors.Details(err)[0].(*ttnpb.ScheduleDownlinkErrorDetails)
+					if !a.So(details, should.NotBeNil) {
+						t.FailNow()
+					}
+					errDetail := ttnpb.ErrorDetailsFromProto(details.PathErrors[i])
 					if !a.So(assert(errDetail), should.BeTrue) {
 						t.Fatalf("Unexpected Rx window %d error: %v", i+1, errDetail)
 					}
