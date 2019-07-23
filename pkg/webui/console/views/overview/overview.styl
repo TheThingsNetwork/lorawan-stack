@@ -1,0 +1,108 @@
+// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+.welcome, .get-started
+  text-align: center
+
+.welcome-title-section
+  padding: $ls.l 0 $ls.xl
+
+.welcome-section
+  padding: 0 0 $ls.xl
+
+.welcome
+  font-size: $fs.xl3
+
+.get-started
+  font-size: $fs.l
+
+.get-started
+  font-weight: normal
+
+.chooser
+  cursor: pointer
+  display: flex
+  justify-content: center
+  flex-direction: column
+  align-items: center
+  transform: scale(1.0001) // Will fix jiggle in animation
+  height: 28rem
+  width: 28rem
+  background: white
+  margin: 0 auto $ls.l auto
+  box-shadow: 0 4px 35px 0 rgba(0,0,0,0.04), inset 0 -1px 0 0 rgba(0,0,0,0.11)
+  border-radius: 25px
+  transition: box-shadow .4s cubic-bezier(0.250, 0.010, 0.070, 1.000), transform .4s cubic-bezier(0.250, 0.010, 0.070, 1.000)
+
+  & > div
+    margin-top: -2.9rem
+
+  & > span
+    h2()
+    one-liner()
+    color: $tc-active
+    font-weight: normal
+    margin-top: $cs.s * -1
+
+  &:hover
+    transform: scale(1.05)
+    box-shadow: 0 4px 55px 0 rgba(0,0,0,0.04), inset 0 -1px 0 0 rgba(0,0,0,0.11)
+
+.component-cards
+  display: flex
+  flex-wrap: wrap
+
+.component-section
+  margin-bottom: $ls.l
+
+.component-card
+  display: inline-flex
+  margin: 0 $cs.xl $cs.xl 0
+  max-width: 18rem
+  flex-shrink: 0
+
+  &-icon
+    nudge('down')
+
+  &-desc
+    one-liner()
+    margin-left: $cs.m
+    display: flex
+    flex-direction: column
+    overflow: hidden
+
+    & > span
+      display: block
+
+  &-name
+    display: flex
+    font-weight: 600
+    margin-bottom: $cs.xs
+
+    & > span:first-child
+      margin-right: $cs.xs
+
+  &-host
+    font-family: $font-family-mono
+    font-size: $fs.s
+    overflow: hidden
+    text-overflow: ellipsis
+
+.version-info-section
+  display: flex
+  flex-direction: column
+
+.version-value
+  font-size: $fs.xl4
+  font-weight: bold
