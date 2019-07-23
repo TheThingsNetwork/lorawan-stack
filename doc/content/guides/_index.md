@@ -7,5 +7,4 @@ menu:
     weight: 2
 ---
 
-Tutorials and advanced walk-through of the stack core and less know features. Each guide focus on a specific objective such as "Mass provisioning devices" or "Manipulate gateway events". While they don't describe the feature in full or use all of the available method, they provide
-valuable explanations.
+This section provides guides for common scenarios. Each guide focuses on achieving a specific goal in a step-by-step way and contains examples.
