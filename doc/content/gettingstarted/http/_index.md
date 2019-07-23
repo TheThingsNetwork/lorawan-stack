@@ -1,4 +1,0 @@
----
-title: "HTTP API"
-description: ""
----
