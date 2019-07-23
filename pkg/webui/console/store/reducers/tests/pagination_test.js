@@ -29,7 +29,7 @@ describe('pagination reducers', function () {
 
   describe('flat', function () {
     const reducer = createNamedPaginationReducer(NAME, entityIdSelector)
-    const defaultState = { ids: [], totalCount: 0 }
+    const defaultState = { ids: [], totalCount: undefined }
 
     const {
       request,

@@ -40,7 +40,7 @@ export const createPaginationTotalCountSelectorByEntity = function (entity) {
   const storeSelector = createStoreSelectorByEntity(entity)
 
   return function (state) {
-    return storeSelector(state).totalCount || 0
+    return storeSelector(state).totalCount
   }
 }
 
@@ -51,6 +51,6 @@ export const createPaginationTotalCountSelectorByEntityAndId = function (entity)
     const store = storeSelector(state)
     const storeById = store[id] || {}
 
-    return storeById.totalCount || 0
+    return storeById.totalCount
   }
 }
