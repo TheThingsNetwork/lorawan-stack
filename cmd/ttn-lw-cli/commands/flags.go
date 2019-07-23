@@ -15,7 +15,9 @@
 package commands
 
 import (
+	"io"
 	"io/ioutil"
+	"os"
 	"strings"
 
 	"github.com/spf13/pflag"
@@ -203,15 +205,43 @@ func getCombinedIdentifiers(flagSet *pflag.FlagSet) *ttnpb.CombinedIdentifiers {
 	return ids
 }
 
-func dataFlags() *pflag.FlagSet {
+// dataFlags returns a flag set for loading binary data.
+// Use getDataBytes() or getDataReader() to obtain the binary data.
+// The given name and usage are optional specifiers to differentiate different purposes (i.e. source and destination).
+func dataFlags(name, usage string) *pflag.FlagSet {
+	flagName := "local-file"
+	if name != "" {
+		flagName = name + "-" + flagName
+	}
+	flagUsage := "(local file name)"
+	if usage != "" {
+		flagUsage = usage + " " + flagUsage
+	}
 	flagSet := &pflag.FlagSet{}
-	flagSet.String("local-file", "", "local file name")
+	flagSet.String(flagName, "", flagUsage)
 	return flagSet
 }
 
-func getData(flagSet *pflag.FlagSet) ([]byte, error) {
-	if filename, _ := flagSet.GetString("local-file"); filename != "" {
-		return ioutil.ReadFile(filename)
+var errNoData = errors.DefineInvalidArgument("no_data", "no data for `{name}`")
+
+func getDataBytes(name string, flagSet *pflag.FlagSet) ([]byte, error) {
+	r, err := getDataReader(name, flagSet)
+	if err != nil {
+		return nil, err
 	}
-	return nil, nil
+	return ioutil.ReadAll(r)
+}
+
+func getDataReader(name string, flagSet *pflag.FlagSet) (io.Reader, error) {
+	flagName := "local-file"
+	if name != "" {
+		flagName = name + "-" + flagName
+	}
+	if filename, _ := flagSet.GetString(flagName); filename != "" {
+		return os.Open(filename)
+	}
+	if name == "" {
+		name = "default"
+	}
+	return nil, errNoData.WithAttributes("name", name)
 }

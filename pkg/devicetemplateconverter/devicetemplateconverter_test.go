@@ -12,27 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package joinserver_test
+package devicetemplateconverter_test
 
 import (
-	"strconv"
+	"testing"
 
-	pbtypes "github.com/gogo/protobuf/types"
-	"go.thethings.network/lorawan-stack/pkg/provisioning"
+	"go.thethings.network/lorawan-stack/pkg/component"
+	. "go.thethings.network/lorawan-stack/pkg/devicetemplateconverter"
+	"go.thethings.network/lorawan-stack/pkg/log"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
-var (
-	Timeout = (1 << 8) * test.Delay
-)
+func TestDeviceTemplateConverter(t *testing.T) {
+	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 
-type byteToSerialNumber struct {
-}
+	conf := &component.Config{}
+	c := component.MustNew(test.GetLogger(t), conf)
 
-func (p *byteToSerialNumber) UniqueID(entry *pbtypes.Struct) (string, error) {
-	return strconv.Itoa(int(entry.Fields["serial_number"].GetNumberValue())), nil
-}
+	test.Must(New(c, &Config{}))
+	test.Must(c.Start(), nil)
+	defer c.Close()
 
-func init() {
-	provisioning.Register("mock", &byteToSerialNumber{})
+	mustHavePeer(ctx, c, ttnpb.PeerInfo_DEVICE_TEMPLATE_CONVERTER)
 }

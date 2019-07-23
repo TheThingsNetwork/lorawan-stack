@@ -12,27 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package joinserver_test
+package provisioning
 
 import (
-	"strconv"
+	"strings"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	"go.thethings.network/lorawan-stack/pkg/provisioning"
-	"go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
-var (
-	Timeout = (1 << 8) * test.Delay
-)
+// Microchip is the provisioning ID for Microchip devices.
+const Microchip = "microchip"
 
-type byteToSerialNumber struct {
-}
+type microchip struct{}
 
-func (p *byteToSerialNumber) UniqueID(entry *pbtypes.Struct) (string, error) {
-	return strconv.Itoa(int(entry.Fields["serial_number"].GetNumberValue())), nil
+// UniqueID returns the serial number.
+func (p *microchip) UniqueID(entry *pbtypes.Struct) (string, error) {
+	sn := entry.Fields["uniqueId"].GetStringValue()
+	if sn == "" {
+		return "", errEntry
+	}
+	return strings.ToUpper(sn), nil
 }
 
 func init() {
-	provisioning.Register("mock", &byteToSerialNumber{})
+	Register(Microchip, new(microchip))
 }

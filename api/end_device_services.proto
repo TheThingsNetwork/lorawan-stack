@@ -61,3 +61,20 @@ service EndDeviceRegistry {
     };
   };
 }
+
+service EndDeviceTemplateConverter {
+  // Returns the configured formats to convert from.
+  rpc ListFormats(google.protobuf.Empty) returns (EndDeviceTemplateFormats) {
+    option (google.api.http) = {
+      get: "/edtc/formats"
+    };
+  };
+
+  // Converts the binary data to a stream of end device templates.
+  rpc Convert(ConvertEndDeviceTemplateRequest) returns (stream EndDeviceTemplate) {
+    option (google.api.http) = {
+      post: "/edtc/convert",
+      body: "*"
+    };
+  };
+}

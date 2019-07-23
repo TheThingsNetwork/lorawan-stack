@@ -12,27 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package joinserver_test
+package provisioning_test
 
 import (
-	"strconv"
+	"testing"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	"go.thethings.network/lorawan-stack/pkg/provisioning"
-	"go.thethings.network/lorawan-stack/pkg/util/test"
+	"github.com/smartystreets/assertions"
+	. "go.thethings.network/lorawan-stack/pkg/provisioning"
+	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-var (
-	Timeout = (1 << 8) * test.Delay
-)
+func TestMicrochip(t *testing.T) {
+	a := assertions.New(t)
 
-type byteToSerialNumber struct {
-}
+	provisioner := Get(Microchip)
+	if !a.So(provisioner, should.NotBeNil) {
+		t.FailNow()
+	}
 
-func (p *byteToSerialNumber) UniqueID(entry *pbtypes.Struct) (string, error) {
-	return strconv.Itoa(int(entry.Fields["serial_number"].GetNumberValue())), nil
-}
+	entry := &pbtypes.Struct{
+		Fields: map[string]*pbtypes.Value{
+			"uniqueId": {
+				Kind: &pbtypes.Value_StringValue{
+					StringValue: "abcd",
+				},
+			},
+		},
+	}
 
-func init() {
-	provisioning.Register("mock", &byteToSerialNumber{})
+	uniqueID, err := provisioner.UniqueID(entry)
+	a.So(err, should.BeNil)
+	a.So(uniqueID, should.Equal, "ABCD")
 }

@@ -84,11 +84,9 @@ func preRun(tasks ...func() error) func(cmd *cobra.Command, args []string) error
 
 		// create input decoder on Stdin
 		if io.IsPipe(os.Stdin) {
-			switch config.InputFormat {
-			case "json":
-				inputDecoder = io.NewJSONDecoder(os.Stdin)
-			default:
-				return fmt.Errorf("unknown input format: %s", config.InputFormat)
+			inputDecoder, err = getInputDecoder(os.Stdin)
+			if err != nil {
+				return err
 			}
 		}
 

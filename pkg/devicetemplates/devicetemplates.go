@@ -12,27 +12,5 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package joinserver_test
-
-import (
-	"strconv"
-
-	pbtypes "github.com/gogo/protobuf/types"
-	"go.thethings.network/lorawan-stack/pkg/provisioning"
-	"go.thethings.network/lorawan-stack/pkg/util/test"
-)
-
-var (
-	Timeout = (1 << 8) * test.Delay
-)
-
-type byteToSerialNumber struct {
-}
-
-func (p *byteToSerialNumber) UniqueID(entry *pbtypes.Struct) (string, error) {
-	return strconv.Itoa(int(entry.Fields["serial_number"].GetNumberValue())), nil
-}
-
-func init() {
-	provisioning.Register("mock", &byteToSerialNumber{})
-}
+// Package devicetemplates implements creating templates for devices.
+package devicetemplates

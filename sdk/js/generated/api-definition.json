@@ -746,6 +746,30 @@
       ]
     }
   },
+  "EndDeviceTemplateConverter": {
+    "ListFormats": {
+      "file": "lorawan-stack/api/end_device_services.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/edtc/formats",
+          "parameters": []
+        }
+      ]
+    },
+    "Convert": {
+      "file": "lorawan-stack/api/end_device_services.proto",
+      "http": [
+        {
+          "method": "post",
+          "pattern": "/edtc/convert",
+          "body": "*",
+          "parameters": [],
+          "stream": true
+        }
+      ]
+    }
+  },
   "Events": {
     "Stream": {
       "file": "lorawan-stack/api/events.proto",

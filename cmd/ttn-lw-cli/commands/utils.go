@@ -15,9 +15,13 @@
 package commands
 
 import (
+	"fmt"
+	stdio "io"
 	"net"
 	"net/url"
 	"strings"
+
+	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/io"
 )
 
 func getHost(address string) string {
@@ -46,4 +50,13 @@ func getHosts(addresses ...string) []string {
 		hosts = append(hosts, host)
 	}
 	return hosts
+}
+
+func getInputDecoder(reader stdio.Reader) (io.Decoder, error) {
+	switch config.InputFormat {
+	case "json":
+		return io.NewJSONDecoder(reader), nil
+	default:
+		return nil, fmt.Errorf("unknown input format: %s", config.InputFormat)
+	}
 }

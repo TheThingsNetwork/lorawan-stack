@@ -1088,6 +1088,15 @@
       "file": "errors.go"
     }
   },
+  "error:cmd/internal/shared:initialize_device_template_converter": {
+    "translations": {
+      "en": "could not initialize Device Template Converter"
+    },
+    "description": {
+      "package": "cmd/internal/shared",
+      "file": "errors.go"
+    }
+  },
   "error:cmd/internal/shared:initialize_gateway_configuration_server": {
     "translations": {
       "en": "could not initialize Gateway Configuration Server"
@@ -1223,6 +1232,15 @@
       "file": "end_devices.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:mapped_end_device_not_found": {
+    "translations": {
+      "en": "end device mapping not found"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "end_device_templates.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/commands:no_api_key_id": {
     "translations": {
       "en": "no API key ID set"
@@ -1286,6 +1304,15 @@
       "file": "flags.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:no_data": {
+    "translations": {
+      "en": "no data for `{name}`"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "flags.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/commands:no_email": {
     "translations": {
       "en": "no email set"
@@ -1311,6 +1338,24 @@
     "description": {
       "package": "cmd/ttn-lw-cli/commands",
       "file": "end_devices.go"
+    }
+  },
+  "error:cmd/ttn-lw-cli/commands:no_end_device_template_join_eui": {
+    "translations": {
+      "en": "no end device template JoinEUI set"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "end_device_templates.go"
+    }
+  },
+  "error:cmd/ttn-lw-cli/commands:no_end_device_template_start_dev_eui": {
+    "translations": {
+      "en": "no end device template start DevEUI set"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "end_device_templates.go"
     }
   },
   "error:cmd/ttn-lw-cli/commands:no_gateway_id": {
@@ -1347,6 +1392,15 @@
     "description": {
       "package": "cmd/ttn-lw-cli/commands",
       "file": "applications_pubsub.go"
+    }
+  },
+  "error:cmd/ttn-lw-cli/commands:no_template_format_id": {
+    "translations": {
+      "en": "no template format ID set"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "end_device_templates.go"
     }
   },
   "error:cmd/ttn-lw-cli/commands:no_token_id": {
@@ -2391,6 +2445,33 @@
     "description": {
       "package": "pkg/devicerepository",
       "file": "devicerepository.go"
+    }
+  },
+  "error:pkg/devicetemplateconverter:converter": {
+    "translations": {
+      "en": "converter `{id}` not found"
+    },
+    "description": {
+      "package": "pkg/devicetemplateconverter",
+      "file": "devicetemplateconverter.go"
+    }
+  },
+  "error:pkg/devicetemplates:microchip_data": {
+    "translations": {
+      "en": "invalid Microchip data"
+    },
+    "description": {
+      "package": "pkg/devicetemplates",
+      "file": "microchip.go"
+    }
+  },
+  "error:pkg/devicetemplates:microchip_public_key": {
+    "translations": {
+      "en": "unknown Microchip public key ID `{id}`"
+    },
+    "description": {
+      "package": "pkg/devicetemplates",
+      "file": "microchip.go"
     }
   },
   "error:pkg/email/sendgrid:email_not_sent": {
@@ -3860,24 +3941,6 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/joinserver/provisioning:entry": {
-    "translations": {
-      "en": "invalid entry"
-    },
-    "description": {
-      "package": "pkg/joinserver/provisioning",
-      "file": "provisioning.go"
-    }
-  },
-  "error:pkg/joinserver/provisioning:microchip_public_key": {
-    "translations": {
-      "en": "unknown Microchip public key ID `{id}`"
-    },
-    "description": {
-      "package": "pkg/joinserver/provisioning",
-      "file": "microchip.go"
-    }
-  },
   "error:pkg/joinserver/redis:already_provisioned": {
     "translations": {
       "en": "device already provisioned"
@@ -4947,6 +5010,15 @@
     "description": {
       "package": "pkg/pfconfig/shared",
       "file": "shared.go"
+    }
+  },
+  "error:pkg/provisioning:entry": {
+    "translations": {
+      "en": "invalid entry"
+    },
+    "description": {
+      "package": "pkg/provisioning",
+      "file": "provisioning.go"
     }
   },
   "error:pkg/redis:not_found": {

@@ -39,6 +39,7 @@ message PeerInfo {
     APPLICATION_SERVER = 5;
     JOIN_SERVER = 6;
     CRYPTO_SERVER = 7;
+    DEVICE_TEMPLATE_CONVERTER = 8;
   }
 
   // Tags of the peer

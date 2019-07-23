@@ -3787,6 +3787,11 @@
               "name": "CRYPTO_SERVER",
               "number": "7",
               "description": ""
+            },
+            {
+              "name": "DEVICE_TEMPLATE_CONVERTER",
+              "number": "8",
+              "description": ""
             }
           ]
         }
@@ -4302,6 +4307,49 @@
       ],
       "extensions": [],
       "messages": [
+        {
+          "name": "ConvertEndDeviceTemplateRequest",
+          "longName": "ConvertEndDeviceTemplateRequest",
+          "fullName": "ttn.lorawan.v3.ConvertEndDeviceTemplateRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "format_id",
+              "description": "ID of the format.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "data",
+              "description": "Data to convert.",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
         {
           "name": "CreateEndDeviceRequest",
           "longName": "CreateEndDeviceRequest",
@@ -5101,6 +5149,174 @@
               "type": "string",
               "longType": "string",
               "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "EndDeviceTemplate",
+          "longName": "EndDeviceTemplate",
+          "fullName": "ttn.lorawan.v3.EndDeviceTemplate",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "end_device",
+              "description": "",
+              "label": "",
+              "type": "EndDevice",
+              "longType": "EndDevice",
+              "fullType": "ttn.lorawan.v3.EndDevice",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "field_mask",
+              "description": "",
+              "label": "",
+              "type": "FieldMask",
+              "longType": "google.protobuf.FieldMask",
+              "fullType": "google.protobuf.FieldMask",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "mapping_key",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 100
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "EndDeviceTemplateFormat",
+          "longName": "EndDeviceTemplateFormat",
+          "fullName": "ttn.lorawan.v3.EndDeviceTemplateFormat",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "name",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 100
+                  }
+                ]
+              }
+            },
+            {
+              "name": "description",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 200
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "EndDeviceTemplateFormats",
+          "longName": "EndDeviceTemplateFormats",
+          "fullName": "ttn.lorawan.v3.EndDeviceTemplateFormats",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "formats",
+              "description": "",
+              "label": "repeated",
+              "type": "FormatsEntry",
+              "longType": "EndDeviceTemplateFormats.FormatsEntry",
+              "fullType": "ttn.lorawan.v3.EndDeviceTemplateFormats.FormatsEntry",
+              "ismap": true,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "map.keys.string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "map.keys.string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "FormatsEntry",
+          "longName": "EndDeviceTemplateFormats.FormatsEntry",
+          "fullName": "ttn.lorawan.v3.EndDeviceTemplateFormats.FormatsEntry",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "key",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "value",
+              "description": "",
+              "label": "",
+              "type": "EndDeviceTemplateFormat",
+              "longType": "EndDeviceTemplateFormat",
+              "fullType": "ttn.lorawan.v3.EndDeviceTemplateFormat",
               "ismap": false,
               "defaultValue": ""
             }
@@ -6851,6 +7067,59 @@
                     {
                       "method": "DELETE",
                       "pattern": "/applications/{application_ids.application_id}/devices/{device_id}"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "EndDeviceTemplateConverter",
+          "longName": "EndDeviceTemplateConverter",
+          "fullName": "ttn.lorawan.v3.EndDeviceTemplateConverter",
+          "description": "",
+          "methods": [
+            {
+              "name": "ListFormats",
+              "description": "Returns the configured formats to convert from.",
+              "requestType": "Empty",
+              "requestLongType": ".google.protobuf.Empty",
+              "requestFullType": "google.protobuf.Empty",
+              "requestStreaming": false,
+              "responseType": "EndDeviceTemplateFormats",
+              "responseLongType": "EndDeviceTemplateFormats",
+              "responseFullType": "ttn.lorawan.v3.EndDeviceTemplateFormats",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/edtc/formats"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Convert",
+              "description": "Converts the binary data to a stream of end device templates.",
+              "requestType": "ConvertEndDeviceTemplateRequest",
+              "requestLongType": "ConvertEndDeviceTemplateRequest",
+              "requestFullType": "ttn.lorawan.v3.ConvertEndDeviceTemplateRequest",
+              "requestStreaming": false,
+              "responseType": "EndDeviceTemplate",
+              "responseLongType": "EndDeviceTemplate",
+              "responseFullType": "ttn.lorawan.v3.EndDeviceTemplate",
+              "responseStreaming": true,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "POST",
+                      "pattern": "/edtc/convert",
+                      "body": "*"
                     }
                   ]
                 }
@@ -10901,7 +11170,10 @@
               "ismap": false,
               "defaultValue": ""
             }
-          ]
+          ],
+          "options": {
+            "deprecated": true
+          }
         },
         {
           "name": "IdentifiersFromData",
@@ -11177,7 +11449,7 @@
             },
             {
               "name": "Provision",
-              "description": "Provision returns end devices that are provisioned using the given vendor-specific data.\nThe devices are not set in the registry.",
+              "description": "This rpc is deprecated; use EndDeviceTemplateConverter service instead.\nTODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/999)",
               "requestType": "ProvisionEndDevicesRequest",
               "requestLongType": "ProvisionEndDevicesRequest",
               "requestFullType": "ttn.lorawan.v3.ProvisionEndDevicesRequest",
@@ -11187,6 +11459,7 @@
               "responseFullType": "ttn.lorawan.v3.EndDevice",
               "responseStreaming": true,
               "options": {
+                "deprecated": true,
                 "google.api.http": {
                   "rules": [
                     {

@@ -13,6 +13,7 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/gogo/protobuf/types"
 	"github.com/golang/protobuf/proto"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/grpc-ecosystem/grpc-gateway/utilities"
@@ -245,6 +246,40 @@ func request_EndDeviceRegistry_Delete_0(ctx context.Context, marshaler runtime.M
 
 }
 
+func request_EndDeviceTemplateConverter_ListFormats_0(ctx context.Context, marshaler runtime.Marshaler, client EndDeviceTemplateConverterClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq types.Empty
+	var metadata runtime.ServerMetadata
+
+	msg, err := client.ListFormats(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func request_EndDeviceTemplateConverter_Convert_0(ctx context.Context, marshaler runtime.Marshaler, client EndDeviceTemplateConverterClient, req *http.Request, pathParams map[string]string) (EndDeviceTemplateConverter_ConvertClient, runtime.ServerMetadata, error) {
+	var protoReq ConvertEndDeviceTemplateRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	stream, err := client.Convert(ctx, &protoReq)
+	if err != nil {
+		return nil, metadata, err
+	}
+	header, err := stream.Header()
+	if err != nil {
+		return nil, metadata, err
+	}
+	metadata.HeaderMD = header
+	return stream, metadata, nil
+
+}
+
 // RegisterEndDeviceRegistryHandlerFromEndpoint is same as RegisterEndDeviceRegistryHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
 func RegisterEndDeviceRegistryHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
@@ -408,4 +443,97 @@ var (
 	forward_EndDeviceRegistry_Update_0 = runtime.ForwardResponseMessage
 
 	forward_EndDeviceRegistry_Delete_0 = runtime.ForwardResponseMessage
+)
+
+// RegisterEndDeviceTemplateConverterHandlerFromEndpoint is same as RegisterEndDeviceTemplateConverterHandler but
+// automatically dials to "endpoint" and closes the connection when "ctx" gets done.
+func RegisterEndDeviceTemplateConverterHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
+	conn, err := grpc.Dial(endpoint, opts...)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err != nil {
+			if cerr := conn.Close(); cerr != nil {
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
+			}
+			return
+		}
+		go func() {
+			<-ctx.Done()
+			if cerr := conn.Close(); cerr != nil {
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
+			}
+		}()
+	}()
+
+	return RegisterEndDeviceTemplateConverterHandler(ctx, mux, conn)
+}
+
+// RegisterEndDeviceTemplateConverterHandler registers the http handlers for service EndDeviceTemplateConverter to "mux".
+// The handlers forward requests to the grpc endpoint over "conn".
+func RegisterEndDeviceTemplateConverterHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
+	return RegisterEndDeviceTemplateConverterHandlerClient(ctx, mux, NewEndDeviceTemplateConverterClient(conn))
+}
+
+// RegisterEndDeviceTemplateConverterHandlerClient registers the http handlers for service EndDeviceTemplateConverter
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "EndDeviceTemplateConverterClient".
+// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "EndDeviceTemplateConverterClient"
+// doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
+// "EndDeviceTemplateConverterClient" to call the correct interceptors.
+func RegisterEndDeviceTemplateConverterHandlerClient(ctx context.Context, mux *runtime.ServeMux, client EndDeviceTemplateConverterClient) error {
+
+	mux.Handle("GET", pattern_EndDeviceTemplateConverter_ListFormats_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_EndDeviceTemplateConverter_ListFormats_0(rctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_EndDeviceTemplateConverter_ListFormats_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("POST", pattern_EndDeviceTemplateConverter_Convert_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_EndDeviceTemplateConverter_Convert_0(rctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_EndDeviceTemplateConverter_Convert_0(ctx, mux, outboundMarshaler, w, req, func() (proto.Message, error) { return resp.Recv() }, mux.GetForwardResponseOptions()...)
+
+	})
+
+	return nil
+}
+
+var (
+	pattern_EndDeviceTemplateConverter_ListFormats_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"edtc", "formats"}, "", runtime.AssumeColonVerbOpt(true)))
+
+	pattern_EndDeviceTemplateConverter_Convert_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"edtc", "convert"}, "", runtime.AssumeColonVerbOpt(true)))
+)
+
+var (
+	forward_EndDeviceTemplateConverter_ListFormats_0 = runtime.ForwardResponseMessage
+
+	forward_EndDeviceTemplateConverter_Convert_0 = runtime.ForwardResponseStream
 )
