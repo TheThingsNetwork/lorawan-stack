@@ -44,13 +44,13 @@ const Footer = function ({
 }) {
   return (
     <footer className={classnames(className, style.footer)}>
-      <div className={style.wrapper}>
-        <span><Message content={m.footer} /> — </span>
+      <div>
+        <span><Message content={m.footer} /> – </span>
         <a className={style.link} href="https://www.thethingsnetwork.org">
           The Things Network
         </a>
       </div>
-      <div className={style.wrapper}>
+      <div>
         {
           links.map((item, key) => (
             <Link key={key} className={style.link} to={item.link}>
@@ -58,6 +58,7 @@ const Footer = function ({
             </Link>
           ))
         }
+        <span className={style.version}>v{process.env.VERSION}</span>
       </div>
     </footer>
   )
