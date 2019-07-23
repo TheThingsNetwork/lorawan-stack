@@ -229,7 +229,22 @@ func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Eve
 		return err
 	}
 
-	srv.pubsub.Publish(evtStreamStart(ctx, req, req))
+	evtStreamStart := evtStreamStart(ctx, req, req)
+	srv.pubsub.Publish(evtStreamStart)
+
+	evtStreamStartVisible, err := srv.isVisible(ctx, evtStreamStart)
+	if err != nil {
+		return err
+	}
+	if !evtStreamStartVisible {
+		evt, err := events.Proto(evtStreamStart)
+		if err != nil {
+			return err
+		}
+		if err := stream.Send(evt); err != nil {
+			return err
+		}
+	}
 	defer srv.pubsub.Publish(evtStreamStop(ctx, req, req))
 
 	for {
