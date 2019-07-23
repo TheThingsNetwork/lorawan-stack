@@ -312,7 +312,9 @@ var (
 				}
 			}
 
-			if abp, _ := cmd.Flags().GetBool("abp"); abp {
+			abp, _ := cmd.Flags().GetBool("abp")
+			multicast, _ := cmd.Flags().GetBool("multicast")
+			if abp || multicast {
 				device.SupportsJoin = false
 				if config.NetworkServerEnabled {
 					paths = append(paths, "supports_join")
