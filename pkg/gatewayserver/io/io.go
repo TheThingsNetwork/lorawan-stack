@@ -295,7 +295,8 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 		if sb, ok := phy.FindSubBand(rx.frequency); ok {
 			eirp = sb.MaxEIRP
 		}
-		if c.fp.MaxEIRP != nil && *c.fp.MaxEIRP < eirp {
+		// TODO: Take frequency plan's sub-band MaxEIRP (https://github.com/TheThingsNetwork/lorawan-stack/issues/300)
+		if c.fp.MaxEIRP != nil {
 			eirp = *c.fp.MaxEIRP
 		}
 		settings := ttnpb.TxSettings{
