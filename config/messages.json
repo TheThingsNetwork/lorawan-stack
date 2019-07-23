@@ -6074,6 +6074,33 @@
       "file": "observability.go"
     }
   },
+  "event:ns.end_device.create": {
+    "translations": {
+      "en": "create end device"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "grpc_deviceregistry.go"
+    }
+  },
+  "event:ns.end_device.delete": {
+    "translations": {
+      "en": "delete end device"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "grpc_deviceregistry.go"
+    }
+  },
+  "event:ns.end_device.update": {
+    "translations": {
+      "en": "update end device"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "grpc_deviceregistry.go"
+    }
+  },
   "event:ns.mac.adr_param_setup.answer": {
     "translations": {
       "en": "ADR parameter setup answer received"
