@@ -21,7 +21,7 @@ import {
 
 const defaultState = {
   ids: [],
-  totalCount: 0,
+  totalCount: undefined,
 }
 
 export const createNamedPaginationReducer = function (reducerName, entityIdSelector) {
