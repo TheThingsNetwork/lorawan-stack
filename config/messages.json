@@ -6065,6 +6065,33 @@
       "file": "invitation_registry.go"
     }
   },
+  "event:js.end_device.create": {
+    "translations": {
+      "en": "create end device"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "grpc_deviceregistry.go"
+    }
+  },
+  "event:js.end_device.delete": {
+    "translations": {
+      "en": "delete end device"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "grpc_deviceregistry.go"
+    }
+  },
+  "event:js.end_device.update": {
+    "translations": {
+      "en": "update end device"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "grpc_deviceregistry.go"
+    }
+  },
   "event:js.join.accept": {
     "translations": {
       "en": "accept join-request"
