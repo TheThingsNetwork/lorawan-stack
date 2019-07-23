@@ -261,10 +261,17 @@ func (m *ApplicationWebhookTemplateField) ValidateFields(paths ...string) error 
 		switch name {
 		case "id":
 
-			if utf8.RuneCountInString(m.GetID()) > 20 {
+			if utf8.RuneCountInString(m.GetID()) > 36 {
 				return ApplicationWebhookTemplateFieldValidationError{
 					field:  "id",
-					reason: "value length must be at most 20 runes",
+					reason: "value length must be at most 36 runes",
+				}
+			}
+
+			if !_ApplicationWebhookTemplateField_ID_Pattern.MatchString(m.GetID()) {
+				return ApplicationWebhookTemplateFieldValidationError{
+					field:  "id",
+					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
 				}
 			}
 
@@ -363,6 +370,8 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ApplicationWebhookTemplateFieldValidationError{}
+
+var _ApplicationWebhookTemplateField_ID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
 // ValidateFields checks the field values on ApplicationWebhookTemplate with
 // the rules defined in the proto definition for this message. If any rules
@@ -477,6 +486,13 @@ func (m *ApplicationWebhookTemplate) ValidateFields(paths ...string) error {
 				return ApplicationWebhookTemplateValidationError{
 					field:  "format",
 					reason: "value length must be at most 20 runes",
+				}
+			}
+
+			if !_ApplicationWebhookTemplate_Format_Pattern.MatchString(m.GetFormat()) {
+				return ApplicationWebhookTemplateValidationError{
+					field:  "format",
+					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
 				}
 			}
 
@@ -660,6 +676,8 @@ var _ interface {
 	ErrorName() string
 } = ApplicationWebhookTemplateValidationError{}
 
+var _ApplicationWebhookTemplate_Format_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+
 // ValidateFields checks the field values on ApplicationWebhookTemplates with
 // the rules defined in the proto definition for this message. If any rules
 // are violated, an error is returned.
@@ -833,6 +851,13 @@ func (m *ApplicationWebhook) ValidateFields(paths ...string) error {
 				return ApplicationWebhookValidationError{
 					field:  "format",
 					reason: "value length must be at most 20 runes",
+				}
+			}
+
+			if !_ApplicationWebhook_Format_Pattern.MatchString(m.GetFormat()) {
+				return ApplicationWebhookValidationError{
+					field:  "format",
+					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
 				}
 			}
 
@@ -1011,6 +1036,8 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ApplicationWebhookValidationError{}
+
+var _ApplicationWebhook_Format_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
 // ValidateFields checks the field values on ApplicationWebhooks with the rules
 // defined in the proto definition for this message. If any rules are

@@ -25,7 +25,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/web/redis"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/config"
-	"go.thethings.network/lorawan-stack/pkg/fetch"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
@@ -163,15 +162,15 @@ func TestTemplateStoreRPC(t *testing.T) {
 
 	for _, tc := range []struct {
 		name       string
-		fetcher    fetch.Interface
+		contents   map[string][]byte
 		assertGet  func(*assertions.Assertion, *ttnpb.ApplicationWebhookTemplate, error)
 		assertList func(*assertions.Assertion, *ttnpb.ApplicationWebhookTemplates, error)
 	}{
 		{
 			name: "InvalidStore",
-			fetcher: fetch.NewMemFetcher(map[string][]byte{
+			contents: map[string][]byte{
 				"templates.yml": []byte(`invalid-yaml`),
-			}),
+			},
 			assertGet: func(a *assertions.Assertion, res *ttnpb.ApplicationWebhookTemplate, err error) {
 				a.So(err, should.NotBeNil)
 				a.So(res, should.BeNil)
@@ -183,9 +182,9 @@ func TestTemplateStoreRPC(t *testing.T) {
 		},
 		{
 			name: "EmptyStore",
-			fetcher: fetch.NewMemFetcher(map[string][]byte{
+			contents: map[string][]byte{
 				"templates.yml": []byte(`--- []`),
-			}),
+			},
 			assertGet: func(a *assertions.Assertion, res *ttnpb.ApplicationWebhookTemplate, err error) {
 				a.So(err, should.NotBeNil)
 				a.So(res, should.BeNil)
@@ -198,7 +197,7 @@ func TestTemplateStoreRPC(t *testing.T) {
 		},
 		{
 			name: "NormalStore",
-			fetcher: fetch.NewMemFetcher(map[string][]byte{
+			contents: map[string][]byte{
 				"templates.yml": []byte(`---
 - foo`),
 				"foo.yml": []byte(
@@ -207,7 +206,7 @@ ids:
   template_id: foo
 name: Foo
 description: Bar`),
-			}),
+			},
 			assertGet: func(a *assertions.Assertion, res *ttnpb.ApplicationWebhookTemplate, err error) {
 				a.So(err, should.BeNil)
 				a.So(res, should.NotBeNil)
@@ -227,7 +226,10 @@ description: Bar`),
 
 			a := assertions.New(t)
 
-			store, err := web.NewTemplateStore(tc.fetcher)
+			config := web.TemplatesConfig{
+				Static: tc.contents,
+			}
+			store, err := config.NewTemplateStore()
 			a.So(err, should.BeNil)
 
 			c := component.MustNew(test.GetLogger(t), &component.Config{})

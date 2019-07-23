@@ -813,7 +813,7 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 | Field | Validations |
 | ----- | ----------- |
 | `ids` | <p>`message.required`: `true`</p> |
-| `format` | <p>`string.max_len`: `20`</p> |
+| `format` | <p>`string.max_len`: `20`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
 | `base_topic` | <p>`string.max_len`: `100`</p> |
 
 ### <a name="ttn.lorawan.v3.ApplicationPubSub.Message">Message `ApplicationPubSub.Message`</a>
@@ -964,7 +964,7 @@ The NATS provider settings.
 | ----- | ----------- |
 | `ids` | <p>`message.required`: `true`</p> |
 | `base_url` | <p>`string.uri`: `true`</p> |
-| `format` | <p>`string.max_len`: `20`</p> |
+| `format` | <p>`string.max_len`: `20`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
 
 ### <a name="ttn.lorawan.v3.ApplicationWebhook.HeadersEntry">Message `ApplicationWebhook.HeadersEntry`</a>
 
@@ -1047,7 +1047,7 @@ The NATS provider settings.
 | `info_url` | <p>`string.uri`: `true`</p> |
 | `documentation_url` | <p>`string.uri`: `true`</p> |
 | `base_url` | <p>`string.uri`: `true`</p> |
-| `format` | <p>`string.max_len`: `20`</p> |
+| `format` | <p>`string.max_len`: `20`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
 
 ### <a name="ttn.lorawan.v3.ApplicationWebhookTemplate.HeadersEntry">Message `ApplicationWebhookTemplate.HeadersEntry`</a>
 
@@ -1080,7 +1080,7 @@ The fields are meant to be replaced inside the URLs and headers when the webhook
 
 | Field | Validations |
 | ----- | ----------- |
-| `id` | <p>`string.max_len`: `20`</p> |
+| `id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
 | `name` | <p>`string.max_len`: `20`</p> |
 | `description` | <p>`string.max_len`: `100`</p> |
 | `default_value` | <p>`string.max_len`: `100`</p> |

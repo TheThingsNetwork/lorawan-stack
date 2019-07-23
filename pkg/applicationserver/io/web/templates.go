@@ -17,20 +17,35 @@ package web
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"path"
 	"sync"
 	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/fetch"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	ttnweb "go.thethings.network/lorawan-stack/pkg/web"
 	"gopkg.in/yaml.v2"
 )
 
-const yamlFetchErrorCache = 1 * time.Minute
+const (
+	yamlFetchErrorCache = 1 * time.Minute
+	directoryBaseURL    = "/as/webhook-templates/static"
+)
+
+// TemplatesConfig defines the configuration for the webhook templates registry.
+type TemplatesConfig struct {
+	Static    map[string][]byte `name:"-"`
+	Directory string            `name:"directory" description:"Retrieve the webhook templates from the filesystem"`
+	URL       string            `name:"url" description:"Retrieve the webhook templates from a web server"`
+}
 
 // TemplateStore contains the webhook templates.
 type TemplateStore struct {
-	Fetcher fetch.Interface
+	fetcher        fetch.Interface
+	mountDirectory string
+	baseURL        string
 
 	templateIDs          []string
 	templateIDsMu        sync.Mutex
@@ -41,12 +56,45 @@ type TemplateStore struct {
 	templatesMu sync.Mutex
 }
 
-// NewTemplateStore creates a new template store that is backed by the provided fetcher.
-func NewTemplateStore(fetcher fetch.Interface) (*TemplateStore, error) {
+// NewTemplateStore returns a new *web.TemplateStore based on the configuration.
+// If no stores are provided, this method returns nil.
+func (c TemplatesConfig) NewTemplateStore() (*TemplateStore, error) {
+	var fetcher fetch.Interface
+	var mountDirectory, baseURL string
+	switch {
+	case c.Static != nil:
+		fetcher = fetch.NewMemFetcher(c.Static)
+	case c.Directory != "":
+		fetcher = fetch.FromFilesystem(c.Directory)
+		mountDirectory = path.Join(c.Directory, "static")
+		baseURL = directoryBaseURL
+	case c.URL != "":
+		fetcher = fetch.FromHTTP(c.URL, true)
+		baseURL = path.Join(c.URL, "static")
+	default:
+		return nil, nil
+	}
 	return &TemplateStore{
-		Fetcher:   fetcher,
-		templates: make(map[string]queryResult),
+		fetcher:        fetcher,
+		mountDirectory: mountDirectory,
+		baseURL:        baseURL,
+		templates:      make(map[string]queryResult),
 	}, nil
+}
+
+// RegisterRoutes implements ttnweb.Registerer.
+func (ts *TemplateStore) RegisterRoutes(server *ttnweb.Server) {
+	if ts.mountDirectory != "" {
+		server.Static(directoryBaseURL, http.Dir(ts.mountDirectory))
+	}
+}
+
+// prependBaseURL prepends the base URL and the template ID to the LogoURL, if it is available.
+func (ts *TemplateStore) prependBaseURL(template *ttnpb.ApplicationWebhookTemplate) {
+	if template.LogoURL == "" {
+		return
+	}
+	template.LogoURL = path.Join(ts.baseURL, template.TemplateID, template.LogoURL)
 }
 
 // GetTemplate returns the template with the given identifiers.
@@ -55,7 +103,12 @@ func (ts *TemplateStore) GetTemplate(ctx context.Context, req *ttnpb.GetApplicat
 	if err != nil {
 		return nil, err
 	}
-	return applyWebhookTemplateFieldMask(nil, template, appendImplicitWebhookTemplatePaths(req.FieldMask.Paths...)...)
+	template, err = applyWebhookTemplateFieldMask(nil, template, appendImplicitWebhookTemplatePaths(req.FieldMask.Paths...)...)
+	if err != nil {
+		return nil, err
+	}
+	ts.prependBaseURL(template)
+	return template, nil
 }
 
 // ListTemplates returns the available templates.
@@ -79,6 +132,8 @@ func (ts *TemplateStore) ListTemplates(ctx context.Context, req *ttnpb.ListAppli
 			return nil, err
 		}
 
+		ts.prependBaseURL(template)
+
 		templates.Templates = append(templates.Templates, template)
 	}
 	return &templates, nil
@@ -96,7 +151,7 @@ var (
 )
 
 func (ts *TemplateStore) allTemplateIDs() (ids []string, err error) {
-	data, err := ts.Fetcher.File("templates.yml")
+	data, err := ts.fetcher.File("templates.yml")
 	if err != nil {
 		return nil, errFetchFailed.WithCause(err)
 	}
@@ -126,7 +181,7 @@ func (ts *TemplateStore) getAllTemplateIDs() ([]string, error) {
 }
 
 func (ts *TemplateStore) template(ids ttnpb.ApplicationWebhookTemplateIdentifiers) (*ttnpb.ApplicationWebhookTemplate, error) {
-	data, err := ts.Fetcher.File(fmt.Sprintf("%s.yml", ids.TemplateID))
+	data, err := ts.fetcher.File(fmt.Sprintf("%s.yml", ids.TemplateID))
 	if err != nil {
 		return nil, errFetchFailed.WithCause(err)
 	}

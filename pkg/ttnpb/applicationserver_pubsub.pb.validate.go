@@ -204,6 +204,13 @@ func (m *ApplicationPubSub) ValidateFields(paths ...string) error {
 				}
 			}
 
+			if !_ApplicationPubSub_Format_Pattern.MatchString(m.GetFormat()) {
+				return ApplicationPubSubValidationError{
+					field:  "format",
+					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+				}
+			}
+
 		case "base_topic":
 
 			if utf8.RuneCountInString(m.GetBaseTopic()) > 100 {
@@ -426,6 +433,8 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ApplicationPubSubValidationError{}
+
+var _ApplicationPubSub_Format_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
 // ValidateFields checks the field values on ApplicationPubSubs with the rules
 // defined in the proto definition for this message. If any rules are
