@@ -2,6 +2,9 @@
 title: "Concepts"
 description: ""
 weight: 3
+menu:
+  main:
+    weight: 3
 ---
 
 Before going further into in the documentation, getting to know the *Concepts* used throughout the stack is a must if you want to use the network at its full capacity.

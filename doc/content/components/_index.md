@@ -2,6 +2,9 @@
 title: "Components"
 description: ""
 weight: 4
+menu:
+  main:
+    weight: 4
 ---
 
 **Components** makes reference to all the important services and tools that make the stack lives.

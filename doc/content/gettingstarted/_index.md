@@ -4,7 +4,7 @@ description: ""
 weight: -1
 menu:
   main:
-    weight: 2
+    weight: 1
 ---
 
 This is a guide for setting up a private LoRaWAN Network Server using The Things Network Stack for LoRaWAN.
