@@ -79,7 +79,9 @@ const withBreadcrumb = (id, element) => function (Component) {
     }
 
     render () {
-      return <Component {...this.props} />
+      const { add, remove, breadcrumb, ...rest } = this.props
+
+      return <Component {...rest} />
     }
   }
 
