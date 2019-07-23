@@ -21,11 +21,16 @@ export default function () {
     component: undefined,
     when: {
       created (props) {
-        driver.component = shallow(
+        const wrapper = shallow(
           <Pagination {...props} />
-        ).dive()
+        )
 
-        return driver
+        if (wrapper.type() !== null) {
+          driver.component = wrapper.dive()
+          return driver
+        }
+
+        return undefined
       },
       navigatedNextPage () {
         driver.get.nextNavigationButton().simulate('click', {
