@@ -159,6 +159,7 @@
 - [File `lorawan-stack/api/gatewayserver.proto`](#lorawan-stack/api/gatewayserver.proto)
   - [Message `GatewayDown`](#ttn.lorawan.v3.GatewayDown)
   - [Message `GatewayUp`](#ttn.lorawan.v3.GatewayUp)
+  - [Message `ScheduleDownlinkErrorDetails`](#ttn.lorawan.v3.ScheduleDownlinkErrorDetails)
   - [Message `ScheduleDownlinkResponse`](#ttn.lorawan.v3.ScheduleDownlinkResponse)
   - [Service `Gs`](#ttn.lorawan.v3.Gs)
   - [Service `GtwGs`](#ttn.lorawan.v3.GtwGs)
@@ -1902,6 +1903,7 @@ The messages (for translation) are stored as "error:<namespace>:<name>".
 | `correlation_id` | [`string`](#string) |  | The correlation ID of the error can be used to correlate the error to stack traces the network may (or may not) store about recent errors. |
 | `cause` | [`ErrorDetails`](#ttn.lorawan.v3.ErrorDetails) |  | The error that caused this error. |
 | `code` | [`uint32`](#uint32) |  | The status code of the error. |
+| `details` | [`google.protobuf.Any`](#google.protobuf.Any) | repeated | The details of the error. |
 
 ## <a name="lorawan-stack/api/events.proto">File `lorawan-stack/api/events.proto`</a>
 
@@ -2427,6 +2429,12 @@ GatewayUp may contain zero or more uplink messages and/or a status message for t
 | `uplink_messages` | [`UplinkMessage`](#ttn.lorawan.v3.UplinkMessage) | repeated | UplinkMessages received by the gateway. |
 | `gateway_status` | [`GatewayStatus`](#ttn.lorawan.v3.GatewayStatus) |  |  |
 | `tx_acknowledgment` | [`TxAcknowledgment`](#ttn.lorawan.v3.TxAcknowledgment) |  |  |
+
+### <a name="ttn.lorawan.v3.ScheduleDownlinkErrorDetails">Message `ScheduleDownlinkErrorDetails`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `path_errors` | [`ErrorDetails`](#ttn.lorawan.v3.ErrorDetails) | repeated |  |
 
 ### <a name="ttn.lorawan.v3.ScheduleDownlinkResponse">Message `ScheduleDownlinkResponse`</a>
 

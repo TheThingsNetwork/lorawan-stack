@@ -81,6 +81,23 @@ func (m *ErrorDetails) ValidateFields(paths ...string) error {
 
 		case "code":
 			// no validation rules for Code
+		case "details":
+
+			for idx, item := range m.GetDetails() {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return ErrorDetailsValidationError{
+							field:  fmt.Sprintf("details[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
 		default:
 			return ErrorDetailsValidationError{
 				field:  name,

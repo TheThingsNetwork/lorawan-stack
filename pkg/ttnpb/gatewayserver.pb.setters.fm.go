@@ -121,3 +121,23 @@ func (dst *ScheduleDownlinkResponse) SetFields(src *ScheduleDownlinkResponse, pa
 	}
 	return nil
 }
+
+func (dst *ScheduleDownlinkErrorDetails) SetFields(src *ScheduleDownlinkErrorDetails, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "path_errors":
+			if len(subs) > 0 {
+				return fmt.Errorf("'path_errors' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.PathErrors = src.PathErrors
+			} else {
+				dst.PathErrors = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}

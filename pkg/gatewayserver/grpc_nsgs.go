@@ -48,7 +48,7 @@ func (gs *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.Downl
 		return nil, errNotTxRequest
 	}
 
-	var details []interface{}
+	var pathErrs []errors.ErrorDetails
 	logger := log.FromContext(ctx)
 	for _, path := range request.DownlinkPaths {
 		var ids ttnpb.GatewayIdentifiers
@@ -58,7 +58,7 @@ func (gs *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.Downl
 		case *ttnpb.DownlinkPath_UplinkToken:
 			antennaIDs, _, err := io.ParseUplinkToken(p.UplinkToken)
 			if err != nil {
-				details = append(details, errUplinkToken) // Hide the cause as uplink tokens are opaque to the Network Server.
+				pathErrs = append(pathErrs, errUplinkToken) // Hide the cause as uplink tokens are opaque to the Network Server.
 				continue
 			}
 			ids = antennaIDs.GatewayIdentifiers
@@ -69,7 +69,7 @@ func (gs *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.Downl
 		uid := unique.ID(ctx, ids)
 		conn, ok := gs.GetConnection(ctx, ids)
 		if !ok {
-			details = append(details, errNotConnected.WithAttributes("gateway_uid", uid))
+			pathErrs = append(pathErrs, errNotConnected.WithAttributes("gateway_uid", uid))
 			continue
 		}
 		down := deepcopy.Copy(down).(*ttnpb.DownlinkMessage) // Let the connection own the DownlinkMessage.
@@ -77,7 +77,7 @@ func (gs *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.Downl
 		delay, err := conn.SendDown(path, down)
 		if err != nil {
 			logger.WithField("gateway_uid", uid).WithError(err).Debug("Failed to schedule on path")
-			details = append(details, errSchedulePath.WithCause(err).WithAttributes("gateway_uid", uid))
+			pathErrs = append(pathErrs, errSchedulePath.WithCause(err).WithAttributes("gateway_uid", uid))
 			continue
 		}
 		ctx = events.ContextWithCorrelationID(ctx, events.CorrelationIDsFromContext(conn.Context())...)
@@ -88,5 +88,11 @@ func (gs *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.Downl
 		}, nil
 	}
 
-	return nil, errSchedule.WithDetails(details...)
+	protoErrs := make([]*ttnpb.ErrorDetails, 0, len(pathErrs))
+	for _, pathErr := range pathErrs {
+		protoErrs = append(protoErrs, ttnpb.ErrorDetailsToProto(pathErr))
+	}
+	return nil, errSchedule.WithDetails(&ttnpb.ScheduleDownlinkErrorDetails{
+		PathErrors: protoErrs,
+	})
 }

@@ -246,7 +246,7 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 	if err != nil {
 		return 0, err
 	}
-	var errRxDetails []interface{}
+	var rxErrs []errors.ErrorDetails
 	for i, rx := range []struct {
 		dataRateIndex ttnpb.DataRateIndex
 		frequency     uint64
@@ -269,7 +269,7 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 		}
 		rxDelay := rx1Delay + rx.delay
 		if rx.frequency == 0 {
-			errRxDetails = append(errRxDetails, errRxEmpty)
+			rxErrs = append(rxErrs, errRxEmpty)
 			continue
 		}
 		logger := logger.WithFields(log.Fields(
@@ -335,7 +335,7 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 		em, err := f(c.ctx, len(msg.RawPayload), settings, c.rtts, request.Priority)
 		if err != nil {
 			logger.WithError(err).Debug("Failed to schedule downlink in Rx window")
-			errRxDetails = append(errRxDetails, errRxWindowSchedule.WithCause(err).WithAttributes("window", i+1))
+			rxErrs = append(rxErrs, errRxWindowSchedule.WithCause(err).WithAttributes("window", i+1))
 			continue
 		}
 		settings.Time = nil
@@ -343,7 +343,7 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 		msg.Settings = &ttnpb.DownlinkMessage_Scheduled{
 			Scheduled: &settings,
 		}
-		errRxDetails = nil
+		rxErrs = nil
 		if now, ok := c.scheduler.Now(); ok {
 			logger = logger.WithField("now", now)
 			delay = time.Duration(em.Starts() - now)
@@ -354,8 +354,14 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 		)).Debug("Scheduled downlink")
 		break
 	}
-	if errRxDetails != nil {
-		return 0, errTxSchedule.WithDetails(errRxDetails...)
+	if len(rxErrs) > 0 {
+		protoErrs := make([]*ttnpb.ErrorDetails, 0, len(rxErrs))
+		for _, rxErr := range rxErrs {
+			protoErrs = append(protoErrs, ttnpb.ErrorDetailsToProto(rxErr))
+		}
+		return 0, errTxSchedule.WithDetails(&ttnpb.ScheduleDownlinkErrorDetails{
+			PathErrors: protoErrs,
+		})
 	}
 	select {
 	case <-c.ctx.Done():

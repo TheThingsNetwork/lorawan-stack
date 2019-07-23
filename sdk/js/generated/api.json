@@ -7019,6 +7019,16 @@
               "fullType": "uint32",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "details",
+              "description": "The details of the error.",
+              "label": "repeated",
+              "type": "Any",
+              "longType": "google.protobuf.Any",
+              "fullType": "google.protobuf.Any",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         }
@@ -9408,6 +9418,27 @@
               "type": "TxAcknowledgment",
               "longType": "TxAcknowledgment",
               "fullType": "ttn.lorawan.v3.TxAcknowledgment",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ScheduleDownlinkErrorDetails",
+          "longName": "ScheduleDownlinkErrorDetails",
+          "fullName": "ttn.lorawan.v3.ScheduleDownlinkErrorDetails",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "path_errors",
+              "description": "",
+              "label": "repeated",
+              "type": "ErrorDetails",
+              "longType": "ErrorDetails",
+              "fullType": "ttn.lorawan.v3.ErrorDetails",
               "ismap": false,
               "defaultValue": ""
             }

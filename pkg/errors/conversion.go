@@ -15,6 +15,7 @@
 package errors
 
 import (
+	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc/status"
 )
 
@@ -78,6 +79,7 @@ type ErrorDetails interface {
 	CorrelationID() string
 	Cause() error
 	Code() uint32
+	Details() []proto.Message
 }
 
 func setErrorDetails(err *Error, details ErrorDetails) {
@@ -107,4 +109,5 @@ func setErrorDetails(err *Error, details ErrorDetails) {
 	if code := details.Code(); code != 0 {
 		err.code = code
 	}
+	err.details = append(err.details, details.Details()...)
 }

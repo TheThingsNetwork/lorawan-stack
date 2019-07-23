@@ -17,6 +17,7 @@ package ttnpb
 import (
 	"fmt"
 
+	"github.com/gogo/protobuf/types"
 	proto "github.com/golang/protobuf/proto"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/gogoproto"
@@ -51,8 +52,26 @@ func (e errorDetails) Cause() error {
 }
 func (e errorDetails) Code() uint32 { return e.GetCode() }
 
+func (e errorDetails) Details() []proto.Message {
+	details := e.GetDetails()
+	if len(details) == 0 {
+		return nil
+	}
+
+	msgs := make([]proto.Message, 0, len(details))
+	for _, dAny := range details {
+		var msg types.DynamicAny
+		err := types.UnmarshalAny(dAny, &msg)
+		if err != nil {
+			panic(fmt.Sprintf("Failed to decode error details: %s", err))
+		}
+		msgs = append(msgs, msg.Message)
+	}
+	return msgs
+}
+
 func ErrorDetailsToProto(e errors.ErrorDetails) *ErrorDetails {
-	proto := &ErrorDetails{
+	pb := &ErrorDetails{
 		Namespace:     e.Namespace(),
 		Name:          e.Name(),
 		MessageFormat: e.MessageFormat(),
@@ -64,14 +83,21 @@ func ErrorDetailsToProto(e errors.ErrorDetails) *ErrorDetails {
 		if err != nil {
 			panic(fmt.Sprintf("Failed to encode error attributes: %s", err)) // Likely a bug in ttn (invalid attribute type).
 		}
-		proto.Attributes = attributesStruct
+		pb.Attributes = attributesStruct
 	}
 	if cause := e.Cause(); cause != nil {
 		if ttnErr, ok := errors.From(cause); ok {
-			proto.Cause = ErrorDetailsToProto(ttnErr)
+			pb.Cause = ErrorDetailsToProto(ttnErr)
 		}
 	}
-	return proto
+	for _, d := range e.Details() {
+		dAny, err := types.MarshalAny(d)
+		if err != nil {
+			panic(fmt.Sprintf("Failed to encode error details: %s", err))
+		}
+		pb.Details = append(pb.Details, dAny)
+	}
+	return pb
 }
 
 func ErrorDetailsFromProto(e *ErrorDetails) errors.ErrorDetails {

@@ -119,3 +119,10 @@ var ScheduleDownlinkResponseFieldPathsNested = []string{
 var ScheduleDownlinkResponseFieldPathsTopLevel = []string{
 	"delay",
 }
+var ScheduleDownlinkErrorDetailsFieldPathsNested = []string{
+	"path_errors",
+}
+
+var ScheduleDownlinkErrorDetailsFieldPathsTopLevel = []string{
+	"path_errors",
+}
