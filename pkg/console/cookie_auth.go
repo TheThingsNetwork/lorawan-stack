@@ -45,27 +45,22 @@ type authCookie struct {
 	Expiry       time.Time
 }
 
-// setCookie sets the authCookie on the request.
-func (console *Console) setAuthCookie(c echo.Context, value authCookie) error {
-	return console.AuthCookie().Set(c, value)
-}
-
-// getCookie returns the authCookie from the echo context.
 func (console *Console) getAuthCookie(c echo.Context) (authCookie, error) {
 	value := authCookie{}
 	ok, err := console.AuthCookie().Get(c, &value)
 	if err != nil {
 		return authCookie{}, err
 	}
-
 	if !ok {
-		return authCookie{}, echo.NewHTTPError(http.StatusUnauthorized, "You are not logged in")
+		return authCookie{}, echo.NewHTTPError(http.StatusUnauthorized, "No auth cookie")
 	}
-
 	return value, nil
 }
 
-// removeCookie removes the authCookie.
+func (console *Console) setAuthCookie(c echo.Context, value authCookie) error {
+	return console.AuthCookie().Set(c, value)
+}
+
 func (console *Console) removeAuthCookie(c echo.Context) {
 	console.AuthCookie().Remove(c)
 }
