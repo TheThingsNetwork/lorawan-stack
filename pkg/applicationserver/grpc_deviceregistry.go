@@ -21,7 +21,23 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+)
+
+var (
+	evtCreateEndDevice = events.Define(
+		"as.end_device.create", "create end device",
+		ttnpb.RIGHT_APPLICATION_DEVICES_READ,
+	)
+	evtUpdateEndDevice = events.Define(
+		"as.end_device.update", "update end device",
+		ttnpb.RIGHT_APPLICATION_DEVICES_READ,
+	)
+	evtDeleteEndDevice = events.Define(
+		"as.end_device.delete", "delete end device",
+		ttnpb.RIGHT_APPLICATION_DEVICES_READ,
+	)
 )
 
 type asEndDeviceRegistryServer struct {
@@ -68,9 +84,14 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 	if err := rights.RequireApplication(ctx, req.EndDevice.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
-	return r.AS.deviceRegistry.Set(ctx, req.EndDevice.EndDeviceIdentifiers, req.FieldMask.Paths, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+
+	var evt events.Event
+	dev, err := r.AS.deviceRegistry.Set(ctx, req.EndDevice.EndDeviceIdentifiers, req.FieldMask.Paths, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		sets := req.FieldMask.Paths
-		if dev != nil {
+		if dev == nil {
+			evt = evtCreateEndDevice(ctx, req.EndDevice.EndDeviceIdentifiers, nil)
+		} else {
+			evt = evtUpdateEndDevice(ctx, req.EndDevice.EndDeviceIdentifiers, req.FieldMask.Paths)
 			if err := ttnpb.ProhibitFields(req.FieldMask.Paths, "ids.dev_addr"); err != nil {
 				return nil, nil, errInvalidFieldMask.WithCause(err)
 			}
@@ -100,6 +121,13 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 		}
 		return &req.EndDevice, sets, nil
 	})
+	if err != nil {
+		return nil, err
+	}
+	if evt != nil {
+		events.Publish(evt)
+	}
+	return dev, nil
 }
 
 // Delete implements ttnpb.AsEndDeviceRegistryServer.
@@ -107,11 +135,18 @@ func (r asEndDeviceRegistryServer) Delete(ctx context.Context, ids *ttnpb.EndDev
 	if err := rights.RequireApplication(ctx, ids.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
-	_, err := r.AS.deviceRegistry.Set(ctx, *ids, nil, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+	var evt events.Event
+	_, err := r.AS.deviceRegistry.Set(ctx, *ids, nil, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+		if dev != nil {
+			evt = evtDeleteEndDevice(ctx, ids, nil)
+		}
 		return nil, nil, nil
 	})
 	if err != nil {
 		return nil, err
+	}
+	if evt != nil {
+		events.Publish(evt)
 	}
 	return ttnpb.Empty, nil
 }

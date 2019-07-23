@@ -5687,6 +5687,33 @@
       "file": "observability.go"
     }
   },
+  "event:as.end_device.create": {
+    "translations": {
+      "en": "create end device"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "grpc_deviceregistry.go"
+    }
+  },
+  "event:as.end_device.delete": {
+    "translations": {
+      "en": "delete end device"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "grpc_deviceregistry.go"
+    }
+  },
+  "event:as.end_device.update": {
+    "translations": {
+      "en": "update end device"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "grpc_deviceregistry.go"
+    }
+  },
   "event:as.link.fail": {
     "translations": {
       "en": "fail link"
