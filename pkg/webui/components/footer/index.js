@@ -17,7 +17,6 @@ import classnames from 'classnames'
 import { defineMessages } from 'react-intl'
 import { Link } from 'react-router-dom'
 import PropTypes from '../../lib/prop-types'
-import sharedMessages from '../../lib/shared-messages'
 
 import Message from '../../lib/components/message'
 
@@ -27,20 +26,9 @@ const m = defineMessages({
   footer: "You are the network. Let's build this thing together.",
 })
 
-const defaultLinks = [
-  {
-    title: sharedMessages.privacyPolicy,
-    link: '#',
-  },
-  {
-    title: sharedMessages.termsAndCondition,
-    link: '#',
-  },
-]
-
 const Footer = function ({
   className,
-  links = defaultLinks,
+  links = [],
 }) {
   return (
     <footer className={classnames(className, style.footer)}>
