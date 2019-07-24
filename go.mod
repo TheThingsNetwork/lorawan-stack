@@ -25,11 +25,12 @@ replace golang.org/x/sys => golang.org/x/sys v0.0.0-20190626221950-04f50cda93cb
 replace golang.org/x/tools => golang.org/x/tools v0.0.0-20190702201734-44aeb8b7c377
 
 require (
+	cloud.google.com/go v0.43.0 // indirect
 	contrib.go.opencensus.io/exporter/prometheus v0.1.0
 	github.com/PuerkitoBio/purell v1.1.1
 	github.com/TheThingsIndustries/magepkg v0.0.0-20190214092847-6c0299b7c3ed
 	github.com/TheThingsIndustries/mystique v0.0.0-20190516134627-66efd81c68ea
-	github.com/TheThingsIndustries/release-notes v0.0.2
+	github.com/TheThingsIndustries/release-notes v0.1.0
 	github.com/TheThingsNetwork/go-cayenne-lib v1.0.0
 	github.com/aws/aws-sdk-go v1.20.14
 	github.com/blang/semver v3.6.1+incompatible
@@ -48,7 +49,7 @@ require (
 	github.com/gogo/protobuf v1.2.1
 	github.com/gohugoio/hugo v0.55.6
 	github.com/golang/gddo v0.0.0-20190419222130-af0f2af80721
-	github.com/golang/protobuf v1.3.1
+	github.com/golang/protobuf v1.3.2
 	github.com/goreleaser/goreleaser v0.111.0
 	github.com/gorilla/securecookie v1.1.1
 	github.com/gorilla/websocket v1.4.0
@@ -94,7 +95,7 @@ require (
 	github.com/satori/go.uuid v1.2.0
 	github.com/sendgrid/rest v2.4.1+incompatible // indirect
 	github.com/sendgrid/sendgrid-go v3.5.0+incompatible
-	github.com/smartystreets/assertions v1.0.0
+	github.com/smartystreets/assertions v1.0.1
 	github.com/soheilhy/cmux v0.1.4
 	github.com/spf13/cast v1.3.0
 	github.com/spf13/cobra v0.0.5
@@ -106,13 +107,14 @@ require (
 	gocloud.dev v0.15.0
 	gocloud.dev/pubsub/natspubsub v0.15.0
 	golang.org/x/crypto v0.0.0-20190701094942-4def268fd1a4
-	golang.org/x/image v0.0.0-20190622003408-7e034cad6442 // indirect
-	golang.org/x/net v0.0.0-20190628185345-da137c7871d7
+	golang.org/x/image v0.0.0-20190703141733-d6a02ce849c9 // indirect
+	golang.org/x/net v0.0.0-20190724013045-ca1201d0de80
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
-	golang.org/x/tools v0.0.0-20190702201734-44aeb8b7c377
-	golang.org/x/xerrors v0.0.0-20190513163551-3ee3066db522
+	golang.org/x/sys v0.0.0-20190712062909-fae7ac547cb7 // indirect
+	golang.org/x/tools v0.0.0-20190723021737-8bb11ff117ca
+	golang.org/x/xerrors v0.0.0-20190717185122-a985d3407aa7
 	google.golang.org/api v0.7.0
-	google.golang.org/genproto v0.0.0-20190701230453-710ae3a149df
+	google.golang.org/genproto v0.0.0-20190716160619-c506a9f90610
 	google.golang.org/grpc v1.22.0
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/mail.v2 v2.3.1 // indirect
