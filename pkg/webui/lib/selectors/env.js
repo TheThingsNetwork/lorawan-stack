@@ -18,6 +18,10 @@ export const selectApplicationRootPath = () => (
   configSelector().APP_ROOT
 )
 
+export const selectAssetsRootPath = () => (
+  configSelector().ASSETS_ROOT
+)
+
 export const selectApplicationConfig = () => (
   configSelector().APP_CONFIG
 )
@@ -30,7 +34,7 @@ export const selectApplicationSiteTitle = () => (
   configSelector().SITE_TITLE
 )
 
-export const selectApplicationSiteSubtitle = () => (
+export const selectApplicationSiteSubTitle = () => (
   configSelector().SITE_SUB_TITLE
 )
 
@@ -52,6 +56,10 @@ export const selectJsConfig = () => (
 
 export const selectAsConfig = () => (
   selectApplicationConfig().as
+)
+
+export const selectLanguageConfig = () => (
+  selectApplicationConfig().language
 )
 
 export const selectPageData = () => (
