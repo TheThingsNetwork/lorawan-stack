@@ -21,8 +21,8 @@ import { Helmet } from 'react-helmet'
 
 import WithLocale from '../../../lib/components/with-locale'
 import withEnv, { EnvProvider } from '../../../lib/components/env'
-import { pageDataSelector } from '../../../lib/selectors/env'
 import ErrorView from '../../../lib/components/error-view'
+import env from '../../../lib/env'
 
 import Landing from '../landing'
 import Login from '../login'
@@ -35,20 +35,13 @@ import Code from '../code'
 
 const history = createBrowserHistory()
 const store = createStore(history)
-const env = {
-  app_root: window.APP_ROOT,
-  assets_root: window.ASSETS_ROOT,
-  config: window.APP_CONFIG,
-  page_data: window.PAGE_DATA,
-  site_name: window.SITE_NAME,
-  site_title: window.SITE_TITLE,
-}
 
 const GenericNotFound = () => <FullViewError error={{ statusCode: 404 }} />
 @withEnv
 export default class OAuthApp extends React.PureComponent {
   render () {
-    const pageData = pageDataSelector(env)
+
+    const { pageData } = env
 
     if (pageData && pageData.error) {
       return (

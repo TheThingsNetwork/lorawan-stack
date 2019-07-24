@@ -23,20 +23,13 @@ import { BreadcrumbsProvider } from './components/breadcrumbs/context'
 import { SideNavigationProvider } from './components/navigation/side/context'
 import Init from './lib/components/init'
 import WithLocale from './lib/components/with-locale'
+import env from './lib/env'
 
 import createStore from './console/store'
 import App from './console/views/app'
 
 const history = createBrowserHistory()
 const store = createStore(history)
-const env = {
-  app_root: window.APP_ROOT,
-  assets_root: window.ASSETS_ROOT,
-  config: window.APP_CONFIG,
-  page_data: window.PAGE_DATA,
-  site_name: window.SITE_NAME,
-  site_title: window.SITE_TITLE,
-}
 
 const Console = () => (
   <EnvProvider env={env}>
