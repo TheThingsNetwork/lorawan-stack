@@ -22,5 +22,5 @@ import (
 // ErrorHandler is an echo.HTTPErrorHandler.
 func ErrorHandler(err error, c echo.Context) {
 	status, err := web.ProcessError(err)
-	c.JSON(status, err.Error())
+	c.JSONPretty(status, err, "  ")
 }

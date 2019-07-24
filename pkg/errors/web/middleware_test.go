@@ -43,7 +43,7 @@ func TestErrorHandling(t *testing.T) {
 			Assert: func(a *assertions.Assertion, res *http.Response) {
 				a.So(res.StatusCode, should.Equal, http.StatusNotFound)
 				b, _ := ioutil.ReadAll(res.Body)
-				a.So(string(b), should.ContainSubstring, `"namespace":"pkg/errors/web","name":"http"`)
+				a.So(string(b), should.ContainSubstring, `"namespace":"pkg/errors/web"`)
 			},
 		},
 		{

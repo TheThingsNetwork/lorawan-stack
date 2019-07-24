@@ -18,6 +18,14 @@ import (
 	"net/http"
 
 	echo "github.com/labstack/echo/v4"
+	"go.thethings.network/lorawan-stack/pkg/errors"
+)
+
+var (
+	errOAuthError   = errors.DefineUnauthenticated("oauth_authorization", "OAuth authorization failed with `{error}`", "error_description")
+	errMissingState = errors.DefineInvalidArgument("missing_state", "missing state parameter in request")
+	errMissingCode  = errors.DefineInvalidArgument("missing_code", "missing code parameter in request")
+	errInvalidState = errors.DefineInvalidArgument("invalid_state", "invalid state parameter in request")
 )
 
 // Callback is the OAuth callback that accepts the authorization code
@@ -25,17 +33,17 @@ import (
 // stored in the authorization cookie for later reference.
 func (console *Console) Callback(c echo.Context) error {
 	if e := c.QueryParam("error"); e != "" {
-		return echo.NewHTTPError(http.StatusUnauthorized, c.QueryParam("error_description"))
+		return errOAuthError.WithAttributes("error", e, "error_description", c.QueryParam("error_description"))
 	}
 
 	state := c.QueryParam("state")
 	if state == "" {
-		return echo.NewHTTPError(http.StatusBadRequest, "No state parameter present in request")
+		return errMissingState
 	}
 
 	code := c.QueryParam("code")
 	if code == "" {
-		return echo.NewHTTPError(http.StatusBadRequest, "No code parameter present in request")
+		return errMissingCode
 	}
 
 	stateCookie, err := console.getStateCookie(c)
@@ -44,7 +52,7 @@ func (console *Console) Callback(c echo.Context) error {
 	}
 
 	if stateCookie.Secret != state {
-		return echo.NewHTTPError(http.StatusBadRequest, "Invalid state")
+		return errInvalidState
 	}
 
 	// Exchange token.

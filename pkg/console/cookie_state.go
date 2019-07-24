@@ -34,19 +34,16 @@ const stateCookieName = "_console_state"
 func (console *Console) StateCookie() *cookie.Cookie {
 	return &cookie.Cookie{
 		Name:     stateCookieName,
+		HTTPOnly: true,
 		Path:     console.config.UI.MountPath(),
 		MaxAge:   10 * time.Minute,
-		HTTPOnly: true,
 	}
 }
 
 // state is the shape of the state for the OAuth flow.
 type state struct {
-	// Secret is the secret in the state.
 	Secret string
-
-	// Next is the path the user was trying to visit.
-	Next string
+	Next   string
 }
 
 func newState(next string) state {
@@ -60,13 +57,11 @@ func (console *Console) getStateCookie(c echo.Context) (state, error) {
 	s := state{}
 	ok, err := console.StateCookie().Get(c, &s)
 	if err != nil {
-		return s, echo.NewHTTPError(http.StatusBadRequest, "Invalid state cookie")
+		return s, err
 	}
-
 	if !ok {
 		return s, echo.NewHTTPError(http.StatusBadRequest, "No state cookie")
 	}
-
 	return s, nil
 }
 
