@@ -4973,6 +4973,16 @@
               "fullType": "bool",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "claim_authentication_code",
+              "description": "Authentication code to claim ownership of the end device. Stored in Join Server.",
+              "label": "",
+              "type": "EndDeviceAuthenticationCode",
+              "longType": "EndDeviceAuthenticationCode",
+              "fullType": "ttn.lorawan.v3.EndDeviceAuthenticationCode",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },
@@ -5033,6 +5043,59 @@
               "type": "Location",
               "longType": "Location",
               "fullType": "ttn.lorawan.v3.Location",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "EndDeviceAuthenticationCode",
+          "longName": "EndDeviceAuthenticationCode",
+          "fullName": "ttn.lorawan.v3.EndDeviceAuthenticationCode",
+          "description": "Authentication code for end devices.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "value",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.min_len",
+                    "value": 1
+                  },
+                  {
+                    "name": "bytes.max_len",
+                    "value": 8
+                  }
+                ]
+              }
+            },
+            {
+              "name": "valid_from",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "valid_to",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
               "ismap": false,
               "defaultValue": ""
             }

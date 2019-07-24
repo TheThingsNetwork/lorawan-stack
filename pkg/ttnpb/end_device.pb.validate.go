@@ -1432,6 +1432,121 @@ var _ interface {
 	ErrorName() string
 } = MACStateValidationError{}
 
+// ValidateFields checks the field values on EndDeviceAuthenticationCode with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *EndDeviceAuthenticationCode) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = EndDeviceAuthenticationCodeFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "value":
+
+			if l := len(m.GetValue()); l < 1 || l > 8 {
+				return EndDeviceAuthenticationCodeValidationError{
+					field:  "value",
+					reason: "value length must be between 1 and 8 bytes, inclusive",
+				}
+			}
+
+		case "valid_from":
+
+			if v, ok := interface{}(m.GetValidFrom()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return EndDeviceAuthenticationCodeValidationError{
+						field:  "valid_from",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "valid_to":
+
+			if v, ok := interface{}(m.GetValidTo()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return EndDeviceAuthenticationCodeValidationError{
+						field:  "valid_to",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return EndDeviceAuthenticationCodeValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// EndDeviceAuthenticationCodeValidationError is the validation error returned
+// by EndDeviceAuthenticationCode.ValidateFields if the designated constraints
+// aren't met.
+type EndDeviceAuthenticationCodeValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e EndDeviceAuthenticationCodeValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e EndDeviceAuthenticationCodeValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e EndDeviceAuthenticationCodeValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e EndDeviceAuthenticationCodeValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e EndDeviceAuthenticationCodeValidationError) ErrorName() string {
+	return "EndDeviceAuthenticationCodeValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e EndDeviceAuthenticationCodeValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sEndDeviceAuthenticationCode.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = EndDeviceAuthenticationCodeValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = EndDeviceAuthenticationCodeValidationError{}
+
 // ValidateFields checks the field values on EndDevice with the rules defined
 // in the proto definition for this message. If any rules are violated, an
 // error is returned.
@@ -1871,6 +1986,18 @@ func (m *EndDevice) ValidateFields(paths ...string) error {
 
 		case "multicast":
 			// no validation rules for Multicast
+		case "claim_authentication_code":
+
+			if v, ok := interface{}(m.GetClaimAuthenticationCode()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return EndDeviceValidationError{
+						field:  "claim_authentication_code",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return EndDeviceValidationError{
 				field:  name,

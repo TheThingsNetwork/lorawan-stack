@@ -403,6 +403,11 @@ var (
 					)
 				}
 			}
+			if withClaimAuthenticationCode, _ := cmd.Flags().GetBool("with-claim-authentication-code"); withClaimAuthenticationCode {
+				device.ClaimAuthenticationCode = &ttnpb.EndDeviceAuthenticationCode{
+					Value: random.Bytes(4),
+				}
+			}
 
 			if err = util.SetFields(&device, setEndDeviceFlags); err != nil {
 				return err
@@ -756,6 +761,7 @@ func init() {
 	endDevicesCreateCommand.Flags().Bool("with-root-keys", false, "generate OTAA root keys")
 	endDevicesCreateCommand.Flags().Bool("abp", false, "configure end device as ABP")
 	endDevicesCreateCommand.Flags().Bool("with-session", false, "generate ABP session DevAddr and keys")
+	endDevicesCreateCommand.Flags().Bool("with-claim-authentication-code", false, "generate claim authentication code of 4 bytes")
 	endDevicesCommand.AddCommand(endDevicesCreateCommand)
 	endDevicesUpdateCommand.Flags().AddFlagSet(endDeviceIDFlags())
 	endDevicesUpdateCommand.Flags().AddFlagSet(setEndDeviceFlags)

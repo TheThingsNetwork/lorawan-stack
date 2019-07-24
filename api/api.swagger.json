@@ -7840,9 +7840,31 @@
           "type": "boolean",
           "format": "boolean",
           "description": "Indicates whether this device represents a multicast group."
+        },
+        "claim_authentication_code": {
+          "$ref": "#/definitions/v3EndDeviceAuthenticationCode",
+          "description": "Authentication code to claim ownership of the end device. Stored in Join Server."
         }
       },
       "description": "Defines an End Device registration and its state on the network.\nThe persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.\nSDKs are responsible for combining (if desired) the three."
+    },
+    "v3EndDeviceAuthenticationCode": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string",
+          "format": "byte"
+        },
+        "valid_from": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "valid_to": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "Authentication code for end devices."
     },
     "v3EndDeviceIdentifiers": {
       "type": "object",

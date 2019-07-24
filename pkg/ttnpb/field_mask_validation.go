@@ -148,6 +148,10 @@ var AllowedFieldMaskPathsForRPC = map[string][]string{
 	"/ttn.lorawan.v3.EndDeviceRegistrySearch/SearchEndDevices": isEndDeviceReadFieldPaths,
 	"/ttn.lorawan.v3.JsEndDeviceRegistry/Get": {
 		"application_server_address",
+		"claim_authentication_code",
+		"claim_authentication_code.value",
+		"claim_authentication_code.valid_to",
+		"claim_authentication_code.valid_from",
 		"ids",
 		"ids.application_ids",
 		"ids.application_ids.application_id",
@@ -174,6 +178,10 @@ var AllowedFieldMaskPathsForRPC = map[string][]string{
 	},
 	"/ttn.lorawan.v3.JsEndDeviceRegistry/Set": {
 		"application_server_address",
+		"claim_authentication_code",
+		"claim_authentication_code.value",
+		"claim_authentication_code.valid_to",
+		"claim_authentication_code.valid_from",
 		"ids",
 		"ids.application_ids",
 		"ids.application_ids.application_id",
