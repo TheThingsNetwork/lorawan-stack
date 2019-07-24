@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Pagination has only a single page should match snapshot 1`] = `
+exports[`Pagination has only a single page with hiding option disabled should match snapshot 1`] = `
 <ul
   className="pagination"
 >

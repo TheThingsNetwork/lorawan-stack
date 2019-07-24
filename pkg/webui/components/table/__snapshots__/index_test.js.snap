@@ -201,6 +201,7 @@ exports[`Table is paginated should match snapshot 1`] = `
             <Pagination
               className="pagination"
               disableInitialCallback={true}
+              hideIfOnlyOnePage={true}
               initialPage={0}
               marginPagesDisplayed={1}
               onPageChange={[Function]}

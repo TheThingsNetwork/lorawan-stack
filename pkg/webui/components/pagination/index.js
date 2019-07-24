@@ -36,9 +36,16 @@ class Pagination extends React.PureComponent {
       initialPage = 1,
       pageRangeDisplayed,
       marginPagesDisplayed,
+      hideIfOnlyOnePage,
       onPageChange,
+      pageCount,
       ...rest
     } = this.props
+
+    // Don't show pagination if there is only one page
+    if (hideIfOnlyOnePage && pageCount === 1) {
+      return null
+    }
 
     const containerClassNames = classnames(style.pagination, className)
     const breakClassNames = classnames(style.item, style.itemBreak)
@@ -74,6 +81,7 @@ class Pagination extends React.PureComponent {
         pageRangeDisplayed={pageRangeDisplayed}
         marginPagesDisplayed={marginPagesDisplayed}
         onPageChange={this.onPageChange}
+        pageCount={pageCount}
         {...rest}
       />
     )
@@ -100,10 +108,14 @@ Pagination.propTypes = {
   marginPagesDisplayed: PropTypes.number,
   /** The initial page number to be selected when the component
    * gets rendered for the first time. Is 1-based.
-   * */
+   */
   initialPage: PropTypes.number,
   /** An onClick handler that gets called with the new page number */
   onPageChange: PropTypes.func.isRequired,
+  /** A flag indicating whether the pagination should be hidden when there is
+   * only one page.
+   */
+  hideIfOnlyOnePage: PropTypes.bool,
 }
 
 Pagination.defaultProps = {
@@ -111,6 +123,7 @@ Pagination.defaultProps = {
   pageRangeDisplayed: 1,
   marginPagesDisplayed: 1,
   initialPage: 1,
+  hideIfOnlyOnePage: true,
 }
 
 export default Pagination

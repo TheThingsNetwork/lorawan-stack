@@ -22,19 +22,29 @@ describe('Pagination', function () {
   })
 
   describe('has only a single page', function () {
-    beforeEach(function () {
-      driver.when.created({ pageCount: 1 })
-    })
-    it('should match snapshot', function () {
-      expect(driver.component).toMatchSnapshot()
-    })
+    describe('with hiding option disabled', function () {
+      beforeEach(function () {
+        driver.when.created({ pageCount: 1, hideIfOnlyOnePage: false })
+      })
+      it('should match snapshot', function () {
+        expect(driver.component).toMatchSnapshot()
+      })
 
-    it('should disable the previous page navigation', function () {
-      expect(driver.is.prevNavigationDisabled()).toBeTruthy()
-    })
+      it('should disable the previous page navigation', function () {
+        expect(driver.is.prevNavigationDisabled()).toBeTruthy()
+      })
 
-    it('should disable the next page navigation', function () {
-      expect(driver.is.nextNavigationDisabled()).toBeTruthy()
+      it('should disable the next page navigation', function () {
+        expect(driver.is.nextNavigationDisabled()).toBeTruthy()
+      })
+    })
+    describe('with hiding option enabled', function () {
+      beforeEach(function () {
+        driver.when.created({ pageCount: 1 })
+      })
+      it('should not render', function () {
+        expect(driver.component).toBe(undefined)
+      })
     })
   })
 
