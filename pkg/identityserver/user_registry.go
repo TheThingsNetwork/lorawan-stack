@@ -406,6 +406,34 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 		if err != nil {
 			return err
 		}
+		if req.RevokeAllAccess == true {
+			sessionStore := store.GetUserSessionStore(db)
+			sessions, err := sessionStore.FindSessions(ctx, &req.UserIdentifiers)
+			if err != nil {
+				return err
+			}
+			for _, session := range sessions {
+				err = sessionStore.DeleteSession(ctx, &req.UserIdentifiers, session.SessionID)
+			}
+			oauthStore := store.GetOAuthStore(db)
+			authorizations, err := oauthStore.ListAuthorizations(ctx, &req.UserIdentifiers)
+			if err != nil {
+				return err
+			}
+
+			for _, auth := range authorizations {
+				tokens, err := oauthStore.ListAccessTokens(ctx, &auth.UserIDs, &auth.ClientIDs)
+				if err != nil {
+					return err
+				}
+				for _, token := range tokens {
+					err = oauthStore.DeleteAccessToken(ctx, token.ID)
+					if err != nil {
+						return err
+					}
+				}
+			}
+		}
 		region := trace.StartRegion(ctx, "validate old password")
 		valid, err := auth.Password(usr.Password).Validate(req.Old)
 		region.End()
@@ -444,6 +472,7 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 	if err != nil {
 		return nil, err
 	}
+
 	events.Publish(evtUpdateUser(ctx, req.UserIdentifiers, updateMask))
 	err = is.SendUserEmail(ctx, &req.UserIdentifiers, func(data emails.Data) email.MessageData {
 		return &emails.PasswordChanged{Data: data}
