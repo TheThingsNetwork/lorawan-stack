@@ -14,34 +14,46 @@
 
 export const configSelector = () => window
 
-export const applicationRootSelector = () => (
+export const selectApplicationRootPath = () => (
   configSelector().APP_ROOT
 )
 
-export const applicationConfigSelector = () => (
+export const selectApplicationConfig = () => (
   configSelector().APP_CONFIG
 )
 
-export const gsConfigSelector = () => (
-  applicationConfigSelector().gs
+export const selectApplicationSiteName = () => (
+  configSelector().SITE_NAME
 )
 
-export const isConfigSelector = () => (
-  applicationConfigSelector().is
+export const selectApplicationSiteTitle = () => (
+  configSelector().SITE_TITLE
 )
 
-export const nsConfigSelector = () => (
-  applicationConfigSelector().ns
+export const selectApplicationSiteSubtitle = () => (
+  configSelector().SITE_SUB_TITLE
 )
 
-export const jsConfigSelector = () => (
-  applicationConfigSelector().js
+export const selectGsConfig = () => (
+  selectApplicationConfig().gs
 )
 
-export const asConfigSelector = () => (
-  applicationConfigSelector().as
+export const selectIsConfig = () => (
+  selectApplicationConfig().is
 )
 
-export const pageDataSelector = () => (
+export const selectNsConfig = () => (
+  selectApplicationConfig().ns
+)
+
+export const selectJsConfig = () => (
+  selectApplicationConfig().js
+)
+
+export const selectAsConfig = () => (
+  selectApplicationConfig().as
+)
+
+export const selectPageData = () => (
   configSelector().PAGE_DATA
 )
