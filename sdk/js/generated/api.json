@@ -1674,7 +1674,11 @@
                 "validate.rules": [
                   {
                     "name": "string.max_len",
-                    "value": 10
+                    "value": 20
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
                   }
                 ]
               }
@@ -2330,6 +2334,38 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 20
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "template_ids",
+              "description": "The ID of the template that was used to create the Webhook.",
+              "label": "",
+              "type": "ApplicationWebhookTemplateIdentifiers",
+              "longType": "ApplicationWebhookTemplateIdentifiers",
+              "fullType": "ttn.lorawan.v3.ApplicationWebhookTemplateIdentifiers",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "template_fields",
+              "description": "The value of the fields used by the template. Maps field.id to the value.",
+              "label": "repeated",
+              "type": "TemplateFieldsEntry",
+              "longType": "ApplicationWebhook.TemplateFieldsEntry",
+              "fullType": "ttn.lorawan.v3.ApplicationWebhook.TemplateFieldsEntry",
+              "ismap": true,
               "defaultValue": ""
             },
             {
@@ -2467,6 +2503,37 @@
           ]
         },
         {
+          "name": "TemplateFieldsEntry",
+          "longName": "ApplicationWebhook.TemplateFieldsEntry",
+          "fullName": "ttn.lorawan.v3.ApplicationWebhook.TemplateFieldsEntry",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "key",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "value",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "ApplicationWebhookFormats",
           "longName": "ApplicationWebhookFormats",
           "fullName": "ttn.lorawan.v3.ApplicationWebhookFormats",
@@ -2570,6 +2637,468 @@
           ]
         },
         {
+          "name": "ApplicationWebhookTemplate",
+          "longName": "ApplicationWebhookTemplate",
+          "fullName": "ttn.lorawan.v3.ApplicationWebhookTemplate",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "ids",
+              "description": "",
+              "label": "",
+              "type": "ApplicationWebhookTemplateIdentifiers",
+              "longType": "ApplicationWebhookTemplateIdentifiers",
+              "fullType": "ttn.lorawan.v3.ApplicationWebhookTemplateIdentifiers",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "name",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 20
+                  }
+                ]
+              }
+            },
+            {
+              "name": "description",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 100
+                  }
+                ]
+              }
+            },
+            {
+              "name": "logo_url",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.uri",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "info_url",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.uri",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "documentation_url",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.uri",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "base_url",
+              "description": "The base URL of the template. Can contain template fields, in RFC 6570 format.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.uri",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "headers",
+              "description": "The HTTP headers used by the template. Both the key and the value can contain template fields.",
+              "label": "repeated",
+              "type": "HeadersEntry",
+              "longType": "ApplicationWebhookTemplate.HeadersEntry",
+              "fullType": "ttn.lorawan.v3.ApplicationWebhookTemplate.HeadersEntry",
+              "ismap": true,
+              "defaultValue": ""
+            },
+            {
+              "name": "format",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 20
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "fields",
+              "description": "",
+              "label": "repeated",
+              "type": "ApplicationWebhookTemplateField",
+              "longType": "ApplicationWebhookTemplateField",
+              "fullType": "ttn.lorawan.v3.ApplicationWebhookTemplateField",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "uplink_message",
+              "description": "",
+              "label": "",
+              "type": "Message",
+              "longType": "ApplicationWebhookTemplate.Message",
+              "fullType": "ttn.lorawan.v3.ApplicationWebhookTemplate.Message",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "join_accept",
+              "description": "",
+              "label": "",
+              "type": "Message",
+              "longType": "ApplicationWebhookTemplate.Message",
+              "fullType": "ttn.lorawan.v3.ApplicationWebhookTemplate.Message",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "downlink_ack",
+              "description": "",
+              "label": "",
+              "type": "Message",
+              "longType": "ApplicationWebhookTemplate.Message",
+              "fullType": "ttn.lorawan.v3.ApplicationWebhookTemplate.Message",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "downlink_nack",
+              "description": "",
+              "label": "",
+              "type": "Message",
+              "longType": "ApplicationWebhookTemplate.Message",
+              "fullType": "ttn.lorawan.v3.ApplicationWebhookTemplate.Message",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "downlink_sent",
+              "description": "",
+              "label": "",
+              "type": "Message",
+              "longType": "ApplicationWebhookTemplate.Message",
+              "fullType": "ttn.lorawan.v3.ApplicationWebhookTemplate.Message",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "downlink_failed",
+              "description": "",
+              "label": "",
+              "type": "Message",
+              "longType": "ApplicationWebhookTemplate.Message",
+              "fullType": "ttn.lorawan.v3.ApplicationWebhookTemplate.Message",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "downlink_queued",
+              "description": "",
+              "label": "",
+              "type": "Message",
+              "longType": "ApplicationWebhookTemplate.Message",
+              "fullType": "ttn.lorawan.v3.ApplicationWebhookTemplate.Message",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "location_solved",
+              "description": "",
+              "label": "",
+              "type": "Message",
+              "longType": "ApplicationWebhookTemplate.Message",
+              "fullType": "ttn.lorawan.v3.ApplicationWebhookTemplate.Message",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "HeadersEntry",
+          "longName": "ApplicationWebhookTemplate.HeadersEntry",
+          "fullName": "ttn.lorawan.v3.ApplicationWebhookTemplate.HeadersEntry",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "key",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "value",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "Message",
+          "longName": "ApplicationWebhookTemplate.Message",
+          "fullName": "ttn.lorawan.v3.ApplicationWebhookTemplate.Message",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "path",
+              "description": "Path to append to the base URL. Can contain template fields, in RFC 6570 format.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ApplicationWebhookTemplateField",
+          "longName": "ApplicationWebhookTemplateField",
+          "fullName": "ttn.lorawan.v3.ApplicationWebhookTemplateField",
+          "description": "ApplicationWebhookTemplateField represents a custom field that needs to be filled by the user in order to use the template.\nA field can be an API key, an username or password, or any custom platform specific field (such as region).\nThe fields are meant to be replaced inside the URLs and headers when the webhook is created.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "name",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 20
+                  }
+                ]
+              }
+            },
+            {
+              "name": "description",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 100
+                  }
+                ]
+              }
+            },
+            {
+              "name": "secret",
+              "description": "Secret decides if the field should be shown in plain-text or should stay hidden.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "default_value",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 100
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ApplicationWebhookTemplateIdentifiers",
+          "longName": "ApplicationWebhookTemplateIdentifiers",
+          "fullName": "ttn.lorawan.v3.ApplicationWebhookTemplateIdentifiers",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "template_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ApplicationWebhookTemplates",
+          "longName": "ApplicationWebhookTemplates",
+          "fullName": "ttn.lorawan.v3.ApplicationWebhookTemplates",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "templates",
+              "description": "",
+              "label": "repeated",
+              "type": "ApplicationWebhookTemplate",
+              "longType": "ApplicationWebhookTemplate",
+              "fullType": "ttn.lorawan.v3.ApplicationWebhookTemplate",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "ApplicationWebhooks",
           "longName": "ApplicationWebhooks",
           "fullName": "ttn.lorawan.v3.ApplicationWebhooks",
@@ -2617,6 +3146,66 @@
                 ]
               }
             },
+            {
+              "name": "field_mask",
+              "description": "",
+              "label": "",
+              "type": "FieldMask",
+              "longType": "google.protobuf.FieldMask",
+              "fullType": "google.protobuf.FieldMask",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "GetApplicationWebhookTemplateRequest",
+          "longName": "GetApplicationWebhookTemplateRequest",
+          "fullName": "ttn.lorawan.v3.GetApplicationWebhookTemplateRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "ids",
+              "description": "",
+              "label": "",
+              "type": "ApplicationWebhookTemplateIdentifiers",
+              "longType": "ApplicationWebhookTemplateIdentifiers",
+              "fullType": "ttn.lorawan.v3.ApplicationWebhookTemplateIdentifiers",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "field_mask",
+              "description": "",
+              "label": "",
+              "type": "FieldMask",
+              "longType": "google.protobuf.FieldMask",
+              "fullType": "google.protobuf.FieldMask",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ListApplicationWebhookTemplatesRequest",
+          "longName": "ListApplicationWebhookTemplatesRequest",
+          "fullName": "ttn.lorawan.v3.ListApplicationWebhookTemplatesRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
             {
               "name": "field_mask",
               "description": "",
@@ -2732,6 +3321,50 @@
                     {
                       "method": "GET",
                       "pattern": "/as/webhook-formats"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "GetTemplate",
+              "description": "",
+              "requestType": "GetApplicationWebhookTemplateRequest",
+              "requestLongType": "GetApplicationWebhookTemplateRequest",
+              "requestFullType": "ttn.lorawan.v3.GetApplicationWebhookTemplateRequest",
+              "requestStreaming": false,
+              "responseType": "ApplicationWebhookTemplate",
+              "responseLongType": "ApplicationWebhookTemplate",
+              "responseFullType": "ttn.lorawan.v3.ApplicationWebhookTemplate",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/as/webhook-templates/{ids.template_id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "ListTemplates",
+              "description": "",
+              "requestType": "ListApplicationWebhookTemplatesRequest",
+              "requestLongType": "ListApplicationWebhookTemplatesRequest",
+              "requestFullType": "ttn.lorawan.v3.ListApplicationWebhookTemplatesRequest",
+              "requestStreaming": false,
+              "responseType": "ApplicationWebhookTemplates",
+              "responseLongType": "ApplicationWebhookTemplates",
+              "responseFullType": "ttn.lorawan.v3.ApplicationWebhookTemplates",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/as/webhook-templates"
                     }
                   ]
                 }

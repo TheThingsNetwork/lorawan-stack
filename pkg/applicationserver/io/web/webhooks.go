@@ -34,6 +34,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/version"
 	ttnweb "go.thethings.network/lorawan-stack/pkg/web"
+	"google.golang.org/api/googleapi"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -349,6 +350,10 @@ func (w *webhooks) newRequest(ctx context.Context, msg *ttnpb.ApplicationUp, hoo
 		return nil, err
 	}
 	url.Path = path.Join(url.Path, cfg.Path)
+	expandVariables(url, msg)
+	if err != nil {
+		return nil, err
+	}
 	format, ok := formats[hook.Format]
 	if !ok {
 		return nil, errFormatNotFound.WithAttributes("format", hook.Format)
@@ -404,4 +409,27 @@ func (w *webhooks) handleDown(c echo.Context, op func(io.Server, context.Context
 		return err
 	}
 	return nil
+}
+
+func expandVariables(url *url.URL, up *ttnpb.ApplicationUp) {
+	var joinEUI, devEUI, devAddr string
+	if up.JoinEUI != nil {
+		joinEUI = up.JoinEUI.String()
+	}
+	if up.DevEUI != nil {
+		devEUI = up.DevEUI.String()
+	}
+	if up.DevAddr != nil {
+		devAddr = up.DevAddr.String()
+	}
+	googleapi.Expand(url, map[string]string{
+		"appID":         up.ApplicationID,
+		"applicationID": up.ApplicationID,
+		"appEUI":        joinEUI,
+		"joinEUI":       joinEUI,
+		"devID":         up.DeviceID,
+		"deviceID":      up.DeviceID,
+		"devEUI":        devEUI,
+		"devAddr":       devAddr,
+	})
 }

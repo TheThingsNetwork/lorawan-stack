@@ -197,10 +197,17 @@ func (m *ApplicationPubSub) ValidateFields(paths ...string) error {
 
 		case "format":
 
-			if utf8.RuneCountInString(m.GetFormat()) > 10 {
+			if utf8.RuneCountInString(m.GetFormat()) > 20 {
 				return ApplicationPubSubValidationError{
 					field:  "format",
-					reason: "value length must be at most 10 runes",
+					reason: "value length must be at most 20 runes",
+				}
+			}
+
+			if !_ApplicationPubSub_Format_Pattern.MatchString(m.GetFormat()) {
+				return ApplicationPubSubValidationError{
+					field:  "format",
+					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
 				}
 			}
 
@@ -426,6 +433,8 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ApplicationPubSubValidationError{}
+
+var _ApplicationPubSub_Format_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
 // ValidateFields checks the field values on ApplicationPubSubs with the rules
 // defined in the proto definition for this message. If any rules are

@@ -433,6 +433,28 @@
         }
       ]
     },
+    "GetTemplate": {
+      "file": "lorawan-stack/api/applicationserver_web.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/as/webhook-templates/{ids.template_id}",
+          "parameters": [
+            "ids.template_id"
+          ]
+        }
+      ]
+    },
+    "ListTemplates": {
+      "file": "lorawan-stack/api/applicationserver_web.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/as/webhook-templates",
+          "parameters": []
+        }
+      ]
+    },
     "Get": {
       "file": "lorawan-stack/api/applicationserver_web.proto",
       "http": [

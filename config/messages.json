@@ -1601,6 +1601,15 @@
       "file": "registry.go"
     }
   },
+  "error:pkg/applicationserver/io/web:fetch": {
+    "translations": {
+      "en": "fetching failed"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/web",
+      "file": "templates.go"
+    }
+  },
   "error:pkg/applicationserver/io/web:format_not_found": {
     "translations": {
       "en": "format `{format}` not found"
@@ -1617,6 +1626,15 @@
     "description": {
       "package": "pkg/applicationserver/io/web",
       "file": "webhooks.go"
+    }
+  },
+  "error:pkg/applicationserver/io/web:parse_file": {
+    "translations": {
+      "en": "could not parse file"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/web",
+      "file": "templates.go"
     }
   },
   "error:pkg/applicationserver/io/web:queue_full": {

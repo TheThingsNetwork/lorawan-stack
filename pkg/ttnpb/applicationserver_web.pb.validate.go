@@ -144,6 +144,639 @@ var _ interface {
 
 var _ApplicationWebhookIdentifiers_WebhookID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
+// ValidateFields checks the field values on
+// ApplicationWebhookTemplateIdentifiers with the rules defined in the proto
+// definition for this message. If any rules are violated, an error is returned.
+func (m *ApplicationWebhookTemplateIdentifiers) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ApplicationWebhookTemplateIdentifiersFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "template_id":
+
+			if utf8.RuneCountInString(m.GetTemplateID()) > 36 {
+				return ApplicationWebhookTemplateIdentifiersValidationError{
+					field:  "template_id",
+					reason: "value length must be at most 36 runes",
+				}
+			}
+
+			if !_ApplicationWebhookTemplateIdentifiers_TemplateID_Pattern.MatchString(m.GetTemplateID()) {
+				return ApplicationWebhookTemplateIdentifiersValidationError{
+					field:  "template_id",
+					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+				}
+			}
+
+		default:
+			return ApplicationWebhookTemplateIdentifiersValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ApplicationWebhookTemplateIdentifiersValidationError is the validation error
+// returned by ApplicationWebhookTemplateIdentifiers.ValidateFields if the
+// designated constraints aren't met.
+type ApplicationWebhookTemplateIdentifiersValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ApplicationWebhookTemplateIdentifiersValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ApplicationWebhookTemplateIdentifiersValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ApplicationWebhookTemplateIdentifiersValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ApplicationWebhookTemplateIdentifiersValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ApplicationWebhookTemplateIdentifiersValidationError) ErrorName() string {
+	return "ApplicationWebhookTemplateIdentifiersValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ApplicationWebhookTemplateIdentifiersValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sApplicationWebhookTemplateIdentifiers.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ApplicationWebhookTemplateIdentifiersValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ApplicationWebhookTemplateIdentifiersValidationError{}
+
+var _ApplicationWebhookTemplateIdentifiers_TemplateID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+
+// ValidateFields checks the field values on ApplicationWebhookTemplateField
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *ApplicationWebhookTemplateField) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ApplicationWebhookTemplateFieldFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "id":
+
+			if utf8.RuneCountInString(m.GetID()) > 36 {
+				return ApplicationWebhookTemplateFieldValidationError{
+					field:  "id",
+					reason: "value length must be at most 36 runes",
+				}
+			}
+
+			if !_ApplicationWebhookTemplateField_ID_Pattern.MatchString(m.GetID()) {
+				return ApplicationWebhookTemplateFieldValidationError{
+					field:  "id",
+					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+				}
+			}
+
+		case "name":
+
+			if utf8.RuneCountInString(m.GetName()) > 20 {
+				return ApplicationWebhookTemplateFieldValidationError{
+					field:  "name",
+					reason: "value length must be at most 20 runes",
+				}
+			}
+
+		case "description":
+
+			if utf8.RuneCountInString(m.GetDescription()) > 100 {
+				return ApplicationWebhookTemplateFieldValidationError{
+					field:  "description",
+					reason: "value length must be at most 100 runes",
+				}
+			}
+
+		case "secret":
+			// no validation rules for Secret
+		case "default_value":
+
+			if utf8.RuneCountInString(m.GetDefaultValue()) > 100 {
+				return ApplicationWebhookTemplateFieldValidationError{
+					field:  "default_value",
+					reason: "value length must be at most 100 runes",
+				}
+			}
+
+		default:
+			return ApplicationWebhookTemplateFieldValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ApplicationWebhookTemplateFieldValidationError is the validation error
+// returned by ApplicationWebhookTemplateField.ValidateFields if the
+// designated constraints aren't met.
+type ApplicationWebhookTemplateFieldValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ApplicationWebhookTemplateFieldValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ApplicationWebhookTemplateFieldValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ApplicationWebhookTemplateFieldValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ApplicationWebhookTemplateFieldValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ApplicationWebhookTemplateFieldValidationError) ErrorName() string {
+	return "ApplicationWebhookTemplateFieldValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ApplicationWebhookTemplateFieldValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sApplicationWebhookTemplateField.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ApplicationWebhookTemplateFieldValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ApplicationWebhookTemplateFieldValidationError{}
+
+var _ApplicationWebhookTemplateField_ID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+
+// ValidateFields checks the field values on ApplicationWebhookTemplate with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *ApplicationWebhookTemplate) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ApplicationWebhookTemplateFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "ids":
+
+			if v, ok := interface{}(&m.ApplicationWebhookTemplateIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationWebhookTemplateValidationError{
+						field:  "ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "name":
+
+			if utf8.RuneCountInString(m.GetName()) > 20 {
+				return ApplicationWebhookTemplateValidationError{
+					field:  "name",
+					reason: "value length must be at most 20 runes",
+				}
+			}
+
+		case "description":
+
+			if utf8.RuneCountInString(m.GetDescription()) > 100 {
+				return ApplicationWebhookTemplateValidationError{
+					field:  "description",
+					reason: "value length must be at most 100 runes",
+				}
+			}
+
+		case "logo_url":
+
+			if uri, err := url.Parse(m.GetLogoURL()); err != nil {
+				return ApplicationWebhookTemplateValidationError{
+					field:  "logo_url",
+					reason: "value must be a valid URI",
+					cause:  err,
+				}
+			} else if !uri.IsAbs() {
+				return ApplicationWebhookTemplateValidationError{
+					field:  "logo_url",
+					reason: "value must be absolute",
+				}
+			}
+
+		case "info_url":
+
+			if uri, err := url.Parse(m.GetInfoURL()); err != nil {
+				return ApplicationWebhookTemplateValidationError{
+					field:  "info_url",
+					reason: "value must be a valid URI",
+					cause:  err,
+				}
+			} else if !uri.IsAbs() {
+				return ApplicationWebhookTemplateValidationError{
+					field:  "info_url",
+					reason: "value must be absolute",
+				}
+			}
+
+		case "documentation_url":
+
+			if uri, err := url.Parse(m.GetDocumentationURL()); err != nil {
+				return ApplicationWebhookTemplateValidationError{
+					field:  "documentation_url",
+					reason: "value must be a valid URI",
+					cause:  err,
+				}
+			} else if !uri.IsAbs() {
+				return ApplicationWebhookTemplateValidationError{
+					field:  "documentation_url",
+					reason: "value must be absolute",
+				}
+			}
+
+		case "base_url":
+
+			if uri, err := url.Parse(m.GetBaseURL()); err != nil {
+				return ApplicationWebhookTemplateValidationError{
+					field:  "base_url",
+					reason: "value must be a valid URI",
+					cause:  err,
+				}
+			} else if !uri.IsAbs() {
+				return ApplicationWebhookTemplateValidationError{
+					field:  "base_url",
+					reason: "value must be absolute",
+				}
+			}
+
+		case "headers":
+			// no validation rules for Headers
+		case "format":
+
+			if utf8.RuneCountInString(m.GetFormat()) > 20 {
+				return ApplicationWebhookTemplateValidationError{
+					field:  "format",
+					reason: "value length must be at most 20 runes",
+				}
+			}
+
+			if !_ApplicationWebhookTemplate_Format_Pattern.MatchString(m.GetFormat()) {
+				return ApplicationWebhookTemplateValidationError{
+					field:  "format",
+					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+				}
+			}
+
+		case "fields":
+
+			for idx, item := range m.GetFields() {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return ApplicationWebhookTemplateValidationError{
+							field:  fmt.Sprintf("fields[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
+		case "uplink_message":
+
+			if v, ok := interface{}(m.GetUplinkMessage()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationWebhookTemplateValidationError{
+						field:  "uplink_message",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "join_accept":
+
+			if v, ok := interface{}(m.GetJoinAccept()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationWebhookTemplateValidationError{
+						field:  "join_accept",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "downlink_ack":
+
+			if v, ok := interface{}(m.GetDownlinkAck()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationWebhookTemplateValidationError{
+						field:  "downlink_ack",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "downlink_nack":
+
+			if v, ok := interface{}(m.GetDownlinkNack()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationWebhookTemplateValidationError{
+						field:  "downlink_nack",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "downlink_sent":
+
+			if v, ok := interface{}(m.GetDownlinkSent()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationWebhookTemplateValidationError{
+						field:  "downlink_sent",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "downlink_failed":
+
+			if v, ok := interface{}(m.GetDownlinkFailed()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationWebhookTemplateValidationError{
+						field:  "downlink_failed",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "downlink_queued":
+
+			if v, ok := interface{}(m.GetDownlinkQueued()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationWebhookTemplateValidationError{
+						field:  "downlink_queued",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "location_solved":
+
+			if v, ok := interface{}(m.GetLocationSolved()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationWebhookTemplateValidationError{
+						field:  "location_solved",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return ApplicationWebhookTemplateValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ApplicationWebhookTemplateValidationError is the validation error returned
+// by ApplicationWebhookTemplate.ValidateFields if the designated constraints
+// aren't met.
+type ApplicationWebhookTemplateValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ApplicationWebhookTemplateValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ApplicationWebhookTemplateValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ApplicationWebhookTemplateValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ApplicationWebhookTemplateValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ApplicationWebhookTemplateValidationError) ErrorName() string {
+	return "ApplicationWebhookTemplateValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ApplicationWebhookTemplateValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sApplicationWebhookTemplate.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ApplicationWebhookTemplateValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ApplicationWebhookTemplateValidationError{}
+
+var _ApplicationWebhookTemplate_Format_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+
+// ValidateFields checks the field values on ApplicationWebhookTemplates with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *ApplicationWebhookTemplates) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ApplicationWebhookTemplatesFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "templates":
+
+			for idx, item := range m.GetTemplates() {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return ApplicationWebhookTemplatesValidationError{
+							field:  fmt.Sprintf("templates[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
+		default:
+			return ApplicationWebhookTemplatesValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ApplicationWebhookTemplatesValidationError is the validation error returned
+// by ApplicationWebhookTemplates.ValidateFields if the designated constraints
+// aren't met.
+type ApplicationWebhookTemplatesValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ApplicationWebhookTemplatesValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ApplicationWebhookTemplatesValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ApplicationWebhookTemplatesValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ApplicationWebhookTemplatesValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ApplicationWebhookTemplatesValidationError) ErrorName() string {
+	return "ApplicationWebhookTemplatesValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ApplicationWebhookTemplatesValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sApplicationWebhookTemplates.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ApplicationWebhookTemplatesValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ApplicationWebhookTemplatesValidationError{}
+
 // ValidateFields checks the field values on ApplicationWebhook with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -213,7 +846,35 @@ func (m *ApplicationWebhook) ValidateFields(paths ...string) error {
 		case "headers":
 			// no validation rules for Headers
 		case "format":
-			// no validation rules for Format
+
+			if utf8.RuneCountInString(m.GetFormat()) > 20 {
+				return ApplicationWebhookValidationError{
+					field:  "format",
+					reason: "value length must be at most 20 runes",
+				}
+			}
+
+			if !_ApplicationWebhook_Format_Pattern.MatchString(m.GetFormat()) {
+				return ApplicationWebhookValidationError{
+					field:  "format",
+					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+				}
+			}
+
+		case "template_ids":
+
+			if v, ok := interface{}(m.ApplicationWebhookTemplateIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationWebhookValidationError{
+						field:  "template_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "template_fields":
+			// no validation rules for TemplateFields
 		case "uplink_message":
 
 			if v, ok := interface{}(m.GetUplinkMessage()).(interface{ ValidateFields(...string) error }); ok {
@@ -375,6 +1036,8 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ApplicationWebhookValidationError{}
+
+var _ApplicationWebhook_Format_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
 // ValidateFields checks the field values on ApplicationWebhooks with the rules
 // defined in the proto definition for this message. If any rules are
@@ -875,6 +1538,290 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = SetApplicationWebhookRequestValidationError{}
+
+// ValidateFields checks the field values on
+// GetApplicationWebhookTemplateRequest with the rules defined in the proto
+// definition for this message. If any rules are violated, an error is returned.
+func (m *GetApplicationWebhookTemplateRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = GetApplicationWebhookTemplateRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "ids":
+
+			if v, ok := interface{}(&m.ApplicationWebhookTemplateIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return GetApplicationWebhookTemplateRequestValidationError{
+						field:  "ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "field_mask":
+
+			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return GetApplicationWebhookTemplateRequestValidationError{
+						field:  "field_mask",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return GetApplicationWebhookTemplateRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// GetApplicationWebhookTemplateRequestValidationError is the validation error
+// returned by GetApplicationWebhookTemplateRequest.ValidateFields if the
+// designated constraints aren't met.
+type GetApplicationWebhookTemplateRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetApplicationWebhookTemplateRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetApplicationWebhookTemplateRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetApplicationWebhookTemplateRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetApplicationWebhookTemplateRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetApplicationWebhookTemplateRequestValidationError) ErrorName() string {
+	return "GetApplicationWebhookTemplateRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetApplicationWebhookTemplateRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetApplicationWebhookTemplateRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetApplicationWebhookTemplateRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetApplicationWebhookTemplateRequestValidationError{}
+
+// ValidateFields checks the field values on
+// ListApplicationWebhookTemplatesRequest with the rules defined in the proto
+// definition for this message. If any rules are violated, an error is returned.
+func (m *ListApplicationWebhookTemplatesRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ListApplicationWebhookTemplatesRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "field_mask":
+
+			if v, ok := interface{}(&m.FieldMask).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ListApplicationWebhookTemplatesRequestValidationError{
+						field:  "field_mask",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return ListApplicationWebhookTemplatesRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ListApplicationWebhookTemplatesRequestValidationError is the validation
+// error returned by ListApplicationWebhookTemplatesRequest.ValidateFields if
+// the designated constraints aren't met.
+type ListApplicationWebhookTemplatesRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListApplicationWebhookTemplatesRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListApplicationWebhookTemplatesRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListApplicationWebhookTemplatesRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListApplicationWebhookTemplatesRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListApplicationWebhookTemplatesRequestValidationError) ErrorName() string {
+	return "ListApplicationWebhookTemplatesRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListApplicationWebhookTemplatesRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListApplicationWebhookTemplatesRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListApplicationWebhookTemplatesRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListApplicationWebhookTemplatesRequestValidationError{}
+
+// ValidateFields checks the field values on ApplicationWebhookTemplate_Message
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *ApplicationWebhookTemplate_Message) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ApplicationWebhookTemplate_MessageFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "path":
+			// no validation rules for Path
+		default:
+			return ApplicationWebhookTemplate_MessageValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ApplicationWebhookTemplate_MessageValidationError is the validation error
+// returned by ApplicationWebhookTemplate_Message.ValidateFields if the
+// designated constraints aren't met.
+type ApplicationWebhookTemplate_MessageValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ApplicationWebhookTemplate_MessageValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ApplicationWebhookTemplate_MessageValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ApplicationWebhookTemplate_MessageValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ApplicationWebhookTemplate_MessageValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ApplicationWebhookTemplate_MessageValidationError) ErrorName() string {
+	return "ApplicationWebhookTemplate_MessageValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ApplicationWebhookTemplate_MessageValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sApplicationWebhookTemplate_Message.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ApplicationWebhookTemplate_MessageValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ApplicationWebhookTemplate_MessageValidationError{}
 
 // ValidateFields checks the field values on ApplicationWebhook_Message with
 // the rules defined in the proto definition for this message. If any rules

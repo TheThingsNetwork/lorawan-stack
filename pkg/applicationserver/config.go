@@ -79,6 +79,7 @@ type WebhooksConfig struct {
 	Timeout   time.Duration       `name:"timeout" description:"Wait timeout of the target to process the request"`
 	QueueSize int                 `name:"queue-size" description:"Number of requests to queue"`
 	Workers   int                 `name:"workers" description:"Number of workers to process requests"`
+	Templates web.TemplatesConfig `name:"templates" description:"The store of the webhook templates"`
 }
 
 // PubSubConfig contains go-cloud PubSub configuration of the Application Server.

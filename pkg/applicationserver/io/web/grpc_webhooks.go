@@ -31,13 +31,15 @@ func appendImplicitWebhookGetPaths(paths ...string) []string {
 }
 
 type webhookRegistryRPC struct {
-	webhooks WebhookRegistry
+	webhooks  WebhookRegistry
+	templates *TemplateStore
 }
 
 // NewWebhookRegistryRPC returns a new webhook registry gRPC server.
-func NewWebhookRegistryRPC(webhooks WebhookRegistry) ttnpb.ApplicationWebhookRegistryServer {
+func NewWebhookRegistryRPC(webhooks WebhookRegistry, templates *TemplateStore) ttnpb.ApplicationWebhookRegistryServer {
 	return &webhookRegistryRPC{
-		webhooks: webhooks,
+		webhooks:  webhooks,
+		templates: templates,
 	}
 }
 
@@ -49,6 +51,14 @@ func (s webhookRegistryRPC) GetFormats(ctx context.Context, _ *pbtypes.Empty) (*
 	return &ttnpb.ApplicationWebhookFormats{
 		Formats: fs,
 	}, nil
+}
+
+func (s webhookRegistryRPC) GetTemplate(ctx context.Context, req *ttnpb.GetApplicationWebhookTemplateRequest) (*ttnpb.ApplicationWebhookTemplate, error) {
+	return s.templates.GetTemplate(ctx, req)
+}
+
+func (s webhookRegistryRPC) ListTemplates(ctx context.Context, req *ttnpb.ListApplicationWebhookTemplatesRequest) (*ttnpb.ApplicationWebhookTemplates, error) {
+	return s.templates.ListTemplates(ctx, req)
 }
 
 func (s webhookRegistryRPC) Get(ctx context.Context, req *ttnpb.GetApplicationWebhookRequest) (*ttnpb.ApplicationWebhook, error) {

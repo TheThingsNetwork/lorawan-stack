@@ -52,7 +52,7 @@ func TestWebhooks(t *testing.T) {
 	_, err := registry.Set(ctx, ids, nil, func(_ *ttnpb.ApplicationWebhook) (*ttnpb.ApplicationWebhook, []string, error) {
 		return &ttnpb.ApplicationWebhook{
 				ApplicationWebhookIdentifiers: ids,
-				BaseURL:                       "https://myapp.com/api/ttn/v3",
+				BaseURL:                       "https://myapp.com/api/ttn/v3{/appID,devID}",
 				Headers: map[string]string{
 					"Authorization": "key secret",
 				},
@@ -102,6 +102,7 @@ func TestWebhooks(t *testing.T) {
 	}
 
 	t.Run("Upstream", func(t *testing.T) {
+		baseURL := fmt.Sprintf("https://myapp.com/api/ttn/v3/%s/%s", registeredApplicationID.ApplicationID, registeredDeviceID.DeviceID)
 		testSink := &mockSink{
 			ch: make(chan *http.Request, 1),
 		}
@@ -150,7 +151,7 @@ func TestWebhooks(t *testing.T) {
 							},
 						},
 						OK:  true,
-						URL: "https://myapp.com/api/ttn/v3/up",
+						URL: fmt.Sprintf("%s/up", baseURL),
 					},
 					{
 						Name: "UplinkMessage/UnregisteredDevice",
@@ -178,7 +179,7 @@ func TestWebhooks(t *testing.T) {
 							},
 						},
 						OK:  true,
-						URL: "https://myapp.com/api/ttn/v3/join",
+						URL: fmt.Sprintf("%s/join", baseURL),
 					},
 					{
 						Name: "DownlinkMessage/Ack",
@@ -194,7 +195,7 @@ func TestWebhooks(t *testing.T) {
 							},
 						},
 						OK:  true,
-						URL: "https://myapp.com/api/ttn/v3/down/ack",
+						URL: fmt.Sprintf("%s/down/ack", baseURL),
 					},
 					{
 						Name: "DownlinkMessage/Nack",
@@ -210,7 +211,7 @@ func TestWebhooks(t *testing.T) {
 							},
 						},
 						OK:  true,
-						URL: "https://myapp.com/api/ttn/v3/down/nack",
+						URL: fmt.Sprintf("%s/down/nack", baseURL),
 					},
 					{
 						Name: "DownlinkMessage/Sent",
@@ -226,7 +227,7 @@ func TestWebhooks(t *testing.T) {
 							},
 						},
 						OK:  true,
-						URL: "https://myapp.com/api/ttn/v3/down/sent",
+						URL: fmt.Sprintf("%s/down/sent", baseURL),
 					},
 					{
 						Name: "DownlinkMessage/Queued",
@@ -242,7 +243,7 @@ func TestWebhooks(t *testing.T) {
 							},
 						},
 						OK:  true,
-						URL: "https://myapp.com/api/ttn/v3/down/queued",
+						URL: fmt.Sprintf("%s/down/queued", baseURL),
 					},
 					{
 						Name: "DownlinkMessage/Failed",
@@ -263,7 +264,7 @@ func TestWebhooks(t *testing.T) {
 							},
 						},
 						OK:  true,
-						URL: "https://myapp.com/api/ttn/v3/down/failed",
+						URL: fmt.Sprintf("%s/down/failed", baseURL),
 					},
 					{
 						Name: "LocationSolved",
@@ -281,7 +282,7 @@ func TestWebhooks(t *testing.T) {
 							},
 						},
 						OK:  true,
-						URL: "https://myapp.com/api/ttn/v3/location",
+						URL: fmt.Sprintf("%s/location", baseURL),
 					},
 				} {
 					t.Run(tc.Name, func(t *testing.T) {

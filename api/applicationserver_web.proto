@@ -31,6 +31,59 @@ message ApplicationWebhookIdentifiers {
   string webhook_id = 2 [(gogoproto.customname) = "WebhookID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
 }
 
+message ApplicationWebhookTemplateIdentifiers {
+  string template_id = 1 [(gogoproto.customname) = "TemplateID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
+}
+
+// ApplicationWebhookTemplateField represents a custom field that needs to be filled by the user in order to use the template.
+// A field can be an API key, an username or password, or any custom platform specific field (such as region).
+// The fields are meant to be replaced inside the URLs and headers when the webhook is created.
+message ApplicationWebhookTemplateField {
+  string id = 1 [(gogoproto.customname) = "ID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
+  string name = 2 [(validate.rules).string.max_len = 20];
+  string description = 3 [(validate.rules).string.max_len = 100];
+  // Secret decides if the field should be shown in plain-text or should stay hidden.
+  bool secret = 4;
+  string default_value = 5 [(validate.rules).string.max_len = 100];
+}
+
+message ApplicationWebhookTemplate {
+  ApplicationWebhookTemplateIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+
+  string name = 2 [(validate.rules).string.max_len = 20];
+  string description = 3 [(validate.rules).string.max_len = 100];
+  string logo_url = 4 [(gogoproto.customname) = "LogoURL", (validate.rules).string.uri = true];
+  string info_url = 5 [(gogoproto.customname) = "InfoURL", (validate.rules).string.uri = true];
+  string documentation_url = 6 [(gogoproto.customname) = "DocumentationURL", (validate.rules).string.uri = true];
+
+  // The base URL of the template. Can contain template fields, in RFC 6570 format.
+  string base_url = 7 [(gogoproto.customname) = "BaseURL", (validate.rules).string.uri = true];
+
+  // The HTTP headers used by the template. Both the key and the value can contain template fields.
+  map<string,string> headers = 8;
+
+  string format = 9 [(validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 20}];
+
+  repeated ApplicationWebhookTemplateField fields = 10;
+
+  message Message {
+    // Path to append to the base URL. Can contain template fields, in RFC 6570 format.
+    string path = 1;
+  }
+  Message uplink_message = 11;
+  Message join_accept = 12;
+  Message downlink_ack = 13;
+  Message downlink_nack = 14;
+  Message downlink_sent = 15;
+  Message downlink_failed = 16;
+  Message downlink_queued = 17;
+  Message location_solved = 18;
+}
+
+message ApplicationWebhookTemplates {
+  repeated ApplicationWebhookTemplate templates = 1;
+}
+
 message ApplicationWebhook {
   ApplicationWebhookIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
@@ -42,7 +95,12 @@ message ApplicationWebhook {
   map<string,string> headers = 5;
   // The format to use for the body.
   // Supported values depend on the Application Server configuration.
-  string format = 6;
+  string format = 6 [(validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 20}];
+
+  // The ID of the template that was used to create the Webhook.
+  ApplicationWebhookTemplateIdentifiers template_ids = 15 [(gogoproto.embed) = true];
+  // The value of the fields used by the template. Maps field.id to the value.
+  map<string,string> template_fields = 16;
 
   message Message {
     // Path to append to the base URL.
@@ -82,10 +140,31 @@ message SetApplicationWebhookRequest {
   google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
 }
 
+message GetApplicationWebhookTemplateRequest {
+  ApplicationWebhookTemplateIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
+}
+
+message ListApplicationWebhookTemplatesRequest {
+  google.protobuf.FieldMask field_mask = 1 [(gogoproto.nullable) = false];
+}
+
 service ApplicationWebhookRegistry {
   rpc GetFormats(google.protobuf.Empty) returns (ApplicationWebhookFormats) {
     option (google.api.http) = {
       get: "/as/webhook-formats"
+    };
+  };
+
+  rpc GetTemplate(GetApplicationWebhookTemplateRequest) returns (ApplicationWebhookTemplate) {
+    option (google.api.http) = {
+      get: "/as/webhook-templates/{ids.template_id}"
+    };
+  };
+
+  rpc ListTemplates(ListApplicationWebhookTemplatesRequest) returns (ApplicationWebhookTemplates) {
+    option (google.api.http) = {
+      get: "/as/webhook-templates"
     };
   };
 

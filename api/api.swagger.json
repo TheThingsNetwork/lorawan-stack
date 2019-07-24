@@ -1453,6 +1453,70 @@
         ]
       }
     },
+    "/as/webhook-templates": {
+      "get": {
+        "operationId": "ListTemplates",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ApplicationWebhookTemplates"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "field_mask.paths",
+            "description": "The set of field mask paths.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "ApplicationWebhookRegistry"
+        ]
+      }
+    },
+    "/as/webhook-templates/{ids.template_id}": {
+      "get": {
+        "operationId": "GetTemplate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ApplicationWebhookTemplate"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "ids.template_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "field_mask.paths",
+            "description": "The set of field mask paths.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "ApplicationWebhookRegistry"
+        ]
+      }
+    },
     "/as/webhooks/{application_ids.application_id}": {
       "get": {
         "operationId": "List",
@@ -6934,6 +6998,17 @@
           "type": "string",
           "description": "The format to use for the body.\nSupported values depend on the Application Server configuration."
         },
+        "template_ids": {
+          "$ref": "#/definitions/v3ApplicationWebhookTemplateIdentifiers",
+          "description": "The ID of the template that was used to create the Webhook."
+        },
+        "template_fields": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "The value of the fields used by the template. Maps field.id to the value."
+        },
         "uplink_message": {
           "$ref": "#/definitions/v3ApplicationWebhookMessage"
         },
@@ -6989,6 +7064,124 @@
         "path": {
           "type": "string",
           "description": "Path to append to the base URL."
+        }
+      }
+    },
+    "v3ApplicationWebhookTemplate": {
+      "type": "object",
+      "properties": {
+        "ids": {
+          "$ref": "#/definitions/v3ApplicationWebhookTemplateIdentifiers"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "logo_url": {
+          "type": "string"
+        },
+        "info_url": {
+          "type": "string"
+        },
+        "documentation_url": {
+          "type": "string"
+        },
+        "base_url": {
+          "type": "string",
+          "description": "The base URL of the template. Can contain template fields, in RFC 6570 format."
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "The HTTP headers used by the template. Both the key and the value can contain template fields."
+        },
+        "format": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3ApplicationWebhookTemplateField"
+          }
+        },
+        "uplink_message": {
+          "$ref": "#/definitions/v3ApplicationWebhookTemplateMessage"
+        },
+        "join_accept": {
+          "$ref": "#/definitions/v3ApplicationWebhookTemplateMessage"
+        },
+        "downlink_ack": {
+          "$ref": "#/definitions/v3ApplicationWebhookTemplateMessage"
+        },
+        "downlink_nack": {
+          "$ref": "#/definitions/v3ApplicationWebhookTemplateMessage"
+        },
+        "downlink_sent": {
+          "$ref": "#/definitions/v3ApplicationWebhookTemplateMessage"
+        },
+        "downlink_failed": {
+          "$ref": "#/definitions/v3ApplicationWebhookTemplateMessage"
+        },
+        "downlink_queued": {
+          "$ref": "#/definitions/v3ApplicationWebhookTemplateMessage"
+        },
+        "location_solved": {
+          "$ref": "#/definitions/v3ApplicationWebhookTemplateMessage"
+        }
+      }
+    },
+    "v3ApplicationWebhookTemplateField": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "secret": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Secret decides if the field should be shown in plain-text or should stay hidden."
+        },
+        "default_value": {
+          "type": "string"
+        }
+      },
+      "description": "ApplicationWebhookTemplateField represents a custom field that needs to be filled by the user in order to use the template.\nA field can be an API key, an username or password, or any custom platform specific field (such as region).\nThe fields are meant to be replaced inside the URLs and headers when the webhook is created."
+    },
+    "v3ApplicationWebhookTemplateIdentifiers": {
+      "type": "object",
+      "properties": {
+        "template_id": {
+          "type": "string"
+        }
+      }
+    },
+    "v3ApplicationWebhookTemplateMessage": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Path to append to the base URL. Can contain template fields, in RFC 6570 format."
+        }
+      }
+    },
+    "v3ApplicationWebhookTemplates": {
+      "type": "object",
+      "properties": {
+        "templates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3ApplicationWebhookTemplate"
+          }
         }
       }
     },

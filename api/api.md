@@ -47,11 +47,20 @@
   - [Message `ApplicationWebhook`](#ttn.lorawan.v3.ApplicationWebhook)
   - [Message `ApplicationWebhook.HeadersEntry`](#ttn.lorawan.v3.ApplicationWebhook.HeadersEntry)
   - [Message `ApplicationWebhook.Message`](#ttn.lorawan.v3.ApplicationWebhook.Message)
+  - [Message `ApplicationWebhook.TemplateFieldsEntry`](#ttn.lorawan.v3.ApplicationWebhook.TemplateFieldsEntry)
   - [Message `ApplicationWebhookFormats`](#ttn.lorawan.v3.ApplicationWebhookFormats)
   - [Message `ApplicationWebhookFormats.FormatsEntry`](#ttn.lorawan.v3.ApplicationWebhookFormats.FormatsEntry)
   - [Message `ApplicationWebhookIdentifiers`](#ttn.lorawan.v3.ApplicationWebhookIdentifiers)
+  - [Message `ApplicationWebhookTemplate`](#ttn.lorawan.v3.ApplicationWebhookTemplate)
+  - [Message `ApplicationWebhookTemplate.HeadersEntry`](#ttn.lorawan.v3.ApplicationWebhookTemplate.HeadersEntry)
+  - [Message `ApplicationWebhookTemplate.Message`](#ttn.lorawan.v3.ApplicationWebhookTemplate.Message)
+  - [Message `ApplicationWebhookTemplateField`](#ttn.lorawan.v3.ApplicationWebhookTemplateField)
+  - [Message `ApplicationWebhookTemplateIdentifiers`](#ttn.lorawan.v3.ApplicationWebhookTemplateIdentifiers)
+  - [Message `ApplicationWebhookTemplates`](#ttn.lorawan.v3.ApplicationWebhookTemplates)
   - [Message `ApplicationWebhooks`](#ttn.lorawan.v3.ApplicationWebhooks)
   - [Message `GetApplicationWebhookRequest`](#ttn.lorawan.v3.GetApplicationWebhookRequest)
+  - [Message `GetApplicationWebhookTemplateRequest`](#ttn.lorawan.v3.GetApplicationWebhookTemplateRequest)
+  - [Message `ListApplicationWebhookTemplatesRequest`](#ttn.lorawan.v3.ListApplicationWebhookTemplatesRequest)
   - [Message `ListApplicationWebhooksRequest`](#ttn.lorawan.v3.ListApplicationWebhooksRequest)
   - [Message `SetApplicationWebhookRequest`](#ttn.lorawan.v3.SetApplicationWebhookRequest)
   - [Service `ApplicationWebhookRegistry`](#ttn.lorawan.v3.ApplicationWebhookRegistry)
@@ -804,7 +813,7 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 | Field | Validations |
 | ----- | ----------- |
 | `ids` | <p>`message.required`: `true`</p> |
-| `format` | <p>`string.max_len`: `10`</p> |
+| `format` | <p>`string.max_len`: `20`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
 | `base_topic` | <p>`string.max_len`: `100`</p> |
 
 ### <a name="ttn.lorawan.v3.ApplicationPubSub.Message">Message `ApplicationPubSub.Message`</a>
@@ -938,6 +947,8 @@ The NATS provider settings.
 | `base_url` | [`string`](#string) |  | Base URL to which the message's path is appended. |
 | `headers` | [`ApplicationWebhook.HeadersEntry`](#ttn.lorawan.v3.ApplicationWebhook.HeadersEntry) | repeated | HTTP headers to use. |
 | `format` | [`string`](#string) |  | The format to use for the body. Supported values depend on the Application Server configuration. |
+| `template_ids` | [`ApplicationWebhookTemplateIdentifiers`](#ttn.lorawan.v3.ApplicationWebhookTemplateIdentifiers) |  | The ID of the template that was used to create the Webhook. |
+| `template_fields` | [`ApplicationWebhook.TemplateFieldsEntry`](#ttn.lorawan.v3.ApplicationWebhook.TemplateFieldsEntry) | repeated | The value of the fields used by the template. Maps field.id to the value. |
 | `uplink_message` | [`ApplicationWebhook.Message`](#ttn.lorawan.v3.ApplicationWebhook.Message) |  |  |
 | `join_accept` | [`ApplicationWebhook.Message`](#ttn.lorawan.v3.ApplicationWebhook.Message) |  |  |
 | `downlink_ack` | [`ApplicationWebhook.Message`](#ttn.lorawan.v3.ApplicationWebhook.Message) |  |  |
@@ -953,6 +964,7 @@ The NATS provider settings.
 | ----- | ----------- |
 | `ids` | <p>`message.required`: `true`</p> |
 | `base_url` | <p>`string.uri`: `true`</p> |
+| `format` | <p>`string.max_len`: `20`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
 
 ### <a name="ttn.lorawan.v3.ApplicationWebhook.HeadersEntry">Message `ApplicationWebhook.HeadersEntry`</a>
 
@@ -966,6 +978,13 @@ The NATS provider settings.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `path` | [`string`](#string) |  | Path to append to the base URL. |
+
+### <a name="ttn.lorawan.v3.ApplicationWebhook.TemplateFieldsEntry">Message `ApplicationWebhook.TemplateFieldsEntry`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `key` | [`string`](#string) |  |  |
+| `value` | [`string`](#string) |  |  |
 
 ### <a name="ttn.lorawan.v3.ApplicationWebhookFormats">Message `ApplicationWebhookFormats`</a>
 
@@ -994,6 +1013,96 @@ The NATS provider settings.
 | `application_ids` | <p>`message.required`: `true`</p> |
 | `webhook_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
 
+### <a name="ttn.lorawan.v3.ApplicationWebhookTemplate">Message `ApplicationWebhookTemplate`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `ids` | [`ApplicationWebhookTemplateIdentifiers`](#ttn.lorawan.v3.ApplicationWebhookTemplateIdentifiers) |  |  |
+| `name` | [`string`](#string) |  |  |
+| `description` | [`string`](#string) |  |  |
+| `logo_url` | [`string`](#string) |  |  |
+| `info_url` | [`string`](#string) |  |  |
+| `documentation_url` | [`string`](#string) |  |  |
+| `base_url` | [`string`](#string) |  | The base URL of the template. Can contain template fields, in RFC 6570 format. |
+| `headers` | [`ApplicationWebhookTemplate.HeadersEntry`](#ttn.lorawan.v3.ApplicationWebhookTemplate.HeadersEntry) | repeated | The HTTP headers used by the template. Both the key and the value can contain template fields. |
+| `format` | [`string`](#string) |  |  |
+| `fields` | [`ApplicationWebhookTemplateField`](#ttn.lorawan.v3.ApplicationWebhookTemplateField) | repeated |  |
+| `uplink_message` | [`ApplicationWebhookTemplate.Message`](#ttn.lorawan.v3.ApplicationWebhookTemplate.Message) |  |  |
+| `join_accept` | [`ApplicationWebhookTemplate.Message`](#ttn.lorawan.v3.ApplicationWebhookTemplate.Message) |  |  |
+| `downlink_ack` | [`ApplicationWebhookTemplate.Message`](#ttn.lorawan.v3.ApplicationWebhookTemplate.Message) |  |  |
+| `downlink_nack` | [`ApplicationWebhookTemplate.Message`](#ttn.lorawan.v3.ApplicationWebhookTemplate.Message) |  |  |
+| `downlink_sent` | [`ApplicationWebhookTemplate.Message`](#ttn.lorawan.v3.ApplicationWebhookTemplate.Message) |  |  |
+| `downlink_failed` | [`ApplicationWebhookTemplate.Message`](#ttn.lorawan.v3.ApplicationWebhookTemplate.Message) |  |  |
+| `downlink_queued` | [`ApplicationWebhookTemplate.Message`](#ttn.lorawan.v3.ApplicationWebhookTemplate.Message) |  |  |
+| `location_solved` | [`ApplicationWebhookTemplate.Message`](#ttn.lorawan.v3.ApplicationWebhookTemplate.Message) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `ids` | <p>`message.required`: `true`</p> |
+| `name` | <p>`string.max_len`: `20`</p> |
+| `description` | <p>`string.max_len`: `100`</p> |
+| `logo_url` | <p>`string.uri`: `true`</p> |
+| `info_url` | <p>`string.uri`: `true`</p> |
+| `documentation_url` | <p>`string.uri`: `true`</p> |
+| `base_url` | <p>`string.uri`: `true`</p> |
+| `format` | <p>`string.max_len`: `20`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+
+### <a name="ttn.lorawan.v3.ApplicationWebhookTemplate.HeadersEntry">Message `ApplicationWebhookTemplate.HeadersEntry`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `key` | [`string`](#string) |  |  |
+| `value` | [`string`](#string) |  |  |
+
+### <a name="ttn.lorawan.v3.ApplicationWebhookTemplate.Message">Message `ApplicationWebhookTemplate.Message`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `path` | [`string`](#string) |  | Path to append to the base URL. Can contain template fields, in RFC 6570 format. |
+
+### <a name="ttn.lorawan.v3.ApplicationWebhookTemplateField">Message `ApplicationWebhookTemplateField`</a>
+
+ApplicationWebhookTemplateField represents a custom field that needs to be filled by the user in order to use the template.
+A field can be an API key, an username or password, or any custom platform specific field (such as region).
+The fields are meant to be replaced inside the URLs and headers when the webhook is created.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `id` | [`string`](#string) |  |  |
+| `name` | [`string`](#string) |  |  |
+| `description` | [`string`](#string) |  |  |
+| `secret` | [`bool`](#bool) |  | Secret decides if the field should be shown in plain-text or should stay hidden. |
+| `default_value` | [`string`](#string) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+| `name` | <p>`string.max_len`: `20`</p> |
+| `description` | <p>`string.max_len`: `100`</p> |
+| `default_value` | <p>`string.max_len`: `100`</p> |
+
+### <a name="ttn.lorawan.v3.ApplicationWebhookTemplateIdentifiers">Message `ApplicationWebhookTemplateIdentifiers`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `template_id` | [`string`](#string) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `template_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+
+### <a name="ttn.lorawan.v3.ApplicationWebhookTemplates">Message `ApplicationWebhookTemplates`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `templates` | [`ApplicationWebhookTemplate`](#ttn.lorawan.v3.ApplicationWebhookTemplate) | repeated |  |
+
 ### <a name="ttn.lorawan.v3.ApplicationWebhooks">Message `ApplicationWebhooks`</a>
 
 | Field | Type | Label | Description |
@@ -1012,6 +1121,25 @@ The NATS provider settings.
 | Field | Validations |
 | ----- | ----------- |
 | `ids` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.GetApplicationWebhookTemplateRequest">Message `GetApplicationWebhookTemplateRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `ids` | [`ApplicationWebhookTemplateIdentifiers`](#ttn.lorawan.v3.ApplicationWebhookTemplateIdentifiers) |  |  |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `ids` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.ListApplicationWebhookTemplatesRequest">Message `ListApplicationWebhookTemplatesRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  |  |
 
 ### <a name="ttn.lorawan.v3.ListApplicationWebhooksRequest">Message `ListApplicationWebhooksRequest`</a>
 
@@ -1044,6 +1172,8 @@ The NATS provider settings.
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `GetFormats` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`ApplicationWebhookFormats`](#ttn.lorawan.v3.ApplicationWebhookFormats) |  |
+| `GetTemplate` | [`GetApplicationWebhookTemplateRequest`](#ttn.lorawan.v3.GetApplicationWebhookTemplateRequest) | [`ApplicationWebhookTemplate`](#ttn.lorawan.v3.ApplicationWebhookTemplate) |  |
+| `ListTemplates` | [`ListApplicationWebhookTemplatesRequest`](#ttn.lorawan.v3.ListApplicationWebhookTemplatesRequest) | [`ApplicationWebhookTemplates`](#ttn.lorawan.v3.ApplicationWebhookTemplates) |  |
 | `Get` | [`GetApplicationWebhookRequest`](#ttn.lorawan.v3.GetApplicationWebhookRequest) | [`ApplicationWebhook`](#ttn.lorawan.v3.ApplicationWebhook) |  |
 | `List` | [`ListApplicationWebhooksRequest`](#ttn.lorawan.v3.ListApplicationWebhooksRequest) | [`ApplicationWebhooks`](#ttn.lorawan.v3.ApplicationWebhooks) |  |
 | `Set` | [`SetApplicationWebhookRequest`](#ttn.lorawan.v3.SetApplicationWebhookRequest) | [`ApplicationWebhook`](#ttn.lorawan.v3.ApplicationWebhook) |  |
@@ -1054,6 +1184,8 @@ The NATS provider settings.
 | Method Name | Method | Pattern | Body |
 | ----------- | ------ | ------- | ---- |
 | `GetFormats` | `GET` | `/api/v3/as/webhook-formats` |  |
+| `GetTemplate` | `GET` | `/api/v3/as/webhook-templates/{ids.template_id}` |  |
+| `ListTemplates` | `GET` | `/api/v3/as/webhook-templates` |  |
 | `Get` | `GET` | `/api/v3/as/webhooks/{ids.application_ids.application_id}/{ids.webhook_id}` |  |
 | `List` | `GET` | `/api/v3/as/webhooks/{application_ids.application_id}` |  |
 | `Set` | `PUT` | `/api/v3/as/webhooks/{webhook.ids.application_ids.application_id}/{webhook.ids.webhook_id}` | `*` |
