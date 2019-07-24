@@ -26,7 +26,7 @@ import (
 )
 
 func (is *IdentityServer) listOAuthClientAuthorizations(ctx context.Context, req *ttnpb.ListOAuthClientAuthorizationsRequest) (authorizations *ttnpb.OAuthClientAuthorizations, err error) {
-	if err := rights.RequireUser(ctx, req.UserIdentifiers, ttnpb.RIGHT_USER_ALL); err != nil {
+	if err := rights.RequireUser(ctx, req.UserIdentifiers, ttnpb.RIGHT_USER_AUTHORIZED_CLIENTS); err != nil {
 		return nil, err
 	}
 	var total uint64
@@ -54,7 +54,7 @@ func (is *IdentityServer) listOAuthAccessTokens(ctx context.Context, req *ttnpb.
 	}
 	accessToken := authInfo.GetOAuthAccessToken()
 	if accessToken == nil || accessToken.UserIDs.UserID != req.UserIDs.UserID || accessToken.ClientIDs.ClientID != req.ClientIDs.ClientID {
-		if err := rights.RequireUser(ctx, req.UserIDs, ttnpb.RIGHT_USER_ALL); err != nil {
+		if err := rights.RequireUser(ctx, req.UserIDs, ttnpb.RIGHT_USER_AUTHORIZED_CLIENTS); err != nil {
 			return nil, err
 		}
 	}
@@ -80,7 +80,7 @@ func (is *IdentityServer) listOAuthAccessTokens(ctx context.Context, req *ttnpb.
 }
 
 func (is *IdentityServer) deleteOAuthAuthorization(ctx context.Context, req *ttnpb.OAuthClientAuthorizationIdentifiers) (*types.Empty, error) {
-	if err := rights.RequireUser(ctx, req.UserIDs, ttnpb.RIGHT_USER_ALL); err != nil {
+	if err := rights.RequireUser(ctx, req.UserIDs, ttnpb.RIGHT_USER_AUTHORIZED_CLIENTS); err != nil {
 		return nil, err
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) (err error) {
@@ -101,7 +101,7 @@ func (is *IdentityServer) deleteOAuthAccessToken(ctx context.Context, req *ttnpb
 	}
 	accessToken := authInfo.GetOAuthAccessToken()
 	if accessToken == nil || accessToken.UserIDs.UserID != req.UserIDs.UserID || accessToken.ClientIDs.ClientID != req.ClientIDs.ClientID {
-		if err := rights.RequireUser(ctx, req.UserIDs, ttnpb.RIGHT_USER_ALL); err != nil {
+		if err := rights.RequireUser(ctx, req.UserIDs, ttnpb.RIGHT_USER_AUTHORIZED_CLIENTS); err != nil {
 			return nil, err
 		}
 	}

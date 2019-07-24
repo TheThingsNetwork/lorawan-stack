@@ -22,54 +22,48 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/unique"
 )
 
-var errNoApplicationRights = errors.DefinePermissionDenied(
-	"no_application_rights",
-	"no rights for application `{uid}`",
-)
-
-var errInsufficientApplicationRights = errors.DefinePermissionDenied(
-	"insufficient_application_rights",
-	"insufficient rights for application `{uid}`",
-)
-
-var errNoClientRights = errors.DefinePermissionDenied(
-	"no_client_rights",
-	"no rights for client `{uid}`",
-)
-
-var errInsufficientClientRights = errors.DefinePermissionDenied(
-	"insufficient_client_rights",
-	"insufficient rights for client `{uid}`",
-)
-
-var errNoGatewayRights = errors.DefinePermissionDenied(
-	"no_gateway_rights",
-	"no rights for gateway `{uid}`",
-)
-
-var errInsufficientGatewayRights = errors.DefinePermissionDenied(
-	"insufficient_gateway_rights",
-	"insufficient rights for gateway `{uid}`",
-)
-
-var errNoOrganizationRights = errors.DefinePermissionDenied(
-	"no_organization_rights",
-	"no rights for organization `{uid}`",
-)
-
-var errInsufficientOrganizationRights = errors.DefinePermissionDenied(
-	"insufficient_organization_rights",
-	"insufficient rights for organization `{uid}`",
-)
-
-var errNoUserRights = errors.DefinePermissionDenied(
-	"no_user_rights",
-	"no rights for user `{uid}`",
-)
-
-var errInsufficientUserRights = errors.DefinePermissionDenied(
-	"insufficient_user_rights",
-	"insufficient rights for user `{uid}`",
+// Errors for no/insufficient rights.
+var (
+	ErrNoApplicationRights = errors.DefinePermissionDenied(
+		"no_application_rights",
+		"no rights for application `{uid}`",
+	)
+	ErrInsufficientApplicationRights = errors.DefinePermissionDenied(
+		"insufficient_application_rights",
+		"insufficient rights for application `{uid}`",
+	)
+	ErrNoClientRights = errors.DefinePermissionDenied(
+		"no_client_rights",
+		"no rights for client `{uid}`",
+	)
+	ErrInsufficientClientRights = errors.DefinePermissionDenied(
+		"insufficient_client_rights",
+		"insufficient rights for client `{uid}`",
+	)
+	ErrNoGatewayRights = errors.DefinePermissionDenied(
+		"no_gateway_rights",
+		"no rights for gateway `{uid}`",
+	)
+	ErrInsufficientGatewayRights = errors.DefinePermissionDenied(
+		"insufficient_gateway_rights",
+		"insufficient rights for gateway `{uid}`",
+	)
+	ErrNoOrganizationRights = errors.DefinePermissionDenied(
+		"no_organization_rights",
+		"no rights for organization `{uid}`",
+	)
+	ErrInsufficientOrganizationRights = errors.DefinePermissionDenied(
+		"insufficient_organization_rights",
+		"insufficient rights for organization `{uid}`",
+	)
+	ErrNoUserRights = errors.DefinePermissionDenied(
+		"no_user_rights",
+		"no rights for user `{uid}`",
+	)
+	ErrInsufficientUserRights = errors.DefinePermissionDenied(
+		"insufficient_user_rights",
+		"insufficient rights for user `{uid}`",
+	)
 )
 
 // RequireApplication checks that context contains the required rights for the
@@ -81,11 +75,11 @@ func RequireApplication(ctx context.Context, id ttnpb.ApplicationIdentifiers, re
 		return err
 	}
 	if len(rights.GetRights()) == 0 {
-		return errNoApplicationRights.WithAttributes("uid", uid)
+		return ErrNoApplicationRights.WithAttributes("uid", uid)
 	}
 	missing := ttnpb.RightsFrom(required...).Sub(rights).GetRights()
 	if len(missing) > 0 {
-		return errInsufficientApplicationRights.WithAttributes("uid", uid, "missing", missing)
+		return ErrInsufficientApplicationRights.WithAttributes("uid", uid, "missing", missing)
 	}
 	return nil
 }
@@ -99,11 +93,11 @@ func RequireClient(ctx context.Context, id ttnpb.ClientIdentifiers, required ...
 		return err
 	}
 	if len(rights.GetRights()) == 0 {
-		return errNoClientRights.WithAttributes("uid", uid)
+		return ErrNoClientRights.WithAttributes("uid", uid)
 	}
 	missing := ttnpb.RightsFrom(required...).Sub(rights).GetRights()
 	if len(missing) > 0 {
-		return errInsufficientClientRights.WithAttributes("uid", uid, "missing", missing)
+		return ErrInsufficientClientRights.WithAttributes("uid", uid, "missing", missing)
 	}
 	return nil
 }
@@ -117,11 +111,11 @@ func RequireGateway(ctx context.Context, id ttnpb.GatewayIdentifiers, required .
 		return err
 	}
 	if len(rights.GetRights()) == 0 {
-		return errNoGatewayRights.WithAttributes("uid", uid)
+		return ErrNoGatewayRights.WithAttributes("uid", uid)
 	}
 	missing := ttnpb.RightsFrom(required...).Sub(rights).GetRights()
 	if len(missing) > 0 {
-		return errInsufficientGatewayRights.WithAttributes("uid", uid, "missing", missing)
+		return ErrInsufficientGatewayRights.WithAttributes("uid", uid, "missing", missing)
 	}
 	return nil
 }
@@ -135,11 +129,11 @@ func RequireOrganization(ctx context.Context, id ttnpb.OrganizationIdentifiers, 
 		return err
 	}
 	if len(rights.GetRights()) == 0 {
-		return errNoOrganizationRights.WithAttributes("uid", uid)
+		return ErrNoOrganizationRights.WithAttributes("uid", uid)
 	}
 	missing := ttnpb.RightsFrom(required...).Sub(rights).GetRights()
 	if len(missing) > 0 {
-		return errInsufficientOrganizationRights.WithAttributes("uid", uid, "missing", missing)
+		return ErrInsufficientOrganizationRights.WithAttributes("uid", uid, "missing", missing)
 	}
 	return nil
 }
@@ -153,11 +147,11 @@ func RequireUser(ctx context.Context, id ttnpb.UserIdentifiers, required ...ttnp
 		return err
 	}
 	if len(rights.GetRights()) == 0 {
-		return errNoUserRights.WithAttributes("uid", uid)
+		return ErrNoUserRights.WithAttributes("uid", uid)
 	}
 	missing := ttnpb.RightsFrom(required...).Sub(rights).GetRights()
 	if len(missing) > 0 {
-		return errInsufficientUserRights.WithAttributes("uid", uid, "missing", missing)
+		return ErrInsufficientUserRights.WithAttributes("uid", uid, "missing", missing)
 	}
 	return nil
 }

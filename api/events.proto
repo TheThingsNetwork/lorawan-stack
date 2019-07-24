@@ -20,6 +20,7 @@ import "google/api/annotations.proto";
 import "google/protobuf/any.proto";
 import "google/protobuf/timestamp.proto";
 import "lorawan-stack/api/identifiers.proto";
+import "lorawan-stack/api/rights.proto";
 
 package ttn.lorawan.v3;
 
@@ -33,6 +34,8 @@ message Event {
   repeated string correlation_ids = 5 [(gogoproto.customname) = "CorrelationIDs", (validate.rules).repeated.items.string.max_len = 100];
   string origin = 6;
   map<string,bytes> context = 7;
+  // The event will be visible to a caller that has any of these rights.
+  Rights visibility = 8;
 }
 
 message StreamEventsRequest {

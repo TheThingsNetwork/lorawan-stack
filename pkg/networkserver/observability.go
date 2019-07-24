@@ -28,58 +28,112 @@ import (
 )
 
 func defineReceiveMACAcceptEvent(name, desc string) func() events.Definition {
-	return events.DefineFunc(fmt.Sprintf("ns.mac.%s.answer.accept", name), fmt.Sprintf("%s accept received", desc))
+	return events.DefineFunc(
+		fmt.Sprintf("ns.mac.%s.answer.accept", name), fmt.Sprintf("%s accept received", desc),
+		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+	)
 }
 
 func defineReceiveMACAnswerEvent(name, desc string) func() events.Definition {
-	return events.DefineFunc(fmt.Sprintf("ns.mac.%s.answer", name), fmt.Sprintf("%s answer received", desc))
+	return events.DefineFunc(
+		fmt.Sprintf("ns.mac.%s.answer", name), fmt.Sprintf("%s answer received", desc),
+		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+	)
 }
 
 func defineReceiveMACIndicationEvent(name, desc string) func() events.Definition {
-	return events.DefineFunc(fmt.Sprintf("ns.mac.%s.indication", name), fmt.Sprintf("%s indication received", desc))
+	return events.DefineFunc(
+		fmt.Sprintf("ns.mac.%s.indication", name), fmt.Sprintf("%s indication received", desc),
+		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+	)
 }
 
 func defineReceiveMACRejectEvent(name, desc string) func() events.Definition {
-	return events.DefineFunc(fmt.Sprintf("ns.mac.%s.answer.reject", name), fmt.Sprintf("%s rejection received", desc))
+	return events.DefineFunc(
+		fmt.Sprintf("ns.mac.%s.answer.reject", name), fmt.Sprintf("%s rejection received", desc),
+		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+	)
 }
 
 func defineReceiveMACRequestEvent(name, desc string) func() events.Definition {
-	return events.DefineFunc(fmt.Sprintf("ns.mac.%s.request", name), fmt.Sprintf("%s request received", desc))
+	return events.DefineFunc(
+		fmt.Sprintf("ns.mac.%s.request", name), fmt.Sprintf("%s request received", desc),
+		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+	)
 }
 
 func defineEnqueueMACAnswerEvent(name, desc string) func() events.Definition {
-	return events.DefineFunc(fmt.Sprintf("ns.mac.%s.answer", name), fmt.Sprintf("%s answer enqueued", desc))
+	return events.DefineFunc(
+		fmt.Sprintf("ns.mac.%s.answer", name), fmt.Sprintf("%s answer enqueued", desc),
+		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+	)
 }
 
 func defineEnqueueMACConfirmationEvent(name, desc string) func() events.Definition {
-	return events.DefineFunc(fmt.Sprintf("ns.mac.%s.confirmation", name), fmt.Sprintf("%s confirmation enqueued", desc))
+	return events.DefineFunc(
+		fmt.Sprintf("ns.mac.%s.confirmation", name), fmt.Sprintf("%s confirmation enqueued", desc),
+		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+	)
 }
 
 func defineEnqueueMACRequestEvent(name, desc string) func() events.Definition {
-	return events.DefineFunc(fmt.Sprintf("ns.mac.%s.request", name), fmt.Sprintf("%s request enqueued", desc))
+	return events.DefineFunc(
+		fmt.Sprintf("ns.mac.%s.request", name), fmt.Sprintf("%s request enqueued", desc),
+		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+	)
 }
 
 var (
-	evtBeginApplicationLink = events.Define("ns.application.begin_link", "begin application link")
-	evtEndApplicationLink   = events.Define("ns.application.end_link", "end application link")
-
-	evtReceiveUplink          = events.Define("ns.up.receive", "receive uplink message")
-	evtReceiveUplinkDuplicate = events.Define("ns.up.receive_duplicate", "receive duplicate uplink message")
-
-	evtMergeMetadata = events.Define("ns.up.merge_metadata", "merge uplink message metadata")
-
-	evtDropDataUplink    = events.Define("ns.up.data.drop", "drop data message")
-	evtForwardDataUplink = events.Define("ns.up.data.forward", "forward data message")
-
-	evtDropJoinRequest    = events.Define("ns.up.join.drop", "drop join-request")
-	evtForwardJoinRequest = events.Define("ns.up.join.forward", "forward join-request")
-
-	evtDropRejoinRequest    = events.Define("ns.up.rejoin.drop", "drop rejoin-request")
-	evtForwardRejoinRequest = events.Define("ns.up.rejoin.forward", "forward rejoin-request")
-
+	evtBeginApplicationLink = events.Define(
+		"ns.application.begin_link", "begin application link",
+		ttnpb.RIGHT_APPLICATION_LINK,
+	)
+	evtEndApplicationLink = events.Define(
+		"ns.application.end_link", "end application link",
+		ttnpb.RIGHT_APPLICATION_LINK,
+	)
+	evtReceiveUplink = events.Define(
+		"ns.up.receive", "receive uplink message",
+		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+	)
+	evtReceiveUplinkDuplicate = events.Define(
+		"ns.up.receive_duplicate", "receive duplicate uplink message",
+		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+	)
+	evtMergeMetadata = events.Define(
+		"ns.up.merge_metadata", "merge uplink message metadata",
+		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+	)
+	evtDropDataUplink = events.Define(
+		"ns.up.data.drop", "drop data message",
+		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+	)
+	evtForwardDataUplink = events.Define(
+		"ns.up.data.forward", "forward data message",
+		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+	)
+	evtDropJoinRequest = events.Define(
+		"ns.up.join.drop", "drop join-request",
+		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+	)
+	evtForwardJoinRequest = events.Define(
+		"ns.up.join.forward", "forward join-request",
+		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+	)
+	evtDropRejoinRequest = events.Define(
+		"ns.up.rejoin.drop", "drop rejoin-request",
+		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+	)
+	evtForwardRejoinRequest = events.Define(
+		"ns.up.rejoin.forward", "forward rejoin-request",
+		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+	)
 	evtEnqueueProprietaryMACAnswer  = defineEnqueueMACAnswerEvent("proprietary", "proprietary MAC command")
 	evtEnqueueProprietaryMACRequest = defineEnqueueMACRequestEvent("proprietary", "proprietary MAC command")
-	evtReceiveProprietaryMAC        = events.Define("ns.mac.proprietary.receive", "proprietary MAC command received")
+	evtReceiveProprietaryMAC        = events.Define(
+		"ns.mac.proprietary.receive", "proprietary MAC command received",
+		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+	)
 )
 
 const (

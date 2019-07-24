@@ -19,6 +19,7 @@ import (
 	"fmt"
 
 	"go.thethings.network/lorawan-stack/pkg/i18n"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 const i18nPrefix = "event"
@@ -42,7 +43,7 @@ var Definitions = make(map[string]string)
 
 // defineSkip registers an event and returns its definition.
 // The argument skip is the number of stack frames to ascend, with 0 identifying the caller of defineSkip.
-func defineSkip(name, description string, skip uint) Definition {
+func defineSkip(name, description string, skip uint, visibility ...ttnpb.Right) Definition {
 	if Definitions[name] != "" {
 		panic(fmt.Errorf("Event %s already defined", name))
 	}
@@ -50,19 +51,19 @@ func defineSkip(name, description string, skip uint) Definition {
 	Definitions[name] = description
 	initMetrics(name)
 	return func(ctx context.Context, identifiers CombinedIdentifiers, data interface{}) Event {
-		return New(ctx, name, identifiers, data)
+		return New(ctx, name, identifiers, data, visibility...)
 	}
 }
 
 // Define a registered event.
-func Define(name, description string) Definition {
-	return defineSkip(name, description, 1)
+func Define(name, description string, visibility ...ttnpb.Right) Definition {
+	return defineSkip(name, description, 1, visibility...)
 }
 
 // DefineFunc generates a function, which returns a Definition with specified name and description.
 // Most callers should be using Define - this function is only useful for helper functions.
-func DefineFunc(name, description string) func() Definition {
+func DefineFunc(name, description string, visibility ...ttnpb.Right) func() Definition {
 	return func() Definition {
-		return defineSkip(name, description, 1)
+		return defineSkip(name, description, 1, visibility...)
 	}
 }

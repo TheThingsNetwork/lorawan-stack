@@ -25,19 +25,48 @@ import (
 )
 
 var (
-	evtGatewayConnect    = events.Define("gs.gateway.connect", "connect gateway")
-	evtGatewayDisconnect = events.Define("gs.gateway.disconnect", "disconnect gateway")
-
-	evtReceiveStatus = events.Define("gs.status.receive", "receive gateway status")
-
-	evtReceiveUp = events.Define("gs.up.receive", "receive uplink message")
-	evtDropUp    = events.Define("gs.up.drop", "drop uplink message")
-	evtForwardUp = events.Define("gs.up.forward", "forward uplink message")
-	evtFailUp    = events.Define("gs.up.fail", "fail to handle uplink message")
-
-	evtSendDown      = events.Define("gs.down.send", "send downlink message")
-	evtTxSuccessDown = events.Define("gs.down.tx.success", "transmit downlink message successful")
-	evtTxFailureDown = events.Define("gs.down.tx.fail", "transmit downlink message failure")
+	evtGatewayConnect = events.Define(
+		"gs.gateway.connect", "connect gateway",
+		ttnpb.RIGHT_GATEWAY_LINK,
+		ttnpb.RIGHT_GATEWAY_STATUS_READ,
+	)
+	evtGatewayDisconnect = events.Define(
+		"gs.gateway.disconnect", "disconnect gateway",
+		ttnpb.RIGHT_GATEWAY_LINK,
+		ttnpb.RIGHT_GATEWAY_STATUS_READ,
+	)
+	evtReceiveStatus = events.Define(
+		"gs.status.receive", "receive gateway status",
+		ttnpb.RIGHT_GATEWAY_STATUS_READ,
+	)
+	evtReceiveUp = events.Define(
+		"gs.up.receive", "receive uplink message",
+		ttnpb.RIGHT_GATEWAY_TRAFFIC_READ,
+	)
+	evtDropUp = events.Define(
+		"gs.up.drop", "drop uplink message",
+		ttnpb.RIGHT_GATEWAY_TRAFFIC_READ,
+	)
+	evtForwardUp = events.Define(
+		"gs.up.forward", "forward uplink message",
+		ttnpb.RIGHT_GATEWAY_TRAFFIC_READ,
+	)
+	evtFailUp = events.Define(
+		"gs.up.fail", "fail to handle uplink message",
+		ttnpb.RIGHT_GATEWAY_TRAFFIC_READ,
+	)
+	evtSendDown = events.Define(
+		"gs.down.send", "send downlink message",
+		ttnpb.RIGHT_GATEWAY_TRAFFIC_READ,
+	)
+	evtTxSuccessDown = events.Define(
+		"gs.down.tx.success", "transmit downlink message successful",
+		ttnpb.RIGHT_GATEWAY_TRAFFIC_READ,
+	)
+	evtTxFailureDown = events.Define(
+		"gs.down.tx.fail", "transmit downlink message failure",
+		ttnpb.RIGHT_GATEWAY_TRAFFIC_READ,
+	)
 )
 
 const (

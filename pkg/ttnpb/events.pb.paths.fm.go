@@ -10,6 +10,8 @@ var EventFieldPathsNested = []string{
 	"name",
 	"origin",
 	"time",
+	"visibility",
+	"visibility.rights",
 }
 
 var EventFieldPathsTopLevel = []string{
@@ -20,6 +22,7 @@ var EventFieldPathsTopLevel = []string{
 	"name",
 	"origin",
 	"time",
+	"visibility",
 }
 var StreamEventsRequestFieldPathsNested = []string{
 	"after",

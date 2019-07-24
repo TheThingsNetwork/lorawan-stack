@@ -25,7 +25,9 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/warning"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/unique"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 )
 
 const workersPerCPU = 2
@@ -83,32 +85,135 @@ var (
 	evtStreamStop  = events.Define("events.stream.stop", "stop event stream")
 )
 
+func (srv *EventsServer) requireAnyRights(ctx context.Context, ids []*ttnpb.EntityIdentifiers) error {
+	for _, entityIDs := range ids {
+		switch ids := entityIDs.Identifiers().(type) {
+		case *ttnpb.ApplicationIdentifiers:
+			list, err := rights.ListApplication(ctx, *ids)
+			if err != nil {
+				return err
+			}
+			if len(list.GetRights()) == 0 {
+				return rights.ErrNoApplicationRights.WithAttributes("uid", unique.ID(ctx, ids))
+			}
+		case *ttnpb.ClientIdentifiers:
+			list, err := rights.ListClient(ctx, *ids)
+			if err != nil {
+				return err
+			}
+			if len(list.GetRights()) == 0 {
+				return rights.ErrNoClientRights.WithAttributes("uid", unique.ID(ctx, ids))
+			}
+		case *ttnpb.EndDeviceIdentifiers:
+			list, err := rights.ListApplication(ctx, ids.ApplicationIdentifiers)
+			if err != nil {
+				return err
+			}
+			if len(list.GetRights()) == 0 {
+				return rights.ErrNoApplicationRights.WithAttributes("uid", unique.ID(ctx, ids.ApplicationIdentifiers))
+			}
+		case *ttnpb.GatewayIdentifiers:
+			list, err := rights.ListGateway(ctx, *ids)
+			if err != nil {
+				return err
+			}
+			if len(list.GetRights()) == 0 {
+				return rights.ErrNoGatewayRights.WithAttributes("uid", unique.ID(ctx, ids))
+			}
+		case *ttnpb.OrganizationIdentifiers:
+			list, err := rights.ListOrganization(ctx, *ids)
+			if err != nil {
+				return err
+			}
+			if len(list.GetRights()) == 0 {
+				return rights.ErrNoOrganizationRights.WithAttributes("uid", unique.ID(ctx, ids))
+			}
+		case *ttnpb.UserIdentifiers:
+			list, err := rights.ListUser(ctx, *ids)
+			if err != nil {
+				return err
+			}
+			if len(list.GetRights()) == 0 {
+				return rights.ErrNoUserRights.WithAttributes("uid", unique.ID(ctx, ids))
+			}
+		}
+	}
+	return nil
+}
+
+func (srv *EventsServer) isVisible(ctx context.Context, evt events.Event) (bool, error) {
+	visibility := evt.Visibility().Union(ttnpb.RightsFrom(
+		ttnpb.RIGHT_APPLICATION_ALL,
+		ttnpb.RIGHT_CLIENT_ALL,
+		ttnpb.RIGHT_GATEWAY_ALL,
+		ttnpb.RIGHT_ORGANIZATION_ALL,
+		ttnpb.RIGHT_USER_ALL,
+	))
+	for _, entityIDs := range evt.Identifiers() {
+		switch ids := entityIDs.Identifiers().(type) {
+		case *ttnpb.ApplicationIdentifiers:
+			rights, err := rights.ListApplication(ctx, *ids)
+			if err != nil {
+				return false, err
+			}
+			if len(rights.Implied().Intersect(visibility).GetRights()) > 0 {
+				return true, nil
+			}
+		case *ttnpb.ClientIdentifiers:
+			rights, err := rights.ListClient(ctx, *ids)
+			if err != nil {
+				return false, err
+			}
+			if len(rights.Implied().Intersect(visibility).GetRights()) > 0 {
+				return true, nil
+			}
+		case *ttnpb.EndDeviceIdentifiers:
+			rights, err := rights.ListApplication(ctx, ids.ApplicationIdentifiers)
+			if err != nil {
+				return false, err
+			}
+			if len(rights.Implied().Intersect(visibility).GetRights()) > 0 {
+				return true, nil
+			}
+		case *ttnpb.GatewayIdentifiers:
+			rights, err := rights.ListGateway(ctx, *ids)
+			if err != nil {
+				return false, err
+			}
+			if len(rights.Implied().Intersect(visibility).GetRights()) > 0 {
+				return true, nil
+			}
+		case *ttnpb.OrganizationIdentifiers:
+			rights, err := rights.ListOrganization(ctx, *ids)
+			if err != nil {
+				return false, err
+			}
+			if len(rights.Implied().Intersect(visibility).GetRights()) > 0 {
+				return true, nil
+			}
+		case *ttnpb.UserIdentifiers:
+			rights, err := rights.ListUser(ctx, *ids)
+			if err != nil {
+				return false, err
+			}
+			if len(rights.Implied().Intersect(visibility).GetRights()) > 0 {
+				return true, nil
+			}
+		}
+	}
+	return false, nil
+}
+
 // Stream implements the EventsServer interface.
-func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Events_StreamServer) (err error) {
+func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Events_StreamServer) error {
 	ctx := stream.Context()
 
 	if len(req.Identifiers) == 0 {
 		return nil
 	}
 
-	for _, entityIDs := range req.Identifiers {
-		switch ids := entityIDs.Identifiers().(type) {
-		case *ttnpb.ApplicationIdentifiers:
-			err = rights.RequireApplication(ctx, *ids, ttnpb.RIGHT_APPLICATION_ALL)
-		case *ttnpb.ClientIdentifiers:
-			err = rights.RequireClient(ctx, *ids, ttnpb.RIGHT_CLIENT_ALL)
-		case *ttnpb.EndDeviceIdentifiers:
-			err = rights.RequireApplication(ctx, ids.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_ALL)
-		case *ttnpb.GatewayIdentifiers:
-			err = rights.RequireGateway(ctx, *ids, ttnpb.RIGHT_GATEWAY_ALL)
-		case *ttnpb.OrganizationIdentifiers:
-			err = rights.RequireOrganization(ctx, *ids, ttnpb.RIGHT_ORGANIZATION_ALL)
-		case *ttnpb.UserIdentifiers:
-			err = rights.RequireUser(ctx, *ids, ttnpb.RIGHT_USER_ALL)
-		}
-		if err != nil {
-			return err
-		}
+	if err := srv.requireAnyRights(ctx, req.Identifiers); err != nil {
+		return err
 	}
 
 	ch := make(events.Channel, 8)
@@ -120,7 +225,26 @@ func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Eve
 		warning.Add(ctx, "Historical events not implemented")
 	}
 
-	srv.pubsub.Publish(evtStreamStart(ctx, req, req))
+	if err := stream.SendHeader(metadata.MD{}); err != nil {
+		return err
+	}
+
+	evtStreamStart := evtStreamStart(ctx, req, req)
+	srv.pubsub.Publish(evtStreamStart)
+
+	evtStreamStartVisible, err := srv.isVisible(ctx, evtStreamStart)
+	if err != nil {
+		return err
+	}
+	if !evtStreamStartVisible {
+		evt, err := events.Proto(evtStreamStart)
+		if err != nil {
+			return err
+		}
+		if err := stream.Send(evt); err != nil {
+			return err
+		}
+	}
 	defer srv.pubsub.Publish(evtStreamStop(ctx, req, req))
 
 	for {
@@ -128,6 +252,13 @@ func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Eve
 		case <-ctx.Done():
 			return ctx.Err()
 		case evt := <-ch:
+			isVisible, err := srv.isVisible(ctx, evt)
+			if err != nil {
+				return err
+			}
+			if !isVisible {
+				continue
+			}
 			marshaled := evt.(marshaledEvent)
 			if err := stream.Send(marshaled.proto); err != nil {
 				return err

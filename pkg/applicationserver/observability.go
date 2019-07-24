@@ -26,27 +26,74 @@ import (
 )
 
 var (
-	evtLinkStart = events.Define("as.link.start", "start link")
-	evtLinkStop  = events.Define("as.link.stop", "stop link")
-	evtLinkFail  = events.Define("as.link.fail", "fail link")
-
-	evtApplicationSubscribe   = events.Define("as.application.subscribe", "subscribe application")
-	evtApplicationUnsubscribe = events.Define("as.application.unsubscribe", "unsubscribe application")
-
-	evtReceiveDataUp    = events.Define("as.up.data.receive", "receive uplink data message")
-	evtDropDataUp       = events.Define("as.up.data.drop", "drop uplink data message")
-	evtForwardDataUp    = events.Define("as.up.data.forward", "forward uplink data message")
-	evtDecodeFailDataUp = events.Define("as.up.data.decode.fail", "decode uplink data message failure")
-
-	evtReceiveJoinAccept = events.Define("as.up.join.receive", "receive join-accept message")
-	evtDropJoinAccept    = events.Define("as.up.join.drop", "drop join-accept message")
-	evtForwardJoinAccept = events.Define("as.up.join.forward", "forward join-accept message")
-
-	evtReceiveDataDown      = events.Define("as.down.data.receive", "receive downlink data message")
-	evtDropDataDown         = events.Define("as.down.data.drop", "drop downlink data message")
-	evtForwardDataDown      = events.Define("as.down.data.forward", "forward downlink data message")
-	evtLostQueueDataDown    = events.Define("as.down.data.queue.lost", "lose downlink data queue")
-	evtInvalidQueueDataDown = events.Define("as.down.data.queue.invalid", "invalid downlink data queue")
+	evtLinkStart = events.Define(
+		"as.link.start", "start link",
+		ttnpb.RIGHT_APPLICATION_LINK,
+	)
+	evtLinkStop = events.Define(
+		"as.link.stop", "stop link",
+		ttnpb.RIGHT_APPLICATION_LINK,
+	)
+	evtLinkFail = events.Define(
+		"as.link.fail", "fail link",
+		ttnpb.RIGHT_APPLICATION_LINK,
+	)
+	evtApplicationSubscribe = events.Define(
+		"as.application.subscribe", "subscribe application",
+		ttnpb.RIGHT_APPLICATION_LINK,
+	)
+	evtApplicationUnsubscribe = events.Define(
+		"as.application.unsubscribe", "unsubscribe application",
+		ttnpb.RIGHT_APPLICATION_LINK,
+	)
+	evtReceiveDataUp = events.Define(
+		"as.up.data.receive", "receive uplink data message",
+		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+	)
+	evtDropDataUp = events.Define(
+		"as.up.data.drop", "drop uplink data message",
+		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+	)
+	evtForwardDataUp = events.Define(
+		"as.up.data.forward", "forward uplink data message",
+		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+	)
+	evtDecodeFailDataUp = events.Define(
+		"as.up.data.decode.fail", "decode uplink data message failure",
+		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+	)
+	evtReceiveJoinAccept = events.Define(
+		"as.up.join.receive", "receive join-accept message",
+		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+	)
+	evtDropJoinAccept = events.Define(
+		"as.up.join.drop", "drop join-accept message",
+		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+	)
+	evtForwardJoinAccept = events.Define(
+		"as.up.join.forward", "forward join-accept message",
+		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+	)
+	evtReceiveDataDown = events.Define(
+		"as.down.data.receive", "receive downlink data message",
+		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+	)
+	evtDropDataDown = events.Define(
+		"as.down.data.drop", "drop downlink data message",
+		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+	)
+	evtForwardDataDown = events.Define(
+		"as.down.data.forward", "forward downlink data message",
+		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+	)
+	evtLostQueueDataDown = events.Define(
+		"as.down.data.queue.lost", "lose downlink data queue",
+		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+	)
+	evtInvalidQueueDataDown = events.Define(
+		"as.down.data.queue.invalid", "invalid downlink data queue",
+		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+	)
 )
 
 const (

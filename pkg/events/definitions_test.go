@@ -19,13 +19,15 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/events"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func TestDefinitions(t *testing.T) {
 	a := assertions.New(t)
-	testEvent := events.Define("test", "Test Event")
+	testEvent := events.Define("test", "Test Event", ttnpb.RIGHT_ALL)
 	evt := testEvent(test.Context(), nil, "err")
 	a.So(evt.Name(), should.Equal, "test")
+	a.So(evt.Visibility().Rights, should.Contain, ttnpb.RIGHT_ALL)
 }

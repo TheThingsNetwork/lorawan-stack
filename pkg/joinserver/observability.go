@@ -25,8 +25,14 @@ import (
 )
 
 var (
-	evtRejectJoin = events.Define("js.join.reject", "reject join-request")
-	evtAcceptJoin = events.Define("js.join.accept", "accept join-request")
+	evtRejectJoin = events.Define(
+		"js.join.reject", "reject join-request",
+		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+	)
+	evtAcceptJoin = events.Define(
+		"js.join.accept", "accept join-request",
+		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+	)
 )
 
 const (

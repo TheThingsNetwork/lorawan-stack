@@ -29,9 +29,18 @@ import (
 )
 
 var (
-	evtCreateApplication = events.Define("application.create", "create application")
-	evtUpdateApplication = events.Define("application.update", "update application")
-	evtDeleteApplication = events.Define("application.delete", "delete application")
+	evtCreateApplication = events.Define(
+		"application.create", "create application",
+		ttnpb.RIGHT_APPLICATION_INFO,
+	)
+	evtUpdateApplication = events.Define(
+		"application.update", "update application",
+		ttnpb.RIGHT_APPLICATION_INFO,
+	)
+	evtDeleteApplication = events.Define(
+		"application.delete", "delete application",
+		ttnpb.RIGHT_APPLICATION_INFO,
+	)
 )
 
 func (is *IdentityServer) createApplication(ctx context.Context, req *ttnpb.CreateApplicationRequest) (app *ttnpb.Application, err error) {
