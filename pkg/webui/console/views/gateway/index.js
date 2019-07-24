@@ -22,8 +22,8 @@ import sharedMessages from '../../../lib/shared-messages'
 import { withSideNavigation } from '../../../components/navigation/side/context'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import withEnv, { EnvProvider } from '../../../lib/components/env'
 import withRequest from '../../../lib/components/with-request'
+import withEnv from '../../../lib/components/env'
 
 import GatewayOverview from '../gateway-overview'
 import GatewayApiKeys from '../gateway-api-keys'
@@ -152,7 +152,7 @@ export default class Gateway extends React.Component {
     const { match, gateway, gtwId, env } = this.props
 
     return (
-      <EnvProvider env={env}>
+      <React.Fragment>
         <IntlHelmet
           titleTemplate={`%s - ${gateway.name || gtwId} - ${env.site_name}`}
         />
@@ -164,7 +164,7 @@ export default class Gateway extends React.Component {
           <Route path={`${match.path}/data`} component={GatewayData} />
           <Route path={`${match.path}/general-settings`} component={GatewayGeneralSettings} />
         </Switch>
-      </EnvProvider>
+      </React.Fragment>
     )
   }
 }

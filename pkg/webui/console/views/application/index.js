@@ -45,7 +45,7 @@ import {
 } from '../../store/selectors/applications'
 
 import Devices from '../devices'
-import withEnv, { EnvProvider } from '../../../lib/components/env'
+import withEnv from '../../../lib/components/env'
 
 @connect(function (state, props) {
   return {
@@ -168,7 +168,7 @@ export default class Application extends React.Component {
     const { match, application, appId, env } = this.props
 
     return (
-      <EnvProvider env={env}>
+      <React.Fragment>
         <IntlHelmet
           titleTemplate={`%s - ${application.name || appId} - ${env.site_name}`}
         />
@@ -183,7 +183,7 @@ export default class Application extends React.Component {
           <Route path={`${match.path}/payload-formatters`} component={ApplicationPayloadFormatters} />
           <Route path={`${match.path}/integrations`} component={ApplicationIntegrations} />
         </Switch>
-      </EnvProvider>
+      </React.Fragment>
     )
   }
 }

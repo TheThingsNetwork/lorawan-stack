@@ -23,7 +23,7 @@ import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import Tabs from '../../../components/tabs'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import withRequest from '../../../lib/components/with-request'
-import withEnv, { EnvProvider } from '../../../lib/components/env'
+import withEnv from '../../../lib/components/env'
 
 import DeviceOverview from '../device-overview'
 import DeviceData from '../device-data'
@@ -35,6 +35,7 @@ import {
   getDevice,
   stopDeviceEventsStream,
 } from '../../store/actions/device'
+
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
 import { selectSelectedDevice, selectDeviceFetching, selectGetDeviceError } from '../../store/selectors/device'
 
@@ -131,7 +132,7 @@ export default class Device extends React.Component {
     ]
 
     return (
-      <EnvProvider env={env}>
+      <React.Fragment>
         <IntlHelmet
           titleTemplate={`%s - ${deviceName || devId} - ${env.site_name}`}
         />
@@ -155,7 +156,7 @@ export default class Device extends React.Component {
           <Route exact path={`${basePath}/general-settings`} component={DeviceGeneralSettings} />
           <Route path={`${basePath}/payload-formatters`} component={DevicePayloadFormatters} />
         </Switch>
-      </EnvProvider>
+      </React.Fragment>
     )
   }
 }
