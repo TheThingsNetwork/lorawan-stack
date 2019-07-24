@@ -2677,10 +2677,6 @@
                   {
                     "name": "string.max_len",
                     "value": 20
-                  },
-                  {
-                    "name": "string.pattern",
-                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
                   }
                 ]
               }
@@ -2799,6 +2795,10 @@
                   {
                     "name": "string.max_len",
                     "value": 20
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
                   }
                 ]
               }

@@ -159,8 +159,6 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 
 	if as.webhookTemplates, err = conf.Webhooks.Templates.NewTemplateStore(); err != nil {
 		return nil, err
-	} else if as.webhookTemplates != nil {
-		c.RegisterWeb(as.webhookTemplates)
 	}
 
 	if as.pubsub, err = conf.PubSub.NewPubSub(c, as, conf.PubSub.Registry); err != nil {

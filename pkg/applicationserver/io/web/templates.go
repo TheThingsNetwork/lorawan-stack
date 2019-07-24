@@ -17,7 +17,6 @@ package web
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"path"
 	"sync"
 	"time"
@@ -25,27 +24,23 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/fetch"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	ttnweb "go.thethings.network/lorawan-stack/pkg/web"
 	"gopkg.in/yaml.v2"
 )
 
-const (
-	yamlFetchErrorCache = 1 * time.Minute
-	directoryBaseURL    = "/as/webhook-templates/static"
-)
+const yamlFetchErrorCache = 1 * time.Minute
 
 // TemplatesConfig defines the configuration for the webhook templates registry.
 type TemplatesConfig struct {
-	Static    map[string][]byte `name:"-"`
-	Directory string            `name:"directory" description:"Retrieve the webhook templates from the filesystem"`
-	URL       string            `name:"url" description:"Retrieve the webhook templates from a web server"`
+	Static      map[string][]byte `name:"-"`
+	Directory   string            `name:"directory" description:"Retrieve the webhook templates from the filesystem"`
+	URL         string            `name:"url" description:"Retrieve the webhook templates from a web server"`
+	LogoBaseURL string            `name:"logo-base-url" description:"The base URL for the logo storage"`
 }
 
 // TemplateStore contains the webhook templates.
 type TemplateStore struct {
-	fetcher        fetch.Interface
-	mountDirectory string
-	baseURL        string
+	fetcher fetch.Interface
+	baseURL string
 
 	templateIDs          []string
 	templateIDsMu        sync.Mutex
@@ -60,33 +55,21 @@ type TemplateStore struct {
 // If no stores are provided, this method returns nil.
 func (c TemplatesConfig) NewTemplateStore() (*TemplateStore, error) {
 	var fetcher fetch.Interface
-	var mountDirectory, baseURL string
 	switch {
 	case c.Static != nil:
 		fetcher = fetch.NewMemFetcher(c.Static)
 	case c.Directory != "":
 		fetcher = fetch.FromFilesystem(c.Directory)
-		mountDirectory = path.Join(c.Directory, "static")
-		baseURL = directoryBaseURL
 	case c.URL != "":
 		fetcher = fetch.FromHTTP(c.URL, true)
-		baseURL = path.Join(c.URL, "static")
 	default:
 		return nil, nil
 	}
 	return &TemplateStore{
-		fetcher:        fetcher,
-		mountDirectory: mountDirectory,
-		baseURL:        baseURL,
-		templates:      make(map[string]queryResult),
+		fetcher:   fetcher,
+		baseURL:   c.LogoBaseURL,
+		templates: make(map[string]queryResult),
 	}, nil
-}
-
-// RegisterRoutes implements ttnweb.Registerer.
-func (ts *TemplateStore) RegisterRoutes(server *ttnweb.Server) {
-	if ts.mountDirectory != "" {
-		server.Static(directoryBaseURL, http.Dir(ts.mountDirectory))
-	}
 }
 
 // prependBaseURL prepends the base URL and the template ID to the LogoURL, if it is available.
