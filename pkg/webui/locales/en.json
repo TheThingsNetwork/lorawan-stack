@@ -281,7 +281,6 @@
   "lib.shared-messages.payloadFormattersUpdateFailure": "There was an error updating the Payload Formatter",
   "lib.shared-messages.phyVersion": "PHY Version",
   "lib.shared-messages.privacyPolicy": "Privacy Policy",
-  "lib.shared-messages.profileSettings": "Profile Settings",
   "lib.shared-messages.refreshPage": "Refresh page",
   "lib.shared-messages.removeCollaborator": "Remove Collaborator",
   "lib.shared-messages.resume": "Resume",
