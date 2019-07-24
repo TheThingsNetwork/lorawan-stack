@@ -156,6 +156,7 @@ var CreateTemporaryPasswordRequestFieldPathsTopLevel = []string{
 var UpdateUserPasswordRequestFieldPathsNested = []string{
 	"new",
 	"old",
+	"revoke_all_access",
 	"user_ids",
 	"user_ids.email",
 	"user_ids.user_id",
@@ -164,6 +165,7 @@ var UpdateUserPasswordRequestFieldPathsNested = []string{
 var UpdateUserPasswordRequestFieldPathsTopLevel = []string{
 	"new",
 	"old",
+	"revoke_all_access",
 	"user_ids",
 }
 var ListUserAPIKeysRequestFieldPathsNested = []string{

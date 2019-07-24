@@ -10387,6 +10387,10 @@
         },
         "old": {
           "type": "string"
+        },
+        "revoke_all_access": {
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },

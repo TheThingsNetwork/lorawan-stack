@@ -109,6 +109,7 @@ message UpdateUserPasswordRequest {
   UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   string new = 2;
   string old = 3;
+  bool revoke_all_access = 4;
 }
 
 message ListUserAPIKeysRequest {

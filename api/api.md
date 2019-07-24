@@ -5488,6 +5488,7 @@ This service is not implemented on all deployments.
 | `user_ids` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) |  |  |
 | `new` | [`string`](#string) |  |  |
 | `old` | [`string`](#string) |  |  |
+| `revoke_all_access` | [`bool`](#bool) |  |  |
 
 #### Field Rules
 
