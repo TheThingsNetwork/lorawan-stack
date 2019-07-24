@@ -20,42 +20,14 @@ import NavigationBar from '../navigation/bar'
 import ProfileDropdown from '../profile-dropdown'
 import Input from '../input'
 import PropTypes from '../../lib/prop-types'
-import sharedMessages from '../../lib/shared-messages'
 
 import styles from './header.styl'
-
-const defaultNavigationEntries = [
-  {
-    title: sharedMessages.overview,
-    icon: 'overview',
-    path: '/console',
-    exact: true,
-  },
-  {
-    title: sharedMessages.applications,
-    icon: 'application',
-    path: '/console/applications',
-  },
-  {
-    title: sharedMessages.gateways,
-    icon: 'gateway',
-    path: '/console/gateways',
-  },
-]
-
-const defaultDropdownItems = handleLogout => [
-  {
-    title: sharedMessages.logout,
-    icon: 'power_settings_new',
-    action: handleLogout,
-  },
-]
 
 const Header = function ({
   className,
   handleLogout = () => null,
-  dropdownItems = defaultDropdownItems(handleLogout),
-  navigationEntries = defaultNavigationEntries,
+  dropdownItems,
+  navigationEntries,
   user,
   searchable,
   handleSearchRequest = () => null,
@@ -84,7 +56,7 @@ const Header = function ({
             <div className={styles.right}>
               { searchable && <Input icon="search" onEnter={handleSearchRequest} /> }
               <ProfileDropdown
-                dropdownItems={dropdownItems || defaultDropdownItems}
+                dropdownItems={dropdownItems}
                 userId={user.ids.user_id}
                 anchored={anchored}
               />
@@ -112,9 +84,9 @@ Header.propTypes = {
   dropdownItems: PropTypes.arrayOf(PropTypes.shape({
     title: PropTypes.message.isRequired,
     icon: PropTypes.string,
-    path: PropTypes.string.isRequired,
+    path: PropTypes.string,
     action: PropTypes.func,
-  })),
+  })).isRequired,
   /**
    * A list of navigation bar entries.
    * @param {(string|Object)} title - The title to be displayed
@@ -122,11 +94,11 @@ Header.propTypes = {
    * @param {string} path -  The path for a navigation tab
    * @param {boolean} exact - Flag identifying whether the path should be matched exactly
    */
-  navigationEntries: PropTypes.arrayOf(PropTypes.shape({
+  entries: PropTypes.arrayOf(PropTypes.shape({
     path: PropTypes.string.isRequired,
     title: PropTypes.message.isRequired,
-    action: PropTypes.func,
     icon: PropTypes.string,
+    exact: PropTypes.bool,
   })),
   /** Flag identifying whether links should be rendered as plain anchor link */
   anchored: PropTypes.bool,

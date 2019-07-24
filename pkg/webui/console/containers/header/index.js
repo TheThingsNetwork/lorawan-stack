@@ -17,8 +17,10 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import bind from 'autobind-decorator'
 
+import { withEnv } from '../../../lib/components/env'
 import { logout } from '../../store/actions/user'
 import PropTypes from '../../../lib/prop-types'
+import sharedMessages from '../../../lib/shared-messages'
 
 import HeaderComponent from '../../../components/header'
 
@@ -26,6 +28,7 @@ import HeaderComponent from '../../../components/header'
 @connect(state => ({
   user: state.user.user,
 }))
+@withEnv
 @bind
 class Header extends Component {
 
@@ -37,12 +40,38 @@ class Header extends Component {
   render () {
     const {
       user,
-      dropdownItems,
-      navigationEntries,
       anchored,
       handleSearchRequest,
       searchable,
+      env: { appRoot },
     } = this.props
+
+    const navigationEntries = [
+      {
+        title: sharedMessages.overview,
+        icon: 'overview',
+        path: appRoot,
+        exact: true,
+      },
+      {
+        title: sharedMessages.applications,
+        icon: 'application',
+        path: `${appRoot}/applications`,
+      },
+      {
+        title: sharedMessages.gateways,
+        icon: 'gateway',
+        path: `${appRoot}/gateways`,
+      },
+    ]
+
+    const dropdownItems = [
+      {
+        title: sharedMessages.logout,
+        icon: 'power_settings_new',
+        action: this.handleLogout,
+      },
+    ]
 
     return (
       <HeaderComponent
@@ -59,32 +88,6 @@ class Header extends Component {
 }
 
 Header.propTypes = {
-  /**
-  * A list of items for the dropdown
-  * @param {(string|Object)} title - The title to be displayed
-  * @param {string} icon - The icon name to be displayed next to the title
-  * @param {string} path - The path for a navigation tab
-  * @param {function} action - Alternatively, the function to be called on click
-  */
-  dropdownItems: PropTypes.arrayOf(PropTypes.shape({
-    title: PropTypes.message.isRequired,
-    icon: PropTypes.string,
-    path: PropTypes.string.isRequired,
-    action: PropTypes.func,
-  })),
-  /**
-   * A list of navigation bar entries.
-   * @param {(string|Object)} title - The title to be displayed
-   * @param {string} icon - The icon name to be displayed next to the title
-   * @param {string} path -  The path for a navigation tab
-   * @param {boolean} exact - Flag identifying whether the path should be matched exactly
-   */
-  navigationEntries: PropTypes.arrayOf(PropTypes.shape({
-    path: PropTypes.string.isRequired,
-    title: PropTypes.message.isRequired,
-    action: PropTypes.func,
-    icon: PropTypes.string,
-  })),
   /** Flag identifying whether links should be rendered as plain anchor link */
   anchored: PropTypes.bool,
   /**
