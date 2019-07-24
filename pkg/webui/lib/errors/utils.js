@@ -87,7 +87,7 @@ export const isNotFoundError = error => (
  * `false` otherwise.
  */
 export const isInternalError = error => (
-  grpcStatusCode(error) === 13
+  grpcStatusCode(error) === 13 // NOTE: HTTP 500 can also be UnknownError.
 )
 
 /**
@@ -97,7 +97,7 @@ export const isInternalError = error => (
  * `false` otherwise.
  */
 export const isAlreadyExistsError = error => (
-  grpcStatusCode(error) === 6
+  grpcStatusCode(error) === 6 // NOTE: HTTP 409 can also be AbortedError.
 )
 
 /**
@@ -107,7 +107,7 @@ export const isAlreadyExistsError = error => (
  * `false` otherwise.
  */
 export const isPermissionDeniedError = error => (
-  grpcStatusCode(error) === 7
+  grpcStatusCode(error) === 7 || httpStatusCode(error) === 403
 )
 
 /**
@@ -117,7 +117,7 @@ export const isPermissionDeniedError = error => (
  * `false` otherwise.
  */
 export const isUnauthenticatedError = error => (
-  grpcStatusCode(error) === 16
+  grpcStatusCode(error) === 16 || httpStatusCode(error) === 401
 )
 
 /**
