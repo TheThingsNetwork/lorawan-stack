@@ -23,6 +23,7 @@ import { withSideNavigation } from '../../../components/navigation/side/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import withRequest from '../../../lib/components/with-request'
+import { withEnv } from '../../../lib/components/env'
 
 import ApplicationOverview from '../application-overview'
 import ApplicationGeneralSettings from '../application-general-settings'
@@ -45,7 +46,6 @@ import {
 } from '../../store/selectors/applications'
 
 import Devices from '../devices'
-import withEnv from '../../../lib/components/env'
 
 @connect(function (state, props) {
   return {
