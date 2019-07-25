@@ -67,7 +67,7 @@ const filterValidator = function (filters) {
     totalCount: base.totalCount || 0,
     fetching: base.fetching,
     fetchingSearch: base.fetchingSearch,
-    pathname: location.pathname,
+    pathname: state.router.location.pathname,
   }
 })
 @bind
@@ -160,12 +160,6 @@ class FetchTable extends Component {
     this.fetchItems()
   }
 
-  onItemAdd () {
-    const { dispatch, pathname, itemPathPrefix } = this.props
-
-    dispatch(push(`${pathname}${itemPathPrefix}/add`))
-  }
-
   onItemClick (index) {
     const {
       dispatch,
@@ -210,6 +204,8 @@ class FetchTable extends Component {
       tabs,
       searchable,
       handlesPagination,
+      itemPathPrefix,
+      pathname,
     } = this.props
     const { page, query, tab } = this.state
 
@@ -242,11 +238,11 @@ class FetchTable extends Component {
                 onChange={this.onQueryChange}
               />
             )}
-            <Button
-              onClick={this.onItemAdd}
+            <Button.Link
               className={style.addButton}
               message={addMessage}
               icon="add"
+              to={`${pathname}${itemPathPrefix}/add`}
             />
           </div>
         </div>
