@@ -170,7 +170,7 @@ export default class Application extends React.Component {
     return (
       <React.Fragment>
         <IntlHelmet
-          titleTemplate={`%s - ${application.name || appId} - ${env.site_name}`}
+          titleTemplate={`%s - ${application.name || appId} - ${env.siteName}`}
         />
         <Switch>
           <Route exact path={`${match.path}`} component={ApplicationOverview} />

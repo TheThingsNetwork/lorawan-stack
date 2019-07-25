@@ -154,7 +154,7 @@ export default class Gateway extends React.Component {
     return (
       <React.Fragment>
         <IntlHelmet
-          titleTemplate={`%s - ${gateway.name || gtwId} - ${env.site_name}`}
+          titleTemplate={`%s - ${gateway.name || gtwId} - ${env.siteName}`}
         />
         <Switch>
           <Route exact path={`${match.path}`} component={GatewayOverview} />

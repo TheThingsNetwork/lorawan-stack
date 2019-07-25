@@ -134,7 +134,7 @@ export default class Device extends React.Component {
     return (
       <React.Fragment>
         <IntlHelmet
-          titleTemplate={`%s - ${deviceName || devId} - ${env.site_name}`}
+          titleTemplate={`%s - ${deviceName || devId} - ${env.siteName}`}
         />
         <Container>
           <Row>

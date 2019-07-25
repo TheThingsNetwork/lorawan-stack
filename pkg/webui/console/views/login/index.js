@@ -41,13 +41,13 @@ const m = defineMessages({
 @bind
 export default class Login extends React.PureComponent {
   render () {
-    const { user, env } = this.props
+    const { user, env: { appRoot }} = this.props
     const { next } = Query.parse(location.search)
     const redirectAppend = next ? `?next=${next}` : ''
 
     // dont show the login page if the user is already logged in
     if (Boolean(user)) {
-      return <Redirect to={env.app_root} />
+      return <Redirect to={appRoot} />
     }
 
     return (
@@ -65,7 +65,7 @@ export default class Login extends React.PureComponent {
               <Message className={style.loginSub} content={m.login} />
               <Button.AnchorLink
                 message={m.loginWithStackAccount}
-                href={`${env.app_root}/login/ttn-stack${redirectAppend}`}
+                href={`${appRoot}/login/ttn-stack${redirectAppend}`}
               />
             </Col>
           </Row>
