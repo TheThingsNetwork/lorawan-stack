@@ -77,7 +77,7 @@ export default class GatewayAdd extends React.Component {
     await this.setState({ error: '' })
 
     try {
-      await api.gateway.create(userId, values)
+      await api.gateway.create(userId, values, {})
 
       createSuccess(gateway_id)
     } catch (error) {

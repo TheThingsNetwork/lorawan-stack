@@ -258,9 +258,9 @@ class Devices {
 
     if (setDefaults) {
       dev = {
-        application_server_address: new Url(this._stackConfig.as).host,
-        join_server_address: new Url(this._stackConfig.js).host,
-        network_server_address: new Url(this._stackConfig.ns).host,
+        application_server_address: new Url(this._stackConfig.as).hostname,
+        join_server_address: new Url(this._stackConfig.js).hostname,
+        network_server_address: new Url(this._stackConfig.ns).hostname,
         ...device,
       }
     }
