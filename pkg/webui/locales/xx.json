@@ -281,7 +281,6 @@
   "lib.shared-messages.payloadFormattersUpdateFailure": "Xxxxx xxx xx xxxxx xxxxxxxx xxx Xxxxxxx Xxxxxxxxx",
   "lib.shared-messages.phyVersion": "XXX Xxxxxxx",
   "lib.shared-messages.privacyPolicy": "Xxxxxxx Xxxxxx",
-  "lib.shared-messages.profileSettings": "Xxxxxxx Xxxxxxxx",
   "lib.shared-messages.refreshPage": "Xxxxxxx xxxx",
   "lib.shared-messages.removeCollaborator": "Xxxxxx Xxxxxxxxxxxx",
   "lib.shared-messages.resume": "Xxxxxx",

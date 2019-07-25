@@ -130,7 +130,6 @@ export default defineMessages({
   payloadFormattersUpdateFailure: 'There was an error updating the Payload Formatter',
   phyVersion: 'PHY Version',
   privacyPolicy: 'Privacy Policy',
-  profileSettings: 'Profile Settings',
   refreshPage: 'Refresh page',
   removeCollaborator: 'Remove Collaborator',
   resume: 'Resume',

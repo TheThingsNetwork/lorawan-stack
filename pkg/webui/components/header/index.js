@@ -45,11 +45,6 @@ const defaultNavigationEntries = [
 
 const defaultDropdownItems = handleLogout => [
   {
-    title: sharedMessages.profileSettings,
-    icon: 'settings',
-    path: '/profile-settings',
-  },
-  {
     title: sharedMessages.logout,
     icon: 'power_settings_new',
     action: handleLogout,
