@@ -114,7 +114,7 @@ export default class CreateAccount extends React.PureComponent {
         user: { ids: { user_id }, ...rest },
       })
 
-      push('/oauth/login', {
+      push('/login', {
         info: getSuccessMessage(result.data.state),
       })
 
@@ -131,7 +131,7 @@ export default class CreateAccount extends React.PureComponent {
     const { replace, location } = this.props
     const state = location.state || {}
 
-    const back = state.back || '/oauth/login'
+    const back = state.back || '/login'
 
     replace(back)
   }

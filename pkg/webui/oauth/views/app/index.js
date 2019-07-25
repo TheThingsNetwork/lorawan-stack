@@ -69,11 +69,11 @@ export default class OAuthApp extends React.PureComponent {
               <ErrorView ErrorComponent={FullViewError}>
                 <ConnectedRouter history={history}>
                   <Switch>
-                    <Route path="/oauth" exact component={Landing} />
-                    <Route path="/oauth/login" component={Login} />
-                    <Route path="/oauth/authorize" component={Authorize} />
-                    <Route path="/oauth/register" component={CreateAccount} />
-                    <Route path="/oauth/code" component={Code} />
+                    <Route path="/" exact component={Landing} />
+                    <Route path="/login" component={Login} />
+                    <Route path="/authorize" component={Authorize} />
+                    <Route path="/register" component={CreateAccount} />
+                    <Route path="/code" component={Code} />
                     <Route component={GenericNotFound} />
                   </Switch>
                 </ConnectedRouter>

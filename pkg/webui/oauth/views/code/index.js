@@ -33,7 +33,7 @@ export default class Code extends React.Component {
 
     if (!query.code) {
       return (
-        <Redirect to="/oauth/login" />
+        <Redirect to="/login" />
       )
     }
 
