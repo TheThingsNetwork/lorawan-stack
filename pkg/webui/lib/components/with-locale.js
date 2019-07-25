@@ -63,10 +63,8 @@ export default class UserLocale extends React.PureComponent {
 
     if (dev) {
       window.addEventListener('keydown', this.onKeydown)
-      log('Press alt + X to toggle the xx locale')
+      log('Press alt + L to toggle the xx locale')
     }
-
-
   }
 
   check (prev, props) {
@@ -90,7 +88,7 @@ export default class UserLocale extends React.PureComponent {
   }
 
   onKeydown (evt) {
-    if (evt.altKey && evt.code === 'KeyX') {
+    if (evt.altKey && evt.code === 'KeyL') {
       this.toggle()
     }
   }
