@@ -112,7 +112,8 @@ type jsonDecoder struct {
 	dec *json.Decoder
 }
 
-// NewJSONDecoder returns a new Decoder on top of r, and that uses the TTN JSON format.
+// NewJSONDecoder returns a new Decoder on top of r, and that uses the common JSON
+// format used in TTN Stack.
 func NewJSONDecoder(r io.Reader) Decoder {
 	return &jsonDecoder{dec: json.NewDecoder(r)}
 }

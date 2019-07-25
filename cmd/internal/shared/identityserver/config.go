@@ -30,7 +30,7 @@ var DefaultIdentityServerConfig = identityserver.Config{
 	OAuth: oauth.Config{
 		UI: oauth.UIConfig{
 			TemplateData: webui.TemplateData{
-				SiteName:      "The Things Network Stack for LoRaWAN",
+				SiteName:      "TTN Stack for LoRaWAN",
 				Language:      "en",
 				CanonicalURL:  shared.DefaultOAuthPublicURL,
 				AssetsBaseURL: shared.DefaultAssetsBaseURL,

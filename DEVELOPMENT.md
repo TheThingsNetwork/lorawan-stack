@@ -156,14 +156,14 @@ The actual commands for compilation are handled by our Makefile, so the only thi
 ├── README.md           general information about this project
 │   ...
 ├── api                 contains the protocol buffer definitions for our API
-├── cmd                 contains the different binaries that form the TTN stack for LoRaWAN
+├── cmd                 contains the different binaries that form TTN Stack for LoRaWAN
 │   ├── internal        contains internal files shared between the different binaries
 │   │   ...
-│   ├── ttn-lw-cli      the command-line-interface for the TTN stack for LoRaWAN
-│   └── ttn-lw-stack    bundles the server binaries that form the TTN stack for LoRaWAN
+│   ├── ttn-lw-cli      the command-line-interface for TTN Stack for LoRaWAN
+│   └── ttn-lw-stack    bundles the server binaries that form TTN Stack for LoRaWAN
 ├── config              configuration for our JavaScript SDK and frontend
-├── doc                 detailed documentation on the workings of the TTN stack for LoRaWAN
-├── pkg                 contains all libraries used in the TTN stack for LoRaWAN
+├── doc                 detailed documentation on the workings of TTN Stack for LoRaWAN
+├── pkg                 contains all libraries used in TTN Stack for LoRaWAN
 │   ├── component       contains the base component; all other components extend this component
 │   ├── config          package for configuration using config files, environment and CLI flags
 │   ├── console         package that provides the web server for the console
