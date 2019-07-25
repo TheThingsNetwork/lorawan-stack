@@ -62,8 +62,8 @@ export default class OAuthApp extends React.PureComponent {
         <Provider store={store}>
           <Init>
             <Helmet
-              titleTemplate={`%s - ${env.site_title ? `${env.site_title} - ` : ''}${env.site_name}`}
-              defaultTitle={`${env.site_title ? `${env.site_title} - ` : ''}${env.site_name}`}
+              titleTemplate={`%s - ${env.siteTitle ? `${env.siteTitle} - ` : ''}${env.siteName}`}
+              defaultTitle={`${env.siteTitle ? `${env.siteTitle} - ` : ''}${env.siteName}`}
             />
             <WithLocale>
               <ErrorView ErrorComponent={FullViewError}>
