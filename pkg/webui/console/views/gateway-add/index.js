@@ -91,19 +91,12 @@ export default class GatewayAdd extends React.Component {
     const { error } = this.state
     const { env } = this.props
 
-    const gs = env.config.gs
-
-    let gsServerAddress = ''
-    if (gs.enabled) {
-      gsServerAddress = new URL(gs.base_url).host
-    }
-
     const initialValues = {
       ids: {
         gateway_id: undefined,
       },
       enforce_duty_cycle: true,
-      gateway_server_address: gsServerAddress,
+      gateway_server_address: env.config.gs.enabled ? new URL(env.config.gs.base_url).hostname : '',
       frequency_plan_id: undefined,
     }
 
