@@ -1384,14 +1384,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}:
 				}
 
-				if !AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(reqCtx context.Context, ids ttnpb.EndDeviceIdentifiers, t time.Time, replace bool) bool {
+				if !AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(reqCtx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
 					return a.So(reqCtx, should.HaveParentContextOrEqual, ctx) &&
 						a.So(ids, should.Resemble, ttnpb.EndDeviceIdentifiers{
 							ApplicationIdentifiers: appID,
 							DeviceID:               devID,
 						}) &&
 						a.So(replace, should.BeTrue) &&
-						a.So(t, should.Resemble, setDevice.MACState.LastConfirmedDownlinkAt.Add(42*time.Second))
+						a.So(startAt, should.Resemble, setDevice.MACState.LastConfirmedDownlinkAt.Add(42*time.Second))
 				},
 					nil,
 				) {
@@ -1775,14 +1775,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}:
 				}
 
-				if !AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(reqCtx context.Context, ids ttnpb.EndDeviceIdentifiers, t time.Time, replace bool) bool {
+				if !AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(reqCtx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
 					return a.So(reqCtx, should.HaveParentContextOrEqual, ctx) &&
 						a.So(ids, should.Resemble, ttnpb.EndDeviceIdentifiers{
 							ApplicationIdentifiers: appID,
 							DeviceID:               devID,
 						}) &&
 						a.So(replace, should.BeTrue) &&
-						a.So(t, should.Resemble, setDevice.MACState.LastConfirmedDownlinkAt.Add(42*time.Second))
+						a.So(startAt, should.Resemble, setDevice.MACState.LastConfirmedDownlinkAt.Add(42*time.Second))
 				},
 					nil,
 				) {
@@ -2099,14 +2099,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}:
 				}
 
-				if !AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(reqCtx context.Context, ids ttnpb.EndDeviceIdentifiers, t time.Time, replace bool) bool {
+				if !AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(reqCtx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
 					return a.So(reqCtx, should.HaveParentContextOrEqual, ctx) &&
 						a.So(ids, should.Resemble, ttnpb.EndDeviceIdentifiers{
 							ApplicationIdentifiers: appID,
 							DeviceID:               devID,
 						}) &&
 						a.So(replace, should.BeTrue) &&
-						a.So(t, should.Resemble, setDevice.MACState.LastConfirmedDownlinkAt.Add(42*time.Second))
+						a.So(startAt, should.Resemble, setDevice.MACState.LastConfirmedDownlinkAt.Add(42*time.Second))
 				},
 					nil,
 				) {
@@ -2857,14 +2857,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 				case setRespCh <- DeviceRegistrySetByIDResponse{}:
 				}
 
-				if !AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(reqCtx context.Context, ids ttnpb.EndDeviceIdentifiers, t time.Time, replace bool) bool {
+				if !AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(reqCtx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
 					return a.So(reqCtx, should.HaveParentContextOrEqual, ctx) &&
 						a.So(ids, should.Resemble, ttnpb.EndDeviceIdentifiers{
 							ApplicationIdentifiers: appID,
 							DeviceID:               devID,
 						}) &&
 						a.So(replace, should.BeTrue) &&
-						a.So(t, should.Resemble, absTime.Add(-gsScheduleWindow))
+						a.So(startAt, should.Resemble, absTime.Add(-gsScheduleWindow))
 				},
 					nil,
 				) {
