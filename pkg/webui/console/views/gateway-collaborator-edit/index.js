@@ -22,10 +22,10 @@ import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import sharedMessages from '../../../lib/shared-messages'
 import CollaboratorForm from '../../components/collaborator-form'
-import Spinner from '../../../components/spinner'
 import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import toast from '../../../components/toast'
+import withRequest from '../../../lib/components/with-request'
 
 import {
   getGatewayCollaborator,
@@ -85,6 +85,10 @@ import api from '../../api'
   ),
   redirectToList: () => dispatchProps.redirectToList(stateProps.gtwId),
 }))
+@withRequest(
+  ({ loadData }) => loadData(),
+  ({ fetching, collaborator }) => fetching || !Boolean(collaborator)
+)
 @withBreadcrumb('gtws.single.collaborators.edit', function (props) {
   const { gtwId, collaboratorId } = props
 
@@ -101,20 +105,6 @@ export default class GatewayCollaboratorEdit extends React.Component {
 
   state = {
     error: '',
-  }
-
-  componentDidMount () {
-    const { loadData } = this.props
-
-    loadData()
-  }
-
-  componentDidUpdate (prevProps) {
-    const { error } = this.props
-
-    if (Boolean(error) && prevProps.error !== error) {
-      throw error
-    }
   }
 
   handleSubmit (updatedCollaborator) {
@@ -140,14 +130,9 @@ export default class GatewayCollaboratorEdit extends React.Component {
     const {
       collaborator,
       rights,
-      fetching,
       redirectToList,
       universalRights,
     } = this.props
-
-    if (fetching || !collaborator) {
-      return <Spinner center />
-    }
 
     return (
       <Container>

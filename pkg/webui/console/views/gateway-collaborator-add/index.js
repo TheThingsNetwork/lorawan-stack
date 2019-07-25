@@ -18,13 +18,13 @@ import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
 import { push } from 'connected-react-router'
 
-import Spinner from '../../../components/spinner'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import sharedMessages from '../../../lib/shared-messages'
 import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import CollaboratorForm from '../../components/collaborator-form'
+import withRequest from '../../../lib/components/with-request'
 
 import {
   selectSelectedGatewayId,
@@ -56,6 +56,10 @@ import api from '../../api'
   getGatewaysRightsList: () => dispatchProps.getGatewaysRightsList(stateProps.gtwId),
   redirectToList: () => dispatchProps.redirectToList(stateProps.gtwId),
 }))
+@withRequest(
+  ({ getGatewaysRightsList }) => getGatewaysRightsList(),
+  ({ fetching, rights }) => fetching || !Boolean(rights.length)
+)
 @withBreadcrumb('gtws.single.collaborators.add', function (props) {
   const gtwId = props.gtwId
   return (
@@ -73,20 +77,6 @@ export default class GatewayCollaboratorAdd extends React.Component {
     error: '',
   }
 
-  componentDidMount () {
-    const { getGatewaysRightsList } = this.props
-
-    getGatewaysRightsList()
-  }
-
-  componentDidUpdate (prevProps) {
-    const { error } = this.props
-
-    if (Boolean(error) && prevProps.error !== error) {
-      throw error
-    }
-  }
-
   handleSubmit (collaborator) {
     const { gtwId } = this.props
 
@@ -96,14 +86,9 @@ export default class GatewayCollaboratorAdd extends React.Component {
   render () {
     const {
       rights,
-      fetching,
       redirectToList,
       universalRights,
     } = this.props
-
-    if (fetching && !rights.length) {
-      return <Spinner center />
-    }
 
     return (
       <Container>
