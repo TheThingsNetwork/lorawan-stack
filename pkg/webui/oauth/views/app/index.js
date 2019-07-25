@@ -22,6 +22,7 @@ import { Helmet } from 'react-helmet'
 import WithLocale from '../../../lib/components/with-locale'
 import withEnv, { EnvProvider } from '../../../lib/components/env'
 import ErrorView from '../../../lib/components/error-view'
+import { selectApplicationRootPath } from '../../../lib/selectors/env'
 import env from '../../../lib/env'
 
 import Landing from '../landing'
@@ -33,7 +34,8 @@ import createStore from '../../store'
 import Init from '../../../lib/components/init'
 import Code from '../code'
 
-const history = createBrowserHistory()
+const appRoot = selectApplicationRootPath()
+const history = createBrowserHistory({ basename: appRoot })
 const store = createStore(history)
 
 const GenericNotFound = () => <FullViewError error={{ statusCode: 404 }} />
