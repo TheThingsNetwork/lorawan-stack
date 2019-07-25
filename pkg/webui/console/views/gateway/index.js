@@ -76,8 +76,7 @@ dispatch => ({
   ({ fetching, gateway }) => fetching || !Boolean(gateway)
 )
 @withSideNavigation(function (props) {
-  const { match, gtwId } = props
-  const matchedUrl = match.url
+  const { match: { url: matchedUrl }, gtwId } = props
 
   return {
     header: { title: gtwId, icon: 'gateway' },
