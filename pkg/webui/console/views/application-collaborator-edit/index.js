@@ -22,10 +22,10 @@ import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import sharedMessages from '../../../lib/shared-messages'
 import CollaboratorForm from '../../components/collaborator-form'
-import Spinner from '../../../components/spinner'
 import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import toast from '../../../components/toast'
+import withRequest from '../../../lib/components/with-request'
 
 import {
   getApplicationCollaborator,
@@ -84,6 +84,10 @@ import api from '../../api'
   redirectToList: () => dispatchProps.redirectToList(stateProps.appId),
 })
 )
+@withRequest(
+  ({ loadData }) => loadData(),
+  ({ fetching, collaborator }) => fetching || !Boolean(collaborator)
+)
 @withBreadcrumb('apps.single.collaborators.edit', function (props) {
   const { appId, collaboratorId, collaboratorType } = props
 
@@ -100,20 +104,6 @@ export default class ApplicationCollaboratorEdit extends React.Component {
 
   state = {
     error: '',
-  }
-
-  componentDidMount () {
-    const { loadData } = this.props
-
-    loadData()
-  }
-
-  componentDidUpdate (prevProps) {
-    const { error } = this.props
-
-    if (Boolean(error) && prevProps.error !== error) {
-      throw error
-    }
   }
 
   async handleSubmit (updatedCollaborator) {
@@ -158,14 +148,9 @@ export default class ApplicationCollaboratorEdit extends React.Component {
     const {
       collaborator,
       rights,
-      fetching,
       universalRights,
       redirectToList,
     } = this.props
-
-    if (fetching || !collaborator) {
-      return <Spinner center />
-    }
 
     return (
       <Container>

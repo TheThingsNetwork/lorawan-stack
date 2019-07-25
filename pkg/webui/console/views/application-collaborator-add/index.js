@@ -18,13 +18,13 @@ import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
 import { push } from 'connected-react-router'
 
-import Spinner from '../../../components/spinner'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import sharedMessages from '../../../lib/shared-messages'
 import CollaboratorForm from '../../components/collaborator-form'
 import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
+import withRequest from '../../../lib/components/with-request'
 
 import { getApplicationsRightsList } from '../../store/actions/applications'
 import {
@@ -54,6 +54,10 @@ import api from '../../api'
   redirectToList: () => dispatchProps.redirectToList(stateProps.appId),
   getApplicationsRightsList: () => dispatchProps.getApplicationsRightsList(stateProps.appId),
 }))
+@withRequest(
+  ({ getApplicationsRightsList }) => getApplicationsRightsList(),
+  ({ fetching, rights }) => fetching || !Boolean(rights.length)
+)
 @withBreadcrumb('apps.single.collaborators.add', function (props) {
   const appId = props.appId
   return (
@@ -71,38 +75,18 @@ export default class ApplicationCollaboratorAdd extends React.Component {
     error: '',
   }
 
-  componentDidMount () {
-    const { getApplicationsRightsList } = this.props
-
-    getApplicationsRightsList()
-  }
-
-  componentDidUpdate (prevProps) {
-    const { error } = this.props
-
-    if (Boolean(error) && prevProps.error !== error) {
-      throw error
-    }
-  }
-
   async handleSubmit (collaborator) {
     const { appId } = this.props
 
     await api.application.collaborators.add(appId, collaborator)
-
   }
 
   render () {
     const {
       rights,
-      fetching,
       universalRights,
       redirectToList,
     } = this.props
-
-    if (fetching && !rights.length) {
-      return <Spinner center />
-    }
 
     return (
       <Container>
