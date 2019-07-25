@@ -47,7 +47,7 @@ import {
 
   return (
     <Breadcrumb
-      path={`/console/applications/${appId}/devices/${devId}/payload-formatters/downlink`}
+      path={`/applications/${appId}/devices/${devId}/payload-formatters/downlink`}
       icon="downlink"
       content={sharedMessages.downlink}
     />

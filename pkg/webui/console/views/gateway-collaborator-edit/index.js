@@ -74,7 +74,7 @@ import api from '../../api'
     dispatch(getGatewayCollaborator(gtwId, collaboratorId, isUser))
   },
   redirectToList (gtwId) {
-    dispatch(replace(`/console/gateways/${gtwId}/collaborators`))
+    dispatch(replace(`/gateways/${gtwId}/collaborators`))
   },
 }), (stateProps, dispatchProps, ownProps) => ({
   ...stateProps, ...dispatchProps, ...ownProps,
@@ -94,7 +94,7 @@ import api from '../../api'
 
   return (
     <Breadcrumb
-      path={`/console/gateways/${gtwId}/collaborators/${collaboratorId}/edit`}
+      path={`/gateways/${gtwId}/collaborators/${collaboratorId}/edit`}
       icon="general_settings"
       content={sharedMessages.edit}
     />

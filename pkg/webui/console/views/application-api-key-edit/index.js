@@ -66,7 +66,7 @@ dispatch => ({
     dispatch(getApplicationsRightsList(appId))
     dispatch(getApplicationApiKey(appId, apiKeyId))
   },
-  deleteSuccess: appId => dispatch(replace(`/console/applications/${appId}/api-keys`)),
+  deleteSuccess: appId => dispatch(replace(`/applications/${appId}/api-keys`)),
 }))
 @withRequest(
   ({ loadData, appId, keyId }) => loadData(appId, keyId),
@@ -77,7 +77,7 @@ dispatch => ({
 
   return (
     <Breadcrumb
-      path={`/console/applications/${appId}/api-keys/${keyId}/edit`}
+      path={`/applications/${appId}/api-keys/${keyId}/edit`}
       icon="general_settings"
       content={sharedMessages.edit}
     />

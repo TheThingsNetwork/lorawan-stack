@@ -46,7 +46,7 @@ import api from '../../api'
 }),
 dispatch => ({
   getApplicationsRightsList: appId => dispatch(getApplicationsRightsList(appId)),
-  navigateToList: appId => dispatch(replace(`/console/applications/${appId}/api-keys`)),
+  navigateToList: appId => dispatch(replace(`/applications/${appId}/api-keys`)),
 }))
 @withRequest(
   ({ appId, getApplicationsRightsList }) => getApplicationsRightsList(appId),
@@ -56,7 +56,7 @@ dispatch => ({
   const appId = props.appId
   return (
     <Breadcrumb
-      path={`/console/applications/${appId}/api-keys/add`}
+      path={`/applications/${appId}/api-keys/add`}
       icon="add"
       content={sharedMessages.add}
     />

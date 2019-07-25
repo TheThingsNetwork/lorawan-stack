@@ -51,7 +51,7 @@ class Auth extends React.PureComponent {
       return (
         <Redirect
           to={{
-            pathname: `${appRoot}/login`,
+            pathname: `/login`,
             search: redirectPath && `?next=${redirectPath}`,
             state: { from: this.props.location.pathname },
           }}

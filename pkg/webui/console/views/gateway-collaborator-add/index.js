@@ -50,7 +50,7 @@ import api from '../../api'
   }
 }, (dispatch, ownProps) => ({
   getGatewaysRightsList: gtwId => dispatch(getGatewaysRightsList(gtwId)),
-  redirectToList: gtwId => dispatch(push(`/console/gateways/${gtwId}/collaborators`)),
+  redirectToList: gtwId => dispatch(push(`/gateways/${gtwId}/collaborators`)),
 }), (stateProps, dispatchProps, ownProps) => ({
   ...stateProps, ...dispatchProps, ...ownProps,
   getGatewaysRightsList: () => dispatchProps.getGatewaysRightsList(stateProps.gtwId),
@@ -64,7 +64,7 @@ import api from '../../api'
   const gtwId = props.gtwId
   return (
     <Breadcrumb
-      path={`/console/gateways/${gtwId}/collaborators/add`}
+      path={`/gateways/${gtwId}/collaborators/add`}
       icon="add"
       content={sharedMessages.add}
     />

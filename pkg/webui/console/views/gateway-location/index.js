@@ -76,7 +76,7 @@ const getRegistryLocation = function (antennas) {
   const { gtwId } = props
   return (
     <Breadcrumb
-      path={`/console/gateways/${gtwId}/location`}
+      path={`/gateways/${gtwId}/location`}
       icon="location"
       content={sharedMessages.location}
     />

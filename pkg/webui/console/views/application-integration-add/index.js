@@ -32,12 +32,15 @@ import api from '../../api'
 
 @connect(state => ({
   appId: selectSelectedApplicationId(state),
+}),
+dispatch => ({
+  navigateToList: appId => dispatch(push(`/applications/${appId}/integrations`)),
 }))
 @withBreadcrumb('apps.single.integrations.add', function (props) {
   const { appId } = props
   return (
     <Breadcrumb
-      path={`/console/applications/${appId}/integrations/add`}
+      path={`/applications/${appId}/integrations/add`}
       icon="add"
       content={sharedMessages.add}
     />
@@ -52,9 +55,9 @@ export default class ApplicationIntegrationAdd extends Component {
   }
 
   handleSubmitSuccess () {
-    const { dispatch, appId } = this.props
+    const { navigateToList, appId } = this.props
 
-    dispatch(push(`/console/applications/${appId}/integrations`))
+    navigateToList(appId)
   }
 
   render () {

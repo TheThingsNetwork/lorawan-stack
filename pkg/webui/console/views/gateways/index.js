@@ -26,7 +26,7 @@ import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 @withBreadcrumb('gateways', function (props) {
   return (
     <Breadcrumb
-      path="/console/gateways"
+      path="/gateways"
       content={sharedMessages.gateways}
     />
   )

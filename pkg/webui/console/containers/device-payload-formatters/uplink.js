@@ -49,7 +49,7 @@ import {
 
   return (
     <Breadcrumb
-      path={`/console/applications/${appId}/devices/${devId}/payload-formatters/uplink`}
+      path={`/applications/${appId}/devices/${devId}/payload-formatters/uplink`}
       icon="uplink"
       content={sharedMessages.uplink}
     />

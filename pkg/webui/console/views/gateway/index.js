@@ -61,7 +61,7 @@ import {
 dispatch => ({
   getGateway: (id, meta) => dispatch(getGateway(id, meta)),
   stopStream: id => dispatch(stopGatewayEventsStream(id)),
-  redirectToList: () => dispatch(replace('/console/gateways')),
+  redirectToList: () => dispatch(replace('/gateways')),
 }))
 @withRequest(
   ({ gtwId, getGateway }) => getGateway(gtwId, [
@@ -122,7 +122,7 @@ dispatch => ({
 
   return (
     <Breadcrumb
-      path={`/console/gateways/${gtwId}`}
+      path={`/gateways/${gtwId}`}
       icon="gateway"
       content={gtwId}
     />

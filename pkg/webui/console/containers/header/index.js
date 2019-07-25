@@ -17,7 +17,6 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import bind from 'autobind-decorator'
 
-import { withEnv } from '../../../lib/components/env'
 import { logout } from '../../store/actions/user'
 import PropTypes from '../../../lib/prop-types'
 import sharedMessages from '../../../lib/shared-messages'
@@ -28,7 +27,6 @@ import HeaderComponent from '../../../components/header'
 @connect(state => ({
   user: state.user.user,
 }))
-@withEnv
 @bind
 class Header extends Component {
 
@@ -43,25 +41,24 @@ class Header extends Component {
       anchored,
       handleSearchRequest,
       searchable,
-      env: { appRoot },
     } = this.props
 
     const navigationEntries = [
       {
         title: sharedMessages.overview,
         icon: 'overview',
-        path: appRoot,
+        path: '/',
         exact: true,
       },
       {
         title: sharedMessages.applications,
         icon: 'application',
-        path: `${appRoot}/applications`,
+        path: '/applications',
       },
       {
         title: sharedMessages.gateways,
         icon: 'gateway',
-        path: `${appRoot}/gateways`,
+        path: '/gateways',
       },
     ]
 

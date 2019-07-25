@@ -58,7 +58,7 @@ import withEnv from '../../../lib/components/env'
 dispatch => ({
   stopStream: id => dispatch(stopApplicationEventsStream(id)),
   getApplication: id => dispatch(getApplication(id, 'name,description')),
-  redirectToList: () => dispatch(replace('/console/applications')),
+  redirectToList: () => dispatch(replace('/applications')),
 }))
 @withRequest(
   ({ appId, getApplication }) => getApplication(appId),
@@ -138,7 +138,7 @@ dispatch => ({
   const { appId } = props
   return (
     <Breadcrumb
-      path={`/console/applications/${appId}`}
+      path={`/applications/${appId}`}
       icon="application"
       content={appId}
     />

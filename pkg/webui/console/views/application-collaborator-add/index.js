@@ -47,7 +47,7 @@ import api from '../../api'
     error: selectApplicationRightsError(state),
   }
 }, (dispatch, ownProps) => ({
-  redirectToList: appId => dispatch(push(`/console/applications/${appId}/collaborators`)),
+  redirectToList: appId => dispatch(push(`/applications/${appId}/collaborators`)),
   getApplicationsRightsList: appId => dispatch(getApplicationsRightsList(appId)),
 }), (stateProps, dispatchProps, ownProps) => ({
   ...stateProps, ...dispatchProps, ...ownProps,
@@ -62,7 +62,7 @@ import api from '../../api'
   const appId = props.appId
   return (
     <Breadcrumb
-      path={`/console/applications/${appId}/collaborators/add`}
+      path={`/applications/${appId}/collaborators/add`}
       icon="add"
       content={sharedMessages.add}
     />

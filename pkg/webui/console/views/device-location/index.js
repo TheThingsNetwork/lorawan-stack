@@ -73,7 +73,7 @@ const getRegistryLocation = function (locations) {
   const { devId, appId } = props
   return (
     <Breadcrumb
-      path={`/console/applications/${appId}/devices/${devId}/location`}
+      path={`/applications/${appId}/devices/${devId}/location`}
       icon="location"
       content={sharedMessages.location}
     />

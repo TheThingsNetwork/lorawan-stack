@@ -36,7 +36,7 @@ const m = defineMessages({
 @withBreadcrumb('apps.single.data', function (props) {
   return (
     <Breadcrumb
-      path={`/console/applications/${props.appId}/data`}
+      path={`/applications/${props.appId}/data`}
       icon="data"
       content={sharedMessages.data}
     />

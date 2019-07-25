@@ -46,7 +46,7 @@ import api from '../../api'
 }),
 dispatch => ({
   getGatewaysRightsList: gtwId => dispatch(getGatewaysRightsList(gtwId)),
-  navigateToList: gtwId => dispatch(replace(`/console/gateways/${gtwId}/api-keys`)),
+  navigateToList: gtwId => dispatch(replace(`/gateways/${gtwId}/api-keys`)),
 }))
 @withRequest(
   ({ gtwId, getGatewaysRightsList }) => getGatewaysRightsList(gtwId),
@@ -57,7 +57,7 @@ dispatch => ({
 
   return (
     <Breadcrumb
-      path={`/console/gateways/${gtwId}/api-keys/add`}
+      path={`/gateways/${gtwId}/api-keys/add`}
       icon="add"
       content={sharedMessages.add}
     />

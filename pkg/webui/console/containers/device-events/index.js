@@ -53,7 +53,7 @@ class DeviceEvents extends React.Component {
         eventsSelector={selectDeviceEvents}
         statusSelector={selectDeviceEventsStatus}
         onClear={onClear}
-        toAllUrl={`/console/applications/${appId}/devices/${devId}/data`}
+        toAllUrl={`/applications/${appId}/devices/${devId}/data`}
       />
     )
   }

@@ -62,7 +62,7 @@ export default class ApplicationEvents extends React.Component {
         statusSelector={selectApplicationEventsStatus}
         errorSelector={selectApplicationEventsError}
         onClear={onClear}
-        toAllUrl={`/console/applications/${appId}/data`}
+        toAllUrl={`/applications/${appId}/data`}
       />
     )
   }

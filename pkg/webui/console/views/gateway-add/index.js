@@ -44,7 +44,7 @@ const m = defineMessages({
 @withBreadcrumb('gateways.add', function () {
   return (
     <Breadcrumb
-      path="/console/gateways/add"
+      path="/gateways/add"
       icon="add"
       content={sharedMessages.add}
     />
@@ -56,7 +56,7 @@ const m = defineMessages({
   return { userId }
 },
 dispatch => ({
-  createSuccess: gtwId => dispatch(push(`/console/gateways/${gtwId}`)),
+  createSuccess: gtwId => dispatch(push(`/gateways/${gtwId}`)),
 }))
 @bind
 export default class GatewayAdd extends React.Component {

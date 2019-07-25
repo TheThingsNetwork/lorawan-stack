@@ -67,7 +67,7 @@ const webhookEntitySelector = [
   const { appId, webhookId } = match.params
   return {
     getWebhook: () => dispatch(getWebhook(appId, webhookId, webhookEntitySelector)),
-    navigateToList: () => dispatch(replace(`/console/applications/${appId}/integrations`)),
+    navigateToList: () => dispatch(replace(`/applications/${appId}/integrations`)),
   }
 })
 @withRequest(
@@ -78,7 +78,7 @@ const webhookEntitySelector = [
   const { appId, match: { params: { webhookId }}} = props
   return (
     <Breadcrumb
-      path={`/console/applications/${appId}/integrations/${webhookId}`}
+      path={`/applications/${appId}/integrations/${webhookId}`}
       icon="general_settings"
       content={sharedMessages.edit}
     />

@@ -36,7 +36,7 @@ import style from './device-add.styl'
   const { appId } = props.match.params
   return (
     <Breadcrumb
-      path={`/console/applications/${appId}/devices/add`}
+      path={`/applications/${appId}/devices/add`}
       icon="add"
       content={sharedMessages.add}
     />
@@ -48,7 +48,7 @@ import style from './device-add.styl'
     appId: selectSelectedApplicationId(state),
   }
 }, dispatch => ({
-  redirectToList: (appId, deviceId) => dispatch(push(`/console/applications/${appId}/devices/${deviceId}`)),
+  redirectToList: (appId, deviceId) => dispatch(push(`/applications/${appId}/devices/${deviceId}`)),
 }),
 )
 @bind

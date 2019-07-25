@@ -35,7 +35,6 @@ import {
   getDevice,
   stopDeviceEventsStream,
 } from '../../store/actions/device'
-
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
 import { selectSelectedDevice, selectDeviceFetching, selectGetDeviceError } from '../../store/selectors/device'
 
@@ -91,7 +90,7 @@ import style from './device.styl'
   const { devId, appId } = props
   return (
     <Breadcrumb
-      path={`/console/applications/${appId}/devices/${devId}`}
+      path={`/applications/${appId}/devices/${devId}`}
       icon="device"
       content={devId}
     />
@@ -116,7 +115,7 @@ export default class Device extends React.Component {
       env,
     } = this.props
 
-    const basePath = `/console/applications/${appId}/devices/${devId}`
+    const basePath = `/applications/${appId}/devices/${devId}`
 
     // Prevent default redirect to uplink when tab is already open
     const payloadFormattersLink =
@@ -134,7 +133,7 @@ export default class Device extends React.Component {
     return (
       <React.Fragment>
         <IntlHelmet
-          titleTemplate={`%s - ${deviceName || devId} - ${env.siteName}`}
+          titleTemplate={`%s - ${deviceName || devId} - ${env.site_name}`}
         />
         <Container>
           <Row>

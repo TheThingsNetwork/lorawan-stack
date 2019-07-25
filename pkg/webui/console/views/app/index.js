@@ -39,7 +39,6 @@ export default class ConsoleApp extends React.Component {
         siteTitle,
         pageData,
         siteName,
-        appRoot,
       },
     } = this.props
 
@@ -63,8 +62,8 @@ export default class ConsoleApp extends React.Component {
             <div className={style.content}>
               <Switch>
                 {/* routes for registration, privacy policy, other public pages */}
-                <Route path={`${appRoot}/login`} component={Login} />
-                <Route path={appRoot} component={Landing} />
+                <Route path="/login" component={Login} />
+                <Route path="/" component={Landing} />
               </Switch>
             </div>
           </main>

@@ -37,15 +37,15 @@ export default class Landing extends React.PureComponent {
         <ToastContainer />
         <div className={style.breadcrumbsContainer}>
           <Container>
-            <Breadcrumbs />
+            <Breadcrumbs pathPrefix={path} />
           </Container>
         </div>
         <div className={style.contentContainer}>
           <WithAuth>
             <Switch>
-              <Route exact path={`${path}`} component={Overview} />
-              <Route path={`${path}/applications`} component={Applications} />
-              <Route path={`${path}/gateways`} component={Gateways} />
+              <Route exact path="/" component={Overview} />
+              <Route path="/applications" component={Applications} />
+              <Route path="/gateways" component={Gateways} />
               <Route component={GenericNotFound} />
             </Switch>
           </WithAuth>
