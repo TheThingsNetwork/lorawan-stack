@@ -5488,7 +5488,7 @@ This service is not implemented on all deployments.
 | `user_ids` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) |  |  |
 | `new` | [`string`](#string) |  |  |
 | `old` | [`string`](#string) |  |  |
-| `revoke_all_access` | [`bool`](#bool) |  |  |
+| `revoke_all_access` | [`bool`](#bool) |  | Revoke active sessions and access tokens of user if true. To be used if credentials are suspected to be compromised. |
 
 #### Field Rules
 

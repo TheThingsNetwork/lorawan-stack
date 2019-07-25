@@ -268,6 +268,7 @@ var (
 				new = string(pw)
 			}
 
+			revokeAllAccess, _ := cmd.Flags().GetBool("revoke-all-access")
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
@@ -276,6 +277,7 @@ var (
 				UserIdentifiers: *usrID,
 				Old:             old,
 				New:             new,
+				RevokeAllAccess: revokeAllAccess,
 			})
 			if err != nil {
 				return err
@@ -339,6 +341,7 @@ func init() {
 	usersUpdatePasswordCommand.Flags().AddFlagSet(userIDFlags())
 	usersUpdatePasswordCommand.Flags().String("old", "", "")
 	usersUpdatePasswordCommand.Flags().String("new", "", "")
+	usersUpdatePasswordCommand.Flags().Bool("revoke_all_access", false, "revoke all sessions and access tokens after the password is updated")
 	usersCommand.AddCommand(usersUpdatePasswordCommand)
 	usersDeleteCommand.Flags().AddFlagSet(userIDFlags())
 	usersCommand.AddCommand(usersDeleteCommand)

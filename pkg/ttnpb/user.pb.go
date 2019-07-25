@@ -551,9 +551,10 @@ func (m *CreateTemporaryPasswordRequest) XXX_DiscardUnknown() {
 var xxx_messageInfo_CreateTemporaryPasswordRequest proto.InternalMessageInfo
 
 type UpdateUserPasswordRequest struct {
-	UserIdentifiers      `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3,embedded=user_ids" json:"user_ids"`
-	New                  string   `protobuf:"bytes,2,opt,name=new,proto3" json:"new,omitempty"`
-	Old                  string   `protobuf:"bytes,3,opt,name=old,proto3" json:"old,omitempty"`
+	UserIdentifiers `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3,embedded=user_ids" json:"user_ids"`
+	New             string `protobuf:"bytes,2,opt,name=new,proto3" json:"new,omitempty"`
+	Old             string `protobuf:"bytes,3,opt,name=old,proto3" json:"old,omitempty"`
+	// Revoke active sessions and access tokens of user if true. To be used if credentials are suspected to be compromised.
 	RevokeAllAccess      bool     `protobuf:"varint,4,opt,name=revoke_all_access,json=revokeAllAccess,proto3" json:"revoke_all_access,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
