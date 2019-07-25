@@ -180,6 +180,13 @@ class DeviceDataForm extends Component {
     return (
       <React.Fragment>
         <Form.Field
+          title={sharedMessages.joinServerAddress}
+          description={m.jsServerAddressDescription}
+          placeholder={sharedMessages.addressPlaceholder}
+          name="join_server_address"
+          component={Input}
+        />
+        <Form.Field
           title={sharedMessages.joinEUI}
           name="ids.join_eui"
           type="byte"
@@ -347,6 +354,20 @@ class DeviceDataForm extends Component {
           title={m.supportsClassC}
           name="supports_class_c"
           component={Checkbox}
+        />
+        <Form.Field
+          title={sharedMessages.networkServerAddress}
+          description={m.nsServerAddressDescription}
+          placeholder={sharedMessages.addressPlaceholder}
+          name="network_server_address"
+          component={Input}
+        />
+        <Form.Field
+          title={sharedMessages.applicationServerAddress}
+          description={m.asServerAddressDescription}
+          placeholder={sharedMessages.addressPlaceholder}
+          name="application_server_address"
+          component={Input}
         />
         <Message
           component="h4"

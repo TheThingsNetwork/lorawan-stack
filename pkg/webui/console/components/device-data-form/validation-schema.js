@@ -15,7 +15,7 @@
 import * as Yup from 'yup'
 
 import sharedMessages from '../../../lib/shared-messages'
-import { id as deviceIdRegexp } from '../../lib/regexp'
+import { id as deviceIdRegexp, address as addressRegexp } from '../../lib/regexp'
 import m from './messages'
 
 export default Yup.object().shape({
@@ -73,6 +73,12 @@ export default Yup.object().shape({
   lorawan_phy_version: Yup.string().required(sharedMessages.validateRequired),
   frequency_plan_id: Yup.string().required(sharedMessages.validateRequired),
   supports_class_c: Yup.boolean(),
+  network_server_address: Yup.string()
+    .matches(addressRegexp, sharedMessages.validateAddressFormat),
+  application_server_address: Yup.string()
+    .matches(addressRegexp, sharedMessages.validateAddressFormat),
+  join_server_address: Yup.string()
+    .matches(addressRegexp, sharedMessages.validateAddressFormat),
   activation_mode: Yup.string().required(),
   supports_join_nonces: Yup.boolean(),
 })
