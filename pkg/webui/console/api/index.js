@@ -17,8 +17,14 @@ import TTN from 'ttn-lw'
 
 import token from '../lib/access-token'
 import getCookieValue from '../../lib/cookie'
+import {
+  selectApplicationConfig,
+  selectApplicationRootPath,
+} from '../../lib/selectors/env'
 
-const config = window.APP_CONFIG
+const config = selectApplicationConfig()
+const appRoot = selectApplicationRootPath()
+
 const stack = {
   is: config.is.enabled ? config.is.base_url : undefined,
   gs: config.gs.enabled ? config.gs.base_url : undefined,
@@ -41,10 +47,10 @@ const instance = axios.create({
 export default {
   console: {
     token () {
-      return instance.get('/console/api/auth/token')
+      return instance.get(`${appRoot}/api/auth/token`)
     },
     logout () {
-      return instance.post('/console/api/auth/logout')
+      return instance.post(`${appRoot}/api/auth/logout`)
     },
   },
   clients: {
