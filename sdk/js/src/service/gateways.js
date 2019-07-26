@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { URL } from 'url'
 import Marshaler from '../util/marshaler'
 import ApiKeys from './api-keys'
 import Collaborators from './collaborators'
@@ -75,21 +74,11 @@ class Gateways {
 
   // Create
 
-  async create (userId = this._defaultUserId, gateway, { setDefaults = true }) {
-    let gtw = gateway
-    const Url = URL ? URL : window.URL
-
-    if (setDefaults) {
-      gtw = {
-        gateway_server_address: new Url(this._stackConfig.gs).hostname,
-        ...gateway,
-      }
-    }
-
+  async create (userId = this._defaultUserId, gateway) {
     const response = await this._api.GatewayRegistry.Create({
       routeParams: { 'collaborator.user_ids.user_id': userId },
     },
-    { gateway: gtw })
+    { gateway })
 
     return Marshaler.unwrapGateway(response)
   }
