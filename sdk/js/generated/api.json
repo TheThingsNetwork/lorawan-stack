@@ -22126,6 +22126,16 @@
               "fullType": "string",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "revoke_all_access",
+              "description": "Revoke active sessions and access tokens of user if true. To be used if credentials are suspected to be compromised.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },

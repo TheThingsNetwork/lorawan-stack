@@ -974,6 +974,8 @@ func (m *UpdateUserPasswordRequest) ValidateFields(paths ...string) error {
 			// no validation rules for New
 		case "old":
 			// no validation rules for Old
+		case "revoke_all_access":
+			// no validation rules for RevokeAllAccess
 		default:
 			return UpdateUserPasswordRequestValidationError{
 				field:  name,

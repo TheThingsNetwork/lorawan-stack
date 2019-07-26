@@ -109,6 +109,8 @@ message UpdateUserPasswordRequest {
   UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   string new = 2;
   string old = 3;
+  // Revoke active sessions and access tokens of user if true. To be used if credentials are suspected to be compromised.
+  bool revoke_all_access = 4;
 }
 
 message ListUserAPIKeysRequest {

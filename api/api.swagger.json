@@ -10387,6 +10387,11 @@
         },
         "old": {
           "type": "string"
+        },
+        "revoke_all_access": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Revoke active sessions and access tokens of user if true. To be used if credentials are suspected to be compromised."
         }
       }
     },

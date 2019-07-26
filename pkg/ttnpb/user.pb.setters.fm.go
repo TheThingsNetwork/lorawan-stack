@@ -462,6 +462,16 @@ func (dst *UpdateUserPasswordRequest) SetFields(src *UpdateUserPasswordRequest, 
 				var zero string
 				dst.Old = zero
 			}
+		case "revoke_all_access":
+			if len(subs) > 0 {
+				return fmt.Errorf("'revoke_all_access' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RevokeAllAccess = src.RevokeAllAccess
+			} else {
+				var zero bool
+				dst.RevokeAllAccess = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
