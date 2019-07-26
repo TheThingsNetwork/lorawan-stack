@@ -18,12 +18,11 @@ import { Switch, Route } from 'react-router'
 import { replace } from 'connected-react-router'
 
 import sharedMessages from '../../../lib/shared-messages'
-import Message from '../../../lib/components/message'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import { withSideNavigation } from '../../../components/navigation/side/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import Spinner from '../../../components/spinner'
 import IntlHelmet from '../../../lib/components/intl-helmet'
+import withRequest from '../../../lib/components/with-request'
 
 import ApplicationOverview from '../application-overview'
 import ApplicationGeneralSettings from '../application-general-settings'
@@ -61,6 +60,10 @@ dispatch => ({
   getApplication: id => dispatch(getApplication(id, 'name,description')),
   redirectToList: () => dispatch(replace('/console/applications')),
 }))
+@withRequest(
+  ({ appId, getApplication }) => getApplication(appId),
+  ({ fetching, application }) => fetching || !Boolean(application)
+)
 @withSideNavigation(function (props) {
   const matchedUrl = props.match.url
 
@@ -144,12 +147,6 @@ dispatch => ({
 @withEnv
 export default class Application extends React.Component {
 
-  componentDidMount () {
-    const { appId, getApplication } = this.props
-
-    getApplication(appId)
-  }
-
   componentDidUpdate (prevProps) {
     const { appId, application, redirectToList } = this.props
 
@@ -168,18 +165,7 @@ export default class Application extends React.Component {
   }
 
   render () {
-    const { fetching, match, error, application, appId, env } = this.props
-    if (error) {
-      throw error
-    }
-
-    if (fetching || !application) {
-      return (
-        <Spinner center>
-          <Message content={sharedMessages.loading} />
-        </Spinner>
-      )
-    }
+    const { match, application, appId, env } = this.props
 
     return (
       <EnvProvider env={env}>
