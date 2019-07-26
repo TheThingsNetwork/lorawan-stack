@@ -37,7 +37,6 @@ import ApplicationIntegrations from '../application-integrations'
 import { getApplicationId } from '../../../lib/selectors/id'
 import {
   getApplication,
-  startApplicationEventsStream,
   stopApplicationEventsStream,
 } from '../../store/actions/applications'
 import {
@@ -58,7 +57,6 @@ import withEnv, { EnvProvider } from '../../../lib/components/env'
   }
 },
 dispatch => ({
-  startStream: id => dispatch(startApplicationEventsStream(id)),
   stopStream: id => dispatch(stopApplicationEventsStream(id)),
   getApplication: id => dispatch(getApplication(id, 'name,description')),
   redirectToList: () => dispatch(replace('/console/applications')),
@@ -147,10 +145,9 @@ dispatch => ({
 export default class Application extends React.Component {
 
   componentDidMount () {
-    const { appId, startStream, getApplication } = this.props
+    const { appId, getApplication } = this.props
 
     getApplication(appId)
-    startStream(appId)
   }
 
   componentDidUpdate (prevProps) {
