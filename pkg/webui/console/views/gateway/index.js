@@ -22,9 +22,8 @@ import sharedMessages from '../../../lib/shared-messages'
 import { withSideNavigation } from '../../../components/navigation/side/context'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import Spinner from '../../../components/spinner'
-import Message from '../../../lib/components/message'
 import withEnv, { EnvProvider } from '../../../lib/components/env'
+import withRequest from '../../../lib/components/with-request'
 
 import GatewayOverview from '../gateway-overview'
 import GatewayApiKeys from '../gateway-api-keys'
@@ -64,6 +63,18 @@ dispatch => ({
   stopStream: id => dispatch(stopGatewayEventsStream(id)),
   redirectToList: () => dispatch(replace('/console/gateways')),
 }))
+@withRequest(
+  ({ gtwId, getGateway }) => getGateway(gtwId, [
+    'name',
+    'description',
+    'enforce_duty_cycle',
+    'frequency_plan_id',
+    'gateway_server_address',
+    'enforce_duty_cycle',
+    'antennas',
+  ]),
+  ({ fetching, gateway }) => fetching || !Boolean(gateway)
+)
 @withSideNavigation(function (props) {
   const { match, gtwId } = props
   const matchedUrl = match.url
@@ -120,20 +131,6 @@ dispatch => ({
 @withEnv
 export default class Gateway extends React.Component {
 
-  componentDidMount () {
-    const { getGateway, gtwId } = this.props
-
-    getGateway(gtwId, [
-      'name',
-      'description',
-      'enforce_duty_cycle',
-      'frequency_plan_id',
-      'gateway_server_address',
-      'enforce_duty_cycle',
-      'antennas',
-    ])
-  }
-
   componentDidUpdate (prevProps) {
     const { gtwId, gateway, redirectToList } = this.props
 
@@ -152,20 +149,7 @@ export default class Gateway extends React.Component {
   }
 
   render () {
-    const { fetching, error, match, gateway, gtwId, env } = this.props
-
-    // show any gateway fetching error, e.g. not found, no rights, etc
-    if (error) {
-      throw error
-    }
-
-    if (!Boolean(gateway) || fetching) {
-      return (
-        <Spinner center>
-          <Message content={sharedMessages.loading} />
-        </Spinner>
-      )
-    }
+    const { match, gateway, gtwId, env } = this.props
 
     return (
       <EnvProvider env={env}>
