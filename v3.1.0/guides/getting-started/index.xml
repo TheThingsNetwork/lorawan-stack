@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Getting Started on TTN Stack for LoRaWAN Documentation</title>
+    <link>https://thethingsnetwork.github.io/lorawan-stack/v3.1.0/guides/getting-started/</link>
+    <description>Recent content in Getting Started on TTN Stack for LoRaWAN Documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    
+	<atom:link href="https://thethingsnetwork.github.io/lorawan-stack/v3.1.0/guides/getting-started/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Dependencies</title>
+      <link>https://thethingsnetwork.github.io/lorawan-stack/v3.1.0/guides/getting-started/dependencies/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://thethingsnetwork.github.io/lorawan-stack/v3.1.0/guides/getting-started/dependencies/</guid>
+      <description>CLI and stack The web interface Console is not yet available. So in this tutorial, we use the command-line interface (CLI) to manage the setup.
+You can use the CLI on your local machine or on the server.
+ Note: if you need help with any CLI command, use the --help flag to get a list of subcommands, flags and their description and aliases.
+ Package managers (recommended) macOS $ brew install TheThingsNetwork/lorawan-stack/ttn-lw-stack  Linux $ sudo snap install ttn-lw-stack $ sudo snap alias ttn-lw-stack.</description>
+    </item>
+    
+    <item>
+      <title>Configuration</title>
+      <link>https://thethingsnetwork.github.io/lorawan-stack/v3.1.0/guides/getting-started/configuration/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://thethingsnetwork.github.io/lorawan-stack/v3.1.0/guides/getting-started/configuration/</guid>
+      <description>The stack can be started for development without passing any configuration. However, there are a lot of things you can configure. In this guide we&amp;rsquo;ll set some environment variables in docker-compose.yml. These environment variables will configure the stack as a development server on localhost. For setting up up a public server or for requesting certificates from an ACME provider such as Let&amp;rsquo;s Encrypt, take a closer look at the comments in docker-compose.</description>
+    </item>
+    
+    <item>
+      <title>Running the Stack</title>
+      <link>https://thethingsnetwork.github.io/lorawan-stack/v3.1.0/guides/getting-started/running-the-stack/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://thethingsnetwork.github.io/lorawan-stack/v3.1.0/guides/getting-started/running-the-stack/</guid>
+      <description>You can run the stack using Docker or container orchestration solutions using Docker. An example Docker Compose configuration is available to get started quickly.
+With the docker-compose.yml file in the directory of your terminal prompt, enter the following commands to initialize the database, create the first user admin, create the CLI OAuth client and start the stack:
+$ docker-compose pull $ docker-compose run --rm stack is-db init $ docker-compose run --rm stack is-db create-admin-user \ --id admin \ --email admin@localhost $ docker-compose run --rm stack is-db create-oauth-client \ --id cli \ --name &amp;quot;Command Line Interface&amp;quot; \ --owner admin \ --no-secret \ --redirect-uri &#39;local-callback&#39; \ --redirect-uri &#39;code&#39; $ docker-compose up  With TTN Stack up and running, it&amp;rsquo;s time to connect gateways, create devices and work with streaming data.</description>
+    </item>
+    
+  </channel>
+</rss>
