@@ -32,7 +32,7 @@ import { withBreadcrumb } from '../../../components/breadcrumbs/context'
     />
   )
 })
-export default class Applications extends React.Component {
+export default class Devices extends React.Component {
 
   render () {
     const { path } = this.props.match
