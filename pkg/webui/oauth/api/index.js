@@ -15,6 +15,9 @@
 import axios from 'axios'
 
 import getCookieValue from '../../lib/cookie'
+import { selectApplicationRootPath } from '../../lib/selectors/env'
+
+const appRoot = selectApplicationRootPath()
 
 const csrf = getCookieValue('_csrf')
 const instance = axios.create({
@@ -29,13 +32,13 @@ export default {
   },
   oauth: {
     login (credentials) {
-      return instance.post('/oauth/api/auth/login', credentials)
+      return instance.post(`${appRoot}/api/auth/login`, credentials)
     },
     logout () {
-      return instance.post('/oauth/api/auth/logout')
+      return instance.post(`${appRoot}/api/auth/logout`)
     },
     me () {
-      return instance.get('/oauth/api/me')
+      return instance.get(`${appRoot}/api/me`)
     },
   },
 }
