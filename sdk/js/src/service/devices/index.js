@@ -252,18 +252,8 @@ class Devices {
     return this._responseTransform(response)
   }
 
-  async create (applicationId, device, { abp = false, setDefaults = true, withRootKeys = false } = {}) {
-    let dev = device
-    const Url = URL ? URL : window.URL
-
-    if (setDefaults) {
-      dev = {
-        application_server_address: new Url(this._stackConfig.as).host,
-        join_server_address: new Url(this._stackConfig.js).host,
-        network_server_address: new Url(this._stackConfig.ns).host,
-        ...device,
-      }
-    }
+  async create (applicationId, device, { abp = false, withRootKeys = false } = {}) {
+    const dev = device
 
     if (abp) {
       const session = {

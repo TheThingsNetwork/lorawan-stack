@@ -22,6 +22,7 @@ import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
+import { withEnv } from '../../../lib/components/env'
 import DeviceDataForm from '../../components/device-data-form'
 import sharedMessages from '../../../lib/shared-messages'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
@@ -30,6 +31,7 @@ import api from '../../api'
 
 import style from './device-add.styl'
 
+@withEnv
 @withBreadcrumb('devices.add', function (props) {
   const { appId } = props.match.params
   return (
@@ -87,6 +89,19 @@ export default class DeviceAdd extends Component {
 
   render () {
     const { error } = this.state
+    const { env: { config }} = this.props
+
+    const initialValues = {
+      network_server_address: config.ns.enabled
+        ? new URL(config.ns.base_url).hostname
+        : '',
+      application_server_address: config.as.enabled
+        ? new URL(config.as.base_url).hostname
+        : '',
+      join_server_address: config.js.enabled
+        ? new URL(config.js.base_url).hostname
+        : '',
+    }
 
     return (
       <Container>
@@ -100,6 +115,7 @@ export default class DeviceAdd extends Component {
               error={error}
               onSubmit={this.handleSubmit}
               onSubmitSuccess={this.handleSubmitSuccess}
+              initialValues={initialValues}
             />
           </Col>
         </Row>
