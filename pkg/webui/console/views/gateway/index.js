@@ -36,7 +36,6 @@ import GatewayGeneralSettings from '../gateway-general-settings'
 import { getGatewayId } from '../../../lib/selectors/id'
 import {
   getGateway,
-  startGatewayEventsStream,
   stopGatewayEventsStream,
 } from '../../store/actions/gateways'
 import {
@@ -62,7 +61,6 @@ import {
 },
 dispatch => ({
   getGateway: (id, meta) => dispatch(getGateway(id, meta)),
-  startStream: id => dispatch(startGatewayEventsStream(id)),
   stopStream: id => dispatch(stopGatewayEventsStream(id)),
   redirectToList: () => dispatch(replace('/console/gateways')),
 }))
@@ -123,9 +121,8 @@ dispatch => ({
 export default class Gateway extends React.Component {
 
   componentDidMount () {
-    const { getGateway, startStream, gtwId } = this.props
+    const { getGateway, gtwId } = this.props
 
-    startStream(gtwId)
     getGateway(gtwId, [
       'name',
       'description',
