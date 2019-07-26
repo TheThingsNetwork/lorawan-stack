@@ -107,7 +107,6 @@ export default class Device extends React.Component {
     stopStream(devIds)
   }
 
-
   render () {
     const {
       fetching,
@@ -120,17 +119,16 @@ export default class Device extends React.Component {
       env,
     } = this.props
 
+    if (error) {
+      throw error
+    }
+
     if (fetching || !device) {
       return (
         <Spinner center>
           <Message content={sharedMessages.loading} />
         </Spinner>
       )
-    }
-
-    // show any device fetching error, e.g. not found, no rights, etc
-    if (error) {
-      throw error
     }
 
     const basePath = `/console/applications/${appId}/devices/${devId}`
