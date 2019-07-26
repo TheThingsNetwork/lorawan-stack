@@ -76,7 +76,7 @@ dispatch => ({
 
   return (
     <Breadcrumb
-      path={`/gateways/${gtwId}/api-keys/${keyId}/edit`}
+      path={`/gateways/${gtwId}/api-keys/${keyId}`}
       icon="general_settings"
       content={sharedMessages.edit}
     />

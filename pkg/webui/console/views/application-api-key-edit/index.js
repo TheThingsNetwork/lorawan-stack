@@ -77,7 +77,7 @@ dispatch => ({
 
   return (
     <Breadcrumb
-      path={`/applications/${appId}/api-keys/${keyId}/edit`}
+      path={`/applications/${appId}/api-keys/${keyId}`}
       icon="general_settings"
       content={sharedMessages.edit}
     />

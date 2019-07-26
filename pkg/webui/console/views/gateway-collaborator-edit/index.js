@@ -90,11 +90,11 @@ import api from '../../api'
   ({ fetching, collaborator }) => fetching || !Boolean(collaborator)
 )
 @withBreadcrumb('gtws.single.collaborators.edit', function (props) {
-  const { gtwId, collaboratorId } = props
+  const { gtwId, collaboratorId, collaboratorType } = props
 
   return (
     <Breadcrumb
-      path={`/gateways/${gtwId}/collaborators/${collaboratorId}/edit`}
+      path={`/gateways/${gtwId}/collaborators/${collaboratorType}/${collaboratorId}`}
       icon="general_settings"
       content={sharedMessages.edit}
     />
