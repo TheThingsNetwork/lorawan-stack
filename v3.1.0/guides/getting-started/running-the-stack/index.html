@@ -51,12 +51,20 @@ $ docker-compose run --rm stack is-db create-oauth-client \
   --no-secret \
   --redirect-uri 'local-callback' \
   --redirect-uri 'code'
+$ docker-compose run --rm stack is-db create-oauth-client \
+  --id console \
+  --name &quot;Console&quot; \
+  --owner admin \
+  --secret console \
+  --redirect-uri 'https://localhost:8885/console/oauth/callback' \
+  --redirect-uri 'http://localhost:1885/console/oauth/callback' \
+  --redirect-uri '/console/oauth/callback'
 $ docker-compose up
 </code></pre>
 
 <p>With TTN Stack up and running, it&rsquo;s time to connect gateways, create devices and work with streaming data. See <a href="/lorawan-stack/v3.1.0/guides/getting-started/cli/">Command-line Interface</a> to proceed.</p>
 <div class="edit-meta">
-Last updated on 23 Jul 2019
+Last updated on 26 Jul 2019
 
 
 <br><a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/guides/getting-started/running-the-stack.md" class="edit-page"><i class="fas fa-pen-square"></i> Edit on GitHub</a></div><nav class="pagination"><a class="nav nav-prev" href="/lorawan-stack/v3.1.0/guides/getting-started/configuration/" title="Configuration"><i class="fas fa-arrow-left" aria-hidden="true"></i> Prev - Configuration</a>
