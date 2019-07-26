@@ -181,7 +181,6 @@ class DeviceDataForm extends Component {
       <React.Fragment>
         <Form.Field
           title={sharedMessages.joinServerAddress}
-          description={m.jsServerAddressDescription}
           placeholder={sharedMessages.addressPlaceholder}
           name="join_server_address"
           component={Input}
@@ -357,14 +356,12 @@ class DeviceDataForm extends Component {
         />
         <Form.Field
           title={sharedMessages.networkServerAddress}
-          description={m.nsServerAddressDescription}
           placeholder={sharedMessages.addressPlaceholder}
           name="network_server_address"
           component={Input}
         />
         <Form.Field
           title={sharedMessages.applicationServerAddress}
-          description={m.asServerAddressDescription}
           placeholder={sharedMessages.addressPlaceholder}
           name="application_server_address"
           component={Input}
