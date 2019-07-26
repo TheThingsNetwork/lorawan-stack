@@ -103,15 +103,22 @@ export async function makeRequests (
   const isDelete = operation === 'delete'
   const rpcFunction = isSet ? 'Set' : isDelete ? 'Delete' : 'Get'
 
-  // Use a wrapper for the api calls to allow ignoring not found errors, if wished
-  const requestWrapper = async function (call, params, payload) {
+  // Use a wrapper for the api calls to allow ignoring not found errors per component, if wished
+  const requestWrapper = async function (
+    call,
+    params,
+    payload,
+    ignoreRequestNotFound = ignoreNotFound
+  ) {
+
     try {
       const res = await call(params, !isDelete ? payload : undefined)
       return res
     } catch (err) {
-      if (ignoreNotFound && err.code === 5) {
+      if (err.code === 5 && ignoreRequestNotFound) {
         return { end_device: {}}
       }
+
       throw err
     }
   }
@@ -139,7 +146,8 @@ export async function makeRequests (
       params, {
         ...payload,
         ...Marshaler.pathsToFieldMask(requestTree.is),
-      }
+      },
+      false
     )
 
     isResult = Marshaler.payloadSingleResponse(isResult)
