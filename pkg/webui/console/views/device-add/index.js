@@ -89,12 +89,18 @@ export default class DeviceAdd extends Component {
 
   render () {
     const { error } = this.state
-    const { env } = this.props
+    const { env: { config }} = this.props
 
     const initialValues = {
-      network_server_address: env.config.ns.enabled ? new URL(env.config.ns.base_url).hostname : '',
-      application_server_address: env.config.as.enabled ? new URL(env.config.as.base_url).hostname : '',
-      join_server_address: env.config.js.enabled ? new URL(env.config.js.base_url).hostname : '',
+      network_server_address: config.ns.enabled
+        ? new URL(config.ns.base_url).hostname
+        : '',
+      application_server_address: config.as.enabled
+        ? new URL(config.as.base_url).hostname
+        : '',
+      join_server_address: config.js.enabled
+        ? new URL(config.js.base_url).hostname
+        : '',
     }
 
     return (
