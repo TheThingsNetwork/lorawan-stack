@@ -30,54 +30,59 @@ Name | Description
 ### <a name="{{ .Name }}">{{ .Name }}</a>
   {{ .Description }}
 
-  {{ print "{{% reftab " "gRPC" .Name " " "HTTP" .Name " %}}" }}
+  {{ print "{{% reftab " .Name " " "gRPC" .Name " " "HTTP" .Name " %}}" }}
 
   **Request**: [{{ .RequestLongType }}](#{{ .RequestFullType }}){{ if .RequestStreaming }}_stream_{{ end }}
-  {{ with $msg := .RequestLongType }}{{- range $files -}}
-    {{- range .Messages -}}
-      {{- if eq .Name $msg -}}
-      {{ .Description }}
+  {{ with $msg := .RequestLongType }}
+    {{- range $files -}}
+      {{- range .Messages -}}
+        {{- if eq .Name $msg -}}
+        {{ .Description }}
 
-        {{- if .HasFields }}
-
+          {{- if .HasFields }}
 Field | Type | Label | Description | Validation
 ---|---|---|---|---
-          {{- range .Fields }}
+            {{- range .Fields }}
 {{ .Name }} | [{{ .LongType }}](#{{ .FullType }}) | {{ .Label }} | {{ nobr .Description }}{{ if .DefaultValue }} Default: {{ .DefaultValue }}{{ end }} | {{range (.Option "validate.rules").Rules}}<p>`{{.Name}}`: `{{.Value}}`</p>{{end}}
+            {{- end -}}
           {{- end -}}
-        {{- end -}}
 
+        {{- end -}}
       {{- end -}}
     {{- end -}}
-  {{- end -}}
-
   {{ end }}
 
   **Response**: [{{ .ResponseLongType }}](#{{ .ResponseFullType }}){{ if .ResponseStreaming }} _stream_{{ end }}
-  {{ with $msg := .ResponseLongType }}{{ range $files }}
-    {{- range .Messages -}}
-      {{- if eq .Name $msg -}}
-      {{ .Description }}
+  {{ with $msg := .ResponseLongType }}
+    {{ range $files }}
+      {{- range .Messages -}}
+        {{- if eq .Name $msg -}}
+          {{ .Description }}
 
-        {{- if .HasFields }}
+          {{- if .HasFields }}
 
 Field | Type | Label | Description
 ---|---|---|---
-          {{- range .Fields }}
+            {{- range .Fields }}
 {{ .Name }} | [{{ .LongType }}](#{{ .FullType }}) | {{ .Label }} | {{ nobr .Description }}{{ if .DefaultValue }} Default: {{ .DefaultValue }}{{ end }}
+            {{- end -}}
           {{- end -}}
         {{- end -}}
       {{- end -}}
-    {{- end -}}
+    {{ end }}
   {{ end }}
+
   $$$$$$
-  #### HTTP bindings
-  Method Name | Method | Pattern | Body
-  |-----------|------|-------|----
+
+Method | Pattern | Body
+------|-------|----
+{{- range (.Option "google.api.http").Rules }}
+ `{{ .Method }}` | `/api/v3{{ .Pattern }}` | {{ .Body }} |
+{{- end -}}
 
   {{ print "{{% /reftab %}}" }}
 
   {{ end }}
   {{ end }}
-  {{ end }}
+{{print "{{% refswitcher %}}" }}
 {{end}}
