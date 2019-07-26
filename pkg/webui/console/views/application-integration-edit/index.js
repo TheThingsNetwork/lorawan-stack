@@ -25,9 +25,9 @@ import IntlHelmet from '../../../lib/components/intl-helmet'
 import Message from '../../../lib/components/message'
 import WebhookForm from '../../components/webhook-form'
 import toast from '../../../components/toast'
-import Spinner from '../../../components/spinner'
 import diff from '../../../lib/diff'
 import sharedMessages from '../../../lib/shared-messages'
+import withRequest from '../../../lib/components/with-request'
 
 import {
   selectSelectedWebhook,
@@ -70,6 +70,10 @@ const webhookEntitySelector = [
     navigateToList: () => dispatch(replace(`/console/applications/${appId}/integrations`)),
   }
 })
+@withRequest(
+  ({ getWebhook }) => getWebhook(),
+  ({ fetching, webhook }) => fetching || !Boolean(webhook)
+)
 @withBreadcrumb('apps.single.integrations.edit', function (props) {
   const { appId, match: { params: { webhookId }}} = props
   return (
@@ -82,11 +86,6 @@ const webhookEntitySelector = [
 })
 @bind
 export default class ApplicationIntegrationEdit extends Component {
-  componentDidMount () {
-    const { getWebhook } = this.props
-
-    getWebhook()
-  }
 
   async handleSubmit (webhook) {
     const { appId, match: { params: { webhookId }}, webhook: originalWebhook } = this.props
@@ -120,15 +119,7 @@ export default class ApplicationIntegrationEdit extends Component {
   }
 
   render () {
-    const { webhook, fetching, error } = this.props
-
-    if (fetching || !webhook) {
-      return <Spinner center />
-    }
-
-    if (error) {
-      throw error
-    }
+    const { webhook } = this.props
 
     return (
       <Container>

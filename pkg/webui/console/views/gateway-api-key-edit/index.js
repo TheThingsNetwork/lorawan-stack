@@ -21,10 +21,10 @@ import { replace } from 'connected-react-router'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import sharedMessages from '../../../lib/shared-messages'
-import Spinner from '../../../components/spinner'
 import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import { ApiKeyEditForm } from '../../components/api-key-form'
+import withRequest from '../../../lib/components/with-request'
 
 import {
   getGatewayApiKey,
@@ -61,12 +61,16 @@ import api from '../../api'
   }
 },
 dispatch => ({
-  async loadPageData (gtwId, apiKeyId) {
-    await dispatch(getGatewaysRightsList(gtwId))
+  loadData (gtwId, apiKeyId) {
+    dispatch(getGatewaysRightsList(gtwId))
     dispatch(getGatewayApiKey(gtwId, apiKeyId))
   },
   deleteSuccess: gtwId => dispatch(replace(`/console/gateways/${gtwId}/api-keys`)),
 }))
+@withRequest(
+  ({ gtwId, keyId, loadData }) => loadData(gtwId, keyId),
+  ({ fetching, apiKey }) => fetching || !Boolean(apiKey)
+)
 @withBreadcrumb('gtws.single.api-keys.edit', function (props) {
   const { gtwId, keyId } = props
 
@@ -92,12 +96,6 @@ export default class GatewayApiKeyEdit extends React.Component {
     )
   }
 
-  componentDidMount () {
-    const { loadPageData, gtwId, keyId } = this.props
-
-    loadPageData(gtwId, keyId)
-  }
-
   onDeleteSuccess () {
     const { gtwId, deleteSuccess } = this.props
 
@@ -105,15 +103,7 @@ export default class GatewayApiKeyEdit extends React.Component {
   }
 
   render () {
-    const { apiKey, rights, fetching, error, universalRights } = this.props
-
-    if (error) {
-      throw error
-    }
-
-    if (fetching || !apiKey) {
-      return <Spinner center />
-    }
+    const { apiKey, rights, universalRights } = this.props
 
     return (
       <Container>

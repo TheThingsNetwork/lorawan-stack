@@ -21,10 +21,10 @@ import { replace } from 'connected-react-router'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import sharedMessages from '../../../lib/shared-messages'
-import Spinner from '../../../components/spinner'
 import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import { ApiKeyEditForm } from '../../components/api-key-form'
+import withRequest from '../../../lib/components/with-request'
 
 import {
   getApplicationApiKey,
@@ -62,12 +62,16 @@ import api from '../../api'
   }
 },
 dispatch => ({
-  async loadPageData (appId, apiKeyId) {
-    await dispatch(getApplicationsRightsList(appId))
+  loadData (appId, apiKeyId) {
+    dispatch(getApplicationsRightsList(appId))
     dispatch(getApplicationApiKey(appId, apiKeyId))
   },
   deleteSuccess: appId => dispatch(replace(`/console/applications/${appId}/api-keys`)),
 }))
+@withRequest(
+  ({ loadData, appId, keyId }) => loadData(appId, keyId),
+  ({ fetching, apiKey }) => fetching || !Boolean(apiKey)
+)
 @withBreadcrumb('apps.single.api-keys.edit', function (props) {
   const { appId, keyId } = props
 
@@ -93,12 +97,6 @@ export default class ApplicationApiKeyEdit extends React.Component {
     )
   }
 
-  componentDidMount () {
-    const { loadPageData, appId, keyId } = this.props
-
-    loadPageData(appId, keyId)
-  }
-
   onDeleteSuccess () {
     const { appId, deleteSuccess } = this.props
 
@@ -106,15 +104,7 @@ export default class ApplicationApiKeyEdit extends React.Component {
   }
 
   render () {
-    const { apiKey, rights, fetching, error, universalRights } = this.props
-
-    if (error) {
-      throw error
-    }
-
-    if (fetching || !apiKey) {
-      return <Spinner center />
-    }
+    const { apiKey, rights, universalRights } = this.props
 
     return (
       <Container>

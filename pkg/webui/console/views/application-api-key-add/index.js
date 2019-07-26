@@ -18,13 +18,13 @@ import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
 import { replace } from 'connected-react-router'
 
-import Spinner from '../../../components/spinner'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import sharedMessages from '../../../lib/shared-messages'
 import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import { ApiKeyCreateForm } from '../../components/api-key-form'
+import withRequest from '../../../lib/components/with-request'
 
 import { getApplicationsRightsList } from '../../store/actions/applications'
 import {
@@ -43,7 +43,15 @@ import api from '../../api'
   error: selectApplicationRightsError(state),
   rights: selectApplicationRights(state),
   universalRights: selectApplicationUniversalRights(state),
+}),
+dispatch => ({
+  getApplicationsRightsList: appId => dispatch(getApplicationsRightsList(appId)),
+  navigateToList: appId => dispatch(replace(`/console/applications/${appId}/api-keys`)),
 }))
+@withRequest(
+  ({ appId, getApplicationsRightsList }) => getApplicationsRightsList(appId),
+  ({ fetching, rights }) => fetching || !Boolean(rights.length)
+)
 @withBreadcrumb('apps.single.api-keys.add', function (props) {
   const appId = props.appId
   return (
@@ -63,28 +71,14 @@ export default class ApplicationApiKeyAdd extends React.Component {
     this.createApplicationKey = key => api.application.apiKeys.create(props.appId, key)
   }
 
-  componentDidMount () {
-    const { dispatch, appId } = this.props
-
-    dispatch(getApplicationsRightsList(appId))
-  }
-
   handleApprove () {
-    const { dispatch, appId } = this.props
+    const { navigateToList, appId } = this.props
 
-    dispatch(replace(`/console/applications/${appId}/api-keys`))
+    navigateToList(appId)
   }
 
   render () {
-    const { rights, fetching, error, universalRights } = this.props
-
-    if (error) {
-      throw error
-    }
-
-    if (fetching || !rights.length) {
-      return <Spinner center />
-    }
+    const { rights, universalRights } = this.props
 
     return (
       <Container>
