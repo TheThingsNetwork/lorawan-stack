@@ -16,6 +16,9 @@
   display: flex
   flex-direction: column
 
+  &:not(:last-child)
+    margin-bottom: 0
+
 .tab-item
   display: flex
   white-space: nowrap
@@ -29,9 +32,6 @@
 
   &:not(.tab-item-active):hover
     color: $tc-deep-gray
-
-  &:not(:last-child)
-    margin-bottom: 0
 
   &-narrow
     padding: $cs.l $cs.m
