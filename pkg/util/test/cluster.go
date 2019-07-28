@@ -77,7 +77,7 @@ func (m MockPeer) Tags() map[string]string {
 // srv is the implementation of the gRPC interface.
 // registrators represents a slice of functions, which register the gRPC interface implementation at a gRPC server.
 func NewGRPCServerPeer(ctx context.Context, srv interface{}, registrators ...interface{}) (*MockPeer, error) {
-	grpcSrv := grpc.NewServer()
+	grpcSrv := rpcserver.New(ctx).Server
 	for _, r := range registrators {
 		reflect.ValueOf(r).Call([]reflect.Value{
 			reflect.ValueOf(grpcSrv),
