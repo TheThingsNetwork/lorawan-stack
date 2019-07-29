@@ -5003,6 +5003,15 @@
       "file": "storage.go"
     }
   },
+  "error:pkg/oauth:no_user_id_password_match": {
+    "translations": {
+      "en": "incorrect password or user ID"
+    },
+    "description": {
+      "package": "pkg/oauth",
+      "file": "user.go"
+    }
+  },
   "error:pkg/oauth:not_authenticated": {
     "translations": {
       "en": "not authenticated"
@@ -5010,15 +5019,6 @@
     "description": {
       "package": "pkg/oauth",
       "file": "middleware.go"
-    }
-  },
-  "error:pkg/oauth:password": {
-    "translations": {
-      "en": "incorrect password"
-    },
-    "description": {
-      "package": "pkg/oauth",
-      "file": "user.go"
     }
   },
   "error:pkg/oauth:session_expired": {

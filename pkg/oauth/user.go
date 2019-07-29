@@ -151,7 +151,7 @@ type loginRequest struct {
 	Password string `json:"password" form:"password"`
 }
 
-var errIncorrectPassword = errors.DefineUnauthenticated("password", "incorrect password")
+var errIncorrectPasswordOrUserID = errors.DefineUnauthenticated("no_user_id_password_match", "incorrect password or user ID")
 
 func (s *server) doLogin(ctx context.Context, userID, password string) error {
 	ids := &ttnpb.UserIdentifiers{UserID: userID}
@@ -164,6 +164,9 @@ func (s *server) doLogin(ctx context.Context, userID, password string) error {
 		&types.FieldMask{Paths: []string{"password"}},
 	)
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return errIncorrectPasswordOrUserID
+		}
 		return err
 	}
 	region := trace.StartRegion(ctx, "validate password")
@@ -171,7 +174,7 @@ func (s *server) doLogin(ctx context.Context, userID, password string) error {
 	region.End()
 	if err != nil || !ok {
 		events.Publish(evtUserLoginFailed(ctx, user.UserIdentifiers, nil))
-		return errIncorrectPassword
+		return errIncorrectPasswordOrUserID
 	}
 	return nil
 }
