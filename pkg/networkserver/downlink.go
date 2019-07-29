@@ -287,6 +287,7 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 					},
 				},
 			})
+			startIdx = len(dev.QueuedApplicationDownlinks)
 			skipAppDown = true
 			break
 		}
