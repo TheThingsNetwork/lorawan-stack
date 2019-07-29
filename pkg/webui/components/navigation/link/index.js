@@ -52,7 +52,7 @@ const NavigationAnchorLink = function ({
   ...rest
 }) {
   return (
-    <Link.Anchor
+    <Link.BaseAnchor
       href={path}
       className={classnames(className, style.link)}
       children={children}

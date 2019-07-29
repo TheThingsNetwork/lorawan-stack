@@ -116,7 +116,7 @@ const Dropdown = ({ items, anchored }) => (
             <Message content={item.title} />
           </button>)
         : anchored
-          ? <Link.Anchor href={item.path}>{icon}<Message content={item.title} /></Link.Anchor>
+          ? <Link.BaseAnchor href={item.path}>{icon}<Message content={item.title} /></Link.BaseAnchor>
           : <Link to={item.path}>{icon}<Message content={item.title} /></Link>
       return (
         <li className={styles.dropdownItem} key={item.title.id || item.title}>
