@@ -56,7 +56,12 @@ builds:
       - 7
 
 archives:
-  - files:
+  - id: stack
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+    builds:
+      - cli
+      - stack
+    files:
       - LICENSE
       - README.md
       - doc/**/*
@@ -67,8 +72,24 @@ archives:
       - goos: windows
         format: zip
 
+  - id: cli
+    name_template: "{{ .ProjectName }}-cli_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+    builds:
+      - cli
+    files:
+      - LICENSE
+      - README.md
+      - doc/**/*
+    wrap_in_directory: true
+    format_overrides:
+      - goos: windows
+        format: zip
+
 nfpms:
-  - vendor: The Things Network
+  - id: stack
+    builds:
+      - stack
+    vendor: The Things Network
     homepage: https://www.thethingsnetwork.org
     maintainer: The Things Network Foundation <stack@thethingsnetwork.org>
     description: The Things Stack for LoRaWAN
@@ -83,7 +104,10 @@ nfpms:
       "public/**/*": "/srv/ttn-lorawan/public"
 
 snapcrafts:
-  - name: ttn-lw-stack
+  - id: stack
+    builds:
+      - stack
+    name: ttn-lw-stack
     summary: The Things Stack for LoRaWAN
     description: The Things Stack for LoRaWAN
     grade: stable
@@ -96,8 +120,9 @@ snapcrafts:
         plugs: [ home, network, network-bind ]
 
 brews:
-  # TODO: Generate separate formulas for stack+CLI and CLI only.(https://github.com/TheThingsNetwork/lorawan-stack/issues/108)
   - name: ttn-lw-stack
+    ids:
+      - stack
     github:
       owner: TheThingsNetwork
       name: homebrew-lorawan-stack
@@ -106,6 +131,8 @@ brews:
       email: stack@thethingsnetwork.org
     homepage: https://www.thethingsnetwork.org
     description: The Things Stack for LoRaWAN
+    conflicts:
+      - ttn-lw-cli
     skip_upload: auto
     install: |
       bin.install "ttn-lw-cli"
@@ -114,6 +141,24 @@ brews:
           :TTN_LW_HTTP_STATIC_SEARCH_PATH => libexec/"public"
       }
       (bin/"ttn-lw-stack").write_env_script libexec/"ttn-lw-stack", env
+
+  - name: ttn-lw-cli
+    ids:
+      - cli
+    github:
+      owner: TheThingsNetwork
+      name: homebrew-lorawan-stack
+    commit_author:
+      name: ttn-ci
+      email: stack@thethingsnetwork.org
+    homepage: https://www.thethingsnetwork.org
+    description: CLI of The Things Stack for LoRaWAN
+    conflicts:
+      - ttn-lw-stack
+    skip_upload: auto
+    install: |
+      bin.install "ttn-lw-cli"
+      libexec.install doc
 
 dockers:
   - goos: linux
