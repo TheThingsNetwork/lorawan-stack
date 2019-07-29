@@ -18,12 +18,11 @@ import { Switch, Route } from 'react-router'
 import { replace } from 'connected-react-router'
 
 import sharedMessages from '../../../lib/shared-messages'
-import Message from '../../../lib/components/message'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import { withSideNavigation } from '../../../components/navigation/side/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import Spinner from '../../../components/spinner'
 import IntlHelmet from '../../../lib/components/intl-helmet'
+import withRequest from '../../../lib/components/with-request'
 
 import ApplicationOverview from '../application-overview'
 import ApplicationGeneralSettings from '../application-general-settings'
@@ -37,7 +36,6 @@ import ApplicationIntegrations from '../application-integrations'
 import { getApplicationId } from '../../../lib/selectors/id'
 import {
   getApplication,
-  startApplicationEventsStream,
   stopApplicationEventsStream,
 } from '../../store/actions/applications'
 import {
@@ -58,11 +56,14 @@ import withEnv, { EnvProvider } from '../../../lib/components/env'
   }
 },
 dispatch => ({
-  startStream: id => dispatch(startApplicationEventsStream(id)),
   stopStream: id => dispatch(stopApplicationEventsStream(id)),
   getApplication: id => dispatch(getApplication(id, 'name,description')),
   redirectToList: () => dispatch(replace('/console/applications')),
 }))
+@withRequest(
+  ({ appId, getApplication }) => getApplication(appId),
+  ({ fetching, application }) => fetching || !Boolean(application)
+)
 @withSideNavigation(function (props) {
   const matchedUrl = props.match.url
 
@@ -146,13 +147,6 @@ dispatch => ({
 @withEnv
 export default class Application extends React.Component {
 
-  componentDidMount () {
-    const { appId, startStream, getApplication } = this.props
-
-    getApplication(appId)
-    startStream(appId)
-  }
-
   componentDidUpdate (prevProps) {
     const { appId, application, redirectToList } = this.props
 
@@ -171,18 +165,7 @@ export default class Application extends React.Component {
   }
 
   render () {
-    const { fetching, match, error, application, appId, env } = this.props
-    if (error) {
-      throw error
-    }
-
-    if (fetching || !application) {
-      return (
-        <Spinner center>
-          <Message content={sharedMessages.loading} />
-        </Spinner>
-      )
-    }
+    const { match, application, appId, env } = this.props
 
     return (
       <EnvProvider env={env}>

@@ -18,12 +18,12 @@ import { Switch, Route } from 'react-router'
 import { Col, Row, Container } from 'react-grid-system'
 
 import sharedMessages from '../../../lib/shared-messages'
-import Message from '../../../lib/components/message'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import Spinner from '../../../components/spinner'
 import Tabs from '../../../components/tabs'
 import IntlHelmet from '../../../lib/components/intl-helmet'
+import withRequest from '../../../lib/components/with-request'
+import withEnv, { EnvProvider } from '../../../lib/components/env'
 
 import DeviceOverview from '../device-overview'
 import DeviceData from '../device-data'
@@ -35,20 +35,22 @@ import {
   getDevice,
   stopDeviceEventsStream,
 } from '../../store/actions/device'
-
-import withEnv, { EnvProvider } from '../../../lib/components/env'
-import { selectDeviceFetching, selectGetDeviceError } from '../../store/selectors/device'
+import { selectSelectedApplicationId } from '../../store/selectors/applications'
+import { selectSelectedDevice, selectDeviceFetching, selectGetDeviceError } from '../../store/selectors/device'
 
 import style from './device.styl'
 
-
 @connect(function (state, props) {
-  const { device } = state
+  const devId = props.match.params.devId
+  const appId = selectSelectedApplicationId(state)
+  const device = selectSelectedDevice(state)
+
   return {
-    device: device.device,
-    deviceName: device.device && device.device.name,
-    devIds: device.device && device.device.ids,
-    devId: props.match.params.devId,
+    devId,
+    appId,
+    device,
+    deviceName: device && device.name,
+    devIds: device && device.ids,
     fetching: selectDeviceFetching(state),
     error: selectGetDeviceError(state),
   }
@@ -57,25 +59,8 @@ import style from './device.styl'
     dispatch(getDevice(appId, devId, selectors, config)),
   stopStream: id => dispatch(stopDeviceEventsStream(id)),
 }))
-@withBreadcrumb('device.single', function (props) {
-  const { devId } = props
-  const { appId } = props.match.params
-  return (
-    <Breadcrumb
-      path={`/console/applications/${appId}/devices/${devId}`}
-      icon="device"
-      content={devId}
-    />
-  )
-})
-
-@withEnv
-export default class Device extends React.Component {
-
-  componentDidMount () {
-    const { getDevice, devId, match } = this.props
-    const { appId } = match.params
-
+@withRequest(
+  ({ appId, devId, getDevice }) =>
     getDevice(
       appId,
       devId,
@@ -98,8 +83,22 @@ export default class Device extends React.Component {
         'locations',
         'formatters',
       ],
-      { ignoreNotFound: true })
-  }
+      { ignoreNotFound: true }),
+  ({ fetching, device }) => fetching || !Boolean(device)
+)
+@withBreadcrumb('device.single', function (props) {
+  const { devId, appId } = props
+  return (
+    <Breadcrumb
+      path={`/console/applications/${appId}/devices/${devId}`}
+      icon="device"
+      content={devId}
+    />
+  )
+})
+
+@withEnv
+export default class Device extends React.Component {
 
   componentWillUnmount () {
     const { devIds, stopStream } = this.props
@@ -109,27 +108,12 @@ export default class Device extends React.Component {
 
   render () {
     const {
-      fetching,
-      error,
       location: { pathname },
       match: { params: { appId }},
       devId,
       deviceName,
-      device,
       env,
     } = this.props
-
-    if (error) {
-      throw error
-    }
-
-    if (fetching || !device) {
-      return (
-        <Spinner center>
-          <Message content={sharedMessages.loading} />
-        </Spinner>
-      )
-    }
 
     const basePath = `/console/applications/${appId}/devices/${devId}`
 

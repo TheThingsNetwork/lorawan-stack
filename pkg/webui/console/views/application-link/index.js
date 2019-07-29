@@ -30,11 +30,11 @@ import Message from '../../../lib/components/message'
 import DataSheet from '../../../components/data-sheet'
 import { apiKey, address } from '../../lib/regexp'
 import IntlHelmet from '../../../lib/components/intl-helmet'
-import Spinner from '../../../components/spinner'
 import toast from '../../../components/toast'
 import DateTime from '../../../lib/components/date-time'
 import Icon from '../../../components/icon'
 import SubmitBar from '../../../components/submit-bar'
+import withRequest from '../../../lib/components/with-request'
 
 import {
   getApplicationLink,
@@ -94,6 +94,11 @@ dispatch => ({
   updateLinkSuccess: (link, stats) => dispatch(updateApplicationLinkSuccess(link, stats)),
   deleteLinkSuccess: () => dispatch(deleteApplicationLinkSuccess()),
 }))
+@withRequest(
+  ({ getLink, appId }) => getLink(appId, [ 'api_key', 'network_server_address' ]),
+  ({ fetching }) => fetching,
+  () => false
+)
 @withBreadcrumb('apps.single.link', function (props) {
   return (
     <Breadcrumb
@@ -111,12 +116,6 @@ class ApplicationLink extends React.Component {
 
     this.form = React.createRef()
     this.state = { error: '' }
-  }
-
-  componentDidMount () {
-    const { getLink, appId } = this.props
-
-    getLink(appId, [ 'api_key', 'network_server_address' ])
   }
 
   async handleLink (values, { setSubmitting, resetForm }) {
@@ -224,19 +223,9 @@ class ApplicationLink extends React.Component {
     const {
       appId,
       link = {},
-      fetching,
       linkError,
     } = this.props
     const { error } = this.state
-
-    if (fetching) {
-      return (
-        <Spinner
-          center
-          message={sharedMessages.loading}
-        />
-      )
-    }
 
     const initialValues = {
       api_key: link.api_key || '',

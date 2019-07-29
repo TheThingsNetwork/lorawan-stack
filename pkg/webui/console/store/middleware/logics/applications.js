@@ -25,9 +25,11 @@ import createEventsConnectLogics from './events'
 
 const getApplicationLogic = createRequestLogic({
   type: applications.GET_APP,
-  async process ({ action }) {
+  async process ({ action }, dispatch) {
     const { payload: { id }, meta: { selector }} = action
-    return api.application.get(id, selector)
+    const app = await api.application.get(id, selector)
+    dispatch(applications.startApplicationEventsStream(id))
+    return app
   },
 })
 

@@ -24,11 +24,13 @@ import createRequestLogic from './lib'
 
 const getGatewayLogic = createRequestLogic({
   type: gateways.GET_GTW,
-  async process ({ action }) {
+  async process ({ action }, dispatch) {
     const { payload, meta } = action
     const { id = {}} = payload
     const selector = meta.selector || ''
-    return api.gateway.get(id, selector)
+    const gtw = await api.gateway.get(id, selector)
+    dispatch(gateways.startGatewayEventsStream(id))
+    return gtw
   },
 })
 
