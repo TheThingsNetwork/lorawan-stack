@@ -182,15 +182,27 @@ func (p Proto) Markdown(context.Context) error {
 	if !changed {
 		return nil
 	}
-	return withProtoc(func(pCtx *protocContext, protoc func(...string) error) error {
-		if err := protoc(
-			fmt.Sprintf("--doc_opt=%s/api/api.md.tmpl,api2.md --doc_out=%s/doc/content/references/", pCtx.WorkingDirectory, pCtx.WorkingDirectory),
-			fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),
-		); err != nil {
-			return xerrors.Errorf("failed to generate protos: %w", err)
+	pages := []string{"services", "messages"}
+	for _, page := range pages {
+		err = withProtoc(func(pCtx *protocContext, protoc func(...string) error) error {
+			err := protoc(
+				fmt.Sprintf("--doc_opt=%s/api/%s.md.tmpl,%s.md --doc_out=%s/doc/content/references/",
+					pCtx.WorkingDirectory,
+					page,
+					page,
+					pCtx.WorkingDirectory),
+				fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),
+			)
+			if err != nil {
+				return xerrors.Errorf("failed to generate protos for %s : %w", page, err)
+			}
+			return nil
+		})
+		if err != nil {
+			return err
 		}
-		return nil
-	})
+	}
+	return nil
 }
 
 // MarkdownClean removes generated Markdown protos.
