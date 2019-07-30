@@ -237,8 +237,13 @@ func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateCli
 	}
 	updatedByAdmin := is.IsAdmin(ctx)
 
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "grants") && !updatedByAdmin {
-		return nil, errUpdateClientAdminField.WithAttributes("field", "grants")
+	if !updatedByAdmin {
+		for _, path := range req.FieldMask.Paths {
+			switch path {
+			case "state", "skip_authorization", "endorsed", "grants":
+				return nil, errUpdateUserAdminField.WithAttributes("field", path)
+			}
+		}
 	}
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
