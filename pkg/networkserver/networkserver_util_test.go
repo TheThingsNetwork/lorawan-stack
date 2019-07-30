@@ -901,7 +901,6 @@ func AssertLinkApplication(ctx context.Context, conn *grpc.ClientConn, getPeerCh
 }
 
 func AssertNetworkServerClose(ctx context.Context, ns *NetworkServer) bool {
-
 	t := test.MustTFromContext(ctx)
 	t.Helper()
 	if !test.WaitContext(ctx, ns.Close) {

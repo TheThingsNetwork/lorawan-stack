@@ -21,11 +21,7 @@ type detailer interface {
 }
 
 func (e *Error) addDetails(details ...proto.Message) {
-	if e.details == nil {
-		e.details = details
-	} else {
-		e.details = append(e.details, details...)
-	}
+	e.details = append(e.details, details...)
 	if e.stack == nil {
 		e.stack = callers(4)
 	}
@@ -52,9 +48,9 @@ func (e Error) Details() (details []proto.Message) {
 		details = append(details, Details(e.cause)...)
 	}
 	if len(e.details) > 0 {
-		return append(details, e.details...)
+		details = append(details, e.details...)
 	}
-	return nil
+	return
 }
 
 // Details are not present in the error definition, so this just returns nil.
