@@ -72,7 +72,7 @@ import api from '../../api'
     dispatch(getApplicationCollaborator(appId, collaboratorId, isUser))
   },
   redirectToList (appId) {
-    dispatch(replace(`/console/applications/${appId}/collaborators`))
+    dispatch(replace(`/applications/${appId}/collaborators`))
   },
 }), (stateProps, dispatchProps, ownProps) => ({
   ...stateProps, ...dispatchProps, ...ownProps,
@@ -93,7 +93,7 @@ import api from '../../api'
 
   return (
     <Breadcrumb
-      path={`/console/applications/${appId}/collaborators/${collaboratorType}/${collaboratorId}`}
+      path={`/applications/${appId}/collaborators/${collaboratorType}/${collaboratorId}`}
       icon="general_settings"
       content={sharedMessages.edit}
     />

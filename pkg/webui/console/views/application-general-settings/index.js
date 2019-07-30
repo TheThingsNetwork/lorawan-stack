@@ -62,7 +62,7 @@ const validationSchema = Yup.object().shape({
 
   return (
     <Breadcrumb
-      path={`/console/applications/${appId}/general-settings`}
+      path={`/applications/${appId}/general-settings`}
       icon="general_settings"
       content={sharedMessages.generalSettings}
     />

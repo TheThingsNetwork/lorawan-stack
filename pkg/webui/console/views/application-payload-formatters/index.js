@@ -62,7 +62,7 @@ dispatch => ({
 
   return (
     <Breadcrumb
-      path={`/console/applications/${appId}/payload-formatters`}
+      path={`/applications/${appId}/payload-formatters`}
       icon="link"
       content={sharedMessages.payloadFormatters}
     />
@@ -105,7 +105,7 @@ export default class ApplicationPayloadFormatters extends React.Component {
         warning={m.warningText}
         messageValues={{
           link: (
-            <Link key="warnining-link" to={`/console/applications/${appId}/link`}>
+            <Link key="warnining-link" to={`/applications/${appId}/link`}>
               <Message content={m.linkApplication} />
             </Link>
           ),

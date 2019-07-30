@@ -37,7 +37,7 @@ import { getDeviceId } from '../../../lib/selectors/id'
   const { appId } = props.match.params
   return (
     <Breadcrumb
-      path={`/console/applications/${appId}/devices/${devId}/data`}
+      path={`/applications/${appId}/devices/${devId}/data`}
       icon="data"
       content={sharedMessages.data}
     />

@@ -17,7 +17,7 @@ import { createLogic } from 'redux-logic'
 import sharedMessages from '../../../../lib/shared-messages'
 import api from '../../../api'
 import * as gateways from '../../actions/gateways'
-import { gsConfigSelector } from '../../../../lib/selectors/env'
+import { selectGsConfig } from '../../../../lib/selectors/env'
 import { selectGatewayById } from '../../selectors/gateways'
 import createEventsConnectLogics from './events'
 import createRequestLogic from './lib'
@@ -142,7 +142,7 @@ const startGatewayStatisticsLogic = createLogic({
     const { id } = action.payload
     const { timeout = 5000 } = action.meta
 
-    const gsConfig = gsConfigSelector()
+    const gsConfig = selectGsConfig()
     const gtw = selectGatewayById(getState(), id)
 
     if (!gsConfig.enabled) {

@@ -33,7 +33,7 @@ import { selectSelectedApplicationId } from '../../store/selectors/applications'
     appId: selectSelectedApplicationId(state),
   }
 }, dispatch => ({
-  onDeleteSuccess: appId => dispatch(replace(`/console/applications/${appId}/devices`)),
+  onDeleteSuccess: appId => dispatch(replace(`/applications/${appId}/devices`)),
   updateDevice: (appId, deviceId, patch) => dispatch(updateDevice(appId, deviceId, patch)),
 }),
 (stateProps, dispatchProps, ownProps) => ({

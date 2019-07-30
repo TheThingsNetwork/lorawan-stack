@@ -49,7 +49,7 @@ import style from './device-payload-formatters.styl'
   const { appId, devId } = props
   return (
     <Breadcrumb
-      path={`/console/applications/${appId}/devices/${devId}/payload-formatters`}
+      path={`/applications/${appId}/devices/${devId}/payload-formatters`}
       icon="link"
       content={sharedMessages.payloadFormatters}
     />

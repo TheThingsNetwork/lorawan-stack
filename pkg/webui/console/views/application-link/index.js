@@ -102,7 +102,7 @@ dispatch => ({
 @withBreadcrumb('apps.single.link', function (props) {
   return (
     <Breadcrumb
-      path={`/console/applications/${props.appId}/link`}
+      path={`/applications/${props.appId}/link`}
       icon="link"
       content={sharedMessages.link}
     />

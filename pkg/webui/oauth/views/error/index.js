@@ -68,7 +68,7 @@ const FullViewError = function ({ error, env }) {
                 <Button.AnchorLink
                   icon="keyboard_arrow_left"
                   message={sharedMessages.takeMeBack}
-                  href={env.app_root}
+                  href={env.appRoot}
                 />
               )
               : (

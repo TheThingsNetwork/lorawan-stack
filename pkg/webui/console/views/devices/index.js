@@ -27,7 +27,7 @@ import { withBreadcrumb } from '../../../components/breadcrumbs/context'
   const { appId } = props.match.params
   return (
     <Breadcrumb
-      path={`/console/applications/${appId}/devices`}
+      path={`/applications/${appId}/devices`}
       content={sharedMessages.devices}
     />
   )

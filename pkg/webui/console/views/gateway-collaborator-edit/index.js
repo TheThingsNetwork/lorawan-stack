@@ -74,7 +74,7 @@ import api from '../../api'
     dispatch(getGatewayCollaborator(gtwId, collaboratorId, isUser))
   },
   redirectToList (gtwId) {
-    dispatch(replace(`/console/gateways/${gtwId}/collaborators`))
+    dispatch(replace(`/gateways/${gtwId}/collaborators`))
   },
 }), (stateProps, dispatchProps, ownProps) => ({
   ...stateProps, ...dispatchProps, ...ownProps,
@@ -90,11 +90,11 @@ import api from '../../api'
   ({ fetching, collaborator }) => fetching || !Boolean(collaborator)
 )
 @withBreadcrumb('gtws.single.collaborators.edit', function (props) {
-  const { gtwId, collaboratorId } = props
+  const { gtwId, collaboratorId, collaboratorType } = props
 
   return (
     <Breadcrumb
-      path={`/console/gateways/${gtwId}/collaborators/${collaboratorId}/edit`}
+      path={`/gateways/${gtwId}/collaborators/${collaboratorType}/${collaboratorId}`}
       icon="general_settings"
       content={sharedMessages.edit}
     />

@@ -31,7 +31,7 @@ import GatewayCollaboratorEdit from '../gateway-collaborator-edit'
 
   return (
     <Breadcrumb
-      path={`/console/gateways/${gtwId}/collaborators`}
+      path={`/gateways/${gtwId}/collaborators`}
       icon="organization"
       content={sharedMessages.collaborators}
     />

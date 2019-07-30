@@ -76,7 +76,7 @@ const componentMap = {
 @withBreadcrumb('overview', function (props) {
   return (
     <Breadcrumb
-      path="/console"
+      path="/"
       content={sharedMessages.overview}
     />
   )
@@ -118,7 +118,6 @@ export default class Overview extends React.Component {
   render () {
     const { config } = this.props.env
     const { fetching, applicationCount, gatewayCount, userId } = this.props
-    const { path } = this.props.match
 
     if (fetching || applicationCount === undefined || gatewayCount === undefined) {
       return (
@@ -129,8 +128,8 @@ export default class Overview extends React.Component {
     }
 
     const hasEntities = applicationCount + gatewayCount !== 0
-    const appPath = path + (hasEntities ? '/applications' : '/applications/add')
-    const gatewayPath = path + (hasEntities ? '/gateways' : '/gateways/add')
+    const appPath = hasEntities ? '/applications' : '/applications/add'
+    const gatewayPath = hasEntities ? '/gateways' : '/gateways/add'
 
     return (
       <Container>

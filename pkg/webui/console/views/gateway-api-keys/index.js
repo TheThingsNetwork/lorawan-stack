@@ -30,7 +30,7 @@ import GatewayApiKeyEdit from '../gateway-api-key-edit'
 
   return (
     <Breadcrumb
-      path={`/console/gateways/${gtwId}/api-keys`}
+      path={`/gateways/${gtwId}/api-keys`}
       icon="api_keys"
       content={sharedMessages.apiKeys}
     />

@@ -22,8 +22,8 @@ import sharedMessages from '../../../lib/shared-messages'
 import { withSideNavigation } from '../../../components/navigation/side/context'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import withEnv, { EnvProvider } from '../../../lib/components/env'
 import withRequest from '../../../lib/components/with-request'
+import withEnv from '../../../lib/components/env'
 
 import GatewayOverview from '../gateway-overview'
 import GatewayApiKeys from '../gateway-api-keys'
@@ -61,7 +61,7 @@ import {
 dispatch => ({
   getGateway: (id, meta) => dispatch(getGateway(id, meta)),
   stopStream: id => dispatch(stopGatewayEventsStream(id)),
-  redirectToList: () => dispatch(replace('/console/gateways')),
+  redirectToList: () => dispatch(replace('/gateways')),
 }))
 @withRequest(
   ({ gtwId, getGateway }) => getGateway(gtwId, [
@@ -76,8 +76,7 @@ dispatch => ({
   ({ fetching, gateway }) => fetching || !Boolean(gateway)
 )
 @withSideNavigation(function (props) {
-  const { match, gtwId } = props
-  const matchedUrl = match.url
+  const { match: { url: matchedUrl }, gtwId } = props
 
   return {
     header: { title: gtwId, icon: 'gateway' },
@@ -122,7 +121,7 @@ dispatch => ({
 
   return (
     <Breadcrumb
-      path={`/console/gateways/${gtwId}`}
+      path={`/gateways/${gtwId}`}
       icon="gateway"
       content={gtwId}
     />
@@ -152,9 +151,9 @@ export default class Gateway extends React.Component {
     const { match, gateway, gtwId, env } = this.props
 
     return (
-      <EnvProvider env={env}>
+      <React.Fragment>
         <IntlHelmet
-          titleTemplate={`%s - ${gateway.name || gtwId} - ${env.site_name}`}
+          titleTemplate={`%s - ${gateway.name || gtwId} - ${env.siteName}`}
         />
         <Switch>
           <Route exact path={`${match.path}`} component={GatewayOverview} />
@@ -164,7 +163,7 @@ export default class Gateway extends React.Component {
           <Route path={`${match.path}/data`} component={GatewayData} />
           <Route path={`${match.path}/general-settings`} component={GatewayGeneralSettings} />
         </Switch>
-      </EnvProvider>
+      </React.Fragment>
     )
   }
 }

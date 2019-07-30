@@ -62,7 +62,7 @@ export default class GatewayEvents extends React.Component {
         statusSelector={selectGatewayEventsStatus}
         errorSelector={selectGatewayEventsError}
         onClear={onClear}
-        toAllUrl={`/console/gateways/${gtwId}/data`}
+        toAllUrl={`/gateways/${gtwId}/data`}
       />
     )
   }

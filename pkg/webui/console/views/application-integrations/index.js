@@ -31,7 +31,7 @@ import ApplicationIntegrationEdit from '../application-integration-edit'
 
   return (
     <Breadcrumb
-      path={`/console/applications/${appId}/integrations`}
+      path={`/applications/${appId}/integrations`}
       icon="integration"
       content={sharedMessages.integrations}
     />

@@ -23,8 +23,8 @@ import DateTime from '../../../lib/components/date-time'
 import DevicesTable from '../../containers/devices-table'
 import DataSheet from '../../../components/data-sheet'
 import ApplicationEvents from '../../containers/application-events'
-import PAGE_SIZES from '../../constants/page-sizes'
 
+import PAGE_SIZES from '../../constants/page-sizes'
 import { getApplicationId } from '../../../lib/selectors/id'
 import { selectSelectedApplication } from '../../store/selectors/applications'
 

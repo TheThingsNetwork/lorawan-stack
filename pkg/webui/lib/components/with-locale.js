@@ -59,19 +59,17 @@ export default class UserLocale extends React.PureComponent {
   }
 
   componentDidMount () {
-    this.check({ env: {}}, this.props)
+    this.check({ env: { config: {}}}, this.props)
 
     if (dev) {
       window.addEventListener('keydown', this.onKeydown)
-      log('Press alt + X to toggle the xx locale')
+      log('Press alt + L to toggle the xx locale')
     }
-
-
   }
 
   check (prev, props) {
-    const current = prev.user && prev.user.language || prev.env.default_language || defaultLanguage
-    const next = props.user && props.user.language || props.env.default_language || defaultLanguage
+    const current = prev.user && prev.user.language || prev.env.config.language || defaultLanguage
+    const next = props.user && props.user.language || props.env.config.language || defaultLanguage
 
     if (current !== next && next !== 'en') {
       this.promise = this.load(next)
@@ -90,7 +88,7 @@ export default class UserLocale extends React.PureComponent {
   }
 
   onKeydown (evt) {
-    if (evt.altKey && evt.code === 'KeyX') {
+    if (evt.altKey && evt.code === 'KeyL') {
       this.toggle()
     }
   }
@@ -135,14 +133,14 @@ export default class UserLocale extends React.PureComponent {
     const {
       user,
       children,
-      env,
+      env: { config },
     } = this.props
 
     const { xx } = this.state
 
     let { messages } = this.state
 
-    const lang = user && user.language || env.default_language || defaultLanguage
+    const lang = user && user.language || config.language || defaultLanguage
 
     if (dev && xx) {
       messages = {

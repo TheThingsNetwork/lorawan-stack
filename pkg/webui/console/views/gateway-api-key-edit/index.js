@@ -65,7 +65,7 @@ dispatch => ({
     dispatch(getGatewaysRightsList(gtwId))
     dispatch(getGatewayApiKey(gtwId, apiKeyId))
   },
-  deleteSuccess: gtwId => dispatch(replace(`/console/gateways/${gtwId}/api-keys`)),
+  deleteSuccess: gtwId => dispatch(replace(`/gateways/${gtwId}/api-keys`)),
 }))
 @withRequest(
   ({ gtwId, keyId, loadData }) => loadData(gtwId, keyId),
@@ -76,7 +76,7 @@ dispatch => ({
 
   return (
     <Breadcrumb
-      path={`/console/gateways/${gtwId}/api-keys/${keyId}/edit`}
+      path={`/gateways/${gtwId}/api-keys/${keyId}`}
       icon="general_settings"
       content={sharedMessages.edit}
     />

@@ -21,8 +21,9 @@ import { Helmet } from 'react-helmet'
 
 import WithLocale from '../../../lib/components/with-locale'
 import withEnv, { EnvProvider } from '../../../lib/components/env'
-import { pageDataSelector } from '../../../lib/selectors/env'
 import ErrorView from '../../../lib/components/error-view'
+import { selectApplicationRootPath } from '../../../lib/selectors/env'
+import env from '../../../lib/env'
 
 import Landing from '../landing'
 import Login from '../login'
@@ -33,22 +34,16 @@ import createStore from '../../store'
 import Init from '../../../lib/components/init'
 import Code from '../code'
 
-const history = createBrowserHistory()
+const appRoot = selectApplicationRootPath()
+const history = createBrowserHistory({ basename: appRoot })
 const store = createStore(history)
-const env = {
-  app_root: window.APP_ROOT,
-  assets_root: window.ASSETS_ROOT,
-  config: window.APP_CONFIG,
-  page_data: window.PAGE_DATA,
-  site_name: window.SITE_NAME,
-  site_title: window.SITE_TITLE,
-}
 
 const GenericNotFound = () => <FullViewError error={{ statusCode: 404 }} />
 @withEnv
 export default class OAuthApp extends React.PureComponent {
   render () {
-    const pageData = pageDataSelector(env)
+
+    const { pageData } = env
 
     if (pageData && pageData.error) {
       return (
@@ -67,18 +62,18 @@ export default class OAuthApp extends React.PureComponent {
         <Provider store={store}>
           <Init>
             <Helmet
-              titleTemplate={`%s - ${env.site_title ? `${env.site_title} - ` : ''}${env.site_name}`}
-              defaultTitle={`${env.site_title ? `${env.site_title} - ` : ''}${env.site_name}`}
+              titleTemplate={`%s - ${env.siteTitle ? `${env.siteTitle} - ` : ''}${env.siteName}`}
+              defaultTitle={`${env.siteTitle ? `${env.siteTitle} - ` : ''}${env.siteName}`}
             />
             <WithLocale>
               <ErrorView ErrorComponent={FullViewError}>
                 <ConnectedRouter history={history}>
                   <Switch>
-                    <Route path="/oauth" exact component={Landing} />
-                    <Route path="/oauth/login" component={Login} />
-                    <Route path="/oauth/authorize" component={Authorize} />
-                    <Route path="/oauth/register" component={CreateAccount} />
-                    <Route path="/oauth/code" component={Code} />
+                    <Route path="/" exact component={Landing} />
+                    <Route path="/login" component={Login} />
+                    <Route path="/authorize" component={Authorize} />
+                    <Route path="/register" component={CreateAccount} />
+                    <Route path="/code" component={Code} />
                     <Route component={GenericNotFound} />
                   </Switch>
                 </ConnectedRouter>

@@ -49,7 +49,7 @@ import api from '../../api'
 
   return (
     <Breadcrumb
-      path={`/console/applications/${appId}/payload-formatters/uplink`}
+      path={`/applications/${appId}/payload-formatters/uplink`}
       icon="uplink"
       content={sharedMessages.uplink}
     />

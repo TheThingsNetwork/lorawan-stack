@@ -26,7 +26,7 @@ import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 @withBreadcrumb('apps', function (props) {
   return (
     <Breadcrumb
-      path="/console/applications"
+      path="/applications"
       content={sharedMessages.applications}
     />
   )

@@ -31,7 +31,7 @@ import ApplicationApiKeyAdd from '../application-api-key-add'
 
   return (
     <Breadcrumb
-      path={`/console/applications/${appId}/api-keys`}
+      path={`/applications/${appId}/api-keys`}
       icon="api_keys"
       content={sharedMessages.apiKeys}
     />

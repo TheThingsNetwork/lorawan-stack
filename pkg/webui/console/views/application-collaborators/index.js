@@ -31,7 +31,7 @@ import ApplicationCollaboratorEdit from '../application-collaborator-edit'
 
   return (
     <Breadcrumb
-      path={`/console/applications/${appId}/collaborators`}
+      path={`/applications/${appId}/collaborators`}
       icon="organization"
       content={sharedMessages.collaborators}
     />

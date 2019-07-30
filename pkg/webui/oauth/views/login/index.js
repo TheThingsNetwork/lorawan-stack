@@ -23,6 +23,7 @@ import * as Yup from 'yup'
 
 import api from '../../api'
 import sharedMessages from '../../../lib/shared-messages'
+import { selectApplicationRootPath } from '../../../lib/selectors/env'
 
 import Button from '../../../components/button'
 import Form from '../../../components/form'
@@ -46,6 +47,8 @@ const validationSchema = Yup.object().shape({
   password: Yup.string()
     .required(sharedMessages.validateRequired),
 })
+
+const appRoot = selectApplicationRootPath()
 
 @withRouter
 @connect()
@@ -74,7 +77,7 @@ export default class OAuth extends React.PureComponent {
 
   navigateToRegister () {
     const { dispatch, location } = this.props
-    dispatch(replace('/oauth/register', {
+    dispatch(replace('/register', {
       back: `${location.pathname}${location.search}`,
     }))
   }
@@ -138,7 +141,7 @@ export default class OAuth extends React.PureComponent {
 function url (location, omitQuery = false) {
   const query = Query.parse(location.search)
 
-  const next = query.n || '/oauth'
+  const next = query.n || appRoot
 
   if (omitQuery) {
     return next.split('?')[0]

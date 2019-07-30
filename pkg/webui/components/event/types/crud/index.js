@@ -20,9 +20,9 @@ import Icon from '../../../icon'
 import PropTypes from '../../../../lib/prop-types'
 import { getEntityId } from '../../../../lib/selectors/id'
 import { warn } from '../../../../lib/log'
-import { getEventActionByName } from '..'
-
 import style from './crud.styl'
+
+import { getEventActionByName } from '..'
 
 class CRUDEvent extends React.PureComponent {
 

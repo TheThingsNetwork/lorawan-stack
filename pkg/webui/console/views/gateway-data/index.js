@@ -38,7 +38,7 @@ const m = defineMessages({
 @withBreadcrumb('gateways.single.data', function (props) {
   return (
     <Breadcrumb
-      path={`/console/gateways/${props.gtwId}/data`}
+      path={`/gateways/${props.gtwId}/data`}
       icon="data"
       content={sharedMessages.data}
     />

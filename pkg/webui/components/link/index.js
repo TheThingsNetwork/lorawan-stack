@@ -18,6 +18,8 @@ import classnames from 'classnames'
 import { injectIntl } from 'react-intl'
 
 import PropTypes from '../../lib/prop-types'
+import { withEnv } from '../../lib/components/env'
+import { url as urlPattern } from '../../lib/regexp'
 
 import style from './link.styl'
 
@@ -126,5 +128,19 @@ AnchorLink.defaultProps = {
 }
 
 Link.Anchor = injectIntl(AnchorLink)
+
+const BaseAnchorLink = function ({ env, href, ...rest }) {
+  const { appRoot } = env
+
+  // Prevent prefixing proper URLs
+  const path = href.match(urlPattern) ? href : appRoot + href
+
+  return <Link.Anchor href={path} {...rest} />
+}
+
+BaseAnchorLink.propTypes = AnchorLink.propTypes
+BaseAnchorLink.defaultProps = AnchorLink.defaultProps
+
+Link.BaseAnchor = withEnv(BaseAnchorLink)
 
 export default injectIntl(Link)

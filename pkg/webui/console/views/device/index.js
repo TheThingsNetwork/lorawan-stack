@@ -23,7 +23,7 @@ import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import Tabs from '../../../components/tabs'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import withRequest from '../../../lib/components/with-request'
-import withEnv, { EnvProvider } from '../../../lib/components/env'
+import withEnv from '../../../lib/components/env'
 
 import DeviceOverview from '../device-overview'
 import DeviceData from '../device-data'
@@ -90,7 +90,7 @@ import style from './device.styl'
   const { devId, appId } = props
   return (
     <Breadcrumb
-      path={`/console/applications/${appId}/devices/${devId}`}
+      path={`/applications/${appId}/devices/${devId}`}
       icon="device"
       content={devId}
     />
@@ -115,7 +115,7 @@ export default class Device extends React.Component {
       env,
     } = this.props
 
-    const basePath = `/console/applications/${appId}/devices/${devId}`
+    const basePath = `/applications/${appId}/devices/${devId}`
 
     // Prevent default redirect to uplink when tab is already open
     const payloadFormattersLink =
@@ -131,7 +131,7 @@ export default class Device extends React.Component {
     ]
 
     return (
-      <EnvProvider env={env}>
+      <React.Fragment>
         <IntlHelmet
           titleTemplate={`%s - ${deviceName || devId} - ${env.site_name}`}
         />
@@ -155,7 +155,7 @@ export default class Device extends React.Component {
           <Route exact path={`${basePath}/general-settings`} component={DeviceGeneralSettings} />
           <Route path={`${basePath}/payload-formatters`} component={DevicePayloadFormatters} />
         </Switch>
-      </EnvProvider>
+      </React.Fragment>
     )
   }
 }

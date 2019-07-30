@@ -39,7 +39,7 @@ class Auth extends React.PureComponent {
       user,
       fetching,
       children,
-      env,
+      env: { appRoot },
     } = this.props
 
     if (fetching) {
@@ -47,11 +47,11 @@ class Auth extends React.PureComponent {
     }
 
     if (!Boolean(user)) {
-      const redirectPath = window.location.pathname.substring(env.app_root.length)
+      const redirectPath = window.location.pathname.substring(appRoot.length)
       return (
         <Redirect
           to={{
-            pathname: `${env.app_root}/login`,
+            pathname: `/login`,
             search: redirectPath && `?next=${redirectPath}`,
             state: { from: this.props.location.pathname },
           }}

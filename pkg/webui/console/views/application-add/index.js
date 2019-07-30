@@ -64,7 +64,7 @@ const validationSchema = Yup.object().shape({
 @withBreadcrumb('apps.add', function (props) {
   return (
     <Breadcrumb
-      path="/console/applications/add"
+      path="/applications/add"
       icon="add"
       content={sharedMessages.add}
     />
@@ -72,6 +72,8 @@ const validationSchema = Yup.object().shape({
 })
 @connect(({ user }) => ({
   userId: user.user.ids.user_id,
+}), dispatch => ({
+  navigateToApplication: appId => dispatch(push(`/applications/${appId}`)),
 }))
 @bind
 export default class Add extends React.Component {
@@ -81,7 +83,7 @@ export default class Add extends React.Component {
   }
 
   async handleSubmit (values, { resetForm }) {
-    const { userId, dispatch } = this.props
+    const { userId, navigateToApplication } = this.props
 
     await this.setState({ error: '' })
 
@@ -93,8 +95,8 @@ export default class Add extends React.Component {
           description: values.description,
         })
 
-      const { ids: { application_id }} = result
-      dispatch(push(`/console/applications/${application_id}`))
+      const { ids: { application_id: appId }} = result
+      navigateToApplication(appId)
     } catch (error) {
       const { application_id, name, description } = values
       resetForm({ application_id, name, description })

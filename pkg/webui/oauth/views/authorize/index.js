@@ -15,6 +15,9 @@
 import React, { PureComponent, Fragment } from 'react'
 import Query from 'query-string'
 import { defineMessages } from 'react-intl'
+import { connect } from 'react-redux'
+import { replace } from 'connected-react-router'
+import bind from 'autobind-decorator'
 
 import api from '../../api'
 import sharedMessages from '../../../lib/shared-messages'
@@ -37,12 +40,17 @@ const m = defineMessages({
   authorize: 'Authorize',
 })
 
+@connect(undefined, dispatch => ({
+  redirectToLogin: () => dispatch(replace('/login')),
+}))
 @withEnv
+@bind
 export default class Authorize extends PureComponent {
 
   async handleLogout () {
+    const { redirectToLogin } = this.props
     await api.oauth.logout()
-    window.location = '/oauth/login'
+    redirectToLogin()
   }
 
   render () {
