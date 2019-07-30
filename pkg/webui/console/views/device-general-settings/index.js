@@ -21,15 +21,19 @@ import bind from 'autobind-decorator'
 import sharedMessages from '../../../lib/shared-messages'
 import diff from '../../../lib/diff'
 import DeviceDataForm from '../../components/device-data-form'
+import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
+import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import api from '../../api'
 
 import { updateDevice } from '../../store/actions/device'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
+import { selectSelectedDevice, selectSelectedDeviceId } from '../../store/selectors/device'
 
 @connect(function (state) {
   return {
-    device: state.device.device,
+    device: selectSelectedDevice(state),
+    devId: selectSelectedDeviceId(state),
     appId: selectSelectedApplicationId(state),
   }
 }, dispatch => ({
@@ -41,6 +45,16 @@ import { selectSelectedApplicationId } from '../../store/selectors/applications'
   onDeleteSuccess: () => dispatchProps.onDeleteSuccess(stateProps.appId),
 })
 )
+@withBreadcrumb('device.single.general-settings', function (props) {
+  const { devId, appId } = props
+  return (
+    <Breadcrumb
+      path={`/applications/${appId}/devices/${devId}/general-settings`}
+      icon="general_settings"
+      content={sharedMessages.generalSettings}
+    />
+  )
+})
 @bind
 export default class DeviceGeneralSettings extends React.Component {
 
