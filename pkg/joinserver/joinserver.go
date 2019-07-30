@@ -219,6 +219,10 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 	if pld.JoinEUI.IsZero() {
 		return nil, errNoJoinEUI
 	}
+	logger = logger.WithFields(log.Fields(
+		"join_eui", pld.JoinEUI,
+		"dev_eui", pld.DevEUI,
+	))
 
 	match := false
 	for _, p := range js.euiPrefixes {
@@ -236,6 +240,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		return nil, errForwardJoinRequest
 	}
 
+	var handled bool
 	dev, err := js.devices.SetByEUI(ctx, pld.JoinEUI, pld.DevEUI,
 		[]string{
 			"application_server_address",
@@ -453,14 +458,19 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			dev.EndDeviceIdentifiers.DevAddr = &req.DevAddr
 			paths = append(paths, "session", "ids.dev_addr")
 
+			handled = true
 			return dev, paths, nil
-		})
+		},
+	)
 	if err != nil {
-		logger.WithFields(log.Fields(
-			"join_eui", pld.JoinEUI,
-			"dev_eui", pld.DevEUI,
-		)).WithError(err).Error("Failed to update device")
-		return nil, err
+		logger := logger.WithError(err)
+		if !handled {
+			logger.Info("Join not accepted")
+			return nil, err
+		} else {
+			logger.Error("Failed to update device")
+			return nil, errRegistryOperation.WithCause(err)
+		}
 	}
 
 	registerAcceptJoin(ctx, dev, req)
