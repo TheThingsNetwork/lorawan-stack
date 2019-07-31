@@ -16,9 +16,11 @@ package basicstationlns
 
 import (
 	"context"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"math"
+	"regexp"
 	"strings"
 	"sync/atomic"
 	"time"
@@ -34,6 +36,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/basicstationlns/messages"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/web"
 	"go.thethings.network/lorawan-stack/pkg/web/middleware"
@@ -46,6 +49,7 @@ var (
 		"listener",
 		"failed to serve Basic Station frontend listener",
 	)
+	errGatewayID = errors.DefineInvalidArgument("invalid_gateway_id", "invalid gateway id `{id}`")
 )
 
 type srv struct {
@@ -131,12 +135,14 @@ func (s *srv) handleDiscover(c echo.Context) error {
 	if c.IsTLS() {
 		scheme = "wss"
 	}
+
+	euiWithPrefix := fmt.Sprintf("eui-%s", ids.EUI.String())
 	res := messages.DiscoverResponse{
 		EUI: req.EUI,
 		Muxs: basicstation.EUI{
 			Prefix: "muxs",
 		},
-		URI: fmt.Sprintf("%s://%s%s", scheme, c.Request().Host, c.Echo().URI(s.handleTraffic, ids.GatewayID)),
+		URI: fmt.Sprintf("%s://%s%s", scheme, c.Request().Host, c.Echo().URI(s.handleTraffic, euiWithPrefix)),
 	}
 	data, err = json.Marshal(res)
 	if err != nil {
@@ -152,25 +158,29 @@ func (s *srv) handleDiscover(c echo.Context) error {
 	return nil
 }
 
+var euiHexPattern = regexp.MustCompile("^eui-([a-f0-9A-F]{16})$")
+
 func (s *srv) handleTraffic(c echo.Context) error {
 	var sessionID int32
 	id := c.Param("id")
 	auth := c.Request().Header.Get(echo.HeaderAuthorization)
 	ctx := c.Request().Context()
+	var md metadata.MD
+
 	if auth != "" {
 		if !strings.Contains(auth, "Bearer") {
 			auth = fmt.Sprintf("Bearer %s", auth)
 		}
-		md := metadata.New(map[string]string{
+		md = metadata.New(map[string]string{
 			"id":            id,
 			"authorization": auth,
 		})
-		if ctxMd, ok := metadata.FromIncomingContext(s.ctx); ok {
-			md = metadata.Join(ctxMd, md)
-		}
-		ctx = metadata.NewIncomingContext(s.ctx, md)
 	}
 
+	if ctxMd, ok := metadata.FromIncomingContext(s.ctx); ok {
+		md = metadata.Join(ctxMd, md)
+	}
+	ctx = metadata.NewIncomingContext(s.ctx, md)
 	// If a fallback frequency is defined in the server context, inject it into local the context.
 	if fallback, ok := frequencyplans.FallbackIDFromContext(s.ctx); ok {
 		ctx = frequencyplans.WithFallbackID(ctx, fallback)
@@ -181,7 +191,19 @@ func (s *srv) handleTraffic(c echo.Context) error {
 		"remote_addr", c.Request().RemoteAddr,
 	))
 
-	ctx, ids, err := s.server.FillGatewayContext(ctx, ttnpb.GatewayIdentifiers{GatewayID: id})
+	// Convert the ID to EUI.
+	str := euiHexPattern.FindStringSubmatch(id)
+	if len(str) != 2 {
+		return errGatewayID.WithAttributes("id", id)
+	}
+	hexValue, err := hex.DecodeString(str[1])
+	if err != nil {
+		return errGatewayID.WithAttributes("id", id)
+	}
+	var eui types.EUI64
+	eui.UnmarshalBinary(hexValue)
+
+	ctx, ids, err := s.server.FillGatewayContext(ctx, ttnpb.GatewayIdentifiers{EUI: &eui})
 	if err != nil {
 		return err
 	}
