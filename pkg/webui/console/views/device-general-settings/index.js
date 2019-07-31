@@ -14,6 +14,7 @@
 
 import React from 'react'
 import { replace } from 'connected-react-router'
+import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { Col, Row, Container } from 'react-grid-system'
 import bind from 'autobind-decorator'
@@ -27,6 +28,7 @@ import IntlHelmet from '../../../lib/components/intl-helmet'
 import api from '../../api'
 
 import { updateDevice } from '../../store/actions/device'
+import { attachPromise } from '../../store/actions/lib'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
 import { selectSelectedDevice, selectSelectedDeviceId } from '../../store/selectors/device'
 
@@ -37,8 +39,8 @@ import { selectSelectedDevice, selectSelectedDeviceId } from '../../store/select
     appId: selectSelectedApplicationId(state),
   }
 }, dispatch => ({
+  ...bindActionCreators({ updateDevice: attachPromise(updateDevice) }, dispatch),
   onDeleteSuccess: appId => dispatch(replace(`/applications/${appId}/devices`)),
-  updateDevice: (appId, deviceId, patch) => dispatch(updateDevice(appId, deviceId, patch)),
 }),
 (stateProps, dispatchProps, ownProps) => ({
   ...stateProps, ...dispatchProps, ...ownProps,

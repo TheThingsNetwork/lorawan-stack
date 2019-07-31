@@ -28,6 +28,7 @@ import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 
 import { updateDevice } from '../../store/actions/device'
+import { attachPromise } from '../../store/actions/lib'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
 
 import {
@@ -67,7 +68,7 @@ const getRegistryLocation = function (locations) {
     appId: selectSelectedApplicationId(state),
     devId: getDeviceId(state.device.device),
   }),
-  { updateDevice }
+  { updateDevice: attachPromise(updateDevice) }
 )
 @withBreadcrumb('device.single.data', function (props) {
   const { devId, appId } = props

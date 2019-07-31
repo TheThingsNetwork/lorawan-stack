@@ -28,6 +28,7 @@ import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 
 import { updateGateway } from '../../store/actions/gateways'
+import { attachPromise } from '../../store/actions/lib'
 import { selectSelectedGateway } from '../../store/selectors/gateways'
 
 import {
@@ -71,7 +72,7 @@ const getRegistryLocation = function (antennas) {
     gtwId: getGatewayId(gateway),
   }
 },
-{ updateGateway })
+{ updateGateway: attachPromise(updateGateway) })
 @withBreadcrumb('gateway.single.data', function (props) {
   const { gtwId } = props
   return (
