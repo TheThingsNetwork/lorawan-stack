@@ -266,7 +266,7 @@ func TestParseMessage(t *testing.T) {
 			Request: []byte(`{
 				"ProtocolVersion": "1.0",
 				"MessageType": "AppSKeyReq",
-				"SenderID": "01020304",
+				"SenderID": "test-as",
 				"ReceiverID": "0102030405060708",
 				"SenderToken": "01",
 				"DevEUI": "0102030405060708",
@@ -286,7 +286,7 @@ func TestParseMessage(t *testing.T) {
 							SenderToken:     []byte{0x1},
 							TransactionID:   0,
 						},
-						SenderID:   Buffer{0x1, 0x2, 0x3, 0x4},
+						SenderID:   "test-as",
 						ReceiverID: EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
 					},
 					DevEUI:       EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
@@ -304,7 +304,7 @@ func TestParseMessage(t *testing.T) {
 				"ProtocolVersion": "1.0",
 				"MessageType": "AppSKeyAns",
 				"SenderID": "0102030405060708",
-				"ReceiverID": "01020304",
+				"ReceiverID": "test-as",
 				"SenderToken": "01",
 				"Result": {
 					"ResultCode": "Success"
@@ -331,7 +331,7 @@ func TestParseMessage(t *testing.T) {
 							TransactionID:   0,
 						},
 						SenderID:   EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
-						ReceiverID: Buffer{0x1, 0x2, 0x3, 0x4},
+						ReceiverID: "test-as",
 					},
 					Result: Result{
 						ResultCode: ResultSuccess,

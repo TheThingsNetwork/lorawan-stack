@@ -137,7 +137,7 @@ type JsNsMessageHeader struct {
 // AsJsMessageHeader contains the message header for AS to JS messages.
 type AsJsMessageHeader struct {
 	MessageHeader
-	SenderID Buffer
+	SenderID string
 	// ReceiverID is a JoinEUI.
 	ReceiverID EUI64
 }
@@ -160,7 +160,7 @@ type JsAsMessageHeader struct {
 	MessageHeader
 	// SenderID is a JoinEUI.
 	SenderID   EUI64
-	ReceiverID Buffer
+	ReceiverID string
 }
 
 // JoinReq is a join-request message.
