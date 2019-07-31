@@ -25,6 +25,7 @@ import Init from './lib/components/init'
 import WithLocale from './lib/components/with-locale'
 import env from './lib/env'
 import { selectApplicationRootPath } from './lib/selectors/env'
+import './lib/yup-extensions'
 
 import createStore from './console/store'
 import App from './console/views/app'
