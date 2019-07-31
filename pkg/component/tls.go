@@ -55,7 +55,12 @@ func (c *Component) GetTLSConfig(ctx context.Context, opts ...TLSConfigOption) (
 	var conf *tls.Config
 	if c.acme != nil {
 		conf = &tls.Config{
-			GetCertificate: c.acme.GetCertificate,
+			GetCertificate: func(hello *tls.ClientHelloInfo) (*tls.Certificate, error) {
+				if hello.ServerName == "" {
+					hello.ServerName = c.config.TLS.ACME.DefaultHost
+				}
+				return c.acme.GetCertificate(hello)
+			},
 		}
 		opts = append(opts, WithNextProtos(acme.ALPNProto))
 	} else {

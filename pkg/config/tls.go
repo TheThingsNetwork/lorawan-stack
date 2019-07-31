@@ -38,11 +38,12 @@ type TLS struct {
 
 // ACME represents ACME configuration.
 type ACME struct {
-	Enable   bool     `name:"enable" description:"Enable automated certificate management (ACME)"`
-	Endpoint string   `name:"endpoint" description:"ACME endpoint"`
-	Dir      string   `name:"dir" description:"Location of ACME storage directory"`
-	Email    string   `name:"email" description:"Email address to register with the ACME account"`
-	Hosts    []string `name:"hosts" description:"Hosts to enable automatic certificates for"`
+	Enable      bool     `name:"enable" description:"Enable automated certificate management (ACME)"`
+	Endpoint    string   `name:"endpoint" description:"ACME endpoint"`
+	Dir         string   `name:"dir" description:"Location of ACME storage directory"`
+	Email       string   `name:"email" description:"Email address to register with the ACME account"`
+	Hosts       []string `name:"hosts" description:"Hosts to enable automatic certificates for"`
+	DefaultHost string   `name:"default-host" description:"Default host to assume for clients without SNI"`
 }
 
 var errNoKeyPair = errors.DefineFailedPrecondition("no_key_pair", "no TLS key pair")
