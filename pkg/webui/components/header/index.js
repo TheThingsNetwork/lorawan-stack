@@ -70,45 +70,27 @@ const Header = function ({
 
 Header.propTypes = {
   /**
-  * The User object, retrieved from the API. If it is
-  * `undefined`, then the guest header is rendered.
+  * The User object, retrieved from the API. If it is `undefined`, then the
+  * guest header is rendered
   */
   user: PropTypes.object,
   /**
   * A list of items for the dropdown
-  * @param {(string|Object)} title - The title to be displayed
-  * @param {string} icon - The icon name to be displayed next to the title
-  * @param {string} path - The path for a navigation tab
-  * @param {function} action - Alternatively, the function to be called on click
+  * See `<ProfileDropdown/>`'s `items` proptypes for details
   */
-  dropdownItems: PropTypes.arrayOf(PropTypes.shape({
-    title: PropTypes.message.isRequired,
-    icon: PropTypes.string,
-    path: PropTypes.string,
-    action: PropTypes.func,
-  })).isRequired,
+  dropdownItems: ProfileDropdown.propTypes.dropdownItems,
   /**
-   * A list of navigation bar entries.
-   * @param {(string|Object)} title - The title to be displayed
-   * @param {string} icon - The icon name to be displayed next to the title
-   * @param {string} path -  The path for a navigation tab
-   * @param {boolean} exact - Flag identifying whether the path should be matched exactly
+   * A list of navigation bar entries
+   * See `<NavigationBar/>`'s `entries` proptypes for details
    */
-  entries: PropTypes.arrayOf(PropTypes.shape({
-    path: PropTypes.string.isRequired,
-    title: PropTypes.message.isRequired,
-    icon: PropTypes.string,
-    exact: PropTypes.bool,
-  })),
+  entries: NavigationBar.propTypes.entries,
   /** Flag identifying whether links should be rendered as plain anchor link */
   anchored: PropTypes.bool,
   /**
   * A handler for when the user clicks the logout button
   */
   handleLogout: PropTypes.func,
-  /**
-  * A handler for when the user used the search input
-  */
+  /** A handler for when the user used the search input */
   handleSearchRequest: PropTypes.func,
   /** A flag identifying whether the header should display the search input */
   searchable: PropTypes.bool,

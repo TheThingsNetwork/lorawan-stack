@@ -140,18 +140,11 @@ class SideNavigation extends Component {
 }
 
 SideNavigation.propTypes = {
-  /** A list of entry objects for the side navigation */
-  entries: PropTypes.arrayOf(
-    PropTypes.oneOfType([
-      PropTypes.link,
-      PropTypes.shape({
-        title: PropTypes.message.isRequired,
-        icon: PropTypes.string,
-        nested: PropTypes.bool.isRequired,
-        items: PropTypes.array.isRequired,
-      }),
-    ])
-  ).isRequired,
+  /**
+   * A list of entry objects for the side navigation
+   * See `<SideNavigationList/>`'s `items` proptypes for details
+   */
+  entries: SideNavigationList.propTypes.items,
   /** The header for the side navigation */
   header: PropTypes.shape({
     title: PropTypes.string,

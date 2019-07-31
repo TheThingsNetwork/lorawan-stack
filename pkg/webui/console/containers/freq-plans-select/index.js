@@ -112,14 +112,12 @@ FrequencyPlansSelect.propTypes = {
   required: PropTypes.bool,
   title: PropTypes.message,
   autoFocus: PropTypes.bool,
-  horizontal: PropTypes.bool,
   menuPlacement: PropTypes.oneOf([ 'top', 'bottom', 'auto' ]),
 }
 
 FrequencyPlansSelect.defaultProps = {
   title: sharedMessages.frequencyPlan,
   autoFocus: false,
-  horizontal: false,
   menuPlacement: 'auto',
   required: false,
 }

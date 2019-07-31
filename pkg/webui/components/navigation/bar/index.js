@@ -64,12 +64,7 @@ NavigationBar.propTypes = {
    * @param {string} path -  The path for a navigation tab
    * @param {boolean} exact - Flag identifying whether the path should be matched exactly
    */
-  entries: PropTypes.arrayOf(PropTypes.shape({
-    path: PropTypes.string.isRequired,
-    title: PropTypes.message.isRequired,
-    icon: PropTypes.string,
-    exact: PropTypes.bool,
-  })),
+  entries: PropTypes.arrayOf(PropTypes.link),
   /** Flag identifying whether links should be rendered as plain anchor link */
   anchored: PropTypes.bool,
 }

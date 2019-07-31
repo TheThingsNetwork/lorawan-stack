@@ -65,7 +65,6 @@ class WebhookFormatsSelector extends React.PureComponent {
       required,
       title,
       autoFocus,
-      horizontal,
       error,
       fetching,
       menuPlacement,
@@ -76,7 +75,6 @@ class WebhookFormatsSelector extends React.PureComponent {
     return (
       <Field
         component={Select}
-        horizontal={horizontal}
         type="select"
         options={fieldOptions}
         name={name}
@@ -96,14 +94,12 @@ WebhookFormatsSelector.propTypes = {
   required: PropTypes.bool.isRequired,
   title: PropTypes.message,
   autoFocus: PropTypes.bool,
-  horizontal: PropTypes.bool,
   menuPlacement: PropTypes.oneOf([ 'top', 'bottom', 'auto' ]),
 }
 
 WebhookFormatsSelector.defaultProps = {
   title: sharedMessages.webhookFormat,
   autoFocus: false,
-  horizontal: false,
   menuPlacement: 'auto',
 }
 
