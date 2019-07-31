@@ -41,7 +41,7 @@ const validationSchema = Yup.object().shape({
       .min(2, sharedMessages.validateTooShort)
       .max(36, sharedMessages.validateTooLong)
       .required(sharedMessages.validateRequired),
-    eui: Yup.string()
+    eui: Yup.nullableString()
       .length(8 * 2, sharedMessages.validateTooShort),
   }),
   name: Yup.string()
@@ -57,9 +57,16 @@ const validationSchema = Yup.object().shape({
 
 @bind
 class GatewayDataForm extends React.Component {
+
+  onSubmit (values, helpers) {
+    const { onSubmit } = this.props
+    const castedValues = validationSchema.cast(values)
+
+    onSubmit(castedValues, helpers)
+  }
+
   render () {
     const {
-      onSubmit,
       update,
       error,
       initialValues,
@@ -70,7 +77,7 @@ class GatewayDataForm extends React.Component {
     return (
       <Form
         error={error}
-        onSubmit={onSubmit}
+        onSubmit={this.onSubmit}
         initialValues={initialValues}
         validationSchema={validationSchema}
         formikRef={formRef}
