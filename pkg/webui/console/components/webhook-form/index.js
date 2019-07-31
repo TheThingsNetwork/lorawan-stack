@@ -23,6 +23,7 @@ import SubmitBar from '../../../components/submit-bar'
 import SubmitButton from '../../../components/submit-button'
 import Notification from '../../../components/notification'
 import Message from '../../../lib/components/message'
+import KeyValueMap from '../../../components/key-value-map'
 import ModalButton from '../../../components/button/modal-button'
 import WebhookFormatSelector from '../../containers/webhook-formats-select'
 import sharedMessages from '../../../lib/shared-messages'
@@ -60,6 +61,10 @@ const m = defineMessages({
   deleteWebhook: 'Delete Webhook',
   modalWarning:
     'Are you sure you want to delete webhook "{webhookId}"? Deleting a webhook cannot be undone!',
+  headers: 'Headers',
+  headersKeyPlaceholder: 'Authorization',
+  headersValuePlaceholder: 'Bearer my-auth-token',
+  headersAdd: 'Add header entry',
 })
 
 @bind
@@ -138,6 +143,14 @@ export default class WebhookForm extends Component {
           horizontal
           name="format"
           required
+        />
+        <Form.Field
+          name="headers"
+          title={m.headers}
+          keyPlaceholder={m.headersKeyPlaceholder}
+          valuePlaceholder={m.headersValuePlaceholder}
+          addMessage={m.headersAdd}
+          component={KeyValueMap}
         />
         <Form.Field
           name="base_url"
