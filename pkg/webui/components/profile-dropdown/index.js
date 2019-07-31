@@ -22,27 +22,34 @@ import PropTypes from '../../lib/prop-types'
 
 import styles from './profile-dropdown.styl'
 
+const dropdownItemsPropTypes = PropTypes.arrayOf(
+  PropTypes.oneOfType([
+    PropTypes.shape({
+      title: PropTypes.message.isRequired,
+      icon: PropTypes.string,
+      path: PropTypes.string,
+      action: PropTypes.func.isRequired,
+    }),
+    PropTypes.shape({
+      title: PropTypes.message.isRequired,
+      icon: PropTypes.string,
+      path: PropTypes.string.isRequired,
+      action: PropTypes.func,
+    }),
+  ])
+).isRequired
+
 @bind
 export default class ProfileDropdown extends React.PureComponent {
 
   static propTypes = {
+    /** The id of the current user */
+    userId: PropTypes.string,
     /**
-    * The id of the current user
+    * A list of items for the dropdown component
+    * See `<Dropdown />`'s `items` proptypes for details
     */
-    userId: PropTypes.string.isRequired,
-    /**
-    * A list of items for the dropdown
-    * @param {(string|Object)} title - The title to be displayed
-    * @param {string} icon - The icon name to be displayed next to the title
-    * @param {string} path - The path for a navigation tab
-    * @param {function} action - Alternatively, the function to be called on click
-    */
-    dropdownItems: PropTypes.arrayOf(PropTypes.shape({
-      title: PropTypes.message.isRequired,
-      icon: PropTypes.string,
-      path: PropTypes.string,
-      action: PropTypes.func,
-    })),
+    dropdownItems: dropdownItemsPropTypes,
   }
 
   state = {
@@ -136,12 +143,7 @@ Dropdown.propTypes = {
   * @param {string} path - The path for a navigation tab
   * @param {function} action - Alternatively, the function to be called on click
   */
-  items: PropTypes.arrayOf(PropTypes.shape({
-    title: PropTypes.message.isRequired,
-    icon: PropTypes.string,
-    path: PropTypes.string,
-    action: PropTypes.func,
-  })),
+  items: dropdownItemsPropTypes,
   /** Flag identifying whether link should be rendered as plain anchor link */
   anchored: PropTypes.bool,
 }
