@@ -85,7 +85,7 @@ type Server struct {
 
 	rootGroup *echo.Group
 	server    *echo.Echo
-	config    config.Interop
+	config    config.InteropServer
 
 	js  JoinServer
 	hNS HomeNetworkServer
@@ -94,8 +94,8 @@ type Server struct {
 	as  ApplicationServer
 }
 
-// New builds a new server.
-func New(ctx context.Context, config config.Interop) (*Server, error) {
+// NewServer builds a new server.
+func NewServer(ctx context.Context, conf config.InteropServer) (*Server, error) {
 	logger := log.FromContext(ctx).WithField("namespace", "interop")
 
 	server := echo.New()
@@ -110,7 +110,7 @@ func New(ctx context.Context, config config.Interop) (*Server, error) {
 	)
 
 	senderClientCAs := make(map[string][]*x509.Certificate)
-	for senderID, filename := range config.SenderClientCAs {
+	for senderID, filename := range conf.SenderClientCAs {
 		pemCerts, err := ioutil.ReadFile(filename)
 		if err != nil {
 			return nil, err
@@ -146,7 +146,7 @@ func New(ctx context.Context, config config.Interop) (*Server, error) {
 			parseMessage(),
 			verifySenderID(getSenderClientCAs),
 		),
-		config: config,
+		config: conf,
 		server: server,
 		js:     noop,
 		hNS:    noop,

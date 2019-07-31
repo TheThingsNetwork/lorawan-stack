@@ -16,14 +16,17 @@ package interop_test
 
 import (
 	"crypto/tls"
-	"crypto/x509"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -33,27 +36,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
-)
-
-const (
-	// NOTE: Client certificate/key are harvested from https://golang.org/pkg/crypto/tls/#example_LoadX509KeyPair.
-	ClientCert = `-----BEGIN CERTIFICATE-----
-MIIBhTCCASugAwIBAgIQIRi6zePL6mKjOipn+dNuaTAKBggqhkjOPQQDAjASMRAw
-DgYDVQQKEwdBY21lIENvMB4XDTE3MTAyMDE5NDMwNloXDTE4MTAyMDE5NDMwNlow
-EjEQMA4GA1UEChMHQWNtZSBDbzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABD0d
-7VNhbWvZLWPuj/RtHFjvtJBEwOkhbN/BnnE8rnZR8+sbwnc/KhCk3FhnpHZnQz7B
-5aETbbIgmuvewdjvSBSjYzBhMA4GA1UdDwEB/wQEAwICpDATBgNVHSUEDDAKBggr
-BgEFBQcDATAPBgNVHRMBAf8EBTADAQH/MCkGA1UdEQQiMCCCDmxvY2FsaG9zdDo1
-NDUzgg4xMjcuMC4wLjE6NTQ1MzAKBggqhkjOPQQDAgNIADBFAiEA2zpJEPQyz6/l
-Wf86aX6PepsntZv2GYlA5UpabfT2EZICICpJ5h/iI+i341gBmLiAFQOyTDT+/wQc
-6MF9+Yw1Yy0t
------END CERTIFICATE-----`
-
-	ClientKey = `-----BEGIN EC PRIVATE KEY-----
-MHcCAQEEIIrYSSNQFaA2Hwf1duRSxKtLYX5CB04fSeQ6tF1aY/PuoAoGCCqGSM49
-AwEHoUQDQgAEPR3tU2Fta9ktY+6P9G0cWO+0kETA6SFs38GecTyudlHz6xvCdz8q
-EKTcWGekdmdDPsHloRNtsiCa697B2O9IFA==
------END EC PRIVATE KEY-----`
 )
 
 func TestJoinServerFQDN(t *testing.T) {
@@ -71,24 +53,6 @@ func TestJoinServerFQDN(t *testing.T) {
 	}
 }
 
-func makeClientCertificates() []tls.Certificate {
-	return []tls.Certificate{
-		test.Must(tls.X509KeyPair(
-			[]byte(ClientCert),
-			[]byte(ClientKey),
-		)).(tls.Certificate),
-	}
-}
-
-func makeClientTLSConfig(srvCert *x509.Certificate) *tls.Config {
-	certpool := x509.NewCertPool()
-	certpool.AddCert(srvCert)
-	return &tls.Config{
-		RootCAs:      certpool,
-		Certificates: makeClientCertificates(),
-	}
-}
-
 func TestGetAppSKey(t *testing.T) {
 	makeSessionKeyRequest := func() *ttnpb.SessionKeyRequest {
 		return &ttnpb.SessionKeyRequest{
@@ -99,19 +63,19 @@ func TestGetAppSKey(t *testing.T) {
 	}
 
 	for _, tc := range []struct {
-		Name              string
-		NewServer         func(*testing.T) *httptest.Server
-		NewTLSConfig      func(*x509.Certificate) *tls.Config
-		NewClientConfig   func(fqdn string, port uint32) ClientConfig
-		AsID              string
-		Request           *ttnpb.SessionKeyRequest
-		ResponseAssertion func(*testing.T, *ttnpb.AppSKeyResponse) bool
-		ErrorAssertion    func(*testing.T, error) bool
+		Name                 string
+		NewServer            func(*testing.T) *httptest.Server
+		NewFallbackTLSConfig func() *tls.Config
+		NewClientConfig      func(fqdn string, port uint32) (ClientConfig, func() error)
+		AsID                 string
+		Request              *ttnpb.SessionKeyRequest
+		ResponseAssertion    func(*testing.T, *ttnpb.AppSKeyResponse) bool
+		ErrorAssertion       func(*testing.T, error) bool
 	}{
 		{
 			Name: "Backend Interfaces 1.0/Success",
 			NewServer: func(t *testing.T) *httptest.Server {
-				return httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				return newTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					a := assertions.New(t)
 					a.So(r.Method, should.Equal, http.MethodPost)
 
@@ -141,66 +105,77 @@ func TestGetAppSKey(t *testing.T) {
 					a.So(err, should.BeNil)
 				}))
 			},
-			NewTLSConfig: makeClientTLSConfig,
-			NewClientConfig: func(fqdn string, port uint32) ClientConfig {
+			NewFallbackTLSConfig: func() *tls.Config { return nil },
+			NewClientConfig: func(fqdn string, port uint32) (ClientConfig, func() error) {
+				confDir := test.Must(ioutil.TempDir("", "lorawan-stack-js-interop-test")).(string)
+				confURI := fmt.Sprintf("file://%s/%s", filepath.ToSlash(confDir), "config.yaml")
+
+				js1Path := filepath.Join(confDir, "test-js-1.yaml")
+				js2Path := filepath.Join(confDir, "foo", "test-js-2.yaml")
+				js3Path := filepath.Join(confDir, "test-js-3.yaml")
+
+				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, "config.yaml"), []byte(fmt.Sprintf(`join-servers:
+   - file: %s
+     join-eui:
+        - 0000000000000000/0
+        - 70b3d57ed0001000/52
+
+   - file: %s
+     join-eui:
+        - 70b3d57ed0000000/40
+
+   - file: %s
+     join-eui:
+        - 70b3d57ed0000000/39
+        - 70b3d83ed0000000/30`,
+					js1Path,
+					js2Path,
+					js3Path,
+				)), 0644))
+
+				test.MustMultiple(ioutil.WriteFile(js1Path, []byte(fmt.Sprintf(`fqdn: test-js.fqdn
+port: 12345
+protocol: LW1.1
+tls:
+   root-ca: %s
+   certificate: %s
+   key: %s
+headers:
+   SomeHeader: Some foo bar
+   TestHeader: baz`,
+					RootCAPath,
+					ClientCertPath,
+					ClientKeyPath,
+				)), 0644))
+
+				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "foo"), 0755))
+				test.MustMultiple(ioutil.WriteFile(js2Path, []byte(fmt.Sprintf(`fqdn: %s
+port: %d
+protocol: LW1.0
+tls:
+   root-ca: %s
+   certificate: %s
+   key: %s
+headers:
+   Authorization: Custom foo bar
+   TestHeader: baz`,
+					fqdn,
+					port,
+					RootCAPath,
+					ClientCertPath,
+					ClientKeyPath,
+				)), 0644))
+
+				test.MustMultiple(ioutil.WriteFile(js3Path, []byte(`dns: invalid.dns
+path: test-path
+protocol: LW1.1`), 0644))
+
 				return ClientConfig{
-					JoinServers: []RemoteJoinServerConfig{
-						{
-							RemoteServerConfig: RemoteServerConfig{
-								FQDN: "fallback.invalid.fqdn",
-								Port: 12345,
-							},
-							JoinEUI: []types.EUI64Prefix{
-								{},
-							},
-							Protocol: LoRaWANJoinServerProtocol1_1,
-						},
-
-						{
-							RemoteServerConfig: RemoteServerConfig{
-								FQDN: "foo.invalid.fqdn",
-							},
-							JoinEUI: []types.EUI64Prefix{
-								{
-									EUI64:  types.EUI64{0x70, 0xb3, 0xd5, 0x7e, 0xd0, 0x00, 0x00, 0x00},
-									Length: 39,
-								},
-								{
-									EUI64:  types.EUI64{0x70, 0xb3, 0xd5, 0x83, 0xd0, 0x00, 0x00, 0x00},
-									Length: 30,
-								},
-							},
-							Protocol: LoRaWANJoinServerProtocol1_0,
-						},
-
-						{
-							RemoteServerConfig: RemoteServerConfig{
-								FQDN: fqdn,
-								Port: port,
-							},
-							JoinEUI: []types.EUI64Prefix{
-								{
-									EUI64:  types.EUI64{0x70, 0xb3, 0xd5, 0x7e, 0xd0, 0x00, 0x00, 0x00},
-									Length: 40,
-								},
-							},
-							Protocol: LoRaWANJoinServerProtocol1_0,
-						},
-
-						{
-							RemoteServerConfig: RemoteServerConfig{
-								FQDN: "bar.invalid.fqdn",
-							},
-							JoinEUI: []types.EUI64Prefix{
-								{
-									EUI64:  types.EUI64{0x70, 0xb3, 0xd5, 0x7e, 0xd0, 0x01, 0x00, 0x00},
-									Length: 48,
-								},
-							},
-							Protocol: LoRaWANJoinServerProtocol1_1,
-						},
-					},
-				}
+						ConfigURI: confURI,
+						CacheTime: time.Millisecond,
+					}, func() error {
+						return os.RemoveAll(confDir)
+					}
 			},
 			AsID:    "test-as",
 			Request: makeSessionKeyRequest(),
@@ -220,7 +195,7 @@ func TestGetAppSKey(t *testing.T) {
 		{
 			Name: "Backend Interfaces 1.1/Success",
 			NewServer: func(t *testing.T) *httptest.Server {
-				return httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				return newTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					a := assertions.New(t)
 					a.So(r.Method, should.Equal, http.MethodPost)
 
@@ -250,66 +225,77 @@ func TestGetAppSKey(t *testing.T) {
 					a.So(err, should.BeNil)
 				}))
 			},
-			NewTLSConfig: makeClientTLSConfig,
-			NewClientConfig: func(fqdn string, port uint32) ClientConfig {
+			NewFallbackTLSConfig: func() *tls.Config { return nil },
+			NewClientConfig: func(fqdn string, port uint32) (ClientConfig, func() error) {
+				confDir := test.Must(ioutil.TempDir("", "lorawan-stack-js-interop-test")).(string)
+				confURI := fmt.Sprintf("file://%s/%s", filepath.ToSlash(confDir), "config.yaml")
+
+				js1Path := filepath.Join(confDir, "test-js-1.yaml")
+				js2Path := filepath.Join(confDir, "foo", "test-js-2.yaml")
+				js3Path := filepath.Join(confDir, "test-js-3.yaml")
+
+				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, "config.yaml"), []byte(fmt.Sprintf(`join-servers:
+   - file: %s
+     join-eui:
+        - 0000000000000000/0
+        - 70b3d57ed0001000/52
+
+   - file: %s
+     join-eui:
+        - 70b3d57ed0000000/40
+
+   - file: %s
+     join-eui:
+        - 70b3d57ed0000000/39
+        - 70b3d83ed0000000/30`,
+					js1Path,
+					js2Path,
+					js3Path,
+				)), 0644))
+
+				test.MustMultiple(ioutil.WriteFile(js1Path, []byte(fmt.Sprintf(`fqdn: test-js.fqdn
+port: 12345
+protocol: LW1.0
+tls:
+   root-ca: %s
+   certificate: %s
+   key: %s
+headers:
+   SomeHeader: Some foo bar
+   TestHeader: baz`,
+					RootCAPath,
+					ClientCertPath,
+					ClientKeyPath,
+				)), 0644))
+
+				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "foo"), 0755))
+				test.MustMultiple(ioutil.WriteFile(js2Path, []byte(fmt.Sprintf(`fqdn: %s
+port: %d
+protocol: LW1.1
+tls:
+   root-ca: %s
+   certificate: %s
+   key: %s
+headers:
+   Authorization: Custom foo bar
+   TestHeader: baz`,
+					fqdn,
+					port,
+					RootCAPath,
+					ClientCertPath,
+					ClientKeyPath,
+				)), 0644))
+
+				test.MustMultiple(ioutil.WriteFile(js3Path, []byte(`dns: invalid.dns
+path: test-path
+protocol: LW1.0`), 0644))
+
 				return ClientConfig{
-					JoinServers: []RemoteJoinServerConfig{
-						{
-							RemoteServerConfig: RemoteServerConfig{
-								FQDN: "fallback.invalid.fqdn",
-								Port: 12345,
-							},
-							JoinEUI: []types.EUI64Prefix{
-								{},
-							},
-							Protocol: LoRaWANJoinServerProtocol1_0,
-						},
-
-						{
-							RemoteServerConfig: RemoteServerConfig{
-								FQDN: "foo.invalid.fqdn",
-							},
-							JoinEUI: []types.EUI64Prefix{
-								{
-									EUI64:  types.EUI64{0x70, 0xb3, 0xd5, 0x7e, 0xd0, 0x00, 0x00, 0x00},
-									Length: 39,
-								},
-								{
-									EUI64:  types.EUI64{0x70, 0xb3, 0xd5, 0x83, 0xd0, 0x00, 0x00, 0x00},
-									Length: 30,
-								},
-							},
-							Protocol: LoRaWANJoinServerProtocol1_1,
-						},
-
-						{
-							RemoteServerConfig: RemoteServerConfig{
-								FQDN: fqdn,
-								Port: port,
-							},
-							JoinEUI: []types.EUI64Prefix{
-								{
-									EUI64:  types.EUI64{0x70, 0xb3, 0xd5, 0x7e, 0xd0, 0x00, 0x00, 0x00},
-									Length: 40,
-								},
-							},
-							Protocol: LoRaWANJoinServerProtocol1_1,
-						},
-
-						{
-							RemoteServerConfig: RemoteServerConfig{
-								FQDN: "bar.invalid.fqdn",
-							},
-							JoinEUI: []types.EUI64Prefix{
-								{
-									EUI64:  types.EUI64{0x70, 0xb3, 0xd5, 0x7e, 0xd0, 0x01, 0x00, 0x00},
-									Length: 48,
-								},
-							},
-							Protocol: LoRaWANJoinServerProtocol1_0,
-						},
-					},
-				}
+						ConfigURI: confURI,
+						CacheTime: time.Millisecond,
+					}, func() error {
+						return os.RemoveAll(confDir)
+					}
 			},
 			AsID:    "test-as",
 			Request: makeSessionKeyRequest(),
@@ -338,7 +324,11 @@ func TestGetAppSKey(t *testing.T) {
 		if len(host) != 2 {
 			t.Fatalf("Invalid server host: %s", host)
 		}
-		cl, err := NewClient(ctx, tc.NewClientConfig(host[0], uint32(test.Must(strconv.ParseUint(host[1], 10, 32)).(uint64))), tc.NewTLSConfig(srv.Certificate()))
+
+		conf, flush := tc.NewClientConfig(host[0], uint32(test.Must(strconv.ParseUint(host[1], 10, 32)).(uint64)))
+		defer flush()
+
+		cl, err := NewClient(ctx, conf, tc.NewFallbackTLSConfig())
 		if !a.So(err, should.BeNil) {
 			t.Fatalf("Failed to create new client: %s", err)
 		}
@@ -371,19 +361,19 @@ func TestHandleJoinRequest(t *testing.T) {
 	}
 
 	for _, tc := range []struct {
-		Name              string
-		NewServer         func(*testing.T) *httptest.Server
-		NewTLSConfig      func(*x509.Certificate) *tls.Config
-		NewClientConfig   func(fqdn string, port uint32) ClientConfig
-		NetID             types.NetID
-		Request           *ttnpb.JoinRequest
-		ResponseAssertion func(*testing.T, *ttnpb.JoinResponse) bool
-		ErrorAssertion    func(*testing.T, error) bool
+		Name                 string
+		NewServer            func(*testing.T) *httptest.Server
+		NewFallbackTLSConfig func() *tls.Config
+		NewClientConfig      func(fqdn string, port uint32) (ClientConfig, func() error)
+		NetID                types.NetID
+		Request              *ttnpb.JoinRequest
+		ResponseAssertion    func(*testing.T, *ttnpb.JoinResponse) bool
+		ErrorAssertion       func(*testing.T, error) bool
 	}{
 		{
 			Name: "Backend Interfaces 1.0/Success",
 			NewServer: func(t *testing.T) *httptest.Server {
-				return httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				return newTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					a := assertions.New(t)
 					a.So(r.Method, should.Equal, http.MethodPost)
 
@@ -419,66 +409,77 @@ func TestHandleJoinRequest(t *testing.T) {
 					a.So(err, should.BeNil)
 				}))
 			},
-			NewTLSConfig: makeClientTLSConfig,
-			NewClientConfig: func(fqdn string, port uint32) ClientConfig {
+			NewFallbackTLSConfig: func() *tls.Config { return nil },
+			NewClientConfig: func(fqdn string, port uint32) (ClientConfig, func() error) {
+				confDir := test.Must(ioutil.TempDir("", "lorawan-stack-js-interop-test")).(string)
+				confURI := fmt.Sprintf("file://%s/%s", filepath.ToSlash(confDir), "config.yaml")
+
+				js1Path := filepath.Join(confDir, "test-js-1.yaml")
+				js2Path := filepath.Join(confDir, "foo", "test-js-2.yaml")
+				js3Path := filepath.Join(confDir, "test-js-3.yaml")
+
+				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, "config.yaml"), []byte(fmt.Sprintf(`join-servers:
+   - file: %s
+     join-eui:
+        - 0000000000000000/0
+        - 70b3d57ed0001000/52
+
+   - file: %s
+     join-eui:
+        - 70b3d57ed0000000/40
+
+   - file: %s
+     join-eui:
+        - 70b3d57ed0000000/39
+        - 70b3d83ed0000000/30`,
+					js1Path,
+					js2Path,
+					js3Path,
+				)), 0644))
+
+				test.MustMultiple(ioutil.WriteFile(js1Path, []byte(fmt.Sprintf(`fqdn: test-js.fqdn
+port: 12345
+protocol: LW1.1
+tls:
+   root-ca: %s
+   certificate: %s
+   key: %s
+headers:
+   SomeHeader: Some foo bar
+   TestHeader: baz`,
+					RootCAPath,
+					ClientCertPath,
+					ClientKeyPath,
+				)), 0644))
+
+				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "foo"), 0755))
+				test.MustMultiple(ioutil.WriteFile(js2Path, []byte(fmt.Sprintf(`fqdn: %s
+port: %d
+protocol: LW1.0
+tls:
+   root-ca: %s
+   certificate: %s
+   key: %s
+headers:
+   Authorization: Custom foo bar
+   TestHeader: baz`,
+					fqdn,
+					port,
+					RootCAPath,
+					ClientCertPath,
+					ClientKeyPath,
+				)), 0644))
+
+				test.MustMultiple(ioutil.WriteFile(js3Path, []byte(`dns: invalid.dns
+path: test-path
+protocol: LW1.1`), 0644))
+
 				return ClientConfig{
-					JoinServers: []RemoteJoinServerConfig{
-						{
-							RemoteServerConfig: RemoteServerConfig{
-								FQDN: "fallback.invalid.fqdn",
-								Port: 12345,
-							},
-							JoinEUI: []types.EUI64Prefix{
-								{},
-							},
-							Protocol: LoRaWANJoinServerProtocol1_1,
-						},
-
-						{
-							RemoteServerConfig: RemoteServerConfig{
-								FQDN: "foo.invalid.fqdn",
-							},
-							JoinEUI: []types.EUI64Prefix{
-								{
-									EUI64:  types.EUI64{0x70, 0xb3, 0xd5, 0x7e, 0xd0, 0x00, 0x00, 0x00},
-									Length: 39,
-								},
-								{
-									EUI64:  types.EUI64{0x70, 0xb3, 0xd5, 0x83, 0xd0, 0x00, 0x00, 0x00},
-									Length: 30,
-								},
-							},
-							Protocol: LoRaWANJoinServerProtocol1_0,
-						},
-
-						{
-							RemoteServerConfig: RemoteServerConfig{
-								FQDN: fqdn,
-								Port: port,
-							},
-							JoinEUI: []types.EUI64Prefix{
-								{
-									EUI64:  types.EUI64{0x70, 0xb3, 0xd5, 0x7e, 0xd0, 0x00, 0x00, 0x00},
-									Length: 40,
-								},
-							},
-							Protocol: LoRaWANJoinServerProtocol1_0,
-						},
-
-						{
-							RemoteServerConfig: RemoteServerConfig{
-								FQDN: "bar.invalid.fqdn",
-							},
-							JoinEUI: []types.EUI64Prefix{
-								{
-									EUI64:  types.EUI64{0x70, 0xb3, 0xd5, 0x7e, 0xd0, 0x01, 0x00, 0x00},
-									Length: 48,
-								},
-							},
-							Protocol: LoRaWANJoinServerProtocol1_1,
-						},
-					},
-				}
+						ConfigURI: confURI,
+						CacheTime: time.Millisecond,
+					}, func() error {
+						return os.RemoveAll(confDir)
+					}
 			},
 			NetID:   types.NetID{0x42, 0xff, 0xff},
 			Request: makeJoinRequest(),
@@ -506,7 +507,7 @@ func TestHandleJoinRequest(t *testing.T) {
 		{
 			Name: "Backend Interfaces 1.1/Success",
 			NewServer: func(t *testing.T) *httptest.Server {
-				return httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				return newTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					a := assertions.New(t)
 					a.So(r.Method, should.Equal, http.MethodPost)
 
@@ -542,66 +543,77 @@ func TestHandleJoinRequest(t *testing.T) {
 					a.So(err, should.BeNil)
 				}))
 			},
-			NewTLSConfig: makeClientTLSConfig,
-			NewClientConfig: func(fqdn string, port uint32) ClientConfig {
+			NewFallbackTLSConfig: func() *tls.Config { return nil },
+			NewClientConfig: func(fqdn string, port uint32) (ClientConfig, func() error) {
+				confDir := test.Must(ioutil.TempDir("", "lorawan-stack-js-interop-test")).(string)
+				confURI := fmt.Sprintf("file://%s/%s", filepath.ToSlash(confDir), "config.yaml")
+
+				js1Path := filepath.Join(confDir, "test-js-1.yaml")
+				js2Path := filepath.Join(confDir, "foo", "test-js-2.yaml")
+				js3Path := filepath.Join(confDir, "test-js-3.yaml")
+
+				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, "config.yaml"), []byte(fmt.Sprintf(`join-servers:
+   - file: %s
+     join-eui:
+        - 0000000000000000/0
+        - 70b3d57ed0001000/52
+
+   - file: %s
+     join-eui:
+        - 70b3d57ed0000000/40
+
+   - file: %s
+     join-eui:
+        - 70b3d57ed0000000/39
+        - 70b3d83ed0000000/30`,
+					js1Path,
+					js2Path,
+					js3Path,
+				)), 0644))
+
+				test.MustMultiple(ioutil.WriteFile(js1Path, []byte(fmt.Sprintf(`fqdn: test-js.fqdn
+port: 12345
+protocol: LW1.0
+tls:
+   root-ca: %s
+   certificate: %s
+   key: %s
+headers:
+   SomeHeader: Some foo bar
+   TestHeader: baz`,
+					RootCAPath,
+					ClientCertPath,
+					ClientKeyPath,
+				)), 0644))
+
+				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "foo"), 0755))
+				test.MustMultiple(ioutil.WriteFile(js2Path, []byte(fmt.Sprintf(`fqdn: %s
+port: %d
+protocol: LW1.1
+tls:
+   root-ca: %s
+   certificate: %s
+   key: %s
+headers:
+   Authorization: Custom foo bar
+   TestHeader: baz`,
+					fqdn,
+					port,
+					RootCAPath,
+					ClientCertPath,
+					ClientKeyPath,
+				)), 0644))
+
+				test.MustMultiple(ioutil.WriteFile(js3Path, []byte(`dns: invalid.dns
+path: test-path
+protocol: LW1.0`), 0644))
+
 				return ClientConfig{
-					JoinServers: []RemoteJoinServerConfig{
-						{
-							RemoteServerConfig: RemoteServerConfig{
-								FQDN: "fallback.invalid.fqdn",
-								Port: 12345,
-							},
-							JoinEUI: []types.EUI64Prefix{
-								{},
-							},
-							Protocol: LoRaWANJoinServerProtocol1_0,
-						},
-
-						{
-							RemoteServerConfig: RemoteServerConfig{
-								FQDN: "foo.invalid.fqdn",
-							},
-							JoinEUI: []types.EUI64Prefix{
-								{
-									EUI64:  types.EUI64{0x70, 0xb3, 0xd5, 0x7e, 0xd0, 0x00, 0x00, 0x00},
-									Length: 39,
-								},
-								{
-									EUI64:  types.EUI64{0x70, 0xb3, 0xd5, 0x83, 0xd0, 0x00, 0x00, 0x00},
-									Length: 30,
-								},
-							},
-							Protocol: LoRaWANJoinServerProtocol1_1,
-						},
-
-						{
-							RemoteServerConfig: RemoteServerConfig{
-								FQDN: fqdn,
-								Port: port,
-							},
-							JoinEUI: []types.EUI64Prefix{
-								{
-									EUI64:  types.EUI64{0x70, 0xb3, 0xd5, 0x7e, 0xd0, 0x00, 0x00, 0x00},
-									Length: 40,
-								},
-							},
-							Protocol: LoRaWANJoinServerProtocol1_1,
-						},
-
-						{
-							RemoteServerConfig: RemoteServerConfig{
-								FQDN: "bar.invalid.fqdn",
-							},
-							JoinEUI: []types.EUI64Prefix{
-								{
-									EUI64:  types.EUI64{0x70, 0xb3, 0xd5, 0x7e, 0xd0, 0x01, 0x00, 0x00},
-									Length: 48,
-								},
-							},
-							Protocol: LoRaWANJoinServerProtocol1_0,
-						},
-					},
-				}
+						ConfigURI: confURI,
+						CacheTime: time.Millisecond,
+					}, func() error {
+						return os.RemoveAll(confDir)
+					}
 			},
 			NetID:   types.NetID{0x42, 0xff, 0xff},
 			Request: makeJoinRequest(),
@@ -638,7 +650,11 @@ func TestHandleJoinRequest(t *testing.T) {
 		if len(host) != 2 {
 			t.Fatalf("Invalid server host: %s", host)
 		}
-		cl, err := NewClient(ctx, tc.NewClientConfig(host[0], uint32(test.Must(strconv.ParseUint(host[1], 10, 32)).(uint64))), tc.NewTLSConfig(srv.Certificate()))
+
+		conf, flush := tc.NewClientConfig(host[0], uint32(test.Must(strconv.ParseUint(host[1], 10, 32)).(uint64)))
+		defer flush()
+
+		cl, err := NewClient(ctx, conf, tc.NewFallbackTLSConfig())
 		if !a.So(err, should.BeNil) {
 			t.Fatalf("Failed to create new client: %s", err)
 		}

@@ -43,7 +43,9 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/web"
 )
 
-var errUnknownComponent = errors.DefineInvalidArgument("unknown_component", "unknown component `{component}`")
+var (
+	errUnknownComponent = errors.DefineInvalidArgument("unknown_component", "unknown component `{component}`")
+)
 
 var (
 	startCommand = &cobra.Command{

@@ -18,18 +18,22 @@ import (
 	"bytes"
 	"context"
 	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
 	"fmt"
+	"io"
+	"io/ioutil"
 	"net/http"
-	"reflect"
+	"net/url"
 	"sort"
 	"time"
 
-	"go.thethings.network/lorawan-stack/pkg/config"
+	"github.com/spf13/afero"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
+	yaml "gopkg.in/yaml.v2"
 )
 
 const (
@@ -45,13 +49,16 @@ const (
 	defaultHTTPSPort = 443
 )
 
+// JoinServerProtocol represents the protocol used for connection to Join-Server by interop client.
 type JoinServerProtocol uint8
 
 const (
-	LoRaWANJoinServerProtocol1_0 = iota
+	LoRaWANJoinServerProtocol1_0 JoinServerProtocol = iota
 	LoRaWANJoinServerProtocol1_1
 )
 
+// BackendInterfacesVersion returns the version of LoRaWAN Backend Interfaces specification version the protocol p is compliant with.
+// BackendInterfacesVersion panics if p is not compliant with LoRaWAN Backend Interfaces specification.
 func (p JoinServerProtocol) BackendInterfacesVersion() string {
 	switch p {
 	case LoRaWANJoinServerProtocol1_0:
@@ -60,6 +67,23 @@ func (p JoinServerProtocol) BackendInterfacesVersion() string {
 		return "1.1"
 	default:
 		panic(fmt.Sprintf("Join Server protocol	`%v` is not compliant with Backend Interfaces specification", p))
+	}
+}
+
+func (p *JoinServerProtocol) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	var s string
+	if err := unmarshal(&s); err != nil {
+		return err
+	}
+	switch s {
+	case "LW1.1":
+		*p = LoRaWANJoinServerProtocol1_1
+		return nil
+	case "LW1.0":
+		*p = LoRaWANJoinServerProtocol1_0
+		return nil
+	default:
+		return errUnknownProtocol
 	}
 }
 
@@ -228,44 +252,19 @@ func (cl joinServerHTTPClient) HandleJoinRequest(ctx context.Context, netID type
 	}, nil
 }
 
-type RemoteServerConfig struct {
-	DNS     string            `name:"dns" description:"Domain name under which server address will be resolved by according to LoRaWAN Backend Interfaces 1.1 specification. LoRa Alliance domain is used if unset. FQDN takes precedence if set"`
-	FQDN    string            `name:"fqdn" description:"FQDN of the server, DNS lookup is performed if not set"`
-	Path    string            `name:"path" description:"URL path to use without the leading slash. Defaults to the paths specified in LoRaWAN Backend Interfaces 1.1 specification"`
-	Port    uint32            `name:"port" description:"Port to use, defaults to 443"`
-	TLS     config.TLS        `name:"tls" description:"TLS configuration to use"`
-	Headers map[string]string `name:"headers" description:"Custom HTTP headers to send as part of the request"`
-}
-
-func makeJoinServerHTTPRequestFunc(scheme string, conf RemoteServerConfig) func(types.EUI64, interface{}) (*http.Request, error) {
-	port := conf.Port
+func makeJoinServerHTTPRequestFunc(scheme string, dns, fqdn, path string, port uint32, headers map[string]string) func(types.EUI64, interface{}) (*http.Request, error) {
 	if port == 0 {
 		port = defaultHTTPSPort
 	}
-	path := conf.Path
 	if path != "" {
 		path = fmt.Sprintf("/%s", path)
 	}
 	return func(joinEUI types.EUI64, pld interface{}) (*http.Request, error) {
-		fqdn := conf.FQDN
 		if fqdn == "" {
-			fqdn = JoinServerFQDN(joinEUI, conf.DNS)
+			fqdn = JoinServerFQDN(joinEUI, dns)
 		}
-		return newHTTPRequest(serverURL(scheme, fqdn, path, port), pld, conf.Headers)
+		return newHTTPRequest(serverURL(scheme, fqdn, path, port), pld, headers)
 	}
-}
-
-type RemoteJoinServerConfig struct {
-	RemoteServerConfig
-
-	JoinEUI  []types.EUI64Prefix `name:"join-eui" description:"List of JoinEUI prefixes Join Server handles"`
-	Protocol JoinServerProtocol  `name:"protocol" description:"Join Server protocol to use"`
-}
-
-var errUnknownProtocol = errors.DefineInvalidArgument("unknown_protocol", "unknown protocol")
-
-type ClientConfig struct {
-	JoinServers []RemoteJoinServerConfig `name:"join-servers" description:"List of Join Servers configured by JoinEUI."`
 }
 
 type joinServerClient interface {
@@ -282,33 +281,151 @@ type Client struct {
 	joinServers []prefixJoinServerClient // Sorted by JoinEUI prefix range length.
 }
 
+var errUnknownProtocol = errors.DefineInvalidArgument("unknown_protocol", "unknown protocol")
+
+// ClientConfig represents the client-side interoperability through LoRaWAN Backend Interfaces configuration.
+type ClientConfig struct {
+	ConfigURI string        `name:"config-uri" description:"URI of the configuration file"`
+	CacheTime time.Duration `name:"cache-time"`
+}
+
+var errUnsupportedURIScheme = errors.DefineUnimplemented("unsupported_uri_scheme", "URI scheme `{scheme}` is not supported", "scheme")
+
+type tlsConfig struct {
+	RootCA      string `yaml:"root-ca"`
+	Certificate string `yaml:"certificate"`
+	Key         string `yaml:"key"`
+}
+
+func (conf tlsConfig) IsZero() bool {
+	return conf == (tlsConfig{})
+}
+
+func (conf tlsConfig) TLSConfig(fs afero.Fs) (*tls.Config, error) {
+	var rootCAs *x509.CertPool
+	if conf.RootCA != "" {
+		caFile, err := fs.Open(conf.RootCA)
+		if err != nil {
+			return nil, err
+		}
+
+		caPEM, err := ioutil.ReadAll(caFile)
+		if err != nil {
+			return nil, err
+		}
+		rootCAs = x509.NewCertPool()
+		rootCAs.AppendCertsFromPEM(caPEM)
+	}
+
+	var certs []tls.Certificate
+	if conf.Certificate != "" || conf.Key != "" {
+		certFile, err := fs.Open(conf.Certificate)
+		if err != nil {
+			return nil, err
+		}
+		certPEM, err := ioutil.ReadAll(certFile)
+		if err != nil {
+			return nil, err
+		}
+
+		keyFile, err := fs.Open(conf.Key)
+		if err != nil {
+			return nil, err
+		}
+		keyPEM, err := ioutil.ReadAll(keyFile)
+		if err != nil {
+			return nil, err
+		}
+		cert, err := tls.X509KeyPair(certPEM, keyPEM)
+		if err != nil {
+			return nil, err
+		}
+		certs = append(certs, cert)
+	}
+	return &tls.Config{
+		RootCAs:      rootCAs,
+		Certificates: certs,
+	}, nil
+}
+
+func decodeYAML(r io.Reader, v interface{}) error {
+	dec := yaml.NewDecoder(r)
+	dec.SetStrict(true)
+	return dec.Decode(v)
+}
+
 func NewClient(ctx context.Context, conf ClientConfig, fallbackTLS *tls.Config) (*Client, error) {
-	jss := make([]prefixJoinServerClient, 0, len(conf.JoinServers))
-	for _, jsConf := range conf.JoinServers {
+	u, err := url.Parse(conf.ConfigURI)
+	if err != nil {
+		return nil, err
+	}
+
+	var fs afero.Fs
+	switch s := u.Scheme; s {
+	case "file":
+		fs = afero.NewOsFs()
+	default:
+		return nil, errUnsupportedURIScheme.WithAttributes("scheme", s)
+	}
+	confFile, err := fs.Open(u.Path)
+	if err != nil {
+		return nil, err
+	}
+	fs = afero.NewCacheOnReadFs(fs, afero.NewMemMapFs(), conf.CacheTime)
+
+	var yamlConf struct {
+		JoinServers []struct {
+			File    string              `yaml:"file"`
+			JoinEUI []types.EUI64Prefix `yaml:"join-eui"`
+		} `yaml:"join-servers"`
+	}
+	if err := decodeYAML(confFile, &yamlConf); err != nil {
+		return nil, err
+	}
+
+	jss := make([]prefixJoinServerClient, 0, len(yamlConf.JoinServers))
+	for _, jsConf := range yamlConf.JoinServers {
+		jsFile, err := fs.Open(jsConf.File)
+		if err != nil {
+			return nil, err
+		}
+
+		var yamlJSConf struct {
+			DNS      string             `yaml:"dns"`
+			FQDN     string             `yaml:"fqdn"`
+			Path     string             `yaml:"path"`
+			Port     uint32             `yaml:"port"`
+			Protocol JoinServerProtocol `yaml:"protocol"`
+			Headers  map[string]string  `yaml:"headers"`
+			TLS      tlsConfig          `yaml:"tls"`
+		}
+		if err := decodeYAML(jsFile, &yamlJSConf); err != nil {
+			return nil, err
+		}
+
 		var js joinServerClient
-		switch jsConf.Protocol {
+		switch yamlJSConf.Protocol {
 		case LoRaWANJoinServerProtocol1_0, LoRaWANJoinServerProtocol1_1:
-			tlsConfig := fallbackTLS
-			if !reflect.DeepEqual(jsConf.TLS, config.TLS{}) {
-				var err error
-				tlsConfig, err = jsConf.TLS.Config(ctx)
+			tlsConf := fallbackTLS
+			if !yamlJSConf.TLS.IsZero() {
+				tlsConf, err = yamlJSConf.TLS.TLSConfig(fs, confDir)
 				if err != nil {
 					return nil, err
 				}
 			}
 
 			var tr *http.Transport
-			if tlsConfig != nil {
+			if tlsConf != nil {
 				tr = &http.Transport{
-					TLSClientConfig: tlsConfig,
+					TLSClientConfig: tlsConf,
 				}
 			}
 			js = &joinServerHTTPClient{
 				Client: http.Client{
 					Transport: tr,
 				},
-				NewRequestFunc: makeJoinServerHTTPRequestFunc("https", jsConf.RemoteServerConfig),
-				Protocol:       jsConf.Protocol,
+				NewRequestFunc: makeJoinServerHTTPRequestFunc("https", yamlJSConf.DNS, yamlJSConf.FQDN, yamlJSConf.Path, yamlJSConf.Port, yamlJSConf.Headers),
+				Protocol:       yamlJSConf.Protocol,
 			}
 		default:
 			return nil, errUnknownProtocol
@@ -335,7 +452,6 @@ func NewClient(ctx context.Context, conf ClientConfig, fallbackTLS *tls.Config) 
 func (cl Client) joinServer(joinEUI types.EUI64) (joinServerClient, bool) {
 	// NOTE: joinServers slice is sorted by prefix length and the range start decreasing, hence the first match is the most specific one.
 	for _, js := range cl.joinServers {
-		fmt.Println(js.prefix.EUI64, js.prefix.Length, js.prefix.EUI64.Mask(js.prefix.Length))
 		if js.prefix.Matches(joinEUI) {
 			return js.joinServerClient, true
 		}

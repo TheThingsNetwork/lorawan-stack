@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package interop
+package interop_test
 
 import (
 	"bytes"
@@ -26,6 +26,7 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/config"
+	. "go.thethings.network/lorawan-stack/pkg/interop"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
@@ -93,7 +94,7 @@ func TestServeHTTP(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			s, err := New(test.Context(), config.Interop{
+			s, err := NewServer(test.Context(), config.InteropServer{
 				SenderClientCAs: map[string]string{
 					"000001": "testdata/clientca.pem",
 				},
