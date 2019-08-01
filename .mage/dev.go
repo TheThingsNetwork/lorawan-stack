@@ -32,7 +32,7 @@ func (Dev) Certificates() error {
 			return nil
 		}
 	}
-	return execGo("run", path.Join(runtime.GOROOT(), "src", "crypto", "tls", "generate_cert.go"), "-ca", "-host", "localhost")
+	return execGo("run", path.Join(runtime.GOROOT(), "src", "crypto", "tls", "generate_cert.go"), "-ca", "-host", "localhost,*.localhost")
 }
 
 func init() {
