@@ -17,6 +17,7 @@
 
 const fs = require('fs')
 const api = require('../generated/api.json')
+const allowedFieldMaskPaths = require('../generated/allowed-field-masks.json')
 
 function map (files) {
   const result = {}
@@ -29,7 +30,11 @@ function map (files) {
       result[service.name] = {}
 
       for (const method of service.methods) {
-        result[service.name][method.name] = { file: file.name, http: []}
+        result[service.name][method.name] = {
+          file: file.name,
+          http: [],
+          allowed_field_masks: allowedFieldMaskPaths[`/${service.fullName}/${method.name}`],
+        }
 
         if (method.options && method.options['google.api.http']) {
           for (const rule of method.options['google.api.http'].rules) {
