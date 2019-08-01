@@ -2933,6 +2933,15 @@
       "file": "basicstationlns.go"
     }
   },
+  "error:pkg/gatewayserver/io/basicstationlns:invalid_gateway_id": {
+    "translations": {
+      "en": "invalid gateway id `{id}`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/basicstationlns",
+      "file": "basicstationlns.go"
+    }
+  },
   "error:pkg/gatewayserver/io/basicstationlns:listener": {
     "translations": {
       "en": "failed to serve Basic Station frontend listener"
