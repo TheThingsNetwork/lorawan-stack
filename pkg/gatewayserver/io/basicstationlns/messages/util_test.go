@@ -52,6 +52,26 @@ func TestGetDataRatesFromFrequencyPlan(t *testing.T) {
 				[3]int{7, 250, 0},
 			},
 		},
+		{
+			Name:   "ValidBAndIDUS",
+			BandID: "US_902_928",
+			DataRates: DataRates{
+				[3]int{10, 125, 0},
+				[3]int{9, 125, 0},
+				[3]int{8, 125, 0},
+				[3]int{7, 125, 0},
+				[3]int{8, 500, 0},
+				[3]int{0, 0, 0},
+				[3]int{0, 0, 0},
+				[3]int{0, 0, 0},
+				[3]int{12, 500, 0},
+				[3]int{11, 500, 0},
+				[3]int{10, 500, 0},
+				[3]int{9, 500, 0},
+				[3]int{8, 500, 0},
+				[3]int{7, 500, 0},
+			},
+		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			drs, err := getDataRatesFromBandID(tc.BandID)
