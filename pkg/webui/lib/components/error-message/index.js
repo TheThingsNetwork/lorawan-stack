@@ -18,7 +18,7 @@ import classnames from 'classnames'
 import Message from '../message'
 
 import PropTypes from '../../prop-types'
-import sharedMessages from '../../shared-messages'
+import errorMessages from '../../errors/error-messages'
 
 import {
   isBackend,
@@ -48,7 +48,7 @@ const ErrorMessage = function ({ content, ...rest }) {
     props.content = content
   } else {
     // Fall back to generic error message
-    props.content = sharedMessages.genericError
+    props.content = errorMessages.genericError
   }
 
   return <Message {...props} />
