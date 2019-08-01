@@ -34,6 +34,7 @@ import SubmitBar from '../../../components/submit-bar'
 
 import { selectSelectedApplication } from '../../store/selectors/applications'
 import { updateApplication, deleteApplication } from '../../store/actions/applications'
+import { attachPromise } from '../../store/actions/lib'
 
 const m = defineMessages({
   basics: 'Basics',
@@ -54,8 +55,8 @@ const validationSchema = Yup.object().shape({
   application: selectSelectedApplication(state),
 }),
 {
-  updateApplication,
-  deleteApplication,
+  updateApplication: attachPromise(updateApplication),
+  deleteApplication: attachPromise(deleteApplication),
 })
 @withBreadcrumb('apps.single.general-settings', function (props) {
   const { appId } = props

@@ -32,6 +32,7 @@ import IntlHelmet from '../../../lib/components/intl-helmet'
 import diff from '../../../lib/diff'
 
 import { updateGateway, deleteGateway } from '../../store/actions/gateways'
+import { attachPromise } from '../../store/actions/lib'
 import { getGatewayId } from '../../../lib/selectors/id'
 import { selectSelectedGateway } from '../../store/selectors/gateways'
 
@@ -49,7 +50,10 @@ const m = defineMessages({
     gateway,
   }
 },
-{ updateGateway, deleteGateway })
+{
+  updateGateway: attachPromise(updateGateway),
+  deleteGateway: attachPromise(deleteGateway),
+})
 @withBreadcrumb('gateways.single.general-settings', function (props) {
   const { gtwId } = props
 

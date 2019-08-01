@@ -19,7 +19,7 @@
  * @returns {Object} The middleware
  */
 const requestPromiseMiddleware = store => next => function (action) {
-  if (action.type.endsWith('_REQUEST')) {
+  if (action.meta && action.meta._attachPromise) {
     return new Promise(function (resolve, reject) {
       action.meta = {
         ...action.meta,
