@@ -108,16 +108,13 @@ func getDataRatesFromBandID(id string) (DataRates, error) {
 		dr[2] = 0
 	}
 
-	i := 0
-	for _, dr := range band.DataRates {
+	for i, dr := range band.DataRates {
 		if loraDR := dr.Rate.GetLoRa(); loraDR != nil {
 			loraDR.GetSpreadingFactor()
 			drs[i][0] = int(loraDR.GetSpreadingFactor())
 			drs[i][1] = int(loraDR.GetBandwidth() / 1000)
-			i++
 		} else if fskDR := dr.Rate.GetFSK(); fskDR != nil {
 			drs[i][0] = 0 // must be set to 0 for FSK, the BW field is ignored.
-			i++
 		}
 	}
 	return drs, nil
