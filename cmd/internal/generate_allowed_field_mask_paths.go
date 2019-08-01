@@ -25,7 +25,7 @@ import (
 )
 
 func main() {
-	messagesFile := "sdk/js/generated/allowed-field-masks.json"
+	messagesFile := "sdk/js/generated/allowed-field-mask-paths.json"
 	if len(os.Args) == 2 {
 		messagesFile = os.Args[1]
 	}

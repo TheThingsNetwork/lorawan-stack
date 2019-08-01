@@ -276,8 +276,3 @@ nextLine:
 func (g Go) Messages() error {
 	return execGo("run", "./cmd/internal/generate_i18n.go")
 }
-
-// AllowedFieldMaskPaths builds the allowed field masks file based on the ttnpb package.
-func (g Go) AllowedFieldMaskPaths() error {
-	return execGo("run", "./cmd/internal/generate_allowed_field_masks.go")
-}

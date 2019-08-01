@@ -151,7 +151,7 @@
           ]
         }
       ],
-      "allowed_field_masks": [
+      "allowedFieldMaskPaths": [
         "attributes",
         "contact_info",
         "created_at",
@@ -185,7 +185,7 @@
           ]
         }
       ],
-      "allowed_field_masks": [
+      "allowedFieldMaskPaths": [
         "attributes",
         "contact_info",
         "created_at",
@@ -208,7 +208,7 @@
           ]
         }
       ],
-      "allowed_field_masks": [
+      "allowedFieldMaskPaths": [
         "attributes",
         "contact_info",
         "created_at",
@@ -291,7 +291,7 @@
           ]
         }
       ],
-      "allowed_field_masks": [
+      "allowedFieldMaskPaths": [
         "api_key",
         "default_formatters",
         "default_formatters.down_formatter",
@@ -313,7 +313,7 @@
           ]
         }
       ],
-      "allowed_field_masks": [
+      "allowedFieldMaskPaths": [
         "api_key",
         "default_formatters",
         "default_formatters.down_formatter",
@@ -361,7 +361,7 @@
           ]
         }
       ],
-      "allowed_field_masks": [
+      "allowedFieldMaskPaths": [
         "formatters",
         "formatters.down_formatter",
         "formatters.down_formatter_parameter",
@@ -416,7 +416,7 @@
           ]
         }
       ],
-      "allowed_field_masks": [
+      "allowedFieldMaskPaths": [
         "formatters",
         "formatters.down_formatter",
         "formatters.down_formatter_parameter",
@@ -477,7 +477,7 @@
           ]
         }
       ],
-      "allowed_field_masks": [
+      "allowedFieldMaskPaths": [
         "base_topic",
         "created_at",
         "downlink_ack",
@@ -522,7 +522,7 @@
           ]
         }
       ],
-      "allowed_field_masks": [
+      "allowedFieldMaskPaths": [
         "base_topic",
         "created_at",
         "downlink_ack",
@@ -577,7 +577,7 @@
           ]
         }
       ],
-      "allowed_field_masks": [
+      "allowedFieldMaskPaths": [
         "base_topic",
         "created_at",
         "downlink_ack",
@@ -647,7 +647,7 @@
           ]
         }
       ],
-      "allowed_field_masks": [
+      "allowedFieldMaskPaths": [
         "base_url",
         "description",
         "documentation_url",
@@ -686,7 +686,7 @@
           "parameters": []
         }
       ],
-      "allowed_field_masks": [
+      "allowedFieldMaskPaths": [
         "base_url",
         "description",
         "documentation_url",
@@ -728,7 +728,7 @@
           ]
         }
       ],
-      "allowed_field_masks": [
+      "allowedFieldMaskPaths": [
         "base_url",
         "created_at",
         "downlink_ack",
@@ -770,7 +770,7 @@
           ]
         }
       ],
-      "allowed_field_masks": [
+      "allowedFieldMaskPaths": [
         "base_url",
         "created_at",
         "downlink_ack",
@@ -822,7 +822,7 @@
           ]
         }
       ],
-      "allowed_field_masks": [
+      "allowedFieldMaskPaths": [
         "base_url",
         "created_at",
         "downlink_ack",
@@ -967,7 +967,7 @@
           ]
         }
       ],
-      "allowed_field_masks": [
+      "allowedFieldMaskPaths": [
         "attributes",
         "contact_info",
         "created_at",
@@ -1007,7 +1007,7 @@
           ]
         }
       ],
-      "allowed_field_masks": [
+      "allowedFieldMaskPaths": [
         "attributes",
         "contact_info",
         "created_at",
@@ -1036,7 +1036,7 @@
           ]
         }
       ],
-      "allowed_field_masks": [
+      "allowedFieldMaskPaths": [
         "attributes",
         "contact_info",
         "created_at",
@@ -1127,7 +1127,7 @@
           ]
         }
       ],
-      "allowed_field_masks": [
+      "allowedFieldMaskPaths": [
         "application_server_address",
         "attributes",
         "created_at",
@@ -1162,7 +1162,7 @@
           ]
         }
       ],
-      "allowed_field_masks": [
+      "allowedFieldMaskPaths": [
         "application_server_address",
         "attributes",
         "created_at",
@@ -1199,7 +1199,7 @@
           ]
         }
       ],
-      "allowed_field_masks": [
+      "allowedFieldMaskPaths": [
         "application_server_address",
         "attributes",
         "description",
@@ -1428,7 +1428,7 @@
           ]
         }
       ],
-      "allowed_field_masks": [
+      "allowedFieldMaskPaths": [
         "antennas",
         "attributes",
         "auto_update",
@@ -1482,7 +1482,7 @@
           ]
         }
       ],
-      "allowed_field_masks": [
+      "allowedFieldMaskPaths": [
         "antennas",
         "attributes",
         "auto_update",
@@ -1521,7 +1521,7 @@
           ]
         }
       ],
-      "allowed_field_masks": [
+      "allowedFieldMaskPaths": [
         "antennas",
         "attributes",
         "auto_update",
@@ -1644,7 +1644,7 @@
           ]
         }
       ],
-      "allowed_field_masks": [
+      "allowedFieldMaskPaths": [
         "application_server_address",
         "claim_authentication_code",
         "claim_authentication_code.value",
@@ -1696,7 +1696,7 @@
           ]
         }
       ],
-      "allowed_field_masks": [
+      "allowedFieldMaskPaths": [
         "application_server_address",
         "claim_authentication_code",
         "claim_authentication_code.value",
@@ -1851,7 +1851,7 @@
           ]
         }
       ],
-      "allowed_field_masks": [
+      "allowedFieldMaskPaths": [
         "battery_percentage",
         "created_at",
         "downlink_margin",
@@ -2152,7 +2152,7 @@
           ]
         }
       ],
-      "allowed_field_masks": [
+      "allowedFieldMaskPaths": [
         "frequency_plan_id",
         "ids",
         "ids.application_ids",
@@ -2424,7 +2424,7 @@
           ]
         }
       ],
-      "allowed_field_masks": [
+      "allowedFieldMaskPaths": [
         "attributes",
         "contact_info",
         "created_at",
@@ -2451,7 +2451,7 @@
           ]
         }
       ],
-      "allowed_field_masks": [
+      "allowedFieldMaskPaths": [
         "attributes",
         "contact_info",
         "created_at",
@@ -2474,7 +2474,7 @@
           ]
         }
       ],
-      "allowed_field_masks": [
+      "allowedFieldMaskPaths": [
         "attributes",
         "contact_info",
         "created_at",
@@ -2510,7 +2510,7 @@
           ]
         }
       ],
-      "allowed_field_masks": [
+      "allowedFieldMaskPaths": [
         "application_server_address",
         "attributes",
         "created_at",
@@ -2545,7 +2545,7 @@
           "parameters": []
         }
       ],
-      "allowed_field_masks": [
+      "allowedFieldMaskPaths": [
         "attributes",
         "contact_info",
         "created_at",
@@ -2565,7 +2565,7 @@
           "parameters": []
         }
       ],
-      "allowed_field_masks": [
+      "allowedFieldMaskPaths": [
         "attributes",
         "contact_info",
         "created_at",
@@ -2591,7 +2591,7 @@
           "parameters": []
         }
       ],
-      "allowed_field_masks": [
+      "allowedFieldMaskPaths": [
         "antennas",
         "attributes",
         "auto_update",
@@ -2627,7 +2627,7 @@
           "parameters": []
         }
       ],
-      "allowed_field_masks": [
+      "allowedFieldMaskPaths": [
         "attributes",
         "contact_info",
         "created_at",
@@ -2647,7 +2647,7 @@
           "parameters": []
         }
       ],
-      "allowed_field_masks": [
+      "allowedFieldMaskPaths": [
         "admin",
         "attributes",
         "contact_info",
@@ -2795,7 +2795,7 @@
           ]
         }
       ],
-      "allowed_field_masks": [
+      "allowedFieldMaskPaths": [
         "admin",
         "attributes",
         "contact_info",
@@ -2832,7 +2832,7 @@
           ]
         }
       ],
-      "allowed_field_masks": [
+      "allowedFieldMaskPaths": [
         "admin",
         "attributes",
         "contact_info",
