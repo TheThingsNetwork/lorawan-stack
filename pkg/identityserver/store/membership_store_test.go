@@ -156,6 +156,11 @@ func TestMembershipStore(t *testing.T) {
 					a.So(errors.IsNotFound(err), should.BeTrue)
 				}
 
+				memberships, err := store.FindMemberships(ctx, tt.Identifiers, tt.EntityType, false)
+				if a.So(err, should.BeNil) {
+					a.So(memberships, should.BeEmpty)
+				}
+
 				// set membership
 				err = store.SetMember(ctx,
 					tt.Identifiers,
@@ -167,6 +172,13 @@ func TestMembershipStore(t *testing.T) {
 				memberEntityRights, err = store.GetMember(ctx, tt.Identifiers, tt.MemberIdentifiers)
 				a.So(err, should.BeNil)
 				a.So(memberEntityRights.GetRights(), should.Resemble, tt.Rights)
+
+				memberships, err = store.FindMemberships(ctx, tt.Identifiers, tt.EntityType, false)
+				if a.So(err, should.BeNil) {
+					if a.So(memberships, should.HaveLength, 1) {
+						a.So(memberships[0], should.Resemble, tt.MemberIdentifiers)
+					}
+				}
 
 				members, err := store.FindMembers(ctx, tt.MemberIdentifiers)
 				a.So(err, should.BeNil)
@@ -218,6 +230,11 @@ func TestMembershipStore(t *testing.T) {
 				memberEntityRights, err = store.GetMember(ctx, tt.Identifiers, tt.MemberIdentifiers)
 				if a.So(err, should.NotBeNil) {
 					a.So(errors.IsNotFound(err), should.BeTrue)
+				}
+
+				memberships, err = store.FindMemberships(ctx, tt.Identifiers, tt.EntityType, false)
+				if a.So(err, should.BeNil) {
+					a.So(memberships, should.BeEmpty)
 				}
 
 				memberRights, err = store.FindMemberRights(ctx, tt.Identifiers, tt.EntityType)

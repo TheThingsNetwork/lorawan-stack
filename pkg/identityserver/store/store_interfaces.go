@@ -118,6 +118,9 @@ type UserSessionStore interface {
 // - Any (successful or unsuccessful) call to SetMember expires the caches
 //   for (entity_type,entity_id) and (account_id,[entityType]).
 type MembershipStore interface {
+	// Find direct and optionally also indirect memberships of the organization or user.
+	FindMemberships(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityType string, includeIndirect bool) ([]ttnpb.Identifiers, error)
+
 	// Find direct members and rights of the given entity.
 	FindMembers(ctx context.Context, entityID ttnpb.Identifiers) (map[*ttnpb.OrganizationOrUserIdentifiers]*ttnpb.Rights, error)
 	// Find direct member rights of the given organization or user. The entityType may be omitted.

@@ -33,6 +33,49 @@ type membershipStore struct {
 	*store
 }
 
+func (s *membershipStore) FindMemberships(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityType string, includeIndirect bool) ([]ttnpb.Identifiers, error) {
+	defer trace.StartRegion(ctx, fmt.Sprintf("find %s memberships of %s", entityType, id.IDString())).End()
+	accountQuery := s.query(ctx, Account{}).
+		Select(`"accounts"."id"`).
+		Where(fmt.Sprintf(`"accounts"."account_type" = '%s' AND "accounts"."uid" = ?`, id.EntityType()), id.IDString()).
+		QueryExpr()
+	query := s.query(ctx, modelForEntityType(entityType))
+	if entityType == "organization" {
+		query = query.Table("accounts").
+			Select(`DISTINCT "accounts"."uid" AS "friendly_id"`).
+			Joins(fmt.Sprintf(`JOIN "memberships" ON "memberships"."entity_type" = '%s' AND "memberships"."entity_id" = "accounts"."account_id"`, entityType))
+	} else {
+		query = query.
+			Select(fmt.Sprintf(`DISTINCT "%[1]ss"."%[1]s_id" AS "friendly_id"`, entityType)).
+			Joins(fmt.Sprintf(`JOIN "memberships" ON "memberships"."entity_type" = '%[1]s' AND "memberships"."entity_id" = "%[1]ss"."id"`, entityType))
+	}
+	query = query.Order(`"friendly_id"`).
+		Where(fmt.Sprintf(`"memberships"."entity_type" = '%s' AND "memberships"."account_id" = (?)`, entityType), accountQuery)
+	if includeIndirect && id.EntityType() == "user" {
+		organizationQuery := s.query(ctx, Account{}).
+			Select(`"accounts"."id"`).
+			Joins(`JOIN "memberships" ON "memberships"."entity_type" = "accounts"."account_type" AND "memberships"."entity_id" = "accounts"."account_id"`).
+			Where(`"memberships"."account_id" IN (?)`, accountQuery).
+			QueryExpr()
+		query = query.Or(`"memberships"."account_id" IN (?)`, organizationQuery)
+	}
+	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
+		countTotal(ctx, query)
+		query = query.Limit(limit).Offset(offset)
+	}
+	var results []struct {
+		FriendlyID string
+	}
+	if err := query.Scan(&results).Error; err != nil {
+		return nil, err
+	}
+	identifiers := make([]ttnpb.Identifiers, len(results))
+	for i, result := range results {
+		identifiers[i] = buildIdentifiers(entityType, result.FriendlyID)
+	}
+	return identifiers, nil
+}
+
 func (s *membershipStore) FindMembers(ctx context.Context, entityID ttnpb.Identifiers) (map[*ttnpb.OrganizationOrUserIdentifiers]*ttnpb.Rights, error) {
 	defer trace.StartRegion(ctx, fmt.Sprintf("find members of %s", entityID.EntityType())).End()
 	entity, err := s.findEntity(ctx, entityID, "id")
