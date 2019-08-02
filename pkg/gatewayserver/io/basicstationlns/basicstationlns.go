@@ -208,19 +208,19 @@ func (s *srv) handleTraffic(c echo.Context) error {
 		return err
 	}
 
+	uid := unique.ID(ctx, ids)
+	ctx = log.NewContextWithField(ctx, "gateway_uid", uid)
+
 	// For gateways with valid EUIs and no auth, we provide the link rights ourselves as in the udp frontend.
 	if auth == "" {
 		ctx = rights.NewContext(ctx, rights.Rights{
 			GatewayRights: map[string]*ttnpb.Rights{
-				id: {
+				uid: {
 					Rights: []ttnpb.Right{ttnpb.RIGHT_GATEWAY_LINK},
 				},
 			},
 		})
 	}
-
-	uid := unique.ID(ctx, ids)
-	ctx = log.NewContextWithField(ctx, "gateway_uid", uid)
 
 	conn, err := s.server.Connect(ctx, s, ids)
 	if err != nil {
