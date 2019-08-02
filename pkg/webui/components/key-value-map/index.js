@@ -35,8 +35,11 @@ class KeyValueMap extends React.PureComponent {
   }
 
   removeEntry (index) {
-    const { onChange, value } = this.props
+    const { onChange, onBlur, value } = this.props
     onChange(value.filter((_, i) => (i !== index)) || [])
+
+    // Trigger also the onBlur event to enforce revalidation
+    onBlur()
   }
 
   addEmptyEntry () {
@@ -52,6 +55,7 @@ class KeyValueMap extends React.PureComponent {
       keyPlaceholder,
       valuePlaceholder,
       addMessage,
+      onBlur,
     } = this.props
 
     return (
@@ -67,6 +71,7 @@ class KeyValueMap extends React.PureComponent {
               index={index}
               onRemoveButtonClick={this.removeEntry}
               onChange={this.handleEntryChange}
+              onBlur={onBlur}
             />
           ))}
         </div>
@@ -91,6 +96,8 @@ KeyValueMap.propTypes = {
   keyPlaceholder: PropTypes.message.isRequired,
   valuePlaceholder: PropTypes.message.isRequired,
   addMessage: PropTypes.message,
+  onChange: PropTypes.func,
+  onBlur: PropTypes.func,
 }
 
 KeyValueMap.defaultProps = {

@@ -34,18 +34,6 @@ import { mapWebhookToFormValues, mapFormValuesToWebhook, blankValues } from './m
 
 const pathPlaceholder = '/path/to/webhook'
 
-const validationSchema = Yup.object().shape({
-  webhook_id: Yup.string()
-    .matches(webhookIdRegexp, sharedMessages.validateAlphanum)
-    .min(2, sharedMessages.validateTooShort)
-    .max(25, sharedMessages.validateTooLong)
-    .required(sharedMessages.validateRequired),
-  format: Yup.string().required(sharedMessages.validateRequired),
-  base_url: Yup.string()
-    .url(sharedMessages.validateUrl)
-    .required(sharedMessages.validateRequired),
-})
-
 const m = defineMessages({
   idPlaceholder: 'my-new-webhook',
   messageTypes: 'Message types',
@@ -65,6 +53,30 @@ const m = defineMessages({
   headersKeyPlaceholder: 'Authorization',
   headersValuePlaceholder: 'Bearer my-auth-token',
   headersAdd: 'Add header entry',
+  headersValidateRequired: 'All header entry values are required. Please remove empty entries.',
+})
+
+const headerCheck = headers =>
+  headers === undefined
+  || headers instanceof Array
+  && (headers.length === 0
+    || headers.every(header =>
+      header.key !== ''
+      && header.value !== ''
+    )
+  )
+
+const validationSchema = Yup.object().shape({
+  webhook_id: Yup.string()
+    .matches(webhookIdRegexp, sharedMessages.validateAlphanum)
+    .min(2, sharedMessages.validateTooShort)
+    .max(25, sharedMessages.validateTooLong)
+    .required(sharedMessages.validateRequired),
+  format: Yup.string().required(sharedMessages.validateRequired),
+  headers: Yup.array().test('has no empty string values', m.headersValidateRequired, headerCheck),
+  base_url: Yup.string()
+    .url(sharedMessages.validateUrl)
+    .required(sharedMessages.validateRequired),
 })
 
 @bind

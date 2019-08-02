@@ -51,6 +51,7 @@ class Entry extends React.Component {
       keyPlaceholder,
       valuePlaceholder,
       value,
+      onBlur,
     } = this.props
 
     return (
@@ -62,7 +63,6 @@ class Entry extends React.Component {
           type="text"
           onChange={this.handleKeyChanged}
           value={value.key}
-          required
         />
         <Input
           className={style.input}
@@ -70,8 +70,8 @@ class Entry extends React.Component {
           placeholder={valuePlaceholder}
           type="text"
           onChange={this.handleValueChanged}
+          onBlur={onBlur}
           value={value.value}
-          required
         />
         <Button
           type="button"
@@ -92,13 +92,9 @@ Entry.propTypes = {
   keyPlaceholder: PropTypes.message.isRequired,
   valuePlaceholder: PropTypes.message.isRequired,
   index: PropTypes.number.isRequired,
-  onRemoveButtonClick: PropTypes.func,
-  onChange: PropTypes.func,
-}
-
-Entry.defaultProps = {
-  onRemoveButtonClicked: () => null,
-  onChange: () => null,
+  onRemoveButtonClick: PropTypes.func.isRequired,
+  onChange: PropTypes.func.isRequired,
+  onBlur: PropTypes.func.isRequired,
 }
 
 export default Entry
