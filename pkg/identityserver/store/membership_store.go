@@ -134,24 +134,19 @@ var errMembershipNotFound = errors.DefineNotFound(
 
 func (s *membershipStore) GetMember(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityID ttnpb.Identifiers) (*ttnpb.Rights, error) {
 	defer trace.StartRegion(ctx, "get membership").End()
-	account, err := s.findAccount(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-	entity, err := s.findEntity(ctx, entityID, "id")
-	if err != nil {
-		return nil, err
-	}
-	if err := ctx.Err(); err != nil { // Early exit if context canceled
-		return nil, err
-	}
-	query := s.query(ctx, Membership{})
+	accountQuery := s.query(ctx, Account{}).
+		Select(`"accounts"."id"`).
+		Where(fmt.Sprintf(`"accounts"."account_type" = '%s' AND "accounts"."uid" = ?`, id.EntityType()), id.IDString()).
+		QueryExpr()
+	entityQuery := s.query(ctx, modelForID(entityID), withID(entityID)).
+		Select(fmt.Sprintf(`"%ss"."id"`, entityID.EntityType())).
+		QueryExpr()
+	query := s.query(ctx, &Membership{}).
+		Select(`"memberships"."rights"`).
+		Where(`"memberships"."account_id" = (?)`, accountQuery).
+		Where(fmt.Sprintf(`"memberships"."entity_type" = '%s' AND "memberships"."entity_id" = (?)`, entityID.EntityType()), entityQuery)
 	var membership Membership
-	err = query.Where(&Membership{
-		AccountID:  account.PrimaryKey(),
-		EntityID:   entity.PrimaryKey(),
-		EntityType: entityTypeForID(entityID),
-	}).First(&membership).Error
+	err := query.First(&membership).Error
 	if err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return nil, errMembershipNotFound.WithAttributes(
