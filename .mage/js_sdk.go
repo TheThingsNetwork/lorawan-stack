@@ -129,7 +129,7 @@ func (JsSDK) CleanDeps() {
 
 // Definitions extracts the api-definition.json from the proto generated api.json.
 func (k JsSDK) Definitions() error {
-	mg.Deps(Proto.JsSDK)
+	mg.Deps(Proto.JsSDK, JsSDK.AllowedFieldMaskPaths)
 	changed, err := target.Path(
 		filepath.Join("sdk", "js", "generated", "api-definition.json"),
 		filepath.Join("sdk", "js", "generated", "api.json"),
@@ -140,7 +140,6 @@ func (k JsSDK) Definitions() error {
 	if !changed {
 		return nil
 	}
-	mg.Deps(JsSDK.AllowedFieldMaskPaths)
 	if mg.Verbose() {
 		fmt.Println("Extracting api definitions from protos…")
 	}
@@ -187,5 +186,13 @@ func (k JsSDK) Link() error {
 
 // AllowedFieldMaskPaths builds the allowed field masks file based on the ttnpb package.
 func (k JsSDK) AllowedFieldMaskPaths() error {
+	changed, err := target.Path(filepath.Join("sdk", "js", "generated", "allowed-field-mask-paths.json"),
+		filepath.Join("pkg", "ttnpb", "field_mask_validation.go"))
+	if err != nil {
+		return err
+	}
+	if !changed {
+		return nil
+	}
 	return execGo("run", "./cmd/internal/generate_allowed_field_mask_paths.go")
 }
