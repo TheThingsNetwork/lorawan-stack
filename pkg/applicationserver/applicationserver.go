@@ -37,6 +37,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
+	"go.thethings.network/lorawan-stack/pkg/interop"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/messageprocessors"
 	"go.thethings.network/lorawan-stack/pkg/messageprocessors/cayennelpp"
@@ -69,6 +70,9 @@ type ApplicationServer struct {
 		asDevices asEndDeviceRegistryServer
 		appAs     ttnpb.AppAsServer
 	}
+
+	interopClient InteropClient
+	interopID     string
 }
 
 // Context returns the context of the Application Server.
@@ -89,9 +93,20 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 	if err != nil {
 		return nil, err
 	}
+
+	ctx := log.NewContextWithField(c.Context(), "namespace", "applicationserver")
+
+	var interopCl InteropClient
+	if conf.Interop.ConfigURI != "" {
+		interopCl, err = interop.NewClient(ctx, conf.Interop.ClientConfig, nil)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	as = &ApplicationServer{
 		Component:      c,
-		ctx:            log.NewContextWithField(c.Context(), "namespace", "applicationserver"),
+		ctx:            ctx,
 		linkMode:       linkMode,
 		linkRegistry:   conf.Links,
 		deviceRegistry: conf.Devices,
@@ -106,6 +121,8 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 				ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP: cayennelpp.New(),
 			},
 		},
+		interopClient: interopCl,
+		interopID:     conf.Interop.ID,
 	}
 
 	as.grpc.asDevices = asEndDeviceRegistryServer{AS: as}
@@ -401,21 +418,29 @@ func (as *ApplicationServer) DownlinkQueueList(ctx context.Context, ids ttnpb.En
 var errJSUnavailable = errors.DefineUnavailable("join_server_unavailable", "Join Server unavailable for JoinEUI `{join_eui}`")
 
 func (as *ApplicationServer) fetchAppSKey(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, sessionKeyID []byte) (ttnpb.KeyEnvelope, error) {
-	// TODO: Lookup Join Server (https://github.com/TheThingsNetwork/lorawan-stack/issues/4)
-	js := as.GetPeer(ctx, ttnpb.PeerInfo_JOIN_SERVER, ids)
-	if js == nil {
-		return ttnpb.KeyEnvelope{}, errJSUnavailable.WithAttributes("join_eui", *ids.JoinEUI)
-	}
-	client := ttnpb.NewAsJsClient(js.Conn())
 	req := &ttnpb.SessionKeyRequest{
 		SessionKeyID: sessionKeyID,
 		DevEUI:       *ids.DevEUI,
 	}
-	res, err := client.GetAppSKey(ctx, req, as.WithClusterAuth())
-	if err != nil {
-		return ttnpb.KeyEnvelope{}, err
+	if js := as.GetPeer(ctx, ttnpb.PeerInfo_JOIN_SERVER, ids); js != nil {
+		res, err := ttnpb.NewAsJsClient(js.Conn()).GetAppSKey(ctx, req, as.WithClusterAuth())
+		if err == nil {
+			return res.AppSKey, nil
+		}
+		if !errors.IsNotFound(err) {
+			return ttnpb.KeyEnvelope{}, err
+		}
 	}
-	return res.AppSKey, nil
+	if as.interopClient != nil {
+		res, err := as.interopClient.GetAppSKey(ctx, as.interopID, req)
+		if err == nil {
+			return res.AppSKey, nil
+		}
+		if !errors.IsNotFound(err) {
+			return ttnpb.KeyEnvelope{}, err
+		}
+	}
+	return ttnpb.KeyEnvelope{}, errJSUnavailable.WithAttributes("join_eui", *ids.JoinEUI)
 }
 
 func (as *ApplicationServer) handleUp(ctx context.Context, up *ttnpb.ApplicationUp, link *link) error {

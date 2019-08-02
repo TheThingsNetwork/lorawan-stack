@@ -24,7 +24,9 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/web"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/interop"
 	"go.thethings.network/lorawan-stack/pkg/log"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 // LinkMode defines how applications are linked to their Network Server.
@@ -37,6 +39,17 @@ const (
 	LinkExplicit
 )
 
+// InteropClient is a client, which Application Server can use for interoperability.
+type InteropClient interface {
+	GetAppSKey(ctx context.Context, asID string, req *ttnpb.SessionKeyRequest) (*ttnpb.AppSKeyResponse, error)
+}
+
+// InteropConfig represents interoperability client configuration.
+type InteropConfig struct {
+	interop.ClientConfig `name:",squash"`
+	ID                   string `name:"id" description:"AS-ID used for interoperability"`
+}
+
 // Config represents the ApplicationServer configuration.
 type Config struct {
 	LinkMode string         `name:"link-mode" description:"Mode to link applications to their Network Server (all, explicit)"`
@@ -45,6 +58,7 @@ type Config struct {
 	MQTT     MQTTConfig     `name:"mqtt" description:"MQTT configuration"`
 	Webhooks WebhooksConfig `name:"webhooks" description:"Webhooks configuration"`
 	PubSub   PubSubConfig   `name:"pubsub" description:"Pub/sub messaging configuration"`
+	Interop  InteropConfig  `name:"interop" description:"Interop client configuration"`
 }
 
 var errLinkMode = errors.DefineInvalidArgument("link_mode", "invalid link mode `{value}`")
