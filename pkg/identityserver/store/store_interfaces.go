@@ -120,6 +120,8 @@ type UserSessionStore interface {
 type MembershipStore interface {
 	// Find direct and optionally also indirect memberships of the organization or user.
 	FindMemberships(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityType string, includeIndirect bool) ([]ttnpb.Identifiers, error)
+	// Find indirect memberships (through organizations) between the user and entity.
+	FindIndirectMemberships(ctx context.Context, userID *ttnpb.UserIdentifiers, entityID ttnpb.Identifiers) ([]IndirectMembership, error)
 
 	// Find direct members and rights of the given entity.
 	FindMembers(ctx context.Context, entityID ttnpb.Identifiers) (map[*ttnpb.OrganizationOrUserIdentifiers]*ttnpb.Rights, error)

@@ -76,6 +76,48 @@ func (s *membershipStore) FindMemberships(ctx context.Context, id *ttnpb.Organiz
 	return identifiers, nil
 }
 
+// IndirectMembership returns an indirect membership through an organization.
+type IndirectMembership struct {
+	RightsOnOrganization *ttnpb.Rights
+	*ttnpb.OrganizationIdentifiers
+	OrganizationRights *ttnpb.Rights
+}
+
+func (s *membershipStore) FindIndirectMemberships(ctx context.Context, userID *ttnpb.UserIdentifiers, entityID ttnpb.Identifiers) ([]IndirectMembership, error) {
+	defer trace.StartRegion(ctx, fmt.Sprintf("find indirect memberships of user on %s", entityID.EntityType())).End()
+	userQuery := s.query(ctx, Account{}).
+		Select(`"accounts"."id"`).
+		Where(`"accounts"."account_type" = 'user' AND "accounts"."uid" = ?`, userID.IDString()).
+		QueryExpr()
+	entityQuery := s.query(ctx, modelForID(entityID), withID(entityID)).
+		Select(fmt.Sprintf(`"%ss"."id"`, entityID.EntityType())).
+		QueryExpr()
+	query := s.query(ctx, Account{}).
+		Select(`"usr_memberships"."rights" AS "usr_rights", "accounts"."uid" AS "organization_id", "entity_memberships"."rights" AS "entity_rights"`).
+		Joins(`JOIN "memberships" "usr_memberships" ON "usr_memberships"."entity_type" = 'organization' AND "usr_memberships"."entity_id" = "accounts"."account_id"`).
+		Joins(`JOIN "memberships" "entity_memberships" ON "entity_memberships"."account_id" = "accounts"."id"`).
+		Where(`"usr_memberships"."account_id" = (?)`, userQuery).
+		Where(fmt.Sprintf(`"entity_memberships"."entity_type" = '%s' AND "entity_memberships"."entity_id" = (?)`, entityID.EntityType()), entityQuery)
+	var res []struct {
+		UsrRights      Rights
+		OrganizationID string
+		EntityRights   Rights
+	}
+	if err := query.Scan(&res).Error; err != nil {
+		return nil, err
+	}
+	commonOrganizations := make([]IndirectMembership, len(res))
+	for i, res := range res {
+		usrRights, entityRights := ttnpb.Rights(res.UsrRights), ttnpb.Rights(res.EntityRights)
+		commonOrganizations[i] = IndirectMembership{
+			RightsOnOrganization:    &usrRights,
+			OrganizationIdentifiers: &ttnpb.OrganizationIdentifiers{OrganizationID: res.OrganizationID},
+			OrganizationRights:      &entityRights,
+		}
+	}
+	return commonOrganizations, nil
+}
+
 func (s *membershipStore) FindMembers(ctx context.Context, entityID ttnpb.Identifiers) (map[*ttnpb.OrganizationOrUserIdentifiers]*ttnpb.Rights, error) {
 	defer trace.StartRegion(ctx, fmt.Sprintf("find members of %s", entityID.EntityType())).End()
 	entity, err := s.findEntity(ctx, entityID, "id")

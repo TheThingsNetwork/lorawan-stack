@@ -25,6 +25,62 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
+func TestFindIndirectMemberships(t *testing.T) {
+	ctx := test.Context()
+	a := assertions.New(t)
+
+	WithDB(t, func(t *testing.T, db *gorm.DB) {
+		s := newStore(db)
+		store := GetMembershipStore(db)
+
+		prepareTest(db,
+			&Membership{},
+			&Account{}, &User{}, &Organization{},
+			&Application{},
+		)
+
+		usr := &User{Account: Account{UID: "test-user"}}
+		s.createEntity(ctx, &usr)
+		org1 := &Organization{Account: Account{UID: "test-org-1"}}
+		s.createEntity(ctx, &org1)
+		org2 := &Organization{Account: Account{UID: "test-org-2"}}
+		s.createEntity(ctx, &org2)
+		app := &Application{ApplicationID: "test-app"}
+		s.createEntity(ctx, &app)
+
+		s.createEntity(ctx, &Membership{
+			AccountID:  usr.Account.ID,
+			EntityID:   org1.ID,
+			EntityType: "organization",
+			Rights:     Rights{Rights: []ttnpb.Right{1, 2, 3, 4}},
+		})
+		s.createEntity(ctx, &Membership{
+			AccountID:  usr.Account.ID,
+			EntityID:   org2.ID,
+			EntityType: "organization",
+			Rights:     Rights{Rights: []ttnpb.Right{5, 6, 7, 8}},
+		})
+
+		s.createEntity(ctx, &Membership{
+			AccountID:  org1.Account.ID,
+			EntityID:   app.ID,
+			EntityType: "application",
+			Rights:     Rights{Rights: []ttnpb.Right{2, 3}},
+		})
+		s.createEntity(ctx, &Membership{
+			AccountID:  org2.Account.ID,
+			EntityID:   app.ID,
+			EntityType: "application",
+			Rights:     Rights{Rights: []ttnpb.Right{6, 7}},
+		})
+
+		common, err := store.FindIndirectMemberships(ctx, &ttnpb.UserIdentifiers{UserID: "test-user"}, &ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"})
+		if a.So(err, should.BeNil) {
+			a.So(common, should.HaveLength, 2)
+		}
+	})
+}
+
 func TestMembershipStore(t *testing.T) {
 	ctx := test.Context()
 
