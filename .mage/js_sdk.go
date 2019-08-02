@@ -123,20 +123,24 @@ func (k JsSDK) Clean() {
 }
 
 // CleanDeps removes all installed node packages (rm -rf node_modules).
-func (j JsSDK) CleanDeps() {
+func (JsSDK) CleanDeps() {
 	sh.Rm(filepath.Join("sdk", "js", "node_modules"))
 }
 
 // Definitions extracts the api-definition.json from the proto generated api.json.
 func (k JsSDK) Definitions() error {
 	mg.Deps(Proto.JsSDK)
-	changed, err := target.Path(filepath.Join("sdk", "js", "generated", "api-definition.json"), filepath.Join("sdk", "js", "generated", "api.json"))
+	changed, err := target.Path(
+		filepath.Join("sdk", "js", "generated", "api-definition.json"),
+		filepath.Join("sdk", "js", "generated", "api.json"),
+		filepath.Join("sdk", "js", "generated", "allowed-field-mask-paths.json"))
 	if err != nil {
 		return errors.Wrap(err, "failed checking modtime")
 	}
 	if !changed {
 		return nil
 	}
+	mg.Deps(JsSDK.AllowedFieldMaskPaths)
 	if mg.Verbose() {
 		fmt.Println("Extracting api definitions from protos…")
 	}
@@ -149,6 +153,10 @@ func (k JsSDK) Definitions() error {
 
 // DefinitionsClean removes the generated api-definition.json.
 func (k JsSDK) DefinitionsClean(context.Context) error {
+	err := sh.Rm(filepath.Join("sdk", "js", "generated", "allowed-field-mask-paths.json"))
+	if err != nil {
+		return err
+	}
 	return sh.Rm(filepath.Join("sdk", "js", "generated", "api-definition.json"))
 }
 
@@ -175,4 +183,9 @@ func (k JsSDK) Link() error {
 		return y("link", "ttn-lw")
 	}
 	return nil
+}
+
+// AllowedFieldMaskPaths builds the allowed field masks file based on the ttnpb package.
+func (k JsSDK) AllowedFieldMaskPaths() error {
+	return execGo("run", "./cmd/internal/generate_allowed_field_mask_paths.go")
 }

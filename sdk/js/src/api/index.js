@@ -70,6 +70,8 @@ Signature tried: ${paramSignature}`)
 
           return connector.handleRequest(endpoint.method, route, component, payload, isStream)
         }
+
+        this[serviceName][`${rpcName}AllowedFieldMaskPaths`] = rpc.allowedFieldMaskPaths
       }
     }
   }

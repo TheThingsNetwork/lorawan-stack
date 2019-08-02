@@ -107,7 +107,7 @@ class Marshaler {
     return this.payloadSingleResponse(result, transform)
   }
 
-  static fieldMaskFromPatch (patch) {
+  static fieldMaskFromPatch (patch, whitelist) {
     const paths = []
 
     traverse(patch).map(function (x) {
@@ -120,7 +120,7 @@ class Marshaler {
       }
     })
 
-    return paths
+    return whitelist ? paths.filter(path => whitelist.includes(path)) : paths
   }
 
   /** This function will convert a paths object to a proper field mask.
