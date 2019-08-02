@@ -75,8 +75,8 @@ class DeviceDataForm extends Component {
 
     try {
       const device = await onSubmit(values)
-      resetForm(values)
       if (update) {
+        resetForm(values)
         toast({
           title: deviceId,
           message: m.updateSuccess,
@@ -85,7 +85,7 @@ class DeviceDataForm extends Component {
       }
       await onSubmitSuccess(device)
     } catch (error) {
-      resetForm()
+      setSubmitting(false)
       const err = error instanceof Error ? errorMessages.genericError : error
       await this.setState({ error: err })
     }
