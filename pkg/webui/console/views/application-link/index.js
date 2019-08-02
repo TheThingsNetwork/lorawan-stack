@@ -266,11 +266,11 @@ class ApplicationLink extends React.Component {
                 autoFocus
               />
               <Form.Field
-                type="password"
                 component={Input}
                 required
                 name="api_key"
                 title={sharedMessages.apiKey}
+                code
               />
               <SubmitBar>
                 <Form.Submit
