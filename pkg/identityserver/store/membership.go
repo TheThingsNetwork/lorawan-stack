@@ -102,21 +102,27 @@ func findIdentifiers(db *gorm.DB, entities ...polymorphicEntity) (map[polymorphi
 		}
 		for _, result := range results {
 			entity := polymorphicEntity{EntityType: entityType, EntityUUID: result.UUID}
-			switch entityType {
-			case "application":
-				identifiers[entity] = ttnpb.ApplicationIdentifiers{ApplicationID: result.FriendlyID}
-			case "client":
-				identifiers[entity] = ttnpb.ClientIdentifiers{ClientID: result.FriendlyID}
-			case "gateway":
-				identifiers[entity] = ttnpb.GatewayIdentifiers{GatewayID: result.FriendlyID}
-			case "organization":
-				identifiers[entity] = ttnpb.OrganizationIdentifiers{OrganizationID: result.FriendlyID}
-			case "user":
-				identifiers[entity] = ttnpb.UserIdentifiers{UserID: result.FriendlyID}
-			}
+			identifiers[entity] = buildIdentifiers(entityType, result.FriendlyID)
 		}
 	}
 	return identifiers, nil
+}
+
+func buildIdentifiers(entityType, id string) ttnpb.Identifiers {
+	switch entityType {
+	case "application":
+		return &ttnpb.ApplicationIdentifiers{ApplicationID: id}
+	case "client":
+		return &ttnpb.ClientIdentifiers{ClientID: id}
+	case "gateway":
+		return &ttnpb.GatewayIdentifiers{GatewayID: id}
+	case "organization":
+		return &ttnpb.OrganizationIdentifiers{OrganizationID: id}
+	case "user":
+		return &ttnpb.UserIdentifiers{UserID: id}
+	default:
+		panic(fmt.Sprintf("can't build identifiers for entity type %q", entityType))
+	}
 }
 
 func (s *store) identifierRights(entityRights map[polymorphicEntity]Rights) (map[ttnpb.Identifiers]*ttnpb.Rights, error) {

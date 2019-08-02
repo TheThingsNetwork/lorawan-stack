@@ -67,7 +67,7 @@ func TestMembershipStore(t *testing.T) {
 			{
 				Name:              "User-Application",
 				Identifiers:       usrIDs,
-				MemberIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"},
+				MemberIdentifiers: &ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"},
 				Rights:            []ttnpb.Right{ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC},
 				RightsUpdated: []ttnpb.Right{
 					ttnpb.RIGHT_APPLICATION_INFO,
@@ -78,7 +78,7 @@ func TestMembershipStore(t *testing.T) {
 			{
 				Name:              "User-Client",
 				Identifiers:       usrIDs,
-				MemberIdentifiers: ttnpb.ClientIdentifiers{ClientID: "test-cli"},
+				MemberIdentifiers: &ttnpb.ClientIdentifiers{ClientID: "test-cli"},
 				Rights:            []ttnpb.Right{ttnpb.RIGHT_CLIENT_ALL},
 				RightsUpdated: []ttnpb.Right{
 					ttnpb.RIGHT_CLIENT_ALL,
@@ -89,7 +89,7 @@ func TestMembershipStore(t *testing.T) {
 			{
 				Name:              "User-Gateway",
 				Identifiers:       usrIDs,
-				MemberIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "test-gtw"},
+				MemberIdentifiers: &ttnpb.GatewayIdentifiers{GatewayID: "test-gtw"},
 				Rights:            []ttnpb.Right{ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC},
 				RightsUpdated: []ttnpb.Right{
 					ttnpb.RIGHT_GATEWAY_INFO,
@@ -100,7 +100,7 @@ func TestMembershipStore(t *testing.T) {
 			{
 				Name:              "User-Organization",
 				Identifiers:       usrIDs,
-				MemberIdentifiers: ttnpb.OrganizationIdentifiers{OrganizationID: "test-org"},
+				MemberIdentifiers: &ttnpb.OrganizationIdentifiers{OrganizationID: "test-org"},
 				Rights: []ttnpb.Right{
 					ttnpb.RIGHT_APPLICATION_ALL,
 					ttnpb.RIGHT_GATEWAY_ALL,
@@ -117,7 +117,7 @@ func TestMembershipStore(t *testing.T) {
 			{
 				Name:              "Organization-Application",
 				Identifiers:       orgIDs,
-				MemberIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"},
+				MemberIdentifiers: &ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"},
 				Rights:            []ttnpb.Right{ttnpb.RIGHT_APPLICATION_INFO},
 				RightsUpdated: []ttnpb.Right{
 					ttnpb.RIGHT_APPLICATION_INFO,
@@ -128,7 +128,7 @@ func TestMembershipStore(t *testing.T) {
 			{
 				Name:              "Organization-Client",
 				Identifiers:       orgIDs,
-				MemberIdentifiers: ttnpb.ClientIdentifiers{ClientID: "test-cli"},
+				MemberIdentifiers: &ttnpb.ClientIdentifiers{ClientID: "test-cli"},
 				Rights:            []ttnpb.Right{ttnpb.RIGHT_CLIENT_ALL},
 				RightsUpdated: []ttnpb.Right{
 					ttnpb.RIGHT_CLIENT_ALL,
@@ -139,7 +139,7 @@ func TestMembershipStore(t *testing.T) {
 			{
 				Name:              "Organization-Gateway",
 				Identifiers:       orgIDs,
-				MemberIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "test-gtw"},
+				MemberIdentifiers: &ttnpb.GatewayIdentifiers{GatewayID: "test-gtw"},
 				Rights:            []ttnpb.Right{ttnpb.RIGHT_GATEWAY_INFO},
 				RightsUpdated: []ttnpb.Right{
 					ttnpb.RIGHT_GATEWAY_INFO,
@@ -250,43 +250,43 @@ func TestMembershipStore(t *testing.T) {
 			{
 				Name:              "User-Application - user not found",
 				Identifiers:       userNotFoundIDs,
-				MemberIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"},
+				MemberIdentifiers: &ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"},
 				EntityType:        "application",
 			},
 			{
 				Name:              "User-Client - user not found",
 				Identifiers:       userNotFoundIDs,
-				MemberIdentifiers: ttnpb.ClientIdentifiers{ClientID: "test-cli"},
+				MemberIdentifiers: &ttnpb.ClientIdentifiers{ClientID: "test-cli"},
 				EntityType:        "client",
 			},
 			{
 				Name:              "User-Gateway - user not found",
 				Identifiers:       userNotFoundIDs,
-				MemberIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "test-gtw"},
+				MemberIdentifiers: &ttnpb.GatewayIdentifiers{GatewayID: "test-gtw"},
 				EntityType:        "gateway",
 			},
 			{
 				Name:              "User-Organization - user not found",
 				Identifiers:       userNotFoundIDs,
-				MemberIdentifiers: ttnpb.OrganizationIdentifiers{OrganizationID: "test-org"},
+				MemberIdentifiers: &ttnpb.OrganizationIdentifiers{OrganizationID: "test-org"},
 				EntityType:        "organization",
 			},
 			{
 				Name:              "Organization-Application - organization not found",
 				Identifiers:       organizationNotFoundIDs,
-				MemberIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"},
+				MemberIdentifiers: &ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"},
 				EntityType:        "application",
 			},
 			{
 				Name:              "Organization-Client - organization not found",
 				Identifiers:       organizationNotFoundIDs,
-				MemberIdentifiers: ttnpb.ClientIdentifiers{ClientID: "test-cli"},
+				MemberIdentifiers: &ttnpb.ClientIdentifiers{ClientID: "test-cli"},
 				EntityType:        "client",
 			},
 			{
 				Name:              "Organization-Gateway - organization not found",
 				Identifiers:       organizationNotFoundIDs,
-				MemberIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "test-gtw"},
+				MemberIdentifiers: &ttnpb.GatewayIdentifiers{GatewayID: "test-gtw"},
 				EntityType:        "gateway",
 			},
 		} {
@@ -316,43 +316,43 @@ func TestMembershipStore(t *testing.T) {
 			{
 				Name:              "User-Application - application not found",
 				Identifiers:       usrIDs,
-				MemberIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-not-found"},
+				MemberIdentifiers: &ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-not-found"},
 				EntityType:        "application",
 			},
 			{
 				Name:              "User-Client - client not found",
 				Identifiers:       usrIDs,
-				MemberIdentifiers: ttnpb.ClientIdentifiers{ClientID: "test-cli-not-found"},
+				MemberIdentifiers: &ttnpb.ClientIdentifiers{ClientID: "test-cli-not-found"},
 				EntityType:        "client",
 			},
 			{
 				Name:              "User-Gateway - gateway not found",
 				Identifiers:       usrIDs,
-				MemberIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "test-gtw-not-found"},
+				MemberIdentifiers: &ttnpb.GatewayIdentifiers{GatewayID: "test-gtw-not-found"},
 				EntityType:        "gateway",
 			},
 			{
 				Name:              "User-Organization - organization not found",
 				Identifiers:       usrIDs,
-				MemberIdentifiers: ttnpb.OrganizationIdentifiers{OrganizationID: "test-org-not-found"},
+				MemberIdentifiers: &ttnpb.OrganizationIdentifiers{OrganizationID: "test-org-not-found"},
 				EntityType:        "organization",
 			},
 			{
 				Name:              "Organization-Application - application not found",
 				Identifiers:       orgIDs,
-				MemberIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-not-found"},
+				MemberIdentifiers: &ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-not-found"},
 				EntityType:        "application",
 			},
 			{
 				Name:              "Organization-Client - client not found",
 				Identifiers:       orgIDs,
-				MemberIdentifiers: ttnpb.ClientIdentifiers{ClientID: "test-cli-not-found"},
+				MemberIdentifiers: &ttnpb.ClientIdentifiers{ClientID: "test-cli-not-found"},
 				EntityType:        "client",
 			},
 			{
 				Name:              "Organization-Gateway - gateway not found",
 				Identifiers:       orgIDs,
-				MemberIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "test-gtw-not-found"},
+				MemberIdentifiers: &ttnpb.GatewayIdentifiers{GatewayID: "test-gtw-not-found"},
 				EntityType:        "gateway",
 			},
 		} {

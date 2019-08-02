@@ -41,16 +41,16 @@ func TestAPIKeyStore(t *testing.T) {
 		store := GetAPIKeyStore(db)
 
 		s.createEntity(ctx, &User{Account: Account{UID: "test-user"}})
-		userIDs := ttnpb.UserIdentifiers{UserID: "test-user"}
+		userIDs := &ttnpb.UserIdentifiers{UserID: "test-user"}
 
 		s.createEntity(ctx, &Organization{Account: Account{UID: "test-org"}})
-		orgIDs := ttnpb.OrganizationIdentifiers{OrganizationID: "test-org"}
+		orgIDs := &ttnpb.OrganizationIdentifiers{OrganizationID: "test-org"}
 
 		s.createEntity(ctx, &Application{ApplicationID: "test-app"})
-		appIDs := ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}
+		appIDs := &ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}
 
 		s.createEntity(ctx, &Gateway{GatewayID: "test-gtw"})
-		gtwIDs := ttnpb.GatewayIdentifiers{GatewayID: "test-gtw"}
+		gtwIDs := &ttnpb.GatewayIdentifiers{GatewayID: "test-gtw"}
 
 		for _, tt := range []struct {
 			Name        string
