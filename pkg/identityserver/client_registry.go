@@ -26,7 +26,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/identityserver/blacklist"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/unique"
 )
 
 var (
@@ -148,21 +147,18 @@ func (is *IdentityServer) getClient(ctx context.Context, req *ttnpb.GetClientReq
 
 func (is *IdentityServer) listClients(ctx context.Context, req *ttnpb.ListClientsRequest) (clis *ttnpb.Clients, err error) {
 	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.ClientFieldPathsNested, req.FieldMask.Paths, getPaths, nil)
-	var cliRights map[string]*ttnpb.Rights
+	var includeIndirect bool
 	if req.Collaborator == nil {
-		callerRights, _, err := is.getRights(ctx)
+		authInfo, err := is.authInfo(ctx)
 		if err != nil {
 			return nil, err
 		}
-		cliRights = make(map[string]*ttnpb.Rights, len(callerRights))
-		for ids, rights := range callerRights {
-			if ids.EntityType() == "client" {
-				cliRights[unique.ID(ctx, ids)] = rights
-			}
-		}
-		if len(cliRights) == 0 {
+		collaborator := authInfo.GetOrganizationOrUserIdentifiers()
+		if collaborator == nil {
 			return &ttnpb.Clients{}, nil
 		}
+		req.Collaborator = collaborator
+		includeIndirect = true
 	}
 	if usrIDs := req.Collaborator.GetUserIDs(); usrIDs != nil {
 		if err = rights.RequireUser(ctx, *usrIDs, ttnpb.RIGHT_USER_CLIENTS_LIST); err != nil {
@@ -174,7 +170,7 @@ func (is *IdentityServer) listClients(ctx context.Context, req *ttnpb.ListClient
 		}
 	}
 	var total uint64
-	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)
+	paginateCtx := store.WithPagination(ctx, req.Limit, req.Page, &total)
 	defer func() {
 		if err == nil {
 			setTotalHeader(ctx, total)
@@ -182,26 +178,18 @@ func (is *IdentityServer) listClients(ctx context.Context, req *ttnpb.ListClient
 	}()
 	clis = &ttnpb.Clients{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		if cliRights == nil {
-			rights, err := store.GetMembershipStore(db).FindMemberRights(ctx, req.Collaborator, "client")
-			if err != nil {
-				return err
-			}
-			cliRights = make(map[string]*ttnpb.Rights, len(rights))
-			for ids, rights := range rights {
-				cliRights[unique.ID(ctx, ids)] = rights
-			}
+		ids, err := store.GetMembershipStore(db).FindMemberships(paginateCtx, req.Collaborator, "client", includeIndirect)
+		if err != nil {
+			return err
 		}
-		if len(cliRights) == 0 {
+		if len(ids) == 0 {
 			return nil
 		}
-		cliIDs := make([]*ttnpb.ClientIdentifiers, 0, len(cliRights))
-		for uid := range cliRights {
-			cliID, err := unique.ToClientID(uid)
-			if err != nil {
-				continue
+		cliIDs := make([]*ttnpb.ClientIdentifiers, 0, len(ids))
+		for _, id := range ids {
+			if cliID := id.EntityIdentifiers().GetClientIDs(); cliID != nil {
+				cliIDs = append(cliIDs, cliID)
 			}
-			cliIDs = append(cliIDs, &cliID)
 		}
 		clis.Clients, err = store.GetClientStore(db).FindClients(ctx, cliIDs, &req.FieldMask)
 		if err != nil {

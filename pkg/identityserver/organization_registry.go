@@ -25,7 +25,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/identityserver/blacklist"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/unique"
 )
 
 var (
@@ -122,21 +121,18 @@ func (is *IdentityServer) getOrganization(ctx context.Context, req *ttnpb.GetOrg
 
 func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.ListOrganizationsRequest) (orgs *ttnpb.Organizations, err error) {
 	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.OrganizationFieldPathsNested, req.FieldMask.Paths, getPaths, nil)
-	var orgRights map[string]*ttnpb.Rights
+	var includeIndirect bool
 	if req.Collaborator == nil {
-		callerRights, _, err := is.getRights(ctx)
+		authInfo, err := is.authInfo(ctx)
 		if err != nil {
 			return nil, err
 		}
-		orgRights = make(map[string]*ttnpb.Rights, len(callerRights))
-		for ids, rights := range callerRights {
-			if ids.EntityType() == "organization" {
-				orgRights[unique.ID(ctx, ids)] = rights
-			}
-		}
-		if len(orgRights) == 0 {
+		collaborator := authInfo.GetOrganizationOrUserIdentifiers()
+		if collaborator == nil {
 			return &ttnpb.Organizations{}, nil
 		}
+		req.Collaborator = collaborator
+		includeIndirect = true
 	}
 	if usrIDs := req.Collaborator.GetUserIDs(); usrIDs != nil {
 		if err = rights.RequireUser(ctx, *usrIDs, ttnpb.RIGHT_USER_ORGANIZATIONS_LIST); err != nil {
@@ -146,7 +142,7 @@ func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.List
 		return nil, errNestedOrganizations
 	}
 	var total uint64
-	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)
+	paginateCtx := store.WithPagination(ctx, req.Limit, req.Page, &total)
 	defer func() {
 		if err == nil {
 			setTotalHeader(ctx, total)
@@ -154,26 +150,18 @@ func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.List
 	}()
 	orgs = &ttnpb.Organizations{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		if orgRights == nil {
-			rights, err := store.GetMembershipStore(db).FindMemberRights(ctx, req.Collaborator, "organization")
-			if err != nil {
-				return err
-			}
-			orgRights = make(map[string]*ttnpb.Rights, len(rights))
-			for ids, rights := range rights {
-				orgRights[unique.ID(ctx, ids)] = rights
-			}
+		ids, err := store.GetMembershipStore(db).FindMemberships(paginateCtx, req.Collaborator, "organization", includeIndirect)
+		if err != nil {
+			return err
 		}
-		if len(orgRights) == 0 {
+		if len(ids) == 0 {
 			return nil
 		}
-		orgIDs := make([]*ttnpb.OrganizationIdentifiers, 0, len(orgRights))
-		for uid := range orgRights {
-			orgID, err := unique.ToOrganizationID(uid)
-			if err != nil {
-				continue
+		orgIDs := make([]*ttnpb.OrganizationIdentifiers, 0, len(ids))
+		for _, id := range ids {
+			if orgID := id.EntityIdentifiers().GetOrganizationIDs(); orgID != nil {
+				orgIDs = append(orgIDs, orgID)
 			}
-			orgIDs = append(orgIDs, &orgID)
 		}
 		orgs.Organizations, err = store.GetOrganizationStore(db).FindOrganizations(ctx, orgIDs, &req.FieldMask)
 		if err != nil {

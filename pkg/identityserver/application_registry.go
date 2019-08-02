@@ -25,7 +25,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/identityserver/blacklist"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/unique"
 )
 
 var (
@@ -122,21 +121,18 @@ func (is *IdentityServer) getApplication(ctx context.Context, req *ttnpb.GetAppl
 
 func (is *IdentityServer) listApplications(ctx context.Context, req *ttnpb.ListApplicationsRequest) (apps *ttnpb.Applications, err error) {
 	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.ApplicationFieldPathsNested, req.FieldMask.Paths, getPaths, nil)
-	var appRights map[string]*ttnpb.Rights
+	var includeIndirect bool
 	if req.Collaborator == nil {
-		callerRights, _, err := is.getRights(ctx)
+		authInfo, err := is.authInfo(ctx)
 		if err != nil {
 			return nil, err
 		}
-		appRights = make(map[string]*ttnpb.Rights, len(callerRights))
-		for ids, rights := range callerRights {
-			if ids.EntityType() == "application" {
-				appRights[unique.ID(ctx, ids)] = rights
-			}
-		}
-		if len(appRights) == 0 {
+		collaborator := authInfo.GetOrganizationOrUserIdentifiers()
+		if collaborator == nil {
 			return &ttnpb.Applications{}, nil
 		}
+		req.Collaborator = collaborator
+		includeIndirect = true
 	}
 	if usrIDs := req.Collaborator.GetUserIDs(); usrIDs != nil {
 		if err = rights.RequireUser(ctx, *usrIDs, ttnpb.RIGHT_USER_APPLICATIONS_LIST); err != nil {
@@ -148,7 +144,7 @@ func (is *IdentityServer) listApplications(ctx context.Context, req *ttnpb.ListA
 		}
 	}
 	var total uint64
-	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)
+	paginateCtx := store.WithPagination(ctx, req.Limit, req.Page, &total)
 	defer func() {
 		if err == nil {
 			setTotalHeader(ctx, total)
@@ -156,26 +152,18 @@ func (is *IdentityServer) listApplications(ctx context.Context, req *ttnpb.ListA
 	}()
 	apps = &ttnpb.Applications{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		if appRights == nil {
-			rights, err := store.GetMembershipStore(db).FindMemberRights(ctx, req.Collaborator, "application")
-			if err != nil {
-				return err
-			}
-			appRights = make(map[string]*ttnpb.Rights, len(rights))
-			for ids, rights := range rights {
-				appRights[unique.ID(ctx, ids)] = rights
-			}
+		ids, err := store.GetMembershipStore(db).FindMemberships(paginateCtx, req.Collaborator, "application", includeIndirect)
+		if err != nil {
+			return err
 		}
-		if len(appRights) == 0 {
+		if len(ids) == 0 {
 			return nil
 		}
-		appIDs := make([]*ttnpb.ApplicationIdentifiers, 0, len(appRights))
-		for uid := range appRights {
-			appID, err := unique.ToApplicationID(uid)
-			if err != nil {
-				continue
+		appIDs := make([]*ttnpb.ApplicationIdentifiers, 0, len(ids))
+		for _, id := range ids {
+			if appID := id.EntityIdentifiers().GetApplicationIDs(); appID != nil {
+				appIDs = append(appIDs, appID)
 			}
-			appIDs = append(appIDs, &appID)
 		}
 		apps.Applications, err = store.GetApplicationStore(db).FindApplications(ctx, appIDs, &req.FieldMask)
 		if err != nil {
