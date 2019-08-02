@@ -48,6 +48,7 @@ class Input extends React.Component {
     label: PropTypes.string,
     loading: PropTypes.bool,
     title: PropTypes.message,
+    code: PropTypes.bool,
   }
 
   static defaultProps = {
@@ -102,6 +103,7 @@ class Input extends React.Component {
       title,
       intl,
       horizontal,
+      code,
       ...rest
     } = this.props
 
@@ -134,6 +136,7 @@ class Input extends React.Component {
       [style.readOnly]: readOnly,
       [style.warn]: !error && warning,
       [style.disabled]: disabled,
+      [style.code]: code,
     })
 
     return (
