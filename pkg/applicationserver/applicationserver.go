@@ -69,6 +69,8 @@ type ApplicationServer struct {
 		asDevices asEndDeviceRegistryServer
 		appAs     ttnpb.AppAsServer
 	}
+
+	interopClient InteropClient
 }
 
 // Context returns the context of the Application Server.
@@ -401,21 +403,30 @@ func (as *ApplicationServer) DownlinkQueueList(ctx context.Context, ids ttnpb.En
 var errJSUnavailable = errors.DefineUnavailable("join_server_unavailable", "Join Server unavailable for JoinEUI `{join_eui}`")
 
 func (as *ApplicationServer) fetchAppSKey(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, sessionKeyID []byte) (ttnpb.KeyEnvelope, error) {
-	// TODO: Lookup Join Server (https://github.com/TheThingsNetwork/lorawan-stack/issues/4)
-	js := as.GetPeer(ctx, ttnpb.PeerInfo_JOIN_SERVER, ids)
-	if js == nil {
-		return ttnpb.KeyEnvelope{}, errJSUnavailable.WithAttributes("join_eui", *ids.JoinEUI)
-	}
-	client := ttnpb.NewAsJsClient(js.Conn())
 	req := &ttnpb.SessionKeyRequest{
 		SessionKeyID: sessionKeyID,
 		DevEUI:       *ids.DevEUI,
 	}
-	res, err := client.GetAppSKey(ctx, req, as.WithClusterAuth())
-	if err != nil {
-		return ttnpb.KeyEnvelope{}, err
+	if js := as.GetPeer(ctx, ttnpb.PeerInfo_JOIN_SERVER, ids); js != nil {
+		res, err := ttnpb.NewAsJsClient(js.Conn()).GetAppSKey(ctx, req, as.WithClusterAuth())
+		if err == nil {
+			return res.AppSKey, nil
+		}
+		if !errors.IsNotFound(err) {
+			return ttnpb.KeyEnvelope{}, err
+		}
 	}
-	return res.AppSKey, nil
+	if as.interopClient != nil {
+		// TODO: Set AS-ID.
+		res, err := as.interopClient.GetAppSKey(ctx, "", req)
+		if err == nil {
+			return res.AppSKey, nil
+		}
+		if !errors.IsNotFound(err) {
+			return ttnpb.KeyEnvelope{}, err
+		}
+	}
+	return ttnpb.KeyEnvelope{}, errJSUnavailable.WithAttributes("join_eui", *ids.JoinEUI)
 }
 
 func (as *ApplicationServer) handleUp(ctx context.Context, up *ttnpb.ApplicationUp, link *link) error {
