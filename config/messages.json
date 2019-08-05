@@ -4175,15 +4175,6 @@
       "file": "grpc_deviceregistry.go"
     }
   },
-  "error:pkg/joinserver:forward_join_request": {
-    "translations": {
-      "en": "failed to forward JoinRequest"
-    },
-    "description": {
-      "package": "pkg/joinserver",
-      "file": "errors.go"
-    }
-  },
   "error:pkg/joinserver:generate_session_key_id": {
     "translations": {
       "en": "failed to generate session key ID"
@@ -4445,9 +4436,9 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/joinserver:unknown_app_eui": {
+  "error:pkg/joinserver:unknown_join_eui": {
     "translations": {
-      "en": "AppEUI specified is not known"
+      "en": "JoinEUI specified is not known"
     },
     "description": {
       "package": "pkg/joinserver",
