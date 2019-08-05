@@ -228,3 +228,13 @@ func (is *IdentityServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.Clien
 func (is *IdentityServer) Roles() []ttnpb.PeerInfo_Role {
 	return []ttnpb.PeerInfo_Role{ttnpb.PeerInfo_ACCESS, ttnpb.PeerInfo_ENTITY_REGISTRY}
 }
+
+func (is *IdentityServer) getMembershipStore(ctx context.Context, db *gorm.DB) store.MembershipStore {
+	s := store.GetMembershipStore(db)
+	if is.redis != nil {
+		if membershipTTL := is.configFromContext(ctx).AuthCache.MembershipTTL; membershipTTL > 0 {
+			s = store.GetMembershipCache(s, is.redis, membershipTTL)
+		}
+	}
+	return s
+}

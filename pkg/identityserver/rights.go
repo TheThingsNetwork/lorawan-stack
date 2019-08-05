@@ -19,7 +19,6 @@ import (
 
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -69,10 +68,9 @@ func (is *IdentityServer) getRights(ctx context.Context, entityID ttnpb.Identifi
 	}
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		membershipStore := store.GetMembershipStore(db)
+		membershipStore := is.getMembershipStore(ctx, db)
 
 		// Find direct membership rights of the organization or user.
-		// TODO: Cache this (https://github.com/TheThingsNetwork/lorawan-stack/issues/443).
 		directMemberRights, err := membershipStore.GetMember(ctx, ouID, entityID)
 		if err != nil && !errors.IsNotFound(err) {
 			return err

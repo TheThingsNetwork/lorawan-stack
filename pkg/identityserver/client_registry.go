@@ -86,7 +86,7 @@ func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateCli
 		if err != nil {
 			return err
 		}
-		if err = store.GetMembershipStore(db).SetMember(
+		if err = is.getMembershipStore(ctx, db).SetMember(
 			ctx,
 			&req.Collaborator,
 			cli.ClientIdentifiers,
@@ -110,7 +110,6 @@ func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateCli
 	cli.Secret = secret // Return the unhashed secret, in case it was generated.
 
 	events.Publish(evtCreateClient(ctx, req.ClientIdentifiers, nil))
-	is.invalidateCachedMembershipsForAccount(ctx, &req.Collaborator)
 	return cli, nil
 }
 
@@ -178,7 +177,7 @@ func (is *IdentityServer) listClients(ctx context.Context, req *ttnpb.ListClient
 	}()
 	clis = &ttnpb.Clients{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		ids, err := store.GetMembershipStore(db).FindMemberships(paginateCtx, req.Collaborator, "client", includeIndirect)
+		ids, err := is.getMembershipStore(ctx, db).FindMemberships(paginateCtx, req.Collaborator, "client", includeIndirect)
 		if err != nil {
 			return err
 		}

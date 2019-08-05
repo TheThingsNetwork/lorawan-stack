@@ -63,7 +63,7 @@ func (is *IdentityServer) createOrganization(ctx context.Context, req *ttnpb.Cre
 		if err != nil {
 			return err
 		}
-		if err = store.GetMembershipStore(db).SetMember(
+		if err = is.getMembershipStore(ctx, db).SetMember(
 			ctx,
 			&req.Collaborator,
 			org.OrganizationIdentifiers,
@@ -84,7 +84,6 @@ func (is *IdentityServer) createOrganization(ctx context.Context, req *ttnpb.Cre
 		return nil, err
 	}
 	events.Publish(evtCreateOrganization(ctx, req.OrganizationIdentifiers, nil))
-	is.invalidateCachedMembershipsForAccount(ctx, &req.Collaborator)
 	return org, nil
 }
 
@@ -150,7 +149,7 @@ func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.List
 	}()
 	orgs = &ttnpb.Organizations{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		ids, err := store.GetMembershipStore(db).FindMemberships(paginateCtx, req.Collaborator, "organization", includeIndirect)
+		ids, err := is.getMembershipStore(ctx, db).FindMemberships(paginateCtx, req.Collaborator, "organization", includeIndirect)
 		if err != nil {
 			return err
 		}

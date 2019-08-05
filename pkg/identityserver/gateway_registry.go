@@ -62,7 +62,7 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 		if err != nil {
 			return err
 		}
-		if err = store.GetMembershipStore(db).SetMember(
+		if err = is.getMembershipStore(ctx, db).SetMember(
 			ctx,
 			&req.Collaborator,
 			gtw.GatewayIdentifiers,
@@ -83,7 +83,6 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 		return nil, err
 	}
 	events.Publish(evtCreateGateway(ctx, req.GatewayIdentifiers, nil))
-	is.invalidateCachedMembershipsForAccount(ctx, &req.Collaborator)
 	return gtw, nil
 }
 
@@ -171,7 +170,7 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 	}()
 	gtws = &ttnpb.Gateways{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		ids, err := store.GetMembershipStore(db).FindMemberships(paginateCtx, req.Collaborator, "gateway", includeIndirect)
+		ids, err := is.getMembershipStore(ctx, db).FindMemberships(paginateCtx, req.Collaborator, "gateway", includeIndirect)
 		if err != nil {
 			return err
 		}
