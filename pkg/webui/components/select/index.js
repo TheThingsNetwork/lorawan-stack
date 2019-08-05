@@ -90,8 +90,10 @@ class Select extends React.PureComponent {
     const { value } = this.state
     const { onBlur } = this.props
 
-    // https://github.com/JedWatson/react-select/issues/3175
-    event.target.value = value
+    if (typeof value !== 'undefined') {
+      // https://github.com/JedWatson/react-select/issues/3175
+      event.target.value = value
+    }
 
     onBlur(event)
   }
