@@ -63,6 +63,7 @@ class Entry extends React.Component {
           type="text"
           onChange={this.handleKeyChanged}
           value={value.key}
+          code
         />
         <Input
           className={style.input}
@@ -72,6 +73,7 @@ class Entry extends React.Component {
           onChange={this.handleValueChanged}
           onBlur={onBlur}
           value={value.value}
+          code
         />
         <Button
           type="button"
