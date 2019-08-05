@@ -22,7 +22,8 @@ export default function () {
     when: {
       created (props) {
         driver.component = shallow(
-          <SideNavigation {...props} />
+          <SideNavigation {...props} />,
+          { context: { intl: {}}}
         )
 
         return driver

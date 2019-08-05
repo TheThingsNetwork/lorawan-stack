@@ -15,6 +15,7 @@
 import React from 'react'
 import classnames from 'classnames'
 import bind from 'autobind-decorator'
+import { injectIntl } from 'react-intl'
 
 import Link from '../link'
 import PropTypes from '../../lib/prop-types'
@@ -57,6 +58,7 @@ const buttonChildren = ({ icon, busy, message }) => (
   </div>
 )
 
+@injectIntl
 @bind
 class Button extends React.PureComponent {
 
@@ -71,8 +73,22 @@ class Button extends React.PureComponent {
   }
 
   render () {
-    const { autoFocus, disabled, name, type, value } = this.props
-    const htmlProps = { autoFocus, disabled, name, type, value }
+    const {
+      autoFocus,
+      disabled,
+      name,
+      type,
+      value,
+      title: rawTitle,
+      intl,
+    } = this.props
+
+    let title = rawTitle
+    if (typeof rawTitle === 'object' && rawTitle.id && rawTitle.defaultMessage) {
+      title = intl.formatMessage(title)
+    }
+
+    const htmlProps = { autoFocus, disabled, name, type, value, title }
     const buttonClassNames = assembleClassnames(this.props)
     return (
       <button
@@ -165,6 +181,8 @@ const commonPropTypes = {
   value: PropTypes.string,
   /** The html `autofocus` prop passed to the <button /> element */
   autoFocus: PropTypes.bool,
+  /** A message to be evaluated and passed to the <button /> element */
+  title: PropTypes.message,
 }
 
 Button.propTypes = {

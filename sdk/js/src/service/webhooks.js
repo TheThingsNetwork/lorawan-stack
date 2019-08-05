@@ -27,8 +27,7 @@ class Webhooks {
     return Marshaler.payloadListResponse('webhooks', result)
   }
 
-  async create (appId, webhook) {
-    const mask = Marshaler.fieldMaskFromPatch(webhook)
+  async create (appId, webhook, mask = Marshaler.fieldMaskFromPatch(webhook, this._api.SetAllowedFieldMaskPaths)) {
     const result = await this._api.Set({
       routeParams: {
         'webhook.ids.application_ids.application_id': appId,
@@ -53,7 +52,7 @@ class Webhooks {
     return Marshaler.payloadSingleResponse(result)
   }
 
-  async updateById (appId, webhookId, patch, mask = Marshaler.fieldMaskFromPatch(patch)) {
+  async updateById (appId, webhookId, patch, mask = Marshaler.fieldMaskFromPatch(patch, this._api.SetAllowedFieldMaskPaths)) {
     const result = await this._api.Set({
       routeParams: {
         'webhook.ids.application_ids.application_id': appId,

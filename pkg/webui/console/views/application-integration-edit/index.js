@@ -48,6 +48,7 @@ const m = defineMessages({
 const webhookEntitySelector = [
   'base_url',
   'format',
+  'headers',
   'uplink_message',
   'join_accept',
   'downlink_ack',

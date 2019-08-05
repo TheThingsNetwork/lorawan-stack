@@ -16,10 +16,19 @@ const mapWebhookMessageTypeToFormValue = messageType =>
   (messageType && { enabled: true, value: messageType.path })
   || { enabled: false, value: '' }
 
+const mapWebhookHeadersTypeToFormValue = headersType =>
+  (headersType && Object.keys(headersType).reduce((result, key) => (
+    result.concat({
+      key,
+      value: headersType[key],
+    })
+  ), [])) || []
+
 export const mapWebhookToFormValues = webhook => ({
   webhook_id: webhook.ids.webhook_id,
   base_url: webhook.base_url,
   format: webhook.format,
+  headers: mapWebhookHeadersTypeToFormValue(webhook.headers),
   uplink_message: mapWebhookMessageTypeToFormValue(webhook.uplink_message),
   join_accept: mapWebhookMessageTypeToFormValue(webhook.join_accept),
   downlink_ack: mapWebhookMessageTypeToFormValue(webhook.downlink_ack),
@@ -33,6 +42,12 @@ export const mapWebhookToFormValues = webhook => ({
 const mapMessageTypeFormValueToWebhookMessageType = formValue =>
   (formValue.enabled && { path: formValue.value }) || null
 
+const mapHeadersTypeFormValueToWebhookHeadersType = formValue =>
+  (formValue && formValue.reduce((result, { key, value }) => ({
+    ...result,
+    [key]: value,
+  }), {})) || null
+
 export const mapFormValuesToWebhook = function (values, appId) {
   return {
     ids: {
@@ -43,6 +58,7 @@ export const mapFormValuesToWebhook = function (values, appId) {
     },
     base_url: values.base_url,
     format: values.format,
+    headers: mapHeadersTypeFormValueToWebhookHeadersType(values.headers),
     uplink_message: mapMessageTypeFormValueToWebhookMessageType(values.uplink_message),
     join_accept: mapMessageTypeFormValueToWebhookMessageType(values.join_accept),
     downlink_ack: mapMessageTypeFormValueToWebhookMessageType(values.downlink_ack),
