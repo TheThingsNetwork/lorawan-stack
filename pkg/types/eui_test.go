@@ -41,29 +41,76 @@ func TestEUI64(t *testing.T) {
 		a.So(addr.HasPrefix(EUI64Prefix{EUI64{1, 1, 1, 1}, 15}), should.BeFalse)
 	}
 
-	// JSON unmarshalling
-	{
-		jsonBytes, err := json.Marshal(eui)
-		if !a.So(err, should.BeNil) {
-			panic(err)
-		}
-		jsonContent := string(jsonBytes)
-		a.So(jsonContent, should.ContainSubstring, "2612345642424242")
+	t.Run("JSON", func(t *testing.T) {
+		a := assertions.New(t)
 
-		jsonBytes, err = json.Marshal(prefix)
-		if !a.So(err, should.BeNil) {
-			panic(err)
-		}
-		jsonContent = string(jsonBytes)
-		a.So(jsonContent, should.ContainSubstring, "2600000000000000/7")
-	}
+		const encodedEUI = `"2612345642424242"`
 
-	// Number unmarshalling
-	{
-		number := eui.MarshalNumber()
-		a.So(number, should.Equal, uint64(2743312668105523778))
-		unmarshaledEui := EUI64{}
-		unmarshaledEui.UnmarshalNumber(number)
-		a.So(unmarshaledEui, should.Equal, eui)
-	}
+		b, err := json.Marshal(eui)
+		if a.So(err, should.BeNil) {
+			a.So(string(b), should.Equal, encodedEUI)
+		}
+
+		var decodedEUI EUI64
+		err = json.Unmarshal([]byte(encodedEUI), &decodedEUI)
+		if a.So(err, should.BeNil) {
+			a.So(decodedEUI, should.Equal, eui)
+		}
+
+		const encodedPrefix = `"2600000000000000/7"`
+
+		b, err = json.Marshal(prefix)
+		if a.So(err, should.BeNil) {
+			a.So(string(b), should.Equal, encodedPrefix)
+		}
+
+		var decodedPrefix EUI64Prefix
+		err = json.Unmarshal([]byte(encodedPrefix), &decodedPrefix)
+		if a.So(err, should.BeNil) {
+			a.So(decodedPrefix, should.Equal, prefix)
+		}
+	})
+
+	t.Run("Text", func(t *testing.T) {
+		a := assertions.New(t)
+
+		const encodedEUI = `2612345642424242`
+
+		b, err := eui.MarshalText()
+		if a.So(err, should.BeNil) {
+			a.So(string(b), should.Equal, encodedEUI)
+		}
+
+		var decodedEUI EUI64
+		err = decodedEUI.UnmarshalText([]byte(encodedEUI))
+		if a.So(err, should.BeNil) {
+			a.So(decodedEUI, should.Equal, eui)
+		}
+
+		const encodedPrefix = `2600000000000000/7`
+
+		b, err = prefix.MarshalText()
+		if a.So(err, should.BeNil) {
+			a.So(string(b), should.Equal, encodedPrefix)
+		}
+
+		var decodedPrefix EUI64Prefix
+		err = decodedPrefix.UnmarshalText([]byte(encodedPrefix))
+		if a.So(err, should.BeNil) {
+			a.So(decodedPrefix, should.Equal, prefix)
+		}
+	})
+
+	t.Run("Number", func(t *testing.T) {
+		a := assertions.New(t)
+
+		const encodedEUI uint64 = 2743312668105523778
+
+		n := eui.MarshalNumber()
+		a.So(n, should.Resemble, encodedEUI)
+
+		var decodedEUI EUI64
+		decodedEUI.UnmarshalNumber(encodedEUI)
+		a.So(decodedEUI, should.Equal, eui)
+	})
 }
