@@ -15,7 +15,9 @@
 package store
 
 import (
+	"os"
 	"testing"
+	"time"
 
 	"github.com/jinzhu/gorm"
 	"github.com/smartystreets/assertions"
@@ -93,6 +95,12 @@ func TestMembershipStore(t *testing.T) {
 
 		s := newStore(db)
 		store := GetMembershipStore(db)
+
+		if os.Getenv("TEST_REDIS") == "1" {
+			redis, flush := test.NewRedis(t, "is_membership_store")
+			defer flush()
+			store = GetMembershipCache(store, redis, time.Minute)
+		}
 
 		usr := &User{Account: Account{UID: "test-user"}}
 		s.createEntity(ctx, usr)
