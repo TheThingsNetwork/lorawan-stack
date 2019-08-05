@@ -359,6 +359,11 @@ func TestMembershipStore(t *testing.T) {
 				)
 				a.So(err, should.NotBeNil)
 				a.So(errors.IsNotFound(err), should.BeTrue)
+
+				members, err := store.FindMembers(ctx, tt.MemberIdentifiers)
+				if a.So(err, should.BeNil) {
+					a.So(members, should.BeEmpty)
+				}
 			})
 		}
 
@@ -422,9 +427,10 @@ func TestMembershipStore(t *testing.T) {
 				a.So(err, should.NotBeNil)
 				a.So(errors.IsNotFound(err), should.BeTrue)
 
-				_, err = store.FindMembers(ctx, tt.MemberIdentifiers)
-				a.So(err, should.NotBeNil)
-				a.So(errors.IsNotFound(err), should.BeTrue)
+				members, err := store.FindMembers(ctx, tt.MemberIdentifiers)
+				if a.So(err, should.BeNil) {
+					a.So(members, should.BeEmpty)
+				}
 			})
 		}
 	})

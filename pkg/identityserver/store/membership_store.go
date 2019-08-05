@@ -125,27 +125,35 @@ func (s *membershipStore) FindIndirectMemberships(ctx context.Context, userID *t
 
 func (s *membershipStore) FindMembers(ctx context.Context, entityID ttnpb.Identifiers) (map[*ttnpb.OrganizationOrUserIdentifiers]*ttnpb.Rights, error) {
 	defer trace.StartRegion(ctx, fmt.Sprintf("find members of %s", entityID.EntityType())).End()
-	entity, err := s.findEntity(ctx, entityID, "id")
-	if err != nil {
-		return nil, err
-	}
-	query := s.query(ctx, Membership{}).Where(&Membership{
-		EntityID:   entity.PrimaryKey(),
-		EntityType: entityTypeForID(entityID),
-	}).Preload("Account")
+	entityQuery := s.query(ctx, modelForID(entityID), withID(entityID)).
+		Select(fmt.Sprintf(`"%ss"."id"`, entityID.EntityType())).
+		QueryExpr()
+	query := s.query(ctx, Account{}).
+		Select(`"accounts"."uid" AS "uid", "accounts"."account_type" AS "account_type", "memberships"."rights" AS "rights"`).
+		Joins(`JOIN "memberships" ON "memberships"."account_id" = "accounts"."id"`).
+		Where(fmt.Sprintf(`"memberships"."entity_type" = '%s' AND "memberships"."entity_id" = (?)`, entityID.EntityType()), entityQuery).
+		Order(`"uid"`)
+	page := query
 	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
-		countTotal(ctx, query.Model(&Membership{}))
-		query = query.Limit(limit).Offset(offset)
+		page = query.Limit(limit).Offset(offset)
 	}
-	var memberships []Membership
-	if err = query.Find(&memberships).Error; err != nil {
+	var results []struct {
+		UID         string
+		AccountType string
+		Rights      Rights
+	}
+	if err := page.Scan(&results).Error; err != nil {
 		return nil, err
 	}
-	setTotal(ctx, uint64(len(memberships)))
-	membershipRights := make(map[*ttnpb.OrganizationOrUserIdentifiers]*ttnpb.Rights, len(memberships))
-	for _, membership := range memberships {
-		ids := membership.Account.OrganizationOrUserIdentifiers()
-		rights := ttnpb.Rights(membership.Rights)
+	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 && (offset > 0 || len(results) == int(limit)) {
+		countTotal(ctx, query)
+	} else {
+		setTotal(ctx, uint64(len(results)))
+	}
+	membershipRights := make(map[*ttnpb.OrganizationOrUserIdentifiers]*ttnpb.Rights, len(results))
+	for _, result := range results {
+		ids := Account{AccountType: result.AccountType, UID: result.UID}.OrganizationOrUserIdentifiers()
+		rights := ttnpb.Rights(result.Rights)
 		membershipRights[ids] = &rights
 	}
 	return membershipRights, nil
