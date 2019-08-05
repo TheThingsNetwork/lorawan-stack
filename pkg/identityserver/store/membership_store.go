@@ -198,10 +198,17 @@ var errAccountType = errors.DefineInvalidArgument(
 	"account of type `{account_type}` can not collaborate on `{entity_type}`",
 )
 
-func (s *membershipStore) SetMember(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityID ttnpb.Identifiers, rights *ttnpb.Rights) (err error) {
+func (s *membershipStore) SetMember(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityID ttnpb.Identifiers, rights *ttnpb.Rights) error {
 	defer trace.StartRegion(ctx, "update membership").End()
-	account, err := s.findAccount(ctx, id)
+	var account Account
+	err := s.query(ctx, Account{}).Where(Account{
+		UID:         id.IDString(),
+		AccountType: id.EntityType(),
+	}).Find(&account).Error
 	if err != nil {
+		if gorm.IsRecordNotFoundError(err) {
+			return errNotFoundForID(id)
+		}
 		return err
 	}
 	entity, err := s.findEntity(ctx, entityID, "id")
