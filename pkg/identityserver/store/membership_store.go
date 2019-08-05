@@ -59,15 +59,20 @@ func (s *membershipStore) FindMemberships(ctx context.Context, id *ttnpb.Organiz
 			QueryExpr()
 		query = query.Or(`"memberships"."account_id" IN (?)`, organizationQuery)
 	}
+	page := query
 	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
-		countTotal(ctx, query)
-		query = query.Limit(limit).Offset(offset)
+		page = query.Limit(limit).Offset(offset)
 	}
 	var results []struct {
 		FriendlyID string
 	}
-	if err := query.Scan(&results).Error; err != nil {
+	if err := page.Scan(&results).Error; err != nil {
 		return nil, err
+	}
+	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 && (offset > 0 || len(results) == int(limit)) {
+		countTotal(ctx, query)
+	} else {
+		setTotal(ctx, uint64(len(results)))
 	}
 	identifiers := make([]ttnpb.Identifiers, len(results))
 	for i, result := range results {
