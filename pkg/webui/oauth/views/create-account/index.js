@@ -14,7 +14,7 @@
 
 import React from 'react'
 import { Container, Col, Row } from 'react-grid-system'
-import { withRouter } from 'react-router-dom'
+import { withRouter, Redirect } from 'react-router-dom'
 import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 import { connect } from 'react-redux'
@@ -30,6 +30,8 @@ import Form from '../../../components/form'
 import SubmitButton from '../../../components/submit-button'
 import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
+import withEnv from '../../../lib/components/env'
+import Spinner from '../../../components/spinner'
 
 import style from './create-account.styl'
 
@@ -91,16 +93,19 @@ const getSuccessMessage = function (state) {
   }
 }
 
-@connect(null, {
+@withEnv
+@withRouter
+@connect( state => ({
+  fetching: state.user.fetching,
+  user: state.user.user,
+}), {
   push,
   replace,
 })
-@withRouter
 @bind
 export default class CreateAccount extends React.PureComponent {
   constructor (props) {
     super(props)
-
     this.state = {
       error: '',
     }
@@ -138,6 +143,29 @@ export default class CreateAccount extends React.PureComponent {
 
   render () {
     const { error } = this.state
+    const {
+      user,
+      fetching,
+      env,
+    } = this.props
+
+    if (fetching) {
+      return (
+        <Spinner center>
+          <Message content={sharedMessages.loading} />
+        </Spinner>
+      )
+    }
+
+    if (Boolean(user)) {
+      return (
+        <Redirect
+          to={{
+            pathname: env.app_root,
+          }}
+        />
+      )
+    }
 
     return (
       <Container className={style.fullHeight}>
