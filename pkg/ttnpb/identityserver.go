@@ -28,6 +28,20 @@ func (m *AuthInfoResponse) GetEntityIdentifiers() *EntityIdentifiers {
 	return nil
 }
 
+// GetRights returns the entity Rights for the used access method.
+func (m *AuthInfoResponse) GetRights() []Right {
+	if m == nil {
+		return nil
+	}
+	switch accessMethod := m.GetAccessMethod().(type) {
+	case *AuthInfoResponse_APIKey:
+		return accessMethod.APIKey.Rights
+	case *AuthInfoResponse_OAuthAccessToken:
+		return accessMethod.OAuthAccessToken.Rights
+	}
+	return nil
+}
+
 // GetOrganizationOrUserIdentifiers returns the OrganizationOrUserIdentifiers for the used access method.
 func (m *AuthInfoResponse) GetOrganizationOrUserIdentifiers() *OrganizationOrUserIdentifiers {
 	ids := m.GetEntityIdentifiers()
