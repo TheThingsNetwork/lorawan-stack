@@ -40,7 +40,7 @@ class InnerForm extends React.PureComponent {
     }
 
     // Scroll invalid fields into view if needed and focus them
-    if (!prevIsSubmitting && isSubmitting && !isValid) {
+    if (prevIsSubmitting && !isSubmitting && !isValid) {
       const firstErrorNode = document.querySelectorAll('[data-needs-focus="true"]')[0]
       if (firstErrorNode) {
         scrollIntoView(firstErrorNode, { behavior: 'smooth' })
