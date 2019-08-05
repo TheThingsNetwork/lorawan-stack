@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import * as configuration from '../../actions/configuration'
-import { get as cacheGet, set as cacheSet } from '../../../lib/cache'
 import api from '../../../api'
 
 import {
@@ -34,11 +33,8 @@ const getNsFrequencyPlansLogic = createRequestLogic({
     }
   },
   async process () {
-    let frequencyPlans = cacheGet('ns_frequency_plans')
-    if (!frequencyPlans) {
-      frequencyPlans = (await api.configuration.listNsFrequencyPlans()).frequency_plans
-      cacheSet('ns_frequency_plans', frequencyPlans)
-    }
+    const frequencyPlans = (await api.configuration.listNsFrequencyPlans()).frequency_plans
+
     return frequencyPlans
   },
 })
@@ -54,11 +50,7 @@ const getGsFrequencyPlansLogic = createRequestLogic({
     }
   },
   async process () {
-    let frequencyPlans = cacheGet('gs_frequency_plans')
-    if (!frequencyPlans) {
-      frequencyPlans = (await api.configuration.listGsFrequencyPlans()).frequency_plans
-      cacheSet('gs_frequency_plans', frequencyPlans)
-    }
+    const frequencyPlans = (await api.configuration.listGsFrequencyPlans()).frequency_plans
 
     return frequencyPlans
   },
