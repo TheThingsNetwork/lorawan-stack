@@ -151,29 +151,6 @@ func (s *membershipStore) FindMembers(ctx context.Context, entityID ttnpb.Identi
 	return membershipRights, nil
 }
 
-func (s *membershipStore) FindMemberRights(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityType string) (map[ttnpb.Identifiers]*ttnpb.Rights, error) {
-	entityTypeForTrace := entityType
-	if entityTypeForTrace == "" {
-		entityTypeForTrace = "all"
-	}
-	defer trace.StartRegion(ctx, fmt.Sprintf("find %s memberships for %s", entityTypeForTrace, id.EntityType())).End()
-	account, err := s.findAccount(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-	if err := ctx.Err(); err != nil { // Early exit if context canceled
-		return nil, err
-	}
-	memberships, err := s.findAccountMemberships(account, entityType)
-	if err != nil {
-		return nil, err
-	}
-	if err := ctx.Err(); err != nil { // Early exit if context canceled
-		return nil, err
-	}
-	return s.identifierRights(entityRightsForMemberships(memberships))
-}
-
 var errMembershipNotFound = errors.DefineNotFound(
 	"membership_not_found",
 	"account `{account_id}` is not a member of `{entity_type}` `{entity_id}`",

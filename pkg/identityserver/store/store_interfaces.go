@@ -112,11 +112,6 @@ type UserSessionStore interface {
 //
 // As the operations in this store may be quite expensive, the results of FindXXX
 // operations should typically be cached. The recommended cache behavior is:
-//
-// - The results of FindMembers are cached by (entity_type,entity_id)
-// - The results of FindMemberRights are cached by (account_id,[entityType])
-// - Any (successful or unsuccessful) call to SetMember expires the caches
-//   for (entity_type,entity_id) and (account_id,[entityType]).
 type MembershipStore interface {
 	// Find direct and optionally also indirect memberships of the organization or user.
 	FindMemberships(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityType string, includeIndirect bool) ([]ttnpb.Identifiers, error)
@@ -125,11 +120,9 @@ type MembershipStore interface {
 
 	// Find direct members and rights of the given entity.
 	FindMembers(ctx context.Context, entityID ttnpb.Identifiers) (map[*ttnpb.OrganizationOrUserIdentifiers]*ttnpb.Rights, error)
-	// Find direct member rights of the given organization or user. The entityType may be omitted.
-	FindMemberRights(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityType string) (map[ttnpb.Identifiers]*ttnpb.Rights, error)
-	// Get member rights on an entity.
+	// Get direct member rights on an entity.
 	GetMember(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityID ttnpb.Identifiers) (*ttnpb.Rights, error)
-	// Set member rights on an entity. Rights can be deleted by not passing any rights.
+	// Set direct member rights on an entity. Rights can be deleted by not passing any rights.
 	SetMember(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityID ttnpb.Identifiers, rights *ttnpb.Rights) error
 }
 

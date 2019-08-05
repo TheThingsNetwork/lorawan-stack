@@ -36,31 +36,6 @@ func init() {
 	registerModel(&Membership{})
 }
 
-func (s *store) findAccountMemberships(account *Account, entityType string) ([]*Membership, error) {
-	return findAccountMemberships(s.DB, account, entityType)
-}
-
-func findAccountMemberships(db *gorm.DB, account *Account, entityType string) ([]*Membership, error) {
-	query := db.Where(Membership{AccountID: account.ID})
-	if entityType != "" {
-		query = query.Where("entity_type = ?", entityType)
-	}
-	var memberships []*Membership
-	if err := query.Find(&memberships).Error; err != nil {
-		return nil, err
-	}
-	return memberships, nil
-}
-
-func entityRightsForMemberships(memberships []*Membership) map[polymorphicEntity]Rights {
-	res := make(map[polymorphicEntity]Rights, len(memberships))
-	for _, membership := range memberships {
-		k := polymorphicEntity{EntityType: membership.EntityType, EntityUUID: membership.EntityID}
-		res[k] = membership.Rights
-	}
-	return res
-}
-
 type polymorphicEntity struct {
 	EntityUUID string
 	EntityType string
@@ -123,29 +98,4 @@ func buildIdentifiers(entityType, id string) ttnpb.Identifiers {
 	default:
 		panic(fmt.Sprintf("can't build identifiers for entity type %q", entityType))
 	}
-}
-
-func (s *store) identifierRights(entityRights map[polymorphicEntity]Rights) (map[ttnpb.Identifiers]*ttnpb.Rights, error) {
-	return identifierRights(s.DB, entityRights)
-}
-
-func identifierRights(db *gorm.DB, entityRights map[polymorphicEntity]Rights) (map[ttnpb.Identifiers]*ttnpb.Rights, error) {
-	entities := make([]polymorphicEntity, 0, len(entityRights))
-	for entity := range entityRights {
-		entities = append(entities, entity)
-	}
-	identifiers, err := findIdentifiers(db, entities...)
-	if err != nil {
-		return nil, err
-	}
-	identifierRights := make(map[ttnpb.Identifiers]*ttnpb.Rights, len(entityRights))
-	for entity, rights := range entityRights {
-		ids, ok := identifiers[entity]
-		if !ok {
-			continue
-		}
-		rights := ttnpb.Rights(rights)
-		identifierRights[ids] = &rights
-	}
-	return identifierRights, nil
 }

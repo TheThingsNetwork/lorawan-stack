@@ -245,15 +245,6 @@ func TestMembershipStore(t *testing.T) {
 					}
 				}
 
-				memberRights, err := store.FindMemberRights(ctx, tt.Identifiers, tt.EntityType)
-				a.So(err, should.BeNil)
-				if a.So(memberRights, should.HaveLength, 1) {
-					for eid, rights := range memberRights {
-						a.So(eid, should.Resemble, tt.MemberIdentifiers)
-						a.So(rights.GetRights(), should.Resemble, tt.Rights)
-					}
-				}
-
 				// update membership
 				err = store.SetMember(ctx,
 					tt.Identifiers,
@@ -265,15 +256,6 @@ func TestMembershipStore(t *testing.T) {
 				memberEntityRights, err = store.GetMember(ctx, tt.Identifiers, tt.MemberIdentifiers)
 				a.So(err, should.BeNil)
 				a.So(memberEntityRights.GetRights(), should.Resemble, tt.RightsUpdated)
-
-				memberRights, err = store.FindMemberRights(ctx, tt.Identifiers, tt.EntityType)
-				a.So(err, should.BeNil)
-				if a.So(memberRights, should.HaveLength, 1) {
-					for eid, rights := range memberRights {
-						a.So(eid, should.Resemble, tt.MemberIdentifiers)
-						a.So(rights.GetRights(), should.Resemble, tt.RightsUpdated)
-					}
-				}
 
 				// delete membership
 				err = store.SetMember(ctx,
@@ -292,10 +274,6 @@ func TestMembershipStore(t *testing.T) {
 				if a.So(err, should.BeNil) {
 					a.So(memberships, should.BeEmpty)
 				}
-
-				memberRights, err = store.FindMemberRights(ctx, tt.Identifiers, tt.EntityType)
-				a.So(err, should.BeNil)
-				a.So(memberRights, should.HaveLength, 0)
 			})
 		}
 
@@ -371,10 +349,6 @@ func TestMembershipStore(t *testing.T) {
 					tt.MemberIdentifiers,
 					ttnpb.RightsFrom([]ttnpb.Right{}...),
 				)
-				a.So(err, should.NotBeNil)
-				a.So(errors.IsNotFound(err), should.BeTrue)
-
-				_, err = store.FindMemberRights(ctx, tt.Identifiers, tt.EntityType)
 				a.So(err, should.NotBeNil)
 				a.So(errors.IsNotFound(err), should.BeTrue)
 			})
