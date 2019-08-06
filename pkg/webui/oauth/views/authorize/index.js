@@ -54,7 +54,7 @@ export default class Authorize extends PureComponent {
   }
 
   render () {
-    const { env: { page_data: { client, user, error }}, location } = this.props
+    const { env: { pageData: { client, user, error }}, location } = this.props
     const { redirect_uri } = Query.parse(location.search)
 
     if (error) {
