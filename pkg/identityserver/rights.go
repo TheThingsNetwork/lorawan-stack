@@ -47,12 +47,16 @@ func (is *IdentityServer) getRights(ctx context.Context, entityID ttnpb.Identifi
 	}
 
 	authInfoRights := ttnpb.RightsFrom(authInfo.GetRights()...)
+	universalRights = allPotentialRights(entityID, authInfo.GetUniversalRights())
+	if len(universalRights.GetRights()) == 0 {
+		universalRights = nil
+	}
 	allPotentialRights := allPotentialRights(entityID, authInfoRights)
 
 	// If the rights of the auth do not contain any rights for the entity type,
 	// there's nothing more to do.
 	if len(allPotentialRights.GetRights()) == 0 {
-		return nil, authInfo.GetUniversalRights(), nil
+		return nil, universalRights, nil
 	}
 
 	// If the caller is the requested entity,
@@ -60,13 +64,13 @@ func (is *IdentityServer) getRights(ctx context.Context, entityID ttnpb.Identifi
 	authenticatedAs := authInfo.GetEntityIdentifiers()
 	if entityID.EntityType() == authenticatedAs.EntityType() &&
 		entityID.IDString() == authenticatedAs.IDString() {
-		return authInfoRights, authInfo.GetUniversalRights(), nil
+		return authInfoRights, universalRights, nil
 	}
 
 	// If the caller is not an organization or user, there's nothing more to do.
 	ouID := authInfo.GetOrganizationOrUserIdentifiers()
 	if ouID == nil {
-		return nil, authInfo.GetUniversalRights(), nil
+		return nil, universalRights, nil
 	}
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
@@ -113,7 +117,7 @@ func (is *IdentityServer) getRights(ctx context.Context, entityID ttnpb.Identifi
 
 	entityRights = entityRights.Intersect(authInfoRights)
 
-	return entityRights, authInfo.UniversalRights, err
+	return entityRights, universalRights, err
 }
 
 // ApplicationRights returns the rights the caller has on the given application.
