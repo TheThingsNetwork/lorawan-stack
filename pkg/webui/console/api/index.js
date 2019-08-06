@@ -159,4 +159,9 @@ export default {
     listNsFrequencyPlans: ttnClient.Configuration.listNsFrequencyPlans.bind(ttnClient.Configuration),
     listGsFrequencyPlans: ttnClient.Configuration.listGsFrequencyPlans.bind(ttnClient.Configuration),
   },
+  js: {
+    joinEUIPRefixes: {
+      list: ttnClient.Js.listJoinEUIPrefixes.bind(ttnClient.Js),
+    },
+  },
 }

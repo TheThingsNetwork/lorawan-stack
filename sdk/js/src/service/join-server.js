@@ -21,9 +21,8 @@ class Js {
 
   async listJoinEUIPrefixes () {
     const result = await this._api.GetJoinEUIPrefixes()
-    const { prefixes } = Marshaler.payloadListResponse('prefixes', result)
 
-    return prefixes
+    return Marshaler.payloadListResponse('prefixes', result)
   }
 }
 
