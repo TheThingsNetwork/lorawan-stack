@@ -129,7 +129,7 @@ func (is *IdentityServer) ApplicationRights(ctx context.Context, appIDs ttnpb.Ap
 	if entity != nil {
 		return entity.Union(universal), nil
 	}
-	if !is.IsAdmin(ctx) {
+	if !is.IsAdmin(ctx) && universal == nil {
 		return &ttnpb.Rights{}, nil
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
@@ -151,7 +151,7 @@ func (is *IdentityServer) ClientRights(ctx context.Context, cliIDs ttnpb.ClientI
 	if entity != nil {
 		return entity.Union(universal), nil
 	}
-	if !is.IsAdmin(ctx) {
+	if !is.IsAdmin(ctx) && universal == nil {
 		return &ttnpb.Rights{}, nil
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
@@ -176,7 +176,7 @@ func (is *IdentityServer) GatewayRights(ctx context.Context, gtwIDs ttnpb.Gatewa
 	if entity != nil {
 		return entity.Union(universal), nil
 	}
-	if !is.IsAdmin(ctx) {
+	if !is.IsAdmin(ctx) && universal == nil {
 		return &ttnpb.Rights{}, nil
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
@@ -201,7 +201,7 @@ func (is *IdentityServer) OrganizationRights(ctx context.Context, orgIDs ttnpb.O
 	if entity != nil {
 		return entity.Union(universal), nil
 	}
-	if !is.IsAdmin(ctx) {
+	if !is.IsAdmin(ctx) && universal == nil {
 		return &ttnpb.Rights{}, nil
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
@@ -226,7 +226,7 @@ func (is *IdentityServer) UserRights(ctx context.Context, userIDs ttnpb.UserIden
 	if entity != nil {
 		return entity.Union(universal), nil
 	}
-	if !is.IsAdmin(ctx) {
+	if !is.IsAdmin(ctx) && universal == nil {
 		return &ttnpb.Rights{}, nil
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
