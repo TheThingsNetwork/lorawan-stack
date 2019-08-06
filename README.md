@@ -43,9 +43,9 @@ LoRaWAN is a protocol for low-power wide area networks. It allows for large scal
   - [x] Gateway management and status
 - Web Interface (Console)
   - [x] Create account and login
-  - [ ] Application management and traffic
-  - [ ] End device management, status and traffic
-  - [ ] Gateway management, status and traffic
+  - [x] Application management and traffic
+  - [x] End device management, status and traffic
+  - [x] Gateway management, status and traffic
 
 ## Getting Started
 
