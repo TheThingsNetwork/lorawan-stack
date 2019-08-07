@@ -3,7 +3,7 @@
   "version": "3.1.0",
   "description": "The Things Stack",
   "main": "index.js",
-  "repository": "https://github.com/TheThingsNetwork/ttn.git",
+  "repository": "https://github.com/TheThingsNetwork/lorawan-stack.git",
   "license": "Apache-2.0",
   "devDependencies": {
     "@babel/cli": "^7.0.0",
