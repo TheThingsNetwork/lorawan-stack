@@ -269,25 +269,44 @@ class Devices {
         },
       }
       if (parseInt(device.lorawan_version.replace(/\D/g, '').padEnd(3, 0)) >= 110) {
-        session.keys.s_nwk_s_int_key = {
-          key: randomByteString(32),
-        }
-        session.keys.nwk_s_enc_key = {
-          key: randomByteString(32),
-        }
+        const {
+          session: {
+            keys: {
+              s_nwk_s_int_key,
+              nwk_s_enc_key,
+            },
+          },
+        } = device
+
+        session.keys.s_nwk_s_int_key = Boolean(s_nwk_s_int_key)
+          ? s_nwk_s_int_key
+          : { key: randomByteString(32) }
+
+        session.keys.nwk_s_enc_key = Boolean(nwk_s_enc_key)
+          ? nwk_s_enc_key
+          : { key: randomByteString(32) }
       }
 
-      let providedKeys = {}
-      if (dev.session && dev.session.keys) {
-        providedKeys = dev.session.keys
-      }
+      const {
+        session: {
+          keys: {
+            f_nwk_s_int_key,
+            app_s_key,
+          },
+        },
+      } = device
 
       dev.session = {
         ...session,
         ...dev.session,
         keys: {
           ...session.keys,
-          ...providedKeys,
+          f_nwk_s_int_key: Boolean(f_nwk_s_int_key)
+            ? f_nwk_s_int_key
+            : session.keys.f_nwk_s_int_key,
+          app_s_key: Boolean(app_s_key)
+            ? app_s_key
+            : session.keys.app_s_key,
         },
       }
 
