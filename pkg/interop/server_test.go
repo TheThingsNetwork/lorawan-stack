@@ -16,12 +16,8 @@ package interop_test
 
 import (
 	"bytes"
-	"crypto/tls"
-	"crypto/x509"
 	"encoding/json"
-	"io/ioutil"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"github.com/smartystreets/assertions"
@@ -96,7 +92,7 @@ func TestServeHTTP(t *testing.T) {
 			a := assertions.New(t)
 			s, err := NewServer(test.Context(), config.InteropServer{
 				SenderClientCAs: map[string]string{
-					"000001": "testdata/clientca.pem",
+					"000001": "testdata/rootCA.pem",
 				},
 			})
 			if !a.So(err, should.BeNil) {
@@ -115,26 +111,11 @@ func TestServeHTTP(t *testing.T) {
 				s.RegisterAS(tc.AS)
 			}
 
-			clientRootCAsPem, err := ioutil.ReadFile("testdata/clientca.pem")
-			if err != nil {
-				t.Fatalf("Failed to read CA: %v", err)
-			}
-			clientRootCAs := x509.NewCertPool()
-			clientRootCAs.AppendCertsFromPEM(clientRootCAsPem)
-			srv := httptest.NewUnstartedServer(s)
-			srv.TLS = &tls.Config{
-				ClientAuth: tls.RequireAndVerifyClientCert,
-				ClientCAs:  clientRootCAs,
-			}
-			srv.StartTLS()
+			srv := newTLSServer(s)
 			defer srv.Close()
 
-			clientCert, err := tls.LoadX509KeyPair("testdata/clientcert.pem", "testdata/clientkey.pem")
-			if !a.So(err, should.BeNil) {
-				t.Fatal("Failed to load client certificate")
-			}
 			client := srv.Client()
-			client.Transport.(*http.Transport).TLSClientConfig.Certificates = []tls.Certificate{clientCert}
+			client.Transport.(*http.Transport).TLSClientConfig = makeClientTLSConfig()
 
 			buf, err := json.Marshal(tc.RequestBody)
 			if !a.So(err, should.BeNil) {
