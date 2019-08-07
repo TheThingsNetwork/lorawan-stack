@@ -34,7 +34,7 @@ var LabelsFromContext func(ctx context.Context) prometheus.Labels
 var ttnInfo = prometheus.NewGauge(prometheus.GaugeOpts{
 	Namespace: Namespace,
 	Name:      "info",
-	Help:      "Information about TTN Stack for LoRaWAN",
+	Help:      "Information about The Things Stack for LoRaWAN",
 	ConstLabels: prometheus.Labels{
 		"version":    version.TTN,
 		"build_date": version.BuildDate,

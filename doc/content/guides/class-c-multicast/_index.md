@@ -20,7 +20,7 @@ To disable Class C scheduling, reset with `--supports-class-c=false`.
 
 ## Class C message settings
 
-TTN Stack supports optional settings for Class C downlink messages: the downlink path and the time to send the message.
+The Things Stack supports optional settings for Class C downlink messages: the downlink path and the time to send the message.
 
 The downlink path is defined by one or more gateways IDs. The Network Server and Gateway Server schedules only on the specified gateways in the specified order. This is useful for multicast (where no downlink path is known because there is no uplink). A scheduling attempt on can fail when the gateway is not connected, if there is a scheduling conflict or if duty-cycle regulations prohibit transmission. See the [Example]({{< relref "#example" >}}) below.
 

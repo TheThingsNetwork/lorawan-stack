@@ -38,7 +38,7 @@ import style from './login.styl'
 const m = defineMessages({
   createAccount: 'Create an account',
   loginToContinue: 'Please login to continue',
-  stackAccount: 'TTN Stack Account',
+  stackAccount: 'The Things Stack Account',
 })
 
 const validationSchema = Yup.object().shape({

@@ -31,7 +31,7 @@ const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 // Error details that are communicated over gRPC (and HTTP) APIs.
 // The messages (for translation) are stored as "error:<namespace>:<name>".
 type ErrorDetails struct {
-	// Namespace of the error (typically the package name in the stack).
+	// Namespace of the error (typically the package name in The Things Stack).
 	Namespace string `protobuf:"bytes,1,opt,name=namespace,proto3" json:"namespace,omitempty"`
 	// Name of the error.
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`

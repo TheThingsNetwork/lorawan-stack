@@ -141,7 +141,7 @@
   "console.views.gateway-location.index.setGatewayLocation": "Set gateway antenna location",
   "console.views.login.index.welcome": "Welcome to {stackConsole}",
   "console.views.login.index.login": "You need to be logged in to use this site",
-  "console.views.login.index.loginWithStackAccount": "Login with your TTN Stack Account",
+  "console.views.login.index.loginWithStackAccount": "Login with your The Things Stack Account",
   "console.views.overview.index.createApplication": "Create an application",
   "console.views.overview.index.createGateway": "Register a gateway",
   "console.views.overview.index.gotoApplications": "Go to applications",
@@ -331,7 +331,7 @@
   "oauth.views.authorize.index.redirectInfo": "You will be redirected to {redirectUri}",
   "oauth.views.authorize.index.authorize": "Authorize",
   "oauth.views.code.index.code": "Your Authorization Code",
-  "oauth.views.create-account.index.createAccount": "Create TTN Stack Account",
+  "oauth.views.create-account.index.createAccount": "Create The Things Stack Account",
   "oauth.views.create-account.index.register": "Register",
   "oauth.views.create-account.index.confirmPassword": "Confirm Password",
   "oauth.views.create-account.index.validatePasswordMatch": "Passwords should match",
@@ -342,5 +342,5 @@
   "oauth.views.create-account.index.registrationPending": "You have successfully sent the registration request. Please wait until an admin approves it.",
   "oauth.views.login.index.createAccount": "Create an account",
   "oauth.views.login.index.loginToContinue": "Please login to continue",
-  "oauth.views.login.index.stackAccount": "TTN Stack Account"
+  "oauth.views.login.index.stackAccount": "The Things Stack Account"
 }

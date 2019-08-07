@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// ttn-lw-cli is the binary for the Command-line interface of The Things Network Stack for LoRaWAN.
+// ttn-lw-cli is the binary for the Command-line interface of The Things Stack for LoRaWAN.
 package main
 
 import (

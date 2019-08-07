@@ -255,7 +255,7 @@ func (protobufv2) ToTxAck(message []byte, _ ttnpb.GatewayIdentifiers) (*ttnpb.Tx
 	return nil, errNotSupported
 }
 
-// ProtobufV2 is a format that uses the legacy The Things Network Stack V2 Protocol Buffers marshaling and unmarshaling.
+// ProtobufV2 is a format that uses the legacy The Things Stack V2 Protocol Buffers marshaling and unmarshaling.
 var ProtobufV2 Format = &protobufv2{
 	Layout: topics.V2,
 }

@@ -19,7 +19,7 @@ Once the device templates are personalized with EUIs, you can set additional fie
 
 ## Example
 
-This example illustrates creating a device profile template, assigning 5 `DevEUI`s and creating them in your TTN Stack application.
+This example illustrates creating a device profile template, assigning 5 `DevEUI`s and creating them in your The Things Stack application.
 
 First, create a mapping file with a device profile in `profile.json`:
 
@@ -198,7 +198,7 @@ $ cat profile.json \
 ```
 </details>
 
-Finally, you can create these devices in your TTN Stack application `test-app`, see [Executing Templates]({{< relref "executing.md" >}}).
+Finally, you can create these devices in your The Things Stack application `test-app`, see [Executing Templates]({{< relref "executing.md" >}}).
 
 ```bash
 $ cat devices.json \

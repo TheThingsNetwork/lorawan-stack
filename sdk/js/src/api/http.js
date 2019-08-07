@@ -68,7 +68,7 @@ class Http {
   async handleRequest (method, endpoint, component, payload = {}, isStream) {
     const parsedComponent = component || this._parseStackComponent(endpoint)
     if (!this._stackConfig[parsedComponent]) {
-      // If the component has not been defined in the stack config, make no
+      // If the component has not been defined in The Things Stack config, make no
       // request and throw an error instead
       throw new Error(`Cannot run "${method.toUpperCase()} ${endpoint}" API call on disabled component: "${parsedComponent}"`)
     }
@@ -121,7 +121,7 @@ class Http {
   }
 
   /**
-   * Extracts the stack component abbreviation from the endpoint.
+   * Extracts The Things Stack component abbreviation from the endpoint.
    * @param {string} endpoint - The endpoint got for a request method.
    * @returns {string} One of {is|as|gs|js|ns}.
    */
@@ -130,7 +130,7 @@ class Http {
       const component = endpoint.split('/')[1]
       return STACK_COMPONENTS.includes(component) ? component : 'is'
     } catch (err) {
-      throw new Error('Unable to extract the stack component:', endpoint)
+      throw new Error('Unable to extract The Things Stack component:', endpoint)
     }
   }
 }

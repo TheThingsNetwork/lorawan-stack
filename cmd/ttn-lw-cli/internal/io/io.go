@@ -113,7 +113,7 @@ type jsonDecoder struct {
 }
 
 // NewJSONDecoder returns a new Decoder on top of r, and that uses the common JSON
-// format used in TTN Stack.
+// format used in The Things Stack.
 func NewJSONDecoder(r io.Reader) Decoder {
 	return &jsonDecoder{dec: json.NewDecoder(r)}
 }

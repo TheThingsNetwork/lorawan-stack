@@ -1,6 +1,6 @@
-# The Things Network Stack for LoRaWAN Development
+# The Things Stack for LoRaWAN Development
 
-The Things Network Stack components are primarily built in Go, while we use Node for web front-ends. It is assumed that you have decent knowledge and experience with these technologies. If you want to get more familiar with Go, we strongly recommend to take [A Tour of Go](https://tour.golang.org/).
+The Things Stack components are primarily built in Go, while we use Node for web front-ends. It is assumed that you have decent knowledge and experience with these technologies. If you want to get more familiar with Go, we strongly recommend to take [A Tour of Go](https://tour.golang.org/).
 
 ## Development Environment
 
@@ -77,7 +77,7 @@ You can use `make dev.databases.redis-cli` to enter a Redis-CLI shell.
 
 ### Building
 
-There is a single binary for the server, `ttn-lw-stack`, as well as a binary for the command-line interface `ttn-lw-cli`. The single binary contains all components start one or multiple components. This allows you to run the stack with one command in simple deployment scenarios, as well as distributing micro-services for more advanced scenarios.
+There is a single binary for the server, `ttn-lw-stack`, as well as a binary for the command-line interface `ttn-lw-cli`. The single binary contains all components start one or multiple components. This allows you to run The Things Stack with one command in simple deployment scenarios, as well as distributing micro-services for more advanced scenarios.
 
 We provide binary releases for all supported platforms, including packages for various package managers at https://github.com/TheThingsNetwork/lorawan-stack/releases. We suggest you use the compiled packages we provide in production scenarios.
 
@@ -131,7 +131,7 @@ After pushing the tag, our CI system will start building the release. When this 
 
 > Note: If you don't work on changes in the API you can skip this section.
 
-Our APIs are defined in `.proto` files in the `api` folder. These files describe the messages and interfaces of the different components of the Stack. If this is the first time you hear the term "protocol buffers" you should probably read the [protocol buffers documentation](https://developers.google.com/protocol-buffers/docs/proto3) before you continue.
+Our APIs are defined in `.proto` files in the `api` folder. These files describe the messages and interfaces of the different components of The Things Stack. If this is the first time you hear the term "protocol buffers" you should probably read the [protocol buffers documentation](https://developers.google.com/protocol-buffers/docs/proto3) before you continue.
 
 From the `.proto` files, we generate code using the `protoc` compiler. As we plan to compile to a number of different languages, we decided to put the compiler and its dependencies in a Docker image, so make sure you have [Docker](https://www.docker.com/) installed before you try to compile them.
 
@@ -156,14 +156,14 @@ The actual commands for compilation are handled by our Makefile, so the only thi
 ├── README.md           general information about this project
 │   ...
 ├── api                 contains the protocol buffer definitions for our API
-├── cmd                 contains the different binaries that form TTN Stack for LoRaWAN
+├── cmd                 contains the different binaries that form The Things Stack for LoRaWAN
 │   ├── internal        contains internal files shared between the different binaries
 │   │   ...
-│   ├── ttn-lw-cli      the command-line-interface for TTN Stack for LoRaWAN
-│   └── ttn-lw-stack    bundles the server binaries that form TTN Stack for LoRaWAN
+│   ├── ttn-lw-cli      the command-line-interface for The Things Stack for LoRaWAN
+│   └── ttn-lw-stack    bundles the server binaries that form The Things Stack for LoRaWAN
 ├── config              configuration for our JavaScript SDK and frontend
-├── doc                 detailed documentation on the workings of TTN Stack for LoRaWAN
-├── pkg                 contains all libraries used in TTN Stack for LoRaWAN
+├── doc                 detailed documentation on the workings of The Things Stack for LoRaWAN
+├── pkg                 contains all libraries used in The Things Stack for LoRaWAN
 │   ├── component       contains the base component; all other components extend this component
 │   ├── config          package for configuration using config files, environment and CLI flags
 │   ├── console         package that provides the web server for the console
@@ -184,13 +184,13 @@ The actual commands for compilation are handled by our Makefile, so the only thi
 
 ## Frontend
 ### Introduction
-The Things Network Stack for LoRaWAN includes two frontend applications: the **Console** and **OAuth Provider**. Both applications use [React](https://reactjs.org/) as frontend framework. The `console` and `oauth` packages of the backend expose their respective web servers and handle all logic that cannot be done in the browser. Otherwise both applications are single page applications (SPA) that run entirely in the browser.
+The Things Stack for LoRaWAN includes two frontend applications: the **Console** and **OAuth Provider**. Both applications use [React](https://reactjs.org/) as frontend framework. The `console` and `oauth` packages of the backend expose their respective web servers and handle all logic that cannot be done in the browser. Otherwise both applications are single page applications (SPA) that run entirely in the browser.
 
 #### Console
-The Console is the official management application of the stack. It can be used to register applications, end devices or gateways, monitor network traffic, or configure network related options, among other things. The console uses an OAuth access token to communicate with the stack.
+The Console is the official management application of The Things Stack. It can be used to register applications, end devices or gateways, monitor network traffic, or configure network related options, among other things. The console uses an OAuth access token to communicate with The Things Stack.
 
 #### OAuth
-The OAuth app provides the necessary frontend for the OAuth provider of the stack. It is used e.g. to display the authorization screen that users get prompted with when they want to authorize a third-party app to access the stack.
+The OAuth app provides the necessary frontend for the OAuth provider of The Things Stack. It is used e.g. to display the authorization screen that users get prompted with when they want to authorize a third-party app to access The Things Stack.
 
 ### Building the frontend
 
@@ -221,11 +221,11 @@ The difference of a development build includes:
 * Using DLL bundle for modules to reduce build time
 * A couple of special build options to improve usage with `webpack-dev-server`
 
-After successfully running the build command, the stack has all necessary files to run the Console and OAuth provider applications.
+After successfully running the build command, The Things Stack has all necessary files to run the Console and OAuth provider applications.
 
 ### Development
 #### Serving the frontend for development
-For development purposes, the frontend can be run using `webpack-dev-server`. After following the [Getting Started](#getting-started) section to initialize the stack and doing an initial build of the frontend via `mage js:build`, it can be served using:
+For development purposes, the frontend can be run using `webpack-dev-server`. After following the [Getting Started](#getting-started) section to initialize The Things Stack and doing an initial build of the frontend via `mage js:build`, it can be served using:
 
 ```sh
 export NODE_ENV=development
@@ -233,7 +233,7 @@ mage js:serve
 ```
 
 The development server runs on `http://localhost:8080` and will proxy all api calls to port `1885`. The serve command watches any changes inside `pkg/webui` and refreshes automatically. 
-In order to set up the stack to support running the frontend via `webpack-dev-server`, the following environment setup is needed:
+In order to set up The Things Stack to support running the frontend via `webpack-dev-server`, the following environment setup is needed:
 
 ```
 NODE_ENV=development
@@ -260,7 +260,7 @@ mage js:test
 ```
 
 ### Internationalization (i18n)
-The Things Network Stack for LoRaWAN employs i18n to provide usage experience in different languages. As such, also the frontend uses translatable messages. For this purpose we use [`react-intl`](https://github.com/yahoo/react-intl), which helps us greatly to define text messages used in the frontend.
+The Things Stack for LoRaWAN employs i18n to provide usage experience in different languages. As such, also the frontend uses translatable messages. For this purpose we use [`react-intl`](https://github.com/yahoo/react-intl), which helps us greatly to define text messages used in the frontend.
 The workflow for defining messages is as follows:
 
 1. Add a `react-intl` message using `intl.defineMessages({…})`
@@ -284,7 +284,7 @@ The message definitions in `pkg/webui/locales` can be used to provide translatio
 ├── assets            assets (eg. vectors, images) used by the frontend
 ├── components        react components shared throughout the frontend
 ├── console           root of the console application
-│   ├── api           api definitions to communicate with the stack
+│   ├── api           api definitions to communicate with The Things Stack
 │   ├── containers    container components
 │   ├── lib           utility classes and functions
 │   ├── store         redux actions, reducers and logic middlewares
@@ -293,7 +293,7 @@ The message definitions in `pkg/webui/locales` can be used to provide translatio
 ├── lib               global utility classes and functions
 ├── locales           frontend and backend locale jsons used for i18n
 ├── oauth             root of the oauth application
-│   ├── api           api definitions to communicate with the stack
+│   ├── api           api definitions to communicate with The Things Stack
 │   ├── store         redux actions, reducers and logic middlewares
 │   ├── views         whole view components of the oauth provider (~pages)
 ├── styles            global stylus (~css) styles and mixins
@@ -305,7 +305,7 @@ The message definitions in `pkg/webui/locales` can be used to provide translatio
 
 ## Documentation
 
-The documentation site for The Things Network Stack is built from the `doc` folder. 
+The documentation site for The Things Stack is built from the `doc` folder. 
 All content is stored as Markdown files in `doc/content`.
 
 In order to build the documentation site with the right theme, you need to run

@@ -42,7 +42,7 @@ var (
 		Use:           name,
 		SilenceErrors: true,
 		SilenceUsage:  true,
-		Short:         "The Things Network Stack for LoRaWAN",
+		Short:         "The Things Stack for LoRaWAN",
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			// read in config from file
 			err := mgr.ReadInConfig()

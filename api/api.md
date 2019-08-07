@@ -2128,7 +2128,7 @@ The messages (for translation) are stored as "error:<namespace>:<name>".
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `namespace` | [`string`](#string) |  | Namespace of the error (typically the package name in the stack). |
+| `namespace` | [`string`](#string) |  | Namespace of the error (typically the package name in The Things Stack). |
 | `name` | [`string`](#string) |  | Name of the error. |
 | `message_format` | [`string`](#string) |  | The default (fallback) message format that should be used for the error. This is also used if the client does not have a translation for the error. |
 | `attributes` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  | Attributes that should be filled into the message format. Any extra attributes can be displayed as error details. |

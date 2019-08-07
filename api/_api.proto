@@ -16,7 +16,7 @@ syntax = "proto3";
 
 // Package documentation should be added in the comment block below:
 
-// The Things Network Stack for LoRaWAN v3 API
+// The Things Stack for LoRaWAN v3 API
 package ttn.lorawan.v3;
 
 option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";

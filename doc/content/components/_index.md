@@ -7,9 +7,9 @@ menu:
     weight: 4
 ---
 
-TTN Stack is composed of components. The core components Network Server, Application Server and Join Server follow the LoRaWAN Network Reference Model. TTN Stack also contains an Identity Server, Gateway Server and Console.
+The Things Stack is composed of components. The core components Network Server, Application Server and Join Server follow the LoRaWAN Network Reference Model. The Things Stack also contains an Identity Server, Gateway Server and Console.
 
-{{< figure src="components.png" alt="TTN Stack components" width="80%" height="80%" >}}
+{{< figure src="components.png" alt="The Things Stack components" width="80%" height="80%" >}}
 
 - **Identity Server**: stores applications, end devices, gateways, users, organizations, OAuth clients, API keys and collaborators. Also acts as a OAuth 2.0 server with login and consent screens
 - **Gateway Server**: maintains connections with gateways supporting the UDP, MQTT, gRPC and Basic Station protocols, forwards uplink traffic to Network Servers, schedules downlink traffic

@@ -1,5 +1,5 @@
-# The Things Network Stack for LoRaWAN JavaScript SDK
-This is the official SDK for the The Things Network Stack for LoRaWAN.
+# The Things Stack for LoRaWAN JavaScript SDK
+This is the official SDK for the The Things Stack for LoRaWAN.
 
 ## Installation
 

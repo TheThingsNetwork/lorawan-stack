@@ -6,7 +6,7 @@ weight: 30
 
 {{< cli-only >}}
 
-The stack keeps a queue of downlink messages per device. Applications can keep pushing downlink messages or replace the queue with a list of downlink messages.
+The Things Stack keeps a queue of downlink messages per device. Applications can keep pushing downlink messages or replace the queue with a list of downlink messages.
 
 If there are more application downlink messages in the queue, the Network Server sets the LoRaWAN `FPending` bit to indicate end devices that there is more downlink available. In class A downlink, this typically triggers the device to send an uplink message to receive the downlink message. In class C, the Network Server automatically transmits all queued downlink messages.
 

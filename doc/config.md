@@ -1,10 +1,10 @@
 # Configuration
 
-The stack binary can be configured by passing parameters.
+The Things Stack binary can be configured by passing parameters.
 
 ## Default config
 
-The stack can be used for local testing purposes without any additional configuration. To test and use the components to the fullest, you can use the `--help` flag to show available parameters, and refer to execution logs for recommendations.
+The Things Stack can be used for local testing purposes without any additional configuration. To test and use the components to the fullest, you can use the `--help` flag to show available parameters, and refer to execution logs for recommendations.
 
 ## Sources
 

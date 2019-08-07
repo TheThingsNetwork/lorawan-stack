@@ -9,11 +9,11 @@ weight: 8
 
 ## Login
 
-The Console needs to be logged on in order to create gateways, applications, devices and API keys. With the stack running, open http://localhost:1885 in your browser.
+The Console needs to be logged on in order to create gateways, applications, devices and API keys. With The Things Stack running, open http://localhost:1885 in your browser.
 
 {{< figure src="front.png" alt="Front page" >}}
 
-You are now on the Console landing page. Click `Login with your TTN Stack Account` in order to reach the login page.
+You are now on the Console landing page. Click `Login with your The Things Stack Account` in order to reach the login page.
 
 {{< figure src="login.png" alt="Login" >}}
 
@@ -31,7 +31,7 @@ Your gateway will be created and you will be redirected to the gateway overview 
 
 {{< figure src="gateway-overview.png" alt="Gateway overview" >}}
 
-You can now connect your gateway to the stack.
+You can now connect your gateway to The Things Stack.
 
 ## Create application
 
@@ -93,6 +93,6 @@ You'll now reach the device overview page for your device. The end device should
 
 ## Working with data
 
-With your TTN Stack setup, a gateway connected and a device registered on your network, it's time to start working with data.
+With your The Things Stack setup, a gateway connected and a device registered on your network, it's time to start working with data.
 
 Learn how to work with the [builtin MQTT server]({{< relref "../mqtt" >}}) and [HTTP webhooks]({{< relref "../webhooks" >}}).

@@ -327,7 +327,7 @@ $ cat templates.json \
 ```
 </details>
 
-Finally, you can create these devices in your TTN Stack application `test-app`, see [Executing Templates]({{< relref "executing.md" >}}).
+Finally, you can create these devices in your The Things Stack application `test-app`, see [Executing Templates]({{< relref "executing.md" >}}).
 
 ```bash
 $ cat devices.json \

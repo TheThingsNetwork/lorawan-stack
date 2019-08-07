@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// ttn-lw-stack is the binary that runs the entire The Things Network Stack for LoRaWAN.
+// ttn-lw-stack is the binary that runs the entire The Things Stack for LoRaWAN.
 package main
 
 import (

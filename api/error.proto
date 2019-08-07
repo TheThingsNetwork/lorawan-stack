@@ -25,7 +25,7 @@ option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 // Error details that are communicated over gRPC (and HTTP) APIs.
 // The messages (for translation) are stored as "error:<namespace>:<name>".
 message ErrorDetails {
-  // Namespace of the error (typically the package name in the stack).
+  // Namespace of the error (typically the package name in The Things Stack).
   string namespace = 1;
   // Name of the error.
   string name = 2;

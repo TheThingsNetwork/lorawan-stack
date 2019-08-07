@@ -36,7 +36,7 @@ import Spinner from '../../../components/spinner'
 import style from './create-account.styl'
 
 const m = defineMessages({
-  createAccount: 'Create TTN Stack Account',
+  createAccount: 'Create The Things Stack Account',
   register: 'Register',
   confirmPassword: 'Confirm Password',
   validatePasswordMatch: 'Passwords should match',
