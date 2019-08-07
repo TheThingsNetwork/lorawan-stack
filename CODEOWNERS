@@ -37,7 +37,7 @@
 /pkg/console @bafonins @kschiffer
 /pkg/gatewayserver @johanstokking
 /pkg/networkserver @johanstokking @rvolosatovs
-/pkg/identityserver @htdvisser
+/pkg/identityserver @htdvisser @bafonins
 /pkg/joinserver @johanstokking @rvolosatovs
 
 # SDKs
