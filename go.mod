@@ -20,6 +20,12 @@ replace golang.org/x/tools => golang.org/x/tools v0.0.0-20190806215303-88ddfcebc
 // The rename of go-nats to nats.go is causing trouble.
 // replace github.com/nats-io/go-nats => github.com/nats-io/nats.go v1.8.1
 
+// github.com/blang/semver doesn't have a v3 semantic import.
+replace github.com/blang/semver => github.com/blang/semver v0.0.0-20190414182527-1a9109f8c4a1
+
+// github.com/go-redis/redis doesn't have a v6 semantic import.
+replace github.com/go-redis/redis => github.com/go-redis/redis v0.0.0-20190503082931-75795aa4236d
+
 require (
 	contrib.go.opencensus.io/exporter/prometheus v0.1.0
 	github.com/PuerkitoBio/purell v1.1.1
@@ -28,7 +34,7 @@ require (
 	github.com/TheThingsIndustries/release-notes v0.1.0
 	github.com/TheThingsNetwork/go-cayenne-lib v1.0.0
 	github.com/aws/aws-sdk-go v1.22.0
-	github.com/blang/semver v3.6.1+incompatible
+	github.com/blang/semver v0.0.0-20190414182527-1a9109f8c4a1
 	github.com/certifi/gocertifi v0.0.0-20190506164543-d2eda7129713 // indirect
 	github.com/client9/misspell v0.3.4
 	github.com/disintegration/imaging v1.6.0
@@ -36,8 +42,7 @@ require (
 	github.com/envoyproxy/protoc-gen-validate v0.1.0
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/getsentry/raven-go v0.2.0
-	github.com/go-mail/mail v2.3.1+incompatible
-	github.com/go-redis/redis v6.15.3+incompatible
+	github.com/go-redis/redis v0.0.0-20190503082931-75795aa4236d
 	github.com/gobuffalo/envy v1.7.0 // indirect
 	github.com/gobwas/glob v0.2.3
 	github.com/gogo/protobuf v1.2.1
@@ -109,7 +114,7 @@ require (
 	google.golang.org/genproto v0.0.0-20190801165951-fa694d86fc64
 	google.golang.org/grpc v1.22.1
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
-	gopkg.in/mail.v2 v2.3.1 // indirect
+	gopkg.in/mail.v2 v2.3.1
 	gopkg.in/sourcemap.v1 v1.0.5 // indirect
 	gopkg.in/square/go-jose.v2 v2.3.1
 	gopkg.in/yaml.v2 v2.2.2
