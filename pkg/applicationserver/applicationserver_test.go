@@ -499,8 +499,11 @@ hardware_versions:
 							chs.downErr <- err
 							continue
 						}
-						err = nc.Publish(subject, buf)
-						chs.downErr <- err
+						chs.downErr <- nc.Publish(subject, buf)
+						err = nc.FlushTimeout(Timeout)
+						if err != nil {
+							chs.downErr <- err
+						}
 					}
 				}()
 				errCh := make(chan error, 1)

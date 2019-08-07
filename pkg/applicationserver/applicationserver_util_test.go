@@ -22,7 +22,7 @@ import (
 )
 
 var (
-	Timeout = (1 << 8) * test.Delay
+	Timeout = (1 << 9) * test.Delay
 )
 
 // MockDeviceRegistry is a mock DeviceRegistry used for testing.
