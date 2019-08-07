@@ -17,6 +17,7 @@ package applicationserver
 import (
 	"bytes"
 	"context"
+	"crypto/tls"
 	"fmt"
 	"net"
 	"sync"
@@ -97,8 +98,16 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 	ctx := log.NewContextWithField(c.Context(), "namespace", "applicationserver")
 
 	var interopCl InteropClient
-	if conf.Interop.ConfigURI != "" {
-		interopCl, err = interop.NewClient(ctx, conf.Interop.ClientConfig, nil)
+	if !conf.Interop.IsZero() {
+		var fallbackTLS *tls.Config
+		cTLS, err := c.GetTLSConfig(ctx)
+		if err != nil {
+			log.FromContext(ctx).WithError(err).Warn("Could not get fallback TLS config for interoperability")
+		} else {
+			fallbackTLS = cTLS
+		}
+
+		interopCl, err = interop.NewClient(ctx, conf.Interop.ClientConfig, fallbackTLS)
 		if err != nil {
 			return nil, err
 		}

@@ -17,6 +17,7 @@ package networkserver
 
 import (
 	"context"
+	"crypto/tls"
 	"hash/fnv"
 	"io"
 	"sync"
@@ -170,8 +171,16 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 	ctx := log.NewContextWithField(c.Context(), "namespace", "networkserver")
 
 	var interopCl InteropClient
-	if conf.Interop.ConfigURI != "" {
-		interopCl, err = interop.NewClient(ctx, conf.Interop, nil)
+	if !conf.Interop.IsZero() {
+		var fallbackTLS *tls.Config
+		cTLS, err := c.GetTLSConfig(ctx)
+		if err != nil {
+			log.FromContext(ctx).WithError(err).Warn("Could not get fallback TLS config for interoperability")
+		} else {
+			fallbackTLS = cTLS
+		}
+
+		interopCl, err = interop.NewClient(ctx, conf.Interop, fallbackTLS)
 		if err != nil {
 			return nil, err
 		}
