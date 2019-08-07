@@ -92,6 +92,18 @@ func Config(mgr *config.Manager) *cobra.Command {
 						}
 						val = joinSlice(pairs)
 					}
+				case map[string][]string:
+					if len(v) == 0 {
+						empty = true
+					} else {
+						var pairs []string
+						for k, vs := range v {
+							for _, v := range vs {
+								pairs = append(pairs, fmt.Sprintf("%s=%s", k, v))
+							}
+						}
+						val = joinSlice(pairs)
+					}
 				case map[string][]uint8:
 					if len(v) == 0 {
 						empty = true
