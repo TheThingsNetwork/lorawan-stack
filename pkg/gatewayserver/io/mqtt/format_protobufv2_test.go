@@ -20,7 +20,7 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
-	legacyttnpb "go.thethings.network/lorawan-stack-legacy/pkg/ttnpb"
+	ttnpbv2 "go.thethings.network/lorawan-stack-legacy/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/mqtt"
@@ -62,20 +62,20 @@ func TestProtobufV2Downlink(t *testing.T) {
 		t.Fatal("Could not unmarshal the downlink payload in the v3 payload struct")
 	}
 
-	Expected := &legacyttnpb.DownlinkMessage{
+	Expected := &ttnpbv2.DownlinkMessage{
 		Payload: pld,
-		GatewayConfiguration: legacyttnpb.GatewayTxConfiguration{
+		GatewayConfiguration: ttnpbv2.GatewayTxConfiguration{
 			Frequency:             863000000,
 			Power:                 14,
 			PolarizationInversion: true,
 			Timestamp:             12000,
 		},
-		ProtocolConfiguration: legacyttnpb.ProtocolTxConfiguration{
-			LoRaWAN: &legacyttnpb.LoRaWANTxConfiguration{
+		ProtocolConfiguration: ttnpbv2.ProtocolTxConfiguration{
+			LoRaWAN: &ttnpbv2.LoRaWANTxConfiguration{
 				CodingRate: "4/5",
 				DataRate:   "SF12BW125",
 				FCnt:       2,
-				Modulation: legacyttnpb.Modulation_LORA,
+				Modulation: ttnpbv2.Modulation_LORA,
 			},
 		},
 	}
@@ -92,12 +92,12 @@ func TestProtobufV2Downlink(t *testing.T) {
 }
 
 func TestProtobufV2Uplinks(t *testing.T) {
-	validV2Settings := legacyttnpb.ProtocolRxMetadata{
-		LoRaWAN: &legacyttnpb.LoRaWANMetadata{
+	validV2Settings := ttnpbv2.ProtocolRxMetadata{
+		LoRaWAN: &ttnpbv2.LoRaWANMetadata{
 			CodingRate:    "4/5",
 			DataRate:      "SF7BW125",
 			FrequencyPlan: 0,
-			Modulation:    legacyttnpb.Modulation_LORA,
+			Modulation:    ttnpbv2.Modulation_LORA,
 		},
 	}
 	validV3Settings := ttnpb.TxSettings{
@@ -112,15 +112,15 @@ func TestProtobufV2Uplinks(t *testing.T) {
 		CodingRate:    "4/5",
 		DataRateIndex: 5,
 	}
-	validV2Metadata := legacyttnpb.GatewayRxMetadata{
+	validV2Metadata := ttnpbv2.GatewayRxMetadata{
 		GatewayID: "gateway-id",
 		RSSI:      -2,
 		SNR:       -75,
 		Timestamp: 1000,
 	}
-	validV2RSigMetadata := legacyttnpb.GatewayRxMetadata{
+	validV2RSigMetadata := ttnpbv2.GatewayRxMetadata{
 		GatewayID: validV2Metadata.GatewayID,
-		Antennas: []*legacyttnpb.GatewayRxMetadata_Antenna{
+		Antennas: []*ttnpbv2.GatewayRxMetadata_Antenna{
 			{
 				RSSI: validV2Metadata.RSSI,
 				SNR:  validV2Metadata.SNR,
@@ -148,19 +148,19 @@ func TestProtobufV2Uplinks(t *testing.T) {
 
 	for _, tc := range []struct {
 		Name           string
-		Input          *legacyttnpb.UplinkMessage
+		Input          *ttnpbv2.UplinkMessage
 		InputPayload   []byte
 		Expected       *ttnpb.UplinkMessage
 		ErrorAssertion func(error) bool
 	}{
 		{
 			Name:           "empty Input",
-			Input:          &legacyttnpb.UplinkMessage{},
+			Input:          &ttnpbv2.UplinkMessage{},
 			ErrorAssertion: func(err error) bool { return err != nil },
 		},
 		{
 			Name: "correct Input",
-			Input: &legacyttnpb.UplinkMessage{
+			Input: &ttnpbv2.UplinkMessage{
 				GatewayMetadata:  validV2Metadata,
 				ProtocolMetadata: validV2Settings,
 			},
@@ -172,7 +172,7 @@ func TestProtobufV2Uplinks(t *testing.T) {
 		},
 		{
 			Name: "correct Input with Rsig",
-			Input: &legacyttnpb.UplinkMessage{
+			Input: &ttnpbv2.UplinkMessage{
 				GatewayMetadata:  validV2RSigMetadata,
 				ProtocolMetadata: validV2Settings,
 			},
@@ -184,10 +184,10 @@ func TestProtobufV2Uplinks(t *testing.T) {
 		},
 		{
 			Name: "incorrect data rate",
-			Input: &legacyttnpb.UplinkMessage{
+			Input: &ttnpbv2.UplinkMessage{
 				GatewayMetadata: validV2Metadata,
-				ProtocolMetadata: legacyttnpb.ProtocolRxMetadata{
-					LoRaWAN: &legacyttnpb.LoRaWANMetadata{
+				ProtocolMetadata: ttnpbv2.ProtocolRxMetadata{
+					LoRaWAN: &ttnpbv2.LoRaWANMetadata{
 						CodingRate:    validV2Settings.LoRaWAN.CodingRate,
 						DataRate:      "SF3BW000",
 						FrequencyPlan: validV2Settings.LoRaWAN.FrequencyPlan,
@@ -199,14 +199,14 @@ func TestProtobufV2Uplinks(t *testing.T) {
 		},
 		{
 			Name: "incorrect modulation",
-			Input: &legacyttnpb.UplinkMessage{
+			Input: &ttnpbv2.UplinkMessage{
 				GatewayMetadata: validV2Metadata,
-				ProtocolMetadata: legacyttnpb.ProtocolRxMetadata{
-					LoRaWAN: &legacyttnpb.LoRaWANMetadata{
+				ProtocolMetadata: ttnpbv2.ProtocolRxMetadata{
+					LoRaWAN: &ttnpbv2.LoRaWANMetadata{
 						CodingRate:    validV2Settings.LoRaWAN.CodingRate,
 						DataRate:      validV2Settings.LoRaWAN.DataRate,
 						FrequencyPlan: validV2Settings.LoRaWAN.FrequencyPlan,
-						Modulation:    legacyttnpb.Modulation(3252),
+						Modulation:    ttnpbv2.Modulation(3252),
 					},
 				},
 			},
@@ -243,13 +243,13 @@ func TestProtobufV2Status(t *testing.T) {
 	}
 	for _, tc := range []struct {
 		Name           string
-		input          *legacyttnpb.StatusMessage
+		input          *ttnpbv2.StatusMessage
 		Expected       *ttnpb.GatewayStatus
 		ErrorAssertion func(error) bool
 	}{
 		{
 			Name: "Simple",
-			input: &legacyttnpb.StatusMessage{
+			input: &ttnpbv2.StatusMessage{
 				TxIn: 5,
 				TxOk: 3,
 				RxIn: 15,
@@ -272,7 +272,7 @@ func TestProtobufV2Status(t *testing.T) {
 		},
 		{
 			Name: "With versions",
-			input: &legacyttnpb.StatusMessage{
+			input: &ttnpbv2.StatusMessage{
 				DSP:  3,
 				HAL:  "v1.1",
 				FPGA: 4,
@@ -299,8 +299,8 @@ func TestProtobufV2Status(t *testing.T) {
 		},
 		{
 			Name: "With metrics",
-			input: &legacyttnpb.StatusMessage{
-				OS: &legacyttnpb.StatusMessage_OSMetrics{
+			input: &ttnpbv2.StatusMessage{
+				OS: &ttnpbv2.StatusMessage_OSMetrics{
 					CPUPercentage:    10.0,
 					Load_1:           30.0,
 					Load_5:           40.0,
@@ -334,12 +334,12 @@ func TestProtobufV2Status(t *testing.T) {
 		},
 		{
 			Name: "With location",
-			input: &legacyttnpb.StatusMessage{
-				Location: &legacyttnpb.LocationMetadata{
+			input: &ttnpbv2.StatusMessage{
+				Location: &ttnpbv2.LocationMetadata{
 					Latitude:  10,
 					Longitude: 10,
 					Altitude:  10,
-					Source:    legacyttnpb.LocationMetadata_GPS,
+					Source:    ttnpbv2.LocationMetadata_GPS,
 				},
 			},
 			Expected: &ttnpb.GatewayStatus{
