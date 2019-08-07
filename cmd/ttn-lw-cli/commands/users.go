@@ -341,7 +341,7 @@ func init() {
 	usersUpdatePasswordCommand.Flags().AddFlagSet(userIDFlags())
 	usersUpdatePasswordCommand.Flags().String("old", "", "")
 	usersUpdatePasswordCommand.Flags().String("new", "", "")
-	usersUpdatePasswordCommand.Flags().Bool("revoke_all_access", false, "revoke all sessions and access tokens after the password is updated")
+	usersUpdatePasswordCommand.Flags().Bool("revoke-all-access", true, "revoke all sessions and access tokens after the password is updated")
 	usersCommand.AddCommand(usersUpdatePasswordCommand)
 	usersDeleteCommand.Flags().AddFlagSet(userIDFlags())
 	usersCommand.AddCommand(usersDeleteCommand)
