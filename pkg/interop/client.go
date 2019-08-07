@@ -50,7 +50,7 @@ const (
 	defaultHTTPSPort = 443
 )
 
-// JoinServerProtocol represents the protocol used for connection to Join-Server by interop client.
+// JoinServerProtocol represents the protocol used for connection to Join Server by interop client.
 type JoinServerProtocol uint8
 
 const (

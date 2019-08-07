@@ -19,7 +19,7 @@ import (
 	"strings"
 )
 
-// JoinNonce is Join-Server nonce used in the join procedure.
+// JoinNonce is Join Server nonce used in the join procedure.
 // - If LoRaWAN version <1.1 - it is randomly generated.
 // - If LoRaWAN version >=1.1 - it is a scrictly increasing counter.
 type JoinNonce [3]byte
