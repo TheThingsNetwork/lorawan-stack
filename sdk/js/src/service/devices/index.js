@@ -222,7 +222,7 @@ class Devices {
       undefined,
       true,
     )
-    return deleteParts.every(e => Object.keys(e.device).length === 0) ? {} : deleteParts
+    return deleteParts.every(e => Boolean(e.device) && Object.keys(e.device).length === 0) ? {} : deleteParts
   }
 
   async getAll (applicationId, params, selector) {
