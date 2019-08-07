@@ -18,7 +18,7 @@ package nats
 import (
 	"context"
 
-	"github.com/nats-io/go-nats"
+	"github.com/nats-io/nats.go"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/provider"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"gocloud.dev/pubsub"

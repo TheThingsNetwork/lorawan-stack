@@ -19,8 +19,8 @@ import (
 	"testing"
 	"time"
 
-	nats_server "github.com/nats-io/gnatsd/server"
-	nats_test_server "github.com/nats-io/nats-server/test"
+	nats_server "github.com/nats-io/nats-server/v2/server"
+	nats_test_server "github.com/nats-io/nats-server/v2/test"
 	nats_client "github.com/nats-io/nats.go"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/provider"

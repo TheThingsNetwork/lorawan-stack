@@ -22,7 +22,7 @@ import (
 	"testing"
 
 	"github.com/go-redis/redis"
-	"github.com/oklog/ulid"
+	ulid "github.com/oklog/ulid/v2"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	ttnredis "go.thethings.network/lorawan-stack/pkg/redis"
 )

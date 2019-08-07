@@ -1,38 +1,33 @@
+go 1.12
+
 module go.thethings.network/lorawan-stack
 
+// Use our fork of grpc-gateway.
 replace github.com/grpc-ecosystem/grpc-gateway => github.com/TheThingsIndustries/grpc-gateway v1.9.4-gogo
 
+// Use our fork of otto.
 replace github.com/robertkrimen/otto => github.com/TheThingsIndustries/otto v0.0.0-20181129100957-6ddbbb60554a
 
-// Pin versions of golang.org/x modules, because one (or more) of our other deps
-// is importing invalid versions. Also, we don't need 10 different versions of
-// the same module.
+// The github.com/mgechev/dots dependency of github.com/mgechev/revive is broken.
+replace github.com/mgechev/dots => github.com/mgechev/dots v0.0.0-20181228164730-18fa4c4b71cc
 
-replace golang.org/x/crypto => golang.org/x/crypto v0.0.0-20190701094942-4def268fd1a4
+// The golang.org/x/sys dependency of github.com/mgechev/revive is broken.
+replace golang.org/x/sys => golang.org/x/sys v0.0.0-20190804053845-51ab0e2deafa
 
-replace golang.org/x/image => golang.org/x/image v0.0.0-20190622003408-7e034cad6442
+// The golang.org/x/tools dependency of github.com/mgechev/revive is broken.
+replace golang.org/x/tools => golang.org/x/tools v0.0.0-20190806215303-88ddfcebc769
 
-replace golang.org/x/lint => golang.org/x/lint v0.0.0-20190409202823-959b441ac422
-
-replace golang.org/x/net => golang.org/x/net v0.0.0-20190628185345-da137c7871d7
-
-replace golang.org/x/oauth2 => golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
-
-replace golang.org/x/sync => golang.org/x/sync v0.0.0-20190423024810-112230192c58
-
-replace golang.org/x/sys => golang.org/x/sys v0.0.0-20190626221950-04f50cda93cb
-
-replace golang.org/x/tools => golang.org/x/tools v0.0.0-20190702201734-44aeb8b7c377
+// The rename of go-nats to nats.go is causing trouble.
+// replace github.com/nats-io/go-nats => github.com/nats-io/nats.go v1.8.1
 
 require (
-	cloud.google.com/go v0.43.0 // indirect
 	contrib.go.opencensus.io/exporter/prometheus v0.1.0
 	github.com/PuerkitoBio/purell v1.1.1
 	github.com/TheThingsIndustries/magepkg v0.0.0-20190214092847-6c0299b7c3ed
 	github.com/TheThingsIndustries/mystique v0.0.0-20190516134627-66efd81c68ea
 	github.com/TheThingsIndustries/release-notes v0.1.0
 	github.com/TheThingsNetwork/go-cayenne-lib v1.0.0
-	github.com/aws/aws-sdk-go v1.20.14
+	github.com/aws/aws-sdk-go v1.22.0
 	github.com/blang/semver v3.6.1+incompatible
 	github.com/certifi/gocertifi v0.0.0-20190506164543-d2eda7129713 // indirect
 	github.com/client9/misspell v0.3.4
@@ -41,24 +36,23 @@ require (
 	github.com/envoyproxy/protoc-gen-validate v0.1.0
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/getsentry/raven-go v0.2.0
-	github.com/go-logfmt/logfmt v0.4.0 // indirect
 	github.com/go-mail/mail v2.3.1+incompatible
 	github.com/go-redis/redis v6.15.3+incompatible
 	github.com/gobuffalo/envy v1.7.0 // indirect
 	github.com/gobwas/glob v0.2.3
 	github.com/gogo/protobuf v1.2.1
-	github.com/gohugoio/hugo v0.55.6
+	github.com/gohugoio/hugo v0.56.3
 	github.com/golang/gddo v0.0.0-20190419222130-af0f2af80721
 	github.com/golang/protobuf v1.3.2
-	github.com/goreleaser/goreleaser v0.111.0
+	github.com/goreleaser/goreleaser v0.114.0
 	github.com/gorilla/securecookie v1.1.1
 	github.com/gorilla/websocket v1.4.0
 	github.com/gotnospirit/makeplural v0.0.0-20180622080156-a5f48d94d976 // indirect
-	github.com/gotnospirit/messageformat v0.0.0-20180622080451-0eab1176a3fb
+	github.com/gotnospirit/messageformat v0.0.0-20190719172517-c1d0bdacdea2
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79
 	github.com/grpc-ecosystem/go-grpc-middleware v1.0.0
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
-	github.com/grpc-ecosystem/grpc-gateway v1.9.3
+	github.com/grpc-ecosystem/grpc-gateway v1.9.4
 	github.com/heptiolabs/healthcheck v0.0.0-20180807145615-6ff867650f40
 	github.com/howeyc/gopass v0.0.0-20170109162249-bf9dde6d0d2c
 	github.com/jacobsa/crypto v0.0.0-20190317225127-9f44e2d11115
@@ -73,24 +67,24 @@ require (
 	// Do not upgrade Echo beyond v4.1.2 - see https://github.com/TheThingsNetwork/lorawan-stack/issues/977 .
 	github.com/labstack/echo/v4 v4.1.2
 	github.com/labstack/gommon v0.2.9
-	github.com/lib/pq v1.1.1
-	github.com/magefile/mage v1.8.1-0.20190702025601-9a6d7fe3be74
+	github.com/lib/pq v1.2.0
+	github.com/magefile/mage v1.8.1-0.20190718165527-e1fda1a0ffba
 	github.com/mattn/go-isatty v0.0.8
 	github.com/mattn/goveralls v0.0.2
 	github.com/mdempsky/unconvert v0.0.0-20190325185700-2f5dc3378ed3
-	github.com/mgechev/revive v0.0.0-20190702162933-cf3705f1b271
+	github.com/mgechev/revive v0.0.0-20190806210943-e43a9dc28a00
 	github.com/mitchellh/mapstructure v1.1.2
+	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
+	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
-	github.com/nats-io/gnatsd v1.4.1
-	github.com/nats-io/go-nats v1.7.2
-	github.com/nats-io/nats-server v1.4.1
-	github.com/nats-io/nats-server/v2 v2.0.0 // indirect
+	github.com/nats-io/nats-server/v2 v2.0.2
 	github.com/nats-io/nats.go v1.8.1
-	github.com/oklog/ulid v2.0.0+incompatible
+	github.com/oklog/ulid/v2 v2.0.2
 	github.com/openshift/osin v1.0.1
+	github.com/pborman/uuid v1.2.0 // indirect
 	github.com/pkg/browser v0.0.0-20180916011732-0a3d74bf9ce4
 	github.com/pkg/errors v0.8.1
-	github.com/prometheus/client_golang v1.0.0
+	github.com/prometheus/client_golang v1.1.0
 	github.com/robertkrimen/otto v0.0.0-00010101000000-000000000000
 	github.com/satori/go.uuid v1.2.0
 	github.com/sendgrid/rest v2.4.1+incompatible // indirect
@@ -107,15 +101,13 @@ require (
 	gocloud.dev v0.15.0
 	gocloud.dev/pubsub/natspubsub v0.15.0
 	golang.org/x/crypto v0.0.0-20190701094942-4def268fd1a4
-	golang.org/x/image v0.0.0-20190703141733-d6a02ce849c9 // indirect
 	golang.org/x/net v0.0.0-20190724013045-ca1201d0de80
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
-	golang.org/x/sys v0.0.0-20190712062909-fae7ac547cb7 // indirect
-	golang.org/x/tools v0.0.0-20190723021737-8bb11ff117ca
+	golang.org/x/tools v0.0.0-20190806215303-88ddfcebc769
 	golang.org/x/xerrors v0.0.0-20190717185122-a985d3407aa7
 	google.golang.org/api v0.7.0
-	google.golang.org/genproto v0.0.0-20190716160619-c506a9f90610
-	google.golang.org/grpc v1.22.0
+	google.golang.org/genproto v0.0.0-20190801165951-fa694d86fc64
+	google.golang.org/grpc v1.22.1
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/mail.v2 v2.3.1 // indirect
 	gopkg.in/sourcemap.v1 v1.0.5 // indirect
