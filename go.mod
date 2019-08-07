@@ -17,9 +17,6 @@ replace golang.org/x/sys => golang.org/x/sys v0.0.0-20190804053845-51ab0e2deafa
 // The golang.org/x/tools dependency of github.com/mgechev/revive is broken.
 replace golang.org/x/tools => golang.org/x/tools v0.0.0-20190806215303-88ddfcebc769
 
-// The rename of go-nats to nats.go is causing trouble.
-// replace github.com/nats-io/go-nats => github.com/nats-io/nats.go v1.8.1
-
 // github.com/blang/semver doesn't have a v3 semantic import.
 replace github.com/blang/semver => github.com/blang/semver v0.0.0-20190414182527-1a9109f8c4a1
 
@@ -104,7 +101,7 @@ require (
 	go.opencensus.io v0.22.0
 	go.thethings.network/lorawan-stack-legacy v0.0.0-20190118141410-68812c833a78
 	gocloud.dev v0.15.0
-	gocloud.dev/pubsub/natspubsub v0.15.0
+	gocloud.dev/pubsub/natspubsub v0.15.1-0.20190606163731-6b9a65123013
 	golang.org/x/crypto v0.0.0-20190701094942-4def268fd1a4
 	golang.org/x/net v0.0.0-20190724013045-ca1201d0de80
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
