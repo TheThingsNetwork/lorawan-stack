@@ -15,7 +15,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Switch, Route } from 'react-router'
-import { replace } from 'connected-react-router'
 
 import sharedMessages from '../../../lib/shared-messages'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
@@ -34,7 +33,6 @@ import ApplicationData from '../application-data'
 import ApplicationPayloadFormatters from '../application-payload-formatters'
 import ApplicationIntegrations from '../application-integrations'
 
-import { getApplicationId } from '../../../lib/selectors/id'
 import {
   getApplication,
   stopApplicationEventsStream,
@@ -58,7 +56,6 @@ import Devices from '../devices'
 dispatch => ({
   stopStream: id => dispatch(stopApplicationEventsStream(id)),
   getApplication: id => dispatch(getApplication(id, 'name,description')),
-  redirectToList: () => dispatch(replace('/applications')),
 }))
 @withRequest(
   ({ appId, getApplication }) => getApplication(appId),
@@ -146,17 +143,6 @@ dispatch => ({
 })
 @withEnv
 export default class Application extends React.Component {
-
-  componentDidUpdate (prevProps) {
-    const { appId, application, redirectToList } = this.props
-
-    const isSame = appId === getApplicationId(prevProps.application)
-    const isDeleted = Boolean(prevProps.application) && !Boolean(application)
-
-    if (isSame && isDeleted) {
-      redirectToList()
-    }
-  }
 
   componentWillUnmount () {
     const { appId, stopStream } = this.props

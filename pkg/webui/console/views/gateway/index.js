@@ -15,7 +15,6 @@
 import React from 'react'
 import { Switch, Route } from 'react-router'
 import { connect } from 'react-redux'
-import { replace } from 'connected-react-router'
 
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import sharedMessages from '../../../lib/shared-messages'
@@ -32,7 +31,6 @@ import GatewayLocation from '../gateway-location'
 import GatewayData from '../gateway-data'
 import GatewayGeneralSettings from '../gateway-general-settings'
 
-import { getGatewayId } from '../../../lib/selectors/id'
 import {
   getGateway,
   stopGatewayEventsStream,
@@ -45,11 +43,7 @@ import {
 
 @connect(function (state, props) {
   const gtwId = props.match.params.gtwId
-  const selectedGateway = selectSelectedGateway(state)
-
-  const gateway = gtwId === getGatewayId(selectedGateway)
-    ? selectedGateway
-    : undefined
+  const gateway = selectSelectedGateway(state)
 
   return {
     gtwId,
@@ -61,7 +55,6 @@ import {
 dispatch => ({
   getGateway: (id, meta) => dispatch(getGateway(id, meta)),
   stopStream: id => dispatch(stopGatewayEventsStream(id)),
-  redirectToList: () => dispatch(replace('/gateways')),
 }))
 @withRequest(
   ({ gtwId, getGateway }) => getGateway(gtwId, [
@@ -129,17 +122,6 @@ dispatch => ({
 })
 @withEnv
 export default class Gateway extends React.Component {
-
-  componentDidUpdate (prevProps) {
-    const { gtwId, gateway, redirectToList } = this.props
-
-    const isSame = gtwId === getGatewayId(prevProps.gateway)
-    const isDeleted = Boolean(prevProps.gateway) && !Boolean(gateway)
-
-    if (isSame && isDeleted) {
-      redirectToList()
-    }
-  }
 
   componentWillUnmount () {
     const { stopStream, gtwId } = this.props

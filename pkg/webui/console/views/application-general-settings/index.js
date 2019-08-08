@@ -18,6 +18,8 @@ import { Col, Row, Container } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 import { connect } from 'react-redux'
 import * as Yup from 'yup'
+import { replace } from 'connected-react-router'
+import { bindActionCreators } from 'redux'
 
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
@@ -35,6 +37,7 @@ import SubmitBar from '../../../components/submit-bar'
 import { selectSelectedApplication } from '../../store/selectors/applications'
 import { updateApplication, deleteApplication } from '../../store/actions/applications'
 import { attachPromise } from '../../store/actions/lib'
+import PropTypes from '../../../lib/prop-types'
 
 const m = defineMessages({
   basics: 'Basics',
@@ -54,10 +57,13 @@ const validationSchema = Yup.object().shape({
 @connect(state => ({
   application: selectSelectedApplication(state),
 }),
-{
-  updateApplication: attachPromise(updateApplication),
-  deleteApplication: attachPromise(deleteApplication),
-})
+dispatch => ({
+  ...bindActionCreators({
+    updateApplication: attachPromise(updateApplication),
+    deleteApplication: attachPromise(deleteApplication),
+  }, dispatch),
+  onDeleteSuccess: () => dispatch(replace(`/applications`)),
+}))
 @withBreadcrumb('apps.single.general-settings', function (props) {
   const { appId } = props
 
@@ -71,6 +77,13 @@ const validationSchema = Yup.object().shape({
 })
 @bind
 export default class ApplicationGeneralSettings extends React.Component {
+
+  static propTypes = {
+    application: PropTypes.object,
+    updateApplication: PropTypes.func.isRequired,
+    deleteApplication: PropTypes.func.isRequired,
+    onDeleteSuccess: PropTypes.func.isRequired,
+  }
 
   state = {
     error: '',
@@ -99,13 +112,14 @@ export default class ApplicationGeneralSettings extends React.Component {
   }
 
   async handleDelete () {
-    const { deleteApplication } = this.props
+    const { deleteApplication, onDeleteSuccess } = this.props
     const { appId } = this.props.match.params
 
     await this.setState({ error: '' })
 
     try {
       await deleteApplication(appId)
+      onDeleteSuccess()
     } catch (error) {
       await this.setState({ error })
     }

@@ -17,6 +17,8 @@ import { defineMessages } from 'react-intl'
 import { connect } from 'react-redux'
 import bind from 'autobind-decorator'
 import { Col, Row, Container } from 'react-grid-system'
+import { bindActionCreators } from 'redux'
+import { replace } from 'connected-react-router'
 
 import toast from '../../../components/toast'
 import Message from '../../../lib/components/message'
@@ -50,10 +52,13 @@ const m = defineMessages({
     gateway,
   }
 },
-{
-  updateGateway: attachPromise(updateGateway),
-  deleteGateway: attachPromise(deleteGateway),
-})
+dispatch => ({
+  ...bindActionCreators({
+    updateGateway: attachPromise(updateGateway),
+    deleteGateway: attachPromise(deleteGateway),
+  }, dispatch),
+  onDeleteSuccess: () => dispatch(replace('/gateways')),
+}))
 @withBreadcrumb('gateways.single.general-settings', function (props) {
   const { gtwId } = props
 
@@ -73,6 +78,7 @@ export default class GatewayGeneralSettings extends React.Component {
     gateway: PropTypes.object.isRequired,
     updateGateway: PropTypes.func.isRequired,
     deleteGateway: PropTypes.func.isRequired,
+    onDeleteSuccess: PropTypes.func.isRequired,
   }
 
   constructor (props) {
@@ -121,12 +127,13 @@ export default class GatewayGeneralSettings extends React.Component {
   }
 
   async handleDelete () {
-    const { gtwId, deleteGateway } = this.props
+    const { gtwId, deleteGateway, onDeleteSuccess } = this.props
 
     await this.setState({ error: '' })
 
     try {
       await deleteGateway(gtwId)
+      onDeleteSuccess()
     } catch (error) {
       this.formRef.current.setSubmitting(false)
       this.setState({ error })
