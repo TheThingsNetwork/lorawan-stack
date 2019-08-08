@@ -317,34 +317,37 @@ func (conf tlsConfig) TLSConfig(fs afero.Fs) (*tls.Config, error) {
 		rootCAs.AppendCertsFromPEM(caPEM)
 	}
 
-	var certs []tls.Certificate
+	var getCert func(*tls.CertificateRequestInfo) (*tls.Certificate, error)
 	if conf.Certificate != "" || conf.Key != "" {
-		certFile, err := fs.Open(conf.Certificate)
-		if err != nil {
-			return nil, err
-		}
-		certPEM, err := ioutil.ReadAll(certFile)
-		if err != nil {
-			return nil, err
-		}
+		getCert = func(*tls.CertificateRequestInfo) (*tls.Certificate, error) {
+			certFile, err := fs.Open(conf.Certificate)
+			if err != nil {
+				return nil, err
+			}
+			certPEM, err := ioutil.ReadAll(certFile)
+			if err != nil {
+				return nil, err
+			}
 
-		keyFile, err := fs.Open(conf.Key)
-		if err != nil {
-			return nil, err
+			keyFile, err := fs.Open(conf.Key)
+			if err != nil {
+				return nil, err
+			}
+			keyPEM, err := ioutil.ReadAll(keyFile)
+			if err != nil {
+				return nil, err
+			}
+
+			cert, err := tls.X509KeyPair(certPEM, keyPEM)
+			if err != nil {
+				return nil, err
+			}
+			return &cert, nil
 		}
-		keyPEM, err := ioutil.ReadAll(keyFile)
-		if err != nil {
-			return nil, err
-		}
-		cert, err := tls.X509KeyPair(certPEM, keyPEM)
-		if err != nil {
-			return nil, err
-		}
-		certs = append(certs, cert)
 	}
 	return &tls.Config{
-		RootCAs:      rootCAs,
-		Certificates: certs,
+		RootCAs:              rootCAs,
+		GetClientCertificate: getCert,
 	}, nil
 }
 
