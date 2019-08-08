@@ -27,7 +27,9 @@ type fsFetcher struct {
 
 // FromFilesystem returns an interface that fetches files from the local filesystem
 func FromFilesystem(basePath string) Interface {
-	basePath = filepath.Clean(basePath)
+	if basePath != "" {
+		basePath = filepath.Clean(basePath)
+	}
 	return fsFetcher{
 		baseFetcher{
 			base:    basePath,
@@ -38,7 +40,13 @@ func FromFilesystem(basePath string) Interface {
 
 func (f fsFetcher) File(pathElements ...string) ([]byte, error) {
 	start := time.Now()
-	content, err := ioutil.ReadFile(filepath.Join(append([]string{f.base}, pathElements...)...))
+	var path string
+	if f.base != "" {
+		path = filepath.Join(append([]string{f.base}, pathElements...)...)
+	} else {
+		path = filepath.Join(pathElements...)
+	}
+	content, err := ioutil.ReadFile(path)
 	if err == nil {
 		f.observeLatency(time.Since(start))
 		return content, nil
