@@ -19,7 +19,7 @@ import (
 	"strconv"
 	"time"
 
-	legacyttnpb "go.thethings.network/lorawan-stack-legacy/pkg/ttnpb"
+	ttnpbv2 "go.thethings.network/lorawan-stack-legacy/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/mqtt/topics"
@@ -31,11 +31,11 @@ import (
 const eirpDelta = 2.15
 
 var (
-	sourceToV3 = map[legacyttnpb.LocationMetadata_LocationSource]ttnpb.LocationSource{
-		legacyttnpb.LocationMetadata_GPS:            ttnpb.SOURCE_GPS,
-		legacyttnpb.LocationMetadata_CONFIG:         ttnpb.SOURCE_REGISTRY,
-		legacyttnpb.LocationMetadata_REGISTRY:       ttnpb.SOURCE_REGISTRY,
-		legacyttnpb.LocationMetadata_IP_GEOLOCATION: ttnpb.SOURCE_IP_GEOLOCATION,
+	sourceToV3 = map[ttnpbv2.LocationMetadata_LocationSource]ttnpb.LocationSource{
+		ttnpbv2.LocationMetadata_GPS:            ttnpb.SOURCE_GPS,
+		ttnpbv2.LocationMetadata_CONFIG:         ttnpb.SOURCE_REGISTRY,
+		ttnpbv2.LocationMetadata_REGISTRY:       ttnpb.SOURCE_REGISTRY,
+		ttnpbv2.LocationMetadata_IP_GEOLOCATION: ttnpb.SOURCE_IP_GEOLOCATION,
 	}
 
 	frequencyPlanToBand = map[uint32]string{
@@ -70,32 +70,32 @@ func (protobufv2) FromDownlink(down *ttnpb.DownlinkMessage, _ ttnpb.GatewayIdent
 	if settings == nil {
 		return nil, errNotScheduled
 	}
-	lorawan := &legacyttnpb.LoRaWANTxConfiguration{}
+	lorawan := &ttnpbv2.LoRaWANTxConfiguration{}
 	if pld, ok := down.GetPayload().GetPayload().(*ttnpb.Message_MACPayload); ok && pld != nil {
 		lorawan.FCnt = pld.MACPayload.FHDR.FCnt
 	}
 	switch dr := settings.DataRate.Modulation.(type) {
 	case *ttnpb.DataRate_LoRa:
-		lorawan.Modulation = legacyttnpb.Modulation_LORA
+		lorawan.Modulation = ttnpbv2.Modulation_LORA
 		lorawan.CodingRate = settings.CodingRate
 		lorawan.DataRate = fmt.Sprintf("SF%dBW%d", dr.LoRa.SpreadingFactor, dr.LoRa.Bandwidth/1000)
 	case *ttnpb.DataRate_FSK:
-		lorawan.Modulation = legacyttnpb.Modulation_FSK
+		lorawan.Modulation = ttnpbv2.Modulation_FSK
 		lorawan.BitRate = dr.FSK.BitRate
 	default:
 		return nil, errModulation
 	}
 
-	v2downlink := &legacyttnpb.DownlinkMessage{
+	v2downlink := &ttnpbv2.DownlinkMessage{
 		Payload: down.RawPayload,
-		GatewayConfiguration: legacyttnpb.GatewayTxConfiguration{
+		GatewayConfiguration: ttnpbv2.GatewayTxConfiguration{
 			Frequency:             settings.Frequency,
 			Power:                 int32(settings.Downlink.TxPower - eirpDelta),
 			PolarizationInversion: true,
 			RfChain:               0,
 			Timestamp:             settings.Timestamp,
 		},
-		ProtocolConfiguration: legacyttnpb.ProtocolTxConfiguration{
+		ProtocolConfiguration: ttnpbv2.ProtocolTxConfiguration{
 			LoRaWAN: lorawan,
 		},
 	}
@@ -103,7 +103,7 @@ func (protobufv2) FromDownlink(down *ttnpb.DownlinkMessage, _ ttnpb.GatewayIdent
 }
 
 func (protobufv2) ToUplink(message []byte, ids ttnpb.GatewayIdentifiers) (*ttnpb.UplinkMessage, error) {
-	v2uplink := &legacyttnpb.UplinkMessage{}
+	v2uplink := &ttnpbv2.UplinkMessage{}
 	err := v2uplink.Unmarshal(message)
 	if err != nil {
 		return nil, err
@@ -122,7 +122,7 @@ func (protobufv2) ToUplink(message []byte, ids ttnpb.GatewayIdentifiers) (*ttnpb
 		Frequency: gwMetadata.Frequency,
 	}
 	switch lorawanMetadata.Modulation {
-	case legacyttnpb.Modulation_LORA:
+	case ttnpbv2.Modulation_LORA:
 		bandID, ok := frequencyPlanToBand[lorawanMetadata.FrequencyPlan]
 		if !ok {
 			return nil, errFrequencyPlan.WithAttributes("frequency_plan", lorawanMetadata.FrequencyPlan)
@@ -150,7 +150,7 @@ func (protobufv2) ToUplink(message []byte, ids ttnpb.GatewayIdentifiers) (*ttnpb
 		settings.DataRate = loraDr.DataRate
 		settings.CodingRate = lorawanMetadata.CodingRate
 		settings.DataRateIndex = drIndex
-	case legacyttnpb.Modulation_FSK:
+	case ttnpbv2.Modulation_FSK:
 		settings.DataRate = ttnpb.DataRate{
 			Modulation: &ttnpb.DataRate_FSK{
 				FSK: &ttnpb.FSKDataRate{
@@ -193,7 +193,7 @@ func (protobufv2) ToUplink(message []byte, ids ttnpb.GatewayIdentifiers) (*ttnpb
 }
 
 func (protobufv2) ToStatus(message []byte, _ ttnpb.GatewayIdentifiers) (*ttnpb.GatewayStatus, error) {
-	v2status := &legacyttnpb.StatusMessage{}
+	v2status := &ttnpbv2.StatusMessage{}
 	err := v2status.Unmarshal(message)
 	if err != nil {
 		return nil, err
