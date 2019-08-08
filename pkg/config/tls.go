@@ -65,8 +65,9 @@ func (t TLS) IsZero() bool {
 
 var errNoKeyPair = errors.DefineFailedPrecondition("no_key_pair", "no TLS key pair")
 
-// Config loads the key pair and returns the TLS configuration.
+// Config loads the key pair and returns the server TLS configuration.
 // Config watches the certificate file and reloads the key pair on changes.
+// NOTE: The configuration returned by Config cannot be used for client connections.
 func (t TLS) Config(ctx context.Context) (*tls.Config, error) {
 	logger := log.FromContext(ctx)
 	if t.Certificate == "" || t.Key == "" {
