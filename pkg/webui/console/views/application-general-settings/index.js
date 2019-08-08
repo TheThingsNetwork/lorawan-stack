@@ -18,6 +18,8 @@ import { Col, Row, Container } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 import { connect } from 'react-redux'
 import * as Yup from 'yup'
+import { replace } from 'connected-react-router'
+import { bindActionCreators } from 'redux'
 
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
@@ -54,10 +56,13 @@ const validationSchema = Yup.object().shape({
 @connect(state => ({
   application: selectSelectedApplication(state),
 }),
-{
-  updateApplication: attachPromise(updateApplication),
-  deleteApplication: attachPromise(deleteApplication),
-})
+dispatch => ({
+  ...bindActionCreators({
+    updateApplication: attachPromise(updateApplication),
+    deleteApplication: attachPromise(deleteApplication),
+  }, dispatch),
+  onDeleteSuccess: () => dispatch(replace(`/applications`)),
+}))
 @withBreadcrumb('apps.single.general-settings', function (props) {
   const { appId } = props
 
@@ -99,13 +104,14 @@ export default class ApplicationGeneralSettings extends React.Component {
   }
 
   async handleDelete () {
-    const { deleteApplication } = this.props
+    const { deleteApplication, onDeleteSuccess } = this.props
     const { appId } = this.props.match.params
 
     await this.setState({ error: '' })
 
     try {
       await deleteApplication(appId)
+      onDeleteSuccess()
     } catch (error) {
       await this.setState({ error })
     }
