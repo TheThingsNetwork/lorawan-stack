@@ -24,7 +24,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/identityserver/blacklist"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/unique"
 )
 
 var (
@@ -63,7 +62,7 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 		if err != nil {
 			return err
 		}
-		if err = store.GetMembershipStore(db).SetMember(
+		if err = is.getMembershipStore(ctx, db).SetMember(
 			ctx,
 			&req.Collaborator,
 			gtw.GatewayIdentifiers,
@@ -84,7 +83,6 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 		return nil, err
 	}
 	events.Publish(evtCreateGateway(ctx, req.GatewayIdentifiers, nil))
-	is.invalidateCachedMembershipsForAccount(ctx, &req.Collaborator)
 	return gtw, nil
 }
 
@@ -141,21 +139,18 @@ func (is *IdentityServer) getGatewayIdentifiersForEUI(ctx context.Context, req *
 
 func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatewaysRequest) (gtws *ttnpb.Gateways, err error) {
 	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.GatewayFieldPathsNested, req.FieldMask.Paths, getPaths, nil)
-	var gtwRights map[string]*ttnpb.Rights
+	var includeIndirect bool
 	if req.Collaborator == nil {
-		callerRights, _, err := is.getRights(ctx)
+		authInfo, err := is.authInfo(ctx)
 		if err != nil {
 			return nil, err
 		}
-		gtwRights = make(map[string]*ttnpb.Rights, len(callerRights))
-		for ids, rights := range callerRights {
-			if ids.EntityType() == "gateway" {
-				gtwRights[unique.ID(ctx, ids)] = rights
-			}
-		}
-		if len(gtwRights) == 0 {
+		collaborator := authInfo.GetOrganizationOrUserIdentifiers()
+		if collaborator == nil {
 			return &ttnpb.Gateways{}, nil
 		}
+		req.Collaborator = collaborator
+		includeIndirect = true
 	}
 	if usrIDs := req.Collaborator.GetUserIDs(); usrIDs != nil {
 		if err = rights.RequireUser(ctx, *usrIDs, ttnpb.RIGHT_USER_GATEWAYS_LIST); err != nil {
@@ -167,7 +162,7 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 		}
 	}
 	var total uint64
-	ctx = store.WithPagination(ctx, req.Limit, req.Page, &total)
+	paginateCtx := store.WithPagination(ctx, req.Limit, req.Page, &total)
 	defer func() {
 		if err == nil {
 			setTotalHeader(ctx, total)
@@ -175,26 +170,18 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 	}()
 	gtws = &ttnpb.Gateways{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		if gtwRights == nil {
-			rights, err := store.GetMembershipStore(db).FindMemberRights(ctx, req.Collaborator, "gateway")
-			if err != nil {
-				return err
-			}
-			gtwRights = make(map[string]*ttnpb.Rights, len(rights))
-			for ids, rights := range rights {
-				gtwRights[unique.ID(ctx, ids)] = rights
-			}
+		ids, err := is.getMembershipStore(ctx, db).FindMemberships(paginateCtx, req.Collaborator, "gateway", includeIndirect)
+		if err != nil {
+			return err
 		}
-		if len(gtwRights) == 0 {
+		if len(ids) == 0 {
 			return nil
 		}
-		gtwIDs := make([]*ttnpb.GatewayIdentifiers, 0, len(gtwRights))
-		for uid := range gtwRights {
-			gtwID, err := unique.ToGatewayID(uid)
-			if err != nil {
-				continue
+		gtwIDs := make([]*ttnpb.GatewayIdentifiers, 0, len(ids))
+		for _, id := range ids {
+			if gtwID := id.EntityIdentifiers().GetGatewayIDs(); gtwID != nil {
+				gtwIDs = append(gtwIDs, gtwID)
 			}
-			gtwIDs = append(gtwIDs, &gtwID)
 		}
 		gtws.Gateways, err = store.GetGatewayStore(db).FindGateways(ctx, gtwIDs, &req.FieldMask)
 		if err != nil {

@@ -247,16 +247,25 @@ func (s *oauthStore) GetAccessToken(ctx context.Context, id string) (*ttnpb.OAut
 		return nil, errAccessTokenNotFound
 	}
 	defer trace.StartRegion(ctx, "get access token").End()
-	var tokenModel AccessToken
-	err := s.query(ctx, AccessToken{}).Where(AccessToken{
-		TokenID: id,
-	}).Preload("Client").Preload("User.Account").First(&tokenModel).Error
+	var tokenModel struct {
+		AccessToken
+		FriendlyClientID string
+		FriendlyUserID   string
+	}
+	err := s.query(ctx, AccessToken{}).
+		Select(`"access_tokens".*, "accounts"."uid" AS "friendly_user_id", "clients"."client_id" AS "friendly_client_id"`).
+		Joins(`JOIN "accounts" ON "accounts"."account_type" = 'user' AND "accounts"."account_id" = "access_tokens"."user_id"`).
+		Joins(`JOIN "clients" ON "clients"."id" = "access_tokens"."client_id"`).
+		Where(AccessToken{TokenID: id}).Scan(&tokenModel).Error
 	if err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return nil, errAccessTokenNotFound
 		}
 	}
-	return tokenModel.toPB(), nil
+	tokenProto := tokenModel.AccessToken.toPB()
+	tokenProto.ClientIDs.ClientID = tokenModel.FriendlyClientID
+	tokenProto.UserIDs.UserID = tokenModel.FriendlyUserID
+	return tokenProto, nil
 }
 
 func (s *oauthStore) DeleteAccessToken(ctx context.Context, id string) error {

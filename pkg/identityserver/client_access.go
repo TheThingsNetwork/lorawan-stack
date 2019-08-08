@@ -57,7 +57,7 @@ func (is *IdentityServer) getClientCollaborator(ctx context.Context, req *ttnpb.
 		OrganizationOrUserIdentifiers: req.OrganizationOrUserIdentifiers,
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		rights, err := store.GetMembershipStore(db).GetMember(
+		rights, err := is.getMembershipStore(ctx, db).GetMember(
 			ctx,
 			&req.OrganizationOrUserIdentifiers,
 			req.ClientIdentifiers,
@@ -84,7 +84,7 @@ func (is *IdentityServer) setClientCollaborator(ctx context.Context, req *ttnpb.
 		return nil, err
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		return store.GetMembershipStore(db).SetMember(
+		return is.getMembershipStore(ctx, db).SetMember(
 			ctx,
 			&req.Collaborator.OrganizationOrUserIdentifiers,
 			req.ClientIdentifiers,
@@ -106,7 +106,6 @@ func (is *IdentityServer) setClientCollaborator(ctx context.Context, req *ttnpb.
 	} else {
 		events.Publish(evtDeleteClientCollaborator(ctx, ttnpb.CombineIdentifiers(req.ClientIdentifiers, req.Collaborator), nil))
 	}
-	is.invalidateCachedMembershipsForAccount(ctx, &req.Collaborator.OrganizationOrUserIdentifiers)
 	return ttnpb.Empty, nil
 }
 
@@ -122,7 +121,7 @@ func (is *IdentityServer) listClientCollaborators(ctx context.Context, req *ttnp
 		}
 	}()
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		memberRights, err := store.GetMembershipStore(db).FindMembers(ctx, req.ClientIdentifiers)
+		memberRights, err := is.getMembershipStore(ctx, db).FindMembers(ctx, req.ClientIdentifiers)
 		if err != nil {
 			return err
 		}

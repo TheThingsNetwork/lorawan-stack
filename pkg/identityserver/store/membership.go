@@ -36,31 +36,6 @@ func init() {
 	registerModel(&Membership{})
 }
 
-func (s *store) findAccountMemberships(account *Account, entityType string) ([]*Membership, error) {
-	return findAccountMemberships(s.DB, account, entityType)
-}
-
-func findAccountMemberships(db *gorm.DB, account *Account, entityType string) ([]*Membership, error) {
-	query := db.Where(Membership{AccountID: account.ID})
-	if entityType != "" {
-		query = query.Where("entity_type = ?", entityType)
-	}
-	var memberships []*Membership
-	if err := query.Find(&memberships).Error; err != nil {
-		return nil, err
-	}
-	return memberships, nil
-}
-
-func entityRightsForMemberships(memberships []*Membership) map[polymorphicEntity]Rights {
-	res := make(map[polymorphicEntity]Rights, len(memberships))
-	for _, membership := range memberships {
-		k := polymorphicEntity{EntityType: membership.EntityType, EntityUUID: membership.EntityID}
-		res[k] = membership.Rights
-	}
-	return res
-}
-
 type polymorphicEntity struct {
 	EntityUUID string
 	EntityType string
@@ -102,44 +77,25 @@ func findIdentifiers(db *gorm.DB, entities ...polymorphicEntity) (map[polymorphi
 		}
 		for _, result := range results {
 			entity := polymorphicEntity{EntityType: entityType, EntityUUID: result.UUID}
-			switch entityType {
-			case "application":
-				identifiers[entity] = ttnpb.ApplicationIdentifiers{ApplicationID: result.FriendlyID}
-			case "client":
-				identifiers[entity] = ttnpb.ClientIdentifiers{ClientID: result.FriendlyID}
-			case "gateway":
-				identifiers[entity] = ttnpb.GatewayIdentifiers{GatewayID: result.FriendlyID}
-			case "organization":
-				identifiers[entity] = ttnpb.OrganizationIdentifiers{OrganizationID: result.FriendlyID}
-			case "user":
-				identifiers[entity] = ttnpb.UserIdentifiers{UserID: result.FriendlyID}
-			}
+			identifiers[entity] = buildIdentifiers(entityType, result.FriendlyID)
 		}
 	}
 	return identifiers, nil
 }
 
-func (s *store) identifierRights(entityRights map[polymorphicEntity]Rights) (map[ttnpb.Identifiers]*ttnpb.Rights, error) {
-	return identifierRights(s.DB, entityRights)
-}
-
-func identifierRights(db *gorm.DB, entityRights map[polymorphicEntity]Rights) (map[ttnpb.Identifiers]*ttnpb.Rights, error) {
-	entities := make([]polymorphicEntity, 0, len(entityRights))
-	for entity := range entityRights {
-		entities = append(entities, entity)
+func buildIdentifiers(entityType, id string) ttnpb.Identifiers {
+	switch entityType {
+	case "application":
+		return &ttnpb.ApplicationIdentifiers{ApplicationID: id}
+	case "client":
+		return &ttnpb.ClientIdentifiers{ClientID: id}
+	case "gateway":
+		return &ttnpb.GatewayIdentifiers{GatewayID: id}
+	case "organization":
+		return &ttnpb.OrganizationIdentifiers{OrganizationID: id}
+	case "user":
+		return &ttnpb.UserIdentifiers{UserID: id}
+	default:
+		panic(fmt.Sprintf("can't build identifiers for entity type %q", entityType))
 	}
-	identifiers, err := findIdentifiers(db, entities...)
-	if err != nil {
-		return nil, err
-	}
-	identifierRights := make(map[ttnpb.Identifiers]*ttnpb.Rights, len(entityRights))
-	for entity, rights := range entityRights {
-		ids, ok := identifiers[entity]
-		if !ok {
-			continue
-		}
-		rights := ttnpb.Rights(rights)
-		identifierRights[ids] = &rights
-	}
-	return identifierRights, nil
 }
