@@ -27,6 +27,7 @@ import SubmitBar from '../../../components/submit-bar'
 import ModalButton from '../../../components/button/modal-button'
 import FrequencyPlansSelect from '../../containers/freq-plans-select'
 import DevAddrInput from '../../containers/dev-addr-input'
+import JoinEUIPrefixesInput from '../../containers/join-eui-prefixes-input'
 
 import sharedMessages from '../../../lib/shared-messages'
 import errorMessages from '../../../lib/errors/error-messages'
@@ -184,16 +185,13 @@ class DeviceDataForm extends Component {
           name="join_server_address"
           component={Input}
         />
-        <Form.Field
+        <JoinEUIPrefixesInput
           title={sharedMessages.joinEUI}
           name="ids.join_eui"
-          type="byte"
-          min={8}
-          max={8}
           description={m.joinEUIDescription}
           required
           disabled={update}
-          component={Input}
+          showPrefixes={!update}
         />
         <Form.Field
           title={sharedMessages.devEUI}
