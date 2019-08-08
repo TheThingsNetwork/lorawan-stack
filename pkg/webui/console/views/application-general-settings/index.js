@@ -37,6 +37,7 @@ import SubmitBar from '../../../components/submit-bar'
 import { selectSelectedApplication } from '../../store/selectors/applications'
 import { updateApplication, deleteApplication } from '../../store/actions/applications'
 import { attachPromise } from '../../store/actions/lib'
+import PropTypes from '../../../lib/prop-types'
 
 const m = defineMessages({
   basics: 'Basics',
@@ -76,6 +77,13 @@ dispatch => ({
 })
 @bind
 export default class ApplicationGeneralSettings extends React.Component {
+
+  static propTypes = {
+    application: PropTypes.object,
+    updateApplication: PropTypes.func.isRequired,
+    deleteApplication: PropTypes.func.isRequired,
+    onDeleteSuccess: PropTypes.func.isRequired,
+  }
 
   state = {
     error: '',
