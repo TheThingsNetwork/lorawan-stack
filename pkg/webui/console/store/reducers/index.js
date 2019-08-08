@@ -44,6 +44,7 @@ import webhooks from './webhooks'
 import webhookFormats from './webhook-formats'
 import organizations from './organizations'
 import { createNamedPaginationReducer } from './pagination'
+import js from './join-server'
 
 export default history =>
   combineReducers({
@@ -91,4 +92,5 @@ export default history =>
       organizations: createNamedPaginationReducer(ORGANIZATION_SHARED_NAME, getOrganizationId),
     }),
     router: connectRouter(history),
+    js,
   })

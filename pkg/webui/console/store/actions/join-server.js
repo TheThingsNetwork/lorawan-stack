@@ -12,24 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import user from './user'
-import init from './init'
-import applications from './applications'
-import devices from './devices'
-import device from './device'
-import gateways from './gateways'
-import configuration from './configuration'
-import organizations from './organizations'
-import js from './join-server'
+import { createRequestActions } from './lib'
 
-export default [
-  ...user,
-  ...init,
-  ...applications,
-  ...devices,
-  ...device,
-  ...gateways,
-  ...configuration,
-  ...organizations,
-  ...js,
-]
+export const GET_JOIN_EUI_PREFIXES_BASE = 'GET_JOIN_EUI_PREFIXES'
+export const [
+  {
+    request: GET_JOIN_EUI_PREFIXES,
+    success: GET_JOIN_EUI_PREFIXES_SUCCESS,
+    failure: GET_JOIN_EUI_PREFIXES_FAILURE,
+  },
+  {
+    request: getJoinEUIPrefixes,
+    success: getJoinEUIPrefixesSuccess,
+    failure: getJoinEUIPrefixesFailure,
+  },
+] = createRequestActions(GET_JOIN_EUI_PREFIXES_BASE)

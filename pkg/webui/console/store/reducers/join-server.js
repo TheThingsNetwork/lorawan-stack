@@ -12,24 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import user from './user'
-import init from './init'
-import applications from './applications'
-import devices from './devices'
-import device from './device'
-import gateways from './gateways'
-import configuration from './configuration'
-import organizations from './organizations'
-import js from './join-server'
+import { handleActions } from 'redux-actions'
 
-export default [
-  ...user,
-  ...init,
-  ...applications,
-  ...devices,
-  ...device,
-  ...gateways,
-  ...configuration,
-  ...organizations,
-  ...js,
-]
+import { GET_JOIN_EUI_PREFIXES_SUCCESS } from '../actions/join-server'
+
+const defaultState = {
+  prefixes: [],
+}
+
+export default handleActions(
+  {
+    [GET_JOIN_EUI_PREFIXES_SUCCESS]: (state, { payload }) => ({
+      ...state,
+      prefixes: payload,
+    }),
+  },
+  defaultState,
+)
