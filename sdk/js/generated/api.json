@@ -7917,7 +7917,7 @@
           "fields": [
             {
               "name": "namespace",
-              "description": "Namespace of the error (typically the package name in the stack).",
+              "description": "Namespace of the error (typically the package name in The Things Stack).",
               "label": "",
               "type": "string",
               "longType": "string",

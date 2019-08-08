@@ -1,9 +1,9 @@
 {
   "name": "ttn-stack",
   "version": "3.1.0",
-  "description": "The Thing Network Stack",
+  "description": "The Things Stack",
   "main": "index.js",
-  "repository": "https://github.com/TheThingsNetwork/ttn.git",
+  "repository": "https://github.com/TheThingsNetwork/lorawan-stack.git",
   "license": "Apache-2.0",
   "devDependencies": {
     "@babel/cli": "^7.0.0",

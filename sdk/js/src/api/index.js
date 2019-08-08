@@ -18,7 +18,7 @@ import Http from './http'
 
 /**
  * Api Class is an abstraction on the API connection which can use either the
- * HTTP or gRPC connector to communicate with TTN Stack for LoraWAN API in order
+ * HTTP or gRPC connector to communicate with The Things Stack for LoraWAN API in order
  * to expose the same class API for both
  */
 class Api {

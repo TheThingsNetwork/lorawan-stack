@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "The Things Network Stack for LoRaWAN v3 API",
+    "title": "The Things Stack for LoRaWAN v3 API",
     "version": "version not set"
   },
   "schemes": [
@@ -8179,7 +8179,7 @@
       "properties": {
         "namespace": {
           "type": "string",
-          "description": "Namespace of the error (typically the package name in the stack)."
+          "description": "Namespace of the error (typically the package name in The Things Stack)."
         },
         "name": {
           "type": "string",

@@ -33,9 +33,9 @@ If your operating system or package manager is not mentioned, please [download b
 
 ## Certificates
 
-By default, the stack requires a `cert.pem` and `key.pem`, in order to to serve content over TLS.
+By default, The Things Stack requires a `cert.pem` and `key.pem`, in order to to serve content over TLS.
 
-Typically you'll get these from a trusted Certificate Authority. Use the "full chain" for `cert.pem` and the "private key" for `key.pem`. The stack also has support for automated certificate management (ACME). This allows you to easily get trusted TLS certificates for your server from [Let's Encrypt](https://letsencrypt.org/getting-started/). If you want this, you'll need to create an `acme` directory that the stack can write in:
+Typically you'll get these from a trusted Certificate Authority. Use the "full chain" for `cert.pem` and the "private key" for `key.pem`. The Things Stack also has support for automated certificate management (ACME). This allows you to easily get trusted TLS certificates for your server from [Let's Encrypt](https://letsencrypt.org/getting-started/). If you want this, you'll need to create an `acme` directory that The Things Stack can write in:
 
 ```bash
 $ mkdir ./acme

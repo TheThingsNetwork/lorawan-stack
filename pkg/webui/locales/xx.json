@@ -141,7 +141,7 @@
   "console.views.gateway-location.index.setGatewayLocation": "Xxx xxxxxxx xxxxxxx xxxxxxxx",
   "console.views.login.index.welcome": "Xxxxxxx xx {stackConsole}",
   "console.views.login.index.login": "Xxx xxxx xx xx xxxxxx xx xx xxx xxxx xxxx",
-  "console.views.login.index.loginWithStackAccount": "Xxxxx xxxx xxxx XXX Xxxxx Xxxxxxx",
+  "console.views.login.index.loginWithStackAccount": "Xxxxx xxxx xxxx Xxx Xxxxxx Xxxxx Xxxxxxx",
   "console.views.overview.index.createApplication": "Xxxxxx xx xxxxxxxxxxx",
   "console.views.overview.index.createGateway": "Xxxxxxxx x xxxxxxx",
   "console.views.overview.index.gotoApplications": "Xx xx xxxxxxxxxxxx",
@@ -331,7 +331,7 @@
   "oauth.views.authorize.index.redirectInfo": "Xxx xxxx xx xxxxxxxxxx xx {redirectUri}",
   "oauth.views.authorize.index.authorize": "Xxxxxxxxx",
   "oauth.views.code.index.code": "Xxxx Xxxxxxxxxxxxx Xxxx",
-  "oauth.views.create-account.index.createAccount": "Xxxxxx XXX Xxxxx Xxxxxxx",
+  "oauth.views.create-account.index.createAccount": "Xxxxxx Xxx Xxxxxx Xxxxx Xxxxxxx",
   "oauth.views.create-account.index.register": "Xxxxxxxx",
   "oauth.views.create-account.index.confirmPassword": "Xxxxxxx Xxxxxxxx",
   "oauth.views.create-account.index.validatePasswordMatch": "Xxxxxxxxx xxxxxx xxxxx",
@@ -342,5 +342,5 @@
   "oauth.views.create-account.index.registrationPending": "Xxx xxxx xxxxxxxxxxxx xxxx xxx xxxxxxxxxxxx xxxxxxx. Xxxxxx xxxx xxxxx xx xxxxx xxxxxxxx xx.",
   "oauth.views.login.index.createAccount": "Xxxxxx xx xxxxxxx",
   "oauth.views.login.index.loginToContinue": "Xxxxxx xxxxx xx xxxxxxxx",
-  "oauth.views.login.index.stackAccount": "XXX Xxxxx Xxxxxxx"
+  "oauth.views.login.index.stackAccount": "Xxx Xxxxxx Xxxxx Xxxxxxx"
 }

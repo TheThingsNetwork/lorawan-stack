@@ -30,9 +30,9 @@ var DefaultConsoleConfig = console.Config{
 	},
 	UI: console.UIConfig{
 		TemplateData: webui.TemplateData{
-			SiteName:      "TTN Stack for LoRaWAN",
+			SiteName:      "The Things Stack for LoRaWAN",
 			Title:         "Console",
-			SubTitle:      "Management platform for TTN Stack for LoRaWAN",
+			SubTitle:      "Management platform for The Things Stack for LoRaWAN",
 			Language:      "en",
 			CanonicalURL:  shared.DefaultConsolePublicURL,
 			AssetsBaseURL: shared.DefaultAssetsBaseURL,

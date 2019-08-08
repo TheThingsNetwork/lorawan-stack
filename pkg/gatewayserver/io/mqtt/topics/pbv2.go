@@ -60,5 +60,5 @@ func (v2) DownlinkTopic(uid string) []string {
 	return []string{uid, "down"}
 }
 
-// V2 is a topic layout that uses the legacy The Things Network Stack V2 topic structure.
+// V2 is a topic layout that uses the legacy The Things Stack V2 topic structure.
 var V2 Layout = &v2{}

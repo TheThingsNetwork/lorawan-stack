@@ -8,7 +8,7 @@ The webhooks feature allows the Application Server to send application related m
 
 ## Creating webhooks
 
-TTN Stack supports multiple formats to encode messages. To show supported formats, use:
+The Things Stack supports multiple formats to encode messages. To show supported formats, use:
 
 ```
 $ ttn-lw-cli applications webhooks get-formats

@@ -69,7 +69,7 @@ storiesOf('Modal', module)
       </div>
       <div className={style.right}>
         <h3>Console <span title="This application is an official application">Official</span></h3>
-        <p>The Console is The Things Network Stack's official web application.</p>
+        <p>The Console is The Things Stack's official web application.</p>
       </div>
     </Modal>
   ))

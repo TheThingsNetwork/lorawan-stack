@@ -68,7 +68,7 @@ With your MQTT client subscribed, when a device joins the network, a `join` mess
 ```
 </details>
 
-You can use the correlation IDs to follow messages as they pass through the stack.
+You can use the correlation IDs to follow messages as they pass through The Things Stack.
 
 When the device sends an uplink message, a message will be published to the topic `v3/{application id}/devices/{device id}/up`.
 
@@ -156,7 +156,7 @@ It is also possible to send multiple downlink messages on a single push because 
 
 >Note: if you do not specify a priority, the default priority `LOWEST` is used. You can specify `LOWEST`, `LOW`, `BELOW_NORMAL`, `NORMAL`, `ABOVE_NORMAL`, `HIGH` and `HIGHEST`.
 
-The stack supports some cool features, such as confirmed downlink with your own correlation IDs. For example, you can push this:
+The Things Stack supports some cool features, such as confirmed downlink with your own correlation IDs. For example, you can push this:
 
 ```json
 {

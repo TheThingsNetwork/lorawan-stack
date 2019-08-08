@@ -71,7 +71,7 @@ nfpms:
   - vendor: The Things Network
     homepage: https://www.thethingsnetwork.org
     maintainer: The Things Network Foundation <stack@thethingsnetwork.org>
-    description: The Things Network Stack for LoRaWAN
+    description: The Things Stack for LoRaWAN
     license: Apache 2.0
     formats:
       - deb
@@ -84,8 +84,8 @@ nfpms:
 
 snapcrafts:
   - name: ttn-lw-stack
-    summary: The Things Network Stack for LoRaWAN
-    description: The Things Network Stack for LoRaWAN
+    summary: The Things Stack for LoRaWAN
+    description: The Things Stack for LoRaWAN
     grade: stable
     confinement: strict
     publish: true
@@ -105,7 +105,7 @@ brews:
       name: ttn-ci
       email: stack@thethingsnetwork.org
     homepage: https://www.thethingsnetwork.org
-    description: The Things Network Stack for LoRaWAN
+    description: The Things Stack for LoRaWAN
     skip_upload: auto
     install: |
       bin.install "ttn-lw-cli"

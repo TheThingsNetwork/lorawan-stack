@@ -23,7 +23,7 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-// MD contains TTN Stack metadata fields
+// MD contains The Things Stack metadata fields
 type MD struct {
 	ID             string
 	AuthType       string
@@ -54,7 +54,7 @@ func (m MD) RequireTransportSecurity() bool {
 	return !m.AllowInsecure
 }
 
-// ToMetadata puts TTN Stack metadata fields in a metadata.MD
+// ToMetadata puts The Things Stack metadata fields in a metadata.MD
 func (m MD) ToMetadata() metadata.MD {
 	var pairs []string
 	if m.ID != "" {
@@ -84,21 +84,21 @@ func (m MD) ToMetadata() metadata.MD {
 	return metadata.Pairs(pairs...)
 }
 
-// ToOutgoingContext puts TTN Stack metadata fields in an outgoing context.Context
+// ToOutgoingContext puts The Things Stack metadata fields in an outgoing context.Context
 func (m MD) ToOutgoingContext(ctx context.Context) context.Context {
 	md, _ := metadata.FromOutgoingContext(ctx)
 	md = metadata.Join(m.ToMetadata(), md)
 	return metadata.NewOutgoingContext(ctx, md)
 }
 
-// ToIncomingContext puts TTN Stack metadata fields in an incoming context.Context
+// ToIncomingContext puts The Things Stack metadata fields in an incoming context.Context
 func (m MD) ToIncomingContext(ctx context.Context) context.Context {
 	md, _ := metadata.FromIncomingContext(ctx)
 	md = metadata.Join(m.ToMetadata(), md)
 	return metadata.NewIncomingContext(ctx, md)
 }
 
-// FromMetadata returns TTN Stack metadata from metadata.MD
+// FromMetadata returns The Things Stack metadata from metadata.MD
 func FromMetadata(md metadata.MD) (m MD) {
 	if id, ok := md["id"]; ok && len(id) > 0 {
 		m.ID = id[len(id)-1]
@@ -132,13 +132,13 @@ func FromMetadata(md metadata.MD) (m MD) {
 	return
 }
 
-// FromOutgoingContext returns TTN Stack metadata from the outgoing context ctx.
+// FromOutgoingContext returns The Things Stack metadata from the outgoing context ctx.
 func FromOutgoingContext(ctx context.Context) (m MD) {
 	md, _ := metadata.FromOutgoingContext(ctx)
 	return FromMetadata(md)
 }
 
-// FromIncomingContext returns TTN Stack metadata from the incoming context ctx.
+// FromIncomingContext returns The Things Stack metadata from the incoming context ctx.
 func FromIncomingContext(ctx context.Context) (m MD) {
 	md, _ := metadata.FromIncomingContext(ctx)
 	return FromMetadata(md)
