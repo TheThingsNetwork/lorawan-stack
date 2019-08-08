@@ -24,7 +24,7 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/mohae/deepcopy"
-	"github.com/oklog/ulid"
+	ulid "github.com/oklog/ulid/v2"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/cluster"

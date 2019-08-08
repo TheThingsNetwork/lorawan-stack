@@ -21,7 +21,7 @@ import (
 	"time"
 
 	echo "github.com/labstack/echo/v4"
-	"github.com/oklog/ulid"
+	ulid "github.com/oklog/ulid/v2"
 )
 
 // used to mock time

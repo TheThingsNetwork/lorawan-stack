@@ -19,7 +19,7 @@ import (
 	"crypto/rand"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware"
-	"github.com/oklog/ulid"
+	ulid "github.com/oklog/ulid/v2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )

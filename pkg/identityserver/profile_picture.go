@@ -24,7 +24,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/oklog/ulid"
+	ulid "github.com/oklog/ulid/v2"
 	ttnblob "go.thethings.network/lorawan-stack/pkg/blob"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/picture"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"

@@ -29,7 +29,7 @@ import (
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/oklog/ulid"
+	ulid "github.com/oklog/ulid/v2"
 	"go.thethings.network/lorawan-stack/pkg/auth"
 	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/pkg/cluster"
