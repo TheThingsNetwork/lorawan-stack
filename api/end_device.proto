@@ -360,6 +360,9 @@ message EndDevice {
   // The connection shall be established with transport layer security (TLS).
   // Custom certificate authorities may be configured out-of-band.
   string network_server_address = 9 [(validate.rules).string.pattern = "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"];
+  // The KEK label of the Network Server to use for wrapping network session keys.
+  // Stored in Join Server.
+  string network_server_kek_label = 47 [(gogoproto.customname) = "NetworkServerKEKLabel", (validate.rules).string.max_len = 2048];
   // The address of the Application Server where this device is supposed to be registered.
   // Stored in Entity Registry and Join Server.
   // The typical format of the address is "host:port". If the port is omitted,
@@ -367,6 +370,12 @@ message EndDevice {
   // The connection shall be established with transport layer security (TLS).
   // Custom certificate authorities may be configured out-of-band.
   string application_server_address = 10 [(validate.rules).string.pattern = "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"];
+  // The KEK label of the Application Server to use for wrapping the application session key.
+  // Stored in Join Server.
+  string application_server_kek_label = 48 [(gogoproto.customname) = "ApplicationServerKEKLabel", (validate.rules).string.max_len = 2048];
+  // The AS-ID of the Application Server to use.
+  // Stored in Join Server.
+  string application_server_id = 49 [(gogoproto.customname) = "ApplicationServerID", (validate.rules).string.max_len = 100];
   // The address of the Join Server where this device is supposed to be registered.
   // Stored in Entity Registry.
   // The typical format of the address is "host:port". If the port is omitted,

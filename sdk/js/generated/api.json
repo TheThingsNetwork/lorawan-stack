@@ -5164,6 +5164,24 @@
               }
             },
             {
+              "name": "network_server_kek_label",
+              "description": "The KEK label of the Network Server to use for wrapping network session keys.\nStored in Join Server.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 2048
+                  }
+                ]
+              }
+            },
+            {
               "name": "application_server_address",
               "description": "The address of the Application Server where this device is supposed to be registered.\nStored in Entity Registry and Join Server.\nThe typical format of the address is \"host:port\". If the port is omitted,\nthe normal port inference (with DNS lookup, otherwise defaults) is used.\nThe connection shall be established with transport layer security (TLS).\nCustom certificate authorities may be configured out-of-band.",
               "label": "",
@@ -5177,6 +5195,42 @@
                   {
                     "name": "string.pattern",
                     "value": "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "application_server_kek_label",
+              "description": "The KEK label of the Application Server to use for wrapping the application session key.\nStored in Join Server.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 2048
+                  }
+                ]
+              }
+            },
+            {
+              "name": "application_server_id",
+              "description": "The AS-ID of the Application Server to use.\nStored in Join Server.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 100
                   }
                 ]
               }
@@ -12353,7 +12407,15 @@
               "longType": "string",
               "fullType": "string",
               "ismap": false,
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 2048
+                  }
+                ]
+              }
             },
             {
               "name": "encrypted_key",
