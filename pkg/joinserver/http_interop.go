@@ -80,7 +80,7 @@ func (srv interopServer) JoinRequest(ctx context.Context, in *interop.JoinReq) (
 			errors.Resemble(err, errNoDevEUI),
 			errors.Resemble(err, errNoJoinEUI):
 			return nil, interop.ErrMalformedMessage.WithCause(err)
-		case errors.Resemble(err, errAddressNotAuthorized):
+		case errors.Resemble(err, errCallerNotAuthorized):
 			return nil, interop.ErrActivation.WithCause(err)
 		case errors.Resemble(err, errMICMismatch):
 			return nil, interop.ErrMIC.WithCause(err)
@@ -160,7 +160,7 @@ func (srv interopServer) AppSKeyRequest(ctx context.Context, in *interop.AppSKey
 	res, err := srv.JS.GetAppSKey(ctx, req)
 	if err != nil {
 		switch {
-		case errors.Resemble(err, errAddressNotAuthorized):
+		case errors.Resemble(err, errCallerNotAuthorized):
 			return nil, interop.ErrActivation.WithCause(err)
 		case errors.Resemble(err, errRegistryOperation):
 			if errors.IsNotFound(errors.Cause(err)) {
