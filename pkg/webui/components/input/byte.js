@@ -129,7 +129,15 @@ export default class ByteInput extends React.Component {
     if (this.input.current && this.input.current.inputElement) {
       const { inputElement } = this.input.current
 
-      inputElement.focus()
+      let i = inputElement.value.indexOf(PLACEHOLDER_CHAR)
+      if (i === -1) {
+        i = inputElement.value.length
+      }
+
+      setTimeout(function () {
+        inputElement.focus()
+        inputElement.setSelectionRange(i, i)
+      }, 0)
     }
   }
 
