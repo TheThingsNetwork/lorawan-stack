@@ -25,6 +25,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"path/filepath"
 	"sort"
 	"time"
 
@@ -301,10 +302,25 @@ func (conf tlsConfig) IsZero() bool {
 	return conf == (tlsConfig{})
 }
 
-func (conf tlsConfig) TLSConfig(fs afero.Fs) (*tls.Config, error) {
+func openFile(fs afero.Fs, basePath, path string) (afero.File, error) {
+	if !filepath.IsAbs(path) {
+		path = filepath.Join(basePath, path)
+	}
+	return fs.Open(path)
+}
+
+func readFile(fs afero.Fs, basePath, path string) ([]byte, error) {
+	f, err := openFile(fs, basePath, path)
+	if err != nil {
+		return nil, err
+	}
+	return ioutil.ReadAll(f)
+}
+
+func (conf tlsConfig) TLSConfig(fs afero.Fs, confDir string) (*tls.Config, error) {
 	var rootCAs *x509.CertPool
 	if conf.RootCA != "" {
-		caFile, err := fs.Open(conf.RootCA)
+		caFile, err := openFile(fs, confDir, conf.RootCA)
 		if err != nil {
 			return nil, err
 		}
@@ -320,7 +336,7 @@ func (conf tlsConfig) TLSConfig(fs afero.Fs) (*tls.Config, error) {
 	var getCert func(*tls.CertificateRequestInfo) (*tls.Certificate, error)
 	if conf.Certificate != "" || conf.Key != "" {
 		getCert = func(*tls.CertificateRequestInfo) (*tls.Certificate, error) {
-			certFile, err := fs.Open(conf.Certificate)
+			certFile, err := openFile(fs, confDir, conf.Certificate)
 			if err != nil {
 				return nil, err
 			}
@@ -329,7 +345,7 @@ func (conf tlsConfig) TLSConfig(fs afero.Fs) (*tls.Config, error) {
 				return nil, err
 			}
 
-			keyFile, err := fs.Open(conf.Key)
+			keyFile, err := openFile(fs, confDir, conf.Key)
 			if err != nil {
 				return nil, err
 			}
@@ -374,6 +390,7 @@ func NewClient(ctx context.Context, conf ClientConfig, fallbackTLS *tls.Config) 
 	if err != nil {
 		return nil, err
 	}
+	confDir := filepath.Dir(u.Path)
 	fs = afero.NewCacheOnReadFs(fs, afero.NewMemMapFs(), conf.CacheTime)
 
 	var yamlConf struct {
@@ -388,7 +405,7 @@ func NewClient(ctx context.Context, conf ClientConfig, fallbackTLS *tls.Config) 
 
 	jss := make([]prefixJoinServerClient, 0, len(yamlConf.JoinServers))
 	for _, jsConf := range yamlConf.JoinServers {
-		jsFile, err := fs.Open(jsConf.File)
+		jsFile, err := openFile(fs, confDir, jsConf.File)
 		if err != nil {
 			return nil, err
 		}

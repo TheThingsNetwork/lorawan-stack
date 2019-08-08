@@ -129,7 +129,7 @@ func TestGetAppSKey(t *testing.T) {
         - 70b3d57ed0000000/39
         - 70b3d83ed0000000/30`,
 					js1Path,
-					js2Path,
+					test.Must(filepath.Rel(confDir, js2Path)).(string),
 					js3Path,
 				)), 0644))
 
@@ -144,7 +144,7 @@ headers:
    SomeHeader: Some foo bar
    TestHeader: baz`,
 					RootCAPath,
-					ClientCertPath,
+					test.Must(filepath.Rel(confDir, ClientCertPath)).(string),
 					ClientKeyPath,
 				)), 0644))
 
@@ -162,7 +162,7 @@ headers:
 					fqdn,
 					port,
 					RootCAPath,
-					ClientCertPath,
+					test.Must(filepath.Rel(confDir, ClientCertPath)).(string),
 					ClientKeyPath,
 				)), 0644))
 
@@ -249,7 +249,7 @@ protocol: LW1.1`), 0644))
         - 70b3d57ed0000000/39
         - 70b3d83ed0000000/30`,
 					js1Path,
-					js2Path,
+					test.Must(filepath.Rel(confDir, js2Path)).(string),
 					js3Path,
 				)), 0644))
 
@@ -264,7 +264,7 @@ headers:
    SomeHeader: Some foo bar
    TestHeader: baz`,
 					RootCAPath,
-					ClientCertPath,
+					test.Must(filepath.Rel(confDir, ClientCertPath)).(string),
 					ClientKeyPath,
 				)), 0644))
 
@@ -282,7 +282,7 @@ headers:
 					fqdn,
 					port,
 					RootCAPath,
-					ClientCertPath,
+					test.Must(filepath.Rel(confDir, ClientCertPath)).(string),
 					ClientKeyPath,
 				)), 0644))
 
@@ -448,7 +448,7 @@ headers:
    SomeHeader: Some foo bar
    TestHeader: baz`,
 					RootCAPath,
-					ClientCertPath,
+					test.Must(filepath.Rel(confDir, ClientCertPath)).(string),
 					ClientKeyPath,
 				)), 0644))
 
@@ -466,7 +466,7 @@ headers:
 					fqdn,
 					port,
 					RootCAPath,
-					ClientCertPath,
+					test.Must(filepath.Rel(confDir, ClientCertPath)).(string),
 					ClientKeyPath,
 				)), 0644))
 
@@ -582,7 +582,7 @@ headers:
    SomeHeader: Some foo bar
    TestHeader: baz`,
 					RootCAPath,
-					ClientCertPath,
+					test.Must(filepath.Rel(confDir, ClientCertPath)).(string),
 					ClientKeyPath,
 				)), 0644))
 
@@ -600,7 +600,7 @@ headers:
 					fqdn,
 					port,
 					RootCAPath,
-					ClientCertPath,
+					test.Must(filepath.Rel(confDir, ClientCertPath)).(string),
 					ClientKeyPath,
 				)), 0644))
 
