@@ -78,11 +78,13 @@ const Placeholder = function(props) {
 @bind
 export default class ByteInput extends React.Component {
   static propTypes = {
-    value: PropTypes.string,
-    onChange: PropTypes.func,
-    min: PropTypes.number,
     max: PropTypes.number,
+    min: PropTypes.number,
+    onChange: PropTypes.func,
+    value: PropTypes.string,
   }
+
+  input = React.createRef()
 
   static validate(value, props) {
     const { min = 0, max = 256 } = props
@@ -106,6 +108,7 @@ export default class ByteInput extends React.Component {
     return [
       <Placeholder key="placeholder" min={min} max={max} value={value} placeholder={placeholder} />,
       <MaskedInput
+        ref={this.input}
         key="input"
         className={classnames(className, style.byte)}
         value={value}
@@ -120,6 +123,14 @@ export default class ByteInput extends React.Component {
         {...rest}
       />,
     ]
+  }
+
+  focus() {
+    if (this.input.current && this.input.current.inputElement) {
+      const { inputElement } = this.input.current
+
+      inputElement.focus()
+    }
   }
 
   onChange(evt) {
