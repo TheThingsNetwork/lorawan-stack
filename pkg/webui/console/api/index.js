@@ -164,4 +164,7 @@ export default {
       list: ttnClient.Js.listJoinEUIPrefixes.bind(ttnClient.Js),
     },
   },
+  ns: {
+    generateDevAddress: ttnClient.Ns.generateDevAddress.bind(ttnClient.Ns),
+  },
 }
