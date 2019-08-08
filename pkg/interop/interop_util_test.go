@@ -20,28 +20,25 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"path/filepath"
 
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
 var (
-	WorkingDirectory = test.Must(os.Getwd()).(string)
-
-	RootCAPath = filepath.Join(WorkingDirectory, "testdata", "rootCA.pem")
+	RootCAPath = filepath.Join("testdata", "rootCA.pem")
 	RootCA     = test.Must(ioutil.ReadFile(RootCAPath)).([]byte)
 
-	ClientCertPath = filepath.Join(WorkingDirectory, "testdata", "clientcert.pem")
+	ClientCertPath = filepath.Join("testdata", "clientcert.pem")
 	ClientCert     = test.Must(ioutil.ReadFile(ClientCertPath)).([]byte)
 
-	ClientKeyPath = filepath.Join(WorkingDirectory, "testdata", "clientkey.pem")
+	ClientKeyPath = filepath.Join("testdata", "clientkey.pem")
 	ClientKey     = test.Must(ioutil.ReadFile(ClientKeyPath)).([]byte)
 
-	ServerCertPath = filepath.Join(WorkingDirectory, "testdata", "servercert.pem")
+	ServerCertPath = filepath.Join("testdata", "servercert.pem")
 	ServerCert     = test.Must(ioutil.ReadFile(ServerCertPath)).([]byte)
 
-	ServerKeyPath = filepath.Join(WorkingDirectory, "testdata", "serverkey.pem")
+	ServerKeyPath = filepath.Join("testdata", "serverkey.pem")
 	ServerKey     = test.Must(ioutil.ReadFile(ServerKeyPath)).([]byte)
 )
 

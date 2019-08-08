@@ -15,6 +15,7 @@
 package config
 
 import (
+	"crypto/tls"
 	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/crypto"
@@ -237,6 +238,30 @@ func (c DeviceRepositoryConfig) Client() *devicerepository.Client {
 	}
 	return &devicerepository.Client{
 		Fetcher: fetcher,
+	}
+}
+
+// InteropClient represents the client-side interoperability through LoRaWAN Backend Interfaces configuration.
+type InteropClient struct {
+	Directory   string      `name:"directory" description:"Retrieve the interoperability client configuration from the filesystem"`
+	URL         string      `name:"url" description:"Retrieve the interoperability client configuration from a web server"`
+	FallbackTLS *tls.Config `name:"-"`
+}
+
+// IsZero returns whether conf is empty.
+func (conf InteropClient) IsZero() bool {
+	return conf == (InteropClient{})
+}
+
+// Fetcher returns fetch.Interface defined by conf.
+func (conf InteropClient) Fetcher() fetch.Interface {
+	switch {
+	case conf.Directory != "":
+		return fetch.FromFilesystem(conf.Directory)
+	case conf.URL != "":
+		return fetch.FromHTTP(conf.URL, true)
+	default:
+		return nil
 	}
 }
 

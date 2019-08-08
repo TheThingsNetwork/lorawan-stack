@@ -21,17 +21,14 @@ import (
 	"crypto/x509"
 	"encoding/json"
 	"fmt"
-	"io"
-	"io/ioutil"
 	"net/http"
-	"net/url"
-	"path/filepath"
 	"sort"
 	"time"
 
-	"github.com/spf13/afero"
+	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/fetch"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	yaml "gopkg.in/yaml.v2"
@@ -284,13 +281,7 @@ type Client struct {
 
 var errUnknownProtocol = errors.DefineInvalidArgument("unknown_protocol", "unknown protocol")
 
-// ClientConfig represents the client-side interoperability through LoRaWAN Backend Interfaces configuration.
-type ClientConfig struct {
-	ConfigURI string        `name:"config-uri" description:"URI of the configuration file"`
-	CacheTime time.Duration `name:"cache-time"`
-}
-
-var errUnsupportedURIScheme = errors.DefineUnimplemented("unsupported_uri_scheme", "URI scheme `{scheme}` is not supported", "scheme")
+var errUnknownConfig = errors.DefineNotFound("unknown_config", "configuration is unknown")
 
 type tlsConfig struct {
 	RootCA      string `yaml:"root-ca"`
@@ -302,30 +293,10 @@ func (conf tlsConfig) IsZero() bool {
 	return conf == (tlsConfig{})
 }
 
-func openFile(fs afero.Fs, basePath, path string) (afero.File, error) {
-	if !filepath.IsAbs(path) {
-		path = filepath.Join(basePath, path)
-	}
-	return fs.Open(path)
-}
-
-func readFile(fs afero.Fs, basePath, path string) ([]byte, error) {
-	f, err := openFile(fs, basePath, path)
-	if err != nil {
-		return nil, err
-	}
-	return ioutil.ReadAll(f)
-}
-
-func (conf tlsConfig) TLSConfig(fs afero.Fs, confDir string) (*tls.Config, error) {
+func (conf tlsConfig) TLSConfig(fetcher fetch.Interface) (*tls.Config, error) {
 	var rootCAs *x509.CertPool
 	if conf.RootCA != "" {
-		caFile, err := openFile(fs, confDir, conf.RootCA)
-		if err != nil {
-			return nil, err
-		}
-
-		caPEM, err := ioutil.ReadAll(caFile)
+		caPEM, err := fetcher.File(conf.RootCA)
 		if err != nil {
 			return nil, err
 		}
@@ -336,24 +307,14 @@ func (conf tlsConfig) TLSConfig(fs afero.Fs, confDir string) (*tls.Config, error
 	var getCert func(*tls.CertificateRequestInfo) (*tls.Certificate, error)
 	if conf.Certificate != "" || conf.Key != "" {
 		getCert = func(*tls.CertificateRequestInfo) (*tls.Certificate, error) {
-			certFile, err := openFile(fs, confDir, conf.Certificate)
+			certPEM, err := fetcher.File(conf.Certificate)
 			if err != nil {
 				return nil, err
 			}
-			certPEM, err := ioutil.ReadAll(certFile)
+			keyPEM, err := fetcher.File(conf.Key)
 			if err != nil {
 				return nil, err
 			}
-
-			keyFile, err := openFile(fs, confDir, conf.Key)
-			if err != nil {
-				return nil, err
-			}
-			keyPEM, err := ioutil.ReadAll(keyFile)
-			if err != nil {
-				return nil, err
-			}
-
 			cert, err := tls.X509KeyPair(certPEM, keyPEM)
 			if err != nil {
 				return nil, err
@@ -367,31 +328,17 @@ func (conf tlsConfig) TLSConfig(fs afero.Fs, confDir string) (*tls.Config, error
 	}, nil
 }
 
-func decodeYAML(r io.Reader, v interface{}) error {
-	dec := yaml.NewDecoder(r)
-	dec.SetStrict(true)
-	return dec.Decode(v)
-}
+const interopClientConfName = "config.yaml"
 
-func NewClient(ctx context.Context, conf ClientConfig, fallbackTLS *tls.Config) (*Client, error) {
-	u, err := url.Parse(conf.ConfigURI)
+func NewClient(ctx context.Context, conf config.InteropClient, fallbackTLS *tls.Config) (*Client, error) {
+	fetcher := conf.Fetcher()
+	if fetcher == nil {
+		return nil, errUnknownConfig
+	}
+	confFileBytes, err := fetcher.File(interopClientConfName)
 	if err != nil {
 		return nil, err
 	}
-
-	var fs afero.Fs
-	switch s := u.Scheme; s {
-	case "file":
-		fs = afero.NewOsFs()
-	default:
-		return nil, errUnsupportedURIScheme.WithAttributes("scheme", s)
-	}
-	confFile, err := fs.Open(u.Path)
-	if err != nil {
-		return nil, err
-	}
-	confDir := filepath.Dir(u.Path)
-	fs = afero.NewCacheOnReadFs(fs, afero.NewMemMapFs(), conf.CacheTime)
 
 	var yamlConf struct {
 		JoinServers []struct {
@@ -399,13 +346,13 @@ func NewClient(ctx context.Context, conf ClientConfig, fallbackTLS *tls.Config) 
 			JoinEUI []types.EUI64Prefix `yaml:"join-eui"`
 		} `yaml:"join-servers"`
 	}
-	if err := decodeYAML(confFile, &yamlConf); err != nil {
+	if err := yaml.UnmarshalStrict(confFileBytes, &yamlConf); err != nil {
 		return nil, err
 	}
 
 	jss := make([]prefixJoinServerClient, 0, len(yamlConf.JoinServers))
 	for _, jsConf := range yamlConf.JoinServers {
-		jsFile, err := openFile(fs, confDir, jsConf.File)
+		jsFileBytes, err := fetcher.File(jsConf.File)
 		if err != nil {
 			return nil, err
 		}
@@ -419,7 +366,7 @@ func NewClient(ctx context.Context, conf ClientConfig, fallbackTLS *tls.Config) 
 			Headers  map[string]string  `yaml:"headers"`
 			TLS      tlsConfig          `yaml:"tls"`
 		}
-		if err := decodeYAML(jsFile, &yamlJSConf); err != nil {
+		if err := yaml.UnmarshalStrict(jsFileBytes, &yamlJSConf); err != nil {
 			return nil, err
 		}
 
@@ -428,7 +375,7 @@ func NewClient(ctx context.Context, conf ClientConfig, fallbackTLS *tls.Config) 
 		case LoRaWANJoinServerProtocol1_0, LoRaWANJoinServerProtocol1_1:
 			tlsConf := fallbackTLS
 			if !yamlJSConf.TLS.IsZero() {
-				tlsConf, err = yamlJSConf.TLS.TLSConfig(fs, confDir)
+				tlsConf, err = yamlJSConf.TLS.TLSConfig(fetcher)
 				if err != nil {
 					return nil, err
 				}

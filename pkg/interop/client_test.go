@@ -26,9 +26,9 @@ import (
 	"strconv"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	. "go.thethings.network/lorawan-stack/pkg/interop"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -66,7 +66,7 @@ func TestGetAppSKey(t *testing.T) {
 		Name                 string
 		NewServer            func(*testing.T) *httptest.Server
 		NewFallbackTLSConfig func() *tls.Config
-		NewClientConfig      func(fqdn string, port uint32) (ClientConfig, func() error)
+		NewClientConfig      func(fqdn string, port uint32) (config.InteropClient, func() error)
 		AsID                 string
 		Request              *ttnpb.SessionKeyRequest
 		ResponseAssertion    func(*testing.T, *ttnpb.AppSKeyResponse) bool
@@ -106,15 +106,25 @@ func TestGetAppSKey(t *testing.T) {
 				}))
 			},
 			NewFallbackTLSConfig: func() *tls.Config { return nil },
-			NewClientConfig: func(fqdn string, port uint32) (ClientConfig, func() error) {
+			NewClientConfig: func(fqdn string, port uint32) (config.InteropClient, func() error) {
 				confDir := test.Must(ioutil.TempDir("", "lorawan-stack-js-interop-test")).(string)
-				confURI := fmt.Sprintf("file://%s/%s", filepath.ToSlash(confDir), "config.yaml")
-
+				confPath := filepath.Join(confDir, "config.yaml")
 				js1Path := filepath.Join(confDir, "test-js-1.yaml")
 				js2Path := filepath.Join(confDir, "foo", "test-js-2.yaml")
 				js3Path := filepath.Join(confDir, "test-js-3.yaml")
 
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, "config.yaml"), []byte(fmt.Sprintf(`join-servers:
+				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "testdata"), 0755))
+				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ClientCertPath), ClientCert, 0644))
+				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ClientKeyPath), ClientKey, 0644))
+				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ServerCertPath), ServerCert, 0644))
+				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ServerKeyPath), ServerKey, 0644))
+				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, RootCAPath), RootCA, 0644))
+
+				rel := func(path string) string {
+					return test.Must(filepath.Rel(confDir, path)).(string)
+				}
+
+				test.MustMultiple(ioutil.WriteFile(confPath, []byte(fmt.Sprintf(`join-servers:
    - file: %s
      join-eui:
         - 0000000000000000/0
@@ -128,9 +138,9 @@ func TestGetAppSKey(t *testing.T) {
      join-eui:
         - 70b3d57ed0000000/39
         - 70b3d83ed0000000/30`,
-					js1Path,
-					test.Must(filepath.Rel(confDir, js2Path)).(string),
-					js3Path,
+					rel(js1Path),
+					rel(js2Path),
+					rel(js3Path),
 				)), 0644))
 
 				test.MustMultiple(ioutil.WriteFile(js1Path, []byte(fmt.Sprintf(`fqdn: test-js.fqdn
@@ -144,7 +154,7 @@ headers:
    SomeHeader: Some foo bar
    TestHeader: baz`,
 					RootCAPath,
-					test.Must(filepath.Rel(confDir, ClientCertPath)).(string),
+					ClientCertPath,
 					ClientKeyPath,
 				)), 0644))
 
@@ -162,7 +172,7 @@ headers:
 					fqdn,
 					port,
 					RootCAPath,
-					test.Must(filepath.Rel(confDir, ClientCertPath)).(string),
+					ClientCertPath,
 					ClientKeyPath,
 				)), 0644))
 
@@ -170,9 +180,8 @@ headers:
 path: test-path
 protocol: BI1.1`), 0644))
 
-				return ClientConfig{
-						ConfigURI: confURI,
-						CacheTime: time.Millisecond,
+				return config.InteropClient{
+						Directory: confDir,
 					}, func() error {
 						return os.RemoveAll(confDir)
 					}
@@ -226,15 +235,25 @@ protocol: BI1.1`), 0644))
 				}))
 			},
 			NewFallbackTLSConfig: func() *tls.Config { return nil },
-			NewClientConfig: func(fqdn string, port uint32) (ClientConfig, func() error) {
+			NewClientConfig: func(fqdn string, port uint32) (config.InteropClient, func() error) {
 				confDir := test.Must(ioutil.TempDir("", "lorawan-stack-js-interop-test")).(string)
-				confURI := fmt.Sprintf("file://%s/%s", filepath.ToSlash(confDir), "config.yaml")
-
+				confPath := filepath.Join(confDir, "config.yaml")
 				js1Path := filepath.Join(confDir, "test-js-1.yaml")
 				js2Path := filepath.Join(confDir, "foo", "test-js-2.yaml")
 				js3Path := filepath.Join(confDir, "test-js-3.yaml")
 
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, "config.yaml"), []byte(fmt.Sprintf(`join-servers:
+				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "testdata"), 0755))
+				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ClientCertPath), ClientCert, 0644))
+				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ClientKeyPath), ClientKey, 0644))
+				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ServerCertPath), ServerCert, 0644))
+				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ServerKeyPath), ServerKey, 0644))
+				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, RootCAPath), RootCA, 0644))
+
+				rel := func(path string) string {
+					return test.Must(filepath.Rel(confDir, path)).(string)
+				}
+
+				test.MustMultiple(ioutil.WriteFile(confPath, []byte(fmt.Sprintf(`join-servers:
    - file: %s
      join-eui:
         - 0000000000000000/0
@@ -248,9 +267,9 @@ protocol: BI1.1`), 0644))
      join-eui:
         - 70b3d57ed0000000/39
         - 70b3d83ed0000000/30`,
-					js1Path,
-					test.Must(filepath.Rel(confDir, js2Path)).(string),
-					js3Path,
+					rel(js1Path),
+					rel(js2Path),
+					rel(js3Path),
 				)), 0644))
 
 				test.MustMultiple(ioutil.WriteFile(js1Path, []byte(fmt.Sprintf(`fqdn: test-js.fqdn
@@ -264,7 +283,7 @@ headers:
    SomeHeader: Some foo bar
    TestHeader: baz`,
 					RootCAPath,
-					test.Must(filepath.Rel(confDir, ClientCertPath)).(string),
+					ClientCertPath,
 					ClientKeyPath,
 				)), 0644))
 
@@ -282,7 +301,7 @@ headers:
 					fqdn,
 					port,
 					RootCAPath,
-					test.Must(filepath.Rel(confDir, ClientCertPath)).(string),
+					ClientCertPath,
 					ClientKeyPath,
 				)), 0644))
 
@@ -290,9 +309,8 @@ headers:
 path: test-path
 protocol: BI1.0`), 0644))
 
-				return ClientConfig{
-						ConfigURI: confURI,
-						CacheTime: time.Millisecond,
+				return config.InteropClient{
+						Directory: confDir,
 					}, func() error {
 						return os.RemoveAll(confDir)
 					}
@@ -312,33 +330,35 @@ protocol: BI1.0`), 0644))
 			},
 		},
 	} {
-		a := assertions.New(t)
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
 
-		ctx := test.Context()
-		ctx = log.NewContext(ctx, test.GetLogger(t))
+			ctx := test.Context()
+			ctx = log.NewContext(ctx, test.GetLogger(t))
 
-		srv := tc.NewServer(t)
-		defer srv.Close()
+			srv := tc.NewServer(t)
+			defer srv.Close()
 
-		host := strings.Split(test.Must(url.Parse(srv.URL)).(*url.URL).Host, ":")
-		if len(host) != 2 {
-			t.Fatalf("Invalid server host: %s", host)
-		}
+			host := strings.Split(test.Must(url.Parse(srv.URL)).(*url.URL).Host, ":")
+			if len(host) != 2 {
+				t.Fatalf("Invalid server host: %s", host)
+			}
 
-		conf, flush := tc.NewClientConfig(host[0], uint32(test.Must(strconv.ParseUint(host[1], 10, 32)).(uint64)))
-		defer flush()
+			conf, flush := tc.NewClientConfig(host[0], uint32(test.Must(strconv.ParseUint(host[1], 10, 32)).(uint64)))
+			defer flush()
 
-		cl, err := NewClient(ctx, conf, tc.NewFallbackTLSConfig())
-		if !a.So(err, should.BeNil) {
-			t.Fatalf("Failed to create new client: %s", err)
-		}
+			cl, err := NewClient(ctx, conf, tc.NewFallbackTLSConfig())
+			if !a.So(err, should.BeNil) {
+				t.Fatalf("Failed to create new client: %s", err)
+			}
 
-		res, err := cl.GetAppSKey(ctx, tc.AsID, tc.Request)
-		if a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
-			a.So(tc.ResponseAssertion(t, res), should.BeTrue)
-		} else if err != nil {
-			t.Errorf("Received unexpected error: %v", errors.Stack(err))
-		}
+			res, err := cl.GetAppSKey(ctx, tc.AsID, tc.Request)
+			if a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
+				a.So(tc.ResponseAssertion(t, res), should.BeTrue)
+			} else if err != nil {
+				t.Errorf("Received unexpected error: %v", errors.Stack(err))
+			}
+		})
 	}
 }
 
@@ -364,7 +384,7 @@ func TestHandleJoinRequest(t *testing.T) {
 		Name                 string
 		NewServer            func(*testing.T) *httptest.Server
 		NewFallbackTLSConfig func() *tls.Config
-		NewClientConfig      func(fqdn string, port uint32) (ClientConfig, func() error)
+		NewClientConfig      func(fqdn string, port uint32) (config.InteropClient, func() error)
 		NetID                types.NetID
 		Request              *ttnpb.JoinRequest
 		ResponseAssertion    func(*testing.T, *ttnpb.JoinResponse) bool
@@ -410,15 +430,25 @@ func TestHandleJoinRequest(t *testing.T) {
 				}))
 			},
 			NewFallbackTLSConfig: func() *tls.Config { return nil },
-			NewClientConfig: func(fqdn string, port uint32) (ClientConfig, func() error) {
+			NewClientConfig: func(fqdn string, port uint32) (config.InteropClient, func() error) {
 				confDir := test.Must(ioutil.TempDir("", "lorawan-stack-js-interop-test")).(string)
-				confURI := fmt.Sprintf("file://%s/%s", filepath.ToSlash(confDir), "config.yaml")
-
+				confPath := filepath.Join(confDir, "config.yaml")
 				js1Path := filepath.Join(confDir, "test-js-1.yaml")
 				js2Path := filepath.Join(confDir, "foo", "test-js-2.yaml")
 				js3Path := filepath.Join(confDir, "test-js-3.yaml")
 
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, "config.yaml"), []byte(fmt.Sprintf(`join-servers:
+				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "testdata"), 0755))
+				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ClientCertPath), ClientCert, 0644))
+				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ClientKeyPath), ClientKey, 0644))
+				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ServerCertPath), ServerCert, 0644))
+				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ServerKeyPath), ServerKey, 0644))
+				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, RootCAPath), RootCA, 0644))
+
+				rel := func(path string) string {
+					return test.Must(filepath.Rel(confDir, path)).(string)
+				}
+
+				test.MustMultiple(ioutil.WriteFile(confPath, []byte(fmt.Sprintf(`join-servers:
    - file: %s
      join-eui:
         - 0000000000000000/0
@@ -432,9 +462,9 @@ func TestHandleJoinRequest(t *testing.T) {
      join-eui:
         - 70b3d57ed0000000/39
         - 70b3d83ed0000000/30`,
-					js1Path,
-					js2Path,
-					js3Path,
+					rel(js1Path),
+					rel(js2Path),
+					rel(js3Path),
 				)), 0644))
 
 				test.MustMultiple(ioutil.WriteFile(js1Path, []byte(fmt.Sprintf(`fqdn: test-js.fqdn
@@ -448,7 +478,7 @@ headers:
    SomeHeader: Some foo bar
    TestHeader: baz`,
 					RootCAPath,
-					test.Must(filepath.Rel(confDir, ClientCertPath)).(string),
+					ClientCertPath,
 					ClientKeyPath,
 				)), 0644))
 
@@ -466,7 +496,7 @@ headers:
 					fqdn,
 					port,
 					RootCAPath,
-					test.Must(filepath.Rel(confDir, ClientCertPath)).(string),
+					ClientCertPath,
 					ClientKeyPath,
 				)), 0644))
 
@@ -474,9 +504,8 @@ headers:
 path: test-path
 protocol: BI1.1`), 0644))
 
-				return ClientConfig{
-						ConfigURI: confURI,
-						CacheTime: time.Millisecond,
+				return config.InteropClient{
+						Directory: confDir,
 					}, func() error {
 						return os.RemoveAll(confDir)
 					}
@@ -544,15 +573,25 @@ protocol: BI1.1`), 0644))
 				}))
 			},
 			NewFallbackTLSConfig: func() *tls.Config { return nil },
-			NewClientConfig: func(fqdn string, port uint32) (ClientConfig, func() error) {
+			NewClientConfig: func(fqdn string, port uint32) (config.InteropClient, func() error) {
 				confDir := test.Must(ioutil.TempDir("", "lorawan-stack-js-interop-test")).(string)
-				confURI := fmt.Sprintf("file://%s/%s", filepath.ToSlash(confDir), "config.yaml")
-
+				confPath := filepath.Join(confDir, "config.yaml")
 				js1Path := filepath.Join(confDir, "test-js-1.yaml")
 				js2Path := filepath.Join(confDir, "foo", "test-js-2.yaml")
 				js3Path := filepath.Join(confDir, "test-js-3.yaml")
 
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, "config.yaml"), []byte(fmt.Sprintf(`join-servers:
+				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "testdata"), 0755))
+				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ClientCertPath), ClientCert, 0644))
+				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ClientKeyPath), ClientKey, 0644))
+				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ServerCertPath), ServerCert, 0644))
+				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ServerKeyPath), ServerKey, 0644))
+				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, RootCAPath), RootCA, 0644))
+
+				rel := func(path string) string {
+					return test.Must(filepath.Rel(confDir, path)).(string)
+				}
+
+				test.MustMultiple(ioutil.WriteFile(confPath, []byte(fmt.Sprintf(`join-servers:
    - file: %s
      join-eui:
         - 0000000000000000/0
@@ -566,9 +605,9 @@ protocol: BI1.1`), 0644))
      join-eui:
         - 70b3d57ed0000000/39
         - 70b3d83ed0000000/30`,
-					js1Path,
-					js2Path,
-					js3Path,
+					rel(js1Path),
+					rel(js2Path),
+					rel(js3Path),
 				)), 0644))
 
 				test.MustMultiple(ioutil.WriteFile(js1Path, []byte(fmt.Sprintf(`fqdn: test-js.fqdn
@@ -582,7 +621,7 @@ headers:
    SomeHeader: Some foo bar
    TestHeader: baz`,
 					RootCAPath,
-					test.Must(filepath.Rel(confDir, ClientCertPath)).(string),
+					ClientCertPath,
 					ClientKeyPath,
 				)), 0644))
 
@@ -600,7 +639,7 @@ headers:
 					fqdn,
 					port,
 					RootCAPath,
-					test.Must(filepath.Rel(confDir, ClientCertPath)).(string),
+					ClientCertPath,
 					ClientKeyPath,
 				)), 0644))
 
@@ -608,9 +647,8 @@ headers:
 path: test-path
 protocol: BI1.0`), 0644))
 
-				return ClientConfig{
-						ConfigURI: confURI,
-						CacheTime: time.Millisecond,
+				return config.InteropClient{
+						Directory: confDir,
 					}, func() error {
 						return os.RemoveAll(confDir)
 					}
@@ -638,32 +676,34 @@ protocol: BI1.0`), 0644))
 			},
 		},
 	} {
-		a := assertions.New(t)
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
 
-		ctx := test.Context()
-		ctx = log.NewContext(ctx, test.GetLogger(t))
+			ctx := test.Context()
+			ctx = log.NewContext(ctx, test.GetLogger(t))
 
-		srv := tc.NewServer(t)
-		defer srv.Close()
+			srv := tc.NewServer(t)
+			defer srv.Close()
 
-		host := strings.Split(test.Must(url.Parse(srv.URL)).(*url.URL).Host, ":")
-		if len(host) != 2 {
-			t.Fatalf("Invalid server host: %s", host)
-		}
+			host := strings.Split(test.Must(url.Parse(srv.URL)).(*url.URL).Host, ":")
+			if len(host) != 2 {
+				t.Fatalf("Invalid server host: %s", host)
+			}
 
-		conf, flush := tc.NewClientConfig(host[0], uint32(test.Must(strconv.ParseUint(host[1], 10, 32)).(uint64)))
-		defer flush()
+			conf, flush := tc.NewClientConfig(host[0], uint32(test.Must(strconv.ParseUint(host[1], 10, 32)).(uint64)))
+			defer flush()
 
-		cl, err := NewClient(ctx, conf, tc.NewFallbackTLSConfig())
-		if !a.So(err, should.BeNil) {
-			t.Fatalf("Failed to create new client: %s", err)
-		}
+			cl, err := NewClient(ctx, conf, tc.NewFallbackTLSConfig())
+			if !a.So(err, should.BeNil) {
+				t.Fatalf("Failed to create new client: %s", err)
+			}
 
-		res, err := cl.HandleJoinRequest(ctx, tc.NetID, tc.Request)
-		if a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
-			a.So(tc.ResponseAssertion(t, res), should.BeTrue)
-		} else if err != nil {
-			t.Errorf("Received unexpected error: %v", errors.Stack(err))
-		}
+			res, err := cl.HandleJoinRequest(ctx, tc.NetID, tc.Request)
+			if a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
+				a.So(tc.ResponseAssertion(t, res), should.BeTrue)
+			} else if err != nil {
+				t.Errorf("Received unexpected error: %v", errors.Stack(err))
+			}
+		})
 	}
 }

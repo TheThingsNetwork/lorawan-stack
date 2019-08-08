@@ -107,7 +107,7 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 			fallbackTLS = cTLS
 		}
 
-		interopCl, err = interop.NewClient(ctx, conf.Interop.ClientConfig, fallbackTLS)
+		interopCl, err = interop.NewClient(ctx, conf.Interop.InteropClient, fallbackTLS)
 		if err != nil {
 			return nil, err
 		}

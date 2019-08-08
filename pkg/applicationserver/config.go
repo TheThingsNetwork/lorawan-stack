@@ -23,8 +23,8 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/web"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/interop"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
@@ -46,7 +46,7 @@ type InteropClient interface {
 
 // InteropConfig represents interoperability client configuration.
 type InteropConfig struct {
-	interop.ClientConfig `name:",squash"`
+	config.InteropClient `name:",squash"`
 	ID                   string `name:"id" description:"AS-ID used for interoperability"`
 }
 

@@ -1,0 +1,14 @@
+join-servers:
+   - file: test-js-1.yaml
+     join-eui:
+        - 0000000000000000/0
+        - 70b3d57ed0001000/52
+
+   - file: foo/test-js-2.yaml
+     join-eui:
+        - 70b3d57ed0000000/40
+
+   - file: test-js-3.yaml
+     join-eui:
+        - 70b3d57ed0000000/39
+        - 70b3d83ed0000000/30
