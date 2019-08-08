@@ -77,10 +77,10 @@ func (p *JoinServerProtocol) UnmarshalYAML(unmarshal func(interface{}) error) er
 		return err
 	}
 	switch s {
-	case "LW1.1":
+	case "BI1.1":
 		*p = LoRaWANJoinServerProtocol1_1
 		return nil
-	case "LW1.0":
+	case "BI1.0":
 		*p = LoRaWANJoinServerProtocol1_0
 		return nil
 	default:

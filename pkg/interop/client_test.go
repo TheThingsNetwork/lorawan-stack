@@ -135,7 +135,7 @@ func TestGetAppSKey(t *testing.T) {
 
 				test.MustMultiple(ioutil.WriteFile(js1Path, []byte(fmt.Sprintf(`fqdn: test-js.fqdn
 port: 12345
-protocol: LW1.1
+protocol: BI1.1
 tls:
    root-ca: %s
    certificate: %s
@@ -151,7 +151,7 @@ headers:
 				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "foo"), 0755))
 				test.MustMultiple(ioutil.WriteFile(js2Path, []byte(fmt.Sprintf(`fqdn: %s
 port: %d
-protocol: LW1.0
+protocol: BI1.0
 tls:
    root-ca: %s
    certificate: %s
@@ -168,7 +168,7 @@ headers:
 
 				test.MustMultiple(ioutil.WriteFile(js3Path, []byte(`dns: invalid.dns
 path: test-path
-protocol: LW1.1`), 0644))
+protocol: BI1.1`), 0644))
 
 				return ClientConfig{
 						ConfigURI: confURI,
@@ -255,7 +255,7 @@ protocol: LW1.1`), 0644))
 
 				test.MustMultiple(ioutil.WriteFile(js1Path, []byte(fmt.Sprintf(`fqdn: test-js.fqdn
 port: 12345
-protocol: LW1.0
+protocol: BI1.0
 tls:
    root-ca: %s
    certificate: %s
@@ -271,7 +271,7 @@ headers:
 				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "foo"), 0755))
 				test.MustMultiple(ioutil.WriteFile(js2Path, []byte(fmt.Sprintf(`fqdn: %s
 port: %d
-protocol: LW1.1
+protocol: BI1.1
 tls:
    root-ca: %s
    certificate: %s
@@ -288,7 +288,7 @@ headers:
 
 				test.MustMultiple(ioutil.WriteFile(js3Path, []byte(`dns: invalid.dns
 path: test-path
-protocol: LW1.0`), 0644))
+protocol: BI1.0`), 0644))
 
 				return ClientConfig{
 						ConfigURI: confURI,
@@ -439,7 +439,7 @@ func TestHandleJoinRequest(t *testing.T) {
 
 				test.MustMultiple(ioutil.WriteFile(js1Path, []byte(fmt.Sprintf(`fqdn: test-js.fqdn
 port: 12345
-protocol: LW1.1
+protocol: BI1.1
 tls:
    root-ca: %s
    certificate: %s
@@ -455,7 +455,7 @@ headers:
 				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "foo"), 0755))
 				test.MustMultiple(ioutil.WriteFile(js2Path, []byte(fmt.Sprintf(`fqdn: %s
 port: %d
-protocol: LW1.0
+protocol: BI1.0
 tls:
    root-ca: %s
    certificate: %s
@@ -472,7 +472,7 @@ headers:
 
 				test.MustMultiple(ioutil.WriteFile(js3Path, []byte(`dns: invalid.dns
 path: test-path
-protocol: LW1.1`), 0644))
+protocol: BI1.1`), 0644))
 
 				return ClientConfig{
 						ConfigURI: confURI,
@@ -573,7 +573,7 @@ protocol: LW1.1`), 0644))
 
 				test.MustMultiple(ioutil.WriteFile(js1Path, []byte(fmt.Sprintf(`fqdn: test-js.fqdn
 port: 12345
-protocol: LW1.0
+protocol: BI1.0
 tls:
    root-ca: %s
    certificate: %s
@@ -589,7 +589,7 @@ headers:
 				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "foo"), 0755))
 				test.MustMultiple(ioutil.WriteFile(js2Path, []byte(fmt.Sprintf(`fqdn: %s
 port: %d
-protocol: LW1.1
+protocol: BI1.1
 tls:
    root-ca: %s
    certificate: %s
@@ -606,7 +606,7 @@ headers:
 
 				test.MustMultiple(ioutil.WriteFile(js3Path, []byte(`dns: invalid.dns
 path: test-path
-protocol: LW1.0`), 0644))
+protocol: BI1.0`), 0644))
 
 				return ClientConfig{
 						ConfigURI: confURI,
