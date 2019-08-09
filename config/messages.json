@@ -3950,6 +3950,24 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/interop:unexpected_result": {
+    "translations": {
+      "en": "unexpected result code {code}"
+    },
+    "description": {
+      "package": "pkg/interop",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/interop:unknown_config": {
+    "translations": {
+      "en": "configuration is unknown"
+    },
+    "description": {
+      "package": "pkg/interop",
+      "file": "client.go"
+    }
+  },
   "error:pkg/interop:unknown_dev_addr": {
     "translations": {
       "en": "unknown DevAddr"
@@ -3975,6 +3993,15 @@
     "description": {
       "package": "pkg/interop",
       "file": "errors.go"
+    }
+  },
+  "error:pkg/interop:unknown_protocol": {
+    "translations": {
+      "en": "unknown protocol"
+    },
+    "description": {
+      "package": "pkg/interop",
+      "file": "client.go"
     }
   },
   "error:pkg/interop:unknown_receiver": {
@@ -4173,15 +4200,6 @@
     "description": {
       "package": "pkg/joinserver",
       "file": "grpc_deviceregistry.go"
-    }
-  },
-  "error:pkg/joinserver:forward_join_request": {
-    "translations": {
-      "en": "failed to forward JoinRequest"
-    },
-    "description": {
-      "package": "pkg/joinserver",
-      "file": "errors.go"
     }
   },
   "error:pkg/joinserver:generate_session_key_id": {
@@ -4454,9 +4472,9 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/joinserver:unknown_app_eui": {
+  "error:pkg/joinserver:unknown_join_eui": {
     "translations": {
-      "en": "AppEUI specified is not known"
+      "en": "JoinEUI specified is not known"
     },
     "description": {
       "package": "pkg/joinserver",
