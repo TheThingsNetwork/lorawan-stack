@@ -157,7 +157,7 @@ func New(logger log.Stack, config *Config, opts ...Option) (*Component, error) {
 		return nil, err
 	}
 
-	c.interop, err = interop.New(c.ctx, config.Interop)
+	c.interop, err = interop.NewServer(c.ctx, config.Interop)
 	if err != nil {
 		return nil, err
 	}

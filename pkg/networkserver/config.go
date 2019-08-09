@@ -17,6 +17,7 @@ package networkserver
 import (
 	"time"
 
+	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
@@ -32,6 +33,7 @@ type Config struct {
 	CooldownWindow      time.Duration          `name:"cooldown-window" description:"Time window starting right after deduplication window, during which, duplicate messages are discarded"`
 	DownlinkPriorities  DownlinkPriorityConfig `name:"downlink-priorities" description:"Downlink message priorities"`
 	DefaultMACSettings  MACSettingConfig       `name:"default-mac-settings" description:"Default MAC settings to fallback to if not specified by device, band or frequency plan"`
+	Interop             config.InteropClient   `name:"interop" description:"Interop client configuration"`
 }
 
 // MACSettingConfig defines MAC-layer configuration.

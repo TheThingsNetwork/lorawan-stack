@@ -15,6 +15,7 @@
 package config
 
 import (
+	"crypto/tls"
 	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/crypto"
@@ -107,8 +108,8 @@ type HTTP struct {
 	Health    Health           `name:"health"`
 }
 
-// Interop represents the interoperability through LoRaWAN Backend Interfaces configuration.
-type Interop struct {
+// InteropServer represents the server-side interoperability through LoRaWAN Backend Interfaces configuration.
+type InteropServer struct {
 	ListenTLS       string            `name:"listen-tls" description:"Address for the interop server to listen on"`
 	SenderClientCAs map[string]string `name:"sender-client-cas" description:"Path to PEM encoded file with client CAs of sender IDs to trust"`
 }
@@ -240,6 +241,30 @@ func (c DeviceRepositoryConfig) Client() *devicerepository.Client {
 	}
 }
 
+// InteropClient represents the client-side interoperability through LoRaWAN Backend Interfaces configuration.
+type InteropClient struct {
+	Directory   string      `name:"directory" description:"Retrieve the interoperability client configuration from the filesystem"`
+	URL         string      `name:"url" description:"Retrieve the interoperability client configuration from a web server"`
+	FallbackTLS *tls.Config `name:"-"`
+}
+
+// IsZero returns whether conf is empty.
+func (conf InteropClient) IsZero() bool {
+	return conf == (InteropClient{})
+}
+
+// Fetcher returns fetch.Interface defined by conf.
+func (conf InteropClient) Fetcher() fetch.Interface {
+	switch {
+	case conf.Directory != "":
+		return fetch.FromFilesystem(conf.Directory)
+	case conf.URL != "":
+		return fetch.FromHTTP(conf.URL, true)
+	default:
+		return nil
+	}
+}
+
 // ServiceBase represents base service configuration.
 type ServiceBase struct {
 	Base             `name:",squash"`
@@ -248,7 +273,7 @@ type ServiceBase struct {
 	Events           Events                 `name:"events"`
 	GRPC             GRPC                   `name:"grpc"`
 	HTTP             HTTP                   `name:"http"`
-	Interop          Interop                `name:"interop"`
+	Interop          InteropServer          `name:"interop"`
 	TLS              TLS                    `name:"tls"`
 	Sentry           Sentry                 `name:"sentry"`
 	Blob             Blob                   `name:"blob"`

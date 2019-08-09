@@ -28,14 +28,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/log"
 )
 
-// TLS represents TLS configuration.
-type TLS struct {
-	RootCA      string `name:"root-ca" description:"Location of TLS root CA certificate (optional)"`
-	Certificate string `name:"certificate" description:"Location of TLS certificate"`
-	Key         string `name:"key" description:"Location of TLS private key"`
-	ACME        ACME   `name:"acme"`
-}
-
 // ACME represents ACME configuration.
 type ACME struct {
 	Enable      bool     `name:"enable" description:"Enable automated certificate management (ACME)"`
@@ -46,10 +38,36 @@ type ACME struct {
 	DefaultHost string   `name:"default-host" description:"Default host to assume for clients without SNI"`
 }
 
+// IsZero returns whether the ACME configuration is empty.
+func (a ACME) IsZero() bool {
+	return !a.Enable &&
+		a.Endpoint == "" &&
+		a.Dir == "" &&
+		a.Email == "" &&
+		len(a.Hosts) == 0
+}
+
+// TLS represents TLS configuration.
+type TLS struct {
+	RootCA      string `name:"root-ca" description:"Location of TLS root CA certificate (optional)"`
+	Certificate string `name:"certificate" description:"Location of TLS certificate"`
+	Key         string `name:"key" description:"Location of TLS private key"`
+	ACME        ACME   `name:"acme"`
+}
+
+// IsZero returns whether the TLS configuration is empty.
+func (t TLS) IsZero() bool {
+	return t.RootCA == "" &&
+		t.Certificate == "" &&
+		t.Key == "" &&
+		t.ACME.IsZero()
+}
+
 var errNoKeyPair = errors.DefineFailedPrecondition("no_key_pair", "no TLS key pair")
 
-// Config loads the key pair and returns the TLS configuration.
+// Config loads the key pair and returns the server TLS configuration.
 // Config watches the certificate file and reloads the key pair on changes.
+// NOTE: The configuration returned by Config cannot be used for client connections.
 func (t TLS) Config(ctx context.Context) (*tls.Config, error) {
 	logger := log.FromContext(ctx)
 	if t.Certificate == "" || t.Key == "" {

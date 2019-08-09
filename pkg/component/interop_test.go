@@ -89,7 +89,7 @@ func TestInteropTLS(t *testing.T) {
 				Certificate: "testdata/servercert.pem",
 				Key:         "testdata/serverkey.pem",
 			},
-			Interop: config.Interop{
+			Interop: config.InteropServer{
 				ListenTLS: ":9188",
 				SenderClientCAs: map[string]string{
 					"000001": "testdata/clientca.pem",

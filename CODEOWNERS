@@ -36,9 +36,10 @@
 /pkg/applicationserver @johanstokking
 /pkg/console @bafonins @kschiffer
 /pkg/gatewayserver @johanstokking
-/pkg/networkserver @johanstokking @rvolosatovs
 /pkg/identityserver @htdvisser @bafonins
+/pkg/interop @johanstokking @rvolosatovs
 /pkg/joinserver @johanstokking @rvolosatovs
+/pkg/networkserver @johanstokking @rvolosatovs
 
 # SDKs
 /sdk/js @bafonins @kschiffer

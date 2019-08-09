@@ -62,8 +62,8 @@ var DefaultHTTPConfig = config.HTTP{
 	},
 }
 
-// DefaultInteropConfig is the default interop config.
-var DefaultInteropConfig = config.Interop{
+// DefaultInteropServerConfig is the default interop server config.
+var DefaultInteropServerConfig = config.InteropServer{
 	ListenTLS: ":8886",
 }
 
@@ -117,7 +117,7 @@ var DefaultServiceBase = config.ServiceBase{
 	Events:           DefaultEventsConfig,
 	GRPC:             DefaultGRPCConfig,
 	HTTP:             DefaultHTTPConfig,
-	Interop:          DefaultInteropConfig,
+	Interop:          DefaultInteropServerConfig,
 	TLS:              DefaultTLSConfig,
 	Blob:             DefaultBlobConfig,
 	FrequencyPlans:   DefaultFrequencyPlansConfig,
