@@ -94,3 +94,10 @@ storiesOf('Input', module)
   .add('With Spinner', () => (
     <Example icon="search" loading />
   ))
+  .add('With Action', () => (
+    <div>
+      <Example action={{ icon: 'build', secondary: true }} />
+      <Example action={{ icon: 'build', secondary: true }} warning />
+      <Example action={{ icon: 'build', secondary: true }} error />
+    </div>
+  ))
