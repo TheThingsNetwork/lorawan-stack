@@ -2168,6 +2168,33 @@
         ]
       }
     },
+    "/edcs/claim": {
+      "post": {
+        "summary": "Claims the end device by claim authentication code or QR code and transfers the device to the target application.",
+        "operationId": "Claim",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3ClaimEndDeviceRequest"
+            }
+          }
+        ],
+        "tags": [
+          "EndDeviceClaimingServer"
+        ]
+      }
+    },
     "/edtc/convert": {
       "post": {
         "summary": "Get the end device with the given identifiers, selecting the fields given\nby the field mask.",
@@ -5691,6 +5718,23 @@
         }
       }
     },
+    "ClaimEndDeviceRequestAuthenticatedIdentifiers": {
+      "type": "object",
+      "properties": {
+        "join_eui": {
+          "type": "string",
+          "format": "byte"
+        },
+        "dev_eui": {
+          "type": "string",
+          "format": "byte"
+        },
+        "authentication_code": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
     "ConcentratorConfigFSKChannel": {
       "type": "object",
       "properties": {
@@ -7256,6 +7300,29 @@
         "CHANNEL_MASKS"
       ],
       "default": "FREQUENCIES"
+    },
+    "v3ClaimEndDeviceRequest": {
+      "type": "object",
+      "properties": {
+        "authenticated_identifiers": {
+          "$ref": "#/definitions/ClaimEndDeviceRequestAuthenticatedIdentifiers"
+        },
+        "qr_code": {
+          "type": "string",
+          "format": "byte"
+        },
+        "target_application_ids": {
+          "$ref": "#/definitions/v3ApplicationIdentifiers"
+        },
+        "target_device_id": {
+          "type": "string"
+        },
+        "invalidate_authentication_code": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "If set, invalidate the authentication code with which the device gets claimed. This prohibits subsequent claiming requests."
+        }
+      }
     },
     "v3Class": {
       "type": "string",
