@@ -468,6 +468,8 @@ var EndDeviceAuthenticationCodeFieldPathsTopLevel = []string{
 }
 var EndDeviceFieldPathsNested = []string{
 	"application_server_address",
+	"application_server_id",
+	"application_server_kek_label",
 	"attributes",
 	"battery_percentage",
 	"claim_authentication_code",
@@ -733,6 +735,7 @@ var EndDeviceFieldPathsNested = []string{
 	"name",
 	"net_id",
 	"network_server_address",
+	"network_server_kek_label",
 	"pending_mac_state",
 	"pending_mac_state.current_parameters",
 	"pending_mac_state.current_parameters.adr_ack_delay",
@@ -1015,6 +1018,8 @@ var EndDeviceFieldPathsNested = []string{
 
 var EndDeviceFieldPathsTopLevel = []string{
 	"application_server_address",
+	"application_server_id",
+	"application_server_kek_label",
 	"attributes",
 	"battery_percentage",
 	"claim_authentication_code",
@@ -1041,6 +1046,7 @@ var EndDeviceFieldPathsTopLevel = []string{
 	"name",
 	"net_id",
 	"network_server_address",
+	"network_server_kek_label",
 	"pending_mac_state",
 	"pending_session",
 	"power_state",
@@ -1071,6 +1077,8 @@ var EndDevicesFieldPathsTopLevel = []string{
 var CreateEndDeviceRequestFieldPathsNested = []string{
 	"end_device",
 	"end_device.application_server_address",
+	"end_device.application_server_id",
+	"end_device.application_server_kek_label",
 	"end_device.attributes",
 	"end_device.battery_percentage",
 	"end_device.claim_authentication_code",
@@ -1336,6 +1344,7 @@ var CreateEndDeviceRequestFieldPathsNested = []string{
 	"end_device.name",
 	"end_device.net_id",
 	"end_device.network_server_address",
+	"end_device.network_server_kek_label",
 	"end_device.pending_mac_state",
 	"end_device.pending_mac_state.current_parameters",
 	"end_device.pending_mac_state.current_parameters.adr_ack_delay",
@@ -1622,6 +1631,8 @@ var CreateEndDeviceRequestFieldPathsTopLevel = []string{
 var UpdateEndDeviceRequestFieldPathsNested = []string{
 	"end_device",
 	"end_device.application_server_address",
+	"end_device.application_server_id",
+	"end_device.application_server_kek_label",
 	"end_device.attributes",
 	"end_device.battery_percentage",
 	"end_device.claim_authentication_code",
@@ -1887,6 +1898,7 @@ var UpdateEndDeviceRequestFieldPathsNested = []string{
 	"end_device.name",
 	"end_device.net_id",
 	"end_device.network_server_address",
+	"end_device.network_server_kek_label",
 	"end_device.pending_mac_state",
 	"end_device.pending_mac_state.current_parameters",
 	"end_device.pending_mac_state.current_parameters.adr_ack_delay",
@@ -2206,6 +2218,8 @@ var ListEndDevicesRequestFieldPathsTopLevel = []string{
 var SetEndDeviceRequestFieldPathsNested = []string{
 	"end_device",
 	"end_device.application_server_address",
+	"end_device.application_server_id",
+	"end_device.application_server_kek_label",
 	"end_device.attributes",
 	"end_device.battery_percentage",
 	"end_device.claim_authentication_code",
@@ -2471,6 +2485,7 @@ var SetEndDeviceRequestFieldPathsNested = []string{
 	"end_device.name",
 	"end_device.net_id",
 	"end_device.network_server_address",
+	"end_device.network_server_kek_label",
 	"end_device.pending_mac_state",
 	"end_device.pending_mac_state.current_parameters",
 	"end_device.pending_mac_state.current_parameters.adr_ack_delay",
@@ -2759,6 +2774,8 @@ var SetEndDeviceRequestFieldPathsTopLevel = []string{
 var EndDeviceTemplateFieldPathsNested = []string{
 	"end_device",
 	"end_device.application_server_address",
+	"end_device.application_server_id",
+	"end_device.application_server_kek_label",
 	"end_device.attributes",
 	"end_device.battery_percentage",
 	"end_device.claim_authentication_code",
@@ -3024,6 +3041,7 @@ var EndDeviceTemplateFieldPathsNested = []string{
 	"end_device.name",
 	"end_device.net_id",
 	"end_device.network_server_address",
+	"end_device.network_server_kek_label",
 	"end_device.pending_mac_state",
 	"end_device.pending_mac_state.current_parameters",
 	"end_device.pending_mac_state.current_parameters.adr_ack_delay",

@@ -4040,9 +4040,9 @@
       "file": "registry.go"
     }
   },
-  "error:pkg/joinserver:address_not_authorized": {
+  "error:pkg/joinserver:caller_not_authorized": {
     "translations": {
-      "en": "address `{address}` is not authorized for the entity"
+      "en": "caller `{name}` is not authorized for the entity"
     },
     "description": {
       "package": "pkg/joinserver",
@@ -4259,6 +4259,15 @@
   "error:pkg/joinserver:no_app_s_key": {
     "translations": {
       "en": "no AppSKey specified"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:no_application_server_id": {
+    "translations": {
+      "en": "no AS-ID specified"
     },
     "description": {
       "package": "pkg/joinserver",

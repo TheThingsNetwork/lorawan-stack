@@ -208,6 +208,10 @@ func (s *Server) handleRequest(c echo.Context) error {
 	switch req := c.Get(messageKey).(type) {
 	case *JoinReq:
 		ans, err = s.js.JoinRequest(ctx, req)
+	case *HomeNSReq:
+		ans, err = s.js.HomeNSRequest(ctx, req)
+	case *AppSKeyReq:
+		ans, err = s.js.AppSKeyRequest(ctx, req)
 	default:
 		return ErrMalformedMessage
 	}

@@ -1668,12 +1668,39 @@ func (m *EndDevice) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "network_server_kek_label":
+
+			if utf8.RuneCountInString(m.GetNetworkServerKEKLabel()) > 2048 {
+				return EndDeviceValidationError{
+					field:  "network_server_kek_label",
+					reason: "value length must be at most 2048 runes",
+				}
+			}
+
 		case "application_server_address":
 
 			if !_EndDevice_ApplicationServerAddress_Pattern.MatchString(m.GetApplicationServerAddress()) {
 				return EndDeviceValidationError{
 					field:  "application_server_address",
 					reason: "value does not match regex pattern \"^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\\\-]*[a-zA-Z0-9])\\\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$\"",
+				}
+			}
+
+		case "application_server_kek_label":
+
+			if utf8.RuneCountInString(m.GetApplicationServerKEKLabel()) > 2048 {
+				return EndDeviceValidationError{
+					field:  "application_server_kek_label",
+					reason: "value length must be at most 2048 runes",
+				}
+			}
+
+		case "application_server_id":
+
+			if utf8.RuneCountInString(m.GetApplicationServerID()) > 100 {
+				return EndDeviceValidationError{
+					field:  "application_server_id",
+					reason: "value length must be at most 100 runes",
 				}
 			}
 

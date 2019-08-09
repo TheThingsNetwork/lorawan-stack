@@ -23,6 +23,8 @@ import (
 	"io"
 	"math"
 	"math/rand"
+	"net"
+	"net/url"
 	"sort"
 	"strings"
 	"sync"
@@ -149,9 +151,25 @@ var supportedMACVersions = [...]ttnpb.MACVersion{
 	ttnpb.MAC_V1_1,
 }
 
-func validateCaller(dn pkix.Name, addr string) error {
-	if addr := strings.ToLower(addr); addr != "" && addr != dn.CommonName {
-		return errAddressNotAuthorized.WithAttributes("address", dn.CommonName)
+// validateCallerByID validates that the given ID matches the common name of the given X.509 distinguished name.
+func validateCallerByID(dn pkix.Name, id string) error {
+	if !strings.EqualFold(id, dn.CommonName) {
+		return errCallerNotAuthorized.WithAttributes("name", dn.CommonName)
+	}
+	return nil
+}
+
+// validateCallerByAddress validates that the host from the given address matches the common name of the given X.509 distinguished name.
+func validateCallerByAddress(dn pkix.Name, addr string) error {
+	host := addr
+	if url, err := url.Parse(addr); err == nil && url.Host != "" {
+		host = url.Host
+	}
+	if h, _, err := net.SplitHostPort(addr); err == nil {
+		host = h
+	}
+	if !strings.EqualFold(host, dn.CommonName) {
+		return errCallerNotAuthorized.WithAttributes("name", dn.CommonName)
 	}
 	return nil
 }
@@ -244,10 +262,13 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 	dev, err := js.devices.SetByEUI(ctx, pld.JoinEUI, pld.DevEUI,
 		[]string{
 			"application_server_address",
+			"application_server_id",
+			"application_server_kek_label",
 			"last_dev_nonce",
 			"last_join_nonce",
 			"net_id",
 			"network_server_address",
+			"network_server_kek_label",
 			"provisioner_id",
 			"provisioning_data",
 			"resets_join_nonces",
@@ -262,8 +283,10 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 				if !req.NetID.Equal(*dev.NetID) {
 					return nil, nil, errNetIDMismatch.WithAttributes("net_id", req.NetID)
 				}
-				if err := validateCaller(dn, dev.NetworkServerAddress); err != nil {
-					return nil, nil, err
+				if dev.NetworkServerAddress != "" {
+					if err := validateCallerByAddress(dn, dev.NetworkServerAddress); err != nil {
+						return nil, nil, err
+					}
 				}
 			}
 
@@ -399,23 +422,32 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 				return nil, nil, errDeriveAppSKey.WithCause(err)
 			}
 
+			nsKEKLabel := dev.NetworkServerKEKLabel
+			if nsKEKLabel == "" {
+				nsKEKLabel = js.KeyVault.NsKEKLabel(ctx, dev.NetID, dev.NetworkServerAddress)
+			}
+			asKEKLabel := dev.ApplicationServerKEKLabel
+			if asKEKLabel == "" {
+				asKEKLabel = js.KeyVault.AsKEKLabel(ctx, dev.ApplicationServerAddress)
+			}
+
 			sessionKeys := ttnpb.SessionKeys{
 				SessionKeyID: skID[:],
 			}
-			sessionKeys.FNwkSIntKey, err = js.wrapKeyIfKEKExists(nwkSKeys.FNwkSIntKey, js.KeyVault.NsKEKLabel(ctx, dev.NetID, dev.NetworkServerAddress))
+			sessionKeys.FNwkSIntKey, err = js.wrapKeyIfKEKExists(nwkSKeys.FNwkSIntKey, nsKEKLabel)
 			if err != nil {
 				return nil, nil, errWrapKey.WithCause(err)
 			}
-			sessionKeys.AppSKey, err = js.wrapKeyIfKEKExists(appSKey, js.KeyVault.AsKEKLabel(ctx, dev.ApplicationServerAddress))
+			sessionKeys.AppSKey, err = js.wrapKeyIfKEKExists(appSKey, asKEKLabel)
 			if err != nil {
 				return nil, nil, errWrapKey.WithCause(err)
 			}
 			if req.SelectedMACVersion >= ttnpb.MAC_V1_1 {
-				sessionKeys.SNwkSIntKey, err = js.wrapKeyIfKEKExists(nwkSKeys.SNwkSIntKey, js.KeyVault.NsKEKLabel(ctx, dev.NetID, dev.NetworkServerAddress))
+				sessionKeys.SNwkSIntKey, err = js.wrapKeyIfKEKExists(nwkSKeys.SNwkSIntKey, nsKEKLabel)
 				if err != nil {
 					return nil, nil, errWrapKey.WithCause(err)
 				}
-				sessionKeys.NwkSEncKey, err = js.wrapKeyIfKEKExists(nwkSKeys.NwkSEncKey, js.KeyVault.NsKEKLabel(ctx, dev.NetID, dev.NetworkServerAddress))
+				sessionKeys.NwkSEncKey, err = js.wrapKeyIfKEKExists(nwkSKeys.NwkSEncKey, nsKEKLabel)
 				if err != nil {
 					return nil, nil, errWrapKey.WithCause(err)
 				}
@@ -488,8 +520,10 @@ func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequ
 		if err != nil {
 			return nil, errRegistryOperation.WithCause(err)
 		}
-		if err := validateCaller(dn, dev.NetworkServerAddress); err != nil {
-			return nil, err
+		if dev.NetworkServerAddress != "" {
+			if err := validateCallerByAddress(dn, dev.NetworkServerAddress); err != nil {
+				return nil, err
+			}
 		}
 	} else if err := clusterauth.Authorized(ctx); err != nil {
 		return nil, err
@@ -529,13 +563,22 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 		dev, err := js.devices.GetByEUI(ctx, req.JoinEUI, req.DevEUI,
 			[]string{
 				"application_server_address",
+				"application_server_id",
 			},
 		)
 		if err != nil {
 			return nil, errRegistryOperation.WithCause(err)
 		}
-		if err := validateCaller(dn, dev.ApplicationServerAddress); err != nil {
-			return nil, err
+		if dev.ApplicationServerID != "" {
+			if err := validateCallerByID(dn, dev.ApplicationServerID); err != nil {
+				return nil, err
+			}
+		} else if dev.ApplicationServerAddress != "" {
+			if err := validateCallerByAddress(dn, dev.ApplicationServerAddress); err != nil {
+				return nil, err
+			}
+		} else {
+			return nil, errNoApplicationServerID
 		}
 	} else if err := clusterauth.Authorized(ctx); err != nil {
 		return nil, err
