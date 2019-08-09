@@ -353,8 +353,8 @@ func NewClient(ctx context.Context, conf config.InteropClient, fallbackTLS *tls.
 
 	var yamlConf struct {
 		JoinServers []struct {
-			File    string              `yaml:"file"`
-			JoinEUI []types.EUI64Prefix `yaml:"join-eui"`
+			File     string              `yaml:"file"`
+			JoinEUIs []types.EUI64Prefix `yaml:"join-euis"`
 		} `yaml:"join-servers"`
 	}
 	if err := yaml.UnmarshalStrict(confFileBytes, &yamlConf); err != nil {
@@ -408,7 +408,7 @@ func NewClient(ctx context.Context, conf config.InteropClient, fallbackTLS *tls.
 		default:
 			return nil, errUnknownProtocol
 		}
-		for _, pre := range jsConf.JoinEUI {
+		for _, pre := range jsConf.JoinEUIs {
 			jss = append(jss, prefixJoinServerClient{
 				joinServerClient: js,
 				prefix:           pre,

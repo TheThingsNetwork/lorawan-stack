@@ -114,16 +114,16 @@ func TestGetAppSKey(t *testing.T) {
 
 				test.MustMultiple(ioutil.WriteFile(confPath, []byte(fmt.Sprintf(`join-servers:
    - file: %s
-     join-eui:
+     join-euis:
         - 0000000000000000/0
         - 70b3d57ed0001000/52
 
    - file: %s
-     join-eui:
+     join-euis:
         - 70b3d57ed0000000/40
 
    - file: %s
-     join-eui:
+     join-euis:
         - 70b3d57ed0000000/39
         - 70b3d83ed0000000/30`,
 					rel(js1Path),
@@ -226,16 +226,16 @@ protocol: BI1.1`), 0644))
 
 				test.MustMultiple(ioutil.WriteFile(confPath, []byte(fmt.Sprintf(`join-servers:
    - file: %s
-     join-eui:
+     join-euis:
         - 0000000000000000/0
         - 70b3d57ed0001000/52
 
    - file: %s
-     join-eui:
+     join-euis:
         - 70b3d57ed0000000/40
 
    - file: %s
-     join-eui:
+     join-euis:
         - 70b3d57ed0000000/39
         - 70b3d83ed0000000/30`,
 					rel(js1Path),
@@ -350,16 +350,16 @@ protocol: BI1.0`), 0644))
 
 				test.MustMultiple(ioutil.WriteFile(confPath, []byte(fmt.Sprintf(`join-servers:
    - file: %s
-     join-eui:
+     join-euis:
         - 0000000000000000/0
         - 70b3d57ed0001000/52
 
    - file: %s
-     join-eui:
+     join-euis:
         - 70b3d57ed0000000/40
 
    - file: %s
-     join-eui:
+     join-euis:
         - 70b3d57ed0000000/39
         - 70b3d83ed0000000/30`,
 					rel(js1Path),
@@ -479,16 +479,16 @@ protocol: BI1.1`), 0644))
 
 				test.MustMultiple(ioutil.WriteFile(confPath, []byte(fmt.Sprintf(`join-servers:
    - file: %s
-     join-eui:
+     join-euis:
         - 0000000000000000/0
         - 70b3d57ed0001000/52
 
    - file: %s
-     join-eui:
+     join-euis:
         - 70b3d57ed0000000/40
 
    - file: %s
-     join-eui:
+     join-euis:
         - 70b3d57ed0000000/39
         - 70b3d83ed0000000/30`,
 					rel(js1Path),
@@ -674,16 +674,16 @@ func TestHandleJoinRequest(t *testing.T) {
 
 				test.MustMultiple(ioutil.WriteFile(confPath, []byte(fmt.Sprintf(`join-servers:
    - file: %s
-     join-eui:
+     join-euis:
         - 0000000000000000/0
         - 70b3d57ed0001000/52
 
    - file: %s
-     join-eui:
+     join-euis:
         - 70b3d57ed0000000/40
 
    - file: %s
-     join-eui:
+     join-euis:
         - 70b3d57ed0000000/39
         - 70b3d83ed0000000/30`,
 					rel(js1Path),
@@ -817,16 +817,16 @@ protocol: BI1.1`), 0644))
 
 				test.MustMultiple(ioutil.WriteFile(confPath, []byte(fmt.Sprintf(`join-servers:
    - file: %s
-     join-eui:
+     join-euis:
         - 0000000000000000/0
         - 70b3d57ed0001000/52
 
    - file: %s
-     join-eui:
+     join-euis:
         - 70b3d57ed0000000/40
 
    - file: %s
-     join-eui:
+     join-euis:
         - 70b3d57ed0000000/39
         - 70b3d83ed0000000/30`,
 					rel(js1Path),
