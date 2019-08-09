@@ -94,6 +94,8 @@
   "console.containers.api-keys-table.index.keyId": "Key ID",
   "console.containers.api-keys-table.index.grantedRights": "Granted Rights",
   "console.containers.collaborators-table.index.id": "User / Organization ID",
+  "console.containers.dev-addr-input.dev-addr-input.generate": "Generate Device Address",
+  "console.containers.dev-addr-input.index.devAddrFetchingFailure": "Could not generate device address",
   "console.containers.freq-plans-select.index.freqPlansFetchingFailure": "Could not retrieve the list of available frequency plans",
   "console.containers.webhook-formats-select.index.formatFetchingFailure": "Could not retrieve the list of available webhook formats",
   "console.containers.webhooks-table.index.format": "Format",
