@@ -108,7 +108,7 @@ func TestGetAppSKey(t *testing.T) {
 			NewFallbackTLSConfig: func() *tls.Config { return nil },
 			NewClientConfig: func(fqdn string, port uint32) (config.InteropClient, func() error) {
 				confDir := test.Must(ioutil.TempDir("", "lorawan-stack-js-interop-test")).(string)
-				confPath := filepath.Join(confDir, "config.yaml")
+				confPath := filepath.Join(confDir, InteropClientConfigurationName)
 				js1Path := filepath.Join(confDir, "test-js-1.yaml")
 				js2Path := filepath.Join(confDir, "foo", "test-js-2.yaml")
 				js3Path := filepath.Join(confDir, "test-js-3.yaml")
@@ -237,7 +237,7 @@ protocol: BI1.1`), 0644))
 			NewFallbackTLSConfig: func() *tls.Config { return nil },
 			NewClientConfig: func(fqdn string, port uint32) (config.InteropClient, func() error) {
 				confDir := test.Must(ioutil.TempDir("", "lorawan-stack-js-interop-test")).(string)
-				confPath := filepath.Join(confDir, "config.yaml")
+				confPath := filepath.Join(confDir, InteropClientConfigurationName)
 				js1Path := filepath.Join(confDir, "test-js-1.yaml")
 				js2Path := filepath.Join(confDir, "foo", "test-js-2.yaml")
 				js3Path := filepath.Join(confDir, "test-js-3.yaml")
@@ -432,7 +432,7 @@ func TestHandleJoinRequest(t *testing.T) {
 			NewFallbackTLSConfig: func() *tls.Config { return nil },
 			NewClientConfig: func(fqdn string, port uint32) (config.InteropClient, func() error) {
 				confDir := test.Must(ioutil.TempDir("", "lorawan-stack-js-interop-test")).(string)
-				confPath := filepath.Join(confDir, "config.yaml")
+				confPath := filepath.Join(confDir, InteropClientConfigurationName)
 				js1Path := filepath.Join(confDir, "test-js-1.yaml")
 				js2Path := filepath.Join(confDir, "foo", "test-js-2.yaml")
 				js3Path := filepath.Join(confDir, "test-js-3.yaml")
@@ -575,7 +575,7 @@ protocol: BI1.1`), 0644))
 			NewFallbackTLSConfig: func() *tls.Config { return nil },
 			NewClientConfig: func(fqdn string, port uint32) (config.InteropClient, func() error) {
 				confDir := test.Must(ioutil.TempDir("", "lorawan-stack-js-interop-test")).(string)
-				confPath := filepath.Join(confDir, "config.yaml")
+				confPath := filepath.Join(confDir, InteropClientConfigurationName)
 				js1Path := filepath.Join(confDir, "test-js-1.yaml")
 				js2Path := filepath.Join(confDir, "foo", "test-js-2.yaml")
 				js3Path := filepath.Join(confDir, "test-js-3.yaml")

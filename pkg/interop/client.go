@@ -51,7 +51,9 @@ const (
 type JoinServerProtocol uint8
 
 const (
+	// LoRaWANJoinServerProtocol1_0 represents Join Server protocol defined by LoRaWAN Backend Interfaces 1.0 specification.
 	LoRaWANJoinServerProtocol1_0 JoinServerProtocol = iota
+	// LoRaWANJoinServerProtocol1_1 represents Join Server protocol defined by LoRaWAN Backend Interfaces 1.1 specification.
 	LoRaWANJoinServerProtocol1_1
 )
 
@@ -68,6 +70,7 @@ func (p JoinServerProtocol) BackendInterfacesVersion() string {
 	}
 }
 
+// UnmarshalYAML implements yaml.Unmarshaler.
 func (p *JoinServerProtocol) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var s string
 	if err := unmarshal(&s); err != nil {
@@ -114,6 +117,9 @@ func newHTTPRequest(url string, pld interface{}, headers map[string]string) (*ht
 	return req, nil
 }
 
+// JoinServerFQDN constructs Join Server FQDN using specified eui under domain
+// according to LoRaWAN Backend Interfaces specification.
+// If domain is empty, LoRaAllianceJoinEUIDomain is used.
 func JoinServerFQDN(eui types.EUI64, domain string) string {
 	if domain == "" {
 		domain = LoRaAllianceJoinEUIDomain
@@ -164,6 +170,7 @@ func parseResult(r Result) error {
 	return errUnexpectedResult.WithAttributes("code", r.ResultCode)
 }
 
+// GetAppSKey performs AppSKey request according to LoRaWAN Backend Interfaces specification.
 func (cl joinServerHTTPClient) GetAppSKey(ctx context.Context, asID string, req *ttnpb.SessionKeyRequest) (*ttnpb.AppSKeyResponse, error) {
 	interopAns := &AppSKeyAns{}
 	if err := cl.exchange(req.JoinEUI, &AppSKeyReq{
@@ -189,6 +196,7 @@ func (cl joinServerHTTPClient) GetAppSKey(ctx context.Context, asID string, req 
 	}, nil
 }
 
+// HandleJoinRequest performs Join request according to LoRaWAN Backend Interfaces specification.
 func (cl joinServerHTTPClient) HandleJoinRequest(ctx context.Context, netID types.NetID, req *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error) {
 	pld := req.Payload.GetJoinRequestPayload()
 	if pld == nil {
@@ -328,14 +336,17 @@ func (conf tlsConfig) TLSConfig(fetcher fetch.Interface) (*tls.Config, error) {
 	}, nil
 }
 
-const interopClientConfName = "config.yaml"
+// InteropClientConfigurationName represents the filename of interop client configuration.
+const InteropClientConfigurationName = "config.yaml"
 
+// NewClient return new interop client.
+// fallbackTLS is optional.
 func NewClient(ctx context.Context, conf config.InteropClient, fallbackTLS *tls.Config) (*Client, error) {
 	fetcher := conf.Fetcher()
 	if fetcher == nil {
 		return nil, errUnknownConfig
 	}
-	confFileBytes, err := fetcher.File(interopClientConfName)
+	confFileBytes, err := fetcher.File(InteropClientConfigurationName)
 	if err != nil {
 		return nil, err
 	}
@@ -426,6 +437,7 @@ func (cl Client) joinServer(joinEUI types.EUI64) (joinServerClient, bool) {
 	return nil, false
 }
 
+// GetAppSKey performs AppSKey request to Join Server associated with req.JoinEUI.
 func (cl Client) GetAppSKey(ctx context.Context, asID string, req *ttnpb.SessionKeyRequest) (*ttnpb.AppSKeyResponse, error) {
 	js, ok := cl.joinServer(req.JoinEUI)
 	if !ok {
@@ -434,6 +446,7 @@ func (cl Client) GetAppSKey(ctx context.Context, asID string, req *ttnpb.Session
 	return js.GetAppSKey(ctx, asID, req)
 }
 
+// HandleJoinRequest performs Join request to Join Server associated with req.JoinEUI.
 func (cl Client) HandleJoinRequest(ctx context.Context, netID types.NetID, req *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error) {
 	pld := req.Payload.GetJoinRequestPayload()
 	if pld == nil {
