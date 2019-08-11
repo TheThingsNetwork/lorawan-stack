@@ -13,22 +13,25 @@
 // limitations under the License.
 
 import React from 'react'
-import { FormattedRelative } from 'react-intl'
+import { FormattedRelativeTime } from 'react-intl'
 
 import PropTypes from '../../prop-types'
 import DateTime from '.'
 
 const RelativeTime = function(props) {
-  const { className, value, updateInterval, options, children } = props
+  const { className, value, updateIntervalInSeconds, children } = props
 
   return (
     <DateTime className={className} value={value}>
       {dateTime => (
-        <FormattedRelative value={dateTime} updateInterval={updateInterval} {...options}>
+        <FormattedRelativeTime
+          value={new Date(dateTime) - new Date() - 100}
+          updateIntervalInSeconds={updateIntervalInSeconds}
+        >
           {formattedRelativeTime =>
             children ? children(formattedRelativeTime) : formattedRelativeTime
           }
-        </FormattedRelative>
+        </FormattedRelativeTime>
       )}
     </DateTime>
   )
@@ -41,14 +44,12 @@ RelativeTime.propTypes = {
     PropTypes.number, // support timestamps
     PropTypes.instanceOf(Date),
   ]).isRequired,
-  /** The interval that the component will re-render (ms) */
-  updateInterval: PropTypes.number,
-  // see https://github.com/yahoo/react-intl/wiki/Components#formattedrelative
-  options: PropTypes.object,
+  /** The interval that the component will re-render in seconds */
+  updateIntervalInSeconds: PropTypes.number,
 }
 
 RelativeTime.defaultProps = {
-  updateInterval: 1000,
+  updateIntervalInSeconds: 1,
 }
 
 export default RelativeTime

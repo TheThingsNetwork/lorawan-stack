@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { IntlProvider } from 'react-intl'
 
 import SortButton from '.'
 
@@ -22,11 +21,7 @@ export default function() {
     component: undefined,
     when: {
       created(props) {
-        driver.component = shallow(
-          <IntlProvider>
-            <SortButton {...props} />
-          </IntlProvider>,
-        ).dive()
+        driver.component = shallow(<SortButton {...props} />)
       },
       buttonPressed() {
         driver.component.simulate('click')
