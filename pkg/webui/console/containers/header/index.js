@@ -26,13 +26,26 @@ import HeaderComponent from '../../../components/header'
 @withRouter
 @connect(state => ({
   user: state.user.user,
+}), dispatch => ({
+  handleLogout: () => dispatch(logout()),
 }))
 @bind
 class Header extends Component {
 
-  handleLogout () {
-    const { dispatch } = this.props
-    dispatch(logout())
+  static propTypes = {
+    /**
+    * The User object, retrieved from the API. If it is `undefined`, then the
+    * guest header is rendered
+    */
+    user: PropTypes.object,
+    /** Flag identifying whether links should be rendered as plain anchor link */
+    anchored: PropTypes.bool,
+    /** A handler for when the user used the search input */
+    handleSearchRequest: PropTypes.func,
+    /** A handler for when the user clicks the logout button */
+    handleLogout: PropTypes.func.isRequired,
+    /** A flag identifying whether the header should display the search input */
+    searchable: PropTypes.bool,
   }
 
   render () {
@@ -40,6 +53,7 @@ class Header extends Component {
       user,
       anchored,
       handleSearchRequest,
+      handleLogout,
       searchable,
     } = this.props
 
@@ -66,14 +80,13 @@ class Header extends Component {
       {
         title: sharedMessages.logout,
         icon: 'power_settings_new',
-        action: this.handleLogout,
+        action: handleLogout,
       },
     ]
 
     return (
       <HeaderComponent
         user={user}
-        handleLogout={this.handleLogout}
         dropdownItems={dropdownItems}
         navigationEntries={navigationEntries}
         anchored={anchored}
@@ -82,17 +95,6 @@ class Header extends Component {
       />
     )
   }
-}
-
-Header.propTypes = {
-  /** Flag identifying whether links should be rendered as plain anchor link */
-  anchored: PropTypes.bool,
-  /**
-  * A handler for when the user used the search input
-  */
-  handleSearchRequest: PropTypes.func,
-  /** A flag identifying whether the header should display the search input */
-  searchable: PropTypes.bool,
 }
 
 export default Header
