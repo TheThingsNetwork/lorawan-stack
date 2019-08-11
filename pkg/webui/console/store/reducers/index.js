@@ -13,6 +13,8 @@
 // limitations under the License.
 
 import { combineReducers } from 'redux'
+import { connectRouter } from 'connected-react-router'
+
 import {
   SHARED_NAME_SINGLE as APPLICATION_SHARED_NAME,
   SHARED_NAME as APPLICATIONS_SHARED_NAME,
@@ -42,45 +44,47 @@ import webhooks from './webhooks'
 import webhookFormats from './webhook-formats'
 import { createNamedPaginationReducer } from './pagination'
 
-export default combineReducers({
-  user,
-  init,
-  applications,
-  link,
-  devices,
-  device,
-  gateways,
-  webhook,
-  webhooks,
-  webhookFormats,
-  configuration,
-  apiKeys: combineReducers({
-    application: createNamedApiKeyReducer(APPLICATION_SHARED_NAME),
-    applications: createNamedApiKeysReducer(APPLICATION_SHARED_NAME),
-    gateway: createNamedApiKeyReducer(GATEWAY_SHARED_NAME),
-    gateways: createNamedApiKeysReducer(GATEWAY_SHARED_NAME),
-  }),
-  rights: combineReducers({
-    applications: createNamedRightsReducer(APPLICATIONS_SHARED_NAME),
-    gateways: createNamedRightsReducer(GATEWAY_SHARED_NAME),
-  }),
-  collaborators: combineReducers({
-    application: createNamedCollaboratorReducer(APPLICATION_SHARED_NAME),
-    applications: createNamedCollaboratorsReducer(APPLICATION_SHARED_NAME),
-    gateway: createNamedCollaboratorReducer(GATEWAY_SHARED_NAME),
-    gateways: createNamedCollaboratorsReducer(GATEWAY_SHARED_NAME),
-  }),
-  events: combineReducers({
-    applications: createNamedEventsReducer(APPLICATION_SHARED_NAME),
-    devices: createNamedEventsReducer(DEVICE_SHARED_NAME),
-    gateways: createNamedEventsReducer(GATEWAY_SHARED_NAME),
-  }),
-  ui: combineReducers({
-    fetching,
-    error,
-  }),
-  pagination: combineReducers({
-    applications: createNamedPaginationReducer(APPLICATION_SHARED_NAME, getApplicationId),
-    gateways: createNamedPaginationReducer(GATEWAY_SHARED_NAME, getGatewayId),
-  }),
-})
+export default history =>
+  combineReducers({
+    user,
+    init,
+    applications,
+    link,
+    devices,
+    device,
+    gateways,
+    webhook,
+    webhooks,
+    webhookFormats,
+    configuration,
+    apiKeys: combineReducers({
+      application: createNamedApiKeyReducer(APPLICATION_SHARED_NAME),
+      applications: createNamedApiKeysReducer(APPLICATION_SHARED_NAME),
+      gateway: createNamedApiKeyReducer(GATEWAY_SHARED_NAME),
+      gateways: createNamedApiKeysReducer(GATEWAY_SHARED_NAME),
+    }),
+    rights: combineReducers({
+      applications: createNamedRightsReducer(APPLICATIONS_SHARED_NAME),
+      gateways: createNamedRightsReducer(GATEWAY_SHARED_NAME),
+    }),
+    collaborators: combineReducers({
+      application: createNamedCollaboratorReducer(APPLICATION_SHARED_NAME),
+      applications: createNamedCollaboratorsReducer(APPLICATION_SHARED_NAME),
+      gateway: createNamedCollaboratorReducer(GATEWAY_SHARED_NAME),
+      gateways: createNamedCollaboratorsReducer(GATEWAY_SHARED_NAME),
+    }),
+    events: combineReducers({
+      applications: createNamedEventsReducer(APPLICATION_SHARED_NAME),
+      devices: createNamedEventsReducer(DEVICE_SHARED_NAME),
+      gateways: createNamedEventsReducer(GATEWAY_SHARED_NAME),
+    }),
+    ui: combineReducers({
+      fetching,
+      error,
+    }),
+    pagination: combineReducers({
+      applications: createNamedPaginationReducer(APPLICATION_SHARED_NAME, getApplicationId),
+      gateways: createNamedPaginationReducer(GATEWAY_SHARED_NAME, getGatewayId),
+    }),
+    router: connectRouter(history),
+  })
