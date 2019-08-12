@@ -51,10 +51,10 @@ const DevAddrInput = function (props) {
     return {
       icon: 'build',
       title: m.generate,
-      secondary: true,
       type: 'button',
       disabled: fetching || disabled,
       onClick: onDevAddrGenerate,
+      raw: true,
     }
   }, [ disabled, fetching, onDevAddrGenerate ])
 
