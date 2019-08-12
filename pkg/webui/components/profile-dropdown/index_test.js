@@ -19,7 +19,7 @@ const dropdownItems = [
   {
     title: 'Profile Settings',
     icon: 'settings',
-    link: '/profile-settings',
+    path: '/profile-settings',
   },
   {
     title: 'Logout',

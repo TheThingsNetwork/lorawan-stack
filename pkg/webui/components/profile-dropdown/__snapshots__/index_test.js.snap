@@ -21,7 +21,7 @@ exports[`Profile Dropdown is in initial state has dropdown open should match sna
       Array [
         Object {
           "icon": "settings",
-          "link": "/profile-settings",
+          "path": "/profile-settings",
           "title": "Profile Settings",
         },
         Object {
