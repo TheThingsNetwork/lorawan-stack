@@ -26,7 +26,6 @@ import styles from './header.styl'
 
 const Header = function ({
   className,
-  handleLogout = () => null,
   dropdownItems,
   navigationEntries,
   user,
@@ -87,10 +86,6 @@ Header.propTypes = {
   entries: NavigationBar.propTypes.entries,
   /** Flag identifying whether links should be rendered as plain anchor link */
   anchored: PropTypes.bool,
-  /**
-  * A handler for when the user clicks the logout button
-  */
-  handleLogout: PropTypes.func,
   /** A handler for when the user used the search input */
   handleSearchRequest: PropTypes.func,
   /** A flag identifying whether the header should display the search input */
