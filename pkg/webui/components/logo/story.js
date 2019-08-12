@@ -18,9 +18,7 @@ import { storiesOf } from '@storybook/react'
 import Logo from '.'
 
 storiesOf('Logo', module)
-  .add('Default', () => (
-    <Logo />
-  ))
+  .add('Default', () => <Logo />)
   .add('TTI', () => (
     <Logo
       env={{

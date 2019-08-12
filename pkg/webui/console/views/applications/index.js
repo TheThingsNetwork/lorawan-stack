@@ -23,17 +23,11 @@ import sharedMessages from '../../../lib/shared-messages'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 
-@withBreadcrumb('apps', function (props) {
-  return (
-    <Breadcrumb
-      path="/applications"
-      content={sharedMessages.applications}
-    />
-  )
+@withBreadcrumb('apps', function(props) {
+  return <Breadcrumb path="/applications" content={sharedMessages.applications} />
 })
 export default class Applications extends React.Component {
-
-  render () {
+  render() {
     const { path } = this.props.match
     return (
       <Switch>

@@ -25,12 +25,11 @@ import style from './tabular.styl'
 
 @bind
 class Tabular extends React.Component {
-
-  onPageChange (page) {
+  onPageChange(page) {
     this.props.onPageChange(page)
   }
 
-  onSortRequest (newOrderBy) {
+  onSortRequest(newOrderBy) {
     const { order, orderBy } = this.props
     const sameColumn = orderBy === newOrderBy
 
@@ -47,7 +46,7 @@ class Tabular extends React.Component {
     this.props.onSortRequest('asc', newOrderBy)
   }
 
-  handlePagination (items = []) {
+  handlePagination(items = []) {
     const { pageSize, page, handlesPagination, paginated } = this.props
 
     if (paginated && handlesPagination) {
@@ -60,7 +59,7 @@ class Tabular extends React.Component {
     return items
   }
 
-  render () {
+  render() {
     const {
       className,
       loading = false,
@@ -80,75 +79,52 @@ class Tabular extends React.Component {
 
     const columns = (
       <Table.Row>
-        {
-          headers.map((header, key) => (
-            <Table.HeadCell
-              key={key}
-              centered={header.centered}
-              content={header.sortable ? undefined : header.displayName}
-              name={header.name}
-              width={header.width}
-            >
-              {
-                header.sortable ? (
-                  <Table.SortButton
-                    title={header.displayName}
-                    direction={order}
-                    name={header.name}
-                    active={orderBy === header.name}
-                    onSort={this.onSortRequest}
-                  />
-                ) : null
-              }
-            </Table.HeadCell>
-          ))
-        }
+        {headers.map((header, key) => (
+          <Table.HeadCell
+            key={key}
+            centered={header.centered}
+            content={header.sortable ? undefined : header.displayName}
+            name={header.name}
+            width={header.width}
+          >
+            {header.sortable ? (
+              <Table.SortButton
+                title={header.displayName}
+                direction={order}
+                name={header.name}
+                active={orderBy === header.name}
+                onSort={this.onSortRequest}
+              />
+            ) : null}
+          </Table.HeadCell>
+        ))}
       </Table.Row>
     )
 
     const paginatedData = this.handlePagination(data)
-    const rows = paginatedData.length > 0 ? (
-      paginatedData.map( function (row, rowKey) {
-        return (
-          <Table.Row
-            key={rowKey}
-            id={rowKey}
-            onClick={onRowClick}
-          >
-            {
-              headers.map(function (header, index) {
+    const rows =
+      paginatedData.length > 0 ? (
+        paginatedData.map(function(row, rowKey) {
+          return (
+            <Table.Row key={rowKey} id={rowKey} onClick={onRowClick}>
+              {headers.map(function(header, index) {
                 const value = getByPath(row, headers[index].name)
                 return (
-                  <Table.DataCell
-                    key={index}
-                    centered={header.centered}
-                    small={small}
-                  >
-                    {headers[index].render
-                      ? headers[index].render(value)
-                      : value
-                    }
+                  <Table.DataCell key={index} centered={header.centered} small={small}>
+                    {headers[index].render ? headers[index].render(value) : value}
                   </Table.DataCell>
                 )
-              })
-            }
-          </Table.Row>
-        )
-      })
-    ) : (
-      <Table.Empty
-        colSpan={headers.length}
-        message={emptyMessage}
-      />
-    )
+              })}
+            </Table.Row>
+          )
+        })
+      ) : (
+        <Table.Empty colSpan={headers.length} message={emptyMessage} />
+      )
 
     const pagination = paginated ? (
       <Table.Row>
-        <Table.DataCell
-          className={style.paginationCell}
-          colSpan={headers.length}
-          small={small}
-        >
+        <Table.DataCell className={style.paginationCell} colSpan={headers.length} small={small}>
           <Pagination
             className={style.pagination}
             pageCount={Math.ceil(totalCount / pageSize) || 1}
@@ -166,15 +142,9 @@ class Tabular extends React.Component {
       <div className={className}>
         <Overlay visible={loading} loading={loading}>
           <Table>
-            <Table.Head>
-              {columns}
-            </Table.Head>
-            <Table.Body>
-              {rows}
-            </Table.Body>
-            <Table.Footer>
-              {pagination}
-            </Table.Footer>
+            <Table.Head>{columns}</Table.Head>
+            <Table.Body>{rows}</Table.Body>
+            <Table.Footer>{pagination}</Table.Footer>
           </Table>
         </Overlay>
       </div>
@@ -200,7 +170,7 @@ Tabular.propTypes = {
   /** The name of the column that the table is sorted according to */
   orderBy: PropTypes.string,
   /** The empty message to be displayed when no data provided */
-  emptyMessage: PropTypes.oneOfType([ PropTypes.message, PropTypes.string ]).isRequired,
+  emptyMessage: PropTypes.oneOfType([PropTypes.message, PropTypes.string]).isRequired,
   /** Function to be called when the table row gets clicked */
   onRowClick: PropTypes.func,
   /**
@@ -219,14 +189,16 @@ Tabular.propTypes = {
   /** A list of data entries to display within the table body */
   data: PropTypes.arrayOf(PropTypes.object),
   /** A list of head entries to displat within the table head */
-  headers: PropTypes.arrayOf(PropTypes.shape({
-    displayName: PropTypes.message.isRequired,
-    name: PropTypes.string.isRequired,
-    render: PropTypes.func,
-    centered: PropTypes.bool,
-    sortable: PropTypes.bool,
-    width: PropTypes.number,
-  })),
+  headers: PropTypes.arrayOf(
+    PropTypes.shape({
+      displayName: PropTypes.message.isRequired,
+      name: PropTypes.string.isRequired,
+      render: PropTypes.func,
+      centered: PropTypes.bool,
+      sortable: PropTypes.bool,
+      width: PropTypes.number,
+    }),
+  ),
   /**
    * A flag specifying whether the table should paginate entries.
    * If true the component makes sure that the items are paginated, otherwise

@@ -28,9 +28,9 @@ test('flattens the object', () => {
     e: 'baz',
     f: undefined,
     g: null,
-    h: [ 1, 2, 3 ],
+    h: [1, 2, 3],
     i: {
-      k: [ 3, 4, 5 ],
+      k: [3, 4, 5],
     },
   }
 
@@ -39,8 +39,8 @@ test('flattens the object', () => {
   expect(getByPath(testData, 'e')).toBe('baz')
   expect(getByPath(testData, 'f')).toBe(undefined)
   expect(getByPath(testData, 'g')).toBe(null)
-  expect(getByPath(testData, 'h')).toMatchObject([ 1, 2, 3 ])
-  expect(getByPath(testData, 'i.k')).toMatchObject([ 3, 4, 5 ])
+  expect(getByPath(testData, 'h')).toMatchObject([1, 2, 3])
+  expect(getByPath(testData, 'i.k')).toMatchObject([3, 4, 5])
   expect(getByPath(testData, 'i.e')).toBe(undefined)
   expect(getByPath(testData, 'a.b')).toMatchObject({ c: 'foo' })
 })

@@ -33,7 +33,7 @@ const m = defineMessages({
 })
 
 @connect(state => ({ appId: selectSelectedApplicationId(state) }))
-@withBreadcrumb('apps.single.data', function (props) {
+@withBreadcrumb('apps.single.data', function(props) {
   return (
     <Breadcrumb
       path={`/applications/${props.appId}/data`}
@@ -43,8 +43,7 @@ const m = defineMessages({
   )
 })
 export default class Data extends React.Component {
-
-  render () {
+  render() {
     const { appId } = this.props
 
     return (
@@ -57,9 +56,7 @@ export default class Data extends React.Component {
         </Row>
         <Row>
           <Col sm={12} className={style.wrapper}>
-            <ApplicationEvents
-              appId={appId}
-            />
+            <ApplicationEvents appId={appId} />
           </Col>
         </Row>
       </Container>

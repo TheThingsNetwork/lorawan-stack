@@ -34,7 +34,7 @@ Note: After closing this window, the value of the key secret will not be accessi
 Make sure to copy and store it in a safe place now.`,
 })
 
-const ApiKeyModal = function (props) {
+const ApiKeyModal = function(props) {
   const { visible, secret, rights, ...rest } = props
 
   if (!visible) {
@@ -60,8 +60,7 @@ const ApiKeyModal = function (props) {
               <Icon icon="check" className={style.icon} />
               <Message className={style.rightName} content={{ id: `enum:${right}` }} />
             </li>
-          )
-          )}
+          ))}
         </ul>
       </div>
       <div className={style.right}>

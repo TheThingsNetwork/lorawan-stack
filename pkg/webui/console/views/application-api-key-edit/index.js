@@ -26,10 +26,7 @@ import IntlHelmet from '../../../lib/components/intl-helmet'
 import { ApiKeyEditForm } from '../../components/api-key-form'
 import withRequest from '../../../lib/components/with-request'
 
-import {
-  getApplicationApiKey,
-  getApplicationsRightsList,
-} from '../../store/actions/applications'
+import { getApplicationApiKey, getApplicationsRightsList } from '../../store/actions/applications'
 import {
   selectSelectedApplicationId,
   selectApplicationRights,
@@ -43,36 +40,38 @@ import {
 
 import api from '../../api'
 
-@connect(function (state, props) {
-  const { apiKeyId } = props.match.params
+@connect(
+  function(state, props) {
+    const { apiKeyId } = props.match.params
 
-  const keyFetching = selectApplicationApiKeyFetching(state)
-  const rightsFetching = selectApplicationRightsFetching(state)
-  const keyError = selectApplicationApiKeyError(state)
-  const rightsError = selectApplicationRightsError(state)
+    const keyFetching = selectApplicationApiKeyFetching(state)
+    const rightsFetching = selectApplicationRightsFetching(state)
+    const keyError = selectApplicationApiKeyError(state)
+    const rightsError = selectApplicationRightsError(state)
 
-  return {
-    keyId: apiKeyId,
-    appId: selectSelectedApplicationId(state),
-    apiKey: selectApplicationApiKey(state),
-    rights: selectApplicationRights(state),
-    universalRights: selectApplicationUniversalRights(state),
-    fetching: keyFetching || rightsFetching,
-    error: keyError || rightsError,
-  }
-},
-dispatch => ({
-  loadData (appId, apiKeyId) {
-    dispatch(getApplicationsRightsList(appId))
-    dispatch(getApplicationApiKey(appId, apiKeyId))
+    return {
+      keyId: apiKeyId,
+      appId: selectSelectedApplicationId(state),
+      apiKey: selectApplicationApiKey(state),
+      rights: selectApplicationRights(state),
+      universalRights: selectApplicationUniversalRights(state),
+      fetching: keyFetching || rightsFetching,
+      error: keyError || rightsError,
+    }
   },
-  deleteSuccess: appId => dispatch(replace(`/applications/${appId}/api-keys`)),
-}))
+  dispatch => ({
+    loadData(appId, apiKeyId) {
+      dispatch(getApplicationsRightsList(appId))
+      dispatch(getApplicationApiKey(appId, apiKeyId))
+    },
+    deleteSuccess: appId => dispatch(replace(`/applications/${appId}/api-keys`)),
+  }),
+)
 @withRequest(
   ({ loadData, appId, keyId }) => loadData(appId, keyId),
-  ({ fetching, apiKey }) => fetching || !Boolean(apiKey)
+  ({ fetching, apiKey }) => fetching || !Boolean(apiKey),
 )
-@withBreadcrumb('apps.single.api-keys.edit', function (props) {
+@withBreadcrumb('apps.single.api-keys.edit', function(props) {
   const { appId, keyId } = props
 
   return (
@@ -85,25 +84,20 @@ dispatch => ({
 })
 @bind
 export default class ApplicationApiKeyEdit extends React.Component {
-
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.deleteApplicationKey = id => api.application.apiKeys.delete(props.appId, id)
-    this.editApplicationKey = key => api.application.apiKeys.update(
-      props.appId,
-      props.keyId,
-      key
-    )
+    this.editApplicationKey = key => api.application.apiKeys.update(props.appId, props.keyId, key)
   }
 
-  onDeleteSuccess () {
+  onDeleteSuccess() {
     const { appId, deleteSuccess } = this.props
 
     deleteSuccess(appId)
   }
 
-  render () {
+  render() {
     const { apiKey, rights, universalRights } = this.props
 
     return (

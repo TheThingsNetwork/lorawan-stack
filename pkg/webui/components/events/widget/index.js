@@ -36,31 +36,18 @@ const m = defineMessages({
 
 @bind
 class EventsWidget extends React.PureComponent {
-
-  renderEvent (event) {
+  renderEvent(event) {
     const { component: Component, type } = getEventComponentByName(event.name)
 
     return (
       <List.Item>
-        <Component
-          event={event}
-          type={type}
-          widget
-        />
+        <Component event={event} type={type} widget />
       </List.Item>
     )
   }
 
-  render () {
-    const {
-      className,
-      events,
-      toAllUrl,
-      emitterId,
-      connectionStatus,
-      limit,
-      error,
-    } = this.props
+  render() {
+    const { className, events, toAllUrl, emitterId, connectionStatus, limit, error } = this.props
 
     let latestActivityTime = null
     if (events.length) {
@@ -72,10 +59,7 @@ class EventsWidget extends React.PureComponent {
 
     const statusMessage = (
       <span>
-        <Message
-          className={style.statusMessage}
-          content={m.latestEvents}
-        />
+        <Message className={style.statusMessage} content={m.latestEvents} />
         {latestActivityTime}
       </span>
     )
@@ -88,34 +72,26 @@ class EventsWidget extends React.PureComponent {
     return (
       <aside className={className}>
         <div className={style.header}>
-          <Status
-            label={statusMessage}
-            status={connectionStatus}
-          />
+          <Status label={statusMessage} status={connectionStatus} />
           {!error && (
             <Link to={toAllUrl}>
-              <Message
-                className={style.seeAllMessage}
-                content={m.seeAllActivity}
-              />
-              →
+              <Message className={style.seeAllMessage} content={m.seeAllActivity} />→
             </Link>
           )}
         </div>
-        {error
-          ? <Notification small title={sharedMessages.eventsCannotShow} error={error} />
-          : (
-            <List
-              bordered
-              listClassName={style.list}
-              size="small"
-              items={truncatedEvents}
-              renderItem={this.renderEvent}
-              emptyMessage={sharedMessages.noEvents}
-              emptyMessageValues={{ entityId: emitterId }}
-            />
-          )
-        }
+        {error ? (
+          <Notification small title={sharedMessages.eventsCannotShow} error={error} />
+        ) : (
+          <List
+            bordered
+            listClassName={style.list}
+            size="small"
+            items={truncatedEvents}
+            renderItem={this.renderEvent}
+            emptyMessage={sharedMessages.noEvents}
+            emptyMessageValues={{ entityId: emitterId }}
+          />
+        )}
       </aside>
     )
   }
@@ -132,7 +108,7 @@ EventsWidget.propTypes = {
   /** An entity identifer. */
   emitterId: PropTypes.node.isRequired,
   /** A current status of the network. */
-  connectionStatus: PropTypes.oneOf([ 'good', 'bad', 'mediocre', 'unknown' ]).isRequired,
+  connectionStatus: PropTypes.oneOf(['good', 'bad', 'mediocre', 'unknown']).isRequired,
   /** The number of events to displayed in the widget. */
   limit: PropTypes.number,
 }

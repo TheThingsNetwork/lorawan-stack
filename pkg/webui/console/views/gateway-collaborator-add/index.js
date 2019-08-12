@@ -37,30 +37,36 @@ import {
 import { getGatewaysRightsList } from '../../store/actions/gateways'
 import api from '../../api'
 
-@connect(function (state, props) {
-  const { collaborators } = state
+@connect(
+  function(state, props) {
+    const { collaborators } = state
 
-  return {
-    gtwId: selectSelectedGatewayId(state),
-    collaborators: collaborators.gateways.collaborators,
-    fetching: selectGatewayRightsFetching(state),
-    error: selectGatewayRightsError(state),
-    rights: selectGatewayRights(state),
-    universalRights: selectGatewayUniversalRights(state),
-  }
-}, (dispatch, ownProps) => ({
-  getGatewaysRightsList: gtwId => dispatch(getGatewaysRightsList(gtwId)),
-  redirectToList: gtwId => dispatch(push(`/gateways/${gtwId}/collaborators`)),
-}), (stateProps, dispatchProps, ownProps) => ({
-  ...stateProps, ...dispatchProps, ...ownProps,
-  getGatewaysRightsList: () => dispatchProps.getGatewaysRightsList(stateProps.gtwId),
-  redirectToList: () => dispatchProps.redirectToList(stateProps.gtwId),
-}))
+    return {
+      gtwId: selectSelectedGatewayId(state),
+      collaborators: collaborators.gateways.collaborators,
+      fetching: selectGatewayRightsFetching(state),
+      error: selectGatewayRightsError(state),
+      rights: selectGatewayRights(state),
+      universalRights: selectGatewayUniversalRights(state),
+    }
+  },
+  (dispatch, ownProps) => ({
+    getGatewaysRightsList: gtwId => dispatch(getGatewaysRightsList(gtwId)),
+    redirectToList: gtwId => dispatch(push(`/gateways/${gtwId}/collaborators`)),
+  }),
+  (stateProps, dispatchProps, ownProps) => ({
+    ...stateProps,
+    ...dispatchProps,
+    ...ownProps,
+    getGatewaysRightsList: () => dispatchProps.getGatewaysRightsList(stateProps.gtwId),
+    redirectToList: () => dispatchProps.redirectToList(stateProps.gtwId),
+  }),
+)
 @withRequest(
   ({ getGatewaysRightsList }) => getGatewaysRightsList(),
-  ({ fetching, rights }) => fetching || !Boolean(rights.length)
+  ({ fetching, rights }) => fetching || !Boolean(rights.length),
 )
-@withBreadcrumb('gtws.single.collaborators.add', function (props) {
+@withBreadcrumb('gtws.single.collaborators.add', function(props) {
   const gtwId = props.gtwId
   return (
     <Breadcrumb
@@ -72,23 +78,18 @@ import api from '../../api'
 })
 @bind
 export default class GatewayCollaboratorAdd extends React.Component {
-
   state = {
     error: '',
   }
 
-  handleSubmit (collaborator) {
+  handleSubmit(collaborator) {
     const { gtwId } = this.props
 
     return api.gateway.collaborators.add(gtwId, collaborator)
   }
 
-  render () {
-    const {
-      rights,
-      redirectToList,
-      universalRights,
-    } = this.props
+  render() {
+    const { rights, redirectToList, universalRights } = this.props
 
     return (
       <Container>

@@ -25,7 +25,7 @@ import ApplicationApiKeysList from '../application-api-keys-list'
 import ApplicationApiKeyEdit from '../application-api-key-edit'
 import ApplicationApiKeyAdd from '../application-api-key-add'
 
-@withBreadcrumb('apps.single.api-keys', function (props) {
+@withBreadcrumb('apps.single.api-keys', function(props) {
   const { match } = props
   const appId = match.params.appId
 
@@ -38,8 +38,7 @@ import ApplicationApiKeyAdd from '../application-api-key-add'
   )
 })
 export default class ApplicationAccess extends React.Component {
-
-  render () {
+  render() {
     const { match } = this.props
     return (
       <ErrorView ErrorComponent={SubViewError}>

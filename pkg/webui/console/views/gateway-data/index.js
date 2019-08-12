@@ -35,18 +35,13 @@ const m = defineMessages({
 @connect(state => ({
   gtwId: selectSelectedGatewayId(state),
 }))
-@withBreadcrumb('gateways.single.data', function (props) {
+@withBreadcrumb('gateways.single.data', function(props) {
   return (
-    <Breadcrumb
-      path={`/gateways/${props.gtwId}/data`}
-      icon="data"
-      content={sharedMessages.data}
-    />
+    <Breadcrumb path={`/gateways/${props.gtwId}/data`} icon="data" content={sharedMessages.data} />
   )
 })
 export default class Data extends React.Component {
-
-  render () {
+  render() {
     const { gtwId } = this.props
 
     return (
@@ -59,9 +54,7 @@ export default class Data extends React.Component {
         </Row>
         <Row>
           <Col sm={12} className={style.wrapper}>
-            <GatewayEvents
-              gtwId={gtwId}
-            />
+            <GatewayEvents gtwId={gtwId} />
           </Col>
         </Row>
       </Container>

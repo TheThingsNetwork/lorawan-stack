@@ -16,8 +16,9 @@
 
 const selectApiKeysStore = (state, entity) => state.apiKeys[entity]
 
-export const createApiKeySelector = entity => function (state) {
-  const store = selectApiKeysStore(state, entity)
+export const createApiKeySelector = entity =>
+  function(state) {
+    const store = selectApiKeysStore(state, entity)
 
-  return store.key
-}
+    return store.key
+  }

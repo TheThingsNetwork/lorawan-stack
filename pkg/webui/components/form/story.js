@@ -26,7 +26,7 @@ import Form from '../form'
 import Checkbox from '../checkbox'
 import Radio from '../radio-button'
 
-const handleSubmit = function (data, { resetForm }) {
+const handleSubmit = function(data, { resetForm }) {
   action('Submit')(data)
   setTimeout(() => resetForm(data), 1000)
 }
@@ -40,12 +40,14 @@ const containerHorizontalStyles = {
 }
 
 storiesOf('Form', module)
-  .addDecorator((story, context) => withInfo({
-    inline: true,
-    header: false,
-    source: true,
-    propTables: [ Form ],
-  })(story)(context))
+  .addDecorator((story, context) =>
+    withInfo({
+      inline: true,
+      header: false,
+      source: true,
+      propTables: [Form],
+    })(story)(context),
+  )
   .add('Login', () => (
     <div style={containerStyles}>
       <Form
@@ -55,18 +57,8 @@ storiesOf('Form', module)
           password: '',
         }}
       >
-        <Form.Field
-          title="Username or Email"
-          name="user_id"
-          type="text"
-          component={Input}
-        />
-        <Form.Field
-          title="Password"
-          name="password"
-          type="password"
-          component={Input}
-        />
+        <Form.Field title="Username or Email" name="user_id" type="text" component={Input} />
+        <Form.Field title="Password" name="password" type="password" component={Input} />
         <SubmitBar>
           <Form.Submit message="Login" component={SubmitButton} />
         </SubmitBar>
@@ -85,44 +77,15 @@ storiesOf('Form', module)
         submitEnabledWhenInvalid
         horizontal
       >
-        <Form.Field
-          name="radio-story"
-          title="Radio Buttons"
-          component={Radio.Group}
-        >
-          <Radio
-            label="Foo"
-            value="foo"
-            name="foo"
-          />
-          <Radio
-            label="Bar"
-            value="bar"
-            name="bar"
-          />
-          <Radio
-            label="Baz"
-            value="baz"
-            name="baz"
-          />
+        <Form.Field name="radio-story" title="Radio Buttons" component={Radio.Group}>
+          <Radio label="Foo" value="foo" name="foo" />
+          <Radio label="Bar" value="bar" name="bar" />
+          <Radio label="Baz" value="baz" name="baz" />
         </Form.Field>
-        <Form.Field
-          name="checkbox-story"
-          title="Checkboxes"
-          component={Checkbox.Group}
-        >
-          <Checkbox
-            label="Foo"
-            name="foo"
-          />
-          <Checkbox
-            label="Bar"
-            name="bar"
-          />
-          <Checkbox
-            label="Baz"
-            name="baz"
-          />
+        <Form.Field name="checkbox-story" title="Checkboxes" component={Checkbox.Group}>
+          <Checkbox label="Foo" name="foo" />
+          <Checkbox label="Bar" name="bar" />
+          <Checkbox label="Baz" name="baz" />
         </Form.Field>
         <SubmitBar>
           <Form.Submit message="Save" component={SubmitButton} />
@@ -146,10 +109,8 @@ storiesOf('Form', module)
           description: Yup.string()
             .min(5, 'Too Short')
             .max(50, 'Too Long'),
-          checkboxes: Yup.object().test(
-            'checkboxes',
-            'Cannot be empty',
-            values => Object.values(values).reduce((acc, curr) => acc || curr, false)
+          checkboxes: Yup.object().test('checkboxes', 'Cannot be empty', values =>
+            Object.values(values).reduce((acc, curr) => acc || curr, false),
           ),
         })}
         initialValues={{
@@ -185,12 +146,7 @@ storiesOf('Form', module)
           <Checkbox name="cb2" label="Checkbox 2" />
           <Checkbox name="cb3" label="Checkbox 3" />
         </Form.Field>
-        <Form.Field
-          component={Radio.Group}
-          name="radio"
-          title="Radio"
-          required
-        >
+        <Form.Field component={Radio.Group} name="radio" title="Radio" required>
           <Radio label="Radio 1" value="radio1" />
           <Radio label="Radio 2" value="radio2" />
           <Radio label="Radio 3" value="radio3" />

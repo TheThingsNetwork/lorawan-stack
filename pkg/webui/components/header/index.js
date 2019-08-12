@@ -24,7 +24,7 @@ import PropTypes from '../../lib/prop-types'
 
 import styles from './header.styl'
 
-const Header = function ({
+const Header = function({
   className,
   dropdownItems,
   navigationEntries,
@@ -40,13 +40,10 @@ const Header = function ({
   return (
     <header {...rest} className={classnames(className, styles.bar)}>
       <div className={styles.left}>
-        <LinkComponent
-          {...anchored ? { href: '/' } : { to: '/' }}
-          className={styles.logo}
-        >
+        <LinkComponent {...(anchored ? { href: '/' } : { to: '/' })} className={styles.logo}>
           <Logo />
         </LinkComponent>
-        { !isGuest && (
+        {!isGuest && (
           <NavigationBar
             className={styles.navList}
             entries={navigationEntries}
@@ -54,9 +51,9 @@ const Header = function ({
           />
         )}
       </div>
-      { !isGuest && (
+      {!isGuest && (
         <div className={styles.right}>
-          { searchable && <Input icon="search" onEnter={handleSearchRequest} /> }
+          {searchable && <Input icon="search" onEnter={handleSearchRequest} />}
           <ProfileDropdown
             dropdownItems={dropdownItems}
             userId={user.ids.user_id}
@@ -70,14 +67,14 @@ const Header = function ({
 
 Header.propTypes = {
   /**
-  * The User object, retrieved from the API. If it is `undefined`, then the
-  * guest header is rendered
-  */
+   * The User object, retrieved from the API. If it is `undefined`, then the
+   * guest header is rendered
+   */
   user: PropTypes.object,
   /**
-  * A list of items for the dropdown
-  * See `<ProfileDropdown/>`'s `items` proptypes for details
-  */
+   * A list of items for the dropdown
+   * See `<ProfileDropdown/>`'s `items` proptypes for details
+   */
   dropdownItems: ProfileDropdown.propTypes.dropdownItems,
   /**
    * A list of navigation bar entries

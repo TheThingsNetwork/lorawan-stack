@@ -25,7 +25,7 @@ import GatewayCollaboratorsList from '../gateway-collaborators-list'
 import GatewayCollaboratorAdd from '../gateway-collaborator-add'
 import GatewayCollaboratorEdit from '../gateway-collaborator-edit'
 
-@withBreadcrumb('gtws.single.collaborators', function (props) {
+@withBreadcrumb('gtws.single.collaborators', function(props) {
   const { match } = props
   const gtwId = match.params.gtwId
 
@@ -38,8 +38,7 @@ import GatewayCollaboratorEdit from '../gateway-collaborator-edit'
   )
 })
 export default class GatewayCollaborators extends React.Component {
-
-  render () {
+  render() {
     const { match } = this.props
 
     return (

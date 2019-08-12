@@ -13,16 +13,19 @@
 // limitations under the License.
 
 const mapWebhookMessageTypeToFormValue = messageType =>
-  (messageType && { enabled: true, value: messageType.path })
-  || { enabled: false, value: '' }
+  (messageType && { enabled: true, value: messageType.path }) || { enabled: false, value: '' }
 
 const mapWebhookHeadersTypeToFormValue = headersType =>
-  (headersType && Object.keys(headersType).reduce((result, key) => (
-    result.concat({
-      key,
-      value: headersType[key],
-    })
-  ), [])) || []
+  (headersType &&
+    Object.keys(headersType).reduce(
+      (result, key) =>
+        result.concat({
+          key,
+          value: headersType[key],
+        }),
+      [],
+    )) ||
+  []
 
 export const mapWebhookToFormValues = webhook => ({
   webhook_id: webhook.ids.webhook_id,
@@ -43,12 +46,17 @@ const mapMessageTypeFormValueToWebhookMessageType = formValue =>
   (formValue.enabled && { path: formValue.value }) || null
 
 const mapHeadersTypeFormValueToWebhookHeadersType = formValue =>
-  (formValue && formValue.reduce((result, { key, value }) => ({
-    ...result,
-    [key]: value,
-  }), {})) || null
+  (formValue &&
+    formValue.reduce(
+      (result, { key, value }) => ({
+        ...result,
+        [key]: value,
+      }),
+      {},
+    )) ||
+  null
 
-export const mapFormValuesToWebhook = function (values, appId) {
+export const mapFormValuesToWebhook = function(values, appId) {
   return {
     ids: {
       application_ids: {

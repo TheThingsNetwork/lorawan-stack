@@ -12,6 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export default function (t = 0) {
+export default function(t = 0) {
   return new Promise(resolve => setTimeout(resolve, t))
 }

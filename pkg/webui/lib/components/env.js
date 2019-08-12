@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 import React from 'react'
 import PropTypes from 'prop-types'
 import displayName from 'react-display-name'
 
 import { warn } from '../log'
 
-export const withEnv = function (Component) {
-  const Base = Component.prototype instanceof React.Component ? React.Component : React.PureComponent
+export const withEnv = function(Component) {
+  const Base =
+    Component.prototype instanceof React.Component ? React.Component : React.PureComponent
 
   class WithEnv extends Base {
     static displayName = `WithEnv(${displayName(Component)})`
@@ -30,19 +30,14 @@ export const withEnv = function (Component) {
       env: PropTypes.object,
     }
 
-    render () {
+    render() {
       const { env } = this.context
 
       if (!env) {
         warn('No env in context, make sure to use env.Provider')
       }
 
-      return (
-        <Component
-          env={this.context.env || {}}
-          {...this.props}
-        />
-      )
+      return <Component env={this.context.env || {}} {...this.props} />
     }
   }
 
@@ -58,13 +53,13 @@ export class EnvProvider extends React.PureComponent {
     env: PropTypes.object.isRequired,
   }
 
-  getChildContext () {
+  getChildContext() {
     return {
       env: this.props.env,
     }
   }
 
-  render () {
+  render() {
     return this.props.children
   }
 }

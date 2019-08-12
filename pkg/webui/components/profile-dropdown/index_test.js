@@ -28,36 +28,36 @@ const dropdownItems = [
   },
 ]
 
-describe('Profile Dropdown', function () {
+describe('Profile Dropdown', function() {
   let driver = null
 
-  beforeEach(function () {
+  beforeEach(function() {
     driver = getProfileDropdownDriver()
   })
 
-  describe('is in initial state', function () {
-    beforeEach(function () {
+  describe('is in initial state', function() {
+    beforeEach(function() {
       driver.when.created({ userId, dropdownItems })
     })
-    it('should match snapshot', function () {
+    it('should match snapshot', function() {
       expect(driver.component).toMatchSnapshot()
     })
-    it('should not have the dropdown open by default', function () {
+    it('should not have the dropdown open by default', function() {
       expect(driver.is.dropdownOpen()).toBeFalsy()
     })
-    it('should open dropdown on click', function () {
+    it('should open dropdown on click', function() {
       driver.when.toggledDropdown()
       expect(driver.is.dropdownOpen()).toBeTruthy()
     })
 
-    describe('has dropdown open', function () {
-      beforeEach(function () {
+    describe('has dropdown open', function() {
+      beforeEach(function() {
         driver.when.toggledDropdown()
       })
-      it('should match snapshot', function () {
+      it('should match snapshot', function() {
         expect(driver.component).toMatchSnapshot()
       })
-      it('should close dropdown on click', function () {
+      it('should close dropdown on click', function() {
         driver.when.toggledDropdown()
         expect(driver.is.dropdownOpen()).toBeFalsy()
       })

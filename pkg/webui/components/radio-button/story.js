@@ -23,98 +23,43 @@ const info = {
   inline: true,
   header: false,
   source: false,
-  propTables: [ Radio ],
+  propTables: [Radio],
 }
 
 storiesOf('Radio', module)
   .addDecorator((story, context) => withInfo(info)(story)(context))
-  .add('Default', () => (
-    <Radio
-      label="Radio"
-      name="radio"
-      value="1"
-    />
-  ))
+  .add('Default', () => <Radio label="Radio" name="radio" value="1" />)
   .add('Disabled', () => (
     <div style={{ padding: '20px' }}>
-      <Radio
-        name="radio"
-        label="Radio 1"
-        value="1"
-        checked
-        disabled
-      />
+      <Radio name="radio" label="Radio 1" value="1" checked disabled />
       <br />
-      <Radio
-        name="radio"
-        label="Radio 2"
-        value="2"
-        disabled
-      />
+      <Radio name="radio" label="Radio 2" value="2" disabled />
     </div>
   ))
   .add('Group (horizontal)', () => (
     <div>
       <div style={{ padding: '20px' }}>
         <RadioGroup name="radio" initialValue="1" horizontal>
-          <Radio
-            label="Radio 1"
-            value="1"
-          />
-          <Radio
-            label="Radio 2"
-            value="2"
-          />
-          <Radio
-            label="Radio 3"
-            value="3"
-          />
-          <Radio
-            label="Radio 4"
-            value="4"
-          />
+          <Radio label="Radio 1" value="1" />
+          <Radio label="Radio 2" value="2" />
+          <Radio label="Radio 3" value="3" />
+          <Radio label="Radio 4" value="4" />
         </RadioGroup>
       </div>
       <div style={{ padding: '20px' }}>
         <RadioGroup name="radio-with-disabled" initialValue="1" horizontal>
-          <Radio
-            label="Radio 1"
-            value="1"
-          />
-          <Radio
-            label="Radio 2"
-            value="2"
-            disabled
-          />
-          <Radio
-            label="Radio 3"
-            value="3"
-            disabled
-          />
-          <Radio
-            label="Radio 4"
-            value="4"
-          />
+          <Radio label="Radio 1" value="1" />
+          <Radio label="Radio 2" value="2" disabled />
+          <Radio label="Radio 3" value="3" disabled />
+          <Radio label="Radio 4" value="4" />
         </RadioGroup>
       </div>
       <div style={{ padding: '20px' }}>
         <RadioGroup name="radio-all-disabled" initialValue="1" disabled horizontal>
-          <Radio
-            label="Radio 1"
-            value="1"
-          />
-          <Radio
-            label="Radio 2"
-            value="2"
-          />
-          <Radio
-            label="Radio 3"
-            value="3"
-          />
-          <Radio
-            label="Radio 4"
-            value="4"
-          />
+          <Radio label="Radio 1" value="1" />
+          <Radio label="Radio 2" value="2" />
+          <Radio label="Radio 3" value="3" />
+          <Radio label="Radio 4" value="4" />
         </RadioGroup>
       </div>
     </div>
@@ -123,64 +68,26 @@ storiesOf('Radio', module)
     <div>
       <div style={{ padding: '20px' }}>
         <RadioGroup name="radio" initialValue="1" horizontal={false}>
-          <Radio
-            label="Radio 1"
-            value="1"
-          />
-          <Radio
-            label="Radio 2"
-            value="2"
-          />
-          <Radio
-            label="Radio 3"
-            value="3"
-          />
-          <Radio
-            label="Radio 4"
-            value="4"
-          />
+          <Radio label="Radio 1" value="1" />
+          <Radio label="Radio 2" value="2" />
+          <Radio label="Radio 3" value="3" />
+          <Radio label="Radio 4" value="4" />
         </RadioGroup>
       </div>
       <div style={{ padding: '20px' }}>
         <RadioGroup name="radio-with-disabled" initialValue="1" horizontal={false}>
-          <Radio
-            label="Radio 1"
-            value="1"
-          />
-          <Radio
-            label="Radio 2"
-            value="2"
-            disabled
-          />
-          <Radio
-            label="Radio 3"
-            value="3"
-            disabled
-          />
-          <Radio
-            label="Radio 4"
-            value="4"
-          />
+          <Radio label="Radio 1" value="1" />
+          <Radio label="Radio 2" value="2" disabled />
+          <Radio label="Radio 3" value="3" disabled />
+          <Radio label="Radio 4" value="4" />
         </RadioGroup>
       </div>
       <div style={{ padding: '20px' }}>
         <RadioGroup name="radio-all-disabled" initialValue="1" disabled horizontal={false}>
-          <Radio
-            label="Radio 1"
-            value="1"
-          />
-          <Radio
-            label="Radio 2"
-            value="2"
-          />
-          <Radio
-            label="Radio 3"
-            value="3"
-          />
-          <Radio
-            label="Radio 4"
-            value="4"
-          />
+          <Radio label="Radio 1" value="1" />
+          <Radio label="Radio 2" value="2" />
+          <Radio label="Radio 3" value="3" />
+          <Radio label="Radio 4" value="4" />
         </RadioGroup>
       </div>
     </div>

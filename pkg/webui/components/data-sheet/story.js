@@ -66,12 +66,14 @@ const containerStyles = {
 }
 
 storiesOf('Data Sheet', module)
-  .addDecorator((story, context) => withInfo({
-    inline: true,
-    header: false,
-    source: true,
-    propTables: [ DataSheet ],
-  })(story)(context))
+  .addDecorator((story, context) =>
+    withInfo({
+      inline: true,
+      header: false,
+      source: true,
+      propTables: [DataSheet],
+    })(story)(context),
+  )
   .add('Default', () => (
     <div style={containerStyles}>
       <DataSheet data={testData} />

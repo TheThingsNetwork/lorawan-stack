@@ -42,10 +42,8 @@ const m = defineMessages({
 })
 
 const validationSchema = Yup.object().shape({
-  user_id: Yup.string()
-    .required(sharedMessages.validateRequired),
-  password: Yup.string()
-    .required(sharedMessages.validateRequired),
+  user_id: Yup.string().required(sharedMessages.validateRequired),
+  password: Yup.string().required(sharedMessages.validateRequired),
 })
 
 const appRoot = selectApplicationRootPath()
@@ -54,14 +52,14 @@ const appRoot = selectApplicationRootPath()
 @connect()
 @bind
 export default class OAuth extends React.PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       error: '',
     }
   }
 
-  async handleSubmit (values, { setSubmitting, setErrors }) {
+  async handleSubmit(values, { setSubmitting, setErrors }) {
     try {
       await api.oauth.login(values)
 
@@ -75,15 +73,16 @@ export default class OAuth extends React.PureComponent {
     }
   }
 
-  navigateToRegister () {
+  navigateToRegister() {
     const { dispatch, location } = this.props
-    dispatch(replace('/register', {
-      back: `${location.pathname}${location.search}`,
-    }))
+    dispatch(
+      replace('/register', {
+        back: `${location.pathname}${location.search}`,
+      }),
+    )
   }
 
-  render () {
-
+  render() {
     const initialValues = {
       user_id: '',
       password: '',
@@ -102,7 +101,9 @@ export default class OAuth extends React.PureComponent {
             </div>
           </div>
           <div className={style.right}>
-            <h1><Message content={m.stackAccount} /></h1>
+            <h1>
+              <Message content={m.stackAccount} />
+            </h1>
             <Form
               onSubmit={this.handleSubmit}
               initialValues={initialValues}
@@ -125,10 +126,7 @@ export default class OAuth extends React.PureComponent {
                 type="password"
                 required
               />
-              <Form.Submit
-                component={SubmitButton}
-                message={sharedMessages.login}
-              />
+              <Form.Submit component={SubmitButton} message={sharedMessages.login} />
               <Button naked message={m.createAccount} onClick={this.navigateToRegister} />
             </Form>
           </div>
@@ -138,7 +136,7 @@ export default class OAuth extends React.PureComponent {
   }
 }
 
-function url (location, omitQuery = false) {
+function url(location, omitQuery = false) {
   const query = Query.parse(location.search)
 
   const next = query.n || appRoot

@@ -19,34 +19,30 @@ import grpcErrToHttpErr from './grpc-error-map'
  * @param {Object} error - The error to be tested.
  * @returns {boolean} `true` if `error` is translated, `false` otherwise.
  */
-export const isBackend = error => (
-  Boolean(error)
-    && typeof error === 'object'
-    && !('id' in error)
-    && error.message
-    && error.details
-    && (error.code || error.grpc_code)
-)
+export const isBackend = error =>
+  Boolean(error) &&
+  typeof error === 'object' &&
+  !('id' in error) &&
+  error.message &&
+  error.details &&
+  (error.code || error.grpc_code)
 
 /**
  * Returns wether the error is a frontend defined error object
  * @param {Object} error - The error to be tested.
  * @returns {boolean} `true` if `error` is translated, `false` otherwise.
  */
-export const isFrontend = error => (
+export const isFrontend = error =>
   // TODO: Define proper object shape, once we need it, for now translated
   // messages are enough
   Boolean(error) && typeof error === 'object' && error.id && error.defaultMessage
-)
 
 /**
  * Returns wether the error has a shape that is not well-known
  * @param {Object} error - The error to be tested.
  * @returns {boolean} `true` if `error` is translated, `false` otherwise.
  */
-export const isUnknown = error => (
-  !isBackend(error) && !isFrontend(error)
-)
+export const isUnknown = error => !isBackend(error) && !isFrontend(error)
 
 /**
  * Maps the error type to a HTTP Status code. Useful for quickly
@@ -55,20 +51,17 @@ export const isUnknown = error => (
  * @param {Object} error - The error to be tested.
  * @returns {number} The (clostest when grpc error) HTTP Status Code
  */
-export const httpStatusCode = error => (
+export const httpStatusCode = error =>
   isBackend(error)
     ? error.http_code || grpcErrToHttpErr(error.code || error.grpc_code)
-    : (Boolean(error) && error.statusCode)
-)
+    : Boolean(error) && error.statusCode
 
 /**
  * Returns the GRPC Status code in case of a backend error.
  * @param {Object} error - The error to be tested.
  * @returns {number} The GRPC error code, or `false`
  */
-export const grpcStatusCode = error => (
-  isBackend(error) && (error.code || error.grpc_code)
-)
+export const grpcStatusCode = error => isBackend(error) && (error.code || error.grpc_code)
 
 /**
  * Tests whether the grpc error represents the not found erorr.
@@ -76,9 +69,7 @@ export const grpcStatusCode = error => (
  * @returns {boolean} `true` if `error` represents the not found error,
  * `false` otherwise.
  */
-export const isNotFoundError = error => (
-  grpcStatusCode(error) === 5 || httpStatusCode(error) === 404
-)
+export const isNotFoundError = error => grpcStatusCode(error) === 5 || httpStatusCode(error) === 404
 
 /**
  * Returns whether the grpc error represents an internal server error.
@@ -86,9 +77,7 @@ export const isNotFoundError = error => (
  * @returns {boolean} `true` if `error` represents an internal server error,
  * `false` otherwise.
  */
-export const isInternalError = error => (
-  grpcStatusCode(error) === 13 // NOTE: HTTP 500 can also be UnknownError.
-)
+export const isInternalError = error => grpcStatusCode(error) === 13 // NOTE: HTTP 500 can also be UnknownError.
 
 /**
  * Returns whether the grpc error represents an already exists error.
@@ -96,9 +85,7 @@ export const isInternalError = error => (
  * @returns {boolean} `true` if `error` represents an already exists error,
  * `false` otherwise.
  */
-export const isAlreadyExistsError = error => (
-  grpcStatusCode(error) === 6 // NOTE: HTTP 409 can also be AbortedError.
-)
+export const isAlreadyExistsError = error => grpcStatusCode(error) === 6 // NOTE: HTTP 409 can also be AbortedError.
 
 /**
  * Returns whether the grpc error represents a permission denied error.
@@ -106,9 +93,8 @@ export const isAlreadyExistsError = error => (
  * @returns {boolean} `true` if `error` represents a permission denied error,
  * `false` otherwise.
  */
-export const isPermissionDeniedError = error => (
+export const isPermissionDeniedError = error =>
   grpcStatusCode(error) === 7 || httpStatusCode(error) === 403
-)
 
 /**
  * Returns whether the grpc error represents an error due to not being authenticated.
@@ -116,42 +102,34 @@ export const isPermissionDeniedError = error => (
  * @returns {boolean} `true` if `error` represents an `Unauthenticated` error,
  * `false` otherwise.
  */
-export const isUnauthenticatedError = error => (
+export const isUnauthenticatedError = error =>
   grpcStatusCode(error) === 16 || httpStatusCode(error) === 401
-)
 
 /**
  * Returns wether `error` has translation ids.
  * @param {Object} error - The error to be tested.
  * @returns {boolean} `true` if `error` has translation ids, `false` otherwise.
  */
-export const isTranslated = error => (
-  isBackend() || typeof error === 'object' && error.id
-)
+export const isTranslated = error => isBackend() || (typeof error === 'object' && error.id)
 
 /**
  * Returns the id of the error, used as message id.
  * @param {Object} error - The backend error object.
  * @returns {string} The ID.
  */
-export const getBackendErrorId = error => (
-  error.message.split(' ')[0]
-)
+export const getBackendErrorId = error => error.message.split(' ')[0]
 
 /**
  * Returns the default message of the error, used as fallback translation.
  * @param {Object} error - The backend error object.
  * @returns {string} The default message.
  */
-export const getBackendErrorDefaultMessage = error => (
+export const getBackendErrorDefaultMessage = error =>
   error.details[0].message_format || error.message.replace(/^.*\s/, '')
-)
 
 /**
  * Returns the attributes of the backend error message, if any.
  * @param {Object} error - The backend error object.
  * @returns {string} The attributes or undefined.
  */
-export const getBackendErrorMessageAttributes = error => (
-  error.details[0].attributes
-)
+export const getBackendErrorMessageAttributes = error => error.details[0].attributes

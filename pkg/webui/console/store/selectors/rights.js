@@ -16,14 +16,16 @@
 
 const selectRightsStore = (state, entity) => state.rights[entity]
 
-export const createRightsSelector = entity => function (state) {
-  const store = selectRightsStore(state, entity)
+export const createRightsSelector = entity =>
+  function(state) {
+    const store = selectRightsStore(state, entity)
 
-  return store.rights.filter(right => !right.endsWith('_ALL'))
-}
+    return store.rights.filter(right => !right.endsWith('_ALL'))
+  }
 
-export const createUniversalRightsSelector = entity => function (state) {
-  const store = selectRightsStore(state, entity)
+export const createUniversalRightsSelector = entity =>
+  function(state) {
+    const store = selectRightsStore(state, entity)
 
-  return store.rights.filter(right => right.endsWith('_ALL'))
-}
+    return store.rights.filter(right => right.endsWith('_ALL'))
+  }

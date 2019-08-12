@@ -34,41 +34,34 @@ const m = defineMessages({
   formatFetchingFailure: 'Could not retrieve the list of available webhook formats',
 })
 
-const formatOptions = formats => Object.keys(formats).map(key => ({ value: key, label: formats[key]}))
+const formatOptions = formats =>
+  Object.keys(formats).map(key => ({ value: key, label: formats[key] }))
 
-@storeConnect(function (state) {
-  return {
-    formats: selectWebhookFormats(state),
-    error: selectWebhookFormatsError(state),
-    fetching: selectWebhookFormatsFetching(state),
-  }
-},
-{ getWebhookFormats }
+@storeConnect(
+  function(state) {
+    return {
+      formats: selectWebhookFormats(state),
+      error: selectWebhookFormatsError(state),
+      fetching: selectWebhookFormatsFetching(state),
+    }
+  },
+  { getWebhookFormats },
 )
 @bind
 class WebhookFormatsSelector extends React.PureComponent {
-
-  componentDidMount () {
+  componentDidMount() {
     const { getWebhookFormats } = this.props
     getWebhookFormats()
   }
 
-  getOptions () {
+  getOptions() {
     const { formats } = this.props
 
     return formatOptions(formats)
   }
 
-  render () {
-    const {
-      name,
-      required,
-      title,
-      autoFocus,
-      error,
-      fetching,
-      menuPlacement,
-    } = this.props
+  render() {
+    const { name, required, title, autoFocus, error, fetching, menuPlacement } = this.props
 
     const fieldOptions = this.getOptions()
 
@@ -94,7 +87,7 @@ WebhookFormatsSelector.propTypes = {
   required: PropTypes.bool.isRequired,
   title: PropTypes.message,
   autoFocus: PropTypes.bool,
-  menuPlacement: PropTypes.oneOf([ 'top', 'bottom', 'auto' ]),
+  menuPlacement: PropTypes.oneOf(['top', 'bottom', 'auto']),
 }
 
 WebhookFormatsSelector.defaultProps = {

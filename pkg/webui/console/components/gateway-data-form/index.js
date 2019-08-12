@@ -41,38 +41,27 @@ const validationSchema = Yup.object().shape({
       .min(2, sharedMessages.validateTooShort)
       .max(36, sharedMessages.validateTooLong)
       .required(sharedMessages.validateRequired),
-    eui: Yup.nullableString()
-      .length(8 * 2, sharedMessages.validateTooShort),
+    eui: Yup.nullableString().length(8 * 2, sharedMessages.validateTooShort),
   }),
   name: Yup.string()
     .min(2, sharedMessages.validateTooShort)
     .max(50, sharedMessages.validateTooLong),
-  description: Yup.string()
-    .max(2000, sharedMessages.validateTooLong),
-  frequency_plan_id: Yup.string()
-    .required(sharedMessages.validateRequired),
-  gateway_server_address: Yup.string()
-    .matches(addressRegexp, sharedMessages.validateAddressFormat),
+  description: Yup.string().max(2000, sharedMessages.validateTooLong),
+  frequency_plan_id: Yup.string().required(sharedMessages.validateRequired),
+  gateway_server_address: Yup.string().matches(addressRegexp, sharedMessages.validateAddressFormat),
 })
 
 @bind
 class GatewayDataForm extends React.Component {
-
-  onSubmit (values, helpers) {
+  onSubmit(values, helpers) {
     const { onSubmit } = this.props
     const castedValues = validationSchema.cast(values)
 
     onSubmit(castedValues, helpers)
   }
 
-  render () {
-    const {
-      update,
-      error,
-      initialValues,
-      formRef,
-      children,
-    } = this.props
+  render() {
+    const { update, error, initialValues, formRef, children } = this.props
 
     return (
       <Form
@@ -82,10 +71,7 @@ class GatewayDataForm extends React.Component {
         validationSchema={validationSchema}
         formikRef={formRef}
       >
-        <Message
-          component="h4"
-          content={sharedMessages.generalSettings}
-        />
+        <Message component="h4" content={sharedMessages.generalSettings} />
         <Form.Field
           title={sharedMessages.gatewayID}
           name="ids.gateway_id"
@@ -104,11 +90,7 @@ class GatewayDataForm extends React.Component {
           placeholder={sharedMessages.gatewayEUI}
           component={Input}
         />
-        <Form.Field
-          title={sharedMessages.gatewayName}
-          name="name"
-          component={Input}
-        />
+        <Form.Field title={sharedMessages.gatewayName} name="name" component={Input} />
         <Form.Field
           title={sharedMessages.gatewayDescription}
           name="description"
@@ -122,10 +104,7 @@ class GatewayDataForm extends React.Component {
           name="gateway_server_address"
           component={Input}
         />
-        <Message
-          component="h4"
-          content={sharedMessages.lorawanOptions}
-        />
+        <Message component="h4" content={sharedMessages.lorawanOptions} />
         <FrequencyPlansSelect
           horizontal
           source="gs"
@@ -139,9 +118,7 @@ class GatewayDataForm extends React.Component {
           component={Checkbox}
           label={m.enforced}
         />
-        <SubmitBar>
-          {children}
-        </SubmitBar>
+        <SubmitBar>{children}</SubmitBar>
       </Form>
     )
   }

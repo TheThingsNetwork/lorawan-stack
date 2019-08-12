@@ -36,25 +36,19 @@ const m = defineMessages({
 
 @bind
 class Events extends React.Component {
-
   state = {
     paused: false,
   }
 
-  shouldComponentUpdate (nextProps, nextState) {
+  shouldComponentUpdate(nextProps, nextState) {
     const { paused } = this.state
-    const {
-      events,
-      emitterId,
-      onClear,
-      limit,
-    } = this.props
+    const { events, emitterId, onClear, limit } = this.props
 
     if (
-      emitterId !== nextProps.emitterId
-      || limit !== nextProps.limit
-      || onClear !== nextProps.onClear
-      || paused !== nextState.paused
+      emitterId !== nextProps.emitterId ||
+      limit !== nextProps.limit ||
+      onClear !== nextProps.onClear ||
+      paused !== nextState.paused
     ) {
       return true
     }
@@ -75,7 +69,7 @@ class Events extends React.Component {
     return newEvents
   }
 
-  renderEvent (event) {
+  renderEvent(event) {
     const { component: Component, type } = getEventComponentByName(event.name)
 
     return (
@@ -90,29 +84,22 @@ class Events extends React.Component {
     )
   }
 
-  onPause () {
+  onPause() {
     this.setState(prev => ({ paused: !prev.paused }))
   }
 
-  onClear () {
+  onClear() {
     const { onClear } = this.props
 
     onClear()
   }
 
-  getEventkey (event) {
+  getEventkey(event) {
     return `${event.time}-${event.name}`
   }
 
-  render () {
-    const {
-      className,
-      events,
-      onClear,
-      emitterId,
-      limit,
-      error,
-    } = this.props
+  render() {
+    const { className, events, onClear, emitterId, limit, error } = this.props
     const { paused } = this.state
 
     if (error) {
@@ -125,17 +112,9 @@ class Events extends React.Component {
       limitedEvents = events.slice(0, limit)
     }
 
-    const header = (
-      <Header
-        paused={paused}
-        onPause={this.onPause}
-        onClear={onClear}
-      />
-    )
+    const header = <Header paused={paused} onPause={this.onPause} onClear={onClear} />
 
-    const footer = (
-      <Footer truncated={truncated} />
-    )
+    const footer = <Footer truncated={truncated} />
 
     return (
       <List
@@ -169,12 +148,8 @@ Events.defaultProps = {
 
 Events.Widget = EventsWidget
 
-const Header = function (props) {
-  const {
-    paused,
-    onPause,
-    onClear,
-  } = props
+const Header = function(props) {
+  const { paused, onPause, onClear } = props
 
   const pauseMessage = paused ? sharedMessages.resume : sharedMessages.pause
   const pauseIcon = paused ? 'play_arrow' : 'pause'
@@ -187,48 +162,30 @@ const Header = function (props) {
         <Message content={sharedMessages.data} />
       </div>
       <div className={style.headerActions}>
-        <Button
-          onClick={onPause}
-          message={pauseMessage}
-          naked
-          secondary
-          icon={pauseIcon}
-        />
-        <Button
-          onClick={onClear}
-          message={sharedMessages.clear}
-          naked
-          secondary
-          icon="delete"
-        />
+        <Button onClick={onPause} message={pauseMessage} naked secondary icon={pauseIcon} />
+        <Button onClick={onClear} message={sharedMessages.clear} naked secondary icon="delete" />
       </div>
     </div>
   )
 }
 
-const Footer = function (props) {
-  const {
-    truncated,
-  } = props
+const Footer = function(props) {
+  const { truncated } = props
 
   return (
-    <div className={classnames(style.footer, {
-      [style.footerTruncated]: truncated,
-    })}
+    <div
+      className={classnames(style.footer, {
+        [style.footerTruncated]: truncated,
+      })}
     >
-      {
-        truncated ? (
-          <React.Fragment>
-            <Icon icon="warning" />
-            <Message
-              content="Events have been truncated"
-              className={style.footerTruncatedText}
-            />
-          </React.Fragment>
-        ) : (
-          <Message content={m.showing} />
-        )
-      }
+      {truncated ? (
+        <React.Fragment>
+          <Icon icon="warning" />
+          <Message content="Events have been truncated" className={style.footerTruncatedText} />
+        </React.Fragment>
+      ) : (
+        <Message content={m.showing} />
+      )}
     </div>
   )
 }

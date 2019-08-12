@@ -19,10 +19,6 @@ import { BreadcrumbsConsumer } from './context'
 
 export default props => (
   <BreadcrumbsConsumer>
-    {
-      ({ breadcrumbs }) => (
-        <Breadcrumbs {...props} breadcrumbs={breadcrumbs} />
-      )
-    }
+    {({ breadcrumbs }) => <Breadcrumbs {...props} breadcrumbs={breadcrumbs} />}
   </BreadcrumbsConsumer>
 )

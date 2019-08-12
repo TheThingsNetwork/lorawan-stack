@@ -20,20 +20,19 @@ import PropTypes from '../../prop-types'
 
 @bind
 export default class Animation extends Component {
-
   static propTypes = {
     animationData: PropTypes.object.isRequired,
     lottieConfig: PropTypes.object,
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.containerRef = React.createRef()
     this.instance = null
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { lottieConfig } = this.props
 
     this.instance = lottie.loadAnimation({
@@ -46,12 +45,8 @@ export default class Animation extends Component {
     })
   }
 
-  render () {
-    const {
-      lottieConfig,
-      animationData,
-      ...rest
-    } = this.props
+  render() {
+    const { lottieConfig, animationData, ...rest } = this.props
 
     return (
       <div

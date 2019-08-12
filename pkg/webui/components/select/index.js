@@ -28,17 +28,18 @@ const getValue = (opts, val) => opts.find(o => o.value === val)
 
 @bind
 class Select extends React.PureComponent {
-
   static propTypes = {
     onChange: PropTypes.func,
     onBlur: PropTypes.func,
     onFocus: PropTypes.func,
     value: PropTypes.string,
     disabled: PropTypes.bool,
-    options: PropTypes.arrayOf(PropTypes.shape({
-      value: PropTypes.string,
-      label: PropTypes.message,
-    })),
+    options: PropTypes.arrayOf(
+      PropTypes.shape({
+        value: PropTypes.string,
+        label: PropTypes.message,
+      }),
+    ),
     error: PropTypes.bool,
     warning: PropTypes.bool,
   }
@@ -53,7 +54,7 @@ class Select extends React.PureComponent {
     warning: false,
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     let value
@@ -66,7 +67,7 @@ class Select extends React.PureComponent {
     }
   }
 
-  static getDerivedStateFromProps (props, state) {
+  static getDerivedStateFromProps(props, state) {
     const { value } = props
 
     if ('value' in props && value !== state.value) {
@@ -76,7 +77,7 @@ class Select extends React.PureComponent {
     return null
   }
 
-  async onChange ({ value }) {
+  async onChange({ value }) {
     const { onChange } = this.props
 
     if (!('value' in this.props)) {
@@ -86,7 +87,7 @@ class Select extends React.PureComponent {
     onChange(value)
   }
 
-  onBlur (event) {
+  onBlur(event) {
     const { value } = this.state
     const { onBlur } = this.props
 
@@ -98,7 +99,7 @@ class Select extends React.PureComponent {
     onBlur(event)
   }
 
-  render () {
+  render() {
     const {
       className,
       options,
@@ -113,13 +114,13 @@ class Select extends React.PureComponent {
       ...rest
     } = this.props
 
-    const formatMessage = (label, values) => intl ? intl.formatMessage(label, values) : label
+    const formatMessage = (label, values) => (intl ? intl.formatMessage(label, values) : label)
     const cls = classnames(className, style.container, {
       [style.error]: error,
       [style.warning]: warning,
     })
-    const translatedOptions = options.map(function (option) {
-      const { label, labelValues = {}} = option
+    const translatedOptions = options.map(function(option) {
+      const { label, labelValues = {} } = option
       if (typeof label === 'object' && label.id && label.defaultMessage) {
         return { ...option, label: formatMessage(label, labelValues) }
       }

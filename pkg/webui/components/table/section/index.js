@@ -15,33 +15,23 @@
 import React from 'react'
 import PropTypes from '../../../lib/prop-types'
 
-const Section = function ({
-  className,
-  component: Component,
-  children,
-  ...rest
-}) {
+const Section = function({ className, component: Component, children, ...rest }) {
   return (
-    <Component
-      className={className}
-      {...rest}
-    >
-      {
-        React.Children.map(children, row => (
-          React.cloneElement(row, {
-            head: Component === 'thead',
-            body: Component === 'tbody',
-            foot: Component === 'tfoot',
-          })
-        ))
-      }
+    <Component className={className} {...rest}>
+      {React.Children.map(children, row =>
+        React.cloneElement(row, {
+          head: Component === 'thead',
+          body: Component === 'tbody',
+          foot: Component === 'tfoot',
+        }),
+      )}
     </Component>
   )
 }
 
 Section.propTypes = {
   /** The html name of the section component */
-  component: PropTypes.oneOf([ 'thead', 'tbody', 'tfoot' ]).isRequired,
+  component: PropTypes.oneOf(['thead', 'tbody', 'tfoot']).isRequired,
 }
 
 export default Section

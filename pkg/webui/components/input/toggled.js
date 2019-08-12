@@ -25,27 +25,21 @@ import Input from './'
 
 @bind
 class Toggled extends Component {
-  handleCheckboxChange (event) {
+  handleCheckboxChange(event) {
     const enabled = event.target.checked
     const { value } = this.props.value
 
     this.props.onChange({ value, enabled }, true)
   }
 
-  handleInputChange (value) {
+  handleInputChange(value) {
     const { enabled } = this.props.value
 
     this.props.onChange({ value, enabled })
   }
 
-  render () {
-    const {
-      value,
-      type,
-      enabledMessage,
-      className,
-      ...rest
-    } = this.props
+  render() {
+    const { value, type, enabledMessage, className, ...rest } = this.props
 
     const isEnabled = value.enabled || false
     const checkboxId = `${rest.id}_checkbox`
@@ -60,7 +54,7 @@ class Toggled extends Component {
             id={checkboxId}
           />
         </label>
-        { isEnabled && (
+        {isEnabled && (
           <Input
             {...rest}
             type="text"

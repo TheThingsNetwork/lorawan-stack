@@ -20,14 +20,7 @@ import PropTypes from '../../lib/prop-types'
 
 import style from './status.styl'
 
-const Status = function ({
-  className,
-  status,
-  label,
-  labelValues,
-  children,
-}) {
-
+const Status = function({ className, status, label, labelValues, children }) {
   const cls = classnames(style.status, {
     [style.statusGood]: status === 'good',
     [style.statusBad]: status === 'bad',
@@ -42,13 +35,7 @@ const Status = function ({
       className: classnames(label.props.className, style.statusLabel),
     })
   } else {
-    statusLabel = (
-      <Message
-        className={style.statusLabel}
-        content={label}
-        values={labelValues}
-      />
-    )
+    statusLabel = <Message className={style.statusLabel} content={label} values={labelValues} />
   }
 
   return (
@@ -61,7 +48,7 @@ const Status = function ({
 }
 
 Status.propTypes = {
-  status: PropTypes.oneOf([ 'good', 'bad', 'mediocre', 'unknown' ]),
+  status: PropTypes.oneOf(['good', 'bad', 'mediocre', 'unknown']),
   label: PropTypes.message,
   labelValues: PropTypes.object,
 }

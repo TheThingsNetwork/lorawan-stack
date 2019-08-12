@@ -27,22 +27,21 @@ import style from './modal.styl'
 
 @bind
 class Modal extends React.PureComponent {
-
-  handleApprove () {
+  handleApprove() {
     this.handleComplete(true)
   }
 
-  handleCancel () {
+  handleCancel() {
     this.handleComplete(false)
   }
 
-  handleComplete (result) {
+  handleComplete(result) {
     const { onComplete } = this.props
 
     onComplete(result)
   }
 
-  render () {
+  render() {
     const {
       title,
       subtitle,
@@ -67,10 +66,14 @@ class Modal extends React.PureComponent {
 
     const name = formName ? { name: formName } : {}
     const RootComponent = this.props.method ? 'form' : 'div'
-    const messageElement = (<Message content={message} className={style.message} />)
+    const messageElement = <Message content={message} className={style.message} />
     const bottomLineElement = <Message content={bottomLine} />
 
-    let buttons = <div><Button message={buttonMessage} onClick={this.handleApprove} icon="check" /></div>
+    let buttons = (
+      <div>
+        <Button message={buttonMessage} onClick={this.handleApprove} icon="check" />
+      </div>
+    )
 
     if (approval) {
       buttons = (
@@ -101,21 +104,21 @@ class Modal extends React.PureComponent {
       <React.Fragment>
         {!inline && <div key="shadow" className={style.shadow} />}
         <RootComponent key="modal" className={modalClassNames} {...rest}>
-          { title
-            && <div className={style.titleSection}>
+          {title && (
+            <div className={style.titleSection}>
               <div>
-                <h1><Message content={title} /></h1>
-                { subtitle && (<Message content={subtitle} />) }
+                <h1>
+                  <Message content={title} />
+                </h1>
+                {subtitle && <Message content={subtitle} />}
               </div>
-              { logo && (<Logo className={style.logo} />)}
+              {logo && <Logo className={style.logo} />}
             </div>
-          }
-          { title && <div className={style.line} /> }
-          <div className={style.body}>
-            {children || messageElement}
-          </div>
+          )}
+          {title && <div className={style.line} />}
+          <div className={style.body}>{children || messageElement}</div>
           <div className={style.controlBar}>
-            <div>{ bottomLineElement }</div>
+            <div>{bottomLineElement}</div>
             {buttons}
           </div>
         </RootComponent>
@@ -132,16 +135,10 @@ Modal.defaultProps = {
 
 Modal.propTypes = {
   title: PropTypes.message,
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.element),
-    PropTypes.element,
-  ]),
+  children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.element), PropTypes.element]),
   message: PropTypes.message,
   subtitle: PropTypes.message,
-  bottomLine: PropTypes.oneOfType([
-    PropTypes.element,
-    PropTypes.message,
-  ]),
+  bottomLine: PropTypes.oneOfType([PropTypes.element, PropTypes.message]),
   approval: PropTypes.bool,
   buttonMessage: PropTypes.message,
   cancelButtonMessage: PropTypes.message,

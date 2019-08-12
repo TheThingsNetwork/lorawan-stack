@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const error = function (state = {}, action) {
+const error = function(state = {}, action) {
   const { type, payload: errorValue } = action
 
   const matches = /(.*)_(REQUEST|SUCCESS|FAILURE)/.exec(type)
@@ -20,7 +20,7 @@ const error = function (state = {}, action) {
     return state
   }
 
-  const [ , key, status ] = matches
+  const [, key, status] = matches
   return {
     ...state,
     [key]: status === 'FAILURE' ? errorValue : undefined,

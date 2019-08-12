@@ -25,7 +25,7 @@ import GatewayApiKeysList from '../gateway-api-keys-list'
 import GatewayApiKeyAdd from '../gateway-api-key-add'
 import GatewayApiKeyEdit from '../gateway-api-key-edit'
 
-@withBreadcrumb('gateways.single.api-keys', function (props) {
+@withBreadcrumb('gateways.single.api-keys', function(props) {
   const gtwId = props.match.params.gtwId
 
   return (
@@ -37,8 +37,7 @@ import GatewayApiKeyEdit from '../gateway-api-key-edit'
   )
 })
 export default class GatewayApiKeys extends React.Component {
-
-  render () {
+  render() {
     const { match } = this.props
 
     return (

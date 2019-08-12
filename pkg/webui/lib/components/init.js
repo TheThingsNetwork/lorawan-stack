@@ -25,24 +25,21 @@ import '../../styles/main.styl'
 // React grid configuration
 // Keep these in line with styles/variables.less
 setConfiguration({
-  breakpoints: [ 480, 768, 1000, 1280 ],
-  containerWidths: [ 365, 650, 880, 1140 ],
+  breakpoints: [480, 768, 1000, 1280],
+  containerWidths: [365, 650, 880, 1140],
   gutterWidth: 28,
 })
 
-@connect(state => (
-  {
-    initialized: state.init.initialized,
-    error: state.init.error,
-  }
-))
+@connect(state => ({
+  initialized: state.init.initialized,
+  error: state.init.error,
+}))
 export default class Init extends React.PureComponent {
-
-  componentDidMount () {
+  componentDidMount() {
     this.props.dispatch({ type: 'INITIALIZE_REQUEST' })
   }
 
-  render () {
+  render() {
     const { initialized, error } = this.props
 
     if (error) {
@@ -50,7 +47,7 @@ export default class Init extends React.PureComponent {
     }
 
     if (!initialized) {
-      return (<Spinner center>Please wait…</Spinner>)
+      return <Spinner center>Please wait…</Spinner>
     }
 
     return this.props.children

@@ -44,22 +44,27 @@ const m = defineMessages({
   modalWarning: 'Are you sure you want to delete "{gtwName}"? Deleting a gateway cannot be undone!',
 })
 
-@connect(function (state) {
-  const gateway = selectSelectedGateway(state)
+@connect(
+  function(state) {
+    const gateway = selectSelectedGateway(state)
 
-  return {
-    gtwId: getGatewayId(gateway),
-    gateway,
-  }
-},
-dispatch => ({
-  ...bindActionCreators({
-    updateGateway: attachPromise(updateGateway),
-    deleteGateway: attachPromise(deleteGateway),
-  }, dispatch),
-  onDeleteSuccess: () => dispatch(replace('/gateways')),
-}))
-@withBreadcrumb('gateways.single.general-settings', function (props) {
+    return {
+      gtwId: getGatewayId(gateway),
+      gateway,
+    }
+  },
+  dispatch => ({
+    ...bindActionCreators(
+      {
+        updateGateway: attachPromise(updateGateway),
+        deleteGateway: attachPromise(deleteGateway),
+      },
+      dispatch,
+    ),
+    onDeleteSuccess: () => dispatch(replace('/gateways')),
+  }),
+)
+@withBreadcrumb('gateways.single.general-settings', function(props) {
   const { gtwId } = props
 
   return (
@@ -72,7 +77,6 @@ dispatch => ({
 })
 @bind
 export default class GatewayGeneralSettings extends React.Component {
-
   static propTypes = {
     gtwId: PropTypes.string.isRequired,
     gateway: PropTypes.object.isRequired,
@@ -81,7 +85,7 @@ export default class GatewayGeneralSettings extends React.Component {
     onDeleteSuccess: PropTypes.func.isRequired,
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.formRef = React.createRef()
@@ -91,7 +95,7 @@ export default class GatewayGeneralSettings extends React.Component {
     error: '',
   }
 
-  async handleSubmit (values) {
+  async handleSubmit(values) {
     const { gtwId, gateway, updateGateway } = this.props
 
     await this.setState({ error: '' })
@@ -100,10 +104,7 @@ export default class GatewayGeneralSettings extends React.Component {
     const { ids: gatewayIds, ...gatewayRest } = gateway
 
     const idsDiff = diff(gatewayIds, valuesIds)
-    const entityDiff = diff(
-      { ...gatewayRest },
-      { ...valuesRest },
-    )
+    const entityDiff = diff({ ...gatewayRest }, { ...valuesRest })
 
     let changed
     if (Object.keys(idsDiff).length) {
@@ -126,7 +127,7 @@ export default class GatewayGeneralSettings extends React.Component {
     }
   }
 
-  async handleDelete () {
+  async handleDelete() {
     const { gtwId, deleteGateway, onDeleteSuccess } = this.props
 
     await this.setState({ error: '' })
@@ -140,7 +141,7 @@ export default class GatewayGeneralSettings extends React.Component {
     }
   }
 
-  render () {
+  render() {
     const { gateway, gtwId } = this.props
     const { error } = this.state
     const {
@@ -165,13 +166,8 @@ export default class GatewayGeneralSettings extends React.Component {
       <Container>
         <Row>
           <Col lg={8} md={12}>
-            <IntlHelmet
-              title={sharedMessages.generalSettings}
-            />
-            <Message
-              component="h2"
-              content={sharedMessages.generalSettings}
-            />
+            <IntlHelmet title={sharedMessages.generalSettings} />
+            <Message component="h2" content={sharedMessages.generalSettings} />
           </Col>
           <Col sm={12} md={8}>
             <GatewayDataForm
@@ -188,7 +184,7 @@ export default class GatewayGeneralSettings extends React.Component {
                 danger
                 naked
                 message={m.deleteGateway}
-                modalData={{ message: { values: { gtwName: name || gtwId }, ...m.modalWarning }}}
+                modalData={{ message: { values: { gtwName: name || gtwId }, ...m.modalWarning } }}
                 onApprove={this.handleDelete}
               />
             </GatewayDataForm>

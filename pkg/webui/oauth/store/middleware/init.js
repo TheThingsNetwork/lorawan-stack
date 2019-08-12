@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 import { createLogic } from 'redux-logic'
 
 import api from '../../api'
@@ -21,7 +20,7 @@ import * as user from '../actions/user'
 
 const oauthInitLogic = createLogic({
   type: init.INITIALIZE,
-  async process ({ getState, action }, dispatch, done) {
+  async process({ getState, action }, dispatch, done) {
     dispatch(user.getUserMe())
 
     try {
@@ -48,4 +47,3 @@ const oauthInitLogic = createLogic({
 })
 
 export default oauthInitLogic
-

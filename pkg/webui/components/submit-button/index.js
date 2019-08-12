@@ -18,15 +18,8 @@ import PropTypes from '../../lib/prop-types'
 import Button from '../button'
 
 class SubmitButton extends React.PureComponent {
-  render () {
-    const {
-      message,
-      icon,
-      isSubmitting,
-      isValidating,
-      disabled,
-      dirty,
-    } = this.props
+  render() {
+    const { message, icon, isSubmitting, isValidating, disabled, dirty } = this.props
 
     const buttonDisabled = disabled || isSubmitting || !dirty
     const buttonLoading = isSubmitting || isValidating

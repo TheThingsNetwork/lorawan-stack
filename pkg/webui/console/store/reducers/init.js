@@ -18,14 +18,14 @@ const defaultState = {
   initialized: false,
 }
 
-const app = function (state = defaultState, action) {
+const app = function(state = defaultState, action) {
   switch (action.type) {
-  case INITIALIZE_SUCCESS:
-    return {
-      initialized: true,
-    }
-  default:
-    return state
+    case INITIALIZE_SUCCESS:
+      return {
+        initialized: true,
+      }
+    default:
+      return state
   }
 }
 

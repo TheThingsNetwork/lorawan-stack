@@ -21,7 +21,7 @@ import Tabs from '.'
 
 @bind
 class Example extends Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.state = {
@@ -29,66 +29,53 @@ class Example extends Component {
     }
   }
 
-  onTabChange (activeTab) {
+  onTabChange(activeTab) {
     this.setState({ activeTab })
   }
 
-  render () {
+  render() {
     const { activeTab } = this.state
 
-    return (
-      <Tabs
-        {...this.props}
-        active={activeTab}
-        onTabChange={this.onTabChange}
-      />
-    )
+    return <Tabs {...this.props} active={activeTab} onTabChange={this.onTabChange} />
   }
 }
 
 storiesOf('Tabs', module)
-  .addDecorator((story, context) => withInfo({
-    inline: true,
-    header: false,
-    source: true,
-    propTables: [ Tabs ],
-    propTablesExclude: [ Example ],
-  })(story)(context))
-  .add('Default', function () {
-    const tabs = [
-      { title: 'All', name: 'all' },
-      { title: 'Starred', name: 'starred' },
-    ]
+  .addDecorator((story, context) =>
+    withInfo({
+      inline: true,
+      header: false,
+      source: true,
+      propTables: [Tabs],
+      propTablesExclude: [Example],
+    })(story)(context),
+  )
+  .add('Default', function() {
+    const tabs = [{ title: 'All', name: 'all' }, { title: 'Starred', name: 'starred' }]
 
-    return (
-      <Example tabs={tabs} active={tabs[0].name} />
-    )
-  }).add('Default (disabled)', function () {
-
+    return <Example tabs={tabs} active={tabs[0].name} />
+  })
+  .add('Default (disabled)', function() {
     const tabs = [
       { title: 'All', name: 'all' },
       { title: 'Starred', name: 'starred', disabled: true },
     ]
 
-    return (
-      <Example tabs={tabs} active={tabs[0].name} />
-    )
-  }).add('With icons', function () {
+    return <Example tabs={tabs} active={tabs[0].name} />
+  })
+  .add('With icons', function() {
     const tabs = [
       { title: 'People', name: 'people', icon: 'organization' },
       { title: 'Data', name: 'data', icon: 'data' },
     ]
 
-    return (
-      <Example tabs={tabs} active={tabs[0].name} />
-    )
-  }).add('With icons (disabled)', function () {
+    return <Example tabs={tabs} active={tabs[0].name} />
+  })
+  .add('With icons (disabled)', function() {
     const tabs = [
       { title: 'People', name: 'people', icon: 'organization' },
       { title: 'Data', name: 'data', icon: 'data', disabled: true },
     ]
 
-    return (
-      <Example tabs={tabs} active={tabs[0].name} />
-    )
+    return <Example tabs={tabs} active={tabs[0].name} />
   })

@@ -15,16 +15,13 @@
 import * as configuration from '../../actions/configuration'
 import api from '../../../api'
 
-import {
-  selectNsFrequencyPlans,
-  selectGsFrequencyPlans,
-} from '../../selectors/configuration'
+import { selectNsFrequencyPlans, selectGsFrequencyPlans } from '../../selectors/configuration'
 
 import createRequestLogic from './lib'
 
 const getNsFrequencyPlansLogic = createRequestLogic({
   type: configuration.GET_NS_FREQUENCY_PLANS,
-  validate ({ getState, action }, allow, reject) {
+  validate({ getState, action }, allow, reject) {
     const plansNs = selectNsFrequencyPlans(getState())
     if (plansNs && plansNs.length) {
       reject()
@@ -32,7 +29,7 @@ const getNsFrequencyPlansLogic = createRequestLogic({
       allow(action)
     }
   },
-  async process () {
+  async process() {
     const frequencyPlans = (await api.configuration.listNsFrequencyPlans()).frequency_plans
 
     return frequencyPlans
@@ -41,7 +38,7 @@ const getNsFrequencyPlansLogic = createRequestLogic({
 
 const getGsFrequencyPlansLogic = createRequestLogic({
   type: configuration.GET_GS_FREQUENCY_PLANS,
-  validate ({ getState, action }, allow, reject) {
+  validate({ getState, action }, allow, reject) {
     const plansGs = selectGsFrequencyPlans(getState())
     if (plansGs && plansGs.length) {
       reject()
@@ -49,14 +46,11 @@ const getGsFrequencyPlansLogic = createRequestLogic({
       allow(action)
     }
   },
-  async process () {
+  async process() {
     const frequencyPlans = (await api.configuration.listGsFrequencyPlans()).frequency_plans
 
     return frequencyPlans
   },
 })
 
-export default [
-  getNsFrequencyPlansLogic,
-  getGsFrequencyPlansLogic,
-]
+export default [getNsFrequencyPlansLogic, getGsFrequencyPlansLogic]

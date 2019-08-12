@@ -23,17 +23,11 @@ import sharedMessages from '../../../lib/shared-messages'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 
-@withBreadcrumb('gateways', function (props) {
-  return (
-    <Breadcrumb
-      path="/gateways"
-      content={sharedMessages.gateways}
-    />
-  )
+@withBreadcrumb('gateways', function(props) {
+  return <Breadcrumb path="/gateways" content={sharedMessages.gateways} />
 })
 export default class Gateways extends React.Component {
-
-  render () {
+  render() {
     const { path } = this.props.match
 
     return (

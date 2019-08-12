@@ -24,19 +24,21 @@ import sharedMessages from '../../../lib/shared-messages'
 import HeaderComponent from '../../../components/header'
 
 @withRouter
-@connect(state => ({
-  user: state.user.user,
-}), dispatch => ({
-  handleLogout: () => dispatch(logout()),
-}))
+@connect(
+  state => ({
+    user: state.user.user,
+  }),
+  dispatch => ({
+    handleLogout: () => dispatch(logout()),
+  }),
+)
 @bind
 class Header extends Component {
-
   static propTypes = {
     /**
-    * The User object, retrieved from the API. If it is `undefined`, then the
-    * guest header is rendered
-    */
+     * The User object, retrieved from the API. If it is `undefined`, then the
+     * guest header is rendered
+     */
     user: PropTypes.object,
     /** Flag identifying whether links should be rendered as plain anchor link */
     anchored: PropTypes.bool,
@@ -48,14 +50,8 @@ class Header extends Component {
     searchable: PropTypes.bool,
   }
 
-  render () {
-    const {
-      user,
-      anchored,
-      handleSearchRequest,
-      handleLogout,
-      searchable,
-    } = this.props
+  render() {
+    const { user, anchored, handleSearchRequest, handleLogout, searchable } = this.props
 
     const navigationEntries = [
       {

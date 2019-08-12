@@ -32,7 +32,7 @@ import api from '../../api'
 import style from './device-add.styl'
 
 @withEnv
-@withBreadcrumb('devices.add', function (props) {
+@withBreadcrumb('devices.add', function(props) {
   const { appId } = props.match.params
   return (
     <Breadcrumb
@@ -42,23 +42,25 @@ import style from './device-add.styl'
     />
   )
 })
-@connect(function (state) {
-  return {
-    device: state.device.device,
-    appId: selectSelectedApplicationId(state),
-  }
-}, dispatch => ({
-  redirectToList: (appId, deviceId) => dispatch(push(`/applications/${appId}/devices/${deviceId}`)),
-}),
+@connect(
+  function(state) {
+    return {
+      device: state.device.device,
+      appId: selectSelectedApplicationId(state),
+    }
+  },
+  dispatch => ({
+    redirectToList: (appId, deviceId) =>
+      dispatch(push(`/applications/${appId}/devices/${deviceId}`)),
+  }),
 )
 @bind
 export default class DeviceAdd extends Component {
-
   state = {
     error: '',
   }
 
-  async handleSubmit (values) {
+  async handleSubmit(values) {
     const { appId } = this.props
     const device = { ...values }
 
@@ -80,27 +82,23 @@ export default class DeviceAdd extends Component {
     })
   }
 
-  handleSubmitSuccess (device) {
+  handleSubmitSuccess(device) {
     const { appId, redirectToList } = this.props
     const deviceId = getDeviceId(device)
 
     redirectToList(appId, deviceId)
   }
 
-  render () {
+  render() {
     const { error } = this.state
-    const { env: { config }} = this.props
+    const {
+      env: { config },
+    } = this.props
 
     const initialValues = {
-      network_server_address: config.ns.enabled
-        ? new URL(config.ns.base_url).hostname
-        : '',
-      application_server_address: config.as.enabled
-        ? new URL(config.as.base_url).hostname
-        : '',
-      join_server_address: config.js.enabled
-        ? new URL(config.js.base_url).hostname
-        : '',
+      network_server_address: config.ns.enabled ? new URL(config.ns.base_url).hostname : '',
+      application_server_address: config.as.enabled ? new URL(config.as.base_url).hostname : '',
+      join_server_address: config.js.enabled ? new URL(config.js.base_url).hostname : '',
     }
 
     return (

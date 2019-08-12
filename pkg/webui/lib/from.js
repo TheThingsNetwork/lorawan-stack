@@ -46,7 +46,7 @@
  * @param {Array} only - Filter the keys by name.
  * @returns {Array} - An array of values from a for which the key in b had a trueish value.
  */
-export default function (a = {}, b = {}, only) {
+export default function(a = {}, b = {}, only) {
   const res = []
   for (const key in b) {
     if (!b[key] || !(key in a) || (only && !only.includes(key))) {

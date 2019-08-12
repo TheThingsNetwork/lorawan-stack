@@ -23,18 +23,12 @@ import sharedMessages from '../../../lib/shared-messages'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 
-@withBreadcrumb('devices', function (props) {
+@withBreadcrumb('devices', function(props) {
   const { appId } = props.match.params
-  return (
-    <Breadcrumb
-      path={`/applications/${appId}/devices`}
-      content={sharedMessages.devices}
-    />
-  )
+  return <Breadcrumb path={`/applications/${appId}/devices`} content={sharedMessages.devices} />
 })
 export default class Devices extends React.Component {
-
-  render () {
+  render() {
     const { path } = this.props.match
     return (
       <Switch>

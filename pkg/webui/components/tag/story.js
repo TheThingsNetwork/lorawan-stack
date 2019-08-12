@@ -19,11 +19,11 @@ import { withInfo } from '@storybook/addon-info'
 import Tab from '.'
 
 storiesOf('Tag', module)
-  .addDecorator((story, context) => withInfo({
-    inline: true,
-    header: false,
-    propTables: [ Tab ],
-  })(story)(context))
-  .add('Default', () => (
-    <Tab content="Info" />
-  ))
+  .addDecorator((story, context) =>
+    withInfo({
+      inline: true,
+      header: false,
+      propTables: [Tab],
+    })(story)(context),
+  )
+  .add('Default', () => <Tab content="Info" />)

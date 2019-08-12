@@ -31,10 +31,7 @@ import {
   createEventsErrorSelector,
   createEventsStatusSelector,
 } from './events'
-import {
-  createRightsSelector,
-  createUniversalRightsSelector,
-} from './rights'
+import { createRightsSelector, createUniversalRightsSelector } from './rights'
 import {
   createUserCollaboratorSelector,
   createOrganizationCollaboratorSelector,
@@ -51,8 +48,10 @@ const ENTITY_SINGLE = 'application'
 export const selectApplicationStore = state => state.applications
 export const selectApplicationEntitiesStore = state => selectApplicationStore(state).entities
 export const selectApplicationById = (state, id) => selectApplicationEntitiesStore(state)[id]
-export const selectSelectedApplicationId = state => selectApplicationStore(state).selectedApplication
-export const selectSelectedApplication = state => selectApplicationById(state, selectSelectedApplicationId(state))
+export const selectSelectedApplicationId = state =>
+  selectApplicationStore(state).selectedApplication
+export const selectSelectedApplication = state =>
+  selectApplicationById(state, selectSelectedApplicationId(state))
 export const selectApplicationFetching = createFetchingSelector(GET_APP_BASE)
 export const selectApplicationError = createErrorSelector(GET_APP_BASE)
 
@@ -62,7 +61,8 @@ const selectAppsTotalCount = createPaginationTotalCountSelectorByEntity(ENTITY)
 const selectAppsFetching = createFetchingSelector(GET_APPS_LIST_BASE)
 const selectAppsError = createErrorSelector(GET_APPS_LIST_BASE)
 
-export const selectApplications = state => selectAppsIds(state).map(id => selectApplicationById(state, id))
+export const selectApplications = state =>
+  selectAppsIds(state).map(id => selectApplicationById(state, id))
 export const selectApplicationsTotalCount = state => selectAppsTotalCount(state)
 export const selectApplicationsFetching = state => selectAppsFetching(state)
 export const selectApplicationsError = state => selectAppsError(state)
@@ -92,12 +92,12 @@ export const selectApplicationLink = state => selectLinkStore(state).link
 export const selectApplicationLinkStats = state => selectLinkStore(state).stats
 export const selectApplicationLinkFetching = createFetchingSelector(GET_APP_LINK_BASE)
 export const selectApplicationLinkError = createErrorSelector(GET_APP_LINK_BASE)
-export const selectApplicationLinkFormatters = function (state) {
+export const selectApplicationLinkFormatters = function(state) {
   const link = selectApplicationLink(state) || {}
 
   return link.default_formatters
 }
-export const selectApplicationIsLinked = function (state) {
+export const selectApplicationIsLinked = function(state) {
   const linkStore = selectLinkStore(state)
   const link = selectApplicationLink(state) || {}
   const error = selectApplicationLinkError(state)
@@ -113,6 +113,10 @@ export const selectApplicationIsLinked = function (state) {
 
 // Collaborators
 export const selectApplicationUserCollaborator = createUserCollaboratorSelector(ENTITY_SINGLE)
-export const selectApplicationOrganizationCollaborator = createOrganizationCollaboratorSelector(ENTITY_SINGLE)
-export const selectApplicationCollaboratorFetching = createFetchingSelector(GET_APP_COLLABORATOR_BASE)
+export const selectApplicationOrganizationCollaborator = createOrganizationCollaboratorSelector(
+  ENTITY_SINGLE,
+)
+export const selectApplicationCollaboratorFetching = createFetchingSelector(
+  GET_APP_COLLABORATOR_BASE,
+)
 export const selectApplicationCollaboratorError = createErrorSelector(GET_APP_COLLABORATOR_BASE)

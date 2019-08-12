@@ -14,26 +14,29 @@
 
 const selectCollaboratorsStore = (state, entity) => state.collaborators[entity]
 
-export const createCollaboratorSelector = entity => function (state) {
-  const store = selectCollaboratorsStore(state, entity)
+export const createCollaboratorSelector = entity =>
+  function(state) {
+    const store = selectCollaboratorsStore(state, entity)
 
-  return store.collaborator
-}
-
-export const createUserCollaboratorSelector = entity => function (state) {
-  const store = selectCollaboratorsStore(state, entity)
-  const collaborator = store.collaborator
-
-  if (Boolean(collaborator) && collaborator.isUser) {
-    return collaborator
+    return store.collaborator
   }
-}
 
-export const createOrganizationCollaboratorSelector = entity => function (state) {
-  const store = selectCollaboratorsStore(state, entity)
-  const collaborator = store.collaborator
+export const createUserCollaboratorSelector = entity =>
+  function(state) {
+    const store = selectCollaboratorsStore(state, entity)
+    const collaborator = store.collaborator
 
-  if (Boolean(collaborator) && !collaborator.isUser) {
-    return collaborator
+    if (Boolean(collaborator) && collaborator.isUser) {
+      return collaborator
+    }
   }
-}
+
+export const createOrganizationCollaboratorSelector = entity =>
+  function(state) {
+    const store = selectCollaboratorsStore(state, entity)
+    const collaborator = store.collaborator
+
+    if (Boolean(collaborator) && !collaborator.isUser) {
+      return collaborator
+    }
+  }

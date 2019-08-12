@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 import React from 'react'
 import { storiesOf } from '@storybook/react'
 import { withInfo } from '@storybook/addon-info'
@@ -20,54 +19,25 @@ import { withInfo } from '@storybook/addon-info'
 import Pagination from '.'
 
 storiesOf('Pagination', module)
-  .addDecorator((story, context) => withInfo({
-    inline: true,
-    header: false,
-    propTables: [ Pagination ],
-  })(story)(context))
-  .add('Default', () =>
-    (
-      <div>
-        <Pagination
-          pageCount={1}
-        />
-        <Pagination
-          pageCount={3}
-          initialPage={2}
-          marginPagesDisplayed={2}
-        />
-        <Pagination
-          pageCount={3}
-          initialPage={3}
-          marginPagesDisplayed={2}
-        />
-      </div>
-    )
-  ).add('All pages (without gaps)', () =>
-    (
-      <Pagination
-        pageCount={10}
-        pageRangeDisplayed={10}
-      />
-    )
-  ).add('With gaps', () =>
-    (
-      <div>
-        <Pagination
-          pageCount={20}
-          marginPagesDisplayed={2}
-        />
-        <Pagination
-          pageCount={9}
-          initialPage={4}
-          pageRangeDisplayed={1}
-          marginPagesDisplayed={2}
-        />
-        <Pagination
-          pageCount={9}
-          initialPage={4}
-          pageRangeDisplayed={3}
-          marginPagesDisplayed={2}
-        />
-      </div>
-    ))
+  .addDecorator((story, context) =>
+    withInfo({
+      inline: true,
+      header: false,
+      propTables: [Pagination],
+    })(story)(context),
+  )
+  .add('Default', () => (
+    <div>
+      <Pagination pageCount={1} />
+      <Pagination pageCount={3} initialPage={2} marginPagesDisplayed={2} />
+      <Pagination pageCount={3} initialPage={3} marginPagesDisplayed={2} />
+    </div>
+  ))
+  .add('All pages (without gaps)', () => <Pagination pageCount={10} pageRangeDisplayed={10} />)
+  .add('With gaps', () => (
+    <div>
+      <Pagination pageCount={20} marginPagesDisplayed={2} />
+      <Pagination pageCount={9} initialPage={4} pageRangeDisplayed={1} marginPagesDisplayed={2} />
+      <Pagination pageCount={9} initialPage={4} pageRangeDisplayed={3} marginPagesDisplayed={2} />
+    </div>
+  ))

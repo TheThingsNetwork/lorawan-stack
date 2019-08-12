@@ -23,7 +23,7 @@ import { url as urlPattern } from '../../lib/regexp'
 
 import style from './link.styl'
 
-const formatTitle = function (content, values, formatter) {
+const formatTitle = function(content, values, formatter) {
   if (typeof content === 'object' && content.id && content.defaultMessage) {
     return formatter(content, values)
   }
@@ -31,7 +31,7 @@ const formatTitle = function (content, values, formatter) {
   return content
 }
 
-const Link = function (props) {
+const Link = function(props) {
   const {
     className,
     title,
@@ -49,9 +49,9 @@ const Link = function (props) {
 
   return (
     <RouterLink
-      className={className ? className : classnames(style.link,
-        { [style.linkVisited]: showVisited }
-      )}
+      className={
+        className ? className : classnames(style.link, { [style.linkVisited]: showVisited })
+      }
       id={id}
       title={formattedTitle}
       replace={replace}
@@ -66,12 +66,15 @@ const Link = function (props) {
 Link.propTypes = {
   title: PropTypes.message,
   id: PropTypes.string,
-  to: PropTypes.oneOfType([ PropTypes.string, PropTypes.shape({
-    pathname: PropTypes.string,
-    search: PropTypes.string,
-    hash: PropTypes.string,
-    state: PropTypes.object,
-  }) ]).isRequired,
+  to: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.shape({
+      pathname: PropTypes.string,
+      search: PropTypes.string,
+      hash: PropTypes.string,
+      state: PropTypes.object,
+    }),
+  ]).isRequired,
   replace: PropTypes.bool,
   target: PropTypes.string,
   showVisited: PropTypes.bool,
@@ -82,7 +85,7 @@ Link.defaultProps = {
   showVisited: false,
 }
 
-const AnchorLink = function (props) {
+const AnchorLink = function(props) {
   const {
     className,
     name,
@@ -100,9 +103,9 @@ const AnchorLink = function (props) {
 
   return (
     <a
-      className={className ? className : classnames(style.link,
-        { [style.linkVisited]: showVisited }
-      )}
+      className={
+        className ? className : classnames(style.link, { [style.linkVisited]: showVisited })
+      }
       title={formattedTitle}
       id={id}
       href={href}
@@ -129,7 +132,7 @@ AnchorLink.defaultProps = {
 
 Link.Anchor = injectIntl(AnchorLink)
 
-const BaseAnchorLink = function ({ env, href, ...rest }) {
+const BaseAnchorLink = function({ env, href, ...rest }) {
   const { appRoot } = env
 
   // Prevent prefixing proper URLs

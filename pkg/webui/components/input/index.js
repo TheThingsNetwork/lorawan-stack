@@ -31,10 +31,7 @@ import style from './input.styl'
 class Input extends React.Component {
   static propTypes = {
     icon: PropTypes.string,
-    value: PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.number,
-    ]),
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     onFocus: PropTypes.func,
     onBlur: PropTypes.func,
     onChange: PropTypes.func,
@@ -69,7 +66,7 @@ class Input extends React.Component {
 
   input = React.createRef()
 
-  focus () {
+  focus() {
     if (this.input.current) {
       this.input.current.focus()
     }
@@ -77,7 +74,7 @@ class Input extends React.Component {
     this.setState({ focus: true })
   }
 
-  blur () {
+  blur() {
     if (this.input.current) {
       this.input.current.blur()
     }
@@ -85,7 +82,7 @@ class Input extends React.Component {
     this.setState({ focus: false })
   }
 
-  render () {
+  render() {
     const {
       icon,
       value = '',
@@ -112,9 +109,7 @@ class Input extends React.Component {
       ...rest
     } = this.props
 
-    const {
-      focus,
-    } = this.state
+    const { focus } = this.state
 
     let Component = component
     if (type === 'byte') {
@@ -166,8 +161,8 @@ class Input extends React.Component {
             title={inputTitle}
             {...rest}
           />
-          { v && <Valid show={v} /> }
-          { loading && <Spinner className={style.spinner} small /> }
+          {v && <Valid show={v} />}
+          {loading && <Spinner className={style.spinner} small />}
         </div>
         {hasAction && (
           <div className={style.actions}>
@@ -178,35 +173,35 @@ class Input extends React.Component {
     )
   }
 
-  onFocus (evt) {
+  onFocus(evt) {
     const { onFocus } = this.props
 
     this.setState({ focus: true })
     onFocus(evt)
   }
 
-  onBlur (evt) {
+  onBlur(evt) {
     const { onBlur } = this.props
 
     this.setState({ focus: false })
     onBlur(evt)
   }
 
-  onChange (evt) {
+  onChange(evt) {
     const { onChange } = this.props
     const { value } = evt.target
 
     onChange(value)
   }
 
-  onKeyDown (evt) {
+  onKeyDown(evt) {
     if (evt.key === 'Enter') {
       this.props.onEnter(evt.target.value)
     }
   }
 }
 
-const Valid = function (props) {
+const Valid = function(props) {
   const classname = classnames(style.valid, {
     [style.show]: props.show,
   })

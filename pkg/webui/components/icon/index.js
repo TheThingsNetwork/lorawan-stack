@@ -46,7 +46,7 @@ const hardcoded = {
   downlink: 'arrow_drop_down',
 }
 
-const Icon = function ({
+const Icon = function({
   icon = '',
   className,
   nudgeUp = false,
@@ -55,7 +55,6 @@ const Icon = function ({
   large = false,
   ...rest
 }) {
-
   const classname = classnames(style.icon, className, {
     [style.nudgeUp]: nudgeUp,
     [style.nudgeDown]: nudgeDown,
@@ -64,10 +63,7 @@ const Icon = function ({
   })
 
   return (
-    <span
-      className={classname}
-      {...rest}
-    >
+    <span className={classname} {...rest}>
       {hardcoded[icon] || icon}
     </span>
   )

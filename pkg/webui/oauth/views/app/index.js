@@ -41,8 +41,7 @@ const store = createStore(history)
 const GenericNotFound = () => <FullViewError error={{ statusCode: 404 }} />
 @withEnv
 export default class OAuthApp extends React.PureComponent {
-  render () {
-
+  render() {
     const { pageData } = env
 
     if (pageData && pageData.error) {

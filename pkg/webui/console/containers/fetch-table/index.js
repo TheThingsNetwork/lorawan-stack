@@ -30,11 +30,10 @@ import style from './fetch-table.styl'
 
 const DEFAULT_PAGE = 1
 const DEFAULT_TAB = 'all'
-const ALLOWED_TABS = [ 'all' ]
-const ALLOWED_ORDERS = [ 'asc', 'desc', undefined ]
+const ALLOWED_TABS = ['all']
+const ALLOWED_ORDERS = ['asc', 'desc', undefined]
 
-const filterValidator = function (filters) {
-
+const filterValidator = function(filters) {
   if (!ALLOWED_TABS.includes(filters.tab)) {
     filters.tab = DEFAULT_TAB
   }
@@ -45,8 +44,8 @@ const filterValidator = function (filters) {
   }
 
   if (
-    Boolean(filters.order) && !Boolean(filters.orderBy)
-      || !Boolean(filters.order) && Boolean(filters.orderBy)
+    (Boolean(filters.order) && !Boolean(filters.orderBy)) ||
+    (!Boolean(filters.order) && Boolean(filters.orderBy))
   ) {
     filters.order = undefined
     filters.orderBy = undefined
@@ -59,7 +58,7 @@ const filterValidator = function (filters) {
   return filters
 }
 
-@connect(function (state, props) {
+@connect(function(state, props) {
   const base = props.baseDataSelector(state, props)
 
   return {
@@ -72,7 +71,7 @@ const filterValidator = function (filters) {
 })
 @bind
 class FetchTable extends Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.state = {
@@ -89,21 +88,16 @@ class FetchTable extends Component {
     this.debounceCancel = cancel
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.fetchItems()
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.debounceCancel()
   }
 
-  fetchItems () {
-    const {
-      dispatch,
-      pageSize,
-      searchItemsAction,
-      getItemsAction,
-    } = this.props
+  fetchItems() {
+    const { dispatch, pageSize, searchItemsAction, getItemsAction } = this.props
 
     const filters = { ...this.state, limit: pageSize }
 
@@ -114,53 +108,62 @@ class FetchTable extends Component {
     }
   }
 
-  async onPageChange (page) {
-    await this.setState(this.props.filterValidator({
-      ...this.state,
-      page,
-    }))
+  async onPageChange(page) {
+    await this.setState(
+      this.props.filterValidator({
+        ...this.state,
+        page,
+      }),
+    )
 
     this.fetchItems()
   }
 
-  async requestSearch () {
-    await this.setState(this.props.filterValidator({
-      ...this.state,
-      page: 1,
-    }))
+  async requestSearch() {
+    await this.setState(
+      this.props.filterValidator({
+        ...this.state,
+        page: 1,
+      }),
+    )
 
     this.fetchItems()
   }
 
-  async onQueryChange (query) {
-
-    await this.setState(this.props.filterValidator({
-      ...this.state,
-      query,
-    }))
+  async onQueryChange(query) {
+    await this.setState(
+      this.props.filterValidator({
+        ...this.state,
+        query,
+      }),
+    )
 
     this.debouncedRequestSearch()
   }
 
-  async onOrderChange (order, orderBy) {
-    await this.setState(this.props.filterValidator({
-      ...this.state,
-      order,
-      orderBy,
-    }))
+  async onOrderChange(order, orderBy) {
+    await this.setState(
+      this.props.filterValidator({
+        ...this.state,
+        order,
+        orderBy,
+      }),
+    )
 
     this.fetchItems()
   }
 
-  async onTabChange (tab) {
-    await this.setState(this.props.filterValidator({
-      ...this.state,
-      tab,
-    }))
+  async onTabChange(tab) {
+    await this.setState(
+      this.props.filterValidator({
+        ...this.state,
+        tab,
+      }),
+    )
     this.fetchItems()
   }
 
-  onItemClick (index) {
+  onItemClick(index) {
     const {
       dispatch,
       pathname,
@@ -191,7 +194,7 @@ class FetchTable extends Component {
     dispatch(push(`${pathname}${entityPath}`))
   }
 
-  render () {
+  render() {
     const {
       items,
       totalCount,
@@ -217,20 +220,22 @@ class FetchTable extends Component {
       <div>
         <div className={buttonClassNames}>
           <div className={style.filtersLeft}>
-            { tabs
-              && (
-                <Tabs
-                  active={tab}
-                  className={style.tabs}
-                  tabs={tabs}
-                  onTabChange={this.onTabChange}
-                />
-              )
-            }
-            { tableTitle && <div className={style.tableTitle}>{tableTitle} ({totalCount})</div> }
+            {tabs && (
+              <Tabs
+                active={tab}
+                className={style.tabs}
+                tabs={tabs}
+                onTabChange={this.onTabChange}
+              />
+            )}
+            {tableTitle && (
+              <div className={style.tableTitle}>
+                {tableTitle} ({totalCount})
+              </div>
+            )}
           </div>
           <div className={style.filtersRight}>
-            { searchable && (
+            {searchable && (
               <Input
                 value={query}
                 icon="search"
@@ -263,7 +268,6 @@ class FetchTable extends Component {
     )
   }
 }
-
 
 FetchTable.defaultProps = {
   pageSize: 20,

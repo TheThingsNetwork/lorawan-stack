@@ -16,14 +16,8 @@ export const INITIALIZE = 'INITIALIZE_REQUEST'
 export const INITIALIZE_SUCCESS = 'INITIALIZE_SUCCESS'
 export const INITIALIZE_FAILURE = 'INITIALIZE_FAILURE'
 
-export const initialize = () => (
-  { type: INITIALIZE }
-)
+export const initialize = () => ({ type: INITIALIZE })
 
-export const initializeSuccess = () => (
-  { type: INITIALIZE_SUCCESS }
-)
+export const initializeSuccess = () => ({ type: INITIALIZE_SUCCESS })
 
-export const initializeFailure = error => (
-  { type: INITIALIZE_FAILURE, error }
-)
+export const initializeFailure = error => ({ type: INITIALIZE_FAILURE, error })

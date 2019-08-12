@@ -30,23 +30,14 @@ import { selectSelectedApplication } from '../../store/selectors/applications'
 
 import style from './application-overview.styl'
 
-
-@connect(function (state) {
+@connect(function(state) {
   return {
     application: selectSelectedApplication(state),
   }
 })
-
 class ApplicationOverview extends React.Component {
-
-  get applicationInfo () {
-    const {
-      ids,
-      name,
-      description,
-      created_at,
-      updated_at,
-    } = this.props.application
+  get applicationInfo() {
+    const { ids, name, description, created_at, updated_at } = this.props.application
 
     const sheetData = [
       {
@@ -63,14 +54,14 @@ class ApplicationOverview extends React.Component {
       <div>
         <div className={style.title}>
           <h2>{name || ids.application_id}</h2>
-          { description && <span className={style.description}>{description}</span> }
+          {description && <span className={style.description}>{description}</span>}
         </div>
         <DataSheet data={sheetData} />
       </div>
     )
   }
 
-  render () {
+  render() {
     const { application } = this.props
     const appId = getApplicationId(application)
 
@@ -83,10 +74,7 @@ class ApplicationOverview extends React.Component {
           </Col>
           <Col sm={12} lg={6}>
             <div className={style.latestEvents}>
-              <ApplicationEvents
-                appId={appId}
-                widget
-              />
+              <ApplicationEvents appId={appId} widget />
             </div>
           </Col>
         </Row>

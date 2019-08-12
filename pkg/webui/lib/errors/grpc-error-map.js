@@ -36,7 +36,7 @@ const errorMap = {
   '16': '401',
 }
 
-export default function getHttpErrorFromRpcError (rpcError) {
+export default function getHttpErrorFromRpcError(rpcError) {
   if (typeof rpcError !== 'string' && typeof rpcError !== 'number') {
     return undefined
   }

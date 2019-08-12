@@ -30,15 +30,14 @@ import Spinner from '../../components/spinner'
 const withRequest = (
   mapPropsToRequest,
   mapPropsToFetching = ({ fetching } = {}) => fetching,
-  mapPropsToError = ({ error } = {}) => error
+  mapPropsToError = ({ error } = {}) => error,
 ) => Component =>
   class WithRequest extends React.Component {
-
-    componentDidMount () {
+    componentDidMount() {
       mapPropsToRequest(this.props)
     }
 
-    componentDidUpdate (prevProps) {
+    componentDidUpdate(prevProps) {
       const error = mapPropsToError(this.props)
       const prevError = mapPropsToError(prevProps)
 
@@ -48,7 +47,7 @@ const withRequest = (
       }
     }
 
-    render () {
+    render() {
       if (mapPropsToFetching(this.props)) {
         return <Spinner center />
       }

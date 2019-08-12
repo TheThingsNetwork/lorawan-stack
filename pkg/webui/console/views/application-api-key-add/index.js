@@ -37,22 +37,24 @@ import {
 
 import api from '../../api'
 
-@connect(state => ({
-  appId: selectSelectedApplicationId(state),
-  fetching: selectApplicationRightsFetching(state),
-  error: selectApplicationRightsError(state),
-  rights: selectApplicationRights(state),
-  universalRights: selectApplicationUniversalRights(state),
-}),
-dispatch => ({
-  getApplicationsRightsList: appId => dispatch(getApplicationsRightsList(appId)),
-  navigateToList: appId => dispatch(replace(`/applications/${appId}/api-keys`)),
-}))
+@connect(
+  state => ({
+    appId: selectSelectedApplicationId(state),
+    fetching: selectApplicationRightsFetching(state),
+    error: selectApplicationRightsError(state),
+    rights: selectApplicationRights(state),
+    universalRights: selectApplicationUniversalRights(state),
+  }),
+  dispatch => ({
+    getApplicationsRightsList: appId => dispatch(getApplicationsRightsList(appId)),
+    navigateToList: appId => dispatch(replace(`/applications/${appId}/api-keys`)),
+  }),
+)
 @withRequest(
   ({ appId, getApplicationsRightsList }) => getApplicationsRightsList(appId),
-  ({ fetching, rights }) => fetching || !Boolean(rights.length)
+  ({ fetching, rights }) => fetching || !Boolean(rights.length),
 )
-@withBreadcrumb('apps.single.api-keys.add', function (props) {
+@withBreadcrumb('apps.single.api-keys.add', function(props) {
   const appId = props.appId
   return (
     <Breadcrumb
@@ -64,20 +66,19 @@ dispatch => ({
 })
 @bind
 export default class ApplicationApiKeyAdd extends React.Component {
-
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.createApplicationKey = key => api.application.apiKeys.create(props.appId, key)
   }
 
-  handleApprove () {
+  handleApprove() {
     const { navigateToList, appId } = this.props
 
     navigateToList(appId)
   }
 
-  render () {
+  render() {
     const { rights, universalRights } = this.props
 
     return (

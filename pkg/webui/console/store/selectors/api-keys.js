@@ -14,28 +14,29 @@
 
 const selectApiKeysStore = (state, props) => state[props.id] || {}
 
-export const createApiKeysStoreSelector = entity => (state, props) => (
+export const createApiKeysStoreSelector = entity => (state, props) =>
   selectApiKeysStore(state.apiKeys[entity], props) || {}
-)
 
-export const createApiKeysSelector = entity => function (state, props) {
-  const store = selectApiKeysStore(state.apiKeys[entity], props)
+export const createApiKeysSelector = entity =>
+  function(state, props) {
+    const store = selectApiKeysStore(state.apiKeys[entity], props)
 
-  return store.keys ? store.keys : []
-}
+    return store.keys ? store.keys : []
+  }
 
-export const createApiKeySelector = function (entity) {
+export const createApiKeySelector = function(entity) {
   const keysSelector = createApiKeysSelector(entity)
 
-  return function (state, props) {
+  return function(state, props) {
     const keys = keysSelector(state, props)
 
     return keys.find(key => key.id === props.keyId)
   }
 }
 
-export const createTotalCountSelector = entity => function (state, props) {
-  const store = selectApiKeysStore(state.totalCount[entity], props)
+export const createTotalCountSelector = entity =>
+  function(state, props) {
+    const store = selectApiKeysStore(state.totalCount[entity], props)
 
-  return store.totalCount
-}
+    return store.totalCount
+  }

@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 import { createLogic } from 'redux-logic'
 
 import api from '../../api'
@@ -20,7 +19,7 @@ import * as user from '../actions/user'
 
 const userLogic = createLogic({
   type: user.LOGOUT,
-  async process ({ getState, action }, dispatch, done) {
+  async process({ getState, action }, dispatch, done) {
     try {
       await api.oauth.logout()
       dispatch(user.logoutSuccess())
@@ -33,4 +32,3 @@ const userLogic = createLogic({
 })
 
 export default userLogic
-

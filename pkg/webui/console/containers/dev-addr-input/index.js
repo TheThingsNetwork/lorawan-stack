@@ -25,7 +25,7 @@ const m = defineMessages({
   devAddrFetchingFailure: 'Could not generate device address',
 })
 
-const DevAddrField = function (props) {
+const DevAddrField = function(props) {
   const {
     className,
     title,

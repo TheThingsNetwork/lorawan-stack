@@ -25,14 +25,14 @@ import DeviceEvents from '../../containers/device-events'
 
 import { getDeviceId } from '../../../lib/selectors/id'
 
-@connect(function ({ device, application }, props) {
+@connect(function({ device, application }, props) {
   return {
     device: device.device,
     devId: getDeviceId(device.device),
     devIds: device.device && device.device.ids,
   }
 })
-@withBreadcrumb('device.single.data', function (props) {
+@withBreadcrumb('device.single.data', function(props) {
   const { devId } = props
   const { appId } = props.match.params
   return (
@@ -45,19 +45,15 @@ import { getDeviceId } from '../../../lib/selectors/id'
 })
 @bind
 export default class Data extends React.Component {
-  render () {
+  render() {
     const { devIds } = this.props
 
     return (
       <Container>
-        <IntlHelmet
-          title={sharedMessages.data}
-        />
+        <IntlHelmet title={sharedMessages.data} />
         <Row>
           <Col sm={12}>
-            <DeviceEvents
-              devIds={devIds}
-            />
+            <DeviceEvents devIds={devIds} />
           </Col>
         </Row>
       </Container>

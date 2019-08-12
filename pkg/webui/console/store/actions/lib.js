@@ -14,40 +14,40 @@
 
 import { createAction } from 'redux-actions'
 
-export const createRequestActions = function (
-  baseType,
-  requestPayloadCreator,
-  requestMetaCreator,
-) {
+export const createRequestActions = function(baseType, requestPayloadCreator, requestMetaCreator) {
   const requestType = `${baseType}_REQUEST`
   const successType = `${baseType}_SUCCESS`
   const failureType = `${baseType}_FAILURE`
 
-  return [{
-    request: requestType,
-    success: successType,
-    failure: failureType,
-  }, {
-    request: createAction(requestType, requestPayloadCreator, requestMetaCreator),
-    success: createAction(successType),
-    failure: createAction(failureType),
-  }]
+  return [
+    {
+      request: requestType,
+      success: successType,
+      failure: failureType,
+    },
+    {
+      request: createAction(requestType, requestPayloadCreator, requestMetaCreator),
+      success: createAction(successType),
+      failure: createAction(failureType),
+    },
+  ]
 }
 
 /**
-* attachPromise is a function which extends an action creator to include a flag
-* which results in a promise being attached to the action by the promise
-* middleware.
-* @param {Function} actionCreator - The original action creator
-* @returns {Function} - The modified action creator
-*/
-export const attachPromise = actionCreator => function (...args) {
-  const action = actionCreator(...args)
-  return {
-    ...action,
-    meta: {
-      ...action.meta,
-      _attachPromise: true,
-    },
+ * attachPromise is a function which extends an action creator to include a flag
+ * which results in a promise being attached to the action by the promise
+ * middleware.
+ * @param {Function} actionCreator - The original action creator
+ * @returns {Function} - The modified action creator
+ */
+export const attachPromise = actionCreator =>
+  function(...args) {
+    const action = actionCreator(...args)
+    return {
+      ...action,
+      meta: {
+        ...action.meta,
+        _attachPromise: true,
+      },
+    }
   }
-}

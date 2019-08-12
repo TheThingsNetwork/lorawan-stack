@@ -22,14 +22,8 @@ import createToast from './toast'
 import style from './toast.styl'
 
 class ToastContainer extends React.Component {
-  render () {
-    return (
-      <Container
-        toastClassName={style.toast}
-        bodyClassName={style.body}
-        {...this.props}
-      />
-    )
+  render() {
+    return <Container toastClassName={style.toast} bodyClassName={style.body} {...this.props} />
   }
 }
 
@@ -42,8 +36,8 @@ ToastContainer.propTypes = {
     'top-center',
     'bottom-center',
   ]),
-  autoClose: PropTypes.oneOfType([ PropTypes.bool, PropTypes.number ]),
-  closeButton: PropTypes.oneOfType([ PropTypes.bool, PropTypes.element ]),
+  autoClose: PropTypes.oneOfType([PropTypes.bool, PropTypes.number]),
+  closeButton: PropTypes.oneOfType([PropTypes.bool, PropTypes.element]),
   hideProgressBar: PropTypes.bool,
   pauseOnHover: PropTypes.bool,
   closeOnClick: PropTypes.bool,
@@ -65,4 +59,3 @@ ToastContainer.defaultProps = {
 const toast = createToast()
 
 export { toast as default, ToastContainer }
-

@@ -34,17 +34,19 @@ import {
 
 import api from '../../api'
 
-@connect(function (state) {
-  const formatters = selectApplicationLinkFormatters(state) || {}
+@connect(
+  function(state) {
+    const formatters = selectApplicationLinkFormatters(state) || {}
 
-  return {
-    appId: selectSelectedApplicationId(state),
-    linked: selectApplicationIsLinked(state) || false,
-    formatters,
-  }
-},
-{ updateLinkSuccess: updateApplicationLinkSuccess })
-@withBreadcrumb('apps.single.payload-formatters.uplink', function (props) {
+    return {
+      appId: selectSelectedApplicationId(state),
+      linked: selectApplicationIsLinked(state) || false,
+      formatters,
+    }
+  },
+  { updateLinkSuccess: updateApplicationLinkSuccess },
+)
+@withBreadcrumb('apps.single.payload-formatters.uplink', function(props) {
   const { appId } = props
 
   return (
@@ -57,7 +59,6 @@ import api from '../../api'
 })
 @bind
 class ApplicationPayloadFormatters extends React.PureComponent {
-
   static propTypes = {
     appId: PropTypes.string.isRequired,
     formatters: PropTypes.object.isRequired,
@@ -65,7 +66,7 @@ class ApplicationPayloadFormatters extends React.PureComponent {
     linked: PropTypes.bool.isRequired,
   }
 
-  async onSubmit (values) {
+  async onSubmit(values) {
     const { appId, formatters } = this.props
 
     return await api.application.link.set(appId, {
@@ -78,7 +79,7 @@ class ApplicationPayloadFormatters extends React.PureComponent {
     })
   }
 
-  onSubmitSuccess (link) {
+  onSubmitSuccess(link) {
     const { appId, updateLinkSuccess } = this.props
     toast({
       title: appId,
@@ -88,7 +89,7 @@ class ApplicationPayloadFormatters extends React.PureComponent {
     updateLinkSuccess(link)
   }
 
-  render () {
+  render() {
     const { formatters, linked } = this.props
 
     return (

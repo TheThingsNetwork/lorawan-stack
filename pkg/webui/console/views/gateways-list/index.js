@@ -22,7 +22,7 @@ import IntlHelmet from '../../../lib/components/intl-helmet'
 import PAGE_SIZES from '../../constants/page-sizes'
 
 export default class GatewaysList extends React.Component {
-  render () {
+  render() {
     return (
       <Container>
         <Row>

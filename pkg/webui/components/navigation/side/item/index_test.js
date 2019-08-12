@@ -14,17 +14,17 @@
 
 import getSideNavigationItemDriver from './index_driver'
 
-describe('SideNavigationItem', function () {
+describe('SideNavigationItem', function() {
   let driver = null
   let onExpandSpy = null
 
-  beforeEach(function () {
+  beforeEach(function() {
     driver = getSideNavigationItemDriver()
     onExpandSpy = jest.fn()
   })
 
-  describe('is flat', function () {
-    beforeEach(function () {
+  describe('is flat', function() {
+    beforeEach(function() {
       driver.when.created({
         title: 'test-title',
         path: '/test-title',
@@ -38,13 +38,13 @@ describe('SideNavigationItem', function () {
       })
     })
 
-    it('should match snapshot', function () {
+    it('should match snapshot', function() {
       expect(driver.component).toMatchSnapshot()
     })
   })
 
-  describe('is collapsable', function () {
-    beforeEach(function () {
+  describe('is collapsable', function() {
+    beforeEach(function() {
       driver.when.created({
         title: 'test-title',
         depth: 0,
@@ -66,16 +66,16 @@ describe('SideNavigationItem', function () {
       })
     })
 
-    it('should match snapshot', function () {
+    it('should match snapshot', function() {
       expect(driver.component).toMatchSnapshot()
     })
 
-    describe('the user selects the item', function () {
-      beforeEach(function () {
+    describe('the user selects the item', function() {
+      beforeEach(function() {
         driver.when.itemSelected()
       })
 
-      it('should call `onExpand` only once', function () {
+      it('should call `onExpand` only once', function() {
         expect(onExpandSpy.mock.calls).toHaveLength(1)
       })
     })

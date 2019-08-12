@@ -18,7 +18,7 @@ import { createErrorSelector } from './error'
 
 const selectWebhookFormatsStore = state => state.webhookFormats
 
-export const selectWebhookFormats = function (state) {
+export const selectWebhookFormats = function(state) {
   const store = selectWebhookFormatsStore(state)
 
   return store.formats || {}

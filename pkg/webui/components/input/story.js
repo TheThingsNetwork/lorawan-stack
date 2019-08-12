@@ -20,7 +20,7 @@ import Input from '.'
 
 @bind
 class Example extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.state = {
@@ -28,11 +28,11 @@ class Example extends React.Component {
     }
   }
 
-  onChange (value) {
+  onChange(value) {
     this.setState({ value })
   }
 
-  render () {
+  render() {
     const { type, valid, ...props } = this.props
     const { value } = this.state
 
@@ -58,42 +58,18 @@ storiesOf('Input', module)
       <Example label="Username" error />
     </div>
   ))
-  .add('With Placeholder', () => (
-    <Example placeholder="Placeholder..." />
-  ))
-  .add('With icon', () => (
-    <Example icon="search" />
-  ))
-  .add('Valid', () => (
-    <Example valid />
-  ))
-  .add('Disabled', () => (
-    <Example value="1234" disabled />
-  ))
-  .add('Readonly', () => (
-    <Example value="1234" readOnly />
-  ))
-  .add('Password', () => (
-    <Example type="password" />
-  ))
-  .add('Number', () => (
-    <Example type="number" />
-  ))
-  .add('Byte', () => (
-    <Example type="byte" min={1} max={5} />
-  ))
-  .add('Byte read-only', () => (
-    <Example type="byte" min={1} max={5} value="A0BF49A464" readOnly />
-  ))
-  .add('Toggled', () => (
-    <Example type="toggled" enabledMessage="Enabled" />
-  ))
-  .add('Textarea', () => (
-    <Example component="textarea" />
-  ))
-  .add('With Spinner', () => (
-    <Example icon="search" loading />
-  ))
+  .add('With Placeholder', () => <Example placeholder="Placeholder..." />)
+  .add('With icon', () => <Example icon="search" />)
+  .add('Valid', () => <Example valid />)
+  .add('Disabled', () => <Example value="1234" disabled />)
+  .add('Readonly', () => <Example value="1234" readOnly />)
+  .add('Password', () => <Example type="password" />)
+  .add('Number', () => <Example type="number" />)
+  .add('Byte', () => <Example type="byte" min={1} max={5} />)
+  .add('Byte read-only', () => <Example type="byte" min={1} max={5} value="A0BF49A464" readOnly />)
+  .add('Toggled', () => <Example type="toggled" enabledMessage="Enabled" />)
+  .add('Textarea', () => <Example component="textarea" />)
+  .add('With Spinner', () => <Example icon="search" loading />)
   .add('With Action', () => (
     <div>
       <Example action={{ icon: 'build', secondary: true }} />

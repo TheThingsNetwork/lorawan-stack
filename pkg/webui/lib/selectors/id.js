@@ -14,42 +14,44 @@
 
 import getByPath from '../get-by-path'
 
-export const getApplicationId = function (application = {}) {
-  return getByPath(application, 'application_id')
-    || getByPath(application, 'application_ids.application_id')
-    || getByPath(application, 'ids.application_id')
+export const getApplicationId = function(application = {}) {
+  return (
+    getByPath(application, 'application_id') ||
+    getByPath(application, 'application_ids.application_id') ||
+    getByPath(application, 'ids.application_id')
+  )
 }
 
-export const getDeviceId = function (device = {}) {
-  return getByPath(device, 'device_id')
-    || getByPath(device, 'ids.device_id')
-    || getByPath(device, 'device_ids.device_id')
+export const getDeviceId = function(device = {}) {
+  return (
+    getByPath(device, 'device_id') ||
+    getByPath(device, 'ids.device_id') ||
+    getByPath(device, 'device_ids.device_id')
+  )
 }
 
-export const getCollaboratorId = function (collaborator = {}) {
-  return getByPath(collaborator, 'ids.organization_ids.organization_id')
-    || getByPath(collaborator, 'ids.user_ids.user_id')
+export const getCollaboratorId = function(collaborator = {}) {
+  return (
+    getByPath(collaborator, 'ids.organization_ids.organization_id') ||
+    getByPath(collaborator, 'ids.user_ids.user_id')
+  )
 }
 
-export const getGatewayId = function (gateway = {}) {
-  return getByPath(gateway, 'gateway_id')
-    || getByPath(gateway, 'gateway_ids.gateway_id')
-    || getByPath(gateway, 'ids.gateway_id')
+export const getGatewayId = function(gateway = {}) {
+  return (
+    getByPath(gateway, 'gateway_id') ||
+    getByPath(gateway, 'gateway_ids.gateway_id') ||
+    getByPath(gateway, 'ids.gateway_id')
+  )
 }
 
-export const getApiKeyId = function (key = {}) {
+export const getApiKeyId = function(key = {}) {
   return key.id
 }
 
-const idSelectors = [
-  getApplicationId,
-  getCollaboratorId,
-  getApiKeyId,
-  getGatewayId,
-  getDeviceId,
-]
+const idSelectors = [getApplicationId, getCollaboratorId, getApiKeyId, getGatewayId, getDeviceId]
 
-export const getEntityId = function (entity) {
+export const getEntityId = function(entity) {
   let id
   let selectorIndex = 0
   while (!id && selectorIndex < idSelectors.length) {
@@ -60,6 +62,6 @@ export const getEntityId = function (entity) {
   return id
 }
 
-export const getWebhookId = function (webhook = {}) {
+export const getWebhookId = function(webhook = {}) {
   return getByPath(webhook, 'ids.webhook_id')
 }

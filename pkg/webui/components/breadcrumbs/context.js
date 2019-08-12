@@ -19,24 +19,23 @@ const { Provider, Consumer } = React.createContext()
 
 @bind
 class BreadcrumbsProvider extends React.Component {
-
   state = {
     breadcrumbs: [],
   }
 
-  add (id, breadcrumb) {
+  add(id, breadcrumb) {
     this.setState(prev => ({
-      breadcrumbs: [ ...prev.breadcrumbs, { id, breadcrumb }],
+      breadcrumbs: [...prev.breadcrumbs, { id, breadcrumb }],
     }))
   }
 
-  remove (id) {
+  remove(id) {
     this.setState(prev => ({
       breadcrumbs: prev.breadcrumbs.filter(b => b.id !== id),
     }))
   }
 
-  render () {
+  render() {
     const { children } = this.props
     const value = {
       add: this.add,
@@ -44,64 +43,52 @@ class BreadcrumbsProvider extends React.Component {
       breadcrumbs: this.state.breadcrumbs.map(b => b.breadcrumb),
     }
 
-    return (
-      <Provider value={value}>
-        {children}
-      </Provider>
-    )
+    return <Provider value={value}>{children}</Provider>
   }
 }
 
-const withBreadcrumb = (id, element) => function (Component) {
+const withBreadcrumb = (id, element) =>
+  function(Component) {
+    class BreadcrumbsConsumer extends React.Component {
+      constructor(props) {
+        super(props)
 
-  class BreadcrumbsConsumer extends React.Component {
-
-    constructor (props) {
-      super(props)
-
-      this.add()
-    }
-
-    add () {
-      const { add, breadcrumb } = this.props
-
-      add(id, breadcrumb)
-    }
-
-    remove () {
-      const { remove } = this.props
-
-      remove(id)
-    }
-
-    componentWillUnmount () {
-      this.remove()
-    }
-
-    render () {
-      const { add, remove, breadcrumb, ...rest } = this.props
-
-      return <Component {...rest} />
-    }
-  }
-
-  const BreadcrumbsConsumerContainer = props => (
-    <Consumer>
-      {
-        ({ add, remove }) => (
-          <BreadcrumbsConsumer
-            {...props}
-            add={add}
-            remove={remove}
-            breadcrumb={element(props)}
-          />
-        )
+        this.add()
       }
-    </Consumer>
-  )
 
-  return BreadcrumbsConsumerContainer
-}
+      add() {
+        const { add, breadcrumb } = this.props
+
+        add(id, breadcrumb)
+      }
+
+      remove() {
+        const { remove } = this.props
+
+        remove(id)
+      }
+
+      componentWillUnmount() {
+        this.remove()
+      }
+
+      render() {
+        const { add, remove, breadcrumb, ...rest } = this.props
+
+        return <Component {...rest} />
+      }
+    }
+
+    const BreadcrumbsConsumerContainer = props => (
+      <Consumer>
+        {({ add, remove }) => (
+          <BreadcrumbsConsumer {...props} add={add} remove={remove} breadcrumb={element(props)} />
+        )}
+      </Consumer>
+    )
+
+    return BreadcrumbsConsumerContainer
+  }
 
 withBreadcrumb.displayName = 'withBreadcrumb'
 

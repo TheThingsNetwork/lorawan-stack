@@ -24,12 +24,8 @@ class ApiKeyForm extends React.Component {
     error: '',
   }
 
-  async handleSubmit (values, { resetForm }) {
-    const {
-      onSubmit,
-      onSubmitSuccess,
-      onSubmitFailure,
-    } = this.props
+  async handleSubmit(values, { resetForm }) {
+    const { onSubmit, onSubmitSuccess, onSubmitFailure } = this.props
 
     await this.setState({ error: '' })
 
@@ -46,13 +42,8 @@ class ApiKeyForm extends React.Component {
     }
   }
 
-  render () {
-    const {
-      children,
-      formError,
-      initialValues,
-      validationSchema,
-    } = this.props
+  render() {
+    const { children, formError, initialValues, validationSchema } = this.props
     const { error } = this.state
 
     const displayError = error || formError || ''

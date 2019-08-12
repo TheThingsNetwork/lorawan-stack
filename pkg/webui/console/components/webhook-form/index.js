@@ -37,7 +37,8 @@ const pathPlaceholder = '/path/to/webhook'
 const m = defineMessages({
   idPlaceholder: 'my-new-webhook',
   messageTypes: 'Message types',
-  messageInfo: 'For each enabled message type, you can set an optional path that will be appended to the base URL.',
+  messageInfo:
+    'For each enabled message type, you can set an optional path that will be appended to the base URL.',
   uplinkMessage: 'Uplink Message',
   joinAccept: 'Join Accept',
   downlinkAck: 'Downlink Ack',
@@ -57,14 +58,9 @@ const m = defineMessages({
 })
 
 const headerCheck = headers =>
-  headers === undefined
-  || headers instanceof Array
-  && (headers.length === 0
-    || headers.every(header =>
-      header.key !== ''
-      && header.value !== ''
-    )
-  )
+  headers === undefined ||
+  (headers instanceof Array &&
+    (headers.length === 0 || headers.every(header => header.key !== '' && header.value !== '')))
 
 const validationSchema = Yup.object().shape({
   webhook_id: Yup.string()
@@ -81,7 +77,7 @@ const validationSchema = Yup.object().shape({
 
 @bind
 export default class WebhookForm extends Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.form = React.createRef()
@@ -91,7 +87,7 @@ export default class WebhookForm extends Component {
     error: '',
   }
 
-  async handleSubmit (values, { setSubmitting, resetForm }) {
+  async handleSubmit(values, { setSubmitting, resetForm }) {
     const { appId, onSubmit, onSubmitSuccess, onSubmitFailure } = this.props
     const webhook = mapFormValuesToWebhook(values, appId)
 
@@ -110,7 +106,7 @@ export default class WebhookForm extends Component {
     }
   }
 
-  async handleDelete () {
+  async handleDelete() {
     const { onDelete, onDeleteSuccess, onDeleteFailure } = this.props
     try {
       await onDelete()
@@ -122,7 +118,7 @@ export default class WebhookForm extends Component {
     }
   }
 
-  render () {
+  render() {
     const { update, initialWebhookValue } = this.props
     const { error } = this.state
     let initialValues = blankValues
@@ -138,10 +134,7 @@ export default class WebhookForm extends Component {
         error={error}
         formikRef={this.form}
       >
-        <Message
-          component="h4"
-          content={sharedMessages.generalInformation}
-        />
+        <Message component="h4" content={sharedMessages.generalInformation} />
         <Form.Field
           name="webhook_id"
           title={sharedMessages.webhookId}
@@ -151,11 +144,7 @@ export default class WebhookForm extends Component {
           autoFocus
           disabled={update}
         />
-        <WebhookFormatSelector
-          horizontal
-          name="format"
-          required
-        />
+        <WebhookFormatSelector horizontal name="format" required />
         <Form.Field
           name="headers"
           title={m.headers}
@@ -171,14 +160,8 @@ export default class WebhookForm extends Component {
           component={Input}
           required
         />
-        <Message
-          component="h4"
-          content={m.messageTypes}
-        />
-        <Notification
-          info={m.messageInfo}
-          small
-        />
+        <Message component="h4" content={m.messageTypes} />
+        <Notification info={m.messageInfo} small />
         <Form.Field
           name="uplink_message"
           type="toggled-input"
@@ -238,12 +221,9 @@ export default class WebhookForm extends Component {
         <SubmitBar>
           <Form.Submit
             component={SubmitButton}
-            message={update
-              ? sharedMessages.saveChanges
-              : sharedMessages.addWebhook
-            }
+            message={update ? sharedMessages.saveChanges : sharedMessages.addWebhook}
           />
-          { update && (
+          {update && (
             <ModalButton
               type="button"
               icon="delete"

@@ -20,7 +20,7 @@ import createRequestLogic from './lib'
 export default [
   createRequestLogic({
     type: user.LOGOUT,
-    async process () {
+    async process() {
       await api.console.logout()
       accessToken.clear()
       return true

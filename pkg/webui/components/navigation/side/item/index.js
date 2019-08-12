@@ -26,16 +26,15 @@ import style from './item.styl'
 
 @bind
 class SideNavigationItem extends React.PureComponent {
-
-  onExpandCollapsableItem () {
+  onExpandCollapsableItem() {
     this.props.onExpand(false)
   }
 
-  onExpandLinkItem () {
+  onExpandLinkItem() {
     this.props.onExpand(true)
   }
 
-  render () {
+  render() {
     const {
       className,
       title,
@@ -57,31 +56,28 @@ class SideNavigationItem extends React.PureComponent {
           [style.itemMinimized]: isMinimized,
         })}
       >
-        {
-          isCollapsable
-            ? (
-              <CollapsableItem
-                title={title}
-                icon={icon}
-                onExpand={onExpand}
-                onClick={this.onExpandCollapsableItem}
-                depth={depth}
-                items={items}
-                isActive={isActive}
-                isExpanded={isExpanded}
-                isMinimized={isMinimized}
-              />
-            ) : (
-              <LinkItem
-                title={title}
-                icon={icon}
-                exact={exact}
-                path={path}
-                depth={depth}
-                onExpand={this.onExpandLinkItem}
-              />
-            )
-        }
+        {isCollapsable ? (
+          <CollapsableItem
+            title={title}
+            icon={icon}
+            onExpand={onExpand}
+            onClick={this.onExpandCollapsableItem}
+            depth={depth}
+            items={items}
+            isActive={isActive}
+            isExpanded={isExpanded}
+            isMinimized={isMinimized}
+          />
+        ) : (
+          <LinkItem
+            title={title}
+            icon={icon}
+            exact={exact}
+            path={path}
+            depth={depth}
+            onExpand={this.onExpandLinkItem}
+          />
+        )}
       </li>
     )
   }
@@ -126,13 +122,7 @@ const CollapsableItem = ({
   </Fragment>
 )
 
-const LinkItem = ({
-  title,
-  icon,
-  exact,
-  path,
-  onExpand,
-}) => (
+const LinkItem = ({ title, icon, exact, path, onExpand }) => (
   <NavigationLink
     className={style.link}
     activeClassName={style.linkActive}

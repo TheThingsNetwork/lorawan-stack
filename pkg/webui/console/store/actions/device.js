@@ -30,36 +30,32 @@ import { createRequestActions } from './lib'
 export const SHARED_NAME = 'DEVICE'
 
 export const GET_DEV_BASE = 'GET_DEVICE'
-export const [{
-  request: GET_DEV,
-  success: GET_DEV_SUCCESS,
-  failure: GET_DEV_FAILURE,
-}, {
-  request: getDevice,
-  success: getDeviceSuccess,
-  failure: getDeviceFailure,
-}] = createRequestActions(GET_DEV_BASE,
+export const [
+  { request: GET_DEV, success: GET_DEV_SUCCESS, failure: GET_DEV_FAILURE },
+  { request: getDevice, success: getDeviceSuccess, failure: getDeviceFailure },
+] = createRequestActions(
+  GET_DEV_BASE,
   (appId, deviceId) => ({ appId, deviceId }),
-  (appId, deviceId, selector, options) => ({ selector, options })
+  (appId, deviceId, selector, options) => ({ selector, options }),
 )
 
 export const UPDATE_DEV_BASE = 'UPDATE_DEVICE'
-export const [{
-  request: UPDATE_DEV,
-  success: UPDATE_DEV_SUCCESS,
-  failure: UPDATE_DEV_FAILURE,
-}, {
-  request: updateDevice,
-  success: updateDeviceSuccess,
-  failure: updateDeviceFailure,
-}] = createRequestActions(UPDATE_DEV_BASE,
+export const [
+  { request: UPDATE_DEV, success: UPDATE_DEV_SUCCESS, failure: UPDATE_DEV_FAILURE },
+  { request: updateDevice, success: updateDeviceSuccess, failure: updateDeviceFailure },
+] = createRequestActions(
+  UPDATE_DEV_BASE,
   (appId, deviceId, patch) => ({ appId, deviceId, patch }),
-  (appId, deviceId, patch, selector) => ({ selector })
+  (appId, deviceId, patch, selector) => ({ selector }),
 )
 
 export const START_DEVICE_EVENT_STREAM = createStartEventsStreamActionType(SHARED_NAME)
-export const START_DEVICE_EVENT_STREAM_SUCCESS = createStartEventsStreamSuccessActionType(SHARED_NAME)
-export const START_DEVICE_EVENT_STREAM_FAILURE = createStartEventsStreamFailureActionType(SHARED_NAME)
+export const START_DEVICE_EVENT_STREAM_SUCCESS = createStartEventsStreamSuccessActionType(
+  SHARED_NAME,
+)
+export const START_DEVICE_EVENT_STREAM_FAILURE = createStartEventsStreamFailureActionType(
+  SHARED_NAME,
+)
 export const STOP_DEVICE_EVENT_STREAM = createStopEventsStreamActionType(SHARED_NAME)
 export const CLEAR_DEVICE_EVENTS = createClearEventsActionType(SHARED_NAME)
 

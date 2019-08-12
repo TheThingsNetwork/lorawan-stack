@@ -14,40 +14,40 @@
 
 import { getHeadCellDriver, getDataCellDriver } from './index_driver'
 
-describe('HeadCell', function () {
+describe('HeadCell', function() {
   let driver = null
 
-  beforeEach(function () {
+  beforeEach(function() {
     driver = getHeadCellDriver()
     driver.when.created({
       content: 'Head cell',
     })
   })
 
-  it('should match snapshot', function () {
+  it('should match snapshot', function() {
     expect(driver.component).toMatchSnapshot()
   })
 
-  it('should be a `th` element', function () {
+  it('should be a `th` element', function() {
     expect(driver.get.cellType()).toBe('th')
   })
 })
 
-describe('DataCell', function () {
+describe('DataCell', function() {
   let driver = null
 
-  beforeEach(function () {
+  beforeEach(function() {
     driver = getDataCellDriver()
     driver.when.created({
       children: 'Data entry',
     })
   })
 
-  it('should match snapshot', function () {
+  it('should match snapshot', function() {
     expect(driver.component).toMatchSnapshot()
   })
 
-  it('should be a `th` element', function () {
+  it('should be a `th` element', function() {
     expect(driver.get.cellType()).toBe('td')
   })
 })

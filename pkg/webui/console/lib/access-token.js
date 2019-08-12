@@ -14,7 +14,7 @@
 
 import api from '../api'
 
-export default async function () {
+export default async function() {
   const storedToken = localStorage.accessToken ? JSON.parse(localStorage.accessToken) : undefined
   let token
 
@@ -35,7 +35,7 @@ export default async function () {
   return token
 }
 
-export function clear () {
+export function clear() {
   if (localStorage.accessToken) {
     localStorage.removeItem('accessToken')
   }

@@ -40,11 +40,13 @@ const items = [
 ]
 
 storiesOf('Header', module)
-  .addDecorator((story, context) => withInfo({
-    inline: true,
-    header: false,
-    propTables: [ Header ],
-  })(story)(context))
+  .addDecorator((story, context) =>
+    withInfo({
+      inline: true,
+      header: false,
+      propTables: [Header],
+    })(story)(context),
+  )
   .add('Default', () => (
     <Header
       dropdownItems={items}

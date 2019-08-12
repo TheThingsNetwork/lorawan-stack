@@ -30,12 +30,11 @@ import validationSchema from './validation-schema'
 
 @bind
 class CreateForm extends React.Component {
-
   state = {
     modal: null,
   }
 
-  async handleModalApprove () {
+  async handleModalApprove() {
     const { onCreateSuccess } = this.props
     const { key } = this.state
 
@@ -43,13 +42,13 @@ class CreateForm extends React.Component {
     await onCreateSuccess(key)
   }
 
-  async handleCreate (values) {
+  async handleCreate(values) {
     const { onCreate } = this.props
 
     return await onCreate(values)
   }
 
-  async handleCreateSuccess (key) {
+  async handleCreateSuccess(key) {
     await this.setState({
       modal: {
         secret: key.key,
@@ -61,12 +60,8 @@ class CreateForm extends React.Component {
     })
   }
 
-  render () {
-    const {
-      rights,
-      onCreateFailure,
-      universalRights,
-    } = this.props
+  render() {
+    const { rights, onCreateFailure, universalRights } = this.props
     const { modal } = this.state
 
     const modalProps = modal ? modal : {}
@@ -78,11 +73,7 @@ class CreateForm extends React.Component {
 
     return (
       <React.Fragment>
-        <ApiKeyModal
-          {...modalProps}
-          visible={modalVisible}
-          approval={false}
-        />
+        <ApiKeyModal {...modalProps} visible={modalVisible} approval={false} />
         <ApiKeyForm
           rights={rights}
           onSubmit={this.handleCreate}
@@ -91,16 +82,8 @@ class CreateForm extends React.Component {
           validationSchema={validationSchema}
           initialValues={initialValues}
         >
-          <Message
-            component="h4"
-            content={sharedMessages.generalInformation}
-          />
-          <FormField
-            title={sharedMessages.name}
-            name="name"
-            autoFocus
-            component={Input}
-          />
+          <Message component="h4" content={sharedMessages.generalInformation} />
+          <FormField title={sharedMessages.name} name="name" autoFocus component={Input} />
           <FormField
             name="rights"
             title={sharedMessages.rights}
@@ -110,10 +93,7 @@ class CreateForm extends React.Component {
             universalRight={universalRights[0]}
           />
           <SubmitBar>
-            <FormSubmit
-              component={SubmitButton}
-              message={sharedMessages.createApiKey}
-            />
+            <FormSubmit component={SubmitButton} message={sharedMessages.createApiKey} />
           </SubmitBar>
         </ApiKeyForm>
       </React.Fragment>

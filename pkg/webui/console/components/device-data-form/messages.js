@@ -21,14 +21,16 @@ export default defineMessages({
   deviceNamePlaceholder: 'My New Device',
   deviceIdDescription: 'Unique Identifier of your device; this cannot be changed afterwards',
   deviceNameDescription: 'Human friendly name of your device for display purposes',
-  deviceDescDescription: 'Optional device description; can also be used to save notes about the device',
+  deviceDescDescription:
+    'Optional device description; can also be used to save notes about the device',
   joinEUIDescription: 'The connected Join EUI',
   leaveBlankPlaceholder: 'Leave blank to generate automatically',
   resetsJoinNonces: 'Resets Join Nonces',
   resetsFCnt: 'Resets Frame Counters',
   deviceEUIDescription: 'The device EUI is the unique identifier for this device on the network.',
   nwkKeyDescription: 'The encrypted Network Key',
-  appKeyDescription: 'The App Key is used to secure the communication between your device and the network.',
+  appKeyDescription:
+    'The App Key is used to secure the communication between your device and the network.',
   appSKeyDescription: 'App Session Key',
   fwdNtwkKeyDescription: 'Forwarding Network Session Integrity Key (or LoRaWAN 1.0.x NwkSKey)',
   sNtwkSIKeyDescription: 'Serving Network Session Integrity Key (only for LoRaWAN 1.1+)',
@@ -42,7 +44,8 @@ export default defineMessages({
   abp: 'Activation By Personalization (ABP)',
   resetWarning: 'Reseting is insecure and makes your device susceptible for replay attacks',
   deleteDevice: 'Delete End Device',
-  deleteWarning: 'Are you sure you want to delete "{deviceId}"? Deleting an end device cannot be undone!',
+  deleteWarning:
+    'Are you sure you want to delete "{deviceId}"? Deleting an end device cannot be undone!',
   deleteSuccess: 'The end device has been deleted successfully',
   updateSuccess: 'Successfully updated end device',
 })

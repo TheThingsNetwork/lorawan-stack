@@ -40,21 +40,28 @@ const m = defineMessages({
   authorize: 'Authorize',
 })
 
-@connect(undefined, dispatch => ({
-  redirectToLogin: () => dispatch(replace('/login')),
-}))
+@connect(
+  undefined,
+  dispatch => ({
+    redirectToLogin: () => dispatch(replace('/login')),
+  }),
+)
 @withEnv
 @bind
 export default class Authorize extends PureComponent {
-
-  async handleLogout () {
+  async handleLogout() {
     const { redirectToLogin } = this.props
     await api.oauth.logout()
     redirectToLogin()
   }
 
-  render () {
-    const { env: { pageData: { client, user, error }}, location } = this.props
+  render() {
+    const {
+      env: {
+        pageData: { client, user, error },
+      },
+      location,
+    } = this.props
     const { redirect_uri } = Query.parse(location.search)
 
     if (error) {
@@ -88,7 +95,7 @@ export default class Authorize extends PureComponent {
         <IntlHelmet title={m.authorize} />
         <Modal
           title={m.modalTitle}
-          subtitle={{ ...m.modalSubtitle, values: { clientName }}}
+          subtitle={{ ...m.modalSubtitle, values: { clientName } }}
           bottomLine={bottomLine}
           buttonMessage={m.authorize}
           method="POST"
@@ -100,13 +107,12 @@ export default class Authorize extends PureComponent {
             <input type="hidden" name="csrf" value={getCookieValue('_csrf')} />
             <div className={style.left}>
               <ul>
-                { client.rights.map(right => (
+                {client.rights.map(right => (
                   <li key={right}>
                     <Icon icon="check" className={style.icon} />
                     <Message content={{ id: `enum:${right}` }} />
                   </li>
-                )
-                )}
+                ))}
               </ul>
             </div>
             <div className={style.right}>
@@ -121,6 +127,6 @@ export default class Authorize extends PureComponent {
 }
 
 // Capitalize the client_id until we have a display name field.
-function capitalize (string) {
+function capitalize(string) {
   return string.charAt(0).toUpperCase() + string.slice(1)
 }

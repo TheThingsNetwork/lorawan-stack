@@ -75,31 +75,32 @@ const validationSchema = Yup.object().shape({
   api_key: Yup.string()
     .matches(apiKey, sharedMessages.validateFormat)
     .required(sharedMessages.validateRequired),
-  network_server_address: Yup.string()
-    .matches(address, sharedMessages.validateFormat),
+  network_server_address: Yup.string().matches(address, sharedMessages.validateFormat),
 })
 
-@connect(function (state) {
-  return {
-    appId: selectSelectedApplicationId(state),
-    link: selectApplicationLink(state),
-    stats: selectApplicationLinkStats(state),
-    fetching: selectApplicationLinkFetching(state),
-    linked: selectApplicationIsLinked(state),
-    linkError: selectApplicationLinkError(state),
-  }
-},
-dispatch => ({
-  getLink: (id, selector) => dispatch(getApplicationLink(id, selector)),
-  updateLinkSuccess: (link, stats) => dispatch(updateApplicationLinkSuccess(link, stats)),
-  deleteLinkSuccess: () => dispatch(deleteApplicationLinkSuccess()),
-}))
-@withRequest(
-  ({ getLink, appId }) => getLink(appId, [ 'api_key', 'network_server_address' ]),
-  ({ fetching }) => fetching,
-  () => false
+@connect(
+  function(state) {
+    return {
+      appId: selectSelectedApplicationId(state),
+      link: selectApplicationLink(state),
+      stats: selectApplicationLinkStats(state),
+      fetching: selectApplicationLinkFetching(state),
+      linked: selectApplicationIsLinked(state),
+      linkError: selectApplicationLinkError(state),
+    }
+  },
+  dispatch => ({
+    getLink: (id, selector) => dispatch(getApplicationLink(id, selector)),
+    updateLinkSuccess: (link, stats) => dispatch(updateApplicationLinkSuccess(link, stats)),
+    deleteLinkSuccess: () => dispatch(deleteApplicationLinkSuccess()),
+  }),
 )
-@withBreadcrumb('apps.single.link', function (props) {
+@withRequest(
+  ({ getLink, appId }) => getLink(appId, ['api_key', 'network_server_address']),
+  ({ fetching }) => fetching,
+  () => false,
+)
+@withBreadcrumb('apps.single.link', function(props) {
   return (
     <Breadcrumb
       path={`/applications/${props.appId}/link`}
@@ -110,15 +111,14 @@ dispatch => ({
 })
 @bind
 class ApplicationLink extends React.Component {
-
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.form = React.createRef()
     this.state = { error: '' }
   }
 
-  async handleLink (values, { setSubmitting, resetForm }) {
+  async handleLink(values, { setSubmitting, resetForm }) {
     const { appId, updateLinkSuccess } = this.props
     const { api_key, network_server_address } = values
 
@@ -147,7 +147,7 @@ class ApplicationLink extends React.Component {
     }
   }
 
-  async handleUnlink () {
+  async handleUnlink() {
     const { appId, deleteLinkSuccess } = this.props
 
     await this.setState({ error: '' })
@@ -167,14 +167,16 @@ class ApplicationLink extends React.Component {
     }
   }
 
-  get statistics () {
+  get statistics() {
     const { stats, linked } = this.props
 
     if (!stats && !linked) {
       return (
         <div className={style.status}>
           <Message component="h3" content={m.linkStatus} />
-          <span className={style.statusText}><Icon icon="link_off" /> <Message content={m.linkStatusUnLinked} /></span>
+          <span className={style.statusText}>
+            <Icon icon="link_off" /> <Message content={m.linkStatusUnLinked} />
+          </span>
         </div>
       )
     }
@@ -201,30 +203,25 @@ class ApplicationLink extends React.Component {
     return (
       <div className={style.status}>
         <Message component="h3" content={m.linkStatus} />
-        <span className={style.statusText}><Icon icon="link" /> <Message content={m.linkStatusLinked} /></span>
+        <span className={style.statusText}>
+          <Icon icon="link" /> <Message content={m.linkStatusLinked} />
+        </span>
         <DataSheet
           className={style.statusData}
-          data={[{
-            header: m.linkStatistics,
-            items: dataSheetItems,
-          }]}
+          data={[
+            {
+              header: m.linkStatistics,
+              items: dataSheetItems,
+            },
+          ]}
         />
-        <Button
-          onClick={this.handleUnlink}
-          message={m.unlink}
-          danger
-          icon="link_off"
-        />
+        <Button onClick={this.handleUnlink} message={m.unlink} danger icon="link_off" />
       </div>
     )
   }
 
-  render () {
-    const {
-      appId,
-      link = {},
-      linkError,
-    } = this.props
+  render() {
+    const { appId, link = {}, linkError } = this.props
     const { error } = this.state
 
     const initialValues = {
@@ -238,14 +235,8 @@ class ApplicationLink extends React.Component {
       <Container className={style.main}>
         <Row>
           <Col lg={8} md={12}>
-            <IntlHelmet
-              title={sharedMessages.link}
-            />
-            <Message
-              component="h2"
-              content={m.linkApplication}
-              values={{ appId }}
-            />
+            <IntlHelmet title={sharedMessages.link} />
+            <Message component="h2" content={m.linkApplication} values={{ appId }} />
           </Col>
         </Row>
         <Row className={style.form}>
@@ -273,10 +264,7 @@ class ApplicationLink extends React.Component {
                 code
               />
               <SubmitBar>
-                <Form.Submit
-                  component={SubmitButton}
-                  message={sharedMessages.saveChanges}
-                />
+                <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
               </SubmitBar>
             </Form>
           </Col>

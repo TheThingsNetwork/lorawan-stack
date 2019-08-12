@@ -27,34 +27,33 @@ import style from './code-editor.styl'
 
 @bind
 class CodeEditor extends React.Component {
-
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.state = { focus: false }
   }
 
-  onFocus (evt) {
+  onFocus(evt) {
     const { onFocus } = this.props
 
-    this.setState({ focus: true }, function () {
+    this.setState({ focus: true }, function() {
       if (onFocus) {
         onFocus(evt)
       }
     })
   }
 
-  onBlur (evt) {
+  onBlur(evt) {
     const { onBlur } = this.props
 
-    this.setState({ focus: false }, function () {
+    this.setState({ focus: false }, function() {
       if (onBlur) {
         onBlur(evt)
       }
     })
   }
 
-  render () {
+  render() {
     const {
       className,
       language = 'javascript',
@@ -100,15 +99,12 @@ class CodeEditor extends React.Component {
           theme="ttn"
           minLines={minLines}
           maxLines={maxLines}
-
           // session options
           mode={language}
-
           // editor options
           readOnly={readOnly}
           highlightActiveLine
           showGutter={showGutter}
-
           // other
           name={name}
           onChange={onChange}
@@ -129,7 +125,7 @@ class CodeEditor extends React.Component {
 
 CodeEditor.propTypes = {
   /** The language to highlight */
-  language: PropTypes.oneOf([ 'javascript', 'json' ]),
+  language: PropTypes.oneOf(['javascript', 'json']),
   /** The name of the editor (should be unique) */
   name: PropTypes.string.isRequired,
   onChange: PropTypes.func,

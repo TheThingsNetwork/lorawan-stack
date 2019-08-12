@@ -20,26 +20,19 @@ import PropTypes from '../../lib/prop-types'
 import style from './breadcrumbs.styl'
 
 const Breadcrumbs = ({ className, breadcrumbs }) => (
-
   <nav className={classnames(className, style.breadcrumbs)}>
-    {breadcrumbs.map(function (component, index) {
-      return (
-        React.cloneElement(component, {
-          key: index,
-          isLast: index === breadcrumbs.length - 1,
-        })
-      )
-    })
-    }
+    {breadcrumbs.map(function(component, index) {
+      return React.cloneElement(component, {
+        key: index,
+        isLast: index === breadcrumbs.length - 1,
+      })
+    })}
   </nav>
 )
 
 Breadcrumbs.propTypes = {
   /** A list of breadcrumb elements */
-  breadcrumbs: PropTypes.arrayOf(PropTypes.oneOfType([
-    PropTypes.func,
-    PropTypes.element,
-  ])),
+  breadcrumbs: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.func, PropTypes.element])),
 }
 
 export default Breadcrumbs

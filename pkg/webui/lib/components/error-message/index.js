@@ -30,8 +30,7 @@ import {
 
 import style from './error-message.styl'
 
-const ErrorMessage = function ({ content, ...rest }) {
-
+const ErrorMessage = function({ content, ...rest }) {
   const props = {
     content: {},
     ...rest,

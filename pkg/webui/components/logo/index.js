@@ -18,20 +18,14 @@ import classnames from 'classnames'
 import TTN from './ttn'
 import style from './logo.styl'
 
-const Logo = function (props) {
-  const {
-    className,
-  } = props
+const Logo = function(props) {
+  const { className } = props
 
   const img = TTN
 
   const classname = classnames(style.logo, className)
 
-  return (
-    <div className={classname}>
-      {img}
-    </div>
-  )
+  return <div className={classname}>{img}</div>
 }
 
 export default Logo

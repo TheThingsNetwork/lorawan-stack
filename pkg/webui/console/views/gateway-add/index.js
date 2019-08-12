@@ -41,26 +41,21 @@ const m = defineMessages({
 })
 
 @withEnv
-@withBreadcrumb('gateways.add', function () {
-  return (
-    <Breadcrumb
-      path="/gateways/add"
-      icon="add"
-      content={sharedMessages.add}
-    />
-  )
+@withBreadcrumb('gateways.add', function() {
+  return <Breadcrumb path="/gateways/add" icon="add" content={sharedMessages.add} />
 })
-@connect(function (state) {
-  const userId = selectUserId(state)
+@connect(
+  function(state) {
+    const userId = selectUserId(state)
 
-  return { userId }
-},
-dispatch => ({
-  createSuccess: gtwId => dispatch(push(`/gateways/${gtwId}`)),
-}))
+    return { userId }
+  },
+  dispatch => ({
+    createSuccess: gtwId => dispatch(push(`/gateways/${gtwId}`)),
+  }),
+)
 @bind
 export default class GatewayAdd extends React.Component {
-
   static propTypes = {
     userId: PropTypes.string.isRequired,
     createSuccess: PropTypes.func.isRequired,
@@ -70,9 +65,11 @@ export default class GatewayAdd extends React.Component {
     error: '',
   }
 
-  async handleSubmit (values, { resetForm }) {
+  async handleSubmit(values, { resetForm }) {
     const { userId, createSuccess } = this.props
-    const { ids: { gateway_id }} = values
+    const {
+      ids: { gateway_id },
+    } = values
 
     await this.setState({ error: '' })
 
@@ -87,18 +84,18 @@ export default class GatewayAdd extends React.Component {
     }
   }
 
-  render () {
+  render() {
     const { error } = this.state
-    const { env: { config }} = this.props
+    const {
+      env: { config },
+    } = this.props
 
     const initialValues = {
       ids: {
         gateway_id: undefined,
       },
       enforce_duty_cycle: true,
-      gateway_server_address: config.gs.enabled
-        ? new URL(config.gs.base_url).hostname
-        : '',
+      gateway_server_address: config.gs.enabled ? new URL(config.gs.base_url).hostname : '',
       frequency_plan_id: undefined,
     }
 
@@ -106,9 +103,7 @@ export default class GatewayAdd extends React.Component {
       <Container>
         <Row className={style.wrapper}>
           <Col sm={12}>
-            <IntlHelmet
-              title={sharedMessages.addGateway}
-            />
+            <IntlHelmet title={sharedMessages.addGateway} />
             <Message component="h2" content={sharedMessages.addGateway} />
           </Col>
           <Col sm={12} md={8}>

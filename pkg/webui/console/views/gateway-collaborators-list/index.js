@@ -31,19 +31,19 @@ import PAGE_SIZES from '../../constants/page-sizes'
 }))
 @bind
 export default class GatewayCollaborators extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     const { gtwId } = this.props
     this.getGatewayCollaboratorsList = filters => getGatewayCollaboratorsList(gtwId, filters)
   }
 
-  baseDataSelector ({ collaborators }) {
+  baseDataSelector({ collaborators }) {
     const { gtwId } = this.props
     return collaborators.gateways[gtwId] || {}
   }
 
-  render () {
+  render() {
     return (
       <Container>
         <Row>

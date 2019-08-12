@@ -27,7 +27,6 @@ import {
   selectGatewaysError,
 } from '../../store/selectors/gateways'
 
-
 const headers = [
   {
     name: 'ids.gateway_id',
@@ -59,18 +58,14 @@ const headers = [
 
 @bind
 export default class GatewaysTable extends React.Component {
-
-  constructor (props) {
+  constructor(props) {
     super(props)
 
-    this.getGatewaysList = params => getGatewaysList(params, [
-      'name',
-      'description',
-      'frequency_plan_id',
-    ])
+    this.getGatewaysList = params =>
+      getGatewaysList(params, ['name', 'description', 'frequency_plan_id'])
   }
 
-  baseDataSelector (state) {
+  baseDataSelector(state) {
     return {
       gateways: selectGateways(state),
       totalCount: selectGatewaysTotalCount(state),
@@ -79,7 +74,7 @@ export default class GatewaysTable extends React.Component {
     }
   }
 
-  render () {
+  render() {
     return (
       <FetchTable
         entity="gateways"

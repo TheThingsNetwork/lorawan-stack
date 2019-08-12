@@ -22,6 +22,6 @@ export default defineMessages({
   genericError: 'An error unknown occurred. Please try again later.',
   genericNotFound: 'The page you requested cannot be found.',
   subviewErrorExplanation: 'There was a problem when displaying this section.',
-  subviewErrorTitle: 'We\'re sorry!',
+  subviewErrorTitle: "We're sorry!",
   unknownErrorTitle: 'An unknown error occurred',
 })

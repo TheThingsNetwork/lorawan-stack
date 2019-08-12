@@ -44,35 +44,33 @@ positioning will differ slightly, so the nudge props can be used to fine-tune
 the appearance.`
 
 storiesOf('Icon', module)
-  .addDecorator((story, context) => withInfo({
-    inline: true,
-    header: false,
-    propTables: [ Icon ],
-    text: doc,
-  })(story)(context))
-  .add('Icons', () => icons.map(function (icon) {
-    return (
-      <div className={style.wrapper} key={icon}>
-        <Icon
-          icon={icon}
-        />
-        {icon}
-      </div>
-    )
-  }))
+  .addDecorator((story, context) =>
+    withInfo({
+      inline: true,
+      header: false,
+      propTables: [Icon],
+      text: doc,
+    })(story)(context),
+  )
+  .add('Icons', () =>
+    icons.map(function(icon) {
+      return (
+        <div className={style.wrapper} key={icon}>
+          <Icon icon={icon} />
+          {icon}
+        </div>
+      )
+    }),
+  )
   .add('Usage', () => (
     <div className={style.wrapper}>
       <div className={style.block}>
-        <Icon
-          icon="devices"
-        />
+        <Icon icon="devices" />
         <span>{'display: inline-block'}</span>
       </div>
       <br />
       <div className={style.flex}>
-        <Icon
-          icon="devices"
-        />
+        <Icon icon="devices" />
         <span>{'display: flex'}</span>
       </div>
     </div>

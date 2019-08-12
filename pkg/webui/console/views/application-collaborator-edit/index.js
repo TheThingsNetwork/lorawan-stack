@@ -45,50 +45,58 @@ import {
 
 import api from '../../api'
 
-@connect(function (state, props) {
-  const appId = selectSelectedApplicationId(state)
+@connect(
+  function(state, props) {
+    const appId = selectSelectedApplicationId(state)
 
-  const { collaboratorId, collaboratorType } = props.match.params
+    const { collaboratorId, collaboratorType } = props.match.params
 
-  const collaborator = collaboratorType === 'user'
-    ? selectApplicationUserCollaborator(state)
-    : selectApplicationOrganizationCollaborator(state)
-  const fetching = selectApplicationRightsFetching(state) || selectApplicationCollaboratorFetching(state)
-  const error = selectApplicationRightsError(state) || selectApplicationCollaboratorError(state)
+    const collaborator =
+      collaboratorType === 'user'
+        ? selectApplicationUserCollaborator(state)
+        : selectApplicationOrganizationCollaborator(state)
+    const fetching =
+      selectApplicationRightsFetching(state) || selectApplicationCollaboratorFetching(state)
+    const error = selectApplicationRightsError(state) || selectApplicationCollaboratorError(state)
 
-  return {
-    collaboratorId,
-    collaboratorType,
-    collaborator,
-    appId,
-    rights: selectApplicationRights(state),
-    universalRights: selectApplicationUniversalRights(state),
-    fetching,
-    error,
-  }
-}, (dispatch, ownProps) => ({
-  loadData (appId, collaboratorId, isUser) {
-    dispatch(getApplicationsRightsList(appId))
-    dispatch(getApplicationCollaborator(appId, collaboratorId, isUser))
+    return {
+      collaboratorId,
+      collaboratorType,
+      collaborator,
+      appId,
+      rights: selectApplicationRights(state),
+      universalRights: selectApplicationUniversalRights(state),
+      fetching,
+      error,
+    }
   },
-  redirectToList (appId) {
-    dispatch(replace(`/applications/${appId}/collaborators`))
-  },
-}), (stateProps, dispatchProps, ownProps) => ({
-  ...stateProps, ...dispatchProps, ...ownProps,
-  loadData: () => dispatchProps.loadData(
-    stateProps.appId,
-    stateProps.collaboratorId,
-    stateProps.collaboratorType === 'user'
-  ),
-  redirectToList: () => dispatchProps.redirectToList(stateProps.appId),
-})
+  (dispatch, ownProps) => ({
+    loadData(appId, collaboratorId, isUser) {
+      dispatch(getApplicationsRightsList(appId))
+      dispatch(getApplicationCollaborator(appId, collaboratorId, isUser))
+    },
+    redirectToList(appId) {
+      dispatch(replace(`/applications/${appId}/collaborators`))
+    },
+  }),
+  (stateProps, dispatchProps, ownProps) => ({
+    ...stateProps,
+    ...dispatchProps,
+    ...ownProps,
+    loadData: () =>
+      dispatchProps.loadData(
+        stateProps.appId,
+        stateProps.collaboratorId,
+        stateProps.collaboratorType === 'user',
+      ),
+    redirectToList: () => dispatchProps.redirectToList(stateProps.appId),
+  }),
 )
 @withRequest(
   ({ loadData }) => loadData(),
-  ({ fetching, collaborator }) => fetching || !Boolean(collaborator)
+  ({ fetching, collaborator }) => fetching || !Boolean(collaborator),
 )
-@withBreadcrumb('apps.single.collaborators.edit', function (props) {
+@withBreadcrumb('apps.single.collaborators.edit', function(props) {
   const { appId, collaboratorId, collaboratorType } = props
 
   return (
@@ -101,25 +109,24 @@ import api from '../../api'
 })
 @bind
 export default class ApplicationCollaboratorEdit extends React.Component {
-
   state = {
     error: '',
   }
 
-  async handleSubmit (updatedCollaborator) {
+  async handleSubmit(updatedCollaborator) {
     const { appId } = this.props
 
     await api.application.collaborators.update(appId, updatedCollaborator)
   }
 
-  handleSubmitSuccess () {
+  handleSubmitSuccess() {
     toast({
       message: sharedMessages.collaboratorUpdateSuccess,
       type: toast.types.SUCCESS,
     })
   }
 
-  async handleDelete () {
+  async handleDelete() {
     const { collaborator, redirectToList, appId } = this.props
     const collaborator_type = collaborator.isUser ? 'user' : 'organization'
 
@@ -144,13 +151,8 @@ export default class ApplicationCollaboratorEdit extends React.Component {
     }
   }
 
-  render () {
-    const {
-      collaborator,
-      rights,
-      universalRights,
-      redirectToList,
-    } = this.props
+  render() {
+    const { collaborator, rights, universalRights, redirectToList } = this.props
 
     return (
       <Container>

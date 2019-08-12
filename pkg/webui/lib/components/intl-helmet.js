@@ -25,7 +25,7 @@ import { warn } from '../log'
  */
 @injectIntl
 export default class IntlHelmet extends React.Component {
-  componentDidMount () {
+  componentDidMount() {
     if (this.props.children) {
       warn(`Children of <IntlHelmet /> will not be translated. If you tried to
 translate head elements with <Message />, use props with message objects
@@ -33,7 +33,7 @@ instead.`)
     }
   }
 
-  render () {
+  render() {
     const { intl, children, values, ...rest } = this.props
     let translatedRest = {}
     for (const key in rest) {

@@ -24,7 +24,7 @@ const info = {
   inline: true,
   header: false,
   source: false,
-  propTables: [ Checkbox ],
+  propTables: [Checkbox],
 }
 
 @bind
@@ -35,7 +35,7 @@ class IndeterminateCheckboxExample extends React.Component {
     indeterminate: false,
   }
 
-  onChange (event) {
+  onChange(event) {
     const { checked } = event.target
 
     if (checked) {
@@ -53,10 +53,10 @@ class IndeterminateCheckboxExample extends React.Component {
     }
   }
 
-  onGroupChange (value) {
+  onGroupChange(value) {
     const cbs = Object.keys(value)
     const totalCheckboxes = cbs.length
-    const checkedCheckboxes = cbs.reduce((acc, curr) => value[curr] ? acc + 1 : acc, 0)
+    const checkedCheckboxes = cbs.reduce((acc, curr) => (value[curr] ? acc + 1 : acc), 0)
 
     this.setState({
       value,
@@ -65,7 +65,7 @@ class IndeterminateCheckboxExample extends React.Component {
     })
   }
 
-  render () {
+  render() {
     return (
       <div>
         <div>
@@ -89,106 +89,39 @@ class IndeterminateCheckboxExample extends React.Component {
 
 storiesOf('Checkbox', module)
   .addDecorator((story, context) => withInfo(info)(story)(context))
-  .add('Default', () => (
-    <Checkbox
-      label="Checkbox"
-      name="checkbox"
-    />
-  ))
-  .add('Indeterminate', () => (
-    <IndeterminateCheckboxExample />
-  ))
+  .add('Default', () => <Checkbox label="Checkbox" name="checkbox" />)
+  .add('Indeterminate', () => <IndeterminateCheckboxExample />)
   .add('Disabled', () => (
     <div style={{ padding: '20px' }}>
-      <Checkbox
-        name="checkbox"
-        label="Checkbox"
-        value
-        disabled
-      />
+      <Checkbox name="checkbox" label="Checkbox" value disabled />
       <br />
-      <Checkbox
-        name="checkbox"
-        label="Checkbox"
-        disabled
-      />
+      <Checkbox name="checkbox" label="Checkbox" disabled />
     </div>
   ))
   .add('Group (horizontal)', () => (
     <div>
       <div style={{ padding: '20px' }}>
-        <CheckboxGroup
-          name="checkbox1"
-          initialValue={{ cb1: true, cb2: true }}
-          horizontal
-        >
-          <Checkbox
-            label="Checkbox 1"
-            name="cb1"
-          />
-          <Checkbox
-            label="Checkbox 2"
-            name="cb2"
-          />
-          <Checkbox
-            label="Checkbox 3"
-            name="cb3"
-          />
-          <Checkbox
-            label="Checkbox 4"
-            name="cb4"
-          />
+        <CheckboxGroup name="checkbox1" initialValue={{ cb1: true, cb2: true }} horizontal>
+          <Checkbox label="Checkbox 1" name="cb1" />
+          <Checkbox label="Checkbox 2" name="cb2" />
+          <Checkbox label="Checkbox 3" name="cb3" />
+          <Checkbox label="Checkbox 4" name="cb4" />
         </CheckboxGroup>
       </div>
       <div style={{ padding: '20px' }}>
-        <CheckboxGroup
-          name="checkbox2"
-          initialValue={{}}
-          horizontal
-        >
-          <Checkbox
-            label="Checkbox 1"
-            name="cb1"
-          />
-          <Checkbox
-            label="Checkbox 2"
-            name="cb2"
-            disabled
-          />
-          <Checkbox
-            label="Checkbox 3"
-            name="cb3"
-            disabled
-          />
-          <Checkbox
-            label="Checkbox 4"
-            name="cb4"
-          />
+        <CheckboxGroup name="checkbox2" initialValue={{}} horizontal>
+          <Checkbox label="Checkbox 1" name="cb1" />
+          <Checkbox label="Checkbox 2" name="cb2" disabled />
+          <Checkbox label="Checkbox 3" name="cb3" disabled />
+          <Checkbox label="Checkbox 4" name="cb4" />
         </CheckboxGroup>
       </div>
       <div style={{ padding: '20px' }}>
-        <CheckboxGroup
-          name="checkbox3"
-          initialValue={{ cb1: true }}
-          disabled
-          horizontal
-        >
-          <Checkbox
-            label="Checkbox 1"
-            name="cb1"
-          />
-          <Checkbox
-            label="Checkbox 2"
-            name="cb2"
-          />
-          <Checkbox
-            label="Checkbox 3"
-            name="cb3"
-          />
-          <Checkbox
-            label="Checkbox 4"
-            name="cb4"
-          />
+        <CheckboxGroup name="checkbox3" initialValue={{ cb1: true }} disabled horizontal>
+          <Checkbox label="Checkbox 1" name="cb1" />
+          <Checkbox label="Checkbox 2" name="cb2" />
+          <Checkbox label="Checkbox 3" name="cb3" />
+          <Checkbox label="Checkbox 4" name="cb4" />
         </CheckboxGroup>
       </div>
     </div>
@@ -196,78 +129,27 @@ storiesOf('Checkbox', module)
   .add('Group (vertical)', () => (
     <div>
       <div style={{ padding: '20px' }}>
-        <CheckboxGroup
-          name="checkbox1"
-          initialValue={{ cb1: true, cb2: true }}
-          horizontal={false}
-        >
-          <Checkbox
-            label="Checkbox 1"
-            name="cb1"
-          />
-          <Checkbox
-            label="Checkbox 2"
-            name="cb2"
-          />
-          <Checkbox
-            label="Checkbox 3"
-            name="cb3"
-          />
-          <Checkbox
-            label="Checkbox 4"
-            name="cb4"
-          />
+        <CheckboxGroup name="checkbox1" initialValue={{ cb1: true, cb2: true }} horizontal={false}>
+          <Checkbox label="Checkbox 1" name="cb1" />
+          <Checkbox label="Checkbox 2" name="cb2" />
+          <Checkbox label="Checkbox 3" name="cb3" />
+          <Checkbox label="Checkbox 4" name="cb4" />
         </CheckboxGroup>
       </div>
       <div style={{ padding: '20px' }}>
-        <CheckboxGroup
-          name="checkbox2"
-          initialValue={{}}
-          horizontal={false}
-        >
-          <Checkbox
-            label="Checkbox 1"
-            name="cb1"
-          />
-          <Checkbox
-            label="Checkbox 2"
-            name="cb2"
-            disabled
-          />
-          <Checkbox
-            label="Checkbox 3"
-            name="cb3"
-            disabled
-          />
-          <Checkbox
-            label="Checkbox 4"
-            name="cb4"
-          />
+        <CheckboxGroup name="checkbox2" initialValue={{}} horizontal={false}>
+          <Checkbox label="Checkbox 1" name="cb1" />
+          <Checkbox label="Checkbox 2" name="cb2" disabled />
+          <Checkbox label="Checkbox 3" name="cb3" disabled />
+          <Checkbox label="Checkbox 4" name="cb4" />
         </CheckboxGroup>
       </div>
       <div style={{ padding: '20px' }}>
-        <CheckboxGroup
-          name="checkbox3"
-          initialValue={{ cb1: true }}
-          disabled
-          horizontal={false}
-        >
-          <Checkbox
-            label="Checkbox 1"
-            name="cb1"
-          />
-          <Checkbox
-            label="Checkbox 2"
-            name="cb2"
-          />
-          <Checkbox
-            label="Checkbox 3"
-            name="cb3"
-          />
-          <Checkbox
-            label="Checkbox 4"
-            name="cb4"
-          />
+        <CheckboxGroup name="checkbox3" initialValue={{ cb1: true }} disabled horizontal={false}>
+          <Checkbox label="Checkbox 1" name="cb1" />
+          <Checkbox label="Checkbox 2" name="cb2" />
+          <Checkbox label="Checkbox 3" name="cb3" />
+          <Checkbox label="Checkbox 4" name="cb4" />
         </CheckboxGroup>
       </div>
     </div>

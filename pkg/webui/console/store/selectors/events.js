@@ -14,20 +14,23 @@
 
 const selectEventsStore = (state, entityId) => state[entityId]
 
-export const createEventsSelector = entity => function (state, entityId) {
-  const store = selectEventsStore(state.events[entity], entityId)
+export const createEventsSelector = entity =>
+  function(state, entityId) {
+    const store = selectEventsStore(state.events[entity], entityId)
 
-  return store ? store.events : []
-}
+    return store ? store.events : []
+  }
 
-export const createEventsStatusSelector = entity => function (state, entityId) {
-  const store = selectEventsStore(state.events[entity], entityId)
+export const createEventsStatusSelector = entity =>
+  function(state, entityId) {
+    const store = selectEventsStore(state.events[entity], entityId)
 
-  return store ? store.status : 'unknown'
-}
+    return store ? store.status : 'unknown'
+  }
 
-export const createEventsErrorSelector = entity => function (state, entityId) {
-  const store = selectEventsStore(state.events[entity], entityId)
+export const createEventsErrorSelector = entity =>
+  function(state, entityId) {
+    const store = selectEventsStore(state.events[entity], entityId)
 
-  return store ? store.error : false
-}
+    return store ? store.error : false
+  }

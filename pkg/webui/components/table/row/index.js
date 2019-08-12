@@ -21,14 +21,13 @@ import style from './row.styl'
 
 @bind
 class Row extends React.Component {
-
-  onClick () {
+  onClick() {
     const { id, onClick } = this.props
 
     onClick(id)
   }
 
-  get clickListener () {
+  get clickListener() {
     const { body, clickable } = this.props
 
     if (body && clickable) {
@@ -36,21 +35,14 @@ class Row extends React.Component {
     }
   }
 
-  get tabIndex () {
+  get tabIndex() {
     const { body, clickable } = this.props
 
     return body && clickable ? 0 : -1
   }
 
-  render () {
-    const {
-      className,
-      children,
-      clickable,
-      head,
-      body,
-      footer,
-    } = this.props
+  render() {
+    const { className, children, clickable, head, body, footer } = this.props
 
     const rowClassNames = classnames(className, {
       [style.clickable]: body && clickable,
@@ -60,11 +52,7 @@ class Row extends React.Component {
     })
 
     return (
-      <tr
-        className={rowClassNames}
-        onClick={this.clickListener}
-        tabIndex={this.tabIndex}
-      >
+      <tr className={rowClassNames} onClick={this.clickListener} tabIndex={this.tabIndex}>
         {children}
       </tr>
     )

@@ -19,20 +19,14 @@ import { warn } from '../../log'
 import PropTypes from '../../prop-types'
 
 const warned = {}
-const warning = function (message) {
+const warning = function(message) {
   if (!warned[message]) {
     warned[message] = true
     warn(`Message is not translated: "${message}"`)
   }
 }
 
-const Message = function ({
-  content,
-  values = {},
-  component: Component = 'span',
-  ...rest
-}) {
-
+const Message = function({ content, values = {}, component: Component = 'span', ...rest }) {
   if (!content && content !== 0) {
     return null
   }

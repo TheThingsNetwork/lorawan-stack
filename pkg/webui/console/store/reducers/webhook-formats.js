@@ -18,15 +18,15 @@ const defaultState = {
   formats: undefined,
 }
 
-const webhooks = function (state = defaultState, { type, payload }) {
+const webhooks = function(state = defaultState, { type, payload }) {
   switch (type) {
-  case GET_WEBHOOK_FORMATS_SUCCESS:
-    return {
-      ...state,
-      formats: payload,
-    }
-  default:
-    return state
+    case GET_WEBHOOK_FORMATS_SUCCESS:
+      return {
+        ...state,
+        formats: payload,
+      }
+    default:
+      return state
   }
 }
 

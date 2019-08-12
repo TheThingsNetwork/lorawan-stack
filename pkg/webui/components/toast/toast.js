@@ -19,12 +19,12 @@ import Notification from '../notification'
 
 import style from './toast.styl'
 
-const createToast = function () {
+const createToast = function() {
   const queue = []
   let toastId = null
   let firstDispatched = false
 
-  const show = function (toastOptions) {
+  const show = function(toastOptions) {
     const { INFO, SUCCESS, ERROR, WARNING, DEFAULT } = toast.types
     const { title, message, type = DEFAULT, ...rest } = toastOptions
 
@@ -42,11 +42,11 @@ const createToast = function () {
       {
         onClose: () => next(),
         ...rest,
-      }
+      },
     )
   }
 
-  const next = function () {
+  const next = function() {
     const hasNext = queue.length > 0
 
     if (!hasNext) {
@@ -56,7 +56,7 @@ const createToast = function () {
     }
   }
 
-  const toast = function (options) {
+  const toast = function(options) {
     queue.push(options)
 
     if (!firstDispatched) {
@@ -74,7 +74,6 @@ const createToast = function () {
   }
 
   return toast
-
 }
 
 export default createToast

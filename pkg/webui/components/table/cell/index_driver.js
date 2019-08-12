@@ -16,22 +16,22 @@ import React from 'react'
 
 import { Cell, HeadCell, DataCell } from '.'
 
-function getCellDriver (create) {
+function getCellDriver(create) {
   const driver = {
     component: undefined,
     when: {
-      created (props) {
+      created(props) {
         driver.component = create(props)
       },
     },
     get: {
-      cell () {
+      cell() {
         return driver.component.find(Cell).first()
       },
-      cellRaw () {
+      cellRaw() {
         return driver.get.cell().dive()
       },
-      cellType () {
+      cellType() {
         return driver.get.cellRaw().type()
       },
     },
@@ -40,11 +40,10 @@ function getCellDriver (create) {
   return driver
 }
 
-export function getHeadCellDriver () {
+export function getHeadCellDriver() {
   return getCellDriver(props => shallow(<HeadCell {...props} />))
 }
 
-export function getDataCellDriver () {
+export function getDataCellDriver() {
   return getCellDriver(props => shallow(<DataCell {...props} />))
 }
-

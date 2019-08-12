@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export default function getByPath (ob, path) {
+export default function getByPath(ob, path) {
   const paths = path.split('.')
   if (paths.length === 1) {
     return ob[path]

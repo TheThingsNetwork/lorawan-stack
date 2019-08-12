@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 import React from 'react'
 import { withRouter, Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
@@ -33,8 +32,7 @@ import { withEnv } from '../../lib/components/env'
   user: state.user.user,
 }))
 class Auth extends React.PureComponent {
-
-  render () {
+  render() {
     const {
       user,
       fetching,

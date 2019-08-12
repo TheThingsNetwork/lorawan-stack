@@ -80,13 +80,7 @@ export default combineReducers({
     error,
   }),
   pagination: combineReducers({
-    applications: createNamedPaginationReducer(
-      APPLICATION_SHARED_NAME,
-      getApplicationId
-    ),
-    gateways: createNamedPaginationReducer(
-      GATEWAY_SHARED_NAME,
-      getGatewayId
-    ),
+    applications: createNamedPaginationReducer(APPLICATION_SHARED_NAME, getApplicationId),
+    gateways: createNamedPaginationReducer(GATEWAY_SHARED_NAME, getGatewayId),
   }),
 })

@@ -25,7 +25,7 @@ const PLACEHOLDER_CHAR = '·'
 const hex = /[0-9a-f]/i
 
 const masks = {}
-const mask = function (min = 0, max = 256) {
+const mask = function(min = 0, max = 256) {
   const key = `${min}-${max}`
   if (masks[key]) {
     return masks[key]
@@ -41,21 +41,16 @@ const mask = function (min = 0, max = 256) {
   return r
 }
 
-const upper = function (str) {
+const upper = function(str) {
   return str.toUpperCase()
 }
 
-const clean = function (str) {
+const clean = function(str) {
   return str.replace(new RegExp(`[ ${PLACEHOLDER_CHAR}]`, 'g'), '')
 }
 
-const Placeholder = function (props) {
-  const {
-    min = 0,
-    max = 256,
-    value = '',
-    placeholder,
-  } = props
+const Placeholder = function(props) {
+  const { min = 0, max = 256, value = '', placeholder } = props
 
   if (placeholder || Boolean(value)) {
     return null
@@ -64,7 +59,7 @@ const Placeholder = function (props) {
   const len = 1.5 * value.length - (value.length - 2 * Math.floor(value.length / 2))
 
   const content = mask(min, max)
-    .map(function (el, i) {
+    .map(function(el, i) {
       if (!(el instanceof RegExp)) {
         return ' '
       }
@@ -77,18 +72,11 @@ const Placeholder = function (props) {
     })
     .join('')
 
-  return (
-    <div
-      className={style.placeholder}
-    >
-      {content}
-    </div>
-  )
+  return <div className={style.placeholder}>{content}</div>
 }
 
 @bind
 export default class ByteInput extends React.Component {
-
   static propTypes = {
     value: PropTypes.string,
     onChange: PropTypes.func,
@@ -96,13 +84,13 @@ export default class ByteInput extends React.Component {
     max: PropTypes.number,
   }
 
-  static validate (value, props) {
+  static validate(value, props) {
     const { min = 0, max = 256 } = props
     const len = Math.floor(value.length / 2)
     return min <= len && len <= max
   }
 
-  render () {
+  render() {
     const {
       value,
       className,
@@ -116,13 +104,7 @@ export default class ByteInput extends React.Component {
     } = this.props
 
     return [
-      <Placeholder
-        key="placeholder"
-        min={min}
-        max={max}
-        value={value}
-        placeholder={placeholder}
-      />,
+      <Placeholder key="placeholder" min={min} max={max} value={value} placeholder={placeholder} />,
       <MaskedInput
         key="input"
         className={classnames(className, style.byte)}
@@ -140,7 +122,7 @@ export default class ByteInput extends React.Component {
     ]
   }
 
-  onChange (evt) {
+  onChange(evt) {
     this.props.onChange({
       target: {
         value: clean(evt.target.value),
@@ -148,16 +130,22 @@ export default class ByteInput extends React.Component {
     })
   }
 
-  onCopy (evt) {
+  onCopy(evt) {
     const input = evt.target
-    const value = input.value.substr(input.selectionStart, input.selectionEnd - input.selectionStart)
+    const value = input.value.substr(
+      input.selectionStart,
+      input.selectionEnd - input.selectionStart,
+    )
     evt.clipboardData.setData('text/plain', clean(value))
     evt.preventDefault()
   }
 
-  onCut (evt) {
+  onCut(evt) {
     const input = evt.target
-    const value = input.value.substr(input.selectionStart, input.selectionEnd - input.selectionStart)
+    const value = input.value.substr(
+      input.selectionStart,
+      input.selectionEnd - input.selectionStart,
+    )
     evt.clipboardData.setData('text/plain', clean(value))
     evt.preventDefault()
 

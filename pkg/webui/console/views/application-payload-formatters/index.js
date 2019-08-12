@@ -44,20 +44,22 @@ const m = defineMessages({
   linkApplication: 'link your application',
 })
 
-@connect(function (state) {
-  const link = selectApplicationLink(state)
-  const fetching = selectApplicationLinkFetching(state)
+@connect(
+  function(state) {
+    const link = selectApplicationLink(state)
+    const fetching = selectApplicationLinkFetching(state)
 
-  return {
-    appId: selectSelectedApplicationId(state),
-    fetching: fetching || !link,
-    linked: selectApplicationIsLinked(state),
-  }
-},
-dispatch => ({
-  getLink: (id, selector) => dispatch(getApplicationLink(id, selector)),
-}))
-@withBreadcrumb('apps.single.payload-formatters', function (props) {
+    return {
+      appId: selectSelectedApplicationId(state),
+      fetching: fetching || !link,
+      linked: selectApplicationIsLinked(state),
+    }
+  },
+  dispatch => ({
+    getLink: (id, selector) => dispatch(getApplicationLink(id, selector)),
+  }),
+)
+@withBreadcrumb('apps.single.payload-formatters', function(props) {
   const { appId } = props
 
   return (
@@ -69,33 +71,23 @@ dispatch => ({
   )
 })
 export default class ApplicationPayloadFormatters extends React.Component {
-
   static propTypes = {
     appId: PropTypes.string.isRequired,
     linked: PropTypes.bool.isRequired,
     fetching: PropTypes.bool.isRequired,
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { appId, getLink } = this.props
 
-    getLink(appId, [
-      'default_formatters',
-      'api_key',
-      'network_server_address',
-    ])
+    getLink(appId, ['default_formatters', 'api_key', 'network_server_address'])
   }
 
-  render () {
+  render() {
     const { match, fetching, linked, appId } = this.props
 
     if (fetching) {
-      return (
-        <Spinner
-          center
-          message={sharedMessages.loading}
-        />
-      )
+      return <Spinner center message={sharedMessages.loading} />
     }
 
     const linkWarning = linked ? null : (
@@ -119,10 +111,7 @@ export default class ApplicationPayloadFormatters extends React.Component {
           <Col sm={12}>
             {linkWarning}
             <Switch>
-              <Route
-                path={`${match.url}/uplink`}
-                component={ApplicationUplinkPayloadFormatters}
-              />
+              <Route path={`${match.url}/uplink`} component={ApplicationUplinkPayloadFormatters} />
               <Route
                 path={`${match.url}/downlink`}
                 component={ApplicationDownlinkPayloadFormatters}

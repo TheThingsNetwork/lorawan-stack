@@ -29,7 +29,7 @@ import style from './sub-view.styl'
 
 const reload = () => location.reload()
 
-const SubViewError = function ({ error }) {
+const SubViewError = function({ error }) {
   return (
     <Container>
       <Row>
@@ -39,16 +39,17 @@ const SubViewError = function ({ error }) {
             <Message component="h2" content={errorMessages.subviewErrorTitle} />
           </div>
           <p>
-            <Message component="span" content={errorMessages.subviewErrorExplanation} /><br />
+            <Message component="span" content={errorMessages.subviewErrorExplanation} />
+            <br />
             <Message component="span" content={errorMessages.contactAdministrator} />
           </p>
-          { isBackend(error) && (
+          {isBackend(error) && (
             <React.Fragment>
               <hr />
               <ErrorMessage content={error} />
             </React.Fragment>
-          ) }
-          { !isNotFoundError(error) && (
+          )}
+          {!isNotFoundError(error) && (
             <Button
               className={style.button}
               icon="refresh"

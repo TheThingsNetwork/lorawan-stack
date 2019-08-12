@@ -44,7 +44,8 @@ const m = defineMessages({
   validatePasswordUppercase: 'Should contain at least one uppercase letter',
   validatePasswordSpecial: 'Should contain at least one special character',
   registrationApproved: 'You have successfully registered and can login now',
-  registrationPending: 'You have successfully sent the registration request. Please wait until an admin approves it.',
+  registrationPending:
+    'You have successfully sent the registration request. Please wait until an admin approves it.',
 })
 
 const digit = /(?=.*[\d])/
@@ -69,7 +70,7 @@ const validationSchema = Yup.object().shape({
     .email(sharedMessages.validateEmail)
     .required(sharedMessages.validateRequired),
   password_confirm: Yup.string()
-    .oneOf([ Yup.ref('password'), null ], m.validatePasswordMatch)
+    .oneOf([Yup.ref('password'), null], m.validatePasswordMatch)
     .min(8)
     .required(sharedMessages.validateRequired),
 })
@@ -82,36 +83,39 @@ const initialValues = {
   password_confirm: '',
 }
 
-const getSuccessMessage = function (state) {
+const getSuccessMessage = function(state) {
   switch (state) {
-  case 'STATE_REQUESTED':
-    return m.registrationPending
-  case 'STATE_APPROVED':
-    return m.registrationApproved
-  default:
-    return ''
+    case 'STATE_REQUESTED':
+      return m.registrationPending
+    case 'STATE_APPROVED':
+      return m.registrationApproved
+    default:
+      return ''
   }
 }
 
 @withEnv
 @withRouter
-@connect( state => ({
-  fetching: state.user.fetching,
-  user: state.user.user,
-}), {
-  push,
-  replace,
-})
+@connect(
+  state => ({
+    fetching: state.user.fetching,
+    user: state.user.user,
+  }),
+  {
+    push,
+    replace,
+  },
+)
 @bind
 export default class CreateAccount extends React.PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       error: '',
     }
   }
 
-  async handleSubmit (values, { setSubmitting, setErrors }) {
+  async handleSubmit(values, { setSubmitting, setErrors }) {
     try {
       const { user_id, ...rest } = values
       const { push } = this.props
@@ -122,7 +126,6 @@ export default class CreateAccount extends React.PureComponent {
       push('/login', {
         info: getSuccessMessage(result.data.state),
       })
-
     } catch (error) {
       this.setState({
         error: error.response.data,
@@ -132,7 +135,7 @@ export default class CreateAccount extends React.PureComponent {
     }
   }
 
-  handleCancel () {
+  handleCancel() {
     const { replace, location } = this.props
     const state = location.state || {}
 
@@ -141,13 +144,9 @@ export default class CreateAccount extends React.PureComponent {
     replace(back)
   }
 
-  render () {
+  render() {
     const { error } = this.state
-    const {
-      user,
-      fetching,
-      env,
-    } = this.props
+    const { user, fetching, env } = this.props
 
     if (fetching) {
       return (
@@ -217,10 +216,7 @@ export default class CreateAccount extends React.PureComponent {
                 autoComplete="new-password"
                 component={Input}
               />
-              <Form.Submit
-                component={SubmitButton}
-                message={m.register}
-              />
+              <Form.Submit component={SubmitButton} message={m.register} />
               <Button naked secondary message={sharedMessages.cancel} onClick={this.handleCancel} />
             </Form>
           </Col>

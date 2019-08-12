@@ -24,14 +24,13 @@ import PropTypes from '../../lib/prop-types'
 
 import style from './safe-inspector.styl'
 
-function chunkArray (array, chunkSize) {
-  return Array.from(
-    { length: Math.ceil(array.length / chunkSize) },
-    (_, index) => array.slice(index * chunkSize, (index + 1) * chunkSize)
+function chunkArray(array, chunkSize) {
+  return Array.from({ length: Math.ceil(array.length / chunkSize) }, (_, index) =>
+    array.slice(index * chunkSize, (index + 1) * chunkSize),
   )
 }
 
-function selectText (node) {
+function selectText(node) {
   if (document.body.createTextRange) {
     const range = document.body.createTextRange()
     range.moveToElementText(node)
@@ -56,7 +55,7 @@ const m = defineMessages({
 @injectIntl
 @bind
 export class SafeInspector extends Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.state = {
@@ -73,37 +72,37 @@ export class SafeInspector extends Component {
     this.copyElem = React.createRef()
   }
 
-  handleVisibiltyToggle () {
+  handleVisibiltyToggle() {
     this.setState(prev => ({
       byteStyle: !prev.hidden ? true : prev.byteStyle,
       hidden: !prev.hidden,
     }))
   }
 
-  async handleTransformToggle () {
+  async handleTransformToggle() {
     await this.setState(prev => ({ byteStyle: !prev.byteStyle }))
     this.checkTruncateState()
   }
 
-  handleSwapToggle () {
+  handleSwapToggle() {
     this.setState(prev => ({ msb: !prev.msb }))
   }
 
-  handleDataClick () {
+  handleDataClick() {
     if (!this.state.hidden) {
       selectText(this.displayElem.current)
     }
   }
 
-  handleCopyClick () {
+  handleCopyClick() {
     this.setState({ copied: true })
   }
 
-  handleCopyAnimationEnd () {
+  handleCopyAnimationEnd() {
     this.setState({ copied: false })
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { disableResize } = this.props
     new clipboard(this.copyElem.current)
     if (!disableResize) {
@@ -112,18 +111,18 @@ export class SafeInspector extends Component {
     }
   }
 
-  componentWillUmount () {
+  componentWillUmount() {
     const { disableResize } = this.props
     if (!disableResize) {
       window.removeEventListener('resize', this.handleWindowResize)
     }
   }
 
-  handleWindowResize () {
+  handleWindowResize() {
     this.checkTruncateState()
   }
 
-  checkTruncateState () {
+  checkTruncateState() {
     if (!this.containerElem.current) {
       return
     }
@@ -139,22 +138,10 @@ export class SafeInspector extends Component {
     }
   }
 
-  render () {
-    const {
-      hidden,
-      byteStyle,
-      msb,
-      copied,
-    } = this.state
+  render() {
+    const { hidden, byteStyle, msb, copied } = this.state
 
-    const {
-      className,
-      data,
-      isBytes,
-      hideable,
-      small,
-      intl,
-    } = this.props
+    const { className, data, isBytes, hideable, small, intl } = this.props
 
     let formattedData = isBytes ? data.toUpperCase() : data
     let display = formattedData
@@ -165,7 +152,9 @@ export class SafeInspector extends Component {
         const orderedChunks = msb ? chunks : chunks.reverse()
         formattedData = display = `${orderedChunks.map(chunk => ` 0x${chunk.join('')}`)}`
       } else {
-        display = chunks.map((chunk, index) => (<span key={`${data}_chunk_${index}`}>{hidden ? '••' : chunk}</span>))
+        display = chunks.map((chunk, index) => (
+          <span key={`${data}_chunk_${index}`}>{hidden ? '••' : chunk}</span>
+        ))
       }
     } else if (hidden) {
       display = '•'.repeat(formattedData.length)
@@ -183,11 +172,13 @@ export class SafeInspector extends Component {
 
     return (
       <div ref={this.containerElem} className={containerStyle}>
-        <div ref={this.displayElem} onClick={this.handleDataClick} className={dataStyle}>{display}</div>
-        <div ref= {this.buttonsElem} className={style.buttons}>
+        <div ref={this.displayElem} onClick={this.handleDataClick} className={dataStyle}>
+          {display}
+        </div>
+        <div ref={this.buttonsElem} className={style.buttons}>
           {!hidden && !byteStyle && isBytes && (
             <React.Fragment>
-              <span>{ msb ? 'msb' : 'lsb' }</span>
+              <span>{msb ? 'msb' : 'lsb'}</span>
               <button
                 title={intl.formatMessage(m.byteOrder)}
                 className={style.buttonSwap}
@@ -213,7 +204,12 @@ export class SafeInspector extends Component {
             data-clipboard-text={formattedData}
             ref={this.copyElem}
           >
-            <Icon className={style.buttonIcon} onClick={this.handleCopyClick} small icon="file_copy" />
+            <Icon
+              className={style.buttonIcon}
+              onClick={this.handleCopyClick}
+              small
+              icon="file_copy"
+            />
             {copied && (
               <Message
                 content={m.copied}
@@ -222,13 +218,17 @@ export class SafeInspector extends Component {
               />
             )}
           </button>
-          { hideable && (
+          {hideable && (
             <button
               title={intl.formatMessage(m.toggleVisibility)}
               className={style.buttonVisibility}
               onClick={this.handleVisibiltyToggle}
             >
-              <Icon className={style.buttonIcon} small icon={hidden ? 'visibility' : 'visibility_off'} />
+              <Icon
+                className={style.buttonIcon}
+                small
+                icon={hidden ? 'visibility' : 'visibility_off'}
+              />
             </button>
           )}
         </div>

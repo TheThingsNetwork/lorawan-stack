@@ -27,14 +27,14 @@ import PropTypes from '../../../lib/prop-types'
  */
 @bind
 class ModalButton extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.state = {
       modalVisible: false,
     }
   }
-  handleClick () {
+  handleClick() {
     const { modalData } = this.props
 
     if (!modalData) {
@@ -46,7 +46,7 @@ class ModalButton extends React.Component {
     this.setState({ modalVisible: true })
   }
 
-  handleComplete (confirmed) {
+  handleComplete(confirmed) {
     const { onApprove, onCancel } = this.props
 
     if (confirmed) {
@@ -57,14 +57,8 @@ class ModalButton extends React.Component {
     this.setState({ modalVisible: false })
   }
 
-  render () {
-    const {
-      modalData,
-      message,
-      onApprove,
-      onCancel,
-      ...rest
-    } = this.props
+  render() {
+    const { modalData, message, onApprove, onCancel, ...rest } = this.props
 
     const modalComposedData = {
       approval: true,
@@ -77,10 +71,7 @@ class ModalButton extends React.Component {
 
     return (
       <React.Fragment>
-        <PortalledModal
-          visible={this.state.modalVisible}
-          modal={modalComposedData}
-        />
+        <PortalledModal visible={this.state.modalVisible} modal={modalComposedData} />
         <Button onClick={this.handleClick} message={message} {...rest} />
       </React.Fragment>
     )

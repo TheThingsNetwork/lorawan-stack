@@ -28,14 +28,8 @@ import {
   createEventsErrorSelector,
   createEventsStatusSelector,
 } from './events'
-import {
-  createRightsSelector,
-  createUniversalRightsSelector,
-} from './rights'
-import {
-  createApiKeysSelector,
-  createApiKeysStoreSelector,
-} from './api-keys'
+import { createRightsSelector, createUniversalRightsSelector } from './rights'
+import { createApiKeysSelector, createApiKeysStoreSelector } from './api-keys'
 import {
   createPaginationIdsSelectorByEntity,
   createPaginationTotalCountSelectorByEntity,
@@ -57,7 +51,8 @@ export const selectGatewayEntitiesStore = state => selectGatewayStore(state).ent
 export const selectGatewayStatisticsStore = state => selectGatewayStore(state).statistics
 export const selectGatewayById = (state, id) => selectGatewayEntitiesStore(state)[id]
 export const selectSelectedGatewayId = state => selectGatewayStore(state).selectedGateway
-export const selectSelectedGateway = state => selectGatewayById(state, selectSelectedGatewayId(state))
+export const selectSelectedGateway = state =>
+  selectGatewayById(state, selectSelectedGatewayId(state))
 
 export const selectGatewayFetching = createFetchingSelector(GET_GTW_BASE)
 export const selectGatewayError = createErrorSelector(GET_GTW_BASE)
@@ -95,15 +90,18 @@ export const selectGatewayRightsFetching = createFetchingSelector(GET_GTWS_RIGHT
 
 // Statistics
 export const selectGatewayStatisticsConnectError = createErrorSelector(START_GTW_STATS_BASE)
-export const selectGatewayStatisticsUpdateError = function (state) {
+export const selectGatewayStatisticsUpdateError = function(state) {
   const statistics = selectGatewayStatisticsStore(state) || {}
 
   return statistics.error
 }
 export const selectGatewayStatisticsError = state =>
   selectGatewayStatisticsConnectError(state) || selectGatewayStatisticsUpdateError(state)
-export const selectGatewayStatisticsIsFetching = createFetchingSelector([ START_GTW_STATS_BASE, UPDATE_GTW_STATS_BASE ])
-export const selectGatewayStatistics = function (state) {
+export const selectGatewayStatisticsIsFetching = createFetchingSelector([
+  START_GTW_STATS_BASE,
+  UPDATE_GTW_STATS_BASE,
+])
+export const selectGatewayStatistics = function(state) {
   const statistics = selectGatewayStatisticsStore(state) || {}
 
   return statistics.stats
@@ -111,6 +109,8 @@ export const selectGatewayStatistics = function (state) {
 
 // Collaborators
 export const selectGatewayUserCollaborator = createUserCollaboratorSelector(ENTITY_SINGLE)
-export const selectGatewayOrganizationCollaborator = createOrganizationCollaboratorSelector(ENTITY_SINGLE)
+export const selectGatewayOrganizationCollaborator = createOrganizationCollaboratorSelector(
+  ENTITY_SINGLE,
+)
 export const selectGatewayCollaboratorFetching = createFetchingSelector(GET_GTW_COLLABORATOR_BASE)
 export const selectGatewayCollaboratorError = createErrorSelector(GET_GTW_COLLABORATOR_BASE)

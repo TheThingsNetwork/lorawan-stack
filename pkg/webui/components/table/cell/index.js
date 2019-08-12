@@ -20,7 +20,7 @@ import Message from '../../../lib/components/message'
 
 import style from './cell.styl'
 
-const Cell = function ({
+const Cell = function({
   className,
   component: Component,
   centered = false,
@@ -38,12 +38,7 @@ const Cell = function ({
   const widthStyle = width ? { width: `${width}%` } : undefined
 
   return (
-    <Component
-      {...rest}
-      style={widthStyle}
-      className={cellClassNames}
-      colSpan={colSpan}
-    >
+    <Component {...rest} style={widthStyle} className={cellClassNames} colSpan={colSpan}>
       {children}
     </Component>
   )
@@ -62,19 +57,10 @@ Cell.propTypes = {
   small: PropTypes.bool,
 }
 
-const HeadCell = ({
-  className,
-  content,
-  children,
-  ...rest
-}) => (
-  <Cell
-    className={classnames(className, style.cellHead)}
-    component="th"
-    {...rest}
-  >
-    { Boolean(content) && ( <Message content={content} /> )}
-    { !Boolean(content) && children }
+const HeadCell = ({ className, content, children, ...rest }) => (
+  <Cell className={classnames(className, style.cellHead)} component="th" {...rest}>
+    {Boolean(content) && <Message content={content} />}
+    {!Boolean(content) && children}
   </Cell>
 )
 
@@ -83,16 +69,8 @@ HeadCell.propTypes = {
   content: PropTypes.message,
 }
 
-const DataCell = ({
-  className,
-  children,
-  ...rest
-}) => (
-  <Cell
-    className={classnames(className, style.cellData)}
-    component="td"
-    {...rest}
-  >
+const DataCell = ({ className, children, ...rest }) => (
+  <Cell className={classnames(className, style.cellData)} component="td" {...rest}>
     {children}
   </Cell>
 )

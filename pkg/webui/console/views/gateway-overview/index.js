@@ -26,16 +26,12 @@ import GatewayEvents from '../../containers/gateway-events'
 import Tag from '../../../components/tag'
 import Message from '../../../lib/components/message'
 
-import {
-  selectSelectedGateway as gatewaySelector,
-} from '../../store/selectors/gateways'
-import {
-  getGatewayId as idSelector,
-} from '../../../lib/selectors/id'
+import { selectSelectedGateway as gatewaySelector } from '../../store/selectors/gateways'
+import { getGatewayId as idSelector } from '../../../lib/selectors/id'
 
 import style from './gateway-overview.styl'
 
-@connect(function (state, props) {
+@connect(function(state, props) {
   const gtw = gatewaySelector(state, props)
 
   return {
@@ -45,8 +41,7 @@ import style from './gateway-overview.styl'
 })
 @bind
 export default class GatewayOverview extends React.Component {
-
-  get gatewayInfo () {
+  get gatewayInfo() {
     const { gtwId, gateway } = this.props
     const {
       ids,
@@ -114,7 +109,7 @@ export default class GatewayOverview extends React.Component {
     )
   }
 
-  render () {
+  render() {
     const { gtwId } = this.props
 
     return (
@@ -126,10 +121,7 @@ export default class GatewayOverview extends React.Component {
           </Col>
           <Col sm={12} lg={6}>
             <div className={style.latestEvents}>
-              <GatewayEvents
-                gtwId={gtwId}
-                widget
-              />
+              <GatewayEvents gtwId={gtwId} widget />
             </div>
           </Col>
         </Row>
@@ -137,4 +129,3 @@ export default class GatewayOverview extends React.Component {
     )
   }
 }
-

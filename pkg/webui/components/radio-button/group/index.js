@@ -22,11 +22,11 @@ import style from './group.styl'
 
 export const RadioGroupContext = React.createContext()
 
-function findCheckedRadio (children) {
+function findCheckedRadio(children) {
   let value
   let matched = false
 
-  React.Children.forEach(children, function (radio) {
+  React.Children.forEach(children, function(radio) {
     if (radio && radio.props && !matched && radio.props.checked) {
       value = radio.props.value
       matched = true
@@ -38,8 +38,7 @@ function findCheckedRadio (children) {
 
 @bind
 class RadioGroup extends React.Component {
-
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     let value
@@ -52,10 +51,9 @@ class RadioGroup extends React.Component {
     }
 
     this.state = { value }
-
   }
 
-  static getDerivedStateFromProps (props, state) {
+  static getDerivedStateFromProps(props, state) {
     if ('value' in props) {
       return { value: props.value }
     }
@@ -68,7 +66,7 @@ class RadioGroup extends React.Component {
     return null
   }
 
-  handleRadioChange (event) {
+  handleRadioChange(event) {
     const { onChange } = this.props
     const { target } = event
 
@@ -77,16 +75,10 @@ class RadioGroup extends React.Component {
     }
 
     onChange(target.value)
-  };
+  }
 
-  render () {
-    const {
-      className,
-      name,
-      disabled,
-      horizontal,
-      children,
-    } = this.props
+  render() {
+    const { className, name, disabled, horizontal, children } = this.props
     const { value } = this.state
 
     const ctx = {
@@ -103,9 +95,7 @@ class RadioGroup extends React.Component {
 
     return (
       <div className={cls}>
-        <RadioGroupContext.Provider value={ctx}>
-          {children}
-        </RadioGroupContext.Provider>
+        <RadioGroupContext.Provider value={ctx}>{children}</RadioGroupContext.Provider>
       </div>
     )
   }
@@ -118,10 +108,7 @@ RadioGroup.propTypes = {
   value: PropTypes.string,
   initialValue: PropTypes.string,
   onChange: PropTypes.func,
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node,
-  ]).isRequired,
+  children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]).isRequired,
 }
 
 RadioGroup.defaultProps = {

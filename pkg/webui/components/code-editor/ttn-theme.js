@@ -13,11 +13,15 @@
 // limitations under the License.
 
 /* eslint-disable no-undef*/
-ace.define('ace/theme/ttn', [ 'require', 'exports', 'module', 'ace/lib/dom' ], function (acequire, exports, module) {
-
+ace.define('ace/theme/ttn', ['require', 'exports', 'module', 'ace/lib/dom'], function(
+  acequire,
+  exports,
+  module,
+) {
   exports.isDark = false
   exports.cssClass = 'ace-ttn'
-  exports.cssText = '\
+  exports.cssText =
+    '\
 .ace_scroller.ace_scroll-left {\
   box-shadow: none;\
 }\

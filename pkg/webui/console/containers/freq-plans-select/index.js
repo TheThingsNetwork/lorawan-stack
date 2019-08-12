@@ -29,10 +29,7 @@ import {
   selectFrequencyPlansFetching,
 } from '../../store/selectors/configuration'
 
-import {
-  getGsFrequencyPlans,
-  getNsFrequencyPlans,
-} from '../../store/actions/configuration'
+import { getGsFrequencyPlans, getNsFrequencyPlans } from '../../store/actions/configuration'
 
 const m = defineMessages({
   freqPlansFetchingFailure: 'Could not retrieve the list of available frequency plans',
@@ -40,27 +37,24 @@ const m = defineMessages({
 
 const formatOptions = plans => plans.map(plan => ({ value: plan.id, label: plan.name }))
 
-@storeConnect(function (state, props) {
-  return {
-    plansGs: selectGsFrequencyPlans(state, props),
-    plansNs: selectNsFrequencyPlans(state, props),
-    error: selectFrequencyPlansError(state, props),
-    fetching: selectFrequencyPlansFetching(state, props),
-  }
-},
-dispatch => ({
-  getGsFrequencyPlans: () => dispatch(getGsFrequencyPlans()),
-  getNsFrequencyPlans: () => dispatch(getNsFrequencyPlans()),
-}))
+@storeConnect(
+  function(state, props) {
+    return {
+      plansGs: selectGsFrequencyPlans(state, props),
+      plansNs: selectNsFrequencyPlans(state, props),
+      error: selectFrequencyPlansError(state, props),
+      fetching: selectFrequencyPlansFetching(state, props),
+    }
+  },
+  dispatch => ({
+    getGsFrequencyPlans: () => dispatch(getGsFrequencyPlans()),
+    getNsFrequencyPlans: () => dispatch(getNsFrequencyPlans()),
+  }),
+)
 @bind
 class FrequencyPlansSelect extends React.PureComponent {
-
-  componentDidMount () {
-    const {
-      source,
-      getNsFrequencyPlans,
-      getGsFrequencyPlans,
-    } = this.props
+  componentDidMount() {
+    const { source, getNsFrequencyPlans, getGsFrequencyPlans } = this.props
 
     if (source === 'ns') {
       getNsFrequencyPlans()
@@ -69,24 +63,14 @@ class FrequencyPlansSelect extends React.PureComponent {
     }
   }
 
-  getOptions () {
+  getOptions() {
     const { source, plansGs, plansNs } = this.props
 
-    return source === 'ns'
-      ? formatOptions(plansNs)
-      : formatOptions(plansGs)
+    return source === 'ns' ? formatOptions(plansNs) : formatOptions(plansGs)
   }
 
-  render () {
-    const {
-      name,
-      required,
-      title,
-      autoFocus,
-      error,
-      fetching,
-      menuPlacement,
-    } = this.props
+  render() {
+    const { name, required, title, autoFocus, error, fetching, menuPlacement } = this.props
 
     const fieldOptions = this.getOptions()
 
@@ -107,12 +91,12 @@ class FrequencyPlansSelect extends React.PureComponent {
 }
 
 FrequencyPlansSelect.propTypes = {
-  source: PropTypes.oneOf([ 'ns', 'gs' ]).isRequired,
+  source: PropTypes.oneOf(['ns', 'gs']).isRequired,
   name: PropTypes.string.isRequired,
   required: PropTypes.bool,
   title: PropTypes.message,
   autoFocus: PropTypes.bool,
-  menuPlacement: PropTypes.oneOf([ 'top', 'bottom', 'auto' ]),
+  menuPlacement: PropTypes.oneOf(['top', 'bottom', 'auto']),
 }
 
 FrequencyPlansSelect.defaultProps = {

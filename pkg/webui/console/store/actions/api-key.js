@@ -14,11 +14,10 @@
 
 import { createRequestActions } from './lib'
 
-export const createGetApiKeyActionType = name => (
-  `GET_${name}_API_KEY`
-)
+export const createGetApiKeyActionType = name => `GET_${name}_API_KEY`
 
-export default name => createRequestActions(
-  createGetApiKeyActionType(name),
-  (parentId, keyId) => ({ id: parentId, keyId })
-)
+export default name =>
+  createRequestActions(createGetApiKeyActionType(name), (parentId, keyId) => ({
+    id: parentId,
+    keyId,
+  }))

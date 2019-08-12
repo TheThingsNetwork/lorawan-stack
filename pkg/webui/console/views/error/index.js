@@ -26,7 +26,11 @@ import errorMessages from '../../../lib/errors/error-messages'
 
 import Header from '../../containers/header'
 
-import { httpStatusCode, isUnknown as isUnknownError, isNotFoundError } from '../../../lib/errors/utils'
+import {
+  httpStatusCode,
+  isUnknown as isUnknownError,
+  isNotFoundError,
+} from '../../../lib/errors/utils'
 
 import statusCodeMessages from '../../../lib/errors/status-code-messages'
 
@@ -34,8 +38,7 @@ import style from './error.styl'
 
 const reload = () => location.reload()
 
-const FullViewErrorInner = function ({ error, env }) {
-
+const FullViewErrorInner = function({ error, env }) {
   const isUnknown = isUnknownError(error)
   const statusCode = httpStatusCode(error)
   const isNotFound = isNotFoundError(error)
@@ -62,26 +65,16 @@ const FullViewErrorInner = function ({ error, env }) {
               component="h2"
               content={errorTitleMessage}
             />
-            <ErrorMessage
-              className={style.fullViewErrorSub}
-              content={errorMessageMessage}
-            />
-            { isNotFoundError(error)
-              ? (
-                <Button.AnchorLink
-                  icon="keyboard_arrow_left"
-                  message={sharedMessages.takeMeBack}
-                  href={env.appRoot}
-                />
-              )
-              : (
-                <Button
-                  icon="refresh"
-                  message={sharedMessages.refreshPage}
-                  onClick={reload}
-                />
-              )
-            }
+            <ErrorMessage className={style.fullViewErrorSub} content={errorMessageMessage} />
+            {isNotFoundError(error) ? (
+              <Button.AnchorLink
+                icon="keyboard_arrow_left"
+                message={sharedMessages.takeMeBack}
+                href={env.appRoot}
+              />
+            ) : (
+              <Button icon="refresh" message={sharedMessages.refreshPage} onClick={reload} />
+            )}
           </Col>
         </Row>
       </Container>
@@ -91,7 +84,7 @@ const FullViewErrorInner = function ({ error, env }) {
 
 const FullViewErrorInnerWithEnv = withEnv(FullViewErrorInner)
 
-const FullViewError = function ({ error }) {
+const FullViewError = function({ error }) {
   return (
     <div className={style.wrapper}>
       <Header className={style.header} anchored />

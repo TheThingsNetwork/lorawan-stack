@@ -20,43 +20,43 @@ const defaultState = {
   totalCount: 0,
 }
 
-const createNamedApiKeyReducer = function (reducerName = '') {
+const createNamedApiKeyReducer = function(reducerName = '') {
   const GET_LIST_BASE = createGetApiKeysListActionType(reducerName)
   const [{ success: GET_LIST_SUCCESS }] = createRequestActions(GET_LIST_BASE)
 
-  return function (state = defaultState, { type, payload }) {
+  return function(state = defaultState, { type, payload }) {
     switch (type) {
-    case GET_LIST_SUCCESS:
-      return {
-        ...state,
-        keys: payload.api_keys,
-        totalCount: payload.totalCount,
-      }
-    default:
-      return state
+      case GET_LIST_SUCCESS:
+        return {
+          ...state,
+          keys: payload.api_keys,
+          totalCount: payload.totalCount,
+        }
+      default:
+        return state
     }
   }
 }
 
-const createNamedApiKeysReducer = function (reducerName = '') {
+const createNamedApiKeysReducer = function(reducerName = '') {
   const GET_LIST_BASE = createGetApiKeysListActionType(reducerName)
   const [{ success: GET_LIST_SUCCESS }] = createRequestActions(GET_LIST_BASE)
   const apiKey = createNamedApiKeyReducer(reducerName)
 
-  return function (state = {}, action) {
+  return function(state = {}, action) {
     const { payload } = action
     if (!payload || !payload.id) {
       return state
     }
 
     switch (action.type) {
-    case GET_LIST_SUCCESS:
-      return {
-        ...state,
-        [payload.id]: apiKey(state[payload.id], action),
-      }
-    default:
-      return state
+      case GET_LIST_SUCCESS:
+        return {
+          ...state,
+          [payload.id]: apiKey(state[payload.id], action),
+        }
+      default:
+        return state
     }
   }
 }

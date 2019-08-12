@@ -15,14 +15,11 @@
 import { createRequestActions } from './lib'
 
 export const GET_WEBHOOKS_LIST_BASE = 'GET_WEBHOOKS_LIST'
-export const [{
-  request: GET_WEBHOOKS_LIST,
-  success: GET_WEBHOOKS_LIST_SUCCESS,
-  failure: GET_WEBHOOKS_LIST_FAILURE,
-}, {
-  request: getWebhooksList,
-  success: getWebhooksListSuccess,
-  failure: getWebhooksListFailure,
-}] = createRequestActions(GET_WEBHOOKS_LIST_BASE,
-  appId => ({ appId })
-)
+export const [
+  {
+    request: GET_WEBHOOKS_LIST,
+    success: GET_WEBHOOKS_LIST_SUCCESS,
+    failure: GET_WEBHOOKS_LIST_FAILURE,
+  },
+  { request: getWebhooksList, success: getWebhooksListSuccess, failure: getWebhooksListFailure },
+] = createRequestActions(GET_WEBHOOKS_LIST_BASE, appId => ({ appId }))

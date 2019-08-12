@@ -20,13 +20,15 @@ import { withInfo } from '@storybook/addon-info'
 import NavigationBar from '../bar'
 
 storiesOf('Navigation', module)
-  .addDecorator((story, context) => withInfo({
-    inline: true,
-    header: false,
-    source: false,
-    propTables: [ NavigationBar ],
-  })(story)(context))
-  .add('NavigationBar', function () {
+  .addDecorator((story, context) =>
+    withInfo({
+      inline: true,
+      header: false,
+      source: false,
+      propTables: [NavigationBar],
+    })(story)(context),
+  )
+  .add('NavigationBar', function() {
     const entries = [
       {
         title: 'Overview',
@@ -50,9 +52,5 @@ storiesOf('Navigation', module)
       },
     ]
 
-    return (
-      <NavigationBar
-        entries={entries}
-      />
-    )
+    return <NavigationBar entries={entries} />
   })

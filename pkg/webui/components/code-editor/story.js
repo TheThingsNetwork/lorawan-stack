@@ -22,8 +22,7 @@ const containerStyles = { height: '500px' }
 
 @bind
 class Example extends React.Component {
-
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.state = {
@@ -31,19 +30,15 @@ class Example extends React.Component {
     }
   }
 
-  onChange (value) {
+  onChange(value) {
     this.setState({ value })
   }
 
-  render () {
+  render() {
     const { value } = this.state
     return (
       <div style={containerStyles}>
-        <CodeEditor
-          {...this.props}
-          onChange={this.onChange}
-          value={value}
-        />
+        <CodeEditor {...this.props} onChange={this.onChange} value={value} />
       </div>
     )
   }
@@ -67,24 +62,11 @@ function Decoder(bytes, port) {
 
 storiesOf('CodeEditor', module)
   .add('Default', () => (
-    <Example
-      language="javascript"
-      name="storybook-code-editor"
-      placeholder={code}
-    />
+    <Example language="javascript" name="storybook-code-editor" placeholder={code} />
   ))
   .add('Readonly', () => (
-    <Example
-      language="javascript"
-      name="storybook-code-editor"
-      placeholder={code}
-      readOnly
-    />
+    <Example language="javascript" name="storybook-code-editor" placeholder={code} readOnly />
   ))
   .add('With warning', () => (
-    <Example
-      language="javascript"
-      name="storybook-code-editor"
-      placeholder={`${code}}`}
-    />
+    <Example language="javascript" name="storybook-code-editor" placeholder={`${code}}`} />
   ))

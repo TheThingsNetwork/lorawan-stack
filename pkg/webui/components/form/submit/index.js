@@ -18,20 +18,16 @@ import FormContext from '../context'
 import PropTypes from '../../../lib/prop-types'
 
 class FormSubmit extends React.Component {
-
   static contextType = FormContext
   static propTypes = {
-    component: PropTypes.oneOfType([
-      PropTypes.func,
-      PropTypes.string,
-    ]).isRequired,
+    component: PropTypes.oneOfType([PropTypes.func, PropTypes.string]).isRequired,
   }
 
   static defaultProps = {
     component: 'button',
   }
 
-  render () {
+  render() {
     const { component: Component, ...rest } = this.props
 
     const submitProps = {
@@ -45,12 +41,7 @@ class FormSubmit extends React.Component {
       disabled: this.context.disabled,
     }
 
-    return (
-      <Component
-        {...rest}
-        {...submitProps}
-      />
-    )
+    return <Component {...rest} {...submitProps} />
   }
 }
 

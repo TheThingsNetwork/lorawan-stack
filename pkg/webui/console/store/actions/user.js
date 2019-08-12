@@ -15,23 +15,13 @@
 import { createRequestActions } from './lib'
 
 export const GET_USER_ME_BASE = 'GET_USER_ME'
-export const [{
-  request: GET_USER_ME,
-  success: GET_USER_ME_SUCCESS,
-  failure: GET_USER_ME_FAILURE,
-}, {
-  request: getUserMe,
-  success: getUserMeSuccess,
-  failure: getUserMeFailure,
-}] = createRequestActions(GET_USER_ME_BASE)
+export const [
+  { request: GET_USER_ME, success: GET_USER_ME_SUCCESS, failure: GET_USER_ME_FAILURE },
+  { request: getUserMe, success: getUserMeSuccess, failure: getUserMeFailure },
+] = createRequestActions(GET_USER_ME_BASE)
 
 export const LOGOUT_BASE = 'LOGOUT'
-export const [{
-  request: LOGOUT,
-  success: LOGOUT_SUCCESS,
-  failure: LOGOUT_FAILURE,
-}, {
-  request: logout,
-  success: logoutSuccess,
-  failure: logoutFailure,
-}] = createRequestActions(LOGOUT_BASE)
+export const [
+  { request: LOGOUT, success: LOGOUT_SUCCESS, failure: LOGOUT_FAILURE },
+  { request: logout, success: logoutSuccess, failure: logoutFailure },
+] = createRequestActions(LOGOUT_BASE)

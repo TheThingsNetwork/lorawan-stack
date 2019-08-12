@@ -59,24 +59,32 @@ const webhookEntitySelector = [
   'location_solved',
 ]
 
-@connect(state => ({
-  appId: selectSelectedApplicationId(state),
-  webhook: selectSelectedWebhook(state),
-  fetching: selectWebhookFetching(state),
-  error: selectWebhookError(state),
-}), function (dispatch, { match }) {
-  const { appId, webhookId } = match.params
-  return {
-    getWebhook: () => dispatch(getWebhook(appId, webhookId, webhookEntitySelector)),
-    navigateToList: () => dispatch(replace(`/applications/${appId}/integrations`)),
-  }
-})
+@connect(
+  state => ({
+    appId: selectSelectedApplicationId(state),
+    webhook: selectSelectedWebhook(state),
+    fetching: selectWebhookFetching(state),
+    error: selectWebhookError(state),
+  }),
+  function(dispatch, { match }) {
+    const { appId, webhookId } = match.params
+    return {
+      getWebhook: () => dispatch(getWebhook(appId, webhookId, webhookEntitySelector)),
+      navigateToList: () => dispatch(replace(`/applications/${appId}/integrations`)),
+    }
+  },
+)
 @withRequest(
   ({ getWebhook }) => getWebhook(),
-  ({ fetching, webhook }) => fetching || !Boolean(webhook)
+  ({ fetching, webhook }) => fetching || !Boolean(webhook),
 )
-@withBreadcrumb('apps.single.integrations.edit', function (props) {
-  const { appId, match: { params: { webhookId }}} = props
+@withBreadcrumb('apps.single.integrations.edit', function(props) {
+  const {
+    appId,
+    match: {
+      params: { webhookId },
+    },
+  } = props
   return (
     <Breadcrumb
       path={`/applications/${appId}/integrations/${webhookId}`}
@@ -87,28 +95,38 @@ const webhookEntitySelector = [
 })
 @bind
 export default class ApplicationIntegrationEdit extends Component {
-
-  async handleSubmit (webhook) {
-    const { appId, match: { params: { webhookId }}, webhook: originalWebhook } = this.props
-    const patch = diff(originalWebhook, webhook, [ 'ids' ])
+  async handleSubmit(webhook) {
+    const {
+      appId,
+      match: {
+        params: { webhookId },
+      },
+      webhook: originalWebhook,
+    } = this.props
+    const patch = diff(originalWebhook, webhook, ['ids'])
 
     await api.application.webhooks.update(appId, webhookId, patch)
   }
 
-  handleSubmitSuccess () {
+  handleSubmitSuccess() {
     toast({
       message: m.updateSuccess,
       type: toast.types.SUCCESS,
     })
   }
 
-  async handleDelete () {
-    const { appId, match: { params: { webhookId }}} = this.props
+  async handleDelete() {
+    const {
+      appId,
+      match: {
+        params: { webhookId },
+      },
+    } = this.props
 
     await api.application.webhooks.delete(appId, webhookId)
   }
 
-  async handleDeleteSuccess () {
+  async handleDeleteSuccess() {
     const { navigateToList } = this.props
 
     toast({
@@ -119,7 +137,7 @@ export default class ApplicationIntegrationEdit extends Component {
     navigateToList()
   }
 
-  render () {
+  render() {
     const { webhook } = this.props
 
     return (

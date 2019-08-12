@@ -26,26 +26,23 @@ const m = defineMessages({
   footer: "You are the network. Let's build this thing together.",
 })
 
-const Footer = function ({
-  className,
-  links = [],
-}) {
+const Footer = function({ className, links = [] }) {
   return (
     <footer className={classnames(className, style.footer)}>
       <div>
-        <span><Message content={m.footer} /> – </span>
+        <span>
+          <Message content={m.footer} /> –{' '}
+        </span>
         <a className={style.link} href="https://www.thethingsnetwork.org">
           The Things Network
         </a>
       </div>
       <div>
-        {
-          links.map((item, key) => (
-            <Link key={key} className={style.link} to={item.link}>
-              <Message content={item.title} />
-            </Link>
-          ))
-        }
+        {links.map((item, key) => (
+          <Link key={key} className={style.link} to={item.link}>
+            <Message content={item.title} />
+          </Link>
+        ))}
         <span className={style.version}>v{process.env.VERSION}</span>
       </div>
     </footer>
@@ -58,10 +55,12 @@ Footer.propTypes = {
    * @param {(string|Object)} title - The title of the link
    * @param {string} link - The link url
    */
-  links: PropTypes.arrayOf(PropTypes.shape({
-    title: PropTypes.message.isRequired,
-    link: PropTypes.string.isRequired,
-  })),
+  links: PropTypes.arrayOf(
+    PropTypes.shape({
+      title: PropTypes.message.isRequired,
+      link: PropTypes.string.isRequired,
+    }),
+  ),
 }
 
 export default Footer
