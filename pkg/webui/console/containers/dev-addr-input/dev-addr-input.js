@@ -49,7 +49,7 @@ const DevAddrInput = function (props) {
 
   const action = React.useMemo(function () {
     return {
-      icon: 'build',
+      icon: 'autorenew',
       title: m.generate,
       type: 'button',
       disabled: fetching || disabled,
