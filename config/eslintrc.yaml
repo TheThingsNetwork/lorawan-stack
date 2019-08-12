@@ -39,6 +39,8 @@ rules:
   jsdoc/require-param-type: error
   jsdoc/require-hyphen-before-param-description: error
 
+  babel/object-curly-spacing: off
+
   # Warn on console occurrences
   no-console:
     - warn
