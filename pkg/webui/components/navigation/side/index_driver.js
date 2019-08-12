@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
+import { IntlProvider } from 'react-intl'
 
 import SideNavigation from './side'
 
@@ -22,9 +23,10 @@ export default function () {
     when: {
       created (props) {
         driver.component = shallow(
-          <SideNavigation {...props} />,
-          { context: { intl: {}}}
-        )
+          <IntlProvider>
+            <SideNavigation {...props} />
+          </IntlProvider>
+        ).dive()
 
         return driver
       },
@@ -75,7 +77,6 @@ export default function () {
       hideButton () {
         return driver.component
           .find('[data-hook="side-nav-hide-button"]')
-          .dive()
       },
       items () {
         return driver.get.list().children()
