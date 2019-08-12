@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { IntlProvider } from 'react-intl'
 
 import SideNavigationItem from '.'
 
@@ -23,10 +22,8 @@ export default function () {
     when: {
       created (props) {
         driver.component = shallow(
-          <IntlProvider>
-            <SideNavigationItem {...props} />
-          </IntlProvider>
-        ).dive()
+          <SideNavigationItem {...props} />
+        )
 
         return driver
       },
