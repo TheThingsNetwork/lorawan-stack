@@ -122,6 +122,10 @@ func (js Js) jest() (func(args ...string) error, error) {
 	return js.execFromNodeBin("jest", false)
 }
 
+func (js Js) prettier() (func(args ...string) error, error) {
+	return js.execFromNodeBin("prettier", false)
+}
+
 func (js Js) eslint() (func(args ...string) error, error) {
 	return js.execFromNodeBin("eslint", false)
 }
@@ -295,6 +299,20 @@ func (js Js) Test() error {
 		return err
 	}
 	return jest("./pkg/webui")
+}
+
+// Fmt formats all js files.
+func (js Js) Fmt() error {
+	if mg.Verbose() {
+		fmt.Println("Running prettier on .js files")
+	}
+
+	prettier, err := js.prettier()
+	if err != nil {
+		return err
+	}
+
+	return prettier("--config", "./config/.prettierrc.js", "./pkg/webui/**/*.js", "--write")
 }
 
 // Lint runs eslint over frontend js files.
