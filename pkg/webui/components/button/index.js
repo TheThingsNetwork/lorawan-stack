@@ -36,6 +36,7 @@ function assembleClassnames ({
   large,
   className,
   error,
+  raw,
 }) {
   return classnames(style.button, className, {
     [style.danger]: danger,
@@ -47,6 +48,7 @@ function assembleClassnames ({
     [style.onlyIcon]: icon !== undefined && !message,
     [style.error]: error && !busy,
     [style.large]: large,
+    [style.raw]: raw,
   })
 }
 
@@ -152,6 +154,10 @@ const commonPropTypes = {
    * A flag specifying whether the `naked` styling should applied to the button
    */
   naked: PropTypes.bool,
+  /**
+   * A flag specifying whether the `raw` styling should applied to the button
+   */
+  raw: PropTypes.bool,
   /**
    * A flag specifying whether the `large` styling should applied to the button
    */
