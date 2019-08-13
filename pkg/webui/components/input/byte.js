@@ -25,13 +25,21 @@ const PLACEHOLDER_CHAR = '·'
 const hex = /[0-9a-f]/i
 
 const masks = {}
-const mask = function(min = 0, max = 256) {
+const mask = function(min, max, showPerChar = false) {
   const key = `${min}-${max}`
   if (masks[key]) {
     return masks[key]
   }
 
-  const r = new Array(3 * max - 1).fill(hex)
+  const wordSize = showPerChar ? 2 : 1
+
+  let length = 3 * Math.floor(max / wordSize) - 1
+  if (showPerChar && max % wordSize !== 0) {
+    // account for the space and the extra character
+    length += wordSize
+  }
+
+  const r = new Array(length).fill(hex)
   for (let i = 0; i < r.length; i++) {
     if ((i + 1) % 3 === 0) {
       r[i] = ' '
@@ -50,7 +58,7 @@ const clean = function(str) {
 }
 
 const Placeholder = function(props) {
-  const { min = 0, max = 256, value = '', placeholder } = props
+  const { min = 0, max = 256, value = '', placeholder, showPerChar = false } = props
 
   if (placeholder || Boolean(value)) {
     return null
@@ -58,7 +66,7 @@ const Placeholder = function(props) {
 
   const len = 1.5 * value.length - (value.length - 2 * Math.floor(value.length / 2))
 
-  const content = mask(min, max)
+  const content = mask(min, max, showPerChar)
     .map(function(el, i) {
       if (!(el instanceof RegExp)) {
         return ' '
@@ -81,7 +89,14 @@ export default class ByteInput extends React.Component {
     max: PropTypes.number,
     min: PropTypes.number,
     onChange: PropTypes.func,
+    showPerChar: PropTypes.bool,
     value: PropTypes.string,
+  }
+
+  static defaultProps = {
+    min: 0,
+    max: 256,
+    showPerChar: false,
   }
 
   input = React.createRef()
@@ -96,23 +111,31 @@ export default class ByteInput extends React.Component {
     const {
       value,
       className,
-      min = 0,
-      max = 255,
+      min,
+      max,
       onChange,
       valid,
       placeholder,
       type,
+      showPerChar,
       ...rest
     } = this.props
 
     return [
-      <Placeholder key="placeholder" min={min} max={max} value={value} placeholder={placeholder} />,
+      <Placeholder
+        key="placeholder"
+        min={min}
+        max={max}
+        value={value}
+        placeholder={placeholder}
+        showPerChar={showPerChar}
+      />,
       <MaskedInput
         ref={this.input}
         key="input"
         className={classnames(className, style.byte)}
         value={value}
-        mask={mask(min, max)}
+        mask={mask(min, max, showPerChar)}
         placeholderChar={PLACEHOLDER_CHAR}
         keepCharPositions={false}
         pipe={upper}
@@ -134,7 +157,7 @@ export default class ByteInput extends React.Component {
         i = inputElement.value.length
       }
 
-      setTimeout(function () {
+      setTimeout(function() {
         inputElement.focus()
         inputElement.setSelectionRange(i, i)
       }, 0)
