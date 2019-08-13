@@ -413,9 +413,10 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 			return err
 		}
 		if valid {
-			if err := rights.RequireUser(ctx, req.UserIdentifiers, ttnpb.RIGHT_USER_ALL); err != nil {
-				return err
-			}
+			// TODO: Add when 2FA is enabled (https://github.com/TheThingsNetwork/lorawan-stack/issues/2)
+			// if err := rights.RequireUser(ctx, req.UserIdentifiers, ttnpb.RIGHT_USER_ALL); err != nil {
+			//	return err
+			// }
 		} else {
 			if usr.TemporaryPassword == "" {
 				events.Publish(evtUpdateUserIncorrectPassword(ctx, req.UserIdentifiers, nil))
