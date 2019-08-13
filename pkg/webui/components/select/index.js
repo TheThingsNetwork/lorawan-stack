@@ -42,6 +42,7 @@ class Select extends React.PureComponent {
     ),
     error: PropTypes.bool,
     warning: PropTypes.bool,
+    name: PropTypes.string.isRequired,
   }
 
   static defaultProps = {
@@ -89,7 +90,11 @@ class Select extends React.PureComponent {
 
   onBlur(event) {
     const { value } = this.state
-    const { onBlur } = this.props
+    const { onBlur, name } = this.props
+
+    // https://github.com/JedWatson/react-select/issues/3523
+    // make sure the input name is always present in the event object
+    event.target.name = name
 
     if (typeof value !== 'undefined') {
       // https://github.com/JedWatson/react-select/issues/3175
@@ -111,6 +116,7 @@ class Select extends React.PureComponent {
       disabled,
       error,
       warning,
+      name,
       ...rest
     } = this.props
 
@@ -138,6 +144,7 @@ class Select extends React.PureComponent {
         onBlur={this.onBlur}
         onFocus={onFocus}
         isDisabled={disabled}
+        name={name}
         {...rest}
       />
     )
