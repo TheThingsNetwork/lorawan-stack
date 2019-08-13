@@ -189,7 +189,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 	server.Server = grpc.NewServer(append(baseOptions, options.serverOptions...)...)
 	server.ServeMux = runtime.NewServeMux(
 		runtime.WithForwardResponseOption(func(ctx context.Context, w http.ResponseWriter, resp proto.Message) error {
-			w.Header().Set("Access-Control-Expose-Headers", "Link, Date, Content-Length, X-Total-Count")
+			w.Header().Set("Access-Control-Expose-Headers", "Date, Content-Length, X-Total-Count, X-Warning")
 			return nil
 		}),
 		runtime.WithMarshalerOption("*", jsonpb.TTN()),
@@ -214,8 +214,9 @@ func New(ctx context.Context, opts ...Option) *Server {
 			switch s {
 			case "x-total-count":
 				return "X-Total-Count", true
-			case "link":
-				return "Link", true
+			case "warning":
+				// NOTE: the "Warning" header in HTTP is specified differently than our "warning" gRPC metadata.
+				return "X-Warning", true
 			}
 			return s, false
 		}),
