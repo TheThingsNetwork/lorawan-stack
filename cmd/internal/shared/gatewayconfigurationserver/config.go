@@ -18,7 +18,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/gatewayconfigurationserver"
 )
 
-// DefaultGatewayConfigurationServerConfig is the default configuration for the Application Server.
+// DefaultGatewayConfigurationServerConfig is the default configuration for the Gateway Configuration Server.
 var DefaultGatewayConfigurationServerConfig = gatewayconfigurationserver.Config{
 	RequireAuth: true,
 }

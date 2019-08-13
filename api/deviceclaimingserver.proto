@@ -1,0 +1,51 @@
+// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "lorawan-stack/api/identifiers.proto";
+
+package ttn.lorawan.v3;
+
+option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
+
+message ClaimEndDeviceRequest {
+  message AuthenticatedIdentifiers {
+    bytes join_eui = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "JoinEUI"];
+    bytes dev_eui = 2 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "DevEUI"];
+    bytes authentication_code = 3 [(validate.rules).bytes = {min_len: 1, max_len: 8}];
+  }
+  oneof source_device {
+    AuthenticatedIdentifiers authenticated_identifiers = 1 [(gogoproto.customname) = "AuthenticatedIdentifiers"];
+    bytes qr_code = 2 [(validate.rules).bytes = {min_len: 1, max_len: 1024}, (gogoproto.customname) = "QRCode"];
+  }
+  ApplicationIdentifiers target_application_ids = 3 [(gogoproto.nullable) = false, (validate.rules).message.required = true, (gogoproto.customname) = "TargetApplicationIDs"];
+  string target_device_id = 4 [(gogoproto.customname) = "TargetDeviceID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$" , max_len: 36}];
+  // If set, invalidate the authentication code with which the device gets claimed. This prohibits subsequent claiming requests.
+  bool invalidate_authentication_code = 5;
+}
+
+service EndDeviceClaimingServer {
+  // Claims the end device by claim authentication code or QR code and transfers the device to the target application.
+  rpc Claim(ClaimEndDeviceRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/edcs/claim",
+      body: "*"
+    };
+  };
+}

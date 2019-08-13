@@ -94,6 +94,10 @@
   - [Enum `ContactMethod`](#ttn.lorawan.v3.ContactMethod)
   - [Enum `ContactType`](#ttn.lorawan.v3.ContactType)
   - [Service `ContactInfoRegistry`](#ttn.lorawan.v3.ContactInfoRegistry)
+- [File `lorawan-stack/api/deviceclaimingserver.proto`](#lorawan-stack/api/deviceclaimingserver.proto)
+  - [Message `ClaimEndDeviceRequest`](#ttn.lorawan.v3.ClaimEndDeviceRequest)
+  - [Message `ClaimEndDeviceRequest.AuthenticatedIdentifiers`](#ttn.lorawan.v3.ClaimEndDeviceRequest.AuthenticatedIdentifiers)
+  - [Service `EndDeviceClaimingServer`](#ttn.lorawan.v3.EndDeviceClaimingServer)
 - [File `lorawan-stack/api/end_device.proto`](#lorawan-stack/api/end_device.proto)
   - [Message `ConvertEndDeviceTemplateRequest`](#ttn.lorawan.v3.ConvertEndDeviceTemplateRequest)
   - [Message `CreateEndDeviceRequest`](#ttn.lorawan.v3.CreateEndDeviceRequest)
@@ -1431,6 +1435,7 @@ PeerInfo
 | `JOIN_SERVER` | 6 |  |
 | `CRYPTO_SERVER` | 7 |  |
 | `DEVICE_TEMPLATE_CONVERTER` | 8 |  |
+| `DEVICE_CLAIMING_SERVER` | 9 |  |
 
 ## <a name="lorawan-stack/api/configuration_services.proto">File `lorawan-stack/api/configuration_services.proto`</a>
 
@@ -1520,6 +1525,52 @@ PeerInfo
 | ----------- | ------ | ------- | ---- |
 | `RequestValidation` | `POST` | `/api/v3/contact_info/validation` |  |
 | `Validate` | `PATCH` | `/api/v3/contact_info/validation` |  |
+
+## <a name="lorawan-stack/api/deviceclaimingserver.proto">File `lorawan-stack/api/deviceclaimingserver.proto`</a>
+
+### <a name="ttn.lorawan.v3.ClaimEndDeviceRequest">Message `ClaimEndDeviceRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `authenticated_identifiers` | [`ClaimEndDeviceRequest.AuthenticatedIdentifiers`](#ttn.lorawan.v3.ClaimEndDeviceRequest.AuthenticatedIdentifiers) |  |  |
+| `qr_code` | [`bytes`](#bytes) |  |  |
+| `target_application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
+| `target_device_id` | [`string`](#string) |  |  |
+| `invalidate_authentication_code` | [`bool`](#bool) |  | If set, invalidate the authentication code with which the device gets claimed. This prohibits subsequent claiming requests. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `qr_code` | <p>`bytes.min_len`: `1`</p><p>`bytes.max_len`: `1024`</p> |
+| `target_application_ids` | <p>`message.required`: `true`</p> |
+| `target_device_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$`</p> |
+
+### <a name="ttn.lorawan.v3.ClaimEndDeviceRequest.AuthenticatedIdentifiers">Message `ClaimEndDeviceRequest.AuthenticatedIdentifiers`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `join_eui` | [`bytes`](#bytes) |  |  |
+| `dev_eui` | [`bytes`](#bytes) |  |  |
+| `authentication_code` | [`bytes`](#bytes) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `authentication_code` | <p>`bytes.min_len`: `1`</p><p>`bytes.max_len`: `8`</p> |
+
+### <a name="ttn.lorawan.v3.EndDeviceClaimingServer">Service `EndDeviceClaimingServer`</a>
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| `Claim` | [`ClaimEndDeviceRequest`](#ttn.lorawan.v3.ClaimEndDeviceRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Claims the end device by claim authentication code or QR code and transfers the device to the target application. |
+
+#### HTTP bindings
+
+| Method Name | Method | Pattern | Body |
+| ----------- | ------ | ------- | ---- |
+| `Claim` | `POST` | `/api/v3/edcs/claim` | `*` |
 
 ## <a name="lorawan-stack/api/end_device.proto">File `lorawan-stack/api/end_device.proto`</a>
 

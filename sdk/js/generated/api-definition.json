@@ -1101,6 +1101,19 @@
       ]
     }
   },
+  "EndDeviceClaimingServer": {
+    "Claim": {
+      "file": "lorawan-stack/api/deviceclaimingserver.proto",
+      "http": [
+        {
+          "method": "post",
+          "pattern": "/edcs/claim",
+          "body": "*",
+          "parameters": []
+        }
+      ]
+    }
+  },
   "EndDeviceRegistry": {
     "Create": {
       "file": "lorawan-stack/api/end_device_services.proto",
