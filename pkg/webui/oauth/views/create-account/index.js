@@ -23,14 +23,13 @@ import * as Yup from 'yup'
 
 import api from '../../api'
 import sharedMessages from '../../../lib/shared-messages'
-
+import { digit, uppercase, special } from '../../lib/regexp'
 import Button from '../../../components/button'
 import Input from '../../../components/input'
 import Form from '../../../components/form'
 import SubmitButton from '../../../components/submit-button'
 import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
-import withEnv from '../../../lib/components/env'
 import Spinner from '../../../components/spinner'
 
 import style from './create-account.styl'
@@ -38,19 +37,7 @@ import style from './create-account.styl'
 const m = defineMessages({
   createAccount: 'Create The Things Stack Account',
   register: 'Register',
-  confirmPassword: 'Confirm Password',
-  validatePasswordMatch: 'Passwords should match',
-  validatePasswordDigit: 'Should contain at least one digit',
-  validatePasswordUppercase: 'Should contain at least one uppercase letter',
-  validatePasswordSpecial: 'Should contain at least one special character',
-  registrationApproved: 'You have successfully registered and can login now',
-  registrationPending:
-    'You have successfully sent the registration request. Please wait until an admin approves it.',
 })
-
-const digit = /(?=.*[\d])/
-const uppercase = /(?=.*[A-Z])/
-const special = /(?=.*[!@#$%^&*])/
 
 const validationSchema = Yup.object().shape({
   user_id: Yup.string()
@@ -62,15 +49,15 @@ const validationSchema = Yup.object().shape({
     .max(50, sharedMessages.validateTooLong),
   password: Yup.string()
     .min(8)
-    .matches(digit, m.validatePasswordDigit)
-    .matches(uppercase, m.validatePasswordUppercase)
-    .matches(special, m.validatePasswordSpecial)
+    .matches(digit, sharedMessages.validatePasswordDigit)
+    .matches(uppercase, sharedMessages.validatePasswordUppercase)
+    .matches(special, sharedMessages.validatePasswordSpecial)
     .required(sharedMessages.validateRequired),
   primary_email_address: Yup.string()
     .email(sharedMessages.validateEmail)
     .required(sharedMessages.validateRequired),
   password_confirm: Yup.string()
-    .oneOf([Yup.ref('password'), null], m.validatePasswordMatch)
+    .oneOf([Yup.ref('password'), null], sharedMessages.validatePasswordMatch)
     .min(8)
     .required(sharedMessages.validateRequired),
 })
@@ -94,7 +81,6 @@ const getSuccessMessage = function(state) {
   }
 }
 
-@withEnv
 @withRouter
 @connect(
   state => ({
@@ -146,7 +132,7 @@ export default class CreateAccount extends React.PureComponent {
 
   render() {
     const { error } = this.state
-    const { user, fetching, env } = this.props
+    const { user, fetching } = this.props
 
     if (fetching) {
       return (
@@ -160,7 +146,7 @@ export default class CreateAccount extends React.PureComponent {
       return (
         <Redirect
           to={{
-            pathname: env.app_root,
+            pathname: '/',
           }}
         />
       )
@@ -210,7 +196,7 @@ export default class CreateAccount extends React.PureComponent {
               />
               <Form.Field
                 required
-                title={m.confirmPassword}
+                title={sharedMessages.confirmPassword}
                 name="password_confirm"
                 type="password"
                 autoComplete="new-password"
