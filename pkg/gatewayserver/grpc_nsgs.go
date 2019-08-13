@@ -74,7 +74,7 @@ func (gs *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.Downl
 		}
 		down := deepcopy.Copy(down).(*ttnpb.DownlinkMessage) // Let the connection own the DownlinkMessage.
 		down.GetRequest().DownlinkPaths = nil                // And do not leak the downlink paths to the gateway.
-		delay, err := conn.SendDown(path, down)
+		delay, err := conn.ScheduleDown(path, down)
 		if err != nil {
 			logger.WithField("gateway_uid", uid).WithError(err).Debug("Failed to schedule on path")
 			pathErrs = append(pathErrs, errSchedulePath.WithCause(err).WithAttributes("gateway_uid", uid))

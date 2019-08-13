@@ -492,7 +492,7 @@ func TestTraffic(t *testing.T) {
 
 				// Send the downlink message, optionally buffer first.
 				conn.Gateway().ScheduleDownlinkLate = tc.ScheduleDownlinkLate
-				_, err = conn.SendDown(tc.Path, tc.Message)
+				_, err = conn.ScheduleDown(tc.Path, tc.Message)
 				if !a.So(err, should.BeNil) {
 					t.FailNow()
 				}
