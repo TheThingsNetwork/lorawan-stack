@@ -159,8 +159,6 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			evt = evtUpdateEndDevice(ctx, req.EndDevice.EndDeviceIdentifiers, req.FieldMask.Paths)
 			if err := ttnpb.ProhibitFields(req.FieldMask.Paths,
 				"ids.dev_addr",
-				"lorawan_phy_version",
-				"lorawan_version",
 				"multicast",
 				"supports_join",
 			); err != nil {
