@@ -112,8 +112,11 @@ func (c *Connection) Disconnect(err error) {
 	c.cancelCtx(err)
 }
 
-// Protocol returns the protocol used for the connection, i.e. grpc, mqtt or udp.
+// Protocol returns the protocol used for the connection.
 func (c *Connection) Protocol() string { return c.protocol }
+
+// SupportsStatusMessage returns true if the protocol supports status messages.
+func (c *Connection) SupportsStatusMessage() bool { return c.protocol != "basicstation" }
 
 // Gateway returns the gateway entity.
 func (c *Connection) Gateway() *ttnpb.Gateway { return c.gateway }
