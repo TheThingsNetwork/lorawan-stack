@@ -155,7 +155,7 @@
   "lib.errors.error-messages.additionalInformation": "Additional Information (please attach to error inquiries)",
   "lib.errors.error-messages.contactAdministrator": "If the error persists after refreshing, please contact an administrator.",
   "lib.errors.error-messages.error": "Error",
-  "lib.errors.error-messages.genericError": "An error unknown occurred. Please try again later.",
+  "lib.errors.error-messages.genericError": "An unknown error occurred. Please try again later.",
   "lib.errors.error-messages.genericNotFound": "The page you requested cannot be found.",
   "lib.errors.error-messages.subviewErrorExplanation": "There was a problem when displaying this section.",
   "lib.errors.error-messages.subviewErrorTitle": "We're sorry!",

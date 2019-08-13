@@ -155,7 +155,7 @@
   "lib.errors.error-messages.additionalInformation": "Xxxxxxxxxx Xxxxxxxxxxx (xxxxxx xxxxxx xx xxxxx xxxxxxxxx)",
   "lib.errors.error-messages.contactAdministrator": "Xx xxx xxxxx xxxxxxxx xxxxx xxxxxxxxxx, xxxxxx xxxxxxx xx xxxxxxxxxxxxx.",
   "lib.errors.error-messages.error": "Xxxxx",
-  "lib.errors.error-messages.genericError": "Xx xxxxx xxxxxxx xxxxxxxx. Xxxxxx xxx xxxxx xxxxx.",
+  "lib.errors.error-messages.genericError": "Xx xxxxxxx xxxxx xxxxxxxx. Xxxxxx xxx xxxxx xxxxx.",
   "lib.errors.error-messages.genericNotFound": "Xxx xxxx xxx xxxxxxxxx xxxxxx xx xxxxx.",
   "lib.errors.error-messages.subviewErrorExplanation": "Xxxxx xxx x xxxxxxx xxxx xxxxxxxxxx xxxx xxxxxxx.",
   "lib.errors.error-messages.subviewErrorTitle": "Xx'xx xxxxx!",
