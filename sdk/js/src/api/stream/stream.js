@@ -87,8 +87,11 @@ export default async function (payload, url) {
       }
 
       const parsed = ArrayBufferToString(value)
-      const result = JSON.parse(parsed).result
-      notify(listeners[EVENTS.EVENT], result)
+
+      for (const line of parsed.trim().split('\n')) {
+        const result = JSON.parse(line).result
+        notify(listeners[EVENTS.EVENT], result)
+      }
 
       return reader.read().then(onChunk)
     })

@@ -73,8 +73,11 @@ export default async function (payload, url) {
 
       stream.on('data', function (data) {
         const parsed = data.toString('utf8')
-        const result = JSON.parse(parsed).result
-        notify(listeners[EVENTS.EVENT], result)
+
+        for (const line of parsed.trim().split('\n')) {
+          const result = JSON.parse(line).result
+          notify(listeners[EVENTS.EVENT], result)
+        }
       })
       stream.on('end', function () {
         notify(listeners[EVENTS.CLOSE])
