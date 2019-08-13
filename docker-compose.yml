@@ -25,7 +25,16 @@ services:
       # - TTN_LW_TLS_ACME_HOSTS=example.com
       # If it's a public server on "example.com":
       # - TTN_LW_IS_EMAIL_NETWORK_IDENTITY_SERVER_URL=https://example.com/oauth
+      # - TTN_LW_IS_EMAIL_NETWORK_CONSOLE_URL=https://example.com/oauth
       # - TTN_LW_IS_OAUTH_UI_CANONICAL_URL=https://example.com/oauth
+      # - TTN_LW_CONSOLE_UI_CANONICAL_URL=https://example.com/console
+      # - TTN_LW_CONSOLE_UI_AS_BASE_URL=https://example.com/api/v3
+      # - TTN_LW_CONSOLE_UI_GS_BASE_URL=https://example.com/api/v3
+      # - TTN_LW_CONSOLE_UI_IS_BASE_URL=https://example.com/api/v3
+      # - TTN_LW_CONSOLE_UI_JS_BASE_URL=https://example.com/api/v3
+      # - TTN_LW_CONSOLE_UI_NS_BASE_URL=https://example.com/api/v3
+      # - TTN_LW_CONSOLE_OAUTH_AUTHORIZE_URL=https://example.com/oauth/authorize
+      # - TTN_LW_CONSOLE_OAUTH_TOKEN_URL=https://example.com/oauth/token
       # - TTN_LW_HTTP_METRICS_PASSWORD=<set a password>
       # - TTN_LW_HTTP_PPROF_PASSWORD=<set a password>
     depends_on:
