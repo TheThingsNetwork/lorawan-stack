@@ -206,6 +206,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 			return md.ToMetadata()
 		}),
 		runtime.WithOutgoingHeaderMatcher(func(s string) (string, bool) {
+			// NOTE: When adding headers, also add them to CORSConfig in ../component/grpc.go.
 			switch s {
 			case "x-total-count":
 				return "X-Total-Count", true
