@@ -227,9 +227,23 @@ func getDownlinkPath(path *ttnpb.DownlinkPath, class ttnpb.Class) (ids ttnpb.Gat
 	return *fixed, 0, nil
 }
 
-// SendDown schedules and sends a downlink message by using the given path and updates the downlink stats.
+// SendDown sends the downlink message directly on the downlink channel.
+func (c *Connection) SendDown(msg *ttnpb.DownlinkMessage) error {
+	select {
+	case <-c.ctx.Done():
+		return c.ctx.Err()
+	case c.downCh <- msg:
+		atomic.AddUint64(&c.downlinks, 1)
+		atomic.StoreInt64(&c.lastDownlinkTime, time.Now().UnixNano())
+	default:
+		return errBufferFull
+	}
+	return nil
+}
+
+// ScheduleDown schedules and sends a downlink message by using the given path and updates the downlink stats.
 // This method returns an error if the downlink message is not a Tx request.
-func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessage) (time.Duration, error) {
+func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessage) (time.Duration, error) {
 	if c.gateway.DownlinkPathConstraint == ttnpb.DOWNLINK_PATH_CONSTRAINT_NEVER {
 		return 0, errNotAllowed
 	}
@@ -367,14 +381,9 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 			PathErrors: protoErrs,
 		})
 	}
-	select {
-	case <-c.ctx.Done():
-		return 0, c.ctx.Err()
-	case c.downCh <- msg:
-		atomic.AddUint64(&c.downlinks, 1)
-		atomic.StoreInt64(&c.lastDownlinkTime, time.Now().UnixNano())
-	default:
-		return 0, errBufferFull
+	err = c.SendDown(msg)
+	if err != nil {
+		return 0, err
 	}
 	return delay, nil
 }
