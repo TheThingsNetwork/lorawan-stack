@@ -26,7 +26,6 @@ import (
 	"time"
 
 	"github.com/getsentry/raven-go"
-	"github.com/golang/protobuf/proto"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
@@ -188,10 +187,6 @@ func New(ctx context.Context, opts ...Option) *Server {
 	}
 	server.Server = grpc.NewServer(append(baseOptions, options.serverOptions...)...)
 	server.ServeMux = runtime.NewServeMux(
-		runtime.WithForwardResponseOption(func(ctx context.Context, w http.ResponseWriter, resp proto.Message) error {
-			w.Header().Set("Access-Control-Expose-Headers", "Date, Content-Length, X-Total-Count, X-Warning")
-			return nil
-		}),
 		runtime.WithMarshalerOption("*", jsonpb.TTN()),
 		runtime.WithMarshalerOption("text/event-stream", jsonpb.TTNEventStream()),
 		runtime.WithProtoErrorHandler(runtime.DefaultHTTPProtoErrorHandler),
