@@ -26,6 +26,7 @@ const webhooks = function(state = defaultState, { type, payload }) {
       return {
         ...state,
         webhooks: payload.webhooks,
+        totalCount: payload.totalCount,
       }
     default:
       return state
