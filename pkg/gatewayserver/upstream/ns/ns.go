@@ -36,11 +36,12 @@ type Handler struct {
 var errNotFound = errors.DefineNotFound("network_server_not_found", "network server not found for ids `ids`")
 
 // NewHandler returns a new upstream handler.
-func NewHandler(ctx context.Context, name string, c component.Component) *Handler {
+func NewHandler(ctx context.Context, name string, c component.Component, devAddrPrefixes []types.DevAddrPrefix) *Handler {
 	return &Handler{
-		ctx:  ctx,
-		name: name,
-		c:    c,
+		ctx:             ctx,
+		name:            name,
+		c:               c,
+		devAddrPrefixes: devAddrPrefixes,
 	}
 }
 
@@ -74,7 +75,7 @@ func (h *Handler) DisconnectGateway(ctx context.Context, gatewayUID string) erro
 
 // HandleUp implements upstream.Handler.
 func (h *Handler) HandleUp(ctx context.Context, gatewayUID string, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.GatewayUp) error {
-	ns := h.c.GetPeer(ctx, ttnpb.PeerInfo_NETWORK_SERVER, ids)
+	ns := h.c.GetPeerConn(ctx, ttnpb.PeerInfo_NETWORK_SERVER, ids)
 	if ns == nil {
 		return errNotFound.WithAttributes("ids", ids)
 	}
