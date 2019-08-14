@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /* global require */
 import React from 'react'
 import { configure, addDecorator } from '@storybook/react'
@@ -32,14 +31,12 @@ const store = createStore(history)
 const req = require.context('../../pkg/webui/', true, /story\.js$/)
 const load = () => req.keys().forEach(req)
 
-addDecorator(function (story) {
+addDecorator(function(story) {
   return (
     <Provider store={store}>
       <IntlProvider key="key" messages={{}} locale="en-US">
         <ConnectedRouter history={history}>
-          <Center>
-            {story()}
-          </Center>
+          <Center>{story()}</Center>
         </ConnectedRouter>
       </IntlProvider>
     </Provider>
