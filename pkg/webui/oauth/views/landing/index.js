@@ -15,11 +15,13 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import bind from 'autobind-decorator'
+import { push } from 'connected-react-router'
 
 import Button from '../../../components/button'
 import WithAuth from '../../../lib/components/with-auth'
 
 import { logout } from '../../store/actions/user'
+import sharedMessages from '../../../lib/shared-messages'
 
 @connect(state => ({
   user: state.user.user,
@@ -32,6 +34,12 @@ export default class OAuth extends React.PureComponent {
     dispatch(logout())
   }
 
+  async handleUpdatePassword() {
+    const { dispatch } = this.props
+
+    dispatch(push('/update-password'))
+  }
+
   render() {
     const { user = { ids: {} } } = this.props
 
@@ -39,7 +47,8 @@ export default class OAuth extends React.PureComponent {
       <WithAuth>
         <div>
           You are logged in as {user.ids.user_id}.{' '}
-          <Button message="Logout" onClick={this.handleLogout} />
+          <Button message={sharedMessages.logout} onClick={this.handleLogout} />
+          <Button message={sharedMessages.changePassword} onClick={this.handleUpdatePassword} />
         </div>
       </WithAuth>
     )

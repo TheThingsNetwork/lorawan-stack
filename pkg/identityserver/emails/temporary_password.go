@@ -32,6 +32,10 @@ A temporary password was requested for your user "{{.User.ID}}" on {{.Network.Na
 This temporary password can only be used once, and only to change the password of your account.
 
 Temporary Password: {{.TemporaryPassword}}
+
+If you wish to change the password using web interface, follow the link below:
+
+{{ .Network.IdentityServerURL }}/update-password?user={{ .User.ID }}&current={{ .TemporaryPassword }}
 `
 
 // DefaultTemplates returns the default templates for this email.

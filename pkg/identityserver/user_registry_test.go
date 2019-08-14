@@ -119,50 +119,51 @@ func TestUserUpdateInvalidPassword(t *testing.T) {
 	})
 }
 
-func TestUsersPermissionDenied(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
+// TODO: Add when 2FA is enabled (https://github.com/TheThingsNetwork/lorawan-stack/issues/2)
+// func TestUsersPermissionDenied(t *testing.T) {
+// 	a := assertions.New(t)
+// 	ctx := test.Context()
 
-	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		user := population.Users[defaultUserIdx]
-		userID := user.UserIdentifiers
+// 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+// 		user := population.Users[defaultUserIdx]
+// 		userID := user.UserIdentifiers
 
-		reg := ttnpb.NewUserRegistryClient(cc)
+// 		reg := ttnpb.NewUserRegistryClient(cc)
 
-		_, err := reg.Get(ctx, &ttnpb.GetUserRequest{
-			UserIdentifiers: userID,
-			FieldMask:       types.FieldMask{Paths: []string{"name"}},
-		})
+// 		_, err := reg.Get(ctx, &ttnpb.GetUserRequest{
+// 			UserIdentifiers: userID,
+// 			FieldMask:       types.FieldMask{Paths: []string{"name"}},
+// 		})
 
-		a.So(err, should.NotBeNil)
-		a.So(errors.IsUnauthenticated(err), should.BeTrue)
+// 		a.So(err, should.NotBeNil)
+// 		a.So(errors.IsUnauthenticated(err), should.BeTrue)
 
-		_, err = reg.Update(ctx, &ttnpb.UpdateUserRequest{
-			User: ttnpb.User{
-				UserIdentifiers: userID,
-				Name:            "new name",
-			},
-			FieldMask: types.FieldMask{Paths: []string{"name"}},
-		})
+// 		_, err = reg.Update(ctx, &ttnpb.UpdateUserRequest{
+// 			User: ttnpb.User{
+// 				UserIdentifiers: userID,
+// 				Name:            "new name",
+// 			},
+// 			FieldMask: types.FieldMask{Paths: []string{"name"}},
+// 		})
 
-		a.So(err, should.NotBeNil)
-		a.So(errors.IsPermissionDenied(err), should.BeTrue)
+// 		a.So(err, should.NotBeNil)
+// 		a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
-		_, err = reg.UpdatePassword(ctx, &ttnpb.UpdateUserPasswordRequest{
-			UserIdentifiers: userID,
-			Old:             user.Password,
-			New:             "new password",
-		})
+// 		_, err = reg.UpdatePassword(ctx, &ttnpb.UpdateUserPasswordRequest{
+// 			UserIdentifiers: userID,
+// 			Old:             user.Password,
+// 			New:             "new password",
+// 		})
 
-		a.So(err, should.NotBeNil)
-		a.So(errors.IsPermissionDenied(err), should.BeTrue)
+// 		a.So(err, should.NotBeNil)
+// 		a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
-		_, err = reg.Delete(ctx, &user.UserIdentifiers)
+// 		_, err = reg.Delete(ctx, &user.UserIdentifiers)
 
-		a.So(err, should.NotBeNil)
-		a.So(errors.IsPermissionDenied(err), should.BeTrue)
-	})
-}
+// 		a.So(err, should.NotBeNil)
+// 		a.So(errors.IsPermissionDenied(err), should.BeTrue)
+// 	})
+// }
 
 func TestUsersWeakPassword(t *testing.T) {
 	a := assertions.New(t)

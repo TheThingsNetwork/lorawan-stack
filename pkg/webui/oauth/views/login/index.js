@@ -37,6 +37,7 @@ import style from './login.styl'
 
 const m = defineMessages({
   createAccount: 'Create an account',
+  forgotPassword: 'Forgot password?',
   loginToContinue: 'Please login to continue',
   stackAccount: 'The Things Stack Account',
 })
@@ -49,7 +50,12 @@ const validationSchema = Yup.object().shape({
 const appRoot = selectApplicationRootPath()
 
 @withRouter
-@connect()
+@connect(
+  null,
+  {
+    replace,
+  },
+)
 @bind
 export default class OAuth extends React.PureComponent {
   constructor(props) {
@@ -74,12 +80,17 @@ export default class OAuth extends React.PureComponent {
   }
 
   navigateToRegister() {
-    const { dispatch, location } = this.props
-    dispatch(
-      replace('/register', {
-        back: `${location.pathname}${location.search}`,
-      }),
-    )
+    const { replace, location } = this.props
+    replace('/register', {
+      back: `${location.pathname}${location.search}`,
+    })
+  }
+
+  navigateToResetPassword() {
+    const { replace, location } = this.props
+    replace('/forgot-password', {
+      back: `${location.pathname}${location.search}`,
+    })
   }
 
   render() {
@@ -128,6 +139,7 @@ export default class OAuth extends React.PureComponent {
               />
               <Form.Submit component={SubmitButton} message={sharedMessages.login} />
               <Button naked message={m.createAccount} onClick={this.navigateToRegister} />
+              <Button naked message={m.forgotPassword} onClick={this.navigateToResetPassword} />
             </Form>
           </div>
         </div>

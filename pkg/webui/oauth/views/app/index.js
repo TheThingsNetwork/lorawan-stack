@@ -29,6 +29,8 @@ import Landing from '../landing'
 import Login from '../login'
 import Authorize from '../authorize'
 import CreateAccount from '../create-account'
+import ForgotPassword from '../forgot-password'
+import UpdatePassword from '../update-password'
 import FullViewError from '../error'
 import createStore from '../../store'
 import Init from '../../../lib/components/init'
@@ -72,7 +74,9 @@ export default class OAuthApp extends React.PureComponent {
                     <Route path="/login" component={Login} />
                     <Route path="/authorize" component={Authorize} />
                     <Route path="/register" component={CreateAccount} />
+                    <Route path="/forgot-password" component={ForgotPassword} />
                     <Route path="/code" component={Code} />
+                    <Route path="/update-password" component={UpdatePassword} />
                     <Route component={GenericNotFound} />
                   </Switch>
                 </ConnectedRouter>

@@ -21,6 +21,11 @@ const userLogic = createLogic({
   type: user.LOGOUT,
   async process({ getState, action }, dispatch, done) {
     try {
+      try {
+        await api.oauth.me()
+      } catch (error) {
+        dispatch(user.getUserMeFailure())
+      }
       await api.oauth.logout()
       dispatch(user.logoutSuccess())
     } catch (error) {

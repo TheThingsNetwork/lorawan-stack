@@ -12,37 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.full-height-center
-  height: 100%
-  display: flex
-  justify-content: center
-  align-items: center
-
-  & > div
-    display: flex
-    justify-content: center
-    nudge('up', 4%)
-    nudge('left', 2%)
-
-.left
-  border-normal('right')
-  flex: 0 1 0
-  display: flex
-  align-items: center
-  padding-right: $ls.l
-
-  & > div > span
-    one-liner()
-
-  & > div > div
-    margin-bottom: $cs.s
-
-.right
-  padding-left: $ls.l
-  padding-top: $ls.xs
-  padding-bottom: $ls.xs
-  width: 330px
-
-  h1
-    margin-bottom: $ls.m
-    line-height: 1
+// alphanumeric, dashes, lowercase
+export const digit = /(?=.*[\d])/
+export const uppercase = /(?=.*[A-Z])/
+export const special = /(?=.*[!@#$%^&*])/
