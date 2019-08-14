@@ -16,11 +16,18 @@ package web
 
 import (
 	"context"
+	"strconv"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 )
+
+func setTotalHeader(ctx context.Context, total uint64) {
+	grpc.SetHeader(ctx, metadata.Pairs("x-total-count", strconv.FormatUint(total, 10)))
+}
 
 // appendImplicitWebhookGetPaths appends implicit ttnpb.ApplicationWebhook get paths to paths.
 func appendImplicitWebhookGetPaths(paths ...string) []string {
@@ -76,6 +83,11 @@ func (s webhookRegistryRPC) List(ctx context.Context, req *ttnpb.ListApplication
 	if err != nil {
 		return nil, err
 	}
+	defer func() {
+		if err == nil {
+			setTotalHeader(ctx, uint64(len(webhooks)))
+		}
+	}()
 	return &ttnpb.ApplicationWebhooks{
 		Webhooks: webhooks,
 	}, nil
