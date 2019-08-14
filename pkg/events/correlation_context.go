@@ -19,7 +19,7 @@ import (
 	"crypto/rand"
 	"sort"
 
-	"github.com/oklog/ulid"
+	ulid "github.com/oklog/ulid/v2"
 )
 
 type correlationKey struct{}

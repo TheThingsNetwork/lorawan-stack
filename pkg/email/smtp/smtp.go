@@ -21,9 +21,9 @@ import (
 	"net/smtp"
 	"strconv"
 
-	gomail "github.com/go-mail/mail"
 	"go.thethings.network/lorawan-stack/pkg/email"
 	"go.thethings.network/lorawan-stack/pkg/log"
+	gomail "gopkg.in/mail.v2"
 )
 
 // Config for the SMTP email provider.

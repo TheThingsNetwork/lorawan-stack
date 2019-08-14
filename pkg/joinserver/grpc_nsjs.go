@@ -22,7 +22,7 @@ import (
 	"sort"
 	"time"
 
-	"github.com/oklog/ulid"
+	ulid "github.com/oklog/ulid/v2"
 	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoservices"
 	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
