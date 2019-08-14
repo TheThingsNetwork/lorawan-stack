@@ -42,13 +42,13 @@ func TestFindIndirectMemberships(t *testing.T) {
 		)
 
 		usr := &User{Account: Account{UID: "test-user"}}
-		s.createEntity(ctx, &usr)
+		s.createEntity(ctx, usr)
 		org1 := &Organization{Account: Account{UID: "test-org-1"}}
-		s.createEntity(ctx, &org1)
+		s.createEntity(ctx, org1)
 		org2 := &Organization{Account: Account{UID: "test-org-2"}}
-		s.createEntity(ctx, &org2)
+		s.createEntity(ctx, org2)
 		app := &Application{ApplicationID: "test-app"}
-		s.createEntity(ctx, &app)
+		s.createEntity(ctx, app)
 
 		s.createEntity(ctx, &Membership{
 			AccountID:  usr.Account.ID,
