@@ -17,17 +17,14 @@
 import path from 'path'
 import webpack from 'webpack'
 
-const {
-  CONTEXT = '.',
-  CACHE_DIR = '.cache',
-  PUBLIC_DIR = 'public',
-} = process.env
+const { CONTEXT = '.', CACHE_DIR = '.cache', PUBLIC_DIR = 'public' } = process.env
 
 const context = path.resolve(CONTEXT)
 const library = '[name]_[hash]'
 
 const pkg = require(path.resolve(context, 'package.json'))
-const libs = Object.keys(pkg.dependencies || {})
+const excludeLibs = ['react-hot-loader']
+const libs = Object.keys(pkg.dependencies || {}).filter(lib => !excludeLibs.includes(lib))
 
 export default {
   context,
