@@ -56,12 +56,13 @@ h2
 h3
   h3()
 
-ul li:not(:last-child)
-  margin-bottom: $cs.s
+ul li
+  &:not(:last-child)
+    margin-bottom: $cs.s
 
-ul li a
-  text-decoration: none
-  color: $tc-deep-gray
+  a
+    text-decoration: none
+    color: $tc-deep-gray
 
 a
   color: $tc-active
