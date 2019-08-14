@@ -30,7 +30,7 @@ require (
 	github.com/TheThingsIndustries/mystique v0.0.0-20190516134627-66efd81c68ea
 	github.com/TheThingsIndustries/release-notes v0.1.0
 	github.com/TheThingsNetwork/go-cayenne-lib v1.0.0
-	github.com/aws/aws-sdk-go v1.22.0
+	github.com/aws/aws-sdk-go v1.23.0
 	github.com/blang/semver v0.0.0-20190414182527-1a9109f8c4a1
 	github.com/certifi/gocertifi v0.0.0-20190506164543-d2eda7129713 // indirect
 	github.com/client9/misspell v0.3.4
@@ -46,7 +46,7 @@ require (
 	github.com/gohugoio/hugo v0.56.3
 	github.com/golang/gddo v0.0.0-20190419222130-af0f2af80721
 	github.com/golang/protobuf v1.3.2
-	github.com/goreleaser/goreleaser v0.114.0
+	github.com/goreleaser/goreleaser v0.115.0
 	github.com/gorilla/securecookie v1.1.1
 	github.com/gorilla/websocket v1.4.0
 	github.com/gotnospirit/makeplural v0.0.0-20180622080156-a5f48d94d976 // indirect
@@ -74,7 +74,7 @@ require (
 	github.com/mattn/go-isatty v0.0.8
 	github.com/mattn/goveralls v0.0.2
 	github.com/mdempsky/unconvert v0.0.0-20190325185700-2f5dc3378ed3
-	github.com/mgechev/revive v0.0.0-20190806210943-e43a9dc28a00
+	github.com/mgechev/revive v0.0.0-20190813230524-a08e03e0bd25
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
@@ -83,6 +83,7 @@ require (
 	github.com/nats-io/nats.go v1.8.1
 	github.com/oklog/ulid/v2 v2.0.2
 	github.com/openshift/osin v1.0.1
+	github.com/opentracing/opentracing-go v1.1.0 // indirect
 	github.com/pborman/uuid v1.2.0 // indirect
 	github.com/pkg/browser v0.0.0-20180916011732-0a3d74bf9ce4
 	github.com/pkg/errors v0.8.1
@@ -100,16 +101,16 @@ require (
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	go.opencensus.io v0.22.0
 	go.thethings.network/lorawan-stack-legacy v0.0.0-20190118141410-68812c833a78
-	gocloud.dev v0.15.0
-	gocloud.dev/pubsub/natspubsub v0.15.1-0.20190606163731-6b9a65123013
+	gocloud.dev v0.16.0
+	gocloud.dev/pubsub/natspubsub v0.16.0
 	golang.org/x/crypto v0.0.0-20190701094942-4def268fd1a4
-	golang.org/x/net v0.0.0-20190724013045-ca1201d0de80
+	golang.org/x/net v0.0.0-20190620200207-3b0461eec859
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
-	golang.org/x/tools v0.0.0-20190806215303-88ddfcebc769
+	golang.org/x/tools v0.0.0-20190813222811-9dba7caff850
 	golang.org/x/xerrors v0.0.0-20190717185122-a985d3407aa7
-	google.golang.org/api v0.7.0
+	google.golang.org/api v0.8.0
 	google.golang.org/genproto v0.0.0-20190801165951-fa694d86fc64
-	google.golang.org/grpc v1.22.1
+	google.golang.org/grpc v1.23.0
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/mail.v2 v2.3.1
 	gopkg.in/sourcemap.v1 v1.0.5 // indirect
