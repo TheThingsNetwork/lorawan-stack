@@ -18,11 +18,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"google.golang.org/grpc"
 )
@@ -33,6 +34,9 @@ func TestEndDevicesPermissionDenied(t *testing.T) {
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewEndDeviceRegistryClient(cc)
+
+		joinEUI := types.EUI64{1, 2, 3, 4, 5, 6, 7, 8}
+		devEUI := types.EUI64{8, 7, 6, 5, 4, 3, 2, 1}
 
 		_, err := reg.Create(ctx, &ttnpb.CreateEndDeviceRequest{
 			EndDevice: ttnpb.EndDevice{
@@ -50,7 +54,7 @@ func TestEndDevicesPermissionDenied(t *testing.T) {
 		}
 
 		_, err = reg.Get(ctx, &ttnpb.GetEndDeviceRequest{
-			FieldMask: types.FieldMask{Paths: []string{"name"}},
+			FieldMask: pbtypes.FieldMask{Paths: []string{"name"}},
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 				DeviceID: "test-device-id",
 				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
@@ -63,8 +67,17 @@ func TestEndDevicesPermissionDenied(t *testing.T) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
 
+		_, err = reg.GetIdentifiersForEUIs(ctx, &ttnpb.GetEndDeviceIdentifiersForEUIsRequest{
+			JoinEUI: joinEUI,
+			DevEUI:  devEUI,
+		})
+
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsUnauthenticated(err), should.BeTrue)
+		}
+
 		_, err = reg.List(ctx, &ttnpb.ListEndDevicesRequest{
-			FieldMask: types.FieldMask{Paths: []string{"name"}},
+			FieldMask: pbtypes.FieldMask{Paths: []string{"name"}},
 			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 				ApplicationID: "test-app-id",
 			},
@@ -75,7 +88,7 @@ func TestEndDevicesPermissionDenied(t *testing.T) {
 		}
 
 		_, err = reg.Update(ctx, &ttnpb.UpdateEndDeviceRequest{
-			FieldMask: types.FieldMask{Paths: []string{"name"}},
+			FieldMask: pbtypes.FieldMask{Paths: []string{"name"}},
 			EndDevice: ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DeviceID: "test-device-id",
@@ -114,6 +127,9 @@ func TestEndDevicesCRUD(t *testing.T) {
 		creds := userCreds(defaultUserIdx)
 		app := userApplications(&userID).Applications[0]
 
+		joinEUI := types.EUI64{1, 2, 3, 4, 5, 6, 7, 8}
+		devEUI := types.EUI64{8, 7, 6, 5, 4, 3, 2, 1}
+
 		start := time.Now()
 
 		created, err := reg.Create(ctx, &ttnpb.CreateEndDeviceRequest{
@@ -121,6 +137,8 @@ func TestEndDevicesCRUD(t *testing.T) {
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DeviceID:               "test-device-id",
 					ApplicationIdentifiers: app.ApplicationIdentifiers,
+					JoinEUI:                &joinEUI,
+					DevEUI:                 &devEUI,
 				},
 				Name: "test-device-name",
 			},
@@ -133,7 +151,7 @@ func TestEndDevicesCRUD(t *testing.T) {
 		a.So(err, should.BeNil)
 
 		got, err := reg.Get(ctx, &ttnpb.GetEndDeviceRequest{
-			FieldMask: types.FieldMask{Paths: []string{"name"}},
+			FieldMask: pbtypes.FieldMask{Paths: []string{"name"}},
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 				DeviceID:               "test-device-id",
 				ApplicationIdentifiers: app.ApplicationIdentifiers,
@@ -144,8 +162,16 @@ func TestEndDevicesCRUD(t *testing.T) {
 		a.So(got.Name, should.Equal, "test-device-name")
 		a.So(err, should.BeNil)
 
+		ids, err := reg.GetIdentifiersForEUIs(ctx, &ttnpb.GetEndDeviceIdentifiersForEUIsRequest{
+			JoinEUI: joinEUI,
+			DevEUI:  devEUI,
+		}, creds)
+
+		a.So(err, should.BeNil)
+		a.So(*ids, should.Resemble, created.EndDeviceIdentifiers)
+
 		list, err := reg.List(ctx, &ttnpb.ListEndDevicesRequest{
-			FieldMask:              types.FieldMask{Paths: []string{"name"}},
+			FieldMask:              pbtypes.FieldMask{Paths: []string{"name"}},
 			ApplicationIdentifiers: app.ApplicationIdentifiers,
 		}, creds)
 
@@ -158,7 +184,7 @@ func TestEndDevicesCRUD(t *testing.T) {
 		start = time.Now()
 
 		updated, err := reg.Update(ctx, &ttnpb.UpdateEndDeviceRequest{
-			FieldMask: types.FieldMask{Paths: []string{"name"}},
+			FieldMask: pbtypes.FieldMask{Paths: []string{"name"}},
 			EndDevice: ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DeviceID:               "test-device-id",
@@ -181,7 +207,7 @@ func TestEndDevicesCRUD(t *testing.T) {
 		a.So(err, should.BeNil)
 
 		_, err = reg.Get(ctx, &ttnpb.GetEndDeviceRequest{
-			FieldMask: types.FieldMask{Paths: []string{"name"}},
+			FieldMask: pbtypes.FieldMask{Paths: []string{"name"}},
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 				DeviceID:               "test-device-id",
 				ApplicationIdentifiers: app.ApplicationIdentifiers,
