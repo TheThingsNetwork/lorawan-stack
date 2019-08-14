@@ -26,15 +26,12 @@ const m = defineMessages({
 })
 
 export default class Code extends React.Component {
-
-  render () {
+  render() {
     const { location } = this.props
     const { query } = Query.parseUrl(location.search)
 
     if (!query.code) {
-      return (
-        <Redirect to="/login" />
-      )
+      return <Redirect to="/login" />
     }
 
     return (
@@ -42,12 +39,7 @@ export default class Code extends React.Component {
         <Row>
           <Col xs={12}>
             <Message component="h2" content={m.code} />
-            <SafeInspector
-              data={query.code}
-              initiallyVisible
-              hideable={false}
-              isBytes={false}
-            />
+            <SafeInspector data={query.code} initiallyVisible hideable={false} isBytes={false} />
           </Col>
         </Row>
       </Container>

@@ -14,20 +14,16 @@
 
 import { createRequestActions } from './lib'
 
-export const createGetCollaboratorsListActionType = name => (
-  `GET_${name}_COLLABORATORS_LIST`
-)
+export const createGetCollaboratorsListActionType = name => `GET_${name}_COLLABORATORS_LIST`
 export const createGetCollaboratorsListRequestActions = name =>
-  createRequestActions(
-    createGetCollaboratorsListActionType(name),
-    (id, { page, limit } = {}) => ({ id, params: { page, limit }})
-  )
+  createRequestActions(createGetCollaboratorsListActionType(name), (id, { page, limit } = {}) => ({
+    id,
+    params: { page, limit },
+  }))
 
-export const createGetCollaboratorActionType = name => (
-  `GET_${name}_COLLABORATOR`
-)
+export const createGetCollaboratorActionType = name => `GET_${name}_COLLABORATOR`
 export const createGetCollaboratorRequestActions = name =>
   createRequestActions(
     createGetCollaboratorActionType(name),
-    (parentId, collaboratorId, isUser) => ({ id: parentId, collaboratorId, isUser })
+    (parentId, collaboratorId, isUser) => ({ id: parentId, collaboratorId, isUser }),
   )

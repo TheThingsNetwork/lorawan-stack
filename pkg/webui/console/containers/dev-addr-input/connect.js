@@ -17,8 +17,7 @@ import bind from 'autobind-decorator'
 
 import api from '../../api'
 
-export default function (Component) {
-
+export default function(Component) {
   @bind
   class Connect extends React.PureComponent {
     state = {
@@ -27,7 +26,7 @@ export default function (Component) {
       fetching: false,
     }
 
-    async generateDevAddr () {
+    async generateDevAddr() {
       await this.setState({ error: undefined, fetching: true })
 
       try {
@@ -47,7 +46,7 @@ export default function (Component) {
       }
     }
 
-    render () {
+    render() {
       const { devAddr, fetching, error } = this.state
 
       return (

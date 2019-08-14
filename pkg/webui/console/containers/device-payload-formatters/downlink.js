@@ -33,17 +33,19 @@ import {
   selectSelectedDeviceFormatters,
 } from '../../store/selectors/device'
 
-@connect(function (state) {
-  const formatters = selectSelectedDeviceFormatters(state) || {}
+@connect(
+  function(state) {
+    const formatters = selectSelectedDeviceFormatters(state) || {}
 
-  return {
-    appId: selectSelectedApplicationId(state),
-    devId: selectSelectedDeviceId(state),
-    formatters,
-  }
-},
-{ updateDevice: attachPromise(updateDevice) })
-@withBreadcrumb('device.single.payload-formatters.downlink', function (props) {
+    return {
+      appId: selectSelectedApplicationId(state),
+      devId: selectSelectedDeviceId(state),
+      formatters,
+    }
+  },
+  { updateDevice: attachPromise(updateDevice) },
+)
+@withBreadcrumb('device.single.payload-formatters.downlink', function(props) {
   const { appId, devId } = props
 
   return (
@@ -56,7 +58,6 @@ import {
 })
 @bind
 class DevicePayloadFormatters extends React.PureComponent {
-
   static propTypes = {
     appId: PropTypes.string.isRequired,
     devId: PropTypes.string.isRequired,
@@ -64,7 +65,7 @@ class DevicePayloadFormatters extends React.PureComponent {
     updateDevice: PropTypes.func.isRequired,
   }
 
-  async onSubmit (values) {
+  async onSubmit(values) {
     const { appId, devId, formatters, updateDevice } = this.props
 
     await updateDevice(appId, devId, {
@@ -83,7 +84,7 @@ class DevicePayloadFormatters extends React.PureComponent {
     })
   }
 
-  render () {
+  render() {
     const { formatters } = this.props
 
     return (

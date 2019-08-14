@@ -19,20 +19,19 @@ const defaultState = {
   rights: [],
 }
 
-const createNamedRightsReducer = function (reducerName = '') {
+const createNamedRightsReducer = function(reducerName = '') {
   const GET_LIST_BASE = createGetRightsListActionType(reducerName)
   const [{ success: GET_LIST_SUCCESS }] = createRequestActions(GET_LIST_BASE)
 
-
-  return function (state = defaultState, { type, payload }) {
+  return function(state = defaultState, { type, payload }) {
     switch (type) {
-    case GET_LIST_SUCCESS:
-      return {
-        ...state,
-        rights: payload,
-      }
-    default:
-      return state
+      case GET_LIST_SUCCESS:
+        return {
+          ...state,
+          rights: payload,
+        }
+      default:
+        return state
     }
   }
 }

@@ -15,74 +15,73 @@
 import React from 'react'
 import Table from '.'
 
-export default function () {
+export default function() {
   const driver = {
     component: undefined,
     when: {
-      created (props) {
-        driver.component = shallow(
-          <Table {...props} />
-        )
+      created(props) {
+        driver.component = shallow(<Table {...props} />)
 
         return driver
       },
-      updated (props) {
+      updated(props) {
         driver.component.setProps(props)
       },
-      rowClicked (index) {
+      rowClicked(index) {
         driver.get.row(index + 1).simulate('click')
         driver.component.update()
       },
-      sortButtonPressed (index) {
-        driver.get.sortButton(index)
+      sortButtonPressed(index) {
+        driver.get
+          .sortButton(index)
           .dive()
           .simulate('click')
         driver.component.update()
       },
     },
     is: {
-      empty () {
+      empty() {
         return driver.get.emptyMessage().exists()
       },
-      paginated () {
+      paginated() {
         return driver.get.pagination().exists()
       },
-      sortButtonActive (index) {
+      sortButtonActive(index) {
         return driver.get.sortButton(index).props().active
       },
     },
     get: {
-      emptyMessage () {
+      emptyMessage() {
         return driver.component.find('Empty').first()
       },
-      headCellsCount () {
+      headCellsCount() {
         return driver.get.headCells().length
       },
-      headCells () {
+      headCells() {
         return driver.component.find('HeadCell')
       },
-      dataCellsCount () {
+      dataCellsCount() {
         return driver.get.dataCells().length
       },
-      dataCells () {
+      dataCells() {
         return driver.component.find('DataCell')
       },
-      sortButtonsCount () {
+      sortButtonsCount() {
         return driver.get.sortButtons().length
       },
-      sortButtons () {
+      sortButtons() {
         return driver.component.find('SortButton')
       },
-      sortButton (index) {
+      sortButton(index) {
         return driver.get.sortButtons().at(index)
       },
-      pagination () {
+      pagination() {
         return driver.component.find('Pagination').first()
       },
-      rows () {
+      rows() {
         return driver.component.find('Row')
       },
-      row (index) {
+      row(index) {
         return driver.get.rows().at(index)
       },
     },

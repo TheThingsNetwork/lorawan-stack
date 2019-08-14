@@ -27,10 +27,7 @@ import IntlHelmet from '../../../lib/components/intl-helmet'
 import toast from '../../../components/toast'
 import withRequest from '../../../lib/components/with-request'
 
-import {
-  getGatewayCollaborator,
-  getGatewaysRightsList,
-} from '../../store/actions/gateways'
+import { getGatewayCollaborator, getGatewaysRightsList } from '../../store/actions/gateways'
 import {
   selectSelectedGatewayId,
   selectGatewayRights,
@@ -45,51 +42,58 @@ import {
 
 import api from '../../api'
 
-@connect(function (state, props) {
-  const gtwId = selectSelectedGatewayId(state, props)
+@connect(
+  function(state, props) {
+    const gtwId = selectSelectedGatewayId(state, props)
 
-  const { collaboratorId, collaboratorType } = props.match.params
+    const { collaboratorId, collaboratorType } = props.match.params
 
-  const collaborator = collaboratorType === 'user'
-    ? selectGatewayUserCollaborator(state)
-    : selectGatewayOrganizationCollaborator(state)
+    const collaborator =
+      collaboratorType === 'user'
+        ? selectGatewayUserCollaborator(state)
+        : selectGatewayOrganizationCollaborator(state)
 
-  const fetching = selectGatewayRightsFetching(state) || selectGatewayCollaboratorFetching(state)
-  const error = selectGatewayRightsError(state) || selectGatewayCollaboratorError(state)
+    const fetching = selectGatewayRightsFetching(state) || selectGatewayCollaboratorFetching(state)
+    const error = selectGatewayRightsError(state) || selectGatewayCollaboratorError(state)
 
-  return {
-    collaboratorId,
-    collaboratorType,
-    collaborator,
-    gtwId,
-    rights: selectGatewayRights(state),
-    universalRights: selectGatewayUniversalRights(state),
-    fetching,
-    error,
-  }
-
-}, (dispatch, ownProps) => ({
-  loadData (gtwId, collaboratorId, isUser) {
-    dispatch(getGatewaysRightsList(gtwId))
-    dispatch(getGatewayCollaborator(gtwId, collaboratorId, isUser))
+    return {
+      collaboratorId,
+      collaboratorType,
+      collaborator,
+      gtwId,
+      rights: selectGatewayRights(state),
+      universalRights: selectGatewayUniversalRights(state),
+      fetching,
+      error,
+    }
   },
-  redirectToList (gtwId) {
-    dispatch(replace(`/gateways/${gtwId}/collaborators`))
-  },
-}), (stateProps, dispatchProps, ownProps) => ({
-  ...stateProps, ...dispatchProps, ...ownProps,
-  loadData: () => dispatchProps.loadData(
-    stateProps.gtwId,
-    stateProps.collaboratorId,
-    stateProps.collaboratorType === 'user'
-  ),
-  redirectToList: () => dispatchProps.redirectToList(stateProps.gtwId),
-}))
+  (dispatch, ownProps) => ({
+    loadData(gtwId, collaboratorId, isUser) {
+      dispatch(getGatewaysRightsList(gtwId))
+      dispatch(getGatewayCollaborator(gtwId, collaboratorId, isUser))
+    },
+    redirectToList(gtwId) {
+      dispatch(replace(`/gateways/${gtwId}/collaborators`))
+    },
+  }),
+  (stateProps, dispatchProps, ownProps) => ({
+    ...stateProps,
+    ...dispatchProps,
+    ...ownProps,
+    loadData: () =>
+      dispatchProps.loadData(
+        stateProps.gtwId,
+        stateProps.collaboratorId,
+        stateProps.collaboratorType === 'user',
+      ),
+    redirectToList: () => dispatchProps.redirectToList(stateProps.gtwId),
+  }),
+)
 @withRequest(
   ({ loadData }) => loadData(),
-  ({ fetching, collaborator }) => fetching || !Boolean(collaborator)
+  ({ fetching, collaborator }) => fetching || !Boolean(collaborator),
 )
-@withBreadcrumb('gtws.single.collaborators.edit', function (props) {
+@withBreadcrumb('gtws.single.collaborators.edit', function(props) {
   const { gtwId, collaboratorId, collaboratorType } = props
 
   return (
@@ -102,37 +106,31 @@ import api from '../../api'
 })
 @bind
 export default class GatewayCollaboratorEdit extends React.Component {
-
   state = {
     error: '',
   }
 
-  handleSubmit (updatedCollaborator) {
+  handleSubmit(updatedCollaborator) {
     const { gtwId } = this.props
 
     return api.gateway.collaborators.update(gtwId, updatedCollaborator)
   }
 
-  handleSubmitSuccess () {
+  handleSubmitSuccess() {
     toast({
       message: sharedMessages.collaboratorUpdateSuccess,
       type: toast.types.SUCCESS,
     })
   }
 
-  async handleDelete (updatedCollaborator) {
+  async handleDelete(updatedCollaborator) {
     const { gtwId } = this.props
 
     return api.gateway.collaborators.remove(gtwId, updatedCollaborator)
   }
 
-  render () {
-    const {
-      collaborator,
-      rights,
-      redirectToList,
-      universalRights,
-    } = this.props
+  render() {
+    const { collaborator, rights, redirectToList, universalRights } = this.props
 
     return (
       <Container>

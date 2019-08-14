@@ -22,21 +22,19 @@ class ErrorView extends React.Component {
     hasCaught: false,
   }
 
-  componentDidCatch (error) {
+  componentDidCatch(error) {
     this.setState({
       hasCaught: true,
       error,
     })
   }
 
-  render () {
+  render() {
     const { children, ErrorComponent } = this.props
     const { hasCaught, error } = this.state
 
     if (hasCaught) {
-      return (
-        <ErrorComponent error={error} />
-      )
+      return <ErrorComponent error={error} />
     }
 
     return React.Children.only(children)

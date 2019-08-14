@@ -26,27 +26,15 @@ import style from './message.styl'
 
 @bind
 class MessageEvent extends React.PureComponent {
-
-  render () {
-    const {
-      className,
-      event,
-      type,
-      widget,
-      overviewClassName,
-      expandedClassName,
-    } = this.props
+  render() {
+    const { className, event, type, widget, overviewClassName, expandedClassName } = this.props
 
     const entityId = getEntityId(event.identifiers[0])
     const icon = type === 'downlink' ? 'downlink' : 'uplink'
     const data = formatMessageData(event.data)
 
-    const eventContent = (
-      <Message content={{ id: `event:${event.name}` }} />
-    )
-    const eventIcon = (
-      <Icon icon={icon} className={style.messageIcon} />
-    )
+    const eventContent = <Message content={{ id: `event:${event.name}` }} />
+    const eventIcon = <Icon icon={icon} className={style.messageIcon} />
 
     return (
       <Event
@@ -66,7 +54,7 @@ class MessageEvent extends React.PureComponent {
 
 MessageEvent.propTypes = {
   event: PropTypes.event.isRequired,
-  type: PropTypes.oneOf([ 'downlink', 'uplink' ]),
+  type: PropTypes.oneOf(['downlink', 'uplink']),
   widget: PropTypes.bool,
 }
 

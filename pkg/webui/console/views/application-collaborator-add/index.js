@@ -37,28 +37,34 @@ import {
 
 import api from '../../api'
 
-@connect(function (state) {
-  return {
-    appId: selectSelectedApplicationId(state),
-    collaborators: state.collaborators.applications.collaborators,
-    rights: selectApplicationRights(state),
-    universalRights: selectApplicationUniversalRights(state),
-    fetching: selectApplicationRightsFetching(state),
-    error: selectApplicationRightsError(state),
-  }
-}, (dispatch, ownProps) => ({
-  redirectToList: appId => dispatch(push(`/applications/${appId}/collaborators`)),
-  getApplicationsRightsList: appId => dispatch(getApplicationsRightsList(appId)),
-}), (stateProps, dispatchProps, ownProps) => ({
-  ...stateProps, ...dispatchProps, ...ownProps,
-  redirectToList: () => dispatchProps.redirectToList(stateProps.appId),
-  getApplicationsRightsList: () => dispatchProps.getApplicationsRightsList(stateProps.appId),
-}))
+@connect(
+  function(state) {
+    return {
+      appId: selectSelectedApplicationId(state),
+      collaborators: state.collaborators.applications.collaborators,
+      rights: selectApplicationRights(state),
+      universalRights: selectApplicationUniversalRights(state),
+      fetching: selectApplicationRightsFetching(state),
+      error: selectApplicationRightsError(state),
+    }
+  },
+  (dispatch, ownProps) => ({
+    redirectToList: appId => dispatch(push(`/applications/${appId}/collaborators`)),
+    getApplicationsRightsList: appId => dispatch(getApplicationsRightsList(appId)),
+  }),
+  (stateProps, dispatchProps, ownProps) => ({
+    ...stateProps,
+    ...dispatchProps,
+    ...ownProps,
+    redirectToList: () => dispatchProps.redirectToList(stateProps.appId),
+    getApplicationsRightsList: () => dispatchProps.getApplicationsRightsList(stateProps.appId),
+  }),
+)
 @withRequest(
   ({ getApplicationsRightsList }) => getApplicationsRightsList(),
-  ({ fetching, rights }) => fetching || !Boolean(rights.length)
+  ({ fetching, rights }) => fetching || !Boolean(rights.length),
 )
-@withBreadcrumb('apps.single.collaborators.add', function (props) {
+@withBreadcrumb('apps.single.collaborators.add', function(props) {
   const appId = props.appId
   return (
     <Breadcrumb
@@ -70,23 +76,18 @@ import api from '../../api'
 })
 @bind
 export default class ApplicationCollaboratorAdd extends React.Component {
-
   state = {
     error: '',
   }
 
-  async handleSubmit (collaborator) {
+  async handleSubmit(collaborator) {
     const { appId } = this.props
 
     await api.application.collaborators.add(appId, collaborator)
   }
 
-  render () {
-    const {
-      rights,
-      universalRights,
-      redirectToList,
-    } = this.props
+  render() {
+    const { rights, universalRights, redirectToList } = this.props
 
     return (
       <Container>

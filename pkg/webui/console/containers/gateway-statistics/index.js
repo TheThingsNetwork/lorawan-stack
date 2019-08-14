@@ -31,29 +31,25 @@ import {
   selectGatewayStatisticsError,
   selectGatewayStatisticsIsFetching,
 } from '../../store/selectors/gateways'
-import {
-  startGatewayStatistics,
-  stopGatewayStatistics,
-} from '../../store/actions/gateways'
+import { startGatewayStatistics, stopGatewayStatistics } from '../../store/actions/gateways'
 
 import style from './gateway-statistics.styl'
 
 @bind
 class GatewayStatistic extends React.PureComponent {
-
-  componentDidMount () {
+  componentDidMount() {
     const { startStatistics } = this.props
 
     startStatistics()
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     const { stopStatistics } = this.props
 
     stopStatistics()
   }
 
-  get status () {
+  get status() {
     const { statistics, error, fetching } = this.props
 
     const isNotConnected = Boolean(error) && isNotFoundError(error)
@@ -82,41 +78,20 @@ class GatewayStatistic extends React.PureComponent {
     }
 
     return (
-      <Status
-        className={style.status}
-        status={statusIndicator}
-      >
-        <Message
-          className={style.lastSeen}
-          content={message}
-        />
-        { statusIndicator === 'good' && (
-          <DateTime.Relative
-            value={statistics.last_status_received_at || new Date()}
-          />
+      <Status className={style.status} status={statusIndicator}>
+        <Message className={style.lastSeen} content={message} />
+        {statusIndicator === 'good' && (
+          <DateTime.Relative value={statistics.last_status_received_at || new Date()} />
         )}
       </Status>
     )
   }
 
-  get messages () {
-    const {
-      statistics,
-      error,
-      startStatistics,
-      fetching,
-    } = this.props
+  get messages() {
+    const { statistics, error, startStatistics, fetching } = this.props
 
     if (isNotFoundError(error)) {
-      return (
-        <Button
-          naked
-          secondary
-          disabled={fetching}
-          icon="refresh"
-          onClick={startStatistics}
-        />
-      )
+      return <Button naked secondary disabled={fetching} icon="refresh" onClick={startStatistics} />
     }
 
     if (!statistics) {
@@ -140,7 +115,7 @@ class GatewayStatistic extends React.PureComponent {
     )
   }
 
-  render () {
+  render() {
     const { className } = this.props
 
     return (
@@ -167,14 +142,16 @@ GatewayStatistic.defaultProps = {
   statistics: null,
 }
 
-export default connect(function (state, props) {
-  return {
-    statistics: selectGatewayStatistics(state, props),
-    error: selectGatewayStatisticsError(state, props),
-    fetching: selectGatewayStatisticsIsFetching(state, props),
-  }
-},
-(dispatch, ownProps) => ({
-  startStatistics: () => dispatch(startGatewayStatistics(ownProps.gtwId)),
-  stopStatistics: () => dispatch(stopGatewayStatistics()),
-}))(GatewayStatistic)
+export default connect(
+  function(state, props) {
+    return {
+      statistics: selectGatewayStatistics(state, props),
+      error: selectGatewayStatisticsError(state, props),
+      fetching: selectGatewayStatisticsIsFetching(state, props),
+    }
+  },
+  (dispatch, ownProps) => ({
+    startStatistics: () => dispatch(startGatewayStatistics(ownProps.gtwId)),
+    stopStatistics: () => dispatch(stopGatewayStatistics()),
+  }),
+)(GatewayStatistic)

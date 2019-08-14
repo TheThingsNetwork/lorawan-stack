@@ -47,14 +47,13 @@ const headers = [
 
 @bind
 export default class ApplicationsTable extends Component {
-
-  constructor (props) {
+  constructor(props) {
     super(props)
 
-    this.getApplicationsList = params => getApplicationsList(params, [ 'name', 'description' ])
+    this.getApplicationsList = params => getApplicationsList(params, ['name', 'description'])
   }
 
-  baseDataSelector (state) {
+  baseDataSelector(state) {
     return {
       applications: selectApplications(state),
       totalCount: selectApplicationsTotalCount(state),
@@ -63,7 +62,7 @@ export default class ApplicationsTable extends Component {
     }
   }
 
-  render () {
+  render() {
     return (
       <FetchTable
         entity="applications"
@@ -78,4 +77,3 @@ export default class ApplicationsTable extends Component {
     )
   }
 }
-

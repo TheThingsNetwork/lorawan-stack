@@ -28,31 +28,23 @@ const m = defineMessages({
 
 @bind
 class Entry extends React.Component {
-
-  handleRemoveButtonClicked (event) {
+  handleRemoveButtonClicked(event) {
     const { onRemoveButtonClick, index } = this.props
     onRemoveButtonClick(index, event)
   }
 
-  handleKeyChanged (newKey) {
+  handleKeyChanged(newKey) {
     const { onChange, index } = this.props
     onChange(index, { key: newKey })
   }
 
-  handleValueChanged (newValue) {
+  handleValueChanged(newValue) {
     const { onChange, index } = this.props
     onChange(index, { value: newValue })
   }
 
-  render () {
-    const {
-      name,
-      index,
-      keyPlaceholder,
-      valuePlaceholder,
-      value,
-      onBlur,
-    } = this.props
+  render() {
+    const { name, index, keyPlaceholder, valuePlaceholder, value, onBlur } = this.props
 
     return (
       <div className={style.entriesRow}>

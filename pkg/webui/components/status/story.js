@@ -27,33 +27,32 @@ const containerStyle = {
 
 @bind
 class Toggle extends React.Component {
-
   state = {
     status: 'unknown',
   }
 
-  toggleStatus () {
+  toggleStatus() {
     const { status } = this.state
     let nextStatus
     switch (status) {
-    case 'unknown':
-      nextStatus = 'bad'
-      break
-    case 'bad':
-      nextStatus = 'mediocre'
-      break
-    case 'mediocre':
-      nextStatus = 'good'
-      break
-    case 'good':
-      nextStatus = 'unknown'
-      break
+      case 'unknown':
+        nextStatus = 'bad'
+        break
+      case 'bad':
+        nextStatus = 'mediocre'
+        break
+      case 'mediocre':
+        nextStatus = 'good'
+        break
+      case 'good':
+        nextStatus = 'unknown'
+        break
     }
 
     this.setState({ status: nextStatus })
   }
 
-  render () {
+  render() {
     const { status } = this.state
     return (
       <div>
@@ -69,16 +68,20 @@ storiesOf('Status', module)
   .add('All types', () => (
     <div>
       <div style={containerStyle}>
-        <span>Good:</span><Status status="good" />
+        <span>Good:</span>
+        <Status status="good" />
       </div>
       <div style={containerStyle}>
-        <span>Bad:</span><Status status="bad" />
+        <span>Bad:</span>
+        <Status status="bad" />
       </div>
       <div style={containerStyle}>
-        <span>Mediocre:</span><Status status="mediocre" />
+        <span>Mediocre:</span>
+        <Status status="mediocre" />
       </div>
       <div style={containerStyle}>
-        <span>Unknown:</span><Status status="unknown" />
+        <span>Unknown:</span>
+        <Status status="unknown" />
       </div>
     </div>
   ))
@@ -90,6 +93,4 @@ storiesOf('Status', module)
       <Status label="Network Status" status="unknown" />
     </div>
   ))
-  .add('Toggle', () => (
-    <Toggle />
-  ))
+  .add('Toggle', () => <Toggle />)

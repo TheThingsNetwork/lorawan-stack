@@ -15,19 +15,11 @@
 import React from 'react'
 import PropTypes from '../../../lib/prop-types'
 
-const ListItem = function (props) {
-  const {
-    className,
-    component: Component,
-    children,
-    ...rest
-  } = props
+const ListItem = function(props) {
+  const { className, component: Component, children, ...rest } = props
 
   return (
-    <Component
-      className={className}
-      {...rest}
-    >
+    <Component className={className} {...rest}>
       {children}
     </Component>
   )

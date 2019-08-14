@@ -37,19 +37,16 @@ const validationSchema = Yup.object().shape({
   collaborator_id: Yup.string()
     .matches(collaboratorIdRegexp, sharedMessages.validateAlphanum)
     .required(sharedMessages.validateRequired),
-  collaborator_type: Yup.string()
-    .required(sharedMessages.validateRequired),
+  collaborator_type: Yup.string().required(sharedMessages.validateRequired),
   rights: Yup.array().min(1, sharedMessages.validateRights),
 })
 
 const m = defineMessages({
-  cannotModifyRightAll:
-    'This user possesses universal admin rights that cannot be modified.',
+  cannotModifyRightAll: 'This user possesses universal admin rights that cannot be modified.',
 })
 
 @bind
 export default class CollaboratorForm extends Component {
-
   static defaultProps = {
     onSubmitSuccess: () => null,
     onSubmitFailure: () => null,
@@ -77,7 +74,7 @@ export default class CollaboratorForm extends Component {
     error: '',
   }
 
-  async handleSubmit (values, { resetForm, setSubmitting }) {
+  async handleSubmit(values, { resetForm, setSubmitting }) {
     const { collaborator_id, collaborator_type, rights } = values
     const { onSubmit, onSubmitSuccess, onSubmitFailure } = this.props
 
@@ -105,7 +102,7 @@ export default class CollaboratorForm extends Component {
     }
   }
 
-  async handleDelete () {
+  async handleDelete() {
     const { collaborator, onDelete, onDeleteSuccess } = this.props
     const collaborator_type = collaborator.isUser ? 'user' : 'organization'
 
@@ -130,7 +127,7 @@ export default class CollaboratorForm extends Component {
     }
   }
 
-  computeInitialValues () {
+  computeInitialValues() {
     const { collaborator } = this.props
 
     if (!collaborator) {
@@ -144,18 +141,12 @@ export default class CollaboratorForm extends Component {
     return {
       collaborator_id: collaborator.id,
       collaborator_type: collaborator.isUser ? 'user' : 'organization',
-      rights: [ ...collaborator.rights ],
+      rights: [...collaborator.rights],
     }
   }
 
-  render () {
-    const {
-      collaborator,
-      rights,
-      universalRights,
-      error: passedError,
-      update,
-    } = this.props
+  render() {
+    const { collaborator, rights, universalRights, error: passedError, update } = this.props
 
     const { error: submitError } = this.state
 
@@ -171,10 +162,7 @@ export default class CollaboratorForm extends Component {
         initialValues={this.computeInitialValues()}
         validationSchema={validationSchema}
       >
-        <Message
-          component="h4"
-          content={sharedMessages.generalInformation}
-        />
+        <Message component="h4" content={sharedMessages.generalInformation} />
         <Form.Field
           name="collaborator_id"
           component={Input}
@@ -191,16 +179,10 @@ export default class CollaboratorForm extends Component {
           disabled={update}
           required
         >
-          <Radio
-            label={sharedMessages.user}
-            value="user"
-          />
-          <Radio
-            label={sharedMessages.organization}
-            value="organization"
-          />
+          <Radio label={sharedMessages.user} value="user" />
+          <Radio label={sharedMessages.organization} value="organization" />
         </Form.Field>
-        { hasRightAll && <Notification small info={m.cannotModifyRightAll} />}
+        {hasRightAll && <Notification small info={m.cannotModifyRightAll} />}
         <Form.Field
           name="rights"
           title={sharedMessages.rights}
@@ -214,12 +196,9 @@ export default class CollaboratorForm extends Component {
         <SubmitBar>
           <Form.Submit
             component={SubmitButton}
-            message={update
-              ? sharedMessages.saveChanges
-              : sharedMessages.collaboratorAdd
-            }
+            message={update ? sharedMessages.saveChanges : sharedMessages.collaboratorAdd}
           />
-          { update && !hasRightAll && (
+          {update && !hasRightAll && (
             <ModalButton
               type="button"
               icon="delete"

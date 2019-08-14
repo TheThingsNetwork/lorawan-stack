@@ -14,7 +14,7 @@
 
 import { getEventDataType } from '..'
 
-const formatMessageData = function (data) {
+const formatMessageData = function(data) {
   if (!data) {
     return null
   }
@@ -23,12 +23,12 @@ const formatMessageData = function (data) {
   const type = getEventDataType(t)
 
   switch (type) {
-  case 'UplinkMessage':
-  case 'DownlinkMessage':
-  case 'ApplicationUp':
-    return rest
-  default:
-    return null
+    case 'UplinkMessage':
+    case 'DownlinkMessage':
+    case 'ApplicationUp':
+      return rest
+    default:
+      return null
   }
 }
 

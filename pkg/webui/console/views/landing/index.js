@@ -29,8 +29,7 @@ import style from './landing.styl'
 const GenericNotFound = () => <FullViewErrorInner error={{ statusCode: 404 }} />
 
 export default class Landing extends React.PureComponent {
-
-  render () {
+  render() {
     const { path } = this.props.match
     return (
       <div className={style.container}>

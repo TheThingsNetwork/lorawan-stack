@@ -19,9 +19,7 @@ import bind from 'autobind-decorator'
 import PropTypes from '../../../lib/prop-types'
 import EventsSubscription from '../../containers/events-subscription'
 
-import {
-  clearGatewayEventsStream,
-} from '../../store/actions/gateways'
+import { clearGatewayEventsStream } from '../../store/actions/gateways'
 
 import {
   selectGatewayEvents,
@@ -33,10 +31,10 @@ import {
   null,
   (dispatch, ownProps) => ({
     onClear: () => dispatch(clearGatewayEventsStream(ownProps.gtwId)),
-  }))
+  }),
+)
 @bind
 export default class GatewayEvents extends React.Component {
-
   static propTypes = {
     gtwId: PropTypes.string.isRequired,
     onClear: PropTypes.func.isRequired,
@@ -47,12 +45,8 @@ export default class GatewayEvents extends React.Component {
     widget: false,
   }
 
-  render () {
-    const {
-      gtwId,
-      widget,
-      onClear,
-    } = this.props
+  render() {
+    const { gtwId, widget, onClear } = this.props
 
     return (
       <EventsSubscription

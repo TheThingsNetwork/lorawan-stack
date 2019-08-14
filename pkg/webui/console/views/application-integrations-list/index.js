@@ -23,7 +23,7 @@ import sharedMessages from '../../../lib/shared-messages'
 import PAGE_SIZES from '../../constants/page-sizes'
 
 export default class ApplicationIntegrationsList extends Component {
-  render () {
+  render() {
     const { appId } = this.props.match.params
 
     return (
@@ -31,10 +31,7 @@ export default class ApplicationIntegrationsList extends Component {
         <Row>
           <IntlHelmet title={sharedMessages.integrations} />
           <Col sm={12}>
-            <WebhooksTable
-              pageSize={PAGE_SIZES.REGULAR}
-              appId={appId}
-            />
+            <WebhooksTable pageSize={PAGE_SIZES.REGULAR} appId={appId} />
           </Col>
         </Row>
       </Container>

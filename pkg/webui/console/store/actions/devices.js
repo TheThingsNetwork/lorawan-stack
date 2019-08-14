@@ -15,15 +15,15 @@
 import { createRequestActions } from './lib'
 
 export const GET_DEVICES_LIST_BASE = 'GET_DEVICES_LIST'
-export const [{
-  request: GET_DEVICES_LIST,
-  success: GET_DEVICES_LIST_SUCCESS,
-  failure: GET_DEVICES_LIST_FAILURE,
-}, {
-  request: getDevicesList,
-  success: getDevicesListSuccess,
-  failure: getDevicesListFailure,
-}] = createRequestActions(GET_DEVICES_LIST_BASE,
-  (appId, { page, limit } = {}) => ({ appId, params: { page, limit }}),
-  (appId, { page, limit } = {}, selectors = []) => ({ selectors })
+export const [
+  {
+    request: GET_DEVICES_LIST,
+    success: GET_DEVICES_LIST_SUCCESS,
+    failure: GET_DEVICES_LIST_FAILURE,
+  },
+  { request: getDevicesList, success: getDevicesListSuccess, failure: getDevicesListFailure },
+] = createRequestActions(
+  GET_DEVICES_LIST_BASE,
+  (appId, { page, limit } = {}) => ({ appId, params: { page, limit } }),
+  (appId, { page, limit } = {}, selectors = []) => ({ selectors }),
 )

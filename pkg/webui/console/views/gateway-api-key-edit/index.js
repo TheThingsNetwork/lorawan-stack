@@ -26,10 +26,7 @@ import IntlHelmet from '../../../lib/components/intl-helmet'
 import { ApiKeyEditForm } from '../../components/api-key-form'
 import withRequest from '../../../lib/components/with-request'
 
-import {
-  getGatewayApiKey,
-  getGatewaysRightsList,
-} from '../../store/actions/gateways'
+import { getGatewayApiKey, getGatewaysRightsList } from '../../store/actions/gateways'
 import {
   selectSelectedGatewayId,
   selectGatewayRights,
@@ -43,35 +40,37 @@ import {
 
 import api from '../../api'
 
-@connect(function (state, props) {
-  const apiKeyId = props.match.params.apiKeyId
-  const keyFetching = selectGatewayApiKeyFetching(state)
-  const rightsFetching = selectGatewayRightsFetching(state)
-  const keyError = selectGatewayApiKeyError(state)
-  const rightsError = selectGatewayRightsError(state)
+@connect(
+  function(state, props) {
+    const apiKeyId = props.match.params.apiKeyId
+    const keyFetching = selectGatewayApiKeyFetching(state)
+    const rightsFetching = selectGatewayRightsFetching(state)
+    const keyError = selectGatewayApiKeyError(state)
+    const rightsError = selectGatewayRightsError(state)
 
-  return {
-    keyId: apiKeyId,
-    gtwId: selectSelectedGatewayId(state),
-    apiKey: selectGatewayApiKey(state),
-    rights: selectGatewayRights(state),
-    universalRights: selectGatewayUniversalRights(state),
-    fetching: keyFetching || rightsFetching,
-    error: keyError || rightsError,
-  }
-},
-dispatch => ({
-  loadData (gtwId, apiKeyId) {
-    dispatch(getGatewaysRightsList(gtwId))
-    dispatch(getGatewayApiKey(gtwId, apiKeyId))
+    return {
+      keyId: apiKeyId,
+      gtwId: selectSelectedGatewayId(state),
+      apiKey: selectGatewayApiKey(state),
+      rights: selectGatewayRights(state),
+      universalRights: selectGatewayUniversalRights(state),
+      fetching: keyFetching || rightsFetching,
+      error: keyError || rightsError,
+    }
   },
-  deleteSuccess: gtwId => dispatch(replace(`/gateways/${gtwId}/api-keys`)),
-}))
+  dispatch => ({
+    loadData(gtwId, apiKeyId) {
+      dispatch(getGatewaysRightsList(gtwId))
+      dispatch(getGatewayApiKey(gtwId, apiKeyId))
+    },
+    deleteSuccess: gtwId => dispatch(replace(`/gateways/${gtwId}/api-keys`)),
+  }),
+)
 @withRequest(
   ({ gtwId, keyId, loadData }) => loadData(gtwId, keyId),
-  ({ fetching, apiKey }) => fetching || !Boolean(apiKey)
+  ({ fetching, apiKey }) => fetching || !Boolean(apiKey),
 )
-@withBreadcrumb('gtws.single.api-keys.edit', function (props) {
+@withBreadcrumb('gtws.single.api-keys.edit', function(props) {
   const { gtwId, keyId } = props
 
   return (
@@ -84,25 +83,20 @@ dispatch => ({
 })
 @bind
 export default class GatewayApiKeyEdit extends React.Component {
-
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.deleteGatewayKey = id => api.gateway.apiKeys.delete(props.gtwId, id)
-    this.editGatewayKey = key => api.gateway.apiKeys.update(
-      props.gtwId,
-      props.keyId,
-      key
-    )
+    this.editGatewayKey = key => api.gateway.apiKeys.update(props.gtwId, props.keyId, key)
   }
 
-  onDeleteSuccess () {
+  onDeleteSuccess() {
     const { gtwId, deleteSuccess } = this.props
 
     deleteSuccess(gtwId)
   }
 
-  render () {
+  render() {
     const { apiKey, rights, universalRights } = this.props
 
     return (

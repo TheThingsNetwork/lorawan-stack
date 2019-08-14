@@ -19,20 +19,12 @@ import SideNavigation from './side'
 
 export default props => (
   <SideNavigationConsumer>
-    {
-      function ({ entries, header }) {
-        if (!entries) {
-          return null
-        }
-
-        return (
-          <SideNavigation
-            {...props}
-            header={header}
-            entries={entries}
-          />
-        )
+    {function({ entries, header }) {
+      if (!entries) {
+        return null
       }
-    }
+
+      return <SideNavigation {...props} header={header} entries={entries} />
+    }}
   </SideNavigationConsumer>
 )

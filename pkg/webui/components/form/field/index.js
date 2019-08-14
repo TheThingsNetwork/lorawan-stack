@@ -25,7 +25,7 @@ import PropTypes from '../../../lib/prop-types'
 
 import style from './field.styl'
 
-export function getPassThroughProps (props, excludeProps) {
+export function getPassThroughProps(props, excludeProps) {
   const rest = {}
   for (const property of Object.keys(props)) {
     if (!excludeProps[property]) {
@@ -35,7 +35,7 @@ export function getPassThroughProps (props, excludeProps) {
   return rest
 }
 
-const isValueEmpty = function (value) {
+const isValueEmpty = function(value) {
   if (value === null || value === undefined) {
     return true
   }
@@ -53,7 +53,6 @@ const isValueEmpty = function (value) {
 
 @bind
 class FormField extends React.Component {
-
   static contextType = FormContext
   static propTypes = {
     className: PropTypes.string,
@@ -62,10 +61,7 @@ class FormField extends React.Component {
     required: PropTypes.bool,
     description: PropTypes.message,
     onChange: PropTypes.func,
-    component: PropTypes.oneOfType([
-      PropTypes.func,
-      PropTypes.string,
-    ]).isRequired,
+    component: PropTypes.oneOfType([PropTypes.func, PropTypes.string]).isRequired,
   }
 
   static defaultProps = {
@@ -75,19 +71,19 @@ class FormField extends React.Component {
     required: false,
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { name } = this.props
 
     this.context.registerField(name, this)
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     const { name } = this.props
 
     this.context.unregisterField(name)
   }
 
-  extractValue (value) {
+  extractValue(value) {
     let newValue = value
     if (typeof value === 'object' && 'target' in value) {
       const target = value.target
@@ -101,7 +97,7 @@ class FormField extends React.Component {
     return newValue
   }
 
-  handleChange (value) {
+  handleChange(value) {
     const { name, onChange } = this.props
     const { setFieldValue } = this.context
 
@@ -112,7 +108,7 @@ class FormField extends React.Component {
     onChange(value)
   }
 
-  handleBlur (event) {
+  handleBlur(event) {
     const { name } = this.props
     const { validateOnBlur, setFieldTouched } = this.context
 
@@ -122,7 +118,7 @@ class FormField extends React.Component {
     }
   }
 
-  render () {
+  render() {
     const {
       className,
       name,
@@ -172,14 +168,18 @@ class FormField extends React.Component {
       onBlur: this.handleBlur,
     }
 
-    const cls = classnames(className, style.field, from(style, {
-      error: showError,
-      warning: showWarning,
-      horizontal,
-      required,
-      readOnly,
-      disabled: fieldDisabled,
-    }))
+    const cls = classnames(
+      className,
+      style.field,
+      from(style, {
+        error: showError,
+        warning: showWarning,
+        horizontal,
+        required,
+        readOnly,
+        disabled: fieldDisabled,
+      }),
+    )
 
     return (
       <div className={cls} data-needs-focus={showError}>
@@ -198,13 +198,8 @@ class FormField extends React.Component {
   }
 }
 
-const Err = function (props) {
-  const {
-    error,
-    warning,
-    name,
-    className,
-  } = props
+const Err = function(props) {
+  const { error, warning, name, className } = props
 
   const content = error || warning || ''
   const contentValues = content.values || {}

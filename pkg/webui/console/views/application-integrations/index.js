@@ -25,7 +25,7 @@ import ApplicationIntegrationsList from '../application-integrations-list'
 import ApplicationIntegrationAdd from '../application-integration-add'
 import ApplicationIntegrationEdit from '../application-integration-edit'
 
-@withBreadcrumb('apps.single.api-keys', function (props) {
+@withBreadcrumb('apps.single.api-keys', function(props) {
   const { match } = props
   const appId = match.params.appId
 
@@ -38,8 +38,7 @@ import ApplicationIntegrationEdit from '../application-integration-edit'
   )
 })
 export default class ApplicationCollaborators extends React.Component {
-
-  render () {
+  render() {
     const { match } = this.props
 
     return (

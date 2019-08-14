@@ -12,39 +12,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {
-  INITIALIZE,
-  INITIALIZE_SUCCESS,
-  INITIALIZE_FAILURE,
-} from '../actions/init'
+import { INITIALIZE, INITIALIZE_SUCCESS, INITIALIZE_FAILURE } from '../actions/init'
 
 const defaultState = {
   initialized: false,
   error: false,
 }
 
-const init = function (state = defaultState, action) {
+const init = function(state = defaultState, action) {
   switch (action.type) {
-  case INITIALIZE:
-    return {
-      ...state,
-      error: false,
-      initialized: false,
-    }
-  case INITIALIZE_SUCCESS:
-    return {
-      ...state,
-      error: false,
-      initialized: true,
-    }
-  case INITIALIZE_FAILURE:
-    return {
-      ...state,
-      error: action.error,
-      initialized: false,
-    }
-  default:
-    return state
+    case INITIALIZE:
+      return {
+        ...state,
+        error: false,
+        initialized: false,
+      }
+    case INITIALIZE_SUCCESS:
+      return {
+        ...state,
+        error: false,
+        initialized: true,
+      }
+    case INITIALIZE_FAILURE:
+      return {
+        ...state,
+        error: action.error,
+        initialized: false,
+      }
+    default:
+      return state
   }
 }
 

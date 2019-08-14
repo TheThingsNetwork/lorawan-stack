@@ -42,14 +42,18 @@ const m = defineMessages({
 })
 
 const validationSchema = Yup.object().shape({
-  latitude: Yup.string().required(sharedMessages.validateRequired)
+  latitude: Yup.string()
+    .required(sharedMessages.validateRequired)
     .matches(latitudeRegexp, sharedMessages.validateLatLong),
-  longitude: Yup.string().required(sharedMessages.validateRequired)
+  longitude: Yup.string()
+    .required(sharedMessages.validateRequired)
     .matches(longitudeRegexp, sharedMessages.validateLatLong),
-  altitude: Yup.string().matches(int32Regexp, sharedMessages.validateInt32).required(sharedMessages.validateRequired),
+  altitude: Yup.string()
+    .matches(int32Regexp, sharedMessages.validateInt32)
+    .required(sharedMessages.validateRequired),
 })
 
-const getRegistryLocation = function (locations) {
+const getRegistryLocation = function(locations) {
   let registryLocation
   if (locations) {
     for (const key of Object.keys(locations)) {
@@ -68,9 +72,9 @@ const getRegistryLocation = function (locations) {
     appId: selectSelectedApplicationId(state),
     devId: getDeviceId(state.device.device),
   }),
-  { updateDevice: attachPromise(updateDevice) }
+  { updateDevice: attachPromise(updateDevice) },
 )
-@withBreadcrumb('device.single.data', function (props) {
+@withBreadcrumb('device.single.data', function(props) {
   const { devId, appId } = props
   return (
     <Breadcrumb
@@ -82,7 +86,7 @@ const getRegistryLocation = function (locations) {
 })
 @bind
 export default class DeviceGeneralSettings extends React.Component {
-  async handleSubmit (values) {
+  async handleSubmit(values) {
     const { device, appId, devId, updateDevice } = this.props
 
     const patch = {
@@ -110,7 +114,7 @@ export default class DeviceGeneralSettings extends React.Component {
     await updateDevice(appId, devId, patch)
   }
 
-  async handleDelete () {
+  async handleDelete() {
     const { device, devId, appId, updateDevice } = this.props
     const registryLocation = getRegistryLocation(device.locations)
 
@@ -122,15 +126,13 @@ export default class DeviceGeneralSettings extends React.Component {
     await updateDevice(appId, devId, patch)
   }
 
-  render () {
+  render() {
     const { device, devId } = this.props
     const registryLocation = getRegistryLocation(device.locations)
 
     return (
       <Container>
-        <IntlHelmet
-          title={sharedMessages.location}
-        />
+        <IntlHelmet title={sharedMessages.location} />
         <Row>
           <Col sm={12} md={12} lg={8} xl={8}>
             <LocationForm

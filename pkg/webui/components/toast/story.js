@@ -24,24 +24,23 @@ const TOAST_CONTENT = 'Toast content'
 
 @bind
 class Example extends React.Component {
-
-  showToast (evt) {
+  showToast(evt) {
     let type = null
     switch (evt.currentTarget.name) {
-    case 'success':
-      type = toast.types.SUCCESS
-      break
-    case 'info':
-      type = toast.types.INFO
-      break
-    case 'warning':
-      type = toast.types.WARNING
-      break
-    case 'error':
-      type = toast.types.ERROR
-      break
-    default:
-      type = toast.types.DEFAULT
+      case 'success':
+        type = toast.types.SUCCESS
+        break
+      case 'info':
+        type = toast.types.INFO
+        break
+      case 'warning':
+        type = toast.types.WARNING
+        break
+      case 'error':
+        type = toast.types.ERROR
+        break
+      default:
+        type = toast.types.DEFAULT
     }
 
     toast({
@@ -51,7 +50,7 @@ class Example extends React.Component {
     })
   }
 
-  render () {
+  render() {
     return (
       <div style={{ width: '100%', height: '100%' }}>
         <ToastContainer />
@@ -65,7 +64,4 @@ class Example extends React.Component {
   }
 }
 
-storiesOf('Toast', module)
-  .add('Default', () => (
-    <Example />
-  ))
+storiesOf('Toast', module).add('Default', () => <Example />)

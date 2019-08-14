@@ -16,9 +16,9 @@ const selectUserStore = state => state.user
 
 export const selectUser = state => selectUserStore(state).user
 
-export const selectUserId = function (state) {
+export const selectUserId = function(state) {
   const user = selectUser(state)
-  const { ids = {}} = user
+  const { ids = {} } = user
 
   return ids.user_id
 }

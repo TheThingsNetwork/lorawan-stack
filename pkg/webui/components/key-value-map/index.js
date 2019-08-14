@@ -26,28 +26,25 @@ const m = defineMessages({
 
 @bind
 class KeyValueMap extends React.PureComponent {
-
-  handleEntryChange (index, newValues) {
+  handleEntryChange(index, newValues) {
     const { onChange, value } = this.props
-    onChange(value.map((kv, i) => (
-      index !== i ? kv : { ...kv, ...newValues }
-    )))
+    onChange(value.map((kv, i) => (index !== i ? kv : { ...kv, ...newValues })))
   }
 
-  removeEntry (index) {
+  removeEntry(index) {
     const { onChange, onBlur, value } = this.props
-    onChange(value.filter((_, i) => (i !== index)) || [])
+    onChange(value.filter((_, i) => i !== index) || [])
 
     // Trigger also the onBlur event to enforce revalidation
     onBlur()
   }
 
-  addEmptyEntry () {
+  addEmptyEntry() {
     const { onChange, value } = this.props
-    onChange([ ...value, { key: '', value: '' }])
+    onChange([...value, { key: '', value: '' }])
   }
 
-  render () {
+  render() {
     const {
       className,
       name,
@@ -61,19 +58,20 @@ class KeyValueMap extends React.PureComponent {
     return (
       <div className={className}>
         <div>
-          {value && value.map((value, index) => (
-            <Entry
-              key={`${name}[${index}]`}
-              name={name}
-              value={value}
-              keyPlaceholder={keyPlaceholder}
-              valuePlaceholder={valuePlaceholder}
-              index={index}
-              onRemoveButtonClick={this.removeEntry}
-              onChange={this.handleEntryChange}
-              onBlur={onBlur}
-            />
-          ))}
+          {value &&
+            value.map((value, index) => (
+              <Entry
+                key={`${name}[${index}]`}
+                name={name}
+                value={value}
+                keyPlaceholder={keyPlaceholder}
+                valuePlaceholder={valuePlaceholder}
+                index={index}
+                onRemoveButtonClick={this.removeEntry}
+                onChange={this.handleEntryChange}
+                onBlur={onBlur}
+              />
+            ))}
         </div>
         <div>
           <Button

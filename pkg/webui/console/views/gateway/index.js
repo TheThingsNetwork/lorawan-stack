@@ -31,45 +31,48 @@ import GatewayLocation from '../gateway-location'
 import GatewayData from '../gateway-data'
 import GatewayGeneralSettings from '../gateway-general-settings'
 
-import {
-  getGateway,
-  stopGatewayEventsStream,
-} from '../../store/actions/gateways'
+import { getGateway, stopGatewayEventsStream } from '../../store/actions/gateways'
 import {
   selectGatewayFetching,
   selectGatewayError,
   selectSelectedGateway,
 } from '../../store/selectors/gateways'
 
-@connect(function (state, props) {
-  const gtwId = props.match.params.gtwId
-  const gateway = selectSelectedGateway(state)
+@connect(
+  function(state, props) {
+    const gtwId = props.match.params.gtwId
+    const gateway = selectSelectedGateway(state)
 
-  return {
-    gtwId,
-    gateway,
-    error: selectGatewayError(state),
-    fetching: selectGatewayFetching(state),
-  }
-},
-dispatch => ({
-  getGateway: (id, meta) => dispatch(getGateway(id, meta)),
-  stopStream: id => dispatch(stopGatewayEventsStream(id)),
-}))
-@withRequest(
-  ({ gtwId, getGateway }) => getGateway(gtwId, [
-    'name',
-    'description',
-    'enforce_duty_cycle',
-    'frequency_plan_id',
-    'gateway_server_address',
-    'enforce_duty_cycle',
-    'antennas',
-  ]),
-  ({ fetching, gateway }) => fetching || !Boolean(gateway)
+    return {
+      gtwId,
+      gateway,
+      error: selectGatewayError(state),
+      fetching: selectGatewayFetching(state),
+    }
+  },
+  dispatch => ({
+    getGateway: (id, meta) => dispatch(getGateway(id, meta)),
+    stopStream: id => dispatch(stopGatewayEventsStream(id)),
+  }),
 )
-@withSideNavigation(function (props) {
-  const { match: { url: matchedUrl }, gtwId } = props
+@withRequest(
+  ({ gtwId, getGateway }) =>
+    getGateway(gtwId, [
+      'name',
+      'description',
+      'enforce_duty_cycle',
+      'frequency_plan_id',
+      'gateway_server_address',
+      'enforce_duty_cycle',
+      'antennas',
+    ]),
+  ({ fetching, gateway }) => fetching || !Boolean(gateway),
+)
+@withSideNavigation(function(props) {
+  const {
+    match: { url: matchedUrl },
+    gtwId,
+  } = props
 
   return {
     header: { title: gtwId, icon: 'gateway' },
@@ -109,34 +112,25 @@ dispatch => ({
     ],
   }
 })
-@withBreadcrumb('gateways.single', function (props) {
+@withBreadcrumb('gateways.single', function(props) {
   const { gtwId } = props
 
-  return (
-    <Breadcrumb
-      path={`/gateways/${gtwId}`}
-      icon="gateway"
-      content={gtwId}
-    />
-  )
+  return <Breadcrumb path={`/gateways/${gtwId}`} icon="gateway" content={gtwId} />
 })
 @withEnv
 export default class Gateway extends React.Component {
-
-  componentWillUnmount () {
+  componentWillUnmount() {
     const { stopStream, gtwId } = this.props
 
     stopStream(gtwId)
   }
 
-  render () {
+  render() {
     const { match, gateway, gtwId, env } = this.props
 
     return (
       <React.Fragment>
-        <IntlHelmet
-          titleTemplate={`%s - ${gateway.name || gtwId} - ${env.siteName}`}
-        />
+        <IntlHelmet titleTemplate={`%s - ${gateway.name || gtwId} - ${env.siteName}`} />
         <Switch>
           <Route exact path={`${match.path}`} component={GatewayOverview} />
           <Route path={`${match.path}/api-keys`} component={GatewayApiKeys} />

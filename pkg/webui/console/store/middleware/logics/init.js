@@ -20,7 +20,7 @@ import createRequestLogic from './lib'
 
 const consoleAppLogic = createRequestLogic({
   type: init.INITIALIZE,
-  async process (_, dispatch) {
+  async process(_, dispatch) {
     dispatch(user.getUserMe())
 
     try {
@@ -43,4 +43,4 @@ const consoleAppLogic = createRequestLogic({
   },
 })
 
-export default [ consoleAppLogic ]
+export default [consoleAppLogic]

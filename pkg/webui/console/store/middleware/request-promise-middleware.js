@@ -18,19 +18,20 @@
  * @param {Object} store - The store to apply the middleware to
  * @returns {Object} The middleware
  */
-const requestPromiseMiddleware = store => next => function (action) {
-  if (action.meta && action.meta._attachPromise) {
-    return new Promise(function (resolve, reject) {
-      action.meta = {
-        ...action.meta,
-        _resolve: resolve,
-        _reject: reject,
-      }
-      next(action)
-    })
-  }
+const requestPromiseMiddleware = store => next =>
+  function(action) {
+    if (action.meta && action.meta._attachPromise) {
+      return new Promise(function(resolve, reject) {
+        action.meta = {
+          ...action.meta,
+          _resolve: resolve,
+          _reject: reject,
+        }
+        next(action)
+      })
+    }
 
-  return next(action)
-}
+    return next(action)
+  }
 
 export default requestPromiseMiddleware

@@ -22,8 +22,7 @@ import style from './tab.styl'
 
 @bind
 class Tab extends React.PureComponent {
-
-  handleClick () {
+  handleClick() {
     const { onClick, name, disabled } = this.props
 
     if (!disabled) {
@@ -31,7 +30,7 @@ class Tab extends React.PureComponent {
     }
   }
 
-  render () {
+  render() {
     const {
       className,
       onClick,
@@ -67,14 +66,8 @@ class Tab extends React.PureComponent {
     }
 
     return (
-      <li
-        {...rest}
-        className={style.tab}
-      >
-        <Component
-          {...props}
-          children={children}
-        />
+      <li {...rest} className={style.tab}>
+        <Component {...props} children={children} />
       </li>
     )
   }

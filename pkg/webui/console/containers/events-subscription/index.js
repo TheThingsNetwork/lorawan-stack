@@ -21,28 +21,23 @@ import PropTypes from '../../../lib/prop-types'
 
 const { Widget } = Events
 
-const mapConnectionStatusToWidget = function (status) {
+const mapConnectionStatusToWidget = function(status) {
   switch (status) {
-  case CONNECTION_STATUS.CONNECTED:
-    return Widget.CONNECTION_STATUS.GOOD
-  case CONNECTION_STATUS.CONNECTING:
-    return Widget.CONNECTION_STATUS.MEDIOCRE
-  case CONNECTION_STATUS.DISCONNECTED:
-  case CONNECTION_STATUS.ERROR:
-    return Widget.CONNECTION_STATUS.BAD
-  case CONNECTION_STATUS.UNKNOWN:
-  default:
-    return Widget.CONNECTION_STATUS.UNKNOWN
+    case CONNECTION_STATUS.CONNECTED:
+      return Widget.CONNECTION_STATUS.GOOD
+    case CONNECTION_STATUS.CONNECTING:
+      return Widget.CONNECTION_STATUS.MEDIOCRE
+    case CONNECTION_STATUS.DISCONNECTED:
+    case CONNECTION_STATUS.ERROR:
+      return Widget.CONNECTION_STATUS.BAD
+    case CONNECTION_STATUS.UNKNOWN:
+    default:
+      return Widget.CONNECTION_STATUS.UNKNOWN
   }
 }
 
-@connect(function (state, props) {
-  const {
-    id,
-    eventsSelector,
-    statusSelector,
-    errorSelector,
-  } = props
+@connect(function(state, props) {
+  const { id, eventsSelector, statusSelector, errorSelector } = props
 
   return {
     events: eventsSelector(state, id),
@@ -51,16 +46,8 @@ const mapConnectionStatusToWidget = function (status) {
   }
 })
 class EventsSubscription extends React.Component {
-  render () {
-    const {
-      id,
-      widget,
-      events,
-      connectionStatus,
-      onClear,
-      toAllUrl,
-      error,
-    } = this.props
+  render() {
+    const { id, widget, events, connectionStatus, onClear, toAllUrl, error } = this.props
 
     if (widget) {
       return (
@@ -74,14 +61,7 @@ class EventsSubscription extends React.Component {
       )
     }
 
-    return (
-      <Events
-        emitterId={id}
-        events={events}
-        onClear={onClear}
-        error={error}
-      />
-    )
+    return <Events emitterId={id} events={events} onClear={onClear} error={error} />
   }
 }
 

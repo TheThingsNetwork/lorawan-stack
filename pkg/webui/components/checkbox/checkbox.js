@@ -25,10 +25,9 @@ import style from './checkbox.styl'
 
 @bind
 class Checkbox extends React.PureComponent {
-
   static contextType = CheckboxGroupContext
 
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.input = React.createRef()
@@ -46,7 +45,7 @@ class Checkbox extends React.PureComponent {
     }
   }
 
-  static getDerivedStateFromProps (props, state) {
+  static getDerivedStateFromProps(props, state) {
     const { value } = props
 
     if ('value' in props && value !== state.checked) {
@@ -56,7 +55,7 @@ class Checkbox extends React.PureComponent {
     return null
   }
 
-  handleChange (event) {
+  handleChange(event) {
     const { onChange } = this.props
     const { checked } = event.target
 
@@ -72,19 +71,19 @@ class Checkbox extends React.PureComponent {
     onChange(event)
   }
 
-  focus () {
+  focus() {
     if (this.input && this.input.current) {
       this.input.current.focus()
     }
   }
 
-  blur () {
+  blur() {
     if (this.input && this.input.current) {
       this.input.current.blur()
     }
   }
 
-  render () {
+  render() {
     const {
       className,
       name,
@@ -138,12 +137,11 @@ class Checkbox extends React.PureComponent {
   }
 }
 
-
 Checkbox.propTypes = {
   className: PropTypes.string,
   label: PropTypes.message,
   name: PropTypes.string.isRequired,
-  value: PropTypes.oneOfType([ PropTypes.bool, PropTypes.object ]),
+  value: PropTypes.oneOfType([PropTypes.bool, PropTypes.object]),
   checked: PropTypes.bool,
   disabled: PropTypes.bool,
   readOnly: PropTypes.bool,

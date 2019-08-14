@@ -24,12 +24,11 @@ import style from './pagination.styl'
 
 @bind
 class Pagination extends React.PureComponent {
-
-  onPageChange (page) {
+  onPageChange(page) {
     this.props.onPageChange(page.selected + 1)
   }
 
-  render () {
+  render() {
     const {
       className,
       forcePage = 1,
@@ -56,20 +55,10 @@ class Pagination extends React.PureComponent {
       <Paginate
         previousClassName={navigationPrevClassNames}
         previousLinkClassName={style.link}
-        previousLabel={
-          <Icon
-            icon="navigate_before"
-            small aria-label="Go to the previous page"
-          />
-        }
+        previousLabel={<Icon icon="navigate_before" small aria-label="Go to the previous page" />}
         nextClassName={navigationNextClassNames}
         nextLinkClassName={style.link}
-        nextLabel={
-          <Icon
-            icon="navigate_next"
-            small aria-label="Go to the next page"
-          />
-        }
+        nextLabel={<Icon icon="navigate_next" small aria-label="Go to the next page" />}
         containerClassName={containerClassNames}
         pageClassName={style.item}
         breakClassName={breakClassNames}

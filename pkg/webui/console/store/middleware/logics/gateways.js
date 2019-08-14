@@ -24,9 +24,9 @@ import createRequestLogic from './lib'
 
 const getGatewayLogic = createRequestLogic({
   type: gateways.GET_GTW,
-  async process ({ action }, dispatch) {
+  async process({ action }, dispatch) {
     const { payload, meta } = action
-    const { id = {}} = payload
+    const { id = {} } = payload
     const selector = meta.selector || ''
     const gtw = await api.gateway.get(id, selector)
     dispatch(gateways.startGatewayEventsStream(id))
@@ -36,8 +36,10 @@ const getGatewayLogic = createRequestLogic({
 
 const updateGatewayLogic = createRequestLogic({
   type: gateways.UPDATE_GTW,
-  async process ({ action }) {
-    const { payload: { id, patch }} = action
+  async process({ action }) {
+    const {
+      payload: { id, patch },
+    } = action
     const result = await api.gateway.update(id, patch)
 
     return { ...patch, ...result }
@@ -46,7 +48,7 @@ const updateGatewayLogic = createRequestLogic({
 
 const deleteGatewayLogic = createRequestLogic({
   type: gateways.DELETE_GTW,
-  async process ({ action }) {
+  async process({ action }) {
     const { id } = action.payload
 
     await api.gateway.delete(id)
@@ -58,17 +60,22 @@ const deleteGatewayLogic = createRequestLogic({
 const getGatewaysLogic = createRequestLogic({
   type: gateways.GET_GTWS_LIST,
   latest: true,
-  async process ({ action }) {
-    const { params: { page, limit, query }} = action.payload
+  async process({ action }) {
+    const {
+      params: { page, limit, query },
+    } = action.payload
     const { selectors } = action.meta
 
     const data = query
-      ? await api.gateways.search({
-        page,
-        limit,
-        id_contains: query,
-        name_contains: query,
-      }, selectors)
+      ? await api.gateways.search(
+          {
+            page,
+            limit,
+            id_contains: query,
+            name_contains: query,
+          },
+          selectors,
+        )
       : await api.gateways.list({ page, limit }, selectors)
 
     return {
@@ -80,7 +87,7 @@ const getGatewaysLogic = createRequestLogic({
 
 const getGatewaysRightsLogic = createRequestLogic({
   type: gateways.GET_GTWS_RIGHTS_LIST,
-  async process ({ action }, dispatch, done) {
+  async process({ action }, dispatch, done) {
     const { id } = action.payload
     const result = await api.rights.gateways(id)
     return result.rights.sort()
@@ -89,7 +96,7 @@ const getGatewaysRightsLogic = createRequestLogic({
 
 const getGatewayCollaboratorLogic = createRequestLogic({
   type: gateways.GET_GTW_COLLABORATOR,
-  async process ({ action }) {
+  async process({ action }) {
     const { id: gtwId, collaboratorId, isUser } = action.payload
 
     const collaborator = isUser
@@ -108,15 +115,13 @@ const getGatewayCollaboratorLogic = createRequestLogic({
 
 const getGatewayCollaboratorsLogic = createRequestLogic({
   type: gateways.GET_GTW_COLLABORATORS_LIST,
-  async process ({ action }) {
+  async process({ action }) {
     const { id, params } = action.payload
     const res = await api.gateway.collaborators.list(id, params)
-    const collaborators = res.collaborators.map(function (collaborator) {
+    const collaborators = res.collaborators.map(function(collaborator) {
       const { ids, ...rest } = collaborator
       const isUser = !!ids.user_ids
-      const collaboratorId = isUser
-        ? ids.user_ids.user_id
-        : ids.organization_ids.organization_id
+      const collaboratorId = isUser ? ids.user_ids.user_id : ids.organization_ids.organization_id
 
       return {
         id: collaboratorId,
@@ -130,15 +135,12 @@ const getGatewayCollaboratorsLogic = createRequestLogic({
 
 const startGatewayStatisticsLogic = createLogic({
   type: gateways.START_GTW_STATS,
-  cancelType: [
-    gateways.STOP_GTW_STATS,
-    gateways.UPDATE_GTW_STATS_FAILURE,
-  ],
+  cancelType: [gateways.STOP_GTW_STATS, gateways.UPDATE_GTW_STATS_FAILURE],
   warnTimeout: 0,
   processOptions: {
     dispatchMultiple: true,
   },
-  async process ({ cancelled$, action, getState }, dispatch, done) {
+  async process({ cancelled$, action, getState }, dispatch, done) {
     const { id } = action.payload
     const { timeout = 5000 } = action.meta
 
@@ -146,9 +148,11 @@ const startGatewayStatisticsLogic = createLogic({
     const gtw = selectGatewayById(getState(), id)
 
     if (!gsConfig.enabled) {
-      dispatch(gateways.startGatewayStatisticsFailure({
-        message: 'Unavailable',
-      }))
+      dispatch(
+        gateways.startGatewayStatisticsFailure({
+          message: 'Unavailable',
+        }),
+      )
       done()
     }
 
@@ -164,26 +168,27 @@ const startGatewayStatisticsLogic = createLogic({
       gtwGsAddress = gtwAddress.split(':')[0]
       consoleGsAddress = new URL(gsConfig.base_url).hostname
     } catch (error) {
-      dispatch(gateways.startGatewayStatisticsFailure({
-        message: sharedMessages.unknown,
-      }))
+      dispatch(
+        gateways.startGatewayStatisticsFailure({
+          message: sharedMessages.unknown,
+        }),
+      )
       done()
     }
 
     if (gtwGsAddress !== consoleGsAddress) {
-      dispatch(gateways.startGatewayStatisticsFailure({
-        message: sharedMessages.otherCluster,
-      }))
+      dispatch(
+        gateways.startGatewayStatisticsFailure({
+          message: sharedMessages.otherCluster,
+        }),
+      )
       done()
     }
 
     dispatch(gateways.startGatewayStatisticsSuccess())
     dispatch(gateways.updateGatewayStatistics(id))
 
-    const interval = setInterval(
-      () => dispatch(gateways.updateGatewayStatistics(id)),
-      timeout
-    )
+    const interval = setInterval(() => dispatch(gateways.updateGatewayStatistics(id)), timeout)
 
     cancelled$.subscribe(() => clearInterval(interval))
   },
@@ -191,7 +196,7 @@ const startGatewayStatisticsLogic = createLogic({
 
 const updateGatewayStatisticsLogic = createRequestLogic({
   type: gateways.UPDATE_GTW_STATS,
-  async process ({ action }) {
+  async process({ action }) {
     const { id } = action.payload
 
     const stats = await api.gateway.stats(id)
@@ -202,7 +207,7 @@ const updateGatewayStatisticsLogic = createRequestLogic({
 
 const getGatewayApiKeysLogic = createRequestLogic({
   type: gateways.GET_GTW_API_KEYS_LIST,
-  async process ({ action }) {
+  async process({ action }) {
     const { id: gtwId, params } = action.payload
     const res = await api.gateway.apiKeys.list(gtwId, params)
     return { ...res, id: gtwId }
@@ -211,7 +216,7 @@ const getGatewayApiKeysLogic = createRequestLogic({
 
 const getGatewayApiKeyLogic = createRequestLogic({
   type: gateways.GET_GTW_API_KEY,
-  async process ({ action }) {
+  async process({ action }) {
     const { id: gtwId, keyId } = action.payload
     return api.gateway.apiKeys.get(gtwId, keyId)
   },
@@ -227,11 +232,7 @@ export default [
   getGatewayCollaboratorsLogic,
   startGatewayStatisticsLogic,
   updateGatewayStatisticsLogic,
-  ...createEventsConnectLogics(
-    gateways.SHARED_NAME,
-    'gateways',
-    api.gateway.eventsSubscribe,
-  ),
+  ...createEventsConnectLogics(gateways.SHARED_NAME, 'gateways', api.gateway.eventsSubscribe),
   getGatewayApiKeysLogic,
   getGatewayApiKeyLogic,
 ]

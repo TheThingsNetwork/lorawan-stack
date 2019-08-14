@@ -52,4 +52,4 @@ const Console = () => (
   </EnvProvider>
 )
 
-DOM.render((<Console />), document.getElementById('app'))
+DOM.render(<Console />, document.getElementById('app'))

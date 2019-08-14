@@ -20,42 +20,26 @@ import Breadcrumb from './breadcrumb'
 import Breadcrumbs from './breadcrumbs'
 
 storiesOf('Breadcrumbs', module)
-  .addDecorator((story, context) => withInfo({
-    inline: true,
-    header: false,
-    source: false,
-    propTables: [ Breadcrumbs, Breadcrumb ],
-  })(story)(context))
-  .add('Default', function () {
+  .addDecorator((story, context) =>
+    withInfo({
+      inline: true,
+      header: false,
+      source: false,
+      propTables: [Breadcrumbs, Breadcrumb],
+    })(story)(context),
+  )
+  .add('Default', function() {
     const breadcrumbs = [
-      <Breadcrumb
-        key="1"
-        path="/applications"
-        content="Applications"
-      />,
-      <Breadcrumb
-        key="2"
-        path="/applications/test-app"
-        content="test-app"
-      />,
-      <Breadcrumb
-        key="3"
-        path="/applications/test-app/devices"
-        content="Devices"
-      />,
+      <Breadcrumb key="1" path="/applications" content="Applications" />,
+      <Breadcrumb key="2" path="/applications/test-app" content="test-app" />,
+      <Breadcrumb key="3" path="/applications/test-app/devices" content="Devices" />,
     ]
 
-    return (
-      <Breadcrumbs breadcrumbs={breadcrumbs} />
-    )
-  }).add('With icons', function () {
+    return <Breadcrumbs breadcrumbs={breadcrumbs} />
+  })
+  .add('With icons', function() {
     const breadcrumbs = [
-      <Breadcrumb
-        key="1"
-        path="/gateways"
-        icon="gateway"
-        content="Gateways"
-      />,
+      <Breadcrumb key="1" path="/gateways" icon="gateway" content="Gateways" />,
       <Breadcrumb
         key="2"
         path="/gateways/eui-0000024b0806021d"
@@ -69,29 +53,13 @@ storiesOf('Breadcrumbs', module)
         content="Traffic"
       />,
     ]
-    return (
-      <Breadcrumbs breadcrumbs={breadcrumbs} />
-    )
-  }).add('Mixed', function () {
+    return <Breadcrumbs breadcrumbs={breadcrumbs} />
+  })
+  .add('Mixed', function() {
     const breadcrumbs = [
-      <Breadcrumb
-        key="1"
-        path="/applications"
-        content="Applications"
-      />,
-      <Breadcrumb
-        key="2"
-        path="/applications/test-app"
-        icon="application"
-        content="test-app"
-      />,
-      <Breadcrumb
-        key="3"
-        path="/applications/test-app/traffix"
-        content="Traffic"
-      />,
+      <Breadcrumb key="1" path="/applications" content="Applications" />,
+      <Breadcrumb key="2" path="/applications/test-app" icon="application" content="test-app" />,
+      <Breadcrumb key="3" path="/applications/test-app/traffix" content="Traffic" />,
     ]
-    return (
-      <Breadcrumbs breadcrumbs={breadcrumbs} />
-    )
+    return <Breadcrumbs breadcrumbs={breadcrumbs} />
   })

@@ -16,33 +16,31 @@ import React from 'react'
 
 import ProfileDropdown from '.'
 
-export default function () {
+export default function() {
   const driver = {
     component: undefined,
     when: {
-      created (props) {
-        driver.component = shallow(
-          <ProfileDropdown {...props} />
-        )
+      created(props) {
+        driver.component = shallow(<ProfileDropdown {...props} />)
 
         return driver
       },
-      toggledDropdown () {
+      toggledDropdown() {
         driver.get.clickableArea().simulate('click', {
           preventDefault: () => undefined,
         })
       },
     },
     is: {
-      dropdownOpen () {
+      dropdownOpen() {
         return driver.component.state('expanded')
       },
     },
     get: {
-      clickableArea () {
+      clickableArea() {
         return driver.component.find('.container').first()
       },
-      dropdown () {
+      dropdown() {
         return driver.component.find('.dropdown').first()
       },
     },

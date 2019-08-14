@@ -21,19 +21,21 @@ const StringSchema = Yup.string
  * It transforms the value to `null` if it is empty and skips validation.
  */
 class NullableStringSchemaType extends StringSchema {
-  constructor () {
+  constructor() {
     super()
 
     const self = this
 
-    self.withMutation(function () {
-      self.transform(function (value) {
-        if (self.isType(value) && Boolean(value)) {
-          return value
-        }
+    self.withMutation(function() {
+      self
+        .transform(function(value) {
+          if (self.isType(value) && Boolean(value)) {
+            return value
+          }
 
-        return null
-      }).nullable(true)
+          return null
+        })
+        .nullable(true)
     })
   }
 }

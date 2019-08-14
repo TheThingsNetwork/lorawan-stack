@@ -21,7 +21,7 @@ import Tag from '../.'
 
 import style from './group.styl'
 
-const measureWidth = function (element) {
+const measureWidth = function(element) {
   if (!element) {
     return 0
   }
@@ -36,8 +36,7 @@ const TAG_SPACE_WIDTH = 3
 
 @bind
 class TagGroup extends React.Component {
-
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.state = {
@@ -47,13 +46,13 @@ class TagGroup extends React.Component {
     this.element = React.createRef()
   }
 
-  componentDidMount () {
+  componentDidMount() {
     window.addEventListener('resize', this.handleWindowResize)
 
     this.handleWindowResize()
   }
 
-  componentDidUpdate (prevProps) {
+  componentDidUpdate(prevProps) {
     const props = this.props
 
     // calculate fit on any props change
@@ -62,15 +61,15 @@ class TagGroup extends React.Component {
     }
   }
 
-  checkTagsFit () {
+  checkTagsFit() {
     this.handleWindowResize()
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     window.removeEventListener('resize', this.handleWindowResize)
   }
 
-  handleWindowResize () {
+  handleWindowResize() {
     const { tags, tagMaxWidth } = this.props
 
     const containerWidth = measureWidth(this.element)
@@ -89,7 +88,7 @@ class TagGroup extends React.Component {
     })
   }
 
-  render () {
+  render() {
     const { className, tags } = this.props
     const { left } = this.state
 

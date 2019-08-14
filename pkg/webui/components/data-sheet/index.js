@@ -28,33 +28,42 @@ const m = defineMessages({
   noData: 'No data available',
 })
 
-const DataSheet = function ({ className, data }) {
+const DataSheet = function({ className, data }) {
   return (
     <table className={classnames(className, style.table)}>
       <tbody>
-        { data.map(function (group, index) {
+        {data.map(function(group, index) {
           return (
             <React.Fragment key={`${group.header}_${index}`}>
-              <tr className={style.groupHeading}><th><Message content={group.header} /></th></tr>
-              { group.items.length > 0 ? group.items.map( function (item) {
-                if (!item) {
-                  return null
-                }
-                const keyId = typeof item.key === 'object' ? item.key.id : item.key
-                const subItems = item.subItems ? item.subItems.map((subItem, subIndex) => (
-                  <DataSheetRow sub item={subItem} key={`${keyId}_${index}_${subIndex}`} />
-                )) : null
+              <tr className={style.groupHeading}>
+                <th>
+                  <Message content={group.header} />
+                </th>
+              </tr>
+              {group.items.length > 0 ? (
+                group.items.map(function(item) {
+                  if (!item) {
+                    return null
+                  }
+                  const keyId = typeof item.key === 'object' ? item.key.id : item.key
+                  const subItems = item.subItems
+                    ? item.subItems.map((subItem, subIndex) => (
+                        <DataSheetRow sub item={subItem} key={`${keyId}_${index}_${subIndex}`} />
+                      ))
+                    : null
 
-                return (
-                  <React.Fragment key={`${keyId}_${index}`}>
-                    <DataSheetRow item={item} />
-                    {subItems}
-                  </React.Fragment>
-                )
-              }
+                  return (
+                    <React.Fragment key={`${keyId}_${index}`}>
+                      <DataSheetRow item={item} />
+                      {subItems}
+                    </React.Fragment>
+                  )
+                })
               ) : (
                 <tr>
-                  <th colSpan={2}><Message content={m.noData} /></th>
+                  <th colSpan={2}>
+                    <Message content={m.noData} />
+                  </th>
                 </tr>
               )}
             </React.Fragment>
@@ -67,27 +76,31 @@ const DataSheet = function ({ className, data }) {
 
 DataSheet.propTypes = {
   /** A list of entries for the sheet */
-  data: PropTypes.arrayOf(PropTypes.shape({
-    /** The title of the item group */
-    header: PropTypes.message.isRequired,
-    /** A list of items for the group */
-    items: PropTypes.arrayOf(PropTypes.shape({
-      /** The key of the item */
-      key: PropTypes.message,
-      /** The value of the item */
-      value: PropTypes.message,
-      /** The type of the item, 'code', 'byte' or 'text' (default) */
-      type: PropTypes.string,
-      /** Whether this 'code' or 'byte' item should be hidden by default */
-      sensitive: PropTypes.bool,
-      /** Optional subitems of this item (same shape as item, but no deeper
-      * hierarchies) */
-      subItems: PropTypes.arrayOf(PropTypes.object),
-    })),
-  })),
+  data: PropTypes.arrayOf(
+    PropTypes.shape({
+      /** The title of the item group */
+      header: PropTypes.message.isRequired,
+      /** A list of items for the group */
+      items: PropTypes.arrayOf(
+        PropTypes.shape({
+          /** The key of the item */
+          key: PropTypes.message,
+          /** The value of the item */
+          value: PropTypes.message,
+          /** The type of the item, 'code', 'byte' or 'text' (default) */
+          type: PropTypes.string,
+          /** Whether this 'code' or 'byte' item should be hidden by default */
+          sensitive: PropTypes.bool,
+          /** Optional subitems of this item (same shape as item, but no deeper
+           * hierarchies) */
+          subItems: PropTypes.arrayOf(PropTypes.object),
+        }),
+      ),
+    }),
+  ),
 }
 
-const DataSheetRow = function ({ item, sub }) {
+const DataSheetRow = function({ item, sub }) {
   const isSafeInspector = item.type === 'byte' || item.type === 'code'
   const rowStyle = classnames({
     [style.sub]: sub,
@@ -95,16 +108,23 @@ const DataSheetRow = function ({ item, sub }) {
 
   return (
     <tr className={rowStyle}>
-      <th><Message content={item.key} /></th>
-      <td>{item.value && isSafeInspector ? (
-        <SafeInspector
-          hideable={false || item.sensitive}
-          isBytes={item.type === 'byte'}
-          small
-          data={item.value}
-        />
-      )
-        : item.value || <Message className={style.notAvailable} content={sharedMessages.notAvailable} />}</td>
+      <th>
+        <Message content={item.key} />
+      </th>
+      <td>
+        {item.value && isSafeInspector ? (
+          <SafeInspector
+            hideable={false || item.sensitive}
+            isBytes={item.type === 'byte'}
+            small
+            data={item.value}
+          />
+        ) : (
+          item.value || (
+            <Message className={style.notAvailable} content={sharedMessages.notAvailable} />
+          )
+        )}
+      </td>
     </tr>
   )
 }

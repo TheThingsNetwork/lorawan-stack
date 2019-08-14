@@ -26,19 +26,21 @@ import { logout } from '../../store/actions/user'
 }))
 @bind
 export default class OAuth extends React.PureComponent {
-
-  async handleLogout () {
+  async handleLogout() {
     const { dispatch } = this.props
 
     dispatch(logout())
   }
 
-  render () {
-    const { user = { ids: {}}} = this.props
+  render() {
+    const { user = { ids: {} } } = this.props
 
     return (
       <WithAuth>
-        <div>You are logged in as {user.ids.user_id}. <Button message="Logout" onClick={this.handleLogout} /></div>
+        <div>
+          You are logged in as {user.ids.user_id}.{' '}
+          <Button message="Logout" onClick={this.handleLogout} />
+        </div>
       </WithAuth>
     )
   }

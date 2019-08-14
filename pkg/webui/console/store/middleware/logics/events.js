@@ -38,11 +38,7 @@ import user from './user'
  * Should accept a list of entity ids.
  * @returns {Object} - The `redux-logic` (decorated) logic.
  */
-const createEventsConnectLogics = function (
-  reducerName,
-  entityName,
-  onEventsStart,
-) {
+const createEventsConnectLogics = function(reducerName, entityName, onEventsStart) {
   const START_EVENTS = createStartEventsStreamActionType(reducerName)
   const START_EVENTS_FAILURE = createStartEventsStreamFailureActionType(reducerName)
   const STOP_EVENTS = createStopEventsStreamActionType(reducerName)
@@ -59,12 +55,12 @@ const createEventsConnectLogics = function (
   return [
     createLogic({
       type: START_EVENTS,
-      cancelType: [ STOP_EVENTS, START_EVENTS_FAILURE, GET_EVENT_MESSAGE_FAILURE ],
+      cancelType: [STOP_EVENTS, START_EVENTS_FAILURE, GET_EVENT_MESSAGE_FAILURE],
       warnTimeout: 0,
       processOptions: {
         dispatchMultiple: true,
       },
-      validate ({ getState, action }, allow, reject) {
+      validate({ getState, action }, allow, reject) {
         const { id } = action
         if (!id) {
           reject()
@@ -82,11 +78,11 @@ const createEventsConnectLogics = function (
 
         allow(action)
       },
-      async process ({ getState, action }, dispatch) {
+      async process({ getState, action }, dispatch) {
         const { id } = action
 
         try {
-          channel = await onEventsStart([ id ])
+          channel = await onEventsStart([id])
 
           channel.on('start', () => dispatch(startEventsSuccess(id)))
           channel.on('event', message => dispatch(getEventSuccess(id, message)))
@@ -102,8 +98,8 @@ const createEventsConnectLogics = function (
       },
     }),
     createLogic({
-      type: [ STOP_EVENTS, START_EVENTS_FAILURE, GET_EVENT_MESSAGE_FAILURE ],
-      validate ({ getState, action }, allow, reject) {
+      type: [STOP_EVENTS, START_EVENTS_FAILURE, GET_EVENT_MESSAGE_FAILURE],
+      validate({ getState, action }, allow, reject) {
         const { id } = action
         if (!id) {
           reject()
@@ -121,7 +117,7 @@ const createEventsConnectLogics = function (
 
         allow(action)
       },
-      process (_, __, done) {
+      process(_, __, done) {
         if (channel) {
           channel.close()
         }

@@ -42,7 +42,8 @@ import PropTypes from '../../../lib/prop-types'
 const m = defineMessages({
   basics: 'Basics',
   deleteApp: 'Delete application',
-  modalWarning: 'Are you sure you want to delete "{appName}"? Deleting an application cannot be undone!',
+  modalWarning:
+    'Are you sure you want to delete "{appName}"? Deleting an application cannot be undone!',
   updateSuccess: 'Successfully updated application',
 })
 
@@ -50,21 +51,25 @@ const validationSchema = Yup.object().shape({
   name: Yup.string()
     .min(3, sharedMessages.validateTooShort)
     .max(50, sharedMessages.validateTooLong),
-  description: Yup.string()
-    .max(150, sharedMessages.validateTooLong),
+  description: Yup.string().max(150, sharedMessages.validateTooLong),
 })
 
-@connect(state => ({
-  application: selectSelectedApplication(state),
-}),
-dispatch => ({
-  ...bindActionCreators({
-    updateApplication: attachPromise(updateApplication),
-    deleteApplication: attachPromise(deleteApplication),
-  }, dispatch),
-  onDeleteSuccess: () => dispatch(replace(`/applications`)),
-}))
-@withBreadcrumb('apps.single.general-settings', function (props) {
+@connect(
+  state => ({
+    application: selectSelectedApplication(state),
+  }),
+  dispatch => ({
+    ...bindActionCreators(
+      {
+        updateApplication: attachPromise(updateApplication),
+        deleteApplication: attachPromise(deleteApplication),
+      },
+      dispatch,
+    ),
+    onDeleteSuccess: () => dispatch(replace(`/applications`)),
+  }),
+)
+@withBreadcrumb('apps.single.general-settings', function(props) {
   const { appId } = props
 
   return (
@@ -77,7 +82,6 @@ dispatch => ({
 })
 @bind
 export default class ApplicationGeneralSettings extends React.Component {
-
   static propTypes = {
     application: PropTypes.object,
     updateApplication: PropTypes.func.isRequired,
@@ -89,13 +93,15 @@ export default class ApplicationGeneralSettings extends React.Component {
     error: '',
   }
 
-  async handleSubmit (values, { resetForm }) {
+  async handleSubmit(values, { resetForm }) {
     const { application, updateApplication } = this.props
 
     await this.setState({ error: '' })
 
     const changed = diff(application, values)
-    const { ids: { application_id }} = application
+    const {
+      ids: { application_id },
+    } = application
 
     try {
       await updateApplication(application_id, changed)
@@ -111,7 +117,7 @@ export default class ApplicationGeneralSettings extends React.Component {
     }
   }
 
-  async handleDelete () {
+  async handleDelete() {
     const { deleteApplication, onDeleteSuccess } = this.props
     const { appId } = this.props.match.params
 
@@ -125,21 +131,16 @@ export default class ApplicationGeneralSettings extends React.Component {
     }
   }
 
-  render () {
+  render() {
     const { application } = this.props
     const { error } = this.state
 
     return (
       <Container>
-        <IntlHelmet
-          title={sharedMessages.generalSettings}
-        />
+        <IntlHelmet title={sharedMessages.generalSettings} />
         <Row>
           <Col lg={8} md={12}>
-            <Message
-              component="h2"
-              content={sharedMessages.generalSettings}
-            />
+            <Message component="h2" content={sharedMessages.generalSettings} />
           </Col>
         </Row>
         <Row>
@@ -151,20 +152,9 @@ export default class ApplicationGeneralSettings extends React.Component {
               initialValues={{ name: application.name, description: application.description }}
               validationSchema={validationSchema}
             >
-              <Message
-                component="h4"
-                content={m.basics}
-              />
-              <Form.Field
-                title={sharedMessages.name}
-                name="name"
-                component={Input}
-              />
-              <Form.Field
-                title={sharedMessages.description}
-                name="description"
-                component={Input}
-              />
+              <Message component="h4" content={m.basics} />
+              <Form.Field title={sharedMessages.name} name="name" component={Input} />
+              <Form.Field title={sharedMessages.description} name="description" component={Input} />
               <SubmitBar>
                 <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
                 <ModalButton
@@ -173,7 +163,9 @@ export default class ApplicationGeneralSettings extends React.Component {
                   danger
                   naked
                   message={m.deleteApp}
-                  modalData={{ message: { values: { appName: application.name }, ...m.modalWarning }}}
+                  modalData={{
+                    message: { values: { appName: application.name }, ...m.modalWarning },
+                  }}
                   onApprove={this.handleDelete}
                 />
               </SubmitBar>

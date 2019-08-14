@@ -23,27 +23,26 @@ import doc from '../table.md'
 import Tabular from '../'
 import examples from './storyData'
 
-
 @bind
 class LoadingExample extends React.Component {
   state = {
     loading: true,
   }
 
-  toggleLoading () {
+  toggleLoading() {
     this.setState(prev => ({
       loading: !prev.loading,
     }))
   }
 
-  render () {
+  render() {
     const { loading } = this.state
     return (
       <div>
         <Tabular {...this.props} loading={loading} />
         <div style={{ textAlign: 'center' }}>
           <button style={{ marginTop: '20px' }} onClick={this.toggleLoading}>
-            { loading ? 'Stop Loading' : 'Start Loading'}
+            {loading ? 'Stop Loading' : 'Start Loading'}
           </button>
         </div>
       </div>
@@ -55,8 +54,7 @@ const PAGE_SIZE = 3
 
 @bind
 class PaginatedExample extends React.Component {
-
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.state = {
@@ -66,15 +64,15 @@ class PaginatedExample extends React.Component {
     }
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.requestNextPage(1)
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     window.clearTimeout(this.timeout)
   }
 
-  getDelay (slow) {
+  getDelay(slow) {
     if (!slow) {
       return Math.floor(Math.random() * (450 - 100)) + 100
     }
@@ -82,35 +80,28 @@ class PaginatedExample extends React.Component {
     return Math.floor(Math.random() * (3000 - 1000)) + 1000
   }
 
-  requestNextPage (page) {
+  requestNextPage(page) {
     action('requestNextPage')(page)
     const offset = (page - 1) * PAGE_SIZE
     const delay = this.getDelay(this.props.slow)
-    this.timeout = setTimeout(() => this.setState({
-      page,
-      loading: false,
-      data: this.props.data.slice(offset, offset + PAGE_SIZE),
-    }), delay)
-  }
-
-  onPageChange (page) {
-    this.setState(
-      { loading: true },
-      () => this.requestNextPage(page)
+    this.timeout = setTimeout(
+      () =>
+        this.setState({
+          page,
+          loading: false,
+          data: this.props.data.slice(offset, offset + PAGE_SIZE),
+        }),
+      delay,
     )
   }
 
-  render () {
-    const {
-      page,
-      data,
-      loading,
-    } = this.state
-    const {
-      small,
-      headers,
-      ...rest
-    } = this.props
+  onPageChange(page) {
+    this.setState({ loading: true }, () => this.requestNextPage(page))
+  }
+
+  render() {
+    const { page, data, loading } = this.state
+    const { small, headers, ...rest } = this.props
 
     return (
       <Tabular
@@ -135,22 +126,21 @@ class ClickableExample extends React.Component {
     clicked: null,
   }
 
-  onRowClick (rowIndex) {
+  onRowClick(rowIndex) {
     action('onRowClick')({ index: rowIndex, id: this.props.data[rowIndex].appId })
     // push to history if link functionality required
     this.setState({ clicked: this.props.data[rowIndex].appId })
   }
 
-  render () {
+  render() {
     const { clicked } = this.state
 
     return (
       <div>
-        <Tabular
-          {...this.props}
-          onRowClick={this.onRowClick}
-        />
-        <span>You clicked on: <strong>{clicked ? clicked : 'nothing'}</strong></span>
+        <Tabular {...this.props} onRowClick={this.onRowClick} />
+        <span>
+          You clicked on: <strong>{clicked ? clicked : 'nothing'}</strong>
+        </span>
       </div>
     )
   }
@@ -158,7 +148,6 @@ class ClickableExample extends React.Component {
 
 @bind
 class SortableExample extends React.Component {
-
   state = {
     order: undefined,
     orderBy: undefined,
@@ -166,54 +155,49 @@ class SortableExample extends React.Component {
     data: [],
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.onSortRequest(undefined, undefined)
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     window.clearTimeout(this.timeout)
   }
 
-  asc (a, b) {
+  asc(a, b) {
     return a > b ? 1 : a < b ? -1 : 0
   }
 
-  onSort (order, orderBy) {
+  onSort(order, orderBy) {
     // this.setState({ order, orderBy })
     const data = this.props.data
     const asc = this.asc
     action('onSort')({ order, orderBy })
 
-    this.timeout = setTimeout(() => this.setState({
-      loading: false,
-      data: [].concat(data).sort((a, b) => (
-        order === 'asc'
-          ? asc(a[orderBy], b[orderBy])
-          : order === 'desc'
-            ? -asc(a[orderBy], b[orderBy])
-            : 0
-      )),
-    }), 800)
-
-  }
-
-  onSortRequest (order, orderBy) {
-    this.setState(
-      { loading: true, order, orderBy },
-      () => this.onSort(order, orderBy)
+    this.timeout = setTimeout(
+      () =>
+        this.setState({
+          loading: false,
+          data: []
+            .concat(data)
+            .sort((a, b) =>
+              order === 'asc'
+                ? asc(a[orderBy], b[orderBy])
+                : order === 'desc'
+                ? -asc(a[orderBy], b[orderBy])
+                : 0,
+            ),
+        }),
+      800,
     )
   }
 
-  render () {
-    const {
-      order,
-      orderBy,
-      loading,
-    } = this.state
-    const {
-      data,
-      ...rest
-    } = this.props
+  onSortRequest(order, orderBy) {
+    this.setState({ loading: true, order, orderBy }, () => this.onSort(order, orderBy))
+  }
+
+  render() {
+    const { order, orderBy, loading } = this.state
+    const { data, ...rest } = this.props
 
     return (
       <Tabular
@@ -229,48 +213,55 @@ class SortableExample extends React.Component {
 }
 
 storiesOf('Table/Tabular', module)
-  .addDecorator((story, context) => withInfo({
-    inline: true,
-    header: false,
-    source: false,
-    propTables: [ Tabular ],
-    propTablesExclude: [ LoadingExample, PaginatedExample, ClickableExample ],
-    text: doc,
-  })(story)(context))
+  .addDecorator((story, context) =>
+    withInfo({
+      inline: true,
+      header: false,
+      source: false,
+      propTables: [Tabular],
+      propTablesExclude: [LoadingExample, PaginatedExample, ClickableExample],
+      text: doc,
+    })(story)(context),
+  )
   .add('Default', () => (
     <Tabular
       data={examples.defaultExample.rows}
       headers={examples.defaultExample.headers}
       emptyMessage="No entries to display"
     />
-  )).add('Loading (slow)', () => (
+  ))
+  .add('Loading (slow)', () => (
     <LoadingExample
       slow
       data={examples.defaultExample.rows}
       headers={examples.defaultExample.headers}
       emptyMessage="No entries to display"
     />
-  )).add('Empty', () => (
+  ))
+  .add('Empty', () => (
     <Tabular
       data={examples.emptyExample.rows}
       headers={examples.emptyExample.headers}
       emptyMessage="No entries to display"
     />
-  )).add('Paginated (slow loading)', () => (
+  ))
+  .add('Paginated (slow loading)', () => (
     <PaginatedExample
       slow
       data={examples.paginatedExample.rows}
       headers={examples.paginatedExample.headers}
       emptyMessage="No entries to display"
     />
-  )).add('Paginated (fast loading)', () => (
+  ))
+  .add('Paginated (fast loading)', () => (
     <PaginatedExample
       fast
       data={examples.paginatedExample.rows}
       headers={examples.paginatedExample.headers}
       emptyMessage="No entries to display"
     />
-  )).add('Small', () => (
+  ))
+  .add('Small', () => (
     <PaginatedExample
       small
       fast
@@ -278,13 +269,15 @@ storiesOf('Table/Tabular', module)
       headers={examples.defaultExample.headers}
       emptyMessage="No entries to display"
     />
-  )).add('Clickable rows', () => (
+  ))
+  .add('Clickable rows', () => (
     <ClickableExample
       data={examples.clickableRowsExample.rows}
       headers={examples.clickableRowsExample.headers}
       emptyMessage="No entries to display"
     />
-  )).add('Sortable', () => (
+  ))
+  .add('Sortable', () => (
     <SortableExample
       data={examples.sortableExample.rows}
       headers={examples.sortableExample.headers}

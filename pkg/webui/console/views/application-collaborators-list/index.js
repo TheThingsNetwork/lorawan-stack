@@ -25,20 +25,20 @@ import PAGE_SIZES from '../../constants/page-sizes'
 
 @bind
 export default class ApplicationCollaborators extends React.Component {
-
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     const { appId } = props.match.params
-    this.getApplicationCollaboratorsList = filters => getApplicationCollaboratorsList(appId, filters)
+    this.getApplicationCollaboratorsList = filters =>
+      getApplicationCollaboratorsList(appId, filters)
   }
 
-  baseDataSelector ({ collaborators }) {
+  baseDataSelector({ collaborators }) {
     const { appId } = this.props.match.params
     return collaborators.applications[appId] || {}
   }
 
-  render () {
+  render() {
     return (
       <Container>
         <Row>
@@ -55,5 +55,3 @@ export default class ApplicationCollaborators extends React.Component {
     )
   }
 }
-
-

@@ -37,48 +37,45 @@ import {
 
 import api from '../../api'
 
-@connect((state, props) => ({
-  gtwId: selectSelectedGatewayId(state),
-  fetching: selectGatewayRightsFetching(state),
-  error: selectGatewayRightsError(state),
-  rights: selectGatewayRights(state),
-  universalRights: selectGatewayUniversalRights(state),
-}),
-dispatch => ({
-  getGatewaysRightsList: gtwId => dispatch(getGatewaysRightsList(gtwId)),
-  navigateToList: gtwId => dispatch(replace(`/gateways/${gtwId}/api-keys`)),
-}))
+@connect(
+  (state, props) => ({
+    gtwId: selectSelectedGatewayId(state),
+    fetching: selectGatewayRightsFetching(state),
+    error: selectGatewayRightsError(state),
+    rights: selectGatewayRights(state),
+    universalRights: selectGatewayUniversalRights(state),
+  }),
+  dispatch => ({
+    getGatewaysRightsList: gtwId => dispatch(getGatewaysRightsList(gtwId)),
+    navigateToList: gtwId => dispatch(replace(`/gateways/${gtwId}/api-keys`)),
+  }),
+)
 @withRequest(
   ({ gtwId, getGatewaysRightsList }) => getGatewaysRightsList(gtwId),
-  ({ fetching, rights }) => fetching || !Boolean(rights.length)
+  ({ fetching, rights }) => fetching || !Boolean(rights.length),
 )
-@withBreadcrumb('gtws.single.api-keys.add', function (props) {
+@withBreadcrumb('gtws.single.api-keys.add', function(props) {
   const gtwId = props.gtwId
 
   return (
-    <Breadcrumb
-      path={`/gateways/${gtwId}/api-keys/add`}
-      icon="add"
-      content={sharedMessages.add}
-    />
+    <Breadcrumb path={`/gateways/${gtwId}/api-keys/add`} icon="add" content={sharedMessages.add} />
   )
 })
 @bind
 export default class GatewayApiKeyAdd extends React.Component {
-
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.createGatewayKey = key => api.gateway.apiKeys.create(props.gtwId, key)
   }
 
-  handleApprove () {
+  handleApprove() {
     const { navigateToList, gtwId } = this.props
 
     navigateToList(gtwId)
   }
 
-  render () {
+  render() {
     const { rights, universalRights } = this.props
 
     return (

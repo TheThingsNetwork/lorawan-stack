@@ -22,22 +22,18 @@ import Message from '../../lib/components/message'
 
 import style from './overlay.styl'
 
-const Overlay = ({
-  className,
-  visible,
-  loading = false,
-  children,
-}) => (
+const Overlay = ({ className, visible, loading = false, children }) => (
   <div className={classnames(className, style.overlayWrapper)}>
-    <div className={classnames(style.overlay, {
-      [style.overlayVisible]: visible,
-    })}
+    <div
+      className={classnames(style.overlay, {
+        [style.overlayVisible]: visible,
+      })}
     />
     {visible && loading && (
       <Spinner center>
         <Message content={sharedMessages.loading} />
-      </Spinner>)
-    }
+      </Spinner>
+    )}
     {children}
   </div>
 )

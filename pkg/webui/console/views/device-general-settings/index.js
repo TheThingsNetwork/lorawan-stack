@@ -32,22 +32,26 @@ import { attachPromise } from '../../store/actions/lib'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
 import { selectSelectedDevice, selectSelectedDeviceId } from '../../store/selectors/device'
 
-@connect(function (state) {
-  return {
-    device: selectSelectedDevice(state),
-    devId: selectSelectedDeviceId(state),
-    appId: selectSelectedApplicationId(state),
-  }
-}, dispatch => ({
-  ...bindActionCreators({ updateDevice: attachPromise(updateDevice) }, dispatch),
-  onDeleteSuccess: appId => dispatch(replace(`/applications/${appId}/devices`)),
-}),
-(stateProps, dispatchProps, ownProps) => ({
-  ...stateProps, ...dispatchProps, ...ownProps,
-  onDeleteSuccess: () => dispatchProps.onDeleteSuccess(stateProps.appId),
-})
+@connect(
+  function(state) {
+    return {
+      device: selectSelectedDevice(state),
+      devId: selectSelectedDeviceId(state),
+      appId: selectSelectedApplicationId(state),
+    }
+  },
+  dispatch => ({
+    ...bindActionCreators({ updateDevice: attachPromise(updateDevice) }, dispatch),
+    onDeleteSuccess: appId => dispatch(replace(`/applications/${appId}/devices`)),
+  }),
+  (stateProps, dispatchProps, ownProps) => ({
+    ...stateProps,
+    ...dispatchProps,
+    ...ownProps,
+    onDeleteSuccess: () => dispatchProps.onDeleteSuccess(stateProps.appId),
+  }),
 )
-@withBreadcrumb('device.single.general-settings', function (props) {
+@withBreadcrumb('device.single.general-settings', function(props) {
   const { devId, appId } = props
   return (
     <Breadcrumb
@@ -59,12 +63,11 @@ import { selectSelectedDevice, selectSelectedDeviceId } from '../../store/select
 })
 @bind
 export default class DeviceGeneralSettings extends React.Component {
-
   state = {
     error: '',
   }
 
-  async handleSubmit (values) {
+  async handleSubmit(values) {
     const { device, appId, updateDevice } = this.props
     const { activation_mode, ...updatedDevice } = values
 
@@ -79,28 +82,30 @@ export default class DeviceGeneralSettings extends React.Component {
       delete updatedDevice.resets_join_nonces
     }
 
-    const { ids: { device_id: deviceId }} = this.props.device
+    const {
+      ids: { device_id: deviceId },
+    } = this.props.device
     const changed = diff(device, updatedDevice)
 
     return updateDevice(appId, deviceId, changed)
   }
 
-  async handleDelete () {
+  async handleDelete() {
     const { appId, device } = this.props
-    const { ids: { device_id: deviceId }} = device
+    const {
+      ids: { device_id: deviceId },
+    } = device
 
     return api.device.delete(appId, deviceId)
   }
 
-  render () {
+  render() {
     const { device, onDeleteSuccess } = this.props
     const { error } = this.state
 
     return (
       <Container>
-        <IntlHelmet
-          title={sharedMessages.generalSettings}
-        />
+        <IntlHelmet title={sharedMessages.generalSettings} />
         <Row>
           <Col sm={12} md={12} lg={8} xl={8}>
             <DeviceDataForm

@@ -24,12 +24,12 @@ import FormField from './field'
 import FormSubmit from './submit'
 
 class InnerForm extends React.PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.notificationRef = React.createRef()
   }
 
-  componentDidUpdate (prevProps) {
+  componentDidUpdate(prevProps) {
     const { formError, isSubmitting, isValid } = this.props
     const { isSubmitting: prevIsSubmitting, formError: prevFormError } = prevProps
 
@@ -49,7 +49,7 @@ class InnerForm extends React.PureComponent {
     }
   }
 
-  render () {
+  render() {
     const {
       className,
       children,
@@ -65,13 +65,14 @@ class InnerForm extends React.PureComponent {
         {(formError || formInfo) && (
           <div style={{ outline: 'none' }} ref={this.notificationRef} tabIndex="-1">
             {formError && <Notification error={formError} small />}
-            {formInfo && <Notification info={formInfo} small /> }
+            {formInfo && <Notification info={formInfo} small />}
           </div>
         )}
-        <FormContext.Provider value={{
-          ...rest,
-          horizontal,
-        }}
+        <FormContext.Provider
+          value={{
+            ...rest,
+            horizontal,
+          }}
         >
           {children}
         </FormContext.Provider>
@@ -80,28 +81,29 @@ class InnerForm extends React.PureComponent {
   }
 }
 
-const formRenderer = ({ children, ...rest }) => function (props) {
-  const { className, horizontal, error, info, disabled } = rest
-  const { handleSubmit, ...restFormikProps } = props
+const formRenderer = ({ children, ...rest }) =>
+  function(props) {
+    const { className, horizontal, error, info, disabled } = rest
+    const { handleSubmit, ...restFormikProps } = props
 
-  return (
-    <InnerForm
-      className={className}
-      horizontal={horizontal}
-      formError={error}
-      formInfo={info}
-      handleSubmit={handleSubmit}
-      disabled={disabled}
-      {...restFormikProps}
-    >
-      {children}
-    </InnerForm>
-  )
-}
+    return (
+      <InnerForm
+        className={className}
+        horizontal={horizontal}
+        formError={error}
+        formInfo={info}
+        handleSubmit={handleSubmit}
+        disabled={disabled}
+        {...restFormikProps}
+      >
+        {children}
+      </InnerForm>
+    )
+  }
 
 @bind
 class Form extends React.PureComponent {
-  render () {
+  render() {
     const {
       onSubmit,
       onReset,

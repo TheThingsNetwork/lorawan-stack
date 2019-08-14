@@ -24,7 +24,7 @@ import Radio from '../../radio-button'
 import Select from '../../select'
 import Form from '..'
 
-const handleSubmit = function (data, { resetForm }) {
+const handleSubmit = function(data, { resetForm }) {
   action('Submit')(data)
   setTimeout(() => resetForm(data), 1000)
 }
@@ -33,7 +33,7 @@ const info = {
   inline: true,
   header: false,
   source: false,
-  propTables: [ Form.Field ],
+  propTables: [Form.Field],
 }
 
 const errorSchema = Yup.string().test('error', 'Something went wrong.', () => false)
@@ -42,21 +42,20 @@ const validationSchema = Yup.object().shape({
 })
 
 class FieldsWrapperExample extends React.Component {
-
   form = React.createRef()
 
   static defaultProps = {
     horizontal: true,
   }
 
-  componentDidMount () {
+  componentDidMount() {
     if (this.form.current) {
       this.form.current.setFieldError('error', 'Something went wrong.')
       this.form.current.setFieldTouched('error')
     }
   }
 
-  render () {
+  render() {
     return (
       <Form
         onSubmit={handleSubmit}
@@ -76,7 +75,7 @@ storiesOf('Fields/Select', module)
   .add('Horizontal', () => (
     <FieldsWrapperExample
       initialValues={{
-        'default': 'amsterdam',
+        default: 'amsterdam',
         description: 'amsterdam',
         error: 'amsterdam',
         warning: 'amsterdam',
@@ -141,7 +140,7 @@ storiesOf('Fields/Select', module)
   .add('Vertical', () => (
     <FieldsWrapperExample
       initialValues={{
-        'default': 'amsterdam',
+        default: 'amsterdam',
         description: 'amsterdam',
         warning: 'amsterdam',
         error: 'amsterdam',
@@ -215,47 +214,34 @@ storiesOf('Fields/Checkbox', module)
   .add('Horizontal', () => (
     <FieldsWrapperExample
       initialValues={{
-        'default': true,
+        default: true,
         description: false,
         warning: false,
         error: false,
         disabled: false,
       }}
     >
-      <Form.Field
-        name="default"
-        title="Default"
-        component={Checkbox}
-      />
+      <Form.Field name="default" title="Default" component={Checkbox} />
       <Form.Field
         name="description"
         title="With Description"
         description="A select field."
         component={Checkbox}
       />
-      <Form.Field
-        name="error"
-        title="With Error"
-        component={Checkbox}
-      />
+      <Form.Field name="error" title="With Error" component={Checkbox} />
       <Form.Field
         name="warning"
         title="With Warning"
         warning="A select field."
         component={Checkbox}
       />
-      <Form.Field
-        name="disabled"
-        title="Disabled"
-        disabled
-        component={Checkbox}
-      />
+      <Form.Field name="disabled" title="Disabled" disabled component={Checkbox} />
     </FieldsWrapperExample>
   ))
   .add('Horizontal Group', () => (
     <FieldsWrapperExample
       initialValues={{
-        'default': {
+        default: {
           default1: false,
           default2: false,
           default3: false,
@@ -282,11 +268,7 @@ storiesOf('Fields/Checkbox', module)
         },
       }}
     >
-      <Form.Field
-        name="default"
-        title="Default"
-        component={Checkbox.Group}
-      >
+      <Form.Field name="default" title="Default" component={Checkbox.Group}>
         <Checkbox name="default1" label="Checkbox 1" />
         <Checkbox name="default2" label="Checkbox 2" />
         <Checkbox name="default3" label="Checkbox 3" />
@@ -301,11 +283,7 @@ storiesOf('Fields/Checkbox', module)
         <Checkbox name="description2" label="Checkbox 2" />
         <Checkbox name="description3" label="Checkbox 3" />
       </Form.Field>
-      <Form.Field
-        name="error"
-        title="With Error"
-        component={Checkbox.Group}
-      >
+      <Form.Field name="error" title="With Error" component={Checkbox.Group}>
         <Checkbox name="error1" label="Checkbox 1" />
         <Checkbox name="error2" label="Checkbox 2" />
         <Checkbox name="error3" label="Checkbox 3" />
@@ -320,12 +298,7 @@ storiesOf('Fields/Checkbox', module)
         <Checkbox name="warning2" label="Checkbox 2" />
         <Checkbox name="warning3" label="Checkbox 3" />
       </Form.Field>
-      <Form.Field
-        name="disabled"
-        title="Disabled"
-        disabled
-        component={Checkbox.Group}
-      >
+      <Form.Field name="disabled" title="Disabled" disabled component={Checkbox.Group}>
         <Checkbox name="disabled1" label="Checkbox 1" />
         <Checkbox name="disabled2" label="Checkbox 2" />
         <Checkbox name="disabled3" label="Checkbox 3" />
@@ -335,7 +308,7 @@ storiesOf('Fields/Checkbox', module)
   .add('Columns', () => (
     <FieldsWrapperExample
       initialValues={{
-        'default': false,
+        default: false,
         description: false,
         warning: false,
         error: false,
@@ -343,40 +316,27 @@ storiesOf('Fields/Checkbox', module)
       }}
       horizontal={false}
     >
-      <Form.Field
-        name="default"
-        title="Default"
-        component={Checkbox}
-      />
+      <Form.Field name="default" title="Default" component={Checkbox} />
       <Form.Field
         name="description"
         title="With Description"
         description="A select field."
         component={Checkbox}
       />
-      <Form.Field
-        name="error"
-        title="With Error"
-        component={Checkbox}
-      />
+      <Form.Field name="error" title="With Error" component={Checkbox} />
       <Form.Field
         name="warning"
         title="With Warning"
         warning="A select field."
         component={Checkbox}
       />
-      <Form.Field
-        name="disabled"
-        title="Disabled"
-        disabled
-        component={Checkbox}
-      />
+      <Form.Field name="disabled" title="Disabled" disabled component={Checkbox} />
     </FieldsWrapperExample>
   ))
   .add('Columns Group', () => (
     <FieldsWrapperExample
       initialValues={{
-        'default': {
+        default: {
           default1: false,
           default2: false,
           default3: false,
@@ -404,11 +364,7 @@ storiesOf('Fields/Checkbox', module)
       }}
       horizontal={false}
     >
-      <Form.Field
-        name="default"
-        title="Default"
-        component={Checkbox.Group}
-      >
+      <Form.Field name="default" title="Default" component={Checkbox.Group}>
         <Checkbox name="default1" label="Checkbox 1" />
         <Checkbox name="default2" label="Checkbox 2" />
         <Checkbox name="default3" label="Checkbox 3" />
@@ -423,11 +379,7 @@ storiesOf('Fields/Checkbox', module)
         <Checkbox name="description2" label="Checkbox 2" />
         <Checkbox name="description3" label="Checkbox 3" />
       </Form.Field>
-      <Form.Field
-        name="error"
-        title="With Error"
-        component={Checkbox.Group}
-      >
+      <Form.Field name="error" title="With Error" component={Checkbox.Group}>
         <Checkbox name="error1" label="Checkbox 1" />
         <Checkbox name="error2" label="Checkbox 2" />
         <Checkbox name="error3" label="Checkbox 3" />
@@ -442,12 +394,7 @@ storiesOf('Fields/Checkbox', module)
         <Checkbox name="warning2" label="Checkbox 2" />
         <Checkbox name="warning3" label="Checkbox 3" />
       </Form.Field>
-      <Form.Field
-        name="disabled"
-        title="Disabled"
-        disabled
-        component={Checkbox.Group}
-      >
+      <Form.Field name="disabled" title="Disabled" disabled component={Checkbox.Group}>
         <Checkbox name="disabled1" label="Checkbox 1" />
         <Checkbox name="disabled2" label="Checkbox 2" />
         <Checkbox name="disabled3" label="Checkbox 3" />
@@ -460,20 +407,14 @@ storiesOf('Fields/Radio', module)
   .add('Horizontal', () => (
     <FieldsWrapperExample
       initialValues={{
-        'default': '1',
+        default: '1',
         description: '2',
         warning: '3',
         error: '4',
         disabled: '5',
       }}
     >
-      <Form.Field
-        name="default"
-        title="Default"
-        label="Radio"
-        checked
-        component={Radio}
-      />
+      <Form.Field name="default" title="Default" label="Radio" checked component={Radio} />
       <Form.Field
         name="description"
         title="With Description"
@@ -482,13 +423,7 @@ storiesOf('Fields/Radio', module)
         checked
         component={Radio}
       />
-      <Form.Field
-        name="error"
-        title="With Error"
-        label="Radio"
-        checked
-        component={Radio}
-      />
+      <Form.Field name="error" title="With Error" label="Radio" checked component={Radio} />
       <Form.Field
         name="warning"
         title="With Warning"
@@ -510,18 +445,14 @@ storiesOf('Fields/Radio', module)
   .add('Horizontal Group', () => (
     <FieldsWrapperExample
       initialValues={{
-        'default': '1',
+        default: '1',
         description: '1',
         warning: '1',
         error: '1',
         disabled: '1',
       }}
     >
-      <Form.Field
-        name="default"
-        title="Default"
-        component={Radio.Group}
-      >
+      <Form.Field name="default" title="Default" component={Radio.Group}>
         <Radio label="Radio 1" value="1" />
         <Radio label="Radio 2" value="2" />
         <Radio label="Radio 3" value="3" />
@@ -536,11 +467,7 @@ storiesOf('Fields/Radio', module)
         <Radio label="Radio 2" value="2" />
         <Radio label="Radio 3" value="3" />
       </Form.Field>
-      <Form.Field
-        name="error"
-        title="With Error"
-        component={Radio.Group}
-      >
+      <Form.Field name="error" title="With Error" component={Radio.Group}>
         <Radio label="Radio 1" value="1" />
         <Radio label="Radio 2" value="2" />
         <Radio label="Radio 3" value="3" />
@@ -555,12 +482,7 @@ storiesOf('Fields/Radio', module)
         <Radio label="Radio 2" value="2" />
         <Radio label="Radio 3" value="3" />
       </Form.Field>
-      <Form.Field
-        name="disabled"
-        title="Disabled"
-        disabled
-        component={Radio.Group}
-      >
+      <Form.Field name="disabled" title="Disabled" disabled component={Radio.Group}>
         <Radio label="Radio 1" value="1" />
         <Radio label="Radio 2" value="2" />
         <Radio label="Radio 3" value="3" />
@@ -570,7 +492,7 @@ storiesOf('Fields/Radio', module)
   .add('Columns', () => (
     <FieldsWrapperExample
       initialValues={{
-        'default': '1',
+        default: '1',
         description: '2',
         warning: '3',
         error: '4',
@@ -578,12 +500,7 @@ storiesOf('Fields/Radio', module)
       }}
       horizontal={false}
     >
-      <Form.Field
-        name="default"
-        title="Default"
-        label="Radio"
-        component={Radio}
-      />
+      <Form.Field name="default" title="Default" label="Radio" component={Radio} />
       <Form.Field
         name="description"
         title="With Description"
@@ -591,12 +508,7 @@ storiesOf('Fields/Radio', module)
         description="A select field."
         component={Radio}
       />
-      <Form.Field
-        name="error"
-        title="With Error"
-        label="Radio"
-        component={Radio}
-      />
+      <Form.Field name="error" title="With Error" label="Radio" component={Radio} />
       <Form.Field
         name="warning"
         title="With Warning"
@@ -604,19 +516,13 @@ storiesOf('Fields/Radio', module)
         label="Radio"
         component={Radio}
       />
-      <Form.Field
-        name="disabled"
-        title="Disabled"
-        disabled
-        label="Radio"
-        component={Radio}
-      />
+      <Form.Field name="disabled" title="Disabled" disabled label="Radio" component={Radio} />
     </FieldsWrapperExample>
   ))
   .add('Columns Group', () => (
     <FieldsWrapperExample
       initialValues={{
-        'default': '1',
+        default: '1',
         description: '1',
         warning: '1',
         error: '1',
@@ -624,11 +530,7 @@ storiesOf('Fields/Radio', module)
       }}
       horizontal={false}
     >
-      <Form.Field
-        name="default"
-        title="Default"
-        component={Radio.Group}
-      >
+      <Form.Field name="default" title="Default" component={Radio.Group}>
         <Radio label="Radio 1" value="1" />
         <Radio label="Radio 2" value="2" />
         <Radio label="Radio 3" value="3" />
@@ -643,11 +545,7 @@ storiesOf('Fields/Radio', module)
         <Radio label="Radio 2" value="2" />
         <Radio label="Radio 3" value="3" />
       </Form.Field>
-      <Form.Field
-        name="error"
-        title="With Error"
-        component={Radio.Group}
-      >
+      <Form.Field name="error" title="With Error" component={Radio.Group}>
         <Radio label="Radio 1" value="1" />
         <Radio label="Radio 2" value="2" />
         <Radio label="Radio 3" value="3" />
@@ -662,12 +560,7 @@ storiesOf('Fields/Radio', module)
         <Radio label="Radio 2" value="2" />
         <Radio label="Radio 3" value="3" />
       </Form.Field>
-      <Form.Field
-        name="disabled"
-        title="Disabled"
-        disabled
-        component={Radio.Group}
-      >
+      <Form.Field name="disabled" title="Disabled" disabled component={Radio.Group}>
         <Radio label="Radio 1" value="1" />
         <Radio label="Radio 2" value="2" />
         <Radio label="Radio 3" value="3" />
@@ -680,47 +573,29 @@ storiesOf('Fields/Input', module)
   .add('Horizontal', () => (
     <FieldsWrapperExample
       initialValues={{
-        'default': 'something...',
+        default: 'something...',
         description: 'something...',
         warning: 'something...',
         error: 'something...',
         disabled: 'something...',
       }}
     >
-      <Form.Field
-        name="default"
-        title="Default"
-        component={Input}
-      />
+      <Form.Field name="default" title="Default" component={Input} />
       <Form.Field
         name="description"
         title="With Description"
         description="A select field."
         component={Input}
       />
-      <Form.Field
-        name="error"
-        title="With Error"
-        component={Input}
-      />
-      <Form.Field
-        name="warning"
-        title="With Warning"
-        warning="A select field."
-        component={Input}
-      />
-      <Form.Field
-        name="disabled"
-        title="Disabled"
-        disabled
-        component={Input}
-      />
+      <Form.Field name="error" title="With Error" component={Input} />
+      <Form.Field name="warning" title="With Warning" warning="A select field." component={Input} />
+      <Form.Field name="disabled" title="Disabled" disabled component={Input} />
     </FieldsWrapperExample>
   ))
   .add('Vertical', () => (
     <FieldsWrapperExample
       initialValues={{
-        'default': 'something...',
+        default: 'something...',
         description: 'something...',
         warning: 'something...',
         error: 'something...',
@@ -728,35 +603,16 @@ storiesOf('Fields/Input', module)
       }}
       horizontal={false}
     >
-      <Form.Field
-        name="default"
-        title="Default"
-        component={Input}
-      />
+      <Form.Field name="default" title="Default" component={Input} />
       <Form.Field
         name="description"
         title="With Description"
         description="A select field."
         component={Input}
       />
-      <Form.Field
-        name="error"
-        title="With Error"
-        component={Input}
-      />
-      <Form.Field
-        name="warning"
-        title="With Warning"
-        warning="A select field."
-        component={Input}
-      />
-      <Form.Field
-        name="disabled"
-        title="Disabled"
-        disabled
-        horizontal={false}
-        component={Input}
-      />
+      <Form.Field name="error" title="With Error" component={Input} />
+      <Form.Field name="warning" title="With Warning" warning="A select field." component={Input} />
+      <Form.Field name="disabled" title="Disabled" disabled horizontal={false} component={Input} />
     </FieldsWrapperExample>
   ))
 
@@ -765,7 +621,7 @@ storiesOf('Fields/Byte', module)
   .add('Horizontal', () => (
     <FieldsWrapperExample
       initialValues={{
-        'default': 'ADADADAD',
+        default: 'ADADADAD',
         description: 'ADADADAD',
         warning: 'ADADADAD',
         error: 'ADADADAD',
@@ -825,7 +681,7 @@ storiesOf('Fields/Byte', module)
   .add('Vertical', () => (
     <FieldsWrapperExample
       initialValues={{
-        'default': 'ADADADAD',
+        default: 'ADADADAD',
         description: 'ADADADAD',
         warning: 'ADADADAD',
         error: 'ADADADAD',
@@ -889,19 +745,14 @@ storiesOf('Fields/TextArea', module)
   .add('Horizontal', () => (
     <FieldsWrapperExample
       initialValues={{
-        'default': 'something...',
+        default: 'something...',
         description: 'something...',
         warning: 'something...',
         error: 'something...',
         disabled: 'something...',
       }}
     >
-      <Form.Field
-        name="default"
-        title="Default"
-        type="textarea"
-        component={Input}
-      />
+      <Form.Field name="default" title="Default" type="textarea" component={Input} />
       <Form.Field
         name="description"
         title="With Description"
@@ -909,12 +760,7 @@ storiesOf('Fields/TextArea', module)
         type="textarea"
         component={Input}
       />
-      <Form.Field
-        name="error"
-        title="With Error"
-        type="textarea"
-        component={Input}
-      />
+      <Form.Field name="error" title="With Error" type="textarea" component={Input} />
       <Form.Field
         name="warning"
         title="With Warning"
@@ -922,19 +768,13 @@ storiesOf('Fields/TextArea', module)
         type="textarea"
         component={Input}
       />
-      <Form.Field
-        name="disabled"
-        title="Disabled"
-        disabled
-        type="textarea"
-        component={Input}
-      />
+      <Form.Field name="disabled" title="Disabled" disabled type="textarea" component={Input} />
     </FieldsWrapperExample>
   ))
   .add('Vertical', () => (
     <FieldsWrapperExample
       initialValues={{
-        'default': 'something...',
+        default: 'something...',
         description: 'something...',
         warning: 'something...',
         error: 'something...',
@@ -942,12 +782,7 @@ storiesOf('Fields/TextArea', module)
       }}
       horizontal={false}
     >
-      <Form.Field
-        name="default"
-        title="Default"
-        type="textarea"
-        component={Input}
-      />
+      <Form.Field name="default" title="Default" type="textarea" component={Input} />
       <Form.Field
         name="description"
         title="With Description"
@@ -955,12 +790,7 @@ storiesOf('Fields/TextArea', module)
         type="textarea"
         component={Input}
       />
-      <Form.Field
-        name="error"
-        title="With Error"
-        type="textarea"
-        component={Input}
-      />
+      <Form.Field name="error" title="With Error" type="textarea" component={Input} />
       <Form.Field
         name="warning"
         title="With Warning"
@@ -968,12 +798,6 @@ storiesOf('Fields/TextArea', module)
         type="textarea"
         component={Input}
       />
-      <Form.Field
-        name="disabled"
-        title="Disabled"
-        disabled
-        type="textarea"
-        component={Input}
-      />
+      <Form.Field name="disabled" title="Disabled" disabled type="textarea" component={Input} />
     </FieldsWrapperExample>
   ))

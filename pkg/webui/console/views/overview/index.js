@@ -62,60 +62,57 @@ const componentMap = {
   js: sharedMessages.componentJoinServer,
 }
 
-@connect(state => ({
-  applicationCount: selectApplicationsTotalCount(state),
-  gatewayCount: selectGatewaysTotalCount(state),
-  fetching: createFetchingSelector([ GET_APPS_LIST, GET_GTWS_LIST ])(state),
-  userId: selectUserId(state),
-}), dispatch => ({
-  loadData () {
-    dispatch(getApplicationsList())
-    dispatch(getGatewaysList())
-  },
-}))
-@withBreadcrumb('overview', function (props) {
-  return (
-    <Breadcrumb
-      path="/"
-      content={sharedMessages.overview}
-    />
-  )
+@connect(
+  state => ({
+    applicationCount: selectApplicationsTotalCount(state),
+    gatewayCount: selectGatewaysTotalCount(state),
+    fetching: createFetchingSelector([GET_APPS_LIST, GET_GTWS_LIST])(state),
+    userId: selectUserId(state),
+  }),
+  dispatch => ({
+    loadData() {
+      dispatch(getApplicationsList())
+      dispatch(getGatewaysList())
+    },
+  }),
+)
+@withBreadcrumb('overview', function(props) {
+  return <Breadcrumb path="/" content={sharedMessages.overview} />
 })
 @withEnv
 @bind
 export default class Overview extends React.Component {
-
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.appAnimationRef = React.createRef()
     this.gatewayAnimationRef = React.createRef()
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { loadData } = this.props
     loadData()
   }
 
-  handleAppChooserMouseEnter () {
+  handleAppChooserMouseEnter() {
     this.appAnimationRef.current.instance.setDirection(1)
     this.appAnimationRef.current.instance.goToAndPlay(0)
   }
 
-  handleAppChooserMouseLeave () {
+  handleAppChooserMouseLeave() {
     this.appAnimationRef.current.instance.setDirection(-1)
   }
 
-  handleGatewayChooserMouseEnter () {
+  handleGatewayChooserMouseEnter() {
     this.gatewayAnimationRef.current.instance.setDirection(1)
     this.gatewayAnimationRef.current.instance.goToAndPlay(0)
   }
 
-  handleGatewayChooserMouseLeave () {
+  handleGatewayChooserMouseLeave() {
     this.gatewayAnimationRef.current.instance.setDirection(-1)
   }
 
-  render () {
+  render() {
     const { config } = this.props.env
     const { fetching, applicationCount, gatewayCount, userId } = this.props
 
@@ -136,8 +133,17 @@ export default class Overview extends React.Component {
         <Row className={style.welcomeSection}>
           <IntlHelmet title={sharedMessages.overview} />
           <Col sm={12} className={style.welcomeTitleSection}>
-            <Message className={style.welcome} content={hasEntities ? m.welcomeBack : m.welcome} values={{ userId }} component="h1" />
-            <Message className={style.getStarted} content={hasEntities ? m.continueWorking : m.getStarted} component="h2" />
+            <Message
+              className={style.welcome}
+              content={hasEntities ? m.welcomeBack : m.welcome}
+              values={{ userId }}
+              component="h1"
+            />
+            <Message
+              className={style.getStarted}
+              content={hasEntities ? m.continueWorking : m.getStarted}
+              component="h2"
+            />
           </Col>
           <Col lg={6}>
             <Link to={appPath} className={style.chooserNav}>
@@ -173,14 +179,21 @@ export default class Overview extends React.Component {
           <Col sm={8}>
             <Message className={style.componentStatus} content={m.componentStatus} component="h3" />
             <div className={style.componentCards}>
-              { Object.keys(config).map(function (componentKey) {
+              {Object.keys(config).map(function(componentKey) {
                 if (componentKey === 'language') {
                   return null
                 }
                 const component = config[componentKey]
                 const name = componentMap[componentKey]
                 const host = new URL(component.base_url).host
-                return <ComponentCard key={componentKey} name={name} host={host} enabled={component.enabled} />
+                return (
+                  <ComponentCard
+                    key={componentKey}
+                    name={name}
+                    host={host}
+                    enabled={component.enabled}
+                  />
+                )
               })}
             </div>
           </Col>
@@ -190,16 +203,18 @@ export default class Overview extends React.Component {
   }
 }
 
-const ComponentCard = function ({ name, enabled, host }) {
-
+const ComponentCard = function({ name, enabled, host }) {
   return (
     <div className={style.componentCard}>
       <img src={ServerIcon} className={style.componentCardIcon} />
       <div className={style.componentCardDesc}>
         <div className={style.componentCardName}>
-          <Status status={enabled ? 'good' : 'bad'} /><Message content={name} />
+          <Status status={enabled ? 'good' : 'bad'} />
+          <Message content={name} />
         </div>
-        <span className={style.componentCardHost} title={host}>{host}</span>
+        <span className={style.componentCardHost} title={host}>
+          {host}
+        </span>
       </div>
     </div>
   )

@@ -23,7 +23,7 @@ import ApplicationsTable from '../../containers/applications-table'
 import PAGE_SIZES from '../../constants/page-sizes'
 
 export default class List extends React.Component {
-  render () {
+  render() {
     return (
       <Container>
         <Row>

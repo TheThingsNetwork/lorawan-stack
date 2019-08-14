@@ -40,8 +40,11 @@ const m = defineMessages({
 }))
 @bind
 export default class Login extends React.PureComponent {
-  render () {
-    const { user, env: { appRoot }} = this.props
+  render() {
+    const {
+      user,
+      env: { appRoot },
+    } = this.props
     const { next } = Query.parse(location.search)
     const redirectAppend = next ? `?next=${next}` : ''
 

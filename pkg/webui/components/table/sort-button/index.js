@@ -24,13 +24,13 @@ import style from './sort-button.styl'
 
 @bind
 class SortButton extends React.PureComponent {
-  onSort () {
+  onSort() {
     const { name, onSort } = this.props
 
     onSort(name)
   }
 
-  render () {
+  render() {
     const { className, active, direction, title } = this.props
 
     const buttonClassNames = classnames(className, style.button, {
@@ -39,11 +39,7 @@ class SortButton extends React.PureComponent {
     })
 
     return (
-      <button
-        className={buttonClassNames}
-        type="button"
-        onClick={this.onSort}
-      >
+      <button className={buttonClassNames} type="button" onClick={this.onSort}>
         <Message content={title} />
         <Icon className={style.icon} icon="sort" />
       </button>

@@ -23,15 +23,11 @@ storiesOf('Link', module)
     <div>
       <div>
         <span style={titleStyle}>link:</span>
-        <Link to="/">
-      Show more
-        </Link>
+        <Link to="/">Show more</Link>
       </div>
       <div>
         <span style={titleStyle}>anchor link:</span>
-        <Link.Anchor href="/">
-      Show more
-        </Link.Anchor>
+        <Link.Anchor href="/">Show more</Link.Anchor>
       </div>
     </div>
   ))
@@ -40,13 +36,13 @@ storiesOf('Link', module)
       <div>
         <span style={titleStyle}>link:</span>
         <Link showVisited to="/">
-      Show more
+          Show more
         </Link>
       </div>
       <div>
         <span style={titleStyle}>anchor link:</span>
         <Link.Anchor showVisited href="/">
-      Show more
+          Show more
         </Link.Anchor>
       </div>
     </div>

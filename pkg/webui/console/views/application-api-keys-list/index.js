@@ -25,20 +25,19 @@ import PAGE_SIZES from '../../constants/page-sizes'
 
 @bind
 export default class ApplicationApiKeys extends React.Component {
-
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     const { appId } = props.match.params
     this.getApplicationsApiKeysList = filters => getApplicationApiKeysList(appId, filters)
   }
 
-  baseDataSelector ({ apiKeys }) {
+  baseDataSelector({ apiKeys }) {
     const { appId } = this.props.match.params
     return apiKeys.applications[appId] || {}
   }
 
-  render () {
+  render() {
     return (
       <Container>
         <Row>

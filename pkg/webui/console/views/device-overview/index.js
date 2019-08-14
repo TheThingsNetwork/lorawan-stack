@@ -35,15 +35,14 @@ const m = defineMessages({
   latestData: 'Latest Data',
 })
 
-@connect(function ({ device }, props) {
+@connect(function({ device }, props) {
   return {
     device: device.device,
   }
 })
 @bind
 class DeviceOverview extends React.Component {
-
-  get deviceInfo () {
+  get deviceInfo() {
     const {
       ids,
       description,
@@ -54,7 +53,7 @@ class DeviceOverview extends React.Component {
     } = this.props.device
 
     // Get session keys
-    const { keys: sessionKeys = {}} = session
+    const { keys: sessionKeys = {} } = session
 
     const {
       f_nwk_s_int_key = { key: undefined },
@@ -68,7 +67,10 @@ class DeviceOverview extends React.Component {
         header: sharedMessages.generalInformation,
         items: [
           { key: sharedMessages.devID, value: ids.device_id, type: 'code', sensitive: false },
-          { key: sharedMessages.description, value: description || <Message content={sharedMessages.noDesc} /> },
+          {
+            key: sharedMessages.description,
+            value: description || <Message content={sharedMessages.noDesc} />,
+          },
           { key: sharedMessages.createdAt, value: <DateTime value={created_at} /> },
         ],
       },
@@ -107,10 +109,20 @@ class DeviceOverview extends React.Component {
           type: 'code',
           sensitive: false,
           subItems: [
-            { key: sharedMessages.appKey, value: root_keys.app_key.key, type: 'byte', sensitive: true },
-            ...root_keys.nwk_key
-              ? { key: sharedMessages.nwkKey, value: root_keys.nwk_key.key, type: 'byte', sensitive: true }
-              : { key: sharedMessages.nwkKey, value: undefined },
+            {
+              key: sharedMessages.appKey,
+              value: root_keys.app_key.key,
+              type: 'byte',
+              sensitive: true,
+            },
+            ...(root_keys.nwk_key
+              ? {
+                  key: sharedMessages.nwkKey,
+                  value: root_keys.nwk_key.key,
+                  type: 'byte',
+                  sensitive: true,
+                }
+              : { key: sharedMessages.nwkKey, value: undefined }),
           ],
         })
       }
@@ -128,9 +140,24 @@ class DeviceOverview extends React.Component {
     if (Object.keys(sessionKeys).length > 0) {
       sessionInfoData.items.push(
         { key: sharedMessages.devAddr, value: ids.dev_addr, type: 'byte', sensitive: false },
-        { key: sharedMessages.fwdNtwkKey, value: f_nwk_s_int_key.key, type: 'code', sensitive: true },
-        { key: sharedMessages.sNtwkSIKey, value: s_nwk_s_int_key.key, type: 'code', sensitive: true },
-        { key: sharedMessages.ntwkSEncKey, value: nwk_s_enc_key.key, type: 'code', sensitive: true },
+        {
+          key: sharedMessages.fwdNtwkKey,
+          value: f_nwk_s_int_key.key,
+          type: 'code',
+          sensitive: true,
+        },
+        {
+          key: sharedMessages.sNtwkSIKey,
+          value: s_nwk_s_int_key.key,
+          type: 'code',
+          sensitive: true,
+        },
+        {
+          key: sharedMessages.ntwkSEncKey,
+          value: nwk_s_enc_key.key,
+          type: 'code',
+          sensitive: true,
+        },
         { key: sharedMessages.appSKey, value: app_s_key.key, type: 'code', sensitive: true },
       )
     }
@@ -146,15 +173,13 @@ class DeviceOverview extends React.Component {
     )
   }
 
-  render () {
+  render() {
     const { device } = this.props
     const devIds = device && device.ids
 
     return (
       <Container>
-        <IntlHelmet
-          title={sharedMessages.overview}
-        />
+        <IntlHelmet title={sharedMessages.overview} />
         <Row className={style.head}>
           <Col md={12} lg={6}>
             {this.deviceInfo}

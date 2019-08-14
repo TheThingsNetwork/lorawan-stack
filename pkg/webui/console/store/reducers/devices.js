@@ -19,16 +19,16 @@ const defaultState = {
   totalCount: 0,
 }
 
-const devices = function (state = defaultState, { type, payload }) {
+const devices = function(state = defaultState, { type, payload }) {
   switch (type) {
-  case GET_DEVICES_LIST_SUCCESS:
-    return {
-      ...state,
-      devices: payload.devices,
-      totalCount: payload.totalCount,
-    }
-  default:
-    return state
+    case GET_DEVICES_LIST_SUCCESS:
+      return {
+        ...state,
+        devices: payload.devices,
+        totalCount: payload.totalCount,
+      }
+    default:
+      return state
   }
 }
 

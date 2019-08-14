@@ -34,7 +34,7 @@ export const selectSelectedDeviceId = state => getDeviceId(selectSelectedDevice(
 export const selectDeviceFetching = createFetchingSelector(GET_DEV_BASE)
 export const selectGetDeviceError = createErrorSelector(GET_DEV_BASE)
 export const selectUpdateDeviceError = createErrorSelector(UPDATE_DEV_BASE)
-export const selectDeviceError = createErrorSelector([ GET_DEV_BASE, UPDATE_DEV_BASE ])
+export const selectDeviceError = createErrorSelector([GET_DEV_BASE, UPDATE_DEV_BASE])
 export const selectSelectedDeviceFormatters = state => selectSelectedDevice(state).formatters
 
 // Events

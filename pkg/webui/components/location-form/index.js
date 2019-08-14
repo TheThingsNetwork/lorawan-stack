@@ -45,7 +45,7 @@ const defaultValues = {
 
 @bind
 class LocationForm extends Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.form = React.createRef()
@@ -55,7 +55,7 @@ class LocationForm extends Component {
     error: '',
   }
 
-  async onSubmit (values, { resetForm, setSubmitting }) {
+  async onSubmit(values, { resetForm, setSubmitting }) {
     const { onSubmit, entityId } = this.props
 
     this.setState({ error: '' })
@@ -74,7 +74,7 @@ class LocationForm extends Component {
     }
   }
 
-  async onDelete () {
+  async onDelete() {
     const { onDelete, entityId } = this.props
 
     try {
@@ -90,12 +90,8 @@ class LocationForm extends Component {
     }
   }
 
-  render () {
-    const {
-      initialValues,
-      formTitle,
-      validationSchema,
-    } = this.props
+  render() {
+    const { initialValues, formTitle, validationSchema } = this.props
 
     const { error } = this.state
 
@@ -113,10 +109,7 @@ class LocationForm extends Component {
           onSubmit={this.onSubmit}
           formikRef={this.form}
         >
-          <Message
-            component="h4"
-            content={formTitle}
-          />
+          <Message component="h4" content={formTitle} />
           <Form.Field
             type="number"
             title={sharedMessages.latitude}
@@ -142,10 +135,7 @@ class LocationForm extends Component {
             required
           />
           <SubmitBar>
-            <Form.Submit
-              component={SubmitButton}
-              message={sharedMessages.saveChanges}
-            />
+            <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
             <ModalButton
               type="button"
               icon="delete"

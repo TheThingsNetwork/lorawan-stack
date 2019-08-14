@@ -14,11 +14,10 @@
 
 import { createRequestActions } from './lib'
 
-export const createGetApiKeysListActionType = name => (
-  `GET_${name}_API_KEYS_LIST`
-)
+export const createGetApiKeysListActionType = name => `GET_${name}_API_KEYS_LIST`
 
-export default name => createRequestActions(
-  createGetApiKeysListActionType(name),
-  (id, { page, limit }) => ({ id, params: { page, limit }})
-)
+export default name =>
+  createRequestActions(createGetApiKeysListActionType(name), (id, { page, limit }) => ({
+    id,
+    params: { page, limit },
+  }))

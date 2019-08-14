@@ -12,29 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {
-  GET_USER_ME_SUCCESS,
-  LOGOUT_SUCCESS,
-} from '../actions/user'
+import { GET_USER_ME_SUCCESS, LOGOUT_SUCCESS } from '../actions/user'
 
 const defaultState = {
   user: undefined,
 }
 
-const user = function (state = defaultState, { type, payload }) {
+const user = function(state = defaultState, { type, payload }) {
   switch (type) {
-  case GET_USER_ME_SUCCESS:
-    return {
-      ...state,
-      user: payload,
-    }
-  case LOGOUT_SUCCESS:
-    return {
-      ...state,
-      user: undefined,
-    }
-  default:
-    return state
+    case GET_USER_ME_SUCCESS:
+      return {
+        ...state,
+        user: payload,
+      }
+    case LOGOUT_SUCCESS:
+      return {
+        ...state,
+        user: undefined,
+      }
+    default:
+      return state
   }
 }
 

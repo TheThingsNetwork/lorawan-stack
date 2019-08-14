@@ -33,13 +33,9 @@ import style from './app.styl'
 @withEnv
 @bind
 export default class ConsoleApp extends React.Component {
-  render () {
+  render() {
     const {
-      env: {
-        siteTitle,
-        pageData,
-        siteName,
-      },
+      env: { siteTitle, pageData, siteName },
     } = this.props
 
     if (pageData && pageData.error) {

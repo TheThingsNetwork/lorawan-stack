@@ -27,50 +27,50 @@ const defaultState = {
   error: false,
 }
 
-const user = function (state = defaultState, action) {
+const user = function(state = defaultState, action) {
   switch (action.type) {
-  case GET_USER_ME:
-    return {
-      ...state,
-      fetching: true,
-      user: undefined,
-      error: false,
-    }
-  case GET_USER_ME_SUCCESS:
-    return {
-      ...state,
-      fetching: false,
-      user: action.user,
-      error: false,
-    }
-  case GET_USER_ME_FAILURE:
-    return {
-      ...state,
-      fetching: false,
-      user: undefined,
-      error: action.error,
-    }
-  case LOGOUT:
-    return {
-      ...state,
-      fetching: true,
-      error: false,
-    }
-  case LOGOUT_SUCCESS:
-    return {
-      ...state,
-      user: undefined,
-      fetching: false,
-      error: false,
-    }
-  case LOGOUT_FAILURE:
-    return {
-      ...state,
-      fetching: false,
-      error: action.error,
-    }
-  default:
-    return state
+    case GET_USER_ME:
+      return {
+        ...state,
+        fetching: true,
+        user: undefined,
+        error: false,
+      }
+    case GET_USER_ME_SUCCESS:
+      return {
+        ...state,
+        fetching: false,
+        user: action.user,
+        error: false,
+      }
+    case GET_USER_ME_FAILURE:
+      return {
+        ...state,
+        fetching: false,
+        user: undefined,
+        error: action.error,
+      }
+    case LOGOUT:
+      return {
+        ...state,
+        fetching: true,
+        error: false,
+      }
+    case LOGOUT_SUCCESS:
+      return {
+        ...state,
+        user: undefined,
+        fetching: false,
+        error: false,
+      }
+    case LOGOUT_FAILURE:
+      return {
+        ...state,
+        fetching: false,
+        error: action.error,
+      }
+    default:
+      return state
   }
 }
 

@@ -12,9 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {
-  createGetCollaboratorActionType,
-} from '../actions/collaborators'
+import { createGetCollaboratorActionType } from '../actions/collaborators'
 
 import { createRequestActions } from '../actions/lib'
 
@@ -22,19 +20,19 @@ const defaultState = {
   collaborator: undefined,
 }
 
-const createNamedCollaboratorReducer = function (reducerName = '') {
+const createNamedCollaboratorReducer = function(reducerName = '') {
   const GET_COLLABORATOR_BASE = createGetCollaboratorActionType(reducerName)
   const [{ success: GET_COLLABORATOR_SUCCESS }] = createRequestActions(GET_COLLABORATOR_BASE)
 
-  return function (state = defaultState, { type, payload }) {
+  return function(state = defaultState, { type, payload }) {
     switch (type) {
-    case GET_COLLABORATOR_SUCCESS:
-      return {
-        ...state,
-        collaborator: payload,
-      }
-    default:
-      return state
+      case GET_COLLABORATOR_SUCCESS:
+        return {
+          ...state,
+          collaborator: payload,
+        }
+      default:
+        return state
     }
   }
 }

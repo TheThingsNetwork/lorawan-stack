@@ -22,25 +22,11 @@ import Tab from './tab'
 
 import style from './tabs.styl'
 
-const Tabs = function ({
-  className,
-  active,
-  tabs,
-  onTabChange,
-  divider,
-}) {
+const Tabs = function({ className, active, tabs, onTabChange, divider }) {
   return (
     <ul className={classnames(className, style.tabs, { [style.divider]: divider })}>
-      {tabs.map(function (tab, index) {
-        const {
-          disabled,
-          title,
-          name,
-          icon,
-          narrow = false,
-          link,
-          exact,
-        } = tab
+      {tabs.map(function(tab, index) {
+        const { disabled, title, name, icon, narrow = false, link, exact } = tab
 
         return (
           <Tab
@@ -66,12 +52,14 @@ Tabs.propTypes = {
   /** The name of the active tab */
   active: PropTypes.string,
   /** A list of tabs */
-  tabs: PropTypes.arrayOf(PropTypes.shape({
-    title: PropTypes.message.isRequired,
-    name: PropTypes.string.isRequired,
-    icon: PropTypes.string,
-    disabled: PropTypes.bool,
-  })).isRequired,
+  tabs: PropTypes.arrayOf(
+    PropTypes.shape({
+      title: PropTypes.message.isRequired,
+      name: PropTypes.string.isRequired,
+      icon: PropTypes.string,
+      disabled: PropTypes.bool,
+    }),
+  ).isRequired,
   /**
    * A click handler to be called when the selected tab changes. Passes
    * the name of the new active tab as an argument.

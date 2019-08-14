@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export function get (key) {
+export function get(key) {
   const value = localStorage.getItem(key)
   try {
     return JSON.parse(value)
@@ -21,15 +21,15 @@ export function get (key) {
   }
 }
 
-export function set (key, val) {
+export function set(key, val) {
   const value = JSON.stringify(val)
   localStorage.setItem(key, value)
 }
 
-export function remove (key) {
+export function remove(key) {
   return localStorage.removeItem(key)
 }
 
-export function clearAll () {
+export function clearAll() {
   return localStorage.clear()
 }

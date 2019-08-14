@@ -48,19 +48,18 @@ const headers = [
 
 @bind
 export default class WebhooksTable extends React.Component {
-
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     const { appId } = props
     this.getWebhooksList = () => getWebhooksList(appId)
   }
 
-  baseDataSelector ({ webhooks }) {
+  baseDataSelector({ webhooks }) {
     return webhooks
   }
 
-  render () {
+  render() {
     return (
       <FetchTable
         entity="webhooks"

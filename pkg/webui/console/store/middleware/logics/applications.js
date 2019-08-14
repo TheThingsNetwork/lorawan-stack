@@ -25,8 +25,11 @@ import createEventsConnectLogics from './events'
 
 const getApplicationLogic = createRequestLogic({
   type: applications.GET_APP,
-  async process ({ action }, dispatch) {
-    const { payload: { id }, meta: { selector }} = action
+  async process({ action }, dispatch) {
+    const {
+      payload: { id },
+      meta: { selector },
+    } = action
     const app = await api.application.get(id, selector)
     dispatch(applications.startApplicationEventsStream(id))
     return app
@@ -35,7 +38,7 @@ const getApplicationLogic = createRequestLogic({
 
 const updateApplicationLogic = createRequestLogic({
   type: applications.UPDATE_APP,
-  async process ({ action }) {
+  async process({ action }) {
     const { id, patch } = action.payload
 
     const result = await api.application.update(id, patch)
@@ -46,7 +49,7 @@ const updateApplicationLogic = createRequestLogic({
 
 const deleteApplicationLogic = createRequestLogic({
   type: applications.DELETE_APP,
-  async process ({ action }) {
+  async process({ action }) {
     const { id } = action.payload
 
     await api.application.delete(id)
@@ -58,17 +61,22 @@ const deleteApplicationLogic = createRequestLogic({
 const getApplicationsLogic = createRequestLogic({
   type: applications.GET_APPS_LIST,
   latest: true,
-  async process ({ action }) {
-    const { params: { page, limit, query }} = action.payload
+  async process({ action }) {
+    const {
+      params: { page, limit, query },
+    } = action.payload
     const { selectors } = action.meta
 
     const data = query
-      ? await api.applications.search({
-        page,
-        limit,
-        id_contains: query,
-        name_contains: query,
-      }, selectors)
+      ? await api.applications.search(
+          {
+            page,
+            limit,
+            id_contains: query,
+            name_contains: query,
+          },
+          selectors,
+        )
       : await api.applications.list({ page, limit }, selectors)
 
     return { entities: data.applications, totalCount: data.totalCount }
@@ -77,7 +85,7 @@ const getApplicationsLogic = createRequestLogic({
 
 const getApplicationsRightsLogic = createRequestLogic({
   type: applications.GET_APPS_RIGHTS_LIST,
-  async process ({ action }) {
+  async process({ action }) {
     const { id } = action.payload
     const result = await api.rights.applications(id)
     return result.rights.sort()
@@ -86,8 +94,11 @@ const getApplicationsRightsLogic = createRequestLogic({
 
 const getApplicationApiKeysLogic = createRequestLogic({
   type: applications.GET_APP_API_KEYS_LIST,
-  async process ({ getState, action }) {
-    const { id: appId, params: { page, limit }} = action.payload
+  async process({ getState, action }) {
+    const {
+      id: appId,
+      params: { page, limit },
+    } = action.payload
     const res = await api.application.apiKeys.list(appId, { limit, page })
     return { ...res, id: appId }
   },
@@ -95,7 +106,7 @@ const getApplicationApiKeysLogic = createRequestLogic({
 
 const getApplicationApiKeyLogic = createRequestLogic({
   type: applications.GET_APP_API_KEY,
-  async process ({ action }) {
+  async process({ action }) {
     const { id: appId, keyId } = action.payload
     return api.application.apiKeys.get(appId, keyId)
   },
@@ -103,7 +114,7 @@ const getApplicationApiKeyLogic = createRequestLogic({
 
 const getApplicationCollaboratorLogic = createRequestLogic({
   type: applications.GET_APP_COLLABORATOR,
-  async process ({ action }) {
+  async process({ action }) {
     const { id: appId, collaboratorId, isUser } = action.payload
 
     const collaborator = isUser
@@ -122,15 +133,13 @@ const getApplicationCollaboratorLogic = createRequestLogic({
 
 const getApplicationCollaboratorsLogic = createRequestLogic({
   type: applications.GET_APP_COLLABORATORS_LIST,
-  async process ({ action }) {
+  async process({ action }) {
     const { id: appId, params } = action.payload
     const res = await api.application.collaborators.list(appId, params)
-    const collaborators = res.collaborators.map(function (collaborator) {
+    const collaborators = res.collaborators.map(function(collaborator) {
       const { ids, ...rest } = collaborator
       const isUser = !!ids.user_ids
-      const collaboratorId = isUser
-        ? ids.user_ids.user_id
-        : ids.organization_ids.organization_id
+      const collaboratorId = isUser ? ids.user_ids.user_id : ids.organization_ids.organization_id
 
       return {
         id: collaboratorId,
@@ -144,8 +153,11 @@ const getApplicationCollaboratorsLogic = createRequestLogic({
 
 const getApplicationLinkLogic = createRequestLogic({
   type: link.GET_APP_LINK,
-  async process ({ action }, dispatch, done) {
-    const { payload: { id }, meta: { selector = []} = {}} = action
+  async process({ action }, dispatch, done) {
+    const {
+      payload: { id },
+      meta: { selector = [] } = {},
+    } = action
 
     let linkResult
     let statsResult
@@ -168,15 +180,18 @@ const getApplicationLinkLogic = createRequestLogic({
 
 const getWebhookLogic = createRequestLogic({
   type: webhook.GET_WEBHOOK,
-  async process ({ action }) {
-    const { payload: { appId, webhookId }, meta: { selector }} = action
+  async process({ action }) {
+    const {
+      payload: { appId, webhookId },
+      meta: { selector },
+    } = action
     return api.application.webhooks.get(appId, webhookId, selector)
   },
 })
 
 const getWebhooksLogic = createRequestLogic({
   type: webhooks.GET_WEBHOOKS_LIST,
-  async process ({ action }) {
+  async process({ action }) {
     const { appId } = action.payload
     const res = await api.application.webhooks.list(appId)
     return { webhooks: res.webhooks, totalCount: res.totalCount }
@@ -185,7 +200,7 @@ const getWebhooksLogic = createRequestLogic({
 
 const getWebhookFormatsLogic = createRequestLogic({
   type: webhookFormats.GET_WEBHOOK_FORMATS,
-  async process () {
+  async process() {
     const { formats } = await api.application.webhooks.getFormats()
     return formats
   },

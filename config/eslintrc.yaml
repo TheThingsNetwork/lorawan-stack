@@ -1,11 +1,14 @@
 extends:
   - ttn
   - plugin:jest/recommended
+  - prettier
+  - prettier/react
 
 parser: babel-eslint
 
 plugins:
   - jsdoc
+  - prettier
 
 env:
   node: true
@@ -23,6 +26,8 @@ parserOptions:
     legacyDecorators: true
 
 rules:
+  prettier/prettier: error
+
   jest/no-large-snapshots:
     - warn
     - maxSize: 400

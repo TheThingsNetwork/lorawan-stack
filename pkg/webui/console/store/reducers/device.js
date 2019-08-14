@@ -12,32 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {
-  GET_DEV_SUCCESS,
-  UPDATE_DEV_SUCCESS,
-} from '../actions/device'
+import { GET_DEV_SUCCESS, UPDATE_DEV_SUCCESS } from '../actions/device'
 
 const defaultState = {
   device: undefined,
 }
 
-const device = function (state = defaultState, { type, payload }) {
+const device = function(state = defaultState, { type, payload }) {
   switch (type) {
-  case UPDATE_DEV_SUCCESS:
-    return {
-      ...state,
-      device: {
-        ...state.device,
-        ...payload,
-      },
-    }
-  case GET_DEV_SUCCESS:
-    return {
-      ...state,
-      device: payload,
-    }
-  default:
-    return state
+    case UPDATE_DEV_SUCCESS:
+      return {
+        ...state,
+        device: {
+          ...state.device,
+          ...payload,
+        },
+      }
+    case GET_DEV_SUCCESS:
+      return {
+        ...state,
+        device: payload,
+      }
+    default:
+      return state
   }
 }
 

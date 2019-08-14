@@ -22,30 +22,29 @@ import Modal from '.'
 
 const bottomLine = (
   <div>
-    <span className={style.loginInfo}>You are logged in as John Doe. <a href="#">Logout</a></span>
-    <span className={style.redirectInfo}>You will be redirected to <span>/test/test</span></span>
+    <span className={style.loginInfo}>
+      You are logged in as John Doe. <a href="#">Logout</a>
+    </span>
+    <span className={style.redirectInfo}>
+      You will be redirected to <span>/test/test</span>
+    </span>
   </div>
 )
 
 storiesOf('Modal', module)
-  .addDecorator((story, context) => withInfo({
-    inline: true,
-    header: false,
-    text: 'The modal can be displayed inline or portalled via `<PortalledModal />`',
-    propTables: [ Modal ],
-  })(story)(context))
+  .addDecorator((story, context) =>
+    withInfo({
+      inline: true,
+      header: false,
+      text: 'The modal can be displayed inline or portalled via `<PortalledModal />`',
+      propTables: [Modal],
+    })(story)(context),
+  )
   .add('Basic Modal', () => (
-    <Modal
-      title="Example Modal"
-      message="This is something you need to know!"
-      inline
-    />
+    <Modal title="Example Modal" message="This is something you need to know!" inline />
   ))
   .add('No Title', () => (
-    <Modal
-      message="This modal has no title. Might be useful in some situations."
-      inline
-    />
+    <Modal message="This modal has no title. Might be useful in some situations." inline />
   ))
   .add('OAuth Authorize Example', () => (
     <Modal
@@ -59,23 +58,40 @@ storiesOf('Modal', module)
     >
       <div className={style.left}>
         <ul>
-          <li><Icon icon="check" className={style.icon} />View your profile</li>
-          <li><Icon icon="check" className={style.icon} />Make changes to your profile</li>
-          <li><Icon icon="check" className={style.icon} />Perform administrative action</li>
-          <li><Icon icon="check" className={style.icon} />List your applications</li>
-          <li><Icon icon="check" className={style.icon} />Degister new gateways in your account</li>
-          <li><Icon icon="check" className={style.icon} />Create and edit devices of your applications</li>
+          <li>
+            <Icon icon="check" className={style.icon} />
+            View your profile
+          </li>
+          <li>
+            <Icon icon="check" className={style.icon} />
+            Make changes to your profile
+          </li>
+          <li>
+            <Icon icon="check" className={style.icon} />
+            Perform administrative action
+          </li>
+          <li>
+            <Icon icon="check" className={style.icon} />
+            List your applications
+          </li>
+          <li>
+            <Icon icon="check" className={style.icon} />
+            Degister new gateways in your account
+          </li>
+          <li>
+            <Icon icon="check" className={style.icon} />
+            Create and edit devices of your applications
+          </li>
         </ul>
       </div>
       <div className={style.right}>
-        <h3>Console <span title="This application is an official application">Official</span></h3>
+        <h3>
+          Console <span title="This application is an official application">Official</span>
+        </h3>
         <p>The Console is The Things Stack's official web application.</p>
       </div>
     </Modal>
   ))
   .add('As Overlay', () => (
-    <Modal
-      title="Example Modal"
-      message="This is something you need to know!"
-    />
+    <Modal title="Example Modal" message="This is something you need to know!" />
   ))

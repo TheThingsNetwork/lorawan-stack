@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export default function debounce (f, ms) {
+export default function debounce(f, ms) {
   let timer = null
   let cancelled = false
   return {
-    debouncedFunction (...args) {
-      const onComplete = function () {
+    debouncedFunction(...args) {
+      const onComplete = function() {
         if (!cancelled) {
           f(...args)
         }
@@ -28,7 +28,7 @@ export default function debounce (f, ms) {
       }
       timer = setTimeout(onComplete, ms)
     },
-    cancel () {
+    cancel() {
       cancelled = true
     },
   }

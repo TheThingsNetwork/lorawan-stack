@@ -25,8 +25,7 @@ import style from './list.styl'
 
 @bind
 class List extends React.PureComponent {
-
-  renderItem (item, index) {
+  renderItem(item, index) {
     const { rowKey, renderItem, size } = this.props
 
     let actualRowKey = null
@@ -45,49 +44,34 @@ class List extends React.PureComponent {
     return React.cloneElement(renderedItem, {
       ...renderedItem.props,
       key: actualRowKey,
-      className: classnames(
-        renderedItem.props.className, {
-          [style[`item-${size}`]]: size !== 'none',
-        }
-      ),
+      className: classnames(renderedItem.props.className, {
+        [style[`item-${size}`]]: size !== 'none',
+      }),
     })
   }
 
-  get header () {
+  get header() {
     const { header, size } = this.props
 
     if (!header) {
       return null
     }
 
-    return (
-      <div className={classnames(style.header, style[`item-${size}`])}>
-        {header}
-      </div>
-    )
+    return <div className={classnames(style.header, style[`item-${size}`])}>{header}</div>
   }
 
-  get footer () {
+  get footer() {
     const { footer, size } = this.props
 
     if (!footer) {
       return null
     }
 
-    return (
-      <div className={classnames(style.footer, style[`item-${size}`])}>
-        {footer}
-      </div>
-    )
+    return <div className={classnames(style.footer, style[`item-${size}`])}>{footer}</div>
   }
 
-  renderItems () {
-    const {
-      items,
-      emptyMessage,
-      emptyMessageValues,
-      children,
-    } = this.props
+  renderItems() {
+    const { items, emptyMessage, emptyMessageValues, children } = this.props
 
     if (children) {
       return children
@@ -106,14 +90,8 @@ class List extends React.PureComponent {
     return items.map((item, idx) => this.renderItem(item, idx))
   }
 
-  render () {
-    const {
-      className,
-      component: Component,
-      bordered,
-      items,
-      listClassName,
-    } = this.props
+  render() {
+    const { className, component: Component, bordered, items, listClassName } = this.props
 
     const cls = classnames(className, style.wrapper, {
       [style.listBordered]: bordered,
@@ -126,9 +104,7 @@ class List extends React.PureComponent {
     return (
       <div className={cls}>
         {this.header}
-        <Component className={listCls}>
-          {this.renderItems()}
-        </Component>
+        <Component className={listCls}>{this.renderItems()}</Component>
         {this.footer}
       </div>
     )
@@ -136,11 +112,11 @@ class List extends React.PureComponent {
 }
 
 List.propTypes = {
-  size: PropTypes.oneOf([ 'small', 'default', 'large', 'none' ]),
+  size: PropTypes.oneOf(['small', 'default', 'large', 'none']),
   renderItem: PropTypes.func,
   items: PropTypes.array,
-  rowKey: PropTypes.oneOfType([ PropTypes.func, PropTypes.string ]),
-  component: PropTypes.oneOf([ 'ol', 'ul' ]),
+  rowKey: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
+  component: PropTypes.oneOf(['ol', 'ul']),
   bordered: PropTypes.bool,
   emptyMessage: PropTypes.message,
   emptyMessageValues: PropTypes.object,

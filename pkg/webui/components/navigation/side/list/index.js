@@ -23,16 +23,15 @@ import style from './list.styl'
 
 @bind
 class SideNavigationList extends React.Component {
-
-  onRootExpand (index) {
+  onRootExpand(index) {
     const { onItemExpand } = this.props
 
-    return function (isLink) {
+    return function(isLink) {
       onItemExpand(index, isLink)
     }
   }
 
-  render () {
+  render() {
     const {
       className,
       items,
@@ -51,23 +50,14 @@ class SideNavigationList extends React.Component {
     })
     return (
       <ul className={listClassNames}>
-        {items.map(function (item, index) {
+        {items.map(function(item, index) {
           const itemState = itemsExpanded[index] || {}
-          const {
-            title,
-            icon,
-            path,
-            exact = true,
-            nested = false,
-            items = [],
-          } = item
+          const { title, icon, path, exact = true, nested = false, items = [] } = item
           const { isOpen = false, isLink = false } = itemState
 
           const isActive = nested && isLink
           const isExpanded = !isMinimized && isOpen
-          const onExpand = isRoot
-            ? onRootExpand(index)
-            : onItemExpand
+          const onExpand = isRoot ? onRootExpand(index) : onItemExpand
 
           return (
             <SideNavigationItem
@@ -113,7 +103,7 @@ SideNavigationList.propTypes = {
         nested: PropTypes.bool.isRequired,
         items: PropTypes.arrayOf(PropTypes.link).isRequired,
       }),
-    ])
+    ]),
   ).isRequired,
   /**
    * A map of expanded items, where:

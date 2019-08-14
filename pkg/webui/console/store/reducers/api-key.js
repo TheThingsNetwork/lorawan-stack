@@ -12,9 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {
-  createGetApiKeyActionType,
-} from '../actions/api-key'
+import { createGetApiKeyActionType } from '../actions/api-key'
 
 import { createRequestActions } from '../actions/lib'
 
@@ -22,19 +20,19 @@ const defaultState = {
   key: undefined,
 }
 
-const createNamedApiKeyReducer = function (reducerName = '') {
+const createNamedApiKeyReducer = function(reducerName = '') {
   const GET_KEY_BASE = createGetApiKeyActionType(reducerName)
   const [{ success: GET_KEY_SUCCESS }] = createRequestActions(GET_KEY_BASE)
 
-  return function (state = defaultState, { type, payload }) {
+  return function(state = defaultState, { type, payload }) {
     switch (type) {
-    case GET_KEY_SUCCESS:
-      return {
-        ...state,
-        key: payload,
-      }
-    default:
-      return state
+      case GET_KEY_SUCCESS:
+        return {
+          ...state,
+          key: payload,
+        }
+      default:
+        return state
     }
   }
 }

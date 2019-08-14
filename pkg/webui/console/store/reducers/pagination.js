@@ -24,37 +24,37 @@ const defaultState = {
   totalCount: undefined,
 }
 
-export const createNamedPaginationReducer = function (reducerName, entityIdSelector) {
+export const createNamedPaginationReducer = function(reducerName, entityIdSelector) {
   const [{ success: GET_PAGINATION_SUCCESS }] = createPaginationRequestActions(reducerName)
   const [{ success: DELETE_PAGINATION_SUCCESS }] = createPaginationDeleteActions(reducerName)
 
-  return function (state = defaultState, { type, payload }) {
+  return function(state = defaultState, { type, payload }) {
     switch (type) {
-    case GET_PAGINATION_SUCCESS:
-      return {
-        ...state,
-        totalCount: payload.totalCount,
-        ids: payload.entities.map(entityIdSelector),
-      }
-    case DELETE_PAGINATION_SUCCESS:
-      return {
-        ...state,
-        totalCount: state.totalCount - 1,
-        ids: state.ids.filter(id => id !== payload.id),
-      }
-    default:
-      return state
+      case GET_PAGINATION_SUCCESS:
+        return {
+          ...state,
+          totalCount: payload.totalCount,
+          ids: payload.entities.map(entityIdSelector),
+        }
+      case DELETE_PAGINATION_SUCCESS:
+        return {
+          ...state,
+          totalCount: state.totalCount - 1,
+          ids: state.ids.filter(id => id !== payload.id),
+        }
+      default:
+        return state
     }
   }
 }
 
-export const createNamedPaginationReducerById = function (reducerName, entityIdSelector) {
+export const createNamedPaginationReducerById = function(reducerName, entityIdSelector) {
   const [{ success: GET_PAGINATION_SUCCESS }] = createPaginationByIdRequestActions(reducerName)
   const [{ success: DELETE_PAGINATION_SUCCESS }] = createPaginationByIdDeleteActions(reducerName)
-  const [ , { success }] = createPaginationDeleteActions(reducerName)
+  const [, { success }] = createPaginationDeleteActions(reducerName)
   const paginationReducer = createNamedPaginationReducer(reducerName, entityIdSelector)
 
-  return function (state = {}, action) {
+  return function(state = {}, action) {
     const { id } = action.payload
 
     if (!id) {
@@ -62,18 +62,18 @@ export const createNamedPaginationReducerById = function (reducerName, entityIdS
     }
 
     switch (action.type) {
-    case GET_PAGINATION_SUCCESS:
-      return {
-        ...state,
-        [id]: paginationReducer(state[id], action),
-      }
-    case DELETE_PAGINATION_SUCCESS:
-      return {
-        ...state,
-        [id]: paginationReducer(state[id], success({ id: action.payload.targetId })),
-      }
-    default:
-      return state
+      case GET_PAGINATION_SUCCESS:
+        return {
+          ...state,
+          [id]: paginationReducer(state[id], action),
+        }
+      case DELETE_PAGINATION_SUCCESS:
+        return {
+          ...state,
+          [id]: paginationReducer(state[id], success({ id: action.payload.targetId })),
+        }
+      default:
+        return state
     }
   }
 }

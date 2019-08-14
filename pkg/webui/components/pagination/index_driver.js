@@ -16,14 +16,12 @@ import React from 'react'
 
 import Pagination from '.'
 
-export default function () {
+export default function() {
   const driver = {
     component: undefined,
     when: {
-      created (props) {
-        const wrapper = shallow(
-          <Pagination {...props} />
-        )
+      created(props) {
+        const wrapper = shallow(<Pagination {...props} />)
 
         if (wrapper.type() !== null) {
           driver.component = wrapper.dive()
@@ -32,55 +30,61 @@ export default function () {
 
         return undefined
       },
-      navigatedNextPage () {
+      navigatedNextPage() {
         driver.get.nextNavigationButton().simulate('click', {
           preventDefault: () => undefined,
         })
       },
-      navigatedLastPage () {
+      navigatedLastPage() {
         driver.get.lastPage().simulate('click', {
           preventDefault: () => undefined,
         })
       },
     },
     is: {
-      pageSelected (page) {
+      pageSelected(page) {
         return driver.get.page(page).props().selected
       },
-      firstPageSelected () {
+      firstPageSelected() {
         return driver.is.pageSelected(0)
       },
-      lastPageSelected () {
+      lastPageSelected() {
         return driver.is.pageSelected(driver.get.pages().length - 1)
       },
-      prevNavigationDisabled () {
+      prevNavigationDisabled() {
         return driver.get.prevNavigation().hasClass('itemDisabled')
       },
-      nextNavigationDisabled () {
+      nextNavigationDisabled() {
         return driver.get.nextNavigation().hasClass('itemDisabled')
       },
     },
     get: {
-      pages () {
+      pages() {
         return driver.component.find('PageView')
       },
-      page (page) {
+      page(page) {
         return driver.get.pages().at(page)
       },
-      lastPage () {
+      lastPage() {
         return driver.get.page(driver.get.pages().length - 1)
       },
-      prevNavigation () {
+      prevNavigation() {
         return driver.component.find('li').first()
       },
-      nextNavigation () {
+      nextNavigation() {
         return driver.component.find('li').last()
       },
-      prevNavigationButton () {
-        return driver.get.prevNavigation().find('a').first()
+      prevNavigationButton() {
+        return driver.get
+          .prevNavigation()
+          .find('a')
+          .first()
       },
-      nextNavigationButton () {
-        return driver.get.nextNavigation().find('a').first()
+      nextNavigationButton() {
+        return driver.get
+          .nextNavigation()
+          .find('a')
+          .first()
       },
     },
   }

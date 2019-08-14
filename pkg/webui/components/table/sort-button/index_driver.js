@@ -17,26 +17,26 @@ import { IntlProvider } from 'react-intl'
 
 import SortButton from '.'
 
-export default function () {
+export default function() {
   const driver = {
     component: undefined,
     when: {
-      created (props) {
+      created(props) {
         driver.component = shallow(
           <IntlProvider>
             <SortButton {...props} />
-          </IntlProvider>
+          </IntlProvider>,
         ).dive()
       },
-      buttonPressed () {
+      buttonPressed() {
         driver.component.simulate('click')
       },
     },
     is: {
-      active () {
+      active() {
         return driver.component.hasClass('buttonActive')
       },
-      descending () {
+      descending() {
         return driver.component.hasClass('buttonDesc')
       },
     },

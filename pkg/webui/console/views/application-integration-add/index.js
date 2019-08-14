@@ -30,13 +30,15 @@ import { selectSelectedApplicationId } from '../../store/selectors/applications'
 
 import api from '../../api'
 
-@connect(state => ({
-  appId: selectSelectedApplicationId(state),
-}),
-dispatch => ({
-  navigateToList: appId => dispatch(push(`/applications/${appId}/integrations`)),
-}))
-@withBreadcrumb('apps.single.integrations.add', function (props) {
+@connect(
+  state => ({
+    appId: selectSelectedApplicationId(state),
+  }),
+  dispatch => ({
+    navigateToList: appId => dispatch(push(`/applications/${appId}/integrations`)),
+  }),
+)
+@withBreadcrumb('apps.single.integrations.add', function(props) {
   const { appId } = props
   return (
     <Breadcrumb
@@ -48,19 +50,19 @@ dispatch => ({
 })
 @bind
 export default class ApplicationIntegrationAdd extends Component {
-  async handleSubmit (webhook) {
+  async handleSubmit(webhook) {
     const { appId } = this.props
 
     await api.application.webhooks.create(appId, webhook)
   }
 
-  handleSubmitSuccess () {
+  handleSubmitSuccess() {
     const { navigateToList, appId } = this.props
 
     navigateToList(appId)
   }
 
-  render () {
+  render() {
     return (
       <Container>
         <Row>

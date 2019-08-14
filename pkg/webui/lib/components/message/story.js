@@ -37,27 +37,20 @@ const messages = {
 
 const IntlDecorator = storyFn => (
   <IntlProvider key="key" messages={messages} locale="en-US">
-    { storyFn() }
+    {storyFn()}
   </IntlProvider>
 )
 
 storiesOf('Utility Components/Message', module)
-  .addDecorator((story, context) => withInfo({
-    inline: true,
-    header: false,
-    text: doc,
-    propTables: [ Message ],
-  })(story)(context))
+  .addDecorator((story, context) =>
+    withInfo({
+      inline: true,
+      header: false,
+      text: doc,
+      propTables: [Message],
+    })(story)(context),
+  )
   .addDecorator(IntlDecorator)
-  .add('Default', () =>
-    (
-      <Message content={exampleMessage} />
-    ))
-  .add('Placeholder', () =>
-    (
-      <Message content={placeholderMessage} values={{ number: 5 }} />
-    ))
-  .add('String', () =>
-    (
-      <Message content="I can also be just a string, but will issue a warning" />
-    ))
+  .add('Default', () => <Message content={exampleMessage} />)
+  .add('Placeholder', () => <Message content={placeholderMessage} values={{ number: 5 }} />)
+  .add('String', () => <Message content="I can also be just a string, but will issue a warning" />)

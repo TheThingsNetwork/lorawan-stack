@@ -18,8 +18,11 @@ import createRequestLogic from './lib'
 
 const getDevicesListLogic = createRequestLogic({
   type: devices.GET_DEVICES_LIST,
-  async process ({ action }) {
-    const { appId, params: { page, limit }} = action.payload
+  async process({ action }) {
+    const {
+      appId,
+      params: { page, limit },
+    } = action.payload
     const { selectors } = action.meta
 
     const data = await api.devices.list(appId, { page, limit }, selectors)
@@ -27,6 +30,4 @@ const getDevicesListLogic = createRequestLogic({
   },
 })
 
-export default [
-  getDevicesListLogic,
-]
+export default [getDevicesListLogic]

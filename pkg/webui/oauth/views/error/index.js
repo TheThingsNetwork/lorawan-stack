@@ -23,7 +23,11 @@ import IntlHelmet from '../../../lib/components/intl-helmet'
 import sharedMessages from '../../../lib/shared-messages'
 import errorMessages from '../../../lib/errors/error-messages'
 
-import { httpStatusCode, isUnknown as isUnknownError, isNotFoundError } from '../../../lib/errors/utils'
+import {
+  httpStatusCode,
+  isUnknown as isUnknownError,
+  isNotFoundError,
+} from '../../../lib/errors/utils'
 
 import statusCodeMessages from '../../../lib/errors/status-code-messages'
 
@@ -31,8 +35,7 @@ import style from './full-view.styl'
 
 const reload = () => location.reload()
 
-const FullViewError = function ({ error, env }) {
-
+const FullViewError = function({ error, env }) {
   const isUnknown = isUnknownError(error)
   const statusCode = httpStatusCode(error)
   const isNotFound = isNotFoundError(error)
@@ -59,26 +62,16 @@ const FullViewError = function ({ error, env }) {
               component="h2"
               content={errorTitleMessage}
             />
-            <ErrorMessage
-              className={style.fullViewErrorSub}
-              content={errorMessageMessage}
-            />
-            { isNotFoundError(error)
-              ? (
-                <Button.AnchorLink
-                  icon="keyboard_arrow_left"
-                  message={sharedMessages.takeMeBack}
-                  href={env.appRoot}
-                />
-              )
-              : (
-                <Button
-                  icon="refresh"
-                  message={sharedMessages.refreshPage}
-                  onClick={reload}
-                />
-              )
-            }
+            <ErrorMessage className={style.fullViewErrorSub} content={errorMessageMessage} />
+            {isNotFoundError(error) ? (
+              <Button.AnchorLink
+                icon="keyboard_arrow_left"
+                message={sharedMessages.takeMeBack}
+                href={env.appRoot}
+              />
+            ) : (
+              <Button icon="refresh" message={sharedMessages.refreshPage} onClick={reload} />
+            )}
           </Col>
         </Row>
       </Container>

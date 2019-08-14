@@ -19,44 +19,26 @@ import { withInfo } from '@storybook/addon-info'
 import SafeInspector from '.'
 
 storiesOf('Safe Inspector', module)
-  .addDecorator((story, context) => withInfo({
-    inline: true,
-    header: false,
-    propTables: [ SafeInspector ],
-  })(story)(context))
-  .add('Default', () => (
-    <SafeInspector
-      data="ab01f46d2f"
-    />
-  ))
+  .addDecorator((story, context) =>
+    withInfo({
+      inline: true,
+      header: false,
+      propTables: [SafeInspector],
+    })(story)(context),
+  )
+  .add('Default', () => <SafeInspector data="ab01f46d2f" />)
   .add('Multiple', () => (
     <React.Fragment>
-      <SafeInspector data="ab01f46d2f" /><br />
-      <SafeInspector data="ff0000" /><br />
+      <SafeInspector data="ab01f46d2f" />
+      <br />
+      <SafeInspector data="ff0000" />
+      <br />
       <SafeInspector data="f8a683c1d9b2" />
     </React.Fragment>
   ))
-  .add('Small', () => (
-    <SafeInspector
-      small
-      data="ab01f46d2f"
-    />
-  ))
+  .add('Small', () => <SafeInspector small data="ab01f46d2f" />)
   .add('Non Byte', () => (
-    <SafeInspector
-      data="somerandomhash.du9d8321-9dk2-edf2398efh8"
-      isBytes={false}
-    />
+    <SafeInspector data="somerandomhash.du9d8321-9dk2-edf2398efh8" isBytes={false} />
   ))
-  .add('Initially Visible', () => (
-    <SafeInspector
-      data="ab01f46d2f"
-      initiallyVisible
-    />
-  ))
-  .add('Not hideable', () => (
-    <SafeInspector
-      data="ab01f46d2f"
-      hideable={false}
-    />
-  ))
+  .add('Initially Visible', () => <SafeInspector data="ab01f46d2f" initiallyVisible />)
+  .add('Not hideable', () => <SafeInspector data="ab01f46d2f" hideable={false} />)

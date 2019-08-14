@@ -24,8 +24,7 @@ export const CheckboxGroupContext = React.createContext()
 
 @bind
 class CheckboxGroup extends React.Component {
-
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     let value
@@ -40,15 +39,15 @@ class CheckboxGroup extends React.Component {
     this.state = { value }
   }
 
-  static getDerivedStateFromProps (props) {
+  static getDerivedStateFromProps(props) {
     if ('value' in props) {
-      return { value: props.value || {}}
+      return { value: props.value || {} }
     }
 
     return null
   }
 
-  async handleCheckboxChange (event) {
+  async handleCheckboxChange(event) {
     const { onChange } = this.props
     const { target } = event
 
@@ -61,21 +60,14 @@ class CheckboxGroup extends React.Component {
     onChange(value)
   }
 
-  getCheckboxValue (name) {
+  getCheckboxValue(name) {
     const { value } = this.state
 
     return value[name] || false
   }
 
-  render () {
-    const {
-      className,
-      disabled,
-      onFocus,
-      onBlur,
-      horizontal,
-      children,
-    } = this.props
+  render() {
+    const { className, disabled, onFocus, onBlur, horizontal, children } = this.props
 
     const ctx = {
       className: style.groupCheckbox,
@@ -92,9 +84,7 @@ class CheckboxGroup extends React.Component {
 
     return (
       <div className={cls}>
-        <CheckboxGroupContext.Provider value={ctx}>
-          {children}
-        </CheckboxGroupContext.Provider>
+        <CheckboxGroupContext.Provider value={ctx}>{children}</CheckboxGroupContext.Provider>
       </div>
     )
   }
@@ -110,10 +100,7 @@ CheckboxGroup.propTypes = {
   onChange: PropTypes.func,
   onBlur: PropTypes.func,
   onFocus: PropTypes.func,
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node,
-  ]).isRequired,
+  children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]).isRequired,
 }
 
 CheckboxGroup.defaultProps = {

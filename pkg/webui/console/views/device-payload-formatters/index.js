@@ -34,7 +34,7 @@ import { selectSelectedDeviceId } from '../../store/selectors/device'
 
 import style from './device-payload-formatters.styl'
 
-@connect(function (state) {
+@connect(function(state) {
   const link = selectApplicationLink(state)
   const fetching = selectApplicationLinkFetching(state)
 
@@ -45,7 +45,7 @@ import style from './device-payload-formatters.styl'
     linked: selectApplicationIsLinked(state),
   }
 })
-@withBreadcrumb('device.single.payload-formatters', function (props) {
+@withBreadcrumb('device.single.payload-formatters', function(props) {
   const { appId, devId } = props
   return (
     <Breadcrumb
@@ -56,8 +56,10 @@ import style from './device-payload-formatters.styl'
   )
 })
 export default class DevicePayloadFormatters extends Component {
-  render () {
-    const { match: { url }} = this.props
+  render() {
+    const {
+      match: { url },
+    } = this.props
 
     const tabs = [
       { title: sharedMessages.uplink, name: 'uplink', link: `${url}/uplink` },
@@ -68,11 +70,7 @@ export default class DevicePayloadFormatters extends Component {
       <Container>
         <Row>
           <Col sm={12}>
-            <Tab
-              className={style.tabs}
-              tabs={tabs}
-              divider
-            />
+            <Tab className={style.tabs} tabs={tabs} divider />
           </Col>
         </Row>
         <Row>

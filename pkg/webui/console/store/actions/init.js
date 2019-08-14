@@ -16,12 +16,7 @@
 
 import { createRequestActions } from './lib'
 
-export const [{
-  request: INITIALIZE,
-  success: INITIALIZE_SUCCESS,
-  failure: INITIALIZE_FAILURE,
-}, {
-  request: initialize,
-  success: initializeSuccess,
-  failure: initializeFailure,
-}] = createRequestActions('INITIALIZE')
+export const [
+  { request: INITIALIZE, success: INITIALIZE_SUCCESS, failure: INITIALIZE_FAILURE },
+  { request: initialize, success: initializeSuccess, failure: initializeFailure },
+] = createRequestActions('INITIALIZE')

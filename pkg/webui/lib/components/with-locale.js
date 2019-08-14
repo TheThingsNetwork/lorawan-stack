@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /* global require */
 
 import React from 'react'
@@ -50,16 +49,16 @@ export default class UserLocale extends React.PureComponent {
     xx: false,
   }
 
-  toggle () {
+  toggle() {
     this.setState(state => ({ xx: !state.xx }))
   }
 
-  componentDidUpdate (props) {
+  componentDidUpdate(props) {
     this.check(this.props, props)
   }
 
-  componentDidMount () {
-    this.check({ env: { config: {}}}, this.props)
+  componentDidMount() {
+    this.check({ env: { config: {} } }, this.props)
 
     if (dev) {
       window.addEventListener('keydown', this.onKeydown)
@@ -67,33 +66,33 @@ export default class UserLocale extends React.PureComponent {
     }
   }
 
-  check (prev, props) {
-    const current = prev.user && prev.user.language || prev.env.config.language || defaultLanguage
-    const next = props.user && props.user.language || props.env.config.language || defaultLanguage
+  check(prev, props) {
+    const current = (prev.user && prev.user.language) || prev.env.config.language || defaultLanguage
+    const next = (props.user && props.user.language) || props.env.config.language || defaultLanguage
 
     if (current !== next && next !== 'en') {
       this.promise = this.load(next)
     }
   }
 
-  success (p) {
+  success(p) {
     const frontendMessages = p[0]
     const backendMessages = p[1]
-    this.setState({ messages: { ...frontendMessages, ...backendMessages }})
+    this.setState({ messages: { ...frontendMessages, ...backendMessages } })
   }
 
-  fail (err) {
+  fail(err) {
     error(err)
     this.setState({ messages: null })
   }
 
-  onKeydown (evt) {
+  onKeydown(evt) {
     if (evt.altKey && evt.code === 'KeyL') {
       this.toggle()
     }
   }
 
-  load (language) {
+  load(language) {
     let locale = navigator.language || navigator.browserLanguage || 'en-US'
 
     // if the browser locale does not match the lang on the html tag, prefer the lang
@@ -112,16 +111,17 @@ export default class UserLocale extends React.PureComponent {
     if (!window.Intl) {
       log(`Polyfilling locale ${locale} for language ${language}`)
       promises.push(import('intl'))
-      promises.push(import(/* webpackChunkName: "locale.[request]" */ `intl/locale-data/jsonp/${locale}`))
+      promises.push(
+        import(/* webpackChunkName: "locale.[request]" */ `intl/locale-data/jsonp/${locale}`),
+      )
     }
 
-    return CancelablePromise
-      .resolve(Promise.all(promises))
+    return CancelablePromise.resolve(Promise.all(promises))
       .then(this.success)
       .catch(this.fail)
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     if (this.promise) {
       this.promise.cancel()
     }
@@ -129,7 +129,7 @@ export default class UserLocale extends React.PureComponent {
     window.removeEventListener('onKeydown', this.onKeydown)
   }
 
-  render () {
+  render() {
     const {
       user,
       children,
@@ -140,7 +140,7 @@ export default class UserLocale extends React.PureComponent {
 
     let { messages } = this.state
 
-    const lang = user && user.language || config.language || defaultLanguage
+    const lang = (user && user.language) || config.language || defaultLanguage
 
     if (dev && xx) {
       messages = {
@@ -152,10 +152,12 @@ export default class UserLocale extends React.PureComponent {
     const key = `${lang}${messages ? 1 : 0}${xx ? 'xx' : ''}`
     const locale = lang === xx ? 'en' : lang
 
-    return messages && (
-      <IntlProvider key={key} messages={messages} locale={locale}>
-        {children}
-      </IntlProvider>
+    return (
+      messages && (
+        <IntlProvider key={key} messages={messages} locale={locale}>
+          {children}
+        </IntlProvider>
+      )
     )
   }
 }

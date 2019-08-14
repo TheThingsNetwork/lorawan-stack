@@ -36,18 +36,14 @@ const items = [
 ]
 
 storiesOf('Profile Dropdown', module)
-  .addDecorator((story, context) => withInfo({
-    inline: true,
-    header: false,
-    source: false,
-    propTables: [ ProfileDropdown ],
-  })(story)(context))
-  .add('Default', function () {
-    return (
-      <ProfileDropdown
-        style={{ marginLeft: '60px' }}
-        user={user}
-        dropdownItems={items}
-      />
-    )
+  .addDecorator((story, context) =>
+    withInfo({
+      inline: true,
+      header: false,
+      source: false,
+      propTables: [ProfileDropdown],
+    })(story)(context),
+  )
+  .add('Default', function() {
+    return <ProfileDropdown style={{ marginLeft: '60px' }} user={user} dropdownItems={items} />
   })

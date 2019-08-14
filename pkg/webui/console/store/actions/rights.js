@@ -14,12 +14,6 @@
 
 import { createRequestActions } from './lib'
 
-export const createGetRightsListActionType = name => (
-  `GET_${name}_RIGHTS_LIST`
-)
+export const createGetRightsListActionType = name => `GET_${name}_RIGHTS_LIST`
 
-export default name =>
-  createRequestActions(
-    createGetRightsListActionType(name),
-    id => ({ id })
-  )
+export default name => createRequestActions(createGetRightsListActionType(name), id => ({ id }))

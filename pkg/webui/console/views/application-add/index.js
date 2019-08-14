@@ -61,41 +61,38 @@ const validationSchema = Yup.object().shape({
   description: Yup.string(),
 })
 
-@withBreadcrumb('apps.add', function (props) {
-  return (
-    <Breadcrumb
-      path="/applications/add"
-      icon="add"
-      content={sharedMessages.add}
-    />
-  )
+@withBreadcrumb('apps.add', function(props) {
+  return <Breadcrumb path="/applications/add" icon="add" content={sharedMessages.add} />
 })
-@connect(({ user }) => ({
-  userId: user.user.ids.user_id,
-}), dispatch => ({
-  navigateToApplication: appId => dispatch(push(`/applications/${appId}`)),
-}))
+@connect(
+  ({ user }) => ({
+    userId: user.user.ids.user_id,
+  }),
+  dispatch => ({
+    navigateToApplication: appId => dispatch(push(`/applications/${appId}`)),
+  }),
+)
 @bind
 export default class Add extends React.Component {
-
   state = {
     error: '',
   }
 
-  async handleSubmit (values, { resetForm }) {
+  async handleSubmit(values, { resetForm }) {
     const { userId, navigateToApplication } = this.props
 
     await this.setState({ error: '' })
 
     try {
-      const result = await api.application.create(userId,
-        {
-          ids: { application_id: values.application_id },
-          name: values.name,
-          description: values.description,
-        })
+      const result = await api.application.create(userId, {
+        ids: { application_id: values.application_id },
+        name: values.name,
+        description: values.description,
+      })
 
-      const { ids: { application_id: appId }} = result
+      const {
+        ids: { application_id: appId },
+      } = result
       navigateToApplication(appId)
     } catch (error) {
       const { application_id, name, description } = values
@@ -105,7 +102,7 @@ export default class Add extends React.Component {
     }
   }
 
-  render () {
+  render() {
     const { error } = this.state
     return (
       <Container>
@@ -142,10 +139,7 @@ export default class Add extends React.Component {
                 component={Input}
               />
               <SubmitBar>
-                <Form.Submit
-                  message={m.createApplication}
-                  component={SubmitButton}
-                />
+                <Form.Submit message={m.createApplication} component={SubmitButton} />
               </SubmitBar>
             </Form>
           </Col>

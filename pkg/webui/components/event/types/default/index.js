@@ -20,21 +20,12 @@ import PropTypes from '../../../../lib/prop-types'
 import { getEntityId } from '../../../../lib/selectors/id'
 
 class DefaultEvent extends React.PureComponent {
-
-  render () {
-    const {
-      className,
-      event,
-      widget,
-      overviewClassName,
-      expandedClassName,
-    } = this.props
+  render() {
+    const { className, event, widget, overviewClassName, expandedClassName } = this.props
 
     const entityId = getEntityId(event.identifiers[0])
 
-    const content = (
-      <Message content={{ id: `event:${event.name}` }} />
-    )
+    const content = <Message content={{ id: `event:${event.name}` }} />
 
     return (
       <Event

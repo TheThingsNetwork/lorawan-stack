@@ -31,7 +31,6 @@ const m = defineMessages({
 
 @bind
 class SideNavigation extends Component {
-
   state = {
     /** A flag specifying whether the side navigation is minimized or not */
     isMinimized: false,
@@ -46,14 +45,14 @@ class SideNavigation extends Component {
     itemsExpanded: {},
   }
 
-  onToggle () {
-    this.setState(function (prev) {
+  onToggle() {
+    this.setState(function(prev) {
       return { isMinimized: !prev.isMinimized }
     })
   }
 
-  onItemExpand (index, linkSelected) {
-    this.setState(function (prev) {
+  onItemExpand(index, linkSelected) {
+    this.setState(function(prev) {
       const oldItemsExpanded = prev.itemsExpanded
       const oldMinimized = prev.isMinimized
 
@@ -61,7 +60,7 @@ class SideNavigation extends Component {
       if (linkSelected) {
         const itemsExpanded = Object.keys(oldItemsExpanded)
           .map(idx => +idx)
-          .reduce(function (acc, idx) {
+          .reduce(function(acc, idx) {
             const { isOpen, isLink } = oldItemsExpanded[idx] || {}
             if (index === idx) {
               acc[idx] = { isOpen: true, isLink: true }
@@ -77,10 +76,7 @@ class SideNavigation extends Component {
         return { itemsExpanded }
       }
 
-      const {
-        isOpen = false,
-        isLink = false,
-      } = oldItemsExpanded[index] || {}
+      const { isOpen = false, isLink = false } = oldItemsExpanded[index] || {}
 
       const shouldOpen = oldMinimized || !isOpen
       const shouldLink = isLink || linkSelected
@@ -96,12 +92,8 @@ class SideNavigation extends Component {
     })
   }
 
-  render () {
-    const {
-      className,
-      header,
-      entries,
-    } = this.props
+  render() {
+    const { className, header, entries } = this.props
     const { isMinimized, itemsExpanded } = this.state
 
     const navigationClassNames = classnames(className, style.navigation, {

@@ -27,10 +27,7 @@ import { address as addressRegexp } from '../../lib/regexp'
 import Input from '../../../components/input'
 import CodeEditor from '../../../components/code-editor'
 import TYPES from '../../constants/formatter-types'
-import {
-  getDefaultGrpcServiceFormatter,
-  getDefaultJavascriptFormatter,
-} from './formatter-values'
+import { getDefaultGrpcServiceFormatter, getDefaultJavascriptFormatter } from './formatter-values'
 
 const m = defineMessages({
   grpc: 'GRPC Service',
@@ -48,14 +45,13 @@ const FIELD_NAMES = {
 
 const validationSchema = Yup.object().shape({
   [FIELD_NAMES.RADIO]: Yup.string().oneOf(Object.values(TYPES)),
-  [FIELD_NAMES.JAVASCRIPT]: Yup.string()
-    .when('types-radio', {
-      is: TYPES.JAVASCRIPT,
-      then: Yup.string().required(sharedMessages.validateRequired),
-    }),
+  [FIELD_NAMES.JAVASCRIPT]: Yup.string().when('types-radio', {
+    is: TYPES.JAVASCRIPT,
+    then: Yup.string().required(sharedMessages.validateRequired),
+  }),
   [FIELD_NAMES.GRPC]: Yup.string()
     .matches(addressRegexp, sharedMessages.validateAddressFormat)
-    .when( FIELD_NAMES.RADIO, {
+    .when(FIELD_NAMES.RADIO, {
       is: TYPES.GRPC,
       then: Yup.string().required(sharedMessages.validateRequired),
     }),
@@ -63,8 +59,7 @@ const validationSchema = Yup.object().shape({
 
 @bind
 class PayloadFormattersForm extends React.Component {
-
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.state = {
@@ -73,16 +68,12 @@ class PayloadFormattersForm extends React.Component {
     }
   }
 
-  onTypeChange (type) {
+  onTypeChange(type) {
     this.setState({ type })
   }
 
-  async handleSubmit (values, { resetForm }) {
-    const {
-      onSubmit,
-      onSubmitSuccess,
-      onSubmitFailure,
-    } = this.props
+  async handleSubmit(values, { resetForm }) {
+    const { onSubmit, onSubmitSuccess, onSubmitFailure } = this.props
 
     const {
       [FIELD_NAMES.RADIO]: type,
@@ -96,16 +87,16 @@ class PayloadFormattersForm extends React.Component {
 
     let parameter = ''
     switch (type) {
-    case TYPES.JAVASCRIPT:
-      parameter = javascriptParameter
-      resetValues[FIELD_NAMES.JAVASCRIPT] = javascriptParameter
-      break
-    case TYPES.GRPC:
-      parameter = grpcParameter
-      resetValues[FIELD_NAMES.GRPC] = grpcParameter
-      break
-    default:
-      parameter = undefined
+      case TYPES.JAVASCRIPT:
+        parameter = javascriptParameter
+        resetValues[FIELD_NAMES.JAVASCRIPT] = javascriptParameter
+        break
+      case TYPES.GRPC:
+        parameter = grpcParameter
+        resetValues[FIELD_NAMES.GRPC] = grpcParameter
+        break
+      default:
+        parameter = undefined
     }
 
     try {
@@ -120,7 +111,7 @@ class PayloadFormattersForm extends React.Component {
     }
   }
 
-  get formatter () {
+  get formatter() {
     const { linked } = this.props
 
     if (!linked) {
@@ -130,53 +121,46 @@ class PayloadFormattersForm extends React.Component {
     const { type } = this.state
 
     switch (type) {
-    case TYPES.JAVASCRIPT:
-      return (
-        <Form.Field
-          required
-          component={CodeEditor}
-          horizontal
-          name={FIELD_NAMES.JAVASCRIPT}
-          title={m.formatterParameter}
-          height="10rem"
-          minLines={15}
-          maxLines={15}
-        />
-      )
-    case TYPES.GRPC:
-      return (
-        <Form.Field
-          horizontal
-          required
-          component={Input}
-          title={m.formatterParameter}
-          name={FIELD_NAMES.GRPC}
-          type="text"
-          placeholder={sharedMessages.addressPlaceholder}
-          description={m.grpcDescription}
-        />
-      )
-    default:
-      return null
+      case TYPES.JAVASCRIPT:
+        return (
+          <Form.Field
+            required
+            component={CodeEditor}
+            horizontal
+            name={FIELD_NAMES.JAVASCRIPT}
+            title={m.formatterParameter}
+            height="10rem"
+            minLines={15}
+            maxLines={15}
+          />
+        )
+      case TYPES.GRPC:
+        return (
+          <Form.Field
+            horizontal
+            required
+            component={Input}
+            title={m.formatterParameter}
+            name={FIELD_NAMES.GRPC}
+            type="text"
+            placeholder={sharedMessages.addressPlaceholder}
+            description={m.grpcDescription}
+          />
+        )
+      default:
+        return null
     }
   }
 
-  render () {
-    const {
-      initialType,
-      initialParameter,
-      linked,
-      uplink,
-    } = this.props
+  render() {
+    const { initialType, initialParameter, linked, uplink } = this.props
 
     const initialValues = {
       [FIELD_NAMES.RADIO]: initialType,
-      [FIELD_NAMES.JAVASCRIPT]: initialType === TYPES.JAVASCRIPT
-        ? initialParameter
-        : getDefaultJavascriptFormatter(uplink),
-      [FIELD_NAMES.GRPC]: initialType === TYPES.GRPC
-        ? initialParameter
-        : getDefaultGrpcServiceFormatter(uplink),
+      [FIELD_NAMES.JAVASCRIPT]:
+        initialType === TYPES.JAVASCRIPT ? initialParameter : getDefaultJavascriptFormatter(uplink),
+      [FIELD_NAMES.GRPC]:
+        initialType === TYPES.GRPC ? initialParameter : getDefaultGrpcServiceFormatter(uplink),
     }
 
     return (
@@ -195,33 +179,15 @@ class PayloadFormattersForm extends React.Component {
             component={Radio.Group}
             onChange={this.onTypeChange}
           >
-            <Radio
-              label={sharedMessages.none}
-              value={TYPES.NONE}
-            />
-            <Radio
-              label="Javascript"
-              value={TYPES.JAVASCRIPT}
-            />
-            <Radio
-              label={m.grpc}
-              value={TYPES.GRPC}
-            />
-            <Radio
-              label="CayenneLPP"
-              value={TYPES.CAYENNELPP}
-            />
-            <Radio
-              label={m.repository}
-              value={TYPES.REPOSITORY}
-            />
+            <Radio label={sharedMessages.none} value={TYPES.NONE} />
+            <Radio label="Javascript" value={TYPES.JAVASCRIPT} />
+            <Radio label={m.grpc} value={TYPES.GRPC} />
+            <Radio label="CayenneLPP" value={TYPES.CAYENNELPP} />
+            <Radio label={m.repository} value={TYPES.REPOSITORY} />
           </Form.Field>
           {this.formatter}
           <SubmitBar>
-            <Form.Submit
-              component={SubmitButton}
-              message={sharedMessages.saveChanges}
-            />
+            <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
           </SubmitBar>
         </Form>
       </div>

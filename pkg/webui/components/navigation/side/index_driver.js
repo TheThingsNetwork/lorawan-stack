@@ -17,89 +17,90 @@ import { IntlProvider } from 'react-intl'
 
 import SideNavigation from './side'
 
-export default function () {
+export default function() {
   const driver = {
     component: undefined,
     when: {
-      created (props) {
+      created(props) {
         driver.component = shallow(
           <IntlProvider>
             <SideNavigation {...props} />
-          </IntlProvider>
+          </IntlProvider>,
         ).dive()
 
         return driver
       },
-      minimized () {
+      minimized() {
         driver.get.hideButton().simulate('click')
         driver.component.update()
       },
-      itemSelected (index) {
+      itemSelected(index) {
         driver.get.itemButton(index).simulate('click')
         driver.component.update()
       },
-      linkSelected (index) {
+      linkSelected(index) {
         driver.get.itemLink(index).simulate('click')
         driver.component.update()
       },
-      nestedLinkSelected (itemIndex, linkIndex) {
+      nestedLinkSelected(itemIndex, linkIndex) {
         driver.get.nestedItemLink(itemIndex, linkIndex).simulate('click')
         driver.component.update()
       },
     },
     is: {
-      minimized () {
+      minimized() {
         return driver.component.state().isMinimized
       },
-      expanded (index) {
+      expanded(index) {
         return !!driver.component.state().itemsExpanded[index].isOpen
       },
-      itemExpanded (index) {
+      itemExpanded(index) {
         return driver.get.item(index).props().isExpanded
       },
-      itemActive (index) {
+      itemActive(index) {
         return driver.get.item(index).props().isActive
       },
     },
     get: {
-      list () {
-        return driver.component
-          .find('SideNavigationList')
-          .dive()
+      list() {
+        return driver.component.find('SideNavigationList').dive()
       },
-      nestedList (index) {
-        return driver.get.item(index)
+      nestedList(index) {
+        return driver.get
+          .item(index)
           .dive()
           .find('CollapsableItem')
           .dive()
           .find('SideNavigationList')
       },
-      hideButton () {
-        return driver.component
-          .find('[data-hook="side-nav-hide-button"]')
+      hideButton() {
+        return driver.component.find('[data-hook="side-nav-hide-button"]')
       },
-      items () {
+      items() {
         return driver.get.list().children()
       },
-      item (index) {
+      item(index) {
         return driver.get.items().at(index)
       },
-      itemButton (index) {
-        return driver.get.item(index)
+      itemButton(index) {
+        return driver.get
+          .item(index)
           .dive()
           .find('CollapsableItem')
           .dive()
           .find('[data-hook="side-nav-item-button"]')
       },
-      itemLink (index) {
-        return driver.get.item(index)
+      itemLink(index) {
+        return driver.get
+          .item(index)
           .dive()
           .find('LinkItem')
           .dive()
           .find('[data-hook="side-nav-item-link"]')
       },
-      nestedItemLink (itemIndex, linkIndex) {
-        return driver.get.nestedList(itemIndex)
+      nestedItemLink(itemIndex, linkIndex) {
+        return driver.get
+          .nestedList(itemIndex)
           .dive()
           .find('SideNavigationItem')
           .dive()
@@ -108,18 +109,14 @@ export default function () {
           .dive()
           .find('[data-hook="side-nav-item-link"]')
       },
-      itemsCount () {
+      itemsCount() {
         return driver.get.items().length
       },
-      collapsableItemsCount () {
-        return driver.get.items()
-          .findWhere(i => i.props().isCollapsable)
-          .length
+      collapsableItemsCount() {
+        return driver.get.items().findWhere(i => i.props().isCollapsable).length
       },
-      expandedItemsCount () {
-        return driver.get.items()
-          .findWhere(i => i.props().isExpanded)
-          .length
+      expandedItemsCount() {
+        return driver.get.items().findWhere(i => i.props().isExpanded).length
       },
     },
   }

@@ -29,10 +29,11 @@ const m = defineMessages({
   grantedRights: 'Granted Rights',
 })
 
-const formatRight = function (right) {
-  return right.split('_')
+const formatRight = function(right) {
+  return right
+    .split('_')
     .slice(1)
-    .map(r => r.charAt(0) + r.slice(1).toLowerCase() )
+    .map(r => r.charAt(0) + r.slice(1).toLowerCase())
     .join(' ')
 }
 
@@ -53,34 +54,21 @@ const headers = [
     name: 'rights',
     displayName: m.grantedRights,
     width: 45,
-    render (rights) {
+    render(rights) {
       const tags = rights.map(r => (
-        <Tag
-          className={style.rightTag}
-          content={formatRight(r)}
-          key={r}
-        />
+        <Tag className={style.rightTag} content={formatRight(r)} key={r} />
       ))
 
       return (
-        <TagGroup
-          className={style.rightTagGroup}
-          tagMaxWidth={RIGHT_TAG_MAX_WIDTH}
-          tags={tags}
-        />
+        <TagGroup className={style.rightTagGroup} tagMaxWidth={RIGHT_TAG_MAX_WIDTH} tags={tags} />
       )
     },
   },
 ]
 
 export default class ApiKeysTable extends Component {
-  render () {
-    const {
-      pageSize,
-      baseDataSelector,
-      getItemsAction,
-      entityId,
-    } = this.props
+  render() {
+    const { pageSize, baseDataSelector, getItemsAction, entityId } = this.props
 
     return (
       <FetchTable

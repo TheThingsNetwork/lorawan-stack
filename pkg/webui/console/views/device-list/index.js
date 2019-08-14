@@ -24,13 +24,13 @@ import { selectSelectedApplication } from '../../store/selectors/applications'
 
 import PAGE_SIZES from '../../constants/page-sizes'
 
-@connect(function (state, props) {
+@connect(function(state, props) {
   return {
     application: selectSelectedApplication(state),
   }
 })
 class ApplicationDeviceList extends React.Component {
-  render () {
+  render() {
     return (
       <Container>
         <Row>

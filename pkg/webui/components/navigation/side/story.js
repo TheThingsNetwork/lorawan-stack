@@ -19,13 +19,15 @@ import { withInfo } from '@storybook/addon-info'
 import SideNavigation from '../side/side'
 
 storiesOf('Navigation', module)
-  .addDecorator((story, context) => withInfo({
-    inline: true,
-    header: false,
-    source: false,
-    propTables: [ SideNavigation ],
-  })(story)(context))
-  .add('SideNavigation', function () {
+  .addDecorator((story, context) =>
+    withInfo({
+      inline: true,
+      header: false,
+      source: false,
+      propTables: [SideNavigation],
+    })(story)(context),
+  )
+  .add('SideNavigation', function() {
     const header = {
       title: 'test-application',
       icon: 'application',
@@ -74,7 +76,8 @@ storiesOf('Navigation', module)
         <SideNavigation entries={entries} header={header} />
       </div>
     )
-  }).add('SideNavigation (Nested)', function () {
+  })
+  .add('SideNavigation (Nested)', function() {
     const header = {
       title: 'test-application',
       icon: 'application',
@@ -95,10 +98,7 @@ storiesOf('Navigation', module)
         title: 'Data',
         icon: 'data',
         nested: true,
-        items: [
-          { title: 'List', path: '/data/list' },
-          { title: 'Map', path: '/data/map' },
-        ],
+        items: [{ title: 'List', path: '/data/list' }, { title: 'Map', path: '/data/map' }],
       },
       {
         title: 'Payload Formats',

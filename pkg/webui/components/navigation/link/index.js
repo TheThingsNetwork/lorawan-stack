@@ -22,7 +22,7 @@ import Link from '../../link'
 import PropTypes from '../../../lib/prop-types'
 import style from './link.styl'
 
-const NavigationLink = function ({
+const NavigationLink = function({
   className,
   children,
   path,
@@ -45,12 +45,7 @@ const NavigationLink = function ({
   )
 }
 
-const NavigationAnchorLink = function ({
-  className,
-  children,
-  path,
-  ...rest
-}) {
+const NavigationAnchorLink = function({ className, children, path, ...rest }) {
   return (
     <Link.BaseAnchor
       href={path}

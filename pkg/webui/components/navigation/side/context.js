@@ -24,15 +24,15 @@ class SideNavigationProvider extends React.Component {
     entries: undefined,
   }
 
-  set (entries, header) {
+  set(entries, header) {
     this.setState({ header, entries })
   }
 
-  remove () {
+  remove() {
     this.setState({ entries: undefined, header: undefined })
   }
 
-  render () {
+  render() {
     const { children } = this.props
     const { header, entries } = this.state
     const value = {
@@ -42,54 +42,43 @@ class SideNavigationProvider extends React.Component {
       entries,
     }
 
-    return (
-      <Provider value={value}>
-        {children}
-      </Provider>
-    )
+    return <Provider value={value}>{children}</Provider>
   }
 }
 
-const withSideNavigation = selectData => function (Component) {
+const withSideNavigation = selectData =>
+  function(Component) {
+    @bind
+    class WithSideNavigation extends React.Component {
+      constructor(props) {
+        super(props)
 
-  @bind
-  class WithSideNavigation extends React.Component {
+        const { set } = props
+        const { header, entries } = selectData(props)
 
-    constructor (props) {
-      super(props)
-
-      const { set } = props
-      const { header, entries } = selectData(props)
-
-      set(entries, header)
-    }
-
-    componentWillUnmount () {
-      const { remove } = this.props
-
-      remove()
-    }
-
-    render () {
-      const { set, remove, ...rest } = this.props
-
-      return (
-        <Component {...rest} />
-      )
-    }
-  }
-
-  const withSideNavigationWrapper = props => (
-    <Consumer>
-      {
-        ({ set, remove }) => (
-          <WithSideNavigation {...props} set={set} remove={remove} />
-        )
+        set(entries, header)
       }
-    </Consumer>
-  )
 
-  return withSideNavigationWrapper
-}
+      componentWillUnmount() {
+        const { remove } = this.props
+
+        remove()
+      }
+
+      render() {
+        const { set, remove, ...rest } = this.props
+
+        return <Component {...rest} />
+      }
+    }
+
+    const withSideNavigationWrapper = props => (
+      <Consumer>
+        {({ set, remove }) => <WithSideNavigation {...props} set={set} remove={remove} />}
+      </Consumer>
+    )
+
+    return withSideNavigationWrapper
+  }
 
 export { Consumer as SideNavigationConsumer, SideNavigationProvider, withSideNavigation }

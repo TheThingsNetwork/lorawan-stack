@@ -16,23 +16,21 @@ import React from 'react'
 
 import SideNavigationItem from '.'
 
-export default function () {
+export default function() {
   const driver = {
     component: undefined,
     when: {
-      created (props) {
-        driver.component = shallow(
-          <SideNavigationItem {...props} />
-        )
+      created(props) {
+        driver.component = shallow(<SideNavigationItem {...props} />)
 
         return driver
       },
-      itemSelected () {
+      itemSelected() {
         driver.get.button().simulate('click')
       },
     },
     get: {
-      button () {
+      button() {
         return driver.component
           .find('CollapsableItem')
           .dive()

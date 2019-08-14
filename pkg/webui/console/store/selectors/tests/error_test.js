@@ -14,71 +14,68 @@
 
 import { createErrorSelector } from '../error'
 
-describe('error selectors', function () {
+describe('error selectors', function() {
   const BASE_ACTION_TYPE = 'BASE_ACTION'
   let initialState = null
 
-  describe('created with a single base action type', function () {
+  describe('created with a single base action type', function() {
     const selector = createErrorSelector(BASE_ACTION_TYPE)
 
-    beforeAll(function () {
-      initialState = { ui: { error: {}}}
+    beforeAll(function() {
+      initialState = { ui: { error: {} } }
     })
 
-    describe('has no errors', function () {
-      it('should return `undefined`', function () {
+    describe('has no errors', function() {
+      it('should return `undefined`', function() {
         expect(selector(initialState)).toBeUndefined()
       })
     })
 
-    describe('has error', function () {
+    describe('has error', function() {
       const error = { status: 404 }
 
-      beforeAll(function () {
+      beforeAll(function() {
         initialState.ui.error[BASE_ACTION_TYPE] = error
       })
 
-      it('should return the error object', function () {
+      it('should return the error object', function() {
         expect(selector(initialState)).toEqual(error)
       })
     })
   })
 
-  describe('created with two base action types', function () {
+  describe('created with two base action types', function() {
     const BASE_ACTION_TYPE_OTHER = 'BASE_ACTION_OTHER'
-    const selector = createErrorSelector([
-      BASE_ACTION_TYPE,
-      BASE_ACTION_TYPE_OTHER,
-    ])
+    const selector = createErrorSelector([BASE_ACTION_TYPE, BASE_ACTION_TYPE_OTHER])
 
-    beforeAll(function () {
-      initialState = { ui: { error: {}}}
+    beforeAll(function() {
+      initialState = { ui: { error: {} } }
     })
 
-    describe('has no errors', function () {
-      it('should return `undefined`', function () {
+    describe('has no errors', function() {
+      it('should return `undefined`', function() {
         expect(selector(initialState)).toBeUndefined()
       })
     })
 
-    describe('has error', function () {
+    describe('has error', function() {
       const not_found = { status: 404 }
       const forbidden = { status: 403 }
 
-      beforeAll(function () {
+      beforeAll(function() {
         initialState.ui.error[BASE_ACTION_TYPE] = not_found
       })
 
-      it('should return the error object', function () {
+      it('should return the error object', function() {
         expect(selector(initialState)).toEqual(not_found)
       })
 
-      describe('has two errors', function () {
-        beforeAll(function () {
+      describe('has two errors', function() {
+        beforeAll(function() {
           initialState.ui.error[BASE_ACTION_TYPE_OTHER] = forbidden
         })
 
-        it('should return the first error object', function () {
+        it('should return the first error object', function() {
           expect(selector(initialState)).toEqual(not_found)
         })
       })

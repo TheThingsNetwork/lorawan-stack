@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 import { createLogic } from 'redux-logic'
 import * as user from '../../actions/user'
 import { isUnauthenticatedError } from '../../../../lib/errors/utils'
 
-const getResultActionFromType = function (typeString, status) {
+const getResultActionFromType = function(typeString, status) {
   if (typeString instanceof Array) {
     if (typeString.length === 1) {
       return typeString[0].replace('REQUEST', status)
@@ -36,12 +35,11 @@ const getResultActionFromType = function (typeString, status) {
  * @param {(string\|function)} failType - The fail action type or action creator
  * @returns {Object} The `redux-logic` (decorated) logic
  */
-const createRequestLogic = function (
+const createRequestLogic = function(
   options,
   successType = getResultActionFromType(options.type, 'SUCCESS'),
   failType = getResultActionFromType(options.type, 'FAILURE'),
 ) {
-
   if (!successType || !failType) {
     throw new Error('Could not derive result actions from provided options')
   }
@@ -58,7 +56,7 @@ const createRequestLogic = function (
 
   return createLogic({
     ...options,
-    async process (deps, dispatch, done) {
+    async process(deps, dispatch, done) {
       const promiseAttached = deps.action.meta && deps.action.meta._attachPromise
 
       try {
@@ -69,7 +67,9 @@ const createRequestLogic = function (
 
         // If we have a promise attached, resolve it
         if (promiseAttached) {
-          const { meta: { _resolve }} = deps.action
+          const {
+            meta: { _resolve },
+          } = deps.action
           _resolve(res)
         }
       } catch (e) {
@@ -83,7 +83,9 @@ const createRequestLogic = function (
 
         // If we have a promise attached, reject it
         if (promiseAttached) {
-          const { meta: { _reject }} = deps.action
+          const {
+            meta: { _reject },
+          } = deps.action
           _reject(e)
         }
       }

@@ -20,48 +20,25 @@ import List from '.'
 
 @bind
 class DefaultList extends React.Component {
-
-  renderItem (item, index) {
-    return (
-      <List.Item key={index}>
-        {item}
-      </List.Item>
-    )
+  renderItem(item, index) {
+    return <List.Item key={index}>{item}</List.Item>
   }
 
-  render () {
+  render() {
     const { listProps } = this.props
-    return (
-      <List
-        {...listProps}
-        renderItem={this.renderItem}
-      />
-    )
+    return <List {...listProps} renderItem={this.renderItem} />
   }
 }
 
-const simpleItems = [ ...new Array(100).keys() ]
-  .map(i => `List item nr. ${i}`)
+const simpleItems = [...new Array(100).keys()].map(i => `List item nr. ${i}`)
 
 storiesOf('List', module)
-  .add('Default', function () {
-    return (
-      <DefaultList
-        listProps={{ items: simpleItems }}
-      />
-    )
+  .add('Default', function() {
+    return <DefaultList listProps={{ items: simpleItems }} />
   })
-  .add('Small', function () {
-    return (
-      <DefaultList
-        listProps={{ items: simpleItems, size: 'small' }}
-      />
-    )
+  .add('Small', function() {
+    return <DefaultList listProps={{ items: simpleItems, size: 'small' }} />
   })
-  .add('Large', function () {
-    return (
-      <DefaultList
-        listProps={{ items: simpleItems, size: 'large' }}
-      />
-    )
+  .add('Large', function() {
+    return <DefaultList listProps={{ items: simpleItems, size: 'large' }} />
   })

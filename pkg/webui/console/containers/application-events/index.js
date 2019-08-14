@@ -19,9 +19,7 @@ import bind from 'autobind-decorator'
 import PropTypes from '../../../lib/prop-types'
 import EventsSubscription from '../../containers/events-subscription'
 
-import {
-  clearApplicationEventsStream,
-} from '../../store/actions/applications'
+import { clearApplicationEventsStream } from '../../store/actions/applications'
 
 import {
   selectApplicationEvents,
@@ -33,10 +31,10 @@ import {
   null,
   (dispatch, ownProps) => ({
     onClear: () => dispatch(clearApplicationEventsStream(ownProps.appId)),
-  }))
+  }),
+)
 @bind
 export default class ApplicationEvents extends React.Component {
-
   static propTypes = {
     appId: PropTypes.string.isRequired,
     onClear: PropTypes.func.isRequired,
@@ -47,12 +45,8 @@ export default class ApplicationEvents extends React.Component {
     widget: false,
   }
 
-  render () {
-    const {
-      appId,
-      widget,
-      onClear,
-    } = this.props
+  render() {
+    const { appId, widget, onClear } = this.props
 
     return (
       <EventsSubscription

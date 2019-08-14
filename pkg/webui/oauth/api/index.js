@@ -26,18 +26,18 @@ const instance = axios.create({
 
 export default {
   users: {
-    async register (userData) {
+    async register(userData) {
       return axios.post(`/api/v3/users`, userData)
     },
   },
   oauth: {
-    login (credentials) {
+    login(credentials) {
       return instance.post(`${appRoot}/api/auth/login`, credentials)
     },
-    logout () {
+    logout() {
       return instance.post(`${appRoot}/api/auth/logout`)
     },
-    me () {
+    me() {
       return instance.get(`${appRoot}/api/me`)
     },
   },

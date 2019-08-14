@@ -14,32 +14,29 @@
 
 import { createRequestActions } from './lib'
 
-export const createPaginationBaseActionType = name => (
-  `GET_${name}_LIST`
-)
+export const createPaginationBaseActionType = name => `GET_${name}_LIST`
 
-export const createPaginationDeleteBaseActionType = name => (
-  `DELETE_${name}`
-)
+export const createPaginationDeleteBaseActionType = name => `DELETE_${name}`
 
-export const createPaginationByIdRequestActions = name => createRequestActions(
-  createPaginationBaseActionType(name),
-  (id, { page, limit, query } = {}) => ({ id, params: { page, limit, query }}),
-  (id, params, selectors = []) => ({ selectors })
-)
+export const createPaginationByIdRequestActions = name =>
+  createRequestActions(
+    createPaginationBaseActionType(name),
+    (id, { page, limit, query } = {}) => ({ id, params: { page, limit, query } }),
+    (id, params, selectors = []) => ({ selectors }),
+  )
 
-export const createPaginationRequestActions = name => createRequestActions(
-  createPaginationBaseActionType(name),
-  ({ page, limit, query } = {}) => ({ params: { page, limit, query }}),
-  (params, selectors) => ({ selectors })
-)
+export const createPaginationRequestActions = name =>
+  createRequestActions(
+    createPaginationBaseActionType(name),
+    ({ page, limit, query } = {}) => ({ params: { page, limit, query } }),
+    (params, selectors) => ({ selectors }),
+  )
 
-export const createPaginationDeleteActions = name => createRequestActions(
-  createPaginationDeleteBaseActionType(name),
-  id => ({ id })
-)
+export const createPaginationDeleteActions = name =>
+  createRequestActions(createPaginationDeleteBaseActionType(name), id => ({ id }))
 
-export const createPaginationByIdDeleteActions = name => createRequestActions(
-  createPaginationDeleteBaseActionType(name),
-  (id, targetId) => ({ id, targetId }),
-)
+export const createPaginationByIdDeleteActions = name =>
+  createRequestActions(createPaginationDeleteBaseActionType(name), (id, targetId) => ({
+    id,
+    targetId,
+  }))

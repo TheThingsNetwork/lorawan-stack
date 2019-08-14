@@ -25,8 +25,8 @@ const defaultProps = {
   stats: undefined,
 }
 
-const getLinkSuccess = function (state, { payload }) {
-  const { linked, stats, link = {}} = payload
+const getLinkSuccess = function(state, { payload }) {
+  const { linked, stats, link = {} } = payload
 
   return {
     ...state,
@@ -36,7 +36,7 @@ const getLinkSuccess = function (state, { payload }) {
   }
 }
 
-const getLinkFailure = function (state) {
+const getLinkFailure = function(state) {
   return {
     ...state,
     link: {},
@@ -45,7 +45,7 @@ const getLinkFailure = function (state) {
   }
 }
 
-const updateLinkSuccess = function (state, { link, stats }) {
+const updateLinkSuccess = function(state, { link, stats }) {
   const newLink = { ...state.link, ...link }
   const newStats = { ...state.stats, ...stats }
 
@@ -57,7 +57,7 @@ const updateLinkSuccess = function (state, { link, stats }) {
   }
 }
 
-const deleteLinkSuccess = function (state) {
+const deleteLinkSuccess = function(state) {
   return {
     ...state,
     linked: false,
@@ -66,18 +66,18 @@ const deleteLinkSuccess = function (state) {
   }
 }
 
-const link = function (state = defaultProps, action) {
+const link = function(state = defaultProps, action) {
   switch (action.type) {
-  case GET_APP_LINK_SUCCESS:
-    return getLinkSuccess(state, action)
-  case UPDATE_APP_LINK_SUCCESS:
-    return updateLinkSuccess(state, action)
-  case DELETE_APP_LINK_SUCCESS:
-    return deleteLinkSuccess(state)
-  case GET_APP_LINK_FAILURE:
-    return getLinkFailure(state, action)
-  default:
-    return state
+    case GET_APP_LINK_SUCCESS:
+      return getLinkSuccess(state, action)
+    case UPDATE_APP_LINK_SUCCESS:
+      return updateLinkSuccess(state, action)
+    case DELETE_APP_LINK_SUCCESS:
+      return deleteLinkSuccess(state)
+    case GET_APP_LINK_FAILURE:
+      return getLinkFailure(state, action)
+    default:
+      return state
   }
 }
 

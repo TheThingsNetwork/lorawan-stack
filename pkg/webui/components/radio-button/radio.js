@@ -24,16 +24,15 @@ import style from './radio-button.styl'
 
 @bind
 class RadioButton extends React.PureComponent {
-
   static contextType = RadioGroupContext
 
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.input = React.createRef()
   }
 
-  handleChange (event) {
+  handleChange(event) {
     const { onChange } = this.props
 
     if (this.context) {
@@ -44,19 +43,19 @@ class RadioButton extends React.PureComponent {
     onChange(event)
   }
 
-  focus () {
+  focus() {
     if (this.input && this.input.current) {
       this.input.current.focus()
     }
   }
 
-  blur () {
+  blur() {
     if (this.input && this.input.current) {
       this.input.current.blur()
     }
   }
 
-  render () {
+  render() {
     const {
       className,
       name,

@@ -21,7 +21,7 @@ import {
   DELETE_APP_SUCCESS,
 } from '../actions/applications'
 
-const application = function (state = {}, application) {
+const application = function(state = {}, application) {
   return {
     ...state,
     ...application,
@@ -33,45 +33,48 @@ const defaultState = {
   selectedApplication: null,
 }
 
-const applications = function (state = defaultState, { type, payload }) {
+const applications = function(state = defaultState, { type, payload }) {
   switch (type) {
-  case GET_APP:
-    return {
-      ...state,
-      selectedApplication: payload.id,
-    }
-  case GET_APPS_LIST_SUCCESS:
-    const entities = payload.entities.reduce(function (acc, app) {
-      const id = getApplicationId(app)
+    case GET_APP:
+      return {
+        ...state,
+        selectedApplication: payload.id,
+      }
+    case GET_APPS_LIST_SUCCESS:
+      const entities = payload.entities.reduce(
+        function(acc, app) {
+          const id = getApplicationId(app)
 
-      acc[id] = application(acc[id], app)
-      return acc
-    }, { ...state.entities })
+          acc[id] = application(acc[id], app)
+          return acc
+        },
+        { ...state.entities },
+      )
 
-    return {
-      ...state,
-      entities,
-    }
-  case GET_APP_SUCCESS:
-  case UPDATE_APP_SUCCESS:
-    const id = getApplicationId(payload)
+      return {
+        ...state,
+        entities,
+      }
+    case GET_APP_SUCCESS:
+    case UPDATE_APP_SUCCESS:
+      const id = getApplicationId(payload)
 
-    return {
-      ...state,
-      entities: {
-        ...state.entities,
-        [id]: application(state.entities[id], payload),
-      },
-    }
-  case DELETE_APP_SUCCESS:
-    const { [payload.id]: deleted, ...rest } = state.entities
+      return {
+        ...state,
+        entities: {
+          ...state.entities,
+          [id]: application(state.entities[id], payload),
+        },
+      }
+    case DELETE_APP_SUCCESS:
+      const { [payload.id]: deleted, ...rest } = state.entities
 
-    return {
-      selectedApplication: null,
-      entities: rest,
-    }
-  default:
-    return state
+      return {
+        selectedApplication: null,
+        entities: rest,
+      }
+    default:
+      return state
   }
 }
 

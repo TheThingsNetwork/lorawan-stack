@@ -21,14 +21,8 @@ import RelativeTime from './relative'
 
 @bind
 class DateTime extends React.PureComponent {
-
-  renderDateTime (formattedDate, formattedTime, dateValue) {
-    const {
-      className,
-      children,
-      date,
-      time,
-    } = this.props
+  renderDateTime(formattedDate, formattedTime, dateValue) {
+    const { className, children, date, time } = this.props
 
     let result = ''
     if (date) {
@@ -44,24 +38,14 @@ class DateTime extends React.PureComponent {
     }
 
     return (
-      <time
-        className={className}
-        dateTime={dateValue.toISOString()}
-        title={result}
-      >
+      <time className={className} dateTime={dateValue.toISOString()} title={result}>
         {children ? children(result) : result}
       </time>
     )
   }
 
-  render () {
-    const {
-      value,
-      dateFormatOptions,
-      timeFormatOptions,
-      dateFormat,
-      timeFormat,
-    } = this.props
+  render() {
+    const { value, dateFormatOptions, timeFormatOptions, dateFormat, timeFormat } = this.props
 
     let dateValue = value
     if (!(value instanceof Date)) {
@@ -69,17 +53,9 @@ class DateTime extends React.PureComponent {
     }
 
     return (
-      <FormattedDate
-        value={dateValue}
-        format={dateFormat}
-        {...dateFormatOptions}
-      >
+      <FormattedDate value={dateValue} format={dateFormat} {...dateFormatOptions}>
         {date => (
-          <FormattedTime
-            value={dateValue}
-            format={timeFormat}
-            {...timeFormatOptions}
-          >
+          <FormattedTime value={dateValue} format={timeFormat} {...timeFormatOptions}>
             {time => this.renderDateTime(date, time, dateValue)}
           </FormattedTime>
         )}

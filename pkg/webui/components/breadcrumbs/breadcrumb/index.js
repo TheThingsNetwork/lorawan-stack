@@ -22,13 +22,7 @@ import PropTypes from '../../../lib/prop-types'
 
 import style from './breadcrumb.styl'
 
-const Breadcrumb = function ({
-  className,
-  path,
-  content,
-  icon = null,
-  isLast = false,
-}) {
+const Breadcrumb = function({ className, path, content, icon = null, isLast = false }) {
   const isRawText = typeof content === 'string' || typeof content === 'number'
   let Component
   let componentProps

@@ -20,28 +20,20 @@ import PropTypes from '../../../lib/prop-types'
 import { getApplicationId, getDeviceId } from '../../../lib/selectors/id'
 import EventsSubscription from '../../containers/events-subscription'
 
-import {
-  clearDeviceEventsStream,
-} from '../../store/actions/device'
+import { clearDeviceEventsStream } from '../../store/actions/device'
 
-import {
-  selectDeviceEvents,
-  selectDeviceEventsStatus,
-} from '../../store/selectors/device'
+import { selectDeviceEvents, selectDeviceEventsStatus } from '../../store/selectors/device'
 
 @connect(
   null,
   (dispatch, ownProps) => ({
     onClear: () => dispatch(clearDeviceEventsStream(ownProps.devIds)),
-  }))
+  }),
+)
 @bind
 class DeviceEvents extends React.Component {
-  render () {
-    const {
-      devIds,
-      widget,
-      onClear,
-    } = this.props
+  render() {
+    const { devIds, widget, onClear } = this.props
 
     const devId = getDeviceId(devIds)
     const appId = getApplicationId(devIds)

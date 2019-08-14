@@ -34,7 +34,7 @@ const headers = [
   {
     name: 'isUser',
     displayName: sharedMessages.type,
-    render (isUser) {
+    render(isUser) {
       const icon = isUser ? 'user' : 'organization'
 
       return (
@@ -48,12 +48,10 @@ const headers = [
   {
     name: 'rights',
     displayName: sharedMessages.rights,
-    render (rights) {
+    render(rights) {
       for (let i = 0; i < rights.length; i++) {
         if (rights[i].includes('_ALL')) {
-          return (
-            <Message content={sharedMessages.all} />
-          )
+          return <Message content={sharedMessages.all} />
         }
       }
 
@@ -63,12 +61,11 @@ const headers = [
 ]
 
 export default class CollaboratorsTable extends Component {
-
-  getCollaboratorPathPrefix (collaborator) {
+  getCollaboratorPathPrefix(collaborator) {
     return `/${collaborator.isUser ? 'user' : 'organization'}/${collaborator.id}`
   }
 
-  render () {
+  render() {
     return (
       <FetchTable
         entity="collaborators"

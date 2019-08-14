@@ -23,7 +23,7 @@ const m = defineMessages({
   generate: 'Generate Device Address',
 })
 
-const DevAddrInput = function (props) {
+const DevAddrInput = function(props) {
   const {
     className,
     name,
@@ -40,23 +40,29 @@ const DevAddrInput = function (props) {
     generatedDevAddr,
   } = props
 
-  React.useEffect(function () {
-    if (Boolean(generatedDevAddr)) {
-      onChange(generatedDevAddr)
-      onBlur({ target: { value: generatedDevAddr }})
-    }
-  }, [ generatedDevAddr, onChange, onBlur ])
+  React.useEffect(
+    function() {
+      if (Boolean(generatedDevAddr)) {
+        onChange(generatedDevAddr)
+        onBlur({ target: { value: generatedDevAddr } })
+      }
+    },
+    [generatedDevAddr, onChange, onBlur],
+  )
 
-  const action = React.useMemo(function () {
-    return {
-      icon: 'autorenew',
-      title: m.generate,
-      type: 'button',
-      disabled: fetching || disabled,
-      onClick: onDevAddrGenerate,
-      raw: true,
-    }
-  }, [ disabled, fetching, onDevAddrGenerate ])
+  const action = React.useMemo(
+    function() {
+      return {
+        icon: 'autorenew',
+        title: m.generate,
+        type: 'button',
+        disabled: fetching || disabled,
+        onClick: onDevAddrGenerate,
+        raw: true,
+      }
+    },
+    [disabled, fetching, onDevAddrGenerate],
+  )
 
   return (
     <Input

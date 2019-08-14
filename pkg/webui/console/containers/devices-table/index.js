@@ -37,30 +37,30 @@ const headers = [
   {
     name: 'created_at',
     displayName: sharedMessages.created,
-    render (datetime) {
+    render(datetime) {
       return <DateTime.Relative value={datetime} />
     },
   },
 ]
 
-@connect(function (state) {
+@connect(function(state) {
   return {
     appId: selectSelectedApplicationId(state),
   }
 })
 @bind
 class DevicesTable extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
 
-    this.getDevicesList = filters => getDevicesList(props.appId, filters, [ 'name' ])
+    this.getDevicesList = filters => getDevicesList(props.appId, filters, ['name'])
   }
 
-  baseDataSelector ({ devices }) {
+  baseDataSelector({ devices }) {
     return devices
   }
 
-  render () {
+  render() {
     const { devicePathPrefix } = this.props
     return (
       <FetchTable

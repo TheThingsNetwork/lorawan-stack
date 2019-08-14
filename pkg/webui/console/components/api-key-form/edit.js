@@ -40,19 +40,18 @@ const m = defineMessages({
 
 @bind
 class EditForm extends React.Component {
-
   state = {
     error: null,
   }
 
-  async handleEdit (values) {
+  async handleEdit(values) {
     const { name, rights } = values
     const { onEdit } = this.props
 
     return await onEdit({ name, rights })
   }
 
-  async handleEditSuccess (key) {
+  async handleEditSuccess(key) {
     const { onEditSuccess } = this.props
 
     toast({
@@ -62,11 +61,8 @@ class EditForm extends React.Component {
     await onEditSuccess(key)
   }
 
-  async handleDelete () {
-    const {
-      onDelete,
-      apiKey,
-    } = this.props
+  async handleDelete() {
+    const { onDelete, apiKey } = this.props
 
     await this.setState({ error: null })
 
@@ -78,7 +74,7 @@ class EditForm extends React.Component {
     }
   }
 
-  async handleDeleteSuccess (id) {
+  async handleDeleteSuccess(id) {
     const { onDeleteSuccess } = this.props
 
     toast({
@@ -88,20 +84,15 @@ class EditForm extends React.Component {
     await onDeleteSuccess(id)
   }
 
-  async handleDeleteFailure (error) {
+  async handleDeleteFailure(error) {
     const { onDeleteFailure } = this.props
 
     await this.setState({ error })
     await onDeleteFailure(error)
   }
 
-  render () {
-    const {
-      rights,
-      apiKey,
-      onEditFailure,
-      universalRights,
-    } = this.props
+  render() {
+    const { rights, apiKey, onEditFailure, universalRights } = this.props
     const { error } = this.state
 
     const initialValues = {
@@ -119,10 +110,7 @@ class EditForm extends React.Component {
         onSubmitSuccess={this.handleEditSuccess}
         onSubmitFailure={onEditFailure}
       >
-        <Message
-          component="h4"
-          content={sharedMessages.generalInformation}
-        />
+        <Message component="h4" content={sharedMessages.generalInformation} />
         <FormField
           title={sharedMessages.keyId}
           name="id"
@@ -131,11 +119,7 @@ class EditForm extends React.Component {
           disabled
           component={Input}
         />
-        <FormField
-          title={sharedMessages.name}
-          name="name"
-          component={Input}
-        />
+        <FormField title={sharedMessages.name} name="name" component={Input} />
         <FormField
           name="rights"
           title={sharedMessages.rights}
@@ -145,10 +129,7 @@ class EditForm extends React.Component {
           universalRight={universalRights[0]}
         />
         <SubmitBar>
-          <FormSubmit
-            component={SubmitButton}
-            message={sharedMessages.saveChanges}
-          />
+          <FormSubmit component={SubmitButton} message={sharedMessages.saveChanges} />
           <ModalButton
             type="button"
             icon="delete"

@@ -22,20 +22,11 @@ import PropTypes from '../../../lib/prop-types'
 
 import style from './bar.styl'
 
-const NavigationBar = function ({
-  className,
-  entries,
-  anchored,
-}) {
+const NavigationBar = function({ className, entries, anchored }) {
   return (
     <nav className={classnames(className, style.bar)}>
-      {entries.map(function (entry, index) {
-        const {
-          path,
-          title,
-          icon = null,
-          exact = false,
-        } = entry
+      {entries.map(function(entry, index) {
+        const { path, title, icon = null, exact = false } = entry
 
         const Component = anchored ? NavigationAnchorLink : NavigationLink
 

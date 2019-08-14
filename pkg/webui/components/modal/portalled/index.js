@@ -26,7 +26,7 @@ import Modal from '../'
  *
  * @returns {Object} - The modal rendered into a portal.
  */
-const PortalledModal = function ({ dispatch, modal, visible, ...rest }) {
+const PortalledModal = function({ dispatch, modal, visible, ...rest }) {
   if (!modal) {
     return null
   }
@@ -35,7 +35,7 @@ const PortalledModal = function ({ dispatch, modal, visible, ...rest }) {
 
   return DOM.createPortal(
     visible && <Modal {...props} />,
-    document.getElementById('modal-container')
+    document.getElementById('modal-container'),
   )
 }
 

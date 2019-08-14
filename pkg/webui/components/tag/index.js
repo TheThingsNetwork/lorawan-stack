@@ -17,14 +17,10 @@ import classnames from 'classnames'
 
 import style from './tag.styl'
 
-const Tag = function (props) {
+const Tag = function(props) {
   const { content, className } = props
 
-  return (
-    <div className={classnames(className, style.tag)}>
-      {content}
-    </div>
-  )
+  return <div className={classnames(className, style.tag)}>{content}</div>
 }
 
 export default Tag

@@ -34,50 +34,39 @@ const m = defineMessages({
 
 @bind
 class Event extends React.PureComponent {
-
   state = {
     expanded: false,
   }
 
-  handleEventExpand () {
+  handleEventExpand() {
     this.setState(prev => ({
       expanded: !prev.expanded,
     }))
   }
 
-  get overview () {
-    const {
-      icon,
-      time,
-      emitter,
-      content,
-      data,
-      widget,
-      overviewClassName,
-    } = this.props
+  get overview() {
+    const { icon, time, emitter, content, data, widget, overviewClassName } = this.props
     const { expanded } = this.state
 
-    const eventIcon = React.isValidElement(icon)
-      ? React.cloneElement(icon, {
+    const eventIcon = React.isValidElement(icon) ? (
+      React.cloneElement(icon, {
         ...icon.props,
         className: classnames(style.overviewIcon, icon.props.className, {
           [style.overviewIconDefault]: !icon.props.className,
         }),
       })
-      : (
-        <Icon
-          className={classnames(style.overviewIcon, style.overviewIconDefault)}
-          icon={icon}
-        />
-      )
+    ) : (
+      <Icon className={classnames(style.overviewIcon, style.overviewIconDefault)} icon={icon} />
+    )
 
-    const eventContent = React.isValidElement(content)
-      ? React.cloneElement(content, {
+    const eventContent = React.isValidElement(content) ? (
+      React.cloneElement(content, {
         ...content.props,
         className: classnames(style.overviewContent, content.props.className),
       })
-      : <div className={style.overviewContent}>{content}</div>
-
+    ) : (
+      <div className={style.overviewContent}>{content}</div>
+    )
 
     const expandable = !widget && data
 
@@ -86,12 +75,7 @@ class Event extends React.PureComponent {
     if (expandable) {
       expandProps = { role: 'button', onClick: this.handleEventExpand }
       const iconCls = classnames(style.overviewIcon, style.overviewIconExpand)
-      expandIcon = (
-        <Icon
-          className={iconCls}
-          icon={expanded ? 'expand_less' : 'expand_more'}
-        />
-      )
+      expandIcon = <Icon className={iconCls} icon={expanded ? 'expand_less' : 'expand_more'} />
     }
 
     const cls = classnames(style.overview, overviewClassName, {
@@ -99,16 +83,9 @@ class Event extends React.PureComponent {
     })
 
     return (
-      <div
-        className={cls}
-        {...expandProps}
-      >
+      <div className={cls} {...expandProps}>
         {eventIcon}
-        <DateTime
-          className={style.overviewTime}
-          value={time}
-          date={false}
-        />
+        <DateTime className={style.overviewTime} value={time} date={false} />
         <span className={style.overviewEmitter}>{emitter}</span>
         {eventContent}
         {expandIcon}
@@ -116,17 +93,9 @@ class Event extends React.PureComponent {
     )
   }
 
-  get expanded () {
-    const {
-      data,
-      widget,
-      emitter,
-      time,
-      expandedClassName,
-    } = this.props
-    const {
-      expanded,
-    } = this.state
+  get expanded() {
+    const { data, widget, emitter, time, expandedClassName } = this.props
+    const { expanded } = this.state
 
     if (widget || !data || !expanded) {
       return null
@@ -137,20 +106,13 @@ class Event extends React.PureComponent {
     return (
       <div className={expandedClassName}>
         <Message content={m.eventData} component="h4" />
-        <CodeEditor
-          readOnly
-          name={`${emitter}-${time}`}
-          language="json"
-          value={formattedData}
-        />
+        <CodeEditor readOnly name={`${emitter}-${time}`} language="json" value={formattedData} />
       </div>
     )
   }
 
-  render () {
-    const {
-      className,
-    } = this.props
+  render() {
+    const { className } = this.props
 
     return (
       <div className={className}>
@@ -163,11 +125,8 @@ class Event extends React.PureComponent {
 
 Event.propTypes = {
   /** The time of the event. */
-  time: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.number,
-    PropTypes.instanceOf(Date),
-  ]).isRequired,
+  time: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.instanceOf(Date)])
+    .isRequired,
   /** The icon of the event. */
   icon: PropTypes.node,
   /** The entity identifier of the event. */

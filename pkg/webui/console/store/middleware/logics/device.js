@@ -19,30 +19,34 @@ import createRequestLogic from './lib'
 
 const getDeviceLogic = createRequestLogic({
   type: device.GET_DEV,
-  async process ({ action }, dispatch) {
-    const { payload: { appId, deviceId }, meta: { selector, options }} = action
+  async process({ action }, dispatch) {
+    const {
+      payload: { appId, deviceId },
+      meta: { selector, options },
+    } = action
     const dev = await api.device.get(appId, deviceId, selector, options)
     dispatch(device.startDeviceEventsStream(dev.ids))
     return dev
   },
 })
 
-const updateDeviceLogic = createRequestLogic({
-  type: device.UPDATE_DEV,
-  async process ({ action }) {
-    const { payload: { appId, deviceId, patch }} = action
-    const result = await api.device.update(appId, deviceId, patch)
+const updateDeviceLogic = createRequestLogic(
+  {
+    type: device.UPDATE_DEV,
+    async process({ action }) {
+      const {
+        payload: { appId, deviceId, patch },
+      } = action
+      const result = await api.device.update(appId, deviceId, patch)
 
-    return { ...patch, ...result }
+      return { ...patch, ...result }
+    },
   },
-}, device.updateDeviceSuccess)
+  device.updateDeviceSuccess,
+)
 
 export default [
   getDeviceLogic,
   updateDeviceLogic,
-  ...createEventsConnectLogics(
-    device.SHARED_NAME,
-    'devices',
-    api.device.eventsSubscribe,
-  ),
+  ...createEventsConnectLogics(device.SHARED_NAME, 'devices', api.device.eventsSubscribe),
 ]

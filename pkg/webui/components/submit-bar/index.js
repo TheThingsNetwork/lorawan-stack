@@ -20,31 +20,20 @@ import Message from '../../lib/components/message'
 
 import style from './submit-bar.styl'
 
-const SubmitBar = function (props) {
-  const {
-    className,
-    children,
-    align,
-  } = props
+const SubmitBar = function(props) {
+  const { className, children, align } = props
 
   const cls = classnames(className, style.bar, style[`bar-${align}`])
 
-  return (
-    <div className={cls}>
-      {children}
-    </div>
-  )
+  return <div className={cls}>{children}</div>
 }
 
 const SubmitBarMessage = ({ className, ...rest }) => (
-  <Message
-    {...rest}
-    className={classnames(className, style.barMessage)}
-  />
+  <Message {...rest} className={classnames(className, style.barMessage)} />
 )
 
 SubmitBar.propTypes = {
-  align: PropTypes.oneOf([ 'start', 'end', 'between', 'around' ]),
+  align: PropTypes.oneOf(['start', 'end', 'between', 'around']),
 }
 
 SubmitBar.defaultProps = {
@@ -54,4 +43,3 @@ SubmitBar.defaultProps = {
 SubmitBar.Message = SubmitBarMessage
 
 export default SubmitBar
-

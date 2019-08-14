@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const shallowDiff = function (initial, changed, ignorePaths = []) {
-  return Object.keys(changed).reduce(function (patch, field) {
+const shallowDiff = function(initial, changed, ignorePaths = []) {
+  return Object.keys(changed).reduce(function(patch, field) {
     const oldValue = initial[field]
     const newValue = changed[field]
 

@@ -35,46 +35,42 @@ export default class Spinner extends React.PureComponent {
     after: 350,
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.state = { visible: false }
     this.id = id()
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.timer = setTimeout(this.show, this.props.after)
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     clearTimeout(this.timer)
   }
 
-  show () {
+  show() {
     this.setState({
       visible: true,
     })
   }
 
-  render () {
-    const {
+  render() {
+    const { className, center = false, small = false, faded = false, children } = this.props
+
+    const { visible = false } = this.state
+
+    const classname = classnames(
+      style.box,
       className,
-      center = false,
-      small = false,
-      faded = false,
-      children,
-    } = this.props
-
-    const {
-      visible = false,
-    } = this.state
-
-    const classname = classnames(style.box, className, ...from(style, {
-      center,
-      small,
-      faded,
-      visible,
-    }))
+      ...from(style, {
+        center,
+        small,
+        faded,
+        visible,
+      }),
+    )
 
     return (
       <div className={classname}>
@@ -86,24 +82,11 @@ export default class Spinner extends React.PureComponent {
             </linearGradient>
           </defs>
           <g transform="translate(50, 50)">
-            <circle
-              cx="0"
-              cy="0"
-              r="40"
-              className={style.bar}
-              stroke={`url(#${this.id})`}
-            />
+            <circle cx="0" cy="0" r="40" className={style.bar} stroke={`url(#${this.id})`} />
           </g>
-          <circle
-            cx="50"
-            cy="50"
-            r="40"
-            className={style.circle}
-          />
+          <circle cx="50" cy="50" r="40" className={style.circle} />
         </svg>
-        <div className={style.message}>
-          {children}
-        </div>
+        <div className={style.message}>{children}</div>
       </div>
     )
   }

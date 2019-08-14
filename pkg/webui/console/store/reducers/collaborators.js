@@ -20,43 +20,43 @@ const defaultState = {
   totalCount: 0,
 }
 
-const createNamedCollaboratorReducer = function (reducerName = '') {
+const createNamedCollaboratorReducer = function(reducerName = '') {
   const GET_LIST_BASE = createGetCollaboratorsListActionType(reducerName)
   const [{ success: GET_LIST_SUCCESS }] = createRequestActions(GET_LIST_BASE)
 
-  return function (state = defaultState, { type, payload }) {
+  return function(state = defaultState, { type, payload }) {
     switch (type) {
-    case GET_LIST_SUCCESS:
-      return {
-        ...state,
-        collaborators: payload.collaborators,
-        totalCount: payload.totalCount,
-      }
-    default:
-      return state
+      case GET_LIST_SUCCESS:
+        return {
+          ...state,
+          collaborators: payload.collaborators,
+          totalCount: payload.totalCount,
+        }
+      default:
+        return state
     }
   }
 }
 
-const createNamedCollaboratorsReducer = function (reducerName = '') {
+const createNamedCollaboratorsReducer = function(reducerName = '') {
   const GET_LIST_BASE = createGetCollaboratorsListActionType(reducerName)
   const [{ success: GET_LIST_SUCCESS }] = createRequestActions(GET_LIST_BASE)
   const collaborators = createNamedCollaboratorReducer(reducerName)
 
-  return function (state = {}, action) {
+  return function(state = {}, action) {
     const { payload, type } = action
     if (!payload || !payload.id) {
       return state
     }
 
     switch (type) {
-    case GET_LIST_SUCCESS:
-      return {
-        ...state,
-        [payload.id]: collaborators(state[payload.id], action),
-      }
-    default:
-      return state
+      case GET_LIST_SUCCESS:
+        return {
+          ...state,
+          [payload.id]: collaborators(state[payload.id], action),
+        }
+      default:
+        return state
     }
   }
 }

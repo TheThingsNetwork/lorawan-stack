@@ -25,15 +25,8 @@ import { HeadCell, DataCell } from '../cell'
 import style from './table.styl'
 
 /* Empty message to render when no entries provided */
-const Empty = ({
-  className,
-  colSpan,
-  message,
-}) => (
-  <Row
-    className={classnames(className, style.emptyMessageRow)}
-    clickable={false}
-  >
+const Empty = ({ className, colSpan, message }) => (
+  <Row className={classnames(className, style.emptyMessageRow)} clickable={false}>
     <DataCell colSpan={colSpan}>
       <Message className={style.emptyMessage} content={message} />
     </DataCell>
@@ -51,7 +44,7 @@ class Table extends React.Component {
   static SortButton = SortButton
   static Empty = Empty
 
-  render () {
+  render() {
     const { className, children, ...rest } = this.props
     const tableClassNames = classnames(className, style.table)
     return (

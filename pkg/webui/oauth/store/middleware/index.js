@@ -15,7 +15,4 @@
 import init from './init'
 import user from './user'
 
-export default [
-  init,
-  user,
-]
+export default [init, user]

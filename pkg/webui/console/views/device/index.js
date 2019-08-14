@@ -31,34 +31,38 @@ import DeviceGeneralSettings from '../device-general-settings'
 import DeviceLocation from '../device-location'
 import DevicePayloadFormatters from '../device-payload-formatters'
 
-import {
-  getDevice,
-  stopDeviceEventsStream,
-} from '../../store/actions/device'
+import { getDevice, stopDeviceEventsStream } from '../../store/actions/device'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
-import { selectSelectedDevice, selectDeviceFetching, selectGetDeviceError } from '../../store/selectors/device'
+import {
+  selectSelectedDevice,
+  selectDeviceFetching,
+  selectGetDeviceError,
+} from '../../store/selectors/device'
 
 import style from './device.styl'
 
-@connect(function (state, props) {
-  const devId = props.match.params.devId
-  const appId = selectSelectedApplicationId(state)
-  const device = selectSelectedDevice(state)
+@connect(
+  function(state, props) {
+    const devId = props.match.params.devId
+    const appId = selectSelectedApplicationId(state)
+    const device = selectSelectedDevice(state)
 
-  return {
-    devId,
-    appId,
-    device,
-    deviceName: device && device.name,
-    devIds: device && device.ids,
-    fetching: selectDeviceFetching(state),
-    error: selectGetDeviceError(state),
-  }
-}, dispatch => ({
-  getDevice: (appId, devId, selectors, config) =>
-    dispatch(getDevice(appId, devId, selectors, config)),
-  stopStream: id => dispatch(stopDeviceEventsStream(id)),
-}))
+    return {
+      devId,
+      appId,
+      device,
+      deviceName: device && device.name,
+      devIds: device && device.ids,
+      fetching: selectDeviceFetching(state),
+      error: selectGetDeviceError(state),
+    }
+  },
+  dispatch => ({
+    getDevice: (appId, devId, selectors, config) =>
+      dispatch(getDevice(appId, devId, selectors, config)),
+    stopStream: id => dispatch(stopDeviceEventsStream(id)),
+  }),
+)
 @withRequest(
   ({ appId, devId, getDevice }) =>
     getDevice(
@@ -83,33 +87,30 @@ import style from './device.styl'
         'locations',
         'formatters',
       ],
-      { ignoreNotFound: true }),
-  ({ fetching, device }) => fetching || !Boolean(device)
+      { ignoreNotFound: true },
+    ),
+  ({ fetching, device }) => fetching || !Boolean(device),
 )
-@withBreadcrumb('device.single', function (props) {
+@withBreadcrumb('device.single', function(props) {
   const { devId, appId } = props
   return (
-    <Breadcrumb
-      path={`/applications/${appId}/devices/${devId}`}
-      icon="device"
-      content={devId}
-    />
+    <Breadcrumb path={`/applications/${appId}/devices/${devId}`} icon="device" content={devId} />
   )
 })
-
 @withEnv
 export default class Device extends React.Component {
-
-  componentWillUnmount () {
+  componentWillUnmount() {
     const { devIds, stopStream } = this.props
 
     stopStream(devIds)
   }
 
-  render () {
+  render() {
     const {
       location: { pathname },
-      match: { params: { appId }},
+      match: {
+        params: { appId },
+      },
       devId,
       deviceName,
       env,
@@ -118,32 +119,35 @@ export default class Device extends React.Component {
     const basePath = `/applications/${appId}/devices/${devId}`
 
     // Prevent default redirect to uplink when tab is already open
-    const payloadFormattersLink =
-    pathname.startsWith(`${basePath}/payload-formatters`)
-      ? pathname : `${basePath}/payload-formatters`
+    const payloadFormattersLink = pathname.startsWith(`${basePath}/payload-formatters`)
+      ? pathname
+      : `${basePath}/payload-formatters`
 
     const tabs = [
       { title: sharedMessages.overview, name: 'overview', link: basePath },
       { title: sharedMessages.data, name: 'data', link: `${basePath}/data` },
       { title: sharedMessages.location, name: 'location', link: `${basePath}/location` },
-      { title: sharedMessages.payloadFormatters, name: 'develop', link: payloadFormattersLink, exact: false },
-      { title: sharedMessages.generalSettings, name: 'general-settings', link: `${basePath}/general-settings` },
+      {
+        title: sharedMessages.payloadFormatters,
+        name: 'develop',
+        link: payloadFormattersLink,
+        exact: false,
+      },
+      {
+        title: sharedMessages.generalSettings,
+        name: 'general-settings',
+        link: `${basePath}/general-settings`,
+      },
     ]
 
     return (
       <React.Fragment>
-        <IntlHelmet
-          titleTemplate={`%s - ${deviceName || devId} - ${env.site_name}`}
-        />
+        <IntlHelmet titleTemplate={`%s - ${deviceName || devId} - ${env.site_name}`} />
         <Container>
           <Row>
             <Col lg={12}>
               <h2 className={style.title}>{deviceName || devId}</h2>
-              <Tabs
-                className={style.tabs}
-                narrow
-                tabs={tabs}
-              />
+              <Tabs className={style.tabs} narrow tabs={tabs} />
             </Col>
           </Row>
         </Container>

@@ -22,7 +22,7 @@ import Icon from '../icon'
 import PropTypes from '../../lib/prop-types'
 import style from './notification.styl'
 
-const Notification = function ({
+const Notification = function({
   className,
   title,
   error,
@@ -33,7 +33,6 @@ const Notification = function ({
   success,
   messageValues = {},
 }) {
-
   const classname = classnames(style.notification, className, {
     [style.error]: error,
     [style.warning]: warning,
@@ -56,13 +55,7 @@ const Notification = function ({
     <div className={classname}>
       <Icon className={style.icon} icon={icon} large={!small} />
       <div className={style.content}>
-        { title && (
-          <Message
-            className={style.title}
-            content={title}
-            component="h4"
-          />
-        )}
+        {title && <Message className={style.title} content={title} component="h4" />}
         <Component content={content} values={messageValues} />
       </div>
     </div>

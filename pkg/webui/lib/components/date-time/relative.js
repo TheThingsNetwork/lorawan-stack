@@ -18,33 +18,18 @@ import { FormattedRelative } from 'react-intl'
 import PropTypes from '../../prop-types'
 import DateTime from '.'
 
-const RelativeTime = function (props) {
-  const {
-    className,
-    value,
-    updateInterval,
-    options,
-    children,
-  } = props
+const RelativeTime = function(props) {
+  const { className, value, updateInterval, options, children } = props
 
   return (
-    <DateTime
-      className={className}
-      value={value}
-    >
-      {
-        dateTime => (
-          <FormattedRelative
-            value={dateTime}
-            updateInterval={updateInterval}
-            {...options}
-          >
-            {formattedRelativeTime => (
-              children ? children(formattedRelativeTime) : formattedRelativeTime
-            )}
-          </FormattedRelative>
-        )
-      }
+    <DateTime className={className} value={value}>
+      {dateTime => (
+        <FormattedRelative value={dateTime} updateInterval={updateInterval} {...options}>
+          {formattedRelativeTime =>
+            children ? children(formattedRelativeTime) : formattedRelativeTime
+          }
+        </FormattedRelative>
+      )}
     </DateTime>
   )
 }
