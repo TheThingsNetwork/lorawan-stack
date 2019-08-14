@@ -1164,6 +1164,10 @@
         "version_ids.model_id"
       ]
     },
+    "GetIdentifiersForEUIs": {
+      "file": "lorawan-stack/api/end_device_services.proto",
+      "http": []
+    },
     "List": {
       "file": "lorawan-stack/api/end_device_services.proto",
       "http": [

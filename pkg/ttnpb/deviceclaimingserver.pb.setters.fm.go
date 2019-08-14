@@ -2,7 +2,11 @@
 
 package ttnpb
 
-import fmt "fmt"
+import (
+	fmt "fmt"
+
+	go_thethings_network_lorawan_stack_pkg_types "go.thethings.network/lorawan-stack/pkg/types"
+)
 
 func (dst *ClaimEndDeviceRequest) SetFields(src *ClaimEndDeviceRequest, paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
@@ -120,7 +124,8 @@ func (dst *ClaimEndDeviceRequest_AuthenticatedIdentifiers) SetFields(src *ClaimE
 			if src != nil {
 				dst.JoinEUI = src.JoinEUI
 			} else {
-				dst.JoinEUI = nil
+				var zero go_thethings_network_lorawan_stack_pkg_types.EUI64
+				dst.JoinEUI = zero
 			}
 		case "dev_eui":
 			if len(subs) > 0 {
@@ -129,7 +134,8 @@ func (dst *ClaimEndDeviceRequest_AuthenticatedIdentifiers) SetFields(src *ClaimE
 			if src != nil {
 				dst.DevEUI = src.DevEUI
 			} else {
-				dst.DevEUI = nil
+				var zero go_thethings_network_lorawan_stack_pkg_types.EUI64
+				dst.DevEUI = zero
 			}
 		case "authentication_code":
 			if len(subs) > 0 {

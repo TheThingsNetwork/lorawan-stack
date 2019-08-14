@@ -26,8 +26,8 @@ option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
 message ClaimEndDeviceRequest {
   message AuthenticatedIdentifiers {
-    bytes join_eui = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "JoinEUI"];
-    bytes dev_eui = 2 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "DevEUI"];
+    bytes join_eui = 1 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "JoinEUI"];
+    bytes dev_eui = 2 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "DevEUI"];
     bytes authentication_code = 3 [(validate.rules).bytes = {min_len: 1, max_len: 8}];
   }
   oneof source_device {

@@ -6547,6 +6547,37 @@
           ]
         },
         {
+          "name": "GetEndDeviceIdentifiersForEUIsRequest",
+          "longName": "GetEndDeviceIdentifiersForEUIsRequest",
+          "fullName": "ttn.lorawan.v3.GetEndDeviceIdentifiersForEUIsRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "join_eui",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "dev_eui",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "GetEndDeviceRequest",
           "longName": "GetEndDeviceRequest",
           "fullName": "ttn.lorawan.v3.GetEndDeviceRequest",
@@ -7951,6 +7982,18 @@
                   ]
                 }
               }
+            },
+            {
+              "name": "GetIdentifiersForEUIs",
+              "description": "",
+              "requestType": "GetEndDeviceIdentifiersForEUIsRequest",
+              "requestLongType": "GetEndDeviceIdentifiersForEUIsRequest",
+              "requestFullType": "ttn.lorawan.v3.GetEndDeviceIdentifiersForEUIsRequest",
+              "requestStreaming": false,
+              "responseType": "EndDeviceIdentifiers",
+              "responseLongType": "EndDeviceIdentifiers",
+              "responseFullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
+              "responseStreaming": false
             },
             {
               "name": "List",

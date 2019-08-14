@@ -41,6 +41,8 @@ service EndDeviceRegistry {
     };
   };
 
+  rpc GetIdentifiersForEUIs(GetEndDeviceIdentifiersForEUIsRequest) returns (EndDeviceIdentifiers);
+
   // List applications. See request message for details.
   rpc List(ListEndDevicesRequest) returns (EndDevices) {
     option (google.api.http) = {

@@ -2199,6 +2199,15 @@ var GetEndDeviceRequestFieldPathsTopLevel = []string{
 	"end_device_ids",
 	"field_mask",
 }
+var GetEndDeviceIdentifiersForEUIsRequestFieldPathsNested = []string{
+	"dev_eui",
+	"join_eui",
+}
+
+var GetEndDeviceIdentifiersForEUIsRequestFieldPathsTopLevel = []string{
+	"dev_eui",
+	"join_eui",
+}
 var ListEndDevicesRequestFieldPathsNested = []string{
 	"application_ids",
 	"application_ids.application_id",

@@ -114,6 +114,7 @@
   - [Message `EndDeviceVersion`](#ttn.lorawan.v3.EndDeviceVersion)
   - [Message `EndDeviceVersionIdentifiers`](#ttn.lorawan.v3.EndDeviceVersionIdentifiers)
   - [Message `EndDevices`](#ttn.lorawan.v3.EndDevices)
+  - [Message `GetEndDeviceIdentifiersForEUIsRequest`](#ttn.lorawan.v3.GetEndDeviceIdentifiersForEUIsRequest)
   - [Message `GetEndDeviceRequest`](#ttn.lorawan.v3.GetEndDeviceRequest)
   - [Message `ListEndDevicesRequest`](#ttn.lorawan.v3.ListEndDevicesRequest)
   - [Message `MACParameters`](#ttn.lorawan.v3.MACParameters)
@@ -1836,6 +1837,13 @@ Identifies an end device model with version information.
 | ----- | ---- | ----- | ----------- |
 | `end_devices` | [`EndDevice`](#ttn.lorawan.v3.EndDevice) | repeated |  |
 
+### <a name="ttn.lorawan.v3.GetEndDeviceIdentifiersForEUIsRequest">Message `GetEndDeviceIdentifiersForEUIsRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `join_eui` | [`bytes`](#bytes) |  |  |
+| `dev_eui` | [`bytes`](#bytes) |  |  |
+
 ### <a name="ttn.lorawan.v3.GetEndDeviceRequest">Message `GetEndDeviceRequest`</a>
 
 | Field | Type | Label | Description |
@@ -2126,6 +2134,7 @@ Power state of the device.
 | ----------- | ------------ | ------------- | ------------|
 | `Create` | [`CreateEndDeviceRequest`](#ttn.lorawan.v3.CreateEndDeviceRequest) | [`EndDevice`](#ttn.lorawan.v3.EndDevice) | Create a new end device within an application. |
 | `Get` | [`GetEndDeviceRequest`](#ttn.lorawan.v3.GetEndDeviceRequest) | [`EndDevice`](#ttn.lorawan.v3.EndDevice) | Get the end device with the given identifiers, selecting the fields given by the field mask. |
+| `GetIdentifiersForEUIs` | [`GetEndDeviceIdentifiersForEUIsRequest`](#ttn.lorawan.v3.GetEndDeviceIdentifiersForEUIsRequest) | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |
 | `List` | [`ListEndDevicesRequest`](#ttn.lorawan.v3.ListEndDevicesRequest) | [`EndDevices`](#ttn.lorawan.v3.EndDevices) | List applications. See request message for details. |
 | `Update` | [`UpdateEndDeviceRequest`](#ttn.lorawan.v3.UpdateEndDeviceRequest) | [`EndDevice`](#ttn.lorawan.v3.EndDevice) |  |
 | `Delete` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) |  |
