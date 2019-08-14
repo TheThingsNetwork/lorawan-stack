@@ -30,7 +30,12 @@ import (
 )
 
 func (is *IdentityServer) getEmailTemplates(ctx context.Context) *email.TemplateRegistry {
-	c := is.configFromContext(ctx).Email.Templates
+	c := &is.configFromContext(ctx).Email.Templates
+	c.registryMu.Lock()
+	defer c.registryMu.Unlock()
+	if c.registry != nil {
+		return c.registry
+	}
 	var fetcher fetch.Interface
 	switch {
 	case c.Static != nil:
@@ -42,7 +47,8 @@ func (is *IdentityServer) getEmailTemplates(ctx context.Context) *email.Template
 	default:
 		fetcher = nil
 	}
-	return email.NewTemplateRegistry(fetcher, c.Includes...)
+	c.registry = email.NewTemplateRegistry(fetcher, c.Includes...)
+	return c.registry
 }
 
 // SendEmail sends an email.
