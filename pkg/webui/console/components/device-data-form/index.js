@@ -26,6 +26,7 @@ import Message from '../../../lib/components/message'
 import SubmitBar from '../../../components/submit-bar'
 import ModalButton from '../../../components/button/modal-button'
 import FrequencyPlansSelect from '../../containers/freq-plans-select'
+import DevAddrInput from '../../containers/dev-addr-input'
 
 import sharedMessages from '../../../lib/shared-messages'
 import errorMessages from '../../../lib/errors/error-messages'
@@ -115,15 +116,11 @@ class DeviceDataForm extends Component {
     const { resets_f_cnt } = this.state
     return (
       <React.Fragment>
-        <Form.Field
+        <DevAddrInput
           title={sharedMessages.devAddr}
           name="session.dev_addr"
-          type="byte"
-          min={4}
-          max={4}
           placeholder={m.leaveBlankPlaceholder}
           description={m.deviceAddrDescription}
-          component={Input}
         />
         <Form.Field
           title={sharedMessages.fwdNtwkKey}

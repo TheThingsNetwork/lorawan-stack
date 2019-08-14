@@ -115,6 +115,15 @@ storiesOf('Button', module)
       <Button secondary message="Secondary" busy />
     </div>
   ))
+  .add('Raw', () => (
+    <div>
+      <Button raw message="Raw" />
+      <br /><br />
+      <Button raw message="Raw" disabled />
+      <br /><br />
+      <Button raw message="Raw" busy />
+    </div>
+  ))
   .add('With Icon', () => (
     <div>
       <Button icon="check" message="With Icon" />

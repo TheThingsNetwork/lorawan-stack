@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+.container
+  display flex
+
 .input-box
   border-input()
   box-sizing: border-box
@@ -53,6 +56,9 @@
 
   &.readOnly
     background-color: $c-backdrop
+
+  &.actionable
+    border-radius: $br.s 0 0 $br.s
 
 ::placeholder
   font-family: $font-family
@@ -127,3 +133,11 @@ textarea.input
   padding: $cs.xs
   min-height: 5rem
   height: auto
+
+.actions
+  display: flex
+
+  .button
+    border-radius: 0 $br.s $br.s 0
+    height: 100%
+    margin-left: -1px
