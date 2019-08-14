@@ -22,8 +22,7 @@ export default function () {
     when: {
       created (props) {
         driver.component = shallow(
-          <ProfileDropdown {...props} />,
-          { context: { intl: {}}}
+          <ProfileDropdown {...props} />
         )
 
         return driver
