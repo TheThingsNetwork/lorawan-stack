@@ -30,6 +30,8 @@ const stack = {
   js: config.js.enabled ? config.js.base_url : undefined,
 }
 
+const isBaseUrl = config.is.base_url
+
 const ttnClient = new TTN(token, {
   stackConfig: stack,
   connectionType: 'http',
@@ -52,19 +54,19 @@ export default {
   },
   clients: {
     get(client_id) {
-      return instance.get(`/api/v3/is/clients/${client_id}`)
+      return instance.get(`${isBaseUrl}/is/clients/${client_id}`)
     },
   },
   users: {
     async get(userId) {
-      return instance.get(`/api/v3/users/${userId}`, {
+      return instance.get(`${isBaseUrl}/users/${userId}`, {
         headers: {
           Authorization: `Bearer ${(await token()).access_token}`,
         },
       })
     },
     async authInfo() {
-      return instance.get('/api/v3/auth_info', {
+      return instance.get(`${isBaseUrl}/auth_info`, {
         headers: {
           Authorization: `Bearer ${(await token()).access_token}`,
         },
