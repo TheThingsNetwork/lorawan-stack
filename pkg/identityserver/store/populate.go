@@ -25,10 +25,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/randutil"
 )
 
-func init() {
-	pbkdf2.SetDefaultIterations(10)
-}
-
 // NewPopulator returns a new database populator with a population of the given size.
 // It is seeded by the given seed.
 func NewPopulator(size int, seed int64) *Populator {
@@ -174,6 +170,9 @@ type Populator struct {
 
 // Populate the database.
 func (p *Populator) Populate(ctx context.Context, db *gorm.DB) (err error) {
+	hashValidator := pbkdf2.Default()
+	hashValidator.Iterations = 10
+	ctx = auth.NewContextWithHashValidator(ctx, hashValidator)
 	if err = p.populateApplications(ctx, db); err != nil {
 		return err
 	}
@@ -215,8 +214,8 @@ func (p *Populator) populateApplications(ctx context.Context, db *gorm.DB) (err 
 func (p *Populator) populateClients(ctx context.Context, db *gorm.DB) (err error) {
 	for i, client := range p.Clients {
 		secret := client.Secret
-		hashedSecret, _ := auth.Hash(client.Secret)
-		client.Secret = string(hashedSecret)
+		hashedSecret, _ := auth.Hash(ctx, client.Secret)
+		client.Secret = hashedSecret
 		p.Clients[i], err = GetClientStore(db).CreateClient(ctx, client)
 		if err != nil {
 			return err
@@ -261,8 +260,8 @@ func (p *Populator) populateOrganizations(ctx context.Context, db *gorm.DB) (err
 func (p *Populator) populateUsers(ctx context.Context, db *gorm.DB) (err error) {
 	for i, user := range p.Users {
 		password := user.Password
-		hashedPassword, _ := auth.Hash(user.Password)
-		user.Password = string(hashedPassword)
+		hashedPassword, _ := auth.Hash(ctx, user.Password)
+		user.Password = hashedPassword
 		p.Users[i], err = GetUserStore(db).CreateUser(ctx, user)
 		if err != nil {
 			return err
@@ -281,9 +280,9 @@ func (p *Populator) populateAPIKeys(ctx context.Context, db *gorm.DB) (err error
 		for _, apiKey := range apiKeys {
 			token, _ := auth.APIKey.Generate(ctx, "")
 			_, generatedID, generatedKey, _ := auth.SplitToken(token)
-			hashedKey, _ := auth.Hash(generatedKey)
+			hashedKey, _ := auth.Hash(ctx, generatedKey)
 			apiKey.ID = generatedID
-			apiKey.Key = string(hashedKey)
+			apiKey.Key = hashedKey
 			if err = GetAPIKeyStore(db).CreateAPIKey(ctx, entityID, apiKey); err != nil {
 				return err
 			}

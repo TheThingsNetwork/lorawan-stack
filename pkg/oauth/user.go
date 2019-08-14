@@ -170,7 +170,7 @@ func (s *server) doLogin(ctx context.Context, userID, password string) error {
 		return err
 	}
 	region := trace.StartRegion(ctx, "validate password")
-	ok, err := auth.Password(user.Password).Validate(password)
+	ok, err := auth.Validate(user.Password, password)
 	region.End()
 	if err != nil || !ok {
 		events.Publish(evtUserLoginFailed(ctx, user.UserIdentifiers, nil))

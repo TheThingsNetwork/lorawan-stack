@@ -69,11 +69,11 @@ func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateCli
 			return nil, err
 		}
 	}
-	hashedSecret, err := auth.Hash(secret)
+	hashedSecret, err := auth.Hash(ctx, secret)
 	if err != nil {
 		return nil, err
 	}
-	req.Client.Secret = string(hashedSecret)
+	req.Client.Secret = hashedSecret
 
 	if !createdByAdmin {
 		req.Client.State = ttnpb.STATE_REQUESTED

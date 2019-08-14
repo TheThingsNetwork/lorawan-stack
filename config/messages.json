@@ -2071,7 +2071,7 @@
   },
   "error:pkg/auth:invalid_hash": {
     "translations": {
-      "en": "invalid password hash"
+      "en": "invalid hash"
     },
     "description": {
       "package": "pkg/auth",
@@ -2089,7 +2089,7 @@
   },
   "error:pkg/auth:unknown_hashing_method": {
     "translations": {
-      "en": "password hashing method `{method}` unknown"
+      "en": "unknown hashing method `{method}`"
     },
     "description": {
       "package": "pkg/auth",

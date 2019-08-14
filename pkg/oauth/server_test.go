@@ -30,6 +30,7 @@ import (
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/auth"
+	"go.thethings.network/lorawan-stack/pkg/auth/pbkdf2"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/oauth"
@@ -69,17 +70,23 @@ var (
 )
 
 func init() {
-	password, err := auth.Hash("pass")
-	if err != nil {
-		panic(err)
-	}
-	mockUser.Password = string(password)
+	ctx := test.Context()
 
-	secret, err := auth.Hash("secret")
+	hashValidator := pbkdf2.Default()
+	hashValidator.Iterations = 10
+	ctx = auth.NewContextWithHashValidator(ctx, hashValidator)
+
+	password, err := auth.Hash(ctx, "pass")
 	if err != nil {
 		panic(err)
 	}
-	mockClient.Secret = string(secret)
+	mockUser.Password = password
+
+	secret, err := auth.Hash(ctx, "secret")
+	if err != nil {
+		panic(err)
+	}
+	mockClient.Secret = secret
 }
 
 func TestOAuthFlow(t *testing.T) {
