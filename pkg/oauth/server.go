@@ -67,7 +67,8 @@ type UIConfig struct {
 
 // FrontendConfig is the configuration for the OAuth frontend.
 type FrontendConfig struct {
-	Language string `json:"language" name:"-"`
+	Language string          `json:"language" name:"-"`
+	IS       webui.APIConfig `json:"is" name:"is"`
 }
 
 // Config is the configuration for the OAuth server.
