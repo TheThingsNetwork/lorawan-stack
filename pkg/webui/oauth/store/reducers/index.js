@@ -13,11 +13,14 @@
 // limitations under the License.
 
 import { combineReducers } from 'redux'
+import { connectRouter } from 'connected-react-router'
 
 import init from './init'
 import user from './user'
 
-export default combineReducers({
-  init,
-  user,
-})
+export default history =>
+  combineReducers({
+    init,
+    user,
+    router: connectRouter(history),
+  })

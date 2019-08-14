@@ -35,7 +35,7 @@ exports[`SideNavigation is flat should match snapshot 1`] = `
       onItemExpand={[Function]}
     />
   </div>
-  <InjectIntl(Button)
+  <injectIntl(Button)
     className="navigationButton"
     data-hook="side-nav-hide-button"
     icon="keyboard_arrow_left"
@@ -107,7 +107,7 @@ exports[`SideNavigation is nested should match snapshot 1`] = `
       onItemExpand={[Function]}
     />
   </div>
-  <InjectIntl(Button)
+  <injectIntl(Button)
     className="navigationButton"
     data-hook="side-nav-hide-button"
     icon="keyboard_arrow_left"

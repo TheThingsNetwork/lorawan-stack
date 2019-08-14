@@ -14,9 +14,9 @@
 
 import { createStore, applyMiddleware, compose } from 'redux'
 import { createLogicMiddleware } from 'redux-logic'
-import { connectRouter, routerMiddleware } from 'connected-react-router'
+import { routerMiddleware } from 'connected-react-router'
 
-import reducer from './reducers'
+import createRootReducer from './reducers'
 import logic from './middleware'
 
 const composeEnhancers =
@@ -25,5 +25,5 @@ const composeEnhancers =
 export default function(history) {
   const middleware = applyMiddleware(routerMiddleware(history), createLogicMiddleware(logic))
 
-  return createStore(connectRouter(history)(reducer), composeEnhancers(middleware))
+  return createStore(createRootReducer(history), composeEnhancers(middleware))
 }

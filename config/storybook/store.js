@@ -12,20 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { createStore, applyMiddleware, compose } from 'redux'
-import { connectRouter, routerMiddleware } from 'connected-react-router'
+import { createStore, applyMiddleware, compose, combineReducers } from 'redux'
+import { routerMiddleware, connectRouter } from 'connected-react-router'
 
-const reducer = function (state) {
-  return state
-}
+const createRootReducer = history =>
+  combineReducers({
+    router: connectRouter(history),
+  })
 
-export default function (history) {
-  const middleware = applyMiddleware(
-    routerMiddleware(history),
-  )
+export default function(history) {
+  const middleware = applyMiddleware(routerMiddleware(history))
 
-  return createStore(
-    connectRouter(history)(reducer),
-    compose(middleware)
-  )
+  return createStore(createRootReducer(history), compose(middleware))
 }
