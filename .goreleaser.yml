@@ -122,10 +122,10 @@ dockers:
       - ttn-lw-cli
       - ttn-lw-stack
     image_templates:
-      - "thethingsnetwork/lorawan-stack:latest"
-      - "thethingsnetwork/lorawan-stack:{{ .Major }}"
-      - "thethingsnetwork/lorawan-stack:{{ .Major }}.{{ .Minor }}"
-      - "thethingsnetwork/lorawan-stack:{{ .Version }}"
+      - "{{ or .Env.DOCKER_IMAGE "lorawan-stack" }}:latest"
+      - "{{ or .Env.DOCKER_IMAGE "lorawan-stack" }}:{{ .Major }}"
+      - "{{ or .Env.DOCKER_IMAGE "lorawan-stack" }}:{{ .Major }}.{{ .Minor }}"
+      - "{{ or .Env.DOCKER_IMAGE "lorawan-stack" }}:{{ .Version }}"
     skip_push: auto
     extra_files:
       - public
