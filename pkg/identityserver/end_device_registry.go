@@ -77,6 +77,27 @@ func (is *IdentityServer) getEndDevice(ctx context.Context, req *ttnpb.GetEndDev
 	return dev, nil
 }
 
+func (is *IdentityServer) getEndDeviceIdentifiersForEUIs(ctx context.Context, req *ttnpb.GetEndDeviceIdentifiersForEUIsRequest) (ids *ttnpb.EndDeviceIdentifiers, err error) {
+	if err = is.RequireAuthenticated(ctx); err != nil {
+		return nil, err
+	}
+	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+		dev, err := store.GetEndDeviceStore(db).GetEndDevice(ctx, &ttnpb.EndDeviceIdentifiers{
+			JoinEUI: &req.JoinEUI,
+			DevEUI:  &req.DevEUI,
+		}, &types.FieldMask{Paths: []string{"ids.application_ids.application_id", "ids.device_id", "ids.join_eui", "ids.dev_eui"}})
+		if err != nil {
+			return err
+		}
+		ids = &dev.EndDeviceIdentifiers
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return ids, nil
+}
+
 func (is *IdentityServer) listEndDevices(ctx context.Context, req *ttnpb.ListEndDevicesRequest) (devs *ttnpb.EndDevices, err error) {
 	if err = rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
 		return nil, err
@@ -146,6 +167,10 @@ func (dr *endDeviceRegistry) Create(ctx context.Context, req *ttnpb.CreateEndDev
 
 func (dr *endDeviceRegistry) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest) (*ttnpb.EndDevice, error) {
 	return dr.getEndDevice(ctx, req)
+}
+
+func (dr *endDeviceRegistry) GetIdentifiersForEUIs(ctx context.Context, req *ttnpb.GetEndDeviceIdentifiersForEUIsRequest) (*ttnpb.EndDeviceIdentifiers, error) {
+	return dr.getEndDeviceIdentifiersForEUIs(ctx, req)
 }
 
 func (dr *endDeviceRegistry) List(ctx context.Context, req *ttnpb.ListEndDevicesRequest) (*ttnpb.EndDevices, error) {

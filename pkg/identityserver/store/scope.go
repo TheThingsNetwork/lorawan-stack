@@ -40,6 +40,9 @@ func withApplicationID(id ...string) func(*gorm.DB) *gorm.DB {
 		case 0:
 			return db
 		case 1:
+			if id[0] == "" {
+				return db
+			}
 			return db.Where("application_id = ?", id[0])
 		default:
 			return db.Where("application_id IN (?)", id).Order("application_id")
@@ -66,9 +69,44 @@ func withDeviceID(id ...string) func(*gorm.DB) *gorm.DB {
 		case 0:
 			return db
 		case 1:
+			if id[0] == "" {
+				return db
+			}
 			return db.Where("device_id = ?", id[0])
 		default:
 			return db.Where("device_id IN (?)", id).Order("device_id")
+		}
+	}
+}
+
+func withJoinEUI(eui ...EUI64) func(*gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		switch len(eui) {
+		case 0:
+			return db
+		case 1:
+			if eui[0] == zeroEUI64 {
+				return db
+			}
+			return db.Where("join_eui = ?", eui[0])
+		default:
+			return db.Where("join_eui IN (?)", eui).Order("dev_eui")
+		}
+	}
+}
+
+func withDevEUI(eui ...EUI64) func(*gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		switch len(eui) {
+		case 0:
+			return db
+		case 1:
+			if eui[0] == zeroEUI64 {
+				return db
+			}
+			return db.Where("dev_eui = ?", eui[0])
+		default:
+			return db.Where("dev_eui IN (?)", eui)
 		}
 	}
 }
