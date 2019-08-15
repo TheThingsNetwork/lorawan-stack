@@ -17,12 +17,13 @@ package console
 import (
 	"go.thethings.network/lorawan-stack/cmd/internal/shared"
 	"go.thethings.network/lorawan-stack/pkg/console"
+	"go.thethings.network/lorawan-stack/pkg/web/oauthclient"
 	"go.thethings.network/lorawan-stack/pkg/webui"
 )
 
 // DefaultConsoleConfig is the default configuration for the Console.
 var DefaultConsoleConfig = console.Config{
-	OAuth: console.OAuth{
+	OAuth: oauthclient.Config{
 		AuthorizeURL: shared.DefaultOAuthPublicURL + "/authorize",
 		TokenURL:     shared.DefaultOAuthPublicURL + "/token",
 		ClientID:     "console",
