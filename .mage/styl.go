@@ -36,7 +36,7 @@ func (styl Styl) stylint() (func(args ...string) (string, error), error) {
 	}, nil
 }
 
-// Lint runs eslint over frontend js files.
+// Lint runs stylint over frontend styl files.
 func (styl Styl) Lint() error {
 	if mg.Verbose() {
 		fmt.Println("Running stylint")

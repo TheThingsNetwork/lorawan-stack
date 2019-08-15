@@ -185,7 +185,7 @@ func (js Js) BuildMain() error {
 	return webpack("--config", "config/webpack.config.babel.js")
 }
 
-// BuildDll runs the webpack to build the DLL bundle
+// BuildDll runs the webpack command to build the DLL bundle
 func (js Js) BuildDll() error {
 	mg.Deps(js.Deps)
 	changed, err := target.Path("./public/libs.bundle.js", "./yarn.lock")
