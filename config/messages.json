@@ -2303,51 +2303,6 @@
       "file": "tls.go"
     }
   },
-  "error:pkg/console:invalid_state": {
-    "translations": {
-      "en": "invalid state parameter in request"
-    },
-    "description": {
-      "package": "pkg/console",
-      "file": "callback.go"
-    }
-  },
-  "error:pkg/console:missing_code": {
-    "translations": {
-      "en": "missing code parameter in request"
-    },
-    "description": {
-      "package": "pkg/console",
-      "file": "callback.go"
-    }
-  },
-  "error:pkg/console:missing_state": {
-    "translations": {
-      "en": "missing state parameter in request"
-    },
-    "description": {
-      "package": "pkg/console",
-      "file": "callback.go"
-    }
-  },
-  "error:pkg/console:no_oauth_config": {
-    "translations": {
-      "en": "no OAuth configuration found for the Console"
-    },
-    "description": {
-      "package": "pkg/console",
-      "file": "console.go"
-    }
-  },
-  "error:pkg/console:oauth_authorization": {
-    "translations": {
-      "en": "OAuth authorization failed with `{error}`"
-    },
-    "description": {
-      "package": "pkg/console",
-      "file": "callback.go"
-    }
-  },
   "error:pkg/crypto/cryptoservices:no_app_key": {
     "translations": {
       "en": "no AppKey specified"
@@ -5622,6 +5577,51 @@
     "description": {
       "package": "pkg/web/middleware",
       "file": "recover.go"
+    }
+  },
+  "error:pkg/web/oauthclient:no_oauth_config": {
+    "translations": {
+      "en": "no OAuth configuration found for the OAuth client"
+    },
+    "description": {
+      "package": "pkg/web/oauthclient",
+      "file": "oauthclient.go"
+    }
+  },
+  "error:pkg/web/oauthclient:oauth_callback_error": {
+    "translations": {
+      "en": "an error occurred: {error}"
+    },
+    "description": {
+      "package": "pkg/web/oauthclient",
+      "file": "callback.go"
+    }
+  },
+  "error:pkg/web/oauthclient:oauth_callback_invalid_state": {
+    "translations": {
+      "en": "invalid state parameter"
+    },
+    "description": {
+      "package": "pkg/web/oauthclient",
+      "file": "callback.go"
+    }
+  },
+  "error:pkg/web/oauthclient:oauth_callback_no_code": {
+    "translations": {
+      "en": "no code parameter present in request"
+    },
+    "description": {
+      "package": "pkg/web/oauthclient",
+      "file": "callback.go"
+    }
+  },
+  "error:pkg/web/oauthclient:oauth_callback_no_state": {
+    "translations": {
+      "en": "no state parameter present in request"
+    },
+    "description": {
+      "package": "pkg/web/oauthclient",
+      "file": "callback.go"
     }
   },
   "event:application.api-key.create": {
