@@ -312,7 +312,7 @@ func (js Js) Fmt() error {
 		return err
 	}
 
-	return prettier("--config", "./config/.prettierrc.js", "./pkg/webui/**/*.js", "--write")
+	return prettier("--config", "./config/.prettierrc.js", "./pkg/webui/**/*.js", "./config/**/*.js", "--write")
 }
 
 // Lint runs eslint over frontend js files.
