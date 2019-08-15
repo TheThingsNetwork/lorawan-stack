@@ -17,6 +17,7 @@ env:
   - TEST_REDIS=1
   - PATH=/snap/bin:$PATH
   - HUGO_BASE_URL=https://thethingsnetwork.github.io/lorawan-stack/
+  - DOCKER_IMAGE=thethingsnetwork/lorawan-stack
 matrix:
   include:
   - env: RUNTYPE=js
