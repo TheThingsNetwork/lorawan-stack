@@ -188,16 +188,22 @@ func (js Js) BuildMain() error {
 // BuildDll runs the webpack command to build the DLL bundle
 func (js Js) BuildDll() error {
 	mg.Deps(js.Deps)
-	changed, err := target.Path("./public/libs.bundle.js", "./yarn.lock")
-	if changed || os.IsNotExist(err) {
-		if mg.Verbose() {
-			fmt.Println("Running Webpack for DLL…")
+	if nodeEnv := os.Getenv("NODE_ENV"); nodeEnv == "development" {
+		changed, err := target.Path("./public/libs.bundle.js", "./yarn.lock")
+		if changed || os.IsNotExist(err) {
+			if mg.Verbose() {
+				fmt.Println("Running Webpack for DLL…")
+			}
+			webpack, err := js.webpack()
+			if err != nil {
+				return err
+			}
+			return webpack("--config", "config/webpack.dll.babel.js")
 		}
-		webpack, err := js.webpack()
-		if err != nil {
-			return err
-		}
-		return webpack("--config", "config/webpack.dll.babel.js")
+		return nil
+	}
+	if mg.Verbose() {
+		fmt.Println("Skipping DLL module bundling (production mode)")
 	}
 	return nil
 }
