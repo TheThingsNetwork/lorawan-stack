@@ -187,8 +187,9 @@ func (js Js) BuildMain() error {
 
 // BuildDll runs the webpack to build the DLL bundle
 func (js Js) BuildDll() error {
+	mg.Deps(js.Deps)
 	changed, err := target.Path("./public/libs.bundle.js", "./yarn.lock")
-	if os.IsNotExist(err) || (err == nil && changed) {
+	if changed || os.IsNotExist(err) {
 		if mg.Verbose() {
 			fmt.Println("Running Webpack for DLL…")
 		}
