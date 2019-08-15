@@ -146,7 +146,7 @@ func (js Js) DevDeps() error {
 // Deps installs the javascript dependencies.
 func (js Js) Deps() error {
 	files, readErr := ioutil.ReadDir("node_modules")
-	changed, targetErr := target.Dir("node_modules", "./package.json", "./yarn.lock")
+	changed, targetErr := target.Path("node_modules", "./package.json", "./yarn.lock")
 	// Check whether package.json/yarn.lock are newer than node_modules
 	// and whether it is not only yarn that is installed via DevDeps()
 	if readErr != nil || os.IsNotExist(targetErr) || (targetErr == nil && changed) || len(files) <= 4 {
