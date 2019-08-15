@@ -189,11 +189,12 @@ func addField(fs *pflag.FlagSet, name string, t reflect.Type, maskOnly bool) {
 			case reflect.String:
 				fs.StringSlice(name, nil, "")
 			case reflect.Int32:
-				if valueMap := enumValues(t); valueMap != nil {
+				if valueMap := enumValues(t.Elem()); valueMap != nil {
 					values := make([]string, 0, len(valueMap))
 					for value := range valueMap {
 						values = append(values, value)
 					}
+					sort.Strings(values)
 					fs.StringSlice(name, nil, strings.Join(values, "|"))
 				} else {
 					fs.IntSlice(name, nil, "")
