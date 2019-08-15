@@ -15,6 +15,7 @@
 package auth
 
 import (
+	"context"
 	"crypto/subtle"
 	"strings"
 
@@ -22,59 +23,68 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
-// hashingMethod is a method to hash a password.
-type hashingMethod interface {
+// HashValidator is a method to hash and validate a secret.
+type HashValidator interface {
 	// Name returns the hashing method name that is used to identify which method
-	// was used to hash a given password.
+	// was used to hash a given secret.
 	Name() string
 
-	// Hash hashes the given plain text password.
+	// Hash hashes the given plain text secret.
 	Hash(plain string) (string, error)
 
-	// Validate checks whether the given plain text password is equal or not to
-	// the given hashed password.
+	// Validate checks whether the given plain text secret is equal or not to
+	// the given hashed secret.
 	Validate(hashed, plain string) (bool, error)
 }
 
-// hashingMethods contains all the supported hashing methods.
-// Be sure to add your hashing method to this list if you implement a new one.
-var hashingMethods = []hashingMethod{
-	pbkdf2.Default(),
+// defaultHashValidator is the default method for hashing and validating secrets.
+var defaultHashValidator = pbkdf2.Default()
+
+type hashValidatorContextKeyType struct{}
+
+var hashValidatorContextKey hashValidatorContextKeyType
+
+// NewContextWithHashValidator returns a context derived from parent that contains hashValidator.
+func NewContextWithHashValidator(parent context.Context, hashValidator HashValidator) context.Context {
+	return context.WithValue(parent, hashValidatorContextKey, hashValidator)
 }
 
-// defaultAlgorithm is the default algorithm used for hashing passwords.
-var defaultAlgorithm = pbkdf2.Default()
+// HashValidatorFromContext returns the HashValidator from the context if present. Otherwise it returns default HashValidator.
+func HashValidatorFromContext(ctx context.Context) HashValidator {
+	if hashValidator, ok := ctx.Value(hashValidatorContextKey).(HashValidator); ok {
+		return hashValidator
+	}
+	return defaultHashValidator
+}
 
-// Password represents a hashed password.
-type Password string
+// hashValidators contains all the supported hashing methods.
+// Be sure to add your hashing method to this list if you implement a new one.
+var hashValidators = []HashValidator{
+	defaultHashValidator,
+}
 
-// Hash hashes a plaintext password into a Password.
-func Hash(plain string) (Password, error) {
-	str, err := defaultAlgorithm.Hash(plain)
+// Hash hashes a plaintext secret.
+func Hash(ctx context.Context, plain string) (string, error) {
+	str, err := HashValidatorFromContext(ctx).Hash(plain)
 	if err != nil {
 		return "", err
 	}
-
-	return Password(str), nil
+	return str, nil
 }
 
 var errInvalidHash = errors.DefineInternal(
 	"invalid_hash",
-	"invalid password hash",
+	"invalid hash",
 )
 
 var errUnknownHashingMethod = errors.DefineInternal(
 	"unknown_hashing_method",
-	"password hashing method `{method}` unknown",
+	"unknown hashing method `{method}`",
 )
 
-// Validate checks if the password matches the plaintext password.
-// While using this over a secure channel is probably fine, consider using a
-// scheme where the hashing happens on the client side, to prevent the server
-// from having the password at all. You can use p.Equals to accomplish that.
-func (p Password) Validate(plain string) (bool, error) {
-	str := string(p)
-	parts := strings.SplitN(str, "$", 2)
+// Validate checks if the hash matches the plaintext.
+func Validate(hashed, plain string) (bool, error) {
+	parts := strings.SplitN(hashed, "$", 2)
 
 	if len(parts) < 2 {
 		return false, errInvalidHash
@@ -82,23 +92,16 @@ func (p Password) Validate(plain string) (bool, error) {
 
 	typ := parts[0]
 
-	for _, method := range hashingMethods {
+	for _, method := range hashValidators {
 		if strings.ToLower(typ) == strings.ToLower(method.Name()) {
-			return method.Validate(str, plain)
+			return method.Validate(hashed, plain)
 		}
 	}
 
 	return false, errUnknownHashingMethod.WithAttributes("method", typ)
 }
 
-// Equals safely checks whether or not the other hashed password and this one
-// are the same. This can be used in schemes where the password is hashed at the
-// client side and the hash is sent over instead of the plaintext password.
-func (p Password) Equals(other Password) bool {
-	return subtle.ConstantTimeEq(int32(len(other)), int32(len(p))) == 1 && subtle.ConstantTimeCompare([]byte(p), []byte(other)) == 1
-}
-
-// String implements fmt.Stringer and returns the string representation of the password.
-func (p Password) String() string {
-	return string(p)
+// Equals safely checks whether or not the hashes are the same.
+func Equals(a, b string) bool {
+	return subtle.ConstantTimeEq(int32(len(a)), int32(len(b))) == 1 && subtle.ConstantTimeCompare([]byte(a), []byte(b)) == 1
 }

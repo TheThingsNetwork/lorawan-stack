@@ -33,10 +33,10 @@ func TestHash(t *testing.T) {
 	for _, hash := range hashes {
 
 		h := &PBKDF2{
-			iterations: 10000,
-			keyLength:  512,
-			algorithm:  hash,
-			saltLength: 64,
+			Iterations: 10000,
+			KeyLength:  512,
+			Algorithm:  hash,
+			SaltLength: 64,
 		}
 
 		plain := "secret"
@@ -73,10 +73,10 @@ func TestHashZeroSalt(t *testing.T) {
 	a := New(t)
 
 	h := &PBKDF2{
-		iterations: 10000,
-		keyLength:  512,
-		algorithm:  Sha512,
-		saltLength: 0,
+		Iterations: 10000,
+		KeyLength:  512,
+		Algorithm:  Sha512,
+		SaltLength: 0,
 	}
 
 	plain := "secret"
@@ -89,10 +89,10 @@ func TestBadHash(t *testing.T) {
 	a := New(t)
 
 	h := &PBKDF2{
-		iterations: 10000,
-		keyLength:  512,
-		algorithm:  Sha512,
-		saltLength: 36,
+		Iterations: 10000,
+		KeyLength:  512,
+		Algorithm:  Sha512,
+		SaltLength: 36,
 	}
 
 	// bad hash, the base64 is wrong
@@ -108,10 +108,10 @@ func TestBadIter(t *testing.T) {
 	a := New(t)
 
 	h := &PBKDF2{
-		iterations: 10000,
-		keyLength:  512,
-		algorithm:  Sha512,
-		saltLength: 36,
+		Iterations: 10000,
+		KeyLength:  512,
+		Algorithm:  Sha512,
+		SaltLength: 36,
 	}
 
 	// bad hash, the salt is bad
@@ -127,10 +127,10 @@ func TestBadAlgorithm(t *testing.T) {
 	a := New(t)
 
 	h := &PBKDF2{
-		iterations: 10000,
-		keyLength:  512,
-		algorithm:  Sha512,
-		saltLength: 36,
+		Iterations: 10000,
+		KeyLength:  512,
+		Algorithm:  Sha512,
+		SaltLength: 36,
 	}
 
 	// bad hash, the base64 is bad
@@ -146,7 +146,7 @@ func TestInvalidSaltLength(t *testing.T) {
 	a := New(t)
 
 	h := &PBKDF2{
-		saltLength: 0,
+		SaltLength: 0,
 	}
 
 	_, err := h.Hash("foo")

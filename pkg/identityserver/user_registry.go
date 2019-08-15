@@ -139,11 +139,11 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 	if err := is.validatePasswordStrength(ctx, req.User.Password); err != nil {
 		return nil, err
 	}
-	hashedPassword, err := auth.Hash(req.User.Password)
+	hashedPassword, err := auth.Hash(ctx, req.User.Password)
 	if err != nil {
 		return nil, err
 	}
-	req.User.Password = string(hashedPassword)
+	req.User.Password = hashedPassword
 	req.User.PasswordUpdatedAt = time.Now()
 
 	if !createdByAdmin {
@@ -396,7 +396,7 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 	if err := is.validatePasswordStrength(ctx, req.New); err != nil {
 		return nil, err
 	}
-	hashedPassword, err := auth.Hash(req.New)
+	hashedPassword, err := auth.Hash(ctx, req.New)
 	if err != nil {
 		return nil, err
 	}
@@ -407,7 +407,7 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 			return err
 		}
 		region := trace.StartRegion(ctx, "validate old password")
-		valid, err := auth.Password(usr.Password).Validate(req.Old)
+		valid, err := auth.Validate(usr.Password, req.Old)
 		region.End()
 		if err != nil {
 			return err
@@ -423,7 +423,7 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 				return errIncorrectPassword
 			}
 			region := trace.StartRegion(ctx, "validate temporary password")
-			valid, err = auth.Password(usr.TemporaryPassword).Validate(req.Old)
+			valid, err = auth.Validate(usr.TemporaryPassword, req.Old)
 			region.End()
 			switch {
 			case err != nil:
@@ -468,7 +468,7 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 				}
 			}
 		}
-		usr.Password, usr.PasswordUpdatedAt, usr.RequirePasswordUpdate = string(hashedPassword), time.Now(), false
+		usr.Password, usr.PasswordUpdatedAt, usr.RequirePasswordUpdate = hashedPassword, time.Now(), false
 		usr, err = store.GetUserStore(db).UpdateUser(ctx, usr, updateMask)
 		return err
 	})
@@ -493,7 +493,7 @@ func (is *IdentityServer) createTemporaryPassword(ctx context.Context, req *ttnp
 	if err != nil {
 		return nil, err
 	}
-	hashedTemporaryPassword, err := auth.Hash(temporaryPassword)
+	hashedTemporaryPassword, err := auth.Hash(ctx, temporaryPassword)
 	if err != nil {
 		return nil, err
 	}
@@ -505,7 +505,7 @@ func (is *IdentityServer) createTemporaryPassword(ctx context.Context, req *ttnp
 		if usr.TemporaryPasswordExpiresAt != nil && usr.TemporaryPasswordExpiresAt.After(time.Now()) {
 			return errTemporaryPasswordStillValid
 		}
-		usr.TemporaryPassword = string(hashedTemporaryPassword)
+		usr.TemporaryPassword = hashedTemporaryPassword
 		expires := now.Add(time.Hour)
 		usr.TemporaryPasswordCreatedAt, usr.TemporaryPasswordExpiresAt = &now, &expires
 		usr, err = store.GetUserStore(db).UpdateUser(ctx, usr, updateTemporaryPasswordFieldMask)

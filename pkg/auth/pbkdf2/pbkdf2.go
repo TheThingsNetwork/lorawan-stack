@@ -27,39 +27,33 @@ import (
 	"golang.org/x/crypto/pbkdf2"
 )
 
-var defaultInstance = &PBKDF2{
-	iterations: 20000,
-	keyLength:  32,
-	algorithm:  Sha256,
-	saltLength: 16,
-}
-
-// SetDefaultIterations sets the number of iterations for the default PBKDF2 instance.
-// This should typically only be changed for testing purposes.
-func SetDefaultIterations(iterations int) {
-	defaultInstance.iterations = iterations
+var defaultInstance = PBKDF2{
+	Iterations: 20000,
+	KeyLength:  32,
+	Algorithm:  Sha256,
+	SaltLength: 16,
 }
 
 // Default returns a the default PBKDF2 instance.
-func Default() *PBKDF2 { return defaultInstance }
+func Default() PBKDF2 { return defaultInstance }
 
 // PBKDF2 is a password derivation method.
 type PBKDF2 struct {
 	// Iterations is the number of iterations to use in the PBKDF2 algorithm.
-	iterations int
+	Iterations int
 
 	// Algorithm is the hashing algorithm used.
-	algorithm Algorithm
+	Algorithm Algorithm
 
 	// SaltLength is the length of the salt used.
-	saltLength int
+	SaltLength int
 
 	// KeyLength is the length of the desired key.
-	keyLength int
+	KeyLength int
 }
 
 // Name returns the name of the PBKDF2 hashing method.
-func (*PBKDF2) Name() string {
+func (PBKDF2) Name() string {
 	return "PBKDF2"
 }
 
@@ -69,14 +63,14 @@ var errZeroLengthSalt = errors.DefineInternal(
 )
 
 // Hash hashes a plain text password.
-func (p *PBKDF2) Hash(plain string) (string, error) {
-	if p.saltLength == 0 {
+func (p PBKDF2) Hash(plain string) (string, error) {
+	if p.SaltLength == 0 {
 		return "", errZeroLengthSalt
 	}
 
-	salt := random.String(p.saltLength)
-	hash := hash64([]byte(plain), []byte(salt), p.iterations, p.keyLength, p.algorithm)
-	pass := fmt.Sprintf("%s$%s$%v$%s$%s", p.Name(), p.algorithm, p.iterations, salt, string(hash))
+	salt := random.String(p.SaltLength)
+	hash := hash64([]byte(plain), []byte(salt), p.Iterations, p.KeyLength, p.Algorithm)
+	pass := fmt.Sprintf("%s$%s$%v$%s$%s", p.Name(), p.Algorithm, p.Iterations, salt, string(hash))
 
 	return pass, nil
 }
@@ -101,7 +95,7 @@ var errKeyLength = errors.DefineInternal(
 //
 //     PBKDF2$<algorithm>$<iterations>$<salt>$<key in base64>
 //
-func (*PBKDF2) Validate(hashed, plain string) (bool, error) {
+func (PBKDF2) Validate(hashed, plain string) (bool, error) {
 	parts := strings.Split(hashed, "$")
 	if len(parts) != 5 {
 		return false, errInvalidPBKDF2

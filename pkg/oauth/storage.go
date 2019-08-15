@@ -43,7 +43,7 @@ func (cli osinClient) ClientSecretMatches(secret string) bool {
 	if cli.Secret == "" {
 		return secret == ""
 	}
-	valid, _ := auth.Password(cli.Secret).Validate(secret)
+	valid, _ := auth.Validate(cli.Secret, secret)
 	return valid
 }
 
@@ -156,7 +156,7 @@ var errNoRefreshToken = errors.DefineInvalidArgument(
 var errInvalidToken = errors.DefineInvalidArgument("token", "invalid token")
 
 func (s *storage) SaveAccess(data *osin.AccessData) error {
-	var accessHash, refreshHash auth.Password
+	var accessHash, refreshHash string
 	tokenType, accessID, accessKey, err := auth.SplitToken(data.AccessToken)
 	if err != nil {
 		return err
@@ -164,7 +164,7 @@ func (s *storage) SaveAccess(data *osin.AccessData) error {
 	if tokenType != auth.AccessToken {
 		return errNoAccessToken
 	}
-	accessHash, err = auth.Hash(accessKey)
+	accessHash, err = auth.Hash(s.ctx, accessKey)
 	if err != nil {
 		return err
 	}
@@ -179,7 +179,7 @@ func (s *storage) SaveAccess(data *osin.AccessData) error {
 		if refreshID != accessID {
 			return errTokenMismatch.WithAttributes("refresh_token_id", refreshID, "access_token_id", accessID)
 		}
-		refreshHash, err = auth.Hash(refreshKey)
+		refreshHash, err = auth.Hash(s.ctx, refreshKey)
 		if err != nil {
 			return err
 		}
@@ -205,8 +205,8 @@ func (s *storage) SaveAccess(data *osin.AccessData) error {
 		UserIDs:      userIDs,
 		Rights:       rights,
 		ID:           accessID,
-		AccessToken:  string(accessHash),
-		RefreshToken: string(refreshHash),
+		AccessToken:  accessHash,
+		RefreshToken: refreshHash,
 		CreatedAt:    data.CreatedAt,
 		ExpiresAt:    data.CreatedAt.Add(time.Duration(data.ExpiresIn) * time.Second),
 	}, previousID)
@@ -258,7 +258,7 @@ func (s *storage) LoadRefresh(token string) (*osin.AccessData, error) {
 	if err != nil {
 		return nil, err
 	}
-	valid, err := auth.Password(data.RefreshToken).Validate(tokenKey)
+	valid, err := auth.Validate(data.RefreshToken, tokenKey)
 	if !valid || err != nil {
 		return nil, errInvalidToken
 	}
