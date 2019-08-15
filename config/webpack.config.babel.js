@@ -47,8 +47,8 @@ const context = path.resolve(CONTEXT)
 const production = NODE_ENV !== 'development'
 
 const src = path.resolve('.', 'pkg/webui')
-const include = [ src ]
-const modules = [ path.resolve(context, 'node_modules') ]
+const include = [src]
+const modules = [path.resolve(context, 'node_modules')]
 
 const r = SUPPORT_LOCALES.split(',').map(l => new RegExp(l.trim()))
 
@@ -78,10 +78,8 @@ export const styleConfig = {
     {
       loader: 'stylus-loader',
       options: {
-        'import': [
-          path.resolve(context, 'pkg/webui/styles/include.styl'),
-        ],
-        use: [ nib() ],
+        import: [path.resolve(context, 'pkg/webui/styles/include.styl')],
+        use: [nib()],
       },
     },
   ],
@@ -90,7 +88,7 @@ export const styleConfig = {
 export default {
   context,
   mode: production ? 'production' : 'development',
-  externals: [ filterLocales ],
+  externals: [filterLocales],
   stats: 'minimal',
   target: 'web',
   devtool: production ? false : 'eval-source-map',
@@ -104,22 +102,18 @@ export default {
     hot: true,
     stats: 'minimal',
     publicPath: `${ASSETS_ROOT}/`,
-    proxy: [{
-      context: [ '/console', '/oauth', '/api' ],
-      target: 'http://localhost:1885',
-      changeOrigin: true,
-    }],
+    proxy: [
+      {
+        context: ['/console', '/oauth', '/api'],
+        target: 'http://localhost:1885',
+        changeOrigin: true,
+      },
+    ],
     historyApiFallback: true,
   },
   entry: {
-    console: [
-      './config/root.js',
-      './pkg/webui/console.js',
-    ],
-    oauth: [
-      './config/root.js',
-      './pkg/webui/oauth.js',
-    ],
+    console: ['./config/root.js', './pkg/webui/console.js'],
+    oauth: ['./config/root.js', './pkg/webui/oauth.js'],
   },
   output: {
     filename: production ? '[name].[chunkhash].js' : '[name].js',
@@ -185,11 +179,10 @@ export default {
         VERSION: version,
       }),
       new webpack.DefinePlugin({
-        'process.predefined.DEFAULT_MESSAGES':
-          JSON.stringify({
-            ...require(`${src}/locales/${DEFAULT_LOCALE}`),
-            ...require(`${src}/locales/.backend/${DEFAULT_LOCALE}`),
-          }),
+        'process.predefined.DEFAULT_MESSAGES': JSON.stringify({
+          ...require(`${src}/locales/${DEFAULT_LOCALE}`),
+          ...require(`${src}/locales/.backend/${DEFAULT_LOCALE}`),
+        }),
       }),
       new HtmlWebpackPlugin({
         inject: false,
@@ -209,14 +202,11 @@ export default {
         dry: DEV_SERVER_BUILD,
         exclude: env({
           production: [],
-          development: [
-            'libs.bundle.js',
-            'libs.bundle.js.map',
-          ],
+          development: ['libs.bundle.js', 'libs.bundle.js.map'],
         }),
       }),
       // Copy static assets to output directory
-      new CopyWebpackPlugin([ `${src}/assets/static` ]),
+      new CopyWebpackPlugin([`${src}/assets/static`]),
     ],
     development: [
       new webpack.HotModuleReplacementPlugin(),
@@ -233,15 +223,15 @@ export default {
         filepath: path.resolve(context, PUBLIC_DIR, 'libs.bundle.js'),
       }),
       new ShellPlugin({
-        onBuildExit: [ 'mage js:translations' ],
+        onBuildExit: ['mage js:translations'],
       }),
     ],
   }),
 }
 
-function filterLocales (context, request, callback) {
+function filterLocales(context, request, callback) {
   if (context.endsWith('node_modules/intl/locale-data/jsonp')) {
-    const supported = r.reduce(function (acc, locale) {
+    const supported = r.reduce(function(acc, locale) {
       return acc || locale.test(request)
     }, false)
 
@@ -254,7 +244,7 @@ function filterLocales (context, request, callback) {
 
 // env selects and merges the environments for the passed object based on NODE_ENV, which
 // can have the all, development and production keys.
-function env (obj = {}) {
+function env(obj = {}) {
   if (!obj) {
     return obj
   }
@@ -264,22 +254,18 @@ function env (obj = {}) {
   const prod = obj.production
 
   if (Array.isArray(all) || Array.isArray(dev) || Array.isArray(prod)) {
-
-    return [
-      ...all || [],
-      ...(production ? prod || [] : dev || []),
-    ]
+    return [...(all || []), ...(production ? prod || [] : dev || [])]
   }
 
   if (
-    dev !== undefined && typeof dev !== 'object'
-    || prod !== undefined && typeof prod !== 'object'
+    (dev !== undefined && typeof dev !== 'object') ||
+    (prod !== undefined && typeof prod !== 'object')
   ) {
     return production ? prod : dev
   }
 
   return {
-    ...all || {},
+    ...(all || {}),
     ...(production ? prod || {} : dev || {}),
   }
 }

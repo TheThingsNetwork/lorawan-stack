@@ -12,17 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 import React from 'react'
 
 const style = {
   padding: '1rem',
 }
 
-export default function (props) {
-  return (
-    <div style={style}>
-      {props.children}
-    </div>
-  )
+export default function(props) {
+  return <div style={style}>{props.children}</div>
 }
