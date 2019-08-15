@@ -45,11 +45,35 @@ message ApplicationPubSub {
     // The server connection URL.
     string server_url = 1 [(gogoproto.customname) = "ServerURL", (validate.rules).string.uri = true];
   }
+  // The MQTT provider settings.
+  message MQTTProvider {
+    string server_url = 1 [(gogoproto.customname) = "ServerURL", (validate.rules).string.uri = true];
+    string client_id = 2 [(gogoproto.customname) = "ClientID", (validate.rules).string.max_len = 23];
+    string username = 3 [(validate.rules).string.max_len = 100];
+    string password = 4 [(validate.rules).string.max_len = 100];
+
+    enum QoS {
+      AT_MOST_ONCE = 0;
+      AT_LEAST_ONCE = 1;
+      EXACTLY_ONCE = 2;
+    }
+    QoS subscribe_qos = 5 [(gogoproto.customname) = "SubscribeQoS"];
+    QoS publish_qos = 6 [(gogoproto.customname) = "PublishQoS"];
+
+    bool use_tls = 7 [(gogoproto.customname) = "UseTLS"];
+    // The server Root CA certificate. PEM formatted.
+    bytes tls_ca = 8 [(gogoproto.customname) = "TLSCA"];
+    // The client certificate. PEM formatted.
+    bytes tls_client_cert = 9 [(gogoproto.customname) = "TLSClientCert"];
+    // The client private key. PEM formatted.
+    bytes tls_client_key = 10 [(gogoproto.customname) = "TLSClientKey"];
+  }
   // The provider for the PubSub.
   oneof provider {
     option (validate.required) = true;
 
     NATSProvider nats = 17 [(gogoproto.customname) = "NATS"];
+    MQTTProvider mqtt = 25 [(gogoproto.customname) = "MQTT"];
   };
 
   // Base topic name to which the messages topic is appended.

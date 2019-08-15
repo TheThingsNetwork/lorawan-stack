@@ -5697,6 +5697,49 @@
         }
       }
     },
+    "ApplicationPubSubMQTTProvider": {
+      "type": "object",
+      "properties": {
+        "server_url": {
+          "type": "string"
+        },
+        "client_id": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "subscribe_qos": {
+          "$ref": "#/definitions/MQTTProviderQoS"
+        },
+        "publish_qos": {
+          "$ref": "#/definitions/MQTTProviderQoS"
+        },
+        "use_tls": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "tls_ca": {
+          "type": "string",
+          "format": "byte",
+          "description": "The server Root CA certificate. PEM formatted."
+        },
+        "tls_client_cert": {
+          "type": "string",
+          "format": "byte",
+          "description": "The client certificate. PEM formatted."
+        },
+        "tls_client_key": {
+          "type": "string",
+          "format": "byte",
+          "description": "The client private key. PEM formatted."
+        }
+      },
+      "description": "The MQTT provider settings."
+    },
     "ApplicationPubSubNATSProvider": {
       "type": "object",
       "properties": {
@@ -6247,6 +6290,15 @@
         }
       }
     },
+    "MQTTProviderQoS": {
+      "type": "string",
+      "enum": [
+        "AT_MOST_ONCE",
+        "AT_LEAST_ONCE",
+        "EXACTLY_ONCE"
+      ],
+      "default": "AT_MOST_ONCE"
+    },
     "PictureEmbedded": {
       "type": "object",
       "properties": {
@@ -6794,6 +6846,9 @@
         },
         "nats": {
           "$ref": "#/definitions/ApplicationPubSubNATSProvider"
+        },
+        "mqtt": {
+          "$ref": "#/definitions/ApplicationPubSubMQTTProvider"
         },
         "base_topic": {
           "type": "string",
