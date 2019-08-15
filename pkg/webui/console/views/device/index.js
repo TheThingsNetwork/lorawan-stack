@@ -113,7 +113,7 @@ export default class Device extends React.Component {
       },
       devId,
       deviceName,
-      env,
+      env: { siteName },
     } = this.props
 
     const basePath = `/applications/${appId}/devices/${devId}`
@@ -142,7 +142,7 @@ export default class Device extends React.Component {
 
     return (
       <React.Fragment>
-        <IntlHelmet titleTemplate={`%s - ${deviceName || devId} - ${env.site_name}`} />
+        <IntlHelmet titleTemplate={`%s - ${deviceName || devId} - ${siteName}`} />
         <Container>
           <Row>
             <Col lg={12}>
