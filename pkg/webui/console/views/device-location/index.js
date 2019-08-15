@@ -74,7 +74,7 @@ const getRegistryLocation = function(locations) {
   }),
   { updateDevice: attachPromise(updateDevice) },
 )
-@withBreadcrumb('device.single.data', function(props) {
+@withBreadcrumb('device.single.location', function(props) {
   const { devId, appId } = props
   return (
     <Breadcrumb
