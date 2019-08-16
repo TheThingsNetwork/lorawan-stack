@@ -406,21 +406,14 @@ func setField(rv reflect.Value, path []string, v reflect.Value) error {
 				case ft.AssignableTo(vt):
 					field.Set(v)
 				case ft.Kind() == reflect.Int32 && vt.Kind() == reflect.String:
-					if valueMap := enumValues(ft); valueMap != nil {
-						if enumValue, ok := valueMap[v.String()]; ok {
-							field.SetInt(int64(enumValue))
-							break
-						}
-					}
-
 					if reflect.PtrTo(ft).Implements(textUnmarshalerType) {
-						fv := reflect.New(ft)
-						if err := fv.Interface().(encoding.TextUnmarshaler).UnmarshalText([]byte(v.String())); err == nil {
-							field.SetInt(fv.Elem().Int())
-							break
+						err := field.Addr().Interface().(encoding.TextUnmarshaler).UnmarshalText([]byte(v.String()))
+						if err != nil {
+							return err
 						}
+					} else {
+						return fmt.Errorf(`%s does not implement encoding.TextUnmarshaler`, ft.Name())
 					}
-					return fmt.Errorf(`invalid value "%s" for %s`, v.String(), ft.Name())
 				case ft.PkgPath() == "time":
 					switch {
 					case ft.Name() == "Time" && vt.Kind() == reflect.String:
@@ -529,15 +522,27 @@ func setField(rv reflect.Value, path []string, v reflect.Value) error {
 						field.Set(reflect.Zero(ft))
 					}
 				case ft.Kind() == reflect.Slice && vt.Kind() == reflect.Slice:
-					if vt.Elem().ConvertibleTo(ft.Elem()) {
-						slice := reflect.MakeSlice(ft, v.Len(), v.Len())
+					slice := reflect.MakeSlice(ft, v.Len(), v.Len())
+					switch {
+					case vt.Elem().ConvertibleTo(ft.Elem()):
 						for i := 0; i < v.Len(); i++ {
 							slice.Index(i).Set(v.Index(i).Convert(ft.Elem()))
 						}
-						field.Set(slice)
-					} else {
+					case ft.Elem().Kind() == reflect.Int32 && vt.Elem().Kind() == reflect.String:
+						if reflect.PtrTo(ft.Elem()).Implements(textUnmarshalerType) {
+							for i := 0; i < v.Len(); i++ {
+								err := slice.Index(i).Addr().Interface().(encoding.TextUnmarshaler).UnmarshalText([]byte(v.Index(i).String()))
+								if err != nil {
+									return err
+								}
+							}
+						} else {
+							return fmt.Errorf(`%s does not implement encoding.TextUnmarshaler`, ft.Elem().Name())
+						}
+					default:
 						return fmt.Errorf("%v is not convertible to %v", ft, vt)
 					}
+					field.Set(slice)
 				default:
 					return fmt.Errorf("%v is not assignable to %v", ft, vt)
 				}
