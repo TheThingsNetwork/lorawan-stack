@@ -231,11 +231,12 @@ func (s *srv) handleTraffic(c echo.Context) error {
 		logger.WithError(err).Error("Failed to claim downlink")
 		return err
 	}
-	defer func() {
+	defer func(error) {
+		conn.Disconnect(err)
 		if err := s.server.UnclaimDownlink(ctx, ids); err != nil {
 			logger.WithError(err).Error("Failed to unclaim downlink")
 		}
-	}()
+	}(err)
 
 	ws, err := s.upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
