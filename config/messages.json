@@ -5320,7 +5320,7 @@
   },
   "error:pkg/ttnpb:field_bound": {
     "translations": {
-      "en": "`{lorawan_field}` should be between `{min}` and `{max}`"
+      "en": "`{field}` should be between `{min}` and `{max}`"
     },
     "description": {
       "package": "pkg/ttnpb",
@@ -5329,7 +5329,7 @@
   },
   "error:pkg/ttnpb:field_with_max": {
     "translations": {
-      "en": "`{lorawan_field}` should be lower or equal to `{max}`"
+      "en": "`{field}` should be lower or equal to `{max}`"
     },
     "description": {
       "package": "pkg/ttnpb",
@@ -5365,7 +5365,7 @@
   },
   "error:pkg/ttnpb:parse": {
     "translations": {
-      "en": "could not parse `{lorawan_field}`"
+      "en": "could not parse `{value}` into `{field}`"
     },
     "description": {
       "package": "pkg/ttnpb",
@@ -5388,15 +5388,6 @@
     "description": {
       "package": "pkg/ttnpb",
       "file": "fieldmask_utils.go"
-    }
-  },
-  "error:pkg/ttnpb:unknown_field": {
-    "translations": {
-      "en": "unknown `{lorawan_field}`"
-    },
-    "description": {
-      "package": "pkg/ttnpb",
-      "file": "errors.go"
     }
   },
   "error:pkg/types:dev_addr_prefix": {
