@@ -23,6 +23,7 @@ import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import withRequest from '../../../lib/components/with-request'
 import { withEnv } from '../../../lib/components/env'
+import BreadcrumbView from '../../../lib/components/breadcrumb-view'
 
 import ApplicationOverview from '../application-overview'
 import ApplicationGeneralSettings from '../application-general-settings'
@@ -146,7 +147,7 @@ export default class Application extends React.Component {
     const { match, application, appId, env } = this.props
 
     return (
-      <React.Fragment>
+      <BreadcrumbView>
         <IntlHelmet titleTemplate={`%s - ${application.name || appId} - ${env.siteName}`} />
         <Switch>
           <Route exact path={`${match.path}`} component={ApplicationOverview} />
@@ -162,7 +163,7 @@ export default class Application extends React.Component {
           />
           <Route path={`${match.path}/integrations`} component={ApplicationIntegrations} />
         </Switch>
-      </React.Fragment>
+      </BreadcrumbView>
     )
   }
 }
