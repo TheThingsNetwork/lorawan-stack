@@ -17,11 +17,7 @@
 import path from 'path'
 import webpack from 'webpack'
 
-const {
-  CONTEXT = '.',
-  CACHE_DIR = '.cache',
-  PUBLIC_DIR = 'public',
-} = process.env
+const { CONTEXT = '.', CACHE_DIR = '.cache', PUBLIC_DIR = 'public' } = process.env
 
 const context = path.resolve(CONTEXT)
 const library = '[name]_[hash]'

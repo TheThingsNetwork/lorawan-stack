@@ -15,7 +15,7 @@
 /* eslint-disable import/no-commonjs */
 
 module.exports = {
-  process () {
+  process() {
     return 'module.exports = {};'
   },
 }

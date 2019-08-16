@@ -312,7 +312,7 @@ func (js Js) Fmt() error {
 		return err
 	}
 
-	return prettier("--config", "./config/.prettierrc.js", "./pkg/webui/**/*.js", "--write")
+	return prettier("--config", "./config/.prettierrc.js", "./pkg/webui/**/*.js", "./config/**/*.js", "--write")
 }
 
 // Lint runs eslint over frontend js files.
@@ -324,7 +324,7 @@ func (js Js) Lint() error {
 	if err != nil {
 		return err
 	}
-	return eslint("./pkg/webui/**/*.js", "--no-ignore", "--color")
+	return eslint("./pkg/webui/**/*.js", "./config/**/*.js", "--no-ignore", "--color")
 }
 
 // LintSnap runs eslint over frontend snap files.

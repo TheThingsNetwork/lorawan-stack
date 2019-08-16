@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const yaml = require("js-yaml")
-const fs = require("fs")
-const path = require("path")
+const yaml = require('js-yaml')
+const fs = require('fs')
+const path = require('path')
 
-module.exports = yaml.safeLoad(fs.readFileSync(path.join(__dirname, "prettierrc.yaml"), "utf8"))
+module.exports = yaml.safeLoad(fs.readFileSync(path.join(__dirname, 'prettierrc.yaml'), 'utf8'))
