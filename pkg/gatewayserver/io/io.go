@@ -86,8 +86,7 @@ type Connection struct {
 }
 
 // NewConnection instantiates a new gateway connection.
-func NewConnection(ctx context.Context, protocol string, gateway *ttnpb.Gateway, fp *frequencyplans.FrequencyPlan, scheduler *scheduling.Scheduler) *Connection {
-	ctx, cancelCtx := errorcontext.New(ctx)
+func NewConnection(ctx context.Context, cancelCtx errorcontext.CancelFunc, protocol string, gateway *ttnpb.Gateway, fp *frequencyplans.FrequencyPlan, scheduler *scheduling.Scheduler) *Connection {
 	return &Connection{
 		ctx:         ctx,
 		cancelCtx:   cancelCtx,

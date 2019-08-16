@@ -22,6 +22,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	"go.thethings.network/lorawan-stack/pkg/errorcontext"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
@@ -76,6 +77,7 @@ func (s *server) FillGatewayContext(ctx context.Context, ids ttnpb.GatewayIdenti
 
 // Connect implements io.Server.
 func (s *server) Connect(ctx context.Context, frontend io.Frontend, ids ttnpb.GatewayIdentifiers) (*io.Connection, error) {
+	ctx, cancelCtx := errorcontext.New(ctx)
 	if err := rights.RequireGateway(ctx, ids, ttnpb.RIGHT_GATEWAY_LINK); err != nil {
 		return nil, err
 	}
@@ -94,7 +96,7 @@ func (s *server) Connect(ctx context.Context, frontend io.Frontend, ids ttnpb.Ga
 	if err != nil {
 		return nil, err
 	}
-	conn := io.NewConnection(ctx, frontend.Protocol(), gtw, fp, scheduler)
+	conn := io.NewConnection(ctx, cancelCtx, frontend.Protocol(), gtw, fp, scheduler)
 	s.connections[unique.ID(ctx, ids)] = conn
 	select {
 	case s.connectionsCh <- conn:
