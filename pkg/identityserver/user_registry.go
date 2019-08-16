@@ -116,8 +116,19 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 
 	if !createdByAdmin {
 		req.User.PrimaryEmailAddressValidatedAt = nil
+		req.User.RequirePasswordUpdate = false
+		if is.configFromContext(ctx).UserRegistration.AdminApproval.Required {
+			req.User.State = ttnpb.STATE_REQUESTED
+		} else {
+			req.User.State = ttnpb.STATE_APPROVED
+		}
+		req.User.Admin = false
+		req.User.TemporaryPassword = ""
+		req.User.TemporaryPasswordCreatedAt = nil
+		req.User.TemporaryPasswordExpiresAt = nil
 		cleanContactInfo(req.User.ContactInfo)
 	}
+
 	var primaryEmailAddressFound bool
 	for _, contactInfo := range req.User.ContactInfo {
 		if contactInfo.ContactMethod == ttnpb.CONTACT_METHOD_EMAIL && contactInfo.Value == req.User.PrimaryEmailAddress {
@@ -146,15 +157,6 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 	req.User.Password = hashedPassword
 	now := time.Now()
 	req.User.PasswordUpdatedAt = &now
-
-	if !createdByAdmin {
-		if is.configFromContext(ctx).UserRegistration.AdminApproval.Required {
-			req.User.State = ttnpb.STATE_REQUESTED
-		} else {
-			req.User.State = ttnpb.STATE_APPROVED
-		}
-		req.User.Admin = false
-	}
 
 	if req.User.ProfilePicture != nil {
 		if err = is.processUserProfilePicture(ctx, &req.User); err != nil {
