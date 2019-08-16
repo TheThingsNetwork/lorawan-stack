@@ -12,18 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { hot } from 'react-hot-loader/root'
 import React from 'react'
 import { Switch, Route } from 'react-router-dom'
 import { ConnectedRouter } from 'connected-react-router'
-import { createBrowserHistory } from 'history'
-import { Provider } from 'react-redux'
 import { Helmet } from 'react-helmet'
 
-import WithLocale from '../../../lib/components/with-locale'
-import withEnv, { EnvProvider } from '../../../lib/components/env'
+import withEnv from '../../../lib/components/env'
 import ErrorView from '../../../lib/components/error-view'
-import { selectApplicationRootPath } from '../../../lib/selectors/env'
-import env from '../../../lib/env'
+import dev from '../../../lib/dev'
 
 import Landing from '../landing'
 import Login from '../login'
@@ -32,59 +29,51 @@ import CreateAccount from '../create-account'
 import ForgotPassword from '../forgot-password'
 import UpdatePassword from '../update-password'
 import FullViewError from '../error'
-import createStore from '../../store'
-import Init from '../../../lib/components/init'
 import Code from '../code'
 
-const appRoot = selectApplicationRootPath()
-const history = createBrowserHistory({ basename: appRoot })
-const store = createStore(history)
-
 const GenericNotFound = () => <FullViewError error={{ statusCode: 404 }} />
+
 @withEnv
-export default class OAuthApp extends React.PureComponent {
+class OAuthApp extends React.PureComponent {
   render() {
-    const { pageData } = env
+    const {
+      env: { siteTitle, pageData, siteName },
+      history,
+    } = this.props
 
     if (pageData && pageData.error) {
       return (
-        <EnvProvider env={env}>
-          <Provider store={store}>
-            <WithLocale>
-              <FullViewError error={pageData.error} />
-            </WithLocale>
-          </Provider>
-        </EnvProvider>
+        <ConnectedRouter history={history}>
+          <FullViewError error={pageData.error} />
+        </ConnectedRouter>
       )
     }
 
     return (
-      <EnvProvider env={env}>
-        <Provider store={store}>
-          <Init>
+      <ConnectedRouter history={history}>
+        <ErrorView ErrorComponent={FullViewError}>
+          <React.Fragment>
             <Helmet
-              titleTemplate={`%s - ${env.siteTitle ? `${env.siteTitle} - ` : ''}${env.siteName}`}
-              defaultTitle={`${env.siteTitle ? `${env.siteTitle} - ` : ''}${env.siteName}`}
+              titleTemplate={`%s - ${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}
+              defaultTitle={`${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}
             />
-            <WithLocale>
-              <ErrorView ErrorComponent={FullViewError}>
-                <ConnectedRouter history={history}>
-                  <Switch>
-                    <Route path="/" exact component={Landing} />
-                    <Route path="/login" component={Login} />
-                    <Route path="/authorize" component={Authorize} />
-                    <Route path="/register" component={CreateAccount} />
-                    <Route path="/forgot-password" component={ForgotPassword} />
-                    <Route path="/code" component={Code} />
-                    <Route path="/update-password" component={UpdatePassword} />
-                    <Route component={GenericNotFound} />
-                  </Switch>
-                </ConnectedRouter>
-              </ErrorView>
-            </WithLocale>
-          </Init>
-        </Provider>
-      </EnvProvider>
+            <Switch>
+              <Route path="/" exact component={Landing} />
+              <Route path="/login" component={Login} />
+              <Route path="/authorize" component={Authorize} />
+              <Route path="/register" component={CreateAccount} />
+              <Route path="/forgot-password" component={ForgotPassword} />
+              <Route path="/code" component={Code} />
+              <Route path="/update-password" component={UpdatePassword} />
+              <Route component={GenericNotFound} />
+            </Switch>
+          </React.Fragment>
+        </ErrorView>
+      </ConnectedRouter>
     )
   }
 }
+
+const ExportedApp = dev ? hot(OAuthApp) : OAuthApp
+
+export default ExportedApp

@@ -14,7 +14,44 @@
 
 import React from 'react'
 import DOM from 'react-dom'
-import OAuthApp from './oauth/views/app'
+import { Provider } from 'react-redux'
+import { createBrowserHistory } from 'history'
 
-const root = document.getElementById('app')
-DOM.render(<OAuthApp />, root)
+import WithLocale from './lib/components/with-locale'
+import env from './lib/env'
+import { selectApplicationRootPath } from './lib/selectors/env'
+import { EnvProvider } from './lib/components/env'
+import Init from './lib/components/init'
+
+import createStore from './oauth/store'
+
+const appRoot = selectApplicationRootPath()
+const history = createBrowserHistory({ basename: `${appRoot}/` })
+const store = createStore(history)
+
+const rootElement = document.getElementById('app')
+
+const render = () => {
+  const App = require('./oauth/views/app').default
+
+  DOM.render(
+    <EnvProvider env={env}>
+      <Provider store={store}>
+        <Init>
+          <WithLocale>
+            <App history={history} />
+          </WithLocale>
+        </Init>
+      </Provider>
+    </EnvProvider>,
+    rootElement,
+  )
+}
+
+if (module.hot) {
+  module.hot.accept('./oauth/views/app', () => {
+    setTimeout(render)
+  })
+}
+
+render()

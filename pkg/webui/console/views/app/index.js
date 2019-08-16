@@ -12,14 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { hot } from 'react-hot-loader/root'
 import React from 'react'
+import { ConnectedRouter } from 'connected-react-router'
 
 import { Route, Switch } from 'react-router-dom'
-import bind from 'autobind-decorator'
 
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import { withEnv } from '../../../lib/components/env'
 import ErrorView from '../../../lib/components/error-view'
+import dev from '../../../lib/dev'
 
 import SideNavigation from '../../../components/navigation/side'
 import Header from '../../containers/header'
@@ -31,41 +33,51 @@ import FullViewError from '../error'
 import style from './app.styl'
 
 @withEnv
-@bind
-export default class ConsoleApp extends React.Component {
+class ConsoleApp extends React.Component {
   render() {
     const {
       env: { siteTitle, pageData, siteName },
+      history,
     } = this.props
 
     if (pageData && pageData.error) {
-      return <FullViewError error={pageData.error} />
+      return (
+        <ConnectedRouter history={history}>
+          <FullViewError error={pageData.error} />
+        </ConnectedRouter>
+      )
     }
 
     return (
-      <ErrorView ErrorComponent={FullViewError}>
-        <div className={style.app}>
-          <IntlHelmet
-            titleTemplate={`%s - ${siteTitle ? `${siteName} - ` : ''}${siteName}`}
-            defaultTitle={siteName}
-          />
-          <div id="modal-container" />
-          <Header className={style.header} />
-          <main className={style.main}>
-            <div>
-              <SideNavigation />
-            </div>
-            <div className={style.content}>
-              <Switch>
-                {/* routes for registration, privacy policy, other public pages */}
-                <Route path="/login" component={Login} />
-                <Route path="/" component={Landing} />
-              </Switch>
-            </div>
-          </main>
-          <Footer className={style.footer} />
-        </div>
-      </ErrorView>
+      <ConnectedRouter history={history}>
+        <ErrorView ErrorComponent={FullViewError}>
+          <div className={style.app}>
+            <IntlHelmet
+              titleTemplate={`%s - ${siteTitle ? `${siteName} - ` : ''}${siteName}`}
+              defaultTitle={siteName}
+            />
+            <div id="modal-container" />
+            <Header className={style.header} />
+            <main className={style.main}>
+              <div>
+                <SideNavigation />
+              </div>
+              <div className={style.content}>
+                <Switch>
+                  {/* routes for registration, privacy policy, other public pages */}
+                  <Route path="/login" component={Login} />
+                  <Route path="/" component={Landing} />
+                </Switch>
+              </div>
+            </main>
+            <Footer className={style.footer} />
+          </div>
+        </ErrorView>
+      </ConnectedRouter>
     )
   }
 }
+
+const ExportedApp = dev ? hot(ConsoleApp) : ConsoleApp
+
+export default ExportedApp

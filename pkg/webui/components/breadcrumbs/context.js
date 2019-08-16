@@ -50,12 +50,6 @@ class BreadcrumbsProvider extends React.Component {
 const withBreadcrumb = (id, element) =>
   function(Component) {
     class BreadcrumbsConsumer extends React.Component {
-      constructor(props) {
-        super(props)
-
-        this.add()
-      }
-
       add() {
         const { add, breadcrumb } = this.props
 
@@ -66,6 +60,10 @@ const withBreadcrumb = (id, element) =>
         const { remove } = this.props
 
         remove(id)
+      }
+
+      componentDidMount() {
+        this.add()
       }
 
       componentWillUnmount() {

@@ -96,6 +96,11 @@ export default {
     fs: 'empty',
     module: 'empty',
   },
+  resolve: {
+    alias: {
+      'react-dom': '@hot-loader/react-dom',
+    },
+  },
   devServer: {
     port: 8080,
     inline: true,

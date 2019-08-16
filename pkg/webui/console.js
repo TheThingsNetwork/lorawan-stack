@@ -14,7 +14,6 @@
 
 import React from 'react'
 import DOM from 'react-dom'
-import { ConnectedRouter } from 'connected-react-router'
 import { createBrowserHistory } from 'history'
 import { Provider } from 'react-redux'
 
@@ -28,28 +27,38 @@ import { selectApplicationRootPath } from './lib/selectors/env'
 import './lib/yup-extensions'
 
 import createStore from './console/store'
-import App from './console/views/app'
 
 const appRoot = selectApplicationRootPath()
 const history = createBrowserHistory({ basename: `${appRoot}/` })
 const store = createStore(history)
 
-const Console = () => (
-  <EnvProvider env={env}>
-    <Provider store={store}>
-      <Init>
-        <WithLocale>
-          <ConnectedRouter history={history}>
+const rootElement = document.getElementById('app')
+
+const render = () => {
+  const App = require('./console/views/app').default
+
+  DOM.render(
+    <EnvProvider env={env}>
+      <Provider store={store}>
+        <Init>
+          <WithLocale>
             <BreadcrumbsProvider>
               <SideNavigationProvider>
-                <App />
+                <App history={history} />
               </SideNavigationProvider>
             </BreadcrumbsProvider>
-          </ConnectedRouter>
-        </WithLocale>
-      </Init>
-    </Provider>
-  </EnvProvider>
-)
+          </WithLocale>
+        </Init>
+      </Provider>
+    </EnvProvider>,
+    rootElement,
+  )
+}
 
-DOM.render(<Console />, document.getElementById('app'))
+if (module.hot) {
+  module.hot.accept('./console/views/app', () => {
+    setTimeout(render)
+  })
+}
+
+render()
