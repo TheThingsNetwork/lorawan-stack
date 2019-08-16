@@ -134,20 +134,28 @@ func isSettableField(name string) bool {
 	return true
 }
 
-func enumValues(t reflect.Type) map[string]int32 {
+func enumValues(t reflect.Type) []string {
 	if t.PkgPath() == "go.thethings.network/lorawan-stack/pkg/ttnpb" {
-		enumValues := make(map[string]int32)
+		valueMap := make(map[string]int32)
 		implementsStringer := t.Implements(reflect.TypeOf((*fmt.Stringer)(nil)).Elem())
 		for s, v := range proto.EnumValueMap(fmt.Sprintf("ttn.lorawan.v3.%s", t.Name())) {
-			enumValues[s] = v
 			if implementsStringer {
+				// If the enum implements Stringer, then the String might be different than the official name.
 				rv := reflect.New(t).Elem()
 				rv.SetInt(int64(v))
-				s := rv.MethodByName("String").Call(nil)[0].String()
-				enumValues[s] = v
+				s := rv.Interface().(fmt.Stringer).String()
+				valueMap[s] = v
+			} else {
+				// Otherwise we use the official name.
+				valueMap[s] = v
 			}
 		}
-		return enumValues
+		values := make([]string, 0, len(valueMap))
+		for value := range valueMap {
+			values = append(values, value)
+		}
+		sort.Strings(values)
+		return values
 	}
 	return nil
 }
@@ -189,12 +197,7 @@ func addField(fs *pflag.FlagSet, name string, t reflect.Type, maskOnly bool) {
 			case reflect.String:
 				fs.StringSlice(name, nil, "")
 			case reflect.Int32:
-				if valueMap := enumValues(t.Elem()); valueMap != nil {
-					values := make([]string, 0, len(valueMap))
-					for value := range valueMap {
-						values = append(values, value)
-					}
-					sort.Strings(values)
+				if values := enumValues(t.Elem()); values != nil {
 					fs.StringSlice(name, nil, strings.Join(values, "|"))
 				} else {
 					fs.IntSlice(name, nil, "")
@@ -216,12 +219,7 @@ func addField(fs *pflag.FlagSet, name string, t reflect.Type, maskOnly bool) {
 			fmt.Printf("flags: %s not yet supported (%s)\n", t.Kind(), name)
 		}
 	} else if t.Kind() == reflect.Int32 && strings.HasSuffix(t.PkgPath(), "ttnpb") {
-		if valueMap := enumValues(t); valueMap != nil {
-			values := make([]string, 0, len(valueMap))
-			for value := range valueMap {
-				values = append(values, value)
-			}
-			sort.Strings(values)
+		if values := enumValues(t); values != nil {
 			fs.String(name, "", strings.Join(values, "|"))
 		}
 	} else if (t.Kind() == reflect.Slice || t.Kind() == reflect.Array) && t.Elem().Kind() == reflect.Uint8 {
