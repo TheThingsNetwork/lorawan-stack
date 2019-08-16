@@ -133,7 +133,7 @@ func TestClientAccessCRUD(t *testing.T) {
 		a.So(err, should.BeNil)
 
 		modifiedClientID := clientID
-		modifiedClientID.ClientID += "mod"
+		modifiedClientID.ClientID = reverse(modifiedClientID.ClientID)
 
 		rights, err = reg.ListRights(ctx, &modifiedClientID, creds)
 		a.So(rights, should.NotBeNil)

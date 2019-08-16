@@ -231,7 +231,7 @@ func TestOrganizationAccessCRUD(t *testing.T) {
 		a.So(err, should.BeNil)
 
 		modifiedOrganizationID := organizationID
-		modifiedOrganizationID.OrganizationID += "mod"
+		modifiedOrganizationID.OrganizationID = reverse(modifiedOrganizationID.OrganizationID)
 
 		rights, err = reg.ListRights(ctx, &modifiedOrganizationID, creds)
 		a.So(rights, should.NotBeNil)

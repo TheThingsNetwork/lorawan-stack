@@ -190,7 +190,7 @@ func TestUserAccessCRUD(t *testing.T) {
 		a.So(err, should.BeNil)
 
 		modifiedUserID := user.UserIdentifiers
-		modifiedUserID.UserID += "mod"
+		modifiedUserID.UserID = reverse(modifiedUserID.UserID)
 
 		rights, err = reg.ListRights(ctx, &modifiedUserID, creds)
 		a.So(rights, should.NotBeNil)

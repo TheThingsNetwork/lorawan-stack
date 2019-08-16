@@ -231,7 +231,7 @@ func TestApplicationAccessCRUD(t *testing.T) {
 		a.So(err, should.BeNil)
 
 		modifiedApplicationID := applicationID
-		modifiedApplicationID.ApplicationID += "mod"
+		modifiedApplicationID.ApplicationID = reverse(modifiedApplicationID.ApplicationID)
 
 		rights, err = reg.ListRights(ctx, &modifiedApplicationID, creds)
 		a.So(rights, should.NotBeNil)
