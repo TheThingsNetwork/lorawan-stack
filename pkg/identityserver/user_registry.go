@@ -285,10 +285,6 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 	}
 	updatedByAdmin := is.IsAdmin(ctx)
 
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "password", "password_updated_at") {
-		return nil, errUpdateUserPasswordRequest
-	}
-
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "primary_email_address") {
 		if err := validate.Email(req.User.PrimaryEmailAddress); err != nil {
 			return nil, err
