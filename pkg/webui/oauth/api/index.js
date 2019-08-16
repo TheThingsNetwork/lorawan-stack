@@ -15,9 +15,11 @@
 import axios from 'axios'
 
 import getCookieValue from '../../lib/cookie'
-import { selectApplicationRootPath } from '../../lib/selectors/env'
+import { selectApplicationRootPath, selectApplicationConfig } from '../../lib/selectors/env'
 
 const appRoot = selectApplicationRootPath()
+const config = selectApplicationConfig()
+const isBaseUrl = config.is.base_url
 
 const csrf = getCookieValue('_csrf')
 const instance = axios.create({
@@ -27,13 +29,13 @@ const instance = axios.create({
 export default {
   users: {
     async register(userData) {
-      return axios.post(`/api/v3/users`, userData)
+      return axios.post(`${isBaseUrl}/users`, userData)
     },
     async resetPassword(user_id) {
-      return axios.post(`/api/v3/users/${user_id}/temporary_password`)
+      return axios.post(`${isBaseUrl}/users/${user_id}/temporary_password`)
     },
     async updatePassword(user_id, passwordData) {
-      return axios.put(`/api/v3/users/${user_id}/password`, passwordData)
+      return axios.put(`${isBaseUrl}/users/${user_id}/password`, passwordData)
     },
   },
   oauth: {

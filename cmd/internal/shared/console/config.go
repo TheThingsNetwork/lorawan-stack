@@ -41,11 +41,11 @@ var DefaultConsoleConfig = console.Config{
 			JSFiles:       []string{"console.js"},
 		},
 		FrontendConfig: console.FrontendConfig{
-			IS: console.APIConfig{Enabled: true, BaseURL: shared.DefaultPublicURL + "/api/v3"},
-			GS: console.APIConfig{Enabled: true, BaseURL: shared.DefaultPublicURL + "/api/v3"},
-			NS: console.APIConfig{Enabled: true, BaseURL: shared.DefaultPublicURL + "/api/v3"},
-			AS: console.APIConfig{Enabled: true, BaseURL: shared.DefaultPublicURL + "/api/v3"},
-			JS: console.APIConfig{Enabled: true, BaseURL: shared.DefaultPublicURL + "/api/v3"},
+			IS: webui.APIConfig{Enabled: true, BaseURL: shared.DefaultPublicURL + "/api/v3"},
+			GS: webui.APIConfig{Enabled: true, BaseURL: shared.DefaultPublicURL + "/api/v3"},
+			NS: webui.APIConfig{Enabled: true, BaseURL: shared.DefaultPublicURL + "/api/v3"},
+			AS: webui.APIConfig{Enabled: true, BaseURL: shared.DefaultPublicURL + "/api/v3"},
+			JS: webui.APIConfig{Enabled: true, BaseURL: shared.DefaultPublicURL + "/api/v3"},
 		},
 	},
 }

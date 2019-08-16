@@ -30,12 +30,6 @@ import (
 	"golang.org/x/oauth2"
 )
 
-// APIConfig for upstream APIs.
-type APIConfig struct {
-	Enabled bool   `json:"enabled" name:"enabled" description:"Enable this API"`
-	BaseURL string `json:"base_url" name:"base-url" description:"Base URL to the HTTP API"`
-}
-
 // UIConfig is the combined configuration for the Console UI.
 type UIConfig struct {
 	webui.TemplateData `name:",squash"`
@@ -44,12 +38,12 @@ type UIConfig struct {
 
 // FrontendConfig is the configuration for the Console frontend.
 type FrontendConfig struct {
-	Language string    `json:"language" name:"-"`
-	IS       APIConfig `json:"is" name:"is"`
-	GS       APIConfig `json:"gs" name:"gs"`
-	NS       APIConfig `json:"ns" name:"ns"`
-	AS       APIConfig `json:"as" name:"as"`
-	JS       APIConfig `json:"js" name:"js"`
+	Language string          `json:"language" name:"-"`
+	IS       webui.APIConfig `json:"is" name:"is"`
+	GS       webui.APIConfig `json:"gs" name:"gs"`
+	NS       webui.APIConfig `json:"ns" name:"ns"`
+	AS       webui.APIConfig `json:"as" name:"as"`
+	JS       webui.APIConfig `json:"js" name:"js"`
 }
 
 // Config is the configuration for the Console.
