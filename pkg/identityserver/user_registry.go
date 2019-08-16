@@ -309,6 +309,24 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 		cleanContactInfo(req.User.ContactInfo)
 	}
 
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "temporary_password") {
+		hashedTemporaryPassword, err := auth.Hash(ctx, req.User.TemporaryPassword)
+		if err != nil {
+			return nil, err
+		}
+		req.User.TemporaryPassword = hashedTemporaryPassword
+		now := time.Now()
+		if !ttnpb.HasAnyField(req.FieldMask.Paths, "temporary_password_created_at") {
+			req.User.TemporaryPasswordCreatedAt = &now
+			req.FieldMask.Paths = append(req.FieldMask.Paths, "temporary_password_created_at")
+		}
+		if !ttnpb.HasAnyField(req.FieldMask.Paths, "temporary_password_expires_at") {
+			expires := now.Add(temporaryPasswordValidity)
+			req.User.TemporaryPasswordExpiresAt = &expires
+			req.FieldMask.Paths = append(req.FieldMask.Paths, "temporary_password_expires_at")
+		}
+	}
+
 	if ttnpb.HasAnyField(ttnpb.TopLevelFields(req.FieldMask.Paths), "profile_picture") {
 		if !ttnpb.HasAnyField(req.FieldMask.Paths, "profile_picture") {
 			req.FieldMask.Paths = append(req.FieldMask.Paths, "profile_picture")
@@ -487,8 +505,9 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 
 var errTemporaryPasswordStillValid = errors.DefineInvalidArgument("temporary_password_still_valid", "previous temporary password still valid")
 
+var temporaryPasswordValidity = time.Hour * 24
+
 func (is *IdentityServer) createTemporaryPassword(ctx context.Context, req *ttnpb.CreateTemporaryPasswordRequest) (*types.Empty, error) {
-	now := time.Now()
 	temporaryPassword, err := auth.GenerateKey(ctx)
 	if err != nil {
 		return nil, err
@@ -497,6 +516,7 @@ func (is *IdentityServer) createTemporaryPassword(ctx context.Context, req *ttnp
 	if err != nil {
 		return nil, err
 	}
+	now := time.Now()
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
 		usr, err := store.GetUserStore(db).GetUser(ctx, &req.UserIdentifiers, temporaryPasswordFieldMask)
 		if err != nil {
@@ -506,7 +526,7 @@ func (is *IdentityServer) createTemporaryPassword(ctx context.Context, req *ttnp
 			return errTemporaryPasswordStillValid
 		}
 		usr.TemporaryPassword = hashedTemporaryPassword
-		expires := now.Add(time.Hour)
+		expires := now.Add(temporaryPasswordValidity)
 		usr.TemporaryPasswordCreatedAt, usr.TemporaryPasswordExpiresAt = &now, &expires
 		usr, err = store.GetUserStore(db).UpdateUser(ctx, usr, updateTemporaryPasswordFieldMask)
 		return err
