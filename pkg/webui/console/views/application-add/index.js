@@ -24,9 +24,7 @@ import Form from '../../../components/form'
 import Input from '../../../components/input'
 import SubmitButton from '../../../components/submit-button'
 import Message from '../../../lib/components/message'
-import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import IntlHelmet from '../../../lib/components/intl-helmet'
-import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import sharedMessages from '../../../lib/shared-messages'
 import { id as applicationIdRegexp } from '../../lib/regexp'
 import SubmitBar from '../../../components/submit-bar'
@@ -61,9 +59,6 @@ const validationSchema = Yup.object().shape({
   description: Yup.string(),
 })
 
-@withBreadcrumb('apps.add', function(props) {
-  return <Breadcrumb path="/applications/add" icon="add" content={sharedMessages.add} />
-})
 @connect(
   ({ user }) => ({
     userId: user.user.ids.user_id,

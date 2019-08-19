@@ -12,5 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.container
-  height: 100%
+import React from 'react'
+import { Container } from 'react-grid-system'
+
+import Breadcrumbs from '../../../components/breadcrumbs'
+
+import style from './breadcrumb-view.styl'
+
+const BreadcrumbView = ({ children }) => {
+  return (
+    <div className={style.container}>
+      <div className={style.breadcrumbsContainer}>
+        <Container>
+          <Breadcrumbs />
+        </Container>
+      </div>
+      <div className={style.contentContainer}>{children}</div>
+    </div>
+  )
+}
+
+export default BreadcrumbView

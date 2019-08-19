@@ -23,6 +23,7 @@ import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import withRequest from '../../../lib/components/with-request'
 import withEnv from '../../../lib/components/env'
+import BreadcrumbView from '../../../lib/components/breadcrumb-view'
 
 import GatewayOverview from '../gateway-overview'
 import GatewayApiKeys from '../gateway-api-keys'
@@ -129,7 +130,7 @@ export default class Gateway extends React.Component {
     const { match, gateway, gtwId, env } = this.props
 
     return (
-      <React.Fragment>
+      <BreadcrumbView>
         <IntlHelmet titleTemplate={`%s - ${gateway.name || gtwId} - ${env.siteName}`} />
         <Switch>
           <Route exact path={`${match.path}`} component={GatewayOverview} />
@@ -139,7 +140,7 @@ export default class Gateway extends React.Component {
           <Route path={`${match.path}/data`} component={GatewayData} />
           <Route path={`${match.path}/general-settings`} component={GatewayGeneralSettings} />
         </Switch>
-      </React.Fragment>
+      </BreadcrumbView>
     )
   }
 }

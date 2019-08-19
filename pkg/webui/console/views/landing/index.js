@@ -14,9 +14,7 @@
 
 import React from 'react'
 import { Switch, Route } from 'react-router-dom'
-import { Container } from 'react-grid-system'
 
-import Breadcrumbs from '../../../components/breadcrumbs'
 import WithAuth from '../../../lib/components/with-auth'
 import Overview from '../overview'
 import Applications from '../applications'
@@ -30,25 +28,17 @@ const GenericNotFound = () => <FullViewErrorInner error={{ statusCode: 404 }} />
 
 export default class Landing extends React.PureComponent {
   render() {
-    const { path } = this.props.match
     return (
       <div className={style.container}>
         <ToastContainer />
-        <div className={style.breadcrumbsContainer}>
-          <Container>
-            <Breadcrumbs pathPrefix={path} />
-          </Container>
-        </div>
-        <div className={style.contentContainer}>
-          <WithAuth>
-            <Switch>
-              <Route exact path="/" component={Overview} />
-              <Route path="/applications" component={Applications} />
-              <Route path="/gateways" component={Gateways} />
-              <Route component={GenericNotFound} />
-            </Switch>
-          </WithAuth>
-        </div>
+        <WithAuth>
+          <Switch>
+            <Route exact path="/" component={Overview} />
+            <Route path="/applications" component={Applications} />
+            <Route path="/gateways" component={Gateways} />
+            <Route component={GenericNotFound} />
+          </Switch>
+        </WithAuth>
       </div>
     )
   }

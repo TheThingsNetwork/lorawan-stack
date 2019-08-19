@@ -19,8 +19,6 @@ import { Container, Col, Row } from 'react-grid-system'
 import bind from 'autobind-decorator'
 import { push } from 'connected-react-router'
 
-import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import sharedMessages from '../../../lib/shared-messages'
 import FormSubmit from '../../../components/form/submit'
 import SubmitButton from '../../../components/submit-button'
@@ -41,9 +39,6 @@ const m = defineMessages({
 })
 
 @withEnv
-@withBreadcrumb('gateways.add', function() {
-  return <Breadcrumb path="/gateways/add" icon="add" content={sharedMessages.add} />
-})
 @connect(
   function(state) {
     const userId = selectUserId(state)
