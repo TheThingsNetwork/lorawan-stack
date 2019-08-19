@@ -31,9 +31,7 @@ type Handler interface {
 	// Setup performs all the preparation necessary to connect the handler to a particular upstream host.
 	Setup() error
 	// ConnectGateway informs the upstream handler that a particular gateway is connected to the front end.
-	ConnectGateway(context.Context, *io.Connection) error
-	// DisconnectGateway informs the upstream handler that a particular gateway has been disconnected.
-	DisconnectGateway(context.Context, string) error
+	ConnectGateway(context.Context, string, *io.Connection) error
 	// HandleUp handles upstream messages.
 	HandleUp(context.Context, string, ttnpb.EndDeviceIdentifiers, *ttnpb.GatewayUp) error
 }

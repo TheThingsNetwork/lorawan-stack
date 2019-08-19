@@ -53,10 +53,6 @@ type Server interface {
 	Connect(ctx context.Context, frontend Frontend, ids ttnpb.GatewayIdentifiers) (*Connection, error)
 	// GetFrequencyPlan gets the specified frequency plan by the gateway identifiers.
 	GetFrequencyPlan(ctx context.Context, ids ttnpb.GatewayIdentifiers) (*frequencyplans.FrequencyPlan, error)
-	// ClaimDownlink claims the downlink path for the given gateway.
-	ClaimDownlink(ctx context.Context, ids ttnpb.GatewayIdentifiers) error
-	// UnclaimDownlink releases the claim of the downlink path for the given gateway.
-	UnclaimDownlink(ctx context.Context, ids ttnpb.GatewayIdentifiers) error
 }
 
 // Connection is a connection to a gateway managed by a frontend.
