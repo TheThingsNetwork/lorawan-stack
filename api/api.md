@@ -2222,7 +2222,7 @@ The messages (for translation) are stored as "error:<namespace>:<name>".
 
 | Field | Validations |
 | ----- | ----------- |
-| `time` | <p>`message.required`: `true`</p> |
+| `time` | <p>`timestamp.required`: `true`</p> |
 | `correlation_ids` | <p>`repeated.items.string.max_len`: `100`</p> |
 
 ### <a name="ttn.lorawan.v3.Event.ContextEntry">Message `Event.ContextEntry`</a>
@@ -2393,9 +2393,9 @@ Connection stats as monitored by the Gateway Server.
 
 | Field | Validations |
 | ----- | ----------- |
-| `min` | <p>`message.required`: `true`</p> |
-| `max` | <p>`message.required`: `true`</p> |
-| `median` | <p>`message.required`: `true`</p> |
+| `min` | <p>`duration.required`: `true`</p> |
+| `max` | <p>`duration.required`: `true`</p> |
+| `median` | <p>`duration.required`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.GatewayModel">Message `GatewayModel`</a>
 
@@ -2446,7 +2446,7 @@ Connection stats as monitored by the Gateway Server.
 
 | Field | Validations |
 | ----- | ----------- |
-| `time` | <p>`message.required`: `true`</p> |
+| `time` | <p>`timestamp.required`: `true`</p> |
 | `versions` | <p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
 | `metrics` | <p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
 
@@ -2745,7 +2745,7 @@ GatewayUp may contain zero or more uplink messages and/or a status message for t
 
 | Field | Validations |
 | ----- | ----------- |
-| `delay` | <p>`message.required`: `true`</p> |
+| `delay` | <p>`duration.required`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.Gs">Service `Gs`</a>
 
@@ -2945,7 +2945,7 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 
 | Field | Validations |
 | ----- | ----------- |
-| `raw_payload` |  |
+| `raw_payload` | <p>`bytes.len`: `23`</p> |
 | `downlink_settings` | <p>`message.required`: `true`</p> |
 | `rx_delay` | <p>`enum.defined_only`: `true`</p> |
 | `correlation_ids` | <p>`repeated.items.string.max_len`: `100`</p> |
@@ -3425,7 +3425,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 | Field | Validations |
 | ----- | ----------- |
-| `cid` | <p>`enum.defined_only`: `true`</p> |
+| `cid` | <p>`enum.defined_only`: `true`</p><p>`enum.not_in`: `[0]`</p> |
 
 ### <a name="ttn.lorawan.v3.MACCommand.ADRParamSetupReq">Message `MACCommand.ADRParamSetupReq`</a>
 
@@ -3542,7 +3542,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 | Field | Validations |
 | ----- | ----------- |
-| `time` | <p>`message.required`: `true`</p> |
+| `time` | <p>`timestamp.required`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.MACCommand.DutyCycleReq">Message `MACCommand.DutyCycleReq`</a>
 
@@ -3728,7 +3728,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 | Field | Validations |
 | ----- | ----------- |
-| `minor_version` | <p>`enum.defined_only`: `true`</p> |
+| `minor_version` | <p>`enum.defined_only`: `true`</p><p>`enum.in`: `[1]`</p> |
 
 ### <a name="ttn.lorawan.v3.MACCommand.ResetInd">Message `MACCommand.ResetInd`</a>
 
@@ -3740,7 +3740,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 | Field | Validations |
 | ----- | ----------- |
-| `minor_version` | <p>`enum.defined_only`: `true`</p> |
+| `minor_version` | <p>`enum.defined_only`: `true`</p><p>`enum.in`: `[1]`</p> |
 
 ### <a name="ttn.lorawan.v3.MACCommand.RxParamSetupAns">Message `MACCommand.RxParamSetupAns`</a>
 
@@ -3838,7 +3838,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 | Field | Validations |
 | ----- | ----------- |
 | `m_hdr` | <p>`message.required`: `true`</p> |
-| `mic` |  |
+| `mic` | <p>`bytes.len`: `4`</p> |
 
 ### <a name="ttn.lorawan.v3.RejoinRequestPayload">Message `RejoinRequestPayload`</a>
 
@@ -4324,7 +4324,7 @@ The UplinkMessageProcessor service processes uplink messages.
 | Field | Validations |
 | ----- | ----------- |
 | `session_key_id` | <p>`bytes.max_len`: `2048`</p> |
-| `f_port` | <p>`uint32.lte`: `255`</p><p>`uint32.gte`: `1`</p> |
+| `f_port` | <p>`uint32.lte`: `255`</p><p>`uint32.gte`: `1`</p><p>`uint32.not_in`: `[224]`</p> |
 | `priority` | <p>`enum.defined_only`: `true`</p> |
 | `correlation_ids` | <p>`repeated.items.string.max_len`: `100`</p> |
 
@@ -4446,7 +4446,7 @@ The UplinkMessageProcessor service processes uplink messages.
 | Field | Validations |
 | ----- | ----------- |
 | `session_key_id` | <p>`bytes.max_len`: `2048`</p> |
-| `f_port` | <p>`uint32.lte`: `255`</p><p>`uint32.gte`: `1`</p> |
+| `f_port` | <p>`uint32.lte`: `255`</p><p>`uint32.gte`: `1`</p><p>`uint32.not_in`: `[224]`</p> |
 | `rx_metadata` | <p>`repeated.min_items`: `1`</p> |
 | `settings` | <p>`message.required`: `true`</p> |
 

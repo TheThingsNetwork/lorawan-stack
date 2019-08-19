@@ -32,6 +32,9 @@ var (
 	_ = types.DynamicAny{}
 )
 
+// define the regex for a UUID once up-front
+var _gateway_uuidPattern = regexp.MustCompile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
+
 // ValidateFields checks the field values on GatewayBrand with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -2300,16 +2303,6 @@ func (m *GatewayStatus) ValidateFields(paths ...string) error {
 		switch name {
 		case "time":
 
-			if v, ok := interface{}(&m.Time).(interface{ ValidateFields(...string) error }); ok {
-				if err := v.ValidateFields(subs...); err != nil {
-					return GatewayStatusValidationError{
-						field:  "time",
-						reason: "embedded message failed validation",
-						cause:  err,
-					}
-				}
-			}
-
 		case "boot_time":
 
 			if v, ok := interface{}(&m.BootTime).(interface{ ValidateFields(...string) error }); ok {
@@ -2729,39 +2722,9 @@ func (m *GatewayConnectionStats_RoundTripTimes) ValidateFields(paths ...string) 
 		switch name {
 		case "min":
 
-			if v, ok := interface{}(&m.Min).(interface{ ValidateFields(...string) error }); ok {
-				if err := v.ValidateFields(subs...); err != nil {
-					return GatewayConnectionStats_RoundTripTimesValidationError{
-						field:  "min",
-						reason: "embedded message failed validation",
-						cause:  err,
-					}
-				}
-			}
-
 		case "max":
 
-			if v, ok := interface{}(&m.Max).(interface{ ValidateFields(...string) error }); ok {
-				if err := v.ValidateFields(subs...); err != nil {
-					return GatewayConnectionStats_RoundTripTimesValidationError{
-						field:  "max",
-						reason: "embedded message failed validation",
-						cause:  err,
-					}
-				}
-			}
-
 		case "median":
-
-			if v, ok := interface{}(&m.Median).(interface{ ValidateFields(...string) error }); ok {
-				if err := v.ValidateFields(subs...); err != nil {
-					return GatewayConnectionStats_RoundTripTimesValidationError{
-						field:  "median",
-						reason: "embedded message failed validation",
-						cause:  err,
-					}
-				}
-			}
 
 		case "count":
 			// no validation rules for Count

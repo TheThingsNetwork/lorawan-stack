@@ -8336,7 +8336,7 @@
               "options": {
                 "validate.rules": [
                   {
-                    "name": "message.required",
+                    "name": "timestamp.required",
                     "value": true
                   }
                 ]
@@ -9197,7 +9197,7 @@
               "options": {
                 "validate.rules": [
                   {
-                    "name": "message.required",
+                    "name": "duration.required",
                     "value": true
                   }
                 ]
@@ -9215,7 +9215,7 @@
               "options": {
                 "validate.rules": [
                   {
-                    "name": "message.required",
+                    "name": "duration.required",
                     "value": true
                   }
                 ]
@@ -9233,7 +9233,7 @@
               "options": {
                 "validate.rules": [
                   {
-                    "name": "message.required",
+                    "name": "duration.required",
                     "value": true
                   }
                 ]
@@ -9439,7 +9439,7 @@
               "options": {
                 "validate.rules": [
                   {
-                    "name": "message.required",
+                    "name": "timestamp.required",
                     "value": true
                   }
                 ]
@@ -10734,7 +10734,7 @@
               "options": {
                 "validate.rules": [
                   {
-                    "name": "message.required",
+                    "name": "duration.required",
                     "value": true
                   }
                 ]
@@ -11404,7 +11404,12 @@
               "ismap": false,
               "defaultValue": "",
               "options": {
-                "validate.rules": null
+                "validate.rules": [
+                  {
+                    "name": "bytes.len",
+                    "value": 23
+                  }
+                ]
               }
             },
             {
@@ -14613,6 +14618,12 @@
                   {
                     "name": "enum.defined_only",
                     "value": true
+                  },
+                  {
+                    "name": "enum.not_in",
+                    "value": [
+                      0
+                    ]
                   }
                 ]
               }
@@ -15281,7 +15292,7 @@
               "options": {
                 "validate.rules": [
                   {
-                    "name": "message.required",
+                    "name": "timestamp.required",
                     "value": true
                   }
                 ]
@@ -15960,6 +15971,12 @@
                   {
                     "name": "enum.defined_only",
                     "value": true
+                  },
+                  {
+                    "name": "enum.in",
+                    "value": [
+                      1
+                    ]
                   }
                 ]
               }
@@ -15989,6 +16006,12 @@
                   {
                     "name": "enum.defined_only",
                     "value": true
+                  },
+                  {
+                    "name": "enum.in",
+                    "value": [
+                      1
+                    ]
                   }
                 ]
               }
@@ -16330,7 +16353,12 @@
               "ismap": false,
               "defaultValue": "",
               "options": {
-                "validate.rules": null
+                "validate.rules": [
+                  {
+                    "name": "bytes.len",
+                    "value": 4
+                  }
+                ]
               }
             },
             {
@@ -17125,6 +17153,12 @@
                   {
                     "name": "uint32.gte",
                     "value": 1
+                  },
+                  {
+                    "name": "uint32.not_in",
+                    "value": [
+                      224
+                    ]
                   }
                 ]
               }
@@ -17698,6 +17732,12 @@
                   {
                     "name": "uint32.gte",
                     "value": 1
+                  },
+                  {
+                    "name": "uint32.not_in",
+                    "value": [
+                      224
+                    ]
                   }
                 ]
               }
