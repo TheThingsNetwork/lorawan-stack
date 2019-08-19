@@ -23,7 +23,7 @@ const context = path.resolve(CONTEXT)
 const library = '[name]_[hash]'
 
 const pkg = require(path.resolve(context, 'package.json'))
-const excludeLibs = ['react-hot-loader']
+const excludeLibs = ['react-hot-loader', 'ttn-lw']
 const libs = Object.keys(pkg.dependencies || {}).filter(lib => !excludeLibs.includes(lib))
 
 export default {
