@@ -3068,15 +3068,6 @@
       "file": "udp.go"
     }
   },
-  "error:pkg/gatewayserver/io/udp:downlink_claim": {
-    "translations": {
-      "en": "failed to claim downlink"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/udp",
-      "file": "udp.go"
-    }
-  },
   "error:pkg/gatewayserver/io/udp:downlink_path_expired": {
     "translations": {
       "en": "downlink path expired"
@@ -3239,6 +3230,15 @@
       "file": "scheduler.go"
     }
   },
+  "error:pkg/gatewayserver/upstream/ns:network_server_not_found": {
+    "translations": {
+      "en": "network server not found for ids `ids`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/upstream/ns",
+      "file": "ns.go"
+    }
+  },
   "error:pkg/gatewayserver:empty_identifiers": {
     "translations": {
       "en": "empty identifiers"
@@ -3345,6 +3345,24 @@
     "description": {
       "package": "pkg/gatewayserver",
       "file": "grpc_nsgs.go"
+    }
+  },
+  "error:pkg/gatewayserver:upstream": {
+    "translations": {
+      "en": "upstream `{name}` failed to start"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "gatewayserver.go"
+    }
+  },
+  "error:pkg/gatewayserver:upstream_type_not_implemented": {
+    "translations": {
+      "en": "upstream `{name}` not implemented"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "gatewayserver.go"
     }
   },
   "error:pkg/identityserver/blacklist:blacklisted_id": {

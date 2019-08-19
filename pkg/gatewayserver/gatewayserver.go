@@ -113,7 +113,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 		return nil, err
 	}
 	if len(forward) == 0 {
-		forward[""] = []types.DevAddrPrefix{{}}
+		forward["ttn.lorawan.v3.GsNs:cluster"] = []types.DevAddrPrefix{{}}
 	}
 	gs = &GatewayServer{
 		Component:                 c,
@@ -225,7 +225,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 		}
 		switch str[0] {
 		case "ttn.lorawan.v3.GsNs":
-			gs.upstreamHandlers[str[1]] = ns.NewHandler(ctx, str[1], *c, prefix)
+			gs.upstreamHandlers[str[1]] = ns.NewHandler(ctx, str[1], c, prefix)
 		default:
 			return nil, errUpstreamType.WithAttributes("name", name)
 		}
@@ -378,8 +378,9 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 
 	for _, handler := range gs.upstreamHandlers {
 		go func(handler upstream.Handler) {
-			if err := handler.ConnectGateway(ctx, conn); err != nil {
-				logger.WithField("handler", handler.GetName()).Warn("Gateway connect errored on upstream")
+			logger := log.FromContext(ctx).WithField("handler", handler.GetName())
+			if err := handler.ConnectGateway(ctx, uid, conn); err != nil {
+				logger.WithError(err).Warn("Gateway connect errored on upstream")
 			}
 		}(handler)
 	}
@@ -430,12 +431,7 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 	logger := log.FromContext(ctx)
 	defer func() {
 		ids := conn.Gateway().GatewayIdentifiers
-		uid := unique.ID(ctx, ids)
 		gs.connections.Delete(unique.ID(ctx, ids))
-		gs.UnclaimDownlink(ctx, ids)
-		for _, handler := range gs.upstreamHandlers {
-			handler.DisconnectGateway(ctx, uid)
-		}
 		registerGatewayDisconnect(ctx, ids)
 		logger.Info("Disconnected")
 	}()
@@ -600,14 +596,4 @@ func (gs *GatewayServer) GetFrequencyPlan(ctx context.Context, ids ttnpb.Gateway
 		return nil, err
 	}
 	return gs.FrequencyPlans.GetByID(fpID)
-}
-
-// ClaimDownlink claims the downlink path for the given gateway.
-func (gs *GatewayServer) ClaimDownlink(ctx context.Context, ids ttnpb.GatewayIdentifiers) error {
-	return gs.ClaimIDs(ctx, ids)
-}
-
-// UnclaimDownlink releases the claim of the downlink path for the given gateway.
-func (gs *GatewayServer) UnclaimDownlink(ctx context.Context, ids ttnpb.GatewayIdentifiers) error {
-	return gs.UnclaimIDs(ctx, ids)
 }
