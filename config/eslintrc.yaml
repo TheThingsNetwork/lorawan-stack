@@ -32,6 +32,29 @@ rules:
     - warn
     - maxSize: 400
 
+  # Change to `error` after https://github.com/TheThingsNetwork/lorawan-stack/issues/1086
+  # is resolved.
+
+  # Prevent extraneous defaultProps on components
+  react/default-props-match-prop-types: warn
+  # Enforce a defaultProps definition for every prop that is not a required prop
+  react/require-default-props: warn
+  # Prevent definitions of unused prop types
+  react/no-unused-prop-types: warn
+  # Prevent missing props validation in a React component definition
+  react/prop-types: warn
+  # Enforce propTypes declarations alphabetical sorting
+  react/sort-prop-types: warn
+  # Prevent vague prop types
+  react/forbid-prop-types:
+    - warn
+    - forbid:
+        - any
+        - array
+        - object
+      checkContextTypes: true
+      checkChildContextTypes: true
+
   jsdoc/no-undefined-types: error
   jsdoc/check-param-names: error
   jsdoc/check-types: error
