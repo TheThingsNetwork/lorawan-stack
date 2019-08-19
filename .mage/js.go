@@ -324,7 +324,9 @@ func (js Js) Lint() error {
 	if err != nil {
 		return err
 	}
-	return eslint("./pkg/webui/**/*.js", "./config/**/*.js", "--no-ignore", "--color")
+	// TODO: Remove the `--quiet` flag after all component prop-types are defined
+	// (https://github.com/TheThingsNetwork/lorawan-stack/issues/1086)
+	return eslint("./pkg/webui/**/*.js", "./config/**/*.js", "--no-ignore", "--color", "--quiet")
 }
 
 // LintSnap runs eslint over frontend snap files.
