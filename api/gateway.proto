@@ -211,7 +211,7 @@ message GatewayAntenna {
 
 message GatewayStatus {
   // Current time of the gateway
-  google.protobuf.Timestamp time = 1 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true, (validate.rules).message.required = true];
+  google.protobuf.Timestamp time = 1 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true, (validate.rules).timestamp.required = true];
   // Boot time of the gateway
   // - can be left out to save bandwidth; old value will be kept
   google.protobuf.Timestamp boot_time = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
@@ -253,9 +253,9 @@ message GatewayConnectionStats {
   uint64 downlink_count = 8;
 
   message RoundTripTimes {
-    google.protobuf.Duration min = 1 [(gogoproto.nullable) = false, (gogoproto.stdduration) = true, (validate.rules).message.required = true];
-    google.protobuf.Duration max = 2 [(gogoproto.nullable) = false, (gogoproto.stdduration) = true, (validate.rules).message.required = true];
-    google.protobuf.Duration median = 3 [(gogoproto.nullable) = false, (gogoproto.stdduration) = true, (validate.rules).message.required = true];
+    google.protobuf.Duration min = 1 [(gogoproto.nullable) = false, (gogoproto.stdduration) = true, (validate.rules).duration.required = true];
+    google.protobuf.Duration max = 2 [(gogoproto.nullable) = false, (gogoproto.stdduration) = true, (validate.rules).duration.required = true];
+    google.protobuf.Duration median = 3 [(gogoproto.nullable) = false, (gogoproto.stdduration) = true, (validate.rules).duration.required = true];
     uint32 count = 4;
   }
   RoundTripTimes round_trip_times = 9;

@@ -52,7 +52,7 @@ service GtwGs {
 }
 
 message ScheduleDownlinkResponse {
-  google.protobuf.Duration delay = 1 [(gogoproto.stdduration) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  google.protobuf.Duration delay = 1 [(gogoproto.stdduration) = true, (gogoproto.nullable) = false, (validate.rules).duration.required = true];
 }
 
 message ScheduleDownlinkErrorDetails {

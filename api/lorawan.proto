@@ -507,7 +507,7 @@ message MACCommand {
     ADRAckDelayExponent adr_ack_delay_exponent = 2 [(gogoproto.customname) = "ADRAckDelayExponent", (validate.rules).enum.defined_only = true];
   }
   message DeviceTimeAns {
-    google.protobuf.Timestamp time = 7 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true, (validate.rules).message.required = true];
+    google.protobuf.Timestamp time = 7 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true, (validate.rules).timestamp.required = true];
   }
   message ForceRejoinReq {
     option (gogoproto.populate) = false;

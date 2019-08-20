@@ -32,6 +32,9 @@ var (
 	_ = types.DynamicAny{}
 )
 
+// define the regex for a UUID once up-front
+var _lorawan_uuidPattern = regexp.MustCompile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
+
 // ValidateFields checks the field values on Message with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
 // is returned.
@@ -4307,16 +4310,6 @@ func (m *MACCommand_DeviceTimeAns) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "time":
-
-			if v, ok := interface{}(&m.Time).(interface{ ValidateFields(...string) error }); ok {
-				if err := v.ValidateFields(subs...); err != nil {
-					return MACCommand_DeviceTimeAnsValidationError{
-						field:  "time",
-						reason: "embedded message failed validation",
-						cause:  err,
-					}
-				}
-			}
 
 		default:
 			return MACCommand_DeviceTimeAnsValidationError{
