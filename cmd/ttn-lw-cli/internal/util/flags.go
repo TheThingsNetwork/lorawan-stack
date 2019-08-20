@@ -134,20 +134,28 @@ func isSettableField(name string) bool {
 	return true
 }
 
-func enumValues(t reflect.Type) map[string]int32 {
+func enumValues(t reflect.Type) []string {
 	if t.PkgPath() == "go.thethings.network/lorawan-stack/pkg/ttnpb" {
-		enumValues := make(map[string]int32)
+		valueMap := make(map[string]int32)
 		implementsStringer := t.Implements(reflect.TypeOf((*fmt.Stringer)(nil)).Elem())
 		for s, v := range proto.EnumValueMap(fmt.Sprintf("ttn.lorawan.v3.%s", t.Name())) {
-			enumValues[s] = v
 			if implementsStringer {
+				// If the enum implements Stringer, then the String might be different than the official name.
 				rv := reflect.New(t).Elem()
 				rv.SetInt(int64(v))
-				s := rv.MethodByName("String").Call(nil)[0].String()
-				enumValues[s] = v
+				s := rv.Interface().(fmt.Stringer).String()
+				valueMap[s] = v
+			} else {
+				// Otherwise we use the official name.
+				valueMap[s] = v
 			}
 		}
-		return enumValues
+		values := make([]string, 0, len(valueMap))
+		for value := range valueMap {
+			values = append(values, value)
+		}
+		sort.Strings(values)
+		return values
 	}
 	return nil
 }
@@ -189,11 +197,7 @@ func addField(fs *pflag.FlagSet, name string, t reflect.Type, maskOnly bool) {
 			case reflect.String:
 				fs.StringSlice(name, nil, "")
 			case reflect.Int32:
-				if valueMap := enumValues(t); valueMap != nil {
-					values := make([]string, 0, len(valueMap))
-					for value := range valueMap {
-						values = append(values, value)
-					}
+				if values := enumValues(t.Elem()); values != nil {
 					fs.StringSlice(name, nil, strings.Join(values, "|"))
 				} else {
 					fs.IntSlice(name, nil, "")
@@ -215,12 +219,7 @@ func addField(fs *pflag.FlagSet, name string, t reflect.Type, maskOnly bool) {
 			fmt.Printf("flags: %s not yet supported (%s)\n", t.Kind(), name)
 		}
 	} else if t.Kind() == reflect.Int32 && strings.HasSuffix(t.PkgPath(), "ttnpb") {
-		if valueMap := enumValues(t); valueMap != nil {
-			values := make([]string, 0, len(valueMap))
-			for value := range valueMap {
-				values = append(values, value)
-			}
-			sort.Strings(values)
+		if values := enumValues(t); values != nil {
 			fs.String(name, "", strings.Join(values, "|"))
 		}
 	} else if (t.Kind() == reflect.Slice || t.Kind() == reflect.Array) && t.Elem().Kind() == reflect.Uint8 {
@@ -405,21 +404,14 @@ func setField(rv reflect.Value, path []string, v reflect.Value) error {
 				case ft.AssignableTo(vt):
 					field.Set(v)
 				case ft.Kind() == reflect.Int32 && vt.Kind() == reflect.String:
-					if valueMap := enumValues(ft); valueMap != nil {
-						if enumValue, ok := valueMap[v.String()]; ok {
-							field.SetInt(int64(enumValue))
-							break
-						}
-					}
-
 					if reflect.PtrTo(ft).Implements(textUnmarshalerType) {
-						fv := reflect.New(ft)
-						if err := fv.Interface().(encoding.TextUnmarshaler).UnmarshalText([]byte(v.String())); err == nil {
-							field.SetInt(fv.Elem().Int())
-							break
+						err := field.Addr().Interface().(encoding.TextUnmarshaler).UnmarshalText([]byte(v.String()))
+						if err != nil {
+							return err
 						}
+					} else {
+						return fmt.Errorf(`%s does not implement encoding.TextUnmarshaler`, ft.Name())
 					}
-					return fmt.Errorf(`invalid value "%s" for %s`, v.String(), ft.Name())
 				case ft.PkgPath() == "time":
 					switch {
 					case ft.Name() == "Time" && vt.Kind() == reflect.String:
@@ -528,15 +520,27 @@ func setField(rv reflect.Value, path []string, v reflect.Value) error {
 						field.Set(reflect.Zero(ft))
 					}
 				case ft.Kind() == reflect.Slice && vt.Kind() == reflect.Slice:
-					if vt.Elem().ConvertibleTo(ft.Elem()) {
-						slice := reflect.MakeSlice(ft, v.Len(), v.Len())
+					slice := reflect.MakeSlice(ft, v.Len(), v.Len())
+					switch {
+					case vt.Elem().ConvertibleTo(ft.Elem()):
 						for i := 0; i < v.Len(); i++ {
 							slice.Index(i).Set(v.Index(i).Convert(ft.Elem()))
 						}
-						field.Set(slice)
-					} else {
+					case ft.Elem().Kind() == reflect.Int32 && vt.Elem().Kind() == reflect.String:
+						if reflect.PtrTo(ft.Elem()).Implements(textUnmarshalerType) {
+							for i := 0; i < v.Len(); i++ {
+								err := slice.Index(i).Addr().Interface().(encoding.TextUnmarshaler).UnmarshalText([]byte(v.Index(i).String()))
+								if err != nil {
+									return err
+								}
+							}
+						} else {
+							return fmt.Errorf(`%s does not implement encoding.TextUnmarshaler`, ft.Elem().Name())
+						}
+					default:
 						return fmt.Errorf("%v is not convertible to %v", ft, vt)
 					}
+					field.Set(slice)
 				default:
 					return fmt.Errorf("%v is not assignable to %v", ft, vt)
 				}

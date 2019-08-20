@@ -140,25 +140,24 @@ func unexpectedValue(err interface {
 }
 
 var (
-	errFieldHasMax        = errors.DefineInvalidArgument("field_with_max", "`{lorawan_field}` should be lower or equal to `{max}`", valueKey)
-	errFieldBound         = errors.DefineInvalidArgument("field_bound", "`{lorawan_field}` should be between `{min}` and `{max}`", valueKey)
+	errFieldHasMax        = errors.DefineInvalidArgument("field_with_max", "`{field}` should be lower or equal to `{max}`", valueKey)
+	errFieldBound         = errors.DefineInvalidArgument("field_bound", "`{field}` should be between `{min}` and `{max}`", valueKey)
 	errMissingIdentifiers = errors.DefineInvalidArgument("missing_identifiers", "missing identifiers")
-	errParse              = errors.DefineInvalidArgument("parse", "could not parse `{lorawan_field}`", valueKey)
-	errUnknownField       = errors.DefineInvalidArgument("unknown_field", "unknown `{lorawan_field}`", valueKey)
+	errParse              = errors.DefineInvalidArgument("parse", "could not parse `{value}` into `{field}`", valueKey)
 )
 
 func errExpectedLowerOrEqual(lorawanField string, max interface{}) valueErr {
-	return unexpectedValue(errFieldHasMax.WithAttributes("lorawan_field", lorawanField, "max", max))
+	return unexpectedValue(errFieldHasMax.WithAttributes("field", lorawanField, "max", max))
 }
 
 func errExpectedBetween(lorawanField string, min, max interface{}) valueErr {
-	return unexpectedValue(errFieldBound.WithAttributes("lorawan_field", lorawanField, "min", min, "max", max))
+	return unexpectedValue(errFieldBound.WithAttributes("field", lorawanField, "min", min, "max", max))
 }
 
 func errCouldNotParse(lorawanField string) valueErr {
-	return unexpectedValue(errParse.WithAttributes("lorawan_field", lorawanField))
+	return unexpectedValue(errParse.WithAttributes("field", lorawanField))
 }
 
 func errMissing(lorawanField string) errors.Error {
-	return errUnknownField.WithAttributes("lorawan_field", lorawanField)
+	return errMissingField.WithAttributes("field", lorawanField)
 }
