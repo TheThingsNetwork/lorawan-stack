@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package console
+package oauthclient
 
 import (
 	"net/http"
@@ -21,8 +21,9 @@ import (
 	echo "github.com/labstack/echo/v4"
 )
 
-// Login redirects the user to the OAuth Authorize URL.
-func (console *Console) Login(c echo.Context) error {
+// HandleLogin is the handler for redirecting the user to the authorization
+// endpoint.
+func (oc *OAuthClient) HandleLogin(c echo.Context) error {
 	next := c.QueryParam("next")
 
 	// Only allow relative paths.
@@ -32,9 +33,9 @@ func (console *Console) Login(c echo.Context) error {
 
 	// Set state cookie.
 	state := newState(next)
-	if err := console.setStateCookie(c, state); err != nil {
+	if err := oc.setStateCookie(c, state); err != nil {
 		return err
 	}
 
-	return c.Redirect(http.StatusFound, console.oauth(c).AuthCodeURL(state.Secret))
+	return c.Redirect(http.StatusFound, oc.oauth(c).AuthCodeURL(state.Secret))
 }

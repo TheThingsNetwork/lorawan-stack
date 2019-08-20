@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package console
+package oauthclient
 
 import (
 	"encoding/gob"
@@ -24,26 +24,24 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/web/cookie"
 )
 
-func init() {
-	gob.Register(state{})
-}
-
-const stateCookieName = "_console_state"
-
-// StateCookie returns the cookie storing the state of the console.
-func (console *Console) StateCookie() *cookie.Cookie {
-	return &cookie.Cookie{
-		Name:     stateCookieName,
-		HTTPOnly: true,
-		Path:     console.config.UI.MountPath(),
-		MaxAge:   10 * time.Minute,
-	}
-}
-
 // state is the shape of the state for the OAuth flow.
 type state struct {
 	Secret string
 	Next   string
+}
+
+func init() {
+	gob.Register(state{})
+}
+
+// StateCookie returns the cookie storing the state of the console.
+func (oc *OAuthClient) StateCookie() *cookie.Cookie {
+	return &cookie.Cookie{
+		Name:     oc.config.StateCookieName,
+		HTTPOnly: true,
+		Path:     oc.getMountPath(),
+		MaxAge:   10 * time.Minute,
+	}
 }
 
 func newState(next string) state {
@@ -53,22 +51,24 @@ func newState(next string) state {
 	}
 }
 
-func (console *Console) getStateCookie(c echo.Context) (state, error) {
+func (oc *OAuthClient) getStateCookie(c echo.Context) (state, error) {
 	s := state{}
-	ok, err := console.StateCookie().Get(c, &s)
+	ok, err := oc.StateCookie().Get(c, &s)
 	if err != nil {
-		return s, err
+		return s, echo.NewHTTPError(http.StatusBadRequest, "Invalid state cookie")
 	}
+
 	if !ok {
 		return s, echo.NewHTTPError(http.StatusBadRequest, "No state cookie")
 	}
+
 	return s, nil
 }
 
-func (console *Console) setStateCookie(c echo.Context, value state) error {
-	return console.StateCookie().Set(c, value)
+func (oc *OAuthClient) setStateCookie(c echo.Context, value state) error {
+	return oc.StateCookie().Set(c, value)
 }
 
-func (console *Console) removeStateCookie(c echo.Context) {
-	console.StateCookie().Remove(c)
+func (oc *OAuthClient) removeStateCookie(c echo.Context) {
+	oc.StateCookie().Remove(c)
 }

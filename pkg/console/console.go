@@ -16,18 +16,15 @@ package console
 
 import (
 	"context"
-	"fmt"
 	"net/url"
-	"strings"
 
 	echo "github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"go.thethings.network/lorawan-stack/pkg/component"
-	"go.thethings.network/lorawan-stack/pkg/errors"
 	web_errors "go.thethings.network/lorawan-stack/pkg/errors/web"
 	"go.thethings.network/lorawan-stack/pkg/web"
+	"go.thethings.network/lorawan-stack/pkg/web/oauthclient"
 	"go.thethings.network/lorawan-stack/pkg/webui"
-	"golang.org/x/oauth2"
 )
 
 // UIConfig is the combined configuration for the Console UI.
@@ -48,40 +45,31 @@ type FrontendConfig struct {
 
 // Config is the configuration for the Console.
 type Config struct {
-	OAuth OAuth    `name:"oauth"`
-	Mount string   `name:"mount" description:"Path on the server where the Console will be served"`
-	UI    UIConfig `name:"ui"`
-}
-
-// OAuth is the OAuth config for the Console.
-type OAuth struct {
-	AuthorizeURL string `name:"authorize-url" description:"The OAuth Authorize URL"`
-	TokenURL     string `name:"token-url" description:"The OAuth Token Exchange URL"`
-
-	ClientID     string `name:"client-id" description:"The OAuth client ID for the Console"`
-	ClientSecret string `name:"client-secret" description:"The OAuth client secret for the Console" json:"-"`
-}
-
-var errNoOAuthConfig = errors.DefineInvalidArgument("no_oauth_config", "no OAuth configuration found for the Console")
-
-func (o OAuth) isZero() bool {
-	return o.AuthorizeURL == "" || o.TokenURL == "" || o.ClientID == "" || o.ClientSecret == ""
+	OAuth oauthclient.Config `name:"oauth"`
+	Mount string             `name:"mount" description:"Path on the server where the Console will be served"`
+	UI    UIConfig           `name:"ui"`
 }
 
 // Console is the Console component.
 type Console struct {
 	*component.Component
+	oc     *oauthclient.OAuthClient
 	config Config
 }
 
 // New returns a new Console.
 func New(c *component.Component, config Config) (*Console, error) {
-	if config.OAuth.isZero() {
-		return nil, errNoOAuthConfig
+	config.OAuth.StateCookieName = "_console_state"
+	config.OAuth.AuthCookieName = "_console_auth"
+	config.OAuth.RootURL = config.UI.CanonicalURL
+	oc, err := oauthclient.New(c, config.OAuth)
+	if err != nil {
+		return nil, err
 	}
 
 	console := &Console{
 		Component: c,
+		oc:        oc,
 		config:    config,
 	}
 
@@ -103,20 +91,6 @@ func (console *Console) configFromContext(ctx context.Context) *Config {
 		return config
 	}
 	return &console.config
-}
-
-func (console *Console) oauth(c echo.Context) *oauth2.Config {
-	config := console.configFromContext(c.Request().Context())
-	return &oauth2.Config{
-		ClientID:     config.OAuth.ClientID,
-		ClientSecret: config.OAuth.ClientSecret,
-		RedirectURL:  fmt.Sprintf("%s/oauth/callback", strings.TrimSuffix(config.UI.CanonicalURL, "/")),
-		Endpoint: oauth2.Endpoint{
-			TokenURL:  config.OAuth.TokenURL,
-			AuthURL:   config.OAuth.AuthorizeURL,
-			AuthStyle: oauth2.AuthStyleInParams,
-		},
-	}
 }
 
 // path extracts the mounted location from the public Console URL.
@@ -156,15 +130,15 @@ func (console *Console) RegisterRoutes(server *web.Server) {
 	)
 
 	api := group.Group("/api", middleware.CSRF())
-	api.GET("/auth/token", console.Token)
-	api.POST("/auth/logout", console.Logout)
+	api.GET("/auth/token", console.oc.HandleToken)
+	api.POST("/auth/logout", console.oc.HandleLogout)
 
 	page := group.Group("", middleware.CSRFWithConfig(middleware.CSRFConfig{
 		TokenLookup: "form:csrf",
 	}))
-	page.GET("/oauth/callback", console.Callback)
+	page.GET("/oauth/callback", console.oc.HandleCallback)
 
-	group.GET("/login/ttn-stack", console.Login)
+	group.GET("/login/ttn-stack", console.oc.HandleLogin)
 
 	if console.config.Mount != "" && console.config.Mount != "/" {
 		group.GET("", webui.Template.Handler, middleware.CSRF())

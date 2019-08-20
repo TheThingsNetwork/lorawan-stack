@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package console
+package oauthclient
 
 import (
 	"net/http"
@@ -22,8 +22,8 @@ import (
 	"golang.org/x/oauth2"
 )
 
-func (console *Console) freshToken(c echo.Context) (*oauth2.Token, error) {
-	value, err := console.getAuthCookie(c)
+func (oc *OAuthClient) freshToken(c echo.Context) (*oauth2.Token, error) {
+	value, err := oc.getAuthCookie(c)
 	if err != nil {
 		return nil, err
 	}
@@ -34,13 +34,13 @@ func (console *Console) freshToken(c echo.Context) (*oauth2.Token, error) {
 		Expiry:       value.Expiry,
 	}
 
-	freshToken, err := console.oauth(c).TokenSource(c.Request().Context(), token).Token()
+	freshToken, err := oc.oauth(c).TokenSource(c.Request().Context(), token).Token()
 	if err != nil {
 		return nil, err
 	}
 
 	if freshToken.AccessToken != token.AccessToken {
-		err = console.setAuthCookie(c, authCookie{
+		err = oc.setAuthCookie(c, authCookie{
 			AccessToken:  freshToken.AccessToken,
 			RefreshToken: freshToken.RefreshToken,
 			Expiry:       freshToken.Expiry,
@@ -53,11 +53,11 @@ func (console *Console) freshToken(c echo.Context) (*oauth2.Token, error) {
 	return freshToken, nil
 }
 
-// Token is a handler that returns a valid OAuth token.
+// HandleToken is a handler that returns a valid OAuth token.
 // It reads the token from the authorization cookie and refreshes it if needed.
 // If the cookie is not there, it returns a 401 Unauthorized error.
-func (console *Console) Token(c echo.Context) error {
-	token, err := console.freshToken(c)
+func (oc *OAuthClient) HandleToken(c echo.Context) error {
+	token, err := oc.freshToken(c)
 	if err != nil {
 		return err
 	}

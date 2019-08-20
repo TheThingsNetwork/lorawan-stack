@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package console
+package oauthclient
 
 import (
 	"encoding/gob"
@@ -27,14 +27,12 @@ func init() {
 	gob.Register(authCookie{})
 }
 
-const authCookieName = "_console_auth"
-
 // AuthCookie returns a new authCookie.
-func (console *Console) AuthCookie() *cookie.Cookie {
+func (oc *OAuthClient) AuthCookie() *cookie.Cookie {
 	return &cookie.Cookie{
-		Name:     authCookieName,
+		Name:     oc.config.AuthCookieName,
 		HTTPOnly: true,
-		Path:     console.config.UI.MountPath(),
+		Path:     oc.getMountPath(),
 	}
 }
 
@@ -45,9 +43,9 @@ type authCookie struct {
 	Expiry       time.Time
 }
 
-func (console *Console) getAuthCookie(c echo.Context) (authCookie, error) {
+func (oc *OAuthClient) getAuthCookie(c echo.Context) (authCookie, error) {
 	value := authCookie{}
-	ok, err := console.AuthCookie().Get(c, &value)
+	ok, err := oc.AuthCookie().Get(c, &value)
 	if err != nil {
 		return authCookie{}, err
 	}
@@ -57,10 +55,10 @@ func (console *Console) getAuthCookie(c echo.Context) (authCookie, error) {
 	return value, nil
 }
 
-func (console *Console) setAuthCookie(c echo.Context, value authCookie) error {
-	return console.AuthCookie().Set(c, value)
+func (oc *OAuthClient) setAuthCookie(c echo.Context, value authCookie) error {
+	return oc.AuthCookie().Set(c, value)
 }
 
-func (console *Console) removeAuthCookie(c echo.Context) {
-	console.AuthCookie().Remove(c)
+func (oc *OAuthClient) removeAuthCookie(c echo.Context) {
+	oc.AuthCookie().Remove(c)
 }

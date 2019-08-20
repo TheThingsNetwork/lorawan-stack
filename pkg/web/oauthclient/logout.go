@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package console
+package oauthclient
 
 import (
 	"net/http"
@@ -24,9 +24,10 @@ import (
 	"google.golang.org/grpc"
 )
 
-// Logout invalidates the user's authorization and removes the auth cookie.
-func (console *Console) Logout(c echo.Context) error {
-	token, err := console.freshToken(c)
+// HandleLogout invalidates the user's authorization and removes the auth
+// cookie.
+func (oc *OAuthClient) HandleLogout(c echo.Context) error {
+	token, err := oc.freshToken(c)
 	if err != nil {
 		return err
 	}
@@ -34,11 +35,11 @@ func (console *Console) Logout(c echo.Context) error {
 	creds := grpc.PerRPCCredentials(rpcmetadata.MD{
 		AuthType:      "Bearer",
 		AuthValue:     token.AccessToken,
-		AllowInsecure: console.AllowInsecureForCredentials(),
+		AllowInsecure: oc.component.AllowInsecureForCredentials(),
 	})
 
 	ctx := c.Request().Context()
-	if peer := console.GetPeer(ctx, ttnpb.PeerInfo_ACCESS, nil); peer != nil {
+	if peer := oc.component.GetPeer(ctx, ttnpb.PeerInfo_ACCESS, nil); peer != nil {
 		if cc := peer.Conn(); cc != nil {
 			if res, err := ttnpb.NewEntityAccessClient(cc).AuthInfo(ctx, ttnpb.Empty, creds); err == nil {
 				if tokenInfo := res.GetOAuthAccessToken(); tokenInfo != nil {
@@ -55,6 +56,6 @@ func (console *Console) Logout(c echo.Context) error {
 		}
 	}
 
-	console.removeAuthCookie(c)
+	oc.removeAuthCookie(c)
 	return c.NoContent(http.StatusNoContent)
 }
