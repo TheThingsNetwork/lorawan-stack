@@ -26,7 +26,6 @@ import (
 	"time"
 
 	"github.com/getsentry/raven-go"
-	"github.com/golang/protobuf/proto"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
@@ -188,10 +187,6 @@ func New(ctx context.Context, opts ...Option) *Server {
 	}
 	server.Server = grpc.NewServer(append(baseOptions, options.serverOptions...)...)
 	server.ServeMux = runtime.NewServeMux(
-		runtime.WithForwardResponseOption(func(ctx context.Context, w http.ResponseWriter, resp proto.Message) error {
-			w.Header().Set("Access-Control-Expose-Headers", "Link, Date, Content-Length, X-Total-Count")
-			return nil
-		}),
 		runtime.WithMarshalerOption("*", jsonpb.TTN()),
 		runtime.WithMarshalerOption("text/event-stream", jsonpb.TTNEventStream()),
 		runtime.WithProtoErrorHandler(runtime.DefaultHTTPProtoErrorHandler),
@@ -211,11 +206,13 @@ func New(ctx context.Context, opts ...Option) *Server {
 			return md.ToMetadata()
 		}),
 		runtime.WithOutgoingHeaderMatcher(func(s string) (string, bool) {
+			// NOTE: When adding headers, also add them to CORSConfig in ../component/grpc.go.
 			switch s {
 			case "x-total-count":
 				return "X-Total-Count", true
-			case "link":
-				return "Link", true
+			case "warning":
+				// NOTE: the "Warning" header in HTTP is specified differently than our "warning" gRPC metadata.
+				return "X-Warning", true
 			}
 			return s, false
 		}),

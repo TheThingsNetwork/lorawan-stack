@@ -55,7 +55,16 @@ func (c *Component) setupGRPC() (err error) {
 	for _, sub := range c.grpcSubsystems {
 		sub.RegisterHandlers(c.grpc.ServeMux, c.loopback)
 	}
-	c.web.RootGroup(ttnpb.HTTPAPIPrefix).Any("/*", echo.WrapHandler(http.StripPrefix(ttnpb.HTTPAPIPrefix, c.grpc)), middleware.CORS())
+	c.web.RootGroup(ttnpb.HTTPAPIPrefix).Any(
+		"/*",
+		echo.WrapHandler(http.StripPrefix(ttnpb.HTTPAPIPrefix, c.grpc)),
+		middleware.CORSWithConfig(middleware.CORSConfig{
+			Skipper:      middleware.DefaultSkipper,
+			AllowOrigins: []string{"*"},
+			AllowMethods: []string{http.MethodGet, http.MethodHead, http.MethodPut, http.MethodPatch, http.MethodPost, http.MethodDelete},
+			AllowHeaders: []string{"Date", "Content-Length", "X-Total-Count", "X-Warning"},
+		}),
+	)
 	return nil
 }
 
