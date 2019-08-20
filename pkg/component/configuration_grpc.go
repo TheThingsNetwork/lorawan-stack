@@ -34,7 +34,7 @@ type ConfigurationServer struct {
 }
 
 // Roles implements the rpcserver.Registerer interface. It just returns nil.
-func (c *ConfigurationServer) Roles() []ttnpb.PeerInfo_Role { return nil }
+func (c *ConfigurationServer) Roles() []ttnpb.ClusterRole { return nil }
 
 // RegisterServices registers the Configuration service.
 func (c *ConfigurationServer) RegisterServices(s *grpc.Server) {

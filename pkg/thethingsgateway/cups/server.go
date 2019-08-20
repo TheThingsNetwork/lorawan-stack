@@ -67,7 +67,7 @@ func (s *Server) getRegistry(ctx context.Context, ids *ttnpb.GatewayIdentifiers)
 	if s.registry != nil {
 		return s.registry
 	}
-	return ttnpb.NewGatewayRegistryClient(s.component.GetPeer(ctx, ttnpb.PeerInfo_ENTITY_REGISTRY, ids).Conn())
+	return ttnpb.NewGatewayRegistryClient(s.component.GetPeer(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, ids).Conn())
 }
 
 // Option configures the CUPS.

@@ -225,8 +225,8 @@ func (is *IdentityServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.Clien
 }
 
 // Roles returns the roles that the Identity Server fulfills.
-func (is *IdentityServer) Roles() []ttnpb.PeerInfo_Role {
-	return []ttnpb.PeerInfo_Role{ttnpb.PeerInfo_ACCESS, ttnpb.PeerInfo_ENTITY_REGISTRY}
+func (is *IdentityServer) Roles() []ttnpb.ClusterRole {
+	return []ttnpb.ClusterRole{ttnpb.ClusterRole_ACCESS, ttnpb.ClusterRole_ENTITY_REGISTRY}
 }
 
 func (is *IdentityServer) getMembershipStore(ctx context.Context, db *gorm.DB) store.MembershipStore {

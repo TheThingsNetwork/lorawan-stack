@@ -225,8 +225,8 @@ func (as *ApplicationServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.Cl
 }
 
 // Roles returns the roles that the Application Server fulfills.
-func (as *ApplicationServer) Roles() []ttnpb.PeerInfo_Role {
-	return []ttnpb.PeerInfo_Role{ttnpb.PeerInfo_APPLICATION_SERVER}
+func (as *ApplicationServer) Roles() []ttnpb.ClusterRole {
+	return []ttnpb.ClusterRole{ttnpb.ClusterRole_APPLICATION_SERVER}
 }
 
 // Subscribe subscribes an application or integration by its identifiers to the Application Server, and returns a
@@ -431,7 +431,7 @@ func (as *ApplicationServer) fetchAppSKey(ctx context.Context, ids ttnpb.EndDevi
 		SessionKeyID: sessionKeyID,
 		DevEUI:       *ids.DevEUI,
 	}
-	if js := as.GetPeer(ctx, ttnpb.PeerInfo_JOIN_SERVER, ids); js != nil {
+	if js := as.GetPeer(ctx, ttnpb.ClusterRole_JOIN_SERVER, ids); js != nil {
 		res, err := ttnpb.NewAsJsClient(js.Conn()).GetAppSKey(ctx, req, as.WithClusterAuth())
 		if err == nil {
 			return res.AppSKey, nil

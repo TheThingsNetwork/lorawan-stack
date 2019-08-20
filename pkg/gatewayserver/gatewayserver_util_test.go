@@ -34,7 +34,7 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.PeerInfo_Role) {
+func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.ClusterRole) {
 	for i := 0; i < 20; i++ {
 		time.Sleep(20 * time.Millisecond)
 		if peer := c.GetPeer(ctx, role, nil); peer != nil {

@@ -351,7 +351,7 @@ func TestWebhooks(t *testing.T) {
 		test.Must(nil, c.Start())
 		defer c.Close()
 
-		mustHavePeer(ctx, c, ttnpb.PeerInfo_ENTITY_REGISTRY)
+		mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 
 		t.Run("Authorization", func(t *testing.T) {
 			for _, tc := range []struct {

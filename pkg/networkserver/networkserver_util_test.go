@@ -864,8 +864,8 @@ func AssertNsJsPeerHandleAuthJoinRequest(ctx context.Context, peerReqCh <-chan t
 	t := test.MustTFromContext(ctx)
 	t.Helper()
 	joinReqCh := make(chan NsJsHandleJoinRequest)
-	if !test.AssertClusterGetPeerRequest(ctx, peerReqCh, func(ctx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) bool {
-		return assertions.New(t).So(role, should.Equal, ttnpb.PeerInfo_JOIN_SERVER) && idsAssert(ctx, ids)
+	if !test.AssertClusterGetPeerRequest(ctx, peerReqCh, func(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
+		return assertions.New(t).So(role, should.Equal, ttnpb.ClusterRole_JOIN_SERVER) && idsAssert(ctx, ids)
 	},
 		NewJSPeer(ctx, &MockNsJsServer{
 			HandleJoinFunc: MakeNsJsHandleJoinChFunc(joinReqCh),
@@ -936,8 +936,8 @@ func AssertLinkApplication(ctx context.Context, conn *grpc.ClientConn, getPeerCh
 	}()
 
 	if !a.So(test.AssertClusterGetPeerRequest(ctx, getPeerCh,
-		func(ctx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) bool {
-			return a.So(role, should.Equal, ttnpb.PeerInfo_ACCESS) && a.So(ids, should.BeNil)
+		func(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
+			return a.So(role, should.Equal, ttnpb.ClusterRole_ACCESS) && a.So(ids, should.BeNil)
 		},
 		NewISPeer(ctx, &test.MockApplicationAccessServer{
 			ListRightsFunc: test.MakeApplicationAccessListRightsChFunc(listRightsCh),

@@ -76,8 +76,8 @@ func (dtc *DeviceTemplateConverter) Context() context.Context {
 }
 
 // Roles returns the roles that the Device Template Converter fulfills.
-func (dtc *DeviceTemplateConverter) Roles() []ttnpb.PeerInfo_Role {
-	return []ttnpb.PeerInfo_Role{ttnpb.PeerInfo_DEVICE_TEMPLATE_CONVERTER}
+func (dtc *DeviceTemplateConverter) Roles() []ttnpb.ClusterRole {
+	return []ttnpb.ClusterRole{ttnpb.ClusterRole_DEVICE_TEMPLATE_CONVERTER}
 }
 
 // RegisterServices registers services provided by dtc at s.

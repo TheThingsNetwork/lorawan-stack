@@ -648,7 +648,7 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *ttnpb
 			"gateway_uid", unique.ID(ctx, path.GatewayIdentifiers),
 		)
 
-		p := ns.GetPeer(ctx, ttnpb.PeerInfo_GATEWAY_SERVER, path.GatewayIdentifiers)
+		p := ns.GetPeer(ctx, ttnpb.ClusterRole_GATEWAY_SERVER, path.GatewayIdentifiers)
 		if p == nil {
 			logger.Debug("Could not get Gateway Server")
 			continue

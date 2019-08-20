@@ -268,13 +268,13 @@ hardware_versions:
 
 	roles := as.Roles()
 	a.So(len(roles), should.Equal, 1)
-	a.So(roles[0], should.Equal, ttnpb.PeerInfo_APPLICATION_SERVER)
+	a.So(roles[0], should.Equal, ttnpb.ClusterRole_APPLICATION_SERVER)
 
 	test.Must(nil, c.Start())
 	defer c.Close()
-	mustHavePeer(ctx, c, ttnpb.PeerInfo_NETWORK_SERVER)
-	mustHavePeer(ctx, c, ttnpb.PeerInfo_JOIN_SERVER)
-	mustHavePeer(ctx, c, ttnpb.PeerInfo_ENTITY_REGISTRY)
+	mustHavePeer(ctx, c, ttnpb.ClusterRole_NETWORK_SERVER)
+	mustHavePeer(ctx, c, ttnpb.ClusterRole_JOIN_SERVER)
+	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 
 	// Delay for the AS-NS link to establish.
 	time.Sleep(Timeout)

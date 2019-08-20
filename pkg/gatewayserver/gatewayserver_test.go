@@ -109,12 +109,12 @@ func TestGatewayServer(t *testing.T) {
 
 	roles := gs.Roles()
 	a.So(len(roles), should.Equal, 1)
-	a.So(roles[0], should.Equal, ttnpb.PeerInfo_GATEWAY_SERVER)
+	a.So(roles[0], should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER)
 
 	test.Must(nil, c.Start())
 	defer c.Close()
-	mustHavePeer(ctx, c, ttnpb.PeerInfo_NETWORK_SERVER)
-	mustHavePeer(ctx, c, ttnpb.PeerInfo_ENTITY_REGISTRY)
+	mustHavePeer(ctx, c, ttnpb.ClusterRole_NETWORK_SERVER)
+	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	is.add(ctx, ttnpb.GatewayIdentifiers{
 		GatewayID: registeredGatewayID,
 		EUI:       &registeredGatewayEUI,

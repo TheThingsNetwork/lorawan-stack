@@ -69,7 +69,7 @@ func (gs *GatewayServer) getRegistry(ctx context.Context, ids *ttnpb.GatewayIden
 	if gs.registry != nil {
 		return gs.registry
 	}
-	return ttnpb.NewGatewayRegistryClient(gs.GetPeer(ctx, ttnpb.PeerInfo_ENTITY_REGISTRY, ids).Conn())
+	return ttnpb.NewGatewayRegistryClient(gs.GetPeer(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, ids).Conn())
 }
 
 // Option configures GatewayServer.
@@ -223,8 +223,8 @@ func (gs *GatewayServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.Client
 }
 
 // Roles returns the roles that the Gateway Server fulfills.
-func (gs *GatewayServer) Roles() []ttnpb.PeerInfo_Role {
-	return []ttnpb.PeerInfo_Role{ttnpb.PeerInfo_GATEWAY_SERVER}
+func (gs *GatewayServer) Roles() []ttnpb.ClusterRole {
+	return []ttnpb.ClusterRole{ttnpb.ClusterRole_GATEWAY_SERVER}
 }
 
 var (
@@ -457,7 +457,7 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 					if ids != nil && ids.DevAddr != nil && !passDevAddr(*ids.DevAddr) {
 						return nil
 					}
-					ns := gs.GetPeer(ctx, ttnpb.PeerInfo_NETWORK_SERVER, ids)
+					ns := gs.GetPeer(ctx, ttnpb.ClusterRole_NETWORK_SERVER, ids)
 					if ns == nil {
 						logger.Warn("Cluster Network Server unavailable for upstream traffic")
 						return nil

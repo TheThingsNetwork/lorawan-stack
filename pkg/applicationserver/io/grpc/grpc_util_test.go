@@ -35,7 +35,7 @@ type mockRegisterer struct {
 	ttnpb.AppAsServer
 }
 
-func (m *mockRegisterer) Roles() []ttnpb.PeerInfo_Role {
+func (m *mockRegisterer) Roles() []ttnpb.ClusterRole {
 	return nil
 }
 
@@ -47,7 +47,7 @@ func (m *mockRegisterer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.Client
 	ttnpb.RegisterAppAsHandler(m.Context, s, conn)
 }
 
-func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.PeerInfo_Role) {
+func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.ClusterRole) {
 	for i := 0; i < 20; i++ {
 		time.Sleep(20 * time.Millisecond)
 		if peer := c.GetPeer(ctx, role, nil); peer != nil {

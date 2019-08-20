@@ -120,8 +120,8 @@ func New(c *component.Component, conf *Config) (*JoinServer, error) {
 }
 
 // Roles of the gRPC service.
-func (js *JoinServer) Roles() []ttnpb.PeerInfo_Role {
-	return []ttnpb.PeerInfo_Role{ttnpb.PeerInfo_JOIN_SERVER}
+func (js *JoinServer) Roles() []ttnpb.ClusterRole {
+	return []ttnpb.ClusterRole{ttnpb.ClusterRole_JOIN_SERVER}
 }
 
 // RegisterServices registers services provided by js at s.
@@ -354,7 +354,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 				return nil, nil, errGenerateSessionKeyID
 			}
 
-			cs := js.GetPeer(ctx, ttnpb.PeerInfo_CRYPTO_SERVER, dev.EndDeviceIdentifiers)
+			cs := js.GetPeer(ctx, ttnpb.ClusterRole_CRYPTO_SERVER, dev.EndDeviceIdentifiers)
 
 			var networkCryptoService cryptoservices.Network
 			if req.SelectedMACVersion.Compare(ttnpb.MAC_V1_1) >= 0 && dev.RootKeys != nil && dev.RootKeys.NwkKey != nil {

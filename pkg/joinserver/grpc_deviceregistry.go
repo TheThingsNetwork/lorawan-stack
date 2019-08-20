@@ -72,7 +72,7 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 		dev.RootKeys = &ttnpb.RootKeys{
 			RootKeyID: rootKeysEnc.GetRootKeyID(),
 		}
-		cs := srv.JS.GetPeer(ctx, ttnpb.PeerInfo_CRYPTO_SERVER, dev.EndDeviceIdentifiers)
+		cs := srv.JS.GetPeer(ctx, ttnpb.ClusterRole_CRYPTO_SERVER, dev.EndDeviceIdentifiers)
 		if ttnpb.HasAnyField(req.FieldMask.Paths, "root_keys.nwk_key") {
 			var networkCryptoService cryptoservices.Network
 			if rootKeysEnc.GetNwkKey() != nil {

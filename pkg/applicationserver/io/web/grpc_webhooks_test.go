@@ -59,7 +59,7 @@ func TestWebhookRegistryRPC(t *testing.T) {
 	test.Must(nil, c.Start())
 	defer c.Close()
 
-	mustHavePeer(ctx, c, ttnpb.PeerInfo_ENTITY_REGISTRY)
+	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 
 	client := ttnpb.NewApplicationWebhookRegistryClient(c.LoopbackConn())
 	creds := grpc.PerRPCCredentials(rpcmetadata.MD{

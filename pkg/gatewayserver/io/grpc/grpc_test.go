@@ -74,7 +74,7 @@ func TestAuthentication(t *testing.T) {
 
 	eui := types.EUI64{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01}
 
-	mustHavePeer(ctx, c, ttnpb.PeerInfo_ENTITY_REGISTRY)
+	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 
 	client := ttnpb.NewGtwGsClient(c.LoopbackConn())
 
@@ -167,7 +167,7 @@ func TestTraffic(t *testing.T) {
 	test.Must(nil, c.Start())
 	defer c.Close()
 
-	mustHavePeer(ctx, c, ttnpb.PeerInfo_ENTITY_REGISTRY)
+	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 
 	client := ttnpb.NewGtwGsClient(c.LoopbackConn())
 
@@ -429,7 +429,7 @@ func TestConcentratorConfig(t *testing.T) {
 	test.Must(nil, c.Start())
 	defer c.Close()
 
-	mustHavePeer(ctx, c, ttnpb.PeerInfo_ENTITY_REGISTRY)
+	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 
 	client := ttnpb.NewGtwGsClient(c.LoopbackConn())
 

@@ -4374,66 +4374,7 @@
       "hasExtensions": false,
       "hasMessages": true,
       "hasServices": false,
-      "enums": [
-        {
-          "name": "Role",
-          "longName": "PeerInfo.Role",
-          "fullName": "ttn.lorawan.v3.PeerInfo.Role",
-          "description": "",
-          "values": [
-            {
-              "name": "NONE",
-              "number": "0",
-              "description": ""
-            },
-            {
-              "name": "ENTITY_REGISTRY",
-              "number": "1",
-              "description": ""
-            },
-            {
-              "name": "ACCESS",
-              "number": "2",
-              "description": ""
-            },
-            {
-              "name": "GATEWAY_SERVER",
-              "number": "3",
-              "description": ""
-            },
-            {
-              "name": "NETWORK_SERVER",
-              "number": "4",
-              "description": ""
-            },
-            {
-              "name": "APPLICATION_SERVER",
-              "number": "5",
-              "description": ""
-            },
-            {
-              "name": "JOIN_SERVER",
-              "number": "6",
-              "description": ""
-            },
-            {
-              "name": "CRYPTO_SERVER",
-              "number": "7",
-              "description": ""
-            },
-            {
-              "name": "DEVICE_TEMPLATE_CONVERTER",
-              "number": "8",
-              "description": ""
-            },
-            {
-              "name": "DEVICE_CLAIMING_SERVER",
-              "number": "9",
-              "description": ""
-            }
-          ]
-        }
-      ],
+      "enums": [],
       "extensions": [],
       "messages": [
         {
@@ -4469,9 +4410,9 @@
               "name": "roles",
               "description": "Roles of the peer.",
               "label": "repeated",
-              "type": "Role",
-              "longType": "PeerInfo.Role",
-              "fullType": "ttn.lorawan.v3.PeerInfo.Role",
+              "type": "ClusterRole",
+              "longType": "ClusterRole",
+              "fullType": "ttn.lorawan.v3.ClusterRole",
               "ismap": false,
               "defaultValue": ""
             },
@@ -8128,6 +8069,64 @@
       "hasMessages": false,
       "hasServices": false,
       "enums": [
+        {
+          "name": "ClusterRole",
+          "longName": "ClusterRole",
+          "fullName": "ttn.lorawan.v3.ClusterRole",
+          "description": "",
+          "values": [
+            {
+              "name": "NONE",
+              "number": "0",
+              "description": ""
+            },
+            {
+              "name": "ENTITY_REGISTRY",
+              "number": "1",
+              "description": ""
+            },
+            {
+              "name": "ACCESS",
+              "number": "2",
+              "description": ""
+            },
+            {
+              "name": "GATEWAY_SERVER",
+              "number": "3",
+              "description": ""
+            },
+            {
+              "name": "NETWORK_SERVER",
+              "number": "4",
+              "description": ""
+            },
+            {
+              "name": "APPLICATION_SERVER",
+              "number": "5",
+              "description": ""
+            },
+            {
+              "name": "JOIN_SERVER",
+              "number": "6",
+              "description": ""
+            },
+            {
+              "name": "CRYPTO_SERVER",
+              "number": "7",
+              "description": ""
+            },
+            {
+              "name": "DEVICE_TEMPLATE_CONVERTER",
+              "number": "8",
+              "description": ""
+            },
+            {
+              "name": "DEVICE_CLAIMING_SERVER",
+              "number": "9",
+              "description": ""
+            }
+          ]
+        },
         {
           "name": "DownlinkPathConstraint",
           "longName": "DownlinkPathConstraint",
