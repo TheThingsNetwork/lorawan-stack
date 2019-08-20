@@ -16,6 +16,7 @@ package mqtt
 
 import (
 	"context"
+	"encoding/json"
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -36,6 +37,14 @@ var errNilClient = errors.DefineInvalidArgument("nil_client", "client is nil")
 
 // OpenTopic returns a *pubsub.Topic that publishes to the given topic name with the given MQTT client.
 func OpenTopic(client mqtt.Client, topicName string, timeout time.Duration, qos byte) (*pubsub.Topic, error) {
+	dt, err := openDriverTopic(client, topicName, timeout, qos)
+	if err != nil {
+		return nil, err
+	}
+	return pubsub.NewTopic(dt, nil), nil
+}
+
+func openDriverTopic(client mqtt.Client, topicName string, timeout time.Duration, qos byte) (driver.Topic, error) {
 	if client == nil {
 		return nil, errNilClient
 	}
@@ -45,11 +54,14 @@ func OpenTopic(client mqtt.Client, topicName string, timeout time.Duration, qos 
 		timeout: timeout,
 		qos:     qos,
 	}
-	return pubsub.NewTopic(dt, nil), nil
+	return dt, nil
 }
 
 // SendBatch implements driver.Topic.
 func (t *topic) SendBatch(ctx context.Context, msgs []*driver.Message) error {
+	if t == nil || t.client == nil {
+		return errNilClient
+	}
 	for _, msg := range msgs {
 		if ctx.Err() != nil {
 			return ctx.Err()
@@ -60,11 +72,56 @@ func (t *topic) SendBatch(ctx context.Context, msgs []*driver.Message) error {
 				return err
 			}
 		}
-		if token := t.client.Publish(t.topic, t.qos, false, msg.Body); !token.WaitTimeout(t.timeout) {
+		body, err := encodeMessage(msg)
+		if err != nil {
+			return err
+		}
+		if token := t.client.Publish(t.topic, t.qos, false, body); !token.WaitTimeout(t.timeout) {
 			return token.Error()
 		}
 	}
 	return nil
+}
+
+type messageWithMetadata struct {
+	Body     []byte            `json:"body,omitempty"`
+	Metadata map[string]string `json:"metadata,omitempty"`
+}
+
+func encodeMessage(dm *driver.Message) ([]byte, error) {
+	if dm.Metadata != nil {
+		return json.Marshal(&messageWithMetadata{
+			Body:     dm.Body,
+			Metadata: dm.Metadata,
+		})
+	}
+	return dm.Body, nil
+}
+
+func decodeMessage(message mqtt.Message) (*driver.Message, error) {
+	asFunc := func(i interface{}) bool {
+		p, ok := i.(*mqtt.Message)
+		if !ok {
+			return false
+		}
+		*p = message
+		return true
+	}
+	var mwm messageWithMetadata
+	if err := json.Unmarshal(message.Payload(), &mwm); err != nil {
+		return &driver.Message{
+			Body:     message.Payload(),
+			Metadata: nil,
+			AckID:    -1,
+			AsFunc:   asFunc,
+		}, nil
+	}
+	return &driver.Message{
+		Body:     mwm.Body,
+		Metadata: mwm.Metadata,
+		AckID:    -1,
+		AsFunc:   asFunc,
+	}, nil
 }
 
 // IsRetryable implements driver.Topic.
@@ -103,6 +160,14 @@ const subscriptionQueueSize = 16
 
 // OpenSubscription returns a *pubsub.Subscription that subscribes to the given topic name with the given MQTT client.
 func OpenSubscription(client mqtt.Client, topicName string, timeout time.Duration, qos byte) (*pubsub.Subscription, error) {
+	ds, err := openDriverSubscription(client, topicName, timeout, qos)
+	if err != nil {
+		return nil, err
+	}
+	return pubsub.NewSubscription(ds, nil, nil), nil
+}
+
+func openDriverSubscription(client mqtt.Client, topicName string, timeout time.Duration, qos byte) (driver.Subscription, error) {
 	if client == nil {
 		return nil, errNilClient
 	}
@@ -119,11 +184,14 @@ func OpenSubscription(client mqtt.Client, topicName string, timeout time.Duratio
 		subCh:   subCh,
 		timeout: timeout,
 	}
-	return pubsub.NewSubscription(ds, nil, nil), nil
+	return ds, nil
 }
 
 // ReceiveBatch implements driver.Subscription.
 func (s *subscription) ReceiveBatch(ctx context.Context, maxMessages int) ([]*driver.Message, error) {
+	if s == nil || s.client == nil {
+		return nil, errNilClient
+	}
 	var messages []*driver.Message
 	for i := 0; i < maxMessages; i++ {
 		select {
@@ -133,18 +201,11 @@ func (s *subscription) ReceiveBatch(ctx context.Context, maxMessages int) ([]*dr
 			if !ok {
 				break
 			}
-			messages = append(messages, &driver.Message{
-				Body:  msg.Payload(),
-				AckID: -1,
-				AsFunc: func(i interface{}) bool {
-					p, ok := i.(*mqtt.Message)
-					if !ok {
-						return false
-					}
-					*p = msg
-					return true
-				},
-			})
+			dm, err := decodeMessage(msg)
+			if err != nil {
+				return nil, err
+			}
+			messages = append(messages, dm)
 		}
 	}
 	return messages, nil
@@ -182,6 +243,9 @@ func (*subscription) ErrorCode(err error) gcerrors.ErrorCode {
 
 // Close implements driver.Subscription.
 func (s *subscription) Close() error {
+	if s == nil || s.client == nil {
+		return nil
+	}
 	if token := s.client.Unsubscribe(s.topic); !token.WaitTimeout(s.timeout) {
 		return token.Error()
 	}
@@ -189,6 +253,9 @@ func (s *subscription) Close() error {
 }
 
 func toErrorCode(err error) gcerrors.ErrorCode {
+	if d, ok := err.(errors.Definition); ok && d.FullName() == errNilClient.FullName() {
+		return gcerrors.NotFound
+	}
 	switch err {
 	case nil:
 		return gcerrors.OK

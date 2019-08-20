@@ -17,8 +17,6 @@ package mqtt
 
 import (
 	"context"
-	"crypto/tls"
-	"crypto/x509"
 	"time"
 
 	mqtt_topic "github.com/TheThingsIndustries/mystique/pkg/topic"
@@ -55,20 +53,11 @@ func (impl) OpenConnection(ctx context.Context, pb *ttnpb.ApplicationPubSub) (pc
 	clientOpts.SetUsername(settings.GetUsername())
 	clientOpts.SetPassword(settings.GetPassword())
 	if settings.GetUseTLS() {
-		certPool := x509.NewCertPool()
-		if !certPool.AppendCertsFromPEM(settings.GetTLSCA()) {
-			panic("adding the PEM certificate failed")
+		config, err := createTLSConfig(settings.GetTLSCA(), settings.GetTLSClientCert(), settings.GetTLSClientKey())
+		if err != nil {
+			return nil, err
 		}
-		clientOpts.SetTLSConfig(&tls.Config{
-			RootCAs: certPool,
-			GetClientCertificate: func(req *tls.CertificateRequestInfo) (*tls.Certificate, error) {
-				cert, err := tls.X509KeyPair(settings.GetTLSClientCert(), settings.GetTLSClientKey())
-				if err != nil {
-					return nil, err
-				}
-				return &cert, nil
-			},
-		})
+		clientOpts.SetTLSConfig(config)
 	}
 	client := mqtt.NewClient(clientOpts)
 	if token := client.Connect(); !token.WaitTimeout(defaultTimeout) {
