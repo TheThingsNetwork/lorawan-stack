@@ -16,7 +16,8 @@
     "test": "node_modules/.bin/jest --testPathIgnorePatterns=/dist/",
     "test:watch": "node_modules/.bin/jest --testPathIgnorePatterns=/dist/ --watch",
     "definitions": "node util/http-mapper.js",
-    "fmt": "prettier './src/**/*.js' './util/**/*.js' --write"
+    "fmt": "prettier './src/**/*.js' './util/**/*.js' --write",
+    "lint": "eslint './src/**/**.js' './util/**/*.js' --no-ignore --color"
   },
   "devDependencies": {
     "babel": "^6.23.0",
