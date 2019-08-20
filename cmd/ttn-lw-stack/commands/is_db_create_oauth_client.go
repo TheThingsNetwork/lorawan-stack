@@ -22,7 +22,6 @@ import (
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/pkg/auth"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
-	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -31,7 +30,7 @@ var (
 		Use:   "create-oauth-client",
 		Short: "Create an OAuth client in the Identity Server database",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx, cancel := context.WithTimeout(log.NewContext(context.Background(), logger), 10*time.Second)
+			ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 			defer cancel()
 
 			logger.Info("Connecting to Identity Server database...")
