@@ -137,7 +137,6 @@ func TestEncodeDecodeMessage(t *testing.T) {
 				Body:     []byte{0x01, 0x02, 0x03},
 				Metadata: nil,
 			},
-			body: []byte{0x01, 0x02, 0x03},
 		},
 		{
 			name: "OnlyMetadata",
@@ -147,7 +146,6 @@ func TestEncodeDecodeMessage(t *testing.T) {
 					"foo": "bar",
 				},
 			},
-			body: []byte(`{"metadata":{"foo":"bar"}}`),
 		},
 		{
 			name: "BodyAndMetadata",
@@ -157,7 +155,6 @@ func TestEncodeDecodeMessage(t *testing.T) {
 					"foo": "bar",
 				},
 			},
-			body: []byte(`{"body":"AQID","metadata":{"foo":"bar"}}`),
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
@@ -165,7 +162,6 @@ func TestEncodeDecodeMessage(t *testing.T) {
 
 			body, err := encodeMessage(tc.dm)
 			a.So(err, should.BeNil)
-			a.So(body, should.Resemble, tc.body)
 
 			dm, err := decodeMessage(&mockMessage{
 				payload: body,

@@ -15,8 +15,9 @@
 package mqtt
 
 import (
+	"bytes"
 	"context"
-	"encoding/json"
+	"encoding/gob"
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -83,19 +84,21 @@ func (t *topic) SendBatch(ctx context.Context, msgs []*driver.Message) error {
 	return nil
 }
 
-type messageWithMetadata struct {
-	Body     []byte            `json:"body,omitempty"`
-	Metadata map[string]string `json:"metadata,omitempty"`
-}
-
 func encodeMessage(dm *driver.Message) ([]byte, error) {
-	if dm.Metadata != nil {
-		return json.Marshal(&messageWithMetadata{
-			Body:     dm.Body,
-			Metadata: dm.Metadata,
-		})
+	var buf bytes.Buffer
+	enc := gob.NewEncoder(&buf)
+	if len(dm.Metadata) == 0 {
+		return dm.Body, nil
 	}
-	return dm.Body, nil
+	err := enc.Encode(dm.Metadata)
+	if err != nil {
+		return nil, err
+	}
+	err = enc.Encode(dm.Body)
+	if err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
 }
 
 func decodeMessage(message mqtt.Message) (*driver.Message, error) {
@@ -107,21 +110,19 @@ func decodeMessage(message mqtt.Message) (*driver.Message, error) {
 		*p = message
 		return true
 	}
-	var mwm messageWithMetadata
-	if err := json.Unmarshal(message.Payload(), &mwm); err != nil {
-		return &driver.Message{
-			Body:     message.Payload(),
-			Metadata: nil,
-			AckID:    -1,
-			AsFunc:   asFunc,
-		}, nil
+	buf := bytes.NewBuffer(message.Payload())
+	dec := gob.NewDecoder(buf)
+	dm := &driver.Message{
+		AckID:  -1,
+		AsFunc: asFunc,
 	}
-	return &driver.Message{
-		Body:     mwm.Body,
-		Metadata: mwm.Metadata,
-		AckID:    -1,
-		AsFunc:   asFunc,
-	}, nil
+	err := dec.Decode(&dm.Metadata)
+	if err != nil {
+		dm.Metadata = nil
+		dm.Body = message.Payload()
+		return dm, nil
+	}
+	return dm, dec.Decode(&dm.Body)
 }
 
 // IsRetryable implements driver.Topic.
