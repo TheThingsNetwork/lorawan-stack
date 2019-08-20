@@ -61,18 +61,18 @@ func TestPeers(t *testing.T) {
 	err = c.Start()
 	a.So(err, should.BeNil)
 
-	unusedRoles := []ttnpb.PeerInfo_Role{
-		ttnpb.PeerInfo_APPLICATION_SERVER,
-		ttnpb.PeerInfo_GATEWAY_SERVER,
-		ttnpb.PeerInfo_JOIN_SERVER,
-		ttnpb.PeerInfo_ACCESS,
-		ttnpb.PeerInfo_ENTITY_REGISTRY,
+	unusedRoles := []ttnpb.ClusterRole{
+		ttnpb.ClusterRole_APPLICATION_SERVER,
+		ttnpb.ClusterRole_GATEWAY_SERVER,
+		ttnpb.ClusterRole_JOIN_SERVER,
+		ttnpb.ClusterRole_ACCESS,
+		ttnpb.ClusterRole_ENTITY_REGISTRY,
 	}
 
 	var peer cluster.Peer
 	for i := 0; i < 20; i++ {
 		time.Sleep(20 * time.Millisecond) // Wait for peers to join cluster.
-		peer = c.GetPeer(context.Background(), ttnpb.PeerInfo_NETWORK_SERVER, nil)
+		peer = c.GetPeer(context.Background(), ttnpb.ClusterRole_NETWORK_SERVER, nil)
 		if peer != nil {
 			break
 		}
@@ -90,7 +90,7 @@ func TestPeers(t *testing.T) {
 		a.So(peer, should.BeNil)
 	}
 
-	peers := c.GetPeers(context.Background(), ttnpb.PeerInfo_NETWORK_SERVER)
+	peers := c.GetPeers(context.Background(), ttnpb.ClusterRole_NETWORK_SERVER)
 	a.So(peers, should.HaveLength, 1)
 
 	for _, role := range unusedRoles {

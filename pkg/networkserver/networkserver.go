@@ -312,8 +312,8 @@ func (ns *NetworkServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.Client
 }
 
 // Roles returns the roles that the Network Server fulfills.
-func (ns *NetworkServer) Roles() []ttnpb.PeerInfo_Role {
-	return []ttnpb.PeerInfo_Role{ttnpb.PeerInfo_NETWORK_SERVER}
+func (ns *NetworkServer) Roles() []ttnpb.ClusterRole {
+	return []ttnpb.ClusterRole{ttnpb.ClusterRole_NETWORK_SERVER}
 }
 
 func (ns *NetworkServer) Close() {

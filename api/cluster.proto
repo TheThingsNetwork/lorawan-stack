@@ -16,6 +16,7 @@ syntax = "proto3";
 
 import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "lorawan-stack/api/enums.proto";
 
 package ttn.lorawan.v3;
 
@@ -28,20 +29,7 @@ message PeerInfo {
   // Indicates whether the gRPC server uses TLS.
   bool tls = 2 [(gogoproto.customname) = "TLS"];
   // Roles of the peer.
-  repeated Role roles = 3;
-
-  enum Role {
-    NONE = 0;
-    ENTITY_REGISTRY = 1;
-    ACCESS = 2;
-    GATEWAY_SERVER = 3;
-    NETWORK_SERVER = 4;
-    APPLICATION_SERVER = 5;
-    JOIN_SERVER = 6;
-    CRYPTO_SERVER = 7;
-    DEVICE_TEMPLATE_CONVERTER = 8;
-    DEVICE_CLAIMING_SERVER = 9;
-  }
+  repeated ClusterRole roles = 3;
 
   // Tags of the peer
   map<string,string> tags = 4;

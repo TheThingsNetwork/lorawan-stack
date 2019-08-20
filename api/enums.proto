@@ -46,3 +46,16 @@ enum State {
   // Denotes that the entity has been reviewed and suspended by an admin.
   STATE_SUSPENDED = 4;
 }
+
+enum ClusterRole {
+  NONE = 0;
+  ENTITY_REGISTRY = 1;
+  ACCESS = 2;
+  GATEWAY_SERVER = 3;
+  NETWORK_SERVER = 4;
+  APPLICATION_SERVER = 5;
+  JOIN_SERVER = 6;
+  CRYPTO_SERVER = 7;
+  DEVICE_TEMPLATE_CONVERTER = 8;
+  DEVICE_CLAIMING_SERVER = 9;
+}

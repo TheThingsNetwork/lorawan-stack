@@ -28,16 +28,16 @@ type Peer interface {
 	// gRPC ClientConn to the peer (if available)
 	Conn() *grpc.ClientConn
 	// Roles announced by the peer
-	Roles() []ttnpb.PeerInfo_Role
+	Roles() []ttnpb.ClusterRole
 	// HasRole returns true iff the peer has the given role
-	HasRole(ttnpb.PeerInfo_Role) bool
+	HasRole(ttnpb.ClusterRole) bool
 	// Tags announced by the peer
 	Tags() map[string]string
 }
 
 type peer struct {
 	name  string
-	roles []ttnpb.PeerInfo_Role
+	roles []ttnpb.ClusterRole
 	tags  map[string]string
 
 	target string
@@ -47,12 +47,12 @@ type peer struct {
 	conn   *grpc.ClientConn
 }
 
-func (p *peer) Name() string                 { return p.name }
-func (p *peer) Conn() *grpc.ClientConn       { return p.conn }
-func (p *peer) Roles() []ttnpb.PeerInfo_Role { return p.roles }
-func (p *peer) Tags() map[string]string      { return p.tags }
+func (p *peer) Name() string               { return p.name }
+func (p *peer) Conn() *grpc.ClientConn     { return p.conn }
+func (p *peer) Roles() []ttnpb.ClusterRole { return p.roles }
+func (p *peer) Tags() map[string]string    { return p.tags }
 
-func (p *peer) HasRole(wanted ttnpb.PeerInfo_Role) bool {
+func (p *peer) HasRole(wanted ttnpb.ClusterRole) bool {
 	roles := p.Roles()
 	for _, role := range roles {
 		if role == wanted {

@@ -106,37 +106,37 @@ func TestProcessDownlinkTask(t *testing.T) {
 				peer3,
 				peer124,
 			},
-			func(reqCtx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) bool {
+			func(reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
 				return a.So(reqCtx, should.HaveParentContextOrEqual, ctx) &&
-					a.So(role, should.Equal, ttnpb.PeerInfo_GATEWAY_SERVER) &&
+					a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER) &&
 					a.So(ids, should.Resemble, ttnpb.GatewayIdentifiers{
 						GatewayID: "gateway-test-0",
 					})
 			},
-			func(reqCtx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) bool {
+			func(reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
 				return a.So(reqCtx, should.HaveParentContextOrEqual, ctx) &&
-					a.So(role, should.Equal, ttnpb.PeerInfo_GATEWAY_SERVER) &&
+					a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER) &&
 					a.So(ids, should.Resemble, ttnpb.GatewayIdentifiers{
 						GatewayID: "gateway-test-1",
 					})
 			},
-			func(reqCtx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) bool {
+			func(reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
 				return a.So(reqCtx, should.HaveParentContextOrEqual, ctx) &&
-					a.So(role, should.Equal, ttnpb.PeerInfo_GATEWAY_SERVER) &&
+					a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER) &&
 					a.So(ids, should.Resemble, ttnpb.GatewayIdentifiers{
 						GatewayID: "gateway-test-2",
 					})
 			},
-			func(reqCtx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) bool {
+			func(reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
 				return a.So(reqCtx, should.HaveParentContextOrEqual, ctx) &&
-					a.So(role, should.Equal, ttnpb.PeerInfo_GATEWAY_SERVER) &&
+					a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER) &&
 					a.So(ids, should.Resemble, ttnpb.GatewayIdentifiers{
 						GatewayID: "gateway-test-3",
 					})
 			},
-			func(reqCtx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) bool {
+			func(reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
 				return a.So(reqCtx, should.HaveParentContextOrEqual, ctx) &&
-					a.So(role, should.Equal, ttnpb.PeerInfo_GATEWAY_SERVER) &&
+					a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER) &&
 					a.So(ids, should.Resemble, ttnpb.GatewayIdentifiers{
 						GatewayID: "gateway-test-4",
 					})

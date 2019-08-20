@@ -125,7 +125,7 @@ func (as *ApplicationServer) connectLink(ctx context.Context, link *link) error 
 		}()
 	} else {
 		allowInsecure = !as.ClusterTLS()
-		ns := as.GetPeer(ctx, ttnpb.PeerInfo_NETWORK_SERVER, link.ApplicationIdentifiers)
+		ns := as.GetPeer(ctx, ttnpb.ClusterRole_NETWORK_SERVER, link.ApplicationIdentifiers)
 		if ns == nil {
 			return errNSNotFound.WithAttributes("application_uid", unique.ID(ctx, link.ApplicationIdentifiers))
 		}

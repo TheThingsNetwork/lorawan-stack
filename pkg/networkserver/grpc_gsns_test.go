@@ -1011,9 +1011,9 @@ func TestHandleUplink(t *testing.T) {
 					}
 				}
 
-				if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer, func(ctx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) bool {
+				if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer, func(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
 					return a.So(ctx, should.HaveParentContextOrEqual, reqCtx) &&
-						a.So(role, should.Equal, ttnpb.PeerInfo_JOIN_SERVER) &&
+						a.So(role, should.Equal, ttnpb.ClusterRole_JOIN_SERVER) &&
 						a.So(ids, should.Resemble, getDevice.EndDeviceIdentifiers)
 				},
 					nil,
@@ -1120,9 +1120,9 @@ func TestHandleUplink(t *testing.T) {
 					}
 				}
 
-				if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer, func(ctx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) bool {
+				if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer, func(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
 					return a.So(ctx, should.HaveParentContextOrEqual, reqCtx) &&
-						a.So(role, should.Equal, ttnpb.PeerInfo_JOIN_SERVER) &&
+						a.So(role, should.Equal, ttnpb.ClusterRole_JOIN_SERVER) &&
 						a.So(ids, should.Resemble, getDevice.EndDeviceIdentifiers)
 				},
 					nil,
@@ -1235,9 +1235,9 @@ func TestHandleUplink(t *testing.T) {
 					}
 				}
 
-				if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer, func(ctx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) bool {
+				if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer, func(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
 					return a.So(ctx, should.HaveParentContextOrEqual, reqCtx) &&
-						a.So(role, should.Equal, ttnpb.PeerInfo_JOIN_SERVER) &&
+						a.So(role, should.Equal, ttnpb.ClusterRole_JOIN_SERVER) &&
 						a.So(ids, should.Resemble, getDevice.EndDeviceIdentifiers)
 				},
 					nil,

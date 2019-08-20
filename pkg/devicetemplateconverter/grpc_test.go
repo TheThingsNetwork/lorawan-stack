@@ -73,7 +73,7 @@ func TestConvertEndDeviceTemplate(t *testing.T) {
 	test.Must(c.Start(), nil)
 	defer c.Close()
 
-	mustHavePeer(ctx, c, ttnpb.PeerInfo_DEVICE_TEMPLATE_CONVERTER)
+	mustHavePeer(ctx, c, ttnpb.ClusterRole_DEVICE_TEMPLATE_CONVERTER)
 
 	client := ttnpb.NewEndDeviceTemplateConverterClient(c.LoopbackConn())
 

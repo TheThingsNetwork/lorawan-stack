@@ -268,7 +268,7 @@ func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Eve
 }
 
 // Roles implements rpcserver.Registerer.
-func (srv *EventsServer) Roles() []ttnpb.PeerInfo_Role {
+func (srv *EventsServer) Roles() []ttnpb.ClusterRole {
 	return nil
 }
 

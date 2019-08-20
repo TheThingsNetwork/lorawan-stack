@@ -71,7 +71,7 @@ func TestAuthentication(t *testing.T) {
 	})
 	test.Must(nil, c.Start())
 	defer c.Close()
-	mustHavePeer(ctx, c, ttnpb.PeerInfo_ENTITY_REGISTRY)
+	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 
 	as := mock.NewServer(c)
 	lis, err := net.Listen("tcp", ":0")
@@ -145,7 +145,7 @@ func TestTraffic(t *testing.T) {
 	test.Must(nil, c.Start())
 	defer c.Close()
 
-	mustHavePeer(ctx, c, ttnpb.PeerInfo_ENTITY_REGISTRY)
+	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 
 	as := mock.NewServer(c)
 	lis, err := net.Listen("tcp", ":0")

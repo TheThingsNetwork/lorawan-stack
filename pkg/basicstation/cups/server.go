@@ -110,14 +110,14 @@ func (s *Server) getRegistry(ctx context.Context, ids *ttnpb.GatewayIdentifiers)
 	if s.registry != nil {
 		return s.registry
 	}
-	return ttnpb.NewGatewayRegistryClient(s.component.GetPeer(ctx, ttnpb.PeerInfo_ENTITY_REGISTRY, ids).Conn())
+	return ttnpb.NewGatewayRegistryClient(s.component.GetPeer(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, ids).Conn())
 }
 
 func (s *Server) getAccess(ctx context.Context, ids *ttnpb.GatewayIdentifiers) ttnpb.GatewayAccessClient {
 	if s.access != nil {
 		return s.access
 	}
-	return ttnpb.NewGatewayAccessClient(s.component.GetPeer(ctx, ttnpb.PeerInfo_ACCESS, ids).Conn())
+	return ttnpb.NewGatewayAccessClient(s.component.GetPeer(ctx, ttnpb.ClusterRole_ACCESS, ids).Conn())
 }
 
 // Option configures the CUPSServer.

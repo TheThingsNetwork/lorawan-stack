@@ -30,13 +30,13 @@ func TestPeer(t *testing.T) {
 
 	p := &peer{
 		name:   "name",
-		roles:  []ttnpb.PeerInfo_Role{ttnpb.PeerInfo_ACCESS},
+		roles:  []ttnpb.ClusterRole{ttnpb.ClusterRole_ACCESS},
 		target: "target",
 		conn:   conn,
 	}
 
-	a.So(p.HasRole(ttnpb.PeerInfo_APPLICATION_SERVER), should.BeFalse)
-	a.So(p.HasRole(ttnpb.PeerInfo_ACCESS), should.BeTrue)
+	a.So(p.HasRole(ttnpb.ClusterRole_APPLICATION_SERVER), should.BeFalse)
+	a.So(p.HasRole(ttnpb.ClusterRole_ACCESS), should.BeTrue)
 
 	a.So(p.Conn(), should.Equal, conn)
 }

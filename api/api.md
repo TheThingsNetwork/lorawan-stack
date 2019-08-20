@@ -82,7 +82,6 @@
 - [File `lorawan-stack/api/cluster.proto`](#lorawan-stack/api/cluster.proto)
   - [Message `PeerInfo`](#ttn.lorawan.v3.PeerInfo)
   - [Message `PeerInfo.TagsEntry`](#ttn.lorawan.v3.PeerInfo.TagsEntry)
-  - [Enum `PeerInfo.Role`](#ttn.lorawan.v3.PeerInfo.Role)
 - [File `lorawan-stack/api/configuration_services.proto`](#lorawan-stack/api/configuration_services.proto)
   - [Message `FrequencyPlanDescription`](#ttn.lorawan.v3.FrequencyPlanDescription)
   - [Message `ListFrequencyPlansRequest`](#ttn.lorawan.v3.ListFrequencyPlansRequest)
@@ -134,6 +133,7 @@
   - [Service `EndDeviceRegistry`](#ttn.lorawan.v3.EndDeviceRegistry)
   - [Service `EndDeviceTemplateConverter`](#ttn.lorawan.v3.EndDeviceTemplateConverter)
 - [File `lorawan-stack/api/enums.proto`](#lorawan-stack/api/enums.proto)
+  - [Enum `ClusterRole`](#ttn.lorawan.v3.ClusterRole)
   - [Enum `DownlinkPathConstraint`](#ttn.lorawan.v3.DownlinkPathConstraint)
   - [Enum `State`](#ttn.lorawan.v3.State)
 - [File `lorawan-stack/api/error.proto`](#lorawan-stack/api/error.proto)
@@ -1413,7 +1413,7 @@ PeerInfo
 | ----- | ---- | ----- | ----------- |
 | `grpc_port` | [`uint32`](#uint32) |  | Port on which the gRPC server is exposed. |
 | `tls` | [`bool`](#bool) |  | Indicates whether the gRPC server uses TLS. |
-| `roles` | [`PeerInfo.Role`](#ttn.lorawan.v3.PeerInfo.Role) | repeated | Roles of the peer. |
+| `roles` | [`ClusterRole`](#ttn.lorawan.v3.ClusterRole) | repeated | Roles of the peer. |
 | `tags` | [`PeerInfo.TagsEntry`](#ttn.lorawan.v3.PeerInfo.TagsEntry) | repeated | Tags of the peer |
 
 ### <a name="ttn.lorawan.v3.PeerInfo.TagsEntry">Message `PeerInfo.TagsEntry`</a>
@@ -1422,21 +1422,6 @@ PeerInfo
 | ----- | ---- | ----- | ----------- |
 | `key` | [`string`](#string) |  |  |
 | `value` | [`string`](#string) |  |  |
-
-### <a name="ttn.lorawan.v3.PeerInfo.Role">Enum `PeerInfo.Role`</a>
-
-| Name | Number | Description |
-| ---- | ------ | ----------- |
-| `NONE` | 0 |  |
-| `ENTITY_REGISTRY` | 1 |  |
-| `ACCESS` | 2 |  |
-| `GATEWAY_SERVER` | 3 |  |
-| `NETWORK_SERVER` | 4 |  |
-| `APPLICATION_SERVER` | 5 |  |
-| `JOIN_SERVER` | 6 |  |
-| `CRYPTO_SERVER` | 7 |  |
-| `DEVICE_TEMPLATE_CONVERTER` | 8 |  |
-| `DEVICE_CLAIMING_SERVER` | 9 |  |
 
 ## <a name="lorawan-stack/api/configuration_services.proto">File `lorawan-stack/api/configuration_services.proto`</a>
 
@@ -2164,6 +2149,21 @@ Power state of the device.
 | `Convert` | `POST` | `/api/v3/edtc/convert` | `*` |
 
 ## <a name="lorawan-stack/api/enums.proto">File `lorawan-stack/api/enums.proto`</a>
+
+### <a name="ttn.lorawan.v3.ClusterRole">Enum `ClusterRole`</a>
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| `NONE` | 0 |  |
+| `ENTITY_REGISTRY` | 1 |  |
+| `ACCESS` | 2 |  |
+| `GATEWAY_SERVER` | 3 |  |
+| `NETWORK_SERVER` | 4 |  |
+| `APPLICATION_SERVER` | 5 |  |
+| `JOIN_SERVER` | 6 |  |
+| `CRYPTO_SERVER` | 7 |  |
+| `DEVICE_TEMPLATE_CONVERTER` | 8 |  |
+| `DEVICE_CLAIMING_SERVER` | 9 |  |
 
 ### <a name="ttn.lorawan.v3.DownlinkPathConstraint">Enum `DownlinkPathConstraint`</a>
 

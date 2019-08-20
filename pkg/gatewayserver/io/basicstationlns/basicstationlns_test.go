@@ -79,7 +79,7 @@ func TestClientTokenAuth(t *testing.T) {
 	})
 	test.Must(nil, c.Start())
 	defer c.Close()
-	mustHavePeer(ctx, c, ttnpb.PeerInfo_ENTITY_REGISTRY)
+	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c)
 
 	bsWebServer := New(ctx, gs)
@@ -182,7 +182,7 @@ func TestDiscover(t *testing.T) {
 	})
 	test.Must(nil, c.Start())
 	defer c.Close()
-	mustHavePeer(ctx, c, ttnpb.PeerInfo_ENTITY_REGISTRY)
+	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c)
 
 	bsWebServer := New(ctx, gs)
@@ -420,7 +420,7 @@ func TestVersion(t *testing.T) {
 	})
 	test.Must(nil, c.Start())
 	defer c.Close()
-	mustHavePeer(ctx, c, ttnpb.PeerInfo_ENTITY_REGISTRY)
+	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c)
 
 	bsWebServer := New(ctx, gs)
@@ -558,7 +558,7 @@ func TestTraffic(t *testing.T) {
 	})
 	test.Must(nil, c.Start())
 	defer c.Close()
-	mustHavePeer(ctx, c, ttnpb.PeerInfo_ENTITY_REGISTRY)
+	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c)
 
 	bsWebServer := New(ctx, gs)
@@ -888,7 +888,7 @@ func TestRTT(t *testing.T) {
 	})
 	test.Must(nil, c.Start())
 	defer c.Close()
-	mustHavePeer(ctx, c, ttnpb.PeerInfo_ENTITY_REGISTRY)
+	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c)
 
 	bsWebServer := New(ctx, gs)

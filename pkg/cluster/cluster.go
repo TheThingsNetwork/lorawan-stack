@@ -42,11 +42,11 @@ type Cluster interface {
 	Leave() error
 
 	// GetPeers returns peers with the given role.
-	GetPeers(ctx context.Context, role ttnpb.PeerInfo_Role) []Peer
+	GetPeers(ctx context.Context, role ttnpb.ClusterRole) []Peer
 	// GetPeer returns a peer with the given role, and a responsibility for the
 	// given identifiers. If the identifiers are nil, this function returns a random
 	// peer from the list that would be returned by GetPeers.
-	GetPeer(ctx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) Peer
+	GetPeer(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) Peer
 
 	// ClaimIDs can be used to indicate that the current peer takes
 	// responsibility for entities identified by ids.
@@ -146,11 +146,11 @@ func New(ctx context.Context, config *config.Cluster, options ...Option) (Cluste
 	}
 	c.peers[c.self.name] = c.self
 
-	tryAddPeer := func(name string, target string, roles ...ttnpb.PeerInfo_Role) {
+	tryAddPeer := func(name string, target string, roles ...ttnpb.ClusterRole) {
 		if target == "" {
 			return
 		}
-		var filteredRoles []ttnpb.PeerInfo_Role
+		var filteredRoles []ttnpb.ClusterRole
 		for _, role := range roles {
 			if !c.self.HasRole(role) {
 				filteredRoles = append(filteredRoles, role)
@@ -166,12 +166,12 @@ func New(ctx context.Context, config *config.Cluster, options ...Option) (Cluste
 		}
 	}
 
-	tryAddPeer("is", config.IdentityServer, ttnpb.PeerInfo_ACCESS, ttnpb.PeerInfo_ENTITY_REGISTRY)
-	tryAddPeer("gs", config.GatewayServer, ttnpb.PeerInfo_GATEWAY_SERVER)
-	tryAddPeer("ns", config.NetworkServer, ttnpb.PeerInfo_NETWORK_SERVER)
-	tryAddPeer("as", config.ApplicationServer, ttnpb.PeerInfo_APPLICATION_SERVER)
-	tryAddPeer("js", config.JoinServer, ttnpb.PeerInfo_JOIN_SERVER)
-	tryAddPeer("cs", config.CryptoServer, ttnpb.PeerInfo_CRYPTO_SERVER)
+	tryAddPeer("is", config.IdentityServer, ttnpb.ClusterRole_ACCESS, ttnpb.ClusterRole_ENTITY_REGISTRY)
+	tryAddPeer("gs", config.GatewayServer, ttnpb.ClusterRole_GATEWAY_SERVER)
+	tryAddPeer("ns", config.NetworkServer, ttnpb.ClusterRole_NETWORK_SERVER)
+	tryAddPeer("as", config.ApplicationServer, ttnpb.ClusterRole_APPLICATION_SERVER)
+	tryAddPeer("js", config.JoinServer, ttnpb.ClusterRole_JOIN_SERVER)
+	tryAddPeer("cs", config.CryptoServer, ttnpb.ClusterRole_CRYPTO_SERVER)
 
 	for _, join := range config.Join {
 		c.peers[join] = &peer{
@@ -246,7 +246,7 @@ func (c *cluster) Leave() error {
 	return nil
 }
 
-func (c *cluster) GetPeers(ctx context.Context, role ttnpb.PeerInfo_Role) []Peer {
+func (c *cluster) GetPeers(ctx context.Context, role ttnpb.ClusterRole) []Peer {
 	var matches []Peer
 	for _, peer := range c.peers {
 		if !peer.HasRole(role) {
@@ -259,7 +259,7 @@ func (c *cluster) GetPeers(ctx context.Context, role ttnpb.PeerInfo_Role) []Peer
 	return matches
 }
 
-func (c *cluster) GetPeer(ctx context.Context, role ttnpb.PeerInfo_Role, ids ttnpb.Identifiers) Peer {
+func (c *cluster) GetPeer(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) Peer {
 	matches := c.GetPeers(ctx, role)
 	if len(matches) == 1 {
 		return matches[0]
