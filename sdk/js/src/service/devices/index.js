@@ -14,7 +14,6 @@
 
 /* eslint-disable no-invalid-this */
 
-import { URL } from 'url'
 import traverse from 'traverse'
 import Marshaler from '../../util/marshaler'
 import Device from '../../entity/device'
