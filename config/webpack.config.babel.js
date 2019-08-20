@@ -220,7 +220,7 @@ export default {
       new webpack.HotModuleReplacementPlugin(),
       new webpack.DllReferencePlugin({
         context,
-        manifest: require(path.resolve(context, CACHE_DIR, 'dll.json')),
+        manifest: path.resolve(context, CACHE_DIR, 'dll.json'),
       }),
       new webpack.WatchIgnorePlugin([
         /node_modules/,

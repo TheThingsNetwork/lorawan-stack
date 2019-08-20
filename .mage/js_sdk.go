@@ -42,7 +42,7 @@ func (k JsSDK) yarn() (func(args ...string) error, error) {
 
 // Deps installs the javascript SDK dependencies.
 func (k JsSDK) Deps() error {
-	changed, err := target.Dir("./sdk/js/node_modules", "./sdk/js/package.json", "./sdk/js/yarn.lock")
+	changed, err := target.Path("./sdk/js/node_modules", "./sdk/js/package.json", "./sdk/js/yarn.lock")
 	if os.IsNotExist(err) || (err == nil && changed) {
 		if mg.Verbose() {
 			fmt.Println("Installing JS SDK dependencies")

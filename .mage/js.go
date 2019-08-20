@@ -146,7 +146,7 @@ func (js Js) DevDeps() error {
 // Deps installs the javascript dependencies.
 func (js Js) Deps() error {
 	files, readErr := ioutil.ReadDir("node_modules")
-	changed, targetErr := target.Dir("node_modules", "./package.json", "./yarn.lock")
+	changed, targetErr := target.Path("node_modules", "./package.json", "./yarn.lock")
 	// Check whether package.json/yarn.lock are newer than node_modules
 	// and whether it is not only yarn that is installed via DevDeps()
 	if readErr != nil || os.IsNotExist(targetErr) || (targetErr == nil && changed) || len(files) <= 4 {
@@ -185,18 +185,25 @@ func (js Js) BuildMain() error {
 	return webpack("--config", "config/webpack.config.babel.js")
 }
 
-// BuildDll runs the webpack to build the DLL bundle
+// BuildDll runs the webpack command to build the DLL bundle
 func (js Js) BuildDll() error {
-	changed, err := target.Path("./public/libs.bundle.js", "./yarn.lock")
-	if os.IsNotExist(err) || (err == nil && changed) {
-		if mg.Verbose() {
-			fmt.Println("Running Webpack for DLL…")
+	mg.Deps(js.Deps)
+	if nodeEnv := os.Getenv("NODE_ENV"); nodeEnv == "development" {
+		changed, err := target.Path("./public/libs.bundle.js", "./yarn.lock")
+		if changed || os.IsNotExist(err) {
+			if mg.Verbose() {
+				fmt.Println("Running Webpack for DLL...")
+			}
+			webpack, err := js.webpack()
+			if err != nil {
+				return err
+			}
+			return webpack("--config", "config/webpack.dll.babel.js")
 		}
-		webpack, err := js.webpack()
-		if err != nil {
-			return err
-		}
-		return webpack("--config", "config/webpack.dll.babel.js")
+		return nil
+	}
+	if mg.Verbose() {
+		fmt.Println("Skipping DLL module bundling (production mode)")
 	}
 	return nil
 }
@@ -210,7 +217,7 @@ func (js Js) Serve() {
 func (js Js) ServeMain() error {
 	mg.Deps(js.Translations, js.BackendTranslations, js.BuildDll)
 	if mg.Verbose() {
-		fmt.Println("Running Webpack for Main Bundle in watch mode…")
+		fmt.Println("Running Webpack for Main Bundle in watch mode...")
 	}
 	webpackServe, err := js.webpackServe()
 	if err != nil {
@@ -225,7 +232,7 @@ func (js Js) Messages() error {
 	changed, err := target.Dir("./.cache/messages", "./pkg/webui/console")
 	if os.IsNotExist(err) || (err == nil && changed) {
 		if mg.Verbose() {
-			fmt.Println("Extracting frontend messages…")
+			fmt.Println("Extracting frontend messages...")
 		}
 		babel, err := js.babel()
 		if err != nil {
@@ -248,7 +255,7 @@ func (js Js) Translations() error {
 	if os.IsNotExist(err) || (err == nil && changed) {
 		mg.Deps(js.Messages)
 		if mg.Verbose() {
-			fmt.Println("Building frontend locale files…")
+			fmt.Println("Building frontend locale files...")
 		}
 		node, err := js.node()
 		if err != nil {
@@ -265,7 +272,7 @@ func (js Js) BackendTranslations() error {
 	if os.IsNotExist(err) || (err == nil && changed) {
 
 		if mg.Verbose() {
-			fmt.Println("Building backend locale files…")
+			fmt.Println("Building backend locale files...")
 		}
 		node, err := js.node()
 		if err != nil {
@@ -347,7 +354,7 @@ func (js Js) LintAll() {
 // Storybook runs a local server with storybook.
 func (js Js) Storybook() error {
 	if mg.Verbose() {
-		fmt.Println("Serving storybook…")
+		fmt.Println("Serving storybook...")
 	}
 	storybook, err := js.storybook()
 	if err != nil {
