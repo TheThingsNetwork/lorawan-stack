@@ -1520,6 +1520,24 @@
       "file": "mqtt.go"
     }
   },
+  "error:pkg/applicationserver/io/pubsub/provider/mqtt:ca_pem_data": {
+    "translations": {
+      "en": "CA PEM data is invalid"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/pubsub/provider/mqtt",
+      "file": "tls.go"
+    }
+  },
+  "error:pkg/applicationserver/io/pubsub/provider/mqtt:nil_client": {
+    "translations": {
+      "en": "client is nil"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/pubsub/provider/mqtt",
+      "file": "driver.go"
+    }
+  },
   "error:pkg/applicationserver/io/pubsub/provider:provider_already_registered": {
     "translations": {
       "en": "provider `{provider_id}` already registered"

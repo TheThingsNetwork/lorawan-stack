@@ -25,6 +25,8 @@ import (
 	"testing"
 	"time"
 
+	mqttnet "github.com/TheThingsIndustries/mystique/pkg/net"
+	mqttserver "github.com/TheThingsIndustries/mystique/pkg/server"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	pbtypes "github.com/gogo/protobuf/types"
 	nats_server "github.com/nats-io/nats-server/v2/server"
@@ -218,6 +220,23 @@ hardware_versions:
 		MaxControlLine: 256,
 	})
 	defer natsServer.Shutdown()
+	time.Sleep(Timeout)
+
+	mqttServer := mqttserver.New(ctx)
+	mqttLis, err := mqttnet.Listen("tcp", ":0")
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	defer mqttLis.Close()
+	go func() {
+		for {
+			conn, err := mqttLis.Accept()
+			if err != nil {
+				return
+			}
+			go mqttServer.Handle(conn)
+		}
+	}()
 	time.Sleep(Timeout)
 
 	c := component.MustNew(test.GetLogger(t), &component.Config{
@@ -523,6 +542,137 @@ hardware_versions:
 				defer subscription.Unsubscribe()
 				select {
 				case err = <-errCh:
+					return err
+				case <-ctx.Done():
+					return ctx.Err()
+				}
+			},
+			SkipCheckDownErr: true, // There is no direct error response in PubSub.
+		},
+		{
+			Protocol: "pubsub/mqtt",
+			ValidAuth: func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, key string) bool {
+				return ids == registeredApplicationID && key == registeredApplicationKey
+			},
+			Connect: func(ctx context.Context, t *testing.T, ids ttnpb.ApplicationIdentifiers, key string, chs *connChannels) error {
+				// Configure pubsub.
+				creds := grpc.PerRPCCredentials(rpcmetadata.MD{
+					AuthType:      "Bearer",
+					AuthValue:     key,
+					AllowInsecure: true,
+				})
+				client := ttnpb.NewApplicationPubSubRegistryClient(as.LoopbackConn())
+				req := &ttnpb.SetApplicationPubSubRequest{
+					ApplicationPubSub: ttnpb.ApplicationPubSub{
+						ApplicationPubSubIdentifiers: registeredApplicationPubSubID,
+						Provider: &ttnpb.ApplicationPubSub_MQTT{
+							MQTT: &ttnpb.ApplicationPubSub_MQTTProvider{
+								ServerURL: fmt.Sprintf("tcp://%v", mqttLis.Addr()),
+							},
+						},
+						Format:    "json",
+						BaseTopic: "foo/bar",
+						DownlinkPush: &ttnpb.ApplicationPubSub_Message{
+							Topic: "down/downlink/push",
+						},
+						DownlinkReplace: &ttnpb.ApplicationPubSub_Message{
+							Topic: "down/downlink/replace",
+						},
+						UplinkMessage: &ttnpb.ApplicationPubSub_Message{
+							Topic: "up/uplink/message",
+						},
+						JoinAccept: &ttnpb.ApplicationPubSub_Message{
+							Topic: "up/join/accept",
+						},
+						DownlinkAck: &ttnpb.ApplicationPubSub_Message{
+							Topic: "up/downlink/ack",
+						},
+						DownlinkNack: &ttnpb.ApplicationPubSub_Message{
+							Topic: "up/downlink/nack",
+						},
+						DownlinkSent: &ttnpb.ApplicationPubSub_Message{
+							Topic: "up/downlink/sent",
+						},
+						DownlinkFailed: &ttnpb.ApplicationPubSub_Message{
+							Topic: "up/downlnk/failed",
+						},
+						DownlinkQueued: &ttnpb.ApplicationPubSub_Message{
+							Topic: "up/downlink/queued",
+						},
+						LocationSolved: &ttnpb.ApplicationPubSub_Message{
+							Topic: "up/location/solved",
+						},
+					},
+					FieldMask: pbtypes.FieldMask{
+						Paths: []string{
+							"base_topic",
+							"downlink_ack",
+							"downlink_failed",
+							"downlink_nack",
+							"downlink_queued",
+							"downlink_sent",
+							"downlink_push",
+							"downlink_replace",
+							"format",
+							"provider",
+							"join_accept",
+							"location_solved",
+							"uplink_message",
+						},
+					},
+				}
+				if _, err := client.Set(ctx, req, creds); err != nil {
+					return err
+				}
+				clientOpts := mqtt.NewClientOptions()
+				clientOpts.AddBroker(mqttLis.Addr().String())
+				mqttClient := mqtt.NewClient(clientOpts)
+				a.So(client, should.NotBeNil)
+				if token := mqttClient.Connect(); !token.WaitTimeout(Timeout) {
+					return errors.New("connect timeout")
+				} else if token.Error() != nil {
+					return token.Error()
+				}
+				defer mqttClient.Disconnect(uint(Timeout / time.Millisecond))
+
+				// Write downstream.
+				go func() {
+					for {
+						var req *ttnpb.DownlinkQueueRequest
+						var topic string
+						select {
+						case <-ctx.Done():
+							return
+						case req = <-chs.downPush:
+							topic = "foo/bar/down/downlink/push"
+						case req = <-chs.downReplace:
+							topic = "foo/bar/down/downlink/replace"
+						}
+						buf, err := jsonpb.TTN().Marshal(req)
+						if err != nil {
+							chs.downErr <- err
+							continue
+						}
+						token := mqttClient.Publish(topic, 1, false, buf)
+						token.Wait()
+						chs.downErr <- token.Error()
+					}
+				}()
+				errCh := make(chan error, 1)
+				// Read upstream.
+				token := mqttClient.Subscribe("foo/bar/up/#", 1, func(_ mqtt.Client, raw mqtt.Message) {
+					msg := &ttnpb.ApplicationUp{}
+					if err := jsonpb.TTN().Unmarshal(raw.Payload(), msg); err != nil {
+						errCh <- err
+						return
+					}
+					chs.up <- msg
+				})
+				if token.Wait() && token.Error() != nil {
+					return token.Error()
+				}
+				select {
+				case err := <-errCh:
 					return err
 				case <-ctx.Done():
 					return ctx.Err()

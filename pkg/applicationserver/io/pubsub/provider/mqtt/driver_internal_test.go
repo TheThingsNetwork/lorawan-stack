@@ -16,7 +16,6 @@ package mqtt
 
 import (
 	"context"
-	"crypto/tls"
 	"fmt"
 	"testing"
 	"time"
@@ -66,11 +65,10 @@ func (h *harness) MaxBatchSizes() (int, int) { return 1, 1 }
 
 func (h *harness) SupportsMultipleSubscriptions() bool { return false }
 
-func createHarnessMaker(broker string, tlsConfig *tls.Config) func(context.Context, *testing.T) (drivertest.Harness, error) {
+func createHarnessMaker(broker string) func(context.Context, *testing.T) (drivertest.Harness, error) {
 	return func(ctx context.Context, t *testing.T) (drivertest.Harness, error) {
 		clientOpts := paho_mqtt.NewClientOptions()
 		clientOpts.AddBroker(broker)
-		clientOpts.SetTLSConfig(tlsConfig)
 		client := paho_mqtt.NewClient(clientOpts)
 		if token := client.Connect(); !token.WaitTimeout(timeout) {
 			return nil, token.Error()
@@ -85,35 +83,12 @@ func TestConformance(t *testing.T) {
 	defer cancelCtx()
 	a := assertions.New(t)
 
-	ca, clientCert, clientKey, err := createPKI()
-	a.So(err, should.BeNil)
-	tlsConfig, err := createTLSConfig(ca, clientCert, clientKey)
-	a.So(err, should.BeNil)
-
-	lis, tlsLis, err := startMQTTServer(ctx, tlsConfig)
+	lis, _, err := startMQTTServer(ctx, nil)
 	a.So(err, should.BeNil)
 	a.So(lis, should.NotBeNil)
-	a.So(tlsLis, should.NotBeNil)
 	defer lis.Close()
-	defer tlsLis.Close()
 
-	for _, tc := range []struct {
-		name  string
-		maker drivertest.HarnessMaker
-	}{
-		{
-			name:  "TCP",
-			maker: createHarnessMaker(fmt.Sprintf("tcp://%v", lis.Addr()), nil),
-		},
-		{
-			name:  "TLS",
-			maker: createHarnessMaker(fmt.Sprintf("tcps://%v", tlsLis.Addr()), tlsConfig),
-		},
-	} {
-		t.Run(tc.name, func(t *testing.T) {
-			drivertest.RunConformanceTests(t, tc.maker, nil)
-		})
-	}
+	drivertest.RunConformanceTests(t, createHarnessMaker(fmt.Sprintf("tcp://%v", lis.Addr())), nil)
 }
 
 type mockMessage struct {
