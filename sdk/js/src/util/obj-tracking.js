@@ -20,7 +20,7 @@ import 'proxy-polyfill/src/proxy'
 // The tracker proxy which will keep track of changes via setters and stores
 // changed properties in the _changed array
 const trackerProxy = trackedData => ({
-  set (obj, prop, value) {
+  set(obj, prop, value) {
     if (prop in trackedData) {
       if (obj._changed === undefined) {
         // Warn about missing changed array in
@@ -41,8 +41,8 @@ const trackerProxy = trackedData => ({
  * @param {Object} obj - The to be tracked object.
  * @returns {Object} The tracked object.
  */
-function trackObject (obj) {
-  if (typeof obj !== 'object' || (obj instanceof Array)) {
+function trackObject(obj) {
+  if (typeof obj !== 'object' || obj instanceof Array) {
     return obj
   }
 
@@ -66,10 +66,10 @@ function trackObject (obj) {
  * @param {boolean} clone - Whether the obj should be cloned before cleaning.
  * @returns {Object} The cleaned object.
  */
-function removeDecorations (obj, clone = false) {
+function removeDecorations(obj, clone = false) {
   const subject = clone ? traverse(obj).clone() : obj
 
-  traverse(subject).forEach(function (element) {
+  traverse(subject).forEach(function(element) {
     if (this.key === '_changed') {
       // "this" now contains information about the node
       // see https://github.com/substack/js-traverse#context

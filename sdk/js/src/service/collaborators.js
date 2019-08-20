@@ -15,12 +15,12 @@
 import Marshaler from '../util/marshaler'
 
 class Collaborators {
-  constructor (registry, { parentRoutes }) {
+  constructor(registry, { parentRoutes }) {
     this._api = registry
     this._parentRoutes = parentRoutes
   }
 
-  async _getById (entityId, collaboratorId, isUser) {
+  async _getById(entityId, collaboratorId, isUser) {
     const entityIdRoute = this._parentRoutes.get
     const collaboratorIdRoute = isUser
       ? 'collaborator.user_ids.user_id'
@@ -36,41 +36,46 @@ class Collaborators {
     return Marshaler.payloadSingleResponse(result)
   }
 
-  async getByUserId (entityId, userId) {
+  async getByUserId(entityId, userId) {
     return this._getById(entityId, userId, true)
   }
 
-  async getByOrganizationId (entityId, organizationId) {
+  async getByOrganizationId(entityId, organizationId) {
     return this._getById(entityId, organizationId, false)
   }
 
-  async getAll (entityId, params) {
+  async getAll(entityId, params) {
     const entityIdRoute = this._parentRoutes.list
-    const result = await this._api.ListCollaborators({
-      routeParams: { [entityIdRoute]: entityId },
-    }, params)
+    const result = await this._api.ListCollaborators(
+      {
+        routeParams: { [entityIdRoute]: entityId },
+      },
+      params,
+    )
 
     return Marshaler.payloadListResponse('collaborators', result)
   }
 
-  async add (entityId, data) {
+  async add(entityId, data) {
     const entityIdRoute = this._parentRoutes.set
-    const result = await this._api.SetCollaborator({
-      routeParams: { [entityIdRoute]: entityId },
-    },
-    {
-      collaborator: data,
-    })
+    const result = await this._api.SetCollaborator(
+      {
+        routeParams: { [entityIdRoute]: entityId },
+      },
+      {
+        collaborator: data,
+      },
+    )
 
     return Marshaler.payloadSingleResponse(result)
   }
 
-  async update (entityId, data) {
+  async update(entityId, data) {
     return await this.add(entityId, data)
   }
 
-  async remove (entityId, data) {
-    return await this.add(entityId, { ...data, rights: []})
+  async remove(entityId, data) {
+    return await this.add(entityId, { ...data, rights: [] })
   }
 }
 

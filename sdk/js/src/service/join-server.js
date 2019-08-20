@@ -15,11 +15,11 @@
 import Marshaler from '../util/marshaler'
 
 class Js {
-  constructor (service) {
+  constructor(service) {
     this._api = service
   }
 
-  async listJoinEUIPrefixes () {
+  async listJoinEUIPrefixes() {
     const result = await this._api.GetJoinEUIPrefixes()
 
     return Marshaler.payloadListResponse('prefixes', result)

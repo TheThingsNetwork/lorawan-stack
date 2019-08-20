@@ -44,9 +44,8 @@ import { notify, EVENTS } from './shared'
  * @returns {Object} The stream subscription object with the `on` function for
  * attaching listeners and the `close` function to close the stream.
  */
-export default async function (payload, url) {
-  let listeners = Object.values(EVENTS)
-    .reduce((acc, curr) => ({ ...acc, [curr]: null }), {})
+export default async function(payload, url) {
+  let listeners = Object.values(EVENTS).reduce((acc, curr) => ({ ...acc, [curr]: null }), {})
   const token = new Token().get()
 
   let Authorization = null
@@ -67,11 +66,11 @@ export default async function (payload, url) {
     },
   })
     .then(response => response.data)
-    .then(function (stream) {
+    .then(function(stream) {
       reader = stream
       notify(listeners[EVENTS.START])
 
-      stream.on('data', function (data) {
+      stream.on('data', function(data) {
         const parsed = data.toString('utf8')
 
         for (const line of parsed.trim().split('\n')) {
@@ -79,21 +78,21 @@ export default async function (payload, url) {
           notify(listeners[EVENTS.EVENT], result)
         }
       })
-      stream.on('end', function () {
+      stream.on('end', function() {
         notify(listeners[EVENTS.CLOSE])
         listeners = null
       })
-      stream.on('error', function (error) {
+      stream.on('error', function(error) {
         notify(listeners[EVENTS.ERROR], error)
         listeners = null
       })
     })
 
   return {
-    on (eventName, callback) {
+    on(eventName, callback) {
       if (listeners[eventName] === undefined) {
         throw new Error(
-          `${eventName} event is not supported. Should be one of: start, error, event or close`
+          `${eventName} event is not supported. Should be one of: start, error, event or close`,
         )
       }
 
@@ -101,7 +100,7 @@ export default async function (payload, url) {
 
       return this
     },
-    close () {
+    close() {
       if (reader) {
         reader.cancel()
       }

@@ -32,19 +32,19 @@ const mockApplicationData = {
       contact_type: 'CONTACT_TYPE_OTHER',
       contact_method: 'CONTACT_METHOD_OTHER',
       value: 'string',
-      'public': true,
+      public: true,
       validated_at: '2018-08-29T14:00:20.793Z',
     },
   ],
 }
 
-jest.mock('../api', function () {
-  return jest.fn().mockImplementation(function () {
+jest.mock('../api', function() {
+  return jest.fn().mockImplementation(function() {
     return {
       ApplicationRegistry: {
         Get: jest.fn().mockResolvedValue({ data: mockApplicationData }),
         List: jest.fn().mockResolvedValue({
-          data: { applications: [ mockApplicationData ]},
+          data: { applications: [mockApplicationData] },
           headers: { 'x-total-count': 1 },
         }),
       },
@@ -52,24 +52,24 @@ jest.mock('../api', function () {
   })
 })
 
-describe('Applications', function () {
+describe('Applications', function() {
   let applications
-  beforeEach(function () {
+  beforeEach(function() {
     const Api = require('../api')
 
     const Applications = require('./applications').default
     applications = new Applications(new Api(), { defaultUserId: 'testuser' })
   })
 
-  describe('Proxied results', function () {
-    test('instance initializes correctly', function () {
+  describe('Proxied results', function() {
+    test('instance initializes correctly', function() {
       jest.resetModules()
 
       expect(applications).toBeInstanceOf(Applications)
       expect(applications._api).toBeDefined()
     })
 
-    test('instance returns an application instance on getById()', async function () {
+    test('instance returns an application instance on getById()', async function() {
       jest.resetModules()
 
       const app = await applications.getById('test')
@@ -78,7 +78,7 @@ describe('Applications', function () {
       expect(app.ids.application_id).toBe('test')
     })
 
-    test('instance returns an application list on getAll()', async function () {
+    test('instance returns an application list on getAll()', async function() {
       jest.resetModules()
 
       const result = await applications.getAll()
@@ -91,5 +91,4 @@ describe('Applications', function () {
       expect(totalCount).toBe(1)
     })
   })
-
 })

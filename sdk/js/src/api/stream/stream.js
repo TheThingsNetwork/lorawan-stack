@@ -45,9 +45,8 @@ import 'web-streams-polyfill/dist/polyfill.js'
  * @returns {Object} The stream subscription object with the `on` function for
  * attaching listeners and the `close` function to close the stream.
  */
-export default async function (payload, url) {
-  let listeners = Object.values(EVENTS)
-    .reduce((acc, curr) => ({ ...acc, [curr]: null }), {})
+export default async function(payload, url) {
+  let listeners = Object.values(EVENTS).reduce((acc, curr) => ({ ...acc, [curr]: null }), {})
   const token = new Token().get()
 
   let Authorization = null
@@ -73,13 +72,14 @@ export default async function (payload, url) {
   }
 
   reader = response.body.getReader()
-  reader.read()
-    .then(function (data) {
+  reader
+    .read()
+    .then(function(data) {
       notify(listeners[EVENTS.START])
 
       return data
     })
-    .then(function onChunk ({ done, value }) {
+    .then(function onChunk({ done, value }) {
       if (done) {
         notify(listeners[EVENTS.CLOSE])
         listeners = null
@@ -95,16 +95,16 @@ export default async function (payload, url) {
 
       return reader.read().then(onChunk)
     })
-    .catch(function (error) {
+    .catch(function(error) {
       notify(listeners[EVENTS.ERROR], error)
       listeners = null
     })
 
   return {
-    on (eventName, callback) {
+    on(eventName, callback) {
       if (listeners[eventName] === undefined) {
         throw new Error(
-          `${eventName} event is not supported. Should be one of: start, error, event or close`
+          `${eventName} event is not supported. Should be one of: start, error, event or close`,
         )
       }
 
@@ -112,7 +112,7 @@ export default async function (payload, url) {
 
       return this
     },
-    close () {
+    close() {
       if (reader) {
         reader.cancel()
       }

@@ -20,7 +20,7 @@ import Entity from './entity'
  * @extends Entity
  */
 class Device extends Entity {
-  constructor (data, api) {
+  constructor(data, api) {
     super(data)
 
     // TODO: Check for data validity
@@ -31,8 +31,11 @@ class Device extends Entity {
     this._api = api
   }
 
-  save () {
-    return this.api.EndDeviceRegistry.Update({ ...this._appIdMask, device_id: this._deviceId }, this.toObject())
+  save() {
+    return this.api.EndDeviceRegistry.Update(
+      { ...this._appIdMask, device_id: this._deviceId },
+      this.toObject(),
+    )
   }
 }
 

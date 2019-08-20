@@ -22,13 +22,7 @@ import Js from './service/join-server'
 import Ns from './service/network-server'
 
 class TtnLw {
-  constructor (token, {
-    stackConfig,
-    connectionType,
-    defaultUserId,
-    proxy,
-    axiosConfig,
-  }) {
+  constructor(token, { stackConfig, connectionType, defaultUserId, proxy, axiosConfig }) {
     const tokenInstance = new Token(token)
     this.config = arguments.config
     this.api = new Api(connectionType, stackConfig, axiosConfig, tokenInstance.get())

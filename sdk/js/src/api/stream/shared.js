@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const notify = function (listener, ...args) {
+export const notify = function(listener, ...args) {
   if (listener !== null) {
     listener(...args)
   }

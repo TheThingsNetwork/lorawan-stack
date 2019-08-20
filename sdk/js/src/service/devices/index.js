@@ -29,7 +29,7 @@ import mergeDevice from './merge'
  * device data.
  */
 class Devices {
-  constructor (api, { proxy = true, ignoreDisabledComponents = true, stackConfig }) {
+  constructor(api, { proxy = true, ignoreDisabledComponents = true, stackConfig }) {
     if (!api) {
       throw new Error('Cannot initialize device service without api object.')
     }
@@ -39,19 +39,17 @@ class Devices {
     this._ignoreDisabledComponents = ignoreDisabledComponents
   }
 
-  _responseTransform (response, single = true) {
+  _responseTransform(response, single = true) {
     return Marshaler[single ? 'unwrapDevice' : 'unwrapDevices'](
       response,
-      this._proxy
-        ? device => new Device(device, this._api)
-        : undefined
+      this._proxy ? device => new Device(device, this._api) : undefined,
     )
   }
 
-  async _setDevice (applicationId, deviceId, device, create = false) {
+  async _setDevice(applicationId, deviceId, device, create = false) {
     const ids = device.ids
-    const devId = deviceId || 'device_id' in ids && ids.device_id
-    const appId = applicationId || 'application_ids' in ids && ids.application_ids.application_id
+    const devId = deviceId || ('device_id' in ids && ids.device_id)
+    const appId = applicationId || ('application_ids' in ids && ids.application_ids.application_id)
 
     if (deviceId && ids && 'device_id' in ids && deviceId !== ids.device_id) {
       throw new Error('Device ID mismatch.')
@@ -66,11 +64,13 @@ class Devices {
     }
 
     // Make sure to write at least the ids, in case of creation
-    const mergeBase = create ? {
-      ns: [[ 'ids' ]],
-      as: [[ 'ids' ]],
-      js: [[ 'ids' ]],
-    } : {}
+    const mergeBase = create
+      ? {
+          ns: [['ids']],
+          as: [['ids']],
+          js: [['ids']],
+        }
+      : {}
 
     const params = {
       routeParams: {
@@ -81,15 +81,23 @@ class Devices {
     // Extract the paths from the patch
     const deviceMap = traverse(deviceEntityMap)
 
-    const commonPathFilter = function (element, index, array) {
+    const commonPathFilter = function(element, index, array) {
       return deviceMap.has(array.slice(0, index + 1))
     }
-    const paths = traverse(device).reduce(function (acc, node) {
+    const paths = traverse(device).reduce(function(acc, node) {
       if (this.isLeaf) {
         const path = this.path
 
         // Only consider adding, if a common parent has not been already added
-        if (acc.every(e => !path.slice(-1).join().startsWith(e.join()))) {
+        if (
+          acc.every(
+            e =>
+              !path
+                .slice(-1)
+                .join()
+                .startsWith(e.join()),
+          )
+        ) {
           // Add only the deepest possible field mask of the patch
           const commonPath = path.filter(commonPathFilter)
           acc.push(commonPath)
@@ -111,7 +119,7 @@ class Devices {
     // Retrieve join information if not present
     if (!create && !('supports_join' in device)) {
       try {
-        const res = await this._getDevice(appId, devId, [[ 'supports_join' ]])
+        const res = await this._getDevice(appId, devId, [['supports_join']])
         device.supports_join = res.supports_join
       } catch (err) {
         throw new Error('Could not retrieve join information of the device')
@@ -127,21 +135,24 @@ class Devices {
     if ('js' in requestTree) {
       if (!create && (!ids || !ids.join_eui || !ids.dev_eui)) {
         try {
-          const res = await this._getDevice(appId, devId, [[ 'ids', 'join_eui' ], [ 'ids', 'dev_eui' ]])
+          const res = await this._getDevice(appId, devId, [['ids', 'join_eui'], ['ids', 'dev_eui']])
           device.ids = {
             ...device.ids,
             join_eui: res.ids.join_eui,
             dev_eui: res.ids.dev_eui,
           }
         } catch (err) {
-          throw new Error('Could not update Join Server data on a device without Join EUI or Dev EUI')
+          throw new Error(
+            'Could not update Join Server data on a device without Join EUI or Dev EUI',
+          )
         }
       }
     }
 
     // Write the device id param based on either the id of the newly created
     // device, or the passed id argument
-    params.routeParams['end_device.ids.device_id'] = 'data' in isResult ? isResult.ids.device_id : devId
+    params.routeParams['end_device.ids.device_id'] =
+      'data' in isResult ? isResult.ids.device_id : devId
 
     try {
       const setParts = await makeRequests(
@@ -151,7 +162,7 @@ class Devices {
         'set',
         requestTree,
         params,
-        devicePayload
+        devicePayload,
       )
       const result = mergeDevice(setParts, isResult)
       return result
@@ -164,8 +175,7 @@ class Devices {
     }
   }
 
-  async _getDevice (applicationId, deviceId, paths, ignoreNotFound) {
-
+  async _getDevice(applicationId, deviceId, paths, ignoreNotFound) {
     if (!applicationId) {
       throw new Error('Missing application_id for device.')
     }
@@ -191,14 +201,14 @@ class Devices {
       requestTree,
       params,
       undefined,
-      ignoreNotFound
+      ignoreNotFound,
     )
     const result = mergeDevice(deviceParts)
 
     return result
   }
 
-  async _deleteDevice (applicationId, deviceId, components = [ 'is', 'ns', 'as', 'js' ]) {
+  async _deleteDevice(applicationId, deviceId, components = ['is', 'ns', 'as', 'js']) {
     const params = {
       routeParams: {
         'application_ids.application_id': applicationId,
@@ -207,7 +217,7 @@ class Devices {
     }
 
     // Compose a request tree
-    const requestTree = components.reduce(function (acc, val) {
+    const requestTree = components.reduce(function(acc, val) {
       acc[val] = undefined
       return acc
     }, {})
@@ -222,27 +232,37 @@ class Devices {
       undefined,
       true,
     )
-    return deleteParts.every(e => Boolean(e.device) && Object.keys(e.device).length === 0) ? {} : deleteParts
+    return deleteParts.every(e => Boolean(e.device) && Object.keys(e.device).length === 0)
+      ? {}
+      : deleteParts
   }
 
-  async getAll (applicationId, params, selector) {
-    const response = await this._api.EndDeviceRegistry.List({
-      routeParams: { 'application_ids.application_id': applicationId },
-    }, {
-      ...params,
-      ...Marshaler.selectorToFieldMask(selector),
-    })
+  async getAll(applicationId, params, selector) {
+    const response = await this._api.EndDeviceRegistry.List(
+      {
+        routeParams: { 'application_ids.application_id': applicationId },
+      },
+      {
+        ...params,
+        ...Marshaler.selectorToFieldMask(selector),
+      },
+    )
 
     return this._responseTransform(response, false)
   }
 
-  async getById (applicationId, deviceId, selector = [[ 'ids' ]], { ignoreNotFound = false } = {}) {
-    const response = await this._getDevice(applicationId, deviceId, Marshaler.selectorToPaths(selector), ignoreNotFound)
+  async getById(applicationId, deviceId, selector = [['ids']], { ignoreNotFound = false } = {}) {
+    const response = await this._getDevice(
+      applicationId,
+      deviceId,
+      Marshaler.selectorToPaths(selector),
+      ignoreNotFound,
+    )
 
     return this._responseTransform(response)
   }
 
-  async updateById (applicationId, deviceId, patch) {
+  async updateById(applicationId, deviceId, patch) {
     const response = await this._setDevice(applicationId, deviceId, patch)
 
     if ('root_keys' in patch) {
@@ -252,7 +272,7 @@ class Devices {
     return this._responseTransform(response)
   }
 
-  async create (applicationId, device, { abp = false, withRootKeys = false } = {}) {
+  async create(applicationId, device, { abp = false, withRootKeys = false } = {}) {
     const dev = device
 
     if (abp) {
@@ -271,10 +291,7 @@ class Devices {
       if (parseInt(device.lorawan_version.replace(/\D/g, '').padEnd(3, 0)) >= 110) {
         const {
           session: {
-            keys: {
-              s_nwk_s_int_key,
-              nwk_s_enc_key,
-            },
+            keys: { s_nwk_s_int_key, nwk_s_enc_key },
           },
         } = device
 
@@ -289,10 +306,7 @@ class Devices {
 
       const {
         session: {
-          keys: {
-            f_nwk_s_int_key,
-            app_s_key,
-          },
+          keys: { f_nwk_s_int_key, app_s_key },
         },
       } = device
 
@@ -304,14 +318,11 @@ class Devices {
           f_nwk_s_int_key: Boolean(f_nwk_s_int_key)
             ? f_nwk_s_int_key
             : session.keys.f_nwk_s_int_key,
-          app_s_key: Boolean(app_s_key)
-            ? app_s_key
-            : session.keys.app_s_key,
+          app_s_key: Boolean(app_s_key) ? app_s_key : session.keys.app_s_key,
         },
       }
 
       dev.supports_join = false
-
     } else {
       if ('provisioner_id' in dev && dev.provisioner_id !== '') {
         throw new Error('Setting a provisioner with end device keys is not allowed.')
@@ -335,14 +346,13 @@ class Devices {
       }
 
       dev.supports_join = true
-
     }
     const response = await this._setDevice(applicationId, undefined, dev, true)
 
     return this._responseTransform(response)
   }
 
-  async deleteById (applicationId, deviceId) {
+  async deleteById(applicationId, deviceId) {
     const result = this._deleteDevice(applicationId, deviceId)
 
     return result
@@ -350,7 +360,7 @@ class Devices {
 
   // Events Stream
 
-  async openStream (identifiers, tail, after) {
+  async openStream(identifiers, tail, after) {
     const payload = {
       identifiers: identifiers.map(ids => ({
         device_ids: ids,

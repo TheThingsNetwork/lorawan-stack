@@ -21,7 +21,7 @@ import stream from './stream/stream-node'
  * Http Class is a connector for the API that uses the HTTP bridge to connect.
  */
 class Http {
-  constructor (token, stackConfig, axiosConfig = {}) {
+  constructor(token, stackConfig, axiosConfig = {}) {
     this._stackConfig = stackConfig
     const headers = axiosConfig.headers || {}
 
@@ -31,7 +31,7 @@ class Http {
     }
 
     const stackComponents = Object.keys(stackConfig)
-    const instances = stackComponents.reduce(function (acc, curr) {
+    const instances = stackComponents.reduce(function(acc, curr) {
       const componentUrl = stackConfig[curr]
       if (componentUrl) {
         acc[curr] = axios.create({
@@ -54,23 +54,27 @@ class Http {
       // useful if the token needs to be refreshed frequently, as the case for
       // access tokens.
       if (typeof token === 'function') {
-        this[instance].interceptors.request.use(async function (config) {
-          const tkn = (await token()).access_token
-          config.headers.Authorization = `Bearer ${tkn}`
+        this[instance].interceptors.request.use(
+          async function(config) {
+            const tkn = (await token()).access_token
+            config.headers.Authorization = `Bearer ${tkn}`
 
-          return config
-        },
-        err => Promise.reject(err))
+            return config
+          },
+          err => Promise.reject(err),
+        )
       }
     }
   }
 
-  async handleRequest (method, endpoint, component, payload = {}, isStream) {
+  async handleRequest(method, endpoint, component, payload = {}, isStream) {
     const parsedComponent = component || this._parseStackComponent(endpoint)
     if (!this._stackConfig[parsedComponent]) {
       // If the component has not been defined in The Things Stack config, make no
       // request and throw an error instead
-      throw new Error(`Cannot run "${method.toUpperCase()} ${endpoint}" API call on disabled component: "${parsedComponent}"`)
+      throw new Error(
+        `Cannot run "${method.toUpperCase()} ${endpoint}" API call on disabled component: "${parsedComponent}"`,
+      )
     }
 
     try {
@@ -109,7 +113,7 @@ class Http {
    * @param {Object} payload - The payload object.
    * @returns {Object} The params object, to be passed to axios config.
    */
-  _payloadToQueryParams (payload) {
+  _payloadToQueryParams(payload) {
     const res = { ...payload }
     if (payload && Object.keys(payload).length > 0) {
       if ('field_mask' in payload) {
@@ -125,7 +129,7 @@ class Http {
    * @param {string} endpoint - The endpoint got for a request method.
    * @returns {string} One of {is|as|gs|js|ns}.
    */
-  _parseStackComponent (endpoint) {
+  _parseStackComponent(endpoint) {
     try {
       const component = endpoint.split('/')[1]
       return STACK_COMPONENTS.includes(component) ? component : 'is'

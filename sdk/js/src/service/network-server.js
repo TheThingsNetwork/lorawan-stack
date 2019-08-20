@@ -15,11 +15,11 @@
 import Marshaler from '../util/marshaler'
 
 class Ns {
-  constructor (service) {
+  constructor(service) {
     this._api = service
   }
 
-  async generateDevAddress () {
+  async generateDevAddress() {
     const result = await this._api.GenerateDevAddr()
 
     return Marshaler.payloadSingleResponse(result)

@@ -25,45 +25,52 @@ const result = {}
 for (const component in fieldMasks) {
   // Write get components
   for (const fieldMask of fieldMasks[component].get) {
-    const path = [ ...fieldMask.split('.'), '_root' ]
+    const path = [...fieldMask.split('.'), '_root']
     const val = traverse(result).get(path)
     if (val) {
       if (typeof val[0] === 'string') {
-        traverse(result).set(path, [[ val[0], component ], val[1] ])
+        traverse(result).set(path, [[val[0], component], val[1]])
       } else {
-        traverse(result).set(path, [[ ...val[0], component ], val[1] ])
+        traverse(result).set(path, [[...val[0], component], val[1]])
       }
     } else {
-      traverse(result).set(path, [ component, 'read_only' ])
+      traverse(result).set(path, [component, 'read_only'])
     }
   }
 
   // Write set components
   for (const fieldMask of fieldMasks[component].set) {
-    const path = [ ...fieldMask.split('.'), '_root' ]
+    const path = [...fieldMask.split('.'), '_root']
     const val = traverse(result).get(path)
     if (val) {
       if (typeof val[1] === 'string') {
-        traverse(result).set(path, [ val[0], val[1] !== 'read_only' ? [ val[1], component ] : component ])
+        traverse(result).set(path, [
+          val[0],
+          val[1] !== 'read_only' ? [val[1], component] : component,
+        ])
       } else {
-        traverse(result).set(path, [ val[0], [ ...val[1], component ]])
+        traverse(result).set(path, [val[0], [...val[1], component]])
       }
     } else {
-      traverse(result).set(path, [ component, component ])
+      traverse(result).set(path, [component, component])
     }
   }
 }
 
 // Rewrite single `_root` entries as plain array leaf
-traverse(result).forEach(function () {
+traverse(result).forEach(function() {
   if (Object.keys(this.node).length === 1 && this.node._root) {
     this.update(this.node._root)
   }
 })
 
-fs.writeFile(`${__dirname}/../generated/device-entity-map.json`, JSON.stringify(result, null, 2), function (err) {
-  if (err) {
-    return console.error(err)
-  }
-  console.log('File saved.')
-})
+fs.writeFile(
+  `${__dirname}/../generated/device-entity-map.json`,
+  JSON.stringify(result, null, 2),
+  function(err) {
+    if (err) {
+      return console.error(err)
+    }
+    console.log('File saved.')
+  },
+)
