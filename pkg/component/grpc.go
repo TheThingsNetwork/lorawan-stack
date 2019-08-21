@@ -59,10 +59,10 @@ func (c *Component) setupGRPC() (err error) {
 		"/*",
 		echo.WrapHandler(http.StripPrefix(ttnpb.HTTPAPIPrefix, c.grpc)),
 		middleware.CORSWithConfig(middleware.CORSConfig{
-			Skipper:      middleware.DefaultSkipper,
-			AllowOrigins: []string{"*"},
-			AllowMethods: []string{http.MethodGet, http.MethodHead, http.MethodPut, http.MethodPatch, http.MethodPost, http.MethodDelete},
-			AllowHeaders: []string{"Date", "Content-Length", "X-Total-Count", "X-Warning"},
+			AllowHeaders:     []string{"Authorization", "Content-Type", "X-CSRF-Token"},
+			AllowCredentials: true,
+			ExposeHeaders:    []string{"Date", "Content-Length", "X-Request-Id", "X-Total-Count", "X-Warning"},
+			MaxAge:           600,
 		}),
 	)
 	return nil
