@@ -78,7 +78,7 @@ func (t *topic) SendBatch(ctx context.Context, msgs []*driver.Message) error {
 			return err
 		}
 		if token := t.client.Publish(t.topic, t.qos, false, body); !token.WaitTimeout(t.timeout) {
-			return token.Error()
+			return convertToCancelled(token.Error())
 		}
 	}
 	return nil
@@ -177,7 +177,7 @@ func openDriverSubscription(client mqtt.Client, topicName string, timeout time.D
 		subCh <- msg
 	}
 	if token := client.Subscribe(topicName, qos, handler); !token.WaitTimeout(timeout) {
-		return nil, token.Error()
+		return nil, convertToCancelled(token.Error())
 	}
 	ds := &subscription{
 		client:  client,
@@ -248,7 +248,7 @@ func (s *subscription) Close() error {
 		return nil
 	}
 	if token := s.client.Unsubscribe(s.topic); !token.WaitTimeout(s.timeout) {
-		return token.Error()
+		return convertToCancelled(token.Error())
 	}
 	return nil
 }
@@ -269,4 +269,12 @@ func toErrorCode(err error) gcerrors.ErrorCode {
 	default:
 		return gcerrors.Unknown
 	}
+}
+
+// convertToCancelled returns the error if it is not nil, or context.DeadlineExceeded otherwise.
+func convertToCancelled(err error) error {
+	if err != nil {
+		return err
+	}
+	return context.DeadlineExceeded
 }

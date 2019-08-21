@@ -61,7 +61,7 @@ func (impl) OpenConnection(ctx context.Context, pb *ttnpb.ApplicationPubSub) (pc
 	}
 	client := mqtt.NewClient(clientOpts)
 	if token := client.Connect(); !token.WaitTimeout(defaultTimeout) {
-		return nil, token.Error()
+		return nil, convertToCancelled(token.Error())
 	}
 	pc = &provider.Connection{
 		ProviderConnection: &connection{
