@@ -26,7 +26,7 @@ import (
 	"gocloud.dev/pubsub"
 )
 
-const defaultTimeout = (1 << 8) * time.Millisecond
+const defaultTimeout = 1 * time.Second
 
 type impl struct {
 }
