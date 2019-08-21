@@ -153,6 +153,7 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 			continue
 		}
 		if desc.DownlinkLength > maxDownLen {
+			maxDownLen = 0
 			continue
 		}
 		cmds = append(cmds, cmd)
