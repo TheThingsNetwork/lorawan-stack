@@ -17,7 +17,6 @@
 import traverse from 'traverse'
 import Marshaler from '../../util/marshaler'
 import Device from '../../entity/device'
-import randomByteString from '../../util/random-bytes'
 import deviceEntityMap from '../../../generated/device-entity-map.json'
 import { splitSetPaths, splitGetPaths, makeRequests } from './split'
 import mergeDevice from './merge'
@@ -271,77 +270,14 @@ class Devices {
     return this._responseTransform(response)
   }
 
-  async create(applicationId, device, { abp = false, withRootKeys = false } = {}) {
+  async create(applicationId, device, { abp = false } = {}) {
     const dev = device
 
     if (abp) {
-      const session = {
-        dev_addr: randomByteString(8), // TODO: Replace with proper generator
-        keys: {
-          session_key_id: randomByteString(16),
-          f_nwk_s_int_key: {
-            key: randomByteString(32),
-          },
-          app_s_key: {
-            key: randomByteString(32),
-          },
-        },
-      }
-      if (parseInt(device.lorawan_version.replace(/\D/g, '').padEnd(3, 0)) >= 110) {
-        const {
-          session: {
-            keys: { s_nwk_s_int_key, nwk_s_enc_key },
-          },
-        } = device
-
-        session.keys.s_nwk_s_int_key = Boolean(s_nwk_s_int_key)
-          ? s_nwk_s_int_key
-          : { key: randomByteString(32) }
-
-        session.keys.nwk_s_enc_key = Boolean(nwk_s_enc_key)
-          ? nwk_s_enc_key
-          : { key: randomByteString(32) }
-      }
-
-      const {
-        session: {
-          keys: { f_nwk_s_int_key, app_s_key },
-        },
-      } = device
-
-      dev.session = {
-        ...session,
-        ...dev.session,
-        keys: {
-          ...session.keys,
-          f_nwk_s_int_key: Boolean(f_nwk_s_int_key)
-            ? f_nwk_s_int_key
-            : session.keys.f_nwk_s_int_key,
-          app_s_key: Boolean(app_s_key) ? app_s_key : session.keys.app_s_key,
-        },
-      }
-
       dev.supports_join = false
     } else {
       if ('provisioner_id' in dev && dev.provisioner_id !== '') {
         throw new Error('Setting a provisioner with end device keys is not allowed.')
-      }
-      let root_keys = {}
-      if (withRootKeys) {
-        root_keys = {
-          root_key_id: 'ttn-lw-js-sdk-generated',
-          app_key: {
-            key: randomByteString(32),
-          },
-          nwk_key: {
-            key: randomByteString(32),
-          },
-        }
-      }
-
-      dev.root_keys = {
-        ...root_keys,
-        ...dev.root_keys,
       }
 
       dev.supports_join = true
