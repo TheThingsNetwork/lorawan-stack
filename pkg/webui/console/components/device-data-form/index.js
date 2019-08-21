@@ -121,6 +121,7 @@ class DeviceDataForm extends Component {
           name="session.dev_addr"
           placeholder={m.leaveBlankPlaceholder}
           description={m.deviceAddrDescription}
+          required
         />
         <Form.Field
           title={sharedMessages.fwdNtwkKey}
@@ -262,7 +263,9 @@ class DeviceDataForm extends Component {
       supports_class_c: false,
       resets_join_nonces: false,
       root_keys: {},
-      session: {},
+      session: {
+        dev_addr: undefined,
+      },
       mac_settings: {
         resets_f_cnt: false,
       },

@@ -61,7 +61,9 @@ const baseSchemaShape = Yup.object({
 
 export const updateFormValidationSchema = baseSchemaShape.shape({
   session: Yup.object().shape({
-    dev_addr: Yup.string().length(4 * 2, m.validate8), // 4 Byte hex
+    dev_addr: Yup.string()
+      .length(4 * 2, m.validate8) // 4 Byte hex
+      .required(sharedMessages.validateRequired),
     keys: Yup.object().shape({
       f_nwk_s_int_key: Yup.object().shape({
         key: Yup.string().length(16 * 2, m.validate32), // 16 Byte hex
@@ -104,7 +106,9 @@ export const createFormValidationSchema = baseSchemaShape.shape({
   session: Yup.object().shape({
     dev_addr: Yup.lazy(
       stripIfEmpty(
-        Yup.string().length(4 * 2, m.validate8), // 4 Byte hex
+        Yup.string()
+          .length(4 * 2, m.validate8) // 4 Byte hex
+          .required(sharedMessages.validateRequired),
       ),
     ),
     keys: Yup.object().shape({
