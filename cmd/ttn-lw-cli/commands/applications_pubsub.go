@@ -48,6 +48,9 @@ func applicationPubSubProviderFlags() *pflag.FlagSet {
 	flagSet.AddFlagSet(natsProviderApplicationPubSubFlags)
 	flagSet.Bool("mqtt", false, "use the MQTT provider")
 	flagSet.AddFlagSet(mqttProviderApplicationPubSubFlags)
+	flagSet.AddFlagSet(dataFlags("mqtt.tls-ca", ""))
+	flagSet.AddFlagSet(dataFlags("mqtt.tls-client-cert", ""))
+	flagSet.AddFlagSet(dataFlags("mqtt.tls-client-key", ""))
 	addDeprecatedProviderFlags(flagSet)
 	return flagSet
 }
@@ -58,6 +61,19 @@ func addDeprecatedProviderFlags(flagSet *pflag.FlagSet) {
 
 func forwardDeprecatedProviderFlags(flagSet *pflag.FlagSet) {
 	util.ForwardFlag(flagSet, "nats_server_url", "nats.server_url")
+}
+
+func forwardProviderDataFlags(flagSet *pflag.FlagSet) error {
+	for _, err := range []error{
+		forwardDataFlag("mqtt.tls-ca", flagSet),
+		forwardDataFlag("mqtt.tls-client-cert", flagSet),
+		forwardDataFlag("mqtt.tls-client-key", flagSet),
+	} {
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 var errNoPubSubID = errors.DefineInvalidArgument("no_pub_sub_id", "no pubsub ID set")
@@ -185,6 +201,11 @@ var (
 		Short:   "Set the properties of an application pubsub",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			forwardDeprecatedProviderFlags(cmd.Flags())
+			err := forwardProviderDataFlags(cmd.Flags())
+			if err != nil {
+				return err
+			}
+
 			pubsubID, err := getApplicationPubSubID(cmd.Flags(), args)
 			if err != nil {
 				return err
