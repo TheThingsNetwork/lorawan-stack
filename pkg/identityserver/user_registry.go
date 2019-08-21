@@ -321,7 +321,7 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 			req.FieldMask.Paths = append(req.FieldMask.Paths, "temporary_password_created_at")
 		}
 		if !ttnpb.HasAnyField(req.FieldMask.Paths, "temporary_password_expires_at") {
-			expires := now.Add(temporaryPasswordValidity)
+			expires := now.Add(36 * time.Hour)
 			req.User.TemporaryPasswordExpiresAt = &expires
 			req.FieldMask.Paths = append(req.FieldMask.Paths, "temporary_password_expires_at")
 		}
@@ -505,8 +505,6 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 
 var errTemporaryPasswordStillValid = errors.DefineInvalidArgument("temporary_password_still_valid", "previous temporary password still valid")
 
-var temporaryPasswordValidity = time.Hour * 24
-
 func (is *IdentityServer) createTemporaryPassword(ctx context.Context, req *ttnpb.CreateTemporaryPasswordRequest) (*types.Empty, error) {
 	temporaryPassword, err := auth.GenerateKey(ctx)
 	if err != nil {
@@ -526,7 +524,7 @@ func (is *IdentityServer) createTemporaryPassword(ctx context.Context, req *ttnp
 			return errTemporaryPasswordStillValid
 		}
 		usr.TemporaryPassword = hashedTemporaryPassword
-		expires := now.Add(temporaryPasswordValidity)
+		expires := now.Add(time.Hour)
 		usr.TemporaryPasswordCreatedAt, usr.TemporaryPasswordExpiresAt = &now, &expires
 		usr, err = store.GetUserStore(db).UpdateUser(ctx, usr, updateTemporaryPasswordFieldMask)
 		return err
