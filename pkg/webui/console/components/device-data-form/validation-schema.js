@@ -16,7 +16,13 @@ import * as Yup from 'yup'
 
 import sharedMessages from '../../../lib/shared-messages'
 import { id as deviceIdRegexp, address as addressRegexp } from '../../lib/regexp'
+import randomByteString from '../../lib/random-bytes'
 import m from './messages'
+
+const random16BytesString = () => randomByteString(32)
+const isABP = mode => mode === 'abp'
+const isOTAA = mode => mode === 'otaa'
+const toUndefined = value => (!Boolean(value) ? undefined : value)
 
 const baseSchemaShape = Yup.object({
   ids: Yup.object()
@@ -28,14 +34,14 @@ const baseSchemaShape = Yup.object({
         .required(sharedMessages.validateRequired),
     })
     .when('activation_mode', {
-      is: 'otaa',
+      is: isOTAA,
       then: Yup.object().shape({
         join_eui: Yup.string()
-          .length(8 * 2, m.validate16)
-          .required(sharedMessages.validateRequired), // 8 Byte hex
+          .length(8 * 2, m.validate16) // 8 Byte hex
+          .required(sharedMessages.validateRequired),
         dev_eui: Yup.string()
-          .length(8 * 2, m.validate16)
-          .required(sharedMessages.validateRequired), // 8 Byte hex
+          .length(8 * 2, m.validate16) // 8 Byte hex
+          .required(sharedMessages.validateRequired),
       }),
     }),
   mac_settings: Yup.object().shape({
@@ -60,102 +66,124 @@ const baseSchemaShape = Yup.object({
 })
 
 export const updateFormValidationSchema = baseSchemaShape.shape({
-  session: Yup.object().shape({
-    dev_addr: Yup.string()
-      .length(4 * 2, m.validate8) // 4 Byte hex
-      .required(sharedMessages.validateRequired),
-    keys: Yup.object().shape({
-      f_nwk_s_int_key: Yup.object().shape({
-        key: Yup.string().length(16 * 2, m.validate32), // 16 Byte hex
+  session: Yup.object().when('activation_mode', {
+    is: isABP,
+    then: schema =>
+      schema.shape({
+        dev_addr: Yup.string()
+          .length(4 * 2, m.validate8) // 4 Byte hex
+          .required(sharedMessages.validateRequired),
+        keys: Yup.object().shape({
+          f_nwk_s_int_key: Yup.object().shape({
+            key: Yup.string()
+              .length(16 * 2, m.validate32) // 16 Byte hex
+              .required(sharedMessages.validateRequired),
+          }),
+          s_nwk_s_int_key: Yup.object().shape({
+            key: Yup.string()
+              .length(16 * 2, m.validate32) // 16 Byte hex
+              .required(sharedMessages.validateRequired),
+          }),
+          nwk_s_enc_key: Yup.object().shape({
+            key: Yup.string()
+              .length(16 * 2, m.validate32) // 16 Byte hex
+              .required(sharedMessages.validateRequired),
+          }),
+          app_s_key: Yup.object().shape({
+            key: Yup.string()
+              .length(16 * 2, m.validate32) // 16 Byte hex
+              .required(sharedMessages.validateRequired),
+          }),
+        }),
       }),
-      s_nwk_s_int_key: Yup.object().shape({
-        key: Yup.string().length(16 * 2, m.validate32), // 16 Byte hex
-      }),
-      nwk_s_enc_key: Yup.object().shape({
-        key: Yup.string().length(16 * 2, m.validate32), // 16 Byte hex
-      }),
-      app_s_key: Yup.object().shape({
-        key: Yup.string().length(16 * 2, m.validate32), // 16 Byte hex
-      }),
-    }),
+    otherwise: schema => schema.strip(),
   }),
-  root_keys: Yup.object().shape({
-    nwk_key: Yup.object().shape({
-      key: Yup.string().length(16 * 2, m.validate32), // 16 Byte hex
-    }),
-    app_key: Yup.object().shape({
-      key: Yup.string().length(16 * 2, m.validate32), // 16 Byte hex
-    }),
+  root_keys: Yup.object().when('activation_mode', {
+    is: isOTAA,
+    then: schema =>
+      schema.shape({
+        nwk_key: Yup.object().shape({
+          key: Yup.string()
+            .length(16 * 2, m.validate32) // 16 Byte hex
+            .required(sharedMessages.validateRequired),
+        }),
+        app_key: Yup.object().shape({
+          key: Yup.string()
+            .length(16 * 2, m.validate32) // 16 Byte hex
+            .required(sharedMessages.validateRequired),
+        }),
+      }),
+    otherwise: schema => schema.strip(),
   }),
 })
 
-const stripIfEmpty = (originalSchema, testEmpty = () => false) =>
-  function(value) {
-    if (!Boolean(value) || testEmpty(value)) {
-      return Yup.string().strip()
-    }
-
-    return originalSchema
-  }
-
-// See discussion in https://github.com/TheThingsNetwork/lorawan-stack/pull/1075 for reasons
-// to strip the key values.
-const stripKeyIfEmpty = originalSchema => stripIfEmpty(originalSchema, value => !Boolean(value.key))
-
 export const createFormValidationSchema = baseSchemaShape.shape({
-  session: Yup.object().shape({
-    dev_addr: Yup.lazy(
-      stripIfEmpty(
-        Yup.string()
+  session: Yup.object().when(['activation_mode', 'lorawan_version'], (mode, version, schema) => {
+    if (isABP(mode)) {
+      // Check if the version is 1.1.x or higher
+      const isNewVersion =
+        Boolean(version) && parseInt(version.replace(/\D/g, '').padEnd(3, 0)) >= 110
+
+      return schema.shape({
+        dev_addr: Yup.string()
           .length(4 * 2, m.validate8) // 4 Byte hex
           .required(sharedMessages.validateRequired),
-      ),
-    ),
-    keys: Yup.object().shape({
-      f_nwk_s_int_key: Yup.lazy(
-        stripKeyIfEmpty(
-          Yup.object().shape({
-            key: Yup.string().length(16 * 2, m.validate32), // 16 Byte hex
+        keys: Yup.object().shape({
+          f_nwk_s_int_key: Yup.object().shape({
+            key: Yup.string()
+              .emptyOrLength(16 * 2, m.validate32) // 16 Byte hex
+              .transform(toUndefined)
+              .default(random16BytesString),
           }),
-        ),
-      ),
-      s_nwk_s_int_key: Yup.lazy(
-        stripKeyIfEmpty(
-          Yup.object().shape({
-            key: Yup.string().length(16 * 2, m.validate32), // 16 Byte hex
+          s_nwk_s_int_key: Yup.lazy(() =>
+            isNewVersion
+              ? Yup.object().shape({
+                  key: Yup.string()
+                    .emptyOrLength(16 * 2, m.validate32) // 16 Byte hex
+                    .transform(toUndefined)
+                    .default(random16BytesString),
+                })
+              : Yup.object().strip(),
+          ),
+          nwk_s_enc_key: Yup.lazy(() =>
+            isNewVersion
+              ? Yup.object().shape({
+                  key: Yup.string()
+                    .emptyOrLength(16 * 2, m.validate32) // 16 Byte hex
+                    .transform(toUndefined)
+                    .default(random16BytesString),
+                })
+              : Yup.object().strip(),
+          ),
+          app_s_key: Yup.object().shape({
+            key: Yup.string()
+              .emptyOrLength(16 * 2, m.validate32) // 16 Byte hex
+              .transform(toUndefined)
+              .default(random16BytesString),
           }),
-        ),
-      ),
-      nwk_s_enc_key: Yup.lazy(
-        stripKeyIfEmpty(
-          Yup.object().shape({
-            key: Yup.string().length(16 * 2, m.validate32), // 16 Byte hex
-          }),
-        ),
-      ),
-      app_s_key: Yup.lazy(
-        stripKeyIfEmpty(
-          Yup.object().shape({
-            key: Yup.string().length(16 * 2, m.validate32), // 16 Byte hex
-          }),
-        ),
-      ),
-    }),
+        }),
+      })
+    }
+
+    return schema.strip()
   }),
-  root_keys: Yup.object().shape({
-    nwk_key: Yup.lazy(
-      stripKeyIfEmpty(
-        Yup.object().shape({
-          key: Yup.string().length(16 * 2, m.validate32), // 16 Byte hex
+  root_keys: Yup.object().when('activation_mode', {
+    is: isOTAA,
+    then: schema =>
+      schema.shape({
+        nwk_key: Yup.object().shape({
+          key: Yup.string()
+            .emptyOrLength(16 * 2, m.validate32) // 16 Byte hex
+            .transform(toUndefined)
+            .default(random16BytesString),
         }),
-      ),
-    ),
-    app_key: Yup.lazy(
-      stripKeyIfEmpty(
-        Yup.object().shape({
-          key: Yup.string().length(16 * 2, m.validate32), // 16 Byte hex
+        app_key: Yup.object().shape({
+          key: Yup.string()
+            .emptyOrLength(16 * 2, m.validate32) // 16 Byte hex
+            .transform(toUndefined)
+            .default(random16BytesString),
         }),
-      ),
-    ),
+      }),
+    otherwise: schema => schema.strip(),
   }),
 })

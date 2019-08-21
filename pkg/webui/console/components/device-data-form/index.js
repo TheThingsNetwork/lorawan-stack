@@ -262,9 +262,18 @@ class DeviceDataForm extends Component {
       frequency_plan_id: undefined,
       supports_class_c: false,
       resets_join_nonces: false,
-      root_keys: {},
+      root_keys: {
+        nwk_key: {},
+        app_key: {},
+      },
       session: {
         dev_addr: undefined,
+        keys: {
+          f_nwk_s_int_key: {},
+          s_nwk_s_int_key: {},
+          nwk_s_enc_key: {},
+          app_s_key: {},
+        },
       },
       mac_settings: {
         resets_f_cnt: false,
