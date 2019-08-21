@@ -203,7 +203,7 @@ func TestUsersWeakPassword(t *testing.T) {
 		}, creds)
 
 		a.So(err, should.BeNil)
-		a.So(afterUpdate.PasswordUpdatedAt, should.Equal, user.PasswordUpdatedAt)
+		a.So(*afterUpdate.PasswordUpdatedAt, should.Equal, *user.PasswordUpdatedAt)
 	})
 }
 
@@ -280,7 +280,7 @@ func TestUsersCRUD(t *testing.T) {
 		}, creds)
 
 		a.So(err, should.BeNil)
-		a.So(afterUpdate.PasswordUpdatedAt, should.HappenAfter, passwordUpdateTime)
+		a.So(*afterUpdate.PasswordUpdatedAt, should.HappenAfter, passwordUpdateTime)
 
 		_, err = reg.Delete(ctx, &user.UserIdentifiers, creds)
 		a.So(err, should.BeNil)

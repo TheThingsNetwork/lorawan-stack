@@ -47,7 +47,7 @@ message User {
 
   // Only used on create; never returned on API calls.
   string password = 10;
-  google.protobuf.Timestamp password_updated_at = 11 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp password_updated_at = 11 [(gogoproto.stdtime) = true];
   bool require_password_update = 12;
 
   // The reviewing state of the user.

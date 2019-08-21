@@ -144,7 +144,8 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 		return nil, err
 	}
 	req.User.Password = hashedPassword
-	req.User.PasswordUpdatedAt = time.Now()
+	now := time.Now()
+	req.User.PasswordUpdatedAt = &now
 
 	if !createdByAdmin {
 		if is.configFromContext(ctx).UserRegistration.AdminApproval.Required {
@@ -468,7 +469,8 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 				}
 			}
 		}
-		usr.Password, usr.PasswordUpdatedAt, usr.RequirePasswordUpdate = hashedPassword, time.Now(), false
+		now := time.Now()
+		usr.Password, usr.PasswordUpdatedAt, usr.RequirePasswordUpdate = hashedPassword, &now, false
 		usr, err = store.GetUserStore(db).UpdateUser(ctx, usr, updateMask)
 		return err
 	})
