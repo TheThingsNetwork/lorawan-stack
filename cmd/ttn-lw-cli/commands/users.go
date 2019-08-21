@@ -220,8 +220,9 @@ var (
 		},
 	}
 	usersForgotPasswordCommand = &cobra.Command{
-		Use:   "forgot-password [user-id]",
-		Short: "Request a temporary user password",
+		Use:               "forgot-password [user-id]",
+		Short:             "Request a temporary user password",
+		PersistentPreRunE: preRun(),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			usrID := getUserID(cmd.Flags(), args)
 			if usrID == nil {
@@ -242,10 +243,14 @@ var (
 		},
 	}
 	usersUpdatePasswordCommand = &cobra.Command{
-		Use:     "update-password [user-id]",
-		Aliases: []string{"change-password"},
-		Short:   "Update a user password",
+		Use:               "update-password [user-id]",
+		Aliases:           []string{"change-password"},
+		Short:             "Update a user password",
+		PersistentPreRunE: preRun(),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			refreshToken() // NOTE: ignore errors.
+			optionalAuth()
+
 			usrID := getUserID(cmd.Flags(), args)
 			if usrID == nil {
 				return errNoUserID
