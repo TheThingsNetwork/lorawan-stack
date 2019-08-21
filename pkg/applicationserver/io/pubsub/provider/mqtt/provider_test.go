@@ -96,7 +96,7 @@ func TestOpenConnection(t *testing.T) {
 	{
 		conn, err := impl.OpenConnection(ctx, pb)
 		a.So(conn, should.BeNil)
-		a.So(err, should.BeNil)
+		a.So(err, should.NotBeNil)
 	}
 
 	// Valid attributes - connection established.

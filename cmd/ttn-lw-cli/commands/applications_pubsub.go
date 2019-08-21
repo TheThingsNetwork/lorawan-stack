@@ -29,8 +29,10 @@ import (
 )
 
 var (
-	selectApplicationPubSubFlags = util.FieldMaskFlags(&ttnpb.ApplicationPubSub{})
-	setApplicationPubSubFlags    = util.FieldFlags(&ttnpb.ApplicationPubSub{})
+	selectApplicationPubSubFlags       = util.FieldMaskFlags(&ttnpb.ApplicationPubSub{})
+	setApplicationPubSubFlags          = util.FieldFlags(&ttnpb.ApplicationPubSub{})
+	natsProviderApplicationPubSubFlags = util.FieldFlags(&ttnpb.ApplicationPubSub_NATSProvider{}, "nats")
+	mqttProviderApplicationPubSubFlags = util.FieldFlags(&ttnpb.ApplicationPubSub_MQTTProvider{}, "mqtt")
 )
 
 func applicationPubSubIDFlags() *pflag.FlagSet {
@@ -40,16 +42,28 @@ func applicationPubSubIDFlags() *pflag.FlagSet {
 	return flagSet
 }
 
-func natsFlags() *pflag.FlagSet {
+func applicationPubSubProviderFlags() *pflag.FlagSet {
 	flagSet := &pflag.FlagSet{}
 	flagSet.Bool("nats", false, "use the NATS provider")
-	flagSet.String("nats-server-url", "", "")
+	flagSet.AddFlagSet(natsProviderApplicationPubSubFlags)
+	flagSet.Bool("mqtt", false, "use the MQTT provider")
+	flagSet.AddFlagSet(mqttProviderApplicationPubSubFlags)
+	addDeprecatedProviderFlags(flagSet)
 	return flagSet
+}
+
+func addDeprecatedProviderFlags(flagSet *pflag.FlagSet) {
+	util.DeprecateFlag(flagSet, "nats_server_url", "nats.server_url")
+}
+
+func forwardDeprecatedProviderFlags(flagSet *pflag.FlagSet) {
+	util.ForwardFlag(flagSet, "nats_server_url", "nats.server_url")
 }
 
 var errNoPubSubID = errors.DefineInvalidArgument("no_pub_sub_id", "no pubsub ID set")
 
 func getApplicationPubSubID(flagSet *pflag.FlagSet, args []string) (*ttnpb.ApplicationPubSubIdentifiers, error) {
+	forwardDeprecatedProviderFlags(flagSet)
 	applicationID, _ := flagSet.GetString("application-id")
 	pubsubID, _ := flagSet.GetString("pubsub-id")
 	switch len(args) {
@@ -104,6 +118,7 @@ var (
 		Aliases: []string{"info"},
 		Short:   "Get the properties of an application pubsub",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			forwardDeprecatedProviderFlags(cmd.Flags())
 			pubsubID, err := getApplicationPubSubID(cmd.Flags(), args)
 			if err != nil {
 				return err
@@ -136,6 +151,7 @@ var (
 		Aliases: []string{"ls"},
 		Short:   "List application pubsubs",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			forwardDeprecatedProviderFlags(cmd.Flags())
 			appID := getApplicationID(cmd.Flags(), args)
 			if appID == nil {
 				return errNoApplicationID
@@ -168,6 +184,7 @@ var (
 		Aliases: []string{"update"},
 		Short:   "Set the properties of an application pubsub",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			forwardDeprecatedProviderFlags(cmd.Flags())
 			pubsubID, err := getApplicationPubSubID(cmd.Flags(), args)
 			if err != nil {
 				return err
@@ -180,14 +197,27 @@ var (
 			}
 			pubsub.ApplicationPubSubIdentifiers = *pubsubID
 
-			if nats, _ := cmd.Flags().GetBool("nats"); nats {
-				serverURL, _ := cmd.Flags().GetString("nats-server-url")
-				pubsub.Provider = &ttnpb.ApplicationPubSub_NATS{
-					NATS: &ttnpb.ApplicationPubSub_NATSProvider{
-						ServerURL: serverURL,
-					},
+			for name, p := range map[string]struct {
+				provider ttnpb.ApplicationPubSub_Provider
+				flags    *pflag.FlagSet
+			}{
+				"nats": {
+					provider: &ttnpb.ApplicationPubSub_NATS{},
+					flags:    natsProviderApplicationPubSubFlags,
+				},
+				"mqtt": {
+					provider: &ttnpb.ApplicationPubSub_MQTT{},
+					flags:    mqttProviderApplicationPubSubFlags,
+				},
+			} {
+				if enabled, _ := cmd.Flags().GetBool(name); enabled {
+					pubsub.Provider = p.provider
+					if err = util.SetFields(pubsub.Provider, p.flags); err != nil {
+						return err
+					}
+					paths = append(paths, "provider")
+					break
 				}
-				paths = append(paths, "provider")
 			}
 
 			as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
@@ -238,7 +268,7 @@ func init() {
 	applicationsPubSubsCommand.AddCommand(applicationsPubSubsListCommand)
 	applicationsPubSubsSetCommand.Flags().AddFlagSet(applicationPubSubIDFlags())
 	applicationsPubSubsSetCommand.Flags().AddFlagSet(setApplicationPubSubFlags)
-	applicationsPubSubsSetCommand.Flags().AddFlagSet(natsFlags())
+	applicationsPubSubsSetCommand.Flags().AddFlagSet(applicationPubSubProviderFlags())
 	applicationsPubSubsCommand.AddCommand(applicationsPubSubsSetCommand)
 	applicationsPubSubsDeleteCommand.Flags().AddFlagSet(applicationPubSubIDFlags())
 	applicationsPubSubsCommand.AddCommand(applicationsPubSubsDeleteCommand)
