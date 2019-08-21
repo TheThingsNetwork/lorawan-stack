@@ -14,9 +14,9 @@
 
 import { trackerProxy, trackObject, removeDecorations } from './obj-tracking'
 
-describe('trackerProxy', function () {
+describe('trackerProxy', function() {
   let obj
-  beforeEach(function () {
+  beforeEach(function() {
     obj = {
       a: {
         b: 'c',
@@ -27,39 +27,37 @@ describe('trackerProxy', function () {
     }
   })
 
-  test('tracks changes properly', function () {
+  test('tracks changes properly', function() {
     const proxyObj = new Proxy(obj, trackerProxy(obj))
 
     proxyObj.e = 'foo'
 
     expect(proxyObj._changed).toBeInstanceOf(Array)
     expect(proxyObj._changed).toHaveLength(1)
-    expect(proxyObj._changed).toEqual([ 'e' ])
+    expect(proxyObj._changed).toEqual(['e'])
   })
 
-  test('tracks only marked properties', function () {
+  test('tracks only marked properties', function() {
     const proxyObj = new Proxy(obj, trackerProxy({ a: 'b' }))
 
     proxyObj.e = 'foo'
 
     expect(proxyObj._changed).toHaveLength(0)
-
   })
 
-  test('does not add tracked props more than once', function () {
+  test('does not add tracked props more than once', function() {
     const proxyObj = new Proxy(obj, trackerProxy(obj))
 
     proxyObj.e = 'foo'
     proxyObj.e = 'foo'
 
-    expect(proxyObj._changed).toEqual([ 'e' ])
-
+    expect(proxyObj._changed).toEqual(['e'])
   })
 })
 
-describe('trackObject', function () {
+describe('trackObject', function() {
   let obj
-  beforeEach(function () {
+  beforeEach(function() {
     obj = {
       a: {
         b: {
@@ -71,7 +69,7 @@ describe('trackObject', function () {
     }
   })
 
-  test('applies tracker proxies to all children', function () {
+  test('applies tracker proxies to all children', function() {
     obj = trackObject(obj)
 
     expect(obj.a.b._changed).toEqual([])
@@ -82,50 +80,49 @@ describe('trackObject', function () {
     obj.a.e = 'bar'
     obj.g = 'baz'
 
-    expect(obj.a.b._changed).toEqual([ 'c' ])
-    expect(obj.a._changed).toEqual([ 'e' ])
-    expect(obj._changed).toEqual([ 'g' ])
+    expect(obj.a.b._changed).toEqual(['c'])
+    expect(obj.a._changed).toEqual(['e'])
+    expect(obj._changed).toEqual(['g'])
   })
 
-  test('does not apply tracker inside arrays', function () {
-    obj.i = [ 'j', 'k', 'l' ]
+  test('does not apply tracker inside arrays', function() {
+    obj.i = ['j', 'k', 'l']
     obj = trackObject(obj)
 
-    obj.i = [ 'foo' ]
+    obj.i = ['foo']
 
     expect(obj.i).not.toContain('_changed')
-    expect(obj._changed).toEqual([ 'i' ])
+    expect(obj._changed).toEqual(['i'])
   })
 })
 
-describe('removeDecorations', function () {
+describe('removeDecorations', function() {
   let obj
-  beforeEach(function () {
+  beforeEach(function() {
     obj = {
       a: {
         b: 'c',
-        _changed: [ 'b' ],
+        _changed: ['b'],
       },
-      _changed: [ 'a' ],
+      _changed: ['a'],
     }
   })
 
-  test('removes all _changed properties', function () {
+  test('removes all _changed properties', function() {
     removeDecorations(obj)
 
-    expect(Object.keys(obj)).toEqual([ 'a' ])
-    expect(Object.keys(obj.a)).toEqual([ 'b' ])
+    expect(Object.keys(obj)).toEqual(['a'])
+    expect(Object.keys(obj.a)).toEqual(['b'])
     expect(obj._changed).not.toBeDefined()
     expect(obj.a._changed).not.toBeDefined()
   })
 
-  test('leaves source object untouched when clone parameter set', function () {
+  test('leaves source object untouched when clone parameter set', function() {
     const clonedObject = removeDecorations(obj, true)
 
     expect(clonedObject._changed).not.toBeDefined()
     expect(clonedObject.a.b).toBe('c')
-    expect(obj._changed).toEqual([ 'a' ])
-    expect(obj.a._changed).toEqual([ 'b' ])
+    expect(obj._changed).toEqual(['a'])
+    expect(obj.a._changed).toEqual(['b'])
   })
-
 })

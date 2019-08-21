@@ -90,6 +90,36 @@ func (k JsSDK) Watch() error {
 	return yarn("run", "build:watch")
 }
 
+// Fmt formats all js files.
+func (k JsSDK) Fmt() error {
+	mg.Deps(JsSDK.Deps)
+
+	if mg.Verbose() {
+		fmt.Println("Running prettier on sdk .js files")
+	}
+	yarn, err := k.yarn()
+	if err != nil {
+		return err
+	}
+
+	return yarn("run", "fmt")
+}
+
+// Lint runs eslint over sdk js files.
+func (k JsSDK) Lint() error {
+	mg.Deps(JsSDK.Deps)
+
+	if mg.Verbose() {
+		fmt.Println("Running eslint on sdk .js files")
+	}
+	yarn, err := k.yarn()
+	if err != nil {
+		return err
+	}
+
+	return yarn("run", "lint")
+}
+
 // Test runs jest unit tests.
 func (k JsSDK) Test() error {
 	if mg.Verbose() {

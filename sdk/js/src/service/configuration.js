@@ -15,17 +15,17 @@
 import Marshaler from '../util/marshaler'
 
 class Configuration {
-  constructor (service) {
+  constructor(service) {
     this._api = service
   }
 
-  async listNsFrequencyPlans (appId) {
+  async listNsFrequencyPlans(appId) {
     const result = await this._api.ListFrequencyPlans({ component: 'ns' })
 
     return Marshaler.payloadListResponse('frequency_plans', result)
   }
 
-  async listGsFrequencyPlans (appId) {
+  async listGsFrequencyPlans(appId) {
     const result = await this._api.ListFrequencyPlans({ component: 'gs' })
 
     return Marshaler.payloadListResponse('frequency_plans', result)

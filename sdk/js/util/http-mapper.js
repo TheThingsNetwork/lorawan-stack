@@ -19,14 +19,12 @@ const fs = require('fs')
 const api = require('../generated/api.json')
 const allowedFieldMaskPaths = require('../generated/allowed-field-mask-paths.json')
 
-function map (files) {
+function map(files) {
   const result = {}
   const paramRegex = /{([a-z._]+)}/gm
 
   for (const file of files) {
-
     for (const service of file.services) {
-
       result[service.name] = {}
 
       for (const method of service.methods) {
@@ -58,10 +56,13 @@ function map (files) {
   return result
 }
 
-
-fs.writeFile(`${__dirname}/../generated/api-definition.json`, JSON.stringify(map(api.files), null, 2), function (err) {
-  if (err) {
-    return console.error(err)
-  }
-  console.log('File saved.')
-})
+fs.writeFile(
+  `${__dirname}/../generated/api-definition.json`,
+  JSON.stringify(map(api.files), null, 2),
+  function(err) {
+    if (err) {
+      return console.error(err)
+    }
+    console.log('File saved.')
+  },
+)

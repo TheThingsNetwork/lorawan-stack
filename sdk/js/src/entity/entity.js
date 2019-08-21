@@ -23,7 +23,7 @@ import { trackerProxy, trackObject, removeDecorations } from '../util/obj-tracki
  * keep track of changes and generate update masks that the API requires.
  */
 class Entity {
-  constructor (data, isNew = true) {
+  constructor(data, isNew = true) {
     this._isNew = isNew
     this._changed = []
 
@@ -37,17 +37,17 @@ class Entity {
     return new Proxy(this, trackerProxy(clonedData))
   }
 
-  applyValues (values) {
+  applyValues(values) {
     for (const key in values) {
       this[key] = values[key]
     }
   }
 
-  clearValues () {
+  clearValues() {
     removeDecorations(this)
   }
 
-  toObject () {
+  toObject() {
     const output = {}
     for (const key in this._rawData) {
       const leaf = this[key]
@@ -62,10 +62,10 @@ class Entity {
     return output
   }
 
-  getUpdateMask () {
+  getUpdateMask() {
     let res = []
     let trails = []
-    const traverseMask = function (tree, trail) {
+    const traverseMask = function(tree, trail) {
       for (const key in tree) {
         if (key === '_changed') {
           continue
@@ -74,35 +74,35 @@ class Entity {
         const leaf = tree[key]
         if (typeof leaf !== 'object') {
           if (tree._changed && tree._changed.indexOf(key) !== -1) {
-            trails.push([ ...trail, key ])
+            trails.push([...trail, key])
           }
         } else {
-          traverseMask(leaf, [ ...trail, key ])
+          traverseMask(leaf, [...trail, key])
         }
       }
     }
 
     for (const key in this._rawData) {
-      const trail = [ key ]
+      const trail = [key]
       trails = []
       if (typeof this[key] === 'object') {
         traverseMask(this[key], trail)
         if (trails.length !== 0) {
-          res = [ ...res, ...trails ]
+          res = [...res, ...trails]
         }
       } else if (this._changed && this._changed.indexOf(key) !== -1) {
-        res = [ ...res, trail ]
+        res = [...res, trail]
       }
     }
 
     return res.map(e => e.join('.'))
   }
 
-  mask (mask = this.getUpdateMask()) {
-    const paths = ('paths' in mask) ? mask.paths : mask
+  mask(mask = this.getUpdateMask()) {
+    const paths = 'paths' in mask ? mask.paths : mask
     const res = this.toObject()
 
-    traverse(res).forEach(function (item) {
+    traverse(res).forEach(function(item) {
       // "this" now contains information about the node
       // see https://github.com/substack/js-traverse#context
       const path = this.path.join('.')
@@ -114,7 +114,7 @@ class Entity {
     return res
   }
 
-  save (data) {
+  save(data) {
     this._isNew = false
     this.applyValues(data)
   }
@@ -122,7 +122,7 @@ class Entity {
 
 // In order to strip the console output of the object from all decorated props,
 // we modify the inspect method to return the plain object representation
-Entity.prototype.inspect = function () {
+Entity.prototype.inspect = function() {
   return this.toObject()
 }
 

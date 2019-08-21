@@ -15,31 +15,36 @@
 import Marshaler from '../util/marshaler'
 
 class Link {
-  constructor (registry) {
+  constructor(registry) {
     this._api = registry
   }
 
-  async get (appId, fieldMask) {
-    const result = await this._api.GetLink({
-      routeParams: { 'application_ids.application_id': appId },
-    }, Marshaler.selectorToFieldMask(fieldMask))
+  async get(appId, fieldMask) {
+    const result = await this._api.GetLink(
+      {
+        routeParams: { 'application_ids.application_id': appId },
+      },
+      Marshaler.selectorToFieldMask(fieldMask),
+    )
 
     return Marshaler.payloadSingleResponse(result)
   }
 
-  async set (appId, data, mask = Marshaler.fieldMaskFromPatch(data)) {
-    const result = await this._api.SetLink({
-      routeParams: { 'application_ids.application_id': appId },
-    },
-    {
-      link: data,
-      field_mask: Marshaler.fieldMask(mask),
-    })
+  async set(appId, data, mask = Marshaler.fieldMaskFromPatch(data)) {
+    const result = await this._api.SetLink(
+      {
+        routeParams: { 'application_ids.application_id': appId },
+      },
+      {
+        link: data,
+        field_mask: Marshaler.fieldMask(mask),
+      },
+    )
 
     return Marshaler.payloadSingleResponse(result)
   }
 
-  async delete (appId) {
+  async delete(appId) {
     const result = await this._api.DeleteLink({
       routeParams: { application_id: appId },
     })
@@ -47,7 +52,7 @@ class Link {
     return Marshaler.payloadSingleResponse(result)
   }
 
-  async getStats (appId) {
+  async getStats(appId) {
     const result = await this._api.GetLinkStats({
       routeParams: { application_id: appId },
     })

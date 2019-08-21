@@ -21,7 +21,7 @@ import Entity from './entity'
  * @extends Entity
  */
 class Application extends Entity {
-  constructor (parent, rawData, isNew = true) {
+  constructor(parent, rawData, isNew = true) {
     let data = rawData
     if ('application' in rawData) {
       data = rawData.application
@@ -36,25 +36,25 @@ class Application extends Entity {
 
   // API Keys
 
-  async getApiKeys (params) {
+  async getApiKeys(params) {
     return this._parent.ApiKeys.getAll(this._id, params)
   }
 
-  async addApiKey (key) {
+  async addApiKey(key) {
     return this._parent.ApiKeys.getAll(this._id, key)
   }
 
   // Devices
 
-  async getDevice (deviceId) {
+  async getDevice(deviceId) {
     return this._parent.Devices.getById(this._id, deviceId)
   }
 
-  async getDevices (params) {
+  async getDevices(params) {
     return this._parent.Devices.getAll(this._id, params)
   }
 
-  async save (userId) {
+  async save(userId) {
     let res
 
     if (this._isNew) {

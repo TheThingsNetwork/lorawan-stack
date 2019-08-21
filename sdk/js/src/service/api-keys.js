@@ -15,12 +15,12 @@
 import Marshaler from '../util/marshaler'
 
 class ApiKeys {
-  constructor (registry, { parentRoutes }) {
+  constructor(registry, { parentRoutes }) {
     this._api = registry
     this._parentRoutes = parentRoutes
   }
 
-  async getById (entityId, id) {
+  async getById(entityId, id) {
     const entityIdRoute = this._parentRoutes.get
     const result = await this._api.GetAPIKey({
       routeParams: { [entityIdRoute]: entityId, key_id: id },
@@ -29,44 +29,51 @@ class ApiKeys {
     return Marshaler.payloadSingleResponse(result)
   }
 
-  async getAll (entityId, params) {
+  async getAll(entityId, params) {
     const entityIdRoute = this._parentRoutes.list
-    const result = await this._api.ListAPIKeys({
-      routeParams: { [entityIdRoute]: entityId },
-    }, params)
+    const result = await this._api.ListAPIKeys(
+      {
+        routeParams: { [entityIdRoute]: entityId },
+      },
+      params,
+    )
 
     return Marshaler.payloadListResponse('api_keys', result)
   }
 
-  async create (entityId, key) {
+  async create(entityId, key) {
     const entityIdRoute = this._parentRoutes.create
-    const result = await this._api.CreateAPIKey({
-      routeParams: { [entityIdRoute]: entityId },
-    },
-    {
-      ...key,
-    })
+    const result = await this._api.CreateAPIKey(
+      {
+        routeParams: { [entityIdRoute]: entityId },
+      },
+      {
+        ...key,
+      },
+    )
 
     return Marshaler.payloadSingleResponse(result)
   }
 
-  async deleteById (entityId, id) {
+  async deleteById(entityId, id) {
     return this.updateById(entityId, id, {
       rights: [],
     })
   }
 
-  async updateById (entityId, id, patch) {
+  async updateById(entityId, id, patch) {
     const entityIdRoute = this._parentRoutes.update
-    const result = await this._api.UpdateAPIKey({
-      routeParams: {
-        [entityIdRoute]: entityId,
-        'api_key.id': id,
+    const result = await this._api.UpdateAPIKey(
+      {
+        routeParams: {
+          [entityIdRoute]: entityId,
+          'api_key.id': id,
+        },
       },
-    },
-    {
-      api_key: { ...patch },
-    })
+      {
+        api_key: { ...patch },
+      },
+    )
 
     return Marshaler.payloadSingleResponse(result)
   }

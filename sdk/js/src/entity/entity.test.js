@@ -25,8 +25,8 @@ const mockData = {
   f: 'left-unchanged',
 }
 
-describe('Entity', function () {
-  test('recursively proxies ingested data', function () {
+describe('Entity', function() {
+  test('recursively proxies ingested data', function() {
     const entity = new Entity(mockData)
 
     expect(entity).toBeInstanceOf(Entity)
@@ -34,7 +34,7 @@ describe('Entity', function () {
     expect(entity.a._changed).toHaveLength(0)
   })
 
-  test('keeps track of changes', function () {
+  test('keeps track of changes', function() {
     const entity = new Entity(mockData)
 
     entity.e = 'foo'
@@ -42,19 +42,19 @@ describe('Entity', function () {
     entity.a.b.c = 'again'
     entity.a.d = 'baz'
 
-    expect(entity._changed).toEqual([ 'e' ])
-    expect(entity.a._changed).toEqual([ 'd' ])
-    expect(entity.a.b._changed).toEqual([ 'c' ])
+    expect(entity._changed).toEqual(['e'])
+    expect(entity.a._changed).toEqual(['d'])
+    expect(entity.a.b._changed).toEqual(['c'])
     expect(entity._rawData).toMatchObject(mockData)
 
-    expect(entity.getUpdateMask()).toEqual([ 'a.b.c', 'a.d', 'e' ])
+    expect(entity.getUpdateMask()).toEqual(['a.b.c', 'a.d', 'e'])
   })
 
-  test('clears changes correctly', function () {
+  test('clears changes correctly', function() {
     const entity = new Entity(mockData)
 
     entity.e = 'foo'
-    expect(entity.getUpdateMask()).toEqual([ 'e' ])
+    expect(entity.getUpdateMask()).toEqual(['e'])
     entity.clearValues()
     expect(entity.getUpdateMask()).toEqual([])
   })

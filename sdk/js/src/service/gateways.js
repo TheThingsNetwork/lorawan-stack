@@ -17,7 +17,7 @@ import ApiKeys from './api-keys'
 import Collaborators from './collaborators'
 
 class Gateways {
-  constructor (api, { defaultUserId, stackConfig, proxy = true }) {
+  constructor(api, { defaultUserId, stackConfig, proxy = true }) {
     this._api = api
     this._defaultUserId = defaultUserId
     this._stackConfig = stackConfig
@@ -40,7 +40,7 @@ class Gateways {
 
   // Retrieval
 
-  async getAll (params, selector) {
+  async getAll(params, selector) {
     const response = await this._api.GatewayRegistry.List(undefined, {
       ...params,
       ...Marshaler.selectorToFieldMask(selector),
@@ -49,43 +49,50 @@ class Gateways {
     return Marshaler.unwrapGateways(response)
   }
 
-  async getById (id, selector) {
+  async getById(id, selector) {
     const fieldMask = Marshaler.selectorToFieldMask(selector)
-    const response = await this._api.GatewayRegistry.Get({
-      routeParams: { 'gateway_ids.gateway_id': id },
-    }, fieldMask)
+    const response = await this._api.GatewayRegistry.Get(
+      {
+        routeParams: { 'gateway_ids.gateway_id': id },
+      },
+      fieldMask,
+    )
 
     return Marshaler.unwrapGateway(response)
   }
 
   // Update
 
-  async updateById (id, patch, mask = Marshaler.fieldMaskFromPatch(patch)) {
-    const response = await this._api.GatewayRegistry.Update({
-      routeParams: { 'gateway.ids.gateway_id': id },
-    },
-    {
-      gateway: patch,
-      field_mask: Marshaler.fieldMask(mask),
-    })
+  async updateById(id, patch, mask = Marshaler.fieldMaskFromPatch(patch)) {
+    const response = await this._api.GatewayRegistry.Update(
+      {
+        routeParams: { 'gateway.ids.gateway_id': id },
+      },
+      {
+        gateway: patch,
+        field_mask: Marshaler.fieldMask(mask),
+      },
+    )
 
     return Marshaler.unwrapGateway(response)
   }
 
   // Create
 
-  async create (userId = this._defaultUserId, gateway) {
-    const response = await this._api.GatewayRegistry.Create({
-      routeParams: { 'collaborator.user_ids.user_id': userId },
-    },
-    { gateway })
+  async create(userId = this._defaultUserId, gateway) {
+    const response = await this._api.GatewayRegistry.Create(
+      {
+        routeParams: { 'collaborator.user_ids.user_id': userId },
+      },
+      { gateway },
+    )
 
     return Marshaler.unwrapGateway(response)
   }
 
   // Delete
 
-  async deleteById (id) {
+  async deleteById(id) {
     const response = await this._api.GatewayRegistry.Delete({
       routeParams: { gateway_id: id },
     })
@@ -93,7 +100,7 @@ class Gateways {
     return Marshaler.payloadSingleResponse(response)
   }
 
-  async getStatisticsById (id) {
+  async getStatisticsById(id) {
     const response = await this._api.Gs.GetGatewayConnectionStats({
       routeParams: { gateway_id: id },
     })
@@ -101,7 +108,7 @@ class Gateways {
     return Marshaler.payloadSingleResponse(response)
   }
 
-  async getRightsById (gatewayId) {
+  async getRightsById(gatewayId) {
     const result = await this._api.GatewayAccess.ListRights({
       routeParams: { gateway_id: gatewayId },
     })
@@ -111,7 +118,7 @@ class Gateways {
 
   // Events Stream
 
-  async openStream (identifiers, tail, after) {
+  async openStream(identifiers, tail, after) {
     const payload = {
       identifiers: identifiers.map(id => ({
         gateway_ids: { gateway_id: id },

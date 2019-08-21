@@ -15,11 +15,11 @@
 import Marshaler from '../util/marshaler'
 
 class Webhooks {
-  constructor (registry) {
+  constructor(registry) {
     this._api = registry
   }
 
-  async getAll (appId) {
+  async getAll(appId) {
     const result = await this._api.List({
       routeParams: { 'application_ids.application_id': appId },
     })
@@ -27,47 +27,64 @@ class Webhooks {
     return Marshaler.payloadListResponse('webhooks', result)
   }
 
-  async create (appId, webhook, mask = Marshaler.fieldMaskFromPatch(webhook, this._api.SetAllowedFieldMaskPaths)) {
-    const result = await this._api.Set({
-      routeParams: {
-        'webhook.ids.application_ids.application_id': appId,
+  async create(
+    appId,
+    webhook,
+    mask = Marshaler.fieldMaskFromPatch(webhook, this._api.SetAllowedFieldMaskPaths),
+  ) {
+    const result = await this._api.Set(
+      {
+        routeParams: {
+          'webhook.ids.application_ids.application_id': appId,
+        },
       },
-    }, {
-      webhook,
-      field_mask: Marshaler.fieldMask(mask),
-    })
+      {
+        webhook,
+        field_mask: Marshaler.fieldMask(mask),
+      },
+    )
 
     return Marshaler.payloadSingleResponse(result)
   }
 
-  async getById (appId, webhookId, selector) {
+  async getById(appId, webhookId, selector) {
     const fieldMask = Marshaler.selectorToFieldMask(selector)
-    const result = await this._api.Get({
-      routeParams: {
-        'ids.application_ids.application_id': appId,
-        'ids.webhook_id': webhookId,
+    const result = await this._api.Get(
+      {
+        routeParams: {
+          'ids.application_ids.application_id': appId,
+          'ids.webhook_id': webhookId,
+        },
       },
-    }, fieldMask)
+      fieldMask,
+    )
 
     return Marshaler.payloadSingleResponse(result)
   }
 
-  async updateById (appId, webhookId, patch, mask = Marshaler.fieldMaskFromPatch(patch, this._api.SetAllowedFieldMaskPaths)) {
-    const result = await this._api.Set({
-      routeParams: {
-        'webhook.ids.application_ids.application_id': appId,
-        'webhook.ids.webhook_id': webhookId,
+  async updateById(
+    appId,
+    webhookId,
+    patch,
+    mask = Marshaler.fieldMaskFromPatch(patch, this._api.SetAllowedFieldMaskPaths),
+  ) {
+    const result = await this._api.Set(
+      {
+        routeParams: {
+          'webhook.ids.application_ids.application_id': appId,
+          'webhook.ids.webhook_id': webhookId,
+        },
       },
-    },
-    {
-      webhook: patch,
-      field_mask: Marshaler.fieldMask(mask),
-    })
+      {
+        webhook: patch,
+        field_mask: Marshaler.fieldMask(mask),
+      },
+    )
 
     return Marshaler.payloadSingleResponse(result)
   }
 
-  async deleteById (appId, webhookId) {
+  async deleteById(appId, webhookId) {
     const result = await this._api.Delete({
       routeParams: {
         'application_ids.application_id': appId,
@@ -78,7 +95,7 @@ class Webhooks {
     return Marshaler.payloadSingleResponse(result)
   }
 
-  async getFormats () {
+  async getFormats() {
     const result = await this._api.GetFormats()
 
     return Marshaler.payloadSingleResponse(result)

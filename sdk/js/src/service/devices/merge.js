@@ -17,25 +17,25 @@
 import traverse from 'traverse'
 
 /** Takes registry responses from different components and merges them into a
-* single entity record.
-* @param {Object} parts - An object containing the device record responded from
-* the registry and the paths that were requested from the component.
-* Shape: { device: …, paths: … }
-* @param {string} base - An optional base device record, that the merge will
-* take as base
-* @param {Object} minimum - Paths that will always be merged for all records
-* @returns {Object} The merged device record
-*/
-export default function mergeDevice (
+ * single entity record.
+ * @param {Object} parts - An object containing the device record responded from
+ * the registry and the paths that were requested from the component.
+ * Shape: { device: …, paths: … }
+ * @param {string} base - An optional base device record, that the merge will
+ * take as base
+ * @param {Object} minimum - Paths that will always be merged for all records
+ * @returns {Object} The merged device record
+ */
+export default function mergeDevice(
   parts,
   base = {},
-  minimum = [[ 'ids' ], [ 'created_at' ], [ 'updated_at' ]]
+  minimum = [['ids'], ['created_at'], ['updated_at']],
 ) {
   const result = base
 
   // Cycle through all responses
   for (const part of parts) {
-    for (const path of part.paths ? [ ...minimum, ...part.paths ] : []) {
+    for (const path of part.paths ? [...minimum, ...part.paths] : []) {
       // For each path requested, get the corresponding value of the device record
       const val = traverse(part.device).get(path)
       if (val) {
@@ -46,14 +46,14 @@ export default function mergeDevice (
             // Ignore empty object values, as they might override legitimate values
             continue
           }
-          traverse(val).forEach(function (e) {
+          traverse(val).forEach(function(e) {
             if (this.isLeaf) {
               if (typeof e === 'object' && Object.keys(e).length === 0) {
                 // Ignore empty object values
                 return
               }
               // Write the sub object leaf into the result
-              traverse(result).set([ ...path, ...this.path ], e)
+              traverse(result).set([...path, ...this.path], e)
             }
           })
         } else {

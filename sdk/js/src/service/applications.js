@@ -32,7 +32,7 @@ import Webhooks from './webhooks'
  *  should be proxied with the wrapper objects.
  */
 class Applications {
-  constructor (api, { defaultUserId, stackConfig, proxy = true }) {
+  constructor(api, { defaultUserId, stackConfig, proxy = true }) {
     this._defaultUserId = defaultUserId
     this._api = api
     this._proxy = proxy
@@ -58,18 +58,16 @@ class Applications {
     this.Webhooks = new Webhooks(api.ApplicationWebhookRegistry)
   }
 
-  _responseTransform (response, single = true) {
+  _responseTransform(response, single = true) {
     return Marshaler[single ? 'unwrapApplication' : 'unwrapApplications'](
       response,
-      this._proxy
-        ? app => new Application(this, app, false)
-        : undefined
+      this._proxy ? app => new Application(this, app, false) : undefined,
     )
   }
 
   // Retrieval
 
-  async getAll (params, selector) {
+  async getAll(params, selector) {
     const response = await this._api.ApplicationRegistry.List(undefined, {
       ...params,
       ...Marshaler.selectorToFieldMask(selector),
@@ -78,16 +76,19 @@ class Applications {
     return this._responseTransform(response, false)
   }
 
-  async getById (id, selector) {
+  async getById(id, selector) {
     const fieldMask = Marshaler.selectorToFieldMask(selector)
-    const response = await this._api.ApplicationRegistry.Get({
-      routeParams: { 'application_ids.application_id': id },
-    }, fieldMask)
+    const response = await this._api.ApplicationRegistry.Get(
+      {
+        routeParams: { 'application_ids.application_id': id },
+      },
+      fieldMask,
+    )
 
     return this._responseTransform(response)
   }
 
-  async getByOrganization (organizationId) {
+  async getByOrganization(organizationId) {
     const response = this._api.ApplicationRegistry.List({
       routeParams: { 'collaborator.organization_ids.organization_id': organizationId },
     })
@@ -95,7 +96,7 @@ class Applications {
     return this._responseTransform(response)
   }
 
-  async getByCollaborator (userId) {
+  async getByCollaborator(userId) {
     const response = this._api.ApplicationRegistry.List({
       routeParams: { 'collaborator.user_ids.user_id': userId },
     })
@@ -103,7 +104,7 @@ class Applications {
     return this._responseTransform(response)
   }
 
-  async search (params) {
+  async search(params) {
     const response = await this._api.EntityRegistrySearch.SearchApplications({
       queryParams: params,
     })
@@ -113,35 +114,36 @@ class Applications {
 
   // Update
 
-  async updateById (id, patch, mask = Marshaler.fieldMaskFromPatch(patch)) {
-    const response = await this._api.ApplicationRegistry.Update({
-      routeParams: {
-        'application.ids.application_id': id,
+  async updateById(id, patch, mask = Marshaler.fieldMaskFromPatch(patch)) {
+    const response = await this._api.ApplicationRegistry.Update(
+      {
+        routeParams: {
+          'application.ids.application_id': id,
+        },
       },
-    },
-    {
-      application: patch,
-      field_mask: Marshaler.fieldMask(mask),
-    })
-    return Marshaler.unwrapApplication(
-      response,
-      this._applicationTransform
+      {
+        application: patch,
+        field_mask: Marshaler.fieldMask(mask),
+      },
     )
+    return Marshaler.unwrapApplication(response, this._applicationTransform)
   }
 
   // Create
 
-  async create (userId = this._defaultUserId, application) {
-    const response = await this._api.ApplicationRegistry.Create({
-      routeParams: { 'collaborator.user_ids.user_id': userId },
-    },
-    { application })
+  async create(userId = this._defaultUserId, application) {
+    const response = await this._api.ApplicationRegistry.Create(
+      {
+        routeParams: { 'collaborator.user_ids.user_id': userId },
+      },
+      { application },
+    )
     return this._responseTransform(response)
   }
 
   // Delete
 
-  async deleteById (applicationId) {
+  async deleteById(applicationId) {
     const response = await this._api.ApplicationRegistry.Delete({
       routeParams: { application_id: applicationId },
     })
@@ -149,7 +151,7 @@ class Applications {
     return Marshaler.payloadSingleResponse(response)
   }
 
-  async getRightsById (applicationId) {
+  async getRightsById(applicationId) {
     const result = await this._api.ApplicationAccess.ListRights({
       routeParams: { application_id: applicationId },
     })
@@ -159,7 +161,7 @@ class Applications {
 
   // Events Stream
 
-  async openStream (identifiers, tail, after) {
+  async openStream(identifiers, tail, after) {
     const payload = {
       identifiers: identifiers.map(id => ({
         application_ids: { application_id: id },

@@ -17,7 +17,7 @@
 import TTN from '../.'
 
 const token = 'access-token-or-api-key'
-const ttn = new TTN( token, {
+const ttn = new TTN(token, {
   connectionType: 'http',
   baseURL: 'http://localhost:1885/api/v3',
   defaultUserId: 'testuser',
@@ -33,8 +33,7 @@ const appData = {
   description: `Some description ${hash}`,
 }
 
-
-async function createApplication () {
+async function createApplication() {
   // Via Applications object
   const firstApp = await ttn.Applications.create('testuser', appData)
   console.log(firstApp)
@@ -46,17 +45,17 @@ async function createApplication () {
   console.log(secondApp)
 }
 
-async function getApplication () {
+async function getApplication() {
   const firstApp = await ttn.Applications.getById(appName)
   console.log(firstApp)
 }
 
-async function listApplications () {
+async function listApplications() {
   const apps = await ttn.Applications.getAll()
   console.log(apps)
 }
 
-async function updateApplication () {
+async function updateApplication() {
   // Via Applications object
   const patch = { description: 'New description' }
   const res = await ttn.Applications.updateById(appName, patch)
@@ -69,12 +68,12 @@ async function updateApplication () {
   console.log(app)
 }
 
-async function deleteApplication () {
+async function deleteApplication() {
   await ttn.Applications.deleteById(appName)
   await ttn.Applications.deleteById(`second-app-${hash}`)
 }
 
-async function main () {
+async function main() {
   try {
     await createApplication()
     await getApplication()

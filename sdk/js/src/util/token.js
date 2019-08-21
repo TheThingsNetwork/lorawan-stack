@@ -13,8 +13,7 @@
 // limitations under the License.
 
 class Token {
-
-  constructor (token) {
+  constructor(token) {
     /**
      * Make sure it is possible to instantiate an instance
      * of the class only once.
@@ -33,7 +32,7 @@ class Token {
     return this
   }
 
-  get () {
+  get() {
     return this.token
   }
 }

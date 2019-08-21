@@ -15,14 +15,18 @@
     "build:watch": "rm -rf dist; babel -w src -d dist",
     "test": "node_modules/.bin/jest --testPathIgnorePatterns=/dist/",
     "test:watch": "node_modules/.bin/jest --testPathIgnorePatterns=/dist/ --watch",
-    "definitions": "node util/http-mapper.js"
+    "definitions": "node util/http-mapper.js",
+    "fmt": "prettier './src/**/*.js' './util/**/*.js' --write",
+    "lint": "eslint './src/**/**.js' './util/**/*.js' --no-ignore --color"
   },
   "devDependencies": {
     "babel": "^6.23.0",
     "babel-cli": "^6.26.0",
     "babel-preset-ttn": "^1.2.3",
+    "eslint": "^5.16.0",
     "jest": "^24.8.0",
-    "jest-preset-ttn": "^0.0.3"
+    "jest-preset-ttn": "^0.0.3",
+    "prettier": "^1.18.2"
   },
   "babel": {
     "presets": [
@@ -42,6 +46,7 @@
       ]
     }
   },
+  "prettier": "../../config/.prettierrc.js",
   "jest": {
     "preset": "jest-preset-ttn"
   },

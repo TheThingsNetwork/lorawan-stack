@@ -22,7 +22,7 @@ import Http from './http'
  * to expose the same class API for both
  */
 class Api {
-  constructor (connectionType = 'http', stackConfig, axiosConfig, token) {
+  constructor(connectionType = 'http', stackConfig, axiosConfig, token) {
     this.connectionType = connectionType
 
     if (this.connectionType !== 'http') {
@@ -40,8 +40,7 @@ class Api {
       for (const rpcName of Object.keys(service)) {
         const rpc = service[rpcName]
 
-        this[serviceName][rpcName] = function ({ routeParams = {}, component } = {}, payload) {
-
+        this[serviceName][rpcName] = function({ routeParams = {}, component } = {}, payload) {
           const componentType = typeof component
           if (componentType === 'string' && !STACK_COMPONENTS.includes(component)) {
             throw new Error(`Unknown stack component: ${component}`)
@@ -50,8 +49,10 @@ class Api {
             throw new Error(`Invalid component argument type: ${typeof componentType}`)
           }
 
-          const paramSignature = Object.keys(routeParams).sort().join()
-          const endpoint = rpc.http.find(function (prospect) {
+          const paramSignature = Object.keys(routeParams)
+            .sort()
+            .join()
+          const endpoint = rpc.http.find(function(prospect) {
             return prospect.parameters.sort().join() === paramSignature
           })
 

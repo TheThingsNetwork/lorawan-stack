@@ -32,40 +32,40 @@ const mockApplicationData = {
       contact_type: 'CONTACT_TYPE_OTHER',
       contact_method: 'CONTACT_METHOD_OTHER',
       value: 'string',
-      'public': true,
+      public: true,
       validated_at: '2018-08-29T14:00:20.793Z',
     },
   ],
 }
 
-jest.mock('../api', function () {
-  return jest.fn().mockImplementation(function () {
+jest.mock('../api', function() {
+  return jest.fn().mockImplementation(function() {
     return {
       ApplicationAccess: {
         Get: jest.fn().mockResolvedValue(mockApplicationData),
-        List: jest.fn().mockResolvedValue({ applications: [ mockApplicationData ]}),
+        List: jest.fn().mockResolvedValue({ applications: [mockApplicationData] }),
       },
     }
   })
 })
 
-describe('Application', function () {
+describe('Application', function() {
   let app
-  beforeEach(function () {
+  beforeEach(function() {
     const Api = require('../api')
     const Applications = require('../service/applications').default
     const applications = new Applications(new Api(), { defaultUserId: 'testuser' })
     app = new Application(applications, mockApplicationData)
   })
 
-  test('instance exposes a Devices Class Object', function () {
+  test('instance exposes a Devices Class Object', function() {
     jest.resetModules()
 
     expect(app).toBeDefined()
     expect(app.Devices.constructor.name).toBe('Devices')
   })
 
-  test('instance proxy keeps track of changes', function () {
+  test('instance proxy keeps track of changes', function() {
     jest.resetModules()
 
     app.description = 'test'
@@ -74,7 +74,7 @@ describe('Application', function () {
     expect(app._changed).not.toContain('name')
   })
 
-  test('instance toObject() returns plain application object, matching input', function () {
+  test('instance toObject() returns plain application object, matching input', function() {
     jest.resetModules()
 
     const appObject = app.toObject()

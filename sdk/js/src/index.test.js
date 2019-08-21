@@ -36,7 +36,7 @@ const mockApplicationData = {
       contact_type: 'CONTACT_TYPE_OTHER',
       contact_method: 'CONTACT_METHOD_OTHER',
       value: 'string',
-      'public': true,
+      public: true,
       validated_at: '2018-08-29T14:00:20.793Z',
     },
   ],
@@ -54,13 +54,13 @@ const mockDeviceData = {
   },
 }
 
-jest.mock('./api', function () {
-  return jest.fn().mockImplementation(function () {
+jest.mock('./api', function() {
+  return jest.fn().mockImplementation(function() {
     return {
       ApplicationRegistry: {
         Get: jest.fn().mockResolvedValue({ data: mockApplicationData }),
         List: jest.fn().mockResolvedValue({
-          data: { applications: [ mockApplicationData ]},
+          data: { applications: [mockApplicationData] },
           headers: { 'x-total-count': 1 },
         }),
       },
@@ -80,26 +80,26 @@ jest.mock('./api', function () {
   })
 })
 
-describe('SDK class', function () {
+describe('SDK class', function() {
   const token = 'faketoken'
-  const ttn = new TTN( token, {
+  const ttn = new TTN(token, {
     connectionType: 'http',
     stackConfig: { is: 'http://localhost:1885/api/v3' },
   })
 
-  test('instance instanciates successfully', async function () {
+  test('instance instanciates successfully', async function() {
     expect(ttn).toBeDefined()
     expect(ttn).toBeInstanceOf(TTN)
     expect(ttn.Applications).toBeInstanceOf(Applications)
   })
 
-  test('retrieves application instance correctly', async function () {
+  test('retrieves application instance correctly', async function() {
     const app = await ttn.Applications.getById('test')
     expect(app).toBeDefined()
     expect(app).toBeInstanceOf(Application)
   })
 
-  test('retrieves device via app instance correctly', async function () {
+  test('retrieves device via app instance correctly', async function() {
     const app = await ttn.Applications.getById('test')
     const device = await app.Devices.getById('test', 'test-device')
 
