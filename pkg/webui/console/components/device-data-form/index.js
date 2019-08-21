@@ -390,14 +390,48 @@ class DeviceDataForm extends Component {
   }
 }
 
+const keyPropType = PropTypes.shape({
+  key: PropTypes.string,
+})
+
+const initialValuesPropType = PropTypes.shape({
+  ids: PropTypes.shape({
+    device_id: PropTypes.string,
+    join_eui: PropTypes.string,
+    dev_eui: PropTypes.string,
+  }),
+  name: PropTypes.string,
+  activation_mode: PropTypes.string,
+  lorawan_version: PropTypes.string,
+  lorawan_phy_version: PropTypes.string,
+  frequency_plan_id: PropTypes.string,
+  supports_class_c: PropTypes.bool,
+  resets_join_nonces: PropTypes.bool,
+  root_keys: PropTypes.shape({
+    nwk_key: keyPropType,
+    app_key: keyPropType,
+  }),
+  session: PropTypes.shape({
+    dev_addr: PropTypes.string,
+    keys: PropTypes.shape({
+      f_nwk_s_int_key: keyPropType,
+      s_nwk_s_int_key: keyPropType,
+      nwk_s_enc_key: keyPropType,
+      app_s_key: keyPropType,
+    }),
+  }),
+  mac_settings: PropTypes.shape({
+    resets_f_cnt: PropTypes.bool,
+  }),
+})
+
 DeviceDataForm.propTypes = {
-  onSubmit: PropTypes.func.isRequired,
+  initialValues: initialValuesPropType,
   onDelete: PropTypes.func,
   onDeleteSuccess: PropTypes.func,
+  onSubmit: PropTypes.func.isRequired,
   onSubmitSuccess: PropTypes.func,
-  error: PropTypes.error,
   update: PropTypes.bool,
-  initialValues: PropTypes.object,
 }
 
 DeviceDataForm.defaultProps = {
@@ -406,7 +440,6 @@ DeviceDataForm.defaultProps = {
   onSubmitSuccess: () => null,
   initialValues: {},
   update: false,
-  error: '',
 }
 
 export default DeviceDataForm
