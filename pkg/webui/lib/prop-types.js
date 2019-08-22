@@ -121,4 +121,10 @@ PropTypes.env = PropTypes.shape({
   }).isRequired,
 })
 
+PropTypes.device = PropTypes.shape({
+  ids: PropTypes.shape({
+    device_id: PropTypes.string.isRequired,
+  }).isRequired,
+})
+
 export default PropTypes
