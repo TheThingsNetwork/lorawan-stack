@@ -103,7 +103,9 @@ var (
 
 			var rootRedirect web.Registerer
 
-			c, err := component.New(logger, &component.Config{ServiceBase: config.ServiceBase})
+			var componentOptions []component.Option
+
+			c, err := component.New(logger, &component.Config{ServiceBase: config.ServiceBase}, componentOptions...)
 			if err != nil {
 				return shared.ErrInitializeBaseComponent.WithCause(err)
 			}
