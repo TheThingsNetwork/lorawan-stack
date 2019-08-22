@@ -15,10 +15,16 @@
 import React from 'react'
 import bind from 'autobind-decorator'
 
+import PropTypes from '../../lib/prop-types'
+
 const { Provider, Consumer } = React.createContext()
 
 @bind
 class BreadcrumbsProvider extends React.Component {
+  static propTypes = {
+    children: PropTypes.node.isRequired,
+  }
+
   state = {
     breadcrumbs: [],
   }
@@ -62,6 +68,12 @@ class BreadcrumbsProvider extends React.Component {
 const withBreadcrumb = (id, element) =>
   function(Component) {
     class BreadcrumbsConsumer extends React.Component {
+      static propTypes = {
+        add: PropTypes.func.isRequired,
+        breadcrumb: PropTypes.oneOfType([PropTypes.func, PropTypes.element]).isRequired,
+        remove: PropTypes.func.isRequired,
+      }
+
       constructor(props) {
         super(props)
 
