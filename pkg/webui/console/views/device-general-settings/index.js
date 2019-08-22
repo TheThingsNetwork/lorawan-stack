@@ -79,17 +79,6 @@ export default class DeviceGeneralSettings extends React.Component {
     const { device, appId, updateDevice } = this.props
     const { activation_mode, ...updatedDevice } = values
 
-    // Clean values based on activation mode
-    if (activation_mode === 'otaa') {
-      delete updatedDevice.mac_settings
-      delete updatedDevice.session
-    } else {
-      delete updatedDevice.ids.join_eui
-      delete updatedDevice.ids.dev_eui
-      delete updatedDevice.root_keys
-      delete updatedDevice.resets_join_nonces
-    }
-
     const {
       ids: { device_id: deviceId },
     } = this.props.device
