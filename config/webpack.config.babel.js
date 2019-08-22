@@ -36,6 +36,7 @@ const {
   CACHE_DIR = '.cache',
   PUBLIC_DIR = 'public',
   NODE_ENV = 'production',
+  MAGE = './mage',
   SUPPORT_LOCALES = 'en',
   DEFAULT_LOCALE = 'en',
 } = process.env
@@ -231,7 +232,7 @@ export default {
         filepath: path.resolve(context, PUBLIC_DIR, 'libs.bundle.js'),
       }),
       new ShellPlugin({
-        onBuildExit: ['mage js:translations'],
+        onBuildExit: [`${MAGE} js:translations`],
       }),
     ],
   }),
