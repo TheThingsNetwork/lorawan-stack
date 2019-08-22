@@ -74,6 +74,7 @@ install:
 - |
   if [[ "$RUNTYPE" == "js" ]]; then
     $MAGE js:devDeps js:deps jsSDK:deps
+    $MAGE docs:deps
   fi
 - |
   if [[ "$RUNTYPE" == "release" ]]; then
@@ -98,6 +99,8 @@ script:
 - if [[ "$RUNTYPE" == "js" ]]; then $MAGE js:translations; fi
 - if [[ "$RUNTYPE" == "js" ]]; then $MAGE js:test jsSDK:test; fi
 - if [[ "$RUNTYPE" == "js" ]]; then $MAGE js:lint jsSDK:lint; fi
+- if [[ "$RUNTYPE" == "js" ]]; then $MAGE version:files; fi
+- if [[ "$RUNTYPE" == "js" ]]; then $MAGE docs:build; fi
 - if [[ "$RUNTYPE" == "go.lint" ]]; then $MAGE headers:check; fi
 - if [[ "$RUNTYPE" == "go.lint" ]]; then $MAGE proto:goClean proto:go; fi
 - if [[ "$RUNTYPE" == "go.lint" ]]; then $MAGE go:messages; fi
