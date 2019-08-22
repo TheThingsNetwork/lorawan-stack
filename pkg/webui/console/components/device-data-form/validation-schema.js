@@ -68,6 +68,11 @@ const baseSchemaShape = Yup.object({
   join_server_address: Yup.string().matches(addressRegexp, sharedMessages.validateAddressFormat),
   activation_mode: Yup.string().required(),
   supports_join_nonces: Yup.boolean(),
+  resets_join_nonces: Yup.boolean().when('activation_mode', {
+    is: isABP,
+    then: schema => schema,
+    otherwise: schema => schema.strip(),
+  }),
 })
 
 export const updateFormValidationSchema = baseSchemaShape.shape({
