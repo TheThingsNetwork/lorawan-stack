@@ -168,7 +168,7 @@ func (m *User) ValidateFields(paths ...string) error {
 			// no validation rules for Password
 		case "password_updated_at":
 
-			if v, ok := interface{}(&m.PasswordUpdatedAt).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetPasswordUpdatedAt()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return UserValidationError{
 						field:  "password_updated_at",

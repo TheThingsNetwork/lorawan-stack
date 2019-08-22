@@ -2863,7 +2863,6 @@
         "ids.email",
         "ids.user_id",
         "name",
-        "password_updated_at",
         "primary_email_address",
         "primary_email_address_validated_at",
         "profile_picture",
@@ -2873,6 +2872,7 @@
         "profile_picture.sizes",
         "require_password_update",
         "state",
+        "temporary_password",
         "temporary_password_created_at",
         "temporary_password_expires_at",
         "updated_at"

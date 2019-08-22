@@ -231,7 +231,7 @@ func TestGatewayAccessCRUD(t *testing.T) {
 		a.So(err, should.BeNil)
 
 		modifiedGatewayID := gatewayID
-		modifiedGatewayID.GatewayID += "mod"
+		modifiedGatewayID.GatewayID = reverse(modifiedGatewayID.GatewayID)
 
 		rights, err = reg.ListRights(ctx, &modifiedGatewayID, creds)
 		a.So(rights, should.NotBeNil)

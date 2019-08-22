@@ -312,3 +312,15 @@ func getIdentityServer(t *testing.T) (*IdentityServer, *grpc.ClientConn) {
 func testWithIdentityServer(t *testing.T, f func(is *IdentityServer, cc *grpc.ClientConn)) {
 	f(getIdentityServer(t))
 }
+
+func reverse(s string) string {
+	b := []byte(s)
+	first := 0
+	last := len(b) - 1
+	for first < last {
+		b[first], b[last] = b[last], b[first]
+		first++
+		last--
+	}
+	return string(b)
+}

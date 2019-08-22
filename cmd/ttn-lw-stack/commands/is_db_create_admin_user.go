@@ -91,7 +91,7 @@ var (
 				PrimaryEmailAddress:            email,
 				PrimaryEmailAddressValidatedAt: &now,
 				Password:                       hashedPassword,
-				PasswordUpdatedAt:              now,
+				PasswordUpdatedAt:              &now,
 				State:                          ttnpb.STATE_APPROVED,
 				Admin:                          true,
 			})

@@ -124,8 +124,7 @@ func (dst *User) SetFields(src *User, paths ...string) error {
 			if src != nil {
 				dst.PasswordUpdatedAt = src.PasswordUpdatedAt
 			} else {
-				var zero time.Time
-				dst.PasswordUpdatedAt = zero
+				dst.PasswordUpdatedAt = nil
 			}
 		case "require_password_update":
 			if len(subs) > 0 {

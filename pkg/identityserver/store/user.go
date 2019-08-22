@@ -69,8 +69,11 @@ var userPBSetters = map[string]func(*ttnpb.User, *User){
 	primaryEmailAddressValidatedAtField: func(pb *ttnpb.User, usr *User) {
 		pb.PrimaryEmailAddressValidatedAt = usr.PrimaryEmailAddressValidatedAt
 	},
-	passwordField:              func(pb *ttnpb.User, usr *User) { pb.Password = usr.Password },
-	passwordUpdatedAtField:     func(pb *ttnpb.User, usr *User) { pb.PasswordUpdatedAt = cleanTime(usr.PasswordUpdatedAt) },
+	passwordField: func(pb *ttnpb.User, usr *User) { pb.Password = usr.Password },
+	passwordUpdatedAtField: func(pb *ttnpb.User, usr *User) {
+		t := cleanTime(usr.PasswordUpdatedAt)
+		pb.PasswordUpdatedAt = &t
+	},
 	requirePasswordUpdateField: func(pb *ttnpb.User, usr *User) { pb.RequirePasswordUpdate = usr.RequirePasswordUpdate },
 	stateField:                 func(pb *ttnpb.User, usr *User) { pb.State = ttnpb.State(usr.State) },
 	adminField:                 func(pb *ttnpb.User, usr *User) { pb.Admin = usr.Admin },
@@ -103,8 +106,14 @@ var userModelSetters = map[string]func(*User, *ttnpb.User){
 	primaryEmailAddressValidatedAtField: func(usr *User, pb *ttnpb.User) {
 		usr.PrimaryEmailAddressValidatedAt = pb.PrimaryEmailAddressValidatedAt
 	},
-	passwordField:              func(usr *User, pb *ttnpb.User) { usr.Password = pb.Password },
-	passwordUpdatedAtField:     func(usr *User, pb *ttnpb.User) { usr.PasswordUpdatedAt = cleanTime(pb.PasswordUpdatedAt) },
+	passwordField: func(usr *User, pb *ttnpb.User) { usr.Password = pb.Password },
+	passwordUpdatedAtField: func(usr *User, pb *ttnpb.User) {
+		if pb.PasswordUpdatedAt != nil {
+			usr.PasswordUpdatedAt = cleanTime(*pb.PasswordUpdatedAt)
+		} else {
+			usr.PasswordUpdatedAt = time.Now()
+		}
+	},
 	requirePasswordUpdateField: func(usr *User, pb *ttnpb.User) { usr.RequirePasswordUpdate = pb.RequirePasswordUpdate },
 	stateField:                 func(usr *User, pb *ttnpb.User) { usr.State = int(pb.State) },
 	adminField:                 func(usr *User, pb *ttnpb.User) { usr.Admin = pb.Admin },

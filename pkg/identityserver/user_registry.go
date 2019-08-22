@@ -116,8 +116,19 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 
 	if !createdByAdmin {
 		req.User.PrimaryEmailAddressValidatedAt = nil
+		req.User.RequirePasswordUpdate = false
+		if is.configFromContext(ctx).UserRegistration.AdminApproval.Required {
+			req.User.State = ttnpb.STATE_REQUESTED
+		} else {
+			req.User.State = ttnpb.STATE_APPROVED
+		}
+		req.User.Admin = false
+		req.User.TemporaryPassword = ""
+		req.User.TemporaryPasswordCreatedAt = nil
+		req.User.TemporaryPasswordExpiresAt = nil
 		cleanContactInfo(req.User.ContactInfo)
 	}
+
 	var primaryEmailAddressFound bool
 	for _, contactInfo := range req.User.ContactInfo {
 		if contactInfo.ContactMethod == ttnpb.CONTACT_METHOD_EMAIL && contactInfo.Value == req.User.PrimaryEmailAddress {
@@ -144,16 +155,8 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 		return nil, err
 	}
 	req.User.Password = hashedPassword
-	req.User.PasswordUpdatedAt = time.Now()
-
-	if !createdByAdmin {
-		if is.configFromContext(ctx).UserRegistration.AdminApproval.Required {
-			req.User.State = ttnpb.STATE_REQUESTED
-		} else {
-			req.User.State = ttnpb.STATE_APPROVED
-		}
-		req.User.Admin = false
-	}
+	now := time.Now()
+	req.User.PasswordUpdatedAt = &now
 
 	if req.User.ProfilePicture != nil {
 		if err = is.processUserProfilePicture(ctx, &req.User); err != nil {
@@ -284,10 +287,6 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 	}
 	updatedByAdmin := is.IsAdmin(ctx)
 
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "password", "password_updated_at") {
-		return nil, errUpdateUserPasswordRequest
-	}
-
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "primary_email_address") {
 		if err := validate.Email(req.User.PrimaryEmailAddress); err != nil {
 			return nil, err
@@ -308,6 +307,24 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 			}
 		}
 		cleanContactInfo(req.User.ContactInfo)
+	}
+
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "temporary_password") {
+		hashedTemporaryPassword, err := auth.Hash(ctx, req.User.TemporaryPassword)
+		if err != nil {
+			return nil, err
+		}
+		req.User.TemporaryPassword = hashedTemporaryPassword
+		now := time.Now()
+		if !ttnpb.HasAnyField(req.FieldMask.Paths, "temporary_password_created_at") {
+			req.User.TemporaryPasswordCreatedAt = &now
+			req.FieldMask.Paths = append(req.FieldMask.Paths, "temporary_password_created_at")
+		}
+		if !ttnpb.HasAnyField(req.FieldMask.Paths, "temporary_password_expires_at") {
+			expires := now.Add(36 * time.Hour)
+			req.User.TemporaryPasswordExpiresAt = &expires
+			req.FieldMask.Paths = append(req.FieldMask.Paths, "temporary_password_expires_at")
+		}
 	}
 
 	if ttnpb.HasAnyField(ttnpb.TopLevelFields(req.FieldMask.Paths), "profile_picture") {
@@ -468,7 +485,8 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 				}
 			}
 		}
-		usr.Password, usr.PasswordUpdatedAt, usr.RequirePasswordUpdate = hashedPassword, time.Now(), false
+		now := time.Now()
+		usr.Password, usr.PasswordUpdatedAt, usr.RequirePasswordUpdate = hashedPassword, &now, false
 		usr, err = store.GetUserStore(db).UpdateUser(ctx, usr, updateMask)
 		return err
 	})
@@ -488,7 +506,6 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 var errTemporaryPasswordStillValid = errors.DefineInvalidArgument("temporary_password_still_valid", "previous temporary password still valid")
 
 func (is *IdentityServer) createTemporaryPassword(ctx context.Context, req *ttnpb.CreateTemporaryPasswordRequest) (*types.Empty, error) {
-	now := time.Now()
 	temporaryPassword, err := auth.GenerateKey(ctx)
 	if err != nil {
 		return nil, err
@@ -497,6 +514,7 @@ func (is *IdentityServer) createTemporaryPassword(ctx context.Context, req *ttnp
 	if err != nil {
 		return nil, err
 	}
+	now := time.Now()
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
 		usr, err := store.GetUserStore(db).GetUser(ctx, &req.UserIdentifiers, temporaryPasswordFieldMask)
 		if err != nil {
