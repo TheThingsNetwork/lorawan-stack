@@ -35,14 +35,20 @@ const baseSchemaShape = Yup.object({
     })
     .when('activation_mode', {
       is: isOTAA,
-      then: Yup.object().shape({
-        join_eui: Yup.string()
-          .length(8 * 2, m.validate16) // 8 Byte hex
-          .required(sharedMessages.validateRequired),
-        dev_eui: Yup.string()
-          .length(8 * 2, m.validate16) // 8 Byte hex
-          .required(sharedMessages.validateRequired),
-      }),
+      then: schema =>
+        schema.shape({
+          join_eui: Yup.string()
+            .length(8 * 2, m.validate16) // 8 Byte hex
+            .required(sharedMessages.validateRequired),
+          dev_eui: Yup.string()
+            .length(8 * 2, m.validate16) // 8 Byte hex
+            .required(sharedMessages.validateRequired),
+        }),
+      otherwise: schema =>
+        schema.shape({
+          join_eui: Yup.string().strip(),
+          dev_eui: Yup.string().strip(),
+        }),
     }),
   mac_settings: Yup.object().when('activation_mode', {
     is: isOTAA,
