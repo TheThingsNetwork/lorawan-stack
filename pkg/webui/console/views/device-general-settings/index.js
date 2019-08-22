@@ -25,6 +25,7 @@ import DeviceDataForm from '../../components/device-data-form'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import IntlHelmet from '../../../lib/components/intl-helmet'
+import PropTypes from '../../../lib/prop-types'
 import api from '../../api'
 
 import { updateDevice } from '../../store/actions/device'
@@ -63,6 +64,13 @@ import { selectSelectedDevice, selectSelectedDeviceId } from '../../store/select
 })
 @bind
 export default class DeviceGeneralSettings extends React.Component {
+  static propTypes = {
+    appId: PropTypes.string.isRequired,
+    device: PropTypes.device.isRequired,
+    onDeleteSuccess: PropTypes.func.isRequired,
+    updateDevice: PropTypes.func.isRequired,
+  }
+
   state = {
     error: '',
   }
