@@ -44,8 +44,13 @@ const baseSchemaShape = Yup.object({
           .required(sharedMessages.validateRequired),
       }),
     }),
-  mac_settings: Yup.object().shape({
-    resets_f_cnt: Yup.boolean(),
+  mac_settings: Yup.object().when('activation_mode', {
+    is: isOTAA,
+    then: schema =>
+      schema.shape({
+        resets_f_cnt: Yup.boolean(),
+      }),
+    otherwise: schema => schema.strip(),
   }),
   name: Yup.string()
     .min(2, sharedMessages.validateTooShort)
