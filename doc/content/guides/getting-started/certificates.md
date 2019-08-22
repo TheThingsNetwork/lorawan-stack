@@ -1,35 +1,8 @@
 ---
-title: "Dependencies"
+title: "Certificates"
 description: ""
-weight: 1
+weight: 2
 ---
-
-## CLI and stack
-
-The web interface Console is not yet available. So in this tutorial, we use the command-line interface (CLI) to manage the setup.
-
-You can use the CLI on your local machine or on the server.
-
->Note: if you need help with any CLI command, use the `--help` flag to get a list of subcommands, flags and their description and aliases.
-
-### Package managers (recommended)
-
-#### macOS
-
-```bash
-$ brew install TheThingsNetwork/lorawan-stack/ttn-lw-stack
-```
-
-#### Linux
-
-```bash
-$ sudo snap install ttn-lw-stack
-$ sudo snap alias ttn-lw-stack.ttn-lw-cli ttn-lw-cli
-```
-
-### Binaries
-
-If your operating system or package manager is not mentioned, please [download binaries](https://github.com/TheThingsNetwork/lorawan-stack/releases) for your operating system and processor architecture.
 
 ## Certificates
 
