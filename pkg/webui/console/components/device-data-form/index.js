@@ -33,7 +33,7 @@ import errorMessages from '../../../lib/errors/error-messages'
 import { getDeviceId } from '../../../lib/selectors/id'
 import PropTypes from '../../../lib/prop-types'
 import m from './messages'
-import { createFormValidationSchema, updateFormValidationSchema } from './validation-schema'
+import validationSchema from './validation-schema'
 
 @bind
 class DeviceDataForm extends Component {
@@ -71,7 +71,6 @@ class DeviceDataForm extends Component {
 
   async handleSubmit(values, { setSubmitting, resetForm }) {
     const { onSubmit, onSubmitSuccess, initialValues, update } = this.props
-    const validationSchema = update ? updateFormValidationSchema : createFormValidationSchema
     const deviceId = getDeviceId(initialValues)
     const castedValues = validationSchema.cast(values)
     await this.setState({ error: '' })
@@ -290,7 +289,7 @@ class DeviceDataForm extends Component {
       <Form
         error={error}
         onSubmit={this.handleSubmit}
-        validationSchema={update ? updateFormValidationSchema : createFormValidationSchema}
+        validationSchema={validationSchema}
         submitEnabledWhenInvalid
         initialValues={formValues}
       >
