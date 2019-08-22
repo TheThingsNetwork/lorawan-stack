@@ -1,7 +1,7 @@
 ---
 title: "Running The Things Stack"
 description: ""
-weight: 3
+weight: 4
 ---
 
 You can run The Things Stack using Docker or container orchestration solutions using Docker. An example [Docker Compose configuration](https://github.com/TheThingsNetwork/lorawan-stack/tree/master/docker-compose.yml) is available to get started quickly.

@@ -1,7 +1,7 @@
 ---
 title: "Configuration"
 description: ""
-weight: 2
+weight: 3
 ---
 
 The Things Stack can be started for development without passing any configuration. However, there are a lot of things you can configure. In this guide we'll set some environment variables in `docker-compose.yml`. These environment variables will configure The Things Stack as a development server on `localhost`. For setting up up a public server or for requesting certificates from an ACME provider such as Let's Encrypt, take a closer look at the comments in `docker-compose.yml`.
