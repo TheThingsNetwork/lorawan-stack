@@ -497,7 +497,6 @@ var AllowedFieldMaskPathsForRPC = map[string][]string{
 		"ids",
 		"ids.application_ids",
 		"ids.application_ids.application_id",
-		"ids.dev_addr",
 		"ids.dev_eui",
 		"ids.device_id",
 		"ids.join_eui",
