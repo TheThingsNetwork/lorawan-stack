@@ -114,6 +114,45 @@ func (dst *ClaimEndDeviceRequest) SetFields(src *ClaimEndDeviceRequest, paths ..
 	return nil
 }
 
+func (dst *AuthorizeApplicationRequest) SetFields(src *AuthorizeApplicationRequest, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "application_ids":
+			if len(subs) > 0 {
+				newDst := &dst.ApplicationIdentifiers
+				var newSrc *ApplicationIdentifiers
+				if src != nil {
+					newSrc = &src.ApplicationIdentifiers
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ApplicationIdentifiers = src.ApplicationIdentifiers
+				} else {
+					var zero ApplicationIdentifiers
+					dst.ApplicationIdentifiers = zero
+				}
+			}
+		case "api_key":
+			if len(subs) > 0 {
+				return fmt.Errorf("'api_key' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.APIKey = src.APIKey
+			} else {
+				var zero string
+				dst.APIKey = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *ClaimEndDeviceRequest_AuthenticatedIdentifiers) SetFields(src *ClaimEndDeviceRequest_AuthenticatedIdentifiers, paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {

@@ -2168,6 +2168,62 @@
         ]
       }
     },
+    "/edcs/applications/{application_ids.application_id}/authorize": {
+      "post": {
+        "operationId": "AuthorizeApplication",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3AuthorizeApplicationRequest"
+            }
+          }
+        ],
+        "tags": [
+          "EndDeviceClaimingServer"
+        ]
+      }
+    },
+    "/edcs/applications/{application_id}/authorize": {
+      "delete": {
+        "operationId": "UnauthorizeApplication",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "EndDeviceClaimingServer"
+        ]
+      }
+    },
     "/edcs/claim": {
       "post": {
         "summary": "Claims the end device by claim authentication code or QR code and transfers the device to the target application.",
@@ -2176,7 +2232,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "properties": {}
+              "$ref": "#/definitions/v3EndDeviceIdentifiers"
             }
           }
         },
@@ -7208,6 +7264,17 @@
         "is_admin": {
           "type": "boolean",
           "format": "boolean"
+        }
+      }
+    },
+    "v3AuthorizeApplicationRequest": {
+      "type": "object",
+      "properties": {
+        "application_ids": {
+          "$ref": "#/definitions/v3ApplicationIdentifiers"
+        },
+        "api_key": {
+          "type": "string"
         }
       }
     },

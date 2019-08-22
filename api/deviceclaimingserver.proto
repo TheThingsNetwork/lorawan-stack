@@ -40,12 +40,30 @@ message ClaimEndDeviceRequest {
   bool invalidate_authentication_code = 5;
 }
 
+message AuthorizeApplicationRequest {
+  ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  string api_key = 2 [(gogoproto.customname) = "APIKey", (validate.rules).string.min_len = 1];
+}
+
 service EndDeviceClaimingServer {
   // Claims the end device by claim authentication code or QR code and transfers the device to the target application.
-  rpc Claim(ClaimEndDeviceRequest) returns (google.protobuf.Empty) {
+  rpc Claim(ClaimEndDeviceRequest) returns (EndDeviceIdentifiers) {
     option (google.api.http) = {
       post: "/edcs/claim",
       body: "*"
+    };
+  };
+
+  rpc AuthorizeApplication(AuthorizeApplicationRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/edcs/applications/{application_ids.application_id}/authorize",
+      body: "*"
+    };
+  };
+
+  rpc UnauthorizeApplication(ApplicationIdentifiers) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/edcs/applications/{application_id}/authorize"
     };
   };
 }

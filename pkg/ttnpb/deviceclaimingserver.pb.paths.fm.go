@@ -21,6 +21,16 @@ var ClaimEndDeviceRequestFieldPathsTopLevel = []string{
 	"target_application_ids",
 	"target_device_id",
 }
+var AuthorizeApplicationRequestFieldPathsNested = []string{
+	"api_key",
+	"application_ids",
+	"application_ids.application_id",
+}
+
+var AuthorizeApplicationRequestFieldPathsTopLevel = []string{
+	"api_key",
+	"application_ids",
+}
 var ClaimEndDeviceRequest_AuthenticatedIdentifiersFieldPathsNested = []string{
 	"authentication_code",
 	"dev_eui",

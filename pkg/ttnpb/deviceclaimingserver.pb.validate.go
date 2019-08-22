@@ -180,6 +180,109 @@ var _ interface {
 
 var _ClaimEndDeviceRequest_TargetDeviceID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$")
 
+// ValidateFields checks the field values on AuthorizeApplicationRequest with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *AuthorizeApplicationRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = AuthorizeApplicationRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "application_ids":
+
+			if v, ok := interface{}(&m.ApplicationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return AuthorizeApplicationRequestValidationError{
+						field:  "application_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "api_key":
+
+			if utf8.RuneCountInString(m.GetAPIKey()) < 1 {
+				return AuthorizeApplicationRequestValidationError{
+					field:  "api_key",
+					reason: "value length must be at least 1 runes",
+				}
+			}
+
+		default:
+			return AuthorizeApplicationRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// AuthorizeApplicationRequestValidationError is the validation error returned
+// by AuthorizeApplicationRequest.ValidateFields if the designated constraints
+// aren't met.
+type AuthorizeApplicationRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AuthorizeApplicationRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AuthorizeApplicationRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AuthorizeApplicationRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AuthorizeApplicationRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AuthorizeApplicationRequestValidationError) ErrorName() string {
+	return "AuthorizeApplicationRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AuthorizeApplicationRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAuthorizeApplicationRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AuthorizeApplicationRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AuthorizeApplicationRequestValidationError{}
+
 // ValidateFields checks the field values on
 // ClaimEndDeviceRequest_AuthenticatedIdentifiers with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
