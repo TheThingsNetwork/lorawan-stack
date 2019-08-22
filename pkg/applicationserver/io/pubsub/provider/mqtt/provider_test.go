@@ -17,6 +17,7 @@ package mqtt
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
 	"testing"
 	"time"
 
@@ -33,12 +34,23 @@ func TestOpenConnection(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()
 
-	ca, clientCert, clientKey, err := createPKI()
+	ca, err := ioutil.ReadFile("testdata/rootCA.pem")
 	a.So(err, should.BeNil)
-	tlsConfig, err := createTLSConfig(ca, clientCert, clientKey)
+	clientCert, err := ioutil.ReadFile("testdata/clientcert.pem")
+	a.So(err, should.BeNil)
+	clientKey, err := ioutil.ReadFile("testdata/clientkey.pem")
+	a.So(err, should.BeNil)
+	serverCert, err := ioutil.ReadFile("testdata/servercert.pem")
+	a.So(err, should.BeNil)
+	serverKey, err := ioutil.ReadFile("testdata/serverkey.pem")
 	a.So(err, should.BeNil)
 
-	lis, tlsLis, err := startMQTTServer(ctx, tlsConfig)
+	clientTLSConfig, err := createTLSConfig(ca, clientCert, clientKey)
+	a.So(err, should.BeNil)
+	serverTLSConfig, err := createTLSConfig(ca, serverCert, serverKey)
+	a.So(err, should.BeNil)
+
+	lis, tlsLis, err := startMQTTServer(ctx, serverTLSConfig)
 	a.So(err, should.BeNil)
 	a.So(lis, should.NotBeNil)
 	a.So(tlsLis, should.NotBeNil)
@@ -142,7 +154,7 @@ func TestOpenConnection(t *testing.T) {
 			createClient: func(t *testing.T, a *assertions.Assertion) paho_mqtt.Client {
 				clientOpts := paho_mqtt.NewClientOptions()
 				clientOpts.AddBroker(fmt.Sprintf("tcps://%v", tlsLis.Addr()))
-				clientOpts.SetTLSConfig(tlsConfig)
+				clientOpts.SetTLSConfig(clientTLSConfig)
 				client := paho_mqtt.NewClient(clientOpts)
 				a.So(client, should.NotBeNil)
 				if token := client.Connect(); !a.So(token.WaitTimeout(timeout), should.BeTrue) {
@@ -157,7 +169,9 @@ func TestOpenConnection(t *testing.T) {
 
 			conn, err := impl.OpenConnection(ctx, pb)
 			a.So(conn, should.NotBeNil)
-			a.So(err, should.BeNil)
+			if !a.So(err, should.BeNil) {
+				t.FailNow()
+			}
 			defer conn.Shutdown(ctx)
 
 			t.Run("Downstream", func(t *testing.T) {

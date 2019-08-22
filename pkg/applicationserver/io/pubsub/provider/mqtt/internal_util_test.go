@@ -15,17 +15,8 @@
 package mqtt
 
 import (
-	"bytes"
 	"context"
-	"crypto/rand"
-	"crypto/rsa"
 	"crypto/tls"
-	"crypto/x509"
-	"crypto/x509/pkix"
-	"encoding/pem"
-	"math/big"
-	"net"
-	"time"
 
 	mqttnet "github.com/TheThingsIndustries/mystique/pkg/net"
 	"github.com/TheThingsIndustries/mystique/pkg/server"
@@ -79,75 +70,4 @@ func startMQTTServer(ctx context.Context, tlsConfig *tls.Config) (mqttnet.Listen
 	}
 
 	return lis, nil, nil
-}
-
-func createPKI() (ca []byte, clientCert []byte, clientKey []byte, err error) {
-	serialNumberLimit := new(big.Int).Lsh(big.NewInt(1), 128)
-	serialNumber, err := rand.Int(rand.Reader, serialNumberLimit)
-	if err != nil {
-		return
-	}
-	template := x509.Certificate{
-		SerialNumber: serialNumber,
-		Subject: pkix.Name{
-			Organization: []string{"Acme Co"},
-			CommonName:   "Test-CA",
-		},
-		NotBefore: time.Now(),
-		NotAfter:  time.Now().Add(24 * time.Hour),
-
-		KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
-		BasicConstraintsValid: true,
-
-		DNSNames:    []string{"localhost"},
-		IPAddresses: []net.IP{net.ParseIP("::1"), net.ParseIP("::")},
-		IsCA:        true,
-	}
-
-	privCA, err := rsa.GenerateKey(rand.Reader, 2048)
-	if err != nil {
-		return
-	}
-	caDERBytes, err := x509.CreateCertificate(rand.Reader, &template, &template, &privCA.PublicKey, privCA)
-	if err != nil {
-		return
-	}
-	caCert, err := x509.ParseCertificate(caDERBytes)
-	if err != nil {
-		return
-	}
-	var caBuf bytes.Buffer
-	err = pem.Encode(&caBuf, &pem.Block{Type: "CERTIFICATE", Bytes: caDERBytes})
-	if err != nil {
-		return
-	}
-	ca = caBuf.Bytes()
-
-	template.Subject.CommonName = "Test-Client"
-	template.SerialNumber, err = rand.Int(rand.Reader, serialNumberLimit)
-	if err != nil {
-		return
-	}
-	privClient, err := rsa.GenerateKey(rand.Reader, 2048)
-	if err != nil {
-		return
-	}
-	clientDERBytes, err := x509.CreateCertificate(rand.Reader, &template, caCert, &privClient.PublicKey, privCA)
-	if err != nil {
-		return
-	}
-	var clientCertBuf bytes.Buffer
-	err = pem.Encode(&clientCertBuf, &pem.Block{Type: "CERTIFICATE", Bytes: clientDERBytes})
-	if err != nil {
-		return
-	}
-	clientCert = clientCertBuf.Bytes()
-	var clientKeyBuf bytes.Buffer
-	err = pem.Encode(&clientKeyBuf, &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(privClient)})
-	if err != nil {
-		return
-	}
-	clientKey = clientKeyBuf.Bytes()
-	return
 }

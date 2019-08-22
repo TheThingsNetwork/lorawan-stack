@@ -23,12 +23,17 @@ import (
 
 var errInvalidCA = errors.DefineInvalidArgument("ca_pem_data", "CA PEM data is invalid")
 
-func createTLSConfig(ca []byte, clientCert []byte, clientKey []byte) (*tls.Config, error) {
-	certPool := x509.NewCertPool()
-	if !certPool.AppendCertsFromPEM(ca) {
-		return nil, errInvalidCA
+func createTLSConfig(caPEM []byte, certPEM []byte, keyPEM []byte) (*tls.Config, error) {
+	// Change the CA certificate pool only if a CA has been provided.
+	// This allows the system-wide CA pool to be used.
+	var certPool *x509.CertPool
+	if len(caPEM) != 0 {
+		certPool = x509.NewCertPool()
+		if !certPool.AppendCertsFromPEM(caPEM) {
+			return nil, errInvalidCA
+		}
 	}
-	cert, err := tls.X509KeyPair(clientCert, clientKey)
+	cert, err := tls.X509KeyPair(certPEM, keyPEM)
 	if err != nil {
 		return nil, err
 	}
