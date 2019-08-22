@@ -68,19 +68,7 @@ export default class DeviceAdd extends Component {
 
   async handleSubmit(values) {
     const { appId } = this.props
-    const device = { ...values }
-
-    // Clean values based on activation mode
-    if (device.activation_mode === 'otaa') {
-      delete device.mac_settings
-      delete device.session
-    } else {
-      delete device.ids.join_eui
-      delete device.ids.dev_eui
-      delete device.root_keys
-      delete device.resets_join_nonces
-    }
-    delete device.activation_mode
+    const { activation_mode, ...device } = values
 
     return api.device.create(appId, device, {
       abp: values.activation_mode === 'abp',
