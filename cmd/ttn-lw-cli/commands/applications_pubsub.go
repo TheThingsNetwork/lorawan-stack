@@ -64,12 +64,12 @@ func forwardDeprecatedProviderFlags(flagSet *pflag.FlagSet) {
 }
 
 func forwardProviderDataFlags(flagSet *pflag.FlagSet) error {
-	for _, err := range []error{
-		forwardDataFlag("mqtt.tls-ca", flagSet),
-		forwardDataFlag("mqtt.tls-client-cert", flagSet),
-		forwardDataFlag("mqtt.tls-client-key", flagSet),
+	for _, flag := range []string{
+		"mqtt.tls-ca",
+		"mqtt.tls-client-cert",
+		"mqtt.tls-client-key",
 	} {
-		if err != nil {
+		if err := forwardDataFlag(flag, flagSet); err != nil {
 			return err
 		}
 	}

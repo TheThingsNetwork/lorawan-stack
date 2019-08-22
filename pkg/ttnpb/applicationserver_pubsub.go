@@ -14,7 +14,32 @@
 
 package ttnpb
 
+import (
+	"strconv"
+)
+
 // ApplicationPubSub_Provider is an alias to the interface identifying the PubSub provider types.
 // This enables provider.RegisterProvider and provider.GetProvider to offer type safety guarantees.
 // The underscore is maintained for consistency with the generated code.
 type ApplicationPubSub_Provider = isApplicationPubSub_Provider
+
+// MarshalText implements encoding.TextMarshaler interface.
+func (q ApplicationPubSub_MQTTProvider_QoS) MarshalText() ([]byte, error) {
+	return []byte(q.String()), nil
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler interface.
+func (q *ApplicationPubSub_MQTTProvider_QoS) UnmarshalText(b []byte) error {
+	s := string(b)
+	if i, ok := ApplicationPubSub_MQTTProvider_QoS_value[s]; ok {
+		*q = ApplicationPubSub_MQTTProvider_QoS(i)
+		return nil
+	}
+	if i, err := strconv.Atoi(s); err == nil {
+		if _, ok := ApplicationPubSub_MQTTProvider_QoS_name[int32(i)]; ok {
+			*q = ApplicationPubSub_MQTTProvider_QoS(int32(i))
+			return nil
+		}
+	}
+	return errCouldNotParse("ApplicationPubSub_MQTTProvider_QoS")(string(b))
+}
