@@ -40,10 +40,15 @@ func getUserAndClientID(flagSet *pflag.FlagSet, args []string) (*ttnpb.UserIdent
 		userID = args[0]
 		clientID = args[1]
 	}
-	if userID == "" || clientID == "" {
-		return nil, nil
+	switch {
+	case userID != "" && clientID != "":
+		return &ttnpb.UserIdentifiers{UserID: userID}, &ttnpb.ClientIdentifiers{ClientID: clientID}
+	case userID != "":
+		return &ttnpb.UserIdentifiers{UserID: userID}, nil
+	case clientID != "":
+		return nil, &ttnpb.ClientIdentifiers{ClientID: clientID}
 	}
-	return &ttnpb.UserIdentifiers{UserID: userID}, &ttnpb.ClientIdentifiers{ClientID: clientID}
+	return nil, nil
 }
 
 var errNoTokenID = errors.DefineInvalidArgument("no_token_id", "no token ID set")
