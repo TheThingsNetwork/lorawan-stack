@@ -225,7 +225,10 @@ var (
 								if err != nil {
 									return err
 								}
-								cmd.Flags().Set(name, hex.EncodeToString(data))
+								err = cmd.Flags().Set(name, hex.EncodeToString(data))
+								if err != nil {
+									return err
+								}
 							}
 						}
 						return nil
