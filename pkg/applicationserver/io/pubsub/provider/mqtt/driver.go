@@ -194,22 +194,28 @@ func (s *subscription) ReceiveBatch(ctx context.Context, maxMessages int) ([]*dr
 		return nil, errNilClient
 	}
 	var messages []*driver.Message
+outer:
 	for i := 0; i < maxMessages; i++ {
 		select {
-		case <-time.After(s.timeout):
-			break
+		case <-ctx.Done():
+			break outer
 		case msg, ok := <-s.subCh:
 			if !ok {
-				break
+				break outer
 			}
 			dm, err := decodeMessage(msg)
 			if err != nil {
 				return nil, err
 			}
 			messages = append(messages, dm)
+		// We cannot delay the messages for too long for the sake of
+		// having bigger batches. Avoid busy waiting, but don't wait
+		// for too long.
+		case <-time.After(1 * time.Millisecond):
+			break outer
 		}
 	}
-	return messages, nil
+	return messages, ctx.Err()
 }
 
 // SendAcks implements driver.Subscription.

@@ -567,7 +567,9 @@ hardware_versions:
 						ApplicationPubSubIdentifiers: registeredApplicationPubSubID,
 						Provider: &ttnpb.ApplicationPubSub_MQTT{
 							MQTT: &ttnpb.ApplicationPubSub_MQTTProvider{
-								ServerURL: fmt.Sprintf("tcp://%v", mqttLis.Addr()),
+								ServerURL:    fmt.Sprintf("tcp://%v", mqttLis.Addr()),
+								PublishQoS:   ttnpb.ApplicationPubSub_MQTTProvider_AT_LEAST_ONCE,
+								SubscribeQoS: ttnpb.ApplicationPubSub_MQTTProvider_AT_LEAST_ONCE,
 							},
 						},
 						Format:    "json",

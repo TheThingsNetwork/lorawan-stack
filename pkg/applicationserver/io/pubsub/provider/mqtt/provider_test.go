@@ -307,3 +307,7 @@ func TestOpenConnection(t *testing.T) {
 		})
 	}
 }
+
+func init() {
+	timeout = (1 << 8) * test.Delay
+}
