@@ -15,7 +15,6 @@
 package commands
 
 import (
-	"encoding/hex"
 	"io"
 	"io/ioutil"
 	"os"
@@ -221,23 +220,6 @@ func dataFlags(name, usage string) *pflag.FlagSet {
 	flagSet := &pflag.FlagSet{}
 	flagSet.String(flagName, "", flagUsage)
 	return flagSet
-}
-
-func forwardDataFlag(name string, flagSet *pflag.FlagSet) error {
-	flagName := "local-file"
-	if name != "" {
-		flagName = name + "-" + flagName
-	}
-	if fileFlag := flagSet.Lookup(flagName); fileFlag != nil && fileFlag.Changed {
-		if dataFlag := flagSet.Lookup(name); dataFlag != nil && !dataFlag.Changed {
-			data, err := getDataBytes(name, flagSet)
-			if err != nil {
-				return err
-			}
-			flagSet.Set(name, hex.EncodeToString(data))
-		}
-	}
-	return nil
 }
 
 var errNoData = errors.DefineInvalidArgument("no_data", "no data for `{name}`")

@@ -15,6 +15,7 @@
 package commands
 
 import (
+	"encoding/hex"
 	"os"
 	"strings"
 
@@ -61,19 +62,6 @@ func addDeprecatedProviderFlags(flagSet *pflag.FlagSet) {
 
 func forwardDeprecatedProviderFlags(flagSet *pflag.FlagSet) {
 	util.ForwardFlag(flagSet, "nats_server_url", "nats.server_url")
-}
-
-func forwardProviderDataFlags(flagSet *pflag.FlagSet) error {
-	for _, flag := range []string{
-		"mqtt.tls-ca",
-		"mqtt.tls-client-cert",
-		"mqtt.tls-client-key",
-	} {
-		if err := forwardDataFlag(flag, flagSet); err != nil {
-			return err
-		}
-	}
-	return nil
 }
 
 var errNoPubSubID = errors.DefineInvalidArgument("no_pub_sub_id", "no pubsub ID set")
@@ -201,11 +189,6 @@ var (
 		Short:   "Set the properties of an application pubsub",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			forwardDeprecatedProviderFlags(cmd.Flags())
-			err := forwardProviderDataFlags(cmd.Flags())
-			if err != nil {
-				return err
-			}
-
 			pubsubID, err := getApplicationPubSubID(cmd.Flags(), args)
 			if err != nil {
 				return err
@@ -221,18 +204,39 @@ var (
 			for name, p := range map[string]struct {
 				provider ttnpb.ApplicationPubSub_Provider
 				flags    *pflag.FlagSet
+				loadData func() error
 			}{
 				"nats": {
 					provider: &ttnpb.ApplicationPubSub_NATS{},
 					flags:    natsProviderApplicationPubSubFlags,
+					loadData: func() error { return nil },
 				},
 				"mqtt": {
 					provider: &ttnpb.ApplicationPubSub_MQTT{},
 					flags:    mqttProviderApplicationPubSubFlags,
+					loadData: func() error {
+						if useTLS, _ := cmd.Flags().GetBool("mqtt.use-tls"); useTLS {
+							for _, name := range []string{
+								"mqtt.tls-ca",
+								"mqtt.tls-client-cert",
+								"mqtt.tls-client-key",
+							} {
+								data, err := getDataBytes(name, cmd.Flags())
+								if err != nil {
+									return err
+								}
+								cmd.Flags().Set(name, hex.EncodeToString(data))
+							}
+						}
+						return nil
+					},
 				},
 			} {
 				if enabled, _ := cmd.Flags().GetBool(name); enabled {
 					pubsub.Provider = p.provider
+					if err = p.loadData(); err != nil {
+						return err
+					}
 					if err = util.SetFields(pubsub.Provider, p.flags); err != nil {
 						return err
 					}
