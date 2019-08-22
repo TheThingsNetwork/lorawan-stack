@@ -34,9 +34,11 @@ func WrapPubSub(wrapped events.PubSub, conf config.Redis) (ps *PubSub) {
 			DB:       conf.Database,
 		}),
 		eventChannel: strings.Join(append(conf.Namespace, "events"), ":"),
+		closeWait:    make(chan struct{}),
 	}
 	ps.sub = ps.client.Subscribe(ps.eventChannel)
 	go func() {
+		defer close(ps.closeWait)
 		for {
 			msg, err := ps.sub.ReceiveMessage()
 			if err != nil {
@@ -62,12 +64,14 @@ type PubSub struct {
 	eventChannel string
 	client       *redis.Client
 	sub          *redis.PubSub
+	closeWait    chan struct{}
 }
 
 // Close the Redis publisher.
 func (ps *PubSub) Close() error {
 	unsubErr := ps.sub.Unsubscribe(ps.eventChannel)
 	closeErr := ps.client.Close()
+	<-ps.closeWait
 	if unsubErr != nil {
 		return unsubErr
 	}
