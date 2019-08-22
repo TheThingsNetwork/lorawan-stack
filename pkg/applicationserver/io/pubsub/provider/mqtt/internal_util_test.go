@@ -24,10 +24,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
-var (
-	timeout = (1 << 5) * test.Delay
-)
-
 func startMQTTServer(ctx context.Context, tlsConfig *tls.Config) (mqttnet.Listener, mqttnet.Listener, error) {
 	logger := log.FromContext(ctx)
 	s := server.New(ctx)
@@ -70,4 +66,8 @@ func startMQTTServer(ctx context.Context, tlsConfig *tls.Config) (mqttnet.Listen
 	}
 
 	return lis, nil, nil
+}
+
+func init() {
+	timeout = (1 << 8) * test.Delay
 }

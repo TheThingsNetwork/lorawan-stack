@@ -26,7 +26,7 @@ import (
 	"gocloud.dev/pubsub"
 )
 
-const defaultTimeout = (1 << 4) * time.Second
+var timeout = (1 << 3) * time.Second
 
 type impl struct {
 }
@@ -37,7 +37,7 @@ type connection struct {
 
 // Shutdown implements provider.Shutdowner.
 func (c *connection) Shutdown(_ context.Context) error {
-	c.Disconnect(uint(defaultTimeout / time.Millisecond))
+	c.Disconnect(uint(timeout / time.Millisecond))
 	return nil
 }
 
@@ -60,7 +60,7 @@ func (impl) OpenConnection(ctx context.Context, pb *ttnpb.ApplicationPubSub) (pc
 		clientOpts.SetTLSConfig(config)
 	}
 	client := mqtt.NewClient(clientOpts)
-	if token := client.Connect(); !token.WaitTimeout(defaultTimeout) {
+	if token := client.Connect(); !token.WaitTimeout(timeout) {
 		return nil, convertToCancelled(token.Error())
 	}
 	pc = &provider.Connection{
@@ -108,10 +108,10 @@ func (impl) OpenConnection(ctx context.Context, pb *ttnpb.ApplicationPubSub) (pc
 		if *t.topic, err = OpenTopic(
 			client,
 			mqtt_topic.Join(append(mqtt_topic.Split(pb.BaseTopic), mqtt_topic.Split(t.topicName)...)),
-			defaultTimeout,
+			timeout,
 			byte(settings.GetPublishQoS()),
 		); err != nil {
-			client.Disconnect(uint(defaultTimeout / time.Millisecond))
+			client.Disconnect(uint(timeout / time.Millisecond))
 			return nil, err
 		}
 	}
@@ -131,10 +131,10 @@ func (impl) OpenConnection(ctx context.Context, pb *ttnpb.ApplicationPubSub) (pc
 		if *s.subscription, err = OpenSubscription(
 			client,
 			mqtt_topic.Join(append(mqtt_topic.Split(pb.BaseTopic), mqtt_topic.Split(s.topicName)...)),
-			defaultTimeout,
+			timeout,
 			byte(settings.GetSubscribeQoS()),
 		); err != nil {
-			client.Disconnect(uint(defaultTimeout / time.Millisecond))
+			client.Disconnect(uint(timeout / time.Millisecond))
 			return nil, err
 		}
 	}
