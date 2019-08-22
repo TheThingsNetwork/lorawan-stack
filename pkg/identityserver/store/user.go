@@ -140,8 +140,10 @@ var defaultUserFieldMask = &types.FieldMask{}
 
 func init() {
 	paths := make([]string, 0, len(userPBSetters))
-	for path := range userPBSetters {
-		paths = append(paths, path)
+	for _, path := range ttnpb.UserFieldPathsNested {
+		if _, ok := userPBSetters[path]; ok {
+			paths = append(paths, path)
+		}
 	}
 	defaultUserFieldMask.Paths = paths
 }

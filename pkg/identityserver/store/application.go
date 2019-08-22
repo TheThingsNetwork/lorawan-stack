@@ -59,8 +59,10 @@ var defaultApplicationFieldMask = &types.FieldMask{}
 
 func init() {
 	paths := make([]string, 0, len(applicationPBSetters))
-	for path := range applicationPBSetters {
-		paths = append(paths, path)
+	for _, path := range ttnpb.ApplicationFieldPathsNested {
+		if _, ok := applicationPBSetters[path]; ok {
+			paths = append(paths, path)
+		}
 	}
 	defaultApplicationFieldMask.Paths = paths
 }

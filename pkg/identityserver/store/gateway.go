@@ -147,8 +147,10 @@ var defaultGatewayFieldMask = &pbtypes.FieldMask{}
 
 func init() {
 	paths := make([]string, 0, len(gatewayPBSetters))
-	for path := range gatewayPBSetters {
-		paths = append(paths, path)
+	for _, path := range ttnpb.GatewayFieldPathsNested {
+		if _, ok := gatewayPBSetters[path]; ok {
+			paths = append(paths, path)
+		}
 	}
 	defaultGatewayFieldMask.Paths = paths
 }

@@ -60,8 +60,10 @@ var defaultOrganizationFieldMask = &types.FieldMask{}
 
 func init() {
 	paths := make([]string, 0, len(organizationPBSetters))
-	for path := range organizationPBSetters {
-		paths = append(paths, path)
+	for _, path := range ttnpb.OrganizationFieldPathsNested {
+		if _, ok := organizationPBSetters[path]; ok {
+			paths = append(paths, path)
+		}
 	}
 	defaultOrganizationFieldMask.Paths = paths
 }

@@ -132,8 +132,10 @@ var defaultEndDeviceFieldMask = &types.FieldMask{}
 
 func init() {
 	paths := make([]string, 0, len(devicePBSetters))
-	for path := range devicePBSetters {
-		paths = append(paths, path)
+	for _, path := range ttnpb.EndDeviceFieldPathsNested {
+		if _, ok := devicePBSetters[path]; ok {
+			paths = append(paths, path)
+		}
 	}
 	defaultEndDeviceFieldMask.Paths = paths
 }
