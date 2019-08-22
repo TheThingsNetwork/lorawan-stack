@@ -27,6 +27,7 @@ import DeviceDataForm from '../../components/device-data-form'
 import sharedMessages from '../../../lib/shared-messages'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
 import { getDeviceId } from '../../../lib/selectors/id'
+import PropTypes from '../../../lib/prop-types'
 import api from '../../api'
 
 import style from './device-add.styl'
@@ -45,7 +46,6 @@ import style from './device-add.styl'
 @connect(
   function(state) {
     return {
-      device: state.device.device,
       appId: selectSelectedApplicationId(state),
     }
   },
@@ -56,6 +56,12 @@ import style from './device-add.styl'
 )
 @bind
 export default class DeviceAdd extends Component {
+  static propTypes = {
+    appId: PropTypes.string.isRequired,
+    env: PropTypes.env.isRequired,
+    redirectToList: PropTypes.func.isRequired,
+  }
+
   state = {
     error: '',
   }
