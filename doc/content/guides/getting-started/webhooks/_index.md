@@ -55,7 +55,7 @@ The path are:
 For example:
 
 ```
-$ curl http://localhost:1885/api/v3/as/applications/app1/webhooks/wh1/devices/dev1/down/push \
+$ curl https://your.thethingsstack.io/api/v3/as/applications/app1/webhooks/wh1/devices/dev1/down/push \
   -X POST \
   -H 'Authorization: Bearer NNSXS.VEEBURF3KR77ZR..' \
   --data '{"downlinks":[{"frm_payload":"vu8=","f_port":15,"priority":"NORMAL"}]}'

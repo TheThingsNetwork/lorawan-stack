@@ -63,9 +63,9 @@ $ cat example.json \
   "updated_at": "2019-07-18T12:43:16.032962Z",
   "attributes": {
   },
-  "network_server_address": "localhost",
-  "application_server_address": "localhost",
-  "join_server_address": "localhost",
+  "network_server_address": "your.thethingsstack.io",
+  "application_server_address": "your.thethingsstack.io",
+  "join_server_address": "your.thethingsstack.io",
   "lorawan_version": "1.0.3",
   "lorawan_phy_version": "1.0.3-a",
   "frequency_plan_id": "US_902_928",
