@@ -262,9 +262,6 @@ func makeJoinServerHTTPRequestFunc(scheme string, dns, fqdn, path string, port u
 	if port == 0 {
 		port = defaultHTTPSPort
 	}
-	if path != "" {
-		path = fmt.Sprintf("/%s", path)
-	}
 	return func(joinEUI types.EUI64, pld interface{}) (*http.Request, error) {
 		if fqdn == "" {
 			fqdn = JoinServerFQDN(joinEUI, dns)
