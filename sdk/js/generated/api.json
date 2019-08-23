@@ -1611,7 +1611,31 @@
       "hasExtensions": false,
       "hasMessages": true,
       "hasServices": true,
-      "enums": [],
+      "enums": [
+        {
+          "name": "QoS",
+          "longName": "ApplicationPubSub.MQTTProvider.QoS",
+          "fullName": "ttn.lorawan.v3.ApplicationPubSub.MQTTProvider.QoS",
+          "description": "",
+          "values": [
+            {
+              "name": "AT_MOST_ONCE",
+              "number": "0",
+              "description": ""
+            },
+            {
+              "name": "AT_LEAST_ONCE",
+              "number": "1",
+              "description": ""
+            },
+            {
+              "name": "EXACTLY_ONCE",
+              "number": "2",
+              "description": ""
+            }
+          ]
+        }
+      ],
       "extensions": [],
       "messages": [
         {
@@ -1690,6 +1714,16 @@
               "type": "NATSProvider",
               "longType": "ApplicationPubSub.NATSProvider",
               "fullType": "ttn.lorawan.v3.ApplicationPubSub.NATSProvider",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "mqtt",
+              "description": "",
+              "label": "",
+              "type": "MQTTProvider",
+              "longType": "ApplicationPubSub.MQTTProvider",
+              "fullType": "ttn.lorawan.v3.ApplicationPubSub.MQTTProvider",
               "ismap": false,
               "defaultValue": ""
             },
@@ -1808,6 +1842,149 @@
               "type": "Message",
               "longType": "ApplicationPubSub.Message",
               "fullType": "ttn.lorawan.v3.ApplicationPubSub.Message",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MQTTProvider",
+          "longName": "ApplicationPubSub.MQTTProvider",
+          "fullName": "ttn.lorawan.v3.ApplicationPubSub.MQTTProvider",
+          "description": "The MQTT provider settings.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "server_url",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.uri",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "client_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 23
+                  }
+                ]
+              }
+            },
+            {
+              "name": "username",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 100
+                  }
+                ]
+              }
+            },
+            {
+              "name": "password",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 100
+                  }
+                ]
+              }
+            },
+            {
+              "name": "subscribe_qos",
+              "description": "",
+              "label": "",
+              "type": "QoS",
+              "longType": "ApplicationPubSub.MQTTProvider.QoS",
+              "fullType": "ttn.lorawan.v3.ApplicationPubSub.MQTTProvider.QoS",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "publish_qos",
+              "description": "",
+              "label": "",
+              "type": "QoS",
+              "longType": "ApplicationPubSub.MQTTProvider.QoS",
+              "fullType": "ttn.lorawan.v3.ApplicationPubSub.MQTTProvider.QoS",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "use_tls",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "tls_ca",
+              "description": "The server Root CA certificate. PEM formatted.",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "tls_client_cert",
+              "description": "The client certificate. PEM formatted.",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "tls_client_key",
+              "description": "The client private key. PEM formatted.",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
               "ismap": false,
               "defaultValue": ""
             }

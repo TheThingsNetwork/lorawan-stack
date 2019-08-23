@@ -33,6 +33,7 @@
   - [Service `AsEndDeviceRegistry`](#ttn.lorawan.v3.AsEndDeviceRegistry)
 - [File `lorawan-stack/api/applicationserver_pubsub.proto`](#lorawan-stack/api/applicationserver_pubsub.proto)
   - [Message `ApplicationPubSub`](#ttn.lorawan.v3.ApplicationPubSub)
+  - [Message `ApplicationPubSub.MQTTProvider`](#ttn.lorawan.v3.ApplicationPubSub.MQTTProvider)
   - [Message `ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message)
   - [Message `ApplicationPubSub.NATSProvider`](#ttn.lorawan.v3.ApplicationPubSub.NATSProvider)
   - [Message `ApplicationPubSubFormats`](#ttn.lorawan.v3.ApplicationPubSubFormats)
@@ -42,6 +43,7 @@
   - [Message `GetApplicationPubSubRequest`](#ttn.lorawan.v3.GetApplicationPubSubRequest)
   - [Message `ListApplicationPubSubsRequest`](#ttn.lorawan.v3.ListApplicationPubSubsRequest)
   - [Message `SetApplicationPubSubRequest`](#ttn.lorawan.v3.SetApplicationPubSubRequest)
+  - [Enum `ApplicationPubSub.MQTTProvider.QoS`](#ttn.lorawan.v3.ApplicationPubSub.MQTTProvider.QoS)
   - [Service `ApplicationPubSubRegistry`](#ttn.lorawan.v3.ApplicationPubSubRegistry)
 - [File `lorawan-stack/api/applicationserver_web.proto`](#lorawan-stack/api/applicationserver_web.proto)
   - [Message `ApplicationWebhook`](#ttn.lorawan.v3.ApplicationWebhook)
@@ -801,6 +803,7 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 | `updated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 | `format` | [`string`](#string) |  | The format to use for the body. Supported values depend on the Application Server configuration. |
 | `nats` | [`ApplicationPubSub.NATSProvider`](#ttn.lorawan.v3.ApplicationPubSub.NATSProvider) |  |  |
+| `mqtt` | [`ApplicationPubSub.MQTTProvider`](#ttn.lorawan.v3.ApplicationPubSub.MQTTProvider) |  |  |
 | `base_topic` | [`string`](#string) |  | Base topic name to which the messages topic is appended. |
 | `downlink_push` | [`ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message) |  | The topic to which the Application Server subscribes for downlink queue push operations. |
 | `downlink_replace` | [`ApplicationPubSub.Message`](#ttn.lorawan.v3.ApplicationPubSub.Message) |  | The topic to which the Application Server subscribes for downlink queue replace operations. |
@@ -820,6 +823,32 @@ The AsEndDeviceRegistry service allows clients to manage their end devices on th
 | `ids` | <p>`message.required`: `true`</p> |
 | `format` | <p>`string.max_len`: `20`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
 | `base_topic` | <p>`string.max_len`: `100`</p> |
+
+### <a name="ttn.lorawan.v3.ApplicationPubSub.MQTTProvider">Message `ApplicationPubSub.MQTTProvider`</a>
+
+The MQTT provider settings.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `server_url` | [`string`](#string) |  |  |
+| `client_id` | [`string`](#string) |  |  |
+| `username` | [`string`](#string) |  |  |
+| `password` | [`string`](#string) |  |  |
+| `subscribe_qos` | [`ApplicationPubSub.MQTTProvider.QoS`](#ttn.lorawan.v3.ApplicationPubSub.MQTTProvider.QoS) |  |  |
+| `publish_qos` | [`ApplicationPubSub.MQTTProvider.QoS`](#ttn.lorawan.v3.ApplicationPubSub.MQTTProvider.QoS) |  |  |
+| `use_tls` | [`bool`](#bool) |  |  |
+| `tls_ca` | [`bytes`](#bytes) |  | The server Root CA certificate. PEM formatted. |
+| `tls_client_cert` | [`bytes`](#bytes) |  | The client certificate. PEM formatted. |
+| `tls_client_key` | [`bytes`](#bytes) |  | The client private key. PEM formatted. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `server_url` | <p>`string.uri`: `true`</p> |
+| `client_id` | <p>`string.max_len`: `23`</p> |
+| `username` | <p>`string.max_len`: `100`</p> |
+| `password` | <p>`string.max_len`: `100`</p> |
 
 ### <a name="ttn.lorawan.v3.ApplicationPubSub.Message">Message `ApplicationPubSub.Message`</a>
 
@@ -918,6 +947,14 @@ The NATS provider settings.
 | Field | Validations |
 | ----- | ----------- |
 | `pubsub` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.ApplicationPubSub.MQTTProvider.QoS">Enum `ApplicationPubSub.MQTTProvider.QoS`</a>
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| `AT_MOST_ONCE` | 0 |  |
+| `AT_LEAST_ONCE` | 1 |  |
+| `EXACTLY_ONCE` | 2 |  |
 
 ### <a name="ttn.lorawan.v3.ApplicationPubSubRegistry">Service `ApplicationPubSubRegistry`</a>
 

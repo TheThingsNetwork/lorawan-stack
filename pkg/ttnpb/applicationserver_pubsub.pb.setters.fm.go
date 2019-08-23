@@ -359,6 +359,30 @@ func (dst *ApplicationPubSub) SetFields(src *ApplicationPubSub, paths ...string)
 							dst.Provider.(*ApplicationPubSub_NATS).NATS = nil
 						}
 					}
+				case "mqtt":
+					if _, ok := dst.Provider.(*ApplicationPubSub_MQTT); !ok {
+						dst.Provider = &ApplicationPubSub_MQTT{}
+					}
+					if len(oneofSubs) > 0 {
+						newDst := dst.Provider.(*ApplicationPubSub_MQTT).MQTT
+						if newDst == nil {
+							newDst = &ApplicationPubSub_MQTTProvider{}
+							dst.Provider.(*ApplicationPubSub_MQTT).MQTT = newDst
+						}
+						var newSrc *ApplicationPubSub_MQTTProvider
+						if src != nil {
+							newSrc = src.GetMQTT()
+						}
+						if err := newDst.SetFields(newSrc, subs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Provider.(*ApplicationPubSub_MQTT).MQTT = src.GetMQTT()
+						} else {
+							dst.Provider.(*ApplicationPubSub_MQTT).MQTT = nil
+						}
+					}
 
 				default:
 					return fmt.Errorf("invalid oneof field: '%s.%s'", name, oneofName)
@@ -541,6 +565,114 @@ func (dst *ApplicationPubSub_NATSProvider) SetFields(src *ApplicationPubSub_NATS
 			} else {
 				var zero string
 				dst.ServerURL = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ApplicationPubSub_MQTTProvider) SetFields(src *ApplicationPubSub_MQTTProvider, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "server_url":
+			if len(subs) > 0 {
+				return fmt.Errorf("'server_url' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ServerURL = src.ServerURL
+			} else {
+				var zero string
+				dst.ServerURL = zero
+			}
+		case "client_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'client_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ClientID = src.ClientID
+			} else {
+				var zero string
+				dst.ClientID = zero
+			}
+		case "username":
+			if len(subs) > 0 {
+				return fmt.Errorf("'username' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Username = src.Username
+			} else {
+				var zero string
+				dst.Username = zero
+			}
+		case "password":
+			if len(subs) > 0 {
+				return fmt.Errorf("'password' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Password = src.Password
+			} else {
+				var zero string
+				dst.Password = zero
+			}
+		case "subscribe_qos":
+			if len(subs) > 0 {
+				return fmt.Errorf("'subscribe_qos' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SubscribeQoS = src.SubscribeQoS
+			} else {
+				var zero ApplicationPubSub_MQTTProvider_QoS
+				dst.SubscribeQoS = zero
+			}
+		case "publish_qos":
+			if len(subs) > 0 {
+				return fmt.Errorf("'publish_qos' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.PublishQoS = src.PublishQoS
+			} else {
+				var zero ApplicationPubSub_MQTTProvider_QoS
+				dst.PublishQoS = zero
+			}
+		case "use_tls":
+			if len(subs) > 0 {
+				return fmt.Errorf("'use_tls' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.UseTLS = src.UseTLS
+			} else {
+				var zero bool
+				dst.UseTLS = zero
+			}
+		case "tls_ca":
+			if len(subs) > 0 {
+				return fmt.Errorf("'tls_ca' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.TLSCA = src.TLSCA
+			} else {
+				dst.TLSCA = nil
+			}
+		case "tls_client_cert":
+			if len(subs) > 0 {
+				return fmt.Errorf("'tls_client_cert' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.TLSClientCert = src.TLSClientCert
+			} else {
+				dst.TLSClientCert = nil
+			}
+		case "tls_client_key":
+			if len(subs) > 0 {
+				return fmt.Errorf("'tls_client_key' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.TLSClientKey = src.TLSClientKey
+			} else {
+				dst.TLSClientKey = nil
 			}
 
 		default:
