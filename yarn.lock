@@ -1027,6 +1027,13 @@
   dependencies:
     "@formatjs/intl-utils" "^0.6.1"
 
+"@formatjs/intl-relativetimeformat@^2.8.2":
+  version "2.8.2"
+  resolved "https://registry.yarnpkg.com/@formatjs/intl-relativetimeformat/-/intl-relativetimeformat-2.8.2.tgz#b137c0333716e88c49c0f56e35edeadbcc170a12"
+  integrity sha512-ZsEpxaDkTv4Zrr6+yrMCcxRFAdE5nfraNVy2HLc51SYGiUO99BM/RPot1+Mb7whUrtjvjnYkzWMYOD0jxQmTMg==
+  dependencies:
+    "@formatjs/intl-utils" "^0.6.1"
+
 "@formatjs/intl-utils@^0.6.1":
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/@formatjs/intl-utils/-/intl-utils-0.6.1.tgz#7661afd5abb2161dc8ac92238be9432aee28ad38"
@@ -6382,6 +6389,13 @@ intl-messageformat@^6.1.6:
     intl-format-cache "^4.1.14"
     intl-messageformat-parser "^3.0.7"
 
+intl-pluralrules@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/intl-pluralrules/-/intl-pluralrules-1.0.3.tgz#25438469f76fd13a4ac54a68a0ae4c0d30248a47"
+  integrity sha512-N+q+NmxJD5Pi+h7DoemDcNZN86e1dPSFUsWUtYtnSc/fKRen4vxCTcsmGveWOUgI9O9uSLTaiwJpC9f5xa2X4w==
+  dependencies:
+    make-plural "^4.3.0"
+
 intl@^1.2.5:
   version "1.2.5"
   resolved "https://registry.yarnpkg.com/intl/-/intl-1.2.5.tgz#82244a2190c4e419f8371f5aa34daa3420e2abde"
@@ -7726,6 +7740,13 @@ make-dir@^3.0.0:
   integrity sha512-grNJDhb8b1Jm1qeqW5R/O63wUo4UXo2v2HMic6YT9i/HBlF93S8jkMgH7yugvY9ABDShH4VZMn8I+U8+fCNegw==
   dependencies:
     semver "^6.0.0"
+
+make-plural@^4.3.0:
+  version "4.3.0"
+  resolved "https://registry.yarnpkg.com/make-plural/-/make-plural-4.3.0.tgz#f23de08efdb0cac2e0c9ba9f315b0dff6b4c2735"
+  integrity sha512-xTYd4JVHpSCW+aqDof6w/MebaMVNTVYBZhbB/vi513xXdiPT92JMVCo0Jq8W2UZnzYRFeVbQiQ+I25l13JuKvA==
+  optionalDependencies:
+    minimist "^1.2.0"
 
 makeerror@1.0.x:
   version "1.0.11"
