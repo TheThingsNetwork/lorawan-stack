@@ -23,6 +23,7 @@ import (
 	echo "github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/openshift/osin"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	web_errors "go.thethings.network/lorawan-stack/pkg/errors/web"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -129,16 +130,59 @@ func (s *server) Printf(format string, v ...interface{}) {
 	log.FromContext(s.ctx).Warnf(format, v...)
 }
 
+// These errors map to errors in the osin library.
+var (
+	errInvalidRequest          = errors.DefineInvalidArgument("invalid_request", "invalid or missing request parameter")
+	errUnauthorizedClient      = errors.DefinePermissionDenied("unauthorized_client", "client is not authorized to request a token using this method")
+	errAccessDenied            = errors.DefinePermissionDenied("access_denied", "access denied")
+	errUnsupportedResponseType = errors.DefineUnimplemented("unsupported_response_type", "unsupported response type")
+	errInvalidScope            = errors.DefineInvalidArgument("invalid_scope", "invalid scope")
+	errUnsupportedGrantType    = errors.DefineUnimplemented("unsupported_grant_type", "unsupported grant type")
+	errInvalidGrant            = errors.DefinePermissionDenied("invalid_grant", "invalid, expired or revoked authorization code")
+	errInvalidClient           = errors.DefinePermissionDenied("invalid client", "invalid or unauthenticated client")
+	errInternal                = errors.Define("internal", "internal error {id}")
+	errInvalidRedirectURI      = errors.DefinePermissionDenied("invalid_redirect_uri", "invalid redirect URI")
+)
+
 func (s *server) output(c echo.Context, resp *osin.Response) error {
-	if resp.IsError && resp.InternalError != nil {
-		return resp.InternalError
-	}
 	headers := c.Response().Header()
 	for i, k := range resp.Headers {
 		for _, v := range k {
 			headers.Add(i, v)
 		}
 	}
+
+	var osinErr error
+	if resp.IsError {
+		switch resp.ErrorId {
+		case osin.E_INVALID_REQUEST:
+			osinErr = errInvalidRequest
+		case osin.E_UNAUTHORIZED_CLIENT:
+			osinErr = errUnauthorizedClient
+		case osin.E_ACCESS_DENIED:
+			osinErr = errAccessDenied
+		case osin.E_UNSUPPORTED_RESPONSE_TYPE:
+			osinErr = errUnsupportedResponseType
+		case osin.E_INVALID_SCOPE:
+			osinErr = errInvalidScope
+		case osin.E_UNSUPPORTED_GRANT_TYPE:
+			osinErr = errUnsupportedGrantType
+		case osin.E_INVALID_GRANT:
+			osinErr = errInvalidGrant
+		case osin.E_INVALID_CLIENT:
+			osinErr = errInvalidClient
+		default:
+			osinErr = errInternal
+		}
+		if resp.InternalError != nil {
+			if _, isURIValidationError := resp.InternalError.(osin.UriValidationError); isURIValidationError {
+				osinErr = errInvalidRedirectURI
+			}
+			osinErr = osinErr.(errors.Definition).WithCause(resp.InternalError)
+		}
+		log.FromContext(c.Request().Context()).WithError(osinErr).Warn("OAuth error")
+	}
+
 	if resp.Type == osin.REDIRECT {
 		location, err := resp.GetRedirectUrl()
 		if err != nil {
@@ -150,6 +194,11 @@ func (s *server) output(c echo.Context, resp *osin.Response) error {
 		}
 		return c.Redirect(http.StatusFound, location)
 	}
+
+	if osinErr != nil {
+		return osinErr
+	}
+
 	return c.JSON(resp.StatusCode, resp.Output)
 }
 

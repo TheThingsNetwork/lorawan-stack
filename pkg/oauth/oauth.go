@@ -53,6 +53,13 @@ func rightsFromScope(scope string) []ttnpb.Right {
 	return ttnpb.RightsFrom(rights...).Sorted().GetRights()
 }
 
+var (
+	errClientMissingGrant = errors.DefinePermissionDenied("client_missing_grant", "OAuth client does not have {grant} grant")
+	errClientNotApproved  = errors.DefinePermissionDenied("client_not_approved", "OAuth client was not approved")
+	errClientRejected     = errors.DefinePermissionDenied("client_rejected", "OAuth client was rejected")
+	errClientSuspended    = errors.DefinePermissionDenied("client_suspended", "OAuth client was suspended")
+)
+
 func (s *server) Authorize(authorizePage echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		req := c.Request()
@@ -73,24 +80,16 @@ func (s *server) Authorize(authorizePage echo.HandlerFunc) echo.HandlerFunc {
 		ar.UserData = userData{UserIdentifiers: session.UserIdentifiers}
 		client := ttnpb.Client(ar.Client.(osinClient))
 		if !clientHasGrant(&client, ttnpb.GRANT_AUTHORIZATION_CODE) {
-			resp.SetError(osin.E_INVALID_CLIENT, "OAuth client does not have authorization code grant")
-			oauth2.FinishAuthorizeRequest(resp, req, ar)
-			return s.output(c, resp)
+			return errClientMissingGrant.WithAttributes("grant", "authorization_code")
 		}
 		switch client.State {
 		case ttnpb.STATE_REJECTED:
-			resp.SetError(osin.E_INVALID_CLIENT, "OAuth client was rejected")
-			oauth2.FinishAuthorizeRequest(resp, req, ar)
-			return s.output(c, resp)
+			return errClientRejected
 		case ttnpb.STATE_SUSPENDED:
-			resp.SetError(osin.E_INVALID_CLIENT, "OAuth client was suspended")
-			oauth2.FinishAuthorizeRequest(resp, req, ar)
-			return s.output(c, resp)
+			return errClientSuspended
 		case ttnpb.STATE_REQUESTED:
 			// TODO: Allow if user is collaborator (https://github.com/TheThingsNetwork/lorawan-stack/issues/49).
-			resp.SetError(osin.E_INVALID_CLIENT, "OAuth client is not yet approved")
-			oauth2.FinishAuthorizeRequest(resp, req, ar)
-			return s.output(c, resp)
+			return errClientNotApproved
 		}
 		ar.Authorized = client.SkipAuthorization
 		ar.Scope = rightsToScope(client.Rights...)
