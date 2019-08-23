@@ -5040,6 +5040,53 @@
       "extensions": [],
       "messages": [
         {
+          "name": "AuthorizeApplicationRequest",
+          "longName": "AuthorizeApplicationRequest",
+          "fullName": "ttn.lorawan.v3.AuthorizeApplicationRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "application_ids",
+              "description": "",
+              "label": "",
+              "type": "ApplicationIdentifiers",
+              "longType": "ApplicationIdentifiers",
+              "fullType": "ttn.lorawan.v3.ApplicationIdentifiers",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "api_key",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.min_len",
+                    "value": 1
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "ClaimEndDeviceRequest",
           "longName": "ClaimEndDeviceRequest",
           "fullName": "ttn.lorawan.v3.ClaimEndDeviceRequest",
@@ -5200,6 +5247,29 @@
               "requestLongType": "ClaimEndDeviceRequest",
               "requestFullType": "ttn.lorawan.v3.ClaimEndDeviceRequest",
               "requestStreaming": false,
+              "responseType": "EndDeviceIdentifiers",
+              "responseLongType": "EndDeviceIdentifiers",
+              "responseFullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "POST",
+                      "pattern": "/edcs/claim",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "AuthorizeApplication",
+              "description": "",
+              "requestType": "AuthorizeApplicationRequest",
+              "requestLongType": "AuthorizeApplicationRequest",
+              "requestFullType": "ttn.lorawan.v3.AuthorizeApplicationRequest",
+              "requestStreaming": false,
               "responseType": "Empty",
               "responseLongType": ".google.protobuf.Empty",
               "responseFullType": "google.protobuf.Empty",
@@ -5209,8 +5279,30 @@
                   "rules": [
                     {
                       "method": "POST",
-                      "pattern": "/edcs/claim",
+                      "pattern": "/edcs/applications/{application_ids.application_id}/authorize",
                       "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "UnauthorizeApplication",
+              "description": "",
+              "requestType": "ApplicationIdentifiers",
+              "requestLongType": "ApplicationIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.ApplicationIdentifiers",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/edcs/applications/{application_id}/authorize"
                     }
                   ]
                 }

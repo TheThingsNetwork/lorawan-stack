@@ -1145,6 +1145,31 @@
           "parameters": []
         }
       ]
+    },
+    "AuthorizeApplication": {
+      "file": "lorawan-stack/api/deviceclaimingserver.proto",
+      "http": [
+        {
+          "method": "post",
+          "pattern": "/edcs/applications/{application_ids.application_id}/authorize",
+          "body": "*",
+          "parameters": [
+            "application_ids.application_id"
+          ]
+        }
+      ]
+    },
+    "UnauthorizeApplication": {
+      "file": "lorawan-stack/api/deviceclaimingserver.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/edcs/applications/{application_id}/authorize",
+          "parameters": [
+            "application_id"
+          ]
+        }
+      ]
     }
   },
   "EndDeviceRegistry": {

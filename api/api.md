@@ -96,6 +96,7 @@
   - [Enum `ContactType`](#ttn.lorawan.v3.ContactType)
   - [Service `ContactInfoRegistry`](#ttn.lorawan.v3.ContactInfoRegistry)
 - [File `lorawan-stack/api/deviceclaimingserver.proto`](#lorawan-stack/api/deviceclaimingserver.proto)
+  - [Message `AuthorizeApplicationRequest`](#ttn.lorawan.v3.AuthorizeApplicationRequest)
   - [Message `ClaimEndDeviceRequest`](#ttn.lorawan.v3.ClaimEndDeviceRequest)
   - [Message `ClaimEndDeviceRequest.AuthenticatedIdentifiers`](#ttn.lorawan.v3.ClaimEndDeviceRequest.AuthenticatedIdentifiers)
   - [Service `EndDeviceClaimingServer`](#ttn.lorawan.v3.EndDeviceClaimingServer)
@@ -1551,6 +1552,20 @@ PeerInfo
 
 ## <a name="lorawan-stack/api/deviceclaimingserver.proto">File `lorawan-stack/api/deviceclaimingserver.proto`</a>
 
+### <a name="ttn.lorawan.v3.AuthorizeApplicationRequest">Message `AuthorizeApplicationRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
+| `api_key` | [`string`](#string) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `application_ids` | <p>`message.required`: `true`</p> |
+| `api_key` | <p>`string.min_len`: `1`</p> |
+
 ### <a name="ttn.lorawan.v3.ClaimEndDeviceRequest">Message `ClaimEndDeviceRequest`</a>
 
 | Field | Type | Label | Description |
@@ -1587,13 +1602,17 @@ PeerInfo
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| `Claim` | [`ClaimEndDeviceRequest`](#ttn.lorawan.v3.ClaimEndDeviceRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Claims the end device by claim authentication code or QR code and transfers the device to the target application. |
+| `Claim` | [`ClaimEndDeviceRequest`](#ttn.lorawan.v3.ClaimEndDeviceRequest) | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | Claims the end device by claim authentication code or QR code and transfers the device to the target application. |
+| `AuthorizeApplication` | [`AuthorizeApplicationRequest`](#ttn.lorawan.v3.AuthorizeApplicationRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) |  |
+| `UnauthorizeApplication` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) |  |
 
 #### HTTP bindings
 
 | Method Name | Method | Pattern | Body |
 | ----------- | ------ | ------- | ---- |
 | `Claim` | `POST` | `/api/v3/edcs/claim` | `*` |
+| `AuthorizeApplication` | `POST` | `/api/v3/edcs/applications/{application_ids.application_id}/authorize` | `*` |
+| `UnauthorizeApplication` | `DELETE` | `/api/v3/edcs/applications/{application_id}/authorize` |  |
 
 ## <a name="lorawan-stack/api/end_device.proto">File `lorawan-stack/api/end_device.proto`</a>
 
