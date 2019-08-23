@@ -30,33 +30,41 @@ import (
 )
 
 func TestValidatePasswordStrength(t *testing.T) {
-	a := assertions.New(t)
+	for p, ok := range map[string]bool{
+		"āA0$": false, // Too short
+		strings.Repeat("āaaAAA➉23!@#aaaAAA12aaaAAA123!@#aaaAAA12aaaAAA123!@#aaaAAA12aaaAAA123!@#aaaAAA12aaaAAA123!@#aaaAAA12aaa", 10): false, // Too long.
+		"āaabbb➉23":    false, // No uppercase and special characters.
+		"āaabbb➉AA":    false, // No digits and special characters.
+		"āaabbb➉@#":    false, // No digits and uppercase characters.
+		"āaa123➉@#":    false, // No uppercase characters.
+		"āaaAAA➉@#":    false, // No digits.
+		"āaaAAA➉23":    false, // No special characters.
+		"āaaAAA123!@#": true,
+		"       1A":    true,
+		"āaa	AAA123 ": true,
+		"āaaAAA123 ": true,
+	} {
+		t.Run(p, func(t *testing.T) {
+			a := assertions.New(t)
 
-	testWithIdentityServer(t, func(is *IdentityServer, _ *grpc.ClientConn) {
-		conf := *is.config
-		conf.UserRegistration.PasswordRequirements.MinLength = 8
-		conf.UserRegistration.PasswordRequirements.MaxLength = 1000
-		conf.UserRegistration.PasswordRequirements.MinUppercase = 1
-		conf.UserRegistration.PasswordRequirements.MinDigits = 1
-		conf.UserRegistration.PasswordRequirements.MinSpecial = 1
-		ctx := context.WithValue(is.Context(), ctxKey, &conf)
+			testWithIdentityServer(t, func(is *IdentityServer, _ *grpc.ClientConn) {
+				conf := *is.config
+				conf.UserRegistration.PasswordRequirements.MinLength = 8
+				conf.UserRegistration.PasswordRequirements.MaxLength = 1000
+				conf.UserRegistration.PasswordRequirements.MinUppercase = 1
+				conf.UserRegistration.PasswordRequirements.MinDigits = 1
+				conf.UserRegistration.PasswordRequirements.MinSpecial = 1
+				ctx := context.WithValue(is.Context(), ctxKey, &conf)
 
-		for p, ok := range map[string]bool{
-			"aA0$": false, // Fails minimum length check.
-			strings.Repeat("aaaAAA123!@#aaaAAA12aaaAAA123!@#aaaAAA12aaaAAA123!@#aaaAAA12aaaAAA123!@#aaaAAA12aaaAAA123!@#aaaAAA12aaa", 10): false, // Fails maximum length check.
-			"aaa123!@#":    false, // Fails uppercase check.
-			"aaaAAA!@#":    false, // Fails digits check.
-			"aaaAAA123":    false, // Fails special check.
-			"aaaAAA123!@#": true,
-		} {
-			err := is.validatePasswordStrength(ctx, p)
-			if ok {
-				a.So(err, should.BeNil)
-			} else {
-				a.So(err, should.NotBeNil)
-			}
-		}
-	})
+				err := is.validatePasswordStrength(ctx, p)
+				if ok {
+					a.So(err, should.BeNil)
+				} else {
+					a.So(err, should.NotBeNil)
+				}
+			})
+		})
+	}
 }
 
 func TestTemporaryValidPassword(t *testing.T) {

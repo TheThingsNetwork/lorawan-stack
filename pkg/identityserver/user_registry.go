@@ -20,6 +20,7 @@ import (
 	"runtime/trace"
 	"strings"
 	"time"
+	"unicode"
 
 	"github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
@@ -77,11 +78,11 @@ func (is *IdentityServer) validatePasswordStrength(ctx context.Context, password
 	var uppercase, digits, special int
 	for _, r := range password {
 		switch {
-		case r >= 'A' && r <= 'Z':
+		case unicode.IsUpper(r):
 			uppercase++
-		case r >= '0' && r <= '9':
+		case unicode.IsDigit(r):
 			digits++
-		case r == '!' || r == '%' || r == '@' || r == '#' || r == '$' || r == '&' || r == '*':
+		case !unicode.IsLetter(r) && !unicode.IsNumber(r):
 			special++
 		}
 	}
