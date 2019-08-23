@@ -4,9 +4,15 @@ description: ""
 weight: 1
 ---
 
-## CLI and stack
+## Preparation
 
-The command-line interface (CLI) allows you to manage all features of The Things Stack. The web interface (Console) supports most actions, however, for some actions, you need to use the CLI.
+Since we're going to install The Things Stack using Docker and Docker Compose, follow the guides to [install Docker](https://docs.docker.com/install/#supported-platforms) and to [install Docker Compose](https://docs.docker.com/compose/install/#install-compose).
+
+Most releases contain an example `docker-compose.yml` file. You can also find this file in the Github repository of The Things Stack. In this guide we'll use that example `docker-compose.yml` for our deployment.
+
+## Command-line Interface (optional)
+
+Although the web interface of The Things Stack (the Console) currently has support for all basic features of The Things Stack, for some actions, you need to use the command-line interface (CLI). The CLI allows you to manage all features of The Things Stack.
 
 You can use the CLI on your local machine and on the server.
 
@@ -29,4 +35,4 @@ $ sudo snap alias ttn-lw-stack.ttn-lw-cli ttn-lw-cli
 
 ### Binaries
 
-If your operating system or package manager is not mentioned, please [download binaries](https://github.com/TheThingsNetwork/lorawan-stack/releases) for your operating system and processor architecture.
+You can download [pre-built binaries](https://github.com/TheThingsNetwork/lorawan-stack/releases) for your operating system and processor architecture.
