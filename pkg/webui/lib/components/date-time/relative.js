@@ -31,10 +31,11 @@ const RelativeTime = function(props) {
         const from = new Date(dateTime)
         const to = new Date()
 
-        const delta = computeDelta(from, to) - Math.floor(Math.random(10) * 10)
+        const delta = computeDelta(from, to)
 
         return (
           <FormattedRelativeTime
+            key={dateTime}
             value={delta}
             numeric="auto"
             updateIntervalInSeconds={updateIntervalInSeconds}
