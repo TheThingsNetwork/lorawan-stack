@@ -188,6 +188,7 @@ export default {
         VERSION: version,
       }),
       new webpack.DefinePlugin({
+        'process.predefined.DEFAULT_MESSAGES_LOCALE': JSON.stringify(DEFAULT_LOCALE),
         'process.predefined.DEFAULT_MESSAGES': JSON.stringify({
           ...require(`${src}/locales/${DEFAULT_LOCALE}`),
           ...require(`${src}/locales/.backend/${DEFAULT_LOCALE}`),
