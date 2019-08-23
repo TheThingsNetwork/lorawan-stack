@@ -1010,6 +1010,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	}
 
 	req := &ttnpb.JoinRequest{
+		Payload:            up.Payload,
 		CFList:             frequencyplans.CFList(*fp, dev.LoRaWANPHYVersion),
 		CorrelationIDs:     events.CorrelationIDsFromContext(ctx),
 		DevAddr:            devAddr,
