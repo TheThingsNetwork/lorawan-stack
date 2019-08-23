@@ -12,12 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package fetch
+package fetch_test
 
-import "fmt"
+import (
+	"fmt"
+
+	"go.thethings.network/lorawan-stack/pkg/fetch"
+)
 
 func Example() {
-	fetcher := FromHTTP("http://webserver.thethings.network/repository", true)
+	fetcher := fetch.FromHTTP("http://webserver.thethings.network/repository", true)
 	content, err := fetcher.File("README.md")
 	if err != nil {
 		panic(err)
