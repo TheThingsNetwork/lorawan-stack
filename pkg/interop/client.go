@@ -21,6 +21,8 @@ import (
 	"crypto/x509"
 	"encoding/json"
 	"fmt"
+	"io"
+	"io/ioutil"
 	"net/http"
 	"path/filepath"
 	"sort"
@@ -31,6 +33,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/fetch"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	yaml "gopkg.in/yaml.v2"
@@ -146,18 +149,40 @@ type joinServerHTTPClient struct {
 	Protocol       JoinServerProtocol
 }
 
-func (cl joinServerHTTPClient) exchange(joinEUI types.EUI64, req, res interface{}) error {
+func (cl joinServerHTTPClient) exchange(ctx context.Context, joinEUI types.EUI64, req, res interface{}) error {
+	logger := log.FromContext(ctx)
+
 	httpReq, err := cl.NewRequestFunc(joinEUI, req)
 	if err != nil {
 		return err
 	}
+	httpReq = httpReq.WithContext(ctx)
+	logger = logger.WithField("url", httpReq.URL)
 
+	logger.Debug("Send interop HTTP request")
 	httpRes, err := cl.Client.Do(httpReq)
 	if err != nil {
 		return err
 	}
 	defer httpRes.Body.Close()
-	return json.NewDecoder(httpRes.Body).Decode(res)
+
+	logger = logger.WithField("http_code", httpRes.StatusCode)
+	logger.Debug("Receive interop HTTP response")
+
+	b, err := ioutil.ReadAll(httpRes.Body)
+	if err != nil {
+		if err == io.EOF && res == nil {
+			return nil
+		}
+		logger.WithError(err).Warn("Failed to read HTTP response body")
+		return errors.FromHTTPStatusCode(httpRes.StatusCode)
+	}
+
+	if err := json.Unmarshal(b, res); err != nil {
+		logger.WithError(err).Warn("Failed to decode HTTP response body")
+		return errors.FromHTTPStatusCode(httpRes.StatusCode)
+	}
+	return nil
 }
 
 func parseResult(r Result) error {
@@ -175,7 +200,7 @@ func parseResult(r Result) error {
 // GetAppSKey performs AppSKey request according to LoRaWAN Backend Interfaces specification.
 func (cl joinServerHTTPClient) GetAppSKey(ctx context.Context, asID string, req *ttnpb.SessionKeyRequest) (*ttnpb.AppSKeyResponse, error) {
 	interopAns := &AppSKeyAns{}
-	if err := cl.exchange(req.JoinEUI, &AppSKeyReq{
+	if err := cl.exchange(ctx, req.JoinEUI, &AppSKeyReq{
 		AsJsMessageHeader: AsJsMessageHeader{
 			MessageHeader: MessageHeader{
 				ProtocolVersion: cl.Protocol.BackendInterfacesVersion(),
@@ -219,7 +244,7 @@ func (cl joinServerHTTPClient) HandleJoinRequest(ctx context.Context, netID type
 	}
 
 	interopAns := &JoinAns{}
-	if err := cl.exchange(pld.JoinEUI, &JoinReq{
+	if err := cl.exchange(ctx, pld.JoinEUI, &JoinReq{
 		NsJsMessageHeader: NsJsMessageHeader{
 			MessageHeader: MessageHeader{
 				ProtocolVersion: cl.Protocol.BackendInterfacesVersion(),
