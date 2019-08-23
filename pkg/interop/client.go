@@ -22,7 +22,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"path/filepath"
 	"sort"
+	"strings"
 	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/config"
@@ -360,7 +362,10 @@ func NewClient(ctx context.Context, conf config.InteropClient, fallbackTLS *tls.
 
 	jss := make([]prefixJoinServerClient, 0, len(yamlConf.JoinServers))
 	for _, jsConf := range yamlConf.JoinServers {
-		jsFileBytes, err := fetcher.File(jsConf.File)
+		jsConfEls := strings.Split(filepath.ToSlash(jsConf.File), "/")
+
+		fetcher := fetch.WithBasePath(fetcher, jsConfEls[:len(jsConfEls)-1]...)
+		jsFileBytes, err := fetcher.File(jsConfEls[len(jsConfEls)-1])
 		if err != nil {
 			return nil, err
 		}
