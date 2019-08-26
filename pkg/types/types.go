@@ -16,10 +16,10 @@
 package types
 
 import (
-	"go.thethings.network/lorawan-stack/pkg/errors"
-
 	"bytes"
 	"encoding/hex"
+
+	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 // Interface all types in pkg/types must implement.

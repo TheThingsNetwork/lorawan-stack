@@ -15,13 +15,13 @@
 package types
 
 import (
-	"go.thethings.network/lorawan-stack/pkg/errors"
-
 	"encoding/binary"
 	"encoding/hex"
 	"fmt"
 	"strconv"
 	"strings"
+
+	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 // DevAddr is a 32-bit LoRaWAN device address.
