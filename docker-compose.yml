@@ -79,12 +79,12 @@ services:
       # - TTN_LW_IS_DATABASE_URI=postgres://root@postgres:5432/${DEV_DATABASE_NAME:-ttn_lorawan}?sslmode=disable
       - TTN_LW_REDIS_ADDRESS=redis:6379
 
-      # Let's Encrypt for "your.thethingsstack.io":
+      # Let's Encrypt for "thethings.example.com":
       # - TTN_LW_TLS_ACME_ENABLE=true
       # - TTN_LW_TLS_ACME_DIR=/var/lib/acme
-      # - TTN_LW_TLS_ACME_EMAIL=you@your.thethingsstack.io
-      # - TTN_LW_TLS_ACME_HOSTS=your.thethingsstack.io
-      # - TTN_LW_TLS_ACME_DEFAULT_HOST=your.thethingsstack.io
+      # - TTN_LW_TLS_ACME_EMAIL=you@thethings.example.com
+      # - TTN_LW_TLS_ACME_HOSTS=thethings.example.com
+      # - TTN_LW_TLS_ACME_DEFAULT_HOST=thethings.example.com
 
       # If using (self) signed certificates:
       - TTN_LW_TLS_CERTIFICATE=/run/secrets/cert.pem
@@ -97,11 +97,11 @@ services:
       - TTN_LW_HTTP_METRICS_PASSWORD # choose a password
       - TTN_LW_HTTP_PPROF_PASSWORD # choose a password
 
-      # Email configuration for "your.thethingsstack.io":
+      # Email configuration for "thethings.example.com":
       # - TTN_LW_IS_EMAIL_SENDER_NAME=The Things Stack
-      # - TTN_LW_IS_EMAIL_SENDER_ADDRESS=noreply@your.thethingsstack.io
-      # - TTN_LW_IS_EMAIL_NETWORK_CONSOLE_URL=https://your.thethingsstack.io/console
-      # - TTN_LW_IS_EMAIL_NETWORK_IDENTITY_SERVER_URL=https://your.thethingsstack.io/oauth
+      # - TTN_LW_IS_EMAIL_SENDER_ADDRESS=noreply@thethings.example.com
+      # - TTN_LW_IS_EMAIL_NETWORK_CONSOLE_URL=https://thethings.example.com/console
+      # - TTN_LW_IS_EMAIL_NETWORK_IDENTITY_SERVER_URL=https://thethings.example.com/oauth
 
       # If sending email with Sendgrid:
       # - TTN_LW_IS_EMAIL_PROVIDER=sendgrid
@@ -113,17 +113,17 @@ services:
       # - TTN_LW_IS_EMAIL_SMTP_USERNAME=enter username
       # - TTN_LW_IS_EMAIL_SMTP_PASSWORD=enter password
 
-      # Web UI configuration for "your.thethingsstack.io":
-      # - TTN_LW_IS_OAUTH_UI_CANONICAL_URL=https://your.thethingsstack.io/oauth"
-      # - TTN_LW_IS_OAUTH_UI_IS_BASE_URL=https://your.thethingsstack.io/api/v3"
-      # - TTN_LW_CONSOLE_OAUTH_AUTHORIZE_URL=https://your.thethingsstack.io/oauth/authorize
-      # - TTN_LW_CONSOLE_OAUTH_TOKEN_URL=https://your.thethingsstack.io/oauth/token
-      # - TTN_LW_CONSOLE_UI_CANONICAL_URL=https://your.thethingsstack.io/console
-      # - TTN_LW_CONSOLE_UI_AS_BASE_URL=https://your.thethingsstack.io/api/v3
-      # - TTN_LW_CONSOLE_UI_GS_BASE_URL=https://your.thethingsstack.io/api/v3
-      # - TTN_LW_CONSOLE_UI_IS_BASE_URL=https://your.thethingsstack.io/api/v3
-      # - TTN_LW_CONSOLE_UI_JS_BASE_URL=https://your.thethingsstack.io/api/v3
-      # - TTN_LW_CONSOLE_UI_NS_BASE_URL=https://your.thethingsstack.io/api/v3
+      # Web UI configuration for "thethings.example.com":
+      # - TTN_LW_IS_OAUTH_UI_CANONICAL_URL=https://thethings.example.com/oauth"
+      # - TTN_LW_IS_OAUTH_UI_IS_BASE_URL=https://thethings.example.com/api/v3"
+      # - TTN_LW_CONSOLE_OAUTH_AUTHORIZE_URL=https://thethings.example.com/oauth/authorize
+      # - TTN_LW_CONSOLE_OAUTH_TOKEN_URL=https://thethings.example.com/oauth/token
+      # - TTN_LW_CONSOLE_UI_CANONICAL_URL=https://thethings.example.com/console
+      # - TTN_LW_CONSOLE_UI_AS_BASE_URL=https://thethings.example.com/api/v3
+      # - TTN_LW_CONSOLE_UI_GS_BASE_URL=https://thethings.example.com/api/v3
+      # - TTN_LW_CONSOLE_UI_IS_BASE_URL=https://thethings.example.com/api/v3
+      # - TTN_LW_CONSOLE_UI_JS_BASE_URL=https://thethings.example.com/api/v3
+      # - TTN_LW_CONSOLE_UI_NS_BASE_URL=https://thethings.example.com/api/v3
 
       # Console OAuth client and secret:
       - TTN_LW_CONSOLE_OAUTH_CLIENT_ID=console

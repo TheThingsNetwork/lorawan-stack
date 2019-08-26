@@ -16,19 +16,19 @@ $ ttn-lw-cli applications webhooks get-formats
 
 The `json` formatter uses the same format as the [MQTT server]({{< relref "../mqtt" >}}).
 
-Creating a webhook requires you to have an HTTP(S) endpoint available, in this example `https://example.com/lorahooks`:
+Creating a webhook requires you to have an HTTP(S) endpoint available, in this example `https://app.example.com/lorahooks`:
 
 ```bash
 $ ttn-lw-cli applications webhooks set \
   --application-id app1 \
   --webhook-id wh1 \
   --format json \
-  --base-url https://example.com/lorahooks \
+  --base-url https://app.example.com/lorahooks \
   --join-accept.path /join \
   --uplink-message.path /up
 ```
 
-This will create a webhook `wh1` for the application `app1` with JSON formatting. The paths are appended to the base URL. So, the Application Server will perform `POST` requests on the endpoint `https://example.com/lorahooks/join` for join-accepts and `https://example.com/lorahooks/up` for uplink messages.
+This will create a webhook `wh1` for the application `app1` with JSON formatting. The paths are appended to the base URL. So, the Application Server will perform `POST` requests on the endpoint `https://app.example.com/lorahooks/join` for join-accepts and `https://app.example.com/lorahooks/up` for uplink messages.
 
 >Note: You can also specify URL paths for downlink events. See `ttn-lw-cli applications webhooks set --help` for more information.
 
@@ -55,7 +55,7 @@ The path are:
 For example:
 
 ```
-$ curl https://your.thethingsstack.io/api/v3/as/applications/app1/webhooks/wh1/devices/dev1/down/push \
+$ curl https://thethings.example.com/api/v3/as/applications/app1/webhooks/wh1/devices/dev1/down/push \
   -X POST \
   -H 'Authorization: Bearer NNSXS.VEEBURF3KR77ZR..' \
   --data '{"downlinks":[{"frm_payload":"vu8=","f_port":15,"priority":"NORMAL"}]}'

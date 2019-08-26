@@ -4,7 +4,7 @@ description: ""
 weight: 3
 ---
 
-The Things Stack can be started for development without passing any configuration. However, there are a number of things you need to configure for a production deployment. In this guide we'll set environment variables in the `docker-compose.yml` file to configure The Things Stack as a private deployment on `your.thethingsstack.io`.
+The Things Stack can be started for development without passing any configuration. However, there are a number of things you need to configure for a production deployment. In this guide we'll set environment variables in the `docker-compose.yml` file to configure The Things Stack as a private deployment on `thethings.example.com`.
 
 ## Databases
 
@@ -79,14 +79,14 @@ TTN_LW_IS_DATABASE_URI=postgres://root@cockroach:26257/ttn_lorawan?sslmode=disab
 TTN_LW_REDIS_ADDRESS=redis:6379
 ```
 
-Then we'll configure TLS with Let's Encrypt. Since we're deploying The Things Stack on `your.thethingsstack.io`, we configure it to only request certificates for that host, and to also use it as the default host.
+Then we'll configure TLS with Let's Encrypt. Since we're deploying The Things Stack on `thethings.example.com`, we configure it to only request certificates for that host, and to also use it as the default host.
 
 ```
 TTN_LW_TLS_ACME_ENABLE=true
 TTN_LW_TLS_ACME_DIR=/var/lib/acme
 TTN_LW_TLS_ACME_EMAIL=your@email.com
-TTN_LW_TLS_ACME_HOSTS=your.thethingsstack.io
-TTN_LW_TLS_ACME_DEFAULT_HOST=your.thethingsstack.io
+TTN_LW_TLS_ACME_HOSTS=thethings.example.com
+TTN_LW_TLS_ACME_DEFAULT_HOST=thethings.example.com
 ```
 
 Next, we'll configure the HTTP server with keys for encrypting and verifying cookies, and with passwords for endpoints that you may want to keep for internal use.
@@ -102,9 +102,9 @@ The Things Stack sends emails to users, so we need to configure how those are se
 
 ```
 TTN_LW_IS_EMAIL_SENDER_NAME=The Things Stack
-TTN_LW_IS_EMAIL_SENDER_ADDRESS=noreply@your.thethingsstack.io
-TTN_LW_IS_EMAIL_NETWORK_CONSOLE_URL=https://your.thethingsstack.io/console
-TTN_LW_IS_EMAIL_NETWORK_IDENTITY_SERVER_URL=https://your.thethingsstack.io/oauth
+TTN_LW_IS_EMAIL_SENDER_ADDRESS=noreply@thethings.example.com
+TTN_LW_IS_EMAIL_NETWORK_CONSOLE_URL=https://thethings.example.com/console
+TTN_LW_IS_EMAIL_NETWORK_IDENTITY_SERVER_URL=https://thethings.example.com/oauth
 ```
 
 You can either use Sendgrid or an SMTP server. If you don't set up an email provider, The Things Stack will print emails to the server log.
@@ -123,21 +123,21 @@ TTN_LW_IS_EMAIL_SMTP_USERNAME=enter username
 TTN_LW_IS_EMAIL_SMTP_PASSWORD=enter password
 ```
 
-Finally, we need to configure the Web UI to use `your.thethingsstack.io`.
+Finally, we need to configure the Web UI to use `thethings.example.com`.
 
 ```
-TTN_LW_IS_OAUTH_UI_CANONICAL_URL=https://your.thethingsstack.io/oauth
-TTN_LW_IS_OAUTH_UI_IS_BASE_URL=https://your.thethingsstack.io/api/v3
+TTN_LW_IS_OAUTH_UI_CANONICAL_URL=https://thethings.example.com/oauth
+TTN_LW_IS_OAUTH_UI_IS_BASE_URL=https://thethings.example.com/api/v3
 
-TTN_LW_CONSOLE_OAUTH_AUTHORIZE_URL=https://your.thethingsstack.io/oauth/authorize
-TTN_LW_CONSOLE_OAUTH_TOKEN_URL=https://your.thethingsstack.io/oauth/token
+TTN_LW_CONSOLE_OAUTH_AUTHORIZE_URL=https://thethings.example.com/oauth/authorize
+TTN_LW_CONSOLE_OAUTH_TOKEN_URL=https://thethings.example.com/oauth/token
 
-TTN_LW_CONSOLE_UI_CANONICAL_URL=https://your.thethingsstack.io/console
-TTN_LW_CONSOLE_UI_AS_BASE_URL=https://your.thethingsstack.io/api/v3
-TTN_LW_CONSOLE_UI_GS_BASE_URL=https://your.thethingsstack.io/api/v3
-TTN_LW_CONSOLE_UI_IS_BASE_URL=https://your.thethingsstack.io/api/v3
-TTN_LW_CONSOLE_UI_JS_BASE_URL=https://your.thethingsstack.io/api/v3
-TTN_LW_CONSOLE_UI_NS_BASE_URL=https://your.thethingsstack.io/api/v3
+TTN_LW_CONSOLE_UI_CANONICAL_URL=https://thethings.example.com/console
+TTN_LW_CONSOLE_UI_AS_BASE_URL=https://thethings.example.com/api/v3
+TTN_LW_CONSOLE_UI_GS_BASE_URL=https://thethings.example.com/api/v3
+TTN_LW_CONSOLE_UI_IS_BASE_URL=https://thethings.example.com/api/v3
+TTN_LW_CONSOLE_UI_JS_BASE_URL=https://thethings.example.com/api/v3
+TTN_LW_CONSOLE_UI_NS_BASE_URL=https://thethings.example.com/api/v3
 
 TTN_LW_CONSOLE_OAUTH_CLIENT_ID=console
 TTN_LW_CONSOLE_OAUTH_CLIENT_SECRET=choose or generate a secret
@@ -147,15 +147,15 @@ You will need the `TTN_LW_CONSOLE_OAUTH_CLIENT_SECRET` again in a later step.
 
 ## Command-line interface
 
-The command-line interface is configured to connect to `localhost` by default. In order to make it connect to `your.thethingsstack.io`, you need to configure it with a configuration file. The recommended way to configure the CLI is with a `.ttn-lw-cli.yml` in your `$XDG_CONFIG_HOME` or `$HOME` directory. You can also put the config file in a different location, and pass it to the CLI as `-c path/to/config.yml`. Your config file should look like this:
+The command-line interface is configured to connect to `localhost` by default. In order to make it connect to `thethings.example.com`, you need to configure it with a configuration file. The recommended way to configure the CLI is with a `.ttn-lw-cli.yml` in your `$XDG_CONFIG_HOME` or `$HOME` directory. You can also put the config file in a different location, and pass it to the CLI as `-c path/to/config.yml`. Your config file should look like this:
 
 ```yml
-oauth-server-address: https://your.thethingsstack.io/oauth
+oauth-server-address: https://thethings.example.com/oauth
 
-identity-server-grpc-address: your.thethingsstack.io:8884
-gateway-server-grpc-address: your.thethingsstack.io:8884
-network-server-grpc-address: your.thethingsstack.io:8884
-application-server-grpc-address: your.thethingsstack.io:8884
-join-server-grpc-address: your.thethingsstack.io:8884
-device-template-converter-grpc-address: your.thethingsstack.io:8884
+identity-server-grpc-address: thethings.example.com:8884
+gateway-server-grpc-address: thethings.example.com:8884
+network-server-grpc-address: thethings.example.com:8884
+application-server-grpc-address: thethings.example.com:8884
+join-server-grpc-address: thethings.example.com:8884
+device-template-converter-grpc-address: thethings.example.com:8884
 ```

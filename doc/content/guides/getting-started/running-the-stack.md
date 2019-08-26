@@ -48,7 +48,7 @@ $ docker-compose run --rm stack is-db create-oauth-client \
   --name "Console" \
   --owner admin \
   --secret the secret you generated before \
-  --redirect-uri 'https://your.thethingsstack.io/console/oauth/callback' \
+  --redirect-uri 'https://thethings.example.com/console/oauth/callback' \
   --redirect-uri '/console/oauth/callback'
 ```
 
