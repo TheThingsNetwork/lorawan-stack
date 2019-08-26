@@ -20,9 +20,13 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/config"
 	. "go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
+
+var _ config.Configurable = &DevAddrPrefix{}
+var _ config.Stringer = DevAddrPrefix{}
 
 func TestDevAddr(t *testing.T) {
 	for _, tc := range []struct {
@@ -215,6 +219,32 @@ func ExampleDevAddrPrefix_Matches() {
 }
 
 func TestDevAddrPrefix_UnmarshalText(t *testing.T) {
+	a := assertions.New(t)
+
+	var prefix DevAddrPrefix
+
+	err := prefix.UnmarshalText([]byte("26000000/7"))
+	a.So(err, should.BeNil)
+	a.So(prefix.DevAddr, should.Equal, DevAddr{0x26, 0x00, 0x00, 0x00})
+	a.So(prefix.Length, should.Equal, 7)
+
+	err = prefix.UnmarshalText([]byte("27000000/0"))
+	a.So(err, should.BeNil)
+	a.So(prefix.DevAddr, should.Equal, DevAddr{0x27, 0x00, 0x00, 0x00})
+	a.So(prefix.Length, should.Equal, 0)
+
+	err = prefix.UnmarshalText([]byte("27000000/32"))
+	a.So(err, should.BeNil)
+	a.So(prefix.DevAddr, should.Equal, DevAddr{0x27, 0x00, 0x00, 0x00})
+	a.So(prefix.Length, should.Equal, 32)
+
+	err = prefix.UnmarshalText([]byte("01000000/7"))
+	a.So(err, should.BeNil)
+	a.So(prefix.DevAddr, should.Equal, DevAddr{0x01, 0x00, 0x00, 0x00})
+	a.So(prefix.Length, should.Equal, 7)
+}
+
+func TestDevAddrPrefix_UnmarshalConfigString(t *testing.T) {
 	a := assertions.New(t)
 
 	var prefix DevAddrPrefix

@@ -19,9 +19,13 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/config"
 	. "go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
+
+var _ config.Configurable = &EUI64Prefix{}
+var _ config.Stringer = EUI64Prefix{}
 
 func TestEUI64(t *testing.T) {
 	a := assertions.New(t)

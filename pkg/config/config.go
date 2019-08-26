@@ -126,7 +126,7 @@ var DefaultOptions = []Option{
 //                                           VAR="k=0x01 q=0x02" or --var k=0x01 --var q=0x02
 //     map[string][]string                 Parsed by key=val pairs where keys are repeated
 //                                           VAR="k=v1 k=v2 q=r" or --var k=v1 --var k=v2 --var q=r
-//     Configurable                        Parsed by the FromConfigString method
+//     Configurable                        Parsed by the UnmarshalConfigString method
 //     structs with fields of these types  The nested config names will be prefixed by the name of this struct, unless it is `name:",squash"`
 //                                         in which case the names are merged into the parent struct.
 func Initialize(name, envPrefix string, defaults interface{}, opts ...Option) *Manager {
@@ -287,8 +287,8 @@ func (m *Manager) UnmarshalKey(key string, raw interface{}) error {
 // For instance, to parse a log level from the strings "fatal", "error", etc into a custom
 // enum for log levels.
 type Configurable interface {
-	// FromConfigString parses a string into the config variable
-	FromConfigString(string) (interface{}, error)
+	// UnmarshalConfigString parses a string into the config variable
+	UnmarshalConfigString(string) error
 }
 
 // Stringer is the interface for config variables that have a custom string representation.
