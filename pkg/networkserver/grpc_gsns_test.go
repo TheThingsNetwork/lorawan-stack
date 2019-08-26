@@ -502,7 +502,7 @@ func TestHandleUplink(t *testing.T) {
 		Response chan<- *pbtypes.Empty
 	}
 
-	var errTest = errors.New("testError")
+	errTest := errors.New("testError")
 
 	for _, tc := range []struct {
 		Name    string
@@ -826,6 +826,7 @@ func TestHandleUplink(t *testing.T) {
 								DevAddr:            req.DevAddr,
 								NetID:              netID,
 								RawPayload:         msg.RawPayload,
+								Payload:            makeJoinRequest(true).Payload,
 								RxDelay:            ttnpb.RX_DELAY_3,
 								SelectedMACVersion: ttnpb.MAC_V1_0_2,
 							})
@@ -929,6 +930,7 @@ func TestHandleUplink(t *testing.T) {
 								},
 								NetID:              netID,
 								RawPayload:         msg.RawPayload,
+								Payload:            makeJoinRequest(true).Payload,
 								RxDelay:            ttnpb.RX_DELAY_3,
 								SelectedMACVersion: ttnpb.MAC_V1_1,
 							})
@@ -1039,6 +1041,7 @@ func TestHandleUplink(t *testing.T) {
 								DevAddr:            req.DevAddr,
 								NetID:              netID,
 								RawPayload:         msg.RawPayload,
+								Payload:            makeJoinRequest(true).Payload,
 								RxDelay:            ttnpb.RX_DELAY_3,
 								SelectedMACVersion: ttnpb.MAC_V1_0_3,
 							})
@@ -1151,6 +1154,7 @@ func TestHandleUplink(t *testing.T) {
 								},
 								NetID:              netID,
 								RawPayload:         msg.RawPayload,
+								Payload:            makeJoinRequest(true).Payload,
 								RxDelay:            ttnpb.RX_DELAY_3,
 								SelectedMACVersion: ttnpb.MAC_V1_1,
 							})
@@ -1270,6 +1274,7 @@ func TestHandleUplink(t *testing.T) {
 								},
 								NetID:              netID,
 								RawPayload:         msg.RawPayload,
+								Payload:            makeJoinRequest(true).Payload,
 								RxDelay:            ttnpb.RX_DELAY_3,
 								SelectedMACVersion: ttnpb.MAC_V1_1,
 							})
@@ -1485,6 +1490,7 @@ func TestHandleUplink(t *testing.T) {
 								DevAddr:            req.DevAddr,
 								NetID:              netID,
 								RawPayload:         msg.RawPayload,
+								Payload:            makeJoinRequest(true).Payload,
 								RxDelay:            ttnpb.RX_DELAY_3,
 								SelectedMACVersion: ttnpb.MAC_V1_0_2,
 							})
@@ -1668,6 +1674,7 @@ func TestHandleUplink(t *testing.T) {
 								},
 								NetID:              netID,
 								RawPayload:         msg.RawPayload,
+								Payload:            makeJoinRequest(true).Payload,
 								RxDelay:            ttnpb.RX_DELAY_3,
 								SelectedMACVersion: ttnpb.MAC_V1_1,
 							})
@@ -1884,6 +1891,7 @@ func TestHandleUplink(t *testing.T) {
 								DevAddr:            req.DevAddr,
 								NetID:              netID,
 								RawPayload:         msg.RawPayload,
+								Payload:            makeJoinRequest(true).Payload,
 								RxDelay:            ttnpb.RX_DELAY_3,
 								SelectedMACVersion: ttnpb.MAC_V1_0_2,
 							})
@@ -2103,6 +2111,7 @@ func TestHandleUplink(t *testing.T) {
 								},
 								NetID:              netID,
 								RawPayload:         msg.RawPayload,
+								Payload:            makeJoinRequest(true).Payload,
 								RxDelay:            ttnpb.RX_DELAY_3,
 								SelectedMACVersion: ttnpb.MAC_V1_1,
 							})

@@ -929,8 +929,8 @@ func (ns *NetworkServer) sendJoinRequest(ctx context.Context, ids ttnpb.EndDevic
 			logger.Debug("Join-request accepted by cluster-local Join Server")
 			return resp, nil
 		}
+		logger.WithError(err).Info("Cluster-local Join Server did not accept join-request")
 		if !errors.IsNotFound(err) {
-			logger.WithError(err).Warn("Cluster-local Join Server did not accept join-request")
 			return nil, err
 		}
 	}
@@ -940,8 +940,8 @@ func (ns *NetworkServer) sendJoinRequest(ctx context.Context, ids ttnpb.EndDevic
 			logger.Debug("Join-request accepted by interop Join Server")
 			return resp, nil
 		}
+		logger.WithError(err).Warn("Interop Join Server did not accept join-request")
 		if !errors.IsNotFound(err) {
-			logger.WithError(err).Warn("Interop Join Server did not accept join-request")
 			return nil, err
 		}
 	}
@@ -1010,6 +1010,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	}
 
 	req := &ttnpb.JoinRequest{
+		Payload:            up.Payload,
 		CFList:             frequencyplans.CFList(*fp, dev.LoRaWANPHYVersion),
 		CorrelationIDs:     events.CorrelationIDsFromContext(ctx),
 		DevAddr:            devAddr,

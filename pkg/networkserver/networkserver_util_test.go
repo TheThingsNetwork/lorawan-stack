@@ -660,6 +660,7 @@ type NsJsHandleJoinResponse struct {
 	Response *ttnpb.JoinResponse
 	Error    error
 }
+
 type NsJsHandleJoinRequest struct {
 	Context  context.Context
 	Message  *ttnpb.JoinRequest
@@ -721,6 +722,7 @@ type NsGsScheduleDownlinkResponse struct {
 	Response *ttnpb.ScheduleDownlinkResponse
 	Error    error
 }
+
 type NsGsScheduleDownlinkRequest struct {
 	Context  context.Context
 	Message  *ttnpb.DownlinkMessage

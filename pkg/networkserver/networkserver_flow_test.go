@@ -312,6 +312,16 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 				a.So(req.DevAddr.NwkID(), should.Resemble, netID.ID()) &&
 				a.So(req.DevAddr.NetIDType(), should.Equal, netID.Type()) &&
 				a.So(req, should.Resemble, &ttnpb.JoinRequest{
+					Payload: &ttnpb.Message{
+						Payload: &ttnpb.Message_JoinRequestPayload{
+							JoinRequestPayload: &ttnpb.JoinRequestPayload{
+								JoinEUI:  types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+								DevEUI:   types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+								DevNonce: [2]byte{0x00, 0x01},
+							},
+						},
+						MIC: []byte{3, 2, 1, 0},
+					},
 					RawPayload:         payload,
 					DevAddr:            req.DevAddr,
 					SelectedMACVersion: ttnpb.MAC_V1_0_2,

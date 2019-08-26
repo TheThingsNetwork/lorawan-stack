@@ -159,9 +159,9 @@ headers:
    TestHeader: baz`,
 					fqdn,
 					port,
-					RootCAPath,
-					ClientCertPath,
-					ClientKeyPath,
+					filepath.Join("..", RootCAPath),
+					filepath.Join("..", ClientCertPath),
+					filepath.Join("..", ClientKeyPath),
 				)), 0644))
 
 				test.MustMultiple(ioutil.WriteFile(js3Path, []byte(`dns: invalid.dns
@@ -271,9 +271,9 @@ headers:
    TestHeader: baz`,
 					fqdn,
 					port,
-					RootCAPath,
-					ClientCertPath,
-					ClientKeyPath,
+					filepath.Join("..", RootCAPath),
+					filepath.Join("..", ClientCertPath),
+					filepath.Join("..", ClientKeyPath),
 				)), 0644))
 
 				test.MustMultiple(ioutil.WriteFile(js3Path, []byte(`dns: invalid.dns
@@ -395,9 +395,9 @@ headers:
    TestHeader: baz`,
 					fqdn,
 					port,
-					RootCAPath,
-					ClientCertPath,
-					ClientKeyPath,
+					filepath.Join("..", RootCAPath),
+					filepath.Join("..", ClientCertPath),
+					filepath.Join("..", ClientKeyPath),
 				)), 0644))
 
 				test.MustMultiple(ioutil.WriteFile(js3Path, []byte(`dns: invalid.dns
@@ -524,9 +524,9 @@ headers:
    TestHeader: baz`,
 					fqdn,
 					port,
-					RootCAPath,
-					ClientCertPath,
-					ClientKeyPath,
+					filepath.Join("..", RootCAPath),
+					filepath.Join("..", ClientCertPath),
+					filepath.Join("..", ClientKeyPath),
 				)), 0644))
 
 				test.MustMultiple(ioutil.WriteFile(js3Path, []byte(`dns: invalid.dns
@@ -719,9 +719,9 @@ headers:
    TestHeader: baz`,
 					fqdn,
 					port,
-					RootCAPath,
-					ClientCertPath,
-					ClientKeyPath,
+					filepath.Join("..", RootCAPath),
+					filepath.Join("..", ClientCertPath),
+					filepath.Join("..", ClientKeyPath),
 				)), 0644))
 
 				test.MustMultiple(ioutil.WriteFile(js3Path, []byte(`dns: invalid.dns
@@ -862,9 +862,9 @@ headers:
    TestHeader: baz`,
 					fqdn,
 					port,
-					RootCAPath,
-					ClientCertPath,
-					ClientKeyPath,
+					filepath.Join("..", RootCAPath),
+					filepath.Join("..", ClientCertPath),
+					filepath.Join("..", ClientKeyPath),
 				)), 0644))
 
 				test.MustMultiple(ioutil.WriteFile(js3Path, []byte(`dns: invalid.dns

@@ -278,7 +278,8 @@ func TestAdaptDataRate(t *testing.T) {
 					{FCnt: 28, MaxSNR: -10, GtwDiversity: 2},
 					{FCnt: 29, MaxSNR: -10, GtwDiversity: 3},
 					{FCnt: 30, MaxSNR: -9, GtwDiversity: 3},
-					{FCnt: 31, MaxSNR: -7, GtwDiversity: 2,
+					{
+						FCnt: 31, MaxSNR: -7, GtwDiversity: 2,
 						TxSettings: ttnpb.TxSettings{
 							DataRate: ttnpb.DataRate{
 								Modulation: &ttnpb.DataRate_LoRa{

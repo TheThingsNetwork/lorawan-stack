@@ -12,21 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package fetch_test
+package fetch
 
-import (
-	"fmt"
+type basePathFetcher struct {
+	Interface
+	basePath []string
+}
 
-	"go.thethings.network/lorawan-stack/pkg/fetch"
-)
+func (f basePathFetcher) File(pathElements ...string) ([]byte, error) {
+	return f.Interface.File(append(f.basePath, pathElements...)...)
+}
 
-func Example() {
-	fetcher := fetch.FromHTTP("http://webserver.thethings.network/repository", true)
-	content, err := fetcher.File("README.md")
-	if err != nil {
-		panic(err)
+func WithBasePath(f Interface, basePath ...string) Interface {
+	return basePathFetcher{
+		Interface: f,
+		basePath:  append(basePath[:0:0], basePath...),
 	}
-
-	fmt.Println("Content of http://webserver.thethings.network/repository/README.md:")
-	fmt.Println(string(content))
 }
