@@ -31,4 +31,4 @@ $ chown 886:886 ./cert.pem ./key.pem
 
 ### Self-Signed Development Certificates
 
-For development deployments on `localhost` you can follow the steps in the `DEVELOPMENT.md` file in the Github repository of The Things Stack, but keep in mind that self-signed development certificates are not trusted by browsers and operating systems, resulting in warnings and errors such as `certificate signed by unknown authority` or `ERR_CERT_AUTHORITY_INVALID`. In most browsers you can add exceptions for your development certificate. You can configure the CLI to trust the certificate as well.
+It is possible to make The Things Stack use self-signed development certificates with similar configuration as you would have for custom certificates. Creating and trusting self-signed certificates is not covered by this guide.
