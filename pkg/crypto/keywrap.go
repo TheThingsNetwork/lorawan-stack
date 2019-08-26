@@ -42,7 +42,7 @@ func lsb(b [16]byte) (c [8]byte) { copy(c[:], b[8:]); return }
 var errInvalidKeyLength = errInvalidSize("key_length", "key length", "16, 24 or 32")
 
 // WrapKey implements the RFC 3394 Wrap algorithm
-func WrapKey(plaintext, kek []byte) (ciphertext []byte, err error) {
+func WrapKey(plaintext, kek []byte) ([]byte, error) {
 	length := len(plaintext)
 	if length%8 != 0 {
 		return nil, errInvalidKeyLength.WithAttributes("size", length)
@@ -78,7 +78,7 @@ func WrapKey(plaintext, kek []byte) (ciphertext []byte, err error) {
 	}
 
 	// Build the result
-	ciphertext = make([]byte, 0, 8*(n+1))
+	ciphertext := make([]byte, 0, 8*(n+1))
 	ciphertext = append(ciphertext, a[:]...)
 	for i := 0; i < n; i++ {
 		ciphertext = append(ciphertext, r[i][:]...)
@@ -90,7 +90,7 @@ func WrapKey(plaintext, kek []byte) (ciphertext []byte, err error) {
 var errCorruptKey = errors.DefineCorruption("corrupt_key", "corrupt key data")
 
 // UnwrapKey implements the RFC 3394 Unwrap algorithm
-func UnwrapKey(ciphertext, kek []byte) (plaintext []byte, err error) {
+func UnwrapKey(ciphertext, kek []byte) ([]byte, error) {
 	length := len(ciphertext)
 	if length%8 != 0 {
 		return nil, errInvalidKeyLength.WithAttributes("size", length)
@@ -132,7 +132,7 @@ func UnwrapKey(ciphertext, kek []byte) (plaintext []byte, err error) {
 	}
 
 	// Build the result
-	plaintext = make([]byte, 0, 8*n)
+	plaintext := make([]byte, 0, 8*n)
 	for i := 0; i < n; i++ {
 		plaintext = append(plaintext, r[i][:]...)
 	}

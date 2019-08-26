@@ -22,12 +22,12 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
-func encrypt(key types.AES128Key, dir uint8, addr types.DevAddr, fCnt uint32, payload []byte) (encrypted []byte, err error) {
+func encrypt(key types.AES128Key, dir uint8, addr types.DevAddr, fCnt uint32, payload []byte) ([]byte, error) {
 	k := len(payload) / aes.BlockSize
 	if len(payload)%aes.BlockSize != 0 {
 		k++
 	}
-	encrypted = make([]byte, 0, k*16)
+	encrypted := make([]byte, 0, k*16)
 	cipher, err := aes.NewCipher(key[:])
 	if err != nil {
 		panic(err) // types.AES128Key
@@ -83,7 +83,7 @@ func DecryptDownlink(key types.AES128Key, addr types.DevAddr, fCnt uint32, paylo
 	return encrypt(key, 1, addr, fCnt, payload)
 }
 
-func computeMIC(key types.AES128Key, dir uint8, confFCnt uint16, addr types.DevAddr, fCnt uint32, payload []byte) (mic [4]byte, err error) {
+func computeMIC(key types.AES128Key, dir uint8, confFCnt uint16, addr types.DevAddr, fCnt uint32, payload []byte) ([4]byte, error) {
 	hash, _ := cmac.New(key[:])
 	var b0 [aes.BlockSize]byte
 	b0[0] = 0x49
@@ -92,16 +92,17 @@ func computeMIC(key types.AES128Key, dir uint8, confFCnt uint16, addr types.DevA
 	copy(b0[6:10], reverse(addr[:]))
 	binary.LittleEndian.PutUint32(b0[10:14], fCnt)
 	b0[15] = uint8(len(payload))
-	_, err = hash.Write(b0[:])
+	_, err := hash.Write(b0[:])
 	if err != nil {
-		return
+		return [4]byte{}, err
 	}
 	_, err = hash.Write(payload)
 	if err != nil {
-		return
+		return [4]byte{}, err
 	}
+	var mic [4]byte
 	copy(mic[:], hash.Sum([]byte{}))
-	return
+	return mic, nil
 }
 
 // ComputeLegacyUplinkMIC computes the Uplink Message Integrity Code.
@@ -114,11 +115,12 @@ func ComputeLegacyUplinkMIC(key types.AES128Key, addr types.DevAddr, fCnt uint32
 // ComputeUplinkMIC computes the Uplink Message Integrity Code.
 // - The payload contains MHDR | FHDR | FPort | FRMPayload
 // - If this uplink has the ACK bit set, confFCnt must be set to the FCnt of the last downlink.
-func ComputeUplinkMIC(sNwkSIntKey, fNwkSIntKey types.AES128Key, confFCnt uint32, txDRIdx uint8, txChIdx uint8, addr types.DevAddr, fCnt uint32, payload []byte) (mic [4]byte, err error) {
+func ComputeUplinkMIC(sNwkSIntKey, fNwkSIntKey types.AES128Key, confFCnt uint32, txDRIdx uint8, txChIdx uint8, addr types.DevAddr, fCnt uint32, payload []byte) ([4]byte, error) {
 	m0, err := computeMIC(fNwkSIntKey, 0, 0, addr, fCnt, payload)
 	if err != nil {
-		return mic, err
+		return [4]byte{}, err
 	}
+	var mic [4]byte
 	copy(mic[2:], m0[:])
 	hash, _ := cmac.New(sNwkSIntKey[:])
 	var b0 [aes.BlockSize]byte
@@ -132,14 +134,14 @@ func ComputeUplinkMIC(sNwkSIntKey, fNwkSIntKey types.AES128Key, confFCnt uint32,
 	b0[15] = uint8(len(payload))
 	_, err = hash.Write(b0[:])
 	if err != nil {
-		return
+		return [4]byte{}, err
 	}
 	_, err = hash.Write(payload)
 	if err != nil {
-		return
+		return [4]byte{}, err
 	}
 	copy(mic[:2], hash.Sum([]byte{}))
-	return
+	return mic, nil
 }
 
 // ComputeLegacyDownlinkMIC computes the Downlink Message Integrity Code.
