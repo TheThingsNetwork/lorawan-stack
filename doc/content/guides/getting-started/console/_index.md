@@ -9,7 +9,7 @@ weight: 8
 
 ## Login
 
-The Console needs to be logged on in order to create gateways, applications, devices and API keys. With The Things Stack running, open http://localhost:1885 in your browser.
+The Console needs to be logged on in order to create gateways, applications, devices and API keys. With The Things Stack running, open `https://thethings.example.com` (replace with the URL of your deployment) in your browser.
 
 {{< figure src="front.png" alt="Front page" >}}
 

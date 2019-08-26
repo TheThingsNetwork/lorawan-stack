@@ -6,29 +6,29 @@ weight: 2
 
 ## Certificates
 
-By default, The Things Stack requires a `cert.pem` and `key.pem`, in order to to serve content over TLS.
+The Things Stack will be configured with Transport Layer Security (TLS) and HTTPS. This requires a TLS certificate and a corresponding key. In this guide we'll request a free, trusted certificate from [Let's Encrypt](https://letsencrypt.org/getting-started/), but if you already have a certificate (`cert.pem`) and key (`key.pem`), you can also use those.
 
-Typically you'll get these from a trusted Certificate Authority. Use the "full chain" for `cert.pem` and the "private key" for `key.pem`. The Things Stack also has support for automated certificate management (ACME). This allows you to easily get trusted TLS certificates for your server from [Let's Encrypt](https://letsencrypt.org/getting-started/). If you want this, you'll need to create an `acme` directory that The Things Stack can write in:
+### Automatic Certificate Management (ACME)
+
+For automatic certificates, we're going to need an `acme` directory where The Things Stack can store the certificate data:
 
 ```bash
 $ mkdir ./acme
 $ chown 886:886 ./acme
 ```
 
-> If you don't do this, you'll get an error saying something like `open /var/lib/acme/acme_account+key<...>: permission denied`.
+> `886` is the uid and the gid of the user that runs The Things Stack in the Docker container. If you don't set these permissions, you'll get an error saying something like `open /var/lib/acme/acme_account+key<...>: permission denied`.
 
-For local (development) deployments, you can generate self-signed certificates. If you have your [Go environment](../DEVELOPMENT.md#development-environment) set up, you can run the following command to generate a key and certificate for `localhost`:
+### Custom Certificates
 
-```bash
-$ go run $(go env GOROOT)/src/crypto/tls/generate_cert.go -ca -host localhost
-```
-
-In order for the user in our Docker container to read these files, you have to change the ownership of the certificate and key:
+If you want to use the certificate (`cert.pem`) and key (`key.pem`) that you already have, you also need to set these permissions.
 
 ```bash
 $ chown 886:886 ./cert.pem ./key.pem
 ```
 
-> If you don't do this, you'll get an error saying something like `/run/secrets/key.pem: permission denied`.
+> If you don't set these permissions, you'll get an error saying something like `/run/secrets/key.pem: permission denied`.
 
-Keep in mind that self-signed certificates are not trusted by browsers and operating systems, resulting in warnings and errors such as `certificate signed by unknown authority` or `ERR_CERT_AUTHORITY_INVALID`. In most browsers you can add an exception for your self-signed certificate. You can configure the CLI to trust the certificate as well.
+### Self-Signed Development Certificates
+
+It is possible to make The Things Stack use self-signed development certificates with similar configuration as you would have for custom certificates. Creating and trusting self-signed certificates is not covered by this guide.

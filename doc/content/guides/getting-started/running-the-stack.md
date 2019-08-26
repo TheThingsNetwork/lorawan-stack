@@ -4,16 +4,33 @@ description: ""
 weight: 4
 ---
 
-You can run The Things Stack using Docker or container orchestration solutions using Docker. An example [Docker Compose configuration](https://github.com/TheThingsNetwork/lorawan-stack/tree/master/docker-compose.yml) is available to get started quickly.
+Now that all configuration is done, we're ready to initialize The Things Stack and start it. Open a terminal prompt in the same directory as your `docker-compose.yml` file.
 
-With the `docker-compose.yml` file in the directory of your terminal prompt, enter the following commands to initialize the database, create the first user `admin`, create the CLI OAuth client and start The Things Stack:
+## Initialization
+
+The first time The Things Stack is started, it requires some initialization. We'll start by pulling the Docker images:
 
 ```bash
 $ docker-compose pull
+```
+
+Next, we need to initialize the database of the Identity Server:
+
+```bash
 $ docker-compose run --rm stack is-db init
+```
+
+We'll now create an initial `admin` user. Make sure to give it a good password.
+
+```bash
 $ docker-compose run --rm stack is-db create-admin-user \
   --id admin \
-  --email admin@localhost
+  --email your@email.com
+```
+
+Then we'll register the command-line interface as an OAuth client:
+
+```bash
 $ docker-compose run --rm stack is-db create-oauth-client \
   --id cli \
   --name "Command Line Interface" \
@@ -21,15 +38,28 @@ $ docker-compose run --rm stack is-db create-oauth-client \
   --no-secret \
   --redirect-uri 'local-callback' \
   --redirect-uri 'code'
+```
+
+We do the same for the console. For `--secret`, make sure to enter the same value as you set for `TTN_LW_CONSOLE_OAUTH_CLIENT_SECRET` in the [Configuration]({{< relref "configuration" >}}) step.
+
+```bash
 $ docker-compose run --rm stack is-db create-oauth-client \
   --id console \
   --name "Console" \
   --owner admin \
-  --secret console \
-  --redirect-uri 'https://localhost:8885/console/oauth/callback' \
-  --redirect-uri 'http://localhost:1885/console/oauth/callback' \
+  --secret the secret you generated before \
+  --redirect-uri 'https://thethings.example.com/console/oauth/callback' \
   --redirect-uri '/console/oauth/callback'
+```
+
+## Running The Things Stack
+
+Now it's time to start The Things Stack:
+
+```bash
 $ docker-compose up
 ```
 
-With The Things Stack up and running, it's time to connect gateways, create devices and work with streaming data. See [Command-line Interface]({{< relref "cli" >}}) to proceed.
+This will start the stack and print logs to your terminal. You can also start the stack in detached mode by adding `-d` to the command above. In that case you can get logs with [`docker-compose logs`](https://docs.docker.com/compose/reference/logs/).
+
+With The Things Stack up and running, it's time to connect gateways, create devices and work with streaming data. See [Console]({{< relref "console" >}}) or [Command-line Interface]({{< relref "cli" >}}) to proceed.

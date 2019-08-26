@@ -28,7 +28,7 @@ $ ttn-lw-cli user api-key create \
 With the created API key:
 
 ```
-$ curl http://localhost:1885/api/v3/events \
+$ curl https://thethings.example.com/api/v3/events \
   -X POST \
   -H 'Authorization: Bearer NNSXS.BR55PTYILPPVXY..' \
   --data '{"identifiers":[{"application_ids":{"application_id":"app1"}},{"gateway_ids":{"gateway_id":"gtw1"}}]}'
