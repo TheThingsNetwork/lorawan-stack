@@ -365,11 +365,12 @@ func (prefix *DevAddrPrefix) UnmarshalText(data []byte) error {
 	return nil
 }
 
+// UnmarshalConfigString implements the config.Configurable interface.
 func (prefix *DevAddrPrefix) UnmarshalConfigString(s string) error {
 	return prefix.UnmarshalText([]byte(s))
 }
 
-// ConfigString implements the config.Stringer interface
+// ConfigString implements the config.Stringer interface.
 func (prefix DevAddrPrefix) ConfigString() string {
 	return prefix.String()
 }

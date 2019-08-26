@@ -301,6 +301,10 @@ type Stringer interface {
 
 var configurableI = reflect.TypeOf((*Configurable)(nil)).Elem()
 
+func isConfigurableType(t reflect.Type) bool {
+	return t.Implements(configurableI) || reflect.PtrTo(t).Implements(configurableI)
+}
+
 func (m *Manager) setDefaults(prefix string, flags *pflag.FlagSet, config interface{}) {
 	configValue := reflect.ValueOf(config)
 	configKind := configValue.Type().Kind()
@@ -340,7 +344,7 @@ func (m *Manager) setDefaults(prefix string, flags *pflag.FlagSet, config interf
 		fileOnly := field.Tag.Get("file-only")
 
 		if configValue.Field(i).CanInterface() {
-			fieldType := field.Type.Kind()
+			fieldKind := field.Type.Kind()
 
 			face := configValue.Field(i).Interface()
 
@@ -350,8 +354,8 @@ func (m *Manager) setDefaults(prefix string, flags *pflag.FlagSet, config interf
 				continue
 			}
 
-			if c, ok := face.(Configurable); ok {
-				val := fmt.Sprintf("%v", c)
+			if isConfigurableType(field.Type) {
+				val := fmt.Sprintf("%v", face)
 
 				if str, ok := face.(fmt.Stringer); ok {
 					val = str.String()
@@ -366,40 +370,37 @@ func (m *Manager) setDefaults(prefix string, flags *pflag.FlagSet, config interf
 				continue
 			}
 
-			if field.Type.Kind() == reflect.Slice {
-				elem := field.Type.Elem()
-				if elem.Implements(configurableI) {
-					val := configValue.Field(i)
-					len := val.Len()
-					defs := make([]string, 0, len)
+			if fieldKind == reflect.Slice && isConfigurableType(field.Type.Elem()) {
+				val := configValue.Field(i)
+				n := val.Len()
+				defs := make([]string, 0, n)
 
-					for j := 0; j < len; j++ {
-						c := val.Index(j).Interface()
-						str := fmt.Sprintf("%v", c)
+				for j := 0; j < n; j++ {
+					c := val.Index(j).Interface()
+					str := fmt.Sprintf("%v", c)
 
-						if s, ok := c.(fmt.Stringer); ok {
-							str = s.String()
-						}
-
-						if s, ok := c.(Stringer); ok {
-							str = s.ConfigString()
-						}
-
-						defs = append(defs, str)
+					if s, ok := c.(fmt.Stringer); ok {
+						str = s.String()
 					}
 
-					m.viper.SetDefault(name, defs)
-					m.flags.StringSliceP(name, shorthand, defs, description)
-					continue
+					if s, ok := c.(Stringer); ok {
+						str = s.ConfigString()
+					}
+
+					defs = append(defs, str)
 				}
+
+				m.viper.SetDefault(name, defs)
+				m.flags.StringSliceP(name, shorthand, defs, description)
+				continue
 			}
 
-			if fieldType == reflect.Interface || fieldType == reflect.Ptr {
+			if fieldKind == reflect.Interface || fieldKind == reflect.Ptr {
 				if configValue.Field(i).IsNil() {
 					continue
 				}
 				elem := configValue.Field(i).Elem()
-				fieldType = elem.Type().Kind()
+				fieldKind = elem.Type().Kind()
 				face = elem.Interface()
 			}
 
@@ -488,7 +489,7 @@ func (m *Manager) setDefaults(prefix string, flags *pflag.FlagSet, config interf
 				flags.Int32P(name, shorthand, int32(val), description)
 
 			default:
-				switch fieldType {
+				switch fieldKind {
 				case reflect.Struct:
 					if field.Anonymous {
 						name = prefix
