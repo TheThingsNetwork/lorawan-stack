@@ -5129,7 +5129,7 @@
             },
             {
               "name": "target_application_ids",
-              "description": "",
+              "description": "Application identifiers of the target end device.",
               "label": "",
               "type": "ApplicationIdentifiers",
               "longType": "ApplicationIdentifiers",
@@ -5147,7 +5147,7 @@
             },
             {
               "name": "target_device_id",
-              "description": "",
+              "description": "End device ID of the target end device. If empty, use the source device ID.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -5166,6 +5166,106 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "target_network_server_address",
+              "description": "The address of the Network Server where the device will be registered.\nIf set and if the source device is currently registered on a Network Server, settings will be transferred.\nIf not set, the device shall not be registered on a Network Server.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.pattern",
+                    "value": "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "target_network_server_kek_label",
+              "description": "The KEK label of the Network Server to use for wrapping network session keys.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 2048
+                  }
+                ]
+              }
+            },
+            {
+              "name": "target_application_server_address",
+              "description": "The address of the Application Server where the device will be registered.\nIf set and if the source device is currently registered on an Application Server, settings will be transferred.\nIf not set, the device shall not be registered on an Application Server.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.pattern",
+                    "value": "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "target_application_server_kek_label",
+              "description": "The KEK label of the Application Server to use for wrapping the application session key.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 2048
+                  }
+                ]
+              }
+            },
+            {
+              "name": "target_application_server_id",
+              "description": "The AS-ID of the Application Server to use.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 100
+                  }
+                ]
+              }
+            },
+            {
+              "name": "target_net_id",
+              "description": "Home NetID.",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "defaultValue": ""
             },
             {
               "name": "invalidate_authentication_code",

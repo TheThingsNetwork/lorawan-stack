@@ -12,14 +12,26 @@ var ClaimEndDeviceRequestFieldPathsNested = []string{
 	"source_device.qr_code",
 	"target_application_ids",
 	"target_application_ids.application_id",
+	"target_application_server_address",
+	"target_application_server_id",
+	"target_application_server_kek_label",
 	"target_device_id",
+	"target_net_id",
+	"target_network_server_address",
+	"target_network_server_kek_label",
 }
 
 var ClaimEndDeviceRequestFieldPathsTopLevel = []string{
 	"invalidate_authentication_code",
 	"source_device",
 	"target_application_ids",
+	"target_application_server_address",
+	"target_application_server_id",
+	"target_application_server_kek_label",
 	"target_device_id",
+	"target_net_id",
+	"target_network_server_address",
+	"target_network_server_kek_label",
 }
 var AuthorizeApplicationRequestFieldPathsNested = []string{
 	"api_key",
