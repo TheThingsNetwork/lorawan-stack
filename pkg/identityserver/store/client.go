@@ -84,8 +84,10 @@ var defaultClientFieldMask = &types.FieldMask{}
 
 func init() {
 	paths := make([]string, 0, len(clientPBSetters))
-	for path := range clientPBSetters {
-		paths = append(paths, path)
+	for _, path := range ttnpb.ClientFieldPathsNested {
+		if _, ok := clientPBSetters[path]; ok {
+			paths = append(paths, path)
+		}
 	}
 	defaultClientFieldMask.Paths = paths
 }
