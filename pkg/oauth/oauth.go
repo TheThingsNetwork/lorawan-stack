@@ -80,16 +80,28 @@ func (s *server) Authorize(authorizePage echo.HandlerFunc) echo.HandlerFunc {
 		ar.UserData = userData{UserIdentifiers: session.UserIdentifiers}
 		client := ttnpb.Client(ar.Client.(osinClient))
 		if !clientHasGrant(&client, ttnpb.GRANT_AUTHORIZATION_CODE) {
-			return errClientMissingGrant.WithAttributes("grant", "authorization_code")
+			resp.InternalError = errClientMissingGrant.WithAttributes("grant", "authorization_code")
+			resp.SetError(osin.E_INVALID_GRANT, resp.InternalError.Error())
+			oauth2.FinishAuthorizeRequest(resp, req, ar)
+			return s.output(c, resp)
 		}
 		switch client.State {
 		case ttnpb.STATE_REJECTED:
-			return errClientRejected
+			resp.InternalError = errClientRejected
+			resp.SetError(osin.E_INVALID_CLIENT, resp.InternalError.Error())
+			oauth2.FinishAuthorizeRequest(resp, req, ar)
+			return s.output(c, resp)
 		case ttnpb.STATE_SUSPENDED:
-			return errClientSuspended
+			resp.InternalError = errClientSuspended
+			resp.SetError(osin.E_INVALID_CLIENT, resp.InternalError.Error())
+			oauth2.FinishAuthorizeRequest(resp, req, ar)
+			return s.output(c, resp)
 		case ttnpb.STATE_REQUESTED:
 			// TODO: Allow if user is collaborator (https://github.com/TheThingsNetwork/lorawan-stack/issues/49).
-			return errClientNotApproved
+			resp.InternalError = errClientNotApproved
+			resp.SetError(osin.E_INVALID_CLIENT, resp.InternalError.Error())
+			oauth2.FinishAuthorizeRequest(resp, req, ar)
+			return s.output(c, resp)
 		}
 		ar.Authorized = client.SkipAuthorization
 		ar.Scope = rightsToScope(client.Rights...)
