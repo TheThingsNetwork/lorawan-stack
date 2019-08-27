@@ -63,11 +63,16 @@ type Server struct {
 	config Config
 }
 
-func (s *Server) getRegistry(ctx context.Context, ids *ttnpb.GatewayIdentifiers) ttnpb.GatewayRegistryClient {
+var errESUnavailable = errors.DefineUnavailable("entity_registry_unavailable", "Entity Registry unavailable for gateway_id `{gateway_id}`")
+
+func (s *Server) getRegistry(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (ttnpb.GatewayRegistryClient, error) {
 	if s.registry != nil {
-		return s.registry
+		return s.registry, nil
 	}
-	return ttnpb.NewGatewayRegistryClient(s.component.GetPeer(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, ids).Conn())
+	if peer := s.component.GetPeer(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, ids); peer != nil {
+		return ttnpb.NewGatewayRegistryClient(peer.Conn()), nil
+	}
+	return nil, errESUnavailable.WithAttributes("gateway_id", ids.GetGatewayID())
 }
 
 // Option configures the CUPS.

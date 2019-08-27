@@ -2177,6 +2177,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/basicstation/cups:access_unavailable": {
+    "translations": {
+      "en": "Access unavailable for gateway_id `{gateway_id}`"
+    },
+    "description": {
+      "package": "pkg/basicstation/cups",
+      "file": "server.go"
+    }
+  },
   "error:pkg/basicstation/cups:cups_not_enabled": {
     "translations": {
       "en": "CUPS is not enabled for gateway `{gateway_uid}`"
@@ -2184,6 +2193,15 @@
     "description": {
       "package": "pkg/basicstation/cups",
       "file": "update_info.go"
+    }
+  },
+  "error:pkg/basicstation/cups:entity_registry_unavailable": {
+    "translations": {
+      "en": "Entity Registry unavailable for gateway_id `{gateway_id}`"
+    },
+    "description": {
+      "package": "pkg/basicstation/cups",
+      "file": "server.go"
     }
   },
   "error:pkg/basicstation/cups:field_length": {
@@ -2816,6 +2834,15 @@
       "file": "frequencyplans.go"
     }
   },
+  "error:pkg/gatewayconfigurationserver:entity_registry_unavailable": {
+    "translations": {
+      "en": "Entity Registry unavailable for gateway_id `{gateway_id}`"
+    },
+    "description": {
+      "package": "pkg/gatewayconfigurationserver",
+      "file": "gatewayconfigurationserver.go"
+    }
+  },
   "error:pkg/gatewayserver/io/basicstationlns/messages:data_rate": {
     "translations": {
       "en": "data rate not found"
@@ -3188,6 +3215,15 @@
   "error:pkg/gatewayserver:empty_identifiers": {
     "translations": {
       "en": "empty identifiers"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "gatewayserver.go"
+    }
+  },
+  "error:pkg/gatewayserver:entity_registry_unavailable": {
+    "translations": {
+      "en": "Entity Registry unavailable for gateway_id `{gateway_id}`"
     },
     "description": {
       "package": "pkg/gatewayserver",
@@ -5262,6 +5298,15 @@
     "description": {
       "package": "pkg/scripting/javascript",
       "file": "javascript.go"
+    }
+  },
+  "error:pkg/thethingsgateway/cups:entity_registry_unavailable": {
+    "translations": {
+      "en": "Entity Registry unavailable for gateway_id `{gateway_id}`"
+    },
+    "description": {
+      "package": "pkg/thethingsgateway/cups",
+      "file": "server.go"
     }
   },
   "error:pkg/thethingsgateway/cups:no_default_firmware_path": {
