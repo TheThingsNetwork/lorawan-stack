@@ -84,9 +84,9 @@ var errERPeerUnavailable = errors.DefineUnavailable("entity_registry_unavailable
 func (gcs *GatewayConfigurationServer) handleGetGlobalConfig(c echo.Context) error {
 	ctx := gcs.getContext(c)
 	gtwID := c.Get(gatewayIDKey).(ttnpb.GatewayIdentifiers)
-	registry := gcs.GetPeer(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, nil)
-	if registry == nil {
-		return errERPeerUnavailable.WithAttributes("gateway_id", unique.ID(ctx, gtwID))
+	registry, err := gcs.GetPeer(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, nil)
+	if err != nil {
+		return errERPeerUnavailable.WithCause(err).WithAttributes("gateway_id", unique.ID(ctx, gtwID))
 	}
 	client := ttnpb.NewGatewayRegistryClient(registry.Conn())
 	gtw, err := client.Get(ctx, &ttnpb.GetGatewayRequest{

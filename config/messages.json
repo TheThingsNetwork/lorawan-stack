@@ -2285,6 +2285,15 @@
       "file": "cluster.go"
     }
   },
+  "error:pkg/cluster:peer_unavailable": {
+    "translations": {
+      "en": "no peer with role {role} is available"
+    },
+    "description": {
+      "package": "pkg/cluster",
+      "file": "cluster.go"
+    }
+  },
   "error:pkg/component:listen_endpoint": {
     "translations": {
       "en": "could not listen on `{endpoint}` address"

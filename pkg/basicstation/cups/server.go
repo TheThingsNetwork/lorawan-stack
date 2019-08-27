@@ -113,13 +113,14 @@ func (s *Server) getRegistry(ctx context.Context, ids *ttnpb.GatewayIdentifiers)
 	if s.registry != nil {
 		return s.registry, nil
 	}
-	if peer := s.component.GetPeer(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, ids); peer != nil {
-		return ttnpb.NewGatewayRegistryClient(peer.Conn()), nil
+	peer, err := s.component.GetPeer(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, ids)
+	if err != nil {
+		if ids != nil {
+			return nil, errERPeerUnavailable.WithCause(err).WithAttributes("gateway_uid", unique.ID(ctx, ids))
+		}
+		return nil, errERPeerUnavailable.WithCause(err)
 	}
-	if ids != nil {
-		return nil, errERPeerUnavailable.WithAttributes("gateway_uid", unique.ID(ctx, ids))
-	}
-	return nil, errERPeerUnavailable
+	return ttnpb.NewGatewayRegistryClient(peer.Conn()), nil
 }
 
 var errAccessPeerUnavailable = errors.DefineUnavailable("access_unavailable", "Access unavailable for gateway `{gateway_uid}`")
@@ -128,13 +129,14 @@ func (s *Server) getAccess(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (
 	if s.access != nil {
 		return s.access, nil
 	}
-	if peer := s.component.GetPeer(ctx, ttnpb.ClusterRole_ACCESS, ids); peer != nil {
-		return ttnpb.NewGatewayAccessClient(peer.Conn()), nil
+	peer, err := s.component.GetPeer(ctx, ttnpb.ClusterRole_ACCESS, ids)
+	if err != nil {
+		if ids != nil {
+			return nil, errAccessPeerUnavailable.WithCause(err).WithAttributes("gateway_uid", unique.ID(ctx, ids))
+		}
+		return nil, errAccessPeerUnavailable.WithCause(err)
 	}
-	if ids != nil {
-		return nil, errAccessPeerUnavailable.WithAttributes("gateway_uid", unique.ID(ctx, ids))
-	}
-	return nil, errAccessPeerUnavailable
+	return ttnpb.NewGatewayAccessClient(peer.Conn()), nil
 }
 
 // Option configures the CUPSServer.

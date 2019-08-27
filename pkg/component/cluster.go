@@ -43,13 +43,13 @@ func (c *Component) ClusterTLS() bool {
 
 // GetPeers returns cluster peers with the given role and the given tags.
 // See package ../cluster for more information.
-func (c *Component) GetPeers(ctx context.Context, role ttnpb.ClusterRole) []cluster.Peer {
+func (c *Component) GetPeers(ctx context.Context, role ttnpb.ClusterRole) ([]cluster.Peer, error) {
 	return c.cluster.GetPeers(ctx, role)
 }
 
 // GetPeer returns a cluster peer with the given role and the given tags.
 // See package ../cluster for more information.
-func (c *Component) GetPeer(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) cluster.Peer {
+func (c *Component) GetPeer(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) (cluster.Peer, error) {
 	return c.cluster.GetPeer(ctx, role, ids)
 }
 

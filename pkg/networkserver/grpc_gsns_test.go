@@ -17,6 +17,7 @@ package networkserver_test
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"math/rand"
 	"sync"
 	"testing"
@@ -1018,7 +1019,10 @@ func TestHandleUplink(t *testing.T) {
 						a.So(role, should.Equal, ttnpb.ClusterRole_JOIN_SERVER) &&
 						a.So(ids, should.Resemble, getDevice.EndDeviceIdentifiers)
 				},
-					nil,
+					test.ClusterGetPeerResponse{
+						Peer:  nil,
+						Error: fmt.Errorf("peer not found"),
+					},
 				), should.BeTrue) {
 					return false
 				}
@@ -1128,7 +1132,10 @@ func TestHandleUplink(t *testing.T) {
 						a.So(role, should.Equal, ttnpb.ClusterRole_JOIN_SERVER) &&
 						a.So(ids, should.Resemble, getDevice.EndDeviceIdentifiers)
 				},
-					nil,
+					test.ClusterGetPeerResponse{
+						Peer:  nil,
+						Error: fmt.Errorf("peer not found"),
+					},
 				), should.BeTrue) {
 					return false
 				}
@@ -1244,7 +1251,10 @@ func TestHandleUplink(t *testing.T) {
 						a.So(role, should.Equal, ttnpb.ClusterRole_JOIN_SERVER) &&
 						a.So(ids, should.Resemble, getDevice.EndDeviceIdentifiers)
 				},
-					nil,
+					test.ClusterGetPeerResponse{
+						Peer:  nil,
+						Error: fmt.Errorf("peer not found"),
+					},
 				), should.BeTrue) {
 					return false
 				}

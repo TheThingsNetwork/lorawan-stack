@@ -24,8 +24,8 @@ import (
 
 func (c *Component) initRights() {
 	fetcher := rights.NewAccessFetcher(func(ctx context.Context) *grpc.ClientConn {
-		peer := c.GetPeer(ctx, ttnpb.ClusterRole_ACCESS, nil)
-		if peer == nil {
+		peer, err := c.GetPeer(ctx, ttnpb.ClusterRole_ACCESS, nil)
+		if err != nil {
 			return nil
 		}
 		return peer.Conn()

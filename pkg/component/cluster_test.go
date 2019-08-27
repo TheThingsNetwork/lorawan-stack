@@ -72,8 +72,8 @@ func TestPeers(t *testing.T) {
 	var peer cluster.Peer
 	for i := 0; i < 20; i++ {
 		time.Sleep(20 * time.Millisecond) // Wait for peers to join cluster.
-		peer = c.GetPeer(context.Background(), ttnpb.ClusterRole_NETWORK_SERVER, nil)
-		if peer != nil {
+		peer, err = c.GetPeer(context.Background(), ttnpb.ClusterRole_NETWORK_SERVER, nil)
+		if err == nil {
 			break
 		}
 	}
@@ -86,15 +86,18 @@ func TestPeers(t *testing.T) {
 	a.So(conn, should.NotBeNil)
 
 	for _, role := range unusedRoles {
-		peer = c.GetPeer(context.Background(), role, nil)
+		peer, err := c.GetPeer(context.Background(), role, nil)
 		a.So(peer, should.BeNil)
+		a.So(err, should.NotBeNil)
 	}
 
-	peers := c.GetPeers(context.Background(), ttnpb.ClusterRole_NETWORK_SERVER)
+	peers, err := c.GetPeers(context.Background(), ttnpb.ClusterRole_NETWORK_SERVER)
 	a.So(peers, should.HaveLength, 1)
+	a.So(err, should.BeNil)
 
 	for _, role := range unusedRoles {
-		peers = c.GetPeers(context.Background(), role)
+		peers, err = c.GetPeers(context.Background(), role)
 		a.So(peers, should.HaveLength, 0)
+		a.So(err, should.BeNil)
 	}
 }

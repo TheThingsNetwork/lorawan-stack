@@ -71,9 +71,12 @@ func AssertSetDevice(ctx context.Context, conn *grpc.ClientConn, getPeerCh <-cha
 		func(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
 			return a.So(role, should.Equal, ttnpb.ClusterRole_ACCESS) && a.So(ids, should.BeNil)
 		},
-		NewISPeer(ctx, &test.MockApplicationAccessServer{
-			ListRightsFunc: test.MakeApplicationAccessListRightsChFunc(listRightsCh),
-		}),
+		test.ClusterGetPeerResponse{
+			Peer: NewISPeer(ctx, &test.MockApplicationAccessServer{
+				ListRightsFunc: test.MakeApplicationAccessListRightsChFunc(listRightsCh),
+			}),
+			Error: nil,
+		},
 	), should.BeTrue) {
 		return nil, false
 	}
@@ -298,7 +301,10 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 						DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 					})
 			},
-			jsPeer,
+			test.ClusterGetPeerResponse{
+				Peer:  jsPeer,
+				Error: nil,
+			},
 		), should.BeTrue) {
 			return
 		}
@@ -431,7 +437,10 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 						GatewayID: "test-gtw-1",
 					})
 			},
-			gsPeer,
+			test.ClusterGetPeerResponse{
+				Peer:  gsPeer,
+				Error: nil,
+			},
 		), should.BeTrue) {
 			return
 		}
@@ -443,7 +452,10 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 						GatewayID: "test-gtw-2",
 					})
 			},
-			gsPeer,
+			test.ClusterGetPeerResponse{
+				Peer:  gsPeer,
+				Error: nil,
+			},
 		), should.BeTrue) {
 			return
 		}
@@ -657,7 +669,10 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 						GatewayID: "test-gtw-3",
 					})
 			},
-			gsPeer,
+			test.ClusterGetPeerResponse{
+				Peer:  gsPeer,
+				Error: nil,
+			},
 		), should.BeTrue)
 
 		a.So(test.AssertClusterGetPeerRequest(ctx, getPeerCh,
@@ -667,7 +682,10 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 						GatewayID: "test-gtw-2",
 					})
 			},
-			gsPeer,
+			test.ClusterGetPeerResponse{
+				Peer:  gsPeer,
+				Error: nil,
+			},
 		), should.BeTrue)
 
 		a.So(AssertAuthNsGsScheduleDownlinkRequest(ctx, authCh, scheduleDownlinkCh,

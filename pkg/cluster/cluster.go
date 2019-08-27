@@ -42,11 +42,11 @@ type Cluster interface {
 	Leave() error
 
 	// GetPeers returns peers with the given role.
-	GetPeers(ctx context.Context, role ttnpb.ClusterRole) []Peer
+	GetPeers(ctx context.Context, role ttnpb.ClusterRole) ([]Peer, error)
 	// GetPeer returns a peer with the given role, and a responsibility for the
 	// given identifiers. If the identifiers are nil, this function returns a random
 	// peer from the list that would be returned by GetPeers.
-	GetPeer(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) Peer
+	GetPeer(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) (Peer, error)
 
 	// ClaimIDs can be used to indicate that the current peer takes
 	// responsibility for entities identified by ids.
@@ -246,7 +246,7 @@ func (c *cluster) Leave() error {
 	return nil
 }
 
-func (c *cluster) GetPeers(ctx context.Context, role ttnpb.ClusterRole) []Peer {
+func (c *cluster) GetPeers(ctx context.Context, role ttnpb.ClusterRole) ([]Peer, error) {
 	var matches []Peer
 	for _, peer := range c.peers {
 		if !peer.HasRole(role) {
@@ -256,16 +256,21 @@ func (c *cluster) GetPeers(ctx context.Context, role ttnpb.ClusterRole) []Peer {
 			matches = append(matches, peer)
 		}
 	}
-	return matches
+	return matches, nil
 }
 
-func (c *cluster) GetPeer(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) Peer {
-	matches := c.GetPeers(ctx, role)
+var errPeerUnavailable = errors.DefineUnavailable("peer_unavailable", "no peer with role {role} is available")
+
+func (c *cluster) GetPeer(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) (Peer, error) {
+	matches, err := c.GetPeers(ctx, role)
+	if err != nil {
+		return nil, err
+	}
 	if len(matches) == 1 {
-		return matches[0]
+		return matches[0], nil
 	}
 	// The reference cluster only has a single instance of each component, so we don't need to filter on IDs.
-	return nil
+	return nil, errPeerUnavailable.WithAttributes("role", role)
 }
 
 // ClaimIDs is a no-op in the reference implementation.
