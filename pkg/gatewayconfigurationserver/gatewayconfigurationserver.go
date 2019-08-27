@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/pfconfig/semtechudp"
 	ttgcups "go.thethings.network/lorawan-stack/pkg/thethingsgateway/cups"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/web"
 	"google.golang.org/grpc/metadata"
 )
@@ -78,14 +79,14 @@ func New(c *component.Component, conf *Config) (*GatewayConfigurationServer, err
 	return gcs, nil
 }
 
-var errESUnavailable = errors.DefineUnavailable("entity_registry_unavailable", "Entity Registry unavailable for gateway_id `{gateway_id}`")
+var errERPeerUnavailable = errors.DefineUnavailable("entity_registry_unavailable", "Entity Registry unavailable for gateway `{gateway_uid}`")
 
 func (gcs *GatewayConfigurationServer) handleGetGlobalConfig(c echo.Context) error {
 	ctx := gcs.getContext(c)
 	gtwID := c.Get(gatewayIDKey).(ttnpb.GatewayIdentifiers)
 	registry := gcs.GetPeer(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, nil)
 	if registry == nil {
-		return errESUnavailable.WithAttributes("gateway_id", gtwID)
+		return errERPeerUnavailable.WithAttributes("gateway_id", unique.ID(ctx, gtwID))
 	}
 	client := ttnpb.NewGatewayRegistryClient(registry.Conn())
 	gtw, err := client.Get(ctx, &ttnpb.GetGatewayRequest{

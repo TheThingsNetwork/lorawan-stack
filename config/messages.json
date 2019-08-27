@@ -2179,7 +2179,7 @@
   },
   "error:pkg/basicstation/cups:access_unavailable": {
     "translations": {
-      "en": "Access unavailable for gateway_id `{gateway_id}`"
+      "en": "Access unavailable for gateway `{gateway_uid}`"
     },
     "description": {
       "package": "pkg/basicstation/cups",
@@ -2197,7 +2197,7 @@
   },
   "error:pkg/basicstation/cups:entity_registry_unavailable": {
     "translations": {
-      "en": "Entity Registry unavailable for gateway_id `{gateway_id}`"
+      "en": "Entity Registry unavailable for gateway `{gateway_uid}`"
     },
     "description": {
       "package": "pkg/basicstation/cups",
@@ -2836,7 +2836,7 @@
   },
   "error:pkg/gatewayconfigurationserver:entity_registry_unavailable": {
     "translations": {
-      "en": "Entity Registry unavailable for gateway_id `{gateway_id}`"
+      "en": "Entity Registry unavailable for gateway `{gateway_uid}`"
     },
     "description": {
       "package": "pkg/gatewayconfigurationserver",
@@ -3223,7 +3223,7 @@
   },
   "error:pkg/gatewayserver:entity_registry_unavailable": {
     "translations": {
-      "en": "Entity Registry unavailable for gateway_id `{gateway_id}`"
+      "en": "Entity Registry unavailable for gateway `{gateway_uid}`"
     },
     "description": {
       "package": "pkg/gatewayserver",
@@ -5302,7 +5302,7 @@
   },
   "error:pkg/thethingsgateway/cups:entity_registry_unavailable": {
     "translations": {
-      "en": "Entity Registry unavailable for gateway_id `{gateway_id}`"
+      "en": "Entity Registry unavailable for gateway `{gateway_uid}`"
     },
     "description": {
       "package": "pkg/thethingsgateway/cups",

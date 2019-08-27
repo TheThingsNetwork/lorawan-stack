@@ -65,11 +65,19 @@ type GatewayServer struct {
 	connections sync.Map
 }
 
-func (gs *GatewayServer) getRegistry(ctx context.Context, ids *ttnpb.GatewayIdentifiers) ttnpb.GatewayRegistryClient {
+var errERPeerUnavailable = errors.DefineUnavailable("entity_registry_unavailable", "Entity Registry unavailable for gateway `{gateway_uid}`")
+
+func (gs *GatewayServer) getRegistry(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (ttnpb.GatewayRegistryClient, error) {
 	if gs.registry != nil {
-		return gs.registry
+		return gs.registry, nil
 	}
-	return ttnpb.NewGatewayRegistryClient(gs.GetPeer(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, ids).Conn())
+	if peer := gs.GetPeer(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, ids); peer != nil {
+		return ttnpb.NewGatewayRegistryClient(peer.Conn()), nil
+	}
+	if ids != nil {
+		return nil, errERPeerUnavailable.WithAttributes("gateway_uid", unique.ID(ctx, ids))
+	}
+	return nil, errERPeerUnavailable
 }
 
 // Option configures GatewayServer.
@@ -243,7 +251,11 @@ func (gs *GatewayServer) FillGatewayContext(ctx context.Context, ids ttnpb.Gatew
 		return nil, ttnpb.GatewayIdentifiers{}, errEmptyIdentifiers
 	}
 	if ids.GatewayID == "" {
-		extIDs, err := gs.getRegistry(ctx, nil).GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
+		registry, err := gs.getRegistry(ctx, nil)
+		if err != nil {
+			return nil, ttnpb.GatewayIdentifiers{}, err
+		}
+		extIDs, err := registry.GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
 			EUI: *ids.EUI,
 		}, gs.WithClusterAuth())
 		if err == nil {
@@ -293,7 +305,11 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 	} else if err != nil {
 		return nil, err
 	}
-	gtw, err := gs.getRegistry(ctx, &ids).Get(ctx, &ttnpb.GetGatewayRequest{
+	registry, err := gs.getRegistry(ctx, &ids)
+	if err != nil {
+		return nil, err
+	}
+	gtw, err := registry.Get(ctx, &ttnpb.GetGatewayRequest{
 		GatewayIdentifiers: ids,
 		FieldMask: pbtypes.FieldMask{
 			Paths: []string{
@@ -540,7 +556,11 @@ func (gs *GatewayServer) GetFrequencyPlan(ctx context.Context, ids ttnpb.Gateway
 	} else if err != nil {
 		return nil, err
 	}
-	gtw, err := gs.getRegistry(ctx, &ids).Get(ctx, &ttnpb.GetGatewayRequest{
+	registry, err := gs.getRegistry(ctx, &ids)
+	if err != nil {
+		return nil, err
+	}
+	gtw, err := registry.Get(ctx, &ttnpb.GetGatewayRequest{
 		GatewayIdentifiers: ids,
 		FieldMask:          pbtypes.FieldMask{Paths: []string{"frequency_plan_id"}},
 	}, callOpt)
