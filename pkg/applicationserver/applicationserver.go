@@ -425,16 +425,19 @@ func (as *ApplicationServer) DownlinkQueueList(ctx context.Context, ids ttnpb.En
 	return res.Downlinks, nil
 }
 
-var errJSPeerUnavailable = errors.DefineUnavailable("join_server_unavailable", "Join Server unavailable for JoinEUI `{join_eui}`")
+var errJSUnavailable = errors.DefineUnavailable("join_server_unavailable", "Join Server unavailable for JoinEUI `{join_eui}`")
 
 func (as *ApplicationServer) fetchAppSKey(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, sessionKeyID []byte) (ttnpb.KeyEnvelope, error) {
 	req := &ttnpb.SessionKeyRequest{
 		SessionKeyID: sessionKeyID,
 		DevEUI:       *ids.DevEUI,
 	}
-	js, peerErr := as.GetPeer(ctx, ttnpb.ClusterRole_JOIN_SERVER, ids)
-	if js != nil {
-		res, err := ttnpb.NewAsJsClient(js.Conn()).GetAppSKey(ctx, req, as.WithClusterAuth())
+	if js, _ := as.GetPeer(ctx, ttnpb.ClusterRole_JOIN_SERVER, ids); js != nil {
+		cc, err := js.Conn()
+		if err != nil {
+			return ttnpb.KeyEnvelope{}, err
+		}
+		res, err := ttnpb.NewAsJsClient(cc).GetAppSKey(ctx, req, as.WithClusterAuth())
 		if err == nil {
 			return res.AppSKey, nil
 		}
@@ -451,7 +454,7 @@ func (as *ApplicationServer) fetchAppSKey(ctx context.Context, ids ttnpb.EndDevi
 			return ttnpb.KeyEnvelope{}, err
 		}
 	}
-	return ttnpb.KeyEnvelope{}, errJSPeerUnavailable.WithCause(peerErr).WithAttributes("join_eui", *ids.JoinEUI)
+	return ttnpb.KeyEnvelope{}, errJSUnavailable.WithAttributes("join_eui", *ids.JoinEUI)
 }
 
 func (as *ApplicationServer) handleUp(ctx context.Context, up *ttnpb.ApplicationUp, link *link) error {

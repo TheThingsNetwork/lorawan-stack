@@ -29,7 +29,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
-	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/web"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -107,7 +106,7 @@ func (s *Server) getAuth(ctx context.Context, eui types.EUI64, auth string) grpc
 	return s.component.WithClusterAuth()
 }
 
-var errERPeerUnavailable = errors.DefineUnavailable("entity_registry_unavailable", "Entity Registry unavailable for gateway `{gateway_uid}`")
+var errERPeerUnavailable = errors.DefineUnavailable("entity_registry_unavailable", "Entity Registry unavailable")
 
 func (s *Server) getRegistry(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (ttnpb.GatewayRegistryClient, error) {
 	if s.registry != nil {
@@ -115,15 +114,16 @@ func (s *Server) getRegistry(ctx context.Context, ids *ttnpb.GatewayIdentifiers)
 	}
 	peer, err := s.component.GetPeer(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, ids)
 	if err != nil {
-		if ids != nil {
-			return nil, errERPeerUnavailable.WithCause(err).WithAttributes("gateway_uid", unique.ID(ctx, ids))
-		}
 		return nil, errERPeerUnavailable.WithCause(err)
 	}
-	return ttnpb.NewGatewayRegistryClient(peer.Conn()), nil
+	cc, err := peer.Conn()
+	if err != nil {
+		return nil, errERPeerUnavailable.WithCause(err)
+	}
+	return ttnpb.NewGatewayRegistryClient(cc), nil
 }
 
-var errAccessPeerUnavailable = errors.DefineUnavailable("access_unavailable", "Access unavailable for gateway `{gateway_uid}`")
+var errAccessPeerUnavailable = errors.DefineUnavailable("access_unavailable", "Access unavailable")
 
 func (s *Server) getAccess(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (ttnpb.GatewayAccessClient, error) {
 	if s.access != nil {
@@ -131,12 +131,13 @@ func (s *Server) getAccess(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (
 	}
 	peer, err := s.component.GetPeer(ctx, ttnpb.ClusterRole_ACCESS, ids)
 	if err != nil {
-		if ids != nil {
-			return nil, errAccessPeerUnavailable.WithCause(err).WithAttributes("gateway_uid", unique.ID(ctx, ids))
-		}
 		return nil, errAccessPeerUnavailable.WithCause(err)
 	}
-	return ttnpb.NewGatewayAccessClient(peer.Conn()), nil
+	cc, err := peer.Conn()
+	if err != nil {
+		return nil, errAccessPeerUnavailable.WithCause(err)
+	}
+	return ttnpb.NewGatewayAccessClient(cc), nil
 }
 
 // Option configures the CUPSServer.

@@ -21,7 +21,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/web"
 )
 
@@ -64,7 +63,7 @@ type Server struct {
 	config Config
 }
 
-var errERPeerUnavailable = errors.DefineUnavailable("entity_registry_unavailable", "Entity Registry unavailable for gateway `{gateway_uid}`")
+var errERPeerUnavailable = errors.DefineUnavailable("entity_registry_unavailable", "Entity Registry unavailable")
 
 func (s *Server) getRegistry(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (ttnpb.GatewayRegistryClient, error) {
 	if s.registry != nil {
@@ -72,12 +71,13 @@ func (s *Server) getRegistry(ctx context.Context, ids *ttnpb.GatewayIdentifiers)
 	}
 	peer, err := s.component.GetPeer(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, ids)
 	if err != nil {
-		if ids != nil {
-			return nil, errERPeerUnavailable.WithCause(err).WithAttributes("gateway_uid", unique.ID(ctx, ids))
-		}
 		return nil, errERPeerUnavailable.WithCause(err)
 	}
-	return ttnpb.NewGatewayRegistryClient(peer.Conn()), nil
+	cc, err := peer.Conn()
+	if err != nil {
+		return nil, errERPeerUnavailable.WithCause(err)
+	}
+	return ttnpb.NewGatewayRegistryClient(cc), nil
 }
 
 // Option configures the CUPS.

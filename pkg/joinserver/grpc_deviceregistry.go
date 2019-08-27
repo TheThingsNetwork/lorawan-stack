@@ -24,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"google.golang.org/grpc"
 )
 
 var (
@@ -72,7 +73,10 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 		dev.RootKeys = &ttnpb.RootKeys{
 			RootKeyID: rootKeysEnc.GetRootKeyID(),
 		}
-		cs, _ := srv.JS.GetPeer(ctx, ttnpb.ClusterRole_CRYPTO_SERVER, dev.EndDeviceIdentifiers)
+		var cc *grpc.ClientConn
+		if cs, _ := srv.JS.GetPeer(ctx, ttnpb.ClusterRole_CRYPTO_SERVER, dev.EndDeviceIdentifiers); cs != nil {
+			cc, _ = cs.Conn()
+		}
 		if ttnpb.HasAnyField(req.FieldMask.Paths, "root_keys.nwk_key") {
 			var networkCryptoService cryptoservices.Network
 			if rootKeysEnc.GetNwkKey() != nil {
@@ -81,8 +85,8 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 					return nil, err
 				}
 				networkCryptoService = cryptoservices.NewMemory(&nwkKey, nil)
-			} else if cs != nil && dev.ProvisionerID != "" {
-				networkCryptoService = cryptoservices.NewNetworkRPCClient(cs.Conn(), srv.JS.KeyVault, srv.JS.WithClusterAuth())
+			} else if cc != nil && dev.ProvisionerID != "" {
+				networkCryptoService = cryptoservices.NewNetworkRPCClient(cc, srv.JS.KeyVault, srv.JS.WithClusterAuth())
 			}
 			if networkCryptoService != nil {
 				if nwkKey, err := networkCryptoService.GetNwkKey(ctx, dev); err == nil {
@@ -102,8 +106,8 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 					return nil, err
 				}
 				applicationCryptoService = cryptoservices.NewMemory(nil, &appKey)
-			} else if cs != nil && dev.ProvisionerID != "" {
-				applicationCryptoService = cryptoservices.NewApplicationRPCClient(cs.Conn(), srv.JS.KeyVault, srv.JS.WithClusterAuth())
+			} else if cc != nil && dev.ProvisionerID != "" {
+				applicationCryptoService = cryptoservices.NewApplicationRPCClient(cc, srv.JS.KeyVault, srv.JS.WithClusterAuth())
 			}
 			if applicationCryptoService != nil {
 				if appKey, err := applicationCryptoService.GetAppKey(ctx, dev); err == nil {

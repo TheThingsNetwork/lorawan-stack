@@ -27,7 +27,7 @@ import (
 // MockPeer is a mock cluster.Peer used for testing.
 type MockPeer struct {
 	NameFunc    func() string
-	ConnFunc    func() *grpc.ClientConn
+	ConnFunc    func() (*grpc.ClientConn, error)
 	HasRoleFunc func(ttnpb.ClusterRole) bool
 	RolesFunc   func() []ttnpb.ClusterRole
 	TagsFunc    func() map[string]string
@@ -42,7 +42,7 @@ func (m MockPeer) Name() string {
 }
 
 // Conn calls ConnFunc if set and panics otherwise.
-func (m MockPeer) Conn() *grpc.ClientConn {
+func (m MockPeer) Conn() (*grpc.ClientConn, error) {
 	if m.ConnFunc == nil {
 		panic("Conn called, but not set")
 	}
@@ -89,7 +89,7 @@ func NewGRPCServerPeer(ctx context.Context, srv interface{}, registrators ...int
 		return nil, err
 	}
 	return &MockPeer{
-		ConnFunc: func() *grpc.ClientConn { return conn },
+		ConnFunc: func() (*grpc.ClientConn, error) { return conn, nil },
 	}, nil
 }
 

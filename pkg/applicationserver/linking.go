@@ -129,7 +129,11 @@ func (as *ApplicationServer) connectLink(ctx context.Context, link *link) error 
 		if err != nil {
 			return errNSPeerNotFound.WithCause(err).WithAttributes("application_uid", unique.ID(ctx, link.ApplicationIdentifiers))
 		}
-		link.conn = ns.Conn()
+		cc, err := ns.Conn()
+		if err != nil {
+			return errNSPeerNotFound.WithCause(err).WithAttributes("application_uid", unique.ID(ctx, link.ApplicationIdentifiers))
+		}
+		link.conn = cc
 		link.connName = ns.Name()
 	}
 	link.callOpts = []grpc.CallOption{

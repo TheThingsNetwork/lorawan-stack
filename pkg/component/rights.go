@@ -28,7 +28,11 @@ func (c *Component) initRights() {
 		if err != nil {
 			return nil
 		}
-		return peer.Conn()
+		conn, err := peer.Conn()
+		if err != nil {
+			return nil
+		}
+		return conn
 	}, c.config.GRPC.AllowInsecureForCredentials)
 
 	if c.config.Rights.TTL > 0 {

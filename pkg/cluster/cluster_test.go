@@ -105,10 +105,12 @@ func TestCluster(t *testing.T) {
 
 	a.So(c.Leave(), should.BeNil)
 
-	a.So(ac.Conn().GetState(), should.Equal, connectivity.Shutdown)
-	a.So(er.Conn().GetState(), should.Equal, connectivity.Shutdown)
-	a.So(gs.Conn().GetState(), should.Equal, connectivity.Shutdown)
-	a.So(ns.Conn().GetState(), should.Equal, connectivity.Shutdown)
-	a.So(as.Conn().GetState(), should.Equal, connectivity.Shutdown)
-	a.So(js.Conn().GetState(), should.Equal, connectivity.Shutdown)
+	for _, peer := range []Peer{
+		ac, er, gs, ns, as, js,
+	} {
+		cc, err := peer.Conn()
+		a.So(cc, should.NotBeNil)
+		a.So(err, should.BeNil)
+		a.So(cc.GetState(), should.Equal, connectivity.Shutdown)
+	}
 }

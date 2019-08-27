@@ -679,7 +679,12 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *ttnpb
 		}
 
 		logger.WithField("path_count", len(req.DownlinkPaths)).Debug("Schedule downlink")
-		res, err := ttnpb.NewNsGsClient(a.peer.Conn()).ScheduleDownlink(ctx, down, ns.WithClusterAuth())
+		cc, err := a.peer.Conn()
+		if err != nil {
+			errs = append(errs, err)
+			continue
+		}
+		res, err := ttnpb.NewNsGsClient(cc).ScheduleDownlink(ctx, down, ns.WithClusterAuth())
 		if err != nil {
 			errs = append(errs, err)
 			continue

@@ -2179,7 +2179,7 @@
   },
   "error:pkg/basicstation/cups:access_unavailable": {
     "translations": {
-      "en": "Access unavailable for gateway `{gateway_uid}`"
+      "en": "Access unavailable"
     },
     "description": {
       "package": "pkg/basicstation/cups",
@@ -2197,7 +2197,7 @@
   },
   "error:pkg/basicstation/cups:entity_registry_unavailable": {
     "translations": {
-      "en": "Entity Registry unavailable for gateway `{gateway_uid}`"
+      "en": "Entity Registry unavailable"
     },
     "description": {
       "package": "pkg/basicstation/cups",
@@ -2279,6 +2279,15 @@
   "error:pkg/cluster:peer_connection": {
     "translations": {
       "en": "connection to peer `{name}` on `{address}` failed"
+    },
+    "description": {
+      "package": "pkg/cluster",
+      "file": "cluster.go"
+    }
+  },
+  "error:pkg/cluster:peer_empty_target": {
+    "translations": {
+      "en": "peer target address is empty"
     },
     "description": {
       "package": "pkg/cluster",
@@ -2845,7 +2854,7 @@
   },
   "error:pkg/gatewayconfigurationserver:entity_registry_unavailable": {
     "translations": {
-      "en": "Entity Registry unavailable for gateway `{gateway_uid}`"
+      "en": "Entity Registry unavailable"
     },
     "description": {
       "package": "pkg/gatewayconfigurationserver",
@@ -3232,7 +3241,7 @@
   },
   "error:pkg/gatewayserver:entity_registry_unavailable": {
     "translations": {
-      "en": "Entity Registry unavailable for gateway `{gateway_uid}`"
+      "en": "Entity Registry unavailable"
     },
     "description": {
       "package": "pkg/gatewayserver",
@@ -5311,7 +5320,7 @@
   },
   "error:pkg/thethingsgateway/cups:entity_registry_unavailable": {
     "translations": {
-      "en": "Entity Registry unavailable for gateway `{gateway_uid}`"
+      "en": "Entity Registry unavailable"
     },
     "description": {
       "package": "pkg/thethingsgateway/cups",

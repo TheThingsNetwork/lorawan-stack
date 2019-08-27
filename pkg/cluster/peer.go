@@ -26,7 +26,7 @@ type Peer interface {
 	// Name of the peer
 	Name() string
 	// gRPC ClientConn to the peer (if available)
-	Conn() *grpc.ClientConn
+	Conn() (*grpc.ClientConn, error)
 	// Roles announced by the peer
 	Roles() []ttnpb.ClusterRole
 	// HasRole returns true iff the peer has the given role
@@ -42,15 +42,16 @@ type peer struct {
 
 	target string
 
-	ctx    context.Context
-	cancel context.CancelFunc
-	conn   *grpc.ClientConn
+	ctx     context.Context
+	cancel  context.CancelFunc
+	conn    *grpc.ClientConn
+	connErr error
 }
 
-func (p *peer) Name() string               { return p.name }
-func (p *peer) Conn() *grpc.ClientConn     { return p.conn }
-func (p *peer) Roles() []ttnpb.ClusterRole { return p.roles }
-func (p *peer) Tags() map[string]string    { return p.tags }
+func (p *peer) Name() string                    { return p.name }
+func (p *peer) Conn() (*grpc.ClientConn, error) { return p.conn, p.connErr }
+func (p *peer) Roles() []ttnpb.ClusterRole      { return p.roles }
+func (p *peer) Tags() map[string]string         { return p.tags }
 
 func (p *peer) HasRole(wanted ttnpb.ClusterRole) bool {
 	roles := p.Roles()

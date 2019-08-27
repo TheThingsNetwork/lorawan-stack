@@ -202,6 +202,11 @@ var errPeerConnection = errors.Define(
 	"connection to peer `{name}` on `{address}` failed",
 )
 
+var errPeerEmptyTarget = errors.Define(
+	"peer_empty_target",
+	"peer target address is empty",
+)
+
 func (c *cluster) Join() (err error) {
 	options := rpcclient.DefaultDialOptions(c.ctx)
 	if c.tls {
@@ -221,12 +226,13 @@ func (c *cluster) Join() (err error) {
 		))
 		if peer.target == "" {
 			logger.Warn("Not connecting to peer, empty address.")
+			peer.connErr = errPeerEmptyTarget
 			continue
 		}
 		logger.Debug("Connecting to peer...")
-		peer.conn, err = grpc.DialContext(peer.ctx, peer.target, options...)
+		peer.conn, peer.connErr = grpc.DialContext(peer.ctx, peer.target, options...)
 		if err != nil {
-			return errPeerConnection.WithCause(err).WithAttributes("name", peer.name, "address", peer.target)
+			return errPeerConnection.WithCause(peer.connErr).WithAttributes("name", peer.name, "address", peer.target)
 		}
 	}
 	return nil
@@ -252,7 +258,11 @@ func (c *cluster) GetPeers(ctx context.Context, role ttnpb.ClusterRole) ([]Peer,
 		if !peer.HasRole(role) {
 			continue
 		}
-		if conn := peer.Conn(); conn != nil && conn.GetState() == connectivity.Ready {
+		conn, err := peer.Conn()
+		if err != nil {
+			continue
+		}
+		if conn.GetState() == connectivity.Ready {
 			matches = append(matches, peer)
 		}
 	}

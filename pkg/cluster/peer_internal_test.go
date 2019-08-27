@@ -38,5 +38,7 @@ func TestPeer(t *testing.T) {
 	a.So(p.HasRole(ttnpb.ClusterRole_APPLICATION_SERVER), should.BeFalse)
 	a.So(p.HasRole(ttnpb.ClusterRole_ACCESS), should.BeTrue)
 
-	a.So(p.Conn(), should.Equal, conn)
+	cc, err := p.Conn()
+	a.So(err, should.BeNil)
+	a.So(cc, should.Equal, conn)
 }

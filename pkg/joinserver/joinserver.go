@@ -354,7 +354,10 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 				return nil, nil, errGenerateSessionKeyID
 			}
 
-			cs, _ := js.GetPeer(ctx, ttnpb.ClusterRole_CRYPTO_SERVER, dev.EndDeviceIdentifiers)
+			var cc *grpc.ClientConn
+			if cs, _ := js.GetPeer(ctx, ttnpb.ClusterRole_CRYPTO_SERVER, dev.EndDeviceIdentifiers); cs != nil {
+				cc, _ = cs.Conn()
+			}
 
 			var networkCryptoService cryptoservices.Network
 			if req.SelectedMACVersion.Compare(ttnpb.MAC_V1_1) >= 0 && dev.RootKeys != nil && dev.RootKeys.NwkKey != nil {
@@ -364,8 +367,8 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 					return nil, nil, err
 				}
 				networkCryptoService = cryptoservices.NewMemory(&nwkKey, nil)
-			} else if cs != nil && dev.ProvisionerID != "" {
-				networkCryptoService = cryptoservices.NewNetworkRPCClient(cs.Conn(), js.KeyVault, js.WithClusterAuth())
+			} else if cc != nil && dev.ProvisionerID != "" {
+				networkCryptoService = cryptoservices.NewNetworkRPCClient(cc, js.KeyVault, js.WithClusterAuth())
 			}
 
 			var applicationCryptoService cryptoservices.Application
@@ -379,8 +382,8 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 					// LoRaWAN 1.0.x use the AppKey for network security operations.
 					networkCryptoService = cryptoservices.NewMemory(nil, &appKey)
 				}
-			} else if cs != nil && dev.ProvisionerID != "" {
-				applicationCryptoService = cryptoservices.NewApplicationRPCClient(cs.Conn(), js.KeyVault, js.WithClusterAuth())
+			} else if cc != nil && dev.ProvisionerID != "" {
+				applicationCryptoService = cryptoservices.NewApplicationRPCClient(cc, js.KeyVault, js.WithClusterAuth())
 			}
 			if networkCryptoService == nil {
 				return nil, nil, errNoNwkKey

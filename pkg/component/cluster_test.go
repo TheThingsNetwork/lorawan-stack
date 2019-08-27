@@ -82,7 +82,8 @@ func TestPeers(t *testing.T) {
 		t.FailNow()
 	}
 
-	conn := peer.Conn()
+	conn, err := peer.Conn()
+	a.So(err, should.BeNil)
 	a.So(conn, should.NotBeNil)
 
 	for _, role := range unusedRoles {
