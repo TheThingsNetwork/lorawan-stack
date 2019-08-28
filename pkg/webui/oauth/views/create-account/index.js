@@ -23,7 +23,6 @@ import * as Yup from 'yup'
 
 import api from '../../api'
 import sharedMessages from '../../../lib/shared-messages'
-import { digit, uppercase, special } from '../../lib/regexp'
 import Button from '../../../components/button'
 import Input from '../../../components/input'
 import Form from '../../../components/form'
@@ -49,9 +48,6 @@ const validationSchema = Yup.object().shape({
     .max(50, sharedMessages.validateTooLong),
   password: Yup.string()
     .min(8)
-    .matches(digit, sharedMessages.validatePasswordDigit)
-    .matches(uppercase, sharedMessages.validatePasswordUppercase)
-    .matches(special, sharedMessages.validatePasswordSpecial)
     .required(sharedMessages.validateRequired),
   primary_email_address: Yup.string()
     .email(sharedMessages.validateEmail)
