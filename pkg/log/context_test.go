@@ -53,5 +53,4 @@ func TestContext(t *testing.T) {
 		a.So(ok, should.BeTrue)
 		a.So(v, should.Equal, "value")
 	})
-
 }

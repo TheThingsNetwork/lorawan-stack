@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package log
+package log_test
 
 import (
 	"encoding/json"
@@ -21,7 +21,11 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	"go.thethings.network/lorawan-stack/pkg/config"
+	. "go.thethings.network/lorawan-stack/pkg/log"
 )
+
+var _ config.Configurable = func(v Level) *Level { return &v }(0)
 
 var levels = []Level{DebugLevel, InfoLevel, WarnLevel, ErrorLevel, FatalLevel}
 
@@ -56,11 +60,8 @@ func TestLevelOrder(t *testing.T) {
 	a.So(WarnLevel > InfoLevel, should.BeTrue)
 
 	for _, level := range levels {
-		a.So(level >= DebugLevel, should.BeTrue)
-		a.So(level <= FatalLevel, should.BeTrue)
-		a.So(level < DebugLevel, should.BeFalse)
-		a.So(level > FatalLevel, should.BeFalse)
-		a.So(level != invalid, should.BeTrue)
+		a.So(level, should.BeGreaterThanOrEqualTo, DebugLevel)
+		a.So(level, should.BeLessThanOrEqualTo, FatalLevel)
 	}
 }
 

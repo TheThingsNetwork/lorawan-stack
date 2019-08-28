@@ -221,16 +221,12 @@ func (prefix *EUI64Prefix) UnmarshalText(data []byte) error {
 	return nil
 }
 
-// FromConfigString implements the config.Configurable interface
-func (prefix EUI64Prefix) FromConfigString(in string) (interface{}, error) {
-	p := new(EUI64Prefix)
-	if err := p.UnmarshalText([]byte(in)); err != nil {
-		return nil, err
-	}
-	return p, nil
+// UnmarshalConfigString implements the config.Configurable interface.
+func (prefix *EUI64Prefix) UnmarshalConfigString(s string) error {
+	return prefix.UnmarshalText([]byte(s))
 }
 
-// ConfigString implements the config.Stringer interface
+// ConfigString implements the config.Stringer interface.
 func (prefix EUI64Prefix) ConfigString() string {
 	return prefix.String()
 }

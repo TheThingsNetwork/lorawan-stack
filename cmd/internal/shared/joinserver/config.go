@@ -21,7 +21,7 @@ import (
 
 // DefaultJoinServerConfig is the default configuration for the JoinServer
 var DefaultJoinServerConfig = joinserver.Config{
-	JoinEUIPrefixes: []*types.EUI64Prefix{
+	JoinEUIPrefixes: []types.EUI64Prefix{
 		{},
 	},
 }

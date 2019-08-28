@@ -15,13 +15,13 @@
 package types
 
 import (
-	"go.thethings.network/lorawan-stack/pkg/errors"
-
 	"encoding/binary"
 	"encoding/hex"
 	"fmt"
 	"strconv"
 	"strings"
+
+	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 // DevAddr is a 32-bit LoRaWAN device address.
@@ -365,16 +365,12 @@ func (prefix *DevAddrPrefix) UnmarshalText(data []byte) error {
 	return nil
 }
 
-// FromConfigString implements the config.Configurable interface
-func (prefix DevAddrPrefix) FromConfigString(in string) (interface{}, error) {
-	p := new(DevAddrPrefix)
-	if err := p.UnmarshalText([]byte(in)); err != nil {
-		return nil, err
-	}
-	return p, nil
+// UnmarshalConfigString implements the config.Configurable interface.
+func (prefix *DevAddrPrefix) UnmarshalConfigString(s string) error {
+	return prefix.UnmarshalText([]byte(s))
 }
 
-// ConfigString implements the config.Stringer interface
+// ConfigString implements the config.Stringer interface.
 func (prefix DevAddrPrefix) ConfigString() string {
 	return prefix.String()
 }

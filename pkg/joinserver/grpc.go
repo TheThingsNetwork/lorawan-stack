@@ -30,7 +30,7 @@ func (srv jsServer) GetJoinEUIPrefixes(ctx context.Context, _ *pbtypes.Empty) (*
 	prefixes := make([]ttnpb.JoinEUIPrefix, 0, len(srv.JS.euiPrefixes))
 	for _, p := range srv.JS.euiPrefixes {
 		prefixes = append(prefixes, ttnpb.JoinEUIPrefix{
-			JoinEUI: &p.EUI64,
+			JoinEUI: p.EUI64,
 			Length:  uint32(p.Length),
 		})
 	}

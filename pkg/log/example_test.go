@@ -20,7 +20,6 @@ import (
 )
 
 func ExampleMiddleware() {
-
 	// build our custom handler (needed for example tests, because it expects us to use fmt.Println)
 	handler := HandlerFunc(func(entry Entry) error {
 		fmt.Printf("%s: %s\n", strings.ToUpper(entry.Level().String()), entry.Message())

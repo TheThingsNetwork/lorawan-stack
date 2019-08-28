@@ -45,14 +45,16 @@ func (c Custom) ConfigString() string {
 	}
 }
 
-func (c Custom) FromConfigString(text string) (interface{}, error) {
+func (c *Custom) UnmarshalConfigString(text string) error {
 	switch text {
 	case "foo":
-		return Custom(42), nil
+		*c = Custom(42)
+		return nil
 	case "bar":
-		return Custom(112), nil
+		*c = Custom(112)
+		return nil
 	}
-	return nil, fmt.Errorf("Could not parse custom value %s", text)
+	return fmt.Errorf("Could not parse custom value %s", text)
 }
 
 type example struct {

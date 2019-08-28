@@ -565,7 +565,8 @@ func (dst *JoinEUIPrefix) SetFields(src *JoinEUIPrefix, paths ...string) error {
 			if src != nil {
 				dst.JoinEUI = src.JoinEUI
 			} else {
-				dst.JoinEUI = nil
+				var zero go_thethings_network_lorawan_stack_pkg_types.EUI64
+				dst.JoinEUI = zero
 			}
 		case "length":
 			if len(subs) > 0 {

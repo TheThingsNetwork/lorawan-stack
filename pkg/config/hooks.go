@@ -160,42 +160,52 @@ func stringToBufferMapHookFunc(f reflect.Type, t reflect.Type, data interface{})
 }
 
 func configurableInterfaceHook(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
-	if f.Kind() != reflect.String || !t.Implements(configurableI) {
+	if f.Kind() != reflect.String || !isConfigurableType(t) {
 		return data, nil
 	}
 
 	str := data.(string)
 
-	u, ok := reflect.New(t).Interface().(Configurable)
-	if !ok {
-		return data, nil
+	if t.Kind() == reflect.Ptr {
+		rv := reflect.New(t.Elem())
+		if err := rv.Interface().(Configurable).UnmarshalConfigString(str); err != nil {
+			return nil, err
+		}
+		return rv.Interface(), nil
 	}
-
-	return u.FromConfigString(str)
+	rv := reflect.New(t)
+	if err := rv.Interface().(Configurable).UnmarshalConfigString(str); err != nil {
+		return nil, err
+	}
+	return rv.Elem().Interface(), nil
 }
 
 func configurableInterfaceSliceHook(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
-	if f.Kind() != reflect.Slice || f.Elem().Kind() != reflect.String || t.Kind() != reflect.Slice || !t.Elem().Implements(configurableI) {
+	if f.Kind() != reflect.Slice || f.Elem().Kind() != reflect.String || t.Kind() != reflect.Slice || !isConfigurableType(t.Elem()) {
 		return data, nil
 	}
 
 	strs := data.([]string)
 	res := reflect.MakeSlice(t, len(strs), len(strs))
 
-	for i, str := range strs {
-		val, ok := reflect.New(t.Elem()).Interface().(Configurable)
-		if !ok {
-			return data, nil
+	et := t.Elem()
+	if et.Kind() == reflect.Ptr {
+		for i, str := range strs {
+			rv := reflect.New(et.Elem())
+			if err := rv.Interface().(Configurable).UnmarshalConfigString(str); err != nil {
+				return nil, err
+			}
+			res.Index(i).Set(rv)
 		}
-
-		v, err := val.FromConfigString(str)
-		if err != nil {
-			return nil, err
+	} else {
+		for i, str := range strs {
+			rv := reflect.New(et)
+			if err := rv.Interface().(Configurable).UnmarshalConfigString(str); err != nil {
+				return nil, err
+			}
+			res.Index(i).Set(rv.Elem())
 		}
-
-		res.Index(i).Set(reflect.ValueOf(v))
 	}
-
 	return res.Interface(), nil
 }
 
