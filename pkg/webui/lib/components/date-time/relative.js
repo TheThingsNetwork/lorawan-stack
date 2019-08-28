@@ -35,14 +35,13 @@ const RelativeTime = function(props) {
 
         return (
           <FormattedRelativeTime
+            key={dateTime}
             value={delta}
             numeric="auto"
             updateIntervalInSeconds={updateIntervalInSeconds}
             unit={unit}
           >
-            {formattedRelativeTime =>
-              children ? children(formattedRelativeTime) : formattedRelativeTime
-            }
+            {formattedRelativeTime => children(formattedRelativeTime)}
           </FormattedRelativeTime>
         )
       }}
@@ -51,21 +50,25 @@ const RelativeTime = function(props) {
 }
 
 RelativeTime.propTypes = {
+  children: PropTypes.func,
+  className: PropTypes.string,
   /** The time to be displayed */
+  computeDelta: PropTypes.func,
+  /** The interval that the component will re-render in seconds */
+  unit: PropTypes.oneOf(['second', 'minute', 'hour', 'day', 'week', 'month', 'year']),
+  /** The unit to calculate relative date time */
+  updateIntervalInSeconds: PropTypes.number,
+  /** A function to compute relative delta in specified time units in the `unit` prop */
   value: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.number, // support timestamps
     PropTypes.instanceOf(Date),
   ]).isRequired,
-  /** The interval that the component will re-render in seconds */
-  updateIntervalInSeconds: PropTypes.number,
-  /** The unit to calculate relative date time */
-  unit: PropTypes.oneOf(['second', 'minute', 'hour', 'day', 'week', 'month', 'year']),
-  /** A function to compute relative delta in specified time units in the `unit` prop */
-  computeDelta: PropTypes.func,
 }
 
 RelativeTime.defaultProps = {
+  children: dateTime => dateTime,
+  className: '',
   updateIntervalInSeconds: 1,
   unit: 'second',
   computeDelta: formatInSeconds,

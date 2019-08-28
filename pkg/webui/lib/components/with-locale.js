@@ -20,10 +20,13 @@ import { connect } from 'react-redux'
 import { IntlProvider } from 'react-intl'
 import CancelablePromise from 'cancelable-promise'
 
+import Spinner from '../../components/spinner'
+
 import log, { error } from '../log'
 import { withEnv } from './env'
 
-const defaultLanguage = 'en'
+const defaultLocale = process.predefined.DEFAULT_MESSAGES_LOCALE // Note: defined by webpack define plugin
+const defaultLanguage = defaultLocale.split('-')[0] || 'en'
 const xx = 'xx'
 const dev = '../../dev'
 
@@ -47,6 +50,7 @@ export default class UserLocale extends React.PureComponent {
   state = {
     messages: process.predefined.DEFAULT_MESSAGES, // Note: defined by webpack define plugin
     xx: false,
+    loaded: false,
   }
 
   toggle() {
@@ -58,7 +62,7 @@ export default class UserLocale extends React.PureComponent {
   }
 
   componentDidMount() {
-    this.check({ env: { config: {} } }, this.props)
+    this.check({ env: { config: {} }, user: {} }, this.props)
 
     if (dev) {
       window.addEventListener('keydown', this.onKeydown)
@@ -67,23 +71,29 @@ export default class UserLocale extends React.PureComponent {
   }
 
   check(prev, props) {
-    const current = (prev.user && prev.user.language) || prev.env.config.language || defaultLanguage
+    const current = (prev.user && prev.user.language) || prev.env.config.language
     const next = (props.user && props.user.language) || props.env.config.language || defaultLanguage
 
-    if (current !== next && next !== 'en') {
+    if (current !== next) {
       this.promise = this.load(next)
     }
   }
 
-  success(p) {
-    const frontendMessages = p[0]
-    const backendMessages = p[1]
-    this.setState({ messages: { ...frontendMessages, ...backendMessages } })
+  success(p, withLocale) {
+    const newState = { loaded: true }
+    if (withLocale) {
+      const frontendMessages = p[0]
+      const backendMessages = p[1]
+
+      newState.messages = { ...frontendMessages, ...backendMessages }
+    }
+
+    this.setState(newState)
   }
 
   fail(err) {
     error(err)
-    this.setState({ messages: null })
+    this.setState({ messages: null, loaded: true })
   }
 
   onKeydown(evt) {
@@ -92,8 +102,8 @@ export default class UserLocale extends React.PureComponent {
     }
   }
 
-  load(language) {
-    let locale = navigator.language || navigator.browserLanguage || 'en-US'
+  async load(language) {
+    let locale = navigator.language || navigator.browserLanguage || defaultLocale
 
     // if the browser locale does not match the lang on the html tag, prefer the lang
     // otherwise we get mixed languages.
@@ -101,14 +111,20 @@ export default class UserLocale extends React.PureComponent {
       locale = language
     }
 
-    // load the language files
-    const promises = [
-      import(/* webpackChunkName: "lang.[request]" */ `../../locales/${language}.json`), // Frontend messages
-      import(/* webpackChunkName: "lang.[request]" */ `../../locales/.backend/${language}.json`), // Backend messages
-    ]
+    // load the language files if needed
+    await this.setState({ loaded: false })
 
-    // load locale polyfill if need be
-    if (!window.Intl) {
+    let promises = []
+    let withLocale = false
+    if (language !== defaultLanguage) {
+      withLocale = true
+      promises = [
+        import(/* webpackChunkName: "lang.[request]" */ `../../locales/${language}.json`), // Frontend messages
+        import(/* webpackChunkName: "lang.[request]" */ `../../locales/.backend/${language}.json`), // Backend messages
+      ]
+    }
+
+    if (!window.Intl.NumberFormat || !window.Intl.DateTimeFormat) {
       log(`Polyfilling locale ${locale} for language ${language}`)
       promises.push(import('intl'))
       promises.push(
@@ -116,8 +132,19 @@ export default class UserLocale extends React.PureComponent {
       )
     }
 
+    if (!window.Intl.PluralRules) {
+      log(`Polyfilling Intl.PluralRules`)
+      promises.push(import('intl-pluralrules'))
+    }
+
+    if (!window.Intl.RelativeTimeFormat) {
+      log(`Polyfilling Intl.RelativeTimeFormat data for language ${language}`)
+      promises.push(import('@formatjs/intl-relativetimeformat/polyfill'))
+      promises.push(import(`@formatjs/intl-relativetimeformat/dist/locale-data/${language}`))
+    }
+
     return CancelablePromise.resolve(Promise.all(promises))
-      .then(this.success)
+      .then(result => this.success(result, withLocale))
       .catch(this.fail)
   }
 
@@ -136,9 +163,11 @@ export default class UserLocale extends React.PureComponent {
       env: { config },
     } = this.props
 
-    const { xx } = this.state
+    const { messages, loaded, xx } = this.state
 
-    let { messages } = this.state
+    if (!loaded) {
+      return <Spinner center />
+    }
 
     const lang = (user && user.language) || config.language || defaultLanguage
 
