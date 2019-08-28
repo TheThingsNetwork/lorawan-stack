@@ -17,14 +17,11 @@ package messages
 import (
 	"bytes"
 	"encoding/binary"
-	"encoding/hex"
 	"reflect"
-	"strings"
 
 	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
 var (
@@ -118,22 +115,4 @@ func getDataRatesFromBandID(id string) (DataRates, error) {
 		}
 	}
 	return drs, nil
-}
-
-// GetEUIfromUID extracts the Gateway EUI from the UID.
-func GetEUIfromUID(uid string) (*types.EUI64, error) {
-	s := strings.Split(uid, "-")
-	if len(s) != 2 || s[0] != "eui" {
-		return nil, errUID.WithAttributes("uid", uid)
-	}
-	euiBytes, err := hex.DecodeString(s[1])
-	if err != nil {
-		return nil, errUID.WithAttributes("uid", uid)
-	}
-	var eui types.EUI64
-	err = eui.Unmarshal(euiBytes)
-	if err != nil {
-		return nil, errUID.WithAttributes("uid", uid)
-	}
-	return &eui, nil
 }

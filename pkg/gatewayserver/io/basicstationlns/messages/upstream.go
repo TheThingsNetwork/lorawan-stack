@@ -175,11 +175,6 @@ func (req *JoinRequest) ToUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID str
 		rxTime = &val
 	}
 
-	ids.EUI, err = GetEUIfromUID(ids.GatewayID)
-	if err != nil {
-		return nil, errGatewayID.WithAttributes("id", ids.GatewayID).WithCause(err)
-	}
-
 	rxMetadata := &ttnpb.RxMetadata{
 		GatewayIdentifiers: ids,
 		Time:               rxTime,
@@ -332,11 +327,6 @@ func (updf *UplinkDataFrame) ToUplinkMessage(ids ttnpb.GatewayIdentifiers, bandI
 	}
 
 	timestamp := uint32(updf.RadioMetaData.UpInfo.XTime & 0xFFFFFFFF)
-
-	ids.EUI, err = GetEUIfromUID(ids.GatewayID)
-	if err != nil {
-		return nil, errGatewayID.WithAttributes("id", ids.GatewayID).WithCause(err)
-	}
 
 	ulToken := ttnpb.UplinkToken{
 		GatewayAntennaIdentifiers: ttnpb.GatewayAntennaIdentifiers{
