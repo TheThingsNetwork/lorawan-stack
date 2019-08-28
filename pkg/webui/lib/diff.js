@@ -12,17 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const shallowDiff = function(initial, changed, ignorePaths = []) {
-  return Object.keys(changed).reduce(function(patch, field) {
-    const oldValue = initial[field]
-    const newValue = changed[field]
+import { observableDiff, applyChange } from 'deep-diff'
 
-    if (!ignorePaths.includes(field) && oldValue !== newValue) {
-      patch[field] = newValue
+/**
+ * Computes the structural differences (deep) between `original` and `updated` objects
+ * by applying any differences (add/remove/update).
+ * @param {Object} original - The original object.
+ * @param {Object} updated - The updated version of the `original` object.
+ * @param {Array} exclude - A list of field names that should not be included in the
+ * final diff.
+ * @returns {Object} - A new object representing the structural differences between
+ * `original` and `updated`.
+ */
+export default function(original, updated, exclude = []) {
+  const result = {}
+
+  observableDiff(original, updated, function(d) {
+    const entry = d.path[d.path.length - 1]
+    if (!exclude.includes(entry)) {
+      applyChange(result, undefined, d)
     }
+  })
 
-    return patch
-  }, {})
+  return result
 }
-
-export default shallowDiff

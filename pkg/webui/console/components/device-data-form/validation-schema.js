@@ -38,7 +38,7 @@ const baseSchemaShape = Yup.object({
           .required(sharedMessages.validateRequired), // 8 Byte hex
       }),
     }),
-  mac_state: Yup.object().shape({
+  mac_settings: Yup.object().shape({
     resets_f_cnt: Yup.boolean(),
   }),
   name: Yup.string()

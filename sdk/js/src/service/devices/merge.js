@@ -38,7 +38,10 @@ export default function mergeDevice(
     for (const path of part.paths ? [...minimum, ...part.paths] : []) {
       // For each path requested, get the corresponding value of the device record
       const val = traverse(part.device).get(path)
-      if (val) {
+
+      // Consider also falsy boolean values, for example
+      const isBoolean = typeof val === 'boolean'
+      if (val || isBoolean) {
         if (typeof val === 'object') {
           // In case of a whole sub-object being selected, write each leaf node
           // explicitly to achieve a deep merge instead of whole object overrides
