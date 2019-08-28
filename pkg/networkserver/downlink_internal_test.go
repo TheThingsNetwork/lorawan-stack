@@ -100,11 +100,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 		a := assertions.New(t)
 		return test.AssertClusterGetPeerRequestSequence(ctx, getPeerCh,
 			[]test.ClusterGetPeerResponse{
-				{Peer: nil, Error: fmt.Errorf("peer not found")},
-				{Peer: peer124, Error: nil},
-				{Peer: peer124, Error: nil},
-				{Peer: peer3, Error: nil},
-				{Peer: peer124, Error: nil},
+				{Error: errors.New("peer not found")},
+				{Peer: peer124},
+				{Peer: peer124},
+				{Peer: peer3},
+				{Peer: peer124},
 			},
 			func(reqCtx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
 				return a.So(reqCtx, should.HaveParentContextOrEqual, ctx) &&

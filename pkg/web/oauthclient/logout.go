@@ -40,18 +40,16 @@ func (oc *OAuthClient) HandleLogout(c echo.Context) error {
 
 	ctx := c.Request().Context()
 
-	if peer, err := oc.component.GetPeer(ctx, ttnpb.ClusterRole_ACCESS, nil); err == nil {
-		if cc, err := peer.Conn(); err == nil {
-			if res, err := ttnpb.NewEntityAccessClient(cc).AuthInfo(ctx, ttnpb.Empty, creds); err == nil {
-				if tokenInfo := res.GetOAuthAccessToken(); tokenInfo != nil {
-					_, err := ttnpb.NewOAuthAuthorizationRegistryClient(cc).DeleteToken(ctx, &ttnpb.OAuthAccessTokenIdentifiers{
-						UserIDs:   tokenInfo.UserIDs,
-						ClientIDs: tokenInfo.ClientIDs,
-						ID:        tokenInfo.ID,
-					}, creds)
-					if err != nil {
-						log.FromContext(ctx).WithError(err).Error("Could not invalidate access token")
-					}
+	if cc, err := oc.component.GetPeerConn(ctx, ttnpb.ClusterRole_ACCESS, nil); err == nil {
+		if res, err := ttnpb.NewEntityAccessClient(cc).AuthInfo(ctx, ttnpb.Empty, creds); err == nil {
+			if tokenInfo := res.GetOAuthAccessToken(); tokenInfo != nil {
+				_, err := ttnpb.NewOAuthAuthorizationRegistryClient(cc).DeleteToken(ctx, &ttnpb.OAuthAccessTokenIdentifiers{
+					UserIDs:   tokenInfo.UserIDs,
+					ClientIDs: tokenInfo.ClientIDs,
+					ID:        tokenInfo.ID,
+				}, creds)
+				if err != nil {
+					log.FromContext(ctx).WithError(err).Error("Could not invalidate access token")
 				}
 			}
 		}

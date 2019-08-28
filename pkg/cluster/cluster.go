@@ -21,6 +21,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"os"
+	"strings"
 
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -47,6 +48,9 @@ type Cluster interface {
 	// given identifiers. If the identifiers are nil, this function returns a random
 	// peer from the list that would be returned by GetPeers.
 	GetPeer(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) (Peer, error)
+	// GetPeerConn returns the gRPC client connection of a peer, if the peer is available as
+	// as per GetPeer.
+	GetPeerConn(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) (*grpc.ClientConn, error)
 
 	// ClaimIDs can be used to indicate that the current peer takes
 	// responsibility for entities identified by ids.
@@ -269,7 +273,7 @@ func (c *cluster) GetPeers(ctx context.Context, role ttnpb.ClusterRole) ([]Peer,
 	return matches, nil
 }
 
-var errPeerUnavailable = errors.DefineUnavailable("peer_unavailable", "no peer with role {role} is available")
+var errPeerUnavailable = errors.DefineUnavailable("peer_unavailable", "{cluster_role} cluster peer unavailable")
 
 func (c *cluster) GetPeer(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) (Peer, error) {
 	matches, err := c.GetPeers(ctx, role)
@@ -280,7 +284,15 @@ func (c *cluster) GetPeer(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb
 		return matches[0], nil
 	}
 	// The reference cluster only has a single instance of each component, so we don't need to filter on IDs.
-	return nil, errPeerUnavailable.WithAttributes("role", role)
+	return nil, errPeerUnavailable.WithAttributes("cluster_role", strings.Title(strings.Replace(role.String(), "_", " ", -1)))
+}
+
+func (c *cluster) GetPeerConn(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) (*grpc.ClientConn, error) {
+	peer, err := c.GetPeer(ctx, role, ids)
+	if err != nil {
+		return nil, err
+	}
+	return peer.Conn()
 }
 
 // ClaimIDs is a no-op in the reference implementation.

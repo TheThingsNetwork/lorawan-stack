@@ -106,36 +106,24 @@ func (s *Server) getAuth(ctx context.Context, eui types.EUI64, auth string) grpc
 	return s.component.WithClusterAuth()
 }
 
-var errERPeerUnavailable = errors.DefineUnavailable("entity_registry_unavailable", "Entity Registry unavailable")
-
 func (s *Server) getRegistry(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (ttnpb.GatewayRegistryClient, error) {
 	if s.registry != nil {
 		return s.registry, nil
 	}
-	peer, err := s.component.GetPeer(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, ids)
+	cc, err := s.component.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, ids)
 	if err != nil {
-		return nil, errERPeerUnavailable.WithCause(err)
-	}
-	cc, err := peer.Conn()
-	if err != nil {
-		return nil, errERPeerUnavailable.WithCause(err)
+		return nil, err
 	}
 	return ttnpb.NewGatewayRegistryClient(cc), nil
 }
-
-var errAccessPeerUnavailable = errors.DefineUnavailable("access_unavailable", "Access unavailable")
 
 func (s *Server) getAccess(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (ttnpb.GatewayAccessClient, error) {
 	if s.access != nil {
 		return s.access, nil
 	}
-	peer, err := s.component.GetPeer(ctx, ttnpb.ClusterRole_ACCESS, ids)
+	cc, err := s.component.GetPeerConn(ctx, ttnpb.ClusterRole_ACCESS, ids)
 	if err != nil {
-		return nil, errAccessPeerUnavailable.WithCause(err)
-	}
-	cc, err := peer.Conn()
-	if err != nil {
-		return nil, errAccessPeerUnavailable.WithCause(err)
+		return nil, err
 	}
 	return ttnpb.NewGatewayAccessClient(cc), nil
 }

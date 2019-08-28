@@ -873,7 +873,6 @@ func AssertNsJsPeerHandleAuthJoinRequest(ctx context.Context, peerReqCh <-chan t
 			Peer: NewJSPeer(ctx, &MockNsJsServer{
 				HandleJoinFunc: MakeNsJsHandleJoinChFunc(joinReqCh),
 			}),
-			Error: nil,
 		},
 	) {
 		return false
@@ -948,7 +947,6 @@ func AssertLinkApplication(ctx context.Context, conn *grpc.ClientConn, getPeerCh
 			Peer: NewISPeer(ctx, &test.MockApplicationAccessServer{
 				ListRightsFunc: test.MakeApplicationAccessListRightsChFunc(listRightsCh),
 			}),
-			Error: nil,
 		},
 	), should.BeTrue) {
 		return nil, false

@@ -75,7 +75,6 @@ func AssertSetDevice(ctx context.Context, conn *grpc.ClientConn, getPeerCh <-cha
 			Peer: NewISPeer(ctx, &test.MockApplicationAccessServer{
 				ListRightsFunc: test.MakeApplicationAccessListRightsChFunc(listRightsCh),
 			}),
-			Error: nil,
 		},
 	), should.BeTrue) {
 		return nil, false
@@ -301,10 +300,7 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 						DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 					})
 			},
-			test.ClusterGetPeerResponse{
-				Peer:  jsPeer,
-				Error: nil,
-			},
+			test.ClusterGetPeerResponse{Peer: jsPeer},
 		), should.BeTrue) {
 			return
 		}
@@ -437,10 +433,7 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 						GatewayID: "test-gtw-1",
 					})
 			},
-			test.ClusterGetPeerResponse{
-				Peer:  gsPeer,
-				Error: nil,
-			},
+			test.ClusterGetPeerResponse{Peer: gsPeer},
 		), should.BeTrue) {
 			return
 		}
@@ -452,10 +445,7 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 						GatewayID: "test-gtw-2",
 					})
 			},
-			test.ClusterGetPeerResponse{
-				Peer:  gsPeer,
-				Error: nil,
-			},
+			test.ClusterGetPeerResponse{Peer: gsPeer},
 		), should.BeTrue) {
 			return
 		}
@@ -669,10 +659,7 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 						GatewayID: "test-gtw-3",
 					})
 			},
-			test.ClusterGetPeerResponse{
-				Peer:  gsPeer,
-				Error: nil,
-			},
+			test.ClusterGetPeerResponse{Peer: gsPeer},
 		), should.BeTrue)
 
 		a.So(test.AssertClusterGetPeerRequest(ctx, getPeerCh,
@@ -682,10 +669,7 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 						GatewayID: "test-gtw-2",
 					})
 			},
-			test.ClusterGetPeerResponse{
-				Peer:  gsPeer,
-				Error: nil,
-			},
+			test.ClusterGetPeerResponse{Peer: gsPeer},
 		), should.BeTrue)
 
 		a.So(AssertAuthNsGsScheduleDownlinkRequest(ctx, authCh, scheduleDownlinkCh,

@@ -138,6 +138,15 @@ func (m MockCluster) GetPeer(ctx context.Context, role ttnpb.ClusterRole, ids tt
 	return m.GetPeerFunc(ctx, role, ids)
 }
 
+// GetPeerConn calls GetPeer and then Conn.
+func (m MockCluster) GetPeerConn(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) (*grpc.ClientConn, error) {
+	peer, err := m.GetPeer(ctx, role, ids)
+	if err != nil {
+		return nil, err
+	}
+	return peer.Conn()
+}
+
 // ClaimIDs calls ClaimIDsFunc if set and panics otherwise.
 func (m MockCluster) ClaimIDs(ctx context.Context, ids ttnpb.Identifiers) error {
 	if m.ClaimIDsFunc == nil {

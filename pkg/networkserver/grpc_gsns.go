@@ -37,7 +37,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/unique"
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -924,11 +923,14 @@ func (ns *NetworkServer) newDevAddr(context.Context, *ttnpb.EndDevice) types.Dev
 
 func (ns *NetworkServer) sendJoinRequest(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, req *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error) {
 	logger := log.FromContext(ctx)
-	var cc *grpc.ClientConn
-	if js, _ := ns.GetPeer(ctx, ttnpb.ClusterRole_JOIN_SERVER, ids); js != nil {
-		cc, _ = js.Conn()
-	}
-	if cc != nil {
+	cc, err := ns.GetPeerConn(ctx, ttnpb.ClusterRole_JOIN_SERVER, ids)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			logger.WithError(err).Debug("Join Server peer not found")
+		} else {
+			logger.WithError(err).Error("Join Server peer connection lookup failed")
+		}
+	} else {
 		resp, err := ttnpb.NewNsJsClient(cc).HandleJoin(ctx, req, ns.WithClusterAuth())
 		if err == nil {
 			logger.Debug("Join-request accepted by cluster-local Join Server")
