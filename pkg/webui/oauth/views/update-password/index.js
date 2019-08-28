@@ -24,7 +24,6 @@ import queryString from 'query-string'
 
 import api from '../../api'
 import sharedMessages from '../../../lib/shared-messages'
-import { digit, uppercase, special } from '../../lib/regexp'
 
 import Button from '../../../components/button'
 import Form from '../../../components/form'
@@ -49,9 +48,6 @@ const m = defineMessages({
 const validationSchema = Yup.object().shape({
   password: Yup.string()
     .min(8)
-    .matches(digit, sharedMessages.validatePasswordDigit)
-    .matches(uppercase, sharedMessages.validatePasswordUppercase)
-    .matches(special, sharedMessages.validatePasswordSpecial)
     .required(sharedMessages.validateRequired),
   confirm: Yup.string()
     .oneOf([Yup.ref('password'), null], sharedMessages.validatePasswordMatch)
