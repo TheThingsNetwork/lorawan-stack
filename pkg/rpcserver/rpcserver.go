@@ -216,6 +216,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 			}
 			return s, false
 		}),
+		runtime.WithDisablePathLengthFallback(),
 	)
 	return server
 }
