@@ -138,7 +138,7 @@ export default class ApplicationIntegrationEdit extends Component {
   }
 
   render() {
-    const { webhook } = this.props
+    const { webhook, appId } = this.props
 
     return (
       <Container>
@@ -152,6 +152,7 @@ export default class ApplicationIntegrationEdit extends Component {
           <Col lg={8} md={12}>
             <WebhookForm
               update
+              appId={appId}
               initialWebhookValue={webhook}
               onSubmit={this.handleSubmit}
               onSubmitSuccess={this.handleSubmitSuccess}
