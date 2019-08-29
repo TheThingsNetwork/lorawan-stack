@@ -15,26 +15,10 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import CONNECTION_STATUS from '../../constants/connection-status'
 import Events from '../../../components/events'
 import PropTypes from '../../../lib/prop-types'
 
 const { Widget } = Events
-
-const mapConnectionStatusToWidget = function(status) {
-  switch (status) {
-    case CONNECTION_STATUS.CONNECTED:
-      return Widget.CONNECTION_STATUS.GOOD
-    case CONNECTION_STATUS.CONNECTING:
-      return Widget.CONNECTION_STATUS.MEDIOCRE
-    case CONNECTION_STATUS.DISCONNECTED:
-    case CONNECTION_STATUS.ERROR:
-      return Widget.CONNECTION_STATUS.BAD
-    case CONNECTION_STATUS.UNKNOWN:
-    default:
-      return Widget.CONNECTION_STATUS.UNKNOWN
-  }
-}
 
 @connect(function(state, props) {
   const { id, eventsSelector, statusSelector, errorSelector } = props
@@ -47,18 +31,10 @@ const mapConnectionStatusToWidget = function(status) {
 })
 class EventsSubscription extends React.Component {
   render() {
-    const { id, widget, events, connectionStatus, onClear, toAllUrl, error } = this.props
+    const { id, widget, events, onClear, toAllUrl, error } = this.props
 
     if (widget) {
-      return (
-        <Widget
-          emitterId={id}
-          events={events}
-          connectionStatus={mapConnectionStatusToWidget(connectionStatus)}
-          toAllUrl={toAllUrl}
-          error={error}
-        />
-      )
+      return <Widget emitterId={id} events={events} toAllUrl={toAllUrl} error={error} />
     }
 
     return <Events emitterId={id} events={events} onClear={onClear} error={error} />
@@ -66,19 +42,17 @@ class EventsSubscription extends React.Component {
 }
 
 EventsSubscription.propTypes = {
-  id: PropTypes.string.isRequired,
-  eventsSelector: PropTypes.func.isRequired,
-  statusSelector: PropTypes.func,
   errorSelector: PropTypes.func,
+  eventsSelector: PropTypes.func.isRequired,
+  id: PropTypes.string.isRequired,
   onClear: PropTypes.func,
-  widget: PropTypes.bool,
   toAllUrl: PropTypes.string,
+  widget: PropTypes.bool,
 }
 
 EventsSubscription.defaultProps = {
   widget: false,
   onClear: () => null,
-  statusSelector: () => 'unknown',
   errorSelector: () => undefined,
   toAllUrl: null,
 }
