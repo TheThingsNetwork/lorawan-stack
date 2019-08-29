@@ -39,6 +39,65 @@ func (dst *ClaimEndDeviceRequest) SetFields(src *ClaimEndDeviceRequest, paths ..
 				var zero string
 				dst.TargetDeviceID = zero
 			}
+		case "target_network_server_address":
+			if len(subs) > 0 {
+				return fmt.Errorf("'target_network_server_address' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.TargetNetworkServerAddress = src.TargetNetworkServerAddress
+			} else {
+				var zero string
+				dst.TargetNetworkServerAddress = zero
+			}
+		case "target_network_server_kek_label":
+			if len(subs) > 0 {
+				return fmt.Errorf("'target_network_server_kek_label' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.TargetNetworkServerKEKLabel = src.TargetNetworkServerKEKLabel
+			} else {
+				var zero string
+				dst.TargetNetworkServerKEKLabel = zero
+			}
+		case "target_application_server_address":
+			if len(subs) > 0 {
+				return fmt.Errorf("'target_application_server_address' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.TargetApplicationServerAddress = src.TargetApplicationServerAddress
+			} else {
+				var zero string
+				dst.TargetApplicationServerAddress = zero
+			}
+		case "target_application_server_kek_label":
+			if len(subs) > 0 {
+				return fmt.Errorf("'target_application_server_kek_label' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.TargetApplicationServerKEKLabel = src.TargetApplicationServerKEKLabel
+			} else {
+				var zero string
+				dst.TargetApplicationServerKEKLabel = zero
+			}
+		case "target_application_server_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'target_application_server_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.TargetApplicationServerID = src.TargetApplicationServerID
+			} else {
+				var zero string
+				dst.TargetApplicationServerID = zero
+			}
+		case "target_net_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'target_net_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.TargetNetID = src.TargetNetID
+			} else {
+				dst.TargetNetID = nil
+			}
 		case "invalidate_authentication_code":
 			if len(subs) > 0 {
 				return fmt.Errorf("'invalidate_authentication_code' has no subfields, but %s were specified", subs)

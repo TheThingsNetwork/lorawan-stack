@@ -7376,10 +7376,37 @@
           "format": "byte"
         },
         "target_application_ids": {
-          "$ref": "#/definitions/v3ApplicationIdentifiers"
+          "$ref": "#/definitions/v3ApplicationIdentifiers",
+          "description": "Application identifiers of the target end device."
         },
         "target_device_id": {
-          "type": "string"
+          "type": "string",
+          "description": "End device ID of the target end device. If empty, use the source device ID."
+        },
+        "target_network_server_address": {
+          "type": "string",
+          "description": "The address of the Network Server where the device will be registered.\nIf set and if the source device is currently registered on a Network Server, settings will be transferred.\nIf not set, the device shall not be registered on a Network Server."
+        },
+        "target_network_server_kek_label": {
+          "type": "string",
+          "description": "The KEK label of the Network Server to use for wrapping network session keys."
+        },
+        "target_application_server_address": {
+          "type": "string",
+          "description": "The address of the Application Server where the device will be registered.\nIf set and if the source device is currently registered on an Application Server, settings will be transferred.\nIf not set, the device shall not be registered on an Application Server."
+        },
+        "target_application_server_kek_label": {
+          "type": "string",
+          "description": "The KEK label of the Application Server to use for wrapping the application session key."
+        },
+        "target_application_server_id": {
+          "type": "string",
+          "description": "The AS-ID of the Application Server to use."
+        },
+        "target_net_id": {
+          "type": "string",
+          "format": "byte",
+          "description": "Home NetID."
         },
         "invalidate_authentication_code": {
           "type": "boolean",

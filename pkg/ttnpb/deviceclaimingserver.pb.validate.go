@@ -78,6 +78,53 @@ func (m *ClaimEndDeviceRequest) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "target_network_server_address":
+
+			if !_ClaimEndDeviceRequest_TargetNetworkServerAddress_Pattern.MatchString(m.GetTargetNetworkServerAddress()) {
+				return ClaimEndDeviceRequestValidationError{
+					field:  "target_network_server_address",
+					reason: "value does not match regex pattern \"^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\\\-]*[a-zA-Z0-9])\\\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$\"",
+				}
+			}
+
+		case "target_network_server_kek_label":
+
+			if utf8.RuneCountInString(m.GetTargetNetworkServerKEKLabel()) > 2048 {
+				return ClaimEndDeviceRequestValidationError{
+					field:  "target_network_server_kek_label",
+					reason: "value length must be at most 2048 runes",
+				}
+			}
+
+		case "target_application_server_address":
+
+			if !_ClaimEndDeviceRequest_TargetApplicationServerAddress_Pattern.MatchString(m.GetTargetApplicationServerAddress()) {
+				return ClaimEndDeviceRequestValidationError{
+					field:  "target_application_server_address",
+					reason: "value does not match regex pattern \"^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\\\-]*[a-zA-Z0-9])\\\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$\"",
+				}
+			}
+
+		case "target_application_server_kek_label":
+
+			if utf8.RuneCountInString(m.GetTargetApplicationServerKEKLabel()) > 2048 {
+				return ClaimEndDeviceRequestValidationError{
+					field:  "target_application_server_kek_label",
+					reason: "value length must be at most 2048 runes",
+				}
+			}
+
+		case "target_application_server_id":
+
+			if utf8.RuneCountInString(m.GetTargetApplicationServerID()) > 100 {
+				return ClaimEndDeviceRequestValidationError{
+					field:  "target_application_server_id",
+					reason: "value length must be at most 100 runes",
+				}
+			}
+
+		case "target_net_id":
+			// no validation rules for TargetNetID
 		case "invalidate_authentication_code":
 			// no validation rules for InvalidateAuthenticationCode
 		case "source_device":
@@ -179,6 +226,10 @@ var _ interface {
 } = ClaimEndDeviceRequestValidationError{}
 
 var _ClaimEndDeviceRequest_TargetDeviceID_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$")
+
+var _ClaimEndDeviceRequest_TargetNetworkServerAddress_Pattern = regexp.MustCompile("^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$")
+
+var _ClaimEndDeviceRequest_TargetApplicationServerAddress_Pattern = regexp.MustCompile("^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$")
 
 // ValidateFields checks the field values on AuthorizeApplicationRequest with
 // the rules defined in the proto definition for this message. If any rules
