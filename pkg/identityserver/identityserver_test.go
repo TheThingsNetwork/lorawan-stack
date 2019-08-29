@@ -299,6 +299,11 @@ func getIdentityServer(t *testing.T) (*IdentityServer, *grpc.ClientConn) {
 	}
 	conf.UserRegistration.PasswordRequirements.MinLength = 10
 	conf.UserRegistration.PasswordRequirements.MaxLength = 1000
+	conf.Email.Templates.Static = map[string][]byte{
+		"overridden.subject.txt": []byte("Overridden subject {{.User.Name}}"),
+		"overridden.html":        []byte("Overridden HTML {{.User.Name}} {{.User.Email}}"),
+		"overridden.txt":         []byte("Overridden text {{.User.Name}} {{.User.Email}}"),
+	}
 	is, err := New(c, conf)
 	if err != nil {
 		panic(err)

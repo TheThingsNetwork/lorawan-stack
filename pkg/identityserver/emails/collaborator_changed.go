@@ -23,14 +23,14 @@ type CollaboratorChanged struct {
 }
 
 // TemplateName returns the name of the template to use for this email.
-func (CollaboratorChanged) TemplateName() string { return "collaborator_added" }
+func (CollaboratorChanged) TemplateName() string { return "collaborator_changed" }
 
 const collaboratorChangedSubject = `A collaborator has been changed`
 
 const collaboratorChangedBody = `Dear {{.User.Name}},
 
 The collaborator "{{.Collaborator.EntityIdentifiers.IDString}}" of {{.Entity.Type}} "{{.Entity.ID}}" on {{.Network.Name}} now has the following rights:
-{{range $right := .Collaborator.Rights}} 
+{{range $right := .Collaborator.Rights}}
 {{$right}} {{end}}
 `
 

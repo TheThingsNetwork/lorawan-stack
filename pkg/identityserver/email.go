@@ -22,18 +22,33 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/email"
 	"go.thethings.network/lorawan-stack/pkg/email/sendgrid"
 	"go.thethings.network/lorawan-stack/pkg/email/smtp"
+	"go.thethings.network/lorawan-stack/pkg/fetch"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/emails"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-var globalEmailTemplateRegistry = email.NewTemplateRegistry(nil)
-
-func (is *IdentityServer) getEmailTemplates(_ context.Context) *email.TemplateRegistry {
-	// TODO: Get email template fetcher from config (https://github.com/TheThingsNetwork/lorawan-stack/issues/148).
-	// Re-use existing registry for same fetcher (to avoid re-compiling templates).
-	return globalEmailTemplateRegistry
+func (is *IdentityServer) getEmailTemplates(ctx context.Context) *email.TemplateRegistry {
+	c := &is.configFromContext(ctx).Email.Templates
+	c.registryMu.Lock()
+	defer c.registryMu.Unlock()
+	if c.registry != nil {
+		return c.registry
+	}
+	var fetcher fetch.Interface
+	switch {
+	case c.Static != nil:
+		fetcher = fetch.NewMemFetcher(c.Static)
+	case c.Directory != "":
+		fetcher = fetch.FromFilesystem(c.Directory)
+	case c.URL != "":
+		fetcher = fetch.FromHTTP(c.URL, true)
+	default:
+		fetcher = nil
+	}
+	c.registry = email.NewTemplateRegistry(fetcher, c.Includes...)
+	return c.registry
 }
 
 // SendEmail sends an email.

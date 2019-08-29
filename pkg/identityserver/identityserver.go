@@ -16,6 +16,7 @@ package identityserver
 
 import (
 	"context"
+	"sync"
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
@@ -72,6 +73,14 @@ type Config struct {
 		email.Config `name:",squash"`
 		SendGrid     sendgrid.Config `name:"sendgrid"`
 		SMTP         smtp.Config     `name:"smtp"`
+		Templates    struct {
+			Static     map[string][]byte `name:"-"`
+			Directory  string            `name:"directory" description:"Retrieve the email templates from the filesystem"`
+			URL        string            `name:"url" description:"Retrieve the email templates from a web server"`
+			Includes   []string          `name:"includes" description:"The email templates that will be preloaded on startup"`
+			registry   *email.TemplateRegistry
+			registryMu sync.Mutex
+		} `name:"templates"`
 	} `name:"email"`
 }
 
