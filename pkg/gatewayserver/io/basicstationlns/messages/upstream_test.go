@@ -108,6 +108,11 @@ func TestMarshalJSON(t *testing.T) {
 }
 
 func TestJoinRequest(t *testing.T) {
+	gtwID := ttnpb.GatewayIdentifiers{
+		GatewayID: "eui-1122334455667788",
+		EUI:       &types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88},
+	}
+
 	for _, tc := range []struct {
 		Name                  string
 		JoinRequest           JoinRequest
@@ -135,7 +140,7 @@ func TestJoinRequest(t *testing.T) {
 					},
 				},
 			},
-			GatewayIDs:     ttnpb.GatewayIdentifiers{GatewayID: "eui-1122334455667788"},
+			GatewayIDs:     gtwID,
 			BandID:         "EU_86_870",
 			ErrorAssertion: errors.IsInvalidArgument,
 		},
@@ -158,14 +163,14 @@ func TestJoinRequest(t *testing.T) {
 					},
 				},
 			},
-			GatewayIDs:     ttnpb.GatewayIdentifiers{GatewayID: "eui-1122334455667788"},
+			GatewayIDs:     gtwID,
 			BandID:         "EU_868_870",
 			ErrorAssertion: errors.IsInvalidArgument,
 		},
 		{
 			Name:        "EmptyJoinRequest",
 			JoinRequest: JoinRequest{},
-			GatewayIDs:  ttnpb.GatewayIdentifiers{GatewayID: "eui-1122334455667788"},
+			GatewayIDs:  gtwID,
 			BandID:      "EU_863_870",
 			ExpectedUplinkMessage: ttnpb.UplinkMessage{
 				Payload: &ttnpb.Message{
@@ -178,11 +183,8 @@ func TestJoinRequest(t *testing.T) {
 					}},
 				},
 				RxMetadata: []*ttnpb.RxMetadata{{
-					GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-						GatewayID: "eui-1122334455667788",
-						EUI:       &types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88},
-					},
-					UplinkToken: []byte{10, 24, 10, 22, 10, 20, 101, 117, 105, 45, 49, 49, 50, 50, 51, 51, 52, 52, 53, 53, 54, 54, 55, 55, 56, 56},
+					GatewayIdentifiers: gtwID,
+					UplinkToken:        []byte{10, 34, 10, 32, 10, 20, 101, 117, 105, 45, 49, 49, 50, 50, 51, 51, 52, 52, 53, 53, 54, 54, 55, 55, 56, 56, 18, 8, 17, 34, 51, 68, 85, 102, 119, 136},
 				}},
 				Settings: ttnpb.TxSettings{
 					CodingRate: "4/5",
@@ -212,7 +214,7 @@ func TestJoinRequest(t *testing.T) {
 					},
 				},
 			},
-			GatewayIDs: ttnpb.GatewayIdentifiers{GatewayID: "eui-1122334455667788"},
+			GatewayIDs: gtwID,
 			BandID:     "EU_863_870",
 			ExpectedUplinkMessage: ttnpb.UplinkMessage{
 				Payload: &ttnpb.Message{
@@ -226,16 +228,13 @@ func TestJoinRequest(t *testing.T) {
 				},
 				RxMetadata: []*ttnpb.RxMetadata{
 					{
-						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-							GatewayID: "eui-1122334455667788",
-							EUI:       &types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88},
-						},
-						Time:        &[]time.Time{time.Unix(1548059982, 0)}[0],
-						Timestamp:   (uint32)(12666373963464220 & 0xFFFFFFFF),
-						RSSI:        89,
-						ChannelRSSI: 89,
-						SNR:         9.25,
-						UplinkToken: []byte{10, 24, 10, 22, 10, 20, 101, 117, 105, 45, 49, 49, 50, 50, 51, 51, 52, 52, 53, 53, 54, 54, 55, 55, 56, 56, 16, 156, 252, 188, 5},
+						GatewayIdentifiers: gtwID,
+						Time:               &[]time.Time{time.Unix(1548059982, 0)}[0],
+						Timestamp:          (uint32)(12666373963464220 & 0xFFFFFFFF),
+						RSSI:               89,
+						ChannelRSSI:        89,
+						SNR:                9.25,
+						UplinkToken:        []byte{10, 34, 10, 32, 10, 20, 101, 117, 105, 45, 49, 49, 50, 50, 51, 51, 52, 52, 53, 53, 54, 54, 55, 55, 56, 56, 18, 8, 17, 34, 51, 68, 85, 102, 119, 136, 16, 156, 252, 188, 5},
 					},
 				},
 				Settings: ttnpb.TxSettings{
@@ -276,6 +275,11 @@ func TestJoinRequest(t *testing.T) {
 }
 
 func TestUplinkDataFrame(t *testing.T) {
+	gtwID := ttnpb.GatewayIdentifiers{
+		GatewayID: "eui-1122334455667788",
+		EUI:       &types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88},
+	}
+
 	for _, tc := range []struct {
 		Name                  string
 		UplinkDataFrame       UplinkDataFrame
@@ -287,7 +291,7 @@ func TestUplinkDataFrame(t *testing.T) {
 		{
 			Name:                  "Empty",
 			UplinkDataFrame:       UplinkDataFrame{},
-			GatewayIDs:            ttnpb.GatewayIdentifiers{GatewayID: "eui-1122334455667788"},
+			GatewayIDs:            gtwID,
 			FrequencyPlanID:       "EU_863_870",
 			ExpectedUplinkMessage: ttnpb.UplinkMessage{},
 			ErrorAssertion: func(err error) bool {
@@ -316,7 +320,7 @@ func TestUplinkDataFrame(t *testing.T) {
 					},
 				},
 			},
-			GatewayIDs:      ttnpb.GatewayIdentifiers{GatewayID: "eui-1122334455667788"},
+			GatewayIDs:      gtwID,
 			FrequencyPlanID: "EU_863_870",
 			ExpectedUplinkMessage: ttnpb.UplinkMessage{
 				Payload: &ttnpb.Message{
@@ -338,16 +342,13 @@ func TestUplinkDataFrame(t *testing.T) {
 				},
 				RxMetadata: []*ttnpb.RxMetadata{
 					{
-						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-							GatewayID: "eui-1122334455667788",
-							EUI:       &types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88},
-						},
-						Time:        &[]time.Time{time.Unix(1548059982, 0)}[0],
-						Timestamp:   (uint32)(12666373963464220 & 0xFFFFFFFF),
-						RSSI:        89,
-						ChannelRSSI: 89,
-						SNR:         9.25,
-						UplinkToken: []byte{10, 34, 10, 32, 10, 20, 101, 117, 105, 45, 49, 49, 50, 50, 51, 51, 52, 52, 53, 53, 54, 54, 55, 55, 56, 56, 18, 8, 17, 34, 51, 68, 85, 102, 119, 136, 16, 156, 252, 188, 5},
+						GatewayIdentifiers: gtwID,
+						Time:               &[]time.Time{time.Unix(1548059982, 0)}[0],
+						Timestamp:          (uint32)(12666373963464220 & 0xFFFFFFFF),
+						RSSI:               89,
+						ChannelRSSI:        89,
+						SNR:                9.25,
+						UplinkToken:        []byte{10, 34, 10, 32, 10, 20, 101, 117, 105, 45, 49, 49, 50, 50, 51, 51, 52, 52, 53, 53, 54, 54, 55, 55, 56, 56, 18, 8, 17, 34, 51, 68, 85, 102, 119, 136, 16, 156, 252, 188, 5},
 					},
 				},
 				Settings: ttnpb.TxSettings{
@@ -384,7 +385,7 @@ func TestUplinkDataFrame(t *testing.T) {
 					},
 				},
 			},
-			GatewayIDs:      ttnpb.GatewayIdentifiers{GatewayID: "eui-1122334455667788"},
+			GatewayIDs:      gtwID,
 			FrequencyPlanID: "EU_863_870",
 			ExpectedUplinkMessage: ttnpb.UplinkMessage{
 				Payload: &ttnpb.Message{
@@ -406,16 +407,13 @@ func TestUplinkDataFrame(t *testing.T) {
 				},
 				RxMetadata: []*ttnpb.RxMetadata{
 					{
-						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-							GatewayID: "eui-1122334455667788",
-							EUI:       &types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88},
-						},
-						Time:        &[]time.Time{time.Unix(1548059982, 0)}[0],
-						Timestamp:   (uint32)(12666373963464220 & 0xFFFFFFFF),
-						RSSI:        89,
-						ChannelRSSI: 89,
-						SNR:         9.25,
-						UplinkToken: []byte{10, 34, 10, 32, 10, 20, 101, 117, 105, 45, 49, 49, 50, 50, 51, 51, 52, 52, 53, 53, 54, 54, 55, 55, 56, 56, 18, 8, 17, 34, 51, 68, 85, 102, 119, 136, 16, 156, 252, 188, 5},
+						GatewayIdentifiers: gtwID,
+						Time:               &[]time.Time{time.Unix(1548059982, 0)}[0],
+						Timestamp:          (uint32)(12666373963464220 & 0xFFFFFFFF),
+						RSSI:               89,
+						ChannelRSSI:        89,
+						SNR:                9.25,
+						UplinkToken:        []byte{10, 34, 10, 32, 10, 20, 101, 117, 105, 45, 49, 49, 50, 50, 51, 51, 52, 52, 53, 53, 54, 54, 55, 55, 56, 56, 18, 8, 17, 34, 51, 68, 85, 102, 119, 136, 16, 156, 252, 188, 5},
 					},
 				},
 				Settings: ttnpb.TxSettings{
@@ -451,6 +449,11 @@ func TestUplinkDataFrame(t *testing.T) {
 }
 
 func TestFromUplinkDataFrame(t *testing.T) {
+	gtwID := ttnpb.GatewayIdentifiers{
+		GatewayID: "eui-1122334455667788",
+		EUI:       &types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88},
+	}
+
 	for _, tc := range []struct {
 		Name                    string
 		UplinkMessage           ttnpb.UplinkMessage
@@ -494,12 +497,12 @@ func TestFromUplinkDataFrame(t *testing.T) {
 				},
 				RxMetadata: []*ttnpb.RxMetadata{
 					{
-						GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "eui-1122334455667788"},
+						GatewayIdentifiers: gtwID,
 						Time:               &[]time.Time{time.Unix(1548059982, 0)}[0],
 						Timestamp:          (uint32)(12666373963464220 & 0xFFFFFFFF),
 						RSSI:               89,
 						SNR:                9.25,
-						UplinkToken:        []byte{10, 16, 10, 14, 10, 12, 116, 101, 115, 116, 45, 103, 97, 116, 101, 119, 97, 121, 16, 156, 252, 188, 5},
+						UplinkToken:        []byte{10, 34, 10, 32, 10, 20, 101, 117, 105, 45, 49, 49, 50, 50, 51, 51, 52, 52, 53, 53, 54, 54, 55, 55, 56, 56, 18, 8, 17, 34, 51, 68, 85, 102, 119, 136, 16, 156, 252, 188, 5},
 					},
 				},
 				Settings: ttnpb.TxSettings{
@@ -553,6 +556,11 @@ func TestFromUplinkDataFrame(t *testing.T) {
 }
 
 func TestJreqFromUplinkDataFrame(t *testing.T) {
+	gtwID := ttnpb.GatewayIdentifiers{
+		GatewayID: "eui-1122334455667788",
+		EUI:       &types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88},
+	}
+
 	for _, tc := range []struct {
 		Name                string
 		UplinkMessage       ttnpb.UplinkMessage
@@ -584,7 +592,7 @@ func TestJreqFromUplinkDataFrame(t *testing.T) {
 				},
 				RxMetadata: []*ttnpb.RxMetadata{
 					{
-						GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "eui-1122334455667788"},
+						GatewayIdentifiers: gtwID,
 						Time:               &[]time.Time{time.Unix(1548059982, 0)}[0],
 						Timestamp:          (uint32)(12666373963464220 & 0xFFFFFFFF),
 						RSSI:               89,
