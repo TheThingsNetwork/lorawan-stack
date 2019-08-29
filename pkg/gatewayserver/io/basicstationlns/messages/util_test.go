@@ -21,7 +21,6 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
@@ -99,72 +98,6 @@ func TestGetUint32IntegerAsByteSlice(t *testing.T) {
 	b, err = getInt32AsByteSlice(0x7FFFFFFF)
 	a.So(err, should.BeNil)
 	a.So(b, should.Resemble, []byte{0xFF, 0xFF, 0xFF, 0x7F})
-}
-
-func TestGetEUIfromUID(t *testing.T) {
-	for i, tc := range []struct {
-		UID            string
-		ErrorAssertion func(error) bool
-		ExpectedEUI    types.EUI64
-	}{
-		{
-			UID: "",
-			ErrorAssertion: func(err error) bool {
-				return errors.Resemble(err, errUID)
-			},
-		},
-		{
-			UID: "eui",
-			ErrorAssertion: func(err error) bool {
-				return errors.Resemble(err, errUID)
-			},
-		},
-		{
-			UID: "eui",
-			ErrorAssertion: func(err error) bool {
-				return errors.Resemble(err, errUID)
-			},
-		},
-		{
-			UID: "uid-0101010101010101",
-			ErrorAssertion: func(err error) bool {
-				return errors.Resemble(err, errUID)
-			},
-		},
-		{
-			UID: "eui-11223344556677",
-			ErrorAssertion: func(err error) bool {
-				return errors.Resemble(err, errUID)
-			},
-		},
-		{
-			UID: "eui-112233445566778899",
-			ErrorAssertion: func(err error) bool {
-				return errors.Resemble(err, errUID)
-			},
-		},
-		{
-			UID:            "eui-1122334455667788",
-			ErrorAssertion: nil,
-			ExpectedEUI:    types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88},
-		},
-	} {
-		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
-			a := assertions.New(t)
-			eui, err := GetEUIfromUID(tc.UID)
-			if err != nil {
-				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
-					t.Fatalf("Unexpected error: %v", err)
-				}
-			} else if tc.ErrorAssertion != nil {
-				t.Fatalf("Expected error")
-			} else {
-				if !a.So(*eui, should.Resemble, tc.ExpectedEUI) {
-					t.Fatalf("Invalid EUI: %v", eui)
-				}
-			}
-		})
-	}
 }
 
 func TestGetDataRateFromDataRateIndex(t *testing.T) {

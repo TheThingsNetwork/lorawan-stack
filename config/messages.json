@@ -2852,15 +2852,6 @@
       "file": "messages.go"
     }
   },
-  "error:pkg/gatewayserver/io/basicstationlns/messages:gateway_id": {
-    "translations": {
-      "en": "invalid gateway ID `{id}`"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/basicstationlns/messages",
-      "file": "upstream.go"
-    }
-  },
   "error:pkg/gatewayserver/io/basicstationlns/messages:join_request_message": {
     "translations": {
       "en": "invalid join-request message received"
