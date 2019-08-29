@@ -72,7 +72,7 @@ class JoinEUIPrefixesInput extends React.PureComponent {
     await this.setState({ prefix })
     onChange(prefix)
     if (this.inputRef.current) {
-      const instance = this.inputRef.current.getWrappedInstance()
+      const instance = this.inputRef.current
 
       instance.focus()
     }

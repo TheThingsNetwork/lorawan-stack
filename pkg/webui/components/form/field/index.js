@@ -56,12 +56,18 @@ class FormField extends React.Component {
   static contextType = FormContext
   static propTypes = {
     className: PropTypes.string,
-    name: PropTypes.string.isRequired,
-    warning: PropTypes.message,
-    required: PropTypes.bool,
+    component: PropTypes.oneOfType([
+      PropTypes.func,
+      PropTypes.string,
+      PropTypes.shape({
+        render: PropTypes.func.isRequired,
+      }),
+    ]).isRequired,
     description: PropTypes.message,
+    name: PropTypes.string.isRequired,
     onChange: PropTypes.func,
-    component: PropTypes.oneOfType([PropTypes.func, PropTypes.string]).isRequired,
+    required: PropTypes.bool,
+    warning: PropTypes.message,
   }
 
   static defaultProps = {
