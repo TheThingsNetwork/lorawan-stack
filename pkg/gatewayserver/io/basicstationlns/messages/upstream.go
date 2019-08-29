@@ -33,7 +33,6 @@ var (
 	errJoinRequestMessage = errors.Define("join_request_message", "invalid join-request message received")
 	errUplinkDataFrame    = errors.Define("uplink_data_Frame", "invalid uplink data frame received")
 	errUplinkMessage      = errors.Define("uplink_message", "invalid uplink message received")
-	errGatewayID          = errors.Define("gateway_id", "invalid gateway ID `{id}`")
 )
 
 // UpInfo provides additional metadata on each upstream message.
