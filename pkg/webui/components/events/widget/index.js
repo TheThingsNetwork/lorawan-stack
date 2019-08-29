@@ -17,15 +17,16 @@ import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 
 import Link from '../../link'
-import Message from '../../../lib/components/message'
 import Status from '../../status'
 import List from '../../list'
 import Notification from '../../notification'
-import PropTypes from '../../../lib/prop-types'
 import getEventComponentByName from '../../event/types'
 
+import Message from '../../../lib/components/message'
+import PropTypes from '../../../lib/prop-types'
 import DateTime from '../../../lib/components/date-time'
 import sharedMessages from '../../../lib/shared-messages'
+
 import style from './widget.styl'
 
 const m = defineMessages({
@@ -97,33 +98,36 @@ class EventsWidget extends React.PureComponent {
   }
 }
 
-EventsWidget.propTypes = {
-  /**
-   * A list of events to be displayed in the widget. Events are expected
-   * to be sorted in the descending order by their time.
-   */
-  events: PropTypes.array,
-  /** A url to the page with full version of the events component. */
-  toAllUrl: PropTypes.string.isRequired,
-  /** An entity identifer. */
-  emitterId: PropTypes.node.isRequired,
-  /** A current status of the network. */
-  connectionStatus: PropTypes.oneOf(['good', 'bad', 'mediocre', 'unknown']).isRequired,
-  /** The number of events to displayed in the widget. */
-  limit: PropTypes.number,
-}
-
-EventsWidget.defaultProps = {
-  events: [],
-  limit: 5,
-}
-
 const CONNECTION_STATUS = Object.freeze({
   GOOD: 'good',
   BAD: 'bad',
   MEDIOCRE: 'mediocre',
   UNKNOWN: 'unknown',
 })
+
+EventsWidget.propTypes = {
+  className: PropTypes.string,
+  connectionStatus: PropTypes.oneOf(Object.values(CONNECTION_STATUS)).isRequired,
+  /** An entity identifer. */
+  emitterId: PropTypes.node.isRequired,
+  error: PropTypes.error,
+  /**
+   * A list of events to be displayed in the widget. Events are expected
+   * to be sorted in the descending order by their time.
+   */
+  events: PropTypes.events,
+  /** The number of events to displayed in the widget. */
+  limit: PropTypes.number,
+  /** A url to the page with full version of the events component. */
+  toAllUrl: PropTypes.string.isRequired,
+}
+
+EventsWidget.defaultProps = {
+  className: undefined,
+  events: [],
+  limit: 5,
+  error: undefined,
+}
 
 EventsWidget.CONNECTION_STATUS = CONNECTION_STATUS
 
