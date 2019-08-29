@@ -150,6 +150,9 @@ headers:
 				test.MustMultiple(ioutil.WriteFile(js2Path, []byte(fmt.Sprintf(`fqdn: %s
 port: %d
 protocol: BI1.0
+paths:
+   app-s-key: test-app-s-key-path
+   home-ns: test-home-ns-path
 tls:
    root-ca: %s
    certificate: %s
@@ -165,8 +168,11 @@ headers:
 				)), 0644))
 
 				test.MustMultiple(ioutil.WriteFile(js3Path, []byte(`dns: invalid.dns
-path: test-path
-protocol: BI1.1`), 0644))
+protocol: BI1.1
+paths:
+   join: test-join-path
+   rejoin: test-rejoin-path`,
+				), 0644))
 
 				return config.InteropClient{
 						Directory: confDir,
@@ -262,6 +268,9 @@ headers:
 				test.MustMultiple(ioutil.WriteFile(js2Path, []byte(fmt.Sprintf(`fqdn: %s
 port: %d
 protocol: BI1.1
+paths:
+   app-s-key: test-app-s-key-path
+   home-ns: test-home-ns-path
 tls:
    root-ca: %s
    certificate: %s
@@ -277,8 +286,11 @@ headers:
 				)), 0644))
 
 				test.MustMultiple(ioutil.WriteFile(js3Path, []byte(`dns: invalid.dns
-path: test-path
-protocol: BI1.0`), 0644))
+protocol: BI1.0
+paths:
+   join: test-join-path
+   rejoin: test-rejoin-path`,
+				), 0644))
 
 				return config.InteropClient{
 						Directory: confDir,
@@ -386,6 +398,9 @@ headers:
 				test.MustMultiple(ioutil.WriteFile(js2Path, []byte(fmt.Sprintf(`fqdn: %s
 port: %d
 protocol: BI1.0
+paths:
+   app-s-key: test-app-s-key-path
+   home-ns: test-home-ns-path
 tls:
    root-ca: %s
    certificate: %s
@@ -401,8 +416,11 @@ headers:
 				)), 0644))
 
 				test.MustMultiple(ioutil.WriteFile(js3Path, []byte(`dns: invalid.dns
-path: test-path
-protocol: BI1.1`), 0644))
+protocol: BI1.1
+paths:
+   join: test-join-path
+   rejoin: test-rejoin-path`,
+				), 0644))
 
 				return config.InteropClient{
 						Directory: confDir,
@@ -515,6 +533,9 @@ headers:
 				test.MustMultiple(ioutil.WriteFile(js2Path, []byte(fmt.Sprintf(`fqdn: %s
 port: %d
 protocol: BI1.1
+paths:
+   app-s-key: test-app-s-key-path
+   home-ns: test-home-ns-path
 tls:
    root-ca: %s
    certificate: %s
@@ -530,8 +551,11 @@ headers:
 				)), 0644))
 
 				test.MustMultiple(ioutil.WriteFile(js3Path, []byte(`dns: invalid.dns
-path: test-path
-protocol: BI1.0`), 0644))
+protocol: BI1.0
+paths:
+   join: test-join-path
+   rejoin: test-rejoin-path`,
+				), 0644))
 
 				return config.InteropClient{
 						Directory: confDir,
@@ -710,6 +734,9 @@ headers:
 				test.MustMultiple(ioutil.WriteFile(js2Path, []byte(fmt.Sprintf(`fqdn: %s
 port: %d
 protocol: BI1.0
+paths:
+   app-s-key: test-app-s-key-path
+   home-ns: test-home-ns-path
 tls:
    root-ca: %s
    certificate: %s
@@ -725,8 +752,11 @@ headers:
 				)), 0644))
 
 				test.MustMultiple(ioutil.WriteFile(js3Path, []byte(`dns: invalid.dns
-path: test-path
-protocol: BI1.1`), 0644))
+protocol: BI1.1
+paths:
+   join: test-join-path
+   rejoin: test-rejoin-path`,
+				), 0644))
 
 				return config.InteropClient{
 						Directory: confDir,
@@ -853,6 +883,9 @@ headers:
 				test.MustMultiple(ioutil.WriteFile(js2Path, []byte(fmt.Sprintf(`fqdn: %s
 port: %d
 protocol: BI1.1
+paths:
+   app-s-key: test-app-s-key-path
+   home-ns: test-home-ns-path
 tls:
    root-ca: %s
    certificate: %s
@@ -868,8 +901,11 @@ headers:
 				)), 0644))
 
 				test.MustMultiple(ioutil.WriteFile(js3Path, []byte(`dns: invalid.dns
-path: test-path
-protocol: BI1.0`), 0644))
+protocol: BI1.0
+paths:
+   join: test-join-path
+   rejoin: test-rejoin-path`,
+				), 0644))
 
 				return config.InteropClient{
 						Directory: confDir,
