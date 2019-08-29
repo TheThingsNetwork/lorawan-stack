@@ -107,7 +107,7 @@ export default class OAuth extends React.PureComponent {
         <div>
           <div className={style.left}>
             <div>
-              <Logo />
+              <Logo className={style.logo} />
               <Message content={m.loginToContinue} />
             </div>
           </div>
