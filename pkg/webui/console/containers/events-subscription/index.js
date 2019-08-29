@@ -12,15 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import { connect } from 'react-redux'
-
-import Events from '../../../components/events'
 import PropTypes from '../../../lib/prop-types'
 
-const { Widget } = Events
+import EventsSubscription from './events-subscription'
+import connect from './connect'
 
-@connect(function(state, props) {
+const mapStateToProps = (state, props) => {
   const { id, eventsSelector, statusSelector, errorSelector } = props
 
   return {
@@ -28,33 +25,18 @@ const { Widget } = Events
     connectionStatus: statusSelector(state, id),
     error: errorSelector(state, id),
   }
-})
-class EventsSubscription extends React.Component {
-  render() {
-    const { id, widget, events, onClear, toAllUrl, error } = this.props
-
-    if (widget) {
-      return <Widget emitterId={id} events={events} toAllUrl={toAllUrl} error={error} />
-    }
-
-    return <Events emitterId={id} events={events} onClear={onClear} error={error} />
-  }
 }
 
-EventsSubscription.propTypes = {
-  errorSelector: PropTypes.func,
+const ConnectedEventsSubscription = connect(
+  mapStateToProps,
+  EventsSubscription,
+)
+
+ConnectedEventsSubscription.propTypes = {
+  errorSelector: PropTypes.func.isRequired,
   eventsSelector: PropTypes.func.isRequired,
   id: PropTypes.string.isRequired,
-  onClear: PropTypes.func,
-  toAllUrl: PropTypes.string,
-  widget: PropTypes.bool,
+  statusSelector: PropTypes.func.isRequired,
 }
 
-EventsSubscription.defaultProps = {
-  widget: false,
-  onClear: () => null,
-  errorSelector: () => undefined,
-  toAllUrl: null,
-}
-
-export default EventsSubscription
+export { ConnectedEventsSubscription as default, EventsSubscription as Subscription }
