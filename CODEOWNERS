@@ -35,7 +35,7 @@
 # Subsystems
 /pkg/applicationserver @johanstokking @adriansmares
 /pkg/console @bafonins @kschiffer
-/pkg/gatewayserver @johanstokking
+/pkg/gatewayserver @johanstokking @KrishnaIyer
 /pkg/identityserver @htdvisser @bafonins
 /pkg/interop @johanstokking @rvolosatovs
 /pkg/joinserver @johanstokking @rvolosatovs
