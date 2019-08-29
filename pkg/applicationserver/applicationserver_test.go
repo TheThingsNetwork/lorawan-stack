@@ -841,7 +841,7 @@ hardware_versions:
 				}
 			}()
 			// Wait for connection to establish.
-			time.Sleep(Timeout)
+			time.Sleep(2 * Timeout)
 
 			t.Run("Upstream", func(t *testing.T) {
 				ns.reset()
