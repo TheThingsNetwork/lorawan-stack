@@ -60,6 +60,7 @@ PropTypes.event = PropTypes.shape({
   identifiers: PropTypes.array.isRequired,
   data: PropTypes.object,
 })
+PropTypes.events = PropTypes.arrayOf(PropTypes.event)
 
 PropTypes.gateway = PropTypes.shape({
   ids: PropTypes.shape({
