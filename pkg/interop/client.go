@@ -93,6 +93,18 @@ func (p *JoinServerProtocol) UnmarshalYAML(unmarshal func(interface{}) error) er
 	}
 }
 
+type jsRPCPaths struct {
+	Join    string `yaml:"join"`
+	Rejoin  string `yaml:"rejoin"`
+	AppSKey string `yaml:"app-s-key"`
+	HomeNS  string `yaml:"home-ns"`
+}
+
+func (p jsRPCPaths) join() string    { return p.Join }
+func (p jsRPCPaths) rejoin() string  { return p.Rejoin }
+func (p jsRPCPaths) appSKey() string { return p.AppSKey }
+func (p jsRPCPaths) homeNS() string  { return p.HomeNS }
+
 func serverURL(scheme, fqdn, path string, port uint32) string {
 	if scheme == "" {
 		scheme = "https"
@@ -143,24 +155,11 @@ func JoinServerFQDN(eui types.EUI64, domain string) string {
 	)
 }
 
-type joinServerHTTPClient struct {
-	Client         http.Client
-	NewRequestFunc func(joinEUI types.EUI64, pld interface{}) (*http.Request, error)
-	Protocol       JoinServerProtocol
-}
-
-func (cl joinServerHTTPClient) exchange(ctx context.Context, joinEUI types.EUI64, req, res interface{}) error {
-	logger := log.FromContext(ctx)
-
-	httpReq, err := cl.NewRequestFunc(joinEUI, req)
-	if err != nil {
-		return err
-	}
-	httpReq = httpReq.WithContext(ctx)
-	logger = logger.WithField("url", httpReq.URL)
+func httpExchange(ctx context.Context, httpReq *http.Request, res interface{}, do func(*http.Request) (*http.Response, error)) error {
+	logger := log.FromContext(ctx).WithField("url", httpReq.URL)
 
 	logger.Debug("Send interop HTTP request")
-	httpRes, err := cl.Client.Do(httpReq)
+	httpRes, err := do(httpReq)
 	if err != nil {
 		return err
 	}
@@ -185,6 +184,20 @@ func (cl joinServerHTTPClient) exchange(ctx context.Context, joinEUI types.EUI64
 	return nil
 }
 
+type joinServerHTTPClient struct {
+	Client         http.Client
+	NewRequestFunc func(types.EUI64, func(jsRPCPaths) string, interface{}) (*http.Request, error)
+	Protocol       JoinServerProtocol
+}
+
+func (cl joinServerHTTPClient) exchange(ctx context.Context, joinEUI types.EUI64, pathFunc func(jsRPCPaths) string, req, res interface{}) error {
+	httpReq, err := cl.NewRequestFunc(joinEUI, pathFunc, req)
+	if err != nil {
+		return err
+	}
+	return httpExchange(ctx, httpReq.WithContext(ctx), res, cl.Client.Do)
+}
+
 func parseResult(r Result) error {
 	if r.ResultCode == ResultSuccess {
 		return nil
@@ -200,7 +213,7 @@ func parseResult(r Result) error {
 // GetAppSKey performs AppSKey request according to LoRaWAN Backend Interfaces specification.
 func (cl joinServerHTTPClient) GetAppSKey(ctx context.Context, asID string, req *ttnpb.SessionKeyRequest) (*ttnpb.AppSKeyResponse, error) {
 	interopAns := &AppSKeyAns{}
-	if err := cl.exchange(ctx, req.JoinEUI, &AppSKeyReq{
+	if err := cl.exchange(ctx, req.JoinEUI, jsRPCPaths.appSKey, &AppSKeyReq{
 		AsJsMessageHeader: AsJsMessageHeader{
 			MessageHeader: MessageHeader{
 				ProtocolVersion: cl.Protocol.BackendInterfacesVersion(),
@@ -244,7 +257,7 @@ func (cl joinServerHTTPClient) HandleJoinRequest(ctx context.Context, netID type
 	}
 
 	interopAns := &JoinAns{}
-	if err := cl.exchange(ctx, pld.JoinEUI, &JoinReq{
+	if err := cl.exchange(ctx, pld.JoinEUI, jsRPCPaths.join, &JoinReq{
 		NsJsMessageHeader: NsJsMessageHeader{
 			MessageHeader: MessageHeader{
 				ProtocolVersion: cl.Protocol.BackendInterfacesVersion(),
@@ -285,15 +298,15 @@ func (cl joinServerHTTPClient) HandleJoinRequest(ctx context.Context, netID type
 	}, nil
 }
 
-func makeJoinServerHTTPRequestFunc(scheme string, dns, fqdn, path string, port uint32, headers map[string]string) func(types.EUI64, interface{}) (*http.Request, error) {
+func makeJoinServerHTTPRequestFunc(scheme, dns, fqdn string, port uint32, rpcPaths jsRPCPaths, headers map[string]string) func(types.EUI64, func(jsRPCPaths) string, interface{}) (*http.Request, error) {
 	if port == 0 {
 		port = defaultHTTPSPort
 	}
-	return func(joinEUI types.EUI64, pld interface{}) (*http.Request, error) {
+	return func(joinEUI types.EUI64, pathFunc func(jsRPCPaths) string, pld interface{}) (*http.Request, error) {
 		if fqdn == "" {
 			fqdn = JoinServerFQDN(joinEUI, dns)
 		}
-		return newHTTPRequest(serverURL(scheme, fqdn, path, port), pld, headers)
+		return newHTTPRequest(serverURL(scheme, fqdn, pathFunc(rpcPaths), port), pld, headers)
 	}
 }
 
@@ -385,6 +398,14 @@ func NewClient(ctx context.Context, conf config.InteropClient, fallbackTLS *tls.
 		return nil, err
 	}
 
+	type ComponentConfig struct {
+		DNS     string            `yaml:"dns"`
+		FQDN    string            `yaml:"fqdn"`
+		Port    uint32            `yaml:"port"`
+		Headers map[string]string `yaml:"headers"`
+		TLS     tlsConfig         `yaml:"tls"`
+	}
+
 	jss := make([]prefixJoinServerClient, 0, len(yamlConf.JoinServers))
 	for _, jsConf := range yamlConf.JoinServers {
 		jsConfEls := strings.Split(filepath.ToSlash(jsConf.File), "/")
@@ -396,13 +417,9 @@ func NewClient(ctx context.Context, conf config.InteropClient, fallbackTLS *tls.
 		}
 
 		var yamlJSConf struct {
-			DNS      string             `yaml:"dns"`
-			FQDN     string             `yaml:"fqdn"`
-			Path     string             `yaml:"path"`
-			Port     uint32             `yaml:"port"`
-			Protocol JoinServerProtocol `yaml:"protocol"`
-			Headers  map[string]string  `yaml:"headers"`
-			TLS      tlsConfig          `yaml:"tls"`
+			ComponentConfig `yaml:",inline"`
+			Paths           jsRPCPaths         `yaml:"paths"`
+			Protocol        JoinServerProtocol `yaml:"protocol"`
 		}
 		if err := yaml.UnmarshalStrict(jsFileBytes, &yamlJSConf); err != nil {
 			return nil, err
@@ -429,7 +446,7 @@ func NewClient(ctx context.Context, conf config.InteropClient, fallbackTLS *tls.
 				Client: http.Client{
 					Transport: tr,
 				},
-				NewRequestFunc: makeJoinServerHTTPRequestFunc("https", yamlJSConf.DNS, yamlJSConf.FQDN, yamlJSConf.Path, yamlJSConf.Port, yamlJSConf.Headers),
+				NewRequestFunc: makeJoinServerHTTPRequestFunc("https", yamlJSConf.DNS, yamlJSConf.FQDN, yamlJSConf.Port, yamlJSConf.Paths, yamlJSConf.Headers),
 				Protocol:       yamlJSConf.Protocol,
 			}
 		default:
