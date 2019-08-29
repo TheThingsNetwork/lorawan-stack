@@ -55,6 +55,36 @@ const m = defineMessages({
 @injectIntl
 @bind
 export class SafeInspector extends Component {
+  static defaultProps = {
+    className: undefined,
+    disableResize: false,
+    hideable: true,
+    initiallyVisible: false,
+    isBytes: true,
+    small: false,
+  }
+
+  static propTypes = {
+    /** The classname to be applied **/
+    className: PropTypes.string,
+    /** The data to be displayed */
+    data: PropTypes.string.isRequired,
+    /** Whether the component should resize when its data is truncated */
+    disableResize: PropTypes.bool,
+    /** Whether the data can be hidden (like passwords) */
+    hideable: PropTypes.bool,
+    /** Whether the data is initially visible */
+    initiallyVisible: PropTypes.bool,
+    /** Utility functions passed via react-intl hoc **/
+    intl: PropTypes.shape({
+      formatMessage: PropTypes.func,
+    }).isRequired,
+    /** Whether the data is in byte format */
+    isBytes: PropTypes.bool,
+    /** Whether a smaller style should be rendered (useful for display in tables) */
+    small: PropTypes.bool,
+  }
+
   constructor(props) {
     super(props)
 
@@ -235,29 +265,6 @@ export class SafeInspector extends Component {
       </div>
     )
   }
-}
-
-SafeInspector.defaultProps = {
-  small: false,
-  isBytes: true,
-  initiallyVisible: false,
-  hideable: true,
-  disableResize: false,
-}
-
-SafeInspector.propTypes = {
-  /** The data to be displayed */
-  data: PropTypes.string.isRequired,
-  /** Whether the data is in byte format */
-  isBytes: PropTypes.bool,
-  /** Whether the data is initially visible */
-  initiallyVisible: PropTypes.bool,
-  /** Whether the data can be hidden (like passwords) */
-  hideable: PropTypes.bool,
-  /** Whether a smaller style should be rendered (useful for display in tables) */
-  small: PropTypes.bool,
-  /** Whether the component should resize when its data is truncated */
-  disableResize: PropTypes.bool,
 }
 
 export default SafeInspector
