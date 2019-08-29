@@ -66,27 +66,39 @@ const Header = function({
 }
 
 Header.propTypes = {
-  /**
-   * The User object, retrieved from the API. If it is `undefined`, then the
-   * guest header is rendered
-   */
-  user: PropTypes.object,
+  /** Flag identifying whether links should be rendered as plain anchor link */
+  anchored: PropTypes.bool,
+  /** The classname applied to the component */
+  className: PropTypes.string,
   /**
    * A list of items for the dropdown
    * See `<ProfileDropdown/>`'s `items` proptypes for details
    */
   dropdownItems: ProfileDropdown.propTypes.dropdownItems,
+  /** A handler for when the user used the search input */
+  handleSearchRequest: PropTypes.func,
+  /** A flag identifying whether the header should display the search input */
   /**
    * A list of navigation bar entries
    * See `<NavigationBar/>`'s `entries` proptypes for details
    */
-  entries: NavigationBar.propTypes.entries,
-  /** Flag identifying whether links should be rendered as plain anchor link */
-  anchored: PropTypes.bool,
-  /** A handler for when the user used the search input */
-  handleSearchRequest: PropTypes.func,
-  /** A flag identifying whether the header should display the search input */
+  navigationEntries: NavigationBar.propTypes.entries,
   searchable: PropTypes.bool,
+  /**
+   * The User object, retrieved from the API. If it is `undefined`, then the
+   * guest header is rendered
+   */
+  user: PropTypes.user,
+}
+
+Header.defaultProps = {
+  anchored: false,
+  className: undefined,
+  dropdownItems: undefined,
+  navigationEntries: undefined,
+  handleSearchRequest: () => null,
+  searchable: false,
+  user: undefined,
 }
 
 export default Header
