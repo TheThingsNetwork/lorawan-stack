@@ -73,7 +73,7 @@ func TestGetAppSKey(t *testing.T) {
 		ErrorAssertion       func(*testing.T, error) bool
 	}{
 		{
-			Name: "Backend Interfaces 1.0/MICFailed",
+			Name: "Backend Interfaces 1.0/UnknownDevEUI",
 			NewServer: func(t *testing.T) *httptest.Server {
 				return newTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					a := assertions.New(t)
@@ -87,7 +87,7 @@ func TestGetAppSKey(t *testing.T) {
 
 					_, err = w.Write([]byte(`{
   "Result": {
-    "ResultCode": "MICFailed"
+    "ResultCode": "UnknownDevEUI"
   }
 }`))
 					a.So(err, should.BeNil)
@@ -186,12 +186,12 @@ paths:
 				return assertions.New(t).So(resp, should.BeNil)
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
-				return assertions.New(t).So(err, should.HaveSameErrorDefinitionAs, ErrMIC)
+				return assertions.New(t).So(err, should.HaveSameErrorDefinitionAs, ErrUnknownDevEUI)
 			},
 		},
 
 		{
-			Name: "Backend Interfaces 1.1/MICFailed",
+			Name: "Backend Interfaces 1.1/UnknownDevEUI",
 			NewServer: func(t *testing.T) *httptest.Server {
 				return newTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					a := assertions.New(t)
@@ -205,7 +205,7 @@ paths:
 
 					_, err = w.Write([]byte(`{
   "Result": {
-    "ResultCode": "MICFailed"
+    "ResultCode": "UnknownDevEUI"
   }
 }`))
 					a.So(err, should.BeNil)
@@ -304,7 +304,7 @@ paths:
 				return assertions.New(t).So(resp, should.BeNil)
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
-				return assertions.New(t).So(err, should.HaveSameErrorDefinitionAs, ErrMIC)
+				return assertions.New(t).So(err, should.HaveSameErrorDefinitionAs, ErrUnknownDevEUI)
 			},
 		},
 
@@ -638,6 +638,242 @@ func TestHandleJoinRequest(t *testing.T) {
 		ResponseAssertion    func(*testing.T, *ttnpb.JoinResponse) bool
 		ErrorAssertion       func(*testing.T, error) bool
 	}{
+		{
+			Name: "Backend Interfaces 1.0/MICFailed",
+			NewServer: func(t *testing.T) *httptest.Server {
+				return newTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					a := assertions.New(t)
+					a.So(r.Method, should.Equal, http.MethodPost)
+
+					b, err := ioutil.ReadAll(r.Body)
+					a.So(err, should.BeNil)
+					a.So(string(b), should.Equal, `{"ProtocolVersion":"1.0","TransactionID":0,"MessageType":"JoinReq","SenderID":"42FFFF","ReceiverID":"70B3D57ED0000000","SenderNSID":"42FFFF","MACVersion":"1.0.3","PHYPayload":"00000000D07ED5B370080706050403020100003851F0B6","DevEUI":"0102030405060708","DevAddr":"01020304","DLSettings":"00","RxDelay":5,"CFList":""}
+`)
+					a.So(r.Body.Close(), should.BeNil)
+
+					_, err = w.Write([]byte(`{
+  "Result": {
+    "ResultCode": "MICFailed"
+  }
+}`))
+					a.So(err, should.BeNil)
+				}))
+			},
+			NewFallbackTLSConfig: func() *tls.Config { return nil },
+			NewClientConfig: func(fqdn string, port uint32) (config.InteropClient, func() error) {
+				confDir := test.Must(ioutil.TempDir("", "lorawan-stack-js-interop-test")).(string)
+				confPath := filepath.Join(confDir, InteropClientConfigurationName)
+				js1Path := filepath.Join(confDir, "test-js-1.yaml")
+				js2Path := filepath.Join(confDir, "foo", "test-js-2.yaml")
+				js3Path := filepath.Join(confDir, "test-js-3.yaml")
+
+				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "testdata"), 0755))
+				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ClientCertPath), ClientCert, 0644))
+				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ClientKeyPath), ClientKey, 0644))
+				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ServerCertPath), ServerCert, 0644))
+				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ServerKeyPath), ServerKey, 0644))
+				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, RootCAPath), RootCA, 0644))
+
+				rel := func(path string) string {
+					return test.Must(filepath.Rel(confDir, path)).(string)
+				}
+
+				test.MustMultiple(ioutil.WriteFile(confPath, []byte(fmt.Sprintf(`join-servers:
+   - file: %s
+     join-euis:
+        - 0000000000000000/0
+        - 70b3d57ed0001000/52
+
+   - file: %s
+     join-euis:
+        - 70b3d57ed0000000/40
+
+   - file: %s
+     join-euis:
+        - 70b3d57ed0000000/39
+        - 70b3d83ed0000000/30`,
+					rel(js1Path),
+					rel(js2Path),
+					rel(js3Path),
+				)), 0644))
+
+				test.MustMultiple(ioutil.WriteFile(js1Path, []byte(fmt.Sprintf(`fqdn: test-js.fqdn
+port: 12345
+protocol: BI1.1
+tls:
+   root-ca: %s
+   certificate: %s
+   key: %s
+headers:
+   SomeHeader: Some foo bar
+   TestHeader: baz`,
+					RootCAPath,
+					ClientCertPath,
+					ClientKeyPath,
+				)), 0644))
+
+				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "foo"), 0755))
+				test.MustMultiple(ioutil.WriteFile(js2Path, []byte(fmt.Sprintf(`fqdn: %s
+port: %d
+protocol: BI1.0
+paths:
+   app-s-key: test-app-s-key-path
+   home-ns: test-home-ns-path
+tls:
+   root-ca: %s
+   certificate: %s
+   key: %s
+headers:
+   Authorization: Custom foo bar
+   TestHeader: baz`,
+					fqdn,
+					port,
+					filepath.Join("..", RootCAPath),
+					filepath.Join("..", ClientCertPath),
+					filepath.Join("..", ClientKeyPath),
+				)), 0644))
+
+				test.MustMultiple(ioutil.WriteFile(js3Path, []byte(`dns: invalid.dns
+protocol: BI1.1
+paths:
+   join: test-join-path
+   rejoin: test-rejoin-path`,
+				), 0644))
+
+				return config.InteropClient{
+						Directory: confDir,
+					}, func() error {
+						return os.RemoveAll(confDir)
+					}
+			},
+			NetID:   types.NetID{0x42, 0xff, 0xff},
+			Request: makeJoinRequest(),
+			ResponseAssertion: func(t *testing.T, resp *ttnpb.JoinResponse) bool {
+				return assertions.New(t).So(resp, should.BeNil)
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.HaveSameErrorDefinitionAs, ErrMIC)
+			},
+		},
+
+		{
+			Name: "Backend Interfaces 1.1/MICFailed",
+			NewServer: func(t *testing.T) *httptest.Server {
+				return newTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					a := assertions.New(t)
+					a.So(r.Method, should.Equal, http.MethodPost)
+
+					b, err := ioutil.ReadAll(r.Body)
+					a.So(err, should.BeNil)
+					a.So(string(b), should.Equal, `{"ProtocolVersion":"1.1","TransactionID":0,"MessageType":"JoinReq","SenderID":"42FFFF","ReceiverID":"70B3D57ED0000000","SenderNSID":"42FFFF","MACVersion":"1.0.3","PHYPayload":"00000000D07ED5B370080706050403020100003851F0B6","DevEUI":"0102030405060708","DevAddr":"01020304","DLSettings":"00","RxDelay":5,"CFList":""}
+`)
+					a.So(r.Body.Close(), should.BeNil)
+
+					_, err = w.Write([]byte(`{
+  "Result": {
+    "ResultCode": "MICFailed"
+  }
+}`))
+					a.So(err, should.BeNil)
+				}))
+			},
+			NewFallbackTLSConfig: func() *tls.Config { return nil },
+			NewClientConfig: func(fqdn string, port uint32) (config.InteropClient, func() error) {
+				confDir := test.Must(ioutil.TempDir("", "lorawan-stack-js-interop-test")).(string)
+				confPath := filepath.Join(confDir, InteropClientConfigurationName)
+				js1Path := filepath.Join(confDir, "test-js-1.yaml")
+				js2Path := filepath.Join(confDir, "foo", "test-js-2.yaml")
+				js3Path := filepath.Join(confDir, "test-js-3.yaml")
+
+				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "testdata"), 0755))
+				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ClientCertPath), ClientCert, 0644))
+				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ClientKeyPath), ClientKey, 0644))
+				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ServerCertPath), ServerCert, 0644))
+				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ServerKeyPath), ServerKey, 0644))
+				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, RootCAPath), RootCA, 0644))
+
+				rel := func(path string) string {
+					return test.Must(filepath.Rel(confDir, path)).(string)
+				}
+
+				test.MustMultiple(ioutil.WriteFile(confPath, []byte(fmt.Sprintf(`join-servers:
+   - file: %s
+     join-euis:
+        - 0000000000000000/0
+        - 70b3d57ed0001000/52
+
+   - file: %s
+     join-euis:
+        - 70b3d57ed0000000/40
+
+   - file: %s
+     join-euis:
+        - 70b3d57ed0000000/39
+        - 70b3d83ed0000000/30`,
+					rel(js1Path),
+					rel(js2Path),
+					rel(js3Path),
+				)), 0644))
+
+				test.MustMultiple(ioutil.WriteFile(js1Path, []byte(fmt.Sprintf(`fqdn: test-js.fqdn
+port: 12345
+protocol: BI1.0
+tls:
+   root-ca: %s
+   certificate: %s
+   key: %s
+headers:
+   SomeHeader: Some foo bar
+   TestHeader: baz`,
+					RootCAPath,
+					ClientCertPath,
+					ClientKeyPath,
+				)), 0644))
+
+				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "foo"), 0755))
+				test.MustMultiple(ioutil.WriteFile(js2Path, []byte(fmt.Sprintf(`fqdn: %s
+port: %d
+protocol: BI1.1
+paths:
+   app-s-key: test-app-s-key-path
+   home-ns: test-home-ns-path
+tls:
+   root-ca: %s
+   certificate: %s
+   key: %s
+headers:
+   Authorization: Custom foo bar
+   TestHeader: baz`,
+					fqdn,
+					port,
+					filepath.Join("..", RootCAPath),
+					filepath.Join("..", ClientCertPath),
+					filepath.Join("..", ClientKeyPath),
+				)), 0644))
+
+				test.MustMultiple(ioutil.WriteFile(js3Path, []byte(`dns: invalid.dns
+protocol: BI1.0
+paths:
+   join: test-join-path
+   rejoin: test-rejoin-path`,
+				), 0644))
+
+				return config.InteropClient{
+						Directory: confDir,
+					}, func() error {
+						return os.RemoveAll(confDir)
+					}
+			},
+			NetID:   types.NetID{0x42, 0xff, 0xff},
+			Request: makeJoinRequest(),
+			ResponseAssertion: func(t *testing.T, resp *ttnpb.JoinResponse) bool {
+				return assertions.New(t).So(resp, should.BeNil)
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.HaveSameErrorDefinitionAs, ErrMIC)
+			},
+		},
+
 		{
 			Name: "Backend Interfaces 1.0/Success",
 			NewServer: func(t *testing.T) *httptest.Server {
