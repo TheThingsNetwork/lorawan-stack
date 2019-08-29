@@ -73,4 +73,13 @@ PropTypes.gateway = PropTypes.shape({
   gateway_server_address: PropTypes.string,
 })
 
+PropTypes.gatewayStats = PropTypes.shape({
+  connected_at: PropTypes.string.isRequired,
+  last_uplink_received_at: PropTypes.string,
+  protocol: PropTypes.string,
+  uplink_count: PropTypes.string,
+  downlink_count: PropTypes.string,
+  round_trip_times: PropTypes.shape({}),
+})
+
 export default PropTypes
