@@ -150,7 +150,7 @@ export class SafeInspector extends Component {
       const chunks = chunkArray(data.toUpperCase().split(''), 2)
       if (!byteStyle) {
         const orderedChunks = msb ? chunks : chunks.reverse()
-        formattedData = display = `${orderedChunks.map(chunk => ` 0x${chunk.join('')}`)}`
+        formattedData = display = orderedChunks.map(chunk => `0x${chunk.join('')}`).join(', ')
       } else {
         display = chunks.map((chunk, index) => (
           <span key={`${data}_chunk_${index}`}>{hidden ? '••' : chunk}</span>
