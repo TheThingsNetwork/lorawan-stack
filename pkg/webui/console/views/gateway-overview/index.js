@@ -17,14 +17,16 @@ import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
 import { Container, Col, Row } from 'react-grid-system'
 
-import sharedMessages from '../../../lib/shared-messages'
-import IntlHelmet from '../../../lib/components/intl-helmet'
-import DateTime from '../../../lib/components/date-time'
 import DataSheet from '../../../components/data-sheet'
 import GatewayStatistics from '../../containers/gateway-statistics'
 import GatewayEvents from '../../containers/gateway-events'
 import Tag from '../../../components/tag'
+
+import sharedMessages from '../../../lib/shared-messages'
+import IntlHelmet from '../../../lib/components/intl-helmet'
+import DateTime from '../../../lib/components/date-time'
 import Message from '../../../lib/components/message'
+import PropTypes from '../../../lib/prop-types'
 
 import { selectSelectedGateway as gatewaySelector } from '../../store/selectors/gateways'
 import { getGatewayId as idSelector } from '../../../lib/selectors/id'
@@ -41,6 +43,11 @@ import style from './gateway-overview.styl'
 })
 @bind
 export default class GatewayOverview extends React.Component {
+  static propTypes = {
+    gateway: PropTypes.gateway.isRequired,
+    gtwId: PropTypes.string.isRequired,
+  }
+
   get gatewayInfo() {
     const { gtwId, gateway } = this.props
     const {
