@@ -33,7 +33,7 @@
 /pkg/webui @bafonins @kschiffer
 
 # Subsystems
-/pkg/applicationserver @johanstokking
+/pkg/applicationserver @johanstokking @adriansmares
 /pkg/console @bafonins @kschiffer
 /pkg/gatewayserver @johanstokking
 /pkg/identityserver @htdvisser @bafonins
