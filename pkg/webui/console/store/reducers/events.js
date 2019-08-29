@@ -27,7 +27,7 @@ import { getDeviceId } from '../../../lib/selectors/id'
 
 const defaultState = {
   events: [],
-  error: false,
+  error: undefined,
   status: CONNECTION_STATUS.DISCONNECTED,
 }
 
