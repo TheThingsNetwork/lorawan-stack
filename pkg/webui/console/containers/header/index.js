@@ -39,15 +39,15 @@ class Header extends Component {
      * The User object, retrieved from the API. If it is `undefined`, then the
      * guest header is rendered
      */
-    user: PropTypes.object,
-    /** Flag identifying whether links should be rendered as plain anchor link */
     anchored: PropTypes.bool,
+    /** Flag identifying whether links should be rendered as plain anchor link */
+    handleLogout: PropTypes.func.isRequired,
     /** A handler for when the user used the search input */
     handleSearchRequest: PropTypes.func,
     /** A handler for when the user clicks the logout button */
-    handleLogout: PropTypes.func.isRequired,
-    /** A flag identifying whether the header should display the search input */
     searchable: PropTypes.bool,
+    /** A flag identifying whether the header should display the search input */
+    user: PropTypes.object,
   }
 
   render() {
@@ -69,6 +69,11 @@ class Header extends Component {
         title: sharedMessages.gateways,
         icon: 'gateway',
         path: '/gateways',
+      },
+      {
+        title: sharedMessages.organizations,
+        icon: 'organization',
+        path: '/organizations',
       },
     ]
 
