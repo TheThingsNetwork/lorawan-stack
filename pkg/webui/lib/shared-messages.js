@@ -21,6 +21,7 @@ export default defineMessages({
   addApplication: 'Add Application',
   addDevice: 'Add Device',
   addGateway: 'Add Gateway',
+  addOrganization: 'Add Organization',
   addressPlaceholder: 'host',
   addWebhook: 'Add Webhook',
   all: 'All',
