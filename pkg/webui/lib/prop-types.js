@@ -61,4 +61,10 @@ PropTypes.event = PropTypes.shape({
   data: PropTypes.object,
 })
 
+PropTypes.user = PropTypes.shape({
+  ids: PropTypes.shape({
+    user_id: PropTypes.string.isRequired,
+  }).isRequired,
+})
+
 export default PropTypes

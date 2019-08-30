@@ -14,20 +14,3 @@
 
 .logo
   line-height: 0
-
-.cloud
-  fill: $c-active-blue
-  fill: url(#logo-gradient) // @stylint ignore
-
-.text
-  fill: #333 // @stylint ignore
-
-.start
-  stop-color: lighter($c-active-blue, 1)
-
-.end
-  stop-color: lighter($c-active-blue, 2)
-  transition: stop-color $ad.s linear
-
-  .logo:hover &
-    stop-color: lighter($c-active-blue, 1)

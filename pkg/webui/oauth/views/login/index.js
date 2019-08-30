@@ -24,6 +24,7 @@ import * as Yup from 'yup'
 import api from '../../api'
 import sharedMessages from '../../../lib/shared-messages'
 import { selectApplicationRootPath } from '../../../lib/selectors/env'
+import PropTypes from '../../../lib/prop-types'
 
 import Button from '../../../components/button'
 import Form from '../../../components/form'
@@ -58,6 +59,11 @@ const appRoot = selectApplicationRootPath()
 )
 @bind
 export default class OAuth extends React.PureComponent {
+  static propTypes = {
+    location: PropTypes.string.isRequired,
+    replace: PropTypes.func.isRequired,
+  }
+
   constructor(props) {
     super(props)
     this.state = {
@@ -107,7 +113,7 @@ export default class OAuth extends React.PureComponent {
         <div>
           <div className={style.left}>
             <div>
-              <Logo />
+              <Logo className={style.logo} />
               <Message content={m.loginToContinue} />
             </div>
           </div>
