@@ -13,10 +13,11 @@
 // limitations under the License.
 
 import React, { Component } from 'react'
-import bind from 'autobind-decorator'
 
 import sharedMessages from '../../../lib/shared-messages'
 import Message from '../../../lib/components/message'
+import PropTypes from '../../../lib/prop-types'
+
 import FetchTable from '../fetch-table'
 
 import { getOrganizationsList } from '../../../console/store/actions/organizations'
@@ -46,13 +47,16 @@ const headers = [
 ]
 
 export default class OrganizationsTable extends Component {
+  static propTypes = {
+    pageSize: PropTypes.number.isRequired,
+  }
+
   constructor(props) {
     super(props)
 
     this.getOrganizationsList = params => getOrganizationsList(params, ['name', 'description'])
   }
 
-  @bind
   baseDataSelector(state) {
     return {
       organizations: selectOrganizations(state),
@@ -63,6 +67,8 @@ export default class OrganizationsTable extends Component {
   }
 
   render() {
+    const { pageSize } = this.props
+
     return (
       <FetchTable
         entity="organizations"
@@ -72,7 +78,7 @@ export default class OrganizationsTable extends Component {
         getItemsAction={this.getOrganizationsList}
         searchItemsAction={this.getOrganizationsList}
         baseDataSelector={this.baseDataSelector}
-        {...this.props}
+        pageSize={pageSize}
       />
     )
   }
