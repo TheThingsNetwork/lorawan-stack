@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Components - The Things Stack for LoRaWAN Documentation</title>
+<meta name="description" content="Documentation for The Things Stack for LoRaWAN">
+<meta name="generator" content="Hugo 0.56.3" />
+<link href="https://thethingsnetwork.github.io/lorawan-stack/v3.1.1index.xml" rel="alternate" type="application/rss+xml">
+<link rel="canonical" href="https://thethingsnetwork.github.io/lorawan-stack/v3.1.1/components/">
+<link rel="stylesheet" href="https://thethingsnetwork.github.io/lorawan-stack/v3.1.1/css/theme.min.css">
+<script src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
+<link rel="stylesheet" href="https://thethingsnetwork.github.io/lorawan-stack/v3.1.1/css/chroma.min.css">
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+<script src="https://thethingsnetwork.github.io/lorawan-stack/v3.1.1/js/functions.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery.easing@1.4.1/jquery.easing.min.js"></script>
+<script src="https://thethingsnetwork.github.io/lorawan-stack/v3.1.1/js/jquery.backtothetop/jquery.backtothetop.min.js"></script></head>
+<body>
+<div class="container"><header>
+<h1>The Things Stack for LoRaWAN Documentation</h1>
+
+ <span class="version">Version v3.1.1</span>
+<a href="https://github.com/TheThingsNetwork/lorawan-stack" class="github"><i class="fab fa-github"></i></a>
+<p class="description">Documentation for The Things Stack for LoRaWAN</p>
+
+</header>
+<div class="menu">
+<nav>
+<ul>
+<li><a href="/lorawan-stack/v3.1.1/guides/getting-started/">Getting Started</a></li>
+<li><a href="/lorawan-stack/v3.1.1/guides/">Guides</a></li>
+<li><a href="/lorawan-stack/v3.1.1/concepts/">Concepts</a></li>
+<li><a href="/lorawan-stack/v3.1.1/components/">Components</a></li>
+<li><a href="/lorawan-stack/v3.1.1/reference/">Reference</a></li></ul>
+</nav>
+</div>
+<div class="content-container">
+<main><h1>Components</h1><p>The Things Stack is composed of components. The core components Network Server, Application Server and Join Server follow the LoRaWAN Network Reference Model. The Things Stack also contains an Identity Server, Gateway Server and Console.</p>
+
+<figure>
+    <img src="components.png"
+         alt="The Things Stack components" width="80%" height="80%"/> 
+</figure>
+
+
+<ul>
+<li><strong>Identity Server</strong>: stores applications, end devices, gateways, users, organizations, OAuth clients, API keys and collaborators. Also acts as a OAuth 2.0 server with login and consent screens</li>
+<li><strong>Gateway Server</strong>: maintains connections with gateways supporting the UDP, MQTT, gRPC and Basic Station protocols, forwards uplink traffic to Network Servers, schedules downlink traffic</li>
+<li><strong>Network Server</strong>: handles LoRaWAN network layer, including MAC commands, regional parameters and adaptive data rate (ADR)</li>
+<li><strong>Application Server</strong>: handles LoRaWAN application layer, including uplink data decryption and decoding, downlink data encoding and encryption, downlink queuing and hosts an MQTT server for streaming application data, manages HTTP webhooks and pub/sub integrations</li>
+<li><strong>Join Server</strong>: handles LoRaWAN join flow, including Network and Application Server authentication and session key generation</li>
+<li><strong>Console</strong>: provides a web interface for managing the components</li>
+<li><strong>Command-line Interface</strong>: provides a cross-platform interface for managing components through command-line</li>
+<li>Supporting components
+
+<ul>
+<li><strong>Gateway Configuration Server</strong>: generates configuration files for gateways and manages gateway firmware updates</li>
+<li><strong>Device Template Converter</strong>: converts data to devices templates for migrating networks and importing vendor-specific data</li>
+<li><strong>Device Repository</strong> (in progress): stores devices brands and models, their capabilities, payload formatters and device templates</li>
+</ul></li>
+</ul>
+<div class="edit-meta">
+Last updated on 7 Aug 2019
+
+
+<br><a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/components/_index.md" class="edit-page"><i class="fas fa-pen-square"></i> Edit on GitHub</a></div><nav class="pagination"><a class="nav nav-prev" href="/lorawan-stack/v3.1.1/concepts/email-templates/" title="Email Templates"><i class="fas fa-arrow-left" aria-hidden="true"></i> Prev - Email Templates</a>
+<a class="nav nav-next" href="/lorawan-stack/v3.1.1/reference/" title="Reference">Next - Reference <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+</nav><footer><p class="powered">Powered by <a href="https://gohugo.io">Hugo</a>. Theme by <a href="https://themes.gohugo.io/hugo-theme-techdoc/">TechDoc</a>. Designed by <a href="https://github.com/thingsym/hugo-theme-techdoc">Thingsym</a>.</p>
+</footer>
+</main><div class="sidebar">
+<nav>
+<ul>
+<li class=""><a href="https://thethingsnetwork.github.io/lorawan-stack/v3.1.1">Home</a></li>
+
+<li class=""><a href="/lorawan-stack/v3.1.1/guides/">Guides</a>
+<ul class="">
+
+<li class=""><a href="/lorawan-stack/v3.1.1/guides/getting-started/">Getting Started</a>
+<ul class="">
+<li class=""><a href="/lorawan-stack/v3.1.1/guides/getting-started/installation/">Installation</a></li>
+<li class=""><a href="/lorawan-stack/v3.1.1/guides/getting-started/certificates/">Certificates</a></li>
+<li class=""><a href="/lorawan-stack/v3.1.1/guides/getting-started/configuration/">Configuration</a></li>
+<li class=""><a href="/lorawan-stack/v3.1.1/guides/getting-started/running-the-stack/">Running The Things Stack</a></li>
+
+<li class=""><a href="/lorawan-stack/v3.1.1/guides/getting-started/console/">Console</a>
+</li>
+
+<li class=""><a href="/lorawan-stack/v3.1.1/guides/getting-started/cli/">Command-line Interface</a>
+</li>
+
+<li class=""><a href="/lorawan-stack/v3.1.1/guides/getting-started/mqtt/">MQTT Server</a>
+</li>
+
+<li class=""><a href="/lorawan-stack/v3.1.1/guides/getting-started/webhooks/">HTTP Webhooks</a>
+</li>
+</ul>
+  
+</li>
+
+<li class=""><a href="/lorawan-stack/v3.1.1/guides/events/">Working with Events</a>
+</li>
+
+<li class=""><a href="/lorawan-stack/v3.1.1/guides/downlink-queue-ops/">Downlink Queue Operations</a>
+</li>
+
+<li class=""><a href="/lorawan-stack/v3.1.1/guides/class-c-multicast/">Class C and Multicast</a>
+</li>
+</ul>
+  
+</li>
+
+<li class=""><a href="/lorawan-stack/v3.1.1/concepts/">Concepts</a>
+<ul class="">
+<li class=""><a href="/lorawan-stack/v3.1.1/concepts/end-device-templates/">End Device Templates</a></li>
+<li class=""><a href="/lorawan-stack/v3.1.1/concepts/email-templates/">Email Templates</a></li>
+</ul>
+  
+</li>
+
+<li class="parent active"><a href="/lorawan-stack/v3.1.1/components/">Components</a>
+</li>
+
+<li class=""><a href="/lorawan-stack/v3.1.1/reference/">Reference</a>
+<ul class="">
+
+<li class=""><a href="/lorawan-stack/v3.1.1/reference/end-device-templates/">End Device Templates</a>
+<ul class="">
+<li class=""><a href="/lorawan-stack/v3.1.1/reference/end-device-templates/creating/">Creating Templates</a></li>
+<li class=""><a href="/lorawan-stack/v3.1.1/reference/end-device-templates/converting/">Converting Templates</a></li>
+<li class=""><a href="/lorawan-stack/v3.1.1/reference/end-device-templates/executing/">Executing Templates</a></li>
+<li class=""><a href="/lorawan-stack/v3.1.1/reference/end-device-templates/mapping/">Mapping Templates</a></li>
+<li class=""><a href="/lorawan-stack/v3.1.1/reference/end-device-templates/assigning-euis/">Assigning EUIs</a></li>
+</ul>
+  
+</li>
+
+<li class=""><a href="/lorawan-stack/v3.1.1/reference/email-templates/">Email Templates</a>
+<ul class="">
+<li class=""><a href="/lorawan-stack/v3.1.1/reference/email-templates/available/">Available Templates</a></li>
+<li class=""><a href="/lorawan-stack/v3.1.1/reference/email-templates/overriding/">Overriding Templates</a></li>
+</ul>
+  
+</li>
+</ul>
+  
+</li>
+</ul>
+</nav>
+
+
+<div class="sidebar-footer"></div>
+</div>
+</div><a href="#" id="backtothetop-fixed" class="backtothetop"
+ data-backtothetop-duration="600"
+ data-backtothetop-easing="easeOutQuart"
+ data-backtothetop-fixed-fadeIn="1000"
+ data-backtothetop-fixed-fadeOut="1000"
+ data-backtothetop-fixed-bottom="10"
+ data-backtothetop-fixed-right="20">
+<span class="fa-layers fa-fw">
+<i class="fas fa-circle"></i>
+<i class="fas fa-arrow-circle-up"></i>
+</span></a>
+</div>
+</body>
+</html>

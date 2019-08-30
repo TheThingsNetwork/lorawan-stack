@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Email Templates on The Things Stack for LoRaWAN Documentation</title>
+    <link>https://thethingsnetwork.github.io/lorawan-stack/v3.1.1/reference/email-templates/</link>
+    <description>Recent content in Email Templates on The Things Stack for LoRaWAN Documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    
+	<atom:link href="https://thethingsnetwork.github.io/lorawan-stack/v3.1.1/reference/email-templates/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Available Templates</title>
+      <link>https://thethingsnetwork.github.io/lorawan-stack/v3.1.1/reference/email-templates/available/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://thethingsnetwork.github.io/lorawan-stack/v3.1.1/reference/email-templates/available/</guid>
+      <description>The following email templates are currently used by The Things Stack:
+   Full Name Identifier Scope Additional fields     API Key changed api_key_changed Sent when the rights of an API Key have been changed. Identifiers and Rights   API Key created api_key_created Send when an API Key has been created. Identifiers and Rights   Collaborator changed collaborator_changed Sent when the rights of a collaborator have been changed.</description>
+    </item>
+    
+    <item>
+      <title>Overriding Templates</title>
+      <link>https://thethingsnetwork.github.io/lorawan-stack/v3.1.1/reference/email-templates/overriding/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://thethingsnetwork.github.io/lorawan-stack/v3.1.1/reference/email-templates/overriding/</guid>
+      <description>Note: We recommend getting familliar with the html/template template format first.
+ Template components An email template override has three components:
+ The subject file, which contains the subject of the email and is named &amp;lt;identifier&amp;gt;.subject.txt. The text contents file, which contains the contents of the email in text format and is named &amp;lt;identifier&amp;gt;.txt. The HTML contents file, which contains the contents of the email in HTML format and is named &amp;lt;identifier&amp;gt;.</description>
+    </item>
+    
+  </channel>
+</rss>
