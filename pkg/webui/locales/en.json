@@ -181,6 +181,7 @@
   "lib.shared-messages.addApplication": "Add Application",
   "lib.shared-messages.addDevice": "Add Device",
   "lib.shared-messages.addGateway": "Add Gateway",
+  "lib.shared-messages.addOrganization": "Add Organization",
   "lib.shared-messages.addressPlaceholder": "host",
   "lib.shared-messages.addWebhook": "Add Webhook",
   "lib.shared-messages.all": "All",
