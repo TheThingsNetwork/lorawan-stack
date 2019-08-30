@@ -65,3 +65,7 @@ export const getEntityId = function(entity) {
 export const getWebhookId = function(webhook = {}) {
   return getByPath(webhook, 'ids.webhook_id')
 }
+
+export const getOrganizationId = function(organization = {}) {
+  return getByPath(organization, 'ids.organization_id')
+}
