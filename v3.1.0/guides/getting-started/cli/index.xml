@@ -2,12 +2,12 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Command-line Interface on TTN Stack for LoRaWAN Documentation</title>
-    <link>https://thethingsnetwork.github.io/lorawan-stack/v3.1.0/guides/getting-started/cli/</link>
+    <link>https://thethingsstack.io/v3.1.0/guides/getting-started/cli/</link>
     <description>Recent content in Command-line Interface on TTN Stack for LoRaWAN Documentation</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     
-	<atom:link href="https://thethingsnetwork.github.io/lorawan-stack/v3.1.0/guides/getting-started/cli/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://thethingsstack.io/v3.1.0/guides/getting-started/cli/index.xml" rel="self" type="application/rss+xml" />
     
     
   </channel>
