@@ -12,22 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import user from './user'
-import init from './init'
-import applications from './applications'
-import devices from './devices'
-import device from './device'
-import gateways from './gateways'
-import configuration from './configuration'
-import organizations from './organizations'
+import api from '../../../api'
+import * as organizations from '../../actions/organizations'
+import createRequestLogic from './lib'
 
-export default [
-  ...user,
-  ...init,
-  ...applications,
-  ...devices,
-  ...device,
-  ...gateways,
-  ...configuration,
-  ...organizations,
-]
+const getOrganizationsLogic = createRequestLogic({
+  type: organizations.GET_ORGS_LIST,
+  latest: true,
+  async process({ action }) {
+    const {
+      params: { page, limit },
+    } = action.payload
+    const { selectors } = action.meta
+
+    const data = await api.organizations.list({ page, limit }, selectors)
+
+    return {
+      entities: data.organizations,
+      totalCount: data.totalCount,
+    }
+  },
+})
+
+export default [getOrganizationsLogic]
