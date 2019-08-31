@@ -29,6 +29,19 @@ class Organizations {
 
     return Marshaler.payloadListResponse('organizations', response)
   }
+
+  // Create
+
+  async create(userId, organization) {
+    const response = await this._api.OrganizationRegistry.Create(
+      {
+        routeParams: { 'collaborator.user_ids.user_id': userId },
+      },
+      { organization },
+    )
+
+    return Marshaler.payloadSingleResponse(response)
+  }
 }
 
 export default Organizations
