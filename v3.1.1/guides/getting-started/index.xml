@@ -2,56 +2,56 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Getting Started on The Things Stack for LoRaWAN Documentation</title>
-    <link>https://thethingsnetwork.github.io/lorawan-stack/v3.1.1/guides/getting-started/</link>
+    <link>https://thethingsstack.io/v3.1.1/guides/getting-started/</link>
     <description>Recent content in Getting Started on The Things Stack for LoRaWAN Documentation</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    
-	<atom:link href="https://thethingsnetwork.github.io/lorawan-stack/v3.1.1/guides/getting-started/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+
+	<atom:link href="https://thethingsstack.io/v3.1.1/guides/getting-started/index.xml" rel="self" type="application/rss+xml" />
+
+
     <item>
       <title>Installation</title>
-      <link>https://thethingsnetwork.github.io/lorawan-stack/v3.1.1/guides/getting-started/installation/</link>
+      <link>https://thethingsstack.io/v3.1.1/guides/getting-started/installation/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://thethingsnetwork.github.io/lorawan-stack/v3.1.1/guides/getting-started/installation/</guid>
+
+      <guid>https://thethingsstack.io/v3.1.1/guides/getting-started/installation/</guid>
       <description>Preparation Since we&amp;rsquo;re going to install The Things Stack using Docker and Docker Compose, follow the guides to install Docker and to install Docker Compose.
 Most releases contain an example docker-compose.yml file. You can also find this file in the Github repository of The Things Stack. In this guide we&amp;rsquo;ll use that example docker-compose.yml for our deployment.
 Command-line Interface (optional) Although the web interface of The Things Stack (the Console) currently has support for all basic features of The Things Stack, for some actions, you need to use the command-line interface (CLI).</description>
     </item>
-    
+
     <item>
       <title>Certificates</title>
-      <link>https://thethingsnetwork.github.io/lorawan-stack/v3.1.1/guides/getting-started/certificates/</link>
+      <link>https://thethingsstack.io/v3.1.1/guides/getting-started/certificates/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://thethingsnetwork.github.io/lorawan-stack/v3.1.1/guides/getting-started/certificates/</guid>
+
+      <guid>https://thethingsstack.io/v3.1.1/guides/getting-started/certificates/</guid>
       <description>Certificates The Things Stack will be configured with Transport Layer Security (TLS) and HTTPS. This requires a TLS certificate and a corresponding key. In this guide we&amp;rsquo;ll request a free, trusted certificate from Let&amp;rsquo;s Encrypt, but if you already have a certificate (cert.pem) and key (key.pem), you can also use those.
 Automatic Certificate Management (ACME) For automatic certificates, we&amp;rsquo;re going to need an acme directory where The Things Stack can store the certificate data:</description>
     </item>
-    
+
     <item>
       <title>Configuration</title>
-      <link>https://thethingsnetwork.github.io/lorawan-stack/v3.1.1/guides/getting-started/configuration/</link>
+      <link>https://thethingsstack.io/v3.1.1/guides/getting-started/configuration/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://thethingsnetwork.github.io/lorawan-stack/v3.1.1/guides/getting-started/configuration/</guid>
+
+      <guid>https://thethingsstack.io/v3.1.1/guides/getting-started/configuration/</guid>
       <description>The Things Stack can be started for development without passing any configuration. However, there are a number of things you need to configure for a production deployment. In this guide we&amp;rsquo;ll set environment variables in the docker-compose.yml file to configure The Things Stack as a private deployment on thethings.example.com.
 Databases We need to configure an SQL database, in this guide we&amp;rsquo;ll use a single instance of CockroachDB. Make sure to find a recent tag of the cockroachdb/cockroach image on Docker Hub and update it in the docker-compose.</description>
     </item>
-    
+
     <item>
       <title>Running The Things Stack</title>
-      <link>https://thethingsnetwork.github.io/lorawan-stack/v3.1.1/guides/getting-started/running-the-stack/</link>
+      <link>https://thethingsstack.io/v3.1.1/guides/getting-started/running-the-stack/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://thethingsnetwork.github.io/lorawan-stack/v3.1.1/guides/getting-started/running-the-stack/</guid>
+
+      <guid>https://thethingsstack.io/v3.1.1/guides/getting-started/running-the-stack/</guid>
       <description>Now that all configuration is done, we&amp;rsquo;re ready to initialize The Things Stack and start it. Open a terminal prompt in the same directory as your docker-compose.yml file.
 Initialization The first time The Things Stack is started, it requires some initialization. We&amp;rsquo;ll start by pulling the Docker images:
 $ docker-compose pull  Next, we need to initialize the database of the Identity Server:
 $ docker-compose run --rm stack is-db init  We&amp;rsquo;ll now create an initial admin user.</description>
     </item>
-    
+
   </channel>
 </rss>

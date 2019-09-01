@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Dependencies - TTN Stack for LoRaWAN Documentation</title>
+<meta name="description" content="Documentation for TTN Stack for LoRaWAN">
+<meta name="generator" content="Hugo 0.55.6" />
+<link href="https://thethingsstack.io/v3.1.0/index.xml" rel="alternate" type="application/rss+xml">
+<link rel="canonical" href="https://thethingsstack.io/v3.1.0/guides/getting-started/dependencies/">
+<link rel="stylesheet" href="https://thethingsstack.io/v3.1.0/css/theme.min.css">
+<script src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
+<link rel="stylesheet" href="https://thethingsstack.io/v3.1.0/css/chroma.min.css">
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+<script src="https://thethingsstack.io/v3.1.0/js/functions.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery.easing@1.4.1/jquery.easing.min.js"></script>
+<script src="https://thethingsstack.io/v3.1.0/js/jquery.backtothetop/jquery.backtothetop.min.js"></script></head>
+<body>
+<div class="container"><header>
+<h1>TTN Stack for LoRaWAN Documentation</h1>
+
+ <span class="version">Version v3.1.0</span>
+<a href="https://github.com/TheThingsNetwork/lorawan-stack" class="github"><i class="fab fa-github"></i></a>
+<p class="description">Documentation for TTN Stack for LoRaWAN</p>
+
+</header>
+<div class="menu">
+<nav>
+<ul>
+<li><a href="/v3.1.0/guides/getting-started/">Getting Started</a></li>
+<li><a href="/v3.1.0/guides/">Guides</a></li>
+<li><a href="/v3.1.0/concepts/">Concepts</a></li>
+<li><a href="/v3.1.0/components/">Components</a></li>
+<li><a href="/v3.1.0/reference/">Reference</a></li></ul>
+</nav>
+</div>
+<div class="content-container">
+<main><h1>Dependencies</h1>
+
+<h2 id="cli-and-stack">CLI and stack</h2>
+
+<p>The web interface Console is not yet available. So in this tutorial, we use the command-line interface (CLI) to manage the setup.</p>
+
+<p>You can use the CLI on your local machine or on the server.</p>
+
+<blockquote>
+<p>Note: if you need help with any CLI command, use the <code>--help</code> flag to get a list of subcommands, flags and their description and aliases.</p>
+</blockquote>
+
+<h3 id="package-managers-recommended">Package managers (recommended)</h3>
+
+<h4 id="macos">macOS</h4>
+
+<pre><code class="language-bash">$ brew install TheThingsNetwork/lorawan-stack/ttn-lw-stack
+</code></pre>
+
+<h4 id="linux">Linux</h4>
+
+<pre><code class="language-bash">$ sudo snap install ttn-lw-stack
+$ sudo snap alias ttn-lw-stack.ttn-lw-cli ttn-lw-cli
+</code></pre>
+
+<h3 id="binaries">Binaries</h3>
+
+<p>If your operating system or package manager is not mentioned, please <a href="https://github.com/TheThingsNetwork/lorawan-stack/releases">download binaries</a> for your operating system and processor architecture.</p>
+
+<h2 id="certificates">Certificates</h2>
+
+<p>By default, the stack requires a <code>cert.pem</code> and <code>key.pem</code>, in order to to serve content over TLS.</p>
+
+<p>Typically you&rsquo;ll get these from a trusted Certificate Authority. Use the &ldquo;full chain&rdquo; for <code>cert.pem</code> and the &ldquo;private key&rdquo; for <code>key.pem</code>. The stack also has support for automated certificate management (ACME). This allows you to easily get trusted TLS certificates for your server from <a href="https://letsencrypt.org/getting-started/">Let&rsquo;s Encrypt</a>. If you want this, you&rsquo;ll need to create an <code>acme</code> directory that the stack can write in:</p>
+
+<pre><code class="language-bash">$ mkdir ./acme
+$ chown 886:886 ./acme
+</code></pre>
+
+<blockquote>
+<p>If you don&rsquo;t do this, you&rsquo;ll get an error saying something like <code>open /var/lib/acme/acme_account+key&lt;...&gt;: permission denied</code>.</p>
+</blockquote>
+
+<p>For local (development) deployments, you can generate self-signed certificates. If you have your <a href="../DEVELOPMENT.md#development-environment">Go environment</a> set up, you can run the following command to generate a key and certificate for <code>localhost</code>:</p>
+
+<pre><code class="language-bash">$ go run $(go env GOROOT)/src/crypto/tls/generate_cert.go -ca -host localhost
+</code></pre>
+
+<p>In order for the user in our Docker container to read these files, you have to change the ownership of the certificate and key:</p>
+
+<pre><code class="language-bash">$ chown 886:886 ./cert.pem ./key.pem
+</code></pre>
+
+<blockquote>
+<p>If you don&rsquo;t do this, you&rsquo;ll get an error saying something like <code>/run/secrets/key.pem: permission denied</code>.</p>
+</blockquote>
+
+<p>Keep in mind that self-signed certificates are not trusted by browsers and operating systems, resulting in warnings and errors such as <code>certificate signed by unknown authority</code> or <code>ERR_CERT_AUTHORITY_INVALID</code>. In most browsers you can add an exception for your self-signed certificate. You can configure the CLI to trust the certificate as well.</p>
+<div class="edit-meta">
+Last updated on 23 Jul 2019
+
+
+<br><a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/guides/getting-started/dependencies.md" class="edit-page"><i class="fas fa-pen-square"></i> Edit on GitHub</a></div><nav class="pagination"><a class="nav nav-prev" href="/v3.1.0/guides/getting-started/" title="Getting Started"><i class="fas fa-arrow-left" aria-hidden="true"></i> Prev - Getting Started</a>
+<a class="nav nav-next" href="/v3.1.0/guides/getting-started/configuration/" title="Configuration">Next - Configuration <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+</nav><footer><p class="powered">Powered by <a href="https://gohugo.io">Hugo</a>. Theme by <a href="https://themes.gohugo.io/hugo-theme-techdoc/">TechDoc</a>. Designed by <a href="https://github.com/thingsym/hugo-theme-techdoc">Thingsym</a>.</p>
+</footer>
+</main><div class="sidebar">
+<nav>
+<ul>
+<li class=""><a href="https://thethingsstack.io/v3.1.0">Home</a></li>
+
+<li class="parent"><a href="/v3.1.0/guides/">Guides</a>
+<ul class="sub-menu">
+
+<li class="parent"><a href="/v3.1.0/guides/getting-started/">Getting Started</a>
+<ul class="sub-menu">
+<li class="active"><a href="/v3.1.0/guides/getting-started/dependencies/">Dependencies</a></li>
+<li class=""><a href="/v3.1.0/guides/getting-started/configuration/">Configuration</a></li>
+<li class=""><a href="/v3.1.0/guides/getting-started/running-the-stack/">Running the Stack</a></li>
+
+<li class=""><a href="/v3.1.0/guides/getting-started/console/">Console</a>
+</li>
+
+<li class=""><a href="/v3.1.0/guides/getting-started/cli/">Command-line Interface</a>
+</li>
+
+<li class=""><a href="/v3.1.0/guides/getting-started/mqtt/">MQTT Server</a>
+</li>
+
+<li class=""><a href="/v3.1.0/guides/getting-started/webhooks/">HTTP Webhooks</a>
+</li>
+</ul>
+
+</li>
+
+<li class=""><a href="/v3.1.0/guides/events/">Working with Events</a>
+</li>
+
+<li class=""><a href="/v3.1.0/guides/downlink-queue-ops/">Downlink Queue Operations</a>
+</li>
+
+<li class=""><a href="/v3.1.0/guides/class-c-multicast/">Class C and Multicast</a>
+</li>
+</ul>
+
+</li>
+
+<li class=""><a href="/v3.1.0/concepts/">Concepts</a>
+<ul class="">
+<li class=""><a href="/v3.1.0/concepts/end-device-templates/">End Device Templates</a></li>
+</ul>
+
+</li>
+
+<li class=""><a href="/v3.1.0/components/">Components</a>
+</li>
+
+<li class=""><a href="/v3.1.0/reference/">Reference</a>
+<ul class="">
+
+<li class=""><a href="/v3.1.0/reference/end-device-templates/">End Device Templates</a>
+<ul class="">
+<li class=""><a href="/v3.1.0/reference/end-device-templates/creating/">Creating Templates</a></li>
+<li class=""><a href="/v3.1.0/reference/end-device-templates/converting/">Converting Templates</a></li>
+<li class=""><a href="/v3.1.0/reference/end-device-templates/executing/">Executing Templates</a></li>
+<li class=""><a href="/v3.1.0/reference/end-device-templates/mapping/">Mapping Templates</a></li>
+<li class=""><a href="/v3.1.0/reference/end-device-templates/assigning-euis/">Assigning EUIs</a></li>
+</ul>
+
+</li>
+</ul>
+
+</li>
+</ul>
+</nav>
+
+
+<div class="sidebar-footer"></div>
+</div>
+</div><a href="#" id="backtothetop-fixed" class="backtothetop"
+ data-backtothetop-duration="600"
+ data-backtothetop-easing="easeOutQuart"
+ data-backtothetop-fixed-fadeIn="1000"
+ data-backtothetop-fixed-fadeOut="1000"
+ data-backtothetop-fixed-bottom="10"
+ data-backtothetop-fixed-right="20">
+<span class="fa-layers fa-fw">
+<i class="fas fa-circle"></i>
+<i class="fas fa-arrow-circle-up"></i>
+</span></a>
+</div>
+</body>
+</html>

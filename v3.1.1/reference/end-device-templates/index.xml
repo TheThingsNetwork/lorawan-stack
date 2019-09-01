@@ -2,67 +2,67 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>End Device Templates on The Things Stack for LoRaWAN Documentation</title>
-    <link>https://thethingsnetwork.github.io/lorawan-stack/v3.1.1/reference/end-device-templates/</link>
+    <link>https://thethingsstack.io/v3.1.1/reference/end-device-templates/</link>
     <description>Recent content in End Device Templates on The Things Stack for LoRaWAN Documentation</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    
-	<atom:link href="https://thethingsnetwork.github.io/lorawan-stack/v3.1.1/reference/end-device-templates/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+
+	<atom:link href="https://thethingsstack.io/v3.1.1/reference/end-device-templates/index.xml" rel="self" type="application/rss+xml" />
+
+
     <item>
       <title>Creating Templates</title>
-      <link>https://thethingsnetwork.github.io/lorawan-stack/v3.1.1/reference/end-device-templates/creating/</link>
+      <link>https://thethingsstack.io/v3.1.1/reference/end-device-templates/creating/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://thethingsnetwork.github.io/lorawan-stack/v3.1.1/reference/end-device-templates/creating/</guid>
+
+      <guid>https://thethingsstack.io/v3.1.1/reference/end-device-templates/creating/</guid>
       <description>Command-line interface only The instructions below use the command-line interface (CLI). Learn how to install the CLI  You can create a device template from an existing device or extend an existing device template. You can also create a new template from scratch.
 Create from existing device You can use the end-device template create command to create a template from an existing device.
  Note: By default, end-device template create strips the device&amp;rsquo;s application ID, device ID, JoinEUI, DevEUI and server addresses to create a generic template.</description>
     </item>
-    
+
     <item>
       <title>Converting Templates</title>
-      <link>https://thethingsnetwork.github.io/lorawan-stack/v3.1.1/reference/end-device-templates/converting/</link>
+      <link>https://thethingsstack.io/v3.1.1/reference/end-device-templates/converting/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://thethingsnetwork.github.io/lorawan-stack/v3.1.1/reference/end-device-templates/converting/</guid>
+
+      <guid>https://thethingsstack.io/v3.1.1/reference/end-device-templates/converting/</guid>
       <description>Command-line interface only The instructions below use the command-line interface (CLI). Learn how to install the CLI  You can convert data in various formats to device templates using formats supported by The Things Stack. Input formats can be vendor-specific information about devices or device data to migrate from another LoRaWAN server stack.
 Start with listing the supported formats:
 $ ttn-lw-cli end-device template list-formats  This gives the supported formats.</description>
     </item>
-    
+
     <item>
       <title>Executing Templates</title>
-      <link>https://thethingsnetwork.github.io/lorawan-stack/v3.1.1/reference/end-device-templates/executing/</link>
+      <link>https://thethingsstack.io/v3.1.1/reference/end-device-templates/executing/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://thethingsnetwork.github.io/lorawan-stack/v3.1.1/reference/end-device-templates/executing/</guid>
+
+      <guid>https://thethingsstack.io/v3.1.1/reference/end-device-templates/executing/</guid>
       <description>Command-line interface only The instructions below use the command-line interface (CLI). Learn how to install the CLI  Once you created or converted a template, you can execute the template with the end-device templates execute command to obtain an end device that can be created.
  The examples use a template that has been created as follows:
 $ ttn-lw-cli end-device template extend \ --lorawan-version 1.0.3 \ --lorawan-phy-version 1.0.3-a \ --frequency-plan-id US_902_928 &amp;gt; example.</description>
     </item>
-    
+
     <item>
       <title>Mapping Templates</title>
-      <link>https://thethingsnetwork.github.io/lorawan-stack/v3.1.1/reference/end-device-templates/mapping/</link>
+      <link>https://thethingsstack.io/v3.1.1/reference/end-device-templates/mapping/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://thethingsnetwork.github.io/lorawan-stack/v3.1.1/reference/end-device-templates/mapping/</guid>
+
+      <guid>https://thethingsstack.io/v3.1.1/reference/end-device-templates/mapping/</guid>
       <description>Command-line interface only The instructions below use the command-line interface (CLI). Learn how to install the CLI  You can use the end-device templates map command to map input templates with a mapping file to create new device templates. This allows for combining fields from different device template files.
 The matching from input to a mapping template is, in order, by mapping key (mapping_key), end device identifiers (ids.application_id and ids.</description>
     </item>
-    
+
     <item>
       <title>Assigning EUIs</title>
-      <link>https://thethingsnetwork.github.io/lorawan-stack/v3.1.1/reference/end-device-templates/assigning-euis/</link>
+      <link>https://thethingsstack.io/v3.1.1/reference/end-device-templates/assigning-euis/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://thethingsnetwork.github.io/lorawan-stack/v3.1.1/reference/end-device-templates/assigning-euis/</guid>
+
+      <guid>https://thethingsstack.io/v3.1.1/reference/end-device-templates/assigning-euis/</guid>
       <description>Command-line interface only The instructions below use the command-line interface (CLI). Learn how to install the CLI  You can use the end-device template assign-euis command to assign the JoinEUI and DevEUI to device templates. The DevEUI is assigned from the given start number. This personalizes the device templates.
 You can use the command in two different ways:
  Pipe a number of device templates to assign EUIs to, for example the result of Mapping Templates or Converting Templates Pipe a generic device template, for example the result of Creating Templates, and pass the --count flag to generate a number of personalized device templates  Once the device templates are personalized with EUIs, you can set additional fields (see Creating Templates) or execute templates (see Executing Templates).</description>
     </item>
-    
+
   </channel>
 </rss>
