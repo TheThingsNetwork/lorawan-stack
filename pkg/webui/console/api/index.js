@@ -181,5 +181,6 @@ export default {
   },
   organizations: {
     list: ttnClient.Organizations.getAll.bind(ttnClient.Organizations),
+    create: ttnClient.Organizations.create.bind(ttnClient.Organizations),
   },
 }
