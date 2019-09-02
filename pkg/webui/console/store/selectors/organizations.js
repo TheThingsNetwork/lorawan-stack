@@ -17,6 +17,11 @@ import {
   createPaginationIdsSelectorByEntity,
   createPaginationTotalCountSelectorByEntity,
 } from './pagination'
+import {
+  createEventsSelector,
+  createEventsErrorSelector,
+  createEventsStatusSelector,
+} from './events'
 import { createFetchingSelector } from './fetching'
 import { createErrorSelector } from './error'
 
@@ -38,3 +43,8 @@ export const selectOrganizations = state =>
 export const selectOrganizationsTotalCount = state => selectOrgsTotalCount(state)
 export const selectOrganizationsFetching = state => selectOrgsFetching(state)
 export const selectOrganizationsError = state => selectOrgsError(state)
+
+// Events
+export const selectOrganizationEvents = createEventsSelector(ENTITY)
+export const selectOrganizationEventsError = createEventsErrorSelector(ENTITY)
+export const selectOrganizationEventsStatus = createEventsStatusSelector(ENTITY)
