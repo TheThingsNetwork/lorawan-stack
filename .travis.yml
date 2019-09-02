@@ -118,7 +118,15 @@ script:
   fi
 - if [[ "$RUNTYPE" == "go.test" ]]; then $MAGE go:testBinaries; fi
 - if [[ "$RUNTYPE" == "release" ]]; then $MAGE version:files; fi
-- if [[ "$RUNTYPE" == "release" ]]; then $MAGE docs:build; fi
+- |
+  if [[ "$RUNTYPE" == "release" ]]; then
+    set -e
+    rm -rf doc/public
+    mkdir doc/public
+    git --work-tree=doc/public checkout gh-pages .
+    git reset .
+    $MAGE docs:build
+  fi
 - make git.diff
 after_success:
 - |
