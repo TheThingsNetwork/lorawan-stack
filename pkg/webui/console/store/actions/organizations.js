@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { createRequestActions } from './lib'
 import { createPaginationRequestActions, createPaginationBaseActionType } from './pagination'
 
 export const SHARED_NAME = 'ORGANIZATION'
@@ -25,3 +26,13 @@ export const [
     failure: getORganizationsListFailure,
   },
 ] = createPaginationRequestActions(SHARED_NAME)
+
+export const CREATE_ORG_BASE = 'CREATE_ORGANIZATION'
+export const [
+  { request: CREATE_ORG, success: CREATE_ORG_SUCCESS, failure: CREATE_ORG_FAILURE },
+  {
+    request: createOrganization,
+    success: createOrganizationSuccess,
+    failure: createOrganizationFailure,
+  },
+] = createRequestActions(CREATE_ORG_BASE)
