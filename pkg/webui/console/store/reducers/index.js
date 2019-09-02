@@ -20,9 +20,9 @@ import {
   SHARED_NAME as APPLICATIONS_SHARED_NAME,
 } from '../actions/applications'
 import { SHARED_NAME as GATEWAY_SHARED_NAME } from '../actions/gateways'
-
+import { SHARED_NAME as ORGANIZATION_SHARED_NAME } from '../actions/organizations'
 import { SHARED_NAME as DEVICE_SHARED_NAME } from '../actions/device'
-import { getApplicationId, getGatewayId } from '../../../lib/selectors/id'
+import { getApplicationId, getGatewayId, getOrganizationId } from '../../../lib/selectors/id'
 import user from './user'
 import init from './init'
 import applications from './applications'
@@ -42,6 +42,7 @@ import error from './ui/error'
 import webhook from './webhook'
 import webhooks from './webhooks'
 import webhookFormats from './webhook-formats'
+import organizations from './organizations'
 import { createNamedPaginationReducer } from './pagination'
 
 export default history =>
@@ -57,6 +58,7 @@ export default history =>
     webhooks,
     webhookFormats,
     configuration,
+    organizations,
     apiKeys: combineReducers({
       application: createNamedApiKeyReducer(APPLICATION_SHARED_NAME),
       applications: createNamedApiKeysReducer(APPLICATION_SHARED_NAME),
@@ -85,6 +87,7 @@ export default history =>
     pagination: combineReducers({
       applications: createNamedPaginationReducer(APPLICATION_SHARED_NAME, getApplicationId),
       gateways: createNamedPaginationReducer(GATEWAY_SHARED_NAME, getGatewayId),
+      organizations: createNamedPaginationReducer(ORGANIZATION_SHARED_NAME, getOrganizationId),
     }),
     router: connectRouter(history),
   })

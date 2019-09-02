@@ -181,6 +181,7 @@
   "lib.shared-messages.addApplication": "Xxx Xxxxxxxxxxx",
   "lib.shared-messages.addDevice": "Xxx Xxxxxx",
   "lib.shared-messages.addGateway": "Xxx Xxxxxxx",
+  "lib.shared-messages.addOrganization": "Xxx Xxxxxxxxxxxx",
   "lib.shared-messages.addressPlaceholder": "xxxx",
   "lib.shared-messages.addWebhook": "Xxx Xxxxxxx",
   "lib.shared-messages.all": "Xxx",
