@@ -160,6 +160,7 @@ func init() {
 	}
 	for _, p := range []ttnpb.ApplicationPubSub_Provider{
 		&ttnpb.ApplicationPubSub_NATS{},
+		&ttnpb.ApplicationPubSub_MQTT{},
 	} {
 		provider.RegisterProvider(p, impl)
 	}

@@ -69,45 +69,48 @@ func (impl) OpenConnection(ctx context.Context, pb *ttnpb.ApplicationPubSub) (pc
 		},
 	}
 	for _, t := range []struct {
-		topic     **pubsub.Topic
-		topicName string
+		topic   **pubsub.Topic
+		message *ttnpb.ApplicationPubSub_Message
 	}{
 		{
-			topic:     &pc.Topics.UplinkMessage,
-			topicName: pb.GetUplinkMessage().GetTopic(),
+			topic:   &pc.Topics.UplinkMessage,
+			message: pb.GetUplinkMessage(),
 		},
 		{
-			topic:     &pc.Topics.JoinAccept,
-			topicName: pb.GetJoinAccept().GetTopic(),
+			topic:   &pc.Topics.JoinAccept,
+			message: pb.GetJoinAccept(),
 		},
 		{
-			topic:     &pc.Topics.DownlinkAck,
-			topicName: pb.GetDownlinkAck().GetTopic(),
+			topic:   &pc.Topics.DownlinkAck,
+			message: pb.GetDownlinkAck(),
 		},
 		{
-			topic:     &pc.Topics.DownlinkNack,
-			topicName: pb.GetDownlinkNack().GetTopic(),
+			topic:   &pc.Topics.DownlinkNack,
+			message: pb.GetDownlinkNack(),
 		},
 		{
-			topic:     &pc.Topics.DownlinkSent,
-			topicName: pb.GetDownlinkSent().GetTopic(),
+			topic:   &pc.Topics.DownlinkSent,
+			message: pb.GetDownlinkSent(),
 		},
 		{
-			topic:     &pc.Topics.DownlinkFailed,
-			topicName: pb.GetDownlinkFailed().GetTopic(),
+			topic:   &pc.Topics.DownlinkFailed,
+			message: pb.GetDownlinkFailed(),
 		},
 		{
-			topic:     &pc.Topics.DownlinkQueued,
-			topicName: pb.GetDownlinkQueued().GetTopic(),
+			topic:   &pc.Topics.DownlinkQueued,
+			message: pb.GetDownlinkQueued(),
 		},
 		{
-			topic:     &pc.Topics.LocationSolved,
-			topicName: pb.GetLocationSolved().GetTopic(),
+			topic:   &pc.Topics.LocationSolved,
+			message: pb.GetLocationSolved(),
 		},
 	} {
+		if t.message == nil {
+			continue
+		}
 		if *t.topic, err = OpenTopic(
 			client,
-			mqtt_topic.Join(append(mqtt_topic.Split(pb.BaseTopic), mqtt_topic.Split(t.topicName)...)),
+			mqtt_topic.Join(append(mqtt_topic.Split(pb.BaseTopic), mqtt_topic.Split(t.message.GetTopic())...)),
 			timeout,
 			byte(settings.GetPublishQoS()),
 		); err != nil {
@@ -117,20 +120,23 @@ func (impl) OpenConnection(ctx context.Context, pb *ttnpb.ApplicationPubSub) (pc
 	}
 	for _, s := range []struct {
 		subscription **pubsub.Subscription
-		topicName    string
+		message      *ttnpb.ApplicationPubSub_Message
 	}{
 		{
 			subscription: &pc.Subscriptions.Push,
-			topicName:    pb.GetDownlinkPush().GetTopic(),
+			message:      pb.GetDownlinkPush(),
 		},
 		{
 			subscription: &pc.Subscriptions.Replace,
-			topicName:    pb.GetDownlinkReplace().GetTopic(),
+			message:      pb.GetDownlinkReplace(),
 		},
 	} {
+		if s.message == nil {
+			continue
+		}
 		if *s.subscription, err = OpenSubscription(
 			client,
-			mqtt_topic.Join(append(mqtt_topic.Split(pb.BaseTopic), mqtt_topic.Split(s.topicName)...)),
+			mqtt_topic.Join(append(mqtt_topic.Split(pb.BaseTopic), mqtt_topic.Split(s.message.GetTopic())...)),
 			timeout,
 			byte(settings.GetSubscribeQoS()),
 		); err != nil {
