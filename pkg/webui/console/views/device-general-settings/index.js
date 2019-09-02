@@ -25,6 +25,7 @@ import DeviceDataForm from '../../components/device-data-form'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import IntlHelmet from '../../../lib/components/intl-helmet'
+import PropTypes from '../../../lib/prop-types'
 import api from '../../api'
 
 import { updateDevice } from '../../store/actions/device'
@@ -63,6 +64,13 @@ import { selectSelectedDevice, selectSelectedDeviceId } from '../../store/select
 })
 @bind
 export default class DeviceGeneralSettings extends React.Component {
+  static propTypes = {
+    appId: PropTypes.string.isRequired,
+    device: PropTypes.device.isRequired,
+    onDeleteSuccess: PropTypes.func.isRequired,
+    updateDevice: PropTypes.func.isRequired,
+  }
+
   state = {
     error: '',
   }
@@ -70,17 +78,6 @@ export default class DeviceGeneralSettings extends React.Component {
   async handleSubmit(values) {
     const { device, appId, updateDevice } = this.props
     const { activation_mode, ...updatedDevice } = values
-
-    // Clean values based on activation mode
-    if (activation_mode === 'otaa') {
-      delete updatedDevice.mac_settings
-      delete updatedDevice.session
-    } else {
-      delete updatedDevice.ids.join_eui
-      delete updatedDevice.ids.dev_eui
-      delete updatedDevice.root_keys
-      delete updatedDevice.resets_join_nonces
-    }
 
     const {
       ids: { device_id: deviceId },

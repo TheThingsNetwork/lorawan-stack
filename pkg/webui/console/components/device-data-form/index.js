@@ -33,7 +33,7 @@ import errorMessages from '../../../lib/errors/error-messages'
 import { getDeviceId } from '../../../lib/selectors/id'
 import PropTypes from '../../../lib/prop-types'
 import m from './messages'
-import { createFormValidationSchema, updateFormValidationSchema } from './validation-schema'
+import validationSchema from './validation-schema'
 
 @bind
 class DeviceDataForm extends Component {
@@ -71,7 +71,6 @@ class DeviceDataForm extends Component {
 
   async handleSubmit(values, { setSubmitting, resetForm }) {
     const { onSubmit, onSubmitSuccess, initialValues, update } = this.props
-    const validationSchema = update ? updateFormValidationSchema : createFormValidationSchema
     const deviceId = getDeviceId(initialValues)
     const castedValues = validationSchema.cast(values)
     await this.setState({ error: '' })
@@ -121,6 +120,7 @@ class DeviceDataForm extends Component {
           name="session.dev_addr"
           placeholder={m.leaveBlankPlaceholder}
           description={m.deviceAddrDescription}
+          required
         />
         <Form.Field
           title={sharedMessages.fwdNtwkKey}
@@ -261,8 +261,19 @@ class DeviceDataForm extends Component {
       frequency_plan_id: undefined,
       supports_class_c: false,
       resets_join_nonces: false,
-      root_keys: {},
-      session: {},
+      root_keys: {
+        nwk_key: {},
+        app_key: {},
+      },
+      session: {
+        dev_addr: undefined,
+        keys: {
+          f_nwk_s_int_key: {},
+          s_nwk_s_int_key: {},
+          nwk_s_enc_key: {},
+          app_s_key: {},
+        },
+      },
       mac_settings: {
         resets_f_cnt: false,
       },
@@ -278,7 +289,7 @@ class DeviceDataForm extends Component {
       <Form
         error={error}
         onSubmit={this.handleSubmit}
-        validationSchema={update ? updateFormValidationSchema : createFormValidationSchema}
+        validationSchema={validationSchema}
         submitEnabledWhenInvalid
         initialValues={formValues}
       >
@@ -390,14 +401,48 @@ class DeviceDataForm extends Component {
   }
 }
 
+const keyPropType = PropTypes.shape({
+  key: PropTypes.string,
+})
+
+const initialValuesPropType = PropTypes.shape({
+  ids: PropTypes.shape({
+    device_id: PropTypes.string,
+    join_eui: PropTypes.string,
+    dev_eui: PropTypes.string,
+  }),
+  name: PropTypes.string,
+  activation_mode: PropTypes.string,
+  lorawan_version: PropTypes.string,
+  lorawan_phy_version: PropTypes.string,
+  frequency_plan_id: PropTypes.string,
+  supports_class_c: PropTypes.bool,
+  resets_join_nonces: PropTypes.bool,
+  root_keys: PropTypes.shape({
+    nwk_key: keyPropType,
+    app_key: keyPropType,
+  }),
+  session: PropTypes.shape({
+    dev_addr: PropTypes.string,
+    keys: PropTypes.shape({
+      f_nwk_s_int_key: keyPropType,
+      s_nwk_s_int_key: keyPropType,
+      nwk_s_enc_key: keyPropType,
+      app_s_key: keyPropType,
+    }),
+  }),
+  mac_settings: PropTypes.shape({
+    resets_f_cnt: PropTypes.bool,
+  }),
+})
+
 DeviceDataForm.propTypes = {
-  onSubmit: PropTypes.func.isRequired,
+  initialValues: initialValuesPropType,
   onDelete: PropTypes.func,
   onDeleteSuccess: PropTypes.func,
+  onSubmit: PropTypes.func.isRequired,
   onSubmitSuccess: PropTypes.func,
-  error: PropTypes.error,
   update: PropTypes.bool,
-  initialValues: PropTypes.object,
 }
 
 DeviceDataForm.defaultProps = {
@@ -406,7 +451,6 @@ DeviceDataForm.defaultProps = {
   onSubmitSuccess: () => null,
   initialValues: {},
   update: false,
-  error: '',
 }
 
 export default DeviceDataForm
