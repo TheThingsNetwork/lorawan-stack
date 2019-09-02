@@ -179,4 +179,7 @@ export default {
   ns: {
     generateDevAddress: ttnClient.Ns.generateDevAddress.bind(ttnClient.Ns),
   },
+  organizations: {
+    list: ttnClient.Organizations.getAll.bind(ttnClient.Organizations),
+  },
 }
