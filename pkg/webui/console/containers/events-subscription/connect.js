@@ -12,18 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.header
-  display: flex
-  align-items: center
-  justify-content: space-between
-  margin-bottom: $cs.xs
+import { connect } from 'react-redux'
 
-.header-title
-  font-weight: 600
-  margin-right: $cs.xs
-
-.see-all-message
-  padding-right: $cs.xxs
-
-.list
-  min-height: 10rem
+export default (mapStateToProps, EventsSubscription) => connect(mapStateToProps)(EventsSubscription)

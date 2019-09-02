@@ -128,15 +128,16 @@ class GatewayStatistic extends React.PureComponent {
 }
 
 GatewayStatistic.propTypes = {
-  gtwId: PropTypes.string.isRequired,
-  startStatistics: PropTypes.func.isRequired,
-  stopStatistics: PropTypes.func.isRequired,
+  className: PropTypes.string,
+  error: PropTypes.error,
   fetching: PropTypes.bool,
-  error: PropTypes.object,
-  statistics: PropTypes.object,
+  startStatistics: PropTypes.func.isRequired,
+  statistics: PropTypes.gatewayStats,
+  stopStatistics: PropTypes.func.isRequired,
 }
 
 GatewayStatistic.defaultProps = {
+  className: undefined,
   fetching: false,
   error: null,
   statistics: null,

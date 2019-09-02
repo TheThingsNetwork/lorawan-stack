@@ -22,7 +22,11 @@ import EventsSubscription from '../../containers/events-subscription'
 
 import { clearDeviceEventsStream } from '../../store/actions/device'
 
-import { selectDeviceEvents, selectDeviceEventsStatus } from '../../store/selectors/device'
+import {
+  selectDeviceEvents,
+  selectDeviceEventsStatus,
+  selectDeviceEventsError,
+} from '../../store/selectors/device'
 
 @connect(
   null,
@@ -44,6 +48,7 @@ class DeviceEvents extends React.Component {
         widget={widget}
         eventsSelector={selectDeviceEvents}
         statusSelector={selectDeviceEventsStatus}
+        errorSelector={selectDeviceEventsError}
         onClear={onClear}
         toAllUrl={`/applications/${appId}/devices/${devId}/data`}
       />

@@ -12,31 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import { connect } from 'react-redux'
-
-import CONNECTION_STATUS from '../../constants/connection-status'
-import Events from '../../../components/events'
 import PropTypes from '../../../lib/prop-types'
 
-const { Widget } = Events
+import EventsSubscription from './events-subscription'
+import connect from './connect'
 
-const mapConnectionStatusToWidget = function(status) {
-  switch (status) {
-    case CONNECTION_STATUS.CONNECTED:
-      return Widget.CONNECTION_STATUS.GOOD
-    case CONNECTION_STATUS.CONNECTING:
-      return Widget.CONNECTION_STATUS.MEDIOCRE
-    case CONNECTION_STATUS.DISCONNECTED:
-    case CONNECTION_STATUS.ERROR:
-      return Widget.CONNECTION_STATUS.BAD
-    case CONNECTION_STATUS.UNKNOWN:
-    default:
-      return Widget.CONNECTION_STATUS.UNKNOWN
-  }
-}
-
-@connect(function(state, props) {
+const mapStateToProps = (state, props) => {
   const { id, eventsSelector, statusSelector, errorSelector } = props
 
   return {
@@ -44,43 +25,18 @@ const mapConnectionStatusToWidget = function(status) {
     connectionStatus: statusSelector(state, id),
     error: errorSelector(state, id),
   }
-})
-class EventsSubscription extends React.Component {
-  render() {
-    const { id, widget, events, connectionStatus, onClear, toAllUrl, error } = this.props
-
-    if (widget) {
-      return (
-        <Widget
-          emitterId={id}
-          events={events}
-          connectionStatus={mapConnectionStatusToWidget(connectionStatus)}
-          toAllUrl={toAllUrl}
-          error={error}
-        />
-      )
-    }
-
-    return <Events emitterId={id} events={events} onClear={onClear} error={error} />
-  }
 }
 
-EventsSubscription.propTypes = {
-  id: PropTypes.string.isRequired,
+const ConnectedEventsSubscription = connect(
+  mapStateToProps,
+  EventsSubscription,
+)
+
+ConnectedEventsSubscription.propTypes = {
+  errorSelector: PropTypes.func.isRequired,
   eventsSelector: PropTypes.func.isRequired,
-  statusSelector: PropTypes.func,
-  errorSelector: PropTypes.func,
-  onClear: PropTypes.func,
-  widget: PropTypes.bool,
-  toAllUrl: PropTypes.string,
+  id: PropTypes.string.isRequired,
+  statusSelector: PropTypes.func.isRequired,
 }
 
-EventsSubscription.defaultProps = {
-  widget: false,
-  onClear: () => null,
-  statusSelector: () => 'unknown',
-  errorSelector: () => undefined,
-  toAllUrl: null,
-}
-
-export default EventsSubscription
+export { ConnectedEventsSubscription as default, EventsSubscription as Subscription }

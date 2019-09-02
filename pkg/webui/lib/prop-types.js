@@ -60,6 +60,28 @@ PropTypes.event = PropTypes.shape({
   identifiers: PropTypes.array.isRequired,
   data: PropTypes.object,
 })
+PropTypes.events = PropTypes.arrayOf(PropTypes.event)
+
+PropTypes.gateway = PropTypes.shape({
+  ids: PropTypes.shape({
+    gateway_id: PropTypes.string.isRequired,
+  }).isRequired,
+  name: PropTypes.string,
+  description: PropTypes.string,
+  created_at: PropTypes.string,
+  updated_at: PropTypes.string,
+  frequency_plan_id: PropTypes.string.isRequired,
+  gateway_server_address: PropTypes.string,
+})
+
+PropTypes.gatewayStats = PropTypes.shape({
+  connected_at: PropTypes.string.isRequired,
+  last_uplink_received_at: PropTypes.string,
+  protocol: PropTypes.string,
+  uplink_count: PropTypes.string,
+  downlink_count: PropTypes.string,
+  round_trip_times: PropTypes.shape({}),
+})
 
 PropTypes.user = PropTypes.shape({
   ids: PropTypes.shape({

@@ -32,5 +32,5 @@ export const createEventsErrorSelector = entity =>
   function(state, entityId) {
     const store = selectEventsStore(state.events[entity], entityId)
 
-    return store ? store.error : false
+    return store.error
   }
