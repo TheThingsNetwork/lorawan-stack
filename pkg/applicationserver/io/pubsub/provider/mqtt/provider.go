@@ -42,18 +42,18 @@ func (c *connection) Shutdown(_ context.Context) error {
 }
 
 // OpenConnection implements provider.Provider using the mqtt driver.
-func (impl) OpenConnection(ctx context.Context, pb *ttnpb.ApplicationPubSub) (pc *provider.Connection, err error) {
-	if _, ok := pb.Provider.(*ttnpb.ApplicationPubSub_MQTT); !ok {
+func (impl) OpenConnection(ctx context.Context, target provider.Target) (pc *provider.Connection, err error) {
+	settings, ok := target.GetProvider().(*ttnpb.ApplicationPubSub_MQTT)
+	if !ok {
 		panic("wrong provider type provided to OpenConnection")
 	}
-	settings := pb.GetMQTT()
 	clientOpts := mqtt.NewClientOptions()
-	clientOpts.AddBroker(settings.GetServerURL())
-	clientOpts.SetClientID(settings.GetClientID())
-	clientOpts.SetUsername(settings.GetUsername())
-	clientOpts.SetPassword(settings.GetPassword())
-	if settings.GetUseTLS() {
-		config, err := createTLSConfig(settings.GetTLSCA(), settings.GetTLSClientCert(), settings.GetTLSClientKey())
+	clientOpts.AddBroker(settings.MQTT.ServerURL)
+	clientOpts.SetClientID(settings.MQTT.ClientID)
+	clientOpts.SetUsername(settings.MQTT.Username)
+	clientOpts.SetPassword(settings.MQTT.Password)
+	if settings.MQTT.UseTLS {
+		config, err := createTLSConfig(settings.MQTT.TLSCA, settings.MQTT.TLSClientCert, settings.MQTT.TLSClientKey)
 		if err != nil {
 			return nil, err
 		}
@@ -74,35 +74,35 @@ func (impl) OpenConnection(ctx context.Context, pb *ttnpb.ApplicationPubSub) (pc
 	}{
 		{
 			topic:   &pc.Topics.UplinkMessage,
-			message: pb.GetUplinkMessage(),
+			message: target.GetUplinkMessage(),
 		},
 		{
 			topic:   &pc.Topics.JoinAccept,
-			message: pb.GetJoinAccept(),
+			message: target.GetJoinAccept(),
 		},
 		{
 			topic:   &pc.Topics.DownlinkAck,
-			message: pb.GetDownlinkAck(),
+			message: target.GetDownlinkAck(),
 		},
 		{
 			topic:   &pc.Topics.DownlinkNack,
-			message: pb.GetDownlinkNack(),
+			message: target.GetDownlinkNack(),
 		},
 		{
 			topic:   &pc.Topics.DownlinkSent,
-			message: pb.GetDownlinkSent(),
+			message: target.GetDownlinkSent(),
 		},
 		{
 			topic:   &pc.Topics.DownlinkFailed,
-			message: pb.GetDownlinkFailed(),
+			message: target.GetDownlinkFailed(),
 		},
 		{
 			topic:   &pc.Topics.DownlinkQueued,
-			message: pb.GetDownlinkQueued(),
+			message: target.GetDownlinkQueued(),
 		},
 		{
 			topic:   &pc.Topics.LocationSolved,
-			message: pb.GetLocationSolved(),
+			message: target.GetLocationSolved(),
 		},
 	} {
 		if t.message == nil {
@@ -110,9 +110,9 @@ func (impl) OpenConnection(ctx context.Context, pb *ttnpb.ApplicationPubSub) (pc
 		}
 		if *t.topic, err = OpenTopic(
 			client,
-			mqtt_topic.Join(append(mqtt_topic.Split(pb.BaseTopic), mqtt_topic.Split(t.message.GetTopic())...)),
+			mqtt_topic.Join(append(mqtt_topic.Split(target.GetBaseTopic()), mqtt_topic.Split(t.message.GetTopic())...)),
 			timeout,
-			byte(settings.GetPublishQoS()),
+			byte(settings.MQTT.PublishQoS),
 		); err != nil {
 			client.Disconnect(uint(timeout / time.Millisecond))
 			return nil, err
@@ -124,11 +124,11 @@ func (impl) OpenConnection(ctx context.Context, pb *ttnpb.ApplicationPubSub) (pc
 	}{
 		{
 			subscription: &pc.Subscriptions.Push,
-			message:      pb.GetDownlinkPush(),
+			message:      target.GetDownlinkPush(),
 		},
 		{
 			subscription: &pc.Subscriptions.Replace,
-			message:      pb.GetDownlinkReplace(),
+			message:      target.GetDownlinkReplace(),
 		},
 	} {
 		if s.message == nil {
@@ -136,9 +136,9 @@ func (impl) OpenConnection(ctx context.Context, pb *ttnpb.ApplicationPubSub) (pc
 		}
 		if *s.subscription, err = OpenSubscription(
 			client,
-			mqtt_topic.Join(append(mqtt_topic.Split(pb.BaseTopic), mqtt_topic.Split(s.message.GetTopic())...)),
+			mqtt_topic.Join(append(mqtt_topic.Split(target.GetBaseTopic()), mqtt_topic.Split(s.message.GetTopic())...)),
 			timeout,
-			byte(settings.GetSubscribeQoS()),
+			byte(settings.MQTT.SubscribeQoS),
 		); err != nil {
 			client.Disconnect(uint(timeout / time.Millisecond))
 			return nil, err

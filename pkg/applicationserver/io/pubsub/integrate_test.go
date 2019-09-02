@@ -42,7 +42,9 @@ func TestIntegrate(t *testing.T) {
 	is, isAddr := startMockIS(ctx)
 	is.add(ctx, registeredApplicationID, registeredApplicationKey)
 
-	mockProvider, err := provider.GetProvider(&ttnpb.ApplicationPubSub_NATS{})
+	mockProvider, err := provider.GetProvider(&ttnpb.ApplicationPubSub{
+		Provider: &ttnpb.ApplicationPubSub_NATS{},
+	})
 	a.So(mockProvider, should.NotBeNil)
 	a.So(err, should.BeNil)
 	mockImpl := mockProvider.(*mock_provider.Impl)
@@ -111,7 +113,7 @@ func TestIntegrate(t *testing.T) {
 	t.Run("AlreadyExisting", func(t *testing.T) {
 		select {
 		case conn := <-mockImpl.OpenConnectionCh:
-			a.So(conn.ApplicationPubSubIdentifiers, should.Resemble, ps1)
+			a.So(conn.ApplicationPubSubIdentifiers(), should.Resemble, &ps1)
 		case <-time.After(timeout):
 			t.Fatal("Expect integration timeout")
 		}
@@ -158,7 +160,7 @@ func TestIntegrate(t *testing.T) {
 		}
 		select {
 		case conn := <-mockImpl.OpenConnectionCh:
-			a.So(conn.ApplicationPubSubIdentifiers, should.Resemble, ps2)
+			a.So(conn.ApplicationPubSubIdentifiers(), should.Resemble, &ps2)
 		case <-time.After(timeout):
 			t.Fatal("Expect integration timeout")
 		}
@@ -182,7 +184,7 @@ func TestIntegrate(t *testing.T) {
 		}
 		select {
 		case conn := <-mockImpl.ShutdownCh:
-			a.So(conn.ApplicationPubSubIdentifiers, should.Resemble, ps2)
+			a.So(conn.ApplicationPubSubIdentifiers(), should.Resemble, &ps2)
 		case <-time.After(timeout):
 			t.Fatal("Expect integration timeout")
 		}

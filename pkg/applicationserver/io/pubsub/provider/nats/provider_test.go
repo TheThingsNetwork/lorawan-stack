@@ -54,7 +54,7 @@ func TestOpenConnection(t *testing.T) {
 			PubSubID: "ps1",
 		},
 		Provider: &ttnpb.ApplicationPubSub_NATS{
-			NATS: nil,
+			NATS: &ttnpb.ApplicationPubSub_NATSProvider{},
 		},
 		BaseTopic: "app1.ps1",
 		DownlinkPush: &ttnpb.ApplicationPubSub_Message{
@@ -89,7 +89,9 @@ func TestOpenConnection(t *testing.T) {
 		},
 	}
 
-	impl, err := provider.GetProvider(&ttnpb.ApplicationPubSub_NATS{})
+	impl, err := provider.GetProvider(&ttnpb.ApplicationPubSub{
+		Provider: &ttnpb.ApplicationPubSub_NATS{},
+	})
 	a.So(impl, should.NotBeNil)
 	a.So(err, should.BeNil)
 

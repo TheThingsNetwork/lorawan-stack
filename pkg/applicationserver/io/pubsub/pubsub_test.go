@@ -119,7 +119,9 @@ func TestPubSub(t *testing.T) {
 		t.Fatalf("Failed to set pubsub in registry: %s", err)
 	}
 
-	mockProvider, err := provider.GetProvider(&ttnpb.ApplicationPubSub_NATS{})
+	mockProvider, err := provider.GetProvider(&ttnpb.ApplicationPubSub{
+		Provider: &ttnpb.ApplicationPubSub_NATS{},
+	})
 	a.So(mockProvider, should.NotBeNil)
 	a.So(err, should.BeNil)
 	mockImpl := mockProvider.(*mock_provider.Impl)
