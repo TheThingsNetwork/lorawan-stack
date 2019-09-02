@@ -124,6 +124,7 @@ export default defineMessages({
   ok: 'Ok',
   options: 'Options',
   organization: 'Organization',
+  organizationId: 'Organization ID',
   organizations: 'Organizations',
   otherCluster: 'Other Cluster',
   overview: 'Overview',

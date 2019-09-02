@@ -14,6 +14,7 @@
 
 import api from '../../../api'
 import * as organizations from '../../actions/organizations'
+import { selectUserId } from '../../selectors/user'
 import createRequestLogic from './lib'
 
 const getOrganizationsLogic = createRequestLogic({
@@ -34,4 +35,13 @@ const getOrganizationsLogic = createRequestLogic({
   },
 })
 
-export default [getOrganizationsLogic]
+const createOrganizationLogic = createRequestLogic({
+  type: organizations.CREATE_ORG,
+  async process({ action, getState }) {
+    const userId = selectUserId(getState())
+
+    return api.organizations.create(userId, action.payload)
+  },
+})
+
+export default [getOrganizationsLogic, createOrganizationLogic]
