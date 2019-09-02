@@ -80,7 +80,7 @@ func (m *mockRegisterer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.Client
 func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.ClusterRole) {
 	for i := 0; i < 20; i++ {
 		time.Sleep(20 * time.Millisecond)
-		if peer := c.GetPeer(ctx, role, nil); peer != nil {
+		if _, err := c.GetPeer(ctx, role, nil); err == nil {
 			return
 		}
 	}

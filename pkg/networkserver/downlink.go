@@ -648,9 +648,9 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *ttnpb
 			"gateway_uid", unique.ID(ctx, path.GatewayIdentifiers),
 		)
 
-		p := ns.GetPeer(ctx, ttnpb.ClusterRole_GATEWAY_SERVER, path.GatewayIdentifiers)
-		if p == nil {
-			logger.Debug("Could not get Gateway Server")
+		p, err := ns.GetPeer(ctx, ttnpb.ClusterRole_GATEWAY_SERVER, path.GatewayIdentifiers)
+		if err != nil {
+			logger.WithError(err).Debug("Could not get Gateway Server")
 			continue
 		}
 
@@ -679,7 +679,12 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *ttnpb
 		}
 
 		logger.WithField("path_count", len(req.DownlinkPaths)).Debug("Schedule downlink")
-		res, err := ttnpb.NewNsGsClient(a.peer.Conn()).ScheduleDownlink(ctx, down, ns.WithClusterAuth())
+		cc, err := a.peer.Conn()
+		if err != nil {
+			errs = append(errs, err)
+			continue
+		}
+		res, err := ttnpb.NewNsGsClient(cc).ScheduleDownlink(ctx, down, ns.WithClusterAuth())
 		if err != nil {
 			errs = append(errs, err)
 			continue

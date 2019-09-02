@@ -65,11 +65,15 @@ type GatewayServer struct {
 	connections sync.Map
 }
 
-func (gs *GatewayServer) getRegistry(ctx context.Context, ids *ttnpb.GatewayIdentifiers) ttnpb.GatewayRegistryClient {
+func (gs *GatewayServer) getRegistry(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (ttnpb.GatewayRegistryClient, error) {
 	if gs.registry != nil {
-		return gs.registry
+		return gs.registry, nil
 	}
-	return ttnpb.NewGatewayRegistryClient(gs.GetPeer(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, ids).Conn())
+	cc, err := gs.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, ids)
+	if err != nil {
+		return nil, err
+	}
+	return ttnpb.NewGatewayRegistryClient(cc), nil
 }
 
 // Option configures GatewayServer.
@@ -243,7 +247,11 @@ func (gs *GatewayServer) FillGatewayContext(ctx context.Context, ids ttnpb.Gatew
 		return nil, ttnpb.GatewayIdentifiers{}, errEmptyIdentifiers
 	}
 	if ids.GatewayID == "" {
-		extIDs, err := gs.getRegistry(ctx, nil).GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
+		registry, err := gs.getRegistry(ctx, nil)
+		if err != nil {
+			return nil, ttnpb.GatewayIdentifiers{}, err
+		}
+		extIDs, err := registry.GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
 			EUI: *ids.EUI,
 		}, gs.WithClusterAuth())
 		if err == nil {
@@ -293,7 +301,11 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 	} else if err != nil {
 		return nil, err
 	}
-	gtw, err := gs.getRegistry(ctx, &ids).Get(ctx, &ttnpb.GetGatewayRequest{
+	registry, err := gs.getRegistry(ctx, &ids)
+	if err != nil {
+		return nil, err
+	}
+	gtw, err := registry.Get(ctx, &ttnpb.GetGatewayRequest{
 		GatewayIdentifiers: ids,
 		FieldMask: pbtypes.FieldMask{
 			Paths: []string{
@@ -457,12 +469,12 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 					if ids != nil && ids.DevAddr != nil && !passDevAddr(*ids.DevAddr) {
 						return nil
 					}
-					ns := gs.GetPeer(ctx, ttnpb.ClusterRole_NETWORK_SERVER, ids)
-					if ns == nil {
-						logger.Warn("Cluster Network Server unavailable for upstream traffic")
+					cc, err := gs.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, ids)
+					if err != nil {
+						logger.WithError(err).Warn("Cluster Network Server unavailable for upstream traffic")
 						return nil
 					}
-					return ttnpb.NewGsNsClient(ns.Conn())
+					return ttnpb.NewGsNsClient(cc)
 				},
 				callOpts: []grpc.CallOption{gs.WithClusterAuth()},
 				handleCh: make(chan upstreamItem),
@@ -540,7 +552,11 @@ func (gs *GatewayServer) GetFrequencyPlan(ctx context.Context, ids ttnpb.Gateway
 	} else if err != nil {
 		return nil, err
 	}
-	gtw, err := gs.getRegistry(ctx, &ids).Get(ctx, &ttnpb.GetGatewayRequest{
+	registry, err := gs.getRegistry(ctx, &ids)
+	if err != nil {
+		return nil, err
+	}
+	gtw, err := registry.Get(ctx, &ttnpb.GetGatewayRequest{
 		GatewayIdentifiers: ids,
 		FieldMask:          pbtypes.FieldMask{Paths: []string{"frequency_plan_id"}},
 	}, callOpt)

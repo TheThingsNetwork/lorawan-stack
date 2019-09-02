@@ -2267,6 +2267,24 @@
       "file": "cluster.go"
     }
   },
+  "error:pkg/cluster:peer_empty_target": {
+    "translations": {
+      "en": "peer target address is empty"
+    },
+    "description": {
+      "package": "pkg/cluster",
+      "file": "cluster.go"
+    }
+  },
+  "error:pkg/cluster:peer_unavailable": {
+    "translations": {
+      "en": "{cluster_role} cluster peer unavailable"
+    },
+    "description": {
+      "package": "pkg/cluster",
+      "file": "cluster.go"
+    }
+  },
   "error:pkg/component:listen_endpoint": {
     "translations": {
       "en": "could not listen on `{endpoint}` address"

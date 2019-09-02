@@ -78,8 +78,8 @@ func TestCluster(t *testing.T) {
 	var ac Peer
 	for i := 0; i < 20; i++ {
 		time.Sleep(20 * time.Millisecond) // Wait for peers to join cluster.
-		ac = c.GetPeer(ctx, ttnpb.ClusterRole_ACCESS, nil)
-		if ac != nil {
+		ac, err = c.GetPeer(ctx, ttnpb.ClusterRole_ACCESS, nil)
+		if err == nil {
 			break
 		}
 	}
@@ -87,23 +87,30 @@ func TestCluster(t *testing.T) {
 		t.FailNow()
 	}
 
-	er := c.GetPeer(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, nil)
+	er, err := c.GetPeer(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, nil)
 	a.So(er, should.NotBeNil)
-	gs := c.GetPeer(ctx, ttnpb.ClusterRole_GATEWAY_SERVER, nil)
+	a.So(err, should.BeNil)
+	gs, err := c.GetPeer(ctx, ttnpb.ClusterRole_GATEWAY_SERVER, nil)
 	a.So(gs, should.NotBeNil)
-	ns := c.GetPeer(ctx, ttnpb.ClusterRole_NETWORK_SERVER, nil)
+	a.So(err, should.BeNil)
+	ns, err := c.GetPeer(ctx, ttnpb.ClusterRole_NETWORK_SERVER, nil)
 	a.So(ns, should.NotBeNil)
-	as := c.GetPeer(ctx, ttnpb.ClusterRole_APPLICATION_SERVER, nil)
+	a.So(err, should.BeNil)
+	as, err := c.GetPeer(ctx, ttnpb.ClusterRole_APPLICATION_SERVER, nil)
 	a.So(as, should.NotBeNil)
-	js := c.GetPeer(ctx, ttnpb.ClusterRole_JOIN_SERVER, nil)
+	a.So(err, should.BeNil)
+	js, err := c.GetPeer(ctx, ttnpb.ClusterRole_JOIN_SERVER, nil)
 	a.So(js, should.NotBeNil)
+	a.So(err, should.BeNil)
 
 	a.So(c.Leave(), should.BeNil)
 
-	a.So(ac.Conn().GetState(), should.Equal, connectivity.Shutdown)
-	a.So(er.Conn().GetState(), should.Equal, connectivity.Shutdown)
-	a.So(gs.Conn().GetState(), should.Equal, connectivity.Shutdown)
-	a.So(ns.Conn().GetState(), should.Equal, connectivity.Shutdown)
-	a.So(as.Conn().GetState(), should.Equal, connectivity.Shutdown)
-	a.So(js.Conn().GetState(), should.Equal, connectivity.Shutdown)
+	for _, peer := range []Peer{
+		ac, er, gs, ns, as, js,
+	} {
+		cc, err := peer.Conn()
+		a.So(cc, should.NotBeNil)
+		a.So(err, should.BeNil)
+		a.So(cc.GetState(), should.Equal, connectivity.Shutdown)
+	}
 }

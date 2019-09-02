@@ -432,8 +432,12 @@ func (as *ApplicationServer) fetchAppSKey(ctx context.Context, ids ttnpb.EndDevi
 		SessionKeyID: sessionKeyID,
 		DevEUI:       *ids.DevEUI,
 	}
-	if js := as.GetPeer(ctx, ttnpb.ClusterRole_JOIN_SERVER, ids); js != nil {
-		res, err := ttnpb.NewAsJsClient(js.Conn()).GetAppSKey(ctx, req, as.WithClusterAuth())
+	if js, err := as.GetPeer(ctx, ttnpb.ClusterRole_JOIN_SERVER, ids); err == nil {
+		cc, err := js.Conn()
+		if err != nil {
+			return ttnpb.KeyEnvelope{}, err
+		}
+		res, err := ttnpb.NewAsJsClient(cc).GetAppSKey(ctx, req, as.WithClusterAuth())
 		if err == nil {
 			return res.AppSKey, nil
 		}

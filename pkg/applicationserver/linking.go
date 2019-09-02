@@ -102,8 +102,8 @@ type link struct {
 const linkBufferSize = 10
 
 var (
-	errAlreadyLinked = errors.DefineAlreadyExists("already_linked", "already linked to `{application_uid}`")
-	errNSNotFound    = errors.DefineNotFound("network_server_not_found", "Network Server not found for `{application_uid}`")
+	errAlreadyLinked  = errors.DefineAlreadyExists("already_linked", "already linked to `{application_uid}`")
+	errNSPeerNotFound = errors.DefineNotFound("network_server_not_found", "Network Server not found for `{application_uid}`")
 )
 
 func (as *ApplicationServer) connectLink(ctx context.Context, link *link) error {
@@ -125,11 +125,15 @@ func (as *ApplicationServer) connectLink(ctx context.Context, link *link) error 
 		}()
 	} else {
 		allowInsecure = !as.ClusterTLS()
-		ns := as.GetPeer(ctx, ttnpb.ClusterRole_NETWORK_SERVER, link.ApplicationIdentifiers)
-		if ns == nil {
-			return errNSNotFound.WithAttributes("application_uid", unique.ID(ctx, link.ApplicationIdentifiers))
+		ns, err := as.GetPeer(ctx, ttnpb.ClusterRole_NETWORK_SERVER, link.ApplicationIdentifiers)
+		if err != nil {
+			return errNSPeerNotFound.WithCause(err).WithAttributes("application_uid", unique.ID(ctx, link.ApplicationIdentifiers))
 		}
-		link.conn = ns.Conn()
+		cc, err := ns.Conn()
+		if err != nil {
+			return errNSPeerNotFound.WithCause(err).WithAttributes("application_uid", unique.ID(ctx, link.ApplicationIdentifiers))
+		}
+		link.conn = cc
 		link.connName = ns.Name()
 	}
 	link.callOpts = []grpc.CallOption{

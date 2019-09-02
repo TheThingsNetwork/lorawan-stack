@@ -72,7 +72,11 @@ func (s *Server) getOrRegisterGateway(ctx context.Context, req UpdateInfoRequest
 	serverAuth := s.getAuth(ctx, req.Router.EUI64, authHeader)
 
 	logger.Info("Finding gateway...")
-	ids, err := s.getRegistry(ctx, nil).GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
+	registry, err := s.getRegistry(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+	ids, err := registry.GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
 		EUI: req.Router.EUI64,
 	}, serverAuth)
 
@@ -83,7 +87,11 @@ func (s *Server) getOrRegisterGateway(ctx context.Context, req UpdateInfoRequest
 			GatewayID: gatewayID,
 			EUI:       &req.Router.EUI64,
 		}
-		return s.getRegistry(ctx, &ids).Create(ctx, &ttnpb.CreateGatewayRequest{
+		registry, err = s.getRegistry(ctx, &ids)
+		if err != nil {
+			return nil, err
+		}
+		return registry.Create(ctx, &ttnpb.CreateGatewayRequest{
 			Gateway: ttnpb.Gateway{
 				GatewayIdentifiers: ids,
 				Attributes: map[string]string{
@@ -100,12 +108,16 @@ func (s *Server) getOrRegisterGateway(ctx context.Context, req UpdateInfoRequest
 		return nil, err
 	}
 
+	registry, err = s.getRegistry(ctx, ids)
+	if err != nil {
+		return nil, err
+	}
 	logger = logger.WithField("gateway_id", ids.GetGatewayID())
 
 	if md := rpcmetadata.FromIncomingContext(ctx); strings.ToLower(md.AuthType) == "bearer" && md.AuthValue != "" {
 		logger.Debug("Getting gateway with request credentials")
 		md.AllowInsecure = s.component.AllowInsecureForCredentials()
-		if gtw, err = s.getRegistry(ctx, ids).Get(ctx, &ttnpb.GetGatewayRequest{
+		if gtw, err = registry.Get(ctx, &ttnpb.GetGatewayRequest{
 			GatewayIdentifiers: *ids,
 			FieldMask:          getGatewayMask,
 		}, grpc.PerRPCCredentials(md)); err == nil {
@@ -116,7 +128,7 @@ func (s *Server) getOrRegisterGateway(ctx context.Context, req UpdateInfoRequest
 	}
 
 	logger.Debug("Getting gateway with server credentials")
-	gtw, err = s.getRegistry(ctx, ids).Get(ctx, &ttnpb.GetGatewayRequest{
+	gtw, err = registry.Get(ctx, &ttnpb.GetGatewayRequest{
 		GatewayIdentifiers: *ids,
 		FieldMask:          getGatewayMask,
 	}, serverAuth)
@@ -194,7 +206,10 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 
 	if gtw.Attributes[cupsCredentialsCRCAttribute] != strconv.FormatUint(uint64(req.CUPSCredentialsCRC), 10) {
 		if gtw.Attributes[cupsCredentialsAttribute] == "" {
-			registry := s.getAccess(ctx, &gtw.GatewayIdentifiers)
+			registry, err := s.getAccess(ctx, &gtw.GatewayIdentifiers)
+			if err != nil {
+				return err
+			}
 			apiKey, err := registry.CreateAPIKey(ctx, &ttnpb.CreateGatewayAPIKeyRequest{
 				GatewayIdentifiers: gtw.GatewayIdentifiers,
 				Name:               fmt.Sprintf("CUPS Key, generated %s", time.Now().UTC().Format(time.RFC3339)),
@@ -240,7 +255,10 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 	}
 	if gtw.Attributes[lnsCredentialsCRCAttribute] != strconv.FormatUint(uint64(req.LNSCredentialsCRC), 10) {
 		if gtw.Attributes[lnsCredentialsAttribute] == "" {
-			registry := s.getAccess(ctx, &gtw.GatewayIdentifiers)
+			registry, err := s.getAccess(ctx, &gtw.GatewayIdentifiers)
+			if err != nil {
+				return err
+			}
 			apiKey, err := registry.CreateAPIKey(ctx, &ttnpb.CreateGatewayAPIKeyRequest{
 				GatewayIdentifiers: gtw.GatewayIdentifiers,
 				Name:               fmt.Sprintf("LNS Key, generated %s", time.Now().UTC().Format(time.RFC3339)),
@@ -315,7 +333,11 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 	gtw.Attributes[cupsModelAttribute] = req.Model
 	gtw.Attributes[cupsPackageAttribute] = req.Package
 
-	gtw, err = s.getRegistry(ctx, &gtw.GatewayIdentifiers).Update(ctx, &ttnpb.UpdateGatewayRequest{
+	registry, err := s.getRegistry(ctx, &gtw.GatewayIdentifiers)
+	if err != nil {
+		return err
+	}
+	gtw, err = registry.Update(ctx, &ttnpb.UpdateGatewayRequest{
 		Gateway: *gtw,
 		FieldMask: types.FieldMask{Paths: []string{
 			"attributes",

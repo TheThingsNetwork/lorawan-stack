@@ -869,9 +869,11 @@ func AssertNsJsPeerHandleAuthJoinRequest(ctx context.Context, peerReqCh <-chan t
 	if !test.AssertClusterGetPeerRequest(ctx, peerReqCh, func(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
 		return assertions.New(t).So(role, should.Equal, ttnpb.ClusterRole_JOIN_SERVER) && idsAssert(ctx, ids)
 	},
-		NewJSPeer(ctx, &MockNsJsServer{
-			HandleJoinFunc: MakeNsJsHandleJoinChFunc(joinReqCh),
-		}),
+		test.ClusterGetPeerResponse{
+			Peer: NewJSPeer(ctx, &MockNsJsServer{
+				HandleJoinFunc: MakeNsJsHandleJoinChFunc(joinReqCh),
+			}),
+		},
 	) {
 		return false
 	}
@@ -941,9 +943,11 @@ func AssertLinkApplication(ctx context.Context, conn *grpc.ClientConn, getPeerCh
 		func(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
 			return a.So(role, should.Equal, ttnpb.ClusterRole_ACCESS) && a.So(ids, should.BeNil)
 		},
-		NewISPeer(ctx, &test.MockApplicationAccessServer{
-			ListRightsFunc: test.MakeApplicationAccessListRightsChFunc(listRightsCh),
-		}),
+		test.ClusterGetPeerResponse{
+			Peer: NewISPeer(ctx, &test.MockApplicationAccessServer{
+				ListRightsFunc: test.MakeApplicationAccessListRightsChFunc(listRightsCh),
+			}),
+		},
 	), should.BeTrue) {
 		return nil, false
 	}

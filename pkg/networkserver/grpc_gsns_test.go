@@ -1018,7 +1018,7 @@ func TestHandleUplink(t *testing.T) {
 						a.So(role, should.Equal, ttnpb.ClusterRole_JOIN_SERVER) &&
 						a.So(ids, should.Resemble, getDevice.EndDeviceIdentifiers)
 				},
-					nil,
+					test.ClusterGetPeerResponse{Error: errors.New("peer not found")},
 				), should.BeTrue) {
 					return false
 				}
@@ -1128,7 +1128,7 @@ func TestHandleUplink(t *testing.T) {
 						a.So(role, should.Equal, ttnpb.ClusterRole_JOIN_SERVER) &&
 						a.So(ids, should.Resemble, getDevice.EndDeviceIdentifiers)
 				},
-					nil,
+					test.ClusterGetPeerResponse{Error: errors.New("peer not found")},
 				), should.BeTrue) {
 					return false
 				}
@@ -1244,7 +1244,7 @@ func TestHandleUplink(t *testing.T) {
 						a.So(role, should.Equal, ttnpb.ClusterRole_JOIN_SERVER) &&
 						a.So(ids, should.Resemble, getDevice.EndDeviceIdentifiers)
 				},
-					nil,
+					test.ClusterGetPeerResponse{Error: errors.New("peer not found")},
 				), should.BeTrue) {
 					return false
 				}

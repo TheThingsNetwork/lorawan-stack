@@ -45,7 +45,11 @@ type gatewayInfoResponse struct {
 func (s *Server) handleGatewayInfo(c echo.Context) error {
 	ctx := s.getContext(c)
 	gatewayIDs := c.Get(gatewayIDKey).(ttnpb.GatewayIdentifiers)
-	if gateway, err := s.getRegistry(ctx, &gatewayIDs).Get(ctx, &ttnpb.GetGatewayRequest{
+	registry, err := s.getRegistry(ctx, &gatewayIDs)
+	if err != nil {
+		return err
+	}
+	if gateway, err := registry.Get(ctx, &ttnpb.GetGatewayRequest{
 		GatewayIdentifiers: gatewayIDs,
 		FieldMask: types.FieldMask{Paths: []string{
 			"frequency_plan_id",

@@ -63,11 +63,15 @@ type Server struct {
 	config Config
 }
 
-func (s *Server) getRegistry(ctx context.Context, ids *ttnpb.GatewayIdentifiers) ttnpb.GatewayRegistryClient {
+func (s *Server) getRegistry(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (ttnpb.GatewayRegistryClient, error) {
 	if s.registry != nil {
-		return s.registry
+		return s.registry, nil
 	}
-	return ttnpb.NewGatewayRegistryClient(s.component.GetPeer(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, ids).Conn())
+	cc, err := s.component.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, ids)
+	if err != nil {
+		return nil, err
+	}
+	return ttnpb.NewGatewayRegistryClient(cc), nil
 }
 
 // Option configures the CUPS.

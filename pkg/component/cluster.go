@@ -19,6 +19,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"google.golang.org/grpc"
 )
 
 func (c *Component) initCluster() (err error) {
@@ -43,14 +44,20 @@ func (c *Component) ClusterTLS() bool {
 
 // GetPeers returns cluster peers with the given role and the given tags.
 // See package ../cluster for more information.
-func (c *Component) GetPeers(ctx context.Context, role ttnpb.ClusterRole) []cluster.Peer {
+func (c *Component) GetPeers(ctx context.Context, role ttnpb.ClusterRole) ([]cluster.Peer, error) {
 	return c.cluster.GetPeers(ctx, role)
 }
 
 // GetPeer returns a cluster peer with the given role and the given tags.
 // See package ../cluster for more information.
-func (c *Component) GetPeer(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) cluster.Peer {
+func (c *Component) GetPeer(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) (cluster.Peer, error) {
 	return c.cluster.GetPeer(ctx, role, ids)
+}
+
+// GetPeerConn returns a gRPC client connection to the cluster peer.
+// See package ../cluster for more information.
+func (c *Component) GetPeerConn(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) (*grpc.ClientConn, error) {
+	return c.cluster.GetPeerConn(ctx, role, ids)
 }
 
 // ClaimIDs claims the identifiers in the cluster.

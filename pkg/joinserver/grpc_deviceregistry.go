@@ -23,6 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -57,6 +58,7 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 		}
 		paths = append(paths, "provisioner_id", "provisioning_data")
 	}
+	logger := log.FromContext(ctx)
 	dev, err := srv.JS.devices.GetByID(ctx, req.ApplicationIdentifiers, req.DeviceID, paths)
 	if errors.IsNotFound(err) {
 		return nil, errDeviceNotFound
@@ -72,7 +74,13 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 		dev.RootKeys = &ttnpb.RootKeys{
 			RootKeyID: rootKeysEnc.GetRootKeyID(),
 		}
-		cs := srv.JS.GetPeer(ctx, ttnpb.ClusterRole_CRYPTO_SERVER, dev.EndDeviceIdentifiers)
+		cc, err := srv.JS.GetPeerConn(ctx, ttnpb.ClusterRole_CRYPTO_SERVER, dev.EndDeviceIdentifiers)
+		if err != nil {
+			if !errors.IsNotFound(err) {
+				logger.WithError(err).Debug("Crypto Server connection is not available")
+			}
+			cc = nil
+		}
 		if ttnpb.HasAnyField(req.FieldMask.Paths, "root_keys.nwk_key") {
 			var networkCryptoService cryptoservices.Network
 			if rootKeysEnc.GetNwkKey() != nil {
@@ -81,8 +89,8 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 					return nil, err
 				}
 				networkCryptoService = cryptoservices.NewMemory(&nwkKey, nil)
-			} else if cs != nil && dev.ProvisionerID != "" {
-				networkCryptoService = cryptoservices.NewNetworkRPCClient(cs.Conn(), srv.JS.KeyVault, srv.JS.WithClusterAuth())
+			} else if cc != nil && dev.ProvisionerID != "" {
+				networkCryptoService = cryptoservices.NewNetworkRPCClient(cc, srv.JS.KeyVault, srv.JS.WithClusterAuth())
 			}
 			if networkCryptoService != nil {
 				if nwkKey, err := networkCryptoService.GetNwkKey(ctx, dev); err == nil {
@@ -102,8 +110,8 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 					return nil, err
 				}
 				applicationCryptoService = cryptoservices.NewMemory(nil, &appKey)
-			} else if cs != nil && dev.ProvisionerID != "" {
-				applicationCryptoService = cryptoservices.NewApplicationRPCClient(cs.Conn(), srv.JS.KeyVault, srv.JS.WithClusterAuth())
+			} else if cc != nil && dev.ProvisionerID != "" {
+				applicationCryptoService = cryptoservices.NewApplicationRPCClient(cc, srv.JS.KeyVault, srv.JS.WithClusterAuth())
 			}
 			if applicationCryptoService != nil {
 				if appKey, err := applicationCryptoService.GetAppKey(ctx, dev); err == nil {

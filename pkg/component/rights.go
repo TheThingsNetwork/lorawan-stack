@@ -24,11 +24,11 @@ import (
 
 func (c *Component) initRights() {
 	fetcher := rights.NewAccessFetcher(func(ctx context.Context) *grpc.ClientConn {
-		peer := c.GetPeer(ctx, ttnpb.ClusterRole_ACCESS, nil)
-		if peer == nil {
+		conn, err := c.GetPeerConn(ctx, ttnpb.ClusterRole_ACCESS, nil)
+		if err != nil {
 			return nil
 		}
-		return peer.Conn()
+		return conn
 	}, c.config.GRPC.AllowInsecureForCredentials)
 
 	if c.config.Rights.TTL > 0 {

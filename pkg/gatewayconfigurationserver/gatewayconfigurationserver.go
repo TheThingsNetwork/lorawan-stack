@@ -80,8 +80,12 @@ func New(c *component.Component, conf *Config) (*GatewayConfigurationServer, err
 func (gcs *GatewayConfigurationServer) handleGetGlobalConfig(c echo.Context) error {
 	ctx := gcs.getContext(c)
 	gtwID := c.Get(gatewayIDKey).(ttnpb.GatewayIdentifiers)
-	registry := ttnpb.NewGatewayRegistryClient(gcs.GetPeer(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, nil).Conn())
-	gtw, err := registry.Get(ctx, &ttnpb.GetGatewayRequest{
+	cc, err := gcs.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, nil)
+	if err != nil {
+		return err
+	}
+	client := ttnpb.NewGatewayRegistryClient(cc)
+	gtw, err := client.Get(ctx, &ttnpb.GetGatewayRequest{
 		GatewayIdentifiers: gtwID,
 		FieldMask: types.FieldMask{
 			Paths: []string{
