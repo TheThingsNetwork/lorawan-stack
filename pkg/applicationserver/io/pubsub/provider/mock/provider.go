@@ -41,7 +41,7 @@ type Impl struct {
 // Connection is a set of mempubsub topics.
 type Connection struct {
 	impl *Impl
-	*ttnpb.ApplicationPubSub
+	provider.Target
 
 	Push    *pubsub.Topic
 	Replace *pubsub.Topic
@@ -54,6 +54,13 @@ type Connection struct {
 	DownlinkFailed *pubsub.Subscription
 	DownlinkQueued *pubsub.Subscription
 	LocationSolved *pubsub.Subscription
+}
+
+func (c *Connection) ApplicationPubSubIdentifiers() *ttnpb.ApplicationPubSubIdentifiers {
+	if pb, ok := c.Target.(*ttnpb.ApplicationPubSub); ok {
+		return &pb.ApplicationPubSubIdentifiers
+	}
+	return nil
 }
 
 // Shutdown implements provider.Shutdowner.
@@ -87,10 +94,10 @@ func (c *Connection) Shutdown(ctx context.Context) (err error) {
 }
 
 // OpenConnection implements provider.Provider using the mempubsub package.
-func (i *Impl) OpenConnection(ctx context.Context, pb *ttnpb.ApplicationPubSub) (pc *provider.Connection, err error) {
+func (i *Impl) OpenConnection(ctx context.Context, target provider.Target) (pc *provider.Connection, err error) {
 	conn := &Connection{
-		impl:              i,
-		ApplicationPubSub: pb,
+		impl:   i,
+		Target: target,
 	}
 	pc = &provider.Connection{
 		ProviderConnection: conn,

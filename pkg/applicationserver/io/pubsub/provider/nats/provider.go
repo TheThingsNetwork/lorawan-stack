@@ -39,12 +39,13 @@ func (c *connection) Shutdown(_ context.Context) error {
 }
 
 // OpenConnection implements provider.Provider using the natspubsub package.
-func (impl) OpenConnection(ctx context.Context, pb *ttnpb.ApplicationPubSub) (pc *provider.Connection, err error) {
-	if _, ok := pb.Provider.(*ttnpb.ApplicationPubSub_NATS); !ok {
+func (impl) OpenConnection(ctx context.Context, target provider.Target) (pc *provider.Connection, err error) {
+	settings, ok := target.GetProvider().(*ttnpb.ApplicationPubSub_NATS)
+	if !ok {
 		panic("wrong provider type provided to OpenConnection")
 	}
 	var conn *nats.Conn
-	if conn, err = nats.Connect(pb.GetNATS().GetServerURL()); err != nil {
+	if conn, err = nats.Connect(settings.NATS.ServerURL); err != nil {
 		return nil, err
 	}
 	pc = &provider.Connection{
@@ -58,35 +59,35 @@ func (impl) OpenConnection(ctx context.Context, pb *ttnpb.ApplicationPubSub) (pc
 	}{
 		{
 			topic:   &pc.Topics.UplinkMessage,
-			message: pb.GetUplinkMessage(),
+			message: target.GetUplinkMessage(),
 		},
 		{
 			topic:   &pc.Topics.JoinAccept,
-			message: pb.GetJoinAccept(),
+			message: target.GetJoinAccept(),
 		},
 		{
 			topic:   &pc.Topics.DownlinkAck,
-			message: pb.GetDownlinkAck(),
+			message: target.GetDownlinkAck(),
 		},
 		{
 			topic:   &pc.Topics.DownlinkNack,
-			message: pb.GetDownlinkNack(),
+			message: target.GetDownlinkNack(),
 		},
 		{
 			topic:   &pc.Topics.DownlinkSent,
-			message: pb.GetDownlinkSent(),
+			message: target.GetDownlinkSent(),
 		},
 		{
 			topic:   &pc.Topics.DownlinkFailed,
-			message: pb.GetDownlinkFailed(),
+			message: target.GetDownlinkFailed(),
 		},
 		{
 			topic:   &pc.Topics.DownlinkQueued,
-			message: pb.GetDownlinkQueued(),
+			message: target.GetDownlinkQueued(),
 		},
 		{
 			topic:   &pc.Topics.LocationSolved,
-			message: pb.GetLocationSolved(),
+			message: target.GetLocationSolved(),
 		},
 	} {
 		if t.message == nil {
@@ -94,7 +95,7 @@ func (impl) OpenConnection(ctx context.Context, pb *ttnpb.ApplicationPubSub) (pc
 		}
 		if *t.topic, err = natspubsub.OpenTopic(
 			conn,
-			combineSubjects(pb.BaseTopic, t.message.GetTopic()),
+			combineSubjects(target.GetBaseTopic(), t.message.GetTopic()),
 			&natspubsub.TopicOptions{},
 		); err != nil {
 			conn.Close()
@@ -107,11 +108,11 @@ func (impl) OpenConnection(ctx context.Context, pb *ttnpb.ApplicationPubSub) (pc
 	}{
 		{
 			subscription: &pc.Subscriptions.Push,
-			message:      pb.GetDownlinkPush(),
+			message:      target.GetDownlinkPush(),
 		},
 		{
 			subscription: &pc.Subscriptions.Replace,
-			message:      pb.GetDownlinkReplace(),
+			message:      target.GetDownlinkReplace(),
 		},
 	} {
 		if s.message == nil {
@@ -119,7 +120,7 @@ func (impl) OpenConnection(ctx context.Context, pb *ttnpb.ApplicationPubSub) (pc
 		}
 		if *s.subscription, err = natspubsub.OpenSubscription(
 			conn,
-			combineSubjects(pb.BaseTopic, s.message.GetTopic()),
+			combineSubjects(target.GetBaseTopic(), s.message.GetTopic()),
 			&natspubsub.SubscriptionOptions{},
 		); err != nil {
 			conn.Close()

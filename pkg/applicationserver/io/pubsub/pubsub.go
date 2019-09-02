@@ -246,7 +246,7 @@ func (ps *PubSub) start(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err e
 		ps.integrationErrors.Store(psUID, ctx.Err())
 		ps.integrations.Delete(psUID)
 	}()
-	provider, err := provider.GetProvider(pb.Provider)
+	provider, err := provider.GetProvider(pb)
 	if err != nil {
 		return err
 	}

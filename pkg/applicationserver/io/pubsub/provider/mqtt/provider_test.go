@@ -65,7 +65,7 @@ func TestOpenConnection(t *testing.T) {
 			PubSubID: "ps1",
 		},
 		Provider: &ttnpb.ApplicationPubSub_MQTT{
-			MQTT: nil,
+			MQTT: &ttnpb.ApplicationPubSub_MQTTProvider{},
 		},
 		BaseTopic: "app1/ps1",
 		DownlinkPush: &ttnpb.ApplicationPubSub_Message{
@@ -100,7 +100,9 @@ func TestOpenConnection(t *testing.T) {
 		},
 	}
 
-	impl, err := provider.GetProvider(&ttnpb.ApplicationPubSub_MQTT{})
+	impl, err := provider.GetProvider(&ttnpb.ApplicationPubSub{
+		Provider: &ttnpb.ApplicationPubSub_MQTT{},
+	})
 	a.So(impl, should.NotBeNil)
 	a.So(err, should.BeNil)
 

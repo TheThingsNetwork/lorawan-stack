@@ -16,16 +16,34 @@ package provider
 
 import (
 	"context"
+	"fmt"
 	"reflect"
 
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
+// Target represents settings for a PubSub provider to connect.
+type Target interface {
+	GetProvider() ttnpb.ApplicationPubSub_Provider
+
+	GetBaseTopic() string
+	GetDownlinkPush() *ttnpb.ApplicationPubSub_Message
+	GetDownlinkReplace() *ttnpb.ApplicationPubSub_Message
+	GetUplinkMessage() *ttnpb.ApplicationPubSub_Message
+	GetJoinAccept() *ttnpb.ApplicationPubSub_Message
+	GetDownlinkAck() *ttnpb.ApplicationPubSub_Message
+	GetDownlinkNack() *ttnpb.ApplicationPubSub_Message
+	GetDownlinkSent() *ttnpb.ApplicationPubSub_Message
+	GetDownlinkFailed() *ttnpb.ApplicationPubSub_Message
+	GetDownlinkQueued() *ttnpb.ApplicationPubSub_Message
+	GetLocationSolved() *ttnpb.ApplicationPubSub_Message
+}
+
 // Provider represents a PubSub service provider.
 type Provider interface {
-	// OpenConnection opens the Connection of a given ttnpb.ApplicationPubSub.
-	OpenConnection(ctx context.Context, pb *ttnpb.ApplicationPubSub) (*Connection, error)
+	// OpenConnection opens the Connection of a given Target.
+	OpenConnection(ctx context.Context, target Target) (*Connection, error)
 }
 
 var (
@@ -39,16 +57,16 @@ var (
 func RegisterProvider(p ttnpb.ApplicationPubSub_Provider, implementation Provider) {
 	t := reflect.TypeOf(p)
 	if _, ok := providers[t]; ok {
-		panic(errAlreadyRegistered.WithAttributes("provider_id", p))
+		panic(errAlreadyRegistered.WithAttributes("provider_id", fmt.Sprintf("%T", p)))
 	}
 	providers[t] = implementation
 }
 
-// GetProvider returns an implementation for a given provider.
-func GetProvider(p ttnpb.ApplicationPubSub_Provider) (Provider, error) {
-	t := reflect.TypeOf(p)
+// GetProvider returns an implementation for a given target.
+func GetProvider(target Target) (Provider, error) {
+	t := reflect.TypeOf(target.GetProvider())
 	if implementation, ok := providers[t]; ok {
 		return implementation, nil
 	}
-	return nil, errNotImplemented.WithAttributes("provider_id", t)
+	return nil, errNotImplemented.WithAttributes("provider_id", fmt.Sprintf("%T", target.GetProvider()))
 }
