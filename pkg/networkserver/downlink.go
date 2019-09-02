@@ -972,7 +972,10 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					}
 				}
 
-				maxUpLength := maximumUplinkLength(fp, phy, dev.RecentUplinks...)
+				var maxUpLength uint16 = math.MaxUint16
+				if dev.MACState.LoRaWANVersion == ttnpb.MAC_V1_1 {
+					maxUpLength = maximumUplinkLength(fp, phy, dev.RecentUplinks...)
+				}
 
 				var sets []string
 			outer:
