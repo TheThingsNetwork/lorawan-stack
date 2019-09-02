@@ -30,6 +30,18 @@ class Organizations {
     return Marshaler.payloadListResponse('organizations', response)
   }
 
+  async getById(id, selector) {
+    const fieldMask = Marshaler.selectorToFieldMask(selector)
+    const response = await this._api.OrganizationRegistry.Get(
+      {
+        routeParams: { 'organization_ids.organization_id': id },
+      },
+      fieldMask,
+    )
+
+    return Marshaler.payloadSingleResponse(response)
+  }
+
   // Create
 
   async create(userId, organization) {
