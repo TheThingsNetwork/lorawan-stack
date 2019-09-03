@@ -25,6 +25,7 @@ import sharedMessages from '../../../lib/shared-messages'
 import PropTypes from '../../../lib/prop-types'
 
 import OrganizationOverview from '../organization-overview'
+import OrganizationData from '../organization-data'
 
 @withEnv
 @withSideNavigation(function(props) {
@@ -37,6 +38,11 @@ import OrganizationOverview from '../organization-overview'
         title: sharedMessages.overview,
         path: matchedUrl,
         icon: 'overview',
+      },
+      {
+        title: sharedMessages.data,
+        path: `${matchedUrl}/data`,
+        icon: 'data',
       },
     ],
   }
@@ -68,6 +74,7 @@ class Organization extends React.Component {
         <IntlHelmet titleTemplate={`%s - ${organization.name || orgId} - ${env.siteName}`} />
         <Switch>
           <Route exact path={`${match.path}`} component={OrganizationOverview} />
+          <Route path={`${match.path}/data`} component={OrganizationData} />
         </Switch>
       </BreadcrumbView>
     )
