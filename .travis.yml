@@ -123,6 +123,7 @@ script:
     set -e
     rm -rf doc/public
     mkdir doc/public
+    git fetch
     git --work-tree=doc/public checkout gh-pages .
     git reset .
     $MAGE docs:build
