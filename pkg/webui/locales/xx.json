@@ -148,6 +148,7 @@
   "console.views.login.index.welcome": "Xxxxxxx xx {stackConsole}",
   "console.views.login.index.login": "Xxx xxxx xx xx xxxxxx xx xx xxx xxxx xxxx",
   "console.views.login.index.loginWithStackAccount": "Xxxxx xxxx xxxx Xxx Xxxxxx Xxxxx Xxxxxxx",
+  "console.views.organization-data.organization-data.orgData": "Xxxxxxxxxxxx Xxxx",
   "console.views.overview.index.createApplication": "Xxxxxx xx xxxxxxxxxxx",
   "console.views.overview.index.createGateway": "Xxxxxxxx x xxxxxxx",
   "console.views.overview.index.gotoApplications": "Xx xx xxxxxxxxxxxx",
