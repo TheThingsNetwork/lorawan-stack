@@ -33,7 +33,7 @@ require (
 	github.com/TheThingsIndustries/mystique v0.0.0-20190516134627-66efd81c68ea
 	github.com/TheThingsIndustries/release-notes v0.1.0
 	github.com/TheThingsNetwork/go-cayenne-lib v1.0.0
-	github.com/aws/aws-sdk-go v1.23.0
+	github.com/aws/aws-sdk-go v1.23.13
 	github.com/blang/semver v0.0.0-20190414182527-1a9109f8c4a1
 	github.com/certifi/gocertifi v0.0.0-20190506164543-d2eda7129713 // indirect
 	github.com/client9/misspell v0.3.4
