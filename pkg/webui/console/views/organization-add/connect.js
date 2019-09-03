@@ -26,7 +26,7 @@ const mapDispatchToProps = dispatch => ({
     },
     dispatch,
   ),
-  createOrganizationSuccess: () => dispatch(push('/organizations')),
+  createOrganizationSuccess: id => dispatch(push(`/organizations/${id}`)),
 })
 
 export default Add =>

@@ -22,6 +22,7 @@ import PropTypes from '../../../lib/prop-types'
 import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import sharedMessages from '../../../lib/shared-messages'
+import { getOrganizationId } from '../../../lib/selectors/id'
 
 import style from './organization-add.styl'
 
@@ -48,8 +49,16 @@ class Add extends React.Component {
     this.setState({ error })
   }
 
+  @bind
+  handleSubmitSuccess(organization) {
+    const { createOrganizationSuccess } = this.props
+    const orgId = getOrganizationId(organization)
+
+    createOrganizationSuccess(orgId)
+  }
+
   render() {
-    const { createOrganization, createOrganizationSuccess } = this.props
+    const { createOrganization } = this.props
     const { error } = this.state
 
     return (
@@ -63,7 +72,7 @@ class Add extends React.Component {
             <OrganizationForm
               error={error}
               onSubmit={createOrganization}
-              onSubmitSuccess={createOrganizationSuccess}
+              onSubmitSuccess={this.handleSubmitSuccess}
               onSubmitFailure={this.handleSubmitFailure}
               initialValues={initialValues}
             />
