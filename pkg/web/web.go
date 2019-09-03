@@ -54,6 +54,8 @@ type options struct {
 	staticSearchPaths []string
 
 	contextFillers []fillcontext.Filler
+
+	redirectToHTTPS map[int]int
 }
 
 // Option for the web server
@@ -77,6 +79,16 @@ func WithCookieKeys(hashKey, blockKey []byte) Option {
 func WithStatic(mount string, searchPaths ...string) Option {
 	return func(o *options) {
 		o.staticMount, o.staticSearchPaths = mount, searchPaths
+	}
+}
+
+// WithRedirectToHTTPS redirects HTTP requests to HTTPS.
+func WithRedirectToHTTPS(from, to int) Option {
+	return func(o *options) {
+		if o.redirectToHTTPS == nil {
+			o.redirectToHTTPS = make(map[int]int)
+		}
+		o.redirectToHTTPS[from] = to
 	}
 }
 
@@ -123,6 +135,10 @@ func New(ctx context.Context, opts ...Option) (*Server, error) {
 		cookie.Cookies(blockKey, hashKey),
 		middleware.FillContext(options.contextFillers...),
 	)
+
+	if options.redirectToHTTPS != nil {
+		server.Use(middleware.RedirectToHTTPS(options.redirectToHTTPS))
+	}
 
 	s := &Server{
 		rootGroup: &rootGroup{
