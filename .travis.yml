@@ -124,8 +124,8 @@ script:
     rm -rf doc/public
     mkdir doc/public
     git fetch
-    git --work-tree=doc/public checkout gh-pages .
-    git reset .
+    git --work-tree=doc/public checkout origin/gh-pages -- .
+    git reset -- .
     $MAGE docs:build
   fi
 - make git.diff
