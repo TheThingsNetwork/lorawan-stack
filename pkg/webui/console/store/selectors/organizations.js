@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { GET_ORGS_LIST_BASE } from '../actions/organizations'
+import { GET_ORGS_LIST_BASE, GET_ORG_BASE } from '../actions/organizations'
 import {
   createPaginationIdsSelectorByEntity,
   createPaginationTotalCountSelectorByEntity,
@@ -31,6 +31,12 @@ const ENTITY = 'organizations'
 export const selectOrganizationStore = state => state.organizations
 export const selectOrganizationEntitiesStore = state => selectOrganizationStore(state).entities
 export const selectOrganizationById = (state, id) => selectOrganizationEntitiesStore(state)[id]
+export const selectSelectedOrganizationId = state =>
+  selectOrganizationStore(state).selectedOrganization
+export const selectSelectedOrganization = state =>
+  selectOrganizationById(state, selectSelectedOrganizationId(state))
+export const selectOrganizationFetching = createFetchingSelector(GET_ORG_BASE)
+export const selectOrganizationError = createErrorSelector(GET_ORG_BASE)
 
 // Organizations
 const selectOrgsIds = createPaginationIdsSelectorByEntity(ENTITY)
