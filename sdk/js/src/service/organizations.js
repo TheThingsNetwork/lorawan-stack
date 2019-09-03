@@ -55,6 +55,24 @@ class Organizations {
     return Marshaler.payloadSingleResponse(response)
   }
 
+  // Update
+
+  async updateById(id, patch, mask = Marshaler.fieldMaskFromPatch(patch)) {
+    const response = await this._api.OrganizationRegistry.Update(
+      {
+        routeParams: {
+          'organization.ids.organization_id': id,
+        },
+      },
+      {
+        organization: patch,
+        field_mask: Marshaler.fieldMask(mask),
+      },
+    )
+
+    return Marshaler.payloadSingleResponse(response)
+  }
+
   // Events Stream
 
   async openStream(identifiers, tail, after) {
