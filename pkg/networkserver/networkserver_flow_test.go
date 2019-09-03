@@ -28,6 +28,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	. "go.thethings.network/lorawan-stack/pkg/networkserver"
 	"go.thethings.network/lorawan-stack/pkg/networkserver/redis"
@@ -272,7 +273,6 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 			))
 			t.Logf("HandleUplink returned %v", err)
 			handleUplinkErrCh <- err
-			close(handleUplinkErrCh)
 		}()
 
 		defer time.AfterFunc((1<<3)*test.Delay, func() {
@@ -425,6 +425,7 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 			t.Error("Timed out while waiting for HandleUplink to return")
 			return
 		}
+		close(handleUplinkErrCh)
 
 		if !a.So(test.AssertClusterGetPeerRequest(ctx, getPeerCh,
 			func(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
@@ -564,24 +565,75 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 		}
 
 		handleUplinkErrCh := make(chan error)
-		go func() {
+		handleFirstUplink := func() {
 			_, err := gsns.HandleUplink(ctx, makeUplink(
 				mds[0],
 				"GsNs-1", "GsNs-2",
 			))
 			t.Logf("HandleUplink returned %v", err)
 			handleUplinkErrCh <- err
-			close(handleUplinkErrCh)
-		}()
-
-		defer time.AfterFunc((1<<3)*test.Delay, func() {
+		}
+		handleDuplicateUplink := func() {
 			_, err := gsns.HandleUplink(ctx, makeUplink(
 				mds[1],
 				"GsNs-1", "GsNs-3",
 			))
 			t.Logf("Duplicate HandleUplink returned %v", err)
 			handleUplinkErrCh <- err
-		}).Stop()
+		}
+
+		go handleFirstUplink()
+		defer time.AfterFunc((1<<3)*test.Delay, handleDuplicateUplink).Stop()
+
+		assertDuplicateHandleUplink := func() bool {
+			select {
+			case <-ctx.Done():
+				t.Error("Timed out while waiting for duplicate HandleUplink to return")
+				return false
+
+			case err := <-handleUplinkErrCh:
+				if !a.So(err, should.BeNil) {
+					t.Errorf("Failed to handle duplicate uplink: %s", err)
+					return false
+				}
+			}
+			return true
+		}
+
+		a.So(assertDuplicateHandleUplink(), should.BeTrue)
+
+		select {
+		case <-ctx.Done():
+			t.Error("Timed out while waiting for HandleUplink to return")
+			return
+
+		case err := <-handleUplinkErrCh:
+			if err != nil {
+				if !a.So(errors.IsNotFound(err), should.BeTrue) {
+					t.Errorf("HandleUplink failed with unexpected error: %v", err)
+					return
+				}
+				t.Log("Uplink handling failed with a not-found error. The join-accept was scheduled, but the new device state most probably had not been written to the registry on time, retry.")
+
+				go handleFirstUplink()
+				go handleDuplicateUplink()
+
+				a.So(assertDuplicateHandleUplink(), should.BeTrue)
+
+				select {
+				case <-ctx.Done():
+					t.Error("Timed out while waiting for HandleUplink to return")
+					return
+
+				case err = <-handleUplinkErrCh:
+				}
+			}
+			if !a.So(err, should.BeNil) {
+				t.Errorf("Failed to handle uplink: %s", err)
+				return
+			}
+		}
+		close(handleUplinkErrCh)
 
 		var asUp *ttnpb.ApplicationUp
 		var err error
@@ -637,18 +689,6 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 		}
 		if !a.So(err, should.BeNil) {
 			t.Errorf("Failed to send AS uplink response: %s", err)
-			return
-		}
-
-		select {
-		case err := <-handleUplinkErrCh:
-			if !a.So(err, should.BeNil) {
-				t.Errorf("Failed to handle uplink: %s", err)
-				return
-			}
-
-		case <-ctx.Done():
-			t.Error("Timed out while waiting for HandleUplink to return")
 			return
 		}
 
