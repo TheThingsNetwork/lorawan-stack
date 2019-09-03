@@ -571,6 +571,9 @@ func TestGatewayServer(t *testing.T) {
 			}
 		})
 
+		// Wait for gateway disconnection to be processed.
+		time.Sleep(timeout)
+
 		t.Run(fmt.Sprintf("Traffic/%v", ptc.Protocol), func(t *testing.T) {
 			a := assertions.New(t)
 
