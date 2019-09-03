@@ -73,6 +73,16 @@ class Organizations {
     return Marshaler.payloadSingleResponse(response)
   }
 
+  // Delete
+
+  async deleteById(organizationId) {
+    const response = await this._api.OrganizationRegistry.Delete({
+      routeParams: { organization_id: organizationId },
+    })
+
+    return Marshaler.payloadSingleResponse(response)
+  }
+
   // Events Stream
 
   async openStream(identifiers, tail, after) {
