@@ -837,17 +837,35 @@ func (ns *NetworkServer) recordDownlink(dev *ttnpb.EndDevice, genDown *generated
 	return nextDownlinkAt
 }
 
-func (ns *NetworkServer) attemptClassADownlink(ctx context.Context, dev *ttnpb.EndDevice, phy band.Band, fp *frequencyplans.FrequencyPlan, maxUpLength uint16, queuedApplicationUplinks []*ttnpb.ApplicationUp, queuedEvents []events.Event) ([]string, []*ttnpb.ApplicationUp, []events.Event, time.Time, bool) {
+type downlinkAttemptResult struct {
+	applicationUpAppender func([]*ttnpb.ApplicationUp, bool) []*ttnpb.ApplicationUp
+
+	SetPaths       []string
+	NextDownlinkAt time.Time
+	Scheduled      bool
+	QueuedEvents   []events.Event
+}
+
+func (res downlinkAttemptResult) AppendApplicationUplinks(ups ...*ttnpb.ApplicationUp) []*ttnpb.ApplicationUp {
+	if res.applicationUpAppender == nil {
+		return ups
+	}
+	return res.applicationUpAppender(ups, res.Scheduled)
+}
+
+func (ns *NetworkServer) attemptClassADownlink(ctx context.Context, dev *ttnpb.EndDevice, phy band.Band, fp *frequencyplans.FrequencyPlan, maxUpLength uint16) downlinkAttemptResult {
 	var sets []string
 	logger := log.FromContext(ctx)
 	if len(dev.RecentUplinks) == 0 {
 		logger.Warn("Rx windows available, but no uplink present, skip class A downlink slot")
 		dev.MACState.QueuedResponses = nil
 		dev.MACState.RxWindowsAvailable = false
-		return append(sets,
-			"mac_state.queued_responses",
-			"mac_state.rx_windows_available",
-		), queuedApplicationUplinks, queuedEvents, time.Time{}, false
+		return downlinkAttemptResult{
+			SetPaths: append(sets,
+				"mac_state.queued_responses",
+				"mac_state.rx_windows_available",
+			),
+		}
 	}
 
 	var rxDelay ttnpb.RxDelay
@@ -866,10 +884,12 @@ func (ns *NetworkServer) attemptClassADownlink(ctx context.Context, dev *ttnpb.E
 		logger.Warn("Last uplink is neither data uplink, nor rejoin-request, skip class A downlink slot")
 		dev.MACState.QueuedResponses = nil
 		dev.MACState.RxWindowsAvailable = false
-		return append(sets,
-			"mac_state.queued_responses",
-			"mac_state.rx_windows_available",
-		), queuedApplicationUplinks, queuedEvents, time.Time{}, false
+		return downlinkAttemptResult{
+			SetPaths: append(sets,
+				"mac_state.queued_responses",
+				"mac_state.rx_windows_available",
+			),
+		}
 	}
 	ctx = events.ContextWithCorrelationID(ctx, up.CorrelationIDs...)
 
@@ -878,24 +898,32 @@ func (ns *NetworkServer) attemptClassADownlink(ctx context.Context, dev *ttnpb.E
 		logger.Warn("Rx1 and Rx2 are expired, skip class A downlink slot")
 		dev.MACState.QueuedResponses = nil
 		dev.MACState.RxWindowsAvailable = false
-		return append(sets,
-			"mac_state.queued_responses",
-			"mac_state.rx_windows_available",
-		), queuedApplicationUplinks, queuedEvents, time.Time{}, false
+		return downlinkAttemptResult{
+			SetPaths: append(sets,
+				"mac_state.queued_responses",
+				"mac_state.rx_windows_available",
+			),
+		}
 	}
 	if len(paths) == 0 {
 		logger.Warn("No downlink path available, skip class A downlink slot")
-		return sets, queuedApplicationUplinks, queuedEvents, time.Time{}, false
+		return downlinkAttemptResult{
+			SetPaths: sets,
+		}
 	}
 	if dev.MACState.DeviceClass != ttnpb.CLASS_A && !rx1 && rx2 && len(dev.MACState.QueuedResponses) == 0 {
 		logger.Debug("Skip Rx2-only Class A downlink for non-class A device")
-		return sets, queuedApplicationUplinks, queuedEvents, time.Time{}, false
+		return downlinkAttemptResult{
+			SetPaths: sets,
+		}
 	}
 
 	req, err := txRequestFromUplink(phy, dev.MACState, rx1, rx2, rxDelay, up)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to generate Tx request from uplink, skip class A downlink slot")
-		return sets, queuedApplicationUplinks, queuedEvents, time.Time{}, false
+		return downlinkAttemptResult{
+			SetPaths: sets,
+		}
 	}
 
 	var maxDR ttnpb.DataRateIndex
@@ -933,7 +961,10 @@ func (ns *NetworkServer) attemptClassADownlink(ctx context.Context, dev *ttnpb.E
 		if genState.ApplicationDownlink != nil {
 			dev.QueuedApplicationDownlinks = append([]*ttnpb.ApplicationDownlink{genState.ApplicationDownlink}, dev.QueuedApplicationDownlinks...)
 		}
-		return sets, genState.appendApplicationUplinks(queuedApplicationUplinks, false), queuedEvents, time.Time{}, false
+		return downlinkAttemptResult{
+			SetPaths:              sets,
+			applicationUpAppender: genState.appendApplicationUplinks,
+		}
 	}
 
 	if rx1 && rx2 {
@@ -941,7 +972,10 @@ func (ns *NetworkServer) attemptClassADownlink(ctx context.Context, dev *ttnpb.E
 		rx2 = len(genDown.Payload) <= int(phy.DataRates[req.Rx2DataRateIndex].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()))
 		if !rx1 && !rx2 {
 			logger.Error("Generated downlink payload size does not fit neither Rx1, nor Rx2, skip class A downlink slot")
-			return sets, genState.appendApplicationUplinks(queuedApplicationUplinks, false), queuedEvents, time.Time{}, false
+			return downlinkAttemptResult{
+				SetPaths:              sets,
+				applicationUpAppender: genState.appendApplicationUplinks,
+			}
 		}
 		req, err = txRequestFromUplink(phy, dev.MACState, rx1, rx2, rxDelay, up)
 		if err != nil {
@@ -949,7 +983,10 @@ func (ns *NetworkServer) attemptClassADownlink(ctx context.Context, dev *ttnpb.E
 			if genState.ApplicationDownlink != nil {
 				dev.QueuedApplicationDownlinks = append([]*ttnpb.ApplicationDownlink{genState.ApplicationDownlink}, dev.QueuedApplicationDownlinks...)
 			}
-			return sets, genState.appendApplicationUplinks(queuedApplicationUplinks, false), queuedEvents, time.Time{}, false
+			return downlinkAttemptResult{
+				SetPaths:              sets,
+				applicationUpAppender: genState.appendApplicationUplinks,
+			}
 		}
 	}
 
@@ -974,18 +1011,23 @@ func (ns *NetworkServer) attemptClassADownlink(ctx context.Context, dev *ttnpb.E
 		if genState.ApplicationDownlink != nil {
 			dev.QueuedApplicationDownlinks = append([]*ttnpb.ApplicationDownlink{genState.ApplicationDownlink}, dev.QueuedApplicationDownlinks...)
 		}
-		return sets, genState.appendApplicationUplinks(queuedApplicationUplinks, false), queuedEvents, time.Time{}, false
+		return downlinkAttemptResult{
+			SetPaths:              sets,
+			applicationUpAppender: genState.appendApplicationUplinks,
+		}
 	}
-	return append(sets,
+	return downlinkAttemptResult{
+		SetPaths: append(sets,
 			"mac_state",
 			"queued_application_downlinks",
 			"recent_downlinks",
 			"session",
 		),
-		genState.appendApplicationUplinks(queuedApplicationUplinks, true),
-		append(queuedEvents, genState.Events...),
-		ns.recordDownlink(dev, genDown, genState, down),
-		true
+		applicationUpAppender: genState.appendApplicationUplinks,
+		QueuedEvents:          genState.Events,
+		NextDownlinkAt:        ns.recordDownlink(dev, genDown, genState, down),
+		Scheduled:             true,
+	}
 }
 
 // processDownlinkTask processes the most recent downlink task ready for execution, if such is available or wait until it is before processing it.
@@ -1129,9 +1171,14 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 
 				var sets []string
 				if dev.MACState.RxWindowsAvailable {
-					var ok bool
-					sets, queuedApplicationUplinks, queuedEvents, nextDownlinkAt, ok = ns.attemptClassADownlink(ctx, dev, phy, fp, maxUpLength, queuedApplicationUplinks, queuedEvents)
-					if ok {
+					a := ns.attemptClassADownlink(ctx, dev, phy, fp, maxUpLength)
+					sets = append(sets, a.SetPaths...)
+					queuedEvents = append(queuedEvents, a.QueuedEvents...)
+					queuedApplicationUplinks = a.AppendApplicationUplinks(queuedApplicationUplinks...)
+					if !a.NextDownlinkAt.IsZero() {
+						nextDownlinkAt = a.NextDownlinkAt
+					}
+					if a.Scheduled {
 						return dev, sets, nil
 					}
 				}
