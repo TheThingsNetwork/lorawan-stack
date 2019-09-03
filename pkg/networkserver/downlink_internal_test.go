@@ -3018,9 +3018,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					return false
 				}
 
-				if a.So(lastDown.CorrelationIDs, should.HaveLength, 5) {
-					a.So(lastDown.CorrelationIDs, should.Contain, "correlation-up-1")
-					a.So(lastDown.CorrelationIDs, should.Contain, "correlation-up-2")
+				if a.So(lastDown.CorrelationIDs, should.HaveLength, 3) {
 					a.So(lastDown.CorrelationIDs, should.Contain, "correlation-app-down-1")
 					a.So(lastDown.CorrelationIDs, should.Contain, "correlation-app-down-2")
 				}
@@ -3329,9 +3327,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					return false
 				}
 
-				if a.So(lastDown.CorrelationIDs, should.HaveLength, 5) {
-					a.So(lastDown.CorrelationIDs, should.Contain, "correlation-up-1")
-					a.So(lastDown.CorrelationIDs, should.Contain, "correlation-up-2")
+				if a.So(lastDown.CorrelationIDs, should.HaveLength, 3) {
 					a.So(lastDown.CorrelationIDs, should.Contain, "correlation-app-down-1")
 					a.So(lastDown.CorrelationIDs, should.Contain, "correlation-app-down-2")
 				}
@@ -3651,9 +3647,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					return false
 				}
 
-				if a.So(lastDown.CorrelationIDs, should.HaveLength, 5) {
-					a.So(lastDown.CorrelationIDs, should.Contain, "correlation-up-1")
-					a.So(lastDown.CorrelationIDs, should.Contain, "correlation-up-2")
+				if a.So(lastDown.CorrelationIDs, should.HaveLength, 3) {
 					a.So(lastDown.CorrelationIDs, should.Contain, "correlation-app-down-1")
 					a.So(lastDown.CorrelationIDs, should.Contain, "correlation-app-down-2")
 				}
@@ -3933,9 +3927,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					return false
 				}
 
-				if a.So(lastDown.CorrelationIDs, should.HaveLength, 5) {
-					a.So(lastDown.CorrelationIDs, should.Contain, "correlation-up-1")
-					a.So(lastDown.CorrelationIDs, should.Contain, "correlation-up-2")
+				if a.So(lastDown.CorrelationIDs, should.HaveLength, 3) {
 					a.So(lastDown.CorrelationIDs, should.Contain, "correlation-app-down-1")
 					a.So(lastDown.CorrelationIDs, should.Contain, "correlation-app-down-2")
 				}
