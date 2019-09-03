@@ -837,6 +837,157 @@ func (ns *NetworkServer) recordDownlink(dev *ttnpb.EndDevice, genDown *generated
 	return nextDownlinkAt
 }
 
+func (ns *NetworkServer) attemptClassADownlink(ctx context.Context, dev *ttnpb.EndDevice, phy band.Band, fp *frequencyplans.FrequencyPlan, maxUpLength uint16, queuedApplicationUplinks []*ttnpb.ApplicationUp, queuedEvents []events.Event) ([]string, []*ttnpb.ApplicationUp, []events.Event, time.Time, bool) {
+	var sets []string
+	logger := log.FromContext(ctx)
+	if len(dev.RecentUplinks) == 0 {
+		logger.Warn("Rx windows available, but no uplink present, skip class A downlink slot")
+		dev.MACState.QueuedResponses = nil
+		dev.MACState.RxWindowsAvailable = false
+		return append(sets,
+			"mac_state.queued_responses",
+			"mac_state.rx_windows_available",
+		), queuedApplicationUplinks, queuedEvents, time.Time{}, false
+	}
+
+	var rxDelay ttnpb.RxDelay
+	up := dev.RecentUplinks[len(dev.RecentUplinks)-1]
+	switch up.Payload.MHDR.MType {
+	case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:
+		rxDelay = dev.MACState.CurrentParameters.Rx1Delay
+		if rxDelay == ttnpb.RX_DELAY_0 {
+			rxDelay = ttnpb.RX_DELAY_1
+		}
+
+	case ttnpb.MType_REJOIN_REQUEST:
+		rxDelay = ttnpb.RxDelay(phy.JoinAcceptDelay1 / time.Second)
+
+	default:
+		logger.Warn("Last uplink is neither data uplink, nor rejoin-request, skip class A downlink slot")
+		dev.MACState.QueuedResponses = nil
+		dev.MACState.RxWindowsAvailable = false
+		return append(sets,
+			"mac_state.queued_responses",
+			"mac_state.rx_windows_available",
+		), queuedApplicationUplinks, queuedEvents, time.Time{}, false
+	}
+	ctx = events.ContextWithCorrelationID(ctx, up.CorrelationIDs...)
+
+	rx1, rx2, paths := downlinkPathsForClassA(rxDelay, dev.RecentUplinks...)
+	if !rx1 && !rx2 {
+		logger.Warn("Rx1 and Rx2 are expired, skip class A downlink slot")
+		dev.MACState.QueuedResponses = nil
+		dev.MACState.RxWindowsAvailable = false
+		return append(sets,
+			"mac_state.queued_responses",
+			"mac_state.rx_windows_available",
+		), queuedApplicationUplinks, queuedEvents, time.Time{}, false
+	}
+	if len(paths) == 0 {
+		logger.Warn("No downlink path available, skip class A downlink slot")
+		return sets, queuedApplicationUplinks, queuedEvents, time.Time{}, false
+	}
+	if dev.MACState.DeviceClass != ttnpb.CLASS_A && !rx1 && rx2 && len(dev.MACState.QueuedResponses) == 0 {
+		logger.Debug("Skip Rx2-only Class A downlink for non-class A device")
+		return sets, queuedApplicationUplinks, queuedEvents, time.Time{}, false
+	}
+
+	req, err := txRequestFromUplink(phy, dev.MACState, rx1, rx2, rxDelay, up)
+	if err != nil {
+		logger.WithError(err).Warn("Failed to generate Tx request from uplink, skip class A downlink slot")
+		return sets, queuedApplicationUplinks, queuedEvents, time.Time{}, false
+	}
+
+	var maxDR ttnpb.DataRateIndex
+	switch {
+	case rx1 && rx2:
+		maxDR = req.Rx1DataRateIndex
+		if req.Rx2DataRateIndex > maxDR {
+			maxDR = req.Rx2DataRateIndex
+		}
+
+	case rx1:
+		maxDR = req.Rx1DataRateIndex
+
+	case rx2:
+		maxDR = req.Rx2DataRateIndex
+	}
+
+	genDown, genState, err := ns.generateDownlink(ctx, dev, phy, ttnpb.CLASS_A,
+		phy.DataRates[maxDR].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
+		maxUpLength,
+	)
+	if genState.NeedsDownlinkQueueUpdate {
+		sets = append(sets,
+			"queued_application_downlinks",
+		)
+	}
+	if err != nil {
+		switch {
+		case errors.Resemble(err, errNoDownlink):
+			logger.Debug("No class A downlink to send, skip class A downlink slot")
+
+		default:
+			logger.WithError(err).Warn("Failed to generate class A downlink, skip class A downlink slot")
+		}
+		if genState.ApplicationDownlink != nil {
+			dev.QueuedApplicationDownlinks = append([]*ttnpb.ApplicationDownlink{genState.ApplicationDownlink}, dev.QueuedApplicationDownlinks...)
+		}
+		return sets, genState.appendApplicationUplinks(queuedApplicationUplinks, false), queuedEvents, time.Time{}, false
+	}
+
+	if rx1 && rx2 {
+		rx1 = len(genDown.Payload) <= int(phy.DataRates[req.Rx1DataRateIndex].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()))
+		rx2 = len(genDown.Payload) <= int(phy.DataRates[req.Rx2DataRateIndex].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()))
+		if !rx1 && !rx2 {
+			logger.Error("Generated downlink payload size does not fit neither Rx1, nor Rx2, skip class A downlink slot")
+			return sets, genState.appendApplicationUplinks(queuedApplicationUplinks, false), queuedEvents, time.Time{}, false
+		}
+		req, err = txRequestFromUplink(phy, dev.MACState, rx1, rx2, rxDelay, up)
+		if err != nil {
+			logger.WithError(err).Warn("Failed to generate Tx request from uplink, skip class A downlink slot")
+			if genState.ApplicationDownlink != nil {
+				dev.QueuedApplicationDownlinks = append([]*ttnpb.ApplicationDownlink{genState.ApplicationDownlink}, dev.QueuedApplicationDownlinks...)
+			}
+			return sets, genState.appendApplicationUplinks(queuedApplicationUplinks, false), queuedEvents, time.Time{}, false
+		}
+	}
+
+	if genState.ApplicationDownlink != nil {
+		ctx = events.ContextWithCorrelationID(ctx, genState.ApplicationDownlink.CorrelationIDs...)
+	}
+	req.Priority = genDown.Priority
+
+	down, err := ns.scheduleDownlinkByPaths(
+		log.NewContext(ctx, loggerWithTxRequestFields(logger, req, rx1, rx2).WithField("rx1_delay", req.Rx1Delay)),
+		req,
+		genDown.Payload,
+		paths...,
+	)
+	if err != nil {
+		if schedErr, ok := err.(downlinkSchedulingError); ok {
+			logger = loggerWithDownlinkSchedulingErrorFields(logger, schedErr)
+		} else {
+			logger = logger.WithError(err)
+		}
+		logger.Warn("All Gateway Servers failed to schedule downlink, skip class A downlink slot")
+		if genState.ApplicationDownlink != nil {
+			dev.QueuedApplicationDownlinks = append([]*ttnpb.ApplicationDownlink{genState.ApplicationDownlink}, dev.QueuedApplicationDownlinks...)
+		}
+		return sets, genState.appendApplicationUplinks(queuedApplicationUplinks, false), queuedEvents, time.Time{}, false
+	}
+	return append(sets,
+			"mac_state",
+			"queued_application_downlinks",
+			"recent_downlinks",
+			"session",
+		),
+		genState.appendApplicationUplinks(queuedApplicationUplinks, true),
+		append(queuedEvents, genState.Events...),
+		ns.recordDownlink(dev, genDown, genState, down),
+		true
+}
+
 // processDownlinkTask processes the most recent downlink task ready for execution, if such is available or wait until it is before processing it.
 // NOTE: ctx.Done() is not guaranteed to be respected by processDownlinkTask.
 func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
@@ -901,7 +1052,6 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 
 					rxDelay := ttnpb.RxDelay(phy.JoinAcceptDelay1 / time.Second)
 
-					// Join-accept downlink for Class A/B/C device in Rx1/Rx2
 					rx1, rx2, paths := downlinkPathsForClassA(rxDelay, dev.RecentUplinks...)
 					if !rx1 && !rx2 {
 						logger.Warn("Rx1 and Rx2 are expired, skip downlink slot")
@@ -978,162 +1128,15 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 				}
 
 				var sets []string
-			outer:
-				for dev.MACState.RxWindowsAvailable {
-					if len(dev.RecentUplinks) == 0 {
-						logger.Warn("Rx windows available, but no uplink present, skip class A downlink slot")
-						dev.MACState.QueuedResponses = nil
-						dev.MACState.RxWindowsAvailable = false
-						sets = append(sets,
-							"mac_state.queued_responses",
-							"mac_state.rx_windows_available",
-						)
-						break
+				if dev.MACState.RxWindowsAvailable {
+					var ok bool
+					sets, queuedApplicationUplinks, queuedEvents, nextDownlinkAt, ok = ns.attemptClassADownlink(ctx, dev, phy, fp, maxUpLength, queuedApplicationUplinks, queuedEvents)
+					if ok {
+						return dev, sets, nil
 					}
-
-					var rxDelay ttnpb.RxDelay
-					up := dev.RecentUplinks[len(dev.RecentUplinks)-1]
-					switch up.Payload.MHDR.MType {
-					case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:
-						rxDelay = dev.MACState.CurrentParameters.Rx1Delay
-						if rxDelay == ttnpb.RX_DELAY_0 {
-							rxDelay = ttnpb.RX_DELAY_1
-						}
-
-					case ttnpb.MType_REJOIN_REQUEST:
-						rxDelay = ttnpb.RxDelay(phy.JoinAcceptDelay1 / time.Second)
-
-					default:
-						logger.Warn("Last uplink is neither data uplink, nor rejoin-request, skip class A downlink slot")
-						dev.MACState.QueuedResponses = nil
-						dev.MACState.RxWindowsAvailable = false
-						sets = append(sets,
-							"mac_state.queued_responses",
-							"mac_state.rx_windows_available",
-						)
-						break outer
-					}
-					ctx = events.ContextWithCorrelationID(ctx, up.CorrelationIDs...)
-
-					rx1, rx2, paths := downlinkPathsForClassA(rxDelay, dev.RecentUplinks...)
-					if !rx1 && !rx2 {
-						logger.Warn("Rx1 and Rx2 are expired, skip class A downlink slot")
-						dev.MACState.QueuedResponses = nil
-						dev.MACState.RxWindowsAvailable = false
-						sets = append(sets,
-							"mac_state.queued_responses",
-							"mac_state.rx_windows_available",
-						)
-						break
-					}
-					if len(paths) == 0 {
-						logger.Warn("No downlink path available, skip class A downlink slot")
-						break
-					}
-					if dev.MACState.DeviceClass != ttnpb.CLASS_A && !rx1 && rx2 && len(dev.MACState.QueuedResponses) == 0 {
-						break
-					}
-
-					req, err := txRequestFromUplink(phy, dev.MACState, rx1, rx2, rxDelay, up)
-					if err != nil {
-						logger.WithError(err).Warn("Failed to generate Tx request from uplink, skip class A downlink slot")
-						break
-					}
-
-					var maxDR ttnpb.DataRateIndex
-					switch {
-					case rx1 && rx2:
-						maxDR = req.Rx1DataRateIndex
-						if req.Rx2DataRateIndex > maxDR {
-							maxDR = req.Rx2DataRateIndex
-						}
-
-					case rx1:
-						maxDR = req.Rx1DataRateIndex
-
-					case rx2:
-						maxDR = req.Rx2DataRateIndex
-					}
-
-					genDown, genState, err := ns.generateDownlink(ctx, dev, phy, ttnpb.CLASS_A,
-						phy.DataRates[maxDR].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
-						maxUpLength,
-					)
-					if genState.NeedsDownlinkQueueUpdate {
-						sets = append(sets,
-							"queued_application_downlinks",
-						)
-					}
-					if err != nil {
-						switch {
-						case errors.Resemble(err, errNoDownlink):
-							logger.Debug("No class A downlink to send, skip class A downlink slot")
-
-						default:
-							logger.WithError(err).Warn("Failed to generate class A downlink, skip class A downlink slot")
-						}
-						queuedApplicationUplinks = genState.appendApplicationUplinks(queuedApplicationUplinks, false)
-						if genState.ApplicationDownlink != nil {
-							dev.QueuedApplicationDownlinks = append([]*ttnpb.ApplicationDownlink{genState.ApplicationDownlink}, dev.QueuedApplicationDownlinks...)
-						}
-						break
-					}
-
-					if rx1 && rx2 {
-						rx1 = len(genDown.Payload) <= int(phy.DataRates[req.Rx1DataRateIndex].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()))
-						rx2 = len(genDown.Payload) <= int(phy.DataRates[req.Rx2DataRateIndex].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()))
-						if !rx1 && !rx2 {
-							logger.Error("Generated downlink payload size does not fit neither Rx1, nor Rx2, skip class A downlink slot")
-							break
-						}
-						req, err = txRequestFromUplink(phy, dev.MACState, rx1, rx2, rxDelay, up)
-						if err != nil {
-							logger.WithError(err).Warn("Failed to generate Tx request from uplink, skip class A downlink slot")
-							queuedApplicationUplinks = genState.appendApplicationUplinks(queuedApplicationUplinks, false)
-							if genState.ApplicationDownlink != nil {
-								dev.QueuedApplicationDownlinks = append([]*ttnpb.ApplicationDownlink{genState.ApplicationDownlink}, dev.QueuedApplicationDownlinks...)
-							}
-							break
-						}
-					}
-
-					if genState.ApplicationDownlink != nil {
-						ctx = events.ContextWithCorrelationID(ctx, genState.ApplicationDownlink.CorrelationIDs...)
-					}
-					req.Priority = genDown.Priority
-
-					down, err := ns.scheduleDownlinkByPaths(
-						log.NewContext(ctx, loggerWithTxRequestFields(logger, req, rx1, rx2).WithField("rx1_delay", req.Rx1Delay)),
-						req,
-						genDown.Payload,
-						paths...,
-					)
-					if err != nil {
-						if schedErr, ok := err.(downlinkSchedulingError); ok {
-							logger = loggerWithDownlinkSchedulingErrorFields(logger, schedErr)
-						} else {
-							logger = logger.WithError(err)
-						}
-						logger.Warn("All Gateway Servers failed to schedule downlink, skip class A downlink slot")
-						queuedApplicationUplinks = genState.appendApplicationUplinks(queuedApplicationUplinks, false)
-						if genState.ApplicationDownlink != nil {
-							dev.QueuedApplicationDownlinks = append([]*ttnpb.ApplicationDownlink{genState.ApplicationDownlink}, dev.QueuedApplicationDownlinks...)
-						}
-						break
-					}
-
-					if t := ns.recordDownlink(dev, genDown, genState, down); !t.IsZero() {
-						nextDownlinkAt = t
-					}
-					queuedApplicationUplinks = genState.appendApplicationUplinks(queuedApplicationUplinks, true)
-					queuedEvents = append(queuedEvents, genState.Events...)
-					return dev, append(sets,
-						"mac_state",
-						"queued_application_downlinks",
-						"recent_downlinks",
-						"session",
-					), nil
 				}
+
+				ctx = log.NewContext(ctx, logger)
 
 				switch dev.MACState.DeviceClass {
 				case ttnpb.CLASS_A:
