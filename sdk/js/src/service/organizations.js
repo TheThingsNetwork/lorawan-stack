@@ -54,6 +54,20 @@ class Organizations {
 
     return Marshaler.payloadSingleResponse(response)
   }
+
+  // Events Stream
+
+  async openStream(identifiers, tail, after) {
+    const payload = {
+      identifiers: identifiers.map(id => ({
+        organization_ids: { organization_id: id },
+      })),
+      tail,
+      after,
+    }
+
+    return this._api.Events.Stream(undefined, payload)
+  }
 }
 
 export default Organizations
